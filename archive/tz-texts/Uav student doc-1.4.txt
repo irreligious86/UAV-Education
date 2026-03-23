@@ -1,0 +1,209 @@
+﻿Ну вот, добрались до этапа, где люди обычно ломаются. Потому что “поставить конфигуратор” звучит просто, пока не начинаешь разбираться, почему их четыре, и каждый живёт в своей вселенной.
+Держи Блок 4 — Этап 1 (инструменты, simulation, среда разработки). Всё в формате страниц для сайта + чеклистов.
+Блок 4. Этап 1 — Инструменты, Simulation и рабочая среда
+Страница: resources/week-5-toolchain
+Неделя 5. Инструменты и экосистема
+Цель недели
+Перестать метаться между программами и понять:
+какой инструмент для чего
+когда использовать что
+и почему “я открыл не тот софт” — это классическая причина тупняка
+1. Что изучаем
+Основные категории инструментов
+Конфигураторы (для настройки)
+Betaflight App / Configurator
+INAV Configurator
+Ground Control Station (GCS)
+Mission Planner
+QGroundControl
+Dev / вспомогательные
+Blackbox Explorer
+VS Code
+Git
+Python
+2. Кто за что отвечает
+Betaflight
+используется свой App
+настройка полностью через GUI + CLI
+нет полноценной GCS как у ArduPilot/PX4
+👉 Документация:
+https://betaflight.com/docs/wiki/app⁠�
+INAV
+Configurator похож на Betaflight
+но есть навигация и миссии
+👉 Репозиторий:
+https://github.com/iNavFlight/inav⁠�
+ArduPilot
+Mission Planner (Windows)
+QGroundControl (кроссплатформенный)
+MAVProxy
+👉 Dev site:
+https://ardupilot.org/dev/⁠�
+PX4
+основной инструмент — QGroundControl
+сильная связка с dev tools
+👉 Docs:
+https://docs.px4.io⁠�
+3. Практика
+Задание 1. Установить всё
+Список:
+Betaflight App
+INAV Configurator
+Mission Planner
+QGroundControl
+Blackbox Explorer
+VS Code
+Задание 2. Сделать таблицу
+Markdown
+| Инструмент | Для чего | Для какой прошивки |
+|-----------|--------|-------------------|
+| Betaflight App | настройка | Betaflight |
+| INAV Configurator | настройка | INAV |
+| Mission Planner | GCS | ArduPilot |
+| QGroundControl | GCS | PX4 / ArduPilot |
+Задание 3. Подключить FC
+Проверить:
+определяется ли COM порт
+подключается ли конфигуратор
+читаются ли параметры
+4. Типовые ошибки
+открыть Betaflight для INAV (да, люди делают это)
+путать GCS и configurator
+не установить драйвера
+не понимать, какой порт выбран
+5. Мини-проект
+Сделай страницу:
+resources/software-toolchain
+С описанием:
+каждого инструмента
+зачем он нужен
+когда использовать
+6. Что добавить на сайт
+resources/software-toolchain
+resources/install-guide
+Страница: fundamentals/week-6-simulation
+Неделя 6. Simulation (SITL)
+Цель недели
+Перестать тестировать всё на реальном дроне как человек, который:
+“ну я просто проверю… ой, а где мой пропеллер?”
+1. Что изучаем
+Что такое SITL
+Software In The Loop
+Это когда:
+прошивка работает
+но вместо реального железа — симуляция
+Где используется
+PX4 → основной инструмент разработки
+ArduPilot → dev/testing
+Betaflight → есть SITL
+INAV → ограниченно
+👉 PX4 Simulation:
+https://docs.px4.io/main/en/simulation/⁠�
+👉 Betaflight SITL:
+https://betaflight.com/docs/development/SITL⁠�
+2. Что можно тестировать
+arm/disarm
+переключение режимов
+failsafe
+миссии
+GPS поведение
+логика
+3. Практика
+Задание 1. Поднять симуляцию
+Минимум:
+PX4 или Betaflight SITL
+Задание 2. Подключить GCS
+Проверить:
+отображается дрон
+меняются режимы
+есть телеметрия
+Задание 3. Прогнать сценарии
+arm
+смена режима
+RTL
+потеря сигнала
+4. Типовые ошибки
+думать, что симуляция = реальный мир
+игнорировать задержки
+не проверять edge cases
+5. Мини-проект
+Создать документ:
+“Что можно и нельзя тестировать в симуляции”
+6. Что добавить на сайт
+fundamentals/simulation
+fundamentals/simulation-scenarios
+Страница: roadmap/week-7-dev-environment
+Неделя 7. Среда разработки и репозитории
+Цель недели
+Перестать хранить всё в голове и называть файлы:
+final_real_last_v2_THIS_ONE_OK
+1. Что изучаем
+Git и структура проектов
+где код прошивки
+где документация
+где release notes
+как читать changelog
+Основные репозитории
+ArduPilot
+PX4
+Betaflight
+INAV
+2. Dev environment
+Минимальный стек
+Git
+VS Code
+Python
+Linux / WSL
+PX4 и ArduPilot официально рекомендуют dev environment с Linux/WSL и IDE (VS Code).
+https://docs.px4.io/main/en/dev_setup/dev_env⁠�
+3. Практика
+Задание 1. Создать структуру проекта
+Plain text
+drone-firmware-academy/
+  notes/
+  configs/
+  logs/
+  scripts/
+  diagrams/
+  website/
+Задание 2. Инициализировать git
+Bash
+git init
+git add .
+git commit -m "init: learning structure"
+Задание 3. Разобрать один репозиторий
+Например:
+открыть PX4 или ArduPilot
+найти:
+docs
+modules
+параметры
+4. Типовые ошибки
+не использовать git
+не читать release notes
+копировать настройки без понимания
+5. Мини-проект
+Создать страницу:
+roadmap/knowledge-base-setup
+С описанием:
+структуры папок
+правил хранения
+naming convention
+6. Что добавить на сайт
+roadmap/dev-environment
+roadmap/git-workflow
+Итог Этапа 1
+После этого этапа ты:
+понимаешь все инструменты
+не путаешь конфигуратор и GCS
+умеешь работать с симуляцией
+имеешь структуру знаний
+используешь git (наконец-то как взрослый человек)
+Что дальше
+Следующий логичный шаг:
+👉 Блок 5 — Betaflight (глубокий разбор с практикой, CLI, Blackbox, тюнингом)
+И вот там уже начнётся настоящее веселье:
+моторы будут орать
+логи будут говорить правду
+а ты впервые увидишь, как дрон “думает”
+Готовься 🙂

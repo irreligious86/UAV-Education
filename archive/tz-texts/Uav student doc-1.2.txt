@@ -1,0 +1,553 @@
+﻿Идём дальше. Ниже Блок 2 в формате, который уже можно складывать в будущий сайт как отдельную страницу roadmap/stages-and-weeks.
+Блок 2. Дорожная карта обучения по этапам и неделям
+Страница: roadmap/stages-and-weeks
+Дорожная карта обучения: этапы, недели, контрольные точки
+Зачем нужен этот раздел
+Эта дорожная карта нужна, чтобы обучение не превратилось в унылый ритуал “сегодня я снова открыл конфигуратор и снова не понимаю, что именно изучаю”.
+Мы строим программу по этапам, где каждый этап даёт:
+понятную цель,
+набор тем,
+практику,
+контрольный результат,
+материалы для будущего сайта.
+Программа опирается на реальные сильные стороны стеков:
+ArduPilot как большой open-source autopilot stack с dev-разделом, сборкой, Lua, companion computers и поддержкой разных типов платформ, PX4 как модульную платформу с simulation и ROS 2, Betaflight как систему с Blackbox, CLI и custom builds, INAV как навигационный стек с Programming Framework. �
+ArduPilot.org + 4
+1. Общая длительность программы
+Базовый вариант
+32 недели
+Это нормальный длинный трек без спешки, чтобы не просто “прочитать”, а реально пройти руками.
+Сжатый вариант
+20-24 недели
+Подходит, если ты уже хорошо понимаешь железо, UART, сенсоры, ESC, GPS и не путаешь FC с магией.
+Продвинутый вариант
+40+ недель
+Если хочешь довести всё до уровня собственной базы знаний, сайта, заметок, схем, скриптов и экспериментов с исходниками.
+2. Логика последовательности
+Мы идём в таком порядке:
+Этап 0. Общий фундамент
+Этап 1. Инструменты, симуляция, логирование
+Этап 2. Betaflight
+Этап 3. INAV
+Этап 4. ArduPilot
+Этап 5. PX4
+Этап 6. Companion computer и внешние микроконтроллеры
+Этап 7. Кастомизация, исходники, capstone-проекты
+Почему именно так:
+Betaflight хорошо учит базовой дисциплине мультикоптера, low-level тюну, CLI и разбору полёта через Blackbox. �
+Betaflight
+INAV удобно вводит в навигацию и программируемую логику без тяжёлого входа в большие flight stacks. �
+GitHub
+ArduPilot логично изучать после этого, когда уже есть база по мультикоптерам и навигации, потому что там широкий стек: Copter, Plane, Lua, MAVLink, companion computers, сборка кода. �
+ArduPilot.org + 1
+PX4 лучше брать после базового опыта, потому что там сильный акцент на архитектуру, simulation, ROS 2 и модульную разработку. �
+PX4 Документація + 1
+3. Метод прохождения каждой недели
+Каждая учебная неделя строится по одной схеме:
+День 1
+Изучение концепции
+Что это за подсистема, зачем она нужна, в каких прошивках реализована.
+День 2
+Разбор внутренней логики
+Как это работает внутри прошивки, какие параметры и ограничения есть.
+День 3
+Практика на конфигураторе / CLI / GCS
+Настройка, подключение, проверка.
+День 4
+Диагностика
+Типовые ошибки, симптомы, что смотреть в логах.
+День 5
+Мини-проект
+Небольшое практическое задание.
+День 6
+Оформление в базу знаний
+Из этой недели должна рождаться страница для сайта:
+заметка,
+чеклист,
+схема,
+список параметров,
+mini how-to.
+День 7
+Ревизия
+Что понял, что не понял, что надо перепройти.
+4. Формат результата по каждой неделе
+В конце каждой недели у тебя должно появиться 4 артефакта:
+Краткая заметка
+Чеклист действий
+Список параметров / команд / вкладок
+Черновик страницы для сайта
+Минимальный шаблон страницы:
+Markdown
+# Тема
+
+
+## Что это
+## Зачем нужно
+## Где используется
+## Как настраивать
+## Типовые ошибки
+## Практика
+## Источники
+5. Этапы по неделям
+Этап 0. Общий фундамент
+Длительность: 4 недели
+Неделя 1. Архитектура полётного контроллера
+Темы:
+MCU
+UART / SPI / I2C
+timer resources
+motor outputs
+sensor buses
+flash / RAM ограничения
+Практика:
+разобрать pinout своей FC
+составить таблицу UART
+отметить, что уже занято и что свободно
+Результат:
+страница fundamentals/fc-architecture
+таблица портов для своего аппарата
+Неделя 2. Сенсоры и исполнительные устройства
+Темы:
+gyro
+accel
+compass
+barometer
+GPS
+rangefinder
+current sensor
+ESC
+servo outputs
+Практика:
+составить карту всех датчиков своего аппарата
+подписать, какой датчик для чего нужен
+определить, какие датчики критичны для каких режимов
+Результат:
+страница fundamentals/sensors-and-actuators
+Неделя 3. Режимы полёта и failsafe
+Темы:
+acro / stabilize / angle
+altitude hold
+position hold
+loiter
+RTL
+mission / auto
+failsafe philosophy
+Практика:
+составить сравнительную таблицу режимов:
+для Betaflight
+INAV
+ArduPilot
+PX4
+Результат:
+страница fundamentals/flight-modes-and-failsafe
+Неделя 4. Логи, тюнинг, журнал изменений
+Темы:
+зачем нужны логи
+почему нельзя тюнить вслепую
+Blackbox / ulog / ArduPilot logs
+backup discipline
+diff / params export / config snapshots
+Betaflight официально использует Blackbox как встроенный flight data recorder для low-level анализа полёта, а PX4 и ArduPilot поддерживают полноценные dev и test workflows с simulation, logs и debugging. �
+Betaflight + 2
+Практика:
+создать шаблон журнала изменений для каждого аппарата
+создать шаблон backup-конфигурации
+Результат:
+страница fundamentals/logs-and-change-discipline
+Этап 1. Инструменты, simulation и безопасная среда
+Длительность: 3 недели
+Неделя 5. Ground station и configurator stack
+Темы:
+Betaflight App / Configurator
+INAV Configurator
+Mission Planner
+QGroundControl
+когда что использовать
+ArduPilot dev site отдельно перечисляет Mission Planner, MAVProxy и QGroundControl как части экосистемы, PX4 опирается на свой guide и QGroundControl workflow, Betaflight работает через собственный app/configurator. �
+ArduPilot.org + 2
+Практика:
+установить весь софт
+завести папку tooling/
+сделать страницу с кратким описанием каждой программы
+Результат:
+страница resources/software-toolchain
+Неделя 6. Simulation
+Темы:
+что такое SITL
+зачем он нужен
+что можно тестировать без железа
+ограничения симуляции
+PX4 имеет отдельный большой раздел по simulation, Betaflight поддерживает SITL, а ArduPilot в dev-site выносит simulation and testing как отдельный блок для разработки. �
+PX4 Документація + 2
+Практика:
+поднять минимум одну симуляцию
+подключить GCS
+проверить arm, mode switch, basic mission
+Результат:
+страница fundamentals/simulation-basics
+Неделя 7. Репозитории, исходники, dev-окружение
+Темы:
+Git-структура проектов
+где docs, где code, где release notes
+как читать changelog
+как вести свои ветки заметок и кода
+ArduPilot dev-site документирует git workflow, building the code и editors/IDEs, PX4 guide аналогично ведёт через dev setup и architecture, Betaflight имеет отдельный development section и custom build docs. �
+ArduPilot.org + 2
+Практика:
+создать локальный каталог курса
+сделать репозиторий заметок
+разложить структуру папок будущего сайта
+Результат:
+страница roadmap/repository-and-knowledge-base-setup
+Этап 2. Betaflight
+Длительность: 5 недель
+Неделя 8. Базовая настройка Betaflight
+Темы:
+прошивка target
+ports
+receiver
+modes
+motors
+OSD
+profiles
+Неделя 9. CLI и backup discipline
+Темы:
+diff
+dump
+get
+set
+save
+безопасные миграции
+presets
+Неделя 10. Фильтры и PID-логика
+Темы:
+PID
+feedforward
+dynamic notch
+RPM filtering
+dynamic idle
+Неделя 11. Blackbox
+Темы:
+что писать в лог
+как читать графики
+как видеть пропвош, осцилляции, шум, моторные проблемы
+Betaflight Blackbox официально предназначен для записи полётных данных и анализа control loop, sensor data и motor outputs. �
+Betaflight
+Неделя 12. Custom builds и remapping
+Темы:
+resource remapping
+custom firmware build
+ограничения памяти FC
+перенос конфигов
+Результат этапа:
+5 страниц для сайта
+один полностью настроенный квадро-профиль
+один чеклист “Betaflight с нуля”
+Этап 3. INAV
+Длительность: 5 недель
+Неделя 13. Базовая архитектура INAV
+Темы:
+отличие от Betaflight
+где INAV сильнее
+навигационные режимы
+GPS-first thinking
+Неделя 14. INAV для квадро
+Темы:
+GPS rescue
+position hold
+navigation basics
+failsafe under navigation logic
+Неделя 15. INAV для крыла
+Темы:
+launch assist
+cruise
+return to home
+servo setup
+wing geometry
+Неделя 16. Programming Framework
+Темы:
+logic conditions
+global variables
+programmable behavior
+связь с flight logic
+Неделя 17. JavaScript logic layer и практическая логика
+Темы:
+JS-подход поверх framework
+автоматизация поведения
+логика по условиям
+INAV Programming Framework официально включает logic conditions, global variables и программируемую логику, а документация репозитория описывает эту систему как основу пользовательского поведения. �
+GitHub
+Результат этапа:
+5 страниц для сайта
+один nav-квадро профиль
+один wing-профиль
+один пример пользовательской логики
+Этап 4. ArduPilot
+Длительность: 6 недель
+Неделя 18. Архитектура ArduPilot
+Темы:
+Copter / Plane
+parameter ecosystem
+Mission Planner
+MAVProxy
+ecosystem map
+Неделя 19. ArduPilot Copter
+Темы:
+frame class
+GPS
+EKF basics
+RTL
+Loiter
+Auto mission
+Неделя 20. ArduPilot для октокоптера
+Темы:
+X8 / coaxial layouts
+output mapping
+heavy-lift особенности
+vibration and power monitoring
+Неделя 21. ArduPilot Plane
+Темы:
+fixed wing basics
+modes
+RTL
+auto mission
+servo behavior
+Неделя 22. Lua scripting
+Темы:
+как включить Lua
+структура скрипта
+параметры
+реакции по событиям
+applets
+ArduPilot официально поддерживает Lua scripts в sandbox-среде, со скриптами на SD-карте и доступом к параметрам и логике поведения. �
+ArduPilot.org
+Неделя 23. Companion computer и MAVLink
+Темы:
+Raspberry Pi
+serial/MAVLink
+telemetry
+pymavlink / MAVProxy basics
+внешняя логика
+ArduPilot dev site прямо выделяет Companion Computers, MAVLink Interface, ROS1/ROS2 и AP_Peripheral Devices как отдельные направления разработки и интеграции. �
+ArduPilot.org
+Результат этапа:
+6 страниц для сайта
+профиль квадро на ArduPilot
+схема для окто
+один Lua-скрипт
+один companion-computer mini how-to
+Этап 5. PX4
+Длительность: 6 недель
+Неделя 24. Архитектура PX4
+Темы:
+modules
+uORB
+parameters
+work queues
+общая структура flight stack
+Неделя 25. PX4 для мультикоптера
+Темы:
+sensors
+modes
+actuator config
+basic tuning
+Неделя 26. PX4 для окто и control allocation
+Темы:
+geometry
+actuator assignment
+control allocation
+отличие от legacy mixing
+PX4 docs отдельно выделяют system architecture, actuator configuration и control allocation как ключевые части современной настройки платформы. �
+PX4 Документація + 1
+Неделя 27. PX4 для крыла
+Темы:
+airframe config
+actuators
+mission behavior
+wing-specific tuning logic
+Неделя 28. ROS 2 и companion computer
+Темы:
+ROS 2 basics
+bridge concepts
+offboard logic
+external modes
+px4_msgs
+PX4 имеет отдельный ROS 2 User Guide и поддерживает внешнюю интеграцию через современный middleware stack для взаимодействия с companion computers. �
+PX4 Документація
+Неделя 29. Свой модуль PX4
+Темы:
+build environment
+module template
+pub/sub logic
+минимальный собственный модуль
+Результат этапа:
+6 страниц для сайта
+один PX4 multicopter setup note
+один control allocation cheat sheet
+один ROS 2 integration note
+один skeleton custom module guide
+Этап 6. Интеграция: companion computer, микроконтроллеры, периферия
+Длительность: 4 недели
+Неделя 30. Raspberry Pi / Linux onboard
+Темы:
+serial links
+telemetry
+MAVLink routing
+logging
+scripts onboard
+Неделя 31. ESP32 / STM32 как периферийные узлы
+Темы:
+управление светом
+payload control
+camera trigger
+serial protocols
+state machine outside FC
+Неделя 32. Связка FC + companion + payload
+Темы:
+кто главный в системе
+что делать на FC
+что уводить на companion
+что лучше отдать внешнему MCU
+Неделя 33. Интеграционный мини-проект
+Темы:
+один рабочий сценарий:
+FC + GPS + telemetry + external MCU
+или FC + Raspberry Pi + логика полезной нагрузки
+Результат этапа:
+страницы integration/raspberry-pi, integration/esp32, integration/system-architecture
+один практический интеграционный проект
+Этап 7. Исходники, кастомизация, итоговые проекты
+Длительность: 4 недели
+Неделя 34. Сборка прошивок из исходников
+Темы:
+где брать код
+как собирать
+как читать структуру проекта
+как не ломать базу
+ArduPilot dev-site документирует building the code и custom build server, PX4 имеет developer-oriented architecture and build docs, Betaflight поддерживает custom builds. �
+ArduPilot.org + 2
+Неделя 35. Кастомизация поведения
+Темы:
+где лучше Lua
+где лучше INAV logic
+где лучше PX4 external mode
+где вообще не надо лезть в core code
+Неделя 36. Итоговый сравнительный анализ стеков
+Темы:
+какой стек для:
+acro квадро
+nav квадро
+окто
+крыло
+research / ROS2
+companion computer heavy use
+Неделя 37. Capstone project
+Варианты:
+один аппарат, 2 прошивки
+квадро vs окто
+PX4 + ROS2
+ArduPilot + Lua + companion computer
+INAV wing + custom logic
+Результат этапа:
+раздел projects/
+итоговая сравнительная статья
+карта выбора прошивки под задачу
+6. Контрольные точки по этапам
+После Этапа 0
+Ты умеешь:
+читать pinout,
+понимать сенсоры,
+различать роли GPS, IMU, baro, compass,
+вести журнал изменений.
+После Этапа 1
+Ты умеешь:
+работать с конфигураторами и GCS,
+запускать simulation,
+хранить знания структурно.
+После Этапа 2
+Ты умеешь:
+настроить Betaflight,
+читать Blackbox,
+делать CLI backup и remap.
+После Этапа 3
+Ты умеешь:
+строить nav-платформу в INAV,
+работать с wing setup,
+писать пользовательскую логику в framework.
+После Этапа 4
+Ты умеешь:
+строить Copter/Plane в ArduPilot,
+использовать Lua,
+подключать companion computer.
+После Этапа 5
+Ты умеешь:
+понимать архитектуру PX4,
+работать с control allocation,
+использовать ROS 2 integration path.
+После Этапа 6-7
+Ты умеешь:
+проектировать всю систему целиком,
+выбирать правильный стек,
+писать кастомную логику,
+собирать свою базу знаний и developer docs.
+7. Как превращать эту программу в будущий сайт
+После каждого этапа у тебя должен появляться новый раздел сайта.
+После Этапа 0
+/fundamentals
+После Этапа 1
+/resources и /roadmap
+После Этапа 2
+/betaflight
+После Этапа 3
+/inav
+После Этапа 4
+/ardupilot
+После Этапа 5
+/px4
+После Этапа 6
+/integration
+После Этапа 7
+/projects и /comparison
+8. Минимальный шаблон учёта прогресса
+Markdown
+# Неделя N
+
+
+## Темы
+- 
+- 
+- 
+
+
+## Что изучил
+- 
+
+
+## Что настроил руками
+- 
+
+
+## Что не понял
+- 
+
+
+## Какие материалы добавить на сайт
+- 
+
+
+## Мини-проект недели
+- 
+
+
+## Источники
+-
+9. Источники для этого блока
+ArduPilot Development Site: dev-раздел, build, companion computers, MAVLink, Lua, simulation/testing. �
+ArduPilot.org + 1
+PX4 Guide: simulation, architecture, ROS 2 user guide. �
+PX4 Документація + 1
+Betaflight Development: Blackbox и dev-подход. �
+Betaflight
+INAV Programming Framework: logic conditions, programmable behavior. �
+GitHub
+Следующим куском логично дать Блок 3: Этап 0 по неделям с уже конкретными заданиями, чеклистами и структурой страниц для сайта.

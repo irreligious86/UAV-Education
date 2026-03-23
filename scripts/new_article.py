@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""Создание черновика статьи и записи в манифесте.
+"""Создание статьи, запись в манифест и автопубликация.
 
   python scripts/new_article.py inav inav-gps-fix "GPS Fix и диагностика" L2
 """
 from __future__ import annotations
 
+import argparse
 import json
+import subprocess
 import sys
 from pathlib import Path
 
@@ -52,9 +54,9 @@ title: "{title}"
 level: {level}
 readingTime: 15 мин
 firmware: {firmware}
-status: draft
+status: {status}
 tags:
-  - черновик
+  - {tag}
 references:
   - title: Official docs (заменить)
     url: https://example.com
@@ -98,18 +100,40 @@ def save_manifest(data: dict) -> None:
     MANIFEST_PATH.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
 
 
-def main() -> None:
-    if len(sys.argv) != 5:
-        print(
-            "Использование: python scripts/new_article.py <section> <id> \"<title>\" <level>",
-            file=sys.stderr,
-        )
-        raise SystemExit(1)
+def parse_args() -> argparse.Namespace:
+    ap = argparse.ArgumentParser(
+        description="Создать статью, обновить content-manifest.json и опубликовать в index.html"
+    )
+    ap.add_argument("section", help="Секция: betaflight|inav|ardupilot|px4|companion|tools")
+    ap.add_argument("article_id", help="Уникальный id статьи, например px4-companion-jetson")
+    ap.add_argument("title", help="Заголовок статьи")
+    ap.add_argument("level", help="Уровень: L1|L2|L3|L4")
+    ap.add_argument(
+        "--status",
+        choices=("published", "draft"),
+        default="published",
+        help="Статус статьи в манифесте и front matter (по умолчанию: published)",
+    )
+    ap.add_argument(
+        "--no-publish",
+        action="store_true",
+        help="Не запускать scripts/publish.py автоматически",
+    )
+    return ap.parse_args()
 
-    section_key, article_id, title, level = sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4]
+
+def main() -> None:
+    args = parse_args()
+    section_key = args.section
+    article_id = args.article_id
+    title = args.title
+    level = args.level
 
     if section_key not in TAB_IDS:
         print(f"Неизвестная секция: {section_key}. Допустимо: {', '.join(TAB_IDS)}", file=sys.stderr)
+        raise SystemExit(1)
+    if level not in {"L1", "L2", "L3", "L4"}:
+        print("Уровень должен быть одним из: L1, L2, L3, L4", file=sys.stderr)
         raise SystemExit(1)
 
     manifest = load_manifest()
@@ -137,9 +161,18 @@ def main() -> None:
         raise SystemExit(1)
 
     firmware = FIRMWARE_DEFAULT.get(section_key, "Указать версию")
+    status = args.status
+    tag = "черновик" if status == "draft" else "новая"
 
     source_file.write_text(
-        TEMPLATE.format(id=article_id, title=title.replace('"', '\\"'), level=level, firmware=firmware),
+        TEMPLATE.format(
+            id=article_id,
+            title=title.replace('"', '\\"'),
+            level=level,
+            firmware=firmware,
+            status=status,
+            tag=tag,
+        ),
         encoding="utf-8",
     )
 
@@ -153,15 +186,27 @@ def main() -> None:
             "readingTime": "15 мин",
             "firmware": firmware,
             "sourceFile": f"content/{section_key}/{article_id}.md",
-            "status": "draft",
-            "tags": ["черновик"],
+            "status": status,
+            "tags": [tag],
             "type": "article",
         }
     )
 
     save_manifest(manifest)
     print(f"Создана статья: {source_file}")
-    print(f"Добавлена запись в manifest: {article_id} (status: draft)")
+    print(f"Добавлена запись в manifest: {article_id} (status: {status})")
+
+    if args.no_publish:
+        print("Публикация пропущена (--no-publish).")
+        return
+
+    publish_script = ROOT / "scripts" / "publish.py"
+    print("Запуск автопубликации...")
+    run = subprocess.run([sys.executable, str(publish_script)], cwd=ROOT)
+    if run.returncode != 0:
+        print("Ошибка: автопубликация завершилась с ошибкой.", file=sys.stderr)
+        raise SystemExit(run.returncode)
+    print("Автопубликация завершена: index.html обновлён.")
 
 
 if __name__ == "__main__":

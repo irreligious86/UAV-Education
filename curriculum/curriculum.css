@@ -26,7 +26,7 @@ body {
 }
 
 .wrap {
-  max-width: 1100px;
+  max-width: 1320px;
   margin: 0 auto;
   padding: 24px;
 }
@@ -43,13 +43,13 @@ body {
 .hero {
   padding: 24px;
   margin-bottom: 20px;
-  max-width: 70ch;
+  max-width: none;
 }
 
 .card,
 .footer-guide {
   padding: 14px;
-  max-width: 70ch;
+  max-width: none;
 }
 
 h1, h2, h3 {
@@ -74,9 +74,17 @@ h1, h2, h3, p, li, td, th, a, code {
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 12px;
   margin: 14px 0;
+}
+
+.grid > .card {
+  height: 100%;
+}
+
+.tab-panel > section {
+  margin-bottom: 18px;
 }
 
 .tag {
@@ -211,7 +219,7 @@ tr:last-child td { border-bottom: 0; }
 
 .tz-doc .intro-tz {
   margin-bottom: 16px;
-  max-width: 70ch;
+  max-width: 90ch;
 }
 
 .tz-section.card {
@@ -245,7 +253,7 @@ tr:last-child td { border-bottom: 0; }
   margin: 26px 0 6px;
   color: var(--muted);
   font-size: 14px;
-  max-width: 70ch;
+  max-width: 90ch;
 }
 
 .footer-guide {
@@ -273,6 +281,66 @@ tr:last-child td { border-bottom: 0; }
   background: rgba(8, 16, 29, 0.35);
 }
 
+/* Улучшение читабельности команд в разделе скриптов */
+#content-automation .grid {
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+}
+
+#scripts-reference .grid {
+  grid-template-columns: 1fr;
+}
+
+#scripts-reference .card,
+#article-add-algorithm {
+  max-width: none;
+}
+
+#content-automation pre,
+#scripts-reference pre,
+#article-add-algorithm pre {
+  position: relative;
+  margin: 8px 0;
+  padding: 10px 12px;
+  padding-right: 96px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: rgba(8, 16, 29, 0.55);
+  overflow-x: auto;
+  white-space: pre;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+#content-automation pre code,
+#scripts-reference pre code,
+#article-add-algorithm pre code {
+  white-space: pre;
+  overflow-wrap: normal;
+  word-break: normal;
+}
+
+.cmd-copy-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  min-height: 30px;
+  padding: 4px 10px;
+  border-radius: 7px;
+  border: 1px solid var(--border);
+  background: rgba(95, 168, 255, 0.18);
+  color: var(--text);
+  font-size: 12px;
+  line-height: 1.2;
+  cursor: pointer;
+}
+
+.cmd-copy-btn:hover,
+.cmd-copy-btn:focus-visible {
+  background: rgba(95, 168, 255, 0.3);
+  border-color: var(--accent);
+  outline: none;
+}
+
 /* Tablet and down */
 @media (max-width: 900px) {
   .wrap {
@@ -293,6 +361,10 @@ tr:last-child td { border-bottom: 0; }
   .grid {
     grid-template-columns: 1fr;
     gap: 10px;
+  }
+
+  #content-automation .grid {
+    grid-template-columns: 1fr;
   }
 
   .tab-nav {

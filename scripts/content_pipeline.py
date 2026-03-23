@@ -289,8 +289,8 @@ def render_toc_html(section: dict, articles: list[dict]) -> str:
     title = section.get("title", section["sectionKey"])
     aria = f"Содержание раздела {title}"
     items: list[str] = []
-    for a in sorted(articles, key=lambda x: x["order"]):
-        num = str(a["order"]).zfill(2)
+    for i, a in enumerate(articles, start=1):
+        num = str(i).zfill(2)
         items.append(
             f'        <a href="#{a["id"]}">\n'
             f'          <span class="toc__num">{num}</span>\n'
@@ -338,8 +338,15 @@ def filter_articles(
 ) -> list[dict]:
     arts = section.get("articles", [])
     out = []
+    level_order = {"L1": 1, "L2": 2, "L3": 3, "L4": 4}
     for a in arts:
         st = a.get("status", "published")
         if st == "published" or (include_drafts and st == "draft"):
             out.append(a)
-    return sorted(out, key=lambda x: x["order"])
+    return sorted(
+        out,
+        key=lambda x: (
+            level_order.get(str(x.get("level", "")).upper(), 99),
+            int(x.get("order", 0)),
+        ),
+    )

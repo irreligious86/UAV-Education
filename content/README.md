@@ -9,10 +9,10 @@
 
 ## Пайплайн (этап 12)
 
-1. **Новая статья:** `python scripts/new_article.py <section> <id> "Заголовок" L2` — создаёт `.md` и строку в манифесте (`draft`).
+1. **Новая статья:** `python scripts/new_article.py <section> <id> "Заголовок" L2` — создаёт `.md`, строку в манифесте (`published` по умолчанию) и запускает автопубликацию.
 2. Заполнить **`content/<stack>/<id>.md`**: `summary`, `theory`, `practice`, `diagnostics`, `references`, опционально `checklist`, `notes`, …
-3. В манифесте выставить **`status: published`**, когда готово к вставке на сайт.
-4. **Одна команда:** `python scripts/publish.py` — валидация, генерация TOC и HTML статей, подстановка в **`index.html`** между комментариями `<!-- AUTO:TOC:... -->` / `<!-- AUTO:ARTICLES:... -->` / `<!-- AUTO:PROGRESS:... -->`.
+3. Для черновика используйте: `python scripts/new_article.py <section> <id> "Заголовок" L2 --status draft --no-publish`.
+4. **Безопасная команда публикации (Windows):** `publish-safe.bat`. Альтернатива: `python scripts/publish.py` — валидация, генерация TOC и HTML статей, подстановка в **`index.html`** между комментариями `<!-- AUTO:TOC:... -->` / `<!-- AUTO:ARTICLES:... -->` / `<!-- AUTO:PROGRESS:... -->`.
 5. Альтернатива: только проверка — `python scripts/validate_content.py`; только TOC в `build/` — `python scripts/build_content.py`.
 6. Windows: **`publish.bat`** (вызов `publish.py`).
 

@@ -29,6 +29,7 @@
       <div class="hero__head">
         <h1 class="hero__title">UAV Student</h1>
         <p class="hero__tagline muted">База знаний по БПЛА и прошивкам</p>
+        <a class="hero__curriculum-link muted" href="curriculum/curriculum.html" target="_blank" rel="noopener noreferrer">для разработчика: curriculum</a>
       </div>
 
       <!-- По умолчанию свёрнуто (экономия места). Раскрыть: клик по «О проекте…». Без JS тоже работает (native details). -->
@@ -118,13 +119,18 @@
           <span class="toc__level">L2</span>
           <span class="toc__label">Blackbox</span>
         </a>
-        <a href="#bf-cli">
+        <a href="#bf-pid-reg-in-bf">
           <span class="toc__num">07</span>
+          <span class="toc__level">L2</span>
+          <span class="toc__label">PID-регулятор в Betaflight</span>
+        </a>
+        <a href="#bf-cli">
+          <span class="toc__num">08</span>
           <span class="toc__level">L3</span>
           <span class="toc__label">CLI и remap</span>
         </a>
         <a href="#bf-custom">
-          <span class="toc__num">08</span>
+          <span class="toc__num">09</span>
           <span class="toc__level">L4</span>
           <span class="toc__label">Кастомная сборка</span>
         </a>
@@ -134,10 +140,10 @@
       <!-- AUTO:PROGRESS:betaflight:start -->
       <div class="section-progress" aria-label="Прогресс раздела Betaflight">
         <span class="section-progress__label">Раздел Betaflight</span>
-        <span class="section-progress__bar" role="progressbar" aria-valuenow="8" aria-valuemin="0" aria-valuemax="8" aria-label="8 из 8 модулей в базовой версии">
+        <span class="section-progress__bar" role="progressbar" aria-valuenow="9" aria-valuemin="0" aria-valuemax="9" aria-label="9 из 9 модулей в базовой версии">
           <span class="section-progress__fill" style="width:100%"></span>
         </span>
-        <span class="section-progress__stats">8 из 8 базовых модулей</span>
+        <span class="section-progress__stats">9 из 9 базовых модулей</span>
       </div>
 <!-- AUTO:PROGRESS:betaflight:end -->
 
@@ -353,6 +359,76 @@
 <li>
               <a href="https://example.com" class="doc-link" target="_blank" rel="noopener noreferrer">Заглушка — заменить на первичный источник</a>
               <span class="tag">primary | A</span>
+            </li>
+          </ul>
+        </div>
+      </article>
+
+      <article id="bf-pid-reg-in-bf" class="card" data-level="L2" data-added="2026-03-21">
+        <h2>PID-регулятор в Betaflight</h2>
+        <p class="muted">PID-регулятор — ядро стабилизации в Betaflight. Статья объясняет физический смысл коэффициентов P, I, D, их взаимодействие, влияние на поведение дрона и методы настройки с использованием Blackbox. После изучения читатель сможет диагностировать типовые проблемы (осцилляции, bounce-back, перегрев моторов) и целенаправленно корректировать параметры, избегая хаотичного подбора.</p>
+        <div class="article-meta">
+          <span class="tag">Уровень: L2 — Интегратор</span>
+          <span class="tag">Время чтения: 15 мин</span>
+          <span class="tag">Betaflight 4.5+</span>
+          <span class="tag">новая</span>
+        </div>
+
+        <h3>📖 Теория</h3>
+<p>PID-регулятор (Proportional-Integral-Derivative) получает от гироскопа угловую скорость по осям roll, pitch, yaw и минимизирует ошибку между желаемой (setpoint, от стиков или навигации) и текущей скоростью вращения. Выход регулятора (PID sum) через миксер преобразуется в сигналы на моторы.</p>
+<p><strong>P-term (пропорциональный)</strong> реагирует на текущую ошибку: чем больше ошибка, тем сильнее коррекция. Определяет основную жёсткость дрона. Недостаток: не может полностью устранить статическую ошибку (дрейф). При завышении вызывает быстрые осцилляции (20–50 Гц).</p>
+<p><strong>I-term (интегральный)</strong> накапливает ошибку во времени, устраняя постоянное отклонение (дрейф от ветра, смещение центра масс). Работает медленнее P. При завышении вызывает медленные плавающие осцилляции (1–5 Гц) и эффект wind-up. Параметр `i_limit` ограничивает максимальное значение I-term.</p>
+<p><strong>D-term (дифференциальный)</strong> реагирует на скорость изменения ошибки, действуя как демпфер. Подавляет колебания, вызванные P-термом. Критически чувствителен к шуму гироскопа. Без фильтрации создаёт высокочастотный шум, перегревающий моторы. Правило: D-term настраивается после P-term; увеличение P требует увеличения D.</p>
+<p><strong>Специфика Betaflight 4.5+:</strong></p>
+<ul><li><strong>Feedforward</strong> — независимый канал управления, подающий сигнал прямо на моторы на основе скорости движения стика. Ускоряет отклик без увеличения P-term.</li><li><strong>TPA (Throttle PID Attenuation)</strong> — снижение PID-коэффициентов на высоких оборотах. В BF 4.5+ работает в режиме `D` (снижает только D-term).</li><li><strong>RPM Filtering</strong> — использование данных с ESC для подавления шума от пропеллеров. Создаёт узкие фильтры на частоте вращения моторов, позволяя поднимать D-term.</li></ul>
+
+        <h3>🛠 Практика</h3>
+<p><strong>Подготовка</strong></p>
+<p>Аппаратные требования: ESC с поддержкой RPM Filtering (BLHeli_32 или Bluejay), полетный контроллер F7/H7, карта памяти SD для Blackbox (минимум 4 ГБ).</p>
+<p>Программные требования: Betaflight Configurator 10.10+, Blackbox Explorer.</p>
+<p><strong>Настройка перед тюнингом</strong></p>
+<p>1. Включите RPM Filtering: во вкладке Configuration включите *RPM Filter*, установите `rpm_notch_q = 500` (CLI). 2. Настройте Blackbox: выберите частоту записи 2 кГц, включите логирование gyro_scaled, pid, setpoint, motor. 3. Установите базовые параметры фильтрации: set gyro_lowpass2_hz = 300 set gyro_lowpass2_type = PT2 set dterm_lowpass2_hz = 150 set dterm_lowpass2_type = PT2 set dynamic_notch_range = MEDIUM set dynamic_notch_q = 250 save</p>
+<p>text</p>
+<p><strong>Пошаговая настройка</strong></p>
+<p>1. Определите стартовые значения (для рамы 5&quot; с моторами 2207–2306): set p_pitch = 45, i_pitch = 50, d_pitch = 25 set p_roll = 42, i_roll = 45, d_roll = 23 set p_yaw = 70, i_yaw = 50, d_yaw = 20 set d_min_roll = 20, d_min_pitch = 22 save</p>
+<p>text</p>
+<ol><li>Настройка P-term: выполните резкий рывок стиком с возвратом. В Blackbox смотрите график gyro (синий) и setpoint (зелёный). Если gyro пересекает setpoint в обратную сторону (bounce-back) — P низкий, увеличьте на 10. Если gyro колеблется вокруг setpoint — P высокий, уменьшите на 5.</li></ol>
+<ol><li>Настройка D-term: после настройки P выполните то же движение. Добавьте график D-term. Если D-term дрожит высокочастотным шумом — снизьте D на 3–5. Если после движения gyro идёт с затухающими колебаниями — увеличьте D на 3.</li></ol>
+<ol><li>Настройка I-term: зависните в режиме Angle/Horizon, слегка наклоните дрон и верните в ноль. Если дрон медленно дрейфует — увеличьте I на 10. Если проходит нейтраль и раскачивается — уменьшите I на 10.</li></ol>
+<ol><li>Настройка Feedforward: выполните серию быстрых движений стиком. В Blackbox сравните setpoint и gyro. При большом отставании увеличьте `feedforward_boost`. При overshoot уменьшите `feedforward_boost`.</li></ol>
+<ol><li>Настройка TPA: выполните punch-out (20% → 80% газа). Если motor выходит на 100% без снижения — проверьте `tpa_rate`. При высокочастотной пульсации увеличьте `tpa_rate` до 1.5, снизьте `tpa_breakpoint` до 1400.</li></ol>
+<p><strong>Заключительные шаги</strong></p>
+<p>Сохраните финальные параметры: `diff all`. Выполните короткий полёт (2–3 минуты) и проверьте температуру моторов. Если моторы горячие, снизьте D-term на 10–15%.</p>
+
+        <h3>🔍 Диагностика</h3>
+<ul><li><strong>Симптом: Быстрые осцилляции на ховере (жужжание, дрожание)</strong></li><li>Возможная причина: завышенный P-term, недостаточная фильтрация гироскопа.</li><li>Что проверить/сделать: снять Blackbox. Если график gyro имеет частые пики 50–100 Гц — уменьшить P на 20%. Проверить работу dynamic notch и RPM filtering.</li><li><strong>Симптом: Bounce-back после резкого движения</strong></li><li>Возможная причина: низкий P-term, высокий D-term.</li><li>Что проверить/сделать: в Blackbox сравнить setpoint и gyro: gyro не доходит до setpoint. Увеличить P на 10%. Если bounce-back не уходит — проверить D-term.</li><li><strong>Симптом: Медленные плавающие колебания (~1–3 Гц)</strong></li><li>Возможная причина: завышенный I-term, неверный anti-windup.</li><li>Что проверить/сделать: уменьшить I на 15–20%. Проверить параметр `i_limit` (100–150 достаточно).</li><li><strong>Симптом: Перегрев моторов</strong></li><li>Возможная причина: высокий D-term, недостаточная фильтрация D-term.</li><li>Что проверить/сделать: в Blackbox посмотреть график D-term — если похож на шум, снизить D на 20–30%. Увеличить `dterm_lowpass2` до 100–120 Гц.</li><li><strong>Симптом: Дрон уходит при резком добавлении газа (punch-out)</strong></li><li>Возможная причина: неверная настройка TPA, высокий P/D без аттенюации.</li><li>Что проверить/сделать: в Blackbox на графике throttle найти punch-out. Если PID sum клиппирует — увеличить `tpa_rate` или снизить `tpa_breakpoint`.</li><li><strong>Симптом: Шум на гироскопе в логах (пилообразный график)</strong></li><li>Возможная причина: механические вибрации, неработающий RPM Filtering.</li><li>Что проверить/сделать: проверить работу RPM Filtering (во вкладке Motors должна отображаться частота вращения). Включить `gyro_lowpass2` 250–300 Гц.</li></ul>
+
+        <div class="references">
+          <h4>📚 Источники</h4>
+          <ul>
+<li>
+              <a href="https://github.com/betaflight/betaflight/wiki/PID-Tuning-Guide" class="doc-link" target="_blank" rel="noopener noreferrer">Betaflight PID Tuning Guide</a>
+              <span class="tag">primary</span>
+            </li>
+<li>
+              <a href="https://github.com/betaflight/betaflight/wiki/4.x-PID-Controller-Explanation" class="doc-link" target="_blank" rel="noopener noreferrer">Betaflight 4.x PID Controller Explanation</a>
+              <span class="tag">primary</span>
+            </li>
+<li>
+              <a href="https://github.com/betaflight/betaflight/wiki/RPM-Filtering" class="doc-link" target="_blank" rel="noopener noreferrer">Betaflight RPM Filtering</a>
+              <span class="tag">primary</span>
+            </li>
+<li>
+              <a href="https://github.com/betaflight/betaflight/wiki/Blackbox-Log-Interpretation" class="doc-link" target="_blank" rel="noopener noreferrer">Betaflight Blackbox Log Interpretation</a>
+              <span class="tag">primary</span>
+            </li>
+<li>
+              <a href="https://oscarliang.com/betaflight-pid-tuning/" class="doc-link" target="_blank" rel="noopener noreferrer">Oscar Liang: Betaflight PID Tuning</a>
+              <span class="tag">secondary</span>
+            </li>
+<li>
+              <a href="https://www.youtube.com/watch?v=YXpPajW9lCU" class="doc-link" target="_blank" rel="noopener noreferrer">Joshua Bardwell: How to Tune PID with Blackbox</a>
+              <span class="tag">secondary</span>
             </li>
           </ul>
         </div>
@@ -915,16 +991,21 @@
           <span class="toc__level">L3</span>
           <span class="toc__label">ROS 2 интеграция</span>
         </a>
+        <a href="#px4-companion-jetson">
+          <span class="toc__num">05</span>
+          <span class="toc__level">L3</span>
+          <span class="toc__label">PX4 Companion Jatson Nano</span>
+        </a>
       </nav>
 <!-- AUTO:TOC:px4:end -->
 
       <!-- AUTO:PROGRESS:px4:start -->
       <div class="section-progress" aria-label="Прогресс раздела PX4">
         <span class="section-progress__label">Раздел PX4</span>
-        <span class="section-progress__bar" role="progressbar" aria-valuenow="4" aria-valuemin="0" aria-valuemax="4" aria-label="4 из 4 модулей в базовой версии">
+        <span class="section-progress__bar" role="progressbar" aria-valuenow="5" aria-valuemin="0" aria-valuemax="5" aria-label="5 из 5 модулей в базовой версии">
           <span class="section-progress__fill" style="width:100%"></span>
         </span>
-        <span class="section-progress__stats">4 из 4 базовых модулей</span>
+        <span class="section-progress__stats">5 из 5 базовых модулей</span>
       </div>
 <!-- AUTO:PROGRESS:px4:end -->
 
@@ -1096,6 +1177,85 @@
           </ul>
         </div>
       </article>
+
+      <article id="px4-companion-jetson" class="card" data-level="L3" data-added="2026-03-21">
+        <h2>PX4 Companion Jatson Nano</h2>
+        <p class="muted">Этот модуль описывает способы подключения одноплатного компьютера NVIDIA Jetson Nano к полетному контроллеру Pixhawk (на прошивке PX4) для организации offboard-управления, передачи телеметрии и обработки данных с камеры (компьютерное зрение).</p>
+        <div class="article-meta">
+          <span class="tag">Уровень: L3 — Специалист</span>
+          <span class="tag">Время чтения: 15 мин</span>
+          <span class="tag">PX4 1.15+</span>
+          <span class="tag">черновик</span>
+        </div>
+
+        <h3>📖 Теория</h3>
+<p>Jetson Nano выступает в роли бортового компьютера (Companion Computer). Он берет на себя сложные вычислительные задачи (компьютерное зрение, планирование миссий, управление через ROS 2), в то время как Pixhawk отвечает за стабилизацию полета и низкоуровневые сенсоры.</p>
+<p>Использование связки Pixhawk + Jetson Nano позволяет создавать полностью автономные дроны с функцией распознавания объектов, облета препятствий и выполнения сложных миссий без участия оператора.</p>
+<p><strong>Архитектура связи:</strong> Существует два основных подхода к организации связи: - <strong>MAVLink</strong> (через MAVROS или Pymavlink): Классический способ. Поток телеметрии передается по последовательному интерфейсу (UART). На Jetson данные принимаются и парсятся библиотеками. - <strong>uXRCE-DDS</strong> (Micro XRCE-DDS): Современный протокол, используемый в PX4 и ROS 2. Позволяет напрямую обмениваться топиками ROS 2 с внутренней шиной uORB полетного контроллера.</p>
+
+        <h3>🛠 Практика</h3>
+<p>### Вариант 1: Подключение через USB (простой и надежный) Этот способ рекомендуется для начальной отладки, так как он наиболее стабилен и не требует сложных манипуляций с аппаратными UART Jetson.</p>
+<p><strong>Соединение:</strong> 1. Возьмите USB-кабель (Micro-USB или USB-C в зависимости от модели Pixhawk, например, Pixhawk 6C или Cube Orange) 2. Подключите кабель к порту USB на Pixhawk (обычно это порт для подключения к Mission Planner/QGC) и к любому USB-порту Jetson Nano 3. Примечание: прямое подключение по USB дает полный поток данных MAVLink без потери пакетов</p>
+<p><strong>Настройка параметров PX4:</strong> 1. В QGroundControl перейдите в Параметры (Parameters) 2. Убедитесь, что порт, к которому подключен USB, настроен на передачу MAVLink. Обычно USB порт включен по умолчанию 3. Если вы используете uXRCE-DDS, необходимо отключить MAVLink на используемом порту и активировать UXRCE_DDS_CFG</p>
+<p><strong>Проверка на Jetson:</strong> 1. Подключитесь к Jetson по SSH или через монитор 2. Найдите устройство: `ls /dev/ttyACM*` или `ls /dev/ttyUSB*`. Обычно USB подключение отображается как ttyACM0 3. Дайте права доступа: `sudo chmod 666 /dev/ttyACM0`</p>
+<p>### Вариант 2: Подключение через UART (аппаратный последовательный порт) Этот способ используется для встраиваемых решений, где USB-порт может быть занят или требуется минимизация кабелей.</p>
+<p><strong>Схема подключения:</strong> 1. Подключите TX (передатчик) пикса к RX (приемнику) нано, и наоборот (RX -&gt; TX). Обязательно соедините GND 2. Рекомендуемые пины на 40-pin разъеме Jetson Nano: Pin 8 (TX) и Pin 10 (RX) — это аппаратный UART1 (обычно /dev/ttyTHS1) 3. На Pixhawk используйте порт TELEM 2 или TELEM 1</p>
+<p><strong>Настройка UART на Jetson Nano (критически важно):</strong></p>
+<p>По умолчанию последовательный порт на джамперных пинах (GPIO) часто занят службой последовательной консоли (serial console). Её необходимо отключить, чтобы освободить порт для связи с дроном.</p>
+<p><strong>Отключите сервис nvgetty:</strong> ```bash sudo systemctl stop nvgetty.service sudo systemctl disable nvgetty.service ``` Это одна из главных причин ошибок &quot;Permission denied&quot;.</p>
+<p><strong>Добавьте пользователя в группу dialout:</strong> ```bash sudo usermod -aG dialout $USER ``` После этого нужно перезагрузиться (логаут/логин).</p>
+<p><strong>Настройка параметров PX4:</strong> 1. В QGroundControl выберите параметр SER_TEL2_BAUD и установите скорость 921600 (рекомендуемая для высокой нагрузки) 2. Для протокола MAVLink: SER_TEL2_PROTOCOL = 2 (MAVLink 2) 3. Для uXRCE-DDS: SER_TEL2_PROTOCOL = 26 (XRCE-DDS). Также необходимо задать параметр UXRCE_DDS_CFG</p>
+<p><strong>Диагностика UART на Jetson:</strong></p>
+<p>Проверьте, что порт виден и имеет правильную группу: ```bash ls -l /dev/ttyTHS* ``` Если вы видите `crw------- 1 root tty`, значит порт все еще заблокирован консолью. После отключения nvgetty группа должна измениться на dialout.</p>
+<p>### Вариант 3: Использование FTDI-адаптера Если прямое UART-подключение нестабильно (частая проблема с некоторыми версиями Cube Orange), используйте переходник USB-to-UART.</p>
+<p><strong>Схема:</strong> 1. FTDI адаптер подключается к USB порту Jetson Nano 2. Провода TX/RX/GND от адаптера идут к пиксу 3. Jetson увидит адаптер как /dev/ttyUSB0 4. Преимущество: Обходит аппаратные проблемы UART на плате Jetson или Pixhawk, обеспечивая стабильную связь</p>
+
+        <h3>🔍 Диагностика</h3>
+<ul><li><strong>Permission denied: &#x27;/dev/ttyTHS1&#x27;</strong> — Порт используется системной консолью (nvgetty) или у пользователя нет прав. Решение: выполните шаги из раздела &quot;Настройка UART на Jetson Nano&quot; (остановка nvgetty и добавление в группу dialout)</li><li><strong>MAVLink работает, но uXRCE-DDS не подключается</strong> — Неправильные параметры прошивки или несоответствие версий PX4. Решение: убедитесь, что на телеметрийном порту выключен MAVLink (SER_TEL2_PROTOCOL = 0 или 26), перепрошейте контроллер стабильной версией, запустите агент вручную: `sudo MicroXRCEAgent serial --dev /dev/ttyTHS1 -b 921600`</li><li><strong>Нет связи, но порт виден</strong> — Перепутаны пины RX/TX или низкое напряжение питания Jetson. Решение: проверьте перекрестное соединение (TX-&gt;RX, RX-&gt;TX), убедитесь, что Jetson Nano получает достаточное питание (5В 2-4А)</li><li><strong>Прерывистая связь или потеря пакетов по UART</strong> — Отсутствие аппаратного контроля потока (RTS/CTS) или электрические помехи. Решение: используйте USB-кабель или FTDI адаптер вместо прямых пинов GPIO</li></ul>
+
+        <div class="references">
+          <h4>📚 Источники</h4>
+          <ul>
+<li>
+              <a href="https://docs.px4.io/main/en/companion_computer/pixhawk_companion.html" class="doc-link" target="_blank" rel="noopener noreferrer">PX4 User Guide: Companion Computer</a>
+              <span class="tag">primary</span>
+            </li>
+<li>
+              <a href="https://docs.px4.io/main/en/middleware/uxrce_dds.html" class="doc-link" target="_blank" rel="noopener noreferrer">PX4 User Guide: uXRCE-DDS (PX4-ROS 2 Bridge)</a>
+              <span class="tag">primary</span>
+            </li>
+<li>
+              <a href="https://ardupilot.org/" class="doc-link" target="_blank" rel="noopener noreferrer">ArduPilot Dev Docs: Turnkey Companion Computer Solutions</a>
+              <span class="tag">primary</span>
+            </li>
+<li>
+              <a href="https://discuss.ardupilot.org/" class="doc-link" target="_blank" rel="noopener noreferrer">ArduPilot Discourse: Jetson Nano - Pixhawk Cube Communication</a>
+              <span class="tag">secondary</span>
+            </li>
+<li>
+              <a href="https://forums.developer.nvidia.com/" class="doc-link" target="_blank" rel="noopener noreferrer">NVIDIA Developer Forums: Jetson Nano Setup</a>
+              <span class="tag">secondary</span>
+            </li>
+<li>
+              <a href="https://github.com/terrytaylorbonn/auxdrone" class="doc-link" target="_blank" rel="noopener noreferrer">GitHub: terrytaylorbonn/auxdrone</a>
+              <span class="tag">secondary</span>
+            </li>
+          </ul>
+        </div>
+        <div class="checklist" id="px4-companion-jetson-checklist">
+          <h4>✅ Чек-лист</h4>
+          <ul class="checklist-list">
+            <li><label><input type="checkbox"> Проверить совместимость версии PX4 (1.15+) с Jetson Nano</label></li>
+            <li><label><input type="checkbox"> Подключить Pixhawk и Jetson Nano (USB, UART или FTDI адаптер)</label></li>
+            <li><label><input type="checkbox"> Отключить сервис nvgetty на Jetson (для подключения по UART)</label></li>
+            <li><label><input type="checkbox"> Добавить пользователя в группу dialout</label></li>
+            <li><label><input type="checkbox"> Настроить параметры PX4 (SER_TEL2_BAUD, SER_TEL2_PROTOCOL)</label></li>
+            <li><label><input type="checkbox"> Проверить доступность портов (`ls /dev/ttyACM*`, `ls /dev/ttyTHS*`)</label></li>
+            <li><label><input type="checkbox"> Убедиться в правильности соединения RX/TX и питания</label></li>
+            <li><label><input type="checkbox"> Запустить тестирование связи (MAVLink или XRCE-DDS)</label></li>
+          </ul>
+        </div>
+      </article>
 <!-- AUTO:ARTICLES:px4:end -->
     </section>
 
@@ -1113,15 +1273,15 @@
           <span class="toc__level">L2</span>
           <span class="toc__label">MAVLink и MAVSDK</span>
         </a>
-        <a href="#comp-raspberry">
-          <span class="toc__num">03</span>
-          <span class="toc__level">L3</span>
-          <span class="toc__label">Raspberry Pi + ArduPilot</span>
-        </a>
         <a href="#comp-esp32">
-          <span class="toc__num">04</span>
+          <span class="toc__num">03</span>
           <span class="toc__level">L2</span>
           <span class="toc__label">ESP32 и периферия</span>
+        </a>
+        <a href="#comp-raspberry">
+          <span class="toc__num">04</span>
+          <span class="toc__level">L3</span>
+          <span class="toc__label">Raspberry Pi + ArduPilot</span>
         </a>
       </nav>
 <!-- AUTO:TOC:companion:end -->
@@ -1234,13 +1394,13 @@
         </div>
       </article>
 
-      <article id="comp-raspberry" class="card" data-level="L3" data-added="2026-03-21">
-        <h2>Raspberry Pi + ArduPilot</h2>
+      <article id="comp-esp32" class="card" data-level="L2" data-added="2026-03-21">
+        <h2>ESP32 и периферия</h2>
         <p class="muted">Краткое описание модуля (черновик; при переносе в сайт синхронизировать с `index.html`).</p>
         <div class="article-meta">
-          <span class="tag">Уровень: L3 — Специалист</span>
-          <span class="tag">Время чтения: 40 мин</span>
-          <span class="tag">Raspberry Pi</span>
+          <span class="tag">Уровень: L2 — Интегратор</span>
+          <span class="tag">Время чтения: 30 мин</span>
+          <span class="tag">ESP32</span>
         </div>
 
         <h3>📖 Теория</h3>
@@ -1263,13 +1423,13 @@
         </div>
       </article>
 
-      <article id="comp-esp32" class="card" data-level="L2" data-added="2026-03-21">
-        <h2>ESP32 и периферия</h2>
+      <article id="comp-raspberry" class="card" data-level="L3" data-added="2026-03-21">
+        <h2>Raspberry Pi + ArduPilot</h2>
         <p class="muted">Краткое описание модуля (черновик; при переносе в сайт синхронизировать с `index.html`).</p>
         <div class="article-meta">
-          <span class="tag">Уровень: L2 — Интегратор</span>
-          <span class="tag">Время чтения: 30 мин</span>
-          <span class="tag">ESP32</span>
+          <span class="tag">Уровень: L3 — Специалист</span>
+          <span class="tag">Время чтения: 40 мин</span>
+          <span class="tag">Raspberry Pi</span>
         </div>
 
         <h3>📖 Теория</h3>
@@ -1680,6 +1840,7 @@
           Учебная программа-прототип: <code>curriculum/</code>.
         </p>
         <p class="muted">Внешние ссылки открываются в новой вкладке. Проверяйте версии прошивок и инструментов.</p>
+        <p class="muted">© 2026 UAV Education — Licensed under CC BY-NC-SA 4.0</p>
       </div>
     </footer>
   </div>
@@ -1691,7 +1852,8 @@
       var tabBtns = document.querySelectorAll(".tab-btn");
       var panes = document.querySelectorAll(".tab-pane");
 
-      function switchTab(tabId) {
+      function switchTab(tabId, opts) {
+        var options = opts || {};
         panes.forEach(function (pane) {
           var on = pane.id === tabId;
           pane.classList.toggle("active", on);
@@ -1707,6 +1869,15 @@
         try {
           localStorage.setItem("uav-active-tab", tabId);
         } catch (e) {}
+
+        if (options.scrollToTop) {
+          var topTarget = document.querySelector(".tab-bar") || document.getElementById("top");
+          if (topTarget) {
+            setTimeout(function () {
+              topTarget.scrollIntoView({ behavior: "smooth", block: "start" });
+            }, 30);
+          }
+        }
       }
 
       /** Якорь внутри вкладки: сначала переключить таб, затем прокрутка (TOC и внутренние ссылки). */
@@ -1727,7 +1898,7 @@
       tabBtns.forEach(function (btn) {
         btn.addEventListener("click", function () {
           var id = btn.getAttribute("data-tab");
-          if (id) switchTab(id);
+          if (id) switchTab(id, { scrollToTop: true });
         });
       });
 

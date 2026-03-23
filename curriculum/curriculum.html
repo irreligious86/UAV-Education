@@ -523,38 +523,138 @@
         </section>
 
         <section id="content-automation">
-          <h2>Workflow автоматизированного добавления контента</h2>
+          <h2>Workflow добавления статьи (актуально)</h2>
           <p class="muted">
-            База знаний растёт из <code>content/*.md</code> и <code>data/content-manifest.json</code>;
-            <code>publish.py</code> подставляет TOC и статьи в <code>index.html</code> только между маркерами
-            <code>AUTO:TOC:*</code>, <code>AUTO:ARTICLES:*</code>, <code>AUTO:PROGRESS:*</code> — без ручного копирования HTML.
+            Источник правды: <code>content/*.md</code> + <code>data/content-manifest.json</code>. Сборка
+            обновляет <code>index.html</code> только между маркерами <code>AUTO:TOC:*</code>,
+            <code>AUTO:ARTICLES:*</code>, <code>AUTO:PROGRESS:*</code>, поэтому ручное копирование HTML
+            не требуется.
           </p>
           <div class="grid">
             <article class="card">
-              <h3>1. Создание статьи</h3>
+              <h3>1. Создать статью одной командой</h3>
               <pre><code>python scripts/new_article.py inav inav-gps-fix "GPS Fix и диагностика" L2</code></pre>
-              <p>Создаётся <code>content/&lt;section&gt;/&lt;id&gt;.md</code> и запись в манифесте (<code>draft</code>).</p>
+              <p>Скрипт создаёт <code>.md</code>, добавляет запись в манифест и сразу запускает автопубликацию.</p>
             </article>
             <article class="card">
-              <h3>2. Заполнение Markdown</h3>
-              <p>Шаблон: <code>content/article-template.md</code>. Обязательные секции: summary, theory, practice, diagnostics, references.</p>
+              <h3>2. Заполнить содержание</h3>
+              <p>Шаблон: <code>content/article-template.md</code>. Обязательные секции для публикации:
+                <code>summary</code>, <code>theory</code>, <code>practice</code>, <code>diagnostics</code>, <code>references</code>.</p>
             </article>
             <article class="card">
-              <h3>3. Публикация</h3>
-              <pre><code>python scripts/publish.py</code></pre>
-              <p>Валидация → TOC → HTML модулей → запись в <code>index.html</code>.</p>
+              <h3>3. Проверить и пересобрать безопасно</h3>
+              <pre><code>publish-safe.bat</code></pre>
+              <p>Порядок: проверка Python → валидация → публикация в <code>index.html</code> с понятными ошибками.</p>
             </article>
             <article class="card">
-              <h3>4. Сайт и Git</h3>
-              <p>Открыть <code>index.html</code> в браузере. Коммит/push: <code>publish-git.bat</code> или <code>bash publish-git.sh</code> (если есть репозиторий).</p>
+              <h3>4. Режимы черновика</h3>
+              <pre><code>python scripts/new_article.py inav inav-test "Тестовая тема" L1 --status draft --no-publish</code></pre>
+              <p>Используйте <code>draft</code> для незавершённых материалов; такие статьи не попадают в обычную публикацию.</p>
             </article>
           </div>
-          <h3>Почему это важно</h3>
+          <h3>Минимальный рабочий сценарий</h3>
           <ul>
-            <li>Единая структура карточек и оглавления.</li>
-            <li>Меньше ошибок якорей и порядка модулей.</li>
-            <li>Markdown остаётся источником правды; <code>index.html</code> — собранный результат.</li>
+            <li>Создать статью через <code>new_article.py</code>.</li>
+            <li>Заполнить текст и источники в <code>.md</code>.</li>
+            <li>Запустить <code>publish-safe.bat</code> и проверить результат в <code>index.html</code>.</li>
+            <li>После проверки — коммит/push через <code>publish-git.bat</code> или <code>publish-git.sh</code>.</li>
           </ul>
+        </section>
+
+        <section id="scripts-reference">
+          <h2>Скрипты проекта: что делает каждый и как запускать</h2>
+          <p class="muted">
+            Ниже — практическая шпаргалка по всем основным скриптам. Команды запускать из корня проекта
+            <code>UAV_Student</code>.
+          </p>
+          <div class="grid">
+            <article class="card">
+              <h3><code>scripts/new_article.py</code></h3>
+              <p><strong>Для чего:</strong> создать новую статью, добавить её в манифест, при необходимости сразу опубликовать.</p>
+              <pre><code>python scripts/new_article.py px4 px4-vision "Компьютерное зрение в PX4" L3</code></pre>
+              <p><strong>Черновик без публикации:</strong></p>
+              <pre><code>python scripts/new_article.py px4 px4-vision "Компьютерное зрение в PX4" L3 --status draft --no-publish</code></pre>
+            </article>
+            <article class="card">
+              <h3><code>scripts/validate_content.py</code></h3>
+              <p><strong>Для чего:</strong> проверить манифест, уникальность <code>id</code>, наличие файлов и обязательных секций.</p>
+              <pre><code>python scripts/validate_content.py</code></pre>
+              <p>Если есть ошибки, публикация должна быть остановлена до исправления.</p>
+            </article>
+            <article class="card">
+              <h3><code>scripts/publish.py</code></h3>
+              <p><strong>Для чего:</strong> собрать TOC, прогресс и HTML-статьи в <code>index.html</code>.</p>
+              <pre><code>python scripts/publish.py</code></pre>
+              <p><strong>Полезные режимы:</strong></p>
+              <pre><code>python scripts/publish.py --include-drafts
+python scripts/publish.py --dry-run</code></pre>
+            </article>
+            <article class="card">
+              <h3><code>publish-safe.bat</code></h3>
+              <p><strong>Для чего:</strong> безопасный сценарий «Python → валидация → публикация» с понятными сообщениями об ошибках.</p>
+              <pre><code>publish-safe.bat</code></pre>
+            </article>
+            <article class="card">
+              <h3><code>publish.bat</code> / <code>publish.sh</code></h3>
+              <p><strong>Для чего:</strong> быстрый ручной запуск публикации без дополнительной диагностики.</p>
+              <pre><code>publish.bat
+bash publish.sh</code></pre>
+            </article>
+            <article class="card">
+              <h3><code>publish-git.bat</code> / <code>publish-git.sh</code></h3>
+              <p><strong>Для чего:</strong> собрать сайт и выполнить git-цикл (commit/push) в одном запуске.</p>
+              <pre><code>publish-git.bat
+bash publish-git.sh</code></pre>
+            </article>
+            <article class="card">
+              <h3><code>scripts/generate_content_stubs.py</code></h3>
+              <p><strong>Для чего:</strong> массово создать недостающие <code>content/*.md</code> по манифесту.</p>
+              <pre><code>python scripts/generate_content_stubs.py</code></pre>
+            </article>
+            <article class="card">
+              <h3><code>scripts/build_content.py</code></h3>
+              <p><strong>Для чего:</strong> служебная сборка TOC-файлов в <code>build/</code> и техобновление манифеста из <code>_manifest_data.py</code>.</p>
+              <pre><code>python scripts/build_content.py
+python scripts/build_content.py --write-manifest</code></pre>
+            </article>
+          </div>
+        </section>
+
+        <section id="article-add-algorithm">
+          <h2>Чёткий алгоритм: как добавить статью</h2>
+          <ol>
+            <li>
+              <strong>Создайте статью:</strong>
+              <pre><code>python scripts/new_article.py inav inav-gps-fix "GPS Fix и диагностика" L2</code></pre>
+            </li>
+            <li>
+              <strong>Откройте созданный файл</strong> <code>content/inav/inav-gps-fix.md</code> и заполните разделы:
+              <code>summary</code>, <code>theory</code>, <code>practice</code>, <code>diagnostics</code>, <code>references</code>.
+            </li>
+            <li>
+              <strong>Проверьте качество данных:</strong>
+              <pre><code>python scripts/validate_content.py</code></pre>
+            </li>
+            <li>
+              <strong>Опубликуйте безопасно:</strong>
+              <pre><code>publish-safe.bat</code></pre>
+            </li>
+            <li>
+              <strong>Проверьте результат в браузере:</strong> статья должна появиться в нужной вкладке и в её TOC.
+            </li>
+            <li>
+              <strong>Если статья не появилась, проверьте в первую очередь:</strong>
+              статус статьи в <code>data/content-manifest.json</code> (должен быть <code>published</code>) и отсутствие ошибок валидации.
+            </li>
+          </ol>
+
+          <h3>Алгоритм для черновика (без публикации)</h3>
+          <ol>
+            <li>Создать черновик: <code>python scripts/new_article.py inav inav-test "Тестовая статья" L1 --status draft --no-publish</code></li>
+            <li>Доработать текст в <code>content/*.md</code>.</li>
+            <li>Когда готово — сменить статус на <code>published</code> в манифесте.</li>
+            <li>Запустить <code>publish-safe.bat</code>.</li>
+          </ol>
         </section>
       </section>
 
@@ -614,9 +714,10 @@
 
           <h3>7) Жизненный цикл статьи</h3>
           <p class="muted">
-            Идея → место в структуре → черновик по шаблону статьи (<code>PROJECT-DIRECTIVES.md</code>, раздел article-template) → чек-лист →
-            <code>references.json</code> → вёрстка в <code>index.html</code> → глоссарий/перекрёстные ссылки →
-            ревью → запись в changelog (раздел Changelog в <code>PROJECT-DIRECTIVES.md</code>).
+            Идея → <code>new_article.py</code> → заполнение <code>content/&lt;stack&gt;/&lt;id&gt;.md</code> →
+            чек-лист и источники (<code>data/references.json</code> или <code>archive/references.json</code>, опционально) →
+            <code>publish-safe.bat</code> → проверка статьи и TOC в <code>index.html</code> →
+            ревью → запись в раздел Changelog файла <code>PROJECT-DIRECTIVES.md</code>.
           </p>
 
           <h3>8) Единый документ директив</h3>
@@ -654,7 +755,7 @@
                 <tr><td>Betaflight</td><td>8</td><td>Синхронизировано с id: <code>bf-intro</code> … <code>bf-custom</code></td></tr>
                 <tr><td>INAV</td><td>5</td><td><code>inav-intro</code> … <code>inav-ipf</code></td></tr>
                 <tr><td>ArduPilot</td><td>5</td><td><code>ap-intro</code> … <code>ap-companion</code></td></tr>
-                <tr><td>PX4</td><td>4</td><td><code>px4-intro</code> … <code>px4-ros2</code></td></tr>
+                <tr><td>PX4</td><td>5</td><td><code>px4-intro</code> … <code>px4-companion-jetson</code></td></tr>
                 <tr><td>Companion</td><td>4</td><td><code>comp-intro</code> … <code>comp-esp32</code></td></tr>
                 <tr><td>Инструменты</td><td>1</td><td>Обзор конфигураторов и ПО (без отдельного набора id по статьям)</td></tr>
               </tbody>
@@ -703,6 +804,85 @@
             </table>
           </article>
 
+          <article class="card tz-section" id="tz-repository-map">
+            <h2>Полная карта проекта: папки и файлы</h2>
+            <p class="muted">
+              Раздел фиксирует структуру репозитория для разработчика: что является рабочим контуром,
+              что служебным, а что историческим или вспомогательным.
+            </p>
+
+            <h3>1) Корень репозитория</h3>
+            <table>
+              <thead>
+                <tr><th>Путь</th><th>Назначение</th><th>Статус</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><code>index.html</code></td><td>Основная страница проекта, куда публикуется контент</td><td>Критичный файл</td></tr>
+                <tr><td><code>style.css</code></td><td>Единый стиль основной страницы</td><td>Критичный файл</td></tr>
+                <tr><td><code>README.md</code></td><td>Краткий вход в проект и ключевые команды</td><td>Актуальный</td></tr>
+                <tr><td><code>PROJECT-DIRECTIVES.md</code></td><td>Единый источник проектных директив и changelog</td><td>Актуальный</td></tr>
+                <tr><td><code>.gitignore</code></td><td>Правила игнорирования для Git</td><td>Технический</td></tr>
+                <tr><td><code>.cursorignore</code></td><td>Фильтр контекста для работы ИИ в Cursor</td><td>Технический</td></tr>
+                <tr><td><code>publish-safe.bat</code></td><td>Безопасный сценарий: проверка среды, валидация, публикация</td><td>Рекомендуемый запуск (Windows)</td></tr>
+                <tr><td><code>publish.bat</code> / <code>publish.sh</code></td><td>Быстрая публикация без расширенной диагностики</td><td>Операционный</td></tr>
+                <tr><td><code>publish-git.bat</code> / <code>publish-git.sh</code></td><td>Публикация + git commit/push</td><td>Операционный</td></tr>
+              </tbody>
+            </table>
+
+            <h3>2) Контент и данные</h3>
+            <table>
+              <thead>
+                <tr><th>Путь</th><th>Назначение</th><th>Примечание</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><code>content/</code></td><td>Markdown-исходники модулей (по стекам)</td><td>Источник текста статей</td></tr>
+                <tr><td><code>content/article-template.md</code></td><td>Шаблон структуры новой статьи</td><td>Для авторов контента</td></tr>
+                <tr><td><code>content/README.md</code></td><td>Инструкция по пайплайну контента</td><td>Актуализирован под автопубликацию</td></tr>
+                <tr><td><code>data/content-manifest.json</code></td><td>Источник правды по структуре разделов, id, порядку и статусам</td><td>Ключ к TOC и генерации</td></tr>
+                <tr><td><code>data/references.json</code></td><td>Реестр источников (опционально в процессе)</td><td>Рабочие ссылки проекта</td></tr>
+                <tr><td><code>build/</code></td><td>Служебные сгенерированные TOC-фрагменты</td><td>Вспомогательный output</td></tr>
+              </tbody>
+            </table>
+
+            <h3>3) Скрипты автоматизации</h3>
+            <table>
+              <thead>
+                <tr><th>Путь</th><th>Роль в процессе</th><th>Когда запускать</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><code>scripts/new_article.py</code></td><td>Создаёт статью, запись в манифесте, может автопубликовать</td><td>При добавлении нового модуля</td></tr>
+                <tr><td><code>scripts/validate_content.py</code></td><td>Проверяет целостность контента и манифеста</td><td>Перед публикацией и перед коммитом</td></tr>
+                <tr><td><code>scripts/publish.py</code></td><td>Собирает TOC/статьи/прогресс и пишет в <code>index.html</code></td><td>Основной этап публикации</td></tr>
+                <tr><td><code>scripts/content_pipeline.py</code></td><td>Общая библиотека парсинга и рендера для пайплайна</td><td>Вызывается из других скриптов</td></tr>
+                <tr><td><code>scripts/build_content.py</code></td><td>Служебная генерация TOC и техоперации с манифестом</td><td>Вспомогательно</td></tr>
+                <tr><td><code>scripts/generate_content_stubs.py</code></td><td>Создаёт недостающие md-заглушки по манифесту</td><td>При массовом наполнении</td></tr>
+                <tr><td><code>scripts/bootstrap_from_index.py</code></td><td>Разовый backup/миграционный инструмент</td><td>Редко, перед экспериментами</td></tr>
+                <tr><td><code>scripts/build-content.py</code> / <code>scripts/validate-content.py</code></td><td>Совместимые обёртки для старого нейминга</td><td>Оставлены для совместимости</td></tr>
+                <tr><td><code>scripts/_manifest_data.py</code></td><td>Служебный модуль данных для генерации манифеста</td><td>Опциональный сценарий</td></tr>
+              </tbody>
+            </table>
+
+            <h3>4) Документация и отдельные контуры</h3>
+            <table>
+              <thead>
+                <tr><th>Путь</th><th>Назначение</th><th>Роль в продукте</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><code>curriculum/curriculum.html</code></td><td>Веб-страница разработчика проекта (методология, workflow, карты)</td><td>Не часть конечного сайта</td></tr>
+                <tr><td><code>curriculum/curriculum.css</code></td><td>Стили страницы curriculum</td><td>Только для разработчика</td></tr>
+                <tr><td><code>archive/</code></td><td>Архив вспомогательных материалов, stubs и резервных файлов</td><td>Исторический/служебный слой</td></tr>
+              </tbody>
+            </table>
+
+            <h3>5) Что считается «ядром» проекта</h3>
+            <ul>
+              <li><strong>Рендер сайта:</strong> <code>index.html</code> + <code>style.css</code>.</li>
+              <li><strong>Контент:</strong> <code>content/</code> + <code>data/content-manifest.json</code>.</li>
+              <li><strong>Публикация:</strong> <code>scripts/validate_content.py</code> + <code>scripts/publish.py</code> (или <code>publish-safe.bat</code>).</li>
+              <li><strong>Директивы:</strong> <code>PROJECT-DIRECTIVES.md</code>.</li>
+            </ul>
+          </article>
+
           <article class="card tz-section" id="tz-project-concept">
             <h2>Концепция проекта (в PROJECT-DIRECTIVES.md)</h2>
             <p><strong>Назначение:</strong> образовательный веб-ресурс по разработке, настройке и эксплуатации БПЛА. Полный текст — в <code>PROJECT-DIRECTIVES.md</code>, раздел project-concept. Файл <code>project-concept.md</code> — указатель.</p>
@@ -726,7 +906,7 @@
                 <tr><td>Companion</td><td>Raspberry Pi, ESP32, MAVLink, MAVSDK</td><td>4–6</td></tr>
               </tbody>
             </table>
-            <p>Качество: достоверность, версии, воспроизводимость, предупреждения рисков; отклонения — через <code>changelog.md</code>.</p>
+            <p>Качество: достоверность, версии, воспроизводимость, предупреждения рисков; отклонения — через раздел Changelog файла <code>PROJECT-DIRECTIVES.md</code>.</p>
           </article>
 
           <article class="card tz-section" id="tz-content-methodology">
@@ -807,7 +987,7 @@
           <article class="card tz-section" id="tz-changelog">
             <h2>История изменений (в PROJECT-DIRECTIVES.md)</h2>
             <p>Актуальный changelog ведётся в разделе <em>Changelog</em> файла <code>PROJECT-DIRECTIVES.md</code>. В том числе: наполнение вкладок <code>index.html</code>, глоссарий и журнал ошибок, ресурсы и чек-листы, объединение markdown-документации в единый файл, обновление <code>curriculum.html</code>.</p>
-            <p>Файл <code>changelog.md</code> в корне — указатель на полный текст.</p>
+            <p>Полный changelog ведётся в <code>PROJECT-DIRECTIVES.md</code>; это актуальный источник истории изменений.</p>
           </article>
 
           <article class="card tz-section" id="tz-roadmap-notes">
@@ -843,6 +1023,37 @@
             }
           });
         });
+      });
+
+      var commandBlocks = document.querySelectorAll(
+        "#content-automation pre, #scripts-reference pre, #article-add-algorithm pre"
+      );
+      commandBlocks.forEach(function (pre) {
+        var button = document.createElement("button");
+        button.type = "button";
+        button.className = "cmd-copy-btn";
+        button.textContent = "Копировать";
+        button.setAttribute("aria-label", "Копировать команду");
+
+        button.addEventListener("click", function () {
+          var text = pre.textContent || "";
+          if (!text.trim()) return;
+
+          navigator.clipboard.writeText(text).then(function () {
+            var prev = button.textContent;
+            button.textContent = "Скопировано";
+            setTimeout(function () {
+              button.textContent = prev;
+            }, 1200);
+          }).catch(function () {
+            button.textContent = "Ошибка";
+            setTimeout(function () {
+              button.textContent = "Копировать";
+            }, 1200);
+          });
+        });
+
+        pre.appendChild(button);
       });
     })();
   </script>
