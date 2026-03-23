@@ -51,12 +51,16 @@ def extract_section(md_body: str, name: str) -> str:
 
 
 def format_inline(text: str) -> str:
-    parts = re.split(r"(\*\*.+?\*\*)", text)
+    # Поддержка inline markdown: **bold** и `inline code`
+    parts = re.split(r"(\*\*.+?\*\*|`[^`]+`)", text)
     out: list[str] = []
     for p in parts:
         if p.startswith("**") and p.endswith("**") and len(p) > 4:
             inner = html.escape(p[2:-2])
             out.append(f"<strong>{inner}</strong>")
+        elif p.startswith("`") and p.endswith("`") and len(p) > 2:
+            inner = html.escape(p[1:-1])
+            out.append(f"<code>{inner}</code>")
         else:
             out.append(html.escape(p))
     return "".join(out)
@@ -67,21 +71,67 @@ def block_to_paragraphs(block: str) -> str:
     if not block:
         return ""
     chunks: list[str] = []
-    for para in re.split(r"\n\n+", block):
-        para = para.strip()
-        if not para:
-            continue
-        lines = [ln.rstrip() for ln in para.splitlines() if ln.strip()]
-        if all(ln.startswith("- ") for ln in lines) and lines:
-            items = "".join(f"<li>{format_inline(ln[2:].strip())}</li>" for ln in lines)
-            chunks.append(f"<ul>{items}</ul>")
-        elif all(re.match(r"^\d+\.\s", ln) for ln in lines if ln):
-            items = "".join(
-                f"<li>{format_inline(re.sub(r'^\d+\.\s+', '', ln))}</li>" for ln in lines
+
+    def render_text_chunk(text: str) -> None:
+        for para in re.split(r"\r?\n\r?\n+", text):
+            para = para.strip()
+            if not para:
+                continue
+            para_l = para.lstrip()
+            # Fallback: если абзац начинается с ###, всегда рендерим как подзаголовок.
+            # Это защищает от "сырых ###" в контенте с неидеальными переносами.
+            if para_l.startswith("### "):
+                first, *rest = para_l.splitlines()
+                htxt = format_inline(first[4:].strip())
+                chunks.append(f'<h4 class="md-subheading">{htxt}</h4>')
+                if rest:
+                    tail = "\n".join(rest).strip()
+                    if tail:
+                        render_text_chunk(tail)
+                continue
+            # Поддержка подзаголовков внутри секций (например, ### ...)
+            heading_lines = [ln.strip() for ln in para.splitlines() if ln.strip()]
+            if (
+                len(heading_lines) == 1
+                and heading_lines[0].startswith("### ")
+                and len(heading_lines[0]) > 4
+            ):
+                htxt = format_inline(heading_lines[0][4:].strip())
+                chunks.append(f'<h4 class="md-subheading">{htxt}</h4>')
+                continue
+
+            lines = [ln.rstrip() for ln in para.splitlines() if ln.strip()]
+            if all(ln.startswith("- ") for ln in lines) and lines:
+                items = "".join(f"<li>{format_inline(ln[2:].strip())}</li>" for ln in lines)
+                chunks.append(f"<ul>{items}</ul>")
+            elif all(re.match(r"^\d+\.\s", ln) for ln in lines if ln):
+                items = "".join(
+                    f"<li>{format_inline(re.sub(r'^\d+\.\s+', '', ln))}</li>" for ln in lines
+                )
+                chunks.append(f"<ol>{items}</ol>")
+            else:
+                chunks.append("<p>" + format_inline(para.replace("\n", " ")) + "</p>")
+
+    # Поддержка fenced code blocks: ```lang ... ```
+    # Если блоков нет, рендерим как раньше.
+    fence_re = re.compile(r"```[^\r\n]*\r?\n(.*?)\r?\n```", re.DOTALL)
+    pos = 0
+    for m in fence_re.finditer(block):
+        before = block[pos : m.start()]
+        if before.strip():
+            render_text_chunk(before)
+        code = m.group(1).rstrip("\n")
+        if code.strip():
+            chunks.append(
+                '<pre class="cli-block"><code>' + html.escape(code) + "</code></pre>"
             )
-            chunks.append(f"<ol>{items}</ol>")
-        else:
-            chunks.append("<p>" + format_inline(para.replace("\n", " ")) + "</p>")
+        pos = m.end()
+    tail = block[pos:]
+    if tail.strip():
+        render_text_chunk(tail)
+
+    if not chunks:
+        render_text_chunk(block)
     return "\n".join(chunks)
 
 
@@ -89,10 +139,65 @@ def diagnostics_to_html(block: str) -> str:
     block = block.strip()
     if not block:
         return ""
-    lines = [ln.strip() for ln in block.splitlines() if ln.strip()]
+    raw_lines = [ln.rstrip() for ln in block.splitlines() if ln.strip()]
+
+    # Группировка "Симптом -> причина -> действие" в отдельные карточки диагностики.
+    groups: list[tuple[str, list[str]]] = []
+    i = 0
+    while i < len(raw_lines):
+        stripped = raw_lines[i].strip()
+        is_symptom = (
+            stripped.startswith("- ")
+            and ("Симптом:" in stripped or "Symptom:" in stripped)
+        )
+        if not is_symptom:
+            i += 1
+            continue
+        title = stripped[2:].strip()
+        details: list[str] = []
+        i += 1
+        while i < len(raw_lines):
+            cur = raw_lines[i]
+            cur_stripped = cur.strip()
+            # Следующий симптом — новая карточка.
+            if cur_stripped.startswith("- ") and (
+                "Симптом:" in cur_stripped or "Symptom:" in cur_stripped
+            ):
+                break
+            # Дочерние пункты внутри симптома.
+            if cur.startswith("  - ") or cur.startswith("\t- "):
+                details.append(cur_stripped[2:].strip())
+            # Плоский markdown-список без отступов: "- Возможная причина:", "- Что сделать:"
+            elif cur_stripped.startswith("- "):
+                details.append(cur_stripped[2:].strip())
+            # Запасной вариант: обычные строки тоже прикрепляем к текущей карточке.
+            elif cur_stripped:
+                details.append(cur_stripped)
+            i += 1
+        groups.append((title, details))
+
+    if groups:
+        cards: list[str] = []
+        for title, details in groups:
+            if details:
+                detail_items = "".join(
+                    f"<li>{format_inline(item)}</li>" for item in details if item
+                )
+                details_html = f"<ul>{detail_items}</ul>"
+            else:
+                details_html = ""
+            cards.append(
+                '<article class="diag-item">'
+                f"<h4>{format_inline(title)}</h4>"
+                f"{details_html}"
+                "</article>"
+            )
+        return '<div class="diag-groups">' + "".join(cards) + "</div>"
+
+    lines = [ln.strip() for ln in raw_lines]
     if all(ln.startswith("- ") for ln in lines):
         items = "".join(f"<li>{format_inline(ln[2:])}</li>" for ln in lines)
-        return f"<ul>{items}</ul>"
+        return f'<ul class="diag-list">{items}</ul>'
     return block_to_paragraphs(block)
 
 
