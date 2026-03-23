@@ -1,0 +1,401 @@
+:root {
+  --bg: #0b1220;
+  --card: #111a2e;
+  --muted: #9fb0d0;
+  --text: #e7eefc;
+  --accent: #5fa8ff;
+  --ok: #45d483;
+  --warn: #ffcc66;
+  --border: #2b3d66;
+}
+
+* { box-sizing: border-box; }
+
+html,
+body {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+body {
+  margin: 0;
+  font: 16px/1.55 "Segoe UI", Roboto, Arial, sans-serif;
+  color: var(--text);
+  background: linear-gradient(180deg, #08101d, #0b1220 30%, #0a1120);
+}
+
+.wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.hero,
+.card,
+.footer-guide {
+  background: rgba(17, 26, 46, 0.78);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
+}
+
+.hero {
+  padding: 24px;
+  margin-bottom: 20px;
+  max-width: 70ch;
+}
+
+.card,
+.footer-guide {
+  padding: 14px;
+  max-width: 70ch;
+}
+
+h1, h2, h3 {
+  margin: 0 0 12px;
+  line-height: 1.25;
+}
+
+h1 { font-size: 30px; }
+h2 { font-size: 24px; margin-top: 28px; }
+h3 { font-size: 19px; margin-top: 20px; }
+
+p { margin: 10px 0; }
+ul { margin: 10px 0 10px 20px; }
+li + li { margin-top: 6px; }
+
+.muted { color: var(--muted); }
+
+h1, h2, h3, p, li, td, th, a, code {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 12px;
+  margin: 14px 0;
+}
+
+.tag {
+  display: inline-block;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 12px;
+  margin-right: 6px;
+  margin-bottom: 6px;
+  min-height: 32px;
+  white-space: normal;
+  line-height: 1.35;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 10px 0 16px;
+  background: rgba(17, 26, 46, 0.5);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+th,
+td {
+  text-align: left;
+  padding: 10px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+}
+
+th {
+  color: #c8d8fa;
+  font-weight: 600;
+}
+
+tr:last-child td { border-bottom: 0; }
+
+.ok { color: var(--ok); }
+.warn { color: var(--warn); }
+
+/* Вкладки (чистый CSS + radio) */
+.tab-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.tabs {
+  margin-top: 8px;
+}
+
+.tab-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+  padding: 10px 12px;
+  background: rgba(17, 26, 46, 0.78);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+.tab-btn {
+  cursor: pointer;
+  color: var(--accent);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: rgba(8, 16, 29, 0.35);
+  border: 1px solid transparent;
+  min-height: 44px;
+  font-size: 14px;
+  line-height: 1.2;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.tab-btn:hover,
+.tab-btn:focus-visible {
+  background: rgba(95, 168, 255, 0.14);
+  outline: none;
+}
+
+#cur-tab-1:checked ~ .tab-nav .tab-btn[for="cur-tab-1"],
+#cur-tab-2:checked ~ .tab-nav .tab-btn[for="cur-tab-2"],
+#cur-tab-3:checked ~ .tab-nav .tab-btn[for="cur-tab-3"],
+#cur-tab-4:checked ~ .tab-nav .tab-btn[for="cur-tab-4"],
+#cur-tab-5:checked ~ .tab-nav .tab-btn[for="cur-tab-5"],
+#cur-tab-6:checked ~ .tab-nav .tab-btn[for="cur-tab-6"],
+#cur-tab-7:checked ~ .tab-nav .tab-btn[for="cur-tab-7"] {
+  background: rgba(95, 168, 255, 0.22);
+  border-color: var(--accent);
+  color: var(--text);
+  font-weight: 600;
+}
+
+.tab-panel {
+  display: none;
+  padding-bottom: 8px;
+}
+
+#cur-tab-1:checked ~ .tab-1,
+#cur-tab-2:checked ~ .tab-2,
+#cur-tab-3:checked ~ .tab-3,
+#cur-tab-4:checked ~ .tab-4,
+#cur-tab-5:checked ~ .tab-5,
+#cur-tab-6:checked ~ .tab-6,
+#cur-tab-7:checked ~ .tab-7 {
+  display: block;
+}
+
+.tab-panel h2:first-child {
+  margin-top: 0;
+}
+
+/* Вкладка «ТЗ: документация» */
+.tz-doc {
+  max-width: 100%;
+}
+
+.tz-doc .intro-tz {
+  margin-bottom: 16px;
+  max-width: 70ch;
+}
+
+.tz-section.card {
+  max-width: none;
+  margin-bottom: 14px;
+}
+
+.tz-section h2 {
+  margin-top: 0;
+  font-size: 20px;
+  color: #c8d8fa;
+}
+
+.tz-section h3 {
+  font-size: 17px;
+  margin-top: 16px;
+}
+
+.tz-doc pre.guide-block {
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.45;
+  white-space: pre;
+}
+
+.tz-footer {
+  margin-top: 20px;
+}
+
+.footer {
+  margin: 26px 0 6px;
+  color: var(--muted);
+  font-size: 14px;
+  max-width: 70ch;
+}
+
+.footer-guide {
+  margin-top: 24px;
+  padding: 16px;
+}
+
+.footer-guide h2 {
+  margin-top: 0;
+}
+
+.footer-guide code {
+  color: #cfe0ff;
+  background: rgba(8, 16, 29, 0.7);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 1px 6px;
+  white-space: normal;
+}
+
+.guide-block {
+  border: 1px dashed var(--border);
+  border-radius: 10px;
+  padding: 10px 12px;
+  background: rgba(8, 16, 29, 0.35);
+}
+
+/* Tablet and down */
+@media (max-width: 900px) {
+  .wrap {
+    width: 100%;
+    max-width: none;
+    padding: 14px;
+  }
+
+  .hero {
+    padding: 16px;
+    border-radius: 12px;
+  }
+
+  h1 { font-size: 24px; }
+  h2 { font-size: 21px; }
+  h3 { font-size: 18px; }
+
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .tab-nav {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 6px;
+    scroll-snap-type: x proximity;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .tab-btn {
+    flex: 0 0 auto;
+    white-space: nowrap;
+    scroll-snap-align: start;
+  }
+
+  table {
+    display: block;
+    border: 0;
+    background: transparent;
+  }
+
+  table thead {
+    display: none;
+  }
+
+  table tbody,
+  table tr,
+  table td {
+    display: block;
+    width: 100%;
+  }
+
+  table tr {
+    margin: 0 0 12px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: rgba(17, 26, 46, 0.78);
+    overflow: hidden;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.16);
+  }
+
+  table td {
+    border: 0;
+    border-bottom: 1px solid var(--border);
+    padding: 10px 12px;
+    white-space: normal;
+  }
+
+  table td:last-child {
+    border-bottom: 0;
+  }
+
+  table td::before {
+    content: attr(data-label) ": ";
+    color: #c8d8fa;
+    font-weight: 600;
+    display: inline;
+  }
+}
+
+/* Small phones */
+@media (max-width: 480px) {
+  body {
+    font-size: 15px;
+    line-height: 1.5;
+  }
+
+  .wrap {
+    width: 100%;
+    max-width: none;
+    padding: 10px;
+  }
+
+  section {
+    margin-bottom: 18px;
+  }
+
+  h1 { font-size: 22px; }
+  h2 {
+    font-size: 19px;
+    margin-top: 18px;
+    margin-bottom: 10px;
+  }
+  h3 {
+    font-size: 17px;
+    margin-top: 14px;
+    margin-bottom: 8px;
+  }
+
+  .hero,
+  .card,
+  .footer-guide {
+    border-radius: 12px;
+  }
+
+  .hero {
+    padding: 14px;
+  }
+
+  .card,
+  .footer-guide {
+    padding: 12px;
+  }
+
+}

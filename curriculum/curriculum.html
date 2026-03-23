@@ -1,0 +1,850 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>UAV Student — Учебная программа</title>
+  <link rel="stylesheet" href="curriculum.css">
+</head>
+<body>
+  <div class="wrap">
+    <header class="hero">
+      <h1>UAV Student — Учебная программа</h1>
+      <p class="muted">
+        Инженерный курс по Betaflight, INAV, ArduPilot, PX4, интеграции companion computer,
+        программируемой логике, работе с исходниками, автономии и эксплуатационной надёжности.
+      </p>
+      <p>
+        <span class="tag">32–56 недель</span>
+        <span class="tag">База → BF → INAV → ArduPilot → PX4</span>
+      </p>
+      <p class="muted">
+        <strong>Идея программы курса (не часть сайта):</strong> папка <code>curriculum/</code> — только HTML+CSS.
+        Не входит в проект <code>index.html</code> + <code>style.css</code>.
+        Тексты директив и ТЗ: единый файл <code>PROJECT-DIRECTIVES.md</code> в корне (отдельные <code>*.md</code> — указатели).
+      </p>
+    </header>
+
+    <div class="tabs">
+      <input class="tab-input" type="radio" name="cur-tab" id="cur-tab-1" checked>
+      <input class="tab-input" type="radio" name="cur-tab" id="cur-tab-2">
+      <input class="tab-input" type="radio" name="cur-tab" id="cur-tab-3">
+      <input class="tab-input" type="radio" name="cur-tab" id="cur-tab-4">
+      <input class="tab-input" type="radio" name="cur-tab" id="cur-tab-5">
+      <input class="tab-input" type="radio" name="cur-tab" id="cur-tab-6">
+      <input class="tab-input" type="radio" name="cur-tab" id="cur-tab-7">
+
+      <nav class="tab-nav" role="tablist" aria-label="Разделы программы">
+        <label class="tab-btn" for="cur-tab-1" role="tab">Обзор</label>
+        <label class="tab-btn" for="cur-tab-2" role="tab">Методология</label>
+        <label class="tab-btn" for="cur-tab-3" role="tab">Сравнения</label>
+        <label class="tab-btn" for="cur-tab-4" role="tab">Треки и карта</label>
+        <label class="tab-btn" for="cur-tab-5" role="tab">Проекты и стек</label>
+        <label class="tab-btn" for="cur-tab-6" role="tab">Стандарт курса</label>
+        <label class="tab-btn" for="cur-tab-7" role="tab">ТЗ: документация</label>
+      </nav>
+
+      <!-- 1 Обзор -->
+      <section class="tab-panel tab-1" role="tabpanel" aria-label="Обзор">
+        <section id="goals">
+          <h2>Цели и уровни подготовки</h2>
+          <div class="grid">
+            <article class="card">
+              <h3>Уровень 1 — Оператор</h3>
+              <ul>
+                <li>Прошивка, порты, датчики, режимы, failsafe, логирование.</li>
+                <li>Базовый тюнинг и безопасный запуск.</li>
+              </ul>
+            </article>
+            <article class="card">
+              <h3>Уровень 2 — Интегратор</h3>
+              <ul>
+                <li>GPS, компас, телеметрия, VTX, rangefinder, сервы.</li>
+                <li>Companion computer и внешние MCU (ESP32/STM32).</li>
+              </ul>
+            </article>
+            <article class="card">
+              <h3>Уровень 3 — Автоматизатор</h3>
+              <ul>
+                <li>Lua (ArduPilot), IPF/JS (INAV), CLI-профили (BF).</li>
+                <li>Offboard/ROS 2 режимы и внешняя логика.</li>
+              </ul>
+            </article>
+            <article class="card">
+              <h3>Уровень 4 — Разработчик</h3>
+              <ul>
+                <li>Сборка из исходников, feature selection, кастомизация.</li>
+                <li>Модули PX4, OEM-подход, анализ архитектуры flight stack.</li>
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <section id="knowledge-architecture">
+          <h2>Архитектура знаний (3 уровня)</h2>
+          <p class="muted">Нелинейная модель: концепты → стек → проверяемая практика.</p>
+          <div class="grid">
+            <article class="card">
+              <h3>Уровень 1 — Фундамент</h3>
+              <ul>
+                <li>PID, rates, фильтры, базовая динамика полёта.</li>
+                <li>Сенсоры: gyro, accel, baro, compass, GPS.</li>
+                <li>Протоколы: UART, I2C, SPI, CRSF/ELRS, MAVLink.</li>
+              </ul>
+            </article>
+            <article class="card">
+              <h3>Уровень 2 — Прошивки</h3>
+              <ul>
+                <li>ArduPilot: миссии, Lua, companion integration.</li>
+                <li>INAV: навигация, wing, IPF/JS-логика.</li>
+                <li>Betaflight: low-level control, CLI, Blackbox.</li>
+                <li>PX4: uORB, control allocation, ROS 2.</li>
+              </ul>
+            </article>
+            <article class="card">
+              <h3>Уровень 3 — Практика</h3>
+              <ul>
+                <li>Настройка реального дрона под задачу.</li>
+                <li>Логи, диагностика и разбор симптомов.</li>
+                <li>Фейлы, дебаг, повторяемый результат.</li>
+              </ul>
+            </article>
+          </div>
+        </section>
+      </section>
+
+      <!-- 2 Методология -->
+      <section class="tab-panel tab-2" role="tabpanel" aria-label="Методология">
+        <section id="method">
+          <h2>Методология обучения</h2>
+          <ul>
+            <li>Изучение по слоям системы: железо, сенсоры, управление, навигация, логи, интеграция, код.</li>
+            <li>Каждая тема: концепция → внутреннее устройство → настройка → диагностика → мини-проект.</li>
+            <li><span class="warn">Правило безопасности:</span> сначала simulation/SITL, потом реальные полёты.</li>
+            <li>Каждая неделя даёт артефакты: чеклист, заметка, конфиг/скрипт, черновик страницы сайта.</li>
+          </ul>
+        </section>
+
+        <section id="missions">
+          <h2>Режим миссий</h2>
+          <p>Каждый учебный блок — миссия с измеримым входом и выходом.</p>
+          <table>
+            <thead>
+              <tr>
+                <th>Миссия</th>
+                <th>Цель</th>
+                <th>Вход</th>
+                <th>Проверка/Выход</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Настроить PID</td>
+                <td>Стабильный полёт без выраженных осцилляций.</td>
+                <td>Дрон + базовая прошивка + безопасный полигон.</td>
+                <td>Видео полёта + diff/params + лог до/после.</td>
+              </tr>
+              <tr>
+                <td>Подключить GPS</td>
+                <td>Устойчивый GPS fix и корректные координаты.</td>
+                <td>FC + GPS + свободный UART.</td>
+                <td>Координаты и спутники в конфигураторе/GCS.</td>
+              </tr>
+              <tr>
+                <td>Проверить failsafe</td>
+                <td>Прогнозируемое поведение при потере связи.</td>
+                <td>Настроенный профиль failsafe.</td>
+                <td>Протокол теста и подтверждённый сценарий.</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        <section id="verification">
+          <h2>Система проверки знаний</h2>
+          <div class="grid">
+            <article class="card">
+              <h3>Чек-лист модуля</h3>
+              <ul>
+                <li>Сделан backup/diff/params до изменений.</li>
+                <li>Выполнен минимум один практический полёт/симуляция.</li>
+                <li>Сохранён лог и сделаны выводы.</li>
+              </ul>
+            </article>
+            <article class="card">
+              <h3>Контрольные вопросы</h3>
+              <ul>
+                <li>Что такое D-term и как влияет на поведение?</li>
+                <li>Почему появляются осцилляции?</li>
+                <li>Чем ArduPilot отличается от Betaflight по назначению?</li>
+              </ul>
+            </article>
+            <article class="card">
+              <h3>Мини-тесты</h3>
+              <ul>
+                <li>10–15 вопросов после каждого крупного этапа.</li>
+                <li>Порог прохождения: не ниже 80%.</li>
+                <li>Если ниже порога — повтор темы и миссии.</li>
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <section id="lab">
+          <h2>Режим лаборатории</h2>
+          <p>Экспериментальная ветка: причинное понимание, а не «настроил по гайду».</p>
+          <ul>
+            <li>Сравнить PID на 5" и 10" платформах.</li>
+            <li>Сравнить фильтры по логам вибраций и motor traces.</li>
+            <li>A/B тест двух прошивок на одном дроне.</li>
+            <li>Серия тестов: одно изменение за итерацию.</li>
+          </ul>
+        </section>
+      </section>
+
+      <!-- 3 Сравнения -->
+      <section class="tab-panel tab-3" role="tabpanel" aria-label="Сравнения">
+        <section id="comparison">
+          <h2>Кросс-сравнение прошивок</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>Фича</th>
+                <th>Betaflight</th>
+                <th>INAV</th>
+                <th>ArduPilot</th>
+                <th>PX4</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>GPS-навигация</td>
+                <td>Ограниченно</td>
+                <td>Сильно</td>
+                <td>Сильно</td>
+                <td>Сильно</td>
+              </tr>
+              <tr>
+                <td>Автономные миссии</td>
+                <td>Базово</td>
+                <td>Средне</td>
+                <td>Сильно</td>
+                <td>Сильно</td>
+              </tr>
+              <tr>
+                <td>Скриптинг внутри FC</td>
+                <td>CLI/presets</td>
+                <td>IPF/JS</td>
+                <td>Lua</td>
+                <td>Внешние modes/ROS2</td>
+              </tr>
+              <tr>
+                <td>Companion computer</td>
+                <td>Ограниченно</td>
+                <td>Частично</td>
+                <td>Сильно</td>
+                <td>Сильно</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        <section id="causality">
+          <h2>Причинно-следственные связи</h2>
+          <p>Для каждого параметра — не только «что включить», но и логика влияния на полёт.</p>
+          <table>
+            <thead>
+              <tr>
+                <th>Параметр</th>
+                <th>Что делает</th>
+                <th>Когда применять</th>
+                <th>Симптомы неправильной настройки</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>D-term</td>
+                <td>Демпфирует быстрые изменения ошибки.</td>
+                <td>При bounce back и резких остановках.</td>
+                <td>Перегрев моторов, шум, дрожание.</td>
+              </tr>
+              <tr>
+                <td>Notch filter</td>
+                <td>Подавляет узкополосные вибрации.</td>
+                <td>При выраженных вибрационных пиках в логах.</td>
+                <td>Осцилляции, «грязный» gyro сигнал.</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        <section id="site-format">
+          <h2>Формат учебного сайта (реализовано)</h2>
+          <p>Материалы публикуются в <code>index.html</code> как карточки <code>article.card</code> с единой структурой блоков (см. вкладку «Стандарт курса» и <code>PROJECT-DIRECTIVES.md</code>).</p>
+          <div class="card">
+            <h3>Черновик темы в Markdown (опционально)</h3>
+            <ul>
+              <li><code># Title</code> → теория, практика, диагностика, источники, чек-лист (по <code>article-template</code> в едином документе).</li>
+              <li>Вёрстка в HTML — по шаблону из методологии контента.</li>
+            </ul>
+          </div>
+        </section>
+
+        <section id="real-builds">
+          <h2>Реальные сборки под задачи</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>Сценарий</th>
+                <th>Рекомендуемая прошивка</th>
+                <th>Ключевые настройки</th>
+                <th>Почему именно так</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Разведка</td>
+                <td>ArduPilot / PX4</td>
+                <td>RTL, mission, логирование, геозоны, companion link.</td>
+                <td>Нужна навигация, стабильность и телеметрия.</td>
+              </tr>
+              <tr>
+                <td>Ударный сценарий</td>
+                <td>ArduPilot / PX4 (или BF для ручного профиля)</td>
+                <td>Надёжный failsafe, payload logic, резерв питания/связи.</td>
+                <td>Критична отказоустойчивость и контроль полезной нагрузки.</td>
+              </tr>
+              <tr>
+                <td>Дальняк</td>
+                <td>INAV / ArduPilot / PX4</td>
+                <td>GPS/компас, energy management, возврат домой.</td>
+                <td>Ключевые факторы: навигация и предсказуемое поведение.</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        <section id="fails">
+          <h2>Журнал ошибок и фейлов</h2>
+          <p>Самый ценный раздел: реальные поломки и восстановление.</p>
+          <table>
+            <thead>
+              <tr>
+                <th>Что не работало</th>
+                <th>Причина</th>
+                <th>Как починил</th>
+                <th>Как предотвращать</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Нет GPS фикса</td>
+                <td>Неверный UART/baudrate, помехи.</td>
+                <td>Переназначен порт, перепроверен wiring.</td>
+                <td>Шаблон проверки портов перед полётом.</td>
+              </tr>
+              <tr>
+                <td>Осцилляции после тюна</td>
+                <td>Агрессивный D-term и слабая фильтрация.</td>
+                <td>Откат параметров, анализ Blackbox, пошаговый тюн.</td>
+                <td>Менять по одному параметру за итерацию.</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+      </section>
+
+      <!-- 4 Треки и карта -->
+      <section class="tab-panel tab-4" role="tabpanel" aria-label="Треки и карта">
+        <section id="tracks">
+          <h2>Основные треки прошивок</h2>
+          <div class="grid">
+            <article class="card">
+              <h3>Трек A — Betaflight (6–8 недель)</h3>
+              <ul>
+                <li>Базовая эксплуатация, Ports/Receiver/Modes/OSD.</li>
+                <li>PID, filters, feedforward, RPM filtering.</li>
+                <li>Blackbox анализ и симптомный тюнинг.</li>
+                <li>CLI: diff/dump/get/set/save, resource remapping.</li>
+                <li>Custom builds под ограничения FC.</li>
+              </ul>
+            </article>
+            <article class="card">
+              <h3>Трек B — INAV (6–8 недель)</h3>
+              <ul>
+                <li>Навигационные режимы и миссии для квадро/крыла.</li>
+                <li>Fixed-wing setup: launch, cruise, RTH, geozones.</li>
+                <li>Programming Framework: logic conditions, variables.</li>
+                <li>JS-слой для пользовательской логики поведения.</li>
+              </ul>
+            </article>
+            <article class="card">
+              <h3>Трек C — ArduPilot (8–10 недель)</h3>
+              <ul>
+                <li>Copter/Plane экосистема, миссии, EKF, логи.</li>
+                <li>Окто/X8, heavy-lift, отказоустойчивость.</li>
+                <li>Lua scripting в sandbox, applets, параметры.</li>
+                <li>MAVLink + companion computer (Raspberry Pi).</li>
+                <li>Build from source, OEM customization.</li>
+              </ul>
+            </article>
+            <article class="card">
+              <h3>Трек D — PX4 (8–10 недель)</h3>
+              <ul>
+                <li>Модульная архитектура: modules, uORB, work queues.</li>
+                <li>Actuator setup и control allocation для квадро/окто.</li>
+                <li>ROS 2 и offboard/external modes.</li>
+                <li>Разработка собственного модуля PX4.</li>
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <section id="roadmap">
+          <h2>Дорожная карта (56 недель)</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>Этап</th>
+                <th>Недели</th>
+                <th>Содержание</th>
+                <th>Результат</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td data-label="Этап">Этап 0: Фундамент</td>
+                <td data-label="Недели">1–4</td>
+                <td data-label="Содержание">FC архитектура, сенсоры, режимы, failsafe, логи.</td>
+                <td data-label="Результат" class="ok">Базовая инженерная грамотность.</td>
+              </tr>
+              <tr>
+                <td data-label="Этап">Этап 1: Инструменты и симуляция</td>
+                <td data-label="Недели">5–7</td>
+                <td data-label="Содержание">Configurator/GCS stack, SITL, dev environment, Git.</td>
+                <td data-label="Результат" class="ok">Безопасный workflow и структура знаний.</td>
+              </tr>
+              <tr>
+                <td data-label="Этап">Этап 2: Betaflight</td>
+                <td data-label="Недели">8–12</td>
+                <td data-label="Содержание">Setup, CLI, PID/filters, Blackbox, remap, custom build.</td>
+                <td data-label="Результат" class="ok">Уверенный low-level контроль квадро.</td>
+              </tr>
+              <tr>
+                <td data-label="Этап">Этап 3: INAV</td>
+                <td data-label="Недели">13–17</td>
+                <td data-label="Содержание">GPS-навигация, крыло, IPF, JS-автоматизация.</td>
+                <td data-label="Результат" class="ok">Навигационный и логический стек.</td>
+              </tr>
+              <tr>
+                <td data-label="Этап">Этап 4: ArduPilot</td>
+                <td data-label="Недели">18–23</td>
+                <td data-label="Содержание">Copter/Plane/Octo, Lua, MAVLink, companion integration.</td>
+                <td data-label="Результат" class="ok">Сложные платформы и onboard-логика.</td>
+              </tr>
+              <tr>
+                <td data-label="Этап">Этап 5: PX4</td>
+                <td data-label="Недели">24–29</td>
+                <td data-label="Содержание">Architecture, control allocation, ROS 2, custom modules.</td>
+                <td data-label="Результат" class="ok">Инженерная модульная разработка.</td>
+              </tr>
+              <tr>
+                <td data-label="Этап">Этап 6: Интеграция</td>
+                <td data-label="Недели">30–33</td>
+                <td data-label="Содержание">Raspberry Pi, ESP32, системная архитектура, integration project.</td>
+                <td data-label="Результат" class="ok">Связка FC + companion + периферия.</td>
+              </tr>
+              <tr>
+                <td data-label="Этап">Этап 7: Advanced</td>
+                <td data-label="Недели">34–37</td>
+                <td data-label="Содержание">Исходники, кастомизация, сравнение стеков, capstone.</td>
+                <td data-label="Результат" class="ok">Переход к уровню разработчика.</td>
+              </tr>
+              <tr>
+                <td data-label="Этап">Этап 8: Автономия/AI</td>
+                <td data-label="Недели">38–43</td>
+                <td data-label="Содержание">Perception, planning, AI control, swarm, автономный проект.</td>
+                <td data-label="Результат" class="ok">Решения уровня autonomous systems.</td>
+              </tr>
+              <tr>
+                <td data-label="Этап">Этап 9: Ops &amp; Reliability</td>
+                <td data-label="Недели">44–49</td>
+                <td data-label="Содержание">Надёжность, питание, связь, полевые проверки, production build.</td>
+                <td data-label="Результат" class="ok">Эксплуатационная зрелость.</td>
+              </tr>
+              <tr>
+                <td data-label="Этап">Этап 10: Firmware Dev Deep Dive</td>
+                <td data-label="Недели">50–56</td>
+                <td data-label="Содержание">Build systems, code structure, модификации, debug, ROS2 deep.</td>
+                <td data-label="Результат" class="ok">Создание кастомной системы управления.</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+      </section>
+
+      <!-- 5 Проекты и стек -->
+      <section class="tab-panel tab-5" role="tabpanel" aria-label="Проекты и стек">
+        <section id="projects">
+          <h2>Итоговые проекты</h2>
+          <div class="grid">
+            <article class="card">
+              <h3>Capstone 1: Один квадро, 4 прошивки</h3>
+              <p>Сравнить Betaflight, INAV, ArduPilot, PX4 на одной аппаратной базе.</p>
+            </article>
+            <article class="card">
+              <h3>Capstone 2: Окто с полезной нагрузкой</h3>
+              <p>ArduPilot/PX4, корректная геометрия, companion logic, RTL-тесты.</p>
+            </article>
+            <article class="card">
+              <h3>Capstone 3: Крыло с навигацией</h3>
+              <p>INAV + ArduPilot/PX4: launch, cruise, geofence, логи и разбор.</p>
+            </article>
+            <article class="card">
+              <h3>Capstone 4: Собственная логика</h3>
+              <p>Lua/IPF/JS/ROS2 offboard + внешний ESP32-модуль.</p>
+            </article>
+          </div>
+        </section>
+
+        <section id="tools">
+          <h2>Минимальный стек инструментов</h2>
+          <ul>
+            <li>Betaflight App, INAV Configurator, Mission Planner, QGroundControl.</li>
+            <li>Blackbox Explorer, VS Code, Git, Python, Linux/WSL2.</li>
+            <li>Raspberry Pi для companion задач; далее ROS 2, MAVSDK, pymavlink.</li>
+          </ul>
+          <h3>Правила обучения</h3>
+          <ul>
+            <li>Всегда сохранять backup/diff/params перед изменениями.</li>
+            <li>Не менять одновременно PID, filters, power, failsafe и порты.</li>
+            <li>Каждый модуль заканчивать мини-проектом и заметкой в базе знаний.</li>
+          </ul>
+        </section>
+
+        <section id="content-automation">
+          <h2>Workflow автоматизированного добавления контента</h2>
+          <p class="muted">
+            База знаний растёт из <code>content/*.md</code> и <code>data/content-manifest.json</code>;
+            <code>publish.py</code> подставляет TOC и статьи в <code>index.html</code> только между маркерами
+            <code>AUTO:TOC:*</code>, <code>AUTO:ARTICLES:*</code>, <code>AUTO:PROGRESS:*</code> — без ручного копирования HTML.
+          </p>
+          <div class="grid">
+            <article class="card">
+              <h3>1. Создание статьи</h3>
+              <pre><code>python scripts/new_article.py inav inav-gps-fix "GPS Fix и диагностика" L2</code></pre>
+              <p>Создаётся <code>content/&lt;section&gt;/&lt;id&gt;.md</code> и запись в манифесте (<code>draft</code>).</p>
+            </article>
+            <article class="card">
+              <h3>2. Заполнение Markdown</h3>
+              <p>Шаблон: <code>content/article-template.md</code>. Обязательные секции: summary, theory, practice, diagnostics, references.</p>
+            </article>
+            <article class="card">
+              <h3>3. Публикация</h3>
+              <pre><code>python scripts/publish.py</code></pre>
+              <p>Валидация → TOC → HTML модулей → запись в <code>index.html</code>.</p>
+            </article>
+            <article class="card">
+              <h3>4. Сайт и Git</h3>
+              <p>Открыть <code>index.html</code> в браузере. Коммит/push: <code>publish-git.bat</code> или <code>bash publish-git.sh</code> (если есть репозиторий).</p>
+            </article>
+          </div>
+          <h3>Почему это важно</h3>
+          <ul>
+            <li>Единая структура карточек и оглавления.</li>
+            <li>Меньше ошибок якорей и порядка модулей.</li>
+            <li>Markdown остаётся источником правды; <code>index.html</code> — собранный результат.</li>
+          </ul>
+        </section>
+      </section>
+
+      <!-- 6 Стандарт -->
+      <section class="tab-panel tab-6" role="tabpanel" aria-label="Стандарт курса">
+        <footer id="course-standard" class="footer-guide">
+          <h2>Единый стандарт курса и обучающей страницы</h2>
+          <p class="muted">
+            Стандарт для новых материалов: курс остаётся цельным и сравнимым между прошивками.
+          </p>
+
+          <h3>1) Структура курса</h3>
+          <ul>
+            <li><strong>Уровень 1:</strong> фундамент (динамика, сенсоры, протоколы).</li>
+            <li><strong>Уровень 2:</strong> прошивки (Betaflight, INAV, ArduPilot, PX4).</li>
+            <li><strong>Уровень 3:</strong> практика (миссии, логи, дебаг, фейлы, лаборатория).</li>
+            <li>Каждый модуль завершается измеримым результатом: лог, видео, конфиг, выводы.</li>
+          </ul>
+
+          <h3>2) Формат учебной страницы</h3>
+          <div class="guide-block">
+            <p><code>article.card[data-level][data-added]</code></p>
+            <p><code>h2</code> + краткое вводное <code>p.muted</code></p>
+            <p><code>.article-meta</code> (уровень, время, версия)</p>
+            <p><code>h3</code>: Теория → Практика → Диагностика</p>
+            <p><code>.cli-block</code> (если есть команды)</p>
+            <p><code>.references</code> + <code>.related-topics</code> + <code>.checklist</code></p>
+            <p><code>.article-footer</code> (добавлено/обновлено/уровень)</p>
+          </div>
+
+          <h3>3) Семантика HTML</h3>
+          <ul>
+            <li>Одна страница = <code>main</code> с набором <code>section</code>.</li>
+            <li>Тема = <code>article</code>, группы карточек = <code>div.grid</code>.</li>
+            <li>Сравнения через <code>table</code> с <code>thead/tbody</code>.</li>
+            <li>Иерархия: один <code>h1</code>, далее <code>h2 → h3</code> без пропусков.</li>
+          </ul>
+
+          <h3>4) CSS</h3>
+          <ul>
+            <li>Токены в <code>:root</code>; компоненты: <code>.card</code>, <code>.grid</code>, <code>.tag</code>.</li>
+            <li>Модификаторы: <code>.ok</code>, <code>.warn</code>; без inline-стилей.</li>
+          </ul>
+
+          <h3>5) Контент</h3>
+          <ul>
+            <li>Тон инженерный, воспроизводимые инструкции, версии прошивок в модулях.</li>
+            <li>Фейлы: что сломалось / почему / как исправлено / профилактика.</li>
+            <li>Обязателен чек-лист публикации: структура, ссылки, техника, интеграция в глоссарий/changelog.</li>
+          </ul>
+
+          <h3>6) Адаптивность</h3>
+          <ul>
+            <li>Брейкпоинты: до 480px, до 900px, выше 900px.</li>
+            <li>Узкие экраны: одна колонка, таблицы с горизонтальным скроллом.</li>
+          </ul>
+
+          <h3>7) Жизненный цикл статьи</h3>
+          <p class="muted">
+            Идея → место в структуре → черновик по шаблону статьи (<code>PROJECT-DIRECTIVES.md</code>, раздел article-template) → чек-лист →
+            <code>references.json</code> → вёрстка в <code>index.html</code> → глоссарий/перекрёстные ссылки →
+            ревью → запись в changelog (раздел Changelog в <code>PROJECT-DIRECTIVES.md</code>).
+          </p>
+
+          <h3>8) Единый документ директив</h3>
+          <p class="muted">
+            Полные тексты концепции, методологии, гайдов и истории изменений — в <code>PROJECT-DIRECTIVES.md</code>.
+            Корневые <code>project-concept.md</code>, <code>content-methodology.md</code> и др. — короткие указатели на разделы этого файла.
+          </p>
+        </footer>
+
+        <p class="footer">
+          Сырые тексты ТЗ — <code>archive/tz-texts/</code> (см. <code>archive/README.md</code>). Папка <code>curriculum/</code> — отдельно от сайта.
+        </p>
+      </section>
+      <!-- 7 ТЗ: сводка документации из *.md -->
+      <section class="tab-panel tab-7" role="tabpanel" aria-label="Техническое задание по документации">
+        <div class="tz-doc">
+          <p class="muted intro-tz">
+            <strong>Источник правды по текстам ТЗ и директив:</strong> <code>PROJECT-DIRECTIVES.md</code> (единый файл с оглавлением).
+            Корневые <code>README.md</code>, <code>project-concept.md</code> и остальные <code>*.md</code> — краткие указатели на разделы единого документа.
+            Эта вкладка даёт обзор и состояние проекта; при расхождении обновлять сначала <code>PROJECT-DIRECTIVES.md</code>, затем при необходимости сводку здесь.
+          </p>
+
+          <article class="card tz-section" id="tz-project-directives">
+            <h2>PROJECT-DIRECTIVES.md — единый документ</h2>
+            <p>В одном файле объединены бывшие отдельные markdown-документы: концепция, архитектура, методология контента, правила текстов, шаблон статьи, политика источников, формат <code>references.json</code>, визуальный стиль, style guide, changelog, roadmap-notes, черновики структуры курса.</p>
+            <p><strong>Протокол развития проекта:</strong> изменения директив и записи в changelog вносятся в <code>PROJECT-DIRECTIVES.md</code>; отдельные имена файлов сохранены для совместимости ссылок.</p>
+          </article>
+
+          <article class="card tz-section" id="tz-site-status">
+            <h2>Состояние сайта <code>index.html</code> (актуально)</h2>
+            <p class="muted">Одна страница, табы по стекам; внизу — глоссарий, журнал ошибок, сравнение прошивок, ресурсы, быстрые чек-листы. Встроен JS: табы, якоря, <code>localStorage</code> (в т.ч. сворачиваемый hero).</p>
+            <table>
+              <thead><tr><th>Вкладка</th><th>Статей (<code>article.card</code>)</th><th>Оглавление (TOC)</th></tr></thead>
+              <tbody>
+                <tr><td>Betaflight</td><td>8</td><td>Синхронизировано с id: <code>bf-intro</code> … <code>bf-custom</code></td></tr>
+                <tr><td>INAV</td><td>5</td><td><code>inav-intro</code> … <code>inav-ipf</code></td></tr>
+                <tr><td>ArduPilot</td><td>5</td><td><code>ap-intro</code> … <code>ap-companion</code></td></tr>
+                <tr><td>PX4</td><td>4</td><td><code>px4-intro</code> … <code>px4-ros2</code></td></tr>
+                <tr><td>Companion</td><td>4</td><td><code>comp-intro</code> … <code>comp-esp32</code></td></tr>
+                <tr><td>Инструменты</td><td>1</td><td>Обзор конфигураторов и ПО (без отдельного набора id по статьям)</td></tr>
+              </tbody>
+            </table>
+          </article>
+
+          <article class="card tz-section" id="tz-readme">
+            <h2>README.md — вход и структура</h2>
+            <table>
+              <thead><tr><th>Что</th><th>Где</th></tr></thead>
+              <tbody>
+                <tr><td>Единый документ ТЗ</td><td><code>PROJECT-DIRECTIVES.md</code></td></tr>
+                <tr><td>Проект сайта</td><td><code>index.html</code> + <code>style.css</code> в корне</td></tr>
+                <tr><td>Идея курса (не сайт)</td><td><code>curriculum/</code> — <code>curriculum.html</code> + <code>curriculum.css</code></td></tr>
+                <tr><td>Тексты ТЗ (временно)</td><td><code>archive/tz-texts/</code></td></tr>
+                <tr><td>Короткие указатели</td><td><code>archive/stubs/*.md</code> → разделы <code>PROJECT-DIRECTIVES.md</code></td></tr>
+                <tr><td>База ссылок (опционально)</td><td><code>archive/references.json</code></td></tr>
+                <tr><td>Резервная копия</td><td><code>archive/uav-student-supplementary-backup.zip</code></td></tr>
+              </tbody>
+            </table>
+            <p><strong>Открыть:</strong> сайт — <code>index.html</code>; программа — <code>curriculum/curriculum.html</code>; полные директивы — <code>PROJECT-DIRECTIVES.md</code>.</p>
+            <p><strong>Как добавлять статьи:</strong> разделы «Методология контента», «Шаблон статьи», «Правила контента», «Политика источников» в <code>PROJECT-DIRECTIVES.md</code>.</p>
+          </article>
+
+          <article class="card tz-section" id="tz-architecture">
+            <h2>architecture.md — архитектура репозитория</h2>
+            <p>Целостная концепция — <code>project-concept.md</code>.</p>
+            <pre class="guide-block">UAV_Student/
+├── index.html
+├── style.css
+├── PROJECT-DIRECTIVES.md
+├── README.md
+├── curriculum/
+│   ├── curriculum.html
+│   └── curriculum.css
+└── archive/            # stubs, tz-texts, references.json, .zip
+</pre>
+            <table>
+              <thead><tr><th>Что</th><th>Назначение</th></tr></thead>
+              <tbody>
+                <tr><td><code>index.html</code> + <code>style.css</code></td><td>Единственная связка проекта сайта</td></tr>
+                <tr><td><code>curriculum/</code></td><td>Автономный прототип учебной программы</td></tr>
+                <tr><td><code>archive/tz-texts/</code></td><td>Сырые тексты ТЗ</td></tr>
+                <tr><td><code>archive/stubs/</code></td><td>Короткие указатели на разделы ТЗ</td></tr>
+              </tbody>
+            </table>
+          </article>
+
+          <article class="card tz-section" id="tz-project-concept">
+            <h2>Концепция проекта (в PROJECT-DIRECTIVES.md)</h2>
+            <p><strong>Назначение:</strong> образовательный веб-ресурс по разработке, настройке и эксплуатации БПЛА. Полный текст — в <code>PROJECT-DIRECTIVES.md</code>, раздел project-concept. Файл <code>project-concept.md</code> — указатель.</p>
+            <p><strong>Формат:</strong> статическая площадка с табами и оглавлением/якорями; источники по политике источников (в едином документе).</p>
+            <table>
+              <thead><tr><th>Уровень IA</th><th>Где</th><th>Содержание</th></tr></thead>
+              <tbody>
+                <tr><td>Идея программы</td><td><code>curriculum/</code></td><td>Обзор, методология, треки (не часть сайта)</td></tr>
+                <tr><td>Проект сайта</td><td><code>index.html</code> + <code>style.css</code></td><td>Табы по стекам: BF, INAV, ArduPilot, PX4, Companion</td></tr>
+              </tbody>
+            </table>
+            <p><strong>Принцип:</strong> JS не обязателен, навигация должна деградировать корректно (content-first).</p>
+            <h3>Целевые табы продукта</h3>
+            <table>
+              <thead><tr><th>Таб</th><th>Содержание</th><th>Ориентир</th></tr></thead>
+              <tbody>
+                <tr><td>Betaflight</td><td>FPV, PID, фильтры, Blackbox, CLI</td><td>6–8 модулей</td></tr>
+                <tr><td>INAV</td><td>Навигация, GPS, крыло, IPF/JS</td><td>6–8</td></tr>
+                <tr><td>ArduPilot</td><td>Миссии, Lua, EKF, тяжёлые платформы</td><td>8–10</td></tr>
+                <tr><td>PX4</td><td>uORB, control allocation, ROS 2</td><td>8–10</td></tr>
+                <tr><td>Companion</td><td>Raspberry Pi, ESP32, MAVLink, MAVSDK</td><td>4–6</td></tr>
+              </tbody>
+            </table>
+            <p>Качество: достоверность, версии, воспроизводимость, предупреждения рисков; отклонения — через <code>changelog.md</code>.</p>
+          </article>
+
+          <article class="card tz-section" id="tz-content-methodology">
+            <h2>Методология контента (в PROJECT-DIRECTIVES.md)</h2>
+            <p>Полный процесс добавления статей: цель, принципы, иерархия, уровни L1–L4, жизненный цикл, шаблон HTML, чек-лист публикации, UI-паттерны. Файл <code>content-methodology.md</code> в корне — указатель на этот раздел.</p>
+            <p><strong>Принципы:</strong> шаблонность, иерархичность, верифицируемость, прогрессивность, связность.</p>
+            <p><strong>Жизненный цикл:</strong> идея → место в структуре → шаблон → чек-лист → <code>archive/references.json</code> (опционально) → вёрстка → глоссарий/связи → ревью → Changelog в <code>PROJECT-DIRECTIVES.md</code>.</p>
+            <p><strong>HTML-шаблон:</strong> <code>.article-meta</code>, <code>.references</code>, <code>.related-topics</code>, <code>.checklist</code>, <code>.article-footer</code>; опционально <code>.breadcrumb</code>, <code>.section-progress</code>, <code>.orientation-guide</code>.</p>
+            <p><strong>Статус:</strong> <code>curriculum/</code> — прототип идеи курса, не часть сборки <code>index.html</code>.</p>
+          </article>
+
+          <article class="card tz-section" id="tz-content-guidelines">
+            <h2>content-guidelines.md — правила контента</h2>
+            <table>
+              <thead><tr><th>Принцип</th><th>Описание</th></tr></thead>
+              <tbody>
+                <tr><td>Слоистый подход</td><td>От фундамента (сенсоры, PID) к прикладным слоям и кастомизации</td></tr>
+                <tr><td>Причинно-следственное обучение</td><td>Параметр: что делает → когда применять → симптомы ошибки</td></tr>
+                <tr><td>Практическая верификация</td><td>Каждый модуль завершается измеримым результатом</td></tr>
+                <tr><td>Безопасность</td><td>Сначала симуляция/SITL, затем реальные полёты</td></tr>
+              </tbody>
+            </table>
+            <p>Каркас модуля: теория → практика → диагностика → ссылки → чек-лист. Уровни L1–L4 и критерии — в документе.</p>
+          </article>
+
+          <article class="card tz-section" id="tz-article-template">
+            <h2>article-template.md — шаблон статьи</h2>
+            <p>Шаблон для черновиков <code>.md</code> (в корне или в <code>content/</code>): кратко, что это, зачем, как работает, практика, типичные ошибки, диагностика, источники, смежные темы.</p>
+            <p>Для HTML-вставки в сайт используйте разметку из <code>content-methodology.md</code> (§3.2) с обязательными блоками и классами.</p>
+          </article>
+
+          <article class="card tz-section" id="tz-source-policy">
+            <h2>source-policy.md — политика источников</h2>
+            <p><strong>A (официальные):</strong> документация, репозитории, wiki, maintainer docs, release notes, спецификации.</p>
+            <p><strong>B (вторичные авторитетные):</strong> статьи разработчиков, technical blogs, проверенные разборы.</p>
+            <p><strong>C (community):</strong> форумы, Reddit, Discord/Discourse, issues, личные гайды — осторожно.</p>
+            <p><strong>Правило приоритета:</strong> A важнее всех; B/C только как дополнение. Для C обязательно указывать версию и необходимость сверки с A.</p>
+          </article>
+
+          <article class="card tz-section" id="tz-references-db">
+            <h2>references-db.md — база ссылок</h2>
+            <p>Единый формат записей для <code>references.json</code>: <code>id</code>, <code>title</code>, <code>url</code>, <code>stack</code>, <code>type</code>, <code>trust</code>, <code>uiTag</code>, <code>notes</code>, <code>lastChecked</code>, <code>firmwareNote</code>.</p>
+            <p>UI-теги <code>primary/community/video</code> не заменяют уровни доверия A/B/C.</p>
+            <pre class="guide-block">{
+  "id": "bf-docs-main",
+  "title": "Betaflight — документация",
+  "url": "https://betaflight.com/docs/development",
+  "stack": "betaflight",
+  "type": "official_docs",
+  "trust": "A"
+}</pre>
+          </article>
+
+          <article class="card tz-section" id="tz-visual-style">
+            <h2>visual-style.md — визуальный стиль</h2>
+            <p><strong>Идея:</strong> dark technical reference interface — спокойный инженерный интерфейс, где оформление не спорит с контентом.</p>
+            <p>Блоки: <code>hero</code>, <code>toc</code>, <code>card</code>, <code>callout-info</code>, <code>callout-warn</code>, <code>doc-links</code>, <code>community-links</code>, <code>compare-table</code>, <code>checklist</code>, <code>glossary-entry</code>.</p>
+            <p>Таблицы: <code>thead</code>/<code>tbody</code>; на мобильных — скролл или карточки строк. Контрольные ширины: 480px, 900px, выше 900px.</p>
+          </article>
+
+          <article class="card tz-section" id="tz-style-guide">
+            <h2>style-guide.md — код и UI</h2>
+            <p>Классы по назначению, данные в <code>references.json</code> по <code>references-db.md</code>. Токены и компоненты для <code>index.html</code> + <code>style.css</code>.</p>
+            <pre class="guide-block">:root {
+  --bg-primary: #0b1220;
+  --bg-secondary: #111a2e;
+  --text-primary: #e7eefc;
+  --text-secondary: #9fb0d0;
+  --accent: #5fa8ff;
+  --success: #45d483;
+  --warning: #ffcc66;
+  --danger: #ff6b6b;
+  --border: #2b3d66;
+}</pre>
+            <p>Компоненты: TabBar, Card, Grid, Table (с <code>data-label</code>), Tag, DocLink, Accordion. JS — опционально при CSS-fallback.</p>
+          </article>
+
+          <article class="card tz-section" id="tz-changelog">
+            <h2>История изменений (в PROJECT-DIRECTIVES.md)</h2>
+            <p>Актуальный changelog ведётся в разделе <em>Changelog</em> файла <code>PROJECT-DIRECTIVES.md</code>. В том числе: наполнение вкладок <code>index.html</code>, глоссарий и журнал ошибок, ресурсы и чек-листы, объединение markdown-документации в единый файл, обновление <code>curriculum.html</code>.</p>
+            <p>Файл <code>changelog.md</code> в корне — указатель на полный текст.</p>
+          </article>
+
+          <article class="card tz-section" id="tz-roadmap-notes">
+            <h2>roadmap-notes.md — заметки по дорожной карте</h2>
+            <p>Рабочее место для идей по этапам, срокам и зависимостям. Не дублирует таблицу из <code>curriculum.html</code>; хранит риски и открытые вопросы.</p>
+            <p>Правила: кратко, с ссылками по <code>source-policy.md</code>; после стабилизации переносить выводы в контент/документы и удалять шум.</p>
+          </article>
+
+          <article class="card tz-section" id="tz-structure-drafts">
+            <h2>structure-drafts.md — черновики структуры курса</h2>
+            <p>Эксперименты с иерархией разделов и навигацией. Это не финальная карта сайта.</p>
+            <p>Перед переносом в контент согласовывать с <code>content-methodology.md</code>.</p>
+          </article>
+
+          <p class="footer tz-footer">Конец обзора. <strong>Источник правды по текстам:</strong> <code>PROJECT-DIRECTIVES.md</code>.</p>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      var tables = document.querySelectorAll("table");
+      tables.forEach(function (table) {
+        var headers = Array.from(table.querySelectorAll("thead th")).map(function (th) {
+          return th.textContent.trim();
+        });
+        if (!headers.length) return;
+        table.querySelectorAll("tbody tr").forEach(function (row) {
+          Array.from(row.children).forEach(function (cell, index) {
+            if (!cell.getAttribute("data-label")) {
+              cell.setAttribute("data-label", headers[index] || "Поле");
+            }
+          });
+        });
+      });
+    })();
+  </script>
+</body>
+</html>

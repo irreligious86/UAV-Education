@@ -1,0 +1,1802 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="UAV Student — инженерная база знаний по БПЛА, прошивкам и интеграции. Betaflight, INAV, ArduPilot, PX4, Companion Computer.">
+  <meta name="keywords" content="Betaflight, INAV, ArduPilot, PX4, drone, UAV, полетный контроллер, настройка дрона">
+  <meta name="author" content="UAV Student">
+  <title>UAV Student — инженерная база знаний</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="wrap" id="top">
+    <!--
+      ============================================================
+      ИНСТРУКЦИЯ ДЛЯ РАЗРАБОТЧИКА (можно удалить позже):
+      ============================================================
+      1. Этот файл — основа проекта. Все стили — в style.css.
+      2. Навигация: табы переключают разделы (стеки прошивок).
+      3. Активный таб: класс .active на кнопке и .tab-pane.
+      4. Каждый раздел (.tab-pane): оглавление .toc, модули, блок источников.
+      5. Новый раздел: кнопка в .tab-bar + секция .tab-pane с id = data-tab.
+      6. Модуль статьи: article.card, структура по content-guidelines / article-template.md.
+      7. Без JS страница читаема; табы переключает скрипт (см. низ файла).
+      ============================================================
+    -->
+
+    <header class="hero" id="site-hero">
+      <div class="hero__head">
+        <h1 class="hero__title">UAV Student</h1>
+        <p class="hero__tagline muted">База знаний по БПЛА и прошивкам</p>
+      </div>
+
+      <!-- По умолчанию свёрнуто (экономия места). Раскрыть: клик по «О проекте…». Без JS тоже работает (native details). -->
+      <details class="hero-details" id="hero-details">
+        <summary class="hero-details__summary">
+          <span class="hero-details__summary-text">О проекте и версии прошивок</span>
+        </summary>
+        <div class="hero-details__body">
+          <p class="muted hero__lead">
+            Инженерная база знаний по настройке, интеграции и разработке БПЛА — от базовых принципов до кастомизации прошивок.
+          </p>
+          <div class="version-info version-info--hero">
+            <strong class="version-info__label">Ориентир версий:</strong>
+            <span class="tag tag--compact">Betaflight 4.5+</span>
+            <span class="tag tag--compact">INAV 7.0+</span>
+            <span class="tag tag--compact">ArduPilot 4.5+</span>
+            <span class="tag tag--compact">PX4 1.15+</span>
+            <span class="tag tag--compact">MAVLink 2.0+</span>
+          </div>
+        </div>
+      </details>
+    </header>
+
+    <section class="section-switch-hint card" aria-label="Подсказка по навигации">
+      <p class="section-switch-hint__text">
+        Выбери стек прошивки во вкладках ниже. Внутри каждого раздела есть содержание,
+        статьи по уровням L1–L4, чек-листы и источники.
+      </p>
+    </section>
+
+    <!--
+      Табы: JS переключает панели; без JS видна только первая активная панель (см. комментарий в style.css).
+    -->
+    <div class="tab-bar" role="tablist" aria-label="Разделы по прошивкам">
+      <button type="button" class="tab-btn active" data-tab="tab-betaflight" role="tab" aria-selected="true" aria-controls="tab-betaflight" id="tab-btn-betaflight">
+        Betaflight
+      </button>
+      <button type="button" class="tab-btn" data-tab="tab-inav" role="tab" aria-selected="false" aria-controls="tab-inav" id="tab-btn-inav">
+        INAV
+      </button>
+      <button type="button" class="tab-btn" data-tab="tab-ardupilot" role="tab" aria-selected="false" aria-controls="tab-ardupilot" id="tab-btn-ardupilot">
+        ArduPilot
+      </button>
+      <button type="button" class="tab-btn" data-tab="tab-px4" role="tab" aria-selected="false" aria-controls="tab-px4" id="tab-btn-px4">
+        PX4
+      </button>
+      <button type="button" class="tab-btn" data-tab="tab-companion" role="tab" aria-selected="false" aria-controls="tab-companion" id="tab-btn-companion">
+        Companion
+      </button>
+      <button type="button" class="tab-btn" data-tab="tab-tools" role="tab" aria-selected="false" aria-controls="tab-tools" id="tab-btn-tools">
+        Инструменты
+      </button>
+    </div>
+
+    <!-- BETAFLIGHT -->
+    <section id="tab-betaflight" class="tab-pane active" role="tabpanel" aria-labelledby="tab-btn-betaflight" aria-hidden="false">
+
+      <!-- AUTO:TOC:betaflight:start -->
+      <nav class="toc toc--enhanced" aria-label="Содержание раздела Betaflight">
+        <a href="#bf-intro">
+          <span class="toc__num">01</span>
+          <span class="toc__level">L1</span>
+          <span class="toc__label">Введение в Betaflight</span>
+        </a>
+        <a href="#bf-ports">
+          <span class="toc__num">02</span>
+          <span class="toc__level">L1</span>
+          <span class="toc__label">Порты и приёмник</span>
+        </a>
+        <a href="#bf-modes-osd">
+          <span class="toc__num">03</span>
+          <span class="toc__level">L1</span>
+          <span class="toc__label">Режимы и OSD</span>
+        </a>
+        <a href="#bf-pid">
+          <span class="toc__num">04</span>
+          <span class="toc__level">L2</span>
+          <span class="toc__label">PID-тюнинг</span>
+        </a>
+        <a href="#bf-filters">
+          <span class="toc__num">05</span>
+          <span class="toc__level">L2</span>
+          <span class="toc__label">Фильтры</span>
+        </a>
+        <a href="#bf-blackbox">
+          <span class="toc__num">06</span>
+          <span class="toc__level">L2</span>
+          <span class="toc__label">Blackbox</span>
+        </a>
+        <a href="#bf-cli">
+          <span class="toc__num">07</span>
+          <span class="toc__level">L3</span>
+          <span class="toc__label">CLI и remap</span>
+        </a>
+        <a href="#bf-custom">
+          <span class="toc__num">08</span>
+          <span class="toc__level">L4</span>
+          <span class="toc__label">Кастомная сборка</span>
+        </a>
+      </nav>
+<!-- AUTO:TOC:betaflight:end -->
+
+      <!-- AUTO:PROGRESS:betaflight:start -->
+      <div class="section-progress" aria-label="Прогресс раздела Betaflight">
+        <span class="section-progress__label">Раздел Betaflight</span>
+        <span class="section-progress__bar" role="progressbar" aria-valuenow="8" aria-valuemin="0" aria-valuemax="8" aria-label="8 из 8 модулей в базовой версии">
+          <span class="section-progress__fill" style="width:100%"></span>
+        </span>
+        <span class="section-progress__stats">8 из 8 базовых модулей</span>
+      </div>
+<!-- AUTO:PROGRESS:betaflight:end -->
+
+      <section class="card orientation-guide" aria-labelledby="bf-orient-title">
+        <div class="breadcrumb" aria-label="Навигация по разделу">
+          <a href="#site-hero">Главная</a>
+          <span class="breadcrumb__sep" aria-hidden="true">›</span>
+          <span>Betaflight</span>
+        </div>
+
+        <h2 id="bf-orient-title">С чего начать в этом разделе</h2>
+        <p class="muted">
+          Этот раздел лучше проходить по возрастанию сложности: от базовой конфигурации
+          и логов к CLI, диагностике и кастомизации.
+        </p>
+
+        <div class="grid quick-start-grid">
+          <article class="quick-start-card level-l1">
+            <h3>L1 · База</h3>
+            <p>Порты, приёмник, режимы, OSD, failsafe, первый backup.</p>
+            <a class="doc-link" href="#bf-intro">Открыть стартовую статью</a>
+          </article>
+
+          <article class="quick-start-card level-l2">
+            <h3>L2 · Интеграция</h3>
+            <p>Фильтры, периферия, Blackbox, структура конфигурации, симптомный разбор.</p>
+            <a class="doc-link" href="#bf-blackbox">Перейти к логам</a>
+          </article>
+
+          <article class="quick-start-card level-l3">
+            <h3>L3 · Автоматизация</h3>
+            <p>CLI workflow, шаблоны конфигов, системная диагностика симптомов.</p>
+            <a class="doc-link" href="#bf-cli">Перейти к CLI</a>
+          </article>
+
+          <article class="quick-start-card level-l4">
+            <h3>L4 · Разработка</h3>
+            <p>Кастомные сборки, ограничения контроллера, feature selection.</p>
+            <a class="doc-link" href="#bf-custom">Перейти к advanced</a>
+          </article>
+        </div>
+      </section>
+
+      <!-- AUTO:ARTICLES:betaflight:start -->
+<article id="bf-intro" class="card" data-level="L1" data-added="2026-03-21">
+        <h2>Введение в Betaflight</h2>
+        <p class="muted">Краткое описание модуля (черновик; при переносе в сайт синхронизировать с `index.html`).</p>
+        <div class="article-meta">
+          <span class="tag">Уровень: L1 — Оператор</span>
+          <span class="tag">Время чтения: 10 мин</span>
+          <span class="tag">Betaflight 4.5+</span>
+        </div>
+
+        <h3>📖 Теория</h3>
+<p>Теоретическая основа (черновик).</p>
+
+        <h3>🛠 Практика</h3>
+<ol><li>Первый практический шаг (черновик).</li></ol>
+
+        <h3>🔍 Диагностика</h3>
+<ul><li><strong>Симптом:</strong> что проверить (черновик).</li></ul>
+
+        <div class="references">
+          <h4>📚 Источники</h4>
+          <ul>
+<li>
+              <a href="https://example.com" class="doc-link" target="_blank" rel="noopener noreferrer">Заглушка — заменить на первичный источник</a>
+              <span class="tag">primary | A</span>
+            </li>
+          </ul>
+        </div>
+      </article>
+
+      <article id="bf-ports" class="card" data-level="L1" data-added="2026-03-21">
+        <h2>Порты и приёмник</h2>
+        <p class="muted">Краткое описание модуля (черновик; при переносе в сайт синхронизировать с `index.html`).</p>
+        <div class="article-meta">
+          <span class="tag">Уровень: L1 — Оператор</span>
+          <span class="tag">Время чтения: 12–15 мин</span>
+          <span class="tag">ports</span>
+          <span class="tag">RX</span>
+        </div>
+
+        <h3>📖 Теория</h3>
+<p>Теоретическая основа (черновик).</p>
+
+        <h3>🛠 Практика</h3>
+<ol><li>Первый практический шаг (черновик).</li></ol>
+
+        <h3>🔍 Диагностика</h3>
+<ul><li><strong>Симптом:</strong> что проверить (черновик).</li></ul>
+
+        <div class="references">
+          <h4>📚 Источники</h4>
+          <ul>
+<li>
+              <a href="https://example.com" class="doc-link" target="_blank" rel="noopener noreferrer">Заглушка — заменить на первичный источник</a>
+              <span class="tag">primary | A</span>
+            </li>
+          </ul>
+        </div>
+      </article>
+
+      <article id="bf-modes-osd" class="card" data-level="L1" data-added="2026-03-21">
+        <h2>Режимы и OSD</h2>
+        <p class="muted">Краткое описание модуля (черновик; при переносе в сайт синхронизировать с `index.html`).</p>
+        <div class="article-meta">
+          <span class="tag">Уровень: L1 — Оператор</span>
+          <span class="tag">Время чтения: 15 мин</span>
+          <span class="tag">modes</span>
+          <span class="tag">OSD</span>
+        </div>
+
+        <h3>📖 Теория</h3>
+<p>Теоретическая основа (черновик).</p>
+
+        <h3>🛠 Практика</h3>
+<ol><li>Первый практический шаг (черновик).</li></ol>
+
+        <h3>🔍 Диагностика</h3>
+<ul><li><strong>Симптом:</strong> что проверить (черновик).</li></ul>
+
+        <div class="references">
+          <h4>📚 Источники</h4>
+          <ul>
+<li>
+              <a href="https://example.com" class="doc-link" target="_blank" rel="noopener noreferrer">Заглушка — заменить на первичный источник</a>
+              <span class="tag">primary | A</span>
+            </li>
+          </ul>
+        </div>
+      </article>
+
+      <article id="bf-pid" class="card" data-level="L2" data-added="2026-03-21">
+        <h2>PID-тюнинг</h2>
+        <p class="muted">Краткое описание модуля (черновик; при переносе в сайт синхронизировать с `index.html`).</p>
+        <div class="article-meta">
+          <span class="tag">Уровень: L2 — Интегратор</span>
+          <span class="tag">Время чтения: 20 мин</span>
+          <span class="tag">PID</span>
+        </div>
+
+        <h3>📖 Теория</h3>
+<p>Теоретическая основа (черновик).</p>
+
+        <h3>🛠 Практика</h3>
+<ol><li>Первый практический шаг (черновик).</li></ol>
+
+        <h3>🔍 Диагностика</h3>
+<ul><li><strong>Симптом:</strong> что проверить (черновик).</li></ul>
+
+        <div class="references">
+          <h4>📚 Источники</h4>
+          <ul>
+<li>
+              <a href="https://example.com" class="doc-link" target="_blank" rel="noopener noreferrer">Заглушка — заменить на первичный источник</a>
+              <span class="tag">primary | A</span>
+            </li>
+          </ul>
+        </div>
+      </article>
+
+      <article id="bf-filters" class="card" data-level="L2" data-added="2026-03-21">
+        <h2>Фильтры</h2>
+        <p class="muted">Краткое описание модуля (черновик; при переносе в сайт синхронизировать с `index.html`).</p>
+        <div class="article-meta">
+          <span class="tag">Уровень: L2 — Интегратор</span>
+          <span class="tag">Время чтения: 15–20 мин</span>
+          <span class="tag">filters</span>
+        </div>
+
+        <h3>📖 Теория</h3>
+<p>Теоретическая основа (черновик).</p>
+
+        <h3>🛠 Практика</h3>
+<ol><li>Первый практический шаг (черновик).</li></ol>
+
+        <h3>🔍 Диагностика</h3>
+<ul><li><strong>Симптом:</strong> что проверить (черновик).</li></ul>
+
+        <div class="references">
+          <h4>📚 Источники</h4>
+          <ul>
+<li>
+              <a href="https://example.com" class="doc-link" target="_blank" rel="noopener noreferrer">Заглушка — заменить на первичный источник</a>
+              <span class="tag">primary | A</span>
+            </li>
+          </ul>
+        </div>
+      </article>
+
+      <article id="bf-blackbox" class="card" data-level="L2" data-added="2026-03-21">
+        <h2>Blackbox</h2>
+        <p class="muted">Краткое описание модуля (черновик; при переносе в сайт синхронизировать с `index.html`).</p>
+        <div class="article-meta">
+          <span class="tag">Уровень: L2 — Интегратор</span>
+          <span class="tag">Время чтения: 20 мин</span>
+          <span class="tag">Blackbox</span>
+        </div>
+
+        <h3>📖 Теория</h3>
+<p>Теоретическая основа (черновик).</p>
+
+        <h3>🛠 Практика</h3>
+<ol><li>Первый практический шаг (черновик).</li></ol>
+
+        <h3>🔍 Диагностика</h3>
+<ul><li><strong>Симптом:</strong> что проверить (черновик).</li></ul>
+
+        <div class="references">
+          <h4>📚 Источники</h4>
+          <ul>
+<li>
+              <a href="https://example.com" class="doc-link" target="_blank" rel="noopener noreferrer">Заглушка — заменить на первичный источник</a>
+              <span class="tag">primary | A</span>
+            </li>
+          </ul>
+        </div>
+      </article>
+
+      <article id="bf-cli" class="card" data-level="L3" data-added="2026-03-21">
+        <h2>CLI и remap</h2>
+        <p class="muted">Краткое описание модуля (черновик; при переносе в сайт синхронизировать с `index.html`).</p>
+        <div class="article-meta">
+          <span class="tag">Уровень: L3 — Специалист</span>
+          <span class="tag">Время чтения: 15 мин</span>
+          <span class="tag">CLI</span>
+        </div>
+
+        <h3>📖 Теория</h3>
+<p>Теоретическая основа (черновик).</p>
+
+        <h3>🛠 Практика</h3>
+<ol><li>Первый практический шаг (черновик).</li></ol>
+
+        <h3>🔍 Диагностика</h3>
+<ul><li><strong>Симптом:</strong> что проверить (черновик).</li></ul>
+
+        <div class="references">
+          <h4>📚 Источники</h4>
+          <ul>
+<li>
+              <a href="https://example.com" class="doc-link" target="_blank" rel="noopener noreferrer">Заглушка — заменить на первичный источник</a>
+              <span class="tag">primary | A</span>
+            </li>
+          </ul>
+        </div>
+      </article>
+
+      <article id="bf-custom" class="card" data-level="L4" data-added="2026-03-21">
+        <h2>Кастомная сборка</h2>
+        <p class="muted">Краткое описание модуля (черновик; при переносе в сайт синхронизировать с `index.html`).</p>
+        <div class="article-meta">
+          <span class="tag">Уровень: L4 — Эксперт</span>
+          <span class="tag">Время чтения: 15–20 мин</span>
+          <span class="tag">build</span>
+        </div>
+
+        <h3>📖 Теория</h3>
+<p>Теоретическая основа (черновик).</p>
+
+        <h3>🛠 Практика</h3>
+<ol><li>Первый практический шаг (черновик).</li></ol>
+
+        <h3>🔍 Диагностика</h3>
+<ul><li><strong>Симптом:</strong> что проверить (черновик).</li></ul>
+
+        <div class="references">
+          <h4>📚 Источники</h4>
+          <ul>
+<li>
+              <a href="https://example.com" class="doc-link" target="_blank" rel="noopener noreferrer">Заглушка — заменить на первичный источник</a>
+              <span class="tag">primary | A</span>
+            </li>
+          </ul>
+        </div>
+      </article>
+<!-- AUTO:ARTICLES:betaflight:end -->
+    </section>
+
+    <!-- INAV -->
+    <section id="tab-inav" class="tab-pane" role="tabpanel" aria-labelledby="tab-btn-inav" aria-hidden="true" hidden>
+      <!-- AUTO:TOC:inav:start -->
+      <nav class="toc toc--enhanced" aria-label="Содержание раздела INAV">
+        <a href="#inav-intro">
+          <span class="toc__num">01</span>
+          <span class="toc__level">L1</span>
+          <span class="toc__label">Введение в INAV</span>
+        </a>
+        <a href="#inav-gps">
+          <span class="toc__num">02</span>
+          <span class="toc__level">L2</span>
+          <span class="toc__label">GPS-навигация в INAV</span>
+        </a>
+        <a href="#inav-wing">
+          <span class="toc__num">03</span>
+          <span class="toc__level">L2</span>
+          <span class="toc__label">Настройка крыла</span>
+        </a>
+        <a href="#inav-missions">
+          <span class="toc__num">04</span>
+          <span class="toc__level">L3</span>
+          <span class="toc__label">Автономные миссии</span>
+        </a>
+        <a href="#inav-ipf">
+          <span class="toc__num">05</span>
+          <span class="toc__level">L3</span>
+          <span class="toc__label">IPF и JavaScript</span>
+        </a>
+      </nav>
+<!-- AUTO:TOC:inav:end -->
+
+      <!-- AUTO:PROGRESS:inav:start -->
+      <div class="section-progress" aria-label="Прогресс раздела INAV">
+        <span class="section-progress__label">Раздел INAV</span>
+        <span class="section-progress__bar" role="progressbar" aria-valuenow="5" aria-valuemin="0" aria-valuemax="5" aria-label="5 из 5 модулей в базовой версии">
+          <span class="section-progress__fill" style="width:100%"></span>
+        </span>
+        <span class="section-progress__stats">5 из 5 базовых модулей</span>
+      </div>
+<!-- AUTO:PROGRESS:inav:end -->
+
+      <section class="card orientation-guide" aria-labelledby="inav-orient-title">
+        <div class="breadcrumb" aria-label="Навигация по разделу">
+          <a href="#site-hero">Главная</a>
+          <span class="breadcrumb__sep" aria-hidden="true">›</span>
+          <span>INAV</span>
+        </div>
+
+        <h2 id="inav-orient-title">С чего начать в этом разделе</h2>
+        <p class="muted">
+          Сначала конфигуратор и тип аппарата, затем GPS и крыло, после — миссии и программируемая логика (IPF/JS).
+        </p>
+
+        <div class="grid quick-start-grid">
+          <article class="quick-start-card level-l1">
+            <h3>L1 · База</h3>
+            <p>Configurator, калибровки, порты, первый ARM-safe профиль.</p>
+            <a class="doc-link" href="#inav-intro">Открыть введение</a>
+          </article>
+
+          <article class="quick-start-card level-l2">
+            <h3>L2 · Навигация</h3>
+            <p>GPS, компас, режимы удержания, крыло и базовая диагностика.</p>
+            <a class="doc-link" href="#inav-gps">К GPS и навигации</a>
+          </article>
+
+          <article class="quick-start-card level-l3">
+            <h3>L3 · Миссии и логика</h3>
+            <p>Waypoints, сценарии полёта, затем IPF/JS для поведения.</p>
+            <a class="doc-link" href="#inav-missions">К миссиям</a>
+          </article>
+
+          <article class="quick-start-card level-l4">
+            <h3>L4 · Продвинуто</h3>
+            <p>Сложная пользовательская логика через IPF и скрипты.</p>
+            <a class="doc-link" href="#inav-ipf">К IPF/JS</a>
+          </article>
+        </div>
+      </section>
+
+      <!-- AUTO:ARTICLES:inav:start -->
+<article id="inav-intro" class="card" data-level="L1" data-added="2026-03-21">
+        <h2>Введение в INAV</h2>
+        <p class="muted">Краткое описание модуля (черновик; при переносе в сайт синхронизировать с `index.html`).</p>
+        <div class="article-meta">
+          <span class="tag">Уровень: L1 — Оператор</span>
+          <span class="tag">Время чтения: 12 мин</span>
+          <span class="tag">INAV 7.0+</span>
+        </div>
+
+        <h3>📖 Теория</h3>
+<p>Теоретическая основа (черновик).</p>
+
+        <h3>🛠 Практика</h3>
+<ol><li>Первый практический шаг (черновик).</li></ol>
+
+        <h3>🔍 Диагностика</h3>
+<ul><li><strong>Симптом:</strong> что проверить (черновик).</li></ul>
+
+        <div class="references">
+          <h4>📚 Источники</h4>
+          <ul>
+<li>
+              <a href="https://example.com" class="doc-link" target="_blank" rel="noopener noreferrer">Заглушка — заменить на первичный источник</a>
+              <span class="tag">primary | A</span>
+            </li>
+          </ul>
+        </div>
+      </article>
+
+      <article id="inav-gps" class="card" data-level="L2" data-added="2026-03-21">
+        <h2>GPS-навигация в INAV</h2>
+        <p class="muted">Базовая логика настройки GPS и компаса для устойчивой навигации в INAV: фиксация позиции, курс и условия для удержания и возврата домой.</p>
+        <div class="article-meta">
+          <span class="tag">Уровень: L2 — Интегратор</span>
+          <span class="tag">Время чтения: 20 мин</span>
+          <span class="tag">INAV 7.0+</span>
+          <span class="tag">GPS</span>
+          <span class="tag">MAG</span>
+        </div>
+
+        <h3>📖 Теория</h3>
+<p>INAV использует <strong>GPS</strong> для оценки горизонтальной позиции и скорости, <strong>магнитометр</strong> — для курса (при корректной ориентации и калибровке), <strong>барометр</strong> — для высоты. Без устойчивого 3D Fix и согласованного компаса режимы удержания позиции и RTH будут нестабильны или опасны.</p>
+
+        <h3>🛠 Практика</h3>
+<ol><li>Подключите GPS к свободному <strong>UART</strong> согласно распиновке и схеме питания (3.3 V / 5 V — по даташиту модуля).</li><li>В Configurator включите соответствующий порт как <strong>GPS</strong>, выставьте корректный <strong>baud rate</strong> (часто 57600 или 115200 — по документации приёмника).</li><li>Убедитесь, что в статусе видно определение устройства и поток данных (спутники / fix).</li><li>Выполните <strong>калибровку компаса</strong> вдали от металла и источников помех; проверьте ориентацию датчика в конфигурации.</li><li>На открытой площадке дождитесь <strong>устойчивого 3D Fix</strong>, затем сохраните <strong>home</strong> и проведите короткий тест в безопасных условиях.</li></ol>
+
+        <h3>🔍 Диагностика</h3>
+<ul><li><strong>Нет fix / мало спутников:</strong> антенна, обзор неба, питание, помехи, некорректный порт или скорость UART.</li><li><strong>«Плавает» позиция:</strong> плохой fix, окружение (отражатели), необходимость перенастройки PD или проверки вибраций (см. фильтры/монтаж).</li><li><strong>Неверный курс / «кружит»:</strong> калибровка компаса, ориентация MAG, интерференция, конфликт с металлом/силовой проводкой.</li></ul>
+
+        <div class="references">
+          <h4>📚 Источники</h4>
+          <ul>
+<li>
+              <a href="https://github.com/iNavFlight/inav/blob/master/docs/GPS.md" class="doc-link" target="_blank" rel="noopener noreferrer">INAV Wiki (официально)</a>
+              <span class="tag">primary | A</span>
+            </li>
+          </ul>
+        </div>
+        <section class="article-notes" aria-labelledby="inav-gps-notes-title">
+          <h4 id="inav-gps-notes-title">🗂 Заметки (из Markdown)</h4>
+          <div class="muted"><p>### Oscar Liang · GPS basics Полезен как <strong>вторичный</strong> практический обзор; сверять формулировки с официальной wiki и релизными заметками INAV.</p></div>
+        </section>
+        <div class="checklist" id="inav-gps-checklist">
+          <h4>✅ Чек-лист</h4>
+          <ul class="checklist-list">
+            <li><label><input type="checkbox"> GPS определяется в конфигураторе и выдаёт данные</label></li>
+            <li><label><input type="checkbox"> Компас откалиброван, ориентация проверена</label></li>
+            <li><label><input type="checkbox"> Есть устойчивый <strong>3D Fix</strong> перед навигационными режимами</label></li>
+            <li><label><input type="checkbox"> Домашняя точка и логика RTH проверены в безопасной зоне</label></li>
+          </ul>
+        </div>
+      </article>
+
+      <article id="inav-wing" class="card" data-level="L2" data-added="2026-03-21">
+        <h2>Настройка крыла</h2>
+        <p class="muted">Краткое описание модуля (черновик; при переносе в сайт синхронизировать с `index.html`).</p>
+        <div class="article-meta">
+          <span class="tag">Уровень: L2 — Интегратор</span>
+          <span class="tag">Время чтения: 25 мин</span>
+          <span class="tag">fixed-wing</span>
+        </div>
+
+        <h3>📖 Теория</h3>
+<p>Теоретическая основа (черновик).</p>
+
+        <h3>🛠 Практика</h3>
+<ol><li>Первый практический шаг (черновик).</li></ol>
+
+        <h3>🔍 Диагностика</h3>
+<ul><li><strong>Симптом:</strong> что проверить (черновик).</li></ul>
+
+        <div class="references">
+          <h4>📚 Источники</h4>
+          <ul>
+<li>
+              <a href="https://example.com" class="doc-link" target="_blank" rel="noopener noreferrer">Заглушка — заменить на первичный источник</a>
+              <span class="tag">primary | A</span>
+            </li>
+          </ul>
+        </div>
+      </article>
+
+      <article id="inav-missions" class="card" data-level="L3" data-added="2026-03-21">
+        <h2>Автономные миссии</h2>
+        <p class="muted">Краткое описание модуля (черновик; при переносе в сайт синхронизировать с `index.html`).</p>
+        <div class="article-meta">
+          <span class="tag">Уровень: L3 — Специалист</span>
+          <span class="tag">Время чтения: 25 мин</span>
+          <span class="tag">waypoints</span>
+        </div>
+
+        <h3>📖 Теория</h3>
+<p>Теоретическая основа (черновик).</p>
+
+        <h3>🛠 Практика</h3>
+<ol><li>Первый практический шаг (черновик).</li></ol>
+
+        <h3>🔍 Диагностика</h3>
+<ul><li><strong>Симптом:</strong> что проверить (черновик).</li></ul>
+
+        <div class="references">
+          <h4>📚 Источники</h4>
+          <ul>
+<li>
+              <a href="https://example.com" class="doc-link" target="_blank" rel="noopener noreferrer">Заглушка — заменить на первичный источник</a>
+              <span class="tag">primary | A</span>
+            </li>
+          </ul>
+        </div>
+      </article>
+
+      <article id="inav-ipf" class="card" data-level="L3" data-added="2026-03-21">
+        <h2>IPF и JavaScript</h2>
+        <p class="muted">Краткое описание модуля (черновик; при переносе в сайт синхронизировать с `index.html`).</p>
+        <div class="article-meta">
+          <span class="tag">Уровень: L3 — Специалист</span>
+          <span class="tag">Время чтения: 30 мин</span>
+          <span class="tag">IPF</span>
+        </div>
+
+        <h3>📖 Теория</h3>
+<p>Теоретическая основа (черновик).</p>
+
+        <h3>🛠 Практика</h3>
+<ol><li>Первый практический шаг (черновик).</li></ol>
+
+        <h3>🔍 Диагностика</h3>
+<ul><li><strong>Симптом:</strong> что проверить (черновик).</li></ul>
+
+        <div class="references">
+          <h4>📚 Источники</h4>
+          <ul>
+<li>
+              <a href="https://example.com" class="doc-link" target="_blank" rel="noopener noreferrer">Заглушка — заменить на первичный источник</a>
+              <span class="tag">primary | A</span>
+            </li>
+          </ul>
+        </div>
+      </article>
+<!-- AUTO:ARTICLES:inav:end -->
+    </section>
+
+    <!-- ArduPilot -->
+    <section id="tab-ardupilot" class="tab-pane" role="tabpanel" aria-labelledby="tab-btn-ardupilot" aria-hidden="true" hidden>
+      <!-- AUTO:TOC:ardupilot:start -->
+      <nav class="toc toc--enhanced" aria-label="Содержание раздела ArduPilot">
+        <a href="#ap-intro">
+          <span class="toc__num">01</span>
+          <span class="toc__level">L1</span>
+          <span class="toc__label">Введение в ArduPilot</span>
+        </a>
+        <a href="#ap-missions">
+          <span class="toc__num">02</span>
+          <span class="toc__level">L2</span>
+          <span class="toc__label">Миссии и планирование</span>
+        </a>
+        <a href="#ap-lua">
+          <span class="toc__num">03</span>
+          <span class="toc__level">L3</span>
+          <span class="toc__label">Lua скриптинг</span>
+        </a>
+        <a href="#ap-ekf">
+          <span class="toc__num">04</span>
+          <span class="toc__level">L3</span>
+          <span class="toc__label">EKF и навигация</span>
+        </a>
+        <a href="#ap-companion">
+          <span class="toc__num">05</span>
+          <span class="toc__level">L3</span>
+          <span class="toc__label">Companion + ArduPilot</span>
+        </a>
+      </nav>
+<!-- AUTO:TOC:ardupilot:end -->
+
+      <!-- AUTO:PROGRESS:ardupilot:start -->
+      <div class="section-progress" aria-label="Прогресс раздела ArduPilot">
+        <span class="section-progress__label">Раздел ArduPilot</span>
+        <span class="section-progress__bar" role="progressbar" aria-valuenow="5" aria-valuemin="0" aria-valuemax="5" aria-label="5 из 5 модулей в базовой версии">
+          <span class="section-progress__fill" style="width:100%"></span>
+        </span>
+        <span class="section-progress__stats">5 из 5 базовых модулей</span>
+      </div>
+<!-- AUTO:PROGRESS:ardupilot:end -->
+
+      <section class="card orientation-guide" aria-labelledby="ap-orient-title">
+        <div class="breadcrumb" aria-label="Навигация по разделу">
+          <a href="#site-hero">Главная</a>
+          <span class="breadcrumb__sep" aria-hidden="true">›</span>
+          <span>ArduPilot</span>
+        </div>
+
+        <h2 id="ap-orient-title">С чего начать в этом разделе</h2>
+        <p class="muted">
+          От калибровок и GCS к миссиям, затем Lua, EKF и связка с companion — по возрастанию ответственности.
+        </p>
+
+        <div class="grid quick-start-grid">
+          <article class="quick-start-card level-l1">
+            <h3>L1 · База</h3>
+            <p>Mission Planner / QGC, калибровки, параметры, первые pre-arm.</p>
+            <a class="doc-link" href="#ap-intro">Открыть введение</a>
+          </article>
+
+          <article class="quick-start-card level-l2">
+            <h3>L2 · Миссии</h3>
+            <p>Планирование, waypoints, RTL, проверка миссии на земле.</p>
+            <a class="doc-link" href="#ap-missions">К миссиям</a>
+          </article>
+
+          <article class="quick-start-card level-l3">
+            <h3>L3 · Скрипты и EKF</h3>
+            <p>Lua-логика и понимание навигации/состояний EKF.</p>
+            <a class="doc-link" href="#ap-lua">К Lua</a>
+          </article>
+
+          <article class="quick-start-card level-l4">
+            <h3>L4 · Интеграция</h3>
+            <p>Companion computer, MAVLink, внешняя логика рядом с FC.</p>
+            <a class="doc-link" href="#ap-companion">К companion</a>
+          </article>
+        </div>
+      </section>
+
+      <!-- AUTO:ARTICLES:ardupilot:start -->
+<article id="ap-intro" class="card" data-level="L1" data-added="2026-03-21">
+        <h2>Введение в ArduPilot</h2>
+        <p class="muted">Краткое описание модуля (черновик; при переносе в сайт синхронизировать с `index.html`).</p>
+        <div class="article-meta">
+          <span class="tag">Уровень: L1 — Оператор</span>
+          <span class="tag">Время чтения: 15 мин</span>
+          <span class="tag">ArduPilot 4.5+</span>
+        </div>
+
+        <h3>📖 Теория</h3>
+<p>Теоретическая основа (черновик).</p>
+
+        <h3>🛠 Практика</h3>
+<ol><li>Первый практический шаг (черновик).</li></ol>
+
+        <h3>🔍 Диагностика</h3>
+<ul><li><strong>Симптом:</strong> что проверить (черновик).</li></ul>
+
+        <div class="references">
+          <h4>📚 Источники</h4>
+          <ul>
+<li>
+              <a href="https://example.com" class="doc-link" target="_blank" rel="noopener noreferrer">Заглушка — заменить на первичный источник</a>
+              <span class="tag">primary | A</span>
+            </li>
+          </ul>
+        </div>
+      </article>
+
+      <article id="ap-missions" class="card" data-level="L2" data-added="2026-03-21">
+        <h2>Миссии и планирование</h2>
+        <p class="muted">Краткое описание модуля (черновик; при переносе в сайт синхронизировать с `index.html`).</p>
+        <div class="article-meta">
+          <span class="tag">Уровень: L2 — Интегратор</span>
+          <span class="tag">Время чтения: 25 мин</span>
+          <span class="tag">missions</span>
+        </div>
+
+        <h3>📖 Теория</h3>
+<p>Теоретическая основа (черновик).</p>
+
+        <h3>🛠 Практика</h3>
+<ol><li>Первый практический шаг (черновик).</li></ol>
+
+        <h3>🔍 Диагностика</h3>
+<ul><li><strong>Симптом:</strong> что проверить (черновик).</li></ul>
+
+        <div class="references">
+          <h4>📚 Источники</h4>
+          <ul>
+<li>
+              <a href="https://example.com" class="doc-link" target="_blank" rel="noopener noreferrer">Заглушка — заменить на первичный источник</a>
+              <span class="tag">primary | A</span>
+            </li>
+          </ul>
+        </div>
+      </article>
+
+      <article id="ap-lua" class="card" data-level="L3" data-added="2026-03-21">
+        <h2>Lua скриптинг</h2>
+        <p class="muted">Краткое описание модуля (черновик; при переносе в сайт синхронизировать с `index.html`).</p>
+        <div class="article-meta">
+          <span class="tag">Уровень: L3 — Специалист</span>
+          <span class="tag">Время чтения: 25 мин</span>
+          <span class="tag">Lua</span>
+        </div>
+
+        <h3>📖 Теория</h3>
+<p>Теоретическая основа (черновик).</p>
+
+        <h3>🛠 Практика</h3>
+<ol><li>Первый практический шаг (черновик).</li></ol>
+
+        <h3>🔍 Диагностика</h3>
+<ul><li><strong>Симптом:</strong> что проверить (черновик).</li></ul>
+
+        <div class="references">
+          <h4>📚 Источники</h4>
+          <ul>
+<li>
+              <a href="https://example.com" class="doc-link" target="_blank" rel="noopener noreferrer">Заглушка — заменить на первичный источник</a>
+              <span class="tag">primary | A</span>
+            </li>
+          </ul>
+        </div>
+      </article>
+
+      <article id="ap-ekf" class="card" data-level="L3" data-added="2026-03-21">
+        <h2>EKF и навигация</h2>
+        <p class="muted">Краткое описание модуля (черновик; при переносе в сайт синхронизировать с `index.html`).</p>
+        <div class="article-meta">
+          <span class="tag">Уровень: L3 — Специалист</span>
+          <span class="tag">Время чтения: 25 мин</span>
+          <span class="tag">EKF</span>
+        </div>
+
+        <h3>📖 Теория</h3>
+<p>Теоретическая основа (черновик).</p>
+
+        <h3>🛠 Практика</h3>
+<ol><li>Первый практический шаг (черновик).</li></ol>
+
+        <h3>🔍 Диагностика</h3>
+<ul><li><strong>Симптом:</strong> что проверить (черновик).</li></ul>
+
+        <div class="references">
+          <h4>📚 Источники</h4>
+          <ul>
+<li>
+              <a href="https://example.com" class="doc-link" target="_blank" rel="noopener noreferrer">Заглушка — заменить на первичный источник</a>
+              <span class="tag">primary | A</span>
+            </li>
+          </ul>
+        </div>
+      </article>
+
+      <article id="ap-companion" class="card" data-level="L3" data-added="2026-03-21">
+        <h2>Companion + ArduPilot</h2>
+        <p class="muted">Краткое описание модуля (черновик; при переносе в сайт синхронизировать с `index.html`).</p>
+        <div class="article-meta">
+          <span class="tag">Уровень: L3 — Специалист</span>
+          <span class="tag">Время чтения: 30 мин</span>
+          <span class="tag">companion</span>
+        </div>
+
+        <h3>📖 Теория</h3>
+<p>Теоретическая основа (черновик).</p>
+
+        <h3>🛠 Практика</h3>
+<ol><li>Первый практический шаг (черновик).</li></ol>
+
+        <h3>🔍 Диагностика</h3>
+<ul><li><strong>Симптом:</strong> что проверить (черновик).</li></ul>
+
+        <div class="references">
+          <h4>📚 Источники</h4>
+          <ul>
+<li>
+              <a href="https://example.com" class="doc-link" target="_blank" rel="noopener noreferrer">Заглушка — заменить на первичный источник</a>
+              <span class="tag">primary | A</span>
+            </li>
+          </ul>
+        </div>
+      </article>
+<!-- AUTO:ARTICLES:ardupilot:end -->
+    </section>
+
+    <!-- PX4 -->
+    <section id="tab-px4" class="tab-pane" role="tabpanel" aria-labelledby="tab-btn-px4" aria-hidden="true" hidden>
+      <!-- AUTO:TOC:px4:start -->
+      <nav class="toc toc--enhanced" aria-label="Содержание раздела PX4">
+        <a href="#px4-intro">
+          <span class="toc__num">01</span>
+          <span class="toc__level">L1</span>
+          <span class="toc__label">Введение в PX4</span>
+        </a>
+        <a href="#px4-architecture">
+          <span class="toc__num">02</span>
+          <span class="toc__level">L2</span>
+          <span class="toc__label">Архитектура и uORB</span>
+        </a>
+        <a href="#px4-control">
+          <span class="toc__num">03</span>
+          <span class="toc__level">L2</span>
+          <span class="toc__label">Control Allocation и миксер</span>
+        </a>
+        <a href="#px4-ros2">
+          <span class="toc__num">04</span>
+          <span class="toc__level">L3</span>
+          <span class="toc__label">ROS 2 интеграция</span>
+        </a>
+      </nav>
+<!-- AUTO:TOC:px4:end -->
+
+      <!-- AUTO:PROGRESS:px4:start -->
+      <div class="section-progress" aria-label="Прогресс раздела PX4">
+        <span class="section-progress__label">Раздел PX4</span>
+        <span class="section-progress__bar" role="progressbar" aria-valuenow="4" aria-valuemin="0" aria-valuemax="4" aria-label="4 из 4 модулей в базовой версии">
+          <span class="section-progress__fill" style="width:100%"></span>
+        </span>
+        <span class="section-progress__stats">4 из 4 базовых модулей</span>
+      </div>
+<!-- AUTO:PROGRESS:px4:end -->
+
+      <section class="card orientation-guide" aria-labelledby="px4-orient-title">
+        <div class="breadcrumb" aria-label="Навигация по разделу">
+          <a href="#site-hero">Главная</a>
+          <span class="breadcrumb__sep" aria-hidden="true">›</span>
+          <span>PX4</span>
+        </div>
+
+        <h2 id="px4-orient-title">С чего начать в этом разделе</h2>
+        <p class="muted">
+          От QGC и airframe к архитектуре uORB, затем актуаторы и, при необходимости, ROS 2 / offboard.
+        </p>
+
+        <div class="grid quick-start-grid">
+          <article class="quick-start-card level-l1">
+            <h3>L1 · База</h3>
+            <p>QGroundControl, калибровки, выбор рамы, первые полёты в безопасной среде.</p>
+            <a class="doc-link" href="#px4-intro">Открыть введение</a>
+          </article>
+
+          <article class="quick-start-card level-l2">
+            <h3>L2 · Архитектура</h3>
+            <p>uORB, модули, понимание потоков данных и настройка control allocation.</p>
+            <a class="doc-link" href="#px4-architecture">К uORB и архитектуре</a>
+          </article>
+
+          <article class="quick-start-card level-l3">
+            <h3>L3 · Управление</h3>
+            <p>Микшер, allocation, геометрия приводов, проверка на конфигурации.</p>
+            <a class="doc-link" href="#px4-control">К control allocation</a>
+          </article>
+
+          <article class="quick-start-card level-l4">
+            <h3>L4 · ROS 2 / offboard</h3>
+            <p>Внешняя логика, интеграция с ROS 2, исследовательские сценарии.</p>
+            <a class="doc-link" href="#px4-ros2">К ROS 2</a>
+          </article>
+        </div>
+      </section>
+
+      <!-- AUTO:ARTICLES:px4:start -->
+<article id="px4-intro" class="card" data-level="L1" data-added="2026-03-21">
+        <h2>Введение в PX4</h2>
+        <p class="muted">Краткое описание модуля (черновик; при переносе в сайт синхронизировать с `index.html`).</p>
+        <div class="article-meta">
+          <span class="tag">Уровень: L1 — Оператор</span>
+          <span class="tag">Время чтения: 15 мин</span>
+          <span class="tag">PX4 1.15+</span>
+        </div>
+
+        <h3>📖 Теория</h3>
+<p>Теоретическая основа (черновик).</p>
+
+        <h3>🛠 Практика</h3>
+<ol><li>Первый практический шаг (черновик).</li></ol>
+
+        <h3>🔍 Диагностика</h3>
+<ul><li><strong>Симптом:</strong> что проверить (черновик).</li></ul>
+
+        <div class="references">
+          <h4>📚 Источники</h4>
+          <ul>
+<li>
+              <a href="https://example.com" class="doc-link" target="_blank" rel="noopener noreferrer">Заглушка — заменить на первичный источник</a>
+              <span class="tag">primary | A</span>
+            </li>
+          </ul>
+        </div>
+      </article>
+
+      <article id="px4-architecture" class="card" data-level="L2" data-added="2026-03-21">
+        <h2>Архитектура и uORB</h2>
+        <p class="muted">Краткое описание модуля (черновик; при переносе в сайт синхронизировать с `index.html`).</p>
+        <div class="article-meta">
+          <span class="tag">Уровень: L2 — Интегратор</span>
+          <span class="tag">Время чтения: 25 мин</span>
+          <span class="tag">uORB</span>
+        </div>
+
+        <h3>📖 Теория</h3>
+<p>Теоретическая основа (черновик).</p>
+
+        <h3>🛠 Практика</h3>
+<ol><li>Первый практический шаг (черновик).</li></ol>
+
+        <h3>🔍 Диагностика</h3>
+<ul><li><strong>Симптом:</strong> что проверить (черновик).</li></ul>
+
+        <div class="references">
+          <h4>📚 Источники</h4>
+          <ul>
+<li>
+              <a href="https://example.com" class="doc-link" target="_blank" rel="noopener noreferrer">Заглушка — заменить на первичный источник</a>
+              <span class="tag">primary | A</span>
+            </li>
+          </ul>
+        </div>
+      </article>
+
+      <article id="px4-control" class="card" data-level="L2" data-added="2026-03-21">
+        <h2>Control Allocation и миксер</h2>
+        <p class="muted">Связь между контурами управления и физическими приводами в PX4: <strong>control allocation</strong>, роли исполнителей, ограничения и проверки перед полётом.</p>
+        <div class="article-meta">
+          <span class="tag">Уровень: L2 — Интегратор</span>
+          <span class="tag">Время чтения: 25 мин</span>
+          <span class="tag">PX4 1.15+</span>
+          <span class="tag">actuators</span>
+        </div>
+
+        <h3>📖 Теория</h3>
+<p>PX4 разделяет <strong>логику управления</strong> (законы, оценка состояния) и <strong>распределение усилий</strong> по исполнителям: моторы, сервоприводы, управляющие поверхности. <strong>Mixer / allocation</strong> задаёт соответствие «запрошенный момент/усилие → команды на каналы», с учётом геометрии рамы, направления вращения и безопасных лимитов.</p>
+
+        <h3>🛠 Практика</h3>
+<ol><li>В <strong>Actuators</strong> задайте геометрию и соответствие выходов физическим каналам (порядок, направление, мин/макс).</li><li>Проверьте <strong>arming</strong> и отсутствие конфликтов (например, двойное назначение канала).</li><li>На земле: короткие проверки отклика по каналам в безопасных условиях (пропы сняты / стенд согласно регламенту).</li><li>Зафиксируйте версию прошивки и параметры, влияющие на allocation (для воспроизводимости).</li></ol>
+
+        <h3>🔍 Диагностика</h3>
+<ul><li><strong>Асимметрия / клевок:</strong> неверная геометрия, перепутанные моторы, инверсия серв.</li><li><strong>Нет отклика по оси:</strong> не назначен исполнитель, failsafe, отключённый канал.</li><li><strong>Ограничение по satuaration:</strong> запас по тяге, клипание — проверить лимиты и центровку.</li></ul>
+
+        <div class="references">
+          <h4>📚 Источники</h4>
+          <ul>
+<li>
+              <a href="https://docs.px4.io/main/en/config/actuators.html" class="doc-link" target="_blank" rel="noopener noreferrer">PX4 Developer Guide — Actuators</a>
+              <span class="tag">primary | A</span>
+            </li>
+          </ul>
+        </div>
+        <section class="article-notes" aria-labelledby="px4-control-notes-title">
+          <h4 id="px4-control-notes-title">🗂 Заметки (из Markdown)</h4>
+          <div class="muted"><p>### Общие материалы по микшерам в других стеках Сопоставляйте термины осторожно: в Betaflight/INAV микшер ближе к PWM-выходу; в PX4 чаще говорят про <strong>actuators</strong> и матрицу распределения.</p></div>
+        </section>
+        <div class="checklist" id="px4-control-checklist">
+          <h4>✅ Чек-лист</h4>
+          <ul class="checklist-list">
+            <li><label><input type="checkbox"> Геометрия и направления соответствуют сборке</label></li>
+            <li><label><input type="checkbox"> Каждый исполнитель проверен на земле</label></li>
+            <li><label><input type="checkbox"> Логи/статус без критических ошибок по приводам</label></li>
+          </ul>
+        </div>
+      </article>
+
+      <article id="px4-ros2" class="card" data-level="L3" data-added="2026-03-21">
+        <h2>ROS 2 интеграция</h2>
+        <p class="muted">Краткое описание модуля (черновик; при переносе в сайт синхронизировать с `index.html`).</p>
+        <div class="article-meta">
+          <span class="tag">Уровень: L3 — Специалист</span>
+          <span class="tag">Время чтения: 35 мин</span>
+          <span class="tag">ROS 2</span>
+        </div>
+
+        <h3>📖 Теория</h3>
+<p>Теоретическая основа (черновик).</p>
+
+        <h3>🛠 Практика</h3>
+<ol><li>Первый практический шаг (черновик).</li></ol>
+
+        <h3>🔍 Диагностика</h3>
+<ul><li><strong>Симптом:</strong> что проверить (черновик).</li></ul>
+
+        <div class="references">
+          <h4>📚 Источники</h4>
+          <ul>
+<li>
+              <a href="https://example.com" class="doc-link" target="_blank" rel="noopener noreferrer">Заглушка — заменить на первичный источник</a>
+              <span class="tag">primary | A</span>
+            </li>
+          </ul>
+        </div>
+      </article>
+<!-- AUTO:ARTICLES:px4:end -->
+    </section>
+
+    <!-- Companion -->
+    <section id="tab-companion" class="tab-pane" role="tabpanel" aria-labelledby="tab-btn-companion" aria-hidden="true" hidden>
+      <!-- AUTO:TOC:companion:start -->
+      <nav class="toc toc--enhanced" aria-label="Содержание раздела Companion">
+        <a href="#comp-intro">
+          <span class="toc__num">01</span>
+          <span class="toc__level">L2</span>
+          <span class="toc__label">Введение в Companion</span>
+        </a>
+        <a href="#comp-mavlink">
+          <span class="toc__num">02</span>
+          <span class="toc__level">L2</span>
+          <span class="toc__label">MAVLink и MAVSDK</span>
+        </a>
+        <a href="#comp-raspberry">
+          <span class="toc__num">03</span>
+          <span class="toc__level">L3</span>
+          <span class="toc__label">Raspberry Pi + ArduPilot</span>
+        </a>
+        <a href="#comp-esp32">
+          <span class="toc__num">04</span>
+          <span class="toc__level">L2</span>
+          <span class="toc__label">ESP32 и периферия</span>
+        </a>
+      </nav>
+<!-- AUTO:TOC:companion:end -->
+
+      <!-- AUTO:PROGRESS:companion:start -->
+      <div class="section-progress" aria-label="Прогресс раздела Companion">
+        <span class="section-progress__label">Раздел Companion</span>
+        <span class="section-progress__bar" role="progressbar" aria-valuenow="4" aria-valuemin="0" aria-valuemax="4" aria-label="4 из 4 модулей в базовой версии">
+          <span class="section-progress__fill" style="width:100%"></span>
+        </span>
+        <span class="section-progress__stats">4 из 4 базовых модулей</span>
+      </div>
+<!-- AUTO:PROGRESS:companion:end -->
+
+      <section class="card orientation-guide" aria-labelledby="comp-orient-title">
+        <div class="breadcrumb" aria-label="Навигация по разделу">
+          <a href="#site-hero">Главная</a>
+          <span class="breadcrumb__sep" aria-hidden="true">›</span>
+          <span>Companion</span>
+        </div>
+
+        <h2 id="comp-orient-title">С чего начать в этом разделе</h2>
+        <p class="muted">
+          Сначала роль companion и протоколы, затем MAVSDK, практика на Raspberry Pi и периферия на ESP32.
+        </p>
+
+        <div class="grid quick-start-grid">
+          <article class="quick-start-card level-l1">
+            <h3>L1 · Концепция</h3>
+            <p>Зачем бортовой компьютер, граница ответственности FC vs companion.</p>
+            <a class="doc-link" href="#comp-intro">Открыть введение</a>
+          </article>
+
+          <article class="quick-start-card level-l2">
+            <h3>L2 · Протоколы</h3>
+            <p>MAVLink, MAVSDK, типовые сценарии запросов и телеметрии.</p>
+            <a class="doc-link" href="#comp-mavlink">К MAVLink / MAVSDK</a>
+          </article>
+
+          <article class="quick-start-card level-l3">
+            <h3>L3 · Платформа</h3>
+            <p>Raspberry Pi, связь с ArduPilot, типовой стек ПО.</p>
+            <a class="doc-link" href="#comp-raspberry">К Raspberry Pi</a>
+          </article>
+
+          <article class="quick-start-card level-l4">
+            <h3>L4 · Периферия</h3>
+            <p>ESP32 и MCU для датчиков, реле, кастомных интерфейсов.</p>
+            <a class="doc-link" href="#comp-esp32">К ESP32</a>
+          </article>
+        </div>
+      </section>
+
+      <!-- AUTO:ARTICLES:companion:start -->
+<article id="comp-intro" class="card" data-level="L2" data-added="2026-03-21">
+        <h2>Введение в Companion</h2>
+        <p class="muted">Краткое описание модуля (черновик; при переносе в сайт синхронизировать с `index.html`).</p>
+        <div class="article-meta">
+          <span class="tag">Уровень: L2 — Интегратор</span>
+          <span class="tag">Время чтения: 15 мин</span>
+          <span class="tag">MAVLink</span>
+        </div>
+
+        <h3>📖 Теория</h3>
+<p>Теоретическая основа (черновик).</p>
+
+        <h3>🛠 Практика</h3>
+<ol><li>Первый практический шаг (черновик).</li></ol>
+
+        <h3>🔍 Диагностика</h3>
+<ul><li><strong>Симптом:</strong> что проверить (черновик).</li></ul>
+
+        <div class="references">
+          <h4>📚 Источники</h4>
+          <ul>
+<li>
+              <a href="https://example.com" class="doc-link" target="_blank" rel="noopener noreferrer">Заглушка — заменить на первичный источник</a>
+              <span class="tag">primary | A</span>
+            </li>
+          </ul>
+        </div>
+      </article>
+
+      <article id="comp-mavlink" class="card" data-level="L2" data-added="2026-03-21">
+        <h2>MAVLink и MAVSDK</h2>
+        <p class="muted">Краткое описание модуля (черновик; при переносе в сайт синхронизировать с `index.html`).</p>
+        <div class="article-meta">
+          <span class="tag">Уровень: L2 — Интегратор</span>
+          <span class="tag">Время чтения: 25 мин</span>
+          <span class="tag">MAVSDK</span>
+        </div>
+
+        <h3>📖 Теория</h3>
+<p>Теоретическая основа (черновик).</p>
+
+        <h3>🛠 Практика</h3>
+<ol><li>Первый практический шаг (черновик).</li></ol>
+
+        <h3>🔍 Диагностика</h3>
+<ul><li><strong>Симптом:</strong> что проверить (черновик).</li></ul>
+
+        <div class="references">
+          <h4>📚 Источники</h4>
+          <ul>
+<li>
+              <a href="https://example.com" class="doc-link" target="_blank" rel="noopener noreferrer">Заглушка — заменить на первичный источник</a>
+              <span class="tag">primary | A</span>
+            </li>
+          </ul>
+        </div>
+      </article>
+
+      <article id="comp-raspberry" class="card" data-level="L3" data-added="2026-03-21">
+        <h2>Raspberry Pi + ArduPilot</h2>
+        <p class="muted">Краткое описание модуля (черновик; при переносе в сайт синхронизировать с `index.html`).</p>
+        <div class="article-meta">
+          <span class="tag">Уровень: L3 — Специалист</span>
+          <span class="tag">Время чтения: 40 мин</span>
+          <span class="tag">Raspberry Pi</span>
+        </div>
+
+        <h3>📖 Теория</h3>
+<p>Теоретическая основа (черновик).</p>
+
+        <h3>🛠 Практика</h3>
+<ol><li>Первый практический шаг (черновик).</li></ol>
+
+        <h3>🔍 Диагностика</h3>
+<ul><li><strong>Симптом:</strong> что проверить (черновик).</li></ul>
+
+        <div class="references">
+          <h4>📚 Источники</h4>
+          <ul>
+<li>
+              <a href="https://example.com" class="doc-link" target="_blank" rel="noopener noreferrer">Заглушка — заменить на первичный источник</a>
+              <span class="tag">primary | A</span>
+            </li>
+          </ul>
+        </div>
+      </article>
+
+      <article id="comp-esp32" class="card" data-level="L2" data-added="2026-03-21">
+        <h2>ESP32 и периферия</h2>
+        <p class="muted">Краткое описание модуля (черновик; при переносе в сайт синхронизировать с `index.html`).</p>
+        <div class="article-meta">
+          <span class="tag">Уровень: L2 — Интегратор</span>
+          <span class="tag">Время чтения: 30 мин</span>
+          <span class="tag">ESP32</span>
+        </div>
+
+        <h3>📖 Теория</h3>
+<p>Теоретическая основа (черновик).</p>
+
+        <h3>🛠 Практика</h3>
+<ol><li>Первый практический шаг (черновик).</li></ol>
+
+        <h3>🔍 Диагностика</h3>
+<ul><li><strong>Симптом:</strong> что проверить (черновик).</li></ul>
+
+        <div class="references">
+          <h4>📚 Источники</h4>
+          <ul>
+<li>
+              <a href="https://example.com" class="doc-link" target="_blank" rel="noopener noreferrer">Заглушка — заменить на первичный источник</a>
+              <span class="tag">primary | A</span>
+            </li>
+          </ul>
+        </div>
+      </article>
+<!-- AUTO:ARTICLES:companion:end -->
+    </section>
+
+    <!-- Инструменты -->
+    <section id="tab-tools" class="tab-pane" role="tabpanel" aria-labelledby="tab-btn-tools" aria-hidden="true" hidden>
+      <!-- AUTO:TOC:tools:start -->
+      <nav class="toc toc--enhanced" aria-label="Содержание раздела Инструменты">
+        <a href="#tools-overview">
+          <span class="toc__num">01</span>
+          <span class="toc__level">L1</span>
+          <span class="toc__label">Инструментарий</span>
+        </a>
+      </nav>
+<!-- AUTO:TOC:tools:end -->
+
+      <!-- AUTO:PROGRESS:tools:start -->
+      <div class="section-progress" aria-label="Прогресс раздела Инструменты">
+        <span class="section-progress__label">Раздел Инструменты</span>
+        <span class="section-progress__bar" role="progressbar" aria-valuenow="1" aria-valuemin="0" aria-valuemax="1" aria-label="1 обзорный модуль">
+          <span class="section-progress__fill" style="width:100%"></span>
+        </span>
+        <span class="section-progress__stats">Обзор стека ПО</span>
+      </div>
+<!-- AUTO:PROGRESS:tools:end -->
+
+      <section class="card orientation-guide" aria-labelledby="tools-orient-title">
+        <div class="breadcrumb" aria-label="Навигация по разделу">
+          <a href="#site-hero">Главная</a>
+          <span class="breadcrumb__sep" aria-hidden="true">›</span>
+          <span>Инструменты</span>
+        </div>
+
+        <h2 id="tools-orient-title">С чего начать</h2>
+        <p class="muted">
+          Конфигураторы и GCS привязаны к прошивкам — переходи в нужный раздел. Здесь — обзор типовых инструментов.
+        </p>
+
+        <div class="grid quick-start-grid">
+          <article class="quick-start-card level-l1">
+            <h3>FPV-стек</h3>
+            <p>Betaflight Configurator, Blackbox Explorer.</p>
+            <a class="doc-link" href="#bf-intro">Раздел Betaflight</a>
+          </article>
+
+          <article class="quick-start-card level-l2">
+            <h3>Навигация</h3>
+            <p>INAV Configurator, миссии в GCS.</p>
+            <a class="doc-link" href="#inav-intro">Раздел INAV</a>
+          </article>
+
+          <article class="quick-start-card level-l3">
+            <h3>ArduPilot / PX4</h3>
+            <p>Mission Planner, QGroundControl, сборки из исходников.</p>
+            <a class="doc-link" href="#ap-intro">ArduPilot</a> · <a class="doc-link" href="#px4-intro">PX4</a>
+          </article>
+
+          <article class="quick-start-card level-l4">
+            <h3>Разработка</h3>
+            <p>VS Code, Git, Docker, Linux/WSL2 — см. статьи по dev в стеках.</p>
+            <a class="doc-link" href="#tools-overview">Обзор ниже</a>
+          </article>
+        </div>
+      </section>
+
+      <!-- AUTO:ARTICLES:tools:start -->
+<article id="tools-overview" class="card" data-level="L1" data-added="2026-03-21">
+        <h2>Инструментарий</h2>
+        <p class="muted">Краткое описание модуля (черновик; при переносе в сайт синхронизировать с `index.html`).</p>
+        <div class="article-meta">
+          <span class="tag">Уровень: L1 — Оператор</span>
+          <span class="tag">Время чтения: 10 мин</span>
+          <span class="tag">GCS</span>
+          <span class="tag">tools</span>
+        </div>
+
+        <h3>📖 Теория</h3>
+<p>Теоретическая основа (черновик).</p>
+
+        <h3>🛠 Практика</h3>
+<ol><li>Первый практический шаг (черновик).</li></ol>
+
+        <h3>🔍 Диагностика</h3>
+<ul><li><strong>Симптом:</strong> что проверить (черновик).</li></ul>
+
+        <div class="references">
+          <h4>📚 Источники</h4>
+          <ul>
+<li>
+              <a href="https://example.com" class="doc-link" target="_blank" rel="noopener noreferrer">Заглушка — заменить на первичный источник</a>
+              <span class="tag">primary | A</span>
+            </li>
+          </ul>
+        </div>
+      </article>
+<!-- AUTO:ARTICLES:tools:end -->
+    </section>
+
+    <footer class="site-footer">
+      <section class="card glossary-section">
+        <h2>Глоссарий</h2>
+        <div class="grid" id="glossary-container">
+          <div class="glossary-entry">
+            <h3>PID</h3>
+            <p>Пропорционально–интегрально–дифференциальный регулятор контура стабилизации.</p>
+          </div>
+          <div class="glossary-entry">
+            <h3>MAVLink</h3>
+            <p>Micro Air Vehicle Link — легковесный протокол обмена данными между БПЛА и наземными станциями. MAVLink 2 поддерживает подписанные сообщения и расширенную адресацию.</p>
+          </div>
+          <div class="glossary-entry">
+            <h3>Blackbox</h3>
+            <p>Система логирования полетных данных в Betaflight для анализа производительности, вибраций и работы PID-регуляторов.</p>
+          </div>
+          <div class="glossary-entry">
+            <h3>SITL</h3>
+            <p>Software In The Loop — симуляция полета на компьютере для безопасной отладки и тестирования миссий без реального дрона.</p>
+          </div>
+          <div class="glossary-entry">
+            <h3>UART</h3>
+            <p>Universal Asynchronous Receiver-Transmitter — последовательный интерфейс связи FC с периферией.</p>
+          </div>
+          <div class="glossary-entry">
+            <h3>CRSF</h3>
+            <p>Crossfire-протокол связи между приемником и FC, используется в TBS Crossfire и ExpressLRS.</p>
+          </div>
+          <div class="glossary-entry">
+            <h3>ELRS</h3>
+            <p>ExpressLRS — открытый протокол радиосвязи с низкой задержкой и высокой дальностью. Популярная альтернатива Crossfire.</p>
+          </div>
+          <div class="glossary-entry">
+            <h3>Gyro</h3>
+            <p>Гироскоп — датчик угловой скорости, основа стабилизации в полетных прошивках.</p>
+          </div>
+          <div class="glossary-entry">
+            <h3>D-term</h3>
+            <p>Дифференциальная составляющая PID-регулятора, подавляет резкие колебания и bounce-back.</p>
+          </div>
+          <div class="glossary-entry">
+            <h3>uORB</h3>
+            <p>micro Object Request Broker — шина сообщений в PX4 для обмена данными между модулями по принципу publish/subscribe.</p>
+          </div>
+          <div class="glossary-entry">
+            <h3>EKF</h3>
+            <p>Extended Kalman Filter — фильтр, объединяющий данные с датчиков для точной оценки положения, скорости и ориентации дрона.</p>
+          </div>
+          <div class="glossary-entry">
+            <h3>VTOL</h3>
+            <p>Vertical Take-Off and Landing — аппарат с вертикальным взлетом/посадкой и горизонтальным полетом.</p>
+          </div>
+          <div class="glossary-entry">
+            <h3>RTK GPS</h3>
+            <p>Real-Time Kinematic — высокоточное позиционирование с точностью до сантиметров для профессиональных задач.</p>
+          </div>
+          <div class="glossary-entry">
+            <h3>DShot</h3>
+            <p>Digital Shot — цифровой протокол связи между FC и ESC, обеспечивающий точное управление моторами по сравнению с PWM/Oneshot.</p>
+          </div>
+          <div class="glossary-entry">
+            <h3>IPF</h3>
+            <p>INAV Programming Framework — система программирования в INAV для создания пользовательской логики поведения.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="card fails-section">
+        <h2>Журнал ошибок и фейлов</h2>
+        <p class="muted">Примеры; пополнять реальными кейсами (см. source-policy.md для ссылок).</p>
+        <table>
+          <thead>
+            <tr>
+              <th>Проблема</th>
+              <th>Причина</th>
+              <th>Решение</th>
+              <th>Профилактика</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Нет GPS фикса</td>
+              <td>UART/baudrate, помехи</td>
+              <td>Порт, экранирование</td>
+              <td>Чек-лист портов</td>
+            </tr>
+            <tr>
+              <td>Осцилляции после тюна</td>
+              <td>D-term, фильтры</td>
+              <td>Откат, Blackbox</td>
+              <td>Один параметр за шаг</td>
+            </tr>
+            <tr>
+              <td>Осцилляции после тюна</td>
+              <td>Завышенный D-term при недостаточной фильтрации</td>
+              <td>Откат параметров, анализ Blackbox, пошаговое увеличение D</td>
+              <td>Изменять D-term малыми шагами и контролировать температуру моторов</td>
+            </tr>
+            <tr>
+              <td>Дрон “виляет” на ховере</td>
+              <td>Слишком высокий P-term по Roll/Pitch</td>
+              <td>Снизить P на 10-15%, проверить логи</td>
+              <td>Тюнить P постепенно с короткими тестовыми полетами</td>
+            </tr>
+            <tr>
+              <td>Нет телеметрии на пульте</td>
+              <td>Неверный UART для Telemetry / MSP</td>
+              <td>В Ports включить Telemetry на нужном UART, проверить протокол</td>
+              <td>Фиксировать карту UART перед каждым изменением wiring</td>
+            </tr>
+            <tr>
+              <td>Дрон “дребезжит” при резких маневрах</td>
+              <td>Слишком высокий D-term при недостаточной фильтрации гироскопа</td>
+              <td>Снизить D-term на 20%, увеличить фильтрацию D-term</td>
+              <td>Тюнить D-term пошагово и сверять логи Blackbox</td>
+            </tr>
+            <tr>
+              <td>Потеря видео (VTX) на дальности</td>
+              <td>Неверная настройка SmartAudio/Tramp, низкая мощность VTX</td>
+              <td>Настроить VTX через OSD/CLI, проверить антенну, увеличить мощность</td>
+              <td>Проверять профиль VTX и состояние антенны перед вылетом</td>
+            </tr>
+            <tr>
+              <td>Дрон не входит в режим миссии (AUTO)</td>
+              <td>EKF нездоров, нет GPS fix, не загружена миссия</td>
+              <td>Проверить EKF в Mission Planner, дождаться стабильного GPS, перезаписать миссию</td>
+              <td>Перед миссией проверять pre-arm и валидность миссии</td>
+            </tr>
+            <tr>
+              <td>Самопроизвольное переключение режимов</td>
+              <td>Дребезг переключателей на пульте, помехи RC-канала</td>
+              <td>Увеличить deadzone, проверить приемник и уровень помех</td>
+              <td>Тестировать каналы RC в статике перед полетом</td>
+            </tr>
+            <tr>
+              <td>ESP32 не видит MAVLink сообщения</td>
+              <td>Неверный baudrate, неправильное подключение UART</td>
+              <td>Проверить скорость порта, перекрестить TX↔RX, проверить питание</td>
+              <td>Фиксировать схему распиновки и тестировать loopback</td>
+            </tr>
+            <tr>
+              <td>ROS 2 узел не получает телеметрию</td>
+              <td>Не запущен uXRCE-DDS Agent, неверный порт, не активирован UXRCE_DDS_CFG_EN</td>
+              <td>Запустить MicroXRCEAgent и проверить параметры PX4/UART</td>
+              <td>Хранить рабочий launch-чеклист ROS 2 + PX4</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section class="card resources-section">
+        <h2>📚 Полезные ресурсы и сообщества</h2>
+        <div class="grid">
+          <div class="resources-category">
+            <h3>Официальная документация</h3>
+            <ul>
+              <li><a href="https://betaflight.com/docs" target="_blank" rel="noopener noreferrer" class="doc-link">Betaflight Documentation</a></li>
+              <li><a href="https://github.com/iNavFlight/inav/wiki" target="_blank" rel="noopener noreferrer" class="doc-link">INAV Wiki</a></li>
+              <li><a href="https://ardupilot.org/copter/index.html" target="_blank" rel="noopener noreferrer" class="doc-link">ArduPilot Copter</a></li>
+              <li><a href="https://docs.px4.io/main/en/" target="_blank" rel="noopener noreferrer" class="doc-link">PX4 Documentation</a></li>
+              <li><a href="https://mavlink.io/en/" target="_blank" rel="noopener noreferrer" class="doc-link">MAVLink Protocol</a></li>
+            </ul>
+          </div>
+          <div class="resources-category">
+            <h3>Сообщества и форумы</h3>
+            <ul>
+              <li><a href="https://discuss.ardupilot.org/" target="_blank" rel="noopener noreferrer">ArduPilot Discourse</a></li>
+              <li><a href="https://discord.gg/betaflight" target="_blank" rel="noopener noreferrer">Betaflight Discord</a></li>
+              <li><a href="https://discord.gg/px4" target="_blank" rel="noopener noreferrer">PX4 Discord</a></li>
+              <li><a href="https://www.reddit.com/r/Multicopter/" target="_blank" rel="noopener noreferrer">r/Multicopter (Reddit)</a></li>
+              <li><a href="https://www.rcgroups.com/multirotor-drone-talk-995/" target="_blank" rel="noopener noreferrer">RCGroups Multirotor</a></li>
+            </ul>
+          </div>
+          <div class="resources-category">
+            <h3>Видео-каналы</h3>
+            <ul>
+              <li><a href="https://www.youtube.com/@JoshuaBardwell" target="_blank" rel="noopener noreferrer">Joshua Bardwell</a> — FPV и Betaflight</li>
+              <li><a href="https://www.youtube.com/@Painless360" target="_blank" rel="noopener noreferrer">Painless360</a> — ArduPilot, PX4</li>
+              <li><a href="https://www.youtube.com/@rctestflight" target="_blank" rel="noopener noreferrer">rctestflight</a> — эксперименты с БПЛА</li>
+              <li><a href="https://www.youtube.com/@PX4Dev" target="_blank" rel="noopener noreferrer">PX4 Developer Summit</a></li>
+            </ul>
+          </div>
+          <div class="resources-category">
+            <h3>Инструменты и ПО</h3>
+            <ul>
+              <li><a href="https://github.com/betaflight/betaflight-configurator" target="_blank" rel="noopener noreferrer">Betaflight Configurator</a></li>
+              <li><a href="https://github.com/iNavFlight/inav-configurator" target="_blank" rel="noopener noreferrer">INAV Configurator</a></li>
+              <li><a href="https://ardupilot.org/planner2/" target="_blank" rel="noopener noreferrer">Mission Planner</a></li>
+              <li><a href="https://qgroundcontrol.com/" target="_blank" rel="noopener noreferrer">QGroundControl</a></li>
+              <li><a href="https://github.com/betaflight/blackbox-log-viewer" target="_blank" rel="noopener noreferrer">Blackbox Explorer</a></li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section class="card compare-section">
+        <h2>Сравнение прошивок</h2>
+        <table class="compare-table">
+          <thead>
+            <tr>
+              <th>Характеристика</th>
+              <th>Betaflight</th>
+              <th>INAV</th>
+              <th>ArduPilot</th>
+              <th>PX4</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Целевое применение</td>
+              <td>FPV, гонки</td>
+              <td>Дальние, крылья</td>
+              <td>Универсально, тяжёлые</td>
+              <td>Исследования, ROS 2</td>
+            </tr>
+            <tr>
+              <td>GPS-навигация</td>
+              <td>Ограниченно</td>
+              <td>Сильно</td>
+              <td>Сильно</td>
+              <td>Сильно</td>
+            </tr>
+            <tr>
+              <td>Скриптинг</td>
+              <td>CLI / presets</td>
+              <td>IPF/JS</td>
+              <td>Lua</td>
+              <td>ROS 2 / модули</td>
+            </tr>
+            <tr>
+              <td>Сложность</td>
+              <td>Средняя</td>
+              <td>Средняя</td>
+              <td>Высокая</td>
+              <td>Высокая</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section class="card checklists-section">
+        <h2>✅ Быстрые чек-листы перед полетом</h2>
+        <div class="grid">
+          <div class="checklist-card">
+            <h3>Перед включением питания</h3>
+            <ul>
+              <li><input type="checkbox"><label>Пропеллеры сняты (настройка) / затянуты (полет)</label></li>
+              <li><input type="checkbox"><label>Аккумулятор заряжен, напряжение в норме</label></li>
+              <li><input type="checkbox"><label>Антенны VTX и приемника установлены</label></li>
+              <li><input type="checkbox"><label>SD-карта вставлена (логи/скрипты)</label></li>
+              <li><input type="checkbox"><label>Нет видимых повреждений рамы и проводов</label></li>
+            </ul>
+          </div>
+          <div class="checklist-card">
+            <h3>После подключения к GCS</h3>
+            <ul>
+              <li><input type="checkbox"><label>Сделан backup конфигурации (diff / param)</label></li>
+              <li><input type="checkbox"><label>Калибровка акселерометра выполнена</label></li>
+              <li><input type="checkbox"><label>Калибровка компаса выполнена (если есть MAG)</label></li>
+              <li><input type="checkbox"><label>GPS fix получен (≥ 8 спутников, HDOP &lt; 1.5)</label></li>
+              <li><input type="checkbox"><label>Режимы назначены на переключатели</label></li>
+            </ul>
+          </div>
+          <div class="checklist-card">
+            <h3>Перед взлетом (armed)</h3>
+            <ul>
+              <li><input type="checkbox"><label>Проверка направления вращения моторов</label></li>
+              <li><input type="checkbox"><label>Проверка движения серв (для крыла)</label></li>
+              <li><input type="checkbox"><label>Проверка работы OSD и телеметрии</label></li>
+              <li><input type="checkbox"><label>Проверка failsafe (выключение пульта)</label></li>
+              <li><input type="checkbox"><label>Дрон в безопасной зоне, люди на расстоянии</label></li>
+            </ul>
+          </div>
+          <div class="checklist-card">
+            <h3>После полета</h3>
+            <ul>
+              <li><input type="checkbox"><label>Сохранение лога полета (Blackbox / .bin)</label></li>
+              <li><input type="checkbox"><label>Проверка температуры моторов и ESC</label></li>
+              <li><input type="checkbox"><label>Проверка остаточного напряжения батареи</label></li>
+              <li><input type="checkbox"><label>Визуальный осмотр на повреждения</label></li>
+              <li><input type="checkbox"><label>Запись наблюдений в журнал ошибок</label></li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <div class="footer-note site-footer__meta">
+        <p class="muted">
+          <strong>UAV Student</strong> — образовательный проект. Концепция и стандарты: <code>PROJECT-DIRECTIVES.md</code>.
+          Учебная программа-прототип: <code>curriculum/</code>.
+        </p>
+        <p class="muted">Внешние ссылки открываются в новой вкладке. Проверяйте версии прошивок и инструментов.</p>
+      </div>
+    </footer>
+  </div>
+
+  <a class="toc-fab" href="#top" aria-label="Наверх">↑ Наверх</a>
+
+  <script>
+    (function () {
+      var tabBtns = document.querySelectorAll(".tab-btn");
+      var panes = document.querySelectorAll(".tab-pane");
+
+      function switchTab(tabId) {
+        panes.forEach(function (pane) {
+          var on = pane.id === tabId;
+          pane.classList.toggle("active", on);
+          pane.setAttribute("aria-hidden", on ? "false" : "true");
+          if (on) pane.removeAttribute("hidden");
+          else pane.setAttribute("hidden", "");
+        });
+        tabBtns.forEach(function (btn) {
+          var active = btn.getAttribute("data-tab") === tabId;
+          btn.classList.toggle("active", active);
+          btn.setAttribute("aria-selected", active ? "true" : "false");
+        });
+        try {
+          localStorage.setItem("uav-active-tab", tabId);
+        } catch (e) {}
+      }
+
+      /** Якорь внутри вкладки: сначала переключить таб, затем прокрутка (TOC и внутренние ссылки). */
+      function scrollToAnchor(href, smooth) {
+        var target = document.querySelector(href);
+        if (!target) return false;
+        var pane = target.closest(".tab-pane");
+        if (pane && pane.id) {
+          switchTab(pane.id);
+        }
+        var behave = smooth !== false ? "smooth" : "auto";
+        setTimeout(function () {
+          target.scrollIntoView({ behavior: behave, block: "start" });
+        }, pane ? 60 : 0);
+        return true;
+      }
+
+      tabBtns.forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          var id = btn.getAttribute("data-tab");
+          if (id) switchTab(id);
+        });
+      });
+
+      var saved = null;
+      try {
+        saved = localStorage.getItem("uav-active-tab");
+      } catch (e) {}
+      if (location.hash && location.hash.length > 1) {
+        if (!scrollToAnchor(location.hash, false)) {
+          if (saved && document.getElementById(saved)) {
+            switchTab(saved);
+          }
+        }
+      } else if (saved && document.getElementById(saved)) {
+        switchTab(saved);
+      }
+
+      document.querySelectorAll("table").forEach(function (table) {
+        var headers = Array.from(table.querySelectorAll("thead th")).map(function (th) {
+          return th.textContent.trim();
+        });
+        if (!headers.length) return;
+        table.querySelectorAll("tbody tr").forEach(function (row) {
+          Array.from(row.children).forEach(function (cell, index) {
+            if (!cell.getAttribute("data-label")) {
+              cell.setAttribute("data-label", headers[index] || "Поле");
+            }
+          });
+        });
+      });
+
+      document.querySelectorAll('a[href^="#"]').forEach(function (anchor) {
+        anchor.addEventListener("click", function (e) {
+          var href = anchor.getAttribute("href");
+          if (!href || href === "#") return;
+          if (document.querySelector(href)) {
+            e.preventDefault();
+            scrollToAnchor(href, true);
+            try {
+              history.replaceState(null, "", href);
+            } catch (err) {}
+          }
+        });
+      });
+
+      var fab = document.querySelector(".toc-fab");
+      if (fab) {
+        function updFab() {
+          fab.style.display = window.scrollY > 300 ? "inline-flex" : "none";
+        }
+        window.addEventListener("scroll", updFab);
+        updFab();
+      }
+
+      /* Состояние шапки (details): запоминаем открыто/закрыто */
+      var heroDetails = document.getElementById("hero-details");
+      if (heroDetails) {
+        try {
+          var ho = localStorage.getItem("uav-hero-open");
+          if (ho === "1") heroDetails.open = true;
+          else if (ho === "0") heroDetails.open = false;
+        } catch (e) {}
+        heroDetails.addEventListener("toggle", function () {
+          try {
+            localStorage.setItem("uav-hero-open", heroDetails.open ? "1" : "0");
+          } catch (e) {}
+        });
+      }
+    })();
+  </script>
+</body>
+</html>
