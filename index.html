@@ -190,7 +190,13 @@
       <!-- AUTO:ARTICLES:betaflight:start -->
 <article id="bf-intro" class="card" data-level="L1" data-added="2026-03-21">
         <h2>Введение в Betaflight</h2>
-        <p class="muted">Краткое описание модуля (черновик; при переносе в сайт синхронизировать с <code>index.html</code>).</p>
+        <p class="muted">Betaflight — открытая прошивка для полётных контроллеров мультикоптеров с упором на <strong>низкую задержку</strong> управления и гибкую настройку. В статье — цепочка от установки конфигуратора до первого безопасного вылета.
+
+<strong>После прочтения вы сможете:</strong>
+
+- прошить FC и сделать <strong>бэкап</strong> конфигурации (<code>diff all</code>);
+- настроить <strong>порты, приёмник, режимы</strong> и калибровку датчиков;
+- проверить <strong>моторы и failsafe</strong> перед полётом.</p>
         <div class="article-meta">
           <span class="tag">Уровень: L1 — Оператор</span>
           <span class="tag">Время чтения: 10 мин</span>
@@ -198,20 +204,99 @@
         </div>
 
         <h3>📖 Теория</h3>
-<p>Теоретическая основа (черновик).</p>
+<h4 class="md-subheading">Что такое Betaflight</h4>
+<p>Betaflight — форк <strong>Cleanflight</strong> (наследник Baseflight / STM32-порт MultiWii). Главный акцент стека — <strong>производительность</strong>: минимальная <strong>latency</strong> и высокая частота контура гироскопа (до <strong>8 кГц</strong>).</p>
+<p><strong>Поддержка:</strong> полётные контроллеры на <strong>STM32</strong> (F4, F7, H7). <strong>Возможности прошивки:</strong></p>
+<ul><li>многопрофильные <strong>PID</strong>;</li><li>фильтрация гироскопа и <strong>D-term</strong>;</li><li>цифровые протоколы к ESC (<strong>DShot</strong>, ProShot);</li><li><strong>Blackbox</strong> для логов;</li><li><strong>CLI</strong> для точной настройки.</li></ul>
+<h4 class="md-subheading">Архитектура прошивки</h4>
+<p>Прошивка модульная, задачи выполняются в реальном времени. <strong>Основные задачи (tasks):</strong></p>
+<ul><li><strong>Gyro task</strong> — чтение гироскопа (до 8 кГц), фильтры.</li><li><strong>PID task</strong> — выход на моторы по ошибке <strong>setpoint</strong> vs <strong>gyro</strong>.</li><li><strong>RX task</strong> — приёмник (CRSF, SBUS, ELRS и др.).</li><li><strong>Scheduler</strong> — распределение времени между задачами.</li></ul>
+<p><strong>PID-цикл:</strong> параметр <code>pid_process_denom</code> задаёт частоту контура PID. Пример: gyro <strong>8 кГц</strong>, <code>pid_process_denom = 2</code> → PID <strong>4 кГц</strong> (типичная отправная точка для большинства сборок).</p>
+<h4 class="md-subheading">Версии прошивки и совместимость</h4>
+<p><strong>Betaflight 4.5</strong> — актуальная стабильная ветка. Ключевые изменения:</p>
+<ul><li>GPS (в т.ч. модули <strong>M10</strong>) и <strong>GPS Rescue</strong>;</li><li>магнитометры;</li><li><strong>Angle / Horizon</strong> с опцией *Earth referencing*;</li><li>шрифты для HD VTX (Walksnail);</li><li>фильтрация с учётом гармоник <strong>RPM</strong>.</li></ul>
+<p><strong>Важно:</strong> при переходе <strong>4.4 → 4.5</strong> нужен <strong>Full Chip Erase</strong> и настройка с нуля. Старые <strong>CLI-дампы</strong> с 4.3 и ниже часто <strong>несовместимы</strong> из‑за переименований и диапазонов параметров.</p>
+<h4 class="md-subheading">Экосистема Betaflight</h4>
+<p>Помимо прошивки — <strong>Betaflight Configurator</strong>. С версии <strong>2025.12</strong> доступен <strong>веб-конфигуратор</strong> (<code>https://app.betaflight.com</code>) через <strong>WebUSB / WebSerial</strong>. Для Android по-прежнему есть нативные приложения.</p>
 
         <h3>🛠 Практика</h3>
-<ol><li>Первый практический шаг (черновик).</li></ol>
+<h4 class="md-subheading">Установка Betaflight Configurator</h4>
+<p><strong>Вариант А — веб (рекомендуется для ПК):</strong></p>
+<ol><li>Браузер на базе <strong>Chromium</strong> (Chrome, Edge, Opera).</li><li>Открыть <code>https://app.betaflight.com</code>.</li><li>При первом подключении FC разрешить доступ к <strong>USB</strong>.</li></ol>
+<p><strong>Вариант Б — офлайн или старая среда:</strong></p>
+<ul><li>установщик с репозитория GitHub Releases: <code>https://github.com/betaflight/betaflight-configurator/releases</code> (Windows / macOS / Linux).</li></ul>
+<h4 class="md-subheading">Подключение полётного контроллера</h4>
+<ol><li>USB-кабель <strong>с передачей данных</strong> (не «только зарядка»).</li><li>В конфигураторе: порт (<strong>COM</strong>* / <code>/dev/ttyACM*</code>) → <strong>Connect</strong>.</li><li>При отсутствии порта — драйверы (<strong>ImpulseRC Driver Fixer</strong> или вручную в Windows).</li></ol>
+<p><strong>Проверка:</strong> вкладка <strong>Setup</strong> — 3D-модель повторяет наклоны. Нет реакции — акселерометр или соединение.</p>
+<h4 class="md-subheading">Резервная копия (CLI)</h4>
+<p>Перед любыми правками: вкладка <strong>CLI</strong> → введите команду ниже → <strong>Save to File</strong>.</p>
+<pre class="cli-block"><code>diff all</code></pre>
+<p><code>diff all</code> сохраняет только <strong>отличия от дефолта</strong> — удобно для восстановления. <code>dump all</code> — для глубокой диагностики; <strong>между мажорными версиями</strong> для переноса конфига не рекомендуется.</p>
+<h4 class="md-subheading">Обновление прошивки (Firmware Flasher)</h4>
+<ol><li><strong>Firmware Flasher</strong> — целевой контроллер (часто определяется по USB).</li><li>Версия — последняя стабильная <strong>4.5.x</strong>.</li><li>Включить <strong>Full chip erase</strong> при смене мажорной ветки.</li><li><strong>Load Firmware [Online]</strong> → <strong>Flash Firmware</strong>; не отключать USB до конца.</li><li>После перезагрузки — восстановить конфиг из бэкапа (<strong>CLI</strong>) или настроить заново.</li></ol>
+<h4 class="md-subheading">Вкладка Configuration</h4>
+<ul><li><strong>Mixer</strong> — тип рамы (<strong>Quad X</strong> для типичного FPV-квада).</li><li><strong>Board and Sensor Alignment</strong> — <strong>Yaw degrees</strong>, если FC повёрнут на раме.</li><li><strong>Battery Voltage</strong> — <strong>VBAT</strong> для отображения напряжения.</li><li><strong>ESC/Motor</strong> — <strong>DSHOT300/600</strong> при поддержке ESC; <strong>Bidirectional DShot</strong> для RPM-фильтра.</li><li><strong>Motor Stop</strong> — если моторы не должны крутиться на нулевом газу после арм.</li></ul>
+<h4 class="md-subheading">Вкладка Ports</h4>
+<ul><li><strong>UART1</strong> — часто связан с USB, <strong>MSP ON</strong>.</li><li><strong>UART2/3/4</strong> — <strong>Serial RX</strong> на том порту, куда припаян приёмник.</li><li><strong>UART5</strong> (пример) — <strong>GPS</strong>, скорость <strong>57600</strong> или <strong>115200</strong>.</li></ul>
+<h4 class="md-subheading">Вкладка Receiver</h4>
+<ul><li><strong>Serial-based receiver</strong> для CRSF / SBUS / FPORT.</li><li><strong>Provider:</strong> <strong>CRSF</strong> (ELRS, TBS), <strong>SBUS</strong> (FrSky, DJI и др.).</li><li>Стики на пульте → ползунки в конфигураторе должны двигаться.</li><li>Диапазон <strong>1000–2000</strong> (центр <strong>1500</strong>); иначе <strong>rxrange</strong> в CLI или endpoints на пульте.</li><li><strong>Channel Map</strong> (например <strong>AETR</strong>, <strong>TAER</strong>) при перепутанных каналах.</li></ul>
+<h4 class="md-subheading">Вкладка Modes</h4>
+<p>Назначьте <strong>AUX</strong> на режимы. Кратко по смыслу:</p>
+<ul><li><strong>ARM</strong> — включение моторов (лучше 2-поз. тумблер).</li><li><strong>ANGLE</strong> — самовыравнивание, обучение.</li><li><strong>HORIZON</strong> — гибрид стабилизации и акро.</li><li><strong>ACRO</strong> — по умолчанию, в списке отдельной строки нет.</li><li><strong>BEEPER</strong> — поиск дрона.</li><li><strong>GPS RESCUE</strong> — если настроен GPS.</li></ul>
+<p>Для каждого режима: <strong>Add Range</strong> → выбрать канал и диапазон положения переключателя.</p>
+<h4 class="md-subheading">Калибровка датчиков</h4>
+<ul><li><strong>Акселерометр:</strong> <strong>Setup</strong>, горизонтальная поверхность → <strong>Calibrate Accelerometer</strong>.</li><li><strong>Магнитометр:</strong> <strong>Calibrate Magnetometer</strong>, ~30 с вращений по осям; проверить согласованность с реальным курсом.</li></ul>
+<h4 class="md-subheading">ESC и моторы (без пропеллеров!)</h4>
+<p><strong>Опасность:</strong> всегда <strong>снимайте пропеллеры</strong> перед тестом моторов.</p>
+<ol><li><strong>Motors</strong> — включить <strong>I understand the risks</strong>.</li><li><strong>Motor 1</strong> — проверить соответствие физическому мотору (обычно передний правый для схемы «Motor 1»).</li><li>Направление вращения — по схеме рамы; править проводами или <strong>BLHeli / Bluejay</strong>.</li><li>Несовпадение порядка/направления — типичная причина переворота при взлёте.</li></ol>
+<h4 class="md-subheading">Предполётная проверка</h4>
+<ul><li><strong>ARM без пропов</strong> — моторы крутятся на малых оборотах.</li><li><strong>Наклон вперёд</strong> — передние моторы кратко добавляют газ (стабилизация реагирует).</li><li><strong>Failsafe</strong> — выключить пульт; ожидаемое поведение (посадка / <strong>GPS Rescue</strong>).</li><li><strong>OSD</strong> — напряжение, таймер, режим (если используете видеолинк).</li></ul>
 
         <h3>🔍 Диагностика</h3>
-<div class="diag-groups"><article class="diag-item"><h4><strong>Симптом:</strong> что проверить (черновик).</h4></article></div>
+<div class="diag-groups"><article class="diag-item"><h4><strong>Симптом:</strong> Конфигуратор не видит контроллер, порт не появляется</h4><ul><li>Возможная причина: не установлены драйверы (Windows), некачественный USB-кабель, конфликт портов.</li><li>Что проверить/сделать: заменить кабель на кабель с передачей данных. Для Windows установить драйверы через ImpulseRC Driver Fixer. Перезагрузить компьютер. Попробовать другой порт USB.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> Контроллер подключается, но 3D-модель не реагирует на движение</h4><ul><li>Возможная причина: не откалиброван акселерометр, повреждён датчик.</li><li>Что проверить/сделать: выполнить калибровку акселерометра на горизонтальной поверхности. Если не помогает — в CLI проверить status и убедиться, что ACCEL распознаётся. Проверить целостность проводов и пайку.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> Дрон не армуется, в правом верхнем углу мигает ошибка (например, RX_FAILSAFE)</h4><ul><li>Возможная причина: приёмник не получает сигнал, не настроен порт, неверный протокол.</li><li>Что проверить/сделать: проверить, что выбран правильный UART для Serial RX, выбран верный протокол (CRSF/SBUS). Убедиться, что пульт включён и приёмник связан (индикатор на приёмнике горит). Во вкладке Receiver проверить, что ползунки движутся.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> Моторы вращаются, но дрон не взлетает или переворачивается при попытке</h4><ul><li>Возможная причина: неправильное направление вращения моторов, неверный порядок подключения, неправильная ориентация FC.</li><li>Что проверить/сделать: на вкладке Motors проверить соответствие порядка моторов (Motor 1 — передний правый и т.д.). Проверить направление вращения (маркировкой на пропеллерах). Убедиться, что угол поворота FC (Yaw degrees) установлен правильно.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> Стики в конфигураторе двигаются, но значения не достигают 1000–2000</h4><ul><li>Возможная причина: конечные точки на пульте настроены неверно.</li><li>Что проверить/сделать: в настройках пульта отрегулировать Travel/Endpoints до 1000–2000 мкс. Альтернативно использовать CLI-команду rxrange для коррекции.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> Дрон армуется, но моторы не вращаются (при выключенном MOTOR_STOP)</h4><ul><li>Возможная причина: минимальный газ (min_throttle) слишком низкий для старта моторов.</li><li>Что проверить/сделать: на вкладке Configuration увеличить значение Minimum Throttle (типичное значение 1050–1100).</li></ul></article></div>
 
         <div class="references">
           <h4>📚 Источники</h4>
           <ul>
 <li>
-              <a href="https://example.com" class="doc-link" target="_blank" rel="noopener noreferrer">Заглушка — заменить на первичный источник</a>
-              <span class="tag">primary | A</span>
+              <a href="https://www.betaflight.com/docs/development/Getting-Started" class="doc-link" target="_blank" rel="noopener noreferrer">Getting Started — Betaflight Documentation</a>
+              <span class="tag">primary</span>
+            </li>
+<li>
+              <a href="https://www.betaflight.com/docs/wiki/release/Betaflight-4-5-Release-Notes" class="doc-link" target="_blank" rel="noopener noreferrer">Betaflight 4.5 Release Notes</a>
+              <span class="tag">primary</span>
+            </li>
+<li>
+              <a href="https://app.betaflight.com" class="doc-link" target="_blank" rel="noopener noreferrer">Betaflight Configurator — Official Web App</a>
+              <span class="tag">primary</span>
+            </li>
+<li>
+              <a href="https://www.betaflight.com/docs/development/Cli" class="doc-link" target="_blank" rel="noopener noreferrer">Betaflight CLI Documentation — Command Reference</a>
+              <span class="tag">primary</span>
+            </li>
+<li>
+              <a href="https://github.com/betaflight/betaflight-configurator/releases" class="doc-link" target="_blank" rel="noopener noreferrer">Betaflight Configurator — GitHub Releases</a>
+              <span class="tag">primary</span>
+            </li>
+<li>
+              <a href="https://www.betaflight.com/docs/wiki/guides/current/FAQ" class="doc-link" target="_blank" rel="noopener noreferrer">Betaflight FAQ — How to Start</a>
+              <span class="tag">primary</span>
+            </li>
+<li>
+              <a href="https://help.iflight-rc.eu/en-US/betaflight-advanced-guide-951396" class="doc-link" target="_blank" rel="noopener noreferrer">Betaflight Advanced Guide — iFlight</a>
+              <span class="tag">secondary</span>
+            </li>
+<li>
+              <a href="https://docs.speedybee.cn/en/fpv/gps/gps-faq/how-to-enable-gps-rescue-mode-and-failsafe.html" class="doc-link" target="_blank" rel="noopener noreferrer">How to Enable GPS Rescue — SpeedyBee Docs</a>
+              <span class="tag">secondary</span>
+            </li>
+<li>
+              <a href="https://iflightrc.freshdesk.com/support/solutions/articles/48001149405/thumbs_down" class="doc-link" target="_blank" rel="noopener noreferrer">My FPV Quad won&#x27;t arm — iFlight Support</a>
+              <span class="tag">secondary</span>
+            </li>
+<li>
+              <a href="https://www.youtube.com/watch?v=xSzO6HP6yzs" class="doc-link" target="_blank" rel="noopener noreferrer">Joshua Bardwell — Betaflight Setup Tutorial</a>
+              <span class="tag">secondary</span>
             </li>
           </ul>
         </div>
@@ -219,29 +304,82 @@
 
       <article id="bf-ports" class="card" data-level="L1" data-added="2026-03-21">
         <h2>Порты и приёмник</h2>
-        <p class="muted">Краткое описание модуля (черновик; при переносе в сайт синхронизировать с <code>index.html</code>).</p>
+        <p class="muted"><strong>UART</strong> — основа подключения приёмника, GPS, телеметрии, VTX и др. к полётному контроллеру в Betaflight. От вкладки <strong>Ports</strong> зависит, дойдёт ли управление до прошивки.
+
+<strong>В статье:</strong>
+
+- как читать <strong>распиновку</strong> и не занять порт под USB;
+- <strong>распайка</strong> под SBUS, CRSF/ELRS, FPort, IBUS, Spektrum;
+- <strong>Serial Rx</strong> + выбор протокола во вкладке <strong>Configuration</strong>;
+- типичные сбои (<strong>MSP</strong>, лимиты, F4/SBUS).</p>
         <div class="article-meta">
           <span class="tag">Уровень: L1 — Оператор</span>
-          <span class="tag">Время чтения: 12–15 мин</span>
+          <span class="tag">Время чтения: 30 мин</span>
+          <span class="tag">Betaflight 4.5+</span>
           <span class="tag">ports</span>
           <span class="tag">RX</span>
         </div>
 
         <h3>📖 Теория</h3>
-<p>Теоретическая основа (черновик).</p>
+<h4 class="md-subheading">Что такое UART и зачем настройка портов</h4>
+<p><strong>UART</strong> — последовательный интерфейс: пара <strong>TX</strong> (передача) и <strong>RX</strong> (приём). Во вкладке <strong>Ports</strong> каждому физическому UART назначают роль: <strong>Serial RX</strong>, <strong>GPS</strong>, телеметрия, <strong>MSP</strong> и т.д.</p>
+<p><strong>Правило:</strong> на одном UART в один момент — <strong>одна основная роль</strong> для потока данных. Совмещение, например, <strong>Serial Rx</strong> и <strong>Telemetry Output</strong> на одном порту без понимания протокола часто даёт конфликт и «ломает» сохранение настроек.</p>
+<h4 class="md-subheading">Типы приёмников и распайка</h4>
+<p>Протокол задаёт и проводку, и пункт <strong>Serial Receiver Provider</strong> в конфигураторе.</p>
+<ul><li><strong>SBUS</strong> (FrSky, Futaba, часть DJI) — в BF: <strong>SBUS</strong>. Сигнал с приёмника → <strong>RX</strong> выбранного UART (не на TX).</li><li><strong>CRSF</strong> (TBS Crossfire, <strong>ExpressLRS</strong>) — в BF: <strong>CRSF</strong>. <strong>RX приёмника → TX FC</strong>, <strong>TX приёмника → RX FC</strong> (классическое перекрёстное соединение для полного дуплекса).</li><li><strong>FPort</strong> (FrSky) — <strong>FrSky FPort</strong>; один провод, инверсия/пин зависят от платы и версии — сверяйтесь с мануалом FC.</li><li><strong>IBUS</strong> (FlySky, Turnigy) — <strong>IBUS</strong>, сигнал → <strong>RX</strong>.</li><li><strong>Spektrum DSM</strong> — <strong>SPEKTRUM1024</strong> / <strong>SPEKTRUM2048</strong>, сигнальный провод по документации приёмника.</li></ul>
+<p><strong>F4 и SBUS:</strong> на части плат <strong>нет</strong> аппаратного инвертора под инвертированный SBUS — используйте выделенный пин <strong>SBUS</strong> на FC или другой протокол (<strong>FPort</strong> и т.д.), иначе понадобится внешний инвертор.</p>
+<h4 class="md-subheading">Betaflight 4.4+ и Cloud Build</h4>
+<p>С <strong>4.4.0</strong> при сборке через <strong>Cloud Build</strong> в прошивку попадают только выбранные <strong>протоколы приёмника</strong>. По умолчанию часто включены <strong>SBUS</strong>, <strong>CRSF</strong>, <strong>GHST</strong>. <strong>IBUS</strong>, <strong>Spektrum</strong> и др. нужно <strong>явно отметить</strong> при сборке — иначе приёмник «молчит» при любой распайке.</p>
+<h4 class="md-subheading">Ограничения MSP</h4>
+<p><strong>MSP</strong> нужен конфигуратору и части устройств. Ограничение: одновременно <strong>не более трёх</strong> UART с включённым <strong>MSP</strong>; четвёртый может привести к сбросу настроек MSP после перезагрузки.</p>
+<p><strong>Совет:</strong> соединение с ПК по <strong>USB</strong> обычно занимает отдельный канал; не переназначайте его под приёмник, не понимая схемы платы.</p>
 
         <h3>🛠 Практика</h3>
-<ol><li>Первый практический шаг (черновик).</li></ol>
+<h4 class="md-subheading">Шаг 1. Идентификация UART на FC</h4>
+<ol><li>Найдите <strong>распиновку</strong> (шёлк на плате или сайт производителя).</li><li>UART подписаны как <strong>UART1…</strong> или <strong>RX1/TX1</strong> и соответствуют строкам во вкладке <strong>Ports</strong>.</li></ol>
+<p><strong>Совет:</strong> <strong>USB</strong> часто «сидит» на <strong>UART1</strong> или отдельном USB-мосте — этот порт не выбирайте под приёмник без чтения схемы.</p>
+<h4 class="md-subheading">Шаг 2. Физическое подключение приёмника</h4>
+<ol><li><strong>Обесточить</strong> FC перед пайкой/вставкой в разъём.</li><li>Для приёмника взять <strong>свободный</strong> UART (часто удобно оставить канал USB как есть и занять <strong>UART2/UART3</strong>).</li><li>Распаять по таблице выше (<strong>SBUS → RX</strong>, <strong>CRSF → перекрёстно</strong> и т.д.).</li><li>Проверить <strong>пайку</strong>, отсутствие <strong>КЗ</strong> между соседними пинами.</li></ol>
+<h4 class="md-subheading">Шаг 3. Вкладка Ports</h4>
+<ol><li>Подключить FC по <strong>USB</strong>, открыть <strong>Betaflight Configurator</strong>.</li><li><strong>Ports</strong> — найти строку <strong>UART</strong>, куда идёт приёмник.</li><li><strong>Не отключать MSP</strong> на том UART, который одновременно нужен для связи с ПК (см. мануал платы).</li><li>Включить только <strong>Serial Rx</strong> на выбранном UART; <strong>остальные функции</strong> на том же UART — выключить (<strong>MSP</strong>, лишняя телеметрия и т.д., если они конфликтуют с вашей схемой).</li><li><strong>Save and Reboot</strong>.</li></ol>
+<h4 class="md-subheading">Шаг 4. Протокол приёмника (Configuration)</h4>
+<ol><li>После перезагрузки — <strong>Configuration</strong> → раздел <strong>Receiver</strong>.</li><li><strong>Receiver Mode:</strong> <strong>Serial-based receiver</strong> (как в подсказке конфигуратора).</li><li><strong>Serial Receiver Provider</strong> — строго под железо:</li></ol>
+<p>- TBS Crossfire / <strong>ELRS</strong> → <strong>CRSF</strong>    - FrSky <strong>SBUS</strong> → <strong>SBUS</strong>    - FrSky <strong>FPort</strong> → <strong>FrSky FPort</strong>    - FlySky / Turnigy → <strong>IBUS</strong>    - Spektrum → <strong>SPEKTRUM1024</strong> / <strong>SPEKTRUM2048</strong></p>
+<ol><li><strong>Save and Reboot</strong>.</li></ol>
+<h4 class="md-subheading">Шаг 5. Проверка Receiver</h4>
+<ol><li>Приёмник <strong>связан</strong> с пультом (индикация по инструкции).</li><li>Вкладка <strong>Receiver</strong> — движение стиков и тумблеров <strong>двигает ползунки</strong> каналов.</li><li>Диапазон типично <strong>~1000–2000</strong>, центр <strong>~1500</strong>.</li></ol>
+<h4 class="md-subheading">Шаг 6. Дополнительно</h4>
+<ul><li>Ползунки «не те» каналы — <strong>Channel Map</strong> (<strong>AETR</strong>, <strong>TAER</strong> …) на <strong>Receiver</strong>.</li><li>Края диапазона кривые — <strong>endpoints</strong> на пульте или <code>rxrange</code> в <strong>CLI</strong>.</li><li><strong>Телеметрия на пульт</strong> (CRSF/ELRS): обычно идёт тем же UART, что управление; при необходимости проверьте опции <strong>Telemetry</strong> в <strong>Configuration</strong> для вашей связки.</li></ul>
 
         <h3>🔍 Диагностика</h3>
-<div class="diag-groups"><article class="diag-item"><h4><strong>Симптом:</strong> что проверить (черновик).</h4></article></div>
+<div class="diag-groups"><article class="diag-item"><h4><strong>Симптом:</strong> После сохранения портов и перезагрузки настройки «откатились».</h4><ul><li>Возможная причина: конфликт функций на одном UART (<strong>Serial Rx</strong> + лишний <strong>MSP</strong> и т.п.) или лимит <strong>MSP</strong> на трёх портах.</li><li>Что сделать: во вкладке <strong>Ports</strong> оставить на UART приёмника только нужное; убедиться, что не больше трёх портов с <strong>MSP</strong>; сохранить и перезагрузить.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> В <strong>Receiver</strong> ползунки не двигаются, приёмник в линке.</h4><ul><li>Возможная причина: <strong>Serial Rx</strong> не на том UART; неверный <strong>Provider</strong>; прошивка без нужного протокола (<strong>Cloud Build</strong>).</li><li>Что сделать: проверить <strong>Ports</strong> и <strong>Configuration</strong>; для BF <strong>4.4+</strong> пересобрать прошивку с нужным протоколом приёмника.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> CRSF/ELRS работает, на пульте нет телеметрии.</h4><ul><li>Возможная причина: выключена телеметрия в настройках связки или не <strong>CRSF</strong> как провайдер.</li><li>Что сделать: <strong>Serial Receiver Provider = CRSF</strong>; включить телеметрию по мануалу ELRS/пульта.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> SBUS на F4 не заводится.</h4><ul><li>Возможная причина: нет инвертора, сигнал идёт не на пин <strong>SBUS</strong> / не тот UART.</li><li>Что сделать: пин <strong>SBUS</strong> на плате, <strong>FPort</strong>, внешний инвертор или смена протокола.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> Ползунки двигаются, но не укладываются в 1000–2000.</h4><ul><li>Возможная причина: <strong>endpoints</strong> на пульте; не настроен <code>rxrange</code>.</li><li>Что сделать: выставить ход на пульте; при необходимости <strong>`rxrange`</strong> в CLI.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> После настроек GPS passthrough «пропадают» MSP-настройки.</h4><ul><li>Возможная причина: превышен лимит <strong>трёх</strong> портов с <strong>MSP</strong>.</li><li>Что сделать: отключить <strong>MSP</strong> там, где не нужен; оставить не более трёх UART с MSP.</li></ul></article></div>
 
         <div class="references">
           <h4>📚 Источники</h4>
           <ul>
 <li>
-              <a href="https://example.com" class="doc-link" target="_blank" rel="noopener noreferrer">Заглушка — заменить на первичный источник</a>
-              <span class="tag">primary | A</span>
+              <a href="https://www.betaflight.com/docs/wiki/app/ports-tab" class="doc-link" target="_blank" rel="noopener noreferrer">Ports Tab — Betaflight Documentation</a>
+              <span class="tag">primary</span>
+            </li>
+<li>
+              <a href="https://support.speedybee.cn/?s=teched&amp;l=en&amp;t=a&amp;p=0&amp;i=124433541697114112" class="doc-link" target="_blank" rel="noopener noreferrer">How to Configure the Receiver in Betaflight — SpeedyBee</a>
+              <span class="tag">secondary</span>
+            </li>
+<li>
+              <a href="https://speedybee.zendesk.com/hc/en-us/articles/13844536933787-How-to-set-up-your-receiver-in-Betaflight-configurator-on-SpeedyBee-F745AIO-flight-controller" class="doc-link" target="_blank" rel="noopener noreferrer">How to Set Up Your Receiver in Betaflight — SpeedyBee F745AIO</a>
+              <span class="tag">secondary</span>
+            </li>
+<li>
+              <a href="https://speedybee.zendesk.com/hc/en-us/articles/15739653255963-How-to-set-up-your-SBUS-receiver-in-Betaflight-configurator-on-SpeedyBee-F7-V3-flight-controller" class="doc-link" target="_blank" rel="noopener noreferrer">How to Set Up Your SBUS Receiver in Betaflight — SpeedyBee F7 V3</a>
+              <span class="tag">secondary</span>
+            </li>
+<li>
+              <a href="https://docs.speedybee.cn/fpv/receiver/common-issues-with-elrs-receivers/how-to-set-up-your-receiver-in-betaflight-configurator.html" class="doc-link" target="_blank" rel="noopener noreferrer">Common Issues with ELRS Receivers — SpeedyBee</a>
+              <span class="tag">secondary</span>
+            </li>
+<li>
+              <a href="https://www.flitetest.com/articles/connecting-ez-id-to-betaflight-for-gps-passthrough" class="doc-link" target="_blank" rel="noopener noreferrer">Connecting EZ ID to Betaflight for GPS Passthrough — Flite Test</a>
+              <span class="tag">secondary</span>
             </li>
           </ul>
         </div>
@@ -308,28 +446,90 @@
 
       <article id="bf-filters" class="card" data-level="L2" data-added="2026-03-21">
         <h2>Фильтры</h2>
-        <p class="muted">Краткое описание модуля (черновик; при переносе в сайт синхронизировать с <code>index.html</code>).</p>
+        <p class="muted">Фильтрация сигнала гироскопа и D-term — критически важный этап настройки дрона в Betaflight. Без корректной фильтрации шум от моторов, пропеллеров и резонансов рамы попадает в PID-регулятор, вызывая перегрев моторов, осцилляции и ухудшение управляемости.
+
+Этот модуль объясняет физическую природу шумов, архитектуру фильтров (RPM, dynamic notch, lowpass PT1/PT2/BIQUAD), их влияние на задержку и поведение дрона. После изучения вы сможете настраивать фильтры по данным Blackbox, а не методом случайного подбора.</p>
         <div class="article-meta">
           <span class="tag">Уровень: L2 — Интегратор</span>
           <span class="tag">Время чтения: 15–20 мин</span>
+          <span class="tag">Betaflight 4.5+</span>
           <span class="tag">filters</span>
         </div>
 
         <h3>📖 Теория</h3>
-<p>Теоретическая основа (черновик).</p>
+<h4 class="md-subheading">Природа шумов в системе БПЛА</h4>
+<p>Сигнал гироскопа содержит полезную динамику и шум. Источники шума:</p>
+<ul><li>моторы и пропеллеры (включая гармоники);</li><li>резонанс рамы и креплений;</li><li>электромагнитные помехи от силовой части;</li><li>алиасинг при несоответствии частоты дискретизации.</li></ul>
+<p>D-term особенно чувствителен к высокочастотному шуму, поэтому при плохой фильтрации именно он чаще всего приводит к перегреву моторов.</p>
+<h4 class="md-subheading">Архитектура фильтров в Betaflight</h4>
+<p>В Betaflight 4.5+ обычно используется каскад:</p>
+<ol><li>RPM Filter — самый эффективный фильтр шумов моторов.</li><li>Dynamic Notch — авто-подавление резонансных пиков.</li><li>Lowpass-фильтры (gyro и D-term) — финальная очистка.</li><li>Статические notch-фильтры — опционально, когда автофильтров недостаточно.</li></ol>
+<h4 class="md-subheading">Задержка vs чистота сигнала</h4>
+<p>Любой фильтр добавляет задержку.   Слишком сильная фильтрация делает дрон &quot;ватным&quot;; слишком слабая — шумным и горячим.</p>
+<p>Практическая цель: минимальная задержка при стабильной температуре моторов и чистом спектре.</p>
 
         <h3>🛠 Практика</h3>
-<ol><li>Первый практический шаг (черновик).</li></ol>
+<h4 class="md-subheading">Подготовка</h4>
+<ul><li>ESC с Bidirectional DShot (BLHeli_32 / Bluejay).</li><li>FC F4/F7/H7.</li><li>Исправная механика: без люфтов, ровные пропеллеры.</li><li>Логирование в Blackbox (flash/SD).</li></ul>
+<h4 class="md-subheading">Базовая настройка</h4>
+<ol><li>Включите Blackbox и RPM filtering.</li><li>Убедитесь, что RPM телеметрия работает (<code>E = 0%</code> во вкладке Motors).</li><li>Сохраните текущую конфигурацию:</li></ol>
+<pre class="cli-block"><code>diff all</code></pre>
+<ol><li>Базовые параметры:</li></ol>
+<pre class="cli-block"><code>set dyn_notch_width_percent = 0
+set dyn_notch_q = 250
+set dshot_bidir = ON
+save</code></pre>
+<h4 class="md-subheading">Пошаговая настройка</h4>
+<p>1. Снимите лог с throttle sweep (<code>20% -&gt; 100%</code>) и обычными маневрами. 2. Посмотрите спектр в Blackbox Explorer / PID ToolBox. 3. Определите шумовые зоны:    - <code>&lt;100 Гц</code> — часто механика/PID;    - <code>100–250 Гц</code> — резонансы;    - <code>&gt;250 Гц</code> — моторный шум. 4. Корректируйте lowpass осторожно, по одному параметру за итерацию. 5. После каждого изменения — новый лог и сравнение.</p>
+<h4 class="md-subheading">Пример ручной корректировки</h4>
+<pre class="cli-block"><code>set gyro_lpf1_static_hz = 0
+set gyro_lpf2_hz = 300
+set dterm_lpf1_hz = 150
+set dterm_lpf2_hz = 120
+save</code></pre>
+<p>Если при активном RPM + dynamic notch статические notch не нужны:</p>
+<pre class="cli-block"><code>set gyro_notch1_hz = 0
+set gyro_notch2_hz = 0
+set dterm_notch_hz = 0
+save</code></pre>
 
         <h3>🔍 Диагностика</h3>
-<div class="diag-groups"><article class="diag-item"><h4><strong>Симптом:</strong> что проверить (черновик).</h4></article></div>
+<div class="diag-groups"><article class="diag-item"><h4>Симптом: моторы горячие после короткого полета.</h4><ul><li>Возможная причина: D-term шумит, RPM-фильтр не работает.</li><li>Что сделать: проверить <code>Bidirectional DShot</code>, активность RPM filter, усилить фильтрацию D-term.</li></ul></article><article class="diag-item"><h4>Симптом: дрон &quot;дребезжит&quot; на ховере.</h4><ul><li>Возможная причина: гирошум/резонанс попадает в PID.</li><li>Что сделать: проверить спектр, убедиться в работе dynamic notch и RPM filter.</li></ul></article><article class="diag-item"><h4>Симптом: при резком газе появляется визг и просадки по управлению.</h4><ul><li>Возможная причина: резонанс в рабочем диапазоне оборотов.</li><li>Что сделать: снять throttle sweep, локализовать частоту пика, при необходимости добавить статический notch.</li></ul></article><article class="diag-item"><h4>Симптом: после фильтрации дрон стал &quot;ватным&quot;.</h4><ul><li>Возможная причина: избыточная фильтрация (высокая задержка).</li><li>Что сделать: постепенно поднимать частоты среза и контролировать температуру моторов.</li></ul></article><article class="diag-item"><h4>Симптом: в логах &quot;пушистый&quot; gyro (широкая шумовая полоса).</h4><ul><li>Возможная причина: RPM телеметрия отсутствует или невалидна.</li><li>Что сделать: проверить RPM и ошибку <code>E</code>, прошивку ESC, настройки bidirectional DShot.</li></ul></article></div>
 
         <div class="references">
           <h4>📚 Источники</h4>
           <ul>
 <li>
-              <a href="https://example.com" class="doc-link" target="_blank" rel="noopener noreferrer">Заглушка — заменить на первичный источник</a>
-              <span class="tag">primary | A</span>
+              <a href="https://www.betaflight.com/docs/development/Cli" class="doc-link" target="_blank" rel="noopener noreferrer">Betaflight CLI Documentation — Gyro &amp; Filter Variables</a>
+              <span class="tag">primary</span>
+            </li>
+<li>
+              <a href="https://www.betaflight.com/docs/wiki/tuning/4-1-Tuning-Notes#new-filter-settings" class="doc-link" target="_blank" rel="noopener noreferrer">Betaflight 4.1 Tuning Notes — Filter Settings</a>
+              <span class="tag">primary</span>
+            </li>
+<li>
+              <a href="https://www.betaflight.com/docs/wiki/app/pid-tuning-tab#filter-settings" class="doc-link" target="_blank" rel="noopener noreferrer">PID Tuning Tab — Filter Settings</a>
+              <span class="tag">primary</span>
+            </li>
+<li>
+              <a href="https://betaflight-com.pages.dev/docs/wiki/guides/archive/Gyro-And-Dterm-Filtering-Recommendations-3-1" class="doc-link" target="_blank" rel="noopener noreferrer">Gyro and Dterm Filtering Recommendations 3.1 (archive)</a>
+              <span class="tag">primary</span>
+            </li>
+<li>
+              <a href="https://github.com/PID-ToolBox" class="doc-link" target="_blank" rel="noopener noreferrer">PID ToolBox — Filter Analysis Tool</a>
+              <span class="tag">secondary</span>
+            </li>
+<li>
+              <a href="https://oscarliang.com/pid-filter-tuning-blackbox/" class="doc-link" target="_blank" rel="noopener noreferrer">How to Tune Filters &amp; PID with Blackbox — Oscar Liang</a>
+              <span class="tag">secondary</span>
+            </li>
+<li>
+              <a href="https://hackmd.io/@nerdCopter/rJzic_N-p" class="doc-link" target="_blank" rel="noopener noreferrer">Bare Minimum Tune Betaflight — Filter Workflow</a>
+              <span class="tag">secondary</span>
+            </li>
+<li>
+              <a href="https://www.drone-fpv.fr/reglages-betaflight-vol-fluide/#Comparatif_des_approches_de_filtrage_et_choix_pragmatique" class="doc-link" target="_blank" rel="noopener noreferrer">Reglages Betaflight : filtres PT2, BIQUAD et sliders</a>
+              <span class="tag">secondary</span>
             </li>
           </ul>
         </div>
@@ -337,28 +537,53 @@
 
       <article id="bf-blackbox" class="card" data-level="L2" data-added="2026-03-21">
         <h2>Blackbox</h2>
-        <p class="muted">Краткое описание модуля (черновик; при переносе в сайт синхронизировать с <code>index.html</code>).</p>
+        <p class="muted">Blackbox — система записи полётных данных в Betaflight, позволяющая фиксировать состояние контроллера на каждом цикле управления (до 8 кГц). Лог содержит гироскоп, акселерометр, сигналы стиков, работу PID-регулятора, выходы на моторы и параметры фильтров. Статья даёт полное понимание настройки логирования, интерпретации графиков и использования инструментов (Blackbox Explorer, PIDToolbox) для диагностики и тюнинга. После изучения читатель сможет выявлять шумовую структуру дрона, оценивать задержки фильтров, настраивать PID и фильтры на основе объективных данных, а не методом случайного подбора.</p>
         <div class="article-meta">
           <span class="tag">Уровень: L2 — Интегратор</span>
           <span class="tag">Время чтения: 20 мин</span>
+          <span class="tag">Betaflight 4.5+</span>
           <span class="tag">Blackbox</span>
         </div>
 
         <h3>📖 Теория</h3>
-<p>Теоретическая основа (черновик).</p>
+<h4 class="md-subheading">Назначение и архитектура Blackbox</h4>
+<p>Blackbox записывает внутреннее состояние полётного контроллера с максимально возможной частотой, чтобы позволить офлайн-симуляцию, отладку и анализ алгоритмов управления по данным реальных полётов. Лог строится из кадров нескольких типов:</p>
+<ul><li>I‑кадры (intra) — полные кадры, независимо декодируемые.</li><li>P‑кадры (inter) — разностные, используют предсказание.</li><li>G/H кадры — для GPS-данных.</li><li>S кадры (slow) — редко меняющиеся состояния.</li><li>E кадры (event) — переходы состояний.</li></ul>
+<p>Для сжатия применяются предсказатели и кодирование переменной длины, что позволяет хранить большой объём данных при умеренном потоке.</p>
+<h4 class="md-subheading">Что именно логируется</h4>
+<p>Blackbox фиксирует: - время, - значения P/I/D и суммарный выход, - setpoint (стики), - данные гироскопа и акселерометра, - напряжение/ток, RSSI, - команды на ESC, - GPS-кадры (при наличии).</p>
+<h4 class="md-subheading">Формат лога и устройства хранения</h4>
+<p>Запись может вестись на: - onboard flash (обычно 2–16 МБ), - SD-карту (предпочтительно для длинных сессий), - внешний логгер через UART.</p>
+<p>Для SD-карты рекомендуется FAT32 и карта с низкой задержкой записи.</p>
+<h4 class="md-subheading">Влияние настроек на качество лога</h4>
+<ul><li>1 кГц — базовый PID-анализ;</li><li>2 кГц (или 1.6 кГц для BMI270) — детальный анализ шумов/фильтров.</li></ul>
+<p>Если looptime мал (высокая частота PID), может потребоваться поднять baudrate или снизить частоту логирования, иначе возможны пропуски.</p>
+<h4 class="md-subheading">Физический смысл спектра шума</h4>
+<ul><li><code>&lt;20 Гц</code> — полезная динамика;</li><li><code>20–100 Гц</code> — вибрации/propwash/проблемы PID;</li><li><code>100–250 Гц</code> — резонансы рамы/люфты;</li><li><code>&gt;250 Гц</code> — шум моторов/пропов и гармоники.</li></ul>
+<p>Цель фильтрации — подавлять высокочастотный шум, не внося лишнюю задержку в полезный диапазон.</p>
 
         <h3>🛠 Практика</h3>
-<ol><li>Первый практический шаг (черновик).</li></ol>
+<h4 class="md-subheading">Подготовка оборудования и ПО</h4>
+<p>Аппаратно: - FC с flash или SD-слотом, - ESC с Bidirectional DShot (BLHeli_32/Bluejay), - качественная и механически жёсткая сборка.</p>
+<p>Настройка: - включить <code>BLACKBOX</code>, - выставить <code>logging rate</code> (обычно 2 kHz), - для шумового анализа использовать <code>debug_mode = GYRO_SCALED</code>, - включить RPM-фильтр.</p>
+<h4 class="md-subheading">Запись лога и манёвры</h4>
+<p>Blackbox обычно стартует при арме и останавливается при дизарме. Для качественного анализа выполняйте: - hover и ровный полёт, - throttle sweep <code>20% -&gt; 100%</code>, - резкие roll/flip, - throttle pump, - резкие развороты (проверка propwash).</p>
+<h4 class="md-subheading">Работа с Blackbox Explorer</h4>
+<ol><li>Выгрузите <code>.bbl</code> (Mass Storage Mode).</li><li>Откройте лог в Blackbox Explorer.</li><li>Проверьте header (<code>i</code>) — там все параметры прошивки.</li><li>Для анализа выберите <code>Gyro</code>, <code>Setpoint</code>, <code>P/I/D</code>, <code>Motor</code>, <code>Debug</code>.</li><li>Используйте <code>I/O</code> для выделения участков одинаковой длины.</li></ol>
+<h4 class="md-subheading">Использование PIDToolbox</h4>
+<p>PIDToolbox полезен для: - оценки задержки фильтров, - сравнения спектров в dB, - анализа step response.</p>
+<h4 class="md-subheading">Пошаговая настройка фильтров</h4>
+<p>1. Запишите лог с <code>GYRO_SCALED</code> и <code>throttle sweep</code>. 2. Оцените спектр:    - <code>&lt;100 Гц</code> чаще решается механикой/PID,    - <code>100–250 Гц</code> — зона динамического режектора,    - <code>&gt;250 Гц</code> — зона RPM-фильтра. 3. Убедитесь, что bidirectional DShot работает (<code>E = 0%</code> в Motors). 4. Настройте lowpass по результату спектра. 5. Делайте изменения итеративно: один параметр -&gt; новый лог -&gt; сравнение.</p>
 
         <h3>🔍 Диагностика</h3>
-<div class="diag-groups"><article class="diag-item"><h4><strong>Симптом:</strong> что проверить (черновик).</h4></article></div>
+<div class="diag-groups"><article class="diag-item"><h4>Симптом: в логе гироскопа сильный пик на <code>100–250 Гц</code>.</h4><ul><li>Возможная причина: резонанс рамы/люфт.</li><li>Что проверить/сделать: проверить механику и убедиться, что dynamic notch активен.</li></ul></article><article class="diag-item"><h4>Симптом: шум выше <code>250 Гц</code> не подавлен.</h4><ul><li>Возможная причина: RPM-фильтр отключён или неверно настроен bidirectional DShot.</li><li>Что проверить/сделать: проверить <code>E = 0%</code> в Motors, включить Gyro/D-term RPM filters.</li></ul></article><article class="diag-item"><h4>Симптом: всплески в <code>20–100 Гц</code>.</h4><ul><li>Возможная причина: недостаточные P/D или избыточная фильтрация (задержка).</li><li>Что проверить/сделать: проверить задержку в PIDToolbox, скорректировать фильтры и PID.</li></ul></article><article class="diag-item"><h4>Симптом: дрон стал «ватным» после фильтрации.</h4><ul><li>Возможная причина: слишком низкие частоты среза.</li><li>Что проверить/сделать: поднять частоту среза gyro lowpass, проверить D-term lowpass и задержку.</li></ul></article><article class="diag-item"><h4>Симптом: лог с пропусками/артефактами.</h4><ul><li>Возможная причина: скорость записи/буфер.</li><li>Что проверить/сделать: использовать качественную SD-карту, при необходимости снизить логрейт.</li></ul></article><article class="diag-item"><h4>Симптом: нет записи на onboard flash при включённом Blackbox.</h4><ul><li>Возможная причина: память заполнена.</li><li>Что проверить/сделать: <code>Erase Flash</code>, регулярно выгружать логи.</li></ul></article><article class="diag-item"><h4>Симптом: некорректные частоты в спектре.</h4><ul><li>Возможная причина: сравниваются участки разной длины.</li><li>Что проверить/сделать: выделять одинаковые интервалы через <code>I/O</code>.</li></ul></article></div>
 
         <div class="references">
           <h4>📚 Источники</h4>
           <ul>
 <li>
-              <a href="https://example.com" class="doc-link" target="_blank" rel="noopener noreferrer">Заглушка — заменить на первичный источник</a>
-              <span class="tag">primary | A</span>
+              <a href="&quot;https://github.com/betaflight/blackbox-log-viewer&quot;" class="doc-link" target="_blank" rel="noopener noreferrer">Blackbox flight data recorder — Betaflight Documentation</a>
+              <span class="tag">primary</span>
             </li>
           </ul>
         </div>
