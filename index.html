@@ -79,6 +79,9 @@
       <button type="button" class="tab-btn" data-tab="tab-companion" role="tab" aria-selected="false" aria-controls="tab-companion" id="tab-btn-companion">
         Companion
       </button>
+      <button type="button" class="tab-btn" data-tab="tab-link" role="tab" aria-selected="false" aria-controls="tab-link" id="tab-btn-link">
+        Радиолинк
+      </button>
       <button type="button" class="tab-btn" data-tab="tab-tools" role="tab" aria-selected="false" aria-controls="tab-tools" id="tab-btn-tools">
         Инструменты
       </button>
@@ -105,34 +108,49 @@
           <span class="toc__label">Режимы и OSD</span>
           <span class="toc__soon">скоро</span>
         </a>
-        <a href="#bf-pid" class="toc__item--planned">
+        <a href="#bf-failsafe">
           <span class="toc__num">04</span>
+          <span class="toc__level">L1</span>
+          <span class="toc__label">Failsafe: стадии и тест по свитчу</span>
+        </a>
+        <a href="#bf-pid" class="toc__item--planned">
+          <span class="toc__num">05</span>
           <span class="toc__level">L2</span>
           <span class="toc__label">PID-тюнинг</span>
           <span class="toc__soon">скоро</span>
         </a>
         <a href="#bf-filters">
-          <span class="toc__num">05</span>
+          <span class="toc__num">06</span>
           <span class="toc__level">L2</span>
           <span class="toc__label">Фильтры</span>
         </a>
         <a href="#bf-blackbox">
-          <span class="toc__num">06</span>
+          <span class="toc__num">07</span>
           <span class="toc__level">L2</span>
           <span class="toc__label">Blackbox</span>
         </a>
         <a href="#bf-pid-reg-in-bf">
-          <span class="toc__num">07</span>
+          <span class="toc__num">08</span>
           <span class="toc__level">L2</span>
           <span class="toc__label">PID-регулятор в Betaflight</span>
         </a>
+        <a href="#bf-rpm-filter">
+          <span class="toc__num">09</span>
+          <span class="toc__level">L2</span>
+          <span class="toc__label">RPM-фильтр: кейс «свистящего» 10&quot;</span>
+        </a>
         <a href="#bf-cli">
-          <span class="toc__num">08</span>
+          <span class="toc__num">10</span>
           <span class="toc__level">L3</span>
           <span class="toc__label">CLI и remap</span>
         </a>
+        <a href="#bf-cli-automation">
+          <span class="toc__num">11</span>
+          <span class="toc__level">L3</span>
+          <span class="toc__label">Автоматизация CLI по serial</span>
+        </a>
         <a href="#bf-custom" class="toc__item--planned">
-          <span class="toc__num">09</span>
+          <span class="toc__num">12</span>
           <span class="toc__level">L4</span>
           <span class="toc__label">Кастомная сборка</span>
           <span class="toc__soon">скоро</span>
@@ -143,10 +161,10 @@
       <!-- AUTO:PROGRESS:betaflight:start -->
       <div class="section-progress" aria-label="Прогресс раздела Betaflight">
         <span class="section-progress__label">Раздел Betaflight</span>
-        <span class="section-progress__bar" role="progressbar" aria-valuenow="6" aria-valuemin="0" aria-valuemax="9" aria-label="Готово 6 из 9 модулей">
-          <span class="section-progress__fill" style="width:67%"></span>
+        <span class="section-progress__bar" role="progressbar" aria-valuenow="9" aria-valuemin="0" aria-valuemax="12" aria-label="Готово 9 из 12 модулей">
+          <span class="section-progress__fill" style="width:75%"></span>
         </span>
-        <span class="section-progress__stats">готово 6 из 9 модулей</span>
+        <span class="section-progress__stats">готово 9 из 12 модулей</span>
       </div>
 <!-- AUTO:PROGRESS:betaflight:end -->
 
@@ -395,6 +413,84 @@
           <span class="tag tag--planned">🚧 В разработке</span>
         </div>
         <p class="muted">Модуль запланирован в программе курса, но ещё не написан. План развития — в <a class="doc-link" href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md" target="_blank" rel="noopener noreferrer">ROADMAP</a>.</p>
+      </article>
+
+      <article id="bf-failsafe" class="card" data-level="L1" data-added="2026-11-07">
+        <h2>Failsafe: стадии и тест по свитчу</h2>
+        <p class="muted">Failsafe — то, что дрон делает, когда пропала связь с пультом. В Betaflight 4.3+ это двухстадийный процесс: короткая «защитная» Stage 1, затем Stage 2 с выбранной процедурой (DROP, AUTO-LAND или GPS_RESCUE). Модуль объясняет, как это устроено, как выбрать процедуру под свой дрон и как безопасно проверить failsafe тумблером, не выключая пульт в воздухе.</p>
+        <div class="article-meta">
+          <span class="tag">Уровень: L1 — Оператор</span>
+          <span class="tag">Время чтения: 20 мин</span>
+          <span class="tag">Betaflight 4.5+</span>
+          <span class="tag">failsafe</span>
+          <span class="tag">safety</span>
+        </div>
+
+        <h3>📖 Теория</h3>
+<h4 class="md-subheading">Как Betaflight понимает, что связь потеряна</h4>
+<p>Если 100 мс нет валидных пакетов, сигнал считается потерянным. Ещё 300 мс удерживаются последние значения, после чего включается Stage 1. Отсчёт до Stage 2 идёт от последнего хорошего пакета.</p>
+<h4 class="md-subheading">Stage 1 — защитный интервал</h4>
+<p>Длится <code>failsafe_delay</code> (в десятых долях секунды: 15 = 1.5 с; дефолт 1.5 с в 4.5, 1.0 с в 4.4). По умолчанию стики в центре, газ на нуле, положения тумблеров удерживаются. Значения для каждого канала задаются в Configurator (Channel fallback) или командой <code>rxfail</code>. Если связь вернулась во время Stage 1, управление возвращается мгновенно.</p>
+<h4 class="md-subheading">Stage 2 — процедура</h4>
+<p>Выбирается параметром <code>failsafe_procedure</code>:</p>
+<ul><li><code>DROP</code> (дефолт) — мгновенный дизарм, моторы стоп. Повторный арм возможен после ≥3 с стабильной связи и выключенного тумблера ARM.</li><li><code>AUTO-LAND</code> — стики в центре, газ на <code>failsafe_throttle</code>, режимы Stage 1 применены, через <code>failsafe_off_delay</code> — дизарм. Повторный арм блокируется минимум на 30 с связи.</li><li><code>GPS_RESCUE</code> — нужен GPS: дрон летит домой и садится. Для возврата управления нужна связь <code>failsafe_recovery_delay</code> и отклонение стиков больше 30°.</li></ul>
+<p>Тонкость: если газ был на минимуме ≥10 с перед Stage 2, срабатывает простой дизарм (кроме GPS Rescue). Stage 2 невозможен первые 5 с после загрузки.</p>
+<h4 class="md-subheading">Что выбрать</h4>
+<p>DROP — честный выбор для фристайла над безопасной зоной: дрон падает рядом, а не улетает. AUTO-LAND с газом чуть ниже висения даёт контролируемое снижение — разумно для тяжёлых 7–10&quot; и полётов над людьми/техникой, но требует подобрать <code>failsafe_throttle</code> под конкретный дрон. AUTO-LAND без самовыравнивания бессмыслен: в Stage 1 на fallback-каналах должен включаться ANGLE.</p>
+<h4 class="md-subheading">Тест тумблером: failsafe_switch_mode</h4>
+<p>Режим FAILSAFE на AUX-канале позволяет вызвать failsafe не выключая пульт:</p>
+<ul><li><code>STAGE1</code> — сразу Stage 1, AUX-каналы остаются активны. Держишь тумблер дольше <code>failsafe_delay</code> — переход в Stage 2. Отпустил — управление вернулось. Это самый честный тест: он повторяет реальную потерю связи.</li><li><code>STAGE2</code> — сразу выбранная процедура Stage 2, отпускание возвращает управление.</li><li><code>KILL</code> — мгновенный дизарм. Один глитч канала = падение. Не для полётов.</li></ul>
+
+        <h3>🛠 Практика</h3>
+<h4 class="md-subheading">Шаг 1. Посмотреть текущие значения</h4>
+<p>Не заучивай дефолты — читай их с конкретного контроллера:</p>
+<pre class="cli-block"><code>get failsafe
+rxfail</code></pre>
+<h4 class="md-subheading">Шаг 2. Настроить AUTO-LAND с тестом по тумблеру</h4>
+<p>Пример из практики (7&quot;, тумблер failsafe на AUX6):</p>
+<pre class="cli-block"><code>set failsafe_procedure = AUTO-LAND
+set failsafe_switch_mode = STAGE1
+set failsafe_delay = 15
+set failsafe_throttle = 1250
+set failsafe_off_delay = 100
+save</code></pre>
+<p>Затем во вкладке Modes повесь FAILSAFE на тумблер, а в Channel fallback для канала ANGLE поставь значение, включающее ANGLE. Иначе на AUTO-LAND дрон снижается без выравнивания.</p>
+<h4 class="md-subheading">Шаг 3. Подобрать газ failsafe по логу</h4>
+<ol><li>Сделай полёт с висением и логом Blackbox.</li><li>Найди медианный газ висения (поле <code>rcCommand[3]</code> или motor average).</li><li>Поставь <code>failsafe_throttle</code> чуть ниже висения — цель около 1 м/с снижения. У тяжёлого 10&quot; это может быть 1350, у лёгкого 7&quot; — 1250: значение индивидуально.</li></ol>
+<h4 class="md-subheading">Шаг 4. Тест</h4>
+<ol><li>Без пропов: арм, тумблер failsafe, убедись, что в OSD <code>FAILSAFE</code>, моторы ведут себя как ожидалось, после отпускания управление возвращается.</li><li>С пропами, на высоте 5–10 м над мягкой поверхностью: в ANGLE включить тумблер на 2–3 с, отпустить. Повторить с удержанием дольше <code>failsafe_delay</code>.</li><li>Записать в журнал дрона дату теста и параметры.</li></ol>
+
+        <h3>🔍 Диагностика</h3>
+<div class="diag-groups"><article class="diag-item"><h4><strong>Симптом:</strong> после failsafe дрон не армится, в OSD <code>NOT_DISARMED</code></h4><ul><li>Возможная причина: тумблер ARM остался включённым.</li><li>Что сделать: выключить и снова включить ARM после <code>failsafe_recovery_delay</code>.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> на AUTO-LAND дрон кувыркается или уходит в сторону</h4><ul><li>Возможная причина: в Stage 1 не включается ANGLE (fallback канала режима не настроен).</li><li>Что сделать: настроить Channel fallback / <code>rxfail</code> для канала ANGLE.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> на AUTO-LAND дрон набирает высоту</h4><ul><li>Возможная причина: <code>failsafe_throttle</code> выше газа висения (например, после смены АКБ или пропов).</li><li>Что сделать: пересчитать газ висения по свежему логу.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> RXLOSS / failsafe в обычном полёте</h4><ul><li>Возможная причина: слабый линк (антенна приёмника, packet rate, мощность TX).</li><li>Что сделать: смотреть RSSI/LQ в логе, см. модуль про ExpressLRS.</li></ul></article></div>
+
+        <div class="references">
+          <h4>📚 Источники</h4>
+          <ul>
+<li>
+              <a href="https://betaflight.com/docs/wiki/guides/current/failsafe" class="doc-link" target="_blank" rel="noopener noreferrer">Failsafe — Betaflight Documentation</a>
+              <span class="tag">primary</span>
+            </li>
+<li>
+              <a href="https://betaflight.com/docs/wiki/app/failsafe-tab" class="doc-link" target="_blank" rel="noopener noreferrer">Failsafe tab — Betaflight App</a>
+              <span class="tag">primary</span>
+            </li>
+<li>
+              <a href="https://oscarliang.com/failsafe-rx-fc-naze32-frsky-d4rii/" class="doc-link" target="_blank" rel="noopener noreferrer">What&#x27;s Failsafe and How to Setup — Oscar Liang</a>
+              <span class="tag">secondary</span>
+            </li>
+          </ul>
+        </div>
+        <div class="checklist" id="bf-failsafe-checklist">
+          <h4>✅ Чек-лист</h4>
+          <ul class="checklist-list">
+            <li><label><input type="checkbox"> Выбрана процедура Stage 2 и понятно, почему именно она</label></li>
+            <li><label><input type="checkbox"> FAILSAFE назначен на тумблер с <code>failsafe_switch_mode = STAGE1</code></label></li>
+            <li><label><input type="checkbox"> Для AUTO-LAND: fallback включает ANGLE, газ подобран по логу</label></li>
+            <li><label><input type="checkbox"> Тест без пропов пройден</label></li>
+            <li><label><input type="checkbox"> Тест в воздухе на безопасной высоте пройден</label></li>
+            <li><label><input type="checkbox"> Параметры failsafe записаны в журнал дрона</label></li>
+          </ul>
+        </div>
       </article>
 
       <article id="bf-pid" class="card card--planned" data-level="L2" data-status="planned">
@@ -646,6 +742,91 @@ save</code></pre>
         </div>
       </article>
 
+      <article id="bf-rpm-filter" class="card" data-level="L2" data-added="2026-11-07">
+        <h2>RPM-фильтр: кейс «свистящего» 10&quot;</h2>
+        <p class="muted">Разбор реального случая: 10-дюймовый квадрокоптер «свистит» моторами и летит неровно. Причина оказалась не в PID, а в одной строке конфига: нижняя граница RPM-фильтра была выше частоты вращения моторов, и фильтр большую часть полёта просто не работал. Модуль учит проверять, покрывает ли RPM-фильтр реальный диапазон оборотов, по данным Blackbox, а не на глаз.</p>
+        <div class="article-meta">
+          <span class="tag">Уровень: L2 — Интегратор</span>
+          <span class="tag">Время чтения: 20 мин</span>
+          <span class="tag">Betaflight 4.5+</span>
+          <span class="tag">RPM filter</span>
+          <span class="tag">case study</span>
+        </div>
+
+        <h3>📖 Теория</h3>
+<h4 class="md-subheading">Как работает RPM-фильтр</h4>
+<p>С bidirectional DShot каждый ESC отдаёт полётному контроллеру eRPM своего мотора. Betaflight пересчитывает eRPM в обороты через <code>motor_poles</code> и ставит узкие notch-фильтры точно на частоту вращения каждого мотора и её гармоники. По умолчанию это 12 notch-фильтров на ось (4 мотора × 3 гармоники) на roll, pitch и yaw. Notch «едет» вслед за оборотами в реальном времени, поэтому режет шум моторов почти без лишней задержки.</p>
+<h4 class="md-subheading">Почему у больших пропов другая математика</h4>
+<p>Частота основной гармоники мотора: <code>f = RPM / 60</code>. Пятидюймовик на висении крутится десятки тысяч оборотов в минуту, основная гармоника лежит в сотнях герц. У 10-дюймовика моторы низкооборотные (низкий KV, тяжёлые пропы), и основная гармоника на висении может опускаться до 50–100 Гц.</p>
+<p>Параметр <code>rpm_filter_min_hz</code> задаёт нижнюю границу: ниже неё notch не опускается. Если граница выше реальной частоты мотора, фильтр стоит «мимо» шума. Ровно это и произошло в кейсе ниже.</p>
+<h4 class="md-subheading">Требования к железу</h4>
+<ul><li>ESC с поддержкой DShot-телеметрии: BLHeli_32 от 32.7.0, AM32, Bluejay (BLHeli_S) или JESC.</li><li><code>dshot_bidir = ON</code> и корректный <code>motor_poles</code> (число магнитов в колоколе, а не число зубцов статора).</li><li>Ошибки телеметрии в вкладке Motors не выше 1%. Если ESC не отдаёт валидную телеметрию, Betaflight блокирует арм и пишет <code>RPMFILTER</code> в OSD.</li></ul>
+<h4 class="md-subheading">Кейс: viking10, iFlight Blitz F722, 10&quot;</h4>
+<p>Жалоба пилота: моторы свистят, полёт неровный. Анализ спектра лога (Python, <code>orangebox</code> + <code>scipy</code>) показал:</p>
+<ul><li>основная гармоника моторов: p5 = 48 Гц, медиана 91 Гц, p95 = 165 Гц;</li><li>в конфиге стояло <code>rpm_filter_min_hz = 100</code> — то есть больше половины полёта мотор крутился ниже границы и RPM-фильтр его не видел;</li><li>в полосе 80–150 Гц отфильтрованный гироскоп был всего на ~2 дБ тише сырого, D-term +44.5 дБ — это и есть «свист»;</li><li>статические notch стояли на 68 Гц, а моторы на висении работали на 84–96 Гц — фильтры резали пустоту.</li></ul>
+<p>Исправление: <code>rpm_filter_min_hz = 50</code>, статические notch убраны, gyro LPF вернули к дефолту. После следующего полёта в той же полосе 80–150 Гц: отфильтрованный гироскоп −9.5 дБ (было +24.4), D-term −1.0 дБ (было +44.5), шум команды моторов упал с ~450 до ~20 условных единиц. Ошибок eRPM — 0%.</p>
+<p>Вывод: прежде чем трогать PID, проверь, что фильтры стоят там, где реально живёт шум.</p>
+
+        <h3>🛠 Практика</h3>
+<h4 class="md-subheading">Шаг 1. Включить и проверить телеметрию</h4>
+<p>Подключи АКБ (без неё вкладка Motors покажет <code>E: 100%</code>) и выполни в CLI:</p>
+<pre class="cli-block"><code>set dshot_bidir = ON
+set motor_poles = 14
+save</code></pre>
+<p>После перезагрузки — обязательно перечитай значения. Betaflight может тихо скорректировать несовместимую комбинацию (например, протокол DShot на конкретной плате):</p>
+<pre class="cli-block"><code>get dshot_bidir
+get motor_pwm_protocol
+status</code></pre>
+<p>В <code>status</code> должна быть DShot-телеметрия с нулевыми оборотами и почти нулевыми ошибками.</p>
+<h4 class="md-subheading">Шаг 2. Узнать реальный диапазон частот моторов</h4>
+<ol><li>Включи Blackbox с частотой логирования не ниже 1 кГц и сделай обычный полёт с висением.</li><li>В Blackbox Explorer или PID Toolbox посмотри поле <code>eRPM</code> (или спектр gyro) и найди минимальную частоту на висении и на сбросе газа.</li><li>Переведи eRPM в Гц: <code>Гц = eRPM / (motor_poles / 2) / 60</code>.</li></ol>
+<h4 class="md-subheading">Шаг 3. Подогнать нижнюю границу</h4>
+<p>Поставь <code>rpm_filter_min_hz</code> ниже минимальной рабочей частоты мотора с запасом:</p>
+<pre class="cli-block"><code>get rpm_filter
+set rpm_filter_min_hz = 50
+save</code></pre>
+<p>Для 5&quot; обычно хватает дефолта; для 7–10&quot; проверь явно — граница легко оказывается выше оборотов.</p>
+<h4 class="md-subheading">Шаг 4. Убрать костыли</h4>
+<p>Статические notch, поставленные «по старому логу» до включения RPM-фильтра, удали: после RPM-фильтра они часто режут не то и добавляют задержку.</p>
+
+        <h3>🔍 Диагностика</h3>
+<div class="diag-groups"><article class="diag-item"><h4><strong>Симптом:</strong> моторы «свистят» или гудят на висении, на газу проходит</h4><ul><li>Возможная причина: <code>rpm_filter_min_hz</code> выше частоты моторов на низком газу.</li><li>Что сделать: посчитать частоту моторов по логу и опустить границу.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> арм заблокирован, в OSD <code>RPMFILTER</code></h4><ul><li>Возможная причина: один из ESC не отдаёт DShot-телеметрию (прошивка без bidir, неверный протокол).</li><li>Что сделать: проверить прошивку ESC, ошибки во вкладке Motors при подключённой АКБ.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> ошибки телеметрии в Motors больше 1%</h4><ul><li>Возможная причина: помехи на сигнальной линии, слишком высокий DShot для выбранного PID loop.</li><li>Что сделать: на 4k/3.2k loop использовать DShot300, проверить пайку сигнальных проводов.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> включил bidir, а после перезагрузки он снова OFF</h4><ul><li>Возможная причина: плата не поддерживает выбранную схему таймеров/DMA, Betaflight тихо откатил значение.</li><li>Что сделать: перечитать <code>get dshot_bidir</code> и <code>get dshot_bitbang</code>, сверить с документацией платы.</li></ul></article></div>
+
+        <div class="references">
+          <h4>📚 Источники</h4>
+          <ul>
+<li>
+              <a href="https://betaflight.com/docs/wiki/guides/current/DSHOT-RPM-Filtering" class="doc-link" target="_blank" rel="noopener noreferrer">DShot RPM Filtering — Betaflight Documentation</a>
+              <span class="tag">primary</span>
+            </li>
+<li>
+              <a href="https://betaflight.com/docs/development/Cli" class="doc-link" target="_blank" rel="noopener noreferrer">Betaflight CLI — Documentation</a>
+              <span class="tag">primary</span>
+            </li>
+<li>
+              <a href="https://github.com/atomgomba/orangebox" class="doc-link" target="_blank" rel="noopener noreferrer">Orangebox — Blackbox log parser for Python</a>
+              <span class="tag">secondary</span>
+            </li>
+<li>
+              <a href="https://oscarliang.com/rpm-filter/" class="doc-link" target="_blank" rel="noopener noreferrer">RPM Filter explained — Oscar Liang</a>
+              <span class="tag">secondary</span>
+            </li>
+          </ul>
+        </div>
+        <div class="checklist" id="bf-rpm-filter-checklist">
+          <h4>✅ Чек-лист</h4>
+          <ul class="checklist-list">
+            <li><label><input type="checkbox"> Перед изменениями сделан <code>diff all</code> и сохранён в файл с датой</label></li>
+            <li><label><input type="checkbox"> АКБ подключена, во вкладке Motors ошибки телеметрии ≤ 1%</label></li>
+            <li><label><input type="checkbox"> <code>motor_poles</code> соответствует числу магнитов мотора</label></li>
+            <li><label><input type="checkbox"> Частота моторов на висении посчитана по логу</label></li>
+            <li><label><input type="checkbox"> <code>rpm_filter_min_hz</code> ниже минимальной рабочей частоты</label></li>
+            <li><label><input type="checkbox"> После <code>save</code> все значения перечитаны через <code>get</code></label></li>
+            <li><label><input type="checkbox"> Первый полёт после изменений: 30 с висения, посадка, проверить температуру моторов</label></li>
+          </ul>
+        </div>
+      </article>
+
       <article id="bf-cli" class="card" data-level="L3" data-added="2026-03-21">
         <h2>CLI и remap</h2>
         <p class="muted">Командная строка (CLI) Betaflight — это текстовый интерфейс, открывающий доступ к конфигурации полётного контроллера на уровне, недоступном в графическом интерфейсе. Из CLI можно изменять любые параметры, включая не вынесенные во вкладки конфигуратора, проверять аппаратное состояние, управлять ресурсами (выводами микроконтроллера) и создавать резервные копии.
@@ -800,6 +981,123 @@ save</code></pre>
               <a href="https://www.youtube.com/results?search_query=joshua+bardwell+betaflight+cli" class="doc-link" target="_blank" rel="noopener noreferrer">Joshua Bardwell: Betaflight CLI Tutorial</a>
               <span class="tag">secondary</span>
             </li>
+          </ul>
+        </div>
+      </article>
+
+      <article id="bf-cli-automation" class="card" data-level="L3" data-added="2026-11-07">
+        <h2>Автоматизация CLI по serial</h2>
+        <p class="muted">Когда дронов больше одного, настраивать их кликами в Configurator — путь к ошибкам. CLI Betaflight доступен через обычный serial-порт, значит его можно скриптовать. Модуль показывает рабочий шаблон на Python (<code>pyserial</code>) и собирает грабли, на которые мы реально наступили при массовой настройке нескольких квадрокоптеров: плавающие COM-порты, «тихие» исправления параметров, перезагрузки и несовместимость diff между версиями.</p>
+        <div class="article-meta">
+          <span class="tag">Уровень: L3 — Специалист</span>
+          <span class="tag">Время чтения: 25 мин</span>
+          <span class="tag">Betaflight 4.5+</span>
+          <span class="tag">CLI</span>
+          <span class="tag">Python</span>
+        </div>
+
+        <h3>📖 Теория</h3>
+<h4 class="md-subheading">Как устроен вход в CLI</h4>
+<p>Полётный контроллер по USB — это виртуальный COM-порт (USB CDC). Скорость в настройках порта для USB CDC роли не играет, принято ставить 115200. Символ <code>#</code> переводит контроллер в CLI, <code>exit</code> выходит с перезагрузкой. Пока FC в CLI, на моторы не идёт сигнал — ESC могут пищать, это нормально.</p>
+<h4 class="md-subheading">Грабли 1: COM-порт не постоянный</h4>
+<p>Если к компьютеру подключено несколько одинаковых плат, у них один USB VID/PID, и номер COM-порта меняется после каждой перезагрузки. Привязываться к <code>COM8</code> нельзя. Надёжный идентификатор — <code>craft_name</code> внутри конфига: открыть каждый порт, войти в CLI, выполнить <code>get craft_name</code> и выбрать нужный. Отсюда правило: у всех дронов разные <code>craft_name</code> ещё до начала работы.</p>
+<h4 class="md-subheading">Грабли 2: exit noreboot перезагружает</h4>
+<p>В Betaflight 4.5.x команда <code>exit noreboot</code> всё равно перезагружает контроллер (флаг <code>noreboot</code> заработал только в более новых версиях). Значит после любого <code>exit</code> скрипт должен заново искать порт по <code>craft_name</code>. Для «просто подсмотреть значение» не выходи из CLI командой — просто закрой порт.</p>
+<h4 class="md-subheading">Грабли 3: тихие исправления</h4>
+<p><code>set</code> + <code>save</code> не гарантирует, что значение осталось таким, каким ты его записал. Betaflight при загрузке корректирует несовместимые комбинации: протокол DShot, bidirectional DShot, схема таймеров на конкретной плате. В нашей практике на F405-плате после включения bidir протокол DShot оказался не тем, что записывали. Правило: после каждого <code>save</code> и перезагрузки — перечитать через <code>get</code> каждое изменённое значение и сравнить с ожидаемым.</p>
+<h4 class="md-subheading">Грабли 4: diff не переносится между версиями</h4>
+<p>Имена и смысл параметров меняются между версиями прошивки: переименовываются <code>debug_mode</code>, меняется синтаксис команды <code>serial</code>, меняется смысл PID-параметров D-term. Вставлять <code>diff all</code> от 2025.12 в 4.5 (и наоборот) построчно нельзя. Переносить настройки между версиями — только осмысленно, по разделам, с перечитыванием.</p>
+<h4 class="md-subheading">Почему диф, а не дамп</h4>
+<p><code>diff all</code> содержит только отличия от дефолтов — его можно читать глазами и хранить в git. <code>dump</code> — всё подряд, при обновлении прошивки он тащит старые дефолты как явные значения.</p>
+
+        <h3>🛠 Практика</h3>
+<h4 class="md-subheading">Шаг 1. Минимальный клиент CLI на Python</h4>
+<pre class="cli-block"><code>import time
+import serial
+from serial.tools import list_ports
+
+
+def cli_cmd(port: serial.Serial, cmd: str, wait: float = 0.6) -&gt; str:
+    port.write((cmd + &quot;
+&quot;).encode())
+    time.sleep(wait)
+    return port.read_all().decode(errors=&quot;replace&quot;)
+
+
+def enter_cli(port: serial.Serial) -&gt; None:
+    port.write(b&quot;
+&quot;)
+    time.sleep(0.3)
+    port.read_all()
+    port.write(b&quot;#&quot;)
+    time.sleep(1.2)
+    port.read_all()
+
+
+def find_craft(craft_name: str) -&gt; str:
+    &quot;&quot;&quot;Return the COM port of the FC whose craft_name matches. Never trust COM numbers.&quot;&quot;&quot;
+    for info in list_ports.comports():
+        try:
+            with serial.Serial(info.device, 115200, timeout=1) as p:
+                enter_cli(p)
+                out = cli_cmd(p, &quot;get craft_name&quot;)
+                # do NOT send exit here: on 4.5.x it reboots the FC
+                if f&quot;craft_name = {craft_name}&quot; in out:
+                    return info.device
+        except serial.SerialException:
+            continue
+    raise RuntimeError(f&quot;FC &#x27;{craft_name}&#x27; not found&quot;)</code></pre>
+<h4 class="md-subheading">Шаг 2. Применение изменений с проверкой</h4>
+<pre class="cli-block"><code>CHANGES = {&quot;rpm_filter_min_hz&quot;: &quot;50&quot;, &quot;failsafe_delay&quot;: &quot;15&quot;}
+
+port_name = find_craft(&quot;viking2&quot;)
+with serial.Serial(port_name, 115200, timeout=1) as p:
+    enter_cli(p)
+    backup = cli_cmd(p, &quot;diff all&quot;, wait=3.0)
+    open(&quot;viking2_before_diff.txt&quot;, &quot;w&quot;, encoding=&quot;utf-8&quot;).write(backup)
+    for key, val in CHANGES.items():
+        cli_cmd(p, f&quot;set {key} = {val}&quot;)
+    cli_cmd(p, &quot;save&quot;, wait=1.0)  # FC reboots, COM port may change
+
+time.sleep(6)
+port_name = find_craft(&quot;viking2&quot;)  # find it again after reboot
+with serial.Serial(port_name, 115200, timeout=1) as p:
+    enter_cli(p)
+    for key, val in CHANGES.items():
+        out = cli_cmd(p, f&quot;get {key}&quot;)
+        ok = f&quot;{key} = {val}&quot; in out
+        print((&quot;OK  &quot; if ok else &quot;FAIL&quot;), key, &quot;expected&quot;, val)</code></pre>
+<h4 class="md-subheading">Шаг 3. Хранить конфиги как код</h4>
+<ol><li>Папка на каждый дрон, внутри <code>configs/</code> и <code>logs/</code>.</li><li>Имя файла: <code>&lt;дрон&gt;_&lt;плата&gt;_&lt;ГГГГ-ММ-ДД&gt;_diff.txt</code> — сортировка по имени = сортировка по дате.</li><li>Перед изменениями — бэкап, после — новый diff; сравнивать их обычным <code>git diff</code>.</li></ol>
+
+        <h3>🔍 Диагностика</h3>
+<div class="diag-groups"><article class="diag-item"><h4><strong>Симптом:</strong> скрипт «потерял» дрон после save</h4><ul><li>Возможная причина: после перезагрузки COM-порт получил другой номер.</li><li>Что сделать: искать порт заново по <code>craft_name</code>, а не по номеру.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> записанное значение после перезагрузки другое</h4><ul><li>Возможная причина: Betaflight скорректировал несовместимую комбинацию.</li><li>Что сделать: перечитать связанные параметры, сверить с документацией платы и прошивки.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> после вставки diff часть строк дала ошибки <code>Invalid name</code></h4><ul><li>Возможная причина: diff от другой версии прошивки.</li><li>Что сделать: переносить настройки по разделам, проверяя имена параметров в <code>help</code> текущей версии.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> два дрона откликаются на один <code>craft_name</code></h4><ul><li>Возможная причина: одинаковые имена (клон конфига).</li><li>Что сделать: сразу переименовать, <code>set craft_name = ...</code> + <code>save</code>.</li></ul></article></div>
+
+        <div class="references">
+          <h4>📚 Источники</h4>
+          <ul>
+<li>
+              <a href="https://betaflight.com/docs/development/Cli" class="doc-link" target="_blank" rel="noopener noreferrer">Betaflight CLI — Documentation</a>
+              <span class="tag">primary</span>
+            </li>
+<li>
+              <a href="https://pyserial.readthedocs.io/en/latest/" class="doc-link" target="_blank" rel="noopener noreferrer">pySerial — Documentation</a>
+              <span class="tag">primary</span>
+            </li>
+<li>
+              <a href="https://github.com/betaflight/betaflight" class="doc-link" target="_blank" rel="noopener noreferrer">Betaflight — source code (GitHub)</a>
+              <span class="tag">primary</span>
+            </li>
+          </ul>
+        </div>
+        <div class="checklist" id="bf-cli-automation-checklist">
+          <h4>✅ Чек-лист</h4>
+          <ul class="checklist-list">
+            <li><label><input type="checkbox"> У каждого дрона уникальный <code>craft_name</code></label></li>
+            <li><label><input type="checkbox"> Скрипт ищет порт по <code>craft_name</code>, а не по номеру COM</label></li>
+            <li><label><input type="checkbox"> Перед изменениями сохраняется <code>diff all</code> с датой в имени</label></li>
+            <li><label><input type="checkbox"> После <code>save</code> скрипт заново находит порт и перечитывает значения</label></li>
+            <li><label><input type="checkbox"> diff между разными версиями прошивки не вставляется построчно</label></li>
           </ul>
         </div>
       </article>
@@ -1481,6 +1779,292 @@ sudo systemctl disable nvgetty.service</code></pre>
         <p class="muted">Модуль запланирован в программе курса, но ещё не написан. План развития — в <a class="doc-link" href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md" target="_blank" rel="noopener noreferrer">ROADMAP</a>.</p>
       </article>
 <!-- AUTO:ARTICLES:companion:end -->
+    </section>
+
+    <!-- RADIO LINK -->
+    <section id="tab-link" class="tab-pane" role="tabpanel" aria-labelledby="tab-btn-link" aria-hidden="true" hidden>
+      <!-- AUTO:TOC:link:start -->
+      <nav class="toc toc--enhanced" aria-label="Содержание раздела Радиолинк">
+        <a href="#link-protocols">
+          <span class="toc__num">01</span>
+          <span class="toc__level">L1</span>
+          <span class="toc__label">SBUS, CRSF и инверсия UART</span>
+        </a>
+        <a href="#link-elrs">
+          <span class="toc__num">02</span>
+          <span class="toc__level">L2</span>
+          <span class="toc__label">ExpressLRS: packet rate, телеметрия, LQ</span>
+        </a>
+        <a href="#link-vtx">
+          <span class="toc__num">03</span>
+          <span class="toc__level">L2</span>
+          <span class="toc__label">VTX-таблицы и смена видеоканала</span>
+        </a>
+      </nav>
+<!-- AUTO:TOC:link:end -->
+
+      <!-- AUTO:PROGRESS:link:start -->
+      <div class="section-progress" aria-label="Прогресс раздела Радиолинк">
+        <span class="section-progress__label">Раздел Радиолинк</span>
+        <span class="section-progress__bar" role="progressbar" aria-valuenow="3" aria-valuemin="0" aria-valuemax="3" aria-label="Готово 3 из 3 модулей">
+          <span class="section-progress__fill" style="width:100%"></span>
+        </span>
+        <span class="section-progress__stats">готово 3 из 3 модулей</span>
+      </div>
+<!-- AUTO:PROGRESS:link:end -->
+
+      <section class="card orientation-guide" aria-labelledby="link-orient-title">
+        <div class="breadcrumb" aria-label="Навигация по разделу">
+          <a href="#site-hero">Главная</a>
+          <span class="breadcrumb__sep" aria-hidden="true">›</span>
+          <span>Радиолинк</span>
+        </div>
+
+        <h2 id="link-orient-title">С чего начать в этом разделе</h2>
+        <p class="muted">
+          Связь общая для всех прошивок: сначала физика протоколов между приёмником и контроллером,
+          затем радиоканал управления, затем видео.
+        </p>
+
+        <div class="grid quick-start-grid">
+          <article class="quick-start-card level-l1">
+            <h3>L1 · Провода</h3>
+            <p>UART, SBUS против CRSF, инверсия и почему F4 с ней мучился.</p>
+            <a class="doc-link" href="#link-protocols">К протоколам</a>
+          </article>
+
+          <article class="quick-start-card level-l2">
+            <h3>L2 · Управление</h3>
+            <p>ExpressLRS: packet rate, телеметрия, чтение LQ и RSSI в логе.</p>
+            <a class="doc-link" href="#link-elrs">К ExpressLRS</a>
+          </article>
+
+          <article class="quick-start-card level-l3">
+            <h3>L2 · Видео</h3>
+            <p>VTX-таблицы, FACTORY против CUSTOM, смена занятого канала.</p>
+            <a class="doc-link" href="#link-vtx">К VTX</a>
+          </article>
+        </div>
+      </section>
+
+      <!-- AUTO:ARTICLES:link:start -->
+<article id="link-protocols" class="card" data-level="L1" data-added="2026-11-07">
+        <h2>SBUS, CRSF и инверсия UART</h2>
+        <p class="muted">Приёмник передаёт полётному контроллеру положения стиков по одному из serial-протоколов. Сегодня два главных — старый SBUS (FrSky, Futaba) и CRSF (TBS Crossfire, ExpressLRS). Модуль объясняет физическую разницу между ними, что такое «инвертированный» сигнал, почему с SBUS были вечные проблемы на F4-контроллерах и как правильно подключить каждый протокол.</p>
+        <div class="article-meta">
+          <span class="tag">Уровень: L1 — Оператор</span>
+          <span class="tag">Время чтения: 15 мин</span>
+          <span class="tag">CRSF / SBUS</span>
+          <span class="tag">SBUS</span>
+          <span class="tag">CRSF</span>
+        </div>
+
+        <h3>📖 Теория</h3>
+<h4 class="md-subheading">Что такое UART-кадр</h4>
+<p>UART передаёт байты последовательно: стартовый бит, 8 бит данных, (необязательный) бит чётности, стоповые биты. В состоянии покоя (idle) линия в логической единице — высокий уровень. Стартовый бит опускает её в ноль, приёмник ловит этот фронт и начинает отсчёт.</p>
+<h4 class="md-subheading">Что значит «инвертированный»</h4>
+<p>В инвертированном сигнале всё наоборот: покой — низкий уровень, единица — низкий, ноль — высокий. Данные те же, перевёрнута только электрика. Если подать инвертированный сигнал на обычный UART, приёмник увидит мусор: он будет ждать стартовый бит не там.</p>
+<h4 class="md-subheading">SBUS</h4>
+<ul><li>100000 бод, 8 бит данных, чётность even, 2 стоповых бита (8E2);</li><li>инвертированный сигнал — это стандарт протокола, а не исключение;</li><li>кадр 25 байт: 16 пропорциональных каналов по 11 бит, 2 цифровых канала, флаги frame lost и failsafe;</li><li>однонаправленный: только приёмник → контроллер, телеметрию назад отдельным проводом (SmartPort).</li></ul>
+<p>Фраза «неинвертированный SBUS» означает сигнал, который кто-то перевернул обратно ради совместимости. Это обходной путь, а не другой протокол.</p>
+<h4 class="md-subheading">Почему F4 мучился с SBUS</h4>
+<p>UART микроконтроллеров STM32F4 не умеет аппаратно инвертировать вход. У F7, H7 и G4 есть для этого бит в регистре USART, и инверсия включается программно. Поэтому F4-платы ставили отдельный аппаратный инвертор на один UART (пад обычно подписан SBUS), а на остальных портах SBUS без доработки не работал.</p>
+<h4 class="md-subheading">CRSF</h4>
+<ul><li>обычный неинвертированный UART, 8N1;</li><li>полный дуплекс на двух проводах (TX и RX): каналы вниз, телеметрия вверх по тому же порту;</li><li>скорость по спецификации — 416666 бод для полного дуплекса, может договариваться выше для меньшей задержки;</li><li>в кадре есть тип пакета и CRC, протокол расширяемый: каналы, телеметрия, link statistics, параметры устройства.</li></ul>
+<p>Отсюда практическое правило: CRSF не нуждается в инверторе и работает на любом свободном UART любой серии.</p>
+
+        <h3>🛠 Практика</h3>
+<h4 class="md-subheading">Подключение CRSF / ExpressLRS к Betaflight</h4>
+<ol><li>Провода крест-накрест: TX приёмника → RX контроллера, RX приёмника → TX контроллера. Плюс 5 В и GND.</li><li>Ports: на этом UART включить Serial RX.</li><li>Receiver: Serial, провайдер CRSF, телеметрия включена.</li><li>В CLI проверить, что порт не инвертирован и не полудуплексный:</li></ol>
+<pre class="cli-block"><code>get serialrx
+set serialrx_provider = CRSF
+set serialrx_inverted = OFF
+set serialrx_halfduplex = OFF
+save</code></pre>
+<h4 class="md-subheading">Подключение SBUS</h4>
+<ol><li>На F4 — только на UART с аппаратным инвертором (пад SBUS по схеме платы) или к приёмнику, который умеет выдавать неинвертированный сигнал.</li><li>На F7/H7 — на любой UART, инверсию Betaflight включит сам.</li><li>Провайдер <code>SBUS</code>. Параметр <code>serialrx_inverted</code> трогать только если приёмник выдаёт неинвертированный SBUS.</li></ol>
+<h4 class="md-subheading">Проверка</h4>
+<p>Вкладка Receiver: каналы двигаются вместе со стиками, порядок каналов совпадает (AETR), диапазон около 1000–2000.</p>
+
+        <h3>🔍 Диагностика</h3>
+<div class="diag-groups"><article class="diag-item"><h4><strong>Симптом:</strong> приёмник забинден, а в Receiver каналы стоят</h4><ul><li>Возможная причина: TX/RX перепутаны или выбран не тот UART в Ports.</li><li>Что сделать: проверить пайку крест-накрест и номер UART по схеме платы.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> SBUS на F4 не работает ни на одном порту</h4><ul><li>Возможная причина: подключено к UART без инвертора.</li><li>Что сделать: найти пад с инвертором по схеме или использовать неинвертированный выход приёмника.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> каналы есть, но телеметрии на пульте нет (CRSF)</h4><ul><li>Возможная причина: не припаян провод TX контроллера → RX приёмника или включён half-duplex.</li><li>Что сделать: проверить второй провод и <code>serialrx_halfduplex = OFF</code>.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> стики «дёргаются» на месте</h4><ul><li>Возможная причина: помехи на линии, плохой GND или неверная скорость.</li><li>Что сделать: проверить общий GND, убрать провод от силовых линий.</li></ul></article></div>
+
+        <div class="references">
+          <h4>📚 Источники</h4>
+          <ul>
+<li>
+              <a href="https://github.com/tbs-fpv/tbs-crsf-spec" class="doc-link" target="_blank" rel="noopener noreferrer">CRSF Protocol Specification — TBS (GitHub)</a>
+              <span class="tag">primary</span>
+            </li>
+<li>
+              <a href="https://www.expresslrs.org/quick-start/receivers/configuring-fc/" class="doc-link" target="_blank" rel="noopener noreferrer">Configuring FC for ExpressLRS — ExpressLRS Docs</a>
+              <span class="tag">primary</span>
+            </li>
+<li>
+              <a href="https://github.com/bolderflight/sbus" class="doc-link" target="_blank" rel="noopener noreferrer">SBUS library and protocol description — Bolder Flight Systems</a>
+              <span class="tag">secondary</span>
+            </li>
+<li>
+              <a href="https://oscarliang.com/sbus-smartport-telemetry-naze32" class="doc-link" target="_blank" rel="noopener noreferrer">How to Setup SBus — Oscar Liang</a>
+              <span class="tag">secondary</span>
+            </li>
+          </ul>
+        </div>
+        <div class="checklist" id="link-protocols-checklist">
+          <h4>✅ Чек-лист</h4>
+          <ul class="checklist-list">
+            <li><label><input type="checkbox"> Понятно, какой протокол выдаёт приёмник</label></li>
+            <li><label><input type="checkbox"> Для SBUS на F4 выбран UART с инвертором</label></li>
+            <li><label><input type="checkbox"> Для CRSF: TX/RX крест-накрест, оба провода припаяны</label></li>
+            <li><label><input type="checkbox"> <code>serialrx_inverted</code> и <code>serialrx_halfduplex</code> проверены через <code>get</code></label></li>
+            <li><label><input type="checkbox"> Во вкладке Receiver каналы и их порядок проверены</label></li>
+          </ul>
+        </div>
+      </article>
+
+      <article id="link-elrs" class="card" data-level="L2" data-added="2026-11-07">
+        <h2>ExpressLRS: packet rate, телеметрия, LQ</h2>
+        <p class="muted">ExpressLRS (ELRS) — открытая система радиоуправления, которая стала стандартом в FPV. Модуль объясняет главные компромиссы: частота пакетов против дальности, 2.4 ГГц против 900 МГц, сколько эфира отдать телеметрии. И учит читать LQ и RSSI в логе, чтобы отличать проблему линка от проблемы настройки.</p>
+        <div class="article-meta">
+          <span class="tag">Уровень: L2 — Интегратор</span>
+          <span class="tag">Время чтения: 20 мин</span>
+          <span class="tag">ELRS 3.x</span>
+          <span class="tag">ExpressLRS</span>
+          <span class="tag">telemetry</span>
+        </div>
+
+        <h3>📖 Теория</h3>
+<h4 class="md-subheading">Packet rate: задержка против чувствительности</h4>
+<p>Packet rate — сколько пакетов управления в секунду передаёт пульт. Больше пакетов — меньше задержка, но короче каждый пакет и хуже чувствительность приёмника. Поэтому высокие частоты — для гонок и фристайла рядом, низкие — для дальних полётов.</p>
+<p>Режимы 2.4 ГГц в ELRS 3.x:</p>
+<ul><li>LoRa: 50, 150, 250, 500 Гц — основной набор, чем ниже, тем дальше;</li><li>FLRC: F500, F1000 — минимальная задержка, меньшая дальность; F1000 требует serial-приёмника и высокой скорости UART;</li><li>D250, D500 — каждый пакет отправляется дважды, надёжнее в помехах;</li><li>Full Resolution режимы (например 100Hz Full, 333Hz Full) — все каналы в полном разрешении для крыльев и сложных миксов.</li></ul>
+<p>На 900 МГц (868/915) частоты ниже: 25, 50, 100, 200 Гц. Длинная волна лучше огибает препятствия и проходит через листву — выбор для крыльев и дальних маршрутов.</p>
+<h4 class="md-subheading">Телеметрия: отношение 1:N</h4>
+<p>Telemetry ratio показывает, какой пакет из N отдаётся обратному каналу. Интервал телеметрии = ratio × 1000 / packet rate (мс). Например, 500 Гц при 1:128 — пакет телеметрии раз в 256 мс. Пакеты бывают двух типов: LINK (статистика линка, примерно каждые 512 мс, есть всегда) и DATA (телеметрия контроллера и MSP). Если на пульт надо гнать много данных (GPS, Lua-конфигуратор), отношение ставят чаще (1:8, 1:4).</p>
+<h4 class="md-subheading">Binding phrase</h4>
+<p>Фраза привязки — не пароль и не шифрование. Из неё вычисляется UID, который задаёт рисунок прыжков по частотам. Уникальная фраза нужна, чтобы не мешать соседям с тем же паттерном. Пульт и приёмник должны иметь одну фразу и одну мажорную версию ELRS.</p>
+<h4 class="md-subheading">LQ и RSSI</h4>
+<ul><li>RQly (uplink LQ) — сколько из последних 100 пакетов пульта дошло до приёмника;</li><li>TQly — то же для телеметрии в обратную сторону;</li><li>RSSI — мощность сигнала в dBm; запас считают до порога чувствительности текущего packet rate.</li></ul>
+<p>LQ отвечает на вопрос «доходят ли пакеты», RSSI — «сколько осталось запаса». LQ 100% при RSSI у самого порога — ты на краю, даже если всё летает.</p>
+
+        <h3>🛠 Практика</h3>
+<h4 class="md-subheading">Выбор режима под задачу</h4>
+<ol><li>Фристайл, гонки, полёты в пределах прямой видимости: 2.4 ГГц, 250–500 Гц или F500.</li><li>7–10&quot; для дальних вылетов: 2.4 ГГц 150 Гц или 900 МГц 100 Гц.</li><li>Крыло, долгие маршруты, лес: 900 МГц, 50–100 Гц.</li></ol>
+<h4 class="md-subheading">Настройка на пульте (ELRS Lua)</h4>
+<ol><li>Tools → ExpressLRS: выбрать Packet Rate и Telem Ratio.</li><li>TX Power: для полётов рядом не ставить максимум — греется модуль, плюс засветка соседей. Dynamic Power поднимет мощность сам при падении LQ.</li><li>После смены режима проверить, что приёмник снова на связи (зелёный статус в Lua).</li></ol>
+<h4 class="md-subheading">Анализ линка по логу Blackbox</h4>
+<ol><li>Включи логирование RSSI/LQ в Betaflight (поля <code>rssi</code> и link quality).</li><li>После полёта найди участки, где LQ падает ниже ~70% или RSSI приближается к порогу.</li><li>Сопоставь с моментами RXLOSS в OSD и с ориентацией дрона. Пример из практики: на 10&quot; RSSI держался в районе 26–52%, падал ниже 30% на десятки секунд, и именно там случились RXLOSS. Виновник — антенна приёмника, а не настройки PID.</li></ol>
+
+        <h3>🔍 Диагностика</h3>
+<div class="diag-groups"><article class="diag-item"><h4><strong>Симптом:</strong> RXLOSS при развороте спиной к пилоту</h4><ul><li>Возможная причина: антенна приёмника затенена рамой или углепластиком.</li><li>Что сделать: вынести антенну, ориентировать её под углом, проверить на целостность.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> LQ «проседает» волнами, хотя дрон рядом</h4><ul><li>Возможная причина: сильные помехи на 2.4 ГГц (Wi-Fi, другие пилоты) или повреждённая антенна пульта.</li><li>Что сделать: попробовать режим D250/D500 или 900 МГц, проверить антенну TX.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> не биндится после обновления</h4><ul><li>Возможная причина: разные мажорные версии ELRS или разные binding phrase.</li><li>Что сделать: обновить обе стороны до одной версии, проверить фразу.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> F1000 недоступен</h4><ul><li>Возможная причина: SPI-приёмник или недостаточная скорость UART у пульта.</li><li>Что сделать: использовать serial-приёмник и проверить baud rate модуля.</li></ul></article></div>
+
+        <div class="references">
+          <h4>📚 Источники</h4>
+          <ul>
+<li>
+              <a href="https://www.expresslrs.org/faq/" class="doc-link" target="_blank" rel="noopener noreferrer">ExpressLRS FAQ</a>
+              <span class="tag">primary</span>
+            </li>
+<li>
+              <a href="https://www.expresslrs.org/info/telem-bandwidth/" class="doc-link" target="_blank" rel="noopener noreferrer">Telemetry Bandwidth — ExpressLRS Docs</a>
+              <span class="tag">primary</span>
+            </li>
+<li>
+              <a href="https://www.expresslrs.org/quick-start/transmitters/lua-howto/" class="doc-link" target="_blank" rel="noopener noreferrer">Lua Script How-To — ExpressLRS Docs</a>
+              <span class="tag">primary</span>
+            </li>
+<li>
+              <a href="https://github.com/ExpressLRS/ExpressLRS" class="doc-link" target="_blank" rel="noopener noreferrer">ExpressLRS — source code (GitHub)</a>
+              <span class="tag">primary</span>
+            </li>
+          </ul>
+        </div>
+        <div class="checklist" id="link-elrs-checklist">
+          <h4>✅ Чек-лист</h4>
+          <ul class="checklist-list">
+            <li><label><input type="checkbox"> Packet rate выбран под задачу, а не «максимальный»</label></li>
+            <li><label><input type="checkbox"> Telem ratio соответствует объёму нужной телеметрии</label></li>
+            <li><label><input type="checkbox"> Уникальная binding phrase, одна мажорная версия на пульте и приёмнике</label></li>
+            <li><label><input type="checkbox"> RSSI и LQ пишутся в лог</label></li>
+            <li><label><input type="checkbox"> Антенна приёмника вынесена и не затенена рамой</label></li>
+          </ul>
+        </div>
+      </article>
+
+      <article id="link-vtx" class="card" data-level="L2" data-added="2026-11-07">
+        <h2>VTX-таблицы и смена видеоканала</h2>
+        <p class="muted">Видеопередатчик (VTX) управляется полётным контроллером: Betaflight знает, какие частоты и мощности у VTX есть, из VTX-таблицы. Модуль объясняет, как устроена таблица, чем режимы FACTORY и CUSTOM отличаются, и даёт алгоритм смены канала, когда твой занят — например, упавшим бортом, который продолжает вещать до конца смены.</p>
+        <div class="article-meta">
+          <span class="tag">Уровень: L2 — Интегратор</span>
+          <span class="tag">Время чтения: 20 мин</span>
+          <span class="tag">Betaflight 4.5+</span>
+          <span class="tag">VTX</span>
+          <span class="tag">vtxtable</span>
+        </div>
+
+        <h3>📖 Теория</h3>
+<h4 class="md-subheading">Зачем таблица</h4>
+<p>Протоколы управления VTX (SmartAudio, IRC Tramp, MSP) передают либо номер band/channel, либо частоту. Чтобы OSD и пульт показывали правильные значения, Betaflight хранит таблицу: список бендов, по 8 каналов в каждом, и список уровней мощности.</p>
+<h4 class="md-subheading">Синтаксис</h4>
+<pre class="cli-block"><code>vtxtable bands 5
+vtxtable channels 8
+vtxtable band 1 BOSCAM_A A FACTORY 5865 5845 5825 5805 5785 5765 5745 5725
+vtxtable band 5 RACEBAND R FACTORY 5658 5695 5732 5769 5806 5843 5880 5917
+vtxtable powerlevels 3
+vtxtable powervalues 14 20 26
+vtxtable powerlabels 25 100 400</code></pre>
+<p>Поля строки band: номер, имя, буква, режим, восемь частот. Частота <code>0</code> блокирует канал.</p>
+<h4 class="md-subheading">FACTORY против CUSTOM</h4>
+<ul><li>FACTORY: Betaflight отправляет VTX номер бенда и канала, VTX использует свою встроенную таблицу. Частоты в таблице FC нужны только для отображения — поэтому они обязаны совпадать с реальной таблицей VTX.</li><li>CUSTOM: Betaflight отправляет саму частоту. Можно задать любые частоты в пределах возможностей VTX. IRC Tramp и RTC6705 работают только в CUSTOM.</li></ul>
+<h4 class="md-subheading">Две записи одного канала</h4>
+<p>Канал записывают как буква+номер (R1, F4, E5) или как пара band-channel (5-1). Это одно и то же, если твоя таблица совпадает с таблицей того, кто тебе этот канал назвал. У нестандартных VTX буквы и номера бендов могут не совпадать с привычными — сверяй по частоте в МГц, а не по букве.</p>
+<h4 class="md-subheading">Частоты и закон</h4>
+<p>Таблицы из интернета часто содержат частоты, на которых передавать нельзя. Документация Betaflight прямо предупреждает: почти никто не может законно использовать типовую таблицу без правки. Разрешённый диапазон и мощность определяются местными правилами.</p>
+
+        <h3>🛠 Практика</h3>
+<h4 class="md-subheading">Алгоритм смены канала, когда твой занят</h4>
+<ol><li>Узнай занятые частоты: свои соседи, другие пилоты на площадке, «вещающий» упавший борт.</li><li>Переведи все занятые каналы в МГц по таблице их VTX — не по букве.</li><li>Выбери свободную частоту с максимально возможным разносом от соседей. Ориентир для аналога — не меньше ~37 МГц, как между соседними каналами Raceband: ближе каналы заметно мешают друг другу.</li><li>Найди эту частоту в своей таблице и запиши band и channel.</li><li>Поменяй сначала на одном-двух передатчиках/дронах, проверь картинку и помехи соседям.</li><li>Только после успешного теста — на всех остальных бортах.</li></ol>
+<h4 class="md-subheading">Смена через CLI</h4>
+<pre class="cli-block"><code>get vtx
+set vtx_band = 4
+set vtx_channel = 1
+save</code></pre>
+<p>Видео-приёмник (очки, наземка) переключи на ту же частоту. Для цифровых систем (Walksnail, DJI, HDZero) канал меняется в их меню, логика выбора та же.</p>
+<h4 class="md-subheading">Проверка</h4>
+<ol><li>В OSD или в очках видна новая частота.</li><li>Соседи подтверждают, что помех нет.</li><li>Записать новую частоту в журнал дрона и в общую таблицу распределения каналов.</li></ol>
+
+        <h3>🔍 Диагностика</h3>
+<div class="diag-groups"><article class="diag-item"><h4><strong>Симптом:</strong> в OSD одна частота, в очках картинка на другой</h4><ul><li>Возможная причина: режим FACTORY, а таблица FC не совпадает со встроенной таблицей VTX.</li><li>Что сделать: загрузить таблицу именно для своей модели VTX и своего региона.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> VTX не реагирует на смену канала из Betaflight</h4><ul><li>Возможная причина: не настроен UART под SmartAudio/Tramp или нет таблицы.</li><li>Что сделать: проверить Ports (VTX на нужном UART) и наличие <code>vtxtable</code>.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> после смены канала помехи у соседа</h4><ul><li>Возможная причина: слишком маленький разнос частот или гармоники при высокой мощности.</li><li>Что сделать: увеличить разнос, снизить мощность на земле (pit mode).</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> канал «E5» у тебя и у соседа — разные частоты</h4><ul><li>Возможная причина: у VTX разные таблицы бендов.</li><li>Что сделать: договариваться о частотах в МГц.</li></ul></article></div>
+
+        <div class="references">
+          <h4>📚 Источники</h4>
+          <ul>
+<li>
+              <a href="https://betaflight.com/docs/development/VTX" class="doc-link" target="_blank" rel="noopener noreferrer">VTX — Betaflight Development Docs</a>
+              <span class="tag">primary</span>
+            </li>
+<li>
+              <a href="https://betaflight.com/docs/wiki/guides/current/VTX-Tables" class="doc-link" target="_blank" rel="noopener noreferrer">VTX Tables — Betaflight Documentation</a>
+              <span class="tag">primary</span>
+            </li>
+<li>
+              <a href="https://oscarliang.com/smartaudio-tramp-vtx-control-vtxtables/" class="doc-link" target="_blank" rel="noopener noreferrer">How to Setup VTX Table in Betaflight — Oscar Liang</a>
+              <span class="tag">secondary</span>
+            </li>
+          </ul>
+        </div>
+        <div class="checklist" id="link-vtx-checklist">
+          <h4>✅ Чек-лист</h4>
+          <ul class="checklist-list">
+            <li><label><input type="checkbox"> Таблица загружена именно для своей модели VTX и региона</label></li>
+            <li><label><input type="checkbox"> Занятые каналы переведены в МГц</label></li>
+            <li><label><input type="checkbox"> Разнос с соседями не меньше ~37 МГц (ориентир Raceband)</label></li>
+            <li><label><input type="checkbox"> Новый канал проверен на 1–2 бортах до массовой смены</label></li>
+            <li><label><input type="checkbox"> Частота записана в журнал и общую таблицу каналов</label></li>
+          </ul>
+        </div>
+      </article>
+<!-- AUTO:ARTICLES:link:end -->
     </section>
 
     <!-- Инструменты -->
