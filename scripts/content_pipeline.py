@@ -14,6 +14,22 @@ BUILD_DIR = ROOT / "build"
 
 REQUIRED_MD_HEADINGS = ("summary", "theory", "practice", "diagnostics", "references")
 
+# Article lifecycle:
+#   published — real content, rendered in full
+#   planned   — slot reserved in the course map; rendered as a "coming soon" card
+#   draft     — work in progress; hidden unless --include-drafts
+VALID_STATUSES = ("published", "planned", "draft")
+
+ROADMAP_URL = "https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md"
+
+# Placeholder fragments that must never reach a published article.
+PLACEHOLDER_MARKERS = (
+    "example.com",
+    "(черновик)",
+    "Заглушка",
+    "заменить конкретной ссылкой",
+)
+
 LEVEL_LABELS = {
     "L1": "L1 — Оператор",
     "L2": "L2 — Интегратор",
@@ -205,12 +221,11 @@ def parse_pipe_references(body: str) -> list[tuple[str, str, str]]:
     """Строки `- title | url | tier` в теле ## references."""
     out: list[tuple[str, str, str]] = []
     for line in body.splitlines():
-        line = line.strip()
-        if not line.startswith("- "):
-            continue
-        rest = line[2:].strip()
+        rest = line.strip()
+        if rest.startswith("- "):
+            rest = rest[2:].strip()
         parts = [p.strip() for p in rest.split("|")]
-        if len(parts) >= 3:
+        if len(parts) >= 3 and parts[1].startswith("http"):
             out.append((parts[0], parts[1], parts[2]))
     return out
 
@@ -233,9 +248,9 @@ def parse_yaml_references(fm: str) -> list[tuple[str, str, str]]:
                     while i < len(lines) and (lines[i].startswith(" ") or lines[i].startswith("\t")):
                         sl = lines[i].strip()
                         if sl.startswith("url:"):
-                            url = sl.split(":", 1)[1].strip()
+                            url = sl.split(":", 1)[1].strip().strip("\"'")
                         elif sl.startswith("tier:"):
-                            tier = sl.split(":", 1)[1].strip()
+                            tier = sl.split(":", 1)[1].strip().strip("\"'")
                         i += 1
                     if url:
                         out.append((title, url, tier))
@@ -311,10 +326,31 @@ def firmware_for_article(article: dict, fm: str | None) -> str:
     return "—"
 
 
+def render_planned_html(article: dict) -> str:
+    aid = html.escape(article["id"])
+    level = article.get("level", "L1")
+    title = html.escape(article.get("title", article["id"]))
+    return "\n".join(
+        [
+            f'      <article id="{aid}" class="card card--planned" data-level="{html.escape(level)}" data-status="planned">',
+            f"        <h2>{title}</h2>",
+            '        <div class="article-meta">',
+            f'          <span class="tag">Уровень: {html.escape(LEVEL_LABELS.get(level, level))}</span>',
+            '          <span class="tag tag--planned">🚧 В разработке</span>',
+            "        </div>",
+            '        <p class="muted">Модуль запланирован в программе курса, но ещё не написан. '
+            f'План развития — в <a class="doc-link" href="{ROADMAP_URL}" target="_blank" rel="noopener noreferrer">ROADMAP</a>.</p>',
+            "      </article>",
+        ]
+    )
+
+
 def render_article_html(article: dict, include_drafts: bool = False) -> str:
     st = article.get("status", "published")
     if st == "draft" and not include_drafts:
         return ""
+    if st == "planned":
+        return render_planned_html(article)
 
     path = ROOT / article["sourceFile"]
     if not path.is_file():
@@ -396,11 +432,14 @@ def render_toc_html(section: dict, articles: list[dict]) -> str:
     items: list[str] = []
     for i, a in enumerate(articles, start=1):
         num = str(i).zfill(2)
+        planned = a.get("status") == "planned"
+        cls = ' class="toc__item--planned"' if planned else ""
+        soon = '\n          <span class="toc__soon">скоро</span>' if planned else ""
         items.append(
-            f'        <a href="#{a["id"]}">\n'
+            f'        <a href="#{a["id"]}"{cls}>\n'
             f'          <span class="toc__num">{num}</span>\n'
             f'          <span class="toc__level">{html.escape(a["level"])}</span>\n'
-            f'          <span class="toc__label">{html.escape(a["title"])}</span>\n'
+            f'          <span class="toc__label">{html.escape(a["title"])}</span>{soon}\n'
             f"        </a>"
         )
     inner = "\n".join(items)
@@ -411,20 +450,19 @@ def render_toc_html(section: dict, articles: list[dict]) -> str:
     )
 
 
-def render_progress_html(section: dict, n: int) -> str:
+def render_progress_html(section: dict, articles: list[dict]) -> str:
+    """Honest progress: written modules out of all modules shown in the section."""
     sk = section["sectionKey"]
     title = section.get("title", sk)
     label = f"Раздел {title}"
-    pct = 100 if n else 0
-    if sk == "tools":
-        stats = "Обзор стека ПО" if n <= 1 else f"{n} модулей"
-        aria = f"{n} обзорный модуль" if n == 1 else f"{n} модулей"
-    else:
-        stats = f"{n} из {n} базовых модулей" if n else "0 модулей"
-        aria = f"{n} из {n} модулей в базовой версии"
+    total = len(articles)
+    done = sum(1 for a in articles if a.get("status") == "published")
+    pct = round(100 * done / total) if total else 0
+    stats = f"готово {done} из {total} модулей" if total else "0 модулей"
+    aria = f"Готово {done} из {total} модулей"
     return f"""      <div class="section-progress" aria-label="Прогресс раздела {html.escape(title)}">
         <span class="section-progress__label">{html.escape(label)}</span>
-        <span class="section-progress__bar" role="progressbar" aria-valuenow="{n}" aria-valuemin="0" aria-valuemax="{n}" aria-label="{html.escape(aria)}">
+        <span class="section-progress__bar" role="progressbar" aria-valuenow="{done}" aria-valuemin="0" aria-valuemax="{total}" aria-label="{html.escape(aria)}">
           <span class="section-progress__fill" style="width:{pct}%"></span>
         </span>
         <span class="section-progress__stats">{html.escape(stats)}</span>
@@ -446,7 +484,7 @@ def filter_articles(
     level_order = {"L1": 1, "L2": 2, "L3": 3, "L4": 4}
     for a in arts:
         st = a.get("status", "published")
-        if st == "published" or (include_drafts and st == "draft"):
+        if st in ("published", "planned") or (include_drafts and st == "draft"):
             out.append(a)
     return sorted(
         out,

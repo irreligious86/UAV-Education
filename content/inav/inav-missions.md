@@ -3,7 +3,7 @@ id: inav-missions
 title: "Автономные миссии"
 level: L3
 readingTime: "25 мин"
-status: published
+status: planned
 tags:
   - waypoints
 references:

@@ -3,7 +3,7 @@ id: comp-intro
 title: "Введение в Companion"
 level: L2
 readingTime: "15 мин"
-status: published
+status: planned
 tags:
   - MAVLink
 references:

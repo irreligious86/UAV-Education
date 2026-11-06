@@ -3,7 +3,7 @@ id: tools-overview
 title: "Инструментарий"
 level: L1
 readingTime: "10 мин"
-status: published
+status: planned
 tags:
   - GCS
   - tools

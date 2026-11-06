@@ -27,6 +27,7 @@ TAB_IDS = {
     "ardupilot": "tab-ardupilot",
     "px4": "tab-px4",
     "companion": "tab-companion",
+    "link": "tab-link",
     "tools": "tab-tools",
 }
 
@@ -36,6 +37,7 @@ SECTION_TITLES = {
     "ardupilot": "ArduPilot",
     "px4": "PX4",
     "companion": "Companion",
+    "link": "Радиолинк",
     "tools": "Инструменты",
 }
 
@@ -45,6 +47,7 @@ FIRMWARE_DEFAULT = {
     "ardupilot": "ArduPilot 4.5+",
     "px4": "PX4 1.15+",
     "companion": "MAVLink / Companion",
+    "link": "ELRS 3.x",
     "tools": "—",
 }
 
@@ -61,6 +64,7 @@ references:
   - title: Official docs (заменить)
     url: https://example.com
     tier: primary | A
+# validate_content.py не пропустит example.com в published-статье
 related: []
 next: []
 ---
@@ -104,15 +108,15 @@ def parse_args() -> argparse.Namespace:
     ap = argparse.ArgumentParser(
         description="Создать статью, обновить content-manifest.json и опубликовать в index.html"
     )
-    ap.add_argument("section", help="Секция: betaflight|inav|ardupilot|px4|companion|tools")
+    ap.add_argument("section", help="Секция: " + "|".join(TAB_IDS))
     ap.add_argument("article_id", help="Уникальный id статьи, например px4-companion-jetson")
     ap.add_argument("title", help="Заголовок статьи")
     ap.add_argument("level", help="Уровень: L1|L2|L3|L4")
     ap.add_argument(
         "--status",
-        choices=("published", "draft"),
-        default="published",
-        help="Статус статьи в манифесте и front matter (по умолчанию: published)",
+        choices=("draft", "planned", "published"),
+        default="draft",
+        help="Статус статьи (по умолчанию: draft). published ставится вручную, когда текст готов",
     )
     ap.add_argument(
         "--no-publish",

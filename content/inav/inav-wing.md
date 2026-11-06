@@ -3,7 +3,7 @@ id: inav-wing
 title: "Настройка крыла"
 level: L2
 readingTime: "25 мин"
-status: published
+status: planned
 tags:
   - fixed-wing
 references:

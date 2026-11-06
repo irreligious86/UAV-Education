@@ -3,7 +3,7 @@ id: ap-companion
 title: "Companion + ArduPilot"
 level: L3
 readingTime: "30 мин"
-status: published
+status: planned
 tags:
   - companion
 references:

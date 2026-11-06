@@ -1,10 +1,10 @@
 ---
-id: bf-pid-tuning
+id: bf-pid-reg-in-bf
 title: "PID-тюнинг в Betaflight"
 level: L2
 readingTime: 25 мин
 firmware: Betaflight 4.5+
-status: draft
+status: published
 tags:
   - PID
   - tuning

@@ -3,7 +3,7 @@ id: ap-ekf
 title: "EKF и навигация"
 level: L3
 readingTime: "25 мин"
-status: published
+status: planned
 tags:
   - EKF
 references:

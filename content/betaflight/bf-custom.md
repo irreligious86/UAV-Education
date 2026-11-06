@@ -3,7 +3,7 @@ id: bf-custom
 title: "Кастомная сборка"
 level: L4
 readingTime: "15–20 мин"
-status: published
+status: planned
 tags:
   - build
 references:

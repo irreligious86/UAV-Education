@@ -133,17 +133,67 @@ def _markdown_body(text):
     return text
 
 
+VALID_STATUSES = ("published", "planned", "draft")
+
+# Fragments of the stub template. A published article containing any of them
+# is a placeholder pretending to be content — fail the build.
+PLACEHOLDER_MARKERS = (
+    "example.com",
+    "(черновик)",
+    "Заглушка",
+    "заменить конкретной ссылкой",
+)
+
+# A published article must have at least this many non-empty body lines.
+MIN_PUBLISHED_LINES = 25
+
+
+def validate_statuses(manifest):
+    errors = []
+    for sec in manifest.get("sections", []):
+        for art in sec.get("articles", []):
+            st = art.get("status")
+            if st not in VALID_STATUSES:
+                errors.append(
+                    f"{art.get('id')}: неизвестный status «{st}» (допустимо: {', '.join(VALID_STATUSES)})"
+                )
+    return errors
+
+
+def validate_front_matter_status(md_path, manifest_status):
+    """Front matter status must match the manifest (manifest is the source of truth)."""
+    if manifest_status is None:
+        return []
+    fm = _parse_front_matter(md_path.read_text(encoding="utf-8"))
+    if not fm:
+        return []
+    m = re.search(r"^status:\s*(\S+)", fm, re.MULTILINE)
+    if m and m.group(1) != manifest_status:
+        rel = md_path.relative_to(ROOT)
+        return [f"{rel}: status в front matter «{m.group(1)}» ≠ манифест «{manifest_status}»"]
+    return []
+
+
 def validate_published_sections(md_path, published):
     if not published:
         return []
     text = md_path.read_text(encoding="utf-8")
-    body = _markdown_body(text).lower()
+    raw_body = _markdown_body(text)
+    body = raw_body.lower()
     errors = []
     rel = md_path.relative_to(ROOT)
     for sec in REQUIRED_MD_HEADINGS:
         token = f"## {sec}"
         if token not in body:
             errors.append(f"{rel}: нет секции «{token}» (обязательно для published)")
+    for marker in PLACEHOLDER_MARKERS:
+        if marker.lower() in text.lower():
+            errors.append(f"{rel}: published-статья содержит заглушку «{marker}» — допиши или поставь status: planned")
+    lines = [ln for ln in raw_body.splitlines() if ln.strip()]
+    if len(lines) < MIN_PUBLISHED_LINES:
+        errors.append(
+            f"{rel}: published-статья слишком короткая ({len(lines)} строк < {MIN_PUBLISHED_LINES})"
+        )
     return errors
 
 
@@ -160,20 +210,23 @@ def main():
     all_ids_set = set(ids)
     errs.extend(validate_source_files(manifest))
 
-    published_by_file = {}
+    errs.extend(validate_statuses(manifest))
+
+    status_by_file = {}
     for sec in manifest.get("sections", []):
         for art in sec.get("articles", []):
             rel = art.get("sourceFile")
             if not rel:
                 continue
-            published_by_file[ROOT / rel] = art.get("status") == "published"
+            status_by_file[ROOT / rel] = art.get("status")
 
     for p in (ROOT / "content").rglob("*.md"):
-        if p.name.upper() == "README.MD":
+        if p.name.upper() == "README.MD" or p.name == "article-template.md":
             continue
         errs.extend(validate_related_in_frontmatter(p, all_ids_set))
-        pub = published_by_file.get(p, False)
-        errs.extend(validate_published_sections(p, pub))
+        st = status_by_file.get(p)
+        errs.extend(validate_front_matter_status(p, st))
+        errs.extend(validate_published_sections(p, st == "published"))
 
     if errs:
         print("Ошибки валидации:\n", file=sys.stderr)
@@ -181,9 +234,12 @@ def main():
             print(f"  - {e}", file=sys.stderr)
         sys.exit(1)
 
+    counts = {}
+    for st in status_by_file.values():
+        counts[st] = counts.get(st, 0) + 1
     print("validate_content: OK")
     print(f"  статей в манифесте: {len(ids)}")
-    print(f"  уникальных id: {len(all_ids_set)}")
+    print("  " + ", ".join(f"{k}: {v}" for k, v in sorted(counts.items())))
 
 
 if __name__ == "__main__":

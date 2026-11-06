@@ -3,7 +3,7 @@ id: comp-esp32
 title: "ESP32 и периферия"
 level: L2
 readingTime: "30 мин"
-status: published
+status: planned
 tags:
   - ESP32
 references:

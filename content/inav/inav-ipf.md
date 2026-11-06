@@ -3,7 +3,7 @@ id: inav-ipf
 title: "IPF и JavaScript"
 level: L3
 readingTime: "30 мин"
-status: published
+status: planned
 tags:
   - IPF
 references:

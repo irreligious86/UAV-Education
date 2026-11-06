@@ -9,14 +9,13 @@
 
 ## Пайплайн (этап 12)
 
-1. **Новая статья:** `python scripts/new_article.py <section> <id> "Заголовок" L2` — создаёт `.md`, строку в манифесте (`published` по умолчанию) и запускает автопубликацию.
+1. **Новая статья:** `python scripts/new_article.py <section> <id> "Заголовок" L2` — создаёт `.md` и строку в манифесте со статусом `draft` (по умолчанию). Когда текст готов — поставить `published` в манифесте и front matter.
 2. Заполнить **`content/<stack>/<id>.md`**: `summary`, `theory`, `practice`, `diagnostics`, `references`, опционально `checklist`, `notes`, …
-3. Для черновика используйте: `python scripts/new_article.py <section> <id> "Заголовок" L2 --status draft --no-publish`.
-4. **Безопасная команда публикации (Windows):** `publish-safe.bat`. Альтернатива: `python scripts/publish.py` — валидация, генерация TOC и HTML статей, подстановка в **`index.html`** между комментариями `<!-- AUTO:TOC:... -->` / `<!-- AUTO:ARTICLES:... -->` / `<!-- AUTO:PROGRESS:... -->`.
-5. Альтернатива: только проверка — `python scripts/validate_content.py`; только TOC в `build/` — `python scripts/build_content.py`.
+3. Слот в программе без текста: `--status planned` (видно на сайте как «скоро»).
+4. **Публикация:** `publish.bat` / `publish.sh`, или напрямую `python scripts/publish.py` — валидация, генерация TOC и HTML статей, подстановка в **`index.html`** между комментариями `<!-- AUTO:TOC:... -->` / `<!-- AUTO:ARTICLES:... -->` / `<!-- AUTO:PROGRESS:... -->`.
+5. Только проверка — `python scripts/validate_content.py`. То же самое выполняет CI на каждый push.
 6. Windows: **`publish.bat`** (вызов `publish.py`).
 
-Манифест из кода: **`python scripts/build_content.py --write-manifest`**. Черновики без файлов: **`python scripts/generate_content_stubs.py`**.
 
 **Важно:** блоки `orientation-guide` и таб-бар в `index.html` не трогаются; перезаписываются только участки между маркерами AUTO.
 

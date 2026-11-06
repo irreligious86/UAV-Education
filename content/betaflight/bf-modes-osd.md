@@ -3,7 +3,7 @@ id: bf-modes-osd
 title: "Режимы и OSD"
 level: L1
 readingTime: "15 мин"
-status: published
+status: planned
 tags:
   - modes
   - OSD

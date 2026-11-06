@@ -1,0 +1,52 @@
+# Content CI: every push/PR must keep content valid and index.html in sync with content/*.md.
+# GitHub Pages keeps serving main as-is; this workflow only guards what lands there.
+name: content-ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-and-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Validate content
+        run: python scripts/validate_content.py
+
+      - name: Rebuild index.html
+        run: python scripts/publish.py --skip-validate
+
+      - name: index.html must be committed in sync with content
+        run: |
+          if ! git diff --quiet -- index.html; then
+            echo "::error::index.html is stale. Run 'python scripts/publish.py' locally and commit the result."
+            git diff --stat -- index.html
+            exit 1
+          fi
+
+      - name: Check local links in index.html
+        run: |
+          python - <<'PY'
+          import re, sys, pathlib
+          html = pathlib.Path("index.html").read_text(encoding="utf-8")
+          ids = set(re.findall(r'id="([^"]+)"', html))
+          anchors = set(re.findall(r'href="#([^"]+)"', html))
+          missing = sorted(a for a in anchors if a not in ids)
+          files = set(re.findall(r'href="(?!https?:|#|mailto:)([^"]+)"', html))
+          missing_files = sorted(f for f in files if not pathlib.Path(f.split("#")[0]).exists())
+          for a in missing:
+              print(f"::error::broken anchor #{a}")
+          for f in missing_files:
+              print(f"::error::broken file link {f}")
+          sys.exit(1 if missing or missing_files else 0)
+          PY

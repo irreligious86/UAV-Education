@@ -3,7 +3,7 @@ id: px4-architecture
 title: "Архитектура и uORB"
 level: L2
 readingTime: "25 мин"
-status: published
+status: planned
 tags:
   - uORB
 references:

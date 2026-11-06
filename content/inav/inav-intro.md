@@ -3,7 +3,7 @@ id: inav-intro
 title: "Введение в INAV"
 level: L1
 readingTime: "12 мин"
-status: published
+status: planned
 tags:
   - INAV 7.0+
 references:

@@ -49,7 +49,7 @@ def publish_index(include_drafts: bool, dry_run: bool) -> None:
         sk = section["sectionKey"]
         arts = filter_articles(section, include_drafts=include_drafts)
         toc = render_toc_html(section, arts)
-        progress = render_progress_html(section, len(arts))
+        progress = render_progress_html(section, arts)
         articles_inner = "\n\n".join(
             render_article_html(a, include_drafts=include_drafts) for a in arts
         ).strip()

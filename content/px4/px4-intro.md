@@ -3,7 +3,7 @@ id: px4-intro
 title: "Введение в PX4"
 level: L1
 readingTime: "15 мин"
-status: published
+status: planned
 tags:
   - PX4 1.15+
 references:

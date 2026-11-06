@@ -1,16 +1,13 @@
 ---
 id: px4-companion-jetson
-title: "PX4 Companion Jatson Nano"
+title: "PX4 + Jetson Nano (companion)"
 level: L3
 readingTime: 15 мин
 firmware: PX4 1.15+
-status: draft
+status: published
 tags:
-  - черновик
-references:
-  - title: Official docs (заменить)
-    url: https://example.com
-    tier: primary | A
+  - Jetson
+  - offboard
 related: []
 next: []
 ---

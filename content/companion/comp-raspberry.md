@@ -3,7 +3,7 @@ id: comp-raspberry
 title: "Raspberry Pi + ArduPilot"
 level: L3
 readingTime: "40 мин"
-status: published
+status: planned
 tags:
   - Raspberry Pi
 references:

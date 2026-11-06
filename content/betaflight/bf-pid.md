@@ -3,7 +3,7 @@ id: bf-pid
 title: "PID-тюнинг"
 level: L2
 readingTime: "20 мин"
-status: published
+status: planned
 tags:
   - PID
 references:

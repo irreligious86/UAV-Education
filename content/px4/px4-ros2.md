@@ -3,7 +3,7 @@ id: px4-ros2
 title: "ROS 2 интеграция"
 level: L3
 readingTime: "35 мин"
-status: published
+status: planned
 tags:
   - ROS 2
 references:

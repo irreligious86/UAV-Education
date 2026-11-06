@@ -543,7 +543,7 @@
             </article>
             <article class="card">
               <h3>3. Проверить и пересобрать безопасно</h3>
-              <pre><code>publish-safe.bat</code></pre>
+              <pre><code>publish.bat</code></pre>
               <p>Порядок: проверка Python → валидация → публикация в <code>index.html</code> с понятными ошибками.</p>
             </article>
             <article class="card">
@@ -556,8 +556,8 @@
           <ul>
             <li>Создать статью через <code>new_article.py</code>.</li>
             <li>Заполнить текст и источники в <code>.md</code>.</li>
-            <li>Запустить <code>publish-safe.bat</code> и проверить результат в <code>index.html</code>.</li>
-            <li>После проверки — коммит/push через <code>publish-git.bat</code> или <code>publish-git.sh</code>.</li>
+            <li>Запустить <code>publish.bat</code> и проверить результат в <code>index.html</code>.</li>
+            <li>После проверки — <code>git commit</code> + <code>git push</code>; CI на GitHub повторит валидацию и проверит, что <code>index.html</code> пересобран.</li>
           </ul>
         </section>
 
@@ -572,8 +572,9 @@
               <h3><code>scripts/new_article.py</code></h3>
               <p><strong>Для чего:</strong> создать новую статью, добавить её в манифест, при необходимости сразу опубликовать.</p>
               <pre><code>python scripts/new_article.py px4 px4-vision "Компьютерное зрение в PX4" L3</code></pre>
-              <p><strong>Черновик без публикации:</strong></p>
-              <pre><code>python scripts/new_article.py px4 px4-vision "Компьютерное зрение в PX4" L3 --status draft --no-publish</code></pre>
+              <p><strong>Без автопубликации:</strong></p>
+              <pre><code>python scripts/new_article.py px4 px4-vision "Компьютерное зрение в PX4" L3 --no-publish</code></pre>
+              <p>По умолчанию статья создаётся как <code>draft</code>. Слот без текста — <code>--status planned</code>.</p>
             </article>
             <article class="card">
               <h3><code>scripts/validate_content.py</code></h3>
@@ -590,32 +591,10 @@
 python scripts/publish.py --dry-run</code></pre>
             </article>
             <article class="card">
-              <h3><code>publish-safe.bat</code></h3>
-              <p><strong>Для чего:</strong> безопасный сценарий «Python → валидация → публикация» с понятными сообщениями об ошибках.</p>
-              <pre><code>publish-safe.bat</code></pre>
-            </article>
-            <article class="card">
               <h3><code>publish.bat</code> / <code>publish.sh</code></h3>
-              <p><strong>Для чего:</strong> быстрый ручной запуск публикации без дополнительной диагностики.</p>
+              <p><strong>Для чего:</strong> «валидация → публикация» одной командой. Commit/push — вручную.</p>
               <pre><code>publish.bat
 bash publish.sh</code></pre>
-            </article>
-            <article class="card">
-              <h3><code>publish-git.bat</code> / <code>publish-git.sh</code></h3>
-              <p><strong>Для чего:</strong> собрать сайт и выполнить git-цикл (commit/push) в одном запуске.</p>
-              <pre><code>publish-git.bat
-bash publish-git.sh</code></pre>
-            </article>
-            <article class="card">
-              <h3><code>scripts/generate_content_stubs.py</code></h3>
-              <p><strong>Для чего:</strong> массово создать недостающие <code>content/*.md</code> по манифесту.</p>
-              <pre><code>python scripts/generate_content_stubs.py</code></pre>
-            </article>
-            <article class="card">
-              <h3><code>scripts/build_content.py</code></h3>
-              <p><strong>Для чего:</strong> служебная сборка TOC-файлов в <code>build/</code> и техобновление манифеста из <code>_manifest_data.py</code>.</p>
-              <pre><code>python scripts/build_content.py
-python scripts/build_content.py --write-manifest</code></pre>
             </article>
           </div>
         </section>
@@ -637,7 +616,7 @@ python scripts/build_content.py --write-manifest</code></pre>
             </li>
             <li>
               <strong>Опубликуйте безопасно:</strong>
-              <pre><code>publish-safe.bat</code></pre>
+              <pre><code>publish.bat</code></pre>
             </li>
             <li>
               <strong>Проверьте результат в браузере:</strong> статья должна появиться в нужной вкладке и в её TOC.
@@ -653,7 +632,7 @@ python scripts/build_content.py --write-manifest</code></pre>
             <li>Создать черновик: <code>python scripts/new_article.py inav inav-test "Тестовая статья" L1 --status draft --no-publish</code></li>
             <li>Доработать текст в <code>content/*.md</code>.</li>
             <li>Когда готово — сменить статус на <code>published</code> в манифесте.</li>
-            <li>Запустить <code>publish-safe.bat</code>.</li>
+            <li>Запустить <code>publish.bat</code>.</li>
           </ol>
         </section>
       </section>
@@ -716,7 +695,7 @@ python scripts/build_content.py --write-manifest</code></pre>
           <p class="muted">
             Идея → <code>new_article.py</code> → заполнение <code>content/&lt;stack&gt;/&lt;id&gt;.md</code> →
             чек-лист и источники (<code>data/references.json</code> или <code>archive/references.json</code>, опционально) →
-            <code>publish-safe.bat</code> → проверка статьи и TOC в <code>index.html</code> →
+            <code>publish.bat</code> → проверка статьи и TOC в <code>index.html</code> →
             ревью → запись в раздел Changelog файла <code>PROJECT-DIRECTIVES.md</code>.
           </p>
 
@@ -823,9 +802,9 @@ python scripts/build_content.py --write-manifest</code></pre>
                 <tr><td><code>PROJECT-DIRECTIVES.md</code></td><td>Единый источник проектных директив и changelog</td><td>Актуальный</td></tr>
                 <tr><td><code>.gitignore</code></td><td>Правила игнорирования для Git</td><td>Технический</td></tr>
                 <tr><td><code>.cursorignore</code></td><td>Фильтр контекста для работы ИИ в Cursor</td><td>Технический</td></tr>
-                <tr><td><code>publish-safe.bat</code></td><td>Безопасный сценарий: проверка среды, валидация, публикация</td><td>Рекомендуемый запуск (Windows)</td></tr>
+                <tr><td><code>publish.bat</code></td><td>Безопасный сценарий: проверка среды, валидация, публикация</td><td>Рекомендуемый запуск (Windows)</td></tr>
                 <tr><td><code>publish.bat</code> / <code>publish.sh</code></td><td>Быстрая публикация без расширенной диагностики</td><td>Операционный</td></tr>
-                <tr><td><code>publish-git.bat</code> / <code>publish-git.sh</code></td><td>Публикация + git commit/push</td><td>Операционный</td></tr>
+                <tr><td><code>.github/workflows/ci.yml</code></td><td>CI: валидация, свежесть index.html, проверка ссылок</td><td>Автоматически на push</td></tr>
               </tbody>
             </table>
 
@@ -854,8 +833,6 @@ python scripts/build_content.py --write-manifest</code></pre>
                 <tr><td><code>scripts/validate_content.py</code></td><td>Проверяет целостность контента и манифеста</td><td>Перед публикацией и перед коммитом</td></tr>
                 <tr><td><code>scripts/publish.py</code></td><td>Собирает TOC/статьи/прогресс и пишет в <code>index.html</code></td><td>Основной этап публикации</td></tr>
                 <tr><td><code>scripts/content_pipeline.py</code></td><td>Общая библиотека парсинга и рендера для пайплайна</td><td>Вызывается из других скриптов</td></tr>
-                <tr><td><code>scripts/build_content.py</code></td><td>Служебная генерация TOC и техоперации с манифестом</td><td>Вспомогательно</td></tr>
-                <tr><td><code>scripts/generate_content_stubs.py</code></td><td>Создаёт недостающие md-заглушки по манифесту</td><td>При массовом наполнении</td></tr>
                 <tr><td><code>scripts/bootstrap_from_index.py</code></td><td>Разовый backup/миграционный инструмент</td><td>Редко, перед экспериментами</td></tr>
                 <tr><td><code>scripts/build-content.py</code> / <code>scripts/validate-content.py</code></td><td>Совместимые обёртки для старого нейминга</td><td>Оставлены для совместимости</td></tr>
                 <tr><td><code>scripts/_manifest_data.py</code></td><td>Служебный модуль данных для генерации манифеста</td><td>Опциональный сценарий</td></tr>
@@ -878,7 +855,7 @@ python scripts/build_content.py --write-manifest</code></pre>
             <ul>
               <li><strong>Рендер сайта:</strong> <code>index.html</code> + <code>style.css</code>.</li>
               <li><strong>Контент:</strong> <code>content/</code> + <code>data/content-manifest.json</code>.</li>
-              <li><strong>Публикация:</strong> <code>scripts/validate_content.py</code> + <code>scripts/publish.py</code> (или <code>publish-safe.bat</code>).</li>
+              <li><strong>Публикация:</strong> <code>scripts/validate_content.py</code> + <code>scripts/publish.py</code> (или <code>publish.bat</code>).</li>
               <li><strong>Директивы:</strong> <code>PROJECT-DIRECTIVES.md</code>.</li>
             </ul>
           </article>

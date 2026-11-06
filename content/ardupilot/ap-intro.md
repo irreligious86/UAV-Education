@@ -3,7 +3,7 @@ id: ap-intro
 title: "Введение в ArduPilot"
 level: L1
 readingTime: "15 мин"
-status: published
+status: planned
 tags:
   - ArduPilot 4.5+
 references:

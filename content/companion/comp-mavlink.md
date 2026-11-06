@@ -3,7 +3,7 @@ id: comp-mavlink
 title: "MAVLink и MAVSDK"
 level: L2
 readingTime: "25 мин"
-status: published
+status: planned
 tags:
   - MAVSDK
 references:
