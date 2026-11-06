@@ -1348,6 +1348,16 @@ refactor: унификация CSS-переменных
 
 ---
 
+## [2026-11-07]
+
+- **Честные статусы:** новый статус `planned` — 20 статей-заглушек больше не помечены как `published`; на сайте пометка «скоро», прогресс разделов считает только написанные модули.
+- **Строгий валидатор:** `validate_content.py` не пропускает заглушки (`example.com`, текст шаблона), слишком короткие статьи и расхождение статуса в front matter и манифесте.
+- **CI:** `.github/workflows/ci.yml` — валидация, проверка свежести `index.html`, проверка локальных ссылок на каждый push.
+- **Удалены** устаревшие скрипты: `build-content.py`, `validate-content.py`, `build_content.py`, `_manifest_data.py` (мог перезаписать манифест устаревшей копией), `generate_content_stubs.py` (генерировал заглушки как `published`), `bootstrap_from_index.py`, `publish-git.*`, `publish-safe.bat`.
+- **Новый раздел «Радиолинк»:** `link-protocols`, `link-elrs`, `link-vtx`.
+- **Betaflight:** `bf-failsafe`, `bf-rpm-filter`, `bf-cli-automation`.
+- **План развития** вынесен в `ROADMAP.md`.
+
 ## [Unreleased]
 
 - Дальнейшее наполнение модулей `index.html` (целевые объёмы — в концепции проекта) и актуализация `archive/references.json`.
@@ -1457,7 +1467,7 @@ refactor: унификация CSS-переменных
 
 ## Заметки
 
-_(добавляйте по мере работы)_
+Актуальный план по фазам — в **`ROADMAP.md`** в корне репозитория.
 
 
 ---
