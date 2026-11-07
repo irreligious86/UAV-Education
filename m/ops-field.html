@@ -32,15 +32,51 @@
     <article class="module" data-module-page="ops-field">
       <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-operator">Оператор</a><span>Полевые операции и работа команды</span></p>
       <h1 class="module-title">Полевые операции и работа команды</h1>
-      <div class="module-tags"><span class="gc-tag" title="Уровень">L2 — Интегратор</span><span class="gc-tag">учёба ~3 ч</span><span class="gc-tag" data-state="caution">СКОРО</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ОСВОЕН</span></div>
+      <div class="module-tags"><span class="gc-tag" title="Уровень">L2 — Интегратор</span><span class="gc-tag">чтение 25 мин</span><span class="gc-tag">учёба ~3 ч</span><span class="gc-tag">любая прошивка</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ОСВОЕН</span></div>
       <p class="gc-muted module-score" data-module-score></p>
-      
+      <p class="module-lead">Большинство аварий случается не из-за прошивки, а из-за организации: не проверили частоты у соседей, не договорились, кто смотрит за аппаратом, не было плана на потерю связи. Модуль — про операции как дисциплину: планирование вылета, роли в команде, частоты и связь, предполётный и послеполётный протокол, действия при инциденте и поиск упавшего аппарата. Основано на практике работы нескольких пилотов на одной площадке.</p>
       <div class="gc-callout" data-state="ok"><strong>После модуля ты умеешь</strong><ul><li>планировать вылет: площадка, погода, частоты, роли в команде</li><li>вести предполётный/послеполётный протокол и журнал</li><li>действовать при инциденте: потеря связи, падение, поиск</li></ul></div><p class="gc-muted">Перед этим модулем: <a href="bf-failsafe.html">Failsafe: стадии и тест по свитчу</a>, <a href="f-regulations.html">Правила, зоны и ответственность оператора</a></p><div class="gc-callout lab"><p class="gc-label gc-muted">Лабораторная</p><strong>Протокол вылета</strong><p class="gc-muted lab__hint">Сдано, когда отмечены все пункты:</p><ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="ops-field:lab:0"><span>Карта площадки с зонами и частотами</span></label></li><li><label><input type="checkbox" data-check-id="ops-field:lab:1"><span>Распределение ролей и связь в команде</span></label></li><li><label><input type="checkbox" data-check-id="ops-field:lab:2"><span>Разбор одного инцидента по протоколу</span></label></li></ul></div><div class="path-pos gc-muted"><span class="gc-label">В пути</span><ul><li><a href="../path/betaflight.html">Betaflight</a>: шаг 17 из 36 → <a href="el-power-design.html">Схемотехника питания борта</a></li></ul></div>
       <div class="gc-prose module-body">
-<div class="gc-callout" data-state="caution"><strong>Модуль в разработке.</strong> Цели и связи уже определены, текст пишется. План — в <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">ROADMAP</a>.</div>
+<h2>Теория</h2>
+<h4 class="md-subheading">Планирование вылета</h4>
+<p>До выезда известно: площадка и зоны (модуль про правила), погода (ветер по высотам, осадки, температура — холод режет ёмкость LiPo), цель вылета и критерии успеха, кто участвует и в каких ролях, какие частоты занимают соседи.</p>
+<h4 class="md-subheading">Роли</h4>
+<p>Даже вдвоём роли стоит назвать явно:</p>
+<ul><li><strong>Пилот</strong> — управляет, ничем другим не занят.</li><li><strong>Наблюдатель (spotter)</strong> — следит за аппаратом глазами и за окружением: люди, птицы, другие аппараты; говорит пилоту, не отвлекая.</li><li><strong>Техник / GCS</strong> — телеметрия, параметры, логи, замена АКБ, таймер.</li><li><strong>Старший</strong> — решает «летим / не летим», ведёт журнал.</li></ul>
+<p>Один человек может совмещать, но пилот в полёте — только пилот.</p>
+<h4 class="md-subheading">Частоты и связь</h4>
+<ul><li><strong>Видео</strong>: таблица занятых каналов на площадке; разнос с соседями (ориентир ≥ ~37 МГц для аналога); смена канала — по алгоритму из модуля про VTX, сначала на одном борту.</li><li><strong>RC</strong>: binding phrase уникальна; packet rate под задачу; при нескольких ELRS-пультах — разные фразы, иначе паттерны прыжков совпадут.</li><li><strong>Голос</strong>: короткие стандартные фразы: «арм», «взлёт», «связь», «низкая батарея», «садимся», «аварийно». Пилот подтверждает одним словом.</li></ul>
+<h4 class="md-subheading">Протоколы</h4>
+<p><strong>Предполётный</strong> (из модуля про безопасность, дополненный): частоты согласованы, роли названы, АКБ напряжение записано, failsafe проверен на этом аппарате, таймер запущен при арме.</p>
+<p><strong>Послеполётный</strong>: дизарм, АКБ отключена, температура моторов, осмотр пропов и рамы, запись в журнал (время, АКБ до/после, замечания), лог сохранён, если вылет тестовый.</p>
+<h4 class="md-subheading">Инциденты</h4>
+<ul><li><strong>Потеря связи</strong>: пилот сообщает, все смотрят на аппарат, никто не бежит. Аппарат делает то, что настроено в failsafe — поэтому failsafe и проверяют заранее.</li><li><strong>Падение</strong>: место по последней телеметрии/видео, пищалка (BEEPER), GPS-координаты из лога GCS. Подход к упавшему аппарату — АКБ может быть повреждена: не трогать горячую/вздутую, не заряжать.</li><li><strong>Травма</strong>: помощь, экстренные службы, потом всё остальное.</li><li><strong>Разбор</strong>: что случилось, по логу, без поиска виноватых; вывод — в журнал и в чек-лист.</li></ul>
+<h4 class="md-subheading">Кейс</h4>
+<p>Рабочий канал E5 (6510 МГц) оказался занят упавшим бортом, который продолжал вещать до конца смены. Решение: выбран F1 (6590 МГц) как ближайшая свободная частота с учётом каналов двух соседей, смена сначала на двух передатчиках и нескольких дронах для теста, затем на всех. Главный урок: таблица занятых частот по площадке должна существовать до инцидента.</p>
+
+<h2>Практика</h2>
+<h4 class="md-subheading">Шаг 1. Карта площадки</h4>
+<p>Схема: точка взлёта/посадки, зона полётов, запретные направления (люди, дорога, провода), место команды, подход при посадке. Частоты соседей в таблице.</p>
+<h4 class="md-subheading">Шаг 2. Протокол на одной странице</h4>
+<p>Распечатать: роли, стандартные фразы, предполётный и послеполётный чек-листы, действия при инциденте, телефоны.</p>
+<h4 class="md-subheading">Шаг 3. Прогон</h4>
+<p>Один вылет строго по протоколу, с таймером и журналом. После — что было неудобно, исправить в протоколе.</p>
+<h4 class="md-subheading">Шаг 4. Разбор инцидента</h4>
+<p>Взять реальный или учебный инцидент (потеря связи, падение), разобрать по логу: причина, что сработало, что нет, какое изменение в протокол.</p>
+
+<h2>Диагностика</h2>
+<div class="diag-groups"><article class="diag-item"><h4><strong>Симптом:</strong> помехи в видео посреди вылета</h4><ul><li>Возможная причина: сосед включился на соседней частоте.</li><li>Что сделать: таблица частот, разнос, при необходимости посадка и смена канала.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> два пульта мешают друг другу</h4><ul><li>Возможная причина: одинаковая binding phrase или перегруженный диапазон.</li><li>Что сделать: уникальные фразы, снизить мощность рядом, разнести по времени.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> упавший аппарат не найден</h4><ul><li>Возможная причина: нет последних координат, пищалка не настроена.</li><li>Что сделать: BEEPER на тумблер, GCS с записью tlog, последняя точка по видео.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> пилот отвлёкся на телеметрию и потерял аппарат из виду</h4><ul><li>Возможная причина: нет распределения ролей.</li><li>Что сделать: наблюдатель и техник — отдельные люди.</li></ul></article></div>
+
+<h2>Чек-лист</h2>
+<ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="ops-field:0"><span>Карта площадки с зонами и таблица частот есть</span></label></li><li><label><input type="checkbox" data-check-id="ops-field:1"><span>Роли названы, пилот в полёте только пилот</span></label></li><li><label><input type="checkbox" data-check-id="ops-field:2"><span>Протокол на одной странице распечатан</span></label></li><li><label><input type="checkbox" data-check-id="ops-field:3"><span>Прогон по протоколу выполнен, журнал заполнен</span></label></li><li><label><input type="checkbox" data-check-id="ops-field:4"><span>Разбор инцидента проведён и дал изменение в протоколе</span></label></li></ul>
+
+<h2>Источники</h2>
+<ul class="refs"><li><a href="https://ardupilot.org/copter/docs/safety-multicopter.html" target="_blank" rel="noopener noreferrer">Safety — ArduPilot Copter</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://github.com/iNavFlight/inav/blob/master/docs/Safety.md" target="_blank" rel="noopener noreferrer">INAV Safety</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://www.betaflight.com/docs/wiki/guides/current/Arming-Sequence-And-Safety" target="_blank" rel="noopener noreferrer">Betaflight Arming Sequence &amp; Safety</a> <span class="gc-tag" data-state="info">primary</span></li></ul>
+<h2>Проверь себя</h2>
+<uav-quiz src="../quiz/ops-field.json" module="ops-field"></uav-quiz>
       </div>
-      
-      
+      <div class="module-done"><gc-button variant="secondary" data-done-toggle="ops-field">Отметить как пройденный</gc-button></div>
+      <section class="related" aria-label="Смежные модули"><p class="gc-label gc-muted">Смежные модули</p><div class="gc-grid ref-grid"><a class="gc-card" href="f-regulations.html"><strong>Правила, зоны и ответственность оператора</strong><div class="gc-card__meta"><span class="gc-tag" title="L1 — Оператор">L1</span></div></a><a class="gc-card" href="bf-failsafe.html"><strong>Failsafe: стадии и тест по свитчу</strong><div class="gc-card__meta"><span class="gc-tag" title="L1 — Оператор">L1</span></div></a><a class="gc-card" href="link-vtx.html"><strong>VTX-таблицы и смена видеоканала</strong><div class="gc-card__meta"><span class="gc-tag" title="L2 — Интегратор">L2</span></div></a></div></section>
       <nav class="pager" aria-label="Соседние модули"><a class="gc-card pager__prev" href="link-vtx.html"><span class="gc-label gc-muted">Назад</span><br>VTX-таблицы и смена видеоканала</a></nav>
     </article>
   </main>

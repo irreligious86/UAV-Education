@@ -32,15 +32,44 @@
     <article class="module" data-module-page="f-regulations">
       <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-foundation">Фундамент</a><span>Правила, зоны и ответственность оператора</span></p>
       <h1 class="module-title">Правила, зоны и ответственность оператора</h1>
-      <div class="module-tags"><span class="gc-tag" title="Уровень">L1 — Оператор</span><span class="gc-tag">учёба ~2 ч</span><span class="gc-tag" data-state="caution">СКОРО</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ОСВОЕН</span></div>
+      <div class="module-tags"><span class="gc-tag" title="Уровень">L1 — Оператор</span><span class="gc-tag">чтение 20 мин</span><span class="gc-tag">учёба ~2 ч</span><span class="gc-tag">любая прошивка</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ОСВОЕН</span></div>
       <p class="gc-muted module-score" data-module-score></p>
-      
+      <p class="module-lead">Инженер БПЛА отвечает не только за то, чтобы аппарат летал, но и за то, где и как он летает. Правила отличаются по странам и меняются каждый год, поэтому модуль не пересказывает их, а учит находить актуальные, понимать общую логику (категории риска, зоны, высоты, регистрация, страховка) и вести документацию оператора. Это не юридическая консультация: источник истины — регулятор твоей страны.</p>
       <div class="gc-callout" data-state="ok"><strong>После модуля ты умеешь</strong><ul><li>найти актуальные правила своей страны: регистрация, категории, высоты, зоны</li><li>вести журнал оператора и полётов</li><li>оценить риск площадки по чек-листу</li></ul></div><p class="gc-muted">Перед этим модулем: <a href="f-safety.html">Безопасность и предполётный чек</a></p><div class="gc-callout lab"><p class="gc-label gc-muted">Лабораторная</p><strong>Карта правил</strong><p class="gc-muted lab__hint">Сдано, когда отмечены все пункты:</p><ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="f-regulations:lab:0"><span>Актуальные правила своей страны найдены и законспектированы со ссылками</span></label></li><li><label><input type="checkbox" data-check-id="f-regulations:lab:1"><span>Зоны вокруг своей площадки проверены</span></label></li><li><label><input type="checkbox" data-check-id="f-regulations:lab:2"><span>Журнал оператора заведён</span></label></li></ul></div><div class="path-pos gc-muted"><span class="gc-label">В пути</span><ul><li><a href="../path/betaflight.html">Betaflight</a>: шаг 8 из 36 → <a href="tools-overview.html">Инструменты: Configurator, GCS, git</a></li><li><a href="../path/inav.html">INAV</a>: шаг 6 из 16 → <a href="tools-overview.html">Инструменты: Configurator, GCS, git</a></li><li><a href="../path/ardupilot.html">ArduPilot</a>: шаг 8 из 43 → <a href="tools-overview.html">Инструменты: Configurator, GCS, git</a></li></ul></div>
       <div class="gc-prose module-body">
-<div class="gc-callout" data-state="caution"><strong>Модуль в разработке.</strong> Цели и связи уже определены, текст пишется. План — в <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">ROADMAP</a>.</div>
+<h2>Теория</h2>
+<h4 class="md-subheading">Общая логика регулирования</h4>
+<p>Большинство стран строят правила вокруг <strong>риска</strong>: масса аппарата, близость к людям и инфраструктуре, высота, видимость. Типовые элементы:</p>
+<ul><li><strong>Регистрация</strong> оператора и/или аппарата выше некоторой массы.</li><li><strong>Категории операций</strong>: от «открытой» (малые аппараты, в прямой видимости, вдали от людей) до «специальной» и «сертифицированной» (разрешения, оценка риска).</li><li><strong>Ограничение высоты</strong> над землёй (часто около 120 м / 400 футов в открытой категории).</li><li><strong>Зоны</strong>: аэродромы, города, объекты инфраструктуры, границы, военные объекты — запрет или разрешение.</li><li><strong>Прямая видимость</strong> (VLOS) как базовое требование; полёты за её пределами (BVLOS) — отдельные разрешения.</li><li><strong>Ночные полёты, полёты над людьми</strong> — отдельные условия.</li><li><strong>Страхование ответственности</strong> — обязательно или настоятельно рекомендуется.</li></ul>
+<h4 class="md-subheading">Что это значит для инженера</h4>
+<ul><li>Тестовые полёты — тоже полёты: те же правила.</li><li>Автономные миссии и BVLOS — почти всегда отдельная категория. Планируй их законно или в симуляторе.</li><li>Частоты RC и видео регулируются отдельно: мощность и диапазоны VTX, разрешённые каналы ELRS/900 МГц зависят от страны.</li><li>Ответственность — на операторе и на владельце. Журнал полётов — твоя защита при инциденте.</li></ul>
+<h4 class="md-subheading">Документация оператора</h4>
+<p>Минимум, который ведут профессионалы:</p>
+<ul><li><strong>Журнал оператора</strong>: дата, место, аппарат, длительность, цель, инциденты.</li><li><strong>Журнал аппарата</strong>: конфигурации, ремонты, замены, наработка моторов/АКБ.</li><li><strong>Паспорт сборки</strong> (из capstone «Фундамента»): масса, силовая установка, частоты.</li><li><strong>Оценка риска площадки</strong>: люди, препятствия, зоны, погода, план на отказ.</li></ul>
+
+<h2>Практика</h2>
+<h4 class="md-subheading">Шаг 1. Найти правила своей страны</h4>
+<ol><li>Регулятор гражданской авиации своей страны — официальный сайт, раздел о беспилотниках.</li><li>Записать со ссылками: регистрация (с какой массы), категории, высота, зоны, VLOS/BVLOS, страхование.</li><li>Отдельно — правила по радиочастотам (мощность VTX, диапазоны).</li><li>Дата проверки — в заметке: через год проверить снова.</li></ol>
+<h4 class="md-subheading">Шаг 2. Карта зон вокруг своей площадки</h4>
+<p>Найти официальную карту зон (у многих регуляторов есть сервис или приложение). Отметить ближайшие аэродромы и запретные зоны, определить, где летать можно без разрешения.</p>
+<h4 class="md-subheading">Шаг 3. Завести журналы</h4>
+<p>Два файла в репозитории дронов: <code>operator-log.md</code> и <code>&lt;дрон&gt;/log.md</code>. Первая запись — сегодня.</p>
+<h4 class="md-subheading">Шаг 4. Оценка риска площадки</h4>
+<p>Чек-лист на одну страницу: люди и животные, препятствия и провода, зона и высота, погода (ветер, осадки, температура АКБ), план при потере связи (куда упадёт при DROP, куда полетит при RTH), контакт экстренных служб.</p>
+
+<h2>Диагностика</h2>
+<div class="diag-groups"><article class="diag-item"><h4><strong>Симптом:</strong> не ясно, нужна ли регистрация</h4><ul><li>Возможная причина: пороговая масса отличается по странам и меняется.</li><li>Что сделать: смотреть только официальный источник, записать дату проверки.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> площадка «вроде свободна», но рядом аэродром</h4><ul><li>Возможная причина: зоны аэродромов часто простираются на километры.</li><li>Что сделать: официальная карта зон, при сомнении — не летать.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> инцидент с третьими лицами</h4><ul><li>Возможная причина: любой.</li><li>Что сделать: помощь пострадавшим, фиксация, уведомление по правилам страны, журнал.</li></ul></article></div>
+
+<h2>Чек-лист</h2>
+<ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="f-regulations:0"><span>Правила своей страны найдены на официальном сайте и законспектированы с датой</span></label></li><li><label><input type="checkbox" data-check-id="f-regulations:1"><span>Зоны вокруг площадки проверены по официальной карте</span></label></li><li><label><input type="checkbox" data-check-id="f-regulations:2"><span>Журналы оператора и аппарата заведены</span></label></li><li><label><input type="checkbox" data-check-id="f-regulations:3"><span>Оценка риска площадки написана</span></label></li><li><label><input type="checkbox" data-check-id="f-regulations:4"><span>Знаю ограничения на частоты и мощность VTX/RC в своей стране</span></label></li></ul>
+
+<h2>Источники</h2>
+<ul class="refs"><li><a href="https://www.icao.int/safety/UA" target="_blank" rel="noopener noreferrer">ICAO — Unmanned Aircraft Systems (UAS)</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://www.easa.europa.eu/en/domains/civil-drones" target="_blank" rel="noopener noreferrer">EASA — Civil drones (пример структуры правил: открытая/специальная/сертифицированная категории)</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://www.faa.gov/uas" target="_blank" rel="noopener noreferrer">FAA — Unmanned Aircraft Systems (пример: Part 107, Recreational Flyers)</a> <span class="gc-tag" data-state="info">primary</span></li></ul>
+<h2>Проверь себя</h2>
+<uav-quiz src="../quiz/f-regulations.json" module="f-regulations"></uav-quiz>
       </div>
-      
-      
+      <div class="module-done"><gc-button variant="secondary" data-done-toggle="f-regulations">Отметить как пройденный</gc-button></div>
+      <section class="related" aria-label="Смежные модули"><p class="gc-label gc-muted">Смежные модули</p><div class="gc-grid ref-grid"><a class="gc-card" href="f-safety.html"><strong>Безопасность и предполётный чек</strong><div class="gc-card__meta"><span class="gc-tag" title="L1 — Оператор">L1</span></div></a><a class="gc-card" href="ops-field.html"><strong>Полевые операции и работа команды</strong><div class="gc-card__meta"><span class="gc-tag" title="L2 — Интегратор">L2</span></div></a></div></section>
       <nav class="pager" aria-label="Соседние модули"><a class="gc-card pager__prev" href="f-safety.html"><span class="gc-label gc-muted">Назад</span><br>Безопасность и предполётный чек</a><a class="gc-card pager__next" href="tools-overview.html"><span class="gc-label gc-muted">Дальше</span><br>Инструменты: Configurator, GCS, git</a></nav>
     </article>
   </main>
