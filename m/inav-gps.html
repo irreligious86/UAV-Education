@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>GPS-навигация в INAV — UAV Student</title>
-  <meta name="description" content="Инженерный курс по БПЛА: от физики полёта до своих прошивок и бортовых компьютеров.">
+  <title>GPS, компас и RTH в INAV — UAV Student</title>
+  <meta name="description" content="подключить и проверить GPS и компас настроить высоту RTH и safehomes под местность">
   <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="../lib/ground-control-ui/dist/ground-control.css">
   <link rel="stylesheet" href="../assets/site.css">
@@ -30,35 +30,58 @@
   </header>
   <main class="gc-container site-main">
     <article class="module" data-module-page="inav-gps">
-      <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-inav">Электив: INAV</a><span>GPS-навигация в INAV</span></p>
-      <h1 class="module-title">GPS-навигация в INAV</h1>
-      <div class="module-tags"><span class="gc-tag" title="Уровень">L2 — Интегратор</span><span class="gc-tag">чтение 20 мин</span><span class="gc-tag">учёба ~3 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ОСВОЕН</span></div>
+      <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-inav">Электив: INAV</a><span>GPS, компас и RTH в INAV</span></p>
+      <h1 class="module-title">GPS, компас и RTH в INAV</h1>
+      <div class="module-tags"><span class="gc-tag" title="Уровень">L2 — Интегратор</span><span class="gc-tag">чтение 25 мин</span><span class="gc-tag">учёба ~3 ч</span><span class="gc-tag">INAV 7.0+</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ОСВОЕН</span></div>
       <p class="gc-muted module-score" data-module-score></p>
-      <p class="module-lead">Базовая логика настройки GPS и компаса для устойчивой навигации в INAV: фиксация позиции, курс и условия для удержания и возврата домой.</p>
-      <div class="path-pos gc-muted"><span class="gc-label">В пути</span><ul><li><a href="../path/inav.html">INAV</a>: шаг 9 из 12 → <a href="inav-missions.html">Автономные миссии</a></li></ul></div>
+      <p class="module-lead">Навигация INAV стоит на трёх датчиках: GPS даёт позицию и скорость, компас — курс, барометр — высоту. Модуль разбирает, как их подключить и проверить, как работают ALTHOLD, POSHOLD и RTH изнутри, шесть режимов высоты возврата, safehomes и что делает INAV при потере GPS в полёте. Настройка RTH — самая важная настройка безопасности в INAV: это ещё и failsafe.</p>
+      <div class="gc-callout" data-state="ok"><strong>После модуля ты умеешь</strong><ul><li>подключить и проверить GPS и компас</li><li>настроить высоту RTH и safehomes под местность</li></ul></div><p class="gc-muted">Перед этим модулем: <a href="inav-intro.html">Введение в INAV</a></p><div class="gc-callout lab"><p class="gc-label gc-muted">Лабораторная</p><strong>RTH тумблером</strong><p class="gc-muted lab__hint">Сдано, когда отмечены все пункты:</p><ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="inav-gps:lab:0"><span>3D-фикс, дом записан в OSD</span></label></li><li><label><input type="checkbox" data-check-id="inav-gps:lab:1"><span>nav_rth_alt_mode/altitude выбраны и обоснованы</span></label></li><li><label><input type="checkbox" data-check-id="inav-gps:lab:2"><span>RTH с 30–50 м выполнен, HDOP и спутники записаны</span></label></li></ul></div><div class="path-pos gc-muted"><span class="gc-label">В пути</span><ul><li><a href="../path/inav.html">INAV</a>: шаг 9 из 12 → <a href="inav-missions.html">Миссии INAV: waypoints и CLI wp</a></li></ul></div>
       <div class="gc-prose module-body">
 <h2>Теория</h2>
-<p>INAV использует <strong>GPS</strong> для оценки горизонтальной позиции и скорости, <strong>магнитометр</strong> — для курса (при корректной ориентации и калибровке), <strong>барометр</strong> — для высоты. Без устойчивого 3D Fix и согласованного компаса режимы удержания позиции и RTH будут нестабильны или опасны.</p>
+<h4 class="md-subheading">Три датчика и их роли</h4>
+<ul><li><strong>GPS</strong> — горизонтальная позиция и скорость. Нужен 3D-фикс; качество — число спутников и HDOP в OSD.</li><li><strong>Компас</strong> — курс. У мультиротора обязателен для POSHOLD и RTH: без курса контроллер не знает, в какую сторону наклонить аппарат, чтобы лететь на север. Режимы с компасом заблокированы, пока он не откалиброван.</li><li><strong>Барометр</strong> — высота. У мультиротора обязателен для ALTHOLD/RTH.</li></ul>
+<p>У крыла курс можно получить из GPS ground course в движении, а стик-команда «сброс курса» позволяет задать его вручную, направив аппарат на север.</p>
+<h4 class="md-subheading">ALTHOLD</h4>
+<p>Газ управляет вертикальной скоростью: стик вверх — набор, в центре — удержание. <code>nav_use_midthr_for_althold</code> задаёт, что считать нейтралью: 50% или положение стика в момент включения.</p>
+<h4 class="md-subheading">POSHOLD</h4>
+<p>Полное 3D-удержание по GPS. <code>nav_user_control_mode</code>: GPS_ATTI — правый стик задаёт наклон, отпустил — записана новая точка; GPS_CRUISE — стик задаёт скорость, контроллер сам считает наклон.</p>
+<h4 class="md-subheading">RTH и высота возврата</h4>
+<p>Дом — точка первого арма (может быть смещена <code>nav_rth_home_offset_*</code> или заменена safehome). Главный параметр — <code>nav_rth_alt_mode</code> (значения CLI):</p>
+<ul><li><code>CURRENT</code> — вернуться на текущей высоте;</li><li><code>EXTRA</code> — текущая плюс <code>nav_rth_altitude</code>;</li><li><code>FIXED</code> — набрать/снизиться до <code>nav_rth_altitude</code> над точкой взлёта;</li><li><code>MAX</code> — максимальная высота полёта;</li><li><code>AT_LEAST</code> — как FIXED, но только набор, без снижения.</li></ul>
+<p>С <code>nav_rth_use_linear_descent = ON</code> аппарат, находясь выше высоты RTH, плавно снижается по пути так, чтобы прийти домой на <code>nav_rth_altitude</code> — экономит энергию. Для местности с деревьями и строениями <code>AT_LEAST</code> — разумный дефолт: возврат никогда не ниже заданного. После прихода домой мультиротор садится, крыло — кружит или садится по настройке.</p>
+<h4 class="md-subheading">Safehomes</h4>
+<p>До 8 точек. При арме выбирается ближайшая включённая в пределах <code>safehome_max_distance</code> (по умолчанию 200 м); при RTH она заменяет дом. <code>safehome_usage_mode</code>: OFF, RTH (любой RTH) или RTH_FS (только по failsafe).</p>
+<h4 class="md-subheading">Потеря GPS в полёте</h4>
+<p>Если во время RTH пропал нужный датчик, INAV после короткого таймаута выполняет аварийную посадку (как процедура LAND). Для крыла есть оценка позиции без GPS по компасу и барометру (<code>inav_allow_gps_fix_estimation</code>) — это страховка, а не замена GPS.</p>
 
 <h2>Практика</h2>
-<ol><li>Подключите GPS к свободному <strong>UART</strong> согласно распиновке и схеме питания (3.3 V / 5 V — по даташиту модуля).</li><li>В Configurator включите соответствующий порт как <strong>GPS</strong>, выставьте корректный <strong>baud rate</strong> (часто 57600 или 115200 — по документации приёмника).</li><li>Убедитесь, что в статусе видно определение устройства и поток данных (спутники / fix).</li><li>Выполните <strong>калибровку компаса</strong> вдали от металла и источников помех; проверьте ориентацию датчика в конфигурации.</li><li>На открытой площадке дождитесь <strong>устойчивого 3D Fix</strong>, затем сохраните <strong>home</strong> и проведите короткий тест в безопасных условиях.</li></ol>
+<h4 class="md-subheading">Шаг 1. Подключение</h4>
+<ol><li>GPS на свободный UART; в Ports — роль GPS; в Configuration — протокол (UBLOX) и скорость по документации модуля.</li><li>Компас по I2C (обычно в одном корпусе с GPS). Вынести на мачту, подальше от силовых проводов.</li><li>В конфигураторе: GPS выдаёт спутники, компас — курс, который поворачивается вместе с аппаратом в нужную сторону.</li></ol>
+<h4 class="md-subheading">Шаг 2. Калибровка компаса</h4>
+<p>На открытом месте, без металла рядом, вращать по всем осям в течение калибровки. Проверить <code>align_mag</code>: при повороте аппарата по часовой курс в конфигураторе растёт.</p>
+<h4 class="md-subheading">Шаг 3. RTH</h4>
+<pre class="cli-block"><code>set nav_rth_alt_mode = AT_LEAST
+set nav_rth_altitude = 5000
+set nav_rth_allow_landing = ALWAYS
+save</code></pre>
+<p>Высота в сантиметрах: 5000 = 50 м. Для посадки — <code>nav_rth_allow_landing</code>; для крыла обычно <code>FS_ONLY</code> или OFF с кружением.</p>
+<h4 class="md-subheading">Шаг 4. Тест</h4>
+<ol><li>Дождаться 3D-фикса, запомнить дом в OSD.</li><li>Отлететь на 30–50 м, включить RTH тумблером. Аппарат должен набрать высоту, вернуться, сесть (мультиротор).</li><li>Повторить с safehome, если используется.</li><li>Записать HDOP, спутники и поведение в журнал.</li></ol>
 
 <h2>Диагностика</h2>
-<ul class="diag-list"><li><strong>Нет fix / мало спутников:</strong> антенна, обзор неба, питание, помехи, некорректный порт или скорость UART.</li><li><strong>«Плавает» позиция:</strong> плохой fix, окружение (отражатели), необходимость перенастройки PD или проверки вибраций (см. фильтры/монтаж).</li><li><strong>Неверный курс / «кружит»:</strong> калибровка компаса, ориентация MAG, интерференция, конфликт с металлом/силовой проводкой.</li></ul>
-
-<h2>Заметки</h2>
-<h4 class="md-subheading">Oscar Liang · GPS basics</h4>
-<p>Полезен как <strong>вторичный</strong> практический обзор; сверять формулировки с официальной wiki и релизными заметками INAV.</p>
+<div class="diag-groups"><article class="diag-item"><h4><strong>Симптом:</strong> нет фикса или мало спутников</h4><ul><li>Возможная причина: антенна закрыта, помехи от VTX/силовых, неверный порт или скорость.</li><li>Что сделать: обзор неба, вынести GPS, проверить UART и протокол.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> в POSHOLD аппарат уплывает по спирали</h4><ul><li>Возможная причина: ошибка курса компаса.</li><li>Что сделать: калибровка, <code>align_mag</code>, убрать помехи.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> RTH набирает высоту «в небо»</h4><ul><li>Возможная причина: <code>nav_rth_alt_mode = EXTRA</code> с большим <code>nav_rth_altitude</code> или <code>MAX</code> после высокого полёта.</li><li>Что сделать: выбрать <code>AT_LEAST</code> и разумную высоту.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> по RTH сел не дома</h4><ul><li>Возможная причина: сработал safehome.</li><li>Что сделать: проверить список и <code>safehome_usage_mode</code>.</li></ul></article></div>
 
 <h2>Чек-лист</h2>
-<ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="inav-gps:0"><span>GPS определяется в конфигураторе и выдаёт данные</span></label></li><li><label><input type="checkbox" data-check-id="inav-gps:1"><span>Компас откалиброван, ориентация проверена</span></label></li><li><label><input type="checkbox" data-check-id="inav-gps:2"><span>Есть устойчивый <strong>3D Fix</strong> перед навигационными режимами</span></label></li><li><label><input type="checkbox" data-check-id="inav-gps:3"><span>Домашняя точка и логика RTH проверены в безопасной зоне</span></label></li></ul>
+<ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="inav-gps:0"><span>GPS даёт 3D-фикс, компас откалиброван и правильно ориентирован</span></label></li><li><label><input type="checkbox" data-check-id="inav-gps:1"><span><code>nav_rth_alt_mode</code> и <code>nav_rth_altitude</code> выбраны под местность</span></label></li><li><label><input type="checkbox" data-check-id="inav-gps:2"><span>Safehomes настроены или осознанно выключены</span></label></li><li><label><input type="checkbox" data-check-id="inav-gps:3"><span>RTH проверен тумблером на малом расстоянии</span></label></li><li><label><input type="checkbox" data-check-id="inav-gps:4"><span>HDOP и спутники записаны в журнал</span></label></li></ul>
 
 <h2>Источники</h2>
-<ul class="refs"><li><a href="https://github.com/iNavFlight/inav/blob/master/docs/GPS.md" target="_blank" rel="noopener noreferrer">INAV Wiki (официально)</a> <span class="gc-tag" data-state="info">primary | A</span></li></ul>
+<ul class="refs"><li><a href="https://github.com/iNavFlight/inav/blob/master/docs/Navigation.md" target="_blank" rel="noopener noreferrer">INAV Navigation</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://github.com/iNavFlight/inav/blob/master/docs/Safehomes.md" target="_blank" rel="noopener noreferrer">INAV Safehomes</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://github.com/iNavFlight/inav/blob/master/docs/GPS_fix_estimation.md" target="_blank" rel="noopener noreferrer">INAV GPS fix estimation</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://github.com/iNavFlight/inav/blob/master/src/main/fc/settings.yaml" target="_blank" rel="noopener noreferrer">INAV settings reference (settings.yaml)</a> <span class="gc-tag" data-state="info">primary</span></li></ul>
+<h2>Проверь себя</h2>
+<uav-quiz src="../quiz/inav-gps.json" module="inav-gps"></uav-quiz>
       </div>
       <div class="module-done"><gc-button variant="secondary" data-done-toggle="inav-gps">Отметить как пройденный</gc-button></div>
-      <section class="related" aria-label="Смежные модули"><p class="gc-label gc-muted">Смежные модули</p><div class="gc-grid ref-grid"><a class="gc-card" href="inav-wing.html"><strong>Настройка крыла</strong><div class="gc-card__meta"><span class="gc-tag" title="L2 — Интегратор">L2</span><span class="gc-tag" data-state="caution">СКОРО</span></div></a><a class="gc-card" href="ap-missions.html"><strong>Миссии и планирование</strong><div class="gc-card__meta"><span class="gc-tag" title="L2 — Интегратор">L2</span></div></a></div></section>
-      <nav class="pager" aria-label="Соседние модули"><a class="gc-card pager__prev" href="inav-intro.html"><span class="gc-label gc-muted">Назад</span><br>Введение в INAV</a><a class="gc-card pager__next" href="inav-wing.html"><span class="gc-label gc-muted">Дальше</span><br>Настройка крыла</a></nav>
+      <section class="related" aria-label="Смежные модули"><p class="gc-label gc-muted">Смежные модули</p><div class="gc-grid ref-grid"><a class="gc-card" href="inav-intro.html"><strong>Введение в INAV</strong><div class="gc-card__meta"><span class="gc-tag" title="L1 — Оператор">L1</span></div></a><a class="gc-card" href="ap-ekf.html"><strong>EKF и навигация</strong><div class="gc-card__meta"><span class="gc-tag" title="L3 — Специалист">L3</span></div></a></div></section>
+      <nav class="pager" aria-label="Соседние модули"><a class="gc-card pager__prev" href="inav-intro.html"><span class="gc-label gc-muted">Назад</span><br>Введение в INAV</a><a class="gc-card pager__next" href="inav-missions.html"><span class="gc-label gc-muted">Дальше</span><br>Миссии INAV: waypoints и CLI wp</a></nav>
     </article>
   </main>
   <footer class="gc-container site-footer gc-muted">

@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Автономные миссии — UAV Student</title>
-  <meta name="description" content="Инженерный курс по БПЛА: от физики полёта до своих прошивок и бортовых компьютеров.">
+  <title>Миссии INAV: waypoints и CLI wp — UAV Student</title>
+  <meta name="description" content="записать миссию через конфигуратор и CLI wp объяснить защиту от чужой миссии">
   <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="../lib/ground-control-ui/dist/ground-control.css">
   <link rel="stylesheet" href="../assets/site.css">
@@ -30,18 +30,58 @@
   </header>
   <main class="gc-container site-main">
     <article class="module" data-module-page="inav-missions">
-      <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-inav">Электив: INAV</a><span>Автономные миссии</span></p>
-      <h1 class="module-title">Автономные миссии</h1>
-      <div class="module-tags"><span class="gc-tag" title="Уровень">L3 — Специалист</span><span class="gc-tag">учёба ~3 ч</span><span class="gc-tag" data-state="caution">СКОРО</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ОСВОЕН</span></div>
+      <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-inav">Электив: INAV</a><span>Миссии INAV: waypoints и CLI wp</span></p>
+      <h1 class="module-title">Миссии INAV: waypoints и CLI wp</h1>
+      <div class="module-tags"><span class="gc-tag" title="Уровень">L2 — Интегратор</span><span class="gc-tag">чтение 20 мин</span><span class="gc-tag">учёба ~2 ч</span><span class="gc-tag">INAV 7.0+</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ОСВОЕН</span></div>
       <p class="gc-muted module-score" data-module-score></p>
-      
-      <div class="path-pos gc-muted"><span class="gc-label">В пути</span><ul><li><a href="../path/inav.html">INAV</a>: шаг 10 из 12 → <a href="inav-wing.html">Настройка крыла</a></li></ul></div>
+      <p class="module-lead">Миссия INAV — список точек с действиями, который аппарат выполняет в режиме NAV WP. Модуль показывает, из чего состоит точка, какие действия есть (WAYPOINT, POSHOLD_TIME, RTH, JUMP, SET_POI, LAND), как записать миссию через конфигуратор и через CLI командой <code>wp</code>, где лежит высота, и как INAV защищает от взлёта с «чужой» миссией.</p>
+      <div class="gc-callout" data-state="ok"><strong>После модуля ты умеешь</strong><ul><li>записать миссию через конфигуратор и CLI wp</li><li>объяснить защиту от чужой миссии</li></ul></div><p class="gc-muted">Перед этим модулем: <a href="inav-gps.html">GPS, компас и RTH в INAV</a></p><div class="gc-callout lab"><p class="gc-label gc-muted">Лабораторная</p><strong>Одна миссия двумя способами</strong><p class="gc-muted lab__hint">Сдано, когда отмечены все пункты:</p><ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="inav-missions:lab:0"><span>Миссия записана в конфигураторе и через CLI wp</span></label></li><li><label><input type="checkbox" data-check-id="inav-missions:lab:1"><span>Вывод wp совпадает</span></label></li><li><label><input type="checkbox" data-check-id="inav-missions:lab:2"><span>Прогон с POSHOLD_TIME и RTH выполнен</span></label></li></ul></div><div class="path-pos gc-muted"><span class="gc-label">В пути</span><ul><li><a href="../path/inav.html">INAV</a>: шаг 10 из 12 → <a href="inav-wing.html">Крыло на INAV: миксер, автозапуск, autotune</a></li></ul></div>
       <div class="gc-prose module-body">
-<div class="gc-callout" data-state="caution"><strong>Модуль в разработке.</strong> Цели и связи уже определены, текст пишется. План — в <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">ROADMAP</a>.</div>
+<h2>Теория</h2>
+<h4 class="md-subheading">Структура точки</h4>
+<p>В CLI: <code>wp &lt;n&gt; &lt;action&gt; &lt;lat&gt; &lt;lon&gt; &lt;alt&gt; &lt;p1&gt; &lt;p2&gt; &lt;p3&gt; &lt;flag&gt;</code>.</p>
+<ul><li><code>lat</code>, <code>lon</code> — градусы × 10⁷ (123456789 = 12.3456789°).</li><li><code>alt</code> — сантиметры; бит 0 в <code>p3</code> задаёт, относительно дома (0) или над уровнем моря (1).</li><li><code>action</code>: 1 WAYPOINT, 3 POSHOLD_TIME, 4 RTH, 5 SET_POI, 6 JUMP, 7 SET_HEAD, 8 LAND.</li><li><code>p1</code>: для WAYPOINT — скорость к точке (см/с); для POSHOLD_TIME — время в секундах; для RTH — p1 &gt; 0 разрешает посадку; для JUMP — индекс цели.</li><li><code>p2</code>: для POSHOLD_TIME — скорость; для JUMP — число повторов.</li><li><code>flag</code> последней точки — 165 (0xA5).</li></ul>
+<p><code>wp load</code> загружает список из EEPROM, <code>wp save</code> — сохраняет, <code>wp reset</code> — очищает.</p>
+<h4 class="md-subheading">Выполнение</h4>
+<p>Режим NAV WP включается тумблером. Аппарат летит от точки к точке на <code>nav_auto_speed</code> (или скорости из <code>p1</code>), радиус захвата точки — <code>nav_wp_radius</code>. JUMP даёт циклы, SET_POI — поворот камеры на точку интереса, LAND — посадка на точке.</p>
+<h4 class="md-subheading">Защита от чужой миссии</h4>
+<p>Если загружена миссия, первая точка которой дальше <code>nav_wp_safe_distance</code>, арм блокируется. Это защита от сценария «приехал на другое поле с вчерашней миссией». Обход — <code>nav_extra_arming_safety = ALLOW_BYPASS</code> плюс yaw-стик при арме, и это именно обход.</p>
+<h4 class="md-subheading">Несколько миссий</h4>
+<p>Конфигуратор умеет хранить несколько миссий в одном списке точек и переключаться между ними; операнды Programming Framework для точек относятся к выбранной миссии.</p>
+<h4 class="md-subheading">Против ArduPilot</h4>
+<p>В INAV миссия проще: нет CONDITION-команд, нет DO-команд в чистом виде (часть действий — через user actions в <code>p3</code> и логические условия), нет MAVLink-диалога загрузки — точки пишутся в EEPROM напрямую. Для съёмки участка и облёта — достаточно; для сложной логики — Programming Framework или ArduPilot.</p>
+
+<h2>Практика</h2>
+<h4 class="md-subheading">Шаг 1. Миссия в конфигураторе</h4>
+<ol><li>Вкладка Mission Control: поставить 3–4 точки, высота 30 м относительно дома.</li><li>Последняя — RTH с посадкой (или без для крыла).</li><li>Сохранить в FC (Save to FC) и в файл.</li></ol>
+<h4 class="md-subheading">Шаг 2. Та же миссия в CLI</h4>
+<pre class="cli-block"><code>wp reset
+wp 0 1 505000000 304000000 3000 0 0 0 0
+wp 1 1 505005000 304005000 3000 0 0 0 0
+wp 2 3 505010000 304000000 3000 20 0 0 0
+wp 3 4 0 0 0 1 0 0 165
+wp save
+wp</code></pre>
+<p>Точка 2 — POSHOLD_TIME 20 с, точка 3 — RTH с посадкой, последний флаг 165.</p>
+<h4 class="md-subheading">Шаг 3. Полёт</h4>
+<ol><li>3D-фикс, дом записан, миссия загружена (<code>wp</code> показывает список).</li><li>Арм, ANGLE, взлёт вручную на безопасную высоту.</li><li>Включить NAV WP тумблером. Следить за прохождением точек в OSD.</li><li>В любой момент — выключить NAV WP и забрать управление.</li></ol>
+<h4 class="md-subheading">Лабораторная</h4>
+<p>Записать одну миссию двумя способами (конфигуратор и CLI), сравнить вывод <code>wp</code> — он должен совпасть. Прогнать с POSHOLD_TIME и RTH.</p>
+
+<h2>Диагностика</h2>
+<div class="diag-groups"><article class="diag-item"><h4><strong>Симптом:</strong> не армится с загруженной миссией</h4><ul><li>Возможная причина: первая точка дальше <code>nav_wp_safe_distance</code>.</li><li>Что сделать: перезаписать миссию под текущее место или сбросить.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> аппарат идёт к точкам, но не садится в конце</h4><ul><li>Возможная причина: у RTH p1 = 0 (посадка запрещена) или <code>nav_rth_allow_landing</code> OFF.</li><li>Что сделать: поставить p1 = 1 и проверить <code>nav_rth_allow_landing</code>.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> высота миссии не та</h4><ul><li>Возможная причина: бит 0 в p3 (абсолютная высота) или путаница сантиметров и метров.</li><li>Что сделать: проверить <code>p3</code> и единицы <code>alt</code>.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> <code>wp</code> показывает пустой список после перезагрузки</h4><ul><li>Возможная причина: не выполнен <code>wp save</code>.</li><li>Что сделать: сохранить и проверить <code>wp load</code>.</li></ul></article></div>
+
+<h2>Чек-лист</h2>
+<ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="inav-missions:0"><span>Понимаю поля точки и единицы (градусы × 10⁷, сантиметры)</span></label></li><li><label><input type="checkbox" data-check-id="inav-missions:1"><span>Последняя точка с флагом 165</span></label></li><li><label><input type="checkbox" data-check-id="inav-missions:2"><span>Миссия перезаписана под текущее поле, арм не заблокирован</span></label></li><li><label><input type="checkbox" data-check-id="inav-missions:3"><span>NAV WP на тумблере, управление возвращается мгновенно</span></label></li><li><label><input type="checkbox" data-check-id="inav-missions:4"><span>Миссия сохранена в файл и в FC</span></label></li></ul>
+
+<h2>Источники</h2>
+<ul class="refs"><li><a href="https://github.com/iNavFlight/inav/blob/master/docs/Navigation.md" target="_blank" rel="noopener noreferrer">INAV Navigation — NAV WP and `wp` CLI</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://github.com/iNavFlight/inav/blob/master/docs/Controls.md" target="_blank" rel="noopener noreferrer">INAV Controls — arming safety</a> <span class="gc-tag" data-state="info">primary</span></li></ul>
+<h2>Проверь себя</h2>
+<uav-quiz src="../quiz/inav-missions.json" module="inav-missions"></uav-quiz>
       </div>
-      
-      
-      <nav class="pager" aria-label="Соседние модули"><a class="gc-card pager__prev" href="inav-wing.html"><span class="gc-label gc-muted">Назад</span><br>Настройка крыла</a><a class="gc-card pager__next" href="inav-ipf.html"><span class="gc-label gc-muted">Дальше</span><br>IPF и JavaScript</a></nav>
+      <div class="module-done"><gc-button variant="secondary" data-done-toggle="inav-missions">Отметить как пройденный</gc-button></div>
+      <section class="related" aria-label="Смежные модули"><p class="gc-label gc-muted">Смежные модули</p><div class="gc-grid ref-grid"><a class="gc-card" href="inav-gps.html"><strong>GPS, компас и RTH в INAV</strong><div class="gc-card__meta"><span class="gc-tag" title="L2 — Интегратор">L2</span></div></a><a class="gc-card" href="ap-missions.html"><strong>Миссии и планирование</strong><div class="gc-card__meta"><span class="gc-tag" title="L2 — Интегратор">L2</span></div></a></div></section>
+      <nav class="pager" aria-label="Соседние модули"><a class="gc-card pager__prev" href="inav-gps.html"><span class="gc-label gc-muted">Назад</span><br>GPS, компас и RTH в INAV</a><a class="gc-card pager__next" href="inav-wing.html"><span class="gc-label gc-muted">Дальше</span><br>Крыло на INAV: миксер, автозапуск, autotune</a></nav>
     </article>
   </main>
   <footer class="gc-container site-footer gc-muted">

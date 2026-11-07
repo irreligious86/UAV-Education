@@ -1098,55 +1098,113 @@
           "id": "inav-intro",
           "title": "Введение в INAV",
           "level": "L1",
-          "hours": 3,
-          "status": "planned",
+          "hours": 2,
+          "status": "published",
           "prerequisites": [],
-          "objectives": [],
-          "lab": null,
+          "objectives": [
+            "объяснить место INAV между Betaflight и ArduPilot",
+            "настроить платформу, датчики и режимы для первого полёта"
+          ],
+          "lab": {
+            "title": "Первый полёт на INAV",
+            "criteria": [
+              "Платформа и миксер проверены без пропов",
+              "Компас и акселерометр откалиброваны",
+              "ALTHOLD → POSHOLD → RTH проверены близко и низко"
+            ]
+          },
           "url": "m/inav-intro.html"
         },
         {
           "id": "inav-gps",
-          "title": "GPS-навигация в INAV",
+          "title": "GPS, компас и RTH в INAV",
           "level": "L2",
           "hours": 3,
           "status": "published",
-          "prerequisites": [],
-          "objectives": [],
-          "lab": null,
+          "prerequisites": [
+            "inav-intro"
+          ],
+          "objectives": [
+            "подключить и проверить GPS и компас",
+            "настроить высоту RTH и safehomes под местность"
+          ],
+          "lab": {
+            "title": "RTH тумблером",
+            "criteria": [
+              "3D-фикс, дом записан в OSD",
+              "nav_rth_alt_mode/altitude выбраны и обоснованы",
+              "RTH с 30–50 м выполнен, HDOP и спутники записаны"
+            ]
+          },
           "url": "m/inav-gps.html"
         },
         {
-          "id": "inav-wing",
-          "title": "Настройка крыла",
-          "level": "L2",
-          "hours": 3,
-          "status": "planned",
-          "prerequisites": [],
-          "objectives": [],
-          "lab": null,
-          "url": "m/inav-wing.html"
-        },
-        {
           "id": "inav-missions",
-          "title": "Автономные миссии",
-          "level": "L3",
-          "hours": 3,
-          "status": "planned",
-          "prerequisites": [],
-          "objectives": [],
-          "lab": null,
+          "title": "Миссии INAV: waypoints и CLI wp",
+          "level": "L2",
+          "hours": 2,
+          "status": "published",
+          "prerequisites": [
+            "inav-gps"
+          ],
+          "objectives": [
+            "записать миссию через конфигуратор и CLI wp",
+            "объяснить защиту от чужой миссии"
+          ],
+          "lab": {
+            "title": "Одна миссия двумя способами",
+            "criteria": [
+              "Миссия записана в конфигураторе и через CLI wp",
+              "Вывод wp совпадает",
+              "Прогон с POSHOLD_TIME и RTH выполнен"
+            ]
+          },
           "url": "m/inav-missions.html"
         },
         {
+          "id": "inav-wing",
+          "title": "Крыло на INAV: миксер, автозапуск, autotune",
+          "level": "L2",
+          "hours": 4,
+          "status": "published",
+          "prerequisites": [
+            "inav-gps"
+          ],
+          "objectives": [
+            "настроить миксер крыла, реверсы и тримы",
+            "выполнить автозапуск и autotune"
+          ],
+          "lab": {
+            "title": "Крыло: от стола до autotune",
+            "criteria": [
+              "Поверхности противодействуют наклону в ANGLE",
+              "Автозапуск выполнен",
+              "Autotune по трём осям, FF до/после записаны"
+            ]
+          },
+          "url": "m/inav-wing.html"
+        },
+        {
           "id": "inav-ipf",
-          "title": "IPF и JavaScript",
+          "title": "INAV Programming Framework",
           "level": "L3",
           "hours": 3,
-          "status": "planned",
-          "prerequisites": [],
-          "objectives": [],
-          "lab": null,
+          "status": "published",
+          "prerequisites": [
+            "inav-missions"
+          ],
+          "objectives": [
+            "собрать логическое правило с активатором",
+            "использовать GVAR как состояние"
+          ],
+          "lab": {
+            "title": "Защита на IPF",
+            "criteria": [
+              "Правило VTX по удалению работает вживую",
+              "GVAR-автомат собран",
+              "Защита напряжение+удаление → RTH проверена"
+            ]
+          },
           "url": "m/inav-ipf.html"
         }
       ]
