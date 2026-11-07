@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Окто X8 с нагрузкой или VTOL-крыло — UAV Student</title>
+  <meta name="description" content="параметры, миссия в SITL, реальный полёт, разбор лога">
+  <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="../lib/ground-control-ui/dist/ground-control.css">
+  <link rel="stylesheet" href="../assets/site.css">
+  <script src="../lib/ground-control-ui/dist/ground-control.js" defer></script>
+  <script src="../assets/progress-store.js" defer></script>
+  <script src="../assets/app.js" defer></script>
+  <script src="../assets/uav-quiz.js" defer></script>
+</head>
+<body class="gc-root">
+  <header class="site-header">
+    <div class="gc-container site-header__inner">
+      <a class="site-brand" href="../index.html"><span class="site-brand__mark" aria-hidden="true">◆</span> UAV Student</a>
+      <nav class="gc-nav" aria-label="Разделы сайта">
+        <a href="../index.html" aria-current="page">Курс</a>
+        <a href="../ref/index.html">Справочник</a>
+        <a href="../pages/glossary.html">Глоссарий</a>
+        <a href="../pages/fails.html">Фейлы</a>
+      </nav>
+    </div>
+  </header>
+  <main class="gc-container site-main">
+    <article class="module" data-module-page="cap-heavy-or-vtol">
+      <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-autonomy">Автономия</a><span>Итоговый проект</span></p>
+      <h1 class="module-title">Окто X8 с нагрузкой или VTOL-крыло</h1>
+      <div class="module-tags"><span class="gc-tag">Итоговый проект трека 3</span><span class="gc-tag" data-state="ok" data-done-badge hidden>СДАН</span></div>
+      <p class="module-lead">Результат: параметры, миссия в SITL, реальный полёт, разбор лога</p>
+      <div class="gc-prose module-body">
+        <h2>Что сдать</h2>
+        <ul><li>Файл параметров с датой и обоснованием ключевых решений</li><li>Миссия, прогнанная в SITL на целевой раме (octaquad или quadplane)</li><li>Тест отказа мотора в SITL (окто) или карта выходов и наземный тест перехода (VTOL)</li><li>Лог реального полёта и его разбор: VIBE, ERR, ATT, BAT</li></ul>
+        <h2>Критерии приёмки</h2>
+        <p class="gc-muted">Проект сдан, когда выполнены все пункты. Отмечай по мере готовности:</p>
+        <ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="cap-heavy-or-vtol:cap:0"><span>Pre-arm проходит без отключения проверок</span></label></li><li><label><input type="checkbox" data-check-id="cap-heavy-or-vtol:cap:1"><span>Failsafe радио/GCS/АКБ настроены до автономного полёта</span></label></li><li><label><input type="checkbox" data-check-id="cap-heavy-or-vtol:cap:2"><span>Разбор лога начинается с вибраций и ошибок</span></label></li><li><label><input type="checkbox" data-check-id="cap-heavy-or-vtol:cap:3"><span>Для VTOL: арм только с тумблера, наклон проверен на земле</span></label></li></ul>
+        <h2>Модули трека</h2>
+        <ol><li><a href="../m/ap-intro.html">Введение в ArduPilot</a></li><li><a href="../m/ap-sitl.html">SITL: дрон без дрона</a></li><li><a href="../m/ap-missions.html">Миссии и планирование</a></li><li><a href="../m/ap-ekf.html">EKF и навигация</a></li><li><a href="../m/ap-logs.html">Логи ArduPilot: разбор полёта</a></li><li><a href="../m/ap-lua.html">Lua: сценарии и fault injection</a></li><li><a href="../m/ap-heavy.html">Тяжёлые платформы: X8 и окто</a></li><li><a href="../m/ap-quadplane.html">QuadPlane и tilt-rotor VTOL</a></li></ol>
+        <div class="gc-callout" data-state="caution"><strong>Безопасность.</strong> Всё, что можно сделать в SITL или без пропов, делается там. Реальный полёт — только после наземных тестов, с проверенным failsafe.</div>
+      </div>
+      <div class="module-done"><gc-button variant="secondary" data-done-toggle="cap-heavy-or-vtol" data-done-label="сданный" data-done-past="Сдан">Отметить как сданный</gc-button></div>
+    </article>
+  </main>
+  <footer class="gc-container site-footer gc-muted">
+    <p>Открытый курс · <a href="https://github.com/irreligious86/UAV-Education">исходники на GitHub</a> · <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">план развития</a> · <a href="../curriculum/curriculum.html">для разработчика</a> · CC BY-NC-SA 4.0</p>
+  </footer>
+</body>
+</html>

@@ -40,7 +40,9 @@
 
     document.querySelectorAll("[data-done-toggle]").forEach(function (btn) {
       var isDone = done.has(btn.getAttribute("data-done-toggle"));
-      btn.textContent = isDone ? "✓ Пройден — снять отметку" : "Отметить как пройденный";
+      var noun = btn.getAttribute("data-done-label") || "пройденный";   // "сданным" for capstones
+      var past = btn.getAttribute("data-done-past") || "Пройден";
+      btn.textContent = isDone ? "✓ " + past + " — снять отметку" : "Отметить как " + noun;
       btn.setAttribute("variant", isDone ? "primary" : "secondary");
     });
   }
@@ -63,7 +65,7 @@
 
     var boxes = document.querySelectorAll("input[data-check-id]");
     if (boxes.length) {
-      var prefix = boxes[0].getAttribute("data-check-id").split(":")[0] + ":";
+      var prefix = boxes[0].getAttribute("data-check-id").split(":")[0] + ":";  // module id prefix
       window.UAVProgress.getChecks(prefix).then(function (checked) {
         boxes.forEach(function (box) {
           box.checked = checked.has(box.getAttribute("data-check-id"));

@@ -12,7 +12,7 @@ from pathlib import Path
 from urllib.parse import unquote
 
 ROOT = Path(__file__).resolve().parent.parent
-SITE_DIRS = ("m", "ref", "pages")
+SITE_DIRS = ("m", "ref", "pages", "cap")
 ATTR = re.compile(r'(?:href|src)="([^"]+)"')
 ID = re.compile(r'\bid="([^"]+)"')
 

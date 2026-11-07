@@ -227,6 +227,16 @@ def validate_curriculum(manifest_ids):
                 errors.append(f"curriculum: {m['id']} ссылается на статью «{m['article']}», которой нет в манифесте")
             if not m.get("article") and m["id"] in manifest_ids:
                 errors.append(f"curriculum: {m['id']} есть в манифесте — укажи \"article\": \"{m['id']}\"")
+    for g in cur.get("tracks", []):
+        for m in g.get("modules", []):
+            lab = m.get("lab")
+            if lab is not None and (not isinstance(lab, dict) or not lab.get("title") or len(lab.get("criteria", [])) < 2):
+                errors.append(f"curriculum: {m['id']} — lab должен иметь title и ≥2 criteria")
+        cap = g.get("capstone")
+        if cap:
+            for k in ("id", "title", "result", "deliverables", "criteria"):
+                if not cap.get(k):
+                    errors.append(f"curriculum: capstone трека {g['id']} — нет «{k}»")
     for mid in sorted(set(manifest_ids) - seen):
         errors.append(f"curriculum: статья «{mid}» из манифеста не размещена ни в одном треке/элективе")
     return errors

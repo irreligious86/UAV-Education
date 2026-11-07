@@ -51,7 +51,7 @@ PAGES = {
     "resources": "Ресурсы и сообщества",
 }
 
-GENERATED_DIRS = ("m", "ref", "pages", "api", "quiz")
+GENERATED_DIRS = ("m", "ref", "pages", "api", "quiz", "cap")
 QUIZ_SRC = ROOT / "content" / "quiz"
 
 esc = html.escape
@@ -211,10 +211,12 @@ def render_group(g: dict, model: dict, base: str) -> str:
     if g.get("capstone"):
         c = g["capstone"]
         capstone = f"""
-        <div class="gc-callout" data-state="ok">
-          <strong>Итоговый проект: {esc(c['title'])}</strong>
+        <a class="gc-card capstone-card" href="{base}cap/{esc(c['id'])}.html" data-module-id="{esc(c['id'])}">
+          <p class="gc-label gc-muted">Итоговый проект</p>
+          <strong>{esc(c['title'])}</strong>
           <div class="gc-muted">Результат: {esc(c['result'])}</div>
-        </div>"""
+          <div class="gc-card__meta"><span class="gc-tag" data-state="ok" data-done-badge hidden>СДАН</span></div>
+        </a>"""
     goal = f'\n        <p class="track__goal">{esc(g["goal"])}</p>' if g.get("goal") else ""
     written = sum(1 for m in mods if m["status"] == "published")
     return f"""      <section class="track gc-panel" id="track-{esc(g['id'])}" aria-labelledby="track-{esc(g['id'])}-title">
@@ -421,8 +423,18 @@ def render_module(m: dict, model: dict) -> str:
     if prereq:
         links = ", ".join(f'<a href="{esc(p["id"])}.html">{esc(p["title"])}</a>' for p in prereq)
         blocks.append(f'<p class="gc-muted">Перед этим модулем: {links}</p>')
-    if m.get("lab"):
-        blocks.append(f'<div class="gc-callout"><strong>Лабораторная</strong><div>{esc(m["lab"])}</div></div>')
+    lab = m.get("lab")
+    if isinstance(lab, dict):
+        items = "".join(
+            f'<li><label><input type="checkbox" data-check-id="{esc(m["id"])}:lab:{i}"><span>{esc(c)}</span></label></li>'
+            for i, c in enumerate(lab.get("criteria", []))
+        )
+        blocks.append(
+            f'<div class="gc-callout lab"><p class="gc-label gc-muted">Лабораторная</p><strong>{esc(lab["title"])}</strong>'
+            f'<p class="gc-muted lab__hint">Сдано, когда отмечены все пункты:</p><ul class="gc-checklist">{items}</ul></div>'
+        )
+    elif lab:
+        blocks.append(f'<div class="gc-callout"><strong>Лабораторная</strong><div>{esc(lab)}</div></div>')
 
     if planned:
         summary_html = ""
@@ -466,6 +478,42 @@ def render_module(m: dict, model: dict) -> str:
       {pager_html}
     </article>"""
     return layout(title=m["title"], base=base, body=body, active="course", description=" ".join(m.get("objectives", [])))
+
+
+# ---------------------------------------------------------------- capstone
+
+
+def render_capstone(g: dict, model: dict) -> str:
+    base = "../"
+    c = g["capstone"]
+    mods = [model["modules"][i] for i in g["moduleIds"]]
+    prereq = "".join(
+        f'<li><a href="{base}m/{esc(m["id"])}.html">{esc(m["title"])}</a>{" " + status_tag(m["status"]) if m["status"] == "planned" else ""}</li>'
+        for m in mods
+    )
+    deliver = "".join(f"<li>{esc(d)}</li>" for d in c.get("deliverables", []))
+    crit = "".join(
+        f'<li><label><input type="checkbox" data-check-id="{esc(c["id"])}:cap:{i}"><span>{esc(x)}</span></label></li>'
+        for i, x in enumerate(c.get("criteria", []))
+    )
+    body = f"""    <article class="module" data-module-page="{esc(c['id'])}">
+      <p class="gc-breadcrumb"><a href="{base}index.html">Курс</a><a href="{base}index.html#track-{esc(g['id'])}">{esc(g['title'])}</a><span>Итоговый проект</span></p>
+      <h1 class="module-title">{esc(c['title'])}</h1>
+      <div class="module-tags"><span class="gc-tag">Итоговый проект трека {g['index']}</span><span class="gc-tag" data-state="ok" data-done-badge hidden>СДАН</span></div>
+      <p class="module-lead">Результат: {esc(c['result'])}</p>
+      <div class="gc-prose module-body">
+        <h2>Что сдать</h2>
+        <ul>{deliver}</ul>
+        <h2>Критерии приёмки</h2>
+        <p class="gc-muted">Проект сдан, когда выполнены все пункты. Отмечай по мере готовности:</p>
+        <ul class="gc-checklist">{crit}</ul>
+        <h2>Модули трека</h2>
+        <ol>{prereq}</ol>
+        <div class="gc-callout" data-state="caution"><strong>Безопасность.</strong> Всё, что можно сделать в SITL или без пропов, делается там. Реальный полёт — только после наземных тестов, с проверенным failsafe.</div>
+      </div>
+      <div class="module-done"><gc-button variant="secondary" data-done-toggle="{esc(c['id'])}" data-done-label="сданный" data-done-past="Сдан">Отметить как сданный</gc-button></div>
+    </article>"""
+    return layout(title=c["title"], base=base, body=body, active="course", description=c.get("result", ""))
 
 
 # ---------------------------------------------------------------- reference
@@ -534,7 +582,7 @@ def api_payload(model: dict) -> dict:
         return {
             "id": m["id"], "title": m["title"], "level": m["level"], "hours": m.get("hours"),
             "status": m["status"], "prerequisites": m.get("prerequisites", []),
-            "objectives": m.get("objectives", []), "url": f"m/{m['id']}.html",
+            "objectives": m.get("objectives", []), "lab": m.get("lab"), "url": f"m/{m['id']}.html",
         }
     return {
         "version": 1,
@@ -563,6 +611,9 @@ def main() -> None:
     write(ROOT / "index.html", render_home(model))
     for m in model["modules"].values():
         write(ROOT / "m" / f"{m['id']}.html", render_module(m, model))
+    for g in model["groups"]:
+        if g.get("capstone"):
+            write(ROOT / "cap" / f"{g['capstone']['id']}.html", render_capstone(g, model))
     write(ROOT / "ref" / "index.html", render_ref_index(model))
     for s in model["stacks"]:
         write(ROOT / "ref" / f"{s['key']}.html", render_ref_stack(s, model))
