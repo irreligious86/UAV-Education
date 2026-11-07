@@ -10,7 +10,7 @@ import sys
 from pathlib import Path
 
 SCRIPTS = Path(__file__).resolve().parent
-STEPS = ("validate_content.py", "build_site.py", "check_links.py")
+STEPS = ("validate_content.py", "build_site.py", "check_links.py", "check_js.py")
 
 
 def main() -> None:

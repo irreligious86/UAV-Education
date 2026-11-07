@@ -86,7 +86,7 @@ Remaining content work is review and depth, not gaps: see Phase C (owner review,
 
 ## Phase 3 — Interactivity
 
-- [ ] Widgets as standalone Web Components: PID step-response simulator, filter frequency response, ELRS packet rate ↔ latency calculator
+- [x] Widgets as standalone Web Components: `uav-pid-sim` (PID modules), `uav-filter-response` (filters), `uav-elrs-calc` (ELRS); `{{widget:name}}` in Markdown; JS syntax check in CI
 - [ ] 3D attitude demo (three.js)
 
 ## Phase 4 — Lab track

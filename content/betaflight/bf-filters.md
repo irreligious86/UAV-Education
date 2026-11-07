@@ -89,6 +89,9 @@ D-term особенно чувствителен к высокочастотно
 
 ## practice
 
+{{widget:filter-response}}
+
+
 ### Подготовка
 
 - ESC с Bidirectional DShot (BLHeli_32 / Bluejay).

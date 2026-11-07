@@ -84,6 +84,8 @@
 
 .refs { list-style: none; padding-left: 0 !important; }
 .refs li { display: flex; flex-wrap: wrap; gap: var(--gc-space-2); align-items: baseline; }
+.refs a { overflow-wrap: anywhere; min-width: 0; }
+.widget { min-width: 0; max-width: 100%; overflow: hidden; }
 
 .related { padding-top: var(--gc-space-6); }
 .related > * + * { margin-top: var(--gc-space-2); }
@@ -194,7 +196,8 @@
 .widget__metrics, .widget__presets { display: flex; flex-wrap: wrap; gap: var(--gc-space-2); }
 .widget__presets button { cursor: pointer; background: var(--gc-surface-100); }
 .widget__presets button:hover { border-color: var(--gc-ink-muted); color: var(--gc-ink); }
-.widget__table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.widget__table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; max-width: 100%; }
+.gc-prose .widget__table { display: table; width: 100%; min-width: 520px; border-collapse: collapse; font-size: 13px; }
 .widget__table th, .widget__table td { padding: 4px 6px; border-bottom: 1px solid var(--gc-line); text-align: left; font-family: var(--gc-font-mono); }
 .widget__table th { color: var(--gc-ink-muted); font-weight: 600; }
 .widget__table tr.is-current td { color: var(--gc-accent-hud); }

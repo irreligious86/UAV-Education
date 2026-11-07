@@ -39,6 +39,13 @@ jobs:
       - name: Check local links
         run: python scripts/check_links.py
 
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: JavaScript syntax check
+        run: for f in assets/*.js assets/widgets/*.js; do node --check "$f"; done
+
       - name: Design system is pinned to a release tag
         run: |
           git -C lib/ground-control-ui fetch -q --tags origin
