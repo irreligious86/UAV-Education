@@ -52,7 +52,7 @@ PAGES = {
     "resources": "Ресурсы и сообщества",
 }
 
-GENERATED_DIRS = ("m", "ref", "pages", "api", "quiz", "cap")
+GENERATED_DIRS = ("m", "ref", "pages", "api", "quiz", "cap", "path")
 QUIZ_SRC = ROOT / "content" / "quiz"
 
 esc = html.escape
@@ -108,7 +108,11 @@ def build_model() -> dict:
                 "status": art["status"], "group": None, "groupTitle": None, "groupKind": None,
                 "articleMeta": art,
             }
-    return {"stacks": stacks, "modules": modules, "groups": groups, "curriculum": curriculum}
+    paths = []
+    for p in curriculum.get("paths", []):
+        ordered = [mid for st in p["stages"] for mid in st["modules"] if mid in modules]
+        paths.append({**p, "moduleIds": ordered})
+    return {"stacks": stacks, "modules": modules, "groups": groups, "curriculum": curriculum, "paths": paths}
 
 
 # ---------------------------------------------------------------- layout
@@ -235,6 +239,60 @@ def render_group(g: dict, model: dict, base: str) -> str:
       </section>"""
 
 
+def render_path_card(p: dict, model: dict, base: str) -> str:
+    mods = [model["modules"][i] for i in p["moduleIds"]]
+    pub = [m["id"] for m in mods if m["status"] == "published"]
+    return f"""        <a class="gc-card path-card" href="{base}path/{esc(p['id'])}.html">
+          <p class="gc-label gc-muted">По прошивке</p>
+          <strong>{esc(p['title'])}</strong>
+          <div class="gc-muted">{esc(p['subtitle'])}</div>
+          <div class="gc-card__meta"><span class="gc-tag">{len(mods)} шагов</span><span class="gc-tag" data-state="ok">написано {len(pub)}</span><span class="gc-tag" data-progress-label="{esc(','.join(pub))}"></span></div>
+          <div class="gc-progress" role="progressbar" aria-label="Прогресс по пути {esc(p['title'])}" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" data-progress-of="{esc(','.join(pub))}" style="--gc-value: 0%"></div>
+        </a>"""
+
+
+def render_path(p: dict, model: dict) -> str:
+    base = "../"
+    mods = [model["modules"][i] for i in p["moduleIds"]]
+    pub = [m["id"] for m in mods if m["status"] == "published"]
+    n = 0
+    stages = []
+    for st in p["stages"]:
+        rows = []
+        for mid in st["modules"]:
+            if mid not in model["modules"]:
+                continue
+            n += 1
+            m = model["modules"][mid]
+            rows.append(module_row(m, n, base))
+        stages.append(f"""      <section class="track gc-panel">
+        <p class="gc-label gc-muted">Этап</p>
+        <h2 class="gc-title">{esc(st['title'])}</h2>
+        <ol class="track__modules">
+{chr(10).join(rows)}
+        </ol>
+      </section>""")
+    caps = []
+    for cid in p.get("capstones", []):
+        g = next((g for g in model["groups"] if g.get("capstone", {}).get("id") == cid), None)
+        if g:
+            c = g["capstone"]
+            caps.append(f'<a class="gc-card capstone-card" href="{base}cap/{esc(cid)}.html" data-module-id="{esc(cid)}"><p class="gc-label gc-muted">Итоговый проект</p><strong>{esc(c["title"])}</strong><div class="gc-muted">{esc(c["result"])}</div><div class="gc-card__meta"><span class="gc-tag" data-state="ok" data-done-badge hidden>СДАН</span></div></a>')
+    caps_html = f'<h2 class="gc-title section-title">Итоговые проекты</h2>{"".join(caps)}' if caps else ""
+    body = f"""    <p class="gc-breadcrumb"><a href="{base}index.html">Курс</a><span>Путь: {esc(p['title'])}</span></p>
+    <section class="home-hero">
+      <h1 class="gc-display">{esc(p['title'])}</h1>
+      <p class="home-hero__lead">{esc(p['goal'])}</p>
+      <div class="home-hero__stats"><span class="gc-tag">{len(mods)} шагов</span><span class="gc-tag" data-state="ok">написано {len(pub)}</span><span class="gc-tag" data-state="caution">в работе {len(mods) - len(pub)}</span></div>
+      <p class="gc-label gc-muted">Твой прогресс <span data-progress-label="{esc(','.join(pub))}"></span></p>
+      <div class="gc-progress" role="progressbar" aria-label="Прогресс по пути" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" data-progress-of="{esc(','.join(pub))}" style="--gc-value: 0%"></div>
+      <p class="gc-muted home-hero__note">Иди по порядку: каждый шаг опирается на предыдущие. Общие модули (физика, питание, радиолинк) включены там, где они нужны именно этой прошивке.</p>
+    </section>
+{chr(10).join(stages)}
+    {caps_html}"""
+    return layout(title=f"Путь {p['title']}", base=base, body=body, active="course", description=p["goal"])
+
+
 def render_home(model: dict) -> str:
     base = ""
     tracks = [g for g in model["groups"] if g["kind"] == "track"]
@@ -250,7 +308,7 @@ def render_home(model: dict) -> str:
     body = f"""    <section class="home-hero">
       <h1 class="gc-display">Инженерный курс по БПЛА</h1>
       <p class="home-hero__lead">От «почему он летает» до настройки по логам, автономных миссий и своего кода на борту.
-      Учись по трекам по порядку: каждый следующий опирается на предыдущий. Нужна конкретная тема по прошивке — открой <a href="ref/index.html">справочник</a>.</p>
+      Выбери прошивку и иди по шагам от простого к сложному — или пройди инженерный путь по трекам. Нужна конкретная тема — <a href="pages/search.html">поиск</a> или <a href="ref/index.html">справочник</a>.</p>
       <div class="home-hero__stats">
         <span class="gc-tag">{len(core)} модулей в ядре</span>
         <span class="gc-tag" data-state="ok">написано {core_written}</span>
@@ -259,10 +317,25 @@ def render_home(model: dict) -> str:
       <p class="gc-label gc-muted">Твой прогресс <span data-progress-label="{esc(','.join(all_published))}"></span></p>
       <div class="gc-progress" role="progressbar" aria-label="Твой прогресс по курсу" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" data-progress-of="{esc(','.join(all_published))}" style="--gc-value: 0%"></div>
       <p class="gc-muted home-hero__note">Прогресс хранится только в этом браузере.</p>
-      <nav class="home-toc" aria-label="Треки">
-{toc}
-      </nav>
     </section>
+
+    <section class="choose" aria-labelledby="choose-title">
+      <h2 class="gc-title" id="choose-title">Как учиться</h2>
+      <p class="gc-muted">Два способа пройти один и тот же материал. Прогресс общий.</p>
+      <div class="gc-grid ref-grid">
+{chr(10).join(render_path_card(p, model, base) for p in model["paths"])}
+      </div>
+      <a class="gc-card choose__tracks" href="#tracks">
+        <p class="gc-label gc-muted">По навыкам</p>
+        <strong>Инженерный путь: 5 треков от физики до своего кода</strong>
+        <div class="gc-muted">Все прошивки вперемешку, по росту сложности. Для тех, кто хочет понимать, а не только настраивать.</div>
+      </a>
+    </section>
+
+    <h2 class="gc-title section-title" id="tracks">По навыкам: треки</h2>
+    <nav class="home-toc" aria-label="Треки">
+{toc}
+    </nav>
 
 {chr(10).join(render_group(g, model, base) for g in tracks)}
 
@@ -455,6 +528,16 @@ def render_module(m: dict, model: dict) -> str:
             f'<div class="module-done"><gc-button variant="secondary" data-done-toggle="{esc(m["id"])}">'
             "Отметить как пройденный</gc-button></div>"
         )
+
+    path_nav = []
+    for p in model["paths"]:
+        if m["id"] in p["moduleIds"]:
+            i = p["moduleIds"].index(m["id"])
+            nxt_id = p["moduleIds"][i + 1] if i + 1 < len(p["moduleIds"]) else None
+            nxt_html = f' → <a href="{esc(nxt_id)}.html">{esc(model["modules"][nxt_id]["title"])}</a>' if nxt_id else " · последний шаг"
+            path_nav.append(f'<li><a href="{base}path/{esc(p["id"])}.html">{esc(p["title"])}</a>: шаг {i + 1} из {len(p["moduleIds"])}{nxt_html}</li>')
+    if path_nav:
+        blocks.append(f'<div class="path-pos gc-muted"><span class="gc-label">В пути</span><ul>{"".join(path_nav)}</ul></div>')
 
     prev, nxt = neighbours(m, model)
     pager = []
@@ -712,6 +795,9 @@ def api_payload(model: dict) -> dict:
         }
     return {
         "version": 1,
+        "paths": [{"id": p["id"], "title": p["title"], "goal": p["goal"],
+                   "stages": [{"title": st["title"], "modules": st["modules"]} for st in p["stages"]],
+                   "url": f"path/{p['id']}.html"} for p in model["paths"]],
         "groups": [
             {"id": g["id"], "kind": g["kind"], "title": g["title"], "level": g.get("level"),
              "goal": g.get("goal"), "capstone": g.get("capstone"),
@@ -737,6 +823,8 @@ def main() -> None:
     write(ROOT / "index.html", render_home(model))
     for m in model["modules"].values():
         write(ROOT / "m" / f"{m['id']}.html", render_module(m, model))
+    for p in model["paths"]:
+        write(ROOT / "path" / f"{p['id']}.html", render_path(p, model))
     for g in model["groups"]:
         if g.get("capstone"):
             write(ROOT / "cap" / f"{g['capstone']['id']}.html", render_capstone(g, model))

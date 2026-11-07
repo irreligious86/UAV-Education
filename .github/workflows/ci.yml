@@ -30,9 +30,9 @@ jobs:
 
       - name: Built site must be committed in sync with content
         run: |
-          if [ -n "$(git status --porcelain -- index.html m ref pages api quiz cap)" ]; then
+          if [ -n "$(git status --porcelain -- index.html m ref pages api quiz cap path)" ]; then
             echo "::error::Site is stale. Run 'python scripts/publish.py' locally and commit the result."
-            git status --short -- index.html m ref pages api quiz cap
+            git status --short -- index.html m ref pages api quiz cap path
             exit 1
           fi
 

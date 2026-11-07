@@ -38,7 +38,7 @@
     <section class="home-hero">
       <h1 class="gc-display">Инженерный курс по БПЛА</h1>
       <p class="home-hero__lead">От «почему он летает» до настройки по логам, автономных миссий и своего кода на борту.
-      Учись по трекам по порядку: каждый следующий опирается на предыдущий. Нужна конкретная тема по прошивке — открой <a href="ref/index.html">справочник</a>.</p>
+      Выбери прошивку и иди по шагам от простого к сложному — или пройди инженерный путь по трекам. Нужна конкретная тема — <a href="pages/search.html">поиск</a> или <a href="ref/index.html">справочник</a>.</p>
       <div class="home-hero__stats">
         <span class="gc-tag">34 модулей в ядре</span>
         <span class="gc-tag" data-state="ok">написано 34</span>
@@ -47,14 +47,56 @@
       <p class="gc-label gc-muted">Твой прогресс <span data-progress-label="f-physics,f-power,f-motors-esc,f-fc-sensors,bf-pid-reg-in-bf,f-safety,tools-overview,bf-intro,bf-ports,link-protocols,bf-modes-osd,bf-failsafe,link-elrs,link-vtx,bf-blackbox,bf-filters,bf-rpm-filter,bf-pid,bf-cli,bf-cli-automation,ap-intro,ap-sitl,ap-missions,ap-ekf,ap-logs,ap-lua,ap-heavy,ap-quadplane,comp-intro,comp-mavlink,comp-esp32,comp-raspberry,ap-companion,bf-custom,inav-gps,px4-control,px4-companion-jetson"></span></p>
       <div class="gc-progress" role="progressbar" aria-label="Твой прогресс по курсу" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" data-progress-of="f-physics,f-power,f-motors-esc,f-fc-sensors,bf-pid-reg-in-bf,f-safety,tools-overview,bf-intro,bf-ports,link-protocols,bf-modes-osd,bf-failsafe,link-elrs,link-vtx,bf-blackbox,bf-filters,bf-rpm-filter,bf-pid,bf-cli,bf-cli-automation,ap-intro,ap-sitl,ap-missions,ap-ekf,ap-logs,ap-lua,ap-heavy,ap-quadplane,comp-intro,comp-mavlink,comp-esp32,comp-raspberry,ap-companion,bf-custom,inav-gps,px4-control,px4-companion-jetson" style="--gc-value: 0%"></div>
       <p class="gc-muted home-hero__note">Прогресс хранится только в этом браузере.</p>
-      <nav class="home-toc" aria-label="Треки">
+    </section>
+
+    <section class="choose" aria-labelledby="choose-title">
+      <h2 class="gc-title" id="choose-title">Как учиться</h2>
+      <p class="gc-muted">Два способа пройти один и тот же материал. Прогресс общий.</p>
+      <div class="gc-grid ref-grid">
+        <a class="gc-card path-card" href="path/betaflight.html">
+          <p class="gc-label gc-muted">По прошивке</p>
+          <strong>Betaflight</strong>
+          <div class="gc-muted">FPV-квадрокоптер: от сборки до настройки по логам</div>
+          <div class="gc-card__meta"><span class="gc-tag">21 шагов</span><span class="gc-tag" data-state="ok">написано 21</span><span class="gc-tag" data-progress-label="f-physics,f-power,f-motors-esc,f-fc-sensors,f-safety,tools-overview,bf-intro,bf-ports,link-protocols,bf-modes-osd,bf-failsafe,link-elrs,link-vtx,bf-pid-reg-in-bf,bf-blackbox,bf-filters,bf-rpm-filter,bf-pid,bf-cli,bf-cli-automation,bf-custom"></span></div>
+          <div class="gc-progress" role="progressbar" aria-label="Прогресс по пути Betaflight" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" data-progress-of="f-physics,f-power,f-motors-esc,f-fc-sensors,f-safety,tools-overview,bf-intro,bf-ports,link-protocols,bf-modes-osd,bf-failsafe,link-elrs,link-vtx,bf-pid-reg-in-bf,bf-blackbox,bf-filters,bf-rpm-filter,bf-pid,bf-cli,bf-cli-automation,bf-custom" style="--gc-value: 0%"></div>
+        </a>
+        <a class="gc-card path-card" href="path/inav.html">
+          <p class="gc-label gc-muted">По прошивке</p>
+          <strong>INAV</strong>
+          <div class="gc-muted">GPS-навигация, крылья и миссии на простом автопилоте</div>
+          <div class="gc-card__meta"><span class="gc-tag">12 шагов</span><span class="gc-tag" data-state="ok">написано 8</span><span class="gc-tag" data-progress-label="f-physics,f-power,f-fc-sensors,f-safety,tools-overview,link-protocols,link-elrs,inav-gps"></span></div>
+          <div class="gc-progress" role="progressbar" aria-label="Прогресс по пути INAV" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" data-progress-of="f-physics,f-power,f-fc-sensors,f-safety,tools-overview,link-protocols,link-elrs,inav-gps" style="--gc-value: 0%"></div>
+        </a>
+        <a class="gc-card path-card" href="path/ardupilot.html">
+          <p class="gc-label gc-muted">По прошивке</p>
+          <strong>ArduPilot</strong>
+          <div class="gc-muted">Автономия: SITL, миссии, EKF, тяжёлые платформы, VTOL</div>
+          <div class="gc-card__meta"><span class="gc-tag">20 шагов</span><span class="gc-tag" data-state="ok">написано 20</span><span class="gc-tag" data-progress-label="f-physics,f-power,f-motors-esc,f-fc-sensors,f-safety,tools-overview,ap-intro,ap-sitl,ap-missions,ap-lua,ap-ekf,ap-logs,ap-heavy,ap-quadplane,comp-intro,comp-mavlink,comp-raspberry,ap-companion,comp-esp32,bf-custom"></span></div>
+          <div class="gc-progress" role="progressbar" aria-label="Прогресс по пути ArduPilot" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" data-progress-of="f-physics,f-power,f-motors-esc,f-fc-sensors,f-safety,tools-overview,ap-intro,ap-sitl,ap-missions,ap-lua,ap-ekf,ap-logs,ap-heavy,ap-quadplane,comp-intro,comp-mavlink,comp-raspberry,ap-companion,comp-esp32,bf-custom" style="--gc-value: 0%"></div>
+        </a>
+        <a class="gc-card path-card" href="path/px4.html">
+          <p class="gc-label gc-muted">По прошивке</p>
+          <strong>PX4</strong>
+          <div class="gc-muted">Исследовательский стек: архитектура, ROS 2, companion</div>
+          <div class="gc-card__meta"><span class="gc-tag">11 шагов</span><span class="gc-tag" data-state="ok">написано 8</span><span class="gc-tag" data-progress-label="f-physics,f-fc-sensors,f-safety,tools-overview,comp-intro,comp-mavlink,px4-control,px4-companion-jetson"></span></div>
+          <div class="gc-progress" role="progressbar" aria-label="Прогресс по пути PX4" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" data-progress-of="f-physics,f-fc-sensors,f-safety,tools-overview,comp-intro,comp-mavlink,px4-control,px4-companion-jetson" style="--gc-value: 0%"></div>
+        </a>
+      </div>
+      <a class="gc-card choose__tracks" href="#tracks">
+        <p class="gc-label gc-muted">По навыкам</p>
+        <strong>Инженерный путь: 5 треков от физики до своего кода</strong>
+        <div class="gc-muted">Все прошивки вперемешку, по росту сложности. Для тех, кто хочет понимать, а не только настраивать.</div>
+      </a>
+    </section>
+
+    <h2 class="gc-title section-title" id="tracks">По навыкам: треки</h2>
+    <nav class="home-toc" aria-label="Треки">
           <a class="gc-tag" href="#track-foundation">0. Фундамент</a>
           <a class="gc-tag" href="#track-operator">1. Оператор</a>
           <a class="gc-tag" href="#track-integrator">2. Интегратор</a>
           <a class="gc-tag" href="#track-autonomy">3. Автономия</a>
           <a class="gc-tag" href="#track-engineer">4. Инженер</a>
-      </nav>
-    </section>
+    </nav>
 
       <section class="track gc-panel" id="track-foundation" aria-labelledby="track-foundation-title">
         <p class="gc-label gc-muted">Трек 0 · L1 · с нуля</p>

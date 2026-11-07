@@ -237,6 +237,15 @@ def validate_curriculum(manifest_ids):
             for k in ("id", "title", "result", "deliverables", "criteria"):
                 if not cap.get(k):
                     errors.append(f"curriculum: capstone трека {g['id']} — нет «{k}»")
+    for p in cur.get("paths", []):
+        pseen = set()
+        for st in p.get("stages", []):
+            for mid in st.get("modules", []):
+                if mid not in seen:
+                    errors.append(f"curriculum: path {p['id']} → модуль «{mid}» не найден")
+                if mid in pseen:
+                    errors.append(f"curriculum: path {p['id']} → модуль «{mid}» дважды")
+                pseen.add(mid)
     for mid in sorted(set(manifest_ids) - seen):
         errors.append(f"curriculum: статья «{mid}» из манифеста не размещена ни в одном треке/элективе")
     return errors
