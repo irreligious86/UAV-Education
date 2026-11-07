@@ -12,6 +12,8 @@
 | **Отдельно** | `scripts/validate_content.py`, `scripts/new_article.py` |
 | **Быстрый запуск** | `publish.bat` (Windows) / `publish.sh` (Linux) — проверка + сборка; commit/push вручную |
 | **CI** | `.github/workflows/ci.yml` — валидация, сайт пересобран и закоммичен, ссылки, GC закреплён на теге |
+| **Глоссарий** | `data/glossary.json` — термин, определение, модуль; страница генерируется |
+| **Журнал фейлов** | генерируется из секций «Диагностика» всех модулей |
 | **Квизы** | `content/quiz/<id>.json` — 5+ вопросов, `answer` = индекс верного, `explain` обязателен; validator проверяет |
 | **План развития** | `ROADMAP.md` |
 | **Страница разработчика (отдельно от сайта)** | `curriculum/curriculum.html` |

@@ -68,6 +68,7 @@ Priority: a well-structured learning program.
 - [x] Static API: `api/v1/curriculum.json` — the contract a future server will serve
 - [x] Quizzes: `<uav-quiz>` + JSON banks for all 34 core modules (5–7 questions each, shuffled, explained, result in ProgressStore)
 - [x] Labs with acceptance criteria on every core module (checklist, state in ProgressStore); capstone pages `cap/<id>.html` with deliverables and criteria
+- [x] Fails journal generated from every module's diagnostics (120+ cases); glossary from `data/glossary.json` (68 terms, each linked to its module)
 - [ ] Client-side search over a generated index
 - [ ] `ARCHITECTURE.md`: layers, data contracts, step-by-step migration to own server
 - [ ] Offline PWA (service worker)

@@ -562,6 +562,79 @@ def render_ref_stack(stack: dict, model: dict) -> str:
     return layout(title=stack["title"], base=base, body=body, active="ref")
 
 
+def parse_diagnostics(block: str) -> list[tuple[str, list[str]]]:
+    """Return [(symptom, [detail lines])] from a ## diagnostics block."""
+    out: list[tuple[str, list[str]]] = []
+    for raw in block.splitlines():
+        line = raw.strip()
+        if not line.startswith("- "):
+            continue
+        text = line[2:].strip()
+        if text.startswith("**Симптом:**"):
+            out.append((text.replace("**Симптом:**", "").strip(), []))
+        elif out:
+            out[-1][1].append(text)
+    return out
+
+
+def render_fails(model: dict) -> str:
+    """Journal of failures: every diagnostics entry from every published module, grouped by track."""
+    base = "../"
+    sections = []
+    toc_ids = []
+    total = 0
+    for g in model["groups"]:
+        rows = []
+        for mid in g["moduleIds"]:
+            m = model["modules"][mid]
+            if m["status"] != "published":
+                continue
+            raw = (ROOT / m["articleMeta"]["sourceFile"]).read_text(encoding="utf-8")
+            entries = parse_diagnostics(extract_section(strip_front_matter(raw), "diagnostics"))
+            for symptom, details in entries:
+                cause = next((d for d in details if d.lower().startswith("возможная причина")), "")
+                fix = next((d for d in details if d.lower().startswith("что сделать")), "")
+                cause = cause.split(":", 1)[1].strip() if ":" in cause else cause
+                fix = fix.split(":", 1)[1].strip() if ":" in fix else fix
+                sym = format_inline(symptom[:1].upper() + symptom[1:])
+                rows.append(
+                    f'<div class="gc-card fail"><strong class="fail__symptom">{sym}</strong>'
+                    f'<p><span class="gc-muted">Причина:</span> {format_inline(cause)}</p>'
+                    f'<p><span class="gc-muted">Что сделать:</span> {format_inline(fix)}</p>'
+                    f'<a class="gc-tag" href="{base}m/{esc(mid)}.html">{esc(m["title"])}</a></div>'
+                )
+                total += 1
+        if rows:
+            toc_ids.append(g)
+            sections.append(
+                f'<h2 id="fails-{esc(g["id"])}">{esc(g["title"])}</h2>'
+                f'<div class="fails__list">{"".join(rows)}</div>'
+            )
+    toc = "".join(f'<a class="gc-tag" href="#fails-{esc(g["id"])}">{esc(g["title"])}</a>' for g in toc_ids)
+    body = f"""    <p class="gc-breadcrumb"><a href="../ref/index.html">Справочник</a><span>Журнал ошибок и фейлов</span></p>
+    <h1 class="gc-display">Журнал ошибок и фейлов</h1>
+    <p class="gc-muted">{total} симптомов из разделов «Диагностика» всех написанных модулей. Собирается автоматически при сборке сайта; чтобы добавить кейс — допиши диагностику в модуль.</p>
+    <div class="home-toc">{toc}</div>
+    <div class="fails">{"".join(sections)}</div>"""
+    return layout(title="Журнал фейлов", base=base, body=body, active="fails")
+
+
+def render_glossary(model: dict) -> str:
+    base = "../"
+    data = json.loads((ROOT / "data" / "glossary.json").read_text(encoding="utf-8"))
+    terms = sorted(data["terms"], key=lambda t: t["term"].lower())
+    cards = []
+    for t in terms:
+        mod = model["modules"].get(t.get("module"))
+        link = f'<a class="gc-tag" href="{base}m/{esc(mod["id"])}.html">{esc(mod["title"])}</a>' if mod else ""
+        cards.append(f'<div class="gc-card glossary-entry"><h3>{esc(t["term"])}</h3><p>{format_inline(t["def"])}</p>{link}</div>')
+    body = f"""    <p class="gc-breadcrumb"><a href="../ref/index.html">Справочник</a><span>Глоссарий</span></p>
+    <h1 class="gc-display">Глоссарий</h1>
+    <p class="gc-muted">{len(terms)} терминов. Каждый ведёт к модулю, где объясняется подробно.</p>
+    <div class="gc-grid ref-grid glossary">{"".join(cards)}</div>"""
+    return layout(title="Глоссарий", base=base, body=body, active="glossary")
+
+
 def render_page(name: str, title: str) -> str:
     base = "../"
     inner = (ROOT / "content" / "pages" / f"{name}.html").read_text(encoding="utf-8")
@@ -618,7 +691,12 @@ def main() -> None:
     for s in model["stacks"]:
         write(ROOT / "ref" / f"{s['key']}.html", render_ref_stack(s, model))
     for name, title in PAGES.items():
-        write(ROOT / "pages" / f"{name}.html", render_page(name, title))
+        if name == "fails":
+            write(ROOT / "pages" / "fails.html", render_fails(model))
+        elif name == "glossary":
+            write(ROOT / "pages" / "glossary.html", render_glossary(model))
+        else:
+            write(ROOT / "pages" / f"{name}.html", render_page(name, title))
     if QUIZ_SRC.is_dir():
         for q in QUIZ_SRC.glob("*.json"):
             write(ROOT / "quiz" / q.name, q.read_text(encoding="utf-8"))

@@ -285,6 +285,28 @@ def validate_quizzes(manifest_ids, status_by_id):
     return errors
 
 
+GLOSSARY_PATH = ROOT / "data" / "glossary.json"
+
+
+def validate_glossary(manifest_ids):
+    import json
+
+    if not GLOSSARY_PATH.is_file():
+        return []
+    data = json.loads(GLOSSARY_PATH.read_text(encoding="utf-8"))
+    errors, seen = [], set()
+    for t in data.get("terms", []):
+        if not t.get("term") or not t.get("def"):
+            errors.append(f"glossary: запись без term/def: {t}")
+        key = t.get("term", "").lower()
+        if key in seen:
+            errors.append(f"glossary: термин «{t['term']}» дублируется")
+        seen.add(key)
+        if t.get("module") and t["module"] not in manifest_ids:
+            errors.append(f"glossary: «{t['term']}» ссылается на несуществующий модуль {t['module']}")
+    return errors
+
+
 def main():
     if not MANIFEST_PATH.is_file():
         print(f"Нет {MANIFEST_PATH}", file=sys.stderr)
@@ -302,6 +324,7 @@ def main():
     errs.extend(validate_curriculum(all_ids_set))
     status_by_id = {a["id"]: a.get("status") for sec in manifest.get("sections", []) for a in sec.get("articles", [])}
     errs.extend(validate_quizzes(all_ids_set, status_by_id))
+    errs.extend(validate_glossary(all_ids_set))
 
     status_by_file = {}
     for sec in manifest.get("sections", []):
