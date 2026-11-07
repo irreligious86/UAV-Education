@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Свой фильтр ориентации — UAV Student</title>
+  <meta name="description" content="Комплементарный фильтр или простой EKF на Python/ESP32, проверенный на реальных данных IMU против эталона">
+  <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="../lib/ground-control-ui/dist/ground-control.css">
+  <link rel="stylesheet" href="../assets/site.css">
+  <script src="../lib/ground-control-ui/dist/ground-control.js" defer></script>
+  <script src="../assets/progress-store.js" defer></script>
+  <script src="../assets/grading.js" defer></script>
+  <script src="../assets/app.js" defer></script>
+  <script src="../assets/uav-quiz.js" defer></script>
+</head>
+<body class="gc-root" data-base="../">
+  <header class="site-header">
+    <div class="gc-container site-header__inner">
+      <a class="site-brand" href="../index.html"><span class="site-brand__mark" aria-hidden="true">◆</span> UAV Student</a>
+      <nav class="gc-nav" aria-label="Разделы сайта">
+        <a href="../index.html" aria-current="page">Курс</a>
+        <a href="../ref/index.html">Справочник</a>
+        <a href="../pages/glossary.html">Глоссарий</a>
+        <a href="../pages/fails.html">Фейлы</a>
+        <a href="../pages/search.html">Поиск</a>
+        <a href="../pages/progress.html">Мой прогресс</a>
+      </nav>
+    </div>
+  </header>
+  <main class="gc-container site-main">
+    <article class="module" data-module-page="cap-estimation">
+      <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-estimation">Оценка состояния и навигация</a><span>Итоговый проект</span></p>
+      <h1 class="module-title">Свой фильтр ориентации</h1>
+      <div class="module-tags"><span class="gc-tag">Итоговый проект трека 4</span><span class="gc-tag" data-state="ok" data-done-badge hidden>СДАН</span></div>
+      <p class="module-lead">Результат: Комплементарный фильтр или простой EKF на Python/ESP32, проверенный на реальных данных IMU против эталона</p>
+      <div class="gc-prose module-body">
+        <h2>Что сдать</h2>
+        <ul><li>Код фильтра с тестами</li><li>Запись IMU с реального аппарата или ESP32</li><li>Сравнение с оценкой полётника (ATT) по логу</li><li>Отчёт: ошибки, дрейф, реакция на вибрации</li></ul>
+        <h2>Критерии приёмки</h2>
+        <p class="gc-muted">Проект сдан, когда выполнены все пункты. Отмечай по мере готовности:</p>
+        <ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="cap-estimation:cap:0"><span>Фильтр сходится и не дрейфует на стенде за 5 минут</span></label></li><li><label><input type="checkbox" data-check-id="cap-estimation:cap:1"><span>Ошибка по крену/тангажу против эталона ≤ 2°</span></label></li><li><label><input type="checkbox" data-check-id="cap-estimation:cap:2"><span>Объяснено, что ломается при вибрациях и как это видно</span></label></li></ul>
+        <h2>Модули трека</h2>
+        <ol><li><a href="../m/est-sensors.html">Датчики IMU: физика, ошибки, калибровка</a> <span class="gc-tag" data-state="caution">СКОРО</span></li><li><a href="../m/est-attitude.html">Ориентация: углы Эйлера, кватернионы, комплементарный фильтр</a> <span class="gc-tag" data-state="caution">СКОРО</span></li><li><a href="../m/est-kalman.html">Фильтр Калмана на пальцах и EKF</a> <span class="gc-tag" data-state="caution">СКОРО</span></li><li><a href="../m/est-gnss.html">GNSS: как работает GPS, ошибки, RTK</a> <span class="gc-tag" data-state="caution">СКОРО</span></li><li><a href="../m/ap-ekf.html">EKF и навигация</a></li><li><a href="../m/est-alt-sources.html">Высота и позиция без GPS: баро, дальномер, оптический поток</a> <span class="gc-tag" data-state="caution">СКОРО</span></li></ol>
+        <div class="gc-callout" data-state="caution"><strong>Безопасность.</strong> Всё, что можно сделать в SITL или без пропов, делается там. Реальный полёт — только после наземных тестов, с проверенным failsafe.</div>
+      </div>
+      <div class="module-done"><gc-button variant="secondary" data-done-toggle="cap-estimation" data-done-label="сданный" data-done-past="Сдан">Отметить как сданный</gc-button></div>
+    </article>
+  </main>
+  <footer class="gc-container site-footer gc-muted">
+    <p>Открытый курс · <a href="https://github.com/irreligious86/UAV-Education">исходники на GitHub</a> · <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">план развития</a> · <a href="../curriculum/curriculum.html">для разработчика</a> · CC BY-NC-SA 4.0</p>
+  </footer>
+</body>
+</html>

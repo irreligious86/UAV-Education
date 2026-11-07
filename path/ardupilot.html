@@ -33,9 +33,9 @@
     <section class="home-hero">
       <h1 class="gc-display">ArduPilot</h1>
       <p class="home-hero__lead">Строить и проверять автономные сценарии: сначала в симуляторе, потом на окто и VTOL, с разбором логов.</p>
-      <div class="home-hero__stats"><span class="gc-tag">20 шагов</span><span class="gc-tag" data-state="ok">написано 20</span><span class="gc-tag" data-state="caution">в работе 0</span></div>
-      <p class="gc-label gc-muted">Твой прогресс <span data-progress-label="f-physics,f-power,f-motors-esc,f-fc-sensors,f-safety,tools-overview,ap-intro,ap-sitl,ap-missions,ap-lua,ap-ekf,ap-logs,ap-heavy,ap-quadplane,comp-intro,comp-mavlink,comp-raspberry,ap-companion,comp-esp32,bf-custom"></span></p>
-      <div class="gc-progress" role="progressbar" aria-label="Прогресс по пути" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" data-progress-of="f-physics,f-power,f-motors-esc,f-fc-sensors,f-safety,tools-overview,ap-intro,ap-sitl,ap-missions,ap-lua,ap-ekf,ap-logs,ap-heavy,ap-quadplane,comp-intro,comp-mavlink,comp-raspberry,ap-companion,comp-esp32,bf-custom" style="--gc-value: 0%"></div>
+      <div class="home-hero__stats"><span class="gc-tag">43 шагов</span><span class="gc-tag" data-state="ok">написано 19</span><span class="gc-tag" data-state="caution">в работе 24</span></div>
+      <p class="gc-label gc-muted">Твой прогресс <span data-progress-label="f-physics,f-power,f-motors-esc,f-fc-sensors,f-safety,tools-overview,ap-intro,ap-sitl,ap-missions,ap-lua,ap-ekf,ap-logs,ap-heavy,ap-quadplane,comp-intro,comp-mavlink,comp-raspberry,ap-companion,comp-esp32"></span></p>
+      <div class="gc-progress" role="progressbar" aria-label="Прогресс по пути" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" data-progress-of="f-physics,f-power,f-motors-esc,f-fc-sensors,f-safety,tools-overview,ap-intro,ap-sitl,ap-missions,ap-lua,ap-ekf,ap-logs,ap-heavy,ap-quadplane,comp-intro,comp-mavlink,comp-raspberry,ap-companion,comp-esp32" style="--gc-value: 0%"></div>
       <p class="gc-muted home-hero__note">Иди по порядку: каждый шаг опирается на предыдущие. Общие модули (физика, питание, радиолинк) включены там, где они нужны именно этой прошивке.</p>
     </section>
       <section class="track gc-panel">
@@ -47,28 +47,43 @@
             <a class="track-module__title" href="../m/f-physics.html">Как летает мультиротор</a>
             <span class="track-module__tags"><span class="gc-tag" title="L1 — Оператор">L1</span><span class="gc-tag">~2 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
           </li>
-          <li class="track-module" data-module-id="f-power">
+          <li class="track-module track-module--planned" data-module-id="f-aero-props">
             <span class="track-module__num">02</span>
+            <a class="track-module__title" href="../m/f-aero-props.html">Аэродинамика пропеллера и подбор силовой установки</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L2 — Интегратор">L2</span><span class="gc-tag">~4 ч</span><span class="gc-tag" data-state="caution">СКОРО</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+          </li>
+          <li class="track-module" data-module-id="f-power">
+            <span class="track-module__num">03</span>
             <a class="track-module__title" href="../m/f-power.html">Питание: LiPo, Li-Ion, BEC</a>
             <span class="track-module__tags"><span class="gc-tag" title="L1 — Оператор">L1</span><span class="gc-tag">~3 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
           </li>
           <li class="track-module" data-module-id="f-motors-esc">
-            <span class="track-module__num">03</span>
+            <span class="track-module__num">04</span>
             <a class="track-module__title" href="../m/f-motors-esc.html">Моторы, ESC и DShot</a>
             <span class="track-module__tags"><span class="gc-tag" title="L1 — Оператор">L1</span><span class="gc-tag">~2 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
           </li>
           <li class="track-module" data-module-id="f-fc-sensors">
-            <span class="track-module__num">04</span>
+            <span class="track-module__num">05</span>
             <a class="track-module__title" href="../m/f-fc-sensors.html">Полётный контроллер и сенсоры</a>
             <span class="track-module__tags"><span class="gc-tag" title="L1 — Оператор">L1</span><span class="gc-tag">~2 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
           </li>
+          <li class="track-module track-module--planned" data-module-id="f-frame-mech">
+            <span class="track-module__num">06</span>
+            <a class="track-module__title" href="../m/f-frame-mech.html">Рама, механика и вибрации</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L2 — Интегратор">L2</span><span class="gc-tag">~3 ч</span><span class="gc-tag" data-state="caution">СКОРО</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+          </li>
           <li class="track-module" data-module-id="f-safety">
-            <span class="track-module__num">05</span>
+            <span class="track-module__num">07</span>
             <a class="track-module__title" href="../m/f-safety.html">Безопасность и предполётный чек</a>
             <span class="track-module__tags"><span class="gc-tag" title="L1 — Оператор">L1</span><span class="gc-tag">~1 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
           </li>
+          <li class="track-module track-module--planned" data-module-id="f-regulations">
+            <span class="track-module__num">08</span>
+            <a class="track-module__title" href="../m/f-regulations.html">Правила, зоны и ответственность оператора</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L1 — Оператор">L1</span><span class="gc-tag">~2 ч</span><span class="gc-tag" data-state="caution">СКОРО</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+          </li>
           <li class="track-module" data-module-id="tools-overview">
-            <span class="track-module__num">06</span>
+            <span class="track-module__num">09</span>
             <a class="track-module__title" href="../m/tools-overview.html">Инструменты: Configurator, GCS, git</a>
             <span class="track-module__tags"><span class="gc-tag" title="L1 — Оператор">L1</span><span class="gc-tag">~2 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
           </li>
@@ -79,22 +94,22 @@
         <h2 class="gc-title">Симулятор</h2>
         <ol class="track__modules">
           <li class="track-module" data-module-id="ap-intro">
-            <span class="track-module__num">07</span>
+            <span class="track-module__num">10</span>
             <a class="track-module__title" href="../m/ap-intro.html">Введение в ArduPilot</a>
             <span class="track-module__tags"><span class="gc-tag" title="L2 — Интегратор">L2</span><span class="gc-tag">~2 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
           </li>
           <li class="track-module" data-module-id="ap-sitl">
-            <span class="track-module__num">08</span>
+            <span class="track-module__num">11</span>
             <a class="track-module__title" href="../m/ap-sitl.html">SITL: дрон без дрона</a>
             <span class="track-module__tags"><span class="gc-tag" title="L2 — Интегратор">L2</span><span class="gc-tag">~3 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
           </li>
           <li class="track-module" data-module-id="ap-missions">
-            <span class="track-module__num">09</span>
+            <span class="track-module__num">12</span>
             <a class="track-module__title" href="../m/ap-missions.html">Миссии и планирование</a>
             <span class="track-module__tags"><span class="gc-tag" title="L2 — Интегратор">L2</span><span class="gc-tag">~3 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
           </li>
           <li class="track-module" data-module-id="ap-lua">
-            <span class="track-module__num">10</span>
+            <span class="track-module__num">13</span>
             <a class="track-module__title" href="../m/ap-lua.html">Lua: сценарии и fault injection</a>
             <span class="track-module__tags"><span class="gc-tag" title="L3 — Специалист">L3</span><span class="gc-tag">~3 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
           </li>
@@ -102,17 +117,68 @@
       </section>
       <section class="track gc-panel">
         <p class="gc-label gc-muted">Этап</p>
-        <h2 class="gc-title">Навигация и логи</h2>
+        <h2 class="gc-title">Датчики и оценка состояния</h2>
         <ol class="track__modules">
+          <li class="track-module track-module--planned" data-module-id="est-sensors">
+            <span class="track-module__num">14</span>
+            <a class="track-module__title" href="../m/est-sensors.html">Датчики IMU: физика, ошибки, калибровка</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L2 — Интегратор">L2</span><span class="gc-tag">~3 ч</span><span class="gc-tag" data-state="caution">СКОРО</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+          </li>
+          <li class="track-module track-module--planned" data-module-id="est-attitude">
+            <span class="track-module__num">15</span>
+            <a class="track-module__title" href="../m/est-attitude.html">Ориентация: углы Эйлера, кватернионы, комплементарный фильтр</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L3 — Специалист">L3</span><span class="gc-tag">~4 ч</span><span class="gc-tag" data-state="caution">СКОРО</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+          </li>
+          <li class="track-module track-module--planned" data-module-id="est-kalman">
+            <span class="track-module__num">16</span>
+            <a class="track-module__title" href="../m/est-kalman.html">Фильтр Калмана на пальцах и EKF</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L3 — Специалист">L3</span><span class="gc-tag">~4 ч</span><span class="gc-tag" data-state="caution">СКОРО</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+          </li>
+          <li class="track-module track-module--planned" data-module-id="est-gnss">
+            <span class="track-module__num">17</span>
+            <a class="track-module__title" href="../m/est-gnss.html">GNSS: как работает GPS, ошибки, RTK</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L2 — Интегратор">L2</span><span class="gc-tag">~3 ч</span><span class="gc-tag" data-state="caution">СКОРО</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+          </li>
           <li class="track-module" data-module-id="ap-ekf">
-            <span class="track-module__num">11</span>
+            <span class="track-module__num">18</span>
             <a class="track-module__title" href="../m/ap-ekf.html">EKF и навигация</a>
             <span class="track-module__tags"><span class="gc-tag" title="L3 — Специалист">L3</span><span class="gc-tag">~3 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
           </li>
+          <li class="track-module track-module--planned" data-module-id="est-alt-sources">
+            <span class="track-module__num">19</span>
+            <a class="track-module__title" href="../m/est-alt-sources.html">Высота и позиция без GPS: баро, дальномер, оптический поток</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L3 — Специалист">L3</span><span class="gc-tag">~3 ч</span><span class="gc-tag" data-state="caution">СКОРО</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+          </li>
+        </ol>
+      </section>
+      <section class="track gc-panel">
+        <p class="gc-label gc-muted">Этап</p>
+        <h2 class="gc-title">Логи, тюнинг, отказоустойчивость</h2>
+        <ol class="track__modules">
+          <li class="track-module track-module--planned" data-module-id="data-python">
+            <span class="track-module__num">20</span>
+            <a class="track-module__title" href="../m/data-python.html">Python для анализа полётных данных</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L2 — Интегратор">L2</span><span class="gc-tag">~4 ч</span><span class="gc-tag" data-state="caution">СКОРО</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+          </li>
+          <li class="track-module track-module--planned" data-module-id="ctl-signals">
+            <span class="track-module__num">21</span>
+            <a class="track-module__title" href="../m/ctl-signals.html">Сигналы и спектры: что видит гироскоп</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L2 — Интегратор">L2</span><span class="gc-tag">~3 ч</span><span class="gc-tag" data-state="caution">СКОРО</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+          </li>
           <li class="track-module" data-module-id="ap-logs">
-            <span class="track-module__num">12</span>
+            <span class="track-module__num">22</span>
             <a class="track-module__title" href="../m/ap-logs.html">Логи ArduPilot: разбор полёта</a>
             <span class="track-module__tags"><span class="gc-tag" title="L3 — Специалист">L3</span><span class="gc-tag">~3 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+          </li>
+          <li class="track-module track-module--planned" data-module-id="ap-tuning">
+            <span class="track-module__num">23</span>
+            <a class="track-module__title" href="../m/ap-tuning.html">Тюнинг ArduPilot: AUTOTUNE, фильтры, notch по ESC</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L3 — Специалист">L3</span><span class="gc-tag">~3 ч</span><span class="gc-tag" data-state="caution">СКОРО</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+          </li>
+          <li class="track-module track-module--planned" data-module-id="ap-safety-fs">
+            <span class="track-module__num">24</span>
+            <a class="track-module__title" href="../m/ap-safety-fs.html">Отказоустойчивость: failsafe, геозона, FMEA полёта</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L3 — Специалист">L3</span><span class="gc-tag">~3 ч</span><span class="gc-tag" data-state="caution">СКОРО</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
           </li>
         </ol>
       </section>
@@ -120,15 +186,35 @@
         <p class="gc-label gc-muted">Этап</p>
         <h2 class="gc-title">Платформы</h2>
         <ol class="track__modules">
+          <li class="track-module track-module--planned" data-module-id="aero-wing">
+            <span class="track-module__num">25</span>
+            <a class="track-module__title" href="../m/aero-wing.html">Аэродинамика крыла и самолётные режимы</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L3 — Специалист">L3</span><span class="gc-tag">~4 ч</span><span class="gc-tag" data-state="caution">СКОРО</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+          </li>
           <li class="track-module" data-module-id="ap-heavy">
-            <span class="track-module__num">13</span>
+            <span class="track-module__num">26</span>
             <a class="track-module__title" href="../m/ap-heavy.html">Тяжёлые платформы: X8 и окто</a>
             <span class="track-module__tags"><span class="gc-tag" title="L3 — Специалист">L3</span><span class="gc-tag">~3 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
           </li>
           <li class="track-module" data-module-id="ap-quadplane">
-            <span class="track-module__num">14</span>
+            <span class="track-module__num">27</span>
             <a class="track-module__title" href="../m/ap-quadplane.html">QuadPlane и tilt-rotor VTOL</a>
             <span class="track-module__tags"><span class="gc-tag" title="L3 — Специалист">L3</span><span class="gc-tag">~4 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+          </li>
+          <li class="track-module track-module--planned" data-module-id="el-power-design">
+            <span class="track-module__num">28</span>
+            <a class="track-module__title" href="../m/el-power-design.html">Схемотехника питания борта</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L2 — Интегратор">L2</span><span class="gc-tag">~4 ч</span><span class="gc-tag" data-state="caution">СКОРО</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+          </li>
+          <li class="track-module track-module--planned" data-module-id="el-emi">
+            <span class="track-module__num">29</span>
+            <a class="track-module__title" href="../m/el-emi.html">Помехи и электромагнитная совместимость</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L2 — Интегратор">L2</span><span class="gc-tag">~3 ч</span><span class="gc-tag" data-state="caution">СКОРО</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+          </li>
+          <li class="track-module track-module--planned" data-module-id="rf-link-budget">
+            <span class="track-module__num">30</span>
+            <a class="track-module__title" href="../m/rf-link-budget.html">Бюджет радиолинка и дальность</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L2 — Интегратор">L2</span><span class="gc-tag">~3 ч</span><span class="gc-tag" data-state="caution">СКОРО</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
           </li>
         </ol>
       </section>
@@ -137,38 +223,79 @@
         <h2 class="gc-title">Свой код на борту</h2>
         <ol class="track__modules">
           <li class="track-module" data-module-id="comp-intro">
-            <span class="track-module__num">15</span>
+            <span class="track-module__num">31</span>
             <a class="track-module__title" href="../m/comp-intro.html">Companion: зачем и где граница</a>
             <span class="track-module__tags"><span class="gc-tag" title="L2 — Интегратор">L2</span><span class="gc-tag">~2 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
           </li>
           <li class="track-module" data-module-id="comp-mavlink">
-            <span class="track-module__num">16</span>
+            <span class="track-module__num">32</span>
             <a class="track-module__title" href="../m/comp-mavlink.html">MAVLink и MAVSDK</a>
             <span class="track-module__tags"><span class="gc-tag" title="L2 — Интегратор">L2</span><span class="gc-tag">~3 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
           </li>
+          <li class="track-module track-module--planned" data-module-id="emb-basics">
+            <span class="track-module__num">33</span>
+            <a class="track-module__title" href="../m/emb-basics.html">Embedded: прерывания, таймеры, DMA, RTOS</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L3 — Специалист">L3</span><span class="gc-tag">~4 ч</span><span class="gc-tag" data-state="caution">СКОРО</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+          </li>
+          <li class="track-module track-module--planned" data-module-id="emb-protocols">
+            <span class="track-module__num">34</span>
+            <a class="track-module__title" href="../m/emb-protocols.html">UART, I2C, SPI, CAN на уровне сигналов и драйверов</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L3 — Специалист">L3</span><span class="gc-tag">~3 ч</span><span class="gc-tag" data-state="caution">СКОРО</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+          </li>
           <li class="track-module" data-module-id="comp-raspberry">
-            <span class="track-module__num">17</span>
+            <span class="track-module__num">35</span>
             <a class="track-module__title" href="../m/comp-raspberry.html">Raspberry Pi + ArduPilot</a>
             <span class="track-module__tags"><span class="gc-tag" title="L3 — Специалист">L3</span><span class="gc-tag">~4 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
           </li>
           <li class="track-module" data-module-id="ap-companion">
-            <span class="track-module__num">18</span>
+            <span class="track-module__num">36</span>
             <a class="track-module__title" href="../m/ap-companion.html">Companion + ArduPilot: управление из кода</a>
             <span class="track-module__tags"><span class="gc-tag" title="L3 — Специалист">L3</span><span class="gc-tag">~3 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
           </li>
           <li class="track-module" data-module-id="comp-esp32">
-            <span class="track-module__num">19</span>
+            <span class="track-module__num">37</span>
             <a class="track-module__title" href="../m/comp-esp32.html">ESP32 и периферия</a>
             <span class="track-module__tags"><span class="gc-tag" title="L2 — Интегратор">L2</span><span class="gc-tag">~4 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
           </li>
-          <li class="track-module" data-module-id="bf-custom">
-            <span class="track-module__num">20</span>
-            <a class="track-module__title" href="../m/bf-custom.html">Свои сборки прошивок</a>
-            <span class="track-module__tags"><span class="gc-tag" title="L4 — Эксперт">L4</span><span class="gc-tag">~3 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+          <li class="track-module track-module--planned" data-module-id="fw-reading">
+            <span class="track-module__num">38</span>
+            <a class="track-module__title" href="../m/fw-reading.html">Как читать исходники прошивки: Betaflight и ArduPilot</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L4 — Эксперт">L4</span><span class="gc-tag">~4 ч</span><span class="gc-tag" data-state="caution">СКОРО</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+          </li>
+          <li class="track-module track-module--planned" data-module-id="eng-systems">
+            <span class="track-module__num">39</span>
+            <a class="track-module__title" href="../m/eng-systems.html">Системная инженерия: требования, FMEA, документация, тесты</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L4 — Эксперт">L4</span><span class="gc-tag">~4 ч</span><span class="gc-tag" data-state="caution">СКОРО</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
           </li>
         </ol>
       </section>
-    <h2 class="gc-title section-title">Итоговые проекты</h2><a class="gc-card capstone-card" href="../cap/cap-heavy-or-vtol.html" data-module-id="cap-heavy-or-vtol"><p class="gc-label gc-muted">Итоговый проект</p><strong>Окто X8 с нагрузкой или VTOL-крыло</strong><div class="gc-muted">параметры, миссия в SITL, реальный полёт, разбор лога</div><div class="gc-card__meta"><span class="gc-tag" data-state="ok" data-done-badge hidden>СДАН</span></div></a><a class="gc-card capstone-card" href="../cap/cap-own-logic.html" data-module-id="cap-own-logic"><p class="gc-label gc-muted">Итоговый проект</p><strong>Своя логика + ESP32-модуль</strong><div class="gc-muted">работающий модуль, протокол обмена, README и тесты</div><div class="gc-card__meta"><span class="gc-tag" data-state="ok" data-done-badge hidden>СДАН</span></div></a>
+      <section class="track gc-panel">
+        <p class="gc-label gc-muted">Этап</p>
+        <h2 class="gc-title">Восприятие</h2>
+        <ol class="track__modules">
+          <li class="track-module track-module--planned" data-module-id="per-camera">
+            <span class="track-module__num">40</span>
+            <a class="track-module__title" href="../m/per-camera.html">Камеры и видеопоток на companion</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L3 — Специалист">L3</span><span class="gc-tag">~3 ч</span><span class="gc-tag" data-state="caution">СКОРО</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+          </li>
+          <li class="track-module track-module--planned" data-module-id="per-cv">
+            <span class="track-module__num">41</span>
+            <a class="track-module__title" href="../m/per-cv.html">Компьютерное зрение: от OpenCV до нейросетей</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L4 — Эксперт">L4</span><span class="gc-tag">~5 ч</span><span class="gc-tag" data-state="caution">СКОРО</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+          </li>
+          <li class="track-module track-module--planned" data-module-id="per-visual-nav">
+            <span class="track-module__num">42</span>
+            <a class="track-module__title" href="../m/per-visual-nav.html">Визуальная навигация: оптический поток, VIO, SLAM обзорно</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L4 — Эксперт">L4</span><span class="gc-tag">~4 ч</span><span class="gc-tag" data-state="caution">СКОРО</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+          </li>
+          <li class="track-module track-module--planned" data-module-id="per-tracking">
+            <span class="track-module__num">43</span>
+            <a class="track-module__title" href="../m/per-tracking.html">Слежение и управление по цели</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L4 — Эксперт">L4</span><span class="gc-tag">~4 ч</span><span class="gc-tag" data-state="caution">СКОРО</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+          </li>
+        </ol>
+      </section>
+    <h2 class="gc-title section-title">Итоговые проекты</h2><a class="gc-card capstone-card" href="../cap/cap-heavy-or-vtol.html" data-module-id="cap-heavy-or-vtol"><p class="gc-label gc-muted">Итоговый проект</p><strong>Окто X8 с нагрузкой или VTOL-крыло</strong><div class="gc-muted">параметры, миссия в SITL, реальный полёт, разбор лога</div><div class="gc-card__meta"><span class="gc-tag" data-state="ok" data-done-badge hidden>СДАН</span></div></a><a class="gc-card capstone-card" href="../cap/cap-own-logic.html" data-module-id="cap-own-logic"><p class="gc-label gc-muted">Итоговый проект</p><strong>Своя логика + ESP32-модуль</strong><div class="gc-muted">работающий модуль, протокол обмена, README и тесты</div><div class="gc-card__meta"><span class="gc-tag" data-state="ok" data-done-badge hidden>СДАН</span></div></a><a class="gc-card capstone-card" href="../cap/cap-perception.html" data-module-id="cap-perception"><p class="gc-label gc-muted">Итоговый проект</p><strong>Слежение за целью</strong><div class="gc-muted">Companion детектирует объект в видео и ведёт аппарат за ним в SITL/в поле через GUIDED/Offboard</div><div class="gc-card__meta"><span class="gc-tag" data-state="ok" data-done-badge hidden>СДАН</span></div></a>
   </main>
   <footer class="gc-container site-footer gc-muted">
     <p>Открытый курс · <a href="https://github.com/irreligious86/UAV-Education">исходники на GitHub</a> · <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">план развития</a> · <a href="../curriculum/curriculum.html">для разработчика</a> · CC BY-NC-SA 4.0</p>
