@@ -1,0 +1,72 @@
+{
+  "module": "comp-mavlink",
+  "pass": 80,
+  "questions": [
+    {
+      "q": "Что такое heartbeat?",
+      "options": [
+        "Команда арма",
+        "Сообщение раз в секунду от каждого участника: тип, режим, арм",
+        "Пакет телеметрии GPS",
+        "Ответ на команду"
+      ],
+      "answer": 1,
+      "explain": "Пока нет heartbeat — нет связи."
+    },
+    {
+      "q": "Как узнать, что команда выполнена?",
+      "options": [
+        "Подождать",
+        "По COMMAND_ACK с результатом",
+        "По heartbeat",
+        "По STATUSTEXT только"
+      ],
+      "answer": 1,
+      "explain": "MAV_RESULT_ACCEPTED (0) — принято; остальное — отказ."
+    },
+    {
+      "q": "ID сообщения GLOBAL_POSITION_INT?",
+      "options": [
+        "30",
+        "33",
+        "65",
+        "1"
+      ],
+      "answer": 1,
+      "explain": "0 — HEARTBEAT, 1 — SYS_STATUS, 30 — ATTITUDE, 33 — GLOBAL_POSITION_INT."
+    },
+    {
+      "q": "Как попросить ATTITUDE с частотой 10 Гц?",
+      "options": [
+        "Через параметр",
+        "MAV_CMD_SET_MESSAGE_INTERVAL с интервалом 100000 мкс",
+        "Нельзя",
+        "Через PARAM_SET"
+      ],
+      "answer": 1,
+      "explain": "Интервал в микросекундах."
+    },
+    {
+      "q": "system_id и component_id — это…",
+      "options": [
+        "Версия протокола",
+        "Аппарат и компонент внутри него (автопилот, камера, companion)",
+        "Канал и диапазон",
+        "Порт и скорость"
+      ],
+      "answer": 1,
+      "explain": "Companion — отдельный компонент той же системы."
+    },
+    {
+      "q": "Когда брать MAVSDK вместо pymavlink?",
+      "options": [
+        "Всегда",
+        "Для приложений с высокоуровневыми действиями; pymavlink — для обучения и нестандартного",
+        "Никогда",
+        "Только с PX4"
+      ],
+      "answer": 1,
+      "explain": "pymavlink показывает каждое сообщение, MAVSDK — arm()/takeoff()."
+    }
+  ]
+}

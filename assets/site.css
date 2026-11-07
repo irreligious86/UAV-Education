@@ -110,3 +110,22 @@
 .legacy-page .checklist-card ul { list-style: none; padding-left: 0; }
 .legacy-page .checklist-card input { accent-color: var(--gc-accent-hud); margin-right: var(--gc-space-2); }
 .legacy-page .muted { color: var(--gc-ink-muted); }
+
+/* ---------- quiz (<uav-quiz>, light DOM) ---------- */
+.uav-quiz { display: block; padding: var(--gc-space-4); border: 1px solid var(--gc-line); border-radius: var(--gc-radius-md); background: var(--gc-surface-200); }
+.uav-quiz > * + * { margin-top: var(--gc-space-3); }
+.uav-quiz__q { font-size: 17px; line-height: 26px; font-weight: 600; }
+.uav-quiz__options { display: grid; gap: var(--gc-space-2); }
+.uav-quiz__opt {
+  all: unset; box-sizing: border-box; cursor: pointer; display: block; width: 100%;
+  padding: var(--gc-space-3) var(--gc-space-4);
+  border: 1px solid var(--gc-line); border-radius: var(--gc-radius-md);
+  background: var(--gc-surface-100); color: var(--gc-ink); line-height: 22px;
+}
+.uav-quiz__opt:hover:not(:disabled) { border-color: var(--gc-ink-muted); }
+.uav-quiz__opt:focus-visible { outline: 2px solid var(--gc-accent-hud); outline-offset: 2px; }
+.uav-quiz__opt:disabled { cursor: default; opacity: 0.8; }
+.uav-quiz__opt[data-state="ok"] { border-color: var(--gc-accent-hud); color: var(--gc-accent-hud); opacity: 1; }
+.uav-quiz__opt[data-state="critical"] { border-color: var(--gc-signal-red); color: var(--gc-signal-red); opacity: 1; }
+.uav-quiz__score { font-family: var(--gc-font-mono); font-size: 22px; }
+.uav-quiz__nav { padding-top: var(--gc-space-2); }

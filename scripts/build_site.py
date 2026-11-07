@@ -51,7 +51,8 @@ PAGES = {
     "resources": "Ресурсы и сообщества",
 }
 
-GENERATED_DIRS = ("m", "ref", "pages", "api")
+GENERATED_DIRS = ("m", "ref", "pages", "api", "quiz")
+QUIZ_SRC = ROOT / "content" / "quiz"
 
 esc = html.escape
 
@@ -132,11 +133,13 @@ def layout(*, title: str, base: str, body: str, active: str, description: str = 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{esc(full_title)}</title>
   <meta name="description" content="{esc(description or 'Инженерный курс по БПЛА: от физики полёта до своих прошивок и бортовых компьютеров.')}">
+  <link rel="icon" href="{base}assets/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="{base}{GC}/ground-control.css">
   <link rel="stylesheet" href="{base}assets/site.css">
   <script src="{base}{GC}/ground-control.js" defer></script>
   <script src="{base}assets/progress-store.js" defer></script>
-  <script src="{base}assets/app.js" defer></script>{extra_head}
+  <script src="{base}assets/app.js" defer></script>
+  <script src="{base}assets/uav-quiz.js" defer></script>{extra_head}
 </head>
 <body class="gc-root">
   <header class="site-header">
@@ -430,6 +433,10 @@ def render_module(m: dict, model: dict) -> str:
         done_toggle = ""
     else:
         summary_html, content = article_sections(m)
+        if (QUIZ_SRC / f"{m['id']}.json").is_file():
+            content += (
+                f'\n<h2>Проверь себя</h2>\n<uav-quiz src="{base}quiz/{esc(m["id"])}.json" module="{esc(m["id"])}"></uav-quiz>'
+            )
         done_toggle = (
             f'<div class="module-done"><gc-button variant="secondary" data-done-toggle="{esc(m["id"])}">'
             "Отметить как пройденный</gc-button></div>"
@@ -561,10 +568,14 @@ def main() -> None:
         write(ROOT / "ref" / f"{s['key']}.html", render_ref_stack(s, model))
     for name, title in PAGES.items():
         write(ROOT / "pages" / f"{name}.html", render_page(name, title))
+    if QUIZ_SRC.is_dir():
+        for q in QUIZ_SRC.glob("*.json"):
+            write(ROOT / "quiz" / q.name, q.read_text(encoding="utf-8"))
     write(ROOT / "api" / "v1" / "curriculum.json", json.dumps(api_payload(model), ensure_ascii=False, indent=2) + "\n")
 
     n_pub = sum(1 for m in model["modules"].values() if m["status"] == "published")
-    print(f"built: {len(model['modules'])} module pages ({n_pub} written), {len(model['stacks'])} stacks, {len(PAGES)} pages")
+    n_quiz = len(list(QUIZ_SRC.glob("*.json"))) if QUIZ_SRC.is_dir() else 0
+    print(f"built: {len(model['modules'])} module pages ({n_pub} written, {n_quiz} with quiz), {len(model['stacks'])} stacks, {len(PAGES)} pages")
 
 
 if __name__ == "__main__":

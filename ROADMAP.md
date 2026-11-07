@@ -66,14 +66,13 @@ Priority: a well-structured learning program.
 - [x] Ground Control UI as a pinned git submodule (`lib/ground-control-ui`, v0.2.2);
       gaps found here are fixed upstream (v0.2.0: namespace + content primitives, v0.2.1: `[hidden]` fix, v0.2.2: card colour)
 - [x] Static API: `api/v1/curriculum.json` — the contract a future server will serve
-- [ ] Quizzes: `<uav-quiz>` + JSON question bank, seeded for written modules
+- [x] Quizzes: `<uav-quiz>` + JSON banks for all 34 core modules (5–7 questions each, shuffled, explained, result in ProgressStore)
 - [ ] Client-side search over a generated index
 - [ ] `ARCHITECTURE.md`: layers, data contracts, step-by-step migration to own server
 - [ ] Offline PWA (service worker)
 
 ## Phase 3 — Interactivity
 
-- [ ] Quiz mode: JSON question bank per article ("question → answer → explanation")
 - [ ] Widgets as standalone Web Components: PID step-response simulator, filter frequency response, ELRS packet rate ↔ latency calculator
 - [ ] 3D attitude demo (three.js)
 

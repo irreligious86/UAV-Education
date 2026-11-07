@@ -11,6 +11,8 @@
  *   setDone(id, isDone)      -> Promise<void>
  *   getChecks(prefix)        -> Promise<Set<string>>   checked checklist items
  *   setCheck(id, isChecked)  -> Promise<void>
+ *   getQuiz(moduleId)        -> Promise<{correct,total,ts}|null>  last quiz result
+ *   setQuiz(moduleId, res)   -> Promise<void>
  */
 (function () {
   "use strict";
@@ -23,9 +25,9 @@
     try {
       var raw = window.localStorage.getItem(KEY);
       var data = raw ? JSON.parse(raw) : {};
-      return { done: data.done || [], checks: data.checks || [] };
+      return { done: data.done || [], checks: data.checks || [], quiz: data.quiz || {} };
     } catch (e) {
-      return { done: [], checks: [] };
+      return { done: [], checks: [], quiz: {} };
     }
   };
 
@@ -60,6 +62,17 @@
     var set = new Set(data.checks);
     if (isChecked) set.add(id); else set.delete(id);
     data.checks = Array.from(set);
+    this._write(data);
+    return Promise.resolve();
+  };
+
+  LocalProgressStore.prototype.getQuiz = function (moduleId) {
+    return Promise.resolve(this._read().quiz[moduleId] || null);
+  };
+
+  LocalProgressStore.prototype.setQuiz = function (moduleId, result) {
+    var data = this._read();
+    data.quiz[moduleId] = result;
     this._write(data);
     return Promise.resolve();
   };

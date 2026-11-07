@@ -14,7 +14,8 @@
 3. Слот в программе без текста: `--status planned` (видно на сайте как «скоро»).
 4. **Публикация:** `publish.bat` / `publish.sh` или `python scripts/publish.py` — валидация, сборка всех страниц сайта, проверка ссылок.
 5. **Место в курсе:** добавь модуль в нужный трек в `data/curriculum.json` (цели, prerequisites, часы). Validator не пропустит статью, не размещённую в курсе.
-6. Только проверка — `python scripts/validate_content.py`. То же самое выполняет CI на каждый push.
+6. **Квиз:** `content/quiz/<id>.json` (см. формат в `assets/uav-quiz.js`); появляется на странице модуля автоматически.
+7. Только проверка — `python scripts/validate_content.py`. То же самое выполняет CI на каждый push.
 
 
 **Важно:** `index.html`, `m/`, `ref/`, `pages/`, `api/` генерируются целиком — руками их не правят. Ручные страницы (глоссарий, фейлы и т.д.) живут в `content/pages/*.html`.

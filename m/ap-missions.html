@@ -5,11 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Миссии и планирование — UAV Student</title>
   <meta name="description" content="разделить маршрут и сценарий проверить миссию в SITL">
+  <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="../lib/ground-control-ui/dist/ground-control.css">
   <link rel="stylesheet" href="../assets/site.css">
   <script src="../lib/ground-control-ui/dist/ground-control.js" defer></script>
   <script src="../assets/progress-store.js" defer></script>
   <script src="../assets/app.js" defer></script>
+  <script src="../assets/uav-quiz.js" defer></script>
 </head>
 <body class="gc-root">
   <header class="site-header">
@@ -91,6 +93,8 @@ print(&quot;mission upload:&quot;, ack.type)  # 0 = MAV_MISSION_ACCEPTED</code><
 
 <h2>Источники</h2>
 <ul class="refs"><li><a href="https://ardupilot.org/copter/docs/common-planning-a-mission-with-waypoints-and-events.html" target="_blank" rel="noopener noreferrer">Planning a Mission with Waypoints and Events — ArduPilot Copter</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://ardupilot.org/copter/docs/mission-command-list.html" target="_blank" rel="noopener noreferrer">Copter Mission Command List — ArduPilot</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://mavlink.io/en/services/mission.html" target="_blank" rel="noopener noreferrer">MAVLink Mission Protocol</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://github.com/mavlink/mavlink/blob/master/message_definitions/v1.0/common.xml" target="_blank" rel="noopener noreferrer">MAVLink common message set (common.xml)</a> <span class="gc-tag" data-state="info">primary</span></li></ul>
+<h2>Проверь себя</h2>
+<uav-quiz src="../quiz/ap-missions.json" module="ap-missions"></uav-quiz>
       </div>
       <div class="module-done"><gc-button variant="secondary" data-done-toggle="ap-missions">Отметить как пройденный</gc-button></div>
       <section class="related" aria-label="Смежные модули"><p class="gc-label gc-muted">Смежные модули</p><div class="gc-grid ref-grid"><a class="gc-card" href="ap-sitl.html"><strong>SITL: дрон без дрона</strong><div class="gc-card__meta"><span class="gc-tag" title="L2 — Интегратор">L2</span></div></a><a class="gc-card" href="ap-ekf.html"><strong>EKF и навигация</strong><div class="gc-card__meta"><span class="gc-tag" title="L3 — Специалист">L3</span></div></a></div></section>

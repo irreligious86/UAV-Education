@@ -232,6 +232,49 @@ def validate_curriculum(manifest_ids):
     return errors
 
 
+QUIZ_DIR = ROOT / "content" / "quiz"
+QUIZ_MIN_QUESTIONS = 5
+
+
+def validate_quizzes(manifest_ids, status_by_id):
+    """Every quiz bank must be well-formed and belong to a published module."""
+    import json
+
+    errors = []
+    if not QUIZ_DIR.is_dir():
+        return errors
+    for path in sorted(QUIZ_DIR.glob("*.json")):
+        rel = path.relative_to(ROOT)
+        try:
+            bank = json.loads(path.read_text(encoding="utf-8"))
+        except json.JSONDecodeError as e:
+            errors.append(f"{rel}: невалидный JSON ({e})")
+            continue
+        mid = path.stem
+        if bank.get("module") != mid:
+            errors.append(f"{rel}: поле module «{bank.get('module')}» ≠ имени файла «{mid}»")
+        if mid not in manifest_ids:
+            errors.append(f"{rel}: модуля «{mid}» нет в манифесте")
+        elif status_by_id.get(mid) != "published":
+            errors.append(f"{rel}: квиз для неопубликованного модуля")
+        qs = bank.get("questions", [])
+        if len(qs) < QUIZ_MIN_QUESTIONS:
+            errors.append(f"{rel}: {len(qs)} вопросов < {QUIZ_MIN_QUESTIONS}")
+        for i, q in enumerate(qs, 1):
+            opts = q.get("options", [])
+            if not q.get("q") or len(opts) < 3:
+                errors.append(f"{rel}: вопрос {i} — нет текста или меньше 3 вариантов")
+                continue
+            ans = q.get("answer")
+            if not isinstance(ans, int) or not 0 <= ans < len(opts):
+                errors.append(f"{rel}: вопрос {i} — answer вне диапазона")
+            if not q.get("explain"):
+                errors.append(f"{rel}: вопрос {i} — нет объяснения")
+            if len(set(opts)) != len(opts):
+                errors.append(f"{rel}: вопрос {i} — повторяющиеся варианты")
+    return errors
+
+
 def main():
     if not MANIFEST_PATH.is_file():
         print(f"Нет {MANIFEST_PATH}", file=sys.stderr)
@@ -247,6 +290,8 @@ def main():
 
     errs.extend(validate_statuses(manifest))
     errs.extend(validate_curriculum(all_ids_set))
+    status_by_id = {a["id"]: a.get("status") for sec in manifest.get("sections", []) for a in sec.get("articles", [])}
+    errs.extend(validate_quizzes(all_ids_set, status_by_id))
 
     status_by_file = {}
     for sec in manifest.get("sections", []):
@@ -276,6 +321,8 @@ def main():
     print("validate_content: OK")
     print(f"  статей в манифесте: {len(ids)}")
     print("  " + ", ".join(f"{k}: {v}" for k, v in sorted(counts.items())))
+    if QUIZ_DIR.is_dir():
+        print(f"  квизов: {len(list(QUIZ_DIR.glob('*.json')))}")
 
 
 if __name__ == "__main__":
