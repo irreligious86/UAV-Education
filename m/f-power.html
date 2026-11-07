@@ -27,13 +27,43 @@
     <article class="module" data-module-page="f-power">
       <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-foundation">Фундамент</a><span>Питание: LiPo, Li-Ion, BEC</span></p>
       <h1 class="module-title">Питание: LiPo, Li-Ion, BEC</h1>
-      <div class="module-tags"><span class="gc-tag" title="Уровень">L1 — Оператор</span><span class="gc-tag">учёба ~3 ч</span><span class="gc-tag" data-state="caution">СКОРО</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></div>
-      
+      <div class="module-tags"><span class="gc-tag" title="Уровень">L1 — Оператор</span><span class="gc-tag">чтение 20 мин</span><span class="gc-tag">учёба ~3 ч</span><span class="gc-tag">любая прошивка</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></div>
+      <p class="module-lead">АКБ — самая тяжёлая и самая опасная деталь дрона. Модуль объясняет, чем LiPo отличается от Li-Ion, что на самом деле значат «S», «mAh» и «C», почему напряжение проседает под нагрузкой, как оценить время полёта и как не сжечь ни аккумулятор, ни мастерскую. В конце — реальный лог тяжёлого 10&quot;, где просадка показала больше, чем любая спецификация.</p>
       <div class="gc-callout" data-state="ok"><strong>После модуля ты умеешь</strong><ul><li>посчитать ток, ёмкость и примерное время полёта</li><li>выбрать АКБ по C-рейтингу и не убить её хранением</li></ul></div><p class="gc-muted">Перед этим модулем: <a href="f-physics.html">Как летает мультиротор</a></p><div class="gc-callout"><strong>Лабораторная</strong><div>Посчитать полётное время своей сборки и сверить с логом</div></div>
       <div class="gc-prose module-body">
-<div class="gc-callout" data-state="caution"><strong>Модуль в разработке.</strong> Цели и связи уже определены, текст пишется. План — в <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">ROADMAP</a>.</div>
+<h2>Теория</h2>
+<h4 class="md-subheading">Обозначения</h4>
+<ul><li><strong>S</strong> — число банок последовательно. 6S = 6 банок, напряжение складывается.</li><li><strong>mAh</strong> — ёмкость. 1300 mAh = 1.3 А·ч.</li><li><strong>C</strong> — ток разряда в долях ёмкости. 1300 mAh × 100C = 130 А по этикетке. Маркетинговое C почти всегда завышено, ориентируйся на внутреннее сопротивление и реальные тесты.</li><li><strong>P</strong> — параллельные банки у сборок из цилиндров (6S2P = 12 ячеек).</li></ul>
+<h4 class="md-subheading">LiPo против Li-Ion</h4>
+<ul><li><strong>LiPo:</strong> номинал 3.7 В/банка, полный заряд 4.2 В (LiHV — 4.35 В). Отдаёт огромные токи, но энергии на грамм меньше. Для фристайла, гонок, всего, где токи большие и полёт короткий.</li><li><strong>Li-Ion (18650, 21700):</strong> номинал около 3.6 В, полный 4.2 В, разряд глубже — до 2.8–3.0 В. Энергии на грамм заметно больше, токи скромнее. Для дальних 7–10&quot;, крыльев, долгого висения на умеренном газу.</li></ul>
+<p>Правило выбора: если средний ток на банку небольшой (дальний полёт, крыло), Li-Ion даёт больше минут. Если нужны пики в десятки ампер — LiPo.</p>
+<h4 class="md-subheading">Просадка напряжения</h4>
+<p>У каждой банки есть внутреннее сопротивление R. Под током I напряжение падает на I × R. При резком газе просадка мгновенная, и полётник видит не «сколько осталось», а «сколько осталось минус просадка». Отсюда ложные предупреждения о низком напряжении на панчах и реальные отключения ESC при севшей АКБ.</p>
+<h4 class="md-subheading">Время полёта</h4>
+<p>Оценка: время, мин ≈ используемая ёмкость, А·ч / средний ток, А × 60. Используемая ёмкость — около 80% номинала: высаживать в ноль нельзя. Средний ток бери из лога, а не из головы.</p>
+<h4 class="md-subheading">BEC и напряжения на борту</h4>
+<p>Полётник, приёмник, камера и VTX работают от 5, 9 или 12 В, а не от 6S. Эти напряжения дают BEC — стабилизаторы на полётнике или ESC. Перед подключением периферии проверяй: от какого пада она питается, хватает ли тока BEC (VTX на высокой мощности может съесть больше ампера), и что VTX не подключён к 5 В, если ему нужно 9–12 В.</p>
+<h4 class="md-subheading">Кейс: просадка на 10&quot;</h4>
+<p>Лог тяжёлого 10&quot; на 6S (АКБ 23.8 В в начале полёта): медианный ток 14–16 А, но p95 на агрессивном профиле — 124 А, пик 147 А. На этих пиках напряжение падало до 16.2 В, то есть 2.7 В на банку. Вывод: на таких токах АКБ работает на пределе, а ESC надо проверять на длительный ток около 125 А. Ни одна этикетка этого бы не сказала — сказал лог.</p>
+
+<h2>Практика</h2>
+<h4 class="md-subheading">Безопасная работа с LiPo</h4>
+<ol><li>Заряжай током 1C, на негорючей поверхности, под присмотром, с балансировкой.</li><li>Хранение — около 3.8 В/банка (режим Storage на зарядке). Полная АКБ на полке неделями деградирует и пухнет.</li><li>Вздутая, пробитая, с повреждённой оболочкой АКБ — выводится из эксплуатации.</li><li>Транспортировка — в огнестойкой сумке или ящике.</li><li>После жёсткого падения АКБ откладывают и наблюдают, прежде чем заряжать.</li></ol>
+<h4 class="md-subheading">Лабораторная: посчитать время полёта и сверить с логом</h4>
+<ol><li>Возьми ёмкость АКБ и средний ток из лога Blackbox или DataFlash.</li><li>Посчитай оценку: 0.8 × ёмкость, А·ч / ток × 60.</li><li>Сравни с реальным временем полёта до предупреждения о напряжении.</li><li>Найди в логе минимальное напряжение под нагрузкой и пересчитай на банку.</li></ol>
+<h4 class="md-subheading">Настройка контроля напряжения</h4>
+<p>В Betaflight проверь масштаб датчика напряжения и тока (Power &amp; Battery) по мультиметру и настрой предупреждения в OSD так, чтобы садиться с запасом, а не по сигналу «уже поздно».</p>
+
+<h2>Диагностика</h2>
+<div class="diag-groups"><article class="diag-item"><h4><strong>Симптом:</strong> предупреждение о низком напряжении на каждом панче</h4><ul><li>Возможная причина: просадка под током, старая АКБ с высоким внутренним сопротивлением.</li><li>Что сделать: смотреть напряжение в покое после полёта, мерить внутреннее сопротивление зарядкой.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> время полёта сильно меньше расчётного</h4><ul><li>Возможная причина: средний ток выше, чем казалось, или АКБ потеряла ёмкость.</li><li>Что сделать: взять средний ток из лога, проверить ёмкость циклом заряда.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> VTX или камера перезагружаются на газу</h4><ul><li>Возможная причина: просадка на шине BEC или питание от неподходящего пада.</li><li>Что сделать: проверить пад питания, добавить конденсатор на силовую шину, проверить ток BEC.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> АКБ тёплая и вздулась после полёта</h4><ul><li>Возможная причина: перегруз по току.</li><li>Что сделать: вывести АКБ из эксплуатации, пересмотреть ёмкость/C под реальный ток.</li></ul></article></div>
+
+<h2>Чек-лист</h2>
+<ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="f-power:0"><span>Понимаю разницу S, P, mAh и C</span></label></li><li><label><input type="checkbox" data-check-id="f-power:1"><span>Знаю, когда выбрать Li-Ion, а когда LiPo</span></label></li><li><label><input type="checkbox" data-check-id="f-power:2"><span>Посчитал время полёта и сверил с логом</span></label></li><li><label><input type="checkbox" data-check-id="f-power:3"><span>Проверил масштаб датчика напряжения мультиметром</span></label></li><li><label><input type="checkbox" data-check-id="f-power:4"><span>АКБ хранятся в storage-напряжении и в огнестойком контейнере</span></label></li></ul>
+
+<h2>Источники</h2>
+<ul class="refs"><li><a href="https://betaflight.com/docs/category/app" target="_blank" rel="noopener noreferrer">Betaflight App — tabs reference (Power &amp; Battery)</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://ardupilot.org/copter/docs/common-powermodule-landingpage.html" target="_blank" rel="noopener noreferrer">Battery Monitors — ArduPilot Copter</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://oscarliang.com/lipo-battery-guide/" target="_blank" rel="noopener noreferrer">LiPo Battery Guide — Oscar Liang</a> <span class="gc-tag">secondary</span></li></ul>
       </div>
-      
+      <div class="module-done"><gc-button variant="secondary" data-done-toggle="f-power">Отметить как пройденный</gc-button></div>
       <nav class="pager" aria-label="Соседние модули"><a class="gc-card pager__prev" href="f-physics.html"><span class="gc-label gc-muted">Назад</span><br>Как летает мультиротор</a><a class="gc-card pager__next" href="f-motors-esc.html"><span class="gc-label gc-muted">Дальше</span><br>Моторы, ESC и DShot</a></nav>
     </article>
   </main>

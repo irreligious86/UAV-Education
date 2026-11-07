@@ -27,13 +27,40 @@
     <article class="module" data-module-page="f-motors-esc">
       <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-foundation">Фундамент</a><span>Моторы, ESC и DShot</span></p>
       <h1 class="module-title">Моторы, ESC и DShot</h1>
-      <div class="module-tags"><span class="gc-tag" title="Уровень">L1 — Оператор</span><span class="gc-tag">учёба ~2 ч</span><span class="gc-tag" data-state="caution">СКОРО</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></div>
-      
+      <div class="module-tags"><span class="gc-tag" title="Уровень">L1 — Оператор</span><span class="gc-tag">чтение 20 мин</span><span class="gc-tag">учёба ~2 ч</span><span class="gc-tag">любая прошивка</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></div>
+      <p class="module-lead">Бесколлекторный мотор не крутится сам: им управляет ESC (регулятор оборотов), который получает команды от полётного контроллера. Модуль объясняет, что значат цифры вроде «2207 1750KV», что такое полюса, почему все перешли с аналогового PWM на цифровой DShot, и какая прошивка ESC актуальна в 2026 году после закрытия BLHeli_32.</p>
       <div class="gc-callout" data-state="ok"><strong>После модуля ты умеешь</strong><ul><li>связать KV, напряжение и размер пропа</li><li>объяснить, что ESC делает с сигналом DShot</li></ul></div><p class="gc-muted">Перед этим модулем: <a href="f-power.html">Питание: LiPo, Li-Ion, BEC</a></p>
       <div class="gc-prose module-body">
-<div class="gc-callout" data-state="caution"><strong>Модуль в разработке.</strong> Цели и связи уже определены, текст пишется. План — в <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">ROADMAP</a>.</div>
+<h2>Теория</h2>
+<h4 class="md-subheading">Обозначение мотора</h4>
+<ul><li><strong>2207</strong> — размер статора: 22 мм диаметр, 7 мм высота. Больше статор — больше момент.</li><li><strong>KV</strong> — обороты на вольт без нагрузки. 1750KV на 6S (25.2 В) — примерно 44 000 об/мин без пропа. Под нагрузкой меньше.</li><li><strong>12N14P</strong> — 12 катушек статора, 14 магнитов. Число магнитов — это <code>motor_poles</code> в прошивке, оно нужно для RPM-фильтра.</li></ul>
+<p>Правило подбора: большой проп требует большого момента и низкого KV, маленький проп — высокого KV. Мотор с высоким KV на большом пропе перегревается и тянет огромный ток.</p>
+<h4 class="md-subheading">Что делает ESC</h4>
+<p>Бесколлекторный мотор — трёхфазный. ESC по очереди подаёт ток на фазы, создавая вращающееся магнитное поле. Положение ротора он определяет без датчиков — по ЭДС, наводимой в незапитанной фазе (sensorless). Отсюда десинк: при резком изменении газа ESC может «потерять» ротор, и мотор дёрнется или встанет.</p>
+<h4 class="md-subheading">Протоколы управления</h4>
+<ul><li><strong>PWM</strong> — импульс 1000–2000 мкс с частотой около 50 Гц. Аналоговый, медленный, требует калибровки диапазона. До сих пор встречается у сервоприводов и тяжёлых ESC.</li><li><strong>OneShot, Multishot</strong> — те же импульсы, только короче и чаще. Исторический этап.</li><li><strong>DShot150/300/600</strong> — цифровой протокол: 16-битный пакет с контрольной суммой, калибровка не нужна, помехи не сдвигают газ. Число — скорость в килобитах.</li><li><strong>Bidirectional DShot</strong> — ESC в ответ отдаёт eRPM мотора. На этом построен RPM-фильтр.</li></ul>
+<p>Из eRPM обороты считаются так: RPM = eRPM / (число магнитов / 2).</p>
+<h4 class="md-subheading">Прошивки ESC в 2026</h4>
+<ul><li><strong>BLHeli_S</strong> — старые 8-битные ESC, открытая. На них ставят <strong>Bluejay</strong> — с bidirectional DShot и RPM-фильтром.</li><li><strong>BLHeli_32</strong> — 32-битные ESC. Проект закрыт в июне 2024 года: сервер прошивки отключён, обновлений больше не будет. Существующие ESC продолжают работать и настраиваться.</li><li><strong>AM32</strong> — открытая прошивка для 32-битных ESC, де-факто замена BLHeli_32. Переход с BLHeli_32 на AM32 односторонний.</li></ul>
+<h4 class="md-subheading">Ток ESC</h4>
+<p>ESC выбирают по длительному току с запасом относительно реального пикового тока из лога. 4-in-1 удобен и лёгок, но перегрев одного канала часто убивает всю плату.</p>
+
+<h2>Практика</h2>
+<h4 class="md-subheading">Проверка моторов и ESC на столе</h4>
+<ol><li>Сними пропы.</li><li>Подключи АКБ через ограничитель тока (smoke stopper) при первом включении новой сборки.</li><li>Во вкладке Motors крути каждый мотор на малом газу: проверь направление и плавность.</li><li>С bidirectional DShot убедись, что каждый мотор отдаёт обороты и ошибок телеметрии почти нет.</li><li>Проверь руками: колокол крутится без люфта и хруста, магниты целы, винты не касаются обмотки.</li></ol>
+<h4 class="md-subheading">Выбор протокола</h4>
+<p>Для Betaflight на типовом 4k–8k цикле — DShot300 или DShot600 (см. модуль про RPM-фильтр). Для ArduPilot — DShot там, где ESC поддерживает, иначе PWM с калибровкой.</p>
+
+<h2>Диагностика</h2>
+<div class="diag-groups"><article class="diag-item"><h4><strong>Симптом:</strong> один мотор горячее остальных</h4><ul><li>Возможная причина: подшипник, задевание, повреждённая обмотка или проп.</li><li>Что сделать: сравнить на ощупь вращение колоколов, заменить подозрительный мотор местами и посмотреть, «переехала» ли проблема.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> мотор дёргается или встаёт на резком газу</h4><ul><li>Возможная причина: десинк ESC.</li><li>Что сделать: проверить настройки timing/demag в прошивке ESC, пайку фаз.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> при подключении АКБ ESC молчит или не играет мелодию</h4><ul><li>Возможная причина: нет питания на ESC, сгорел канал, не выбран протокол.</li><li>Что сделать: проверить пайку силы, <code>MOTOR_PROTO</code> в arming flags, прошивку ESC.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> RPM-фильтр не включается</h4><ul><li>Возможная причина: прошивка ESC без bidirectional DShot или неверный <code>motor_poles</code>.</li><li>Что сделать: Bluejay или AM32, пересчитать магниты.</li></ul></article></div>
+
+<h2>Чек-лист</h2>
+<ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="f-motors-esc:0"><span>Могу расшифровать 2207 1750KV 12N14P</span></label></li><li><label><input type="checkbox" data-check-id="f-motors-esc:1"><span>Знаю, какая прошивка стоит на моих ESC и поддерживает ли она bidirectional DShot</span></label></li><li><label><input type="checkbox" data-check-id="f-motors-esc:2"><span>Проверил каждый мотор без пропов: направление, плавность, люфт</span></label></li><li><label><input type="checkbox" data-check-id="f-motors-esc:3"><span>Знаю реальный пиковый ток из лога и запас ESC по току</span></label></li></ul>
+
+<h2>Источники</h2>
+<ul class="refs"><li><a href="https://betaflight.com/docs/wiki/guides/current/DSHOT-RPM-Filtering" target="_blank" rel="noopener noreferrer">DShot RPM Filtering — Betaflight Documentation</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://ardupilot.org/copter/docs/common-blheli32-passthru.html" target="_blank" rel="noopener noreferrer">BLHeli32, AM32 and BLHeli_S ESCs — ArduPilot</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://github.com/am32-firmware/AM32" target="_blank" rel="noopener noreferrer">AM32 — firmware source (GitHub)</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://github.com/bird-sanctuary/bluejay" target="_blank" rel="noopener noreferrer">Bluejay — firmware source (GitHub)</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://oscarliang.com/end-of-blheli_32" target="_blank" rel="noopener noreferrer">The end of BLHeli_32 — Oscar Liang</a> <span class="gc-tag">secondary</span></li></ul>
       </div>
-      
+      <div class="module-done"><gc-button variant="secondary" data-done-toggle="f-motors-esc">Отметить как пройденный</gc-button></div>
       <nav class="pager" aria-label="Соседние модули"><a class="gc-card pager__prev" href="f-power.html"><span class="gc-label gc-muted">Назад</span><br>Питание: LiPo, Li-Ion, BEC</a><a class="gc-card pager__next" href="f-fc-sensors.html"><span class="gc-label gc-muted">Дальше</span><br>Полётный контроллер и сенсоры</a></nav>
     </article>
   </main>

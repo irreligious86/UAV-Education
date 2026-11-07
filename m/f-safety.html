@@ -27,13 +27,40 @@
     <article class="module" data-module-page="f-safety">
       <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-foundation">Фундамент</a><span>Безопасность и предполётный чек</span></p>
       <h1 class="module-title">Безопасность и предполётный чек</h1>
-      <div class="module-tags"><span class="gc-tag" title="Уровень">L1 — Оператор</span><span class="gc-tag">учёба ~1 ч</span><span class="gc-tag" data-state="caution">СКОРО</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></div>
-      
+      <div class="module-tags"><span class="gc-tag" title="Уровень">L1 — Оператор</span><span class="gc-tag">чтение 15 мин</span><span class="gc-tag">учёба ~1 ч</span><span class="gc-tag">любая прошивка</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></div>
+      <p class="module-lead">Пятидюймовый проп на 30 000 об/мин режет как нож, а LiPo горит так, что не тушится водой. Большинство травм в хобби случается не в воздухе, а на столе: дрон заармился с пропами во время настройки. Модуль собирает правила, которые не обсуждаются, предполётный чек-лист и то, как прошивка сама защищает от ошибок — если ей не мешать.</p>
       <div class="gc-callout" data-state="ok"><strong>После модуля ты умеешь</strong><ul><li>пройти предполётный чек-лист</li><li>объяснить, почему пропы снимают на столе</li></ul></div>
       <div class="gc-prose module-body">
-<div class="gc-callout" data-state="caution"><strong>Модуль в разработке.</strong> Цели и связи уже определены, текст пишется. План — в <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">ROADMAP</a>.</div>
+<h2>Теория</h2>
+<h4 class="md-subheading">Где реально опасно</h4>
+<ul><li><strong>Стол.</strong> Подключённая АКБ + пропы + случайный арм. Отсюда правило: на столе пропов нет. Никогда.</li><li><strong>Первый полёт после изменений.</strong> Перепутанный мотор, неверный failsafe, непроверенный фильтр.</li><li><strong>АКБ.</strong> Короткое замыкание, пробой при падении, заряд без присмотра.</li><li><strong>Потеря связи.</strong> Если failsafe не проверен, дрон делает то, что ты не выбирал.</li></ul>
+<h4 class="md-subheading">Как прошивка защищает от арма</h4>
+<p>Betaflight не даст заармиться, пока активен хотя бы один флаг запрета арма (arming disable flags). Их видно командой <code>status</code> в CLI и в OSD. Самые частые:</p>
+<ul><li><code>RXLOSS</code> — нет сигнала с приёмника;</li><li><code>THROTTLE</code> — газ не в нуле;</li><li><code>ANGLE</code> — дрон стоит слишком наклонно;</li><li><code>BOOTGRACE</code> — прошло слишком мало времени после включения;</li><li><code>ARMSWITCH</code> — тумблер ARM был включён при подключении;</li><li><code>NOPREARM</code> — не включён тумблер PREARM, если он назначен;</li><li><code>CLI</code> и <code>MSP</code> — открыт CLI или подключён конфигуратор;</li><li><code>RPMFILTER</code> — ESC не отдают обороты при включённом RPM-фильтре.</li></ul>
+<p>Эти флаги — не помеха, а страховка. Не отключай их, а устраняй причину. ArduPilot делает то же через pre-arm checks.</p>
+<h4 class="md-subheading">Режимы для защиты</h4>
+<ul><li><strong>PREARM</strong> — второй тумблер, без которого арм невозможен. Хорош для дронов с тяжёлыми пропами.</li><li><strong>Failsafe</strong> — что делать при потере связи (отдельный модуль).</li><li><strong>Beeper</strong> — найти дрон после падения.</li></ul>
+<h4 class="md-subheading">Правила и пространство</h4>
+<p>Правила полётов (регистрация, высота, зоны, полёты над людьми) зависят от страны и меняются. Перед полётами проверь актуальные правила своей страны и места: этот курс их не заменяет.</p>
+
+<h2>Практика</h2>
+<h4 class="md-subheading">Предполётный чек-лист</h4>
+<ol><li>Пропы целые, затянуты, стоят по направлению вращения.</li><li>АКБ без вздутий и повреждений, напряжение в норме, закреплена.</li><li>Антенны приёмника и VTX на месте и не касаются пропов.</li><li>Пульт: правильная модель, заряжен, тумблер ARM выключен.</li><li>Видео есть, OSD показывает напряжение и связь.</li><li>Зона полёта свободна от людей, вокруг нет препятствий на взлёте.</li><li>После арма — 2–3 секунды висения низко, оценить поведение.</li></ol>
+<h4 class="md-subheading">Правила на столе</h4>
+<ol><li>Пропы сняты — до любого подключения АКБ.</li><li>Новая сборка — первое включение через smoke stopper.</li><li>Тест моторов — только без пропов и с ограниченным газом.</li><li>Конфигуратор подключён — дрон не армится (флаги <code>MSP</code>/<code>CLI</code>), и это правильно.</li></ol>
+<h4 class="md-subheading">После полёта</h4>
+<ol><li>Дизарм, отключить АКБ, проверить температуру моторов.</li><li>Записать в журнал дрона: что менял, как летел, что заметил.</li><li>Сохранить лог, если вылет был тестовым.</li></ol>
+
+<h2>Диагностика</h2>
+<div class="diag-groups"><article class="diag-item"><h4><strong>Симптом:</strong> дрон не армится</h4><ul><li>Возможная причина: активен флаг запрета арма.</li><li>Что сделать: выполнить <code>status</code> в CLI или посмотреть флаг в OSD, устранить причину.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> дрон заармился сразу после подключения АКБ</h4><ul><li>Возможная причина: тумблер ARM был включён, а защита отключена или назначена неправильно.</li><li>Что сделать: проверить режимы, вернуть защиту, использовать PREARM.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> после падения АКБ греется без нагрузки</h4><ul><li>Возможная причина: внутренний пробой.</li><li>Что сделать: изолировать АКБ в безопасном месте, не заряжать.</li></ul></article></div>
+
+<h2>Чек-лист</h2>
+<ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="f-safety:0"><span>На столе пропов нет — без исключений</span></label></li><li><label><input type="checkbox" data-check-id="f-safety:1"><span>Знаю, как посмотреть флаги запрета арма</span></label></li><li><label><input type="checkbox" data-check-id="f-safety:2"><span>Предполётный чек-лист распечатан или в телефоне</span></label></li><li><label><input type="checkbox" data-check-id="f-safety:3"><span>Failsafe проверен на этом дроне</span></label></li><li><label><input type="checkbox" data-check-id="f-safety:4"><span>Знаю правила полётов в своей стране и месте</span></label></li><li><label><input type="checkbox" data-check-id="f-safety:5"><span>После полёта веду запись в журнале дрона</span></label></li></ul>
+
+<h2>Источники</h2>
+<ul class="refs"><li><a href="https://www.betaflight.com/docs/wiki/guides/current/Arming-Sequence-And-Safety" target="_blank" rel="noopener noreferrer">Arming Sequence &amp; Safety — Betaflight Documentation</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://ardupilot.org/copter/docs/common-prearm-safety-checks.html" target="_blank" rel="noopener noreferrer">Pre-Arm Safety Checks — ArduPilot Copter</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://oscarliang.com/quad-arming-issue-fix" target="_blank" rel="noopener noreferrer">Fix arming issues — Oscar Liang</a> <span class="gc-tag">secondary</span></li></ul>
       </div>
-      
+      <div class="module-done"><gc-button variant="secondary" data-done-toggle="f-safety">Отметить как пройденный</gc-button></div>
       <nav class="pager" aria-label="Соседние модули"><a class="gc-card pager__prev" href="bf-pid-reg-in-bf.html"><span class="gc-label gc-muted">Назад</span><br>PID-регулятор в Betaflight</a><a class="gc-card pager__next" href="tools-overview.html"><span class="gc-label gc-muted">Дальше</span><br>Инструментарий</a></nav>
     </article>
   </main>

@@ -27,13 +27,43 @@
     <article class="module" data-module-page="f-physics">
       <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-foundation">Фундамент</a><span>Как летает мультиротор</span></p>
       <h1 class="module-title">Как летает мультиротор</h1>
-      <div class="module-tags"><span class="gc-tag" title="Уровень">L1 — Оператор</span><span class="gc-tag">учёба ~2 ч</span><span class="gc-tag" data-state="caution">СКОРО</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></div>
-      
+      <div class="module-tags"><span class="gc-tag" title="Уровень">L1 — Оператор</span><span class="gc-tag">чтение 15 мин</span><span class="gc-tag">учёба ~2 ч</span><span class="gc-tag">любая прошивка</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></div>
+      <p class="module-lead">У мультиротора нет рулей: всё управление — это изменение оборотов моторов. Модуль объясняет, как из четырёх (шести, восьми) пропеллеров получаются газ, крен, тангаж и рыскание, зачем пропы крутятся в разные стороны, что такое миксер и почему отношение тяги к весу определяет характер дрона. Это фундамент, на котором стоят PID, фильтры и вообще вся настройка.</p>
       <div class="gc-callout" data-state="ok"><strong>После модуля ты умеешь</strong><ul><li>объяснить тягу, моменты и как миксер превращает команды в обороты моторов</li><li>объяснить, зачем пропеллеры крутятся в разные стороны</li></ul></div>
       <div class="gc-prose module-body">
-<div class="gc-callout" data-state="caution"><strong>Модуль в разработке.</strong> Цели и связи уже определены, текст пишется. План — в <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">ROADMAP</a>.</div>
+<h2>Теория</h2>
+<h4 class="md-subheading">Тяга и вес</h4>
+<p>Пропеллер отбрасывает воздух вниз и получает тягу вверх. Чтобы висеть, суммарная тяга всех моторов должна равняться весу. Тяга растёт примерно как квадрат оборотов: чтобы удвоить тягу, обороты нужно поднять примерно в 1.4 раза.</p>
+<p>Отношение тяги к весу (thrust-to-weight, T/W) — максимальная тяга всех моторов, делённая на взлётный вес:</p>
+<ul><li>около 2:1 — минимум для управляемого полёта: тяжёлые платформы, грузовые октокоптеры;</li><li>3:1–4:1 — спокойные дальние 7–10&quot;;</li><li>6:1 и выше — фристайл и гонки.</li></ul>
+<p>При T/W 2:1 висение идёт примерно на половине газа, и запаса на манёвр и порыв ветра почти нет. Это главный аргумент, почему тяжёлый дрон нельзя настраивать как пятидюймовик.</p>
+<h4 class="md-subheading">Реактивный момент и направления вращения</h4>
+<p>Мотор, раскручивающий проп, одновременно пытается провернуть раму в обратную сторону — это реактивный момент. Если бы все пропы крутились в одну сторону, рама вращалась бы вокруг вертикальной оси. Поэтому в квадрокоптере две пары: по диагонали пропы крутятся в одну сторону, соседние — в противоположные. Моменты взаимно гасятся, пока обороты равны.</p>
+<h4 class="md-subheading">Четыре оси управления</h4>
+<ul><li><strong>Газ (throttle):</strong> все моторы быстрее или медленнее одновременно.</li><li><strong>Крен (roll):</strong> моторы одной стороны быстрее, другой медленнее. Крен вправо — левые моторы быстрее.</li><li><strong>Тангаж (pitch):</strong> передние против задних. Наклон носом вниз (полёт вперёд) — задние моторы быстрее.</li><li><strong>Рыскание (yaw):</strong> диагональные пары. Мотор, крутящийся против часовой, толкает раму по часовой. Чтобы развернуться по часовой (если смотреть сверху), ускоряют моторы, вращающиеся против часовой, и замедляют другую пару. Суммарная тяга при этом почти не меняется.</li></ul>
+<p>Yaw — самая «слабая» ось: момент от разницы оборотов мал по сравнению с моментами от разницы тяги. Поэтому на рыскании дрон реагирует медленнее и легче упирается в ограничения моторов.</p>
+<h4 class="md-subheading">Миксер</h4>
+<p>Полётный контроллер считает желаемые газ, крен, тангаж и рыскание, а миксер переводит их в команду каждому мотору. Для каждого мотора это сумма: газ плюс вклад крена, тангажа и рыскания с знаком, зависящим от положения мотора и направления вращения. Миксер задаётся типом рамы (Quad X, Hex, Octo X8 и т.д.), а прошивка знает знаки для каждого типа.</p>
+<p>Отсюда главное правило: порядок моторов и направления вращения в прошивке должны совпадать с реальной сборкой. Перепутанный мотор — это дрон, который на взлёте мгновенно переворачивается.</p>
+<h4 class="md-subheading">Насыщение моторов</h4>
+<p>Если какой-то мотор уже на 100% или на 0%, миксер не может выполнить команду полностью. Прошивки решают это по-разному (Betaflight — air mode и mixer scaling, ArduPilot — приоритет крена/тангажа над рысканием), но физику не обмануть: без запаса тяги нет управления.</p>
+
+<h2>Практика</h2>
+<h4 class="md-subheading">Лабораторная: посчитать T/W своей сборки</h4>
+<ol><li>Найди в даташите мотора таблицу тяги для твоего пропа и напряжения: максимальная тяга одного мотора, г.</li><li>Умножь на число моторов — это максимальная тяга.</li><li>Взвесь дрон с АКБ, камерой и всем, что он несёт в полёте.</li><li>T/W = максимальная тяга / взлётный вес. Запиши в журнал дрона.</li><li>Проверка по логу: средний газ на висении должен быть примерно равен <code>1 / (T/W)</code> (с поправкой на нелинейность — тяга растёт быстрее газа).</li></ol>
+<h4 class="md-subheading">Проверка направлений без пропов</h4>
+<ol><li>Сними пропы.</li><li>Во вкладке Motors (Betaflight) или Motor Test (ArduPilot) по очереди крути каждый мотор на малом газу.</li><li>Сверь номер и направление вращения со схемой рамы твоей прошивки.</li></ol>
+
+<h2>Диагностика</h2>
+<div class="diag-groups"><article class="diag-item"><h4><strong>Симптом:</strong> дрон переворачивается сразу на взлёте</h4><ul><li>Возможная причина: перепутан порядок моторов или направление вращения, пропы стоят не той стороной.</li><li>Что сделать: без пропов проверить каждый мотор по схеме рамы, проверить пропы.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> дрон медленно крутится по yaw на висении</h4><ul><li>Возможная причина: перекошенный мотор, разные пропы, разные по силе моторы.</li><li>Что сделать: проверить соосность моторов, поставить одинаковые новые пропы.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> висение на газу выше 60–70%</h4><ul><li>Возможная причина: перегруз, T/W около 1.5–2.</li><li>Что сделать: облегчить, поставить другие пропы/моторы, не летать в ветер.</li></ul></article></div>
+
+<h2>Чек-лист</h2>
+<ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="f-physics:0"><span>Могу объяснить, как дрон делает крен, тангаж и рыскание без рулей</span></label></li><li><label><input type="checkbox" data-check-id="f-physics:1"><span>Знаю, почему соседние пропы крутятся в разные стороны</span></label></li><li><label><input type="checkbox" data-check-id="f-physics:2"><span>Посчитал T/W своей сборки и записал его</span></label></li><li><label><input type="checkbox" data-check-id="f-physics:3"><span>Проверил порядок и направление моторов без пропов</span></label></li></ul>
+
+<h2>Источники</h2>
+<ul class="refs"><li><a href="https://ardupilot.org/copter/docs/frame-type-configuration.html" target="_blank" rel="noopener noreferrer">Frame Class and Type Configuration — ArduPilot Copter</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://ardupilot.org/copter/docs/connect-escs-and-motors.html" target="_blank" rel="noopener noreferrer">Connect ESCs and Motors — ArduPilot Copter</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://ardupilot.org/dev/docs/code-overview-copter-motors-library.html" target="_blank" rel="noopener noreferrer">Copter Motors Library — ArduPilot Dev</a> <span class="gc-tag" data-state="info">primary</span></li></ul>
       </div>
-      
+      <div class="module-done"><gc-button variant="secondary" data-done-toggle="f-physics">Отметить как пройденный</gc-button></div>
       <nav class="pager" aria-label="Соседние модули"><a class="gc-card pager__next" href="f-power.html"><span class="gc-label gc-muted">Дальше</span><br>Питание: LiPo, Li-Ion, BEC</a></nav>
     </article>
   </main>

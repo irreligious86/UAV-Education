@@ -27,13 +27,41 @@
     <article class="module" data-module-page="f-fc-sensors">
       <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-foundation">Фундамент</a><span>Полётный контроллер и сенсоры</span></p>
       <h1 class="module-title">Полётный контроллер и сенсоры</h1>
-      <div class="module-tags"><span class="gc-tag" title="Уровень">L1 — Оператор</span><span class="gc-tag">учёба ~2 ч</span><span class="gc-tag" data-state="caution">СКОРО</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></div>
-      
+      <div class="module-tags"><span class="gc-tag" title="Уровень">L1 — Оператор</span><span class="gc-tag">чтение 20 мин</span><span class="gc-tag">учёба ~2 ч</span><span class="gc-tag">любая прошивка</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></div>
+      <p class="module-lead">Полётный контроллер (FC) — маленький компьютер, который тысячи раз в секунду читает сенсоры, считает регулятор и командует моторами. Модуль объясняет, что стоит на плате, за что отвечает каждый датчик, как читать схему подключения и почему один и тот же провод на разных падах ведёт себя по-разному. После него схема платы перестаёт быть ребусом.</p>
       <div class="gc-callout" data-state="ok"><strong>После модуля ты умеешь</strong><ul><li>назвать роль gyro, accel, baro, mag, GPS</li><li>прочитать схему платы: UART, пады, питание</li></ul></div><p class="gc-muted">Перед этим модулем: <a href="f-motors-esc.html">Моторы, ESC и DShot</a></p>
       <div class="gc-prose module-body">
-<div class="gc-callout" data-state="caution"><strong>Модуль в разработке.</strong> Цели и связи уже определены, текст пишется. План — в <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">ROADMAP</a>.</div>
+<h2>Теория</h2>
+<h4 class="md-subheading">Процессор</h4>
+<p>Сердце FC — микроконтроллер. Серии определяют возможности:</p>
+<ul><li><strong>F4</strong> — самые распространённые и дешёвые; ограничены по числу UART и не умеют аппаратно инвертировать UART (см. модуль про SBUS).</li><li><strong>F7</strong> — быстрее, больше UART, программная инверсия.</li><li><strong>H7</strong> — самые мощные, стандарт для ArduPilot и PX4 на сложных платформах.</li></ul>
+<p>Важно не «лучший процессор», а поддержка платы нужной прошивкой: у каждой прошивки свой список таргетов (targets).</p>
+<h4 class="md-subheading">Сенсоры</h4>
+<ul><li><strong>Гироскоп (gyro)</strong> — угловая скорость по трём осям. Главный датчик: на нём работает стабилизация. Читается тысячи раз в секунду, чувствителен к вибрациям.</li><li><strong>Акселерометр (accel)</strong> — ускорение, в покое показывает направление гравитации. Нужен для режимов с самовыравниванием (ANGLE) и навигации.</li><li><strong>Барометр (baro)</strong> — давление, из него высота. Чувствителен к потоку от пропов и к свету — его закрывают поролоном.</li><li><strong>Магнитометр (mag, компас)</strong> — курс. Боится силовых проводов: его ставят на мачту вместе с GPS, подальше от тока.</li><li><strong>GPS</strong> — координаты и скорость. Нужен для удержания позиции, возврата домой и миссий.</li></ul>
+<p>Связка этих датчиков — задача фильтра оценки состояния: в ArduPilot это EKF, в Betaflight упрощённая схема без навигации.</p>
+<h4 class="md-subheading">Шины</h4>
+<ul><li><strong>UART</strong> — последовательный порт: приёмник, GPS, VTX, телеметрия, companion. Провода крест-накрест (TX → RX).</li><li><strong>I2C</strong> — шина для нескольких датчиков (компас, внешний баро, дисплей) по двум проводам SDA/SCL.</li><li><strong>SPI</strong> — быстрая шина внутри платы: гироскоп, OSD, флеш для логов.</li></ul>
+<h4 class="md-subheading">Пады на плате</h4>
+<p>Типовые обозначения: <code>VBAT</code> (напряжение АКБ), <code>5V</code>/<code>9V</code>/<code>10V</code> (выходы BEC), <code>GND</code>, <code>TX1</code>/<code>RX1</code> (UART1), <code>SDA</code>/<code>SCL</code> (I2C), <code>CURR</code> (датчик тока), <code>LED</code> (адресные светодиоды), <code>BZ+</code>/<code>BZ-</code> (пищалка), <code>M1</code>–<code>M4</code> или <code>S1</code>–<code>S8</code> (выходы на ESC/сервы).</p>
+<h4 class="md-subheading">Монтаж</h4>
+<p>Стандарты крепления — 30.5×30.5 и 20×20 мм. Плату ставят на резиновые демпферы: гироскоп должен слышать движение рамы, а не её вибрации. Стрелка на плате показывает «вперёд»; если плату повернули, поворот задаётся в прошивке (board alignment / AHRS_ORIENTATION).</p>
+
+<h2>Практика</h2>
+<h4 class="md-subheading">Лабораторная: прочитать схему своей платы</h4>
+<ol><li>Найди схему подключения (wiring diagram) своего FC у производителя.</li><li>Выпиши, какой UART свободен для приёмника, какой для GPS, какой для VTX.</li><li>Найди, от какого пада питать VTX и камеру и какой ток даёт этот BEC.</li><li>Отметь, есть ли пад с инвертором (для SBUS на F4) и куда паять LED и пищалку.</li><li>Сохрани результат в журнал сборки рядом с фото платы.</li></ol>
+<h4 class="md-subheading">Проверка сенсоров после сборки</h4>
+<ol><li>Подключи FC к конфигуратору (Betaflight App, Mission Planner или QGroundControl).</li><li>Наклоняй дрон: модель на экране должна повторять движения по всем трём осям без задержки.</li><li>Откалибруй акселерометр на ровной поверхности.</li><li>Проверь, что барометр показывает изменение высоты при подъёме дрона рукой, а компас — курс.</li></ol>
+
+<h2>Диагностика</h2>
+<div class="diag-groups"><article class="diag-item"><h4><strong>Симптом:</strong> модель в конфигураторе крутится не в ту сторону</h4><ul><li>Возможная причина: плата установлена с поворотом, а поворот не задан в прошивке.</li><li>Что сделать: задать board alignment / AHRS_ORIENTATION.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> в arming flags <code>NOGYRO</code></h4><ul><li>Возможная причина: гироскоп не определяется — не та прошивка (target) или повреждённая плата.</li><li>Что сделать: перепрошить правильным таргетом, проверить плату на повреждения.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> курс компаса «уплывает» на газу</h4><ul><li>Возможная причина: магнитные помехи от силовых проводов.</li><li>Что сделать: вынести компас с GPS на мачту, скрутить силовые провода.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> высота по баро прыгает на висении</h4><ul><li>Возможная причина: поток воздуха от пропов на датчик.</li><li>Что сделать: закрыть барометр поролоном.</li></ul></article></div>
+
+<h2>Чек-лист</h2>
+<ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="f-fc-sensors:0"><span>Знаю серию процессора своего FC и что прошивка его поддерживает</span></label></li><li><label><input type="checkbox" data-check-id="f-fc-sensors:1"><span>Расписал UART-ы своей платы под приёмник, GPS, VTX</span></label></li><li><label><input type="checkbox" data-check-id="f-fc-sensors:2"><span>Знаю, какой пад питания для какой периферии</span></label></li><li><label><input type="checkbox" data-check-id="f-fc-sensors:3"><span>Плата на демпферах, ориентация задана в прошивке</span></label></li><li><label><input type="checkbox" data-check-id="f-fc-sensors:4"><span>Сенсоры проверены в конфигураторе после сборки</span></label></li></ul>
+
+<h2>Источники</h2>
+<ul class="refs"><li><a href="https://www.betaflight.com/docs/wiki/guides/current/Arming-Sequence-And-Safety" target="_blank" rel="noopener noreferrer">Arming Sequence &amp; Safety — Betaflight Documentation</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://ardupilot.org/copter/docs/common-autopilots.html" target="_blank" rel="noopener noreferrer">Flight Controller Hardware — ArduPilot</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://ardupilot.org/copter/docs/common-compass-setup-advanced.html" target="_blank" rel="noopener noreferrer">Compass Setup — ArduPilot</a> <span class="gc-tag" data-state="info">primary</span></li></ul>
       </div>
-      
+      <div class="module-done"><gc-button variant="secondary" data-done-toggle="f-fc-sensors">Отметить как пройденный</gc-button></div>
       <nav class="pager" aria-label="Соседние модули"><a class="gc-card pager__prev" href="f-motors-esc.html"><span class="gc-label gc-muted">Назад</span><br>Моторы, ESC и DShot</a><a class="gc-card pager__next" href="bf-pid-reg-in-bf.html"><span class="gc-label gc-muted">Дальше</span><br>PID-регулятор в Betaflight</a></nav>
     </article>
   </main>
