@@ -27,13 +27,45 @@
     <article class="module" data-module-page="ap-intro">
       <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-autonomy">Автономия</a><span>Введение в ArduPilot</span></p>
       <h1 class="module-title">Введение в ArduPilot</h1>
-      <div class="module-tags"><span class="gc-tag" title="Уровень">L2 — Интегратор</span><span class="gc-tag">учёба ~2 ч</span><span class="gc-tag" data-state="caution">СКОРО</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></div>
-      
+      <div class="module-tags"><span class="gc-tag" title="Уровень">L2 — Интегратор</span><span class="gc-tag">чтение 20 мин</span><span class="gc-tag">учёба ~2 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></div>
+      <p class="module-lead">ArduPilot — автопилот, а не просто стабилизатор. Если Betaflight делает квадрокоптер послушным под стиками, то ArduPilot знает, где он находится, куда летит и что делать без пилота. Модуль объясняет, чем мышление в ArduPilot отличается от Betaflight: параметры вместо CLI-дифов, режимы полёта как уровни автономности, наземная станция, pre-arm проверки и требования к железу. После него открывается весь трек «Автономия».</p>
       <div class="gc-callout" data-state="ok"><strong>После модуля ты умеешь</strong><ul><li>объяснить параметры, режимы и отличия от Betaflight</li></ul></div><p class="gc-muted">Перед этим модулем: <a href="bf-failsafe.html">Failsafe: стадии и тест по свитчу</a></p>
       <div class="gc-prose module-body">
-<div class="gc-callout" data-state="caution"><strong>Модуль в разработке.</strong> Цели и связи уже определены, текст пишется. План — в <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">ROADMAP</a>.</div>
+<h2>Теория</h2>
+<h4 class="md-subheading">Один код — много аппаратов</h4>
+<p>ArduPilot — общий код и отдельные прошивки под тип аппарата: Copter (мультироторы и вертолёты), Plane (самолёты, крылья и QuadPlane-VTOL), Rover, Sub. Тип рамы внутри прошивки задаётся параметрами: для Copter это <code>FRAME_CLASS</code> (1 — Quad, 2 — Hexa, 3 — Octa, 4 — OctaQuad, 7 — Tri…) и <code>FRAME_TYPE</code> (0 — Plus, 1 — X, 2 — V, 3 — H…).</p>
+<h4 class="md-subheading">Параметры</h4>
+<p>Вся конфигурация — это параметры (их больше тысячи). Ключевое отличие от Betaflight: изменение параметра записывается сразу, команды <code>save</code> нет. Часть параметров требует перезагрузки (тип рамы, протоколы, включение подсистем). Рабочий процесс:</p>
+<ol><li>Сохранить полный список параметров в файл (<code>.param</code>) до изменений.</li><li>Менять по одному смысловому блоку.</li><li>Сравнивать файлы параметров до и после — как <code>diff all</code> в Betaflight.</li></ol>
+<h4 class="md-subheading">Режимы полёта</h4>
+<p>Режимы — это уровни автономности. Для Copter:</p>
+<ul><li><strong>STABILIZE</strong> — самовыравнивание, газ ручной. Базовый режим, работает без GPS.</li><li><strong>ALT_HOLD</strong> — плюс удержание высоты по барометру.</li><li><strong>LOITER</strong> — плюс удержание позиции, нужен GPS.</li><li><strong>AUTO</strong> — выполнение миссии.</li><li><strong>GUIDED</strong> — команды от наземной станции или скрипта (основа companion-компьютеров).</li><li><strong>RTL</strong> и <strong>LAND</strong> — возврат домой и посадка.</li></ul>
+<p>Правило: режим выбирают по тому, каким датчикам ты доверяешь. Нет GPS — нет LOITER, RTL и AUTO.</p>
+<h4 class="md-subheading">Наземная станция и MAVLink</h4>
+<p>Настраивают ArduPilot через наземную станцию (GCS): Mission Planner, QGroundControl или консольный MAVProxy. Все они говорят с полётником по MAVLink — тому же протоколу, по которому потом будет общаться твой companion-компьютер.</p>
+<h4 class="md-subheading">Pre-arm проверки</h4>
+<p>ArduPilot не армится, пока что-то не так: не откалиброван акселерометр или компас, нет связи, плохой EKF, неверные параметры. Сообщение <code>PreArm: ...</code> в GCS — подсказка, а не помеха. Отключать проверки, чтобы «просто полетело», — классический путь к аварии.</p>
+<h4 class="md-subheading">Требования к железу</h4>
+<p>ArduPilot заметно тяжелее Betaflight. На F4-контроллерах часть функций недоступна: например, Lua-скрипты требуют минимум 2 МБ флеша и не работают на F4. Для сложных платформ берут H7.</p>
+<h4 class="md-subheading">Что меняется для пилота Betaflight</h4>
+<ul><li>Не дифы, а файлы параметров.</li><li>Не «прошил и полетел», а калибровки (акселерометр, компас, радио, ESC) и pre-arm.</li><li>Логи DataFlash (<code>.bin</code>) пишутся почти всегда и содержат всё: от вибраций до решений EKF.</li><li>Тюнинг чаще начинают с AUTOTUNE, а не с ручного PID.</li></ul>
+
+<h2>Практика</h2>
+<h4 class="md-subheading">Первое знакомство без риска</h4>
+<ol><li>Пройди модуль про SITL: всё ниже можно сделать на симуляторе.</li><li>Открой полный список параметров в GCS и найди <code>FRAME_CLASS</code>, <code>FRAME_TYPE</code>, <code>ARMING_CHECK</code>, <code>FS_THR_ENABLE</code>.</li><li>Сохрани параметры в файл с датой в имени.</li><li>Переключи режимы STABILIZE → ALT_HOLD → LOITER в SITL и посмотри, какие требуют GPS.</li></ol>
+<h4 class="md-subheading">Чек перед первым реальным полётом</h4>
+<ol><li>Тип рамы и порядок моторов проверены без пропов (Motor Test).</li><li>Калибровки пройдены: акселерометр, компас (если есть), радио, ESC.</li><li>Настроены failsafe по радио и по батарее.</li><li>Нет <code>PreArm</code>-сообщений.</li><li>Первый полёт — в STABILIZE низко, затем ALT_HOLD.</li></ol>
+
+<h2>Диагностика</h2>
+<div class="diag-groups"><article class="diag-item"><h4><strong>Симптом:</strong> <code>PreArm: ...</code> и дрон не армится</h4><ul><li>Возможная причина: незавершённая калибровка или неверный параметр, текст сообщения указывает подсистему.</li><li>Что сделать: читать сообщение целиком, устранять причину, а не отключать <code>ARMING_CHECK</code>.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> после изменения параметра ничего не изменилось</h4><ul><li>Возможная причина: параметр требует перезагрузки.</li><li>Что сделать: перезагрузить полётник и перечитать значение.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> LOITER/RTL недоступны</h4><ul><li>Возможная причина: нет GPS-фикса или EKF не готов.</li><li>Что сделать: дождаться 3D-фикса, проверить статус EKF в GCS.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> Lua-скрипты не запускаются на полётнике</h4><ul><li>Возможная причина: F4-плата или мало памяти.</li><li>Что сделать: проверить серию процессора; для скриптов нужен F7/H7.</li></ul></article></div>
+
+<h2>Чек-лист</h2>
+<ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="ap-intro:0"><span>Понимаю разницу Copter/Plane и что задают <code>FRAME_CLASS</code> и <code>FRAME_TYPE</code></span></label></li><li><label><input type="checkbox" data-check-id="ap-intro:1"><span>Сохраняю параметры в файл до изменений</span></label></li><li><label><input type="checkbox" data-check-id="ap-intro:2"><span>Знаю, какие режимы требуют GPS</span></label></li><li><label><input type="checkbox" data-check-id="ap-intro:3"><span>Не отключаю pre-arm проверки ради взлёта</span></label></li><li><label><input type="checkbox" data-check-id="ap-intro:4"><span>Знаю серию процессора своего FC и ограничения F4</span></label></li></ul>
+
+<h2>Источники</h2>
+<ul class="refs"><li><a href="https://ardupilot.org/copter/docs/frame-type-configuration.html" target="_blank" rel="noopener noreferrer">Frame Class and Type Configuration — ArduPilot Copter</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://ardupilot.org/copter/docs/common-prearm-safety-checks.html" target="_blank" rel="noopener noreferrer">Pre-Arm Safety Checks — ArduPilot Copter</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://ardupilot.org/copter/docs/common-autopilots.html" target="_blank" rel="noopener noreferrer">Choosing an Autopilot — ArduPilot Copter</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://ardupilot.org/copter/docs/common-lua-scripts.html" target="_blank" rel="noopener noreferrer">Lua Scripts — ArduPilot</a> <span class="gc-tag" data-state="info">primary</span></li></ul>
       </div>
-      
+      <div class="module-done"><gc-button variant="secondary" data-done-toggle="ap-intro">Отметить как пройденный</gc-button></div>
       <nav class="pager" aria-label="Соседние модули"><a class="gc-card pager__next" href="ap-sitl.html"><span class="gc-label gc-muted">Дальше</span><br>SITL: дрон без дрона</a></nav>
     </article>
   </main>

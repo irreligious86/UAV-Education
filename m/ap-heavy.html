@@ -27,14 +27,45 @@
     <article class="module" data-module-page="ap-heavy">
       <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-autonomy">Автономия</a><span>Тяжёлые платформы: X8 и окто</span></p>
       <h1 class="module-title">Тяжёлые платформы: X8 и окто</h1>
-      <div class="module-tags"><span class="gc-tag" title="Уровень">L3 — Специалист</span><span class="gc-tag">учёба ~3 ч</span><span class="gc-tag" data-state="caution">СКОРО</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></div>
-      
+      <div class="module-tags"><span class="gc-tag" title="Уровень">L3 — Специалист</span><span class="gc-tag">чтение 25 мин</span><span class="gc-tag">учёба ~3 ч</span><span class="gc-tag">ArduPilot 4.5+</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></div>
+      <p class="module-lead">Восьмимоторный аппарат с пропами 15–17&quot; — другой зверь, чем пятидюймовик: медленные моторы, огромная инерция, низкое отношение тяги к весу и цена ошибки в виде дорогой полезной нагрузки. Модуль разбирает коаксиальную схему X8 на примере сборки на двух рамах Tarot Ironman 650, настройку тяги и вибраций в ArduPilot и проверку отказоустойчивости до первого полёта с грузом.</p>
       <div class="gc-callout" data-state="ok"><strong>После модуля ты умеешь</strong><ul><li>настроить coaxial-раму и моторную раскладку</li><li>проверить отказоустойчивость</li></ul></div><p class="gc-muted">Перед этим модулем: <a href="ap-logs.html">Логи ArduPilot: разбор полёта</a></p>
       <div class="gc-prose module-body">
-<div class="gc-callout" data-state="caution"><strong>Модуль в разработке.</strong> Цели и связи уже определены, текст пишется. План — в <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">ROADMAP</a>.</div>
+<h2>Теория</h2>
+<h4 class="md-subheading">X8 (OctaQuad): за и против</h4>
+<p>X8 — четыре луча, на каждом два мотора соосно: верхний и нижний, вращаются в разные стороны.</p>
+<ul><li><strong>За:</strong> восемь моторов на габарите квадрокоптера; отказ одного мотора не роняет аппарат; компактность при транспортировке.</li><li><strong>Против:</strong> нижний проп работает в потоке верхнего, поэтому коаксиальная пара даёт меньше тяги, чем два отдельных пропа. Ориентир потери — порядка 15% (зависит от пропов и расстояния между ними).</li></ul>
+<p>В ArduPilot это <code>FRAME_CLASS = 4</code> (OctaQuad) и <code>FRAME_TYPE = 1</code> (X). Порядок моторов и направления — строго по схеме OctaQuad X из документации.</p>
+<h4 class="md-subheading">Пример сборки</h4>
+<p>Учебная платформа курса: две рамы Tarot Ironman 650, 8 моторов Tarot 4008 380KV, 8 ESC Flycolor 45A, питание 6S Li-Ion. Низкий KV и большие пропы — ставка на эффективность и время полёта, а не на динамику. Li-Ion выбран из-за умеренного тока на висении.</p>
+<h4 class="md-subheading">Тяга и кривая газа</h4>
+<ul><li><code>MOT_THST_HOVER</code> — газ висения, ArduPilot уточняет его сам в полёте. От него зависит работа удержания высоты.</li><li><code>MOT_THST_EXPO</code> — линеаризация тяги. Большие пропы обычно требуют большего значения, чем пятидюймовики.</li><li><code>MOT_SPIN_ARM</code> и <code>MOT_SPIN_MIN</code> — обороты при арме и минимум в полёте: моторы должны уверенно крутиться, но не поднимать аппарат.</li><li>Протокол моторов <code>MOT_PWM_TYPE</code>: DShot, если ESC его поддерживают, иначе PWM с калибровкой ESC.</li></ul>
+<p>Для стартовых значений в Mission Planner есть помощник Initial Tune Parameters: он считает базовые фильтры и ограничения по размеру пропа и напряжению.</p>
+<h4 class="md-subheading">Вибрации</h4>
+<p>Большие медленные пропы дают низкочастотные вибрации, которые хуже фильтруются. EKF на вибрациях начинает «плыть»: в логах это видно как рост <code>VIBE</code> и клиппинг акселерометра, в полёте — как потеря высоты или сообщения об отказе IMU. Лекарство в порядке приоритета: балансировка пропов и моторов, жёсткость рамы, демпфирование полётника, и только потом фильтры. Гармонический notch-фильтр (<code>INS_HNTCH_*</code>) следует за оборотами по газу или по ESC-телеметрии — аналог RPM-фильтра Betaflight.</p>
+<h4 class="md-subheading">Отказоустойчивость</h4>
+<p>Главная причина брать окто — пережить отказ мотора. Но это нужно проверить, а не предположить: в SITL с applet отказа мотора (модуль про Lua), затем на реальном аппарате на высоте и без груза.</p>
+
+<h2>Практика</h2>
+<h4 class="md-subheading">Шаг 1. Сначала SITL</h4>
+<pre class="cli-block"><code>sim_vehicle.py -v ArduCopter -f octaquad --console --map</code></pre>
+<p>Отработай взлёт, LOITER, RTL и отказ мотора до того, как трогать железо.</p>
+<h4 class="md-subheading">Шаг 2. Конфигурация реальной рамы</h4>
+<ol><li><code>FRAME_CLASS = 4</code>, <code>FRAME_TYPE = 1</code>, перезагрузка.</li><li>Без пропов — Motor Test по каждому мотору: порядок и направление по схеме OctaQuad X.</li><li>Калибровка ESC (для PWM) или выбор DShot.</li><li>Initial Tune Parameters по размеру пропа и числу банок.</li><li>Проверка: все пропы одной модели, правильное направление и затяжка.</li></ol>
+<h4 class="md-subheading">Шаг 3. Первые полёты</h4>
+<ol><li>Висение низко в STABILIZE, затем ALT_HOLD, с логированием.</li><li>Анализ лога: <code>VIBE</code> (вибрации и клиппинг), реальный газ висения, ток и просадка АКБ.</li><li>Только потом AUTOTUNE — по одной оси за раз, в тихую погоду.</li><li>Тест отказа мотора — на высоте, без груза, с готовностью перехватить управление.</li></ol>
+
+<h2>Диагностика</h2>
+<div class="diag-groups"><article class="diag-item"><h4><strong>Симптом:</strong> аппарат теряет высоту в ALT_HOLD без причины</h4><ul><li>Возможная причина: вибрации, EKF перестаёт доверять акселерометру.</li><li>Что сделать: смотреть <code>VIBE</code> и клиппинг в логе, балансировать пропы и моторы.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> постоянный разворот по yaw на висении</h4><ul><li>Возможная причина: перекошенный мотор или разные пропы в коаксиальных парах.</li><li>Что сделать: проверить соосность моторов, пропы одной модели и шага.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> газ висения выше 60%</h4><ul><li>Возможная причина: перегруз с учётом коаксиальных потерь.</li><li>Что сделать: пересчитать T/W с поправкой на коаксиал, облегчить.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> после отказа мотора аппарат вращается и теряет управление</h4><ul><li>Возможная причина: недостаточный запас тяги или неверный порядок моторов.</li><li>Что сделать: повторить тест в SITL, проверить Motor Test и запас тяги.</li></ul></article></div>
+
+<h2>Чек-лист</h2>
+<ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="ap-heavy:0"><span><code>FRAME_CLASS</code>/<code>FRAME_TYPE</code> соответствуют раме, Motor Test пройден без пропов</span></label></li><li><label><input type="checkbox" data-check-id="ap-heavy:1"><span>T/W посчитан с поправкой на коаксиал</span></label></li><li><label><input type="checkbox" data-check-id="ap-heavy:2"><span>Initial Tune Parameters применены</span></label></li><li><label><input type="checkbox" data-check-id="ap-heavy:3"><span>Первый лог проверен на вибрации и газ висения</span></label></li><li><label><input type="checkbox" data-check-id="ap-heavy:4"><span>Отказ мотора проверен в SITL до реального теста</span></label></li></ul>
+
+<h2>Источники</h2>
+<ul class="refs"><li><a href="https://ardupilot.org/copter/docs/connect-escs-and-motors.html" target="_blank" rel="noopener noreferrer">Connect ESCs and Motors — ArduPilot Copter</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://ardupilot.org/copter/docs/frame-type-configuration.html" target="_blank" rel="noopener noreferrer">Frame Class and Type Configuration — ArduPilot Copter</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://github.com/ArduPilot/ardupilot/blob/master/libraries/AP_Scripting/applets/motor_failure_test.md" target="_blank" rel="noopener noreferrer">Motor failure test applet — ArduPilot (GitHub)</a> <span class="gc-tag" data-state="info">primary</span></li></ul>
       </div>
-      
-      <nav class="pager" aria-label="Соседние модули"><a class="gc-card pager__prev" href="ap-lua.html"><span class="gc-label gc-muted">Назад</span><br>Lua скриптинг</a><a class="gc-card pager__next" href="ap-quadplane.html"><span class="gc-label gc-muted">Дальше</span><br>QuadPlane и tilt-rotor VTOL</a></nav>
+      <div class="module-done"><gc-button variant="secondary" data-done-toggle="ap-heavy">Отметить как пройденный</gc-button></div>
+      <nav class="pager" aria-label="Соседние модули"><a class="gc-card pager__prev" href="ap-lua.html"><span class="gc-label gc-muted">Назад</span><br>Lua: сценарии и fault injection</a><a class="gc-card pager__next" href="ap-quadplane.html"><span class="gc-label gc-muted">Дальше</span><br>QuadPlane и tilt-rotor VTOL</a></nav>
     </article>
   </main>
   <footer class="gc-container site-footer gc-muted">

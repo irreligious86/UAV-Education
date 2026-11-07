@@ -39,12 +39,15 @@ Done:
 - [x] Betaflight: `bf-failsafe`, `bf-rpm-filter` (10" whistle case), `bf-cli-automation`
 
 Next (priority order):
-- [ ] Foundation track: `f-physics`, `f-power`, `f-motors-esc`, `f-fc-sensors`, `f-safety`
-- [ ] `ap-intro` + `ap-sitl` — ArduPilot via SITL, from the ardupilot-lab project
-- [ ] `ap-lua` — Lua fault-injection applets used in SITL (sensor/motor chaos, gated by RC switches)
-- [ ] `ap-quadplane` — tilt-rotor QuadPlane bring-up: channel mapping, DCM-only, the "motor on a servo channel" incident (expert level)
+- [x] Foundation track: `f-physics`, `f-power`, `f-motors-esc`, `f-fc-sensors`, `f-safety`
+- [x] `ap-intro` + `ap-sitl` — ArduPilot via SITL, from the ardupilot-lab project
+- [x] `ap-lua` — Lua fault-injection applets used in SITL (sensor/motor chaos, gated by RC switches)
+- [x] `ap-heavy` — X8 / OctaQuad: coaxial losses, thrust curve, vibrations, motor-failure testing
+- [x] `ap-quadplane` — tilt-rotor QuadPlane bring-up: channel mapping, DCM-only, the "motor on a servo channel" incident (expert level)
 - [ ] `bf-pid` — practical tuning workflow with A/B profiles (CRISP/COOL/SHARP/FLOAT) and stick-response metrics
 - [ ] `bf-modes-osd`
+- [ ] `ap-missions`, `ap-ekf`, `ap-logs`
+- [ ] `comp-mavlink`
 - [ ] `comp-esp32` — ESP32 companion: EdgeTX Lua ↔ ESP32 serial (TX16S companion project)
 - [ ] `tools-overview`
 

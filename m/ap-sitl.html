@@ -27,13 +27,79 @@
     <article class="module" data-module-page="ap-sitl">
       <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-autonomy">Автономия</a><span>SITL: дрон без дрона</span></p>
       <h1 class="module-title">SITL: дрон без дрона</h1>
-      <div class="module-tags"><span class="gc-tag" title="Уровень">L2 — Интегратор</span><span class="gc-tag">учёба ~3 ч</span><span class="gc-tag" data-state="caution">СКОРО</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></div>
-      
+      <div class="module-tags"><span class="gc-tag" title="Уровень">L2 — Интегратор</span><span class="gc-tag">чтение 25 мин</span><span class="gc-tag">учёба ~3 ч</span><span class="gc-tag">ArduPilot 4.5+</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></div>
+      <p class="module-lead">SITL (Software In The Loop) — настоящая прошивка ArduPilot, запущенная на компьютере вместо полётного контроллера, с симулятором физики вместо реального мира. Здесь можно бесплатно разбить сотню октокоптеров: перепутать параметры, выключить GPS в полёте, уронить мотор. Модуль показывает, как поднять SITL, подключить наземную станцию, управлять дроном скриптом на Python и организовать проект так, чтобы маршруты и сценарии жили отдельно.</p>
       <div class="gc-callout" data-state="ok"><strong>После модуля ты умеешь</strong><ul><li>поднять SITL + GCS</li><li>повторить сценарий скриптом</li></ul></div><p class="gc-muted">Перед этим модулем: <a href="ap-intro.html">Введение в ArduPilot</a></p><div class="gc-callout"><strong>Лабораторная</strong><div>Взлёт, круг, посадка скриптом</div></div>
       <div class="gc-prose module-body">
-<div class="gc-callout" data-state="caution"><strong>Модуль в разработке.</strong> Цели и связи уже определены, текст пишется. План — в <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">ROADMAP</a>.</div>
+<h2>Теория</h2>
+<h4 class="md-subheading">Как устроен SITL</h4>
+<p>Прошивка собирается под Linux и обменивается с симулятором физики «показаниями датчиков» и «командами моторам». Всё остальное — настоящее: те же параметры, режимы, EKF, failsafe, логи. Поэтому всё, что ты отладил в SITL, переносится на железо почти без изменений. Почти — потому что в симуляции идеальные вибрации, идеальная связь и честный GPS, если ты не испортишь их сам.</p>
+<h4 class="md-subheading">sim_vehicle.py и MAVProxy</h4>
+<p>Скрипт <code>sim_vehicle.py</code> собирает прошивку, запускает её и консольную наземную станцию MAVProxy. Ключевые флаги:</p>
+<ul><li><code>-v ArduCopter</code> или <code>-v ArduPlane</code> — тип аппарата;</li><li><code>-f octaquad</code>, <code>-f quad</code>, <code>-f quadplane</code> — модель рамы в симуляторе;</li><li><code>--console --map</code> — окна консоли и карты;</li><li><code>-w</code> — сбросить параметры к дефолтам (полезно, когда эксперименты зашли не туда).</li></ul>
+<p>Наземную станцию (QGroundControl, Mission Planner) подключают к выходу MAVProxy по UDP — обычно она находит его сама.</p>
+<h4 class="md-subheading">Сценарий против маршрута</h4>
+<p>Главное архитектурное решение в учебном проекте: маршрут и сценарий живут раздельно.</p>
+<ul><li><strong>Маршрут</strong> — только последовательность точек в одном формате. Первая точка — старт, последняя — финиш.</li><li><strong>Сценарий</strong> — только команды: взлёт, «пролети маршрут X», посадка, отказ мотора на третьей точке. Координат в сценарии нет.</li></ul>
+<p>Так один маршрут прогоняется разными сценариями, а один сценарий — по разным маршрутам. Это та же идея, что разделение данных и логики в любом нормальном коде.</p>
+
+<h2>Практика</h2>
+<h4 class="md-subheading">Шаг 1. Установка (Ubuntu)</h4>
+<pre class="cli-block"><code>git clone --recurse-submodules https://github.com/ArduPilot/ardupilot.git
+cd ardupilot
+Tools/environment_install/install-prereqs-ubuntu.sh -y
+. ~/.profile</code></pre>
+<h4 class="md-subheading">Шаг 2. Первый запуск</h4>
+<pre class="cli-block"><code>sim_vehicle.py -v ArduCopter -f octaquad --console --map -w</code></pre>
+<p>В консоли MAVProxy:</p>
+<pre class="cli-block"><code>mode guided
+arm throttle
+takeoff 10</code></pre>
+<p>Дрон взлетит на 10 м. <code>mode rtl</code> вернёт его домой.</p>
+<h4 class="md-subheading">Шаг 3. Управление скриптом (pymavlink)</h4>
+<p>SITL открывает дополнительные TCP-порты для внешних клиентов. Пример взлёта скриптом:</p>
+<pre class="cli-block"><code>from pymavlink import mavutil
+
+master = mavutil.mavlink_connection(&quot;tcp:127.0.0.1:5762&quot;)
+master.wait_heartbeat()
+print(&quot;connected to system&quot;, master.target_system)
+
+master.set_mode(master.mode_mapping()[&quot;GUIDED&quot;])
+master.arducopter_arm()
+master.motors_armed_wait()
+
+master.mav.command_long_send(
+    master.target_system, master.target_component,
+    mavutil.mavlink.MAV_CMD_NAV_TAKEOFF,
+    0, 0, 0, 0, 0, 0, 0, 10,  # param7 = altitude, m
+)
+
+while True:
+    msg = master.recv_match(type=&quot;GLOBAL_POSITION_INT&quot;, blocking=True)
+    alt = msg.relative_alt / 1000
+    print(f&quot;alt {alt:.1f} m&quot;)
+    if alt &gt; 9.5:
+        break</code></pre>
+<h4 class="md-subheading">Шаг 4. Структура проекта</h4>
+<pre class="cli-block"><code>ardupilot-lab/
+  sitl/
+    lib/          # shared code: connection, waiting for modes, helpers
+    routes/       # data only: lists of waypoints, one format everywhere
+    scenarios/    # commands only: takeoff, fly route X, inject failure, land
+    run_sitl.sh   # start SITL + GCS with the right frame</code></pre>
+<h4 class="md-subheading">Лабораторная</h4>
+<p>Напиши сценарий «взлёт → круг → посадка» так, чтобы координаты лежали в <code>routes/</code>, а сценарий просто ссылался на маршрут. Прогони его на двух разных маршрутах без правки кода сценария.</p>
+
+<h2>Диагностика</h2>
+<div class="diag-groups"><article class="diag-item"><h4><strong>Симптом:</strong> <code>sim_vehicle.py: command not found</code></h4><ul><li>Возможная причина: не перечитан профиль после установки.</li><li>Что сделать: <code>. ~/.profile</code> или новый терминал.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> скрипт висит на <code>wait_heartbeat</code></h4><ul><li>Возможная причина: неверный адрес или порт, SITL не запущен.</li><li>Что сделать: проверить, что SITL работает, и номер порта.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> <code>arm throttle</code> отказывает с <code>PreArm</code></h4><ul><li>Возможная причина: EKF ещё не сошёлся после старта.</li><li>Что сделать: подождать 10–20 с после запуска, читать сообщение PreArm.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> после экспериментов дрон ведёт себя странно</h4><ul><li>Возможная причина: остались изменённые параметры.</li><li>Что сделать: перезапуск с <code>-w</code> для сброса.</li></ul></article></div>
+
+<h2>Чек-лист</h2>
+<ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="ap-sitl:0"><span>SITL запускается, GCS подключена</span></label></li><li><label><input type="checkbox" data-check-id="ap-sitl:1"><span>Взлёт и RTL выполнены из консоли MAVProxy</span></label></li><li><label><input type="checkbox" data-check-id="ap-sitl:2"><span>Скрипт на pymavlink поднимает дрон</span></label></li><li><label><input type="checkbox" data-check-id="ap-sitl:3"><span>Маршруты и сценарии разнесены по разным папкам</span></label></li><li><label><input type="checkbox" data-check-id="ap-sitl:4"><span>Знаю, как сбросить параметры SITL</span></label></li></ul>
+
+<h2>Источники</h2>
+<ul class="refs"><li><a href="https://ardupilot.org/dev/docs/setting-up-sitl-on-linux.html" target="_blank" rel="noopener noreferrer">Setting up SITL on Linux — ArduPilot Dev</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://ardupilot.org/dev/docs/SITL-setup-landingpage.html" target="_blank" rel="noopener noreferrer">Setting Up SITL — ArduPilot Dev</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://github.com/ArduPilot/pymavlink" target="_blank" rel="noopener noreferrer">pymavlink — source code (GitHub)</a> <span class="gc-tag" data-state="info">primary</span></li></ul>
       </div>
-      
+      <div class="module-done"><gc-button variant="secondary" data-done-toggle="ap-sitl">Отметить как пройденный</gc-button></div>
       <nav class="pager" aria-label="Соседние модули"><a class="gc-card pager__prev" href="ap-intro.html"><span class="gc-label gc-muted">Назад</span><br>Введение в ArduPilot</a><a class="gc-card pager__next" href="ap-missions.html"><span class="gc-label gc-muted">Дальше</span><br>Миссии и планирование</a></nav>
     </article>
   </main>
