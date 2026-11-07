@@ -44,12 +44,13 @@ Next (priority order):
 - [x] `ap-lua` — Lua fault-injection applets used in SITL (sensor/motor chaos, gated by RC switches)
 - [x] `ap-heavy` — X8 / OctaQuad: coaxial losses, thrust curve, vibrations, motor-failure testing
 - [x] `ap-quadplane` — tilt-rotor QuadPlane bring-up: channel mapping, DCM-only, the "motor on a servo channel" incident (expert level)
-- [ ] `bf-pid` — practical tuning workflow with A/B profiles (CRISP/COOL/SHARP/FLOAT) and stick-response metrics
-- [ ] `bf-modes-osd`
+- [x] `bf-pid` — A/B profiles (CRISP/COOL/SHARP/FLOAT) and stick-response metrics
+- [x] `bf-modes-osd`
 - [x] `ap-missions`, `ap-ekf`, `ap-logs` — Autonomy track complete
 - [x] `comp-mavlink`
 - [x] Engineer track complete: `comp-intro`, `comp-esp32` (TX16S companion), `comp-raspberry`, `ap-companion` (GUIDED offboard), `bf-custom`
-- [ ] `tools-overview`
+- [x] `tools-overview` — **core curriculum complete (34/34)**
+- [x] `related` modules shown on module pages
 
 ## Phase 2 — Course structure and architecture 🟡 in progress
 
@@ -62,8 +63,8 @@ Priority: a well-structured learning program.
       old `index.html#<id>` links redirect to module pages
 - [x] Home = course map with per-track progress
 - [x] Progress behind an async `ProgressStore` interface (localStorage now, server later)
-- [x] Ground Control UI as a pinned git submodule (`lib/ground-control-ui`, v0.2.1);
-      gaps found here are fixed upstream (v0.2.0: namespace + content primitives, v0.2.1: `[hidden]` fix)
+- [x] Ground Control UI as a pinned git submodule (`lib/ground-control-ui`, v0.2.2);
+      gaps found here are fixed upstream (v0.2.0: namespace + content primitives, v0.2.1: `[hidden]` fix, v0.2.2: card colour)
 - [x] Static API: `api/v1/curriculum.json` — the contract a future server will serve
 - [ ] Quizzes: `<uav-quiz>` + JSON question bank, seeded for written modules
 - [ ] Client-side search over a generated index

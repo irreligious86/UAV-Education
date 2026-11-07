@@ -310,6 +310,45 @@ def render_checklist(block: str, mid: str) -> str:
     return f'<ul class="gc-checklist">{items}</ul>'
 
 
+def yaml_id_list(fm: str | None, key: str) -> list[str]:
+    """Read a simple YAML list (inline [a, b] or '- a' lines) from front matter."""
+    if not fm:
+        return []
+    out: list[str] = []
+    collecting = False
+    for line in fm.splitlines():
+        stripped = line.strip()
+        if stripped.startswith(f"{key}:"):
+            inline = stripped[len(key) + 1 :].strip()
+            if inline.startswith("[") and inline.endswith("]"):
+                out += [x.strip().strip("'\"") for x in inline[1:-1].split(",") if x.strip()]
+                break
+            collecting = True
+            continue
+        if collecting:
+            if stripped.startswith("- "):
+                out.append(stripped[2:].strip().strip("'\""))
+            elif stripped and not stripped.startswith("#"):
+                break
+    return out
+
+
+def render_related(m: dict, model: dict) -> str:
+    art = m.get("articleMeta")
+    if not art:
+        return ""
+    fm = parse_front_matter((ROOT / art["sourceFile"]).read_text(encoding="utf-8"))
+    ids = [i for i in yaml_id_list(fm, "related") if i in model["modules"] and i != m["id"]]
+    if not ids:
+        return ""
+    links = "".join(
+        f'<a class="gc-card" href="{esc(i)}.html"><strong>{esc(model["modules"][i]["title"])}</strong>'
+        f'<div class="gc-card__meta">{level_tag(model["modules"][i]["level"])}{status_tag(model["modules"][i]["status"])}</div></a>'
+        for i in ids
+    )
+    return f'<section class="related" aria-label="Смежные модули"><p class="gc-label gc-muted">Смежные модули</p><div class="gc-grid ref-grid">{links}</div></section>'
+
+
 def article_sections(m: dict) -> tuple[str, str]:
     """Return (summary_html, body_html) for a published article."""
     art = m["articleMeta"]
@@ -403,6 +442,7 @@ def render_module(m: dict, model: dict) -> str:
     if nxt:
         pager.append(f'<a class="gc-card pager__next" href="{esc(nxt["id"])}.html"><span class="gc-label gc-muted">Дальше</span><br>{esc(nxt["title"])}</a>')
     pager_html = f'<nav class="pager" aria-label="Соседние модули">{"".join(pager)}</nav>' if pager else ""
+    related_html = render_related(m, model)
 
     lead = f'<p class="module-lead">{summary_html}</p>' if summary_html else ""
     body = f"""    <article class="module" data-module-page="{esc(m['id'])}">
@@ -415,6 +455,7 @@ def render_module(m: dict, model: dict) -> str:
 {content}
       </div>
       {done_toggle}
+      {related_html}
       {pager_html}
     </article>"""
     return layout(title=m["title"], base=base, body=body, active="course", description=" ".join(m.get("objectives", [])))

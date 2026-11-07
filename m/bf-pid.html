@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>PID-тюнинг — UAV Student</title>
+  <title>PID-тюнинг по данным — UAV Student</title>
   <meta name="description" content="построить A/B-профили сравнить по bounce-back и задержке входа">
   <link rel="stylesheet" href="../lib/ground-control-ui/dist/ground-control.css">
   <link rel="stylesheet" href="../assets/site.css">
@@ -25,15 +25,56 @@
   </header>
   <main class="gc-container site-main">
     <article class="module" data-module-page="bf-pid">
-      <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-integrator">Интегратор</a><span>PID-тюнинг</span></p>
-      <h1 class="module-title">PID-тюнинг</h1>
-      <div class="module-tags"><span class="gc-tag" title="Уровень">L2 — Интегратор</span><span class="gc-tag">учёба ~4 ч</span><span class="gc-tag" data-state="caution">СКОРО</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></div>
-      
+      <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-integrator">Интегратор</a><span>PID-тюнинг по данным</span></p>
+      <h1 class="module-title">PID-тюнинг по данным</h1>
+      <div class="module-tags"><span class="gc-tag" title="Уровень">L2 — Интегратор</span><span class="gc-tag">чтение 30 мин</span><span class="gc-tag">учёба ~4 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></div>
+      <p class="module-lead">«Чётче», «мягче», «качает», «греется» — ощущения пилота, которые можно перевести в числа из лога и сравнить профили между собой честно. Модуль даёт рабочий метод: фильтры до PID, один параметр за шаг, четыре профиля в одном полёте, пять метрик по манёврам. Кейс — эксперимент на двух одинаковых 7&quot;: четыре профиля, что совпало с ощущениями, что нет, и почему итогом стал не новый PID, а новые фильтры.</p>
       <div class="gc-callout" data-state="ok"><strong>После модуля ты умеешь</strong><ul><li>построить A/B-профили</li><li>сравнить по bounce-back и задержке входа</li></ul></div><p class="gc-muted">Перед этим модулем: <a href="bf-rpm-filter.html">RPM-фильтр: кейс «свистящего» 10&quot;</a></p><div class="gc-callout"><strong>Лабораторная</strong><div>4 профиля, один вылет, сравнение метрик</div></div>
       <div class="gc-prose module-body">
-<div class="gc-callout" data-state="caution"><strong>Модуль в разработке.</strong> Цели и связи уже определены, текст пишется. План — в <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">ROADMAP</a>.</div>
+<h2>Теория</h2>
+<h4 class="md-subheading">Порядок: сначала фильтры, потом PID</h4>
+<p>PID усиливает всё, что приходит с гироскопа, включая шум. Тюнить PID на плохих фильтрах — настраивать усилитель на фоне помех. Поэтому: RPM-фильтр и динамический notch работают, спектр чистый (модули про фильтры и RPM-фильтр), и только потом — PID.</p>
+<h4 class="md-subheading">Слайдеры Betaflight 4.3+</h4>
+<p>Простой режим тюнинга крутит группы параметров сразу:</p>
+<ul><li><strong>Damping</strong> (D) — сопротивление быстрым движениям, гасит перелёт; выше — греются моторы.</li><li><strong>Tracking</strong> (P и I) — точность следования за стиком и возмущениями; выше — осцилляции.</li><li><strong>Stick Response</strong> (FF) — реакция на быстрые движения стика; выше — перелёт в конце флипа.</li><li><strong>Dynamic Damping</strong> (D max) — насколько D может вырасти на быстрых движениях.</li><li><strong>Drift – Wobble</strong> (I) — удержание в поворотах и на нулевом газу.</li><li><strong>Master Multiplier</strong> — всё разом; трогают, когда остальным не хватает хода.</li></ul>
+<p>В CLI это <code>simplified_pi_gain</code>, <code>simplified_d_gain</code>, <code>simplified_feedforward_gain</code>, <code>simplified_d_max_gain</code>, <code>simplified_i_gain</code>, <code>simplified_master_multiplier</code> плюс <code>simplified_tuning apply</code>. Профилей PID четыре, профилей рейтов четыре — переключаются тумблером или в CLI командой <code>profile N</code>.</p>
+<h4 class="md-subheading">Симптомы</h4>
+<ul><li>P велик — дёрганый, перекорректирует, быстрая осцилляция. Мал — вялый, медленная раскачка.</li><li>I велик — «робот», низкочастотная осцилляция. Мал — уплывает, «катается как по льду».</li><li>D мал — bounce-back после флипов, пропвош на спуске. Велик — горячие моторы, мыльный отклик.</li><li>FF велик — перелёт в начале флипа, дрожь на стик-движениях.</li></ul>
+<p>Проверка температуры моторов после каждого изменения D или фильтров: короткий полёт, посадка, палец на мотор. Не можешь держать — откат.</p>
+<h4 class="md-subheading">Пять метрик по манёврам</h4>
+<p>Манёвр — участок, где |setpoint| выше порога (например, 200 °/с) дольше 50 мс. Для каждого:</p>
+<p>| Ощущение | Метрика | Как считать | |---|---|---| | греется | <strong>motor noise</strong> | std команд моторам выше 40 Гц, среднее по моторам | | трясёт на спуске | <strong>propwash RMS</strong> | RMS gyro в полосе 20–70 Гц на участках спуска | | качает после остановки | <strong>bounce-back</strong> | пик gyro противоположного знака в 150 мс после остановки / амплитуда манёвра, % | | тупит на стик | <strong>entry lag</strong> | время от начала движения setpoint до 50% на gyro, мс | | не долетает / перелетает | <strong>peak tracking</strong> | max gyro / max setpoint, % |</p>
+<p>Медиана по 10–20 манёврам — устойчива; среднее портит один кривой бросок. Классический step response (PID-Analyzer, PIDtoolbox) хорош на длинных фристайл-логах, но на коротких логах по 1–2 минуты на профиль шумит на ±40% — прямые метрики честнее.</p>
+<h4 class="md-subheading">Кейс: четыре профиля на двух 7&quot;</h4>
+<p>Два почти одинаковых 7&quot; (одна рама, моторы, пропы, FC), приведённых к общему базису. Четыре профиля отличались только слайдерами, фильтры одинаковые:</p>
+<p>| | COOL | SHARP | WASH | FLOAT | |---|---|---|---|---| | Tracking | 1.00 | <strong>1.15</strong> | 1.00 | 1.00 | | Damping | 1.00 | 1.00 | <strong>1.20</strong> | <strong>0.85</strong> | | D max | 1.00 | 1.00 | <strong>1.20</strong> | 1.00 | | Feedforward | 1.00 | <strong>1.15</strong> | 1.00 | <strong>0.80</strong> |</p>
+<p>Результат (дрон A, медианы): motor noise 16.1 / 23.3 / 18.0 / 14.6; bounce-back 6.0 / 8.5 / 9.4 / 14.9%; entry lag 38 / 31 / 40 / 44 мс.</p>
+<ul><li><strong>SHARP «чётче»</strong> — да: lag на 7 мс меньше. Цена — шум на моторах +45%. Это P: он поднимает усиление на всех частотах.</li><li><strong>FLOAT «мягче»</strong> — да, самый тихий. Но bounce-back почти 15%: после остановки дрон откатывается на 1/7 амплитуды. Для съёмки плохо.</li><li><strong>WASH «не почувствовал»</strong> — и цифры подтвердили: пропвош 0.97 от COOL, в пределах шума. На 1.4 кг под 7&quot; пропами пропвош — аэродинамика, а не недодемпфирование. Профиль убрали.</li><li><strong>Два «одинаковых» дрона дали разный bounce-back у SHARP</strong> (2.9% против 8.5%): на втором пилот летал резче, D-max успевал включаться. Вывод о методе: сравнивать профили только внутри одного полёта или нормировать на амплитуду манёвра.</li></ul>
+<p><strong>Итог:</strong> COOL — лучший компромисс. Чёткость вернули не через P, а через фильтры: <code>simplified_gyro_filter_multiplier</code> 1.00 → 1.10 и <code>dyn_notch_q</code> 400 → 450, PID как COOL. Так появился профиль CRISP. Первое предложение было агрессивнее (1.25 и один notch), его отклонили в пользу малых шагов: 1.10 → полёт → при успехе 1.20.</p>
+
+<h2>Практика</h2>
+<h4 class="md-subheading">Шаг 1. Базис</h4>
+<p>Фильтры чистые, RPM-фильтр работает, слайдеры в 1.00, <code>diff all</code> сохранён с датой. Это профиль-контроль.</p>
+<h4 class="md-subheading">Шаг 2. Четыре профиля</h4>
+<p>В профилях 1–4 задай варианты, отличающиеся одним-двумя слайдерами. Переключение — тумблером (режим или <code>adjustment</code>), чтобы менять в воздухе.</p>
+<h4 class="md-subheading">Шаг 3. Программа полёта</h4>
+<p>Одна и та же для всех профилей: 20 с висения, 10 резких бросков по roll, 10 по pitch, три спуска с нулевым газом. Профили по очереди в одном вылете. После каждого — запись в <code>session_notes.md</code>: порядок, ветер, ощущения, температура моторов.</p>
+<h4 class="md-subheading">Шаг 4. Метрики</h4>
+<p>Разбор лога на Python (<code>orangebox</code> для чтения, <code>scipy</code> для спектров). Обрезать первые и последние 3 с, шум считать на участках с газом 25–60%, логи с потерей кадров выше 1% не брать. Сравнивать медианы.</p>
+<h4 class="md-subheading">Шаг 5. Один шаг за раз</h4>
+<p>Победивший профиль — новый базис. Следующее изменение — одно, малое, с полётом и логом. Назад — одним движением тумблера: контрольный профиль остаётся в слоте.</p>
+
+<h2>Диагностика</h2>
+<div class="diag-groups"><article class="diag-item"><h4><strong>Симптом:</strong> step response «прыгает» между соседними манёврами</h4><ul><li>Возможная причина: короткий лог, плавный стиль, ANGLE-режим.</li><li>Что сделать: прямые метрики по манёврам, медианы, ACRO для теста.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> моторы горячие после профиля с высоким D</h4><ul><li>Возможная причина: D усиливает остаточный шум.</li><li>Что сделать: вернуть D, улучшить фильтры, затем повторить.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> пропвош не уходит от D</h4><ul><li>Возможная причина: аэродинамика тяжёлого дрона под малыми пропами.</li><li>Что сделать: другие пропы/вес, TPA, не задирать D.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> два одинаковых дрона дают разные цифры</h4><ul><li>Возможная причина: разная программа полёта де-факто.</li><li>Что сделать: сравнивать профили внутри одного полёта, нормировать на амплитуду.</li></ul></article></div>
+
+<h2>Чек-лист</h2>
+<ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="bf-pid:0"><span>Фильтры настроены до PID, спектр чистый</span></label></li><li><label><input type="checkbox" data-check-id="bf-pid:1"><span>Контрольный профиль сохранён и остаётся в слоте</span></label></li><li><label><input type="checkbox" data-check-id="bf-pid:2"><span>Профили отличаются одним-двумя слайдерами</span></label></li><li><label><input type="checkbox" data-check-id="bf-pid:3"><span>Одна программа полёта для всех профилей, записи в session_notes</span></label></li><li><label><input type="checkbox" data-check-id="bf-pid:4"><span>Метрики — медианы по манёврам, не среднее</span></label></li><li><label><input type="checkbox" data-check-id="bf-pid:5"><span>Один шаг за раз, с логом</span></label></li></ul>
+
+<h2>Источники</h2>
+<ul class="refs"><li><a href="https://betaflight.com/docs/wiki/guides/current/PID-Tuning-Guide" target="_blank" rel="noopener noreferrer">PID Tuning Guide — Betaflight Documentation</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://betaflight.com/docs/wiki/app/pid-tuning-tab" target="_blank" rel="noopener noreferrer">PID Tuning tab — Betaflight App</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://github.com/betaflight/betaflight/blob/master/src/main/cli/settings.c" target="_blank" rel="noopener noreferrer">Betaflight settings reference (settings.c, GitHub)</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://github.com/Plasmatree/PID-Analyzer" target="_blank" rel="noopener noreferrer">PID-Analyzer — step response tool (GitHub)</a> <span class="gc-tag">secondary</span></li></ul>
       </div>
-      
+      <div class="module-done"><gc-button variant="secondary" data-done-toggle="bf-pid">Отметить как пройденный</gc-button></div>
+      <section class="related" aria-label="Смежные модули"><p class="gc-label gc-muted">Смежные модули</p><div class="gc-grid ref-grid"><a class="gc-card" href="bf-pid-reg-in-bf.html"><strong>PID-регулятор в Betaflight</strong><div class="gc-card__meta"><span class="gc-tag" title="L1 — Оператор">L1</span></div></a><a class="gc-card" href="bf-filters.html"><strong>Фильтры</strong><div class="gc-card__meta"><span class="gc-tag" title="L2 — Интегратор">L2</span></div></a><a class="gc-card" href="bf-blackbox.html"><strong>Blackbox</strong><div class="gc-card__meta"><span class="gc-tag" title="L2 — Интегратор">L2</span></div></a></div></section>
       <nav class="pager" aria-label="Соседние модули"><a class="gc-card pager__prev" href="bf-rpm-filter.html"><span class="gc-label gc-muted">Назад</span><br>RPM-фильтр: кейс «свистящего» 10&quot;</a><a class="gc-card pager__next" href="bf-cli.html"><span class="gc-label gc-muted">Дальше</span><br>CLI и remap</a></nav>
     </article>
   </main>
