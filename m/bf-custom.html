@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Кастомная сборка — UAV Student</title>
+  <title>Свои сборки прошивок — UAV Student</title>
   <meta name="description" content="собрать прошивку под ограничения FC">
   <link rel="stylesheet" href="../lib/ground-control-ui/dist/ground-control.css">
   <link rel="stylesheet" href="../assets/site.css">
@@ -25,16 +25,52 @@
   </header>
   <main class="gc-container site-main">
     <article class="module" data-module-page="bf-custom">
-      <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-engineer">Инженер</a><span>Кастомная сборка</span></p>
-      <h1 class="module-title">Кастомная сборка</h1>
-      <div class="module-tags"><span class="gc-tag" title="Уровень">L4 — Эксперт</span><span class="gc-tag">учёба ~3 ч</span><span class="gc-tag" data-state="caution">СКОРО</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></div>
-      
+      <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-engineer">Инженер</a><span>Свои сборки прошивок</span></p>
+      <h1 class="module-title">Свои сборки прошивок</h1>
+      <div class="module-tags"><span class="gc-tag" title="Уровень">L4 — Эксперт</span><span class="gc-tag">чтение 25 мин</span><span class="gc-tag">учёба ~3 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></div>
+      <p class="module-lead">Флеш-память полётника не резиновая: включить всё сразу нельзя, а значит, прошивка под твой аппарат — это выбор. Модуль объясняет, как в Betaflight собрать прошивку под свой набор функций через Cloud Build и когда нужны custom defines, и как в ArduPilot собрать свой вариант из исходников — например, убрать GPS и лишние драйверы, чтобы уместить нужное на F405. С примером из проекта HeeWing.</p>
       <div class="gc-callout" data-state="ok"><strong>После модуля ты умеешь</strong><ul><li>собрать прошивку под ограничения FC</li></ul></div><p class="gc-muted">Перед этим модулем: <a href="bf-cli.html">CLI и remap</a></p>
       <div class="gc-prose module-body">
-<div class="gc-callout" data-state="caution"><strong>Модуль в разработке.</strong> Цели и связи уже определены, текст пишется. План — в <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">ROADMAP</a>.</div>
+<h2>Теория</h2>
+<h4 class="md-subheading">Зачем вообще собирать</h4>
+<ul><li>На F411/F405 стандартная прошивка со всеми опциями не влезает или влезает без нужной функции.</li><li>Нужна опция, которой нет в стандартном наборе (дальномер, транспондер, экзотический протокол).</li><li>Нужно убрать то, чего на борту нет и не будет (GPS, компас, OSD-чип), освободив место и память.</li></ul>
+<h4 class="md-subheading">Betaflight: Cloud Build</h4>
+<p>Начиная с 4.4, прошивку собирает облачный сервер под твой список опций. В Firmware Flasher выбираешь протокол приёмника, тип OSD, телеметрию, ESC-протокол и прочее; каждая опция — это флаг <code>USE_*</code> в исходниках, имя вводится без префикса. Выбор тянет зависимости сам: CRSF добавит CRSF-телеметрию, <code>GPS</code> — GPS Rescue и элементы OSD. Драйверы конкретной платы (гироскоп, флеш, OSD-чип) добавляются по таргету автоматически.</p>
+<p><strong>Custom defines</strong> — поле в экспертном режиме для опций вне списков. Они не тестируются на всех платах; если опции нужен пин, его назначают в CLI через <code>resource</code>. Слишком большая прошивка — сборка просто падает.</p>
+<p>Проверка на плате: команда <code>version</code> в CLI показывает версию, таргет и <code>BUILD KEY</code> — ключ, по которому Cloud Build соберёт ровно такую же прошивку ещё раз. В <code>diff all</code> ключ тоже записывается.</p>
+<h4 class="md-subheading">ArduPilot: сборка из исходников</h4>
+<p>ArduPilot собирается <code>waf</code>: <code>./waf configure --board &lt;board&gt;</code> и <code>./waf copter</code> (или <code>plane</code>). Таргет описывается в <code>libraries/AP_HAL_ChibiOS/hwdef/&lt;board&gt;/hwdef.dat</code>: пины, шины, какие драйверы включать. Там же через <code>define</code>-строки отключают ненужное.</p>
+<p>Для плат с маленькой флешью существуют урезанные конфигурации: много функций в коде обёрнуто проверками <code>#if AP_&lt;FEATURE&gt;_ENABLED</code>, и hwdef может задать <code>define AP_&lt;FEATURE&gt;_ENABLED 0</code>. Веб-инструмент Custom Firmware Builder (ссылка в документации «Building the code») делает то же через интерфейс: ставишь галочки, получаешь прошивку.</p>
+<h4 class="md-subheading">Кейс: HeeWing F405 без GPS</h4>
+<p>Стоковый F405 в проекте HeeWing T1 — плата с ограниченной флешью: нет Lua-скриптинга, часть возможностей урезана. Варианты прошивки, которые планировались для него: убрать поддержку GPS (на этой сборке он не используется для арма и базового полёта) и лишние драйверы, чтобы освободить место под нужное. Это осмысленное решение, если понимаешь последствия: без GPS в прошивке не будет ни RTL, ни геозоны по координатам — не только «сейчас», а вообще.</p>
+<h4 class="md-subheading">Правила своих сборок</h4>
+<ol><li>Хранить конфигурацию сборки в git рядом с параметрами: список опций Betaflight или <code>hwdef</code>-патч ArduPilot.</li><li>Называть сборку с датой и хешем коммита; вывод <code>version</code> (с BUILD KEY) должен совпадать с записью.</li><li>Перед прошивкой — полный бэкап (<code>diff all</code> / файл параметров), после — перечитать всё критичное.</li><li>Не смешивать: своя сборка + стандартный конфиг от другой версии = непредсказуемость.</li></ol>
+
+<h2>Практика</h2>
+<h4 class="md-subheading">Betaflight: сборка под конкретный аппарат</h4>
+<ol><li>Firmware Flasher → таргет платы → версия.</li><li>Опции: приёмник (CRSF), OSD (аналог или цифра), телеметрия, ESC-протокол (DShot), GPS только если он есть.</li><li>Expert mode → Custom Defines, если нужно что-то вне списков.</li><li>Build → Flash. После прошивки в CLI: <code>version</code> — сохранить вывод (там BUILD KEY) в папку дрона.</li><li>Восстановить конфиг из <code>diff all</code> <strong>той же</strong> мажорной версии, перечитать ключевые параметры.</li></ol>
+<h4 class="md-subheading">ArduPilot: сборка из исходников</h4>
+<pre class="cli-block"><code>git clone --recurse-submodules https://github.com/ArduPilot/ardupilot.git
+cd ardupilot
+Tools/environment_install/install-prereqs-ubuntu.sh -y
+./waf configure --board MatekF405-Wing   # example board name; use yours
+./waf plane
+ls build/MatekF405-Wing/bin/             # arduplane.apj / .bin / .hex</code></pre>
+<p>Отключение функции: добавить в <code>hwdef.dat</code> платы (или в отдельный файл extra hwdef) строку вида <code>define AP_&lt;FEATURE&gt;_ENABLED 0</code>, пересобрать, проверить размер в выводе сборки. Для первого опыта проще Custom Firmware Builder на сайте.</p>
+<h4 class="md-subheading">Лабораторная</h4>
+<p>Собери две прошивки ArduPlane для своей платы: стандартную и без одной подсистемы. Сравни размер бинарников, прошей вторую в SITL-подобный стенд (плата на столе) и убедись, что отключённая подсистема действительно исчезла из параметров.</p>
+
+<h2>Диагностика</h2>
+<div class="diag-groups"><article class="diag-item"><h4><strong>Симптом:</strong> Cloud Build падает с ошибкой размера</h4><ul><li>Возможная причина: слишком много опций для флеша платы.</li><li>Что сделать: убрать неиспользуемое (второй OSD, лишние протоколы, GPS без GPS).</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> после своей сборки функция «есть», но не работает</h4><ul><li>Возможная причина: опции нужен пин, не назначенный через <code>resource</code>.</li><li>Что сделать: <code>resource</code> в CLI, перезагрузка, проверить <code>status</code>.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> ArduPilot <code>waf configure</code> не находит плату</h4><ul><li>Возможная причина: опечатка в имени, нет сабмодулей.</li><li>Что сделать: <code>./waf list_boards</code>, <code>git submodule update --init --recursive</code>.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> после своей сборки часть параметров исчезла</h4><ul><li>Возможная причина: это и есть эффект отключённой подсистемы.</li><li>Что сделать: сверить с записью о сборке; если параметр нужен — вернуть функцию.</li></ul></article></div>
+
+<h2>Чек-лист</h2>
+<ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="bf-custom:0"><span>Знаю, какие опции реально нужны моему аппарату</span></label></li><li><label><input type="checkbox" data-check-id="bf-custom:1"><span>Сборка описана в git: опции / hwdef-патч, дата, хеш</span></label></li><li><label><input type="checkbox" data-check-id="bf-custom:2"><span>Вывод <code>version</code> с BUILD KEY сохранён после прошивки</span></label></li><li><label><input type="checkbox" data-check-id="bf-custom:3"><span>Конфиг восстанавливается из той же мажорной версии</span></label></li><li><label><input type="checkbox" data-check-id="bf-custom:4"><span>Понимаю, что теряю, отключая подсистему</span></label></li></ul>
+
+<h2>Источники</h2>
+<ul class="refs"><li><a href="https://betaflight.com/docs/wiki/guides/current/Build-Options" target="_blank" rel="noopener noreferrer">Build Options — Betaflight Documentation</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://betaflight.com/docs/development/Defines" target="_blank" rel="noopener noreferrer">Defines — Betaflight Development</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://ardupilot.org/dev/docs/building-the-code.html" target="_blank" rel="noopener noreferrer">Building the code — ArduPilot Dev</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://ardupilot.org/dev/docs/SITL-setup-landingpage.html" target="_blank" rel="noopener noreferrer">Setting up SITL / build environment — ArduPilot Dev</a> <span class="gc-tag" data-state="info">primary</span></li></ul>
       </div>
-      
-      <nav class="pager" aria-label="Соседние модули"><a class="gc-card pager__prev" href="ap-companion.html"><span class="gc-label gc-muted">Назад</span><br>Companion + ArduPilot</a></nav>
+      <div class="module-done"><gc-button variant="secondary" data-done-toggle="bf-custom">Отметить как пройденный</gc-button></div>
+      <nav class="pager" aria-label="Соседние модули"><a class="gc-card pager__prev" href="ap-companion.html"><span class="gc-label gc-muted">Назад</span><br>Companion + ArduPilot: управление из кода</a></nav>
     </article>
   </main>
   <footer class="gc-container site-footer gc-muted">

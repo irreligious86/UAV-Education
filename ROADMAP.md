@@ -48,7 +48,7 @@ Next (priority order):
 - [ ] `bf-modes-osd`
 - [x] `ap-missions`, `ap-ekf`, `ap-logs` — Autonomy track complete
 - [x] `comp-mavlink`
-- [ ] `comp-esp32` — ESP32 companion: EdgeTX Lua ↔ ESP32 serial (TX16S companion project)
+- [x] Engineer track complete: `comp-intro`, `comp-esp32` (TX16S companion), `comp-raspberry`, `ap-companion` (GUIDED offboard), `bf-custom`
 - [ ] `tools-overview`
 
 ## Phase 2 — Course structure and architecture 🟡 in progress

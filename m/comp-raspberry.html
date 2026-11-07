@@ -27,14 +27,94 @@
     <article class="module" data-module-page="comp-raspberry">
       <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-engineer">Инженер</a><span>Raspberry Pi + ArduPilot</span></p>
       <h1 class="module-title">Raspberry Pi + ArduPilot</h1>
-      <div class="module-tags"><span class="gc-tag" title="Уровень">L3 — Специалист</span><span class="gc-tag">учёба ~4 ч</span><span class="gc-tag" data-state="caution">СКОРО</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></div>
-      
+      <div class="module-tags"><span class="gc-tag" title="Уровень">L3 — Специалист</span><span class="gc-tag">чтение 30 мин</span><span class="gc-tag">учёба ~4 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></div>
+      <p class="module-lead">Raspberry Pi на борту — классический первый companion: Linux, Python, камера, Wi-Fi. Модуль проводит от провода до рабочего сервиса: подключение к телеметрийному порту ArduPilot, настройка UART на Pi, проверка MAVProxy, маршрутизация MAVLink сразу нескольким потребителям и запуск своего скрипта как системного сервиса, который переживает перезагрузки.</p>
       <div class="gc-callout" data-state="ok"><strong>После модуля ты умеешь</strong><ul><li>поднять mavlink-router и сервис на борту</li></ul></div><p class="gc-muted">Перед этим модулем: <a href="comp-mavlink.html">MAVLink и MAVSDK</a></p>
       <div class="gc-prose module-body">
-<div class="gc-callout" data-state="caution"><strong>Модуль в разработке.</strong> Цели и связи уже определены, текст пишется. План — в <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">ROADMAP</a>.</div>
+<h2>Теория</h2>
+<h4 class="md-subheading">Подключение</h4>
+<p>Телеметрийный порт FC (например TELEM2 = <code>SERIAL2</code>) ↔ UART Pi: TX → RX, RX → TX, общий GND. Уровни 3.3 В с обеих сторон. На FC:</p>
+<ul><li><code>SERIAL2_PROTOCOL = 2</code> — MAVLink 2;</li><li><code>SERIAL2_BAUD = 921</code> — 921600 бод; для коротких проводов и большого потока телеметрии это норма, для длинных — 57 (57600).</li></ul>
+<p>Питание Pi — от отдельного BEC 5 В с запасом по току (Pi 4/5 под нагрузкой — больше ампера), не с порта телеметрии FC.</p>
+<h4 class="md-subheading">UART на Raspberry Pi</h4>
+<p>По умолчанию UART занят консолью Linux. В <code>raspi-config</code> → Interfacing → Serial: консоль по serial — <strong>нет</strong>, аппаратный порт — <strong>да</strong>. После перезагрузки порт доступен как <code>/dev/serial0</code>.</p>
+<h4 class="md-subheading">Маршрутизация</h4>
+<p>Один UART, а потребителей несколько: GCS по Wi-Fi, твой скрипт, запись tlog. Решение — маршрутизатор MAVLink: <code>mavlink-router</code> или <code>mavp2p</code> читает порт и раздаёт по UDP/TCP всем подключённым. Скрипты тогда подключаются к локальному UDP-порту, а не к <code>/dev/serial0</code> напрямую, и не мешают друг другу.</p>
+<h4 class="md-subheading">Сервис вместо «запустил руками»</h4>
+<p>Скрипт, запущенный из терминала по SSH, умирает вместе с сессией. На борту всё должно стартовать само: <code>systemd</code>-юнит с <code>Restart=always</code>. Логи — в <code>journalctl</code>.</p>
+<h4 class="md-subheading">Время и логи</h4>
+<p>У Pi без сети нет точного времени после загрузки. Для сопоставления логов companion с DataFlash FC используй <code>SYSTEM_TIME</code> из MAVLink (время GPS) или пиши в лог метки <code>TimeUS</code>-подобного монотонного счётчика и момент синхронизации.</p>
+
+<h2>Практика</h2>
+<h4 class="md-subheading">Шаг 1. Порт и проверка</h4>
+<pre class="cli-block"><code>sudo raspi-config        # Interfacing Options -&gt; Serial: console NO, hardware YES
+sudo reboot
+pip install --user pymavlink MAVProxy
+mavproxy.py --master=/dev/serial0 --baudrate 921600</code></pre>
+<p>Увидел heartbeat и параметры — связь есть. Команду <code>arm throttle</code> на столе давать только без пропов.</p>
+<h4 class="md-subheading">Шаг 2. Маршрутизатор</h4>
+<p>Пример конфигурации <code>mavlink-router</code> (<code>/etc/mavlink-router/main.conf</code>):</p>
+<pre class="cli-block"><code>[General]
+TcpServerPort=5760
+ReportStats=false
+
+[UartEndpoint fc]
+Device=/dev/serial0
+Baud=921600
+
+[UdpEndpoint gcs]
+Mode=Normal
+Address=192.168.4.20
+Port=14550
+
+[UdpEndpoint local]
+Mode=Server
+Address=127.0.0.1
+Port=14551</code></pre>
+<p>GCS на ноутбуке получает поток на 14550, локальные скрипты подключаются к <code>udpin:127.0.0.1:14551</code> или <code>tcp:127.0.0.1:5760</code>.</p>
+<h4 class="md-subheading">Шаг 3. Свой сервис</h4>
+<p><code>/opt/uav/telemetry_logger.py</code>:</p>
+<pre class="cli-block"><code>import csv, time
+from pymavlink import mavutil
+
+m = mavutil.mavlink_connection(&quot;tcp:127.0.0.1:5760&quot;)
+m.wait_heartbeat()
+with open(&quot;/var/log/uav/telemetry.csv&quot;, &quot;a&quot;, newline=&quot;&quot;) as f:
+    w = csv.writer(f)
+    while True:
+        msg = m.recv_match(type=[&quot;GLOBAL_POSITION_INT&quot;, &quot;BATTERY_STATUS&quot;], blocking=True)
+        w.writerow([time.monotonic(), msg.get_type(), msg.to_dict()])
+        f.flush()</code></pre>
+<p><code>/etc/systemd/system/uav-telemetry.service</code>:</p>
+<pre class="cli-block"><code>[Unit]
+Description=UAV telemetry logger
+After=mavlink-router.service
+Requires=mavlink-router.service
+
+[Service]
+ExecStart=/usr/bin/python3 /opt/uav/telemetry_logger.py
+Restart=always
+RestartSec=2
+User=pi
+
+[Install]
+WantedBy=multi-user.target</code></pre>
+<pre class="cli-block"><code>sudo systemctl enable --now uav-telemetry
+journalctl -u uav-telemetry -f</code></pre>
+<h4 class="md-subheading">Шаг 4. Отработать отказ</h4>
+<p>Выдерни питание Pi в SITL-подобном стенде (FC на столе без пропов): FC продолжает работать, GCS теряет поток, после включения Pi сервис поднимается сам. Это и есть граница ответственности из вводного модуля.</p>
+
+<h2>Диагностика</h2>
+<div class="diag-groups"><article class="diag-item"><h4><strong>Симптом:</strong> MAVProxy не видит heartbeat</h4><ul><li>Возможная причина: консоль Linux держит порт, не та скорость, перепутаны TX/RX.</li><li>Что сделать: <code>raspi-config</code>, сравнить <code>SERIAL2_BAUD</code>, проверить провода.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> мусор в данных на 921600</h4><ul><li>Возможная причина: длинные провода, помехи, плохой GND.</li><li>Что сделать: укоротить, экранировать или снизить до 57600.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> второй скрипт не может открыть порт</h4><ul><li>Возможная причина: <code>/dev/serial0</code> занят первым.</li><li>Что сделать: маршрутизатор MAVLink, клиенты по UDP/TCP.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> Pi перезагружается на газу</h4><ul><li>Возможная причина: слабое питание.</li><li>Что сделать: BEC с запасом, конденсатор, отдельная линия от силовой шины.</li></ul></article></div>
+
+<h2>Чек-лист</h2>
+<ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="comp-raspberry:0"><span>Консоль Linux снята с UART, порт <code>/dev/serial0</code> доступен</span></label></li><li><label><input type="checkbox" data-check-id="comp-raspberry:1"><span><code>SERIAL2_PROTOCOL</code>/<code>SERIAL2_BAUD</code> совпадают с настройкой Pi</span></label></li><li><label><input type="checkbox" data-check-id="comp-raspberry:2"><span>Pi питается от отдельного BEC</span></label></li><li><label><input type="checkbox" data-check-id="comp-raspberry:3"><span>Маршрутизатор раздаёт MAVLink нескольким клиентам</span></label></li><li><label><input type="checkbox" data-check-id="comp-raspberry:4"><span>Скрипт запущен как <code>systemd</code>-сервис с автоперезапуском</span></label></li><li><label><input type="checkbox" data-check-id="comp-raspberry:5"><span>Отказ Pi в стенде не влияет на FC</span></label></li></ul>
+
+<h2>Источники</h2>
+<ul class="refs"><li><a href="https://ardupilot.org/dev/docs/raspberry-pi-via-mavlink.html" target="_blank" rel="noopener noreferrer">Communicating with Raspberry Pi via MAVLink — ArduPilot Dev</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://github.com/mavlink-router/mavlink-router" target="_blank" rel="noopener noreferrer">mavlink-router — source code (GitHub)</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://github.com/bluenviron/mavp2p" target="_blank" rel="noopener noreferrer">mavp2p — source code (GitHub)</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://ardupilot.org/mavproxy/" target="_blank" rel="noopener noreferrer">MAVProxy — Documentation</a> <span class="gc-tag" data-state="info">primary</span></li></ul>
       </div>
-      
-      <nav class="pager" aria-label="Соседние модули"><a class="gc-card pager__prev" href="comp-esp32.html"><span class="gc-label gc-muted">Назад</span><br>ESP32 и периферия</a><a class="gc-card pager__next" href="ap-companion.html"><span class="gc-label gc-muted">Дальше</span><br>Companion + ArduPilot</a></nav>
+      <div class="module-done"><gc-button variant="secondary" data-done-toggle="comp-raspberry">Отметить как пройденный</gc-button></div>
+      <nav class="pager" aria-label="Соседние модули"><a class="gc-card pager__prev" href="comp-esp32.html"><span class="gc-label gc-muted">Назад</span><br>ESP32 и периферия</a><a class="gc-card pager__next" href="ap-companion.html"><span class="gc-label gc-muted">Дальше</span><br>Companion + ArduPilot: управление из кода</a></nav>
     </article>
   </main>
   <footer class="gc-container site-footer gc-muted">

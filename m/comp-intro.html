@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Введение в Companion — UAV Student</title>
+  <title>Companion: зачем и где граница — UAV Student</title>
   <meta name="description" content="разделить ответственность FC и companion">
   <link rel="stylesheet" href="../lib/ground-control-ui/dist/ground-control.css">
   <link rel="stylesheet" href="../assets/site.css">
@@ -25,15 +25,45 @@
   </header>
   <main class="gc-container site-main">
     <article class="module" data-module-page="comp-intro">
-      <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-engineer">Инженер</a><span>Введение в Companion</span></p>
-      <h1 class="module-title">Введение в Companion</h1>
-      <div class="module-tags"><span class="gc-tag" title="Уровень">L2 — Интегратор</span><span class="gc-tag">учёба ~2 ч</span><span class="gc-tag" data-state="caution">СКОРО</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></div>
-      
+      <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-engineer">Инженер</a><span>Companion: зачем и где граница</span></p>
+      <h1 class="module-title">Companion: зачем и где граница</h1>
+      <div class="module-tags"><span class="gc-tag" title="Уровень">L2 — Интегратор</span><span class="gc-tag">чтение 15 мин</span><span class="gc-tag">учёба ~2 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></div>
+      <p class="module-lead">Полётный контроллер делает одно: держит аппарат в воздухе и выполняет простые команды, тысячи раз в секунду и без права на зависание. Всё, что тяжелее — компьютерное зрение, планирование, связь с сетью, своя логика миссий, — живёт на бортовом компьютере (companion). Модуль проводит границу между ними, показывает типичные конфигурации от ESP32 до Jetson и объясняет главное правило: companion советует, FC решает.</p>
       <div class="gc-callout" data-state="ok"><strong>После модуля ты умеешь</strong><ul><li>разделить ответственность FC и companion</li></ul></div><p class="gc-muted">Перед этим модулем: <a href="ap-intro.html">Введение в ArduPilot</a></p>
       <div class="gc-prose module-body">
-<div class="gc-callout" data-state="caution"><strong>Модуль в разработке.</strong> Цели и связи уже определены, текст пишется. План — в <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">ROADMAP</a>.</div>
+<h2>Теория</h2>
+<h4 class="md-subheading">Разделение ответственности</h4>
+<ul><li><strong>Полётный контроллер (FC):</strong> стабилизация, навигация, failsafe, миксер. Жёсткое реальное время, минимальная задержка, проверенный код. Он обязан летать, даже если companion завис, перезагрузился или сгорел.</li><li><strong>Companion:</strong> всё остальное. Зрение, нейросети, обработка карт, сложные сценарии, интернет, логирование в облако, интерфейс оператора.</li></ul>
+<p>Граница проходит по требованию к надёжности: то, без чего аппарат упадёт, — на FC; то, без чего он просто вернётся домой, — на companion.</p>
+<h4 class="md-subheading">Как они общаются</h4>
+<p>По MAVLink через UART (телеметрийный порт FC) или по сети. Companion — отдельный компонент в той же системе MAVLink. Он может:</p>
+<ul><li>читать телеметрию и параметры;</li><li>переводить аппарат в GUIDED и задавать цели по позиции/скорости;</li><li>загружать и запускать миссии;</li><li>получать текстовые сообщения и состояние.</li></ul>
+<p>Чего он не делает: не управляет моторами напрямую и не подменяет стабилизацию. Даже при offboard-управлении FC сам следит за ограничениями и failsafe.</p>
+<h4 class="md-subheading">Правило «советует, не управляет»</h4>
+<p>Companion предлагает «лети в точку X со скоростью Y». FC проверяет геозону, батарею, здоровье EKF и выполняет — или отказывает. Если companion перестал слать команды, FC по таймауту переходит в безопасный режим. Именно поэтому GCS-failsafe и таймауты GUIDED — часть дизайна, а не помеха.</p>
+<h4 class="md-subheading">Типовые платформы</h4>
+<ul><li><strong>ESP32 / ESP32-S3</strong> — микроконтроллер с Wi-Fi и BLE. Телеметрия в телефон, мост MAVLink по Wi-Fi, датчики, индикация, небольшие сценарии. Нет Linux, зато мгновенный старт и милливатты.</li><li><strong>Raspberry Pi</strong> — Linux, Python, камера. Маршрутизация MAVLink, видеопоток, скрипты миссий, логи. Стандартный первый companion.</li><li><strong>Jetson / Orange Pi с NPU</strong> — когда нужны нейросети в реальном времени.</li></ul>
+<h4 class="md-subheading">Протоколы и роли</h4>
+<p>ArduPilot ждёт MAVLink 2 на <code>SERIALx_PROTOCOL = 2</code>; PX4 на companion-порту — тот же MAVLink либо uXRCE-DDS для ROS 2. Для Betaflight/INAV companion в классическом смысле редок: там есть MSP, и бортовой компьютер обычно нужен только для видео и телеметрии.</p>
+
+<h2>Практика</h2>
+<h4 class="md-subheading">Выбор платформы под задачу</h4>
+<ol><li>Телеметрия на экран, индикация, настройки с телефона — ESP32.</li><li>Видео, маршрутизация MAVLink, Python-сценарии — Raspberry Pi.</li><li>Распознавание объектов, слежение — Jetson.</li></ol>
+<h4 class="md-subheading">Чек-лист архитектуры перед проектом</h4>
+<ol><li>Что аппарат делает, если companion выключился в полёте? Ответ должен быть «переходит в режим X по таймауту».</li><li>По какому порту и на какой скорости идёт MAVLink? Хватает ли полосы под телеметрию и команды?</li><li>Как companion питается? Не с телеметрийного порта FC.</li><li>Кто логирует: FC на SD-карту, companion — свои логи. Совпадают ли метки времени?</li><li>Как обновлять софт companion в поле?</li></ol>
+<h4 class="md-subheading">Лабораторная</h4>
+<p>В SITL подними «companion» как отдельный процесс на pymavlink (отдельный <code>component_id</code>), который раз в секунду читает <code>GLOBAL_POSITION_INT</code> и пишет в файл. Останови процесс в полёте и убедись, что аппарат ничего не заметил.</p>
+
+<h2>Диагностика</h2>
+<div class="diag-groups"><article class="diag-item"><h4><strong>Симптом:</strong> аппарат «замирает» или падает при зависании companion</h4><ul><li>Возможная причина: companion делает то, что должен делать FC (стабилизация, прямые команды моторам).</li><li>Что сделать: перенести критичное на FC, оставить companion только советы через GUIDED.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> FC не видит companion</h4><ul><li>Возможная причина: не тот порт, протокол или скорость; перепутаны TX/RX.</li><li>Что сделать: <code>SERIALx_PROTOCOL</code>, <code>SERIALx_BAUD</code>, проверка heartbeat через MAVProxy.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> companion перезагружается на газу</h4><ul><li>Возможная причина: питание от слабого BEC или просадка.</li><li>Что сделать: отдельный BEC/стабилизатор с запасом по току.</li></ul></article></div>
+
+<h2>Чек-лист</h2>
+<ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="comp-intro:0"><span>Могу объяснить, что остаётся на FC и почему</span></label></li><li><label><input type="checkbox" data-check-id="comp-intro:1"><span>Знаю, что делает аппарат при отказе companion</span></label></li><li><label><input type="checkbox" data-check-id="comp-intro:2"><span>Выбрал платформу под задачу, а не наоборот</span></label></li><li><label><input type="checkbox" data-check-id="comp-intro:3"><span>Companion питается не от порта телеметрии</span></label></li><li><label><input type="checkbox" data-check-id="comp-intro:4"><span>Companion выступает отдельным компонентом MAVLink</span></label></li></ul>
+
+<h2>Источники</h2>
+<ul class="refs"><li><a href="https://ardupilot.org/dev/docs/companion-computers.html" target="_blank" rel="noopener noreferrer">Companion Computers — ArduPilot Dev</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://ardupilot.org/dev/docs/raspberry-pi-via-mavlink.html" target="_blank" rel="noopener noreferrer">Communicating with Raspberry Pi via MAVLink — ArduPilot Dev</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://docs.px4.io/main/en/companion_computer/" target="_blank" rel="noopener noreferrer">Companion Computers — PX4 User Guide</a> <span class="gc-tag" data-state="info">primary</span></li></ul>
       </div>
-      
+      <div class="module-done"><gc-button variant="secondary" data-done-toggle="comp-intro">Отметить как пройденный</gc-button></div>
       <nav class="pager" aria-label="Соседние модули"><a class="gc-card pager__next" href="comp-mavlink.html"><span class="gc-label gc-muted">Дальше</span><br>MAVLink и MAVSDK</a></nav>
     </article>
   </main>
