@@ -27,13 +27,44 @@
     <article class="module" data-module-page="ap-ekf">
       <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-autonomy">Автономия</a><span>EKF и навигация</span></p>
       <h1 class="module-title">EKF и навигация</h1>
-      <div class="module-tags"><span class="gc-tag" title="Уровень">L3 — Специалист</span><span class="gc-tag">учёба ~3 ч</span><span class="gc-tag" data-state="caution">СКОРО</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></div>
-      
+      <div class="module-tags"><span class="gc-tag" title="Уровень">L3 — Специалист</span><span class="gc-tag">чтение 25 мин</span><span class="gc-tag">учёба ~3 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></div>
+      <p class="module-lead">EKF — фильтр, который из шумных и противоречивых датчиков собирает одно согласованное представление: где аппарат, куда летит и как ориентирован. Когда ArduPilot «не армится из-за EKF», «уплывает в LOITER» или «улетает при GPS-глитче», причина почти всегда здесь. Модуль объясняет, что фильтр делает, как выбирать источники данных, что такое вариации и lane switching, и как читать его здоровье в GCS и логах. Пример из практики — HeeWing без компаса и с нестабильным GPS.</p>
       <div class="gc-callout" data-state="ok"><strong>После модуля ты умеешь</strong><ul><li>прочитать состояние EKF</li><li>понять, когда GPS/компас врут</li></ul></div><p class="gc-muted">Перед этим модулем: <a href="ap-missions.html">Миссии и планирование</a></p>
       <div class="gc-prose module-body">
-<div class="gc-callout" data-state="caution"><strong>Модуль в разработке.</strong> Цели и связи уже определены, текст пишется. План — в <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">ROADMAP</a>.</div>
+<h2>Теория</h2>
+<h4 class="md-subheading">Зачем фильтр</h4>
+<p>Гироскоп точен на коротких интервалах, но дрейфует. GPS не дрейфует, но шумит и обновляется редко. Барометр знает высоту, но врёт при ветре и нагреве. Компас знает курс, но боится тока. EKF (расширенный фильтр Калмана) предсказывает состояние по инерциальным датчикам тысячи раз в секунду и корректирует предсказание редкими измерениями GPS, баро и компаса, взвешивая их по заявленному шуму. Измерение, слишком далёкое от предсказания, фильтр отвергает — так отрабатываются GPS-глитчи.</p>
+<h4 class="md-subheading">EKF3, DCM и lane switching</h4>
+<ul><li><code>AHRS_EKF_TYPE = 3</code> — основной оценщик EKF3; DCM (простой комплементарный фильтр) работает в фоне как запасной.</li><li>На каждый IMU из <code>EK3_IMU_MASK</code> запускается своё ядро («lane»). Используется самое здоровое; при деградации одного ядра фильтр переключается на другое. <code>EK3_PRIMARY</code> выбирает стартовое.</li><li>У Plane и Rover есть откат на DCM при нездоровом EKF; у Copter нет — там EKF-failsafe.</li></ul>
+<h4 class="md-subheading">Источники</h4>
+<p>Откуда брать позицию, скорость, высоту и курс, задают <code>EK3_SRC1_*</code>:</p>
+<ul><li><code>EK3_SRC1_POSXY</code>: 0 — нет, 3 — GPS, 4 — Beacon, 6 — ExternalNav.</li><li><code>EK3_SRC1_VELXY</code>: плюс 5 — OpticalFlow, 7 — WheelEncoder.</li><li><code>EK3_SRC1_POSZ</code>: 1 — Baro, 2 — RangeFinder, 3 — GPS.</li><li><code>EK3_SRC1_YAW</code>: 1 — Compass, 2 — GPS, 3 — GPS с откатом на компас, 8 — GSF (оценка курса по GPS-скорости без компаса).</li></ul>
+<p>Наборы <code>SRC2</code>/<code>SRC3</code> переключаются в полёте тумблером — например, GPS снаружи и оптический поток в помещении.</p>
+<h4 class="md-subheading">Вариации и failsafe</h4>
+<p>Фильтр оценивает собственную неуверенность по компасу, скорости, позиции и высоте. Когда нормированная вариация превышает <code>FS_EKF_THRESH</code> (0.8 по умолчанию, 0.6 строго, 1.0 мягко), срабатывает EKF-failsafe с действием <code>FS_EKF_ACTION</code>: 1 — посадка, если режим требует позиции; 2 — AltHold; 3 — посадка из любого режима. Те же вариации используются в pre-arm: «EKF variance» при арме — сигнал о плохом компасе или GPS, а не повод поднять порог.</p>
+<h4 class="md-subheading">Что требует позиции</h4>
+<p>LOITER, AUTO, GUIDED, RTL, PosHold нуждаются в здоровой оценке позиции. STABILIZE, ALT_HOLD, ACRO — нет. Отсюда правило из модуля про ArduPilot: режим выбирают по тому, каким датчикам доверяешь.</p>
+<h4 class="md-subheading">Кейс: полёт без компаса и без доверия к GPS</h4>
+<p>HeeWing T1 на стоковом F405: компаса на борту нет вовсе, GPS на этапе настройки вёл себя нестабильно. Вместо того чтобы заставлять EKF работать с ненадёжным курсом, было принято решение отключить EKF3 и летать на DCM: аппарат армится и управляется в режимах без позиции (MANUAL, FBWA, ACRO, QSTABILIZE, QLAND), а удержание высоты и позиции осознанно не используется. Альтернатива на будущее, когда GPS стабилен: <code>EK3_SRC1_YAW = 8</code> (GSF) — курс по GPS без компаса, но он появляется только в движении.</p>
+
+<h2>Практика</h2>
+<h4 class="md-subheading">Проверка здоровья EKF</h4>
+<ol><li>В Mission Planner — окно EKF (кнопка на HUD): столбики вариаций должны быть зелёными и низкими.</li><li>В MAVProxy: сообщения <code>EKF3 IMU0 ...</code> при старте — ожидание «using GPS» перед армом в режимах с позицией.</li><li>Pre-arm «EKF compass variance» или «EKF velocity variance» — искать причину в компасе (помехи, калибровка) или GPS (мало спутников, HDOP).</li></ol>
+<h4 class="md-subheading">Лабораторная в SITL: GPS-глитч</h4>
+<ol><li>Взлети в LOITER на 20 м.</li><li>Внеси глитч параметрами симулятора <code>SIM_GPS*</code> (актуальные имена: <code>param show SIM_GPS*</code>).</li><li>Наблюдай: аппарат должен удержаться на инерции и отвергнуть измерение; в логе появится <code>ERR</code> с подсистемой GPS.</li><li>Усиль глитч до срабатывания EKF-failsafe и убедись, что <code>FS_EKF_ACTION</code> делает то, что ты выбрал.</li></ol>
+<h4 class="md-subheading">Лабораторная: источники</h4>
+<p>Переключи <code>EK3_SRC1_YAW</code> с 1 на 8 в SITL и посмотри, как ведёт себя курс на земле и после начала движения.</p>
+
+<h2>Диагностика</h2>
+<div class="diag-groups"><article class="diag-item"><h4><strong>Симптом:</strong> pre-arm «EKF compass variance»</h4><ul><li>Возможная причина: помехи от силовых проводов, плохая калибровка, компас у GPS развёрнут.</li><li>Что сделать: калибровка в чистом месте, вынести компас, проверить ориентацию.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> в LOITER аппарат медленно уплывает или «кружит»</h4><ul><li>Возможная причина: ошибка курса (компас) при хорошем GPS.</li><li>Что сделать: проверить расхождение курса компаса и GPS в логе, перекалибровать.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> внезапный рывок в сторону в режимах с позицией</h4><ul><li>Возможная причина: GPS-глитч, принятый фильтром.</li><li>Что сделать: смотреть <code>ERR</code>/GPS в логе, HDOP и число спутников, антенну GPS.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> EKF-failsafe и посадка посреди полёта</h4><ul><li>Возможная причина: вариации выше порога — вибрации, компас или GPS.</li><li>Что сделать: разбор лога (следующий модуль), не поднимать <code>FS_EKF_THRESH</code> вслепую.</li></ul></article></div>
+
+<h2>Чек-лист</h2>
+<ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="ap-ekf:0"><span>Знаю, какие режимы требуют позиции</span></label></li><li><label><input type="checkbox" data-check-id="ap-ekf:1"><span>Умею смотреть вариации EKF в GCS</span></label></li><li><label><input type="checkbox" data-check-id="ap-ekf:2"><span>Понимаю, что задают <code>EK3_SRC1_*</code></span></label></li><li><label><input type="checkbox" data-check-id="ap-ekf:3"><span>Pre-arm по EKF решаю причиной, а не порогом</span></label></li><li><label><input type="checkbox" data-check-id="ap-ekf:4"><span>Прогнал GPS-глитч и EKF-failsafe в SITL</span></label></li></ul>
+
+<h2>Источники</h2>
+<ul class="refs"><li><a href="https://ardupilot.org/copter/docs/common-apm-navigation-extended-kalman-filter-overview.html" target="_blank" rel="noopener noreferrer">Extended Kalman Filter (EKF) — ArduPilot</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://ardupilot.org/copter/docs/ekf-inav-failsafe.html" target="_blank" rel="noopener noreferrer">EKF Failsafe — ArduPilot Copter</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://github.com/ArduPilot/ardupilot/blob/master/libraries/AP_NavEKF/AP_NavEKF_Source.cpp" target="_blank" rel="noopener noreferrer">EKF source parameters (AP_NavEKF_Source.cpp, GitHub)</a> <span class="gc-tag" data-state="info">primary</span></li></ul>
       </div>
-      
+      <div class="module-done"><gc-button variant="secondary" data-done-toggle="ap-ekf">Отметить как пройденный</gc-button></div>
       <nav class="pager" aria-label="Соседние модули"><a class="gc-card pager__prev" href="ap-missions.html"><span class="gc-label gc-muted">Назад</span><br>Миссии и планирование</a><a class="gc-card pager__next" href="ap-logs.html"><span class="gc-label gc-muted">Дальше</span><br>Логи ArduPilot: разбор полёта</a></nav>
     </article>
   </main>

@@ -27,13 +27,73 @@
     <article class="module" data-module-page="comp-mavlink">
       <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-engineer">Инженер</a><span>MAVLink и MAVSDK</span></p>
       <h1 class="module-title">MAVLink и MAVSDK</h1>
-      <div class="module-tags"><span class="gc-tag" title="Уровень">L2 — Интегратор</span><span class="gc-tag">учёба ~3 ч</span><span class="gc-tag" data-state="caution">СКОРО</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></div>
-      
+      <div class="module-tags"><span class="gc-tag" title="Уровень">L2 — Интегратор</span><span class="gc-tag">чтение 30 мин</span><span class="gc-tag">учёба ~3 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></div>
+      <p class="module-lead">MAVLink — язык, на котором полётник говорит с наземной станцией, бортовым компьютером, телеметрией и твоими скриптами. Всё, что ты делал в SITL через pymavlink, — это MAVLink. Модуль разбирает протокол на уровне, достаточном чтобы писать свои клиенты: структуру пакета, систему и компонент, heartbeat, команды с подтверждением, параметры, потоки телеметрии. Два инструмента на выбор: pymavlink (низкий уровень, всё видно) и MAVSDK (высокоуровневый API).</p>
       <div class="gc-callout" data-state="ok"><strong>После модуля ты умеешь</strong><ul><li>прочитать телеметрию и отправить команду</li></ul></div><p class="gc-muted">Перед этим модулем: <a href="comp-intro.html">Введение в Companion</a></p>
       <div class="gc-prose module-body">
-<div class="gc-callout" data-state="caution"><strong>Модуль в разработке.</strong> Цели и связи уже определены, текст пишется. План — в <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">ROADMAP</a>.</div>
+<h2>Теория</h2>
+<h4 class="md-subheading">Пакет</h4>
+<p>MAVLink 2 — бинарный протокол поверх UART, UDP или TCP. Пакет: стартовый байт <code>0xFD</code>, длина, флаги, порядковый номер, <code>system_id</code>, <code>component_id</code>, трёхбайтный ID сообщения, полезная нагрузка, CRC. Контрольная сумма включает «соль» из описания сообщения, поэтому обе стороны обязаны использовать одинаковые определения (диалект). Сообщения описаны в XML: <code>common.xml</code> — общие, <code>ardupilotmega.xml</code> — расширения ArduPilot. Из XML генерируются библиотеки для C, Python и других языков.</p>
+<h4 class="md-subheading">Система и компонент</h4>
+<p><code>system_id</code> — аппарат (по умолчанию 1), <code>component_id</code> — что внутри: автопилот (1), камера, гимбал, бортовой компьютер. GCS обычно система 255. Команды адресуются паре система+компонент; бортовой компьютер — это отдельный компонент той же системы.</p>
+<h4 class="md-subheading">Heartbeat</h4>
+<p><code>HEARTBEAT</code> (ID 0) раз в секунду от каждого участника: тип аппарата, автопилот, режим, состояние арма. Пока нет heartbeat, нет и связи — поэтому любой клиент начинается с <code>wait_heartbeat()</code>. Отсутствие heartbeat от GCS дольше таймаута — это GCS-failsafe.</p>
+<h4 class="md-subheading">Основные сообщения</h4>
+<ul><li>Телеметрия от аппарата: <code>SYS_STATUS</code> (1), <code>ATTITUDE</code> (30), <code>GLOBAL_POSITION_INT</code> (33), <code>RC_CHANNELS</code> (65), <code>BATTERY_STATUS</code> (147), <code>STATUSTEXT</code> (253 — текстовые сообщения, в том числе pre-arm).</li><li>Команды: <code>COMMAND_LONG</code> (76) с кодом <code>MAV_CMD_*</code> и семью параметрами; ответ — <code>COMMAND_ACK</code> (77) с результатом. Примеры кодов: <code>MAV_CMD_COMPONENT_ARM_DISARM</code> (400), <code>MAV_CMD_NAV_TAKEOFF</code> (22), <code>MAV_CMD_DO_SET_MODE</code> (176).</li><li>Частота потоков: <code>MAV_CMD_SET_MESSAGE_INTERVAL</code> (511) — попросить конкретное сообщение с нужным интервалом; <code>MAV_CMD_REQUEST_MESSAGE</code> (512) — один раз.</li><li>Параметры: <code>PARAM_REQUEST_READ</code> (20) → <code>PARAM_VALUE</code> (22); запись <code>PARAM_SET</code> (23), подтверждение тем же <code>PARAM_VALUE</code>.</li><li>Управление в GUIDED: <code>SET_POSITION_TARGET_LOCAL_NED</code> (84) и <code>SET_POSITION_TARGET_GLOBAL_INT</code> (86) — цель по позиции или скорости; основа offboard-управления с companion.</li><li>Миссии: <code>MISSION_COUNT</code> (44), <code>MISSION_ITEM_INT</code> (73), <code>MISSION_REQUEST_INT</code> (51), <code>MISSION_ACK</code> (47) — диалог из модуля про миссии.</li></ul>
+<h4 class="md-subheading">Правило подтверждений</h4>
+<p>Команда без проверки <code>COMMAND_ACK</code> — это надежда, а не управление. Результат <code>MAV_RESULT_ACCEPTED</code> (0) означает «принято»; остальные коды — отказ, и его причина обычно приходит в <code>STATUSTEXT</code>.</p>
+<h4 class="md-subheading">pymavlink против MAVSDK</h4>
+<ul><li><strong>pymavlink</strong> — тонкая обёртка над протоколом: видишь каждое сообщение, подходит для обучения, диагностики и нестандартных вещей. Код многословный.</li><li><strong>MAVSDK</strong> (C++, Python) — высокоуровневые действия: <code>arm()</code>, <code>takeoff()</code>, <code>goto_location()</code>, подписки на телеметрию. Быстрее писать приложения, меньше видно изнутри. Исторически ближе к PX4, но с ArduPilot работает.</li></ul>
+
+<h2>Практика</h2>
+<h4 class="md-subheading">Шаг 1. Слушать телеметрию</h4>
+<pre class="cli-block"><code>from pymavlink import mavutil
+
+m = mavutil.mavlink_connection(&quot;tcp:127.0.0.1:5762&quot;)
+m.wait_heartbeat()
+print(f&quot;system {m.target_system} component {m.target_component}&quot;)
+
+# ask for ATTITUDE at 10 Hz (interval in microseconds)
+m.mav.command_long_send(
+    m.target_system, m.target_component,
+    mavutil.mavlink.MAV_CMD_SET_MESSAGE_INTERVAL, 0,
+    mavutil.mavlink.MAVLINK_MSG_ID_ATTITUDE, 100_000, 0, 0, 0, 0, 0)
+
+for _ in range(20):
+    msg = m.recv_match(type=[&quot;ATTITUDE&quot;, &quot;STATUSTEXT&quot;], blocking=True)
+    if msg.get_type() == &quot;ATTITUDE&quot;:
+        print(f&quot;roll {msg.roll:+.2f} pitch {msg.pitch:+.2f} yaw {msg.yaw:+.2f} rad&quot;)
+    else:
+        print(&quot;FC says:&quot;, msg.text)</code></pre>
+<h4 class="md-subheading">Шаг 2. Команда с подтверждением</h4>
+<pre class="cli-block"><code>def command(m, cmd, *params):
+    m.mav.command_long_send(m.target_system, m.target_component, cmd, 0, *params)
+    ack = m.recv_match(type=&quot;COMMAND_ACK&quot;, blocking=True, timeout=3)
+    if ack is None or ack.command != cmd:
+        raise RuntimeError(f&quot;no ACK for {cmd}&quot;)
+    if ack.result != mavutil.mavlink.MAV_RESULT_ACCEPTED:
+        raise RuntimeError(f&quot;command {cmd} rejected: result {ack.result}&quot;)
+
+m.set_mode(m.mode_mapping()[&quot;GUIDED&quot;])
+command(m, mavutil.mavlink.MAV_CMD_COMPONENT_ARM_DISARM, 1, 0, 0, 0, 0, 0, 0)
+command(m, mavutil.mavlink.MAV_CMD_NAV_TAKEOFF, 0, 0, 0, 0, 0, 0, 15)</code></pre>
+<h4 class="md-subheading">Шаг 3. Параметры</h4>
+<pre class="cli-block"><code>m.mav.param_request_read_send(m.target_system, m.target_component, b&quot;FS_THR_ENABLE&quot;, -1)
+p = m.recv_match(type=&quot;PARAM_VALUE&quot;, blocking=True)
+print(p.param_id, p.param_value)</code></pre>
+<h4 class="md-subheading">Шаг 4. Прослушать эфир</h4>
+<p>Запусти <code>mavproxy.py --master=tcp:127.0.0.1:5762</code> и команду <code>watch ATTITUDE</code>: видно живой поток сообщений. Это лучший способ понять, что именно летает по линии, прежде чем писать код.</p>
+
+<h2>Диагностика</h2>
+<div class="diag-groups"><article class="diag-item"><h4><strong>Симптом:</strong> <code>wait_heartbeat()</code> не возвращается</h4><ul><li>Возможная причина: неверный адрес/порт, не тот диалект, скорость UART.</li><li>Что сделать: проверить порт, baud (57600 или 115200 на телеметрии), что SITL запущен.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> команда «выполнилась», а аппарат ничего не сделал</h4><ul><li>Возможная причина: <code>COMMAND_ACK</code> не проверен, команда отклонена.</li><li>Что сделать: читать ACK и <code>STATUSTEXT</code>.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> телеметрия приходит редко</h4><ul><li>Возможная причина: дефолтные интервалы потоков.</li><li>Что сделать: <code>MAV_CMD_SET_MESSAGE_INTERVAL</code> для нужных сообщений.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> CRC-ошибки, сообщения «unknown»</h4><ul><li>Возможная причина: разные версии определений на двух сторонах.</li><li>Что сделать: обновить pymavlink/MAVSDK, использовать тот же диалект (ardupilotmega).</li></ul></article></div>
+
+<h2>Чек-лист</h2>
+<ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="comp-mavlink:0"><span>Понимаю system_id / component_id и heartbeat</span></label></li><li><label><input type="checkbox" data-check-id="comp-mavlink:1"><span>Каждая команда проверяется по <code>COMMAND_ACK</code></span></label></li><li><label><input type="checkbox" data-check-id="comp-mavlink:2"><span>Умею запросить телеметрию с нужной частотой</span></label></li><li><label><input type="checkbox" data-check-id="comp-mavlink:3"><span>Читаю и пишу параметры из кода</span></label></li><li><label><input type="checkbox" data-check-id="comp-mavlink:4"><span>Знаю, когда брать pymavlink, а когда MAVSDK</span></label></li></ul>
+
+<h2>Источники</h2>
+<ul class="refs"><li><a href="https://mavlink.io/en/" target="_blank" rel="noopener noreferrer">MAVLink Developer Guide</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://mavlink.io/en/messages/common.html" target="_blank" rel="noopener noreferrer">MAVLink common message set</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://github.com/ArduPilot/pymavlink" target="_blank" rel="noopener noreferrer">pymavlink — source code (GitHub)</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://mavsdk.mavlink.io/main/en/" target="_blank" rel="noopener noreferrer">MAVSDK — Documentation</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://ardupilot.org/dev/docs/mavlink-basics.html" target="_blank" rel="noopener noreferrer">MAVLink Interface — ArduPilot Dev</a> <span class="gc-tag" data-state="info">primary</span></li></ul>
       </div>
-      
+      <div class="module-done"><gc-button variant="secondary" data-done-toggle="comp-mavlink">Отметить как пройденный</gc-button></div>
       <nav class="pager" aria-label="Соседние модули"><a class="gc-card pager__prev" href="comp-intro.html"><span class="gc-label gc-muted">Назад</span><br>Введение в Companion</a><a class="gc-card pager__next" href="comp-esp32.html"><span class="gc-label gc-muted">Дальше</span><br>ESP32 и периферия</a></nav>
     </article>
   </main>

@@ -46,8 +46,8 @@ Next (priority order):
 - [x] `ap-quadplane` — tilt-rotor QuadPlane bring-up: channel mapping, DCM-only, the "motor on a servo channel" incident (expert level)
 - [ ] `bf-pid` — practical tuning workflow with A/B profiles (CRISP/COOL/SHARP/FLOAT) and stick-response metrics
 - [ ] `bf-modes-osd`
-- [ ] `ap-missions`, `ap-ekf`, `ap-logs`
-- [ ] `comp-mavlink`
+- [x] `ap-missions`, `ap-ekf`, `ap-logs` — Autonomy track complete
+- [x] `comp-mavlink`
 - [ ] `comp-esp32` — ESP32 companion: EdgeTX Lua ↔ ESP32 serial (TX16S companion project)
 - [ ] `tools-overview`
 
