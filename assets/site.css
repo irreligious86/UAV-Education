@@ -146,3 +146,17 @@
 .fail__symptom { display: block; color: var(--gc-signal-amber); }
 .fail p { margin: 0; font-size: 14px; line-height: 21px; }
 .fail .gc-tag { text-decoration: none; }
+
+/* ---------- search ---------- */
+.search-form > * + * { margin-top: var(--gc-space-2); }
+.search-input {
+  width: 100%; box-sizing: border-box; min-height: 44px;
+  padding: var(--gc-space-2) var(--gc-space-3);
+  background: var(--gc-surface-200); color: var(--gc-ink);
+  border: 1px solid var(--gc-line); border-radius: var(--gc-radius-md);
+  font: inherit; font-size: 16px;
+}
+.search-input:focus { outline: 2px solid var(--gc-accent-hud); outline-offset: 2px; border-color: var(--gc-accent-hud); }
+.search-results { display: grid; gap: var(--gc-space-3); }
+.search-hit > * + * { margin-top: var(--gc-space-1); }
+.search-hit__snippet { font-size: 14px; line-height: 21px; color: var(--gc-ink-muted); margin: 0; }

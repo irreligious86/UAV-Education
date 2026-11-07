@@ -52,7 +52,7 @@ Next (priority order):
 - [x] `tools-overview` — **core curriculum complete (34/34)**
 - [x] `related` modules shown on module pages
 
-## Phase 2 — Course structure and architecture 🟡 in progress
+## Phase 2 — Course structure and architecture ✅ done (except PWA)
 
 Decision (2026-11-07): **modular monolith on static hosting** now, ready to move data to our own server later.
 Priority: a well-structured learning program.
@@ -69,8 +69,8 @@ Priority: a well-structured learning program.
 - [x] Quizzes: `<uav-quiz>` + JSON banks for all 34 core modules (5–7 questions each, shuffled, explained, result in ProgressStore)
 - [x] Labs with acceptance criteria on every core module (checklist, state in ProgressStore); capstone pages `cap/<id>.html` with deliverables and criteria
 - [x] Fails journal generated from every module's diagnostics (120+ cases); glossary from `data/glossary.json` (68 terms, each linked to its module)
-- [ ] Client-side search over a generated index
-- [ ] `ARCHITECTURE.md`: layers, data contracts, step-by-step migration to own server
+- [x] Client-side search (`pages/search.html`) over `api/v1/search.json`: modules, terms, capstones; identifiers like `rpm_filter_min_hz` searchable
+- [x] `ARCHITECTURE.md`: layers, data contracts, migration path to own server
 - [ ] Offline PWA (service worker)
 
 ## Phase 3 — Interactivity

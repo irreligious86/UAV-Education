@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import html
 import json
+import re
 import shutil
 import sys
 from pathlib import Path
@@ -119,6 +120,7 @@ def layout(*, title: str, base: str, body: str, active: str, description: str = 
         ("ref", f"{base}ref/index.html", "Справочник"),
         ("glossary", f"{base}pages/glossary.html", "Глоссарий"),
         ("fails", f"{base}pages/fails.html", "Фейлы"),
+        ("search", f"{base}pages/search.html", "Поиск"),
     ]
     current = ' aria-current="page"'
     nav = "\n".join(
@@ -141,7 +143,7 @@ def layout(*, title: str, base: str, body: str, active: str, description: str = 
   <script src="{base}assets/app.js" defer></script>
   <script src="{base}assets/uav-quiz.js" defer></script>{extra_head}
 </head>
-<body class="gc-root">
+<body class="gc-root" data-base="{base}">
   <header class="site-header">
     <div class="gc-container site-header__inner">
       <a class="site-brand" href="{base}index.html"><span class="site-brand__mark" aria-hidden="true">◆</span> {SITE_TITLE}</a>
@@ -646,6 +648,57 @@ def render_page(name: str, title: str) -> str:
     return layout(title=title, base=base, body=body, active=active)
 
 
+# ---------------------------------------------------------------- search index
+
+
+def strip_md(text: str) -> str:
+    """Plain text for the search index: keep code and identifiers (rpm_filter_min_hz), drop markup."""
+    text = re.sub(r"[#*`>|\[\]()]", " ", text)
+    return " ".join(text.split())
+
+
+def search_index(model: dict) -> list[dict]:
+    docs = []
+    for m in model["modules"].values():
+        if m["status"] != "published":
+            continue
+        raw = (ROOT / m["articleMeta"]["sourceFile"]).read_text(encoding="utf-8")
+        body = strip_front_matter(raw)
+        summary = " ".join(extract_section(body, "summary").split())
+        headings = " ".join(h.strip() for h in re.findall(r"^###\s+(.+)$", body, flags=re.M))
+        docs.append({
+            "id": m["id"], "type": "module", "title": m["title"], "url": f"m/{m['id']}.html",
+            "group": m.get("groupTitle") or "", "level": m["level"],
+            "summary": summary[:300], "headings": headings,
+            "text": strip_md(body)[:6000],
+            "tags": " ".join(str(t) for t in (m["articleMeta"].get("tags") or [])),
+        })
+    gl = json.loads((ROOT / "data" / "glossary.json").read_text(encoding="utf-8"))
+    for t in gl["terms"]:
+        docs.append({"id": "g:" + t["term"], "type": "term", "title": t["term"], "url": "pages/glossary.html",
+                     "group": "Глоссарий", "level": "", "summary": t["def"], "headings": "", "text": "", "tags": ""})
+    for g in model["groups"]:
+        c = g.get("capstone")
+        if c:
+            docs.append({"id": c["id"], "type": "capstone", "title": c["title"], "url": f"cap/{c['id']}.html",
+                         "group": g["title"], "level": "", "summary": c.get("result", ""), "headings": "",
+                         "text": " ".join(c.get("deliverables", []) + c.get("criteria", [])), "tags": ""})
+    return docs
+
+
+def render_search() -> str:
+    base = "../"
+    body = """    <h1 class="gc-display">Поиск</h1>
+    <form class="search-form" role="search" onsubmit="return false">
+      <label class="gc-label gc-muted" for="q">Модули, термины, симптомы</label>
+      <input id="q" class="search-input" type="search" autocomplete="off" placeholder="например: rpm_filter_min_hz, failsafe, инверсия">
+    </form>
+    <p class="gc-muted" id="search-status">Начни вводить запрос.</p>
+    <div id="search-results" class="search-results" aria-live="polite"></div>"""
+    return layout(title="Поиск", base=base, body=body, active="search",
+                  extra_head=f'\n  <script src="{base}assets/search.js" defer></script>')
+
+
 # ---------------------------------------------------------------- static API
 
 
@@ -700,6 +753,8 @@ def main() -> None:
     if QUIZ_SRC.is_dir():
         for q in QUIZ_SRC.glob("*.json"):
             write(ROOT / "quiz" / q.name, q.read_text(encoding="utf-8"))
+    write(ROOT / "pages" / "search.html", render_search())
+    write(ROOT / "api" / "v1" / "search.json", json.dumps(search_index(model), ensure_ascii=False) + "\n")
     write(ROOT / "api" / "v1" / "curriculum.json", json.dumps(api_payload(model), ensure_ascii=False, indent=2) + "\n")
 
     n_pub = sum(1 for m in model["modules"].values() if m["status"] == "published")
