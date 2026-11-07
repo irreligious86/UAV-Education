@@ -174,6 +174,19 @@ def validate_front_matter_status(md_path, manifest_status):
     return []
 
 
+WIDGET_LINE = re.compile(r"^\{\{widget:([a-z0-9-]+)\}\}$", re.MULTILINE)
+
+
+def validate_widgets(md_path):
+    if str(Path(__file__).resolve().parent) not in sys.path:
+        sys.path.insert(0, str(Path(__file__).resolve().parent))
+    from content_pipeline import WIDGETS
+
+    text = md_path.read_text(encoding="utf-8")
+    rel = md_path.relative_to(ROOT)
+    return [f"{rel}: неизвестный виджет «{n}» (есть: {', '.join(sorted(WIDGETS))})" for n in WIDGET_LINE.findall(text) if n not in WIDGETS]
+
+
 def validate_published_sections(md_path, published):
     if not published:
         return []
@@ -347,6 +360,7 @@ def main():
         if p.name.upper() == "README.MD" or p.name == "article-template.md":
             continue
         errs.extend(validate_related_in_frontmatter(p, all_ids_set))
+        errs.extend(validate_widgets(p))
         st = status_by_file.get(p)
         errs.extend(validate_front_matter_status(p, st))
         errs.extend(validate_published_sections(p, st == "published"))

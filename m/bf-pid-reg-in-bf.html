@@ -13,6 +13,8 @@
   <script src="../assets/grading.js" defer></script>
   <script src="../assets/app.js" defer></script>
   <script src="../assets/uav-quiz.js" defer></script>
+  <script src="../assets/widgets/plot.js" defer></script>
+  <script src="../assets/widgets/pid-sim.js" defer></script>
 </head>
 <body class="gc-root" data-base="../">
   <header class="site-header">
@@ -46,6 +48,7 @@
 <ul><li><strong>Feedforward</strong> — независимый канал управления, подающий сигнал прямо на моторы на основе скорости движения стика. Ускоряет отклик без увеличения P-term.</li><li><strong>TPA (Throttle PID Attenuation)</strong> — снижение PID-коэффициентов на высоких оборотах. В BF 4.5+ работает в режиме <code>D</code> (снижает только D-term).</li><li><strong>RPM Filtering</strong> — использование данных с ESC для подавления шума от пропеллеров. Создаёт узкие фильтры на частоте вращения моторов, позволяя поднимать D-term.</li></ul>
 
 <h2>Практика</h2>
+<uav-pid-sim class="widget"></uav-pid-sim>
 <p><strong>Подготовка</strong></p>
 <p>Аппаратные требования: ESC с поддержкой RPM Filtering (BLHeli_32 или Bluejay), полетный контроллер F7/H7, карта памяти SD для Blackbox (минимум 4 ГБ).</p>
 <p>Программные требования: Betaflight Configurator 10.10+, Blackbox Explorer.</p>

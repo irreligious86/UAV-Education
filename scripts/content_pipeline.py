@@ -80,6 +80,12 @@ def format_inline(text: str) -> str:
     return "".join(out)
 
 
+# Interactive widgets: a line "{{widget:name}}" in Markdown becomes <uav-name></uav-name>.
+# Registered names only, so a typo fails validation instead of rendering a dead tag.
+WIDGETS = {"pid-sim", "filter-response", "elrs-calc"}
+WIDGET_RE = re.compile(r"^\{\{widget:([a-z0-9-]+)\}\}$")
+
+
 def block_to_paragraphs(block: str) -> str:
     block = block.strip()
     if not block:
@@ -92,6 +98,12 @@ def block_to_paragraphs(block: str) -> str:
             if not para:
                 continue
             para_l = para.lstrip()
+            wm = WIDGET_RE.match(para_l)
+            if wm:
+                name = wm.group(1)
+                if name in WIDGETS:
+                    chunks.append(f'<uav-{name} class="widget"></uav-{name}>')
+                continue
             # Fallback: если абзац начинается с ###, всегда рендерим как подзаголовок.
             # Это защищает от "сырых ###" в контенте с неидеальными переносами.
             if para_l.startswith("### "):

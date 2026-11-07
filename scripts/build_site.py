@@ -459,6 +459,16 @@ def article_sections(m: dict) -> tuple[str, str]:
     return summary_html, "\n\n".join(parts)
 
 
+def widget_scripts(content_html: str, base: str) -> str:
+    """Script tags for widgets actually present in the rendered content."""
+    names = sorted(set(re.findall(r"<uav-([a-z0-9-]+) class=\"widget\"", content_html)))
+    if not names:
+        return ""
+    tags = [f'\n  <script src="{base}assets/widgets/plot.js" defer></script>']
+    tags += [f'\n  <script src="{base}assets/widgets/{n}.js" defer></script>' for n in names]
+    return "".join(tags)
+
+
 def neighbours(m: dict, model: dict) -> tuple[dict | None, dict | None]:
     if not m["group"]:
         return None, None
@@ -565,7 +575,8 @@ def render_module(m: dict, model: dict) -> str:
       {related_html}
       {pager_html}
     </article>"""
-    return layout(title=m["title"], base=base, body=body, active="course", description=" ".join(m.get("objectives", [])))
+    return layout(title=m["title"], base=base, body=body, active="course", description=" ".join(m.get("objectives", [])),
+                  extra_head=widget_scripts(content if not planned else "", base))
 
 
 # ---------------------------------------------------------------- capstone

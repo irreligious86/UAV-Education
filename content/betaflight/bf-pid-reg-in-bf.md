@@ -52,6 +52,9 @@ PID-регулятор (Proportional-Integral-Derivative) получает от 
 
 ## practice
 
+{{widget:pid-sim}}
+
+
 **Подготовка**
 
 Аппаратные требования: ESC с поддержкой RPM Filtering (BLHeli_32 или Bluejay), полетный контроллер F7/H7, карта памяти SD для Blackbox (минимум 4 ГБ).

@@ -37,6 +37,8 @@ PID усиливает всё, что приходит с гироскопа, в
 
 В CLI это `simplified_pi_gain`, `simplified_d_gain`, `simplified_feedforward_gain`, `simplified_d_max_gain`, `simplified_i_gain`, `simplified_master_multiplier` плюс `simplified_tuning apply`. Профилей PID четыре, профилей рейтов четыре — переключаются тумблером или в CLI командой `profile N`.
 
+{{widget:pid-sim}}
+
 ### Симптомы
 - P велик — дёрганый, перекорректирует, быстрая осцилляция. Мал — вялый, медленная раскачка.
 - I велик — «робот», низкочастотная осцилляция. Мал — уплывает, «катается как по льду».
