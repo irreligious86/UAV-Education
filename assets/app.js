@@ -75,7 +75,9 @@
 
   var base = document.body.getAttribute("data-base") || "";
 
-  function refresh() { return window.UAVGrading.load(base).then(render); }
+  function refresh() {
+    return window.UAVGrading.load(base).then(render).catch(function () { /* no grading meta (offline/file://): page stays readable */ });
+  }
 
   function init() {
     if (!window.UAVProgress || !window.UAVGrading) return;

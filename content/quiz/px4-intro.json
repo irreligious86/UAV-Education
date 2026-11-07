@@ -1,0 +1,72 @@
+{
+  "module": "px4-intro",
+  "pass": 80,
+  "questions": [
+    {
+      "q": "Какая GCS «родная» для PX4?",
+      "options": [
+        "Mission Planner",
+        "QGroundControl",
+        "MAVProxy",
+        "Betaflight App"
+      ],
+      "answer": 1,
+      "explain": "QGC делает всё: прошивка, airframe, калибровки, миссии, логи."
+    },
+    {
+      "q": "Как PX4 интегрируется с ROS 2?",
+      "options": [
+        "Через MAVLink только",
+        "Нативно через uXRCE-DDS",
+        "Никак",
+        "Через Lua"
+      ],
+      "answer": 1,
+      "explain": "Топики uORB выводятся прямо в ROS 2."
+    },
+    {
+      "q": "Формат логов PX4?",
+      "options": [
+        "DataFlash .bin",
+        "ULog .ulg",
+        "Blackbox .bbl",
+        "CSV"
+      ],
+      "answer": 1,
+      "explain": "Анализ — Flight Review или pyulog."
+    },
+    {
+      "q": "Какой режим требует надёжного GPS?",
+      "options": [
+        "Stabilized",
+        "Acro",
+        "Position",
+        "Altitude"
+      ],
+      "answer": 2,
+      "explain": "Position держит позицию по GPS."
+    },
+    {
+      "q": "Команда запуска SITL с Gazebo и квадрокоптером x500?",
+      "options": [
+        "sim_vehicle.py -v ArduCopter",
+        "make px4_sitl gz_x500",
+        "px4 start",
+        "ros2 launch px4"
+      ],
+      "answer": 1,
+      "explain": "Клиент uXRCE-DDS в SITL стартует сам."
+    },
+    {
+      "q": "Когда выбирать ArduPilot вместо PX4?",
+      "options": [
+        "Всегда",
+        "Экзотическое железо, Lua на борту, большое сообщество практиков",
+        "Для ROS 2",
+        "Для Gazebo"
+      ],
+      "answer": 1,
+      "explain": "PX4 сильнее в исследованиях и ROS 2."
+    }
+  ]
+}

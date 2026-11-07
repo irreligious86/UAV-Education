@@ -70,9 +70,9 @@ sudo usermod -aG dialout $USER
 После этого нужно перезагрузиться (логаут/логин).
 
 **Настройка параметров PX4:**
-1. В QGroundControl выберите параметр SER_TEL2_BAUD и установите скорость 921600 (рекомендуемая для высокой нагрузки)
-2. Для протокола MAVLink: SER_TEL2_PROTOCOL = 2 (MAVLink 2)
-3. Для uXRCE-DDS: SER_TEL2_PROTOCOL = 26 (XRCE-DDS). Также необходимо задать параметр UXRCE_DDS_CFG
+1. Для MAVLink на TELEM2 (так настроено по умолчанию): `MAV_1_CONFIG = TELEM 2`, `MAV_1_MODE = Onboard` (набор сообщений для companion), `SER_TEL2_BAUD = 921600`.
+2. Для uXRCE-DDS вместо MAVLink: отключить MAVLink на порту (`MAV_1_CONFIG = Disabled`), затем `UXRCE_DDS_CFG = TELEM2` и та же `SER_TEL2_BAUD`. После изменения этих параметров — перезагрузка.
+3. На одном порту не могут одновременно жить MAVLink и uXRCE-DDS: выбери одно.
 
 **Диагностика UART на Jetson:**
 
@@ -95,7 +95,7 @@ ls -l /dev/ttyTHS*
 
 - **Permission denied: '/dev/ttyTHS1'** — Порт используется системной консолью (nvgetty) или у пользователя нет прав. Решение: выполните шаги из раздела "Настройка UART на Jetson Nano" (остановка nvgetty и добавление в группу dialout)
 
-- **MAVLink работает, но uXRCE-DDS не подключается** — Неправильные параметры прошивки или несоответствие версий PX4. Решение: убедитесь, что на телеметрийном порту выключен MAVLink (SER_TEL2_PROTOCOL = 0 или 26), перепрошейте контроллер стабильной версией, запустите агент вручную: `sudo MicroXRCEAgent serial --dev /dev/ttyTHS1 -b 921600`
+- **MAVLink работает, но uXRCE-DDS не подключается** — Неправильные параметры прошивки или несоответствие версий PX4. Решение: убедитесь, что на телеметрийном порту выключен MAVLink (`MAV_1_CONFIG = Disabled`) и задан `UXRCE_DDS_CFG = TELEM2`, перепрошейте контроллер стабильной версией, запустите агент вручную: `sudo MicroXRCEAgent serial --dev /dev/ttyTHS1 -b 921600`
 
 - **Нет связи, но порт виден** — Перепутаны пины RX/TX или низкое напряжение питания Jetson. Решение: проверьте перекрестное соединение (TX->RX, RX->TX), убедитесь, что Jetson Nano получает достаточное питание (5В 2-4А)
 
@@ -116,7 +116,7 @@ ls -l /dev/ttyTHS*
 - Подключить Pixhawk и Jetson Nano (USB, UART или FTDI адаптер)
 - Отключить сервис nvgetty на Jetson (для подключения по UART)
 - Добавить пользователя в группу dialout
-- Настроить параметры PX4 (SER_TEL2_BAUD, SER_TEL2_PROTOCOL)
+- Настроить параметры PX4 (MAV_1_CONFIG/MAV_1_MODE или UXRCE_DDS_CFG, SER_TEL2_BAUD)
 - Проверить доступность портов (`ls /dev/ttyACM*`, `ls /dev/ttyTHS*`)
 - Убедиться в правильности соединения RX/TX и питания
 - Запустить тестирование связи (MAVLink или XRCE-DDS)

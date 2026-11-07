@@ -79,6 +79,11 @@ Priority: a well-structured learning program.
 - [x] Grading model: module score (quiz 40 / lab 60), earned vs self-marked status, group scores, capstone status
 - [x] `pages/progress.html`: transcript with per-module quiz/lab/score/status, export/import/reset
 
+## Content status (2026-11-08)
+
+**All 44 modules written** (34 core + 5 INAV + 5 PX4), 44 quizzes, labs with criteria on every module, 5 capstones.
+Remaining content work is review and depth, not gaps: see Phase C (owner review, first student).
+
 ## Phase 3 — Interactivity
 
 - [ ] Widgets as standalone Web Components: PID step-response simulator, filter frequency response, ELRS packet rate ↔ latency calculator

@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Введение в PX4 — UAV Student</title>
-  <meta name="description" content="Инженерный курс по БПЛА: от физики полёта до своих прошивок и бортовых компьютеров.">
+  <meta name="description" content="объяснить, когда PX4, а когда ArduPilot запустить SITL с Gazebo и QGC">
   <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="../lib/ground-control-ui/dist/ground-control.css">
   <link rel="stylesheet" href="../assets/site.css">
@@ -32,16 +32,56 @@
     <article class="module" data-module-page="px4-intro">
       <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-px4">Электив: PX4</a><span>Введение в PX4</span></p>
       <h1 class="module-title">Введение в PX4</h1>
-      <div class="module-tags"><span class="gc-tag" title="Уровень">L1 — Оператор</span><span class="gc-tag">учёба ~3 ч</span><span class="gc-tag" data-state="caution">СКОРО</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ОСВОЕН</span></div>
+      <div class="module-tags"><span class="gc-tag" title="Уровень">L2 — Интегратор</span><span class="gc-tag">чтение 20 мин</span><span class="gc-tag">учёба ~2 ч</span><span class="gc-tag">PX4 1.14+</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ОСВОЕН</span></div>
       <p class="gc-muted module-score" data-module-score></p>
-      
-      <div class="path-pos gc-muted"><span class="gc-label">В пути</span><ul><li><a href="../path/px4.html">PX4</a>: шаг 7 из 11 → <a href="px4-architecture.html">Архитектура и uORB</a></li></ul></div>
+      <p class="module-lead">PX4 — второй большой открытый автопилот рядом с ArduPilot. Он вырос из академической среды и ближе к исследовательским задачам: модульная архитектура, строгие интерфейсы, глубокая интеграция с ROS 2. Модуль объясняет, чем PX4 отличается от ArduPilot на практике — наземная станция, режимы полёта, параметры, симуляция, требования к железу, — и когда его выбирать.</p>
+      <div class="gc-callout" data-state="ok"><strong>После модуля ты умеешь</strong><ul><li>объяснить, когда PX4, а когда ArduPilot</li><li>запустить SITL с Gazebo и QGC</li></ul></div><div class="gc-callout lab"><p class="gc-label gc-muted">Лабораторная</p><strong>SITL и первый лог</strong><p class="gc-muted lab__hint">Сдано, когда отмечены все пункты:</p><ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="px4-intro:lab:0"><span>SITL gz_x500 запущен, QGC подключена</span></label></li><li><label><input type="checkbox" data-check-id="px4-intro:lab:1"><span>Миссия из QGC выполнена</span></label></li><li><label><input type="checkbox" data-check-id="px4-intro:lab:2"><span>Лог .ulg открыт в Flight Review</span></label></li></ul></div><div class="path-pos gc-muted"><span class="gc-label">В пути</span><ul><li><a href="../path/px4.html">PX4</a>: шаг 7 из 11 → <a href="px4-architecture.html">Архитектура PX4: модули и uORB</a></li></ul></div>
       <div class="gc-prose module-body">
-<div class="gc-callout" data-state="caution"><strong>Модуль в разработке.</strong> Цели и связи уже определены, текст пишется. План — в <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">ROADMAP</a>.</div>
+<h2>Теория</h2>
+<h4 class="md-subheading">PX4 против ArduPilot</h4>
+<p>Обе прошивки — полноценные автопилоты с навигацией, миссиями и companion-интерфейсами. Различия в характере:</p>
+<ul><li><strong>Экосистема.</strong> PX4 — Dronecode Foundation, стандарты (Pixhawk, MAVLink, MAVSDK), QGroundControl как «родная» GCS. ArduPilot — сообщество, Mission Planner, огромная база поддерживаемого железа.</li><li><strong>Архитектура.</strong> PX4 — модули, общающиеся через шину uORB; каждый модуль можно остановить и перезапустить на лету. ArduPilot — монолитнее, но с Lua-скриптами внутри.</li><li><strong>ROS 2.</strong> В PX4 — нативно через uXRCE-DDS: топики PX4 видны в ROS 2 напрямую. В ArduPilot — через MAVLink/DDS-мост.</li><li><strong>Тюнинг.</strong> В PX4 хорошо проработан autotune мультиротора и самолёта, параметры структурированы по контурам (<code>MC_*RATE_*</code>, <code>MC_*_P</code>, <code>MPC_*</code>).</li></ul>
+<p>Правило выбора: исследования, компьютерное зрение и ROS 2 — PX4; поддержка экзотического железа, Lua на борту, большое сообщество практиков — ArduPilot. Летают оба.</p>
+<h4 class="md-subheading">Наземная станция</h4>
+<p>QGroundControl: прошивка, выбор airframe, калибровки, параметры, миссии, анализ логов (<code>.ulg</code>). Работает с ArduPilot тоже, но для PX4 это основной инструмент.</p>
+<h4 class="md-subheading">Режимы полёта мультиротора</h4>
+<ul><li><strong>Manual/Stabilized</strong> — стабилизация углов, газ ручной.</li><li><strong>Acro</strong> — угловые скорости.</li><li><strong>Altitude</strong> — удержание высоты.</li><li><strong>Position</strong> — удержание позиции по GPS; стик — скорость.</li><li><strong>Hold</strong>, <strong>Return</strong>, <strong>Land</strong>, <strong>Takeoff</strong>, <strong>Mission</strong>, <strong>Orbit</strong>, <strong>Follow Me</strong> — автономные.</li><li><strong>Offboard</strong> — управление с companion-компьютера.</li></ul>
+<p>Как и везде: режим выбирают по тому, каким датчикам доверяешь. Position без надёжного GPS не включится.</p>
+<h4 class="md-subheading">Параметры и логи</h4>
+<p>Параметры — через QGC или консоль <code>param set/show</code>. Логи ULog (<code>.ulg</code>) содержат все топики uORB, которые включены в логирование; анализ — Flight Review (веб) или <code>pyulog</code>.</p>
+<h4 class="md-subheading">Железо</h4>
+<p>Стандарт — Pixhawk-совместимые полётники (FMUv5/v6, H7). PX4 требовательнее к ресурсам, чем Betaflight, и F4-платы для него — редкость.</p>
+<h4 class="md-subheading">Симуляция</h4>
+<p><code>make px4_sitl gz_x500</code> поднимает SITL с Gazebo и моделью квадрокоптера x500; QGC подключается сама. Для ROS 2 это тот же стенд, что и для реального аппарата.</p>
+
+<h2>Практика</h2>
+<h4 class="md-subheading">Шаг 1. SITL и QGC</h4>
+<pre class="cli-block"><code>git clone https://github.com/PX4/PX4-Autopilot.git --recursive
+cd PX4-Autopilot
+bash ./Tools/setup/ubuntu.sh
+make px4_sitl gz_x500</code></pre>
+<p>В консоли PX4 (<code>pxh&gt;</code>): <code>commander takeoff</code>, <code>commander land</code>. QGC подключится по UDP сама.</p>
+<h4 class="md-subheading">Шаг 2. Режимы</h4>
+<p>В QGC переключи Position → Altitude → Stabilized на симуляторе, наблюдай, как меняется реакция на стик (в QGC есть виртуальный джойстик).</p>
+<h4 class="md-subheading">Шаг 3. Параметры и лог</h4>
+<p><code>param show MPC_THR_HOVER</code> в консоли; после полёта скачай <code>.ulg</code> из QGC (Analyze → Log Download) и открой в Flight Review.</p>
+<h4 class="md-subheading">Лабораторная</h4>
+<p>Взлёт, короткая миссия из QGC и посадка в SITL; лог загружен в Flight Review, найдены графики attitude и position setpoint против фактических.</p>
+
+<h2>Диагностика</h2>
+<div class="diag-groups"><article class="diag-item"><h4><strong>Симптом:</strong> QGC не подключается к SITL</h4><ul><li>Возможная причина: другой экземпляр PX4 или занятый UDP-порт.</li><li>Что сделать: закрыть старые процессы, перезапустить SITL.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> Position не включается</h4><ul><li>Возможная причина: нет GPS-фикса (в SITL — ждать инициализации).</li><li>Что сделать: подождать «ready for takeoff» в QGC.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> прошивка не ставится на F4-плату</h4><ul><li>Возможная причина: PX4 не поддерживает это железо.</li><li>Что сделать: Pixhawk-совместимый FMUv5/v6 или ArduPilot.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> <code>make</code> падает на зависимостях</h4><ul><li>Возможная причина: не выполнен <code>ubuntu.sh</code>.</li><li>Что сделать: запустить скрипт настройки окружения, перелогиниться.</li></ul></article></div>
+
+<h2>Чек-лист</h2>
+<ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="px4-intro:0"><span>Могу объяснить, когда PX4, а когда ArduPilot</span></label></li><li><label><input type="checkbox" data-check-id="px4-intro:1"><span>SITL с Gazebo запущен, QGC подключена</span></label></li><li><label><input type="checkbox" data-check-id="px4-intro:2"><span>Режимы Stabilized/Altitude/Position попробованы</span></label></li><li><label><input type="checkbox" data-check-id="px4-intro:3"><span>Лог .ulg открыт в Flight Review</span></label></li></ul>
+
+<h2>Источники</h2>
+<ul class="refs"><li><a href="https://docs.px4.io/main/en/flight_modes_mc/" target="_blank" rel="noopener noreferrer">PX4 User Guide — Flight Modes (Multicopter)</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://docs.px4.io/main/en/simulation/" target="_blank" rel="noopener noreferrer">PX4 User Guide — Simulation</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://github.com/PX4/PX4-Autopilot" target="_blank" rel="noopener noreferrer">PX4-Autopilot — source code (GitHub)</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://docs.qgroundcontrol.com/master/en/" target="_blank" rel="noopener noreferrer">QGroundControl — User Guide</a> <span class="gc-tag" data-state="info">primary</span></li></ul>
+<h2>Проверь себя</h2>
+<uav-quiz src="../quiz/px4-intro.json" module="px4-intro"></uav-quiz>
       </div>
-      
-      
-      <nav class="pager" aria-label="Соседние модули"><a class="gc-card pager__next" href="px4-architecture.html"><span class="gc-label gc-muted">Дальше</span><br>Архитектура и uORB</a></nav>
+      <div class="module-done"><gc-button variant="secondary" data-done-toggle="px4-intro">Отметить как пройденный</gc-button></div>
+      <section class="related" aria-label="Смежные модули"><p class="gc-label gc-muted">Смежные модули</p><div class="gc-grid ref-grid"><a class="gc-card" href="ap-intro.html"><strong>Введение в ArduPilot</strong><div class="gc-card__meta"><span class="gc-tag" title="L2 — Интегратор">L2</span></div></a><a class="gc-card" href="px4-architecture.html"><strong>Архитектура PX4: модули и uORB</strong><div class="gc-card__meta"><span class="gc-tag" title="L3 — Специалист">L3</span></div></a></div></section>
+      <nav class="pager" aria-label="Соседние модули"><a class="gc-card pager__next" href="px4-architecture.html"><span class="gc-label gc-muted">Дальше</span><br>Архитектура PX4: модули и uORB</a></nav>
     </article>
   </main>
   <footer class="gc-container site-footer gc-muted">

@@ -1,0 +1,72 @@
+{
+  "module": "px4-ros2",
+  "pass": 80,
+  "questions": [
+    {
+      "q": "Что делает MicroXRCEAgent?",
+      "options": [
+        "Летает",
+        "Принимает топики от клиента PX4 и выставляет их в DDS/ROS 2",
+        "Калибрует",
+        "Заменяет QGC"
+      ],
+      "answer": 1,
+      "explain": "Клиент — на полётнике, агент — на companion/ПК."
+    },
+    {
+      "q": "Какое сообщение должно идти потоком до перехода в Offboard?",
+      "options": [
+        "TrajectorySetpoint",
+        "OffboardControlMode",
+        "VehicleCommand",
+        "VehicleAttitude"
+      ],
+      "answer": 1,
+      "explain": "Иначе PX4 не переключится и не заармится в Offboard."
+    },
+    {
+      "q": "При какой частоте OffboardControlMode PX4 выходит из Offboard?",
+      "options": [
+        "Ниже ~2 Гц",
+        "Ниже 50 Гц",
+        "Ниже 0.1 Гц",
+        "Никогда"
+      ],
+      "answer": 0,
+      "explain": "Таймаут — защита от замолчавшего companion."
+    },
+    {
+      "q": "Что важно про ветку px4_msgs?",
+      "options": [
+        "Любая",
+        "Должна соответствовать версии PX4",
+        "Только main",
+        "Не нужна"
+      ],
+      "answer": 1,
+      "explain": "Иначе несовпадение определений сообщений."
+    },
+    {
+      "q": "Как в ROS 2 называются топики из PX4?",
+      "options": [
+        "/px4/*",
+        "/fmu/out/*",
+        "/uorb/*",
+        "/mavlink/*"
+      ],
+      "answer": 1,
+      "explain": "В PX4 — /fmu/in/*."
+    },
+    {
+      "q": "Высота 3 м в TrajectorySetpoint (NED) — это Z = …",
+      "options": [
+        "+3",
+        "−3",
+        "0",
+        "+300"
+      ],
+      "answer": 1,
+      "explain": "Z вниз."
+    }
+  ]
+}

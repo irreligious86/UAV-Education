@@ -34,7 +34,12 @@
     });
   }
 
-  function refresh() { return G.load(base).then(fill); }
+  function refresh() {
+    return G.load(base).then(fill).catch(function () {
+      var h = document.querySelector(".progress-headline");
+      if (h) h.textContent = "Не удалось загрузить данные оценок.";
+    });
+  }
 
   document.addEventListener("DOMContentLoaded", function () {
     refresh();

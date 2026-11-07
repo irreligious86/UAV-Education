@@ -1220,56 +1220,114 @@
         {
           "id": "px4-intro",
           "title": "Введение в PX4",
-          "level": "L1",
-          "hours": 3,
-          "status": "planned",
+          "level": "L2",
+          "hours": 2,
+          "status": "published",
           "prerequisites": [],
-          "objectives": [],
-          "lab": null,
+          "objectives": [
+            "объяснить, когда PX4, а когда ArduPilot",
+            "запустить SITL с Gazebo и QGC"
+          ],
+          "lab": {
+            "title": "SITL и первый лог",
+            "criteria": [
+              "SITL gz_x500 запущен, QGC подключена",
+              "Миссия из QGC выполнена",
+              "Лог .ulg открыт в Flight Review"
+            ]
+          },
           "url": "m/px4-intro.html"
         },
         {
           "id": "px4-architecture",
-          "title": "Архитектура и uORB",
-          "level": "L2",
+          "title": "Архитектура PX4: модули и uORB",
+          "level": "L3",
           "hours": 3,
-          "status": "planned",
-          "prerequisites": [],
-          "objectives": [],
-          "lab": null,
+          "status": "published",
+          "prerequisites": [
+            "px4-intro"
+          ],
+          "objectives": [
+            "назвать цепочку модулей от IMU до моторов",
+            "читать топики uORB в работающей системе"
+          ],
+          "lab": {
+            "title": "Цепочка IMU → моторы",
+            "criteria": [
+              "Частоты топиков сняты через uorb top",
+              "Отчёт с модулями и топиками написан",
+              "listener на двух топиках выполнен"
+            ]
+          },
           "url": "m/px4-architecture.html"
         },
         {
           "id": "px4-control",
-          "title": "Control Allocation и миксер",
-          "level": "L2",
+          "title": "Контуры управления и тюнинг PX4",
+          "level": "L3",
           "hours": 3,
           "status": "published",
-          "prerequisites": [],
-          "objectives": [],
-          "lab": null,
+          "prerequisites": [
+            "px4-architecture"
+          ],
+          "objectives": [
+            "объяснить каскад position → attitude → rate → allocation",
+            "выполнить autotune и проверить по step response"
+          ],
+          "lab": {
+            "title": "Step response до/после",
+            "criteria": [
+              "Аллокация проверена без пропов",
+              "Step response записан на дефолте и при удвоенном K",
+              "Разница объяснена по графику"
+            ]
+          },
           "url": "m/px4-control.html"
         },
         {
           "id": "px4-ros2",
-          "title": "ROS 2 интеграция",
-          "level": "L3",
-          "hours": 3,
-          "status": "planned",
-          "prerequisites": [],
-          "objectives": [],
-          "lab": null,
+          "title": "PX4 и ROS 2: uXRCE-DDS и offboard",
+          "level": "L4",
+          "hours": 4,
+          "status": "published",
+          "prerequisites": [
+            "px4-control"
+          ],
+          "objectives": [
+            "поднять мост uXRCE-DDS и увидеть топики в ROS 2",
+            "написать offboard-узел с правильным порядком потока и режима"
+          ],
+          "lab": {
+            "title": "Offboard-узел",
+            "criteria": [
+              "Топики /fmu/out видны в ROS 2",
+              "Пример offboard запущен",
+              "Свой узел держит точку, остановка узла вызывает выход из Offboard"
+            ]
+          },
           "url": "m/px4-ros2.html"
         },
         {
           "id": "px4-companion-jetson",
           "title": "PX4 + Jetson Nano (companion)",
-          "level": "L3",
-          "hours": 3,
+          "level": "L4",
+          "hours": 4,
           "status": "published",
-          "prerequisites": [],
-          "objectives": [],
-          "lab": null,
+          "prerequisites": [
+            "px4-ros2"
+          ],
+          "objectives": [
+            "подключить companion к TELEM2 и получить телеметрию",
+            "запустить сервис на Jetson, общающийся с PX4"
+          ],
+          "lab": {
+            "title": "Companion на TELEM2",
+            "criteria": [
+              "MAV_1_CONFIG/MODE/BAUD настроены, heartbeat получен",
+              "Сервис стартует автоматически",
+              "Отказ companion не влияет на PX4"
+            ]
+          },
           "url": "m/px4-companion-jetson.html"
         }
       ]

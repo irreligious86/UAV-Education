@@ -1,0 +1,72 @@
+{
+  "module": "px4-control",
+  "pass": 80,
+  "questions": [
+    {
+      "q": "Порядок контуров мультиротора в PX4?",
+      "options": [
+        "rate → attitude → position",
+        "position → attitude → rate → allocation",
+        "allocation → rate",
+        "attitude → position"
+      ],
+      "answer": 1,
+      "explain": "Внешний медленный — position, внутренний быстрый — rate."
+    },
+    {
+      "q": "Что делает MC_ROLLRATE_K?",
+      "options": [
+        "Только P",
+        "Общий множитель для P, I и D rate-контура",
+        "Фильтр",
+        "Рейт стика"
+      ],
+      "answer": 1,
+      "explain": "Параллельная форма с множителем K."
+    },
+    {
+      "q": "Чему в PX4 соответствует feedforward Betaflight?",
+      "options": [
+        "MC_ROLL_P",
+        "MC_ROLLRATE_FF",
+        "MPC_XY_P",
+        "CA_ROTOR0_KM"
+      ],
+      "answer": 1,
+      "explain": "FF rate-контура."
+    },
+    {
+      "q": "Что документация PX4 рекомендует большинству пользователей?",
+      "options": [
+        "Ручной тюнинг",
+        "Autotune",
+        "Дефолт",
+        "Betaflight"
+      ],
+      "answer": 1,
+      "explain": "Быстрее и обычно хорошо; ручной — для нестандартных рам."
+    },
+    {
+      "q": "Где задаётся газ висения?",
+      "options": [
+        "MC_ROLL_P",
+        "MPC_THR_HOVER",
+        "MC_AIRMODE",
+        "CA_AIRFRAME"
+      ],
+      "answer": 1,
+      "explain": "Параметр position controller."
+    },
+    {
+      "q": "Быстрые осцилляции после autotune. Что первое?",
+      "options": [
+        "Увеличить K",
+        "Проверить фильтры и повторить autotune",
+        "Сменить раму",
+        "Отключить autotune"
+      ],
+      "answer": 1,
+      "explain": "Autotune на шумном сигнале подбирает гейны под шум."
+    }
+  ]
+}

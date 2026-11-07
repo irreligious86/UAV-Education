@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>ROS 2 интеграция — UAV Student</title>
-  <meta name="description" content="Инженерный курс по БПЛА: от физики полёта до своих прошивок и бортовых компьютеров.">
+  <title>PX4 и ROS 2: uXRCE-DDS и offboard — UAV Student</title>
+  <meta name="description" content="поднять мост uXRCE-DDS и увидеть топики в ROS 2 написать offboard-узел с правильным порядком потока и режима">
   <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="../lib/ground-control-ui/dist/ground-control.css">
   <link rel="stylesheet" href="../assets/site.css">
@@ -30,18 +30,54 @@
   </header>
   <main class="gc-container site-main">
     <article class="module" data-module-page="px4-ros2">
-      <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-px4">Электив: PX4</a><span>ROS 2 интеграция</span></p>
-      <h1 class="module-title">ROS 2 интеграция</h1>
-      <div class="module-tags"><span class="gc-tag" title="Уровень">L3 — Специалист</span><span class="gc-tag">учёба ~3 ч</span><span class="gc-tag" data-state="caution">СКОРО</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ОСВОЕН</span></div>
+      <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-px4">Электив: PX4</a><span>PX4 и ROS 2: uXRCE-DDS и offboard</span></p>
+      <h1 class="module-title">PX4 и ROS 2: uXRCE-DDS и offboard</h1>
+      <div class="module-tags"><span class="gc-tag" title="Уровень">L4 — Эксперт</span><span class="gc-tag">чтение 30 мин</span><span class="gc-tag">учёба ~4 ч</span><span class="gc-tag">PX4 1.14+</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ОСВОЕН</span></div>
       <p class="gc-muted module-score" data-module-score></p>
-      
-      <div class="path-pos gc-muted"><span class="gc-label">В пути</span><ul><li><a href="../path/px4.html">PX4</a>: шаг 10 из 11 → <a href="px4-companion-jetson.html">PX4 + Jetson Nano (companion)</a></li></ul></div>
+      <p class="module-lead">В PX4 топики uORB можно вывести прямо в ROS 2: клиент uXRCE-DDS на полётнике и агент на companion-компьютере прокидывают сообщения в обе стороны. Это даёт ROS-узлам доступ к ориентации, позиции и командам без MAVLink-обёртки. Модуль показывает, как поднять мост на SITL, что такое <code>px4_msgs</code>, как устроено offboard-управление (<code>OffboardControlMode</code> + <code>TrajectorySetpoint</code> + <code>VehicleCommand</code>) и почему PX4 выкидывает из Offboard, если ты замолчал.</p>
+      <div class="gc-callout" data-state="ok"><strong>После модуля ты умеешь</strong><ul><li>поднять мост uXRCE-DDS и увидеть топики в ROS 2</li><li>написать offboard-узел с правильным порядком потока и режима</li></ul></div><p class="gc-muted">Перед этим модулем: <a href="px4-control.html">Контуры управления и тюнинг PX4</a></p><div class="gc-callout lab"><p class="gc-label gc-muted">Лабораторная</p><strong>Offboard-узел</strong><p class="gc-muted lab__hint">Сдано, когда отмечены все пункты:</p><ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="px4-ros2:lab:0"><span>Топики /fmu/out видны в ROS 2</span></label></li><li><label><input type="checkbox" data-check-id="px4-ros2:lab:1"><span>Пример offboard запущен</span></label></li><li><label><input type="checkbox" data-check-id="px4-ros2:lab:2"><span>Свой узел держит точку, остановка узла вызывает выход из Offboard</span></label></li></ul></div><div class="path-pos gc-muted"><span class="gc-label">В пути</span><ul><li><a href="../path/px4.html">PX4</a>: шаг 10 из 11 → <a href="px4-companion-jetson.html">PX4 + Jetson Nano (companion)</a></li></ul></div>
       <div class="gc-prose module-body">
-<div class="gc-callout" data-state="caution"><strong>Модуль в разработке.</strong> Цели и связи уже определены, текст пишется. План — в <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">ROADMAP</a>.</div>
+<h2>Теория</h2>
+<h4 class="md-subheading">Мост uXRCE-DDS</h4>
+<ul><li><strong>Клиент</strong> <code>uxrce_dds_client</code> в PX4 публикует/подписывает ограниченный набор топиков uORB (список — <code>dds_topics.yaml</code>).</li><li><strong>Агент</strong> <code>MicroXRCEAgent</code> на companion или ПК принимает их по UDP или serial и выставляет в DDS — то есть в ROS 2.</li><li>Сообщения на стороне ROS 2 — пакет <code>px4_msgs</code>; <strong>ветка `px4_msgs` должна соответствовать версии PX4</strong>, иначе несовпадение определений. Для разных версий есть узел-переводчик сообщений.</li></ul>
+<p>Топики появляются в ROS 2 как <code>/fmu/out/*</code> (из PX4) и <code>/fmu/in/*</code> (в PX4).</p>
+<h4 class="md-subheading">Offboard: три сообщения</h4>
+<ol><li><strong>`OffboardControlMode`</strong> — говорит PX4, *чем* ты управляешь (позиция, скорость, ускорение, ориентация, rates). Должен идти потоком <strong>до</strong> перехода в Offboard и всё время в нём; при частоте ниже ~2 Гц PX4 выходит из Offboard.</li><li><strong>`TrajectorySetpoint`</strong> — сама цель: позиция/скорость в NED (Z вниз!), yaw.</li><li><strong>`VehicleCommand`</strong> — команды: сменить режим (<code>VEHICLE_CMD_DO_SET_MODE</code>, Offboard = base 1, custom 6), арм (<code>VEHICLE_CMD_COMPONENT_ARM_DISARM</code>). Подтверждение — <code>VehicleCommandAck</code>.</li></ol>
+<p>Та же философия, что GUIDED в ArduPilot: companion советует потоком, автопилот следит за таймаутом и всегда может быть перехвачен пилотом.</p>
+<h4 class="md-subheading">Против MAVLink/MAVSDK</h4>
+<p>MAVLink через MAVSDK проще для простых задач и не требует ROS. uXRCE-DDS — когда нужны ROS-экосистема (навигация, зрение, планирование), низкая задержка и доступ к внутренним топикам.</p>
+
+<h2>Практика</h2>
+<h4 class="md-subheading">Шаг 1. Окружение</h4>
+<pre class="cli-block"><code># ROS 2 Humble установлен и source&#x27;нут
+mkdir -p ~/ws_px4/src &amp;&amp; cd ~/ws_px4/src
+git clone https://github.com/PX4/px4_msgs.git      # branch matching your PX4 version
+git clone https://github.com/PX4/px4_ros_com.git
+cd .. &amp;&amp; colcon build &amp;&amp; source install/setup.bash</code></pre>
+<p>Агент: <code>MicroXRCEAgent udp4 -p 8888</code> (сборка из исходников или snap — по документации).</p>
+<h4 class="md-subheading">Шаг 2. SITL с клиентом</h4>
+<p><code>make px4_sitl gz_x500</code> — в SITL клиент uXRCE-DDS стартует сам и ищет агента на 8888. Проверка: <code>ros2 topic list</code> показывает <code>/fmu/out/vehicle_attitude</code> и прочие; <code>ros2 topic echo /fmu/out/vehicle_local_position</code>.</p>
+<h4 class="md-subheading">Шаг 3. Offboard-пример</h4>
+<p>Запусти пример из <code>px4_ros_com</code> (offboard control): узел 10 циклов шлёт <code>OffboardControlMode</code> + <code>TrajectorySetpoint</code>, затем переключает режим и армит через <code>VehicleCommand</code>, после чего держит точку на 5 м. Прочитай код: порядок «сначала поток, потом режим» — ключевой.</p>
+<h4 class="md-subheading">Шаг 4. Свой узел</h4>
+<p>Напиши узел на Python (<code>rclpy</code>), который держит квадрокоптер на высоте 3 м и каждые 10 с меняет цель по кругу радиусом 5 м. Проверь: остановил узел — через ~2 с PX4 выходит из Offboard (в SITL — переход в Hold/Land по failsafe-настройке).</p>
+<h4 class="md-subheading">Лабораторная</h4>
+<p>Узел работает в SITL; лог <code>.ulg</code> показывает <code>vehicle_local_position</code> против <code>trajectory_setpoint</code>; документировано поведение при остановке узла.</p>
+
+<h2>Диагностика</h2>
+<div class="diag-groups"><article class="diag-item"><h4><strong>Симптом:</strong> <code>ros2 topic list</code> пуст</h4><ul><li>Возможная причина: агент не запущен, не тот порт, не совпадает версия <code>px4_msgs</code>.</li><li>Что сделать: запустить агента на 8888, проверить ветку <code>px4_msgs</code>.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> не переключается в Offboard</h4><ul><li>Возможная причина: <code>OffboardControlMode</code> не шёл потоком до команды.</li><li>Что сделать: слать поток ≥ 2 Гц заранее, затем режим.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> выкидывает из Offboard в полёте</h4><ul><li>Возможная причина: частота <code>OffboardControlMode</code> упала ниже ~2 Гц.</li><li>Что сделать: таймер узла, проверить загрузку companion.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> летит вверх вместо вниз</h4><ul><li>Возможная причина: знак Z в NED.</li><li>Что сделать: Z вниз положительный, высота 3 м — Z = −3.</li></ul></article></div>
+
+<h2>Чек-лист</h2>
+<ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="px4-ros2:0"><span>Агент и клиент связаны, топики видны в ROS 2</span></label></li><li><label><input type="checkbox" data-check-id="px4-ros2:1"><span>Ветка <code>px4_msgs</code> соответствует версии PX4</span></label></li><li><label><input type="checkbox" data-check-id="px4-ros2:2"><span>Пример offboard запущен и прочитан</span></label></li><li><label><input type="checkbox" data-check-id="px4-ros2:3"><span>Свой узел держит поток <code>OffboardControlMode</code> ≥ 2 Гц</span></label></li><li><label><input type="checkbox" data-check-id="px4-ros2:4"><span>Поведение при остановке узла проверено</span></label></li></ul>
+
+<h2>Источники</h2>
+<ul class="refs"><li><a href="https://docs.px4.io/main/en/ros2/user_guide.html" target="_blank" rel="noopener noreferrer">PX4 ROS 2 User Guide</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://docs.px4.io/main/en/middleware/uxrce_dds.html" target="_blank" rel="noopener noreferrer">PX4 uXRCE-DDS</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://docs.px4.io/main/en/ros2/offboard_control.html" target="_blank" rel="noopener noreferrer">PX4 ROS 2 Offboard Control Example</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://github.com/PX4/px4_msgs" target="_blank" rel="noopener noreferrer">px4_msgs (GitHub)</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://github.com/PX4/px4_ros_com" target="_blank" rel="noopener noreferrer">px4_ros_com (GitHub)</a> <span class="gc-tag" data-state="info">primary</span></li></ul>
+<h2>Проверь себя</h2>
+<uav-quiz src="../quiz/px4-ros2.json" module="px4-ros2"></uav-quiz>
       </div>
-      
-      
-      <nav class="pager" aria-label="Соседние модули"><a class="gc-card pager__prev" href="px4-control.html"><span class="gc-label gc-muted">Назад</span><br>Control Allocation и миксер</a><a class="gc-card pager__next" href="px4-companion-jetson.html"><span class="gc-label gc-muted">Дальше</span><br>PX4 + Jetson Nano (companion)</a></nav>
+      <div class="module-done"><gc-button variant="secondary" data-done-toggle="px4-ros2">Отметить как пройденный</gc-button></div>
+      <section class="related" aria-label="Смежные модули"><p class="gc-label gc-muted">Смежные модули</p><div class="gc-grid ref-grid"><a class="gc-card" href="px4-architecture.html"><strong>Архитектура PX4: модули и uORB</strong><div class="gc-card__meta"><span class="gc-tag" title="L3 — Специалист">L3</span></div></a><a class="gc-card" href="ap-companion.html"><strong>Companion + ArduPilot: управление из кода</strong><div class="gc-card__meta"><span class="gc-tag" title="L3 — Специалист">L3</span></div></a></div></section>
+      <nav class="pager" aria-label="Соседние модули"><a class="gc-card pager__prev" href="px4-control.html"><span class="gc-label gc-muted">Назад</span><br>Контуры управления и тюнинг PX4</a><a class="gc-card pager__next" href="px4-companion-jetson.html"><span class="gc-label gc-muted">Дальше</span><br>PX4 + Jetson Nano (companion)</a></nav>
     </article>
   </main>
   <footer class="gc-container site-footer gc-muted">

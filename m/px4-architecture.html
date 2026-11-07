@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Архитектура и uORB — UAV Student</title>
-  <meta name="description" content="Инженерный курс по БПЛА: от физики полёта до своих прошивок и бортовых компьютеров.">
+  <title>Архитектура PX4: модули и uORB — UAV Student</title>
+  <meta name="description" content="назвать цепочку модулей от IMU до моторов читать топики uORB в работающей системе">
   <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="../lib/ground-control-ui/dist/ground-control.css">
   <link rel="stylesheet" href="../assets/site.css">
@@ -30,18 +30,57 @@
   </header>
   <main class="gc-container site-main">
     <article class="module" data-module-page="px4-architecture">
-      <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-px4">Электив: PX4</a><span>Архитектура и uORB</span></p>
-      <h1 class="module-title">Архитектура и uORB</h1>
-      <div class="module-tags"><span class="gc-tag" title="Уровень">L2 — Интегратор</span><span class="gc-tag">учёба ~3 ч</span><span class="gc-tag" data-state="caution">СКОРО</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ОСВОЕН</span></div>
+      <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-px4">Электив: PX4</a><span>Архитектура PX4: модули и uORB</span></p>
+      <h1 class="module-title">Архитектура PX4: модули и uORB</h1>
+      <div class="module-tags"><span class="gc-tag" title="Уровень">L3 — Специалист</span><span class="gc-tag">чтение 25 мин</span><span class="gc-tag">учёба ~3 ч</span><span class="gc-tag">PX4 1.14+</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ОСВОЕН</span></div>
       <p class="gc-muted module-score" data-module-score></p>
-      
-      <div class="path-pos gc-muted"><span class="gc-label">В пути</span><ul><li><a href="../path/px4.html">PX4</a>: шаг 8 из 11 → <a href="px4-control.html">Control Allocation и миксер</a></li></ul></div>
+      <p class="module-lead">PX4 — не одна программа, а набор независимых модулей, которые обмениваются сообщениями через шину uORB по схеме publish/subscribe. Это объясняет почти всё в PX4: почему модуль можно перезапустить в полёте, почему ROS 2 видит внутренности автопилота напрямую, как устроен путь от датчика до мотора. Модуль разбирает flight stack и middleware, сообщения <code>.msg</code>, частоты обновления и инструменты для подглядывания внутрь работающей системы.</p>
+      <div class="gc-callout" data-state="ok"><strong>После модуля ты умеешь</strong><ul><li>назвать цепочку модулей от IMU до моторов</li><li>читать топики uORB в работающей системе</li></ul></div><p class="gc-muted">Перед этим модулем: <a href="px4-intro.html">Введение в PX4</a></p><div class="gc-callout lab"><p class="gc-label gc-muted">Лабораторная</p><strong>Цепочка IMU → моторы</strong><p class="gc-muted lab__hint">Сдано, когда отмечены все пункты:</p><ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="px4-architecture:lab:0"><span>Частоты топиков сняты через uorb top</span></label></li><li><label><input type="checkbox" data-check-id="px4-architecture:lab:1"><span>Отчёт с модулями и топиками написан</span></label></li><li><label><input type="checkbox" data-check-id="px4-architecture:lab:2"><span>listener на двух топиках выполнен</span></label></li></ul></div><div class="path-pos gc-muted"><span class="gc-label">В пути</span><ul><li><a href="../path/px4.html">PX4</a>: шаг 8 из 11 → <a href="px4-control.html">Контуры управления и тюнинг PX4</a></li></ul></div>
       <div class="gc-prose module-body">
-<div class="gc-callout" data-state="caution"><strong>Модуль в разработке.</strong> Цели и связи уже определены, текст пишется. План — в <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">ROADMAP</a>.</div>
+<h2>Теория</h2>
+<h4 class="md-subheading">Два слоя</h4>
+<ul><li><strong>Middleware</strong> — драйверы датчиков, связь с внешним миром (MAVLink, uXRCE-DDS), шина uORB и слой симуляции.</li><li><strong>Flight stack</strong> — алгоритмы: оценка состояния (estimator), контроллеры, навигатор, commander, распределение управления (control allocation).</li></ul>
+<h4 class="md-subheading">Путь от датчика до мотора</h4>
+<ol><li>Драйверы IMU опрашивают датчик (~1 кГц), интегрируют и публикуют (~250 Гц).</li><li><strong>EKF2</strong> объединяет IMU, GPS, баро, магнитометр в оценку ориентации, скорости и позиции.</li><li><strong>Navigator</strong> решает, куда лететь: миссия, возврат, удержание.</li><li><strong>Position controller</strong> из желаемой позиции делает желаемую ориентацию и тягу.</li><li><strong>Attitude controller</strong> → желаемые угловые скорости; <strong>rate controller</strong> → моменты.</li><li><strong>Control allocation</strong> переводит моменты и тягу в команды конкретным моторам/сервам по геометрии рамы (<code>CA_AIRFRAME</code>, <code>CA_ROTOR*</code>).</li><li>Драйверы выходов — PWM/DShot.</li></ol>
+<p><strong>Commander</strong> — «арбитр»: арм/дизарм, смена режимов, проверки готовности, failsafe.</p>
+<h4 class="md-subheading">uORB</h4>
+<p>Каждый модуль публикует топики и подписывается на чужие. Топик описан файлом <code>.msg</code> (CamelCase имя → snake_case топик: <code>VehicleAttitude.msg</code> → <code>vehicle_attitude</code>), обязательное поле — <code>uint64 timestamp</code>. Один <code>.msg</code> может задавать несколько топиков (<code># TOPICS ...</code>). Шина асинхронна: подписчик просыпается, когда появились новые данные, поэтому частоту модуля задаёт тот, кто публикует.</p>
+<p>Это та же идея, что ROS: именно поэтому мост uXRCE-DDS выглядит так естественно — он просто выносит часть топиков uORB наружу.</p>
+<h4 class="md-subheading">Исполнение</h4>
+<p>Модули — отдельные задачи (на NuttX — потоки с приоритетами; на Linux/macOS в SITL — потоки процесса). Их можно запускать и останавливать командами <code>&lt;module&gt; start/stop</code>, смотреть загрузку через <code>top</code>, частоты топиков — <code>uorb top</code>, содержимое — <code>listener &lt;topic&gt;</code>.</p>
+<h4 class="md-subheading">Зачем это знать</h4>
+<ul><li>При отладке странного поведения ты ищешь не «параметр», а <strong>модуль и топик</strong>: что опубликовано, с какой частотой, что получил контроллер.</li><li>Свой код в PX4 — это новый модуль с подпиской на топики, а не правка чужого.</li><li>Логи ULog — просто запись топиков; анализируя их, ты читаешь те же сообщения.</li></ul>
+
+<h2>Практика</h2>
+<h4 class="md-subheading">Шаг 1. Заглянуть внутрь SITL</h4>
+<pre class="cli-block"><code>make px4_sitl gz_x500
+pxh&gt; top
+pxh&gt; uorb top
+pxh&gt; listener vehicle_attitude
+pxh&gt; listener sensor_combined -n 1</code></pre>
+<h4 class="md-subheading">Шаг 2. Проследить цепочку</h4>
+<p>Найди в <code>uorb top</code> частоты <code>sensor_combined</code>, <code>vehicle_attitude</code>, <code>vehicle_local_position</code>, <code>actuator_motors</code>. Сопоставь с цепочкой выше: кто быстрее, кто медленнее, почему.</p>
+<h4 class="md-subheading">Шаг 3. Остановить и запустить модуль</h4>
+<p><code>mc_rate_control stop</code> в висении SITL — аппарат теряет управление; <code>mc_rate_control start</code> — возвращает. Делать только в симуляторе: это демонстрация модульности, а не приём.</p>
+<h4 class="md-subheading">Шаг 4. Прочитать <code>.msg</code></h4>
+<p>Открой <code>msg/VehicleCommand.msg</code> и <code>msg/OffboardControlMode.msg</code> в исходниках: эти два сообщения понадобятся для ROS 2.</p>
+<h4 class="md-subheading">Лабораторная</h4>
+<p>Отчёт на страницу: цепочка от IMU до моторов с именами модулей и топиков и их частотами, снятыми в SITL.</p>
+
+<h2>Диагностика</h2>
+<div class="diag-groups"><article class="diag-item"><h4><strong>Симптом:</strong> контроллер не реагирует на setpoint</h4><ul><li>Возможная причина: топик не публикуется или публикуется с нулевой частотой.</li><li>Что сделать: <code>uorb top</code>, <code>listener &lt;topic&gt;</code> — есть ли данные.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> модуль не стартует</h4><ul><li>Возможная причина: не собран для этой платы или зависит от отсутствующего драйвера.</li><li>Что сделать: проверить board config и вывод при старте.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> в логе нет нужного топика</h4><ul><li>Возможная причина: не включён в профиль логирования (<code>SDLOG_PROFILE</code>).</li><li>Что сделать: включить профиль, повторить полёт.</li></ul></article></div>
+
+<h2>Чек-лист</h2>
+<ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="px4-architecture:0"><span>Могу назвать цепочку модулей от IMU до моторов</span></label></li><li><label><input type="checkbox" data-check-id="px4-architecture:1"><span>Понимаю publish/subscribe и роль timestamp</span></label></li><li><label><input type="checkbox" data-check-id="px4-architecture:2"><span>Использовал <code>top</code>, <code>uorb top</code>, <code>listener</code> в SITL</span></label></li><li><label><input type="checkbox" data-check-id="px4-architecture:3"><span>Знаю, где лежат <code>.msg</code> и как имя файла становится топиком</span></label></li></ul>
+
+<h2>Источники</h2>
+<ul class="refs"><li><a href="https://docs.px4.io/main/en/concept/architecture.html" target="_blank" rel="noopener noreferrer">PX4 Architectural Overview</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://docs.px4.io/main/en/middleware/uorb.html" target="_blank" rel="noopener noreferrer">PX4 uORB Messaging</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://docs.px4.io/main/en/concept/control_allocation.html" target="_blank" rel="noopener noreferrer">PX4 Control Allocation</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://github.com/PX4/PX4-Autopilot/tree/main/msg" target="_blank" rel="noopener noreferrer">PX4-Autopilot msg definitions (GitHub)</a> <span class="gc-tag" data-state="info">primary</span></li></ul>
+<h2>Проверь себя</h2>
+<uav-quiz src="../quiz/px4-architecture.json" module="px4-architecture"></uav-quiz>
       </div>
-      
-      
-      <nav class="pager" aria-label="Соседние модули"><a class="gc-card pager__prev" href="px4-intro.html"><span class="gc-label gc-muted">Назад</span><br>Введение в PX4</a><a class="gc-card pager__next" href="px4-control.html"><span class="gc-label gc-muted">Дальше</span><br>Control Allocation и миксер</a></nav>
+      <div class="module-done"><gc-button variant="secondary" data-done-toggle="px4-architecture">Отметить как пройденный</gc-button></div>
+      <section class="related" aria-label="Смежные модули"><p class="gc-label gc-muted">Смежные модули</p><div class="gc-grid ref-grid"><a class="gc-card" href="px4-intro.html"><strong>Введение в PX4</strong><div class="gc-card__meta"><span class="gc-tag" title="L2 — Интегратор">L2</span></div></a><a class="gc-card" href="px4-ros2.html"><strong>PX4 и ROS 2: uXRCE-DDS и offboard</strong><div class="gc-card__meta"><span class="gc-tag" title="L4 — Эксперт">L4</span></div></a></div></section>
+      <nav class="pager" aria-label="Соседние модули"><a class="gc-card pager__prev" href="px4-intro.html"><span class="gc-label gc-muted">Назад</span><br>Введение в PX4</a><a class="gc-card pager__next" href="px4-control.html"><span class="gc-label gc-muted">Дальше</span><br>Контуры управления и тюнинг PX4</a></nav>
     </article>
   </main>
   <footer class="gc-container site-footer gc-muted">

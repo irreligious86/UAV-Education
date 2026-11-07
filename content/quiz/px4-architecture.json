@@ -1,0 +1,72 @@
+{
+  "module": "px4-architecture",
+  "pass": 80,
+  "questions": [
+    {
+      "q": "Как модули PX4 обмениваются данными?",
+      "options": [
+        "Глобальные переменные",
+        "Шина uORB publish/subscribe",
+        "Файлы",
+        "MAVLink внутри"
+      ],
+      "answer": 1,
+      "explain": "Асинхронно, подписчик просыпается на новые данные."
+    },
+    {
+      "q": "Что обязательно в каждом .msg?",
+      "options": [
+        "Поле id",
+        "Поле uint64 timestamp",
+        "Поле name",
+        "Ничего"
+      ],
+      "answer": 1,
+      "explain": "Заполняется при публикации."
+    },
+    {
+      "q": "Как VehicleAttitude.msg превращается в имя топика?",
+      "options": [
+        "Остаётся VehicleAttitude",
+        "vehicle_attitude (snake_case)",
+        "attitude",
+        "VA"
+      ],
+      "answer": 1,
+      "explain": "CamelCase → snake_case."
+    },
+    {
+      "q": "Какой модуль переводит моменты в команды моторам?",
+      "options": [
+        "EKF2",
+        "Control allocation",
+        "Navigator",
+        "Commander"
+      ],
+      "answer": 1,
+      "explain": "По геометрии CA_AIRFRAME и CA_ROTOR*."
+    },
+    {
+      "q": "Кто отвечает за арм, режимы и failsafe?",
+      "options": [
+        "Navigator",
+        "Commander",
+        "Rate controller",
+        "Драйвер IMU"
+      ],
+      "answer": 1,
+      "explain": "Commander — арбитр системы."
+    },
+    {
+      "q": "Как посмотреть частоты топиков в работающем PX4?",
+      "options": [
+        "param show",
+        "uorb top",
+        "top",
+        "listener"
+      ],
+      "answer": 1,
+      "explain": "listener показывает содержимое, top — загрузку модулей."
+    }
+  ]
+}
