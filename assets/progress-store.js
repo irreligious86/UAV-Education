@@ -11,8 +11,10 @@
  *   setDone(id, isDone)      -> Promise<void>
  *   getChecks(prefix)        -> Promise<Set<string>>   checked checklist items
  *   setCheck(id, isChecked)  -> Promise<void>
- *   getQuiz(moduleId)        -> Promise<{correct,total,ts}|null>  last quiz result
- *   setQuiz(moduleId, res)   -> Promise<void>
+ *   getQuiz(moduleId)        -> Promise<{correct,total,ts}|null>  best quiz result
+ *   setQuiz(moduleId, res)   -> Promise<void>                       keeps the best of old/new
+ *   getAllQuiz()             -> Promise<{moduleId: result}>
+ *   reset()                  -> Promise<void>                       wipe everything (student asked)
  */
 (function () {
   "use strict";
@@ -72,8 +74,21 @@
 
   LocalProgressStore.prototype.setQuiz = function (moduleId, result) {
     var data = this._read();
-    data.quiz[moduleId] = result;
+    var old = data.quiz[moduleId];
+    var better = !old || (result.correct / result.total) >= (old.correct / old.total);
+    if (better) data.quiz[moduleId] = result;
+    data.quiz[moduleId].attempts = (old && old.attempts ? old.attempts : 0) + 1;
+    data.quiz[moduleId].last = result.ts;
     this._write(data);
+    return Promise.resolve();
+  };
+
+  LocalProgressStore.prototype.getAllQuiz = function () {
+    return Promise.resolve(this._read().quiz);
+  };
+
+  LocalProgressStore.prototype.reset = function () {
+    try { window.localStorage.removeItem(KEY); } catch (e) { /* ignore */ }
     return Promise.resolve();
   };
 

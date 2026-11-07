@@ -60,6 +60,19 @@ Today: `LocalProgressStore` (localStorage, one browser). Later: `ApiProgressStor
 same methods over HTTP, selected by one line at the bottom of the file. Module ids, capstone
 ids (`cap-*`) and check ids are stable strings; a server stores them as-is.
 
+### Grading (`assets/grading.js`, `api/v1/grading.json`)
+
+Pure functions, no DOM, same inputs a server would have:
+
+- module score = 40 × quiz% (best attempt) + 60 × (lab criteria checked / total); modules without lab or quiz use the other part at 100%
+- module **освоен** (earned) when quiz ≥ 80% **and** all lab criteria are checked
+- manual "done" mark = **отмечен** (self-marked): counts for completion display, shown with a different chip, score unaffected
+- group (track / path / course) score = mean of module scores; "освоено N из M" counts earned + self-marked
+- capstone **сдан** when all criteria checked (or self-marked)
+- `grading.json` carries per-module quiz presence and lab size so pages don't parse curriculum at runtime
+
+`pages/progress.html` is the student transcript and the shape of a future mentor view. Export/import of the raw store JSON lets a student carry progress between devices or send it to a mentor before a server exists.
+
 ## Migration to our own server (when the time comes)
 
 1. **Keep the static site.** Host it from the same server (nginx) or keep GitHub Pages; the

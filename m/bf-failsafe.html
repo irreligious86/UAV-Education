@@ -10,6 +10,7 @@
   <link rel="stylesheet" href="../assets/site.css">
   <script src="../lib/ground-control-ui/dist/ground-control.js" defer></script>
   <script src="../assets/progress-store.js" defer></script>
+  <script src="../assets/grading.js" defer></script>
   <script src="../assets/app.js" defer></script>
   <script src="../assets/uav-quiz.js" defer></script>
 </head>
@@ -23,6 +24,7 @@
         <a href="../pages/glossary.html">Глоссарий</a>
         <a href="../pages/fails.html">Фейлы</a>
         <a href="../pages/search.html">Поиск</a>
+        <a href="../pages/progress.html">Мой прогресс</a>
       </nav>
     </div>
   </header>
@@ -30,7 +32,8 @@
     <article class="module" data-module-page="bf-failsafe">
       <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-operator">Оператор</a><span>Failsafe: стадии и тест по свитчу</span></p>
       <h1 class="module-title">Failsafe: стадии и тест по свитчу</h1>
-      <div class="module-tags"><span class="gc-tag" title="Уровень">L1 — Оператор</span><span class="gc-tag">чтение 20 мин</span><span class="gc-tag">учёба ~2 ч</span><span class="gc-tag">Betaflight 4.5+</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></div>
+      <div class="module-tags"><span class="gc-tag" title="Уровень">L1 — Оператор</span><span class="gc-tag">чтение 20 мин</span><span class="gc-tag">учёба ~2 ч</span><span class="gc-tag">Betaflight 4.5+</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ОСВОЕН</span></div>
+      <p class="gc-muted module-score" data-module-score></p>
       <p class="module-lead">Failsafe — то, что дрон делает, когда пропала связь с пультом. В Betaflight 4.3+ это двухстадийный процесс: короткая «защитная» Stage 1, затем Stage 2 с выбранной процедурой (DROP, AUTO-LAND или GPS_RESCUE). Модуль объясняет, как это устроено, как выбрать процедуру под свой дрон и как безопасно проверить failsafe тумблером, не выключая пульт в воздухе.</p>
       <div class="gc-callout" data-state="ok"><strong>После модуля ты умеешь</strong><ul><li>выбрать процедуру Stage 2</li><li>проверить failsafe тумблером без пропов и в воздухе</li></ul></div><p class="gc-muted">Перед этим модулем: <a href="bf-modes-osd.html">Режимы и OSD</a></p><div class="gc-callout lab"><p class="gc-label gc-muted">Лабораторная</p><strong>Тест failsafe по тумблеру</strong><p class="gc-muted lab__hint">Сдано, когда отмечены все пункты:</p><ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="bf-failsafe:lab:0"><span>Процедура Stage 2 выбрана и обоснована в журнале</span></label></li><li><label><input type="checkbox" data-check-id="bf-failsafe:lab:1"><span>Тест без пропов: FAILSAFE в OSD, возврат управления</span></label></li><li><label><input type="checkbox" data-check-id="bf-failsafe:lab:2"><span>Тест в воздухе на безопасной высоте пройден</span></label></li><li><label><input type="checkbox" data-check-id="bf-failsafe:lab:3"><span>Параметры failsafe и дата теста записаны</span></label></li></ul></div><div class="path-pos gc-muted"><span class="gc-label">В пути</span><ul><li><a href="../path/betaflight.html">Betaflight</a>: шаг 11 из 21 → <a href="link-elrs.html">ExpressLRS: packet rate, телеметрия, LQ</a></li></ul></div>
       <div class="gc-prose module-body">

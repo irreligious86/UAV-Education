@@ -10,6 +10,7 @@
   <link rel="stylesheet" href="../assets/site.css">
   <script src="../lib/ground-control-ui/dist/ground-control.js" defer></script>
   <script src="../assets/progress-store.js" defer></script>
+  <script src="../assets/grading.js" defer></script>
   <script src="../assets/app.js" defer></script>
   <script src="../assets/uav-quiz.js" defer></script>
 </head>
@@ -23,6 +24,7 @@
         <a href="../pages/glossary.html">Глоссарий</a>
         <a href="../pages/fails.html">Фейлы</a>
         <a href="../pages/search.html">Поиск</a>
+        <a href="../pages/progress.html">Мой прогресс</a>
       </nav>
     </div>
   </header>
@@ -30,7 +32,8 @@
     <article class="module" data-module-page="bf-cli-automation">
       <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-integrator">Интегратор</a><span>Автоматизация CLI по serial</span></p>
       <h1 class="module-title">Автоматизация CLI по serial</h1>
-      <div class="module-tags"><span class="gc-tag" title="Уровень">L3 — Специалист</span><span class="gc-tag">чтение 25 мин</span><span class="gc-tag">учёба ~3 ч</span><span class="gc-tag">Betaflight 4.5+</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></div>
+      <div class="module-tags"><span class="gc-tag" title="Уровень">L3 — Специалист</span><span class="gc-tag">чтение 25 мин</span><span class="gc-tag">учёба ~3 ч</span><span class="gc-tag">Betaflight 4.5+</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ОСВОЕН</span></div>
+      <p class="gc-muted module-score" data-module-score></p>
       <p class="module-lead">Когда дронов больше одного, настраивать их кликами в Configurator — путь к ошибкам. CLI Betaflight доступен через обычный serial-порт, значит его можно скриптовать. Модуль показывает рабочий шаблон на Python (<code>pyserial</code>) и собирает грабли, на которые мы реально наступили при массовой настройке нескольких квадрокоптеров: плавающие COM-порты, «тихие» исправления параметров, перезагрузки и несовместимость diff между версиями.</p>
       <div class="gc-callout" data-state="ok"><strong>После модуля ты умеешь</strong><ul><li>написать скрипт, который находит дрон по craft_name</li><li>применять изменения с перечитыванием</li></ul></div><p class="gc-muted">Перед этим модулем: <a href="bf-cli.html">CLI и remap</a></p><div class="gc-callout lab"><p class="gc-label gc-muted">Лабораторная</p><strong>Скрипт настройки</strong><p class="gc-muted lab__hint">Сдано, когда отмечены все пункты:</p><ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="bf-cli-automation:lab:0"><span>Скрипт находит дрон по craft_name, а не по COM</span></label></li><li><label><input type="checkbox" data-check-id="bf-cli-automation:lab:1"><span>Перед изменениями сохраняется diff all с датой</span></label></li><li><label><input type="checkbox" data-check-id="bf-cli-automation:lab:2"><span>После save скрипт заново находит порт и перечитывает значения</span></label></li><li><label><input type="checkbox" data-check-id="bf-cli-automation:lab:3"><span>Прогон на двух дронах без ручных правок</span></label></li></ul></div><div class="path-pos gc-muted"><span class="gc-label">В пути</span><ul><li><a href="../path/betaflight.html">Betaflight</a>: шаг 20 из 21 → <a href="bf-custom.html">Свои сборки прошивок</a></li></ul></div>
       <div class="gc-prose module-body">

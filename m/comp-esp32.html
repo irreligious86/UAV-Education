@@ -10,6 +10,7 @@
   <link rel="stylesheet" href="../assets/site.css">
   <script src="../lib/ground-control-ui/dist/ground-control.js" defer></script>
   <script src="../assets/progress-store.js" defer></script>
+  <script src="../assets/grading.js" defer></script>
   <script src="../assets/app.js" defer></script>
   <script src="../assets/uav-quiz.js" defer></script>
 </head>
@@ -23,6 +24,7 @@
         <a href="../pages/glossary.html">Глоссарий</a>
         <a href="../pages/fails.html">Фейлы</a>
         <a href="../pages/search.html">Поиск</a>
+        <a href="../pages/progress.html">Мой прогресс</a>
       </nav>
     </div>
   </header>
@@ -30,7 +32,8 @@
     <article class="module" data-module-page="comp-esp32">
       <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-engineer">Инженер</a><span>ESP32 и периферия</span></p>
       <h1 class="module-title">ESP32 и периферия</h1>
-      <div class="module-tags"><span class="gc-tag" title="Уровень">L2 — Интегратор</span><span class="gc-tag">чтение 30 мин</span><span class="gc-tag">учёба ~4 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></div>
+      <div class="module-tags"><span class="gc-tag" title="Уровень">L2 — Интегратор</span><span class="gc-tag">чтение 30 мин</span><span class="gc-tag">учёба ~4 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ОСВОЕН</span></div>
+      <p class="gc-muted module-score" data-module-score></p>
       <p class="module-lead">ESP32 — идеальный «маленький companion»: UART, Wi-Fi, BLE, дисплей, копеечная цена и запуск за долю секунды. Модуль разбирает три типовых роли: периферия на борту (датчики, индикация), MAVLink-мост Wi-Fi ↔ FC и компаньон пульта. Последний — на примере проекта для RadioMaster TX16S: ESP32-S3 с экраном, который в полёте показывает телеметрию, а на земле поднимает точку доступа для настроек с телефона. Разобраны ловушки: lifecycle Lua-виджета EdgeTX, уровни UART, бюджет питания и проверяемое отключение радио.</p>
       <div class="gc-callout" data-state="ok"><strong>После модуля ты умеешь</strong><ul><li>связать ESP32 с FC или пультом по UART</li></ul></div><p class="gc-muted">Перед этим модулем: <a href="comp-mavlink.html">MAVLink и MAVSDK</a>, <a href="link-protocols.html">SBUS, CRSF и инверсия UART</a></p><div class="gc-callout lab"><p class="gc-label gc-muted">Лабораторная</p><strong>Эхо и heartbeat</strong><p class="gc-muted lab__hint">Сдано, когда отмечены все пункты:</p><ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="comp-esp32:lab:0"><span>Эхо-тест с USB-UART: 200+ символов без потерь</span></label></li><li><label><input type="checkbox" data-check-id="comp-esp32:lab:1"><span>Виджет шлёт heartbeat из refresh() и background()</span></label></li><li><label><input type="checkbox" data-check-id="comp-esp32:lab:2"><span>ESP32 уходит в FLIGHT по таймауту heartbeat</span></label></li><li><label><input type="checkbox" data-check-id="comp-esp32:lab:3"><span>Протокол сообщений описан в docs/</span></label></li></ul></div><div class="path-pos gc-muted"><span class="gc-label">В пути</span><ul><li><a href="../path/ardupilot.html">ArduPilot</a>: шаг 19 из 20 → <a href="bf-custom.html">Свои сборки прошивок</a></li></ul></div>
       <div class="gc-prose module-body">

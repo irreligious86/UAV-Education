@@ -132,13 +132,14 @@
       this.appendChild(h("p", { class: "uav-quiz__score", text: this._correct + " из " + total + " · " + pct + "%" }));
       this.appendChild(h("div", { class: "gc-callout", "data-state": ok ? "ok" : "caution" }, [
         h("strong", { text: ok ? "Квиз сдан. " : "Пока не сдан. " }),
-        h("span", { text: ok ? "Отметь модуль пройденным, если лабораторная тоже сделана." : "Перечитай теорию и диагностику, затем попробуй ещё раз." })
+        h("span", { text: ok ? "Засчитан лучший результат. Модуль станет «освоен», когда выполнена и лабораторная." : "Перечитай теорию и диагностику, затем попробуй ещё раз. Засчитывается лучшая попытка." })
       ]));
       this.appendChild(h("div", { class: "uav-quiz__nav" }, [
         h("gc-button", { variant: "secondary", text: "Пройти ещё раз", onclick: function () { self.start(); } })
       ]));
       var s = this.store();
-      if (s && s.setQuiz) s.setQuiz(this._module, { correct: this._correct, total: total, ts: Date.now() });
+      if (s && s.setQuiz) s.setQuiz(this._module, { correct: this._correct, total: total, ts: Date.now() })
+        .then(function () { document.dispatchEvent(new CustomEvent("uav-quiz-result")); });
     }
   }
 

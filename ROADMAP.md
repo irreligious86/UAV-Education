@@ -73,6 +73,12 @@ Priority: a well-structured learning program.
 - [x] `ARCHITECTURE.md`: layers, data contracts, migration path to own server
 - [ ] Offline PWA (service worker)
 
+## Phase 2b — Structure and grading (2026-11-08) ✅
+
+- [x] Learning paths per firmware: `path/betaflight|inav|ardupilot|px4.html` with stages; chooser on home; step position on module pages
+- [x] Grading model: module score (quiz 40 / lab 60), earned vs self-marked status, group scores, capstone status
+- [x] `pages/progress.html`: transcript with per-module quiz/lab/score/status, export/import/reset
+
 ## Phase 3 — Interactivity
 
 - [ ] Widgets as standalone Web Components: PID step-response simulator, filter frequency response, ELRS packet rate ↔ latency calculator

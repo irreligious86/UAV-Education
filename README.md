@@ -15,6 +15,8 @@
 | **Глоссарий** | `data/glossary.json` — термин, определение, модуль; страница генерируется |
 | **Журнал фейлов** | генерируется из секций «Диагностика» всех модулей |
 | **Квизы** | `content/quiz/<id>.json` — 5+ вопросов, `answer` = индекс верного, `explain` обязателен; validator проверяет |
+| **Пути по прошивкам** | `data/curriculum.json` → `paths` (этапы и порядок модулей); страницы `path/<id>.html` |
+| **Оценки** | `assets/grading.js` + `api/v1/grading.json`; ведомость `pages/progress.html` (см. ARCHITECTURE.md) |
 | **Поиск** | `pages/search.html` по `api/v1/search.json` (генерируется) |
 | **Архитектура** | `ARCHITECTURE.md` — слои, контракты, переезд на свой сервер |
 | **План развития** | `ROADMAP.md` |

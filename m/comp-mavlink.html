@@ -10,6 +10,7 @@
   <link rel="stylesheet" href="../assets/site.css">
   <script src="../lib/ground-control-ui/dist/ground-control.js" defer></script>
   <script src="../assets/progress-store.js" defer></script>
+  <script src="../assets/grading.js" defer></script>
   <script src="../assets/app.js" defer></script>
   <script src="../assets/uav-quiz.js" defer></script>
 </head>
@@ -23,6 +24,7 @@
         <a href="../pages/glossary.html">Глоссарий</a>
         <a href="../pages/fails.html">Фейлы</a>
         <a href="../pages/search.html">Поиск</a>
+        <a href="../pages/progress.html">Мой прогресс</a>
       </nav>
     </div>
   </header>
@@ -30,7 +32,8 @@
     <article class="module" data-module-page="comp-mavlink">
       <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-engineer">Инженер</a><span>MAVLink и MAVSDK</span></p>
       <h1 class="module-title">MAVLink и MAVSDK</h1>
-      <div class="module-tags"><span class="gc-tag" title="Уровень">L2 — Интегратор</span><span class="gc-tag">чтение 30 мин</span><span class="gc-tag">учёба ~3 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></div>
+      <div class="module-tags"><span class="gc-tag" title="Уровень">L2 — Интегратор</span><span class="gc-tag">чтение 30 мин</span><span class="gc-tag">учёба ~3 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ОСВОЕН</span></div>
+      <p class="gc-muted module-score" data-module-score></p>
       <p class="module-lead">MAVLink — язык, на котором полётник говорит с наземной станцией, бортовым компьютером, телеметрией и твоими скриптами. Всё, что ты делал в SITL через pymavlink, — это MAVLink. Модуль разбирает протокол на уровне, достаточном чтобы писать свои клиенты: структуру пакета, систему и компонент, heartbeat, команды с подтверждением, параметры, потоки телеметрии. Два инструмента на выбор: pymavlink (низкий уровень, всё видно) и MAVSDK (высокоуровневый API).</p>
       <div class="gc-callout" data-state="ok"><strong>После модуля ты умеешь</strong><ul><li>прочитать телеметрию и отправить команду</li></ul></div><p class="gc-muted">Перед этим модулем: <a href="comp-intro.html">Companion: зачем и где граница</a></p><div class="gc-callout lab"><p class="gc-label gc-muted">Лабораторная</p><strong>Слушать и командовать</strong><p class="gc-muted lab__hint">Сдано, когда отмечены все пункты:</p><ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="comp-mavlink:lab:0"><span>ATTITUDE запрошен с частотой 10 Гц</span></label></li><li><label><input type="checkbox" data-check-id="comp-mavlink:lab:1"><span>Команда арма подтверждена по COMMAND_ACK</span></label></li><li><label><input type="checkbox" data-check-id="comp-mavlink:lab:2"><span>Параметр прочитан и записан из кода</span></label></li><li><label><input type="checkbox" data-check-id="comp-mavlink:lab:3"><span>Эфир просмотрен через mavproxy watch</span></label></li></ul></div><div class="path-pos gc-muted"><span class="gc-label">В пути</span><ul><li><a href="../path/ardupilot.html">ArduPilot</a>: шаг 16 из 20 → <a href="comp-raspberry.html">Raspberry Pi + ArduPilot</a></li><li><a href="../path/px4.html">PX4</a>: шаг 6 из 11 → <a href="px4-intro.html">Введение в PX4</a></li></ul></div>
       <div class="gc-prose module-body">

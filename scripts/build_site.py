@@ -125,6 +125,7 @@ def layout(*, title: str, base: str, body: str, active: str, description: str = 
         ("glossary", f"{base}pages/glossary.html", "Глоссарий"),
         ("fails", f"{base}pages/fails.html", "Фейлы"),
         ("search", f"{base}pages/search.html", "Поиск"),
+        ("progress", f"{base}pages/progress.html", "Мой прогресс"),
     ]
     current = ' aria-current="page"'
     nav = "\n".join(
@@ -144,6 +145,7 @@ def layout(*, title: str, base: str, body: str, active: str, description: str = 
   <link rel="stylesheet" href="{base}assets/site.css">
   <script src="{base}{GC}/ground-control.js" defer></script>
   <script src="{base}assets/progress-store.js" defer></script>
+  <script src="{base}assets/grading.js" defer></script>
   <script src="{base}assets/app.js" defer></script>
   <script src="{base}assets/uav-quiz.js" defer></script>{extra_head}
 </head>
@@ -316,7 +318,7 @@ def render_home(model: dict) -> str:
       </div>
       <p class="gc-label gc-muted">Твой прогресс <span data-progress-label="{esc(','.join(all_published))}"></span></p>
       <div class="gc-progress" role="progressbar" aria-label="Твой прогресс по курсу" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" data-progress-of="{esc(','.join(all_published))}" style="--gc-value: 0%"></div>
-      <p class="gc-muted home-hero__note">Прогресс хранится только в этом браузере.</p>
+      <p class="gc-muted home-hero__note">Прогресс хранится в этом браузере · <a href="pages/progress.html">подробная ведомость</a></p>
     </section>
 
     <section class="choose" aria-labelledby="choose-title">
@@ -552,7 +554,8 @@ def render_module(m: dict, model: dict) -> str:
     body = f"""    <article class="module" data-module-page="{esc(m['id'])}">
       <p class="gc-breadcrumb">{''.join(crumbs)}</p>
       <h1 class="module-title">{esc(m['title'])}</h1>
-      <div class="module-tags">{''.join(tags)}<span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></div>
+      <div class="module-tags">{''.join(tags)}<span class="gc-tag" data-state="ok" data-done-badge hidden>ОСВОЕН</span></div>
+      <p class="gc-muted module-score" data-module-score></p>
       {lead}
       {''.join(blocks)}
       <div class="gc-prose module-body">
@@ -782,6 +785,69 @@ def render_search() -> str:
                   extra_head=f'\n  <script src="{base}assets/search.js" defer></script>')
 
 
+# ---------------------------------------------------------------- grading
+
+
+def grading_meta(model: dict) -> dict:
+    mods = []
+    for m in model["modules"].values():
+        if m["status"] != "published":
+            continue
+        lab = m.get("lab")
+        mods.append({"id": m["id"], "quiz": (QUIZ_SRC / f"{m['id']}.json").is_file(),
+                     "lab": len(lab.get("criteria", [])) if isinstance(lab, dict) else 0})
+    caps = [{"id": g["capstone"]["id"], "criteria": len(g["capstone"].get("criteria", [])), "group": g["id"]}
+            for g in model["groups"] if g.get("capstone")]
+    return {"version": 1, "pass": 80, "weights": {"quiz": 40, "lab": 60}, "modules": mods, "capstones": caps}
+
+
+def render_progress(model: dict) -> str:
+    """Student transcript: every path/track with module-level scores. Filled by progress.js."""
+    base = "../"
+    def table(title, ids, anchor):
+        rows = "".join(
+            f'<tr data-row="{esc(i)}"><td><a href="{base}m/{esc(i)}.html">{esc(model["modules"][i]["title"])}</a></td>'
+            f'<td class="num" data-cell="quiz">—</td><td class="num" data-cell="lab">—</td><td class="num" data-cell="score">—</td><td data-cell="status"></td></tr>'
+            for i in ids if model["modules"][i]["status"] == "published"
+        )
+        return f"""      <section class="gc-panel" id="{esc(anchor)}">
+        <h2 class="gc-title">{esc(title)}</h2>
+        <p class="gc-muted" data-group-summary="{esc(','.join(i for i in ids if model['modules'][i]['status'] == 'published'))}"></p>
+        <div class="table-wrap"><table class="progress-table"><thead><tr><th>Модуль</th><th>Квиз</th><th>Лаба</th><th>Балл</th><th>Статус</th></tr></thead><tbody>{rows}</tbody></table></div>
+      </section>"""
+    paths = "".join(table(f"Путь: {p['title']}", p["moduleIds"], f"path-{p['id']}") for p in model["paths"])
+    tracks = "".join(table(f"Трек {g['index']}: {g['title']}", g["moduleIds"], f"track-{g['id']}") for g in model["groups"] if g["kind"] == "track")
+    caps = "".join(
+        f'<li data-cap="{esc(g["capstone"]["id"])}"><a href="{base}cap/{esc(g["capstone"]["id"])}.html">{esc(g["capstone"]["title"])}</a> <span class="gc-tag" data-cap-status></span></li>'
+        for g in model["groups"] if g.get("capstone")
+    )
+    all_pub = [m["id"] for m in model["modules"].values() if m["status"] == "published"]
+    body = f"""    <h1 class="gc-display">Мой прогресс</h1>
+    <p class="gc-muted">Балл модуля = 40% квиз (лучшая попытка) + 60% лабораторная. «Освоен» — квиз ≥ 80% и все пункты лабораторной. Ручная отметка видна как «отмечен», это честно другое.</p>
+    <section class="gc-panel">
+      <p class="gc-label gc-muted">Весь курс</p>
+      <p class="progress-headline" data-group-summary="{esc(','.join(all_pub))}"></p>
+      <div class="gc-progress" role="progressbar" aria-label="Общий балл" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" data-progress-of="{esc(','.join(all_pub))}" style="--gc-value: 0%"></div>
+      <p class="gc-label gc-muted">Итоговые проекты</p>
+      <ul class="progress-caps">{caps}</ul>
+    </section>
+    <h2 class="gc-title section-title">По прошивке</h2>
+{paths}
+    <h2 class="gc-title section-title">По навыкам</h2>
+{tracks}
+    <section class="gc-panel">
+      <p class="gc-label gc-muted">Данные</p>
+      <p class="gc-muted">Прогресс хранится в этом браузере. Экспортируй, чтобы перенести на другое устройство или показать наставнику.</p>
+      <div class="progress-actions">
+        <gc-button variant="secondary" data-export>Скачать JSON</gc-button>
+        <label class="gc-tag" style="cursor:pointer">Импорт JSON <input type="file" accept="application/json" data-import hidden></label>
+        <gc-button variant="secondary" data-reset>Сбросить всё</gc-button>
+      </div>
+    </section>"""
+    return layout(title="Мой прогресс", base=base, body=body, active="progress",
+                  extra_head=f'\n  <script src="{base}assets/progress-page.js" defer></script>')
+
+
 # ---------------------------------------------------------------- static API
 
 
@@ -842,6 +908,8 @@ def main() -> None:
         for q in QUIZ_SRC.glob("*.json"):
             write(ROOT / "quiz" / q.name, q.read_text(encoding="utf-8"))
     write(ROOT / "pages" / "search.html", render_search())
+    write(ROOT / "pages" / "progress.html", render_progress(model))
+    write(ROOT / "api" / "v1" / "grading.json", json.dumps(grading_meta(model), ensure_ascii=False, indent=2) + "\n")
     write(ROOT / "api" / "v1" / "search.json", json.dumps(search_index(model), ensure_ascii=False) + "\n")
     write(ROOT / "api" / "v1" / "curriculum.json", json.dumps(api_payload(model), ensure_ascii=False, indent=2) + "\n")
 

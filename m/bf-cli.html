@@ -10,6 +10,7 @@
   <link rel="stylesheet" href="../assets/site.css">
   <script src="../lib/ground-control-ui/dist/ground-control.js" defer></script>
   <script src="../assets/progress-store.js" defer></script>
+  <script src="../assets/grading.js" defer></script>
   <script src="../assets/app.js" defer></script>
   <script src="../assets/uav-quiz.js" defer></script>
 </head>
@@ -23,6 +24,7 @@
         <a href="../pages/glossary.html">Глоссарий</a>
         <a href="../pages/fails.html">Фейлы</a>
         <a href="../pages/search.html">Поиск</a>
+        <a href="../pages/progress.html">Мой прогресс</a>
       </nav>
     </div>
   </header>
@@ -30,7 +32,8 @@
     <article class="module" data-module-page="bf-cli">
       <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-integrator">Интегратор</a><span>CLI и remap</span></p>
       <h1 class="module-title">CLI и remap</h1>
-      <div class="module-tags"><span class="gc-tag" title="Уровень">L3 — Специалист</span><span class="gc-tag">чтение 15 мин</span><span class="gc-tag">учёба ~2 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></div>
+      <div class="module-tags"><span class="gc-tag" title="Уровень">L3 — Специалист</span><span class="gc-tag">чтение 15 мин</span><span class="gc-tag">учёба ~2 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ОСВОЕН</span></div>
+      <p class="gc-muted module-score" data-module-score></p>
       <p class="module-lead">Командная строка (CLI) Betaflight — это текстовый интерфейс, открывающий доступ к конфигурации полётного контроллера на уровне, недоступном в графическом интерфейсе. Из CLI можно изменять любые параметры, включая не вынесенные во вкладки конфигуратора, проверять аппаратное состояние, управлять ресурсами (выводами микроконтроллера) и создавать резервные копии. Ключевая практическая задача статьи — дать навык уверенной работы с <code>resource</code> и ремаппингом выводов без перепрошивки, а также научить диагностировать состав прошивки и восстанавливать конфигурацию после сбоев.</p>
       <div class="gc-callout" data-state="ok"><strong>После модуля ты умеешь</strong><ul><li>прочитать и применить diff</li><li>переназначить ресурс пада</li></ul></div><p class="gc-muted">Перед этим модулем: <a href="bf-ports.html">Порты и приёмник</a></p><div class="gc-callout lab"><p class="gc-label gc-muted">Лабораторная</p><strong>Diff и remap</strong><p class="gc-muted lab__hint">Сдано, когда отмечены все пункты:</p><ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="bf-cli:lab:0"><span>diff all прочитан и объяснён по разделам</span></label></li><li><label><input type="checkbox" data-check-id="bf-cli:lab:1"><span>Один ресурс переназначен командой resource и проверен</span></label></li><li><label><input type="checkbox" data-check-id="bf-cli:lab:2"><span>Изменение зафиксировано в git</span></label></li></ul></div><div class="path-pos gc-muted"><span class="gc-label">В пути</span><ul><li><a href="../path/betaflight.html">Betaflight</a>: шаг 19 из 21 → <a href="bf-cli-automation.html">Автоматизация CLI по serial</a></li></ul></div>
       <div class="gc-prose module-body">

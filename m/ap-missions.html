@@ -10,6 +10,7 @@
   <link rel="stylesheet" href="../assets/site.css">
   <script src="../lib/ground-control-ui/dist/ground-control.js" defer></script>
   <script src="../assets/progress-store.js" defer></script>
+  <script src="../assets/grading.js" defer></script>
   <script src="../assets/app.js" defer></script>
   <script src="../assets/uav-quiz.js" defer></script>
 </head>
@@ -23,6 +24,7 @@
         <a href="../pages/glossary.html">Глоссарий</a>
         <a href="../pages/fails.html">Фейлы</a>
         <a href="../pages/search.html">Поиск</a>
+        <a href="../pages/progress.html">Мой прогресс</a>
       </nav>
     </div>
   </header>
@@ -30,7 +32,8 @@
     <article class="module" data-module-page="ap-missions">
       <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-autonomy">Автономия</a><span>Миссии и планирование</span></p>
       <h1 class="module-title">Миссии и планирование</h1>
-      <div class="module-tags"><span class="gc-tag" title="Уровень">L2 — Интегратор</span><span class="gc-tag">чтение 25 мин</span><span class="gc-tag">учёба ~3 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></div>
+      <div class="module-tags"><span class="gc-tag" title="Уровень">L2 — Интегратор</span><span class="gc-tag">чтение 25 мин</span><span class="gc-tag">учёба ~3 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ОСВОЕН</span></div>
+      <p class="gc-muted module-score" data-module-score></p>
       <p class="module-lead">Миссия в ArduPilot — список команд, который полётник выполняет сам в режиме AUTO: взлететь, пройти точки, снять кадр, вернуться. Модуль объясняет, из чего состоит миссия, чем навигационные команды отличаются от DO- и CONDITION-команд, как считается высота, где дом и что происходит при потере связи посреди маршрута. Практика — на SITL, по схеме «маршрут отдельно, сценарий отдельно».</p>
       <div class="gc-callout" data-state="ok"><strong>После модуля ты умеешь</strong><ul><li>разделить маршрут и сценарий</li><li>проверить миссию в SITL</li></ul></div><p class="gc-muted">Перед этим модулем: <a href="ap-sitl.html">SITL: дрон без дрона</a></p><div class="gc-callout lab"><p class="gc-label gc-muted">Лабораторная</p><strong>Миссия из кода</strong><p class="gc-muted lab__hint">Сдано, когда отмечены все пункты:</p><ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="ap-missions:lab:0"><span>Миссия загружена как диалог запрос–ответ, MISSION_ACK = 0</span></label></li><li><label><input type="checkbox" data-check-id="ap-missions:lab:1"><span>Все точки в относительной высоте</span></label></li><li><label><input type="checkbox" data-check-id="ap-missions:lab:2"><span>Три сценария поверх одного маршрута выполнены в SITL</span></label></li></ul></div><div class="path-pos gc-muted"><span class="gc-label">В пути</span><ul><li><a href="../path/ardupilot.html">ArduPilot</a>: шаг 9 из 20 → <a href="ap-lua.html">Lua: сценарии и fault injection</a></li></ul></div>
       <div class="gc-prose module-body">

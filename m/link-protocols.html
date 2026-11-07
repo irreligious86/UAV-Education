@@ -10,6 +10,7 @@
   <link rel="stylesheet" href="../assets/site.css">
   <script src="../lib/ground-control-ui/dist/ground-control.js" defer></script>
   <script src="../assets/progress-store.js" defer></script>
+  <script src="../assets/grading.js" defer></script>
   <script src="../assets/app.js" defer></script>
   <script src="../assets/uav-quiz.js" defer></script>
 </head>
@@ -23,6 +24,7 @@
         <a href="../pages/glossary.html">Глоссарий</a>
         <a href="../pages/fails.html">Фейлы</a>
         <a href="../pages/search.html">Поиск</a>
+        <a href="../pages/progress.html">Мой прогресс</a>
       </nav>
     </div>
   </header>
@@ -30,7 +32,8 @@
     <article class="module" data-module-page="link-protocols">
       <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-operator">Оператор</a><span>SBUS, CRSF и инверсия UART</span></p>
       <h1 class="module-title">SBUS, CRSF и инверсия UART</h1>
-      <div class="module-tags"><span class="gc-tag" title="Уровень">L1 — Оператор</span><span class="gc-tag">чтение 15 мин</span><span class="gc-tag">учёба ~1.5 ч</span><span class="gc-tag">CRSF / SBUS</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></div>
+      <div class="module-tags"><span class="gc-tag" title="Уровень">L1 — Оператор</span><span class="gc-tag">чтение 15 мин</span><span class="gc-tag">учёба ~1.5 ч</span><span class="gc-tag">CRSF / SBUS</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ОСВОЕН</span></div>
+      <p class="gc-muted module-score" data-module-score></p>
       <p class="module-lead">Приёмник передаёт полётному контроллеру положения стиков по одному из serial-протоколов. Сегодня два главных — старый SBUS (FrSky, Futaba) и CRSF (TBS Crossfire, ExpressLRS). Модуль объясняет физическую разницу между ними, что такое «инвертированный» сигнал, почему с SBUS были вечные проблемы на F4-контроллерах и как правильно подключить каждый протокол.</p>
       <div class="gc-callout" data-state="ok"><strong>После модуля ты умеешь</strong><ul><li>подключить CRSF и SBUS правильно</li><li>объяснить инверсию UART</li></ul></div><p class="gc-muted">Перед этим модулем: <a href="bf-ports.html">Порты и приёмник</a></p><div class="gc-callout lab"><p class="gc-label gc-muted">Лабораторная</p><strong>Подключить приёмник правильно</strong><p class="gc-muted lab__hint">Сдано, когда отмечены все пункты:</p><ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="link-protocols:lab:0"><span>Протокол приёмника определён (SBUS/CRSF)</span></label></li><li><label><input type="checkbox" data-check-id="link-protocols:lab:1"><span>serialrx_inverted и serialrx_halfduplex проверены через get</span></label></li><li><label><input type="checkbox" data-check-id="link-protocols:lab:2"><span>Для CRSF: телеметрия видна на пульте</span></label></li></ul></div><div class="path-pos gc-muted"><span class="gc-label">В пути</span><ul><li><a href="../path/betaflight.html">Betaflight</a>: шаг 9 из 21 → <a href="bf-modes-osd.html">Режимы и OSD</a></li><li><a href="../path/inav.html">INAV</a>: шаг 6 из 12 → <a href="link-elrs.html">ExpressLRS: packet rate, телеметрия, LQ</a></li></ul></div>
       <div class="gc-prose module-body">

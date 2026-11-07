@@ -10,6 +10,7 @@
   <link rel="stylesheet" href="../assets/site.css">
   <script src="../lib/ground-control-ui/dist/ground-control.js" defer></script>
   <script src="../assets/progress-store.js" defer></script>
+  <script src="../assets/grading.js" defer></script>
   <script src="../assets/app.js" defer></script>
   <script src="../assets/uav-quiz.js" defer></script>
 </head>
@@ -23,6 +24,7 @@
         <a href="../pages/glossary.html">Глоссарий</a>
         <a href="../pages/fails.html">Фейлы</a>
         <a href="../pages/search.html">Поиск</a>
+        <a href="../pages/progress.html">Мой прогресс</a>
       </nav>
     </div>
   </header>
@@ -30,7 +32,8 @@
     <article class="module" data-module-page="f-physics">
       <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-foundation">Фундамент</a><span>Как летает мультиротор</span></p>
       <h1 class="module-title">Как летает мультиротор</h1>
-      <div class="module-tags"><span class="gc-tag" title="Уровень">L1 — Оператор</span><span class="gc-tag">чтение 15 мин</span><span class="gc-tag">учёба ~2 ч</span><span class="gc-tag">любая прошивка</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></div>
+      <div class="module-tags"><span class="gc-tag" title="Уровень">L1 — Оператор</span><span class="gc-tag">чтение 15 мин</span><span class="gc-tag">учёба ~2 ч</span><span class="gc-tag">любая прошивка</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ОСВОЕН</span></div>
+      <p class="gc-muted module-score" data-module-score></p>
       <p class="module-lead">У мультиротора нет рулей: всё управление — это изменение оборотов моторов. Модуль объясняет, как из четырёх (шести, восьми) пропеллеров получаются газ, крен, тангаж и рыскание, зачем пропы крутятся в разные стороны, что такое миксер и почему отношение тяги к весу определяет характер дрона. Это фундамент, на котором стоят PID, фильтры и вообще вся настройка.</p>
       <div class="gc-callout" data-state="ok"><strong>После модуля ты умеешь</strong><ul><li>объяснить тягу, моменты и как миксер превращает команды в обороты моторов</li><li>объяснить, зачем пропеллеры крутятся в разные стороны</li></ul></div><div class="gc-callout lab"><p class="gc-label gc-muted">Лабораторная</p><strong>Посчитать T/W своей сборки</strong><p class="gc-muted lab__hint">Сдано, когда отмечены все пункты:</p><ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="f-physics:lab:0"><span>Записаны вес с АКБ и максимальная тяга по даташиту мотора</span></label></li><li><label><input type="checkbox" data-check-id="f-physics:lab:1"><span>T/W посчитан и записан в журнал дрона</span></label></li><li><label><input type="checkbox" data-check-id="f-physics:lab:2"><span>Газ висения из лога сравнён с 1/(T/W)</span></label></li><li><label><input type="checkbox" data-check-id="f-physics:lab:3"><span>Порядок и направление всех моторов проверены без пропов</span></label></li></ul></div><div class="path-pos gc-muted"><span class="gc-label">В пути</span><ul><li><a href="../path/betaflight.html">Betaflight</a>: шаг 1 из 21 → <a href="f-power.html">Питание: LiPo, Li-Ion, BEC</a></li><li><a href="../path/inav.html">INAV</a>: шаг 1 из 12 → <a href="f-power.html">Питание: LiPo, Li-Ion, BEC</a></li><li><a href="../path/ardupilot.html">ArduPilot</a>: шаг 1 из 20 → <a href="f-power.html">Питание: LiPo, Li-Ion, BEC</a></li><li><a href="../path/px4.html">PX4</a>: шаг 1 из 11 → <a href="f-fc-sensors.html">Полётный контроллер и сенсоры</a></li></ul></div>
       <div class="gc-prose module-body">

@@ -10,6 +10,7 @@
   <link rel="stylesheet" href="../assets/site.css">
   <script src="../lib/ground-control-ui/dist/ground-control.js" defer></script>
   <script src="../assets/progress-store.js" defer></script>
+  <script src="../assets/grading.js" defer></script>
   <script src="../assets/app.js" defer></script>
   <script src="../assets/uav-quiz.js" defer></script>
 </head>
@@ -23,6 +24,7 @@
         <a href="../pages/glossary.html">Глоссарий</a>
         <a href="../pages/fails.html">Фейлы</a>
         <a href="../pages/search.html">Поиск</a>
+        <a href="../pages/progress.html">Мой прогресс</a>
       </nav>
     </div>
   </header>
@@ -30,7 +32,8 @@
     <article class="module" data-module-page="ap-intro">
       <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-autonomy">Автономия</a><span>Введение в ArduPilot</span></p>
       <h1 class="module-title">Введение в ArduPilot</h1>
-      <div class="module-tags"><span class="gc-tag" title="Уровень">L2 — Интегратор</span><span class="gc-tag">чтение 20 мин</span><span class="gc-tag">учёба ~2 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></div>
+      <div class="module-tags"><span class="gc-tag" title="Уровень">L2 — Интегратор</span><span class="gc-tag">чтение 20 мин</span><span class="gc-tag">учёба ~2 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ОСВОЕН</span></div>
+      <p class="gc-muted module-score" data-module-score></p>
       <p class="module-lead">ArduPilot — автопилот, а не просто стабилизатор. Если Betaflight делает квадрокоптер послушным под стиками, то ArduPilot знает, где он находится, куда летит и что делать без пилота. Модуль объясняет, чем мышление в ArduPilot отличается от Betaflight: параметры вместо CLI-дифов, режимы полёта как уровни автономности, наземная станция, pre-arm проверки и требования к железу. После него открывается весь трек «Автономия».</p>
       <div class="gc-callout" data-state="ok"><strong>После модуля ты умеешь</strong><ul><li>объяснить параметры, режимы и отличия от Betaflight</li></ul></div><p class="gc-muted">Перед этим модулем: <a href="bf-failsafe.html">Failsafe: стадии и тест по свитчу</a></p><div class="gc-callout lab"><p class="gc-label gc-muted">Лабораторная</p><strong>Знакомство в SITL</strong><p class="gc-muted lab__hint">Сдано, когда отмечены все пункты:</p><ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="ap-intro:lab:0"><span>Параметры сохранены в файл с датой</span></label></li><li><label><input type="checkbox" data-check-id="ap-intro:lab:1"><span>FRAME_CLASS/FRAME_TYPE найдены и объяснены</span></label></li><li><label><input type="checkbox" data-check-id="ap-intro:lab:2"><span>Режимы STABILIZE→ALT_HOLD→LOITER переключены, зависимость от GPS понята</span></label></li></ul></div><div class="path-pos gc-muted"><span class="gc-label">В пути</span><ul><li><a href="../path/ardupilot.html">ArduPilot</a>: шаг 7 из 20 → <a href="ap-sitl.html">SITL: дрон без дрона</a></li></ul></div>
       <div class="gc-prose module-body">

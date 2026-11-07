@@ -10,6 +10,7 @@
   <link rel="stylesheet" href="../assets/site.css">
   <script src="../lib/ground-control-ui/dist/ground-control.js" defer></script>
   <script src="../assets/progress-store.js" defer></script>
+  <script src="../assets/grading.js" defer></script>
   <script src="../assets/app.js" defer></script>
   <script src="../assets/uav-quiz.js" defer></script>
 </head>
@@ -23,6 +24,7 @@
         <a href="../pages/glossary.html">Глоссарий</a>
         <a href="../pages/fails.html">Фейлы</a>
         <a href="../pages/search.html">Поиск</a>
+        <a href="../pages/progress.html">Мой прогресс</a>
       </nav>
     </div>
   </header>
@@ -30,7 +32,8 @@
     <article class="module" data-module-page="bf-pid">
       <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-integrator">Интегратор</a><span>PID-тюнинг по данным</span></p>
       <h1 class="module-title">PID-тюнинг по данным</h1>
-      <div class="module-tags"><span class="gc-tag" title="Уровень">L2 — Интегратор</span><span class="gc-tag">чтение 30 мин</span><span class="gc-tag">учёба ~4 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></div>
+      <div class="module-tags"><span class="gc-tag" title="Уровень">L2 — Интегратор</span><span class="gc-tag">чтение 30 мин</span><span class="gc-tag">учёба ~4 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ОСВОЕН</span></div>
+      <p class="gc-muted module-score" data-module-score></p>
       <p class="module-lead">«Чётче», «мягче», «качает», «греется» — ощущения пилота, которые можно перевести в числа из лога и сравнить профили между собой честно. Модуль даёт рабочий метод: фильтры до PID, один параметр за шаг, четыре профиля в одном полёте, пять метрик по манёврам. Кейс — эксперимент на двух одинаковых 7&quot;: четыре профиля, что совпало с ощущениями, что нет, и почему итогом стал не новый PID, а новые фильтры.</p>
       <div class="gc-callout" data-state="ok"><strong>После модуля ты умеешь</strong><ul><li>построить A/B-профили</li><li>сравнить по bounce-back и задержке входа</li></ul></div><p class="gc-muted">Перед этим модулем: <a href="bf-rpm-filter.html">RPM-фильтр: кейс «свистящего» 10&quot;</a></p><div class="gc-callout lab"><p class="gc-label gc-muted">Лабораторная</p><strong>Четыре профиля, один вылет</strong><p class="gc-muted lab__hint">Сдано, когда отмечены все пункты:</p><ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="bf-pid:lab:0"><span>Контрольный профиль сохранён в слоте</span></label></li><li><label><input type="checkbox" data-check-id="bf-pid:lab:1"><span>Профили отличаются одним-двумя слайдерами</span></label></li><li><label><input type="checkbox" data-check-id="bf-pid:lab:2"><span>Одна программа полёта, session_notes заполнены</span></label></li><li><label><input type="checkbox" data-check-id="bf-pid:lab:3"><span>Медианы bounce-back, entry lag, motor noise посчитаны и сравнены</span></label></li></ul></div><div class="path-pos gc-muted"><span class="gc-label">В пути</span><ul><li><a href="../path/betaflight.html">Betaflight</a>: шаг 18 из 21 → <a href="bf-cli.html">CLI и remap</a></li></ul></div>
       <div class="gc-prose module-body">
