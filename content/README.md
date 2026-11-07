@@ -12,11 +12,11 @@
 1. **Новая статья:** `python scripts/new_article.py <section> <id> "Заголовок" L2` — создаёт `.md` и строку в манифесте со статусом `draft` (по умолчанию). Когда текст готов — поставить `published` в манифесте и front matter.
 2. Заполнить **`content/<stack>/<id>.md`**: `summary`, `theory`, `practice`, `diagnostics`, `references`, опционально `checklist`, `notes`, …
 3. Слот в программе без текста: `--status planned` (видно на сайте как «скоро»).
-4. **Публикация:** `publish.bat` / `publish.sh`, или напрямую `python scripts/publish.py` — валидация, генерация TOC и HTML статей, подстановка в **`index.html`** между комментариями `<!-- AUTO:TOC:... -->` / `<!-- AUTO:ARTICLES:... -->` / `<!-- AUTO:PROGRESS:... -->`.
-5. Только проверка — `python scripts/validate_content.py`. То же самое выполняет CI на каждый push.
-6. Windows: **`publish.bat`** (вызов `publish.py`).
+4. **Публикация:** `publish.bat` / `publish.sh` или `python scripts/publish.py` — валидация, сборка всех страниц сайта, проверка ссылок.
+5. **Место в курсе:** добавь модуль в нужный трек в `data/curriculum.json` (цели, prerequisites, часы). Validator не пропустит статью, не размещённую в курсе.
+6. Только проверка — `python scripts/validate_content.py`. То же самое выполняет CI на каждый push.
 
 
-**Важно:** блоки `orientation-guide` и таб-бар в `index.html` не трогаются; перезаписываются только участки между маркерами AUTO.
+**Важно:** `index.html`, `m/`, `ref/`, `pages/`, `api/` генерируются целиком — руками их не правят. Ручные страницы (глоссарий, фейлы и т.д.) живут в `content/pages/*.html`.
 
 Строка в Changelog — **`PROJECT-DIRECTIVES.md`**.

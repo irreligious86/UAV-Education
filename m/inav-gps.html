@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>GPS-навигация в INAV — UAV Student</title>
+  <meta name="description" content="Инженерный курс по БПЛА: от физики полёта до своих прошивок и бортовых компьютеров.">
+  <link rel="stylesheet" href="../lib/ground-control-ui/dist/ground-control.css">
+  <link rel="stylesheet" href="../assets/site.css">
+  <script src="../lib/ground-control-ui/dist/ground-control.js" defer></script>
+  <script src="../assets/progress-store.js" defer></script>
+  <script src="../assets/app.js" defer></script>
+</head>
+<body class="gc-root">
+  <header class="site-header">
+    <div class="gc-container site-header__inner">
+      <a class="site-brand" href="../index.html"><span class="site-brand__mark" aria-hidden="true">◆</span> UAV Student</a>
+      <nav class="gc-nav" aria-label="Разделы сайта">
+        <a href="../index.html" aria-current="page">Курс</a>
+        <a href="../ref/index.html">Справочник</a>
+        <a href="../pages/glossary.html">Глоссарий</a>
+        <a href="../pages/fails.html">Фейлы</a>
+      </nav>
+    </div>
+  </header>
+  <main class="gc-container site-main">
+    <article class="module" data-module-page="inav-gps">
+      <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-inav">Электив: INAV</a><span>GPS-навигация в INAV</span></p>
+      <h1 class="module-title">GPS-навигация в INAV</h1>
+      <div class="module-tags"><span class="gc-tag" title="Уровень">L2 — Интегратор</span><span class="gc-tag">чтение 20 мин</span><span class="gc-tag">учёба ~3 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></div>
+      <p class="module-lead">Базовая логика настройки GPS и компаса для устойчивой навигации в INAV: фиксация позиции, курс и условия для удержания и возврата домой.</p>
+      
+      <div class="gc-prose module-body">
+<h2>Теория</h2>
+<p>INAV использует <strong>GPS</strong> для оценки горизонтальной позиции и скорости, <strong>магнитометр</strong> — для курса (при корректной ориентации и калибровке), <strong>барометр</strong> — для высоты. Без устойчивого 3D Fix и согласованного компаса режимы удержания позиции и RTH будут нестабильны или опасны.</p>
+
+<h2>Практика</h2>
+<ol><li>Подключите GPS к свободному <strong>UART</strong> согласно распиновке и схеме питания (3.3 V / 5 V — по даташиту модуля).</li><li>В Configurator включите соответствующий порт как <strong>GPS</strong>, выставьте корректный <strong>baud rate</strong> (часто 57600 или 115200 — по документации приёмника).</li><li>Убедитесь, что в статусе видно определение устройства и поток данных (спутники / fix).</li><li>Выполните <strong>калибровку компаса</strong> вдали от металла и источников помех; проверьте ориентацию датчика в конфигурации.</li><li>На открытой площадке дождитесь <strong>устойчивого 3D Fix</strong>, затем сохраните <strong>home</strong> и проведите короткий тест в безопасных условиях.</li></ol>
+
+<h2>Диагностика</h2>
+<ul class="diag-list"><li><strong>Нет fix / мало спутников:</strong> антенна, обзор неба, питание, помехи, некорректный порт или скорость UART.</li><li><strong>«Плавает» позиция:</strong> плохой fix, окружение (отражатели), необходимость перенастройки PD или проверки вибраций (см. фильтры/монтаж).</li><li><strong>Неверный курс / «кружит»:</strong> калибровка компаса, ориентация MAG, интерференция, конфликт с металлом/силовой проводкой.</li></ul>
+
+<h2>Заметки</h2>
+<h4 class="md-subheading">Oscar Liang · GPS basics</h4>
+<p>Полезен как <strong>вторичный</strong> практический обзор; сверять формулировки с официальной wiki и релизными заметками INAV.</p>
+
+<h2>Чек-лист</h2>
+<ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="inav-gps:0"><span>GPS определяется в конфигураторе и выдаёт данные</span></label></li><li><label><input type="checkbox" data-check-id="inav-gps:1"><span>Компас откалиброван, ориентация проверена</span></label></li><li><label><input type="checkbox" data-check-id="inav-gps:2"><span>Есть устойчивый <strong>3D Fix</strong> перед навигационными режимами</span></label></li><li><label><input type="checkbox" data-check-id="inav-gps:3"><span>Домашняя точка и логика RTH проверены в безопасной зоне</span></label></li></ul>
+
+<h2>Источники</h2>
+<ul class="refs"><li><a href="https://github.com/iNavFlight/inav/blob/master/docs/GPS.md" target="_blank" rel="noopener noreferrer">INAV Wiki (официально)</a> <span class="gc-tag" data-state="info">primary | A</span></li></ul>
+      </div>
+      <div class="module-done"><gc-button variant="secondary" data-done-toggle="inav-gps">Отметить как пройденный</gc-button></div>
+      <nav class="pager" aria-label="Соседние модули"><a class="gc-card pager__prev" href="inav-intro.html"><span class="gc-label gc-muted">Назад</span><br>Введение в INAV</a><a class="gc-card pager__next" href="inav-wing.html"><span class="gc-label gc-muted">Дальше</span><br>Настройка крыла</a></nav>
+    </article>
+  </main>
+  <footer class="gc-container site-footer gc-muted">
+    <p>Открытый курс · <a href="https://github.com/irreligious86/UAV-Education">исходники на GitHub</a> · <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">план развития</a> · <a href="../curriculum/curriculum.html">для разработчика</a> · CC BY-NC-SA 4.0</p>
+  </footer>
+</body>
+</html>

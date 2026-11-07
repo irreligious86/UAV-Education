@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Общая логика: парсинг .md, рендер HTML, маркеры index.html."""
+"""Shared Markdown parsing and HTML fragment rendering used by build_site.py."""
 from __future__ import annotations
 
 import html
@@ -9,15 +9,13 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 MANIFEST_PATH = ROOT / "data" / "content-manifest.json"
-INDEX_PATH = ROOT / "index.html"
-BUILD_DIR = ROOT / "build"
 
 REQUIRED_MD_HEADINGS = ("summary", "theory", "practice", "diagnostics", "references")
 
 # Article lifecycle:
 #   published — real content, rendered in full
-#   planned   — slot reserved in the course map; rendered as a "coming soon" card
-#   draft     — work in progress; hidden unless --include-drafts
+#   planned   — slot reserved in the course map; module page shows goals + "in progress"
+#   draft     — work in progress; not built into the site
 VALID_STATUSES = ("published", "planned", "draft")
 
 ROADMAP_URL = "https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md"
@@ -265,54 +263,6 @@ def parse_yaml_references(fm: str) -> list[tuple[str, str, str]]:
     return out
 
 
-def render_references_html(
-    refs_body: str, fm: str | None
-) -> str:
-    items: list[tuple[str, str, str]] = parse_pipe_references(refs_body)
-    if not items and fm:
-        items = parse_yaml_references(fm)
-    if not items:
-        return ""
-    lis = []
-    for title, url, tier in items:
-        if not url:
-            continue
-        lis.append(
-            f'<li>\n              <a href="{html.escape(url)}" class="doc-link" '
-            f'target="_blank" rel="noopener noreferrer">{html.escape(title)}</a>\n'
-            f'              <span class="tag">{html.escape(tier)}</span>\n            </li>'
-        )
-    if not lis:
-        return ""
-    return (
-        '        <div class="references">\n'
-        '          <h4>📚 Источники</h4>\n'
-        "          <ul>\n"
-        + "\n".join(lis)
-        + "\n          </ul>\n        </div>"
-    )
-
-
-def render_checklist_html(block: str, article_id: str) -> str:
-    block = block.strip()
-    if not block:
-        return ""
-    lines = [ln.strip()[2:].strip() for ln in block.splitlines() if ln.strip().startswith("- ")]
-    if not lines:
-        return ""
-    cid = f"{article_id}-checklist"
-    items = "".join(
-        f'\n            <li><label><input type="checkbox"> {format_inline(t)}</label></li>'
-        for t in lines
-    )
-    return (
-        f'        <div class="checklist" id="{html.escape(cid)}">\n'
-        f"          <h4>✅ Чек-лист</h4>\n"
-        f'          <ul class="checklist-list">{items}\n'
-        f"          </ul>\n        </div>"
-    )
-
-
 def firmware_for_article(article: dict, fm: str | None) -> str:
     if article.get("firmware"):
         return str(article["firmware"])
@@ -324,172 +274,3 @@ def firmware_for_article(article: dict, fm: str | None) -> str:
     if tags:
         return str(tags[0])
     return "—"
-
-
-def render_planned_html(article: dict) -> str:
-    aid = html.escape(article["id"])
-    level = article.get("level", "L1")
-    title = html.escape(article.get("title", article["id"]))
-    return "\n".join(
-        [
-            f'      <article id="{aid}" class="card card--planned" data-level="{html.escape(level)}" data-status="planned">',
-            f"        <h2>{title}</h2>",
-            '        <div class="article-meta">',
-            f'          <span class="tag">Уровень: {html.escape(LEVEL_LABELS.get(level, level))}</span>',
-            '          <span class="tag tag--planned">🚧 В разработке</span>',
-            "        </div>",
-            '        <p class="muted">Модуль запланирован в программе курса, но ещё не написан. '
-            f'План развития — в <a class="doc-link" href="{ROADMAP_URL}" target="_blank" rel="noopener noreferrer">ROADMAP</a>.</p>',
-            "      </article>",
-        ]
-    )
-
-
-def render_article_html(article: dict, include_drafts: bool = False) -> str:
-    st = article.get("status", "published")
-    if st == "draft" and not include_drafts:
-        return ""
-    if st == "planned":
-        return render_planned_html(article)
-
-    path = ROOT / article["sourceFile"]
-    if not path.is_file():
-        return f"<!-- ERROR: нет файла {article['sourceFile']} -->\n"
-
-    raw = path.read_text(encoding="utf-8")
-    fm = parse_front_matter(raw)
-    body = strip_front_matter(raw)
-
-    summary = extract_section(body, "summary")
-    theory = extract_section(body, "theory")
-    practice = extract_section(body, "practice")
-    diagnostics = extract_section(body, "diagnostics")
-    refs = extract_section(body, "references")
-    checklist = extract_section(body, "checklist")
-    notes = extract_section(body, "notes")
-
-    aid = article["id"]
-    title = article.get("title", aid)
-    level = article.get("level", "L1")
-    rt = article.get("readingTime", "—")
-    fw = firmware_for_article(article, fm)
-
-    meta_parts = [
-        f'<span class="tag">Уровень: {html.escape(LEVEL_LABELS.get(level, level))}</span>',
-        f'<span class="tag">Время чтения: {html.escape(str(rt))}</span>',
-        f'<span class="tag">{html.escape(fw)}</span>',
-    ]
-    for t in (article.get("tags") or [])[:2]:
-        if str(t) != fw:
-            meta_parts.append(f'<span class="tag">{html.escape(str(t))}</span>')
-
-    data_added = "2026-03-21"
-    if fm:
-        m = re.search(r"^added:\s*(.+)$", fm, re.MULTILINE)
-        if m:
-            data_added = m.group(1).strip()
-
-    parts: list[str] = [
-        f'      <article id="{html.escape(aid)}" class="card" data-level="{html.escape(level)}" data-added="{html.escape(data_added)}">',
-        f"        <h2>{html.escape(title)}</h2>",
-        f'        <p class="muted">{format_inline(summary) if summary else ""}</p>',
-        '        <div class="article-meta">',
-    ]
-    parts.extend(f"          {p}" for p in meta_parts)
-    parts.append("        </div>")
-    parts.append("")
-    parts.append("        <h3>📖 Теория</h3>")
-    parts.append(block_to_paragraphs(theory) if theory else "<p></p>")
-    parts.append("")
-    parts.append("        <h3>🛠 Практика</h3>")
-    parts.append(block_to_paragraphs(practice) if practice else "<p></p>")
-    parts.append("")
-    parts.append("        <h3>🔍 Диагностика</h3>")
-    parts.append(diagnostics_to_html(diagnostics) if diagnostics else "<p></p>")
-    parts.append("")
-
-    ref_html = render_references_html(refs, fm)
-    if ref_html:
-        parts.append(ref_html)
-
-    if notes.strip():
-        parts.append("        <section class=\"article-notes\" aria-labelledby=\"{0}-notes-title\">".format(aid))
-        parts.append(f'          <h4 id="{aid}-notes-title">🗂 Заметки (из Markdown)</h4>')
-        parts.append(f'          <div class="muted">{block_to_paragraphs(notes)}</div>')
-        parts.append("        </section>")
-
-    ch = render_checklist_html(checklist, aid)
-    if ch:
-        parts.append(ch)
-
-    parts.append("      </article>")
-    return "\n".join(parts)
-
-
-def render_toc_html(section: dict, articles: list[dict]) -> str:
-    title = section.get("title", section["sectionKey"])
-    aria = f"Содержание раздела {title}"
-    items: list[str] = []
-    for i, a in enumerate(articles, start=1):
-        num = str(i).zfill(2)
-        planned = a.get("status") == "planned"
-        cls = ' class="toc__item--planned"' if planned else ""
-        soon = '\n          <span class="toc__soon">скоро</span>' if planned else ""
-        items.append(
-            f'        <a href="#{a["id"]}"{cls}>\n'
-            f'          <span class="toc__num">{num}</span>\n'
-            f'          <span class="toc__level">{html.escape(a["level"])}</span>\n'
-            f'          <span class="toc__label">{html.escape(a["title"])}</span>{soon}\n'
-            f"        </a>"
-        )
-    inner = "\n".join(items)
-    return (
-        f'      <nav class="toc toc--enhanced" aria-label="{html.escape(aria)}">\n'
-        f"{inner}\n"
-        f"      </nav>"
-    )
-
-
-def render_progress_html(section: dict, articles: list[dict]) -> str:
-    """Honest progress: written modules out of all modules shown in the section."""
-    sk = section["sectionKey"]
-    title = section.get("title", sk)
-    label = f"Раздел {title}"
-    total = len(articles)
-    done = sum(1 for a in articles if a.get("status") == "published")
-    pct = round(100 * done / total) if total else 0
-    stats = f"готово {done} из {total} модулей" if total else "0 модулей"
-    aria = f"Готово {done} из {total} модулей"
-    return f"""      <div class="section-progress" aria-label="Прогресс раздела {html.escape(title)}">
-        <span class="section-progress__label">{html.escape(label)}</span>
-        <span class="section-progress__bar" role="progressbar" aria-valuenow="{done}" aria-valuemin="0" aria-valuemax="{total}" aria-label="{html.escape(aria)}">
-          <span class="section-progress__fill" style="width:{pct}%"></span>
-        </span>
-        <span class="section-progress__stats">{html.escape(stats)}</span>
-      </div>"""
-
-
-def replace_between_markers(html: str, start: str, end: str, inner: str) -> tuple[str, bool]:
-    pattern = re.escape(start) + r".*?" + re.escape(end)
-    repl = start + "\n" + inner.rstrip() + "\n" + end
-    new_html, n = re.subn(pattern, repl, html, count=1, flags=re.DOTALL)
-    return new_html, n == 1
-
-
-def filter_articles(
-    section: dict, include_drafts: bool
-) -> list[dict]:
-    arts = section.get("articles", [])
-    out = []
-    level_order = {"L1": 1, "L2": 2, "L3": 3, "L4": 4}
-    for a in arts:
-        st = a.get("status", "published")
-        if st in ("published", "planned") or (include_drafts and st == "draft"):
-            out.append(a)
-    return sorted(
-        out,
-        key=lambda x: (
-            level_order.get(str(x.get("level", "")).upper(), 99),
-            int(x.get("order", 0)),
-        ),
-    )

@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Failsafe: стадии и тест по свитчу — UAV Student</title>
+  <meta name="description" content="выбрать процедуру Stage 2 проверить failsafe тумблером без пропов и в воздухе">
+  <link rel="stylesheet" href="../lib/ground-control-ui/dist/ground-control.css">
+  <link rel="stylesheet" href="../assets/site.css">
+  <script src="../lib/ground-control-ui/dist/ground-control.js" defer></script>
+  <script src="../assets/progress-store.js" defer></script>
+  <script src="../assets/app.js" defer></script>
+</head>
+<body class="gc-root">
+  <header class="site-header">
+    <div class="gc-container site-header__inner">
+      <a class="site-brand" href="../index.html"><span class="site-brand__mark" aria-hidden="true">◆</span> UAV Student</a>
+      <nav class="gc-nav" aria-label="Разделы сайта">
+        <a href="../index.html" aria-current="page">Курс</a>
+        <a href="../ref/index.html">Справочник</a>
+        <a href="../pages/glossary.html">Глоссарий</a>
+        <a href="../pages/fails.html">Фейлы</a>
+      </nav>
+    </div>
+  </header>
+  <main class="gc-container site-main">
+    <article class="module" data-module-page="bf-failsafe">
+      <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-operator">Оператор</a><span>Failsafe: стадии и тест по свитчу</span></p>
+      <h1 class="module-title">Failsafe: стадии и тест по свитчу</h1>
+      <div class="module-tags"><span class="gc-tag" title="Уровень">L1 — Оператор</span><span class="gc-tag">чтение 20 мин</span><span class="gc-tag">учёба ~2 ч</span><span class="gc-tag">Betaflight 4.5+</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></div>
+      <p class="module-lead">Failsafe — то, что дрон делает, когда пропала связь с пультом. В Betaflight 4.3+ это двухстадийный процесс: короткая «защитная» Stage 1, затем Stage 2 с выбранной процедурой (DROP, AUTO-LAND или GPS_RESCUE). Модуль объясняет, как это устроено, как выбрать процедуру под свой дрон и как безопасно проверить failsafe тумблером, не выключая пульт в воздухе.</p>
+      <div class="gc-callout" data-state="ok"><strong>После модуля ты умеешь</strong><ul><li>выбрать процедуру Stage 2</li><li>проверить failsafe тумблером без пропов и в воздухе</li></ul></div><p class="gc-muted">Перед этим модулем: <a href="bf-modes-osd.html">Режимы и OSD</a></p><div class="gc-callout"><strong>Лабораторная</strong><div>Тест failsafe по свитчу с записью в журнал</div></div>
+      <div class="gc-prose module-body">
+<h2>Теория</h2>
+<h4 class="md-subheading">Как Betaflight понимает, что связь потеряна</h4>
+<p>Если 100 мс нет валидных пакетов, сигнал считается потерянным. Ещё 300 мс удерживаются последние значения, после чего включается Stage 1. Отсчёт до Stage 2 идёт от последнего хорошего пакета.</p>
+<h4 class="md-subheading">Stage 1 — защитный интервал</h4>
+<p>Длится <code>failsafe_delay</code> (в десятых долях секунды: 15 = 1.5 с; дефолт 1.5 с в 4.5, 1.0 с в 4.4). По умолчанию стики в центре, газ на нуле, положения тумблеров удерживаются. Значения для каждого канала задаются в Configurator (Channel fallback) или командой <code>rxfail</code>. Если связь вернулась во время Stage 1, управление возвращается мгновенно.</p>
+<h4 class="md-subheading">Stage 2 — процедура</h4>
+<p>Выбирается параметром <code>failsafe_procedure</code>:</p>
+<ul><li><code>DROP</code> (дефолт) — мгновенный дизарм, моторы стоп. Повторный арм возможен после ≥3 с стабильной связи и выключенного тумблера ARM.</li><li><code>AUTO-LAND</code> — стики в центре, газ на <code>failsafe_throttle</code>, режимы Stage 1 применены, через <code>failsafe_off_delay</code> — дизарм. Повторный арм блокируется минимум на 30 с связи.</li><li><code>GPS_RESCUE</code> — нужен GPS: дрон летит домой и садится. Для возврата управления нужна связь <code>failsafe_recovery_delay</code> и отклонение стиков больше 30°.</li></ul>
+<p>Тонкость: если газ был на минимуме ≥10 с перед Stage 2, срабатывает простой дизарм (кроме GPS Rescue). Stage 2 невозможен первые 5 с после загрузки.</p>
+<h4 class="md-subheading">Что выбрать</h4>
+<p>DROP — честный выбор для фристайла над безопасной зоной: дрон падает рядом, а не улетает. AUTO-LAND с газом чуть ниже висения даёт контролируемое снижение — разумно для тяжёлых 7–10&quot; и полётов над людьми/техникой, но требует подобрать <code>failsafe_throttle</code> под конкретный дрон. AUTO-LAND без самовыравнивания бессмыслен: в Stage 1 на fallback-каналах должен включаться ANGLE.</p>
+<h4 class="md-subheading">Тест тумблером: failsafe_switch_mode</h4>
+<p>Режим FAILSAFE на AUX-канале позволяет вызвать failsafe не выключая пульт:</p>
+<ul><li><code>STAGE1</code> — сразу Stage 1, AUX-каналы остаются активны. Держишь тумблер дольше <code>failsafe_delay</code> — переход в Stage 2. Отпустил — управление вернулось. Это самый честный тест: он повторяет реальную потерю связи.</li><li><code>STAGE2</code> — сразу выбранная процедура Stage 2, отпускание возвращает управление.</li><li><code>KILL</code> — мгновенный дизарм. Один глитч канала = падение. Не для полётов.</li></ul>
+
+<h2>Практика</h2>
+<h4 class="md-subheading">Шаг 1. Посмотреть текущие значения</h4>
+<p>Не заучивай дефолты — читай их с конкретного контроллера:</p>
+<pre class="cli-block"><code>get failsafe
+rxfail</code></pre>
+<h4 class="md-subheading">Шаг 2. Настроить AUTO-LAND с тестом по тумблеру</h4>
+<p>Пример из практики (7&quot;, тумблер failsafe на AUX6):</p>
+<pre class="cli-block"><code>set failsafe_procedure = AUTO-LAND
+set failsafe_switch_mode = STAGE1
+set failsafe_delay = 15
+set failsafe_throttle = 1250
+set failsafe_off_delay = 100
+save</code></pre>
+<p>Затем во вкладке Modes повесь FAILSAFE на тумблер, а в Channel fallback для канала ANGLE поставь значение, включающее ANGLE. Иначе на AUTO-LAND дрон снижается без выравнивания.</p>
+<h4 class="md-subheading">Шаг 3. Подобрать газ failsafe по логу</h4>
+<ol><li>Сделай полёт с висением и логом Blackbox.</li><li>Найди медианный газ висения (поле <code>rcCommand[3]</code> или motor average).</li><li>Поставь <code>failsafe_throttle</code> чуть ниже висения — цель около 1 м/с снижения. У тяжёлого 10&quot; это может быть 1350, у лёгкого 7&quot; — 1250: значение индивидуально.</li></ol>
+<h4 class="md-subheading">Шаг 4. Тест</h4>
+<ol><li>Без пропов: арм, тумблер failsafe, убедись, что в OSD <code>FAILSAFE</code>, моторы ведут себя как ожидалось, после отпускания управление возвращается.</li><li>С пропами, на высоте 5–10 м над мягкой поверхностью: в ANGLE включить тумблер на 2–3 с, отпустить. Повторить с удержанием дольше <code>failsafe_delay</code>.</li><li>Записать в журнал дрона дату теста и параметры.</li></ol>
+
+<h2>Диагностика</h2>
+<div class="diag-groups"><article class="diag-item"><h4><strong>Симптом:</strong> после failsafe дрон не армится, в OSD <code>NOT_DISARMED</code></h4><ul><li>Возможная причина: тумблер ARM остался включённым.</li><li>Что сделать: выключить и снова включить ARM после <code>failsafe_recovery_delay</code>.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> на AUTO-LAND дрон кувыркается или уходит в сторону</h4><ul><li>Возможная причина: в Stage 1 не включается ANGLE (fallback канала режима не настроен).</li><li>Что сделать: настроить Channel fallback / <code>rxfail</code> для канала ANGLE.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> на AUTO-LAND дрон набирает высоту</h4><ul><li>Возможная причина: <code>failsafe_throttle</code> выше газа висения (например, после смены АКБ или пропов).</li><li>Что сделать: пересчитать газ висения по свежему логу.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> RXLOSS / failsafe в обычном полёте</h4><ul><li>Возможная причина: слабый линк (антенна приёмника, packet rate, мощность TX).</li><li>Что сделать: смотреть RSSI/LQ в логе, см. модуль про ExpressLRS.</li></ul></article></div>
+
+<h2>Чек-лист</h2>
+<ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="bf-failsafe:0"><span>Выбрана процедура Stage 2 и понятно, почему именно она</span></label></li><li><label><input type="checkbox" data-check-id="bf-failsafe:1"><span>FAILSAFE назначен на тумблер с <code>failsafe_switch_mode = STAGE1</code></span></label></li><li><label><input type="checkbox" data-check-id="bf-failsafe:2"><span>Для AUTO-LAND: fallback включает ANGLE, газ подобран по логу</span></label></li><li><label><input type="checkbox" data-check-id="bf-failsafe:3"><span>Тест без пропов пройден</span></label></li><li><label><input type="checkbox" data-check-id="bf-failsafe:4"><span>Тест в воздухе на безопасной высоте пройден</span></label></li><li><label><input type="checkbox" data-check-id="bf-failsafe:5"><span>Параметры failsafe записаны в журнал дрона</span></label></li></ul>
+
+<h2>Источники</h2>
+<ul class="refs"><li><a href="https://betaflight.com/docs/wiki/guides/current/failsafe" target="_blank" rel="noopener noreferrer">Failsafe — Betaflight Documentation</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://betaflight.com/docs/wiki/app/failsafe-tab" target="_blank" rel="noopener noreferrer">Failsafe tab — Betaflight App</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://oscarliang.com/failsafe-rx-fc-naze32-frsky-d4rii/" target="_blank" rel="noopener noreferrer">What&#x27;s Failsafe and How to Setup — Oscar Liang</a> <span class="gc-tag">secondary</span></li></ul>
+      </div>
+      <div class="module-done"><gc-button variant="secondary" data-done-toggle="bf-failsafe">Отметить как пройденный</gc-button></div>
+      <nav class="pager" aria-label="Соседние модули"><a class="gc-card pager__prev" href="bf-modes-osd.html"><span class="gc-label gc-muted">Назад</span><br>Режимы и OSD</a><a class="gc-card pager__next" href="link-elrs.html"><span class="gc-label gc-muted">Дальше</span><br>ExpressLRS: packet rate, телеметрия, LQ</a></nav>
+    </article>
+  </main>
+  <footer class="gc-container site-footer gc-muted">
+    <p>Открытый курс · <a href="https://github.com/irreligious86/UAV-Education">исходники на GitHub</a> · <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">план развития</a> · <a href="../curriculum/curriculum.html">для разработчика</a> · CC BY-NC-SA 4.0</p>
+  </footer>
+</body>
+</html>

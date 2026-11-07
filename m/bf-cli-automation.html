@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Автоматизация CLI по serial — UAV Student</title>
+  <meta name="description" content="написать скрипт, который находит дрон по craft_name применять изменения с перечитыванием">
+  <link rel="stylesheet" href="../lib/ground-control-ui/dist/ground-control.css">
+  <link rel="stylesheet" href="../assets/site.css">
+  <script src="../lib/ground-control-ui/dist/ground-control.js" defer></script>
+  <script src="../assets/progress-store.js" defer></script>
+  <script src="../assets/app.js" defer></script>
+</head>
+<body class="gc-root">
+  <header class="site-header">
+    <div class="gc-container site-header__inner">
+      <a class="site-brand" href="../index.html"><span class="site-brand__mark" aria-hidden="true">◆</span> UAV Student</a>
+      <nav class="gc-nav" aria-label="Разделы сайта">
+        <a href="../index.html" aria-current="page">Курс</a>
+        <a href="../ref/index.html">Справочник</a>
+        <a href="../pages/glossary.html">Глоссарий</a>
+        <a href="../pages/fails.html">Фейлы</a>
+      </nav>
+    </div>
+  </header>
+  <main class="gc-container site-main">
+    <article class="module" data-module-page="bf-cli-automation">
+      <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-integrator">Интегратор</a><span>Автоматизация CLI по serial</span></p>
+      <h1 class="module-title">Автоматизация CLI по serial</h1>
+      <div class="module-tags"><span class="gc-tag" title="Уровень">L3 — Специалист</span><span class="gc-tag">чтение 25 мин</span><span class="gc-tag">учёба ~3 ч</span><span class="gc-tag">Betaflight 4.5+</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></div>
+      <p class="module-lead">Когда дронов больше одного, настраивать их кликами в Configurator — путь к ошибкам. CLI Betaflight доступен через обычный serial-порт, значит его можно скриптовать. Модуль показывает рабочий шаблон на Python (<code>pyserial</code>) и собирает грабли, на которые мы реально наступили при массовой настройке нескольких квадрокоптеров: плавающие COM-порты, «тихие» исправления параметров, перезагрузки и несовместимость diff между версиями.</p>
+      <div class="gc-callout" data-state="ok"><strong>После модуля ты умеешь</strong><ul><li>написать скрипт, который находит дрон по craft_name</li><li>применять изменения с перечитыванием</li></ul></div><p class="gc-muted">Перед этим модулем: <a href="bf-cli.html">CLI и remap</a></p>
+      <div class="gc-prose module-body">
+<h2>Теория</h2>
+<h4 class="md-subheading">Как устроен вход в CLI</h4>
+<p>Полётный контроллер по USB — это виртуальный COM-порт (USB CDC). Скорость в настройках порта для USB CDC роли не играет, принято ставить 115200. Символ <code>#</code> переводит контроллер в CLI, <code>exit</code> выходит с перезагрузкой. Пока FC в CLI, на моторы не идёт сигнал — ESC могут пищать, это нормально.</p>
+<h4 class="md-subheading">Грабли 1: COM-порт не постоянный</h4>
+<p>Если к компьютеру подключено несколько одинаковых плат, у них один USB VID/PID, и номер COM-порта меняется после каждой перезагрузки. Привязываться к <code>COM8</code> нельзя. Надёжный идентификатор — <code>craft_name</code> внутри конфига: открыть каждый порт, войти в CLI, выполнить <code>get craft_name</code> и выбрать нужный. Отсюда правило: у всех дронов разные <code>craft_name</code> ещё до начала работы.</p>
+<h4 class="md-subheading">Грабли 2: exit noreboot перезагружает</h4>
+<p>В Betaflight 4.5.x команда <code>exit noreboot</code> всё равно перезагружает контроллер (флаг <code>noreboot</code> заработал только в более новых версиях). Значит после любого <code>exit</code> скрипт должен заново искать порт по <code>craft_name</code>. Для «просто подсмотреть значение» не выходи из CLI командой — просто закрой порт.</p>
+<h4 class="md-subheading">Грабли 3: тихие исправления</h4>
+<p><code>set</code> + <code>save</code> не гарантирует, что значение осталось таким, каким ты его записал. Betaflight при загрузке корректирует несовместимые комбинации: протокол DShot, bidirectional DShot, схема таймеров на конкретной плате. В нашей практике на F405-плате после включения bidir протокол DShot оказался не тем, что записывали. Правило: после каждого <code>save</code> и перезагрузки — перечитать через <code>get</code> каждое изменённое значение и сравнить с ожидаемым.</p>
+<h4 class="md-subheading">Грабли 4: diff не переносится между версиями</h4>
+<p>Имена и смысл параметров меняются между версиями прошивки: переименовываются <code>debug_mode</code>, меняется синтаксис команды <code>serial</code>, меняется смысл PID-параметров D-term. Вставлять <code>diff all</code> от 2025.12 в 4.5 (и наоборот) построчно нельзя. Переносить настройки между версиями — только осмысленно, по разделам, с перечитыванием.</p>
+<h4 class="md-subheading">Почему диф, а не дамп</h4>
+<p><code>diff all</code> содержит только отличия от дефолтов — его можно читать глазами и хранить в git. <code>dump</code> — всё подряд, при обновлении прошивки он тащит старые дефолты как явные значения.</p>
+
+<h2>Практика</h2>
+<h4 class="md-subheading">Шаг 1. Минимальный клиент CLI на Python</h4>
+<pre class="cli-block"><code>import time
+import serial
+from serial.tools import list_ports
+
+
+def cli_cmd(port: serial.Serial, cmd: str, wait: float = 0.6) -&gt; str:
+    port.write((cmd + &quot;\n&quot;).encode())
+    time.sleep(wait)
+    return port.read_all().decode(errors=&quot;replace&quot;)
+
+
+def enter_cli(port: serial.Serial) -&gt; None:
+    port.write(b&quot;\n&quot;)
+    time.sleep(0.3)
+    port.read_all()
+    port.write(b&quot;#&quot;)
+    time.sleep(1.2)
+    port.read_all()
+
+
+def find_craft(craft_name: str) -&gt; str:
+    &quot;&quot;&quot;Return the COM port of the FC whose craft_name matches. Never trust COM numbers.&quot;&quot;&quot;
+    for info in list_ports.comports():
+        try:
+            with serial.Serial(info.device, 115200, timeout=1) as p:
+                enter_cli(p)
+                out = cli_cmd(p, &quot;get craft_name&quot;)
+                # do NOT send exit here: on 4.5.x it reboots the FC
+                if f&quot;craft_name = {craft_name}&quot; in out:
+                    return info.device
+        except serial.SerialException:
+            continue
+    raise RuntimeError(f&quot;FC &#x27;{craft_name}&#x27; not found&quot;)</code></pre>
+<h4 class="md-subheading">Шаг 2. Применение изменений с проверкой</h4>
+<pre class="cli-block"><code>CHANGES = {&quot;rpm_filter_min_hz&quot;: &quot;50&quot;, &quot;failsafe_delay&quot;: &quot;15&quot;}
+
+port_name = find_craft(&quot;viking2&quot;)
+with serial.Serial(port_name, 115200, timeout=1) as p:
+    enter_cli(p)
+    backup = cli_cmd(p, &quot;diff all&quot;, wait=3.0)
+    open(&quot;viking2_before_diff.txt&quot;, &quot;w&quot;, encoding=&quot;utf-8&quot;).write(backup)
+    for key, val in CHANGES.items():
+        cli_cmd(p, f&quot;set {key} = {val}&quot;)
+    cli_cmd(p, &quot;save&quot;, wait=1.0)  # FC reboots, COM port may change
+
+time.sleep(6)
+port_name = find_craft(&quot;viking2&quot;)  # find it again after reboot
+with serial.Serial(port_name, 115200, timeout=1) as p:
+    enter_cli(p)
+    for key, val in CHANGES.items():
+        out = cli_cmd(p, f&quot;get {key}&quot;)
+        ok = f&quot;{key} = {val}&quot; in out
+        print((&quot;OK  &quot; if ok else &quot;FAIL&quot;), key, &quot;expected&quot;, val)</code></pre>
+<h4 class="md-subheading">Шаг 3. Хранить конфиги как код</h4>
+<ol><li>Папка на каждый дрон, внутри <code>configs/</code> и <code>logs/</code>.</li><li>Имя файла: <code>&lt;дрон&gt;_&lt;плата&gt;_&lt;ГГГГ-ММ-ДД&gt;_diff.txt</code> — сортировка по имени = сортировка по дате.</li><li>Перед изменениями — бэкап, после — новый diff; сравнивать их обычным <code>git diff</code>.</li></ol>
+
+<h2>Диагностика</h2>
+<div class="diag-groups"><article class="diag-item"><h4><strong>Симптом:</strong> скрипт «потерял» дрон после save</h4><ul><li>Возможная причина: после перезагрузки COM-порт получил другой номер.</li><li>Что сделать: искать порт заново по <code>craft_name</code>, а не по номеру.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> записанное значение после перезагрузки другое</h4><ul><li>Возможная причина: Betaflight скорректировал несовместимую комбинацию.</li><li>Что сделать: перечитать связанные параметры, сверить с документацией платы и прошивки.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> после вставки diff часть строк дала ошибки <code>Invalid name</code></h4><ul><li>Возможная причина: diff от другой версии прошивки.</li><li>Что сделать: переносить настройки по разделам, проверяя имена параметров в <code>help</code> текущей версии.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> два дрона откликаются на один <code>craft_name</code></h4><ul><li>Возможная причина: одинаковые имена (клон конфига).</li><li>Что сделать: сразу переименовать, <code>set craft_name = ...</code> + <code>save</code>.</li></ul></article></div>
+
+<h2>Чек-лист</h2>
+<ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="bf-cli-automation:0"><span>У каждого дрона уникальный <code>craft_name</code></span></label></li><li><label><input type="checkbox" data-check-id="bf-cli-automation:1"><span>Скрипт ищет порт по <code>craft_name</code>, а не по номеру COM</span></label></li><li><label><input type="checkbox" data-check-id="bf-cli-automation:2"><span>Перед изменениями сохраняется <code>diff all</code> с датой в имени</span></label></li><li><label><input type="checkbox" data-check-id="bf-cli-automation:3"><span>После <code>save</code> скрипт заново находит порт и перечитывает значения</span></label></li><li><label><input type="checkbox" data-check-id="bf-cli-automation:4"><span>diff между разными версиями прошивки не вставляется построчно</span></label></li></ul>
+
+<h2>Источники</h2>
+<ul class="refs"><li><a href="https://betaflight.com/docs/development/Cli" target="_blank" rel="noopener noreferrer">Betaflight CLI — Documentation</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://pyserial.readthedocs.io/en/latest/" target="_blank" rel="noopener noreferrer">pySerial — Documentation</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://github.com/betaflight/betaflight" target="_blank" rel="noopener noreferrer">Betaflight — source code (GitHub)</a> <span class="gc-tag" data-state="info">primary</span></li></ul>
+      </div>
+      <div class="module-done"><gc-button variant="secondary" data-done-toggle="bf-cli-automation">Отметить как пройденный</gc-button></div>
+      <nav class="pager" aria-label="Соседние модули"><a class="gc-card pager__prev" href="bf-cli.html"><span class="gc-label gc-muted">Назад</span><br>CLI и remap</a></nav>
+    </article>
+  </main>
+  <footer class="gc-container site-footer gc-muted">
+    <p>Открытый курс · <a href="https://github.com/irreligious86/UAV-Education">исходники на GitHub</a> · <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">план развития</a> · <a href="../curriculum/curriculum.html">для разработчика</a> · CC BY-NC-SA 4.0</p>
+  </footer>
+</body>
+</html>

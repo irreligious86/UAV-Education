@@ -12,7 +12,7 @@ this file only says **what is next and why**.
    `draft` = hidden. The validator and CI enforce it.
 4. **Verify, don't assume.** After every change: re-read values, rebuild, check links.
 
-## Status (2026-11-07)
+## Status (2026-11-07, see the course map on the site for live numbers)
 
 | Section | Published | Planned |
 |---|---|---|
@@ -39,24 +39,33 @@ Done:
 - [x] Betaflight: `bf-failsafe`, `bf-rpm-filter` (10" whistle case), `bf-cli-automation`
 
 Next (priority order):
-- [ ] `ap-intro` + new `ap-sitl` — ArduPilot via SITL, from the ardupilot-lab project
+- [ ] Foundation track: `f-physics`, `f-power`, `f-motors-esc`, `f-fc-sensors`, `f-safety`
+- [ ] `ap-intro` + `ap-sitl` — ArduPilot via SITL, from the ardupilot-lab project
 - [ ] `ap-lua` — Lua fault-injection applets used in SITL (sensor/motor chaos, gated by RC switches)
-- [ ] New `ap-quadplane-tilt` — tilt-rotor QuadPlane bring-up: channel mapping, DCM-only, the "motor on a servo channel" incident (expert level)
+- [ ] `ap-quadplane` — tilt-rotor QuadPlane bring-up: channel mapping, DCM-only, the "motor on a servo channel" incident (expert level)
 - [ ] `bf-pid` — practical tuning workflow with A/B profiles (CRISP/COOL/SHARP/FLOAT) and stick-response metrics
 - [ ] `bf-modes-osd`
 - [ ] `comp-esp32` — ESP32 companion: EdgeTX Lua ↔ ESP32 serial (TX16S companion project)
 - [ ] `tools-overview`
 
-## Phase 2 — Architecture (needs owner decision)
+## Phase 2 — Course structure and architecture 🟡 in progress
 
-Problem: one 185 KB `index.html` that every article rewrites.
+Decision (2026-11-07): **modular monolith on static hosting** now, ready to move data to our own server later.
+Priority: a well-structured learning program.
 
-Options under discussion (see chat): modular static site vs. adding backend services.
-Tentative direction until decided:
-- [ ] One generated page per article + shared layout (still zero-framework, still GitHub Pages)
-- [ ] Apply the Ground Control design system tokens
-- [ ] Offline PWA (service worker), reusing the Report UAV approach
-- [ ] Client-side search over a generated JSON index
+- [x] Course map `data/curriculum.json`: 5 core tracks (Foundation → Operator → Integrator → Autonomy → Engineer),
+      electives (INAV, PX4), prerequisites, objectives, hours, capstones on real hardware — approved
+- [x] One page per module (`m/<id>.html`), reference by stack (`ref/`), hand-written pages (`pages/`);
+      old `index.html#<id>` links redirect to module pages
+- [x] Home = course map with per-track progress
+- [x] Progress behind an async `ProgressStore` interface (localStorage now, server later)
+- [x] Ground Control UI as a pinned git submodule (`lib/ground-control-ui`, v0.2.1);
+      gaps found here are fixed upstream (v0.2.0: namespace + content primitives, v0.2.1: `[hidden]` fix)
+- [x] Static API: `api/v1/curriculum.json` — the contract a future server will serve
+- [ ] Quizzes: `<uav-quiz>` + JSON question bank, seeded for written modules
+- [ ] Client-side search over a generated index
+- [ ] `ARCHITECTURE.md`: layers, data contracts, step-by-step migration to own server
+- [ ] Offline PWA (service worker)
 
 ## Phase 3 — Interactivity
 

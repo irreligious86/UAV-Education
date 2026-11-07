@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Blackbox — UAV Student</title>
+  <meta name="description" content="записать и открыть лог найти шум и перегрузку в спектре">
+  <link rel="stylesheet" href="../lib/ground-control-ui/dist/ground-control.css">
+  <link rel="stylesheet" href="../assets/site.css">
+  <script src="../lib/ground-control-ui/dist/ground-control.js" defer></script>
+  <script src="../assets/progress-store.js" defer></script>
+  <script src="../assets/app.js" defer></script>
+</head>
+<body class="gc-root">
+  <header class="site-header">
+    <div class="gc-container site-header__inner">
+      <a class="site-brand" href="../index.html"><span class="site-brand__mark" aria-hidden="true">◆</span> UAV Student</a>
+      <nav class="gc-nav" aria-label="Разделы сайта">
+        <a href="../index.html" aria-current="page">Курс</a>
+        <a href="../ref/index.html">Справочник</a>
+        <a href="../pages/glossary.html">Глоссарий</a>
+        <a href="../pages/fails.html">Фейлы</a>
+      </nav>
+    </div>
+  </header>
+  <main class="gc-container site-main">
+    <article class="module" data-module-page="bf-blackbox">
+      <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-integrator">Интегратор</a><span>Blackbox</span></p>
+      <h1 class="module-title">Blackbox</h1>
+      <div class="module-tags"><span class="gc-tag" title="Уровень">L2 — Интегратор</span><span class="gc-tag">чтение 20 мин</span><span class="gc-tag">учёба ~3 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></div>
+      <p class="module-lead">Blackbox — система записи полётных данных в Betaflight, позволяющая фиксировать состояние контроллера на каждом цикле управления (до 8 кГц). Лог содержит гироскоп, акселерометр, сигналы стиков, работу PID-регулятора, выходы на моторы и параметры фильтров. Статья даёт полное понимание настройки логирования, интерпретации графиков и использования инструментов (Blackbox Explorer, PIDToolbox) для диагностики и тюнинга. После изучения читатель сможет выявлять шумовую структуру дрона, оценивать задержки фильтров, настраивать PID и фильтры на основе объективных данных, а не методом случайного подбора.</p>
+      <div class="gc-callout" data-state="ok"><strong>После модуля ты умеешь</strong><ul><li>записать и открыть лог</li><li>найти шум и перегрузку в спектре</li></ul></div><p class="gc-muted">Перед этим модулем: <a href="bf-pid-reg-in-bf.html">PID-регулятор в Betaflight</a>, <a href="bf-modes-osd.html">Режимы и OSD</a></p>
+      <div class="gc-prose module-body">
+<h2>Теория</h2>
+<h4 class="md-subheading">Назначение и архитектура Blackbox</h4>
+<p>Blackbox записывает внутреннее состояние полётного контроллера с максимально возможной частотой, чтобы позволить офлайн-симуляцию, отладку и анализ алгоритмов управления по данным реальных полётов. Лог строится из кадров нескольких типов:</p>
+<ul><li>I‑кадры (intra) — полные кадры, независимо декодируемые.</li><li>P‑кадры (inter) — разностные, используют предсказание.</li><li>G/H кадры — для GPS-данных.</li><li>S кадры (slow) — редко меняющиеся состояния.</li><li>E кадры (event) — переходы состояний.</li></ul>
+<p>Для сжатия применяются предсказатели и кодирование переменной длины, что позволяет хранить большой объём данных при умеренном потоке.</p>
+<h4 class="md-subheading">Что именно логируется</h4>
+<p>Blackbox фиксирует: - время, - значения P/I/D и суммарный выход, - setpoint (стики), - данные гироскопа и акселерометра, - напряжение/ток, RSSI, - команды на ESC, - GPS-кадры (при наличии).</p>
+<h4 class="md-subheading">Формат лога и устройства хранения</h4>
+<p>Запись может вестись на: - onboard flash (обычно 2–16 МБ), - SD-карту (предпочтительно для длинных сессий), - внешний логгер через UART.</p>
+<p>Для SD-карты рекомендуется FAT32 и карта с низкой задержкой записи.</p>
+<h4 class="md-subheading">Влияние настроек на качество лога</h4>
+<ul><li>1 кГц — базовый PID-анализ;</li><li>2 кГц (или 1.6 кГц для BMI270) — детальный анализ шумов/фильтров.</li></ul>
+<p>Если looptime мал (высокая частота PID), может потребоваться поднять baudrate или снизить частоту логирования, иначе возможны пропуски.</p>
+<h4 class="md-subheading">Физический смысл спектра шума</h4>
+<ul><li><code>&lt;20 Гц</code> — полезная динамика;</li><li><code>20–100 Гц</code> — вибрации/propwash/проблемы PID;</li><li><code>100–250 Гц</code> — резонансы рамы/люфты;</li><li><code>&gt;250 Гц</code> — шум моторов/пропов и гармоники.</li></ul>
+<p>Цель фильтрации — подавлять высокочастотный шум, не внося лишнюю задержку в полезный диапазон.</p>
+
+<h2>Практика</h2>
+<h4 class="md-subheading">Подготовка оборудования и ПО</h4>
+<p>Аппаратно: - FC с flash или SD-слотом, - ESC с Bidirectional DShot (BLHeli_32/Bluejay), - качественная и механически жёсткая сборка.</p>
+<p>Настройка: - включить <code>BLACKBOX</code>, - выставить <code>logging rate</code> (обычно 2 kHz), - для шумового анализа использовать <code>debug_mode = GYRO_SCALED</code>, - включить RPM-фильтр.</p>
+<h4 class="md-subheading">Запись лога и манёвры</h4>
+<p>Blackbox обычно стартует при арме и останавливается при дизарме. Для качественного анализа выполняйте: - hover и ровный полёт, - throttle sweep <code>20% -&gt; 100%</code>, - резкие roll/flip, - throttle pump, - резкие развороты (проверка propwash).</p>
+<h4 class="md-subheading">Работа с Blackbox Explorer</h4>
+<ol><li>Выгрузите <code>.bbl</code> (Mass Storage Mode).</li><li>Откройте лог в Blackbox Explorer.</li><li>Проверьте header (<code>i</code>) — там все параметры прошивки.</li><li>Для анализа выберите <code>Gyro</code>, <code>Setpoint</code>, <code>P/I/D</code>, <code>Motor</code>, <code>Debug</code>.</li><li>Используйте <code>I/O</code> для выделения участков одинаковой длины.</li></ol>
+<h4 class="md-subheading">Использование PIDToolbox</h4>
+<p>PIDToolbox полезен для: - оценки задержки фильтров, - сравнения спектров в dB, - анализа step response.</p>
+<h4 class="md-subheading">Пошаговая настройка фильтров</h4>
+<p>1. Запишите лог с <code>GYRO_SCALED</code> и <code>throttle sweep</code>. 2. Оцените спектр:    - <code>&lt;100 Гц</code> чаще решается механикой/PID,    - <code>100–250 Гц</code> — зона динамического режектора,    - <code>&gt;250 Гц</code> — зона RPM-фильтра. 3. Убедитесь, что bidirectional DShot работает (<code>E = 0%</code> в Motors). 4. Настройте lowpass по результату спектра. 5. Делайте изменения итеративно: один параметр -&gt; новый лог -&gt; сравнение.</p>
+
+<h2>Диагностика</h2>
+<div class="diag-groups"><article class="diag-item"><h4>Симптом: в логе гироскопа сильный пик на <code>100–250 Гц</code>.</h4><ul><li>Возможная причина: резонанс рамы/люфт.</li><li>Что проверить/сделать: проверить механику и убедиться, что dynamic notch активен.</li></ul></article><article class="diag-item"><h4>Симптом: шум выше <code>250 Гц</code> не подавлен.</h4><ul><li>Возможная причина: RPM-фильтр отключён или неверно настроен bidirectional DShot.</li><li>Что проверить/сделать: проверить <code>E = 0%</code> в Motors, включить Gyro/D-term RPM filters.</li></ul></article><article class="diag-item"><h4>Симптом: всплески в <code>20–100 Гц</code>.</h4><ul><li>Возможная причина: недостаточные P/D или избыточная фильтрация (задержка).</li><li>Что проверить/сделать: проверить задержку в PIDToolbox, скорректировать фильтры и PID.</li></ul></article><article class="diag-item"><h4>Симптом: дрон стал «ватным» после фильтрации.</h4><ul><li>Возможная причина: слишком низкие частоты среза.</li><li>Что проверить/сделать: поднять частоту среза gyro lowpass, проверить D-term lowpass и задержку.</li></ul></article><article class="diag-item"><h4>Симптом: лог с пропусками/артефактами.</h4><ul><li>Возможная причина: скорость записи/буфер.</li><li>Что проверить/сделать: использовать качественную SD-карту, при необходимости снизить логрейт.</li></ul></article><article class="diag-item"><h4>Симптом: нет записи на onboard flash при включённом Blackbox.</h4><ul><li>Возможная причина: память заполнена.</li><li>Что проверить/сделать: <code>Erase Flash</code>, регулярно выгружать логи.</li></ul></article><article class="diag-item"><h4>Симптом: некорректные частоты в спектре.</h4><ul><li>Возможная причина: сравниваются участки разной длины.</li><li>Что проверить/сделать: выделять одинаковые интервалы через <code>I/O</code>.</li></ul></article></div>
+
+<h2>Источники</h2>
+<ul class="refs"><li><a href="https://betaflight-com.pages.dev/docs/development/Blackbox" target="_blank" rel="noopener noreferrer">Blackbox flight data recorder — Betaflight Documentation</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://www.betaflight.com/docs/development/Blackbox-Internals" target="_blank" rel="noopener noreferrer">Blackbox logging internals</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://github.com/betaflight/blackbox-log-viewer" target="_blank" rel="noopener noreferrer">Betaflight Blackbox Explorer</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://oscarliang.com/blackbox/" target="_blank" rel="noopener noreferrer">How to Use Blackbox in Betaflight — Oscar Liang</a> <span class="gc-tag">secondary</span></li><li><a href="https://oscarliang.com/pid-filter-tuning-blackbox/" target="_blank" rel="noopener noreferrer">How to Tune FPV Drone Filters &amp; PID with Blackbox — Oscar Liang</a> <span class="gc-tag">secondary</span></li><li><a href="https://github.com/bw1129/PIDtoolbox/wiki/PIDtoolbox-user-guide" target="_blank" rel="noopener noreferrer">PIDToolbox User Guide</a> <span class="gc-tag">secondary</span></li><li><a href="https://intofpv.com/archive/index.php/thread-22141-2.html" target="_blank" rel="noopener noreferrer">IntoFPV Forum — 3D Printed Frame Tuning Discussion</a> <span class="gc-tag">secondary</span></li></ul>
+      </div>
+      <div class="module-done"><gc-button variant="secondary" data-done-toggle="bf-blackbox">Отметить как пройденный</gc-button></div>
+      <nav class="pager" aria-label="Соседние модули"><a class="gc-card pager__next" href="bf-filters.html"><span class="gc-label gc-muted">Дальше</span><br>Фильтры</a></nav>
+    </article>
+  </main>
+  <footer class="gc-container site-footer gc-muted">
+    <p>Открытый курс · <a href="https://github.com/irreligious86/UAV-Education">исходники на GitHub</a> · <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">план развития</a> · <a href="../curriculum/curriculum.html">для разработчика</a> · CC BY-NC-SA 4.0</p>
+  </footer>
+</body>
+</html>

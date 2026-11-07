@@ -1,0 +1,109 @@
+/*
+ * Site-specific layout on top of Ground Control UI (lib/ground-control-ui).
+ * Rule: use --gc-* tokens only. Anything reusable belongs in Ground Control, not here.
+ */
+
+/* ---------- shell ---------- */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: var(--gc-surface-100);
+  border-bottom: 1px solid var(--gc-line);
+}
+.site-header__inner {
+  display: flex;
+  align-items: center;
+  gap: var(--gc-space-4);
+}
+.site-header .gc-nav { border-bottom: 0; flex: 1; min-width: 0; }
+.site-brand {
+  flex: none;
+  font-weight: 600;
+  color: var(--gc-ink) !important;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.site-brand__mark { color: var(--gc-accent-hud); }
+.site-main { padding-top: var(--gc-space-6); padding-bottom: var(--gc-space-8); }
+.site-main > * + * { margin-top: var(--gc-space-6); }
+.site-footer { padding-bottom: var(--gc-space-8); font-size: 13px; }
+.section-title { margin-top: var(--gc-space-8); }
+
+@media (max-width: 560px) {
+  .site-header__inner { flex-direction: column; align-items: stretch; gap: 0; }
+  .site-brand { padding-top: var(--gc-space-3); }
+  .gc-display { font-size: 30px; line-height: 36px; }
+}
+
+/* ---------- home ---------- */
+.home-hero > * + * { margin-top: var(--gc-space-3); }
+.home-hero__lead { font-size: 17px; line-height: 26px; }
+.home-hero__stats, .home-toc { display: flex; flex-wrap: wrap; gap: var(--gc-space-2); }
+.home-toc a { text-decoration: none; }
+.home-hero__note { font-size: 13px; }
+
+.track > * + * { margin-top: var(--gc-space-3); }
+.track__goal { font-size: 16px; }
+.track__stats { display: flex; flex-wrap: wrap; justify-content: space-between; gap: var(--gc-space-2); font-size: 13px; }
+.track__modules { list-style: none; padding: 0; margin: var(--gc-space-4) 0 0; }
+.track-module {
+  display: grid;
+  grid-template-columns: 2.25em 1fr;
+  gap: var(--gc-space-1) var(--gc-space-2);
+  padding: var(--gc-space-3) 0;
+  border-top: 1px solid var(--gc-line);
+}
+.track-module__num { font-family: var(--gc-font-mono); color: var(--gc-ink-muted); padding-top: 1px; }
+.track-module__title { color: var(--gc-ink) !important; text-decoration: none; font-weight: 600; }
+.track-module__title:hover { color: var(--gc-signal-cyan) !important; }
+.track-module__tags { grid-column: 2; display: flex; flex-wrap: wrap; gap: var(--gc-space-1); }
+.track-module--planned .track-module__title { color: var(--gc-ink-muted) !important; font-weight: 400; }
+.track-module.is-done .track-module__num { color: var(--gc-accent-hud); }
+
+/* ---------- module page ---------- */
+.module > * + * { margin-top: var(--gc-space-4); }
+.module-title { font-size: 28px; line-height: 34px; margin-bottom: 0; }
+.module-tags { display: flex; flex-wrap: wrap; gap: var(--gc-space-2); }
+.module-lead { font-size: 17px; line-height: 26px; color: var(--gc-ink-muted); }
+.module .gc-callout ul { margin: var(--gc-space-2) 0 0; padding-left: var(--gc-space-6); }
+.module-done { padding-top: var(--gc-space-4); }
+.md-subheading { font-size: 17px; }
+
+/* diagnostics cards produced by the content pipeline */
+.diag-groups { display: grid; gap: var(--gc-space-3); }
+.diag-item {
+  padding: var(--gc-space-3) var(--gc-space-4);
+  border: 1px solid var(--gc-line);
+  border-left: 3px solid var(--gc-signal-amber);
+  border-radius: var(--gc-radius-md);
+  background: var(--gc-surface-200);
+}
+.diag-item h4 { margin: 0; font-size: 15px; }
+.diag-item ul { margin: var(--gc-space-2) 0 0; }
+
+.refs { list-style: none; padding-left: 0 !important; }
+.refs li { display: flex; flex-wrap: wrap; gap: var(--gc-space-2); align-items: baseline; }
+
+.pager { display: grid; grid-template-columns: 1fr 1fr; gap: var(--gc-space-3); padding-top: var(--gc-space-6); }
+.pager__next { grid-column: 2; text-align: right; }
+
+/* ---------- reference ---------- */
+.ref-grid { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); }
+
+/* ---------- legacy hand-written pages (content/pages) ---------- */
+.legacy-page .grid { display: grid; gap: var(--gc-space-3); grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); }
+.legacy-page .glossary-entry,
+.legacy-page .checklist-card,
+.legacy-page .resources-category {
+  padding: var(--gc-space-3) var(--gc-space-4);
+  border: 1px solid var(--gc-line);
+  border-radius: var(--gc-radius-md);
+  background: var(--gc-surface-200);
+}
+.legacy-page .glossary-entry h3,
+.legacy-page .checklist-card h3,
+.legacy-page .resources-category h3 { margin-top: 0; font-size: 16px; }
+.legacy-page .checklist-card ul { list-style: none; padding-left: 0; }
+.legacy-page .checklist-card input { accent-color: var(--gc-accent-hud); margin-right: var(--gc-space-2); }
+.legacy-page .muted { color: var(--gc-ink-muted); }

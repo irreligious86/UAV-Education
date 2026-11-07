@@ -35,4 +35,4 @@ references:
 
 Публикация: `status: published` в манифесте, затем `python scripts/publish.py`.
 
-Не править статьи в index.html между маркерами AUTO:ARTICLES — перезапишется.
+Не править сгенерированные страницы (`m/*.html`, `index.html`) — перезапишутся при сборке.

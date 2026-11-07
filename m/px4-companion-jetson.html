@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PX4 + Jetson Nano (companion) — UAV Student</title>
+  <meta name="description" content="Инженерный курс по БПЛА: от физики полёта до своих прошивок и бортовых компьютеров.">
+  <link rel="stylesheet" href="../lib/ground-control-ui/dist/ground-control.css">
+  <link rel="stylesheet" href="../assets/site.css">
+  <script src="../lib/ground-control-ui/dist/ground-control.js" defer></script>
+  <script src="../assets/progress-store.js" defer></script>
+  <script src="../assets/app.js" defer></script>
+</head>
+<body class="gc-root">
+  <header class="site-header">
+    <div class="gc-container site-header__inner">
+      <a class="site-brand" href="../index.html"><span class="site-brand__mark" aria-hidden="true">◆</span> UAV Student</a>
+      <nav class="gc-nav" aria-label="Разделы сайта">
+        <a href="../index.html" aria-current="page">Курс</a>
+        <a href="../ref/index.html">Справочник</a>
+        <a href="../pages/glossary.html">Глоссарий</a>
+        <a href="../pages/fails.html">Фейлы</a>
+      </nav>
+    </div>
+  </header>
+  <main class="gc-container site-main">
+    <article class="module" data-module-page="px4-companion-jetson">
+      <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-px4">Электив: PX4</a><span>PX4 + Jetson Nano (companion)</span></p>
+      <h1 class="module-title">PX4 + Jetson Nano (companion)</h1>
+      <div class="module-tags"><span class="gc-tag" title="Уровень">L3 — Специалист</span><span class="gc-tag">чтение 15 мин</span><span class="gc-tag">учёба ~3 ч</span><span class="gc-tag">PX4 1.15+</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></div>
+      <p class="module-lead">Этот модуль описывает способы подключения одноплатного компьютера NVIDIA Jetson Nano к полетному контроллеру Pixhawk (на прошивке PX4) для организации offboard-управления, передачи телеметрии и обработки данных с камеры (компьютерное зрение).</p>
+      
+      <div class="gc-prose module-body">
+<h2>Теория</h2>
+<p>Jetson Nano выступает в роли бортового компьютера (Companion Computer). Он берет на себя сложные вычислительные задачи (компьютерное зрение, планирование миссий, управление через ROS 2), в то время как Pixhawk отвечает за стабилизацию полета и низкоуровневые сенсоры.</p>
+<p>Использование связки Pixhawk + Jetson Nano позволяет создавать полностью автономные дроны с функцией распознавания объектов, облета препятствий и выполнения сложных миссий без участия оператора.</p>
+<p><strong>Архитектура связи:</strong> Существует два основных подхода к организации связи: - <strong>MAVLink</strong> (через MAVROS или Pymavlink): Классический способ. Поток телеметрии передается по последовательному интерфейсу (UART). На Jetson данные принимаются и парсятся библиотеками. - <strong>uXRCE-DDS</strong> (Micro XRCE-DDS): Современный протокол, используемый в PX4 и ROS 2. Позволяет напрямую обмениваться топиками ROS 2 с внутренней шиной uORB полетного контроллера.</p>
+
+<h2>Практика</h2>
+<h4 class="md-subheading">Вариант 1: Подключение через USB (простой и надежный)</h4>
+<p>Этот способ рекомендуется для начальной отладки, так как он наиболее стабилен и не требует сложных манипуляций с аппаратными UART Jetson.</p>
+<p><strong>Соединение:</strong> 1. Возьмите USB-кабель (Micro-USB или USB-C в зависимости от модели Pixhawk, например, Pixhawk 6C или Cube Orange) 2. Подключите кабель к порту USB на Pixhawk (обычно это порт для подключения к Mission Planner/QGC) и к любому USB-порту Jetson Nano 3. Примечание: прямое подключение по USB дает полный поток данных MAVLink без потери пакетов</p>
+<p><strong>Настройка параметров PX4:</strong> 1. В QGroundControl перейдите в Параметры (Parameters) 2. Убедитесь, что порт, к которому подключен USB, настроен на передачу MAVLink. Обычно USB порт включен по умолчанию 3. Если вы используете uXRCE-DDS, необходимо отключить MAVLink на используемом порту и активировать UXRCE_DDS_CFG</p>
+<p><strong>Проверка на Jetson:</strong> 1. Подключитесь к Jetson по SSH или через монитор 2. Найдите устройство: <code>ls /dev/ttyACM*</code> или <code>ls /dev/ttyUSB*</code>. Обычно USB подключение отображается как ttyACM0 3. Дайте права доступа: <code>sudo chmod 666 /dev/ttyACM0</code></p>
+<h4 class="md-subheading">Вариант 2: Подключение через UART (аппаратный последовательный порт)</h4>
+<p>Этот способ используется для встраиваемых решений, где USB-порт может быть занят или требуется минимизация кабелей.</p>
+<p><strong>Схема подключения:</strong> 1. Подключите TX (передатчик) пикса к RX (приемнику) нано, и наоборот (RX -&gt; TX). Обязательно соедините GND 2. Рекомендуемые пины на 40-pin разъеме Jetson Nano: Pin 8 (TX) и Pin 10 (RX) — это аппаратный UART1 (обычно /dev/ttyTHS1) 3. На Pixhawk используйте порт TELEM 2 или TELEM 1</p>
+<p><strong>Настройка UART на Jetson Nano (критически важно):</strong></p>
+<p>По умолчанию последовательный порт на джамперных пинах (GPIO) часто занят службой последовательной консоли (serial console). Её необходимо отключить, чтобы освободить порт для связи с дроном.</p>
+<p><strong>Отключите сервис nvgetty:</strong></p>
+<pre class="cli-block"><code>sudo systemctl stop nvgetty.service
+sudo systemctl disable nvgetty.service</code></pre>
+<p>Это одна из главных причин ошибок &quot;Permission denied&quot;.</p>
+<p><strong>Добавьте пользователя в группу dialout:</strong></p>
+<pre class="cli-block"><code>sudo usermod -aG dialout $USER</code></pre>
+<p>После этого нужно перезагрузиться (логаут/логин).</p>
+<p><strong>Настройка параметров PX4:</strong> 1. В QGroundControl выберите параметр SER_TEL2_BAUD и установите скорость 921600 (рекомендуемая для высокой нагрузки) 2. Для протокола MAVLink: SER_TEL2_PROTOCOL = 2 (MAVLink 2) 3. Для uXRCE-DDS: SER_TEL2_PROTOCOL = 26 (XRCE-DDS). Также необходимо задать параметр UXRCE_DDS_CFG</p>
+<p><strong>Диагностика UART на Jetson:</strong></p>
+<p>Проверьте, что порт виден и имеет правильную группу:</p>
+<pre class="cli-block"><code>ls -l /dev/ttyTHS*</code></pre>
+<p>Если вы видите <code>crw------- 1 root tty</code>, значит порт все еще заблокирован консолью. После отключения nvgetty группа должна измениться на dialout.</p>
+<h4 class="md-subheading">Вариант 3: Использование FTDI-адаптера</h4>
+<p>Если прямое UART-подключение нестабильно (частая проблема с некоторыми версиями Cube Orange), используйте переходник USB-to-UART.</p>
+<p><strong>Схема:</strong> 1. FTDI адаптер подключается к USB порту Jetson Nano 2. Провода TX/RX/GND от адаптера идут к пиксу 3. Jetson увидит адаптер как /dev/ttyUSB0 4. Преимущество: Обходит аппаратные проблемы UART на плате Jetson или Pixhawk, обеспечивая стабильную связь</p>
+
+<h2>Диагностика</h2>
+<ul class="diag-list"><li><strong>Permission denied: &#x27;/dev/ttyTHS1&#x27;</strong> — Порт используется системной консолью (nvgetty) или у пользователя нет прав. Решение: выполните шаги из раздела &quot;Настройка UART на Jetson Nano&quot; (остановка nvgetty и добавление в группу dialout)</li><li><strong>MAVLink работает, но uXRCE-DDS не подключается</strong> — Неправильные параметры прошивки или несоответствие версий PX4. Решение: убедитесь, что на телеметрийном порту выключен MAVLink (SER_TEL2_PROTOCOL = 0 или 26), перепрошейте контроллер стабильной версией, запустите агент вручную: <code>sudo MicroXRCEAgent serial --dev /dev/ttyTHS1 -b 921600</code></li><li><strong>Нет связи, но порт виден</strong> — Перепутаны пины RX/TX или низкое напряжение питания Jetson. Решение: проверьте перекрестное соединение (TX-&gt;RX, RX-&gt;TX), убедитесь, что Jetson Nano получает достаточное питание (5В 2-4А)</li><li><strong>Прерывистая связь или потеря пакетов по UART</strong> — Отсутствие аппаратного контроля потока (RTS/CTS) или электрические помехи. Решение: используйте USB-кабель или FTDI адаптер вместо прямых пинов GPIO</li></ul>
+
+<h2>Чек-лист</h2>
+<ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="px4-companion-jetson:0"><span>Проверить совместимость версии PX4 (1.15+) с Jetson Nano</span></label></li><li><label><input type="checkbox" data-check-id="px4-companion-jetson:1"><span>Подключить Pixhawk и Jetson Nano (USB, UART или FTDI адаптер)</span></label></li><li><label><input type="checkbox" data-check-id="px4-companion-jetson:2"><span>Отключить сервис nvgetty на Jetson (для подключения по UART)</span></label></li><li><label><input type="checkbox" data-check-id="px4-companion-jetson:3"><span>Добавить пользователя в группу dialout</span></label></li><li><label><input type="checkbox" data-check-id="px4-companion-jetson:4"><span>Настроить параметры PX4 (SER_TEL2_BAUD, SER_TEL2_PROTOCOL)</span></label></li><li><label><input type="checkbox" data-check-id="px4-companion-jetson:5"><span>Проверить доступность портов (<code>ls /dev/ttyACM*</code>, <code>ls /dev/ttyTHS*</code>)</span></label></li><li><label><input type="checkbox" data-check-id="px4-companion-jetson:6"><span>Убедиться в правильности соединения RX/TX и питания</span></label></li><li><label><input type="checkbox" data-check-id="px4-companion-jetson:7"><span>Запустить тестирование связи (MAVLink или XRCE-DDS)</span></label></li></ul>
+
+<h2>Источники</h2>
+<ul class="refs"><li><a href="https://docs.px4.io/main/en/companion_computer/pixhawk_companion.html" target="_blank" rel="noopener noreferrer">PX4 User Guide: Companion Computer</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://docs.px4.io/main/en/middleware/uxrce_dds.html" target="_blank" rel="noopener noreferrer">PX4 User Guide: uXRCE-DDS (PX4-ROS 2 Bridge)</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://ardupilot.org/" target="_blank" rel="noopener noreferrer">ArduPilot Dev Docs: Turnkey Companion Computer Solutions</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://discuss.ardupilot.org/" target="_blank" rel="noopener noreferrer">ArduPilot Discourse: Jetson Nano - Pixhawk Cube Communication</a> <span class="gc-tag">secondary</span></li><li><a href="https://forums.developer.nvidia.com/" target="_blank" rel="noopener noreferrer">NVIDIA Developer Forums: Jetson Nano Setup</a> <span class="gc-tag">secondary</span></li><li><a href="https://github.com/terrytaylorbonn/auxdrone" target="_blank" rel="noopener noreferrer">GitHub: terrytaylorbonn/auxdrone</a> <span class="gc-tag">secondary</span></li></ul>
+      </div>
+      <div class="module-done"><gc-button variant="secondary" data-done-toggle="px4-companion-jetson">Отметить как пройденный</gc-button></div>
+      <nav class="pager" aria-label="Соседние модули"><a class="gc-card pager__prev" href="px4-ros2.html"><span class="gc-label gc-muted">Назад</span><br>ROS 2 интеграция</a></nav>
+    </article>
+  </main>
+  <footer class="gc-container site-footer gc-muted">
+    <p>Открытый курс · <a href="https://github.com/irreligious86/UAV-Education">исходники на GitHub</a> · <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">план развития</a> · <a href="../curriculum/curriculum.html">для разработчика</a> · CC BY-NC-SA 4.0</p>
+  </footer>
+</body>
+</html>

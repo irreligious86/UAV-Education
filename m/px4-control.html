@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Control Allocation и миксер — UAV Student</title>
+  <meta name="description" content="Инженерный курс по БПЛА: от физики полёта до своих прошивок и бортовых компьютеров.">
+  <link rel="stylesheet" href="../lib/ground-control-ui/dist/ground-control.css">
+  <link rel="stylesheet" href="../assets/site.css">
+  <script src="../lib/ground-control-ui/dist/ground-control.js" defer></script>
+  <script src="../assets/progress-store.js" defer></script>
+  <script src="../assets/app.js" defer></script>
+</head>
+<body class="gc-root">
+  <header class="site-header">
+    <div class="gc-container site-header__inner">
+      <a class="site-brand" href="../index.html"><span class="site-brand__mark" aria-hidden="true">◆</span> UAV Student</a>
+      <nav class="gc-nav" aria-label="Разделы сайта">
+        <a href="../index.html" aria-current="page">Курс</a>
+        <a href="../ref/index.html">Справочник</a>
+        <a href="../pages/glossary.html">Глоссарий</a>
+        <a href="../pages/fails.html">Фейлы</a>
+      </nav>
+    </div>
+  </header>
+  <main class="gc-container site-main">
+    <article class="module" data-module-page="px4-control">
+      <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-px4">Электив: PX4</a><span>Control Allocation и миксер</span></p>
+      <h1 class="module-title">Control Allocation и миксер</h1>
+      <div class="module-tags"><span class="gc-tag" title="Уровень">L2 — Интегратор</span><span class="gc-tag">чтение 25 мин</span><span class="gc-tag">учёба ~3 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></div>
+      <p class="module-lead">Связь между контурами управления и физическими приводами в PX4: <strong>control allocation</strong>, роли исполнителей, ограничения и проверки перед полётом.</p>
+      
+      <div class="gc-prose module-body">
+<h2>Теория</h2>
+<p>PX4 разделяет <strong>логику управления</strong> (законы, оценка состояния) и <strong>распределение усилий</strong> по исполнителям: моторы, сервоприводы, управляющие поверхности. <strong>Mixer / allocation</strong> задаёт соответствие «запрошенный момент/усилие → команды на каналы», с учётом геометрии рамы, направления вращения и безопасных лимитов.</p>
+
+<h2>Практика</h2>
+<ol><li>В <strong>Actuators</strong> задайте геометрию и соответствие выходов физическим каналам (порядок, направление, мин/макс).</li><li>Проверьте <strong>arming</strong> и отсутствие конфликтов (например, двойное назначение канала).</li><li>На земле: короткие проверки отклика по каналам в безопасных условиях (пропы сняты / стенд согласно регламенту).</li><li>Зафиксируйте версию прошивки и параметры, влияющие на allocation (для воспроизводимости).</li></ol>
+
+<h2>Диагностика</h2>
+<ul class="diag-list"><li><strong>Асимметрия / клевок:</strong> неверная геометрия, перепутанные моторы, инверсия серв.</li><li><strong>Нет отклика по оси:</strong> не назначен исполнитель, failsafe, отключённый канал.</li><li><strong>Ограничение по satuaration:</strong> запас по тяге, клипание — проверить лимиты и центровку.</li></ul>
+
+<h2>Заметки</h2>
+<h4 class="md-subheading">Общие материалы по микшерам в других стеках</h4>
+<p>Сопоставляйте термины осторожно: в Betaflight/INAV микшер ближе к PWM-выходу; в PX4 чаще говорят про <strong>actuators</strong> и матрицу распределения.</p>
+
+<h2>Чек-лист</h2>
+<ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="px4-control:0"><span>Геометрия и направления соответствуют сборке</span></label></li><li><label><input type="checkbox" data-check-id="px4-control:1"><span>Каждый исполнитель проверен на земле</span></label></li><li><label><input type="checkbox" data-check-id="px4-control:2"><span>Логи/статус без критических ошибок по приводам</span></label></li></ul>
+
+<h2>Источники</h2>
+<ul class="refs"><li><a href="https://docs.px4.io/main/en/config/actuators.html" target="_blank" rel="noopener noreferrer">PX4 Developer Guide — Actuators</a> <span class="gc-tag" data-state="info">primary | A</span></li></ul>
+      </div>
+      <div class="module-done"><gc-button variant="secondary" data-done-toggle="px4-control">Отметить как пройденный</gc-button></div>
+      <nav class="pager" aria-label="Соседние модули"><a class="gc-card pager__prev" href="px4-architecture.html"><span class="gc-label gc-muted">Назад</span><br>Архитектура и uORB</a><a class="gc-card pager__next" href="px4-ros2.html"><span class="gc-label gc-muted">Дальше</span><br>ROS 2 интеграция</a></nav>
+    </article>
+  </main>
+  <footer class="gc-container site-footer gc-muted">
+    <p>Открытый курс · <a href="https://github.com/irreligious86/UAV-Education">исходники на GitHub</a> · <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">план развития</a> · <a href="../curriculum/curriculum.html">для разработчика</a> · CC BY-NC-SA 4.0</p>
+  </footer>
+</body>
+</html>

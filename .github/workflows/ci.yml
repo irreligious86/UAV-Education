@@ -1,5 +1,5 @@
-# Content CI: every push/PR must keep content valid and index.html in sync with content/*.md.
-# GitHub Pages keeps serving main as-is; this workflow only guards what lands there.
+# Site CI: content must be valid, the committed site must be rebuilt from content,
+# and every local link must resolve. GitHub Pages serves main as-is.
 name: content-ci
 
 on:
@@ -15,38 +15,31 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: true
 
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
 
-      - name: Validate content
+      - name: Validate content and curriculum
         run: python scripts/validate_content.py
 
-      - name: Rebuild index.html
-        run: python scripts/publish.py --skip-validate
+      - name: Rebuild site
+        run: python scripts/build_site.py
 
-      - name: index.html must be committed in sync with content
+      - name: Built site must be committed in sync with content
         run: |
-          if ! git diff --quiet -- index.html; then
-            echo "::error::index.html is stale. Run 'python scripts/publish.py' locally and commit the result."
-            git diff --stat -- index.html
+          if [ -n "$(git status --porcelain -- index.html m ref pages api)" ]; then
+            echo "::error::Site is stale. Run 'python scripts/publish.py' locally and commit the result."
+            git status --short -- index.html m ref pages api
             exit 1
           fi
 
-      - name: Check local links in index.html
+      - name: Check local links
+        run: python scripts/check_links.py
+
+      - name: Design system is pinned to a release tag
         run: |
-          python - <<'PY'
-          import re, sys, pathlib
-          html = pathlib.Path("index.html").read_text(encoding="utf-8")
-          ids = set(re.findall(r'id="([^"]+)"', html))
-          anchors = set(re.findall(r'href="#([^"]+)"', html))
-          missing = sorted(a for a in anchors if a not in ids)
-          files = set(re.findall(r'href="(?!https?:|#|mailto:)([^"]+)"', html))
-          missing_files = sorted(f for f in files if not pathlib.Path(f.split("#")[0]).exists())
-          for a in missing:
-              print(f"::error::broken anchor #{a}")
-          for f in missing_files:
-              print(f"::error::broken file link {f}")
-          sys.exit(1 if missing or missing_files else 0)
-          PY
+          git -C lib/ground-control-ui fetch -q --tags origin
+          git -C lib/ground-control-ui describe --tags --exact-match

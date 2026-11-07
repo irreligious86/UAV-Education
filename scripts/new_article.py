@@ -106,7 +106,7 @@ def save_manifest(data: dict) -> None:
 
 def parse_args() -> argparse.Namespace:
     ap = argparse.ArgumentParser(
-        description="Создать статью, обновить content-manifest.json и опубликовать в index.html"
+        description="Создать статью, обновить content-manifest.json и пересобрать сайт"
     )
     ap.add_argument("section", help="Секция: " + "|".join(TAB_IDS))
     ap.add_argument("article_id", help="Уникальный id статьи, например px4-companion-jetson")
@@ -210,7 +210,7 @@ def main() -> None:
     if run.returncode != 0:
         print("Ошибка: автопубликация завершилась с ошибкой.", file=sys.stderr)
         raise SystemExit(run.returncode)
-    print("Автопубликация завершена: index.html обновлён.")
+    print("Автопубликация завершена. Не забудь разместить модуль в data/curriculum.json.")
 
 
 if __name__ == "__main__":

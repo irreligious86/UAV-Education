@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Порты и приёмник — UAV Student</title>
+  <meta name="description" content="назначить UART под приёмник, VTX, GPS">
+  <link rel="stylesheet" href="../lib/ground-control-ui/dist/ground-control.css">
+  <link rel="stylesheet" href="../assets/site.css">
+  <script src="../lib/ground-control-ui/dist/ground-control.js" defer></script>
+  <script src="../assets/progress-store.js" defer></script>
+  <script src="../assets/app.js" defer></script>
+</head>
+<body class="gc-root">
+  <header class="site-header">
+    <div class="gc-container site-header__inner">
+      <a class="site-brand" href="../index.html"><span class="site-brand__mark" aria-hidden="true">◆</span> UAV Student</a>
+      <nav class="gc-nav" aria-label="Разделы сайта">
+        <a href="../index.html" aria-current="page">Курс</a>
+        <a href="../ref/index.html">Справочник</a>
+        <a href="../pages/glossary.html">Глоссарий</a>
+        <a href="../pages/fails.html">Фейлы</a>
+      </nav>
+    </div>
+  </header>
+  <main class="gc-container site-main">
+    <article class="module" data-module-page="bf-ports">
+      <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-operator">Оператор</a><span>Порты и приёмник</span></p>
+      <h1 class="module-title">Порты и приёмник</h1>
+      <div class="module-tags"><span class="gc-tag" title="Уровень">L1 — Оператор</span><span class="gc-tag">чтение 30 мин</span><span class="gc-tag">учёба ~2 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></div>
+      <p class="module-lead"><strong>UART</strong> — основа подключения приёмника, GPS, телеметрии, VTX и др. к полётному контроллеру в Betaflight. От вкладки <strong>Ports</strong> зависит, дойдёт ли управление до прошивки. <strong>В статье:</strong> - как читать <strong>распиновку</strong> и не занять порт под USB; - <strong>распайка</strong> под SBUS, CRSF/ELRS, FPort, IBUS, Spektrum; - <strong>Serial Rx</strong> + выбор протокола во вкладке <strong>Configuration</strong>; - типичные сбои (<strong>MSP</strong>, лимиты, F4/SBUS).</p>
+      <div class="gc-callout" data-state="ok"><strong>После модуля ты умеешь</strong><ul><li>назначить UART под приёмник, VTX, GPS</li></ul></div><p class="gc-muted">Перед этим модулем: <a href="bf-intro.html">Введение в Betaflight</a></p>
+      <div class="gc-prose module-body">
+<h2>Теория</h2>
+<h4 class="md-subheading">Что такое UART и зачем настройка портов</h4>
+<p><strong>UART</strong> — последовательный интерфейс: пара <strong>TX</strong> (передача) и <strong>RX</strong> (приём). Во вкладке <strong>Ports</strong> каждому физическому UART назначают роль: <strong>Serial RX</strong>, <strong>GPS</strong>, телеметрия, <strong>MSP</strong> и т.д.</p>
+<p><strong>Правило:</strong> на одном UART в один момент — <strong>одна основная роль</strong> для потока данных. Совмещение, например, <strong>Serial Rx</strong> и <strong>Telemetry Output</strong> на одном порту без понимания протокола часто даёт конфликт и «ломает» сохранение настроек.</p>
+<h4 class="md-subheading">Типы приёмников и распайка</h4>
+<p>Протокол задаёт и проводку, и пункт <strong>Serial Receiver Provider</strong> в конфигураторе.</p>
+<ul><li><strong>SBUS</strong> (FrSky, Futaba, часть DJI) — в BF: <strong>SBUS</strong>. Сигнал с приёмника → <strong>RX</strong> выбранного UART (не на TX).</li><li><strong>CRSF</strong> (TBS Crossfire, <strong>ExpressLRS</strong>) — в BF: <strong>CRSF</strong>. <strong>RX приёмника → TX FC</strong>, <strong>TX приёмника → RX FC</strong> (классическое перекрёстное соединение для полного дуплекса).</li><li><strong>FPort</strong> (FrSky) — <strong>FrSky FPort</strong>; один провод, инверсия/пин зависят от платы и версии — сверяйтесь с мануалом FC.</li><li><strong>IBUS</strong> (FlySky, Turnigy) — <strong>IBUS</strong>, сигнал → <strong>RX</strong>.</li><li><strong>Spektrum DSM</strong> — <strong>SPEKTRUM1024</strong> / <strong>SPEKTRUM2048</strong>, сигнальный провод по документации приёмника.</li></ul>
+<p><strong>F4 и SBUS:</strong> на части плат <strong>нет</strong> аппаратного инвертора под инвертированный SBUS — используйте выделенный пин <strong>SBUS</strong> на FC или другой протокол (<strong>FPort</strong> и т.д.), иначе понадобится внешний инвертор.</p>
+<h4 class="md-subheading">Betaflight 4.4+ и Cloud Build</h4>
+<p>С <strong>4.4.0</strong> при сборке через <strong>Cloud Build</strong> в прошивку попадают только выбранные <strong>протоколы приёмника</strong>. По умолчанию часто включены <strong>SBUS</strong>, <strong>CRSF</strong>, <strong>GHST</strong>. <strong>IBUS</strong>, <strong>Spektrum</strong> и др. нужно <strong>явно отметить</strong> при сборке — иначе приёмник «молчит» при любой распайке.</p>
+<h4 class="md-subheading">Ограничения MSP</h4>
+<p><strong>MSP</strong> нужен конфигуратору и части устройств. Ограничение: одновременно <strong>не более трёх</strong> UART с включённым <strong>MSP</strong>; четвёртый может привести к сбросу настроек MSP после перезагрузки.</p>
+<p><strong>Совет:</strong> соединение с ПК по <strong>USB</strong> обычно занимает отдельный канал; не переназначайте его под приёмник, не понимая схемы платы.</p>
+
+<h2>Практика</h2>
+<h4 class="md-subheading">Шаг 1. Идентификация UART на FC</h4>
+<ol><li>Найдите <strong>распиновку</strong> (шёлк на плате или сайт производителя).</li><li>UART подписаны как <strong>UART1…</strong> или <strong>RX1/TX1</strong> и соответствуют строкам во вкладке <strong>Ports</strong>.</li></ol>
+<p><strong>Совет:</strong> <strong>USB</strong> часто «сидит» на <strong>UART1</strong> или отдельном USB-мосте — этот порт не выбирайте под приёмник без чтения схемы.</p>
+<h4 class="md-subheading">Шаг 2. Физическое подключение приёмника</h4>
+<ol><li><strong>Обесточить</strong> FC перед пайкой/вставкой в разъём.</li><li>Для приёмника взять <strong>свободный</strong> UART (часто удобно оставить канал USB как есть и занять <strong>UART2/UART3</strong>).</li><li>Распаять по таблице выше (<strong>SBUS → RX</strong>, <strong>CRSF → перекрёстно</strong> и т.д.).</li><li>Проверить <strong>пайку</strong>, отсутствие <strong>КЗ</strong> между соседними пинами.</li></ol>
+<h4 class="md-subheading">Шаг 3. Вкладка Ports</h4>
+<ol><li>Подключить FC по <strong>USB</strong>, открыть <strong>Betaflight Configurator</strong>.</li><li><strong>Ports</strong> — найти строку <strong>UART</strong>, куда идёт приёмник.</li><li><strong>Не отключать MSP</strong> на том UART, который одновременно нужен для связи с ПК (см. мануал платы).</li><li>Включить только <strong>Serial Rx</strong> на выбранном UART; <strong>остальные функции</strong> на том же UART — выключить (<strong>MSP</strong>, лишняя телеметрия и т.д., если они конфликтуют с вашей схемой).</li><li><strong>Save and Reboot</strong>.</li></ol>
+<h4 class="md-subheading">Шаг 4. Протокол приёмника (Configuration)</h4>
+<ol><li>После перезагрузки — <strong>Configuration</strong> → раздел <strong>Receiver</strong>.</li><li><strong>Receiver Mode:</strong> <strong>Serial-based receiver</strong> (как в подсказке конфигуратора).</li><li><strong>Serial Receiver Provider</strong> — строго под железо:</li></ol>
+<p>- TBS Crossfire / <strong>ELRS</strong> → <strong>CRSF</strong>    - FrSky <strong>SBUS</strong> → <strong>SBUS</strong>    - FrSky <strong>FPort</strong> → <strong>FrSky FPort</strong>    - FlySky / Turnigy → <strong>IBUS</strong>    - Spektrum → <strong>SPEKTRUM1024</strong> / <strong>SPEKTRUM2048</strong></p>
+<ol><li><strong>Save and Reboot</strong>.</li></ol>
+<h4 class="md-subheading">Шаг 5. Проверка Receiver</h4>
+<ol><li>Приёмник <strong>связан</strong> с пультом (индикация по инструкции).</li><li>Вкладка <strong>Receiver</strong> — движение стиков и тумблеров <strong>двигает ползунки</strong> каналов.</li><li>Диапазон типично <strong>~1000–2000</strong>, центр <strong>~1500</strong>.</li></ol>
+<h4 class="md-subheading">Шаг 6. Дополнительно</h4>
+<ul><li>Ползунки «не те» каналы — <strong>Channel Map</strong> (<strong>AETR</strong>, <strong>TAER</strong> …) на <strong>Receiver</strong>.</li><li>Края диапазона кривые — <strong>endpoints</strong> на пульте или <code>rxrange</code> в <strong>CLI</strong>.</li><li><strong>Телеметрия на пульт</strong> (CRSF/ELRS): обычно идёт тем же UART, что управление; при необходимости проверьте опции <strong>Telemetry</strong> в <strong>Configuration</strong> для вашей связки.</li></ul>
+
+<h2>Диагностика</h2>
+<div class="diag-groups"><article class="diag-item"><h4><strong>Симптом:</strong> После сохранения портов и перезагрузки настройки «откатились».</h4><ul><li>Возможная причина: конфликт функций на одном UART (<strong>Serial Rx</strong> + лишний <strong>MSP</strong> и т.п.) или лимит <strong>MSP</strong> на трёх портах.</li><li>Что сделать: во вкладке <strong>Ports</strong> оставить на UART приёмника только нужное; убедиться, что не больше трёх портов с <strong>MSP</strong>; сохранить и перезагрузить.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> В <strong>Receiver</strong> ползунки не двигаются, приёмник в линке.</h4><ul><li>Возможная причина: <strong>Serial Rx</strong> не на том UART; неверный <strong>Provider</strong>; прошивка без нужного протокола (<strong>Cloud Build</strong>).</li><li>Что сделать: проверить <strong>Ports</strong> и <strong>Configuration</strong>; для BF <strong>4.4+</strong> пересобрать прошивку с нужным протоколом приёмника.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> CRSF/ELRS работает, на пульте нет телеметрии.</h4><ul><li>Возможная причина: выключена телеметрия в настройках связки или не <strong>CRSF</strong> как провайдер.</li><li>Что сделать: <strong>Serial Receiver Provider = CRSF</strong>; включить телеметрию по мануалу ELRS/пульта.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> SBUS на F4 не заводится.</h4><ul><li>Возможная причина: нет инвертора, сигнал идёт не на пин <strong>SBUS</strong> / не тот UART.</li><li>Что сделать: пин <strong>SBUS</strong> на плате, <strong>FPort</strong>, внешний инвертор или смена протокола.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> Ползунки двигаются, но не укладываются в 1000–2000.</h4><ul><li>Возможная причина: <strong>endpoints</strong> на пульте; не настроен <code>rxrange</code>.</li><li>Что сделать: выставить ход на пульте; при необходимости <strong>`rxrange`</strong> в CLI.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> После настроек GPS passthrough «пропадают» MSP-настройки.</h4><ul><li>Возможная причина: превышен лимит <strong>трёх</strong> портов с <strong>MSP</strong>.</li><li>Что сделать: отключить <strong>MSP</strong> там, где не нужен; оставить не более трёх UART с MSP.</li></ul></article></div>
+
+<h2>Источники</h2>
+<ul class="refs"><li><a href="https://www.betaflight.com/docs/wiki/app/ports-tab" target="_blank" rel="noopener noreferrer">Ports Tab — Betaflight Documentation</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://support.speedybee.cn/?s=teched&amp;l=en&amp;t=a&amp;p=0&amp;i=124433541697114112" target="_blank" rel="noopener noreferrer">How to Configure the Receiver in Betaflight — SpeedyBee</a> <span class="gc-tag">secondary</span></li><li><a href="https://speedybee.zendesk.com/hc/en-us/articles/13844536933787-How-to-set-up-your-receiver-in-Betaflight-configurator-on-SpeedyBee-F745AIO-flight-controller" target="_blank" rel="noopener noreferrer">How to Set Up Your Receiver in Betaflight — SpeedyBee F745AIO</a> <span class="gc-tag">secondary</span></li><li><a href="https://speedybee.zendesk.com/hc/en-us/articles/15739653255963-How-to-set-up-your-SBUS-receiver-in-Betaflight-configurator-on-SpeedyBee-F7-V3-flight-controller" target="_blank" rel="noopener noreferrer">How to Set Up Your SBUS Receiver in Betaflight — SpeedyBee F7 V3</a> <span class="gc-tag">secondary</span></li><li><a href="https://docs.speedybee.cn/fpv/receiver/common-issues-with-elrs-receivers/how-to-set-up-your-receiver-in-betaflight-configurator.html" target="_blank" rel="noopener noreferrer">Common Issues with ELRS Receivers — SpeedyBee</a> <span class="gc-tag">secondary</span></li><li><a href="https://www.flitetest.com/articles/connecting-ez-id-to-betaflight-for-gps-passthrough" target="_blank" rel="noopener noreferrer">Connecting EZ ID to Betaflight for GPS Passthrough — Flite Test</a> <span class="gc-tag">secondary</span></li></ul>
+      </div>
+      <div class="module-done"><gc-button variant="secondary" data-done-toggle="bf-ports">Отметить как пройденный</gc-button></div>
+      <nav class="pager" aria-label="Соседние модули"><a class="gc-card pager__prev" href="bf-intro.html"><span class="gc-label gc-muted">Назад</span><br>Введение в Betaflight</a><a class="gc-card pager__next" href="link-protocols.html"><span class="gc-label gc-muted">Дальше</span><br>SBUS, CRSF и инверсия UART</a></nav>
+    </article>
+  </main>
+  <footer class="gc-container site-footer gc-muted">
+    <p>Открытый курс · <a href="https://github.com/irreligious86/UAV-Education">исходники на GitHub</a> · <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">план развития</a> · <a href="../curriculum/curriculum.html">для разработчика</a> · CC BY-NC-SA 4.0</p>
+  </footer>
+</body>
+</html>

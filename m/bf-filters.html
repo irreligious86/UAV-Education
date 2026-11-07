@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Фильтры — UAV Student</title>
+  <meta name="description" content="объяснить цену фильтра в задержке настроить LPF и dynamic notch по логу">
+  <link rel="stylesheet" href="../lib/ground-control-ui/dist/ground-control.css">
+  <link rel="stylesheet" href="../assets/site.css">
+  <script src="../lib/ground-control-ui/dist/ground-control.js" defer></script>
+  <script src="../assets/progress-store.js" defer></script>
+  <script src="../assets/app.js" defer></script>
+</head>
+<body class="gc-root">
+  <header class="site-header">
+    <div class="gc-container site-header__inner">
+      <a class="site-brand" href="../index.html"><span class="site-brand__mark" aria-hidden="true">◆</span> UAV Student</a>
+      <nav class="gc-nav" aria-label="Разделы сайта">
+        <a href="../index.html" aria-current="page">Курс</a>
+        <a href="../ref/index.html">Справочник</a>
+        <a href="../pages/glossary.html">Глоссарий</a>
+        <a href="../pages/fails.html">Фейлы</a>
+      </nav>
+    </div>
+  </header>
+  <main class="gc-container site-main">
+    <article class="module" data-module-page="bf-filters">
+      <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-integrator">Интегратор</a><span>Фильтры</span></p>
+      <h1 class="module-title">Фильтры</h1>
+      <div class="module-tags"><span class="gc-tag" title="Уровень">L2 — Интегратор</span><span class="gc-tag">чтение 15–20 мин</span><span class="gc-tag">учёба ~3 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></div>
+      <p class="module-lead">Фильтрация сигнала гироскопа и D-term — критически важный этап настройки дрона в Betaflight. Без корректной фильтрации шум от моторов, пропеллеров и резонансов рамы попадает в PID-регулятор, вызывая перегрев моторов, осцилляции и ухудшение управляемости. Этот модуль объясняет физическую природу шумов, архитектуру фильтров (RPM, dynamic notch, lowpass PT1/PT2/BIQUAD), их влияние на задержку и поведение дрона. После изучения вы сможете настраивать фильтры по данным Blackbox, а не методом случайного подбора.</p>
+      <div class="gc-callout" data-state="ok"><strong>После модуля ты умеешь</strong><ul><li>объяснить цену фильтра в задержке</li><li>настроить LPF и dynamic notch по логу</li></ul></div><p class="gc-muted">Перед этим модулем: <a href="bf-blackbox.html">Blackbox</a></p>
+      <div class="gc-prose module-body">
+<h2>Теория</h2>
+<h4 class="md-subheading">Природа шумов в системе БПЛА</h4>
+<p>Сигнал гироскопа содержит полезную динамику и шум. Источники шума:</p>
+<ul><li>моторы и пропеллеры (включая гармоники);</li><li>резонанс рамы и креплений;</li><li>электромагнитные помехи от силовой части;</li><li>алиасинг при несоответствии частоты дискретизации.</li></ul>
+<p>D-term особенно чувствителен к высокочастотному шуму, поэтому при плохой фильтрации именно он чаще всего приводит к перегреву моторов.</p>
+<h4 class="md-subheading">Архитектура фильтров в Betaflight</h4>
+<p>В Betaflight 4.5+ обычно используется каскад:</p>
+<ol><li>RPM Filter — самый эффективный фильтр шумов моторов.</li><li>Dynamic Notch — авто-подавление резонансных пиков.</li><li>Lowpass-фильтры (gyro и D-term) — финальная очистка.</li><li>Статические notch-фильтры — опционально, когда автофильтров недостаточно.</li></ol>
+<h4 class="md-subheading">Задержка vs чистота сигнала</h4>
+<p>Любой фильтр добавляет задержку.   Слишком сильная фильтрация делает дрон &quot;ватным&quot;; слишком слабая — шумным и горячим.</p>
+<p>Практическая цель: минимальная задержка при стабильной температуре моторов и чистом спектре.</p>
+
+<h2>Практика</h2>
+<h4 class="md-subheading">Подготовка</h4>
+<ul><li>ESC с Bidirectional DShot (BLHeli_32 / Bluejay).</li><li>FC F4/F7/H7.</li><li>Исправная механика: без люфтов, ровные пропеллеры.</li><li>Логирование в Blackbox (flash/SD).</li></ul>
+<h4 class="md-subheading">Базовая настройка</h4>
+<ol><li>Включите Blackbox и RPM filtering.</li><li>Убедитесь, что RPM телеметрия работает (<code>E = 0%</code> во вкладке Motors).</li><li>Сохраните текущую конфигурацию:</li></ol>
+<pre class="cli-block"><code>diff all</code></pre>
+<ol><li>Базовые параметры:</li></ol>
+<pre class="cli-block"><code>set dyn_notch_width_percent = 0
+set dyn_notch_q = 250
+set dshot_bidir = ON
+save</code></pre>
+<h4 class="md-subheading">Пошаговая настройка</h4>
+<p>1. Снимите лог с throttle sweep (<code>20% -&gt; 100%</code>) и обычными маневрами. 2. Посмотрите спектр в Blackbox Explorer / PID ToolBox. 3. Определите шумовые зоны:    - <code>&lt;100 Гц</code> — часто механика/PID;    - <code>100–250 Гц</code> — резонансы;    - <code>&gt;250 Гц</code> — моторный шум. 4. Корректируйте lowpass осторожно, по одному параметру за итерацию. 5. После каждого изменения — новый лог и сравнение.</p>
+<h4 class="md-subheading">Пример ручной корректировки</h4>
+<pre class="cli-block"><code>set gyro_lpf1_static_hz = 0
+set gyro_lpf2_hz = 300
+set dterm_lpf1_hz = 150
+set dterm_lpf2_hz = 120
+save</code></pre>
+<p>Если при активном RPM + dynamic notch статические notch не нужны:</p>
+<pre class="cli-block"><code>set gyro_notch1_hz = 0
+set gyro_notch2_hz = 0
+set dterm_notch_hz = 0
+save</code></pre>
+
+<h2>Диагностика</h2>
+<div class="diag-groups"><article class="diag-item"><h4>Симптом: моторы горячие после короткого полета.</h4><ul><li>Возможная причина: D-term шумит, RPM-фильтр не работает.</li><li>Что сделать: проверить <code>Bidirectional DShot</code>, активность RPM filter, усилить фильтрацию D-term.</li></ul></article><article class="diag-item"><h4>Симптом: дрон &quot;дребезжит&quot; на ховере.</h4><ul><li>Возможная причина: гирошум/резонанс попадает в PID.</li><li>Что сделать: проверить спектр, убедиться в работе dynamic notch и RPM filter.</li></ul></article><article class="diag-item"><h4>Симптом: при резком газе появляется визг и просадки по управлению.</h4><ul><li>Возможная причина: резонанс в рабочем диапазоне оборотов.</li><li>Что сделать: снять throttle sweep, локализовать частоту пика, при необходимости добавить статический notch.</li></ul></article><article class="diag-item"><h4>Симптом: после фильтрации дрон стал &quot;ватным&quot;.</h4><ul><li>Возможная причина: избыточная фильтрация (высокая задержка).</li><li>Что сделать: постепенно поднимать частоты среза и контролировать температуру моторов.</li></ul></article><article class="diag-item"><h4>Симптом: в логах &quot;пушистый&quot; gyro (широкая шумовая полоса).</h4><ul><li>Возможная причина: RPM телеметрия отсутствует или невалидна.</li><li>Что сделать: проверить RPM и ошибку <code>E</code>, прошивку ESC, настройки bidirectional DShot.</li></ul></article></div>
+
+<h2>Источники</h2>
+<ul class="refs"><li><a href="https://www.betaflight.com/docs/development/Cli" target="_blank" rel="noopener noreferrer">Betaflight CLI Documentation — Gyro &amp; Filter Variables</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://www.betaflight.com/docs/wiki/tuning/4-1-Tuning-Notes#new-filter-settings" target="_blank" rel="noopener noreferrer">Betaflight 4.1 Tuning Notes — Filter Settings</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://www.betaflight.com/docs/wiki/app/pid-tuning-tab#filter-settings" target="_blank" rel="noopener noreferrer">PID Tuning Tab — Filter Settings</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://betaflight-com.pages.dev/docs/wiki/guides/archive/Gyro-And-Dterm-Filtering-Recommendations-3-1" target="_blank" rel="noopener noreferrer">Gyro and Dterm Filtering Recommendations 3.1 (archive)</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://github.com/PID-ToolBox" target="_blank" rel="noopener noreferrer">PID ToolBox — Filter Analysis Tool</a> <span class="gc-tag">secondary</span></li><li><a href="https://oscarliang.com/pid-filter-tuning-blackbox/" target="_blank" rel="noopener noreferrer">How to Tune Filters &amp; PID with Blackbox — Oscar Liang</a> <span class="gc-tag">secondary</span></li><li><a href="https://hackmd.io/@nerdCopter/rJzic_N-p" target="_blank" rel="noopener noreferrer">Bare Minimum Tune Betaflight — Filter Workflow</a> <span class="gc-tag">secondary</span></li><li><a href="https://www.drone-fpv.fr/reglages-betaflight-vol-fluide/#Comparatif_des_approches_de_filtrage_et_choix_pragmatique" target="_blank" rel="noopener noreferrer">Reglages Betaflight : filtres PT2, BIQUAD et sliders</a> <span class="gc-tag">secondary</span></li></ul>
+      </div>
+      <div class="module-done"><gc-button variant="secondary" data-done-toggle="bf-filters">Отметить как пройденный</gc-button></div>
+      <nav class="pager" aria-label="Соседние модули"><a class="gc-card pager__prev" href="bf-blackbox.html"><span class="gc-label gc-muted">Назад</span><br>Blackbox</a><a class="gc-card pager__next" href="bf-rpm-filter.html"><span class="gc-label gc-muted">Дальше</span><br>RPM-фильтр: кейс «свистящего» 10&quot;</a></nav>
+    </article>
+  </main>
+  <footer class="gc-container site-footer gc-muted">
+    <p>Открытый курс · <a href="https://github.com/irreligious86/UAV-Education">исходники на GitHub</a> · <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">план развития</a> · <a href="../curriculum/curriculum.html">для разработчика</a> · CC BY-NC-SA 4.0</p>
+  </footer>
+</body>
+</html>

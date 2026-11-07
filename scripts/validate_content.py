@@ -197,6 +197,41 @@ def validate_published_sections(md_path, published):
     return errors
 
 
+CURRICULUM_PATH = ROOT / "data" / "curriculum.json"
+
+
+def validate_curriculum(manifest_ids):
+    """curriculum.json must be consistent with itself and with the manifest."""
+    import json
+
+    if not CURRICULUM_PATH.is_file():
+        return ["нет data/curriculum.json"]
+    cur = json.loads(CURRICULUM_PATH.read_text(encoding="utf-8"))
+    errors = []
+    groups = cur.get("tracks", []) + cur.get("electives", [])
+    ids = [m["id"] for g in groups for m in g.get("modules", [])]
+    seen = set()
+    for i in ids:
+        if i in seen:
+            errors.append(f"curriculum: модуль «{i}» встречается дважды")
+        seen.add(i)
+    for g in groups:
+        for m in g.get("modules", []):
+            for k in ("id", "title", "level"):
+                if k not in m:
+                    errors.append(f"curriculum: у модуля {m.get('id', '?')} нет «{k}»")
+            for p in m.get("prerequisites", []):
+                if p not in seen:
+                    errors.append(f"curriculum: {m['id']} → prerequisite «{p}» не найден")
+            if m.get("article") and m["article"] not in manifest_ids:
+                errors.append(f"curriculum: {m['id']} ссылается на статью «{m['article']}», которой нет в манифесте")
+            if not m.get("article") and m["id"] in manifest_ids:
+                errors.append(f"curriculum: {m['id']} есть в манифесте — укажи \"article\": \"{m['id']}\"")
+    for mid in sorted(set(manifest_ids) - seen):
+        errors.append(f"curriculum: статья «{mid}» из манифеста не размещена ни в одном треке/элективе")
+    return errors
+
+
 def main():
     if not MANIFEST_PATH.is_file():
         print(f"Нет {MANIFEST_PATH}", file=sys.stderr)
@@ -211,6 +246,7 @@ def main():
     errs.extend(validate_source_files(manifest))
 
     errs.extend(validate_statuses(manifest))
+    errs.extend(validate_curriculum(all_ids_set))
 
     status_by_file = {}
     for sec in manifest.get("sections", []):

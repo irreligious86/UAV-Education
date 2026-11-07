@@ -1357,6 +1357,9 @@ refactor: унификация CSS-переменных
 - **Новый раздел «Радиолинк»:** `link-protocols`, `link-elrs`, `link-vtx`.
 - **Betaflight:** `bf-failsafe`, `bf-rpm-filter`, `bf-cli-automation`.
 - **План развития** вынесен в `ROADMAP.md`.
+- **Новая архитектура сайта:** программа курса `data/curriculum.json` (5 треков + элективы); страница на модуль `m/<id>.html`; справочник `ref/`; ручные страницы перенесены в `content/pages/`; главная — карта курса с прогрессом; старые ссылки `index.html#<id>` перенаправляются.
+- **Дизайн:** Ground Control UI подключён как submodule `lib/ground-control-ui` (тег v0.2.1); `style.css` удалён, свои стили — `assets/site.css`.
+- **Сборка:** `scripts/build_site.py` + `scripts/check_links.py`; маркеры `AUTO:*` упразднены; `publish.py` = валидация + сборка + ссылки.
 
 ## [Unreleased]
 

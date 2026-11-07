@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SBUS, CRSF и инверсия UART — UAV Student</title>
+  <meta name="description" content="подключить CRSF и SBUS правильно объяснить инверсию UART">
+  <link rel="stylesheet" href="../lib/ground-control-ui/dist/ground-control.css">
+  <link rel="stylesheet" href="../assets/site.css">
+  <script src="../lib/ground-control-ui/dist/ground-control.js" defer></script>
+  <script src="../assets/progress-store.js" defer></script>
+  <script src="../assets/app.js" defer></script>
+</head>
+<body class="gc-root">
+  <header class="site-header">
+    <div class="gc-container site-header__inner">
+      <a class="site-brand" href="../index.html"><span class="site-brand__mark" aria-hidden="true">◆</span> UAV Student</a>
+      <nav class="gc-nav" aria-label="Разделы сайта">
+        <a href="../index.html" aria-current="page">Курс</a>
+        <a href="../ref/index.html">Справочник</a>
+        <a href="../pages/glossary.html">Глоссарий</a>
+        <a href="../pages/fails.html">Фейлы</a>
+      </nav>
+    </div>
+  </header>
+  <main class="gc-container site-main">
+    <article class="module" data-module-page="link-protocols">
+      <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-operator">Оператор</a><span>SBUS, CRSF и инверсия UART</span></p>
+      <h1 class="module-title">SBUS, CRSF и инверсия UART</h1>
+      <div class="module-tags"><span class="gc-tag" title="Уровень">L1 — Оператор</span><span class="gc-tag">чтение 15 мин</span><span class="gc-tag">учёба ~1.5 ч</span><span class="gc-tag">CRSF / SBUS</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></div>
+      <p class="module-lead">Приёмник передаёт полётному контроллеру положения стиков по одному из serial-протоколов. Сегодня два главных — старый SBUS (FrSky, Futaba) и CRSF (TBS Crossfire, ExpressLRS). Модуль объясняет физическую разницу между ними, что такое «инвертированный» сигнал, почему с SBUS были вечные проблемы на F4-контроллерах и как правильно подключить каждый протокол.</p>
+      <div class="gc-callout" data-state="ok"><strong>После модуля ты умеешь</strong><ul><li>подключить CRSF и SBUS правильно</li><li>объяснить инверсию UART</li></ul></div><p class="gc-muted">Перед этим модулем: <a href="bf-ports.html">Порты и приёмник</a></p>
+      <div class="gc-prose module-body">
+<h2>Теория</h2>
+<h4 class="md-subheading">Что такое UART-кадр</h4>
+<p>UART передаёт байты последовательно: стартовый бит, 8 бит данных, (необязательный) бит чётности, стоповые биты. В состоянии покоя (idle) линия в логической единице — высокий уровень. Стартовый бит опускает её в ноль, приёмник ловит этот фронт и начинает отсчёт.</p>
+<h4 class="md-subheading">Что значит «инвертированный»</h4>
+<p>В инвертированном сигнале всё наоборот: покой — низкий уровень, единица — низкий, ноль — высокий. Данные те же, перевёрнута только электрика. Если подать инвертированный сигнал на обычный UART, приёмник увидит мусор: он будет ждать стартовый бит не там.</p>
+<h4 class="md-subheading">SBUS</h4>
+<ul><li>100000 бод, 8 бит данных, чётность even, 2 стоповых бита (8E2);</li><li>инвертированный сигнал — это стандарт протокола, а не исключение;</li><li>кадр 25 байт: 16 пропорциональных каналов по 11 бит, 2 цифровых канала, флаги frame lost и failsafe;</li><li>однонаправленный: только приёмник → контроллер, телеметрию назад отдельным проводом (SmartPort).</li></ul>
+<p>Фраза «неинвертированный SBUS» означает сигнал, который кто-то перевернул обратно ради совместимости. Это обходной путь, а не другой протокол.</p>
+<h4 class="md-subheading">Почему F4 мучился с SBUS</h4>
+<p>UART микроконтроллеров STM32F4 не умеет аппаратно инвертировать вход. У F7, H7 и G4 есть для этого бит в регистре USART, и инверсия включается программно. Поэтому F4-платы ставили отдельный аппаратный инвертор на один UART (пад обычно подписан SBUS), а на остальных портах SBUS без доработки не работал.</p>
+<h4 class="md-subheading">CRSF</h4>
+<ul><li>обычный неинвертированный UART, 8N1;</li><li>полный дуплекс на двух проводах (TX и RX): каналы вниз, телеметрия вверх по тому же порту;</li><li>скорость по спецификации — 416666 бод для полного дуплекса, может договариваться выше для меньшей задержки;</li><li>в кадре есть тип пакета и CRC, протокол расширяемый: каналы, телеметрия, link statistics, параметры устройства.</li></ul>
+<p>Отсюда практическое правило: CRSF не нуждается в инверторе и работает на любом свободном UART любой серии.</p>
+
+<h2>Практика</h2>
+<h4 class="md-subheading">Подключение CRSF / ExpressLRS к Betaflight</h4>
+<ol><li>Провода крест-накрест: TX приёмника → RX контроллера, RX приёмника → TX контроллера. Плюс 5 В и GND.</li><li>Ports: на этом UART включить Serial RX.</li><li>Receiver: Serial, провайдер CRSF, телеметрия включена.</li><li>В CLI проверить, что порт не инвертирован и не полудуплексный:</li></ol>
+<pre class="cli-block"><code>get serialrx
+set serialrx_provider = CRSF
+set serialrx_inverted = OFF
+set serialrx_halfduplex = OFF
+save</code></pre>
+<h4 class="md-subheading">Подключение SBUS</h4>
+<ol><li>На F4 — только на UART с аппаратным инвертором (пад SBUS по схеме платы) или к приёмнику, который умеет выдавать неинвертированный сигнал.</li><li>На F7/H7 — на любой UART, инверсию Betaflight включит сам.</li><li>Провайдер <code>SBUS</code>. Параметр <code>serialrx_inverted</code> трогать только если приёмник выдаёт неинвертированный SBUS.</li></ol>
+<h4 class="md-subheading">Проверка</h4>
+<p>Вкладка Receiver: каналы двигаются вместе со стиками, порядок каналов совпадает (AETR), диапазон около 1000–2000.</p>
+
+<h2>Диагностика</h2>
+<div class="diag-groups"><article class="diag-item"><h4><strong>Симптом:</strong> приёмник забинден, а в Receiver каналы стоят</h4><ul><li>Возможная причина: TX/RX перепутаны или выбран не тот UART в Ports.</li><li>Что сделать: проверить пайку крест-накрест и номер UART по схеме платы.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> SBUS на F4 не работает ни на одном порту</h4><ul><li>Возможная причина: подключено к UART без инвертора.</li><li>Что сделать: найти пад с инвертором по схеме или использовать неинвертированный выход приёмника.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> каналы есть, но телеметрии на пульте нет (CRSF)</h4><ul><li>Возможная причина: не припаян провод TX контроллера → RX приёмника или включён half-duplex.</li><li>Что сделать: проверить второй провод и <code>serialrx_halfduplex = OFF</code>.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> стики «дёргаются» на месте</h4><ul><li>Возможная причина: помехи на линии, плохой GND или неверная скорость.</li><li>Что сделать: проверить общий GND, убрать провод от силовых линий.</li></ul></article></div>
+
+<h2>Чек-лист</h2>
+<ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="link-protocols:0"><span>Понятно, какой протокол выдаёт приёмник</span></label></li><li><label><input type="checkbox" data-check-id="link-protocols:1"><span>Для SBUS на F4 выбран UART с инвертором</span></label></li><li><label><input type="checkbox" data-check-id="link-protocols:2"><span>Для CRSF: TX/RX крест-накрест, оба провода припаяны</span></label></li><li><label><input type="checkbox" data-check-id="link-protocols:3"><span><code>serialrx_inverted</code> и <code>serialrx_halfduplex</code> проверены через <code>get</code></span></label></li><li><label><input type="checkbox" data-check-id="link-protocols:4"><span>Во вкладке Receiver каналы и их порядок проверены</span></label></li></ul>
+
+<h2>Источники</h2>
+<ul class="refs"><li><a href="https://github.com/tbs-fpv/tbs-crsf-spec" target="_blank" rel="noopener noreferrer">CRSF Protocol Specification — TBS (GitHub)</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://www.expresslrs.org/quick-start/receivers/configuring-fc/" target="_blank" rel="noopener noreferrer">Configuring FC for ExpressLRS — ExpressLRS Docs</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://github.com/bolderflight/sbus" target="_blank" rel="noopener noreferrer">SBUS library and protocol description — Bolder Flight Systems</a> <span class="gc-tag">secondary</span></li><li><a href="https://oscarliang.com/sbus-smartport-telemetry-naze32" target="_blank" rel="noopener noreferrer">How to Setup SBus — Oscar Liang</a> <span class="gc-tag">secondary</span></li></ul>
+      </div>
+      <div class="module-done"><gc-button variant="secondary" data-done-toggle="link-protocols">Отметить как пройденный</gc-button></div>
+      <nav class="pager" aria-label="Соседние модули"><a class="gc-card pager__prev" href="bf-ports.html"><span class="gc-label gc-muted">Назад</span><br>Порты и приёмник</a><a class="gc-card pager__next" href="bf-modes-osd.html"><span class="gc-label gc-muted">Дальше</span><br>Режимы и OSD</a></nav>
+    </article>
+  </main>
+  <footer class="gc-container site-footer gc-muted">
+    <p>Открытый курс · <a href="https://github.com/irreligious86/UAV-Education">исходники на GitHub</a> · <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">план развития</a> · <a href="../curriculum/curriculum.html">для разработчика</a> · CC BY-NC-SA 4.0</p>
+  </footer>
+</body>
+</html>

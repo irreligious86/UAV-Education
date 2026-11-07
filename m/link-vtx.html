@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>VTX-таблицы и смена видеоканала — UAV Student</title>
+  <meta name="description" content="загрузить vtxtable сменить занятый канал по алгоритму">
+  <link rel="stylesheet" href="../lib/ground-control-ui/dist/ground-control.css">
+  <link rel="stylesheet" href="../assets/site.css">
+  <script src="../lib/ground-control-ui/dist/ground-control.js" defer></script>
+  <script src="../assets/progress-store.js" defer></script>
+  <script src="../assets/app.js" defer></script>
+</head>
+<body class="gc-root">
+  <header class="site-header">
+    <div class="gc-container site-header__inner">
+      <a class="site-brand" href="../index.html"><span class="site-brand__mark" aria-hidden="true">◆</span> UAV Student</a>
+      <nav class="gc-nav" aria-label="Разделы сайта">
+        <a href="../index.html" aria-current="page">Курс</a>
+        <a href="../ref/index.html">Справочник</a>
+        <a href="../pages/glossary.html">Глоссарий</a>
+        <a href="../pages/fails.html">Фейлы</a>
+      </nav>
+    </div>
+  </header>
+  <main class="gc-container site-main">
+    <article class="module" data-module-page="link-vtx">
+      <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-operator">Оператор</a><span>VTX-таблицы и смена видеоканала</span></p>
+      <h1 class="module-title">VTX-таблицы и смена видеоканала</h1>
+      <div class="module-tags"><span class="gc-tag" title="Уровень">L2 — Интегратор</span><span class="gc-tag">чтение 20 мин</span><span class="gc-tag">учёба ~1.5 ч</span><span class="gc-tag">Betaflight 4.5+</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></div>
+      <p class="module-lead">Видеопередатчик (VTX) управляется полётным контроллером: Betaflight знает, какие частоты и мощности у VTX есть, из VTX-таблицы. Модуль объясняет, как устроена таблица, чем режимы FACTORY и CUSTOM отличаются, и даёт алгоритм смены канала, когда твой занят — например, упавшим бортом, который продолжает вещать до конца смены.</p>
+      <div class="gc-callout" data-state="ok"><strong>После модуля ты умеешь</strong><ul><li>загрузить vtxtable</li><li>сменить занятый канал по алгоритму</li></ul></div><p class="gc-muted">Перед этим модулем: <a href="bf-ports.html">Порты и приёмник</a></p>
+      <div class="gc-prose module-body">
+<h2>Теория</h2>
+<h4 class="md-subheading">Зачем таблица</h4>
+<p>Протоколы управления VTX (SmartAudio, IRC Tramp, MSP) передают либо номер band/channel, либо частоту. Чтобы OSD и пульт показывали правильные значения, Betaflight хранит таблицу: список бендов, по 8 каналов в каждом, и список уровней мощности.</p>
+<h4 class="md-subheading">Синтаксис</h4>
+<pre class="cli-block"><code>vtxtable bands 5
+vtxtable channels 8
+vtxtable band 1 BOSCAM_A A FACTORY 5865 5845 5825 5805 5785 5765 5745 5725
+vtxtable band 5 RACEBAND R FACTORY 5658 5695 5732 5769 5806 5843 5880 5917
+vtxtable powerlevels 3
+vtxtable powervalues 14 20 26
+vtxtable powerlabels 25 100 400</code></pre>
+<p>Поля строки band: номер, имя, буква, режим, восемь частот. Частота <code>0</code> блокирует канал.</p>
+<h4 class="md-subheading">FACTORY против CUSTOM</h4>
+<ul><li>FACTORY: Betaflight отправляет VTX номер бенда и канала, VTX использует свою встроенную таблицу. Частоты в таблице FC нужны только для отображения — поэтому они обязаны совпадать с реальной таблицей VTX.</li><li>CUSTOM: Betaflight отправляет саму частоту. Можно задать любые частоты в пределах возможностей VTX. IRC Tramp и RTC6705 работают только в CUSTOM.</li></ul>
+<h4 class="md-subheading">Две записи одного канала</h4>
+<p>Канал записывают как буква+номер (R1, F4, E5) или как пара band-channel (5-1). Это одно и то же, если твоя таблица совпадает с таблицей того, кто тебе этот канал назвал. У нестандартных VTX буквы и номера бендов могут не совпадать с привычными — сверяй по частоте в МГц, а не по букве.</p>
+<h4 class="md-subheading">Частоты и закон</h4>
+<p>Таблицы из интернета часто содержат частоты, на которых передавать нельзя. Документация Betaflight прямо предупреждает: почти никто не может законно использовать типовую таблицу без правки. Разрешённый диапазон и мощность определяются местными правилами.</p>
+
+<h2>Практика</h2>
+<h4 class="md-subheading">Алгоритм смены канала, когда твой занят</h4>
+<ol><li>Узнай занятые частоты: свои соседи, другие пилоты на площадке, «вещающий» упавший борт.</li><li>Переведи все занятые каналы в МГц по таблице их VTX — не по букве.</li><li>Выбери свободную частоту с максимально возможным разносом от соседей. Ориентир для аналога — не меньше ~37 МГц, как между соседними каналами Raceband: ближе каналы заметно мешают друг другу.</li><li>Найди эту частоту в своей таблице и запиши band и channel.</li><li>Поменяй сначала на одном-двух передатчиках/дронах, проверь картинку и помехи соседям.</li><li>Только после успешного теста — на всех остальных бортах.</li></ol>
+<h4 class="md-subheading">Смена через CLI</h4>
+<pre class="cli-block"><code>get vtx
+set vtx_band = 4
+set vtx_channel = 1
+save</code></pre>
+<p>Видео-приёмник (очки, наземка) переключи на ту же частоту. Для цифровых систем (Walksnail, DJI, HDZero) канал меняется в их меню, логика выбора та же.</p>
+<h4 class="md-subheading">Проверка</h4>
+<ol><li>В OSD или в очках видна новая частота.</li><li>Соседи подтверждают, что помех нет.</li><li>Записать новую частоту в журнал дрона и в общую таблицу распределения каналов.</li></ol>
+
+<h2>Диагностика</h2>
+<div class="diag-groups"><article class="diag-item"><h4><strong>Симптом:</strong> в OSD одна частота, в очках картинка на другой</h4><ul><li>Возможная причина: режим FACTORY, а таблица FC не совпадает со встроенной таблицей VTX.</li><li>Что сделать: загрузить таблицу именно для своей модели VTX и своего региона.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> VTX не реагирует на смену канала из Betaflight</h4><ul><li>Возможная причина: не настроен UART под SmartAudio/Tramp или нет таблицы.</li><li>Что сделать: проверить Ports (VTX на нужном UART) и наличие <code>vtxtable</code>.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> после смены канала помехи у соседа</h4><ul><li>Возможная причина: слишком маленький разнос частот или гармоники при высокой мощности.</li><li>Что сделать: увеличить разнос, снизить мощность на земле (pit mode).</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> канал «E5» у тебя и у соседа — разные частоты</h4><ul><li>Возможная причина: у VTX разные таблицы бендов.</li><li>Что сделать: договариваться о частотах в МГц.</li></ul></article></div>
+
+<h2>Чек-лист</h2>
+<ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="link-vtx:0"><span>Таблица загружена именно для своей модели VTX и региона</span></label></li><li><label><input type="checkbox" data-check-id="link-vtx:1"><span>Занятые каналы переведены в МГц</span></label></li><li><label><input type="checkbox" data-check-id="link-vtx:2"><span>Разнос с соседями не меньше ~37 МГц (ориентир Raceband)</span></label></li><li><label><input type="checkbox" data-check-id="link-vtx:3"><span>Новый канал проверен на 1–2 бортах до массовой смены</span></label></li><li><label><input type="checkbox" data-check-id="link-vtx:4"><span>Частота записана в журнал и общую таблицу каналов</span></label></li></ul>
+
+<h2>Источники</h2>
+<ul class="refs"><li><a href="https://betaflight.com/docs/development/VTX" target="_blank" rel="noopener noreferrer">VTX — Betaflight Development Docs</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://betaflight.com/docs/wiki/guides/current/VTX-Tables" target="_blank" rel="noopener noreferrer">VTX Tables — Betaflight Documentation</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://oscarliang.com/smartaudio-tramp-vtx-control-vtxtables/" target="_blank" rel="noopener noreferrer">How to Setup VTX Table in Betaflight — Oscar Liang</a> <span class="gc-tag">secondary</span></li></ul>
+      </div>
+      <div class="module-done"><gc-button variant="secondary" data-done-toggle="link-vtx">Отметить как пройденный</gc-button></div>
+      <nav class="pager" aria-label="Соседние модули"><a class="gc-card pager__prev" href="link-elrs.html"><span class="gc-label gc-muted">Назад</span><br>ExpressLRS: packet rate, телеметрия, LQ</a></nav>
+    </article>
+  </main>
+  <footer class="gc-container site-footer gc-muted">
+    <p>Открытый курс · <a href="https://github.com/irreligious86/UAV-Education">исходники на GitHub</a> · <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">план развития</a> · <a href="../curriculum/curriculum.html">для разработчика</a> · CC BY-NC-SA 4.0</p>
+  </footer>
+</body>
+</html>

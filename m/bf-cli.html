@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CLI и remap — UAV Student</title>
+  <meta name="description" content="прочитать и применить diff переназначить ресурс пада">
+  <link rel="stylesheet" href="../lib/ground-control-ui/dist/ground-control.css">
+  <link rel="stylesheet" href="../assets/site.css">
+  <script src="../lib/ground-control-ui/dist/ground-control.js" defer></script>
+  <script src="../assets/progress-store.js" defer></script>
+  <script src="../assets/app.js" defer></script>
+</head>
+<body class="gc-root">
+  <header class="site-header">
+    <div class="gc-container site-header__inner">
+      <a class="site-brand" href="../index.html"><span class="site-brand__mark" aria-hidden="true">◆</span> UAV Student</a>
+      <nav class="gc-nav" aria-label="Разделы сайта">
+        <a href="../index.html" aria-current="page">Курс</a>
+        <a href="../ref/index.html">Справочник</a>
+        <a href="../pages/glossary.html">Глоссарий</a>
+        <a href="../pages/fails.html">Фейлы</a>
+      </nav>
+    </div>
+  </header>
+  <main class="gc-container site-main">
+    <article class="module" data-module-page="bf-cli">
+      <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-integrator">Интегратор</a><span>CLI и remap</span></p>
+      <h1 class="module-title">CLI и remap</h1>
+      <div class="module-tags"><span class="gc-tag" title="Уровень">L3 — Специалист</span><span class="gc-tag">чтение 15 мин</span><span class="gc-tag">учёба ~2 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></div>
+      <p class="module-lead">Командная строка (CLI) Betaflight — это текстовый интерфейс, открывающий доступ к конфигурации полётного контроллера на уровне, недоступном в графическом интерфейсе. Из CLI можно изменять любые параметры, включая не вынесенные во вкладки конфигуратора, проверять аппаратное состояние, управлять ресурсами (выводами микроконтроллера) и создавать резервные копии. Ключевая практическая задача статьи — дать навык уверенной работы с <code>resource</code> и ремаппингом выводов без перепрошивки, а также научить диагностировать состав прошивки и восстанавливать конфигурацию после сбоев.</p>
+      <div class="gc-callout" data-state="ok"><strong>После модуля ты умеешь</strong><ul><li>прочитать и применить diff</li><li>переназначить ресурс пада</li></ul></div><p class="gc-muted">Перед этим модулем: <a href="bf-ports.html">Порты и приёмник</a></p>
+      <div class="gc-prose module-body">
+<h2>Теория</h2>
+<h4 class="md-subheading">Архитектура CLI</h4>
+<p>CLI работает поверх последовательного порта (UART), используя тот же канал, что и конфигуратор (<code>MSP</code>, <code>MultiWii Serial Protocol</code>). Для входа в CLI через терминал (например, PuTTY/screen) необходимо отправить символ <code>#</code> — он переключает контроллер в командный режим.</p>
+<h4 class="md-subheading">Ключевые команды и их назначение</h4>
+<ul><li>Управление сессией: <code>save</code>, <code>exit</code>, <code>batch start</code>, <code>batch end</code></li><li>Просмотр конфигурации: <code>get</code>, <code>diff</code>, <code>dump</code>, <code>status</code>, <code>version</code></li><li>Изменение параметров: <code>set</code>, <code>feature</code>, <code>profile</code>, <code>rateprofile</code></li><li>Ремаппинг ресурсов: <code>resource</code>, <code>timer</code></li><li>Диагностика и отладка: <code>tasks</code>, <code>flash_info</code>, <code>dma</code></li></ul>
+<h4 class="md-subheading">Diff vs Dump: что и когда использовать</h4>
+<p><code>diff all</code> выводит только изменённые параметры. Это основной формат для резервных копий и безопасного переноса в пределах одной версии прошивки.</p>
+<p><code>dump all</code> выводит полный снимок конфигурации, включая значения по умолчанию. Подходит для глубокой диагностики, но опасен для переноса между разными версиями.</p>
+<p>Рекомендуется сохранять отдельно: - <code>diff all</code> - <code>resource show</code> - <code>status</code> (версия/сборка)</p>
+<h4 class="md-subheading">Ремаппинг ресурсов: концепция и ограничения</h4>
+<p>Команда <code>resource</code> управляет привязкой «функция -&gt; физический пин»:</p>
+<pre class="cli-block"><code>resource &lt;ФУНКЦИЯ&gt; &lt;ИНДЕКС&gt; &lt;ПИН&gt; 
+resource MOTOR 1 B00 
+resource MOTOR 5 NONE</code></pre>
+<ul><li>ADC-ресурсы (<code>ADC_BATT</code>, <code>ADC_CURR</code>, <code>ADC_RSSI</code>) назначаются только на ADC-пины.</li><li>UART ограничен аппаратными блоками контроллера — не любой пин можно использовать как сериал.</li><li>Для DShot критичны таймеры и DMA: неверный пин/канал приводит к неработающим моторам.</li></ul>
+<h4 class="md-subheading">Специфика Betaflight 4.5</h4>
+<p>Между версиями меняются названия и логика части параметров:</p>
+<ul><li>D-term naming: в 4.5+ <code>d_roll</code> — base D, <code>d_max_roll</code> — peak.</li><li>GPS rescue: часть переменных переработана.</li><li>Failsafe landing: появились отличия в naming/поведении.</li></ul>
+<p>Из-за этого старые бэкапы нельзя бездумно вставлять в новую прошивку.</p>
+<h4 class="md-subheading">Проверка состава прошивки через BUILD KEY</h4>
+<p>В <code>status</code> у Betaflight 4.5+ отображается <code>BUILD KEY</code>. Подставив его в URL ниже, можно получить JSON со списком включённых опций (<code>Options</code>):</p>
+<pre class="cli-block"><code>https://build.betaflight.com/api/builds/&lt;BUILD_KEY&gt;/json</code></pre>
+<p>Это помогает диагностировать отсутствие функций (например, GPS/LED/VTX) без перепрошивки.</p>
+
+<h2>Практика</h2>
+<h4 class="md-subheading">Доступ к CLI</h4>
+<ol><li>Подключите полётный контроллер по USB и откройте Betaflight Configurator.</li><li>Перейдите на вкладку CLI.</li><li>Нажмите <code>Connect</code>, если соединение не поднялось автоматически.</li></ol>
+<p>Альтернатива через терминал: - подключитесь к порту (<code>/dev/ttyACM0</code> в Linux или <code>COMx</code> в Windows); - установите скорость <code>115200</code>; - отправьте символ <code>#</code>.</p>
+<h4 class="md-subheading">Создание полной резервной копии</h4>
+<p>Перед любыми изменениями сохраните состояние:</p>
+<pre class="cli-block"><code>status
+version
+diff all
+resource show
+timer show</code></pre>
+<p>Сохраните вывод в файл — это даст: - версию и сборку; - список изменённых параметров; - назначения ресурсов; - конфигурацию таймеров.</p>
+<h4 class="md-subheading">Просмотр и изменение параметров</h4>
+<p>Просмотр:</p>
+<pre class="cli-block"><code>get gyro_
+get acc
+set dyn_notch_min_hz = 150</code></pre>
+<p>Изменение:</p>
+<pre class="cli-block"><code>set dyn_notch_min_hz = 150
+set dyn_notch_q = 250
+save</code></pre>
+<p>Для пакетного редактирования (меньше перезагрузок):</p>
+<pre class="cli-block"><code>batch start
+set gyro_lpf1_static_hz = 0
+set gyro_lpf2_hz = 300
+set dterm_lpf2_hz = 150
+batch end
+save</code></pre>
+<h4 class="md-subheading">Ремаппинг моторов: полный пример</h4>
+<p>Сценарий: поворот FC на 90° по часовой стрелке без изменения ориентации в прошивке.</p>
+<p>Шаг 1. Проверить текущие назначения:</p>
+<pre class="cli-block"><code>resource show</code></pre>
+<p>Пример вывода:</p>
+<pre class="cli-block"><code>A06: MOTOR 1
+A07: MOTOR 2
+A11: MOTOR 3
+A12: MOTOR 4</code></pre>
+<p>Шаг 2. Текущая схема:</p>
+<pre class="cli-block"><code>         FRONT
+4 (A12)        2 (A07)
+
+3 (A11)        1 (A06)
+         BACK</code></pre>
+<p>Шаг 3. После поворота FC целевая схема:</p>
+<pre class="cli-block"><code>         FRONT
+3 (A11)        4 (A12)
+
+1 (A06)        2 (A07)
+         BACK</code></pre>
+<p>Шаг 4. Назначить новые соответствия:</p>
+<pre class="cli-block"><code>resource MOTOR 1 none
+resource MOTOR 2 none
+resource MOTOR 3 none
+resource MOTOR 4 none
+resource MOTOR 1 A07
+resource MOTOR 2 A12
+resource MOTOR 3 A06
+resource MOTOR 4 A11
+save</code></pre>
+<p>После <code>save</code> контроллер перезагрузится с новой схемой.</p>
+<h4 class="md-subheading">Проверка build-опций через BUILD KEY</h4>
+<pre class="cli-block"><code>status</code></pre>
+<p>Далее откройте:</p>
+<pre class="cli-block"><code>https://build.betaflight.com/api/builds/&lt;BUILD_KEY&gt;/json</code></pre>
+<p>Пример секции опций:</p>
+<pre class="cli-block"><code>&quot;Options&quot;: [
+  &quot;CLOUD_BUILD&quot;,
+  &quot;USE_DSHOT&quot;,
+  &quot;USE_GPS&quot;,
+  &quot;USE_OSD&quot;,
+  &quot;USE_SERIALRX&quot;,
+  &quot;USE_SERIALRX_CRSF&quot;,
+  &quot;USE_TELEMETRY&quot;,
+  &quot;USE_VTX&quot;
+]</code></pre>
+<h4 class="md-subheading">Восстановление конфигурации из бэкапа</h4>
+<ol><li>Выполните сброс:</li></ol>
+<pre class="cli-block"><code>defaults</code></pre>
+<ol><li>После перезагрузки снова войдите в CLI.</li><li>Вставьте команды из бэкапа частями (не одним огромным блоком).</li><li>Проверьте критичные параметры для вашей версии прошивки.</li><li>Выполните <code>save</code>.</li></ol>
+
+<h2>Диагностика</h2>
+<div class="diag-groups"><article class="diag-item"><h4>Симптом: CLI не отвечает, команды не выполняются.</h4><ul><li>Возможная причина: неверный вход в CLI (не отправлен <code>#</code>), конфликт порта, некорректная скорость.</li><li>Что сделать: убедиться, что активна вкладка CLI, закрыть другие приложения с доступом к COM-порту, сверить <code>msp_baudrate</code> и скорость терминала.</li></ul></article><article class="diag-item"><h4>Симптом: после вставки бэкапа дрон работает некорректно.</h4><ul><li>Возможная причина: версионное несоответствие прошивки.</li><li>Что сделать: сверить <code>version</code> из бэкапа и текущую версию, восстанавливать через <code>diff all</code>, а не через <code>dump all</code>, вручную проверить критические параметры.</li></ul></article><article class="diag-item"><h4>Симптом: при ремаппинге появляются ошибки <code>also used by MOTOR</code>.</h4><ul><li>Возможная причина: временное перекрытие ресурсов при последовательном назначении.</li><li>Что сделать: сначала очистить назначения (<code>resource MOTOR N none</code>), затем назначить новые, сохранить через <code>save</code>.</li></ul></article><article class="diag-item"><h4>Симптом: после ремаппинга моторы не работают или работают неверно.</h4><ul><li>Возможная причина: неверный пин, конфликт таймера/DMA, отсутствует поддержка DShot на выбранном пине.</li><li>Что сделать: выполнить <code>resource show</code> и <code>timer show</code>, сверить распиновку платы и поддерживаемые функции пинов.</li></ul></article><article class="diag-item"><h4>Симптом: команда <code>save</code> зависает или контроллер не перезагружается.</h4><ul><li>Возможная причина: нестабильное USB-подключение, питание, повреждённая конфигурация.</li><li>Что сделать: переподключить питание и USB, проверить кабель, при повторении выполнить <code>defaults</code> и восстановление по шагам.</li></ul></article><article class="diag-item"><h4>Симптом: не удаётся получить BUILD KEY или URL возвращает ошибку.</h4><ul><li>Возможная причина: старая версия Betaflight (&lt; 4.5), ключ скопирован не полностью, неверный URL.</li><li>Что сделать: убедиться, что версия 4.5+, повторно скопировать ключ, при необходимости проверить альтернативный endpoint <code>.../&lt;BUILD_KEY&gt;/log</code>.</li></ul></article></div>
+
+<h2>Источники</h2>
+<ul class="refs"><li><a href="https://www.betaflight.com/docs/development/Cli" target="_blank" rel="noopener noreferrer">Betaflight CLI Documentation</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://www.betaflight.com/docs/wiki/guides/current/Resource-remapping" target="_blank" rel="noopener noreferrer">Betaflight Resource Remapping Guide</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://betaflight-com.pages.dev/docs/wiki/guides/current/Betaflight-4.5-CLI-commands" target="_blank" rel="noopener noreferrer">Betaflight 4.5 CLI Command Reference</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://betaflight-com.pages.dev/docs/wiki/guides/current/Remapping-Motors-with-Resource-Command" target="_blank" rel="noopener noreferrer">Remapping Motors with Resource Command</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://www.betaflight.com/docs/wiki/guides/archive/Betaflight-4.0-CLI-commands" target="_blank" rel="noopener noreferrer">Betaflight 4.0 CLI Reference (для сравнения версий)</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://oscarliang.com/check-betaflight-build-options/" target="_blank" rel="noopener noreferrer">How to Check Betaflight Build Options</a> <span class="gc-tag">secondary</span></li><li><a href="https://github.com/rotorflight/rotorflight-old-wiki/wiki/Back-up-and-restore" target="_blank" rel="noopener noreferrer">Rotorflight Wiki: Backup and Restore (общие принципы)</a> <span class="gc-tag">secondary</span></li><li><a href="https://www.youtube.com/results?search_query=joshua+bardwell+betaflight+cli" target="_blank" rel="noopener noreferrer">Joshua Bardwell: Betaflight CLI Tutorial</a> <span class="gc-tag">secondary</span></li></ul>
+      </div>
+      <div class="module-done"><gc-button variant="secondary" data-done-toggle="bf-cli">Отметить как пройденный</gc-button></div>
+      <nav class="pager" aria-label="Соседние модули"><a class="gc-card pager__prev" href="bf-pid.html"><span class="gc-label gc-muted">Назад</span><br>PID-тюнинг</a><a class="gc-card pager__next" href="bf-cli-automation.html"><span class="gc-label gc-muted">Дальше</span><br>Автоматизация CLI по serial</a></nav>
+    </article>
+  </main>
+  <footer class="gc-container site-footer gc-muted">
+    <p>Открытый курс · <a href="https://github.com/irreligious86/UAV-Education">исходники на GitHub</a> · <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">план развития</a> · <a href="../curriculum/curriculum.html">для разработчика</a> · CC BY-NC-SA 4.0</p>
+  </footer>
+</body>
+</html>

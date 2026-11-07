@@ -1,0 +1,689 @@
+{
+  "version": 1,
+  "groups": [
+    {
+      "id": "foundation",
+      "kind": "track",
+      "title": "Фундамент",
+      "level": "L1",
+      "goal": "Понимать, почему дрон летает и из чего он состоит, до первой прошивки.",
+      "capstone": null,
+      "modules": [
+        {
+          "id": "f-physics",
+          "title": "Как летает мультиротор",
+          "level": "L1",
+          "hours": 2,
+          "status": "planned",
+          "prerequisites": [],
+          "objectives": [
+            "объяснить тягу, моменты и как миксер превращает команды в обороты моторов",
+            "объяснить, зачем пропеллеры крутятся в разные стороны"
+          ],
+          "url": "m/f-physics.html"
+        },
+        {
+          "id": "f-power",
+          "title": "Питание: LiPo, Li-Ion, BEC",
+          "level": "L1",
+          "hours": 3,
+          "status": "planned",
+          "prerequisites": [
+            "f-physics"
+          ],
+          "objectives": [
+            "посчитать ток, ёмкость и примерное время полёта",
+            "выбрать АКБ по C-рейтингу и не убить её хранением"
+          ],
+          "url": "m/f-power.html"
+        },
+        {
+          "id": "f-motors-esc",
+          "title": "Моторы, ESC и DShot",
+          "level": "L1",
+          "hours": 2,
+          "status": "planned",
+          "prerequisites": [
+            "f-power"
+          ],
+          "objectives": [
+            "связать KV, напряжение и размер пропа",
+            "объяснить, что ESC делает с сигналом DShot"
+          ],
+          "url": "m/f-motors-esc.html"
+        },
+        {
+          "id": "f-fc-sensors",
+          "title": "Полётный контроллер и сенсоры",
+          "level": "L1",
+          "hours": 2,
+          "status": "planned",
+          "prerequisites": [
+            "f-motors-esc"
+          ],
+          "objectives": [
+            "назвать роль gyro, accel, baro, mag, GPS",
+            "прочитать схему платы: UART, пады, питание"
+          ],
+          "url": "m/f-fc-sensors.html"
+        },
+        {
+          "id": "bf-pid-reg-in-bf",
+          "title": "PID-регулятор в Betaflight",
+          "level": "L1",
+          "hours": 2,
+          "status": "published",
+          "prerequisites": [
+            "f-fc-sensors"
+          ],
+          "objectives": [
+            "объяснить P, I, D и feedforward на примере",
+            "предсказать симптом слишком большого P или D"
+          ],
+          "url": "m/bf-pid-reg-in-bf.html"
+        },
+        {
+          "id": "f-safety",
+          "title": "Безопасность и предполётный чек",
+          "level": "L1",
+          "hours": 1,
+          "status": "planned",
+          "prerequisites": [],
+          "objectives": [
+            "пройти предполётный чек-лист",
+            "объяснить, почему пропы снимают на столе"
+          ],
+          "url": "m/f-safety.html"
+        },
+        {
+          "id": "tools-overview",
+          "title": "Инструментарий",
+          "level": "L1",
+          "hours": 2,
+          "status": "planned",
+          "prerequisites": [],
+          "objectives": [
+            "установить Betaflight App, Mission Planner/QGC",
+            "хранить конфиги в git с датой в имени"
+          ],
+          "url": "m/tools-overview.html"
+        }
+      ]
+    },
+    {
+      "id": "operator",
+      "kind": "track",
+      "title": "Оператор",
+      "level": "L1",
+      "goal": "Настроить квадрокоптер на Betaflight с нуля и безопасно его поднять.",
+      "capstone": {
+        "id": "cap-first-quad",
+        "title": "Свой квадро от стола до первого полёта",
+        "result": "diff all, отчёт о тесте failsafe, видео первого висения"
+      },
+      "modules": [
+        {
+          "id": "bf-intro",
+          "title": "Введение в Betaflight",
+          "level": "L1",
+          "hours": 2,
+          "status": "published",
+          "prerequisites": [
+            "f-fc-sensors",
+            "tools-overview"
+          ],
+          "objectives": [
+            "прошить FC и сделать первый backup"
+          ],
+          "url": "m/bf-intro.html"
+        },
+        {
+          "id": "bf-ports",
+          "title": "Порты и приёмник",
+          "level": "L1",
+          "hours": 2,
+          "status": "published",
+          "prerequisites": [
+            "bf-intro"
+          ],
+          "objectives": [
+            "назначить UART под приёмник, VTX, GPS"
+          ],
+          "url": "m/bf-ports.html"
+        },
+        {
+          "id": "link-protocols",
+          "title": "SBUS, CRSF и инверсия UART",
+          "level": "L1",
+          "hours": 1.5,
+          "status": "published",
+          "prerequisites": [
+            "bf-ports"
+          ],
+          "objectives": [
+            "подключить CRSF и SBUS правильно",
+            "объяснить инверсию UART"
+          ],
+          "url": "m/link-protocols.html"
+        },
+        {
+          "id": "bf-modes-osd",
+          "title": "Режимы и OSD",
+          "level": "L1",
+          "hours": 2,
+          "status": "planned",
+          "prerequisites": [
+            "link-protocols"
+          ],
+          "objectives": [
+            "назначить ARM, ANGLE, BEEPER на тумблеры",
+            "собрать OSD под задачу"
+          ],
+          "url": "m/bf-modes-osd.html"
+        },
+        {
+          "id": "bf-failsafe",
+          "title": "Failsafe: стадии и тест по свитчу",
+          "level": "L1",
+          "hours": 2,
+          "status": "published",
+          "prerequisites": [
+            "bf-modes-osd"
+          ],
+          "objectives": [
+            "выбрать процедуру Stage 2",
+            "проверить failsafe тумблером без пропов и в воздухе"
+          ],
+          "url": "m/bf-failsafe.html"
+        },
+        {
+          "id": "link-elrs",
+          "title": "ExpressLRS: packet rate, телеметрия, LQ",
+          "level": "L2",
+          "hours": 2,
+          "status": "published",
+          "prerequisites": [
+            "link-protocols"
+          ],
+          "objectives": [
+            "выбрать packet rate под задачу",
+            "найти просадки LQ в логе"
+          ],
+          "url": "m/link-elrs.html"
+        },
+        {
+          "id": "link-vtx",
+          "title": "VTX-таблицы и смена видеоканала",
+          "level": "L2",
+          "hours": 1.5,
+          "status": "published",
+          "prerequisites": [
+            "bf-ports"
+          ],
+          "objectives": [
+            "загрузить vtxtable",
+            "сменить занятый канал по алгоритму"
+          ],
+          "url": "m/link-vtx.html"
+        }
+      ]
+    },
+    {
+      "id": "integrator",
+      "kind": "track",
+      "title": "Интегратор",
+      "level": "L2",
+      "goal": "Настраивать дрон по логам, а не по ощущениям.",
+      "capstone": {
+        "id": "cap-tune-by-logs",
+        "title": "Настройка по логам",
+        "result": "A/B-профили, спектры до/после, отчёт с выводами"
+      },
+      "modules": [
+        {
+          "id": "bf-blackbox",
+          "title": "Blackbox",
+          "level": "L2",
+          "hours": 3,
+          "status": "published",
+          "prerequisites": [
+            "bf-pid-reg-in-bf",
+            "bf-modes-osd"
+          ],
+          "objectives": [
+            "записать и открыть лог",
+            "найти шум и перегрузку в спектре"
+          ],
+          "url": "m/bf-blackbox.html"
+        },
+        {
+          "id": "bf-filters",
+          "title": "Фильтры",
+          "level": "L2",
+          "hours": 3,
+          "status": "published",
+          "prerequisites": [
+            "bf-blackbox"
+          ],
+          "objectives": [
+            "объяснить цену фильтра в задержке",
+            "настроить LPF и dynamic notch по логу"
+          ],
+          "url": "m/bf-filters.html"
+        },
+        {
+          "id": "bf-rpm-filter",
+          "title": "RPM-фильтр: кейс «свистящего» 10\"",
+          "level": "L2",
+          "hours": 2,
+          "status": "published",
+          "prerequisites": [
+            "bf-filters"
+          ],
+          "objectives": [
+            "включить bidir DShot и проверить телеметрию",
+            "подогнать rpm_filter_min_hz под реальные обороты"
+          ],
+          "url": "m/bf-rpm-filter.html"
+        },
+        {
+          "id": "bf-pid",
+          "title": "PID-тюнинг",
+          "level": "L2",
+          "hours": 4,
+          "status": "planned",
+          "prerequisites": [
+            "bf-rpm-filter"
+          ],
+          "objectives": [
+            "построить A/B-профили",
+            "сравнить по bounce-back и задержке входа"
+          ],
+          "url": "m/bf-pid.html"
+        },
+        {
+          "id": "bf-cli",
+          "title": "CLI и remap",
+          "level": "L3",
+          "hours": 2,
+          "status": "published",
+          "prerequisites": [
+            "bf-ports"
+          ],
+          "objectives": [
+            "прочитать и применить diff",
+            "переназначить ресурс пада"
+          ],
+          "url": "m/bf-cli.html"
+        },
+        {
+          "id": "bf-cli-automation",
+          "title": "Автоматизация CLI по serial",
+          "level": "L3",
+          "hours": 3,
+          "status": "published",
+          "prerequisites": [
+            "bf-cli"
+          ],
+          "objectives": [
+            "написать скрипт, который находит дрон по craft_name",
+            "применять изменения с перечитыванием"
+          ],
+          "url": "m/bf-cli-automation.html"
+        }
+      ]
+    },
+    {
+      "id": "autonomy",
+      "kind": "track",
+      "title": "Автономия",
+      "level": "L2–L3",
+      "goal": "Строить и проверять автономные сценарии на ArduPilot: сначала в SITL, потом в воздухе.",
+      "capstone": {
+        "id": "cap-heavy-or-vtol",
+        "title": "Окто X8 с нагрузкой или VTOL-крыло",
+        "result": "параметры, миссия в SITL, реальный полёт, разбор лога"
+      },
+      "modules": [
+        {
+          "id": "ap-intro",
+          "title": "Введение в ArduPilot",
+          "level": "L2",
+          "hours": 2,
+          "status": "planned",
+          "prerequisites": [
+            "bf-failsafe"
+          ],
+          "objectives": [
+            "объяснить параметры, режимы и отличия от Betaflight"
+          ],
+          "url": "m/ap-intro.html"
+        },
+        {
+          "id": "ap-sitl",
+          "title": "SITL: дрон без дрона",
+          "level": "L2",
+          "hours": 3,
+          "status": "planned",
+          "prerequisites": [
+            "ap-intro"
+          ],
+          "objectives": [
+            "поднять SITL + GCS",
+            "повторить сценарий скриптом"
+          ],
+          "url": "m/ap-sitl.html"
+        },
+        {
+          "id": "ap-missions",
+          "title": "Миссии и планирование",
+          "level": "L2",
+          "hours": 3,
+          "status": "planned",
+          "prerequisites": [
+            "ap-sitl"
+          ],
+          "objectives": [
+            "разделить маршрут и сценарий",
+            "проверить миссию в SITL"
+          ],
+          "url": "m/ap-missions.html"
+        },
+        {
+          "id": "ap-ekf",
+          "title": "EKF и навигация",
+          "level": "L3",
+          "hours": 3,
+          "status": "planned",
+          "prerequisites": [
+            "ap-missions"
+          ],
+          "objectives": [
+            "прочитать состояние EKF",
+            "понять, когда GPS/компас врут"
+          ],
+          "url": "m/ap-ekf.html"
+        },
+        {
+          "id": "ap-logs",
+          "title": "Логи ArduPilot: разбор полёта",
+          "level": "L3",
+          "hours": 3,
+          "status": "planned",
+          "prerequisites": [
+            "ap-ekf"
+          ],
+          "objectives": [
+            "найти вибрации, просадку питания, отказ сенсора в DataFlash"
+          ],
+          "url": "m/ap-logs.html"
+        },
+        {
+          "id": "ap-lua",
+          "title": "Lua скриптинг",
+          "level": "L3",
+          "hours": 3,
+          "status": "planned",
+          "prerequisites": [
+            "ap-sitl"
+          ],
+          "objectives": [
+            "написать applet под тумблер",
+            "сымитировать отказ мотора/сенсора в SITL"
+          ],
+          "url": "m/ap-lua.html"
+        },
+        {
+          "id": "ap-heavy",
+          "title": "Тяжёлые платформы: X8 и окто",
+          "level": "L3",
+          "hours": 3,
+          "status": "planned",
+          "prerequisites": [
+            "ap-logs"
+          ],
+          "objectives": [
+            "настроить coaxial-раму и моторную раскладку",
+            "проверить отказоустойчивость"
+          ],
+          "url": "m/ap-heavy.html"
+        },
+        {
+          "id": "ap-quadplane",
+          "title": "QuadPlane и tilt-rotor VTOL",
+          "level": "L3",
+          "hours": 4,
+          "status": "planned",
+          "prerequisites": [
+            "ap-logs"
+          ],
+          "objectives": [
+            "сверить каналы с SERVOx_FUNCTION до арма",
+            "настроить переход и посадку"
+          ],
+          "url": "m/ap-quadplane.html"
+        }
+      ]
+    },
+    {
+      "id": "engineer",
+      "kind": "track",
+      "title": "Инженер",
+      "level": "L3–L4",
+      "goal": "Связывать полётник, бортовой компьютер и свою периферию; собирать прошивки.",
+      "capstone": {
+        "id": "cap-own-logic",
+        "title": "Своя логика + ESP32-модуль",
+        "result": "работающий модуль, протокол обмена, README и тесты"
+      },
+      "modules": [
+        {
+          "id": "comp-intro",
+          "title": "Введение в Companion",
+          "level": "L2",
+          "hours": 2,
+          "status": "planned",
+          "prerequisites": [
+            "ap-intro"
+          ],
+          "objectives": [
+            "разделить ответственность FC и companion"
+          ],
+          "url": "m/comp-intro.html"
+        },
+        {
+          "id": "comp-mavlink",
+          "title": "MAVLink и MAVSDK",
+          "level": "L2",
+          "hours": 3,
+          "status": "planned",
+          "prerequisites": [
+            "comp-intro"
+          ],
+          "objectives": [
+            "прочитать телеметрию и отправить команду"
+          ],
+          "url": "m/comp-mavlink.html"
+        },
+        {
+          "id": "comp-esp32",
+          "title": "ESP32 и периферия",
+          "level": "L2",
+          "hours": 4,
+          "status": "planned",
+          "prerequisites": [
+            "comp-mavlink",
+            "link-protocols"
+          ],
+          "objectives": [
+            "связать ESP32 с FC или пультом по UART"
+          ],
+          "url": "m/comp-esp32.html"
+        },
+        {
+          "id": "comp-raspberry",
+          "title": "Raspberry Pi + ArduPilot",
+          "level": "L3",
+          "hours": 4,
+          "status": "planned",
+          "prerequisites": [
+            "comp-mavlink"
+          ],
+          "objectives": [
+            "поднять mavlink-router и сервис на борту"
+          ],
+          "url": "m/comp-raspberry.html"
+        },
+        {
+          "id": "ap-companion",
+          "title": "Companion + ArduPilot",
+          "level": "L3",
+          "hours": 3,
+          "status": "planned",
+          "prerequisites": [
+            "comp-raspberry",
+            "ap-missions"
+          ],
+          "objectives": [
+            "управлять дроном из скрипта (guided/offboard)"
+          ],
+          "url": "m/ap-companion.html"
+        },
+        {
+          "id": "bf-custom",
+          "title": "Кастомная сборка",
+          "level": "L4",
+          "hours": 3,
+          "status": "planned",
+          "prerequisites": [
+            "bf-cli"
+          ],
+          "objectives": [
+            "собрать прошивку под ограничения FC"
+          ],
+          "url": "m/bf-custom.html"
+        }
+      ]
+    },
+    {
+      "id": "inav",
+      "kind": "elective",
+      "title": "Электив: INAV",
+      "level": null,
+      "goal": null,
+      "capstone": null,
+      "modules": [
+        {
+          "id": "inav-intro",
+          "title": "Введение в INAV",
+          "level": "L1",
+          "hours": 3,
+          "status": "planned",
+          "prerequisites": [],
+          "objectives": [],
+          "url": "m/inav-intro.html"
+        },
+        {
+          "id": "inav-gps",
+          "title": "GPS-навигация в INAV",
+          "level": "L2",
+          "hours": 3,
+          "status": "published",
+          "prerequisites": [],
+          "objectives": [],
+          "url": "m/inav-gps.html"
+        },
+        {
+          "id": "inav-wing",
+          "title": "Настройка крыла",
+          "level": "L2",
+          "hours": 3,
+          "status": "planned",
+          "prerequisites": [],
+          "objectives": [],
+          "url": "m/inav-wing.html"
+        },
+        {
+          "id": "inav-missions",
+          "title": "Автономные миссии",
+          "level": "L3",
+          "hours": 3,
+          "status": "planned",
+          "prerequisites": [],
+          "objectives": [],
+          "url": "m/inav-missions.html"
+        },
+        {
+          "id": "inav-ipf",
+          "title": "IPF и JavaScript",
+          "level": "L3",
+          "hours": 3,
+          "status": "planned",
+          "prerequisites": [],
+          "objectives": [],
+          "url": "m/inav-ipf.html"
+        }
+      ]
+    },
+    {
+      "id": "px4",
+      "kind": "elective",
+      "title": "Электив: PX4",
+      "level": null,
+      "goal": null,
+      "capstone": null,
+      "modules": [
+        {
+          "id": "px4-intro",
+          "title": "Введение в PX4",
+          "level": "L1",
+          "hours": 3,
+          "status": "planned",
+          "prerequisites": [],
+          "objectives": [],
+          "url": "m/px4-intro.html"
+        },
+        {
+          "id": "px4-architecture",
+          "title": "Архитектура и uORB",
+          "level": "L2",
+          "hours": 3,
+          "status": "planned",
+          "prerequisites": [],
+          "objectives": [],
+          "url": "m/px4-architecture.html"
+        },
+        {
+          "id": "px4-control",
+          "title": "Control Allocation и миксер",
+          "level": "L2",
+          "hours": 3,
+          "status": "published",
+          "prerequisites": [],
+          "objectives": [],
+          "url": "m/px4-control.html"
+        },
+        {
+          "id": "px4-ros2",
+          "title": "ROS 2 интеграция",
+          "level": "L3",
+          "hours": 3,
+          "status": "planned",
+          "prerequisites": [],
+          "objectives": [],
+          "url": "m/px4-ros2.html"
+        },
+        {
+          "id": "px4-companion-jetson",
+          "title": "PX4 + Jetson Nano (companion)",
+          "level": "L3",
+          "hours": 3,
+          "status": "published",
+          "prerequisites": [],
+          "objectives": [],
+          "url": "m/px4-companion-jetson.html"
+        }
+      ]
+    }
+  ]
+}

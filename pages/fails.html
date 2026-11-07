@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Журнал ошибок и фейлов — UAV Student</title>
+  <meta name="description" content="Инженерный курс по БПЛА: от физики полёта до своих прошивок и бортовых компьютеров.">
+  <link rel="stylesheet" href="../lib/ground-control-ui/dist/ground-control.css">
+  <link rel="stylesheet" href="../assets/site.css">
+  <script src="../lib/ground-control-ui/dist/ground-control.js" defer></script>
+  <script src="../assets/progress-store.js" defer></script>
+  <script src="../assets/app.js" defer></script>
+</head>
+<body class="gc-root">
+  <header class="site-header">
+    <div class="gc-container site-header__inner">
+      <a class="site-brand" href="../index.html"><span class="site-brand__mark" aria-hidden="true">◆</span> UAV Student</a>
+      <nav class="gc-nav" aria-label="Разделы сайта">
+        <a href="../index.html">Курс</a>
+        <a href="../ref/index.html">Справочник</a>
+        <a href="../pages/glossary.html">Глоссарий</a>
+        <a href="../pages/fails.html" aria-current="page">Фейлы</a>
+      </nav>
+    </div>
+  </header>
+  <main class="gc-container site-main">
+    <p class="gc-breadcrumb"><a href="../ref/index.html">Справочник</a><span>Журнал ошибок и фейлов</span></p>
+    <div class="gc-prose legacy-page">
+<h2>Журнал ошибок и фейлов</h2>
+        <p class="muted">Примеры; пополнять реальными кейсами (см. source-policy.md для ссылок).</p>
+        <table>
+          <thead>
+            <tr>
+              <th>Проблема</th>
+              <th>Причина</th>
+              <th>Решение</th>
+              <th>Профилактика</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Нет GPS фикса</td>
+              <td>UART/baudrate, помехи</td>
+              <td>Порт, экранирование</td>
+              <td>Чек-лист портов</td>
+            </tr>
+            <tr>
+              <td>Осцилляции после тюна</td>
+              <td>D-term, фильтры</td>
+              <td>Откат, Blackbox</td>
+              <td>Один параметр за шаг</td>
+            </tr>
+            <tr>
+              <td>Осцилляции после тюна</td>
+              <td>Завышенный D-term при недостаточной фильтрации</td>
+              <td>Откат параметров, анализ Blackbox, пошаговое увеличение D</td>
+              <td>Изменять D-term малыми шагами и контролировать температуру моторов</td>
+            </tr>
+            <tr>
+              <td>Дрон “виляет” на ховере</td>
+              <td>Слишком высокий P-term по Roll/Pitch</td>
+              <td>Снизить P на 10-15%, проверить логи</td>
+              <td>Тюнить P постепенно с короткими тестовыми полетами</td>
+            </tr>
+            <tr>
+              <td>Нет телеметрии на пульте</td>
+              <td>Неверный UART для Telemetry / MSP</td>
+              <td>В Ports включить Telemetry на нужном UART, проверить протокол</td>
+              <td>Фиксировать карту UART перед каждым изменением wiring</td>
+            </tr>
+            <tr>
+              <td>Дрон “дребезжит” при резких маневрах</td>
+              <td>Слишком высокий D-term при недостаточной фильтрации гироскопа</td>
+              <td>Снизить D-term на 20%, увеличить фильтрацию D-term</td>
+              <td>Тюнить D-term пошагово и сверять логи Blackbox</td>
+            </tr>
+            <tr>
+              <td>Потеря видео (VTX) на дальности</td>
+              <td>Неверная настройка SmartAudio/Tramp, низкая мощность VTX</td>
+              <td>Настроить VTX через OSD/CLI, проверить антенну, увеличить мощность</td>
+              <td>Проверять профиль VTX и состояние антенны перед вылетом</td>
+            </tr>
+            <tr>
+              <td>Дрон не входит в режим миссии (AUTO)</td>
+              <td>EKF нездоров, нет GPS fix, не загружена миссия</td>
+              <td>Проверить EKF в Mission Planner, дождаться стабильного GPS, перезаписать миссию</td>
+              <td>Перед миссией проверять pre-arm и валидность миссии</td>
+            </tr>
+            <tr>
+              <td>Самопроизвольное переключение режимов</td>
+              <td>Дребезг переключателей на пульте, помехи RC-канала</td>
+              <td>Увеличить deadzone, проверить приемник и уровень помех</td>
+              <td>Тестировать каналы RC в статике перед полетом</td>
+            </tr>
+            <tr>
+              <td>ESP32 не видит MAVLink сообщения</td>
+              <td>Неверный baudrate, неправильное подключение UART</td>
+              <td>Проверить скорость порта, перекрестить TX↔RX, проверить питание</td>
+              <td>Фиксировать схему распиновки и тестировать loopback</td>
+            </tr>
+            <tr>
+              <td>ROS 2 узел не получает телеметрию</td>
+              <td>Не запущен uXRCE-DDS Agent, неверный порт, не активирован UXRCE_DDS_CFG_EN</td>
+              <td>Запустить MicroXRCEAgent и проверить параметры PX4/UART</td>
+              <td>Хранить рабочий launch-чеклист ROS 2 + PX4</td>
+            </tr>
+          </tbody>
+        </table>
+
+    </div>
+  </main>
+  <footer class="gc-container site-footer gc-muted">
+    <p>Открытый курс · <a href="https://github.com/irreligious86/UAV-Education">исходники на GitHub</a> · <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">план развития</a> · <a href="../curriculum/curriculum.html">для разработчика</a> · CC BY-NC-SA 4.0</p>
+  </footer>
+</body>
+</html>

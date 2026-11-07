@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ExpressLRS: packet rate, телеметрия, LQ — UAV Student</title>
+  <meta name="description" content="выбрать packet rate под задачу найти просадки LQ в логе">
+  <link rel="stylesheet" href="../lib/ground-control-ui/dist/ground-control.css">
+  <link rel="stylesheet" href="../assets/site.css">
+  <script src="../lib/ground-control-ui/dist/ground-control.js" defer></script>
+  <script src="../assets/progress-store.js" defer></script>
+  <script src="../assets/app.js" defer></script>
+</head>
+<body class="gc-root">
+  <header class="site-header">
+    <div class="gc-container site-header__inner">
+      <a class="site-brand" href="../index.html"><span class="site-brand__mark" aria-hidden="true">◆</span> UAV Student</a>
+      <nav class="gc-nav" aria-label="Разделы сайта">
+        <a href="../index.html" aria-current="page">Курс</a>
+        <a href="../ref/index.html">Справочник</a>
+        <a href="../pages/glossary.html">Глоссарий</a>
+        <a href="../pages/fails.html">Фейлы</a>
+      </nav>
+    </div>
+  </header>
+  <main class="gc-container site-main">
+    <article class="module" data-module-page="link-elrs">
+      <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-operator">Оператор</a><span>ExpressLRS: packet rate, телеметрия, LQ</span></p>
+      <h1 class="module-title">ExpressLRS: packet rate, телеметрия, LQ</h1>
+      <div class="module-tags"><span class="gc-tag" title="Уровень">L2 — Интегратор</span><span class="gc-tag">чтение 20 мин</span><span class="gc-tag">учёба ~2 ч</span><span class="gc-tag">ELRS 3.x</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></div>
+      <p class="module-lead">ExpressLRS (ELRS) — открытая система радиоуправления, которая стала стандартом в FPV. Модуль объясняет главные компромиссы: частота пакетов против дальности, 2.4 ГГц против 900 МГц, сколько эфира отдать телеметрии. И учит читать LQ и RSSI в логе, чтобы отличать проблему линка от проблемы настройки.</p>
+      <div class="gc-callout" data-state="ok"><strong>После модуля ты умеешь</strong><ul><li>выбрать packet rate под задачу</li><li>найти просадки LQ в логе</li></ul></div><p class="gc-muted">Перед этим модулем: <a href="link-protocols.html">SBUS, CRSF и инверсия UART</a></p>
+      <div class="gc-prose module-body">
+<h2>Теория</h2>
+<h4 class="md-subheading">Packet rate: задержка против чувствительности</h4>
+<p>Packet rate — сколько пакетов управления в секунду передаёт пульт. Больше пакетов — меньше задержка, но короче каждый пакет и хуже чувствительность приёмника. Поэтому высокие частоты — для гонок и фристайла рядом, низкие — для дальних полётов.</p>
+<p>Режимы 2.4 ГГц в ELRS 3.x:</p>
+<ul><li>LoRa: 50, 150, 250, 500 Гц — основной набор, чем ниже, тем дальше;</li><li>FLRC: F500, F1000 — минимальная задержка, меньшая дальность; F1000 требует serial-приёмника и высокой скорости UART;</li><li>D250, D500 — каждый пакет отправляется дважды, надёжнее в помехах;</li><li>Full Resolution режимы (например 100Hz Full, 333Hz Full) — все каналы в полном разрешении для крыльев и сложных миксов.</li></ul>
+<p>На 900 МГц (868/915) частоты ниже: 25, 50, 100, 200 Гц. Длинная волна лучше огибает препятствия и проходит через листву — выбор для крыльев и дальних маршрутов.</p>
+<h4 class="md-subheading">Телеметрия: отношение 1:N</h4>
+<p>Telemetry ratio показывает, какой пакет из N отдаётся обратному каналу. Интервал телеметрии = ratio × 1000 / packet rate (мс). Например, 500 Гц при 1:128 — пакет телеметрии раз в 256 мс. Пакеты бывают двух типов: LINK (статистика линка, примерно каждые 512 мс, есть всегда) и DATA (телеметрия контроллера и MSP). Если на пульт надо гнать много данных (GPS, Lua-конфигуратор), отношение ставят чаще (1:8, 1:4).</p>
+<h4 class="md-subheading">Binding phrase</h4>
+<p>Фраза привязки — не пароль и не шифрование. Из неё вычисляется UID, который задаёт рисунок прыжков по частотам. Уникальная фраза нужна, чтобы не мешать соседям с тем же паттерном. Пульт и приёмник должны иметь одну фразу и одну мажорную версию ELRS.</p>
+<h4 class="md-subheading">LQ и RSSI</h4>
+<ul><li>RQly (uplink LQ) — сколько из последних 100 пакетов пульта дошло до приёмника;</li><li>TQly — то же для телеметрии в обратную сторону;</li><li>RSSI — мощность сигнала в dBm; запас считают до порога чувствительности текущего packet rate.</li></ul>
+<p>LQ отвечает на вопрос «доходят ли пакеты», RSSI — «сколько осталось запаса». LQ 100% при RSSI у самого порога — ты на краю, даже если всё летает.</p>
+
+<h2>Практика</h2>
+<h4 class="md-subheading">Выбор режима под задачу</h4>
+<ol><li>Фристайл, гонки, полёты в пределах прямой видимости: 2.4 ГГц, 250–500 Гц или F500.</li><li>7–10&quot; для дальних вылетов: 2.4 ГГц 150 Гц или 900 МГц 100 Гц.</li><li>Крыло, долгие маршруты, лес: 900 МГц, 50–100 Гц.</li></ol>
+<h4 class="md-subheading">Настройка на пульте (ELRS Lua)</h4>
+<ol><li>Tools → ExpressLRS: выбрать Packet Rate и Telem Ratio.</li><li>TX Power: для полётов рядом не ставить максимум — греется модуль, плюс засветка соседей. Dynamic Power поднимет мощность сам при падении LQ.</li><li>После смены режима проверить, что приёмник снова на связи (зелёный статус в Lua).</li></ol>
+<h4 class="md-subheading">Анализ линка по логу Blackbox</h4>
+<ol><li>Включи логирование RSSI/LQ в Betaflight (поля <code>rssi</code> и link quality).</li><li>После полёта найди участки, где LQ падает ниже ~70% или RSSI приближается к порогу.</li><li>Сопоставь с моментами RXLOSS в OSD и с ориентацией дрона. Пример из практики: на 10&quot; RSSI держался в районе 26–52%, падал ниже 30% на десятки секунд, и именно там случились RXLOSS. Виновник — антенна приёмника, а не настройки PID.</li></ol>
+
+<h2>Диагностика</h2>
+<div class="diag-groups"><article class="diag-item"><h4><strong>Симптом:</strong> RXLOSS при развороте спиной к пилоту</h4><ul><li>Возможная причина: антенна приёмника затенена рамой или углепластиком.</li><li>Что сделать: вынести антенну, ориентировать её под углом, проверить на целостность.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> LQ «проседает» волнами, хотя дрон рядом</h4><ul><li>Возможная причина: сильные помехи на 2.4 ГГц (Wi-Fi, другие пилоты) или повреждённая антенна пульта.</li><li>Что сделать: попробовать режим D250/D500 или 900 МГц, проверить антенну TX.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> не биндится после обновления</h4><ul><li>Возможная причина: разные мажорные версии ELRS или разные binding phrase.</li><li>Что сделать: обновить обе стороны до одной версии, проверить фразу.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> F1000 недоступен</h4><ul><li>Возможная причина: SPI-приёмник или недостаточная скорость UART у пульта.</li><li>Что сделать: использовать serial-приёмник и проверить baud rate модуля.</li></ul></article></div>
+
+<h2>Чек-лист</h2>
+<ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="link-elrs:0"><span>Packet rate выбран под задачу, а не «максимальный»</span></label></li><li><label><input type="checkbox" data-check-id="link-elrs:1"><span>Telem ratio соответствует объёму нужной телеметрии</span></label></li><li><label><input type="checkbox" data-check-id="link-elrs:2"><span>Уникальная binding phrase, одна мажорная версия на пульте и приёмнике</span></label></li><li><label><input type="checkbox" data-check-id="link-elrs:3"><span>RSSI и LQ пишутся в лог</span></label></li><li><label><input type="checkbox" data-check-id="link-elrs:4"><span>Антенна приёмника вынесена и не затенена рамой</span></label></li></ul>
+
+<h2>Источники</h2>
+<ul class="refs"><li><a href="https://www.expresslrs.org/faq/" target="_blank" rel="noopener noreferrer">ExpressLRS FAQ</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://www.expresslrs.org/info/telem-bandwidth/" target="_blank" rel="noopener noreferrer">Telemetry Bandwidth — ExpressLRS Docs</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://www.expresslrs.org/quick-start/transmitters/lua-howto/" target="_blank" rel="noopener noreferrer">Lua Script How-To — ExpressLRS Docs</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://github.com/ExpressLRS/ExpressLRS" target="_blank" rel="noopener noreferrer">ExpressLRS — source code (GitHub)</a> <span class="gc-tag" data-state="info">primary</span></li></ul>
+      </div>
+      <div class="module-done"><gc-button variant="secondary" data-done-toggle="link-elrs">Отметить как пройденный</gc-button></div>
+      <nav class="pager" aria-label="Соседние модули"><a class="gc-card pager__prev" href="bf-failsafe.html"><span class="gc-label gc-muted">Назад</span><br>Failsafe: стадии и тест по свитчу</a><a class="gc-card pager__next" href="link-vtx.html"><span class="gc-label gc-muted">Дальше</span><br>VTX-таблицы и смена видеоканала</a></nav>
+    </article>
+  </main>
+  <footer class="gc-container site-footer gc-muted">
+    <p>Открытый курс · <a href="https://github.com/irreligious86/UAV-Education">исходники на GitHub</a> · <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">план развития</a> · <a href="../curriculum/curriculum.html">для разработчика</a> · CC BY-NC-SA 4.0</p>
+  </footer>
+</body>
+</html>
