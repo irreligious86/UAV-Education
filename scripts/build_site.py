@@ -949,7 +949,7 @@ def build_task_variants(bank: dict) -> dict:
             if key in seen:
                 continue
             seen.add(key)
-            ans = eval(t["answer"], {"__builtins__": {}, "math": math}, dict(vals))  # authored by us, not user input
+            ans = eval(t["answer"], {"__builtins__": {"min": min, "max": max, "abs": abs, "round": round}, "math": math}, dict(vals))  # authored by us, not user input
             if not math.isfinite(ans):
                 continue
             statement = re.sub(r"\{([a-z0-9_]+)\}", lambda mm: _fmt_num(vals[mm.group(1)]), t["statement"])

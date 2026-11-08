@@ -1,0 +1,94 @@
+{
+  "module": "ros2-from-ros1",
+  "pass": 80,
+  "questions": [
+    {
+      "q": "Чего нет в ROS 2 по сравнению с ROS 1?",
+      "options": [
+        "Центрального master (roscore)",
+        "Топиков",
+        "tf2",
+        "Сервисов"
+      ],
+      "answer": 0,
+      "explain": "DDS discovery без единой точки отказа."
+    },
+    {
+      "q": "Цикл while с rate.sleep() в ROS 2 заменяют:",
+      "options": [
+        "Таймером и колбэками",
+        "Тем же циклом",
+        "Сервисом",
+        "Lifecycle"
+      ],
+      "answer": 0,
+      "explain": "create_timer + spin."
+    },
+    {
+      "q": "Синхронный вызов сервиса в колбэке однопоточного узла приводит к:",
+      "options": [
+        "Взаимной блокировке",
+        "Ускорению",
+        "Ошибке QoS",
+        "Ничему"
+      ],
+      "answer": 0,
+      "explain": "Используйте call_async."
+    },
+    {
+      "q": "Система сборки ROS 2:",
+      "options": [
+        "ament + colcon",
+        "catkin",
+        "rosbuild",
+        "bazel"
+      ],
+      "answer": 0,
+      "explain": "package.xml format 3."
+    },
+    {
+      "q": "Параметр в ROS 2 перед использованием нужно:",
+      "options": [
+        "Объявить в узле (declare_parameter)",
+        "Записать в roscore",
+        "Опубликовать в топик",
+        "Ничего"
+      ],
+      "answer": 0,
+      "explain": "Параметры принадлежат узлу."
+    },
+    {
+      "q": "ROS 1 Noetic:",
+      "options": [
+        "Без поддержки с мая 2025",
+        "LTS до 2030",
+        "Устарел в 2020",
+        "Основа ROS 2"
+      ],
+      "answer": 0,
+      "explain": "Перенос — правильный путь для живого кода."
+    },
+    {
+      "q": "Сконвертировать .bag ROS 1 в ROS 2:",
+      "options": [
+        "rosbags-convert",
+        "ros1_bridge",
+        "colcon",
+        "tf2_echo"
+      ],
+      "answer": 0,
+      "explain": "Пакет rosbags на чистом Python."
+    },
+    {
+      "q": "Первое, что читать в незнакомом ROS 1 проекте:",
+      "options": [
+        "Launch-файлы — это схема системы",
+        "Все .cpp по алфавиту",
+        "README только",
+        "CMakeLists целиком"
+      ],
+      "answer": 0,
+      "explain": "Launch показывает узлы, параметры и remap-ы."
+    }
+  ]
+}

@@ -20,7 +20,7 @@ answer from a friend — only the method transfers.
 
 - `params`: either a range `{min, max, step}` or an explicit list; `{name}` in the statement is
   replaced by the drawn value. Statement and solution accept the course's inline Markdown.
-- `answer`: a Python expression over the parameters with `math` available; evaluated at build
+- `answer`: a Python expression over the parameters with `math`, `min`, `max`, `abs`, `round` available; evaluated at build
   time (`scripts/build_site.py`, `build_task_variants`), never in the browser.
 - `tol`: relative tolerance (default 0.03); `abs`: optional absolute tolerance floor.
 - `solution`: shown after a correct answer or on "Показать решение" (a revealed variant does

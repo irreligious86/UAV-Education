@@ -342,6 +342,21 @@ D["offboard-fsm"] = flow("Автомат состояний offboard-узла (�
 
 
 
+D["ros2-lifecycle"] = flow("Lifecycle-узел ROS 2: явные состояния и переходы", [
+    Box("unc", ["unconfigured"], 10, 40, 140), Box("ina", ["inactive", "настроен, не работает"], 210, 40, 170),
+    Box("act", ["active", "публикует, обрабатывает"], 450, 40, 190, accent=True), Box("fin", ["finalized"], 450, 140, 190)],
+    [("unc", "ina", "configure"), ("ina", "act", "activate", True), ("act", "ina", "deactivate"), ("ina", "unc", "cleanup"), ("act", "fin", "shutdown")],
+    720, 250, notes=[(10, 215, "configure: открыть камеру, загрузить модель — ошибку видно до взлёта;", "m t"),
+                     (10, 231, "deactivate: пауза без убийства процесса (восприятие на посадке).", "m t")])
+
+D["planning-layers"] = flow("Слои навигации: от карты к уставкам", [
+    Box("sens", ["Лидар / глубина", "OBSTACLE_DISTANCE"], 10, 30, 170), Box("map", ["Сетка занятости", "+ раздувание"], 250, 30, 170),
+    Box("glob", ["Глобальный план", "A*, 1 Гц"], 490, 30, 190, accent=True), Box("loc", ["Локальный уровень", "10–20 Гц, стоп/обход"], 490, 120, 190),
+    Box("sp", ["Уставки", "GUIDED/Offboard 20–50 Гц"], 250, 120, 190), Box("ap", ["Автопилот", "avoidance, геозона"], 10, 120, 170, accent=True)],
+    [("sens", "map"), ("map", "glob"), ("glob", "loc"), ("loc", "sp"), ("sp", "ap", "", True), ("sens", "ap", "последний рубеж", False, "v")],
+    720, 190)
+
+
 def main() -> None:
     OUT.mkdir(parents=True, exist_ok=True)
     for name, content in D.items():

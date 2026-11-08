@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Из ROS 1 в ROS 2: читать старые проекты и переносить их — UAV Student</title>
+  <meta name="description" content="знать соответствия ROS 1 → ROS 2 читать ROS 1 проект через launch-файлы выбирать между мостом и переносом переносить узел с проверкой на эталонных данных">
+  <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#0b0f14">
+  <link rel="stylesheet" href="../lib/ground-control-ui/dist/ground-control.css">
+  <link rel="stylesheet" href="../assets/site.css">
+  <script src="../lib/ground-control-ui/dist/ground-control.js" defer></script>
+  <script src="../assets/progress-store.js" defer></script>
+  <script src="../assets/grading.js" defer></script>
+  <script src="../assets/app.js" defer></script>
+  <script src="../assets/uav-quiz.js" defer></script>
+  <script src="../assets/uav-tasks.js" defer></script>
+  <script src="../assets/offline.js" defer></script>
+</head>
+<body class="gc-root" data-base="../">
+  <header class="site-header">
+    <div class="gc-container site-header__inner">
+      <a class="site-brand" href="../index.html"><span class="site-brand__mark" aria-hidden="true">◆</span> UAV Student</a>
+      <nav class="gc-nav" aria-label="Разделы сайта">
+        <a href="../index.html" aria-current="page">Курс</a>
+        <a href="../ref/index.html">Справочник</a>
+        <a href="../pages/glossary.html">Глоссарий</a>
+        <a href="../pages/fails.html">Фейлы</a>
+        <a href="../pages/search.html">Поиск</a>
+        <a href="../pages/progress.html">Мой прогресс</a>
+      </nav>
+    </div>
+  </header>
+  <main class="gc-container site-main">
+    <article class="module" data-module-page="ros2-from-ros1">
+      <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-ros2">Электив: ROS 2 на борту</a><span>Из ROS 1 в ROS 2: читать старые проекты и переносить их</span></p>
+      <h1 class="module-title">Из ROS 1 в ROS 2: читать старые проекты и переносить их</h1>
+      <div class="module-tags"><span class="gc-tag" title="Уровень">L3 — Специалист</span><span class="gc-tag">чтение 30 мин</span><span class="gc-tag">учёба ~3 ч</span><span class="gc-tag">PX4 · ArduPilot</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ОСВОЕН</span></div>
+      <p class="gc-muted module-score" data-module-score></p>
+      <p class="module-lead">ROS 1 Noetic закончил поддержку в мае 2025 года, но половина открытых дроновых проектов, статей и туториалов — на ROS 1: MAVROS 1, catkin-воркспейсы, launch в XML, <code>rospy</code>. Модуль учит быстро читать такой проект («что здесь главное и что от чего зависит»), знать соответствия понятий ROS 1 → ROS 2, решать, переносить или запускать рядом через мост, и переносить небольшой пакет. Лабораторная: перенос узла ROS 1 на ROS 2 с сохранением поведения, проверенный на записанных данных.</p>
+      <div class="gc-callout" data-state="ok"><strong>После модуля ты умеешь</strong><ul><li>знать соответствия ROS 1 → ROS 2</li><li>читать ROS 1 проект через launch-файлы</li><li>выбирать между мостом и переносом</li><li>переносить узел с проверкой на эталонных данных</li></ul></div><p class="gc-muted">Перед этим модулем: <a href="ros2-basics.html">ROS 2 для борта: узлы, топики, QoS, tf2, bag</a></p><div class="gc-callout lab"><p class="gc-label gc-muted">Лабораторная</p><strong>Перенос узла ROS 1</strong><p class="gc-muted lab__hint">Сдано, когда отмечены все пункты:</p><ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="ros2-from-ros1:lab:0"><span>Граф узлов исходного проекта</span></label></li><li><label><input type="checkbox" data-check-id="ros2-from-ros1:lab:1"><span>Перенесённый узел с тестами логики без ROS</span></label></li><li><label><input type="checkbox" data-check-id="ros2-from-ros1:lab:2"><span>Совпадение выходов на одних данных</span></label></li><li><label><input type="checkbox" data-check-id="ros2-from-ros1:lab:3"><span>Отчёт о различиях</span></label></li></ul></div>
+      <div class="gc-prose module-body">
+<h2>Теория</h2>
+<h4 class="md-subheading">Чем ROS 2 отличается по существу</h4>
+<p>| ROS 1 | ROS 2 | Что это меняет | |---|---|---| | <code>roscore</code> (master) — центральный узел имён | нет master, DDS discovery | нет единой точки отказа; нужны домены/ограничение discovery | | TCPROS/UDPROS | DDS с QoS | надо думать о QoS (модуль ros2-basics) | | <code>rospy</code>, <code>roscpp</code> | <code>rclpy</code>, <code>rclcpp</code> | API другой, но идеи те же | | catkin, <code>catkin_make</code>/<code>catkin build</code> | ament, <code>colcon build</code> | другая сборка, <code>package.xml</code> format 3 | | launch XML (<code>.launch</code>) | launch Python/XML/YAML (<code>.launch.py</code>) | логика в launch-файле | | параметры в глобальном сервере | параметры у каждого узла | <code>rosparam</code> → <code>ros2 param</code> к конкретному узлу | | <code>rosbag</code> (<code>.bag</code>) | <code>ros2 bag</code> (SQLite3/MCAP) | конвертеры есть (rosbags) | | <code>tf</code> | <code>tf2</code> (был и в ROS 1) | почти без изменений | | nodelets | компоненты (composable nodes) | несколько узлов в одном процессе без копирования | | MAVROS 1 | MAVROS 2 (<code>mavros</code> в ROS 2) | те же плагины, другие имена сервисов/QoS |</p>
+<h4 class="md-subheading">Как читать ROS 1 проект за 30 минут</h4>
+<ol><li><strong>Корень</strong>: <code>package.xml</code>/<code>CMakeLists.txt</code> — зависимости (что за датчики, MAVROS ли, OpenCV ли).</li><li><strong>Launch-файлы</strong> (<code>launch/*.launch</code>) — что запускается, с какими параметрами и remap-ами. Это «схема системы».</li><li><strong>Узлы</strong> (<code>scripts/*.py</code>, <code>src/*.cpp</code>): найдите <code>init_node</code>, <code>Subscriber</code>, <code>Publisher</code>, <code>Service</code>, <code>Timer</code>/<code>Rate</code>. Нарисуйте граф: что слушает, что публикует.</li><li><strong>Параметры</strong> (<code>config/*.yaml</code>, <code>rospy.get_param</code>) — что настраивается.</li><li><strong>Сообщения</strong> (<code>msg/</code>, <code>srv/</code>) — свои типы.</li><li><strong>MAVROS-специфика</strong>: <code>/mavros/setpoint_*</code>, <code>/mavros/set_mode</code>, <code>/mavros/cmd/arming</code> — где проект управляет аппаратом и в какой системе координат.</li></ol>
+<p>Итог — граф узлов (как в ros2-basics) и список внешних зависимостей. С ним понятно, сколько стоит перенос.</p>
+<h4 class="md-subheading">Перенос или мост</h4>
+<ul><li><strong>ros1_bridge</strong> — двунаправленный мост топиков/сервисов между ROS 1 и ROS 2 при запущенных обоих. Требует совместимой сборки (одинаковые типы сообщений с обеих сторон), исторически — Noetic + Foxy/Humble из исходников. После окончания поддержки Noetic это временное решение.</li><li><strong>Перенос</strong> — правильный путь для живого кода. Порядок: сообщения → библиотечный код без ROS (вынести!) → узлы → launch → тесты на записанных данных.</li><li><strong>Запуск ROS 1 в контейнере</strong> — для «посмотреть, как это работало» и для записи эталонных данных до переноса.</li></ul>
+<h4 class="md-subheading">Типовые замены в коде (Python)</h4>
+<p>| ROS 1 (rospy) | ROS 2 (rclpy) | |---|---| | <code>rospy.init_node(&quot;n&quot;)</code> | <code>rclpy.init(); node = Node(&quot;n&quot;)</code> | | <code>rospy.Subscriber(&quot;/t&quot;, T, cb)</code> | <code>node.create_subscription(T, &quot;/t&quot;, cb, qos)</code> | | <code>rospy.Publisher(&quot;/t&quot;, T, queue_size=10)</code> | <code>node.create_publisher(T, &quot;/t&quot;, 10)</code> | | <code>rospy.Rate(20); while not rospy.is_shutdown(): ... rate.sleep()</code> | <code>node.create_timer(0.05, tick); rclpy.spin(node)</code> | | <code>rospy.get_param(&quot;~alt&quot;, 5.0)</code> | <code>node.declare_parameter(&quot;alt&quot;, 5.0); node.get_parameter(&quot;alt&quot;).value</code> | | <code>rospy.ServiceProxy(&quot;/s&quot;, S)(req)</code> | <code>cli = node.create_client(S, &quot;/s&quot;); cli.call_async(req)</code> | | <code>rospy.Time.now()</code> | <code>node.get_clock().now()</code> | | <code>rospy.loginfo(...)</code> | <code>node.get_logger().info(...)</code> |</p>
+<p>Главная смена мышления — <strong>цикл `while` с `rate.sleep()` заменяется таймером и колбэками</strong>, а синхронный вызов сервиса внутри колбэка — асинхронным, иначе узел заблокирует сам себя (тот же executor обслуживает ответ).</p>
+<h4 class="md-subheading">MAVROS 1 → MAVROS 2</h4>
+<p>Имена топиков в основном те же (<code>/mavros/state</code>, <code>/mavros/local_position/pose</code>, <code>/mavros/setpoint_position/local</code>), но: QoS телеметрии — sensor data; некоторые сервисы и параметры переименованы; запуск — <code>ros2 launch mavros apm.launch fcu_url:=...</code> (или <code>px4.launch</code>). Для PX4 в ROS 2 вместо MAVROS обычно переходят на uXRCE-DDS (модуль ros2-px4), для ArduPilot — на AP_DDS там, где его функций хватает (модуль ros2-ardupilot).</p>
+
+<h2>Практика</h2>
+<h4 class="md-subheading">Шаг 1. Чтение проекта</h4>
+<p>Возьмите открытый ROS 1 дроновый проект (например, пример offboard из документации PX4 для ROS 1 / MAVROS или любой репозиторий с MAVROS 1). За 30 минут нарисуйте граф узлов, список зависимостей и где проект управляет аппаратом.</p>
+<h4 class="md-subheading">Шаг 2. Эталонные данные</h4>
+<p>Если есть возможность — запустите проект в контейнере ROS 1 Noetic с SITL и запишите <code>rosbag</code> входов и выходов узла. Если нет — используйте bag из открытых источников или синтетические входы.</p>
+<h4 class="md-subheading">Шаг 3. Перенос</h4>
+<p>Перенесите один узел (до ~200 строк): логику без ROS — в отдельный модуль с pytest-тестами (как <code>offboard_fsm.py</code>), узел — тонкая обёртка <code>rclpy</code>. Сконвертируйте bag в формат ROS 2 (пакет <code>rosbags</code>: <code>rosbags-convert</code>) и проверьте, что выходы перенесённого узла совпадают с эталонными.</p>
+<h4 class="md-subheading">Шаг 4. Отчёт</h4>
+<p>Таблица: что заменено, сколько строк логики стало тестируемыми без ROS, какие различия в поведении найдены (обычно — QoS и время).</p>
+<p>Лабораторная засчитывается, когда есть граф исходного проекта, перенесённый узел с тестами логики и сравнение выходов на одних и тех же данных.</p>
+
+<h2>Диагностика</h2>
+<div class="diag-groups"><article class="diag-item"><h4><strong>Симптом:</strong> перенесённый узел «зависает» на вызове сервиса</h4><ul><li>Возможная причина: синхронный вызов в колбэке однопоточного executor-а.</li><li>Что сделать: call_async + обработка future, или отдельная группа колбэков.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> узел не получает телеметрию MAVROS 2</h4><ul><li>Возможная причина: QoS (sensor data у издателя) или другое имя топика.</li><li>Что сделать: <code>ros2 topic info -v</code>, профиль подписки.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> параметры «не применяются»</h4><ul><li>Возможная причина: в ROS 2 параметр нужно объявить (<code>declare_parameter</code>) и передать конкретному узлу.</li><li>Что сделать: объявление в конструкторе, YAML с именем узла в launch.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> ros1_bridge не передаёт свой тип сообщения</h4><ul><li>Возможная причина: мост собран без этого типа или определения различаются.</li><li>Что сделать: собрать мост из исходников с обоими воркспейсами; лучше — переносить.</li></ul></article></div>
+
+<h2>Чек-лист</h2>
+<ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="ros2-from-ros1:0"><span>Знаю соответствия понятий ROS 1 → ROS 2 и что меняется по существу</span></label></li><li><label><input type="checkbox" data-check-id="ros2-from-ros1:1"><span>Читаю ROS 1 проект через launch-файлы и рисую граф узлов</span></label></li><li><label><input type="checkbox" data-check-id="ros2-from-ros1:2"><span>Выбираю между мостом и переносом</span></label></li><li><label><input type="checkbox" data-check-id="ros2-from-ros1:3"><span>Заменяю цикл с rate.sleep таймером, синхронные сервисы — асинхронными</span></label></li><li><label><input type="checkbox" data-check-id="ros2-from-ros1:4"><span>Проверяю перенос на эталонных записанных данных</span></label></li></ul>
+
+<h2>Источники</h2>
+<ul class="refs"><li><a href="https://docs.ros.org/en/humble/How-To-Guides/Migrating-from-ROS1.html" target="_blank" rel="noopener noreferrer">ROS 2 — Migration guide from ROS 1</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://github.com/ros2/ros1_bridge" target="_blank" rel="noopener noreferrer">ros1_bridge</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://gitlab.com/ternaris/rosbags" target="_blank" rel="noopener noreferrer">rosbags (bag conversion, pure Python)</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://github.com/mavlink/mavros" target="_blank" rel="noopener noreferrer">MAVROS (ROS 2 branch)</a> <span class="gc-tag" data-state="info">primary</span></li></ul>
+<h2>Проверь себя</h2>
+<uav-quiz src="../quiz/ros2-from-ros1.json" module="ros2-from-ros1"></uav-quiz>
+      </div>
+      <div class="module-done"><gc-button variant="secondary" data-done-toggle="ros2-from-ros1">Отметить как пройденный</gc-button></div>
+      <section class="related" aria-label="Смежные модули"><p class="gc-label gc-muted">Смежные модули</p><div class="gc-grid ref-grid"><a class="gc-card" href="ros2-basics.html"><strong>ROS 2 для борта: узлы, топики, QoS, tf2, bag</strong><div class="gc-card__meta"><span class="gc-tag" title="L3 — Специалист">L3</span></div></a><a class="gc-card" href="ros2-ardupilot.html"><strong>ROS 2 + ArduPilot: AP_DDS и MAVROS, один узел — два маршрута</strong><div class="gc-card__meta"><span class="gc-tag" title="L3 — Специалист">L3</span></div></a></div></section>
+      <nav class="pager" aria-label="Соседние модули" data-track-pager><a class="gc-card pager__prev" href="ros2-nav.html"><span class="gc-label gc-muted">Назад · трек</span><br>Навигация и обход препятствий: карты, планировщики, уставки</a></nav>
+    </article>
+  </main>
+  <footer class="gc-container site-footer gc-muted">
+    <p>Открытый курс · <a href="https://github.com/irreligious86/UAV-Education">исходники на GitHub</a> · <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">план развития</a> · <a href="../curriculum/curriculum.html">для разработчика</a> · CC BY-NC-SA 4.0</p>
+  </footer>
+</body>
+</html>
