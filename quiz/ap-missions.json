@@ -89,6 +89,19 @@
       ],
       "answer": 1,
       "explain": "В конце миссии — DIST 0."
+    },
+    {
+      "q": "Миссия для коптера загружена, но с земли в Auto аппарат не взлетает как ожидалось. Что не так в первых пунктах?",
+      "kind": "apply",
+      "fragment": "seq cmd                  frame          alt\n0   HOME                 GLOBAL         0\n1   NAV_WAYPOINT         RELATIVE_ALT   20\n2   NAV_WAYPOINT         RELATIVE_ALT   20\n3   NAV_RETURN_TO_LAUNCH",
+      "options": [
+        "Нет NAV_TAKEOFF: миссия коптера, стартующая с земли, должна начинаться с команды взлёта",
+        "NAV_RETURN_TO_LAUNCH в конце запрещён: миссия должна заканчиваться NAV_LAND",
+        "RELATIVE_ALT нельзя смешивать с HOME в GLOBAL: нужен единый frame во всех пунктах",
+        "Пункты 1 и 2 совпадают по высоте, а Auto требует изменения высоты между точками"
+      ],
+      "answer": 0,
+      "explain": "Первый навигационный пункт при старте с земли — TAKEOFF; так поведение однозначно."
     }
   ]
 }

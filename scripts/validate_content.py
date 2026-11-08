@@ -327,6 +327,12 @@ def validate_quizzes(manifest_ids, status_by_id):
                 errors.append(f"{rel}: вопрос {i} — нет объяснения")
             if len(set(opts)) != len(opts):
                 errors.append(f"{rel}: вопрос {i} — повторяющиеся варианты")
+            if q.get("kind") not in (None, "apply"):
+                errors.append(f"{rel}: вопрос {i} — неизвестный kind «{q.get('kind')}»")
+            if q.get("kind") == "apply" and not q.get("fragment"):
+                errors.append(f"{rel}: вопрос {i} — kind=apply без fragment")
+            if q.get("fragment") is not None and (not isinstance(q["fragment"], str) or len(q["fragment"]) > 1500):
+                errors.append(f"{rel}: вопрос {i} — fragment должен быть строкой ≤ 1500 символов")
     return errors
 
 

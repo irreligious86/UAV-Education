@@ -12,6 +12,8 @@
  *   "pass": 80,
  *   "questions": [
  *     { "q": "...", "options": ["...", "..."], "answer": 1, "explain": "..." }
+ *   optional per question: "fragment": "<log / config / frame excerpt>" (shown preformatted),
+ *                          "kind": "apply" (an application question: find the fault in the fragment)
  *   ]
  * }
  */
@@ -93,7 +95,10 @@
       this.innerHTML = "";
       this.appendChild(h("p", { class: "gc-label gc-muted",
         text: "Вопрос " + (this._pos + 1) + " из " + this._order.length }));
+      if (q.kind === "apply") this.appendChild(h("p", { class: "gc-tag uav-quiz__kind", text: "НАЙДИ ОШИБКУ" }));
       this.appendChild(h("p", { class: "uav-quiz__q", text: q.q }));
+      // optional log/config/frame fragment: textContent only, so a fragment can never inject markup
+      if (q.fragment) this.appendChild(h("pre", { class: "uav-quiz__fragment", text: q.fragment }));
       var list = h("div", { class: "uav-quiz__options", role: "group" });
       var answered = false;
       // Shuffle option order per render so the correct answer's position carries no signal.

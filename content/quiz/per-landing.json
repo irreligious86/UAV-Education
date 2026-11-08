@@ -89,6 +89,19 @@
       ],
       "answer": 0,
       "explain": "Метры = высота × tan(угла); баровысота у земли не годится."
+    },
+    {
+      "q": "Аппарат игнорирует цель, в сообщениях GCS — «Plnd: Frame not supported». Что отправляет companion?",
+      "kind": "apply",
+      "fragment": "LANDING_TARGET time_usec=1234567 target_num=0 frame=1 (MAV_FRAME_LOCAL_NED)\n               angle_x=0.05 angle_y=-0.02 distance=6.1",
+      "options": [
+        "Неподдерживаемая система координат: ArduPilot принимает только MAV_FRAME_BODY_FRD или LOCAL_FRD",
+        "angle_x = 0.05 рад выходит за поле зрения камеры, поэтому цель отбрасывается",
+        "distance должен быть 0 при угловой версии, иначе цель считается неверной",
+        "time_usec должен совпадать со временем загрузки автопилота, иначе сообщение отброшено"
+      ],
+      "answer": 0,
+      "explain": "Обработчик LANDING_TARGET в ArduPilot отклоняет другие frame и пишет это сообщение."
     }
   ]
 }

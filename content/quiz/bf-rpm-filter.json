@@ -89,6 +89,19 @@
       ],
       "answer": 1,
       "explain": "Меньше 10 дБ — проверять poles/E%/bidir."
+    },
+    {
+      "q": "RPM-фильтр включён, но спектр в Blackbox не изменился. Что в этом diff объясняет проблему?",
+      "kind": "apply",
+      "fragment": "# diff\nset motor_pwm_protocol = DSHOT600\nset dshot_bidir = OFF\nset rpm_filter_harmonics = 3\nset rpm_filter_min_hz = 100",
+      "options": [
+        "dshot_bidir = OFF: без двунаправленного DShot нет eRPM, вырезам не по чему настраиваться",
+        "rpm_filter_harmonics = 3 избыточно: третья гармоника съедает фазу и маскирует результат",
+        "DSHOT600 слишком быстр для телеметрии: RPM-фильтр работает только на DSHOT300",
+        "rpm_filter_min_hz = 100 отсекает все вырезы: моторы в висении крутятся ниже 100 Гц"
+      ],
+      "answer": 0,
+      "explain": "RPM-фильтр берёт частоты моторов из eRPM-телеметрии; без dshot_bidir её нет, вырезы не ставятся."
     }
   ]
 }

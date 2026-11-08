@@ -78,6 +78,19 @@
       ],
       "answer": 1,
       "explain": "Четвёртый приводит к сбросу настроек MSP."
+    },
+    {
+      "q": "Приёмник ExpressLRS подключён к UART2. Аппарат не видит стиков. Причина в этом diff:",
+      "kind": "apply",
+      "fragment": "serial 1 64 115200 57600 0 115200\nset serialrx_provider = SBUS\nset serialrx_inverted = OFF",
+      "options": [
+        "serialrx_provider = SBUS, а ELRS говорит CRSF — нужен serialrx_provider = CRSF",
+        "Маска 64 на UART2 означает MSP, а не Serial RX — приёмник подключён к порту телеметрии",
+        "Скорость 115200 мала для ELRS: CRSF требует 420000, и это задаётся в команде serial",
+        "serialrx_inverted = OFF: для ELRS на UART2 нужен включённый программный инвертор"
+      ],
+      "answer": 0,
+      "explain": "serial 1 (UART2) с маской 64 — Serial RX, это верно; не тот протокол."
     }
   ]
 }
