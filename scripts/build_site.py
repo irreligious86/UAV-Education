@@ -118,9 +118,10 @@ def build_model() -> dict:
     for p in curriculum.get("paths", []):
         ordered = [mid for st in p["stages"] for mid in st["modules"] if mid in modules]
         paths.append({**p, "moduleIds": ordered})
-    projects = json.loads(PROJECTS_SRC.read_text(encoding="utf-8"))["projects"] if PROJECTS_SRC.is_file() else []
+    pdata = json.loads(PROJECTS_SRC.read_text(encoding="utf-8")) if PROJECTS_SRC.is_file() else {}
+    projects = pdata.get("projects", [])
     return {"stacks": stacks, "modules": modules, "groups": groups, "curriculum": curriculum, "paths": paths,
-            "projects": projects}
+            "projects": projects, "project_rubric": pdata.get("rubric", [])}
 
 
 # ---------------------------------------------------------------- layout
@@ -727,7 +728,20 @@ def render_project(p: dict, model: dict) -> str:
     mods = "".join(f'<li><a href="{base}m/{esc(i)}.html">{esc(model["modules"][i]["title"])}</a></li>'
                    for i in p.get("modules", []) if i in model["modules"])
     stack = "".join(f"<li>{esc(x)}</li>" for x in p.get("stack", []))
-    miles = "".join(f"<li>{esc(x)}</li>" for x in p.get("milestones", []))
+    checks = p.get("checks") or []
+    miles = "".join(f"<li>{esc(x)}" + (f'<br><span class="gc-muted">Проверка:</span> <code>{esc(checks[i])}</code>' if i < len(checks) and checks[i]
+                    else ('<br><span class="gc-muted">Проверка: демонстрация в отчёте</span>' if checks else "")) + "</li>"
+                    for i, x in enumerate(p.get("milestones", [])))
+    rubric = model.get("project_rubric") or []
+    rub_html = ""
+    if rubric:
+        names = ("Засчитано", "Хорошо", "Отлично")
+        items = "".join(f"<li><strong>{esc(r['criterion'])}</strong><ul>" +
+                        "".join(f"<li><em>{names[k]}:</em> {esc(l)}</li>" for k, l in enumerate(r["levels"])) + "</ul></li>" for r in rubric)
+        rub_html = ('<h2>Оценка</h2><p class="gc-muted">Сдан — когда выполнены все критерии приёмки. Уровень работы — по критериям ниже; каждый уровень включает предыдущий.</p>'
+                    f"<ul>{items}</ul>")
+    stretch = "".join(f"<li>{esc(x)}</li>" for x in p.get("stretch", []))
+    stretch_html = f"<h2>Задания «на отлично»</h2><ul>{stretch}</ul>" if stretch else ""
     deliver = "".join(f"<li>{esc(x)}</li>" for x in p.get("deliverables", []))
     crit = "".join(f'<li><label><input type="checkbox" data-check-id="{esc(p["id"])}:cap:{i}"><span>{esc(x)}</span></label></li>'
                    for i, x in enumerate(p.get("acceptance", [])))
@@ -756,6 +770,8 @@ def render_project(p: dict, model: dict) -> str:
         <ul class="gc-checklist">{crit}</ul>
         <h2>Автопроверка</h2>
         <p>{esc(p.get('autotest', ''))}</p>
+        {rub_html}
+        {stretch_html}
         <h2>Что сдать</h2>
         <ul>{deliver}</ul>
         <h2>Нужные модули</h2>

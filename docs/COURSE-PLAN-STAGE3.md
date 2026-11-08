@@ -70,6 +70,6 @@ bf-rpm-filter (harmonic frequencies from eRPM), per-cv (precision/recall from co
 | 2 ✅ | lab-result schema and import (`docs/LAB-RESULTS.md`), two graders, progress page import with ⚙ marks | medium |
 | 3 ⏸ | nightly SITL and Docker workflows — postponed: Alex runs SITL on his machine | medium, needs CI minutes |
 | 4 ✅ | 23 new tasks in 10 modules (f-frame-mech, f-mechanics, ctl-theory, bf-rpm-filter, link-vtx, rf-antennas, est-gnss, ap-heavy, per-geometry, per-mapping): 79 tasks in 35 modules | medium |
-| 5 | rubrics and checkpoints for 12 projects | medium |
+| 5 ✅ | shared 4-criterion rubric (`rubric` in `data/projects.json`), a check per milestone (`checks`: pytest selector or "demo in report"; 32 selectors verified to collect tests), 2 stretch tasks per project; validated in CI | medium |
 
 Out of scope, unchanged from Stage 2: flight-simulator training, video content, country-specific law.

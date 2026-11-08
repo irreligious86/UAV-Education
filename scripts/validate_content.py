@@ -405,6 +405,19 @@ def validate_projects(manifest_ids, track_ids):
         for mid in p.get("modules", []):
             if mid not in manifest_ids:
                 errs.append(f"{where}: unknown module {mid}")
+        checks = p.get("checks")
+        if checks is not None:
+            if len(checks) != len(p.get("milestones", [])):
+                errs.append(f"{where}: checks must have one entry (command or null) per milestone")
+            for c in checks:
+                m = re.match(r"(?:pytest|python) (examples/[\w./-]+)", c or "")
+                if c and not (m and (ROOT / m.group(1)).exists()):
+                    errs.append(f"{where}: check '{c}' does not point to an existing examples/ path")
+        if p.get("stretch") is not None and not all(isinstance(x, str) and x for x in p["stretch"]):
+            errs.append(f"{where}: stretch must be a list of non-empty strings")
+    for i, r in enumerate(data.get("rubric", [])):
+        if not r.get("criterion") or len(r.get("levels", [])) != 3:
+            errs.append(f"projects.json: rubric[{i}] needs a criterion and exactly 3 levels")
     return errs
 
 

@@ -46,6 +46,17 @@
     "mav-sdk",
     "comp-raspberry",
     "ap-sitl"
+   ],
+   "checks": [
+    "pytest examples/web-gcs/tests -k \"frame or battery\"",
+    null,
+    "pytest examples/web-gcs/tests -k commands_are_acked",
+    "pytest examples/web-gcs/tests -k link_loss",
+    null
+   ],
+   "stretch": [
+    "Загрузка и редактирование миссии на карте (MISSION_ITEM_INT) с проверкой обратным чтением",
+    "Несколько аппаратов в одном UI по sysid"
    ]
   },
   {
@@ -91,6 +102,17 @@
     "comp-raspberry",
     "nav-resilience",
     "eng-systems"
+   ],
+   "checks": [
+    "pytest examples/fleet-telemetry/tests -k schema",
+    "pytest examples/fleet-telemetry/tests -k \"outage or overflow\"",
+    "pytest examples/fleet-telemetry/tests -k duplicates",
+    null,
+    "pytest examples/fleet-telemetry/tests -k alerts"
+   ],
+   "stretch": [
+    "Дедупликация и порядок выдерживают 10 % дубликатов и перестановку пакетов",
+    "Расчёт трафика на аппарат·час и выбор формата (JSON против CBOR) по замеру"
    ]
   },
   {
@@ -135,6 +157,17 @@
     "data-python",
     "diag-troubleshooting",
     "ap-tuning"
+   ],
+   "checks": [
+    "pytest examples/log-report/tests -k \"clean_flight or vibration or battery\"",
+    "pytest examples/log-report/tests -k err_and_gps",
+    "pytest examples/log-report/tests -k cli_writes",
+    null,
+    null
+   ],
+   "stretch": [
+    "Регрессия: 10 своих логов с известным вердиктом, сервис ни разу не ошибается",
+    "Сравнение двух логов «до/после» тюна одним отчётом"
    ]
   },
   {
@@ -180,6 +213,17 @@
     "per-edge-ml",
     "ros2-px4",
     "ros2-app-arch"
+   ],
+   "checks": [
+    null,
+    null,
+    null,
+    "pytest examples/follow-target/tests",
+    null
+   ],
+   "stretch": [
+    "Метрики детектора по срезам дистанции и освещённости",
+    "Повторное захватывание цели после 3 с потери без смены ID"
    ]
   },
   {
@@ -224,6 +268,17 @@
     "per-cv",
     "mav-services",
     "ap-companion"
+   ],
+   "checks": [
+    "pytest examples/precision-landing/tests -k \"marker or dropout\"",
+    "pytest examples/precision-landing/tests -k marker_east",
+    "pytest examples/precision-landing/tests -k landing_target_uses",
+    "pytest examples/precision-landing/tests -k landing_stats",
+    null
+   ],
+   "stretch": [
+    "Посадка в SITL при ветре 8 м/с с ошибкой < 0.3 м в 9 из 10 прогонов",
+    "Сравнение PLND_EST_TYPE 0 и 1 на одном сценарии"
    ]
   },
   {
@@ -267,6 +322,17 @@
     "per-geometry",
     "est-gnss",
     "ops-field"
+   ],
+   "checks": [
+    "pytest examples/inspection/tests -k \"offset or mission\"",
+    null,
+    "pytest examples/inspection/tests -k \"matching or naive\"",
+    "pytest examples/inspection/tests -k geojson",
+    null
+   ],
+   "stretch": [
+    "Терраин-фоллоуинг по DEM на холмистом участке",
+    "Автоматическая выборка кадров для находок по модели, а не вручную"
    ]
   },
   {
@@ -309,6 +375,17 @@
     "per-visual-nav",
     "est-gnss",
     "ap-missions"
+   ],
+   "checks": [
+    null,
+    null,
+    "pytest examples/perception/tests -k checkpoints",
+    "pytest examples/perception/tests -k gsd_and_spacing",
+    "pytest examples/perception/tests -k \"gsd or fx_from\""
+   ],
+   "stretch": [
+    "Кривая «перекрытие → точность» минимум по 4 точкам",
+    "Сравнение геопривязки по EXIF и по GCP на одном наборе"
    ]
   },
   {
@@ -352,6 +429,17 @@
     "comp-esp32",
     "emb-protocols",
     "ap-sitl"
+   ],
+   "checks": [
+    "pytest examples/mavlink/tests -k rangefinder",
+    null,
+    "pytest examples/mavlink/tests -k \"arm_command or rejected\"",
+    null,
+    null
+   ],
+   "stretch": [
+    "Параметры компонента через PARAM_* (свой компонент в списке параметров GCS)",
+    "Подпись MAVLink 2 между ESP32 и автопилотом"
    ]
   },
   {
@@ -394,6 +482,17 @@
     "comp-raspberry",
     "nav-resilience",
     "ap-safety-fs"
+   ],
+   "checks": [
+    null,
+    "pytest examples/cell-bridge/tests -k control_never",
+    "pytest examples/cell-bridge/tests -k commands_get_through",
+    "pytest examples/cell-bridge/tests -k bad_link",
+    "pytest examples/cell-bridge/tests -k outage"
+   ],
+   "stretch": [
+    "Переключение Wi-Fi ↔ 4G без потери команды",
+    "Замер стоимости трафика за час полёта и бюджет телеметрии под тариф"
    ]
   },
   {
@@ -436,6 +535,17 @@
     "ap-sitl",
     "ap-safety-fs",
     "bf-cli-automation"
+   ],
+   "checks": [
+    null,
+    "python examples/sitl-pymavlink/test_check_lab_log.py",
+    null,
+    "python examples/sitl-pymavlink/check_lab_log.py flight.bin --lab mission --json result.json",
+    null
+   ],
+   "stretch": [
+    "Матрица CI по двум версиям прошивки",
+    "Автоматический diff параметров с объяснением из документации"
    ]
   },
   {
@@ -477,6 +587,17 @@
     "ap-safety-fs",
     "ap-sitl",
     "eng-ci-configs"
+   ],
+   "checks": [
+    "pytest examples/lua-protection/tests -k \"quiet or disarm\"",
+    "pytest examples/lua-protection/tests -k vibration",
+    "pytest examples/lua-protection/tests -k polygon",
+    "pytest examples/lua-protection/tests -k \"errors or no_fix\"",
+    null
+   ],
+   "stretch": [
+    "Третья защита (просадка напряжения под нагрузкой) с тестом через мок и в SITL",
+    "Параметры защиты меняются в полёте без перезапуска скрипта"
    ]
   },
   {
@@ -518,6 +639,51 @@
     "comp-esp32",
     "emb-protocols",
     "link-elrs"
+   ],
+   "checks": [
+    "pytest examples/tx16s-companion/tests",
+    null,
+    null,
+    null,
+    null
+   ],
+   "stretch": [
+    "Фаззинг парсера CRSF случайными байтами без падений",
+    "Энергопотребление модуля и время работы от батареи пульта"
+   ]
+  }
+ ],
+ "rubric": [
+  {
+   "criterion": "Функциональность",
+   "levels": [
+    "Все этапы работают в сценарии из README",
+    "Плюс отказные сценарии: потеря связи, пропуск данных, неверный ввод",
+    "Плюс хотя бы одно задание «на отлично» из списка проекта"
+   ]
+  },
+  {
+   "criterion": "Проверяемость",
+   "levels": [
+    "Тесты стартера проходят, свои функции покрыты хотя бы одним тестом",
+    "Тест на каждый этап; тесты запускаются в CI",
+    "Тесты на отказы и регрессию на собственных данных; покрытие ключевой логики видно в отчёте"
+   ]
+  },
+  {
+   "criterion": "Инженерный отчёт",
+   "levels": [
+    "Есть замеры, которых требуют критерии приёмки",
+    "Замеры с методикой и повторяемостью (несколько прогонов, разброс)",
+    "Сравнение вариантов решения с выводом, ограничения и что делать дальше"
+   ]
+  },
+  {
+   "criterion": "Код и документация",
+   "levels": [
+    "README: запуск одной командой, архитектура",
+    "Модули разделены, интерфейсы описаны, нет «магических чисел» без пояснения",
+    "Код читается без автора: docs/, примеры, история коммитов по этапам"
    ]
   }
  ]
