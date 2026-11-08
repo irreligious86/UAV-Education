@@ -119,7 +119,7 @@ make px4_sitl gz_x500
 - PX4 User Guide — Flight Modes (Multicopter) | https://docs.px4.io/main/en/flight_modes_mc/ | primary | A
 - PX4 User Guide — Simulation | https://docs.px4.io/main/en/simulation/ | primary | A
 - PX4-Autopilot — source code (GitHub) | https://github.com/PX4/PX4-Autopilot | primary | A
-- QGroundControl — User Guide | https://docs.qgroundcontrol.com/master/en/ | primary | A
+- QGroundControl — User Guide | https://docs.qgroundcontrol.com/Stable_V5.0/en/ | primary | A
 
 ## checklist
 - Могу объяснить, когда PX4, а когда ArduPilot

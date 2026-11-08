@@ -118,7 +118,7 @@ Betaflight: flash на FC → выгрузка через конфигурато
 ## references
 - Betaflight App — Documentation | https://betaflight.com/docs/wiki/app | primary | A
 - Mission Planner — Documentation | https://ardupilot.org/planner/ | primary | A
-- QGroundControl — User Guide | https://docs.qgroundcontrol.com/master/en/ | primary | A
+- QGroundControl — User Guide | https://docs.qgroundcontrol.com/Stable_V5.0/en/ | primary | A
 - MAVProxy — Documentation | https://ardupilot.org/mavproxy/ | primary | A
 - Pro Git — book | https://git-scm.com/book/en/v2 | primary | A
 

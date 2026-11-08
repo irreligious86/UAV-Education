@@ -16,21 +16,17 @@ references:
     url: "https://www.betaflight.com/docs/wiki/app/ports-tab"
     tier: primary
     stack: betaflight
-  - title: "How to Configure the Receiver in Betaflight — SpeedyBee"
-    url: "https://support.speedybee.cn/?s=teched&l=en&t=a&p=0&i=124433541697114112"
-    tier: secondary
+  - title: "Serial (UART) configuration — Betaflight Documentation"
+    url: "https://betaflight.com/docs/wiki/guides/current/Serial"
+    tier: primary
     stack: betaflight
-  - title: "How to Set Up Your Receiver in Betaflight — SpeedyBee F745AIO"
-    url: "https://speedybee.zendesk.com/hc/en-us/articles/13844536933787-How-to-set-up-your-receiver-in-Betaflight-configurator-on-SpeedyBee-F745AIO-flight-controller"
-    tier: secondary
+  - title: "Betaflight Setup Guide — receiver and ports"
+    url: "https://betaflight.com/docs/wiki/getting-started/setup-guide"
+    tier: primary
     stack: betaflight
-  - title: "How to Set Up Your SBUS Receiver in Betaflight — SpeedyBee F7 V3"
-    url: "https://speedybee.zendesk.com/hc/en-us/articles/15739653255963-How-to-set-up-your-SBUS-receiver-in-Betaflight-configurator-on-SpeedyBee-F7-V3-flight-controller"
-    tier: secondary
-    stack: betaflight
-  - title: "Common Issues with ELRS Receivers — SpeedyBee"
-    url: "https://docs.speedybee.cn/fpv/receiver/common-issues-with-elrs-receivers/how-to-set-up-your-receiver-in-betaflight-configurator.html"
-    tier: secondary
+  - title: "ExpressLRS — Configuring the flight controller"
+    url: "https://www.expresslrs.org/quick-start/receivers/configuring-fc/"
+    tier: primary
     stack: betaflight
   - title: "Connecting EZ ID to Betaflight for GPS Passthrough — Flite Test"
     url: "https://www.flitetest.com/articles/connecting-ez-id-to-betaflight-for-gps-passthrough"
@@ -192,8 +188,7 @@ next:
 ## references
 
 - Ports Tab — Betaflight Documentation | https://www.betaflight.com/docs/wiki/app/ports-tab | primary | A
-- How to Configure the Receiver in Betaflight — SpeedyBee | https://support.speedybee.cn/?s=teched&l=en&t=a&p=0&i=124433541697114112 | secondary | B
-- How to Set Up Your Receiver in Betaflight — SpeedyBee F745AIO | https://speedybee.zendesk.com/hc/en-us/articles/13844536933787-How-to-set-up-your-receiver-in-Betaflight-configurator-on-SpeedyBee-F745AIO-flight-controller | secondary | B
-- How to Set Up Your SBUS Receiver in Betaflight — SpeedyBee F7 V3 | https://speedybee.zendesk.com/hc/en-us/articles/15739653255963-How-to-set-up-your-SBUS-receiver-in-Betaflight-configurator-on-SpeedyBee-F7-V3-flight-controller | secondary | B
-- Common Issues with ELRS Receivers — SpeedyBee | https://docs.speedybee.cn/fpv/receiver/common-issues-with-elrs-receivers/how-to-set-up-your-receiver-in-betaflight-configurator.html | secondary | B
+- Serial (UART) configuration — Betaflight Documentation | https://betaflight.com/docs/wiki/guides/current/Serial | primary | A
+- Betaflight Setup Guide — receiver and ports | https://betaflight.com/docs/wiki/getting-started/setup-guide | primary | A
+- ExpressLRS — Configuring the flight controller | https://www.expresslrs.org/quick-start/receivers/configuring-fc/ | primary | A
 - Connecting EZ ID to Betaflight for GPS Passthrough — Flite Test | https://www.flitetest.com/articles/connecting-ez-id-to-betaflight-for-gps-passthrough | secondary | B

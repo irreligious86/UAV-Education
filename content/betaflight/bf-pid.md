@@ -58,7 +58,7 @@ PID усиливает всё, что приходит с гироскопа, в
 | тупит на стик | **entry lag** | время от начала движения setpoint до 50% на gyro, мс |
 | не долетает / перелетает | **peak tracking** | max gyro / max setpoint, % |
 
-Медиана по 10–20 манёврам — устойчива; среднее портит один кривой бросок. Классический step response (PID-Analyzer, PIDtoolbox) хорош на длинных фристайл-логах, но на коротких логах по 1–2 минуты на профиль шумит на ±40% — прямые метрики честнее.
+Медиана по 10–20 манёврам — устойчива; среднее портит один кривой бросок. Классический step response (Blackbox Explorer; PID-Analyzer — не развивается с 2019 года, PIDtoolbox) хорош на длинных фристайл-логах, но на коротких логах по 1–2 минуты на профиль шумит на ±40% — прямые метрики честнее.
 
 ### Кейс: четыре профиля на двух 7"
 Два почти одинаковых 7" (одна рама, моторы, пропы, FC), приведённых к общему базису. Четыре профиля отличались только слайдерами, фильтры одинаковые:
@@ -137,7 +137,7 @@ PID усиливает всё, что приходит с гироскопа, в
 - PID Tuning Guide — Betaflight Documentation | https://betaflight.com/docs/wiki/guides/current/PID-Tuning-Guide | primary | A
 - PID Tuning tab — Betaflight App | https://betaflight.com/docs/wiki/app/pid-tuning-tab | primary | A
 - Betaflight settings reference (settings.c, GitHub) | https://github.com/betaflight/betaflight/blob/master/src/main/cli/settings.c | primary | A
-- PID-Analyzer — step response tool (GitHub) | https://github.com/Plasmatree/PID-Analyzer | secondary | B
+- PID-Analyzer — step response tool (legacy, unmaintained since 2019) | https://github.com/Plasmatree/PID-Analyzer | secondary | C
 
 ## checklist
 - Фильтры настроены до PID, спектр чистый

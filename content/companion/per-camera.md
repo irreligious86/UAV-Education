@@ -124,7 +124,7 @@ mediamtx или gst-rtsp-server; подключиться из QGC и VLC одн
 ## references
 - Raspberry Pi — Camera software (libcamera, picamera2) | https://raspberrypi.com/documentation/computers/camera_software.html | primary | A
 - GStreamer — Documentation | https://gstreamer.freedesktop.org/documentation/ | secondary | B
-- QGroundControl — Video settings (UDP/RTSP sources) | https://docs.qgroundcontrol.com/master/en/qgc-user-guide/settings_view/video.html | primary | A
+- QGroundControl — Video settings (UDP/RTSP sources) | https://docs.qgroundcontrol.com/Stable_V5.0/en/qgc-user-guide/settings_view/video.html | primary | A
 
 ## checklist
 - Знаю разницу CSI/USB, rolling/global shutter и форматов
