@@ -156,6 +156,8 @@ def layout(*, title: str, base: str, body: str, active: str, description: str = 
   <link rel="stylesheet" href="{base}assets/site.css">
   <script src="{base}{GC}/ground-control.js" defer></script>
   <script src="{base}assets/progress-store.js" defer></script>
+  <script src="{base}assets/backend-config.js" defer></script>
+  <script src="{base}assets/account.js" defer></script>
   <script src="{base}assets/grading.js" defer></script>
   <script src="{base}assets/app.js" defer></script>
   <script src="{base}assets/uav-quiz.js" defer></script>
@@ -940,6 +942,95 @@ def render_glossary(model: dict) -> str:
     return layout(title="Глоссарий", base=base, body=body, active="glossary")
 
 
+def render_account() -> str:
+    base = "../"
+    body = """    <h1 class="gc-display">Аккаунт</h1>
+    <section class="gc-panel" data-acc="off">
+      <p class="gc-muted">Аккаунты ещё не включены: прогресс хранится только в этом браузере — <a href="progress.html">моя ведомость</a>. Как включить — <code>docs/MULTIUSER-PLAN.md</code>.</p>
+    </section>
+    <section class="gc-panel" data-acc="loading" hidden><p class="gc-muted">Подключаюсь к серверу…</p></section>
+    <section class="gc-panel acc-forms" data-acc="guest" hidden>
+      <div class="widget__presets" role="tablist">
+        <button type="button" class="gc-tag" data-tab="login" data-state="ok">Вход</button>
+        <button type="button" class="gc-tag" data-tab="register">Регистрация</button>
+        <button type="button" class="gc-tag" data-tab="forgot">Забыли пароль</button>
+      </div>
+      <form class="acc-form" data-form="login">
+        <label>Почта <input type="email" name="email" autocomplete="email" required></label>
+        <label>Пароль <input type="password" name="password" autocomplete="current-password" required></label>
+        <gc-button type="submit">Войти</gc-button>
+      </form>
+      <form class="acc-form" data-form="register" hidden>
+        <label>Почта <input type="email" name="email" autocomplete="email" required></label>
+        <label>Имя пользователя <input type="text" name="username" autocomplete="username" pattern="[a-z0-9_]{3,32}" required>
+          <small class="gc-muted">3–32 символа: a-z, 0-9, _ — его видит администрация</small></label>
+        <label>Пароль <input type="password" name="password" autocomplete="new-password" minlength="10" required>
+          <small class="gc-muted">минимум 10 символов</small></label>
+        <gc-button type="submit">Зарегистрироваться</gc-button>
+        <p class="gc-muted">Оценки видишь ты и администрация курса. Прогресс, накопленный в этом браузере, перейдёт в аккаунт.</p>
+      </form>
+      <form class="acc-form" data-form="forgot" hidden>
+        <label>Почта <input type="email" name="email" autocomplete="email" required></label>
+        <gc-button type="submit">Прислать ссылку</gc-button>
+      </form>
+    </section>
+    <section class="gc-panel" data-acc="recovery" hidden>
+      <form class="acc-form" data-form="newpass">
+        <label>Новый пароль <input type="password" name="password" autocomplete="new-password" minlength="10" required></label>
+        <gc-button type="submit">Сохранить пароль</gc-button>
+      </form>
+    </section>
+    <section class="gc-panel" data-acc="user" hidden>
+      <p class="progress-headline"><span data-acc-username></span> <span class="gc-tag" data-acc-role></span></p>
+      <p class="gc-muted">Почта: <span data-acc-email></span> · синхронизация: <span class="gc-tag" data-acc-sync></span></p>
+      <form class="acc-form acc-form--inline" data-form="rename">
+        <label>Сменить имя <input type="text" name="username" pattern="[a-z0-9_]{3,32}" required></label>
+        <gc-button type="submit" variant="secondary">Сохранить</gc-button>
+      </form>
+      <div class="progress-actions">
+        <a class="gc-tag" href="progress.html">Моя ведомость</a>
+        <a class="gc-tag" href="admin.html" data-acc-admin hidden>Админка</a>
+        <gc-button variant="secondary" data-acc-sync-now>Синхронизировать</gc-button>
+        <gc-button variant="secondary" data-acc-logout>Выйти</gc-button>
+      </div>
+      <p class="gc-muted">При выходе копия прогресса в этом браузере стирается — на сервере он остаётся.</p>
+    </section>
+    <p class="acc-msg" data-acc-msg aria-live="polite"></p>"""
+    return layout(title="Аккаунт", base=base, body=body, active="progress",
+                  extra_head=f'\n  <script src="{base}assets/account-page.js" defer></script>')
+
+
+def render_admin() -> str:
+    base = "../"
+    body = """    <h1 class="gc-display">Администрация</h1>
+    <section class="gc-panel" data-adm="off">
+      <p class="gc-muted">Страница для администрации курса. Нужен вход с ролью admin или superadmin — <a href="account.html">аккаунт</a>.</p>
+    </section>
+    <section data-adm="on" hidden>
+      <div class="gc-panel">
+        <p class="gc-label gc-muted">Студенты</p>
+        <div class="progress-actions">
+          <input type="search" class="adm-filter" placeholder="поиск по имени или почте" data-adm-filter>
+          <gc-button variant="secondary" data-adm-csv>CSV</gc-button>
+          <gc-button variant="secondary" data-adm-reload>Обновить</gc-button>
+        </div>
+        <div class="md-table-wrap"><table class="md-table adm-table">
+          <thead><tr><th>Имя</th><th>Почта</th><th>Роль</th><th>Освоено</th><th>Балл</th><th>Активность</th></tr></thead>
+          <tbody data-adm-rows></tbody>
+        </table></div>
+        <p class="gc-muted">Баллы считает браузер студента (квизы и задачи проверяются на его стороне): это видимость работы, а не экзамен — <code>docs/MULTIUSER-PLAN.md</code>, раздел 6.</p>
+      </div>
+      <div class="gc-panel" data-adm-detail hidden></div>
+      <div class="gc-panel" data-adm-audit-panel>
+        <p class="gc-label gc-muted">Журнал смены ролей</p>
+        <ul class="progress-labs" data-adm-audit></ul>
+      </div>
+    </section>
+    <p class="acc-msg" data-acc-msg aria-live="polite"></p>"""
+    return layout(title="Администрация", base=base, body=body, active="progress",
+                  extra_head=f'\n  <script src="{base}assets/admin-page.js" defer></script>')
+
+
 def render_page(name: str, title: str) -> str:
     base = "../"
     inner = (ROOT / "content" / "pages" / f"{name}.html").read_text(encoding="utf-8")
@@ -1300,6 +1391,8 @@ def main() -> None:
             write(ROOT / "tasks" / t.name, json.dumps(build_task_variants(bank), ensure_ascii=False) + "\n")
     write(ROOT / "pages" / "search.html", render_search())
     write(ROOT / "pages" / "progress.html", render_progress(model))
+    write(ROOT / "pages" / "account.html", render_account())
+    write(ROOT / "pages" / "admin.html", render_admin())
     write(ROOT / "api" / "v1" / "grading.json", json.dumps(grading_meta(model), ensure_ascii=False, indent=2) + "\n")
     write(ROOT / "api" / "v1" / "search.json", json.dumps(search_index(model), ensure_ascii=False) + "\n")
     write(ROOT / "api" / "v1" / "curriculum.json", json.dumps(api_payload(model), ensure_ascii=False, indent=2) + "\n")

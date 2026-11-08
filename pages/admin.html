@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Администрация — UAV Student</title>
+  <meta name="description" content="Инженерный курс по БПЛА: от физики полёта до своих прошивок и бортовых компьютеров.">
+  <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#0b0f14">
+  <link rel="stylesheet" href="../lib/ground-control-ui/dist/ground-control.css">
+  <link rel="stylesheet" href="../assets/site.css">
+  <script src="../lib/ground-control-ui/dist/ground-control.js" defer></script>
+  <script src="../assets/progress-store.js" defer></script>
+  <script src="../assets/backend-config.js" defer></script>
+  <script src="../assets/account.js" defer></script>
+  <script src="../assets/grading.js" defer></script>
+  <script src="../assets/app.js" defer></script>
+  <script src="../assets/uav-quiz.js" defer></script>
+  <script src="../assets/uav-tasks.js" defer></script>
+  <script src="../assets/offline.js" defer></script>
+  <script src="../assets/admin-page.js" defer></script>
+</head>
+<body class="gc-root" data-base="../">
+  <header class="site-header">
+    <div class="gc-container site-header__inner">
+      <a class="site-brand" href="../index.html"><span class="site-brand__mark" aria-hidden="true">◆</span> UAV Student</a>
+      <nav class="gc-nav" aria-label="Разделы сайта">
+        <a href="../index.html">Курс</a>
+        <a href="../ref/index.html">Справочник</a>
+        <a href="../pages/glossary.html">Глоссарий</a>
+        <a href="../pages/fails.html">Фейлы</a>
+        <a href="../pages/search.html">Поиск</a>
+        <a href="../pages/progress.html" aria-current="page">Мой прогресс</a>
+      </nav>
+    </div>
+  </header>
+  <main class="gc-container site-main">
+    <h1 class="gc-display">Администрация</h1>
+    <section class="gc-panel" data-adm="off">
+      <p class="gc-muted">Страница для администрации курса. Нужен вход с ролью admin или superadmin — <a href="account.html">аккаунт</a>.</p>
+    </section>
+    <section data-adm="on" hidden>
+      <div class="gc-panel">
+        <p class="gc-label gc-muted">Студенты</p>
+        <div class="progress-actions">
+          <input type="search" class="adm-filter" placeholder="поиск по имени или почте" data-adm-filter>
+          <gc-button variant="secondary" data-adm-csv>CSV</gc-button>
+          <gc-button variant="secondary" data-adm-reload>Обновить</gc-button>
+        </div>
+        <div class="md-table-wrap"><table class="md-table adm-table">
+          <thead><tr><th>Имя</th><th>Почта</th><th>Роль</th><th>Освоено</th><th>Балл</th><th>Активность</th></tr></thead>
+          <tbody data-adm-rows></tbody>
+        </table></div>
+        <p class="gc-muted">Баллы считает браузер студента (квизы и задачи проверяются на его стороне): это видимость работы, а не экзамен — <code>docs/MULTIUSER-PLAN.md</code>, раздел 6.</p>
+      </div>
+      <div class="gc-panel" data-adm-detail hidden></div>
+      <div class="gc-panel" data-adm-audit-panel>
+        <p class="gc-label gc-muted">Журнал смены ролей</p>
+        <ul class="progress-labs" data-adm-audit></ul>
+      </div>
+    </section>
+    <p class="acc-msg" data-acc-msg aria-live="polite"></p>
+  </main>
+  <footer class="gc-container site-footer gc-muted">
+    <p>Открытый курс · <a href="https://github.com/irreligious86/UAV-Education">исходники на GitHub</a> · <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">план развития</a> · <a href="../curriculum/curriculum.html">для разработчика</a> · CC BY-NC-SA 4.0</p>
+  </footer>
+</body>
+</html>

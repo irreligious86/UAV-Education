@@ -88,6 +88,15 @@ jobs:
       - name: JavaScript syntax check
         run: for f in assets/*.js assets/widgets/*.js; do node --check "$f"; done
 
+      - name: Account logic (merge rules) and account UI end-to-end (fake backend, Chromium)
+        run: |
+          node --test tests/js/*.test.js
+          npm install --global --silent playwright@1.63.0
+          npx --yes playwright@1.63.0 install --with-deps chromium > /dev/null
+          python -m http.server 8765 > /dev/null 2>&1 &
+          sleep 2
+          NODE_PATH="$(npm root -g)" node tests/e2e/accounts.e2e.js http://localhost:8765
+
       - name: Design system is pinned to a release tag
         run: |
           git -C lib/ground-control-ui fetch -q --tags origin

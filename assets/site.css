@@ -301,3 +301,19 @@ body.ready-only .track-module--planned, body.ready-only .gc-card[data-state="pen
   .md-table td:first-child::before { content: none; }
   .md-table td code { white-space: normal; overflow-wrap: anywhere; }
 }
+
+/* ---------------------------------------------------------------- accounts (pages/account.html, pages/admin.html) */
+.acc-form { display: grid; gap: 0.75rem; max-width: 28rem; margin-top: 1rem; }
+.acc-form label { display: grid; gap: 0.25rem; }
+.acc-form--inline { grid-template-columns: 1fr auto; align-items: end; max-width: 32rem; }
+.acc-form input, .adm-filter, .adm-table select {
+  font: inherit; color: var(--gc-ink); background: var(--gc-surface-2, transparent);
+  border: 1px solid var(--gc-line); border-radius: 6px; padding: 0.5rem 0.6rem; min-width: 0;
+}
+.acc-form input:focus, .adm-filter:focus, .adm-table select:focus { outline: 2px solid var(--gc-accent-hud); outline-offset: 1px; }
+.acc-msg { min-height: 1.5em; }
+.acc-msg[data-state="critical"] { color: var(--gc-signal-red); }
+.acc-msg[data-state="ok"] { color: var(--gc-accent-hud); }
+.adm-filter { flex: 1 1 14rem; }
+@media (max-width: 640px) { .acc-form--inline { grid-template-columns: 1fr; } }
+.acc-form + .progress-actions, [data-acc="user"] .progress-actions { margin-top: var(--gc-space-3, 0.75rem); }

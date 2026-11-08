@@ -1,6 +1,6 @@
 # Multi-user system: accounts, roles, progress on a server
 
-Status: design + implementation behind a feature flag (2026-11-09). The site keeps working exactly as
+Status: phases 1–2 implemented behind a feature flag (2026-11-09). The site keeps working exactly as
 before until a backend is configured in `assets/backend-config.js`.
 
 ## 1. Requirements (from Alex)
@@ -82,8 +82,8 @@ carry the grader's JSON (`uav-lab-result/1`) that a server can re-verify.
 
 | # | Phase | Done when |
 |---|---|---|
-| 1 | Schema, roles, RLS, superadmin rules — `supabase/migrations/`, tests in CI against Postgres 16 | policy tests pass for every cell of the access table |
-| 2 | Account page (register/login/logout/reset), server progress store with merge, admin page (grades table, per-student detail), superadmin role management — behind the feature flag | Playwright tests with a fake backend pass; site unchanged with the flag off |
+| 1 ✅ | Schema, roles, RLS, superadmin rules — `supabase/migrations/`, tests in CI against Postgres 16 | policy tests pass for every cell of the access table |
+| 2 ✅ | Account page (register/login/logout/reset), server progress store with merge, admin page (grades table, per-student detail), superadmin role management — behind the feature flag | Playwright tests with a fake backend pass; site unchanged with the flag off |
 | 3 | Server-side grading of quizzes (Edge Function), lab result verification | scored work cannot be written from the browser |
 | 4 | Groups/cohorts (admin sees own group), CSV export, deadlines | — |
 
@@ -98,3 +98,18 @@ carry the grader's JSON (`uav-lab-result/1`) that a server can re-verify.
 6. Project settings → API: copy the Project URL and the **anon** public key into
    `assets/backend-config.js` (`enabled: true`), run `python scripts/publish.py`, commit.
    Never put the `service_role` key in the repository.
+
+## 9. Files
+
+| Piece | File |
+|---|---|
+| Schema, roles, RLS | `supabase/migrations/0001_accounts_roles_progress.sql` |
+| Policy tests (Postgres 16, CI job `database-access-rules`) | `supabase/tests/test_rls.py`, `supabase/tests/supabase_stub.sql` |
+| Feature flag and keys | `assets/backend-config.js` |
+| Auth, sync, merge, staff API | `assets/account.js` (merge rules tested in `tests/js/merge.test.js`) |
+| Pages | `pages/account.html` + `assets/account-page.js`, `pages/admin.html` + `assets/admin-page.js` |
+| supabase-js 2.45.4 (MIT), vendored, loaded only when enabled | `assets/vendor/supabase/` |
+| UI end-to-end with an in-memory fake backend | `tests/e2e/accounts.e2e.js`, `tests/e2e/fake-supabase.js` |
+
+Login is by email; the username is the public handle shown to the administration (logging in by
+username would need a lookup that reveals which emails exist).

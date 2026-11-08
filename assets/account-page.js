@@ -1,0 +1,84 @@
+/* pages/account.html: register, log in, reset password, profile. Logic lives in account.js (UAVAccount). */
+(function () {
+  "use strict";
+
+  var ROLE = { student: "студент", admin: "админ", superadmin: "суперадмин" };
+  var SYNC = { idle: "—", loading: "загрузка", saving: "сохраняю", saved: "сохранено", offline: "нет связи, сохранится позже" };
+
+  function $(sel) { return document.querySelector(sel); }
+  function show(name) {
+    document.querySelectorAll("[data-acc]").forEach(function (el) { el.hidden = el.getAttribute("data-acc") !== name; });
+  }
+  function msg(text, state) {
+    var el = $("[data-acc-msg]");
+    el.textContent = text || "";
+    el.setAttribute("data-state", state || "");
+  }
+  function busy(form, on) { form.querySelectorAll("gc-button, input").forEach(function (b) { b.toggleAttribute("disabled", on); }); }
+
+  // gc-button is not form-associated: submit by hand, and on Enter in any field
+  function wireSubmit(form, handler) {
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      if (!form.reportValidity()) return;
+      var data = Object.fromEntries(new FormData(form).entries());
+      busy(form, true); msg("");
+      Promise.resolve().then(function () { return handler(data); })
+        .then(function (text) { if (text) msg(text, "ok"); })
+        .catch(function (err) { msg(window.UAVAccount.humanError(err), "critical"); })
+        .then(function () { busy(form, false); });
+    });
+    form.querySelectorAll("gc-button[type=submit]").forEach(function (b) { b.addEventListener("click", function () { form.requestSubmit(); }); });
+    form.addEventListener("keydown", function (e) { if (e.key === "Enter" && e.target.tagName === "INPUT") { e.preventDefault(); form.requestSubmit(); } });
+  }
+
+  function render(s) {
+    if (!s.enabled) return show("off");
+    if (s.recovery && s.user) return show("recovery");
+    if (!s.user) return show("guest");
+    show("user");
+    var p = s.profile || {};
+    $("[data-acc-username]").textContent = p.username || "…";
+    $("[data-acc-email]").textContent = p.email || (s.user && s.user.email) || "";
+    var role = $("[data-acc-role]");
+    role.textContent = ROLE[p.role] || "";
+    role.setAttribute("data-state", p.role === "superadmin" ? "critical" : p.role === "admin" ? "caution" : "ok");
+    var sync = $("[data-acc-sync]");
+    sync.textContent = SYNC[s.sync] || s.sync;
+    sync.setAttribute("data-state", s.sync === "saved" ? "ok" : s.sync === "offline" ? "caution" : "");
+    $("[data-acc-admin]").hidden = !s.isStaff;
+    var rename = document.querySelector('[data-form="rename"] input');
+    if (rename && !rename.value && p.username) rename.value = p.username;
+  }
+
+  function start() {
+    var A = window.UAVAccount;
+    if (!A || !A.enabled) return show("off");
+    show("loading");
+    document.querySelectorAll("[data-tab]").forEach(function (t) {
+      t.addEventListener("click", function () {
+        var name = t.getAttribute("data-tab");
+        document.querySelectorAll("[data-tab]").forEach(function (x) { x.setAttribute("data-state", x === t ? "ok" : ""); });
+        document.querySelectorAll(".acc-forms [data-form]").forEach(function (f) { f.hidden = f.getAttribute("data-form") !== name; });
+        msg("");
+      });
+    });
+    wireSubmit($('[data-form="login"]'), function (d) { return A.signIn(d.email, d.password).then(function () { return ""; }); });
+    wireSubmit($('[data-form="register"]'), function (d) {
+      return A.signUp(d.email, d.username, d.password).then(function (r) {
+        return r.needsConfirmation ? "Готово. Открой письмо и подтверди почту, потом войди." : "Аккаунт создан.";
+      });
+    });
+    wireSubmit($('[data-form="forgot"]'), function (d) {
+      return A.resetPassword(d.email).then(function () { return "Если такая почта есть, ссылка для смены пароля уже в пути."; });
+    });
+    wireSubmit($('[data-form="newpass"]'), function (d) { return A.updatePassword(d.password).then(function () { return "Пароль обновлён."; }); });
+    wireSubmit($('[data-form="rename"]'), function (d) { return A.rename(d.username).then(function () { return "Имя сохранено."; }); });
+    $("[data-acc-logout]").addEventListener("click", function () { A.signOut().then(function () { msg("Вышел. Копия прогресса в этом браузере стёрта.", "ok"); }); });
+    $("[data-acc-sync-now]").addEventListener("click", function () { A.syncNow(); });
+    A.onChange(render);
+    A.init().then(render);
+  }
+
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", start); else start();
+})();
