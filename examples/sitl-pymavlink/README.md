@@ -33,8 +33,19 @@ The test arms in GUIDED, climbs to 10 m, simulates RC loss (`SIM_RC_FAIL = 1`) a
 that the mode changes to RTL or LAND within 5 s. Break it on purpose (`FS_THR_ENABLE = 0`)
 to see it fail — a test that cannot fail proves nothing.
 
+## 4. Grade a lab log automatically
+
+```bash
+python3 check_lab_log.py logs/00000012.BIN --lab failsafe    # also: mission | hover | motorfail
+```
+
+Prints PASS/FAIL per criterion (RC failsafe triggered, mode changed within 5 s, …) and exits 0/1.
+SITL logs are in `logs/` next to where `sim_vehicle.py` ran; real logs come from the SD card.
+The checks are deliberately simple and readable — extend them for your own labs.
+
 ## Files
 
 - `fly_square.py` — connect, wait for EKF, arm, takeoff, 4 waypoints in GUIDED, land.
 - `test_failsafe.py` — RC-failsafe assertion, usable in GitHub Actions.
 - `ci.yml` — example workflow (copy to `.github/workflows/`).
+- `check_lab_log.py` — lab grader for DataFlash logs (failsafe, mission, hover, motor failure).
