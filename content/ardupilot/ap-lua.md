@@ -26,7 +26,7 @@ ArduPilot умеет выполнять Lua-скрипты прямо на по�
 - Скрипты (`.lua`) лежат в `APM/scripts` на SD-карте; в SITL — в папке `scripts` там, откуда запущен симулятор.
 - Каждый скрипт работает в своей «песочнице» и с низким приоритетом: полётный код важнее, точного расписания скрипту никто не обещает.
 - Память для скриптов задаёт `SCR_HEAP_SIZE`. Мало — скрипты падают и появляется pre-arm ошибка о нехватке памяти. Много — может не инициализироваться EKF.
-- Если один скрипт исчерпал память или упал с ошибкой, останавливаются все скрипты до перезагрузки.
+- Если один скрипт упал с ошибкой, останавливается только он. Если кончилась общая память скриптов (или паника), останавливаются все скрипты до перезагрузки.
 - Скриптинг требует минимум 2 МБ флеша и не работает на F4-контроллерах.
 
 ### Паттерн update()
@@ -39,10 +39,10 @@ ArduPilot умеет выполнять Lua-скрипты прямо на по�
 В репозитории ArduPilot есть готовые скрипты: `libraries/AP_Scripting/applets` (готовы к использованию, у каждого есть `.md`-описание) и `libraries/AP_Scripting/examples` (учебные примеры). Начинать стоит с applet `motor_failure_test.lua`: он останавливает моторы, заданные битовой маской `MOT_STOP_BITMASK`, когда тумблер Scripting1 вверх. Октокоптер должен лететь на одном отказавшем моторе.
 
 ### Что умеет API (по `docs/docs.lua` в AP_Scripting)
-Чтение состояния: `ahrs:get_position()`, `ahrs:get_velocity_NED()`, `ahrs:get_yaw()`, `gps:num_sats()`, `battery:voltage()`, `rangefinder:distance_cm_orient()`, `esc_telem:get_rpm()`, `vehicle:get_mode()`, `arming:is_armed()`; действие: `vehicle:set_mode()`, `vehicle:set_target_velocity_NED()`, `vehicle:set_target_location()`, `mission:set_current_cmd()`, `SRV_Channels:set_output_pwm()`, `relay:on()`, `param:set()`/`param:add_param()` (свои параметры с префиксом), `gcs:send_text()`, `logger:write()` (свои лог-сообщения!), `notify:play_tune()`, `rc:get_aux_cached()` (тумблер `RCx_OPTION = 300..307` Scripting1..8), `serial:find_serial()` (свой протокол на UART), `CAN:get_device()` (DroneCAN), `periph` на AP_Periph. Таймеры — возврат `update, 100` (мс до следующего вызова). Параметры скриптинга: `SCR_ENABLE`, `SCR_HEAP_SIZE` (память; на F4 не хватает → только H7/F7 с запасом), `SCR_VM_I_COUNT` (лимит инструкций на вызов — защита от зависания), `SCR_DEBUG_OPTS`.
+Чтение состояния: `ahrs:get_position()`, `ahrs:get_velocity_NED()`, `ahrs:get_yaw()`, `gps:num_sats()`, `battery:voltage()`, `rangefinder:distance_orient()` (в метрах; `distance_cm_orient` устарел), `esc_telem:get_rpm()`, `vehicle:get_mode()`, `arming:is_armed()`; действие: `vehicle:set_mode()`, `vehicle:set_target_velocity_NED()`, `vehicle:set_target_location()`, `mission:set_current_cmd()`, `SRV_Channels:set_output_pwm()`, `relay:on()`, `param:set()`/`param:add_param()` (свои параметры с префиксом), `gcs:send_text()`, `logger:write()` (свои лог-сообщения!), `notify:play_tune()`, `rc:get_aux_cached()` (тумблер `RCx_OPTION = 300..307` Scripting1..8), `serial:find_serial()` (свой протокол на UART), `CAN:get_device()` (DroneCAN), `periph` на AP_Periph. Таймеры — возврат `update, 100` (мс до следующего вызова). Параметры скриптинга: `SCR_ENABLE`, `SCR_HEAP_SIZE` (память; на F4 не хватает → только H7/F7 с запасом), `SCR_VM_I_COUNT` (лимит инструкций на вызов — защита от зависания), `SCR_DEBUG_OPTS`.
 
 ### Applets как учебник
-`libraries/AP_Scripting/applets/` — готовые, с `.md`-описанием: `motor_failure_test.lua` (останавливает моторы по битмаске `MOT_STOP_BITMASK` тумблером Scripting1 — тест отказа мотора на гексе/X8 в SITL и в поле), `VTOL-quicktune.lua`/`copter-quicktune` (QuikTune), `copter-deadreckon-home.lua` (возврат по счислению при потере GPS), `arming-checks.lua` (свои пред-армовые проверки), `ahrs-source-extnav-optflow.lua` (переключение источников EKF по качеству), `BattEstimate.lua`, `MissionSelector.lua`, `net_webserver.lua`, `crsf-calibrate.lua`, `SmartAudio.lua`. Читать их — лучший способ выучить API и стиль (защитные проверки, `pcall`-подобные обёртки, параметры через `param:add_table`).
+`libraries/AP_Scripting/applets/` — готовые, с `.md`-описанием: `motor_failure_test.lua` (останавливает моторы по битмаске `MOT_STOP_BITMASK` тумблером Scripting1 — тест отказа мотора на гексе/X8 в SITL и в поле), `VTOL-quicktune.lua` (QuikTune для мультикоптеров и VTOL), `rover-quicktune.lua`, `copter-deadreckon-home.lua` (возврат по счислению при потере GPS), `arming-checks.lua` (свои пред-армовые проверки), `ahrs-source-extnav-optflow.lua` (переключение источников EKF по качеству), `BattEstimate.lua`, `MissionSelector.lua`, `net_webserver.lua`, `crsf-calibrate.lua`, `SmartAudio.lua`. Читать их — лучший способ выучить API и стиль (защитные проверки, `pcall`-подобные обёртки, параметры через `param:add_table`).
 
 ### Разобранный пример: защита по температуре ESC
 ```lua
@@ -54,7 +54,7 @@ function update()
   for i = 0, 7 do
     local t = esc_telem:get_temperature(i)          -- nil if no telemetry; value in centi-degrees
     if t then
-      t = t / 100
+      t = t // 100
       if t >= CRIT and arming:is_armed() and vehicle:get_mode() ~= MODE_LAND then
         gcs:send_text(2, string.format("ESC %d %dC: LAND", i + 1, t))
         vehicle:set_mode(MODE_LAND)
@@ -110,7 +110,7 @@ return update, 1000
 1. Скопируй applet `motor_failure_test.lua` в `scripts/`.
 2. Назначь тумблер на Scripting1: `RCx_OPTION = 300`.
 3. После перезагрузки появится `MOT_STOP_BITMASK`. Поставь 1 — будет отключаться мотор 1.
-4. В SITL с рамой `octaquad`: взлёт, LOITER, тумблер вверх. Смотри, как дрон компенсирует отказ.
+4. В SITL с рамой `octa-quad`: взлёт, LOITER, тумблер вверх. Смотри, как дрон компенсирует отказ.
 
 ### Шаг 4. Набор хаос-скриптов
 Идея учебного набора: каждый «отказ» — отдельный скрипт на своём тумблере, чтобы включать их независимо:
@@ -141,7 +141,7 @@ return update, 1000
 - **Симптом:** скрипт не запускается, «Lua: … out of memory»
   - Возможная причина: `SCR_HEAP_SIZE` мал, плата без запаса RAM.
   - Что сделать: увеличить heap (H7 — 200–300 КБ), упростить скрипт.
-- **Симптом:** «script took too long»
+- **Симптом:** «<имя>.lua exceeded time limit»
   - Возможная причина: тяжёлый цикл в одном вызове update.
   - Что сделать: разбить работу по вызовам, `SCR_VM_I_COUNT` поднимать осторожно.
 
@@ -152,7 +152,7 @@ return update, 1000
 
 ## checklist
 - Скриптинг включён в SITL, тестовый скрипт отвечает на тумблер
-- Applet отказа мотора настроен и проверен на octaquad
+- Applet отказа мотора настроен и проверен на octa-quad
 - Каждый хаос-скрипт на своём тумблере
 - Понимаю, почему на F4 скриптинга нет
 - Скрипты с `SIM_*` не попадают на реальный аппарат

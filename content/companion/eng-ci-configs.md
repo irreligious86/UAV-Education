@@ -48,7 +48,7 @@ Betaflight: по USB через MSP — `diff all` с CLI командой из 
 ### Инварианты: проверка конфигов
 Скрипт, который читает конфиг и падает на нарушении правил, известных из курса:
 - Betaflight: `failsafe_procedure` задан, `failsafe_delay` в разумных пределах, `motor_poles` = 14 для 2207, `dshot_bidir = ON` при rpm_filter, `vbat_min_cell_voltage` ≥ 330, нет `set debug_mode` в полётном профиле.
-- ArduPilot: `FS_THR_ENABLE ≠ 0`, `BATT_FS_LOW_ACT ≠ 0`, `FENCE_ENABLE = 1` для полётов по правилам, `RTL_ALT` ≥ высота препятствий площадки (в README), `ARMING_CHECK = 1`, `INS_HNTCH_ENABLE = 1` если notch нужен, `BRD_SAFETY_DEFLT` по политике.
+- ArduPilot: `FS_THR_ENABLE ≠ 0`, `BATT_FS_LOW_ACT ≠ 0`, `FENCE_ENABLE = 1` для полётов по правилам, `RTL_ALT_M` ≥ высота препятствий площадки (в README), `ARMING_SKIPCHK = 0` (до 4.7 — `ARMING_CHECK = 1`), `INS_HNTCH_ENABLE = 1` если notch нужен, `BRD_SAFETY_DEFLT` по политике.
 Реализация — JSON Schema/простой Python с таблицей правил; вывод — список нарушений с ссылкой на модуль курса.
 
 ### SITL-автотест

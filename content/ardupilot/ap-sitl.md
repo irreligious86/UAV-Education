@@ -28,7 +28,7 @@ SITL (Software In The Loop) — настоящая прошивка ArduPilot, �
 Скрипт `sim_vehicle.py` собирает прошивку, запускает её и консольную наземную станцию MAVProxy. Ключевые флаги:
 
 - `-v ArduCopter` или `-v ArduPlane` — тип аппарата;
-- `-f octaquad`, `-f quad`, `-f quadplane` — модель рамы в симуляторе;
+- `-f octa-quad`, `-f quad`, `-f quadplane` — модель рамы в симуляторе;
 - `--console --map` — окна консоли и карты;
 - `-w` — сбросить параметры к дефолтам (полезно, когда эксперименты зашли не туда).
 
@@ -43,7 +43,7 @@ SITL (Software In The Loop) — настоящая прошивка ArduPilot, �
 Так один маршрут прогоняется разными сценариями, а один сценарий — по разным маршрутам. Это та же идея, что разделение данных и логики в любом нормальном коде.
 
 ### Что умеет SITL кроме «полетать»
-- **Модели рам** (`-f`): quad, hexa, octa, octa-quad (X8), y6, tri, heli, plane, quadplane, tiltrotor, rover, boat, sub — у каждой своя физика в `libraries/SITL/SIM_*.cpp`; параметры по умолчанию для модели — `Tools/autotest/default_params/*.parm`.
+- **Модели рам** (`-f`): quad, hexa, octa, octa-quad (X8), y6, tri, heli, plane, quadplane, quadplane-tilttri/quadplane-tilt (тилтроторы), rover, boat, sub — у каждой своя физика в `libraries/SITL/SIM_*.cpp`; параметры по умолчанию для модели — `Tools/autotest/default_params/*.parm`.
 - **Отказы и среда** через `SIM_*`: ветер (`SIM_WIND_SPD/DIR/TURB`), отказ мотора (`SIM_ENGINE_FAIL` + `SIM_ENGINE_MUL`), GPS (выключение, шум, глитч, задержка), компас (смещение), баро (дрейф/глитч), вибрации (`SIM_VIB_*`), потеря RC (`SIM_RC_FAIL`), напряжение АКБ (`SIM_BATT_VOLTAGE`), дальномер и оптический поток (`RNGFND1_TYPE = 100`, `FLOW_TYPE = 10`). Это основа модулей «Отказоустойчивость» и «Устойчивость навигации».
 - **Ускорение времени** `--speedup 10` для длинных миссий; `--add-param-file` для своих параметров; `--out=udp:IP:14550` для внешней GCS; `--no-mavproxy` для скриптов.
 - **Внешние физические движки**: Gazebo (`-f gazebo-iris`), RealFlight, X-Plane, JSBSim (крыло), Webots — когда нужна аэродинамика/визуализация; для логики failsafe и миссий встроенной физики достаточно.
@@ -71,7 +71,7 @@ Tools/environment_install/install-prereqs-ubuntu.sh -y
 
 ### Шаг 2. Первый запуск
 ```
-sim_vehicle.py -v ArduCopter -f octaquad --console --map -w
+sim_vehicle.py -v ArduCopter -f octa-quad --console --map -w
 ```
 
 В консоли MAVProxy:

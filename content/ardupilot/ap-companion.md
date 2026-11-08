@@ -53,7 +53,7 @@ next:
 ### Пример: скорость в GUIDED (pymavlink)
 ```python
 from pymavlink import mavutil
-m = mavutil.mavlink_connection("udp:127.0.0.1:14551"); m.wait_heartbeat()
+m = mavutil.mavlink_connection("tcp:127.0.0.1:5762"); m.wait_heartbeat()
 m.set_mode(m.mode_mapping()["GUIDED"]); m.arducopter_arm(); m.motors_armed_wait()
 m.mav.command_long_send(m.target_system, m.target_component, mavutil.mavlink.MAV_CMD_NAV_TAKEOFF, 0, 0,0,0,0,0,0, 10)
 import time; time.sleep(10)
@@ -68,7 +68,7 @@ for _ in range(50):                          # 10 s at 5 Hz: forward 1 m/s in bo
 Полный стартовый проект (квадрат, тест failsafe, CI) — `examples/sitl-pymavlink` в репозитории курса. `GUID_TIMEOUT` = 3.0 с по умолчанию (диапазон 0.1–5); `GUID_OPTIONS` биты: 0 — разрешить арм с пульта в GUIDED, 2 — игнорировать yaw пилота, 6 — навигация по точкам для позиционных целей, 7 — флюгирование.
 
 ### Разобранный пример: «аппарат не двигается по команде скорости»
-Проверки по порядку: (1) режим GUIDED (`HEARTBEAT.custom_mode`); (2) `type_mask` — не замаскирована ли скорость; (3) частота отправки ≥ 2 Гц (таймаут 3 с); (4) `WPNAV_SPEED`/`PSC_*` не ограничивают до нуля; (5) геозона не держит у границы; (6) `STATUSTEXT` — «EKF needs position» и т.п. В 80% случаев — (1) или (2).
+Проверки по порядку: (1) режим GUIDED (`HEARTBEAT.custom_mode`); (2) `type_mask` — не замаскирована ли скорость; (3) частота отправки ≥ 2 Гц (таймаут 3 с); (4) `WP_SPD` (до 4.7 — `WPNAV_SPEED`)/`PSC_*` не ограничивают до нуля; (5) геозона не держит у границы; (6) `STATUSTEXT` — «EKF needs position» и т.п. В 80% случаев — (1) или (2).
 
 {{diagram:guided-timeout|Цель по скорости в GUIDED действует GUID_TIMEOUT (3 с по умолчанию): companion обязан повторять её чаще, иначе аппарат остановится и зависнет.}}
 
@@ -108,7 +108,7 @@ VEL_ONLY = 0b0000_1111_1100_0111  # use vx,vy,vz; ignore position, accel, yaw
 t_end = time.time() + 5
 while time.time() < t_end:
     hb = m.recv_match(type="HEARTBEAT", blocking=False)
-    if hb and m.mode_mapping_bynumber(hb.custom_mode) != "GUIDED":
+    if hb and hb.type != mavutil.mavlink.MAV_TYPE_GCS and mavutil.mode_string_v10(hb) != "GUIDED":
         print("pilot took over, stop sending"); break
     m.mav.set_position_target_local_ned_send(
         0, m.target_system, m.target_component,

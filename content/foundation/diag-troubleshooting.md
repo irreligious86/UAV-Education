@@ -43,7 +43,7 @@ next:
 - **RPMFILTER** — включён RPM-фильтр, нет телеметрии ESC (DShot bidir не поддерживается прошивкой ESC или не включён).
 - **BOOT_GRACE_TIME** — просто подождать несколько секунд после включения.
 - **MOTOR_PROTOCOL** — не выбран протокол моторов.
-INAV: вкладка Status показывает причины (Navigation is unsafe, Compass not calibrated, Hardware failure...). ArduPilot: `PreArm: ...` в GCS — каждая строка называет виновника (Compass not calibrated, Gyros inconsistent, RC not calibrated, Throttle below failsafe, GPS: No Fix, Battery failsafe и т. д.); флаг `ARMING_CHECK` менять нельзя — чинить причину.
+INAV: вкладка Status показывает причины (Navigation is unsafe, Compass not calibrated, Hardware failure...). ArduPilot: `PreArm: ...` в GCS — каждая строка называет виновника (Compass not calibrated, Gyros inconsistent, RC not calibrated, Throttle below failsafe, GPS: No Fix, Battery failsafe и т. д.); проверки в `ARMING_SKIPCHK` (до 4.7 — `ARMING_CHECK`) не отключать — чинить причину.
 
 {{diagram:arming-tree|Дерево 1 в виде схемы: флаг → причина → проверка.}}
 

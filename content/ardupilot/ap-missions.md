@@ -35,22 +35,22 @@ next:
 Домашняя точка для Copter — место, где аппарат заармился. RTL возвращает туда, а не туда, где стоит пилот. Если стартовал с крыши машины и переехал — дом остался на старом месте. В GCS дом можно переустановить до взлёта.
 
 ### Запуск и возобновление
-Миссия Copter обычно начинается с `NAV_TAKEOFF`. Переход в AUTO на земле с заармленным аппаратом выполняет взлёт. По умолчанию при повторном входе в AUTO миссия продолжается с текущей команды; параметр `MIS_RESTART` заставляет начинать с первой.
+Миссия Copter обычно начинается с `NAV_TAKEOFF`. Переход в AUTO на земле с заармленным аппаратом запускает взлёт после подъёма газа пилотом (или сразу, если в `AUTO_OPTIONS` включён бит 1 «Allow Takeoff Without Raising Throttle»); в SITL — `rc 3 1500`. По умолчанию при повторном входе в AUTO миссия продолжается с текущей команды; параметр `MIS_RESTART` заставляет начинать с первой.
 
 ### Failsafe в миссии
-Потеря радиосвязи во время AUTO ведёт себя по `FS_THR_ENABLE`: можно продолжать миссию, уйти в RTL или сесть. Для автономных полётов за пределами видимости это решение принимают до взлёта, а не по факту. Потеря GCS — отдельный параметр `FS_GCS_ENABLE`. Батарейный failsafe (`BATT_FS_LOW_ACT`, `BATT_FS_CRT_ACT`) перебивает миссию.
+Потеря радиосвязи во время AUTO ведёт себя по `FS_THR_ENABLE` (RTL, Land, SmartRTL…), а продолжение миссии включается битом 0 `FS_OPTIONS`. Для автономных полётов за пределами видимости это решение принимают до взлёта, а не по факту. Потеря GCS — отдельный параметр `FS_GCS_ENABLE`. Батарейный failsafe (`BATT_FS_LOW_ACT`, `BATT_FS_CRT_ACT`) перебивает миссию.
 
 ### Файл миссии
 GCS сохраняют миссию в текстовый файл формата `QGC WPL 110`: по строке на команду — номер, флаг текущей, frame, код команды, четыре параметра, широта, долгота, высота, флаг автопродолжения. Такой файл удобно хранить в git рядом с параметрами.
 
 ### Команды, которые стоит знать наизусть
-NAV: `NAV_WAYPOINT` (p1 — задержка в точке, с), `NAV_TAKEOFF` (alt), `NAV_LAND`, `NAV_RETURN_TO_LAUNCH`, `NAV_LOITER_TIME/TURNS/UNLIM`, `NAV_SPLINE_WAYPOINT` (сплайн), `NAV_DELAY`; DO: `DO_SET_SERVO`, `DO_SET_RELAY`, `DO_DIGICAM_CONTROL`, `DO_SET_CAM_TRIGG_DIST` (съёмка через каждые N м — основа фотограмметрии), `DO_CHANGE_SPEED`, `DO_SET_ROI` (нацелить гимбал/нос), `DO_JUMP` (цикл, с счётчиком), `DO_LAND_START` (точка входа посадочной последовательности для failsafe), `DO_SET_HOME`; CONDITION: `CONDITION_DELAY`, `CONDITION_DISTANCE`, `CONDITION_YAW`. Параметры выполнения: `WPNAV_SPEED` (см/с горизонталь), `WPNAV_SPEED_UP/DN`, `WPNAV_RADIUS` (радиус захвата), `WPNAV_ACCEL`, `WP_YAW_BEHAVIOR` (нос по курсу/нет), `MIS_RESTART` (0 — продолжить с последней команды при входе в Auto, 1 — с начала), `MIS_OPTIONS` (бит 0 — стирать миссию при перезагрузке; бит 1 — учитывать расстояние до посадки в failsafe АКБ; бит 2 — продолжать после посадки), `RTL_*` для конца миссии.
+NAV: `NAV_WAYPOINT` (p1 — задержка в точке, с), `NAV_TAKEOFF` (alt), `NAV_LAND`, `NAV_RETURN_TO_LAUNCH`, `NAV_LOITER_TIME/TURNS/UNLIM`, `NAV_SPLINE_WAYPOINT` (сплайн), `NAV_DELAY`; DO: `DO_SET_SERVO`, `DO_SET_RELAY`, `DO_DIGICAM_CONTROL`, `DO_SET_CAM_TRIGG_DIST` (съёмка через каждые N м — основа фотограмметрии), `DO_CHANGE_SPEED`, `DO_SET_ROI` (нацелить гимбал/нос), `DO_JUMP` (цикл, с счётчиком), `DO_LAND_START` (точка входа посадочной последовательности для failsafe), `DO_SET_HOME`; CONDITION: `CONDITION_DELAY`, `CONDITION_DISTANCE`, `CONDITION_YAW`. Параметры выполнения: `WP_SPD` (м/с горизонталь), `WP_SPD_UP/DN`, `WP_RADIUS_M` (радиус захвата), `WP_ACC` (до 4.7 — `WPNAV_SPEED` в см/с, `WPNAV_SPEED_UP/DN`, `WPNAV_RADIUS`, `WPNAV_ACCEL`), `WP_YAW_BEHAVIOR` (нос по курсу/нет), `MIS_RESTART` (0 — продолжить с последней команды при входе в Auto, 1 — с начала), `MIS_OPTIONS` (бит 0 — стирать миссию при перезагрузке; бит 1 — учитывать расстояние до посадки в failsafe АКБ (только Plane); бит 2 — продолжать после посадки), `RTL_*` для конца миссии.
 
 ### Высоты: три системы и одна ошибка
-Относительная (над домом, `MAV_FRAME_GLOBAL_RELATIVE_ALT`, по умолчанию), абсолютная (над уровнем моря — ошибка при другом месте взлёта), terrain (над рельефом по данным SRTM с GCS или дальномера, `TERRAIN_ENABLE`, `TERRAIN_FOLLOW`). Классическая авария: миссия с абсолютными высотами, составленная для другой площадки на 300 м выше — аппарат пытается уйти под землю или в небо. Правило: относительные высоты, проверка в GCS профилем высот над рельефом.
+Относительная (над домом, `MAV_FRAME_GLOBAL_RELATIVE_ALT`, по умолчанию), абсолютная (над уровнем моря — ошибка при другом месте взлёта), terrain (над рельефом по данным SRTM с GCS или дальномера, `TERRAIN_ENABLE`, frame «Terrain» у точек и `WP_RFND_USE`/`RTL_ALT_TYPE`). Классическая авария: миссия с абсолютными высотами, составленная для другой площадки на 300 м выше — аппарат пытается уйти под землю или в небо. Правило: относительные высоты, проверка в GCS профилем высот над рельефом.
 
 ### Разобранный пример: съёмка участка 300×200 м
-Mission Planner → Survey (Grid): камера (сенсор, фокус), высота 80 м, перекрытие 75/65% → план сам считает расстояние между галсами и `DO_SET_CAM_TRIGG_DIST`; скорость 8 м/с (по выдержке камеры: смаз ≤ 1 px → v·t_exp ≤ GSD); `NAV_TAKEOFF` 80, галсы, `DO_SET_CAM_TRIGG_DIST 0` в конце, `NAV_RETURN_TO_LAUNCH`. Проверка: профиль высот, время миссии против ёмкости АКБ (`BATT_LOW_MAH` с запасом на RTL + бит 1 `MIS_OPTIONS`), геозона вокруг участка. Прогон в SITL с тем же файлом миссии — обязателен.
+Mission Planner → Survey (Grid): камера (сенсор, фокус), высота 80 м, перекрытие 75/65% → план сам считает расстояние между галсами и `DO_SET_CAM_TRIGG_DIST`; скорость 8 м/с (по выдержке камеры: смаз ≤ 1 px → v·t_exp ≤ GSD); `NAV_TAKEOFF` 80, галсы, `DO_SET_CAM_TRIGG_DIST 0` в конце, `NAV_RETURN_TO_LAUNCH`. Проверка: профиль высот, время миссии против ёмкости АКБ (`BATT_LOW_MAH` с запасом на RTL + запас ёмкости на возврат), геозона вокруг участка. Прогон в SITL с тем же файлом миссии — обязателен.
 
 {{diagram:mission-alt-frames|Выбор системы высот в миссии: Relative для ровного участка, Terrain при перепадах рельефа, Absolute когда задана высота над уровнем моря.}}
 
@@ -82,7 +82,7 @@ def item(seq, cmd, lat=0, lon=0, alt=0, p1=0):
         m.target_system, m.target_component, seq, FRAME, cmd,
         0, 1, p1, 0, 0, 0, int(lat * 1e7), int(lon * 1e7), alt)
 
-items = [item(0, mavutil.mavlink.MAV_CMD_NAV_TAKEOFF, alt=20)]
+items = [item(0, mavutil.mavlink.MAV_CMD_NAV_WAYPOINT), item(1, mavutil.mavlink.MAV_CMD_NAV_TAKEOFF, alt=20)]  # seq 0 = home
 items += [item(i + 1, mavutil.mavlink.MAV_CMD_NAV_WAYPOINT, *wp) for i, wp in enumerate(ROUTE)]
 items.append(item(len(items), mavutil.mavlink.MAV_CMD_NAV_RETURN_TO_LAUNCH))
 

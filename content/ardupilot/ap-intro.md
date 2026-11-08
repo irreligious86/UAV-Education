@@ -21,6 +21,9 @@ next:
 ArduPilot — автопилот, а не просто стабилизатор. Если Betaflight делает квадрокоптер послушным под стиками, то ArduPilot знает, где он находится, куда летит и что делать без пилота. Модуль объясняет, чем мышление в ArduPilot отличается от Betaflight: параметры вместо CLI-дифов, режимы полёта как уровни автономности, наземная станция, pre-arm проверки и требования к железу. После него открывается весь трек «Автономия».
 
 ## theory
+### Версии и имена параметров
+Курс написан для ArduPilot 4.5 и новее. В Copter 4.7 (стабильная с июля 2026) часть параметров переименована и переведена в единицы СИ: `ARMING_SKIPCHK` → `ARMING_SKIPCHK` (смысл обратный: список **пропускаемых** проверок, 0 — все включены), `WPNAV_*` → `WP_*` (м, м/с), `RTL_ALT` → `RTL_ALT_M` (м), `ATC_ACCEL_*_MAX` → `ATC_ACC_*_MAX` (°/с²), `PSC_ACCZ_*` → `PSC_D_ACC_*`. В Plane с 4.5 `ARSPD_FBW_MIN/MAX` → `AIRSPEED_MIN/MAX`. В модулях указано новое имя и старое в скобках; при обновлении прошивки старые значения конвертируются автоматически, но свои скрипты и файлы параметров нужно поправить руками.
+
 ### Один код — много аппаратов
 ArduPilot — общий код и отдельные прошивки под тип аппарата: Copter (мультироторы и вертолёты), Plane (самолёты, крылья и QuadPlane-VTOL), Rover, Sub. Тип рамы внутри прошивки задаётся параметрами: для Copter это `FRAME_CLASS` (1 — Quad, 2 — Hexa, 3 — Octa, 4 — OctaQuad, 7 — Tri…) и `FRAME_TYPE` (0 — Plus, 1 — X, 2 — V, 3 — H…).
 
@@ -67,18 +70,18 @@ ArduPilot заметно тяжелее Betaflight. На F4-контроллер
 1. Прошивка по типу платы (`hwdef`), выбор frame class/type (`FRAME_CLASS`, `FRAME_TYPE`).
 2. Калибровки: акселерометр (6 положений), уровень, компас (в поле), радио (`RC1..4_MIN/MAX/TRIM`), ESC (`MOT_PWM_TYPE` DShot — калибровка не нужна), датчик напряжения/тока (`BATT_MONITOR`, `BATT_VOLT_MULT`, `BATT_AMP_PERVLT` по ваттметру).
 3. Режимы на тумблерах, `RCx_OPTION` (ARM/DISARM, Motor E-Stop, EKF source set…).
-4. Failsafe (модуль «Отказоустойчивость»), геозона, `RTL_ALT`.
-5. Стартовые параметры тюнинга по размеру пропа (модуль «Тюнинг ArduPilot»): `INS_GYRO_FILTER`, `ATC_RAT_*_FLT*`, `MOT_THST_EXPO`, `ATC_INPUT_TC`, `PSC_ACCZ_*`.
+4. Failsafe (модуль «Отказоустойчивость»), геозона, `RTL_ALT_M`.
+5. Стартовые параметры тюнинга по размеру пропа (модуль «Тюнинг ArduPilot»): `INS_GYRO_FILTER`, `ATC_RAT_*_FLT*`, `MOT_THST_EXPO`, `ATC_INPUT_TC`, `PSC_D_ACC_*` (до 4.7 — `PSC_ACCZ_*`).
 6. Логи (`LOG_BITMASK`), `LOG_DISARMED` для наземных измерений.
 7. Motor test (Mission Planner → Optional Hardware → Motor Test) без пропов: порядок и направление по схеме frame type.
 
 ### Разобранный пример: перевод пилота с Betaflight
-«Почему не армится?» — `ARMING_CHECK` сообщает причину текстом (компас, GPS, INS, параметры, RC не откалибровано); «почему не держит высоту в Stabilize?» — потому что Stabilize = Betaflight Angle, высоту держит AltHold; «где rates?» — `ACRO_RP_RATE`/`ACRO_Y_RATE`, `ACRO_RP_EXPO`; «где PID?» — `ATC_RAT_RLL_P/I/D/FF/FLTD/FLTE/FLTT` (rate) и `ATC_ANG_RLL_P` (angle); «где фильтры?» — `INS_GYRO_FILTER`, `INS_HNTCH_*`; «где Blackbox?» — DataFlash на SD, Log Review; «где diff all?» — Full Parameter List → Save/Compare, или `param save` в MAVProxy.
+«Почему не армится?» — `ARMING_SKIPCHK` сообщает причину текстом (компас, GPS, INS, параметры, RC не откалибровано); «почему не держит высоту в Stabilize?» — потому что Stabilize = Betaflight Angle, высоту держит AltHold; «где rates?» — `ACRO_RP_RATE`/`ACRO_Y_RATE`, `ACRO_RP_EXPO`; «где PID?» — `ATC_RAT_RLL_P/I/D/FF/FLTD/FLTE/FLTT` (rate) и `ATC_ANG_RLL_P` (angle); «где фильтры?» — `INS_GYRO_FILTER`, `INS_HNTCH_*`; «где Blackbox?» — DataFlash на SD, Log Review; «где diff all?» — Full Parameter List → Save/Compare, или `param save` в MAVProxy.
 
 ## practice
 ### Первое знакомство без риска
 1. Пройди модуль про SITL: всё ниже можно сделать на симуляторе.
-2. Открой полный список параметров в GCS и найди `FRAME_CLASS`, `FRAME_TYPE`, `ARMING_CHECK`, `FS_THR_ENABLE`.
+2. Открой полный список параметров в GCS и найди `FRAME_CLASS`, `FRAME_TYPE`, `ARMING_SKIPCHK`, `FS_THR_ENABLE`.
 3. Сохрани параметры в файл с датой в имени.
 4. Переключи режимы STABILIZE → ALT_HOLD → LOITER в SITL и посмотри, какие требуют GPS.
 
@@ -94,7 +97,7 @@ ArduPilot заметно тяжелее Betaflight. На F4-контроллер
 ## diagnostics
 - **Симптом:** `PreArm: ...` и дрон не армится
   - Возможная причина: незавершённая калибровка или неверный параметр, текст сообщения указывает подсистему.
-  - Что сделать: читать сообщение целиком, устранять причину, а не отключать `ARMING_CHECK`.
+  - Что сделать: читать сообщение целиком, устранять причину, а не отключать проверки (`ARMING_SKIPCHK` в 4.7+, `ARMING_SKIPCHK` в 4.6 и раньше).
 - **Симптом:** после изменения параметра ничего не изменилось
   - Возможная причина: параметр требует перезагрузки.
   - Что сделать: перезагрузить полётник и перечитать значение.
