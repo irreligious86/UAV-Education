@@ -540,6 +540,9 @@ def survey_overlap():
 D["sector-map"] = sector_map()
 D["survey-overlap"] = survey_overlap()
 
+import wave2  # noqa: E402
+wave2.build(D, _arch)
+
 
 def main() -> None:
     OUT.mkdir(parents=True, exist_ok=True)

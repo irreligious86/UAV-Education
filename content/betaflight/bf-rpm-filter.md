@@ -65,6 +65,8 @@ next:
 ### Разобранный пример: 7" с Bluejay
 ESC BLHeli_S → прошить Bluejay (48 кГц), `dshot_bidir = ON`, `motor_poles = 14` (2806.5), Motors tab: RPM по всем четырём, E = 0%; `rpm_filter_min_hz = 70` (висение ~110–130 Гц на 7"), `rpm_filter_harmonics = 3`, weights 100/80/60; спектр: пик 125 Гц −27 дБ; `dyn_notch_count` 1 для рамы; после — `simplified_gyro_filter_multiplier` 120, D-term 110; bounce-back 14 → 9%, моторы тёплые.
 
+{{diagram:rpm-filter-chain|RPM-фильтр: eRPM от ESC пересчитывается в частоту мотора и её гармоники, на каждую ставится notch; rpm_filter_min_hz ограничивает снизу.}}
+
 ## practice
 ### Шаг 1. Включить и проверить телеметрию
 Подключи АКБ (без неё вкладка Motors покажет `E: 100%`) и выполни в CLI:

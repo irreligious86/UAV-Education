@@ -159,8 +159,8 @@ Totals: +19 modules, 12 projects, ~120 diagrams, 4 Docker environments, a task s
 | 4 ✅ | MAVLink mini-course (5 modules, 3 sequence/topology diagrams) + `examples/mavlink/` with 12 pytest tests against a lossy fake vehicle (CI; SITL steps are in the labs) | labs autotested in CI |
 | 5 ✅ | `examples/ros2-docker/` (Compose: ROS 2 Humble, PX4 SITL + Gazebo, ArduPilot SITL + DDS) and `uav_ros2_labs` (logger, PX4 offboard square, AP_DDS square; flight logic as a pure state machine with 11 CI tests) + modules ros2-basics, ros2-px4, ros2-ardupilot. Image builds not exercised in CI (registry access) | flight logic tested in CI; flights in Gazebo are the student lab |
 | 6 ✅ | ROS 2 modules 4–6 (ros2-app-arch with a tested watchdog, ros2-nav with a tested A* planner, ros2-from-ros1); project catalogue `data/projects.json` → `projects/` (12 cards, each with an architecture diagram, milestones, acceptance criteria tracked like capstones, validated in CI); starters for #1 web GCS (`examples/web-gcs`, 6 tests), #3 log service (`examples/log-report`), #8 (`examples/mavlink`), #10 (`examples/sitl-pymavlink`) | projects with autotests |
-| 7 | Perception +5 modules, lab data, projects #4, #5, #7 | labs without a drone |
-| 8 | remaining projects (#2, 6, 8, 9, 11, 12), Blackbox grader, application quizzes | catalogue of 12 |
+| 7 ✅ | Perception +5 modules (per-geometry, per-landing, per-depth-avoid, per-mapping, per-edge-ml) with `examples/perception` (15 tests); starters #4 `examples/follow-target`, #5 `examples/precision-landing`, #7 `examples/perception` | labs without a drone |
+| 8 ✅ | starters for all 12 projects (new: #2 fleet-telemetry, #6 inspection, #9 cell-bridge, #11 lua-protection via lupa, #12 tx16s-companion in C99); `examples/blackbox-grader`; "find the fault" questions in 19 modules; answer-length bias removed from 778 questions (`QUIZ_MAX_LONGEST_SHARE`); projects in the progress transcript | catalogue of 12 |
 | 9 | second infographics wave (to ~120), consistency review of all modules | every module ≥ 1 diagram |
 
 Effort: iterations 1–3 are fast (structure + text); 4–8 are the heavy ones (code and simulation);

@@ -52,6 +52,8 @@ NAV: `NAV_WAYPOINT` (p1 — задержка в точке, с), `NAV_TAKEOFF` (
 ### Разобранный пример: съёмка участка 300×200 м
 Mission Planner → Survey (Grid): камера (сенсор, фокус), высота 80 м, перекрытие 75/65% → план сам считает расстояние между галсами и `DO_SET_CAM_TRIGG_DIST`; скорость 8 м/с (по выдержке камеры: смаз ≤ 1 px → v·t_exp ≤ GSD); `NAV_TAKEOFF` 80, галсы, `DO_SET_CAM_TRIGG_DIST 0` в конце, `NAV_RETURN_TO_LAUNCH`. Проверка: профиль высот, время миссии против ёмкости АКБ (`BATT_LOW_MAH` с запасом на RTL + бит 1 `MIS_OPTIONS`), геозона вокруг участка. Прогон в SITL с тем же файлом миссии — обязателен.
 
+{{diagram:mission-alt-frames|Выбор системы высот в миссии: Relative для ровного участка, Terrain при перепадах рельефа, Absolute когда задана высота над уровнем моря.}}
+
 ## practice
 ### Шаг 1. Миссия в SITL через GCS
 1. Запусти SITL: `sim_vehicle.py -v ArduCopter --console --map`.

@@ -105,6 +105,8 @@ next:
 ### Разобранный пример: распределить 5 устройств по 4 UART на F405
 Устройства: ELRS (CRSF), GPS, цифровой VTX (DisplayPort), ESC-телеметрия, SmartAudio-VTX — нет: цифровой и аналоговый VTX одновременно не бывает; пусть аналоговый VTX со SmartAudio + камера с RunCam-протоколом. UART1 — CRSF (не SBUS-порт нужен), UART2 — GPS, UART3 — SmartAudio (TX-пин), UART4 — ESC Sensor (RX-пин), RunCam Device — на SoftSerial 11 по LED-паду. Правило: сначала полнодуплексные (CRSF, GPS, DisplayPort), потом однопроводные, потом softserial для некритичного.
 
+{{diagram:bf-uart-plan|Разобранный пример: пять устройств на четырёх UART F405 — сначала полнодуплексные, потом однопроводные, потом softserial.}}
+
 ## practice
 
 ### Шаг 1. Идентификация UART на FC

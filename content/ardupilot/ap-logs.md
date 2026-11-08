@@ -78,6 +78,8 @@ vibe = df_of("flight.bin", "VIBE"); print("VibeZ p95:", vibe.VibeZ.quantile(0.95
 ### Что писать в LOG_BITMASK
 По умолчанию достаточно для разбора полёта; для тюнинга добавить `PID` (сообщения `PIDR/PIDP/PIDY` с P/I/D/FF по осям) и `IMU_RAW`/батч-сэмплинг (`INS_LOG_BAT_MASK`) на время настройки фильтров — лог растёт в разы, после — выключить. `LOG_FILE_DSRMROT` — новый файл при каждом дизарме; `LOG_DISARMED = 1` — для наземных измерений (шум, GPS), потом выключить, иначе SD забивается.
 
+{{diagram:log-triage|С чего начинать разбор лога: симптом определяет первое сообщение — VIBE, BAT/POWR, XKF4/GPS, RATE/ATT или MODE/ERR/EV.}}
+
 ## practice
 ### Скрипт: вибрации и клиппинг по логу
 ```python

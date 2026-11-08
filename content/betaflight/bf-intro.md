@@ -117,6 +117,8 @@ Betaflight — форк **Cleanflight** (наследник Baseflight / STM32-�
 ### Разобранный пример: порядок первой настройки
 Прошивка (Cloud Build: CRSF, OSD HD, GPS если есть) → `resource`/target по умолчанию → Ports (UART приёмника) → Receiver (CRSF, проверка каналов и `map` AETR) → Motors (DShot600, `motor_poles`, `dshot_bidir`, направление без пропов) → Modes (ARM, ANGLE, BEEPER, FAILSAFE) → Failsafe (DROP для первого полёта) → OSD (напряжение, LQ, таймер, предупреждения) → Blackbox (2 кГц) → `diff all` в репозиторий (модуль «CI»). Первый полёт — на умолчаниях PID: Betaflight 4.5 «из коробки» летает на 5" лучше, чем большинство ручных тюнов новичка; тюнинг — после логов.
 
+{{diagram:bf-setup-map|Порядок первой настройки: резервная копия → Ports → Receiver → Modes → Motors (без пропеллеров) → OSD → PID и фильтры по логу.}}
+
 ## practice
 
 ### Установка Betaflight Configurator

@@ -52,6 +52,8 @@ Stabilize/AltHold на минимальном весе, полной АКБ («m
 ### Что смотреть после
 `RATE.RDes/R` — отклик без перелёта > 10%; `RATE.ROut` (выход PID) без насыщения; `VIBE` не вырос; температура моторов; спектр после фильтров чистый; `PIDR.P/I/D` (логирование PID по оси при `LOG_BITMASK` с PID) — доля D-шума.
 
+{{diagram:ap-tuning-order|Порядок тюнинга: базовые параметры → гармонический notch → QuikTune или ручная настройка → AUTOTUNE → input shaping, с логом после каждого шага.}}
+
 ## practice
 ### Шаг 1. SITL
 `sim_vehicle.py -v ArduCopter -f quad`: выставить стартовые параметры под 10", AUTOTUNE roll (`AUTOTUNE_AXES = 1`) в AltHold; посмотреть `ATUN` в логе, итоговые `ATC_RAT_RLL_*`. Повторить с `AUTOTUNE_AGGR = 0.05` — сравнить.

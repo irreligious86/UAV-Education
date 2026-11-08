@@ -131,6 +131,8 @@ https://build.betaflight.com/api/builds/<BUILD_KEY>/json
 ### Разобранный пример: сгорел пад мотора 2
 Плата F405, пад M2 отвалился. `resource show all` — свободные таймерные пады: `LED_STRIP 1 A08`. Проверка `timer A08 list` — есть таймер с DMA; `resource LED_STRIP 1 NONE`, `resource MOTOR 2 A08`, `timer A08 AF1` (если нужен), `dma pin A08 0`, `save`; Motors tab — мотор 2 крутится на правильной позиции без пропов; `diff all` в репозиторий с комментарием. Если таймер пада конфликтует с DShot других моторов (одна DMA-группа) — `dma show` покажет, и bitbang DShot (`dshot_bitbang = ON`) обходит часть конфликтов.
 
+{{diagram:bf-resource-remap|Перенос мотора на другой пад: проверить таймер и DMA, освободить старый ресурс, назначить новый, сохранить и проверить на вкладке Motors.}}
+
 ## practice
 
 ### Доступ к CLI
