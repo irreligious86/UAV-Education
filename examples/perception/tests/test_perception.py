@@ -96,3 +96,16 @@ def test_latency_summary():
     s = lb.summarize([10, 11, 12, 13, 100], budget_ms=50)
     assert s["p50"] == 12 and not s["ok"] and abs(s["over_budget_frac"] - 0.2) < 1e-12
     assert lb.percentile([1, 2, 3, 4], 50) == 2.5
+
+
+def test_checkpoints_rmse_uses_check_points_only():
+    import checkpoints as ck
+    pts = [
+        {"name": "g1", "role": "gcp", "e_true": 0, "n_true": 0, "h_true": 0, "e_map": 0.001, "n_map": 0, "h_map": 0},
+        {"name": "c1", "role": "check", "e_true": 0, "n_true": 0, "h_true": 10, "e_map": 0.03, "n_map": 0.04, "h_map": 10.06},
+        {"name": "c2", "role": "check", "e_true": 5, "n_true": 5, "h_true": 12, "e_map": 5.0, "n_map": 5.0, "h_map": 11.92},
+    ]
+    r = ck.rmse(pts)
+    assert r["n"] == 2 and abs(r["rmse_xy"] - math.sqrt(0.05 ** 2 / 2)) < 1e-12
+    assert abs(r["rmse_z"] - math.sqrt((0.06 ** 2 + 0.08 ** 2) / 2)) < 1e-12
+    assert abs(ck.in_gsd(r, 0.025)["xy_gsd"] - r["rmse_xy"] / 0.025) < 1e-12

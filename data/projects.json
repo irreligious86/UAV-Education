@@ -151,14 +151,14 @@
     "OpenCV, ONNX Runtime",
     "examples/ros2-docker"
    ],
-   "starter": null,
-   "status": "planned",
+   "starter": "examples/follow-target",
+   "status": "starter",
    "diagram": "proj-detect-follow",
    "milestones": [
     "Поток камеры из Gazebo в ROS 2, замер FPS",
     "Детектор с метриками на записанном bag",
     "Трекер с ID и предсказанием при пропусках",
-    "Регулятор следования, ограничения скорости и сторожевой таймер",
+    "Регулятор следования (стартер: follow.py — чистая функция с ограничениями и сторожем потери цели), замер задержки",
     "Сценарий в симуляторе с движущейся целью и потерей цели"
    ],
    "acceptance": [
@@ -196,11 +196,11 @@
     "ArduPilot PLND / PX4 precision land",
     "Gazebo"
    ],
-   "starter": null,
-   "status": "planned",
+   "starter": "examples/precision-landing",
+   "status": "starter",
    "diagram": "proj-precision-landing",
    "milestones": [
-    "Калибровка камеры и оценка позы маркера",
+    "Синтетическая камера в SITL без Gazebo (стартер: target_sim.py + lt_sender.py), затем ArUco на камере Gazebo",
     "Перевод в систему координат аппарата (FRD/NED)",
     "Отправка LANDING_TARGET, проверка в логе",
     "Посадка в SITL с ветром",
@@ -209,6 +209,7 @@
    "acceptance": [
     "Ошибка посадки ≤ 15 см в 9 из 10 прогонов",
     "Потеря маркера обрабатывается: уход вверх или обычная посадка, а не падение",
+    "Постоянная задержка камеры измерена и выставлена в PLND_LAG",
     "Системы координат проверены тестом",
     "Лог показывает использование цели автопилотом",
     "README и видео"
@@ -281,13 +282,13 @@
     "QGIS",
     "Python для метрик"
    ],
-   "starter": null,
-   "status": "planned",
+   "starter": "examples/perception",
+   "status": "starter",
    "diagram": "proj-photogrammetry",
    "milestones": [
     "Запуск ODM на открытом наборе",
     "Ортофото и DEM, просмотр в QGIS",
-    "Метрика точности по GCP",
+    "Метрика точности по проверочным точкам (стартер: checkpoints.py; GCP в оценку не входят)",
     "Эксперимент: перекрытие и разрешение против точности",
     "План своей съёмочной миссии с расчётом GSD"
    ],

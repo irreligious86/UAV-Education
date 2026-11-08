@@ -11,5 +11,7 @@ Each folder is self-contained; copy it out of this repository to begin a project
 | `ros2-skeleton/` | ROS 2 package layout for a companion node talking to PX4 (uXRCE-DDS) or ArduPilot (MAVROS), with a velocity-setpoint publisher stub | px4-ros2, per-tracking |
 | `web-gcs/` | Project #1 starter: MAVLink → WebSocket bridge with ACK-confirmed commands and link-loss detection, a Leaflet UI, protocol doc, 6 tests | mav-services, mav-routing, projects/proj-web-gcs |
 | `perception/` | Camera geometry (pixel → ground, distortion, mount extrinsics, GSD/survey spacing, LANDING_TARGET angles), depth → OBSTACLE_DISTANCE sectors, stopping-distance budget, inference latency bench; 14 tests | per-geometry, per-landing, per-depth-avoid, per-mapping, per-edge-ml |
+| `precision-landing/` | Project #5 starter: synthetic downward camera over SITL state, delayed LANDING_TARGET sender (sign convention checked against ArduPilot), touchdown statistics; 7 tests | per-landing, projects/proj-precision-landing |
+| `follow-target/` | Project #4 starter: follow controller as a pure function (bbox → body velocity + yaw rate, limits, slew, target-lost watchdog); 7 tests | per-tracking, projects/proj-detect-follow |
 
 Goal: a simulation on screen in 15 minutes, not an afternoon of dependencies.

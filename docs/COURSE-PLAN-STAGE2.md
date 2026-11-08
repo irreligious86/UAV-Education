@@ -117,7 +117,7 @@ autotests, deliverables. A project can replace the hardware capstone of its trac
 | 4 | Detector + tracker + following in Gazebo | 7 | ROS 2, OpenCV, YOLO-nano | SITL test |
 | 5 | Precision landing on a marker in simulation | 7 | ROS 2/MAVLink, ArUco | SITL test |
 | 6 | Route inspection with georeferenced findings | 5/7 | missions, camera, EXIF, report | fixtures |
-| 7 ◐ | Perception +5 modules done (per-geometry, per-landing, per-depth-avoid, per-mapping, per-edge-ml; 5 diagrams, 11 tasks, parameters verified against ArduPilot source and PX4 docs) with `examples/perception` (14 tests); projects #4, #5, #7 linked to the new modules — starters next | labs without a drone |
+| 7 ✅ | Perception +5 modules (per-geometry, per-landing, per-depth-avoid, per-mapping, per-edge-ml; 5 diagrams, 11 tasks; parameters and the LANDING_TARGET sign/timestamp handling verified against ArduPilot source, PLD_*/CP_* against PX4 docs), `examples/perception` (15 tests); starters for projects #4 `examples/follow-target`, #5 `examples/precision-landing`, #7 `examples/perception/checkpoints.py` (all in CI) | labs without a drone |
 | 8 | MAVLink component on ESP32 + SITL twin | 6 | C/ESP-IDF, Python | pytest |
 | 9 | 4G/Wi-Fi bridge with reconnect and encryption | 6 | Python/Go, VPN | loss test |
 | 10 | Fleet CI/CD | 6 | GitHub Actions, SITL | exists |
