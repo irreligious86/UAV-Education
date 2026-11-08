@@ -32,15 +32,74 @@
     <article class="module" data-module-page="est-attitude">
       <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-estimation">Оценка состояния и навигация</a><span>Ориентация: углы Эйлера, кватернионы, комплементарный фильтр</span></p>
       <h1 class="module-title">Ориентация: углы Эйлера, кватернионы, комплементарный фильтр</h1>
-      <div class="module-tags"><span class="gc-tag" title="Уровень">L3 — Специалист</span><span class="gc-tag">учёба ~4 ч</span><span class="gc-tag" data-state="caution">СКОРО</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ОСВОЕН</span></div>
+      <div class="module-tags"><span class="gc-tag" title="Уровень">L3 — Специалист</span><span class="gc-tag">чтение 40 мин</span><span class="gc-tag">учёба ~4 ч</span><span class="gc-tag">любая прошивка</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ОСВОЕН</span></div>
       <p class="gc-muted module-score" data-module-score></p>
-      
+      <p class="module-lead">«Где верх» — первый вопрос, на который автопилот отвечает тысячу раз в секунду. Гироскоп даёт быстрый, но дрейфующий ответ; акселерометр — медленный и шумный, но без дрейфа; компас — курс. Модуль объясняет, почему углы Эйлера ломаются (gimbal lock) и прошивки живут на кватернионах, как интегрировать угловую скорость, как работает комплементарный фильтр (на Python, ~40 строк) и как он относится к DCM ArduPilot и к Mahony/Madgwick в Betaflight/INAV. Лабораторная: свой фильтр на записи IMU против <code>ATT</code> из лога.</p>
       <div class="gc-callout" data-state="ok"><strong>После модуля ты умеешь</strong><ul><li>объяснить, почему кватернионы, а не углы Эйлера</li><li>реализовать комплементарный фильтр на Python</li><li>объяснить, как DCM в ArduPilot относится к этому</li></ul></div><p class="gc-muted">Перед этим модулем: <a href="est-sensors.html">Датчики IMU: физика, ошибки, калибровка</a>, <a href="data-python.html">Python для анализа полётных данных</a></p><div class="gc-callout lab"><p class="gc-label gc-muted">Лабораторная</p><strong>Комплементарный фильтр</strong><p class="gc-muted lab__hint">Сдано, когда отмечены все пункты:</p><ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="est-attitude:lab:0"><span>Фильтр реализован и прогнан на записи IMU</span></label></li><li><label><input type="checkbox" data-check-id="est-attitude:lab:1"><span>Сравнение с ATT из лога</span></label></li><li><label><input type="checkbox" data-check-id="est-attitude:lab:2"><span>Дрейф по yaw без компаса объяснён</span></label></li></ul></div><div class="path-pos gc-muted"><span class="gc-label">В пути</span><ul><li data-path-pos="ardupilot"><a href="../path/ardupilot.html">ArduPilot</a>: шаг 21 из 54 → <a href="est-kalman.html?path=ardupilot">Фильтр Калмана на пальцах и EKF</a></li><li data-path-pos="px4"><a href="../path/px4.html">PX4</a>: шаг 8 из 19 → <a href="comp-intro.html?path=px4">Companion: зачем и где граница</a></li></ul></div>
       <div class="gc-prose module-body">
-<div class="gc-callout" data-state="caution"><strong>Модуль в разработке.</strong> Цели и связи уже определены, текст пишется. План — в <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">ROADMAP</a>.</div>
+<h2>Теория</h2>
+<h4 class="md-subheading">Представления ориентации</h4>
+<ul><li><strong>Углы Эйлера</strong> (roll φ, pitch θ, yaw ψ) — удобны человеку. Проблема: при θ = ±90° roll и yaw сливаются (<strong>gimbal lock</strong>), и уравнения для скоростей изменения углов содержат деление на cos θ. Для фристайла с петлями — неприемлемо. Используются только для вывода (<code>ATT.Roll/Pitch/Yaw</code>).</li><li><strong>Матрица поворота (DCM)</strong> — 3×3, столбцы — оси аппарата в земной системе. Без особых точек, но 9 чисел с 6 связями; нужна ортонормализация после интегрирования.</li><li><strong>Кватернион</strong> q = (w, x, y, z), |q| = 1 — 4 числа, одна связь, без особых точек, дешёвое умножение. Стандарт в Betaflight (с 3.x), INAV, PX4 (<code>vehicle_attitude.q</code>), EKF3 (состояния 0–3).</li></ul>
+<p>Переход кватернион → Эйлер (для вывода): φ = atan2(2(wx + yz), 1 − 2(x² + y²)); θ = asin(2(wy − zx)); ψ = atan2(2(wz + xy), 1 − 2(y² + z²)).</p>
+<h4 class="md-subheading">Интегрирование гироскопа</h4>
+<p>Угловая скорость ω (в осях аппарата) меняет кватернион: q̇ = ½ · q ⊗ (0, ω). Дискретно за шаг Δt: q ← q ⊗ (cos(|ω|Δt/2), ω/|ω| · sin(|ω|Δt/2)), затем нормировать. Только гироскоп → дрейф со скоростью bias (0.05 °/с → 3°/мин) плюс накопление шума.</p>
+<h4 class="md-subheading">Комплементарный фильтр</h4>
+<p>Идея: гироскопу верим на высоких частотах, акселерометру (гравитации) — на низких. Алгоритм Mahony: 1. Предсказать «вниз» в осях аппарата из текущего q: v = R(q)ᵀ · (0, 0, 1). 2. Измеренный «вниз» — нормированный акселерометр a/|a|. 3. Ошибка — векторное произведение e = a × v (мал при согласии, направление — ось поправки). 4. Поправить угловую скорость: ω&#x27; = ω + Kp·e + Ki·∫e (Ki — оценка bias гироскопа!). 5. Проинтегрировать ω&#x27; в q.</p>
+<p>Kp задаёт постоянную времени «доверия» акселерометру: τ ≈ 1/Kp; Kp = 0.5 → ~2 с. Во время манёвров |a| ≠ 1 g — акселерометр врёт; стандартная защита: уменьшать Kp, когда | |a| − g | велико (ArduPilot DCM: <code>AHRS_GPS_GAIN</code>, использование GPS для центростремительной поправки; Betaflight: <code>imu_dcm_kp</code>, отключение коррекции при больших ускорениях). Компас добавляется тем же способом для оси yaw: ошибка между измеренным и ожидаемым направлением горизонтальной составляющей поля.</p>
+<h4 class="md-subheading">Что это в прошивках</h4>
+<ul><li><strong>Betaflight</strong>: Mahony-подобный фильтр на кватернионах, <code>imu_dcm_kp</code> (по умолчанию 2500 → 0.25 после масштаба), <code>imu_dcm_ki</code>; без компаса yaw дрейфует — для Acro неважно, для GPS Rescue используется курс по GPS.</li><li><strong>INAV</strong>: тот же класс фильтра + компас и GPS-курс, поправки с учётом ускорения по GPS.</li><li><strong>ArduPilot</strong>: DCM (матрица, с поправкой по GPS-скорости) как резерв, основной — <strong>EKF3</strong>, где ориентация — часть вектора состояния вместе со скоростью, позицией и bias датчиков. Комплементарный фильтр — это EKF с постоянными, не адаптивными коэффициентами.</li><li><strong>PX4</strong>: EKF2 (<code>ekf2</code>), ориентация в <code>vehicle_attitude</code>.</li></ul>
+<h4 class="md-subheading">Почему yaw — особенный</h4>
+<p>Гравитация не содержит информации о курсе: без компаса или GPS-курса yaw дрейфует с bias гироскопа Z. На висении это ~3°/мин, незаметно; за 10 минут — 30°, и Loiter поедет по спирали («туалетная воронка» — классический симптом). Источники yaw: компас (помехи), GPS-курс при движении (не на висении), два GPS (moving baseline), EKF-GSF (оценка по движению, ArduPilot <code>EK3_SRC1_YAW = 8</code>), внешняя навигация.</p>
+
+<h2>Практика</h2>
+<h4 class="md-subheading">Шаг 1. Запись IMU</h4>
+<p>ArduPilot: лог с <code>IMU</code> (gyro, accel) и <code>ATT</code>; <code>LOG_BITMASK</code> с IMU_RAW не нужен — 50–400 Гц IMU достаточно. Betaflight: blackbox с <code>debug_mode = ATTITUDE</code> (пишет углы) или использовать gyro + accel из обычного лога. Полёт 2–3 минуты с наклонами и висением.</p>
+<h4 class="md-subheading">Шаг 2. Свой фильтр</h4>
+<pre class="cli-block"><code>import numpy as np
+def qmul(a, b):
+    w1,x1,y1,z1 = a; w2,x2,y2,z2 = b
+    return np.array([w1*w2-x1*x2-y1*y2-z1*z2, w1*x2+x1*w2+y1*z2-z1*y2,
+                     w1*y2-x1*z2+y1*w2+z1*x2, w1*z2+x1*y2-y1*x2+z1*w2])
+def down_body(q):          # gravity direction in body frame from quaternion (w,x,y,z)
+    w,x,y,z = q
+    return np.array([2*(x*z - w*y), 2*(w*x + y*z), w*w - x*x - y*y + z*z])
+def mahony(gyro, acc, dt, kp=0.5, ki=0.01):
+    q = np.array([1.0, 0, 0, 0]); ib = np.zeros(3); out = []
+    for g, a in zip(gyro, acc):                 # g in rad/s, a in m/s^2 (body frame)
+        an = np.linalg.norm(a)
+        if an &gt; 1e-3:
+            a_u = a / an; v = down_body(q)
+            e = np.cross(a_u, v)
+            trust = 1.0 if abs(an - 9.81) &lt; 2.0 else 0.0   # ignore accel during hard manoeuvres
+            ib += ki * e * dt * trust
+            g = g + (kp * e * trust) + ib
+        n = np.linalg.norm(g)
+        if n &gt; 1e-9:
+            dq = np.concatenate([[np.cos(n*dt/2)], g/n*np.sin(n*dt/2)])
+            q = qmul(q, dq); q /= np.linalg.norm(q)
+        w,x,y,z = q
+        out.append([np.degrees(np.arctan2(2*(w*x+y*z), 1-2*(x*x+y*y))),
+                    np.degrees(np.arcsin(np.clip(2*(w*y-z*x), -1, 1)))])
+    return np.array(out)</code></pre>
+<p>Прогнать на своей записи; построить roll/pitch против <code>ATT.Roll/Pitch</code> (ArduPilot) или углов из debug-лога.</p>
+<h4 class="md-subheading">Шаг 3. Эксперименты</h4>
+<ul><li>Ki = 0: наблюдать медленный уход при постоянном bias.</li><li>Kp = 0: только гироскоп — дрейф.</li><li>Kp = 5: акселерометр «тянет» в манёврах — ошибки во время разгона.</li><li>Сравнить RMS-ошибку относительно ATT при трёх Kp.</li></ul>
+<h4 class="md-subheading">Шаг 4. Yaw</h4>
+<p>Проинтегрировать gyro Z без коррекции — записать дрейф за минуту; сравнить с <code>ATT.Yaw</code>. Объяснить, откуда прошивка берёт курс. Лабораторная: фильтр реализован, сравнение с ATT, дрейф yaw объяснён.</p>
+
+<h2>Диагностика</h2>
+<div class="diag-groups"><article class="diag-item"><h4><strong>Симптом:</strong> горизонт в OSD уезжает после резких манёвров и медленно возвращается</h4><ul><li>Возможная причина: гироскоп накопил ошибку, Kp мал — долгое восстановление.</li><li>Что сделать: норма для Acro; для Angle — поднять Kp умеренно, проверить вибрации.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> Loiter ходит по спирали, курс в OSD не совпадает с реальным</h4><ul><li>Возможная причина: дрейф yaw / плохой компас.</li><li>Что сделать: компас, GPS yaw, GSF; проверить помехи.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> свой фильтр расходится с ATT на 5–10° в манёврах</h4><ul><li>Возможная причина: без компенсации центростремительного ускорения.</li><li>Что сделать: добавить коррекцию по GPS-скорости или снижать доверие accel при |a| ≠ g.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> NaN в кватернионе</h4><ul><li>Возможная причина: нормировка пропущена или acc = 0.</li><li>Что сделать: проверять нормы, защищать деления.</li></ul></article></div>
+
+<h2>Чек-лист</h2>
+<ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="est-attitude:0"><span>Могу объяснить gimbal lock и почему прошивки на кватернионах</span></label></li><li><label><input type="checkbox" data-check-id="est-attitude:1"><span>Понимаю, как Kp/Ki комплементарного фильтра делят доверие между гироскопом и акселерометром</span></label></li><li><label><input type="checkbox" data-check-id="est-attitude:2"><span>Реализовал фильтр и сравнил с ATT из лога</span></label></li><li><label><input type="checkbox" data-check-id="est-attitude:3"><span>Знаю, откуда берётся yaw и почему он дрейфует без компаса</span></label></li><li><label><input type="checkbox" data-check-id="est-attitude:4"><span>Понимаю связь комплементарного фильтра с EKF</span></label></li></ul>
+
+<h2>Источники</h2>
+<ul class="refs"><li><a href="https://ardupilot.org/copter/docs/common-apm-navigation-extended-kalman-filter-overview.html" target="_blank" rel="noopener noreferrer">ArduPilot — EKF (Extended Kalman Filter) overview</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://docs.px4.io/main/en/advanced_config/tuning_the_ecl_ekf.html" target="_blank" rel="noopener noreferrer">PX4 — Using the ECL EKF (attitude/state estimation)</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://hal.archives-ouvertes.fr/hal-00488376" target="_blank" rel="noopener noreferrer">Mahony et al., &quot;Nonlinear Complementary Filters on the Special Orthogonal Group&quot; (IEEE TAC 2008) — исходник алгоритма</a> <span class="gc-tag" data-state="info">primary</span></li></ul>
+<h2>Проверь себя</h2>
+<uav-quiz src="../quiz/est-attitude.json" module="est-attitude"></uav-quiz>
       </div>
-      
-      
+      <div class="module-done"><gc-button variant="secondary" data-done-toggle="est-attitude">Отметить как пройденный</gc-button></div>
+      <section class="related" aria-label="Смежные модули"><p class="gc-label gc-muted">Смежные модули</p><div class="gc-grid ref-grid"><a class="gc-card" href="est-sensors.html"><strong>Датчики IMU: физика, ошибки, калибровка</strong><div class="gc-card__meta"><span class="gc-tag" title="L2 — Интегратор">L2</span></div></a><a class="gc-card" href="data-python.html"><strong>Python для анализа полётных данных</strong><div class="gc-card__meta"><span class="gc-tag" title="L2 — Интегратор">L2</span></div></a><a class="gc-card" href="est-kalman.html"><strong>Фильтр Калмана на пальцах и EKF</strong><div class="gc-card__meta"><span class="gc-tag" title="L3 — Специалист">L3</span></div></a><a class="gc-card" href="ap-ekf.html"><strong>EKF и навигация</strong><div class="gc-card__meta"><span class="gc-tag" title="L3 — Специалист">L3</span></div></a></div></section>
       <nav class="pager" aria-label="Соседние модули" data-track-pager><a class="gc-card pager__prev" href="est-sensors.html"><span class="gc-label gc-muted">Назад · трек</span><br>Датчики IMU: физика, ошибки, калибровка</a><a class="gc-card pager__next" href="est-kalman.html"><span class="gc-label gc-muted">Дальше · трек</span><br>Фильтр Калмана на пальцах и EKF</a></nav><nav class="pager" aria-label="Соседние шаги пути ArduPilot" data-path-pager="ardupilot" hidden><a class="gc-card pager__prev" href="est-sensors.html?path=ardupilot"><span class="gc-label gc-muted">Назад · путь ArduPilot</span><br>Датчики IMU: физика, ошибки, калибровка</a><a class="gc-card pager__next" href="est-kalman.html?path=ardupilot"><span class="gc-label gc-muted">Дальше · шаг 22 из 54</span><br>Фильтр Калмана на пальцах и EKF</a></nav><nav class="pager" aria-label="Соседние шаги пути PX4" data-path-pager="px4" hidden><a class="gc-card pager__prev" href="est-sensors.html?path=px4"><span class="gc-label gc-muted">Назад · путь PX4</span><br>Датчики IMU: физика, ошибки, калибровка</a><a class="gc-card pager__next" href="comp-intro.html?path=px4"><span class="gc-label gc-muted">Дальше · шаг 9 из 19</span><br>Companion: зачем и где граница</a></nav>
     </article>
   </main>

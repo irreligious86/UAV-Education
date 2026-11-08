@@ -32,15 +32,61 @@
     <article class="module" data-module-page="est-kalman">
       <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-estimation">Оценка состояния и навигация</a><span>Фильтр Калмана на пальцах и EKF</span></p>
       <h1 class="module-title">Фильтр Калмана на пальцах и EKF</h1>
-      <div class="module-tags"><span class="gc-tag" title="Уровень">L3 — Специалист</span><span class="gc-tag">учёба ~4 ч</span><span class="gc-tag" data-state="caution">СКОРО</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ОСВОЕН</span></div>
+      <div class="module-tags"><span class="gc-tag" title="Уровень">L3 — Специалист</span><span class="gc-tag">чтение 40 мин</span><span class="gc-tag">учёба ~4 ч</span><span class="gc-tag">ArduPilot · PX4</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ОСВОЕН</span></div>
       <p class="gc-muted module-score" data-module-score></p>
-      
+      <p class="module-lead">EKF3 в ArduPilot и EKF2 в PX4 — это один и тот же приём, повторённый для 24 состояний. Модуль объясняет его на одном измерении: предсказание по модели, коррекция по измерению, ковариация как «насколько я не уверен», усиление Калмана как компромисс между ними, инновация как разница «ожидал — увидел». Реализуется 1D-фильтр высоты по барометру и акселерометру (~30 строк), показывается, что он делает при выбросе барометра, и как это выглядит в логе: <code>XKF4.SV/SP/SH/SM</code> (нормированные инновации), <code>XKF3</code> (инновации), <code>XKF1/XKF2</code> (состояния, bias).</p>
       <div class="gc-callout" data-state="ok"><strong>После модуля ты умеешь</strong><ul><li>объяснить предсказание/коррекцию, ковариацию и усиление Калмана</li><li>реализовать 1D-фильтр (высота по баро и акселерометру)</li><li>понимать, что такое инновации и вариации в EKF3</li></ul></div><p class="gc-muted">Перед этим модулем: <a href="est-attitude.html">Ориентация: углы Эйлера, кватернионы, комплементарный фильтр</a></p><div class="gc-callout lab"><p class="gc-label gc-muted">Лабораторная</p><strong>1D-фильтр высоты</strong><p class="gc-muted lab__hint">Сдано, когда отмечены все пункты:</p><ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="est-kalman:lab:0"><span>Фильтр баро+accel реализован</span></label></li><li><label><input type="checkbox" data-check-id="est-kalman:lab:1"><span>Поведение при выбросе баро показано</span></label></li><li><label><input type="checkbox" data-check-id="est-kalman:lab:2"><span>Связь с XKF-сообщениями лога объяснена</span></label></li></ul></div><div class="path-pos gc-muted"><span class="gc-label">В пути</span><ul><li data-path-pos="ardupilot"><a href="../path/ardupilot.html">ArduPilot</a>: шаг 22 из 54 → <a href="est-gnss.html?path=ardupilot">GNSS: как работает GPS, ошибки, RTK</a></li></ul></div>
       <div class="gc-prose module-body">
-<div class="gc-callout" data-state="caution"><strong>Модуль в разработке.</strong> Цели и связи уже определены, текст пишется. План — в <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">ROADMAP</a>.</div>
+<h2>Теория</h2>
+<h4 class="md-subheading">Задача</h4>
+<p>Есть модель движения (как состояние меняется само) и измерения (шумные, иногда редкие). Хотим оценку состояния лучше любой из двух по отдельности, плюс честную оценку её неопределённости.</p>
+<h4 class="md-subheading">Один шаг Калмана (скаляр)</h4>
+<p>Состояние x (например, высота), неопределённость P (дисперсия оценки). 1. <strong>Предсказание</strong>: x⁻ = f(x) (по модели: x + v·Δt), P⁻ = P + Q, где Q — шум процесса («насколько модель может ошибиться за шаг»). 2. <strong>Инновация</strong>: y = z − h(x⁻) — измерение минус то, что ожидали. S = P⁻ + R — её дисперсия (R — шум измерения). 3. <strong>Усиление</strong>: K = P⁻ / S ∈ (0, 1). Если измерение точное (R мало) — K → 1, верим измерению; если модель точная (P⁻ мало) — K → 0, игнорируем измерение. 4. <strong>Коррекция</strong>: x = x⁻ + K·y, P = (1 − K)·P⁻.</p>
+<p>Всё остальное — та же схема с векторами и матрицами: P — матрица ковариаций, H — как состояние превращается в измерение, K = P Hᵀ (H P Hᵀ + R)⁻¹. <strong>Extended</strong> (EKF) — модель нелинейная (повороты через кватернион), и её линеаризуют в текущей точке (якобианы).</p>
+<h4 class="md-subheading">Почему это лучше комплементарного фильтра</h4>
+<p>Комплементарный фильтр — Калман с фиксированным K. Настоящий Калман меняет K сам: когда GPS даёт плохие данные (большой R от HDOP), доверие падает; когда давно не было измерений, P растёт и первое же измерение принимается с большим весом. И он оценивает <strong>bias датчиков</strong> как состояния — то, что в комплементарном делает Ki вслепую.</p>
+<h4 class="md-subheading">Инновации и ворота</h4>
+<p>Инновация y с дисперсией S даёт нормированную величину y²/S. В ArduPilot <code>XKF4.SV/SP/SH/SM</code> (скорость, позиция, высота, компас) — это квадрат отношения «инновация / максимально допустимая инновация», где допуск задан воротами (<code>EK3_VEL_I_GATE</code>, <code>EK3_HGT_I_GATE</code>, <code>EK3_MAG_I_GATE</code>, в процентах от σ): &lt; 1 — измерение принято, &gt; 1 — <strong>отброшено</strong>. Здоровый полёт — значения &lt; 0.5. Это защита от выбросов GPS и компаса: один плохой кадр не сломает оценку. Но если измерения стабильно за воротами — фильтр «уплывает» на модели, пока не сбросится (lane switch, reset, failsafe EKF).</p>
+<h4 class="md-subheading">Что в векторе состояния EKF3</h4>
+<p>24 состояния: кватернион (4), скорость NED (3), позиция NED (3), bias гироскопа (3), bias акселерометра (3), поле Земли NED (3), поле на борту (3), ветер NE (2). Измерения: GPS позиция/скорость, баро, компас, airspeed, дальномер, оптический поток, внешняя навигация, маяки, энкодеры. Несколько <strong>ядер (lanes)</strong> — по одному на IMU; активное выбирается по меньшей ошибке (<code>XKF4.PI</code>, <code>NKF</code>→<code>XKF</code>).</p>
+<h4 class="md-subheading">Параметры, которые имеет смысл трогать</h4>
+<p><code>EK3_GPS_CHECK</code>, <code>EK3_*_NOISE</code> (R по источникам), <code>EK3_*_I_GATE</code>, <code>EK3_ACC_P_NSE/GYRO_P_NSE</code> (Q), <code>EK3_SRCn_*</code> (источники). Остальное — после чтения кода и логов, не раньше.</p>
+
+<h2>Практика</h2>
+<h4 class="md-subheading">Шаг 1. 1D-фильтр высоты</h4>
+<p>Состояние: [h, v, b] — высота, вертикальная скорость, bias акселерометра. Модель: h += v·dt, v += (a − b)·dt. Измерение: баро h_b с R = 0.3² м².</p>
+<pre class="cli-block"><code>import numpy as np
+def kf_alt(acc_z, baro, dt, q_acc=0.5, r_baro=0.3**2, q_bias=1e-4):
+    &quot;&quot;&quot;1D altitude filter: state [h, v, accel_bias]; predict with accel, correct with baro.&quot;&quot;&quot;
+    x = np.array([baro[0], 0.0, 0.0]); P = np.diag([1.0, 1.0, 0.1]); h = np.array([1.0, 0, 0])
+    F = np.array([[1, dt, -0.5*dt*dt], [0, 1, -dt], [0, 0, 1]]); B = np.array([0.5*dt*dt, dt, 0])
+    Q = np.diag([0, (q_acc*dt)**2, q_bias*dt]); out = []; innov = []
+    for a, z in zip(acc_z, baro):
+        x = F @ x + B * a; P = F @ P @ F.T + Q                        # predict
+        y = z - h @ x; S = h @ P @ h + r_baro                         # innovation and its variance
+        if y * y / S &lt; 9:                                             # 3-sigma gate
+            K = P @ h / S; x = x + K * y; P = (np.eye(3) - np.outer(K, h)) @ P
+        out.append(x.copy()); innov.append(y / np.sqrt(S))
+    return np.array(out), np.array(innov)</code></pre>
+<p>Сгенерировать истину (подъём 2 м/с, висение, спуск), accel с bias 0.2 м/с² и шумом, баро с шумом 0.3 м. Проверить: оценка h сглажена, v близка к истине, b сходится к 0.2.</p>
+<h4 class="md-subheading">Шаг 2. Выброс барометра</h4>
+<p>Вставить скачок +5 м на 1 с (пропвош/дверь): без ворот оценка прыгает; с воротами — измерение отбрасывается, нормированная инновация &gt; 3, оценка идёт по акселерометру. Сделать скачок длинным (10 с): фильтр в итоге «сдаётся» — так и должен (ворота не спасают от систематической ошибки).</p>
+<h4 class="md-subheading">Шаг 3. Связь с логом</h4>
+<p>Взять лог ArduPilot: <code>XKF4.SH</code> (нормированная инновация высоты) и <code>XKF3.IPD</code> (инновация позиции D) во время взлёта/посадки; <code>XKF2.AZ</code> — оценка bias accel Z. Сопоставить с тем, что делал свой фильтр. Лабораторная: фильтр реализован, выброс показан, XKF-сообщения объяснены.</p>
+
+<h2>Диагностика</h2>
+<div class="diag-groups"><article class="diag-item"><h4><strong>Симптом:</strong> <code>XKF4.SH</code> &gt; 1 на взлёте</h4><ul><li>Возможная причина: баро под пропвошем/в потоке; большой R не хватает.</li><li>Что сделать: закрыть баро поролоном, <code>EK3_ALT_M_NSE</code>, дальномер как источник высоты вблизи земли.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> инновации позиции растут, потом «EKF variance» и failsafe</h4><ul><li>Возможная причина: GPS глитч/многолучёвость, или компас врёт, и модель уезжает.</li><li>Что сделать: <code>GPS.NSats/HDOP</code>, <code>XKF4.SM</code>; источники EKF, GPS check.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> свой фильтр расходится (P растёт без границ)</h4><ul><li>Возможная причина: все измерения отбрасываются воротами после систематической ошибки.</li><li>Что сделать: шире ворота на время / сброс по измерению при длительном отказе (как EKF reset).</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> переключение lane в логе</h4><ul><li>Возможная причина: один IMU шумнее (вибрации) — ядро с ним набрало ошибку.</li><li>Что сделать: механика, проверка IMU, нормально если редко.</li></ul></article></div>
+
+<h2>Чек-лист</h2>
+<ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="est-kalman:0"><span>Могу объяснить предсказание, инновацию, усиление и коррекцию</span></label></li><li><label><input type="checkbox" data-check-id="est-kalman:1"><span>Понимаю, что ковариация — мера неуверенности, а K — компромисс</span></label></li><li><label><input type="checkbox" data-check-id="est-kalman:2"><span>Реализовал 1D-фильтр высоты с воротами</span></label></li><li><label><input type="checkbox" data-check-id="est-kalman:3"><span>Показал поведение при коротком и длинном выбросе баро</span></label></li><li><label><input type="checkbox" data-check-id="est-kalman:4"><span>Читаю XKF1–XKF4 в логе и понимаю, что там</span></label></li></ul>
+
+<h2>Источники</h2>
+<ul class="refs"><li><a href="https://ardupilot.org/copter/docs/common-apm-navigation-extended-kalman-filter-overview.html" target="_blank" rel="noopener noreferrer">ArduPilot — EKF overview and lanes</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://github.com/ArduPilot/ardupilot/tree/master/libraries/AP_NavEKF3" target="_blank" rel="noopener noreferrer">ArduPilot — EKF3 source (AP_NavEKF3, state vector and fusion)</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://docs.px4.io/main/en/advanced_config/tuning_the_ecl_ekf.html" target="_blank" rel="noopener noreferrer">PX4 — ECL EKF tuning (innovations, gates, noise parameters)</a> <span class="gc-tag" data-state="info">primary</span></li></ul>
+<h2>Проверь себя</h2>
+<uav-quiz src="../quiz/est-kalman.json" module="est-kalman"></uav-quiz>
       </div>
-      
-      
+      <div class="module-done"><gc-button variant="secondary" data-done-toggle="est-kalman">Отметить как пройденный</gc-button></div>
+      <section class="related" aria-label="Смежные модули"><p class="gc-label gc-muted">Смежные модули</p><div class="gc-grid ref-grid"><a class="gc-card" href="est-attitude.html"><strong>Ориентация: углы Эйлера, кватернионы, комплементарный фильтр</strong><div class="gc-card__meta"><span class="gc-tag" title="L3 — Специалист">L3</span></div></a><a class="gc-card" href="ap-ekf.html"><strong>EKF и навигация</strong><div class="gc-card__meta"><span class="gc-tag" title="L3 — Специалист">L3</span></div></a><a class="gc-card" href="data-python.html"><strong>Python для анализа полётных данных</strong><div class="gc-card__meta"><span class="gc-tag" title="L2 — Интегратор">L2</span></div></a></div></section>
       <nav class="pager" aria-label="Соседние модули" data-track-pager><a class="gc-card pager__prev" href="est-attitude.html"><span class="gc-label gc-muted">Назад · трек</span><br>Ориентация: углы Эйлера, кватернионы, комплементарный фильтр</a><a class="gc-card pager__next" href="est-gnss.html"><span class="gc-label gc-muted">Дальше · трек</span><br>GNSS: как работает GPS, ошибки, RTK</a></nav><nav class="pager" aria-label="Соседние шаги пути ArduPilot" data-path-pager="ardupilot" hidden><a class="gc-card pager__prev" href="est-attitude.html?path=ardupilot"><span class="gc-label gc-muted">Назад · путь ArduPilot</span><br>Ориентация: углы Эйлера, кватернионы, комплементарный фильтр</a><a class="gc-card pager__next" href="est-gnss.html?path=ardupilot"><span class="gc-label gc-muted">Дальше · шаг 23 из 54</span><br>GNSS: как работает GPS, ошибки, RTK</a></nav>
     </article>
   </main>
