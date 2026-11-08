@@ -82,7 +82,7 @@ def format_inline(text: str) -> str:
 
 # Interactive widgets: a line "{{widget:name}}" in Markdown becomes <uav-name></uav-name>.
 # Registered names only, so a typo fails validation instead of rendering a dead tag.
-WIDGETS = {"pid-sim", "filter-response", "elrs-calc"}
+WIDGETS = {"pid-sim", "filter-response", "elrs-calc", "tw-calc", "wire-drop"}
 WIDGET_RE = re.compile(r"^\{\{widget:([a-z0-9-]+)\}\}$")
 
 

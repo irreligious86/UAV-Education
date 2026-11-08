@@ -13,6 +13,8 @@
   <script src="../assets/grading.js" defer></script>
   <script src="../assets/app.js" defer></script>
   <script src="../assets/uav-quiz.js" defer></script>
+  <script src="../assets/widgets/plot.js" defer></script>
+  <script src="../assets/widgets/wire-drop.js" defer></script>
 </head>
 <body class="gc-root" data-base="../">
   <header class="site-header">
@@ -52,6 +54,7 @@
 <h4 class="md-subheading">Защита</h4>
 <ul><li><strong>Smoke stopper</strong> — лампочка или резистор/ограничитель тока в разрыв плюса при первом включении. Короткое замыкание — лампочка горит, борт не дымит.</li><li><strong>Предохранитель</strong> — на больших аппаратах на силовой шине (не на моторах — ток слишком большой и импульсный) и на шине companion.</li><li><strong>Переполюсовка</strong> — XT60/XT30 защищают геометрией, но пайка наоборот убивает плату за секунду. Диод Шоттки последовательно (падение 0.3–0.5 В) или P-MOSFET в идеальном диоде для низковольтных веток.</li><li><strong>Разъёмы</strong>: XT30 до ~15–30 А длительно, XT60 до ~60 А, XT90 выше; AS150/XT150 для больших токов. Недогруженный разъём греется, нагретый — окисляется, окисленный — греется сильнее.</li></ul>
 <h4 class="md-subheading">Сечения</h4>
+<uav-wire-drop class="widget"></uav-wire-drop>
 <p>Правило для коротких отрезков на борту: 12 AWG до ~60–80 А, 14 AWG до ~40–50 А, 16 AWG до ~25 А, 18 AWG до ~15 А, 20–22 AWG — сигнальные и 5-вольтовые ветки до 2–3 А. Критерии — нагрев изоляции и допустимая просадка; длинные провода на крыле — на размер больше.</p>
 
 <h2>Практика</h2>

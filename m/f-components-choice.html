@@ -13,6 +13,8 @@
   <script src="../assets/grading.js" defer></script>
   <script src="../assets/app.js" defer></script>
   <script src="../assets/uav-quiz.js" defer></script>
+  <script src="../assets/widgets/plot.js" defer></script>
+  <script src="../assets/widgets/tw-calc.js" defer></script>
 </head>
 <body class="gc-root" data-base="../">
   <header class="site-header">
@@ -32,15 +34,59 @@
     <article class="module" data-module-page="f-components-choice">
       <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-foundation">Фундамент</a><span>Выбор компонентов под задачу и бюджет</span></p>
       <h1 class="module-title">Выбор компонентов под задачу и бюджет</h1>
-      <div class="module-tags"><span class="gc-tag" title="Уровень">L1 — Оператор</span><span class="gc-tag">учёба ~3 ч</span><span class="gc-tag" data-state="caution">СКОРО</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ОСВОЕН</span></div>
+      <div class="module-tags"><span class="gc-tag" title="Уровень">L1 — Оператор</span><span class="gc-tag">чтение 35 мин</span><span class="gc-tag">учёба ~3 ч</span><span class="gc-tag">любая прошивка</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ОСВОЕН</span></div>
       <p class="gc-muted module-score" data-module-score></p>
-      
+      <p class="module-lead">Восемьдесят процентов реальной инженерной работы — не настройка, а выбор: что купить, чтобы аппарат решал задачу, укладывался в бюджет и не развалился. Модуль даёт метод: задача в числах → класс аппарата → рама и пропы → моторы и ESC → АКБ → FC и периферия → проверка массы и T/W → две альтернативы. С калькулятором T/W и времени полёта и с разбором двух спецификаций: 7&quot; дальний и 10&quot; грузовой.</p>
       <div class="gc-callout" data-state="ok"><strong>После модуля ты умеешь</strong><ul><li>сформулировать задачу аппарата в числах: масса нагрузки, время, дальность, скорость, бюджет</li><li>подобрать раму, моторы, пропы, ESC, АКБ и FC под задачу с обоснованием по таблицам</li><li>оценить компромиссы: цена, масса, запас, доступность, ремонтопригодность</li></ul></div><p class="gc-muted">Перед этим модулем: <a href="f-aero-props.html">Аэродинамика пропеллера и подбор силовой установки</a>, <a href="f-power.html">Питание: LiPo, Li-Ion, BEC</a>, <a href="f-motors-esc.html">Моторы, ESC и DShot</a></p><div class="gc-callout lab"><p class="gc-label gc-muted">Лабораторная</p><strong>Спецификация сборки</strong><p class="gc-muted lab__hint">Сдано, когда отмечены все пункты:</p><ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="f-components-choice:lab:0"><span>Таблица требований в числах</span></label></li><li><label><input type="checkbox" data-check-id="f-components-choice:lab:1"><span>Спецификация с ценами и массой, итог T/W и время полёта посчитаны</span></label></li><li><label><input type="checkbox" data-check-id="f-components-choice:lab:2"><span>Два альтернативных варианта сравнены по критериям</span></label></li></ul></div><div class="path-pos gc-muted"><span class="gc-label">В пути</span><ul><li data-path-pos="betaflight"><a href="../path/betaflight.html">Betaflight</a>: шаг 11 из 44 → <a href="tools-overview.html?path=betaflight">Инструменты: Configurator, GCS, git</a></li><li data-path-pos="ardupilot"><a href="../path/ardupilot.html">ArduPilot</a>: шаг 11 из 54 → <a href="tools-overview.html?path=ardupilot">Инструменты: Configurator, GCS, git</a></li></ul></div>
       <div class="gc-prose module-body">
-<div class="gc-callout" data-state="caution"><strong>Модуль в разработке.</strong> Цели и связи уже определены, текст пишется. План — в <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">ROADMAP</a>.</div>
+<h2>Теория</h2>
+<h4 class="md-subheading">Шаг 0: задача в числах</h4>
+<p>Пока задача звучит «хочу летать далеко», выбирать нечего. Нужны числа:</p>
+<p>| Параметр | Пример: дальний 7&quot; | Пример: грузовой 10&quot; | |---|---|---| | Полезная нагрузка | камера 30 г | груз 1000 г | | Время полёта | ≥ 15 мин | ≥ 12 мин с грузом | | Дальность | 5 км | 1 км | | Крейсерская скорость | 15–20 м/с | 8 м/с | | Условия | ветер до 8 м/с | ветер до 6 м/с | | Бюджет | 400 € | 700 € | | Ограничения | масса &lt; 1 кг (категория) | складной |</p>
+<p>Каждое число станет требованием с ID в инженерной папке (следующий модуль).</p>
+<h4 class="md-subheading">Шаг 1: класс и рама</h4>
+<p>Размер пропа определяет всё остальное. Правило: масса нагрузки и время задают необходимую эффективность (г/Вт), эффективность задаёт диаметр пропа (модуль про аэродинамику): 5&quot; — 4–6 г/Вт, 7&quot; — 8–10, 10&quot; — 12–15, 15&quot; — 15–20. Длительное висение с грузом — большие пропы; скорость и манёвр — малые.</p>
+<p>Рама: карбон 3–5 мм на лучах для 5–7&quot;, 5–6 мм или трубки для 10&quot;+. Смотреть: масса, свободное место под АКБ и нагрузку, защита электроники, доступность запчастей (луч должен покупаться отдельно), стек 20×20 или 30.5×30.5 мм.</p>
+<h4 class="md-subheading">Шаг 2: моторы и пропы</h4>
+<p>Из таблицы тяги производителя под выбранный проп и напряжение: тяга на висении должна приходиться на 30–45% газа (запас на ветер и манёвр) при токе не выше 40% длительного. Размер мотора и KV: 7&quot; — 2806.5/2807 1300–1700 KV на 6S; 10&quot; — 3110/3115 600–900 KV на 6S; 15&quot; — 4008–4114 320–400 KV на 6S. Масса моторов — в бюджет массы.</p>
+<h4 class="md-subheading">Шаг 3: ESC</h4>
+<p>Длительный ток ESC ≥ 1.3 × максимальный ток мотора из таблицы; напряжение с запасом (6S → ESC на 6S, не «до 6S» на пределе). 4-в-1 — компактно, но одна авария = замена всего; отдельные ESC — ремонтопригодно, нужно разводить питание. Прошивка (BLHeli_32/AM32/BLHeli_S) определяет телеметрию и RPM-фильтр.</p>
+<h4 class="md-subheading">Шаг 4: АКБ</h4>
+<p>Ёмкость из тока: I_ср (из таблицы для крейсера/висения × число моторов + борт) × t / 0.8. Химия: LiPo — ток, Li-Ion — энергия на килограмм (но токоотдача низкая: типично 2–3C для 21700 с высокой ёмкостью). Проверка: масса АКБ попадает в бюджет массы? Иначе — итерация: тяжелее АКБ → больше ток → ещё больше АКБ. Этот цикл сходится не всегда; если не сошёлся — менять класс.</p>
+<h4 class="md-subheading">Шаг 5: FC, приёмник, видео, GPS</h4>
+<p>FC: F4 хватает для Betaflight без лишнего, F7/H7 для INAV/ArduPilot с GPS, компасом и логами; число UART ≥ потребителей + 1; черный ящик (флеш/SD) для настройки по логам. Приёмник: диапазон под дальность (900 МГц для 5+ км). Видео: аналог дёшев и живуч, цифра — качество и бюджет. GPS: с компасом на мачте для INAV/ArduPilot.</p>
+<h4 class="md-subheading">Шаг 6: бюджет массы и проверка</h4>
+<p>Таблица: деталь, масса, цена. Итог: взлётная масса → T/W по таблице мотора → ток висения → время полёта → сравнение с требованиями. Правило: если T/W &lt; 2 при полной нагрузке — переделывать. Запас в бюджете 15% на пропы, крепёж, провода, ремонт.</p>
+<h4 class="md-subheading">Компромиссы</h4>
+<ul><li><strong>Цена vs масса</strong>: дешёвые компоненты тяжелее; масса — это время полёта и ток.</li><li><strong>Ремонтопригодность</strong>: аппарат на мелких, доступных деталях живёт дольше экзотики.</li><li><strong>Запас</strong>: 20% по току и тяге окупаются первым же ветреным днём.</li><li><strong>Доступность</strong>: деталь, которой нет в наличии через полгода, — проблема при первом ремонте.</li></ul>
+<p>Калькулятор ниже считает T/W, ток висения и время полёта по твоим числам — используй его в шаге 6.</p>
+
+<h2>Практика</h2>
+<uav-tw-calc class="widget"></uav-tw-calc>
+<h4 class="md-subheading">Шаг 1. Требования</h4>
+<p>Таблица задачи в числах для своей идеи аппарата (как в теории), 8–12 строк.</p>
+<h4 class="md-subheading">Шаг 2. Спецификация</h4>
+<p>Таблица компонентов: модель, масса, цена, ссылка на источник данных (таблица тяги, даташит). Итог по массе и цене.</p>
+<h4 class="md-subheading">Шаг 3. Расчёт</h4>
+<p>Калькулятором: T/W, газ висения, ток, время полёта. Сравнить с требованиями, записать, какие выполнены.</p>
+<h4 class="md-subheading">Шаг 4. Альтернативы</h4>
+<p>Два варианта (например, 7&quot; Li-Ion vs 7&quot; LiPo; или 10&quot; квад vs 7&quot; с меньшим грузом) в одной таблице по критериям: время, цена, масса, ремонтопригодность, риск. Обосновать выбор.</p>
+<h4 class="md-subheading">Лабораторная</h4>
+<p>Спецификация с требованиями, расчётом и сравнением двух альтернатив — первый документ инженерной папки.</p>
+
+<h2>Диагностика</h2>
+<div class="diag-groups"><article class="diag-item"><h4><strong>Симптом:</strong> расчёт времени полёта не сходится: АКБ растёт, время не растёт</h4><ul><li>Возможная причина: цикл масса → ток → масса расходится; класс аппарата мал для задачи.</li><li>Что сделать: больший проп/рама или снизить требования.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> T/W на бумаге 3, а висение на 60% газа</h4><ul><li>Возможная причина: таблица тяги для другого напряжения или пропа; реальная масса выше.</li><li>Что сделать: перевзвесить, пересчитать по своей таблице, проверить напряжение под нагрузкой.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> не хватает UART для всей периферии</h4><ul><li>Возможная причина: FC выбран без счёта портов.</li><li>Что сделать: FC с большим числом UART или объединение функций (например, ESC-телеметрия по одному порту).</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> бюджет превышен вдвое</h4><ul><li>Возможная причина: не учтены пропы, крепёж, зарядник, запчасти.</li><li>Что сделать: запас 15–20% в бюджете, отложить необязательное (цифровое видео) на следующую итерацию.</li></ul></article></div>
+
+<h2>Чек-лист</h2>
+<ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="f-components-choice:0"><span>Задача записана в числах, не словами</span></label></li><li><label><input type="checkbox" data-check-id="f-components-choice:1"><span>Диаметр пропа выбран из требуемой эффективности</span></label></li><li><label><input type="checkbox" data-check-id="f-components-choice:2"><span>Моторы выбраны по таблице тяги: висение на 30–45% газа</span></label></li><li><label><input type="checkbox" data-check-id="f-components-choice:3"><span>АКБ рассчитана из тока и времени, масса сошлась</span></label></li><li><label><input type="checkbox" data-check-id="f-components-choice:4"><span>Две альтернативы сравнены, выбор обоснован</span></label></li></ul>
+
+<h2>Источники</h2>
+<ul class="refs"><li><a href="https://ardupilot.org/copter/docs/choosing-a-frame.html" target="_blank" rel="noopener noreferrer">Choosing a MultiCopter Frame — ArduPilot Copter</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://m-selig.ae.illinois.edu/props/propDB.html" target="_blank" rel="noopener noreferrer">UIUC Propeller Database (efficiency data by diameter)</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://oscarliang.com/quadcopter-motor-propeller/" target="_blank" rel="noopener noreferrer">How to choose motors for FPV drones — Oscar Liang</a> <span class="gc-tag">secondary</span></li></ul>
+<h2>Проверь себя</h2>
+<uav-quiz src="../quiz/f-components-choice.json" module="f-components-choice"></uav-quiz>
       </div>
-      
-      
+      <div class="module-done"><gc-button variant="secondary" data-done-toggle="f-components-choice">Отметить как пройденный</gc-button></div>
+      <section class="related" aria-label="Смежные модули"><p class="gc-label gc-muted">Смежные модули</p><div class="gc-grid ref-grid"><a class="gc-card" href="f-aero-props.html"><strong>Аэродинамика пропеллера и подбор силовой установки</strong><div class="gc-card__meta"><span class="gc-tag" title="L2 — Интегратор">L2</span></div></a><a class="gc-card" href="f-power.html"><strong>Питание: LiPo, Li-Ion, BEC</strong><div class="gc-card__meta"><span class="gc-tag" title="L1 — Оператор">L1</span></div></a><a class="gc-card" href="f-motors-esc.html"><strong>Моторы, ESC и DShot</strong><div class="gc-card__meta"><span class="gc-tag" title="L1 — Оператор">L1</span></div></a><a class="gc-card" href="eng-method-101.html"><strong>Инженерный метод 101: требования, архитектура, тесты, документация</strong><div class="gc-card__meta"><span class="gc-tag" title="L1 — Оператор">L1</span></div></a></div></section>
       <nav class="pager" aria-label="Соседние модули" data-track-pager><a class="gc-card pager__prev" href="f-regulations.html"><span class="gc-label gc-muted">Назад · трек</span><br>Правила, зоны и ответственность оператора</a><a class="gc-card pager__next" href="eng-method-101.html"><span class="gc-label gc-muted">Дальше · трек</span><br>Инженерный метод 101: требования, архитектура, тесты, документация</a></nav><nav class="pager" aria-label="Соседние шаги пути Betaflight" data-path-pager="betaflight" hidden><a class="gc-card pager__prev" href="f-regulations.html?path=betaflight"><span class="gc-label gc-muted">Назад · путь Betaflight</span><br>Правила, зоны и ответственность оператора</a><a class="gc-card pager__next" href="tools-overview.html?path=betaflight"><span class="gc-label gc-muted">Дальше · шаг 12 из 44</span><br>Инструменты: Configurator, GCS, git</a></nav><nav class="pager" aria-label="Соседние шаги пути ArduPilot" data-path-pager="ardupilot" hidden><a class="gc-card pager__prev" href="f-regulations.html?path=ardupilot"><span class="gc-label gc-muted">Назад · путь ArduPilot</span><br>Правила, зоны и ответственность оператора</a><a class="gc-card pager__next" href="tools-overview.html?path=ardupilot"><span class="gc-label gc-muted">Дальше · шаг 12 из 54</span><br>Инструменты: Configurator, GCS, git</a></nav>
     </article>
   </main>
