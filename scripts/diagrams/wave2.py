@@ -424,3 +424,26 @@ def build4(D: dict, arch) -> None:
         ("открытость", Node("oi", ["OpenIPC + WFB-ng", "MAVLink в канале"], leaf=True)),
         ("дальность", Node("lr", ["цифра + ELRS", "OSD с качеством линка"], leaf=True, accent=True)),
     ]), width=780)
+    D["gimbal-manager"] = arch("MAVLink Gimbal Protocol v2: кто кем командует",
+        [L("gcs", ["GCS / companion", "SET_PITCHYAW"]), L("mgr", ["Gimbal manager", "автопилот, MNT1_*"], True),
+         L("dev", ["Gimbal device", "подвес, свой IMU"], True), L("cam", ["Камера", "CAM1_*, захват"])],
+        [L("rc", ["RC: RCx_OPTION", "212–214, 163 lock"], False, 0), L("mis", ["Миссия: ROI,", "GIMBAL_MANAGER_*"], False, 1),
+         L("st", ["ATTITUDE_STATUS", "обратно, кватернион"], False, 2)],
+        [("gcs", "mgr"), ("mgr", "dev", "", True), ("dev", "cam"), ("rc", "mgr", "", False, "v"), ("mis", "mgr", "", False, "v"),
+         ("dev", "st", "", False, "v")],
+        notes=[(10, 196, "Одна точка управления: manager решает, чья команда главная (primary control)", "m t")], height=210)
+    D["esc-firmware-choice"] = tree("Какая прошивка ESC: по микроконтроллеру", Node("r", ["Что стоит", "на ESC?"], [
+        ("8-бит EFM8/BB", Node("bs", ["BLHeli_S → Bluejay", "bidir DShot, EDT"], leaf=True, accent=True)),
+        ("32-бит ARM", Node("am", ["AM32", "если есть таргет"], leaf=True, accent=True)),
+        ("BLHeli_32", Node("b32", ["работает — оставить", "развитие прекращено"], leaf=True)),
+        ("нет таргета", Node("no", ["родная прошивка", "не прошивать наугад"], leaf=True)),
+    ]), width=780)
+    D["security-surface"] = arch("Поверхность атаки аппарата и что её закрывает",
+        [L("rc", ["RC-линк", "ELRS binding"]), L("tel", ["Телеметрия", "MAVLink"], True), L("gnss", ["GNSS", "глушение, спуфинг"], True),
+         L("comp", ["Companion", "Wi-Fi, DDS, SSH"]), L("fw", ["Прошивка", "загрузчик"])],
+        [L("d1", ["свой binding", "phrase, failsafe"], False, 0), L("d2", ["MAVLink 2", "signing, 32 байта"], True, 1),
+         L("d3", ["EKF-проверки,", "нав. без GNSS"], False, 2), L("d4", ["файрвол, ключи,", "ROS_DOMAIN, SROS2"], False, 3),
+         L("d5", ["подписанная", "прошивка"], True, 4)],
+        [("rc", "d1", "", False, "v"), ("tel", "d2", "", True, "v"), ("gnss", "d3", "", False, "v"), ("comp", "d4", "", False, "v"),
+         ("fw", "d5", "", True, "v")],
+        notes=[(10, 196, "Подпись MAVLink — аутентификация, не шифрование: трафик остаётся читаемым", "m t")], height=210)

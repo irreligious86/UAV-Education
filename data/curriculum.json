@@ -1202,6 +1202,33 @@
           "article": "bf-filters"
         },
         {
+          "id": "f-esc-firmware",
+          "title": "Прошивка ESC: Bluejay, AM32, BLHeli_32 и настройка регулятора",
+          "level": "L2",
+          "hours": 2,
+          "prerequisites": [
+            "f-motors-esc"
+          ],
+          "objectives": [
+            "выбрать прошивку ESC по микроконтроллеру",
+            "включить двунаправленный DShot и EDT",
+            "обосновать настройки регулятора измерениями"
+          ],
+          "lab": {
+            "title": "Паспорт регуляторов",
+            "criteria": [
+              "Таблица ESC: прошивка, таргет, ШИМ, тайминг",
+              "RPM от ESC видны в полётнике, ошибки DShot около 0 %",
+              "Частота ШИМ выбрана по сравнению тока или температуры"
+            ]
+          },
+          "stacks": [
+            "betaflight",
+            "ardupilot"
+          ],
+          "article": "f-esc-firmware"
+        },
+        {
           "id": "bf-rpm-filter",
           "title": "RPM-фильтр: кейс 10\"",
           "level": "L2",
@@ -1843,6 +1870,34 @@
           "article": "ap-tuning"
         },
         {
+          "id": "ap-plane-tuning",
+          "title": "Тюнинг ArduPlane: AUTOTUNE крыла, TECS, навигация L1, посадка",
+          "level": "L3",
+          "hours": 3,
+          "prerequisites": [
+            "aero-wing",
+            "ap-tuning"
+          ],
+          "objectives": [
+            "настроить самолёт в порядке внутренние → внешние контуры",
+            "измерить пределы TECS тестовыми полётами",
+            "подобрать NAVL1_PERIOD и параметры посадки по логу"
+          ],
+          "lab": {
+            "title": "Самолёт от AUTOTUNE до посадки",
+            "criteria": [
+              "AUTOTUNE пройден, коэффициенты сохранены",
+              "Параметры TECS обоснованы измерениями",
+              "NAVL1_PERIOD выбран по ошибке поперечного отклонения",
+              "Посадка в SITL с измеренной скоростью касания"
+            ]
+          },
+          "stacks": [
+            "ardupilot"
+          ],
+          "article": "ap-plane-tuning"
+        },
+        {
           "id": "ap-safety-fs",
           "title": "Отказоустойчивость: failsafe, геозона, FMEA полёта",
           "level": "L3",
@@ -2105,6 +2160,35 @@
           "article": "mav-routing"
         },
         {
+          "id": "f-remote-id-security",
+          "title": "Remote ID и безопасность аппарата: трансляция, подпись MAVLink, защита прошивки",
+          "level": "L3",
+          "hours": 3,
+          "prerequisites": [
+            "mav-routing",
+            "f-regulations"
+          ],
+          "objectives": [
+            "объяснить Remote ID и требования своей страны",
+            "составить карту каналов атаки и защиту каждого",
+            "включить подпись MAVLink 2 и закрыть сеть companion"
+          ],
+          "lab": {
+            "title": "Аппарат, которым не управляет посторонний",
+            "criteria": [
+              "Карта каналов атаки составлена",
+              "В SITL неподписанная команда отклонена, подписанная принята",
+              "Порты companion перечислены, лишние закрыты",
+              "Remote ID проверен приёмником или составлен список требований"
+            ]
+          },
+          "stacks": [
+            "ardupilot",
+            "mavlink"
+          ],
+          "article": "f-remote-id-security"
+        },
+        {
           "id": "mav-component",
           "title": "Свой компонент MAVLink: датчик, параметры, сообщения",
           "level": "L3",
@@ -2132,6 +2216,35 @@
             "companion"
           ],
           "article": "mav-component"
+        },
+        {
+          "id": "payload-gimbal",
+          "title": "Подвесы и полезная нагрузка: MAVLink Gimbal v2, камера, сброс",
+          "level": "L3",
+          "hours": 3,
+          "prerequisites": [
+            "mav-component",
+            "ap-missions"
+          ],
+          "objectives": [
+            "объяснить роли gimbal manager и gimbal device",
+            "управлять подвесом с пульта, из миссии и из кода companion",
+            "настроить съёмку по дистанции и проверить баланс аппарата с нагрузкой"
+          ],
+          "lab": {
+            "title": "Подвес под управлением кода",
+            "criteria": [
+              "Подвес виден как компонент 154 и управляется с пульта",
+              "Команда из кода подтверждена COMMAND_ACK и статусом подвеса",
+              "Миссия с ROI и съёмкой по дистанции даёт ожидаемое число кадров в логе",
+              "Баланс моторов с нагрузкой проверен числами"
+            ]
+          },
+          "stacks": [
+            "ardupilot",
+            "mavlink"
+          ],
+          "article": "payload-gimbal"
         },
         {
           "id": "mav-sdk",

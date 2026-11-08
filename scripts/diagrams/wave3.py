@@ -192,3 +192,16 @@ def build(D: dict) -> None:
          dict(name="база 12 см", xs=zr, ys=[err(z, 0.12) for z in zr], cls="a", label_at=20, label_dy=-6)],
         Axis("дистанция Z, м", 0, 20), Axis("ошибка ΔZ, м", 0, 3),
         hmarks=[(0.5, "0.5 м", "m")])
+
+    # ------------------------------------------------------------ ap-plane-tuning
+    t = lin(0, 2.5)
+    def fo(tau, delay=0.08):
+        return [0 if x < delay else 30 * (1 - math.exp(-(x - delay) / tau)) for x in t]
+    D["chart-plane-tconst"] = chart(
+        "Крен на ступеньку 30°: первый порядок с постоянной времени RLL2SRV_TCONST",
+        [dict(name="", xs=t, ys=fo(0.3), cls="a"), dict(name="", xs=t, ys=fo(0.5), cls="w"),
+         dict(name="", xs=t, ys=fo(0.8), cls="m")],
+        Axis("время, с", 0, 2.5), Axis("крен, °", 0, 35),
+        hmarks=[(30 * (1 - math.exp(-1)), "63 % за τ", "m")],
+        legend=[("τ = 0.3 с: резче, ближе к перерегулированию", "a", False), ("τ = 0.5 с: значение по умолчанию", "w", False),
+                ("τ = 0.8 с: мягко, для тяжёлых и медленных", "m", False)], legend_at=(330, 250))
