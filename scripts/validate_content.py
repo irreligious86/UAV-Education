@@ -286,6 +286,13 @@ def validate_curriculum(manifest_ids):
                 errors.append(f"curriculum: {m['id']} ссылается на статью «{m['article']}», которой нет в манифесте")
             if not m.get("article") and m["id"] in manifest_ids:
                 errors.append(f"curriculum: {m['id']} есть в манифесте — укажи \"article\": \"{m['id']}\"")
+    # a prerequisite from the same track must come earlier in that track
+    for g in groups:
+        order = {m["id"]: k for k, m in enumerate(g.get("modules", []))}
+        for m in g.get("modules", []):
+            for p in m.get("prerequisites", []):
+                if p in order and order[p] > order[m["id"]]:
+                    errors.append(f"curriculum: {m['id']} стоит раньше своего prerequisite «{p}» в треке {g.get('id', '?')}")
     for g in cur.get("tracks", []):
         for m in g.get("modules", []):
             lab = m.get("lab")

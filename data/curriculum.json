@@ -101,34 +101,6 @@
           "article": "f-mechanics"
         },
         {
-          "id": "f-aero-props",
-          "title": "Аэродинамика пропеллера и подбор силовой установки",
-          "level": "L2",
-          "hours": 4,
-          "prerequisites": [
-            "f-physics",
-            "f-power",
-            "f-motors-esc"
-          ],
-          "objectives": [
-            "объяснить тягу, момент и КПД пропа через диск-актуатор и шаг",
-            "подобрать мотор, проп и АКБ по тяговым таблицам под T/W и время полёта",
-            "посчитать ток и нагрев на висении и в манёвре"
-          ],
-          "lab": {
-            "title": "Подбор силовой установки",
-            "criteria": [
-              "Таблица тяги мотора прочитана, рабочая точка висения найдена",
-              "Ток и время полёта посчитаны для двух вариантов пропов",
-              "Выбор обоснован числами, записан в паспорт сборки"
-            ]
-          },
-          "stacks": [
-            "foundation"
-          ],
-          "article": "f-aero-props"
-        },
-        {
           "id": "f-electricity-101",
           "title": "Электричество и измерения 101",
           "level": "L1",
@@ -207,6 +179,34 @@
             "foundation"
           ],
           "article": "f-motors-esc"
+        },
+        {
+          "id": "f-aero-props",
+          "title": "Аэродинамика пропеллера и подбор силовой установки",
+          "level": "L2",
+          "hours": 4,
+          "prerequisites": [
+            "f-physics",
+            "f-power",
+            "f-motors-esc"
+          ],
+          "objectives": [
+            "объяснить тягу, момент и КПД пропа через диск-актуатор и шаг",
+            "подобрать мотор, проп и АКБ по тяговым таблицам под T/W и время полёта",
+            "посчитать ток и нагрев на висении и в манёвре"
+          ],
+          "lab": {
+            "title": "Подбор силовой установки",
+            "criteria": [
+              "Таблица тяги мотора прочитана, рабочая точка висения найдена",
+              "Ток и время полёта посчитаны для двух вариантов пропов",
+              "Выбор обоснован числами, записан в паспорт сборки"
+            ]
+          },
+          "stacks": [
+            "foundation"
+          ],
+          "article": "f-aero-props"
         },
         {
           "id": "f-fc-sensors",
@@ -2169,59 +2169,6 @@
       },
       "modules": [
         {
-          "id": "emb-basics",
-          "title": "Embedded: прерывания, таймеры, DMA, RTOS",
-          "level": "L3",
-          "hours": 4,
-          "prerequisites": [
-            "comp-esp32"
-          ],
-          "objectives": [
-            "объяснить, как FC успевает 8 кГц: прерывания, DMA, приоритеты",
-            "написать на ESP32 задачу FreeRTOS с очередью и таймером",
-            "понимать, почему blocking-код в петле — авария"
-          ],
-          "lab": {
-            "title": "Две задачи FreeRTOS",
-            "criteria": [
-              "Задача датчика и задача UART через очередь",
-              "Замер джиттера периода",
-              "Блокировка показана и устранена"
-            ]
-          },
-          "stacks": [
-            "engineer"
-          ],
-          "article": "emb-basics"
-        },
-        {
-          "id": "emb-protocols",
-          "title": "UART, I2C, SPI, CAN на уровне сигналов и драйверов",
-          "level": "L3",
-          "hours": 3,
-          "prerequisites": [
-            "emb-basics",
-            "el-measure"
-          ],
-          "objectives": [
-            "объяснить тайминги, адресацию, pull-up, скорость и ошибки каждой шины",
-            "написать драйвер I2C-датчика на ESP32",
-            "понимать DroneCAN и зачем он на больших аппаратах"
-          ],
-          "lab": {
-            "title": "Драйвер датчика",
-            "criteria": [
-              "I2C-датчик прочитан своим драйвером",
-              "Шина снята анализатором",
-              "Ошибка на шине воспроизведена и обработана"
-            ]
-          },
-          "stacks": [
-            "engineer"
-          ],
-          "article": "emb-protocols"
-        },
-        {
           "id": "comp-intro",
           "title": "Companion: зачем и где граница",
           "level": "L2",
@@ -2326,6 +2273,138 @@
             "companion"
           ],
           "article": "mav-services"
+        },
+        {
+          "id": "mav-sdk",
+          "title": "Библиотеки над MAVLink: pymavlink, MAVSDK, MAVROS",
+          "level": "L3",
+          "hours": 4,
+          "prerequisites": [
+            "mav-services"
+          ],
+          "objectives": [
+            "выбирать слой под задачу и объяснять выбор",
+            "писать асинхронный код MAVSDK с таймаутами",
+            "управлять в Offboard/GUIDED и знать таймауты уставок",
+            "проверять поведение при обрыве связи и смерти скрипта"
+          ],
+          "lab": {
+            "title": "MAVSDK: миссия, offboard, обрыв",
+            "criteria": [
+              "Сравнены tlog pymavlink и MAVSDK для одной миссии",
+              "Миссия с прогрессом, таймаутами и CSV-телеметрией",
+              "Offboard-квадрат и реакция автопилота на убитый скрипт",
+              "Сценарий обрыва канала с восстановлением скрипта"
+            ]
+          },
+          "stacks": [
+            "companion"
+          ],
+          "article": "mav-sdk"
+        },
+        {
+          "id": "comp-esp32",
+          "title": "ESP32 и периферия",
+          "level": "L2",
+          "hours": 4,
+          "prerequisites": [
+            "comp-mavlink",
+            "link-protocols"
+          ],
+          "objectives": [
+            "связать ESP32 с FC или пультом по UART"
+          ],
+          "lab": {
+            "title": "Эхо и heartbeat",
+            "criteria": [
+              "Эхо-тест с USB-UART: 200+ символов без потерь",
+              "Виджет шлёт heartbeat из refresh() и background()",
+              "ESP32 уходит в FLIGHT по таймауту heartbeat",
+              "Протокол сообщений описан в docs/"
+            ]
+          },
+          "stacks": [
+            "companion"
+          ],
+          "article": "comp-esp32"
+        },
+        {
+          "id": "emb-basics",
+          "title": "Embedded: прерывания, таймеры, DMA, RTOS",
+          "level": "L3",
+          "hours": 4,
+          "prerequisites": [
+            "comp-esp32"
+          ],
+          "objectives": [
+            "объяснить, как FC успевает 8 кГц: прерывания, DMA, приоритеты",
+            "написать на ESP32 задачу FreeRTOS с очередью и таймером",
+            "понимать, почему blocking-код в петле — авария"
+          ],
+          "lab": {
+            "title": "Две задачи FreeRTOS",
+            "criteria": [
+              "Задача датчика и задача UART через очередь",
+              "Замер джиттера периода",
+              "Блокировка показана и устранена"
+            ]
+          },
+          "stacks": [
+            "engineer"
+          ],
+          "article": "emb-basics"
+        },
+        {
+          "id": "emb-protocols",
+          "title": "UART, I2C, SPI, CAN на уровне сигналов и драйверов",
+          "level": "L3",
+          "hours": 3,
+          "prerequisites": [
+            "emb-basics",
+            "el-measure"
+          ],
+          "objectives": [
+            "объяснить тайминги, адресацию, pull-up, скорость и ошибки каждой шины",
+            "написать драйвер I2C-датчика на ESP32",
+            "понимать DroneCAN и зачем он на больших аппаратах"
+          ],
+          "lab": {
+            "title": "Драйвер датчика",
+            "criteria": [
+              "I2C-датчик прочитан своим драйвером",
+              "Шина снята анализатором",
+              "Ошибка на шине воспроизведена и обработана"
+            ]
+          },
+          "stacks": [
+            "engineer"
+          ],
+          "article": "emb-protocols"
+        },
+        {
+          "id": "comp-raspberry",
+          "title": "Raspberry Pi + ArduPilot",
+          "level": "L3",
+          "hours": 4,
+          "prerequisites": [
+            "comp-mavlink"
+          ],
+          "objectives": [
+            "поднять mavlink-router и сервис на борту"
+          ],
+          "lab": {
+            "title": "Сервис на борту",
+            "criteria": [
+              "/dev/serial0 свободен от консоли, heartbeat в MAVProxy",
+              "Маршрутизатор раздаёт поток GCS и локальному скрипту",
+              "Сервис systemd перезапускается после падения",
+              "Отказ Pi в стенде не влияет на FC"
+            ]
+          },
+          "stacks": [
+            "companion"
+          ],
+          "article": "comp-raspberry"
         },
         {
           "id": "mav-routing",
@@ -2444,85 +2523,6 @@
           "article": "payload-gimbal"
         },
         {
-          "id": "mav-sdk",
-          "title": "Библиотеки над MAVLink: pymavlink, MAVSDK, MAVROS",
-          "level": "L3",
-          "hours": 4,
-          "prerequisites": [
-            "mav-services"
-          ],
-          "objectives": [
-            "выбирать слой под задачу и объяснять выбор",
-            "писать асинхронный код MAVSDK с таймаутами",
-            "управлять в Offboard/GUIDED и знать таймауты уставок",
-            "проверять поведение при обрыве связи и смерти скрипта"
-          ],
-          "lab": {
-            "title": "MAVSDK: миссия, offboard, обрыв",
-            "criteria": [
-              "Сравнены tlog pymavlink и MAVSDK для одной миссии",
-              "Миссия с прогрессом, таймаутами и CSV-телеметрией",
-              "Offboard-квадрат и реакция автопилота на убитый скрипт",
-              "Сценарий обрыва канала с восстановлением скрипта"
-            ]
-          },
-          "stacks": [
-            "companion"
-          ],
-          "article": "mav-sdk"
-        },
-        {
-          "id": "comp-esp32",
-          "title": "ESP32 и периферия",
-          "level": "L2",
-          "hours": 4,
-          "prerequisites": [
-            "comp-mavlink",
-            "link-protocols"
-          ],
-          "objectives": [
-            "связать ESP32 с FC или пультом по UART"
-          ],
-          "lab": {
-            "title": "Эхо и heartbeat",
-            "criteria": [
-              "Эхо-тест с USB-UART: 200+ символов без потерь",
-              "Виджет шлёт heartbeat из refresh() и background()",
-              "ESP32 уходит в FLIGHT по таймауту heartbeat",
-              "Протокол сообщений описан в docs/"
-            ]
-          },
-          "stacks": [
-            "companion"
-          ],
-          "article": "comp-esp32"
-        },
-        {
-          "id": "comp-raspberry",
-          "title": "Raspberry Pi + ArduPilot",
-          "level": "L3",
-          "hours": 4,
-          "prerequisites": [
-            "comp-mavlink"
-          ],
-          "objectives": [
-            "поднять mavlink-router и сервис на борту"
-          ],
-          "lab": {
-            "title": "Сервис на борту",
-            "criteria": [
-              "/dev/serial0 свободен от консоли, heartbeat в MAVProxy",
-              "Маршрутизатор раздаёт поток GCS и локальному скрипту",
-              "Сервис systemd перезапускается после падения",
-              "Отказ Pi в стенде не влияет на FC"
-            ]
-          },
-          "stacks": [
-            "companion"
-          ],
-          "article": "comp-raspberry"
-        },
-        {
           "id": "ap-companion",
           "title": "Companion + ArduPilot",
           "level": "L3",
@@ -2578,6 +2578,31 @@
           "article": "mav-multi-vehicle"
         },
         {
+          "id": "bf-custom",
+          "title": "Свои сборки прошивок",
+          "level": "L4",
+          "hours": 3,
+          "prerequisites": [
+            "bf-cli"
+          ],
+          "objectives": [
+            "собрать прошивку под ограничения FC"
+          ],
+          "lab": {
+            "title": "Две сборки",
+            "criteria": [
+              "Собраны стандартная и урезанная прошивки",
+              "Размеры сравнены, вывод version/BUILD KEY сохранён",
+              "Отключённая подсистема исчезла из параметров — подтверждено",
+              "Конфигурация сборки в git"
+            ]
+          },
+          "stacks": [
+            "betaflight"
+          ],
+          "article": "bf-custom"
+        },
+        {
           "id": "fw-reading",
           "title": "Как читать исходники прошивки: Betaflight и ArduPilot",
           "level": "L4",
@@ -2603,31 +2628,6 @@
             "engineer"
           ],
           "article": "fw-reading"
-        },
-        {
-          "id": "bf-custom",
-          "title": "Свои сборки прошивок",
-          "level": "L4",
-          "hours": 3,
-          "prerequisites": [
-            "bf-cli"
-          ],
-          "objectives": [
-            "собрать прошивку под ограничения FC"
-          ],
-          "lab": {
-            "title": "Две сборки",
-            "criteria": [
-              "Собраны стандартная и урезанная прошивки",
-              "Размеры сравнены, вывод version/BUILD KEY сохранён",
-              "Отключённая подсистема исчезла из параметров — подтверждено",
-              "Конфигурация сборки в git"
-            ]
-          },
-          "stacks": [
-            "betaflight"
-          ],
-          "article": "bf-custom"
         },
         {
           "id": "eng-systems",

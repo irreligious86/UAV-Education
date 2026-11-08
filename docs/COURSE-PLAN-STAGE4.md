@@ -93,6 +93,5 @@ Still to do:
 
 SITL in CI stays postponed (Stage 3, iteration 3): Alex runs SITL locally.
 
-Curriculum consistency found while adding modules (pre-existing, to fix): prerequisites placed later in the track
-order — f-aero-props ← f-power/f-motors-esc, emb-basics ← comp-esp32, mav-routing ← comp-raspberry,
-mav-component ← comp-esp32, fw-reading ← bf-custom.
+Curriculum consistency (fixed): prerequisites placed later in their track (f-aero-props, emb-basics, mav-routing,
+mav-component, fw-reading) — tracks reordered by dependency; validate_content.py now rejects this.
