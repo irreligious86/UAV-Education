@@ -5,20 +5,20 @@
     {
       "q": "Где в Betaflight главный цикл PID?",
       "options": [
-        "src/main/flight/pid.c: main()",
-        "src/main/fc/core.c: taskMainPidLoop → subTaskPidController → subTaskMotorUpdate",
-        "src/main/scheduler",
-        "src/main/drivers/dshot.c"
+        "main/scheduler",
+        "fc/core.c: taskMainPidLoop",
+        "flight/pid.c: main() в цикле",
+        "drivers/dshot.c"
       ],
       "answer": 1,
-      "explain": "Планировщик вызывает taskMainPidLoop; PID и миксер — его подзадачи."
+      "explain": "taskMainPidLoop → subTaskPidController → subTaskMotorUpdate: PID и миксер — подзадачи цикла."
     },
     {
       "q": "От чего считается D-term в Betaflight?",
       "options": [
+        "От setpoint пилота",
+        "От гироскопа",
         "От ошибки",
-        "От отфильтрованного гироскопа",
-        "От setpoint",
         "От моторов"
       ],
       "answer": 1,
@@ -29,8 +29,8 @@
       "options": [
         "Attitude.cpp",
         "Copter.cpp: scheduler_tasks[]",
-        "motors.cpp",
-        "Parameters.cpp"
+        "Parameters.cpp: var_info[]",
+        "motors.cpp"
       ],
       "answer": 1,
       "explain": "FAST_TASK и SCHED_TASK(func, hz, max_us, prio)."
@@ -39,20 +39,20 @@
       "q": "Что делает AP_MotorsMatrix::output_armed_stabilizing()?",
       "options": [
         "Читает гироскоп",
-        "Распределяет roll/pitch/yaw/throttle по матрице моторов с приоритетами",
-        "Считает EKF",
-        "Пишет лог"
+        "Раздаёт оси по моторам",
+        "Шлёт MAVLink",
+        "Считает EKF и пишет лог"
       ],
       "answer": 1,
-      "explain": "Yaw — последним, в пределах MOT_YAW_HEADROOM."
+      "explain": "Распределяет roll/pitch/yaw/throttle по матрице моторов с приоритетами; yaw — последним, в пределах MOT_YAW_HEADROOM."
     },
     {
       "q": "Откуда берётся вики параметров ArduPilot?",
       "options": [
-        "Пишется вручную",
-        "Из блоков // @Param в исходниках",
+        "Из MAVLink",
+        "Из блоков @Param в коде",
         "Из Mission Planner",
-        "Из MAVLink"
+        "Пишется вручную командой разработчиков"
       ],
       "answer": 1,
       "explain": "Описание, диапазон, @Values — в коде."
@@ -60,10 +60,10 @@
     {
       "q": "Как безопасно проверить патч прошивки?",
       "options": [
-        "На дроне",
-        "В SITL / юнит-тестах, затем стенд",
-        "В конфигураторе",
-        "Никак"
+        "Сразу на дроне",
+        "SITL и тесты, затем стенд",
+        "Никак",
+        "В конфигураторе через CLI"
       ],
       "answer": 1,
       "explain": "make SITL / sim_vehicle.py; make test."
@@ -71,9 +71,9 @@
     {
       "q": "git log -S \"имя\" нужен, чтобы:",
       "options": [
+        "Собрать прошивку из старого коммита",
+        "Найти коммит с этой строкой",
         "Удалить строку",
-        "Найти коммит, добавивший/убравший строку с этим текстом",
-        "Собрать прошивку",
         "Проверить стиль"
       ],
       "answer": 1,

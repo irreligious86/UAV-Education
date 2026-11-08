@@ -291,6 +291,9 @@ QUIZ_DIR = ROOT / "content" / "quiz"
 QUIZ_MIN_QUESTIONS = 5
 
 
+QUIZ_MAX_LONGEST_SHARE = 0.34
+
+
 def validate_quizzes(manifest_ids, status_by_id):
     """Every quiz bank must be well-formed and belong to a published module."""
     import json
@@ -333,6 +336,17 @@ def validate_quizzes(manifest_ids, status_by_id):
                 errors.append(f"{rel}: вопрос {i} — kind=apply без fragment")
             if q.get("fragment") is not None and (not isinstance(q["fragment"], str) or len(q["fragment"]) > 1500):
                 errors.append(f"{rel}: вопрос {i} — fragment должен быть строкой ≤ 1500 символов")
+        # "pick the longest answer" must not work: the correct option may be the unique longest one
+        # in at most a third of a bank's questions (chance level for 4 options is ~25-28 %)
+        longest = 0
+        for q in qs:
+            L = [len(o) for o in q.get("options", [])]
+            a = q.get("answer")
+            if L and isinstance(a, int) and 0 <= a < len(L) and L[a] == max(L) and L.count(max(L)) == 1:
+                longest += 1
+        if qs and longest / len(qs) > QUIZ_MAX_LONGEST_SHARE:
+            errors.append(f"{rel}: верный вариант — самый длинный в {longest} из {len(qs)} вопросов "
+                          f"(> {QUIZ_MAX_LONGEST_SHARE:.0%}); выровняйте дистракторы по длине и конкретике")
     return errors
 
 

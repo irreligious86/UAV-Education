@@ -5,9 +5,9 @@
     {
       "q": "Что делает MicroXRCEAgent?",
       "options": [
+        "Калибрует датчики по ROS 2",
+        "Мост uORB ↔ DDS",
         "Летает",
-        "Принимает топики от клиента PX4 и выставляет их в DDS/ROS 2",
-        "Калибрует",
         "Заменяет QGC"
       ],
       "answer": 1,
@@ -18,8 +18,8 @@
       "options": [
         "TrajectorySetpoint",
         "OffboardControlMode",
-        "VehicleCommand",
-        "VehicleAttitude"
+        "VehicleAttitude с текущей ориентацией",
+        "VehicleCommand"
       ],
       "answer": 1,
       "explain": "Иначе PX4 не переключится и не заармится в Offboard."
@@ -38,9 +38,9 @@
     {
       "q": "Что важно про ветку px4_msgs?",
       "options": [
+        "Только ветка main",
+        "Под версию PX4",
         "Любая",
-        "Должна соответствовать версии PX4",
-        "Только main",
         "Не нужна"
       ],
       "answer": 1,
@@ -72,9 +72,9 @@
       "q": "Z = −5 в TrajectorySetpoint означает:",
       "options": [
         "5 м вниз",
-        "5 м вверх (NED)",
+        "5 м вверх",
         "Ошибку",
-        "5 м/с"
+        "5 м/с вниз"
       ],
       "answer": 1,
       "explain": "NED: ось Z направлена вниз."
@@ -83,8 +83,8 @@
       "q": "Какой QoS нужен подписчику на /fmu/out/*?",
       "options": [
         "RELIABLE",
-        "BEST_EFFORT (PX4 публикует best-effort)",
-        "TRANSIENT_LOCAL только",
+        "BEST_EFFORT",
+        "Только TRANSIENT_LOCAL",
         "Любой"
       ],
       "answer": 1,

@@ -6,9 +6,9 @@
       "q": "Как модули PX4 обмениваются данными?",
       "options": [
         "Глобальные переменные",
-        "Шина uORB publish/subscribe",
-        "Файлы",
-        "MAVLink внутри"
+        "uORB publish/subscribe",
+        "MAVLink-сообщения внутри платы",
+        "Файлы"
       ],
       "answer": 1,
       "explain": "Асинхронно, подписчик просыпается на новые данные."
@@ -16,10 +16,10 @@
     {
       "q": "Что обязательно в каждом .msg?",
       "options": [
-        "Поле id",
-        "Поле uint64 timestamp",
+        "Ничего",
+        "uint64 timestamp",
         "Поле name",
-        "Ничего"
+        "Поле id и имя модуля"
       ],
       "answer": 1,
       "explain": "Заполняется при публикации."
@@ -27,10 +27,10 @@
     {
       "q": "Как VehicleAttitude.msg превращается в имя топика?",
       "options": [
-        "Остаётся VehicleAttitude",
-        "vehicle_attitude (snake_case)",
+        "VA",
+        "vehicle_attitude",
         "attitude",
-        "VA"
+        "VehicleAttitude без изменений"
       ],
       "answer": 1,
       "explain": "CamelCase → snake_case."
@@ -38,10 +38,10 @@
     {
       "q": "Какой модуль переводит моменты в команды моторам?",
       "options": [
-        "EKF2",
+        "Commander по команде",
         "Control allocation",
         "Navigator",
-        "Commander"
+        "EKF2"
       ],
       "answer": 1,
       "explain": "По геометрии CA_AIRFRAME и CA_ROTOR*."
@@ -72,7 +72,7 @@
       "q": "Где исполняется большинство модулей PX4 на NuttX?",
       "options": [
         "Отдельные процессы",
-        "Work queue с приоритетами",
+        "Work queue",
         "Прерывания",
         "Lua"
       ],

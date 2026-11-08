@@ -5,10 +5,10 @@
     {
       "q": "Включить AP_DDS по последовательному порту:",
       "options": [
-        "SERIALn_PROTOCOL = 45 и DDS_ENABLE = 1",
-        "SERIALn_PROTOCOL = 2",
+        "PROTOCOL 45, DDS_ENABLE",
+        "MAV_SYSID = 45",
         "RNGFND1_TYPE = 10",
-        "MAV_SYSID = 45"
+        "SERIALn_PROTOCOL = 2 (MAVLink2)"
       ],
       "answer": 0,
       "explain": "Для UDP — DDS_UDP_PORT (2019) и DDS_IP0..3."
@@ -16,8 +16,8 @@
     {
       "q": "В какой системе координат /ap/pose/filtered?",
       "options": [
-        "ENU, frame map",
-        "NED",
+        "ENU, map",
+        "NED относительно дома",
         "ECEF",
         "FRD"
       ],
@@ -27,10 +27,10 @@
     {
       "q": "Сервис смены режима в GUIDED для Copter:",
       "options": [
-        "/ap/mode_switch с mode = 4",
+        "/ap/mode_switch, 4",
         "/ap/arm_motors",
         "/ap/cmd_vel",
-        "/mavros/set_mode с 6"
+        "/mavros/set_mode, 6"
       ],
       "answer": 0,
       "explain": "GUIDED = 4, LAND = 9."
@@ -38,10 +38,10 @@
     {
       "q": "Уставки /ap/cmd_vel на земле игнорируются. Чего не хватает?",
       "options": [
-        "Взлёта в GUIDED (takeoff)",
+        "Взлёта в GUIDED",
         "QoS RELIABLE",
-        "Сервиса prearm",
-        "MAVROS"
+        "MAVROS",
+        "Сервиса prearm и QoS"
       ],
       "answer": 0,
       "explain": "Порядок: GUIDED → arm → takeoff → уставки."
@@ -60,9 +60,9 @@
     {
       "q": "Где взять типы ardupilot_msgs?",
       "options": [
-        "В репозитории ArduPilot: Tools/ros2/ardupilot_msgs",
+        "Tools/ros2 в ArduPilot",
         "В px4_msgs",
-        "В MAVROS",
+        "В пакете px4_msgs",
         "В ROS core"
       ],
       "answer": 0,
@@ -71,9 +71,9 @@
     {
       "q": "Когда MAVROS предпочтительнее AP_DDS?",
       "options": [
-        "Нужны миссии, параметры, произвольные MAVLink-сообщения или смешанный парк",
+        "Миссии, параметры, весь MAVLink",
         "Всегда",
-        "Когда важна минимальная задержка",
+        "Ради минимальной задержки",
         "Никогда"
       ],
       "answer": 0,
@@ -82,10 +82,10 @@
     {
       "q": "frame_id \"base_link\" в /ap/cmd_vel означает:",
       "options": [
-        "Скорость в осях корпуса, AP переводит в NED",
+        "Оси корпуса",
         "Мировые ENU",
         "Глобальные координаты",
-        "Ошибку"
+        "Ошибка"
       ],
       "answer": 0,
       "explain": "\"map\" — мировые ENU."

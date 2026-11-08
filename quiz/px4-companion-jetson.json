@@ -16,10 +16,10 @@
     {
       "q": "Какие параметры включают MAVLink для companion на TELEM2?",
       "options": [
-        "SER_TEL2_PROTOCOL = 2",
-        "MAV_1_CONFIG = TELEM 2, MAV_1_MODE = Onboard",
+        "MC_AIRMODE = 1",
+        "MAV_1_CONFIG + MODE Onboard",
         "UXRCE_DDS_CFG = TELEM2",
-        "MC_AIRMODE"
+        "SER_TEL2_PROTOCOL = 2 и BAUD"
       ],
       "answer": 1,
       "explain": "Режим Onboard — набор сообщений для бортового компьютера."
@@ -27,8 +27,8 @@
     {
       "q": "Можно ли на одном порту держать MAVLink и uXRCE-DDS?",
       "options": [
-        "Да",
-        "Нет — выбирается одно, MAVLink на порту отключают",
+        "Да, если скорость 921600",
+        "Нет, выбирается одно",
         "Только на H7",
         "Только по UDP"
       ],
@@ -49,10 +49,10 @@
     {
       "q": "Что должно происходить при отказе companion?",
       "options": [
+        "Перезагрузка PX4 по watchdog",
+        "Offboard завершится по таймауту",
         "Аппарат падает",
-        "PX4 продолжает полёт; Offboard завершается по таймауту",
-        "Перезагрузка PX4",
-        "Ничего не меняется в Offboard"
+        "Offboard не меняется"
       ],
       "answer": 1,
       "explain": "Граница ответственности: FC летает сам."
@@ -61,9 +61,9 @@
       "q": "Зачем добавлять пользователя Jetson в группу dialout?",
       "options": [
         "Для Wi-Fi",
-        "Для доступа к последовательному порту без sudo",
-        "Для ROS",
-        "Для CUDA"
+        "Доступ к UART без sudo",
+        "Для доступа к CUDA и GPU",
+        "Для автозапуска"
       ],
       "answer": 1,
       "explain": "Иначе /dev/ttyTHS1 недоступен обычному пользователю."
@@ -72,7 +72,7 @@
       "q": "Какой порт Jetson Orin Nano на 40-пиновой гребёнке — UART для Pixhawk?",
       "options": [
         "/dev/ttyUSB0",
-        "/dev/ttyTHS1 (пины 8/10)",
+        "/dev/ttyTHS1",
         "/dev/ttyAMA0",
         "/dev/ttyACM0"
       ],
@@ -82,10 +82,10 @@
     {
       "q": "Можно ли MAVLink и uXRCE-DDS на одном TELEM2?",
       "options": [
-        "Да",
-        "Нет — конфликт порта; разные порты",
+        "Только по USB, не по UART",
+        "Нет, разные порты",
         "Только в SITL",
-        "Только по USB"
+        "Да"
       ],
       "answer": 1,
       "explain": "MAV_1_CONFIG и UXRCE_DDS_CFG на разных портах."

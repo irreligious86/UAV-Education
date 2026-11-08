@@ -5,9 +5,9 @@
     {
       "q": "PARAM_SET подтверждается:",
       "options": [
-        "Эхом PARAM_VALUE с новым значением",
-        "PARAM_ACK",
-        "COMMAND_ACK",
+        "Эхом PARAM_VALUE",
+        "Сообщением PARAM_ACK",
+        "Через COMMAND_ACK",
         "Ничем"
       ],
       "answer": 0,
@@ -16,10 +16,10 @@
     {
       "q": "При повторе COMMAND_LONG после потери ACK протокол требует:",
       "options": [
-        "Увеличить поле confirmation",
+        "Увеличить confirmation",
         "Сменить sysid",
-        "Отправить COMMAND_INT",
-        "Ничего"
+        "Ничего",
+        "Отправить COMMAND_INT вместо LONG"
       ],
       "answer": 0,
       "explain": "Получатель может отличить повтор."
@@ -27,9 +27,9 @@
     {
       "q": "COMMAND_ACK с result IN_PROGRESS означает:",
       "options": [
-        "Долгая команда выполняется, ждать финального ACK",
-        "Отказ",
-        "Команда не поддерживается",
+        "Выполняется, ждать финала",
+        "Отказ, причина в поле progress",
+        "Не поддерживается",
         "Повторить немедленно"
       ],
       "answer": 0,
@@ -38,8 +38,8 @@
     {
       "q": "Кто повторяет запрос при потере пункта при загрузке миссии?",
       "options": [
-        "Принимающая сторона (аппарат) — повторным MISSION_REQUEST_INT",
-        "Отправитель шлёт все пункты заново",
+        "Аппарат повторным запросом",
+        "Отправитель шлёт всё заново",
         "Никто",
         "GCS шлёт MISSION_ACK"
       ],
@@ -60,10 +60,10 @@
     {
       "q": "Почему MISSION_ITEM_INT лучше MISSION_ITEM?",
       "options": [
-        "Целые координаты ×10⁷ не теряют точность",
-        "Он короче",
+        "Целые ×10⁷ без потери точности",
+        "Он короче и быстрее обрабатывается",
         "Он подписан",
-        "Он быстрее обрабатывается"
+        "Он быстрее"
       ],
       "answer": 0,
       "explain": "float даёт ошибку порядка метра на широте."
@@ -71,10 +71,10 @@
     {
       "q": "Попросить ATTITUDE с частотой 50 Гц:",
       "options": [
-        "MAV_CMD_SET_MESSAGE_INTERVAL с интервалом 20000 мкс",
-        "PARAM_SET SR_ATT=50",
-        "REQUEST_DATA_STREAM в любом случае",
-        "Нельзя"
+        "SET_MESSAGE_INTERVAL 20000 мкс",
+        "Никак нельзя",
+        "REQUEST_DATA_STREAM всегда",
+        "PARAM_SET SR_ATT = 50 по MAVLink"
       ],
       "answer": 0,
       "explain": "param2 — интервал в микросекундах."
@@ -82,10 +82,10 @@
     {
       "q": "ArduPilot и PX4 по-разному упаковывают целые параметры в float. Где это видно клиенту?",
       "options": [
-        "В AUTOPILOT_VERSION.capabilities (C_CAST или BYTEWISE)",
-        "В HEARTBEAT",
-        "В PARAM_VALUE.param_count",
-        "Нигде"
+        "AUTOPILOT_VERSION.capabilities",
+        "Поля HEARTBEAT",
+        "PARAM_VALUE.param_count",
+        "В поле param_count сообщения PARAM_VALUE"
       ],
       "answer": 0,
       "explain": "Флаги MAV_PROTOCOL_CAPABILITY_PARAM_ENCODE_*."
@@ -97,8 +97,8 @@
       "options": [
         "Команда отклонена pre-arm проверкой: причина в STATUSTEXT — напряжение ниже порога арма",
         "Скрипт не дождался ACK: result=4 означает «в процессе», нужно ждать дольше",
-        "Неверный номер команды: армирование — это MAV_CMD_DO_SET_MODE, а не 400",
-        "Нужно повторить с confirmation=1 — без этого автопилот отклоняет первую попытку"
+        "Нужно повторить с confirmation=1 — без этого ArduPilot всегда отклоняет первую попытку арма",
+        "Неверный номер команды: армирование — это MAV_CMD_DO_SET_MODE, а не 400"
       ],
       "answer": 0,
       "explain": "result=4 — отказ; причина приходит отдельно в STATUSTEXT. Повтор не поможет."

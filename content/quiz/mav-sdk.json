@@ -5,10 +5,10 @@
     {
       "q": "MAVSDK-Python внутри:",
       "options": [
-        "Запускает mavsdk_server (C++) и общается с ним по gRPC",
-        "Чистый Python поверх pymavlink",
-        "Обёртка MAVROS",
-        "Обёртка DroneKit"
+        "mavsdk_server по gRPC",
+        "Чистый Python и pymavlink",
+        "Обёртка над MAVROS",
+        "Обёртка над DroneKit"
       ],
       "answer": 0,
       "explain": "Отсюда async API и исключения с кодами плагинов."
@@ -16,7 +16,7 @@
     {
       "q": "`async for x in drone.telemetry.position()`:",
       "options": [
-        "Не завершается сам — нужен break или отмена задачи",
+        "Сам не завершается",
         "Возвращает одно значение",
         "Завершается через 1 с",
         "Блокирует event loop"
@@ -27,10 +27,10 @@
     {
       "q": "PX4 выходит из Offboard сразу после старта. Причина:",
       "options": [
-        "Уставки не шли до start или идут реже 2 Гц",
-        "Нет GPS",
+        "Уставки до start или реже 2 Гц",
+        "Нет фикса GPS для режима Offboard",
         "Неверный sysid",
-        "Подпись"
+        "Включена подпись"
       ],
       "answer": 0,
       "explain": "Нужна начальная уставка и непрерывный поток."
@@ -38,7 +38,7 @@
     {
       "q": "DroneKit-Python в 2026:",
       "options": [
-        "Не поддерживается, только для чтения старого кода",
+        "Не поддерживается",
         "Рекомендуемый для PX4",
         "Замена MAVSDK",
         "Часть ArduPilot"
@@ -51,8 +51,8 @@
       "options": [
         "uXRCE-DDS",
         "DroneKit",
-        "MAVProxy",
-        "SiK"
+        "SiK",
+        "MAVProxy с модулем ROS 2"
       ],
       "answer": 0,
       "explain": "MAVROS — для ArduPilot/ROS или особых случаев."
@@ -60,10 +60,10 @@
     {
       "q": "Кто должен обеспечивать безопасность при «смерти» скрипта на companion?",
       "options": [
-        "Автопилот: таймауты уставок и failsafe",
-        "Скрипт: try/except",
+        "Автопилот: таймауты и failsafe",
         "MAVSDK",
-        "GCS-оператор вручную"
+        "Сам скрипт через try/except",
+        "Оператор вручную"
       ],
       "answer": 0,
       "explain": "Companion советует, автопилот решает."
@@ -72,9 +72,9 @@
       "q": "Ожидание `health.is_global_position_ok` без таймаута на аппарате без GPS приведёт к:",
       "options": [
         "Вечному зависанию скрипта",
-        "Исключению",
+        "Ничему",
         "Автоматическому армингу",
-        "Ничему"
+        "Исключению TimeoutError через 30 с"
       ],
       "answer": 0,
       "explain": "Оборачивайте ожидания в asyncio.wait_for."
@@ -82,9 +82,9 @@
     {
       "q": "mission.upload_mission() на проводе — это:",
       "options": [
-        "Тот же диалог MISSION_COUNT/REQUEST_INT/ITEM_INT/ACK",
-        "Один большой пакет",
-        "MAVFTP",
+        "Тот же диалог MISSION_*",
+        "Один большой пакет через MAVFTP",
+        "Передача по MAVFTP",
         "Свой протокол MAVSDK"
       ],
       "answer": 0,
