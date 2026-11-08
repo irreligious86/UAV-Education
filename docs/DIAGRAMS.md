@@ -8,7 +8,11 @@ work offline (PWA) and in both themes.
 
 1. Add a diagram to `scripts/diagrams/build_diagrams.py` — first-wave and hand-built diagrams — or
    to `scripts/diagrams/wave2.py` (one per module that had none; grouped by track), or drop a
-   hand-written SVG into `assets/diagrams/<id>.svg`. Ids: `[a-z0-9-]+`. Text budget: about 19
+   hand-written SVG into `assets/diagrams/<id>.svg`.
+   Quantitative charts (curves computed from the module's formulas) go to `scripts/diagrams/wave3.py`
+   using `plot.py`: `chart()` for line/log plots with labelled curves, marks, bands and a legend,
+   `polar()` for antenna patterns. Curves are labelled in place (no colour-only legend) and the
+   caption states the model and its numbers. Ids: `[a-z0-9-]+`. Text budget: about 19
    characters per line in a 150 px box, 16 in the narrow boxes of a five-column row — render and look
    before committing; long labels overflow silently.
 2. Run `python3 scripts/publish.py` — it regenerates `assets/diagrams/`, runs
