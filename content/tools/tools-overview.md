@@ -69,7 +69,7 @@ drones/
 | Радио | ExpressLRS Configurator, EdgeTX Companion + Buddy | прошивка модулей, модели пульта |
 | Железо | мультиметр, ваттметр XT60, smoke stopper, программатор ST-Link (восстановление FC), логический анализатор 24 МГц, осциллограф (по мере роста) | модули «Измерения» |
 | Терминал | Linux / WSL2: `picocom -b 115200 /dev/ttyACM0`, `pyserial`, `venv` | скрипты к CLI, MAVLink |
-| Симуляция | ArduPilot SITL (`sim_vehicle.py`), PX4 SITL (`make px4_sitl gz_x500`), Betaflight SITL (`make SITL`) | любой сценарий — сначала здесь |
+| Симуляция | ArduPilot SITL (`sim_vehicle.py`), PX4 SITL (`make px4_sitl gz_x500`), Betaflight SITL (`make TARGET=SITL`) | любой сценарий — сначала здесь |
 | Версионирование | git + GitHub; `.gitattributes` с LFS для `.bin/.BFL` | конфиги и скрипты, модуль «CI» |
 
 ### Порядок установки (Linux / WSL2)

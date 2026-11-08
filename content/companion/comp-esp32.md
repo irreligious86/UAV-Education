@@ -93,8 +93,13 @@ void loop() {
   if (Serial1.available()) {
     String line = Serial1.readStringUntil('\n');   // one line == one message
     lastHeartbeat = millis();
-    if (line.startsWith("STATE armed")) { if (mode == Mode::CONFIG) { radioOff(); mode = Mode::FLIGHT; } }
-    else if (line.startsWith("STATE disarmed")) { if (mode == Mode::FLIGHT) enterConfig(); }
+    // S,<mode>,<armed>,<vbat>,<rssi>  — the protocol above; armed is the third field
+    if (line.startsWith("S,")) {
+      int a = line.indexOf(',', 2);                 // end of <mode>
+      bool armed = a > 0 && line.charAt(a + 1) == '1';
+      if (armed && mode == Mode::CONFIG) { radioOff(); mode = Mode::FLIGHT; }
+      else if (!armed && mode == Mode::FLIGHT) enterConfig();
+    }
   }
   if (millis() - lastHeartbeat > HEARTBEAT_TIMEOUT_MS && mode == Mode::CONFIG) {
     radioOff(); mode = Mode::FLIGHT;  // lost the radio: fail safe
@@ -139,9 +144,6 @@ return { name = "Companion", create = create, update = update, refresh = refresh
 - **Симптом:** строки приходят обрезанными
   - Возможная причина: `serialRead` вызывается реже, чем приходят данные, буфер переполняется.
   - Что сделать: читать в каждом `tick()`, укоротить сообщения, снизить частоту.
-- **Симптом:** ESP32 перезагружается при включении Wi-Fi
-  - Возможная причина: просадка питания на пиках.
-  - Что сделать: конденсатор по питанию, стабилизатор с запасом, измерить ток в CONFIG.
 - **Симптом:** точка доступа поднялась в полёте
   - Возможная причина: защита только на одной стороне.
   - Что сделать: проверка арма и в Lua, и в прошивке; таймаут heartbeat → FLIGHT.

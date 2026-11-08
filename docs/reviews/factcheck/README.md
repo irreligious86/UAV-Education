@@ -40,3 +40,14 @@ next pass:
 - foundation-electronics: 10 items
 - inav-link-px4: 9 items
 - perception-ros2: 5 items
+
+## Backlog resolved after the pass
+
+- Raspberry Pi 5: `/dev/serial0` points to the debug UART `/dev/ttyAMA10`; GPIO 14/15 is `/dev/ttyAMA0`
+  after `dtparam=uart0=on` (raspberrypi/documentation PR 3294) — comp-raspberry now says so.
+- Lithium fire guidance unified across f-safety, el-battery-packs and f-electricity-101: knock the flame
+  down, cool with plenty of water or isolate outdoors; class D is for metallic lithium.
+- Sony VTC6 rating: 15 A continuous, 30 A with an 80 °C cutoff.
+- f-motors-esc: the 2207-vs-2306 torque claim replaced with a neutral statement (compare thrust tables).
+- tools-overview: Betaflight SITL is `make TARGET=SITL`.
+- comp-esp32: the code now parses the documented `S,<mode>,<armed>,…` line; duplicate diagnostic removed.
