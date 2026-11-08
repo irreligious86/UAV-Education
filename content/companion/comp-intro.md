@@ -50,7 +50,7 @@ Companion предлагает «лети в точку X со скорость�
 ArduPilot ждёт MAVLink 2 на `SERIALx_PROTOCOL = 2`; PX4 на companion-порту — тот же MAVLink либо uXRCE-DDS для ROS 2. Для Betaflight/INAV companion в классическом смысле редок: там есть MSP, и бортовой компьютер обычно нужен только для видео и телеметрии.
 
 ### Маршрутизация MAVLink
-Один порт FC — несколько потребителей (GCS по 4G, скрипт на companion, логгер): нужен маршрутизатор. `mavlink-router` (C, systemd-сервис, конфиг с endpoint'ами UART/UDP/TCP) или `mavproxy.py --master=/dev/ttyAMA0 --out=udp:gcs-ip:14550 --out=udp:127.0.0.1:14551` — каждый клиент получает копию потока, команды идут обратно к FC. Скорость UART companion-порта: 921600 бод (`SERIALx_BAUD = 921`) — иначе при `SRx_*` потоках на 10–50 Гц порт захлёбывается. Поток настраивается с companion (`REQUEST_DATA_STREAM`/`SET_MESSAGE_INTERVAL`), не по умолчанию.
+Один порт FC — несколько потребителей (GCS по 4G, скрипт на companion, логгер): нужен маршрутизатор. `mavlink-router` (C++, systemd-сервис, конфиг с endpoint'ами UART/UDP/TCP) или `mavproxy.py --master=/dev/ttyAMA0 --out=udp:gcs-ip:14550 --out=udp:127.0.0.1:14551` — каждый клиент получает копию потока, команды идут обратно к FC. Скорость UART companion-порта: 921600 бод (`SERIALx_BAUD = 921`) — иначе при `SRx_*` потоках на 10–50 Гц порт захлёбывается. Поток настраивается с companion (`REQUEST_DATA_STREAM`/`SET_MESSAGE_INTERVAL`), не по умолчанию.
 
 {{diagram:mavlink-routing|Типовая схема маршрутизации MAVLink на борту с companion.}}
 

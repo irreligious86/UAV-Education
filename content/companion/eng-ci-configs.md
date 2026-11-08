@@ -43,7 +43,7 @@ fleet/
 Правила: один коммит — одно изменение с причиной («D roll 38→42: bounce-back 18%→9%, лог 2026-11-08-03»); без причины — не коммит. Бинарные логи — не в репозиторий (Git LFS или релизы).
 
 ### Снять конфиг автоматически
-Betaflight: по USB через MSP — `diff all` с CLI командой из Python (`pyserial`: `#` → ждать `# ` → `diff all` → читать до `# `), либо через `betaflight-configurator` экспорт. ArduPilot: `mavproxy.py --master=... --cmd="param download; param save params.param"` или pymavlink `param_fetch_all` → отсортированный текстовый файл. Сортировка и нормализация (убрать `#` комментарии с датой) — иначе diff шумит.
+Betaflight: по USB в режиме CLI (не MSP: вход в CLI символом `#`) — `diff all` из Python (`pyserial`: `#` → ждать `# ` → `diff all` → читать до `# `), либо через `betaflight-configurator` экспорт. ArduPilot: `mavproxy.py --master=... --cmd="param fetch; param save params.param"` или pymavlink `param_fetch_all` → отсортированный текстовый файл. Сортировка и нормализация (убрать `#` комментарии с датой) — иначе diff шумит.
 
 ### Инварианты: проверка конфигов
 Скрипт, который читает конфиг и падает на нарушении правил, известных из курса:

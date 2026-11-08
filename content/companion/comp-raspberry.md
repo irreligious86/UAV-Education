@@ -54,18 +54,18 @@ Device = /dev/serial0
 Baud = 921600
 [UdpEndpoint gcs]
 Mode = Normal
-Address = 192.168.1.20      # laptop with QGC
+Address = 192.168.1.20
 Port = 14550
 [UdpEndpoint scripts]
 Mode = Server
 Address = 127.0.0.1
-Port = 14551                # local scripts connect here (udpin)
+Port = 14551
 [UdpEndpoint logger]
 Mode = Normal
 Address = 127.0.0.1
 Port = 14552
 ```
-`systemctl enable --now mavlink-router`; скрипты — `mavutil.mavlink_connection("udpin:127.0.0.1:14551")`. Pi 5 использует `/dev/ttyAMA0` на GPIO 14/15 после `dtparam=uart0=on`; на Pi 4 — `enable_uart=1` и отключённый Bluetooth на том же UART (`dtoverlay=disable-bt`) для стабильной скорости 921600 (mini-UART на Pi 3/4 без этого «плавает» по скорости).
+`systemctl enable --now mavlink-router`; скрипты — `mavutil.mavlink_connection("udpout:127.0.0.1:14551")` (endpoint в режиме Server слушает порт и отвечает тому, кто прислал первый пакет). Pi 5 использует `/dev/ttyAMA0` на GPIO 14/15 после `dtparam=uart0=on`; на Pi 4 — `enable_uart=1` и отключённый Bluetooth на том же UART (`dtoverlay=disable-bt`) для стабильной скорости 921600 (mini-UART на Pi 3/4 без этого «плавает» по скорости).
 
 ### Сервис для своего скрипта
 ```ini
@@ -121,7 +121,7 @@ Address=127.0.0.1
 Port=14551
 ```
 
-GCS на ноутбуке получает поток на 14550, локальные скрипты подключаются к `udpin:127.0.0.1:14551` или `tcp:127.0.0.1:5760`.
+GCS на ноутбуке получает поток на 14550, локальные скрипты подключаются к `udpout:127.0.0.1:14551` или `tcp:127.0.0.1:5760`.
 
 ### Шаг 3. Свой сервис
 `/opt/uav/telemetry_logger.py`:

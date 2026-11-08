@@ -51,7 +51,7 @@ CAN 2.0: дифференциальная пара CAN_H/CAN_L, терминат
 6. Потокобезопасность: мьютекс на шину, если устройств несколько.
 
 ## practice
-### Шаг 1. Драйвер I2C-датчика (ESP32, ESP-IDF)
+### Шаг 1. Драйвер I2C-датчика (ESP32, ESP-IDF; пример на legacy-API `driver/i2c.h`, который объявлен end-of-life с ESP-IDF v6.0 — в новых проектах `driver/i2c_master.h`: `i2c_master_transmit_receive`/`i2c_master_transmit`)
 Пример для BMP280 (адрес 0x76/0x77, chip id 0x58 в регистре 0xD0):
 ```c
 static esp_err_t rd(uint8_t reg, uint8_t *buf, size_t n) {       // repeated-START read, 50 ms timeout

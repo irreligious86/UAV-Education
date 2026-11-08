@@ -57,7 +57,7 @@
 <ol><li>Инициализация шины и проверка устройства (WHO_AM_I/chip id).</li><li>Конфигурация (регистры): диапазон, частота, фильтры.</li><li>Чтение блоком с таймаутом; возврат ошибки, не зависание.</li><li>Преобразование сырых единиц в физические (LSB → °/с, Па).</li><li>Обработка ошибок: счётчики, повторная инициализация после N ошибок подряд, bus recovery для I2C.</li><li>Потокобезопасность: мьютекс на шину, если устройств несколько.</li></ol>
 
 <h2>Практика</h2>
-<h4 class="md-subheading">Шаг 1. Драйвер I2C-датчика (ESP32, ESP-IDF)</h4>
+<h4 class="md-subheading">Шаг 1. Драйвер I2C-датчика (ESP32, ESP-IDF; пример на legacy-API <code>driver/i2c.h</code>, который объявлен end-of-life с ESP-IDF v6.0 — в новых проектах <code>driver/i2c_master.h</code>: <code>i2c_master_transmit_receive</code>/<code>i2c_master_transmit</code>)</h4>
 <p>Пример для BMP280 (адрес 0x76/0x77, chip id 0x58 в регистре 0xD0):</p>
 <pre class="cli-block"><code>static esp_err_t rd(uint8_t reg, uint8_t *buf, size_t n) {       // repeated-START read, 50 ms timeout
   return i2c_master_write_read_device(I2C_NUM_0, ADDR, &amp;reg, 1, buf, n, pdMS_TO_TICKS(50));

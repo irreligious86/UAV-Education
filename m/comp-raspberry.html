@@ -65,17 +65,17 @@ Device = /dev/serial0
 Baud = 921600
 [UdpEndpoint gcs]
 Mode = Normal
-Address = 192.168.1.20      # laptop with QGC
+Address = 192.168.1.20
 Port = 14550
 [UdpEndpoint scripts]
 Mode = Server
 Address = 127.0.0.1
-Port = 14551                # local scripts connect here (udpin)
+Port = 14551
 [UdpEndpoint logger]
 Mode = Normal
 Address = 127.0.0.1
 Port = 14552</code></pre>
-<p><code>systemctl enable --now mavlink-router</code>; скрипты — <code>mavutil.mavlink_connection(&quot;udpin:127.0.0.1:14551&quot;)</code>. Pi 5 использует <code>/dev/ttyAMA0</code> на GPIO 14/15 после <code>dtparam=uart0=on</code>; на Pi 4 — <code>enable_uart=1</code> и отключённый Bluetooth на том же UART (<code>dtoverlay=disable-bt</code>) для стабильной скорости 921600 (mini-UART на Pi 3/4 без этого «плавает» по скорости).</p>
+<p><code>systemctl enable --now mavlink-router</code>; скрипты — <code>mavutil.mavlink_connection(&quot;udpout:127.0.0.1:14551&quot;)</code> (endpoint в режиме Server слушает порт и отвечает тому, кто прислал первый пакет). Pi 5 использует <code>/dev/ttyAMA0</code> на GPIO 14/15 после <code>dtparam=uart0=on</code>; на Pi 4 — <code>enable_uart=1</code> и отключённый Bluetooth на том же UART (<code>dtoverlay=disable-bt</code>) для стабильной скорости 921600 (mini-UART на Pi 3/4 без этого «плавает» по скорости).</p>
 <h4 class="md-subheading">Сервис для своего скрипта</h4>
 <pre class="cli-block"><code># /etc/systemd/system/uav-mission.service
 [Unit]
@@ -119,7 +119,7 @@ Port=14550
 Mode=Server
 Address=127.0.0.1
 Port=14551</code></pre>
-<p>GCS на ноутбуке получает поток на 14550, локальные скрипты подключаются к <code>udpin:127.0.0.1:14551</code> или <code>tcp:127.0.0.1:5760</code>.</p>
+<p>GCS на ноутбуке получает поток на 14550, локальные скрипты подключаются к <code>udpout:127.0.0.1:14551</code> или <code>tcp:127.0.0.1:5760</code>.</p>
 <h4 class="md-subheading">Шаг 3. Свой сервис</h4>
 <p><code>/opt/uav/telemetry_logger.py</code>:</p>
 <pre class="cli-block"><code>import csv, time

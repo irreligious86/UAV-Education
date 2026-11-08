@@ -28,7 +28,7 @@ MAVLink — это не набор сообщений, а набор **диал�
 `HEARTBEAT` (0) раз в секунду от каждого компонента: тип (`MAV_TYPE`), автопилот, `base_mode` (флаг арма — `MAV_MODE_FLAG_SAFETY_ARMED`), `custom_mode` (номер режима, свой у каждой прошивки), `system_status`. Heartbeat — это и обнаружение участников, и источник адреса для маршрутизации, и основа failsafe: автопилот, переставший слышать heartbeat GCS, запускает GCS failsafe (если включён); companion, переставший слышать автопилот, обязан прекратить выдавать уставки. Правило: начинать любые адресные команды только после первого heartbeat от адресата.
 
 ### Команды: COMMAND_LONG, COMMAND_INT и ACK
-`COMMAND_LONG` (76): `target_system`, `target_component`, `command` (MAV_CMD), `confirmation`, семь float-параметров. `COMMAND_INT` (75): то же, но параметры 5–6 — целые `x`, `y` (широта/долгота × 10⁷ без потери точности float) и есть поле `frame`; для команд с координатами предпочтителен он. Ответ — `COMMAND_ACK` (77) с `result`:
+`COMMAND_LONG` (76): `target_system`, `target_component`, `command` (MAV_CMD), `confirmation`, семь float-параметров. `COMMAND_INT` (75): та же адресация и param1–4, но без поля `confirmation` (вместо него `current`/`autocontinue`, не используются); параметры 5–6 — целые `x`, `y` (широта/долгота × 10⁷ без потери точности float) и есть поле `frame`; для команд с координатами предпочтителен он. Ответ — `COMMAND_ACK` (77) с `result`:
 
 | result | Значение | Что делать клиенту |
 |---|---|---|
@@ -62,7 +62,7 @@ MAVLink — это не набор сообщений, а набор **диал�
 
 `mission_type`: 0 — маршрут, 1 — геозона (fence), 2 — точки сбора (rally), 255 — все (для очистки `MISSION_CLEAR_ALL`). Пункт 0 в ArduPilot — домашняя точка; загрузка с пункта 1 в Mission Planner — это интерфейс, а на проводе home всё равно seq 0. Устаревшие `MISSION_ITEM` (39) и `MISSION_REQUEST` (40) с float-координатами избегайте: точность float на широте ~ метр.
 
-Во время полёта: `MISSION_CURRENT` (42) — текущий пункт, `MISSION_ITEM_REACHED` (46) — достигнут, `MISSION_SET_CURRENT` или `MAV_CMD_DO_SET_MISSION_CURRENT` — перейти. Частичное обновление: `MISSION_WRITE_PARTIAL_LIST` (38) с диапазоном индексов — поддерживается не везде, надёжнее перезалить целиком и проверить скачиванием.
+Во время полёта: `MISSION_CURRENT` (42) — текущий пункт, `MISSION_ITEM_REACHED` (46) — достигнут, `MAV_CMD_DO_SET_MISSION_CURRENT` (224) — перейти (сообщение `MISSION_SET_CURRENT` (41) устарело с 2022 г. и заменено этой командой). Частичное обновление: `MISSION_WRITE_PARTIAL_LIST` (38) с диапазоном индексов — поддерживается не везде, надёжнее перезалить целиком и проверить скачиванием.
 
 {{diagram:mavlink-mission-seq|Загрузка миссии: аппарат запрашивает пункты по одному и сам повторяет запрос при потере; завершает MISSION_ACK.}}
 
