@@ -433,7 +433,7 @@ def build4(D: dict, arch) -> None:
          ("dev", "st", "", False, "v")],
         notes=[(10, 196, "Одна точка управления: manager решает, чья команда главная (primary control)", "m t")], height=210)
     D["esc-firmware-choice"] = tree("Какая прошивка ESC: по микроконтроллеру", Node("r", ["Что стоит", "на ESC?"], [
-        ("8-бит EFM8/BB", Node("bs", ["BLHeli_S → Bluejay", "bidir DShot, EDT"], leaf=True, accent=True)),
+        ("8-бит BB21/BB51", Node("bs", ["BLHeli_S → Bluejay", "bidir DShot, EDT"], leaf=True, accent=True)),
         ("32-бит ARM", Node("am", ["AM32", "если есть таргет"], leaf=True, accent=True)),
         ("BLHeli_32", Node("b32", ["работает — оставить", "развитие прекращено"], leaf=True)),
         ("нет таргета", Node("no", ["родная прошивка", "не прошивать наугад"], leaf=True)),

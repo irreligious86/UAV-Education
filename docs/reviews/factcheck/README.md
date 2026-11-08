@@ -51,3 +51,11 @@ next pass:
 - f-motors-esc: the 2207-vs-2306 torque claim replaced with a neutral statement (compare thrust tables).
 - tools-overview: Betaflight SITL is `make TARGET=SITL`.
 - comp-esp32: the code now parses the documented `S,<mode>,<armed>,…` line; duplicate diagnostic removed.
+
+## Stage 4 new modules (iteration 3)
+
+`stage4-new-modules.md`: el-dronecan, link-digital-video, payload-gimbal, f-esc-firmware, ap-plane-tuning,
+f-remote-id-security and their quizzes, checked by an independent agent against ArduPilot master/4.7,
+PX4 main, pymavlink, MAVProxy, mavlink-devguide, Bluejay/AM32 sources. 4 findings (1 error, 1 outdated,
+2 imprecise), all applied; quizzes clean. Not verified (fetch blocked): FAA Remote ID page, OpenIPC and
+wfb-ng repository links — the weekly external link check covers them.

@@ -86,9 +86,13 @@ Still to do:
 |---|---|---|---|
 | 1 ✅ | Chart toolkit | `scripts/diagrams/plot.py`: static SVG line/polar/log plots from computed data, same theme as diagrams; 12 charts: thrust & current vs throttle, LiPo/Li-Ion discharge under load, PT1/biquad/notch response, gyro spectrum with harmonics, dipole/patch patterns, link margin vs distance, Kalman gain/covariance, overshoot vs ζ, step responses, GSD vs altitude, glass-to-glass latency stack, aliasing | charts in the 12 modules they belong to, checked at phone width |
 | 2 ✅ | Deepen the thinnest modules — done: est-kalman, el-wiring, el-emi, rf-antennas, ctl-signals, px4-companion-jetson (rewritten for Orin), inav-missions, inav-ipf, inav-intro, ap-companion, eng-ci-configs, eng-systems, per-cv, per-camera, px4-ros2; every added code sample was run or compiled. Left for later passes: comp-raspberry, per-tracking, ap-sitl (Alex runs SITL locally) | worked example, numbers, runnable code in each |
-| 3 | New modules, wave 1 | DroneCAN, digital FPV video, gimbals and payloads, ESC firmware, ArduPlane tuning, Remote ID and security | each with quiz, diagram, references, curriculum entry, fact-checked by an independent agent |
-| 4 | New modules, wave 2 | Gazebo simulation, system identification, guidance and trajectories, long-range telemetry radios, weather and planning, maintenance and reliability, multi-vehicle ops, hardware design (KiCad) | same bar as wave 1 |
+| 3 ✅ | New modules, wave 1 — done: el-dronecan, link-digital-video, payload-gimbal, f-esc-firmware, ap-plane-tuning, f-remote-id-security; fact-check `docs/reviews/factcheck/stage4-new-modules.md` (4 findings applied) | DroneCAN, digital FPV video, gimbals and payloads, ESC firmware, ArduPlane tuning, Remote ID and security | each with quiz, diagram, references, curriculum entry, fact-checked by an independent agent |
+| 4 ◐ | New modules, wave 2 — done: ops-weather, ops-maintenance, link-telemetry-radios, mav-multi-vehicle, ctl-guidance; left: system identification, Gazebo, KiCad | Gazebo simulation, system identification, guidance and trajectories, long-range telemetry radios, weather and planning, maintenance and reliability, multi-vehicle ops, hardware design (KiCad) | same bar as wave 1 |
 | 5 | Widgets | Kalman 1D, antenna polarization/pattern, GSD and overlap calculator, RPM harmonics vs filter, FSPL vs distance | each widget used in at least one module, works offline |
 | 6 | ROS 2 Jazzy-first pass and remaining link items | | link check clean, Jazzy commands first everywhere |
 
 SITL in CI stays postponed (Stage 3, iteration 3): Alex runs SITL locally.
+
+Curriculum consistency found while adding modules (pre-existing, to fix): prerequisites placed later in the track
+order — f-aero-props ← f-power/f-motors-esc, emb-basics ← comp-esp32, mav-routing ← comp-raspberry,
+mav-component ← comp-esp32, fw-reading ← bf-custom.

@@ -85,7 +85,7 @@ m = mavutil.mavlink_connection("udpin:0.0.0.0:14551"); m.wait_heartbeat()
 m.set_mode("GUIDED")                       # без подписи
 print(m.recv_match(type="COMMAND_ACK", blocking=True, timeout=3))
 ```
-Подключение скрипта — через `--out udp:127.0.0.1:14551` у MAVProxy или отдельный порт SITL. Если команда проходит через MAVProxy (он подписывает за всех), подключите скрипт к порту SITL напрямую (`tcp:127.0.0.1:5763`, SERIAL2). Записать: принят ли режим без ключа, затем — с ключом:
+Подключение скрипта — через `--out udp:127.0.0.1:14551` у MAVProxy или отдельный порт SITL. Если команда проходит через MAVProxy, это ожидаемо: MAVProxy подключён к SERIAL0 SITL (`tcp:127.0.0.1:5760`), а канал 0 ArduPilot считает защищённым (как USB) и принимает неподписанные пакеты, — подключите скрипт к порту SITL напрямую (`tcp:127.0.0.1:5763`, SERIAL2). Записать: принят ли режим без ключа, затем — с ключом:
 ```python
 import hashlib
 key = hashlib.sha256(b"mysecretphrase").digest()   # MAVProxy делает ключ так же
