@@ -84,10 +84,10 @@ Priority: a well-structured learning program.
 - [x] Grading model: module score (quiz 40 / lab 60), earned vs self-marked status, group scores, capstone status
 - [x] `pages/progress.html`: transcript with per-module quiz/lab/score/status, export/import/reset
 
-## Content status (2026-11-08)
+## Content status (2026-11-08, evening)
 
-**All 44 modules written** (34 core + 5 INAV + 5 PX4), 44 quizzes, labs with criteria on every module, 5 capstones.
-Remaining content work is review and depth, not gaps: see Phase C (owner review, first student).
+**Course Plan v3 phases 1–7 complete: all 84 modules written** (8 tracks in 4 stages + INAV/PX4 electives), 84 quizzes, labs with criteria on every module, 8 capstones with good/bad rubrics and an engineering-folder deliverable, 116 glossary terms, 47 formulas, 6 interactive widgets, starter repositories in `examples/`. Every pre-v3 module went through a depth pass (mechanisms, numbers, worked examples, extended diagnostics, source-verified parameter names).
+Remaining content work: owner review and first-student feedback (Phase C).
 
 ## Phase 3 — Interactivity
 

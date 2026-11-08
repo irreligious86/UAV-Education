@@ -15,7 +15,11 @@
 | **Глоссарий** | `data/glossary.json` — термин, определение, модуль; страница генерируется |
 | **Журнал фейлов** | генерируется из секций «Диагностика» всех модулей |
 | **Квизы** | `content/quiz/<id>.json` — 5+ вопросов, `answer` = индекс верного, `explain` обязателен; validator проверяет |
-| **Пути по прошивкам** | `data/curriculum.json` → `paths` (этапы и порядок модулей); страницы `path/<id>.html` |
+| **Пути по прошивкам** | `data/curriculum.json` → `paths` (этапы и порядок модулей); страницы `path/<id>.html`; независимый прогресс и «Продолжить» для каждого пути |
+| **План курса v3** | `docs/COURSE-PLAN.md` — ступени, треки, принципы, фазы; внешние разборы в `docs/reviews/` |
+| **Формулы и CLI** | `data/formulas.json` → `pages/formulas.html` |
+| **Виджеты** | `assets/widgets/*.js` — `{{widget:name}}` в Markdown (pid-sim, filter-response, elrs-calc, tw-calc, wire-drop, link-latency) |
+| **Стартовые репозитории** | `examples/` — SITL + pymavlink (полёт, тест failsafe, CI), скелет ROS 2 |
 | **Оценки** | `assets/grading.js` + `api/v1/grading.json`; ведомость `pages/progress.html` (см. ARCHITECTURE.md) |
 | **Поиск** | `pages/search.html` по `api/v1/search.json` (генерируется) |
 | **Архитектура** | `ARCHITECTURE.md` — слои, контракты, переезд на свой сервер |

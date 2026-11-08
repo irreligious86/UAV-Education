@@ -1,6 +1,6 @@
 # Course Plan v3 — "From zero to a top UAV engineer"
 
-Status: adopted 2026-11-08. Supersedes the track list in ROADMAP.md.
+Status: adopted 2026-11-08; phases 1–7 completed 2026-11-08 (see git history). Supersedes the track list in ROADMAP.md.
 Inputs: two external reviews (`docs/reviews/`), owner requirements
 (independent parallel firmware paths, deeper grading, serious depth).
 
@@ -93,12 +93,12 @@ Sections: summary · theory · practice (ends with "Лабораторная") �
 
 | Phase | Scope | Exit criterion |
 |---|---|---|
-| 1 Structure | curriculum v3 (tracks reordered, 11 new planned modules, rubrics, engineering-folder deliverables), "ready only" filter, rubric rendering, fails restructure, formulas page, issue template | site rebuilt, CI green |
-| 2 Stage A | f-mechanics, f-electricity-101, f-components-choice, eng-method-101, ops-case-studies, diag-troubleshooting; widgets tw-calc, wire-drop | Track 0 and 1 100% written |
-| 3 Stage B | el-battery-packs, el-peripherals, el-redundancy, data-python, ctl-signals, ctl-theory; widget link-latency | Tracks 2, 3 100% written |
-| 4 Stage C | est-sensors, est-attitude, est-kalman, est-gnss, est-alt-sources, nav-resilience, aero-wing, ap-tuning, ap-safety-fs | Tracks 4, 5 100% written |
-| 5 Stage D | emb-basics, emb-protocols, fw-reading, eng-ci-configs, eng-systems, `examples/` starters | Track 6 100% written |
-| 6 Specialisation | per-camera, per-cv, per-visual-nav, per-tracking | Track 7 written |
-| 7 Depth pass | every pre-v3 module deepened: mechanisms, worked numbers, extended diagnostics, source re-verification | owner review |
+| ✅ 1 Structure | curriculum v3 (tracks reordered, 11 new planned modules, rubrics, engineering-folder deliverables), "ready only" filter, rubric rendering, fails restructure, formulas page, issue template | site rebuilt, CI green |
+| ✅ 2 Stage A | f-mechanics, f-electricity-101, f-components-choice, eng-method-101, ops-case-studies, diag-troubleshooting; widgets tw-calc, wire-drop | Track 0 and 1 100% written |
+| ✅ 3 Stage B | el-battery-packs, el-peripherals, el-redundancy, data-python, ctl-signals, ctl-theory; widget link-latency | Tracks 2, 3 100% written |
+| ✅ 4 Stage C | est-sensors, est-attitude, est-kalman, est-gnss, est-alt-sources, nav-resilience, aero-wing, ap-tuning, ap-safety-fs | Tracks 4, 5 100% written |
+| ✅ 5 Stage D | emb-basics, emb-protocols, fw-reading, eng-ci-configs, eng-systems, `examples/` starters | Track 6 100% written |
+| ✅ 6 Specialisation | per-camera, per-cv, per-visual-nav, per-tracking | Track 7 written |
+| ✅ 7 Depth pass | every pre-v3 module deepened: mechanisms, worked numbers, extended diagnostics, source re-verification | owner review |
 
 Later (unchanged from ROADMAP): PWA/offline, progress server, SITL labs with automatic log checks.
