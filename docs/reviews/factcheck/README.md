@@ -59,3 +59,12 @@ f-remote-id-security and their quizzes, checked by an independent agent against 
 PX4 main, pymavlink, MAVProxy, mavlink-devguide, Bluejay/AM32 sources. 4 findings (1 error, 1 outdated,
 2 imprecise), all applied; quizzes clean. Not verified (fetch blocked): FAA Remote ID page, OpenIPC and
 wfb-ng repository links — the weekly external link check covers them.
+
+## Stage 4 wave 2 (iteration 4)
+
+`stage4-wave2.md`: ops-weather, ops-maintenance, link-telemetry-radios, mav-multi-vehicle, ctl-guidance,
+ctl-sysid, tools-gazebo, el-kicad and quizzes. 14 findings (4 errors, 2 outdated, 8 imprecise), all applied:
+RADIO_STATUS.txbuf is free buffer space (also fixed in mav-routing), 4.7 stream rates `MAVn_*`, `--mcast`
+for multi-vehicle SITL, L1 gain 4ζ², 4.7 `WP_SPD/WP_ACC/WP_JERK` units, SYSID input is `RATE.ROut` and the
+entry conditions, Betaflight 2025.12 CHIRP mode, Gazebo camera streaming plugin. All code samples ran and
+printed what the modules say. Several non-GitHub reference pages could not be fetched (weekly link check).

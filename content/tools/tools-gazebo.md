@@ -54,7 +54,7 @@ SITL без внешнего симулятора считает физику п
 ### Датчики и мост в ROS 2
 - Камеры, камеры глубины, лидары (`gpu_lidar`), IMU — элементы `sensor` в модели; публикуют в шину Gazebo (gz-transport), список — `gz topic -l`.
 - **ros_gz_bridge** переносит топики между Gazebo и ROS 2: `ros2 run ros_gz_bridge parameter_bridge /camera@sensor_msgs/msg/Image@gz.msgs.Image` — имя топика, тип ROS 2, тип Gazebo; `@` — в обе стороны, `[` — из Gazebo в ROS, `]` — из ROS в Gazebo.
-- Плагин ArduPilot умеет отдавать видео с камеры по GStreamer (UDP 5600) — как настоящая камера на companion; пример мира с подвесом — `gimbal.sdf`, подвес управляется каналами RC6–RC8.
+- Отдельный плагин `GstCameraPlugin` из `ardupilot_gazebo` отдаёт видео с камеры по GStreamer (H.264, UDP 5600) — как настоящая камера на companion; поток включается сообщением в топик `.../enable_streaming`. Пример мира с подвесом и камерой — `gimbal.sdf`; подвес Iris в `iris_runway.sdf` (SITL с `gazebo-iris-gimbal.parm`) управляется каналами RC6–RC8.
 - Реализм: идеальная камера без шума и размытия обманывает — алгоритмы зрения стоит проверять с шумом, сменой освещения и размытием движения (параметры шума в описании датчика).
 
 ### Скорость и ресурсы

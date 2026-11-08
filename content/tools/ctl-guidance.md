@@ -41,7 +41,7 @@ a = V²·κ = 2·V²·sin α / L.
 {{diagram:chart-pure-pursuit|Pure pursuit с 20 м сбоку при 10 м/с: малое упреждение даёт перелёт, большое — долгий выход на линию.}}
 
 ### L1 в ArduPlane и NPFG в PX4
-L1 — тот же закон бокового ускорения, но дальность упреждения растёт со скоростью, чтобы динамика выхода на линию не зависела от скорости:
+L1 — тот же закон бокового ускорения (в ArduPilot с коэффициентом 4ζ² вместо 2: a = 4ζ²·V²·sin η / L1, при ζ = 0.707 — ровно pure pursuit), но дальность упреждения растёт со скоростью, чтобы динамика выхода на линию не зависела от скорости:
 L1 = (1/π)·ζ·T·V, где T = `NAVL1_PERIOD`, ζ = `NAVL1_DAMPING`, V — путевая скорость.
 - Пример: V = 18 м/с, T = 17 с, ζ = 0.75 → L1 ≈ 0.318·0.75·17·18 ≈ 73 м.
 - Уменьшение `NAVL1_PERIOD` укорачивает L1 — резче повороты, риск вилять (настройка — в модуле «Тюнинг ArduPlane»).
@@ -52,7 +52,7 @@ L1 = (1/π)·ζ·T·V, где T = `NAVL1_PERIOD`, ζ = `NAVL1_DAMPING`, V — п
 ### Профили скорости: трапеция и S-кривая
 - **Трапеция**: разгон с постоянным ускорением, крейсер, торможение. Ускорение меняется скачком — рывок (производная ускорения) бесконечен. Для коптера скачок ускорения = скачок наклона: дёрганье, раскачка груза и камеры, перерегулирование.
 - **S-кривая** (jerk-limited): ускорение нарастает с ограниченным рывком. Перемещение на 50 м при v ≤ 10 м/с, a ≤ 5 м/с², рывок ≤ 10 м/с³: трапеция — 7.0 с, S-кривая — 7.5 с (+0.5 с за время нарастания ускорения), но без скачков.
-- **ArduCopter** (с 4.1) строит путь по точкам S-кривыми: скорость, ускорение и рывок задаются параметрами навигации (`WPNAV_SPEED`, `WPNAV_ACCEL`, `WPNAV_JERK`; в Copter 4.7 — семейство `WP_*` в м/с), углы маршрута скругляются с радиусом `WPNAV_RADIUS` (4.7 — `WP_RADIUS_M`).
+- **ArduCopter** (с 4.1) строит путь по точкам S-кривыми: скорость, ускорение и рывок задаются параметрами навигации (`WPNAV_SPEED`, см/с; `WPNAV_ACCEL`, см/с²; `WPNAV_JERK`, м/с³; в Copter 4.7 — `WP_SPD`, м/с; `WP_ACC`, м/с²; `WP_JERK`, м/с³), углы маршрута скругляются с радиусом `WPNAV_RADIUS` (4.7 — `WP_RADIUS_M`).
 
 {{diagram:chart-scurve|Ускорение при перемещении на 50 м: трапеция переключает ускорение скачком, S-кривая — с ограниченным рывком, ценой 0.5 с.}}
 
@@ -129,7 +129,7 @@ ArduCopter SITL, квадратная миссия 50×50 м. Два прого�
 - ArduPilot — AP_L1_Control (source) | https://github.com/ArduPilot/ardupilot/blob/master/libraries/AP_L1_Control/AP_L1_Control.cpp | primary | A
 - Mellinger, Kumar — Minimum snap trajectory generation and control for quadrotors (ICRA 2011) | https://doi.org/10.1109/ICRA.2011.5980409 | primary | A
 - ArduPilot — SCurves (source) | https://github.com/ArduPilot/ardupilot/blob/master/libraries/AP_Math/SCurve.cpp | primary | A
-- PX4 — Fixed-wing path following (NPFG) | https://docs.px4.io/main/en/flight_stack/controller_diagrams.html | primary | B
+- PX4 — Fixed-wing position tuning (NPFG) | https://docs.px4.io/main/en/config_fw/position_tuning_guide_fixedwing.html | primary | B
 
 ## checklist
 - Различаю путь, траекторию и наведение; следование пути и слежение за траекторией
