@@ -92,7 +92,7 @@ Remaining content work: owner review and first-student feedback (Phase C).
 ## Phase 3 — Interactivity
 
 - [x] Widgets as standalone Web Components: `uav-pid-sim` (PID modules), `uav-filter-response` (filters), `uav-elrs-calc` (ELRS); `{{widget:name}}` in Markdown; JS syntax check in CI
-- [ ] 3D attitude demo (three.js)
+- [x] 3D attitude demo: `<uav-attitude-3d>` (pure canvas, Euler ↔ quaternion ↔ matrix, gimbal-lock preset) in the attitude module (2026-11-08)
 
 ## Phase 4 — Lab track
 

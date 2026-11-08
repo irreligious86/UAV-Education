@@ -16,6 +16,8 @@
   <script src="../assets/app.js" defer></script>
   <script src="../assets/uav-quiz.js" defer></script>
   <script src="../assets/offline.js" defer></script>
+  <script src="../assets/widgets/plot.js" defer></script>
+  <script src="../assets/widgets/attitude-3d.js" defer></script>
 </head>
 <body class="gc-root" data-base="../">
   <header class="site-header">
@@ -44,6 +46,7 @@
 <h4 class="md-subheading">Представления ориентации</h4>
 <ul><li><strong>Углы Эйлера</strong> (roll φ, pitch θ, yaw ψ) — удобны человеку. Проблема: при θ = ±90° roll и yaw сливаются (<strong>gimbal lock</strong>), и уравнения для скоростей изменения углов содержат деление на cos θ. Для фристайла с петлями — неприемлемо. Используются только для вывода (<code>ATT.Roll/Pitch/Yaw</code>).</li><li><strong>Матрица поворота (DCM)</strong> — 3×3, столбцы — оси аппарата в земной системе. Без особых точек, но 9 чисел с 6 связями; нужна ортонормализация после интегрирования.</li><li><strong>Кватернион</strong> q = (w, x, y, z), |q| = 1 — 4 числа, одна связь, без особых точек, дешёвое умножение. Стандарт в Betaflight (с 3.x), INAV, PX4 (<code>vehicle_attitude.q</code>), EKF3 (состояния 0–3).</li></ul>
 <p>Переход кватернион → Эйлер (для вывода): φ = atan2(2(wx + yz), 1 − 2(x² + y²)); θ = asin(2(wy − zx)); ψ = atan2(2(wz + xy), 1 − 2(y² + z²)).</p>
+<uav-attitude-3d class="widget"></uav-attitude-3d>
 <h4 class="md-subheading">Интегрирование гироскопа</h4>
 <p>Угловая скорость ω (в осях аппарата) меняет кватернион: q̇ = ½ · q ⊗ (0, ω). Дискретно за шаг Δt: q ← q ⊗ (cos(|ω|Δt/2), ω/|ω| · sin(|ω|Δt/2)), затем нормировать. Только гироскоп → дрейф со скоростью bias (0.05 °/с → 3°/мин) плюс накопление шума.</p>
 <h4 class="md-subheading">Комплементарный фильтр</h4>
