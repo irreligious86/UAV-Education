@@ -124,7 +124,20 @@ print(dt.mean(), dt.std(), np.percentile(dt, 99.9))</code></pre>
 <h4 class="md-subheading">Шаг 3. Метрики</h4>
 <p><code>step_metrics</code> и <code>bounce_back</code> на roll: таблица шагов с overshoot и settle, медиана bounce-back. Сравнить с ориентирами.</p>
 <h4 class="md-subheading">Шаг 4. Пакет</h4>
-<p>Сложить функции в <code>uavlog.py</code> (read_bf, read_ap, spectrum, step_metrics, bounce_back) с docstring; второй лог прогоняется в три строки. Лабораторная: DataFrame, Welch, функция bounce-back проверена на двух логах.</p>
+<p>Сложить функции в <code>uavlog.py</code> (read_bf, read_ap, spectrum, step_metrics, bounce_back) с docstring; второй лог прогоняется в три строки.</p>
+<h4 class="md-subheading">Проверка на синтетике до своего лога</h4>
+<p>Прежде чем верить спектру своего лога, проверь функцию на сигнале с известным ответом: синус 210 Гц плюс шум должен дать пик ровно там.</p>
+<pre class="cli-block"><code>import numpy as np
+from scipy.signal import welch
+
+fs = 2000.0                                     # 8 kHz loop, blackbox 1/4
+t = np.arange(0, 10, 1 / fs)
+x = 5 * np.sin(2 * np.pi * 210 * t) + np.random.default_rng(0).normal(0, 1, t.size)
+f, p = welch(x, fs=fs, nperseg=int(fs))        # 1 s windows -&gt; 1 Hz resolution
+print(f&quot;peak at {f[np.argmax(p)]:.0f} Hz&quot;)      # expect 210</code></pre>
+<h4 class="md-subheading">Что должно получиться и что записать</h4>
+<ul><li><strong>Шаг 1.</strong> <code>fs</code> считается по временным меткам лога, а не берётся из настроек: у Betaflight это частота цикла, делённая на делитель записи Blackbox (8 кГц / 4 = 2 кГц), у ArduPilot — частота сообщения, которое читаешь. Ошибка в <code>fs</code> сдвигает все частоты спектра в то же число раз.</li><li><strong>Шаг 2.</strong> Разрешение по частоте равно <code>fs / nperseg</code>. Пики моторов 5&quot; на висении обычно лежат в сотнях герц, и их гармоники видны на кратных частотах. Подпиши частоты пиков и сравни с оборотами моторов из модуля про RPM-фильтр, если bidir DShot включён.</li><li><strong>Шаг 3.</strong> Ориентиры для 5&quot; из теории: overshoot 5–15 % — хорошо, bounce-back меньше 10 % — хорошо, больше 25 % — много D или плохая механика. Запиши медиану по 10–20 шагам, а не лучший шаг.</li><li><strong>Шаг 4.</strong> Второй лог прогоняется тремя строками: <code>read_*</code>, <code>spectrum</code>, <code>bounce_back</code>. Если нужно что-то править руками, функция ещё не готова.</li></ul>
+<p>Лабораторная засчитывается, когда лог прочитан в DataFrame с посчитанной <code>fs</code>, спектр Уэлча построен по трём осям с подписанными пиками и проверен на синтетике, функция bounce-back дала медиану на двух логах и сравнена с ориентирами.</p>
 
 <h2>Диагностика</h2>
 <div class="diag-groups"><article class="diag-item"><h4><strong>Симптом:</strong> спектры двух логов нельзя сравнить</h4><ul><li>Возможная причина: разные fs или nperseg, разные режимы полёта.</li><li>Что сделать: одинаковые параметры, один и тот же режим (висение).</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> step_metrics пустой</h4><ul><li>Возможная причина: в логе нет резких движений стиков или порог не под fs.</li><li>Что сделать: полёт с резкими остановками стика, порог подобрать по гистограмме d setpoint.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> пики спектра размазаны</h4><ul><li>Возможная причина: обороты менялись внутри окна.</li><li>Что сделать: ровный участок, спектрограмма вместо Welch.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> pymavlink читает очень долго</h4><ul><li>Возможная причина: лог в сотни МБ, чтение в Python по сообщению.</li><li>Что сделать: фильтр <code>type=[...]</code>, <code>mavlogdump.py --format csv</code> для разовой выгрузки.</li></ul></article></div>
