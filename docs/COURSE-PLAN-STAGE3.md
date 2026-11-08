@@ -66,8 +66,8 @@ bf-rpm-filter (harmonic frequencies from eRPM), per-cv (precision/recall from co
 
 | # | Iteration | Size |
 |---|---|---|
-| 1 | fact-check pass + link checker | large (103 modules) |
-| 2 | lab-result schema and import | medium |
+| 1 ✅ | fact-check pass + link checker: 2204 claims checked, 254 findings applied (125 errors), see `docs/reviews/factcheck/`; weekly `links.yml`, 18 dead links replaced | large (103 modules) |
+| 2 ✅ | lab-result schema and import (`docs/LAB-RESULTS.md`), two graders, progress page import with ⚙ marks | medium |
 | 3 | nightly SITL and Docker workflows | medium, needs CI minutes |
 | 4 | ~11 modules of new tasks | medium |
 | 5 | rubrics and checkpoints for 12 projects | medium |
