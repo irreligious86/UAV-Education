@@ -45,6 +45,12 @@ def main() -> int:
     for md in (ROOT / "content").rglob("*.md"):
         for m in TAG.finditer(md.read_text(encoding="utf-8")):
             used.setdefault(m.group(1), []).append(str(md.relative_to(ROOT)))
+    proj = ROOT / "data" / "projects.json"
+    if proj.is_file():
+        import json
+        for pr in json.loads(proj.read_text(encoding="utf-8")).get("projects", []):
+            if pr.get("diagram"):
+                used.setdefault(pr["diagram"], []).append("data/projects.json")
     names = {f.stem for f in files}
     for n, where in sorted(used.items()):
         if n not in names:

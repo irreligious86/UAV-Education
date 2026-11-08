@@ -1,0 +1,520 @@
+{
+ "version": 1,
+ "projects": [
+  {
+   "id": "proj-web-gcs",
+   "num": 1,
+   "title": "Веб-GCS: телеметрия, карта, режимы",
+   "capstoneFor": "engineer",
+   "level": "L3",
+   "hours": 30,
+   "summary": "Наземная станция в браузере: бэкенд читает MAVLink и раздаёт телеметрию по WebSocket, фронтенд рисует аппарат на карте, показывает режим, батарею и STATUSTEXT, умеет армить и менять режим с подтверждением.",
+   "stack": [
+    "Python 3, pymavlink, asyncio",
+    "WebSocket (websockets)",
+    "JS, Leaflet, без фреймворка",
+    "ArduPilot SITL"
+   ],
+   "starter": "examples/web-gcs",
+   "status": "starter",
+   "diagram": "proj-web-gcs",
+   "milestones": [
+    "Мост MAVLink → JSON по WebSocket: HEARTBEAT, GLOBAL_POSITION_INT, ATTITUDE, SYS_STATUS, STATUSTEXT",
+    "Страница с картой и маркером аппарата, режим и батарея на панели",
+    "Команды из браузера: arm/disarm и смена режима через COMMAND_LONG с ожиданием ACK, ответ в UI",
+    "Устойчивость: потеря связи видна за 3 с (heartbeat timeout), переподключение без перезагрузки страницы",
+    "Запись сессии в tlog и воспроизведение её в том же UI"
+   ],
+   "acceptance": [
+    "Тесты моста (pytest) проходят на фейковом аппарате, включая потерю пакетов",
+    "Задержка телеметрии в UI ≤ 300 мс на localhost (замер в отчёте)",
+    "Команда без ACK не показывается пользователю как выполненная",
+    "Потеря и восстановление связи отображаются без перезагрузки",
+    "Есть README: запуск с SITL одной командой, скриншот, архитектура",
+    "Код бэкенда и фронтенда разделён, протокол WebSocket описан в docs/"
+   ],
+   "autotest": "pytest examples/web-gcs/tests: разбор сообщений в JSON, команды с ACK, таймаут heartbeat",
+   "deliverables": [
+    "Репозиторий с backend/, web/, docs/protocol.md",
+    "Видео или GIF: полёт миссии в SITL в вашем UI",
+    "Отчёт: замер задержки, что сделано для устойчивости"
+   ],
+   "modules": [
+    "mav-protocol",
+    "mav-services",
+    "mav-routing",
+    "mav-sdk",
+    "comp-raspberry",
+    "ap-sitl"
+   ]
+  },
+  {
+   "id": "proj-fleet-telemetry",
+   "num": 2,
+   "title": "Телеметрия флота в облако + дашборд",
+   "capstoneFor": "engineer",
+   "level": "L3",
+   "hours": 35,
+   "summary": "Каждый аппарат через companion публикует сжатую телеметрию в MQTT; сервис складывает её во временную БД, Grafana показывает флот, алерты срабатывают на батарею, потерю связи и EKF.",
+   "stack": [
+    "MQTT (Mosquitto)",
+    "Python-ingest",
+    "InfluxDB или TimescaleDB",
+    "Grafana",
+    "Docker Compose"
+   ],
+   "starter": null,
+   "status": "planned",
+   "diagram": "proj-fleet-telemetry",
+   "milestones": [
+    "Схема топиков и формат сообщений (JSON/CBOR), версия в каждом сообщении",
+    "Publisher на companion: 1–5 Гц, буфер на время потери сети",
+    "Ingest в БД с проверкой схемы и меткой аппарата",
+    "Дашборд флота: карта, батарея, режимы, связь",
+    "Алерты: батарея, нет данных > 10 с, EKF failsafe"
+   ],
+   "acceptance": [
+    "Ingest-тест: 3 фейковых аппарата × 10 мин без потерь записей",
+    "Потеря сети на 60 с не теряет данные (буфер досылает)",
+    "Схема сообщений версионирована, старые клиенты не ломают ingest",
+    "Дашборд и алерты развёртываются одной командой docker compose up",
+    "Описаны объёмы трафика на аппарат в час"
+   ],
+   "autotest": "ingest-тест на сгенерированных потоках с разрывами",
+   "deliverables": [
+    "docker-compose.yml, publisher, ingest, дашборд в JSON",
+    "Отчёт: трафик, задержка, поведение при разрывах"
+   ],
+   "modules": [
+    "mav-routing",
+    "mav-sdk",
+    "comp-raspberry",
+    "nav-resilience",
+    "eng-systems"
+   ]
+  },
+  {
+   "id": "proj-log-service",
+   "num": 3,
+   "title": "Сервис анализа логов",
+   "capstoneFor": "integrator",
+   "level": "L3",
+   "hours": 25,
+   "summary": "Из лога полёта — отчёт с находками: вибрации и клиппинг, просадка и внутреннее сопротивление АКБ, ошибки, GPS, ошибка слежения по углам. Каждая находка с порогом и объяснением, отчёт — один HTML-файл.",
+   "stack": [
+    "Python, pymavlink",
+    "blackbox_decode (Betaflight)",
+    "matplotlib → встроенные SVG/PNG",
+    "pytest на синтетических логах"
+   ],
+   "starter": "examples/log-report",
+   "status": "starter",
+   "diagram": "proj-log-service",
+   "milestones": [
+    "Разбор DataFlash: VIBE, BAT, ERR, GPS, ATT, MODE, MSG",
+    "Проверки с порогами и severity, JSON-вывод",
+    "HTML-отчёт с графиками и таймлайном режимов",
+    "Вход Betaflight Blackbox через blackbox_decode",
+    "Проверки EKF (XKF4) и регрессия на собственных логах"
+   ],
+   "acceptance": [
+    "Тесты на синтетических логах с известными дефектами проходят",
+    "Код возврата ≠ 0 при любой находке уровня FAIL (годится для CI)",
+    "Каждая находка содержит значение, порог и что с этим делать",
+    "Отчёт открывается без интернета",
+    "Проверено минимум на 3 своих реальных логах, выводы совпадают с ручным разбором"
+   ],
+   "autotest": "pytest examples/log-report/tests (5 тестов на синтетических логах)",
+   "deliverables": [
+    "Инструмент + README",
+    "Три отчёта по своим логам и сравнение с ручным разбором"
+   ],
+   "modules": [
+    "ap-logs",
+    "bf-blackbox",
+    "data-python",
+    "diag-troubleshooting",
+    "ap-tuning"
+   ]
+  },
+  {
+   "id": "proj-detect-follow",
+   "num": 4,
+   "title": "Детектор + трекер + следование в Gazebo",
+   "capstoneFor": "perception",
+   "level": "L4",
+   "hours": 45,
+   "summary": "Камера в симуляторе → детектор (YOLO-nano или цветовой) → трекер → регулятор, который держит цель в центре кадра и на заданной дистанции через скоростные setpoint'ы в Offboard/GUIDED.",
+   "stack": [
+    "ROS 2 Humble",
+    "Gazebo + PX4 или ArduPilot SITL",
+    "OpenCV, ONNX Runtime",
+    "examples/ros2-docker"
+   ],
+   "starter": null,
+   "status": "planned",
+   "diagram": "proj-detect-follow",
+   "milestones": [
+    "Поток камеры из Gazebo в ROS 2, замер FPS",
+    "Детектор с метриками на записанном bag",
+    "Трекер с ID и предсказанием при пропусках",
+    "Регулятор следования, ограничения скорости и сторожевой таймер",
+    "Сценарий в симуляторе с движущейся целью и потерей цели"
+   ],
+   "acceptance": [
+    "Задержка камера → команда измерена и ≤ 150 мс",
+    "При потере цели > 1 с аппарат зависает, а не продолжает движение",
+    "Скорости ограничены, Offboard-таймаут не срабатывает в норме",
+    "Тест на bag: детектор находит цель в ≥ 90 % кадров",
+    "Видео: следование 2 минуты без потери"
+   ],
+   "autotest": "тест регулятора как чистой функции + прогон на записанном bag",
+   "deliverables": [
+    "ROS 2 пакет, launch, README",
+    "Видео и график ошибки положения цели в кадре"
+   ],
+   "modules": [
+    "per-camera",
+    "per-cv",
+    "per-tracking",
+    "ros2-px4",
+    "ros2-app-arch"
+   ]
+  },
+  {
+   "id": "proj-precision-landing",
+   "num": 5,
+   "title": "Точная посадка на маркер в симуляции",
+   "capstoneFor": "perception",
+   "level": "L4",
+   "hours": 35,
+   "summary": "ArUco-маркер на площадке, камера вниз, оценка позы маркера, LANDING_TARGET в автопилот (или управление скоростью), посадка с ошибкой меньше 15 см.",
+   "stack": [
+    "OpenCV ArUco",
+    "MAVLink LANDING_TARGET или ROS 2",
+    "ArduPilot PLND / PX4 precision land",
+    "Gazebo"
+   ],
+   "starter": null,
+   "status": "planned",
+   "diagram": "proj-precision-landing",
+   "milestones": [
+    "Калибровка камеры и оценка позы маркера",
+    "Перевод в систему координат аппарата (FRD/NED)",
+    "Отправка LANDING_TARGET, проверка в логе",
+    "Посадка в SITL с ветром",
+    "Отказ: маркер потерян на высоте ниже 2 м"
+   ],
+   "acceptance": [
+    "Ошибка посадки ≤ 15 см в 9 из 10 прогонов",
+    "Потеря маркера обрабатывается: уход вверх или обычная посадка, а не падение",
+    "Системы координат проверены тестом",
+    "Лог показывает использование цели автопилотом",
+    "README и видео"
+   ],
+   "autotest": "тест преобразований координат + серия SITL-посадок с подсчётом ошибки",
+   "deliverables": [
+    "Код, параметры автопилота, отчёт по 10 посадкам"
+   ],
+   "modules": [
+    "per-camera",
+    "per-cv",
+    "math-linalg-rot",
+    "mav-services",
+    "ap-companion"
+   ]
+  },
+  {
+   "id": "proj-inspection",
+   "num": 6,
+   "title": "Инспекция маршрута с геопривязкой находок",
+   "capstoneFor": "autonomy",
+   "level": "L3",
+   "hours": 30,
+   "summary": "Миссия вдоль линии (ЛЭП, трубопровод, забор), съёмка по расстоянию, автоматическая привязка кадров к координатам и отчёт с находками на карте.",
+   "stack": [
+    "ArduPilot миссии, CAM_TRIGG_DIST",
+    "EXIF/XMP геотеги",
+    "Python, Leaflet-отчёт"
+   ],
+   "starter": null,
+   "status": "planned",
+   "diagram": "proj-inspection",
+   "milestones": [
+    "Генератор миссии вдоль полилинии с перекрытием",
+    "Съёмка по расстоянию, лог CAM",
+    "Сопоставление кадров с лог-записями CAM, запись геотегов",
+    "Разметка находок и отчёт-карта",
+    "Проверка точности привязки по контрольным точкам"
+   ],
+   "acceptance": [
+    "Каждый кадр имеет координаты, расхождение с логом ≤ 1 кадра",
+    "Отчёт открывается офлайн, находки кликабельны",
+    "Точность привязки измерена по контрольным точкам",
+    "Миссия проверена в SITL до полёта",
+    "README"
+   ],
+   "autotest": "тест сопоставления на фикстурах (лог CAM + набор EXIF)",
+   "deliverables": [
+    "Генератор миссии, инструмент привязки, отчёт по одному маршруту"
+   ],
+   "modules": [
+    "ap-missions",
+    "per-camera",
+    "est-gnss",
+    "data-python",
+    "ops-field"
+   ]
+  },
+  {
+   "id": "proj-photogrammetry",
+   "num": 7,
+   "title": "Фотограмметрия на открытом наборе",
+   "capstoneFor": "perception",
+   "level": "L3",
+   "hours": 20,
+   "summary": "Ортофотоплан и модель рельефа из открытого набора снимков с помощью OpenDroneMap; оценка точности по контрольным точкам и разбор, от чего она зависит.",
+   "stack": [
+    "OpenDroneMap (Docker)",
+    "QGIS",
+    "Python для метрик"
+   ],
+   "starter": null,
+   "status": "planned",
+   "diagram": "proj-photogrammetry",
+   "milestones": [
+    "Запуск ODM на открытом наборе",
+    "Ортофото и DEM, просмотр в QGIS",
+    "Метрика точности по GCP",
+    "Эксперимент: перекрытие и разрешение против точности",
+    "План своей съёмочной миссии с расчётом GSD"
+   ],
+   "acceptance": [
+    "Ортофото и DEM получены, параметры запуска сохранены",
+    "RMSE по контрольным точкам посчитан и объяснён",
+    "Эксперимент с двумя настройками и выводом",
+    "Расчёт GSD и перекрытия для своей миссии",
+    "README"
+   ],
+   "autotest": "скрипт метрики RMSE на эталонных точках",
+   "deliverables": [
+    "Отчёт с картами и таблицей точности"
+   ],
+   "modules": [
+    "per-camera",
+    "per-visual-nav",
+    "est-gnss",
+    "ap-missions"
+   ]
+  },
+  {
+   "id": "proj-esp32-component",
+   "num": 8,
+   "title": "MAVLink-компонент на ESP32 + SITL-двойник",
+   "capstoneFor": "engineer",
+   "level": "L3",
+   "hours": 30,
+   "summary": "ESP32 как полноценный MAVLink-компонент: свой heartbeat и compid, датчик (дальномер или ток) в DISTANCE_SENSOR/BATTERY_STATUS, приём команд. Python-двойник того же компонента проходит те же тесты против SITL и фейкового аппарата.",
+   "stack": [
+    "ESP-IDF или PlatformIO, C",
+    "c_library_v2",
+    "Python-двойник (examples/mavlink)",
+    "ArduPilot SITL"
+   ],
+   "starter": "examples/mavlink",
+   "status": "starter",
+   "diagram": "proj-esp32-component",
+   "milestones": [
+    "Python-двойник проходит тесты (стартер: virtual_rangefinder.py)",
+    "Прошивка ESP32: UART MAVLink, heartbeat, DISTANCE_SENSOR",
+    "Приём COMMAND_LONG с ACK",
+    "Автопилот использует компонент (RNGFND1_TYPE=10) — проверено в логе",
+    "Стенд: ESP32 ↔ USB-UART ↔ SITL на ПК"
+   ],
+   "acceptance": [
+    "Двойник и прошивка ведут себя одинаково на одном наборе тестов",
+    "Компонент не мешает другим: правильные sysid/compid, частота ≤ заявленной",
+    "Автопилот видит датчик, в логе RFND правдоподобные значения",
+    "Потеря UART не вешает прошивку (watchdog)",
+    "README, схема подключения"
+   ],
+   "autotest": "pytest examples/mavlink/tests как основа; добавить тесты своего компонента",
+   "deliverables": [
+    "Прошивка, двойник, тесты, лог SITL с датчиком"
+   ],
+   "modules": [
+    "mav-component",
+    "mav-protocol",
+    "comp-esp32",
+    "emb-protocols",
+    "ap-sitl"
+   ]
+  },
+  {
+   "id": "proj-cell-bridge",
+   "num": 9,
+   "title": "Мост 4G/Wi-Fi с переподключением и шифрованием",
+   "capstoneFor": "engineer",
+   "level": "L3",
+   "hours": 25,
+   "summary": "Companion держит связь GCS ↔ аппарат через сотовую сеть: VPN (WireGuard), маршрутизация MAVLink, переподключение, приоритет команд над телеметрией и поведение при потере канала.",
+   "stack": [
+    "WireGuard",
+    "mavlink-router",
+    "Python или Go",
+    "tc/netem для имитации плохой сети"
+   ],
+   "starter": null,
+   "status": "planned",
+   "diagram": "proj-cell-bridge",
+   "milestones": [
+    "VPN между companion и сервером, автоподнятие",
+    "Маршрутизация MAVLink через туннель",
+    "Имитация потерь и задержек (netem), замеры",
+    "Снижение частоты телеметрии при плохом канале",
+    "Failsafe на стороне аппарата при потере GCS — проверен"
+   ],
+   "acceptance": [
+    "При 20 % потерь и 300 мс задержки команды доходят с подтверждением",
+    "Разрыв на 30 с: связь восстанавливается сама",
+    "Трафик зашифрован, порты наружу закрыты",
+    "Поведение аппарата при потере GCS соответствует параметрам и проверено в SITL",
+    "Отчёт с замерами"
+   ],
+   "autotest": "тест на netem: потери, задержка, разрыв",
+   "deliverables": [
+    "Конфиги, скрипты, отчёт с замерами"
+   ],
+   "modules": [
+    "mav-routing",
+    "comp-raspberry",
+    "nav-resilience",
+    "ap-safety-fs"
+   ]
+  },
+  {
+   "id": "proj-fleet-ci",
+   "num": 10,
+   "title": "CI/CD для флота",
+   "capstoneFor": "engineer",
+   "level": "L3",
+   "hours": 20,
+   "summary": "Параметры и скрипты флота живут в git; каждый коммит прогоняет тест failsafe и миссию в SITL, сравнивает параметры с эталоном и собирает артефакт для выкладки на аппарат.",
+   "stack": [
+    "GitHub Actions",
+    "ArduPilot SITL",
+    "pymavlink",
+    "параметры в .param, Lua-скрипты"
+   ],
+   "starter": "examples/sitl-pymavlink",
+   "status": "starter",
+   "diagram": "proj-fleet-ci",
+   "milestones": [
+    "Репозиторий флота: параметры по аппаратам, общие и личные",
+    "Workflow: SITL + тест failsafe (стартер ci.yml)",
+    "Diff параметров против эталона с объяснением изменений",
+    "Тест миссии и проверка лога грейдером",
+    "Выкладка: артефакт с параметрами и чек-листом"
+   ],
+   "acceptance": [
+    "Каждый PR запускает SITL-тесты, красный тест блокирует слияние",
+    "Изменение критичного параметра без комментария не проходит проверку",
+    "Логи SITL сохраняются как артефакт",
+    "Выкладка воспроизводима: из тега — тот же набор параметров",
+    "README"
+   ],
+   "autotest": "сам workflow — это тест (examples/sitl-pymavlink/ci.yml, check_lab_log.py)",
+   "deliverables": [
+    "Репозиторий флота с зелёным CI и историей изменений"
+   ],
+   "modules": [
+    "eng-ci-configs",
+    "ap-sitl",
+    "ap-safety-fs",
+    "bf-cli-automation"
+   ]
+  },
+  {
+   "id": "proj-lua-protection",
+   "num": 11,
+   "title": "Пакет защит на Lua с тестами",
+   "capstoneFor": "autonomy",
+   "level": "L3",
+   "hours": 20,
+   "summary": "Набор Lua-скриптов ArduPilot для своей задачи (контроль вибраций, геозона по полигону, защита груза), каждый с тестом в SITL и понятным поведением при отказе самого скрипта.",
+   "stack": [
+    "ArduPilot Lua scripting",
+    "SITL",
+    "pymavlink-тесты"
+   ],
+   "starter": null,
+   "status": "planned",
+   "diagram": "proj-lua-protection",
+   "milestones": [
+    "Каркас скрипта: параметры, частота, лог, обработка ошибок",
+    "Первая защита и её SITL-тест",
+    "Ещё две защиты",
+    "Поведение при ошибке скрипта: безопасный режим",
+    "Документация параметров"
+   ],
+   "acceptance": [
+    "Каждая защита имеет SITL-тест, который её вызывает",
+    "Ошибка в скрипте не оставляет аппарат без защиты",
+    "Параметры скрипта документированы",
+    "CPU и память замерены",
+    "README"
+   ],
+   "autotest": "SITL-тесты в CI (как в проекте 10)",
+   "deliverables": [
+    "Скрипты, тесты, документация"
+   ],
+   "modules": [
+    "ap-lua",
+    "ap-safety-fs",
+    "ap-sitl",
+    "eng-ci-configs"
+   ]
+  },
+  {
+   "id": "proj-tx16s-companion",
+   "num": 12,
+   "title": "Компаньон для пульта TX16S",
+   "capstoneFor": "engineer",
+   "level": "L3",
+   "hours": 30,
+   "summary": "ESP32-модуль в отсеке пульта: принимает телеметрию CRSF, показывает её на своём экране или отдаёт по BLE/Wi-Fi в телефон, плюс EdgeTX Lua-скрипт на пульте. Разработка с эмулятором до железа.",
+   "stack": [
+    "ESP32, ESP-IDF/PlatformIO",
+    "CRSF",
+    "EdgeTX Lua + симулятор EdgeTX"
+   ],
+   "starter": null,
+   "status": "planned",
+   "diagram": "proj-tx16s-companion",
+   "milestones": [
+    "Разбор CRSF-телеметрии на ESP32 с тестами на записанных кадрах",
+    "Lua-скрипт EdgeTX в симуляторе",
+    "Передача на телефон (BLE или Wi-Fi)",
+    "Монтаж и питание в пульте",
+    "Полевой тест"
+   ],
+   "acceptance": [
+    "Парсер CRSF проходит тесты на записанных кадрах, включая битые",
+    "Пульт продолжает управлять при зависании модуля",
+    "Lua-скрипт работает в симуляторе и на пульте",
+    "Энергопотребление измерено",
+    "README со схемой"
+   ],
+   "autotest": "тесты парсера CRSF на фикстурах + симулятор EdgeTX",
+   "deliverables": [
+    "Прошивка, Lua-скрипт, схема, видео"
+   ],
+   "modules": [
+    "link-protocols",
+    "comp-esp32",
+    "emb-protocols",
+    "link-elrs"
+   ]
+  }
+ ]
+}

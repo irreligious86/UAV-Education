@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Веб-GCS: телеметрия, карта, режимы — UAV Student</title>
+  <meta name="description" content="Наземная станция в браузере: бэкенд читает MAVLink и раздаёт телеметрию по WebSocket, фронтенд рисует аппарат на карте, показывает режим, батарею и STATUSTEXT, умеет армить и менять режим с подтвержде">
+  <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#0b0f14">
+  <link rel="stylesheet" href="../lib/ground-control-ui/dist/ground-control.css">
+  <link rel="stylesheet" href="../assets/site.css">
+  <script src="../lib/ground-control-ui/dist/ground-control.js" defer></script>
+  <script src="../assets/progress-store.js" defer></script>
+  <script src="../assets/grading.js" defer></script>
+  <script src="../assets/app.js" defer></script>
+  <script src="../assets/uav-quiz.js" defer></script>
+  <script src="../assets/uav-tasks.js" defer></script>
+  <script src="../assets/offline.js" defer></script>
+</head>
+<body class="gc-root" data-base="../">
+  <header class="site-header">
+    <div class="gc-container site-header__inner">
+      <a class="site-brand" href="../index.html"><span class="site-brand__mark" aria-hidden="true">◆</span> UAV Student</a>
+      <nav class="gc-nav" aria-label="Разделы сайта">
+        <a href="../index.html" aria-current="page">Курс</a>
+        <a href="../ref/index.html">Справочник</a>
+        <a href="../pages/glossary.html">Глоссарий</a>
+        <a href="../pages/fails.html">Фейлы</a>
+        <a href="../pages/search.html">Поиск</a>
+        <a href="../pages/progress.html">Мой прогресс</a>
+      </nav>
+    </div>
+  </header>
+  <main class="gc-container site-main">
+    <article class="module" data-module-page="proj-web-gcs">
+      <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="index.html">Проекты</a><span>Проект 1</span></p>
+      <h1 class="module-title">Веб-GCS: телеметрия, карта, режимы</h1>
+      <div class="module-tags"><span class="gc-tag">Проект 1</span><span class="gc-tag">L3</span><span class="gc-tag">~30 ч</span><span class="gc-tag" data-state="ok">есть стартер</span><span class="gc-tag" data-state="ok" data-done-badge hidden>СДАН</span></div>
+      <p class="module-lead">Наземная станция в браузере: бэкенд читает MAVLink и раздаёт телеметрию по WebSocket, фронтенд рисует аппарат на карте, показывает режим, батарею и STATUSTEXT, умеет армить и менять режим с подтверждением.</p>
+      <div class="gc-prose module-body">
+        <figure class="diagram" data-diagram="proj-web-gcs"><div class="diagram__svg"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 200" width="100%" role="img" aria-labelledby="t" style="max-width:720px;display:block;margin:0 auto"><title id="t">Веб-GCS: архитектура</title><style>text{font-family: var(--gc-font-mono, ui-monospace, Menlo, monospace); font-size: 12px;fill:currentColor} .m{fill:var(--gc-ink-muted, #8a93a3)} .a{fill:var(--gc-accent-hud, #5ef1d2)} .w{fill:var(--gc-signal-amber, #f0b24c)} .d{fill:var(--gc-signal-red, #e8636b)} .box{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:currentColor;stroke-width:1.2} .boxa{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6} .ln{stroke:currentColor;stroke-width:1.2;fill:none} .lna{stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6;fill:none} .lnm{stroke:var(--gc-ink-muted, #8a93a3);stroke-width:1;fill:none;stroke-dasharray:4 3} .t{font-size:11px} .b{font-weight:600}</style><defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker><marker id="ara" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--gc-accent-hud, #5ef1d2)"/></marker></defs><rect class="box" x="10.0" y="30" width="142.0" height="48" rx="6"/><text x="81.0" y="58.0" text-anchor="middle">Автопилот / SITL</text><rect class="boxa" x="196.0" y="30" width="142.0" height="48" rx="6"/><text x="267.0" y="51.0" text-anchor="middle" class="b">Мост</text><text x="267.0" y="65.0" text-anchor="middle" class="b">pymavlink + asyncio</text><rect class="box" x="382.0" y="30" width="142.0" height="48" rx="6"/><text x="453.0" y="51.0" text-anchor="middle">WebSocket</text><text x="453.0" y="65.0" text-anchor="middle">JSON-кадры</text><rect class="boxa" x="568.0" y="30" width="142.0" height="48" rx="6"/><text x="639.0" y="51.0" text-anchor="middle" class="b">Браузер</text><text x="639.0" y="65.0" text-anchor="middle" class="b">Leaflet + панель</text><rect class="box" x="10.0" y="130" width="142.0" height="48" rx="6"/><text x="81.0" y="158.0" text-anchor="middle">tlog-запись</text><rect class="boxa" x="568.0" y="130" width="142.0" height="48" rx="6"/><text x="639.0" y="151.0" text-anchor="middle" class="b">Команды: arm, mode</text><text x="639.0" y="165.0" text-anchor="middle" class="b">COMMAND_LONG → ACK</text><path class="lna" d="M152.0 54.0 L196.0 54.0" marker-end="url(#ara)"/><text x="174.0" y="47.0" text-anchor="middle" class="m t" style="font-size:10px">MAVLink</text><path class="ln" d="M338.0 54.0 L382.0 54.0" marker-end="url(#ar)"/><path class="ln" d="M524.0 54.0 L568.0 54.0" marker-end="url(#ar)"/><path class="ln" d="M267.0 78 L267.0 104.0 L81.0 104.0 L81.0 130" marker-end="url(#ar)"/><path class="ln" d="M639.0 78 L639.0 130" marker-end="url(#ar)"/><path class="lna" d="M639.0 130 L639.0 104.0 L267.0 104.0 L267.0 78" marker-end="url(#ara)"/></svg></div><figcaption class="gc-muted">Архитектура проекта 1.</figcaption><div class="diagram__hint">Схему можно прокрутить по горизонтали</div></figure>
+        <h2>Стек</h2>
+        <ul><li>Python 3, pymavlink, asyncio</li><li>WebSocket (websockets)</li><li>JS, Leaflet, без фреймворка</li><li>ArduPilot SITL</li></ul>
+        <p>Стартер: <a href="https://github.com/irreligious86/UAV-Education/tree/main/examples/web-gcs" target="_blank" rel="noopener noreferrer"><code>examples/web-gcs</code></a> — клонируйте и начинайте с его README.</p>
+        <p>Может заменить итоговый проект трека «<a href="../cap/cap-own-logic.html">Инженер: код на борту</a>».</p>
+        <h2>Этапы</h2>
+        <ol><li>Мост MAVLink → JSON по WebSocket: HEARTBEAT, GLOBAL_POSITION_INT, ATTITUDE, SYS_STATUS, STATUSTEXT</li><li>Страница с картой и маркером аппарата, режим и батарея на панели</li><li>Команды из браузера: arm/disarm и смена режима через COMMAND_LONG с ожиданием ACK, ответ в UI</li><li>Устойчивость: потеря связи видна за 3 с (heartbeat timeout), переподключение без перезагрузки страницы</li><li>Запись сессии в tlog и воспроизведение её в том же UI</li></ol>
+        <h2>Критерии приёмки</h2>
+        <p class="gc-muted">Проект сдан, когда выполнены все пункты. Отмечайте по мере готовности:</p>
+        <ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="proj-web-gcs:cap:0"><span>Тесты моста (pytest) проходят на фейковом аппарате, включая потерю пакетов</span></label></li><li><label><input type="checkbox" data-check-id="proj-web-gcs:cap:1"><span>Задержка телеметрии в UI ≤ 300 мс на localhost (замер в отчёте)</span></label></li><li><label><input type="checkbox" data-check-id="proj-web-gcs:cap:2"><span>Команда без ACK не показывается пользователю как выполненная</span></label></li><li><label><input type="checkbox" data-check-id="proj-web-gcs:cap:3"><span>Потеря и восстановление связи отображаются без перезагрузки</span></label></li><li><label><input type="checkbox" data-check-id="proj-web-gcs:cap:4"><span>Есть README: запуск с SITL одной командой, скриншот, архитектура</span></label></li><li><label><input type="checkbox" data-check-id="proj-web-gcs:cap:5"><span>Код бэкенда и фронтенда разделён, протокол WebSocket описан в docs/</span></label></li></ul>
+        <h2>Автопроверка</h2>
+        <p>pytest examples/web-gcs/tests: разбор сообщений в JSON, команды с ACK, таймаут heartbeat</p>
+        <h2>Что сдать</h2>
+        <ul><li>Репозиторий с backend/, web/, docs/protocol.md</li><li>Видео или GIF: полёт миссии в SITL в вашем UI</li><li>Отчёт: замер задержки, что сделано для устойчивости</li></ul>
+        <h2>Нужные модули</h2>
+        <ol><li><a href="../m/mav-protocol.html">MAVLink изнутри: кадр, CRC, диалекты, подпись</a></li><li><a href="../m/mav-services.html">Микросервисы MAVLink: команды, параметры, миссии, потоки</a></li><li><a href="../m/mav-routing.html">Маршрутизация и транспорт MAVLink: радио, 4G, несколько GCS</a></li><li><a href="../m/mav-sdk.html">Библиотеки над MAVLink: pymavlink, MAVSDK, MAVROS — что и когда</a></li><li><a href="../m/comp-raspberry.html">Raspberry Pi + ArduPilot</a></li><li><a href="../m/ap-sitl.html">SITL: дрон без дрона</a></li></ol>
+        <div class="gc-callout" data-state="caution"><strong>Безопасность.</strong> Всё, что управляет аппаратом, сначала проходит тесты и SITL. Реальный полёт — только с проверенным failsafe и пилотом, готовым забрать управление.</div>
+      </div>
+      <div class="module-done"><gc-button variant="secondary" data-done-toggle="proj-web-gcs" data-done-label="сданный" data-done-past="Сдан">Отметить как сданный</gc-button></div>
+    </article>
+  </main>
+  <footer class="gc-container site-footer gc-muted">
+    <p>Открытый курс · <a href="https://github.com/irreligious86/UAV-Education">исходники на GitHub</a> · <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">план развития</a> · <a href="../curriculum/curriculum.html">для разработчика</a> · CC BY-NC-SA 4.0</p>
+  </footer>
+</body>
+</html>

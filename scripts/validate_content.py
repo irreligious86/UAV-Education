@@ -3,6 +3,7 @@
 """Проверка манифеста и .md. Запуск: python scripts/validate_content.py"""
 from __future__ import annotations
 
+import json
 import re
 import sys
 from pathlib import Path
@@ -351,6 +352,42 @@ def validate_glossary(manifest_ids):
     return errors
 
 
+def validate_projects(manifest_ids, track_ids):
+    """data/projects.json: ids, numbering, capstone target, diagram file, starter path, linked modules."""
+    path = ROOT / "data" / "projects.json"
+    if not path.is_file():
+        return []
+    errs = []
+    data = json.loads(path.read_text(encoding="utf-8"))
+    seen, nums = set(), set()
+    for p in data.get("projects", []):
+        pid = p.get("id", "?")
+        where = f"projects.json:{pid}"
+        if not re.fullmatch(r"proj-[a-z0-9-]+", pid):
+            errs.append(f"{where}: id must match proj-[a-z0-9-]+")
+        if pid in seen or pid in manifest_ids:
+            errs.append(f"{where}: duplicate id")
+        seen.add(pid)
+        if p.get("num") in nums:
+            errs.append(f"{where}: duplicate num {p.get('num')}")
+        nums.add(p.get("num"))
+        for k in ("title", "summary", "stack", "milestones", "acceptance", "deliverables", "autotest", "diagram"):
+            if not p.get(k):
+                errs.append(f"{where}: missing {k}")
+        if p.get("capstoneFor") and p["capstoneFor"] not in track_ids:
+            errs.append(f"{where}: capstoneFor '{p['capstoneFor']}' is not a track id")
+        if p.get("diagram") and not (DIAGRAMS_DIR / f"{p['diagram']}.svg").is_file():
+            errs.append(f"{where}: diagram assets/diagrams/{p['diagram']}.svg not found")
+        if p.get("starter") and not (ROOT / p["starter"]).is_dir():
+            errs.append(f"{where}: starter {p['starter']} does not exist")
+        if p.get("status") == "starter" and not p.get("starter"):
+            errs.append(f"{where}: status 'starter' without a starter path")
+        for mid in p.get("modules", []):
+            if mid not in manifest_ids:
+                errs.append(f"{where}: unknown module {mid}")
+    return errs
+
+
 def main():
     if not MANIFEST_PATH.is_file():
         print(f"Нет {MANIFEST_PATH}", file=sys.stderr)
@@ -369,6 +406,8 @@ def main():
     status_by_id = {a["id"]: a.get("status") for sec in manifest.get("sections", []) for a in sec.get("articles", [])}
     errs.extend(validate_quizzes(all_ids_set, status_by_id))
     errs.extend(validate_glossary(all_ids_set))
+    track_ids = {t["id"] for t in json.loads((ROOT / "data" / "curriculum.json").read_text(encoding="utf-8")).get("tracks", [])}
+    errs.extend(validate_projects(all_ids_set, track_ids))
 
     status_by_file = {}
     for sec in manifest.get("sections", []):

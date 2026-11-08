@@ -81,7 +81,7 @@ def flow(title: str, boxes: list[Box], links: list[tuple], width: int, height: i
         lines = b.label if isinstance(b.label, list) else [b.label]
         out.append(f'<rect class="{"boxa" if b.accent else "box"}" x="{b.x}" y="{b.y}" width="{b.w}" height="{b.h}" rx="6"/>')
         ty = b.cy() - (len(lines) - 1) * 7 + 4
-        out.append(multiline(b.cx(), ty, lines, "b" if b.accent else ""))
+        out.append(multiline(b.cx(), ty, lines, "b" if b.accent else "", size=10.5 if b.w < 130 else None))
         if b.note:
             out.append(text(b.cx(), b.y + b.h + 13, b.note, "m t"))
     for ln in links:

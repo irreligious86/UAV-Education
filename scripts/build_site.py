@@ -35,6 +35,7 @@ from content_pipeline import (  # noqa: E402
     parse_front_matter,
     parse_pipe_references,
     parse_yaml_references,
+    render_diagram,
     strip_front_matter,
 )
 
@@ -54,7 +55,8 @@ PAGES = {
     "prerequisites": "Входные требования и тест",
 }
 
-GENERATED_DIRS = ("m", "ref", "pages", "api", "quiz", "cap", "path", "tasks")
+GENERATED_DIRS = ("m", "ref", "pages", "api", "quiz", "cap", "path", "tasks", "projects")
+PROJECTS_SRC = ROOT / "data" / "projects.json"
 QUIZ_SRC = ROOT / "content" / "quiz"
 TASKS_SRC = ROOT / "content" / "tasks"
 TASK_VARIANTS = 8
@@ -116,7 +118,9 @@ def build_model() -> dict:
     for p in curriculum.get("paths", []):
         ordered = [mid for st in p["stages"] for mid in st["modules"] if mid in modules]
         paths.append({**p, "moduleIds": ordered})
-    return {"stacks": stacks, "modules": modules, "groups": groups, "curriculum": curriculum, "paths": paths}
+    projects = json.loads(PROJECTS_SRC.read_text(encoding="utf-8"))["projects"] if PROJECTS_SRC.is_file() else []
+    return {"stacks": stacks, "modules": modules, "groups": groups, "curriculum": curriculum, "paths": paths,
+            "projects": projects}
 
 
 # ---------------------------------------------------------------- layout
@@ -361,6 +365,11 @@ def render_home(model: dict) -> str:
         <p class="gc-label gc-muted">По навыкам</p>
         <strong>Инженерный путь: 5 треков от физики до своего кода</strong>
         <div class="gc-muted">Все прошивки вперемешку, по росту сложности. Для тех, кто хочет понимать, а не только настраивать.</div>
+      </a>
+      <a class="gc-card choose__tracks" href="projects/index.html">
+        <p class="gc-label gc-muted">Практика в коде</p>
+        <strong>Проекты: ПО для БАС — {len(model.get("projects", []))} программных проектов</strong>
+        <div class="gc-muted">Веб-GCS, сервис логов, CI для флота, компоненты MAVLink, зрение в симуляторе. Каждый может заменить итоговый проект трека.</div>
       </a>
     </section>
 
@@ -662,6 +671,7 @@ def render_capstone(g: dict, model: dict) -> str:
         <p class="gc-muted">Проект сдан, когда выполнены все пункты. Отмечай по мере готовности:</p>
         <ul class="gc-checklist">{crit}</ul>
         {rubric_html}
+        {project_alternatives(g, model, base)}
         <h2>Модули трека</h2>
         <ol>{prereq}</ol>
         <div class="gc-callout" data-state="caution"><strong>Безопасность.</strong> Всё, что можно сделать в SITL или без пропов, делается там. Реальный полёт — только после наземных тестов, с проверенным failsafe.</div>
@@ -669,6 +679,92 @@ def render_capstone(g: dict, model: dict) -> str:
       <div class="module-done"><gc-button variant="secondary" data-done-toggle="{esc(c['id'])}" data-done-label="сданный" data-done-past="Сдан">Отметить как сданный</gc-button></div>
     </article>"""
     return layout(title=c["title"], base=base, body=body, active="course", description=c.get("result", ""))
+
+
+# ---------------------------------------------------------------- project catalogue
+
+PROJECT_STATUS = {"starter": ("есть стартер", "ok"), "planned": ("описание", "")}
+
+
+def project_alternatives(g: dict, model: dict, base: str) -> str:
+    alts = [p for p in model.get("projects", []) if p.get("capstoneFor") == g["id"]]
+    if not alts:
+        return ""
+    items = "".join(f'<li><a href="{base}projects/{esc(p["id"])}.html">Проект {p["num"]}: {esc(p["title"])}</a></li>' for p in alts)
+    return (f'<h2>Программная альтернатива</h2><p class="gc-muted">Итоговый проект трека можно заменить проектом '
+            f'из каталога «ПО для БАС» — с теми же требованиями к сдаче: критерии, автотесты, README.</p><ul>{items}</ul>')
+
+
+def project_card(p: dict, base: str) -> str:
+    label, state = PROJECT_STATUS.get(p.get("status", "planned"), ("", ""))
+    stack = " · ".join(p.get("stack", [])[:3])
+    return (f'<a class="gc-card capstone-card" href="{base}projects/{esc(p["id"])}.html" data-module-id="{esc(p["id"])}">'
+            f'<p class="gc-label gc-muted">Проект {p["num"]} · {esc(p.get("level", ""))} · ~{p.get("hours", "?")} ч</p>'
+            f'<strong>{esc(p["title"])}</strong><div class="gc-muted">{esc(stack)}</div>'
+            f'<div class="gc-card__meta"><span class="gc-tag" data-state="{state}">{esc(label)}</span>'
+            f'<span class="gc-tag" data-state="ok" data-done-badge hidden>СДАН</span></div></a>')
+
+
+def render_projects_index(model: dict) -> str:
+    base = "../"
+    groups = {g["id"]: g for g in model["groups"]}
+    cards = "".join(project_card(p, base) for p in sorted(model["projects"], key=lambda p: p["num"]))
+    body = f"""    <p class="gc-breadcrumb"><a href="{base}index.html">Курс</a><span>Проекты</span></p>
+    <h1 class="gc-display">Проекты: ПО для БАС</h1>
+    <p class="module-lead">Двенадцать программных проектов от веб-GCS до точной посадки по маркеру. Каждый — с архитектурной схемой, этапами, критериями приёмки и автотестом; там, где написан стартер, он лежит в <code>examples/</code> репозитория. Проект может заменить итоговый проект своего трека.</p>
+    <div class="gc-prose module-body">
+      <p class="gc-muted">Как работать: возьмите проект, пройдите модули из его списка, сделайте этапы по порядку, сдайте по критериям. Код — в собственном репозитории с README и тестами; «работает у меня» не засчитывается.</p>
+    </div>
+    <div class="gc-grid ref-grid">{cards}</div>"""
+    return layout(title="Проекты", base=base, body=body, active="course",
+                  description="Каталог программных проектов курса: веб-GCS, сервис логов, CI для флота, компоненты MAVLink, компьютерное зрение.")
+
+
+def render_project(p: dict, model: dict) -> str:
+    base = "../"
+    g = next((g for g in model["groups"] if g["id"] == p.get("capstoneFor")), None)
+    label, state = PROJECT_STATUS.get(p.get("status", "planned"), ("", ""))
+    mods = "".join(f'<li><a href="{base}m/{esc(i)}.html">{esc(model["modules"][i]["title"])}</a></li>'
+                   for i in p.get("modules", []) if i in model["modules"])
+    stack = "".join(f"<li>{esc(x)}</li>" for x in p.get("stack", []))
+    miles = "".join(f"<li>{esc(x)}</li>" for x in p.get("milestones", []))
+    deliver = "".join(f"<li>{esc(x)}</li>" for x in p.get("deliverables", []))
+    crit = "".join(f'<li><label><input type="checkbox" data-check-id="{esc(p["id"])}:cap:{i}"><span>{esc(x)}</span></label></li>'
+                   for i, x in enumerate(p.get("acceptance", [])))
+    repo = "https://github.com/irreligious86/UAV-Education/tree/main/"
+    starter = (f'<p>Стартер: <a href="{repo}{esc(p["starter"])}" target="_blank" rel="noopener noreferrer"><code>{esc(p["starter"])}</code></a> — '
+               f'клонируйте и начинайте с его README.</p>' if p.get("starter") else
+               '<p class="gc-muted">Стартера пока нет: проект начинается с пустого репозитория по этапам ниже.</p>')
+    replaces = (f'<p>Может заменить итоговый проект трека «<a href="{base}cap/{esc(g["capstone"]["id"])}.html">{esc(g["title"])}</a>».</p>'
+                if g and g.get("capstone") else "")
+    diagram = render_diagram(p["diagram"], f"Архитектура проекта {p['num']}.") if p.get("diagram") else ""
+    body = f"""    <article class="module" data-module-page="{esc(p['id'])}">
+      <p class="gc-breadcrumb"><a href="{base}index.html">Курс</a><a href="index.html">Проекты</a><span>Проект {p['num']}</span></p>
+      <h1 class="module-title">{esc(p['title'])}</h1>
+      <div class="module-tags"><span class="gc-tag">Проект {p['num']}</span><span class="gc-tag">{esc(p.get('level', ''))}</span><span class="gc-tag">~{p.get('hours', '?')} ч</span><span class="gc-tag" data-state="{state}">{esc(label)}</span><span class="gc-tag" data-state="ok" data-done-badge hidden>СДАН</span></div>
+      <p class="module-lead">{esc(p['summary'])}</p>
+      <div class="gc-prose module-body">
+        {diagram}
+        <h2>Стек</h2>
+        <ul>{stack}</ul>
+        {starter}
+        {replaces}
+        <h2>Этапы</h2>
+        <ol>{miles}</ol>
+        <h2>Критерии приёмки</h2>
+        <p class="gc-muted">Проект сдан, когда выполнены все пункты. Отмечайте по мере готовности:</p>
+        <ul class="gc-checklist">{crit}</ul>
+        <h2>Автопроверка</h2>
+        <p>{esc(p.get('autotest', ''))}</p>
+        <h2>Что сдать</h2>
+        <ul>{deliver}</ul>
+        <h2>Нужные модули</h2>
+        <ol>{mods}</ol>
+        <div class="gc-callout" data-state="caution"><strong>Безопасность.</strong> Всё, что управляет аппаратом, сначала проходит тесты и SITL. Реальный полёт — только с проверенным failsafe и пилотом, готовым забрать управление.</div>
+      </div>
+      <div class="module-done"><gc-button variant="secondary" data-done-toggle="{esc(p['id'])}" data-done-label="сданный" data-done-past="Сдан">Отметить как сданный</gc-button></div>
+    </article>"""
+    return layout(title=p["title"], base=base, body=body, active="course", description=p["summary"][:200])
 
 
 # ---------------------------------------------------------------- reference
@@ -686,6 +782,8 @@ def render_ref_index(model: dict) -> str:
             f'<span class="gc-tag">всего {len(mods)}</span></div></a>'
         )
     pages = "".join(f'<a class="gc-card" href="../pages/{k}.html"><strong>{esc(v)}</strong></a>' for k, v in PAGES.items())
+    if model.get("projects"):
+        pages = f'<a class="gc-card" href="../projects/index.html"><strong>Проекты: ПО для БАС</strong></a>' + pages
     body = f"""    <h1 class="gc-display">Справочник</h1>
     <p class="gc-muted">Те же модули, что в курсе, но сгруппированные по прошивкам и стекам.</p>
     <div class="gc-grid ref-grid">{''.join(cards)}</div>
@@ -872,6 +970,10 @@ def search_index(model: dict) -> list[dict]:
             docs.append({"id": c["id"], "type": "capstone", "title": c["title"], "url": f"cap/{c['id']}.html",
                          "group": g["title"], "level": "", "summary": c.get("result", ""), "headings": "",
                          "text": " ".join(c.get("deliverables", []) + c.get("criteria", [])), "tags": ""})
+    for p in model.get("projects", []):
+        docs.append({"id": p["id"], "type": "capstone", "title": f"Проект {p['num']}: {p['title']}", "url": f"projects/{p['id']}.html",
+                     "group": "Проекты", "level": p.get("level", ""), "summary": p["summary"], "headings": "",
+                     "text": " ".join(p.get("stack", []) + p.get("milestones", []) + p.get("acceptance", [])), "tags": ""})
     return docs
 
 
@@ -902,6 +1004,8 @@ def grading_meta(model: dict) -> dict:
                      "lab": len(lab.get("criteria", [])) if isinstance(lab, dict) else 0})
     caps = [{"id": g["capstone"]["id"], "criteria": len(g["capstone"].get("criteria", [])), "group": g["id"]}
             for g in model["groups"] if g.get("capstone")]
+    caps += [{"id": p["id"], "criteria": len(p.get("acceptance", [])), "group": p.get("capstoneFor"), "project": True}
+             for p in model.get("projects", [])]
     return {"version": 2, "pass": 80, "weights": {"quiz": 40, "lab": 60, "withTasks": {"quiz": 30, "tasks": 30, "lab": 40}},
             "modules": mods, "capstones": caps}
 
@@ -1140,6 +1244,10 @@ def main() -> None:
     for g in model["groups"]:
         if g.get("capstone"):
             write(ROOT / "cap" / f"{g['capstone']['id']}.html", render_capstone(g, model))
+    if model.get("projects"):
+        write(ROOT / "projects" / "index.html", render_projects_index(model))
+        for pr in model["projects"]:
+            write(ROOT / "projects" / f"{pr['id']}.html", render_project(pr, model))
     write(ROOT / "ref" / "index.html", render_ref_index(model))
     for s in model["stacks"]:
         write(ROOT / "ref" / f"{s['key']}.html", render_ref_stack(s, model))

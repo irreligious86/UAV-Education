@@ -35,9 +35,9 @@ jobs:
 
       - name: Built site must be committed in sync with content
         run: |
-          if [ -n "$(git status --porcelain -- index.html m ref pages api quiz cap path tasks sw.js manifest.webmanifest assets/diagrams)" ]; then
+          if [ -n "$(git status --porcelain -- index.html m ref pages api quiz cap path tasks projects sw.js manifest.webmanifest assets/diagrams)" ]; then
             echo "::error::Site is stale. Run 'python scripts/publish.py' locally and commit the result."
-            git status --short -- index.html m ref pages api quiz cap path tasks sw.js manifest.webmanifest assets/diagrams
+            git status --short -- index.html m ref pages api quiz cap path tasks projects sw.js manifest.webmanifest assets/diagrams
             exit 1
           fi
 
@@ -56,6 +56,7 @@ jobs:
         run: |
           pip install --quiet pytest
           python -m pytest -q -p no:cacheprovider examples/mavlink/tests
+          python -m pytest -q -p no:cacheprovider examples/web-gcs/tests
 
       - name: ROS 2 labs logic (frames, offboard state machine) and compose file
         run: |

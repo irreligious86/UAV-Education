@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Web GCS (starter)</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <style>
+    :root { --bg: #0f1420; --panel: #171e2c; --ink: #e6e9ef; --muted: #8a93a3; --ok: #5ef1d2; --bad: #e8636b; }
+    body { margin: 0; background: var(--bg); color: var(--ink); font: 14px/1.4 ui-monospace, Menlo, monospace; display: grid; grid-template-columns: 1fr 300px; height: 100vh; }
+    #map { height: 100%; }
+    aside { background: var(--panel); padding: 12px; overflow-y: auto; }
+    .row { display: flex; justify-content: space-between; margin: 4px 0; }
+    .muted { color: var(--muted); }
+    #link[data-ok="true"] { color: var(--ok); } #link[data-ok="false"] { color: var(--bad); }
+    button, select { font: inherit; margin: 4px 4px 0 0; padding: 6px 10px; background: #222b3d; color: var(--ink); border: 1px solid #334; border-radius: 6px; }
+    #log { margin-top: 12px; font-size: 12px; max-height: 40vh; overflow-y: auto; }
+    @media (max-width: 700px) { body { grid-template-columns: 1fr; grid-template-rows: 55vh auto; } }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+  <aside>
+    <div class="row"><span>Связь</span><strong id="link" data-ok="false">нет</strong></div>
+    <div class="row"><span>Режим</span><strong id="mode">—</strong></div>
+    <div class="row"><span>Арм</span><strong id="armed">—</strong></div>
+    <div class="row"><span>Высота</span><span id="alt">—</span></div>
+    <div class="row"><span>Скорость</span><span id="vel">—</span></div>
+    <div class="row"><span>Крен / тангаж</span><span id="att">—</span></div>
+    <div class="row"><span>Батарея</span><span id="bat">—</span></div>
+    <div>
+      <button data-op="arm">ARM</button><button data-op="disarm">DISARM</button><br>
+      <select id="modesel"><option>STABILIZE</option><option>ALT_HOLD</option><option>LOITER</option><option>GUIDED</option><option>AUTO</option><option>RTL</option><option>LAND</option></select>
+      <button data-op="mode">Режим</button>
+    </div>
+    <div id="log" class="muted"></div>
+  </aside>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script>
+    // Starter UI: every frame type from docs/protocol.md has exactly one handler below.
+    const WS_URL = new URLSearchParams(location.search).get("ws") || "ws://127.0.0.1:8765";
+    const $ = (id) => document.getElementById(id);
+    const map = L.map("map").setView([50.45, 30.52], 16);
+    L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 19, attribution: "© OpenStreetMap" }).addTo(map);
+    const marker = L.marker([50.45, 30.52]).addTo(map);
+    const track = L.polyline([], { color: "#5ef1d2" }).addTo(map);
+    let ws, nextId = 1, centered = false;
+    const pending = new Map();
+
+    function log(text, cls) {
+      const d = document.createElement("div");
+      d.textContent = new Date().toLocaleTimeString() + " " + text;
+      if (cls) d.style.color = cls;
+      $("log").prepend(d);
+    }
+    const handlers = {
+      link: (f) => { $("link").dataset.ok = f.ok; $("link").textContent = f.ok ? "есть" : "ПОТЕРЯНА"; if (!f.ok) log("связь с аппаратом потеряна", "var(--bad)"); },
+      heartbeat: (f) => { $("mode").textContent = f.mode; $("armed").textContent = f.armed ? "ДА" : "нет"; },
+      position: (f) => {
+        const ll = [f.lat, f.lon]; marker.setLatLng(ll); track.addLatLng(ll);
+        if (!centered) { map.setView(ll, 17); centered = true; }
+        $("alt").textContent = f.alt_rel + " м"; $("vel").textContent = f.vel + " м/с";
+      },
+      attitude: (f) => { $("att").textContent = f.roll + "° / " + f.pitch + "°"; },
+      battery: (f) => { $("bat").textContent = f.voltage + " В" + (f.remaining != null ? " · " + f.remaining + " %" : ""); },
+      text: (f) => log(f.text, f.severity <= 3 ? "var(--bad)" : null),
+      ack: (f) => {
+        const what = pending.get(f.id) || "?"; pending.delete(f.id);
+        log((f.ok ? "✓ " : "✗ ") + what + (f.ok ? "" : ": " + f.detail), f.ok ? "var(--ok)" : "var(--bad)");
+      },
+    };
+    function connect() {
+      ws = new WebSocket(WS_URL);
+      ws.onmessage = (e) => { const f = JSON.parse(e.data); (handlers[f.type] || (() => {}))(f); };
+      ws.onclose = () => { handlers.link({ ok: false }); setTimeout(connect, 1000); };   // reconnect without reload
+    }
+    document.querySelectorAll("button[data-op]").forEach((b) => b.addEventListener("click", () => {
+      const req = { id: nextId++, op: b.dataset.op };
+      if (req.op === "mode") req.mode = $("modesel").value;
+      pending.set(req.id, req.op + (req.mode ? " " + req.mode : ""));
+      log("→ " + pending.get(req.id) + " (ждём подтверждения)");
+      ws.send(JSON.stringify(req));
+    }));
+    connect();
+  </script>
+</body>
+</html>

@@ -357,6 +357,93 @@ D["planning-layers"] = flow("Слои навигации: от карты к у�
     720, 190)
 
 
+# ---------------------------------------------------------------- project catalogue: architecture diagrams
+def _arch(title, top, bottom=(), links=(), height=None, notes=()):
+    """Two rows of boxes. top: (id, [lines], accent); bottom: (id, [lines], accent[, column]) where the
+    optional column pins the box under that top-row box (otherwise bottom boxes are spread evenly).
+    links: (from, to, label[, accent[, route]]). Nothing is linked automatically."""
+    n = len(top)
+    gap = 36 if n >= 5 else 44
+    w = min(150, (700 - gap * (n - 1)) / n)
+    gap = (700 - n * w) / max(1, n - 1) if n > 1 else 0
+    xs = [10 + k * (w + gap) for k in range(n)]
+    boxes = [Box(i, lab, xs[k], 30, w, 48, accent=acc) for k, (i, lab, acc) in enumerate(top)]
+    free = [b for b in bottom if len(b) < 4]
+    m = len(free)
+    fgap = (700 - m * w) / max(1, m - 1) if m > 1 else 0
+    k = 0
+    for item in bottom:
+        if len(item) >= 4:
+            x = xs[item[3]]
+        else:
+            x = 10 + k * (w + fgap); k += 1
+        boxes.append(Box(item[0], item[1], x, 130, w, 48, accent=item[2]))
+    return flow(title, boxes, list(links), 720, height or (200 if bottom else 100), notes=list(notes))
+
+
+D["proj-web-gcs"] = _arch("Веб-GCS: архитектура",
+    [("fc", ["Автопилот / SITL"], False), ("br", ["Мост", "pymavlink + asyncio"], True), ("ws", ["WebSocket", "JSON-кадры"], False), ("ui", ["Браузер", "Leaflet + панель"], True)],
+    [("tlog", ["tlog-запись"], False, 0), ("cmd", ["Команды: arm, mode", "COMMAND_LONG → ACK"], True, 3)],
+    [("fc", "br", "MAVLink", True), ("br", "ws"), ("ws", "ui"), ("br", "tlog", "", False, "v"), ("ui", "cmd", "", False, "v"), ("cmd", "br", "", True, "v")])
+
+D["proj-fleet-telemetry"] = _arch("Телеметрия флота: архитектура",
+    [("v", ["Аппараты ×N", "companion"], False), ("pub", ["Publisher", "буфер"], True), ("mq", ["MQTT"], False), ("ing", ["Ingest", "схема v1"], True), ("db", ["Influx /", "Timescale"], False)],
+    [("gr", ["Grafana", "карта, батарея"], False, 2), ("al", ["Алерты: АКБ,", "связь, EKF"], True, 4)],
+    [("v", "pub"), ("pub", "mq"), ("mq", "ing"), ("ing", "db"), ("db", "gr", "", False, "v"), ("db", "al", "", False, "v")])
+
+D["proj-log-service"] = _arch("Сервис анализа логов: архитектура",
+    [("bin", ["DataFlash .bin", "Blackbox .bbl"], False), ("prs", ["Парсер: pymavlink,", "blackbox_decode"], True), ("chk", ["Проверки", "порог + severity"], True), ("rep", ["HTML-отчёт", "графики, таймлайн"], False)],
+    [("js", ["findings.json"], False, 2), ("ci", ["CI: код возврата", "≠ 0 при FAIL"], False, 3)],
+    [("bin", "prs"), ("prs", "chk"), ("chk", "rep"), ("chk", "js", "", False, "v"), ("js", "ci")])
+
+D["proj-detect-follow"] = _arch("Детектор + трекер + следование: архитектура",
+    [("cam", ["Камера", "Gazebo"], False), ("det", ["Детектор", "YOLO-nano"], True), ("trk", ["Трекер", "ID, прогноз"], True), ("ctl", ["Регулятор", "кадр, дистанция"], True), ("fc", ["Автопилот", "Offboard/GUIDED"], False)],
+    [("wd", ["Сторож: цель", "потеряна > 1 с"], False, 3)],
+    [("cam", "det"), ("det", "trk"), ("trk", "ctl"), ("ctl", "fc", "", True), ("wd", "ctl", "стоп → висеть", False, "v")],
+    notes=[(10, 160, "кадр → bbox → цель → скорость", "m t")])
+
+D["proj-precision-landing"] = _arch("Точная посадка: архитектура",
+    [("cam", ["Камера вниз", "калибрована"], False), ("aru", ["ArUco", "поза маркера"], True), ("tf", ["Преобразование", "камера → FRD → NED"], True), ("fc", ["Автопилот", "PLND / precland"], False)],
+    [("lost", ["Маркер потерян:", "вверх / посадка"], False, 1), ("lt", ["LANDING_TARGET", "MAVLink"], True, 2)],
+    [("cam", "aru"), ("aru", "tf"), ("tf", "lt", "", False, "v"), ("lt", "fc", "", True), ("aru", "lost", "", False, "v")])
+
+D["proj-inspection"] = _arch("Инспекция маршрута: архитектура",
+    [("line", ["Полилиния", "объекта"], False), ("gen", ["Генератор миссии", "перекрытие, высота"], True), ("fc", ["Автопилот", "CAM_TRIGG_DIST"], False), ("cam", ["Камера", "кадры"], False)],
+    [("log", ["Лог CAM", "время, координаты"], False, 2), ("geo", ["Привязка", "кадр ↔ CAM"], True, 3)],
+    [("line", "gen"), ("gen", "fc", "миссия"), ("fc", "cam", "триггер"), ("fc", "log", "", False, "v"), ("cam", "geo", "", False, "v"), ("log", "geo")],
+    notes=[(10, 150, "Результат: кадры с геотегами", "m t"), (10, 164, "→ отчёт-карта с находками", "m t")])
+
+D["proj-photogrammetry"] = _arch("Фотограмметрия: конвейер",
+    [("img", ["Снимки", "с перекрытием"], False), ("sfm", ["ODM: SfM", "облако точек"], True), ("mesh", ["Ортофото", "DEM"], True), ("qgis", ["QGIS", "просмотр"], False)],
+    [("gcp", ["Контрольные", "точки GCP"], False, 1), ("rmse", ["Метрика RMSE"], True, 2)],
+    [("img", "sfm"), ("sfm", "mesh"), ("mesh", "qgis"), ("gcp", "rmse"), ("mesh", "rmse", "", False, "v")])
+
+D["proj-esp32-component"] = _arch("MAVLink-компонент на ESP32: архитектура",
+    [("sens", ["Датчик", "дальномер / ток"], False), ("esp", ["ESP32", "heartbeat, compid"], True), ("fc", ["Автопилот", "RNGFND1_TYPE=10"], False), ("log", ["Лог", "RFND"], False)],
+    [("tests", ["pytest: фейк", "+ SITL"], False, 0), ("twin", ["Python-двойник", "тот же протокол"], True, 1)],
+    [("sens", "esp"), ("esp", "fc", "", True), ("fc", "log"), ("tests", "twin"), ("twin", "esp", "те же тесты", False, "v")])
+
+D["proj-cell-bridge"] = _arch("Мост 4G/Wi-Fi: архитектура",
+    [("fc", ["Автопилот"], False), ("cc", ["Companion", "mavlink-router"], True), ("wg", ["WireGuard"], True), ("srv", ["Сервер VPN"], False), ("gcs", ["GCS"], False)],
+    [("fs", ["Потеря GCS →", "failsafe"], False, 0), ("qos", ["Команды выше", "телеметрии"], False, 1)],
+    [("fc", "cc", "UART"), ("cc", "wg"), ("wg", "srv", "4G"), ("srv", "gcs"), ("cc", "qos", "", False, "v"), ("fc", "fs", "", False, "v")])
+
+D["proj-fleet-ci"] = _arch("CI/CD флота: конвейер",
+    [("git", ["git push / PR"], False), ("act", ["GitHub", "Actions"], False), ("sitl", ["SITL: failsafe,", "миссия"], True), ("grd", ["Грейдер", "лога"], True), ("art", ["Артефакт:", "параметры"], False)],
+    [("diff", ["Diff параметров", "vs эталон"], True, 1), ("block", ["Красный тест —", "нет слияния"], False, 3)],
+    [("git", "act"), ("act", "sitl"), ("sitl", "grd"), ("grd", "art"), ("act", "diff", "", False, "v"), ("grd", "block", "", False, "v")])
+
+D["proj-lua-protection"] = _arch("Пакет защит на Lua: архитектура",
+    [("par", ["Параметры", "SCR_USER*"], False), ("lua", ["Lua-скрипты", "update() по таймеру"], True), ("api", ["API автопилота", "vehicle, ahrs, gcs"], False), ("act", ["Действие", "режим, сообщение"], False)],
+    [("t", ["SITL-тест на", "каждую защиту"], False, 0), ("err", ["Ошибка скрипта →", "безопасный режим"], True, 1)],
+    [("par", "lua"), ("lua", "api"), ("api", "act"), ("lua", "err", "", False, "v"), ("t", "lua", "", False, "h")])
+
+D["proj-tx16s-companion"] = _arch("Компаньон TX16S: архитектура",
+    [("rx", ["Аппарат", "ELRS RX"], False), ("tx", ["Пульт TX16S", "EdgeTX"], False), ("esp", ["ESP32 в пульте", "парсер CRSF"], True), ("ph", ["Телефон", "BLE / Wi-Fi"], False)],
+    [("sim", ["Симулятор EdgeTX", "+ фикстуры CRSF"], False, 0), ("lua", ["Lua-скрипт", "EdgeTX"], True, 1)],
+    [("rx", "tx", "CRSF"), ("tx", "esp", "UART"), ("esp", "ph"), ("tx", "lua", "", False, "v"), ("sim", "lua", "", False, "h")])
+
+
 def main() -> None:
     OUT.mkdir(parents=True, exist_ok=True)
     for name, content in D.items():
