@@ -1,0 +1,94 @@
+{
+  "module": "ros2-ardupilot",
+  "pass": 80,
+  "questions": [
+    {
+      "q": "Включить AP_DDS по последовательному порту:",
+      "options": [
+        "SERIALn_PROTOCOL = 45 и DDS_ENABLE = 1",
+        "SERIALn_PROTOCOL = 2",
+        "RNGFND1_TYPE = 10",
+        "MAV_SYSID = 45"
+      ],
+      "answer": 0,
+      "explain": "Для UDP — DDS_UDP_PORT (2019) и DDS_IP0..3."
+    },
+    {
+      "q": "В какой системе координат /ap/pose/filtered?",
+      "options": [
+        "ENU, frame map",
+        "NED",
+        "ECEF",
+        "FRD"
+      ],
+      "answer": 0,
+      "explain": "AP_DDS конвертирует сам."
+    },
+    {
+      "q": "Сервис смены режима в GUIDED для Copter:",
+      "options": [
+        "/ap/mode_switch с mode = 4",
+        "/ap/arm_motors",
+        "/ap/cmd_vel",
+        "/mavros/set_mode с 6"
+      ],
+      "answer": 0,
+      "explain": "GUIDED = 4, LAND = 9."
+    },
+    {
+      "q": "Уставки /ap/cmd_vel на земле игнорируются. Чего не хватает?",
+      "options": [
+        "Взлёта в GUIDED (takeoff)",
+        "QoS RELIABLE",
+        "Сервиса prearm",
+        "MAVROS"
+      ],
+      "answer": 0,
+      "explain": "Порядок: GUIDED → arm → takeoff → уставки."
+    },
+    {
+      "q": "Если cmd_vel перестал приходить в GUIDED, ArduPilot останавливается через:",
+      "options": [
+        "GUID_TIMEOUT",
+        "COM_OF_LOSS_T",
+        "FS_GCS_TIMEOUT",
+        "DDS_TIMEOUT_MS"
+      ],
+      "answer": 0,
+      "explain": "Аналог 2 Гц у PX4."
+    },
+    {
+      "q": "Где взять типы ardupilot_msgs?",
+      "options": [
+        "В репозитории ArduPilot: Tools/ros2/ardupilot_msgs",
+        "В px4_msgs",
+        "В MAVROS",
+        "В ROS core"
+      ],
+      "answer": 0,
+      "explain": "Ветка должна соответствовать прошивке."
+    },
+    {
+      "q": "Когда MAVROS предпочтительнее AP_DDS?",
+      "options": [
+        "Нужны миссии, параметры, произвольные MAVLink-сообщения или смешанный парк",
+        "Всегда",
+        "Когда важна минимальная задержка",
+        "Никогда"
+      ],
+      "answer": 0,
+      "explain": "MAVROS охватывает почти весь MAVLink."
+    },
+    {
+      "q": "frame_id \"base_link\" в /ap/cmd_vel означает:",
+      "options": [
+        "Скорость в осях корпуса, AP переводит в NED",
+        "Мировые ENU",
+        "Глобальные координаты",
+        "Ошибку"
+      ],
+      "answer": 0,
+      "explain": "\"map\" — мировые ENU."
+    }
+  ]
+}

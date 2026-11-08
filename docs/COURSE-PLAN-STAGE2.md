@@ -157,7 +157,7 @@ Totals: +19 modules, 12 projects, ~120 diagrams, 4 Docker environments, a task s
 | 2 ✅ | numeric task system + 31 tasks in 14 calculation modules; grading 30/30/40 (`docs/TASKS.md`) | tasks count in progress |
 | 3 ✅ | mathematics elective (3 modules, 9 tasks, 3 diagrams) + `pages/prerequisites.html` with a 10-task entry test; stage "Математика" in the ArduPilot and PX4 paths | prerequisites wired in curriculum |
 | 4 ✅ | MAVLink mini-course (5 modules, 3 sequence/topology diagrams) + `examples/mavlink/` with 12 pytest tests against a lossy fake vehicle (CI; SITL steps are in the labs) | labs autotested in CI |
-| 5 | ROS 2 Docker environment + ROS 2 modules 1–3 | `docker compose up` → flight in Gazebo |
+| 5 ✅ | `examples/ros2-docker/` (Compose: ROS 2 Humble, PX4 SITL + Gazebo, ArduPilot SITL + DDS) and `uav_ros2_labs` (logger, PX4 offboard square, AP_DDS square; flight logic as a pure state machine with 11 CI tests) + modules ros2-basics, ros2-px4, ros2-ardupilot. Image builds not exercised in CI (registry access) | flight logic tested in CI; flights in Gazebo are the student lab |
 | 6 | ROS 2 modules 4–6 + projects #1, #3, #10 | projects with autotests |
 | 7 | Perception +5 modules, lab data, projects #4, #5, #7 | labs without a drone |
 | 8 | remaining projects (#2, 6, 8, 9, 11, 12), Blackbox grader, application quizzes | catalogue of 12 |

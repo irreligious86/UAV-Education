@@ -1,0 +1,43 @@
+# ROS 2 labs environment. Profiles keep the heavy simulators optional:
+#   docker compose --profile px4 up        # PX4 SITL + Gazebo + XRCE agent + ROS 2 shell
+#   docker compose --profile ardupilot up  # ArduPilot SITL (DDS) + micro-ROS agent + ROS 2 shell
+#   docker compose run --rm ros bash       # just the ROS 2 workspace (tests, bags)
+name: uav-ros2
+
+services:
+  ros:
+    build: { context: ., dockerfile: docker/ros.Dockerfile }
+    network_mode: host
+    environment:
+      - ROS_DOMAIN_ID=0
+    volumes:
+      - ./ws/src/uav_ros2_labs:/ws/src/uav_ros2_labs
+      - ./bags:/bags
+    stdin_open: true
+    tty: true
+
+  xrce-agent:
+    profiles: [px4]
+    build: { context: ., dockerfile: docker/ros.Dockerfile }
+    network_mode: host
+    command: ["MicroXRCEAgent", "udp4", "-p", "8888"]
+
+  px4:
+    profiles: [px4]
+    build: { context: ., dockerfile: docker/px4.Dockerfile }
+    network_mode: host
+    environment:
+      - HEADLESS=1
+    depends_on: [xrce-agent]
+
+  microros-agent:
+    profiles: [ardupilot]
+    build: { context: ., dockerfile: docker/ros.Dockerfile }
+    network_mode: host
+    command: ["bash", "-lc", "source /ws/install/setup.bash && ros2 run micro_ros_agent micro_ros_agent udp4 -p 2019"]
+
+  ardupilot:
+    profiles: [ardupilot]
+    build: { context: ., dockerfile: docker/ardupilot.Dockerfile }
+    network_mode: host
+    depends_on: [microros-agent]

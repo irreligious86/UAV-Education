@@ -57,6 +57,11 @@ jobs:
           pip install --quiet pytest
           python -m pytest -q -p no:cacheprovider examples/mavlink/tests
 
+      - name: ROS 2 labs logic (frames, offboard state machine) and compose file
+        run: |
+          python -m pytest -q -p no:cacheprovider examples/ros2-docker/ws/src/uav_ros2_labs/test
+          python -c "import yaml; yaml.safe_load(open('examples/ros2-docker/docker-compose.yml'))"
+
       - uses: actions/setup-node@v4
         with:
           node-version: "22"

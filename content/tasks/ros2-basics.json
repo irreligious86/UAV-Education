@@ -1,0 +1,49 @@
+{
+ "module": "ros2-basics",
+ "tasks": [
+  {
+   "id": "yaw-enu",
+   "title": "Курс в ENU",
+   "statement": "Курс аппарата в NED ψ = **{y}°** (от севера по часовой). Найдите угол рысканья в ENU (градусы, от востока против часовой, в диапазоне (−180…180]).",
+   "params": {
+    "y": {
+     "min": 0,
+     "max": 350,
+     "step": 10
+    }
+   },
+   "answer": "math.degrees(math.atan2(math.sin(math.radians(90-y)), math.cos(math.radians(90-y))))",
+   "unit": "°",
+   "tol": 0.001,
+   "abs": 0.5,
+   "solution": "ψ_enu = 90° − ψ_ned, затем привести к (−180°, 180°]."
+  },
+  {
+   "id": "pos-enu",
+   "title": "Позиция в ENU",
+   "statement": "Позиция в NED: (**{n}**, **{e}**, **{d}**) м. Найдите z-компоненту в ENU (м).",
+   "params": {
+    "n": {
+     "min": -20,
+     "max": 20,
+     "step": 1
+    },
+    "e": {
+     "min": -20,
+     "max": 20,
+     "step": 1
+    },
+    "d": {
+     "min": -30,
+     "max": -1,
+     "step": 1
+    }
+   },
+   "answer": "-d",
+   "unit": "м",
+   "tol": 0.001,
+   "abs": 0.01,
+   "solution": "(n, e, d) → (e, n, −d)."
+  }
+ ]
+}

@@ -2788,6 +2788,99 @@
           "article": "math-prob-est"
         }
       ]
+    },
+    {
+      "id": "ros2",
+      "title": "Электив: ROS 2 на борту",
+      "modules": [
+        {
+          "id": "ros2-basics",
+          "title": "ROS 2 для борта: узлы, топики, QoS, tf2, bag",
+          "level": "L3",
+          "hours": 5,
+          "prerequisites": [
+            "math-linalg-rot",
+            "data-python"
+          ],
+          "objectives": [
+            "различать топики, сервисы, действия и параметры",
+            "объяснять совместимость QoS и подписываться на PX4",
+            "применять REP-103/105 и tf2",
+            "управлять временем и пользоваться ros2 bag"
+          ],
+          "lab": {
+            "title": "Логгер телеметрии и bag",
+            "criteria": [
+              "Эффект QoS показан выводом ros2 topic info -v",
+              "CSV логгера получен в SITL",
+              "CSV из воспроизведённого bag совпадает",
+              "Объяснено преобразование камеры в tf2"
+            ]
+          },
+          "stacks": [
+            "ros2"
+          ],
+          "article": "ros2-basics"
+        },
+        {
+          "id": "ros2-px4",
+          "title": "ROS 2 + PX4: uXRCE-DDS, offboard-узел как автомат состояний",
+          "level": "L3",
+          "hours": 6,
+          "prerequisites": [
+            "ros2-basics",
+            "px4-intro"
+          ],
+          "objectives": [
+            "объяснять мост uXRCE-DDS и версии px4_msgs",
+            "соблюдать правила Offboard",
+            "держать логику полёта в тестируемом автомате состояний",
+            "проверять защиты в SITL и отлаживать по bag"
+          ],
+          "lab": {
+            "title": "Offboard-квадрат с защитами",
+            "criteria": [
+              "Свой тест автомата (батарея → ABORT) проходит",
+              "График квадрата в Gazebo",
+              "Описаны три сценария защит: пилот, смерть узла, потеря агента",
+              "Узел проходит переходы на воспроизведённом bag"
+            ]
+          },
+          "stacks": [
+            "ros2"
+          ],
+          "article": "ros2-px4"
+        },
+        {
+          "id": "ros2-ardupilot",
+          "title": "ROS 2 + ArduPilot: AP_DDS и MAVROS",
+          "level": "L3",
+          "hours": 5,
+          "prerequisites": [
+            "ros2-basics",
+            "ap-sitl"
+          ],
+          "objectives": [
+            "подключать ArduPilot через AP_DDS",
+            "знать топики и сервисы /ap/* и их фреймы",
+            "выдерживать порядок GUIDED → arm → takeoff",
+            "сравнивать AP_DDS, MAVROS и маршрут PX4 по измерениям"
+          ],
+          "lab": {
+            "title": "Квадрат через AP_DDS и MAVROS",
+            "criteria": [
+              "Квадрат через AP_DDS: график и переходы",
+              "Проверен GUID_TIMEOUT по логу",
+              "Обёртка MAVROS с тем же автоматом",
+              "Таблица сравнения с измеренными задержками"
+            ]
+          },
+          "stacks": [
+            "ros2"
+          ],
+          "article": "ros2-ardupilot"
+        }
+      ]
     }
   ],
   "backlogTopics": [
@@ -3026,6 +3119,13 @@
           ]
         },
         {
+          "title": "ROS 2 (рекомендуется)",
+          "modules": [
+            "ros2-basics",
+            "ros2-ardupilot"
+          ]
+        },
+        {
           "title": "Восприятие",
           "modules": [
             "per-camera",
@@ -3089,6 +3189,14 @@
             "mav-routing",
             "mav-component",
             "mav-sdk"
+          ]
+        },
+        {
+          "title": "ROS 2",
+          "modules": [
+            "ros2-basics",
+            "ros2-px4",
+            "ros2-ardupilot"
           ]
         },
         {

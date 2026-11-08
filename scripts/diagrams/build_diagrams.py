@@ -303,6 +303,45 @@ D["mavlink-topology"] = flow("Топология MAVLink: кто кого вид
                      (10, 286, "широковещательные (target 0) — во все порты, кроме входного.", "m t")])
 
 
+# ---------------------------------------------------------------- ROS 2 elective
+D["ros2-graph"] = flow("Граф узлов ROS 2 в учебной системе: топики, сервисы, параметры", [
+    Box("ap", ["Автопилот"], 10, 100, 100, accent=True),
+    Box("bridge", ["Мост", "uXRCE-DDS / AP_DDS"], 150, 100, 150, accent=True),
+    Box("logger", ["telemetry_logger", "CSV, 10 Гц"], 400, 10, 150),
+    Box("fsm", ["offboard_square", "автомат состояний"], 400, 100, 150, accent=True),
+    Box("percep", ["perception", "камера → цели"], 400, 200, 150),
+    Box("bag", ["ros2 bag"], 600, 10, 110),
+    Box("watch", ["watchdog"], 600, 200, 110)],
+    [("ap", "bridge", "", True), ("bridge", "logger", "pose"), ("bridge", "fsm", "status, pose"), ("fsm", "bridge", "setpoints 20 Гц", True),
+     ("logger", "bag", ""), ("percep", "fsm", "цели"), ("percep", "watch", "")],
+    720, 260)
+
+D["ros2-qos"] = flow("QoS: совместимость издателя и подписчика (reliability)", [
+    Box("pbe", ["Издатель", "BEST_EFFORT"], 20, 30, 140), Box("prel", ["Издатель", "RELIABLE"], 20, 120, 140),
+    Box("sbe", ["Подписчик", "BEST_EFFORT"], 330, 30, 160, accent=True), Box("srel", ["Подписчик", "RELIABLE", "(по умолчанию)"], 330, 112, 160, 60)],
+    [("pbe", "sbe", "✓ работает"), ("prel", "srel", "✓ работает"), ("prel", "sbe", "✓ работает")],
+    720, 190, notes=[(520, 50, "BEST_EFFORT → RELIABLE: ✗ нет связи,", "d t"), (520, 66, "и молча — без ошибки.", "d t"),
+                     (520, 100, "PX4 публикует /fmu/out/* как", "m t"), (520, 116, "BEST_EFFORT: подписывайтесь", "m t"),
+                     (520, 132, "профилем sensor data.", "m t")])
+
+D["uxrce-scheme"] = flow("Два моста в ROS 2: PX4 uXRCE-DDS и ArduPilot AP_DDS", [
+    Box("px4", ["PX4: uORB", "uxrce_dds_client"], 10, 30, 150, accent=True), Box("ag1", ["MicroXRCEAgent", "udp4 :8888"], 220, 30, 150),
+    Box("ap", ["ArduPilot", "AP_DDS (DDS_ENABLE)"], 10, 130, 150, accent=True), Box("ag2", ["micro_ros_agent", "udp4 :2019"], 220, 130, 150),
+    Box("dds", ["DDS-сеть ROS 2", "/fmu/in|out/*, /ap/*"], 440, 80, 160, accent=True), Box("node", ["Ваши узлы"], 640, 80, 70)],
+    [("px4", "ag1", "XRCE"), ("ag1", "dds"), ("ap", "ag2", "XRCE"), ("ag2", "dds"), ("dds", "node")],
+    720, 200, notes=[(10, 192, "Последовательный порт вместо UDP: PX4 — UXRCE_DDS_CFG, ArduPilot — SERIALn_PROTOCOL = 45.", "m t")])
+
+D["offboard-fsm"] = flow("Автомат состояний offboard-узла (одинаковый для PX4 Offboard и ArduPilot GUIDED)", [
+    Box("wait", ["WAIT_READY"], 10, 40, 130), Box("stream", ["STREAM_SP", "≥ 1 с уставок"], 195, 40, 130), Box("arm", ["ARMING"], 380, 40, 130),
+    Box("off", ["OFFBOARD"], 565, 40, 130),
+    Box("to", ["TAKEOFF"], 565, 140, 130), Box("sq", ["SQUARE"], 380, 140, 130), Box("land", ["LAND"], 195, 140, 130), Box("done", ["DONE"], 10, 140, 130),
+    Box("abort", ["ABORT → посадка: нет позиции, устаревший статус, таймаут шага"], 10, 230, 685, 34, accent=True)],
+    [("wait", "stream", "позиция"), ("stream", "arm", ""), ("arm", "off", "armed"), ("off", "to", "режим ok"), ("to", "sq", "высота"),
+     ("sq", "land", "квадрат"), ("land", "done", "сел")],
+    720, 300, notes=[(10, 290, "Пилот переключил режим → DONE без команд: управление отдано человеку.", "m t")])
+
+
+
 def main() -> None:
     OUT.mkdir(parents=True, exist_ok=True)
     for name, content in D.items():
