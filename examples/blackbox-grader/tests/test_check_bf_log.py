@@ -69,3 +69,19 @@ def test_header_units_are_normalised(tmp_path):
 def test_threshold_override(logs):
     r = g.grade(logs["imbalanced"], ["motors"], overrides={"imbalance_max": 0.5})
     assert r["pass"]
+
+
+def test_lab_result_file_marks_only_passed_labs(logs, tmp_path):
+    r = g.grade(logs["noisy"], ["filters", "rpm"])
+    res = g.to_lab_result(r, logs["noisy"])
+    assert res["schema"] == "uav-lab-result/1" and len(res["input"]["sha256"]) == 64
+    labs = {x["lab"]: x["pass"] for x in res["labs"]}
+    assert labs == {"filters": False, "rpm": True}
+    assert "bf-filters:lab:0" not in res["marks"] and "bf-rpm-filter:lab:4" in res["marks"]
+    good = g.to_lab_result(g.grade(logs["good"], ["filters", "tracking", "motors", "rpm"]), logs["good"])
+    assert {"bf-filters:lab:0", "bf-filters:lab:1", "bf-pid:lab:4", "bf-pid:lab:5", "bf-rpm-filter:lab:4"} <= set(good["marks"])
+
+
+def test_labresult_copies_identical():
+    here = Path(__file__).resolve().parents[1]
+    assert (here / "labresult.py").read_bytes() == (here.parent / "sitl-pymavlink" / "labresult.py").read_bytes()

@@ -10,6 +10,7 @@
 | **Манифест навигации и статей** | `data/content-manifest.json` |
 | **Сборка** | `python scripts/publish.py` = валидация + `build_site.py` + `check_links.py` |
 | **Отдельно** | `scripts/validate_content.py`, `scripts/new_article.py` |
+| **Результаты грейдеров** | `docs/LAB-RESULTS.md` — JSON грейдеров (`--json`) импортируется на странице прогресса и отмечает проверенные пункты лабораторных |
 | **Внешние ссылки** | `scripts/check_external_links.py` — раз в неделю в `.github/workflows/links.yml`, мёртвые ссылки → issue `broken-links` (не блокирует CI) |
 | **Быстрый запуск** | `publish.bat` (Windows) / `publish.sh` (Linux) — проверка + сборка; commit/push вручную |
 | **CI** | `.github/workflows/ci.yml` — валидация, сайт пересобран и закоммичен, ссылки, GC закреплён на теге |

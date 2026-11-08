@@ -1113,6 +1113,15 @@ def render_progress(model: dict) -> str:
         <label class="gc-tag" style="cursor:pointer">Импорт JSON <input type="file" accept="application/json" data-import hidden></label>
         <gc-button variant="secondary" data-reset>Сбросить всё</gc-button>
       </div>
+    </section>
+    <section class="gc-panel">
+      <p class="gc-label gc-muted">Результаты грейдеров</p>
+      <p class="gc-muted">Грейдеры курса (<code>examples/sitl-pymavlink/check_lab_log.py</code>, <code>examples/blackbox-grader/check_bf_log.py</code>) с флагом <code>--json result.json</code> пишут файл результата. Загрузи его — пункты лабораторных, которые грейдер действительно проверил и которые прошли, отметятся сами; в таблице они помечены «⚙». Это самопроверка: файл можно подделать, он показывает, что грейдер запускали, а не что кто-то принял работу.</p>
+      <div class="progress-actions">
+        <label class="gc-tag" style="cursor:pointer">Импорт результата грейдера <input type="file" accept="application/json" data-lab-import hidden></label>
+        <span class="gc-muted" data-lab-msg aria-live="polite"></span>
+      </div>
+      <ul class="progress-labs" data-lab-results></ul>
     </section>"""
     return layout(title="Мой прогресс", base=base, body=body, active="progress",
                   extra_head=f'\n  <script src="{base}assets/progress-page.js" defer></script>')

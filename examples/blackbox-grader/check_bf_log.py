@@ -4,6 +4,7 @@
 Input is the CSV written by blackbox_decode (blackbox-tools):
     blackbox_decode LOG00001.BFL            # -> LOG00001.01.csv
     python check_bf_log.py LOG00001.01.csv --lab all --motor-range 48,2047 --json result.json
+    # result.json -> course progress page, "Импорт результата грейдера" (ticks the matching lab criteria)
 
 Labs (thresholds are course defaults, override with --set name=value):
   filters   gyroUnfilt vs gyroADC: high-frequency noise before/after filtering, dominant noise frequency
@@ -23,6 +24,19 @@ import re
 import sys
 
 import numpy as np
+
+sys.path.insert(0, __import__("os").path.dirname(__import__("os").path.abspath(__file__)))
+import labresult  # noqa: E402
+
+GRADER_VERSION = 1
+# lab -> course lab criteria (module:lab:index) proven when every check of that lab passes
+MARKS = {
+    "filters": ["bf-filters:lab:0", "bf-filters:lab:1"],
+    "tracking": ["bf-pid:lab:4"],
+    "motors": ["bf-pid:lab:5"],
+    "rpm": ["bf-rpm-filter:lab:4"],
+}
+BLACKBOX_RATE_MARK = ("bf-blackbox:lab:0", 1000.0)   # "log recorded at >= 1 kHz"
 
 DEFAULTS = {
     "noise_max_dps": 4.0,          # HF noise RMS left after filtering, roll/pitch
@@ -181,6 +195,16 @@ def grade(path: str, labs: list[str], motor_range=(48, 2047), overrides: dict | 
     return res
 
 
+def to_lab_result(r: dict, path: str) -> dict:
+    """Convert grade() output to the course lab result file (uav-lab-result/1)."""
+    labs: dict[str, list[dict]] = {}
+    for c in r["checks"]:
+        labs.setdefault(c["lab"], []).append({"check": c["check"], "pass": bool(c["pass"]), "value": str(c["value"]),
+                                              "limit": str(c["limit"])})
+    extra = [BLACKBOX_RATE_MARK[0]] if r["sample_rate_hz"] >= BLACKBOX_RATE_MARK[1] else []
+    return labresult.build("check_bf_log", GRADER_VERSION, path, labs, MARKS, extra, {"sample_rate_hz": r["sample_rate_hz"]})
+
+
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("csv")
@@ -199,8 +223,7 @@ def main() -> None:
             print(f"         {c['meaning']}")
     print("RESULT:", "PASS" if r["pass"] else "FAIL", f"({r['sample_rate_hz']} Hz)")
     if a.json:
-        with open(a.json, "w") as f:
-            json.dump(r, f, indent=1)
+        labresult.write(a.json, to_lab_result(r, a.csv))
     sys.exit(0 if r["pass"] else 1)
 
 

@@ -7,11 +7,24 @@ Usage:
   python3 check_lab_log.py <log.bin> --lab hover        # first-flight lab: vibration, hover throttle, tracking
   python3 check_lab_log.py <log.bin> --lab motorfail    # redundancy lab (el-redundancy): motor failure survived
 
+Add --json result.json to get a file the course progress page imports (ticks the matching lab criteria).
 Exit code 0 when every check passes, 1 otherwise. Output is a table the student pastes into the
 engineering folder. Checks are intentionally simple and transparent — read the code.
 """
-import argparse, sys
+import argparse, os, sys
 from pymavlink import mavutil
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import labresult  # noqa: E402
+
+GRADER_VERSION = 1
+# lab -> course lab criteria (module:lab:index) proven when every check of that lab passes
+MARKS = {
+    "failsafe": ["ap-safety-fs:lab:3"],
+    "mission": ["ap-missions:lab:3"],
+    "hover": ["ap-tuning:lab:2"],
+    "motorfail": ["ap-heavy:lab:0", "el-redundancy:lab:2"],
+}
 
 COPTER_MODES = {0: "STABILIZE", 2: "ALT_HOLD", 3: "AUTO", 4: "GUIDED", 5: "LOITER", 6: "RTL", 9: "LAND", 16: "POSHOLD", 21: "SMART_RTL"}
 
@@ -55,7 +68,7 @@ def lab_failsafe(log):
         rows.append(("Reaction within 5 s", bool(react) and dt <= 5.0, f"{dt:.1f} s" if react else "-"))
         resolved = [e for e in d["ERR"] if e.Subsys == 5 and e.ECode == 0 and t_s(e) > t0]
         rows.append(("Failsafe cleared (RC back) logged", True, f"{len(resolved)} clear event(s) — informational"))
-    return report(rows)
+    return rows
 
 
 def lab_mission(log):
@@ -74,7 +87,7 @@ def lab_mission(log):
     rows.append(("GPS satellites >= 6 throughout", not gps_bad, f"{len(gps_bad)} samples below 6" if gps_bad else "ok"))
     errs = [e for e in d["ERR"] if e.Subsys in (16, 17, 11)]          # EKF variance, EKF failsafe, GPS glitch
     rows.append(("No EKF/GPS errors", not errs, f"{len(errs)} ERR events (EKF/GPS)" if errs else "ok"))
-    return report(rows)
+    return rows
 
 
 def lab_hover(log):
@@ -99,14 +112,14 @@ def lab_hover(log):
     if d["BAT"]:
         vmin = min(b.Volt for b in d["BAT"]); vmax = max(b.Volt for b in d["BAT"])
         rows.append(("Battery sag < 15 %", (vmax - vmin) / vmax < 0.15, f"{vmax:.2f} → {vmin:.2f} V ({100 * (vmax - vmin) / vmax:.0f} %)"))
-    return report(rows)
+    return rows
 
 
 def lab_motorfail(log):
     d = read(log, ["RCOU", "CTUN", "ATT", "MODE"])
     rows = []
     if not d["RCOU"]:
-        return report([("RCOU logged", False, "no motor outputs in log")])
+        return [("RCOU logged", False, "no motor outputs in log")]
     n = max(i for i in range(1, 13) if hasattr(d["RCOU"][0], f"C{i}"))
     # a failed motor shows as one output pinned at max while the vehicle keeps flying
     sat = {}
@@ -124,14 +137,20 @@ def lab_motorfail(log):
     if d["ATT"]:
         err = sorted(abs(a.DesRoll - a.Roll) for a in d["ATT"]); p99 = err[int(0.99 * (len(err) - 1))]
         rows.append(("Roll tracking p99 < 15° with motor out", p99 < 15, f"p99 = {p99:.1f}°"))
-    return report(rows)
+    return rows
 
 
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("log"); ap.add_argument("--lab", required=True, choices=["failsafe", "mission", "hover", "motorfail"])
+    ap.add_argument("--json", help="write a lab result file for the course progress page (uav-lab-result/1)")
     a = ap.parse_args()
-    sys.exit({"failsafe": lab_failsafe, "mission": lab_mission, "hover": lab_hover, "motorfail": lab_motorfail}[a.lab](a.log))
+    rows = {"failsafe": lab_failsafe, "mission": lab_mission, "hover": lab_hover, "motorfail": lab_motorfail}[a.lab](a.log)
+    code = report(rows)
+    if a.json:
+        checks = [{"check": n, "pass": bool(ok), "value": str(detail)} for n, ok, detail in rows]
+        labresult.write(a.json, labresult.build("check_lab_log", GRADER_VERSION, a.log, {a.lab: checks}, MARKS))
+    sys.exit(code)
 
 
 if __name__ == "__main__":

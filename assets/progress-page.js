@@ -4,13 +4,52 @@
   var base = document.body.getAttribute("data-base") || "../";
   var G = window.UAVGrading;
 
+  var verified = {};   // module id -> number of lab criteria confirmed by an imported grader result
+
+  function esc(s) {
+    return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; });
+  }
+
+  function fillLabs(list) {
+    verified = {};
+    var seen = {};
+    list.forEach(function (r) {
+      if (!r.pass && !r.marks.length) return;
+      r.marks.forEach(function (m) { if (!seen[m]) { seen[m] = 1; var id = m.split(":")[0]; verified[id] = (verified[id] || 0) + 1; } });
+    });
+    var box = document.querySelector("[data-lab-results]");
+    if (!box) return;
+    box.innerHTML = list.length ? list.map(function (r) {
+      return '<li><span class="gc-tag" data-state="' + (r.pass ? "ok" : "caution") + '">' + (r.pass ? "PASS" : "FAIL") + "</span> " +
+        "<code>" + esc(r.grader) + " --lab " + esc(r.labs.join(",")) + "</code> · " + esc(r.name) + " · " + esc(r.generated.slice(0, 10)) +
+        ' · <span class="gc-muted">sha256 ' + esc(r.sha256.slice(0, 12)) + "…</span>" +
+        (r.marks.length ? " · отмечено: " + r.marks.map(function (m) { return "<code>" + esc(m) + "</code>"; }).join(", ") : "") + "</li>";
+    }).join("") : '<li class="gc-muted">Пока нет. Запусти грейдер с <code>--json result.json</code> и загрузи файл.</li>';
+  }
+
+  // Validate a uav-lab-result/1 file against the grading meta; returns a summary or throws with a reason.
+  function parseLabResult(data, meta) {
+    if (!data || data.schema !== "uav-lab-result/1") throw new Error("это не файл результата грейдера (нет schema uav-lab-result/1)");
+    var labN = {};
+    meta.modules.forEach(function (m) { labN[m.id] = m.lab || 0; });
+    var marks = (data.marks || []).filter(function (m) {
+      var p = /^([a-z0-9-]+):lab:(\d+)$/.exec(m);
+      return p && labN[p[1]] > Number(p[2]);
+    });
+    if (!data.input || !/^[0-9a-f]{64}$/.test(data.input.sha256 || "")) throw new Error("нет контрольной суммы входного лога");
+    return { grader: String(data.grader || "?"), labs: (data.labs || []).map(function (l) { return String(l.lab); }),
+             pass: !!data.pass, generated: String(data.generated || ""), name: String(data.input.name || ""),
+             sha256: data.input.sha256, marks: marks, ignored: (data.marks || []).length - marks.length };
+  }
+
   function fill(R) {
     var grades = R.grades, caps = R.caps;
     document.querySelectorAll("[data-row]").forEach(function (tr) {
       var g = grades[tr.getAttribute("data-row")];
       if (!g) return;
       tr.querySelector('[data-cell="quiz"]').textContent = (g.hasQuiz ? (g.quizPct === null ? "—" : g.quizPct + "%") : "нет") + (g.tasksTotal ? " · з. " + g.tasksDone + "/" + g.tasksTotal : "");
-      tr.querySelector('[data-cell="lab"]').textContent = g.labTotal ? g.labDone + "/" + g.labTotal : "нет";
+      var v = verified[g.id] || 0;
+      tr.querySelector('[data-cell="lab"]').textContent = g.labTotal ? g.labDone + "/" + g.labTotal + (v ? " · ⚙" + v : "") : "нет";
       tr.querySelector('[data-cell="score"]').textContent = g.score;
       var st = tr.querySelector('[data-cell="status"]');
       var label = G.statusLabel(g);
@@ -34,8 +73,11 @@
     });
   }
 
+  var lastMeta = null;
+
   function refresh() {
-    return G.load(base).then(fill).catch(function () {
+    var labs = window.UAVProgress.getLabResults ? window.UAVProgress.getLabResults() : Promise.resolve([]);
+    return labs.then(fillLabs).then(function () { return G.load(base); }).then(function (R) { lastMeta = R.meta; fill(R); }).catch(function () {
       var h = document.querySelector(".progress-headline");
       if (h) h.textContent = "Не удалось загрузить данные оценок.";
     });
@@ -60,6 +102,25 @@
         try { window.localStorage.setItem("uav-student:progress:v1", JSON.stringify(data)); } catch (e) {}
         return refresh();
       }).catch(function () { alert("Не удалось прочитать файл прогресса."); });
+    });
+    var labIn = document.querySelector("[data-lab-import]");
+    if (labIn) labIn.addEventListener("change", function () {
+      var f = labIn.files[0], msg = document.querySelector("[data-lab-msg]");
+      if (!f) return;
+      f.text().then(function (txt) {
+        var data = JSON.parse(txt);
+        var meta = lastMeta ? Promise.resolve(lastMeta) : fetch(base + "api/v1/grading.json").then(function (r) { return r.json(); });
+        return meta.then(function (m) {
+          var r = parseLabResult(data, m);
+          return window.UAVProgress.addLabResult(r).then(function (added) {
+            if (msg) msg.textContent = !added ? "Этот результат уже загружен." :
+              (r.marks.length ? "Отмечено пунктов лабораторных: " + r.marks.length + "." : "Результат сохранён; пункты не отмечены — проверки не пройдены.") +
+              (r.ignored ? " Неизвестных пунктов пропущено: " + r.ignored + "." : "");
+            return refresh();
+          });
+        });
+      }).catch(function (e) { if (msg) msg.textContent = "Не удалось загрузить: " + (e && e.message ? e.message : "неверный файл"); });
+      labIn.value = "";
     });
     var rst = document.querySelector("[data-reset]");
     if (rst) rst.addEventListener("click", function () {

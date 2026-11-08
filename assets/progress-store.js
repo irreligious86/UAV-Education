@@ -17,6 +17,9 @@
  *   getTasks(moduleId)       -> Promise<{taskId: true}>              solved numeric tasks
  *   setTask(moduleId, taskId, solved) -> Promise<void>
  *   getAllTasks()            -> Promise<{moduleId: {taskId: true}}>
+ *   addLabResult(summary)    -> Promise<boolean>  imported grader result (uav-lab-result/1 summary);
+ *                                                  ticks summary.marks, false if already imported
+ *   getLabResults()          -> Promise<Array>    imported grader results, newest first
  *   reset()                  -> Promise<void>                       wipe everything (student asked)
  */
 (function () {
@@ -30,9 +33,10 @@
     try {
       var raw = window.localStorage.getItem(KEY);
       var data = raw ? JSON.parse(raw) : {};
-      return { done: data.done || [], checks: data.checks || [], quiz: data.quiz || {}, tasks: data.tasks || {} };
+      return { done: data.done || [], checks: data.checks || [], quiz: data.quiz || {}, tasks: data.tasks || {},
+               labs: data.labs || [] };
     } catch (e) {
-      return { done: [], checks: [], quiz: {}, tasks: {} };
+      return { done: [], checks: [], quiz: {}, tasks: {}, labs: [] };
     }
   };
 
@@ -105,6 +109,22 @@
 
   LocalProgressStore.prototype.getAllTasks = function () {
     return Promise.resolve(this._read().tasks);
+  };
+
+  LocalProgressStore.prototype.addLabResult = function (r) {
+    var data = this._read();
+    var key = r.grader + "|" + r.labs.join(",") + "|" + r.sha256;
+    if (data.labs.some(function (x) { return x.key === key; })) return Promise.resolve(false);
+    data.labs.unshift(Object.assign({ key: key }, r));
+    var set = new Set(data.checks);
+    r.marks.forEach(function (m) { set.add(m); });
+    data.checks = Array.from(set);
+    this._write(data);
+    return Promise.resolve(true);
+  };
+
+  LocalProgressStore.prototype.getLabResults = function () {
+    return Promise.resolve(this._read().labs);
   };
 
   LocalProgressStore.prototype.reset = function () {
