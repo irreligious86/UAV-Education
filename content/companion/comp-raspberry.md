@@ -41,6 +41,50 @@ Raspberry Pi на борту — классический первый companion
 ### Время и логи
 У Pi без сети нет точного времени после загрузки. Для сопоставления логов companion с DataFlash FC используй `SYSTEM_TIME` из MAVLink (время GPS) или пиши в лог метки `TimeUS`-подобного монотонного счётчика и момент синхронизации.
 
+### Конфигурация mavlink-router (пример)
+```ini
+# /etc/mavlink-router/main.conf
+[General]
+TcpServerPort = 5760
+ReportStats = false
+[UartEndpoint fc]
+Device = /dev/serial0
+Baud = 921600
+[UdpEndpoint gcs]
+Mode = Normal
+Address = 192.168.1.20      # laptop with QGC
+Port = 14550
+[UdpEndpoint scripts]
+Mode = Server
+Address = 127.0.0.1
+Port = 14551                # local scripts connect here (udpin)
+[UdpEndpoint logger]
+Mode = Normal
+Address = 127.0.0.1
+Port = 14552
+```
+`systemctl enable --now mavlink-router`; скрипты — `mavutil.mavlink_connection("udpin:127.0.0.1:14551")`. Pi 5 использует `/dev/ttyAMA0` на GPIO 14/15 после `dtparam=uart0=on`; на Pi 4 — `enable_uart=1` и отключённый Bluetooth на том же UART (`dtoverlay=disable-bt`) для стабильной скорости 921600 (mini-UART на Pi 3/4 без этого «плавает» по скорости).
+
+### Сервис для своего скрипта
+```ini
+# /etc/systemd/system/uav-mission.service
+[Unit]
+Description=UAV mission script
+After=mavlink-router.service network.target
+[Service]
+ExecStart=/home/pi/uav/.venv/bin/python /home/pi/uav/mission.py
+Restart=always
+RestartSec=2
+WatchdogSec=30             # script must call sd_notify("WATCHDOG=1") or it is restarted
+User=pi
+[Install]
+WantedBy=multi-user.target
+```
+Логи `journalctl -u uav-mission -f`; перезапуск при падении — норма, но контур управления обязан это переживать (GUIDED-таймаут, модуль «Companion»).
+
+### Синхронизация времени и логов
+`chrony` с GPS через MAVLink невозможен напрямую; практично: скрипт при старте пишет пару (`SYSTEM_TIME.time_unix_usec`, свой `time.monotonic()`) и далее использует монотонные метки; при разборе сопоставление с `TimeUS` в DataFlash идёт через `GPS.GMS`/`SYSTEM_TIME`. Pi без RTC стартует с 1970 года — любые «абсолютные» метки до синхронизации бессмысленны.
+
 ## practice
 ### Шаг 1. Порт и проверка
 ```
@@ -133,6 +177,12 @@ journalctl -u uav-telemetry -f
 - **Симптом:** Pi перезагружается на газу
   - Возможная причина: слабое питание.
   - Что сделать: BEC с запасом, конденсатор, отдельная линия от силовой шины.
+- **Симптом:** мусор или нет данных на `/dev/serial0`
+  - Возможная причина: консоль на UART, mini-UART с плавающей скоростью, Bluetooth на том же порту.
+  - Что сделать: `raspi-config` (консоль выкл, UART вкл), `disable-bt`, 921600 только на полном UART.
+- **Симптом:** скрипт работает по SSH и «умирает» после отключения
+  - Возможная причина: не сервис.
+  - Что сделать: systemd-юнит с Restart=always.
 
 ## references
 - Communicating with Raspberry Pi via MAVLink — ArduPilot Dev | https://ardupilot.org/dev/docs/raspberry-pi-via-mavlink.html | primary | A

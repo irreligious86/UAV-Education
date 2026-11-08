@@ -45,6 +45,30 @@ MAVLink 2 — бинарный протокол поверх UART, UDP или TC
 - **pymavlink** — тонкая обёртка над протоколом: видишь каждое сообщение, подходит для обучения, диагностики и нестандартных вещей. Код многословный.
 - **MAVSDK** (C++, Python) — высокоуровневые действия: `arm()`, `takeoff()`, `goto_location()`, подписки на телеметрию. Быстрее писать приложения, меньше видно изнутри. Исторически ближе к PX4, но с ArduPilot работает.
 
+### Кадр MAVLink 2 побайтно
+`FD | len | incompat_flags | compat_flags | seq | sysid | compid | msgid(3) | payload(len) | crc(2) | [signature(13)]`. `incompat_flags` бит 0 — пакет подписан; подпись — HMAC-SHA256 по секретному ключу + timestamp (защита от подмены команд по открытому радиоканалу — `MAV_SIGNING` в ArduPilot/QGC). CRC-16/MCRF4XX по кадру + `CRC_EXTRA` байт сообщения (из XML) — несовпадение диалектов = «молчание». Payload сжимается обрезанием нулевых байтов в конце (поэтому `len` меньше размера структуры). Параметры в `PARAM_VALUE` — всегда float (32 бит), целые упакованы «по байтам» (`MAV_PARAM_TYPE`), о чём легко споткнуться в pymavlink.
+
+### Потоки телеметрии: кто задаёт частоту
+ArduPilot шлёт потоки по `SRx_*` параметрам порта (`SR2_EXTRA1` — ATTITUDE, `SR2_POSITION` — GLOBAL_POSITION_INT, `SR2_RAW_SENS` — RAW_IMU…) в Гц; современный способ — `MAV_CMD_SET_MESSAGE_INTERVAL` (511) от клиента: интервал в мкс (−1 — выключить, 0 — по умолчанию). PX4 — профили `MAV_x_MODE` (Normal/Onboard/OSD…). Порт 921600 бод вмещает ~90 КБ/с: ATTITUDE на 50 Гц + позиция 10 Гц + RAW_IMU 50 Гц — порядка 10 КБ/с, запас есть; на 57600 (радиомодем) — всё, что выше 5–10 Гц, захлёбывается.
+
+### Разобранный пример: надёжная команда
+```python
+def cmd(m, command, *params, retries=3, timeout=1.0):
+    """Send COMMAND_LONG and wait for a matching ACK; retry on timeout; raise on rejection."""
+    p = list(params) + [0] * (7 - len(params))
+    for _ in range(retries):
+        m.mav.command_long_send(m.target_system, m.target_component, command, 0, *p)
+        t0 = time.time()
+        while time.time() - t0 < timeout:
+            ack = m.recv_match(type="COMMAND_ACK", blocking=True, timeout=timeout)
+            if ack and ack.command == command:
+                if ack.result == mavutil.mavlink.MAV_RESULT_ACCEPTED: return True
+                if ack.result == mavutil.mavlink.MAV_RESULT_IN_PROGRESS: continue
+                raise RuntimeError(f"cmd {command} rejected: result {ack.result}")
+    raise TimeoutError(f"cmd {command}: no ACK")
+```
+`STATUSTEXT` параллельно объясняет отказ («PreArm: …»). MAVSDK делает то же под капотом — но понимать, что внутри, нужно, чтобы читать tlog при разборе.
+
 ## practice
 ### Шаг 1. Слушать телеметрию
 ```python

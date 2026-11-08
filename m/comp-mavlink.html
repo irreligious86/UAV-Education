@@ -50,6 +50,25 @@
 <p>Команда без проверки <code>COMMAND_ACK</code> — это надежда, а не управление. Результат <code>MAV_RESULT_ACCEPTED</code> (0) означает «принято»; остальные коды — отказ, и его причина обычно приходит в <code>STATUSTEXT</code>.</p>
 <h4 class="md-subheading">pymavlink против MAVSDK</h4>
 <ul><li><strong>pymavlink</strong> — тонкая обёртка над протоколом: видишь каждое сообщение, подходит для обучения, диагностики и нестандартных вещей. Код многословный.</li><li><strong>MAVSDK</strong> (C++, Python) — высокоуровневые действия: <code>arm()</code>, <code>takeoff()</code>, <code>goto_location()</code>, подписки на телеметрию. Быстрее писать приложения, меньше видно изнутри. Исторически ближе к PX4, но с ArduPilot работает.</li></ul>
+<h4 class="md-subheading">Кадр MAVLink 2 побайтно</h4>
+<p><code>FD | len | incompat_flags | compat_flags | seq | sysid | compid | msgid(3) | payload(len) | crc(2) | [signature(13)]</code>. <code>incompat_flags</code> бит 0 — пакет подписан; подпись — HMAC-SHA256 по секретному ключу + timestamp (защита от подмены команд по открытому радиоканалу — <code>MAV_SIGNING</code> в ArduPilot/QGC). CRC-16/MCRF4XX по кадру + <code>CRC_EXTRA</code> байт сообщения (из XML) — несовпадение диалектов = «молчание». Payload сжимается обрезанием нулевых байтов в конце (поэтому <code>len</code> меньше размера структуры). Параметры в <code>PARAM_VALUE</code> — всегда float (32 бит), целые упакованы «по байтам» (<code>MAV_PARAM_TYPE</code>), о чём легко споткнуться в pymavlink.</p>
+<h4 class="md-subheading">Потоки телеметрии: кто задаёт частоту</h4>
+<p>ArduPilot шлёт потоки по <code>SRx_*</code> параметрам порта (<code>SR2_EXTRA1</code> — ATTITUDE, <code>SR2_POSITION</code> — GLOBAL_POSITION_INT, <code>SR2_RAW_SENS</code> — RAW_IMU…) в Гц; современный способ — <code>MAV_CMD_SET_MESSAGE_INTERVAL</code> (511) от клиента: интервал в мкс (−1 — выключить, 0 — по умолчанию). PX4 — профили <code>MAV_x_MODE</code> (Normal/Onboard/OSD…). Порт 921600 бод вмещает ~90 КБ/с: ATTITUDE на 50 Гц + позиция 10 Гц + RAW_IMU 50 Гц — порядка 10 КБ/с, запас есть; на 57600 (радиомодем) — всё, что выше 5–10 Гц, захлёбывается.</p>
+<h4 class="md-subheading">Разобранный пример: надёжная команда</h4>
+<pre class="cli-block"><code>def cmd(m, command, *params, retries=3, timeout=1.0):
+    &quot;&quot;&quot;Send COMMAND_LONG and wait for a matching ACK; retry on timeout; raise on rejection.&quot;&quot;&quot;
+    p = list(params) + [0] * (7 - len(params))
+    for _ in range(retries):
+        m.mav.command_long_send(m.target_system, m.target_component, command, 0, *p)
+        t0 = time.time()
+        while time.time() - t0 &lt; timeout:
+            ack = m.recv_match(type=&quot;COMMAND_ACK&quot;, blocking=True, timeout=timeout)
+            if ack and ack.command == command:
+                if ack.result == mavutil.mavlink.MAV_RESULT_ACCEPTED: return True
+                if ack.result == mavutil.mavlink.MAV_RESULT_IN_PROGRESS: continue
+                raise RuntimeError(f&quot;cmd {command} rejected: result {ack.result}&quot;)
+    raise TimeoutError(f&quot;cmd {command}: no ACK&quot;)</code></pre>
+<p><code>STATUSTEXT</code> параллельно объясняет отказ («PreArm: …»). MAVSDK делает то же под капотом — но понимать, что внутри, нужно, чтобы читать tlog при разборе.</p>
 
 <h2>Практика</h2>
 <h4 class="md-subheading">Шаг 1. Слушать телеметрию</h4>
