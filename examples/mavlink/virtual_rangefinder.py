@@ -5,7 +5,7 @@ ArduPilot uses it when RNGFND1_TYPE = 10 (MAVLink) and RNGFND1_ORIENT = 25 (down
 The component has its own compid (MAV_COMP_ID_PERIPHERAL), sends its own HEARTBEAT, and
 reads altitude from GLOBAL_POSITION_INT to fake a terrain-following measurement.
 
-  python virtual_rangefinder.py --master udpout:127.0.0.1:14550 --rate 20
+  python virtual_rangefinder.py --master udpin:0.0.0.0:14551 --rate 20   # SITL: add --out=udp:127.0.0.1:14551
 """
 from __future__ import annotations
 
@@ -57,7 +57,8 @@ class VirtualRangefinder:
 
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--master", default="udpout:127.0.0.1:14550")
+    ap.add_argument("--master", default="udpin:0.0.0.0:14551",
+                    help="listen where MAVProxy/mavlink-router sends a copy of the stream (udpin), or tcp:127.0.0.1:5762")
     ap.add_argument("--rate", type=float, default=20.0)
     a = ap.parse_args()
     VirtualRangefinder(a.master).run(a.rate)

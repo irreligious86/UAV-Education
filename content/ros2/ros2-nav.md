@@ -25,7 +25,7 @@ next:
 
 ## theory
 ### Что умеет автопилот без вас
-- **ArduPilot**: proximity-датчики (`PRX1_TYPE`, в том числе MAVLink `OBSTACLE_DISTANCE`) → **simple avoidance** (остановка/скольжение в Loiter, `AVOID_ENABLE`, `AVOID_MARGIN`) и **object avoidance** в автоматических режимах: `OA_TYPE = 1` BendyRuler (реактивный, ищет обходное направление), `2` Dijkstra (по геозонам-полигонам, глобальный путь вокруг известных запретных зон), `3` комбинация. Параметры `OA_MARGIN_MAX`, `OA_LOOKAHEAD`.
+- **ArduPilot**: proximity-датчики (`PRX1_TYPE`, в том числе MAVLink `OBSTACLE_DISTANCE`) → **simple avoidance** (остановка/скольжение в Loiter, `AVOID_ENABLE`, `AVOID_MARGIN`) и **object avoidance** в автоматических режимах: `OA_TYPE = 1` BendyRuler (реактивный, ищет обходное направление), `2` Dijkstra (по геозонам-полигонам, глобальный путь вокруг известных запретных зон), `3` комбинация. Параметры `OA_MARGIN_MAX`, `OA_BR_LOOKAHEAD`.
 - **PX4**: **collision prevention** в Position-режиме (`CP_DIST` — минимальная дистанция, по `OBSTACLE_DISTANCE`/ROS 2 `ObstacleDistance`), ограничивает скорость в сторону препятствия.
 
 Это работает и проверено в полёте — начинайте с этого. Своя навигация на companion нужна, когда: карту надо строить и хранить (полёт в помещении, лес), путь — глобально оптимальный в неизвестной среде, или есть цель более высокого уровня (обследовать объект, долететь до точки, найденной камерой).

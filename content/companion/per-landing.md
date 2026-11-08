@@ -38,7 +38,7 @@ GPS сажает аппарат с точностью метр-два; на за
 - `distance` — расстояние до цели (м), если известно (из PnP или дальномера).
 - `size_x`, `size_y` — угловой размер цели.
 - `frame` — система координат (обычно `MAV_FRAME_BODY_FRD` для угловой версии).
-- Расширенная версия: `position_valid = 1` и поля `x, y, z` — положение цели в метрах в указанной системе, плюс `q` — ориентация цели. Её заполняют, когда PnP даёт полную позу.
+- Расширенная версия: `position_valid = 1` и поля `x, y, z` — положение цели в метрах в указанной системе, плюс `q` — ориентация цели. Её заполняют, когда PnP даёт полную позу. ArduPilot при `position_valid = 1` требует `distance > 0` (иначе сообщение отбрасывается) и `q` не использует; PX4 принимает только `x, y, z` в `MAV_FRAME_LOCAL_NED`.
 - `time_usec` — время **экспозиции кадра** по монотонным часам companion (не время отправки). ArduPilot не требует синхронизации часов: его коррекция джиттера (`correct_offboard_timestamp_usec_to_ms`) оценивает смещение между часами companion и своими по самым быстрым сообщениям. Следствие, которое важно понимать: **переменная** часть задержки (обработка то 30, то 90 мс) так убирается, а **постоянная** неотличима от смещения часов — её задают параметром `PLND_LAG`. Без правильной метки и `PLND_LAG` задержка камеры 50–100 мс превращается в раскачку над целью.
 
 Углы для downward-камеры: angle_x = atan(x_n), angle_y = atan(y_n), где (x_n, y_n) — нормированные координаты центра маркера после снятия дисторсии. Функция `landing_target_angles()` в `examples/perception/camgeo.py` делает ровно это.
@@ -87,7 +87,8 @@ import math, time
 from pymavlink import mavutil
 import camgeo as cg   # examples/perception
 
-m = mavutil.mavlink_connection("udpout:127.0.0.1:14550", source_system=1, source_component=mavutil.mavlink.MAV_COMP_ID_ONBOARD_COMPUTER)
+m = mavutil.mavlink_connection("udpin:127.0.0.1:14550", source_system=1, source_component=mavutil.mavlink.MAV_COMP_ID_ONBOARD_COMPUTER)
+m.wait_heartbeat()   # udpin узнаёт адрес отправителя только из первого пакета
 K = cg.K_matrix(600, 600, 320, 240)
 
 def send_target(u, v, t_exposure_s, distance_m=0.0):

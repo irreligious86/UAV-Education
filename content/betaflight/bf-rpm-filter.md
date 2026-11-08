@@ -131,7 +131,7 @@ save
 
 ## references
 - DShot RPM Filtering — Betaflight Documentation | https://betaflight.com/docs/wiki/guides/current/DSHOT-RPM-Filtering | primary | A
-- Betaflight CLI — Documentation | https://betaflight.com/docs/development/Cli | primary | A
+- Betaflight CLI — Documentation | https://betaflight.com/docs/wiki/guides/current/Cli | primary | A
 - Orangebox — Blackbox log parser for Python | https://github.com/atomgomba/orangebox | secondary | B
 - RPM Filter explained — Oscar Liang | https://oscarliang.com/rpm-filter/ | secondary | B
 

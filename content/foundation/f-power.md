@@ -91,7 +91,7 @@ U под нагрузкой = E − I·R. LiPo 6S 1300 мА·ч 100C «свеж�
   - Что сделать: вывести АКБ из эксплуатации, пересмотреть ёмкость/C под реальный ток.
 
 ## references
-- Betaflight App — tabs reference (Power & Battery) | https://betaflight.com/docs/category/app | primary | A
+- Betaflight App — tabs reference (Power & Battery) | https://betaflight.com/docs/wiki/app | primary | A
 - Battery Monitors — ArduPilot Copter | https://ardupilot.org/copter/docs/common-powermodule-landingpage.html | primary | A
 - LiPo Battery Guide — Oscar Liang | https://oscarliang.com/lipo-battery-guide/ | secondary | B
 

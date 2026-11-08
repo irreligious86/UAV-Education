@@ -103,7 +103,7 @@ DroneCAN GUI Tool через SLCAN-мост полётника: увидеть n
   - Что сделать: короче/витые/экран, SPI или CAN вместо I2C.
 
 ## references
-- NXP — I2C-bus specification and user manual (UM10204) | https://www.NXP.com/docs/en/user-guide/UM10204.pdf | primary | A
+- NXP — I2C-bus specification and user manual (UM10204) | https://www.nxp.com/docs/en/user-guide/UM10204.pdf | primary | A
 - DroneCAN — Specification | https://dronecan.github.io/Specification/1._Introduction | primary | A
 - Bosch — BMP280 datasheet BST-BMP280-DS001 (registers, compensation) | https://bluerobotics.com/wp-content/uploads/2022/05/BMP280-DATASHEET.pdf | primary | A
 

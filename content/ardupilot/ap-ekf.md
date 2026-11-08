@@ -90,7 +90,7 @@ HeeWing T1 на стоковом F405: компаса на борту нет в�
 
 ## references
 - Extended Kalman Filter (EKF) — ArduPilot | https://ardupilot.org/copter/docs/common-apm-navigation-extended-kalman-filter-overview.html | primary | A
-- EKF Failsafe — ArduPilot Copter | https://ardupilot.org/copter/docs/ekf-inav-failsafe.html | primary | A
+- EKF Failsafe — ArduPilot Copter | https://ardupilot.org/copter/docs/common-ekf-inav-failsafe.html | primary | A
 - EKF source parameters (AP_NavEKF_Source.cpp, GitHub) | https://github.com/ArduPilot/ardupilot/blob/master/libraries/AP_NavEKF/AP_NavEKF_Source.cpp | primary | A
 
 ## checklist

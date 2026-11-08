@@ -58,7 +58,7 @@ next:
 ### Развёртывание
 - **Контейнер**: образ с ROS 2, зависимостями и вашим пакетом; версия образа = версия бортового ПО. `docker compose` с `restart: unless-stopped` и `network_mode: host` (DDS discovery внутри контейнеров с bridge-сетью сложнее).
 - **Автозапуск**: systemd-сервис, запускающий `ros2 launch` (или compose) после сети и после появления последовательного порта (`After=`, `BindsTo=dev-ttyAMA0.device`).
-- **Логи**: `ros2 bag record` ключевых топиков в кольцевом режиме (`--max-bag-duration`, `--max-bag-size`) + journald; после инцидента — выгрузка bag вместе с логом автопилота.
+- **Логи**: `ros2 bag record` ключевых топиков с разбиением на файлы (`--max-bag-duration`, `--max-bag-size`; автоудаление старых файлов `--max-bag-files` есть только в новых версиях rosbag2, в Humble/Jazzy место на диске нужно чистить самому) + journald; после инцидента — выгрузка bag вместе с логом автопилота.
 - **Время**: chrony/NTP на companion, синхронизация с автопилотом (TIMESYNC/uXRCE) — иначе bag и лог автопилота не совмещаются.
 
 ### Отладка и профилирование
@@ -104,7 +104,7 @@ python -m pytest -q test/test_watchdog.py
 - ROS 2 — Managed nodes (lifecycle) design | https://design.ros2.org/articles/node_lifecycle.html | primary | A
 - ROS 2 Humble — Executors and callback groups | https://docs.ros.org/en/humble/Concepts/Intermediate/About-Executors.html | primary | A
 - ros2_tracing | https://github.com/ros2/ros2_tracing | primary | A
-- Nav2 — lifecycle manager | https://docs.nav2.org/configuration/packages/configuring-lifecycle.html | primary | A
+- Nav2 — lifecycle manager | https://api.nav2.org/nav2-jazzy/html/md_nav2_lifecycle_manager_README.html | primary | A
 
 ## checklist
 - Разделяю приложение на мост, восприятие, решение и защиты с правильными зависимостями

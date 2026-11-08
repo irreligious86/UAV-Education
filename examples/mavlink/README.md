@@ -4,7 +4,7 @@ Starter code and autotests for the MAVLink mini-course (`mav-protocol`, `mav-ser
 `mav-routing`, `mav-component`, `mav-sdk`). Everything here runs **without SITL**: a small
 `fake_vehicle.py` speaks heartbeat, parameters, missions and commands, and can drop a fraction
 of its packets to prove that your retries work. The same clients work unchanged against
-ArduPilot SITL (`udpout:127.0.0.1:14550`) or a real vehicle.
+ArduPilot SITL (listen with `udpin:0.0.0.0:14551` on an extra MAVProxy output `--out=udp:127.0.0.1:14551`, or connect `tcp:127.0.0.1:5762`) or a real vehicle.
 
 ```bash
 pip install pymavlink pytest

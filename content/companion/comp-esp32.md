@@ -153,7 +153,7 @@ return { name = "Companion", create = create, update = update, refresh = refresh
   - Что сделать: Hardware → AUX = Lua, `setSerialBaudrate`, анализатор на линии.
 
 ## references
-- EdgeTX Lua API Reference | https://luadoc.edgetx.org/lua-api-reference | primary | A
+- EdgeTX Lua API Reference | https://luadoc.edgetx.org/ | primary | A
 - EdgeTX Lua serial API source (api_general.cpp, GitHub) | https://github.com/EdgeTX/edgetx/blob/main/radio/src/lua/api_general.cpp | primary | A
 - ESP32 Arduino core — Wi-Fi API (GitHub) | https://github.com/espressif/arduino-esp32 | primary | A
 - PlatformIO — Documentation | https://docs.platformio.org/ | primary | A

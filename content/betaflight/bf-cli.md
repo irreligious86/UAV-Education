@@ -13,7 +13,7 @@ tags:
   - Betaflight
 references:
   - title: "Betaflight CLI Documentation"
-    url: "https://www.betaflight.com/docs/development/Cli"
+    url: "https://betaflight.com/docs/wiki/guides/current/Cli"
     tier: primary
     stack: betaflight
   - title: "Betaflight Resource Remapping Guide"
@@ -21,7 +21,7 @@ references:
     tier: primary
     stack: betaflight
   - title: "Betaflight 4.5 CLI Command Reference"
-    url: "https://betaflight-com.pages.dev/docs/wiki/guides/current/Betaflight-4.5-CLI-commands"
+    url: "https://betaflight.com/docs/wiki/guides/archive/Betaflight-4.5-CLI-commands"
     tier: primary
     stack: betaflight
   - title: "Remapping Motors with Resource Command"
@@ -316,9 +316,9 @@ defaults
 
 ## references
 
-- Betaflight CLI Documentation | https://www.betaflight.com/docs/development/Cli | primary | A
+- Betaflight CLI Documentation | https://betaflight.com/docs/wiki/guides/current/Cli | primary | A
 - Betaflight Resource Remapping Guide | https://www.betaflight.com/docs/wiki/guides/current/Resource-remapping | primary | A
-- Betaflight 4.5 CLI Command Reference | https://betaflight-com.pages.dev/docs/wiki/guides/current/Betaflight-4.5-CLI-commands | primary | A
+- Betaflight 4.5 CLI Command Reference | https://betaflight.com/docs/wiki/guides/archive/Betaflight-4.5-CLI-commands | primary | A
 - Remapping Motors with Resource Command | https://betaflight-com.pages.dev/docs/wiki/guides/current/Remapping-Motors-with-Resource-Command | primary | A
 - Betaflight 4.0 CLI Reference (для сравнения версий) | https://www.betaflight.com/docs/wiki/guides/archive/Betaflight-4.0-CLI-commands | primary | A
 - How to Check Betaflight Build Options | https://oscarliang.com/check-betaflight-build-options/ | secondary | B

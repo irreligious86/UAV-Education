@@ -12,7 +12,7 @@ tags:
   - настройка
 references:
   - title: "Getting Started — Betaflight Documentation"
-    url: "https://www.betaflight.com/docs/development/Getting-Started"
+    url: "https://betaflight.com/docs/wiki/getting-started"
     tier: primary
     stack: betaflight
   - title: "Betaflight 4.5 Release Notes"
@@ -247,10 +247,10 @@ diff all
   - Что сделать: `pid_process_denom = 2`, отключить LED/лишние телеметрии, `tasks` для поиска тяжёлых.
 
 ## references
-- Getting Started — Betaflight Documentation | https://www.betaflight.com/docs/development/Getting-Started | primary | A
+- Getting Started — Betaflight Documentation | https://betaflight.com/docs/wiki/getting-started | primary | A
 - Betaflight 4.5 Release Notes | https://www.betaflight.com/docs/wiki/release/Betaflight-4-5-Release-Notes | primary | A
 - Betaflight Configurator — Official Web App | https://app.betaflight.com | primary | A
-- Betaflight CLI Documentation — Command Reference | https://www.betaflight.com/docs/development/Cli | primary | A
+- Betaflight CLI Documentation — Command Reference | https://betaflight.com/docs/wiki/guides/current/Cli | primary | A
 - Betaflight Configurator — GitHub Releases | https://github.com/betaflight/betaflight-configurator/releases | primary | A
 - Betaflight FAQ — How to Start | https://www.betaflight.com/docs/wiki/guides/current/FAQ | primary | A
 - Betaflight Advanced Guide — iFlight | https://help.iflight-rc.eu/en-US/betaflight-advanced-guide-951396 | secondary | B

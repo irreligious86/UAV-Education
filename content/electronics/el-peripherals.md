@@ -95,7 +95,7 @@ next:
 
 ## references
 - ArduPilot — CAN Bus Setup (DroneCAN) | https://ardupilot.org/copter/docs/common-canbus-setup-advanced.html | primary | A
-- Betaflight — Serial (development docs: ports, inversion, half-duplex) | https://web.betaflight.com/docs/development/Serial | primary | A
+- Betaflight — Serial (development docs: ports, inversion, half-duplex) | https://betaflight.com/docs/wiki/guides/current/Serial | primary | A
 - ArduPilot — Serial Port Options and Protocols | https://ardupilot.org/copter/docs/common-serial-options.html | primary | A
 
 ## checklist

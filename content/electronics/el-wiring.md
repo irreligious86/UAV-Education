@@ -85,7 +85,7 @@ XT60 → PDB/ESC 14 AWG. Проверить: вытягивание, прозв�
   - Что сделать: прозвонка до включения, smoke stopper.
 
 ## references
-- NASA Workmanship Standards — Soldering (pictorial reference) | https://workmanship.nasa.gov | primary | A
+- NASA Workmanship Standards — Soldering (pictorial reference) | https://standards.nasa.gov/standard/nasa/nasa-std-87394 | primary | A
 - Adafruit — Guide to Excellent Soldering | https://learn.adafruit.com/adafruit-guide-excellent-soldering | secondary | B
 - Oscar Liang — A Beginner's Guide to Soldering for FPV Drones | https://oscarliang.com/soldering-guide | secondary | B
 

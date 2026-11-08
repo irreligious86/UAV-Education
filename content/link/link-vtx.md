@@ -107,8 +107,8 @@ save
   - Что сделать: разнос ≥ 37 МГц, мощность минимально достаточная, таблица площадки.
 
 ## references
-- VTX — Betaflight Development Docs | https://betaflight.com/docs/development/VTX | primary | A
-- VTX Tables — Betaflight Documentation | https://betaflight.com/docs/wiki/guides/current/VTX-Tables | primary | A
+- VTX — Betaflight Development Docs | https://betaflight.com/docs/wiki/guides/current/VTX | primary | A
+- VTX Tables — Betaflight Documentation | https://betaflight.com/docs/wiki/guides/current/VTX | primary | A
 - How to Setup VTX Table in Betaflight — Oscar Liang | https://oscarliang.com/smartaudio-tramp-vtx-control-vtxtables/ | secondary | B
 
 ## checklist

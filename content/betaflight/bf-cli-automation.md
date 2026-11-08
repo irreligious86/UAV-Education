@@ -154,7 +154,7 @@ with serial.Serial(port_name, 115200, timeout=1) as p:
   - Что сделать: сразу переименовать, `set craft_name = ...` + `save`.
 
 ## references
-- Betaflight CLI — Documentation | https://betaflight.com/docs/development/Cli | primary | A
+- Betaflight CLI — Documentation | https://betaflight.com/docs/wiki/guides/current/Cli | primary | A
 - pySerial — Documentation | https://pyserial.readthedocs.io/en/latest/ | primary | A
 - Betaflight — source code (GitHub) | https://github.com/betaflight/betaflight | primary | A
 

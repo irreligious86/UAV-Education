@@ -97,7 +97,7 @@ ArduPilot SITL, Loiter на 20 м:
   - Что сделать: план частот, другой диапазон, второй приёмник.
 
 ## references
-- ArduPilot — EKF Failsafe | https://ardupilot.org/copter/docs/ekf-inav-failsafe.html | primary | A
+- ArduPilot — EKF Failsafe | https://ardupilot.org/copter/docs/common-ekf-inav-failsafe.html | primary | A
 - ArduPilot — EKF Source Selection and Switching | https://ardupilot.org/copter/docs/common-ekf-sources.html | primary | A
 - PX4 — Safety (failsafe) configuration | https://docs.px4.io/main/en/config/safety.html | primary | A
 

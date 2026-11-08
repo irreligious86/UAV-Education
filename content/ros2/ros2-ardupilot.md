@@ -36,7 +36,7 @@ next:
 ### Что публикует и принимает AP_DDS
 | Топик/сервис | Тип | Назначение |
 |---|---|---|
-| `/ap/pose/filtered` | `geometry_msgs/PoseStamped` | локальная поза из EKF, ENU, frame `map` |
+| `/ap/pose/filtered` | `geometry_msgs/PoseStamped` | локальная поза из EKF относительно home, ENU (в `header.frame_id` прошивка пишет `base_link`) |
 | `/ap/twist/filtered` | `geometry_msgs/TwistStamped` | скорость |
 | `/ap/geopose/filtered`, `/ap/navsat` | `geographic_msgs/GeoPoseStamped`, `sensor_msgs/NavSatFix` | глобальная поза, GNSS |
 | `/ap/battery`, `/ap/status`, `/ap/rc` | `sensor_msgs/BatteryState`, `ardupilot_msgs/Status`, `ardupilot_msgs/Rc` | батарея; armed, mode, flying, external_control, failsafe |
