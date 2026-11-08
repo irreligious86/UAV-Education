@@ -86,7 +86,7 @@ rclpy.init(); rclpy.spin(Offboard())
 ## practice
 ### Шаг 1. Окружение
 ```
-# ROS 2 Humble установлен и source'нут
+# ROS 2 Jazzy (Ubuntu 24.04) или Humble (22.04) установлен и source'нут
 mkdir -p ~/ws_px4/src && cd ~/ws_px4/src
 git clone https://github.com/PX4/px4_msgs.git      # branch matching your PX4 version
 git clone https://github.com/PX4/px4_ros_com.git
@@ -103,6 +103,54 @@ cd .. && colcon build && source install/setup.bash
 
 ### Шаг 4. Свой узел
 Напиши узел на Python (`rclpy`), который держит квадрокоптер на высоте 3 м и каждые 10 с меняет цель по кругу радиусом 5 м. Проверь: остановил узел — через ~2 с PX4 выходит из Offboard (в SITL — переход в Hold/Land по failsafe-настройке).
+
+Каркас (структура как в примере `px4_ros_com`, имена топиков сверить с `ros2 topic list` своей версии PX4):
+```python
+import math
+import rclpy
+from rclpy.node import Node
+from rclpy.qos import QoSProfile, ReliabilityPolicy, DurabilityPolicy, HistoryPolicy
+from px4_msgs.msg import OffboardControlMode, TrajectorySetpoint, VehicleCommand
+
+QOS = QoSProfile(reliability=ReliabilityPolicy.BEST_EFFORT, durability=DurabilityPolicy.TRANSIENT_LOCAL,
+                 history=HistoryPolicy.KEEP_LAST, depth=1)
+
+class Circle(Node):
+    def __init__(self):
+        super().__init__("circle")
+        self.mode_pub = self.create_publisher(OffboardControlMode, "/fmu/in/offboard_control_mode", QOS)
+        self.sp_pub = self.create_publisher(TrajectorySetpoint, "/fmu/in/trajectory_setpoint", QOS)
+        self.cmd_pub = self.create_publisher(VehicleCommand, "/fmu/in/vehicle_command", QOS)
+        self.ticks = 0
+        self.create_timer(0.1, self.tick)                       # 10 Hz, well above the 2 Hz minimum
+
+    def now_us(self):
+        return self.get_clock().now().nanoseconds // 1000
+
+    def command(self, cmd, p1=0.0, p2=0.0):
+        m = VehicleCommand(command=cmd, param1=p1, param2=p2, target_system=1, target_component=1,
+                           source_system=1, source_component=1, from_external=True, timestamp=self.now_us())
+        self.cmd_pub.publish(m)
+
+    def tick(self):
+        self.mode_pub.publish(OffboardControlMode(position=True, timestamp=self.now_us()))
+        a = 2 * math.pi * (self.ticks // 100) / 6               # next point on the circle every 10 s
+        sp = TrajectorySetpoint(timestamp=self.now_us())
+        sp.position = [5.0 * math.cos(a), 5.0 * math.sin(a), -3.0]   # NED: z = -3 is 3 m up
+        sp.yaw = float(a + math.pi)
+        self.sp_pub.publish(sp)
+        if self.ticks == 10:                                    # stream first, then switch mode and arm
+            self.command(VehicleCommand.VEHICLE_CMD_DO_SET_MODE, 1.0, 6.0)   # custom mode 6 = Offboard
+            self.command(VehicleCommand.VEHICLE_CMD_COMPONENT_ARM_DISARM, 1.0)
+        self.ticks += 1
+
+def main():
+    rclpy.init(); rclpy.spin(Circle())
+
+if __name__ == "__main__":
+    main()
+```
+Что проверить по логу: в `.ulg` `trajectory_setpoint` ступенькой меняется каждые 10 с, `vehicle_local_position` догоняет за 2–4 с без перелёта больше 0.5 м; при `Ctrl+C` узла — переход режима через `COM_OF_LOSS_T`.
 
 ### Лабораторная
 Узел работает в SITL; лог `.ulg` показывает `vehicle_local_position` против `trajectory_setpoint`; документировано поведение при остановке узла.
