@@ -37,8 +37,6 @@ when a part is absent); "Освоен" requires quiz ≥ 80 %, every task solved
 Solved tasks are stored per module in the progress store (`tasks` key) and show on the module
 page ("задачи 2/3") and in the transcript.
 
-## Inventory: 40 tasks in 17 modules + a 10-task entry test (`prereq-test`, pages/prerequisites.html)
+## Inventory: 79 tasks in 35 modules + a 10-task entry test (`prereq-test`, pages/prerequisites.html)
 
-f-physics (2), f-aero-props (3), f-electricity-101 (3), f-power (2), f-motors-esc (2),
-el-power-design (2), el-wiring (2), el-battery-packs (2), rf-link-budget (3), link-elrs (2),
-est-kalman (3), aero-wing (2), bf-filters (1), ctl-signals (2), math-linalg-rot (3), math-ode-dyn (3), math-prob-est (3).
+aero-wing (2), ap-heavy (2), bf-filters (1), bf-rpm-filter (2), ctl-signals (2), ctl-theory (2), el-battery-packs (2), el-power-design (2), el-wiring (2), est-gnss (2), est-kalman (3), f-aero-props (3), f-electricity-101 (3), f-frame-mech (2), f-mechanics (3), f-motors-esc (2), f-physics (2), f-power (2), link-elrs (2), link-vtx (2), math-linalg-rot (3), math-ode-dyn (3), math-prob-est (3), mav-protocol (3), mav-routing (2), per-depth-avoid (2), per-edge-ml (2), per-geometry (3), per-landing (2), per-mapping (3), rf-antennas (2), rf-link-budget (3), ros2-basics (2), ros2-nav (2), ros2-px4 (1).

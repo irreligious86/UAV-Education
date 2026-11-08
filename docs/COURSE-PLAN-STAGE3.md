@@ -68,8 +68,8 @@ bf-rpm-filter (harmonic frequencies from eRPM), per-cv (precision/recall from co
 |---|---|---|
 | 1 ✅ | fact-check pass + link checker: 2204 claims checked, 254 findings applied (125 errors), see `docs/reviews/factcheck/`; weekly `links.yml`, 18 dead links replaced | large (103 modules) |
 | 2 ✅ | lab-result schema and import (`docs/LAB-RESULTS.md`), two graders, progress page import with ⚙ marks | medium |
-| 3 | nightly SITL and Docker workflows | medium, needs CI minutes |
-| 4 | ~11 modules of new tasks | medium |
+| 3 ⏸ | nightly SITL and Docker workflows — postponed: Alex runs SITL on his machine | medium, needs CI minutes |
+| 4 ✅ | 23 new tasks in 10 modules (f-frame-mech, f-mechanics, ctl-theory, bf-rpm-filter, link-vtx, rf-antennas, est-gnss, ap-heavy, per-geometry, per-mapping): 79 tasks in 35 modules | medium |
 | 5 | rubrics and checkpoints for 12 projects | medium |
 
 Out of scope, unchanged from Stage 2: flight-simulator training, video content, country-specific law.
