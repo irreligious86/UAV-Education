@@ -3,6 +3,8 @@
 Living plan. Updated as phases land. Detailed rules live in `PROJECT-DIRECTIVES.md`;
 this file only says **what is next and why**.
 
+> **2026-11-08 (evening) — Stage 2 plan adopted, implementation deferred:** [`docs/COURSE-PLAN-STAGE2.md`](docs/COURSE-PLAN-STAGE2.md) — depth of theory (mathematics, MAVLink, ROS 2, perception), software project catalogue, objective assessment, infographics system. Reviews 3–4 in `docs/reviews/`.
+>
 > **2026-11-08 — Course Plan v3 adopted.** The program structure, principles and
 > implementation phases now live in [`docs/COURSE-PLAN.md`](docs/COURSE-PLAN.md),
 > built from two external reviews in `docs/reviews/`. Sections below that

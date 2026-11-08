@@ -17,6 +17,7 @@
 | **Квизы** | `content/quiz/<id>.json` — 5+ вопросов, `answer` = индекс верного, `explain` обязателен; validator проверяет |
 | **Пути по прошивкам** | `data/curriculum.json` → `paths` (этапы и порядок модулей); страницы `path/<id>.html`; независимый прогресс и «Продолжить» для каждого пути |
 | **План курса v3** | `docs/COURSE-PLAN.md` — ступени, треки, принципы, фазы; внешние разборы в `docs/reviews/` |
+| **План этапа 2** | `docs/COURSE-PLAN-STAGE2.md` — глубина теории, программная практика, инфографика (реализация отложена) |
 | **Формулы и CLI** | `data/formulas.json` → `pages/formulas.html` |
 | **Виджеты** | `assets/widgets/*.js` — `{{widget:name}}` в Markdown (pid-sim, filter-response, elrs-calc, tw-calc, wire-drop, link-latency) |
 | **Офлайн (PWA)** | `sw.js` и `manifest.webmanifest` генерируются сборкой; `assets/offline.js` регистрирует; после первого визита курс работает без сети |
