@@ -188,7 +188,7 @@ def build2(D: dict, arch) -> None:
         ("слишком близко", Node("d", ["Мин. дистанция", "→ стоп"], leaf=True)),
         ("граница", Node("f", ["Геозона и высота", "— у автопилота"], leaf=True)),
         ("оператор", Node("o", ["Смена режима", "с пульта — сразу"], leaf=True, accent=True)),
-    ]), width=720)
+    ]), width=780)
 
     D["visual-nav-levels"] = tree("Визуальная навигация: три уровня", Node("r", ["Что даёт", "камера?"], [
         ("скорость", Node("of", ["Оптический поток", "+ дальномер"], [("", Node("of1", ["OPTICAL_FLOW", "EK3_SRC*_VELXY=5"], leaf=True))])),
@@ -418,3 +418,9 @@ def build4(D: dict, arch) -> None:
         [L("esc", ["ESC ×8 по CAN2", "отдельная шина"], False, 1), L("chk", ["H–L без питания:", "≈ 60 Ом"], True, 3)],
         [("t1", "fc"), ("fc", "gps"), ("gps", "pm"), ("pm", "t2"), ("fc", "esc", "", False, "v")],
         notes=[(10, 150, "Линия, не звезда;", "m t"), (10, 164, "отводы короткие", "m t")])
+    D["fpv-video-choice"] = tree("Какую систему FPV-видео выбрать", Node("r", ["Что важнее", "всего?"], [
+        ("гонки", Node("an", ["Аналог / HDZero", "постоянная задержка"], leaf=True, accent=True)),
+        ("картинка", Node("dj", ["DJI / Walksnail", "сжатое HD"], leaf=True)),
+        ("открытость", Node("oi", ["OpenIPC + WFB-ng", "MAVLink в канале"], leaf=True)),
+        ("дальность", Node("lr", ["цифра + ELRS", "OSD с качеством линка"], leaf=True, accent=True)),
+    ]), width=780)
