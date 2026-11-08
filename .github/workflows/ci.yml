@@ -52,6 +52,11 @@ jobs:
           pip install --quiet pymavlink
           python examples/sitl-pymavlink/test_check_lab_log.py
 
+      - name: MAVLink labs (fake vehicle, no SITL)
+        run: |
+          pip install --quiet pytest
+          python -m pytest -q -p no:cacheprovider examples/mavlink/tests
+
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
