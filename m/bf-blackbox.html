@@ -47,9 +47,11 @@
 <ul><li>I‑кадры (intra) — полные кадры, независимо декодируемые.</li><li>P‑кадры (inter) — разностные, используют предсказание.</li><li>G/H кадры — для GPS-данных.</li><li>S кадры (slow) — редко меняющиеся состояния.</li><li>E кадры (event) — переходы состояний.</li></ul>
 <p>Для сжатия применяются предсказатели и кодирование переменной длины, что позволяет хранить большой объём данных при умеренном потоке.</p>
 <h4 class="md-subheading">Что именно логируется</h4>
-<p>Blackbox фиксирует: - время, - значения P/I/D и суммарный выход, - setpoint (стики), - данные гироскопа и акселерометра, - напряжение/ток, RSSI, - команды на ESC, - GPS-кадры (при наличии).</p>
+<p>Blackbox фиксирует:</p>
+<ul><li>время,</li><li>значения P/I/D и суммарный выход,</li><li>setpoint (стики),</li><li>данные гироскопа и акселерометра,</li><li>напряжение/ток, RSSI,</li><li>команды на ESC,</li><li>GPS-кадры (при наличии).</li></ul>
 <h4 class="md-subheading">Формат лога и устройства хранения</h4>
-<p>Запись может вестись на: - onboard flash (обычно 2–16 МБ), - SD-карту (предпочтительно для длинных сессий), - внешний логгер через UART.</p>
+<p>Запись может вестись на:</p>
+<ul><li>onboard flash (обычно 2–16 МБ),</li><li>SD-карту (предпочтительно для длинных сессий),</li><li>внешний логгер через UART.</li></ul>
 <p>Для SD-карты рекомендуется FAT32 и карта с низкой задержкой записи.</p>
 <h4 class="md-subheading">Влияние настроек на качество лога</h4>
 <ul><li>1 кГц — базовый PID-анализ;</li><li>2 кГц (или 1.6 кГц для BMI270) — детальный анализ шумов/фильтров.</li></ul>
@@ -69,16 +71,22 @@
 
 <h2>Практика</h2>
 <h4 class="md-subheading">Подготовка оборудования и ПО</h4>
-<p>Аппаратно: - FC с flash или SD-слотом, - ESC с Bidirectional DShot (BLHeli_32/Bluejay), - качественная и механически жёсткая сборка.</p>
-<p>Настройка: - включить <code>BLACKBOX</code>, - выставить <code>logging rate</code> (обычно 2 kHz), - для шумового анализа использовать <code>debug_mode = GYRO_SCALED</code>, - включить RPM-фильтр.</p>
+<p>Аппаратно:</p>
+<ul><li>FC с flash или SD-слотом,</li><li>ESC с Bidirectional DShot (BLHeli_32/Bluejay),</li><li>качественная и механически жёсткая сборка.</li></ul>
+<p>Настройка:</p>
+<ul><li>включить <code>BLACKBOX</code>,</li><li>выставить <code>logging rate</code> (обычно 2 kHz),</li><li>для шумового анализа использовать <code>debug_mode = GYRO_SCALED</code>,</li><li>включить RPM-фильтр.</li></ul>
 <h4 class="md-subheading">Запись лога и манёвры</h4>
-<p>Blackbox обычно стартует при арме и останавливается при дизарме. Для качественного анализа выполняйте: - hover и ровный полёт, - throttle sweep <code>20% -&gt; 100%</code>, - резкие roll/flip, - throttle pump, - резкие развороты (проверка propwash).</p>
+<p>Blackbox обычно стартует при арме и останавливается при дизарме. Для качественного анализа выполняйте:</p>
+<ul><li>hover и ровный полёт,</li><li>throttle sweep <code>20% -&gt; 100%</code>,</li><li>резкие roll/flip,</li><li>throttle pump,</li><li>резкие развороты (проверка propwash).</li></ul>
 <h4 class="md-subheading">Работа с Blackbox Explorer</h4>
 <ol><li>Выгрузите <code>.bbl</code> (Mass Storage Mode).</li><li>Откройте лог в Blackbox Explorer.</li><li>Проверьте header (<code>i</code>) — там все параметры прошивки.</li><li>Для анализа выберите <code>Gyro</code>, <code>Setpoint</code>, <code>P/I/D</code>, <code>Motor</code>, <code>Debug</code>.</li><li>Используйте <code>I/O</code> для выделения участков одинаковой длины.</li></ol>
 <h4 class="md-subheading">Использование PIDToolbox</h4>
-<p>PIDToolbox полезен для: - оценки задержки фильтров, - сравнения спектров в dB, - анализа step response.</p>
+<p>PIDToolbox полезен для:</p>
+<ul><li>оценки задержки фильтров,</li><li>сравнения спектров в dB,</li><li>анализа step response.</li></ul>
 <h4 class="md-subheading">Пошаговая настройка фильтров</h4>
-<p>1. Запишите лог с <code>GYRO_SCALED</code> и <code>throttle sweep</code>. 2. Оцените спектр:    - <code>&lt;100 Гц</code> чаще решается механикой/PID,    - <code>100–250 Гц</code> — зона динамического режектора,    - <code>&gt;250 Гц</code> — зона RPM-фильтра. 3. Убедитесь, что bidirectional DShot работает (<code>E = 0%</code> в Motors). 4. Настройте lowpass по результату спектра. 5. Делайте изменения итеративно: один параметр -&gt; новый лог -&gt; сравнение.</p>
+<ol><li>Запишите лог с <code>GYRO_SCALED</code> и <code>throttle sweep</code>.</li><li>Оцените спектр:</li></ol>
+<ul><li><code>&lt;100 Гц</code> чаще решается механикой/PID,</li><li><code>100–250 Гц</code> — зона динамического режектора,</li><li><code>&gt;250 Гц</code> — зона RPM-фильтра.</li></ul>
+<ol><li>Убедитесь, что bidirectional DShot работает (<code>E = 0%</code> в Motors).</li><li>Настройте lowpass по результату спектра.</li><li>Делайте изменения итеративно: один параметр -&gt; новый лог -&gt; сравнение.</li></ol>
 <h4 class="md-subheading">Автопроверка лога</h4>
 <p>Расшифруйте лог <code>blackbox_decode</code> и прогоните грейдер курса: <code>python examples/blackbox-grader/check_bf_log.py LOG.01.csv --lab all --motor-range &lt;motorOutput из заголовка лога&gt;</code>. Он выдаёт PASS/FAIL по каждой проверке (tracking, motors) со значением, порогом и объяснением; пороги — ориентиры для 5&quot;, их можно переопределить через <code>--set</code>, записав причину. Потренироваться до своих логов можно на синтетике: <code>make_bf_fixture.py --kind noisy</code> (или <code>sluggish</code>, <code>oscillating</code>, <code>saturated</code>, <code>imbalanced</code>, <code>no_rpm</code>).</p>
 

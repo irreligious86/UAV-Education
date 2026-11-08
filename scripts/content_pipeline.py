@@ -113,6 +113,77 @@ def render_diagram(name: str, caption: str) -> str:
             '<div class="diagram__hint">Схему можно прокрутить по горизонтали</div></figure>')
 
 
+TABLE_SEP_RE = re.compile(r"^\|?\s*:?-+:?\s*(\|\s*:?-+:?\s*)*\|?\s*$")
+
+
+def _is_table_row(line: str) -> bool:
+    t = line.strip()
+    return t.startswith("|") and t.count("|") >= 2
+
+
+def split_table_row(line: str) -> list[str]:
+    """Split '| a | b |' into cells; '\\|' is a literal pipe."""
+    t = line.strip()
+    if t.startswith("|"):
+        t = t[1:]
+    if t.endswith("|") and not t.endswith("\\|"):
+        t = t[:-1]
+    cells, cur, i = [], "", 0
+    while i < len(t):
+        if t[i] == "\\" and i + 1 < len(t) and t[i + 1] == "|":
+            cur += "|"; i += 2; continue
+        if t[i] == "|":
+            cells.append(cur.strip()); cur = ""
+        else:
+            cur += t[i]
+        i += 1
+    cells.append(cur.strip())
+    return cells
+
+
+def split_runs(lines: list[str]) -> list[tuple[str, list[str]]]:
+    """Group the lines of one paragraph into runs: table (header + separator + rows), ul, ol, text.
+    Lets a sentence introduce a list or a table without a blank line, as people write Markdown."""
+    runs: list[tuple[str, list[str]]] = []
+    i = 0
+    while i < len(lines):
+        ln = lines[i]
+        if _is_table_row(ln) and i + 1 < len(lines) and TABLE_SEP_RE.match(lines[i + 1].strip()):
+            j = i + 2
+            while j < len(lines) and _is_table_row(lines[j]):
+                j += 1
+            runs.append(("table", lines[i:j])); i = j; continue
+        kind = "ul" if ln.strip().startswith("- ") else "ol" if re.match(r"^\d+\.\s", ln.strip()) else "text"
+        if runs and runs[-1][0] == kind and kind != "table":
+            runs[-1][1].append(ln)
+        else:
+            runs.append((kind, [ln]))
+        i += 1
+    return runs
+
+
+def render_table(run: list[str]) -> str:
+    head = split_table_row(run[0])
+    aligns = []
+    for c in split_table_row(run[1]):
+        c = c.strip()
+        aligns.append("center" if c.startswith(":") and c.endswith(":") else "right" if c.endswith(":") else "")
+    def cell(tag, text, k):
+        a = aligns[k] if k < len(aligns) and aligns[k] else ""
+        style = f' style="text-align:{a}"' if a else ""
+        label = f' data-label="{html.escape(re.sub(r"[`*]", "", head[k]), quote=True)}"' if tag == "td" and k < len(head) else ""
+        return f"<{tag}{style}{label}>{format_inline(text)}</{tag}>"
+    n = len(head)
+    thead = "".join(cell("th", h, k) for k, h in enumerate(head))
+    body = []
+    for row in run[2:]:
+        cells = split_table_row(row)
+        cells = (cells + [""] * n)[:n]
+        body.append("<tr>" + "".join(cell("td", c, k) for k, c in enumerate(cells)) + "</tr>")
+    return (f'<div class="table-wrap md-table-wrap" tabindex="0"><table class="md-table">'
+            f"<thead><tr>{thead}</tr></thead><tbody>{''.join(body)}</tbody></table></div>")
+
+
 def block_to_paragraphs(block: str) -> str:
     block = block.strip()
     if not block:
@@ -158,16 +229,17 @@ def block_to_paragraphs(block: str) -> str:
                 continue
 
             lines = [ln.rstrip() for ln in para.splitlines() if ln.strip()]
-            if all(ln.startswith("- ") for ln in lines) and lines:
-                items = "".join(f"<li>{format_inline(ln[2:].strip())}</li>" for ln in lines)
-                chunks.append(f"<ul>{items}</ul>")
-            elif all(re.match(r"^\d+\.\s", ln) for ln in lines if ln):
-                items = "".join(
-                    f"<li>{format_inline(re.sub(r'^\d+\.\s+', '', ln))}</li>" for ln in lines
-                )
-                chunks.append(f"<ol>{items}</ol>")
-            else:
-                chunks.append("<p>" + format_inline(para.replace("\n", " ")) + "</p>")
+            for kind, run in split_runs(lines):
+                if kind == "table":
+                    chunks.append(render_table(run))
+                elif kind == "ul":
+                    items = "".join(f"<li>{format_inline(ln.strip()[2:].strip())}</li>" for ln in run)
+                    chunks.append(f"<ul>{items}</ul>")
+                elif kind == "ol":
+                    items = "".join(f"<li>{format_inline(re.sub(r'^\d+\.\s+', '', ln.strip()))}</li>" for ln in run)
+                    chunks.append(f"<ol>{items}</ol>")
+                else:
+                    chunks.append("<p>" + format_inline(" ".join(ln.strip() for ln in run)) + "</p>")
 
     # Поддержка fenced code blocks: ```lang ... ```
     # Если блоков нет, рендерим как раньше.

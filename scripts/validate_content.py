@@ -233,6 +233,21 @@ def validate_published_sections(md_path, published):
             errors.append(f"{rel}: references must be '- Title | URL | primary|secondary | A|B|C' lines; bad: {bad[0][:80]}")
         if len(refs) < 2:
             errors.append(f"{rel}: fewer than 2 references")
+    # tables: every row must have the header's number of cells, or the reader gets shifted columns
+    from content_pipeline import TABLE_SEP_RE, split_table_row
+    body_lines = raw_body.splitlines()
+    for i in range(len(body_lines) - 1):
+        hdr, sep = body_lines[i].strip(), body_lines[i + 1].strip()
+        if hdr.startswith("|") and TABLE_SEP_RE.match(sep):
+            n = len(split_table_row(hdr))
+            if len(split_table_row(sep)) != n:
+                errors.append(f"{rel}: table separator has {len(split_table_row(sep))} cells, header {n}: {hdr[:60]}")
+            j = i + 2
+            while j < len(body_lines) and body_lines[j].strip().startswith("|"):
+                k = len(split_table_row(body_lines[j]))
+                if k != n:
+                    errors.append(f"{rel}: table row has {k} cells, header {n}: {body_lines[j].strip()[:60]}")
+                j += 1
     lines = [ln for ln in raw_body.splitlines() if ln.strip()]
     if len(lines) < MIN_PUBLISHED_LINES:
         errors.append(

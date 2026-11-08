@@ -21,3 +21,20 @@
 **Важно:** `index.html`, `m/`, `ref/`, `pages/`, `api/` генерируются целиком — руками их не правят. Ручные страницы (чек-листы, сравнение, ресурсы) живут в `content/pages/*.html`; глоссарий — `data/glossary.json`; журнал фейлов собирается из секций `## diagnostics` автоматически.
 
 Строка в Changelog — **`PROJECT-DIRECTIVES.md`**.
+
+## Tables
+
+Standard GitHub-style Markdown tables are supported inside any section:
+
+```
+| Column | Column |
+|---|---|
+| cell | cell |
+```
+
+- A table may follow a heading or a sentence directly; a blank line is not required.
+- Every row must have as many cells as the header (`validate_content.py` rejects shifted rows).
+- Write a literal pipe inside a cell as `\|`.
+- On a phone each row is shown as a card ("Header: value"), on a desktop as a normal table.
+- `check_rendering.py` (in `publish.py` and CI) fails the build if a table, `**bold**`, a heading
+  or a `{{diagram}}` tag ever shows up in a page as raw text.

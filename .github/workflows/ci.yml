@@ -44,6 +44,9 @@ jobs:
       - name: Check local links
         run: python scripts/check_links.py
 
+      - name: Rendering check (no raw Markdown tables, bold or headings in pages)
+        run: python scripts/check_rendering.py
+
       - name: Compile starter examples
         run: python -m compileall -q examples
 

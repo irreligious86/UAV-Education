@@ -275,3 +275,29 @@ body.ready-only .track-module--planned, body.ready-only .gc-card[data-state="pen
 /* imported grader results on the progress page */
 .progress-labs { list-style: none; padding: 0; margin: 0.5rem 0 0; display: grid; gap: 0.4rem; }
 .progress-labs li { overflow-wrap: anywhere; font-size: 0.9rem; }
+
+/* Markdown tables in module text: readable on a phone — the table scrolls inside its frame,
+   the page never does; header row stays distinct; cells wrap but keep a sane minimum width. */
+.md-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; margin: 1rem 0; max-width: 100%;
+  border: 1px solid var(--gc-border, rgba(128,128,128,0.35)); border-radius: 6px; }
+.md-table { border-collapse: collapse; width: 100%; font-size: 0.92rem; line-height: 1.45; }
+.md-table th, .md-table td { padding: 0.45rem 0.65rem; text-align: left; vertical-align: top;
+  border-bottom: 1px solid var(--gc-border, rgba(128,128,128,0.25)); min-width: 6.5rem; }
+.md-table th { background: var(--gc-surface-200, rgba(128,128,128,0.10)); font-weight: 600; white-space: nowrap; }
+.md-table tr:last-child td { border-bottom: 0; }
+.md-table td code { white-space: nowrap; }
+.md-table-wrap:focus-visible { outline: 2px solid var(--gc-accent-hud, #5ef1d2); outline-offset: 2px; }
+
+/* Phone: each table row becomes a card — "Header: value" lines, no sideways scrolling. */
+@media (max-width: 640px) {
+  .md-table-wrap { overflow-x: visible; border: 0; }
+  .md-table, .md-table tbody, .md-table tr, .md-table td { display: block; width: 100%; box-sizing: border-box; }
+  .md-table thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+  .md-table tr { border: 1px solid var(--gc-border, rgba(128,128,128,0.35)); border-radius: 6px;
+    margin: 0 0 0.6rem; padding: 0.35rem 0.6rem; background: var(--gc-surface-200, rgba(128,128,128,0.06)); }
+  .md-table td { border: 0; padding: 0.2rem 0; min-width: 0; text-align: left !important; }
+  .md-table td:first-child { font-weight: 600; }
+  .md-table td[data-label]::before { content: attr(data-label) ": "; color: var(--gc-ink-muted, #8a93a3); font-weight: 400; }
+  .md-table td:first-child::before { content: none; }
+  .md-table td code { white-space: normal; overflow-wrap: anywhere; }
+}
