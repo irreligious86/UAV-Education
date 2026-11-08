@@ -73,8 +73,7 @@ Still to do:
 - ✅ ROS 2: Jazzy first in ros2-basics, ros2-app-arch, px4-ros2; the course Docker image takes `ROS_DISTRO` (default jazzy, `ROS_DISTRO=humble` as fallback). Not test-built here (Docker Hub unreachable from the build environment) — first local build should confirm.
 - ✅ Vendor support pages (SpeedyBee) in bf-intro and bf-ports → Betaflight Serial/Setup/GPS Rescue 4.5 docs and ExpressLRS FC configuration.
 - ✅ Plasmatree PID-Analyzer marked legacy (unmaintained since 2019) in bf-pid.
-- PIDtoolbox: the GitHub repository is gone (404 on the 2026-11-08 link check); references removed, the
-  module text still names the tool — point to a maintained alternative once one is verified.
+- ✅ PIDtoolbox became a paid product in 2024; modules now point to PIDscope (GPL-3.0 GNU Octave continuation, maintained in 2026).
 - NXP UM10204: `https://www.nxp.com/docs/en/user-guide/UM10204.pdf` is still the canonical location (search engines index it); the 404 is NXP refusing automated clients. Kept.
 - ✅ QGroundControl docs now link `Stable_V5.0` instead of `master`.
 - Every module has exactly 2–6 references, mostly 3; primary sources for the fact-checked claims
@@ -89,7 +88,7 @@ Still to do:
 | 3 ✅ | New modules, wave 1 — done: el-dronecan, link-digital-video, payload-gimbal, f-esc-firmware, ap-plane-tuning, f-remote-id-security; fact-check `docs/reviews/factcheck/stage4-new-modules.md` (4 findings applied) | DroneCAN, digital FPV video, gimbals and payloads, ESC firmware, ArduPlane tuning, Remote ID and security | each with quiz, diagram, references, curriculum entry, fact-checked by an independent agent |
 | 4 ✅ | New modules, wave 2 — done: ops-weather, ops-maintenance, link-telemetry-radios, mav-multi-vehicle, ctl-guidance, ctl-sysid, tools-gazebo, el-kicad; fact-check `stage4-wave2.md` (14 findings applied) | Gazebo simulation, system identification, guidance and trajectories, long-range telemetry radios, weather and planning, maintenance and reliability, multi-vehicle ops, hardware design (KiCad) | same bar as wave 1 |
 | 5 ✅ | Widgets — done: kalman-1d (est-kalman), link-margin (rf-link-budget), gsd-calc (per-mapping), rpm-harmonics (bf-rpm-filter), antenna-pol (rf-antennas); checked in Chromium at 1200 and 390 px, no console errors | Kalman 1D, antenna polarization/pattern, GSD and overlap calculator, RPM harmonics vs filter, FSPL vs distance | each widget used in at least one module, works offline |
-| 6 ✅ | ROS 2 Jazzy-first pass and remaining link items — done (see “Still to do” above; PIDtoolbox replacement still open) | | link check clean, Jazzy commands first everywhere |
+| 6 ✅ | ROS 2 Jazzy-first pass and remaining link items — done (see “Still to do” above) | | link check clean, Jazzy commands first everywhere |
 
 SITL in CI stays postponed (Stage 3, iteration 3): Alex runs SITL locally.
 

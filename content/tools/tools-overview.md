@@ -33,7 +33,7 @@ next:
 - Иногда нужен **Zadig** (Windows) для драйвера DFU при прошивке.
 
 ### Логи
-- **Blackbox Explorer** (Betaflight) и **PIDtoolbox** — логи Betaflight.
+- **Blackbox Explorer** (Betaflight) и **PIDscope** (открытое продолжение PIDtoolbox на GNU Octave; сам PIDtoolbox с 2024 года платный) — логи Betaflight.
 - **Mission Planner / MAVExplorer / UAV Log Viewer** — DataFlash ArduPilot.
 - **Python** с `orangebox` (Betaflight) и `pymavlink.DFReader` (ArduPilot) — когда нужны свои метрики.
 
@@ -63,7 +63,7 @@ drones/
 | Настройка Betaflight/INAV | Betaflight App / INAV Configurator (десктоп, не веб — для прошивки и DFU) | полный доступ к CLI, прошивка, DFU |
 | ArduPilot/PX4 | Mission Planner (Windows; самый полный для ArduPilot: Full Parameter List, MAVFtp, log review), QGroundControl (кроссплатформенный; PX4 — основной) | параметры, калибровки, миссии, логи |
 | Консоль MAVLink | MAVProxy (`pip install MAVProxy`), `mavproxy.py --master=/dev/ttyACM0 --console --map` | скриптуемая GCS, `param`, `module load log` |
-| Логи Betaflight | Blackbox Explorer, PIDtoolbox (MATLAB runtime), `blackbox_decode` → CSV → Python | спектры, step response, свои метрики |
+| Логи Betaflight | Blackbox Explorer, PIDscope (GNU Octave), `blackbox_decode` → CSV → Python | спектры, step response, свои метрики |
 | Логи ArduPilot | Mission Planner Log Review, MAVExplorer (`mavexplorer.py log.bin`, графики по выражениям `ATT.Roll-ATT.DesRoll`), UAV Log Viewer (веб), `pymavlink` | быстрый обзор / свои метрики |
 | ESC | ESC Configurator (веб, Chrome), Bluejay/AM32 configurator; passthrough через FC | прошивка и настройки ESC |
 | Радио | ExpressLRS Configurator, EdgeTX Companion + Buddy | прошивка модулей, модели пульта |

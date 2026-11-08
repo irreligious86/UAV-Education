@@ -42,7 +42,7 @@ next:
 
 ## summary
 
-Blackbox — система записи полётных данных в Betaflight, позволяющая фиксировать состояние контроллера на каждом цикле управления (до 8 кГц). Лог содержит гироскоп, акселерометр, сигналы стиков, работу PID-регулятора, выходы на моторы и параметры фильтров. Статья даёт полное понимание настройки логирования, интерпретации графиков и использования инструментов (Blackbox Explorer, PIDToolbox) для диагностики и тюнинга. После изучения читатель сможет выявлять шумовую структуру дрона, оценивать задержки фильтров, настраивать PID и фильтры на основе объективных данных, а не методом случайного подбора.
+Blackbox — система записи полётных данных в Betaflight, позволяющая фиксировать состояние контроллера на каждом цикле управления (до 8 кГц). Лог содержит гироскоп, акселерометр, сигналы стиков, работу PID-регулятора, выходы на моторы и параметры фильтров. Статья даёт полное понимание настройки логирования, интерпретации графиков и использования инструментов (Blackbox Explorer, PIDscope) для диагностики и тюнинга. После изучения читатель сможет выявлять шумовую структуру дрона, оценивать задержки фильтров, настраивать PID и фильтры на основе объективных данных, а не методом случайного подбора.
 
 ## theory
 
@@ -144,9 +144,9 @@ Blackbox обычно стартует при арме и останавлива
 4. Для анализа выберите `Gyro`, `Setpoint`, `P/I/D`, `Motor`, `Debug`.
 5. Используйте `I/O` для выделения участков одинаковой длины.
 
-### Использование PIDToolbox
+### PIDscope (бывший PIDtoolbox)
 
-PIDToolbox полезен для:
+PIDtoolbox с 2024 года распространяется как платный продукт по подписке; открытое продолжение — **PIDscope** (GPL-3.0, работает в бесплатной GNU Octave, поддерживает логи Betaflight 4.x и 2025.12). Он полезен для:
 - оценки задержки фильтров,
 - сравнения спектров в dB,
 - анализа step response.
@@ -177,7 +177,7 @@ PIDToolbox полезен для:
 
 - Симптом: всплески в `20–100 Гц`.
   - Возможная причина: недостаточные P/D или избыточная фильтрация (задержка).
-  - Что проверить/сделать: проверить задержку в PIDToolbox, скорректировать фильтры и PID.
+  - Что проверить/сделать: проверить задержку в PIDscope (или PIDtoolbox), скорректировать фильтры и PID.
 
 - Симптом: дрон стал «ватным» после фильтрации.
   - Возможная причина: слишком низкие частоты среза.
@@ -206,5 +206,6 @@ PIDToolbox полезен для:
 - Blackbox flight data recorder — Betaflight Documentation | https://betaflight.com/docs/wiki/guides/current/Black-Box-logging-and-usage | primary | A
 - Blackbox logging internals | https://www.betaflight.com/docs/development/Blackbox-Internals | primary | A
 - Betaflight Blackbox Explorer | https://github.com/betaflight/blackbox-log-viewer | primary | A
+- PIDscope — open-source GNU Octave continuation of PIDtoolbox | https://github.com/dzikus/PIDscope | secondary | B
 - How to Use Blackbox in Betaflight — Oscar Liang | https://oscarliang.com/blackbox/ | secondary | B
 - How to Tune FPV Drone Filters & PID with Blackbox — Oscar Liang | https://oscarliang.com/pid-filter-tuning-blackbox/ | secondary | B
