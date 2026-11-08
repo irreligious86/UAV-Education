@@ -69,7 +69,7 @@
 <h4 class="md-subheading">Ревью</h4>
 <p>PR = изменение + причина + доказательство (лог до/после, спектр, число). Чек-лист ревьюера: причина понятна? риск (failsafe, моторы, лимиты)? проверено в SITL/на стенде? откат описан? Для одного человека — self-review: PR с описанием, CI зелёный, мерж через день (эффект «утро вечера мудренее» реален).</p>
 <h4 class="md-subheading">Релизы и откат</h4>
-<p>Тег <code>viking7-v12</code> на коммит, с которым летали; <code>CHANGELOG.md</code> по версиям; релиз в GitHub с приложенными <code>diff all</code>/<code>.param</code> и логом контрольного полёта. Откат — <code>git checkout viking7-v11 -- viking7/</code> и загрузка конфига. Прошивка — её версия и сборочный ключ (<code>version</code> в CLI Betaflight; <code>ver</code> в ArduPilot) в README релиза.</p>
+<p>Тег <code>viking7-v12</code> на коммит, с которым летали; <code>CHANGELOG.md</code> по версиям; релиз в GitHub с приложенными <code>diff all</code>/<code>.param</code> и логом контрольного полёта. Откат — <code>git checkout viking7-v11 -- viking7/</code> и загрузка конфига. Прошивка — её версия и сборочный ключ (Betaflight: <code>version</code> и BUILD KEY из <code>status</code>; ArduPilot: сообщение <code>AUTOPILOT_VERSION</code> или <code>version</code> в MAVProxy) в README релиза.</p>
 <figure class="diagram" data-diagram="config-ci"><div class="diagram__svg"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 200" width="100%" role="img" aria-labelledby="t" style="max-width:720px;display:block;margin:0 auto"><title id="t">Конфиги как код: путь изменения</title><style>text{font-family: var(--gc-font-mono, ui-monospace, Menlo, monospace); font-size: 12px;fill:currentColor} .m{fill:var(--gc-ink-muted, #8a93a3)} .a{fill:var(--gc-accent-hud, #5ef1d2)} .w{fill:var(--gc-signal-amber, #f0b24c)} .d{fill:var(--gc-signal-red, #e8636b)} .box{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:currentColor;stroke-width:1.2} .boxa{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6} .ln{stroke:currentColor;stroke-width:1.2;fill:none} .lna{stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6;fill:none} .lnm{stroke:var(--gc-ink-muted, #8a93a3);stroke-width:1;fill:none;stroke-dasharray:4 3} .t{font-size:11px} .b{font-weight:600}</style><defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker><marker id="ara" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--gc-accent-hud, #5ef1d2)"/></marker></defs><rect class="box" x="10.0" y="30" width="111.2" height="48" rx="6"/><text x="65.6" y="51.0" text-anchor="middle" style="font-size:10.5px">Снять конфиг</text><text x="65.6" y="65.0" text-anchor="middle" style="font-size:10.5px">diff all / param</text><rect class="box" x="157.2" y="30" width="111.2" height="48" rx="6"/><text x="212.79999999999998" y="51.0" text-anchor="middle" style="font-size:10.5px">git: ветка</text><text x="212.79999999999998" y="65.0" text-anchor="middle" style="font-size:10.5px">+ PR</text><rect class="boxa" x="304.4" y="30" width="111.2" height="48" rx="6"/><text x="360.0" y="51.0" text-anchor="middle" class="b" style="font-size:10.5px">Инварианты</text><text x="360.0" y="65.0" text-anchor="middle" class="b" style="font-size:10.5px">и линтер</text><rect class="boxa" x="451.59999999999997" y="30" width="111.2" height="48" rx="6"/><text x="507.2" y="58.0" text-anchor="middle" class="b" style="font-size:10.5px">SITL-автотест</text><rect class="box" x="598.8" y="30" width="111.2" height="48" rx="6"/><text x="654.4" y="51.0" text-anchor="middle" style="font-size:10.5px">Релиз-тег</text><text x="654.4" y="65.0" text-anchor="middle" style="font-size:10.5px">и откат</text><rect class="box" x="157.2" y="130" width="111.2" height="48" rx="6"/><text x="212.79999999999998" y="151.0" text-anchor="middle" style="font-size:10.5px">Ревью: человек</text><text x="212.79999999999998" y="165.0" text-anchor="middle" style="font-size:10.5px">читает diff</text><rect class="box" x="451.59999999999997" y="130" width="111.2" height="48" rx="6"/><text x="507.2" y="151.0" text-anchor="middle" style="font-size:10.5px">Красное —</text><text x="507.2" y="165.0" text-anchor="middle" style="font-size:10.5px">нет слияния</text><path class="ln" d="M121.2 54.0 L157.2 54.0" marker-end="url(#ar)"/><path class="ln" d="M268.4 54.0 L304.4 54.0" marker-end="url(#ar)"/><path class="ln" d="M415.59999999999997 54.0 L451.59999999999997 54.0" marker-end="url(#ar)"/><path class="ln" d="M562.8 54.0 L598.8 54.0" marker-end="url(#ar)"/><path class="ln" d="M212.79999999999998 78 L212.79999999999998 130" marker-end="url(#ar)"/><path class="ln" d="M507.2 78 L507.2 130" marker-end="url(#ar)"/></svg></div><figcaption class="gc-muted">Изменение конфига как изменение кода: снять, закоммитить, проверить инварианты и SITL, отрецензировать, выпустить с возможностью отката.</figcaption><div class="diagram__hint">Схему можно прокрутить по горизонтали</div></figure>
 
 <h2>Практика</h2>
@@ -79,6 +79,39 @@
 <p><code>export_bf.py</code> или <code>param save</code> по команде; коммит «snapshot before tuning».</p>
 <h4 class="md-subheading">Шаг 3. Инварианты + CI</h4>
 <p><code>check_params.py</code> с 5+ правилами; <code>.github/workflows/ci.yml</code>: ruff, check_params на всех конфигах. Сломать правило нарочно → CI красный → починить.</p>
+<p>Заготовка для ArduPilot (<code>.param</code>: строки <code>NAME,VALUE</code> или <code>NAME VALUE</code>):</p>
+<pre class="cli-block"><code>import re, sys
+
+RULES = [  # (parameter, predicate, why — with the course module to read)
+    (&quot;FS_THR_ENABLE&quot;, lambda v: v != 0, &quot;RC failsafe must act (ap-safety-fs)&quot;),
+    (&quot;BATT_FS_LOW_ACT&quot;, lambda v: v != 0, &quot;low battery must act (ap-safety-fs)&quot;),
+    (&quot;FENCE_ENABLE&quot;, lambda v: v == 1, &quot;geofence on for field flights (ap-safety-fs)&quot;),
+    (&quot;RTL_ALT_M&quot;, lambda v: v &gt;= 30, &quot;RTL altitude above site obstacles (ap-safety-fs)&quot;),
+    (&quot;INS_HNTCH_ENABLE&quot;, lambda v: v == 1, &quot;harmonic notch configured (ap-tuning)&quot;),
+]
+
+def load(path):
+    params = {}
+    for line in open(path):
+        m = re.match(r&quot;\s*([A-Z0-9_]+)[,\s]+(-?[\d.eE+-]+)&quot;, line)
+        if m:
+            params[m.group(1)] = float(m.group(2))
+    return params
+
+def check(params):
+    errs = []
+    for name, ok, why in RULES:
+        if name not in params:
+            errs.append(f&quot;{name}: missing ({why})&quot;)
+        elif not ok(params[name]):
+            errs.append(f&quot;{name} = {params[name]:g}: {why}&quot;)
+    return errs
+
+if __name__ == &quot;__main__&quot;:
+    bad = [f&quot;{p}: {e}&quot; for p in sys.argv[1:] for e in check(load(p))]
+    print(&quot;\n&quot;.join(bad) or &quot;all invariants hold&quot;)
+    sys.exit(1 if bad else 0)</code></pre>
+<p>Правила, чьи параметры переименованы между версиями (<code>RTL_ALT</code> → <code>RTL_ALT_M</code> в 4.7), держите с обоими именами, или проверяйте версию прошивки из README аппарата. Для Betaflight — тот же подход по строкам <code>set name = value</code> из <code>diff all</code>.</p>
 <h4 class="md-subheading">Шаг 4. SITL-тест в CI</h4>
 <p>Готовая заготовка — в репозитории курса: [examples/sitl-pymavlink](https://github.com/irreligious86/UAV-Education/tree/main/examples/sitl-pymavlink) (<code>test_failsafe.py</code> + <code>ci.yml</code>). Job с ArduPilot SITL и тестом (RC failsafe → RTL/LAND). Сломать <code>FS_THR_ENABLE = 0</code> в <code>.param</code> → тест падает. Один PR с изменением параметра, описанием, CI и мержем. Лабораторная: репозиторий с читаемой историей, SITL-тест в CI, одно изменение через PR.</p>
 

@@ -62,7 +62,7 @@ Python: `ruff`/`flake8` + `black`; Lua (ArduPilot): `luacheck` с конфиго
 PR = изменение + причина + доказательство (лог до/после, спектр, число). Чек-лист ревьюера: причина понятна? риск (failsafe, моторы, лимиты)? проверено в SITL/на стенде? откат описан? Для одного человека — self-review: PR с описанием, CI зелёный, мерж через день (эффект «утро вечера мудренее» реален).
 
 ### Релизы и откат
-Тег `viking7-v12` на коммит, с которым летали; `CHANGELOG.md` по версиям; релиз в GitHub с приложенными `diff all`/`.param` и логом контрольного полёта. Откат — `git checkout viking7-v11 -- viking7/` и загрузка конфига. Прошивка — её версия и сборочный ключ (`version` в CLI Betaflight; `ver` в ArduPilot) в README релиза.
+Тег `viking7-v12` на коммит, с которым летали; `CHANGELOG.md` по версиям; релиз в GitHub с приложенными `diff all`/`.param` и логом контрольного полёта. Откат — `git checkout viking7-v11 -- viking7/` и загрузка конфига. Прошивка — её версия и сборочный ключ (Betaflight: `version` и BUILD KEY из `status`; ArduPilot: сообщение `AUTOPILOT_VERSION` или `version` в MAVProxy) в README релиза.
 
 {{diagram:config-ci|Изменение конфига как изменение кода: снять, закоммитить, проверить инварианты и SITL, отрецензировать, выпустить с возможностью отката.}}
 
@@ -75,6 +75,42 @@ PR = изменение + причина + доказательство (лог 
 
 ### Шаг 3. Инварианты + CI
 `check_params.py` с 5+ правилами; `.github/workflows/ci.yml`: ruff, check_params на всех конфигах. Сломать правило нарочно → CI красный → починить.
+
+Заготовка для ArduPilot (`.param`: строки `NAME,VALUE` или `NAME VALUE`):
+```python
+import re, sys
+
+RULES = [  # (parameter, predicate, why — with the course module to read)
+    ("FS_THR_ENABLE", lambda v: v != 0, "RC failsafe must act (ap-safety-fs)"),
+    ("BATT_FS_LOW_ACT", lambda v: v != 0, "low battery must act (ap-safety-fs)"),
+    ("FENCE_ENABLE", lambda v: v == 1, "geofence on for field flights (ap-safety-fs)"),
+    ("RTL_ALT_M", lambda v: v >= 30, "RTL altitude above site obstacles (ap-safety-fs)"),
+    ("INS_HNTCH_ENABLE", lambda v: v == 1, "harmonic notch configured (ap-tuning)"),
+]
+
+def load(path):
+    params = {}
+    for line in open(path):
+        m = re.match(r"\s*([A-Z0-9_]+)[,\s]+(-?[\d.eE+-]+)", line)
+        if m:
+            params[m.group(1)] = float(m.group(2))
+    return params
+
+def check(params):
+    errs = []
+    for name, ok, why in RULES:
+        if name not in params:
+            errs.append(f"{name}: missing ({why})")
+        elif not ok(params[name]):
+            errs.append(f"{name} = {params[name]:g}: {why}")
+    return errs
+
+if __name__ == "__main__":
+    bad = [f"{p}: {e}" for p in sys.argv[1:] for e in check(load(p))]
+    print("\n".join(bad) or "all invariants hold")
+    sys.exit(1 if bad else 0)
+```
+Правила, чьи параметры переименованы между версиями (`RTL_ALT` → `RTL_ALT_M` в 4.7), держите с обоими именами, или проверяйте версию прошивки из README аппарата. Для Betaflight — тот же подход по строкам `set name = value` из `diff all`.
 
 ### Шаг 4. SITL-тест в CI
 Готовая заготовка — в репозитории курса: [examples/sitl-pymavlink](https://github.com/irreligious86/UAV-Education/tree/main/examples/sitl-pymavlink) (`test_failsafe.py` + `ci.yml`). Job с ArduPilot SITL и тестом (RC failsafe → RTL/LAND). Сломать `FS_THR_ENABLE = 0` в `.param` → тест падает. Один PR с изменением параметра, описанием, CI и мержем. Лабораторная: репозиторий с читаемой историей, SITL-тест в CI, одно изменение через PR.
