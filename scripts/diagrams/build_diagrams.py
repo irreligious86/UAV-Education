@@ -544,6 +544,7 @@ import wave2  # noqa: E402
 wave2.build(D, _arch)
 wave2.build2(D, _arch)
 wave2.build3(D, _arch)
+wave2.build4(D, _arch)
 
 import wave3  # noqa: E402
 wave3.build(D)

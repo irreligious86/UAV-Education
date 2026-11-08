@@ -945,6 +945,35 @@
           "article": "el-peripherals"
         },
         {
+          "id": "el-dronecan",
+          "title": "DroneCAN: шина CAN на борту, узлы, ESC и прошивка периферии",
+          "level": "L3",
+          "hours": 3,
+          "prerequisites": [
+            "el-peripherals"
+          ],
+          "objectives": [
+            "собрать и проверить шину CAN: терминаторы, разъём, топология",
+            "настроить DroneCAN в ArduPilot/PX4 и выбрать тип датчика",
+            "разрешить конфликт номеров узлов и оценить загрузку шины для ESC по CAN"
+          ],
+          "lab": {
+            "title": "Шина DroneCAN на столе",
+            "criteria": [
+              "Шина проверена мультиметром: ~60 Ом между H и L без питания",
+              "Узлы видны в GCS и логе, таблица узлов записана",
+              "Загрузка шины измерена в DroneCAN GUI Tool и сравнена с оценкой",
+              "Порядок восстановления после конфликта node ID записан"
+            ]
+          },
+          "stacks": [
+            "electronics",
+            "ardupilot",
+            "px4"
+          ],
+          "article": "el-dronecan"
+        },
+        {
           "id": "el-wiring",
           "title": "Пайка, жгуты и надёжность соединений",
           "level": "L1",

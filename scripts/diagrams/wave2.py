@@ -408,3 +408,13 @@ def build3(D: dict, arch) -> None:
         ("код", Node("cd", ["Python, git,", "терминал"], leaf=True, accent=True)),
         ("без дрона", Node("sim", ["SITL", "ArduPilot / PX4"], leaf=True)),
     ]), width=720)
+
+
+def build4(D: dict, arch) -> None:
+    """Stage 4 new modules."""
+    D["dronecan-bus"] = arch("DroneCAN: одна пара проводов на всё",
+        [L("t1", ["120 Ом", "терминатор"], True), L("fc", ["Полётник", "node 10, DNA"], True), L("gps", ["GPS + компас", "node auto"]),
+         L("pm", ["Датчик тока", "node auto"]), L("t2", ["120 Ом", "терминатор"], True)],
+        [L("esc", ["ESC ×8 по CAN2", "отдельная шина"], False, 1), L("chk", ["H–L без питания:", "≈ 60 Ом"], True, 3)],
+        [("t1", "fc"), ("fc", "gps"), ("gps", "pm"), ("pm", "t2"), ("fc", "esc", "", False, "v")],
+        notes=[(10, 150, "Линия, не звезда;", "m t"), (10, 164, "отводы короткие", "m t")])
