@@ -1,0 +1,64 @@
+{
+ "module": "math-linalg-rot",
+ "tasks": [
+  {
+   "id": "grav-body",
+   "title": "Гравитация в осях борта",
+   "statement": "Крен **{phi}°**, тангаж **{theta}°**, рысканье любое. Найдите компоненту z вектора гравитации (0, 0, 9.81) в осях FRD (м/с²).",
+   "params": {
+    "phi": {
+     "min": -40,
+     "max": 40,
+     "step": 5
+    },
+    "theta": {
+     "min": -30,
+     "max": 30,
+     "step": 5
+    }
+   },
+   "answer": "9.81*math.cos(math.radians(phi))*math.cos(math.radians(theta))",
+   "unit": "м/с²",
+   "tol": 0.01,
+   "solution": "g_body = R_nbᵀ·g_ned; z-компонента = g·cos φ·cos θ. Рысканье на неё не влияет."
+  },
+  {
+   "id": "grav-y",
+   "title": "Боковая компонента",
+   "statement": "Крен **{phi}°**, тангаж **{theta}°**. Найдите компоненту y (вправо) вектора гравитации в осях FRD (м/с²).",
+   "params": {
+    "phi": {
+     "min": -40,
+     "max": 40,
+     "step": 5
+    },
+    "theta": {
+     "min": -30,
+     "max": 30,
+     "step": 5
+    }
+   },
+   "answer": "9.81*math.sin(math.radians(phi))*math.cos(math.radians(theta))",
+   "unit": "м/с²",
+   "tol": 0.01,
+   "abs": 0.02,
+   "solution": "Третья строка R_nb (третий столбец R_nbᵀ): (−sin θ, sin φ cos θ, cos φ cos θ)·g."
+  },
+  {
+   "id": "quat-angle",
+   "title": "Угол из кватерниона",
+   "statement": "Скалярная часть единичного кватерниона w = **{w}**. На какой угол (в градусах) он поворачивает?",
+   "params": {
+    "w": {
+     "min": 0.5,
+     "max": 0.99,
+     "step": 0.01
+    }
+   },
+   "answer": "2*math.degrees(math.acos(w))",
+   "unit": "°",
+   "tol": 0.01,
+   "solution": "w = cos(α/2) → α = 2·acos(w)."
+  }
+ ]
+}

@@ -51,6 +51,7 @@ PAGES = {
     "checklists": "Быстрые чек-листы",
     "compare": "Сравнение прошивок",
     "resources": "Ресурсы и сообщества",
+    "prerequisites": "Входные требования и тест",
 }
 
 GENERATED_DIRS = ("m", "ref", "pages", "api", "quiz", "cap", "path", "tasks")

@@ -177,6 +177,100 @@ D["actuator-disk"] = """<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720
 """
 
 
+# ---------------------------------------------------------------- mathematics elective (hand-built)
+def _poly(points, cls="ln"):
+    return f'<polyline class="{cls}" points="' + " ".join(f"{x:.1f},{y:.1f}" for x, y in points) + '"/>'
+
+
+def _gauss_curve(mu, sig, x0, x1, y0, h, xs=(-4, 8)):
+    import math
+    pts = []
+    for i in range(121):
+        x = xs[0] + (xs[1] - xs[0]) * i / 120
+        y = math.exp(-0.5 * ((x - mu) / sig) ** 2) / sig
+        pts.append((x0 + (x1 - x0) * (x - xs[0]) / (xs[1] - xs[0]), y0 - h * y))
+    return pts
+
+
+def gaussian_fusion():
+    import math
+    from svg import svg, text
+    s1, m1, s2, m2 = 1.6, 0.0, 0.7, 3.0
+    sf = math.sqrt(1 / (1 / s1**2 + 1 / s2**2)); mf = (m1 / s1**2 + m2 / s2**2) / (1 / s1**2 + 1 / s2**2)
+    x0, x1, y0, h = 40, 700, 200, 100
+    body = [f'<line class="lnm" x1="{x0}" y1="{y0}" x2="{x1}" y2="{y0}"/>']
+    body.append(_poly(_gauss_curve(m1, s1, x0, x1, y0, h), "ln"))
+    body.append(_poly(_gauss_curve(m2, s2, x0, x1, y0, h), "ln"))
+    body.append(_poly(_gauss_curve(mf, sf, x0, x1, y0, h), "lna"))
+    X = lambda x: x0 + (x1 - x0) * (x + 4) / 12
+    body.append(text(X(m1), y0 + 16, "z₁ (σ₁ = 1.6)", "m t"))
+    body.append(text(X(m2), y0 + 16, "z₂ (σ₂ = 0.7)", "m t"))
+    body.append(text(X(mf), y0 + 30, f"x̂ = {mf:.2f}, σ̂ = {sf:.2f} — уже обеих", "a t"))
+    body.append(text(16, 16, "Слияние двух гауссовых оценок: x̂ = (z₁/σ₁² + z₂/σ₂²)/(1/σ₁² + 1/σ₂²),  1/σ̂² = 1/σ₁² + 1/σ₂²", "m t", "start"))
+    body.append(text(16, 40, "предсказание P ↔ σ₁², измерение R ↔ σ₂²,", "m t", "start"))
+    body.append(text(16, 54, "K = σ₁²/(σ₁²+σ₂²) — усиление Калмана", "m t", "start"))
+    return svg(720, 240, "Слияние двух гауссовых оценок", "".join(body))
+
+
+def pole_response():
+    import math
+    from svg import svg, text
+    body = []
+    # s-plane
+    ox, oy = 170, 120
+    body.append(f'<line class="lnm" x1="40" y1="{oy}" x2="300" y2="{oy}"/><line class="lnm" x1="{ox}" y1="20" x2="{ox}" y2="220"/>')
+    body.append(text(300, oy - 6, "Re s", "m t", "end")); body.append(text(ox + 6, 28, "Im s", "m t", "start"))
+    body.append(f'<rect x="{ox}" y="20" width="130" height="200" fill="var(--gc-signal-red,#e8636b)" opacity="0.08"/>')
+    body.append(text(ox + 65, 210, "неустойчиво", "d t"))
+    poles = [("A", -110, 0, False), ("B", -40, 0, False), ("C", -50, -60, True), ("D", 30, -40, False)]
+    for name, dx, dy, acc in poles:
+        cls = "a" if acc else ("d" if dx > 0 else "")
+        body.append(f'<text x="{ox + dx}" y="{oy + dy + 5}" text-anchor="middle" class="{cls} b" style="font-size:16px">×</text>')
+        if dy:
+            body.append(f'<text x="{ox + dx}" y="{oy - dy + 5}" text-anchor="middle" class="{cls} b" style="font-size:16px">×</text>')
+        body.append(text(ox + dx + 10, oy + dy - 8, name, cls + " t", "start"))
+    # responses
+    def resp(x0, y0, w, h, fn, label, cls="ln"):
+        pts = []
+        for i in range(81):
+            t = 6 * i / 80
+            v = fn(t)
+            pts.append((x0 + w * i / 80, y0 + h - h * (max(-0.3, min(2.2, v)) + 0.3) / 2.5))
+        out = [f'<line class="lnm" x1="{x0}" y1="{y0 + h}" x2="{x0 + w}" y2="{y0 + h}"/>', _poly(pts, cls), text(x0, y0 - 4, label, "m t", "start")]
+        return "".join(out)
+    body.append(resp(340, 30, 160, 60, lambda t: 1 - math.exp(-2.2 * t), "A: s = −2.2 — быстро"))
+    body.append(resp(540, 30, 160, 60, lambda t: 1 - math.exp(-0.8 * t), "B: s = −0.8 — медленно"))
+    body.append(resp(340, 130, 160, 60, lambda t: 1 - math.exp(-1.0 * t) * (math.cos(1.2 * t) + (1.0 / 1.2) * math.sin(1.2 * t)), "C: −1 ± 1.2j — перелёт", "lna"))
+    body.append(resp(540, 130, 160, 60, lambda t: 1 - 0.3 * math.exp(0.2 * t) * math.cos(0.9 * t), "D: Re s > 0 — растёт", "ln"))
+    body.append(text(16, 16, "Карта полюсов → отклик на скачок", "m t", "start"))
+    return svg(720, 230, "Полюса и отклик на скачок", "".join(body))
+
+
+def frames_rotations():
+    from svg import svg, text
+    body = [text(16, 16, "Системы координат: NED/FRD (ArduPilot, PX4, MAVLink) и ENU/FLU (ROS, REP-103)", "m t", "start")]
+    def axes(cx, cy, labels, accent, title):
+        out = [text(cx, cy - 92, title, "b", "middle")]
+        arrows = [((cx, cy), (cx + 70, cy), labels[0]), ((cx, cy), (cx - 45, cy - 40), labels[1]), ((cx, cy), (cx, cy + 60 if labels[2].endswith("↓") else cy - 60), labels[2])]
+        for (x1, y1), (x2, y2), lab in arrows:
+            out.append(f'<path class="{"lna" if accent else "ln"}" d="M{x1} {y1} L{x2} {y2}" marker-end="url(#{"ara" if accent else "ar"})"/>')
+            out.append(text(x2 + (8 if x2 >= x1 else -8), y2 + (14 if y2 > y1 else -6), lab, "t", "start" if x2 >= x1 else "end"))
+        return "".join(out)
+    body.append(axes(100, 120, ["N (x)", "E (y)", "D (z) ↓"], True, "NED — мировая"))
+    body.append(axes(265, 120, ["F (x)", "R (y)", "D (z) ↓"], True, "FRD — борт"))
+    body.append(axes(430, 120, ["E (x)", "N (y)", "U (z)"], False, "ENU — мировая"))
+    body.append(axes(595, 120, ["F (x)", "L (y)", "U (z)"], False, "FLU — борт"))
+    body.append(text(16, 212, "Борт: F — нос, R/L — правое/левое крыло, D/U — вниз/вверх.", "m t", "start"))
+    body.append(text(16, 228, "FRD → FLU: (x, y, z) → (x, −y, −z).   NED → ENU: (n, e, d) → (e, n, −d).   ψ_enu = 90° − ψ_ned.", "m t", "start"))
+    body.append(text(16, 244, "R_nb = Rz(ψ)·Ry(θ)·Rx(φ): к вектору в FRD сначала применяется крен, потом тангаж, потом рысканье → NED.", "m t", "start"))
+    return svg(720, 258, "Системы координат NED/FRD и ENU/FLU", "".join(body))
+
+
+D["gaussian-fusion"] = gaussian_fusion()
+D["pole-response"] = pole_response()
+D["frames-rotations"] = frames_rotations()
+
+
 def main() -> None:
     OUT.mkdir(parents=True, exist_ok=True)
     for name, content in D.items():

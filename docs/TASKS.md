@@ -37,8 +37,8 @@ when a part is absent); "Освоен" requires quiz ≥ 80 %, every task solved
 Solved tasks are stored per module in the progress store (`tasks` key) and show on the module
 page ("задачи 2/3") and in the transcript.
 
-## Inventory (iteration 2): 31 tasks in 14 modules
+## Inventory: 40 tasks in 17 modules + a 10-task entry test (`prereq-test`, pages/prerequisites.html)
 
 f-physics (2), f-aero-props (3), f-electricity-101 (3), f-power (2), f-motors-esc (2),
 el-power-design (2), el-wiring (2), el-battery-packs (2), rf-link-budget (3), link-elrs (2),
-est-kalman (3), aero-wing (2), bf-filters (1), ctl-signals (2).
+est-kalman (3), aero-wing (2), bf-filters (1), ctl-signals (2), math-linalg-rot (3), math-ode-dyn (3), math-prob-est (3).
