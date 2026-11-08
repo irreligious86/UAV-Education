@@ -121,7 +121,6 @@ ls -l /dev/ttyTHS*
 - ArduPilot Dev Docs: Turnkey Companion Computer Solutions | https://ardupilot.org/ | primary | A
 - ArduPilot Discourse: Jetson Nano - Pixhawk Cube Communication | https://discuss.ardupilot.org/ | secondary | B
 - NVIDIA Developer Forums: Jetson Nano Setup | https://forums.developer.nvidia.com/ | secondary | B
-- GitHub: terrytaylorbonn/auxdrone | https://github.com/terrytaylorbonn/auxdrone | secondary | C
 
 ## checklist
 

@@ -207,10 +207,9 @@ PIDToolbox полезен для:
 
 ## references
 
-Blackbox flight data recorder — Betaflight Documentation | https://betaflight.com/docs/wiki/guides/current/Black-Box-logging-and-usage | primary | A
-Blackbox logging internals | https://www.betaflight.com/docs/development/Blackbox-Internals | primary | A
-Betaflight Blackbox Explorer | https://github.com/betaflight/blackbox-log-viewer | primary | A
-How to Use Blackbox in Betaflight — Oscar Liang | https://oscarliang.com/blackbox/ | secondary | B
-How to Tune FPV Drone Filters & PID with Blackbox — Oscar Liang | https://oscarliang.com/pid-filter-tuning-blackbox/ | secondary | B
-PIDToolbox User Guide | https://github.com/bw1129/PIDtoolbox | secondary | B
-IntoFPV Forum — 3D Printed Frame Tuning Discussion | https://intofpv.com/archive/index.php/thread-22141-2.html | secondary | C
+- Blackbox flight data recorder — Betaflight Documentation | https://betaflight.com/docs/wiki/guides/current/Black-Box-logging-and-usage | primary | A
+- Blackbox logging internals | https://www.betaflight.com/docs/development/Blackbox-Internals | primary | A
+- Betaflight Blackbox Explorer | https://github.com/betaflight/blackbox-log-viewer | primary | A
+- How to Use Blackbox in Betaflight — Oscar Liang | https://oscarliang.com/blackbox/ | secondary | B
+- How to Tune FPV Drone Filters & PID with Blackbox — Oscar Liang | https://oscarliang.com/pid-filter-tuning-blackbox/ | secondary | B
+- PIDToolbox User Guide | https://github.com/bw1129/PIDtoolbox | secondary | B

@@ -24,16 +24,8 @@ references:
     url: "https://betaflight.com/docs/wiki/guides/archive/Betaflight-4.5-CLI-commands"
     tier: primary
     stack: betaflight
-  - title: "Remapping Motors with Resource Command"
-    url: "https://betaflight-com.pages.dev/docs/wiki/guides/current/Remapping-Motors-with-Resource-Command"
-    tier: primary
-    stack: betaflight
   - title: "How to Check Betaflight Build Options"
     url: "https://oscarliang.com/check-betaflight-build-options/"
-    tier: secondary
-    stack: betaflight
-  - title: "Rotorflight Wiki: Backup and Restore (общие принципы)"
-    url: "https://github.com/rotorflight/rotorflight-old-wiki/wiki/Back-up-and-restore"
     tier: secondary
     stack: betaflight
 related:
@@ -319,8 +311,4 @@ defaults
 - Betaflight CLI Documentation | https://betaflight.com/docs/wiki/guides/current/Cli | primary | A
 - Betaflight Resource Remapping Guide | https://www.betaflight.com/docs/wiki/guides/current/Resource-remapping | primary | A
 - Betaflight 4.5 CLI Command Reference | https://betaflight.com/docs/wiki/guides/archive/Betaflight-4.5-CLI-commands | primary | A
-- Remapping Motors with Resource Command | https://betaflight-com.pages.dev/docs/wiki/guides/current/Remapping-Motors-with-Resource-Command | primary | A
-- Betaflight 4.0 CLI Reference (для сравнения версий) | https://www.betaflight.com/docs/wiki/guides/archive/Betaflight-4.0-CLI-commands | primary | A
 - How to Check Betaflight Build Options | https://oscarliang.com/check-betaflight-build-options/ | secondary | B
-- Rotorflight Wiki: Backup and Restore (общие принципы) | https://github.com/rotorflight/rotorflight-old-wiki/wiki/Back-up-and-restore | secondary | B
-- Joshua Bardwell: Betaflight CLI Tutorial | https://www.youtube.com/results?search_query=joshua+bardwell+betaflight+cli | secondary | B

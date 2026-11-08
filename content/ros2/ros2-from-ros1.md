@@ -101,7 +101,7 @@ ROS 1 Noetic закончил поддержку в мае 2025 года, но �
   - Что сделать: собрать мост из исходников с обоими воркспейсами; лучше — переносить.
 
 ## references
-- ROS 2 — Migration guide from ROS 1 | https://docs.ros.org/en/humble/How-To-Guides/Migrating-from-ROS1.html | primary | A
+- ROS 2 — Migration guide from ROS 1 | https://docs.ros.org/en/jazzy/How-To-Guides/Migrating-from-ROS1.html | primary | A
 - ros1_bridge | https://github.com/ros2/ros1_bridge | primary | A
 - rosbags (bag conversion, pure Python) | https://gitlab.com/ternaris/rosbags | primary | A
 - MAVROS (ROS 2 branch) | https://github.com/mavlink/mavros | primary | A

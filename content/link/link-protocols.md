@@ -122,7 +122,6 @@ save
 - CRSF Protocol Specification — TBS (GitHub) | https://github.com/tbs-fpv/tbs-crsf-spec | primary | A
 - Configuring FC for ExpressLRS — ExpressLRS Docs | https://www.expresslrs.org/quick-start/receivers/configuring-fc/ | primary | A
 - SBUS library and protocol description — Bolder Flight Systems | https://github.com/bolderflight/sbus | secondary | B
-- How to Setup SBus — Oscar Liang | https://oscarliang.com/sbus-smartport-telemetry-naze32 | secondary | B
 
 ## checklist
 - Понятно, какой протокол выдаёт приёмник

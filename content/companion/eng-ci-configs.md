@@ -95,7 +95,7 @@ PR = изменение + причина + доказательство (лог 
 
 ## references
 - ArduPilot — Autotest framework (Tools/autotest) | https://ardupilot.org/dev/docs/the-ardupilot-autotest-framework.html | primary | A
-- GitHub Docs — GitHub Actions workflows | https://docs.github.com/fr/actions/writing-workflows | primary | A
+- GitHub Docs — GitHub Actions workflows | https://docs.github.com/en/actions/writing-workflows | primary | A
 - Betaflight — Command Line Interface (CLI) | https://betaflight.com/docs/wiki/guides/current/Cli | primary | A
 
 ## checklist

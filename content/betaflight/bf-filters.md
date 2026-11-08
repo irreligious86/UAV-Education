@@ -16,8 +16,8 @@ references:
     url: "https://betaflight.com/docs/wiki/guides/current/Cli"
     tier: primary
     stack: betaflight
-  - title: "Betaflight 4.1 Tuning Notes — Filter Settings"
-    url: "https://www.betaflight.com/docs/wiki/tuning/4-1-Tuning-Notes#new-filter-settings"
+  - title: "Betaflight — PID Tuning tab: filter settings"
+    url: "https://betaflight.com/docs/wiki/app/pid-tuning-tab#filter-settings"
     tier: primary
     stack: betaflight
   - title: "PID Tuning Tab — Filter Settings"
@@ -156,7 +156,7 @@ Blackbox Explorer → спектрограмма gyro (до и после фил
 ## references
 
 - Betaflight CLI Documentation — Gyro & Filter Variables | https://betaflight.com/docs/wiki/guides/current/Cli | primary | A
-- Betaflight 4.1 Tuning Notes — Filter Settings | https://www.betaflight.com/docs/wiki/tuning/4-1-Tuning-Notes#new-filter-settings | primary | A
+- Betaflight — PID Tuning tab: filter settings | https://betaflight.com/docs/wiki/app/pid-tuning-tab#filter-settings | primary | A
 - PID Tuning Tab — Filter Settings | https://www.betaflight.com/docs/wiki/app/pid-tuning-tab#filter-settings | primary | A
 - Betaflight — Deep Dive (Filtering, Aliasing and Gyro Sync) | https://betaflight.com/docs/wiki/guides/current/Deep-Dive | primary | A
 - Betaflight source — cli/settings.c (filter parameter names, ranges) | https://github.com/betaflight/betaflight/blob/master/src/main/cli/settings.c | primary | A

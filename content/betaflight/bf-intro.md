@@ -255,6 +255,6 @@ diff all
 - Betaflight FAQ — How to Start | https://www.betaflight.com/docs/wiki/guides/current/FAQ | primary | A
 - Betaflight Advanced Guide — iFlight | https://help.iflight-rc.eu/en-US/betaflight-advanced-guide-951396 | secondary | B
 - How to Enable GPS Rescue — SpeedyBee Docs | https://docs.speedybee.cn/en/fpv/gps/gps-faq/how-to-enable-gps-rescue-mode-and-failsafe.html | secondary | B
-- My FPV Quad won't arm — iFlight Support | https://iflightrc.freshdesk.com/support/solutions/articles/48001149405/thumbs_down | secondary | B
+- Betaflight — Arming sequence and safety (arming flags) | https://www.betaflight.com/docs/wiki/guides/current/Arming-Sequence-And-Safety | secondary | B
 - Joshua Bardwell — Betaflight Setup Tutorial | https://www.youtube.com/watch?v=xSzO6HP6yzs | secondary | B
 

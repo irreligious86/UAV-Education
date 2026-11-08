@@ -107,7 +107,7 @@ static void uart_task(void *arg) {                    // lower priority: formats
 
 ## references
 - FreeRTOS — Mastering the FreeRTOS Real Time Kernel (book, GitHub) | https://www.github.com/FreeRTOS/FreeRTOS-Kernel-Book/blob/main/toc.md | primary | A
-- ESP-IDF — FreeRTOS (ESP-IDF additions, task watchdog) | https://docs.espressif.com/projects/esp-idf/en/stable/esp32c2/api-reference/system/freertos.html | primary | A
+- ESP-IDF — FreeRTOS (ESP-IDF additions, task watchdog) | https://docs.espressif.com/projects/esp-idf/en/stable/esp32/api-reference/system/freertos.html | primary | A
 - Betaflight — source: fc/core.c and scheduler | https://github.com/betaflight/betaflight/tree/master/src/main | primary | A
 
 ## checklist

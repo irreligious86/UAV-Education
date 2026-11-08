@@ -115,7 +115,7 @@ save
 ## references
 - Failsafe — Betaflight Documentation | https://betaflight.com/docs/wiki/guides/current/Failsafe | primary | A
 - Failsafe tab — Betaflight App | https://betaflight.com/docs/wiki/app/failsafe-tab | primary | A
-- What's Failsafe and How to Setup — Oscar Liang | https://oscarliang.com/failsafe-rx-fc-naze32-frsky-d4rii/ | secondary | B
+- Betaflight — Failsafe tab | https://betaflight.com/docs/wiki/app/failsafe-tab | secondary | B
 
 ## checklist
 - Выбрана процедура Stage 2 и понятно, почему именно она

@@ -40,6 +40,8 @@ def collect() -> dict[str, set[str]]:
         m = re.search(r"^## references\n(.*?)(?=^## |\Z)", text, re.M | re.S)
         for url in URL_RE.findall(m.group(1) if m else ""):
             add(url, str(f.relative_to(ROOT)))
+        for url in re.findall(r'^\s+url: "(https?://[^"]+)"', text, re.M):     # front-matter references
+            add(url, str(f.relative_to(ROOT)))
     for f in sorted((ROOT / "content" / "pages").glob("*.html")):
         for url in URL_RE.findall(f.read_text(encoding="utf-8")):
             add(url, str(f.relative_to(ROOT)))

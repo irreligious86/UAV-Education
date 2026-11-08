@@ -12,15 +12,11 @@ tags:
   - Blackbox
 references:
   - title: "Betaflight PID Tuning Guide"
-    url: "https://github.com/betaflight/betaflight/wiki/PID-Tuning-Guide"
+    url: "https://betaflight.com/docs/wiki/guides/current/PID-Tuning-Guide"
     tier: primary
     stack: betaflight
-  - title: "Betaflight 4.x PID Controller Explanation"
-    url: "https://github.com/betaflight/betaflight/wiki/4.x-PID-Controller-Explanation"
-    tier: primary
-    stack: betaflight
-  - title: "Betaflight RPM Filtering"
-    url: "https://github.com/betaflight/betaflight/wiki/RPM-Filtering"
+  - title: "Betaflight DShot RPM Filtering"
+    url: "https://betaflight.com/docs/wiki/guides/current/DSHOT-RPM-Filtering"
     tier: primary
     stack: betaflight
 related:
@@ -158,9 +154,8 @@ text
 
 ## references
 
-- Betaflight PID Tuning Guide | https://github.com/betaflight/betaflight/wiki/PID-Tuning-Guide | primary | A
-- Betaflight 4.x PID Controller Explanation | https://github.com/betaflight/betaflight/wiki/4.x-PID-Controller-Explanation | primary | A
-- Betaflight RPM Filtering | https://github.com/betaflight/betaflight/wiki/RPM-Filtering | primary | A
-- Betaflight Blackbox Log Interpretation | https://github.com/betaflight/betaflight/wiki/Blackbox-Log-Interpretation | primary | A
+- Betaflight PID Tuning Guide | https://betaflight.com/docs/wiki/guides/current/PID-Tuning-Guide | primary | A
+- Betaflight DShot RPM Filtering | https://betaflight.com/docs/wiki/guides/current/DSHOT-RPM-Filtering | primary | A
+- Betaflight Blackbox logging and usage | https://betaflight.com/docs/wiki/guides/current/Black-Box-logging-and-usage | primary | A
 - Oscar Liang: Betaflight PID Tuning | https://oscarliang.com/betaflight-pid-tuning/ | secondary | B
 - Joshua Bardwell: How to Tune PID with Blackbox | https://www.youtube.com/watch?v=YXpPajW9lCU | secondary | B

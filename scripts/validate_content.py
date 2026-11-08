@@ -225,6 +225,14 @@ def validate_published_sections(md_path, published):
     for marker in PLACEHOLDER_MARKERS:
         if marker.lower() in text.lower():
             errors.append(f"{rel}: published-статья содержит заглушку «{marker}» — допиши или поставь status: planned")
+    m = re.search(r"^## references\n(.*?)(?=^## |\Z)", raw_body, re.M | re.S)
+    if m:
+        refs = [ln for ln in m.group(1).splitlines() if ln.strip()]
+        bad = [ln for ln in refs if not re.match(r"- .+ \| https?://\S+ \| (primary|secondary) \| [ABC]$", ln.strip())]
+        if bad:
+            errors.append(f"{rel}: references must be '- Title | URL | primary|secondary | A|B|C' lines; bad: {bad[0][:80]}")
+        if len(refs) < 2:
+            errors.append(f"{rel}: fewer than 2 references")
     lines = [ln for ln in raw_body.splitlines() if ln.strip()]
     if len(lines) < MIN_PUBLISHED_LINES:
         errors.append(
