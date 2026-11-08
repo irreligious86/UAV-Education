@@ -303,3 +303,39 @@ def build(D: dict) -> None:
         Axis("время, с", 0, 8.5), Axis("ускорение, м/с²", -6, 6),
         legend=[("трапеция: 7.0 с, скачки ускорения", "w", True), ("S-кривая: 7.5 с, ускорение без скачков", "a", False)],
         legend_at=(270, 100))
+
+    # ------------------------------------------------------------ est-sysid
+    # chirp 1→40 Hz through G(s) = K e^{-sτ} / (Ts + 1), sampled at 400 Hz, noise on output; identify by DFT ratio
+    fs, Tdur, K, Tm, tau = 400.0, 20.0, 1.0, 0.02, 0.01
+    n = int(fs * Tdur); f0, f1 = 1.0, 40.0
+    rnd = random.Random(42)
+    kk = (f1 / f0) ** (1 / Tdur)
+    u = [math.sin(2 * math.pi * f0 * (kk ** (i / fs) - 1) / math.log(kk)) for i in range(n)]
+    a = math.exp(-1 / (fs * Tm)); d = int(round(tau * fs)); y, yv = [], 0.0
+    for i in range(n):
+        yv = a * yv + (1 - a) * K * (u[i - d] if i >= d else 0.0)
+        y.append(yv + rnd.gauss(0, 0.02))
+    def dft(sig, f):
+        w = 2 * math.pi * f / fs
+        re = sum(s * math.cos(w * i) for i, s in enumerate(sig)); im = -sum(s * math.sin(w * i) for i, s in enumerate(sig))
+        return complex(re, im)
+    fq = [f0 * (f1 / f0) ** (k / 23) for k in range(24)]
+    meas = []
+    for f in fq:
+        H = dft(y, f) / dft(u, f)
+        meas.append((f, 20 * math.log10(abs(H)), math.degrees(math.atan2(H.imag, H.real))))
+    fm = logspace(1, 40)
+    def Hz(f):   # the same plant as a discrete transfer function: (1 − a)·z^−d / (1 − a·z^−1)
+        z = complex(math.cos(2 * math.pi * f / fs), math.sin(2 * math.pi * f / fs))
+        return K * (1 - a) * z ** (-d) / (1 - a / z)
+    mag = lambda f: 20 * math.log10(abs(Hz(f)))
+    ph = lambda f: math.degrees(math.atan2(Hz(f).imag, Hz(f).real)) - (360 if math.atan2(Hz(f).imag, Hz(f).real) > 0 else 0)
+    D["chart-sysid-bode"] = chart(
+        "Идентификация: чирп 1→40 Гц, модель K·e^(−sτ)/(Ts+1), T = 20 мс, τ = 10 мс",
+        [dict(name="", xs=fm, ys=[mag(f) for f in fm], cls="a"),
+         dict(name="", xs=[m[0] for m in meas], ys=[m[1] for m in meas], cls="a", dots=True),
+         dict(name="", xs=fm, ys=[ph(f) for f in fm], cls="w", axis=2),
+         dict(name="", xs=[m[0] for m in meas], ys=[m[2] for m in meas], cls="w", dots=True, axis=2)],
+        Axis("частота, Гц", 1, 40, log=True, ticks=[1, 2, 5, 10, 20, 40]), Axis("усиление, дБ", -16, 2), Axis("фаза, °", -240, 0),
+        marks=[(1 / (2 * math.pi * Tm), "излом 8 Гц", "m")],
+        legend=[("усиление: модель / точки по DFT", "a", False), ("фаза: модель / точки (правая ось)", "w", False)], legend_at=(90, 250))
