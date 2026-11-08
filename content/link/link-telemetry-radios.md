@@ -119,7 +119,7 @@ print(f"{nbytes / 30 / 1024:.1f} КБ/с вниз")
   - Что сделать: ECC выключить, грузить на земле, снизить частоты потоков (`SRn_*` в ArduPilot).
 - **Симптом:** два аппарата видят чужую телеметрию
   - Возможная причина: одинаковый `NETID`.
-  - Что сделать: уникальный `NETID` на каждую пару, разные `SYSID_THISMAV`.
+  - Что сделать: уникальный `NETID` на каждую пару, разные sysid аппаратов (`MAV_SYSID`, до 4.7 — `SYSID_THISMAV`; в PX4 — `MAV_SYS_ID`).
 
 ## references
 - ArduPilot — SiK telemetry radio | https://ardupilot.org/copter/docs/common-sik-telemetry-radio.html | primary | A

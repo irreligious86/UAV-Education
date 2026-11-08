@@ -4,7 +4,7 @@ build(D, arch) adds entries to the diagram dict; `arch` is build_diagrams._arch 
 """
 from __future__ import annotations
 
-from svg import Node, sequence, timeline, tree
+from svg import Box, Node, flow, sequence, timeline, tree
 
 
 def L(i, lines, acc=False, col=None):
@@ -447,3 +447,10 @@ def build4(D: dict, arch) -> None:
         [("rc", "d1", "", False, "v"), ("tel", "d2", "", True, "v"), ("gnss", "d3", "", False, "v"), ("comp", "d4", "", False, "v"),
          ("fw", "d5", "", True, "v")],
         notes=[(10, 196, "Подпись MAVLink — аутентификация, не шифрование: трафик остаётся читаемым", "m t")], height=210)
+    D["multi-vehicle"] = flow("Флот: адресация, маршрутизация и разнесение", [
+        Box("gcs", ["GCS, sysid 255", "один оператор"], 10, 30, 160, 48), Box("rt", ["mavlink-router", "UDP на каждый аппарат"], 280, 30, 160, 48, accent=True),
+        Box("sup", ["Супервизор", "дистанции, общий стоп"], 550, 30, 160, 48, accent=True),
+        Box("v1", ["Аппарат 1", "sysid 1, слой 30 м"], 10, 140, 160, 48), Box("v2", ["Аппарат 2", "sysid 2, слой 40 м"], 280, 140, 160, 48),
+        Box("v3", ["Аппарат 3, FOLLOW", "FOLL_SYSID = 2"], 550, 140, 160, 48)],
+        [("gcs", "rt"), ("rt", "sup", "", True), ("rt", "v1", "", False, "v"), ("rt", "v2", "", False, "v"), ("rt", "v3", "", False, "v")],
+        720, 230, notes=[(10, 216, "target_system = 0 — команда всем аппаратам: только сознательно", "m t")])
