@@ -16,5 +16,8 @@ Each folder is self-contained; copy it out of this repository to begin a project
 | `blackbox-grader/` | Betaflight Blackbox grader (filters, tracking, motors, RPM telemetry) on blackbox_decode CSV, synthetic fixtures with known defects; 8 tests | bf-blackbox, bf-filters, bf-rpm-filter, bf-pid |
 | `inspection/` | Project #6 starter: offset mission along a line object with distance triggering on the inspected stretch, photo ↔ CAM matching by time with clock-offset estimation, findings → GeoJSON; 5 tests | per-mapping, ap-missions, projects/proj-inspection |
 | `tx16s-companion/` | Project #12 starter: CRSF telemetry parser in C99 (CRC8, framing state machine, battery/link/attitude/GPS) with a Python frame generator; 4 tests compile the C with -Werror | projects/proj-tx16s-companion |
+| `fleet-telemetry/` | Project #2 starter: versioned message schema, store-and-forward publisher (outage buffer, ordered backfill, thinning), ingest core with de-duplication and alerts; 6 tests | mav-routing, comp-raspberry, nav-resilience, projects/proj-fleet-telemetry |
+| `cell-bridge/` | Project #9 starter: MAVLink uplink scheduler for a cellular tunnel (control first, token-bucket budget, per-stream coalescing, quality-driven telemetry share, reconnect backoff), tested on a simulated lossy link; 4 tests | mav-routing, nav-resilience, ap-safety-fs, projects/proj-cell-bridge |
+| `lua-protection/` | Project #11 starter: ArduPilot Lua guard (vibration → LAND, keep-in polygon → RTL, self-protection on script errors) run by a lupa mock of the bindings; 6 tests | ap-lua, ap-safety-fs, projects/proj-lua-protection |
 
 Goal: a simulation on screen in 15 minutes, not an afternoon of dependencies.
