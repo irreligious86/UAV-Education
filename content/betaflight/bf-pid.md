@@ -35,7 +35,7 @@ PID усиливает всё, что приходит с гироскопа, в
 - **Drift – Wobble** (I) — удержание в поворотах и на нулевом газу.
 - **Master Multiplier** — всё разом; трогают, когда остальным не хватает хода.
 
-В CLI это `simplified_pi_gain`, `simplified_d_gain`, `simplified_feedforward_gain`, `simplified_d_max_gain`, `simplified_i_gain`, `simplified_master_multiplier` плюс `simplified_tuning apply`. Профилей PID четыре, профилей рейтов четыре — переключаются тумблером или в CLI командой `profile N`.
+В CLI это `simplified_pi_gain`, `simplified_d_gain`, `simplified_feedforward_gain`, `simplified_dmax_gain` (в 2025.12 — `simplified_d_max_gain`), `simplified_i_gain`, `simplified_master_multiplier` плюс `simplified_tuning apply`. Профилей PID четыре, профилей рейтов четыре — переключаются тумблером или в CLI командой `profile N`.
 
 {{widget:pid-sim}}
 

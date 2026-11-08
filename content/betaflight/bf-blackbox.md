@@ -99,10 +99,10 @@ Blackbox фиксирует:
 Цель фильтрации — подавлять высокочастотный шум, не внося лишнюю задержку в полезный диапазон.
 
 ### Параметры записи
-`blackbox_device` (SPIFLASH / SDCARD / SERIAL), `blackbox_sample_rate` (1/1, 1/2, 1/4, … от частоты PID: при 8 кГц PID и 1/4 — 2 кГц лога), `blackbox_mode` (NORMAL — по арму; MOTOR_TEST; ALWAYS — и на земле: для измерения шума/bias гироскопа), `blackbox_high_resolution` (точнее gyro/setpoint), `blackbox_disable_*` (отключить группы полей: `acc`, `rc`, `gyrounfilt`, `rpm`, `gps`… — экономия потока), `debug_mode` (какие 8 отладочных значений писать: `GYRO_SCALED` — сырой гироскоп до фильтров, `RPM_FILTER`, `D_LPF`, `DSHOT_RPM_TELEMETRY`, `FEEDFORWARD`, `GPS_RESCUE_*`, `RTH`…). Поток: 2 кГц с полным набором полей — порядка 60–100 КБ/с → 16 МБ flash хватает на 3–4 минуты; SD — часы. `blackbox_uart`/`blackbox_baud` — внешний логгер.
+`blackbox_device` (SPIFLASH / SDCARD / SERIAL), `blackbox_sample_rate` (1/1, 1/2, 1/4, … от частоты PID: при 8 кГц PID и 1/4 — 2 кГц лога), `blackbox_mode` (NORMAL — по арму; MOTOR_TEST; ALWAYS — и на земле: для измерения шума/bias гироскопа), `blackbox_high_resolution` (точнее gyro/setpoint), `blackbox_disable_*` (отключить группы полей: `acc`, `rc`, `gyrounfilt`, `rpm`, `gps`… — экономия потока), `debug_mode` (какие 8 отладочных значений писать: `GYRO_SCALED` — сырой гироскоп до фильтров (только 4.5; в 2025.12 удалён, используйте поле `gyroUnfilt`), `RPM_FILTER`, `D_LPF`, `DSHOT_RPM_TELEMETRY`, `FEEDFORWARD`, `GPS_RESCUE_*`, `RTH`…). Поток: 2 кГц с полным набором полей — порядка 60–100 КБ/с → 16 МБ flash хватает на 3–4 минуты; SD — часы. Внешний логгер — функция Blackbox на UART во вкладке Ports (`serial <id> 128 …` с blackbox baud); отдельных `blackbox_uart`/`blackbox_baud` в 4.5 и 2025.12 нет.
 
 ### Поля, которые нужны чаще всего
-`gyroADC[0..2]` (после фильтров), `gyroUnfilt[0..2]` (до, при включённом поле), `setpoint[0..3]`, `rcCommand[0..3]`, `axisP/I/D/F[0..2]`, `motor[0..3]`, `eRPM[0..3]`, `vbatLatest`, `amperageLatest`, `rssi`, `debug[0..7]`, `flightModeFlags`, `stateFlags`, `failsafePhase`; события (E-кадры): арм/дизарм, смена режима, failsafe. Заголовок лога содержит **весь `diff`** — по логу можно восстановить конфигурацию полёта.
+`gyroADC[0..2]` (после фильтров), `gyroUnfilt[0..2]` (до, при включённом поле), `setpoint[0..3]`, `rcCommand[0..3]`, `axisP/I/D/F[0..2]`, `motor[0..3]`, `eRPM[0..3]`, `vbatLatest`, `amperageLatest`, `rssi`, `debug[0..7]`, `flightModeFlags`, `stateFlags`, `failsafePhase`; события (E-кадры): арм/дизарм, смена режима, failsafe. Заголовок лога содержит около 190 ключевых параметров (PID, рейты, фильтры, моторы), но не весь `diff`: нет `aux`, `serial`, OSD, failsafe — полный бэкап только через `diff all`.
 
 ### Метод чтения лога за 5 минут
 1. Blackbox Explorer: обзор — нет ли обрывов (пропуски кадров), `vbat` под нагрузкой, `rssi/LQ`.
@@ -177,7 +177,7 @@ PIDToolbox полезен для:
 
 - Симптом: шум выше `250 Гц` не подавлен.
   - Возможная причина: RPM-фильтр отключён или неверно настроен bidirectional DShot.
-  - Что проверить/сделать: проверить `E = 0%` в Motors, включить Gyro/D-term RPM filters.
+  - Что проверить/сделать: проверить `E = 0%` в Motors, включить RPM-фильтр (в 4.5 он есть только на гироскопе; отдельного D-term RPM-фильтра нет).
 
 - Симптом: всплески в `20–100 Гц`.
   - Возможная причина: недостаточные P/D или избыточная фильтрация (задержка).

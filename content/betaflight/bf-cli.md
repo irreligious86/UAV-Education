@@ -92,7 +92,7 @@ resource MOTOR 5 NONE
 
 Между версиями меняются названия и логика части параметров:
 
-- D-term naming: в 4.5+ `d_roll` — base D, `d_max_roll` — peak.
+- D-term naming: в 4.5 `d_roll` — пиковый D, `d_min_roll` — базовый; в 2025.12 наоборот: `d_roll` — базовый, `d_max_roll` — пиковый (`d_min_*` удалены).
 - GPS rescue: часть переменных переработана.
 - Failsafe landing: появились отличия в naming/поведении.
 
@@ -111,11 +111,11 @@ https://build.betaflight.com/api/builds/<BUILD_KEY>/json
 ### Рецепты, которые нужны чаще всего (команды из `cli/cli.c`)
 | Задача | Команда |
 |---|---|
-| Узнать версию, target, BUILD KEY | `version` |
+| Узнать версию, target / BUILD KEY | `version` / `status` |
 | Загрузка CPU, флаги арма, частота гироскопа | `status`, `tasks` |
 | Переназначить мотор на другой пад | `resource MOTOR 3 B01` → `save` (`resource show all` — занятость) |
 | Поменять порядок моторов без перепайки | `resource` своп пар или в Motors tab «Motor direction/remap» |
-| Реверс направления одного мотора (DShot-команды) | `dshotprog 1 21` (21 — reversed, 20 — normal; у части ESC 7/8 — direction 1/2), затем `dshotprog 1 12` (save settings); моторы без пропов, индекс с 1 |
+| Реверс направления одного мотора (DShot-команды) | `dshotprog 0 21` (21 — reversed, 20 — normal; у части ESC 7/8 — direction 1/2), затем `dshotprog 0 12` (save settings); моторы без пропов, индекс с 0 (255 — все моторы) |
 | Проверить DShot-телеметрию | `dshot_telemetry_info` |
 | Таймеры/DMA (конфликты моторов, LED, serial) | `timer`, `dma show` |
 | Сброс к умолчаниям без сохранения / с | `defaults nosave`, `defaults` |
@@ -124,8 +124,8 @@ https://build.betaflight.com/api/builds/<BUILD_KEY>/json
 | Прошить ESC/настроить | `serialpassthrough`/`escprog` через конфигуратор ESC |
 | Пакетная загрузка diff без промежуточных перезагрузок | `batch start` … `batch end` → `save` |
 | Диапазоны каналов, карта стиков | `rxrange`, `map AETR1234` |
-| Профили | `profile 1`, `rateprofile 2`, `battery_profile` |
-| Тест пищалки/звука, сенсоры | `beeper`, `play_sound`, `sensor_hardware`, `gyroregisters` |
+| Профили | `profile 1`, `rateprofile 2` (команды `battery_profile` в Betaflight нет) |
+| Тест пищалки/звука, сенсоры | `beeper`, `play_sound`, `gyroregisters` (найденные датчики — в выводе `status`) |
 | Подпись и идентификация платы | `board_name`, `manufacturer_id`, `mcu_id`, `signature` |
 
 ### Разобранный пример: сгорел пад мотора 2
@@ -187,8 +187,8 @@ save
 ```text
 batch start
 set gyro_lpf1_static_hz = 0
-set gyro_lpf2_hz = 300
-set dterm_lpf2_hz = 150
+set gyro_lpf2_static_hz = 300
+set dterm_lpf2_static_hz = 150
 batch end
 save
 ```
@@ -292,7 +292,7 @@ defaults
 
 - Симптом: CLI не отвечает, команды не выполняются.
   - Возможная причина: неверный вход в CLI (не отправлен `#`), конфликт порта, некорректная скорость.
-  - Что сделать: убедиться, что активна вкладка CLI, закрыть другие приложения с доступом к COM-порту, сверить `msp_baudrate` и скорость терминала.
+  - Что сделать: убедиться, что активна вкладка CLI, закрыть другие приложения с доступом к COM-порту, сверить скорость MSP на порту (`serial`/вкладка Ports) и скорость терминала (для USB VCP она не важна).
 
 - Симптом: после вставки бэкапа дрон работает некорректно.
   - Возможная причина: версионное несоответствие прошивки.
@@ -311,7 +311,7 @@ defaults
   - Что сделать: переподключить питание и USB, проверить кабель, при повторении выполнить `defaults` и восстановление по шагам.
 
 - Симптом: не удаётся получить BUILD KEY или URL возвращает ошибку.
-  - Возможная причина: старая версия Betaflight (< 4.5), ключ скопирован не полностью, неверный URL.
+  - Возможная причина: старая версия Betaflight (< 4.4, до Cloud Build), ключ скопирован не полностью, неверный URL.
   - Что сделать: убедиться, что версия 4.5+, повторно скопировать ключ, при необходимости проверить альтернативный endpoint `.../<BUILD_KEY>/log`.
 
 ## references
