@@ -6,10 +6,11 @@
  * Module score (0..100):
  *   quiz part  = 40 * (best quiz % / 100)         — 0 when no quiz exists for the module
  *   lab part   = 60 * (checked criteria / total)  — 0..60; modules without lab: quiz counts 100%
+ *   with numeric tasks (meta.tasks > 0): quiz 30 + tasks 30 * (solved / total) + lab 40
  *   bonus      = module checklist is informational, not graded
  *
  * Module status:
- *   "passed"   quiz >= pass (80) AND all lab criteria checked   (or self-marked, see below)
+ *   "passed"   quiz >= pass (80) AND all lab criteria checked AND all numeric tasks solved (or self-marked)
  *   "active"   anything started (any quiz attempt, any check)
  *   "none"     untouched
  *   A manual "done" mark counts as passed but is flagged selfMarked=true; it is shown
@@ -25,26 +26,32 @@
 
   function moduleGrade(meta, state) {
     // meta: {id, quiz: bool, lab: int(criteria count)}  state: {quiz: {correct,total}|null, checks: Set, done: Set}
-    var hasQuiz = !!meta.quiz, labN = meta.lab || 0;
+    var hasQuiz = !!meta.quiz, labN = meta.lab || 0, taskN = meta.tasks || 0;
     var quizPct = state.quiz && state.quiz.total ? Math.round(100 * state.quiz.correct / state.quiz.total) : null;
     var labDone = 0;
     for (var i = 0; i < labN; i++) if (state.checks.has(meta.id + ":lab:" + i)) labDone++;
+    var tasksDone = 0;
+    if (taskN && state.tasks) tasksDone = Math.min(taskN, Object.keys(state.tasks).filter(function (k) { return state.tasks[k]; }).length);
 
-    var score;
-    if (hasQuiz && labN) score = QUIZ_WEIGHT * ((quizPct || 0) / 100) + LAB_WEIGHT * (labDone / labN);
-    else if (hasQuiz) score = 100 * ((quizPct || 0) / 100);
-    else if (labN) score = 100 * (labDone / labN);
-    else score = 0;
-    score = Math.round(score);
+    // weights of the parts that exist, renormalised to 100
+    var parts = [];
+    if (hasQuiz) parts.push([taskN ? 30 : QUIZ_WEIGHT, (quizPct || 0) / 100]);
+    if (taskN) parts.push([30, tasksDone / taskN]);
+    if (labN) parts.push([taskN ? 40 : LAB_WEIGHT, labDone / labN]);
+    var wsum = 0, acc = 0;
+    parts.forEach(function (p) { wsum += p[0]; acc += p[0] * p[1]; });
+    var score = wsum ? Math.round(100 * acc / wsum) : 0;
 
     var quizOk = !hasQuiz || (quizPct !== null && quizPct >= PASS);
     var labOk = !labN || labDone === labN;
-    var earned = (hasQuiz || labN) && quizOk && labOk;
+    var tasksOk = !taskN || tasksDone === taskN;
+    var earned = (hasQuiz || labN || taskN) && quizOk && labOk && tasksOk;
     var selfMarked = state.done.has(meta.id) && !earned;
-    var started = (quizPct !== null) || labDone > 0 || state.done.has(meta.id);
+    var started = (quizPct !== null) || labDone > 0 || tasksDone > 0 || state.done.has(meta.id);
 
     return {
       id: meta.id, score: score, quizPct: quizPct, labDone: labDone, labTotal: labN, hasQuiz: hasQuiz,
+      tasksDone: tasksDone, tasksTotal: taskN,
       status: (earned || selfMarked) ? "passed" : started ? "active" : "none",
       earned: !!earned, selfMarked: selfMarked
     };
@@ -82,13 +89,14 @@
     var store = window.UAVProgress;
     return Promise.all([
       fetch(base + "api/v1/grading.json").then(function (r) { return r.json(); }),
-      store.getDone(), store.getChecks(""), store.getAllQuiz ? store.getAllQuiz() : Promise.resolve({})
+      store.getDone(), store.getChecks(""), store.getAllQuiz ? store.getAllQuiz() : Promise.resolve({}),
+      store.getAllTasks ? store.getAllTasks() : Promise.resolve({})
     ]).then(function (res) {
-      var meta = res[0], done = res[1], checks = res[2], quiz = res[3];
-      var state = { done: done, checks: checks, quiz: quiz };
+      var meta = res[0], done = res[1], checks = res[2], quiz = res[3], tasks = res[4] || {};
+      var state = { done: done, checks: checks, quiz: quiz, tasks: tasks };
       var grades = {};
       meta.modules.forEach(function (m) {
-        grades[m.id] = moduleGrade(m, { quiz: quiz[m.id] || null, checks: checks, done: done });
+        grades[m.id] = moduleGrade(m, { quiz: quiz[m.id] || null, checks: checks, done: done, tasks: tasks[m.id] || {} });
       });
       var caps = {};
       meta.capstones.forEach(function (c) { caps[c.id] = capstoneGrade(c, state); });

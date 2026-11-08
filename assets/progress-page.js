@@ -9,7 +9,7 @@
     document.querySelectorAll("[data-row]").forEach(function (tr) {
       var g = grades[tr.getAttribute("data-row")];
       if (!g) return;
-      tr.querySelector('[data-cell="quiz"]').textContent = g.hasQuiz ? (g.quizPct === null ? "—" : g.quizPct + "%") : "нет";
+      tr.querySelector('[data-cell="quiz"]').textContent = (g.hasQuiz ? (g.quizPct === null ? "—" : g.quizPct + "%") : "нет") + (g.tasksTotal ? " · з. " + g.tasksDone + "/" + g.tasksTotal : "");
       tr.querySelector('[data-cell="lab"]').textContent = g.labTotal ? g.labDone + "/" + g.labTotal : "нет";
       tr.querySelector('[data-cell="score"]').textContent = g.score;
       var st = tr.querySelector('[data-cell="status"]');

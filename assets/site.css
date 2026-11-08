@@ -243,3 +243,26 @@ body.ready-only .track-module--planned, body.ready-only .gc-card[data-state="pen
 .diagram figcaption { margin-top: var(--gc-space-3); font-size: 13px; line-height: 18px; }
 @media (max-width: 719px) { .diagram__hint { display: block; } }
 @media (min-width: 720px) { .diagram__svg svg { min-width: 0; } }
+
+/* ---------- numeric tasks (<uav-tasks>) ---------- */
+.uav-tasks { display: block; }
+.uav-tasks > * + * { margin-top: var(--gc-space-3); }
+.uav-tasks__task { padding: var(--gc-space-4); border: 1px solid var(--gc-line); border-radius: var(--gc-radius-md); background: var(--gc-surface-200); }
+.uav-tasks__task > * + * { margin-top: var(--gc-space-3); }
+.uav-tasks__task[data-solved="1"] { border-left: 3px solid var(--gc-accent-hud); }
+.uav-tasks__head { display: flex; align-items: center; gap: var(--gc-space-3); flex-wrap: wrap; }
+.uav-tasks__statement { line-height: 24px; }
+.uav-tasks__row { display: flex; gap: var(--gc-space-2); align-items: center; flex-wrap: wrap; }
+.uav-tasks__input {
+  box-sizing: border-box; width: 140px; max-width: 100%; padding: var(--gc-space-2) var(--gc-space-3);
+  border: 1px solid var(--gc-line); border-radius: var(--gc-radius-md); background: var(--gc-surface-100); color: var(--gc-ink);
+  font-family: var(--gc-font-mono); font-size: 15px; line-height: 22px;
+}
+.uav-tasks__input:focus-visible { outline: 2px solid var(--gc-accent-hud); outline-offset: 1px; }
+.uav-tasks__unit { font-family: var(--gc-font-mono); font-size: 13px; }
+.uav-tasks__feedback { font-size: 14px; line-height: 20px; }
+.uav-tasks__feedback:empty { display: none; }
+.uav-tasks__feedback[data-state="ok"] { color: var(--gc-accent-hud); }
+.uav-tasks__feedback[data-state="danger"] { color: var(--gc-signal-red); }
+.uav-tasks__feedback[data-state="caution"] { color: var(--gc-signal-amber); }
+.uav-tasks__feedback[data-state="info"] { color: var(--gc-ink-muted); }

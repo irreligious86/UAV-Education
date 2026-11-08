@@ -18,6 +18,7 @@
 | **Пути по прошивкам** | `data/curriculum.json` → `paths` (этапы и порядок модулей); страницы `path/<id>.html`; независимый прогресс и «Продолжить» для каждого пути |
 | **План курса v3** | `docs/COURSE-PLAN.md` — ступени, треки, принципы, фазы; внешние разборы в `docs/reviews/` |
 | **План этапа 2** | `docs/COURSE-PLAN-STAGE2.md` — глубина теории, программная практика, инфографика (итерация 1 выполнена) |
+| **Задачи** | `docs/TASKS.md` — числовые задачи с автопроверкой (`content/tasks/`), модель оценки |
 | **Схемы** | `docs/DIAGRAMS.md` — как добавлять SVG-инфографику в модули (`{{diagram:id|подпись}}`) |
 | **Формулы и CLI** | `data/formulas.json` → `pages/formulas.html` |
 | **Виджеты** | `assets/widgets/*.js` — `{{widget:name}}` в Markdown (pid-sim, filter-response, elrs-calc, tw-calc, wire-drop, link-latency) |

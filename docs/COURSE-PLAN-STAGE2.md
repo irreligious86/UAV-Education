@@ -153,8 +153,8 @@ Totals: +19 modules, 12 projects, ~120 diagrams, 4 Docker environments, a task s
 
 | Iteration | Scope | Exit criterion |
 |---|---|---|
-| 1 | diagram infrastructure (`{{diagram}}`, standard, CI check) + 25 diagrams on key existing modules | diagrams on all pillar modules of tracks 0–3 |
-| 2 | numeric task system + 30 tasks in calculation modules; updated grading model | tasks count in progress |
+| 1 ✅ | diagram infrastructure (`{{diagram}}`, standard, CI check) + 25 diagrams on key existing modules | diagrams on all pillar modules of tracks 0–3 |
+| 2 ✅ | numeric task system + 31 tasks in 14 calculation modules; grading 30/30/40 (`docs/TASKS.md`) | tasks count in progress |
 | 3 | mathematics elective (3 modules with tasks and diagrams) + prerequisites page | prerequisites wired in curriculum |
 | 4 | MAVLink mini-course (5) + `examples/mavlink/` with pytest | all labs pass in SITL in CI |
 | 5 | ROS 2 Docker environment + ROS 2 modules 1–3 | `docker compose up` → flight in Gazebo |

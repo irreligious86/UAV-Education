@@ -14,6 +14,9 @@
  *   getQuiz(moduleId)        -> Promise<{correct,total,ts}|null>  best quiz result
  *   setQuiz(moduleId, res)   -> Promise<void>                       keeps the best of old/new
  *   getAllQuiz()             -> Promise<{moduleId: result}>
+ *   getTasks(moduleId)       -> Promise<{taskId: true}>              solved numeric tasks
+ *   setTask(moduleId, taskId, solved) -> Promise<void>
+ *   getAllTasks()            -> Promise<{moduleId: {taskId: true}}>
  *   reset()                  -> Promise<void>                       wipe everything (student asked)
  */
 (function () {
@@ -27,9 +30,9 @@
     try {
       var raw = window.localStorage.getItem(KEY);
       var data = raw ? JSON.parse(raw) : {};
-      return { done: data.done || [], checks: data.checks || [], quiz: data.quiz || {} };
+      return { done: data.done || [], checks: data.checks || [], quiz: data.quiz || {}, tasks: data.tasks || {} };
     } catch (e) {
-      return { done: [], checks: [], quiz: {} };
+      return { done: [], checks: [], quiz: {}, tasks: {} };
     }
   };
 
@@ -85,6 +88,23 @@
 
   LocalProgressStore.prototype.getAllQuiz = function () {
     return Promise.resolve(this._read().quiz);
+  };
+
+  LocalProgressStore.prototype.getTasks = function (moduleId) {
+    return Promise.resolve(this._read().tasks[moduleId] || {});
+  };
+
+  LocalProgressStore.prototype.setTask = function (moduleId, taskId, solved) {
+    var data = this._read();
+    var m = data.tasks[moduleId] || {};
+    if (solved) m[taskId] = true; else delete m[taskId];
+    data.tasks[moduleId] = m;
+    this._write(data);
+    return Promise.resolve();
+  };
+
+  LocalProgressStore.prototype.getAllTasks = function () {
+    return Promise.resolve(this._read().tasks);
   };
 
   LocalProgressStore.prototype.reset = function () {

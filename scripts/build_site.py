@@ -53,8 +53,10 @@ PAGES = {
     "resources": "Ресурсы и сообщества",
 }
 
-GENERATED_DIRS = ("m", "ref", "pages", "api", "quiz", "cap", "path")
+GENERATED_DIRS = ("m", "ref", "pages", "api", "quiz", "cap", "path", "tasks")
 QUIZ_SRC = ROOT / "content" / "quiz"
+TASKS_SRC = ROOT / "content" / "tasks"
+TASK_VARIANTS = 8
 
 esc = html.escape
 
@@ -151,6 +153,7 @@ def layout(*, title: str, base: str, body: str, active: str, description: str = 
   <script src="{base}assets/grading.js" defer></script>
   <script src="{base}assets/app.js" defer></script>
   <script src="{base}assets/uav-quiz.js" defer></script>
+  <script src="{base}assets/uav-tasks.js" defer></script>
   <script src="{base}assets/offline.js" defer></script>{extra_head}
 </head>
 <body class="gc-root" data-base="{base}">
@@ -558,6 +561,10 @@ def render_module(m: dict, model: dict) -> str:
         done_toggle = ""
     else:
         summary_html, content = article_sections(m)
+        if (TASKS_SRC / f"{m['id']}.json").is_file():
+            content += (
+                f'\n<h2>Задачи с числовым ответом</h2>\n<uav-tasks src="{base}tasks/{esc(m["id"])}.json" module="{esc(m["id"])}"></uav-tasks>'
+            )
         if (QUIZ_SRC / f"{m['id']}.json").is_file():
             content += (
                 f'\n<h2>Проверь себя</h2>\n<uav-quiz src="{base}quiz/{esc(m["id"])}.json" module="{esc(m["id"])}"></uav-quiz>'
@@ -890,10 +897,65 @@ def grading_meta(model: dict) -> dict:
             continue
         lab = m.get("lab")
         mods.append({"id": m["id"], "quiz": (QUIZ_SRC / f"{m['id']}.json").is_file(),
+                     "tasks": task_count(m["id"]),
                      "lab": len(lab.get("criteria", [])) if isinstance(lab, dict) else 0})
     caps = [{"id": g["capstone"]["id"], "criteria": len(g["capstone"].get("criteria", [])), "group": g["id"]}
             for g in model["groups"] if g.get("capstone")]
-    return {"version": 1, "pass": 80, "weights": {"quiz": 40, "lab": 60}, "modules": mods, "capstones": caps}
+    return {"version": 2, "pass": 80, "weights": {"quiz": 40, "lab": 60, "withTasks": {"quiz": 30, "tasks": 30, "lab": 40}},
+            "modules": mods, "capstones": caps}
+
+
+# ---------------------------------------------------------------- numeric tasks
+
+
+def task_count(module_id: str) -> int:
+    p = TASKS_SRC / f"{module_id}.json"
+    if not p.is_file():
+        return 0
+    return len(json.loads(p.read_text(encoding="utf-8")).get("tasks", []))
+
+
+def _fmt_num(v: float) -> str:
+    if abs(v - round(v)) < 1e-9:
+        return str(int(round(v)))
+    return f"{v:.4g}".rstrip("0").rstrip(".")
+
+
+def build_task_variants(bank: dict) -> dict:
+    """Expand a parametrised bank into concrete variants with precomputed answers.
+    Deterministic (seeded by module/task id) so the published JSON is stable between builds."""
+    import math
+    import random
+    out = {"module": bank["module"], "tasks": []}
+    for t in bank["tasks"]:
+        rng = random.Random(f"{bank['module']}/{t['id']}")
+        variants = []
+        seen: set[tuple] = set()
+        tries = 0
+        while len(variants) < TASK_VARIANTS and tries < 200:
+            tries += 1
+            vals = {}
+            for name, spec in t.get("params", {}).items():
+                if isinstance(spec, list):
+                    vals[name] = rng.choice(spec)
+                else:
+                    step = spec.get("step", 1)
+                    n = int(round((spec["max"] - spec["min"]) / step))
+                    vals[name] = round(spec["min"] + step * rng.randint(0, n), 6)
+            key = tuple(sorted(vals.items()))
+            if key in seen:
+                continue
+            seen.add(key)
+            ans = eval(t["answer"], {"__builtins__": {}, "math": math}, dict(vals))  # authored by us, not user input
+            if not math.isfinite(ans):
+                continue
+            statement = re.sub(r"\{([a-z0-9_]+)\}", lambda mm: _fmt_num(vals[mm.group(1)]), t["statement"])
+            variants.append({"values": vals, "statement": format_inline(statement), "answer": round(float(ans), 6)})
+        if not variants:
+            raise SystemExit(f"task {bank['module']}/{t['id']}: no finite variants")
+        out["tasks"].append({"id": t["id"], "title": t["title"], "unit": t.get("unit", ""), "tol": t.get("tol", 0.03),
+                             "abs": t.get("abs", 0), "solution": format_inline(t.get("solution", "")), "variants": variants})
+    return out
 
 
 def render_progress(model: dict) -> str:
@@ -918,7 +980,7 @@ def render_progress(model: dict) -> str:
     )
     all_pub = [m["id"] for m in model["modules"].values() if m["status"] == "published"]
     body = f"""    <h1 class="gc-display">Мой прогресс</h1>
-    <p class="gc-muted">Балл модуля = 40% квиз (лучшая попытка) + 60% лабораторная. «Освоен» — квиз ≥ 80% и все пункты лабораторной. Ручная отметка видна как «отмечен», это честно другое.</p>
+    <p class="gc-muted">Балл модуля = 40% квиз (лучшая попытка) + 60% лабораторная; в модулях с задачами — 30% квиз + 30% задачи + 40% лабораторная. «Освоен» — квиз ≥ 80%, все задачи решены и все пункты лабораторной. Ручная отметка видна как «отмечен», это честно другое.</p>
     <section class="gc-panel">
       <p class="gc-label gc-muted">Весь курс</p>
       <p class="progress-headline" data-group-summary="{esc(','.join(all_pub))}"></p>
@@ -977,7 +1039,7 @@ def write_pwa() -> None:
     produces a new cache and old caches are dropped on activate."""
     import hashlib
     files: list[str] = ["index.html", "manifest.webmanifest"]
-    for d in ("m", "ref", "pages", "api", "quiz", "cap", "path"):
+    for d in GENERATED_DIRS:
         for f in sorted((ROOT / d).rglob("*")):
             if f.is_file():
                 files.append(f.relative_to(ROOT).as_posix())
@@ -1090,6 +1152,10 @@ def main() -> None:
     if QUIZ_SRC.is_dir():
         for q in QUIZ_SRC.glob("*.json"):
             write(ROOT / "quiz" / q.name, q.read_text(encoding="utf-8"))
+    if TASKS_SRC.is_dir():
+        for t in sorted(TASKS_SRC.glob("*.json")):
+            bank = json.loads(t.read_text(encoding="utf-8"))
+            write(ROOT / "tasks" / t.name, json.dumps(build_task_variants(bank), ensure_ascii=False) + "\n")
     write(ROOT / "pages" / "search.html", render_search())
     write(ROOT / "pages" / "progress.html", render_progress(model))
     write(ROOT / "api" / "v1" / "grading.json", json.dumps(grading_meta(model), ensure_ascii=False, indent=2) + "\n")
@@ -1100,7 +1166,8 @@ def main() -> None:
 
     n_pub = sum(1 for m in model["modules"].values() if m["status"] == "published")
     n_quiz = len(list(QUIZ_SRC.glob("*.json"))) if QUIZ_SRC.is_dir() else 0
-    print(f"built: {len(model['modules'])} module pages ({n_pub} written, {n_quiz} with quiz), {len(model['stacks'])} stacks, {len(PAGES)} pages")
+    n_tasks = sum(task_count(p.stem) for p in TASKS_SRC.glob("*.json")) if TASKS_SRC.is_dir() else 0
+    print(f"built: {len(model['modules'])} module pages ({n_pub} written, {n_quiz} with quiz, {n_tasks} numeric tasks), {len(model['stacks'])} stacks, {len(PAGES)} pages")
 
 
 if __name__ == "__main__":

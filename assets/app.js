@@ -96,6 +96,7 @@
       if (sc && grades[id]) {
         var gr = grades[id], parts = [];
         if (gr.hasQuiz) parts.push("квиз " + (gr.quizPct === null ? "—" : gr.quizPct + "%"));
+        if (gr.tasksTotal) parts.push("задачи " + gr.tasksDone + "/" + gr.tasksTotal);
         if (gr.labTotal) parts.push("лаба " + gr.labDone + "/" + gr.labTotal);
         sc.textContent = "Балл модуля: " + gr.score + "/100 · " + parts.join(" · ");
       }
@@ -122,7 +123,7 @@
       var earned = g && g.status === "passed" && !g.selfMarked;
       var marked = G.state.done.has(id);
       if (earned && !marked) {
-        btn.textContent = isCap ? "✓ Сдан по критериям" : "✓ Освоен: квиз сдан, лабораторная выполнена";
+        btn.textContent = isCap ? "✓ Сдан по критериям" : (g.tasksTotal ? "✓ Освоен: квиз сдан, задачи решены, лабораторная выполнена" : "✓ Освоен: квиз сдан, лабораторная выполнена");
         btn.setAttribute("variant", "primary"); btn.setAttribute("disabled", "");
       } else {
         btn.removeAttribute("disabled");
