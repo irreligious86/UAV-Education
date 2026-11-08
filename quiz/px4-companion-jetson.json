@@ -67,6 +67,28 @@
       ],
       "answer": 1,
       "explain": "Иначе /dev/ttyTHS1 недоступен обычному пользователю."
+    },
+    {
+      "q": "Какой порт Jetson Orin Nano на 40-пиновой гребёнке — UART для Pixhawk?",
+      "options": [
+        "/dev/ttyUSB0",
+        "/dev/ttyTHS1 (пины 8/10)",
+        "/dev/ttyAMA0",
+        "/dev/ttyACM0"
+      ],
+      "answer": 1,
+      "explain": "Отключить nvgetty, группа dialout."
+    },
+    {
+      "q": "Можно ли MAVLink и uXRCE-DDS на одном TELEM2?",
+      "options": [
+        "Да",
+        "Нет — конфликт порта; разные порты",
+        "Только в SITL",
+        "Только по USB"
+      ],
+      "answer": 1,
+      "explain": "MAV_1_CONFIG и UXRCE_DDS_CFG на разных портах."
     }
   ]
 }
