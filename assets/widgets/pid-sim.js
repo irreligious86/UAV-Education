@@ -29,7 +29,7 @@
     var a = (2 * Math.PI * p.lpf * DT) / (1 + 2 * Math.PI * p.lpf * DT);
     var ad = (2 * Math.PI * D_LPF * DT) / (1 + 2 * Math.PI * D_LPF * DT);
     var am = DT / MOTOR_TAU, fa = DT / FF_TAU;
-    var dl = Math.round(LOOP_DELAY_S / DT), buf = [], seed = 12345;
+    var dl = Math.round(((p.delay === undefined ? LOOP_DELAY_S * 1000 : p.delay) / 1000) / DT), buf = [], seed = 12345;
     for (var k = 0; k <= dl; k++) buf.push(0);
     function rnd() { seed = (seed * 1103515245 + 12345) & 0x7fffffff; return seed / 0x7fffffff - 0.5; }
     for (var i = 0; i < n; i++) {
@@ -73,8 +73,8 @@
       var self = this;
       this.classList.add("widget");
       this.innerHTML = '<p class="gc-label gc-muted">Интерактив · step response одной оси</p>' +
-        '<p class="widget__hint gc-muted">Setpoint — ступенька 300 °/с на 300 мс по одной оси. Модель учебная: моторы с запаздыванием ~20 мс, петля 2 кГц, D на отфильтрованном гироскопе. Крути P, I, D, FF, шум и фильтр: смотри перелёт, bounce-back после остановки и как D превращает шум в дрожание моторов. Тренды честные, абсолютные цифры — нет.</p>';
-      var p = this.p = { P: 45, I: 60, D: 25, FF: 60, noise: 2, lpf: 150 };
+        '<p class="widget__hint gc-muted">Setpoint — ступенька 300 °/с на 300 мс по одной оси. Модель учебная: моторы с запаздыванием ~20 мс, петля 2 кГц, D на отфильтрованном гироскопе; «Задержка петли» — суммарная чистая задержка (фильтры + ESC + передача), она съедает запас по фазе. Крути P, I, D, FF, шум и фильтр: смотри перелёт, bounce-back после остановки и как D превращает шум в дрожание моторов. Тренды честные, абсолютные цифры — нет.</p>';
+      var p = this.p = { P: 45, I: 60, D: 25, FF: 60, noise: 2, lpf: 150, delay: 2 };
       var controls = document.createElement("div"); controls.className = "widget__controls";
       var defs = [
         { k: "P", label: "P", min: 0, max: 150, value: p.P },
@@ -82,10 +82,11 @@
         { k: "D", label: "D", min: 0, max: 80, value: p.D },
         { k: "FF", label: "FF", min: 0, max: 250, value: p.FF },
         { k: "noise", label: "Шум гиро", min: 0, max: 15, value: p.noise, unit: "°/с" },
-        { k: "lpf", label: "Gyro LPF", min: 30, max: 500, step: 10, value: p.lpf, unit: "Гц" }
+        { k: "lpf", label: "Gyro LPF", min: 30, max: 500, step: 10, value: p.lpf, unit: "Гц" },
+        { k: "delay", label: "Задержка петли", min: 0, max: 12, step: 0.5, value: p.delay, unit: "мс", fmt: function (v) { return (+v).toFixed(1); } }
       ];
       defs.forEach(function (d) {
-        controls.appendChild(UAVPlot.slider({ label: d.label, min: d.min, max: d.max, step: d.step, value: d.value, unit: d.unit, onChange: function (v) { p[d.k] = v; self.update(); } }).el);
+        controls.appendChild(UAVPlot.slider({ label: d.label, min: d.min, max: d.max, step: d.step, value: d.value, unit: d.unit, fmt: d.fmt, onChange: function (v) { p[d.k] = v; self.update(); } }).el);
       });
       this.appendChild(controls);
       var c1 = document.createElement("canvas"); c1.className = "widget__canvas"; this.appendChild(c1);
@@ -94,12 +95,13 @@
       this.plot2 = UAVPlot.create(c2, { xLabel: "мс", yLabel: "выход PID", height: 120 });
       var m = document.createElement("div"); m.className = "widget__metrics"; this.appendChild(m); this.metricsEl = m;
       var presets = document.createElement("div"); presets.className = "widget__presets";
-      [["Базис", { P: 45, I: 60, D: 25, FF: 60, lpf: 150 }], ["Мало D", { P: 45, I: 60, D: 5, FF: 60 }], ["Много D + шум", { P: 45, I: 60, D: 70, FF: 60, noise: 8 }], ["Много P", { P: 130, I: 60, D: 25, FF: 60 }], ["Много I", { P: 45, I: 200, D: 25, FF: 60 }], ["Много FF", { P: 45, I: 60, D: 25, FF: 200 }], ["Тяжёлый фильтр", { P: 45, I: 60, D: 25, FF: 60, lpf: 40 }]].forEach(function (pr) {
+      [["Базис", { P: 45, I: 60, D: 25, FF: 60, lpf: 150 }], ["Мало D", { P: 45, I: 60, D: 5, FF: 60 }], ["Много D + шум", { P: 45, I: 60, D: 70, FF: 60, noise: 8 }], ["Много P", { P: 130, I: 60, D: 25, FF: 60 }], ["Много I", { P: 45, I: 200, D: 25, FF: 60 }], ["Много FF", { P: 45, I: 60, D: 25, FF: 200 }], ["Тяжёлый фильтр", { P: 45, I: 60, D: 25, FF: 60, lpf: 40 }], ["Большая задержка", { P: 45, I: 60, D: 25, FF: 60, delay: 8 }]].forEach(function (pr) {
         var b = document.createElement("button"); b.type = "button"; b.className = "gc-tag"; b.textContent = pr[0];
         b.addEventListener("click", function () {
           Object.keys(pr[1]).forEach(function (k) { p[k] = pr[1][k]; });
           if (!("noise" in pr[1])) p.noise = 2;
           if (!("lpf" in pr[1])) p.lpf = 150;
+          if (!("delay" in pr[1])) p.delay = 2;
           controls.querySelectorAll("input").forEach(function (inp, i) { inp.value = p[defs[i].k]; inp.dispatchEvent(new Event("input")); });
         });
         presets.appendChild(b);

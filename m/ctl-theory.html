@@ -13,6 +13,8 @@
   <script src="../assets/grading.js" defer></script>
   <script src="../assets/app.js" defer></script>
   <script src="../assets/uav-quiz.js" defer></script>
+  <script src="../assets/widgets/plot.js" defer></script>
+  <script src="../assets/widgets/link-latency.js" defer></script>
 </head>
 <body class="gc-root" data-base="../">
   <header class="site-header">
@@ -32,15 +34,56 @@
     <article class="module" data-module-page="ctl-theory">
       <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-integrator">Интегратор</a><span>Теория управления: устойчивость, запасы, каскады</span></p>
       <h1 class="module-title">Теория управления: устойчивость, запасы, каскады</h1>
-      <div class="module-tags"><span class="gc-tag" title="Уровень">L3 — Специалист</span><span class="gc-tag">учёба ~4 ч</span><span class="gc-tag" data-state="caution">СКОРО</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ОСВОЕН</span></div>
+      <div class="module-tags"><span class="gc-tag" title="Уровень">L3 — Специалист</span><span class="gc-tag">чтение 40 мин</span><span class="gc-tag">учёба ~4 ч</span><span class="gc-tag">любая прошивка</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ОСВОЕН</span></div>
       <p class="gc-muted module-score" data-module-score></p>
-      
+      <p class="module-lead">PID-тюнинг без теории — перебор. Модуль объясняет на уровне, достаточном для инженера: что такое устойчивость замкнутого контура, почему задержка съедает запас по фазе и приводит к осцилляциям при большом P, как step response связан с полюсами и демпфированием (и почему bounce-back — это недодемпфированный полюс), и почему автопилот строит каскад угол → угловая скорость с внутренним контуром в разы быстрее внешнего. Формулы минимальны, каждая привязана к тому, что видно в симуляторе PID и в логе.</p>
       <div class="gc-callout" data-state="ok"><strong>После модуля ты умеешь</strong><ul><li>объяснить устойчивость, запас по фазе и почему задержка её съедает</li><li>связать step response с полюсами и демпфированием</li><li>объяснить каскад угол → скорость и почему внутренний контур должен быть быстрее</li></ul></div><p class="gc-muted">Перед этим модулем: <a href="ctl-signals.html">Сигналы и спектры: что видит гироскоп</a>, <a href="bf-pid-reg-in-bf.html">PID-регулятор в Betaflight</a></p><div class="gc-callout lab"><p class="gc-label gc-muted">Лабораторная</p><strong>Задержка против устойчивости</strong><p class="gc-muted lab__hint">Сдано, когда отмечены все пункты:</p><ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="ctl-theory:lab:0"><span>В симуляторе PID подобран предел P до осцилляций при двух задержках</span></label></li><li><label><input type="checkbox" data-check-id="ctl-theory:lab:1"><span>Связь bounce-back с демпфированием объяснена</span></label></li><li><label><input type="checkbox" data-check-id="ctl-theory:lab:2"><span>Отчёт на страницу</span></label></li></ul></div><div class="path-pos gc-muted"><span class="gc-label">В пути</span><ul><li data-path-pos="betaflight"><a href="../path/betaflight.html">Betaflight</a>: шаг 38 из 44 → <a href="bf-pid.html?path=betaflight">PID-тюнинг по данным</a></li></ul></div>
       <div class="gc-prose module-body">
-<div class="gc-callout" data-state="caution"><strong>Модуль в разработке.</strong> Цели и связи уже определены, текст пишется. План — в <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">ROADMAP</a>.</div>
+<h2>Теория</h2>
+<h4 class="md-subheading">Объект, регулятор, контур</h4>
+<p>Объект — аппарат: вход — команда моторам, выход — угловая скорость. Регулятор — PID: вход — ошибка (setpoint − gyro), выход — команда. Замкнутый контур: выход влияет на вход через измерение. Весь смысл теории — предсказать поведение контура, не замыкая его.</p>
+<h4 class="md-subheading">Модель оси в первом приближении</h4>
+<p>Момент двигателей создаёт угловое ускорение: J·ω̇ = M − b·ω, где J — момент инерции, b — аэродинамическое демпфирование. Передаточная функция от момента к ω — апериодическое звено 1/(J·s + b) — «интегратор с утечкой»: ω растёт, пока прикладывается момент. Плюс <strong>запаздывания</strong>: мотор (ток/обороты, τ ≈ 10–30 мс для 5&quot;), фильтры гироскопа и D (1–5 мс), период петли и ESC-протокола (0.1–0.5 мс). Суммарная чистая задержка T_d — главный враг.</p>
+<h4 class="md-subheading">Устойчивость и запас по фазе</h4>
+<p>Контур с P-регулятором: при малом P — вялый, при большом — осцилляции, при ещё большем — расходящиеся. Граница — там, где петлевое усиление на частоте, на которой фазовый сдвиг достигает −180°, равно 1. Чистая задержка T_d даёт фазовый сдвиг −360°·f·T_d: на 50 Гц при T_d = 5 мс это −90°, и полюс объекта добавляет ещё −90° — вот и −180°. Поэтому:</p>
+<ul><li><strong>Запас по фазе</strong> — сколько градусов до −180° на частоте, где усиление = 1. 45–60° — хороший тюн (небольшой overshoot); 20–30° — звон и bounce-back; 0 — незатухающие осцилляции.</li><li>Задержка T_d съедает запас линейно с частотой: чем быстрее хочешь контур (выше P), тем больше теряешь. Удвоение задержки при том же P — потеря ~половины запаса.</li><li>Отсюда ограничение «P не больше, чем позволяет задержка». Снижение задержки (фильтры повыше, RPM-notch вместо широкого LPF, быстрый ESC-протокол, лёгкие пропы) — единственный способ поднять P без осцилляций.</li></ul>
+<h4 class="md-subheading">Step response, полюса, демпфирование</h4>
+<p>Замкнутый контур второго порядка описывается собственной частотой ωₙ и демпфированием ζ: - ζ &gt; 1 — апериодический, медленный; - ζ ≈ 0.7 — быстрый с overshoot ~5%; это цель; - ζ = 0.4 — overshoot ~25%, звон; - ζ → 0 — осцилляции.</p>
+<p><strong>Overshoot ≈ exp(−π·ζ/√(1−ζ²))</strong>: 0.7 → 4.6%, 0.5 → 16%, 0.3 → 37%. Время установления ≈ 4/(ζ·ωₙ). Bounce-back после остановки стика — тот же недодемпфированный полюс, только возбуждённый ступенькой «вниз»: большой bounce-back = низкое ζ = либо мало D, либо много P/задержки. D-term повышает демпфирование (ζ) — поэтому «много D» убирает отскок, но D усиливает шум ∝ частоте, и фильтры D добавляют задержку, которая снова снижает запас. Это и есть компромисс тюнинга.</p>
+<h4 class="md-subheading">I-term: статическая ошибка и windup</h4>
+<p>I убирает установившуюся ошибку (ветер, несимметрия). Платит фазой: интегратор даёт −90° на низких частотах, поэтому слишком большой I — медленные колебания (0.5–3 Гц, «плавание»). Windup — накопление I при насыщении выходов (стик в упоре, моторы в потолке): прошивки ограничивают (<code>iterm_limit</code>, <code>iterm_relax</code>, в ArduPilot <code>ATC_RAT_*_IMAX</code>).</p>
+<h4 class="md-subheading">Feedforward</h4>
+<p>FF подаёт команду пропорционально производной setpoint, минуя ошибку: выход начинает двигаться до того, как накопилась ошибка. Не влияет на устойчивость (вне контура), но даёт overshoot при резких стиках, если его много. Хороший FF — малая задержка отклика при том же P.</p>
+<h4 class="md-subheading">Каскад: угол → скорость</h4>
+<p>Внешний контур (angle) считает желаемую угловую скорость из ошибки угла; внутренний (rate) отрабатывает её. Правило: внутренний контур должен быть в 3–10 раз быстрее внешнего (полоса), иначе внешний «видит» динамику внутреннего и каскад осциллирует. В ArduPilot: <code>ATC_ANG_RLL_P</code> (внешний, ~4.5–12) и <code>ATC_RAT_RLL_P/I/D</code> (внутренний); поверх — контур позиции (<code>PSC_*</code>) ещё медленнее. В Betaflight angle mode: <code>angle_p</code> поверх rate PID. В PX4: <code>MC_ROLL_P</code> → <code>MC_ROLLRATE_P/I/D</code>. Автотюн настраивает сначала внутренний контур, потом внешний — по той же причине.</p>
+<h4 class="md-subheading">Что это значит для тюнинга</h4>
+<ol><li>Сначала снизить задержку (механика, фильтры), потом поднимать P.</li><li>P — до начала звона, потом назад на 20–30% (запас по фазе).</li><li>D — пока bounce-back не станет &lt; 10% и моторы не греются.</li><li>I — до исчезновения дрейфа, без «плавания».</li><li>Внешний контур — после внутреннего.</li></ol>
+<p>Откуда берётся суммарная задержка T_d и какое звено весит больше всего — посчитай для своей связки:</p>
+<uav-link-latency class="widget"></uav-link-latency>
+
+<h2>Практика</h2>
+<h4 class="md-subheading">Шаг 1. Симулятор: предел P при двух задержках</h4>
+<p>В интерактивном симуляторе PID (модуль «PID-регулятор в Betaflight»): задержка 2 мс — поднимать P до начала незатухающих осцилляций, записать P_max и частоту; задержка 5 мс — повторить. Ожидаемо: P_max заметно ниже, частота осцилляций ниже.</p>
+<h4 class="md-subheading">Шаг 2. ζ по overshoot</h4>
+<p>По логу (<code>data-python</code> → <code>step_metrics</code>): overshoot → ζ по формуле; время установления → ωₙ. Сравнить две оси.</p>
+<h4 class="md-subheading">Шаг 3. Bounce-back ↔ D</h4>
+<p>Взять лог до/после изменения D на 20%: медиана bounce-back и шум моторов. Объяснить через ζ и задержку.</p>
+<h4 class="md-subheading">Шаг 4. Каскад</h4>
+<p>ArduPilot SITL: <code>ATC_ANG_RLL_P</code> поднять с 4.5 до 15 при стандартном rate-тюне — наблюдать осцилляции по углу; объяснить соотношением полос. Лабораторная: отчёт на страницу: P_max при двух задержках, ζ своих осей, вывод о bounce-back.</p>
+
+<h2>Диагностика</h2>
+<div class="diag-groups"><article class="diag-item"><h4><strong>Симптом:</strong> быстрые осцилляции (20–60 Гц) при подъёме P</h4><ul><li>Возможная причина: исчерпан запас по фазе из-за задержки.</li><li>Что сделать: снизить задержку (фильтры/механика) или P.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> медленные колебания 0.5–3 Гц</h4><ul><li>Возможная причина: слишком большой I или внешний контур быстрее допустимого.</li><li>Что сделать: снизить I / ANG_P, проверить windup.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> bounce-back при хорошем отклике</h4><ul><li>Возможная причина: низкое ζ — мало D или много задержки в D-фильтрах.</li><li>Что сделать: поднять D, поднять D-LPF, проверить шум.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> overshoot только при резких стиках</h4><ul><li>Возможная причина: много FF.</li><li>Что сделать: снизить FF/сгладить FF.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> автотюн дал странный внешний контур</h4><ul><li>Возможная причина: внутренний контур не был настроен до него.</li><li>Что сделать: сначала rate, потом angle.</li></ul></article></div>
+
+<h2>Чек-лист</h2>
+<ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="ctl-theory:0"><span>Могу объяснить запас по фазе и как задержка его съедает</span></label></li><li><label><input type="checkbox" data-check-id="ctl-theory:1"><span>Связал overshoot и bounce-back с демпфированием ζ</span></label></li><li><label><input type="checkbox" data-check-id="ctl-theory:2"><span>Нашёл предел P при двух задержках в симуляторе</span></label></li><li><label><input type="checkbox" data-check-id="ctl-theory:3"><span>Понимаю, почему внутренний контур должен быть быстрее внешнего</span></label></li><li><label><input type="checkbox" data-check-id="ctl-theory:4"><span>Знаю порядок тюнинга: задержка → P → D → I → внешний контур</span></label></li></ul>
+
+<h2>Источники</h2>
+<ul class="refs"><li><a href="https://ardupilot.org/copter/docs/tuning-process-instructions.html" target="_blank" rel="noopener noreferrer">ArduPilot — Tuning Process Instructions (rate → angle, filters first)</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://docs.px4.io/main/en/config_mc/pid_tuning_guide_multicopter.html" target="_blank" rel="noopener noreferrer">PX4 — Multicopter PID Tuning Guide (cascaded controllers)</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://betaflight.com/docs/wiki/guides/current/PID-Tuning-Guide" target="_blank" rel="noopener noreferrer">Betaflight — PID Tuning Guide</a> <span class="gc-tag" data-state="info">primary</span></li></ul>
+<h2>Проверь себя</h2>
+<uav-quiz src="../quiz/ctl-theory.json" module="ctl-theory"></uav-quiz>
       </div>
-      
-      
+      <div class="module-done"><gc-button variant="secondary" data-done-toggle="ctl-theory">Отметить как пройденный</gc-button></div>
+      <section class="related" aria-label="Смежные модули"><p class="gc-label gc-muted">Смежные модули</p><div class="gc-grid ref-grid"><a class="gc-card" href="ctl-signals.html"><strong>Сигналы и спектры: что видит гироскоп</strong><div class="gc-card__meta"><span class="gc-tag" title="L2 — Интегратор">L2</span></div></a><a class="gc-card" href="bf-pid-reg-in-bf.html"><strong>PID-регулятор в Betaflight</strong><div class="gc-card__meta"><span class="gc-tag" title="L1 — Оператор">L1</span></div></a><a class="gc-card" href="bf-pid.html"><strong>PID-тюнинг по данным</strong><div class="gc-card__meta"><span class="gc-tag" title="L2 — Интегратор">L2</span></div></a><a class="gc-card" href="px4-control.html"><strong>Контуры управления и тюнинг PX4</strong><div class="gc-card__meta"><span class="gc-tag" title="L3 — Специалист">L3</span></div></a></div></section>
       <nav class="pager" aria-label="Соседние модули" data-track-pager><a class="gc-card pager__prev" href="bf-rpm-filter.html"><span class="gc-label gc-muted">Назад · трек</span><br>RPM-фильтр: кейс «свистящего» 10&quot;</a><a class="gc-card pager__next" href="bf-pid.html"><span class="gc-label gc-muted">Дальше · трек</span><br>PID-тюнинг по данным</a></nav><nav class="pager" aria-label="Соседние шаги пути Betaflight" data-path-pager="betaflight" hidden><a class="gc-card pager__prev" href="bf-rpm-filter.html?path=betaflight"><span class="gc-label gc-muted">Назад · путь Betaflight</span><br>RPM-фильтр: кейс «свистящего» 10&quot;</a><a class="gc-card pager__next" href="bf-pid.html?path=betaflight"><span class="gc-label gc-muted">Дальше · шаг 39 из 44</span><br>PID-тюнинг по данным</a></nav>
     </article>
   </main>

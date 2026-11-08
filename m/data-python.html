@@ -32,15 +32,106 @@
     <article class="module" data-module-page="data-python">
       <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-integrator">Интегратор</a><span>Python для анализа полётных данных</span></p>
       <h1 class="module-title">Python для анализа полётных данных</h1>
-      <div class="module-tags"><span class="gc-tag" title="Уровень">L2 — Интегратор</span><span class="gc-tag">учёба ~4 ч</span><span class="gc-tag" data-state="caution">СКОРО</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ОСВОЕН</span></div>
+      <div class="module-tags"><span class="gc-tag" title="Уровень">L2 — Интегратор</span><span class="gc-tag">чтение 40 мин</span><span class="gc-tag">учёба ~4 ч</span><span class="gc-tag">Betaflight · ArduPilot · INAV</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ОСВОЕН</span></div>
       <p class="gc-muted module-score" data-module-score></p>
-      
+      <p class="module-lead">Blackbox Explorer и MAVExplorer показывают графики; инженеру нужны числа, которые можно сравнить до/после и положить в отчёт. Модуль — минимальный стек: Python + pandas + numpy + scipy + matplotlib; как прочитать лог Betaflight (через <code>blackbox_decode</code> в CSV) и ArduPilot (<code>.bin</code> через pymavlink), как построить спектр гироскопа методом Уэлча, и как написать переиспользуемые функции метрик: overshoot, время установления, bounce-back, джиттер петли. Весь код — рабочий, с ожидаемыми числами.</p>
       <div class="gc-callout" data-state="ok"><strong>После модуля ты умеешь</strong><ul><li>читать логи Betaflight/ArduPilot в pandas</li><li>строить графики и спектры (FFT/Welch) с scipy</li><li>писать переиспользуемые функции метрик</li></ul></div><p class="gc-muted">Перед этим модулем: <a href="tools-overview.html">Инструменты: Configurator, GCS, git</a></p><div class="gc-callout lab"><p class="gc-label gc-muted">Лабораторная</p><strong>Свой анализатор логов</strong><p class="gc-muted lab__hint">Сдано, когда отмечены все пункты:</p><ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="data-python:lab:0"><span>Лог прочитан в DataFrame</span></label></li><li><label><input type="checkbox" data-check-id="data-python:lab:1"><span>Спектр гироскопа построен Welch</span></label></li><li><label><input type="checkbox" data-check-id="data-python:lab:2"><span>Функция метрики (bounce-back) написана и проверена</span></label></li></ul></div><div class="path-pos gc-muted"><span class="gc-label">В пути</span><ul><li data-path-pos="betaflight"><a href="../path/betaflight.html">Betaflight</a>: шаг 33 из 44 → <a href="ctl-signals.html?path=betaflight">Сигналы и спектры: что видит гироскоп</a></li><li data-path-pos="ardupilot"><a href="../path/ardupilot.html">ArduPilot</a>: шаг 27 из 54 → <a href="ctl-signals.html?path=ardupilot">Сигналы и спектры: что видит гироскоп</a></li></ul></div>
       <div class="gc-prose module-body">
-<div class="gc-callout" data-state="caution"><strong>Модуль в разработке.</strong> Цели и связи уже определены, текст пишется. План — в <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">ROADMAP</a>.</div>
+<h2>Теория</h2>
+<h4 class="md-subheading">Стек и установка</h4>
+<pre class="cli-block"><code>python3 -m venv ~/uav-venv &amp;&amp; source ~/uav-venv/bin/activate
+pip install pandas numpy scipy matplotlib pymavlink</code></pre>
+<p><code>blackbox_decode</code> — из репозитория betaflight/blackbox-tools (собирается <code>make</code>), превращает <code>.BFL</code> в CSV с одной строкой на цикл PID.</p>
+<h4 class="md-subheading">Чтение логов</h4>
+<p><strong>Betaflight CSV</strong>: колонки <code>time (us)</code>, <code>gyroADC[0..2]</code> (град/с, после фильтров — <code>gyroADC</code>, до — <code>gyroUnfilt</code> в новых версиях при <code>debug_mode = GYRO_SCALED</code>), <code>setpoint[0..3]</code>, <code>motor[0..3]</code>, <code>rcCommand[0..3]</code>, <code>axisP/I/D/F[...]</code>, <code>eRPM[...]</code> при ESC-телеметрии.</p>
+<pre class="cli-block"><code>import pandas as pd, numpy as np
+df = pd.read_csv(&quot;log.01.csv&quot;, skipinitialspace=True)
+df.columns = [c.strip() for c in df.columns]
+t = df[&quot;time (us)&quot;].to_numpy() / 1e6
+fs = 1 / np.median(np.diff(t))          # частота логирования, Гц (8000/4000/2000)
+gyro_roll = df[&quot;gyroADC[0]&quot;].to_numpy()</code></pre>
+<p><strong>ArduPilot .bin</strong>:</p>
+<pre class="cli-block"><code>from pymavlink import mavutil
+m = mavutil.mavlink_connection(&quot;flight.bin&quot;)
+rows = []
+while (msg := m.recv_match(type=&quot;ATT&quot;)) is not None:
+    rows.append(msg.to_dict())
+att = pd.DataFrame(rows); att[&quot;t&quot;] = att[&quot;TimeUS&quot;] / 1e6</code></pre>
+<p>Для гироскопа на высокой частоте — <code>IMU</code> (обычно 1 кГц при <code>LOG_BITMASK</code> с RAW IMU) или batch-сэмплы <code>ISBH/ISBD</code> (до нескольких кГц для спектров; <code>INS_LOG_BAT_MASK</code>).</p>
+<h4 class="md-subheading">Спектр: почему Уэлч, а не один FFT</h4>
+<p>FFT всего лога — шумный и зависит от длины. Метод Уэлча режет сигнал на перекрывающиеся окна, берёт FFT каждого и усредняет: оценка спектральной плотности с контролируемым разрешением (Δf = fs / nperseg).</p>
+<pre class="cli-block"><code>from scipy.signal import welch
+f, pxx = welch(gyro_roll, fs=fs, nperseg=1024, noverlap=512, window=&quot;hann&quot;)
+pxx_db = 10 * np.log10(pxx + 1e-12)</code></pre>
+<p>При fs = 8000 и nperseg = 1024 разрешение 7.8 Гц; пик мотора на 250 Гц виден как бугор шириной 2–3 бина. Сравнивать логи — только при одинаковых fs и nperseg. Сегмент для спектра — висение или ровный полёт 10–20 с, без газа в пол (иначе пики размазываются по частотам).</p>
+<h4 class="md-subheading">Спектрограмма</h4>
+<pre class="cli-block"><code>from scipy.signal import spectrogram
+f, tt, S = spectrogram(gyro_roll, fs=fs, nperseg=512, noverlap=256)
+# imshow(10*log10(S), aspect=&quot;auto&quot;, origin=&quot;lower&quot;, extent=[tt[0], tt[-1], f[0], f[-1]])</code></pre>
+<p>Показывает, как пики едут с оборотами (моторы) или стоят (резонанс) — модуль «Сигналы и спектры».</p>
+<h4 class="md-subheading">Метрики переходного процесса</h4>
+<p>По паре setpoint → gyro на одной оси:</p>
+<ul><li><strong>Ошибка</strong> e(t) = setpoint − gyro.</li><li><strong>Overshoot</strong> — насколько gyro перелетает setpoint после ступеньки, в % от величины ступеньки.</li><li><strong>Время установления</strong> — через сколько мс gyro остаётся в ±5% (или ±2%) от setpoint.</li><li><strong>Bounce-back</strong> — после резкой остановки стика (setpoint → 0) gyro уходит в противоположную сторону: амплитуда отскока в % от пикового значения перед остановкой.</li><li><strong>Задержка</strong> — лаг между setpoint и gyro по максимуму кросс-корреляции.</li></ul>
+<p>Удобная реализация — не искать ступеньки вручную, а строить <strong>step response</strong> деконволюцией (как PID Toolbox): считать импульсную характеристику системы setpoint→gyro по окнам и интегрировать. Проще для начала — отобрать участки, где |d setpoint/dt| большой, и мерить на них.</p>
+<pre class="cli-block"><code>def step_metrics(sp, gy, fs, thr=200.0):
+    &quot;&quot;&quot;Find fast setpoint steps (deg/s per sample threshold) and measure response.&quot;&quot;&quot;
+    d = np.diff(sp)
+    idx = np.where(np.abs(d) &gt; thr / fs * 1000)[0]
+    res = []
+    for i in idx:
+        seg_sp, seg_gy = sp[i:i + int(0.25 * fs)], gy[i:i + int(0.25 * fs)]
+        if len(seg_gy) &lt; 10: continue
+        target = seg_sp[-1]; base = sp[i]
+        step = target - base
+        if abs(step) &lt; 50: continue
+        resp = (seg_gy - base) / step            # normalised 0→1
+        overshoot = max(0.0, resp.max() - 1.0) * 100
+        inside = np.abs(resp - 1.0) &lt; 0.05
+        settle = next((k for k in range(len(inside)) if inside[k:].all()), None)
+        res.append({&quot;t&quot;: i / fs, &quot;step&quot;: step, &quot;overshoot_pct&quot;: overshoot,
+                    &quot;settle_ms&quot;: None if settle is None else 1000 * settle / fs})
+    return pd.DataFrame(res)</code></pre>
+<p><strong>Bounce-back</strong>:</p>
+<pre class="cli-block"><code>def bounce_back(sp, gy, fs, big=200.0):
+    &quot;&quot;&quot;After setpoint returns to ~0 from a large value (&gt; big deg/s), measure gyro reversal (% of peak).&quot;&quot;&quot;
+    out = []
+    hi = np.abs(sp) &gt; big
+    for i in range(1, len(sp)):
+        if hi[i - 1] and not hi[i]:
+            peak = sp[i - 1]
+            win = gy[i:i + int(0.2 * fs)]
+            rev = -np.sign(peak) * win
+            out.append(100 * max(0.0, rev.max()) / abs(peak))
+    return np.array(out)</code></pre>
+<p>Ориентиры для 5&quot; (Betaflight): overshoot 5–15% — хорошо; bounce-back &lt; 10% — хорошо, &gt; 25% — много D или плохая механика.</p>
+<h4 class="md-subheading">Джиттер петли</h4>
+<pre class="cli-block"><code>dt = np.diff(t) * 1e6   # мкс
+print(dt.mean(), dt.std(), np.percentile(dt, 99.9))</code></pre>
+<p>Для 8 кГц среднее 125 мкс, std единицы мкс; std &gt; 10 — перегруженный процессор, пропуски — обрыв записи.</p>
+
+<h2>Практика</h2>
+<h4 class="md-subheading">Шаг 1. Прочитать</h4>
+<p>Свой лог (Betaflight CSV или ArduPilot .bin) → DataFrame, fs посчитана, первые 5 строк и описание колонок выведены.</p>
+<h4 class="md-subheading">Шаг 2. Спектр</h4>
+<p>Выбрать 10 с висения, <code>welch</code> по трём осям, график в дБ до fs/2, пики подписаны частотами. Сохранить PNG.</p>
+<h4 class="md-subheading">Шаг 3. Метрики</h4>
+<p><code>step_metrics</code> и <code>bounce_back</code> на roll: таблица шагов с overshoot и settle, медиана bounce-back. Сравнить с ориентирами.</p>
+<h4 class="md-subheading">Шаг 4. Пакет</h4>
+<p>Сложить функции в <code>uavlog.py</code> (read_bf, read_ap, spectrum, step_metrics, bounce_back) с docstring; второй лог прогоняется в три строки. Лабораторная: DataFrame, Welch, функция bounce-back проверена на двух логах.</p>
+
+<h2>Диагностика</h2>
+<div class="diag-groups"><article class="diag-item"><h4><strong>Симптом:</strong> спектры двух логов нельзя сравнить</h4><ul><li>Возможная причина: разные fs или nperseg, разные режимы полёта.</li><li>Что сделать: одинаковые параметры, один и тот же режим (висение).</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> step_metrics пустой</h4><ul><li>Возможная причина: в логе нет резких движений стиков или порог не под fs.</li><li>Что сделать: полёт с резкими остановками стика, порог подобрать по гистограмме d setpoint.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> пики спектра размазаны</h4><ul><li>Возможная причина: обороты менялись внутри окна.</li><li>Что сделать: ровный участок, спектрограмма вместо Welch.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> pymavlink читает очень долго</h4><ul><li>Возможная причина: лог в сотни МБ, чтение в Python по сообщению.</li><li>Что сделать: фильтр <code>type=[...]</code>, <code>mavlogdump.py --format csv</code> для разовой выгрузки.</li></ul></article></div>
+
+<h2>Чек-лист</h2>
+<ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="data-python:0"><span>Лог прочитан в DataFrame, fs определена</span></label></li><li><label><input type="checkbox" data-check-id="data-python:1"><span>Спектр Уэлча построен с подписанными пиками</span></label></li><li><label><input type="checkbox" data-check-id="data-python:2"><span>Overshoot, settle и bounce-back посчитаны функциями</span></label></li><li><label><input type="checkbox" data-check-id="data-python:3"><span>Функции собраны в модуль и работают на втором логе</span></label></li><li><label><input type="checkbox" data-check-id="data-python:4"><span>Понимаю, почему Уэлч, а не один FFT</span></label></li></ul>
+
+<h2>Источники</h2>
+<ul class="refs"><li><a href="https://github.com/betaflight/blackbox-tools" target="_blank" rel="noopener noreferrer">Betaflight blackbox-tools (blackbox_decode)</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://github.com/ArduPilot/pymavlink" target="_blank" rel="noopener noreferrer">pymavlink — DataFlash log reading (mavutil)</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.welch.html" target="_blank" rel="noopener noreferrer">SciPy — scipy.signal.welch</a> <span class="gc-tag" data-state="info">primary</span></li></ul>
+<h2>Проверь себя</h2>
+<uav-quiz src="../quiz/data-python.json" module="data-python"></uav-quiz>
       </div>
-      
-      
+      <div class="module-done"><gc-button variant="secondary" data-done-toggle="data-python">Отметить как пройденный</gc-button></div>
+      <section class="related" aria-label="Смежные модули"><p class="gc-label gc-muted">Смежные модули</p><div class="gc-grid ref-grid"><a class="gc-card" href="tools-overview.html"><strong>Инструменты: Configurator, GCS, git</strong><div class="gc-card__meta"><span class="gc-tag" title="L1 — Оператор">L1</span></div></a><a class="gc-card" href="bf-blackbox.html"><strong>Blackbox</strong><div class="gc-card__meta"><span class="gc-tag" title="L2 — Интегратор">L2</span></div></a><a class="gc-card" href="ap-logs.html"><strong>Логи ArduPilot: разбор полёта</strong><div class="gc-card__meta"><span class="gc-tag" title="L3 — Специалист">L3</span></div></a></div></section>
       <nav class="pager" aria-label="Соседние модули" data-track-pager><a class="gc-card pager__next" href="ctl-signals.html"><span class="gc-label gc-muted">Дальше · трек</span><br>Сигналы и спектры: что видит гироскоп</a></nav><nav class="pager" aria-label="Соседние шаги пути Betaflight" data-path-pager="betaflight" hidden><a class="gc-card pager__prev" href="bf-pid-reg-in-bf.html?path=betaflight"><span class="gc-label gc-muted">Назад · путь Betaflight</span><br>PID-регулятор в Betaflight</a><a class="gc-card pager__next" href="ctl-signals.html?path=betaflight"><span class="gc-label gc-muted">Дальше · шаг 34 из 44</span><br>Сигналы и спектры: что видит гироскоп</a></nav><nav class="pager" aria-label="Соседние шаги пути ArduPilot" data-path-pager="ardupilot" hidden><a class="gc-card pager__prev" href="nav-resilience.html?path=ardupilot"><span class="gc-label gc-muted">Назад · путь ArduPilot</span><br>Устойчивость навигации и связи к помехам</a><a class="gc-card pager__next" href="ctl-signals.html?path=ardupilot"><span class="gc-label gc-muted">Дальше · шаг 28 из 54</span><br>Сигналы и спектры: что видит гироскоп</a></nav>
     </article>
   </main>
