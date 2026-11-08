@@ -48,6 +48,8 @@ MAVLink 2 — бинарный протокол поверх UART, UDP или TC
 ### Кадр MAVLink 2 побайтно
 `FD | len | incompat_flags | compat_flags | seq | sysid | compid | msgid(3) | payload(len) | crc(2) | [signature(13)]`. `incompat_flags` бит 0 — пакет подписан; подпись — HMAC-SHA256 по секретному ключу + timestamp (защита от подмены команд по открытому радиоканалу — `MAV_SIGNING` в ArduPilot/QGC). CRC-16/MCRF4XX по кадру + `CRC_EXTRA` байт сообщения (из XML) — несовпадение диалектов = «молчание». Payload сжимается обрезанием нулевых байтов в конце (поэтому `len` меньше размера структуры). Параметры в `PARAM_VALUE` — всегда float (32 бит), целые упакованы «по байтам» (`MAV_PARAM_TYPE`), о чём легко споткнуться в pymavlink.
 
+{{diagram:mavlink2-frame|Кадр MAVLink 2: заголовок, идентификаторы системы и компонента, полезная нагрузка, CRC с CRC_EXTRA, необязательная подпись.}}
+
 ### Потоки телеметрии: кто задаёт частоту
 ArduPilot шлёт потоки по `SRx_*` параметрам порта (`SR2_EXTRA1` — ATTITUDE, `SR2_POSITION` — GLOBAL_POSITION_INT, `SR2_RAW_SENS` — RAW_IMU…) в Гц; современный способ — `MAV_CMD_SET_MESSAGE_INTERVAL` (511) от клиента: интервал в мкс (−1 — выключить, 0 — по умолчанию). PX4 — профили `MAV_x_MODE` (Normal/Onboard/OSD…). Порт 921600 бод вмещает ~90 КБ/с: ATTITUDE на 50 Гц + позиция 10 Гц + RAW_IMU 50 Гц — порядка 10 КБ/с, запас есть; на 57600 (радиомодем) — всё, что выше 5–10 Гц, захлёбывается.
 

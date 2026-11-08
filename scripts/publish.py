@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""One command for authors: validate content, rebuild the site, check links.
+"""One command for authors: build diagrams, validate content, rebuild the site, check links.
 
   python scripts/publish.py
 """
@@ -10,7 +10,7 @@ import sys
 from pathlib import Path
 
 SCRIPTS = Path(__file__).resolve().parent
-STEPS = ("validate_content.py", "build_site.py", "check_links.py", "check_js.py")
+STEPS = ("diagrams/build_diagrams.py", "check_diagrams.py", "validate_content.py", "build_site.py", "check_links.py", "check_js.py")
 
 
 def main() -> None:

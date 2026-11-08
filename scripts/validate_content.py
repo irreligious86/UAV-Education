@@ -187,6 +187,28 @@ def validate_widgets(md_path):
     return [f"{rel}: неизвестный виджет «{n}» (есть: {', '.join(sorted(WIDGETS))})" for n in WIDGET_LINE.findall(text) if n not in WIDGETS]
 
 
+DIAGRAM_LINE = re.compile(r"^\{\{diagram:([^}]*)\}\}$", re.MULTILINE)
+DIAGRAMS_DIR = ROOT / "assets" / "diagrams"
+
+
+def validate_diagrams(md_path):
+    errs = []
+    text = md_path.read_text(encoding="utf-8")
+    rel = md_path.relative_to(ROOT)
+    for body in DIAGRAM_LINE.findall(text):
+        if "|" not in body:
+            errs.append(f"{rel}: диаграмма «{body}» без подписи (формат {{{{diagram:id|Подпись}}}})")
+            continue
+        name, caption = body.split("|", 1)
+        if not re.fullmatch(r"[a-z0-9-]+", name):
+            errs.append(f"{rel}: неверный id диаграммы «{name}»")
+        elif not (DIAGRAMS_DIR / f"{name}.svg").is_file():
+            errs.append(f"{rel}: нет файла assets/diagrams/{name}.svg")
+        if not caption.strip():
+            errs.append(f"{rel}: пустая подпись у диаграммы «{name}»")
+    return errs
+
+
 def validate_published_sections(md_path, published):
     if not published:
         return []
@@ -361,6 +383,7 @@ def main():
             continue
         errs.extend(validate_related_in_frontmatter(p, all_ids_set))
         errs.extend(validate_widgets(p))
+        errs.extend(validate_diagrams(p))
         st = status_by_file.get(p)
         errs.extend(validate_front_matter_status(p, st))
         errs.extend(validate_published_sections(p, st == "published"))

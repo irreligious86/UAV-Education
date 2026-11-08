@@ -45,6 +45,21 @@
 <h2>Теория</h2>
 <h4 class="md-subheading">Диск-актуатор: откуда тяга</h4>
 <p>Самая простая модель: проп — диск площадью A, который разгоняет воздух от скорости V₀ (набегающий поток) до Vₑ (за диском). Тяга — изменение импульса воздуха в секунду:</p>
+<figure class="diagram" data-diagram="actuator-disk"><div class="diagram__svg"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 220" width="100%" role="img" aria-labelledby="t" style="max-width:720px;display:block;margin:0 auto">
+<title id="t">Диск-актуатор: тяга как изменение импульса воздуха</title><style>text{font-family: var(--gc-font-mono, ui-monospace, Menlo, monospace); font-size: 12px;fill:currentColor} .m{fill:var(--gc-ink-muted, #8a93a3)} .a{fill:var(--gc-accent-hud, #5ef1d2)} .w{fill:var(--gc-signal-amber, #f0b24c)} .d{fill:var(--gc-signal-red, #e8636b)} .box{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:currentColor;stroke-width:1.2} .boxa{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6} .ln{stroke:currentColor;stroke-width:1.2;fill:none} .lna{stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6;fill:none} .lnm{stroke:var(--gc-ink-muted, #8a93a3);stroke-width:1;fill:none;stroke-dasharray:4 3} .t{font-size:11px} .b{font-weight:600}</style>
+<defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker></defs>
+<rect class="boxa" x="300" y="40" width="120" height="8" rx="3"/><text x="360" y="32" class="t">проп = диск площадью A</text>
+<path class="lnm" d="M250 60 C 280 90, 290 150, 300 200"/><path class="lnm" d="M470 60 C 440 90, 430 150, 420 200"/>
+<g class="m"><path class="ln" d="M330 70 L330 110" marker-end="url(#ar)"/><path class="ln" d="M360 70 L360 110" marker-end="url(#ar)"/><path class="ln" d="M390 70 L390 110" marker-end="url(#ar)"/></g>
+<path class="ln" d="M330 130 L330 190" marker-end="url(#ar)"/><path class="ln" d="M360 130 L360 190" marker-end="url(#ar)"/><path class="ln" d="M390 130 L390 190" marker-end="url(#ar)"/>
+<text x="440" y="100" class="t" text-anchor="start">V₀ (набегающий, 0 на висении)</text>
+<text x="440" y="170" class="t" text-anchor="start">Vₑ (за диском)</text>
+<text x="20" y="80" class="b" text-anchor="start">F = ½·ρ·A·(Vₑ² − V₀²)</text>
+<text x="20" y="104" class="m t" text-anchor="start">Тяга ~ импульс (~V), мощность ~ энергия (~V²):</text>
+<text x="20" y="120" class="m t" text-anchor="start">большой диск при той же тяге тратит меньше мощности.</text>
+<text x="20" y="150" class="m t" text-anchor="start">Cт = T/(ρ·n²·D⁴) — тяга ~ n²</text>
+<text x="20" y="166" class="m t" text-anchor="start">Cₚ = P/(ρ·n³·D⁵) — мощность ~ n³</text>
+</svg></div><figcaption class="gc-muted">Диск-актуатор: тяга — это изменение импульса потока; мощность растёт быстрее тяги.</figcaption><div class="diagram__hint">Схему можно прокрутить по горизонтали</div></figure>
 <p><strong>F = ½ · ρ · A · (Vₑ² − V₀²)</strong>, где ρ — плотность воздуха (≈1.225 кг/м³ у земли).</p>
 <p>На висении V₀ = 0, и тяга растёт с квадратом скорости отбрасываемого воздуха. Следствия:</p>
 <ul><li><strong>Большой диск выгоднее.</strong> Для той же тяги большой проп отбрасывает много воздуха медленно, маленький — мало воздуха быстро. Кинетическая энергия ~ V², импульс ~ V: при равной тяге мощность на малом пропе выше. Поэтому дальние и грузовые аппараты летают на больших медленных пропах.</li><li><strong>Плотность воздуха имеет значение.</strong> В горах и в жару ρ меньше — тяга падает при тех же оборотах; аппарат, еле висевший на равнине, в горах не взлетит.</li><li>Модель идеальная: реальные потери (концевые вихри, профильное сопротивление лопасти, закрутка потока) снижают КПД.</li></ul>

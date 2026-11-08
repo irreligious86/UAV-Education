@@ -43,6 +43,8 @@ next:
 ### ArduPilot: путь IMU → rate → motors
 Репозиторий `ArduPilot/ardupilot`, транспорт в `ArduCopter/`, библиотеки в `libraries/`:
 
+{{diagram:ardupilot-fast-loop|Быстрая петля ArduCopter: задачи, которые планировщик вызывает каждый тик, и медленные задачи с собственной частотой.}}
+
 1. **Планировщик**: `ArduCopter/Copter.cpp` — таблица `scheduler_tasks[]`: `FAST_TASK_CLASS(AP_InertialSensor, &copter.ins, update)` → `FAST_TASK(run_rate_controller_main)` → `FAST_TASK(motors_output_main)` → `FAST_TASK(read_AHRS)` → … → `FAST_TASK(update_flight_mode)`; медленные задачи `SCHED_TASK(rc_loop, 250, 130, 3)` с частотой, бюджетом (мкс) и приоритетом. Новые версии умеют выделенный rate-поток (`ArduCopter/rate_thread.cpp`, `FSTRATE_ENABLE`) на частоте гироскопа.
 2. **IMU и фильтры**: `libraries/AP_InertialSensor/` — `AP_InertialSensor.cpp` (`update()`), backend драйверы (`AP_InertialSensor_Invensensev3.cpp`), гармонический notch `libraries/Filter/HarmonicNotchFilter.cpp`, LPF `Filter/LowPassFilter2p.cpp`.
 3. **Rate-контур**: `ArduCopter/Attitude.cpp` — `run_rate_controller_main()` → `attitude_control->rate_controller_run()` в `libraries/AC_AttitudeControl/AC_AttitudeControl_Multi.cpp`: для каждой оси `rate_target_to_motor_roll(gyro, target)` → `_pid_rate_roll.update_all(target, gyro, dt, limit)` в `libraries/AC_PID/AC_PID.cpp` (P, I с limit, D с фильтром `FLTD`, FF, ошибка через `FLTE`, цель через `FLTT`) → `_motors.set_roll(...)`.

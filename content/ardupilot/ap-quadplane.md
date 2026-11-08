@@ -67,6 +67,8 @@ Tilt-rotor VTOL взлетает как мультиротор и летит к�
 - **VTOL-контур**: `Q_A_RAT_*` (rate PID VTOL), `Q_A_ANG_*`, `Q_P_*` (позиция), `Q_M_THST_HOVER`, `Q_M_SPIN_MIN/ARM`, `Q_WVANE_*` (флюгирование на ветер). QAUTOTUNE — для VTOL-части; TECS и `PTCH2SRV_*`/`RLL2SRV_*` — для крыла.
 - **Посадка**: `Q_LAND_SPEED`, `Q_LAND_FINAL_ALT`; RTL как VTOL (`Q_RTL_MODE`) или по-самолётному с переходом в QLAND у дома.
 
+{{diagram:quadplane-transition|Переход VTOL → крыло: VTOL-моторы держат аппарат, пока не набрана ARSPD_FBW_MIN или не истёк Q_TRANSITION_MS.}}
+
 ### Разобранный пример: первый переход
 Порядок: (1) QSTABILIZE/QHOVER висение и QLOITER (GPS) — VTOL-часть настроена; (2) FBWA/MANUAL броском или с рук проверены отдельно, если конструкция позволяет; (3) переход на высоте ≥ 60 м в FBWA с `ARSPD_FBW_MIN` = 1.3 V_s, `Q_ASSIST_SPEED` = 1.2 V_s, `Q_TRANSITION_MS` 5000; наблюдать airspeed (`ARSP`), наклон тилтов (`RCOU`), высоту; (4) обратный переход в QHOVER; лог → `QTUN` (VTOL), `TECS`, `ATT`. Без airspeed-датчика переход по времени — только над открытой площадкой с запасом высоты.
 

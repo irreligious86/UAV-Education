@@ -85,6 +85,33 @@ def format_inline(text: str) -> str:
 WIDGETS = {"pid-sim", "filter-response", "elrs-calc", "tw-calc", "wire-drop", "link-latency", "attitude-3d"}
 WIDGET_RE = re.compile(r"^\{\{widget:([a-z0-9-]+)\}\}$")
 
+# Diagrams: a line "{{diagram:id|Caption}}" inlines assets/diagrams/<id>.svg inside a <figure>.
+# Inline SVG inherits CSS variables (theme) and works offline; the validator checks the file exists.
+DIAGRAM_RE = re.compile(r"^\{\{diagram:([a-z0-9-]+)\|(.+?)\}\}$")
+DIAGRAMS_DIR = ROOT / "assets" / "diagrams"
+_svg_cache: dict[str, str] = {}
+
+
+def diagram_svg(name: str) -> str | None:
+    if name in _svg_cache:
+        return _svg_cache[name]
+    f = DIAGRAMS_DIR / f"{name}.svg"
+    if not f.is_file():
+        return None
+    svg = f.read_text(encoding="utf-8")
+    svg = re.sub(r"<\?xml[^>]*\?>\s*", "", svg).strip()
+    _svg_cache[name] = svg
+    return svg
+
+
+def render_diagram(name: str, caption: str) -> str:
+    svg = diagram_svg(name)
+    if svg is None:
+        return ""
+    return (f'<figure class="diagram" data-diagram="{name}"><div class="diagram__svg">{svg}</div>'
+            f'<figcaption class="gc-muted">{format_inline(caption)}</figcaption>'
+            '<div class="diagram__hint">Схему можно прокрутить по горизонтали</div></figure>')
+
 
 def block_to_paragraphs(block: str) -> str:
     block = block.strip()
@@ -103,6 +130,10 @@ def block_to_paragraphs(block: str) -> str:
                 name = wm.group(1)
                 if name in WIDGETS:
                     chunks.append(f'<uav-{name} class="widget"></uav-{name}>')
+                continue
+            dm = DIAGRAM_RE.match(para_l)
+            if dm:
+                chunks.append(render_diagram(dm.group(1), dm.group(2).strip()))
                 continue
             # Fallback: если абзац начинается с ###, всегда рендерим как подзаголовок.
             # Это защищает от "сырых ###" в контенте с неидеальными переносами.

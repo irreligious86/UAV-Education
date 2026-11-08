@@ -32,6 +32,8 @@ EKF — фильтр, который из шумных и противоречи
 ### Источники
 Откуда брать позицию, скорость, высоту и курс, задают `EK3_SRC1_*`:
 
+{{diagram:estimation-sources|EKF3 собирает все датчики в одну оценку: IMU двигает предсказание, остальные источники корректируют его через ворота инноваций.}}
+
 - `EK3_SRC1_POSXY`: 0 — нет, 3 — GPS, 4 — Beacon, 6 — ExternalNav.
 - `EK3_SRC1_VELXY`: плюс 5 — OpticalFlow, 7 — WheelEncoder.
 - `EK3_SRC1_POSZ`: 1 — Baro, 2 — RangeFinder, 3 — GPS.

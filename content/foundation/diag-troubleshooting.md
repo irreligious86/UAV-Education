@@ -45,6 +45,8 @@ next:
 - **MOTOR_PROTOCOL** — не выбран протокол моторов.
 INAV: вкладка Status показывает причины (Navigation is unsafe, Compass not calibrated, Hardware failure...). ArduPilot: `PreArm: ...` в GCS — каждая строка называет виновника (Compass not calibrated, Gyros inconsistent, RC not calibrated, Throttle below failsafe, GPS: No Fix, Battery failsafe и т. д.); флаг `ARMING_CHECK` менять нельзя — чинить причину.
 
+{{diagram:arming-tree|Дерево 1 в виде схемы: флаг → причина → проверка.}}
+
 ### Дерево 2. Моторы не крутятся / крутятся не так
 Пропы сняты.
 - **Ни один мотор не реагирует во вкладке Motors.** → Протокол (DShot300/600) и `motor_pwm_protocol` совпадают с ESC? → ESC получают питание (напряжение на падах)? → Сигнальные провода на нужных падах (`resource MOTOR`)? → ESC пищат при подаче питания (стартовая мелодия) — если нет, ESC не живёт или нет питания.

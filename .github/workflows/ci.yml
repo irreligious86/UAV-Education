@@ -22,6 +22,11 @@ jobs:
         with:
           python-version: "3.12"
 
+      - name: Build and check diagrams
+        run: |
+          python scripts/diagrams/build_diagrams.py
+          python scripts/check_diagrams.py
+
       - name: Validate content and curriculum
         run: python scripts/validate_content.py
 
@@ -30,9 +35,9 @@ jobs:
 
       - name: Built site must be committed in sync with content
         run: |
-          if [ -n "$(git status --porcelain -- index.html m ref pages api quiz cap path sw.js manifest.webmanifest)" ]; then
+          if [ -n "$(git status --porcelain -- index.html m ref pages api quiz cap path sw.js manifest.webmanifest assets/diagrams)" ]; then
             echo "::error::Site is stale. Run 'python scripts/publish.py' locally and commit the result."
-            git status --short -- index.html m ref pages api quiz cap path sw.js manifest.webmanifest
+            git status --short -- index.html m ref pages api quiz cap path sw.js manifest.webmanifest assets/diagrams
             exit 1
           fi
 
