@@ -32,15 +32,68 @@
     <article class="module" data-module-page="emb-protocols">
       <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-engineer">Инженер: код на борту</a><span>UART, I2C, SPI, CAN на уровне сигналов и драйверов</span></p>
       <h1 class="module-title">UART, I2C, SPI, CAN на уровне сигналов и драйверов</h1>
-      <div class="module-tags"><span class="gc-tag" title="Уровень">L3 — Специалист</span><span class="gc-tag">учёба ~3 ч</span><span class="gc-tag" data-state="caution">СКОРО</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ОСВОЕН</span></div>
+      <div class="module-tags"><span class="gc-tag" title="Уровень">L3 — Специалист</span><span class="gc-tag">чтение 40 мин</span><span class="gc-tag">учёба ~3 ч</span><span class="gc-tag">любая прошивка</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ОСВОЕН</span></div>
       <p class="gc-muted module-score" data-module-score></p>
-      
+      <p class="module-lead">Модуль «Подключение периферии» учил подключать готовое; этот — делать своё: как выглядят биты на линии, зачем стартовый бит и ACK, откуда берутся ошибки кадра и NACK, как считаются тайминги и ограничивается длина шины, и как пишется драйвер датчика с нуля (I2C-барометр/IMU на ESP32: регистры, чтение блоком, обработка ошибок, таймауты). Завершается DroneCAN: кадры CAN 2.0, арбитраж, node ID, зачем это большим аппаратам и как выглядит пакет DroneCAN в анализаторе.</p>
       <div class="gc-callout" data-state="ok"><strong>После модуля ты умеешь</strong><ul><li>объяснить тайминги, адресацию, pull-up, скорость и ошибки каждой шины</li><li>написать драйвер I2C-датчика на ESP32</li><li>понимать DroneCAN и зачем он на больших аппаратах</li></ul></div><p class="gc-muted">Перед этим модулем: <a href="emb-basics.html">Embedded: прерывания, таймеры, DMA, RTOS</a>, <a href="el-measure.html">Измерения: мультиметр, осциллограф, логический анализатор</a></p><div class="gc-callout lab"><p class="gc-label gc-muted">Лабораторная</p><strong>Драйвер датчика</strong><p class="gc-muted lab__hint">Сдано, когда отмечены все пункты:</p><ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="emb-protocols:lab:0"><span>I2C-датчик прочитан своим драйвером</span></label></li><li><label><input type="checkbox" data-check-id="emb-protocols:lab:1"><span>Шина снята анализатором</span></label></li><li><label><input type="checkbox" data-check-id="emb-protocols:lab:2"><span>Ошибка на шине воспроизведена и обработана</span></label></li></ul></div><div class="path-pos gc-muted"><span class="gc-label">В пути</span><ul><li data-path-pos="ardupilot"><a href="../path/ardupilot.html">ArduPilot</a>: шаг 44 из 54 → <a href="comp-raspberry.html?path=ardupilot">Raspberry Pi + ArduPilot</a></li></ul></div>
       <div class="gc-prose module-body">
-<div class="gc-callout" data-state="caution"><strong>Модуль в разработке.</strong> Цели и связи уже определены, текст пишется. План — в <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">ROADMAP</a>.</div>
+<h2>Теория</h2>
+<h4 class="md-subheading">UART</h4>
+<p>Асинхронный: нет тактовой линии, обе стороны знают скорость. Кадр: стартовый бит (0), 5–9 бит данных (LSB первым), опционально паритет, 1–2 стоповых (1). 8N1 на 115200 → 10 бит на байт → 11 520 байт/с. Приёмник сэмплирует в середине бита (обычно ×16 передискретизация); ошибка скорости до ~3–5% терпима, больше — <strong>framing error</strong>. Ошибки: framing (стоп-бит не 1 — неверная скорость/инверсия), overrun (не успели забрать байт — нужен DMA/прерывание), noise. Инверсия (SBUS): уровни перевёрнуты, idle = 0. Уровни 3.3 В TTL; RS-232/RS-485 — другие уровни/дифф. пара (длинные линии).</p>
+<p>Драйвер: кольцевой буфер приёма по прерыванию/DMA, парсер кадров протокола (CRSF: <code>[адрес][длина][тип][payload][CRC8 0xD5]</code>; MAVLink: magic 0xFD, длина, seq, sysid/compid, msgid, CRC16 с CRC_EXTRA), таймаут между байтами для ресинхронизации.</p>
+<h4 class="md-subheading">I2C</h4>
+<p>Синхронный, две линии open-drain с подтяжками: SCL, SDA. Мастер генерирует такт; транзакция: START (SDA↓ при SCL=1) → 7-бит адрес + бит R/W → ACK от ведомого (SDA↓ на 9-м такте) → байты данных с ACK/NACK → STOP. Чтение регистра: START, адрес+W, номер регистра, <strong>повторный START</strong>, адрес+R, данные, NACK последнего, STOP. Скорости 100/400 кГц (fast), 1 МГц (fast-plus). Ограничения: ёмкость шины ≤ 400 пФ → провода до ~30–50 см, подтяжки 2.2–4.7 кОм (меньше — круче фронты, больше ток). Ошибки: NACK на адрес (нет устройства/адрес/питание), NACK на данные, <strong>зависшая шина</strong> (ведомый держит SDA=0 после сбоя мастера — лечится 9 тактами SCL вручную, «bus recovery»), clock stretching (ведомый тянет SCL — мастер должен уметь ждать; у некоторых МК/датчиков проблемы).</p>
+<h4 class="md-subheading">SPI</h4>
+<p>Синхронный, полный дуплекс: SCLK, MOSI, MISO, CS (по линии на устройство). Нет адресов и ACK: мастер опускает CS, выдаёт такты, каждый такт сдвигает бит в обе стороны. Режимы CPOL/CPHA (0–3) — полярность/фаза такта, должны совпадать с даташитом (ICM42688 — mode 0 или 3). Скорости до десятков МГц (гироскоп 8–24 МГц, flash 50+). Чтение регистра: байт адреса с битом R (часто старший бит = 1), затем N байт мусора на MOSI — данные на MISO. Burst-чтение 14 байт IMU за одну транзакцию — так делают все прошивки. Ошибок «протокола» нет — проверка целостности только по смыслу (WHO_AM_I регистр, значения в диапазоне). Короткие дорожки: SPI наружу платы почти не выводят.</p>
+<h4 class="md-subheading">CAN и DroneCAN</h4>
+<p>CAN 2.0: дифференциальная пара CAN_H/CAN_L, терминаторы 120 Ом с обоих концов, до 1 Мбит/с (до 40 м при 1 Мбит, дольше — медленнее). Кадр: идентификатор 11 или 29 бит (расширенный), DLC, до 8 байт данных, CRC15, ACK от любого приёмника. <strong>Арбитраж</strong>: все передают одновременно, доминантный 0 побеждает рецессивную 1 — меньший ID выигрывает без потери времени; приоритет заложен в ID. Контроллер CAN в МК принимает/отправляет кадры аппаратно, фильтрует по ID; ошибки считаются (error passive/bus-off при 256 ошибках — узел отключается).</p>
+<p><strong>DroneCAN</strong> (бывший UAVCAN v0): поверх CAN — 29-битный ID с приоритетом, типом сообщения и node ID источника (1–127), многокадровые сообщения с транспортным CRC и toggle-битом, динамическое распределение node ID (DNA), стандартные типы: <code>uavcan.equipment.gnss.Fix2</code>, <code>ahrs.MagneticFieldStrength2</code>, <code>esc.RawCommand/Status</code>, <code>power.BatteryInfo</code>, <code>range_sensor.Measurement</code>. Зачем на больших аппаратах: одна витая пара на все устройства, помехоустойчивость дифф. пары и CRC, телеметрия от каждого ESC, горячая замена узлов, длинные линии (крыло 2 м), без «один UART — одно устройство». Инструмент: DroneCAN GUI Tool (SLCAN-адаптер или полётник как мост <code>CAN_SLCAN_CPORT</code>) — видно узлы, параметры узлов, сообщения.</p>
+<h4 class="md-subheading">Драйвер: что должно быть</h4>
+<ol><li>Инициализация шины и проверка устройства (WHO_AM_I/chip id).</li><li>Конфигурация (регистры): диапазон, частота, фильтры.</li><li>Чтение блоком с таймаутом; возврат ошибки, не зависание.</li><li>Преобразование сырых единиц в физические (LSB → °/с, Па).</li><li>Обработка ошибок: счётчики, повторная инициализация после N ошибок подряд, bus recovery для I2C.</li><li>Потокобезопасность: мьютекс на шину, если устройств несколько.</li></ol>
+
+<h2>Практика</h2>
+<h4 class="md-subheading">Шаг 1. Драйвер I2C-датчика (ESP32, ESP-IDF)</h4>
+<p>Пример для BMP280 (адрес 0x76/0x77, chip id 0x58 в регистре 0xD0):</p>
+<pre class="cli-block"><code>static esp_err_t rd(uint8_t reg, uint8_t *buf, size_t n) {       // repeated-START read, 50 ms timeout
+  return i2c_master_write_read_device(I2C_NUM_0, ADDR, &amp;reg, 1, buf, n, pdMS_TO_TICKS(50));
+}
+static esp_err_t wr(uint8_t reg, uint8_t val) {
+  uint8_t b[2] = { reg, val };
+  return i2c_master_write_to_device(I2C_NUM_0, ADDR, b, 2, pdMS_TO_TICKS(50));
+}
+esp_err_t bmp280_init(void) {
+  uint8_t id; ESP_RETURN_ON_ERROR(rd(0xD0, &amp;id, 1), TAG, &quot;no response&quot;);
+  if (id != 0x58) return ESP_ERR_NOT_FOUND;
+  ESP_RETURN_ON_ERROR(rd(0x88, calib, 24), TAG, &quot;calib&quot;);         // dig_T1..dig_P9
+  return wr(0xF4, 0x57);                                            // osrs_t x2, osrs_p x16, normal mode
+}
+esp_err_t bmp280_read(float *temp_c, float *press_pa) {
+  uint8_t d[6]; esp_err_t e = rd(0xF7, d, 6); if (e != ESP_OK) { errors++; return e; }
+  int32_t adc_p = (d[0] &lt;&lt; 12) | (d[1] &lt;&lt; 4) | (d[2] &gt;&gt; 4), adc_t = (d[3] &lt;&lt; 12) | (d[4] &lt;&lt; 4) | (d[5] &gt;&gt; 4);
+  /* compensation formulas from the datasheet (bmp280_compensate_T/P) */ ...
+  return ESP_OK;
+}</code></pre>
+<p>Читать 50 Гц, выводить; после 5 ошибок подряд — переинициализация с логом.</p>
+<h4 class="md-subheading">Шаг 2. Анализатор</h4>
+<p>Снять транзакцию: START, адрес+W, 0xF7, повторный START, адрес+R, 6 байт, NACK, STOP. Сопоставить байты с выводом. Записать длительность транзакции при 400 кГц (ожидаемо ~0.2 мс).</p>
+<h4 class="md-subheading">Шаг 3. Сломать шину</h4>
+<p>Отключить SDA на ходу → NACK/таймаут, счётчик ошибок, переинициализация; замкнуть SDA на землю на секунду → зависшая шина; реализовать recovery (9 тактов SCL в GPIO-режиме) и показать восстановление. Лабораторная: датчик прочитан своим драйвером, шина снята анализатором, ошибка воспроизведена и обработана.</p>
+<h4 class="md-subheading">Шаг 4. DroneCAN (если есть узел)</h4>
+<p>DroneCAN GUI Tool через SLCAN-мост полётника: увидеть node ID, <code>GetNodeInfo</code>, сообщения GPS/компаса; снять кадр CAN анализатором и разобрать 29-битный ID на приоритет/тип/источник.</p>
+
+<h2>Диагностика</h2>
+<div class="diag-groups"><article class="diag-item"><h4><strong>Симптом:</strong> UART принимает мусор</h4><ul><li>Возможная причина: скорость/инверсия/нет общей земли; overrun без DMA.</li><li>Что сделать: проверить анализатором, DMA-приём, framing/overrun счётчики.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> I2C-транзакция «висит»</h4><ul><li>Возможная причина: ведомый держит SDA; clock stretching без поддержки.</li><li>Что сделать: таймауты в драйвере, bus recovery, снизить до 100 кГц.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> SPI возвращает 0xFF/0x00</h4><ul><li>Возможная причина: CS не опускается, режим CPOL/CPHA, слишком быстро.</li><li>Что сделать: осциллограф на CS/SCLK, режим по даташиту, WHO_AM_I тест.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> CAN-узел уходит в bus-off</h4><ul><li>Возможная причина: нет терминаторов, разная скорость, перепутаны H/L.</li><li>Что сделать: 120 Ом с обоих концов, одна скорость, счётчики ошибок.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> датчик работает на столе, но не на борту</h4><ul><li>Возможная причина: помехи на I2C от силовых, длина проводов.</li><li>Что сделать: короче/витые/экран, SPI или CAN вместо I2C.</li></ul></article></div>
+
+<h2>Чек-лист</h2>
+<ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="emb-protocols:0"><span>Могу нарисовать кадр UART и транзакцию I2C с ACK/NACK</span></label></li><li><label><input type="checkbox" data-check-id="emb-protocols:1"><span>Знаю режимы SPI и почему нет ACK</span></label></li><li><label><input type="checkbox" data-check-id="emb-protocols:2"><span>Понимаю арбитраж CAN и структуру DroneCAN-ID</span></label></li><li><label><input type="checkbox" data-check-id="emb-protocols:3"><span>Написал драйвер с таймаутами, ошибками и восстановлением</span></label></li><li><label><input type="checkbox" data-check-id="emb-protocols:4"><span>Снял транзакцию анализатором и сопоставил с кодом</span></label></li></ul>
+
+<h2>Источники</h2>
+<ul class="refs"><li><a href="https://www.NXP.com/docs/en/user-guide/UM10204.pdf" target="_blank" rel="noopener noreferrer">NXP — I2C-bus specification and user manual (UM10204)</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://dronecan.github.io/Specification/1._Introduction" target="_blank" rel="noopener noreferrer">DroneCAN — Specification</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://bluerobotics.com/wp-content/uploads/2022/05/BMP280-DATASHEET.pdf" target="_blank" rel="noopener noreferrer">Bosch — BMP280 datasheet BST-BMP280-DS001 (registers, compensation)</a> <span class="gc-tag" data-state="info">primary</span></li></ul>
+<h2>Проверь себя</h2>
+<uav-quiz src="../quiz/emb-protocols.json" module="emb-protocols"></uav-quiz>
       </div>
-      
-      
+      <div class="module-done"><gc-button variant="secondary" data-done-toggle="emb-protocols">Отметить как пройденный</gc-button></div>
+      <section class="related" aria-label="Смежные модули"><p class="gc-label gc-muted">Смежные модули</p><div class="gc-grid ref-grid"><a class="gc-card" href="emb-basics.html"><strong>Embedded: прерывания, таймеры, DMA, RTOS</strong><div class="gc-card__meta"><span class="gc-tag" title="L3 — Специалист">L3</span></div></a><a class="gc-card" href="el-measure.html"><strong>Измерения: мультиметр, осциллограф, логический анализатор</strong><div class="gc-card__meta"><span class="gc-tag" title="L2 — Интегратор">L2</span></div></a><a class="gc-card" href="el-peripherals.html"><strong>Подключение периферии: UART, I2C, CAN на практике</strong><div class="gc-card__meta"><span class="gc-tag" title="L2 — Интегратор">L2</span></div></a></div></section>
       <nav class="pager" aria-label="Соседние модули" data-track-pager><a class="gc-card pager__prev" href="emb-basics.html"><span class="gc-label gc-muted">Назад · трек</span><br>Embedded: прерывания, таймеры, DMA, RTOS</a><a class="gc-card pager__next" href="comp-intro.html"><span class="gc-label gc-muted">Дальше · трек</span><br>Companion: зачем и где граница</a></nav><nav class="pager" aria-label="Соседние шаги пути ArduPilot" data-path-pager="ardupilot" hidden><a class="gc-card pager__prev" href="emb-basics.html?path=ardupilot"><span class="gc-label gc-muted">Назад · путь ArduPilot</span><br>Embedded: прерывания, таймеры, DMA, RTOS</a><a class="gc-card pager__next" href="comp-raspberry.html?path=ardupilot"><span class="gc-label gc-muted">Дальше · шаг 45 из 54</span><br>Raspberry Pi + ArduPilot</a></nav>
     </article>
   </main>

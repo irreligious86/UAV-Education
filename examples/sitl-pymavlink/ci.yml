@@ -1,0 +1,22 @@
+# Example GitHub Actions workflow: run the RC-failsafe test against ArduPilot SITL.
+# Copy to .github/workflows/sitl-test.yml in your fleet repository.
+name: sitl-failsafe-test
+on: [push, pull_request]
+jobs:
+  sitl:
+    runs-on: ubuntu-latest
+    container: ardupilot/ardupilot-dev-base:latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build and start SITL
+        run: |
+          git clone --depth 1 https://github.com/ArduPilot/ardupilot.git /ardupilot
+          cd /ardupilot && git submodule update --init --recursive --depth 1
+          ./waf configure --board sitl && ./waf copter
+          nohup build/sitl/bin/arducopter -S --model + --speedup 5 --defaults Tools/autotest/default_params/copter.parm \
+            > sitl.log 2>&1 &
+          sleep 15
+      - name: Run failsafe test
+        run: |
+          pip install pymavlink
+          python3 examples/sitl-pymavlink/test_failsafe.py --connect tcp:127.0.0.1:5760

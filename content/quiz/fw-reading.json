@@ -1,0 +1,83 @@
+{
+  "module": "fw-reading",
+  "pass": 80,
+  "questions": [
+    {
+      "q": "Где в Betaflight главный цикл PID?",
+      "options": [
+        "src/main/flight/pid.c: main()",
+        "src/main/fc/core.c: taskMainPidLoop → subTaskPidController → subTaskMotorUpdate",
+        "src/main/scheduler",
+        "src/main/drivers/dshot.c"
+      ],
+      "answer": 1,
+      "explain": "Планировщик вызывает taskMainPidLoop; PID и миксер — его подзадачи."
+    },
+    {
+      "q": "От чего считается D-term в Betaflight?",
+      "options": [
+        "От ошибки",
+        "От отфильтрованного гироскопа",
+        "От setpoint",
+        "От моторов"
+      ],
+      "answer": 1,
+      "explain": "Нет derivative kick при движении стика."
+    },
+    {
+      "q": "Где в ArduCopter таблица задач с частотами и бюджетом времени?",
+      "options": [
+        "Attitude.cpp",
+        "Copter.cpp: scheduler_tasks[]",
+        "motors.cpp",
+        "Parameters.cpp"
+      ],
+      "answer": 1,
+      "explain": "FAST_TASK и SCHED_TASK(func, hz, max_us, prio)."
+    },
+    {
+      "q": "Что делает AP_MotorsMatrix::output_armed_stabilizing()?",
+      "options": [
+        "Читает гироскоп",
+        "Распределяет roll/pitch/yaw/throttle по матрице моторов с приоритетами",
+        "Считает EKF",
+        "Пишет лог"
+      ],
+      "answer": 1,
+      "explain": "Yaw — последним, в пределах MOT_YAW_HEADROOM."
+    },
+    {
+      "q": "Откуда берётся вики параметров ArduPilot?",
+      "options": [
+        "Пишется вручную",
+        "Из блоков // @Param в исходниках",
+        "Из Mission Planner",
+        "Из MAVLink"
+      ],
+      "answer": 1,
+      "explain": "Описание, диапазон, @Values — в коде."
+    },
+    {
+      "q": "Как безопасно проверить патч прошивки?",
+      "options": [
+        "На дроне",
+        "В SITL / юнит-тестах, затем стенд",
+        "В конфигураторе",
+        "Никак"
+      ],
+      "answer": 1,
+      "explain": "make SITL / sim_vehicle.py; make test."
+    },
+    {
+      "q": "git log -S \"имя\" нужен, чтобы:",
+      "options": [
+        "Удалить строку",
+        "Найти коммит, добавивший/убравший строку с этим текстом",
+        "Собрать прошивку",
+        "Проверить стиль"
+      ],
+      "answer": 1,
+      "explain": "Комментарий PR объясняет причину изменения."
+    }
+  ]
+}

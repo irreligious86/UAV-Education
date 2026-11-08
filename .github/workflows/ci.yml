@@ -39,6 +39,9 @@ jobs:
       - name: Check local links
         run: python scripts/check_links.py
 
+      - name: Compile starter examples
+        run: python -m compileall -q examples
+
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
