@@ -339,3 +339,18 @@ def build(D: dict) -> None:
         Axis("частота, Гц", 1, 40, log=True, ticks=[1, 2, 5, 10, 20, 40]), Axis("усиление, дБ", -16, 2), Axis("фаза, °", -240, 0),
         marks=[(1 / (2 * math.pi * Tm), "излом 8 Гц", "m")],
         legend=[("усиление: модель / точки по DFT", "a", False), ("фаза: модель / точки (правая ось)", "w", False)], legend_at=(90, 250))
+
+    # ------------------------------------------------------------ el-kicad
+    def ipc_width_mm(I, oz, dT=10.0, k=0.048):   # IPC-2221, external layer: I = k·ΔT^0.44·A^0.725, A in mil²
+        area = (I / (k * dT ** 0.44)) ** (1 / 0.725)
+        return area / (1.378 * oz) * 0.0254
+    cur = lin(0.5, 20)
+    D["chart-trace-width"] = chart(
+        "Ширина внешней дорожки от тока (IPC-2221, нагрев +10 °C)",
+        [dict(name="", xs=cur, ys=[ipc_width_mm(i, 1) for i in cur], cls="w"),
+         dict(name="", xs=cur, ys=[ipc_width_mm(i, 2) for i in cur], cls="a"),
+         dict(name="", xs=cur, ys=[ipc_width_mm(i, 1, 20) for i in cur], cls="m", dash=True)],
+        Axis("ток, А", 0, 20), Axis("ширина дорожки, мм", 0, 20),
+        marks=[(10, "10 А: 7.2 мм (1 oz)", "m")],
+        legend=[("1 oz (35 мкм), +10 °C", "w", False), ("2 oz (70 мкм), +10 °C", "a", False), ("1 oz, +20 °C", "m", True)],
+        legend_at=(90, 60))
