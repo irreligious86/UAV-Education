@@ -73,6 +73,9 @@ Still to do:
 - ROS 2: modules teach Humble first; Jazzy (LTS to 2029) should be the default, Humble the fallback.
 - Vendor support pages (SpeedyBee) as references in bf-intro and bf-ports → replace with Betaflight docs.
 - Plasmatree PID-Analyzer is unmaintained since 2019 → mark as legacy next to PIDtoolbox/Blackbox Explorer.
+- PIDtoolbox: the GitHub repository is gone (404 on the 2026-11-08 link check); references removed, the
+  module text still names the tool — point to a maintained alternative once one is verified.
+- NXP UM10204 (I²C spec) returns 404 to the checker in both URL spellings — find the current NXP location.
 - QGroundControl docs link to `master` (development) → link the stable docs.
 - Every module has exactly 2–6 references, mostly 3; primary sources for the fact-checked claims
   (parameter reference pages, source files) should be added where the fact-check relied on them.

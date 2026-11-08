@@ -28,10 +28,6 @@ references:
     url: "https://oscarliang.com/pid-filter-tuning-blackbox/"
     tier: secondary
     stack: betaflight
-  - title: "PIDToolbox User Guide"
-    url: "https://github.com/bw1129/PIDtoolbox"
-    tier: secondary
-    stack: betaflight
   - title: "Betaflight Blackbox Explorer"
     url: "https://github.com/betaflight/blackbox-log-viewer"
     tier: primary
@@ -212,4 +208,3 @@ PIDToolbox полезен для:
 - Betaflight Blackbox Explorer | https://github.com/betaflight/blackbox-log-viewer | primary | A
 - How to Use Blackbox in Betaflight — Oscar Liang | https://oscarliang.com/blackbox/ | secondary | B
 - How to Tune FPV Drone Filters & PID with Blackbox — Oscar Liang | https://oscarliang.com/pid-filter-tuning-blackbox/ | secondary | B
-- PIDToolbox User Guide | https://github.com/bw1129/PIDtoolbox | secondary | B
