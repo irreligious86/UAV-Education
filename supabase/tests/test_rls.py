@@ -327,3 +327,22 @@ def test_updated_at_cannot_be_forged(db, users):
     db.execute("insert into public.progress (user_id, data, updated_at) values (%s, '{}', '2099-01-01')", (users["alice"],))
     year = db.execute("select extract(year from updated_at) from public.progress where user_id = %s", (users["alice"],)).fetchone()[0]
     assert year < 2099
+
+
+# ------------------------------------------------------------------ accounts are created only by their owners
+@pytest.mark.parametrize("who", ["alice", "adam", "boss"])
+def test_nobody_creates_accounts_for_others(db, users, who):
+    """Only self-registration creates accounts; staff (even the superadmin) cannot insert users or profiles."""
+    act(db, users[who])
+    savepoint_raises(db, errors.InsufficientPrivilege,
+                     "insert into public.profiles (id, username, email) values (gen_random_uuid(), 'made_by_staff', 'x@example.org')")
+    savepoint_raises(db, errors.InsufficientPrivilege,
+                     "insert into auth.users (email, raw_user_meta_data) values ('y@example.org', '{\"username\": \"made_by_staff\"}')")
+    savepoint_raises(db, errors.InsufficientPrivilege, "delete from public.profiles where id = %s", (users["bob"],))
+
+
+def test_superadmin_makes_admins_only_from_registered_users(db, users):
+    act(db, users["boss"])
+    savepoint_raises(db, errors.NoDataFound, "select public.set_role(%s, 'admin')", (uuid.uuid4(),))
+    db.execute("select public.set_role(%s, 'admin')", (users["carol"],))
+    assert db.execute("select role from public.profiles where id = %s", (users["carol"],)).fetchone() == ("admin",)

@@ -6,6 +6,9 @@ before until a backend is configured in `assets/backend-config.js`.
 ## 1. Requirements (from Alex)
 
 - A person registers with **email, username (login) and password**.
+- **Only the person themselves creates their account** (self-registration). Nobody — not an admin, not the
+  superadmin — creates accounts for others.
+- The superadmin **makes admins** out of registered users (and can return them to students).
 - Their grades (quizzes, numeric tasks, labs, completed modules) are visible **to them and to the
   administration**, nobody else.
 - Roles: **student**, **admin**, **superadmin**. There is exactly **one** superadmin.
@@ -32,6 +35,7 @@ table is protected by RLS. Moving to self-hosted Supabase or plain Postgres late
 | Action | student | admin | superadmin |
 |---|---|---|---|
 | Register, log in, reset password | ✓ | ✓ | ✓ |
+| Create an account for someone else | — | — | — |
 | Read / write **own** progress | ✓ | ✓ | ✓ |
 | Read own profile, change own username | ✓ | ✓ | ✓ |
 | Read **all** profiles and progress (grades table) | — | ✓ | ✓ |
