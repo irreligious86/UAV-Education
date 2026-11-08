@@ -81,8 +81,16 @@ git clone --depth 1 https://github.com/ArduPilot/ardupilot &amp;&amp; cd ardupil
 <ol><li>Betaflight App, Mission Planner или QGroundControl.</li><li>Python 3 + <code>pip install pyserial pymavlink orangebox scipy matplotlib</code> в venv.</li><li>Git; репозиторий <code>drones/</code> по структуре выше.</li><li>Терминал последовательного порта.</li><li>Для ArduPilot — SITL по модулю «SITL: дрон без дрона».</li></ol>
 <h4 class="md-subheading">Первый коммит</h4>
 <ol><li>Подключить дрон, <code>diff all</code> в CLI (или сохранить <code>.param</code>).</li><li>Сохранить в <code>drones/&lt;имя&gt;/configs/&lt;дата&gt;_&lt;имя&gt;_&lt;плата&gt;_diff.txt</code>.</li><li><code>git add</code>, <code>git commit -m &quot;&lt;имя&gt;: baseline &lt;дата&gt;&quot;</code>.</li><li>После любого изменения — новый файл и коммит с описанием, что и зачем.</li></ol>
+<h4 class="md-subheading">Что должно получиться</h4>
+<p>После двух коммитов <code>git log --oneline drones/&lt;имя&gt;/configs/</code> показывает две строки с понятными описаниями, а <code>git diff</code> между файлами — ровно одну изменённую строку:</p>
+<pre class="cli-block"><code>-set rpm_filter_min_hz = 100
++set rpm_filter_min_hz = 50</code></pre>
+<p>Если в разнице больше строк, чем ты менял, значит, в диф попали неожиданные изменения: другая версия прошивки (новые или переименованные настройки), чьи-то правки, сброс к умолчаниям. Это повод разобраться до полёта, а не после. Сравнивай дифы одной версии прошивки. После обновления прошивки делай отдельный базовый коммит «baseline после обновления».</p>
+<h4 class="md-subheading">Типичные ошибки</h4>
+<ul><li>Имя файла без даты или без платы — через месяц не понять, что это и откуда.</li><li>Сохранять <code>dump</code> вместо <code>diff all</code>: в дампе сотни строк значений по умолчанию, и полезное изменение в нём теряется.</li><li>Коммит без описания «зачем». Через полгода «изменил фильтр» ничего не скажет, а «rpm_filter_min_hz 100→50: моторы 10&quot; ниже 100 Гц на висении» — скажет.</li></ul>
 <h4 class="md-subheading">Лабораторная</h4>
 <p>Сделай два дифа с разницей в один параметр и покажи <code>git diff</code> между ними. Это твой первый «код-ревью» собственного дрона.</p>
+<p>Лабораторная засчитывается, когда репозиторий <code>drones/</code> создан по структуре, конфиг сохранён с датой и платой в имени и закоммичен с описанием, а <code>git diff</code> двух конфигов показывает ровно одно изменение с объяснением в сообщении коммита.</p>
 
 <h2>Диагностика</h2>
 <div class="diag-groups"><article class="diag-item"><h4><strong>Симптом:</strong> конфигуратор не видит плату</h4><ul><li>Возможная причина: драйвер (Windows), кабель только для зарядки, плата в DFU.</li><li>Что сделать: Zadig для DFU, другой кабель, проверить COM-порт.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> не помню, что менял перед тем, как сломалось</h4><ul><li>Возможная причина: нет дифов «до/после».</li><li>Что сделать: правило «файл до изменений — всегда», git.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> библиотеки Python конфликтуют между проектами</h4><ul><li>Возможная причина: всё ставится в системный Python.</li><li>Что сделать: venv на проект.</li></ul></article></div>
