@@ -225,3 +225,16 @@ def build(D: dict) -> None:
          dict(name="", xs=[10 * 1.4 * (x / 10) ** (1 / 7) for x in z], ys=z, cls="w", dash=True)],
         Axis("скорость ветра, м/с (на 10 м — 10 м/с)", 0, 24), Axis("высота, м", 0, 150),
         legend=[("средний ветер", "a", False), ("порывы ×1.4", "w", True)], legend_at=(90, 60))
+
+    # ------------------------------------------------------------ ops-maintenance
+    hrs = lin(0, 300)
+    lam = 1 / 1000.0
+    rq = [math.exp(-4 * lam * x) for x in hrs]
+    rh = [(lambda r: r ** 6 + 6 * r ** 5 * (1 - r))(math.exp(-lam * x)) for x in hrs]
+    D["chart-reliability"] = chart(
+        "Вероятность обойтись без потери из-за моторов: λ мотора = 1/1000 ч (иллюстрация)",
+        [dict(name="", xs=hrs, ys=[100 * v for v in rq], cls="w"),
+         dict(name="", xs=hrs, ys=[100 * v for v in rh], cls="a")],
+        Axis("налёт без замены моторов, ч", 0, 300), Axis("вероятность, %", 0, 100),
+        marks=[(100, "100 ч: квадро 67 %, гекса 90 %", "m")],
+        legend=[("квадро: нужны все 4 (R⁴)", "w", False), ("гекса, переживает 1 отказ", "a", False)], legend_at=(90, 250))
