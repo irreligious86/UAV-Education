@@ -96,7 +96,8 @@ Remaining content work: owner review and first-student feedback (Phase C).
 
 ## Phase 4 — Lab track
 
-- [ ] SITL exercises with checkable outcomes: load `.param`, fly a mission, compare the log to a reference
+- [x] SITL exercises with checkable outcomes: `examples/sitl-pymavlink/check_lab_log.py` grades DataFlash logs for the failsafe, mission, hover and motor-failure labs (2026-11-08)
+- [ ] Reference logs for each lab (SITL-generated) committed as fixtures for CI
 
 ## Backlog / ideas
 
