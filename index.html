@@ -20,7 +20,7 @@
   <script>
     // Old single-page links (index.html#bf-filters) -> module pages.
     (function () {
-      var ids = ["aero-wing", "ap-companion", "ap-ekf", "ap-heavy", "ap-intro", "ap-logs", "ap-lua", "ap-missions", "ap-plane-tuning", "ap-quadplane", "ap-safety-fs", "ap-sitl", "ap-tuning", "bf-blackbox", "bf-cli", "bf-cli-automation", "bf-custom", "bf-failsafe", "bf-filters", "bf-intro", "bf-modes-osd", "bf-pid", "bf-pid-reg-in-bf", "bf-ports", "bf-rpm-filter", "comp-esp32", "comp-intro", "comp-mavlink", "comp-raspberry", "ctl-signals", "ctl-theory", "data-python", "diag-troubleshooting", "el-battery-packs", "el-dronecan", "el-emi", "el-measure", "el-peripherals", "el-power-design", "el-redundancy", "el-wiring", "emb-basics", "emb-protocols", "eng-ci-configs", "eng-method-101", "eng-systems", "est-alt-sources", "est-attitude", "est-gnss", "est-kalman", "est-sensors", "f-aero-props", "f-components-choice", "f-electricity-101", "f-esc-firmware", "f-fc-sensors", "f-frame-mech", "f-mechanics", "f-motors-esc", "f-physics", "f-power", "f-regulations", "f-remote-id-security", "f-safety", "fw-reading", "inav-gps", "inav-intro", "inav-ipf", "inav-missions", "inav-wing", "link-digital-video", "link-elrs", "link-protocols", "link-telemetry-radios", "link-vtx", "math-linalg-rot", "math-ode-dyn", "math-prob-est", "mav-component", "mav-multi-vehicle", "mav-protocol", "mav-routing", "mav-sdk", "mav-services", "nav-resilience", "ops-case-studies", "ops-field", "ops-maintenance", "ops-weather", "payload-gimbal", "per-camera", "per-cv", "per-depth-avoid", "per-edge-ml", "per-geometry", "per-landing", "per-mapping", "per-tracking", "per-visual-nav", "px4-architecture", "px4-companion-jetson", "px4-control", "px4-intro", "px4-ros2", "rf-antennas", "rf-link-budget", "ros2-app-arch", "ros2-ardupilot", "ros2-basics", "ros2-from-ros1", "ros2-nav", "ros2-px4", "tools-overview"];
+      var ids = ["aero-wing", "ap-companion", "ap-ekf", "ap-heavy", "ap-intro", "ap-logs", "ap-lua", "ap-missions", "ap-plane-tuning", "ap-quadplane", "ap-safety-fs", "ap-sitl", "ap-tuning", "bf-blackbox", "bf-cli", "bf-cli-automation", "bf-custom", "bf-failsafe", "bf-filters", "bf-intro", "bf-modes-osd", "bf-pid", "bf-pid-reg-in-bf", "bf-ports", "bf-rpm-filter", "comp-esp32", "comp-intro", "comp-mavlink", "comp-raspberry", "ctl-guidance", "ctl-signals", "ctl-theory", "data-python", "diag-troubleshooting", "el-battery-packs", "el-dronecan", "el-emi", "el-measure", "el-peripherals", "el-power-design", "el-redundancy", "el-wiring", "emb-basics", "emb-protocols", "eng-ci-configs", "eng-method-101", "eng-systems", "est-alt-sources", "est-attitude", "est-gnss", "est-kalman", "est-sensors", "f-aero-props", "f-components-choice", "f-electricity-101", "f-esc-firmware", "f-fc-sensors", "f-frame-mech", "f-mechanics", "f-motors-esc", "f-physics", "f-power", "f-regulations", "f-remote-id-security", "f-safety", "fw-reading", "inav-gps", "inav-intro", "inav-ipf", "inav-missions", "inav-wing", "link-digital-video", "link-elrs", "link-protocols", "link-telemetry-radios", "link-vtx", "math-linalg-rot", "math-ode-dyn", "math-prob-est", "mav-component", "mav-multi-vehicle", "mav-protocol", "mav-routing", "mav-sdk", "mav-services", "nav-resilience", "ops-case-studies", "ops-field", "ops-maintenance", "ops-weather", "payload-gimbal", "per-camera", "per-cv", "per-depth-avoid", "per-edge-ml", "per-geometry", "per-landing", "per-mapping", "per-tracking", "per-visual-nav", "px4-architecture", "px4-companion-jetson", "px4-control", "px4-intro", "px4-ros2", "rf-antennas", "rf-link-budget", "ros2-app-arch", "ros2-ardupilot", "ros2-basics", "ros2-from-ros1", "ros2-nav", "ros2-px4", "tools-overview"];
       var h = decodeURIComponent(location.hash.slice(1));
       if (h && ids.indexOf(h) !== -1) location.replace("m/" + h + ".html");
     })();
@@ -46,12 +46,12 @@
       <p class="home-hero__lead">От «почему он летает» до настройки по логам, автономных миссий и своего кода на борту.
       Выбери прошивку и иди по шагам от простого к сложному — или пройди инженерный путь по трекам. Нужна конкретная тема — <a href="pages/search.html">поиск</a> или <a href="ref/index.html">справочник</a>.</p>
       <div class="home-hero__stats">
-        <span class="gc-tag">94 модулей в ядре</span>
-        <span class="gc-tag" data-state="ok">написано 94</span>
+        <span class="gc-tag">95 модулей в ядре</span>
+        <span class="gc-tag" data-state="ok">написано 95</span>
         <span class="gc-tag" data-state="caution">в работе 0</span>
       </div>
-      <p class="gc-label gc-muted">Твой прогресс <span data-progress-label="f-physics,f-mechanics,f-aero-props,f-electricity-101,f-power,f-motors-esc,f-fc-sensors,f-frame-mech,bf-pid-reg-in-bf,f-safety,f-regulations,f-components-choice,eng-method-101,tools-overview,bf-intro,bf-ports,link-protocols,bf-modes-osd,bf-failsafe,link-elrs,link-vtx,link-digital-video,link-telemetry-radios,ops-weather,ops-field,ops-case-studies,ops-maintenance,diag-troubleshooting,el-power-design,el-measure,el-battery-packs,el-emi,rf-antennas,rf-link-budget,el-peripherals,el-dronecan,el-wiring,el-redundancy,data-python,ctl-signals,bf-blackbox,bf-filters,f-esc-firmware,bf-rpm-filter,ctl-theory,bf-pid,bf-cli,bf-cli-automation,est-sensors,est-attitude,est-kalman,est-gnss,ap-ekf,est-alt-sources,nav-resilience,ap-intro,ap-sitl,ap-missions,ap-logs,ap-lua,ap-heavy,aero-wing,ap-quadplane,ap-tuning,ap-plane-tuning,ap-safety-fs,emb-basics,emb-protocols,comp-intro,comp-mavlink,mav-protocol,mav-services,mav-routing,f-remote-id-security,mav-component,payload-gimbal,mav-sdk,comp-esp32,comp-raspberry,ap-companion,mav-multi-vehicle,fw-reading,bf-custom,eng-systems,eng-ci-configs,per-camera,per-geometry,per-cv,per-edge-ml,per-visual-nav,per-mapping,per-landing,per-depth-avoid,per-tracking,inav-intro,inav-gps,inav-missions,inav-wing,inav-ipf,px4-intro,px4-architecture,px4-control,px4-ros2,px4-companion-jetson,math-linalg-rot,math-ode-dyn,math-prob-est,ros2-basics,ros2-px4,ros2-ardupilot,ros2-app-arch,ros2-nav,ros2-from-ros1"></span></p>
-      <div class="gc-progress" role="progressbar" aria-label="Твой прогресс по курсу" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" data-progress-of="f-physics,f-mechanics,f-aero-props,f-electricity-101,f-power,f-motors-esc,f-fc-sensors,f-frame-mech,bf-pid-reg-in-bf,f-safety,f-regulations,f-components-choice,eng-method-101,tools-overview,bf-intro,bf-ports,link-protocols,bf-modes-osd,bf-failsafe,link-elrs,link-vtx,link-digital-video,link-telemetry-radios,ops-weather,ops-field,ops-case-studies,ops-maintenance,diag-troubleshooting,el-power-design,el-measure,el-battery-packs,el-emi,rf-antennas,rf-link-budget,el-peripherals,el-dronecan,el-wiring,el-redundancy,data-python,ctl-signals,bf-blackbox,bf-filters,f-esc-firmware,bf-rpm-filter,ctl-theory,bf-pid,bf-cli,bf-cli-automation,est-sensors,est-attitude,est-kalman,est-gnss,ap-ekf,est-alt-sources,nav-resilience,ap-intro,ap-sitl,ap-missions,ap-logs,ap-lua,ap-heavy,aero-wing,ap-quadplane,ap-tuning,ap-plane-tuning,ap-safety-fs,emb-basics,emb-protocols,comp-intro,comp-mavlink,mav-protocol,mav-services,mav-routing,f-remote-id-security,mav-component,payload-gimbal,mav-sdk,comp-esp32,comp-raspberry,ap-companion,mav-multi-vehicle,fw-reading,bf-custom,eng-systems,eng-ci-configs,per-camera,per-geometry,per-cv,per-edge-ml,per-visual-nav,per-mapping,per-landing,per-depth-avoid,per-tracking,inav-intro,inav-gps,inav-missions,inav-wing,inav-ipf,px4-intro,px4-architecture,px4-control,px4-ros2,px4-companion-jetson,math-linalg-rot,math-ode-dyn,math-prob-est,ros2-basics,ros2-px4,ros2-ardupilot,ros2-app-arch,ros2-nav,ros2-from-ros1" style="--gc-value: 0%"></div>
+      <p class="gc-label gc-muted">Твой прогресс <span data-progress-label="f-physics,f-mechanics,f-aero-props,f-electricity-101,f-power,f-motors-esc,f-fc-sensors,f-frame-mech,bf-pid-reg-in-bf,f-safety,f-regulations,f-components-choice,eng-method-101,tools-overview,bf-intro,bf-ports,link-protocols,bf-modes-osd,bf-failsafe,link-elrs,link-vtx,link-digital-video,link-telemetry-radios,ops-weather,ops-field,ops-case-studies,ops-maintenance,diag-troubleshooting,el-power-design,el-measure,el-battery-packs,el-emi,rf-antennas,rf-link-budget,el-peripherals,el-dronecan,el-wiring,el-redundancy,data-python,ctl-signals,bf-blackbox,bf-filters,f-esc-firmware,bf-rpm-filter,ctl-theory,bf-pid,bf-cli,bf-cli-automation,est-sensors,est-attitude,est-kalman,est-gnss,ap-ekf,est-alt-sources,nav-resilience,ap-intro,ap-sitl,ap-missions,ctl-guidance,ap-logs,ap-lua,ap-heavy,aero-wing,ap-quadplane,ap-tuning,ap-plane-tuning,ap-safety-fs,emb-basics,emb-protocols,comp-intro,comp-mavlink,mav-protocol,mav-services,mav-routing,f-remote-id-security,mav-component,payload-gimbal,mav-sdk,comp-esp32,comp-raspberry,ap-companion,mav-multi-vehicle,fw-reading,bf-custom,eng-systems,eng-ci-configs,per-camera,per-geometry,per-cv,per-edge-ml,per-visual-nav,per-mapping,per-landing,per-depth-avoid,per-tracking,inav-intro,inav-gps,inav-missions,inav-wing,inav-ipf,px4-intro,px4-architecture,px4-control,px4-ros2,px4-companion-jetson,math-linalg-rot,math-ode-dyn,math-prob-est,ros2-basics,ros2-px4,ros2-ardupilot,ros2-app-arch,ros2-nav,ros2-from-ros1"></span></p>
+      <div class="gc-progress" role="progressbar" aria-label="Твой прогресс по курсу" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" data-progress-of="f-physics,f-mechanics,f-aero-props,f-electricity-101,f-power,f-motors-esc,f-fc-sensors,f-frame-mech,bf-pid-reg-in-bf,f-safety,f-regulations,f-components-choice,eng-method-101,tools-overview,bf-intro,bf-ports,link-protocols,bf-modes-osd,bf-failsafe,link-elrs,link-vtx,link-digital-video,link-telemetry-radios,ops-weather,ops-field,ops-case-studies,ops-maintenance,diag-troubleshooting,el-power-design,el-measure,el-battery-packs,el-emi,rf-antennas,rf-link-budget,el-peripherals,el-dronecan,el-wiring,el-redundancy,data-python,ctl-signals,bf-blackbox,bf-filters,f-esc-firmware,bf-rpm-filter,ctl-theory,bf-pid,bf-cli,bf-cli-automation,est-sensors,est-attitude,est-kalman,est-gnss,ap-ekf,est-alt-sources,nav-resilience,ap-intro,ap-sitl,ap-missions,ctl-guidance,ap-logs,ap-lua,ap-heavy,aero-wing,ap-quadplane,ap-tuning,ap-plane-tuning,ap-safety-fs,emb-basics,emb-protocols,comp-intro,comp-mavlink,mav-protocol,mav-services,mav-routing,f-remote-id-security,mav-component,payload-gimbal,mav-sdk,comp-esp32,comp-raspberry,ap-companion,mav-multi-vehicle,fw-reading,bf-custom,eng-systems,eng-ci-configs,per-camera,per-geometry,per-cv,per-edge-ml,per-visual-nav,per-mapping,per-landing,per-depth-avoid,per-tracking,inav-intro,inav-gps,inav-missions,inav-wing,inav-ipf,px4-intro,px4-architecture,px4-control,px4-ros2,px4-companion-jetson,math-linalg-rot,math-ode-dyn,math-prob-est,ros2-basics,ros2-px4,ros2-ardupilot,ros2-app-arch,ros2-nav,ros2-from-ros1" style="--gc-value: 0%"></div>
       <p class="gc-muted home-hero__note">Прогресс хранится в этом браузере · <a href="pages/progress.html">подробная ведомость</a></p>
       <p class="ready-filter"><label class="gc-muted"><input type="checkbox" data-ready-only> Показывать только готовые модули</label></p>
     </section>
@@ -487,10 +487,10 @@
         <h2 class="gc-title" id="track-autonomy-title">Автономия</h2>
         <p class="track__goal">Строить и проверять автономные сценарии на ArduPilot: сначала в SITL, потом в воздухе.</p>
         <div class="track__stats gc-muted">
-          <span>11 модулей · ~34 ч · написано 11</span>
-          <span data-progress-label="ap-intro,ap-sitl,ap-missions,ap-logs,ap-lua,ap-heavy,aero-wing,ap-quadplane,ap-tuning,ap-plane-tuning,ap-safety-fs"></span>
+          <span>12 модулей · ~37 ч · написано 12</span>
+          <span data-progress-label="ap-intro,ap-sitl,ap-missions,ctl-guidance,ap-logs,ap-lua,ap-heavy,aero-wing,ap-quadplane,ap-tuning,ap-plane-tuning,ap-safety-fs"></span>
         </div>
-        <div class="gc-progress" role="progressbar" aria-label="Пройдено в треке «Автономия»" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" data-progress-of="ap-intro,ap-sitl,ap-missions,ap-logs,ap-lua,ap-heavy,aero-wing,ap-quadplane,ap-tuning,ap-plane-tuning,ap-safety-fs" style="--gc-value: 0%"></div>
+        <div class="gc-progress" role="progressbar" aria-label="Пройдено в треке «Автономия»" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" data-progress-of="ap-intro,ap-sitl,ap-missions,ctl-guidance,ap-logs,ap-lua,ap-heavy,aero-wing,ap-quadplane,ap-tuning,ap-plane-tuning,ap-safety-fs" style="--gc-value: 0%"></div>
         <ol class="track__modules">
           <li class="track-module" data-module-id="ap-intro">
             <span class="track-module__num">01</span>
@@ -507,43 +507,48 @@
             <a class="track-module__title" href="m/ap-missions.html">Миссии и планирование</a>
             <span class="track-module__tags"><span class="gc-tag" title="L2 — Интегратор">L2</span><span class="gc-tag">~3 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
           </li>
-          <li class="track-module" data-module-id="ap-logs">
+          <li class="track-module" data-module-id="ctl-guidance">
             <span class="track-module__num">04</span>
+            <a class="track-module__title" href="m/ctl-guidance.html">Наведение и траектории: pure pursuit, L1, S-кривые, minimum snap</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L3 — Специалист">L3</span><span class="gc-tag">~3 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+          </li>
+          <li class="track-module" data-module-id="ap-logs">
+            <span class="track-module__num">05</span>
             <a class="track-module__title" href="m/ap-logs.html">Логи ArduPilot: разбор полёта</a>
             <span class="track-module__tags"><span class="gc-tag" title="L3 — Специалист">L3</span><span class="gc-tag">~3 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
           </li>
           <li class="track-module" data-module-id="ap-lua">
-            <span class="track-module__num">05</span>
+            <span class="track-module__num">06</span>
             <a class="track-module__title" href="m/ap-lua.html">Lua: сценарии и fault injection</a>
             <span class="track-module__tags"><span class="gc-tag" title="L3 — Специалист">L3</span><span class="gc-tag">~3 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
           </li>
           <li class="track-module" data-module-id="ap-heavy">
-            <span class="track-module__num">06</span>
+            <span class="track-module__num">07</span>
             <a class="track-module__title" href="m/ap-heavy.html">Тяжёлые платформы: X8 и окто</a>
             <span class="track-module__tags"><span class="gc-tag" title="L3 — Специалист">L3</span><span class="gc-tag">~3 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
           </li>
           <li class="track-module" data-module-id="aero-wing">
-            <span class="track-module__num">07</span>
+            <span class="track-module__num">08</span>
             <a class="track-module__title" href="m/aero-wing.html">Аэродинамика крыла и самолётные режимы</a>
             <span class="track-module__tags"><span class="gc-tag" title="L3 — Специалист">L3</span><span class="gc-tag">~4 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
           </li>
           <li class="track-module" data-module-id="ap-quadplane">
-            <span class="track-module__num">08</span>
+            <span class="track-module__num">09</span>
             <a class="track-module__title" href="m/ap-quadplane.html">QuadPlane и tilt-rotor VTOL</a>
             <span class="track-module__tags"><span class="gc-tag" title="L3 — Специалист">L3</span><span class="gc-tag">~4 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
           </li>
           <li class="track-module" data-module-id="ap-tuning">
-            <span class="track-module__num">09</span>
+            <span class="track-module__num">10</span>
             <a class="track-module__title" href="m/ap-tuning.html">Тюнинг ArduPilot: AUTOTUNE, фильтры, notch по ESC</a>
             <span class="track-module__tags"><span class="gc-tag" title="L3 — Специалист">L3</span><span class="gc-tag">~3 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
           </li>
           <li class="track-module" data-module-id="ap-plane-tuning">
-            <span class="track-module__num">10</span>
+            <span class="track-module__num">11</span>
             <a class="track-module__title" href="m/ap-plane-tuning.html">Тюнинг ArduPlane: AUTOTUNE крыла, TECS, навигация L1, посадка</a>
             <span class="track-module__tags"><span class="gc-tag" title="L3 — Специалист">L3</span><span class="gc-tag">~3 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
           </li>
           <li class="track-module" data-module-id="ap-safety-fs">
-            <span class="track-module__num">11</span>
+            <span class="track-module__num">12</span>
             <a class="track-module__title" href="m/ap-safety-fs.html">Отказоустойчивость: failsafe, геозона, FMEA полёта</a>
             <span class="track-module__tags"><span class="gc-tag" title="L3 — Специалист">L3</span><span class="gc-tag">~3 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
           </li>

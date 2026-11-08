@@ -248,3 +248,58 @@ def build(D: dict) -> None:
          dict(name="", xs=rates, ys=[(64 / r) ** 0.5 for r in rates], cls="a", dots=True)],
         Axis("AIR_SPEED, кбит/с", 2, 250, log=True, ticks=[2, 4, 8, 16, 32, 64, 128, 250]), Axis("дальность, × от 64 кбит/с", 0, 6),
         marks=[(64, "по умолчанию", "m")], hmarks=[(2, "16 кбит/с → ×2", "m")])
+
+    # ------------------------------------------------------------ ctl-guidance
+    def pursuit(L, y0=20.0, V=10.0, alat=8.0, T=12.0, dt=0.02):
+        x, y, psi = 0.0, y0, 0.0
+        xs, ys = [x], [y]
+        for _ in range(int(T / dt)):
+            dx = math.sqrt(max(L * L - y * y, 0.0)) if abs(y) < L else 0.0
+            tx, ty = x + max(dx, 0.5), 0.0
+            alpha = math.atan2(ty - y, tx - x) - psi
+            alpha = math.atan2(math.sin(alpha), math.cos(alpha))
+            kappa = 2 * math.sin(alpha) / L
+            a = max(-alat, min(alat, V * V * kappa))
+            psi += a / V * dt
+            x += V * math.cos(psi) * dt
+            y += V * math.sin(psi) * dt
+            xs.append(x); ys.append(y)
+        return xs, ys
+    ser = []
+    for L, cls in ((8, "w"), (20, "a"), (45, "m")):
+        px, py = pursuit(L)
+        ser.append(dict(name="", xs=px, ys=py, cls=cls))
+    D["chart-pure-pursuit"] = chart(
+        "Pure pursuit: выход на линию с 20 м сбоку, 10 м/с, разная дальность упреждения L",
+        ser, Axis("вдоль линии, м", 0, 120), Axis("отклонение от линии, м", -8, 22),
+        hmarks=[(0, "линия пути", "m")],
+        legend=[("L = 8 м: резко, перелёт ~3 м", "w", False), ("L = 20 м: быстро, перелёт ~1 м", "a", False),
+                ("L = 45 м: плавно, но долго", "m", False)], legend_at=(330, 60))
+
+    # trapezoid vs jerk-limited (S-curve) profile, 50 m move
+    vmax, amax, jmax = 10.0, 5.0, 10.0
+    def trap(t):
+        ta = vmax / amax; tc = (50 - vmax * ta) / vmax; T = 2 * ta + tc
+        if t < ta: return amax * t, amax
+        if t < ta + tc: return vmax, 0.0
+        if t < T: return vmax - amax * (t - ta - tc), -amax
+        return 0.0, 0.0
+    def scurve_acc(t):
+        tj = amax / jmax; ta = vmax / amax + tj; tc = (50 - vmax * ta) / vmax
+        def up(u):
+            if u < tj: return jmax * u
+            if u < ta - tj: return amax
+            if u < ta: return amax - jmax * (u - ta + tj)
+            return 0.0
+        if t < ta: return up(t)
+        if t < ta + tc: return 0.0
+        if t < 2 * ta + tc: return -up(t - ta - tc)
+        return 0.0
+    ts = lin(0, 8.5, 800)
+    D["chart-scurve"] = chart(
+        "Разгон и торможение на 50 м: ускорение трапеции скачет, у S-кривой рывок ≤ 10 м/с³",
+        [dict(name="", xs=ts, ys=[trap(t)[1] for t in ts], cls="w", dash=True),
+         dict(name="", xs=ts, ys=[scurve_acc(t) for t in ts], cls="a")],
+        Axis("время, с", 0, 8.5), Axis("ускорение, м/с²", -6, 6),
+        legend=[("трапеция: 7.0 с, скачки ускорения", "w", True), ("S-кривая: 7.5 с, ускорение без скачков", "a", False)],
+        legend_at=(270, 100))
