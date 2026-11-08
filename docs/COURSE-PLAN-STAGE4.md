@@ -70,7 +70,7 @@ reference lists, and the validator rejects malformed reference sections (bf-blac
 Still to do:
 - px4-companion-jetson: rewrite for Jetson Orin Nano / JetPack 6 (the Jetson Nano is end-of-life);
   verify UART device names against NVIDIA documentation.
-- ROS 2: modules teach Humble first; Jazzy (LTS to 2029) should be the default, Humble the fallback.
+- ✅ ROS 2: Jazzy first in ros2-basics, ros2-app-arch, px4-ros2; the course Docker image takes `ROS_DISTRO` (default jazzy, `ROS_DISTRO=humble` as fallback). Not test-built here (Docker Hub unreachable from the build environment) — first local build should confirm.
 - ✅ Vendor support pages (SpeedyBee) in bf-intro and bf-ports → Betaflight Serial/Setup/GPS Rescue 4.5 docs and ExpressLRS FC configuration.
 - ✅ Plasmatree PID-Analyzer marked legacy (unmaintained since 2019) in bf-pid.
 - PIDtoolbox: the GitHub repository is gone (404 on the 2026-11-08 link check); references removed, the

@@ -3,7 +3,7 @@ id: px4-ros2
 title: "PX4 и ROS 2: uXRCE-DDS и offboard"
 level: L4
 readingTime: 30 мин
-firmware: PX4 1.14+ / ROS 2 Humble
+firmware: PX4 1.15+ / ROS 2 Jazzy (Humble — запасной)
 status: published
 added: 2026-11-08
 tags:
@@ -86,7 +86,7 @@ rclpy.init(); rclpy.spin(Offboard())
 ## practice
 ### Шаг 1. Окружение
 ```
-# ROS 2 Jazzy (Ubuntu 24.04) или Humble (22.04) установлен и source'нут
+# ROS 2 Jazzy (Ubuntu 24.04) установлен и source'нут; запасной вариант — Humble (22.04)
 mkdir -p ~/ws_px4/src && cd ~/ws_px4/src
 git clone https://github.com/PX4/px4_msgs.git      # branch matching your PX4 version
 git clone https://github.com/PX4/px4_ros_com.git

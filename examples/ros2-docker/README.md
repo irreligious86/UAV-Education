@@ -1,8 +1,9 @@
 # ROS 2 labs environment
 
 Containers and a ROS 2 package for the elective "ROS 2 on board" (`ros2-basics`, `ros2-px4`,
-`ros2-ardupilot`). Target: ROS 2 Humble on Ubuntu 22.04 (PX4's recommended platform),
-PX4 SITL + Gazebo Harmonic, ArduPilot SITL built with `--enable-DDS`.
+`ros2-ardupilot`). Target: ROS 2 Jazzy on Ubuntu 24.04 (LTS to 2029, recommended by current PX4 docs),
+PX4 SITL + Gazebo Harmonic, ArduPilot SITL built with `--enable-DDS`. Humble stays available as a fallback:
+`ROS_DISTRO=humble docker compose build ros` (the image is parameterised by the `ROS_DISTRO` build argument).
 
 ```bash
 docker compose build ros                       # ROS 2 workspace (~10 min)

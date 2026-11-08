@@ -31,7 +31,7 @@ ROS 2 — не «библиотека для дронов», а способ с�
 - **Действие (action)** — долгая цель с обратной связью и отменой (`NavigateToPose` в Nav2). Это топики+сервисы, собранные в протокол.
 - **Параметры** — типизированные настройки узла (`ros2 param set /node alt 7.0`), с колбэком проверки при изменении.
 
-DDS сам находит участников в сети (discovery) внутри одного `ROS_DOMAIN_ID`. На борту с companion и ноутбуком в одной Wi-Fi-сети это значит: без разных доменов или фильтров ноутбук «увидит» и сможет публиковать в топики аппарата. Для полётов в поле — отдельный домен, а лучше `ROS_LOCALHOST_ONLY=1` (Humble) или `ROS_AUTOMATIC_DISCOVERY_RANGE=LOCALHOST` (Jazzy) на борту и мост наружу только для нужных топиков.
+DDS сам находит участников в сети (discovery) внутри одного `ROS_DOMAIN_ID`. На борту с companion и ноутбуком в одной Wi-Fi-сети это значит: без разных доменов или фильтров ноутбук «увидит» и сможет публиковать в топики аппарата. Для полётов в поле — отдельный домен, а лучше `ROS_AUTOMATIC_DISCOVERY_RANGE=LOCALHOST` (Jazzy; в Humble — `ROS_LOCALHOST_ONLY=1`) на борту и мост наружу только для нужных топиков.
 
 {{diagram:ros2-graph|Учебная система как граф: мост к автопилоту, логгер, автомат состояний, восприятие и watchdog — отдельные узлы.}}
 
@@ -56,7 +56,7 @@ ROS живёт в **ENU** (мир) и **FLU** (корпус) — REP-103; авт
 Launch-файл (Python) запускает набор узлов с параметрами, пространствами имён, перенаправлением топиков (`remappings`). Это то, что запускается на борту при старте: systemd-сервис → `ros2 launch`. Параметры в YAML-файле, а не в коде — чтобы один и тот же пакет работал на двух разных аппаратах.
 
 ### ros2 bag
-`ros2 bag record -o run1 /topic1 /topic2` пишет трафик в файл (по умолчанию SQLite3 в Humble, MCAP — опционально и по умолчанию в новых дистрибутивах); `ros2 bag play run1` воспроизводит его, и ваши узлы не отличат повтор от полёта. Это главный инструмент отладки: записали полёт с ошибкой — воспроизводите и чините узел на столе сколько угодно раз. Запись всех топиков с камерами на борту быстро съедает диск и CPU: пишите сжатые изображения или с пониженной частотой.
+`ros2 bag record -o run1 /topic1 /topic2` пишет трафик в файл (в Jazzy по умолчанию MCAP, в Humble — SQLite3; формат задаётся ключом `-s`); `ros2 bag play run1` воспроизводит его, и ваши узлы не отличат повтор от полёта. Это главный инструмент отладки: записали полёт с ошибкой — воспроизводите и чините узел на столе сколько угодно раз. Запись всех топиков с камерами на борту быстро съедает диск и CPU: пишите сжатые изображения или с пониженной частотой.
 
 ## practice
 ### Шаг 1. Окружение
@@ -66,7 +66,7 @@ docker compose build ros
 docker compose run --rm ros bash
 ros2 doctor --report | head -20
 ```
-Если Docker недоступен — установите ROS 2 Humble на Ubuntu 22.04 по официальной инструкции и соберите `ws/` через `colcon build`.
+Образ собирается на ROS 2 Jazzy (Ubuntu 24.04); запасной вариант — `ROS_DISTRO=humble docker compose build ros`. Если Docker недоступен — установите ROS 2 Jazzy на Ubuntu 24.04 (или Humble на 22.04) по официальной инструкции и соберите `ws/` через `colcon build`.
 
 ### Шаг 2. Граф руками
 В двух терминалах `ros2 run demo_nodes_py talker` и `listener`; посмотрите `ros2 node list`, `ros2 topic info -v /chatter`, `ros2 topic hz`. Затем опубликуйте в топик с BEST_EFFORT (`ros2 topic pub --qos-reliability best_effort ...`) и подпишитесь RELIABLE (`ros2 topic echo --qos-reliability reliable ...`) — связи нет. Поменяйте подписчика на best_effort — появилась. Запишите вывод `topic info -v` в обоих случаях.
@@ -97,7 +97,7 @@ ros2 doctor --report | head -20
   - Что сделать: тесты конвертаций (`frames.py`), проверка на неподвижном аппарате с известным курсом.
 
 ## references
-- ROS 2 Humble — Concepts (nodes, topics, services, actions) | https://docs.ros.org/en/jazzy/Concepts.html | primary | A
+- ROS 2 Jazzy — Concepts (nodes, topics, services, actions) | https://docs.ros.org/en/jazzy/Concepts.html | primary | A
 - ROS 2 — About Quality of Service settings (compatibility table) | https://docs.ros.org/en/jazzy/Concepts/Intermediate/About-Quality-of-Service-Settings.html | primary | A
 - REP-103 — Standard units and coordinate conventions | https://www.ros.org/reps/rep-0103.html | primary | A
 - REP-105 — Coordinate frames for mobile platforms | https://www.ros.org/reps/rep-0105.html | primary | A

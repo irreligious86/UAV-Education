@@ -1,11 +1,14 @@
-# ROS 2 Humble workspace: px4_msgs, ardupilot_msgs, Micro XRCE-DDS Agent (PX4), micro-ROS agent (ArduPilot AP_DDS),
+# ROS 2 workspace: px4_msgs, ardupilot_msgs, Micro XRCE-DDS Agent (PX4), micro-ROS agent (ArduPilot AP_DDS),
 # and the course package uav_ros2_labs.
-FROM ros:humble-ros-base
+# ROS_DISTRO: jazzy (default, LTS to 2029, Ubuntu 24.04) or humble (fallback, Ubuntu 22.04).
+ARG ROS_DISTRO=jazzy
+FROM ros:${ROS_DISTRO}-ros-base
+ARG ROS_DISTRO
 
 ARG DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y --no-install-recommends \
-      git python3-pip python3-colcon-common-extensions ros-humble-geographic-msgs ros-humble-launch-ros \
-      ros-humble-rmw-cyclonedds-cpp ros-humble-rosbag2 \
+      git python3-pip python3-colcon-common-extensions ros-${ROS_DISTRO}-geographic-msgs ros-${ROS_DISTRO}-launch-ros \
+      ros-${ROS_DISTRO}-rmw-cyclonedds-cpp ros-${ROS_DISTRO}-rosbag2 \
     && rm -rf /var/lib/apt/lists/*
 
 # Micro XRCE-DDS Agent for PX4's uXRCE-DDS client (pinned release)
@@ -23,17 +26,17 @@ RUN git clone --depth 1 --filter=blob:none --sparse https://github.com/ArduPilot
  && git -C /tmp/ap sparse-checkout set Tools/ros2/ardupilot_msgs \
  && cp -r /tmp/ap/Tools/ros2/ardupilot_msgs src/ && rm -rf /tmp/ap
 # micro-ROS agent (used by ArduPilot AP_DDS)
-RUN git clone --depth 1 -b humble https://github.com/micro-ROS/micro_ros_setup.git src/micro_ros_setup
+RUN git clone --depth 1 -b ${ROS_DISTRO} https://github.com/micro-ROS/micro_ros_setup.git src/micro_ros_setup
 
 COPY ws/src/uav_ros2_labs src/uav_ros2_labs
-RUN . /opt/ros/humble/setup.sh && apt-get update && rosdep update \
+RUN . /opt/ros/${ROS_DISTRO}/setup.sh && apt-get update && rosdep update \
  && rosdep install --from-paths src --ignore-src -y --skip-keys "px4_msgs ardupilot_msgs" \
  && rm -rf /var/lib/apt/lists/*
-RUN . /opt/ros/humble/setup.sh && colcon build --packages-select micro_ros_setup \
+RUN . /opt/ros/${ROS_DISTRO}/setup.sh && colcon build --packages-select micro_ros_setup \
  && . install/setup.sh && ros2 run micro_ros_setup create_agent_ws.sh && ros2 run micro_ros_setup build_agent.sh
-RUN . /opt/ros/humble/setup.sh && . install/setup.sh \
+RUN . /opt/ros/${ROS_DISTRO}/setup.sh && . install/setup.sh \
  && colcon build --packages-select px4_msgs ardupilot_msgs uav_ros2_labs
 
 ENV RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
-RUN echo "source /opt/ros/humble/setup.bash && source /ws/install/setup.bash" >> /root/.bashrc
+RUN echo "source /opt/ros/${ROS_DISTRO}/setup.bash && source /ws/install/setup.bash" >> /root/.bashrc
 CMD ["bash"]
