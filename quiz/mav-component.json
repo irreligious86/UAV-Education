@@ -1,0 +1,94 @@
+{
+  "module": "mav-component",
+  "pass": 80,
+  "questions": [
+    {
+      "q": "Компонент-датчик в HEARTBEAT указывает autopilot =",
+      "options": [
+        "MAV_AUTOPILOT_INVALID",
+        "MAV_AUTOPILOT_ARDUPILOTMEGA",
+        "MAV_AUTOPILOT_PX4",
+        "Любое"
+      ],
+      "answer": 0,
+      "explain": "Он не автопилот; иначе GCS может принять его за аппарат."
+    },
+    {
+      "q": "Единицы current_distance в DISTANCE_SENSOR:",
+      "options": [
+        "Сантиметры",
+        "Метры",
+        "Миллиметры",
+        "Дюймы"
+      ],
+      "answer": 0,
+      "explain": "min/max/current — в см."
+    },
+    {
+      "q": "ArduPilot принимает DISTANCE_SENSOR как дальномер вниз при:",
+      "options": [
+        "RNGFND1_TYPE = 10, RNGFND1_ORIENT = 25",
+        "RNGFND1_TYPE = 1",
+        "PRX1_TYPE = 2",
+        "EK3_SRC1_POSZ = 2 и всё"
+      ],
+      "answer": 0,
+      "explain": "10 — MAVLink, 25 — Down; ориентация в сообщении должна совпадать."
+    },
+    {
+      "q": "Что должен делать компонент при потере измерений?",
+      "options": [
+        "Перестать слать сообщение или пометить его недостоверным",
+        "Слать последнее значение",
+        "Слать 0",
+        "Перезагрузить автопилот"
+      ],
+      "answer": 0,
+      "explain": "Автопилот обнаружит таймаут и отключит источник."
+    },
+    {
+      "q": "Быстро вывести своё число в GCS и лог без своего диалекта:",
+      "options": [
+        "NAMED_VALUE_FLOAT",
+        "STATUSTEXT с числом",
+        "PARAM_VALUE",
+        "HEARTBEAT.custom_mode"
+      ],
+      "answer": 0,
+      "explain": "ArduPilot пишет NVF в лог."
+    },
+    {
+      "q": "На ESP32 кадры MAVLink иногда битые. Вероятная причина:",
+      "options": [
+        "Несколько задач пишут в UART без синхронизации",
+        "Слишком частый heartbeat",
+        "Неверный CRC_EXTRA",
+        "Подпись"
+      ],
+      "answer": 0,
+      "explain": "Нужна одна задача-отправитель или мьютекс."
+    },
+    {
+      "q": "Какой уровень теста доказывает, что автопилот использует данные компонента?",
+      "options": [
+        "SITL с проверкой по логу (RFND)",
+        "Юнит-тест упаковки",
+        "Тест на фейковом аппарате",
+        "Компиляция"
+      ],
+      "answer": 0,
+      "explain": "Только он проверяет согласование параметров и сообщения."
+    },
+    {
+      "q": "2D-лидар для обхода препятствий отправляет:",
+      "options": [
+        "OBSTACLE_DISTANCE",
+        "DISTANCE_SENSOR с ориентацией вниз",
+        "ODOMETRY",
+        "GPS_INPUT"
+      ],
+      "answer": 0,
+      "explain": "72 сектора → proximity (PRX1_TYPE = 2)."
+    }
+  ]
+}

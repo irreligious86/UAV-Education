@@ -916,7 +916,9 @@ def task_count(module_id: str) -> int:
     return len(json.loads(p.read_text(encoding="utf-8")).get("tasks", []))
 
 
-def _fmt_num(v: float) -> str:
+def _fmt_num(v) -> str:
+    if isinstance(v, str):
+        return v
     if abs(v - round(v)) < 1e-9:
         return str(int(round(v)))
     return f"{v:.4g}".rstrip("0").rstrip(".")

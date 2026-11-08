@@ -1,0 +1,94 @@
+{
+  "module": "mav-services",
+  "pass": 80,
+  "questions": [
+    {
+      "q": "PARAM_SET подтверждается:",
+      "options": [
+        "Эхом PARAM_VALUE с новым значением",
+        "PARAM_ACK",
+        "COMMAND_ACK",
+        "Ничем"
+      ],
+      "answer": 0,
+      "explain": "Отдельного ACK нет; эхо со старым значением = отказ."
+    },
+    {
+      "q": "При повторе COMMAND_LONG после потери ACK протокол требует:",
+      "options": [
+        "Увеличить поле confirmation",
+        "Сменить sysid",
+        "Отправить COMMAND_INT",
+        "Ничего"
+      ],
+      "answer": 0,
+      "explain": "Получатель может отличить повтор."
+    },
+    {
+      "q": "COMMAND_ACK с result IN_PROGRESS означает:",
+      "options": [
+        "Долгая команда выполняется, ждать финального ACK",
+        "Отказ",
+        "Команда не поддерживается",
+        "Повторить немедленно"
+      ],
+      "answer": 0,
+      "explain": "Поле progress показывает ход."
+    },
+    {
+      "q": "Кто повторяет запрос при потере пункта при загрузке миссии?",
+      "options": [
+        "Принимающая сторона (аппарат) — повторным MISSION_REQUEST_INT",
+        "Отправитель шлёт все пункты заново",
+        "Никто",
+        "GCS шлёт MISSION_ACK"
+      ],
+      "answer": 0,
+      "explain": "Инициатива у получателя; отправитель отвечает на каждый запрос."
+    },
+    {
+      "q": "mission_type = 1 — это:",
+      "options": [
+        "Геозона",
+        "Маршрут",
+        "Точки сбора",
+        "Все сразу"
+      ],
+      "answer": 0,
+      "explain": "0 — маршрут, 1 — fence, 2 — rally, 255 — все."
+    },
+    {
+      "q": "Почему MISSION_ITEM_INT лучше MISSION_ITEM?",
+      "options": [
+        "Целые координаты ×10⁷ не теряют точность",
+        "Он короче",
+        "Он подписан",
+        "Он быстрее обрабатывается"
+      ],
+      "answer": 0,
+      "explain": "float даёт ошибку порядка метра на широте."
+    },
+    {
+      "q": "Попросить ATTITUDE с частотой 50 Гц:",
+      "options": [
+        "MAV_CMD_SET_MESSAGE_INTERVAL с интервалом 20000 мкс",
+        "PARAM_SET SR_ATT=50",
+        "REQUEST_DATA_STREAM в любом случае",
+        "Нельзя"
+      ],
+      "answer": 0,
+      "explain": "param2 — интервал в микросекундах."
+    },
+    {
+      "q": "ArduPilot и PX4 по-разному упаковывают целые параметры в float. Где это видно клиенту?",
+      "options": [
+        "В AUTOPILOT_VERSION.capabilities (C_CAST или BYTEWISE)",
+        "В HEARTBEAT",
+        "В PARAM_VALUE.param_count",
+        "Нигде"
+      ],
+      "answer": 0,
+      "explain": "Флаги MAV_PROTOCOL_CAPABILITY_PARAM_ENCODE_*."
+    }
+  ]
+}

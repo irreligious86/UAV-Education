@@ -1959,6 +1959,149 @@
           "article": "comp-mavlink"
         },
         {
+          "id": "mav-protocol",
+          "title": "MAVLink изнутри: кадр, CRC, диалекты, подпись",
+          "level": "L3",
+          "hours": 4,
+          "prerequisites": [
+            "comp-mavlink"
+          ],
+          "objectives": [
+            "размечать кадр MAVLink 2 побайтно и проверять CRC с CRC_EXTRA",
+            "объяснять обрезку нулей, порядок полей и extension-поля",
+            "собирать свой диалект mavgen-ом",
+            "объяснять, от чего защищает подпись"
+          ],
+          "lab": {
+            "title": "Декодер кадра и свой диалект",
+            "criteria": [
+              "Тесты tests/test_protocol.py проходят",
+              "Кадр размечен вручную, эффект порчи байта показан",
+              "Свой диалект сгенерирован, сообщение принято вторым скриптом",
+              "Счётчик потерь по seq совпал с заданными 20 %"
+            ]
+          },
+          "stacks": [
+            "companion"
+          ],
+          "article": "mav-protocol"
+        },
+        {
+          "id": "mav-services",
+          "title": "Микросервисы MAVLink: команды, параметры, миссии, потоки",
+          "level": "L3",
+          "hours": 5,
+          "prerequisites": [
+            "mav-protocol",
+            "ap-missions"
+          ],
+          "objectives": [
+            "реализовывать команды с ACK, повторами и confirmation",
+            "записывать параметры с проверкой эха и понимать упаковку типов",
+            "реализовывать загрузку и скачивание миссий с повторами",
+            "управлять частотой потоков и считать бюджет канала"
+          ],
+          "lab": {
+            "title": "Клиент миссий с повторами",
+            "criteria": [
+              "Свой клиент миссий проходит тесты при 25 % потерь",
+              "Отказ MISSION_ACK вызывает исключение (свой тест)",
+              "Миссия и геозона совпадают после скачивания в SITL",
+              "Объяснена упаковка параметров C-cast и bytewise"
+            ]
+          },
+          "stacks": [
+            "companion"
+          ],
+          "article": "mav-services"
+        },
+        {
+          "id": "mav-routing",
+          "title": "Маршрутизация и транспорт MAVLink: радио, 4G, несколько GCS",
+          "level": "L3",
+          "hours": 4,
+          "prerequisites": [
+            "mav-services",
+            "comp-raspberry"
+          ],
+          "objectives": [
+            "формулировать правила пересылки по sysid/compid",
+            "выбирать транспорт и решать NAT для 4G",
+            "измерять RTT, потери и джиттер под netem",
+            "рисовать топологию системы с адресами и защитой"
+          ],
+          "lab": {
+            "title": "Роутер и измерения канала",
+            "criteria": [
+              "Роутер обслуживает три клиента; эффект heartbeat скрипта показан",
+              "Графики RTT и потерь для трёх сценариев netem",
+              "Показан эффект TCP на задержку телеметрии",
+              "Схема топологии своей системы"
+            ]
+          },
+          "stacks": [
+            "companion"
+          ],
+          "article": "mav-routing"
+        },
+        {
+          "id": "mav-component",
+          "title": "Свой компонент MAVLink: датчик, параметры, сообщения",
+          "level": "L3",
+          "hours": 5,
+          "prerequisites": [
+            "mav-routing",
+            "comp-esp32"
+          ],
+          "objectives": [
+            "реализовывать обязанности компонента: heartbeat, ответы, параметры",
+            "публиковать DISTANCE_SENSOR и настраивать ArduPilot на него",
+            "тестировать компонент на трёх уровнях",
+            "переносить компонент на ESP32"
+          ],
+          "lab": {
+            "title": "Виртуальный дальномер",
+            "criteria": [
+              "Тесты tests/test_component.py проходят",
+              "SITL использует дальномер (RFND в логе), отключение обнаруживается",
+              "Параметр компонента виден и меняется из GCS",
+              "ESP32-версия шлёт heartbeat и DISTANCE_SENSOR"
+            ]
+          },
+          "stacks": [
+            "companion"
+          ],
+          "article": "mav-component"
+        },
+        {
+          "id": "mav-sdk",
+          "title": "Библиотеки над MAVLink: pymavlink, MAVSDK, MAVROS",
+          "level": "L3",
+          "hours": 4,
+          "prerequisites": [
+            "mav-services"
+          ],
+          "objectives": [
+            "выбирать слой под задачу и объяснять выбор",
+            "писать асинхронный код MAVSDK с таймаутами",
+            "управлять в Offboard/GUIDED и знать таймауты уставок",
+            "проверять поведение при обрыве связи и смерти скрипта"
+          ],
+          "lab": {
+            "title": "MAVSDK: миссия, offboard, обрыв",
+            "criteria": [
+              "Сравнены tlog pymavlink и MAVSDK для одной миссии",
+              "Миссия с прогрессом, таймаутами и CSV-телеметрией",
+              "Offboard-квадрат и реакция автопилота на убитый скрипт",
+              "Сценарий обрыва канала с восстановлением скрипта"
+            ]
+          },
+          "stacks": [
+            "companion"
+          ],
+          "article": "mav-sdk"
+        },
+        {
           "id": "comp-esp32",
           "title": "ESP32 и периферия",
           "level": "L2",
@@ -2867,6 +3010,11 @@
           "modules": [
             "comp-intro",
             "comp-mavlink",
+            "mav-protocol",
+            "mav-services",
+            "mav-routing",
+            "mav-component",
+            "mav-sdk",
             "emb-basics",
             "emb-protocols",
             "comp-raspberry",
@@ -2931,6 +3079,16 @@
             "px4-ros2",
             "px4-companion-jetson",
             "eng-ci-configs"
+          ]
+        },
+        {
+          "title": "MAVLink",
+          "modules": [
+            "mav-protocol",
+            "mav-services",
+            "mav-routing",
+            "mav-component",
+            "mav-sdk"
           ]
         },
         {

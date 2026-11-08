@@ -156,7 +156,7 @@ Totals: +19 modules, 12 projects, ~120 diagrams, 4 Docker environments, a task s
 | 1 ✅ | diagram infrastructure (`{{diagram}}`, standard, CI check) + 25 diagrams on key existing modules | diagrams on all pillar modules of tracks 0–3 |
 | 2 ✅ | numeric task system + 31 tasks in 14 calculation modules; grading 30/30/40 (`docs/TASKS.md`) | tasks count in progress |
 | 3 ✅ | mathematics elective (3 modules, 9 tasks, 3 diagrams) + `pages/prerequisites.html` with a 10-task entry test; stage "Математика" in the ArduPilot and PX4 paths | prerequisites wired in curriculum |
-| 4 | MAVLink mini-course (5) + `examples/mavlink/` with pytest | all labs pass in SITL in CI |
+| 4 ✅ | MAVLink mini-course (5 modules, 3 sequence/topology diagrams) + `examples/mavlink/` with 12 pytest tests against a lossy fake vehicle (CI; SITL steps are in the labs) | labs autotested in CI |
 | 5 | ROS 2 Docker environment + ROS 2 modules 1–3 | `docker compose up` → flight in Gazebo |
 | 6 | ROS 2 modules 4–6 + projects #1, #3, #10 | projects with autotests |
 | 7 | Perception +5 modules, lab data, projects #4, #5, #7 | labs without a drone |

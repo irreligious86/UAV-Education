@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Библиотеки над MAVLink: pymavlink, MAVSDK, MAVROS — что и когда — UAV Student</title>
+  <meta name="description" content="выбирать слой под задачу и объяснять выбор писать асинхронный код MAVSDK с таймаутами управлять в Offboard/GUIDED и знать таймауты уставок проверять поведение при обрыве связи и смерти скрипта">
+  <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#0b0f14">
+  <link rel="stylesheet" href="../lib/ground-control-ui/dist/ground-control.css">
+  <link rel="stylesheet" href="../assets/site.css">
+  <script src="../lib/ground-control-ui/dist/ground-control.js" defer></script>
+  <script src="../assets/progress-store.js" defer></script>
+  <script src="../assets/grading.js" defer></script>
+  <script src="../assets/app.js" defer></script>
+  <script src="../assets/uav-quiz.js" defer></script>
+  <script src="../assets/uav-tasks.js" defer></script>
+  <script src="../assets/offline.js" defer></script>
+</head>
+<body class="gc-root" data-base="../">
+  <header class="site-header">
+    <div class="gc-container site-header__inner">
+      <a class="site-brand" href="../index.html"><span class="site-brand__mark" aria-hidden="true">◆</span> UAV Student</a>
+      <nav class="gc-nav" aria-label="Разделы сайта">
+        <a href="../index.html" aria-current="page">Курс</a>
+        <a href="../ref/index.html">Справочник</a>
+        <a href="../pages/glossary.html">Глоссарий</a>
+        <a href="../pages/fails.html">Фейлы</a>
+        <a href="../pages/search.html">Поиск</a>
+        <a href="../pages/progress.html">Мой прогресс</a>
+      </nav>
+    </div>
+  </header>
+  <main class="gc-container site-main">
+    <article class="module" data-module-page="mav-sdk">
+      <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-engineer">Инженер: код на борту</a><span>Библиотеки над MAVLink: pymavlink, MAVSDK, MAVROS — что и когда</span></p>
+      <h1 class="module-title">Библиотеки над MAVLink: pymavlink, MAVSDK, MAVROS — что и когда</h1>
+      <div class="module-tags"><span class="gc-tag" title="Уровень">L3 — Специалист</span><span class="gc-tag">чтение 40 мин</span><span class="gc-tag">учёба ~4 ч</span><span class="gc-tag">ArduPilot · PX4</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ОСВОЕН</span></div>
+      <p class="gc-muted module-score" data-module-score></p>
+      <p class="module-lead">После четырёх модулей «по проводу» можно выбирать инструмент осознанно. pymavlink — прямой доступ к каждому сообщению; MAVSDK — готовые действия (<code>arm</code>, <code>takeoff</code>, <code>mission.upload</code>, offboard) поверх тех же микросервисов, асинхронный API и сервер на C++; MAVROS — мост MAVLink ↔ ROS; DroneKit — исторический, не поддерживается. Модуль сравнивает их по слоям, показывает одну и ту же миссию в pymavlink и MAVSDK, разбирает асинхронную модель MAVSDK (подписки, отмена, таймауты) и что происходит при обрыве связи на каждом уровне. Лабораторная: миссия и offboard-полёт через MAVSDK в SITL с проверкой поведения при разрыве канала.</p>
+      <div class="gc-callout" data-state="ok"><strong>После модуля ты умеешь</strong><ul><li>выбирать слой под задачу и объяснять выбор</li><li>писать асинхронный код MAVSDK с таймаутами</li><li>управлять в Offboard/GUIDED и знать таймауты уставок</li><li>проверять поведение при обрыве связи и смерти скрипта</li></ul></div><p class="gc-muted">Перед этим модулем: <a href="mav-services.html">Микросервисы MAVLink: команды, параметры, миссии, потоки</a></p><div class="gc-callout lab"><p class="gc-label gc-muted">Лабораторная</p><strong>MAVSDK: миссия, offboard, обрыв</strong><p class="gc-muted lab__hint">Сдано, когда отмечены все пункты:</p><ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="mav-sdk:lab:0"><span>Сравнены tlog pymavlink и MAVSDK для одной миссии</span></label></li><li><label><input type="checkbox" data-check-id="mav-sdk:lab:1"><span>Миссия с прогрессом, таймаутами и CSV-телеметрией</span></label></li><li><label><input type="checkbox" data-check-id="mav-sdk:lab:2"><span>Offboard-квадрат и реакция автопилота на убитый скрипт</span></label></li><li><label><input type="checkbox" data-check-id="mav-sdk:lab:3"><span>Сценарий обрыва канала с восстановлением скрипта</span></label></li></ul></div><div class="path-pos gc-muted"><span class="gc-label">В пути</span><ul><li data-path-pos="ardupilot"><a href="../path/ardupilot.html">ArduPilot</a>: шаг 50 из 62 → <a href="emb-basics.html?path=ardupilot">Embedded: прерывания, таймеры, DMA, RTOS</a></li><li data-path-pos="px4"><a href="../path/px4.html">PX4</a>: шаг 24 из 27 → <a href="per-camera.html?path=px4">Камеры и видеопоток на companion</a></li></ul></div>
+      <div class="gc-prose module-body">
+<h2>Теория</h2>
+<h4 class="md-subheading">Слои</h4>
+<p>| Слой | Что даёт | Чего не даёт | Когда брать | |---|---|---|---| | Сырой протокол (mav-protocol) | всё | ничего готового | драйвер на МК, свой диалект, отладка | | <strong>pymavlink</strong> | кодек, соединения, <code>recv_match</code>, tlog | логику диалогов (миссии, ACK, повторы — сами) | скрипты, анализ логов, тесты, нестандартные сообщения | | <strong>MAVSDK</strong> (C++, Python, …) | действия и микросервисы: action, telemetry, mission, offboard, param, ftp, camera, gimbal | экзотические сообщения прошивки (через <code>mavlink_passthrough</code> можно) | приложения на companion, автотесты полётов | | <strong>MAVROS</strong> | MAVLink ↔ топики/сервисы ROS 1/2, TF, setpoints | ROS-независимость; накладные расходы | система на ROS с ArduPilot; PX4 + ROS 2 — предпочтительно uXRCE-DDS (модуль px4-ros2) | | DroneKit-Python | — | не развивается, проблемы с современным Python и прошивками | только чтение старого кода |</p>
+<p>Все верхние слои реализуют те же диалоги, что вы писали руками: <code>mission.upload_mission()</code> внутри — это MISSION_COUNT/REQUEST_INT/ITEM_INT/ACK с повторами. Понимание нижнего слоя нужно, чтобы читать tlog, когда верхний слой говорит «timeout».</p>
+<h4 class="md-subheading">MAVSDK: как устроен</h4>
+<p>MAVSDK — C++-ядро; Python-пакет <code>mavsdk</code> запускает встроенный <code>mavsdk_server</code> (gRPC) и общается с ним. Отсюда: (1) API асинхронный (<code>asyncio</code>); (2) потоки телеметрии — асинхронные генераторы; (3) ошибки — исключения с кодом результата плагина (<code>ActionError</code>, <code>MissionError</code>) — тот же смысл, что <code>MAV_RESULT</code>.</p>
+<pre class="cli-block"><code>import asyncio
+from mavsdk import System
+from mavsdk.mission import MissionItem, MissionPlan
+
+async def main():
+    drone = System()
+    await drone.connect(system_address=&quot;udpin://0.0.0.0:14540&quot;)    # older releases: &quot;udp://:14540&quot;
+    async for state in drone.core.connection_state():
+        if state.is_connected:
+            break
+    async for health in drone.telemetry.health():
+        if health.is_global_position_ok and health.is_home_position_ok:
+            break
+    items = [MissionItem(lat, lon, 20, 5, True, float(&quot;nan&quot;), float(&quot;nan&quot;),
+                         MissionItem.CameraAction.NONE, float(&quot;nan&quot;), float(&quot;nan&quot;),
+                         float(&quot;nan&quot;), float(&quot;nan&quot;), float(&quot;nan&quot;), MissionItem.VehicleAction.NONE)
+             for lat, lon in [(47.3978, 8.5456), (47.3982, 8.5460), (47.3980, 8.5465)]]
+    await drone.mission.upload_mission(MissionPlan(items))
+    await drone.action.arm()
+    await drone.mission.start_mission()
+    async for p in drone.mission.mission_progress():
+        print(f&quot;{p.current}/{p.total}&quot;)
+        if p.current == p.total:
+            break
+    await drone.action.return_to_launch()
+
+asyncio.run(main())</code></pre>
+<p>Конструктор <code>MissionItem</code> меняется между версиями MAVSDK (добавляются поля) — сверяйтесь с документацией установленной версии; это нормальная плата за высокий уровень.</p>
+<h4 class="md-subheading">Асинхронность без сюрпризов</h4>
+<ul><li><strong>Подписки бесконечны</strong>: <code>async for x in telemetry.position()</code> не закончится сам. Выход — <code>break</code> по условию или отдельная задача с отменой.</li><li><strong>Таймауты — ваши</strong>: «ждать, пока GPS ok» без <code>asyncio.wait_for(..., timeout)</code> зависнет навсегда на аппарате без GPS.</li><li><strong>Параллельные задачи</strong>: телеметрия, логирование и управление — отдельные <code>asyncio.create_task</code>; ошибка в задаче без <code>await</code> её результата теряется молча.</li><li><strong>Одна система — один владелец</strong>: два процесса с MAVSDK на одном порту — два mavsdk_server с одинаковыми идентификаторами; разведите их роутером и разными compid.</li></ul>
+<h4 class="md-subheading">Offboard и GUIDED</h4>
+<p>Высокоуровневое управление с companion: в PX4 — режим Offboard (MAVSDK <code>offboard.set_velocity_ned(...)</code>, затем <code>offboard.start()</code>; уставки нужно слать непрерывно &gt; 2 Гц, иначе PX4 выйдет из Offboard по таймауту), в ArduPilot — GUIDED с <code>SET_POSITION_TARGET_LOCAL_NED</code> (MAVSDK offboard тоже работает с ArduPilot через те же сообщения; поддержка набора полей может отличаться). Правило безопасности из модуля comp-intro: companion советует, автопилот решает; при молчании companion аппарат обязан перейти в безопасное поведение сам — это проверяется тестом, а не верой.</p>
+<h4 class="md-subheading">Что происходит при обрыве связи</h4>
+<p>| Уровень | Поведение | |---|---| | pymavlink | <code>recv_match</code> возвращает None по таймауту; решение — ваше | | MAVSDK | <code>connection_state</code> → <code>is_connected = False</code> (по пропаже heartbeat, ~3 с); действия завершаются ошибкой; offboard-уставки не доходят | | Автопилот | GCS failsafe (если включён и связь с GCS), выход из Offboard/GUIDED по таймауту уставок (PX4 <code>COM_OF_LOSS_T</code>, ArduPilot — <code>GUID_TIMEOUT</code> для уставок скорости/ускорения) |</p>
+<p>Проектируйте так, чтобы безопасность обеспечивал нижний уровень (автопилот), а верхний — только восстанавливал работу.</p>
+
+<h2>Практика</h2>
+<h4 class="md-subheading">Шаг 1. Одна миссия, два инструмента</h4>
+<p>Загрузите одну и ту же миссию из 5 точек в PX4 SITL (или ArduPilot SITL) дважды: своим клиентом из mav-services (pymavlink) и через MAVSDK. Запишите tlog обоих сеансов (MAVProxy или mavlink-router) и сравните последовательности сообщений: что MAVSDK шлёт дополнительно (запросы версий, интервалы, <code>MISSION_CLEAR_ALL</code>)?</p>
+<h4 class="md-subheading">Шаг 2. Полёт по миссии с прогрессом</h4>
+<p>Скрипт выше: арм, миссия, прогресс, RTL. Добавьте таймауты на каждом ожидании и запись CSV телеметрии в отдельной задаче.</p>
+<h4 class="md-subheading">Шаг 3. Offboard-квадрат</h4>
+<p>Скорости NED по 5 с в четыре стороны в Offboard (PX4) или GUIDED (ArduPilot). Затем «убейте» скрипт посреди квадрата (<code>kill -9</code>) и зафиксируйте по логу, через сколько и в какой режим перешёл автопилот. Сравните со значением параметра таймаута.</p>
+<h4 class="md-subheading">Шаг 4. Обрыв канала</h4>
+<p>Между SITL и скриптом поставьте <code>tc netem loss 100%</code> на 5 с во время миссии. Что сделал MAVSDK (<code>connection_state</code>), что сделал автопилот, восстановился ли скрипт после возврата связи без перезапуска? Доработайте скрипт, чтобы восстанавливался.</p>
+<p>Лабораторная засчитывается, когда есть сравнение tlog двух клиентов, миссия с прогрессом и таймаутами, offboard-квадрат с тестом «убитого» скрипта и сценарий обрыва с восстановлением.</p>
+
+<h2>Диагностика</h2>
+<div class="diag-groups"><article class="diag-item"><h4><strong>Симптом:</strong> скрипт MAVSDK висит на старте</h4><ul><li>Возможная причина: ожидание <code>health</code> без таймаута на аппарате без GPS/home; не тот адрес подключения (udpin против udpout, версия синтаксиса).</li><li>Что сделать: <code>asyncio.wait_for</code>; проверить адрес и версию MAVSDK.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> PX4 сразу выходит из Offboard</h4><ul><li>Возможная причина: уставки не шли до <code>offboard.start()</code> или идут реже 2 Гц.</li><li>Что сделать: отправить начальную уставку до старта; отдельная задача с частотой 10–20 Гц.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> <code>upload_mission</code> иногда падает с timeout по радио</h4><ul><li>Возможная причина: потери на медленном канале, мало повторов по умолчанию.</li><li>Что сделать: загружать по быстрому каналу/через companion; смотреть tlog — какой пункт потерян.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> два скрипта мешают друг другу</h4><ul><li>Возможная причина: оба занимают один порт или один compid.</li><li>Что сделать: роутер с отдельными endpoints, разные compid.</li></ul></article></div>
+
+<h2>Чек-лист</h2>
+<ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="mav-sdk:0"><span>Выбираю слой (сырой протокол, pymavlink, MAVSDK, MAVROS) под задачу и объясняю почему</span></label></li><li><label><input type="checkbox" data-check-id="mav-sdk:1"><span>Понимаю архитектуру MAVSDK (сервер, gRPC, async) и где искать ошибку</span></label></li><li><label><input type="checkbox" data-check-id="mav-sdk:2"><span>Пишу асинхронный код с таймаутами и отменой задач</span></label></li><li><label><input type="checkbox" data-check-id="mav-sdk:3"><span>Управляю в Offboard/GUIDED и знаю таймауты уставок</span></label></li><li><label><input type="checkbox" data-check-id="mav-sdk:4"><span>Проверяю поведение системы при обрыве связи и «смерти» скрипта</span></label></li></ul>
+
+<h2>Источники</h2>
+<ul class="refs"><li><a href="https://mavsdk.mavlink.io/main/en/" target="_blank" rel="noopener noreferrer">MAVSDK — Guide and Python API</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://github.com/mavlink/MAVSDK-Python" target="_blank" rel="noopener noreferrer">MAVSDK-Python (source, examples)</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://github.com/mavlink/mavros" target="_blank" rel="noopener noreferrer">MAVROS</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://docs.px4.io/main/en/flight_modes/offboard.html" target="_blank" rel="noopener noreferrer">PX4 — Offboard mode (timeouts, COM_OF_LOSS_T)</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://ardupilot.org/dev/docs/copter-commands-in-guided-mode.html" target="_blank" rel="noopener noreferrer">ArduPilot — Copter commands in Guided mode</a> <span class="gc-tag" data-state="info">primary</span></li></ul>
+<h2>Проверь себя</h2>
+<uav-quiz src="../quiz/mav-sdk.json" module="mav-sdk"></uav-quiz>
+      </div>
+      <div class="module-done"><gc-button variant="secondary" data-done-toggle="mav-sdk">Отметить как пройденный</gc-button></div>
+      <section class="related" aria-label="Смежные модули"><p class="gc-label gc-muted">Смежные модули</p><div class="gc-grid ref-grid"><a class="gc-card" href="mav-services.html"><strong>Микросервисы MAVLink: команды, параметры, миссии, потоки</strong><div class="gc-card__meta"><span class="gc-tag" title="L3 — Специалист">L3</span></div></a><a class="gc-card" href="px4-ros2.html"><strong>PX4 и ROS 2: uXRCE-DDS и offboard</strong><div class="gc-card__meta"><span class="gc-tag" title="L4 — Эксперт">L4</span></div></a><a class="gc-card" href="ap-companion.html"><strong>Companion + ArduPilot: управление из кода</strong><div class="gc-card__meta"><span class="gc-tag" title="L3 — Специалист">L3</span></div></a></div></section>
+      <nav class="pager" aria-label="Соседние модули" data-track-pager><a class="gc-card pager__prev" href="mav-component.html"><span class="gc-label gc-muted">Назад · трек</span><br>Свой компонент MAVLink: датчик, параметры, сообщения</a><a class="gc-card pager__next" href="comp-esp32.html"><span class="gc-label gc-muted">Дальше · трек</span><br>ESP32 и периферия</a></nav><nav class="pager" aria-label="Соседние шаги пути ArduPilot" data-path-pager="ardupilot" hidden><a class="gc-card pager__prev" href="mav-component.html?path=ardupilot"><span class="gc-label gc-muted">Назад · путь ArduPilot</span><br>Свой компонент MAVLink: датчик, параметры, сообщения</a><a class="gc-card pager__next" href="emb-basics.html?path=ardupilot"><span class="gc-label gc-muted">Дальше · шаг 51 из 62</span><br>Embedded: прерывания, таймеры, DMA, RTOS</a></nav><nav class="pager" aria-label="Соседние шаги пути PX4" data-path-pager="px4" hidden><a class="gc-card pager__prev" href="mav-component.html?path=px4"><span class="gc-label gc-muted">Назад · путь PX4</span><br>Свой компонент MAVLink: датчик, параметры, сообщения</a><a class="gc-card pager__next" href="per-camera.html?path=px4"><span class="gc-label gc-muted">Дальше · шаг 25 из 27</span><br>Камеры и видеопоток на companion</a></nav>
+    </article>
+  </main>
+  <footer class="gc-container site-footer gc-muted">
+    <p>Открытый курс · <a href="https://github.com/irreligious86/UAV-Education">исходники на GitHub</a> · <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">план развития</a> · <a href="../curriculum/curriculum.html">для разработчика</a> · CC BY-NC-SA 4.0</p>
+  </footer>
+</body>
+</html>

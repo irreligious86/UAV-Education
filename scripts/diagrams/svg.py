@@ -228,3 +228,36 @@ def tree(title: str, root: Node, width: int = 720, box_w: int = 150, box_h: int 
     place(root, 0, 10)
     h = 34 + (depth_max[0] + 1) * gap_y + 10
     return svg(width, h, title, text(16, 16, title, "m t", "start") + "".join(out))
+
+
+# ---------------------------------------------------------------- sequence
+def sequence(title: str, actors: list[str], steps: list[tuple], width: int = 720, step_h: int = 30, notes: list[tuple] = ()) -> str:
+    """Message sequence chart. steps: (from_idx, to_idx, label, accent=False, dashed=False);
+    a step with from == to is drawn as a note on that lifeline. notes: (step_index, text) on the right margin."""
+    n = len(actors)
+    margin, right = 80, 250          # right margin is reserved for notes
+    xs = [margin + i * (width - margin - right) / max(1, n - 1) for i in range(n)]
+    top = 40
+    h = top + 30 + len(steps) * step_h + 20
+    out = [text(16, 16, title, "m t", "start")]
+    for x, a in zip(xs, actors):
+        out.append(f'<rect class="box" x="{x - 60:.1f}" y="{top - 14}" width="120" height="26" rx="5"/>')
+        out.append(text(x, top + 3, a, "b", size=11))
+        out.append(f'<line class="lnm" x1="{x:.1f}" y1="{top + 12}" x2="{x:.1f}" y2="{h - 10}"/>')
+    for i, st in enumerate(steps):
+        a, b, label = st[0], st[1], st[2]
+        acc = st[3] if len(st) > 3 else False
+        dashed = st[4] if len(st) > 4 else False
+        y = top + 34 + i * step_h
+        if a == b:
+            mid = (xs[0] + xs[-1]) / 2
+            out.append(text(mid, y + 4, "— " + label + " —", "w t", size=10))
+            continue
+        x1, x2 = xs[a], xs[b]
+        x2e = x2 - 4 if x2 > x1 else x2 + 4
+        style = ' style="stroke-dasharray:5 4"' if dashed else ""
+        out.append(f'<path class="{"lna" if acc else "ln"}"{style} d="M{x1:.1f} {y} L{x2e:.1f} {y}" marker-end="url(#{"ara" if acc else "ar"})"/>')
+        out.append(text((x1 + x2) / 2, y - 5, label, "a t" if acc else "t", size=10))
+    for (i, s) in notes:
+        out.append(text(width - 16, top + 34 + i * step_h + 4, s, "m t", "end", size=10))
+    return svg(width, h, title, "".join(out))

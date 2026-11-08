@@ -91,7 +91,7 @@ Priority: a well-structured learning program.
 **Course Plan v3 phases 1–7 complete: all 84 modules written** (8 tracks in 4 stages + INAV/PX4 electives), 84 quizzes, labs with criteria on every module, 8 capstones with good/bad rubrics and an engineering-folder deliverable, 116 glossary terms, 47 formulas, 6 interactive widgets, starter repositories in `examples/`. Every pre-v3 module went through a depth pass (mechanisms, numbers, worked examples, extended diagnostics, source-verified parameter names).
 Remaining content work: owner review and first-student feedback (Phase C).
 
-**Stage 2 (`docs/COURSE-PLAN-STAGE2.md`) in progress:** iteration 1 — SVG diagram system (`{{diagram:id|caption}}`, 22 diagrams, `docs/DIAGRAMS.md`); iteration 2 — numeric tasks with auto-check (`content/tasks/`, grading 30/30/40, `docs/TASKS.md`); iteration 3 — elective "Математический фундамент" (3 modules, stage "Математика" in the ArduPilot and PX4 paths) and `pages/prerequisites.html` with a 10-task entry test. Next: iteration 4 (MAVLink mini-course + `examples/mavlink/`).
+**Stage 2 (`docs/COURSE-PLAN-STAGE2.md`) in progress:** iteration 1 — SVG diagram system (`{{diagram:id|caption}}`, 22 diagrams, `docs/DIAGRAMS.md`); iteration 2 — numeric tasks with auto-check (`content/tasks/`, grading 30/30/40, `docs/TASKS.md`); iteration 3 — elective "Математический фундамент" (3 modules, stage "Математика" in the ArduPilot and PX4 paths) and `pages/prerequisites.html` with a 10-task entry test. Iteration 4 — MAVLink mini-course (mav-protocol, mav-services, mav-routing, mav-component, mav-sdk) with `examples/mavlink/` autotests. Next: iteration 5 (ROS 2 environment and modules 1–3).
 
 ## Phase 3 — Interactivity
 

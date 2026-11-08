@@ -1,0 +1,94 @@
+{
+  "module": "mav-sdk",
+  "pass": 80,
+  "questions": [
+    {
+      "q": "MAVSDK-Python внутри:",
+      "options": [
+        "Запускает mavsdk_server (C++) и общается с ним по gRPC",
+        "Чистый Python поверх pymavlink",
+        "Обёртка MAVROS",
+        "Обёртка DroneKit"
+      ],
+      "answer": 0,
+      "explain": "Отсюда async API и исключения с кодами плагинов."
+    },
+    {
+      "q": "`async for x in drone.telemetry.position()`:",
+      "options": [
+        "Не завершается сам — нужен break или отмена задачи",
+        "Возвращает одно значение",
+        "Завершается через 1 с",
+        "Блокирует event loop"
+      ],
+      "answer": 0,
+      "explain": "Подписки бесконечны."
+    },
+    {
+      "q": "PX4 выходит из Offboard сразу после старта. Причина:",
+      "options": [
+        "Уставки не шли до start или идут реже 2 Гц",
+        "Нет GPS",
+        "Неверный sysid",
+        "Подпись"
+      ],
+      "answer": 0,
+      "explain": "Нужна начальная уставка и непрерывный поток."
+    },
+    {
+      "q": "DroneKit-Python в 2026:",
+      "options": [
+        "Не поддерживается, только для чтения старого кода",
+        "Рекомендуемый для PX4",
+        "Замена MAVSDK",
+        "Часть ArduPilot"
+      ],
+      "answer": 0,
+      "explain": "Проект не развивается."
+    },
+    {
+      "q": "Для PX4 + ROS 2 предпочтительный мост:",
+      "options": [
+        "uXRCE-DDS",
+        "DroneKit",
+        "MAVProxy",
+        "SiK"
+      ],
+      "answer": 0,
+      "explain": "MAVROS — для ArduPilot/ROS или особых случаев."
+    },
+    {
+      "q": "Кто должен обеспечивать безопасность при «смерти» скрипта на companion?",
+      "options": [
+        "Автопилот: таймауты уставок и failsafe",
+        "Скрипт: try/except",
+        "MAVSDK",
+        "GCS-оператор вручную"
+      ],
+      "answer": 0,
+      "explain": "Companion советует, автопилот решает."
+    },
+    {
+      "q": "Ожидание `health.is_global_position_ok` без таймаута на аппарате без GPS приведёт к:",
+      "options": [
+        "Вечному зависанию скрипта",
+        "Исключению",
+        "Автоматическому армингу",
+        "Ничему"
+      ],
+      "answer": 0,
+      "explain": "Оборачивайте ожидания в asyncio.wait_for."
+    },
+    {
+      "q": "mission.upload_mission() на проводе — это:",
+      "options": [
+        "Тот же диалог MISSION_COUNT/REQUEST_INT/ITEM_INT/ACK",
+        "Один большой пакет",
+        "MAVFTP",
+        "Свой протокол MAVSDK"
+      ],
+      "answer": 0,
+      "explain": "Верхние слои реализуют те же микросервисы."
+    }
+  ]
+}

@@ -28,6 +28,7 @@ work offline (PWA) and in both themes.
 | `frame(title, fields, width, unit, note)` | byte/bit layout of a protocol frame | field `(name, size, accent, sub)`; sqrt-scaled widths |
 | `timeline(title, lanes, t_max, width, unit, marks)` | timing / stage diagrams | lane `(name, [(t0, t1, label, accent)])` |
 | `tree(title, root, width, ...)` | decision trees | `Node(id, label|lines, [(edge_label, Node)], accent, leaf)` |
+| `sequence(title, actors, steps, width, notes)` | message sequence charts (protocol dialogues) | step `(from, to, label, accent, dashed)`; from == to → note |
 
 Rules enforced by `scripts/check_diagrams.py` (CI): well-formed XML, `<svg>` root with
 `viewBox` and `<title>`, no `<script>`, `<image>` or external `href`, ≤ 60 KB per file, every
@@ -59,5 +60,7 @@ Keep labels short (a box line ≈ 18 characters at 12 px) and check the render:
 | ekf-source-tree | tree | est-alt-sources |
 | component-choice-tree | tree | f-components-choice |
 | quad-forces, actuator-disk | hand SVG | f-physics, f-aero-props |
+
+Iteration 3–4 added: frames-rotations, pole-response, gaussian-fusion (math elective); mavlink-command-seq, mavlink-mission-seq, mavlink-topology (MAVLink).
 
 Planned additions are listed per iteration in `COURSE-PLAN-STAGE2.md`.

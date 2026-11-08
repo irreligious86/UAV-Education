@@ -10,7 +10,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from svg import Box, Node, flow, frame, timeline, tree  # noqa: E402
+from svg import Box, Node, flow, frame, sequence, timeline, tree  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[2]
 OUT = ROOT / "assets" / "diagrams"
@@ -269,6 +269,38 @@ def frames_rotations():
 D["gaussian-fusion"] = gaussian_fusion()
 D["pole-response"] = pole_response()
 D["frames-rotations"] = frames_rotations()
+
+
+# ---------------------------------------------------------------- MAVLink mini-course
+D["mavlink-mission-seq"] = sequence("Загрузка миссии (mission microservice): ведёт аппарат, клиент отвечает", ["GCS / клиент", "Автопилот"], [
+    (0, 1, "MISSION_COUNT (count = N, mission_type)", True),
+    (1, 0, "MISSION_REQUEST_INT seq = 0"),
+    (0, 1, "MISSION_ITEM_INT seq = 0"),
+    (1, 0, "MISSION_REQUEST_INT seq = 1"),
+    (0, 1, "MISSION_ITEM_INT seq = 1 — потерян", False, True),
+    (1, 1, "таймаут: повтор того же seq"),
+    (1, 0, "MISSION_REQUEST_INT seq = 1"),
+    (0, 1, "MISSION_ITEM_INT seq = 1 … N−1"),
+    (1, 0, "MISSION_ACK (ACCEPTED / ошибка)", True),
+], notes=[(0, "клиент объявляет размер"), (6, "повтор — забота запрашивающего"), (8, "без ACK миссии нет")])
+
+D["mavlink-command-seq"] = sequence("Команда с подтверждением: COMMAND_LONG → COMMAND_ACK", ["Клиент", "Автопилот"], [
+    (0, 1, "COMMAND_LONG cmd, confirmation = 0", True),
+    (0, 1, "ACK потерян: повтор, confirmation = 1", False, True),
+    (1, 0, "COMMAND_ACK IN_PROGRESS (progress = 40 %)"),
+    (1, 0, "COMMAND_ACK ACCEPTED", True),
+    (1, 1, "или DENIED / FAILED + STATUSTEXT"),
+], notes=[(1, "confirmation растёт при повторе"), (2, "долгие: калибровка, взлёт")])
+
+D["mavlink-topology"] = flow("Топология MAVLink: кто кого видит и куда идут пакеты", [
+    Box("gcs1", ["QGC оператора", "sys 255"], 10, 20, 130), Box("gcs2", ["Удалённая GCS", "sys 254, VPN"], 10, 120, 130),
+    Box("sik", ["SiK-радио", "57600, RADIO_STATUS"], 190, 20, 140), Box("lte", ["4G-модем", "UDP/TCP"], 190, 120, 140),
+    Box("cc", ["Companion", "mavlink-router"], 380, 120, 140, accent=True),
+    Box("fc", ["Автопилот", "sys 1, comp 1"], 570, 20, 140, accent=True),
+    Box("cam", ["Камера/гимбал", "sys 1, comp 100/154"], 570, 120, 140), Box("rf", ["Дальномер", "sys 1, comp 158"], 570, 200, 140)],
+    [("gcs1", "sik"), ("sik", "fc", "TELEM1"), ("gcs2", "lte"), ("lte", "cc"), ("cc", "fc", "TELEM2", True), ("cc", "cam"), ("cc", "rf")],
+    720, 300, notes=[(10, 270, "Автопилот пересылает пакеты между портами по таблице «где я видел sys/comp»;", "m t"),
+                     (10, 286, "широковещательные (target 0) — во все порты, кроме входного.", "m t")])
 
 
 def main() -> None:
