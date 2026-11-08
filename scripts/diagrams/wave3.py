@@ -205,3 +205,23 @@ def build(D: dict) -> None:
         hmarks=[(30 * (1 - math.exp(-1)), "63 % за τ", "m")],
         legend=[("τ = 0.3 с: резче, ближе к перерегулированию", "a", False), ("τ = 0.5 с: значение по умолчанию", "w", False),
                 ("τ = 0.8 с: мягко, для тяжёлых и медленных", "m", False)], legend_at=(330, 250))
+
+    # ------------------------------------------------------------ ops-weather
+    h = lin(0, 4000)
+    rho = lambda z: 1.225 * (1 - 2.25577e-5 * z) ** 4.2559
+    D["chart-density-altitude"] = chart(
+        "Плотностная высота: тяга на полном газу падает ∝ ρ, мощность висения растёт ∝ 1/√ρ",
+        [dict(name="", xs=h, ys=[100 * rho(z) / 1.225 for z in h], cls="w"),
+         dict(name="", xs=h, ys=[100 * math.sqrt(1.225 / rho(z)) for z in h], cls="a")],
+        Axis("плотностная высота, м", 0, 4000), Axis("% от уровня моря (МСА)", 60, 130),
+        marks=[(3025, "2000 м, +30 °C", "m")],
+        legend=[("максимальная тяга, %", "w", False), ("мощность висения, %", "a", False)], legend_at=(90, 250))
+
+    # wind profile (power law, open terrain) for the same module
+    z = lin(2, 150)
+    D["chart-wind-profile"] = chart(
+        "Ветер растёт с высотой: v(h) = v₁₀·(h/10)^α, открытая местность α ≈ 1/7",
+        [dict(name="", xs=[10 * (x / 10) ** (1 / 7) for x in z], ys=z, cls="a"),
+         dict(name="", xs=[10 * 1.4 * (x / 10) ** (1 / 7) for x in z], ys=z, cls="w", dash=True)],
+        Axis("скорость ветра, м/с (на 10 м — 10 м/с)", 0, 24), Axis("высота, м", 0, 150),
+        legend=[("средний ветер", "a", False), ("порывы ×1.4", "w", True)], legend_at=(90, 60))
