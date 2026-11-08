@@ -1,0 +1,38 @@
+# Weekly check of external reference URLs. Never blocks content changes: it only reports.
+name: external-links
+
+on:
+  schedule:
+    - cron: "17 4 * * 1"     # Mondays 04:17 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Check external links
+        run: |
+          python scripts/check_external_links.py --out link-report.md --json link-report.json
+          cat link-report.md >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: link-report
+          path: link-report.*
+      - name: Open or update the issue when links are dead
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if grep -q "^## Dead" link-report.md; then
+            n=$(gh issue list --label broken-links --state open --json number -q '.[0].number')
+            gh label create broken-links --color B60205 --description "External links found dead" 2>/dev/null || true
+            if [ -n "$n" ]; then gh issue edit "$n" --body-file link-report.md
+            else gh issue create --title "Dead external links" --label broken-links --body-file link-report.md; fi
+          fi
