@@ -177,6 +177,7 @@
     "per-camera",
     "per-cv",
     "per-tracking",
+    "per-edge-ml",
     "ros2-px4",
     "ros2-app-arch"
    ]
@@ -217,9 +218,9 @@
     "Код, параметры автопилота, отчёт по 10 посадкам"
    ],
    "modules": [
-    "per-camera",
+    "per-landing",
+    "per-geometry",
     "per-cv",
-    "math-linalg-rot",
     "mav-services",
     "ap-companion"
    ]
@@ -233,7 +234,7 @@
    "hours": 30,
    "summary": "Миссия вдоль линии (ЛЭП, трубопровод, забор), съёмка по расстоянию, автоматическая привязка кадров к координатам и отчёт с находками на карте.",
    "stack": [
-    "ArduPilot миссии, CAM_TRIGG_DIST",
+    "ArduPilot миссии, CAM1_TRIGG_DIST / DO_SET_CAM_TRIGG_DIST",
     "EXIF/XMP геотеги",
     "Python, Leaflet-отчёт"
    ],
@@ -242,7 +243,7 @@
    "diagram": "proj-inspection",
    "milestones": [
     "Генератор миссии вдоль полилинии с перекрытием",
-    "Съёмка по расстоянию, лог CAM",
+    "Съёмка по расстоянию, лог CAM с обратной связью затвора (CAM1_FEEDBAK_PIN)",
     "Сопоставление кадров с лог-записями CAM, запись геотегов",
     "Разметка находок и отчёт-карта",
     "Проверка точности привязки по контрольным точкам"
@@ -261,8 +262,9 @@
    "modules": [
     "ap-missions",
     "per-camera",
+    "per-mapping",
+    "per-geometry",
     "est-gnss",
-    "data-python",
     "ops-field"
    ]
   },
@@ -301,6 +303,7 @@
     "Отчёт с картами и таблицей точности"
    ],
    "modules": [
+    "per-mapping",
     "per-camera",
     "per-visual-nav",
     "est-gnss",

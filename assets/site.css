@@ -90,7 +90,8 @@
 .related { padding-top: var(--gc-space-6); }
 .related > * + * { margin-top: var(--gc-space-2); }
 
-.pager { display: grid; grid-template-columns: 1fr 1fr; gap: var(--gc-space-3); padding-top: var(--gc-space-6); }
+.pager { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--gc-space-3); padding-top: var(--gc-space-6); }
+.pager .gc-card, .gc-card strong { min-width: 0; overflow-wrap: anywhere; }
 .pager__next { grid-column: 2; text-align: right; }
 
 /* ---------- reference ---------- */

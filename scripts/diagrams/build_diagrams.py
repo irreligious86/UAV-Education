@@ -408,7 +408,7 @@ D["proj-precision-landing"] = _arch("Точная посадка: архитек
     [("cam", "aru"), ("aru", "tf"), ("tf", "lt", "", False, "v"), ("lt", "fc", "", True), ("aru", "lost", "", False, "v")])
 
 D["proj-inspection"] = _arch("Инспекция маршрута: архитектура",
-    [("line", ["Полилиния", "объекта"], False), ("gen", ["Генератор миссии", "перекрытие, высота"], True), ("fc", ["Автопилот", "CAM_TRIGG_DIST"], False), ("cam", ["Камера", "кадры"], False)],
+    [("line", ["Полилиния", "объекта"], False), ("gen", ["Генератор миссии", "перекрытие, высота"], True), ("fc", ["Автопилот", "CAM1_TRIGG_DIST"], False), ("cam", ["Камера", "кадры"], False)],
     [("log", ["Лог CAM", "время, координаты"], False, 2), ("geo", ["Привязка", "кадр ↔ CAM"], True, 3)],
     [("line", "gen"), ("gen", "fc", "миссия"), ("fc", "cam", "триггер"), ("fc", "log", "", False, "v"), ("cam", "geo", "", False, "v"), ("log", "geo")],
     notes=[(10, 150, "Результат: кадры с геотегами", "m t"), (10, 164, "→ отчёт-карта с находками", "m t")])
@@ -442,6 +442,103 @@ D["proj-tx16s-companion"] = _arch("Компаньон TX16S: архитекту�
     [("rx", ["Аппарат", "ELRS RX"], False), ("tx", ["Пульт TX16S", "EdgeTX"], False), ("esp", ["ESP32 в пульте", "парсер CRSF"], True), ("ph", ["Телефон", "BLE / Wi-Fi"], False)],
     [("sim", ["Симулятор EdgeTX", "+ фикстуры CRSF"], False, 0), ("lua", ["Lua-скрипт", "EdgeTX"], True, 1)],
     [("rx", "tx", "CRSF"), ("tx", "esp", "UART"), ("esp", "ph"), ("tx", "lua", "", False, "v"), ("sim", "lua", "", False, "h")])
+
+
+# ---------------------------------------------------------------- perception track
+D["pixel-ground-chain"] = flow("Пиксель → точка на земле",
+    [Box("px", ["Пиксель (u, v)"], 10, 30, 110), Box("ray", ["K⁻¹ + снятие", "дисторсии → луч"], 140, 30, 130, accent=True),
+     Box("frd", ["R_bc: крепление", "→ луч в FRD"], 290, 30, 130, accent=True), Box("ned", ["R_nb(φ,θ,ψ)", "→ луч в NED"], 440, 30, 120, accent=True),
+     Box("gnd", ["t = h / r_z", "→ (N, E) м"], 580, 30, 130),
+     Box("att", ["ATT в момент", "экспозиции"], 440, 120, 120), Box("alt", ["Высота над", "рельефом"], 580, 120, 130)],
+    [("px", "ray"), ("ray", "frd"), ("frd", "ned"), ("ned", "gnd"), ("att", "ned", "", False, "v"), ("alt", "gnd", "", False, "v")],
+    720, 190, notes=[(10, 140, "Ошибка 1° ориентации на 100 м", "m t"), (10, 154, "= 1.7 м на земле (надир)", "m t")])
+
+D["landing-loop"] = flow("Контур точной посадки",
+    [Box("cam", ["Камера вниз"], 10, 30, 110), Box("det", ["ArUco / IR-LOCK", "4 угла, ID"], 140, 30, 130, accent=True),
+     Box("pose", ["Поза: PnP", "или углы"], 290, 30, 120, accent=True), Box("lt", ["LANDING_TARGET", "time_usec = кадр"], 430, 30, 140, accent=True),
+     Box("fc", ["Фильтр цели", "PLND_EST_TYPE"], 590, 30, 120),
+     Box("rng", ["Дальномер", "PLND_ALT_MIN/MAX"], 430, 120, 140), Box("pos", ["Контур положения", "+ снижение"], 590, 120, 120)],
+    [("cam", "det"), ("det", "pose"), ("pose", "lt"), ("lt", "fc", "", True), ("fc", "pos", "", False, "v"), ("rng", "pos")],
+    720, 190, notes=[(10, 140, "Цель потеряна: выше порога — поиск/повтор,", "m t"), (10, 154, "ниже PLND_ALT_MIN — садиться дальше", "m t")])
+
+D["edge-mlops"] = flow("Цикл ML на борту",
+    [Box("data", ["Набор данных", "из своих полётов"], 10, 30, 130), Box("lab", ["Разметка"], 160, 30, 100),
+     Box("train", ["Обучение"], 280, 30, 100), Box("q", ["Квантование +", "приёмка по срезам"], 400, 30, 140, accent=True),
+     Box("ship", ["Выкатка: версия", "+ откат"], 560, 30, 150, accent=True),
+     Box("hard", ["Трудные примеры,", "ошибки из полей"], 10, 130, 130),
+     Box("mon", ["Мониторинг дрейфа:", "уверенность, детекции/мин"], 480, 130, 230, accent=True)],
+    [("data", "lab"), ("lab", "train"), ("train", "q"), ("q", "ship"), ("ship", "mon", "", False, "v"),
+     ("mon", "hard", "", True, "h"), ("hard", "data", "", False, "v")],
+    720, 200)
+
+
+def sector_map():
+    import math
+    from svg import svg, text
+    cx, cy, R = 200, 165, 120
+    body = [text(16, 16, "OBSTACLE_DISTANCE: 72 сектора × 5°, MAV_FRAME_BODY_FRD (0° — вперёд, по часовой)", "m t", "start")]
+    hfov = 87
+    for i in range(72):
+        a0, a1 = math.radians(i * 5 - 2.5), math.radians(i * 5 + 2.5)
+        b = i * 5 if i * 5 <= 180 else i * 5 - 360
+        in_fov = abs(b) <= hfov / 2
+        r = R
+        cls = "box"
+        if in_fov:
+            r = R * (0.45 if 10 <= b <= 30 else 0.95)
+            cls = "boxa" if 10 <= b <= 30 else "box"
+        x0, y0 = cx + r * math.sin(a0), cy - r * math.cos(a0)
+        x1, y1 = cx + r * math.sin(a1), cy - r * math.cos(a1)
+        style = "" if in_fov else ' style="opacity:0.25"'
+        body.append(f'<path class="{cls}"{style} d="M{cx} {cy} L{x0:.1f} {y0:.1f} A{r} {r} 0 0 1 {x1:.1f} {y1:.1f} Z"/>')
+    body.append(f'<circle cx="{cx}" cy="{cy}" r="7" class="boxa"/>')
+    body.append(text(cx, cy - R - 8, "0° вперёд", "t"))
+    body.append(text(cx + R + 6, cy + 4, "90°", "t", "start"))
+    body.append(text(cx, cy + R + 16, "180° — нет данных (65535)", "m t"))
+    lx = 380
+    body.append(text(lx, 60, "Поле зрения камеры 87° → ~17 секторов с данными", "t", "start"))
+    body.append(f'<rect x="{lx}" y="78" width="14" height="12" class="boxa"/>')
+    body.append(text(lx + 22, 88, "препятствие 3 м, азимут 10–30°", "t", "start"))
+    body.append(f'<rect x="{lx}" y="100" width="14" height="12" class="box"/>')
+    body.append(text(lx + 22, 110, "свободно до max_distance (max+1)", "t", "start"))
+    body.append(f'<rect x="{lx}" y="122" width="14" height="12" class="box" style="opacity:0.25"/>')
+    body.append(text(lx + 22, 132, "нет данных: UINT16_MAX — «не знаю»", "t", "start"))
+    body.append(text(lx, 170, "PX4: CP_GO_NO_DATA = 0 — туда нельзя.", "m t", "start"))
+    body.append(text(lx, 186, "Ошибка: слать 0 или max вместо 65535.", "m t", "start"))
+    return svg(720, 310, "Секторная карта OBSTACLE_DISTANCE", "".join(body))
+
+
+def survey_overlap():
+    from svg import svg, text
+    body = [text(16, 16, "Съёмка: footprint кадра, продольное и поперечное перекрытие", "m t", "start")]
+    fw, fh = 120, 80           # footprint across x along (drawn: across = horizontal)
+    step = fh * (1 - 0.75)     # trigger spacing along track (vertical)
+    lines = fw * (1 - 0.65)    # line spacing
+    x0, y0 = 60, 40
+    for li in range(3):
+        x = x0 + li * lines
+        for k in range(4):
+            y = y0 + k * step
+            cls = "boxa" if (li == 0 and k == 0) else "box"
+            body.append(f'<rect class="{cls}" x="{x:.1f}" y="{y:.1f}" width="{fw}" height="{fh}" style="fill-opacity:0.35" rx="2"/>')
+        body.append(f'<path class="lna" d="M{x + fw / 2:.1f} {y0 - 8} L{x + fw / 2:.1f} {y0 + 3 * step + fh + 8:.1f}" marker-end="url(#ara)"/>')
+    # dimension: step
+    ax = x0 - 14
+    body.append(f'<path class="ln" d="M{ax} {y0} L{ax} {y0 + step}"/>')
+    body.append(text(ax - 4, y0 + step / 2 + 4, "шаг", "t", "end"))
+    by = y0 + 3 * step + fh + 26
+    body.append(f'<path class="ln" d="M{x0} {by} L{x0 + lines:.1f} {by}"/>')
+    body.append(text(x0 + lines / 2, by + 14, "галс", "t"))
+    tx = 360
+    for i, ln in enumerate(["footprint = 2H·tan(FOV/2)", "шаг = footprint_вдоль·(1 − p_прод)",
+                            "галсы = footprint_поперёк·(1 − p_попер)", "GSD = H·w_сенсора / (f·W_px)",
+                            "", "100 м, HFOV 84°, VFOV 62°, 80/70 %:", "footprint 180 × 120 м,", "шаг 24 м, галсы через 54 м"]):
+        body.append(text(tx, 60 + i * 18, ln, "t" if i < 4 else "m t", "start"))
+    return svg(720, 300, "Геометрия съёмки и перекрытие", "".join(body))
+
+
+D["sector-map"] = sector_map()
+D["survey-overlap"] = survey_overlap()
 
 
 def main() -> None:

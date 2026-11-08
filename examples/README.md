@@ -10,5 +10,6 @@ Each folder is self-contained; copy it out of this repository to begin a project
 | `ros2-docker/` | Docker Compose environment (ROS 2 Humble, PX4 SITL + Gazebo, ArduPilot SITL with DDS) and the `uav_ros2_labs` package: telemetry logger, PX4 offboard square, ArduPilot AP_DDS square; flight logic as a tested state machine | ros2-basics, ros2-px4, ros2-ardupilot |
 | `ros2-skeleton/` | ROS 2 package layout for a companion node talking to PX4 (uXRCE-DDS) or ArduPilot (MAVROS), with a velocity-setpoint publisher stub | px4-ros2, per-tracking |
 | `web-gcs/` | Project #1 starter: MAVLink → WebSocket bridge with ACK-confirmed commands and link-loss detection, a Leaflet UI, protocol doc, 6 tests | mav-services, mav-routing, projects/proj-web-gcs |
+| `perception/` | Camera geometry (pixel → ground, distortion, mount extrinsics, GSD/survey spacing, LANDING_TARGET angles), depth → OBSTACLE_DISTANCE sectors, stopping-distance budget, inference latency bench; 14 tests | per-geometry, per-landing, per-depth-avoid, per-mapping, per-edge-ml |
 
 Goal: a simulation on screen in 15 minutes, not an afternoon of dependencies.

@@ -1,0 +1,74 @@
+{
+ "module": "per-geometry",
+ "tasks": [
+  {
+   "id": "fx-hfov",
+   "title": "Фокус в пикселях",
+   "statement": "Камера шириной **{w} px** с горизонтальным полем зрения **{h}°**. Найдите f_x (пиксели).",
+   "params": {
+    "w": [
+     640,
+     1280,
+     1920,
+     3840
+    ],
+    "h": {
+     "min": 60,
+     "max": 130,
+     "step": 5
+    }
+   },
+   "answer": "(w/2)/math.tan(math.radians(h)/2)",
+   "unit": "px",
+   "tol": 0.01,
+   "solution": "f_x = (W/2)/tan(HFOV/2)."
+  },
+  {
+   "id": "nadir-offset",
+   "title": "Смещение по кадру",
+   "statement": "Nadir-камера, f = **{f} px**, высота **{alt} м**, горизонтальный полёт. Объект на **{dv} px** выше центра кадра. На сколько метров он впереди аппарата?",
+   "params": {
+    "f": {
+     "min": 400,
+     "max": 1200,
+     "step": 50
+    },
+    "alt": {
+     "min": 20,
+     "max": 150,
+     "step": 5
+    },
+    "dv": {
+     "min": 20,
+     "max": 300,
+     "step": 10
+    }
+   },
+   "answer": "alt*dv/f",
+   "unit": "м",
+   "tol": 0.01,
+   "solution": "Подобные треугольники: d = h·Δv/f."
+  },
+  {
+   "id": "roll-error",
+   "title": "Ошибка от крена",
+   "statement": "Nadir-камера на высоте **{alt} м**. Ошибка оценки крена **{e}°**. Насколько сместится точка под центром кадра (м)?",
+   "params": {
+    "alt": {
+     "min": 20,
+     "max": 200,
+     "step": 10
+    },
+    "e": {
+     "min": 0.5,
+     "max": 5,
+     "step": 0.5
+    }
+   },
+   "answer": "alt*math.tan(math.radians(e))",
+   "unit": "м",
+   "tol": 0.01,
+   "solution": "Δ = h·tan(δφ)."
+  }
+ ]
+}
