@@ -49,10 +49,41 @@
 <h4 class="md-subheading">Система координат</h4>
 <p><code>LOCAL_NED</code>: X — север, Y — восток, Z — <strong>вниз</strong>. Подъём на 10 м — это Z = −10. Половина ошибок offboard-кода — знак оси Z. Для целей относительно носа аппарата есть <code>MAV_FRAME_BODY_OFFSET_NED</code>.</p>
 <h4 class="md-subheading">Что проверяет FC</h4>
-<p>Геозона (<code>FENCE_*</code>), ограничения скорости и ускорения (<code>WPNAV_*</code>), батарейный failsafe, здоровье EKF. Companion может просить что угодно — выполнение всё равно в рамках параметров FC. Отсюда правило отладки: если аппарат «не слушается», сначала <code>STATUSTEXT</code>, потом параметры ограничений, и только потом свой код.</p>
+<p>Геозона (<code>FENCE_*</code>), ограничения скорости и ускорения (<code>WP_*</code>, до 4.7 — <code>WPNAV_*</code>), батарейный failsafe, здоровье EKF. Companion может просить что угодно — выполнение всё равно в рамках параметров FC. Отсюда правило отладки: если аппарат «не слушается», сначала <code>STATUSTEXT</code>, потом параметры ограничений, и только потом свой код.</p>
 <h4 class="md-subheading">Цикл управления</h4>
 <p>Хороший цикл companion:</p>
 <ol><li>Читать состояние (позиция, скорость, режим, арм) из телеметрии с заданной частотой.</li><li>Считать решение.</li><li>Отправлять цель <strong>регулярно</strong> (например, 5–10 Гц для скорости), даже если она не изменилась.</li><li>Проверять, что режим всё ещё GUIDED: пилот тумблером может забрать управление в любой момент, и код обязан это уважать.</li></ol>
+<h4 class="md-subheading">Код companion как конечный автомат</h4>
+<p>Скрипт «отправил команду, поспал 10 секунд, отправил следующую» работает в SITL и ломается в поле: команда не принята, пилот переключил режим, GPS пропал. Надёжная форма — автомат состояний, где каждый переход проверяет условие и имеет таймаут:</p>
+<div class="table-wrap md-table-wrap" tabindex="0"><table class="md-table"><thead><tr><th>Состояние</th><th>Что делает</th><th>Переход дальше</th><th>Если не вышло</th></tr></thead><tbody><tr><td data-label="Состояние">WAIT_READY</td><td data-label="Что делает">ждёт GPS fix и EKF OK по телеметрии</td><td data-label="Переход дальше">готовность</td><td data-label="Если не вышло">ждать, ничего не слать</td></tr><tr><td data-label="Состояние">ARM_TAKEOFF</td><td data-label="Что делает">GUIDED, арм, <code>MAV_CMD_NAV_TAKEOFF</code>, ждёт ACK и высоту ≥ 90 % цели</td><td data-label="Переход дальше">высота достигнута</td><td data-label="Если не вышло">за 20 с нет высоты → LAND</td></tr><tr><td data-label="Состояние">TASK</td><td data-label="Что делает">шлёт цели с частотой 5–10 Гц, проверяет режим каждую итерацию</td><td data-label="Переход дальше">задача выполнена</td><td data-label="Если не вышло">режим не GUIDED → PILOT</td></tr><tr><td data-label="Состояние">RETURN</td><td data-label="Что делает"><code>RTL</code> по команде смены режима</td><td data-label="Переход дальше">дизарм</td><td data-label="Если не вышло">—</td></tr><tr><td data-label="Состояние">PILOT</td><td data-label="Что делает"><strong>молчит</strong>, только читает телеметрию</td><td data-label="Переход дальше">пилот вернул GUIDED и подтвердил</td><td data-label="Если не вышло">—</td></tr></tbody></table></div>
+<p>Каркас:</p>
+<pre class="cli-block"><code>import time
+from pymavlink import mavutil
+
+class Mission:
+    def __init__(self, m):
+        self.m, self.state, self.t0 = m, &quot;WAIT_READY&quot;, time.time()
+        self.alt, self.mode, self.armed = 0.0, &quot;&quot;, False
+
+    def go(self, state):
+        print(f&quot;{self.state} -&gt; {state}&quot;); self.state, self.t0 = state, time.time()
+
+    def read(self):
+        while (msg := self.m.recv_match(blocking=False)) is not None:
+            t = msg.get_type()
+            if t == &quot;GLOBAL_POSITION_INT&quot;: self.alt = msg.relative_alt / 1000
+            elif t == &quot;HEARTBEAT&quot; and msg.type != mavutil.mavlink.MAV_TYPE_GCS:
+                self.mode = mavutil.mode_string_v10(msg)
+                self.armed = bool(msg.base_mode &amp; mavutil.mavlink.MAV_MODE_FLAG_SAFETY_ARMED)
+
+    def step(self):
+        self.read()
+        if self.state in (&quot;TASK&quot;, &quot;ARM_TAKEOFF&quot;) and self.mode not in (&quot;GUIDED&quot;, &quot;&quot;):
+            return self.go(&quot;PILOT&quot;)                       # the pilot always wins
+        if self.state == &quot;ARM_TAKEOFF&quot; and time.time() - self.t0 &gt; 20 and self.alt &lt; 9:
+            self.m.set_mode(self.m.mode_mapping()[&quot;LAND&quot;]); return self.go(&quot;PILOT&quot;)
+        # ... the remaining transitions follow the table</code></pre>
+<p>Такой код легко тестировать: подмените <code>m</code> фейковым соединением (как в <code>examples/mavlink/tests</code>) и проверьте каждую строку таблицы, включая «пилот забрал управление посреди TASK».</p>
 <h4 class="md-subheading">Безопасность при разработке</h4>
 <ul><li>Всё сначала в SITL. Тот же код, тот же порт, только адрес другой.</li><li>Пилот с пультом и тумблером на LOITER/RTL — всегда, даже когда «точно работает».</li><li>Геозона включена и проверена.</li><li>Первые реальные тесты — только цели по позиции на малой высоте; скорость — потом.</li></ul>
 <h4 class="md-subheading">Пример: скорость в GUIDED (pymavlink)</h4>
@@ -113,6 +144,8 @@ while time.time() &lt; t_end:
         0, 0, 0,  1.0, 0, 0,  0, 0, 0,  0, 0)   # 1 m/s north
     time.sleep(0.2)                              # 5 Hz, inside GUID_TIMEOUT</code></pre>
 <p>Перестань слать — аппарат зависнет сам. Это и есть тест таймаута: выполни его намеренно.</p>
+<h4 class="md-subheading">Шаг 2б. Автомат на фейковом соединении</h4>
+<p>Дописать переходы из таблицы и тест: фейк отдаёт HEARTBEAT с режимом LOITER посреди TASK — автомат должен перейти в PILOT и не отправить больше ни одной цели. Второй тест: высота не растёт 20 с после взлёта — автомат командует LAND. Оба теста — в CI, как в стартере <code>examples/sitl-pymavlink</code>.</p>
 <h4 class="md-subheading">Шаг 3. Capstone-каркас</h4>
 <p>Собери из модулей трека: Raspberry Pi с маршрутизатором → сервис на Python → GUIDED-логика (например, «облететь точку интереса по кругу и вернуться»), ESP32 с индикацией состояния. Критерий сдачи: сценарий работает в SITL, документирован протокол и поведение при отказе companion, реальный полёт — только с геозоной и пилотом.</p>
 

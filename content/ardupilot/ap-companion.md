@@ -34,7 +34,7 @@ next:
 `LOCAL_NED`: X — север, Y — восток, Z — **вниз**. Подъём на 10 м — это Z = −10. Половина ошибок offboard-кода — знак оси Z. Для целей относительно носа аппарата есть `MAV_FRAME_BODY_OFFSET_NED`.
 
 ### Что проверяет FC
-Геозона (`FENCE_*`), ограничения скорости и ускорения (`WPNAV_*`), батарейный failsafe, здоровье EKF. Companion может просить что угодно — выполнение всё равно в рамках параметров FC. Отсюда правило отладки: если аппарат «не слушается», сначала `STATUSTEXT`, потом параметры ограничений, и только потом свой код.
+Геозона (`FENCE_*`), ограничения скорости и ускорения (`WP_*`, до 4.7 — `WPNAV_*`), батарейный failsafe, здоровье EKF. Companion может просить что угодно — выполнение всё равно в рамках параметров FC. Отсюда правило отладки: если аппарат «не слушается», сначала `STATUSTEXT`, потом параметры ограничений, и только потом свой код.
 
 ### Цикл управления
 Хороший цикл companion:
@@ -43,6 +43,48 @@ next:
 2. Считать решение.
 3. Отправлять цель **регулярно** (например, 5–10 Гц для скорости), даже если она не изменилась.
 4. Проверять, что режим всё ещё GUIDED: пилот тумблером может забрать управление в любой момент, и код обязан это уважать.
+
+### Код companion как конечный автомат
+Скрипт «отправил команду, поспал 10 секунд, отправил следующую» работает в SITL и ломается в поле: команда не принята, пилот переключил режим, GPS пропал. Надёжная форма — автомат состояний, где каждый переход проверяет условие и имеет таймаут:
+
+| Состояние | Что делает | Переход дальше | Если не вышло |
+|---|---|---|---|
+| WAIT_READY | ждёт GPS fix и EKF OK по телеметрии | готовность | ждать, ничего не слать |
+| ARM_TAKEOFF | GUIDED, арм, `MAV_CMD_NAV_TAKEOFF`, ждёт ACK и высоту ≥ 90 % цели | высота достигнута | за 20 с нет высоты → LAND |
+| TASK | шлёт цели с частотой 5–10 Гц, проверяет режим каждую итерацию | задача выполнена | режим не GUIDED → PILOT |
+| RETURN | `RTL` по команде смены режима | дизарм | — |
+| PILOT | **молчит**, только читает телеметрию | пилот вернул GUIDED и подтвердил | — |
+
+Каркас:
+```python
+import time
+from pymavlink import mavutil
+
+class Mission:
+    def __init__(self, m):
+        self.m, self.state, self.t0 = m, "WAIT_READY", time.time()
+        self.alt, self.mode, self.armed = 0.0, "", False
+
+    def go(self, state):
+        print(f"{self.state} -> {state}"); self.state, self.t0 = state, time.time()
+
+    def read(self):
+        while (msg := self.m.recv_match(blocking=False)) is not None:
+            t = msg.get_type()
+            if t == "GLOBAL_POSITION_INT": self.alt = msg.relative_alt / 1000
+            elif t == "HEARTBEAT" and msg.type != mavutil.mavlink.MAV_TYPE_GCS:
+                self.mode = mavutil.mode_string_v10(msg)
+                self.armed = bool(msg.base_mode & mavutil.mavlink.MAV_MODE_FLAG_SAFETY_ARMED)
+
+    def step(self):
+        self.read()
+        if self.state in ("TASK", "ARM_TAKEOFF") and self.mode not in ("GUIDED", ""):
+            return self.go("PILOT")                       # the pilot always wins
+        if self.state == "ARM_TAKEOFF" and time.time() - self.t0 > 20 and self.alt < 9:
+            self.m.set_mode(self.m.mode_mapping()["LAND"]); return self.go("PILOT")
+        # ... the remaining transitions follow the table
+```
+Такой код легко тестировать: подмените `m` фейковым соединением (как в `examples/mavlink/tests`) и проверьте каждую строку таблицы, включая «пилот забрал управление посреди TASK».
 
 ### Безопасность при разработке
 - Всё сначала в SITL. Тот же код, тот же порт, только адрес другой.
@@ -118,6 +160,9 @@ while time.time() < t_end:
 ```
 
 Перестань слать — аппарат зависнет сам. Это и есть тест таймаута: выполни его намеренно.
+
+### Шаг 2б. Автомат на фейковом соединении
+Дописать переходы из таблицы и тест: фейк отдаёт HEARTBEAT с режимом LOITER посреди TASK — автомат должен перейти в PILOT и не отправить больше ни одной цели. Второй тест: высота не растёт 20 с после взлёта — автомат командует LAND. Оба теста — в CI, как в стартере `examples/sitl-pymavlink`.
 
 ### Шаг 3. Capstone-каркас
 Собери из модулей трека: Raspberry Pi с маршрутизатором → сервис на Python → GUIDED-логика (например, «облететь точку интереса по кругу и вернуться»), ESP32 с индикацией состояния. Критерий сдачи: сценарий работает в SITL, документирован протокол и поведение при отказе companion, реальный полёт — только с геозоной и пилотом.
