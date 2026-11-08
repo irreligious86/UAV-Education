@@ -50,6 +50,26 @@ next:
 - Геозона включена и проверена.
 - Первые реальные тесты — только цели по позиции на малой высоте; скорость — потом.
 
+### Пример: скорость в GUIDED (pymavlink)
+```python
+from pymavlink import mavutil
+m = mavutil.mavlink_connection("udp:127.0.0.1:14551"); m.wait_heartbeat()
+m.set_mode(m.mode_mapping()["GUIDED"]); m.arducopter_arm(); m.motors_armed_wait()
+m.mav.command_long_send(m.target_system, m.target_component, mavutil.mavlink.MAV_CMD_NAV_TAKEOFF, 0, 0,0,0,0,0,0, 10)
+import time; time.sleep(10)
+for _ in range(50):                          # 10 s at 5 Hz: forward 1 m/s in body frame
+    m.mav.set_position_target_local_ned_send(
+        0, m.target_system, m.target_component, mavutil.mavlink.MAV_FRAME_BODY_OFFSET_NED,
+        0b0000111111000111,                    # use velocity only (bits: ignore pos x/y/z, acc, yaw, yaw_rate)
+        0,0,0,  1.0,0.0,0.0,  0,0,0,  0,0)
+    time.sleep(0.2)
+# stop sending -> after GUID_TIMEOUT (3 s default) the copter stops and hovers
+```
+Полный стартовый проект (квадрат, тест failsafe, CI) — `examples/sitl-pymavlink` в репозитории курса. `GUID_TIMEOUT` = 3.0 с по умолчанию (диапазон 0.1–5); `GUID_OPTIONS` биты: 0 — разрешить арм с пульта в GUIDED, 2 — игнорировать yaw пилота, 6 — навигация по точкам для позиционных целей, 7 — флюгирование.
+
+### Разобранный пример: «аппарат не двигается по команде скорости»
+Проверки по порядку: (1) режим GUIDED (`HEARTBEAT.custom_mode`); (2) `type_mask` — не замаскирована ли скорость; (3) частота отправки ≥ 2 Гц (таймаут 3 с); (4) `WPNAV_SPEED`/`PSC_*` не ограничивают до нуля; (5) геозона не держит у границы; (6) `STATUSTEXT` — «EKF needs position» и т.п. В 80% случаев — (1) или (2).
+
 ## practice
 ### Шаг 1. Взлёт и цель по позиции (SITL)
 ```python

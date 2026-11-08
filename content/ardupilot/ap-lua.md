@@ -38,6 +38,37 @@ ArduPilot умеет выполнять Lua-скрипты прямо на по�
 ### Applets и examples
 В репозитории ArduPilot есть готовые скрипты: `libraries/AP_Scripting/applets` (готовы к использованию, у каждого есть `.md`-описание) и `libraries/AP_Scripting/examples` (учебные примеры). Начинать стоит с applet `motor_failure_test.lua`: он останавливает моторы, заданные битовой маской `MOT_STOP_BITMASK`, когда тумблер Scripting1 вверх. Октокоптер должен лететь на одном отказавшем моторе.
 
+### Что умеет API (по `docs/docs.lua` в AP_Scripting)
+Чтение состояния: `ahrs:get_position()`, `ahrs:get_velocity_NED()`, `ahrs:get_yaw()`, `gps:num_sats()`, `battery:voltage()`, `rangefinder:distance_cm_orient()`, `esc_telem:get_rpm()`, `vehicle:get_mode()`, `arming:is_armed()`; действие: `vehicle:set_mode()`, `vehicle:set_target_velocity_NED()`, `vehicle:set_target_location()`, `mission:set_current_cmd()`, `SRV_Channels:set_output_pwm()`, `relay:on()`, `param:set()`/`param:add_param()` (свои параметры с префиксом), `gcs:send_text()`, `logger:write()` (свои лог-сообщения!), `notify:play_tune()`, `rc:get_aux_cached()` (тумблер `RCx_OPTION = 300..307` Scripting1..8), `serial:find_serial()` (свой протокол на UART), `CAN:get_device()` (DroneCAN), `periph` на AP_Periph. Таймеры — возврат `update, 100` (мс до следующего вызова). Параметры скриптинга: `SCR_ENABLE`, `SCR_HEAP_SIZE` (память; на F4 не хватает → только H7/F7 с запасом), `SCR_VM_I_COUNT` (лимит инструкций на вызов — защита от зависания), `SCR_DEBUG_OPTS`.
+
+### Applets как учебник
+`libraries/AP_Scripting/applets/` — готовые, с `.md`-описанием: `motor_failure_test.lua` (останавливает моторы по битмаске `MOT_STOP_BITMASK` тумблером Scripting1 — тест отказа мотора на гексе/X8 в SITL и в поле), `VTOL-quicktune.lua`/`copter-quicktune` (QuikTune), `copter-deadreckon-home.lua` (возврат по счислению при потере GPS), `arming-checks.lua` (свои пред-армовые проверки), `ahrs-source-extnav-optflow.lua` (переключение источников EKF по качеству), `BattEstimate.lua`, `MissionSelector.lua`, `net_webserver.lua`, `crsf-calibrate.lua`, `SmartAudio.lua`. Читать их — лучший способ выучить API и стиль (защитные проверки, `pcall`-подобные обёртки, параметры через `param:add_table`).
+
+### Разобранный пример: защита по температуре ESC
+```lua
+-- esc_temp_guard.lua: warn at 80 C, switch to LAND at 100 C (any ESC), check every 500 ms
+local WARN, CRIT = 80, 100
+local MODE_LAND = 9
+local warned = false
+function update()
+  for i = 0, 7 do
+    local t = esc_telem:get_temperature(i)          -- nil if no telemetry; value in centi-degrees
+    if t then
+      t = t / 100
+      if t >= CRIT and arming:is_armed() and vehicle:get_mode() ~= MODE_LAND then
+        gcs:send_text(2, string.format("ESC %d %dC: LAND", i + 1, t))
+        vehicle:set_mode(MODE_LAND)
+      elseif t >= WARN and not warned then
+        gcs:send_text(4, string.format("ESC %d temp %dC", i + 1, t)); warned = true
+      end
+    end
+  end
+  return update, 500
+end
+return update()
+```
+Проверка в SITL: `SIM_ESC_TELEM = 1`, подменить порог на 30 °C, убедиться в срабатывании; затем — на стенде. Запись в FMEA как мера с ссылкой на тест (модуль «Отказоустойчивость»).
+
 ## practice
 ### Шаг 1. Включить скриптинг в SITL
 ```
@@ -102,6 +133,12 @@ return update, 1000
 - **Симптом:** `find_channel_for_option` возвращает nil
   - Возможная причина: ни одному каналу не назначен нужный `RCx_OPTION`.
   - Что сделать: назначить опцию на канал с тумблером.
+- **Симптом:** скрипт не запускается, «Lua: … out of memory»
+  - Возможная причина: `SCR_HEAP_SIZE` мал, плата без запаса RAM.
+  - Что сделать: увеличить heap (H7 — 200–300 КБ), упростить скрипт.
+- **Симптом:** «script took too long»
+  - Возможная причина: тяжёлый цикл в одном вызове update.
+  - Что сделать: разбить работу по вызовам, `SCR_VM_I_COUNT` поднимать осторожно.
 
 ## references
 - Lua Scripts — ArduPilot | https://ardupilot.org/copter/docs/common-lua-scripts.html | primary | A

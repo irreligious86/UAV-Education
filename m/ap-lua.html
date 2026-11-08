@@ -46,6 +46,32 @@
 <p>Параметр <code>RCx_OPTION</code> назначает каналу пульта функцию. Значения 300–307 — Scripting1…Scripting8: зарезервированы для скриптов. Скрипт находит свой канал через <code>rc:find_channel_for_option(300)</code> и читает положение тумблера через <code>get_aux_switch_pos()</code> (0 — низ, 1 — середина, 2 — верх).</p>
 <h4 class="md-subheading">Applets и examples</h4>
 <p>В репозитории ArduPilot есть готовые скрипты: <code>libraries/AP_Scripting/applets</code> (готовы к использованию, у каждого есть <code>.md</code>-описание) и <code>libraries/AP_Scripting/examples</code> (учебные примеры). Начинать стоит с applet <code>motor_failure_test.lua</code>: он останавливает моторы, заданные битовой маской <code>MOT_STOP_BITMASK</code>, когда тумблер Scripting1 вверх. Октокоптер должен лететь на одном отказавшем моторе.</p>
+<h4 class="md-subheading">Что умеет API (по <code>docs/docs.lua</code> в AP_Scripting)</h4>
+<p>Чтение состояния: <code>ahrs:get_position()</code>, <code>ahrs:get_velocity_NED()</code>, <code>ahrs:get_yaw()</code>, <code>gps:num_sats()</code>, <code>battery:voltage()</code>, <code>rangefinder:distance_cm_orient()</code>, <code>esc_telem:get_rpm()</code>, <code>vehicle:get_mode()</code>, <code>arming:is_armed()</code>; действие: <code>vehicle:set_mode()</code>, <code>vehicle:set_target_velocity_NED()</code>, <code>vehicle:set_target_location()</code>, <code>mission:set_current_cmd()</code>, <code>SRV_Channels:set_output_pwm()</code>, <code>relay:on()</code>, <code>param:set()</code>/<code>param:add_param()</code> (свои параметры с префиксом), <code>gcs:send_text()</code>, <code>logger:write()</code> (свои лог-сообщения!), <code>notify:play_tune()</code>, <code>rc:get_aux_cached()</code> (тумблер <code>RCx_OPTION = 300..307</code> Scripting1..8), <code>serial:find_serial()</code> (свой протокол на UART), <code>CAN:get_device()</code> (DroneCAN), <code>periph</code> на AP_Periph. Таймеры — возврат <code>update, 100</code> (мс до следующего вызова). Параметры скриптинга: <code>SCR_ENABLE</code>, <code>SCR_HEAP_SIZE</code> (память; на F4 не хватает → только H7/F7 с запасом), <code>SCR_VM_I_COUNT</code> (лимит инструкций на вызов — защита от зависания), <code>SCR_DEBUG_OPTS</code>.</p>
+<h4 class="md-subheading">Applets как учебник</h4>
+<p><code>libraries/AP_Scripting/applets/</code> — готовые, с <code>.md</code>-описанием: <code>motor_failure_test.lua</code> (останавливает моторы по битмаске <code>MOT_STOP_BITMASK</code> тумблером Scripting1 — тест отказа мотора на гексе/X8 в SITL и в поле), <code>VTOL-quicktune.lua</code>/<code>copter-quicktune</code> (QuikTune), <code>copter-deadreckon-home.lua</code> (возврат по счислению при потере GPS), <code>arming-checks.lua</code> (свои пред-армовые проверки), <code>ahrs-source-extnav-optflow.lua</code> (переключение источников EKF по качеству), <code>BattEstimate.lua</code>, <code>MissionSelector.lua</code>, <code>net_webserver.lua</code>, <code>crsf-calibrate.lua</code>, <code>SmartAudio.lua</code>. Читать их — лучший способ выучить API и стиль (защитные проверки, <code>pcall</code>-подобные обёртки, параметры через <code>param:add_table</code>).</p>
+<h4 class="md-subheading">Разобранный пример: защита по температуре ESC</h4>
+<pre class="cli-block"><code>-- esc_temp_guard.lua: warn at 80 C, switch to LAND at 100 C (any ESC), check every 500 ms
+local WARN, CRIT = 80, 100
+local MODE_LAND = 9
+local warned = false
+function update()
+  for i = 0, 7 do
+    local t = esc_telem:get_temperature(i)          -- nil if no telemetry; value in centi-degrees
+    if t then
+      t = t / 100
+      if t &gt;= CRIT and arming:is_armed() and vehicle:get_mode() ~= MODE_LAND then
+        gcs:send_text(2, string.format(&quot;ESC %d %dC: LAND&quot;, i + 1, t))
+        vehicle:set_mode(MODE_LAND)
+      elseif t &gt;= WARN and not warned then
+        gcs:send_text(4, string.format(&quot;ESC %d temp %dC&quot;, i + 1, t)); warned = true
+      end
+    end
+  end
+  return update, 500
+end
+return update()</code></pre>
+<p>Проверка в SITL: <code>SIM_ESC_TELEM = 1</code>, подменить порог на 30 °C, убедиться в срабатывании; затем — на стенде. Запись в FMEA как мера с ссылкой на тест (модуль «Отказоустойчивость»).</p>
 
 <h2>Практика</h2>
 <h4 class="md-subheading">Шаг 1. Включить скриптинг в SITL</h4>
@@ -82,7 +108,7 @@ return update, 1000</code></pre>
 <p>Имена параметров <code>SIM_*</code> меняются между версиями — смотри актуальные в своей сборке командой <code>param show SIM_GPS*</code> в MAVProxy. Такие скрипты — только для SITL: на реальном аппарате <code>SIM_*</code> параметров нет.</p>
 
 <h2>Диагностика</h2>
-<div class="diag-groups"><article class="diag-item"><h4><strong>Симптом:</strong> скрипт не запускается, в GCS тишина</h4><ul><li>Возможная причина: <code>SCR_ENABLE</code> не включён или не было перезагрузки, файл не в той папке.</li><li>Что сделать: проверить параметр и путь <code>scripts/</code> относительно папки запуска SITL.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> pre-arm ошибка о памяти скриптов</h4><ul><li>Возможная причина: мало <code>SCR_HEAP_SIZE</code> для загруженных скриптов.</li><li>Что сделать: поднять <code>SCR_HEAP_SIZE</code> или убрать лишние скрипты.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> все скрипты перестали работать посреди полёта</h4><ul><li>Возможная причина: один скрипт упал с ошибкой или исчерпал память.</li><li>Что сделать: читать сообщения в GCS, исправить скрипт, перезагрузить.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> <code>find_channel_for_option</code> возвращает nil</h4><ul><li>Возможная причина: ни одному каналу не назначен нужный <code>RCx_OPTION</code>.</li><li>Что сделать: назначить опцию на канал с тумблером.</li></ul></article></div>
+<div class="diag-groups"><article class="diag-item"><h4><strong>Симптом:</strong> скрипт не запускается, в GCS тишина</h4><ul><li>Возможная причина: <code>SCR_ENABLE</code> не включён или не было перезагрузки, файл не в той папке.</li><li>Что сделать: проверить параметр и путь <code>scripts/</code> относительно папки запуска SITL.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> pre-arm ошибка о памяти скриптов</h4><ul><li>Возможная причина: мало <code>SCR_HEAP_SIZE</code> для загруженных скриптов.</li><li>Что сделать: поднять <code>SCR_HEAP_SIZE</code> или убрать лишние скрипты.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> все скрипты перестали работать посреди полёта</h4><ul><li>Возможная причина: один скрипт упал с ошибкой или исчерпал память.</li><li>Что сделать: читать сообщения в GCS, исправить скрипт, перезагрузить.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> <code>find_channel_for_option</code> возвращает nil</h4><ul><li>Возможная причина: ни одному каналу не назначен нужный <code>RCx_OPTION</code>.</li><li>Что сделать: назначить опцию на канал с тумблером.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> скрипт не запускается, «Lua: … out of memory»</h4><ul><li>Возможная причина: <code>SCR_HEAP_SIZE</code> мал, плата без запаса RAM.</li><li>Что сделать: увеличить heap (H7 — 200–300 КБ), упростить скрипт.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> «script took too long»</h4><ul><li>Возможная причина: тяжёлый цикл в одном вызове update.</li><li>Что сделать: разбить работу по вызовам, <code>SCR_VM_I_COUNT</code> поднимать осторожно.</li></ul></article></div>
 
 <h2>Чек-лист</h2>
 <ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="ap-lua:0"><span>Скриптинг включён в SITL, тестовый скрипт отвечает на тумблер</span></label></li><li><label><input type="checkbox" data-check-id="ap-lua:1"><span>Applet отказа мотора настроен и проверен на octaquad</span></label></li><li><label><input type="checkbox" data-check-id="ap-lua:2"><span>Каждый хаос-скрипт на своём тумблере</span></label></li><li><label><input type="checkbox" data-check-id="ap-lua:3"><span>Понимаю, почему на F4 скриптинга нет</span></label></li><li><label><input type="checkbox" data-check-id="ap-lua:4"><span>Скрипты с <code>SIM_*</code> не попадают на реальный аппарат</span></label></li></ul>

@@ -52,6 +52,32 @@ ArduPilot пишет на SD-карту бинарный лог DataFlash (`.bin
 ### Инструменты
 Mission Planner (Review a Log), MAVExplorer из пакета MAVProxy (графики по именам полей, например `graph ATT.Roll ATT.DesRoll`), UAV Log Viewer в браузере. Для автоматизации — `pymavlink.DFReader`: читает `.bin` напрямую в Python.
 
+### Разобранный пример: разбор «просадка высоты на 3 м в Loiter»
+1. `VIBE.VibeZ` 12 м/с², `Clip` 0 → не вибрации.
+2. `ERR`/`MSG`: нет.
+3. `CTUN`: `DAlt` 20 м постоянна, `Alt` проваливается до 17 м, `BAlt` одновременно → реальная просадка, не оценка.
+4. `CTUN.ThO` в момент — 0.78 (до — 0.42), `BAT.Volt` 21.1 → 18.9 В, `BAT.Curr` 60 → 95 А: газ упёрся в потолок на просевшей АКБ.
+5. `RCIN.C3` — пилот газ не трогал; `MODE` без смен.
+Вывод: нехватка тяги при просадке напряжения на старой АКБ (`BAT.Res` 0.09 Ом — высоко): АКБ на замену, `MOT_BAT_VOLT_MIN/MAX` для компенсации, порог `BATT_LOW_VOLT` выше. Метод важнее вывода: каждый шаг — конкретное поле.
+
+### Python для своих метрик (pymavlink)
+```python
+from pymavlink import mavutil
+import pandas as pd
+def df_of(log, msg):
+    m = mavutil.mavlink_connection(log); rows = []
+    while (x := m.recv_match(type=msg, blocking=False)) is not None: rows.append(x.to_dict())
+    return pd.DataFrame(rows)
+att = df_of("flight.bin", "ATT")
+err = (att.DesRoll - att.Roll).abs()
+print("roll tracking RMS deg:", err.pow(2).mean() ** 0.5, "p99:", err.quantile(0.99))
+vibe = df_of("flight.bin", "VIBE"); print("VibeZ p95:", vibe.VibeZ.quantile(0.95), "clips:", vibe.Clip.max())
+```
+`mavlogdump.py --types ATT,VIBE --format csv flight.bin` — быстрая выгрузка в CSV без кода; `MAVExplorer`: `graph ATT.Roll ATT.DesRoll`, `fft` для спектров батч-сэмплинга (`ISBH/ISBD`), `map` для траектории. Метрики переходного процесса и спектры — модуль «Python для данных».
+
+### Что писать в LOG_BITMASK
+По умолчанию достаточно для разбора полёта; для тюнинга добавить `PID` (сообщения `PIDR/PIDP/PIDY` с P/I/D/FF по осям) и `IMU_RAW`/батч-сэмплинг (`INS_LOG_BAT_MASK`) на время настройки фильтров — лог растёт в разы, после — выключить. `LOG_FILE_DSRMROT` — новый файл при каждом дизарме; `LOG_DISARMED = 1` — для наземных измерений (шум, GPS), потом выключить, иначе SD забивается.
+
 ## practice
 ### Скрипт: вибрации и клиппинг по логу
 ```python

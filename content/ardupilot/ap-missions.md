@@ -43,6 +43,15 @@ next:
 ### Файл миссии
 GCS сохраняют миссию в текстовый файл формата `QGC WPL 110`: по строке на команду — номер, флаг текущей, frame, код команды, четыре параметра, широта, долгота, высота, флаг автопродолжения. Такой файл удобно хранить в git рядом с параметрами.
 
+### Команды, которые стоит знать наизусть
+NAV: `NAV_WAYPOINT` (p1 — задержка в точке, с), `NAV_TAKEOFF` (alt), `NAV_LAND`, `NAV_RETURN_TO_LAUNCH`, `NAV_LOITER_TIME/TURNS/UNLIM`, `NAV_SPLINE_WAYPOINT` (сплайн), `NAV_DELAY`; DO: `DO_SET_SERVO`, `DO_SET_RELAY`, `DO_DIGICAM_CONTROL`, `DO_SET_CAM_TRIGG_DIST` (съёмка через каждые N м — основа фотограмметрии), `DO_CHANGE_SPEED`, `DO_SET_ROI` (нацелить гимбал/нос), `DO_JUMP` (цикл, с счётчиком), `DO_LAND_START` (точка входа посадочной последовательности для failsafe), `DO_SET_HOME`; CONDITION: `CONDITION_DELAY`, `CONDITION_DISTANCE`, `CONDITION_YAW`. Параметры выполнения: `WPNAV_SPEED` (см/с горизонталь), `WPNAV_SPEED_UP/DN`, `WPNAV_RADIUS` (радиус захвата), `WPNAV_ACCEL`, `WP_YAW_BEHAVIOR` (нос по курсу/нет), `MIS_RESTART` (0 — продолжить с последней команды при входе в Auto, 1 — с начала), `MIS_OPTIONS` (бит 0 — стирать миссию при перезагрузке; бит 1 — учитывать расстояние до посадки в failsafe АКБ; бит 2 — продолжать после посадки), `RTL_*` для конца миссии.
+
+### Высоты: три системы и одна ошибка
+Относительная (над домом, `MAV_FRAME_GLOBAL_RELATIVE_ALT`, по умолчанию), абсолютная (над уровнем моря — ошибка при другом месте взлёта), terrain (над рельефом по данным SRTM с GCS или дальномера, `TERRAIN_ENABLE`, `TERRAIN_FOLLOW`). Классическая авария: миссия с абсолютными высотами, составленная для другой площадки на 300 м выше — аппарат пытается уйти под землю или в небо. Правило: относительные высоты, проверка в GCS профилем высот над рельефом.
+
+### Разобранный пример: съёмка участка 300×200 м
+Mission Planner → Survey (Grid): камера (сенсор, фокус), высота 80 м, перекрытие 75/65% → план сам считает расстояние между галсами и `DO_SET_CAM_TRIGG_DIST`; скорость 8 м/с (по выдержке камеры: смаз ≤ 1 px → v·t_exp ≤ GSD); `NAV_TAKEOFF` 80, галсы, `DO_SET_CAM_TRIGG_DIST 0` в конце, `NAV_RETURN_TO_LAUNCH`. Проверка: профиль высот, время миссии против ёмкости АКБ (`BATT_LOW_MAH` с запасом на RTL + бит 1 `MIS_OPTIONS`), геозона вокруг участка. Прогон в SITL с тем же файлом миссии — обязателен.
+
 ## practice
 ### Шаг 1. Миссия в SITL через GCS
 1. Запусти SITL: `sim_vehicle.py -v ArduCopter --console --map`.
@@ -102,6 +111,12 @@ print("mission upload:", ack.type)  # 0 = MAV_MISSION_ACCEPTED
 - **Симптом:** загрузка миссии зависает
   - Возможная причина: отправка точек без ожидания запросов или неверный `seq`.
   - Что сделать: отвечать на `MISSION_REQUEST(_INT)` по номеру, проверить `MISSION_ACK`.
+- **Симптом:** в Auto аппарат ушёл в землю/набор после смены площадки
+  - Возможная причина: абсолютные высоты в миссии.
+  - Что сделать: относительные/terrain; проверять профиль высот в GCS.
+- **Симптом:** после посадки в миссии аппарат не дизармится или продолжает
+  - Возможная причина: `MIS_OPTIONS` бит 2 (ContinueAfterLand), `LAND_*`.
+  - Что сделать: выставить осознанно; проверить в SITL.
 
 ## references
 - Planning a Mission with Waypoints and Events — ArduPilot Copter | https://ardupilot.org/copter/docs/common-planning-a-mission-with-waypoints-and-events.html | primary | A

@@ -47,6 +47,22 @@
 <ol><li><strong>Обрывается ли лог?</strong> Лог, который кончается в воздухе, — потеря питания или перезагрузка.</li><li><strong>Вибрации</strong> (<code>VIBE</code>). Всё остальное бессмысленно, пока они высокие.</li><li><strong>Ошибки</strong> (<code>ERR</code>, <code>MSG</code>): что и когда сработало.</li><li><strong>Режимы</strong> (<code>MODE</code>): кто менял режим — пилот или failsafe.</li><li><strong>Управление</strong> (<code>ATT</code>, <code>CTUN</code>): успевал ли аппарат за командами.</li><li><strong>Питание</strong> (<code>BAT</code>, <code>POWR</code>): просадки и их совпадение с событиями.</li><li><strong>Навигация</strong> (<code>GPS</code>, <code>XKF4</code>): качество позиции и вариации в момент проблемы.</li></ol>
 <h4 class="md-subheading">Инструменты</h4>
 <p>Mission Planner (Review a Log), MAVExplorer из пакета MAVProxy (графики по именам полей, например <code>graph ATT.Roll ATT.DesRoll</code>), UAV Log Viewer в браузере. Для автоматизации — <code>pymavlink.DFReader</code>: читает <code>.bin</code> напрямую в Python.</p>
+<h4 class="md-subheading">Разобранный пример: разбор «просадка высоты на 3 м в Loiter»</h4>
+<p>1. <code>VIBE.VibeZ</code> 12 м/с², <code>Clip</code> 0 → не вибрации. 2. <code>ERR</code>/<code>MSG</code>: нет. 3. <code>CTUN</code>: <code>DAlt</code> 20 м постоянна, <code>Alt</code> проваливается до 17 м, <code>BAlt</code> одновременно → реальная просадка, не оценка. 4. <code>CTUN.ThO</code> в момент — 0.78 (до — 0.42), <code>BAT.Volt</code> 21.1 → 18.9 В, <code>BAT.Curr</code> 60 → 95 А: газ упёрся в потолок на просевшей АКБ. 5. <code>RCIN.C3</code> — пилот газ не трогал; <code>MODE</code> без смен. Вывод: нехватка тяги при просадке напряжения на старой АКБ (<code>BAT.Res</code> 0.09 Ом — высоко): АКБ на замену, <code>MOT_BAT_VOLT_MIN/MAX</code> для компенсации, порог <code>BATT_LOW_VOLT</code> выше. Метод важнее вывода: каждый шаг — конкретное поле.</p>
+<h4 class="md-subheading">Python для своих метрик (pymavlink)</h4>
+<pre class="cli-block"><code>from pymavlink import mavutil
+import pandas as pd
+def df_of(log, msg):
+    m = mavutil.mavlink_connection(log); rows = []
+    while (x := m.recv_match(type=msg, blocking=False)) is not None: rows.append(x.to_dict())
+    return pd.DataFrame(rows)
+att = df_of(&quot;flight.bin&quot;, &quot;ATT&quot;)
+err = (att.DesRoll - att.Roll).abs()
+print(&quot;roll tracking RMS deg:&quot;, err.pow(2).mean() ** 0.5, &quot;p99:&quot;, err.quantile(0.99))
+vibe = df_of(&quot;flight.bin&quot;, &quot;VIBE&quot;); print(&quot;VibeZ p95:&quot;, vibe.VibeZ.quantile(0.95), &quot;clips:&quot;, vibe.Clip.max())</code></pre>
+<p><code>mavlogdump.py --types ATT,VIBE --format csv flight.bin</code> — быстрая выгрузка в CSV без кода; <code>MAVExplorer</code>: <code>graph ATT.Roll ATT.DesRoll</code>, <code>fft</code> для спектров батч-сэмплинга (<code>ISBH/ISBD</code>), <code>map</code> для траектории. Метрики переходного процесса и спектры — модуль «Python для данных».</p>
+<h4 class="md-subheading">Что писать в LOG_BITMASK</h4>
+<p>По умолчанию достаточно для разбора полёта; для тюнинга добавить <code>PID</code> (сообщения <code>PIDR/PIDP/PIDY</code> с P/I/D/FF по осям) и <code>IMU_RAW</code>/батч-сэмплинг (<code>INS_LOG_BAT_MASK</code>) на время настройки фильтров — лог растёт в разы, после — выключить. <code>LOG_FILE_DSRMROT</code> — новый файл при каждом дизарме; <code>LOG_DISARMED = 1</code> — для наземных измерений (шум, GPS), потом выключить, иначе SD забивается.</p>
 
 <h2>Практика</h2>
 <h4 class="md-subheading">Скрипт: вибрации и клиппинг по логу</h4>
