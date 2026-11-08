@@ -1,0 +1,51 @@
+  <script>
+    (function () {
+      var tables = document.querySelectorAll("table");
+      tables.forEach(function (table) {
+        var headers = Array.from(table.querySelectorAll("thead th")).map(function (th) {
+          return th.textContent.trim();
+        });
+        if (!headers.length) return;
+        table.querySelectorAll("tbody tr").forEach(function (row) {
+          Array.from(row.children).forEach(function (cell, index) {
+            if (!cell.getAttribute("data-label")) {
+              cell.setAttribute("data-label", headers[index] || "Поле");
+            }
+          });
+        });
+      });
+
+      var commandBlocks = document.querySelectorAll(
+        "#content-automation pre, #scripts-reference pre, #article-add-algorithm pre"
+      );
+      commandBlocks.forEach(function (pre) {
+        var button = document.createElement("button");
+        button.type = "button";
+        button.className = "cmd-copy-btn";
+        button.textContent = "Копировать";
+        button.setAttribute("aria-label", "Копировать команду");
+
+        button.addEventListener("click", function () {
+          var text = pre.textContent || "";
+          if (!text.trim()) return;
+
+          navigator.clipboard.writeText(text).then(function () {
+            var prev = button.textContent;
+            button.textContent = "Скопировано";
+            setTimeout(function () {
+              button.textContent = prev;
+            }, 1200);
+          }).catch(function () {
+            button.textContent = "Ошибка";
+            setTimeout(function () {
+              button.textContent = "Копировать";
+            }, 1200);
+          });
+        });
+
+        pre.appendChild(button);
+      });
+    })();
+  </script>
+</body>
+</html>

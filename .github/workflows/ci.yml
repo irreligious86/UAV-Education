@@ -31,13 +31,15 @@ jobs:
         run: python scripts/validate_content.py
 
       - name: Rebuild site
-        run: python scripts/build_site.py
+        run: |
+          python scripts/build_site.py
+          python scripts/build_curriculum_page.py
 
       - name: Built site must be committed in sync with content
         run: |
-          if [ -n "$(git status --porcelain -- index.html m ref pages api quiz cap path tasks projects sw.js manifest.webmanifest assets/diagrams)" ]; then
+          if [ -n "$(git status --porcelain -- index.html m ref pages api quiz cap path tasks projects curriculum sw.js manifest.webmanifest assets/diagrams)" ]; then
             echo "::error::Site is stale. Run 'python scripts/publish.py' locally and commit the result."
-            git status --short -- index.html m ref pages api quiz cap path tasks projects sw.js manifest.webmanifest assets/diagrams
+            git status --short -- index.html m ref pages api quiz cap path tasks projects curriculum sw.js manifest.webmanifest assets/diagrams
             exit 1
           fi
 
