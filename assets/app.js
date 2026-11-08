@@ -8,6 +8,63 @@
 
   function ids(attr) { return attr ? attr.split(",").filter(Boolean) : []; }
 
+  /* --- Firmware paths: independent, parallel progress ---------------------
+   * Which path the student is "in" comes from ?path=<id> on the URL; it is
+   * remembered per browser so the next click keeps the same context.
+   * «Продолжить» = first published step of that path not yet passed.      */
+  var PATH_KEY = "uav-student:active-path";
+  function activePath() {
+    var q = /[?&]path=([a-z0-9-]+)/.exec(location.search);
+    if (q) { try { localStorage.setItem(PATH_KEY, q[1]); } catch (e) { /* storage unavailable */ } return q[1]; }
+    try { return localStorage.getItem(PATH_KEY) || ""; } catch (e) { return ""; }
+  }
+  function steps(attr) {
+    return (attr || "").split(";;").filter(Boolean).map(function (s) { var i = s.indexOf("|"); return { id: s.slice(0, i), title: s.slice(i + 1) }; });
+  }
+  function renderPaths(G) {
+    var grades = G.grades;
+    document.querySelectorAll("[data-path-continue]").forEach(function (el) {
+      var pid = el.getAttribute("data-path-continue"), list = steps(el.getAttribute("data-path-steps"));
+      if (!list.length) return;
+      var passed = 0, next = null;
+      list.forEach(function (s) { var g = grades[s.id]; if (g && g.status === "passed") passed++; else if (!next) next = s; });
+      var isCard = el.tagName === "A";
+      var href = base + "m/" + (next ? next.id : list[list.length - 1].id) + ".html?path=" + pid;
+      el.hidden = false;
+      if (isCard) {
+        el.setAttribute("href", href);
+        el.innerHTML = next
+          ? '<span class="gc-label gc-muted">' + (passed ? "Продолжить · шаг " + (list.indexOf(next) + 1) + " из " + list.length : "Начать путь") + '</span><br><strong>' + next.title + "</strong>"
+          : '<span class="gc-label gc-muted">Все шаги пройдены</span><br><strong>Повторить последний шаг</strong>';
+      } else {
+        el.textContent = next ? (passed ? "Продолжить: " : "Начать: ") + next.title : "Все шаги пройдены";
+        el.setAttribute("data-next-href", href);
+      }
+    });
+    // home cards: a click on «Продолжить» goes straight to the step
+    document.querySelectorAll("[data-path-card]").forEach(function (card) {
+      var cont = card.querySelector("[data-path-continue]");
+      if (cont && cont.getAttribute("data-next-href") && !card.getAttribute("data-path-bound")) {
+        card.setAttribute("data-path-bound", "1");
+        cont.classList.add("path-card__link");
+        cont.addEventListener("click", function (e) { e.preventDefault(); location.href = cont.getAttribute("data-next-href"); });
+      }
+    });
+  }
+  function applyPathContext() {
+    var pid = activePath();
+    var pagers = document.querySelectorAll("[data-path-pager]");
+    if (!pagers.length) return;
+    var match = null;
+    pagers.forEach(function (n) { if (n.getAttribute("data-path-pager") === pid) match = n; });
+    var trackPager = document.querySelector("[data-track-pager]");
+    if (match) {
+      match.hidden = false;
+      if (trackPager) trackPager.hidden = true;
+      document.querySelectorAll("[data-path-pos]").forEach(function (li) { li.classList.toggle("is-active", li.getAttribute("data-path-pos") === pid); });
+    }
+  }
+
   function render(G) {
     var grades = G.grades, caps = G.caps;
 
@@ -57,6 +114,8 @@
       label.textContent = list.length ? "освоено " + gg.passed + " из " + gg.total + " · балл " + gg.score : "";
     });
 
+    renderPaths(G);
+
     document.querySelectorAll("[data-done-toggle]").forEach(function (btn) {
       var id = btn.getAttribute("data-done-toggle"), g = gradeOf(id);
       var isCap = !!caps[id];
@@ -80,6 +139,7 @@
   }
 
   function init() {
+    applyPathContext();
     if (!window.UAVProgress || !window.UAVGrading) return;
 
     document.querySelectorAll("[data-done-toggle]").forEach(function (btn) {

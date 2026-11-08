@@ -190,9 +190,12 @@ def hours_text(h) -> str:
 # ---------------------------------------------------------------- home: course map
 
 
-def module_row(m: dict, n: int, base: str) -> str:
+def module_row(m: dict, n: int, base: str, path_id: str | None = None, shared: bool = False) -> str:
     planned = m["status"] == "planned"
     tags = [level_tag(m["level"])]
+    if shared:
+        tags.append('<span class="gc-tag" title="Общий модуль: засчитывается во всех путях, где он есть">общий</span>')
+    q = f"?path={esc(path_id)}" if path_id else ""
     if m.get("hours"):
         tags.append(f'<span class="gc-tag">{hours_text(m["hours"])}</span>')
     if planned:
@@ -200,7 +203,7 @@ def module_row(m: dict, n: int, base: str) -> str:
     tags.append('<span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span>')
     return f"""          <li class="track-module{' track-module--planned' if planned else ''}" data-module-id="{esc(m['id'])}">
             <span class="track-module__num">{n:02d}</span>
-            <a class="track-module__title" href="{base}m/{esc(m['id'])}.html">{esc(m['title'])}</a>
+            <a class="track-module__title" href="{base}m/{esc(m['id'])}.html{q}">{esc(m['title'])}</a>
             <span class="track-module__tags">{''.join(tags)}</span>
           </li>"""
 
@@ -241,22 +244,38 @@ def render_group(g: dict, model: dict, base: str) -> str:
       </section>"""
 
 
+def path_steps_attr(p: dict, model: dict) -> str:
+    """id|title pairs of published steps, in path order — read by app.js for «Продолжить»."""
+    return esc(";;".join(f"{m['id']}|{m['title']}" for m in (model["modules"][i] for i in p["moduleIds"]) if m["status"] == "published"))
+
+
 def render_path_card(p: dict, model: dict, base: str) -> str:
     mods = [model["modules"][i] for i in p["moduleIds"]]
     pub = [m["id"] for m in mods if m["status"] == "published"]
-    return f"""        <a class="gc-card path-card" href="{base}path/{esc(p['id'])}.html">
+    return f"""        <a class="gc-card path-card" href="{base}path/{esc(p['id'])}.html" data-path-card="{esc(p['id'])}">
           <p class="gc-label gc-muted">По прошивке</p>
           <strong>{esc(p['title'])}</strong>
           <div class="gc-muted">{esc(p['subtitle'])}</div>
+          <div class="path-card__continue gc-muted" data-path-continue="{esc(p['id'])}" data-path-steps="{path_steps_attr(p, model)}" hidden></div>
           <div class="gc-card__meta"><span class="gc-tag">{len(mods)} шагов</span><span class="gc-tag" data-state="ok">написано {len(pub)}</span><span class="gc-tag" data-progress-label="{esc(','.join(pub))}"></span></div>
           <div class="gc-progress" role="progressbar" aria-label="Прогресс по пути {esc(p['title'])}" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" data-progress-of="{esc(','.join(pub))}" style="--gc-value: 0%"></div>
         </a>"""
+
+
+def shared_module_ids(model: dict) -> set:
+    """Modules that appear in more than one firmware path."""
+    seen, shared = set(), set()
+    for p in model["paths"]:
+        for mid in p["moduleIds"]:
+            (shared if mid in seen else seen).add(mid)
+    return shared
 
 
 def render_path(p: dict, model: dict) -> str:
     base = "../"
     mods = [model["modules"][i] for i in p["moduleIds"]]
     pub = [m["id"] for m in mods if m["status"] == "published"]
+    shared = shared_module_ids(model)
     n = 0
     stages = []
     for st in p["stages"]:
@@ -266,7 +285,7 @@ def render_path(p: dict, model: dict) -> str:
                 continue
             n += 1
             m = model["modules"][mid]
-            rows.append(module_row(m, n, base))
+            rows.append(module_row(m, n, base, path_id=p["id"], shared=mid in shared))
         stages.append(f"""      <section class="track gc-panel">
         <p class="gc-label gc-muted">Этап</p>
         <h2 class="gc-title">{esc(st['title'])}</h2>
@@ -288,7 +307,8 @@ def render_path(p: dict, model: dict) -> str:
       <div class="home-hero__stats"><span class="gc-tag">{len(mods)} шагов</span><span class="gc-tag" data-state="ok">написано {len(pub)}</span><span class="gc-tag" data-state="caution">в работе {len(mods) - len(pub)}</span></div>
       <p class="gc-label gc-muted">Твой прогресс <span data-progress-label="{esc(','.join(pub))}"></span></p>
       <div class="gc-progress" role="progressbar" aria-label="Прогресс по пути" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" data-progress-of="{esc(','.join(pub))}" style="--gc-value: 0%"></div>
-      <p class="gc-muted home-hero__note">Иди по порядку: каждый шаг опирается на предыдущие. Общие модули (физика, питание, радиолинк) включены там, где они нужны именно этой прошивке.</p>
+      <p class="path-continue"><a class="gc-card" data-path-continue="{esc(p['id'])}" data-path-steps="{path_steps_attr(p, model)}" hidden></a></p>
+      <p class="gc-muted home-hero__note">Иди по порядку: каждый шаг опирается на предыдущие. Модули с тегом «общий» входят и в другие пути — пройденный один раз, такой модуль засчитан везде. Открывай уроки отсюда: тогда кнопки «назад/дальше» ведут по шагам именно этого пути.</p>
     </section>
 {chr(10).join(stages)}
     {caps_html}"""
@@ -323,7 +343,7 @@ def render_home(model: dict) -> str:
 
     <section class="choose" aria-labelledby="choose-title">
       <h2 class="gc-title" id="choose-title">Как учиться</h2>
-      <p class="gc-muted">Два способа пройти один и тот же материал. Прогресс общий.</p>
+      <p class="gc-muted">Пути по прошивкам независимы: можно идти по нескольким параллельно в своём темпе — у каждого свой прогресс и своя кнопка «Продолжить». Общие модули засчитываются во всех путях сразу.</p>
       <div class="gc-grid ref-grid">
 {chr(10).join(render_path_card(p, model, base) for p in model["paths"])}
       </div>
@@ -542,22 +562,33 @@ def render_module(m: dict, model: dict) -> str:
         )
 
     path_nav = []
+    path_pagers = []
     for p in model["paths"]:
         if m["id"] in p["moduleIds"]:
             i = p["moduleIds"].index(m["id"])
             nxt_id = p["moduleIds"][i + 1] if i + 1 < len(p["moduleIds"]) else None
-            nxt_html = f' → <a href="{esc(nxt_id)}.html">{esc(model["modules"][nxt_id]["title"])}</a>' if nxt_id else " · последний шаг"
-            path_nav.append(f'<li><a href="{base}path/{esc(p["id"])}.html">{esc(p["title"])}</a>: шаг {i + 1} из {len(p["moduleIds"])}{nxt_html}</li>')
+            prev_id = p["moduleIds"][i - 1] if i > 0 else None
+            q = f"?path={esc(p['id'])}"
+            nxt_html = f' → <a href="{esc(nxt_id)}.html{q}">{esc(model["modules"][nxt_id]["title"])}</a>' if nxt_id else " · последний шаг"
+            path_nav.append(f'<li data-path-pos="{esc(p["id"])}"><a href="{base}path/{esc(p["id"])}.html">{esc(p["title"])}</a>: шаг {i + 1} из {len(p["moduleIds"])}{nxt_html}</li>')
+            pg = []
+            if prev_id:
+                pg.append(f'<a class="gc-card pager__prev" href="{esc(prev_id)}.html{q}"><span class="gc-label gc-muted">Назад · путь {esc(p["title"])}</span><br>{esc(model["modules"][prev_id]["title"])}</a>')
+            if nxt_id:
+                pg.append(f'<a class="gc-card pager__next" href="{esc(nxt_id)}.html{q}"><span class="gc-label gc-muted">Дальше · шаг {i + 2} из {len(p["moduleIds"])}</span><br>{esc(model["modules"][nxt_id]["title"])}</a>')
+            else:
+                pg.append(f'<a class="gc-card pager__next" href="{base}path/{esc(p["id"])}.html"><span class="gc-label gc-muted">Путь пройден</span><br>К итоговым проектам пути {esc(p["title"])}</a>')
+            path_pagers.append(f'<nav class="pager" aria-label="Соседние шаги пути {esc(p["title"])}" data-path-pager="{esc(p["id"])}" hidden>{"".join(pg)}</nav>')
     if path_nav:
         blocks.append(f'<div class="path-pos gc-muted"><span class="gc-label">В пути</span><ul>{"".join(path_nav)}</ul></div>')
 
     prev, nxt = neighbours(m, model)
     pager = []
     if prev:
-        pager.append(f'<a class="gc-card pager__prev" href="{esc(prev["id"])}.html"><span class="gc-label gc-muted">Назад</span><br>{esc(prev["title"])}</a>')
+        pager.append(f'<a class="gc-card pager__prev" href="{esc(prev["id"])}.html"><span class="gc-label gc-muted">Назад · трек</span><br>{esc(prev["title"])}</a>')
     if nxt:
-        pager.append(f'<a class="gc-card pager__next" href="{esc(nxt["id"])}.html"><span class="gc-label gc-muted">Дальше</span><br>{esc(nxt["title"])}</a>')
-    pager_html = f'<nav class="pager" aria-label="Соседние модули">{"".join(pager)}</nav>' if pager else ""
+        pager.append(f'<a class="gc-card pager__next" href="{esc(nxt["id"])}.html"><span class="gc-label gc-muted">Дальше · трек</span><br>{esc(nxt["title"])}</a>')
+    pager_html = (f'<nav class="pager" aria-label="Соседние модули" data-track-pager>{"".join(pager)}</nav>' if pager else "") + "".join(path_pagers)
     related_html = render_related(m, model)
 
     lead = f'<p class="module-lead">{summary_html}</p>' if summary_html else ""

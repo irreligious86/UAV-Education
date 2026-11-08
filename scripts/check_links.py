@@ -29,6 +29,7 @@ def main() -> int:
             if re.match(r"^(https?:|mailto:|data:)", link):
                 continue
             path_part, _, anchor = link.partition("#")
+            path_part = path_part.split("?", 1)[0]  # query strings (e.g. ?path=betaflight) are client-side context
             target = page if not path_part else (page.parent / unquote(path_part)).resolve()
             rel = page.relative_to(ROOT)
             if not target.exists():
