@@ -59,8 +59,12 @@ jobs:
 
       - name: ROS 2 labs logic (frames, offboard state machine) and compose file
         run: |
+          pip install --quiet pyyaml
           python -m pytest -q -p no:cacheprovider examples/ros2-docker/ws/src/uav_ros2_labs/test
           python -c "import yaml; yaml.safe_load(open('examples/ros2-docker/docker-compose.yml'))"
+
+      - name: Project starters (log report)
+        run: python -m pytest -q -p no:cacheprovider examples/log-report/tests
 
       - uses: actions/setup-node@v4
         with:
