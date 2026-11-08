@@ -47,7 +47,7 @@
 pip install pandas numpy scipy matplotlib pymavlink</code></pre>
 <p><code>blackbox_decode</code> — из репозитория betaflight/blackbox-tools (собирается <code>make</code>), превращает <code>.BFL</code> в CSV с одной строкой на цикл PID.</p>
 <h4 class="md-subheading">Чтение логов</h4>
-<p><strong>Betaflight CSV</strong>: колонки <code>time (us)</code>, <code>gyroADC[0..2]</code> (град/с, после фильтров — <code>gyroADC</code>, до — <code>gyroUnfilt</code> в новых версиях при <code>debug_mode = GYRO_SCALED</code>), <code>setpoint[0..3]</code>, <code>motor[0..3]</code>, <code>rcCommand[0..3]</code>, <code>axisP/I/D/F[...]</code>, <code>eRPM[...]</code> при ESC-телеметрии.</p>
+<p><strong>Betaflight CSV</strong>: колонки <code>time (us)</code>, <code>gyroADC[0..2]</code> (град/с, после фильтров — <code>gyroADC</code>, до — <code>gyroUnfilt</code> (отдельное поле blackbox в 4.5, включается выбором полей; <code>debug_mode = GYRO_SCALED</code> пишет нефильтрованный гироскоп в <code>debug[]</code>)), <code>setpoint[0..3]</code>, <code>motor[0..3]</code>, <code>rcCommand[0..3]</code>, <code>axisP/I/D/F[...]</code>, <code>eRPM[...]</code> при ESC-телеметрии.</p>
 <pre class="cli-block"><code>import pandas as pd, numpy as np
 df = pd.read_csv(&quot;log.01.csv&quot;, skipinitialspace=True)
 df.columns = [c.strip() for c in df.columns]

@@ -31,7 +31,7 @@ pip install pandas numpy scipy matplotlib pymavlink
 `blackbox_decode` — из репозитория betaflight/blackbox-tools (собирается `make`), превращает `.BFL` в CSV с одной строкой на цикл PID.
 
 ### Чтение логов
-**Betaflight CSV**: колонки `time (us)`, `gyroADC[0..2]` (град/с, после фильтров — `gyroADC`, до — `gyroUnfilt` в новых версиях при `debug_mode = GYRO_SCALED`), `setpoint[0..3]`, `motor[0..3]`, `rcCommand[0..3]`, `axisP/I/D/F[...]`, `eRPM[...]` при ESC-телеметрии.
+**Betaflight CSV**: колонки `time (us)`, `gyroADC[0..2]` (град/с, после фильтров — `gyroADC`, до — `gyroUnfilt` (отдельное поле blackbox в 4.5, включается выбором полей; `debug_mode = GYRO_SCALED` пишет нефильтрованный гироскоп в `debug[]`)), `setpoint[0..3]`, `motor[0..3]`, `rcCommand[0..3]`, `axisP/I/D/F[...]`, `eRPM[...]` при ESC-телеметрии.
 
 ```python
 import pandas as pd, numpy as np

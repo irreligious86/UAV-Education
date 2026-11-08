@@ -32,7 +32,7 @@ next:
 5. **Записывай путь.** Шаги с результатами — в заметку; найденная причина — в дерево и в журнал аппарата.
 
 ### Дерево 1. Не армится
-Прочитай причину: Betaflight CLI → `status` → `Arming disable flags: ...`. Самые частые:
+Прочитай причину: Betaflight CLI → `status` → `Arming disable flags: ...`. CLI печатает короткие имена из `runtime_config.c` (FAILSAFE, CALIB, NO_ACC_CAL, CMS, BOOTGRACE, MOTOR_PROTO, DSHOT_TELEM, ARMSWITCH в 4.5 / ARM_SWITCH в 2025.12+); ниже часть флагов названа по документации. Самые частые:
 - **RXLOSS / RX_FAILSAFE** — приёмник не даёт каналов. → Порт и протокол (UART, CRSF/SBUS, инверсия для SBUS на F4), бинд, питание приёмника (5 В мультиметром), вкладка Receiver — двигаются ли каналы.
 - **THROTTLE** — газ выше минимума. → Калибровка стиков в пульте, `min_check`, реверс канала.
 - **ANGLE** — аппарат наклонён больше `small_angle`. → Поверхность, калибровка акселерометра.
@@ -40,7 +40,7 @@ next:
 - **ARM_SWITCH** — тумблер арма был включён при подаче питания. → Выключить, включить.
 - **MSP / CLI / CMS_MENU** — подключён конфигуратор или открыто меню OSD. → Отключить USB, выйти из меню.
 - **NOPREARM** — задан prearm-режим, не активирован.
-- **RPMFILTER** — включён RPM-фильтр, нет телеметрии ESC (DShot bidir не поддерживается прошивкой ESC или не включён).
+- **DSHOT_TELEM** (до 4.5 — RPMFILTER) — включён RPM-фильтр, нет телеметрии ESC (DShot bidir не поддерживается прошивкой ESC или не включён).
 - **BOOT_GRACE_TIME** — просто подождать несколько секунд после включения.
 - **MOTOR_PROTOCOL** — не выбран протокол моторов.
 INAV: вкладка Status показывает причины (Navigation is unsafe, Compass not calibrated, Hardware failure...). ArduPilot: `PreArm: ...` в GCS — каждая строка называет виновника (Compass not calibrated, Gyros inconsistent, RC not calibrated, Throttle below failsafe, GPS: No Fix, Battery failsafe и т. д.); проверки в `ARMING_SKIPCHK` (до 4.7 — `ARMING_CHECK`) не отключать — чинить причину.
