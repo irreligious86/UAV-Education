@@ -32,15 +32,47 @@
     <article class="module" data-module-page="el-wiring">
       <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-electronics">Электроника и радио</a><span>Пайка, жгуты и надёжность соединений</span></p>
       <h1 class="module-title">Пайка, жгуты и надёжность соединений</h1>
-      <div class="module-tags"><span class="gc-tag" title="Уровень">L1 — Оператор</span><span class="gc-tag">учёба ~2 ч</span><span class="gc-tag" data-state="caution">СКОРО</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ОСВОЕН</span></div>
+      <div class="module-tags"><span class="gc-tag" title="Уровень">L1 — Оператор</span><span class="gc-tag">чтение 25 мин</span><span class="gc-tag">учёба ~2 ч</span><span class="gc-tag">любая прошивка</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ОСВОЕН</span></div>
       <p class="gc-muted module-score" data-module-score></p>
-      
+      <p class="module-lead">Большинство «загадочных» отказов — холодная пайка, перетёртый провод или разъём, который держался на честном слове. Модуль — ремесло: как паять силовые пады и тонкие сигнальные провода без холодных паек, какой припой и флюс, как лудить, как снимать изоляцию, вести жгуты, фиксировать и защищать от вибрации, и как проверять соединения механически и электрически до полёта.</p>
       <div class="gc-callout" data-state="ok"><strong>После модуля ты умеешь</strong><ul><li>паять силовые и сигнальные соединения без холодных паек</li><li>вести жгуты так, чтобы не перетирались и не ловили помехи</li><li>проверять соединения на вибростенде и тягой</li></ul></div><p class="gc-muted">Перед этим модулем: <a href="el-power-design.html">Схемотехника питания борта</a></p><div class="gc-callout lab"><p class="gc-label gc-muted">Лабораторная</p><strong>Сборка жгута</strong><p class="gc-muted lab__hint">Сдано, когда отмечены все пункты:</p><ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="el-wiring:lab:0"><span>Силовая пайка проверена нагрузкой</span></label></li><li><label><input type="checkbox" data-check-id="el-wiring:lab:1"><span>Жгут закреплён, провода не касаются пропов и острых кромок</span></label></li></ul></div><div class="path-pos gc-muted"><span class="gc-label">В пути</span><ul><li><a href="../path/betaflight.html">Betaflight</a>: шаг 19 из 36 → <a href="el-measure.html">Измерения: мультиметр, осциллограф, логический анализатор</a></li></ul></div>
       <div class="gc-prose module-body">
-<div class="gc-callout" data-state="caution"><strong>Модуль в разработке.</strong> Цели и связи уже определены, текст пишется. План — в <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">ROADMAP</a>.</div>
+<h2>Теория</h2>
+<h4 class="md-subheading">Физика пайки</h4>
+<p>Припой смачивает металл только при достаточной температуре и чистой поверхности. Флюс растворяет окислы. Холодная пайка — припой застыл, не смочив одну из сторон: матовая, зернистая, шариком. Она проводит сегодня и рвётся от вибрации завтра.</p>
+<ul><li><strong>Температура</strong>: 330–370 °C для свинцового припоя (Sn63/Pb37, плавится 183 °C), 370–400 °C для бессвинцового. Большие силовые пады — большой жала и мощность (60–80 Вт), иначе пад не прогреется и получится холодная пайка; маленькие пады FC — тонкое жало, короткий контакт (≤ 3 с), иначе отслоится пад.</li><li><strong>Припой</strong>: 0.6–0.8 мм с флюсом в сердцевине для сигнальных, 1.0 мм для силовых. Свинцовый проще для новичков (ниже температура, лучше текучесть).</li><li><strong>Флюс</strong>: безотмывочный или канифольный; активные (кислотные) — никогда на электронике. Остатки канифоли — смыть изопропанолом: они гигроскопичны и могут проводить.</li><li><strong>Лужение</strong>: перед соединением лудятся оба: провод и пад. Соединение — прижать залуженный провод к залуженному паду, прогреть до слияния, держать неподвижно до застывания (1–2 с).</li></ul>
+<h4 class="md-subheading">Провода</h4>
+<ul><li><strong>Силиконовая изоляция, многожильный</strong> — для всего на борту: гибкие, терпят жару паяльника.</li><li>Снимать изоляцию стриппером по калибру, не ножом: подрезанные жилы ломаются.</li><li><strong>Длина лужения</strong> = глубина пада; лишний залуженный участок становится жёстким и ломается на границе — провод должен гнуться у изоляции, не у пайки.</li><li>Термоусадка на каждый открытый участок, особенно на силовые.</li></ul>
+<h4 class="md-subheading">Разъёмы</h4>
+<p>XT30/XT60 паять: разъём в паре (чтобы не повело пластик), пады прогреть до текучести, провод вставить, долить припоя. Пины JST-SH/GH — обжим, не пайка; обжимать правильным инструментом или покупать готовые жгуты. Разъёмы на вибрации — фиксировать (капля горячего клея на корпусе, не на пинах).</p>
+<h4 class="md-subheading">Жгуты и вибрации</h4>
+<ul><li>Провод ломается там, где одна точка жёсткая, а соседняя — нет: у пайки, у стяжки. Фиксация — через 3–5 см от пайки, не впритык.</li><li>Жгут — свободный изгиб, не натянут (особенно к FC на демпферах).</li><li>Защита от перетирания: оплётка/термоусадка в местах контакта с карбоном; острые кромки рамы — обработать.</li><li>Сигнальные провода — скрутить с землёй, вести отдельно от силовых; силовые + и − — скрутить (см. помехи).</li><li>Ничего — в зоне пропов и в траектории изгиба лучей складной рамы.</li></ul>
+<h4 class="md-subheading">Проверка</h4>
+<ol><li><strong>Визуально</strong>: блестящий конус припоя, виден контур провода, нет шариков и перемычек.</li><li><strong>Механически</strong>: лёгкий тест на вытягивание каждого провода; пошевелить у пайки.</li><li><strong>Электрически</strong>: прозвонка соседних падов на КЗ, сопротивление силового соединения — доли мОм (мультиметром не видно, но нагрев под нагрузкой покажет).</li><li><strong>Под нагрузкой</strong>: пропы сняты, газ на минуту, тепловизор или палец (осторожно) на каждом соединении: нагретый — плохой.</li><li><strong>Вибротест</strong>: моторы на малом газу без пропов 30 с — ничего не дребезжит и не отходит.</li></ol>
+
+<h2>Практика</h2>
+<h4 class="md-subheading">Шаг 1. Тренировка</h4>
+<p>На обрезке платы/старом ESC: 10 паек 20 AWG, 10 паек 28 AWG. Разрезать одну силовую пайку поперёк — припой должен заполнить всё сечение без пустот.</p>
+<h4 class="md-subheading">Шаг 2. Силовая пайка на сборке</h4>
+<p>XT60 → PDB/ESC 14 AWG. Проверить: вытягивание, прозвонка, нагрев под нагрузкой (без пропов).</p>
+<h4 class="md-subheading">Шаг 3. Сигнальный жгут</h4>
+<p>Приёмник → FC (5 В, GND, TX, RX): скрутить, длина с запасом на изгиб, фиксация через 3–5 см от пайки, термоусадка.</p>
+<h4 class="md-subheading">Шаг 4. Трассировка и фиксация</h4>
+<p>Фото сборки сверху и снизу: ничего в зоне пропов, нет контакта с острыми кромками, жгуты не натянуты. Лабораторная: силовая пайка проверена нагрузкой, жгут закреплён.</p>
+
+<h2>Диагностика</h2>
+<div class="diag-groups"><article class="diag-item"><h4><strong>Симптом:</strong> мотор дёргается или отваливается на газу</h4><ul><li>Возможная причина: холодная пайка фазы или перетёртый провод.</li><li>Что сделать: перепаять, прозвонить, вибротест.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> XT60 греется</h4><ul><li>Возможная причина: плохая пайка или окисленные контакты.</li><li>Что сделать: перепаять с прогревом, заменить разъём.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> периодические потери приёмника/GPS</h4><ul><li>Возможная причина: подломленная жила у пайки или в обжиме JST.</li><li>Что сделать: пошевелить провод при работающем борту, перепаять с фиксацией.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> пад FC отслоился</h4><ul><li>Возможная причина: перегрев или рывок провода.</li><li>Что сделать: припаяться к ближайшей дорожке/переходному отверстию, зафиксировать провод клеем.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> КЗ после сборки</h4><ul><li>Возможная причина: перемычка припоя между соседними падами, провод касается карбона.</li><li>Что сделать: прозвонка до включения, smoke stopper.</li></ul></article></div>
+
+<h2>Чек-лист</h2>
+<ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="el-wiring:0"><span>Пайки блестящие, конусом, без шариков</span></label></li><li><label><input type="checkbox" data-check-id="el-wiring:1"><span>Провод гнётся у изоляции, зафиксирован в 3–5 см от пайки</span></label></li><li><label><input type="checkbox" data-check-id="el-wiring:2"><span>Силовые соединения проверены нагревом под нагрузкой</span></label></li><li><label><input type="checkbox" data-check-id="el-wiring:3"><span>Жгуты не касаются пропов и острых кромок, не натянуты</span></label></li><li><label><input type="checkbox" data-check-id="el-wiring:4"><span>Прозвонка на КЗ и smoke stopper перед первым включением</span></label></li></ul>
+
+<h2>Источники</h2>
+<ul class="refs"><li><a href="https://workmanship.nasa.gov" target="_blank" rel="noopener noreferrer">NASA Workmanship Standards — Soldering (pictorial reference)</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://learn.adafruit.com/adafruit-guide-excellent-soldering" target="_blank" rel="noopener noreferrer">Adafruit — Guide to Excellent Soldering</a> <span class="gc-tag">secondary</span></li><li><a href="https://oscarliang.com/soldering-guide" target="_blank" rel="noopener noreferrer">Oscar Liang — A Beginner&#x27;s Guide to Soldering for FPV Drones</a> <span class="gc-tag">secondary</span></li></ul>
+<h2>Проверь себя</h2>
+<uav-quiz src="../quiz/el-wiring.json" module="el-wiring"></uav-quiz>
       </div>
-      
-      
+      <div class="module-done"><gc-button variant="secondary" data-done-toggle="el-wiring">Отметить как пройденный</gc-button></div>
+      <section class="related" aria-label="Смежные модули"><p class="gc-label gc-muted">Смежные модули</p><div class="gc-grid ref-grid"><a class="gc-card" href="el-power-design.html"><strong>Схемотехника питания борта</strong><div class="gc-card__meta"><span class="gc-tag" title="L2 — Интегратор">L2</span></div></a><a class="gc-card" href="f-frame-mech.html"><strong>Рама, механика и вибрации</strong><div class="gc-card__meta"><span class="gc-tag" title="L2 — Интегратор">L2</span></div></a></div></section>
       <nav class="pager" aria-label="Соседние модули"><a class="gc-card pager__prev" href="rf-link-budget.html"><span class="gc-label gc-muted">Назад</span><br>Бюджет радиолинка и дальность</a></nav>
     </article>
   </main>

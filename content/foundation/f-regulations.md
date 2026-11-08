@@ -74,7 +74,7 @@ next:
   - Что сделать: помощь пострадавшим, фиксация, уведомление по правилам страны, журнал.
 
 ## references
-- ICAO — Unmanned Aircraft Systems (UAS) | https://www.icao.int/safety/UA | primary | A
+- ICAO — Unmanned Aircraft Systems (UAS) | https://www.icao.int/UA | primary | A
 - EASA — Civil drones (пример структуры правил: открытая/специальная/сертифицированная категории) | https://www.easa.europa.eu/en/domains/civil-drones | primary | A
 - FAA — Unmanned Aircraft Systems (пример: Part 107, Recreational Flyers) | https://www.faa.gov/uas | primary | A
 

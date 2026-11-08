@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Антенны, поляризация и диаграммы — UAV Student</title>
+  <title>Антенны, поляризация и диаграммы направленности — UAV Student</title>
   <meta name="description" content="объяснить дипoль, патч, клевер, круговую и линейную поляризацию читать диаграмму направленности и выбирать ориентацию на борту измерять КСВ и понимать, когда антенна «не та»">
   <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="../lib/ground-control-ui/dist/ground-control.css">
@@ -30,17 +30,49 @@
   </header>
   <main class="gc-container site-main">
     <article class="module" data-module-page="rf-antennas">
-      <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-electronics">Электроника и радио</a><span>Антенны, поляризация и диаграммы</span></p>
-      <h1 class="module-title">Антенны, поляризация и диаграммы</h1>
-      <div class="module-tags"><span class="gc-tag" title="Уровень">L2 — Интегратор</span><span class="gc-tag">учёба ~3 ч</span><span class="gc-tag" data-state="caution">СКОРО</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ОСВОЕН</span></div>
+      <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-electronics">Электроника и радио</a><span>Антенны, поляризация и диаграммы направленности</span></p>
+      <h1 class="module-title">Антенны, поляризация и диаграммы направленности</h1>
+      <div class="module-tags"><span class="gc-tag" title="Уровень">L2 — Интегратор</span><span class="gc-tag">чтение 30 мин</span><span class="gc-tag">учёба ~3 ч</span><span class="gc-tag">любая прошивка</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ОСВОЕН</span></div>
       <p class="gc-muted module-score" data-module-score></p>
-      
+      <p class="module-lead">Антенна — половина радиолинка, и самая недооценённая. Модуль объясняет диполь, патч, клевер и «T»-антенны, разницу линейной и круговой поляризации, что такое усиление в dBi и почему оно всегда за счёт ширины луча, как читать диаграмму направленности и ориентировать антенны на борту и на земле, что измеряет КСВ и когда антенна «не та». Завершается тестом дальности на земле.</p>
       <div class="gc-callout" data-state="ok"><strong>После модуля ты умеешь</strong><ul><li>объяснить дипoль, патч, клевер, круговую и линейную поляризацию</li><li>читать диаграмму направленности и выбирать ориентацию на борту</li><li>измерять КСВ и понимать, когда антенна «не та»</li></ul></div><p class="gc-muted">Перед этим модулем: <a href="link-protocols.html">SBUS, CRSF и инверсия UART</a></p><div class="gc-callout lab"><p class="gc-label gc-muted">Лабораторная</p><strong>Антенны на своём аппарате</strong><p class="gc-muted lab__hint">Сдано, когда отмечены все пункты:</p><ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="rf-antennas:lab:0"><span>Антенны RC и видео выбраны по поляризации и диаграмме</span></label></li><li><label><input type="checkbox" data-check-id="rf-antennas:lab:1"><span>Ориентация на борту обоснована</span></label></li><li><label><input type="checkbox" data-check-id="rf-antennas:lab:2"><span>Тест дальности на земле проведён</span></label></li></ul></div><div class="path-pos gc-muted"><span class="gc-label">В пути</span><ul><li><a href="../path/betaflight.html">Betaflight</a>: шаг 22 из 36 → <a href="rf-link-budget.html">Бюджет радиолинка и дальность</a></li><li><a href="../path/inav.html">INAV</a>: шаг 10 из 16 → <a href="aero-wing.html">Аэродинамика крыла и самолётные режимы</a></li></ul></div>
       <div class="gc-prose module-body">
-<div class="gc-callout" data-state="caution"><strong>Модуль в разработке.</strong> Цели и связи уже определены, текст пишется. План — в <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">ROADMAP</a>.</div>
+<h2>Теория</h2>
+<h4 class="md-subheading">Как антенна излучает</h4>
+<p>Полуволновой диполь — два проводника по четверти волны. λ = c/f: 2.4 ГГц → 12.5 см (четверть 3.1 см), 915 МГц → 32.8 см (четверть 8.2 см), 5.8 ГГц → 5.2 см (четверть 1.3 см). Антенна «настроена», когда её размер соответствует частоте — тогда энергия уходит в эфир, а не отражается назад.</p>
+<h4 class="md-subheading">Диаграмма направленности и усиление</h4>
+<p>Изотропный излучатель (воображаемый) светит одинаково во все стороны — 0 dBi. Реальная антенна перераспределяет энергию: диполь даёт 2.15 dBi в плоскости, перпендикулярной оси, и ничего — вдоль оси («бублик»). <strong>Усиление — всегда за счёт сужения луча.</strong> Патч 8–9 dBi светит сектором ~60–70°, направленная Yagi 12–14 dBi — ~30°. На борту нужна всенаправленная (положение аппарата меняется), на земле — направленная, если есть кому наводить.</p>
+<p>Главное следствие для борта: диполь/«T»-антенна, установленная вертикально, не светит вверх и вниз. Если аппарат прямо над головой — провал. Поэтому две антенны приёмника (diversity) ставят под 90° друг к другу.</p>
+<h4 class="md-subheading">Поляризация</h4>
+<ul><li><strong>Линейная</strong> (диполь, «T», монополь): поле колеблется в одной плоскости. Приёмная антенна должна быть в той же плоскости: поворот на 90° даёт потери до 20–30 дБ в теории, на практике из-за отражений 10–20. При кренах аппарата поляризация рассогласовывается.</li><li><strong>Круговая</strong> (клевер, спираль, патч с круговой): поле вращается — правая (RHCP) или левая (LHCP). Ориентация антенн почти не важна; отражения меняют направление вращения и ослабляются (меньше multipath — чище видео). Платим ~3 дБ при приёме линейной антенной круговой и наоборот. RHCP↔LHCP — потери 15–20 дБ: не смешивать.</li><li>Для видео 5.8 ГГц — круговая на обоих концах; для RC 900 МГц/2.4 ГГц — линейные диполи, расположенные ортогонально.</li></ul>
+<h4 class="md-subheading">КСВ (SWR) и согласование</h4>
+<p>КСВ показывает, какая часть мощности отражается от антенны назад в передатчик. 1.0 — идеал; 1.5 — 4% отражения (−0.18 дБ), 2.0 — 11% (−0.5 дБ), 3.0 — 25% (−1.25 дБ). Высокий КСВ греет VTX и может его убить; на потери дальности влияет меньше, чем кажется, пока он ≤ 2. Измеряется антенным анализатором (NanoVNA — доступно). Антенна «не та»: КСВ минимален не на твоей частоте (обрезана/рассчитана на другой диапазон), повреждён разъём, оторвана земля коаксиала.</p>
+<h4 class="md-subheading">Расположение на борту</h4>
+<ul><li>Антенны — вне карбона: карбон — проводник, экранирует и расстраивает антенну.</li><li>Приёмник: две антенны под 90°, подальше от VTX и силовых; хвостовые «усы» вниз-назад под 45°.</li><li>Видео: антенна сверху или снизу так, чтобы между ней и землёй/пилотом не было рамы и АКБ; при полётах вдалеке и низко — снизу.</li><li>GPS: сверху, керамический патч горизонтально, земля (ground plane) под ним.</li><li>Кабель-пигтейл — минимальной длины: коаксиал теряет ~1 дБ на 30 см на 5.8 ГГц в тонком RG178.</li></ul>
+
+<h2>Практика</h2>
+<h4 class="md-subheading">Шаг 1. Инвентаризация</h4>
+<p>Для каждой антенны на борту и земле: диапазон, тип, поляризация (и направление круговой), усиление, разъём (SMA/RP-SMA, U.FL/MMCX). Проверить совпадение поляризаций в каждом линке.</p>
+<h4 class="md-subheading">Шаг 2. Ориентация</h4>
+<p>Нарисовать диаграммы (бублик диполя, сектор патча) в проекции на аппарат в типовых положениях: висение, крен 45°, отлёт на 1 км на высоте 100 м (угол места ~6°). Убедиться, что в каждом положении обе стороны «видят» друг друга не через провал.</p>
+<h4 class="md-subheading">Шаг 3. КСВ</h4>
+<p>NanoVNA (если есть): КСВ антенны видео на рабочем канале и соседних; антенны RC на центре диапазона. Записать. Без прибора — косвенно: RSSI на фиксированной дистанции с двумя антеннами.</p>
+<h4 class="md-subheading">Шаг 4. Тест дальности на земле</h4>
+<p>Аппарат на штативе 1.5 м, оператор отходит на 50, 100, 200 м (прямая видимость). Записать RSSI/LQ и качество видео; повернуть аппарат на 90° и 180° — записать провалы. Лабораторная: таблица дальность × ориентация × RSSI.</p>
+
+<h2>Диагностика</h2>
+<div class="diag-groups"><article class="diag-item"><h4><strong>Симптом:</strong> связь пропадает, когда аппарат прямо над головой</h4><ul><li>Возможная причина: провал диаграммы диполя вдоль оси.</li><li>Что сделать: вторая антенна под 90°, наклон антенны пульта.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> видео шумит при кренах</h4><ul><li>Возможная причина: линейные антенны, рассогласование поляризации.</li><li>Что сделать: круговая поляризация на обоих концах, одинаковая RHCP/LHCP.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> VTX сильно греется, дальность мала</h4><ul><li>Возможная причина: высокий КСВ — антенна другого диапазона или повреждена.</li><li>Что сделать: проверить КСВ/заменить антенну; никогда не включать VTX без антенны.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> RSSI хороший, LQ плохой</h4><ul><li>Возможная причина: шум рядом с антенной RX, не антенна.</li><li>Что сделать: см. модуль про помехи; разнести от VTX.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> GPS долго ловит спутники</h4><ul><li>Возможная причина: патч под карбоном, нет ground plane, рядом помехи.</li><li>Что сделать: мачта, металлическая площадка под патчем.</li></ul></article></div>
+
+<h2>Чек-лист</h2>
+<ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="rf-antennas:0"><span>Знаю типы антенн, их диаграммы и усиление</span></label></li><li><label><input type="checkbox" data-check-id="rf-antennas:1"><span>Поляризации в каждом линке совпадают (RHCP/LHCP не смешаны)</span></label></li><li><label><input type="checkbox" data-check-id="rf-antennas:2"><span>Антенны RC ортогональны, вне карбона, вдали от VTX</span></label></li><li><label><input type="checkbox" data-check-id="rf-antennas:3"><span>КСВ измерен или оценён косвенно</span></label></li><li><label><input type="checkbox" data-check-id="rf-antennas:4"><span>Тест дальности на земле проведён, таблица записана</span></label></li></ul>
+
+<h2>Источники</h2>
+<ul class="refs"><li><a href="https://www.expresslrs.org/hardware/hardware-selection/" target="_blank" rel="noopener noreferrer">ExpressLRS — Hardware Selection (antennas RX/TX)</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://oscarliang.com/fpv-antenna/" target="_blank" rel="noopener noreferrer">Oscar Liang — FPV Antenna guide (polarization, types)</a> <span class="gc-tag">secondary</span></li><li><a href="https://www.arrl.org/antennas" target="_blank" rel="noopener noreferrer">ARRL — Antenna fundamentals (SWR, gain, polarization)</a> <span class="gc-tag">secondary</span></li></ul>
+<h2>Проверь себя</h2>
+<uav-quiz src="../quiz/rf-antennas.json" module="rf-antennas"></uav-quiz>
       </div>
-      
-      
+      <div class="module-done"><gc-button variant="secondary" data-done-toggle="rf-antennas">Отметить как пройденный</gc-button></div>
+      <section class="related" aria-label="Смежные модули"><p class="gc-label gc-muted">Смежные модули</p><div class="gc-grid ref-grid"><a class="gc-card" href="link-protocols.html"><strong>SBUS, CRSF и инверсия UART</strong><div class="gc-card__meta"><span class="gc-tag" title="L1 — Оператор">L1</span></div></a><a class="gc-card" href="link-vtx.html"><strong>VTX-таблицы и смена видеоканала</strong><div class="gc-card__meta"><span class="gc-tag" title="L2 — Интегратор">L2</span></div></a><a class="gc-card" href="rf-link-budget.html"><strong>Бюджет радиолинка и дальность</strong><div class="gc-card__meta"><span class="gc-tag" title="L2 — Интегратор">L2</span></div></a></div></section>
       <nav class="pager" aria-label="Соседние модули"><a class="gc-card pager__prev" href="el-emi.html"><span class="gc-label gc-muted">Назад</span><br>Помехи и электромагнитная совместимость</a><a class="gc-card pager__next" href="rf-link-budget.html"><span class="gc-label gc-muted">Дальше</span><br>Бюджет радиолинка и дальность</a></nav>
     </article>
   </main>
