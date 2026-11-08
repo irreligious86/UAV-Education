@@ -454,3 +454,10 @@ def build4(D: dict, arch) -> None:
         Box("v3", ["Аппарат 3, FOLLOW", "FOLL_SYSID = 2"], 550, 140, 160, 48)],
         [("gcs", "rt"), ("rt", "sup", "", True), ("rt", "v1", "", False, "v"), ("rt", "v2", "", False, "v"), ("rt", "v3", "", False, "v")],
         720, 230, notes=[(10, 216, "target_system = 0 — команда всем аппаратам: только сознательно", "m t")])
+    D["gazebo-sitl"] = flow("Gazebo + SITL: кто что считает", [
+        Box("gz", ["Gazebo (gz sim)", "физика, мир, датчики"], 10, 30, 160, 48, accent=True), Box("pl", ["ArduPilotPlugin", "JSON, lockstep"], 280, 30, 160, 48),
+        Box("sitl", ["SITL", "прошивка на ПК"], 550, 30, 160, 48, accent=True),
+        Box("br", ["ros_gz_bridge", "изображение → ROS 2"], 10, 140, 160, 48), Box("ros", ["ROS 2 узлы", "зрение, обход"], 280, 140, 160, 48),
+        Box("gcs", ["GCS и pytest", "MAVLink"], 550, 140, 160, 48)],
+        [("gz", "pl"), ("pl", "gz"), ("pl", "sitl"), ("sitl", "pl"), ("gz", "br", "", False, "v"), ("br", "ros"), ("sitl", "gcs", "", False, "v")],
+        720, 220, notes=[(10, 210, "Без графики: gz sim -s -r мир.sdf; камеры без экрана: --headless-rendering", "m t")])
