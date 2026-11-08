@@ -85,6 +85,8 @@ git clone --depth 1 https://github.com/ArduPilot/ardupilot && cd ardupilot && To
 ### Куда что логируется (чтобы потом найти)
 Betaflight: flash на FC → выгрузка через конфигуратор (Blackbox tab) в `.BFL`; ArduPilot: SD-карта `/APM/LOGS/*.BIN` или MAVFtp из Mission Planner; телеметрийные логи GCS (`.tlog`) — отдельно, содержат всё, что шло по MAVLink; PX4: `.ulg` на SD, просмотр через Flight Review (веб) или `pyulog`. Именование: `ГГГГ-ММ-ДД_аппарат_цель.ext` в папке аппарата.
 
+{{diagram:toolbox-map|Минимальный набор инструментов инженера по задачам.}}
+
 ## practice
 ### Минимальная установка
 1. Betaflight App, Mission Planner или QGroundControl.

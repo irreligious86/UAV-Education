@@ -64,6 +64,8 @@ INAV не использует EKF: позиция и скорость счит�
 ### Разобранный пример: настройка RTH для 7" в лесистой местности
 `nav_rth_alt_mode = AT_LEAST`, `nav_rth_altitude = 6000` (60 м выше самых высоких деревьев + запас), `nav_rth_climb_first = ON`, `nav_rth_use_linear_descent = ON`, `nav_rth_home_altitude = 1500` (зависнуть на 15 м, посадка вручную), `nav_rth_allow_landing = FS_ONLY` (сесть сам только по failsafe), `safehome_usage_mode = RTH_FS`, safehome на поляне. Проверка: RTH тумблером в 100 м от дома на 30 м высоты — аппарат сначала набирает 60 м, потом летит; лог/OSD — высота и расстояние.
 
+{{diagram:inav-rth-steps|RTH мультиротора в INAV по шагам, включая проверку минимальной дистанции и аварийную посадку при удалении от дома.}}
+
 ## practice
 ### Шаг 1. Подключение
 1. GPS на свободный UART; в Ports — роль GPS; в Configuration — протокол (UBLOX) и скорость по документации модуля.

@@ -6,8 +6,11 @@ work offline (PWA) and in both themes.
 
 ## Authoring
 
-1. Add a diagram to `scripts/diagrams/build_diagrams.py` (or drop a hand-written SVG into
-   `assets/diagrams/<id>.svg`). Ids: `[a-z0-9-]+`.
+1. Add a diagram to `scripts/diagrams/build_diagrams.py` — first-wave and hand-built diagrams — or
+   to `scripts/diagrams/wave2.py` (one per module that had none; grouped by track), or drop a
+   hand-written SVG into `assets/diagrams/<id>.svg`. Ids: `[a-z0-9-]+`. Text budget: about 19
+   characters per line in a 150 px box, 16 in the narrow boxes of a five-column row — render and look
+   before committing; long labels overflow silently.
 2. Run `python3 scripts/publish.py` — it regenerates `assets/diagrams/`, runs
    `scripts/check_diagrams.py`, then validates and builds the site.
 3. Reference the diagram from a module on a line of its own, with a caption:

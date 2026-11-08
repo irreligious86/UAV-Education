@@ -69,6 +69,8 @@ ROS 1 Noetic закончил поддержку в мае 2025 года, но �
 ### MAVROS 1 → MAVROS 2
 Имена топиков в основном те же (`/mavros/state`, `/mavros/local_position/pose`, `/mavros/setpoint_position/local`), но: QoS телеметрии — sensor data; некоторые сервисы и параметры переименованы; запуск — `ros2 launch mavros apm.launch fcu_url:=...` (или `px4.launch`). Для PX4 в ROS 2 вместо MAVROS обычно переходят на uXRCE-DDS (модуль ros2-px4), для ArduPilot — на AP_DDS там, где его функций хватает (модуль ros2-ardupilot).
 
+{{diagram:ros1-migration|Что делать со старым проектом ROS 1: временный мост, перенос, MAVROS 2 или переписать по идеям.}}
+
 ## practice
 ### Шаг 1. Чтение проекта
 Возьмите открытый ROS 1 дроновый проект (например, пример offboard из документации PX4 для ROS 1 / MAVROS или любой репозиторий с MAVROS 1). За 30 минут нарисуйте граф узлов, список зависимостей и где проект управляет аппаратом.

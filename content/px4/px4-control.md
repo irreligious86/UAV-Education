@@ -56,6 +56,8 @@ PX4 использует параллельную форму с общим мн�
 ### Разобранный пример: 7" 6S, 1.4 кг
 Старт: airframe Generic Quad, `CA_ROTOR_COUNT` = 4, `IMU_GYRO_RATEMAX` 400 → 800 Гц (H7), `IMU_GYRO_CUTOFF` 40 → 80, `IMU_DGYRO_CUTOFF` 20 → 40; eRPM по DShot (`DSHOT_TEL_CFG`), `IMU_GYRO_DNF_EN` = 1; `MPC_THR_HOVER` уточнится оценщиком HTE; первый полёт Stabilized — `MC_ROLLRATE_K` 1.0 → 0.7 если качает; autotune; `MPC_XY_VEL_MAX` под задачу. Лог → Flight Review: rate tracking, спектр, `vehicle_torque_setpoint` без насыщения.
 
+{{diagram:px4-cascade|Каскад PX4: позиция → скорость → ориентация → угловая скорость → аллокатор, с параметрами каждого уровня.}}
+
 ## practice
 ### Шаг 1. Сначала аллокация
 Без пропов: Actuators в QGC — геометрия соответствует раме, каждый мотор крутится в нужную сторону по тесту.

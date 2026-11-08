@@ -126,6 +126,8 @@ print(dt.mean(), dt.std(), np.percentile(dt, 99.9))
 ```
 Для 8 кГц среднее 125 мкс, std единицы мкс; std > 10 — перегруженный процессор, пропуски — обрыв записи.
 
+{{diagram:log-analysis-pipeline|Конвейер анализа лога на Python: CSV → DataFrame → общая ось времени → спектры и метрики → отчёт.}}
+
 ## practice
 ### Шаг 1. Прочитать
 Свой лог (Betaflight CSV или ArduPilot .bin) → DataFrame, fs посчитана, первые 5 строк и описание колонок выведены.

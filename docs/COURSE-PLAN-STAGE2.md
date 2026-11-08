@@ -161,7 +161,7 @@ Totals: +19 modules, 12 projects, ~120 diagrams, 4 Docker environments, a task s
 | 6 ✅ | ROS 2 modules 4–6 (ros2-app-arch with a tested watchdog, ros2-nav with a tested A* planner, ros2-from-ros1); project catalogue `data/projects.json` → `projects/` (12 cards, each with an architecture diagram, milestones, acceptance criteria tracked like capstones, validated in CI); starters for #1 web GCS (`examples/web-gcs`, 6 tests), #3 log service (`examples/log-report`), #8 (`examples/mavlink`), #10 (`examples/sitl-pymavlink`) | projects with autotests |
 | 7 ✅ | Perception +5 modules (per-geometry, per-landing, per-depth-avoid, per-mapping, per-edge-ml) with `examples/perception` (15 tests); starters #4 `examples/follow-target`, #5 `examples/precision-landing`, #7 `examples/perception` | labs without a drone |
 | 8 ✅ | starters for all 12 projects (new: #2 fleet-telemetry, #6 inspection, #9 cell-bridge, #11 lua-protection via lupa, #12 tx16s-companion in C99); `examples/blackbox-grader`; "find the fault" questions in 19 modules; answer-length bias removed from 778 questions (`QUIZ_MAX_LONGEST_SHARE`); projects in the progress transcript | catalogue of 12 |
-| 9 | second infographics wave (to ~120), consistency review of all modules | every module ≥ 1 diagram |
+| 9 ✅ | second infographics wave: 64 diagrams in `scripts/diagrams/wave2.py`, 112 in total, all 103 modules carry at least one (each rendered and checked at desktop and phone width); consistency pass on module ↔ starter links | every module ≥ 1 diagram |
 
 Effort: iterations 1–3 are fast (structure + text); 4–8 are the heavy ones (code and simulation);
 9 is review.

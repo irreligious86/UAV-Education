@@ -81,6 +81,8 @@ rclpy.init(); rclpy.spin(Offboard())
 ```
 Защиты из модуля «Слежение» (лимиты, watchdog, таймауты `COM_OF_LOSS_T` = 1 с и действие `COM_OBL_RC_ACT`) обязательны и здесь.
 
+{{diagram:px4-offboard-seq|Offboard из ROS 2: поток OffboardControlMode и TrajectorySetpoint до переключения режима, затем команды режима и арма; при обрыве — failsafe.}}
+
 ## practice
 ### Шаг 1. Окружение
 ```

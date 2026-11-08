@@ -264,3 +264,147 @@ def build2(D: dict, arch) -> None:
         ("fix хороший, SP ↑", Node("sp", ["Подмена:", "источники спорят"], leaf=True, accent=True)),
         ("SM > 1", Node("mg", ["Помеха компасу"], leaf=True)),
     ]), width=720)
+
+
+def build3(D: dict, arch) -> None:
+    # ------------------------------------------------------------ foundation
+    D["traceability"] = arch("Трассируемость: от требования до записи в журнале",
+        [L("req", ["Требование", "измеримое"], True), L("arc", ["Архитектура", "кто отвечает"]), L("tst", ["Тест", "как проверено"], True), L("doc", ["Документ", "и журнал"])],
+        [L("chg", ["Изменение →", "какие тесты снова"], False, 2)],
+        [("req", "arc"), ("arc", "tst"), ("tst", "doc"), ("tst", "chg", "", False, "v")],
+        notes=[(10, 150, "У каждого требования —", "m t"), (10, 164, "тест, у теста — требование", "m t")])
+
+    D["thrust-sag-chain"] = arch("От тяги к просадке",
+        [L("t", ["Тяга ↑"]), L("i", ["Ток I ↑"], True), L("dv", ["Просадка", "ΔU = I · Rвн"], True), L("u", ["U под", "нагрузкой ↓"]), L("p", ["Мощность", "P = U · I"])],
+        [L("e", ["Энергия, Вт·ч", "= В × А·ч"], False, 4)],
+        [("t", "i"), ("i", "dv"), ("dv", "u"), ("u", "p"), ("p", "e", "", False, "v")],
+        notes=[(10, 150, "Rвн растёт на холоде", "m t"), (10, 164, "и со старением", "m t")])
+
+    D["vibration-path"] = arch("Путь вибраций: от пропеллера до контура",
+        [L("src", ["Моторы, пропы", "f = RPM/60"]), L("frm", ["Рама", "резонанс"], True), L("mnt", ["Крепление FC", "демпфер"]), L("gyr", ["Гироскоп", "шум, клиппинг"], True), L("ctl", ["Контур", "D-term, моторы"])],
+        [L("bal", ["Баланс пропов,", "затяжка"], False, 0), L("alias", ["Алиасинг выше", "Найквиста"], False, 3)],
+        [("src", "frm"), ("frm", "mnt"), ("mnt", "gyr"), ("gyr", "ctl"), ("bal", "src", "", False, "v"), ("gyr", "alias", "", False, "v")])
+
+    D["forces-moments"] = arch("Уравнения движения коптера: силы и моменты",
+        [L("t", ["Тяга ΣTᵢ", "по оси тела"]), L("g", ["Вес m·g"]), L("d", ["Сопротивление", "~ V²"]), L("ma", ["m · a = ΣF"], True)],
+        [L("m", ["Моменты:", "ΔT·плечо, yaw"], False, 1), L("jw", ["J · ω̇ = ΣM"], True, 3)],
+        [("t", "g"), ("g", "d"), ("d", "ma"), ("m", "jw")],
+        notes=[(10, 150, "Меньше J — резче", "m t"), (10, 164, "отклик по осям", "m t")])
+
+    D["flight-time-chain"] = arch("Честное время полёта",
+        [L("c", ["Ёмкость", "А·ч"]), L("u", ["× 0.8", "не в ноль"], True), L("i", ["÷ средний ток", "висение + манёвры"], True), L("t", ["× 60", "= минуты"])],
+        [L("corr", ["Поправки: холод,", "старение, ветер"], False, 2)],
+        [("c", "u"), ("u", "i"), ("i", "t"), ("corr", "i", "", False, "v")])
+
+    D["airspace-check"] = tree("Можно ли лететь здесь?", Node("r", ["Зона на", "официальной карте"], [
+        ("запретная", Node("n", ["Нет"], leaf=True)),
+        ("ограниченная", Node("p", ["Разрешение", "заранее"], leaf=True, accent=True)),
+        ("открытая", Node("o", ["Правила категории:", "высота, VLOS, масса"], leaf=True)),
+        ("частоты", Node("f", ["Разрешённые", "диапазоны и мощность"], leaf=True)),
+    ]), width=720)
+
+    D["incident-analysis"] = arch("Схема разбора аварии",
+        [L("sym", ["Симптом", "что видели"]), L("seq", ["Хронология", "по логам"], True), L("cause", ["Причина", "техн. + систем."], True), L("data", ["Данные", "сообщения лога"]), L("cons", ["Последствия", "энергия, зона"])],
+        [L("rec", ["Что изменить", "у себя"], True, 2)],
+        [("sym", "seq"), ("seq", "cause"), ("cause", "data"), ("data", "cons"), ("cause", "rec", "", False, "v")])
+
+    D["sortie-flow"] = arch("Вылет как процесс",
+        [L("plan", ["План", "зона, погода"]), L("brief", ["Брифинг", "10 мин"], True), L("site", ["Чек-лист", "площадки"]), L("fly", ["Полёт", "радиообмен"], True), L("deb", ["Дебрифинг", "+ журнал"], True)],
+        [L("roles", ["Роли: пилот,", "наблюдатель"], False, 3)],
+        [("plan", "brief"), ("brief", "site"), ("site", "fly"), ("fly", "deb"), ("fly", "roles", "", False, "v")])
+
+    # ------------------------------------------------------------ INAV
+    D["inav-rth-steps"] = arch("RTH в INAV (мультиротор) по шагам",
+        [L("d", ["Дом ближе", "min_rth_distance?"]), L("alt", ["Высота RTH", "climb_first"], True), L("go", ["Домой", "nav_auto_speed"]), L("home", ["Над домом", "allow_landing"])],
+        [L("land", ["Посадка", "на месте"], False, 0), L("abort", ["Растёт дистанция", "→ авар. посадка"], True, 2)],
+        [("d", "alt", "нет"), ("alt", "go"), ("go", "home"), ("d", "land", "да", False, "v"), ("go", "abort", "", False, "v")])
+
+    D["firmware-choice"] = tree("Какая прошивка под задачу", Node("r", ["Задача"], [
+        ("фристайл, гонки", Node("bf", ["Betaflight"], leaf=True)),
+        ("навигация, крыло", Node("in", ["INAV: оценщик,", "RTH, миссии, крыло"], leaf=True, accent=True)),
+        ("автономия", Node("ap", ["ArduPilot / PX4:", "EKF, MAVLink, API"], leaf=True)),
+    ]), width=720)
+
+    D["inav-ipf-model"] = arch("INAV Programming Framework: модель",
+        [L("op", ["Операнды", "RC, высота, GVAR"]), L("lc", ["Logic Condition", "операция"], True), L("gv", ["GVAR", "−32768…32767"]), L("out", ["Действия", "VTX, газ, режим"])],
+        [L("act", ["Активатор:", "другое условие"], False, 1), L("pid", ["Programming PID", "×4"], False, 2)],
+        [("op", "lc"), ("lc", "gv"), ("gv", "out"), ("act", "lc", "", False, "v"), ("pid", "gv", "", False, "v")])
+
+    D["inav-mission-flow"] = arch("Миссия INAV: от планирования до выполнения",
+        [L("pl", ["Точки WP", "lat, lon, alt"]), L("up", ["Загрузка", "Configurator, CLI"]), L("sv", ["Сохранение", "в EEPROM"]), L("wp", ["Режим WP", "с тумблера"], True)],
+        [L("end", ["Последняя точка:", "RTH или висение"], False, 3)],
+        [("pl", "up"), ("up", "sv"), ("sv", "wp"), ("wp", "end", "", False, "v")])
+
+    D["inav-autolaunch"] = timeline("Автозапуск крыла в INAV (значения по умолчанию)",
+        [("Детекция", [(0, 0.2, "бросок ≈1.9 g", True)]), ("Задержка", [(0.2, 0.7, "0.5 с")]),
+         ("Набор", [(0.7, 5.2, "launch_thr 1700, угол 18°", True)]), ("Пилот", [(5.2, 6.5, "стики / таймаут")])],
+        6.5, unit="с", marks=[(0, "бросок"), (5.2, "launch_timeout 5 с")])
+
+    D["vtx-four-pilots"] = arch("Четыре аналоговых аппарата: Raceband через канал",
+        [L("r1", ["R1", "5658 МГц"], True), L("r3", ["R3", "5732 МГц"], True), L("r5", ["R5", "5806 МГц"], True), L("r7", ["R7", "5880 МГц"], True)],
+        [L("f2", ["Пятый на F2 5760 —", "помехи R3"], False, 1)],
+        [("r1", "r3", "74"), ("r3", "r5", "74"), ("r5", "r7", "74"), ("f2", "r3", "", False, "v")],
+        notes=[(10, 150, "Разнос 74 МГц,", "m t"), (10, 164, "мощность 200 мВт", "m t")])
+
+    # ------------------------------------------------------------ PX4
+    D["px4-uorb-path"] = arch("PX4: путь от датчика до мотора через uORB",
+        [L("s", ["sensors", "sensor_combined"]), L("e", ["ekf2", "поза, скорость"], True), L("pc", ["mc_pos_control", "→ attitude_sp"]), L("ac", ["mc_att_control", "→ rates_sp"]), L("rc", ["mc_rate_control", "→ torque_sp"], True)],
+        [L("ca", ["Аллокатор", "actuator_motors"], True, 4)],
+        [("s", "e"), ("e", "pc"), ("pc", "ac"), ("ac", "rc"), ("rc", "ca", "", False, "v")],
+        notes=[(10, 150, "listener <топик> —", "m t"), (10, 164, "посмотреть любой шаг", "m t")])
+
+    D["px4-jetson-link"] = arch("PX4 + Jetson: связь и роли",
+        [L("cam", ["Камера", "CSI / USB"]), L("j", ["Jetson", "зрение, ROS 2"], True), L("pix", ["Pixhawk / PX4", "TELEM2"], True), L("qgc", ["QGC"])],
+        [L("m", ["MAVLink 921600", "MAVSDK / MAVROS"], False, 1), L("d", ["uXRCE-DDS", "топики ROS 2"], False, 2)],
+        [("cam", "j"), ("j", "pix", "UART"), ("pix", "qgc"), ("j", "m", "", False, "v"), ("pix", "d", "", False, "v")])
+
+    D["px4-cascade"] = arch("Каскад управления PX4",
+        [L("pos", ["Позиция", "P"]), L("vel", ["Скорость", "PID"]), L("att", ["Ориентация", "P (кватернион)"], True), L("rate", ["Угл. скорость", "PID + FF"], True), L("alloc", ["Аллокатор"])],
+        [L("pp", ["MPC_XY_P", "MPC_XY_VEL_*"], False, 1), L("ap", ["MC_ROLL_P", "MC_ROLLRATE_*"], False, 3)],
+        [("pos", "vel"), ("vel", "att"), ("att", "rate"), ("rate", "alloc"), ("vel", "pp", "", False, "v"), ("rate", "ap", "", False, "v")],
+        notes=[(10, 150, "Внутренний в 3–5", "m t"), (10, 164, "раз быстрее", "m t")])
+
+    D["px4-qgc-order"] = arch("Первая настройка PX4 в QGroundControl",
+        [L("fw", ["Прошивка", "+ airframe"], True), L("sen", ["Датчики", "компас, accel"]), L("rc", ["Радио", "режимы, kill"]), L("mot", ["Моторы", "без пропов"]), L("bat", ["Питание", "делитель, пороги"])],
+        [L("saf", ["Safety: RC loss,", "АКБ, геозона"], True, 4)],
+        [("fw", "sen"), ("sen", "rc"), ("rc", "mot"), ("mot", "bat"), ("bat", "saf", "", False, "v")],
+        notes=[(10, 150, "Смена airframe", "m t"), (10, 164, "сбрасывает параметры", "m t")])
+
+    D["px4-offboard-seq"] = sequence("Offboard через uXRCE-DDS: три сообщения",
+        ["ROS 2 узел", "PX4"],
+        [(0, 1, "OffboardControlMode ≥ 2 Гц", True), (0, 1, "TrajectorySetpoint (NED)", True), (0, 0, "поток идёт ≥ 1 с"),
+         (0, 1, "VehicleCommand: режим OFFBOARD"), (0, 1, "VehicleCommand: ARM"), (1, 0, "VehicleStatus", False, True),
+         (0, 0, "поток прервался"), (1, 1, "COM_OF_LOSS_T → failsafe")],
+        notes=[(1, "ENU/FLU ROS → NED/FRD PX4"), (3, "без потока режим не включится"), (7, "COM_OBL_RC_ACT — действие")])
+
+    # ------------------------------------------------------------ ROS / tools
+    D["ros1-migration"] = tree("Старый проект ROS 1: что делать", Node("r", ["Проект ROS 1"], [
+        ("нужен сейчас", Node("br", ["ros1_bridge", "временно"], leaf=True)),
+        ("живой код", Node("pt", ["Перенос: rclpy,", "launch.py, QoS"], leaf=True, accent=True)),
+        ("MAVROS", Node("mv", ["MAVROS 2:", "те же плагины"], leaf=True)),
+        ("мёртвый", Node("rw", ["Взять идеи,", "написать заново"], leaf=True)),
+    ]), width=720)
+
+    D["peak-diagnosis"] = tree("Пик в спектре гироскопа: что это", Node("r", ["Как пик ведёт", "себя с газом?"], [
+        ("едет", Node("m", ["Гармоника моторов", "f = k · RPM/60"], [("", Node("m1", ["RPM-фильтр,", "баланс пропов"], leaf=True))], accent=True)),
+        ("стоит", Node("f", ["Резонанс рамы", "или крепления"], [("", Node("f1", ["Статический notch,", "механика"], leaf=True))])),
+        ("широкий", Node("w", ["Шум, турбулентность,", "люфт"], [("", Node("w1", ["Механика, LPF"], leaf=True))])),
+    ]), width=720)
+
+    D["angle-rate-cascade"] = arch("Каскад «угол → угловая скорость»",
+        [L("asp", ["Уставка угла"]), L("ap", ["P угла"], True), L("rsp", ["Уставка", "угл. скорости"]), L("rpid", ["PID скорости", "+ FF"], True), L("pl", ["Объект", "моторы + рама"])],
+        [L("est", ["Оценка угла", "фильтр/EKF"], False, 1), L("gyr", ["Гироскоп"], False, 3)],
+        [("asp", "ap"), ("ap", "rsp"), ("rsp", "rpid"), ("rpid", "pl"), ("est", "ap", "", False, "v"), ("gyr", "rpid", "", False, "v")],
+        notes=[(10, 150, "Внутренний", "m t"), (10, 164, "контур быстрее", "m t")])
+
+    D["log-analysis-pipeline"] = arch("Анализ лога на Python",
+        [L("log", ["Лог → CSV", ".bin / .bbl"]), L("df", ["DataFrame", "pandas"]), L("rs", ["Ресемплинг", "общая ось t"]), L("an", ["Welch, спектр,", "step-метрики"], True), L("rep", ["Отчёт", "графики + числа"])],
+        [L("jit", ["Джиттер петли", "по меткам t"], False, 2)],
+        [("log", "df"), ("df", "rs"), ("rs", "an"), ("an", "rep"), ("rs", "jit", "", False, "v")])
+
+    D["toolbox-map"] = tree("Рабочее место инженера", Node("r", ["Инструменты"], [
+        ("настройка", Node("cfg", ["Configurator BF/INAV,", "Mission Planner, QGC"], leaf=True)),
+        ("логи", Node("lg", ["Blackbox Explorer,", "PlotJuggler"], leaf=True)),
+        ("код", Node("cd", ["Python, git,", "терминал"], leaf=True, accent=True)),
+        ("без дрона", Node("sim", ["SITL", "ArduPilot / PX4"], leaf=True)),
+    ]), width=720)

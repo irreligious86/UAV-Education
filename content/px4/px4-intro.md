@@ -70,6 +70,8 @@ QGroundControl: прошивка, выбор airframe, калибровки, п�
 ### Логи ULog и Flight Review
 Лог включается при арме (`SDLOG_MODE`), содержит топики uORB с заданной частотой (`SDLOG_PROFILE` — профили: по умолчанию, высокая частота для тюнинга, ...). Flight Review (веб) рисует: отклик rate (setpoint vs actual), спектр вибраций (acceleration power spectral density — по нему видно моторы и резонансы), оценку GPS/EKF (innovation test ratios — те же «ворота», что в модуле про Калмана), загрузку CPU и RAM, потери RC. `pyulog` (`ulog2csv`) — для Python-анализа (модуль «Python для данных»).
 
+{{diagram:px4-qgc-order|Порядок первой настройки PX4 в QGroundControl.}}
+
 ## practice
 ### Шаг 1. SITL и QGC
 ```
