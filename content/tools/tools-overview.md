@@ -57,6 +57,34 @@ drones/
 ### SITL
 Для ArduPilot — SITL, для PX4 — Gazebo/jMAVSim. Любой сценарий, скрипт и параметр сначала на симуляторе.
 
+### Рабочее место инженера: минимальный набор
+| Задача | Инструмент | Зачем именно он |
+|---|---|---|
+| Настройка Betaflight/INAV | Betaflight App / INAV Configurator (десктоп, не веб — для прошивки и DFU) | полный доступ к CLI, прошивка, DFU |
+| ArduPilot/PX4 | Mission Planner (Windows; самый полный для ArduPilot: Full Parameter List, MAVFtp, log review), QGroundControl (кроссплатформенный; PX4 — основной) | параметры, калибровки, миссии, логи |
+| Консоль MAVLink | MAVProxy (`pip install MAVProxy`), `mavproxy.py --master=/dev/ttyACM0 --console --map` | скриптуемая GCS, `param`, `module load log` |
+| Логи Betaflight | Blackbox Explorer, PIDtoolbox (MATLAB runtime), `blackbox_decode` → CSV → Python | спектры, step response, свои метрики |
+| Логи ArduPilot | Mission Planner Log Review, MAVExplorer (`mavexplorer.py log.bin`, графики по выражениям `ATT.Roll-ATT.DesRoll`), UAV Log Viewer (веб), `pymavlink` | быстрый обзор / свои метрики |
+| ESC | ESC Configurator (веб, Chrome), Bluejay/AM32 configurator; passthrough через FC | прошивка и настройки ESC |
+| Радио | ExpressLRS Configurator, EdgeTX Companion + Buddy | прошивка модулей, модели пульта |
+| Железо | мультиметр, ваттметр XT60, smoke stopper, программатор ST-Link (восстановление FC), логический анализатор 24 МГц, осциллограф (по мере роста) | модули «Измерения» |
+| Терминал | Linux / WSL2: `picocom -b 115200 /dev/ttyACM0`, `pyserial`, `venv` | скрипты к CLI, MAVLink |
+| Симуляция | ArduPilot SITL (`sim_vehicle.py`), PX4 SITL (`make px4_sitl gz_x500`), Betaflight SITL (`make SITL`) | любой сценарий — сначала здесь |
+| Версионирование | git + GitHub; `.gitattributes` с LFS для `.bin/.BFL` | конфиги и скрипты, модуль «CI» |
+
+### Порядок установки (Linux / WSL2)
+```bash
+sudo apt install git python3-venv picocom build-essential
+python3 -m venv ~/uav && . ~/uav/bin/activate
+pip install pymavlink MAVProxy pandas numpy scipy matplotlib pyserial
+sudo usermod -aG dialout $USER     # access to /dev/ttyACM*/ttyUSB*; re-login
+git clone --depth 1 https://github.com/ArduPilot/ardupilot && cd ardupilot && Tools/environment_install/install-prereqs-ubuntu.sh -y
+```
+Проверка: `mavproxy.py --master=tcp:127.0.0.1:5760` подключается к `sim_vehicle.py -v ArduCopter`. В WSL2 USB-устройства пробрасываются через `usbipd` (Windows 11) — или использовать Windows-приложения для USB, Linux — для скриптов и логов.
+
+### Куда что логируется (чтобы потом найти)
+Betaflight: flash на FC → выгрузка через конфигуратор (Blackbox tab) в `.BFL`; ArduPilot: SD-карта `/APM/LOGS/*.BIN` или MAVFtp из Mission Planner; телеметрийные логи GCS (`.tlog`) — отдельно, содержат всё, что шло по MAVLink; PX4: `.ulg` на SD, просмотр через Flight Review (веб) или `pyulog`. Именование: `ГГГГ-ММ-ДД_аппарат_цель.ext` в папке аппарата.
+
 ## practice
 ### Минимальная установка
 1. Betaflight App, Mission Planner или QGroundControl.

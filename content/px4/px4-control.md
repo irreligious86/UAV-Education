@@ -45,6 +45,17 @@ PX4 использует параллельную форму с общим мн�
 ### Ручной тюнинг по step response
 Порядок: фильтры → rate (K, затем D, затем I) → attitude P → position. Шаг: Acro или Stabilized, резкие короткие движения стиком, лог, график `vehicle_rates_setpoint` против `vehicle_angular_velocity` в Flight Review. Перелёт — меньше K или больше D; медленный отклик — больше K; дрейф — больше I. Тот же метод и те же метрики, что в модуле про PID по данным.
 
+### Умолчания и что они значат
+`MC_ROLLRATE_P` = 0.15, `I` = 0.2, `D` = 0.003, `K` = 1.0, `FF` = 0 (выход — безразмерный момент на 1 рад/с ошибки); `MC_ROLL_P` = 4.0 (угловая скорость на радиан ошибки угла → 1/с), `MC_YAW_P` = 2.8; позиция: `MPC_XY_P` = 0.95 (1/с), скорость → ускорение `MPC_XY_VEL_P_ACC` = 1.8, `I_ACC` = 0.4, `D_ACC` = 0.2; `MPC_Z_P` = 1.0. Газ висения `MPC_THR_HOVER` = 0.5 (норм.) — уточняется оценщиком тяги висения (`HTE_*`, hover thrust estimator). Фильтры: `IMU_GYRO_CUTOFF` = 40 Гц, `IMU_DGYRO_CUTOFF` = 20 Гц, статический notch `IMU_GYRO_NF0_FRQ`/`BW` (0 = выкл, BW 20 Гц), динамический по ESC RPM `IMU_GYRO_DNF_EN` (битмаска; требует eRPM от ESC по DShot-телеметрии), `IMU_GYRO_DNF_MIN` = 25 Гц. Air-mode `MC_AIRMODE` (0 выкл, 1 roll/pitch, 2 + yaw).
+
+Единицы важны: ошибка в рад/с, выход — доля максимального момента. P = 0.15 означает: ошибка 1 рад/с (57°/с) даёт 15% момента. Для сравнения с Betaflight (безразмерные «45») — только качественно, через модуль «Теория управления» (ζ, запас по фазе).
+
+### Autotune подробнее
+`MC_AT_EN` = 1 включает модуль `mc_autotune_attitude_control`; запуск — из QGC (PID Tuning → Autotune) в Altitude/Position в висении при штиле; модуль инжектирует возбуждение амплитудой `MC_AT_SYSID_AMP` (0.7) по каждой оси, идентифицирует модель rate-контура и считает коэффициенты; `MC_AT_APPLY` (0 — не применять, 1 — после посадки, 2 — сразу в полёте) — умолчание 1. После — контрольный полёт и Flight Review: отклик без перелёта > 10%, D без шума. Autotune не настраивает фильтры и не лечит вибрации — их делают **до** (спектр!).
+
+### Разобранный пример: 7" 6S, 1.4 кг
+Старт: airframe Generic Quad, `CA_ROTOR_COUNT` = 4, `IMU_GYRO_RATEMAX` 400 → 800 Гц (H7), `IMU_GYRO_CUTOFF` 40 → 80, `IMU_DGYRO_CUTOFF` 20 → 40; eRPM по DShot (`DSHOT_TEL_CFG`), `IMU_GYRO_DNF_EN` = 1; `MPC_THR_HOVER` уточнится оценщиком HTE; первый полёт Stabilized — `MC_ROLLRATE_K` 1.0 → 0.7 если качает; autotune; `MPC_XY_VEL_MAX` под задачу. Лог → Flight Review: rate tracking, спектр, `vehicle_torque_setpoint` без насыщения.
+
 ## practice
 ### Шаг 1. Сначала аллокация
 Без пропов: Actuators в QGC — геометрия соответствует раме, каждый мотор крутится в нужную сторону по тесту.
@@ -74,6 +85,12 @@ Step response в Flight Review до и после: перелёт и время 
 - **Симптом:** мотор крутится не туда в тесте
   - Возможная причина: геометрия или направление в Actuators.
   - Что сделать: исправить `CA_ROTOR<n>_KM`/направление, перепроверить без пропов.
+- **Симптом:** autotune прерывается
+  - Возможная причина: ветер, вибрации, слишком низкий начальный тюн, недостаточно высоты.
+  - Что сделать: штиль, спектр и notch до autotune, `MC_ROLLRATE_K` ниже, высота 5+ м.
+- **Симптом:** медленные колебания позиции в Position mode
+  - Возможная причина: `MPC_XY_P`/`MPC_XY_VEL_*` выше, чем позволяет качество GPS/задержка.
+  - Что сделать: проверить EKF (innovations), снизить `MPC_XY_VEL_P_ACC`, затем `MPC_XY_P`.
 
 ## references
 - PX4 Multicopter PID Tuning Guide (Advanced) | https://docs.px4.io/main/en/config_mc/pid_tuning_guide_multicopter.html | primary | A

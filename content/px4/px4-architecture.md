@@ -48,6 +48,22 @@ PX4 — не одна программа, а набор независимых �
 - Свой код в PX4 — это новый модуль с подпиской на топики, а не правка чужого.
 - Логи ULog — просто запись топиков; анализируя их, ты читаешь те же сообщения.
 
+### Модули по именам (где искать в коде)
+`src/modules/`: `sensors` (сбор датчиков, `sensor_combined`), `ekf2` (оценка состояния), `commander` (арм, режимы, failsafe, pre-arm), `navigator` (миссии, RTL, геозона, `position_setpoint_triplet`), `mc_pos_control` (позиция → ориентация+тяга), `mc_att_control` (угол → угловая скорость), `mc_rate_control` (скорость → моменты, `vehicle_torque_setpoint`/`vehicle_thrust_setpoint`), `control_allocator` (моменты → `actuator_motors`/`actuator_servos`), `logger`, `mavlink`, `uxrce_dds_client`, `land_detector`, `battery_status`, `mc_autotune_attitude_control`. Драйверы — `src/drivers/` (imu, gps, barometer, dshot, pwm_out). Путь IMU → мотор: `sensors` → `ekf2` → `mc_pos_control` → `mc_att_control` → `mc_rate_control` → `control_allocator` → `dshot`/`pwm_out`.
+
+### Исполнение: work queue и приоритеты
+На NuttX большинство модулей — не отдельные потоки, а элементы **work queue** с приоритетами (`wq:rate_ctrl` выше, `wq:nav_and_controllers`, `wq:hp_default`, `wq:lp_default` ниже): быстрые задачи (rate control) просыпаются по приходу данных гироскопа и выполняются первыми; `work_queue status` показывает их. Тяжёлые — EKF2, logger, mavlink — отдельные задачи. `top` в консоли — загрузка CPU по задачам (норма < 70–80% на FMUv5); перегрузка видна как рост задержек и предупреждения.
+
+### Хранилище и конфигурация
+Параметры — во flash/EEPROM (`param save`, `param reset_all`), миссии и геозона — в `dataman` (SD или flash), логи — SD. Загрузочные скрипты — `ROMFS/px4fmu_common/init.d/` (`rc.*`): какой драйвер стартовать, с какими параметрами, airframe-файлы `init.d/airframes/` — это и есть «выбор airframe» в QGC. Свой модуль добавляется в `boards/<board>/default.px4board` и стартует из `rc.*` или по параметру.
+
+### Разобранный пример: разбор «аппарат качает по roll»
+1. `listener vehicle_angular_velocity` — частота ~400 Гц? если ниже — перегрузка (`top`).
+2. `listener vehicle_rates_setpoint` против `vehicle_angular_velocity` в логе: осцилляция только в факте → rate P/D; и в setpoint тоже → attitude P/position.
+3. `uorb top -1` — кто публикует редко/часто необычно (датчик с пропусками → EKF2 inovations).
+4. Flight Review → спектр: пик моторов в полосе? → `IMU_GYRO_CUTOFF`/notch (`IMU_GYRO_NF0_FRQ`/`BW`, `IMU_GYRO_DNF_EN`).
+Так архитектура превращается в метод: топик → модуль → параметр, а не «подкрутить P».
+
 ## practice
 ### Шаг 1. Заглянуть внутрь SITL
 ```

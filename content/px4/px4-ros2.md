@@ -38,6 +38,49 @@ next:
 ### Против MAVLink/MAVSDK
 MAVLink через MAVSDK проще для простых задач и не требует ROS. uXRCE-DDS — когда нужны ROS-экосистема (навигация, зрение, планирование), низкая задержка и доступ к внутренним топикам.
 
+### Настройка моста на реальном борту
+PX4: `UXRCE_DDS_CFG` = TELEM2 (порт), `SER_TEL2_BAUD` = 921600; на companion: `MicroXRCEAgent serial --dev /dev/ttyTHS1 -b 921600` (Jetson) или `udp4 -p 8888` для SITL/Wi-Fi. Проверка: `ros2 topic list | grep fmu`, `ros2 topic hz /fmu/out/vehicle_odometry` (ожидаемо десятки–сотни Гц). Если топиков нет: порт занят MAVLink (`MAV_1_CONFIG` на том же TELEM2 — конфликт), скорость, `uxrce_dds_client status` в консоли PX4.
+
+### Системы координат — главный источник ошибок
+PX4 работает в NED (север-восток-вниз) и FRD (вперёд-вправо-вниз); ROS 2 (REP-103) — ENU и FLU. `TrajectorySetpoint.position = [x, y, z]` — NED: z = −10 означает 10 м вверх. Переводы: ENU→NED: (x, y, z) → (y, x, −z); FLU→FRD: (x, y, z) → (x, −y, −z). Пакет `px4_ros_com` содержит утилиты преобразования; MAVROS делает это сам. Ошибка знака по z — классический «аппарат ушёл в землю при взлёте в симуляторе».
+
+### Минимальный offboard-узел (Python, rclpy)
+```python
+import rclpy
+from rclpy.node import Node
+from px4_msgs.msg import OffboardControlMode, TrajectorySetpoint, VehicleCommand
+from rclpy.qos import QoSProfile, ReliabilityPolicy, HistoryPolicy, DurabilityPolicy
+
+class Offboard(Node):
+    def __init__(self):
+        super().__init__("offboard_min")
+        qos = QoSProfile(reliability=ReliabilityPolicy.BEST_EFFORT, durability=DurabilityPolicy.TRANSIENT_LOCAL,
+                         history=HistoryPolicy.KEEP_LAST, depth=1)   # PX4 publishes best-effort
+        self.mode_pub = self.create_publisher(OffboardControlMode, "/fmu/in/offboard_control_mode", qos)
+        self.sp_pub = self.create_publisher(TrajectorySetpoint, "/fmu/in/trajectory_setpoint", qos)
+        self.cmd_pub = self.create_publisher(VehicleCommand, "/fmu/in/vehicle_command", qos)
+        self.n = 0
+        self.create_timer(0.1, self.step)                               # 10 Hz > 2 Hz minimum
+
+    def cmd(self, command, p1=0.0, p2=0.0):
+        m = VehicleCommand(command=command, param1=p1, param2=p2, target_system=1, target_component=1,
+                           source_system=1, source_component=1, from_external=True,
+                           timestamp=int(self.get_clock().now().nanoseconds / 1000))
+        self.cmd_pub.publish(m)
+
+    def step(self):
+        now = int(self.get_clock().now().nanoseconds / 1000)
+        self.mode_pub.publish(OffboardControlMode(position=True, timestamp=now))
+        self.sp_pub.publish(TrajectorySetpoint(position=[0.0, 0.0, -5.0], yaw=0.0, timestamp=now))  # 5 m up (NED)
+        if self.n == 10:                                                # after 1 s of setpoints
+            self.cmd(VehicleCommand.VEHICLE_CMD_DO_SET_MODE, 1.0, 6.0)  # Offboard
+            self.cmd(VehicleCommand.VEHICLE_CMD_COMPONENT_ARM_DISARM, 1.0)
+        self.n += 1
+
+rclpy.init(); rclpy.spin(Offboard())
+```
+Защиты из модуля «Слежение» (лимиты, watchdog, таймауты `COM_OF_LOSS_T` = 1 с и действие `COM_OBL_RC_ACT`) обязательны и здесь.
+
 ## practice
 ### Шаг 1. Окружение
 ```
@@ -75,6 +118,12 @@ cd .. && colcon build && source install/setup.bash
 - **Симптом:** летит вверх вместо вниз
   - Возможная причина: знак Z в NED.
   - Что сделать: Z вниз положительный, высота 3 м — Z = −3.
+- **Симптом:** PX4 не входит в Offboard
+  - Возможная причина: setpoint'ы не шли ≥ 1 с до команды, частота < 2 Гц, неверный QoS.
+  - Что сделать: поток до смены режима, 10+ Гц, BEST_EFFORT QoS; `commander status`.
+- **Симптом:** взлёт «в землю» в SITL
+  - Возможная причина: знак z (NED).
+  - Что сделать: z отрицательный вверх; проверить конверсию ENU/NED.
 
 ## references
 - PX4 ROS 2 User Guide | https://docs.px4.io/main/en/ros2/user_guide.html | primary | A
