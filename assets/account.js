@@ -18,13 +18,19 @@
   var CFG = window.UAV_BACKEND || { enabled: false };
   var KEY = "uav-student:progress:v1";
   var PENDING = "uav-student:sync-pending";
+  var OWNER = "uav-student:owner";            // whose progress sits in this browser (shared computers)
   var USERNAME_RE = /^[a-z0-9_]{3,32}$/;
   var MIN_PASSWORD = 10;
 
   // ------------------------------------------------------------------ pure merge (unit-tested)
+  // tolerate anything: the document may come from another device, an old version or a hostile edit
+  function arr(x) { return Array.isArray(x) ? x : []; }
+  function obj(x) { return x && typeof x === "object" && !Array.isArray(x) ? x : {}; }
+  function isStr(x) { return typeof x === "string"; }
   function norm(d) {
-    d = d || {};
-    return { done: d.done || [], checks: d.checks || [], quiz: d.quiz || {}, tasks: d.tasks || {}, labs: d.labs || [] };
+    d = obj(d);
+    return { done: arr(d.done).filter(isStr), checks: arr(d.checks).filter(isStr), quiz: obj(d.quiz), tasks: obj(d.tasks),
+             labs: arr(d.labs).filter(function (l) { return l && typeof l === "object" && !Array.isArray(l); }) };
   }
 
   function ratio(q) { return q && q.total ? q.correct / q.total : -1; }
@@ -35,7 +41,9 @@
     out.done = Array.from(new Set(a.done.concat(b.done))).sort();
     out.checks = Array.from(new Set(a.checks.concat(b.checks))).sort();
     Object.keys(a.quiz).concat(Object.keys(b.quiz)).forEach(function (k) {
-      var x = a.quiz[k], y = b.quiz[k];
+      var x = obj(a.quiz[k]), y = obj(b.quiz[k]);
+      if (!Object.keys(x).length) x = null;
+      if (!Object.keys(y).length) y = null;
       var best = !x ? y : !y ? x : ratio(x) > ratio(y) ? x : ratio(y) > ratio(x) ? y : ((x.ts || 0) >= (y.ts || 0) ? x : y);
       var r = Object.assign({}, best);
       var att = Math.max((x && x.attempts) || 0, (y && y.attempts) || 0);
@@ -45,7 +53,7 @@
       out.quiz[k] = r;
     });
     Object.keys(a.tasks).concat(Object.keys(b.tasks)).forEach(function (m) {
-      var t = Object.assign({}, a.tasks[m] || {}, b.tasks[m] || {});
+      var t = Object.assign({}, obj(a.tasks[m]), obj(b.tasks[m]));
       Object.keys(t).forEach(function (id) { if (!t[id]) delete t[id]; });
       out.tasks[m] = t;
     });
@@ -63,7 +71,12 @@
   // ------------------------------------------------------------------ local storage helpers
   function readLocal() { try { return JSON.parse(localStorage.getItem(KEY) || "{}"); } catch (e) { return {}; } }
   function writeLocal(d) { try { localStorage.setItem(KEY, JSON.stringify(d)); } catch (e) { /* storage off */ } }
-  function clearLocal() { try { localStorage.removeItem(KEY); localStorage.removeItem(PENDING); } catch (e) { /* ignore */ } }
+  function clearLocal() { try { localStorage.removeItem(KEY); localStorage.removeItem(PENDING); localStorage.removeItem(OWNER); } catch (e) { /* ignore */ } }
+  // Progress of another account left in this browser is wiped, never merged into the next account;
+  // anonymous (ownerless) progress is merged on first login, as intended.
+  function claimLocal(id) {
+    try { var o = localStorage.getItem(OWNER); if (o && o !== id) clearLocal(); localStorage.setItem(OWNER, id); } catch (e) { /* ignore */ }
+  }
   function setPending(v) { try { if (v) localStorage.setItem(PENDING, "1"); else localStorage.removeItem(PENDING); } catch (e) { /* ignore */ } }
   function isPending() { try { return localStorage.getItem(PENDING) === "1"; } catch (e) { return false; } }
 
@@ -139,6 +152,7 @@
   }
 
   function syncDown() {
+    claimLocal(uid());
     st.sync = "loading"; notify();
     return st.client.from("progress").select("data,updated_at").eq("user_id", uid()).maybeSingle().then(check)
       .then(function (row) {
@@ -194,6 +208,7 @@
       st.client = c;
       c.auth.onAuthStateChange(function (event, session) {
         if (event === "PASSWORD_RECOVERY") st.recovery = true;
+        if (event === "SIGNED_OUT") clearLocal();   // also when the session was revoked elsewhere
         setSession(session);
       });
       return c.auth.getSession();
@@ -228,11 +243,17 @@
       return st.client.auth.signInWithPassword({ email: email, password: password }).then(check)
         .then(function (d) { return setSession(d.session); }).then(snapshot);
     },
-    signOut: function () {
+    // Refuses to drop unsynced progress unless force=true (offline logout would lose it).
+    signOut: function (force) {
       need();
       clearTimeout(pushTimer);
       var flush = isPending() ? push(readLocal()) : Promise.resolve();
-      return flush.then(function () { return st.client.auth.signOut(); }).then(function () {
+      return flush.then(function () {
+        if (isPending() && !force) {
+          var e = new Error("Нет связи: часть прогресса ещё не на сервере. Выйти сейчас — эти изменения пропадут."); e.unsynced = true; throw e;
+        }
+        return st.client.auth.signOut({ scope: "local" });
+      }).then(function () {
         clearLocal(); st.recovery = false; return setSession(null);
       });
     },

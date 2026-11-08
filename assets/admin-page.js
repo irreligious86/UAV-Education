@@ -68,7 +68,7 @@
             '<td data-label="Балл">' + g.score + "</td></tr>";
         }).join("") + "</tbody></table></div>" : '<p class="gc-muted">Пока ничего не начато.</p>') +
       (labs.length ? '<p class="gc-label gc-muted">Результаты грейдеров</p><ul class="progress-labs">' + labs.map(function (l) {
-        return "<li>" + esc(l.grader || "грейдер") + " · " + esc((l.labs || []).join(", ")) + " · " + esc(l.ts || "") + "</li>";
+        return "<li>" + esc(l.grader || "грейдер") + " · " + esc((Array.isArray(l.labs) ? l.labs : []).join(", ")) + " · " + esc(l.ts || "") + "</li>";
       }).join("") + "</ul>" : "");
     box.scrollIntoView({ behavior: "smooth", block: "nearest" });
   }
@@ -77,7 +77,9 @@
     var head = ["username", "email", "role", "mastered", "total", "score", "updated_at"];
     var lines = [head.join(",")].concat(model.rows.map(function (r) {
       return [r.username, r.email, r.role, r.g.mastered, r.g.total, r.g.score, r.updated_at || ""].map(function (v) {
-        v = String(v); return /[",\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v;
+        v = String(v);
+        if (/^[=+\-@\t\r]/.test(v)) v = "'" + v;      // no formulas when the CSV is opened in a spreadsheet
+        return /[",\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v;
       }).join(",");
     }));
     var a = document.createElement("a");
@@ -99,7 +101,7 @@
     if (typeof note !== "string") note = "";
     if (!note) msg("Загружаю…");
     return Promise.all([A.listStudents(), A.audit()]).then(function (res) {
-      model.rows = res[0].map(function (r) { r.g = gradeStudent(r.data); return r; });
+      model.rows = res[0].map(function (r) { try { r.g = gradeStudent(r.data); } catch (e) { r.g = gradeStudent({}); } return r; });
       renderRows(); renderAudit(res[1]); if (note) msg(note, "ok"); else msg("");
     }).catch(function (e) { msg(A.humanError(e), "critical"); });
   }

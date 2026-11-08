@@ -49,10 +49,12 @@ def db(dsn):
         c.rollback()
 
 
-def signup(db, username, email=None):
+def signup(db, username, email=None, confirmed=True):
     uid = uuid.uuid4()
     db.execute("insert into auth.users (id, email, raw_user_meta_data) values (%s, %s, %s)",
                (uid, email or f"{username.lower()}@example.org", json.dumps({"username": username})))
+    if confirmed:   # Supabase sets email_confirmed_at when the user clicks the link (an UPDATE after the insert)
+        db.execute("update auth.users set email_confirmed_at = now() where id = %s", (uid,))
     return uid
 
 
@@ -72,7 +74,7 @@ def users(db):
     """Three students, one admin, the superadmin."""
     u = {name: signup(db, name) for name in ("alice", "bob", "carol", "adam", "boss")}
     db.execute("update public.profiles set role = 'admin' where id = %s", (u["adam"],))
-    db.execute("select public.bootstrap_superadmin('boss@example.org')")
+    db.execute("select public.bootstrap_superadmin('boss@example.org', 'boss')")
     db.execute("update public.progress set data = %s where user_id = %s", (json.dumps({"quiz": {"f-power": {"correct": 7, "total": 8}}}), u["bob"]))
     return u
 
@@ -168,7 +170,7 @@ def test_student_renames_self_only(db, users):
 
 def test_student_cannot_bootstrap(db, users):
     act(db, users["alice"])
-    savepoint_raises(db, errors.InsufficientPrivilege, "select public.bootstrap_superadmin('alice@example.org')")
+    savepoint_raises(db, errors.InsufficientPrivilege, "select public.bootstrap_superadmin('alice@example.org', 'alice')")
 
 
 def test_progress_must_be_object_and_bounded(db, users):
@@ -228,7 +230,7 @@ def test_there_is_only_one_superadmin(db, users):
     savepoint_raises(db, errors.InsufficientPrivilege, "select public.set_role(%s, 'superadmin')", (users["alice"],))
     savepoint_raises(db, errors.InsufficientPrivilege, "select public.set_role(%s, 'student')", (users["boss"],))
     as_postgres(db)
-    savepoint_raises(db, errors.InsufficientPrivilege, "select public.bootstrap_superadmin('alice@example.org')")
+    savepoint_raises(db, errors.InsufficientPrivilege, "select public.bootstrap_superadmin('alice@example.org', 'alice')")
     savepoint_raises(db, errors.UniqueViolation, "update public.profiles set role = 'superadmin' where id = %s", (users["alice"],))
 
 
@@ -243,7 +245,7 @@ def test_set_role_unknown_user(db, users):
 
 
 def test_bootstrap_requires_registered_email(db):
-    savepoint_raises(db, errors.NoDataFound, "select public.bootstrap_superadmin('nobody@example.org')")
+    savepoint_raises(db, errors.NoDataFound, "select public.bootstrap_superadmin('nobody@example.org', 'nobody')")
 
 
 def test_my_role_reports_caller(db, users):
@@ -275,3 +277,53 @@ def test_security_definer_functions_pin_search_path(db):
     rows = db.execute("""select proname from pg_proc where pronamespace = 'public'::regnamespace and prosecdef
                          and not coalesce(proconfig::text like '%search_path=%', false)""").fetchall()
     assert rows == []
+
+
+# ------------------------------------------------------------------ findings of the 2026-11-09 security review
+def test_bootstrap_refuses_unconfirmed_preregistration(db):
+    """M1: an attacker signs up with the owner's address before the owner does."""
+    signup(db, "evil_owner", "owner@example.org", confirmed=False)
+    savepoint_raises(db, errors.NoDataFound, "select public.bootstrap_superadmin('owner@example.org', 'evil_owner')")
+    assert db.execute("select count(*) from public.profiles where role = 'superadmin'").fetchone() == (0,)
+
+
+def test_bootstrap_requires_the_expected_username(db):
+    signup(db, "evil_owner", "owner@example.org")
+    savepoint_raises(db, errors.InvalidParameterValue, "select public.bootstrap_superadmin('owner@example.org', 'alex')")
+    db.execute("select public.bootstrap_superadmin('owner@example.org', 'EVIL_OWNER')")   # case-insensitive match is fine
+
+
+def test_bootstrap_drops_old_sessions(db):
+    uid = signup(db, "owner", "owner@example.org")
+    db.execute("insert into auth.sessions (user_id) values (%s), (%s)", (uid, uid))
+    db.execute("select public.bootstrap_superadmin('owner@example.org', 'owner')")
+    assert db.execute("select count(*) from auth.sessions where user_id = %s", (uid,)).fetchone() == (0,)
+
+
+@pytest.mark.parametrize("bad", ['{"done": 1}', '{"labs": {}}', '{"labs": [null]}', '{"checks": true}',
+                                 '{"quiz": []}', '{"tasks": "x"}', '{"done": [1]}', '{"labs": ["x"]}'])
+def test_progress_shape_enforced(db, users, bad):
+    """M2: one malformed row must not break the admin table."""
+    act(db, users["alice"])
+    savepoint_raises(db, errors.CheckViolation, "update public.progress set data = %s where user_id = %s", (bad, users["alice"]))
+
+
+def test_unconfirmed_signups_hidden_from_admin_view(db, users):
+    """L1: unverified addresses do not appear as students."""
+    ghost = signup(db, "teacher_official", "victim@example.org", confirmed=False)
+    act(db, users["adam"])
+    names = [r[0] for r in db.execute("select username from public.student_progress").fetchall()]
+    assert "teacher_official" not in names and len(names) == 5
+    as_postgres(db)
+    db.execute("update auth.users set email_confirmed_at = now() where id = %s", (ghost,))
+    act(db, users["adam"])
+    assert db.execute("select count(*) from public.student_progress").fetchone() == (6,)
+
+
+def test_updated_at_cannot_be_forged(db, users):
+    """L2: delete + insert with a future timestamp."""
+    act(db, users["alice"])
+    db.execute("delete from public.progress where user_id = %s", (users["alice"],))
+    db.execute("insert into public.progress (user_id, data, updated_at) values (%s, '{}', '2099-01-01')", (users["alice"],))
+    year = db.execute("select extract(year from updated_at) from public.progress where user_id = %s", (users["alice"],)).fetchone()[0]
+    assert year < 2099

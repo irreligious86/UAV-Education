@@ -45,8 +45,13 @@ Rules enforced in the database:
   `set_role()` changes it, and only when the caller is the superadmin.
 - A unique partial index allows at most one row with `role = 'superadmin'`.
 - `set_role()` refuses to touch the superadmin row and refuses to grant `superadmin`.
-- The first superadmin is assigned once from the Supabase SQL editor with `bootstrap_superadmin(email)`,
-  which the browser roles cannot execute. After that it refuses to run.
+- The first superadmin is assigned once from the Supabase SQL editor with
+  `bootstrap_superadmin(email, username)`, which the browser roles cannot execute. It accepts only a
+  *confirmed* email whose account has exactly that username, drops sessions issued before the promotion,
+  and refuses to run once a superadmin exists.
+- `progress.data` must have the shape the pages expect (arrays of strings, objects of objects), so one
+  malformed row cannot break the admin table; `updated_at` is set by the server on insert and update.
+- Unconfirmed sign-ups do not appear in the admin view.
 - Progress rows are writable only by their owner; admins read them, nobody else.
 
 ## 4. Data model
@@ -87,17 +92,30 @@ carry the grader's JSON (`uav-lab-result/1`) that a server can re-verify.
 | 3 | Server-side grading of quizzes (Edge Function), lab result verification | scored work cannot be written from the browser |
 | 4 | Groups/cohorts (admin sees own group), CSV export, deadlines | — |
 
-## 8. Going live (what Alex does, ~15 minutes)
+## 8. Going live (what Alex does, ~20 minutes)
+
+Order matters: the superadmin is created **before** the anon key is published, so nobody can race the
+owner's registration (the database also refuses unconfirmed or mismatched accounts).
 
 1. Create a project at supabase.com (free tier), region close to students.
 2. SQL editor → run `supabase/migrations/0001_accounts_roles_progress.sql`.
-3. Authentication → Providers → Email: keep "Confirm email" on; set minimum password length (≥ 10).
-   Authentication → URL configuration: Site URL `https://irreligious86.github.io/UAV-Education/`.
-4. Register on the site with `irreligious86@gmail.com`, confirm the email.
-5. SQL editor → `select public.bootstrap_superadmin('irreligious86@gmail.com');`
-6. Project settings → API: copy the Project URL and the **anon** public key into
-   `assets/backend-config.js` (`enabled: true`), run `python scripts/publish.py`, commit.
+3. Authentication → Providers → Email: keep "Confirm email" on; minimum password length ≥ 10.
+   Authentication → Emails → SMTP: set a custom SMTP sender — the built-in sender only delivers to the
+   project team and is heavily rate-limited, students would never get the confirmation mail.
+4. Authentication → URL configuration: Site URL `https://irreligious86.github.io/UAV-Education/`;
+   Redirect URLs exactly `https://irreligious86.github.io/UAV-Education/pages/account.html` and, for
+   step 5 only, `http://localhost:8765/pages/account.html` (no wildcards).
+5. Locally, **without committing**: put the Project URL and the **anon** key into
+   `assets/backend-config.js` with `enabled: true`, run `python3 -m http.server 8765`, open
+   `http://localhost:8765/pages/account.html`, register with `irreligious86@gmail.com` and your username,
+   confirm the email, log in and check the username shown.
+6. SQL editor → `select public.bootstrap_superadmin('irreligious86@gmail.com', '<your username>');`
+7. Remove the localhost redirect URL, commit `assets/backend-config.js`, run `python scripts/publish.py`, push.
    Never put the `service_role` key in the repository.
+
+Known limits: sign-up requires a username, so dashboard invites, magic links and OAuth sign-ups are
+rejected by the profile trigger (by design for now). Usernames can be probed through rename errors —
+accepted: it reveals who is enrolled, not emails or grades.
 
 ## 9. Files
 
@@ -113,3 +131,11 @@ carry the grader's JSON (`uav-lab-result/1`) that a server can re-verify.
 
 Login is by email; the username is the public handle shown to the administration (logging in by
 username would need a lookup that reveals which emails exist).
+
+## 10. Security review (2026-11-09)
+
+An independent review (`docs/reviews/security-2026-11-09.md`) found no way to exceed the access matrix
+and six edge issues, all fixed with tests: bootstrap could promote an unconfirmed pre-registration of the
+owner's email (M1); a malformed progress row could blank the admin table (M2); another account's local
+progress on a shared browser could merge into the next account (M3); unconfirmed sign-ups listed as
+students and CSV formula injection (L1); forged `updated_at` (L2); username probing accepted (L3).

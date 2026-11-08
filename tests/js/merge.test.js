@@ -45,3 +45,12 @@ test("merge is idempotent", () => {
 test("false task flags dropped", () => {
   assert.deepStrictEqual(merge({ tasks: { a: { t1: false } } }, {}).tasks, { a: {} });
 });
+
+test("malformed documents never throw (security review M2)", () => {
+  for (const bad of [{ done: 1 }, { labs: {} }, { labs: [null, "x", [1]] }, { checks: true }, { quiz: [] }, { tasks: "x" },
+                     { done: [1, "a"] }, { quiz: { q: "x" } }, { tasks: { a: "y" } }, "string", 42, null, []]) {
+    const m = merge(bad, { done: ["ok"] });
+    assert.deepStrictEqual(m.done.includes("ok"), true);
+  }
+  assert.deepStrictEqual(merge({ done: [1, "a"] }, {}).done, ["a"]);
+});

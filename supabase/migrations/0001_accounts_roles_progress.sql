@@ -13,6 +13,7 @@ create table public.profiles (
   username    text not null unique check (username ~ '^[a-z0-9_]{3,32}$'),
   email       text not null,
   role        public.app_role not null default 'student',
+  confirmed_at timestamptz,            -- copied from auth.users.email_confirmed_at; unconfirmed sign-ups stay out of the admin view
   created_at  timestamptz not null default now()
 );
 
@@ -23,6 +24,16 @@ create table public.progress (
   user_id     uuid primary key references public.profiles (id) on delete cascade,
   data        jsonb not null default '{}'::jsonb
               check (jsonb_typeof(data) = 'object' and pg_column_size(data) < 262144),
+  -- shape the pages rely on; one malformed row must not break the admin table for everyone
+  constraint progress_shape check (
+    (not data ? 'done'   or jsonb_typeof(data -> 'done')   = 'array') and
+    (not data ? 'checks' or jsonb_typeof(data -> 'checks') = 'array') and
+    (not data ? 'labs'   or jsonb_typeof(data -> 'labs')   = 'array') and
+    (not data ? 'quiz'   or jsonb_typeof(data -> 'quiz')   = 'object') and
+    (not data ? 'tasks'  or jsonb_typeof(data -> 'tasks')  = 'object') and
+    not jsonb_path_exists(data, '$.done[*] ? (@.type() != "string")') and
+    not jsonb_path_exists(data, '$.checks[*] ? (@.type() != "string")') and
+    not jsonb_path_exists(data, '$.labs[*] ? (@.type() != "object")')),
   updated_at  timestamptz not null default now()
 );
 
@@ -57,7 +68,7 @@ begin
   if uname !~ '^[a-z0-9_]{3,32}$' then
     raise exception 'username must be 3-32 characters: a-z, 0-9, _' using errcode = '22023';
   end if;
-  insert into public.profiles (id, username, email) values (new.id, uname, new.email);
+  insert into public.profiles (id, username, email, confirmed_at) values (new.id, uname, new.email, new.email_confirmed_at);
   insert into public.progress (user_id) values (new.id);
   return new;
 end $$;
@@ -76,6 +87,16 @@ end $$;
 create trigger on_auth_user_email after update of email on auth.users
   for each row when (old.email is distinct from new.email) execute function public.handle_user_email();
 
+create function public.handle_user_confirmed() returns trigger
+language plpgsql security definer set search_path = '' as $$
+begin
+  update public.profiles set confirmed_at = new.email_confirmed_at where id = new.id;
+  return new;
+end $$;
+
+create trigger on_auth_user_confirmed after update of email_confirmed_at on auth.users
+  for each row when (old.email_confirmed_at is distinct from new.email_confirmed_at) execute function public.handle_user_confirmed();
+
 create function public.touch_progress() returns trigger
 language plpgsql set search_path = '' as $$
 begin
@@ -83,7 +104,7 @@ begin
   return new;
 end $$;
 
-create trigger progress_touch before update on public.progress
+create trigger progress_touch before insert or update on public.progress
   for each row execute function public.touch_progress();
 
 -- ---------------------------------------------------------------- role management
@@ -113,19 +134,26 @@ begin
   insert into public.role_audit (actor, target, old_role, new_role) values (auth.uid(), target, old, new_role);
 end $$;
 
--- One-time bootstrap from the SQL editor (postgres / service_role only): make the given account the superadmin.
-create function public.bootstrap_superadmin(user_email text) returns void
+-- One-time bootstrap from the SQL editor (postgres / service_role only). Requires a *confirmed* email and the
+-- username the owner chose, so an attacker who pre-registered the owner's address cannot be promoted.
+create function public.bootstrap_superadmin(user_email text, expected_username text) returns void
 language plpgsql security definer set search_path = '' as $$
 declare
-  uid uuid;
+  uid uuid; uname text; n int;
 begin
   if exists (select 1 from public.profiles where role = 'superadmin') then
     raise exception 'a superadmin already exists' using errcode = '42501';
   end if;
-  select id into uid from public.profiles where lower(email) = lower(user_email);
-  if uid is null then
-    raise exception 'register this email on the site first' using errcode = 'P0002';
+  select count(*), min(p.id::text)::uuid, min(p.username) into n, uid, uname
+    from public.profiles p join auth.users u on u.id = p.id
+   where lower(u.email) = lower(user_email) and u.email_confirmed_at is not null;
+  if n <> 1 then
+    raise exception 'need exactly one confirmed account with this email (found %)', n using errcode = 'P0002';
   end if;
+  if uname <> lower(expected_username) then
+    raise exception 'this email belongs to username %, not %', uname, expected_username using errcode = '22023';
+  end if;
+  delete from auth.sessions where user_id = uid;   -- sessions issued before the promotion
   update public.profiles set role = 'superadmin' where id = uid;
   insert into public.role_audit (actor, target, old_role, new_role) values (null, uid, 'student', 'superadmin');
 end $$;
@@ -139,8 +167,8 @@ grant update (username) on public.profiles to authenticated;
 grant select, insert, update, delete on public.progress to authenticated;
 grant select on public.role_audit to authenticated;
 
-revoke all on function public.bootstrap_superadmin(text) from public, anon, authenticated;
-revoke all on function public.handle_new_user(), public.handle_user_email(), public.touch_progress() from public, anon, authenticated;
+revoke all on function public.bootstrap_superadmin(text, text) from public, anon, authenticated;
+revoke all on function public.handle_new_user(), public.handle_user_email(), public.handle_user_confirmed(), public.touch_progress() from public, anon, authenticated;
 revoke all on function public.set_role(uuid, public.app_role) from public, anon;
 grant execute on function public.set_role(uuid, public.app_role) to authenticated;
 revoke all on function public.my_role(), public.is_staff() from public, anon;
@@ -171,7 +199,8 @@ create policy role_audit_staff on public.role_audit for select to authenticated
 -- ---------------------------------------------------------------- admin view (RLS of both tables applies)
 create view public.student_progress with (security_invoker = true) as
   select p.id, p.username, p.email, p.role, p.created_at, g.data, g.updated_at
-  from public.profiles p left join public.progress g on g.user_id = p.id;
+  from public.profiles p left join public.progress g on g.user_id = p.id
+  where p.confirmed_at is not null;
 
 revoke all on public.student_progress from anon, authenticated;
 grant select on public.student_progress to authenticated;

@@ -13,7 +13,13 @@ grant usage on schema public to anon, authenticated, service_role;
 create table auth.users (
   id                  uuid primary key default gen_random_uuid(),
   email               text unique,
+  email_confirmed_at  timestamptz,
   raw_user_meta_data  jsonb not null default '{}'::jsonb
+);
+
+create table auth.sessions (
+  id       uuid primary key default gen_random_uuid(),
+  user_id  uuid not null references auth.users (id) on delete cascade
 );
 
 create function auth.uid() returns uuid language sql stable as $$

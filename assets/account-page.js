@@ -74,7 +74,11 @@
     });
     wireSubmit($('[data-form="newpass"]'), function (d) { return A.updatePassword(d.password).then(function () { return "Пароль обновлён."; }); });
     wireSubmit($('[data-form="rename"]'), function (d) { return A.rename(d.username).then(function () { return "Имя сохранено."; }); });
-    $("[data-acc-logout]").addEventListener("click", function () { A.signOut().then(function () { msg("Вышел. Копия прогресса в этом браузере стёрта.", "ok"); }); });
+    var armed = false;   // second click forces logout when progress is not synced
+    $("[data-acc-logout]").addEventListener("click", function () {
+      A.signOut(armed).then(function () { armed = false; msg("Вышел. Копия прогресса в этом браузере стёрта.", "ok"); })
+        .catch(function (e) { if (e.unsynced) { armed = true; msg(e.message + " Нажми «Выйти» ещё раз, чтобы выйти всё равно.", "critical"); } else msg(A.humanError(e), "critical"); });
+    });
     $("[data-acc-sync-now]").addEventListener("click", function () { A.syncNow(); });
     A.onChange(render);
     A.init().then(render);

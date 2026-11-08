@@ -102,6 +102,20 @@ const LOCAL = "uav-student:progress:v1";
   await p.waitForSelector('[data-acc="guest"]:not([hidden])');
   ok("student: no admin page, no admin link");
 
+  // 6b. another account's progress left in the browser is wiped, not merged into the next account (review M3)
+  await p.evaluate((k) => { localStorage.setItem(k, JSON.stringify({ done: ["leaked-module"] })); localStorage.setItem("uav-student:owner", "u-someone-else"); }, LOCAL);
+  await p.fill('[data-form="login"] [name=email]', "bob@example.org");
+  await p.fill('[data-form="login"] [name=password]', "studentpass1");
+  await p.click('[data-form="login"] gc-button[type=submit]');
+  await p.waitForSelector('[data-acc="user"]:not([hidden])');
+  await p.waitForFunction(() => document.querySelector("[data-acc-sync]").textContent === "сохранено");
+  const bobServer = await p.evaluate(() => JSON.parse(localStorage.getItem("fake-supabase-db")).progress["u-bob"].data);
+  assert.ok(!(bobServer.done || []).includes("leaked-module"), "foreign local progress must not reach bob");
+  assert.ok((bobServer.done || []).includes("f-physics"));
+  await p.click("[data-acc-logout]");
+  await p.waitForSelector('[data-acc="guest"]:not([hidden])');
+  ok("shared browser: another account's leftovers are wiped, not merged");
+
   // 7. admin sees grades, cannot change roles
   await p.fill('[data-form="login"] [name=email]', "adam@example.org");
   await p.fill('[data-form="login"] [name=password]', "adminpassword1");
