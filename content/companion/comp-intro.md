@@ -79,8 +79,35 @@ Raspberry Pi 4/5 — 1–3 А при 5 В с пиками до 5 А: отдел�
 4. Кто логирует: FC на SD-карту, companion — свои логи. Совпадают ли метки времени?
 5. Как обновлять софт companion в поле?
 
+### Код наблюдателя и что должно получиться
+```python
+import time
+from pymavlink import mavutil
+
+# own identity: system 1 (this vehicle), component 191 = onboard computer
+m = mavutil.mavlink_connection("tcp:127.0.0.1:5762", source_system=1,
+                               source_component=mavutil.mavlink.MAV_COMP_ID_ONBOARD_COMPUTER)
+m.wait_heartbeat()
+with open("companion_track.csv", "a") as f:
+    last_hb = 0.0
+    while True:
+        if time.time() - last_hb > 1.0:          # say "I am here" once a second, like a real companion
+            m.mav.heartbeat_send(mavutil.mavlink.MAV_TYPE_ONBOARD_CONTROLLER,
+                                 mavutil.mavlink.MAV_AUTOPILOT_INVALID, 0, 0, 0)
+            last_hb = time.time()
+        p = m.recv_match(type="GLOBAL_POSITION_INT", blocking=True, timeout=1)
+        if p:
+            f.write(f"{time.monotonic():.3f},{p.lat / 1e7:.7f},{p.lon / 1e7:.7f},{p.relative_alt / 1000:.1f}\n")
+            f.flush()
+```
+- В наземке (MAVLink Inspector) появляется второй участник: компонент 191 той же системы. Так и выглядит companion для остальной сети.
+- В файле одна строка на каждое сообщение позиции. Чтобы было ровно раз в секунду, либо запроси интервал `GLOBAL_POSITION_INT` 1 000 000 мкс, либо прореживай запись в коде.
+- **Отказ.** Останови процесс (Ctrl+C или `kill`) в полёте в LOITER. Аппарат продолжает делать то, что делал, потому что ничего от companion не ждал. Запиши это как факт. Если бы companion управлял (GUIDED), остановка привела бы к таймауту уставок — это следующий модуль.
+
 ### Лабораторная
 В SITL подними «companion» как отдельный процесс на pymavlink (отдельный `component_id`), который раз в секунду читает `GLOBAL_POSITION_INT` и пишет в файл. Останови процесс в полёте и убедись, что аппарат ничего не заметил.
+
+Лабораторная засчитывается, когда процесс с отдельным `component_id` виден в наземке и пишет позицию в файл, остановка в полёте не изменила поведения аппарата, а в отчёте записано, что произошло бы при отказе companion, управляющего в GUIDED.
 
 ## diagnostics
 - **Симптом:** аппарат «замирает» или падает при зависании companion

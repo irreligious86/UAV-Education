@@ -74,8 +74,29 @@
 <ol><li>Телеметрия на экран, индикация, настройки с телефона — ESP32.</li><li>Видео, маршрутизация MAVLink, Python-сценарии — Raspberry Pi.</li><li>Распознавание объектов, слежение — Jetson.</li></ol>
 <h4 class="md-subheading">Чек-лист архитектуры перед проектом</h4>
 <ol><li>Что аппарат делает, если companion выключился в полёте? Ответ должен быть «переходит в режим X по таймауту».</li><li>По какому порту и на какой скорости идёт MAVLink? Хватает ли полосы под телеметрию и команды?</li><li>Как companion питается? Не с телеметрийного порта FC.</li><li>Кто логирует: FC на SD-карту, companion — свои логи. Совпадают ли метки времени?</li><li>Как обновлять софт companion в поле?</li></ol>
+<h4 class="md-subheading">Код наблюдателя и что должно получиться</h4>
+<pre class="cli-block"><code>import time
+from pymavlink import mavutil
+
+# own identity: system 1 (this vehicle), component 191 = onboard computer
+m = mavutil.mavlink_connection(&quot;tcp:127.0.0.1:5762&quot;, source_system=1,
+                               source_component=mavutil.mavlink.MAV_COMP_ID_ONBOARD_COMPUTER)
+m.wait_heartbeat()
+with open(&quot;companion_track.csv&quot;, &quot;a&quot;) as f:
+    last_hb = 0.0
+    while True:
+        if time.time() - last_hb &gt; 1.0:          # say &quot;I am here&quot; once a second, like a real companion
+            m.mav.heartbeat_send(mavutil.mavlink.MAV_TYPE_ONBOARD_CONTROLLER,
+                                 mavutil.mavlink.MAV_AUTOPILOT_INVALID, 0, 0, 0)
+            last_hb = time.time()
+        p = m.recv_match(type=&quot;GLOBAL_POSITION_INT&quot;, blocking=True, timeout=1)
+        if p:
+            f.write(f&quot;{time.monotonic():.3f},{p.lat / 1e7:.7f},{p.lon / 1e7:.7f},{p.relative_alt / 1000:.1f}\n&quot;)
+            f.flush()</code></pre>
+<ul><li>В наземке (MAVLink Inspector) появляется второй участник: компонент 191 той же системы. Так и выглядит companion для остальной сети.</li><li>В файле одна строка на каждое сообщение позиции. Чтобы было ровно раз в секунду, либо запроси интервал <code>GLOBAL_POSITION_INT</code> 1 000 000 мкс, либо прореживай запись в коде.</li><li><strong>Отказ.</strong> Останови процесс (Ctrl+C или <code>kill</code>) в полёте в LOITER. Аппарат продолжает делать то, что делал, потому что ничего от companion не ждал. Запиши это как факт. Если бы companion управлял (GUIDED), остановка привела бы к таймауту уставок — это следующий модуль.</li></ul>
 <h4 class="md-subheading">Лабораторная</h4>
 <p>В SITL подними «companion» как отдельный процесс на pymavlink (отдельный <code>component_id</code>), который раз в секунду читает <code>GLOBAL_POSITION_INT</code> и пишет в файл. Останови процесс в полёте и убедись, что аппарат ничего не заметил.</p>
+<p>Лабораторная засчитывается, когда процесс с отдельным <code>component_id</code> виден в наземке и пишет позицию в файл, остановка в полёте не изменила поведения аппарата, а в отчёте записано, что произошло бы при отказе companion, управляющего в GUIDED.</p>
 
 <h2>Диагностика</h2>
 <div class="diag-groups"><article class="diag-item"><h4><strong>Симптом:</strong> аппарат «замирает» или падает при зависании companion</h4><ul><li>Возможная причина: companion делает то, что должен делать FC (стабилизация, прямые команды моторам).</li><li>Что сделать: перенести критичное на FC, оставить companion только советы через GUIDED.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> FC не видит companion</h4><ul><li>Возможная причина: не тот порт, протокол или скорость; перепутаны TX/RX.</li><li>Что сделать: <code>SERIALx_PROTOCOL</code>, <code>SERIALx_BAUD</code>, проверка heartbeat через MAVProxy.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> companion перезагружается на газу</h4><ul><li>Возможная причина: питание от слабого BEC или просадка.</li><li>Что сделать: отдельный BEC/стабилизатор с запасом по току.</li></ul></article></div>
