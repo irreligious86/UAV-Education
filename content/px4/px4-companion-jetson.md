@@ -1,134 +1,164 @@
 ---
 id: px4-companion-jetson
-title: "PX4 + Jetson Nano (companion)"
+title: "PX4 + Jetson Orin: companion по UART, MAVLink и uXRCE-DDS"
 level: L3
-readingTime: 15 мин
-firmware: PX4 1.15+
+readingTime: 35 мин
+firmware: PX4 1.15+ · JetPack 6/7
 status: published
 tags:
   - Jetson
+  - companion
+  - uXRCE-DDS
   - offboard
-related: []
-next: []
+related:
+  - comp-intro
+  - px4-ros2
+  - per-cv
+  - per-edge-ml
+next:
+  - per-cv
 ---
 
 ## summary
-Этот модуль описывает способы подключения одноплатного компьютера NVIDIA Jetson Nano к полетному контроллеру Pixhawk (на прошивке PX4) для организации offboard-управления, передачи телеметрии и обработки данных с камеры (компьютерное зрение).
+Jetson Orin Nano/NX — стандартный companion для зрения на PX4: CUDA и TensorRT в 7–25 Вт. Модуль собирает связку целиком: роли и граница ответственности, питание и тепло, физическое подключение к TELEM2, как **найти** правильный UART на своей версии JetPack (имя устройства у разных версий разное), два канала связи — MAVLink и uXRCE-DDS — с параметрами PX4 и проверкой, автозапуск агента через systemd, бюджет задержки цепочки «камера → команда». Первое поколение Jetson Nano снято с поддержки (JetPack 4, Ubuntu 18.04) — для новых проектов его не берут.
 
 ## theory
 ### Роли и граница
-Pixhawk (PX4) — стабилизация, EKF, failsafe, миссии; Jetson — зрение, планирование, ROS 2, сеть. Граница та же, что в модуле «Companion: роль и границы»: без Jetson аппарат обязан лететь и возвращаться. Jetson Orin Nano/NX — текущий стандарт (Nano первого поколения снят с поддержки JetPack 5+); JetPack ставит Ubuntu, CUDA, TensorRT, OpenCV.
+Pixhawk (PX4) — стабилизация, EKF, failsafe, миссии; Jetson — зрение, планирование, ROS 2, сеть. Граница та же, что в модуле «Companion: роль и границы»: без Jetson аппарат обязан лететь и возвращаться, а потеря companion в offboard обрабатывается failsafe PX4 (`COM_OF_LOSS_T`, `COM_OBL_RC_ACT`), а не надеждой.
+
+### Какой Jetson и какая система
+| Плата | Что даёт | Система |
+|---|---|---|
+| Orin Nano 4/8 ГБ | основной выбор для детекции и трекинга; режимы 7–25 Вт (`nvpmodel`) | JetPack 6 (Ubuntu 22.04 → ROS 2 Humble) или JetPack 7 (Ubuntu 24.04 → ROS 2 Jazzy) |
+| Orin NX 8/16 ГБ | в 2 раза больше вычислений, тот же форм-фактор модуля | то же |
+| Jetson Nano (2019) | снят с поддержки, JetPack 4 | не для новых проектов |
+
+Версия JetPack определяет Ubuntu, а значит и дистрибутив ROS 2: ставить ROS 2 «не своей» Ubuntu — путь к сборке из исходников и вечным проблемам с зависимостями.
+
+### Питание и тепло
+- Jetson — **отдельный** BEC или DC-DC от силовой шины с запасом по току, не от полётного контроллера; общая земля с Pixhawk.
+- Режим мощности: `sudo nvpmodel -q` показывает текущий, `nvpmodel -m <N>` переключает; `jetson_clocks` фиксирует частоты (стабильная задержка ценой энергии).
+- Тепло: в закрытом корпусе без обдува Orin троттлит через несколько минут, и задержка детекции растёт вдвое (модуль «ML на борту»). Радиатор с вентилятором или обдув от пропов, `tegrastats` в логе полёта.
 
 ### Физическое подключение
-- **UART**: TELEM2 Pixhawk (TX, RX, GND; 3.3 В логика) ↔ UART Jetson (`/dev/ttyTHS1` на 40-пиновой гребёнке Orin Nano: пины 8/10, TX↔RX перекрёстно, общая земля). Скорость 921600 (`SER_TEL2_BAUD`). Отключить консоль на этом порту в Jetson (`nvgetty`), добавить пользователя в `dialout`.
-- **Ethernet** (Pixhawk 6X и др. с Ethernet): MAVLink/DDS по UDP — удобнее для больших потоков и видео.
-- **USB** — для стенда; в полёте USB-соединение ненадёжно (виброразъём, перезагрузка энумерации).
-- **Питание**: Jetson Orin Nano 7–15 Вт — отдельный BEC 5 В/5 А (или 12–19 В в модульный разъём), не от полётника; общая земля с Pixhawk; радиатор и вентилятор — троттлинг по температуре ломает задержки.
+- **UART (рекомендуется для полёта)**: TELEM2 Pixhawk — TX, RX, GND; Jetson — пины 8 (TX) и 10 (RX) 40-пиновой гребёнки, земля на пин 6. TX↔RX перекрёстно. Логика 3.3 В с обеих сторон; **5 В с разъёма TELEM2 к Jetson не подключать**.
+- **Имя устройства зависит от платы и JetPack**: на Orin этот UART бывает `/dev/ttyTHS0` или `/dev/ttyTHS1`, на старом Nano — `/dev/ttyTHS1`; отладочная консоль Orin — `/dev/ttyTCU0`. Не верь статье — проверь петлёй (практика, шаг 2).
+- **Ethernet** (Pixhawk 6X, 6X Pro и др.): MAVLink и uXRCE-DDS по UDP, без ограничения скорости UART — лучший вариант, если есть.
+- **USB** — для стенда; в полёте USB-соединение ненадёжно: вибрация разъёма и перезапуск энумерации обрывают связь.
 
-### Два варианта связи
-1. **MAVLink** (MAVROS для ROS 2 или pymavlink/MAVSDK): `MAV_1_CONFIG` = TELEM2, `MAV_1_MODE` = Onboard (2) — режим с нужными потоками для companion; на Jetson `ros2 launch mavros px4.launch fcu_url:=serial:///dev/ttyTHS1:921600`. Плюс: стандарт, работает с ArduPilot тоже; минус: задержка и ограниченный набор данных.
-2. **uXRCE-DDS**: `UXRCE_DDS_CFG` = TELEM2 (и MAVLink тогда на другом порту — не на том же!), на Jetson `MicroXRCEAgent serial --dev /dev/ttyTHS1 -b 921600`; топики `/fmu/out/*`, `/fmu/in/*` с `px4_msgs` той же версии, что прошивка. Плюс: низкая задержка, внутренние топики; минус: только PX4, версии должны совпадать.
+### Два канала связи
+1. **MAVLink** (MAVSDK, pymavlink, MAVROS): `MAV_1_CONFIG = TELEM2`, `MAV_1_MODE = Onboard` (набор потоков для companion), `SER_TEL2_BAUD = 921600`. Плюс: стандарт, тот же код работает с ArduPilot; минус: ограниченный набор данных и частот.
+2. **uXRCE-DDS**: `UXRCE_DDS_CFG = TELEM2`, та же скорость, MAVLink на этом порту выключен (`MAV_1_CONFIG = Disabled` или перенесён на другой порт). На Jetson — `MicroXRCEAgent serial --dev <порт> -b 921600`; топики `/fmu/out/*`, `/fmu/in/*` из `px4_msgs` **той же версии**, что прошивка (с 1.16 сообщения версионируются, у части топиков суффикс `_v1`). Плюс: внутренние топики PX4 с малой задержкой; минус: только PX4, версии должны совпадать.
 
-### Что крутится на Jetson
-ROS 2 узлы: камера (`per-camera`), детектор на TensorRT (`per-cv`), VIO/внешняя навигация (`per-visual-nav`), контур слежения с защитами (`per-tracking`), логгер (`ros2 bag` + синхронизация времени с PX4 через `/fmu/out/timesync_status`). Разделение по процессам: падение детектора не должно останавливать узел защит. Автозапуск — systemd-сервисы с рестартом; watchdog-узел, который сообщает в QGC (`STATUSTEXT`) о здоровье companion.
+На одном порту живёт что-то одно. Нужны оба — MAVLink на TELEM1/USB/Ethernet, DDS на TELEM2.
 
-### Разобранный пример: задержка цепочки
-Камера CSI 60 fps (16 мс) → TensorRT YOLO-nano FP16 12 мс → трекер 2 мс → DDS 2 мс → PX4 position controller (`MPC_XY_VEL_P_ACC`, постоянная времени ~0.5 с). Чистая задержка ~35 мс + динамика — контур слежения с K_p ≈ 1 1/с устойчив с запасом (модуль «Слежение»); при USB-камере MJPEG (+60 мс) и Wi-Fi-мосте вместо UART (+20–50 мс, джиттер) — запас исчезает. Отсюда: CSI и провод, не USB и радио.
+### Разобранный пример: бюджет задержки
+Камера CSI 60 кадр/с (до 16 мс до готового кадра) → TensorRT YOLO-nano FP16 ~12 мс → трекер 2 мс → DDS по UART 921600 ~2 мс → контроллер скорости PX4 (постоянная времени ~0.5 с). Чистая задержка ~35 мс: контур слежения с Kp ≈ 1 1/с устойчив с запасом (модуль «Слежение»). USB-камера с MJPEG добавляет 40–80 мс, Wi-Fi-мост вместо провода — 20–50 мс с джиттером; две такие «мелочи» съедают весь запас. Отсюда правило: CSI и провод, не USB и радио.
 
 {{diagram:px4-jetson-link|PX4 и Jetson: камера на Jetson, связь с полётным контроллером по TELEM2 через MAVLink или uXRCE-DDS.}}
 
 ## practice
-
-### Вариант 1: Подключение через USB (простой и надежный)
-Этот способ рекомендуется для начальной отладки, так как он наиболее стабилен и не требует сложных манипуляций с аппаратными UART Jetson.
-
-**Соединение:**
-1. Возьмите USB-кабель (Micro-USB или USB-C в зависимости от модели Pixhawk, например, Pixhawk 6C или Cube Orange)
-2. Подключите кабель к порту USB на Pixhawk (обычно это порт для подключения к Mission Planner/QGC) и к любому USB-порту Jetson Nano
-3. Примечание: USB удобен на стенде, но в полёте ненадёжен (см. раздел «Физическое подключение»)
-
-**Настройка параметров PX4:**
-1. В QGroundControl перейдите в Параметры (Parameters)
-2. Убедитесь, что порт, к которому подключен USB, настроен на передачу MAVLink. Обычно USB порт включен по умолчанию
-3. Если вы используете uXRCE-DDS, необходимо отключить MAVLink на используемом порту и активировать UXRCE_DDS_CFG
-
-**Проверка на Jetson:**
-1. Подключитесь к Jetson по SSH или через монитор
-2. Найдите устройство: `ls /dev/ttyACM*` или `ls /dev/ttyUSB*`. Обычно USB подключение отображается как ttyACM0
-3. Дайте права доступа: `sudo chmod 666 /dev/ttyACM0`
-
-### Вариант 2: Подключение через UART (аппаратный последовательный порт)
-Этот способ используется для встраиваемых решений, где USB-порт может быть занят или требуется минимизация кабелей.
-
-**Схема подключения:**
-1. Подключите TX (передатчик) пикса к RX (приемнику) нано, и наоборот (RX -> TX). Обязательно соедините GND
-2. Рекомендуемые пины на 40-pin разъеме Jetson Nano: Pin 8 (TX) и Pin 10 (RX) — это аппаратный UART1 (обычно /dev/ttyTHS1)
-3. На Pixhawk используйте порт TELEM 2 или TELEM 1
-
-**Настройка UART на Jetson Nano (критически важно):**
-
-По умолчанию последовательный порт на джамперных пинах (GPIO) часто занят службой последовательной консоли (serial console). Её необходимо отключить, чтобы освободить порт для связи с дроном.
-
-**Отключите сервис nvgetty:**
+### Шаг 1. Подготовка Jetson
 ```bash
-sudo systemctl stop nvgetty.service
-sudo systemctl disable nvgetty.service
+sudo usermod -aG dialout $USER        # access to serial ports (log out and in)
+systemctl status nvgetty              # on boards where the header UART is a console, stop it:
+sudo systemctl disable --now nvgetty
+sudo nvpmodel -q                      # current power mode
 ```
-Это одна из главных причин ошибок "Permission denied".
 
-**Добавьте пользователя в группу dialout:**
+### Шаг 2. Найти «свой» UART петлёй
+Перемычка между пинами 8 и 10, Pixhawk не подключён. Для каждого кандидата:
+```python
+import serial, sys
+for dev in ("/dev/ttyTHS0", "/dev/ttyTHS1"):
+    try:
+        with serial.Serial(dev, 921600, timeout=0.2) as s:
+            s.reset_input_buffer(); s.write(b"loopback-test\n")
+            print(dev, "OK" if s.readline() == b"loopback-test\n" else "no echo")
+    except serial.SerialException as e:
+        print(dev, "error:", e)
+```
+Ровно один порт должен ответить OK — это и есть пины 8/10 на вашей системе. «Permission denied» — группа dialout или консоль на порту; «no echo» на обоих — пины не те или UART выключен в device tree (Jetson-IO: `sudo /opt/nvidia/jetson-io/jetson-io.py`).
+
+### Шаг 3. MAVLink-канал
+Параметры PX4 в QGC: `MAV_1_CONFIG = TELEM 2`, `MAV_1_MODE = Onboard`, `SER_TEL2_BAUD = 921600`, перезагрузка. Перемычку снять, подключить TX/RX/GND. Проверка:
+```python
+from pymavlink import mavutil
+m = mavutil.mavlink_connection("/dev/ttyTHS1", baud=921600)   # your port from step 2
+m.wait_heartbeat(); print("sys", m.target_system, "comp", m.target_component)
+import time, collections
+cnt, t0 = collections.Counter(), time.time()
+while time.time() - t0 < 10:
+    msg = m.recv_match(type=["ATTITUDE", "LOCAL_POSITION_NED"], blocking=True, timeout=1)
+    if msg: cnt[msg.get_type()] += 1
+print({k: v / 10 for k, v in cnt.items()}, "Hz")
+```
+Записать частоты ATTITUDE и LOCAL_POSITION_NED.
+
+### Шаг 4. uXRCE-DDS-канал
+`MAV_1_CONFIG = Disabled`, `UXRCE_DDS_CFG = TELEM2`, перезагрузка. На Jetson:
 ```bash
-sudo usermod -aG dialout $USER
+MicroXRCEAgent serial --dev /dev/ttyTHS1 -b 921600
+ros2 topic list | grep fmu                     # versioned names, e.g. ..._v1 since PX4 1.16/1.17
+ros2 topic hz /fmu/out/vehicle_attitude
+ros2 topic echo --once /fmu/out/timesync_status
 ```
-После этого нужно перезагрузиться (логаут/логин).
+Сравнить частоту `vehicle_attitude` с ATTITUDE из шага 3.
 
-**Настройка параметров PX4:**
-1. Для MAVLink на TELEM2 (по умолчанию MAVLink на TELEM2 выключен — включить вручную): `MAV_1_CONFIG = TELEM 2`, `MAV_1_MODE = Onboard` (набор сообщений для companion), `SER_TEL2_BAUD = 921600`.
-2. Для uXRCE-DDS вместо MAVLink: отключить MAVLink на порту (`MAV_1_CONFIG = Disabled`), затем `UXRCE_DDS_CFG = TELEM2` и та же `SER_TEL2_BAUD`. После изменения этих параметров — перезагрузка.
-3. На одном порту не могут одновременно жить MAVLink и uXRCE-DDS: выбери одно.
+### Шаг 5. Автозапуск агента
+`/etc/systemd/system/xrce-agent.service`:
+```ini
+[Unit]
+Description=Micro XRCE-DDS Agent for PX4
+After=network.target
 
-**Диагностика UART на Jetson:**
+[Service]
+ExecStart=/usr/local/bin/MicroXRCEAgent serial --dev /dev/ttyTHS1 -b 921600
+Restart=always
+RestartSec=2
+User=nvidia
 
-Проверьте, что порт виден и имеет правильную группу:
-```bash
-ls -l /dev/ttyTHS*
+[Install]
+WantedBy=multi-user.target
 ```
-Если вы видите `crw------- 1 root tty`, значит порт все еще заблокирован консолью. После отключения nvgetty группа должна измениться на dialout.
+`sudo systemctl enable --now xrce-agent`; проверить, что после `sudo kill` агента топики возвращаются за 2–3 с. Путь к бинарнику, пользователь и порт — свои.
 
-### Вариант 3: Использование FTDI-адаптера
-Если прямое UART-подключение нестабильно (частая проблема с некоторыми версиями Cube Orange), используйте переходник USB-to-UART.
+### Шаг 6. Тепло под нагрузкой
+Запустить детектор (модуль «Компьютерное зрение») на 20 минут в корпусе, писать `tegrastats --interval 1000 --logfile tegra.log`. Найти момент троттлинга (частота GPU падает, температура у предела) и задержку детекции до и после.
 
-**Схема:**
-1. FTDI адаптер подключается к USB порту Jetson Nano
-2. Провода TX/RX/GND от адаптера идут к пиксу
-3. Jetson увидит адаптер как /dev/ttyUSB0
-4. Преимущество: Обходит аппаратные проблемы UART на плате Jetson или Pixhawk, обеспечивая стабильную связь
+Лабораторная засчитывается, когда найден порт петлёй, оба канала проверены с записанными частотами, агент поднимается сам после падения, есть 20-минутный тепловой лог.
 
 ## diagnostics
-
-- **Permission denied: '/dev/ttyTHS1'** — Порт используется системной консолью (nvgetty) или у пользователя нет прав. Решение: выполните шаги из раздела "Настройка UART на Jetson Nano" (остановка nvgetty и добавление в группу dialout)
-
-- **MAVLink работает, но uXRCE-DDS не подключается** — Неправильные параметры прошивки или несоответствие версий PX4. Решение: убедитесь, что на телеметрийном порту выключен MAVLink (`MAV_1_CONFIG = Disabled`) и задан `UXRCE_DDS_CFG = TELEM2`, перепрошейте контроллер стабильной версией, запустите агент вручную: `sudo MicroXRCEAgent serial --dev /dev/ttyTHS1 -b 921600`
-
-- **Нет связи, но порт виден** — Перепутаны пины RX/TX или низкое напряжение питания Jetson. Решение: проверьте перекрестное соединение (TX->RX, RX->TX), убедитесь, что Jetson Nano получает достаточное питание (5В 2-4А)
-
-- **Прерывистая связь или потеря пакетов по UART** — Отсутствие аппаратного контроля потока (RTS/CTS) или электрические помехи. Решение: используйте USB-кабель или FTDI адаптер вместо прямых пинов GPIO
+- **Симптом:** `Permission denied: /dev/ttyTHS*`
+  - Возможная причина: пользователь не в dialout или на порту консоль.
+  - Что сделать: `usermod -aG dialout`, перелогиниться, `systemctl disable --now nvgetty`.
+- **Симптом:** порт открывается, данных нет
+  - Возможная причина: не тот ttyTHS, TX/RX не перекрещены, нет общей земли, MAVLink на TELEM2 не включён.
+  - Что сделать: петля из шага 2, проверка проводки, `MAV_1_CONFIG`.
+- **Симптом:** MAVLink работает, uXRCE-DDS — нет
+  - Возможная причина: MAVLink всё ещё на том же порту, агент не той скорости, `px4_msgs` другой версии.
+  - Что сделать: `MAV_1_CONFIG = Disabled`, одинаковый baud, `px4_msgs` из ветки, совпадающей с прошивкой.
+- **Симптом:** топики есть, но `ros2 topic echo` молчит
+  - Возможная причина: несовпадение QoS (PX4 публикует best effort).
+  - Что сделать: подписчик с `qos_profile_sensor_data`, `ros2 topic echo --qos-reliability best_effort`.
+- **Симптом:** задержка детекции растёт через 10 минут полёта
+  - Возможная причина: троттлинг Jetson.
+  - Что сделать: обдув, режим `nvpmodel`, `tegrastats` в логе полёта.
+- **Симптом:** Jetson перезагружается на газу
+  - Возможная причина: просадка общего BEC.
+  - Что сделать: отдельный DC-DC с запасом, конденсатор на входе, измерить напряжение осциллографом под нагрузкой.
 
 ## references
-
-- PX4 User Guide: Companion Computer | https://docs.px4.io/main/en/companion_computer/pixhawk_companion.html | primary | A
-- PX4 User Guide: uXRCE-DDS (PX4-ROS 2 Bridge) | https://docs.px4.io/main/en/middleware/uxrce_dds.html | primary | A
-- ArduPilot Dev Docs: Turnkey Companion Computer Solutions | https://ardupilot.org/ | primary | A
-- ArduPilot Discourse: Jetson Nano - Pixhawk Cube Communication | https://discuss.ardupilot.org/ | secondary | B
-- NVIDIA Developer Forums: Jetson Nano Setup | https://forums.developer.nvidia.com/ | secondary | B
+- PX4 — Pixhawk + Companion Computer | https://docs.px4.io/main/en/companion_computer/pixhawk_companion.html | primary | A
+- PX4 — uXRCE-DDS (PX4–ROS 2/DDS bridge) | https://docs.px4.io/main/en/middleware/uxrce_dds.html | primary | A
+- eProsima — Micro XRCE-DDS Agent | https://github.com/eProsima/Micro-XRCE-DDS-Agent | primary | A
+- NVIDIA Developer Forums — UART1 on expansion pins 8/10 (Orin) | https://forums.developer.nvidia.com/t/how-to-access-uart1-on-expansion-pins-8-10/328934 | secondary | B
 
 ## checklist
-
-- Проверить совместимость версии PX4 (1.15+) с Jetson Nano
-- Подключить Pixhawk и Jetson Nano (USB, UART или FTDI адаптер)
-- Отключить сервис nvgetty на Jetson (для подключения по UART)
-- Добавить пользователя в группу dialout
-- Настроить параметры PX4 (MAV_1_CONFIG/MAV_1_MODE или UXRCE_DDS_CFG, SER_TEL2_BAUD)
-- Проверить доступность портов (`ls /dev/ttyACM*`, `ls /dev/ttyTHS*`)
-- Убедиться в правильности соединения RX/TX и питания
-- Запустить тестирование связи (MAVLink или XRCE-DDS)
+- Понимаю границу Jetson и PX4 и что делает PX4 при потере companion
+- Выбираю JetPack и ROS 2 под одну Ubuntu
+- Питаю Jetson отдельно, слежу за теплом и режимом мощности
+- Нахожу свой UART петлёй, не по статье
+- Настраиваю MAVLink и uXRCE-DDS на разных портах и проверяю частоты
+- Поднимаю агент через systemd с автоперезапуском
+- Считаю бюджет задержки «камера → команда»
