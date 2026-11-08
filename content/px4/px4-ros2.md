@@ -96,7 +96,7 @@ cd .. && colcon build && source install/setup.bash
 Агент: `MicroXRCEAgent udp4 -p 8888` (сборка из исходников или snap — по документации).
 
 ### Шаг 2. SITL с клиентом
-`make px4_sitl gz_x500` — в SITL клиент uXRCE-DDS стартует сам и ищет агента на 8888. Проверка: `ros2 topic list` показывает `/fmu/out/vehicle_attitude` и прочие; `ros2 topic echo /fmu/out/vehicle_local_position`.
+`make px4_sitl gz_x500` — в SITL клиент uXRCE-DDS стартует сам и ищет агента на 8888. Проверка: `ros2 topic list` показывает `/fmu/out/vehicle_attitude` и прочие; `ros2 topic echo /fmu/out/vehicle_local_position` (с PX4 1.17 — `/fmu/out/vehicle_local_position_v1`).
 
 ### Шаг 3. Offboard-пример
 Запусти пример из `px4_ros_com` (offboard control): узел 10 циклов шлёт `OffboardControlMode` + `TrajectorySetpoint`, затем переключает режим и армит через `VehicleCommand`, после чего держит точку на 5 м. Прочитай код: порядок «сначала поток, потом режим» — ключевой.

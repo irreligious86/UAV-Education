@@ -25,7 +25,7 @@ PX4 — не одна программа, а набор независимых �
 - **Flight stack** — алгоритмы: оценка состояния (estimator), контроллеры, навигатор, commander, распределение управления (control allocation).
 
 ### Путь от датчика до мотора
-1. Драйверы IMU опрашивают датчик (~1 кГц), интегрируют и публикуют (~250 Гц).
+1. Драйверы IMU читают FIFO датчика (килогерцы, у современных IMU до 8 кГц); гироскоп после фильтров публикуется в `vehicle_angular_velocity` на `IMU_GYRO_RATEMAX` (400 Гц), интегрированные данные — в `vehicle_imu` на `IMU_INTEG_RATE` (200 Гц).
 2. **EKF2** объединяет IMU, GPS, баро, магнитометр в оценку ориентации, скорости и позиции.
 3. **Navigator** решает, куда лететь: миссия, возврат, удержание.
 4. **Position controller** из желаемой позиции делает желаемую ориентацию и тягу.
@@ -52,7 +52,7 @@ PX4 — не одна программа, а набор независимых �
 `src/modules/`: `sensors` (сбор датчиков, `sensor_combined`), `ekf2` (оценка состояния), `commander` (арм, режимы, failsafe, pre-arm), `navigator` (миссии, RTL, геозона, `position_setpoint_triplet`), `mc_pos_control` (позиция → ориентация+тяга), `mc_att_control` (угол → угловая скорость), `mc_rate_control` (скорость → моменты, `vehicle_torque_setpoint`/`vehicle_thrust_setpoint`), `control_allocator` (моменты → `actuator_motors`/`actuator_servos`), `logger`, `mavlink`, `uxrce_dds_client`, `land_detector`, `battery_status`, `mc_autotune_attitude_control`. Драйверы — `src/drivers/` (imu, gps, barometer, dshot, pwm_out). Путь IMU → мотор: `sensors` → `ekf2` → `mc_pos_control` → `mc_att_control` → `mc_rate_control` → `control_allocator` → `dshot`/`pwm_out`.
 
 ### Исполнение: work queue и приоритеты
-На NuttX большинство модулей — не отдельные потоки, а элементы **work queue** с приоритетами (`wq:rate_ctrl` выше, `wq:nav_and_controllers`, `wq:hp_default`, `wq:lp_default` ниже): быстрые задачи (rate control) просыпаются по приходу данных гироскопа и выполняются первыми; `work_queue status` показывает их. Тяжёлые — EKF2, logger, mavlink — отдельные задачи. `top` в консоли — загрузка CPU по задачам (норма < 70–80% на FMUv5); перегрузка видна как рост задержек и предупреждения.
+На NuttX большинство модулей — не отдельные потоки, а элементы **work queue** с приоритетами (`wq:rate_ctrl` выше, `wq:nav_and_controllers`, `wq:hp_default`, `wq:lp_default` ниже): быстрые задачи (rate control) просыпаются по приходу данных гироскопа и выполняются первыми; `work_queue status` показывает их. Отдельные задачи — logger, mavlink; EKF2 тоже работает в work queue (ScheduledWorkItem). `top` в консоли — загрузка CPU по задачам (норма < 70–80% на FMUv5); перегрузка видна как рост задержек и предупреждения.
 
 ### Хранилище и конфигурация
 Параметры — во flash/EEPROM (`param save`, `param reset_all`), миссии и геозона — в `dataman` (SD или flash), логи — SD. Загрузочные скрипты — `ROMFS/px4fmu_common/init.d/` (`rc.*`): какой драйвер стартовать, с какими параметрами, airframe-файлы `init.d/airframes/` — это и есть «выбор airframe» в QGC. Свой модуль добавляется в `boards/<board>/default.px4board` и стартует из `rc.*` или по параметру.
@@ -83,7 +83,7 @@ pxh> listener sensor_combined -n 1
 `mc_rate_control stop` в висении SITL — аппарат теряет управление; `mc_rate_control start` — возвращает. Делать только в симуляторе: это демонстрация модульности, а не приём.
 
 ### Шаг 4. Прочитать `.msg`
-Открой `msg/VehicleCommand.msg` и `msg/OffboardControlMode.msg` в исходниках: эти два сообщения понадобятся для ROS 2.
+Открой `msg/VehicleCommand.msg` (с PX4 1.16 — `msg/versioned/VehicleCommand.msg`) и `msg/OffboardControlMode.msg` в исходниках: эти два сообщения понадобятся для ROS 2.
 
 ### Лабораторная
 Отчёт на страницу: цепочка от IMU до моторов с именами модулей и топиков и их частотами, снятыми в SITL.

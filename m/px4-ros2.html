@@ -99,7 +99,7 @@ git clone https://github.com/PX4/px4_ros_com.git
 cd .. &amp;&amp; colcon build &amp;&amp; source install/setup.bash</code></pre>
 <p>Агент: <code>MicroXRCEAgent udp4 -p 8888</code> (сборка из исходников или snap — по документации).</p>
 <h4 class="md-subheading">Шаг 2. SITL с клиентом</h4>
-<p><code>make px4_sitl gz_x500</code> — в SITL клиент uXRCE-DDS стартует сам и ищет агента на 8888. Проверка: <code>ros2 topic list</code> показывает <code>/fmu/out/vehicle_attitude</code> и прочие; <code>ros2 topic echo /fmu/out/vehicle_local_position</code>.</p>
+<p><code>make px4_sitl gz_x500</code> — в SITL клиент uXRCE-DDS стартует сам и ищет агента на 8888. Проверка: <code>ros2 topic list</code> показывает <code>/fmu/out/vehicle_attitude</code> и прочие; <code>ros2 topic echo /fmu/out/vehicle_local_position</code> (с PX4 1.17 — <code>/fmu/out/vehicle_local_position_v1</code>).</p>
 <h4 class="md-subheading">Шаг 3. Offboard-пример</h4>
 <p>Запусти пример из <code>px4_ros_com</code> (offboard control): узел 10 циклов шлёт <code>OffboardControlMode</code> + <code>TrajectorySetpoint</code>, затем переключает режим и армит через <code>VehicleCommand</code>, после чего держит точку на 5 м. Прочитай код: порядок «сначала поток, потом режим» — ключевой.</p>
 <h4 class="md-subheading">Шаг 4. Свой узел</h4>

@@ -45,7 +45,7 @@ ROS 2 узлы: камера (`per-camera`), детектор на TensorRT (`pe
 **Соединение:**
 1. Возьмите USB-кабель (Micro-USB или USB-C в зависимости от модели Pixhawk, например, Pixhawk 6C или Cube Orange)
 2. Подключите кабель к порту USB на Pixhawk (обычно это порт для подключения к Mission Planner/QGC) и к любому USB-порту Jetson Nano
-3. Примечание: прямое подключение по USB дает полный поток данных MAVLink без потери пакетов
+3. Примечание: USB удобен на стенде, но в полёте ненадёжен (см. раздел «Физическое подключение»)
 
 **Настройка параметров PX4:**
 1. В QGroundControl перейдите в Параметры (Parameters)
@@ -83,7 +83,7 @@ sudo usermod -aG dialout $USER
 После этого нужно перезагрузиться (логаут/логин).
 
 **Настройка параметров PX4:**
-1. Для MAVLink на TELEM2 (так настроено по умолчанию): `MAV_1_CONFIG = TELEM 2`, `MAV_1_MODE = Onboard` (набор сообщений для companion), `SER_TEL2_BAUD = 921600`.
+1. Для MAVLink на TELEM2 (по умолчанию MAVLink на TELEM2 выключен — включить вручную): `MAV_1_CONFIG = TELEM 2`, `MAV_1_MODE = Onboard` (набор сообщений для companion), `SER_TEL2_BAUD = 921600`.
 2. Для uXRCE-DDS вместо MAVLink: отключить MAVLink на порту (`MAV_1_CONFIG = Disabled`), затем `UXRCE_DDS_CFG = TELEM2` и та же `SER_TEL2_BAUD`. После изменения этих параметров — перезагрузка.
 3. На одном порту не могут одновременно жить MAVLink и uXRCE-DDS: выбери одно.
 

@@ -57,7 +57,7 @@
 <h2>Практика</h2>
 <h4 class="md-subheading">Вариант 1: Подключение через USB (простой и надежный)</h4>
 <p>Этот способ рекомендуется для начальной отладки, так как он наиболее стабилен и не требует сложных манипуляций с аппаратными UART Jetson.</p>
-<p><strong>Соединение:</strong> 1. Возьмите USB-кабель (Micro-USB или USB-C в зависимости от модели Pixhawk, например, Pixhawk 6C или Cube Orange) 2. Подключите кабель к порту USB на Pixhawk (обычно это порт для подключения к Mission Planner/QGC) и к любому USB-порту Jetson Nano 3. Примечание: прямое подключение по USB дает полный поток данных MAVLink без потери пакетов</p>
+<p><strong>Соединение:</strong> 1. Возьмите USB-кабель (Micro-USB или USB-C в зависимости от модели Pixhawk, например, Pixhawk 6C или Cube Orange) 2. Подключите кабель к порту USB на Pixhawk (обычно это порт для подключения к Mission Planner/QGC) и к любому USB-порту Jetson Nano 3. Примечание: USB удобен на стенде, но в полёте ненадёжен (см. раздел «Физическое подключение»)</p>
 <p><strong>Настройка параметров PX4:</strong> 1. В QGroundControl перейдите в Параметры (Parameters) 2. Убедитесь, что порт, к которому подключен USB, настроен на передачу MAVLink. Обычно USB порт включен по умолчанию 3. Если вы используете uXRCE-DDS, необходимо отключить MAVLink на используемом порту и активировать UXRCE_DDS_CFG</p>
 <p><strong>Проверка на Jetson:</strong> 1. Подключитесь к Jetson по SSH или через монитор 2. Найдите устройство: <code>ls /dev/ttyACM*</code> или <code>ls /dev/ttyUSB*</code>. Обычно USB подключение отображается как ttyACM0 3. Дайте права доступа: <code>sudo chmod 666 /dev/ttyACM0</code></p>
 <h4 class="md-subheading">Вариант 2: Подключение через UART (аппаратный последовательный порт)</h4>
@@ -72,7 +72,7 @@ sudo systemctl disable nvgetty.service</code></pre>
 <p><strong>Добавьте пользователя в группу dialout:</strong></p>
 <pre class="cli-block"><code>sudo usermod -aG dialout $USER</code></pre>
 <p>После этого нужно перезагрузиться (логаут/логин).</p>
-<p><strong>Настройка параметров PX4:</strong> 1. Для MAVLink на TELEM2 (так настроено по умолчанию): <code>MAV_1_CONFIG = TELEM 2</code>, <code>MAV_1_MODE = Onboard</code> (набор сообщений для companion), <code>SER_TEL2_BAUD = 921600</code>. 2. Для uXRCE-DDS вместо MAVLink: отключить MAVLink на порту (<code>MAV_1_CONFIG = Disabled</code>), затем <code>UXRCE_DDS_CFG = TELEM2</code> и та же <code>SER_TEL2_BAUD</code>. После изменения этих параметров — перезагрузка. 3. На одном порту не могут одновременно жить MAVLink и uXRCE-DDS: выбери одно.</p>
+<p><strong>Настройка параметров PX4:</strong> 1. Для MAVLink на TELEM2 (по умолчанию MAVLink на TELEM2 выключен — включить вручную): <code>MAV_1_CONFIG = TELEM 2</code>, <code>MAV_1_MODE = Onboard</code> (набор сообщений для companion), <code>SER_TEL2_BAUD = 921600</code>. 2. Для uXRCE-DDS вместо MAVLink: отключить MAVLink на порту (<code>MAV_1_CONFIG = Disabled</code>), затем <code>UXRCE_DDS_CFG = TELEM2</code> и та же <code>SER_TEL2_BAUD</code>. После изменения этих параметров — перезагрузка. 3. На одном порту не могут одновременно жить MAVLink и uXRCE-DDS: выбери одно.</p>
 <p><strong>Диагностика UART на Jetson:</strong></p>
 <p>Проверьте, что порт виден и имеет правильную группу:</p>
 <pre class="cli-block"><code>ls -l /dev/ttyTHS*</code></pre>
