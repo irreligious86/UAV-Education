@@ -38,6 +38,39 @@ next: []
 ### Почему диф, а не дамп
 `diff all` содержит только отличия от дефолтов — его можно читать глазами и хранить в git. `dump` — всё подряд, при обновлении прошивки он тащит старые дефолты как явные значения.
 
+### Минимальный скрипт выгрузки `diff all` (pyserial)
+```python
+import serial, time, sys, glob
+
+def cli(port, cmds, timeout=3.0):
+    """Open CLI, run commands, return full text. Do not send 'exit' (reboots on 4.5)."""
+    with serial.Serial(port, 115200, timeout=0.2) as s:
+        s.write(b"#\n"); time.sleep(0.5); s.read(s.in_waiting or 1)
+        out = ""
+        for c in cmds:
+            s.write((c + "\n").encode()); t0 = time.time(); buf = ""
+            while time.time() - t0 < timeout:
+                chunk = s.read(4096).decode(errors="replace")
+                if chunk: buf += chunk; t0 = time.time()
+                if buf.rstrip().endswith("# "): break        # prompt returned
+            out += buf
+        return out
+
+ports = glob.glob("/dev/ttyACM*")                              # Linux; Windows: COM*
+for p in ports:
+    name = cli(p, ["get craft_name"])
+    if "viking7" in name:
+        text = cli(p, ["version", "diff all"])
+        open("viking7/betaflight/diff-all.txt", "w").write(text)
+        break
+else:
+    sys.exit("craft not found")
+```
+Нормализация перед коммитом: убрать строки с датой/временем из `version` и `# ` эхо, отсортировать блоки — иначе `git diff` шумит (модуль «CI»).
+
+### Что автоматизировать стоит, а что нет
+Стоит: бэкап `diff all` перед каждым полётным днём; проверка инвариантов (failsafe, poles, bidir) по выгрузке; массовая смена `craft_name`/VTX-таблицы на парке; выгрузка логов через `msc`. Не стоит: массовая «накатка PID» на разные аппараты (разная механика), любые изменения без перечитывания `get` после `save`.
+
 ## practice
 ### Шаг 1. Минимальный клиент CLI на Python
 ```python

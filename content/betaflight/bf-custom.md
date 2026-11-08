@@ -46,6 +46,20 @@ ArduPilot собирается `waf`: `./waf configure --board <board>` и `./wa
 3. Перед прошивкой — полный бэкап (`diff all` / файл параметров), после — перечитать всё критичное.
 4. Не смешивать: своя сборка + стандартный конфиг от другой версии = непредсказуемость.
 
+### Локальная сборка Betaflight (когда Cloud Build не подходит)
+```bash
+git clone https://github.com/betaflight/betaflight && cd betaflight
+make arm_sdk_install                      # toolchain
+make configs                              # unified target configs
+make STM32H743 EXTRA_FLAGS="-DUSE_RANGEFINDER -DUSE_GPS_LAP_TIMER"   # family target + extra defines
+# или с конфигом конкретной платы:
+make SPEEDYBEEF405V4 EXTRA_FLAGS="-DUSE_..."
+```
+Результат — `obj/betaflight_<ver>_<target>.hex`, прошивается конфигуратором «Load Firmware [Local]». Для проверки без железа — `make SITL` и `make test` (юнит-тесты gtest, модуль «Как читать исходники»). Размер прошивки — в конце сборки; F411 (512 КБ flash) требует отключать опции `-DUSE_*` через `EXTRA_FLAGS` с минусом или урезанные target-конфиги.
+
+### Что ломается после своей сборки и как проверять
+1. `version` показывает ожидаемые опции; 2. `status` — гироскоп найден; 3. Ports/Receiver — приёмник отвечает; 4. Motors — DShot и bidir работают без пропов; 5. OSD видно; 6. `diff all` совпадает с бэкапом по смыслу. Чек-лист — в журнал аппарата вместе с хешем коммита и `EXTRA_FLAGS`.
+
 ## practice
 ### Betaflight: сборка под конкретный аппарат
 1. Firmware Flasher → таргет платы → версия.

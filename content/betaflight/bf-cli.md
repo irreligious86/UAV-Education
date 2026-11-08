@@ -108,6 +108,29 @@ https://build.betaflight.com/api/builds/<BUILD_KEY>/json
 
 Это помогает диагностировать отсутствие функций (например, GPS/LED/VTX) без перепрошивки.
 
+### Рецепты, которые нужны чаще всего (команды из `cli/cli.c`)
+| Задача | Команда |
+|---|---|
+| Узнать версию, target, BUILD KEY | `version` |
+| Загрузка CPU, флаги арма, частота гироскопа | `status`, `tasks` |
+| Переназначить мотор на другой пад | `resource MOTOR 3 B01` → `save` (`resource show all` — занятость) |
+| Поменять порядок моторов без перепайки | `resource` своп пар или в Motors tab «Motor direction/remap» |
+| Реверс направления одного мотора (DShot-команды) | `dshotprog 1 21` (21 — reversed, 20 — normal; у части ESC 7/8 — direction 1/2), затем `dshotprog 1 12` (save settings); моторы без пропов, индекс с 1 |
+| Проверить DShot-телеметрию | `dshot_telemetry_info` |
+| Таймеры/DMA (конфликты моторов, LED, serial) | `timer`, `dma show` |
+| Сброс к умолчаниям без сохранения / с | `defaults nosave`, `defaults` |
+| Войти в загрузчик DFU | `bl` (или `bl rom`) |
+| Flash как USB-диск (выгрузка логов) | `msc` |
+| Прошить ESC/настроить | `serialpassthrough`/`escprog` через конфигуратор ESC |
+| Пакетная загрузка diff без промежуточных перезагрузок | `batch start` … `batch end` → `save` |
+| Диапазоны каналов, карта стиков | `rxrange`, `map AETR1234` |
+| Профили | `profile 1`, `rateprofile 2`, `battery_profile` |
+| Тест пищалки/звука, сенсоры | `beeper`, `play_sound`, `sensor_hardware`, `gyroregisters` |
+| Подпись и идентификация платы | `board_name`, `manufacturer_id`, `mcu_id`, `signature` |
+
+### Разобранный пример: сгорел пад мотора 2
+Плата F405, пад M2 отвалился. `resource show all` — свободные таймерные пады: `LED_STRIP 1 A08`. Проверка `timer A08 list` — есть таймер с DMA; `resource LED_STRIP 1 NONE`, `resource MOTOR 2 A08`, `timer A08 AF1` (если нужен), `dma pin A08 0`, `save`; Motors tab — мотор 2 крутится на правильной позиции без пропов; `diff all` в репозиторий с комментарием. Если таймер пада конфликтует с DShot других моторов (одна DMA-группа) — `dma show` покажет, и bitbang DShot (`dshot_bitbang = ON`) обходит часть конфликтов.
+
 ## practice
 
 ### Доступ к CLI

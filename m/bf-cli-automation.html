@@ -50,6 +50,35 @@
 <p>Имена и смысл параметров меняются между версиями прошивки: переименовываются <code>debug_mode</code>, меняется синтаксис команды <code>serial</code>, меняется смысл PID-параметров D-term. Вставлять <code>diff all</code> от 2025.12 в 4.5 (и наоборот) построчно нельзя. Переносить настройки между версиями — только осмысленно, по разделам, с перечитыванием.</p>
 <h4 class="md-subheading">Почему диф, а не дамп</h4>
 <p><code>diff all</code> содержит только отличия от дефолтов — его можно читать глазами и хранить в git. <code>dump</code> — всё подряд, при обновлении прошивки он тащит старые дефолты как явные значения.</p>
+<h4 class="md-subheading">Минимальный скрипт выгрузки <code>diff all</code> (pyserial)</h4>
+<pre class="cli-block"><code>import serial, time, sys, glob
+
+def cli(port, cmds, timeout=3.0):
+    &quot;&quot;&quot;Open CLI, run commands, return full text. Do not send &#x27;exit&#x27; (reboots on 4.5).&quot;&quot;&quot;
+    with serial.Serial(port, 115200, timeout=0.2) as s:
+        s.write(b&quot;#\n&quot;); time.sleep(0.5); s.read(s.in_waiting or 1)
+        out = &quot;&quot;
+        for c in cmds:
+            s.write((c + &quot;\n&quot;).encode()); t0 = time.time(); buf = &quot;&quot;
+            while time.time() - t0 &lt; timeout:
+                chunk = s.read(4096).decode(errors=&quot;replace&quot;)
+                if chunk: buf += chunk; t0 = time.time()
+                if buf.rstrip().endswith(&quot;# &quot;): break        # prompt returned
+            out += buf
+        return out
+
+ports = glob.glob(&quot;/dev/ttyACM*&quot;)                              # Linux; Windows: COM*
+for p in ports:
+    name = cli(p, [&quot;get craft_name&quot;])
+    if &quot;viking7&quot; in name:
+        text = cli(p, [&quot;version&quot;, &quot;diff all&quot;])
+        open(&quot;viking7/betaflight/diff-all.txt&quot;, &quot;w&quot;).write(text)
+        break
+else:
+    sys.exit(&quot;craft not found&quot;)</code></pre>
+<p>Нормализация перед коммитом: убрать строки с датой/временем из <code>version</code> и <code># </code> эхо, отсортировать блоки — иначе <code>git diff</code> шумит (модуль «CI»).</p>
+<h4 class="md-subheading">Что автоматизировать стоит, а что нет</h4>
+<p>Стоит: бэкап <code>diff all</code> перед каждым полётным днём; проверка инвариантов (failsafe, poles, bidir) по выгрузке; массовая смена <code>craft_name</code>/VTX-таблицы на парке; выгрузка логов через <code>msc</code>. Не стоит: массовая «накатка PID» на разные аппараты (разная механика), любые изменения без перечитывания <code>get</code> после <code>save</code>.</p>
 
 <h2>Практика</h2>
 <h4 class="md-subheading">Шаг 1. Минимальный клиент CLI на Python</h4>

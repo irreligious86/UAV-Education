@@ -51,6 +51,16 @@
 <p>Стоковый F405 в проекте HeeWing T1 — плата с ограниченной флешью: нет Lua-скриптинга, часть возможностей урезана. Варианты прошивки, которые планировались для него: убрать поддержку GPS (на этой сборке он не используется для арма и базового полёта) и лишние драйверы, чтобы освободить место под нужное. Это осмысленное решение, если понимаешь последствия: без GPS в прошивке не будет ни RTL, ни геозоны по координатам — не только «сейчас», а вообще.</p>
 <h4 class="md-subheading">Правила своих сборок</h4>
 <ol><li>Хранить конфигурацию сборки в git рядом с параметрами: список опций Betaflight или <code>hwdef</code>-патч ArduPilot.</li><li>Называть сборку с датой и хешем коммита; вывод <code>version</code> (с BUILD KEY) должен совпадать с записью.</li><li>Перед прошивкой — полный бэкап (<code>diff all</code> / файл параметров), после — перечитать всё критичное.</li><li>Не смешивать: своя сборка + стандартный конфиг от другой версии = непредсказуемость.</li></ol>
+<h4 class="md-subheading">Локальная сборка Betaflight (когда Cloud Build не подходит)</h4>
+<pre class="cli-block"><code>git clone https://github.com/betaflight/betaflight &amp;&amp; cd betaflight
+make arm_sdk_install                      # toolchain
+make configs                              # unified target configs
+make STM32H743 EXTRA_FLAGS=&quot;-DUSE_RANGEFINDER -DUSE_GPS_LAP_TIMER&quot;   # family target + extra defines
+# или с конфигом конкретной платы:
+make SPEEDYBEEF405V4 EXTRA_FLAGS=&quot;-DUSE_...&quot;</code></pre>
+<p>Результат — <code>obj/betaflight_&lt;ver&gt;_&lt;target&gt;.hex</code>, прошивается конфигуратором «Load Firmware [Local]». Для проверки без железа — <code>make SITL</code> и <code>make test</code> (юнит-тесты gtest, модуль «Как читать исходники»). Размер прошивки — в конце сборки; F411 (512 КБ flash) требует отключать опции <code>-DUSE_*</code> через <code>EXTRA_FLAGS</code> с минусом или урезанные target-конфиги.</p>
+<h4 class="md-subheading">Что ломается после своей сборки и как проверять</h4>
+<ol><li><code>version</code> показывает ожидаемые опции; 2. <code>status</code> — гироскоп найден; 3. Ports/Receiver — приёмник отвечает; 4. Motors — DShot и bidir работают без пропов; 5. OSD видно; 6. <code>diff all</code> совпадает с бэкапом по смыслу. Чек-лист — в журнал аппарата вместе с хешем коммита и <code>EXTRA_FLAGS</code>.</li></ol>
 
 <h2>Практика</h2>
 <h4 class="md-subheading">Betaflight: сборка под конкретный аппарат</h4>
