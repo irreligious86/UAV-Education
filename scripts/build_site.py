@@ -1085,6 +1085,11 @@ def render_progress(model: dict) -> str:
         f'<li data-cap="{esc(g["capstone"]["id"])}"><a href="{base}cap/{esc(g["capstone"]["id"])}.html">{esc(g["capstone"]["title"])}</a> <span class="gc-tag" data-cap-status></span></li>'
         for g in model["groups"] if g.get("capstone")
     )
+    projs = "".join(
+        f'<li data-cap="{esc(pr["id"])}"><a href="{base}projects/{esc(pr["id"])}.html">Проект {pr["num"]}: {esc(pr["title"])}</a> <span class="gc-tag" data-cap-status></span></li>'
+        for pr in sorted(model.get("projects", []), key=lambda x: x["num"])
+    )
+    projs_html = (f'<p class="gc-label gc-muted">Проекты «ПО для БАС»</p><ul class="progress-caps">{projs}</ul>' if projs else "")
     all_pub = [m["id"] for m in model["modules"].values() if m["status"] == "published"]
     body = f"""    <h1 class="gc-display">Мой прогресс</h1>
     <p class="gc-muted">Балл модуля = 40% квиз (лучшая попытка) + 60% лабораторная; в модулях с задачами — 30% квиз + 30% задачи + 40% лабораторная. «Освоен» — квиз ≥ 80%, все задачи решены и все пункты лабораторной. Ручная отметка видна как «отмечен», это честно другое.</p>
@@ -1094,6 +1099,7 @@ def render_progress(model: dict) -> str:
       <div class="gc-progress" role="progressbar" aria-label="Общий балл" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" data-progress-of="{esc(','.join(all_pub))}" style="--gc-value: 0%"></div>
       <p class="gc-label gc-muted">Итоговые проекты</p>
       <ul class="progress-caps">{caps}</ul>
+      {projs_html}
     </section>
     <h2 class="gc-title section-title">По прошивке</h2>
 {paths}

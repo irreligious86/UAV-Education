@@ -14,5 +14,7 @@ Each folder is self-contained; copy it out of this repository to begin a project
 | `precision-landing/` | Project #5 starter: synthetic downward camera over SITL state, delayed LANDING_TARGET sender (sign convention checked against ArduPilot), touchdown statistics; 7 tests | per-landing, projects/proj-precision-landing |
 | `follow-target/` | Project #4 starter: follow controller as a pure function (bbox → body velocity + yaw rate, limits, slew, target-lost watchdog); 7 tests | per-tracking, projects/proj-detect-follow |
 | `blackbox-grader/` | Betaflight Blackbox grader (filters, tracking, motors, RPM telemetry) on blackbox_decode CSV, synthetic fixtures with known defects; 8 tests | bf-blackbox, bf-filters, bf-rpm-filter, bf-pid |
+| `inspection/` | Project #6 starter: offset mission along a line object with distance triggering on the inspected stretch, photo ↔ CAM matching by time with clock-offset estimation, findings → GeoJSON; 5 tests | per-mapping, ap-missions, projects/proj-inspection |
+| `tx16s-companion/` | Project #12 starter: CRSF telemetry parser in C99 (CRC8, framing state machine, battery/link/attitude/GPS) with a Python frame generator; 4 tests compile the C with -Werror | projects/proj-tx16s-companion |
 
 Goal: a simulation on screen in 15 minutes, not an afternoon of dependencies.
