@@ -164,6 +164,9 @@ PIDToolbox полезен для:
 4. Настройте lowpass по результату спектра.
 5. Делайте изменения итеративно: один параметр -> новый лог -> сравнение.
 
+### Автопроверка лога
+Расшифруйте лог `blackbox_decode` и прогоните грейдер курса: `python examples/blackbox-grader/check_bf_log.py LOG.01.csv --lab all --motor-range <motorOutput из заголовка лога>`. Он выдаёт PASS/FAIL по каждой проверке (tracking, motors) со значением, порогом и объяснением; пороги — ориентиры для 5", их можно переопределить через `--set`, записав причину. Потренироваться до своих логов можно на синтетике: `make_bf_fixture.py --kind noisy` (или `sluggish`, `oscillating`, `saturated`, `imbalanced`, `no_rpm`).
+
 ## diagnostics
 
 - Симптом: в логе гироскопа сильный пик на `100–250 Гц`.

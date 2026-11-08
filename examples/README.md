@@ -13,5 +13,6 @@ Each folder is self-contained; copy it out of this repository to begin a project
 | `perception/` | Camera geometry (pixel → ground, distortion, mount extrinsics, GSD/survey spacing, LANDING_TARGET angles), depth → OBSTACLE_DISTANCE sectors, stopping-distance budget, inference latency bench; 14 tests | per-geometry, per-landing, per-depth-avoid, per-mapping, per-edge-ml |
 | `precision-landing/` | Project #5 starter: synthetic downward camera over SITL state, delayed LANDING_TARGET sender (sign convention checked against ArduPilot), touchdown statistics; 7 tests | per-landing, projects/proj-precision-landing |
 | `follow-target/` | Project #4 starter: follow controller as a pure function (bbox → body velocity + yaw rate, limits, slew, target-lost watchdog); 7 tests | per-tracking, projects/proj-detect-follow |
+| `blackbox-grader/` | Betaflight Blackbox grader (filters, tracking, motors, RPM telemetry) on blackbox_decode CSV, synthetic fixtures with known defects; 8 tests | bf-blackbox, bf-filters, bf-rpm-filter, bf-pid |
 
 Goal: a simulation on screen in 15 minutes, not an afternoon of dependencies.
