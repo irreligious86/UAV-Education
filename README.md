@@ -19,6 +19,7 @@
 | **План курса v3** | `docs/COURSE-PLAN.md` — ступени, треки, принципы, фазы; внешние разборы в `docs/reviews/` |
 | **Формулы и CLI** | `data/formulas.json` → `pages/formulas.html` |
 | **Виджеты** | `assets/widgets/*.js` — `{{widget:name}}` в Markdown (pid-sim, filter-response, elrs-calc, tw-calc, wire-drop, link-latency) |
+| **Офлайн (PWA)** | `sw.js` и `manifest.webmanifest` генерируются сборкой; `assets/offline.js` регистрирует; после первого визита курс работает без сети |
 | **Стартовые репозитории** | `examples/` — SITL + pymavlink (полёт, тест failsafe, CI), скелет ROS 2 |
 | **Оценки** | `assets/grading.js` + `api/v1/grading.json`; ведомость `pages/progress.html` (см. ARCHITECTURE.md) |
 | **Поиск** | `pages/search.html` по `api/v1/search.json` (генерируется) |

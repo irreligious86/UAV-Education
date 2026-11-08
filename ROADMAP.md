@@ -76,7 +76,7 @@ Priority: a well-structured learning program.
 - [x] Fails journal generated from every module's diagnostics (120+ cases); glossary from `data/glossary.json` (68 terms, each linked to its module)
 - [x] Client-side search (`pages/search.html`) over `api/v1/search.json`: modules, terms, capstones; identifiers like `rpm_filter_min_hz` searchable
 - [x] `ARCHITECTURE.md`: layers, data contracts, migration path to own server
-- [ ] Offline PWA (service worker)
+- [x] Offline PWA: generated `sw.js` precaches the whole site (versioned by content hash), `manifest.webmanifest`, status line in the footer (2026-11-08)
 
 ## Phase 2b — Structure and grading (2026-11-08) ✅
 

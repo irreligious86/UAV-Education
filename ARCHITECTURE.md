@@ -94,3 +94,13 @@ Each step is independent and reversible. None requires changing content or the b
 - No framework, no bundler. The site is HTML + CSS + small scripts, same policy as Ground Control.
 - No database in the repo. Student state lives in the browser until a server exists.
 - No analytics. If ever added, it goes through the same API boundary, not into pages.
+
+## Offline (PWA)
+
+`scripts/build_site.py` emits `sw.js` (service worker) and `manifest.webmanifest`. The worker precaches
+every generated page, API/quiz JSON, `assets/` and the pinned Ground Control dist (~4 MB) under a cache
+named by a SHA-1 of their contents, so a publish that changes anything yields a new cache and the old one
+is deleted on activate. Fetch strategy: same-origin → cache first with background refresh (stale-while-
+revalidate), falling back to `index.html` when offline; cross-origin requests are left to the network.
+Query strings (`?path=`) are ignored for cache matching. Progress remains in localStorage, so quizzes and
+labs work offline; the future progress server will sync when back online (see ProgressStore).
