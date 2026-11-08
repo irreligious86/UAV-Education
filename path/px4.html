@@ -33,9 +33,10 @@
     <section class="home-hero">
       <h1 class="gc-display">PX4</h1>
       <p class="home-hero__lead">Понять устройство PX4 и связать его с ROS 2 и бортовым компьютером.</p>
-      <div class="home-hero__stats"><span class="gc-tag">16 шагов</span><span class="gc-tag" data-state="ok">написано 11</span><span class="gc-tag" data-state="caution">в работе 5</span></div>
+      <div class="home-hero__stats"><span class="gc-tag">19 шагов</span><span class="gc-tag" data-state="ok">написано 11</span><span class="gc-tag" data-state="caution">в работе 8</span></div>
       <p class="gc-label gc-muted">Твой прогресс <span data-progress-label="f-physics,f-fc-sensors,f-safety,tools-overview,comp-intro,comp-mavlink,px4-intro,px4-architecture,px4-control,px4-ros2,px4-companion-jetson"></span></p>
       <div class="gc-progress" role="progressbar" aria-label="Прогресс по пути" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" data-progress-of="f-physics,f-fc-sensors,f-safety,tools-overview,comp-intro,comp-mavlink,px4-intro,px4-architecture,px4-control,px4-ros2,px4-companion-jetson" style="--gc-value: 0%"></div>
+      <p class="ready-filter"><label class="gc-muted"><input type="checkbox" data-ready-only> Показывать только готовые модули</label></p>
       <p class="path-continue"><a class="gc-card" data-path-continue="px4" data-path-steps="f-physics|Как летает мультиротор;;f-fc-sensors|Полётный контроллер и сенсоры;;f-safety|Безопасность и предполётный чек;;tools-overview|Инструменты: Configurator, GCS, git;;comp-intro|Companion: зачем и где граница;;comp-mavlink|MAVLink и MAVSDK;;px4-intro|Введение в PX4;;px4-architecture|Архитектура PX4: модули и uORB;;px4-control|Контуры управления и тюнинг PX4;;px4-ros2|PX4 и ROS 2: uXRCE-DDS и offboard;;px4-companion-jetson|PX4 + Jetson Nano (companion)" hidden></a></p>
       <p class="gc-muted home-hero__note">Иди по порядку: каждый шаг опирается на предыдущие. Модули с тегом «общий» входят и в другие пути — пройденный один раз, такой модуль засчитан везде. Открывай уроки отсюда: тогда кнопки «назад/дальше» ведут по шагам именно этого пути.</p>
     </section>
@@ -48,38 +49,48 @@
             <a class="track-module__title" href="../m/f-physics.html?path=px4">Как летает мультиротор</a>
             <span class="track-module__tags"><span class="gc-tag" title="L1 — Оператор">L1</span><span class="gc-tag" title="Общий модуль: засчитывается во всех путях, где он есть">общий</span><span class="gc-tag">~2 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
           </li>
-          <li class="track-module" data-module-id="f-fc-sensors">
+          <li class="track-module track-module--planned" data-module-id="f-mechanics">
             <span class="track-module__num">02</span>
+            <a class="track-module__title" href="../m/f-mechanics.html?path=px4">Механика полёта: силы, моменты, уравнения движения</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L1 — Оператор">L1</span><span class="gc-tag" title="Общий модуль: засчитывается во всех путях, где он есть">общий</span><span class="gc-tag">~3 ч</span><span class="gc-tag" data-state="caution">СКОРО</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+          </li>
+          <li class="track-module" data-module-id="f-fc-sensors">
+            <span class="track-module__num">03</span>
             <a class="track-module__title" href="../m/f-fc-sensors.html?path=px4">Полётный контроллер и сенсоры</a>
             <span class="track-module__tags"><span class="gc-tag" title="L1 — Оператор">L1</span><span class="gc-tag" title="Общий модуль: засчитывается во всех путях, где он есть">общий</span><span class="gc-tag">~2 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
           </li>
           <li class="track-module" data-module-id="f-safety">
-            <span class="track-module__num">03</span>
+            <span class="track-module__num">04</span>
             <a class="track-module__title" href="../m/f-safety.html?path=px4">Безопасность и предполётный чек</a>
             <span class="track-module__tags"><span class="gc-tag" title="L1 — Оператор">L1</span><span class="gc-tag" title="Общий модуль: засчитывается во всех путях, где он есть">общий</span><span class="gc-tag">~1 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
           </li>
           <li class="track-module" data-module-id="tools-overview">
-            <span class="track-module__num">04</span>
+            <span class="track-module__num">05</span>
             <a class="track-module__title" href="../m/tools-overview.html?path=px4">Инструменты: Configurator, GCS, git</a>
             <span class="track-module__tags"><span class="gc-tag" title="L1 — Оператор">L1</span><span class="gc-tag" title="Общий модуль: засчитывается во всех путях, где он есть">общий</span><span class="gc-tag">~2 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
           </li>
+          <li class="track-module track-module--planned" data-module-id="eng-method-101">
+            <span class="track-module__num">06</span>
+            <a class="track-module__title" href="../m/eng-method-101.html?path=px4">Инженерный метод 101: требования, архитектура, тесты, документация</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L1 — Оператор">L1</span><span class="gc-tag" title="Общий модуль: засчитывается во всех путях, где он есть">общий</span><span class="gc-tag">~3 ч</span><span class="gc-tag" data-state="caution">СКОРО</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+          </li>
           <li class="track-module track-module--planned" data-module-id="est-sensors">
-            <span class="track-module__num">05</span>
+            <span class="track-module__num">07</span>
             <a class="track-module__title" href="../m/est-sensors.html?path=px4">Датчики IMU: физика, ошибки, калибровка</a>
             <span class="track-module__tags"><span class="gc-tag" title="L2 — Интегратор">L2</span><span class="gc-tag" title="Общий модуль: засчитывается во всех путях, где он есть">общий</span><span class="gc-tag">~3 ч</span><span class="gc-tag" data-state="caution">СКОРО</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
           </li>
           <li class="track-module track-module--planned" data-module-id="est-attitude">
-            <span class="track-module__num">06</span>
+            <span class="track-module__num">08</span>
             <a class="track-module__title" href="../m/est-attitude.html?path=px4">Ориентация: углы Эйлера, кватернионы, комплементарный фильтр</a>
             <span class="track-module__tags"><span class="gc-tag" title="L3 — Специалист">L3</span><span class="gc-tag" title="Общий модуль: засчитывается во всех путях, где он есть">общий</span><span class="gc-tag">~4 ч</span><span class="gc-tag" data-state="caution">СКОРО</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
           </li>
           <li class="track-module" data-module-id="comp-intro">
-            <span class="track-module__num">07</span>
+            <span class="track-module__num">09</span>
             <a class="track-module__title" href="../m/comp-intro.html?path=px4">Companion: зачем и где граница</a>
             <span class="track-module__tags"><span class="gc-tag" title="L2 — Интегратор">L2</span><span class="gc-tag" title="Общий модуль: засчитывается во всех путях, где он есть">общий</span><span class="gc-tag">~2 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
           </li>
           <li class="track-module" data-module-id="comp-mavlink">
-            <span class="track-module__num">08</span>
+            <span class="track-module__num">10</span>
             <a class="track-module__title" href="../m/comp-mavlink.html?path=px4">MAVLink и MAVSDK</a>
             <span class="track-module__tags"><span class="gc-tag" title="L2 — Интегратор">L2</span><span class="gc-tag" title="Общий модуль: засчитывается во всех путях, где он есть">общий</span><span class="gc-tag">~3 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
           </li>
@@ -90,29 +101,34 @@
         <h2 class="gc-title">PX4</h2>
         <ol class="track__modules">
           <li class="track-module" data-module-id="px4-intro">
-            <span class="track-module__num">09</span>
+            <span class="track-module__num">11</span>
             <a class="track-module__title" href="../m/px4-intro.html?path=px4">Введение в PX4</a>
             <span class="track-module__tags"><span class="gc-tag" title="L2 — Интегратор">L2</span><span class="gc-tag">~2 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
           </li>
           <li class="track-module" data-module-id="px4-architecture">
-            <span class="track-module__num">10</span>
+            <span class="track-module__num">12</span>
             <a class="track-module__title" href="../m/px4-architecture.html?path=px4">Архитектура PX4: модули и uORB</a>
             <span class="track-module__tags"><span class="gc-tag" title="L3 — Специалист">L3</span><span class="gc-tag">~3 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
           </li>
           <li class="track-module" data-module-id="px4-control">
-            <span class="track-module__num">11</span>
+            <span class="track-module__num">13</span>
             <a class="track-module__title" href="../m/px4-control.html?path=px4">Контуры управления и тюнинг PX4</a>
             <span class="track-module__tags"><span class="gc-tag" title="L3 — Специалист">L3</span><span class="gc-tag">~3 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
           </li>
           <li class="track-module" data-module-id="px4-ros2">
-            <span class="track-module__num">12</span>
+            <span class="track-module__num">14</span>
             <a class="track-module__title" href="../m/px4-ros2.html?path=px4">PX4 и ROS 2: uXRCE-DDS и offboard</a>
             <span class="track-module__tags"><span class="gc-tag" title="L4 — Эксперт">L4</span><span class="gc-tag">~4 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
           </li>
           <li class="track-module" data-module-id="px4-companion-jetson">
-            <span class="track-module__num">13</span>
+            <span class="track-module__num">15</span>
             <a class="track-module__title" href="../m/px4-companion-jetson.html?path=px4">PX4 + Jetson Nano (companion)</a>
             <span class="track-module__tags"><span class="gc-tag" title="L4 — Эксперт">L4</span><span class="gc-tag">~4 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+          </li>
+          <li class="track-module track-module--planned" data-module-id="eng-ci-configs">
+            <span class="track-module__num">16</span>
+            <a class="track-module__title" href="../m/eng-ci-configs.html?path=px4">CI и версионирование конфигов и кода</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L3 — Специалист">L3</span><span class="gc-tag" title="Общий модуль: засчитывается во всех путях, где он есть">общий</span><span class="gc-tag">~3 ч</span><span class="gc-tag" data-state="caution">СКОРО</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
           </li>
         </ol>
       </section>
@@ -121,17 +137,17 @@
         <h2 class="gc-title">Восприятие</h2>
         <ol class="track__modules">
           <li class="track-module track-module--planned" data-module-id="per-camera">
-            <span class="track-module__num">14</span>
+            <span class="track-module__num">17</span>
             <a class="track-module__title" href="../m/per-camera.html?path=px4">Камеры и видеопоток на companion</a>
             <span class="track-module__tags"><span class="gc-tag" title="L3 — Специалист">L3</span><span class="gc-tag" title="Общий модуль: засчитывается во всех путях, где он есть">общий</span><span class="gc-tag">~3 ч</span><span class="gc-tag" data-state="caution">СКОРО</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
           </li>
           <li class="track-module track-module--planned" data-module-id="per-cv">
-            <span class="track-module__num">15</span>
+            <span class="track-module__num">18</span>
             <a class="track-module__title" href="../m/per-cv.html?path=px4">Компьютерное зрение: от OpenCV до нейросетей</a>
             <span class="track-module__tags"><span class="gc-tag" title="L4 — Эксперт">L4</span><span class="gc-tag" title="Общий модуль: засчитывается во всех путях, где он есть">общий</span><span class="gc-tag">~5 ч</span><span class="gc-tag" data-state="caution">СКОРО</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
           </li>
           <li class="track-module track-module--planned" data-module-id="per-tracking">
-            <span class="track-module__num">16</span>
+            <span class="track-module__num">19</span>
             <a class="track-module__title" href="../m/per-tracking.html?path=px4">Слежение и управление по цели</a>
             <span class="track-module__tags"><span class="gc-tag" title="L4 — Эксперт">L4</span><span class="gc-tag" title="Общий модуль: засчитывается во всех путях, где он есть">общий</span><span class="gc-tag">~4 ч</span><span class="gc-tag" data-state="caution">СКОРО</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
           </li>

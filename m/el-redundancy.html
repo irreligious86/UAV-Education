@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Резервирование на борту: X8, гекса, питание и сигналы — UAV Student</title>
+  <meta name="description" content="объяснить, какие отказы переживает квад, гекса, X8 и почему спроектировать распределение питания: шины, предохранители, двойные BEC, резерв приёмника рассчитать токи по лучам X8 и выбрать сечения и разъёмы проверить поведение при отказе мотора в SITL/на стенде">
+  <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="../lib/ground-control-ui/dist/ground-control.css">
+  <link rel="stylesheet" href="../assets/site.css">
+  <script src="../lib/ground-control-ui/dist/ground-control.js" defer></script>
+  <script src="../assets/progress-store.js" defer></script>
+  <script src="../assets/grading.js" defer></script>
+  <script src="../assets/app.js" defer></script>
+  <script src="../assets/uav-quiz.js" defer></script>
+</head>
+<body class="gc-root" data-base="../">
+  <header class="site-header">
+    <div class="gc-container site-header__inner">
+      <a class="site-brand" href="../index.html"><span class="site-brand__mark" aria-hidden="true">◆</span> UAV Student</a>
+      <nav class="gc-nav" aria-label="Разделы сайта">
+        <a href="../index.html" aria-current="page">Курс</a>
+        <a href="../ref/index.html">Справочник</a>
+        <a href="../pages/glossary.html">Глоссарий</a>
+        <a href="../pages/fails.html">Фейлы</a>
+        <a href="../pages/search.html">Поиск</a>
+        <a href="../pages/progress.html">Мой прогресс</a>
+      </nav>
+    </div>
+  </header>
+  <main class="gc-container site-main">
+    <article class="module" data-module-page="el-redundancy">
+      <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-electronics">Электроника и радио</a><span>Резервирование на борту: X8, гекса, питание и сигналы</span></p>
+      <h1 class="module-title">Резервирование на борту: X8, гекса, питание и сигналы</h1>
+      <div class="module-tags"><span class="gc-tag" title="Уровень">L2 — Интегратор</span><span class="gc-tag">учёба ~3 ч</span><span class="gc-tag" data-state="caution">СКОРО</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ОСВОЕН</span></div>
+      <p class="gc-muted module-score" data-module-score></p>
+      
+      <div class="gc-callout" data-state="ok"><strong>После модуля ты умеешь</strong><ul><li>объяснить, какие отказы переживает квад, гекса, X8 и почему</li><li>спроектировать распределение питания: шины, предохранители, двойные BEC, резерв приёмника</li><li>рассчитать токи по лучам X8 и выбрать сечения и разъёмы</li><li>проверить поведение при отказе мотора в SITL/на стенде</li></ul></div><p class="gc-muted">Перед этим модулем: <a href="el-power-design.html">Схемотехника питания борта</a>, <a href="f-aero-props.html">Аэродинамика пропеллера и подбор силовой установки</a></p><div class="gc-callout lab"><p class="gc-label gc-muted">Лабораторная</p><strong>Схема резервирования</strong><p class="gc-muted lab__hint">Сдано, когда отмечены все пункты:</p><ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="el-redundancy:lab:0"><span>Таблица отказов для своей схемы: что переживает, что нет</span></label></li><li><label><input type="checkbox" data-check-id="el-redundancy:lab:1"><span>Схема питания с двойными BEC и защитами</span></label></li><li><label><input type="checkbox" data-check-id="el-redundancy:lab:2"><span>Отказ мотора смоделирован в SITL, поведение описано</span></label></li></ul></div><div class="path-pos gc-muted"><span class="gc-label">В пути</span><ul><li data-path-pos="ardupilot"><a href="../path/ardupilot.html">ArduPilot</a>: шаг 36 из 54 → <a href="el-battery-packs.html?path=ardupilot">Сборки Li-Ion и LiFePO4: элементы, сварка, BMS</a></li></ul></div>
+      <div class="gc-prose module-body">
+<div class="gc-callout" data-state="caution"><strong>Модуль в разработке.</strong> Цели и связи уже определены, текст пишется. План — в <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">ROADMAP</a>.</div>
+      </div>
+      
+      
+      <nav class="pager" aria-label="Соседние модули" data-track-pager><a class="gc-card pager__prev" href="el-wiring.html"><span class="gc-label gc-muted">Назад · трек</span><br>Пайка, жгуты и надёжность соединений</a></nav><nav class="pager" aria-label="Соседние шаги пути ArduPilot" data-path-pager="ardupilot" hidden><a class="gc-card pager__prev" href="el-power-design.html?path=ardupilot"><span class="gc-label gc-muted">Назад · путь ArduPilot</span><br>Схемотехника питания борта</a><a class="gc-card pager__next" href="el-battery-packs.html?path=ardupilot"><span class="gc-label gc-muted">Дальше · шаг 37 из 54</span><br>Сборки Li-Ion и LiFePO4: элементы, сварка, BMS</a></nav>
+    </article>
+  </main>
+  <footer class="gc-container site-footer gc-muted">
+    <p>Открытый курс · <a href="https://github.com/irreligious86/UAV-Education">исходники на GitHub</a> · <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">план развития</a> · <a href="../curriculum/curriculum.html">для разработчика</a> · CC BY-NC-SA 4.0</p>
+  </footer>
+</body>
+</html>

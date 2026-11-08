@@ -1,0 +1,62 @@
+{
+  "sections": [
+    {
+      "id": "flight",
+      "title": "Полёт и силовая установка",
+      "items": [
+        {"name": "Отношение тяги к весу", "expr": "T/W = ΣTmax / (m·g)   [безразмерно; Tmax — максимальная тяга всех моторов, Н]", "note": "Газ висения ≈ 1/(T/W). 2:1 — груз, 3–4:1 — дальний, 6+:1 — фристайл.", "module": "f-physics"},
+        {"name": "Тяга диска (импульсная теория)", "expr": "F = ½·ρ·A·(Vₑ² − V₀²)   [Н; ρ ≈ 1.225 кг/м³, A = π·D²/4]", "note": "На висении V₀ = 0. Большой диск при той же тяге тратит меньше мощности.", "module": "f-aero-props"},
+        {"name": "Коэффициенты пропеллера", "expr": "Cₜ = T/(ρ·n²·D⁴)   Cₚ = P/(ρ·n³·D⁵)   J = V/(n·D)   η = J·Cₜ/Cₚ", "note": "n — об/с, D — м. Следствие: тяга ~ n², мощность ~ n³.", "module": "f-aero-props"},
+        {"name": "Частота гармоники мотора", "expr": "f₁ = RPM/60   fₖ = k·f₁   RPM = eRPM / (пары полюсов)", "note": "Мотор на 14 магнитов имеет 7 пар полюсов. Нужна для RPM-фильтра и чтения спектра.", "module": "bf-rpm-filter"},
+        {"name": "Время полёта (оценка)", "expr": "t [мин] = 60 · (C [А·ч] · k) / I [А]   k ≈ 0.8 — используемая доля ёмкости", "note": "I — средний ток из лога, не ток висения на столе.", "module": "f-power"},
+        {"name": "Внутреннее сопротивление и просадка", "expr": "U = E − I·Rвн   Rвн(пакет) = Rэл · S / P", "note": "6S4P Li-Ion по 30 мОм → 45 мОм на пакет → 2.7 В просадки при 60 А.", "module": "el-power-design"}
+      ]
+    },
+    {
+      "id": "electricity",
+      "title": "Электричество",
+      "items": [
+        {"name": "Закон Ома и мощность", "expr": "U = I·R   P = U·I = I²·R = U²/R   [В, А, Ом, Вт]", "note": "Тепло на линейном BEC: P = (Uвх − Uвых)·I.", "module": "el-power-design"},
+        {"name": "Сопротивление провода", "expr": "R = ρ·L/S   ρ(медь) = 0.0172 Ом·мм²/м   ΔU = I·R (туда и обратно — 2L)", "note": "14 AWG ≈ 2.08 мм² → 8.3 мОм/м; 12 AWG ≈ 3.31 мм² → 5.2 мОм/м.", "module": "el-power-design"},
+        {"name": "Выброс на индуктивности", "expr": "U = L·dI/dt   L(провод) ≈ 1 мкГн/м", "note": "Почему нужен низкоESR-конденсатор на силовых падах: он гасит dI/dt от ESC.", "module": "el-power-design"},
+        {"name": "Магнитное поле провода", "expr": "B = μ₀·I/(2π·r)   μ₀ = 4π·10⁻⁷ Гн/м   → B[мкТл] ≈ 0.2·I[А]/r[м]", "note": "60 А на 5 см — 240 мкТл против ~50 мкТл поля Земли: компас рядом с силовым проводом бесполезен.", "module": "el-emi"},
+        {"name": "Децибелы", "expr": "дБ = 10·log₁₀(P₂/P₁)   дБм = 10·log₁₀(P/1 мВт)   +3 дБ ≈ ×2, +10 дБ = ×10", "note": "20 дБм = 100 мВт, 27 дБм = 500 мВт, 30 дБм = 1 Вт.", "module": "rf-link-budget"}
+      ]
+    },
+    {
+      "id": "radio",
+      "title": "Радиолинк",
+      "items": [
+        {"name": "Затухание в свободном пространстве", "expr": "FSPL[дБ] = 20·log₁₀(d[км]) + 20·log₁₀(f[МГц]) + 32.44", "note": "2.4 ГГц, 10 км → 120 дБ. Удвоение дальности = +6 дБ.", "module": "rf-link-budget"},
+        {"name": "Бюджет линка", "expr": "Pпр = Pпд + Gпд + Gпр − Lкаб − FSPL − Lдоп   M = Pпр − Sчувств ≥ 10–15 дБ", "note": "S для ELRS 2.4 ГГц: 50 Гц −115, 150 Гц −112, 250 Гц −108, 500 Гц −105 дБм.", "module": "rf-link-budget"},
+        {"name": "Длина волны", "expr": "λ = c/f   λ/4: 915 МГц — 8.2 см, 2.4 ГГц — 3.1 см, 5.8 ГГц — 1.3 см", "note": "Размер антенны должен соответствовать диапазону.", "module": "rf-antennas"},
+        {"name": "Интервал телеметрии ELRS", "expr": "Tтлм[мс] = ratio · 1000 / packet_rate", "note": "1:128 на 250 Гц → 512 мс между кадрами телеметрии.", "module": "link-elrs"}
+      ]
+    },
+    {
+      "id": "control",
+      "title": "Сигналы, фильтры, управление",
+      "items": [
+        {"name": "Частота Найквиста", "expr": "f_N = f_s / 2   — всё выше f_N отражается (алиасинг)", "note": "Гироскоп 8 кГц видит до 4 кГц; аналоговый антиалиасинг в самом датчике.", "module": "bf-filters"},
+        {"name": "Фильтр первого порядка (PT1)", "expr": "|H(f)| = 1/√(1 + (f/f_c)²)   фазовое запаздывание φ = −arctan(f/f_c)   групповая задержка τ ≈ 1/(2π·f_c)", "note": "f_c = 100 Гц → задержка ≈ 1.6 мс на низких частотах. Каждый фильтр добавляет задержку в контур.", "module": "bf-filters"},
+        {"name": "Нотч-фильтр", "expr": "центр f₀, ширина по −3 дБ Δf = f₀/Q   полоса от f₀ − Δf/2 до f₀ + Δf/2", "note": "Q = 10 на 250 Гц → полоса 25 Гц.", "module": "bf-rpm-filter"},
+        {"name": "PID-регулятор", "expr": "u(t) = Kp·e + Ki·∫e dt + Kd·de/dt (+ Kff·setpoint')", "note": "В Betaflight D берётся от измерения (gyro), не от ошибки, и фильтруется отдельно.", "module": "bf-pid-reg-in-bf"},
+        {"name": "Метрики переходного процесса", "expr": "перерегулирование = (y_max − y_∞)/y_∞ · 100%   время установления: |y − y_∞| < 2–5%   задержка: время до 30–50% y_∞", "note": "Считаются по step response из Blackbox; это язык, на котором сравнивают тюны.", "module": "bf-pid"},
+        {"name": "Комплементарный фильтр", "expr": "θ = α·(θ + ω·dt) + (1 − α)·θ_acc   α = τ/(τ + dt)", "note": "Гироскоп — короткие времена, акселерометр — долгие. τ = 1 с, dt = 1 мс → α ≈ 0.999.", "module": "f-fc-sensors"}
+      ]
+    },
+    {
+      "id": "cli",
+      "title": "Команды и параметры",
+      "items": [
+        {"name": "Betaflight CLI: снять и вернуть конфиг", "expr": "diff all        # только отличия от умолчаний\ndump all        # всё\nsave            # записать и перезагрузить\nversion         # версия и BUILD KEY", "note": "`diff all` — то, что хранят в git и шлют на разбор.", "module": "bf-cli"},
+        {"name": "Betaflight CLI: ресурсы и порты", "expr": "resource        # назначение пинов\nresource MOTOR 1 B06\nserial          # порты и функции\nget <name> / set <name> = <value>", "note": "После `set` — обязательно `save`.", "module": "bf-cli-automation"},
+        {"name": "INAV CLI: RTH и навигация", "expr": "set nav_rth_altitude = 5000      # см\nset nav_rth_alt_mode = AT_LEAST  # CURRENT|EXTRA|FIXED|MAX|AT_LEAST\nset nav_rth_use_linear_descent = ON", "note": "Высота в сантиметрах. Проверено по исходникам INAV.", "module": "inav-gps"},
+        {"name": "ArduPilot: ключевые параметры безопасности", "expr": "FS_THR_ENABLE  FS_GCS_ENABLE  BATT_FS_LOW_ACT  BATT_LOW_VOLT\nFENCE_ENABLE  FENCE_TYPE  FENCE_ACTION  RTL_ALT (см)", "note": "Каждый failsafe проверяется в SITL до поля.", "module": "ap-missions"},
+        {"name": "ArduPilot: SITL", "expr": "sim_vehicle.py -v ArduCopter --console --map\nparam set <NAME> <value>\nmode GUIDED / arm throttle / takeoff 10", "note": "MAVProxy-команды внутри SITL-консоли.", "module": "ap-sitl"},
+        {"name": "ArduPilot: вибрации и EKF в логе", "expr": "VIBE.VibeX/Y/Z < 30 м/с² норма, > 60 плохо; VIBE.Clip0/1/2 должны быть 0\nXKF4.SV, SP, SH, SM — нормированные инновации (< 1)", "note": "Пороги из документации ArduPilot по измерению вибраций.", "module": "ap-logs"},
+        {"name": "PX4: MAVLink на TELEM2", "expr": "MAV_1_CONFIG = TELEM 2\nMAV_1_MODE = Onboard\nSER_TEL2_BAUD = 921600\nUXRCE_DDS_CFG — для ROS 2 через uXRCE-DDS", "note": "`SER_TEL2_PROTOCOL` не существует: протокол порта задаётся через MAV_n_CONFIG.", "module": "px4-companion-jetson"}
+      ]
+    }
+  ]
+}

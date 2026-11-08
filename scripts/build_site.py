@@ -47,6 +47,7 @@ SITE_TITLE = "UAV Student"
 PAGES = {
     "glossary": "Глоссарий",
     "fails": "Журнал ошибок и фейлов",
+    "formulas": "Формулы и команды",
     "checklists": "Быстрые чек-листы",
     "compare": "Сравнение прошивок",
     "resources": "Ресурсы и сообщества",
@@ -307,6 +308,7 @@ def render_path(p: dict, model: dict) -> str:
       <div class="home-hero__stats"><span class="gc-tag">{len(mods)} шагов</span><span class="gc-tag" data-state="ok">написано {len(pub)}</span><span class="gc-tag" data-state="caution">в работе {len(mods) - len(pub)}</span></div>
       <p class="gc-label gc-muted">Твой прогресс <span data-progress-label="{esc(','.join(pub))}"></span></p>
       <div class="gc-progress" role="progressbar" aria-label="Прогресс по пути" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" data-progress-of="{esc(','.join(pub))}" style="--gc-value: 0%"></div>
+      <p class="ready-filter"><label class="gc-muted"><input type="checkbox" data-ready-only> Показывать только готовые модули</label></p>
       <p class="path-continue"><a class="gc-card" data-path-continue="{esc(p['id'])}" data-path-steps="{path_steps_attr(p, model)}" hidden></a></p>
       <p class="gc-muted home-hero__note">Иди по порядку: каждый шаг опирается на предыдущие. Модули с тегом «общий» входят и в другие пути — пройденный один раз, такой модуль засчитан везде. Открывай уроки отсюда: тогда кнопки «назад/дальше» ведут по шагам именно этого пути.</p>
     </section>
@@ -339,6 +341,7 @@ def render_home(model: dict) -> str:
       <p class="gc-label gc-muted">Твой прогресс <span data-progress-label="{esc(','.join(all_published))}"></span></p>
       <div class="gc-progress" role="progressbar" aria-label="Твой прогресс по курсу" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" data-progress-of="{esc(','.join(all_published))}" style="--gc-value: 0%"></div>
       <p class="gc-muted home-hero__note">Прогресс хранится в этом браузере · <a href="pages/progress.html">подробная ведомость</a></p>
+      <p class="ready-filter"><label class="gc-muted"><input type="checkbox" data-ready-only> Показывать только готовые модули</label></p>
     </section>
 
     <section class="choose" aria-labelledby="choose-title">
@@ -626,6 +629,16 @@ def render_capstone(g: dict, model: dict) -> str:
         f'<li><label><input type="checkbox" data-check-id="{esc(c["id"])}:cap:{i}"><span>{esc(x)}</span></label></li>'
         for i, x in enumerate(c.get("criteria", []))
     )
+    rubric_rows = "".join(
+        f'<tr><th scope="row">{esc(r["criterion"])}</th><td class="rubric__bad">{esc(r["bad"])}</td><td class="rubric__good">{esc(r["good"])}</td></tr>'
+        for r in c.get("rubric", [])
+    )
+    rubric_html = (
+        f'<h2>Рубрика: как отличить сделанное от сданного</h2>'
+        f'<p class="gc-muted">Проверь свою работу по каждой строке. Если она ближе к левой колонке — проект ещё не готов.</p>'
+        f'<div class="widget__table-wrap"><table class="rubric"><thead><tr><th>Критерий</th><th>Плохо</th><th>Хорошо</th></tr></thead><tbody>{rubric_rows}</tbody></table></div>'
+        if rubric_rows else ""
+    )
     body = f"""    <article class="module" data-module-page="{esc(c['id'])}">
       <p class="gc-breadcrumb"><a href="{base}index.html">Курс</a><a href="{base}index.html#track-{esc(g['id'])}">{esc(g['title'])}</a><span>Итоговый проект</span></p>
       <h1 class="module-title">{esc(c['title'])}</h1>
@@ -637,6 +650,7 @@ def render_capstone(g: dict, model: dict) -> str:
         <h2>Критерии приёмки</h2>
         <p class="gc-muted">Проект сдан, когда выполнены все пункты. Отмечай по мере готовности:</p>
         <ul class="gc-checklist">{crit}</ul>
+        {rubric_html}
         <h2>Модули трека</h2>
         <ol>{prereq}</ol>
         <div class="gc-callout" data-state="caution"><strong>Безопасность.</strong> Всё, что можно сделать в SITL или без пропов, делается там. Реальный полёт — только после наземных тестов, с проверенным failsafe.</div>
@@ -724,13 +738,22 @@ def render_fails(model: dict) -> str:
             for symptom, details in entries:
                 cause = next((d for d in details if d.lower().startswith("возможная причина")), "")
                 fix = next((d for d in details if d.lower().startswith("что сделать")), "")
+                evidence = next((d for d in details if d.lower().startswith("в логе") or d.lower().startswith("что видно")), "")
+                consequence = next((d for d in details if d.lower().startswith("последствия")), "")
                 cause = cause.split(":", 1)[1].strip() if ":" in cause else cause
                 fix = fix.split(":", 1)[1].strip() if ":" in fix else fix
+                evidence = evidence.split(":", 1)[1].strip() if ":" in evidence else evidence
+                consequence = consequence.split(":", 1)[1].strip() if ":" in consequence else consequence
                 sym = format_inline(symptom[:1].upper() + symptom[1:])
+                extra = ""
+                if evidence:
+                    extra += f'<p><span class="gc-muted">Что видно в логе/приборе:</span> {format_inline(evidence)}</p>'
+                if consequence:
+                    extra += f'<p><span class="gc-muted">Последствия:</span> {format_inline(consequence)}</p>'
                 rows.append(
                     f'<div class="gc-card fail"><strong class="fail__symptom">{sym}</strong>'
-                    f'<p><span class="gc-muted">Причина:</span> {format_inline(cause)}</p>'
-                    f'<p><span class="gc-muted">Что сделать:</span> {format_inline(fix)}</p>'
+                    f'<p><span class="gc-muted">Причина:</span> {format_inline(cause)}</p>{extra}'
+                    f'<p><span class="gc-muted">Исправление:</span> {format_inline(fix)}</p>'
                     f'<a class="gc-tag" href="{base}m/{esc(mid)}.html">{esc(m["title"])}</a></div>'
                 )
                 total += 1
@@ -743,10 +766,37 @@ def render_fails(model: dict) -> str:
     toc = "".join(f'<a class="gc-tag" href="#fails-{esc(g["id"])}">{esc(g["title"])}</a>' for g in toc_ids)
     body = f"""    <p class="gc-breadcrumb"><a href="../ref/index.html">Справочник</a><span>Журнал ошибок и фейлов</span></p>
     <h1 class="gc-display">Журнал ошибок и фейлов</h1>
-    <p class="gc-muted">{total} симптомов из разделов «Диагностика» всех написанных модулей. Собирается автоматически при сборке сайта; чтобы добавить кейс — допиши диагностику в модуль.</p>
+    <p class="gc-muted">{total} случаев из разделов «Диагностика» всех написанных модулей, по схеме симптом → причина → что видно в логе или приборе → последствия → исправление. Собирается автоматически при сборке сайта; чтобы добавить кейс — допиши диагностику в модуль. Разборы реальных инцидентов — в модуле <a href="../m/ops-case-studies.html">«Разбор реальных аварий»</a>.</p>
     <div class="home-toc">{toc}</div>
     <div class="fails">{"".join(sections)}</div>"""
     return layout(title="Журнал фейлов", base=base, body=body, active="fails")
+
+
+def render_formulas(model: dict) -> str:
+    """Reference of formulas and CLI commands from data/formulas.json, grouped by section."""
+    base = "../"
+    data = json.loads((ROOT / "data" / "formulas.json").read_text(encoding="utf-8"))
+    sections = []
+    toc = []
+    for s in data["sections"]:
+        rows = []
+        for item in s["items"]:
+            mod = model["modules"].get(item.get("module"))
+            link = f'<a class="gc-tag" href="{base}m/{esc(mod["id"])}.html">{esc(mod["title"])}</a>' if mod else ""
+            rows.append(
+                f'<div class="gc-card formula"><strong>{esc(item["name"])}</strong>'
+                f'<pre class="formula__expr"><code>{esc(item["expr"])}</code></pre>'
+                f'<p class="gc-muted">{format_inline(item["note"])}</p>{link}</div>'
+            )
+        sid = s["id"]
+        toc.append(f'<a class="gc-tag" href="#f-{esc(sid)}">{esc(s["title"])}</a>')
+        sections.append(f'<h2 id="f-{esc(sid)}">{esc(s["title"])}</h2><div class="fails__list">{"".join(rows)}</div>')
+    body = f"""    <p class="gc-breadcrumb"><a href="../ref/index.html">Справочник</a><span>Формулы и команды</span></p>
+    <h1 class="gc-display">Формулы и команды</h1>
+    <p class="gc-muted">Шпаргалка инженера: формулы с единицами и CLI-команды прошивок, каждая со ссылкой на модуль, где она объясняется. Источник — <code>data/formulas.json</code>.</p>
+    <div class="home-toc">{"".join(toc)}</div>
+    <div class="fails">{"".join(sections)}</div>"""
+    return layout(title="Формулы и команды", base=base, body=body, active="ref")
 
 
 def render_glossary(model: dict) -> str:
@@ -942,6 +992,8 @@ def main() -> None:
     for name, title in PAGES.items():
         if name == "fails":
             write(ROOT / "pages" / "fails.html", render_fails(model))
+        elif name == "formulas":
+            write(ROOT / "pages" / "formulas.html", render_formulas(model))
         elif name == "glossary":
             write(ROOT / "pages" / "glossary.html", render_glossary(model))
         else:

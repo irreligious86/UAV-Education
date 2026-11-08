@@ -1,0 +1,43 @@
+name: "Разбор лога / проекта"
+description: "Попросить разбор лога полёта или итогового проекта по курсу"
+title: "[разбор] <аппарат> — <симптом или проект>"
+labels: ["log-review"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Минимальная обратная связь по курсу. Чем точнее данные — тем полезнее разбор.
+        Личные данные (координаты дома, имена) из лога и скриншотов убери.
+  - type: input
+    id: module
+    attributes:
+      label: Модуль или итоговый проект
+      placeholder: "например, bf-filters или cap-tune-by-logs"
+    validations:
+      required: true
+  - type: textarea
+    id: aircraft
+    attributes:
+      label: Аппарат
+      description: Рама, моторы, пропы, АКБ, FC и прошивка с версией (`version` в CLI / `ver` в MAVProxy)
+    validations:
+      required: true
+  - type: textarea
+    id: symptom
+    attributes:
+      label: Симптом и что уже проверено
+      description: Что происходит, при каких условиях, какие ветки дерева диагностики уже исключены и чем (измерение, лог, сообщение прошивки)
+    validations:
+      required: true
+  - type: textarea
+    id: data
+    attributes:
+      label: Данные
+      description: Ссылка на лог (Blackbox .bbl / DataFlash .bin / ULog), `diff all` или параметры, скриншоты спектров. Файлы можно перетащить сюда.
+    validations:
+      required: true
+  - type: textarea
+    id: hypothesis
+    attributes:
+      label: Твоя гипотеза
+      description: Что, по-твоему, причина и почему. Разбор без гипотезы — это не учёба.

@@ -151,7 +151,8 @@
 .glossary-entry p { margin: 0 0 var(--gc-space-2); font-size: 14px; line-height: 21px; color: var(--gc-ink-muted); }
 .glossary-entry .gc-tag { text-decoration: none; }
 .fails h2 { font-size: 22px; margin: var(--gc-space-8) 0 var(--gc-space-3); }
-.fails__list { display: grid; gap: var(--gc-space-3); }
+.fails__list { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--gc-space-3); }
+.fail, .formula { min-width: 0; overflow-wrap: anywhere; }
 .fail > * + * { margin-top: var(--gc-space-2); }
 .fail__symptom { display: block; color: var(--gc-signal-amber); }
 .fail p { margin: 0; font-size: 14px; line-height: 21px; }
@@ -209,3 +210,19 @@
 .path-continue .gc-card { display: block; text-decoration: none; }
 .path-pos li.is-active { color: var(--gc-text, inherit); font-weight: 600; }
 .pager[hidden] { display: none; }
+
+/* ready-only filter */
+.ready-filter { margin-top: var(--gc-space-3); font-size: 14px; }
+.ready-filter input { margin-right: 6px; }
+body.ready-only .track-module--planned, body.ready-only .gc-card[data-state="pending"] { display: none; }
+
+/* capstone rubric */
+.rubric { border-collapse: collapse; width: 100%; min-width: 560px; font-size: 14px; }
+.rubric th, .rubric td { border: 1px solid var(--gc-border, #333); padding: 8px 10px; vertical-align: top; text-align: left; }
+.rubric thead th { background: var(--gc-surface-2, rgba(255,255,255,.04)); }
+.rubric__bad { color: var(--gc-danger, #e5484d); }
+.rubric__good { color: var(--gc-success, #30a46c); }
+
+/* formulas */
+.formula__expr { margin: var(--gc-space-2) 0; padding: 8px 10px; background: var(--gc-surface-2, rgba(255,255,255,.04)); border-radius: 6px; white-space: pre-wrap; overflow-wrap: anywhere; font-size: 14px; }
+.fail .gc-tag, .formula .gc-tag { white-space: normal; max-width: 100%; height: auto; }

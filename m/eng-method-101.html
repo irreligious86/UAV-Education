@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Инженерный метод 101: требования, архитектура, тесты, документация — UAV Student</title>
+  <meta name="description" content="записать требования к аппарату с ID и измеримыми критериями нарисовать архитектуру: блоки, интерфейсы, питание, данные спланировать тесты, которые проверяют каждое требование, и вести журнал изменений вести инженерную папку так, чтобы другой человек продолжил проект">
+  <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="../lib/ground-control-ui/dist/ground-control.css">
+  <link rel="stylesheet" href="../assets/site.css">
+  <script src="../lib/ground-control-ui/dist/ground-control.js" defer></script>
+  <script src="../assets/progress-store.js" defer></script>
+  <script src="../assets/grading.js" defer></script>
+  <script src="../assets/app.js" defer></script>
+  <script src="../assets/uav-quiz.js" defer></script>
+</head>
+<body class="gc-root" data-base="../">
+  <header class="site-header">
+    <div class="gc-container site-header__inner">
+      <a class="site-brand" href="../index.html"><span class="site-brand__mark" aria-hidden="true">◆</span> UAV Student</a>
+      <nav class="gc-nav" aria-label="Разделы сайта">
+        <a href="../index.html" aria-current="page">Курс</a>
+        <a href="../ref/index.html">Справочник</a>
+        <a href="../pages/glossary.html">Глоссарий</a>
+        <a href="../pages/fails.html">Фейлы</a>
+        <a href="../pages/search.html">Поиск</a>
+        <a href="../pages/progress.html">Мой прогресс</a>
+      </nav>
+    </div>
+  </header>
+  <main class="gc-container site-main">
+    <article class="module" data-module-page="eng-method-101">
+      <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-foundation">Фундамент</a><span>Инженерный метод 101: требования, архитектура, тесты, документация</span></p>
+      <h1 class="module-title">Инженерный метод 101: требования, архитектура, тесты, документация</h1>
+      <div class="module-tags"><span class="gc-tag" title="Уровень">L1 — Оператор</span><span class="gc-tag">учёба ~3 ч</span><span class="gc-tag" data-state="caution">СКОРО</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ОСВОЕН</span></div>
+      <p class="gc-muted module-score" data-module-score></p>
+      
+      <div class="gc-callout" data-state="ok"><strong>После модуля ты умеешь</strong><ul><li>записать требования к аппарату с ID и измеримыми критериями</li><li>нарисовать архитектуру: блоки, интерфейсы, питание, данные</li><li>спланировать тесты, которые проверяют каждое требование, и вести журнал изменений</li><li>вести инженерную папку так, чтобы другой человек продолжил проект</li></ul></div><p class="gc-muted">Перед этим модулем: <a href="f-safety.html">Безопасность и предполётный чек</a></p><div class="gc-callout lab"><p class="gc-label gc-muted">Лабораторная</p><strong>Инженерная папка первой сборки</strong><p class="gc-muted lab__hint">Сдано, когда отмечены все пункты:</p><ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="eng-method-101:lab:0"><span>Требования с ID (≥8), каждое измеримо</span></label></li><li><label><input type="checkbox" data-check-id="eng-method-101:lab:1"><span>Схема архитектуры с интерфейсами</span></label></li><li><label><input type="checkbox" data-check-id="eng-method-101:lab:2"><span>Таблица тестов: требование → тест → результат</span></label></li><li><label><input type="checkbox" data-check-id="eng-method-101:lab:3"><span>README и журнал изменений заведены в git</span></label></li></ul></div><div class="path-pos gc-muted"><span class="gc-label">В пути</span><ul><li data-path-pos="betaflight"><a href="../path/betaflight.html">Betaflight</a>: шаг 13 из 44 → <a href="bf-intro.html?path=betaflight">Введение в Betaflight</a></li><li data-path-pos="inav"><a href="../path/inav.html">INAV</a>: шаг 10 из 20 → <a href="link-protocols.html?path=inav">SBUS, CRSF и инверсия UART</a></li><li data-path-pos="ardupilot"><a href="../path/ardupilot.html">ArduPilot</a>: шаг 13 из 54 → <a href="ap-intro.html?path=ardupilot">Введение в ArduPilot</a></li><li data-path-pos="px4"><a href="../path/px4.html">PX4</a>: шаг 6 из 19 → <a href="est-sensors.html?path=px4">Датчики IMU: физика, ошибки, калибровка</a></li></ul></div>
+      <div class="gc-prose module-body">
+<div class="gc-callout" data-state="caution"><strong>Модуль в разработке.</strong> Цели и связи уже определены, текст пишется. План — в <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">ROADMAP</a>.</div>
+      </div>
+      
+      
+      <nav class="pager" aria-label="Соседние модули" data-track-pager><a class="gc-card pager__prev" href="f-components-choice.html"><span class="gc-label gc-muted">Назад · трек</span><br>Выбор компонентов под задачу и бюджет</a><a class="gc-card pager__next" href="tools-overview.html"><span class="gc-label gc-muted">Дальше · трек</span><br>Инструменты: Configurator, GCS, git</a></nav><nav class="pager" aria-label="Соседние шаги пути Betaflight" data-path-pager="betaflight" hidden><a class="gc-card pager__prev" href="tools-overview.html?path=betaflight"><span class="gc-label gc-muted">Назад · путь Betaflight</span><br>Инструменты: Configurator, GCS, git</a><a class="gc-card pager__next" href="bf-intro.html?path=betaflight"><span class="gc-label gc-muted">Дальше · шаг 14 из 44</span><br>Введение в Betaflight</a></nav><nav class="pager" aria-label="Соседние шаги пути INAV" data-path-pager="inav" hidden><a class="gc-card pager__prev" href="tools-overview.html?path=inav"><span class="gc-label gc-muted">Назад · путь INAV</span><br>Инструменты: Configurator, GCS, git</a><a class="gc-card pager__next" href="link-protocols.html?path=inav"><span class="gc-label gc-muted">Дальше · шаг 11 из 20</span><br>SBUS, CRSF и инверсия UART</a></nav><nav class="pager" aria-label="Соседние шаги пути ArduPilot" data-path-pager="ardupilot" hidden><a class="gc-card pager__prev" href="tools-overview.html?path=ardupilot"><span class="gc-label gc-muted">Назад · путь ArduPilot</span><br>Инструменты: Configurator, GCS, git</a><a class="gc-card pager__next" href="ap-intro.html?path=ardupilot"><span class="gc-label gc-muted">Дальше · шаг 14 из 54</span><br>Введение в ArduPilot</a></nav><nav class="pager" aria-label="Соседние шаги пути PX4" data-path-pager="px4" hidden><a class="gc-card pager__prev" href="tools-overview.html?path=px4"><span class="gc-label gc-muted">Назад · путь PX4</span><br>Инструменты: Configurator, GCS, git</a><a class="gc-card pager__next" href="est-sensors.html?path=px4"><span class="gc-label gc-muted">Дальше · шаг 7 из 19</span><br>Датчики IMU: физика, ошибки, калибровка</a></nav>
+    </article>
+  </main>
+  <footer class="gc-container site-footer gc-muted">
+    <p>Открытый курс · <a href="https://github.com/irreligious86/UAV-Education">исходники на GitHub</a> · <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">план развития</a> · <a href="../curriculum/curriculum.html">для разработчика</a> · CC BY-NC-SA 4.0</p>
+  </footer>
+</body>
+</html>

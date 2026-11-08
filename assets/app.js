@@ -138,7 +138,23 @@
     return window.UAVGrading.load(base).then(render).catch(function () { /* no grading meta (offline/file://): page stays readable */ });
   }
 
+  var READY_KEY = "uav-student:ready-only";
+  function initReadyFilter() {
+    var boxes = document.querySelectorAll("[data-ready-only]");
+    var on = false;
+    try { on = localStorage.getItem(READY_KEY) === "1"; } catch (e) { /* storage unavailable */ }
+    document.body.classList.toggle("ready-only", on);
+    boxes.forEach(function (box) {
+      box.checked = on;
+      box.addEventListener("change", function () {
+        document.body.classList.toggle("ready-only", box.checked);
+        try { localStorage.setItem(READY_KEY, box.checked ? "1" : "0"); } catch (e) { /* storage unavailable */ }
+      });
+    });
+  }
+
   function init() {
+    initReadyFilter();
     applyPathContext();
     if (!window.UAVProgress || !window.UAVGrading) return;
 

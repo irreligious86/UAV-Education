@@ -3,6 +3,11 @@
 Living plan. Updated as phases land. Detailed rules live in `PROJECT-DIRECTIVES.md`;
 this file only says **what is next and why**.
 
+> **2026-11-08 — Course Plan v3 adopted.** The program structure, principles and
+> implementation phases now live in [`docs/COURSE-PLAN.md`](docs/COURSE-PLAN.md),
+> built from two external reviews in `docs/reviews/`. Sections below that
+> describe tracks are superseded by it.
+
 ## Principles
 
 1. **Content over infrastructure.** Ten honest articles beat thirty pretty stubs.

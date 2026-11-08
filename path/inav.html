@@ -33,9 +33,10 @@
     <section class="home-hero">
       <h1 class="gc-display">INAV</h1>
       <p class="home-hero__lead">Перейти от ручного полёта к удержанию позиции, возврату домой и миссиям; настроить крыло.</p>
-      <div class="home-hero__stats"><span class="gc-tag">16 шагов</span><span class="gc-tag" data-state="ok">написано 15</span><span class="gc-tag" data-state="caution">в работе 1</span></div>
+      <div class="home-hero__stats"><span class="gc-tag">20 шагов</span><span class="gc-tag" data-state="ok">написано 15</span><span class="gc-tag" data-state="caution">в работе 5</span></div>
       <p class="gc-label gc-muted">Твой прогресс <span data-progress-label="f-physics,f-aero-props,f-power,f-fc-sensors,f-safety,f-regulations,tools-overview,link-protocols,link-elrs,rf-antennas,inav-intro,inav-gps,inav-missions,inav-wing,inav-ipf"></span></p>
       <div class="gc-progress" role="progressbar" aria-label="Прогресс по пути" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" data-progress-of="f-physics,f-aero-props,f-power,f-fc-sensors,f-safety,f-regulations,tools-overview,link-protocols,link-elrs,rf-antennas,inav-intro,inav-gps,inav-missions,inav-wing,inav-ipf" style="--gc-value: 0%"></div>
+      <p class="ready-filter"><label class="gc-muted"><input type="checkbox" data-ready-only> Показывать только готовые модули</label></p>
       <p class="path-continue"><a class="gc-card" data-path-continue="inav" data-path-steps="f-physics|Как летает мультиротор;;f-aero-props|Аэродинамика пропеллера и подбор силовой установки;;f-power|Питание: LiPo, Li-Ion, BEC;;f-fc-sensors|Полётный контроллер и сенсоры;;f-safety|Безопасность и предполётный чек;;f-regulations|Правила, зоны и ответственность оператора;;tools-overview|Инструменты: Configurator, GCS, git;;link-protocols|SBUS, CRSF и инверсия UART;;link-elrs|ExpressLRS: packet rate, телеметрия, LQ;;rf-antennas|Антенны, поляризация и диаграммы направленности;;inav-intro|Введение в INAV;;inav-gps|GPS, компас и RTH в INAV;;inav-missions|Миссии INAV: waypoints и CLI wp;;inav-wing|Крыло на INAV: миксер, автозапуск, autotune;;inav-ipf|INAV Programming Framework" hidden></a></p>
       <p class="gc-muted home-hero__note">Иди по порядку: каждый шаг опирается на предыдущие. Модули с тегом «общий» входят и в другие пути — пройденный один раз, такой модуль засчитан везде. Открывай уроки отсюда: тогда кнопки «назад/дальше» ведут по шагам именно этого пути.</p>
     </section>
@@ -48,48 +49,63 @@
             <a class="track-module__title" href="../m/f-physics.html?path=inav">Как летает мультиротор</a>
             <span class="track-module__tags"><span class="gc-tag" title="L1 — Оператор">L1</span><span class="gc-tag" title="Общий модуль: засчитывается во всех путях, где он есть">общий</span><span class="gc-tag">~2 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
           </li>
-          <li class="track-module" data-module-id="f-aero-props">
+          <li class="track-module track-module--planned" data-module-id="f-mechanics">
             <span class="track-module__num">02</span>
+            <a class="track-module__title" href="../m/f-mechanics.html?path=inav">Механика полёта: силы, моменты, уравнения движения</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L1 — Оператор">L1</span><span class="gc-tag" title="Общий модуль: засчитывается во всех путях, где он есть">общий</span><span class="gc-tag">~3 ч</span><span class="gc-tag" data-state="caution">СКОРО</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+          </li>
+          <li class="track-module" data-module-id="f-aero-props">
+            <span class="track-module__num">03</span>
             <a class="track-module__title" href="../m/f-aero-props.html?path=inav">Аэродинамика пропеллера и подбор силовой установки</a>
             <span class="track-module__tags"><span class="gc-tag" title="L2 — Интегратор">L2</span><span class="gc-tag" title="Общий модуль: засчитывается во всех путях, где он есть">общий</span><span class="gc-tag">~4 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
           </li>
+          <li class="track-module track-module--planned" data-module-id="f-electricity-101">
+            <span class="track-module__num">04</span>
+            <a class="track-module__title" href="../m/f-electricity-101.html?path=inav">Электричество и измерения 101</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L1 — Оператор">L1</span><span class="gc-tag" title="Общий модуль: засчитывается во всех путях, где он есть">общий</span><span class="gc-tag">~3 ч</span><span class="gc-tag" data-state="caution">СКОРО</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+          </li>
           <li class="track-module" data-module-id="f-power">
-            <span class="track-module__num">03</span>
+            <span class="track-module__num">05</span>
             <a class="track-module__title" href="../m/f-power.html?path=inav">Питание: LiPo, Li-Ion, BEC</a>
             <span class="track-module__tags"><span class="gc-tag" title="L1 — Оператор">L1</span><span class="gc-tag" title="Общий модуль: засчитывается во всех путях, где он есть">общий</span><span class="gc-tag">~3 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
           </li>
           <li class="track-module" data-module-id="f-fc-sensors">
-            <span class="track-module__num">04</span>
+            <span class="track-module__num">06</span>
             <a class="track-module__title" href="../m/f-fc-sensors.html?path=inav">Полётный контроллер и сенсоры</a>
             <span class="track-module__tags"><span class="gc-tag" title="L1 — Оператор">L1</span><span class="gc-tag" title="Общий модуль: засчитывается во всех путях, где он есть">общий</span><span class="gc-tag">~2 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
           </li>
           <li class="track-module" data-module-id="f-safety">
-            <span class="track-module__num">05</span>
+            <span class="track-module__num">07</span>
             <a class="track-module__title" href="../m/f-safety.html?path=inav">Безопасность и предполётный чек</a>
             <span class="track-module__tags"><span class="gc-tag" title="L1 — Оператор">L1</span><span class="gc-tag" title="Общий модуль: засчитывается во всех путях, где он есть">общий</span><span class="gc-tag">~1 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
           </li>
           <li class="track-module" data-module-id="f-regulations">
-            <span class="track-module__num">06</span>
+            <span class="track-module__num">08</span>
             <a class="track-module__title" href="../m/f-regulations.html?path=inav">Правила, зоны и ответственность оператора</a>
             <span class="track-module__tags"><span class="gc-tag" title="L1 — Оператор">L1</span><span class="gc-tag" title="Общий модуль: засчитывается во всех путях, где он есть">общий</span><span class="gc-tag">~2 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
           </li>
           <li class="track-module" data-module-id="tools-overview">
-            <span class="track-module__num">07</span>
+            <span class="track-module__num">09</span>
             <a class="track-module__title" href="../m/tools-overview.html?path=inav">Инструменты: Configurator, GCS, git</a>
             <span class="track-module__tags"><span class="gc-tag" title="L1 — Оператор">L1</span><span class="gc-tag" title="Общий модуль: засчитывается во всех путях, где он есть">общий</span><span class="gc-tag">~2 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
           </li>
+          <li class="track-module track-module--planned" data-module-id="eng-method-101">
+            <span class="track-module__num">10</span>
+            <a class="track-module__title" href="../m/eng-method-101.html?path=inav">Инженерный метод 101: требования, архитектура, тесты, документация</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L1 — Оператор">L1</span><span class="gc-tag" title="Общий модуль: засчитывается во всех путях, где он есть">общий</span><span class="gc-tag">~3 ч</span><span class="gc-tag" data-state="caution">СКОРО</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+          </li>
           <li class="track-module" data-module-id="link-protocols">
-            <span class="track-module__num">08</span>
+            <span class="track-module__num">11</span>
             <a class="track-module__title" href="../m/link-protocols.html?path=inav">SBUS, CRSF и инверсия UART</a>
             <span class="track-module__tags"><span class="gc-tag" title="L1 — Оператор">L1</span><span class="gc-tag" title="Общий модуль: засчитывается во всех путях, где он есть">общий</span><span class="gc-tag">~1.5 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
           </li>
           <li class="track-module" data-module-id="link-elrs">
-            <span class="track-module__num">09</span>
+            <span class="track-module__num">12</span>
             <a class="track-module__title" href="../m/link-elrs.html?path=inav">ExpressLRS: packet rate, телеметрия, LQ</a>
             <span class="track-module__tags"><span class="gc-tag" title="L2 — Интегратор">L2</span><span class="gc-tag" title="Общий модуль: засчитывается во всех путях, где он есть">общий</span><span class="gc-tag">~2 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
           </li>
           <li class="track-module" data-module-id="rf-antennas">
-            <span class="track-module__num">10</span>
+            <span class="track-module__num">13</span>
             <a class="track-module__title" href="../m/rf-antennas.html?path=inav">Антенны, поляризация и диаграммы направленности</a>
             <span class="track-module__tags"><span class="gc-tag" title="L2 — Интегратор">L2</span><span class="gc-tag" title="Общий модуль: засчитывается во всех путях, где он есть">общий</span><span class="gc-tag">~3 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
           </li>
@@ -100,7 +116,7 @@
         <h2 class="gc-title">Крыло</h2>
         <ol class="track__modules">
           <li class="track-module track-module--planned" data-module-id="aero-wing">
-            <span class="track-module__num">11</span>
+            <span class="track-module__num">14</span>
             <a class="track-module__title" href="../m/aero-wing.html?path=inav">Аэродинамика крыла и самолётные режимы</a>
             <span class="track-module__tags"><span class="gc-tag" title="L3 — Специалист">L3</span><span class="gc-tag" title="Общий модуль: засчитывается во всех путях, где он есть">общий</span><span class="gc-tag">~4 ч</span><span class="gc-tag" data-state="caution">СКОРО</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
           </li>
@@ -111,29 +127,34 @@
         <h2 class="gc-title">INAV</h2>
         <ol class="track__modules">
           <li class="track-module" data-module-id="inav-intro">
-            <span class="track-module__num">12</span>
+            <span class="track-module__num">15</span>
             <a class="track-module__title" href="../m/inav-intro.html?path=inav">Введение в INAV</a>
             <span class="track-module__tags"><span class="gc-tag" title="L1 — Оператор">L1</span><span class="gc-tag">~2 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
           </li>
           <li class="track-module" data-module-id="inav-gps">
-            <span class="track-module__num">13</span>
+            <span class="track-module__num">16</span>
             <a class="track-module__title" href="../m/inav-gps.html?path=inav">GPS, компас и RTH в INAV</a>
             <span class="track-module__tags"><span class="gc-tag" title="L2 — Интегратор">L2</span><span class="gc-tag">~3 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
           </li>
           <li class="track-module" data-module-id="inav-missions">
-            <span class="track-module__num">14</span>
+            <span class="track-module__num">17</span>
             <a class="track-module__title" href="../m/inav-missions.html?path=inav">Миссии INAV: waypoints и CLI wp</a>
             <span class="track-module__tags"><span class="gc-tag" title="L2 — Интегратор">L2</span><span class="gc-tag">~2 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
           </li>
           <li class="track-module" data-module-id="inav-wing">
-            <span class="track-module__num">15</span>
+            <span class="track-module__num">18</span>
             <a class="track-module__title" href="../m/inav-wing.html?path=inav">Крыло на INAV: миксер, автозапуск, autotune</a>
             <span class="track-module__tags"><span class="gc-tag" title="L2 — Интегратор">L2</span><span class="gc-tag">~4 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
           </li>
           <li class="track-module" data-module-id="inav-ipf">
-            <span class="track-module__num">16</span>
+            <span class="track-module__num">19</span>
             <a class="track-module__title" href="../m/inav-ipf.html?path=inav">INAV Programming Framework</a>
             <span class="track-module__tags"><span class="gc-tag" title="L3 — Специалист">L3</span><span class="gc-tag">~3 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+          </li>
+          <li class="track-module track-module--planned" data-module-id="diag-troubleshooting">
+            <span class="track-module__num">20</span>
+            <a class="track-module__title" href="../m/diag-troubleshooting.html?path=inav">Дерево диагностики: дрон не взлетает</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L1 — Оператор">L1</span><span class="gc-tag" title="Общий модуль: засчитывается во всех путях, где он есть">общий</span><span class="gc-tag">~3 ч</span><span class="gc-tag" data-state="caution">СКОРО</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
           </li>
         </ol>
       </section>
