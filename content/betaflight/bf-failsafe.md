@@ -45,6 +45,15 @@ DROP — честный выбор для фристайла над безопа
 - `STAGE2` — сразу выбранная процедура Stage 2, отпускание возвращает управление.
 - `KILL` — мгновенный дизарм. Один глитч канала = падение. Не для полётов.
 
+### Параметры целиком (CLI)
+`failsafe_delay` (десятые секунды, Stage 1), `failsafe_off_delay` (десятые, время AUTO-LAND до дизарма), `failsafe_throttle` (газ AUTO-LAND, 1000–2000), `failsafe_throttle_low_delay` (десятые: если газ был ниже минимума дольше этого — просто дизарм; 0 = выкл), `failsafe_procedure` (DROP / AUTO-LAND / GPS-RESCUE), `failsafe_switch_mode` (STAGE1 / KILL / STAGE2), `failsafe_recovery_delay` (десятые, сколько связь должна быть стабильной до возврата), `failsafe_stick_threshold` (%, отклонение стика для выхода из GPS Rescue). Значения каналов на Stage 1 — `rxfail <channel> <mode> [value]`: `a` (auto: центр/мин газа), `h` (hold — удерживать последнее), `s <value>` (set — фиксированное значение, например 1700 на канале ANGLE). Проверка: `rxfail` без аргументов печатает таблицу.
+
+### GPS Rescue: что нужно, чтобы он работал
+GPS с fix ≥ `gps_rescue_min_sats` (8 по умолчанию) **до арма** (дом записывается при арме), `gps_rescue_min_start_dist` (минимальная дистанция, ближе — просто посадка/DROP логика), высота возврата `gps_rescue_alt_mode` (MAX_ALT / FIXED_ALT / CURRENT_ALT) и `gps_rescue_return_alt`, скорости `gps_rescue_ground_speed`, `gps_rescue_ascend_rate/descend_rate`, снижение и посадка `gps_rescue_descent_dist` (дистанция, с которой начинается снижение), `gps_rescue_descend_rate`, `gps_rescue_disarm_threshold` (дизарм при ударе), `gps_rescue_initial_climb`; без компаса курс берётся по GPS в движении — поэтому Rescue сначала набирает высоту и летит, «нащупывая» курс; с компасом (`mag_hardware`) надёжнее. Санитарные проверки (`gps_rescue_sanity_checks`) прерывают Rescue, если расстояние растёт или аппарат падает. Тест — только на открытой площадке, тумблером GPS RESCUE на умеренной высоте и дистанции, с пальцем на тумблере режима и наблюдателем; `gps_rescue_allow_arming_without_fix` оставить OFF — иначе Rescue без дома бесполезен.
+
+### Разобранный пример: 7" long range
+`failsafe_procedure = GPS-RESCUE`, `failsafe_delay = 10` (1 с: на 250 Гц это 250 потерянных пакетов — явная потеря), `gps_rescue_min_sats = 8`, `gps_rescue_alt_mode = MAX_ALT` (вернуться на максимальной высоте полёта + запас), `gps_rescue_return_alt = 50`, `gps_rescue_ground_speed = 1000` (10 м/с), `gps_rescue_descend_rate = 150`, `rxfail 5 s 1700` (канал ANGLE), ELRS: failsafe «no pulses» в приёмнике (иначе Stage 1 не начнётся), предупреждение LQ в OSD. Проверка: на земле без пропов — выключить пульт, в OSD «FAILSAFE», через 1 с «RESCUE» (без арма — только индикация); в поле — тумблером на 30 м высоты и 60 м от дома, наблюдатель, готовность перехватить.
+
 ## practice
 ### Шаг 1. Посмотреть текущие значения
 Не заучивай дефолты — читай их с конкретного контроллера:
@@ -91,6 +100,15 @@ save
 - **Симптом:** RXLOSS / failsafe в обычном полёте
   - Возможная причина: слабый линк (антенна приёмника, packet rate, мощность TX).
   - Что сделать: смотреть RSSI/LQ в логе, см. модуль про ExpressLRS.
+- **Симптом:** при выключении пульта аппарат продолжает лететь по последним стикам
+  - Возможная причина: приёмник не в режиме «no pulses»/cut — Stage 1 не начинается.
+  - Что сделать: настроить failsafe приёмника (ELRS: по умолчанию «no pulses»; FrSky — выбрать), проверить без пропов.
+- **Симптом:** GPS Rescue летит не домой / «сходит с ума»
+  - Возможная причина: дом записан при плохом fix, нет компаса и мало скорости для курса по GPS, магнитные помехи.
+  - Что сделать: армить после fix с 8+ спутниками, компас на мачте, проверить `gps_rescue_sanity_checks`.
+- **Симптом:** после возврата связи управление не возвращается
+  - Возможная причина: `failsafe_recovery_delay` + требование отклонить стики (`failsafe_stick_threshold`).
+  - Что сделать: отклонить стик > порога; снизить recovery_delay умеренно.
 
 ## references
 - Failsafe — Betaflight Documentation | https://betaflight.com/docs/wiki/guides/current/failsafe | primary | A

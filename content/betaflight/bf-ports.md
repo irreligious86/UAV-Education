@@ -84,6 +84,27 @@ next:
 
 **Совет:** соединение с ПК по **USB** обычно занимает отдельный канал; не переназначайте его под приёмник, не понимая схемы платы.
 
+### Команда `serial`: что хранится на самом деле
+Вкладка Ports — обёртка над `serial <id> <маска функций> <msp baud> <gps baud> <telemetry baud> <blackbox baud>`: идентификатор порта (0 = UART1, 1 = UART2, … 20 = VCP/USB, 30+ = SoftSerial), битовая маска функций (MSP = 1, GPS = 2, … Serial RX = 64, Blackbox = 128, ESC Sensor, SmartAudio, Tramp, MSP DisplayPort — свои биты; точные значения — перечисление `serialPortFunction_e` в `src/main/io/serial.h`), и скорости. Поэтому `diff all` содержит строки вроде `serial 2 64 115200 57600 0 115200` — UART3 = Serial RX. Читать их полезно при переносе конфигов между платами: номера UART у разных плат разные.
+
+### Функции по портам: совместимость
+| Функция | Провода | Может делить порт с | Замечания |
+|---|---|---|---|
+| Serial RX (CRSF) | TX+RX | ни с чем | полный дуплекс, телеметрия в том же порту |
+| Serial RX (SBUS) | RX | — | инвертор на F4 |
+| GPS | TX+RX | — | 57600/115200, UBX; `gps_auto_config` |
+| MSP (конфигуратор/компьютер) | TX+RX | — | ≤ 3 портов с MSP |
+| MSP DisplayPort (HD OSD) | TX+RX | — | 115200, VTX-настройки через тот же порт |
+| ESC Sensor (телеметрия ESC) | RX | — | один общий провод от всех ESC |
+| VTX SmartAudio / Tramp | TX | — | один провод; SA 4800 бод |
+| Telemetry (SmartPort/MAVLink/LTM) | TX (или TX+RX) | — | для пульта/наземки |
+| Blackbox (внешний логгер OpenLog) | TX | — | редко |
+| SoftSerial | любые 2 ноги | — | до 115200, нагружает CPU, не для приёмника |
+Нет ресурсов на всё? `resource serial_tx 11 A09`/`resource serial_rx 11 A10` — softserial на свободных падах (LED, PPM), с оговоркой по CPU.
+
+### Разобранный пример: распределить 5 устройств по 4 UART на F405
+Устройства: ELRS (CRSF), GPS, цифровой VTX (DisplayPort), ESC-телеметрия, SmartAudio-VTX — нет: цифровой и аналоговый VTX одновременно не бывает; пусть аналоговый VTX со SmartAudio + камера с RunCam-протоколом. UART1 — CRSF (не SBUS-порт нужен), UART2 — GPS, UART3 — SmartAudio (TX-пин), UART4 — ESC Sensor (RX-пин), RunCam Device — на SoftSerial 11 по LED-паду. Правило: сначала полнодуплексные (CRSF, GPS, DisplayPort), потом однопроводные, потом softserial для некритичного.
+
 ## practice
 
 ### Шаг 1. Идентификация UART на FC
@@ -159,6 +180,12 @@ next:
 - **Симптом:** После настроек GPS passthrough «пропадают» MSP-настройки.
   - Возможная причина: превышен лимит **трёх** портов с **MSP**.
   - Что сделать: отключить **MSP** там, где не нужен; оставить не более трёх UART с MSP.
+- **Симптом:** после сохранения Ports конфигуратор «отваливается»
+  - Возможная причина: отключён MSP на порту USB/VCP или включён MSP на 4-м порту.
+  - Что сделать: подключение через другой порт/DFU, `serial 20 1 115200 …` для VCP.
+- **Симптом:** ESC Sensor не даёт телеметрию
+  - Возможная причина: провод на TX вместо RX, ESC без телеметрии, не включён `esc_sensor`.
+  - Что сделать: RX-пин, прошивка ESC, `esc_sensor` в CLI (или bidirectional DShot как альтернатива для RPM).
 
 ## references
 

@@ -94,6 +94,29 @@ Betaflight — форк **Cleanflight** (наследник Baseflight / STM32-�
 
 Помимо прошивки — **Betaflight Configurator**. С версии **2025.12** доступен **веб-конфигуратор** (`https://app.betaflight.com`) через **WebUSB / WebSerial**. Для Android по-прежнему есть нативные приложения.
 
+### Target, unified target и Cloud Build
+Прошивка собирается под **target** — описание платы: процессор, какие ноги на что заведены (`resource`), какой гироскоп на каком SPI. С 4.3 почти все платы — **unified targets**: один бинарник на семейство процессора (например, `STM32F405`) плюс текстовый конфиг платы (`board_name`, `manufacturer_id`, набор `resource`/`set`), который конфигуратор подгружает при прошивке. Cloud Build (4.4+) собирает бинарник на сервере с выбранным набором функций: протокол приёмника, OSD, GPS, телеметрия, LED — чего не отметил, того в прошивке нет (типичная причина «приёмник молчит»). `version` в CLI показывает версию, target, `BUILD KEY` (ключ сборки для воспроизведения) и список включённых опций.
+
+### Что делает планировщик каждые 125 мкс
+`fc/tasks.c` описывает задачи с периодом и приоритетом; `scheduler/scheduler.c` выбирает их. Критичные: `GYRO` (чтение, фильтры) и `PID` (`taskMainPidLoop`: RC-команда → PID → миксер → DShot) — на частоте гироскопа / `pid_process_denom`. Остальные — по остаточному принципу: `RX` (приём и обработка кадров, событийно), `SERIAL`, `BATTERY_*`, `GPS`, `OSD` (по `osd framerate_hz`), `BLACKBOX`, `TELEMETRY`, `LED_STRIP`. CLI `tasks` показывает фактический период, среднее и максимальное время каждой задачи и загрузку CPU; `status` — частоту гироскопа, загрузку и флаги арма. Перегрузка (> 85–90% на F4 с 8 кГц) — пропуски задач, джиттер, флаг `LOAD`: лечится `pid_process_denom = 2` или отключением функций.
+
+### Карта настройки: где что живёт
+| Что | Где в конфигураторе | Ключевые параметры CLI |
+|---|---|---|
+| Порты и устройства | Ports | `serial`, `resource`, `serialrx_provider` |
+| Приёмник, каналы, рейты | Receiver | `map`, `rates_type`, `roll_rc_rate`… |
+| Режимы на тумблерах | Modes | `aux` |
+| Моторы, ESC, протокол | Motors | `motor_pwm_protocol`, `dshot_bidir`, `motor_poles`, `dshot_idle_value` |
+| PID, фильтры, FF | PID Tuning | `set p_roll`… `simplified_*`, `gyro_lpf*`, `rpm_filter_*` |
+| OSD | OSD | `osd_*_pos`, `osd_warn_bitmask` |
+| Blackbox | Blackbox | `blackbox_device`, `blackbox_sample_rate`, `debug_mode` |
+| Failsafe | Failsafe | `failsafe_procedure`, `failsafe_delay`, `rxfail` |
+| Прошивка | Firmware Flasher | — |
+Профили: до 4 PID-профилей (`profile`) и 4 профилей рейтов (`rateprofile`), переключаемые тумблером/adjustments — один «спокойный», один «гоночный».
+
+### Разобранный пример: порядок первой настройки
+Прошивка (Cloud Build: CRSF, OSD HD, GPS если есть) → `resource`/target по умолчанию → Ports (UART приёмника) → Receiver (CRSF, проверка каналов и `map` AETR) → Motors (DShot600, `motor_poles`, `dshot_bidir`, направление без пропов) → Modes (ARM, ANGLE, BEEPER, FAILSAFE) → Failsafe (DROP для первого полёта) → OSD (напряжение, LQ, таймер, предупреждения) → Blackbox (2 кГц) → `diff all` в репозиторий (модуль «CI»). Первый полёт — на умолчаниях PID: Betaflight 4.5 «из коробки» летает на 5" лучше, чем большинство ручных тюнов новичка; тюнинг — после логов.
+
 ## practice
 
 ### Установка Betaflight Configurator
@@ -214,6 +237,12 @@ diff all
 - **Симптом:** Дрон армуется, но моторы не вращаются (при выключенном MOTOR_STOP)
   - Возможная причина: минимальный газ (min_throttle) слишком низкий для старта моторов.
   - Что проверить/сделать: на вкладке Configuration увеличить значение Minimum Throttle (типичное значение 1050–1100).
+- **Симптом:** после прошивки приёмник/GPS не работают, хотя проводка верна
+  - Возможная причина: функция не включена в Cloud Build.
+  - Что сделать: `version` → список опций; перепрошить с нужными.
+- **Симптом:** `LOAD` в флагах арма или CPU > 90%
+  - Возможная причина: F4 на 8 кГц со всеми функциями.
+  - Что сделать: `pid_process_denom = 2`, отключить LED/лишние телеметрии, `tasks` для поиска тяжёлых.
 
 ## references
 - Getting Started — Betaflight Documentation | https://www.betaflight.com/docs/development/Getting-Started | primary | A
