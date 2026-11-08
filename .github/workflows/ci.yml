@@ -42,6 +42,11 @@ jobs:
       - name: Compile starter examples
         run: python -m compileall -q examples
 
+      - name: Lab grader self-test (synthetic DataFlash fixtures)
+        run: |
+          pip install --quiet pymavlink
+          python examples/sitl-pymavlink/test_check_lab_log.py
+
       - uses: actions/setup-node@v4
         with:
           node-version: "22"

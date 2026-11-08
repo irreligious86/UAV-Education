@@ -49,3 +49,4 @@ The checks are deliberately simple and readable — extend them for your own lab
 - `test_failsafe.py` — RC-failsafe assertion, usable in GitHub Actions.
 - `ci.yml` — example workflow (copy to `.github/workflows/`).
 - `check_lab_log.py` — lab grader for DataFlash logs (failsafe, mission, hover, motor failure).
+- `make_fixture_log.py`, `test_check_lab_log.py` — synthetic DataFlash fixtures and the grader's self-test (CI).

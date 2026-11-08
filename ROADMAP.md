@@ -97,7 +97,7 @@ Remaining content work: owner review and first-student feedback (Phase C).
 ## Phase 4 — Lab track
 
 - [x] SITL exercises with checkable outcomes: `examples/sitl-pymavlink/check_lab_log.py` grades DataFlash logs for the failsafe, mission, hover and motor-failure labs (2026-11-08)
-- [ ] Reference logs for each lab (SITL-generated) committed as fixtures for CI
+- [x] Grader self-test with synthetic DataFlash fixtures (`make_fixture_log.py`, `test_check_lab_log.py`) runs in CI; real SITL reference logs still to be recorded by the owner (SITL cannot be built in the authoring environment)
 
 ## Backlog / ideas
 
