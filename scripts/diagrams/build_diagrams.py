@@ -542,6 +542,7 @@ D["survey-overlap"] = survey_overlap()
 
 import wave2  # noqa: E402
 wave2.build(D, _arch)
+wave2.build2(D, _arch)
 
 
 def main() -> None:
