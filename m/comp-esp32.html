@@ -73,20 +73,27 @@
 #include &lt;WiFi.h&gt;
 #include &lt;esp_wifi.h&gt;
 
-enum class Mode { FLIGHT, CONFIG };
+enum class Mode { FLIGHT, GROUND };
 Mode mode = Mode::FLIGHT;            // undefined state == FLIGHT
-unsigned long lastHeartbeat = 0;
-const unsigned long HEARTBEAT_TIMEOUT_MS = 3000;
+unsigned long lastLine = 0;          // last valid S-line from the radio
+unsigned long disarmedSince = 0;     // 0 = not continuously disarmed
+const unsigned long LINE_TIMEOUT_MS = 2000;
+const unsigned long GROUND_AFTER_MS = 3000;
 
 void radioOff() {
   WiFi.mode(WIFI_OFF);
   esp_wifi_stop();                   // verifiable off, not assumed off
 }
 
-void enterConfig() {
+void enterGround() {
   WiFi.mode(WIFI_AP);
   WiFi.softAP(&quot;tx16s-companion&quot;, &quot;change-me&quot;);
-  mode = Mode::CONFIG;
+  mode = Mode::GROUND;
+}
+
+void enterFlight() {
+  radioOff();
+  mode = Mode::FLIGHT;
 }
 
 void setup() {
@@ -96,30 +103,43 @@ void setup() {
 }
 
 void loop() {
+  unsigned long now = millis();
   if (Serial1.available()) {
     String line = Serial1.readStringUntil(&#x27;\n&#x27;);   // one line == one message
-    lastHeartbeat = millis();
     // S,&lt;mode&gt;,&lt;armed&gt;,&lt;vbat&gt;,&lt;rssi&gt;  — the protocol above; armed is the third field
     if (line.startsWith(&quot;S,&quot;)) {
       int a = line.indexOf(&#x27;,&#x27;, 2);                 // end of &lt;mode&gt;
-      bool armed = a &gt; 0 &amp;&amp; line.charAt(a + 1) == &#x27;1&#x27;;
-      if (armed &amp;&amp; mode == Mode::CONFIG) { radioOff(); mode = Mode::FLIGHT; }
-      else if (!armed &amp;&amp; mode == Mode::FLIGHT) enterConfig();
+      if (a &gt; 0 &amp;&amp; a + 1 &lt; (int)line.length()) {
+        lastLine = now;
+        bool armed = line.charAt(a + 1) == &#x27;1&#x27;;
+        if (armed) {
+          disarmedSince = 0;
+          if (mode == Mode::GROUND) enterFlight();  // any armed=1 -&gt; FLIGHT at once
+        } else {
+          if (disarmedSince == 0) disarmedSince = now;
+          if (mode == Mode::FLIGHT &amp;&amp; now - disarmedSince &gt;= GROUND_AFTER_MS) enterGround();
+        }
+      }
     }
   }
-  if (millis() - lastHeartbeat &gt; HEARTBEAT_TIMEOUT_MS &amp;&amp; mode == Mode::CONFIG) {
-    radioOff(); mode = Mode::FLIGHT;  // lost the radio: fail safe
+  if (mode == Mode::GROUND &amp;&amp; now - lastLine &gt; LINE_TIMEOUT_MS) {
+    enterFlight();                    // lost the radio: fail safe
+    disarmedSince = 0;
   }
 }</code></pre>
 <h4 class="md-subheading">Шаг 3. Виджет EdgeTX с общим tick()</h4>
-<pre class="cli-block"><code>-- companion.lua (widget): send state every 500 ms whether visible or not
+<pre class="cli-block"><code>-- companion.lua (widget): send the S-line every 500 ms whether visible or not
+-- protocol: S,&lt;mode&gt;,&lt;armed&gt;,&lt;vbat&gt;,&lt;rssi&gt;\n  (see docs/protocol.md)
 local lastSend = 0
 
 local function tick()
   local now = getTime()                       -- 10 ms units
   if now - lastSend &gt;= 50 then
+    local _, fmName = getFlightMode()
     local armed = getValue(&quot;sa&quot;) &gt; 0          -- example: arm switch on SA
-    serialWrite(string.format(&quot;STATE %s\n&quot;, armed and &quot;armed&quot; or &quot;disarmed&quot;))
+    local vbat = getValue(&quot;RxBt&quot;) or 0        -- CRSF telemetry; 0 when the sensor is missing
+    local rssi = getValue(&quot;1RSS&quot;) or 0
+    serialWrite(string.format(&quot;S,%s,%d,%.2f,%d\n&quot;, fmName or &quot;?&quot;, armed and 1 or 0, vbat, rssi))
     lastSend = now
   end
 end
@@ -136,6 +156,11 @@ return { name = &quot;Companion&quot;, create = create, update = update, refresh
 <p>Источник истины для «arm» — тумблер плюс heartbeat, а не состояние из телеметрии CRSF: оно может отсутствовать или запаздывать.</p>
 <h4 class="md-subheading">Шаг 4. Структура репозитория</h4>
 <p><code>firmware/</code> (PlatformIO), <code>lua/</code> (скрипты пульта), <code>web/</code> (страница настроек, отдаётся с ESP32), <code>docs/</code> (протокол сообщений). Протокол — отдельный документ: каждая строка, её поля и кто имеет право её слать.</p>
+<h4 class="md-subheading">Что должно получиться и что записать</h4>
+<ul><li><strong>Эхо-тест.</strong> 200+ символов уходят и возвращаются без потерь и искажений. Если теряются, почти всегда виновата скорость порта или земля. Сначала добейся чистого эха с USB-UART, только потом подключай ESP32 — иначе непонятно, чья ошибка.</li><li><strong>Поток S-строк.</strong> В отладочном выводе ESP32 (USB-порт, <code>Serial</code>) строки <code>S,…</code> приходят каждые 500 мс ± 50 мс, и видимость виджета на экране пульта на это не влияет: <code>tick()</code> вызывается и из <code>refresh()</code>, и из <code>background()</code>.</li><li><strong>Переходы.</strong> Запиши время каждого перехода по отладочным меткам <code>millis()</code>. Дизарм — через 3 с GROUND и точка доступа Wi-Fi. Арм — сразу FLIGHT, Wi-Fi выключен. Кабель от пульта выдернут в GROUND — через 2 с FLIGHT. Мусорная строка не меняет состояние.</li><li><strong>Проверка на ПК без пульта.</strong> Те же сценарии проверяются эмулятором: скрипт на ПК шлёт S-строки в USB-UART с нужным темпом и обрывом. Это быстрее и повторяемее, чем щёлкать тумблером.</li></ul>
+<h4 class="md-subheading">docs/protocol.md</h4>
+<p>Каждая строка протокола — отдельный раздел: формат (<code>S,&lt;mode&gt;,&lt;armed&gt;,&lt;vbat&gt;,&lt;rssi&gt;</code>), поля и единицы, кто шлёт и как часто, что делает получатель при ошибке формата и при отсутствии строк. Протокол, которого нет в документе, превращается в «как в коде» и ломается при первой правке.</p>
+<p>Лабораторная засчитывается, когда эхо-тест с USB-UART проходит на 200+ символах, виджет шлёт S-строки из <code>refresh()</code> и <code>background()</code>, ESP32 уходит в FLIGHT по таймауту строк с измеренным временем, а протокол описан в <code>docs/</code>.</p>
 
 <h2>Диагностика</h2>
 <div class="diag-groups"><article class="diag-item"><h4><strong>Симптом:</strong> компаньон теряет связь при смене экрана пульта</h4><ul><li>Возможная причина: отправка только в <code>refresh()</code>.</li><li>Что сделать: общий <code>tick()</code> в <code>refresh()</code> и <code>background()</code>.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> строки приходят обрезанными</h4><ul><li>Возможная причина: <code>serialRead</code> вызывается реже, чем приходят данные, буфер переполняется.</li><li>Что сделать: читать в каждом <code>tick()</code>, укоротить сообщения, снизить частоту.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> точка доступа поднялась в полёте</h4><ul><li>Возможная причина: защита только на одной стороне.</li><li>Что сделать: проверка арма и в Lua, и в прошивке; таймаут heartbeat → FLIGHT.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> ESP32 перезагружается при включении Wi-Fi</h4><ul><li>Возможная причина: просадка питания (пики 300–500 мА).</li><li>Что сделать: конденсатор 470 мкФ на 3.3 В, BEC/LDO с запасом, не питать от пина пульта без проверки тока.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> Lua на пульте не видит ответов ESP32</h4><ul><li>Возможная причина: порт AUX не в режиме Lua, скорость, TX/RX.</li><li>Что сделать: Hardware → AUX = Lua, <code>setSerialBaudrate</code>, анализатор на линии.</li></ul></article></div>

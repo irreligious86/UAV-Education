@@ -67,20 +67,27 @@ ESP32 как компонент системы: шлёт `HEARTBEAT` (свой c
 #include <WiFi.h>
 #include <esp_wifi.h>
 
-enum class Mode { FLIGHT, CONFIG };
+enum class Mode { FLIGHT, GROUND };
 Mode mode = Mode::FLIGHT;            // undefined state == FLIGHT
-unsigned long lastHeartbeat = 0;
-const unsigned long HEARTBEAT_TIMEOUT_MS = 3000;
+unsigned long lastLine = 0;          // last valid S-line from the radio
+unsigned long disarmedSince = 0;     // 0 = not continuously disarmed
+const unsigned long LINE_TIMEOUT_MS = 2000;
+const unsigned long GROUND_AFTER_MS = 3000;
 
 void radioOff() {
   WiFi.mode(WIFI_OFF);
   esp_wifi_stop();                   // verifiable off, not assumed off
 }
 
-void enterConfig() {
+void enterGround() {
   WiFi.mode(WIFI_AP);
   WiFi.softAP("tx16s-companion", "change-me");
-  mode = Mode::CONFIG;
+  mode = Mode::GROUND;
+}
+
+void enterFlight() {
+  radioOff();
+  mode = Mode::FLIGHT;
 }
 
 void setup() {
@@ -90,33 +97,46 @@ void setup() {
 }
 
 void loop() {
+  unsigned long now = millis();
   if (Serial1.available()) {
     String line = Serial1.readStringUntil('\n');   // one line == one message
-    lastHeartbeat = millis();
     // S,<mode>,<armed>,<vbat>,<rssi>  — the protocol above; armed is the third field
     if (line.startsWith("S,")) {
       int a = line.indexOf(',', 2);                 // end of <mode>
-      bool armed = a > 0 && line.charAt(a + 1) == '1';
-      if (armed && mode == Mode::CONFIG) { radioOff(); mode = Mode::FLIGHT; }
-      else if (!armed && mode == Mode::FLIGHT) enterConfig();
+      if (a > 0 && a + 1 < (int)line.length()) {
+        lastLine = now;
+        bool armed = line.charAt(a + 1) == '1';
+        if (armed) {
+          disarmedSince = 0;
+          if (mode == Mode::GROUND) enterFlight();  // any armed=1 -> FLIGHT at once
+        } else {
+          if (disarmedSince == 0) disarmedSince = now;
+          if (mode == Mode::FLIGHT && now - disarmedSince >= GROUND_AFTER_MS) enterGround();
+        }
+      }
     }
   }
-  if (millis() - lastHeartbeat > HEARTBEAT_TIMEOUT_MS && mode == Mode::CONFIG) {
-    radioOff(); mode = Mode::FLIGHT;  // lost the radio: fail safe
+  if (mode == Mode::GROUND && now - lastLine > LINE_TIMEOUT_MS) {
+    enterFlight();                    // lost the radio: fail safe
+    disarmedSince = 0;
   }
 }
 ```
 
 ### Шаг 3. Виджет EdgeTX с общим tick()
 ```lua
--- companion.lua (widget): send state every 500 ms whether visible or not
+-- companion.lua (widget): send the S-line every 500 ms whether visible or not
+-- protocol: S,<mode>,<armed>,<vbat>,<rssi>\n  (see docs/protocol.md)
 local lastSend = 0
 
 local function tick()
   local now = getTime()                       -- 10 ms units
   if now - lastSend >= 50 then
+    local _, fmName = getFlightMode()
     local armed = getValue("sa") > 0          -- example: arm switch on SA
-    serialWrite(string.format("STATE %s\n", armed and "armed" or "disarmed"))
+    local vbat = getValue("RxBt") or 0        -- CRSF telemetry; 0 when the sensor is missing
+    local rssi = getValue("1RSS") or 0
+    serialWrite(string.format("S,%s,%d,%.2f,%d\n", fmName or "?", armed and 1 or 0, vbat, rssi))
     lastSend = now
   end
 end
@@ -136,6 +156,17 @@ return { name = "Companion", create = create, update = update, refresh = refresh
 
 ### Шаг 4. Структура репозитория
 `firmware/` (PlatformIO), `lua/` (скрипты пульта), `web/` (страница настроек, отдаётся с ESP32), `docs/` (протокол сообщений). Протокол — отдельный документ: каждая строка, её поля и кто имеет право её слать.
+
+### Что должно получиться и что записать
+- **Эхо-тест.** 200+ символов уходят и возвращаются без потерь и искажений. Если теряются, почти всегда виновата скорость порта или земля. Сначала добейся чистого эха с USB-UART, только потом подключай ESP32 — иначе непонятно, чья ошибка.
+- **Поток S-строк.** В отладочном выводе ESP32 (USB-порт, `Serial`) строки `S,…` приходят каждые 500 мс ± 50 мс, и видимость виджета на экране пульта на это не влияет: `tick()` вызывается и из `refresh()`, и из `background()`.
+- **Переходы.** Запиши время каждого перехода по отладочным меткам `millis()`. Дизарм — через 3 с GROUND и точка доступа Wi-Fi. Арм — сразу FLIGHT, Wi-Fi выключен. Кабель от пульта выдернут в GROUND — через 2 с FLIGHT. Мусорная строка не меняет состояние.
+- **Проверка на ПК без пульта.** Те же сценарии проверяются эмулятором: скрипт на ПК шлёт S-строки в USB-UART с нужным темпом и обрывом. Это быстрее и повторяемее, чем щёлкать тумблером.
+
+### docs/protocol.md
+Каждая строка протокола — отдельный раздел: формат (`S,<mode>,<armed>,<vbat>,<rssi>`), поля и единицы, кто шлёт и как часто, что делает получатель при ошибке формата и при отсутствии строк. Протокол, которого нет в документе, превращается в «как в коде» и ломается при первой правке.
+
+Лабораторная засчитывается, когда эхо-тест с USB-UART проходит на 200+ символах, виджет шлёт S-строки из `refresh()` и `background()`, ESP32 уходит в FLIGHT по таймауту строк с измеренным временем, а протокол описан в `docs/`.
 
 ## diagnostics
 - **Симптом:** компаньон теряет связь при смене экрана пульта

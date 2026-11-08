@@ -72,7 +72,27 @@
 <h4 class="md-subheading">Шаг 3. Настройки</h4>
 <p>Проверить <code>GPS_RATE_MS</code>, <code>GPS_GNSS_MODE</code>, <code>GPS_NAVFILTER</code> (или аналоги в INAV/Betaflight: <code>gps_ublox_use_galileo</code>, динамическая модель), <code>GPS_AUTO_CONFIG</code>. Записать в паспорт сборки.</p>
 <h4 class="md-subheading">Шаг 4. Оценка потребности в RTK</h4>
-<p>Для своей задачи — нужен ли RTK? Обосновать по требованиям точности (инженерная папка). Лабораторная: таблица условий, пример многолучёвости, настройки проверены.</p>
+<p>Для своей задачи — нужен ли RTK? Обосновать по требованиям точности (инженерная папка).</p>
+<h4 class="md-subheading">Скрипт: разброс позиции на месте</h4>
+<pre class="cli-block"><code>import math, sys
+from pymavlink import DFReader
+
+log = DFReader.DFReader_binary(sys.argv[1])
+pts, worst_hdop, min_sats = [], 0.0, 99
+while (m := log.recv_match(type=&quot;GPS&quot;)) is not None:
+    if m.Status &lt; 3:                      # no 3D fix yet
+        continue
+    pts.append((m.Lat, m.Lng))
+    worst_hdop, min_sats = max(worst_hdop, m.HDop), min(min_sats, m.NSats)
+lat0, lon0 = pts[0]
+xy = [((la - lat0) * 111_320, (lo - lon0) * 111_320 * math.cos(math.radians(lat0))) for la, lo in pts]
+cx, cy = sum(p[0] for p in xy) / len(xy), sum(p[1] for p in xy) / len(xy)
+r = sorted(math.hypot(x - cx, y - cy) for x, y in xy)
+print(f&quot;{len(r)} fixes, median {r[len(r) // 2]:.2f} m, p95 {r[int(len(r) * 0.95)]:.2f} m, max {r[-1]:.2f} m, &quot;
+      f&quot;worst HDOP {worst_hdop:.2f}, min sats {min_sats}&quot;)</code></pre>
+<h4 class="md-subheading">Что должно получиться и что записать</h4>
+<ul><li><strong>Открытое поле:</strong> много спутников (с несколькими созвездиями — 20 и больше), HDOP около 1 и ниже, разброс на месте — метр–два. Это эталон, с которым сравниваются другие условия.</li><li><strong>У стены:</strong> спутников меньше, HDOP выше, а главное — скачки позиции на метры из-за отражённого сигнала (многолучёвость). Разброс p95 и max вырастут кратно, хотя число спутников может остаться приличным. Именно поэтому «спутников много» — не гарантия.</li><li><strong>Под деревьями:</strong> сигнал ослаблен, фиксация теряется чаще (<code>Status</code> падает), <code>HAcc</code> в <code>GPA</code> растёт.</li><li><strong>Настройки:</strong> запиши фактические значения параметров GNSS своей версии ArduPilot (в 4.6+ часть параметров приёмника — с префиксом <code>GPS1_</code>, например <code>GPS1_TYPE</code>; сверяйся со списком параметров).</li></ul>
+<p>Лабораторная засчитывается, когда HDOP, число спутников и разброс позиции записаны для трёх условий, многолучёвость показана скачками позиции на логе у стены, настройки приёмника проверены и записаны в паспорт, а решение о RTK обосновано требованиями точности.</p>
 
 <h2>Диагностика</h2>
 <div class="diag-groups"><article class="diag-item"><h4><strong>Симптом:</strong> долгий поиск спутников после включения</h4><ul><li>Возможная причина: холодный старт, антенна под карбоном, помехи от USB/камеры.</li><li>Что сделать: мачта, ground plane, модуль про EMI; дать 1–2 минуты.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> HDOP &gt; 2 при 15 спутниках</h4><ul><li>Возможная причина: спутники с одной стороны (стена, крыша).</li><li>Что сделать: открытое небо; не армить в GPS-режимах.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> позиция прыгает на 10–30 м в городе</h4><ul><li>Возможная причина: многолучёвость.</li><li>Что сделать: выше над рамой, helix-антенна, не доверять Loiter у зданий.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> «GPS glitch» в сообщениях ArduPilot</h4><ul><li>Возможная причина: скачок позиции/скорости за ворота EKF.</li><li>Что сделать: лог <code>GPS</code>/<code>XKF4</code>, источник помехи, при повторении — failsafe настройки.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> RTK не выходит в Fixed</h4><ul><li>Возможная причина: далеко от базы, плохая связь RTCM, одночастотный приёмник.</li><li>Что сделать: проверить поток RTCM, расстояние, антенны обоих концов.</li></ul></article></div>
