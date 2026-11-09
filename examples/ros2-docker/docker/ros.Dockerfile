@@ -13,9 +13,13 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 # Micro XRCE-DDS Agent for PX4's uXRCE-DDS client (pinned release)
 WORKDIR /opt
+# Installed into its own prefix: its bundled Fast-CDR must not shadow the one ROS ships (Humble uses Fast-CDR 1.x,
+# and micro_ros_agent below fails to compile against 2.x headers in /usr/local).
 RUN git clone --depth 1 -b v2.4.3 https://github.com/eProsima/Micro-XRCE-DDS-Agent.git \
- && cmake -S Micro-XRCE-DDS-Agent -B Micro-XRCE-DDS-Agent/build -DCMAKE_BUILD_TYPE=Release \
- && cmake --build Micro-XRCE-DDS-Agent/build -j"$(nproc)" && cmake --install Micro-XRCE-DDS-Agent/build && ldconfig
+ && cmake -S Micro-XRCE-DDS-Agent -B Micro-XRCE-DDS-Agent/build -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/opt/xrce \
+ && cmake --build Micro-XRCE-DDS-Agent/build -j"$(nproc)" && cmake --install Micro-XRCE-DDS-Agent/build \
+ && echo /opt/xrce/lib > /etc/ld.so.conf.d/xrce.conf && ldconfig
+ENV PATH=/opt/xrce/bin:$PATH
 
 WORKDIR /ws
 # px4_msgs must match the PX4 release you fly (message versioning since v1.16)
