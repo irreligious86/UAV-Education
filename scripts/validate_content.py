@@ -18,6 +18,7 @@ ROOT = Path(__file__).resolve().parent.parent
 MANIFEST_PATH = ROOT / "data" / "content-manifest.json"
 REQUIRED_ARTICLE_KEYS = ("id", "title", "level", "order", "status", "sourceFile", "type")
 REQUIRED_MD_HEADINGS = ("summary", "theory", "practice", "diagnostics", "references")
+PRACTICE_MIN_WORDS = 150
 
 
 def load_manifest():
@@ -225,6 +226,13 @@ def validate_published_sections(md_path, published):
     for marker in PLACEHOLDER_MARKERS:
         if marker.lower() in text.lower():
             errors.append(f"{rel}: published-статья содержит заглушку «{marker}» — допиши или поставь status: planned")
+    # practice must teach, not just list steps: at least PRACTICE_MIN_WORDS of prose (code blocks excluded)
+    pm = re.search(r"^## practice\n(.*?)(?=^## |\Z)", raw_body, re.M | re.S)
+    if pm:
+        prose = re.sub(r"```.*?```", "", pm.group(1), flags=re.S)
+        n = len(prose.split())
+        if n < PRACTICE_MIN_WORDS:
+            errors.append(f"{rel}: в «## practice» {n} слов прозы без кода (< {PRACTICE_MIN_WORDS}); добавь ожидаемые результаты, что записать и критерии зачёта")
     m = re.search(r"^## references\n(.*?)(?=^## |\Z)", raw_body, re.M | re.S)
     if m:
         refs = [ln for ln in m.group(1).splitlines() if ln.strip()]

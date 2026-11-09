@@ -13,7 +13,7 @@ practice-depth debt the Stage 4 audit found.
 | 3 | Go live | Alex creates the Supabase project and enables the flag (`MULTIUSER-PLAN.md` §8); smoke test with three real accounts (student, admin, superadmin) | registration email arrives, roles behave as the access table says |
 | 4 | Server-side grading | Edge Function grades quizzes (answers off the client), signed grader results for labs; admin sees "verified" vs "self-reported" | a student cannot raise their own score from the browser |
 | 5 | Cohorts | groups, admin sees own group, deadlines, CSV per group | — |
-| 6 | Practice depth pass | 41 modules have under 150 words of practice prose (code excluded); add expected outputs, numbers to record and a worked result per step, thinnest first: comp-mavlink, bf-cli-automation, ap-sitl, ops-field, data-python, px4-intro, f-motors-esc, ap-logs, f-components-choice, px4-architecture | every published module ≥ 150 words of practice prose or a justified exception |
+| 6 ◐ | Practice depth pass — all 41 modules done (2026-11-09); independent fact-check running | 41 modules have under 150 words of practice prose (code excluded); add expected outputs, numbers to record and a worked result per step, thinnest first: comp-mavlink, bf-cli-automation, ap-sitl, ops-field, data-python, px4-intro, f-motors-esc, ap-logs, f-components-choice, px4-architecture | every published module ≥ 150 words of practice prose or a justified exception |
 | 7 | SITL in CI | postponed by Alex (runs SITL locally); revisit after iteration 6 | — |
 
 Done outside the table on 2026-11-09: comp-raspberry and per-tracking deepened (the last two thin modules

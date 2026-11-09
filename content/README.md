@@ -38,3 +38,7 @@ Standard GitHub-style Markdown tables are supported inside any section:
 - On a phone each row is shown as a card ("Header: value"), on a desktop as a normal table.
 - `check_rendering.py` (in `publish.py` and CI) fails the build if a table, `**bold**`, a heading
   or a `{{diagram}}` tag ever shows up in a page as raw text.
+
+## Practice depth
+
+A published module needs at least 150 words of prose in `## practice` (code blocks excluded): expected results, numbers to record, a worked example and the lab acceptance line. `scripts/validate_content.py` enforces it.
