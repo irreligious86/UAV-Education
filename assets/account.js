@@ -71,7 +71,13 @@
   // ------------------------------------------------------------------ local storage helpers
   function readLocal() { try { return JSON.parse(localStorage.getItem(KEY) || "{}"); } catch (e) { return {}; } }
   function writeLocal(d) { try { localStorage.setItem(KEY, JSON.stringify(d)); } catch (e) { /* storage off */ } }
-  function clearLocal() { try { localStorage.removeItem(KEY); localStorage.removeItem(PENDING); localStorage.removeItem(OWNER); } catch (e) { /* ignore */ } }
+  function clearLocal() {
+    try {
+      localStorage.removeItem(KEY); localStorage.removeItem(PENDING); localStorage.removeItem(OWNER);
+      // exam picks of this account must not stay for the next person on a shared browser (review 2026-11-09, L5)
+      Object.keys(localStorage).forEach(function (k) { if (k.indexOf("uav-student:exam-draft:") === 0) localStorage.removeItem(k); });
+    } catch (e) { /* ignore */ }
+  }
   // Progress of another account left in this browser is wiped, never merged into the next account;
   // anonymous (ownerless) progress is merged on first login, as intended.
   function claimLocal(id) {

@@ -34,4 +34,4 @@ real server-side grading, no cohorts.
 | 11 ✅ | Quizzes to 8 questions — 65 questions added, every bank has 8 (fact-check in 14) | 52 banks below 8; same bias rule (correct answer longest in ≤ 34 %) | all banks ≥ 8 |
 | 12 ✅ | Glossary — 69 terms added (185 total), every module has at least one, the validator enforces it (fact-check in 14) | terms introduced by Stage 4–5 modules, each linked to its module | new terms searchable on the glossary page |
 | 13 ✅ | Cohorts — `0003_cohorts.sql`, 11 RLS tests, admin filter and CSV per group, students see their own group names (security review in 14) | groups created by admins, students added to groups, filter and CSV per group on the admin page; access matrix unchanged | admin page filters by group, RLS tests extended |
-| 14 | Verification | independent fact-check of 10–12, security review of 9 and 13, CI green, report | findings applied |
+| 14 🔄 | Verification — security review applied (0004, 11 regression tests); fact-check applied in the next commit | independent fact-check of 10–12, security review of 9 and 13, CI green, report | findings applied |

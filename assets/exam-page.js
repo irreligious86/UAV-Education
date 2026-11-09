@@ -99,7 +99,7 @@
       var ok = r.your === r.answer;
       return '<li><strong>' + esc(x.q) + "</strong><br>" + (ok ? "✓ " : "✗ ") + "твой ответ: " + esc(r.your == null ? "—" : x.options[r.your]) +
         (ok ? "" : " · верно: " + esc(x.options[r.answer])) + (r.explain ? '<br><span class="gc-muted">' + esc(r.explain) + "</span>" : "") + "</li>";
-    }).join("") : '<li class="gc-muted">Разбор ответов для этого экзамена скрыт.</li>';
+    }).join("") : '<li class="gc-muted">Разбор ответов скрыт: он появится после последней попытки или когда экзамен закроется (если преподаватель его включил).</li>';
     current = null;
   }
 

@@ -206,3 +206,90 @@ def test_anon_has_no_exam_access(db, users):
     for t in ("public.exams", "public.exam_questions", "public.exam_attempts", "public.exam_results"):
         savepoint_raises(db, errors.InsufficientPrivilege, f"select * from {t}")
     savepoint_raises(db, errors.InsufficientPrivilege, "select public.exam_start(%s)", (uuid.uuid4(),))
+
+
+# ------------------------------------------------------------------ review 2026-11-09 (migration 0004)
+def test_question_cannot_leave_a_frozen_bank(db, users):
+    """M1: moving questions to an unused exam used to dodge the freeze and regrade running attempts."""
+    eid = make_exam(db, users["adam"], n=2, per_attempt=2)
+    act(db, users["adam"])
+    other = db.execute("insert into public.exams (title) values ('scratch') returning id").fetchone()[0]
+    start(db, users["alice"], eid)
+    act(db, users["adam"])
+    savepoint_raises(db, errors.InsufficientPrivilege, "update public.exam_questions set exam_id = %s where exam_id = %s", (other, eid))
+    savepoint_raises(db, errors.InsufficientPrivilege, "delete from public.exam_questions where exam_id = %s", (eid,))
+
+
+def test_question_exam_id_is_not_writable(db, users):
+    eid = make_exam(db, users["adam"], n=1, per_attempt=1)
+    act(db, users["adam"])
+    other = db.execute("insert into public.exams (title) values ('scratch') returning id").fetchone()[0]
+    savepoint_raises(db, errors.InsufficientPrivilege, "update public.exam_questions set exam_id = %s where exam_id = %s", (other, eid))
+    assert db.execute("update public.exam_questions set q = 'Edited question?' where exam_id = %s", (eid,)).rowcount == 1
+
+
+def test_deadline_never_passes_closes_at(db, users):
+    """L1"""
+    eid = make_exam(db, users["adam"], minutes=240)
+    as_postgres(db)
+    db.execute("update public.exams set closes_at = now() + interval '5 minutes' where id = %s", (eid,))
+    r = start(db, users["alice"], eid)
+    as_postgres(db)
+    dl, cl = db.execute("""select a.deadline, e.closes_at from public.exam_attempts a join public.exams e on e.id = a.exam_id
+                           where a.id = %s""", (r["attempt"],)).fetchone()
+    assert dl <= cl
+
+
+def test_answers_filtered_and_bounded(db, users):
+    """L2: odd numbers do not abort the submit, junk is not stored, huge payloads are refused."""
+    eid = make_exam(db, users["adam"], n=3, per_attempt=3)
+    r = start(db, users["alice"], eid)
+    savepoint_raises(db, errors.InvalidParameterValue, "select public.exam_submit(%s, %s)",
+                     (r["attempt"], json.dumps({f"k{i}": "x" * 1000 for i in range(200)})))
+    ids = [str(q["id"]) for q in r["questions"]]
+    res = db.execute("select public.exam_submit(%s, %s)",
+                     (r["attempt"], json.dumps({ids[0]: 1.5, ids[1]: 10 ** 12, ids[2]: 1, "junk": 0}))).fetchone()[0]
+    assert res["total"] == 3
+    as_postgres(db)
+    stored = db.execute("select answers from public.exam_attempts where id = %s", (r["attempt"],)).fetchone()[0]
+    assert stored == {ids[2]: 1}
+
+
+def test_exam_settings_frozen_after_attempts(db, users):
+    """L3: an exam that has been taken cannot be turned into something else; authorship is the database's."""
+    eid = make_exam(db, users["adam"])
+    start(db, users["alice"], eid)
+    act(db, users["adam"])
+    for col, val in (("title", "Practice only"), ("pass_pct", 1), ("questions_per_attempt", 50), ("time_limit_min", 240)):
+        savepoint_raises(db, errors.InsufficientPrivilege, f"update public.exams set {col} = %s where id = %s", (val, eid))
+    assert db.execute("update public.exams set published = false, attempts_allowed = 3 where id = %s", (eid,)).rowcount == 1
+    db.execute("update public.exams set created_by = %s, created_at = '2000-01-01' where id = %s", (users["boss"], eid))
+    assert db.execute("select created_by from public.exams where id = %s", (eid,)).fetchone() == (users["adam"],)
+    forged = db.execute("insert into public.exams (title, created_by) values ('forged author', %s) returning created_by",
+                        (users["boss"],)).fetchone()[0]
+    assert forged == users["adam"]
+
+
+def test_review_only_after_the_last_attempt(db, users):
+    """L4: with two attempts allowed, the first review would be the key for the second."""
+    eid = make_exam(db, users["adam"], n=4, per_attempt=3, attempts=2)
+    r1 = start(db, users["alice"], eid)
+    assert db.execute("select public.exam_submit(%s, '{}')", (r1["attempt"],)).fetchone()[0]["review"] is None
+    r2 = start(db, users["alice"], eid)
+    assert len(db.execute("select public.exam_submit(%s, '{}')", (r2["attempt"],)).fetchone()[0]["review"]) == 3
+
+
+def test_attempts_are_numbered(db, users):
+    eid = make_exam(db, users["adam"], attempts=2)
+    r1 = start(db, users["alice"], eid)
+    db.execute("select public.exam_submit(%s, '{}')", (r1["attempt"],))
+    start(db, users["alice"], eid)
+    as_postgres(db)
+    assert [n for (n,) in db.execute("select attempt_no from public.exam_attempts where exam_id = %s order by attempt_no", (eid,))] == [1, 2]
+
+
+def test_browser_roles_have_no_sequence_privileges(db):
+    rows = db.execute("""select c.relname from pg_class c join pg_namespace n on n.oid = c.relnamespace
+                         where n.nspname = 'public' and c.relkind = 'S'
+                           and (has_sequence_privilege('anon', c.oid, 'usage') or has_sequence_privilege('authenticated', c.oid, 'usage'))""").fetchall()
+    assert rows == []

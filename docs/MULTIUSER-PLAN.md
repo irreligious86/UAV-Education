@@ -106,7 +106,7 @@ owner's registration (the database also refuses unconfirmed or mismatched accoun
 
 1. Create a project at supabase.com (free tier), region close to students.
 2. SQL editor → run every file in `supabase/migrations/` in order: `0001_accounts_roles_progress.sql`,
-   `0002_exams.sql`, `0003_cohorts.sql` (each is one transaction; a later one needs the earlier ones).
+   `0002_exams.sql`, `0003_cohorts.sql`, `0004_exam_hardening.sql` (each is one transaction; a later one needs the earlier ones).
 3. Authentication → Providers → Email: keep "Confirm email" on; minimum password length ≥ 10.
    Authentication → Emails → SMTP: set a custom SMTP sender — the built-in sender only delivers to the
    project team and is heavily rate-limited, students would never get the confirmation mail.
@@ -129,8 +129,8 @@ accepted: it reveals who is enrolled, not emails or grades.
 
 | Piece | File |
 |---|---|
-| Schema, roles, RLS | `supabase/migrations/0001_accounts_roles_progress.sql`, `0002_exams.sql`, `0003_cohorts.sql` |
-| Policy tests (Postgres 16, CI job `database-access-rules`) | `supabase/tests/test_rls.py`, `test_exams.py`, `test_cohorts.py`, `supabase_stub.sql` |
+| Schema, roles, RLS | `supabase/migrations/0001_accounts_roles_progress.sql`, `0002_exams.sql`, `0003_cohorts.sql`, `0004_exam_hardening.sql` |
+| Policy tests (Postgres 16, CI job `database-access-rules`) | `supabase/tests/test_rls.py`, `test_exams.py`, `test_cohorts.py`, `test_zz_concurrency.py` (races, several connections), `supabase_stub.sql` |
 | Feature flag and keys | `assets/backend-config.js` |
 | Auth, sync, merge, staff API | `assets/account.js` (merge rules tested in `tests/js/merge.test.js`) |
 | Pages | `pages/account.html` + `assets/account-page.js`, `pages/admin.html` + `assets/admin-page.js` |
@@ -157,7 +157,7 @@ uses **exams whose question banks exist only in the database** (`supabase/migrat
 |---|---|
 | admin, superadmin | upload a bank (JSON, the course quiz format plus exam settings), publish or unpublish it, delete it while nobody has taken it, see every attempt and export CSV |
 | student | see published exams, start an attempt (random subset of questions **without answers**, timer), resume it after a reload, submit once |
-| database | grades the submission, enforces the deadline (+30 s grace), the attempt limit and the exam window, freezes a bank once anyone has taken it |
+| database | grades the submission, enforces the deadline (+30 s grace, never past `closes_at`), the attempt limit (also under parallel requests) and the exam window, freezes a bank and the grading settings once anyone has taken it, shows the answer review only after the last allowed attempt or after the exam closes |
 | nobody | read the bank from the browser as a student, write or change a score, delete an attempt — not even the superadmin |
 
 Bank format (`pages/admin.html` → "Загрузить банк JSON"):
@@ -187,3 +187,15 @@ Deleting a group deletes only the memberships; grades and accounts stay. A demot
 groups at once (the policies call `is_staff()` on every query).
 Tests: `supabase/tests/test_cohorts.py` (11), `tests/e2e/cohorts.e2e.js` (create → add → filter → CSV per
 group → student view → remove → delete).
+
+## 13. Security review of exams and cohorts (2026-11-09)
+
+Second independent review (`docs/reviews/security-2026-11-09-exams-cohorts.md`), all findings fixed in
+`supabase/migrations/0004_exam_hardening.sql` and the pages, each with a regression test that fails without the fix:
+parallel `exam_start` calls could exceed the attempt limit and harvest the key from a second attempt (H1);
+staff could move questions out of a frozen bank and regrade running attempts (M1); the deadline ignored
+`closes_at` (L1); answers were stored unbounded and odd numbers aborted the submit (L2); a taken exam's title
+and grading settings could change (L3); the review of attempt 1 was the key for attempt 2 (L4); exam picks
+survived logout on a shared browser (L5); browser roles kept sequence privileges; CSV quoting missed `\r`.
+Cohorts were found sound.
+

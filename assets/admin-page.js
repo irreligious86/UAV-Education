@@ -120,7 +120,7 @@
       return r.map(function (v) {
         v = String(v == null ? "" : v);
         if (/^[=+\-@\t\r]/.test(v)) v = "'" + v;      // no formulas when the CSV is opened in a spreadsheet
-        return /[",\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v;
+        return /[",\r\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v;
       }).join(",");
     });
     var a = document.createElement("a");

@@ -98,8 +98,11 @@ const FAKE = fs.readFileSync(path.join(__dirname, "fake-supabase.js"), "utf8");
   const sw = await p.evaluate(() => document.documentElement.scrollWidth);
   assert.ok(sw <= 390, "exam page scrollWidth " + sw);
 
-  // 3. admin sees the result
+  // 3. admin sees the result; bob's logout wiped any exam picks left in this browser (review L5)
+  await p.evaluate(() => localStorage.setItem("uav-student:exam-draft:left-over", JSON.stringify({ attempt: "x", picks: { 1: 2 } })));
   await login("adam@example.org", "adminpassword1");
+  assert.deepStrictEqual(await p.evaluate(() => Object.keys(localStorage).filter((k) => k.startsWith("uav-student:exam-draft:"))), [],
+    "exam drafts must not survive a logout");
   await p.goto(`${BASE}/pages/admin.html`, { waitUntil: "networkidle" });
   await p.waitForFunction(() => /bob/.test(document.querySelector("[data-adm-exam-results]").textContent));
   const row = await p.textContent("[data-adm-exam-results]");

@@ -197,7 +197,9 @@
         });
         a.submitted_at = new Date().toISOString(); a.correct = correct; a.total = a.question_ids.length;
         a.score_pct = Math.round(100 * correct / Math.max(1, a.total)); a.passed = a.score_pct >= ex.pass_pct; save(db);
-        return ok({ correct: a.correct, total: a.total, score_pct: a.score_pct, passed: a.passed, review: ex.show_review ? review : null });
+        var usedN = db.exam_attempts.filter(function (x) { return x.exam_id === a.exam_id && x.user_id === a.user_id; }).length;
+        var last = usedN >= ex.attempts_allowed || (ex.closes_at && Date.now() > new Date(ex.closes_at).getTime());   // as in 0004
+        return ok({ correct: a.correct, total: a.total, score_pct: a.score_pct, passed: a.passed, review: ex.show_review && last ? review : null });
       }
       if (name !== "set_role") return fail("unknown rpc");
       if (!u || u.role !== "superadmin") return fail("only the superadmin can change roles");
