@@ -983,6 +983,7 @@ def render_account() -> str:
     <section class="gc-panel" data-acc="user" hidden>
       <p class="progress-headline"><span data-acc-username></span> <span class="gc-tag" data-acc-role></span></p>
       <p class="gc-muted">Почта: <span data-acc-email></span> · синхронизация: <span class="gc-tag" data-acc-sync></span></p>
+      <p class="gc-muted" data-acc-groups hidden>Группы: <span data-acc-group-names></span></p>
       <form class="acc-form acc-form--inline" data-form="rename">
         <label>Сменить имя <input type="text" name="username" pattern="[a-z0-9_]{3,32}" required></label>
         <gc-button type="submit" variant="secondary">Сохранить</gc-button>
@@ -1035,16 +1036,26 @@ def render_admin() -> str:
         <p class="gc-label gc-muted">Студенты</p>
         <div class="progress-actions">
           <input type="search" class="adm-filter" placeholder="поиск по имени или почте" data-adm-filter>
+          <select class="adm-filter adm-cohort" data-adm-cohort aria-label="Группа"><option value="">все группы</option></select>
           <gc-button variant="secondary" data-adm-csv>CSV</gc-button>
           <gc-button variant="secondary" data-adm-reload>Обновить</gc-button>
         </div>
         <div class="md-table-wrap"><table class="md-table adm-table">
-          <thead><tr><th>Имя</th><th>Почта</th><th>Роль</th><th>Освоено</th><th>Балл</th><th>Активность</th></tr></thead>
+          <thead><tr><th>Имя</th><th>Почта</th><th>Роль</th><th>Группы</th><th>Освоено</th><th>Балл</th><th>Активность</th></tr></thead>
           <tbody data-adm-rows></tbody>
         </table></div>
         <p class="gc-muted">Баллы считает браузер студента (квизы и задачи проверяются на его стороне): это видимость работы, а не экзамен — <code>docs/MULTIUSER-PLAN.md</code>, раздел 6.</p>
       </div>
       <div class="gc-panel" data-adm-detail hidden></div>
+      <div class="gc-panel" data-adm-cohorts-panel>
+        <p class="gc-label gc-muted">Группы</p>
+        <p class="gc-muted">Группа — это фильтр для оценок и CSV. Студента добавляют в группу в таблице выше; сам студент видит только названия своих групп. Удаление группы не трогает оценки.</p>
+        <form class="progress-actions acc-form" data-adm-cohort-form>
+          <input name="name" class="adm-filter" placeholder="название, например «Весна-2027»" maxlength="100" required data-adm-cohort-name>
+          <button type="submit" class="gc-tag">создать группу</button>
+        </form>
+        <ul class="progress-labs" data-adm-cohorts></ul>
+      </div>
       <div class="gc-panel" data-adm-exams-panel>
         <p class="gc-label gc-muted">Экзамены</p>
         <p class="gc-muted">Банк вопросов — JSON: <code>{"title", "pass_pct", "questions_per_attempt", "time_limit_min", "attempts_allowed", "show_review", "questions": [{"q", "options", "answer", "explain"}]}</code>. Файл квиза модуля тоже подходит, но его ответы публичны — для настоящего экзамена готовь закрытый банк и не кладите его в репозиторий.</p>

@@ -32,6 +32,20 @@
     form.addEventListener("keydown", function (e) { if (e.key === "Enter" && e.target.tagName === "INPUT") { e.preventDefault(); form.requestSubmit(); } });
   }
 
+  // the student's own groups (RLS returns only those); fetched once per signed-in user
+  var groupsFor = null;
+  function loadGroups(s) {
+    var uidNow = s.user && s.user.id;
+    if (!uidNow || groupsFor === uidNow || !window.UAVAccount.listCohorts) return;
+    groupsFor = uidNow;
+    window.UAVAccount.listCohorts().then(function (r) {
+      var mine = r.members.filter(function (m) { return m.user_id === uidNow; }).map(function (m) { return m.cohort_id; });
+      var names = r.cohorts.filter(function (c) { return mine.indexOf(c.id) >= 0; }).map(function (c) { return c.name; });
+      $("[data-acc-group-names]").textContent = names.join(", ");
+      $("[data-acc-groups]").hidden = names.length === 0;
+    }).catch(function () { groupsFor = null; });
+  }
+
   function render(s) {
     if (!s.enabled) return show("off");
     if (s.recovery && s.user) return show("recovery");
@@ -47,6 +61,7 @@
     sync.textContent = SYNC[s.sync] || s.sync;
     sync.setAttribute("data-state", s.sync === "saved" ? "ok" : s.sync === "offline" ? "caution" : "");
     $("[data-acc-admin]").hidden = !s.isStaff;
+    loadGroups(s);
     var rename = document.querySelector('[data-form="rename"] input');
     if (rename && !rename.value && p.username) rename.value = p.username;
   }

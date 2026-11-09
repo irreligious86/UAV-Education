@@ -8,7 +8,7 @@
   var DBK = "fake-supabase-db", SK = "fake-supabase-session";
   function load() {
     var d = JSON.parse(localStorage.getItem(DBK) || '{"users":[],"progress":{},"audit":[]}');
-    d.exams = d.exams || []; d.exam_questions = d.exam_questions || []; d.exam_attempts = d.exam_attempts || [];
+    d.exams = d.exams || []; d.cohorts = d.cohorts || []; d.cohort_members = d.cohort_members || []; d.exam_questions = d.exam_questions || []; d.exam_attempts = d.exam_attempts || [];
     return d;
   }
   function save(db) { localStorage.setItem(DBK, JSON.stringify(db)); }
@@ -30,6 +30,9 @@
     if (table === "student_progress") return rowsFor("profiles", db, u).map(function (p) {
       var g = db.progress[p.id] || {}; return Object.assign({}, p, { data: g.data || {}, updated_at: g.updated_at || null }); });
     if (table === "role_audit") return staff(u) ? db.audit.slice() : [];
+    if (table === "cohorts") return db.cohorts.filter(function (c) {
+      return staff(u) || (u && db.cohort_members.some(function (m) { return m.cohort_id === c.id && m.user_id === u.id; })); });
+    if (table === "cohort_members") return db.cohort_members.filter(function (m) { return staff(u) || (u && m.user_id === u.id); });
     if (table === "exams") return db.exams.filter(function (e) { return e.published || staff(u); });
     if (table === "exam_questions") return staff(u) ? db.exam_questions.slice() : [];
     if (table === "exam_results") return db.exam_attempts.filter(function (a) { return staff(u) || (u && a.user_id === u.id); }).map(function (a) {
@@ -65,6 +68,23 @@
       if (mode === "insert") {
         if (!staff(u)) return fail("new row violates row-level security policy");
         var rows = Array.isArray(payload) ? payload : [payload], made = [];
+        if (table === "cohorts") {
+          for (var ci = 0; ci < rows.length; ci++) {
+            var nm = String(rows[ci].name || "").trim();
+            if (nm.length < 2) return fail('new row violates check constraint "cohorts_name_check"');
+            if (db.cohorts.some(function (c) { return c.name.toLowerCase() === nm.toLowerCase(); })) return fail('duplicate key value violates unique constraint "cohorts_name_unique"');
+            var c = { id: "c-" + Math.random().toString(36).slice(2, 9), name: nm, created_by: u.id, created_at: new Date().toISOString() };
+            db.cohorts.push(c); made.push(c);
+          }
+        }
+        if (table === "cohort_members") {
+          for (var mi = 0; mi < rows.length; mi++) {
+            var r0 = rows[mi];
+            if (db.cohort_members.some(function (m) { return m.cohort_id === r0.cohort_id && m.user_id === r0.user_id; })) return fail('duplicate key value violates unique constraint "cohort_members_pkey"');
+            var mm = { cohort_id: r0.cohort_id, user_id: r0.user_id, added_by: u.id, added_at: new Date().toISOString() };
+            db.cohort_members.push(mm); made.push(mm);
+          }
+        }
         if (table === "exams") rows.forEach(function (r) {
           var e = Object.assign({ id: "e-" + Math.random().toString(36).slice(2, 9), pass_pct: 80, questions_per_attempt: 10, time_limit_min: 20,
                                   attempts_allowed: 1, show_review: true, published: false, created_at: new Date().toISOString() }, r);
@@ -83,6 +103,14 @@
       }
       if (mode === "delete") {
         var did = (filters.filter(function (f) { return f[0] === "id"; })[0] || [])[1];
+        if ((table === "cohorts" || table === "cohort_members") && staff(u)) {
+          var hit = function (r) { return filters.every(function (f) { return String(r[f[0]]) === String(f[1]); }); };
+          if (table === "cohorts") {
+            db.cohort_members = db.cohort_members.filter(function (m) { return m.cohort_id !== did; });
+            db.cohorts = db.cohorts.filter(function (c) { return !hit(c); });
+          } else db.cohort_members = db.cohort_members.filter(function (m) { return !hit(m); });
+          save(db); return ok(null);
+        }
         if (table !== "exams" || !staff(u)) return ok(null);
         if (db.exam_attempts.some(function (a) { return a.exam_id === did; })) return fail("violates foreign key constraint");
         db.exams = db.exams.filter(function (e) { return e.id !== did; });

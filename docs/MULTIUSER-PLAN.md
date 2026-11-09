@@ -43,6 +43,9 @@ table is protected by RLS. Moving to self-hosted Supabase or plain Postgres late
 | Make a user admin / back to student | — | — | ✓ |
 | Change the superadmin's role, create a second superadmin | — | — | — (impossible by design) |
 | See the role-change audit log | — | ✓ | ✓ |
+| Create / delete study groups, add or remove students | — | ✓ | ✓ |
+| See the names of **own** groups | ✓ | ✓ | ✓ |
+| See who else is in a group | — | ✓ | ✓ |
 
 Rules enforced in the database:
 - `profiles.role` cannot be changed by an UPDATE from the browser (column privileges); only
@@ -102,7 +105,8 @@ Order matters: the superadmin is created **before** the anon key is published, s
 owner's registration (the database also refuses unconfirmed or mismatched accounts).
 
 1. Create a project at supabase.com (free tier), region close to students.
-2. SQL editor → run `supabase/migrations/0001_accounts_roles_progress.sql`.
+2. SQL editor → run every file in `supabase/migrations/` in order: `0001_accounts_roles_progress.sql`,
+   `0002_exams.sql`, `0003_cohorts.sql` (each is one transaction; a later one needs the earlier ones).
 3. Authentication → Providers → Email: keep "Confirm email" on; minimum password length ≥ 10.
    Authentication → Emails → SMTP: set a custom SMTP sender — the built-in sender only delivers to the
    project team and is heavily rate-limited, students would never get the confirmation mail.
@@ -125,13 +129,13 @@ accepted: it reveals who is enrolled, not emails or grades.
 
 | Piece | File |
 |---|---|
-| Schema, roles, RLS | `supabase/migrations/0001_accounts_roles_progress.sql` |
-| Policy tests (Postgres 16, CI job `database-access-rules`) | `supabase/tests/test_rls.py`, `supabase/tests/supabase_stub.sql` |
+| Schema, roles, RLS | `supabase/migrations/0001_accounts_roles_progress.sql`, `0002_exams.sql`, `0003_cohorts.sql` |
+| Policy tests (Postgres 16, CI job `database-access-rules`) | `supabase/tests/test_rls.py`, `test_exams.py`, `test_cohorts.py`, `supabase_stub.sql` |
 | Feature flag and keys | `assets/backend-config.js` |
 | Auth, sync, merge, staff API | `assets/account.js` (merge rules tested in `tests/js/merge.test.js`) |
 | Pages | `pages/account.html` + `assets/account-page.js`, `pages/admin.html` + `assets/admin-page.js` |
 | supabase-js 2.45.4 (MIT), vendored, loaded only when enabled | `assets/vendor/supabase/` |
-| UI end-to-end with an in-memory fake backend | `tests/e2e/accounts.e2e.js`, `tests/e2e/fake-supabase.js` |
+| UI end-to-end with an in-memory fake backend | `tests/e2e/accounts.e2e.js`, `exams.e2e.js`, `cohorts.e2e.js`, `fake-supabase.js` |
 
 Login is by email; the username is the public handle shown to the administration (logging in by
 username would need a lookup that reveals which emails exist).
@@ -167,3 +171,19 @@ Bank format (`pages/admin.html` → "Загрузить банк JSON"):
 Keep real exam banks **out of the repository** — a bank committed to a public repo is a published answer key.
 Tests: `supabase/tests/test_exams.py` (22), `tests/e2e/exams.e2e.js` (upload → publish → take → resume →
 grade → admin results).
+
+## 12. Study groups (cohorts)
+
+A group is a label for filtering, not a permission: staff already read every student, so groups change
+nothing in the access matrix (`supabase/migrations/0003_cohorts.sql`).
+
+| Who | Can |
+|---|---|
+| admin, superadmin | create and delete groups (renaming is allowed by the database, no button yet); add a student to several groups, remove them; filter the grades table by group or "без группы"; CSV of exactly what the table shows, with a `groups` column |
+| student | see the names of their own groups on the account page — not the other members, not other groups |
+| nobody | join or leave a group by themselves, forge who added whom or when (set by the database) |
+
+Deleting a group deletes only the memberships; grades and accounts stay. A demoted admin loses access to
+groups at once (the policies call `is_staff()` on every query).
+Tests: `supabase/tests/test_cohorts.py` (11), `tests/e2e/cohorts.e2e.js` (create → add → filter → CSV per
+group → student view → remove → delete).

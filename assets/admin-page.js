@@ -1,5 +1,5 @@
 /*
- * pages/admin.html: grades of all students (admin, superadmin) and role management (superadmin).
+ * pages/admin.html: grades of all students (admin, superadmin), study groups (staff) and role management (superadmin).
  * The database decides what this page may read or change (RLS, set_role); the page only shows it.
  * Scores are computed with the same UAVGrading.moduleGrade the student sees.
  */
@@ -8,7 +8,7 @@
 
   var ROLE = { student: "студент", admin: "админ", superadmin: "суперадмин" };
   var base = "../";
-  var model = { rows: [], meta: null, titles: {}, me: null };
+  var model = { rows: [], meta: null, titles: {}, me: null, cohorts: [], members: [] };
 
   function $(sel) { return document.querySelector(sel); }
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
@@ -35,18 +35,60 @@
     return '<span class="gc-tag" data-state="' + (r.role === "superadmin" ? "critical" : r.role === "admin" ? "caution" : "ok") + '">' + ROLE[r.role] + "</span>";
   }
 
-  function renderRows() {
+  // ------------------------------------------------------------------ cohorts
+  function cohortName(id) { var c = model.cohorts.filter(function (x) { return x.id === id; })[0]; return c ? c.name : "?"; }
+  function groupsOf(uid) {
+    return model.members.filter(function (m) { return m.user_id === uid; }).map(function (m) { return m.cohort_id; })
+      .sort(function (a, b) { return cohortName(a).localeCompare(cohortName(b), "ru"); });
+  }
+
+  function groupCell(r) {
+    var mine = groupsOf(r.id);
+    var chips = mine.map(function (cid) {
+      return '<button type="button" class="gc-tag" data-unjoin="' + esc(cid) + '" data-user="' + esc(r.id) + '" title="убрать из группы">' + esc(cohortName(cid)) + " ×</button>";
+    }).join(" ");
+    var free = model.cohorts.filter(function (c) { return mine.indexOf(c.id) < 0; });
+    var add = free.length ? ' <select data-join-of="' + esc(r.id) + '" aria-label="Добавить ' + esc(r.username) + ' в группу"><option value="">+ группа</option>' +
+      free.map(function (c) { return '<option value="' + esc(c.id) + '">' + esc(c.name) + "</option>"; }).join("") + "</select>" : "";
+    return (chips || (model.cohorts.length ? "" : '<span class="gc-muted">—</span>')) + add;
+  }
+
+  function renderCohorts() {
+    var sel = $("[data-adm-cohort]"), cur = sel.value;
+    sel.innerHTML = '<option value="">все группы</option><option value="-">без группы</option>' + model.cohorts.map(function (c) {
+      return '<option value="' + esc(c.id) + '">' + esc(c.name) + "</option>";
+    }).join("");
+    sel.value = model.cohorts.some(function (c) { return c.id === cur; }) || cur === "-" ? cur : "";
+    $("[data-adm-cohorts]").innerHTML = model.cohorts.length ? model.cohorts.map(function (c) {
+      var n = model.members.filter(function (m) { return m.cohort_id === c.id; }).length;
+      return "<li><strong>" + esc(c.name) + "</strong> · студентов: " + n +
+        ' <button type="button" class="gc-tag" data-cohort-del="' + esc(c.id) + '" data-name="' + esc(c.name) + '">удалить группу</button></li>';
+    }).join("") : '<li class="gc-muted">Групп пока нет</li>';
+  }
+
+  function visibleRows() {
     var q = ($("[data-adm-filter]").value || "").trim().toLowerCase();
-    var rows = model.rows.filter(function (r) { return !q || r.username.indexOf(q) >= 0 || String(r.email).toLowerCase().indexOf(q) >= 0; });
+    var g = $("[data-adm-cohort]").value;
+    return model.rows.filter(function (r) {
+      if (q && r.username.indexOf(q) < 0 && String(r.email).toLowerCase().indexOf(q) < 0) return false;
+      var mine = groupsOf(r.id);
+      if (g === "-") return mine.length === 0;
+      return !g || mine.indexOf(g) >= 0;
+    });
+  }
+
+  function renderRows() {
+    var rows = visibleRows();
     $("[data-adm-rows]").innerHTML = rows.map(function (r) {
       return "<tr>" +
         '<td data-label="Имя"><button type="button" class="gc-tag" data-detail="' + esc(r.id) + '">' + esc(r.username) + "</button></td>" +
         '<td data-label="Почта">' + esc(r.email) + "</td>" +
         '<td data-label="Роль">' + roleCell(r) + "</td>" +
+        '<td data-label="Группы">' + groupCell(r) + "</td>" +
         '<td data-label="Освоено">' + r.g.mastered + " / " + r.g.total + "</td>" +
         '<td data-label="Балл">' + r.g.score + "</td>" +
         '<td data-label="Активность">' + when(r.updated_at) + "</td></tr>";
-    }).join("") || '<tr><td colspan="6" class="gc-muted">Никого не нашлось</td></tr>';
+    }).join("") || '<tr><td colspan="7" class="gc-muted">Никого не нашлось</td></tr>';
   }
 
   function renderDetail(id) {
@@ -87,10 +129,22 @@
     a.click();
   }
 
+  // ASCII file names: browsers fall back to "download" for some non-ASCII names
+  var TR = { "а": "a", "б": "b", "в": "v", "г": "g", "д": "d", "е": "e", "ё": "e", "ж": "zh", "з": "z", "и": "i", "й": "y", "к": "k", "л": "l", "м": "m",
+             "н": "n", "о": "o", "п": "p", "р": "r", "с": "s", "т": "t", "у": "u", "ф": "f", "х": "h", "ц": "ts", "ч": "ch", "ш": "sh", "щ": "sch",
+             "ъ": "", "ы": "y", "ь": "", "э": "e", "ю": "yu", "я": "ya", "і": "i", "ї": "yi", "є": "ye", "ґ": "g" };
+  function slug(s) {
+    return String(s).toLowerCase().replace(/[^\u0000-\u007f]/g, function (c) { return TR[c] != null ? TR[c] : "-"; })
+      .replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 40);
+  }
+
+  // exports what the table shows: the search and the group filter apply
   function csv() {
-    download([["username", "email", "role", "mastered", "total", "score", "updated_at"]].concat(model.rows.map(function (r) {
-      return [r.username, r.email, r.role, r.g.mastered, r.g.total, r.g.score, r.updated_at || ""];
-    })), "uav-students");
+    var g = $("[data-adm-cohort]").value;
+    var tag = g === "-" ? "-no-group" : g ? "-" + (slug(cohortName(g)) || "group") : "";
+    download([["username", "email", "role", "groups", "mastered", "total", "score", "updated_at"]].concat(visibleRows().map(function (r) {
+      return [r.username, r.email, r.role, groupsOf(r.id).map(cohortName).join("; "), r.g.mastered, r.g.total, r.g.score, r.updated_at || ""];
+    })), "uav-students" + tag);
   }
 
   function renderAudit(items) {
@@ -133,9 +187,10 @@
     var A = window.UAVAccount;
     if (typeof note !== "string") note = "";
     if (!note) msg("Загружаю…");
-    return Promise.all([A.listStudents(), A.audit()]).then(function (res) {
+    return Promise.all([A.listStudents(), A.audit(), A.listCohorts()]).then(function (res) {
       model.rows = res[0].map(function (r) { try { r.g = gradeStudent(r.data); } catch (e) { r.g = gradeStudent({}); } return r; });
-      renderRows(); renderAudit(res[1]); if (note) msg(note, "ok"); else msg("");
+      model.cohorts = res[2].cohorts; model.members = res[2].members;
+      renderCohorts(); renderRows(); renderAudit(res[1]); if (note) msg(note, "ok"); else msg("");
     }).catch(function (e) { msg(A.humanError(e), "critical"); });
   }
 
@@ -153,6 +208,18 @@
       model.me = s;
       $('[data-adm="off"]').hidden = true; $('[data-adm="on"]').hidden = false;
       $("[data-adm-filter]").addEventListener("input", renderRows);
+      $("[data-adm-cohort]").addEventListener("change", renderRows);
+      function fail(err) { msg(A.humanError(err), "critical"); }
+      $("[data-adm-cohort-form]").addEventListener("submit", function (e) {
+        e.preventDefault();
+        var inp = $("[data-adm-cohort-name]");
+        A.createCohort(inp.value).then(function () { inp.value = ""; return load("Группа создана."); }).catch(fail);
+      });
+      $("[data-adm-cohorts]").addEventListener("click", function (e) {
+        var d = e.target.closest("[data-cohort-del]"); if (!d) return;
+        if (!window.confirm("Удалить группу «" + d.getAttribute("data-name") + "»? Студенты и их оценки останутся.")) return;
+        A.deleteCohort(d.getAttribute("data-cohort-del")).then(function () { return load("Группа удалена."); }).catch(fail);
+      });
       $("[data-adm-reload]").addEventListener("click", load);
       $("[data-adm-csv]").addEventListener("click", csv);
       $("[data-adm-exam-csv]").addEventListener("click", examsCsv);
@@ -171,8 +238,20 @@
         if (p) A.setExamPublished(p.getAttribute("data-exam-pub"), p.getAttribute("data-on") === "1").then(loadExams).catch(function (err) { msg(A.humanError(err), "critical"); });
         if (d) A.deleteExam(d.getAttribute("data-exam-del")).then(loadExams).catch(function (err) { msg(A.humanError(err), "critical"); });
       });
-      $("[data-adm-rows]").addEventListener("click", function (e) { var b = e.target.closest("[data-detail]"); if (b) renderDetail(b.getAttribute("data-detail")); });
+      $("[data-adm-rows]").addEventListener("click", function (e) {
+        var b = e.target.closest("[data-detail]"); if (b) renderDetail(b.getAttribute("data-detail"));
+        var u = e.target.closest("[data-unjoin]");
+        if (u) A.removeFromCohort(u.getAttribute("data-unjoin"), u.getAttribute("data-user")).then(function () { return load("Убран из группы."); }).catch(fail);
+      });
       $("[data-adm-rows]").addEventListener("change", function (e) {
+        var j = e.target.closest("[data-join-of]");
+        if (j) {
+          if (!j.value) return;
+          j.disabled = true;
+          A.addToCohort(j.value, j.getAttribute("data-join-of")).then(function () { return load("Добавлен в группу."); })
+            .catch(function (err) { var t = A.humanError(err); return load().then(function () { msg(t, "critical"); }); });
+          return;
+        }
         var sel = e.target.closest("[data-role-of]"); if (!sel) return;
         sel.disabled = true;
         A.setRole(sel.getAttribute("data-role-of"), sel.value).then(function () { return load("Роль изменена."); })

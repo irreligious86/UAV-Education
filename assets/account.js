@@ -124,6 +124,9 @@
     if (/already submitted/i.test(m)) return "Эта попытка уже сдана.";
     if (/already has attempts/i.test(m)) return "По экзамену уже есть попытки: вопросы и сам экзамен менять нельзя, можно только снять с публикации.";
     if (/confirmed account/i.test(m)) return "Нужен вход с подтверждённой почтой.";
+    if (/cohorts_name_unique/i.test(m)) return "Группа с таким названием уже есть.";
+    if (/cohort_members_pkey/i.test(m)) return "Студент уже в этой группе.";
+    if (/cohorts_name_check/i.test(m)) return "Название группы — от 2 до 100 символов.";
     if (/no such exam/i.test(m)) return "Экзамен не найден или не опубликован.";
     if (/failed to fetch|network/i.test(m)) return "Нет связи с сервером. Прогресс сохраняется локально и уйдёт позже.";
     if (/password/i.test(m) && /least|short|weak/i.test(m)) return "Пароль слишком простой: минимум " + MIN_PASSWORD + " символов.";
@@ -337,6 +340,25 @@
             return st.client.from("exams").delete().eq("id", e.id).then(function () { throw err; });
           });
       });
+    },
+    // cohorts (docs/MULTIUSER-PLAN.md §12): staff see every group, a student only their own
+    listCohorts: function () {
+      need();
+      return Promise.all([
+        st.client.from("cohorts").select("id,name,created_at").order("name").then(check),
+        st.client.from("cohort_members").select("cohort_id,user_id").then(check)
+      ]).then(function (r) { return { cohorts: r[0] || [], members: r[1] || [] }; });
+    },
+    createCohort: function (name) {
+      need();
+      name = String(name || "").trim();
+      if (name.length < 2 || name.length > 100) return Promise.reject(new Error("cohorts_name_check"));
+      return st.client.from("cohorts").insert({ name: name }).select("id").single().then(check).then(function (c) { return c.id; });
+    },
+    deleteCohort: function (id) { need(); return st.client.from("cohorts").delete().eq("id", id).then(check); },
+    addToCohort: function (cohortId, userId) { need(); return st.client.from("cohort_members").insert({ cohort_id: cohortId, user_id: userId }).then(check); },
+    removeFromCohort: function (cohortId, userId) {
+      need(); return st.client.from("cohort_members").delete().eq("cohort_id", cohortId).eq("user_id", userId).then(check);
     },
     setExamPublished: function (id, on) { need(); return st.client.from("exams").update({ published: !!on }).eq("id", id).then(check); },
     deleteExam: function (id) { need(); return st.client.from("exams").delete().eq("id", id).then(check); }
