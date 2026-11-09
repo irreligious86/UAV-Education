@@ -55,6 +55,19 @@
         <p class="gc-muted">Баллы считает браузер студента (квизы и задачи проверяются на его стороне): это видимость работы, а не экзамен — <code>docs/MULTIUSER-PLAN.md</code>, раздел 6.</p>
       </div>
       <div class="gc-panel" data-adm-detail hidden></div>
+      <div class="gc-panel" data-adm-exams-panel>
+        <p class="gc-label gc-muted">Экзамены</p>
+        <p class="gc-muted">Банк вопросов — JSON: <code>{"title", "pass_pct", "questions_per_attempt", "time_limit_min", "attempts_allowed", "show_review", "questions": [{"q", "options", "answer", "explain"}]}</code>. Файл квиза модуля тоже подходит, но его ответы публичны — для настоящего экзамена готовь закрытый банк и не кладите его в репозиторий.</p>
+        <div class="progress-actions">
+          <label class="gc-tag" style="cursor:pointer">Загрузить банк JSON <input type="file" accept="application/json" data-adm-exam-file hidden></label>
+          <gc-button variant="secondary" data-adm-exam-csv>CSV результатов</gc-button>
+        </div>
+        <ul class="progress-labs" data-adm-exams></ul>
+        <div class="md-table-wrap"><table class="md-table">
+          <thead><tr><th>Экзамен</th><th>Студент</th><th>Результат</th><th>Сдан</th><th>Когда</th></tr></thead>
+          <tbody data-adm-exam-results></tbody>
+        </table></div>
+      </div>
       <div class="gc-panel" data-adm-audit-panel>
         <p class="gc-label gc-muted">Журнал смены ролей</p>
         <ul class="progress-labs" data-adm-audit></ul>

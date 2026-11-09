@@ -6,7 +6,11 @@
  */
 (function () {
   var DBK = "fake-supabase-db", SK = "fake-supabase-session";
-  function load() { return JSON.parse(localStorage.getItem(DBK) || '{"users":[],"progress":{},"audit":[]}'); }
+  function load() {
+    var d = JSON.parse(localStorage.getItem(DBK) || '{"users":[],"progress":{},"audit":[]}');
+    d.exams = d.exams || []; d.exam_questions = d.exam_questions || []; d.exam_attempts = d.exam_attempts || [];
+    return d;
+  }
   function save(db) { localStorage.setItem(DBK, JSON.stringify(db)); }
   function sess() { return JSON.parse(localStorage.getItem(SK) || "null"); }
   function setSess(s) { if (s) localStorage.setItem(SK, JSON.stringify(s)); else localStorage.removeItem(SK); }
@@ -26,6 +30,13 @@
     if (table === "student_progress") return rowsFor("profiles", db, u).map(function (p) {
       var g = db.progress[p.id] || {}; return Object.assign({}, p, { data: g.data || {}, updated_at: g.updated_at || null }); });
     if (table === "role_audit") return staff(u) ? db.audit.slice() : [];
+    if (table === "exams") return db.exams.filter(function (e) { return e.published || staff(u); });
+    if (table === "exam_questions") return staff(u) ? db.exam_questions.slice() : [];
+    if (table === "exam_results") return db.exam_attempts.filter(function (a) { return staff(u) || (u && a.user_id === u.id); }).map(function (a) {
+      var e = db.exams.filter(function (x) { return x.id === a.exam_id; })[0] || {};
+      var p = db.users.filter(function (x) { return x.id === a.user_id; })[0] || {};
+      return Object.assign({ title: e.title, username: p.username, email: p.email }, a);
+    });
     return [];
   }
 
@@ -39,6 +50,8 @@
       single: function () { single = "single"; return q; },
       maybeSingle: function () { single = "maybe"; return q; },
       upsert: function (row) { mode = "upsert"; payload = row; return q; },
+      insert: function (row) { mode = "insert"; payload = row; return q; },
+      delete: function () { mode = "delete"; return q; },
       update: function (row) { mode = "update"; payload = row; return q; },
       then: function (res, rej) { return run().then(res, rej); }
     };
@@ -48,6 +61,38 @@
       if (mode === "upsert") {
         if (!u || payload.user_id !== u.id) return fail("new row violates row-level security policy");
         db.progress[u.id] = { data: payload.data, updated_at: new Date().toISOString() }; save(db); return ok(null);
+      }
+      if (mode === "insert") {
+        if (!staff(u)) return fail("new row violates row-level security policy");
+        var rows = Array.isArray(payload) ? payload : [payload], made = [];
+        if (table === "exams") rows.forEach(function (r) {
+          var e = Object.assign({ id: "e-" + Math.random().toString(36).slice(2, 9), pass_pct: 80, questions_per_attempt: 10, time_limit_min: 20,
+                                  attempts_allowed: 1, show_review: true, published: false, created_at: new Date().toISOString() }, r);
+          db.exams.push(e); made.push(e);
+        });
+        if (table === "exam_questions") {
+          for (var i = 0; i < rows.length; i++) {
+            var r = rows[i];
+            if (!Array.isArray(r.options) || r.answer < 0 || r.answer >= r.options.length) return fail("new row violates check constraint");
+            if (db.exam_attempts.some(function (a) { return a.exam_id === r.exam_id; })) return fail("this exam already has attempts");
+          }
+          rows.forEach(function (r) { var x = Object.assign({ id: db.exam_questions.length + 1 }, r); db.exam_questions.push(x); made.push(x); });
+        }
+        save(db);
+        return single ? ok(made[0]) : ok(made);
+      }
+      if (mode === "delete") {
+        var did = (filters.filter(function (f) { return f[0] === "id"; })[0] || [])[1];
+        if (table !== "exams" || !staff(u)) return ok(null);
+        if (db.exam_attempts.some(function (a) { return a.exam_id === did; })) return fail("violates foreign key constraint");
+        db.exams = db.exams.filter(function (e) { return e.id !== did; });
+        db.exam_questions = db.exam_questions.filter(function (x) { return x.exam_id !== did; });
+        save(db); return ok(null);
+      }
+      if (mode === "update" && table === "exams") {
+        var xid = (filters.filter(function (f) { return f[0] === "id"; })[0] || [])[1];
+        if (!staff(u)) return ok(null);
+        db.exams.forEach(function (e) { if (e.id === xid) Object.assign(e, payload); }); save(db); return ok(null);
       }
       if (mode === "update") {
         var id = (filters.filter(function (f) { return f[0] === "id"; })[0] || [])[1];
@@ -93,6 +138,39 @@
     rpc: function (name, args) {
       var db = load(), u = me(db);
       window.__fakeCalls.push({ rpc: name, args: args });
+      if (name === "exam_start") {
+        if (!u) return fail("log in with a confirmed account");
+        var e = db.exams.filter(function (x) { return x.id === args.p_exam && x.published; })[0];
+        if (!e) return fail("no such exam");
+        var now = Date.now();
+        var run = db.exam_attempts.filter(function (a) { return a.exam_id === e.id && a.user_id === u.id && !a.submitted_at && new Date(a.deadline).getTime() > now; })[0];
+        if (!run) {
+          var used = db.exam_attempts.filter(function (a) { return a.exam_id === e.id && a.user_id === u.id; }).length;
+          if (used >= e.attempts_allowed) return fail("no attempts left (" + used + " of " + e.attempts_allowed + ")");
+          var ids = db.exam_questions.filter(function (x) { return x.exam_id === e.id; }).map(function (x) { return x.id; }).slice(0, e.questions_per_attempt);
+          run = { id: "a-" + Math.random().toString(36).slice(2, 9), exam_id: e.id, user_id: u.id, started_at: new Date().toISOString(),
+                  deadline: new Date(now + e.time_limit_min * 60000).toISOString(), question_ids: ids, submitted_at: null };
+          db.exam_attempts.push(run); save(db);
+        }
+        var qs = run.question_ids.map(function (id) { var x = db.exam_questions.filter(function (y) { return y.id === id; })[0]; return { id: x.id, q: x.q, options: x.options }; });
+        return ok({ attempt: run.id, exam: e.id, title: e.title, deadline: run.deadline, questions: qs });
+      }
+      if (name === "exam_submit") {
+        var a = db.exam_attempts.filter(function (x) { return x.id === args.p_attempt && u && x.user_id === u.id; })[0];
+        if (!a) return fail("no such attempt");
+        if (a.submitted_at) return fail("this attempt is already submitted");
+        var ex = db.exams.filter(function (x) { return x.id === a.exam_id; })[0];
+        var correct = 0, review = [];
+        a.question_ids.forEach(function (id) {
+          var x = db.exam_questions.filter(function (y) { return y.id === id; })[0];
+          var pick = typeof args.p_answers[id] === "number" ? args.p_answers[id] : null;
+          if (pick === x.answer) correct++;
+          review.push({ id: id, your: pick, answer: x.answer, explain: x.explain });
+        });
+        a.submitted_at = new Date().toISOString(); a.correct = correct; a.total = a.question_ids.length;
+        a.score_pct = Math.round(100 * correct / Math.max(1, a.total)); a.passed = a.score_pct >= ex.pass_pct; save(db);
+        return ok({ correct: a.correct, total: a.total, score_pct: a.score_pct, passed: a.passed, review: ex.show_review ? review : null });
+      }
       if (name !== "set_role") return fail("unknown rpc");
       if (!u || u.role !== "superadmin") return fail("only the superadmin can change roles");
       var t = db.users.filter(function (x) { return x.id === args.target; })[0];

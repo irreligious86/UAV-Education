@@ -1000,6 +1000,30 @@ def render_account() -> str:
                   extra_head=f'\n  <script src="{base}assets/account-page.js" defer></script>')
 
 
+def render_exam() -> str:
+    base = "../"
+    body = """    <h1 class="gc-display">Экзамены</h1>
+    <section class="gc-panel" data-ex="off">
+      <p class="gc-muted">Экзамены работают, когда включены аккаунты. Квизы модулей — самопроверка: их ответы лежат в открытом репозитории. Экзамены — другое: вопросы и ответы хранятся только в базе, проверяет сервер.</p>
+    </section>
+    <section class="gc-panel" data-ex="guest" hidden><p class="gc-muted">Экзамены доступны после входа — <a href="account.html">аккаунт</a>.</p></section>
+    <section data-ex="list" hidden><div data-ex-list></div></section>
+    <section class="gc-panel" data-ex="run" hidden>
+      <p class="progress-headline"><span data-ex-title></span> <span class="gc-tag" data-ex-timer></span></p>
+      <p class="gc-muted">Ответы сохраняются в этом браузере — после перезагрузки страницы попытка продолжится. По истечении времени работа сдаётся сама.</p>
+      <div data-ex-questions></div>
+      <gc-button data-ex-submit>Сдать</gc-button>
+    </section>
+    <section class="gc-panel" data-ex="result" hidden>
+      <p class="progress-headline" data-ex-score></p>
+      <ol class="exam-review" data-ex-review></ol>
+      <gc-button variant="secondary" data-ex-back>К списку экзаменов</gc-button>
+    </section>
+    <p class="acc-msg" data-acc-msg aria-live="polite"></p>"""
+    return layout(title="Экзамены", base=base, body=body, active="progress",
+                  extra_head=f'\n  <script src="{base}assets/exam-page.js" defer></script>')
+
+
 def render_admin() -> str:
     base = "../"
     body = """    <h1 class="gc-display">Администрация</h1>
@@ -1021,6 +1045,19 @@ def render_admin() -> str:
         <p class="gc-muted">Баллы считает браузер студента (квизы и задачи проверяются на его стороне): это видимость работы, а не экзамен — <code>docs/MULTIUSER-PLAN.md</code>, раздел 6.</p>
       </div>
       <div class="gc-panel" data-adm-detail hidden></div>
+      <div class="gc-panel" data-adm-exams-panel>
+        <p class="gc-label gc-muted">Экзамены</p>
+        <p class="gc-muted">Банк вопросов — JSON: <code>{"title", "pass_pct", "questions_per_attempt", "time_limit_min", "attempts_allowed", "show_review", "questions": [{"q", "options", "answer", "explain"}]}</code>. Файл квиза модуля тоже подходит, но его ответы публичны — для настоящего экзамена готовь закрытый банк и не кладите его в репозиторий.</p>
+        <div class="progress-actions">
+          <label class="gc-tag" style="cursor:pointer">Загрузить банк JSON <input type="file" accept="application/json" data-adm-exam-file hidden></label>
+          <gc-button variant="secondary" data-adm-exam-csv>CSV результатов</gc-button>
+        </div>
+        <ul class="progress-labs" data-adm-exams></ul>
+        <div class="md-table-wrap"><table class="md-table">
+          <thead><tr><th>Экзамен</th><th>Студент</th><th>Результат</th><th>Сдан</th><th>Когда</th></tr></thead>
+          <tbody data-adm-exam-results></tbody>
+        </table></div>
+      </div>
       <div class="gc-panel" data-adm-audit-panel>
         <p class="gc-label gc-muted">Журнал смены ролей</p>
         <ul class="progress-labs" data-adm-audit></ul>
@@ -1393,6 +1430,7 @@ def main() -> None:
     write(ROOT / "pages" / "progress.html", render_progress(model))
     write(ROOT / "pages" / "account.html", render_account())
     write(ROOT / "pages" / "admin.html", render_admin())
+    write(ROOT / "pages" / "exam.html", render_exam())
     write(ROOT / "api" / "v1" / "grading.json", json.dumps(grading_meta(model), ensure_ascii=False, indent=2) + "\n")
     write(ROOT / "api" / "v1" / "search.json", json.dumps(search_index(model), ensure_ascii=False) + "\n")
     write(ROOT / "api" / "v1" / "curriculum.json", json.dumps(api_payload(model), ensure_ascii=False, indent=2) + "\n")

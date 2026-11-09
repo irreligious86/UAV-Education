@@ -118,6 +118,13 @@
     if (/email not confirmed/i.test(m)) return "Почта не подтверждена: открой ссылку из письма.";
     if (/database error saving new user|username/i.test(m)) return "Имя пользователя занято или не подходит (3–32 символа: a-z, 0-9, _).";
     if (/rate limit|too many/i.test(m)) return "Слишком много попыток, подожди минуту.";
+    if (/no attempts left/i.test(m)) return "Попытки на этот экзамен закончились.";
+    if (/time is up/i.test(m)) return "Время вышло: попытка не принята.";
+    if (/not open now/i.test(m)) return "Экзамен сейчас закрыт (вне окна сдачи).";
+    if (/already submitted/i.test(m)) return "Эта попытка уже сдана.";
+    if (/already has attempts/i.test(m)) return "По экзамену уже есть попытки: вопросы и сам экзамен менять нельзя, можно только снять с публикации.";
+    if (/confirmed account/i.test(m)) return "Нужен вход с подтверждённой почтой.";
+    if (/no such exam/i.test(m)) return "Экзамен не найден или не опубликован.";
     if (/failed to fetch|network/i.test(m)) return "Нет связи с сервером. Прогресс сохраняется локально и уйдёт позже.";
     if (/password/i.test(m) && /least|short|weak/i.test(m)) return "Пароль слишком простой: минимум " + MIN_PASSWORD + " символов.";
     return m;
@@ -192,6 +199,9 @@
     if (!a) { a = document.createElement("a"); a.id = "nav-account"; nav.appendChild(a); }
     a.href = base() + "pages/account.html";
     a.textContent = st.profile ? "👤 " + st.profile.username : "Войти";
+    var ex = document.getElementById("nav-exams");
+    if (st.profile && !ex) { ex = document.createElement("a"); ex.id = "nav-exams"; ex.textContent = "Экзамены"; ex.href = base() + "pages/exam.html"; nav.appendChild(ex); }
+    if (!st.profile && ex) ex.remove();
     var adm = document.getElementById("nav-admin");
     var staff = snapshot().isStaff;
     if (staff && !adm) { adm = document.createElement("a"); adm.id = "nav-admin"; adm.textContent = "Админка"; adm.href = base() + "pages/admin.html"; nav.appendChild(adm); }
@@ -286,7 +296,50 @@
     setRole: function (target, role) {
       need();
       return st.client.rpc("set_role", { target: target, new_role: role }).then(check);
-    }
+    },
+
+    // exams (docs/MULTIUSER-PLAN.md §11): questions and answers live only in the database
+    listExams: function () {
+      need();
+      return Promise.all([
+        st.client.from("exams").select("id,title,module_id,pass_pct,questions_per_attempt,time_limit_min,attempts_allowed,show_review,opens_at,closes_at,published").order("title").then(check),
+        st.client.from("exam_results").select("id,exam_id,started_at,deadline,submitted_at,correct,total,score_pct,passed").eq("user_id", uid()).then(check)
+      ]).then(function (r) {
+        return r[0].map(function (e) {
+          var mine = r[1].filter(function (a) { return a.exam_id === e.id; });
+          return Object.assign({}, e, { attempts: mine });
+        });
+      });
+    },
+    startExam: function (examId) { need(); return st.client.rpc("exam_start", { p_exam: examId }).then(check); },
+    submitExam: function (attemptId, answers) { need(); return st.client.rpc("exam_submit", { p_attempt: attemptId, p_answers: answers }).then(check); },
+    examResults: function () {
+      need();
+      return st.client.from("exam_results").select("id,exam_id,title,user_id,username,email,started_at,submitted_at,correct,total,score_pct,passed").order("started_at", { ascending: false }).then(check);
+    },
+    staffExams: function () {
+      need();
+      return st.client.from("exams").select("id,title,pass_pct,questions_per_attempt,time_limit_min,attempts_allowed,show_review,opens_at,closes_at,published,created_at").order("created_at", { ascending: false }).then(check);
+    },
+    // bank: {title, pass_pct?, questions_per_attempt?, time_limit_min?, attempts_allowed?, show_review?,
+    //        questions: [{q, options: [..], answer, explain?}]} — a course quiz file also fits
+    createExam: function (bank) {
+      need();
+      var qs = (bank && bank.questions) || [];
+      if (!bank.title || qs.length < 1) return Promise.reject(new Error("Нужны название и хотя бы один вопрос."));
+      var row = { title: String(bank.title).slice(0, 200), published: false };
+      ["pass_pct", "questions_per_attempt", "time_limit_min", "attempts_allowed", "show_review", "module_id"].forEach(function (k) { if (bank[k] != null) row[k] = bank[k]; });
+      if (row.questions_per_attempt == null) row.questions_per_attempt = Math.min(10, qs.length);
+      return st.client.from("exams").insert(row).select("id").single().then(check).then(function (e) {
+        var items = qs.map(function (q) { return { exam_id: e.id, q: q.q, options: q.options, answer: q.answer, explain: q.explain || "" }; });
+        return st.client.from("exam_questions").insert(items).then(check).then(function () { return e.id; })
+          .catch(function (err) {   // keep the database clean if the bank was rejected
+            return st.client.from("exams").delete().eq("id", e.id).then(function () { throw err; });
+          });
+      });
+    },
+    setExamPublished: function (id, on) { need(); return st.client.from("exams").update({ published: !!on }).eq("id", id).then(check); },
+    deleteExam: function (id) { need(); return st.client.from("exams").delete().eq("id", id).then(check); }
   };
 
   window.UAVAccount = api;

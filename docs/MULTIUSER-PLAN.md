@@ -93,7 +93,7 @@ carry the grader's JSON (`uav-lab-result/1`) that a server can re-verify.
 |---|---|---|
 | 1 ✅ | Schema, roles, RLS, superadmin rules — `supabase/migrations/`, tests in CI against Postgres 16 | policy tests pass for every cell of the access table |
 | 2 ✅ | Account page (register/login/logout/reset), server progress store with merge, admin page (grades table, per-student detail), superadmin role management — behind the feature flag | Playwright tests with a fake backend pass; site unchanged with the flag off |
-| 3 | Server-side grading of quizzes (Edge Function), lab result verification | scored work cannot be written from the browser |
+| 3 ✅ | Exams with private banks graded in the database (section 11) | an exam score cannot be written or answers read from the browser |
 | 4 | Groups/cohorts (admin sees own group), CSV export, deadlines | — |
 
 ## 8. Going live (what Alex does, ~20 minutes)
@@ -143,3 +143,27 @@ and six edge issues, all fixed with tests: bootstrap could promote an unconfirme
 owner's email (M1); a malformed progress row could blank the admin table (M2); another account's local
 progress on a shared browser could merge into the next account (M3); unconfirmed sign-ups listed as
 students and CSV formula injection (L1); forged `updated_at` (L2); username probing accepted (L3).
+
+## 11. Exams: real grading
+
+Module quizzes cannot hide their answers: the repository and the site are public. Real grading therefore
+uses **exams whose question banks exist only in the database** (`supabase/migrations/0002_exams.sql`).
+
+| Who | Can |
+|---|---|
+| admin, superadmin | upload a bank (JSON, the course quiz format plus exam settings), publish or unpublish it, delete it while nobody has taken it, see every attempt and export CSV |
+| student | see published exams, start an attempt (random subset of questions **without answers**, timer), resume it after a reload, submit once |
+| database | grades the submission, enforces the deadline (+30 s grace), the attempt limit and the exam window, freezes a bank once anyone has taken it |
+| nobody | read the bank from the browser as a student, write or change a score, delete an attempt — not even the superadmin |
+
+Bank format (`pages/admin.html` → "Загрузить банк JSON"):
+
+```json
+{"title": "Final: power and batteries", "pass_pct": 70, "questions_per_attempt": 10,
+ "time_limit_min": 20, "attempts_allowed": 2, "show_review": true,
+ "questions": [{"q": "...", "options": ["...", "..."], "answer": 1, "explain": "..."}]}
+```
+
+Keep real exam banks **out of the repository** — a bank committed to a public repo is a published answer key.
+Tests: `supabase/tests/test_exams.py` (22), `tests/e2e/exams.e2e.js` (upload → publish → take → resume →
+grade → admin results).

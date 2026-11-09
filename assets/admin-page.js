@@ -73,19 +73,24 @@
     box.scrollIntoView({ behavior: "smooth", block: "nearest" });
   }
 
-  function csv() {
-    var head = ["username", "email", "role", "mastered", "total", "score", "updated_at"];
-    var lines = [head.join(",")].concat(model.rows.map(function (r) {
-      return [r.username, r.email, r.role, r.g.mastered, r.g.total, r.g.score, r.updated_at || ""].map(function (v) {
-        v = String(v);
+  function download(rows, name) {
+    var lines = rows.map(function (r) {
+      return r.map(function (v) {
+        v = String(v == null ? "" : v);
         if (/^[=+\-@\t\r]/.test(v)) v = "'" + v;      // no formulas when the CSV is opened in a spreadsheet
         return /[",\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v;
       }).join(",");
-    }));
+    });
     var a = document.createElement("a");
-    a.href = URL.createObjectURL(new Blob(["﻿" + lines.join("\n")], { type: "text/csv" }));
-    a.download = "uav-students-" + new Date().toISOString().slice(0, 10) + ".csv";
+    a.href = URL.createObjectURL(new Blob(["\ufeff" + lines.join("\n")], { type: "text/csv" }));
+    a.download = name + "-" + new Date().toISOString().slice(0, 10) + ".csv";
     a.click();
+  }
+
+  function csv() {
+    download([["username", "email", "role", "mastered", "total", "score", "updated_at"]].concat(model.rows.map(function (r) {
+      return [r.username, r.email, r.role, r.g.mastered, r.g.total, r.g.score, r.updated_at || ""];
+    })), "uav-students");
   }
 
   function renderAudit(items) {
@@ -94,6 +99,34 @@
       return "<li>" + when(a.at) + " · " + esc(names[a.actor] || (a.actor ? "?" : "система")) + ": " + esc(names[a.target] || "?") + " " +
         esc(ROLE[a.old_role] || "—") + " → " + esc(ROLE[a.new_role]) + "</li>";
     }).join("") : '<li class="gc-muted">Пусто</li>';
+  }
+
+  // ------------------------------------------------------------------ exams
+  function loadExams() {
+    var A = window.UAVAccount;
+    return Promise.all([A.staffExams(), A.examResults()]).then(function (r) {
+      model.exams = r[0]; model.examResults = r[1];
+      $("[data-adm-exams]").innerHTML = r[0].length ? r[0].map(function (e) {
+        var n = r[1].filter(function (x) { return x.exam_id === e.id; }).length;
+        return "<li><strong>" + esc(e.title) + "</strong> · " + e.questions_per_attempt + " вопр., " + e.time_limit_min + " мин, порог " + e.pass_pct +
+          " %, попыток " + e.attempts_allowed + " · попыток сдано: " + n + " " +
+          '<button type="button" class="gc-tag" data-state="' + (e.published ? "ok" : "") + '" data-exam-pub="' + esc(e.id) + '" data-on="' + (e.published ? 0 : 1) + '">' +
+          (e.published ? "опубликован — снять" : "черновик — опубликовать") + "</button>" +
+          (n ? "" : ' <button type="button" class="gc-tag" data-exam-del="' + esc(e.id) + '">удалить</button>') + "</li>";
+      }).join("") : '<li class="gc-muted">Экзаменов нет</li>';
+      $("[data-adm-exam-results]").innerHTML = r[1].length ? r[1].map(function (x) {
+        return '<tr><td data-label="Экзамен">' + esc(x.title || "—") + '</td><td data-label="Студент">' + esc(x.username) +
+          '</td><td data-label="Результат">' + (x.submitted_at ? x.correct + " / " + x.total + " · " + x.score_pct + " %" : "не сдан") +
+          '</td><td data-label="Сдан">' + (x.passed ? "да" : "нет") + '</td><td data-label="Когда">' + when(x.submitted_at || x.started_at) + "</td></tr>";
+      }).join("") : '<tr><td colspan="5" class="gc-muted">Попыток пока нет</td></tr>';
+    });
+  }
+
+  function examsCsv() {
+    var rows = [["exam", "username", "email", "correct", "total", "score_pct", "passed", "submitted_at"]].concat((model.examResults || []).map(function (x) {
+      return [x.title, x.username, x.email, x.correct, x.total, x.score_pct, x.passed, x.submitted_at || ""];
+    }));
+    download(rows, "uav-exam-results");
   }
 
   function load(note) {
@@ -122,6 +155,22 @@
       $("[data-adm-filter]").addEventListener("input", renderRows);
       $("[data-adm-reload]").addEventListener("click", load);
       $("[data-adm-csv]").addEventListener("click", csv);
+      $("[data-adm-exam-csv]").addEventListener("click", examsCsv);
+      $("[data-adm-exam-file]").addEventListener("change", function (e) {
+        var f = e.target.files[0]; if (!f) return;
+        f.text().then(function (t) {
+          var bank = JSON.parse(t);
+          if (!bank.title) bank.title = f.name.replace(/\.json$/i, "");
+          return A.createExam(bank);
+        }).then(function () { msg("Экзамен загружен черновиком — проверь и опубликуй.", "ok"); return loadExams(); })
+          .catch(function (err) { msg(err instanceof SyntaxError ? "Это не JSON." : A.humanError(err), "critical"); })
+          .then(function () { e.target.value = ""; });
+      });
+      $("[data-adm-exams]").addEventListener("click", function (e) {
+        var p = e.target.closest("[data-exam-pub]"), d = e.target.closest("[data-exam-del]");
+        if (p) A.setExamPublished(p.getAttribute("data-exam-pub"), p.getAttribute("data-on") === "1").then(loadExams).catch(function (err) { msg(A.humanError(err), "critical"); });
+        if (d) A.deleteExam(d.getAttribute("data-exam-del")).then(loadExams).catch(function (err) { msg(A.humanError(err), "critical"); });
+      });
       $("[data-adm-rows]").addEventListener("click", function (e) { var b = e.target.closest("[data-detail]"); if (b) renderDetail(b.getAttribute("data-detail")); });
       $("[data-adm-rows]").addEventListener("change", function (e) {
         var sel = e.target.closest("[data-role-of]"); if (!sel) return;
@@ -129,7 +178,7 @@
         A.setRole(sel.getAttribute("data-role-of"), sel.value).then(function () { return load("Роль изменена."); })
           .catch(function (err) { var t = A.humanError(err); return load().then(function () { msg(t, "critical"); }); });
       });
-      return load();
+      return Promise.all([load(), loadExams()]);
     });
   }
 
