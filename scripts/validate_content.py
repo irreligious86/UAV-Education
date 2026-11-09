@@ -407,6 +407,10 @@ def validate_glossary(manifest_ids):
         seen.add(key)
         if t.get("module") and t["module"] not in manifest_ids:
             errors.append(f"glossary: «{t['term']}» ссылается на несуществующий модуль {t['module']}")
+    # every module contributes at least one term, so the glossary keeps up with the course
+    covered = {t.get("module") for t in data.get("terms", [])}
+    for mid in sorted(set(manifest_ids) - covered):
+        errors.append(f"glossary: у модуля {mid} нет ни одного термина")
     return errors
 
 
