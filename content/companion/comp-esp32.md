@@ -116,9 +116,9 @@ void loop() {
       }
     }
   }
-  if (mode == Mode::GROUND && now - lastLine > LINE_TIMEOUT_MS) {
-    enterFlight();                    // lost the radio: fail safe
-    disarmedSince = 0;
+  if (now - lastLine > LINE_TIMEOUT_MS) {
+    disarmedSince = 0;                // a gap breaks "continuously disarmed"
+    if (mode == Mode::GROUND) enterFlight();   // lost the radio: fail safe
   }
 }
 ```

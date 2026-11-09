@@ -68,3 +68,11 @@ RADIO_STATUS.txbuf is free buffer space (also fixed in mav-routing), 4.7 stream 
 for multi-vehicle SITL, L1 gain 4ζ², 4.7 `WP_SPD/WP_ACC/WP_JERK` units, SYSID input is `RATE.ROut` and the
 entry conditions, Betaflight 2025.12 CHIRP mode, Gazebo camera streaming plugin. All code samples ran and
 printed what the modules say. Several non-GitHub reference pages could not be fetched (weekly link check).
+
+## Stage 5 practice depth
+
+`stage5-practice-depth.md`: text added to 41 modules. 7 findings (3 errors, 1 outdated, 3 imprecise), all
+applied: SITL ports 5762/5763 send no streams until asked (observer and takeoff scripts now request
+messages; 4.7 rates are `MAVn_*`), `AUTOTUNE_AGGR` default 0.075 since 4.6, GPS glitch is ERR subsystem 11
+code 2, `FS_EKF_ACTION` scope, rate measurement off-by-one. Also fixed from the reviewer's notes: comp-esp32
+gap handling (re-checked on the host), ap-heavy hover throttle aligned with the module's own numbers.
