@@ -28,7 +28,7 @@ real server-side grading, no cohorts.
 
 | # | Iteration | Content | Done when |
 |---|---|---|---|
-| 8 | Build the ROS 2 image in CI | workflow builds `examples/ros2-docker` ros image (Jazzy default, Humble fallback) on changes and on demand — Docker Hub is reachable from GitHub Actions | image builds green for both distros |
+| 8 ✅ | Build the ROS 2 image in CI — Jazzy green; Humble dropped from the matrix (micro-ROS-Agent humble vs Fast-CDR 2.x, upstream), documented | workflow builds `examples/ros2-docker` ros image (Jazzy default, Humble fallback) on changes and on demand — Docker Hub is reachable from GitHub Actions | image builds green for both distros |
 | 9 ✅ | Exams with private banks (security review in 14) | tables for exams, questions (answers only in the DB), attempts; RPCs `exam_start` (questions without answers), `exam_submit` (graded in the database, one attempt per window); admin page uploads banks and sees results; student exam page; RLS tests, e2e with the fake backend, security review | 0 ways to read answers or write a score from the browser in tests |
 | 10 ✅ | Numeric tasks for quantitative modules — 31 tasks in 16 modules added (fact-check in 14) | task banks (`content/tasks/`) for the Stage 4 modules and other modules with formulas (weather, guidance, sysid, KiCad, telemetry, plane tuning, ESC, multi-vehicle, maintenance, DroneCAN, attitude, altitude, measurement…) | every module with a worked formula has a task bank |
 | 11 ✅ | Quizzes to 8 questions — 65 questions added, every bank has 8 (fact-check in 14) | 52 banks below 8; same bias rule (correct answer longest in ≤ 34 %) | all banks ≥ 8 |

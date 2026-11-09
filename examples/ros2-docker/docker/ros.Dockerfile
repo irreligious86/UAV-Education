@@ -1,6 +1,6 @@
 # ROS 2 workspace: px4_msgs, ardupilot_msgs, Micro XRCE-DDS Agent (PX4), micro-ROS agent (ArduPilot AP_DDS),
 # and the course package uav_ros2_labs.
-# ROS_DISTRO: jazzy (default, LTS to 2029, Ubuntu 24.04) or humble (fallback, Ubuntu 22.04).
+# ROS_DISTRO: jazzy (default, LTS to 2029, Ubuntu 24.04; the only distro tested in CI — humble fails in micro-ROS-Agent, see README).
 ARG ROS_DISTRO=jazzy
 FROM ros:${ROS_DISTRO}-ros-base
 ARG ROS_DISTRO
@@ -13,8 +13,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 # Micro XRCE-DDS Agent for PX4's uXRCE-DDS client (pinned release)
 WORKDIR /opt
-# Installed into its own prefix: its bundled Fast-CDR must not shadow the one ROS ships (Humble uses Fast-CDR 1.x,
-# and micro_ros_agent below fails to compile against 2.x headers in /usr/local).
+# Installed into its own prefix so its bundled Fast-CDR / foonathan_memory never shadow the ones ROS ships.
 RUN git clone --depth 1 -b v2.4.3 https://github.com/eProsima/Micro-XRCE-DDS-Agent.git \
  && cmake -S Micro-XRCE-DDS-Agent -B Micro-XRCE-DDS-Agent/build -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/opt/xrce \
  && cmake --build Micro-XRCE-DDS-Agent/build -j"$(nproc)" && cmake --install Micro-XRCE-DDS-Agent/build \

@@ -69,7 +69,7 @@
 docker compose build ros
 docker compose run --rm ros bash
 ros2 doctor --report | head -20</code></pre>
-<p>Образ собирается на ROS 2 Jazzy (Ubuntu 24.04); запасной вариант — <code>ROS_DISTRO=humble docker compose build ros</code>. Если Docker недоступен — установите ROS 2 Jazzy на Ubuntu 24.04 (или Humble на 22.04) по официальной инструкции и соберите <code>ws/</code> через <code>colcon build</code>.</p>
+<p>Образ собирается и проверяется в CI на ROS 2 Jazzy (Ubuntu 24.04 внутри контейнера, поэтому хост может быть и на 22.04). Сборка с <code>ROS_DISTRO=humble</code> сейчас не проходит: ветка humble у micro-ROS-Agent не компилируется с Fast-CDR 2.x. Если Docker недоступен — установите ROS 2 Jazzy на Ubuntu 24.04 (или Humble на 22.04) по официальной инструкции и соберите <code>ws/</code> через <code>colcon build</code>.</p>
 <h4 class="md-subheading">Шаг 2. Граф руками</h4>
 <p>В двух терминалах <code>ros2 run demo_nodes_py talker</code> и <code>listener</code>; посмотрите <code>ros2 node list</code>, <code>ros2 topic info -v /chatter</code>, <code>ros2 topic hz</code>. Затем опубликуйте в топик с BEST_EFFORT (<code>ros2 topic pub --qos-reliability best_effort ...</code>) и подпишитесь RELIABLE (<code>ros2 topic echo --qos-reliability reliable ...</code>) — связи нет. Поменяйте подписчика на best_effort — появилась. Запишите вывод <code>topic info -v</code> в обоих случаях.</p>
 <h4 class="md-subheading">Шаг 3. Логгер телеметрии</h4>

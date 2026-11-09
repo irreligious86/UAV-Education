@@ -2,8 +2,11 @@
 
 Containers and a ROS 2 package for the elective "ROS 2 on board" (`ros2-basics`, `ros2-px4`,
 `ros2-ardupilot`). Target: ROS 2 Jazzy on Ubuntu 24.04 (LTS to 2029, recommended by current PX4 docs),
-PX4 SITL + Gazebo Harmonic, ArduPilot SITL built with `--enable-DDS`. Humble stays available as a fallback:
-`ROS_DISTRO=humble docker compose build ros` (the image is parameterised by the `ROS_DISTRO` build argument).
+PX4 SITL + Gazebo Harmonic, ArduPilot SITL built with `--enable-DDS`. The image is built and smoke-tested in CI for **Jazzy only** (`.github/workflows/ros2-image.yml`).
+`ROS_DISTRO=humble` is accepted by the build argument but currently fails: the humble branch of
+micro-ROS-Agent does not compile against the Fast-CDR 2.x it pulls in (`DDS_CDR` / `getSerializedDataLength`
+errors in `graph_typesupport.cpp`). On Ubuntu 22.04 hosts use this image anyway (it is Ubuntu 24.04 inside), or
+install ROS 2 Humble natively and build the agents by hand.
 
 ```bash
 docker compose build ros                       # ROS 2 workspace (~10 min)

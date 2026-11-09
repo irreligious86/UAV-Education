@@ -66,7 +66,7 @@ docker compose build ros
 docker compose run --rm ros bash
 ros2 doctor --report | head -20
 ```
-Образ собирается на ROS 2 Jazzy (Ubuntu 24.04); запасной вариант — `ROS_DISTRO=humble docker compose build ros`. Если Docker недоступен — установите ROS 2 Jazzy на Ubuntu 24.04 (или Humble на 22.04) по официальной инструкции и соберите `ws/` через `colcon build`.
+Образ собирается и проверяется в CI на ROS 2 Jazzy (Ubuntu 24.04 внутри контейнера, поэтому хост может быть и на 22.04). Сборка с `ROS_DISTRO=humble` сейчас не проходит: ветка humble у micro-ROS-Agent не компилируется с Fast-CDR 2.x. Если Docker недоступен — установите ROS 2 Jazzy на Ubuntu 24.04 (или Humble на 22.04) по официальной инструкции и соберите `ws/` через `colcon build`.
 
 ### Шаг 2. Граф руками
 В двух терминалах `ros2 run demo_nodes_py talker` и `listener`; посмотрите `ros2 node list`, `ros2 topic info -v /chatter`, `ros2 topic hz`. Затем опубликуйте в топик с BEST_EFFORT (`ros2 topic pub --qos-reliability best_effort ...`) и подпишитесь RELIABLE (`ros2 topic echo --qos-reliability reliable ...`) — связи нет. Поменяйте подписчика на best_effort — появилась. Запишите вывод `topic info -v` в обоих случаях.

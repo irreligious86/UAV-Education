@@ -16,7 +16,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        distro: [jazzy, humble]
+        distro: [jazzy]   # humble: micro-ROS-Agent (humble branch) does not build against Fast-CDR 2.x — see examples/ros2-docker/README.md
     steps:
       - uses: actions/checkout@v4
       - name: Build ros image (${{ matrix.distro }})
