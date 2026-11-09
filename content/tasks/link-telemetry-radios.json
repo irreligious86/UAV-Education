@@ -21,7 +21,7 @@
   {
    "id": "fade",
    "title": "Запас по замиранию",
-   "statement": "`RADIO_STATUS`: rssi = **{r}**, noise = **{n}** (единицы SiK). Найдите запас по замиранию (дБ).",
+   "statement": "`RADIO_STATUS`: rssi = **{r}**, noise = **{n}** (единицы SiK, одна единица ≈ 0.5 дБ). Найдите запас по замиранию (дБ).",
    "params": {
     "r": {
      "min": 100,
@@ -36,7 +36,7 @@
    },
    "answer": "(r-n)/2",
    "unit": "дБ",
-   "tol": 0.01,
+   "tol": 0.06,
    "abs": 0.3,
    "solution": "Запас ≈ (RSSI − noise) / 2 дБ: единица RSSI SiK ≈ 0.5 дБ."
   },

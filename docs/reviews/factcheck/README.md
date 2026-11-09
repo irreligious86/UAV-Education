@@ -76,3 +76,12 @@ applied: SITL ports 5762/5763 send no streams until asked (observer and takeoff 
 messages; 4.7 rates are `MAVn_*`), `AUTOTUNE_AGGR` default 0.075 since 4.6, GPS glitch is ERR subsystem 11
 code 2, `FS_EKF_ACTION` scope, rate measurement off-by-one. Also fixed from the reviewer's notes: comp-esp32
 gap handling (re-checked on the host), ap-heavy hover throttle aligned with the module's own numbers.
+
+## Stage 5 tasks, quizzes, glossary
+
+`stage5-tasks-quizzes-glossary.md`: 31 numeric tasks, 66 new quiz questions, 69 glossary terms. 17 findings
+(2 errors, 7 inaccuracies, 8 nits), all applied: INAV on GPS loss in RTH goes to Emergency Landing
+(`failsafe_procedure` is the RC-loss reaction; the quiz and the nav-resilience module were wrong), AP_DDS is
+an eProsima Micro XRCE-DDS client, `GPS1_RATE_MS` since 4.6, Bluejay targets BB21/BB51 (BB1 only to 0.18.1),
+L2 tunnels carry MAVLink broadcast, two arguably-correct quiz distractors reworded, task wording and
+tolerances (hover %, SiK units, hexa reliability, trapezoid ranges, T/W title).

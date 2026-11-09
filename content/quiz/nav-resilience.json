@@ -80,15 +80,15 @@
       "explain": "Лишняя мощность глушит соседей и греет VTX."
     },
     {
-      "q": "Что делает INAV при потере GPS в RTH?",
+      "q": "Что делает INAV на мультикоптере, если GPS пропал во время RTH?",
       "options": [
-        "failsafe_procedure: Land или Drop — RTH без GPS невозможен",
+        "Аварийная посадка (Emergency Landing): позиция потеряна — RTH невозможен",
         "Продолжает RTH по последнему курсу",
         "Переходит в ACRO",
         "Перезагружает полётник"
       ],
       "answer": 0,
-      "explain": "Без позиции RTH невозможен; INAV выполняет процедуру failsafe."
+      "explain": "Если позиции нет дольше ~2 с, INAV в RTH/WP переходит в Emergency Landing: коптер в ANGLE снижается на failsafe_throttle и выключает моторы через failsafe_off_delay (при нулевых значениях — фактически DROP). failsafe_procedure — реакция на потерю RC, а не GPS; крыло с inav_allow_gps_fix_estimation может продолжить возврат по оценке."
     }
   ]
 }

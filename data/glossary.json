@@ -638,7 +638,7 @@
     },
     {
       "term": "Отказоустойчивость",
-      "def": "Способность аппарата пережить отказ одного элемента (мотора, BEC, приёмника) и сесть управляемо. Квадрокоптер её по мотору не имеет, X8 и гекса — имеют.",
+      "def": "Способность аппарата пережить отказ одного элемента (мотора, BEC, приёмника) и сесть управляемо. Квадрокоптер её по мотору не имеет; гекса и X8 могут иметь — при запасе тяги, продуманном питании и проверенной (в SITL/на стенде) реакции прошивки.",
       "module": "el-redundancy"
     },
     {
@@ -668,7 +668,7 @@
     },
     {
       "term": "Bluejay",
-      "def": "Открытая прошивка для ESC на MCU BB1/BB2/BB51 (наследник BLHeli_S) с bidirectional DShot для RPM-фильтра.",
+      "def": "Открытая прошивка для ESC на 8-битных EFM8 BB21 и BB51 (BB1 — только до версии 0.18.1), наследник BLHeli_S, с bidirectional DShot для RPM-фильтра.",
       "module": "f-esc-firmware"
     },
     {
@@ -733,7 +733,7 @@
     },
     {
       "term": "SiK",
-      "def": "Открытая прошивка телеметрийных модемов 433/915 МГц с прыжками по частотам; на ней 3DR Radio и RFD900.",
+      "def": "Открытая прошивка телеметрийных модемов 433/868/915 МГц с прыжками по частотам; на ней 3DR Radio и RFD900.",
       "module": "link-telemetry-radios"
     },
     {
@@ -783,7 +783,7 @@
     },
     {
       "term": "UDP broadcast / unicast",
-      "def": "Способы доставки MAVLink по сети: broadcast — всем в подсети, unicast — на один адрес. Через 4G и VPN работает только unicast.",
+      "def": "Способы доставки MAVLink по сети: broadcast — всем в подсети, unicast — на один адрес. Через 4G/NAT и L3-VPN (WireGuard, Tailscale, OpenVPN tun) работает только unicast; broadcast проходит лишь через L2-туннели (ZeroTier, OpenVPN tap).",
       "module": "mav-routing"
     },
     {
@@ -853,7 +853,7 @@
     },
     {
       "term": "Jetson Orin",
-      "def": "Семейство модулей NVIDIA с GPU и NPU для бортового инференса. Типичный companion для PX4 и ArduPilot.",
+      "def": "Семейство модулей NVIDIA с GPU Ampere (у Orin NX/AGX — ещё ускорители DLA) для бортового инференса. Типичный companion для PX4 и ArduPilot.",
       "module": "px4-companion-jetson"
     },
     {
@@ -873,12 +873,12 @@
     },
     {
       "term": "AP_DDS",
-      "def": "Встроенный в ArduPilot клиент DDS (micro-ROS): публикует состояние в ROS 2 и принимает команды без MAVLink, через micro-ROS agent.",
+      "def": "Встроенный в ArduPilot клиент eProsima Micro XRCE-DDS: публикует состояние в ROS 2 и принимает команды без MAVLink; на стороне ROS 2 его обслуживает агент (`micro_ros_agent` или Micro XRCE-DDS Agent).",
       "module": "ros2-ardupilot"
     },
     {
       "term": "QoS",
-      "def": "Quality of Service в ROS 2: надёжность, глубина очереди, durability. Несовместимые QoS у издателя и подписчика молча не соединяются.",
+      "def": "Quality of Service в ROS 2: надёжность, глубина очереди, durability. Несовместимые QoS у издателя и подписчика не соединяются, и ошибки нет — подписчик просто ничего не получает (в логе только предупреждение «incompatible QoS»).",
       "module": "ros2-basics"
     },
     {
