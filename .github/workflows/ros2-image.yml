@@ -1,0 +1,31 @@
+name: ros2-image
+
+# Builds the course ROS 2 image (examples/ros2-docker) for the default distro and the fallback.
+# Docker Hub is reachable from GitHub runners, which is not true for every development sandbox.
+on:
+  push:
+    paths:
+      - "examples/ros2-docker/**"
+      - ".github/workflows/ros2-image.yml"
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        distro: [jazzy, humble]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build ros image (${{ matrix.distro }})
+        working-directory: examples/ros2-docker
+        run: docker build --build-arg ROS_DISTRO=${{ matrix.distro }} -f docker/ros.Dockerfile -t uav-ros2:${{ matrix.distro }} .
+      - name: Smoke test inside the image
+        run: |
+          docker run --rm uav-ros2:${{ matrix.distro }} bash -lc '
+            source /opt/ros/${{ matrix.distro }}/setup.bash && source /ws/install/setup.bash &&
+            test "$ROS_DISTRO" = "${{ matrix.distro }}" &&
+            ros2 pkg list | grep -x px4_msgs && ros2 pkg list | grep -x ardupilot_msgs && ros2 pkg list | grep -x uav_ros2_labs &&
+            which MicroXRCEAgent && echo SMOKE_OK'
