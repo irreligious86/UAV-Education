@@ -53,7 +53,7 @@ The practical takeaway from the formulas: thrust ~ n², power ~ n³. **To double
 ### Motor + prop: the operating point
 The motor sets the RPM through KV and voltage, the prop sets the load. The operating point is where motor torque equals the prop's drag torque. Motor manufacturers publish tables: prop, voltage, throttle → thrust (g), current (A), power (W), g/W. That's the main document when choosing.
 
-The higher the KV with the same prop, the higher the RPM, thrust and current. Overdo it and you overheat the winding and the ESC. Rule of thumb: big prop, low KV (10": 300–500 KV on 6S); small prop, high KV (5": 1700–2300 KV on 6S).
+The higher the KV with the same prop, the higher the RPM, thrust and current. Overdo it and you overheat the winding and the ESC. Rule of thumb: big prop, low KV (10": 600–900 KV on 6S); small prop, high KV (5": 1700–2300 KV on 6S).
 
 ### Hover efficiency
 Static efficiency in g/W is the key figure for flight time. Typical values: a 5" racer ~4–6 g/W in hover, a 7" ~8–10, 10–15" ~12–20. The higher the g/W, the longer the hover on the same battery.

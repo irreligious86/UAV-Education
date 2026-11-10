@@ -45,7 +45,7 @@ A DShot frame is 16 bits: 11 throttle bits, 1 telemetry bit, 4 CRC bits. Each bi
 ### Logic analyzer
 Records digital levels on many channels and decodes protocols. A cheap 8-channel 24 MHz one with software like PulseView/sigrok is enough for UART up to 1 Mbaud, I2C at 400 kHz, SPI up to a few MHz and DShot600 (you need ≥ 4–5 samples per bit — 12–24 MHz is better).
 
-- **UART**: connect to the TX line and GND, set the baud rate (115200 for MSP/CRSF — 420000 for CRSF!), the decoder shows the bytes. You can see: the wrong baud rate (garbage), inversion (SBUS is an inverted UART at 100000 8E2).
+- **UART**: connect to the TX line and GND, set the baud rate (115200 for MSP, 420000 for CRSF!), the decoder shows the bytes. You can see: the wrong baud rate (garbage), inversion (SBUS is an inverted UART at 100000 8E2).
 - **I2C**: SDA and SCL, the decoder shows addresses and ACK/NACK. A NACK on an address — the sensor isn't there or the address is different; no pull-up — the lines don't go high.
 - **SPI**: CLK, MOSI, MISO, CS — reading the gyro registers.
 - A common ground with the aircraft — always. Levels are 3.3 V; most analyzers tolerate 5 V lines, 12 V — no.

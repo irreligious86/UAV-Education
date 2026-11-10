@@ -114,7 +114,7 @@ Photos of the build from above and below: nothing in the prop zone, no contact w
   - What to do: continuity test before power-up, smoke stopper.
 
 ## references
-- NASA Workmanship Standards — Soldering (pictorial reference) | https://standards.nasa.gov/standard/nasa/nasa-std-87394 | primary | A
+- NASA-STD-8739.4 — Crimping, Interconnecting Cables, Harnesses, and Wiring | https://standards.nasa.gov/standard/nasa/nasa-std-87394 | primary | A
 - Adafruit — Guide to Excellent Soldering | https://learn.adafruit.com/adafruit-guide-excellent-soldering | secondary | B
 - Oscar Liang — A Beginner's Guide to Soldering for FPV Drones | https://oscarliang.com/soldering-guide | secondary | B
 

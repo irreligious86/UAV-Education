@@ -83,7 +83,7 @@ RMSE over the checkpoints: √(Σ (Δx² + Δy²)/n) for horizontal, separately 
 Download an open image dataset (ODM publishes test datasets at github.com/OpenDroneMap, for example `odm_data_aukerman`). Process it in ODM with the default parameters, then with `--orthophoto-resolution` equal to the dataset's GSD. Open the orthophoto and DSM in QGIS. Read the report: average number of matches, reprojection error, areas with low overlap.
 
 ### Step 2. Experiment
-Remove every second image (simulating a forward overlap lower by ~half of the original) and process again. Compare: coverage, holes, reprojection error, accuracy against checkpoints if the dataset has them. State your conclusion in one sentence.
+Remove every second image (simulating a twice larger shot spacing: forward overlap o → 2o − 1, e.g. 80 % → 60 %) and process again. Compare: coverage, holes, reprojection error, accuracy against checkpoints if the dataset has them. State your conclusion in one sentence.
 
 ### Step 3. Your own mission
 For your camera and a GSD requirement of 3 cm, use the functions `gsd_cm()`, `footprint_m()`, `survey_spacing()` from `examples/perception/camgeo.py` to calculate the altitude, trigger spacing and distance between lines at 80/70 overlap. Check the motion blur and camera interval limits and choose a speed. Build the polygon in Mission Planner (Survey Grid) or QGC and compare it with your calculation. Run the mission in SITL with `DO_SET_CAM_TRIGG_DIST`: the number of `TRIG` entries in the log should match the calculated number of shots, give or take the turns.

@@ -69,7 +69,7 @@ If the firmware supports it, enable bidirectional DShot and the pole count in th
 ### Step 3. Flashing (if there's a benefit)
 Only if you need bidir DShot or EDT that you don't have: BLHeli_S → Bluejay (only on BB21/BB51 MCUs) or BLHeli_32 → AM32 if a target exists. Save the settings first; take the target from the layout you read. After flashing, restore the direction and check the motor order and direction.
 
-### Step 4. PWM frequency on the bench
+### Step 4. PWM frequency: comparison in flight
 Don't measure without props: you need a real operating mode. With props, tethered or in flight: two flights with the same pack at 24 and 48 kHz (Bluejay/AM32). Compare in Blackbox or the log: hover current, ESC temperature (EDT), gyro noise. Write down the conclusion for your aircraft.
 
 The lab counts as done when the ESC table is filled in, the ESC RPM is visible in the flight controller with errors around 0%, and the PWM frequency choice is backed by a current or temperature comparison.

@@ -122,7 +122,7 @@ Take an ArduPilot log: `XKF4.SH` (normalized height innovation) and `XKF3.IPD` (
 
 ## diagnostics
 - **Symptom:** `XKF4.SH` > 1 on takeoff
-  - Possible cause: baro in the prop wash/airflow; a large R isn't enough.
+  - Possible cause: baro in the prop wash/airflow; the configured R (`EK3_ALT_M_NSE`) is too small to cover this error.
   - What to do: cover the baro with foam, `EK3_ALT_M_NSE`, a rangefinder as the height source near the ground.
 - **Symptom:** position innovations grow, then “EKF variance” and a failsafe
   - Possible cause: GPS glitch/multipath, or the compass is lying and the model drifts off.

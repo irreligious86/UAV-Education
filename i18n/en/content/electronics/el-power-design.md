@@ -60,7 +60,7 @@ ESCs switch the windings at tens of kHz, and the current in the battery wires je
 - **Smoke stopper** — a bulb or a resistor/current limiter in series with the positive lead at the first power-up. A short circuit — the bulb lights up, the aircraft doesn't smoke.
 - **Fuse** — on large aircraft on the power bus (not on the motors — the current is too high and pulsed) and on the companion bus.
 - **Reverse polarity** — XT60/XT30 protect by their shape, but soldering one backwards kills the board in a second. A Schottky diode in series (0.3–0.5 V drop) or a P-MOSFET ideal diode for low-voltage branches.
-- **Connectors**: XT30 up to ~15–30 A continuous, XT60 ~30 A continuous (briefly up to ~60 A), XT90 ~45 A continuous; AS150/XT150 for high currents. An underloaded connector heats up, a hot one oxidizes, an oxidized one heats up even more.
+- **Connectors**: XT30 up to ~15–30 A continuous, XT60 ~30 A continuous (briefly up to ~60 A), XT90 ~45 A continuous; AS150/XT150 for high currents. A connector overloaded for its current (rated below the real current) heats up, a hot one oxidizes, an oxidized one heats up even more.
 
 ### Wire gauges
 {{widget:wire-drop}}

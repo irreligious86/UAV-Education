@@ -63,7 +63,7 @@ The gyro is a MEMS chip on SPI. Common ones: MPU6000 (old, 8 kHz output, low noi
 - **BEC**: 5 V (typically 2–3 A total for all loads) and 9–12 V (for the VTX/digital system, 2–3 A). The limits are in the board's description; don't power a Raspberry Pi from an FC pad (the “Connecting peripherals” module).
 - **Current sensor** on the PDB/ESC → the `CURR` pad; the scale `ibata_scale` (Betaflight) / `BATT_AMP_PERVLT` (ArduPilot) is calibrated against a wattmeter.
 - **UART inverters** on F4 exist only on some ports (for SBUS they're labeled “SBUS”/“RX” and have a hardware inverter); F7/H7 invert any port in software.
-- **Softserial**: a UART emulated on GPIO: up to 115200 baud, loads the processor; for SmartAudio/telemetry, not for the receiver.
+- **Softserial**: a UART emulated on GPIO: up to 19200 baud, loads the processor; for SmartAudio/telemetry, not for the receiver.
 
 ### What limits your choice of board
 The number of UARTs (receiver + GPS + VTX + companion = 4 minimum), whether it has a baro and compass (mandatory for INAV/ArduPilot), BEC current for the load, support for the target by the firmware you need **and its version** (ArduPilot: `hwdef`, Betaflight: unified target), size and mass, 30.5/20 mm mounting, whether it has CAN (DroneCAN on big aircraft), the number of motor/servo outputs (VTOL needs 8+).

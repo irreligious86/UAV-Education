@@ -40,7 +40,7 @@ Example: an X8 on 6S, 8 × 4008 380KV, hover 7 A per motor, max 25 A: hover 56 A
 - **Buses**: a single power bus from the battery is a single point of failure. Option: two batteries in parallel through diode/ideal-diode ORing modules, or simply two parallel batteries with a fuse on each; one fails — you fly on the second.
 - **Fuses**: on each battery (ANL/MIDI at 1.3 × the branch's maximum current), on the companion/payload branch, on the BEC. On the motors — no: the current is pulsed, so a fuse will either blow for nothing or fail to protect.
 - **Dual BECs**: two 5 V BECs with diode ORing for the FC and receiver (a Pixhawk-class board accepts three sources: power module, USB, servo rail — with priority). One BEC fails — the aircraft lives on.
-- **Receiver**: two receivers (primary CRSF + a backup on another band) or one with diversity; ArduPilot: `RC_OPTIONS`, a backup input on another UART with `RSSI`/failover in PX4 (`RC_MAP`), INAV — at the very least one receiver with diversity antennas.
+- **Receiver**: two receivers (primary CRSF + a backup on another band) or one with diversity; ArduPilot: `RC_OPTIONS` bit 10 (multiple receivers) — a backup input on another UART; PX4 — RC ↔ MAVLink control fallback (`COM_RC_IN_MODE`; `RC_MAP_*` only assigns channels), INAV — at the very least one receiver with diversity antennas.
 - **GPS/compass**: two GPS units with blending (`GPS_AUTO_SWITCH`) on DroneCAN, two compasses with priority.
 - **IMU**: H7 flight controllers have two or three IMUs — the EKF switches on its own (EK3 has several cores).
 
@@ -51,7 +51,7 @@ Drop across a 30 cm 12 AWG arm wire at 50 A: R = 0.0172 × 0.6 / 3.31 ≈ 3.1 m�
 
 ### Firmware behavior on a failure
 - **ArduPilot**: the mixer normalizes the outputs; on saturation the priority is roll/pitch, then throttle, yaw last (`MOT_YAW_HEADROOM`). A motor failure shows up in `RCOU` (one channel at maximum, its neighbor at minimum) and in the `ESC` telemetry (RPM 0). There's a thrust loss check (the message “Potential Thrust Loss (n)”): the mixer enables thrust boost and excludes the lost motor from yaw control; but survivability is still determined by thrust margin and geometry.
-- **PX4**: has motor failure detection from ESC telemetry (`FD_ACT_EN`, `FD_ACT_MOT_TOUT`) and an action (warning/land/ground).
+- **PX4**: has motor failure detection from ESC telemetry (`FD_ACT_EN`, `FD_ACT_MOT_TOUT`) and an action: the `COM_ACT_FAIL_ACT` failsafe (warning/Hold/Land/Return/Terminate), while `CA_FAILURE_MODE = 1` removes the motor from the mixer.
 - **INAV**: the mixer has no special logic; a hexa/X8 with thrust margin keeps flying, yaw degrades.
 
 {{diagram:redundancy-schemes|What each layout survives when one motor fails.}}

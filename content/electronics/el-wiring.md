@@ -112,7 +112,7 @@ R = U / I. Пример: 1.2 мВ при 5 А → 0.24 мОм — хорошо. 
   - Что сделать: прозвонка до включения, smoke stopper.
 
 ## references
-- NASA Workmanship Standards — Soldering (pictorial reference) | https://standards.nasa.gov/standard/nasa/nasa-std-87394 | primary | A
+- NASA-STD-8739.4 — Crimping, Interconnecting Cables, Harnesses, and Wiring | https://standards.nasa.gov/standard/nasa/nasa-std-87394 | primary | A
 - Adafruit — Guide to Excellent Soldering | https://learn.adafruit.com/adafruit-guide-excellent-soldering | secondary | B
 - Oscar Liang — A Beginner's Guide to Soldering for FPV Drones | https://oscarliang.com/soldering-guide | secondary | B
 

@@ -88,7 +88,7 @@ Two options (for example, 7" Li-Ion vs 7" LiPo; or a 10" quad vs a 7" with a sma
 
 ### Worked calculation
 The calculator's default values: mass 1400 g, 4 motors with 1200 g maximum thrust each, 6.5 g/W in hover, 6S 4000 mAh, electronics 0.8 A.
-- T/W = 4 · 1200 / 1400 = 3.43, hover throttle ≈ 1 / 3.43 ≈ 29%.
+- T/W = 4 · 1200 / 1400 = 3.43, hover throttle ≈ 1 / 3.43 ≈ 29% — in the linear "thrust ∝ throttle" approximation; thrust grows faster than throttle (T ∝ n²), so the real hover throttle is higher: with a `MOT_THST_EXPO = 0.65` curve, about 45%.
 - Motor power in hover: 1400 g / 6.5 g/W ≈ 215 W; current 215 / (6 · 3.7) + 0.8 ≈ 10.5 A.
 - Hover on 80% of capacity: 4 · 0.8 / 10.5 · 60 ≈ 18 minutes. In flight with maneuvers and wind, 20–40% less.
 - Add 400 g of load (1800 g): T/W 2.67, throttle 38%, current 13.3 A, hover ≈ 14.5 minutes. That's the price of every gram in minutes of flight.

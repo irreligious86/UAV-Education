@@ -43,7 +43,7 @@ Frying a flight controller port is easier than it seems: 5 V on a 3.3 V pin, swa
 ### UART: details
 - FC TX → device RX, FC RX ← device TX.
 - **Inversion**: SBUS and some protocols are inverted; on an F4 without a hardware inverter you need an external one or a port with an inverter; F7/H7 — software inversion (Betaflight `serialrx_inverted`). CRSF is not inverted, one line in each direction.
-- **Half-duplex**: ESC telemetry (KISS/BLHeli_32 protocol) arrives on one RX pin from all ESCs over a common wire; VTX SmartAudio/Tramp — one wire to the TX pin.
+- **Single wire**: ESC telemetry (KISS/BLHeli_32 protocol) is one-way (ESC → FC): it arrives on one RX pin from all ESCs in turn over a common wire, the request goes over the DShot signal; VTX SmartAudio/Tramp is true half-duplex: one wire to the TX pin, data both ways.
 - One device per UART (except half-duplex protocols designed specifically for that).
 
 ### I2C: details

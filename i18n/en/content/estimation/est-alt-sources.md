@@ -30,7 +30,7 @@ Indoors, under tree canopy and next to walls GPS is useless, and the baro “bre
 Altitude from pressure via the standard atmosphere: Δh ≈ −8.4 m per 1 hPa near the ground. Errors:
 - **Weather**: pressure changes by 1–3 hPa per hour when a front passes → 10–25 m of drift per hour; relative altitude over a 10-minute flight is ±1–3 m.
 - Chip **temperature**: warm-up after power-on drifts by meters (`BARO_*` calibration, ArduPilot `TCAL_ENABLED`/`TCAL_BARO_EXP`, foam for thermal stability).
-- **Prop wash and airspeed**: dynamic pressure ½ρv² — at 20 m/s that's 2.4 hPa ≈ 20 m! The baro must sit in a “quiet” spot, under foam; on wings — compensation from airspeed (on copters — `BARO1_WCF_*`, wind pressure compensation; `BARO_GND_TEMP` is only the ground temperature used for the altitude calculation), on copters — the prop-wash effect on takeoff/landing (−1…−3 m of false altitude near the ground).
+- **Prop wash and airspeed**: dynamic pressure ½ρv² — at 20 m/s that's 2.4 hPa ≈ 20 m! The baro must sit in a “quiet” spot, under foam; the error from the airflow is compensated by `BARO1_WCF_*` (wind pressure compensation; on copters only with EKF3 and tuned `EK3_DRAG_BCOEF_*`; `BARO_GND_TEMP` is only the ground temperature used for the altitude calculation), on copters also the prop-wash effect on takeoff/landing (−1…−3 m of false altitude near the ground).
 - **Noise**: 0.2–0.5 m RMS unfiltered.
 
 The EKF blends the baro with the accelerometer (see the Kalman module): fast changes come from the accel, the slow level from the baro; nothing compensates the weather drift relative to the takeoff point except GPS altitude (`EK3_SRC1_POSZ = 3`) or a rangefinder near the ground.
