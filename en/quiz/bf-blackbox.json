@@ -3,92 +3,92 @@
   "pass": 80,
   "questions": [
     {
-      "q": "Что пишет Blackbox?",
+      "q": "What does Blackbox record?",
       "options": [
-        "Только видео с камеры",
-        "Гироскоп, setpoint, PID, моторы",
-        "Только ошибки и предупреждения",
-        "Только GPS-трек и напряжение по кругам"
+        "Only the camera video",
+        "Gyro, setpoint, PID, motors",
+        "Only errors and warnings",
+        "Only the GPS track and voltage per lap"
       ],
       "answer": 1,
-      "explain": "Blackbox — поток внутренних данных контура управления для разбора после полёта."
+      "explain": "Blackbox is a stream of internal control-loop data for post-flight analysis."
     },
     {
-      "q": "Куда пишется лог?",
+      "q": "Where is the log written?",
       "options": [
-        "Только на SD-карту",
-        "На флеш платы или SD",
-        "На пульт по телеметрии",
-        "В конфигуратор по USB"
+        "Only to an SD card",
+        "To the board's flash or an SD card",
+        "To the radio over telemetry",
+        "To the configurator over USB"
       ],
       "answer": 1,
-      "explain": "У многих плат есть флеш-чип; у других — слот SD. Выбирается в Blackbox."
+      "explain": "Many boards have a flash chip; others have an SD slot. You choose it in the Blackbox tab."
     },
     {
-      "q": "Какую частоту логирования брать для анализа фильтров?",
+      "q": "What logging rate should you use for filter analysis?",
       "options": [
-        "Как можно ниже",
-        "Не ниже 1 кГц",
-        "100 Гц",
-        "10 Гц"
+        "As low as possible",
+        "At least 1 kHz",
+        "100 Hz",
+        "10 Hz"
       ],
       "answer": 1,
-      "explain": "Чтобы увидеть шум моторов и гармоники, нужна высокая частота дискретизации."
+      "explain": "To see motor noise and harmonics you need a high sampling rate."
     },
     {
-      "q": "Лог с потерей кадров выше 1% …",
+      "q": "A log with more than 1% dropped frames…",
       "options": [
-        "Годится для любого анализа",
-        "Не годится для спектров",
-        "Точнее обычного лога",
-        "Его можно восстановить"
+        "Is fine for any analysis",
+        "Is not suitable for spectra",
+        "Is more accurate than a normal log",
+        "Can be recovered"
       ],
       "answer": 1,
-      "explain": "Пропуски ломают спектр: такой лог используют только для грубой картины."
+      "explain": "Gaps break the spectrum: such a log is only good for a rough picture."
     },
     {
-      "q": "Что сравнить, чтобы увидеть, успевает ли дрон за стиком?",
+      "q": "What do you compare to see whether the drone keeps up with the stick?",
       "options": [
-        "RSSI и LQ",
-        "gyro против setpoint",
-        "Высоту и GPS",
-        "Напряжение и ток в моменты панчей"
+        "RSSI and LQ",
+        "gyro vs. setpoint",
+        "Altitude and GPS",
+        "Voltage and current during punch-outs"
       ],
       "answer": 1,
-      "explain": "Setpoint — желаемая угловая скорость, gyro — фактическая. Их расхождение — качество тюна."
+      "explain": "Setpoint is the desired angular rate, gyro is the actual one. The difference between them is the quality of the tune."
     },
     {
-      "q": "Почему первые и последние секунды лога обрезают?",
+      "q": "Why do you trim the first and last seconds of a log?",
       "options": [
-        "Так требует Blackbox Explorer при импорте",
-        "Искажают метрики шума",
-        "Там нет данных",
-        "Ради экономии места"
+        "Blackbox Explorer requires it on import",
+        "They distort the noise metrics",
+        "There's no data there",
+        "To save space"
       ],
       "answer": 1,
-      "explain": "Взлёт, посадка и переходные режимы на земле искажают метрики шума."
+      "explain": "Takeoff, landing and transients on the ground distort the noise metrics."
     },
     {
-      "q": "blackbox_sample_rate 1/4 при PID 8 кГц даёт лог на:",
+      "q": "blackbox_sample_rate 1/4 with an 8 kHz PID loop gives a log at:",
       "options": [
-        "8 кГц",
-        "2 кГц",
-        "4 кГц",
-        "1 кГц"
+        "8 kHz",
+        "2 kHz",
+        "4 kHz",
+        "1 kHz"
       ],
       "answer": 1,
-      "explain": "Делитель от частоты PID."
+      "explain": "It's a divider of the PID rate."
     },
     {
-      "q": "Как получить гироскоп до фильтров в логе?",
+      "q": "How do you get the pre-filter gyro in the log?",
       "options": [
-        "Никак нельзя",
-        "Поле gyroUnfilt",
-        "Только в конфигураторе",
-        "Ослабить фильтры"
+        "There's no way",
+        "The gyroUnfilt field",
+        "Only in the configurator",
+        "Weaken the filters"
       ],
       "answer": 1,
-      "explain": "Поле gyroUnfilt или debug_mode = GYRO_SCALED — нужно для спектров до/после."
+      "explain": "The gyroUnfilt field or debug_mode = GYRO_SCALED — needed for before/after spectra."
     }
   ]
 }

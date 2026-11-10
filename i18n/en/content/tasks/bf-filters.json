@@ -1,0 +1,32 @@
+{
+ "module": "bf-filters",
+ "tasks": [
+  {
+   "id": "motor-freq",
+   "title": "Motor noise frequency",
+   "statement": "A **{kv} KV** motor, **{u} V** under load, RPM with the prop **{k} %** below no-load. Find the frequency of the first harmonic (Hz) — the center for the RPM filter.",
+   "params": {
+    "kv": {
+     "min": 1300,
+     "max": 2600,
+     "step": 50
+    },
+    "u": [
+     14.8,
+     16.8,
+     22.2,
+     24
+    ],
+    "k": {
+     "min": 10,
+     "max": 30,
+     "step": 5
+    }
+   },
+   "answer": "kv*u*(1-k/100)/60",
+   "unit": "Hz",
+   "tol": 0.02,
+   "solution": "n = KV·U·(1 − k/100) RPM, f = n/60. This is the first harmonic; the RPM filter places notches on the 1st, 2nd and 3rd."
+  }
+ ]
+}

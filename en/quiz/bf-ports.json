@@ -3,94 +3,94 @@
   "pass": 80,
   "questions": [
     {
-      "q": "Для чего вкладка Ports?",
+      "q": "What is the Ports tab for?",
       "options": [
-        "Выбор канала VTX",
-        "Роли UART: RX, VTX, GPS",
-        "Настройка OSD",
-        "Калибровка моторов и ESC"
+        "Choosing the VTX channel",
+        "UART roles: RX, VTX, GPS",
+        "OSD setup",
+        "Motor and ESC calibration"
       ],
       "answer": 1,
-      "explain": "Каждый UART получает роль; без этого FC не знает, где искать приёмник или GPS."
+      "explain": "Each UART gets a role; without it the FC doesn't know where to look for the receiver or GPS."
     },
     {
-      "q": "Serial RX включён на UART2, приёмник припаян к UART1. Результат?",
+      "q": "Serial RX is enabled on UART2, the receiver is soldered to UART1. The result?",
       "options": [
-        "Арм невозможен из-за RXLOSS",
-        "FC слушает не тот порт",
-        "Всё работает",
-        "VTX не настроится"
+        "Arming is impossible because of RXLOSS",
+        "The FC listens to the wrong port",
+        "Everything works",
+        "The VTX won't configure"
       ],
       "answer": 1,
-      "explain": "Роль порта должна совпадать с физическим подключением."
+      "explain": "The port role must match the physical connection."
     },
     {
-      "q": "Можно ли назначить два устройства на один UART?",
+      "q": "Can you assign two devices to one UART?",
       "options": [
-        "Только GPS и VTX на F7",
-        "Нет, одна роль на UART",
-        "Да, всегда",
-        "Только на F7"
+        "Only GPS and VTX on F7",
+        "No, one role per UART",
+        "Yes, always",
+        "Only on F7"
       ],
       "answer": 1,
-      "explain": "UART — одна пара TX/RX. Две роли на одном порту конфликтуют."
+      "explain": "A UART is one TX/RX pair. Two roles on one port conflict."
     },
     {
-      "q": "Что такое softserial?",
+      "q": "What is softserial?",
       "options": [
-        "Порт USB",
-        "Программный медленный UART",
-        "Облегчённая прошивка для F4",
-        "Тип приёмника"
+        "The USB port",
+        "A slow software UART",
+        "A lightweight firmware for F4",
+        "A receiver type"
       ],
       "answer": 1,
-      "explain": "Программная эмуляция UART на обычных пинах: выручает, когда UART закончились, но для SBUS не годится."
+      "explain": "Software emulation of a UART on regular pins: it helps when you've run out of UARTs, but it's no good for SBUS."
     },
     {
-      "q": "USB-порт FC в Ports показан как…",
+      "q": "The FC's USB port is shown in Ports as…",
       "options": [
         "UART0",
         "USB VCP",
         "Softserial",
-        "Не показан"
+        "Not shown"
       ],
       "answer": 1,
-      "explain": "USB VCP — виртуальный COM-порт для конфигуратора и CLI."
+      "explain": "USB VCP is a virtual COM port for the configurator and the CLI."
     },
     {
-      "q": "Строка `serial 2 64 115200 57600 0 115200` означает:",
+      "q": "The line `serial 2 64 115200 57600 0 115200` means:",
       "options": [
         "UART2 = GPS",
         "UART3 = Serial RX",
         "USB = RX",
-        "UART2 = MSP на 115200"
+        "UART2 = MSP at 115200"
       ],
       "answer": 1,
-      "explain": "Идентификатор 2 = UART3, 64 = Serial RX."
+      "explain": "Identifier 2 = UART3, 64 = Serial RX."
     },
     {
-      "q": "Сколько портов с MSP допустимо одновременно?",
+      "q": "How many ports with MSP are allowed at the same time?",
       "options": [
-        "Только один",
-        "Не более трёх",
-        "Ровно два",
-        "Любое число, если скорость разная"
+        "Only one",
+        "No more than three",
+        "Exactly two",
+        "Any number, if the baud rates differ"
       ],
       "answer": 1,
-      "explain": "Четвёртый приводит к сбросу настроек MSP."
+      "explain": "A fourth one causes the MSP settings to reset."
     },
     {
-      "q": "Приёмник ExpressLRS подключён к UART2. Аппарат не видит стиков. Причина в этом diff:",
+      "q": "An ExpressLRS receiver is connected to UART2. The aircraft doesn't see the sticks. The cause is in this diff:",
       "kind": "apply",
       "fragment": "serial 1 64 115200 57600 0 115200\nset serialrx_provider = SBUS\nset serialrx_inverted = OFF",
       "options": [
-        "serialrx_provider = SBUS, а ELRS говорит CRSF — нужен serialrx_provider = CRSF",
-        "Маска 64 на UART2 означает MSP, а не Serial RX — приёмник подключён к порту телеметрии",
-        "Скорость 115200 мала для ELRS: CRSF требует 420000, и это задаётся в команде serial",
-        "serialrx_inverted = OFF: для ELRS на UART2 нужен включённый программный инвертор"
+        "serialrx_provider = SBUS, but ELRS speaks CRSF — you need serialrx_provider = CRSF",
+        "Mask 64 on UART2 means MSP, not Serial RX — the receiver is connected to the telemetry port",
+        "115200 baud is too low for ELRS: CRSF requires 420000, and that is set in the serial command",
+        "serialrx_inverted = OFF: ELRS on UART2 needs the software inverter turned on"
       ],
       "answer": 0,
-      "explain": "serial 1 (UART2) с маской 64 — Serial RX, это верно; не тот протокол."
+      "explain": "serial 1 (UART2) with mask 64 is Serial RX, that's correct; the protocol is wrong."
     }
   ]
 }

@@ -1,0 +1,94 @@
+{
+  "module": "ap-heavy",
+  "pass": 80,
+  "questions": [
+    {
+      "q": "The main downside of the coaxial X8 layout?",
+      "options": [
+        "The frame ends up heavier",
+        "A thrust loss of about 15 %",
+        "RTL is not supported",
+        "No protection against failures"
+      ],
+      "answer": 1,
+      "explain": "The lower prop works in the upper prop's wash. You pay for compactness and fault tolerance with efficiency."
+    },
+    {
+      "q": "FRAME_CLASS/FRAME_TYPE for an X8?",
+      "options": [
+        "1/1",
+        "4/1",
+        "3/0",
+        "7/1"
+      ],
+      "answer": 1,
+      "explain": "4 — OctaQuad, 1 — X."
+    },
+    {
+      "q": "What do you fix first with high VIBE on big props?",
+      "options": [
+        "The gyro filters",
+        "Balancing and stiffness",
+        "The PID gains and D-term filters on the yaw axis",
+        "The EKF settings"
+      ],
+      "answer": 1,
+      "explain": "Balancing props and motors, frame stiffness, FC damping. Filters are the last resort."
+    },
+    {
+      "q": "When do you test a motor failure?",
+      "options": [
+        "Never — it is dangerous",
+        "SITL, then at altitude without a payload",
+        "Right away with the full payload, to test the worst case",
+        "On the bench with props on"
+      ],
+      "answer": 1,
+      "explain": "Fault tolerance is tested, not assumed."
+    },
+    {
+      "q": "What does MOT_THST_HOVER set?",
+      "options": [
+        "Maximum throttle",
+        "Hover throttle",
+        "Minimum throttle",
+        "The motor protocol"
+      ],
+      "answer": 1,
+      "explain": "Hover throttle, refined in flight; altitude hold depends on it."
+    },
+    {
+      "q": "MOT_YAW_HEADROOM = 200 is:",
+      "options": [
+        "The maximum bank angle in centidegrees",
+        "The output headroom reserved for yaw",
+        "The notch filter frequency",
+        "The ESC current limit"
+      ],
+      "answer": 1,
+      "explain": "The motor output headroom (PWM) reserved for yaw at saturation; yaw is the mixer's lowest priority."
+    },
+    {
+      "q": "How do you safely test a motor failure on an X8?",
+      "options": [
+        "Remove a prop right in flight",
+        "An applet in SITL, then without a payload",
+        "Disconnect an ESC on the ground with props on",
+        "There is no way to test it"
+      ],
+      "answer": 1,
+      "explain": "motor_failure_test first in SITL, then at altitude without a payload; MOT_STOP_BITMASK + a switch."
+    },
+    {
+      "q": "Why is a heavy vehicle tuned slower and more carefully than a 5\"?",
+      "options": [
+        "Large inertia and slow motors: errors build up longer and are more dangerous",
+        "It has no AUTOTUNE",
+        "ArduPilot does not support big props",
+        "It has no gyroscope"
+      ],
+      "answer": 0,
+      "explain": "Big props and mass mean slow dynamics and a high cost of error."
+    }
+  ]
+}

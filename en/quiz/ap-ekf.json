@@ -3,105 +3,105 @@
   "pass": 80,
   "questions": [
     {
-      "q": "Зачем нужен EKF?",
+      "q": "What is the EKF for?",
       "options": [
-        "Чтобы писать сжатые логи полёта на SD-карту",
-        "Чтобы свести шумные датчики в одну оценку",
-        "Чтобы держать связь с GCS",
-        "Чтобы управлять моторами"
+        "To write compressed flight logs to the SD card",
+        "To merge noisy sensors into one estimate",
+        "To keep the link to the GCS",
+        "To drive the motors"
       ],
       "answer": 1,
-      "explain": "Одна согласованная оценка позиции, скорости и ориентации: предсказание по IMU, коррекция редкими измерениями GPS/баро/компаса."
+      "explain": "One consistent estimate of position, velocity and attitude: prediction from the IMU, correction with infrequent GPS/baro/compass measurements."
     },
     {
-      "q": "Что такое lane switching?",
+      "q": "What is lane switching?",
       "options": [
-        "Смена канала видеопередатчика при помехах",
-        "Переход на более здоровое ядро EKF",
-        "Переключение на запасную миссию",
-        "Автосмена полётного режима"
+        "Changing the video transmitter channel when there is interference",
+        "Switching to a healthier EKF core",
+        "Switching to a backup mission",
+        "Automatic flight mode change"
       ],
       "answer": 1,
-      "explain": "На каждый IMU своё ядро EKF; используется самое здоровое."
+      "explain": "Each IMU has its own EKF core; the healthiest one is used."
     },
     {
-      "q": "EK3_SRC1_YAW = 8 означает…",
+      "q": "EK3_SRC1_YAW = 8 means…",
       "options": [
-        "Курс по компасу",
-        "Курс по GPS-скорости (GSF)",
-        "Курс не оценивается",
-        "Курс от внешней навигационной системы"
+        "Heading from the compass",
+        "Heading from GPS velocity (GSF)",
+        "Heading is not estimated",
+        "Heading from an external navigation system"
       ],
       "answer": 1,
-      "explain": "Работает только в движении — на земле курса нет."
+      "explain": "It only works while moving — on the ground there is no heading."
     },
     {
-      "q": "Что делать с pre-arm «EKF compass variance»?",
+      "q": "What do you do about the pre-arm “EKF compass variance”?",
       "options": [
-        "Поднять FS_EKF_THRESH до 1.0 и взлететь",
-        "Искать помехи и калибровку",
-        "Отключить проверку EKF",
-        "Взлететь — само пройдёт"
+        "Raise FS_EKF_THRESH to 1.0 and take off",
+        "Look for interference and check the calibration",
+        "Disable the EKF check",
+        "Take off — it will go away by itself"
       ],
       "answer": 1,
-      "explain": "Помехи, калибровка, ориентация компаса. Порог — не лекарство."
+      "explain": "Interference, calibration, compass orientation. The threshold is not a cure."
     },
     {
-      "q": "FS_EKF_ACTION = 1 означает…",
+      "q": "FS_EKF_ACTION = 1 means…",
       "options": [
-        "Только сообщить на GCS",
-        "Land, если режим требует позиции",
-        "Переход в AltHold",
-        "Land из любого режима, даже из Stabilize"
+        "Only report to the GCS",
+        "Land if the mode requires position",
+        "Switch to AltHold",
+        "Land from any mode, even from Stabilize"
       ],
       "answer": 1,
-      "explain": "0 — report, 1 — Land если режим требует позиции, 2 — AltHold, 3 — Land всегда."
+      "explain": "0 — report, 1 — Land if the mode requires position, 2 — AltHold, 3 — always Land."
     },
     {
-      "q": "Почему в кейсе HeeWing отключили EKF3?",
+      "q": "Why was EKF3 disabled in the HeeWing case?",
       "options": [
-        "EKF3 не поддерживает конфигурацию QuadPlane",
-        "Нет компаса и нестабильный GPS",
-        "Не хватило памяти контроллера",
-        "Так быстрее работает цикл"
+        "EKF3 does not support the QuadPlane configuration",
+        "No compass and an unstable GPS",
+        "The controller ran out of memory",
+        "It makes the loop run faster"
       ],
       "answer": 1,
-      "explain": "Нет компаса и нестабильный GPS — выбрали DCM и режимы без позиции: осознанный компромисс под конкретное железо."
+      "explain": "No compass and an unstable GPS — they chose DCM and modes without position: a deliberate compromise for specific hardware."
     },
     {
-      "q": "XKF4.SM = 1.3 стабильно означает:",
+      "q": "A steady XKF4.SM = 1.3 means:",
       "options": [
-        "Компас здоров и откалиброван",
-        "Компас отбрасывается воротами",
-        "Потерян сигнал GPS",
-        "Барометр выдаёт неверную высоту"
+        "The compass is healthy and calibrated",
+        "The compass is being rejected by the gate",
+        "The GPS signal is lost",
+        "The barometer reports a wrong altitude"
       ],
       "answer": 1,
-      "explain": "Квадрат отношения инновации к допустимой > 1: помеха или калибровка."
+      "explain": "The square of the innovation-to-allowed ratio is > 1: interference or calibration."
     },
     {
-      "q": "EK3_GLITCH_RAD = 25 задаёт:",
+      "q": "EK3_GLITCH_RAD = 25 sets:",
       "options": [
-        "Радиус круговой геозоны вокруг точки дома",
-        "Порог сброса позиции к GPS",
-        "Ширину ворот компаса",
-        "Требуемую точность RTK"
+        "The radius of a circular geofence around the home point",
+        "The threshold for resetting the position to GPS",
+        "The width of the compass gate",
+        "The required RTK accuracy"
       ],
       "answer": 1,
-      "explain": "Расхождение с GPS, после которого позиция сбрасывается к GPS. Больше — терпимее к глитчам, но дольше уход."
+      "explain": "The discrepancy with GPS after which the position is reset to GPS. Larger is more tolerant of glitches, but the drift lasts longer."
     },
     {
-      "q": "Фрагмент XKF4 во время рывков позиции. Что происходит?",
+      "q": "An XKF4 fragment during position jumps. What is happening?",
       "kind": "apply",
       "fragment": "XKF4  C=0  SV=1.34  SP=1.62  SH=0.31  SM=0.22  ...\nXKF4  C=0  SV=1.18  SP=1.45  SH=0.28  SM=0.25  ...",
       "options": [
-        "Тестовые отношения скорости и позиции GPS > 1 — EKF отвергает GPS: глитч или многолучевость",
-        "SH около 0.3 значит, что барометр отвергнут, и высота считается только по GPS",
-        "SM около 0.2 — признак магнитной помехи: компас отвергнут, отсюда рывки позиции",
-        "Значения больше 1 означают высокую уверенность фильтра в GPS, а рывки позиции вызваны порывами ветра"
+        "The GPS velocity and position test ratios are > 1 — the EKF is rejecting GPS: a glitch or multipath",
+        "SH around 0.3 means the barometer is rejected and altitude comes from GPS only",
+        "SM around 0.2 is a sign of magnetic interference: the compass is rejected, hence the position jumps",
+        "Values above 1 mean the filter is highly confident in GPS, and the position jumps are caused by wind gusts"
       ],
       "answer": 0,
-      "explain": "Test ratio > 1 — измерение не прошло ворота; здесь это SV и SP, т. е. GPS."
+      "explain": "A test ratio > 1 means the measurement did not pass the gate; here that is SV and SP, i.e. GPS."
     }
   ]
 }

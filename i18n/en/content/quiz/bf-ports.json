@@ -1,0 +1,96 @@
+{
+  "module": "bf-ports",
+  "pass": 80,
+  "questions": [
+    {
+      "q": "What is the Ports tab for?",
+      "options": [
+        "Choosing the VTX channel",
+        "UART roles: RX, VTX, GPS",
+        "OSD setup",
+        "Motor and ESC calibration"
+      ],
+      "answer": 1,
+      "explain": "Each UART gets a role; without it the FC doesn't know where to look for the receiver or GPS."
+    },
+    {
+      "q": "Serial RX is enabled on UART2, the receiver is soldered to UART1. The result?",
+      "options": [
+        "Arming is impossible because of RXLOSS",
+        "The FC listens to the wrong port",
+        "Everything works",
+        "The VTX won't configure"
+      ],
+      "answer": 1,
+      "explain": "The port role must match the physical connection."
+    },
+    {
+      "q": "Can you assign two devices to one UART?",
+      "options": [
+        "Only GPS and VTX on F7",
+        "No, one role per UART",
+        "Yes, always",
+        "Only on F7"
+      ],
+      "answer": 1,
+      "explain": "A UART is one TX/RX pair. Two roles on one port conflict."
+    },
+    {
+      "q": "What is softserial?",
+      "options": [
+        "The USB port",
+        "A slow software UART",
+        "A lightweight firmware for F4",
+        "A receiver type"
+      ],
+      "answer": 1,
+      "explain": "Software emulation of a UART on regular pins: it helps when you've run out of UARTs, but it's no good for SBUS."
+    },
+    {
+      "q": "The FC's USB port is shown in Ports as…",
+      "options": [
+        "UART0",
+        "USB VCP",
+        "Softserial",
+        "Not shown"
+      ],
+      "answer": 1,
+      "explain": "USB VCP is a virtual COM port for the configurator and the CLI."
+    },
+    {
+      "q": "The line `serial 2 64 115200 57600 0 115200` means:",
+      "options": [
+        "UART2 = GPS",
+        "UART3 = Serial RX",
+        "USB = RX",
+        "UART2 = MSP at 115200"
+      ],
+      "answer": 1,
+      "explain": "Identifier 2 = UART3, 64 = Serial RX."
+    },
+    {
+      "q": "How many ports with MSP are allowed at the same time?",
+      "options": [
+        "Only one",
+        "No more than three",
+        "Exactly two",
+        "Any number, if the baud rates differ"
+      ],
+      "answer": 1,
+      "explain": "A fourth one causes the MSP settings to reset."
+    },
+    {
+      "q": "An ExpressLRS receiver is connected to UART2. The aircraft doesn't see the sticks. The cause is in this diff:",
+      "kind": "apply",
+      "fragment": "serial 1 64 115200 57600 0 115200\nset serialrx_provider = SBUS\nset serialrx_inverted = OFF",
+      "options": [
+        "serialrx_provider = SBUS, but ELRS speaks CRSF — you need serialrx_provider = CRSF",
+        "Mask 64 on UART2 means MSP, not Serial RX — the receiver is connected to the telemetry port",
+        "115200 baud is too low for ELRS: CRSF requires 420000, and that is set in the serial command",
+        "serialrx_inverted = OFF: ELRS on UART2 needs the software inverter turned on"
+      ],
+      "answer": 0,
+      "explain": "serial 1 (UART2) with mask 64 is Serial RX, that's correct; the protocol is wrong."
+    }
+  ]
+}

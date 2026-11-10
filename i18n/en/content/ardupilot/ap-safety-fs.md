@@ -76,7 +76,7 @@ For each failsafe: scenario → expected → observed → log. Mandatory: RC los
 ### Step 4. Field check
 Only after SITL: RC failsafe on the ground with props off (turn off the transmitter → motors disarm/message), then at 5 m altitude over a clear field — RC failsafe with a spotter; geofence — approach the boundary at low speed. Lab: FMEA, SITL test log, geofence verified.
 
-**Automatic log check:** `python3 examples/sitl-pymavlink/check_lab_log.py <лог.bin> --lab failsafe` (from the course repo) prints PASS/FAIL against the criteria: failsafe triggered (`ERR` Subsys 5), mode changed to RTL/LAND, reaction ≤ 5 s. Put the output in your test log.
+**Automatic log check:** `python3 examples/sitl-pymavlink/check_lab_log.py <log.bin> --lab failsafe` (from the course repo) prints PASS/FAIL against the criteria: failsafe triggered (`ERR` Subsys 5), mode changed to RTL/LAND, reaction ≤ 5 s. Put the output in your test log.
 
 ## diagnostics
 - **Symptom:** nothing happens when you turn off the transmitter

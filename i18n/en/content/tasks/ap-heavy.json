@@ -1,0 +1,42 @@
+{
+ "module": "ap-heavy",
+ "tasks": [
+  {
+   "id": "hover-time",
+   "title": "Hover time of a heavy vehicle",
+   "statement": "A **{c} Ah** pack, hover current **{i} A**, we use 80 % of the capacity. Hover time (min)?",
+   "params": {
+    "c": {
+     "min": 8,
+     "max": 44,
+     "step": 2
+    },
+    "i": {
+     "min": 30,
+     "max": 90,
+     "step": 2
+    }
+   },
+   "answer": "c*0.8/i*60",
+   "unit": "min",
+   "tol": 0.01,
+   "solution": "t = 0.8·C / I · 60. For the course platform: 20 Ah, 56 A → ~17 min; the real time is shorter with maneuvering, wind and cold."
+  },
+  {
+   "id": "motor-out",
+   "title": "Thrust per motor after a failure",
+   "statement": "An X8 with a mass of **{m} kg** has lost one motor. The average thrust on each of the remaining ones (g) to hover?",
+   "params": {
+    "m": {
+     "min": 3,
+     "max": 15,
+     "step": 0.5
+    }
+   },
+   "answer": "m*1000/7",
+   "unit": "g",
+   "tol": 0.01,
+   "solution": "The weight is shared by 7 motors instead of 8. In practice the failed motor's coaxial partner carries more than the average — check in the log that its output is not hitting the maximum."
+  }
+ ]
+}

@@ -3,40 +3,40 @@
   "pass": 80,
   "questions": [
     {
-      "q": "Зачем собирать свою прошивку Betaflight?",
+      "q": "Why build your own Betaflight firmware?",
       "options": [
-        "Так требует CRSF",
-        "Флеш ограничен: только нужное",
-        "Чтобы прошивка быстрее отрабатывала цикл PID",
-        "Незачем, есть готовая"
+        "CRSF requires it",
+        "Flash is limited: only what you need",
+        "To make the firmware run the PID loop faster",
+        "No reason, there's a ready-made one"
       ],
       "answer": 1,
-      "explain": "Cloud Build собирает под твой список опций."
+      "explain": "Cloud Build builds for your list of options."
     },
     {
-      "q": "Что такое custom define?",
+      "q": "What is a custom define?",
       "options": [
-        "Имя дрона в OSD",
-        "Флаг USE_* вне списков",
-        "Профиль PID",
-        "Параметр CLI с пользовательским именем"
+        "The drone's name in the OSD",
+        "A USE_* flag outside the lists",
+        "A PID profile",
+        "A CLI parameter with a user-defined name"
       ],
       "answer": 1,
-      "explain": "Опция вне стандартных списков, флаг USE_* без префикса; не тестируется на всех платах, пин задаётся через resource."
+      "explain": "An option outside the standard lists, a USE_* flag without the prefix; it isn't tested on every board, and its pin is set with resource."
     },
     {
-      "q": "Где увидеть ключ сборки на плате?",
+      "q": "Where can you see the build key on the board?",
       "options": [
         "get build",
-        "version в CLI",
-        "status в CLI",
-        "Команда build_info в CLI"
+        "version in the CLI",
+        "status in the CLI",
+        "The build_info command in the CLI"
       ],
       "answer": 1,
-      "explain": "Команды build_info в Betaflight нет."
+      "explain": "Betaflight has no build_info command."
     },
     {
-      "q": "Чем собирается ArduPilot?",
+      "q": "What is ArduPilot built with?",
       "options": [
         "make",
         "waf",
@@ -44,51 +44,51 @@
         "gradle"
       ],
       "answer": 1,
-      "explain": "./waf configure --board X; ./waf copter. Таргет описан в hwdef.dat платы."
+      "explain": "./waf configure --board X; ./waf copter. The target is described in the board's hwdef.dat."
     },
     {
-      "q": "Что потеряешь, убрав GPS из прошивки ArduPilot?",
+      "q": "What do you lose by removing GPS from the ArduPilot firmware?",
       "options": [
-        "Только элементы OSD с координатами и скоростью",
-        "RTL и геозону по координатам",
-        "Ничего важного",
-        "Работу компаса"
+        "Only the OSD elements with coordinates and speed",
+        "RTL and a coordinate-based geofence",
+        "Nothing important",
+        "The compass"
       ],
       "answer": 1,
-      "explain": "Вообще, не только сейчас. Решение осмысленное, если понимаешь последствия."
+      "explain": "At all, not just for now. It's a sensible decision if you understand the consequences."
     },
     {
-      "q": "Можно ли вставить diff all от другой мажорной версии в свою сборку?",
+      "q": "Can you paste a diff all from another major version into your custom build?",
       "options": [
-        "Только в формате dump и только на платах F7",
-        "Нет, как и для стандартной",
-        "Да, без ограничений",
-        "Да, если сборка с той же целью"
+        "Only in dump format and only on F7 boards",
+        "No, same as for the standard one",
+        "Yes, without restrictions",
+        "Yes, if the build has the same target"
       ],
       "answer": 1,
-      "explain": "Своя сборка + конфиг от другой версии = непредсказуемость."
+      "explain": "A custom build + a config from another version = unpredictability."
     },
     {
-      "q": "Что проверить сразу после прошивки своей сборки?",
+      "q": "What should you check right after flashing your custom build?",
       "options": [
-        "Совпадение version и BUILD KEY, гироскоп и порты",
-        "Только цвет светодиодов",
-        "Скорость загрузки конфигуратора",
-        "Ничего: сборка гарантированно верна"
+        "That version and BUILD KEY match, the gyro and the ports",
+        "Only the LED colors",
+        "How fast the configurator loads",
+        "Nothing: the build is guaranteed to be correct"
       ],
       "answer": 0,
-      "explain": "Сверить сборку с ожидаемой и перечитать критичное: гироскоп, порты, приёмник."
+      "explain": "Compare the build with the expected one and re-read what's critical: gyro, ports, receiver."
     },
     {
-      "q": "Как назвать свою сборку, чтобы её можно было повторить?",
+      "q": "How should you name your build so it can be reproduced?",
       "options": [
-        "Именем пилота",
-        "Просто «custom»",
-        "Номером COM-порта",
-        "С датой и хешем коммита"
+        "With the pilot's name",
+        "Just “custom”",
+        "With the COM port number",
+        "With the date and commit hash"
       ],
       "answer": 3,
-      "explain": "Дата и хеш коммита однозначно указывают, из чего собрано."
+      "explain": "The date and commit hash unambiguously identify what it was built from."
     }
   ]
 }

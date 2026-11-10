@@ -1,0 +1,41 @@
+{
+ "module": "bf-rpm-filter",
+ "tasks": [
+  {
+   "id": "erpm-hz",
+   "title": "Motor frequency from eRPM",
+   "statement": "The ESC reports **{e} eRPM**, `motor_poles = {p}`. Find the frequency of the motor's fundamental harmonic (Hz).",
+   "params": {
+    "e": {
+     "min": 20000,
+     "max": 250000,
+     "step": 5000
+    },
+    "p": [
+     12,
+     14
+    ]
+   },
+   "answer": "e/(p/2)/60",
+   "unit": "Hz",
+   "tol": 0.01,
+   "solution": "RPM = eRPM / (poles/2), f = RPM/60. A wrong `motor_poles` shifts every notch: with 12 instead of 14 the filter lands at 7/6 of the real frequency."
+  },
+  {
+   "id": "harmonic3",
+   "title": "Third harmonic vs. the lower bound",
+   "statement": "The motor in hover spins at **{rpm} RPM**. Find the frequency of the third harmonic (Hz).",
+   "params": {
+    "rpm": {
+     "min": 3000,
+     "max": 30000,
+     "step": 500
+    }
+   },
+   "answer": "3*rpm/60",
+   "unit": "Hz",
+   "tol": 0.01,
+   "solution": "The k-th harmonic is k·RPM/60. If the fundamental is below `rpm_filter_min_hz`, its notch sits at the bound, off target from the noise; higher harmonics are filtered."
+  }
+ ]
+}

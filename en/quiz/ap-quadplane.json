@@ -3,62 +3,62 @@
   "pass": 80,
   "questions": [
     {
-      "q": "Q_TILT_TYPE = 2 — это…",
+      "q": "Q_TILT_TYPE = 2 is…",
       "options": [
-        "Непрерывный наклон всех моторов",
-        "Vectored yaw: раздельный наклон",
-        "Двухпозиционный наклон",
-        "Схема бикоптера"
+        "Continuous tilt of all motors",
+        "Vectored yaw: independent tilt",
+        "Two-position tilt",
+        "A bicopter layout"
       ],
       "answer": 1,
-      "explain": "Vectored yaw даёт рыскание на висении наклоном моторов."
+      "explain": "Vectored yaw provides yaw in hover by tilting the motors."
     },
     {
-      "q": "Q_TILT_MASK = 3 означает…",
+      "q": "Q_TILT_MASK = 3 means…",
       "options": [
-        "Наклона нет",
-        "Наклоняются моторы 1 и 2",
-        "Наклоняется мотор 3",
-        "Наклоняются все моторы, кроме хвостового"
+        "No tilt",
+        "Motors 1 and 2 tilt",
+        "Motor 3 tilts",
+        "All motors tilt except the tail one"
       ],
       "answer": 1,
-      "explain": "Бит 0 — мотор 1, бит 1 — мотор 2."
+      "explain": "Bit 0 — motor 1, bit 1 — motor 2."
     },
     {
-      "q": "Почему мотор может раскрутиться без команды при проверке каналов?",
+      "q": "Why can a motor spin up without a command during a channel check?",
       "options": [
-        "Нет фикса GPS",
-        "Перепутаны выходы мотора и сервы",
-        "Низкое напряжение АКБ",
-        "Слишком высокий P контура скорости рыскания"
+        "No GPS fix",
+        "Motor and servo outputs are swapped",
+        "Low battery voltage",
+        "Yaw rate loop P is too high"
       ],
       "answer": 1,
-      "explain": "Функция мотора назначена на выход, физически подключённый к серве, и наоборот. Карту выходов составляют вручную без пропов."
+      "explain": "A motor function is assigned to an output physically connected to a servo, and vice versa. The output map is built by hand with props off."
     },
     {
-      "q": "Почему нельзя смешивать DShot-мотор и 50-Гц серву на одном таймере?",
+      "q": "Why can't you mix a DShot motor and a 50 Hz servo on one timer?",
       "options": [
-        "Можно, ограничений нет",
-        "Один протокол на группу таймера",
-        "Таймеры только для серв",
-        "Можно, если серва и мотор на одном BEC"
+        "You can, there are no restrictions",
+        "One protocol per timer group",
+        "Timers are for servos only",
+        "You can if the servo and motor share one BEC"
       ],
       "answer": 1,
-      "explain": "В группе таймера один протокол и частота на все выходы."
+      "explain": "A timer group has one protocol and rate for all its outputs."
     },
     {
-      "q": "Что проверить на земле до первого полёта tilt-rotor?",
+      "q": "What do you check on the ground before the first flight of a tilt-rotor?",
       "options": [
-        "Только фикс GPS",
-        "MANUAL ↔ QSTABILIZE: наклон и тримы",
-        "Только что аппарат армится в QHOVER",
-        "Канал видеопередатчика"
+        "Only the GPS fix",
+        "MANUAL ↔ QSTABILIZE: tilt and trims",
+        "Only that the aircraft arms in QHOVER",
+        "The video transmitter channel"
       ],
       "answer": 1,
-      "explain": "Плавный наклон, тримы серв, направления: в MANUAL моторы вперёд, в QSTABILIZE вверх."
+      "explain": "Smooth tilt, servo trims, directions: in MANUAL the motors point forward, in QSTABILIZE up."
     },
     {
-      "q": "Номера функций TiltMotorFrontLeft / FrontRight?",
+      "q": "Function numbers of TiltMotorFrontLeft / FrontRight?",
       "options": [
         "41/45",
         "75/76",
@@ -66,29 +66,29 @@
         "19/24"
       ],
       "answer": 1,
-      "explain": "75 и 76 — для vectored yaw; 41 — общий наклон передних."
+      "explain": "75 and 76 — for vectored yaw; 41 — common tilt of the front motors."
     },
     {
-      "q": "Q_ASSIST_SPEED задаёт:",
+      "q": "Q_ASSIST_SPEED sets:",
       "options": [
-        "Скорость поворота тилтов",
-        "Скорость, ниже которой VTOL помогает",
-        "Скорость вертикальной посадки",
-        "Скорость завершения перехода VTOL → крыло"
+        "The tilt rotation rate",
+        "The airspeed below which VTOL assists",
+        "The vertical landing speed",
+        "The airspeed at which the VTOL → wing transition completes"
       ],
       "answer": 1,
-      "explain": "Защита от сваливания."
+      "explain": "Stall protection."
     },
     {
-      "q": "AIRSPEED_MIN (до 4.5 — ARSPD_FBW_MIN) относительно V_s:",
+      "q": "AIRSPEED_MIN (before 4.5 — ARSPD_FBW_MIN) relative to V_s:",
       "options": [
-        "Ниже",
+        "Below",
         "≥ 1.3 V_s",
-        "Равна",
-        "Не связана"
+        "Equal",
+        "Unrelated"
       ],
       "answer": 1,
-      "explain": "Иначе сваливание после перехода."
+      "explain": "Otherwise you stall after the transition."
     }
   ]
 }

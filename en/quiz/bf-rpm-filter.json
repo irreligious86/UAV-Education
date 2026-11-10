@@ -3,105 +3,105 @@
   "pass": 80,
   "questions": [
     {
-      "q": "Что требуется для RPM-фильтра?",
+      "q": "What does the RPM filter require?",
       "options": [
-        "Включённый Air mode",
+        "Air mode enabled",
         "Bidirectional DShot",
-        "Обязательно F7",
-        "Барометр и модуль GPS"
+        "An F7, necessarily",
+        "A barometer and a GPS module"
       ],
       "answer": 1,
-      "explain": "Bidirectional DShot и ESC с его поддержкой: фильтру нужны обороты по обратному каналу."
+      "explain": "Bidirectional DShot and an ESC that supports it: the filter needs the RPM over the return channel."
     },
     {
-      "q": "Что задаёт rpm_filter_min_hz?",
+      "q": "What does rpm_filter_min_hz set?",
       "options": [
-        "Максимум оборотов",
-        "Нижнюю границу notch",
-        "Мощность VTX",
-        "Частоту записи логов Blackbox"
+        "The maximum RPM",
+        "The lower bound of the notch",
+        "VTX power",
+        "The Blackbox logging rate"
       ],
       "answer": 1,
-      "explain": "Если граница выше реальной частоты мотора, фильтр стоит мимо шума."
+      "explain": "If the bound is above the motor's real frequency, the filter sits off target from the noise."
     },
     {
-      "q": "Почему у 10\" дрона минимальная граница должна быть ниже, чем у 5\"?",
+      "q": "Why should the minimum bound on a 10\" drone be lower than on a 5\"?",
       "options": [
-        "Выше напряжение и больше вес",
-        "Моторы медленнее: 50–100 Гц",
-        "Больше ESC",
-        "Меньше полюсов мотора"
+        "Higher voltage and more weight",
+        "The motors are slower: 50–100 Hz",
+        "More ESCs",
+        "Fewer motor poles"
       ],
       "answer": 1,
-      "explain": "Частота = RPM/60. Большие пропы — медленные моторы — низкая частота."
+      "explain": "Frequency = RPM/60. Big props — slow motors — low frequency."
     },
     {
-      "q": "В кейсе viking10 rpm_filter_min_hz стоял 100, а медиана частоты моторов была 91 Гц. Следствие?",
+      "q": "In the viking10 case rpm_filter_min_hz was 100, while the median motor frequency was 91 Hz. The consequence?",
       "options": [
-        "Всё работало",
-        "Фильтр не видел моторы",
-        "Блок арма",
-        "Перегруз CPU и пропуск циклов"
+        "Everything worked",
+        "The filter didn't see the motors",
+        "Arming blocked",
+        "CPU overload and skipped loops"
       ],
       "answer": 1,
-      "explain": "Большую часть полёта RPM-фильтр стоял выше частоты моторов: шум 80–150 Гц почти не фильтровался, D-term +44.5 дБ."
+      "explain": "For most of the flight the RPM filter sat above the motor frequency: 80–150 Hz noise was barely filtered, D-term +44.5 dB."
     },
     {
-      "q": "Что значит флаг DSHOT_TELEM (до 4.5 — RPMFILTER) в OSD при арме?",
+      "q": "What does the DSHOT_TELEM flag (before 4.5 — RPMFILTER) in the OSD on arming mean?",
       "options": [
-        "Моторы перегреты по телеметрии",
-        "Нет валидной телеметрии ESC",
-        "Фильтр включён",
-        "Низкие обороты"
+        "Motors overheated per telemetry",
+        "No valid ESC telemetry",
+        "The filter is enabled",
+        "Low RPM"
       ],
       "answer": 1,
-      "explain": "Хотя бы один ESC не отдаёт телеметрию — арм заблокирован."
+      "explain": "At least one ESC isn't reporting telemetry — arming is blocked."
     },
     {
-      "q": "После save bidir снова OFF. Что это?",
+      "q": "After save, bidir is OFF again. What is this?",
       "options": [
-        "Баг конфигуратора",
-        "Прошивка откатила настройку",
-        "Сломан ESC или его прошивка",
-        "Так и должно быть"
+        "A configurator bug",
+        "The firmware rolled the setting back",
+        "A broken ESC or its firmware",
+        "That's how it should be"
       ],
       "answer": 1,
-      "explain": "После каждого save — перечитывать значения через get."
+      "explain": "After every save, read the values back with get."
     },
     {
-      "q": "rpm_filter_q = 500 задаёт ширину notch примерно:",
+      "q": "rpm_filter_q = 500 sets the notch width to roughly:",
       "options": [
         "f/50",
         "f/5",
         "f/500",
-        "5 Гц"
+        "5 Hz"
       ],
       "answer": 1,
-      "explain": "Q в сотых; 500 → добротность 5."
+      "explain": "Q is in hundredths; 500 → Q factor of 5."
     },
     {
-      "q": "Какое ослабление пиков моторов после RPM-фильтра — норма?",
+      "q": "What attenuation of the motor peaks after the RPM filter is normal?",
       "options": [
-        "1–2 дБ",
-        "20–30 дБ",
-        "60 дБ",
-        "60 дБ и больше"
+        "1–2 dB",
+        "20–30 dB",
+        "60 dB",
+        "60 dB or more"
       ],
       "answer": 1,
-      "explain": "Меньше 10 дБ — проверять poles/E%/bidir."
+      "explain": "Less than 10 dB — check poles/E%/bidir."
     },
     {
-      "q": "RPM-фильтр включён, но спектр в Blackbox не изменился. Что в этом diff объясняет проблему?",
+      "q": "The RPM filter is enabled, but the spectrum in Blackbox didn't change. What in this diff explains the problem?",
       "kind": "apply",
       "fragment": "# diff\nset motor_pwm_protocol = DSHOT600\nset dshot_bidir = OFF\nset rpm_filter_harmonics = 3\nset rpm_filter_min_hz = 100",
       "options": [
-        "dshot_bidir = OFF: без двунаправленного DShot нет eRPM, вырезам не по чему настраиваться",
-        "rpm_filter_harmonics = 3 избыточно: третья гармоника съедает фазу и маскирует результат",
-        "rpm_filter_min_hz = 100 отсекает все вырезы: моторы этого 5\" в висении крутятся ниже 100 Гц",
-        "DSHOT600 слишком быстр для телеметрии: RPM-фильтр работает только на DSHOT300"
+        "dshot_bidir = OFF: without bidirectional DShot there's no eRPM, so the notches have nothing to tune to",
+        "rpm_filter_harmonics = 3 is excessive: the third harmonic eats phase and masks the result",
+        "rpm_filter_min_hz = 100 cuts off all the notches: this 5\"'s motors spin below 100 Hz in hover",
+        "DSHOT600 is too fast for telemetry: the RPM filter works only on DSHOT300"
       ],
       "answer": 0,
-      "explain": "RPM-фильтр берёт частоты моторов из eRPM-телеметрии; без dshot_bidir её нет, вырезы не ставятся."
+      "explain": "The RPM filter takes motor frequencies from eRPM telemetry; without dshot_bidir there is none, and no notches are placed."
     }
   ]
 }

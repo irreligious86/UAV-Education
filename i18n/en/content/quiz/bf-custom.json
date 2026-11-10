@@ -1,0 +1,94 @@
+{
+  "module": "bf-custom",
+  "pass": 80,
+  "questions": [
+    {
+      "q": "Why build your own Betaflight firmware?",
+      "options": [
+        "CRSF requires it",
+        "Flash is limited: only what you need",
+        "To make the firmware run the PID loop faster",
+        "No reason, there's a ready-made one"
+      ],
+      "answer": 1,
+      "explain": "Cloud Build builds for your list of options."
+    },
+    {
+      "q": "What is a custom define?",
+      "options": [
+        "The drone's name in the OSD",
+        "A USE_* flag outside the lists",
+        "A PID profile",
+        "A CLI parameter with a user-defined name"
+      ],
+      "answer": 1,
+      "explain": "An option outside the standard lists, a USE_* flag without the prefix; it isn't tested on every board, and its pin is set with resource."
+    },
+    {
+      "q": "Where can you see the build key on the board?",
+      "options": [
+        "get build",
+        "version in the CLI",
+        "status in the CLI",
+        "The build_info command in the CLI"
+      ],
+      "answer": 1,
+      "explain": "Betaflight has no build_info command."
+    },
+    {
+      "q": "What is ArduPilot built with?",
+      "options": [
+        "make",
+        "waf",
+        "cmake",
+        "gradle"
+      ],
+      "answer": 1,
+      "explain": "./waf configure --board X; ./waf copter. The target is described in the board's hwdef.dat."
+    },
+    {
+      "q": "What do you lose by removing GPS from the ArduPilot firmware?",
+      "options": [
+        "Only the OSD elements with coordinates and speed",
+        "RTL and a coordinate-based geofence",
+        "Nothing important",
+        "The compass"
+      ],
+      "answer": 1,
+      "explain": "At all, not just for now. It's a sensible decision if you understand the consequences."
+    },
+    {
+      "q": "Can you paste a diff all from another major version into your custom build?",
+      "options": [
+        "Only in dump format and only on F7 boards",
+        "No, same as for the standard one",
+        "Yes, without restrictions",
+        "Yes, if the build has the same target"
+      ],
+      "answer": 1,
+      "explain": "A custom build + a config from another version = unpredictability."
+    },
+    {
+      "q": "What should you check right after flashing your custom build?",
+      "options": [
+        "That version and BUILD KEY match, the gyro and the ports",
+        "Only the LED colors",
+        "How fast the configurator loads",
+        "Nothing: the build is guaranteed to be correct"
+      ],
+      "answer": 0,
+      "explain": "Compare the build with the expected one and re-read what's critical: gyro, ports, receiver."
+    },
+    {
+      "q": "How should you name your build so it can be reproduced?",
+      "options": [
+        "With the pilot's name",
+        "Just “custom”",
+        "With the COM port number",
+        "With the date and commit hash"
+      ],
+      "answer": 3,
+      "explain": "The date and commit hash unambiguously identify what it was built from."
+    }
+  ]
+}

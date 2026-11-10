@@ -1,0 +1,107 @@
+{
+  "module": "bf-rpm-filter",
+  "pass": 80,
+  "questions": [
+    {
+      "q": "What does the RPM filter require?",
+      "options": [
+        "Air mode enabled",
+        "Bidirectional DShot",
+        "An F7, necessarily",
+        "A barometer and a GPS module"
+      ],
+      "answer": 1,
+      "explain": "Bidirectional DShot and an ESC that supports it: the filter needs the RPM over the return channel."
+    },
+    {
+      "q": "What does rpm_filter_min_hz set?",
+      "options": [
+        "The maximum RPM",
+        "The lower bound of the notch",
+        "VTX power",
+        "The Blackbox logging rate"
+      ],
+      "answer": 1,
+      "explain": "If the bound is above the motor's real frequency, the filter sits off target from the noise."
+    },
+    {
+      "q": "Why should the minimum bound on a 10\" drone be lower than on a 5\"?",
+      "options": [
+        "Higher voltage and more weight",
+        "The motors are slower: 50–100 Hz",
+        "More ESCs",
+        "Fewer motor poles"
+      ],
+      "answer": 1,
+      "explain": "Frequency = RPM/60. Big props — slow motors — low frequency."
+    },
+    {
+      "q": "In the viking10 case rpm_filter_min_hz was 100, while the median motor frequency was 91 Hz. The consequence?",
+      "options": [
+        "Everything worked",
+        "The filter didn't see the motors",
+        "Arming blocked",
+        "CPU overload and skipped loops"
+      ],
+      "answer": 1,
+      "explain": "For most of the flight the RPM filter sat above the motor frequency: 80–150 Hz noise was barely filtered, D-term +44.5 dB."
+    },
+    {
+      "q": "What does the DSHOT_TELEM flag (before 4.5 — RPMFILTER) in the OSD on arming mean?",
+      "options": [
+        "Motors overheated per telemetry",
+        "No valid ESC telemetry",
+        "The filter is enabled",
+        "Low RPM"
+      ],
+      "answer": 1,
+      "explain": "At least one ESC isn't reporting telemetry — arming is blocked."
+    },
+    {
+      "q": "After save, bidir is OFF again. What is this?",
+      "options": [
+        "A configurator bug",
+        "The firmware rolled the setting back",
+        "A broken ESC or its firmware",
+        "That's how it should be"
+      ],
+      "answer": 1,
+      "explain": "After every save, read the values back with get."
+    },
+    {
+      "q": "rpm_filter_q = 500 sets the notch width to roughly:",
+      "options": [
+        "f/50",
+        "f/5",
+        "f/500",
+        "5 Hz"
+      ],
+      "answer": 1,
+      "explain": "Q is in hundredths; 500 → Q factor of 5."
+    },
+    {
+      "q": "What attenuation of the motor peaks after the RPM filter is normal?",
+      "options": [
+        "1–2 dB",
+        "20–30 dB",
+        "60 dB",
+        "60 dB or more"
+      ],
+      "answer": 1,
+      "explain": "Less than 10 dB — check poles/E%/bidir."
+    },
+    {
+      "q": "The RPM filter is enabled, but the spectrum in Blackbox didn't change. What in this diff explains the problem?",
+      "kind": "apply",
+      "fragment": "# diff\nset motor_pwm_protocol = DSHOT600\nset dshot_bidir = OFF\nset rpm_filter_harmonics = 3\nset rpm_filter_min_hz = 100",
+      "options": [
+        "dshot_bidir = OFF: without bidirectional DShot there's no eRPM, so the notches have nothing to tune to",
+        "rpm_filter_harmonics = 3 is excessive: the third harmonic eats phase and masks the result",
+        "rpm_filter_min_hz = 100 cuts off all the notches: this 5\"'s motors spin below 100 Hz in hover",
+        "DSHOT600 is too fast for telemetry: the RPM filter works only on DSHOT300"
+      ],
+      "answer": 0,
+      "explain": "The RPM filter takes motor frequencies from eRPM telemetry; without dshot_bidir there is none, and no notches are placed."
+    }
+  ]
+}

@@ -3,116 +3,116 @@
   "pass": 80,
   "questions": [
     {
-      "q": "Зачем фильтровать сигнал гироскопа?",
+      "q": "Why filter the gyro signal?",
       "options": [
-        "Для красоты графиков",
-        "Чтобы шум не шёл в PID",
-        "Чтобы снизить задержку",
-        "Чтобы поднять P"
+        "To make the graphs look nice",
+        "To keep noise out of the PID",
+        "To reduce delay",
+        "To raise P"
       ],
       "answer": 1,
-      "explain": "Шум моторов и рамы не должен попадать в PID и моторы: D усиливает шум, моторы греются."
+      "explain": "Motor and frame noise must not reach the PID and the motors: D amplifies noise, and the motors heat up."
     },
     {
-      "q": "Какова цена любого фильтра?",
+      "q": "What is the price of any filter?",
       "options": [
-        "Рост расхода АКБ на обработку",
-        "Задержка сигнала",
-        "Потеря связи",
-        "Цены нет"
+        "Higher battery draw for processing",
+        "Signal delay",
+        "Link loss",
+        "There is no price"
       ],
       "answer": 1,
-      "explain": "Фильтр отстаёт от сигнала: больше фильтрации — медленнее реакция."
+      "explain": "A filter lags behind the signal: more filtering means a slower response."
     },
     {
-      "q": "Самый эффективный фильтр шума моторов в Betaflight?",
+      "q": "The most effective motor-noise filter in Betaflight?",
       "options": [
-        "Статический notch",
-        "RPM-фильтр",
+        "Static notch",
+        "RPM filter",
         "LPF2",
-        "Фильтр D-term"
+        "The D-term filter"
       ],
       "answer": 1,
-      "explain": "RPM-фильтр ставит узкие notch точно на частоту каждого мотора по телеметрии ESC."
+      "explain": "The RPM filter puts narrow notches exactly on each motor's frequency using ESC telemetry."
     },
     {
-      "q": "Что делает dynamic notch?",
+      "q": "What does the dynamic notch do?",
       "options": [
-        "Режет всё выше частоты",
-        "Ставит notch на пики спектра",
-        "Снижает P",
-        "Удваивает D на частоте пика"
+        "Cuts everything above a frequency",
+        "Puts notches on spectrum peaks",
+        "Lowers P",
+        "Doubles D at the peak frequency"
       ],
       "answer": 1,
-      "explain": "Динамический notch следит за резонансами рамы и прочим, что не поймал RPM-фильтр."
+      "explain": "The dynamic notch tracks frame resonances and whatever else the RPM filter didn't catch."
     },
     {
-      "q": "Порядок каскада в Betaflight 4.5?",
+      "q": "The cascade order in Betaflight 4.5?",
       "options": [
         "LPF → notch → RPM",
         "RPM → dyn notch → LPF",
-        "Только LPF, notch отключены по умолчанию",
-        "Только RPM"
+        "Only LPF, notches are off by default",
+        "Only RPM"
       ],
       "answer": 1,
-      "explain": "Сначала точные notch по моторам, затем автоматические, затем финальный lowpass."
+      "explain": "First the precise per-motor notches, then the automatic ones, then the final lowpass."
     },
     {
-      "q": "Моторы горячие после изменения фильтров. Что делать?",
+      "q": "The motors are hot after changing the filters. What do you do?",
       "options": [
-        "Поднять P, чтобы перекрыть шум",
-        "Откатить и смотреть спектр",
-        "Поднять D",
-        "Летать дальше"
+        "Raise P to override the noise",
+        "Roll back and look at the spectrum",
+        "Raise D",
+        "Keep flying"
       ],
       "answer": 1,
-      "explain": "Нагрев — признак пропущенного шума. Назад к рабочему состоянию, затем анализ."
+      "explain": "Heat is a sign of noise getting through. Go back to a working state, then analyze."
     },
     {
-      "q": "В каком порядке применяются фильтры гироскопа в Betaflight 4.5?",
+      "q": "In what order are the gyro filters applied in Betaflight 4.5?",
       "options": [
         "LPF1 → LPF2 → RPM → dyn notch",
         "RPM → dyn notch → LPF1 → LPF2",
         "dyn notch → RPM → LPF1 → LPF2",
-        "LPF1 → LPF2 без notch"
+        "LPF1 → LPF2 without notches"
       ],
       "answer": 1,
-      "explain": "Порядок из gyroFiltering(): сначала узкополосные notch, затем LPF."
+      "explain": "The order from gyroFiltering(): narrowband notches first, then the LPFs."
     },
     {
-      "q": "Что делает simplified_gyro_filter_multiplier = 150?",
+      "q": "What does simplified_gyro_filter_multiplier = 150 do?",
       "options": [
-        "Снижает частоты среза на 50 %",
-        "Поднимает частоты среза на 50 %",
-        "Отключает RPM-фильтр и включает PT3 вместо него",
-        "Удваивает частоту notch"
+        "Lowers the cutoff frequencies by 50%",
+        "Raises the cutoff frequencies by 50%",
+        "Disables the RPM filter and enables PT3 instead",
+        "Doubles the notch frequency"
       ],
       "answer": 1,
-      "explain": "100 — умолчания; выше — меньше фильтрации и задержки."
+      "explain": "100 is the defaults; higher means less filtering and less delay."
     },
     {
-      "q": "Какой критерий «достаточно отфильтровано» неверен?",
+      "q": "Which “filtered enough” criterion is wrong?",
       "options": [
-        "Пики моторов ≤ 5–10 дБ над фоном",
-        "Моторы тёплые, не горячие",
-        "LPF гироскопа ниже 100 Гц на 5\"",
-        "bounce-back < 15% и нет «ваты»"
+        "Motor peaks ≤ 5–10 dB above the floor",
+        "Motors warm, not hot",
+        "Gyro LPF below 100 Hz on a 5\"",
+        "bounce-back < 15% and no “mush”"
       ],
       "answer": 2,
-      "explain": "Низкий LPF «прячет» механику ценой задержки — это не критерий, а симптом."
+      "explain": "A low LPF “hides” mechanics at the cost of delay — that's not a criterion, it's a symptom."
     },
     {
-      "q": "Вывод грейдера курса по логу 5\". Какой вывод верный?",
+      "q": "The course grader's output for a 5\" log. Which conclusion is correct?",
       "kind": "apply",
       "fragment": "[FAIL] filters  roll noise after filters: 12.9 (limit <= 4.0 deg/s)\n[FAIL] filters  roll noise reduction: 4.4 (limit >= 6.0 dB)\n[PASS] filters  roll dominant noise frequency: 250.0\n[FAIL] rpm      eRPM telemetry logged: None (limit present)",
       "options": [
-        "Моторный шум (~250 Гц) проходит фильтры, а RPM-фильтр не работает — нет eRPM-телеметрии",
-        "Пик 250 Гц — резонанс рамы; RPM-фильтр тут не поможет, нужен только статический notch",
-        "Фильтры слишком сильные: подавление 4 дБ означает перефильтрованный гироскоп, их надо ослабить",
-        "Гироскоп повреждён: 13 °/с шума после фильтров невозможно получить на исправном датчике"
+        "Motor noise (~250 Hz) gets through the filters, and the RPM filter isn't working — there's no eRPM telemetry",
+        "The 250 Hz peak is a frame resonance; the RPM filter won't help here, only a static notch will",
+        "The filters are too strong: 4 dB of reduction means an over-filtered gyro, they need to be relaxed",
+        "The gyro is damaged: 13 °/s of noise after the filters is impossible on a healthy sensor"
       ],
       "answer": 0,
-      "explain": "Пик на моторной частоте, слабое подавление и отсутствие eRPM указывают на неработающий RPM-фильтр."
+      "explain": "A peak at the motor frequency, weak reduction and no eRPM point to a non-working RPM filter."
     }
   ]
 }

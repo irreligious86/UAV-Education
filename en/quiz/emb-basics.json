@@ -3,92 +3,92 @@
   "pass": 80,
   "questions": [
     {
-      "q": "Сколько времени на один цикл при 8 кГц?",
+      "q": "How much time is there for one cycle at 8 kHz?",
       "options": [
-        "1 мс",
-        "125 мкс",
-        "12.5 мкс",
-        "8 мс"
+        "1 ms",
+        "125 µs",
+        "12.5 µs",
+        "8 ms"
       ],
       "answer": 1,
-      "explain": "1/8000 с = 125 мкс."
+      "explain": "1/8000 s = 125 µs."
     },
     {
-      "q": "Что делает DMA?",
+      "q": "What does DMA do?",
       "options": [
-        "Ускоряет процессор",
-        "Копирует данные без CPU",
-        "Считает PID",
-        "Фильтрует сигнал гироскопа"
+        "Speeds up the CPU",
+        "Copies data without the CPU",
+        "Computes the PID",
+        "Filters the gyro signal"
       ],
       "answer": 1,
-      "explain": "Копирует данные между периферией и памятью без участия процессора: DShot, SPI-гироскоп, приём UART."
+      "explain": "It copies data between peripherals and memory without the CPU's involvement: DShot, the SPI gyro, UART reception."
     },
     {
-      "q": "Какое правило обязательно для обработчика прерывания?",
+      "q": "Which rule is mandatory for an interrupt handler?",
       "options": [
-        "Делать всю работу внутри",
-        "Коротко, без блокировок",
-        "Выделять память",
-        "Ждать UART"
+        "Do all the work inside",
+        "Short, no blocking",
+        "Allocate memory",
+        "Wait for the UART"
       ],
       "answer": 1,
-      "explain": "Без блокировок и printf, тяжёлое — в задачу через очередь; ISR завершается за микросекунды."
+      "explain": "No blocking and no printf, heavy work goes to a task via a queue; the ISR finishes in microseconds."
     },
     {
-      "q": "Почему blocking-код в контуре управления — авария?",
+      "q": "Why is blocking code in the control loop a disaster?",
       "options": [
-        "Ломает DMA",
-        "Пропуск циклов и watchdog",
-        "Греет процессор и снижает напряжение",
-        "Ломает таблицу векторов прерываний"
+        "It breaks DMA",
+        "Missed cycles and the watchdog",
+        "It heats the CPU and lowers the voltage",
+        "It breaks the interrupt vector table"
       ],
       "answer": 1,
-      "explain": "Пропускаются циклы: устаревший гироскоп, скачки D, возможная перезагрузка watchdog."
+      "explain": "Cycles get skipped: stale gyro data, D jumps, a possible watchdog reboot."
     },
     {
-      "q": "Как в FreeRTOS получить точный период задачи?",
+      "q": "How do you get a precise task period in FreeRTOS?",
       "options": [
-        "vTaskDelay после работы",
-        "vTaskDelayUntil или таймер",
-        "Программный таймер с колбэком",
-        "Busy-wait в цикле"
+        "vTaskDelay after the work",
+        "vTaskDelayUntil or a timer",
+        "A software timer with a callback",
+        "Busy-wait in a loop"
       ],
       "answer": 1,
-      "explain": "vTaskDelay отсчитывает от конца работы и накапливает дрейф."
+      "explain": "vTaskDelay counts from the end of the work and accumulates drift."
     },
     {
-      "q": "Что такое watchdog?",
+      "q": "What is a watchdog?",
       "options": [
-        "Логгер последних событий",
-        "Таймер сброса МК",
-        "Датчик",
-        "Фильтр"
+        "A logger of the latest events",
+        "An MCU reset timer",
+        "A sensor",
+        "A filter"
       ],
       "answer": 1,
-      "explain": "Аппаратный таймер перезагружает МК, если его не «кормить»: зависание = перезагрузка."
+      "explain": "A hardware timer reboots the MCU if it isn't “fed”: a hang = a reboot."
     },
     {
-      "q": "Что произойдёт с джиттером задачи датчика, если задача с большим приоритетом делает busy-wait 5 мс?",
+      "q": "What happens to the sensor task's jitter if a higher-priority task does a 5 ms busy-wait?",
       "options": [
-        "Уменьшится за счёт вытеснения",
-        "Вырастет до миллисекунд",
-        "Ничего",
-        "Задача ускорится"
+        "It decreases thanks to preemption",
+        "It grows to milliseconds",
+        "Nothing",
+        "The task speeds up"
       ],
       "answer": 1,
-      "explain": "Вытесняющий планировщик отдаёт ядро более приоритетной задаче."
+      "explain": "The preemptive scheduler gives the core to the higher-priority task."
     },
     {
-      "q": "Почему в обработчике прерывания нельзя вызывать printf?",
+      "q": "Why can't you call printf in an interrupt handler?",
       "options": [
-        "Он долгий и блокирующий — задерживает остальные прерывания",
-        "Он не компилируется на STM32",
-        "Прерывания не имеют доступа к памяти",
-        "printf работает только в main"
+        "It's slow and blocking — it delays the other interrupts",
+        "It doesn't compile on STM32",
+        "Interrupts have no access to memory",
+        "printf only works in main"
       ],
       "answer": 0,
-      "explain": "ISR должен быть коротким: долгие и блокирующие вызовы ломают тайминг всей системы."
+      "explain": "An ISR must be short: slow and blocking calls break the timing of the whole system."
     }
   ]
 }

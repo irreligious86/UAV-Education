@@ -3,92 +3,92 @@
   "pass": 80,
   "questions": [
     {
-      "q": "Что сделать с UART Raspberry Pi перед подключением FC?",
+      "q": "What do you do with the Raspberry Pi UART before connecting the FC?",
       "options": [
-        "Ничего не делать",
-        "Снять консоль с порта",
-        "Удалить драйвер",
-        "Поставить скорость 9600 для надёжности"
+        "Nothing",
+        "Remove the console from the port",
+        "Delete the driver",
+        "Set the speed to 9600 for reliability"
       ],
       "answer": 1,
-      "explain": "Снять консоль Linux с порта (raspi-config) и включить аппаратный порт — иначе консоль держит порт."
+      "explain": "Remove the Linux console from the port (raspi-config) and enable the hardware port — otherwise the console holds the port."
     },
     {
-      "q": "SERIAL2_BAUD = 921 означает…",
+      "q": "SERIAL2_BAUD = 921 means…",
       "options": [
-        "9210 бод после округления",
-        "921600 бод",
-        "921 бод",
-        "92100 бод"
+        "9210 baud after rounding",
+        "921600 baud",
+        "921 baud",
+        "92100 baud"
       ],
       "answer": 1,
-      "explain": "Для коротких проводов норма; для длинных — 57 (57600)."
+      "explain": "Normal for short wires; for long ones use 57 (57600)."
     },
     {
-      "q": "Зачем маршрутизатор MAVLink?",
+      "q": "Why a MAVLink router?",
       "options": [
-        "Для скорости",
-        "Один UART — много клиентов",
-        "Для Wi-Fi",
-        "Для шифрования телеметрии"
+        "For speed",
+        "One UART, many clients",
+        "For Wi-Fi",
+        "To encrypt telemetry"
       ],
       "answer": 1,
-      "explain": "mavlink-router или mavp2p раздают поток по UDP/TCP."
+      "explain": "mavlink-router or mavp2p serve the stream over UDP/TCP."
     },
     {
-      "q": "Почему скрипт запускают как systemd-сервис?",
+      "q": "Why is the script run as a systemd service?",
       "options": [
-        "Так быстрее",
-        "Автостарт и перезапуск",
-        "Ради логов",
-        "Так требует MAVLink-роутер"
+        "It's faster",
+        "Autostart and restart",
+        "For the logs",
+        "The MAVLink router requires it"
       ],
       "answer": 1,
-      "explain": "Скрипт из SSH умирает вместе с сессией."
+      "explain": "A script started over SSH dies with the session."
     },
     {
-      "q": "Pi выключился в полёте. Что с FC?",
+      "q": "The Pi shut down in flight. What happens to the FC?",
       "options": [
-        "Уходит в RTL по таймауту",
-        "Продолжает работать",
-        "Садится",
-        "Падает"
+        "Goes to RTL on a timeout",
+        "Keeps working",
+        "Lands",
+        "Crashes"
       ],
       "answer": 1,
-      "explain": "FC работает дальше; после включения Pi сервис поднимается сам."
+      "explain": "The FC keeps working; after the Pi powers back on, the service comes up by itself."
     },
     {
-      "q": "Почему на Pi 4 отключают Bluetooth для UART?",
+      "q": "Why is Bluetooth disabled on a Pi 4 for the UART?",
       "options": [
-        "Не нужен",
-        "BT занимает полный UART",
-        "Мешает Wi-Fi",
-        "Экономия энергии в полёте"
+        "It isn't needed",
+        "BT takes the full UART",
+        "It interferes with Wi-Fi",
+        "To save power in flight"
       ],
       "answer": 1,
-      "explain": "Bluetooth занимает полный UART, а mini-UART нестабилен на 921600: dtoverlay=disable-bt."
+      "explain": "Bluetooth takes the full UART, and the mini-UART is unstable at 921600: dtoverlay=disable-bt."
     },
     {
-      "q": "Как скрипты подключаются при mavlink-router?",
+      "q": "How do scripts connect when mavlink-router is used?",
       "options": [
-        "К /dev/serial0",
-        "К локальному UDP-порту",
-        "Через SSH-туннель на порт",
-        "По USB"
+        "To /dev/serial0",
+        "To a local UDP port",
+        "Through an SSH tunnel to the port",
+        "Over USB"
       ],
       "answer": 1,
-      "explain": "Иначе мешают друг другу."
+      "explain": "Otherwise they get in each other's way."
     },
     {
-      "q": "Что показывает vcgencmd get_throttled = 0x50000?",
+      "q": "What does vcgencmd get_throttled = 0x50000 show?",
       "options": [
-        "Были просадка питания и троттлинг с момента загрузки",
-        "Всё в порядке",
-        "Троттлинг прямо сейчас",
-        "Перегрев SD-карты"
+        "Undervoltage and throttling have occurred since boot",
+        "Everything is fine",
+        "Throttling right now",
+        "SD card overheating"
       ],
       "answer": 0,
-      "explain": "Биты 16 и 18 — просадка питания и троттлинг происходили; биты 0–3 — происходят сейчас."
+      "explain": "Bits 16 and 18 — undervoltage and throttling have occurred; bits 0–3 — they are happening now."
     }
   ]
 }

@@ -1,0 +1,118 @@
+{
+  "module": "bf-failsafe",
+  "pass": 80,
+  "questions": [
+    {
+      "q": "After how long does Betaflight consider the signal lost?",
+      "options": [
+        "Immediately at the first loss",
+        "100 ms + 300 ms of hold",
+        "After a minute",
+        "After 5 seconds without valid packets"
+      ],
+      "answer": 1,
+      "explain": "100 ms — loss, 300 ms — holding the last values, then Stage 1."
+    },
+    {
+      "q": "What does failsafe_delay = 15 set?",
+      "options": [
+        "15 milliseconds before the procedure starts",
+        "1.5 seconds of Stage 1",
+        "15 seconds",
+        "15% throttle"
+      ],
+      "answer": 1,
+      "explain": "The parameter is in tenths of a second."
+    },
+    {
+      "q": "What does the DROP procedure do?",
+      "options": [
+        "Lands smoothly",
+        "Instant disarm",
+        "Flies home",
+        "Hovers in place"
+      ],
+      "answer": 1,
+      "explain": "Motors stop; re-arming is possible after the link returns, the failsafe_recovery_delay wait, and with the arm switch off."
+    },
+    {
+      "q": "What does Betaflight do with ANGLE mode in Stage 2 (AUTO-LAND)?",
+      "options": [
+        "Enables it by itself if an accelerometer is present",
+        "Nothing: ANGLE is set only by the channel",
+        "Disables it so it doesn't interfere with the descent",
+        "Enables it only with a GPS fix"
+      ],
+      "answer": 0,
+      "explain": "In Stage 2 the firmware enables ANGLE by itself (fc/core.c) if there is an accelerometer; without an accelerometer there's nothing to level with — such an aircraft is better set to DROP."
+    },
+    {
+      "q": "Which switch mode most honestly reproduces a link loss?",
+      "options": [
+        "KILL",
+        "STAGE2",
+        "STAGE1",
+        "DROP"
+      ],
+      "answer": 2,
+      "explain": "STAGE1 goes through both stages, as in a real signal loss."
+    },
+    {
+      "q": "What's dangerous about KILL on a switch?",
+      "options": [
+        "It enables GPS Rescue instead of disarming",
+        "A channel glitch means an instant disarm",
+        "Nothing dangerous",
+        "It doesn't work in flight"
+      ],
+      "answer": 1,
+      "explain": "KILL disarms with no delay — any channel glitch drops the drone."
+    },
+    {
+      "q": "How do you pick failsafe_throttle for AUTO-LAND?",
+      "options": [
+        "Always 1500 — the middle of the throttle range",
+        "Slightly below hover throttle",
+        "Full throttle",
+        "Always 1000"
+      ],
+      "answer": 1,
+      "explain": "Slightly below hover throttle from the log, aiming for about 1 m/s descent: on a heavy 10\" it might be 1350, on a light 7\" — 1250."
+    },
+    {
+      "q": "rxfail 5 s 1700 means:",
+      "options": [
+        "Channel 5 is held",
+        "Channel 5 = 1700 µs in Stage 1",
+        "Channel 5 in auto mode",
+        "Channel 5 is disabled during failsafe"
+      ],
+      "answer": 1,
+      "explain": "a — auto, h — hold, s — set; for example, to enable ANGLE."
+    },
+    {
+      "q": "What does GPS Rescue need to record home?",
+      "options": [
+        "A calibrated compass",
+        "A fix with the required number of satellites",
+        "Nothing",
+        "A working barometer and accelerometer calibration"
+      ],
+      "answer": 1,
+      "explain": "A fix with ≥ gps_rescue_min_sats before arming. Without home, Rescue is useless; leave allow_arming_without_fix OFF."
+    },
+    {
+      "q": "The aircraft won't arm. What does this status output mean?",
+      "kind": "apply",
+      "fragment": "# status\n...\nArming disable flags: RXLOSS CLI",
+      "options": [
+        "No valid RC frames, and the CLI is open — arming is blocked for both reasons",
+        "The accelerometer isn't calibrated: the RXLOSS flag appears when ACC calibration is missing",
+        "The aircraft is tilted more than small_angle, which is encoded by the CLI flag",
+        "GPS Rescue mode is on without a satellite fix — that's what the RXLOSS and CLI flags mean"
+      ],
+      "answer": 0,
+      "explain": "RXLOSS — no RC frames; CLI — arming is deliberately blocked while the CLI is open."
+    }
+  ]
+}

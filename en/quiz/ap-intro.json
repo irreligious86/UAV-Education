@@ -3,73 +3,73 @@
   "pass": 80,
   "questions": [
     {
-      "q": "Чем ArduPilot принципиально отличается от Betaflight?",
+      "q": "What fundamentally sets ArduPilot apart from Betaflight?",
       "options": [
-        "Ничем, кроме интерфейса",
-        "Знает позицию и летает сам",
-        "Предназначен только для самолётов",
-        "Работает без PID-регуляторов"
+        "Nothing except the interface",
+        "It knows its position and flies by itself",
+        "It is meant for planes only",
+        "It works without PID controllers"
       ],
       "answer": 1,
-      "explain": "Автопилот: знает позицию, выполняет миссии, летает без пилота. Betaflight — стабилизатор под стики."
+      "explain": "An autopilot: it knows its position, runs missions, flies without a pilot. Betaflight is a stabilizer for stick input."
     },
     {
-      "q": "Есть ли в ArduPilot команда save?",
+      "q": "Does ArduPilot have a save command?",
       "options": [
-        "Да, как в Betaflight",
-        "Нет, запись сразу",
-        "Только в CLI-режиме",
-        "Только через MAVProxy"
+        "Yes, like Betaflight",
+        "No, changes are written immediately",
+        "Only in CLI mode",
+        "Only through MAVProxy"
       ],
       "answer": 1,
-      "explain": "Часть параметров требует перезагрузки, но запись происходит мгновенно."
+      "explain": "Some parameters require a reboot, but the write happens instantly."
     },
     {
-      "q": "Какие режимы Copter требуют GPS?",
+      "q": "Which Copter modes need GPS?",
       "options": [
-        "STABILIZE и ACRO",
+        "STABILIZE and ACRO",
         "LOITER, AUTO, RTL",
-        "Только ALT_HOLD",
-        "Все без исключения"
+        "Only ALT_HOLD",
+        "All of them, without exception"
       ],
       "answer": 1,
-      "explain": "Режимы с позицией нуждаются в здоровой оценке положения."
+      "explain": "Position modes need a healthy position estimate."
     },
     {
-      "q": "Сообщение PreArm — это…",
+      "q": "A PreArm message is…",
       "options": [
-        "Ошибка прошивки",
-        "Что не готово к арму",
-        "Предупреждение о низком напряжении АКБ",
-        "Название режима"
+        "A firmware error",
+        "What is not ready for arming",
+        "A low battery voltage warning",
+        "The name of a mode"
       ],
       "answer": 1,
-      "explain": "Отключать предармовые проверки (ARMING_SKIPCHK, до 4.7 — ARMING_CHECK) ради взлёта — путь к аварии."
+      "explain": "Disabling pre-arm checks (ARMING_SKIPCHK, before 4.7 — ARMING_CHECK) to take off is the road to a crash."
     },
     {
-      "q": "Что задаёт FRAME_CLASS = 4?",
+      "q": "What does FRAME_CLASS = 4 set?",
       "options": [
-        "Квадрокоптер",
+        "Quadcopter",
         "OctaQuad (X8)",
-        "Гексакоптер в схеме X",
-        "Трикоптер"
+        "Hexacopter in X layout",
+        "Tricopter"
       ],
       "answer": 1,
       "explain": "1 — Quad, 2 — Hexa, 3 — Octa, 4 — OctaQuad, 7 — Tri."
     },
     {
-      "q": "Почему Lua-скрипты не работают на F4?",
+      "q": "Why don't Lua scripts work on F4?",
       "options": [
-        "Запрещены лицензией",
-        "Мало флеша и памяти",
-        "F4 слишком быстрый",
-        "Работают нормально"
+        "The license forbids it",
+        "Not enough flash and memory",
+        "F4 is too fast",
+        "They work fine"
       ],
       "answer": 1,
-      "explain": "Нужно минимум 2 МБ флеша и память, которых у F4 нет."
+      "explain": "They need at least 2 MB of flash and memory that the F4 doesn't have."
     },
     {
-      "q": "Режим 5 в FLTMODE означает:",
+      "q": "Mode 5 in FLTMODE means:",
       "options": [
         "Stabilize",
         "Loiter",
@@ -80,15 +80,15 @@
       "explain": "0 Stabilize, 2 AltHold, 3 Auto, 4 Guided, 5 Loiter, 6 RTL, 9 Land, 16 PosHold."
     },
     {
-      "q": "Аналог Betaflight Angle в ArduCopter:",
+      "q": "The ArduCopter counterpart of Betaflight Angle:",
       "options": [
         "AltHold",
         "Stabilize",
-        "Loiter без GPS",
+        "Loiter without GPS",
         "Acro"
       ],
       "answer": 1,
-      "explain": "Stabilize стабилизирует углы, высоту не держит."
+      "explain": "Stabilize stabilizes the angles but does not hold altitude."
     }
   ]
 }

@@ -1,0 +1,51 @@
+{
+ "module": "ap-plane-tuning",
+ "tasks": [
+  {
+   "id": "tconst",
+   "title": "Roll response",
+   "statement": "The roll time constant `RLL2SRV_TCONST` = **{tau} s**, a bank of **{phi}°** is requested as a step. What will the bank be after **{t} s** (first-order model, no delay)?",
+   "params": {
+    "tau": [
+     0.3,
+     0.4,
+     0.5,
+     0.6,
+     0.8
+    ],
+    "phi": {
+     "min": 20,
+     "max": 45,
+     "step": 5
+    },
+    "t": [
+     0.2,
+     0.3,
+     0.5,
+     0.8,
+     1.0
+    ]
+   },
+   "answer": "phi*(1-math.exp(-t/tau))",
+   "unit": "°",
+   "tol": 0.03,
+   "solution": "φ(t) = φ*·(1 − e^(−t/τ)); within τ — 63 %."
+  },
+  {
+   "id": "bank",
+   "title": "Bank for lateral acceleration",
+   "statement": "Guidance needs a lateral acceleration of **{a} m/s²**. What bank angle (°) is needed for that in a coordinated turn?",
+   "params": {
+    "a": {
+     "min": 1,
+     "max": 9,
+     "step": 0.5
+    }
+   },
+   "answer": "math.degrees(math.atan(a/9.81))",
+   "unit": "°",
+   "tol": 0.03,
+   "solution": "tan φ = a / g."
+  }
+ ]
+}

@@ -3,92 +3,92 @@
   "pass": 80,
   "questions": [
     {
-      "q": "В каком порядке тюнят самолёт в ArduPlane?",
+      "q": "In what order do you tune a plane in ArduPlane?",
       "options": [
-        "Крен/тангаж → TECS → навигация",
-        "Навигация → TECS → крен/тангаж",
-        "TECS → навигация → крен/тангаж",
-        "Посадка → TECS → крен/тангаж"
+        "Roll/pitch → TECS → navigation",
+        "Navigation → TECS → roll/pitch",
+        "TECS → navigation → roll/pitch",
+        "Landing → TECS → roll/pitch"
       ],
       "answer": 0,
-      "explain": "Внутренние контуры раньше внешних: плохой тангаж выглядит как плохой TECS."
+      "explain": "Inner loops before outer ones: bad pitch looks like bad TECS."
     },
     {
-      "q": "Как проверить реверсы рулей перед полётом в FBWA?",
+      "q": "How do you check control surface reversals before a flight in FBWA?",
       "options": [
-        "Покачать стиками в MANUAL и посмотреть на рули",
-        "Наклонить самолёт: рули противодействуют",
-        "Запустить AUTOTUNE на земле",
-        "Посмотреть уровень газа в логе"
+        "Wiggle the sticks in MANUAL and watch the surfaces",
+        "Tilt the plane: the surfaces counteract",
+        "Run AUTOTUNE on the ground",
+        "Look at the throttle level in the log"
       ],
       "answer": 1,
-      "explain": "В стабилизированном режиме рули должны парировать наклон; ошибка — краш на броске."
+      "explain": "In a stabilized mode the surfaces must counter the tilt; getting it wrong means a crash on launch."
     },
     {
-      "q": "Когда AUTOTUNE сохраняет P и D?",
+      "q": "When does AUTOTUNE save P and D?",
       "options": [
-        "Только при дизарме",
-        "При выходе из режима",
-        "По завершении каждой оси",
-        "После перезагрузки полётника"
+        "Only on disarm",
+        "When you exit the mode",
+        "When each axis finishes",
+        "After a flight controller reboot"
       ],
       "answer": 2,
-      "explain": "P и D — по окончании оси, FF и I — при выходе из режима."
+      "explain": "P and D — when an axis finishes, FF and I — when you exit the mode."
     },
     {
-      "q": "Что задаёт RLL2SRV_TCONST?",
+      "q": "What does RLL2SRV_TCONST set?",
       "options": [
-        "Предел крена в градусах",
-        "Частоту фильтра гироскопа",
-        "Максимальную скорость сервы элеронов в °/с",
-        "Постоянную времени отклика по крену"
+        "The bank limit in degrees",
+        "The gyro filter frequency",
+        "The maximum aileron servo speed in °/s",
+        "The time constant of the roll response"
       ],
       "answer": 3,
-      "explain": "За τ самолёт проходит ~63 % запрошенного угла; по умолчанию 0.5 с."
+      "explain": "Within τ the plane covers ~63 % of the requested angle; 0.5 s by default."
     },
     {
-      "q": "Как получить TECS_CLMB_MAX?",
+      "q": "How do you get TECS_CLMB_MAX?",
       "options": [
-        "Из расчёта по массе, тяге и площади крыла",
-        "Взять половину AIRSPEED_CRUISE",
-        "Замерить набор на THR_MAX в FBWA",
-        "Оставить значение по умолчанию"
+        "Calculate it from weight, thrust and wing area",
+        "Take half of AIRSPEED_CRUISE",
+        "Measure the climb at THR_MAX in FBWA",
+        "Leave the default value"
       ],
       "answer": 2,
-      "explain": "Пределы TECS меряются тестовыми полётами; у электролётов — в конце батареи."
+      "explain": "TECS limits are measured with test flights; for electric planes — at the end of the battery."
     },
     {
-      "q": "Высота в LOITER качается, тангаж настроен. Что крутить?",
+      "q": "Altitude oscillates in LOITER, pitch is tuned. What do you adjust?",
       "options": [
-        "TECS_TIME_CONST увеличить на 1",
-        "NAVL1_PERIOD уменьшить",
-        "AUTOTUNE_LEVEL поднять до 9 и повторить",
-        "TRIM_THROTTLE обнулить"
+        "Increase TECS_TIME_CONST by 1",
+        "Decrease NAVL1_PERIOD",
+        "Raise AUTOTUNE_LEVEL to 9 and repeat",
+        "Set TRIM_THROTTLE to zero"
       ],
       "answer": 0,
-      "explain": "Раскачку высоты лечат TECS_TIME_CONST, затем TECS_PTCH_DAMP."
+      "explain": "Altitude oscillation is fixed with TECS_TIME_CONST, then TECS_PTCH_DAMP."
     },
     {
-      "q": "Самолёт виляет после каждого поворота в AUTO. Что делать?",
+      "q": "The plane weaves after every turn in AUTO. What do you do?",
       "options": [
-        "NAVL1_PERIOD уменьшить на 5",
-        "NAVL1_DAMPING снизить до 0.3",
-        "WP_RADIUS установить в 0",
-        "NAVL1_PERIOD увеличить на 1–2"
+        "Decrease NAVL1_PERIOD by 5",
+        "Lower NAVL1_DAMPING to 0.3",
+        "Set WP_RADIUS to 0",
+        "Increase NAVL1_PERIOD by 1–2"
       ],
       "answer": 3,
-      "explain": "Вилянье — слишком резкий L1; вялые повороты — наоборот, уменьшать на 5."
+      "explain": "Weaving means L1 is too sharp; sluggish turns are the opposite — decrease by 5."
     },
     {
-      "q": "Почему для автопосадки ставят дальномер?",
+      "q": "Why do you install a rangefinder for auto landing?",
       "options": [
-        "Барометр не работает на малой высоте",
-        "Ошибка высоты по барометру — метры",
-        "Без него NAV_LAND не принимается",
-        "Он заменяет датчик скорости"
+        "The barometer doesn't work at low altitude",
+        "Barometric altitude error is meters",
+        "NAV_LAND isn't accepted without it",
+        "It replaces the airspeed sensor"
       ],
       "answer": 1,
-      "explain": "Ошибка баро в несколько метров делает flare лотереей; RNGFND_LANDING = 1 даёт повторяемость."
+      "explain": "A baro error of a few meters makes the flare a lottery; RNGFND_LANDING = 1 makes it repeatable."
     }
   ]
 }

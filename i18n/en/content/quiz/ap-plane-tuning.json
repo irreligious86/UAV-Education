@@ -1,0 +1,94 @@
+{
+  "module": "ap-plane-tuning",
+  "pass": 80,
+  "questions": [
+    {
+      "q": "In what order do you tune a plane in ArduPlane?",
+      "options": [
+        "Roll/pitch → TECS → navigation",
+        "Navigation → TECS → roll/pitch",
+        "TECS → navigation → roll/pitch",
+        "Landing → TECS → roll/pitch"
+      ],
+      "answer": 0,
+      "explain": "Inner loops before outer ones: bad pitch looks like bad TECS."
+    },
+    {
+      "q": "How do you check control surface reversals before a flight in FBWA?",
+      "options": [
+        "Wiggle the sticks in MANUAL and watch the surfaces",
+        "Tilt the plane: the surfaces counteract",
+        "Run AUTOTUNE on the ground",
+        "Look at the throttle level in the log"
+      ],
+      "answer": 1,
+      "explain": "In a stabilized mode the surfaces must counter the tilt; getting it wrong means a crash on launch."
+    },
+    {
+      "q": "When does AUTOTUNE save P and D?",
+      "options": [
+        "Only on disarm",
+        "When you exit the mode",
+        "When each axis finishes",
+        "After a flight controller reboot"
+      ],
+      "answer": 2,
+      "explain": "P and D — when an axis finishes, FF and I — when you exit the mode."
+    },
+    {
+      "q": "What does RLL2SRV_TCONST set?",
+      "options": [
+        "The bank limit in degrees",
+        "The gyro filter frequency",
+        "The maximum aileron servo speed in °/s",
+        "The time constant of the roll response"
+      ],
+      "answer": 3,
+      "explain": "Within τ the plane covers ~63 % of the requested angle; 0.5 s by default."
+    },
+    {
+      "q": "How do you get TECS_CLMB_MAX?",
+      "options": [
+        "Calculate it from weight, thrust and wing area",
+        "Take half of AIRSPEED_CRUISE",
+        "Measure the climb at THR_MAX in FBWA",
+        "Leave the default value"
+      ],
+      "answer": 2,
+      "explain": "TECS limits are measured with test flights; for electric planes — at the end of the battery."
+    },
+    {
+      "q": "Altitude oscillates in LOITER, pitch is tuned. What do you adjust?",
+      "options": [
+        "Increase TECS_TIME_CONST by 1",
+        "Decrease NAVL1_PERIOD",
+        "Raise AUTOTUNE_LEVEL to 9 and repeat",
+        "Set TRIM_THROTTLE to zero"
+      ],
+      "answer": 0,
+      "explain": "Altitude oscillation is fixed with TECS_TIME_CONST, then TECS_PTCH_DAMP."
+    },
+    {
+      "q": "The plane weaves after every turn in AUTO. What do you do?",
+      "options": [
+        "Decrease NAVL1_PERIOD by 5",
+        "Lower NAVL1_DAMPING to 0.3",
+        "Set WP_RADIUS to 0",
+        "Increase NAVL1_PERIOD by 1–2"
+      ],
+      "answer": 3,
+      "explain": "Weaving means L1 is too sharp; sluggish turns are the opposite — decrease by 5."
+    },
+    {
+      "q": "Why do you install a rangefinder for auto landing?",
+      "options": [
+        "The barometer doesn't work at low altitude",
+        "Barometric altitude error is meters",
+        "NAV_LAND isn't accepted without it",
+        "It replaces the airspeed sensor"
+      ],
+      "answer": 1,
+      "explain": "A baro error of a few meters makes the flare a lottery; RNGFND_LANDING = 1 makes it repeatable."
+    }
+  ]
+}

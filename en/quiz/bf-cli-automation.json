@@ -3,92 +3,92 @@
   "pass": 80,
   "questions": [
     {
-      "q": "Почему нельзя привязываться к номеру COM-порта?",
+      "q": "Why can't you rely on the COM port number?",
       "options": [
-        "Windows запрещает доступ по номеру порта",
-        "Номер меняется после перезагрузки",
-        "Он всегда COM1",
-        "Linux не поддерживает COM"
+        "Windows forbids access by port number",
+        "The number changes after a reboot",
+        "It's always COM1",
+        "Linux doesn't support COM"
       ],
       "answer": 1,
-      "explain": "У одинаковых плат один VID/PID, номер меняется после перезагрузки. Искать дрон по craft_name внутри CLI."
+      "explain": "Identical boards share one VID/PID, and the number changes after a reboot. Find the drone by craft_name inside the CLI."
     },
     {
-      "q": "Что делает exit noreboot в Betaflight 4.5.x?",
+      "q": "What does exit noreboot do in Betaflight 4.5.x?",
       "options": [
-        "Выходит без перезагрузки",
-        "Всё равно перезагружает",
-        "Сохраняет настройки",
-        "Стирает флеш"
+        "Exits without rebooting",
+        "Reboots anyway",
+        "Saves the settings",
+        "Erases the flash"
       ],
       "answer": 1,
-      "explain": "Флаг noreboot заработал в более новых версиях. Для подсмотра значения — просто закрыть порт."
+      "explain": "The noreboot flag started working in newer versions. To peek at a value, just close the port."
     },
     {
-      "q": "После set + save значение оказалось другим. Почему?",
+      "q": "After set + save the value turned out different. Why?",
       "options": [
-        "Порт был занят другой программой при записи",
-        "Прошивка скорректировала значение",
-        "Скрипт сломан",
-        "Плохой USB-кабель"
+        "The port was busy with another program during the write",
+        "The firmware corrected the value",
+        "The script is broken",
+        "A bad USB cable"
       ],
       "answer": 1,
-      "explain": "Betaflight корректирует несовместимые комбинации при загрузке. Правило: после save перечитать каждое изменённое значение через get."
+      "explain": "Betaflight corrects incompatible combinations on boot. Rule: after save, re-read every changed value with get."
     },
     {
-      "q": "Что должен сделать скрипт сразу после save?",
+      "q": "What should the script do right after save?",
       "options": [
-        "Отправить diff ещё раз для подтверждения записи",
-        "Найти порт по craft_name заново",
-        "Выйти из CLI",
-        "Включить dshot_bidir"
+        "Send the diff again to confirm the write",
+        "Find the port by craft_name again",
+        "Exit the CLI",
+        "Enable dshot_bidir"
       ],
       "answer": 1,
-      "explain": "После перезагрузки COM-порт может сменить номер."
+      "explain": "After a reboot the COM port may get a different number."
     },
     {
-      "q": "Почему diff, а не dump, для хранения?",
+      "q": "Why store a diff and not a dump?",
       "options": [
-        "dump нельзя сохранить в текстовый файл",
-        "diff — только отличия от дефолтов",
-        "diff короче по байтам",
-        "dump не работает"
+        "A dump can't be saved to a text file",
+        "A diff is only the differences from defaults",
+        "A diff is shorter in bytes",
+        "dump doesn't work"
       ],
       "answer": 1,
-      "explain": "diff читаем и переносим; dump навязывает старые дефолты как явные значения при обновлении."
+      "explain": "A diff is readable and portable; a dump forces old defaults as explicit values when you update."
     },
     {
-      "q": "Что безопасно автоматизировать скриптом CLI?",
+      "q": "What is safe to automate with a CLI script?",
       "options": [
-        "Выгрузку diff all и проверку значений после save",
-        "Подбор PID по ощущениям пилота после каждого полёта",
-        "Решение о допуске дрона к полёту",
-        "Прошивку загрузчика вместо DFU"
+        "Exporting diff all and verifying values after save",
+        "Picking PIDs by pilot feel after every flight",
+        "Deciding whether a drone is cleared to fly",
+        "Flashing the bootloader instead of DFU"
       ],
       "answer": 0,
-      "explain": "Рутина с проверяемым результатом — да; решения и рискованные операции — нет."
+      "explain": "Routine work with a verifiable result — yes; decisions and risky operations — no."
     },
     {
-      "q": "Перенос diff со старой мажорной версии на новую:",
+      "q": "Moving a diff from an old major version to a new one:",
       "options": [
-        "Всегда работает без изменений",
-        "Невозможен ни при каких условиях",
-        "Делается только через dump",
-        "Требует проверки: имена и смысл настроек меняются"
+        "Always works unchanged",
+        "Is impossible under any circumstances",
+        "Is done only via dump",
+        "Requires checking: setting names and meanings change"
       ],
       "answer": 3,
-      "explain": "Между версиями настройки переименовывают и меняют; diff проверяют, а не вставляют вслепую."
+      "explain": "Settings get renamed and changed between versions; you check a diff instead of pasting it blindly."
     },
     {
-      "q": "Как скрипт входит в режим CLI Betaflight?",
+      "q": "How does a script enter the Betaflight CLI?",
       "options": [
-        "Нажимает кнопку BOOT на плате",
-        "Шлёт MAVLink-команду COMMAND_LONG",
-        "Отправляет символ # в последовательный порт",
-        "Открывает вкладку CLI в конфигураторе"
+        "It presses the BOOT button on the board",
+        "It sends the MAVLink command COMMAND_LONG",
+        "It sends the # character to the serial port",
+        "It opens the CLI tab in the configurator"
       ],
       "answer": 2,
-      "explain": "Символ # переводит прошивку в CLI; дальше команды текстом."
+      "explain": "The # character puts the firmware into the CLI; after that, commands are plain text."
     }
   ]
 }

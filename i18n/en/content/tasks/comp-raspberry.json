@@ -1,0 +1,32 @@
+{
+ "module": "comp-raspberry",
+ "tasks": [
+  {
+   "id": "drop",
+   "title": "Voltage drop on the Pi power wire",
+   "statement": "An onboard Pi draws **{p} W** from 5 V over a pair of wires **{l} m** long, the conductor resistance is **{r} mΩ/m**. Find the voltage drop (V) across the wires, out and back.",
+   "params": {
+    "p": {
+     "min": 6,
+     "max": 15,
+     "step": 1
+    },
+    "l": [
+     0.2,
+     0.3,
+     0.5
+    ],
+    "r": [
+     33,
+     53,
+     84
+    ]
+   },
+   "answer": "(p/5)*(2*l*r/1000)",
+   "unit": "V",
+   "tol": 0.03,
+   "solution": "I = P/U; R = 2·l·r; ΔU = I·R.",
+   "abs": 0.003
+  }
+ ]
+}

@@ -1,0 +1,94 @@
+{
+  "module": "bf-blackbox",
+  "pass": 80,
+  "questions": [
+    {
+      "q": "What does Blackbox record?",
+      "options": [
+        "Only the camera video",
+        "Gyro, setpoint, PID, motors",
+        "Only errors and warnings",
+        "Only the GPS track and voltage per lap"
+      ],
+      "answer": 1,
+      "explain": "Blackbox is a stream of internal control-loop data for post-flight analysis."
+    },
+    {
+      "q": "Where is the log written?",
+      "options": [
+        "Only to an SD card",
+        "To the board's flash or an SD card",
+        "To the radio over telemetry",
+        "To the configurator over USB"
+      ],
+      "answer": 1,
+      "explain": "Many boards have a flash chip; others have an SD slot. You choose it in the Blackbox tab."
+    },
+    {
+      "q": "What logging rate should you use for filter analysis?",
+      "options": [
+        "As low as possible",
+        "At least 1 kHz",
+        "100 Hz",
+        "10 Hz"
+      ],
+      "answer": 1,
+      "explain": "To see motor noise and harmonics you need a high sampling rate."
+    },
+    {
+      "q": "A log with more than 1% dropped frames…",
+      "options": [
+        "Is fine for any analysis",
+        "Is not suitable for spectra",
+        "Is more accurate than a normal log",
+        "Can be recovered"
+      ],
+      "answer": 1,
+      "explain": "Gaps break the spectrum: such a log is only good for a rough picture."
+    },
+    {
+      "q": "What do you compare to see whether the drone keeps up with the stick?",
+      "options": [
+        "RSSI and LQ",
+        "gyro vs. setpoint",
+        "Altitude and GPS",
+        "Voltage and current during punch-outs"
+      ],
+      "answer": 1,
+      "explain": "Setpoint is the desired angular rate, gyro is the actual one. The difference between them is the quality of the tune."
+    },
+    {
+      "q": "Why do you trim the first and last seconds of a log?",
+      "options": [
+        "Blackbox Explorer requires it on import",
+        "They distort the noise metrics",
+        "There's no data there",
+        "To save space"
+      ],
+      "answer": 1,
+      "explain": "Takeoff, landing and transients on the ground distort the noise metrics."
+    },
+    {
+      "q": "blackbox_sample_rate 1/4 with an 8 kHz PID loop gives a log at:",
+      "options": [
+        "8 kHz",
+        "2 kHz",
+        "4 kHz",
+        "1 kHz"
+      ],
+      "answer": 1,
+      "explain": "It's a divider of the PID rate."
+    },
+    {
+      "q": "How do you get the pre-filter gyro in the log?",
+      "options": [
+        "There's no way",
+        "The gyroUnfilt field",
+        "Only in the configurator",
+        "Weaken the filters"
+      ],
+      "answer": 1,
+      "explain": "The gyroUnfilt field or debug_mode = GYRO_SCALED — needed for before/after spectra."
+    }
+  ]
+}

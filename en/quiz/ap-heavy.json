@@ -3,18 +3,18 @@
   "pass": 80,
   "questions": [
     {
-      "q": "Главный минус коаксиальной схемы X8?",
+      "q": "The main downside of the coaxial X8 layout?",
       "options": [
-        "Рама получается тяжелее",
-        "Потеря тяги около 15 %",
-        "Не поддерживается RTL",
-        "Нет защиты от отказов"
+        "The frame ends up heavier",
+        "A thrust loss of about 15 %",
+        "RTL is not supported",
+        "No protection against failures"
       ],
       "answer": 1,
-      "explain": "Нижний проп работает в потоке верхнего. За компактность и отказоустойчивость платят эффективностью."
+      "explain": "The lower prop works in the upper prop's wash. You pay for compactness and fault tolerance with efficiency."
     },
     {
-      "q": "FRAME_CLASS/FRAME_TYPE для X8?",
+      "q": "FRAME_CLASS/FRAME_TYPE for an X8?",
       "options": [
         "1/1",
         "4/1",
@@ -25,70 +25,70 @@
       "explain": "4 — OctaQuad, 1 — X."
     },
     {
-      "q": "Что лечить первым при высоких VIBE на больших пропах?",
+      "q": "What do you fix first with high VIBE on big props?",
       "options": [
-        "Фильтры гироскопа",
-        "Балансировку и жёсткость",
-        "Коэффициенты PID и фильтры D-term по оси рыскания",
-        "Настройки EKF"
+        "The gyro filters",
+        "Balancing and stiffness",
+        "The PID gains and D-term filters on the yaw axis",
+        "The EKF settings"
       ],
       "answer": 1,
-      "explain": "Балансировка пропов и моторов, жёсткость рамы, демпфирование FC. Фильтры — последнее средство."
+      "explain": "Balancing props and motors, frame stiffness, FC damping. Filters are the last resort."
     },
     {
-      "q": "Когда проверять отказ мотора?",
+      "q": "When do you test a motor failure?",
       "options": [
-        "Никогда — это опасно",
-        "SITL, затем высота без груза",
-        "Сразу с полным грузом, чтобы проверить худший случай",
-        "На столе с пропами"
+        "Never — it is dangerous",
+        "SITL, then at altitude without a payload",
+        "Right away with the full payload, to test the worst case",
+        "On the bench with props on"
       ],
       "answer": 1,
-      "explain": "Отказоустойчивость — проверяется, а не предполагается."
+      "explain": "Fault tolerance is tested, not assumed."
     },
     {
-      "q": "Что задаёт MOT_THST_HOVER?",
+      "q": "What does MOT_THST_HOVER set?",
       "options": [
-        "Максимальный газ",
-        "Газ висения",
-        "Минимальный газ",
-        "Протокол моторов"
+        "Maximum throttle",
+        "Hover throttle",
+        "Minimum throttle",
+        "The motor protocol"
       ],
       "answer": 1,
-      "explain": "Газ висения, уточняется в полёте; от него зависит удержание высоты."
+      "explain": "Hover throttle, refined in flight; altitude hold depends on it."
     },
     {
-      "q": "MOT_YAW_HEADROOM = 200 — это:",
+      "q": "MOT_YAW_HEADROOM = 200 is:",
       "options": [
-        "Максимальный угол крена в сотых градуса",
-        "Запас выхода на рыскание",
-        "Частоту notch-фильтра",
-        "Ограничение тока ESC"
+        "The maximum bank angle in centidegrees",
+        "The output headroom reserved for yaw",
+        "The notch filter frequency",
+        "The ESC current limit"
       ],
       "answer": 1,
-      "explain": "Запас выхода моторов (PWM) на рыскание при насыщении; yaw — последний приоритет миксера."
+      "explain": "The motor output headroom (PWM) reserved for yaw at saturation; yaw is the mixer's lowest priority."
     },
     {
-      "q": "Как безопасно проверить отказ мотора на X8?",
+      "q": "How do you safely test a motor failure on an X8?",
       "options": [
-        "Снять проп прямо в полёте",
-        "Applet в SITL, затем без груза",
-        "Отключить ESC на земле с пропами",
-        "Проверить нельзя никак"
+        "Remove a prop right in flight",
+        "An applet in SITL, then without a payload",
+        "Disconnect an ESC on the ground with props on",
+        "There is no way to test it"
       ],
       "answer": 1,
-      "explain": "motor_failure_test сначала в SITL, затем на высоте без груза; MOT_STOP_BITMASK + тумблер."
+      "explain": "motor_failure_test first in SITL, then at altitude without a payload; MOT_STOP_BITMASK + a switch."
     },
     {
-      "q": "Почему тяжёлый аппарат тюнят медленнее и осторожнее, чем 5\"?",
+      "q": "Why is a heavy vehicle tuned slower and more carefully than a 5\"?",
       "options": [
-        "Большая инерция и медленные моторы: ошибки разгоняются дольше и опаснее",
-        "У него нет AUTOTUNE",
-        "ArduPilot не поддерживает большие пропы",
-        "У него нет гироскопа"
+        "Large inertia and slow motors: errors build up longer and are more dangerous",
+        "It has no AUTOTUNE",
+        "ArduPilot does not support big props",
+        "It has no gyroscope"
       ],
       "answer": 0,
-      "explain": "Большие пропы и масса — медленная динамика и высокая цена ошибки."
+      "explain": "Big props and mass mean slow dynamics and a high cost of error."
     }
   ]
 }

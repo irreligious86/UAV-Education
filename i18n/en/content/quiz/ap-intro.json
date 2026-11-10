@@ -1,0 +1,94 @@
+{
+  "module": "ap-intro",
+  "pass": 80,
+  "questions": [
+    {
+      "q": "What fundamentally sets ArduPilot apart from Betaflight?",
+      "options": [
+        "Nothing except the interface",
+        "It knows its position and flies by itself",
+        "It is meant for planes only",
+        "It works without PID controllers"
+      ],
+      "answer": 1,
+      "explain": "An autopilot: it knows its position, runs missions, flies without a pilot. Betaflight is a stabilizer for stick input."
+    },
+    {
+      "q": "Does ArduPilot have a save command?",
+      "options": [
+        "Yes, like Betaflight",
+        "No, changes are written immediately",
+        "Only in CLI mode",
+        "Only through MAVProxy"
+      ],
+      "answer": 1,
+      "explain": "Some parameters require a reboot, but the write happens instantly."
+    },
+    {
+      "q": "Which Copter modes need GPS?",
+      "options": [
+        "STABILIZE and ACRO",
+        "LOITER, AUTO, RTL",
+        "Only ALT_HOLD",
+        "All of them, without exception"
+      ],
+      "answer": 1,
+      "explain": "Position modes need a healthy position estimate."
+    },
+    {
+      "q": "A PreArm message is…",
+      "options": [
+        "A firmware error",
+        "What is not ready for arming",
+        "A low battery voltage warning",
+        "The name of a mode"
+      ],
+      "answer": 1,
+      "explain": "Disabling pre-arm checks (ARMING_SKIPCHK, before 4.7 — ARMING_CHECK) to take off is the road to a crash."
+    },
+    {
+      "q": "What does FRAME_CLASS = 4 set?",
+      "options": [
+        "Quadcopter",
+        "OctaQuad (X8)",
+        "Hexacopter in X layout",
+        "Tricopter"
+      ],
+      "answer": 1,
+      "explain": "1 — Quad, 2 — Hexa, 3 — Octa, 4 — OctaQuad, 7 — Tri."
+    },
+    {
+      "q": "Why don't Lua scripts work on F4?",
+      "options": [
+        "The license forbids it",
+        "Not enough flash and memory",
+        "F4 is too fast",
+        "They work fine"
+      ],
+      "answer": 1,
+      "explain": "They need at least 2 MB of flash and memory that the F4 doesn't have."
+    },
+    {
+      "q": "Mode 5 in FLTMODE means:",
+      "options": [
+        "Stabilize",
+        "Loiter",
+        "Auto",
+        "RTL"
+      ],
+      "answer": 1,
+      "explain": "0 Stabilize, 2 AltHold, 3 Auto, 4 Guided, 5 Loiter, 6 RTL, 9 Land, 16 PosHold."
+    },
+    {
+      "q": "The ArduCopter counterpart of Betaflight Angle:",
+      "options": [
+        "AltHold",
+        "Stabilize",
+        "Loiter without GPS",
+        "Acro"
+      ],
+      "answer": 1,
+      "explain": "Stabilize stabilizes the angles but does not hold altitude."
+    }
+  ]
+}

@@ -1,0 +1,94 @@
+{
+  "module": "comp-raspberry",
+  "pass": 80,
+  "questions": [
+    {
+      "q": "What do you do with the Raspberry Pi UART before connecting the FC?",
+      "options": [
+        "Nothing",
+        "Remove the console from the port",
+        "Delete the driver",
+        "Set the speed to 9600 for reliability"
+      ],
+      "answer": 1,
+      "explain": "Remove the Linux console from the port (raspi-config) and enable the hardware port — otherwise the console holds the port."
+    },
+    {
+      "q": "SERIAL2_BAUD = 921 means…",
+      "options": [
+        "9210 baud after rounding",
+        "921600 baud",
+        "921 baud",
+        "92100 baud"
+      ],
+      "answer": 1,
+      "explain": "Normal for short wires; for long ones use 57 (57600)."
+    },
+    {
+      "q": "Why a MAVLink router?",
+      "options": [
+        "For speed",
+        "One UART, many clients",
+        "For Wi-Fi",
+        "To encrypt telemetry"
+      ],
+      "answer": 1,
+      "explain": "mavlink-router or mavp2p serve the stream over UDP/TCP."
+    },
+    {
+      "q": "Why is the script run as a systemd service?",
+      "options": [
+        "It's faster",
+        "Autostart and restart",
+        "For the logs",
+        "The MAVLink router requires it"
+      ],
+      "answer": 1,
+      "explain": "A script started over SSH dies with the session."
+    },
+    {
+      "q": "The Pi shut down in flight. What happens to the FC?",
+      "options": [
+        "Goes to RTL on a timeout",
+        "Keeps working",
+        "Lands",
+        "Crashes"
+      ],
+      "answer": 1,
+      "explain": "The FC keeps working; after the Pi powers back on, the service comes up by itself."
+    },
+    {
+      "q": "Why is Bluetooth disabled on a Pi 4 for the UART?",
+      "options": [
+        "It isn't needed",
+        "BT takes the full UART",
+        "It interferes with Wi-Fi",
+        "To save power in flight"
+      ],
+      "answer": 1,
+      "explain": "Bluetooth takes the full UART, and the mini-UART is unstable at 921600: dtoverlay=disable-bt."
+    },
+    {
+      "q": "How do scripts connect when mavlink-router is used?",
+      "options": [
+        "To /dev/serial0",
+        "To a local UDP port",
+        "Through an SSH tunnel to the port",
+        "Over USB"
+      ],
+      "answer": 1,
+      "explain": "Otherwise they get in each other's way."
+    },
+    {
+      "q": "What does vcgencmd get_throttled = 0x50000 show?",
+      "options": [
+        "Undervoltage and throttling have occurred since boot",
+        "Everything is fine",
+        "Throttling right now",
+        "SD card overheating"
+      ],
+      "answer": 0,
+      "explain": "Bits 16 and 18 — undervoltage and throttling have occurred; bits 0–3 — they are happening now."
+    }
+  ]
+}

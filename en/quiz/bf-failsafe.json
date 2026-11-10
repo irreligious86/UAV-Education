@@ -3,51 +3,51 @@
   "pass": 80,
   "questions": [
     {
-      "q": "Через сколько Betaflight считает сигнал потерянным?",
+      "q": "After how long does Betaflight consider the signal lost?",
       "options": [
-        "Сразу при первой потере",
-        "100 мс + 300 мс удержания",
-        "Через минуту",
-        "Через 5 секунд без валидных пакетов"
+        "Immediately at the first loss",
+        "100 ms + 300 ms of hold",
+        "After a minute",
+        "After 5 seconds without valid packets"
       ],
       "answer": 1,
-      "explain": "100 мс — потеря, 300 мс — удержание последних значений, затем Stage 1."
+      "explain": "100 ms — loss, 300 ms — holding the last values, then Stage 1."
     },
     {
-      "q": "Что задаёт failsafe_delay = 15?",
+      "q": "What does failsafe_delay = 15 set?",
       "options": [
-        "15 миллисекунд до начала процедуры",
-        "1.5 секунды Stage 1",
-        "15 секунд",
-        "15 % газа"
+        "15 milliseconds before the procedure starts",
+        "1.5 seconds of Stage 1",
+        "15 seconds",
+        "15% throttle"
       ],
       "answer": 1,
-      "explain": "Параметр в десятых долях секунды."
+      "explain": "The parameter is in tenths of a second."
     },
     {
-      "q": "Что делает процедура DROP?",
+      "q": "What does the DROP procedure do?",
       "options": [
-        "Плавно садится",
-        "Мгновенный дизарм",
-        "Летит домой",
-        "Зависает на месте"
+        "Lands smoothly",
+        "Instant disarm",
+        "Flies home",
+        "Hovers in place"
       ],
       "answer": 1,
-      "explain": "Моторы стоп; повторный арм — после возврата связи, выдержки failsafe_recovery_delay и выключенного тумблера арма."
+      "explain": "Motors stop; re-arming is possible after the link returns, the failsafe_recovery_delay wait, and with the arm switch off."
     },
     {
-      "q": "Что делает Betaflight с режимом ANGLE в Stage 2 (AUTO-LAND)?",
+      "q": "What does Betaflight do with ANGLE mode in Stage 2 (AUTO-LAND)?",
       "options": [
-        "Включает сам при наличии акселерометра",
-        "Ничего: ANGLE задаётся только каналом",
-        "Выключает, чтобы не мешать снижению",
-        "Включает только при наличии GPS-фикса"
+        "Enables it by itself if an accelerometer is present",
+        "Nothing: ANGLE is set only by the channel",
+        "Disables it so it doesn't interfere with the descent",
+        "Enables it only with a GPS fix"
       ],
       "answer": 0,
-      "explain": "В Stage 2 прошивка включает ANGLE сама (fc/core.c), если акселерометр есть; без акселерометра выравнивать нечем — такой аппарат лучше настраивать на DROP."
+      "explain": "In Stage 2 the firmware enables ANGLE by itself (fc/core.c) if there is an accelerometer; without an accelerometer there's nothing to level with — such an aircraft is better set to DROP."
     },
     {
-      "q": "Какой режим тумблера честнее всего повторяет потерю связи?",
+      "q": "Which switch mode most honestly reproduces a link loss?",
       "options": [
         "KILL",
         "STAGE2",
@@ -55,64 +55,64 @@
         "DROP"
       ],
       "answer": 2,
-      "explain": "STAGE1 проходит обе стадии, как при реальной потере сигнала."
+      "explain": "STAGE1 goes through both stages, as in a real signal loss."
     },
     {
-      "q": "Чем опасен KILL на тумблере?",
+      "q": "What's dangerous about KILL on a switch?",
       "options": [
-        "Он включает GPS Rescue вместо дизарма",
-        "Глитч канала — мгновенный дизарм",
-        "Ничем не опасен",
-        "Он не работает в полёте"
+        "It enables GPS Rescue instead of disarming",
+        "A channel glitch means an instant disarm",
+        "Nothing dangerous",
+        "It doesn't work in flight"
       ],
       "answer": 1,
-      "explain": "KILL дизармит без задержки — любой сбой канала роняет дрон."
+      "explain": "KILL disarms with no delay — any channel glitch drops the drone."
     },
     {
-      "q": "Как подобрать failsafe_throttle для AUTO-LAND?",
+      "q": "How do you pick failsafe_throttle for AUTO-LAND?",
       "options": [
-        "Всегда 1500 — середина диапазона газа",
-        "Чуть ниже газа висения",
-        "Максимальный газ",
-        "Всегда 1000"
+        "Always 1500 — the middle of the throttle range",
+        "Slightly below hover throttle",
+        "Full throttle",
+        "Always 1000"
       ],
       "answer": 1,
-      "explain": "Чуть ниже газа висения из лога, цель около 1 м/с снижения: у тяжёлого 10\" может быть 1350, у лёгкого 7\" — 1250."
+      "explain": "Slightly below hover throttle from the log, aiming for about 1 m/s descent: on a heavy 10\" it might be 1350, on a light 7\" — 1250."
     },
     {
-      "q": "rxfail 5 s 1700 означает:",
+      "q": "rxfail 5 s 1700 means:",
       "options": [
-        "Канал 5 удерживается",
-        "Канал 5 = 1700 мкс в Stage 1",
-        "Канал 5 в режиме auto",
-        "Канал 5 отключается на время failsafe"
+        "Channel 5 is held",
+        "Channel 5 = 1700 µs in Stage 1",
+        "Channel 5 in auto mode",
+        "Channel 5 is disabled during failsafe"
       ],
       "answer": 1,
-      "explain": "a — auto, h — hold, s — set; например, включить ANGLE."
+      "explain": "a — auto, h — hold, s — set; for example, to enable ANGLE."
     },
     {
-      "q": "Что нужно GPS Rescue для записи дома?",
+      "q": "What does GPS Rescue need to record home?",
       "options": [
-        "Откалиброванный компас",
-        "Фикс с нужным числом спутников",
-        "Ничего не нужно",
-        "Работающий барометр и калибровку акселерометра"
+        "A calibrated compass",
+        "A fix with the required number of satellites",
+        "Nothing",
+        "A working barometer and accelerometer calibration"
       ],
       "answer": 1,
-      "explain": "Fix с ≥ gps_rescue_min_sats до арма. Без дома Rescue бесполезен; allow_arming_without_fix оставить OFF."
+      "explain": "A fix with ≥ gps_rescue_min_sats before arming. Without home, Rescue is useless; leave allow_arming_without_fix OFF."
     },
     {
-      "q": "Аппарат не армится. Что значит этот вывод status?",
+      "q": "The aircraft won't arm. What does this status output mean?",
       "kind": "apply",
       "fragment": "# status\n...\nArming disable flags: RXLOSS CLI",
       "options": [
-        "Нет валидных RC-кадров, и открыт CLI — арм запрещён по обеим причинам",
-        "Не откалиброван акселерометр: флаг RXLOSS появляется при отсутствии калибровки ACC",
-        "Аппарат стоит под наклоном больше small_angle, это кодируется флагом CLI",
-        "Включён режим GPS Rescue без фикса спутников — флаги RXLOSS и CLI это и означают"
+        "No valid RC frames, and the CLI is open — arming is blocked for both reasons",
+        "The accelerometer isn't calibrated: the RXLOSS flag appears when ACC calibration is missing",
+        "The aircraft is tilted more than small_angle, which is encoded by the CLI flag",
+        "GPS Rescue mode is on without a satellite fix — that's what the RXLOSS and CLI flags mean"
       ],
       "answer": 0,
-      "explain": "RXLOSS — нет RC-кадров; CLI — пока открыт CLI, арм запрещён намеренно."
+      "explain": "RXLOSS — no RC frames; CLI — arming is deliberately blocked while the CLI is open."
     }
   ]
 }
