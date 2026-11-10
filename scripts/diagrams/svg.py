@@ -13,7 +13,17 @@ from __future__ import annotations
 
 import html
 import math
+import os
+import sys
 from dataclasses import dataclass, field
+from pathlib import Path
+
+# Diagram text is translated like the rest of the interface (docs/I18N.md): build_diagrams.py runs once per
+# language with UAV_LANG set, and every label passes through esc() -> i18n._().
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+import i18n  # noqa: E402
+
+i18n.set_lang(os.environ.get("UAV_LANG") or i18n.SOURCE)
 
 ACCENT = "var(--gc-accent-hud, #5ef1d2)"
 INK = "currentColor"
@@ -32,7 +42,7 @@ STYLE = (
 
 
 def esc(s: str) -> str:
-    return html.escape(str(s), quote=True)
+    return html.escape(i18n.tr(str(s), "diagrams"), quote=True)
 
 
 def svg(width: int, height: int, title: str, body: str) -> str:

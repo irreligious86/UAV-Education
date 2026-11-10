@@ -82,6 +82,15 @@ def _(s: str, **kw) -> str:
     return out.format(**kw) if kw else out
 
 
+def tr(s: str, name: str) -> str:
+    """Translate one string through the catalog `name` (diagrams, data); records it as used."""
+    used_by.setdefault(name, set()).add(s)
+    return s if _lang == SOURCE else catalog(_lang, name).get(s, s)
+
+
+used_by: dict[str, set[str]] = {}
+
+
 def tr_data(value, name: str = "data"):
     """Translate every string inside a JSON value through the data catalog (keys and ids are untouched)."""
     if _lang == SOURCE:

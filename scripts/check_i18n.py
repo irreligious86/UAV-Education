@@ -114,7 +114,7 @@ def main() -> int:
     for l in i18n.LANGS[1:]:
         base = ROOT / "i18n" / l["code"]
         parts = []
-        for name in ("ui", "data"):
+        for name in ("ui", "data", "diagrams"):
             p = base / f"{name}.json"
             if p.is_file():
                 d, t = check_catalog(p, errors)

@@ -551,10 +551,22 @@ wave3.build(D)
 
 
 def main() -> None:
-    OUT.mkdir(parents=True, exist_ok=True)
+    import json
+    import os
+    import subprocess
+    import i18n
+    out = OUT / i18n.lang_dir() if i18n.lang_dir() else OUT
+    out.mkdir(parents=True, exist_ok=True)
     for name, content in D.items():
-        (OUT / f"{name}.svg").write_text(content, encoding="utf-8")
-    print(f"diagrams: {len(D)} written to {OUT.relative_to(ROOT)}")
+        (out / f"{name}.svg").write_text(content, encoding="utf-8")
+    print(f"diagrams: {len(D)} written to {out.relative_to(ROOT)}")
+    if os.environ.get("UAV_LANG"):
+        return
+    # the source run records the label strings for scripts/i18n_extract.py and builds the other languages
+    keys = sorted(k for k in i18n.used_by.get("diagrams", ()) if any("\u0400" <= ch <= "\u04ff" for ch in k))
+    (ROOT / "i18n" / ".diagram-keys.json").write_text(json.dumps(keys, ensure_ascii=False, indent=0) + "\n", encoding="utf-8")
+    for l in i18n.LANGS[1:]:
+        subprocess.run([sys.executable, __file__], env={**os.environ, "UAV_LANG": l["code"]}, check=True)
 
 
 if __name__ == "__main__":

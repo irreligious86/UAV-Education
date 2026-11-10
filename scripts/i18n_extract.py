@@ -4,7 +4,7 @@
 Sources of keys:
   - strings the build looked up through _() / tr_html()   (i18n/.build-keys.json, written by build_site.py)
   - T("...") literals in assets/*.js and assets/widgets/*.js
-  - text of the diagram generators                           (i18n/.diagram-keys.json, written by build_diagrams.py)
+  - text of the diagram generators -> i18n/<lang>/diagrams.json (i18n/.diagram-keys.json, written by build_diagrams.py)
 
 For every non-source language, i18n/<lang>/ui.json is rewritten sorted: existing translations are kept,
 new keys are added with an empty value (empty = untranslated, the site shows the source), keys that no
@@ -85,12 +85,10 @@ def update(code: str, name: str, keys: set[str], todo: bool) -> None:
 
 def main() -> int:
     keys = load_keys(".build-keys.json", ["scripts/build_site.py"]) | js_keys()
-    dk = ROOT / "i18n" / ".diagram-keys.json"
-    if dk.is_file():
-        keys |= set(json.loads(dk.read_text(encoding="utf-8")))
     keys = {k for k in keys if re.search(r"[А-Яа-яЁё]", k)}
+    dkeys = load_keys(".diagram-keys.json", ["scripts/diagrams/build_diagrams.py"])
     todo = "--todo" in sys.argv
-    for name, ks in (("ui", keys), ("data", data_keys())):
+    for name, ks in (("ui", keys), ("data", data_keys()), ("diagrams", dkeys)):
         for l in i18n.LANGS[1:]:
             update(l["code"], name, ks, todo)
     return 0

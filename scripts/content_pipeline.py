@@ -94,14 +94,18 @@ _svg_cache: dict[str, str] = {}
 
 
 def diagram_svg(name: str) -> str | None:
-    if name in _svg_cache:
-        return _svg_cache[name]
+    import i18n   # the current language's diagram if it was generated (assets/diagrams/<dir>/), else the source one
+    key = f"{i18n.lang()}:{name}"
+    if key in _svg_cache:
+        return _svg_cache[key]
     f = DIAGRAMS_DIR / f"{name}.svg"
+    if i18n.lang_dir() and (DIAGRAMS_DIR / i18n.lang_dir() / f"{name}.svg").is_file():
+        f = DIAGRAMS_DIR / i18n.lang_dir() / f"{name}.svg"
     if not f.is_file():
         return None
     svg = f.read_text(encoding="utf-8")
     svg = re.sub(r"<\?xml[^>]*\?>\s*", "", svg).strip()
-    _svg_cache[name] = svg
+    _svg_cache[key] = svg
     return svg
 
 
