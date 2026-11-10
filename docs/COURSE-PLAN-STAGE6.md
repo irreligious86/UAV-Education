@@ -52,6 +52,9 @@ diagram, glossary terms, and is translated into uk/en/gal and fact-checked befor
 | nav-rtk | RTK/PPK: база и ровер, NTRIP, moving baseline yaw, GPS_INJECT | A | base + rover (or NTRIP caster), fix type and accuracy log, GPS yaw on a bench |
 | nav-indoor | Без GNSS: оптический поток, UWB, motion capture → EKF3 ExternalNav / VISION_POSITION | A | SITL with simulated external nav; optical-flow hover check; mocap pipeline described |
 | nav-terrain | Следование рельефу: terrain data, дальномер, TERRAIN_*, безопасность | B | SITL mission over terrain with and without rangefinder, AGL plot |
+| nav-vtrn | Ориентирование по местности камерой: сопоставление кадра со спутниковой картой, визуальная одометрия + карта, VPR, GNSS-denied возврат | A | Python: georeference a downward frame by matching to a satellite tile (ORB/SuperPoint + homography), drift of VO vs map-fix; SITL with the fix fed as GPS_INPUT |
+| per-vision-pipeline | Машинное зрение на борту от и до: калибровка → детекция → трекинг → геопривязка цели → команда автопилоту, с измерением задержки на каждом звене | A | end-to-end pipeline on a recorded flight video (dataset) with latency budget; SITL target-follow replay |
+| comp-jetson-nano | Jetson Nano как компаньон: что он может и чего нет — JetPack, CSI/USB-камеры, GStreamer/NVENC, TensorRT/DeepStream, питание и тепло, MAVLink, бенчмарки | A | benchmark table (YOLO sizes × precision × fps × W), MAVLink + video on one board, power/thermal log |
 
 ### 2.3 Control and autonomy
 
@@ -205,7 +208,7 @@ Each iteration ends with: modules published, quizzes and tasks, diagrams, glossa
 |---|---|---|
 | 1 | Design core — **done** | des-sizing, des-thrust-stand, aero-stability, ctl-allocation; new track "Конструктор", capstone cap-designer; X8 example rebuilt on the MN4006 table |
 | 1b | Setup from scratch (§2.8) — **done** | bf-setup-scratch, inav-setup-scratch, inav-setup-wing, ap-setup-scratch, px4-setup-scratch; capstones cap-inav-gps, cap-px4-scratch; path changes; setup cards |
-| 2 | Precision navigation | nav-rtk, nav-indoor, nav-terrain |
+| 2 | Precision navigation and vision (Alex, 2026-11-11: add machine vision, vision-based terrain navigation, Jetson Nano) | nav-rtk, nav-indoor, nav-terrain, nav-vtrn, per-vision-pipeline, comp-jetson-nano |
 | 3 | Firmware development elective | fw-build-ap, fw-debug, fw-driver, fw-px4-module, fw-hil-testing |
 | 4 | Autonomy | aut-planning, aut-behavior, ctl-trajectory, ctl-advanced, aut-swarm |
 | 5 | Operations and safety | ops-flight-test, ops-risk-sora, ops-human-factors, safety-parachute, sec-threats |
