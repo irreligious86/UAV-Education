@@ -52,6 +52,7 @@ PAGES = {  # titles are translated with _() where used
     "fails": "Журнал ошибок и фейлов",
     "formulas": "Формулы и команды",
     "checklists": "Быстрые чек-листы",
+    "setup-cards": "Карточки настройки с нуля",
     "compare": "Сравнение прошивок",
     "resources": "Ресурсы и сообщества",
     "prerequisites": "Входные требования и тест",
