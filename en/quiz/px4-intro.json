@@ -3,7 +3,7 @@
   "pass": 80,
   "questions": [
     {
-      "q": "Какая GCS «родная» для PX4?",
+      "q": "Which GCS is “native” to PX4?",
       "options": [
         "Mission Planner",
         "QGroundControl",
@@ -11,21 +11,21 @@
         "Betaflight App"
       ],
       "answer": 1,
-      "explain": "QGC делает всё: прошивка, airframe, калибровки, миссии, логи."
+      "explain": "QGC does it all: firmware, airframe, calibrations, missions, logs."
     },
     {
-      "q": "Как PX4 интегрируется с ROS 2?",
+      "q": "How does PX4 integrate with ROS 2?",
       "options": [
-        "Через MAVLink только",
-        "Нативно через uXRCE-DDS",
-        "Через Lua-скрипты на борту",
-        "Никак"
+        "Via MAVLink only",
+        "Natively via uXRCE-DDS",
+        "Via Lua scripts on board",
+        "It doesn't"
       ],
       "answer": 1,
-      "explain": "Топики uORB выводятся прямо в ROS 2."
+      "explain": "uORB topics are exposed directly to ROS 2."
     },
     {
-      "q": "Формат логов PX4?",
+      "q": "The PX4 log format?",
       "options": [
         "DataFlash .bin",
         "ULog .ulg",
@@ -33,10 +33,10 @@
         "CSV"
       ],
       "answer": 1,
-      "explain": "Анализ — Flight Review или pyulog."
+      "explain": "Analysis — Flight Review or pyulog."
     },
     {
-      "q": "Какой режим требует надёжного GPS?",
+      "q": "Which mode requires a reliable GPS?",
       "options": [
         "Stabilized",
         "Acro",
@@ -44,10 +44,10 @@
         "Altitude"
       ],
       "answer": 2,
-      "explain": "Position держит позицию по GPS."
+      "explain": "Position holds the position by GPS."
     },
     {
-      "q": "Команда запуска SITL с Gazebo и квадрокоптером x500?",
+      "q": "The command to start SITL with Gazebo and the x500 quadcopter?",
       "options": [
         "sim_vehicle.py -v ArduCopter",
         "make px4_sitl gz_x500",
@@ -55,40 +55,40 @@
         "ros2 launch px4"
       ],
       "answer": 1,
-      "explain": "Клиент uXRCE-DDS в SITL стартует сам."
+      "explain": "The uXRCE-DDS client starts by itself in SITL."
     },
     {
-      "q": "Когда выбирать ArduPilot вместо PX4?",
+      "q": "When should you choose ArduPilot over PX4?",
       "options": [
-        "Для ROS 2 и Gazebo",
-        "Экзотика, Lua, сообщество",
-        "Всегда",
-        "Для гонок"
+        "For ROS 2 and Gazebo",
+        "Exotic hardware, Lua, the community",
+        "Always",
+        "For racing"
       ],
       "answer": 1,
-      "explain": "PX4 сильнее в исследованиях и ROS 2."
+      "explain": "PX4 is stronger in research and ROS 2."
     },
     {
-      "q": "Умолчания фильтров PX4 (IMU_GYRO_CUTOFF 40 Гц, IMU_DGYRO_CUTOFF 20 Гц) по сравнению с Betaflight:",
+      "q": "The PX4 filter defaults (IMU_GYRO_CUTOFF 40 Hz, IMU_DGYRO_CUTOFF 20 Hz) compared with Betaflight:",
       "options": [
-        "Выше",
-        "Заметно ниже",
-        "Такие же",
-        "Не настраиваются"
+        "Higher",
+        "Noticeably lower",
+        "The same",
+        "Not adjustable"
       ],
       "answer": 1,
-      "explain": "PX4 рассчитан на крупные аппараты; для 5\" их поднимают. Плюс notch по ESC-телеметрии (IMU_GYRO_DNF_EN)."
+      "explain": "PX4 is designed for large vehicles; for a 5\" they are raised. Plus a notch from ESC telemetry (IMU_GYRO_DNF_EN)."
     },
     {
-      "q": "Что сбрасывает смена airframe в QGC?",
+      "q": "What does changing the airframe in QGC reset?",
       "options": [
-        "Только калибровки датчиков",
-        "Параметры аппарата",
-        "Ничего",
-        "Только миссии"
+        "Only the sensor calibrations",
+        "The vehicle parameters",
+        "Nothing",
+        "Only the missions"
       ],
       "answer": 1,
-      "explain": "После смены — повторная настройка."
+      "explain": "After the change — set up again."
     }
   ]
 }

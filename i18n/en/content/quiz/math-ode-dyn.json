@@ -1,0 +1,94 @@
+{
+  "module": "math-ode-dyn",
+  "pass": 80,
+  "questions": [
+    {
+      "q": "After time τ, the step response of a first-order system reaches:",
+      "options": [
+        "63 %",
+        "50 %",
+        "95 %",
+        "100 %"
+      ],
+      "answer": 0,
+      "explain": "1 − e⁻¹ ≈ 0.632; 3τ — 95 %, 5τ — 99 %."
+    },
+    {
+      "q": "A damping ratio ζ = 0.5 gives an overshoot of about:",
+      "options": [
+        "16 %",
+        "0 %",
+        "50 %",
+        "100 %"
+      ],
+      "answer": 0,
+      "explain": "100·e^(−πζ/√(1−ζ²)) ≈ 16 %; at ζ = 0.7 — 5 %."
+    },
+    {
+      "q": "A pole with a positive real part means:",
+      "options": [
+        "Instability",
+        "Fast decay",
+        "Undamped oscillations",
+        "A pure delay"
+      ],
+      "answer": 0,
+      "explain": "e^(st) with Re s > 0 grows."
+    },
+    {
+      "q": "For a quadcopter axis with an angle P controller, raising P:",
+      "options": [
+        "Increases both frequency and overshoot",
+        "Lowers the oscillation frequency",
+        "Leaves the overshoot unchanged",
+        "Adds delay"
+      ],
+      "answer": 0,
+      "explain": "ω₀ = √(K_p/J), ζ = K_d/(2√(K_p J)) drops → overshoot grows."
+    },
+    {
+      "q": "A pure delay e^(−sL) in the loop:",
+      "options": [
+        "Eats up the phase margin",
+        "Speeds the system up",
+        "Reduces the amplitude at high frequencies",
+        "Is equivalent to a PT1 filter"
+      ],
+      "answer": 0,
+      "explain": "Phase −ω·L — that's exactly what limits the gain."
+    },
+    {
+      "q": "The PT1 filter coefficient in code is k = T_s/(τ + T_s). At f_c = 100 Hz and f_s = 8 kHz it is approximately:",
+      "options": [
+        "0.073",
+        "0.5",
+        "0.99",
+        "0.5 — half a step"
+      ],
+      "answer": 0,
+      "explain": "τ = 1/(2π·100) = 1.59 ms; k = 0.125/(1.59+0.125) ≈ 0.073."
+    },
+    {
+      "q": "The rule for choosing the loop period T_s relative to τ of the fastest process:",
+      "options": [
+        "T_s ≤ τ/10",
+        "T_s = τ",
+        "T_s ≥ 10τ",
+        "They are unrelated"
+      ],
+      "answer": 0,
+      "explain": "Otherwise discretization distorts the dynamics, and forward Euler can destabilize the system."
+    },
+    {
+      "q": "The loop oscillates at a frequency that doesn't depend on P. The most likely cause:",
+      "options": [
+        "The total delay in the loop",
+        "Motor inertia",
+        "Too little I and a soft motor",
+        "A low gyro rate"
+      ],
+      "answer": 0,
+      "explain": "The frequency is set by the condition ω·L ≈ π/2; the fix is reducing delay, not P."
+    }
+  ]
+}

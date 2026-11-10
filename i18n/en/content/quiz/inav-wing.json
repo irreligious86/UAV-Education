@@ -1,0 +1,94 @@
+{
+  "module": "inav-wing",
+  "pass": 80,
+  "questions": [
+    {
+      "q": "Which mode must always be on its own switch on a wing?",
+      "options": [
+        "ANGLE",
+        "MANUAL",
+        "CRUISE",
+        "RTH"
+      ],
+      "answer": 1,
+      "explain": "Direct servo control is the last resort."
+    },
+    {
+      "q": "What does wing autotune tune?",
+      "options": [
+        "P and I on roll and pitch",
+        "Feedforward and rates",
+        "Only D",
+        "Filters"
+      ],
+      "answer": 1,
+      "explain": "Autotune doesn't touch P and I — you tune them manually."
+    },
+    {
+      "q": "In which mode does autotune not work?",
+      "options": [
+        "ACRO",
+        "ANGLE",
+        "MANUAL",
+        "HORIZON"
+      ],
+      "answer": 2,
+      "explain": "MANUAL has no stabilization — there's nothing to tune."
+    },
+    {
+      "q": "What is NAV LAUNCH auto launch for?",
+      "options": [
+        "For looks",
+        "Motor after the throw",
+        "For RTH after link loss",
+        "For landing"
+      ],
+      "answer": 1,
+      "explain": "Throw detection by acceleration, smooth throttle ramp-up."
+    },
+    {
+      "q": "The wing loses altitude while climbing in navigation. What do you check?",
+      "options": [
+        "The compass",
+        "Cruise and max throttle",
+        "The VTX channel",
+        "Rates and stick expo"
+      ],
+      "answer": 1,
+      "explain": "nav_fw_cruise_thr and nav_fw_max_thr: low cruise throttle means a stall in the climb."
+    },
+    {
+      "q": "How do you check the elevon reversal before flight?",
+      "options": [
+        "From the radio",
+        "Tilt it in ANGLE",
+        "You can't",
+        "With the OSD surface indicator"
+      ],
+      "answer": 1,
+      "explain": "The surfaces should counteract the tilt; if they help it — reverse in the mixer."
+    },
+    {
+      "q": "nav_fw_pitch2thr = 10 means:",
+      "options": [
+        "10 % throttle",
+        "Throttle per degree of pitch",
+        "A 10° pitch angle in the climb",
+        "A 10° angle"
+      ],
+      "answer": 1,
+      "explain": "Nose up → more throttle."
+    },
+    {
+      "q": "What detects the throw in auto launch?",
+      "options": [
+        "A button",
+        "Acceleration or velocity",
+        "A timer after arming",
+        "GPS"
+      ],
+      "answer": 1,
+      "explain": "Then the motor delay and the launch throttle."
+    }
+  ]
+}

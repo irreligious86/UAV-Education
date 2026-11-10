@@ -1,0 +1,94 @@
+{
+  "module": "math-prob-est",
+  "pass": 80,
+  "questions": [
+    {
+      "q": "The variance of the mean of N independent samples with variance σ²:",
+      "options": [
+        "σ²/N",
+        "σ²",
+        "N·σ²",
+        "σ/N"
+      ],
+      "answer": 0,
+      "explain": "Averaging 100 samples reduces σ by a factor of 10."
+    },
+    {
+      "q": "The fraction of Gaussian samples outside ±3σ:",
+      "options": [
+        "≈ 0.3 %",
+        "≈ 5 %",
+        "≈ 32 %",
+        "0 % — the Gaussian is bounded"
+      ],
+      "answer": 0,
+      "explain": "68/95/99.7 — that is where the innovation gates come from."
+    },
+    {
+      "q": "Optimal fusion of z₁ (σ₁) and z₂ (σ₂) weights them by:",
+      "options": [
+        "Inverse variances",
+        "Equally",
+        "Variances — the accurate sensor gets less weight",
+        "Inverse σ"
+      ],
+      "answer": 0,
+      "explain": "x̂ = (z₁/σ₁² + z₂/σ₂²)/(1/σ₁² + 1/σ₂²)."
+    },
+    {
+      "q": "After fusing two measurements, the σ of the result is:",
+      "options": [
+        "Smaller than the smaller of σ₁, σ₂",
+        "Equal to the smaller one",
+        "The arithmetic mean of the two σ",
+        "Larger than the larger one"
+      ],
+      "answer": 0,
+      "explain": "1/σ̂² = 1/σ₁² + 1/σ₂²."
+    },
+    {
+      "q": "An off-diagonal element of the covariance matrix shows:",
+      "options": [
+        "How the errors of two components are linked",
+        "The variance of the second component",
+        "Bias",
+        "Correlation with time"
+      ],
+      "answer": 0,
+      "explain": "ρ = P₁₂/(σ₁σ₂); geometrically — the tilt of the ellipse."
+    },
+    {
+      "q": "The covariance after a linear transform y = A·x:",
+      "options": [
+        "A·P·Aᵀ",
+        "A·P",
+        "P·A",
+        "Aᵀ·P·A"
+      ],
+      "answer": 0,
+      "explain": "The same formula is the EKF prediction (A = F) and the rotation of the ellipse (A = R)."
+    },
+    {
+      "q": "On an Allan deviation plot, a slope of −½ corresponds to:",
+      "options": [
+        "White noise (ARW/VRW)",
+        "Bias instability",
+        "Rate random walk",
+        "Temperature drift"
+      ],
+      "answer": 0,
+      "explain": "The plateau is bias instability, +½ is rate random walk."
+    },
+    {
+      "q": "The position error from an accelerometer alone, with no corrections, grows as:",
+      "options": [
+        "t^1.5",
+        "√t",
+        "t",
+        "It doesn't grow"
+      ],
+      "answer": 0,
+      "explain": "White acceleration noise → velocity √t → position t^1.5."
+    }
+  ]
+}

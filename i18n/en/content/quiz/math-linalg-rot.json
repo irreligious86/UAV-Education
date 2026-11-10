@@ -1,0 +1,94 @@
+{
+  "module": "math-linalg-rot",
+  "pass": 80,
+  "questions": [
+    {
+      "q": "The columns of the rotation matrix R_nb (from body to NED) are:",
+      "options": [
+        "The body axes in NED coordinates",
+        "The NED axes in body coordinates",
+        "The Euler angles, column by column",
+        "The principal axes of inertia"
+      ],
+      "answer": 0,
+      "explain": "The first column is where the vehicle's x axis points in NED."
+    },
+    {
+      "q": "The inverse of a rotation matrix equals:",
+      "options": [
+        "Its transpose",
+        "The matrix of reciprocal elements",
+        "The same matrix",
+        "The identity"
+      ],
+      "answer": 0,
+      "explain": "R is orthogonal: R⁻¹ = Rᵀ. No need to invert it numerically."
+    },
+    {
+      "q": "Rx(90°)·Ry(90°) and Ry(90°)·Rx(90°):",
+      "options": [
+        "Are different rotations — composition is not commutative",
+        "Are the same",
+        "Are the same only for small angles — and these are small angles",
+        "Are inverses of each other"
+      ],
+      "answer": 0,
+      "explain": "For small angles the difference is second-order; for 90° they are completely different attitudes."
+    },
+    {
+      "q": "Gimbal lock in ZYX Euler angles occurs at:",
+      "options": [
+        "Pitch ±90°",
+        "Roll ±90°",
+        "Yaw 180°",
+        "Zero angles"
+      ],
+      "answer": 0,
+      "explain": "At θ = ±90° the roll and yaw axes coincide."
+    },
+    {
+      "q": "The quaternions q and −q:",
+      "options": [
+        "Represent the same rotation",
+        "Represent inverse rotations",
+        "Differ by 180° in yaw",
+        "One of them is invalid"
+      ],
+      "answer": 0,
+      "explain": "Double cover of SO(3): account for the sign when comparing/interpolating."
+    },
+    {
+      "q": "The component order of a quaternion in the ROS geometry_msgs/Quaternion message:",
+      "options": [
+        "(x, y, z, w)",
+        "(w, x, y, z)",
+        "(roll, pitch, yaw, 1)",
+        "Any — set by the order field"
+      ],
+      "answer": 0,
+      "explain": "ROS — (x, y, z, w); PX4 and ArduPilot — (w, x, y, z)."
+    },
+    {
+      "q": "A small gyro attitude update over a step Δt:",
+      "options": [
+        "q ← q ⊗ (1, ω·Δt/2), then normalize",
+        "Euler angles += ω·Δt component-wise, then convert to a quaternion",
+        "q ← q + ω·Δt",
+        "q ← (ω·Δt, 0, 0, 0)"
+      ],
+      "answer": 0,
+      "explain": "For a small angle δ the quaternion ≈ (1, δ/2); normalization keeps errors from accumulating."
+    },
+    {
+      "q": "The gravity vector (0, 0, 9.81) in NED, expressed in FLU axes at zero angles, is:",
+      "options": [
+        "(0, 0, −9.81)",
+        "(0, 0, 9.81)",
+        "(9.81, 0, 0)",
+        "(0, −9.81, 0)"
+      ],
+      "answer": 0,
+      "explain": "FLU: z is up, gravity points down → negative z."
+    }
+  ]
+}

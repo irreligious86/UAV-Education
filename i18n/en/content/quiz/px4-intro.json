@@ -1,0 +1,94 @@
+{
+  "module": "px4-intro",
+  "pass": 80,
+  "questions": [
+    {
+      "q": "Which GCS is “native” to PX4?",
+      "options": [
+        "Mission Planner",
+        "QGroundControl",
+        "MAVProxy",
+        "Betaflight App"
+      ],
+      "answer": 1,
+      "explain": "QGC does it all: firmware, airframe, calibrations, missions, logs."
+    },
+    {
+      "q": "How does PX4 integrate with ROS 2?",
+      "options": [
+        "Via MAVLink only",
+        "Natively via uXRCE-DDS",
+        "Via Lua scripts on board",
+        "It doesn't"
+      ],
+      "answer": 1,
+      "explain": "uORB topics are exposed directly to ROS 2."
+    },
+    {
+      "q": "The PX4 log format?",
+      "options": [
+        "DataFlash .bin",
+        "ULog .ulg",
+        "Blackbox .bbl",
+        "CSV"
+      ],
+      "answer": 1,
+      "explain": "Analysis — Flight Review or pyulog."
+    },
+    {
+      "q": "Which mode requires a reliable GPS?",
+      "options": [
+        "Stabilized",
+        "Acro",
+        "Position",
+        "Altitude"
+      ],
+      "answer": 2,
+      "explain": "Position holds the position by GPS."
+    },
+    {
+      "q": "The command to start SITL with Gazebo and the x500 quadcopter?",
+      "options": [
+        "sim_vehicle.py -v ArduCopter",
+        "make px4_sitl gz_x500",
+        "px4 start",
+        "ros2 launch px4"
+      ],
+      "answer": 1,
+      "explain": "The uXRCE-DDS client starts by itself in SITL."
+    },
+    {
+      "q": "When should you choose ArduPilot over PX4?",
+      "options": [
+        "For ROS 2 and Gazebo",
+        "Exotic hardware, Lua, the community",
+        "Always",
+        "For racing"
+      ],
+      "answer": 1,
+      "explain": "PX4 is stronger in research and ROS 2."
+    },
+    {
+      "q": "The PX4 filter defaults (IMU_GYRO_CUTOFF 40 Hz, IMU_DGYRO_CUTOFF 20 Hz) compared with Betaflight:",
+      "options": [
+        "Higher",
+        "Noticeably lower",
+        "The same",
+        "Not adjustable"
+      ],
+      "answer": 1,
+      "explain": "PX4 is designed for large vehicles; for a 5\" they are raised. Plus a notch from ESC telemetry (IMU_GYRO_DNF_EN)."
+    },
+    {
+      "q": "What does changing the airframe in QGC reset?",
+      "options": [
+        "Only the sensor calibrations",
+        "The vehicle parameters",
+        "Nothing",
+        "Only the missions"
+      ],
+      "answer": 1,
+      "explain": "After the change — set up again."
+    }
+  ]
+}

@@ -1,0 +1,94 @@
+{
+  "module": "link-digital-video",
+  "pass": 80,
+  "questions": [
+    {
+      "q": "Why is analog safer than a compressed digital system at the edge of range?",
+      "options": [
+        "Analog has noticeably more range at the same power",
+        "The picture gets noisy but doesn't freeze",
+        "Analog isn't affected by obstacles and reflections",
+        "Analog has a higher frame rate at the edge"
+      ],
+      "answer": 1,
+      "explain": "Analog degrades gracefully; digital holds a clean picture up to a threshold and then freezes or breaks up."
+    },
+    {
+      "q": "Why do you have to measure a digital system's latency yourself?",
+      "options": [
+        "Manufacturers don't specify it at all",
+        "It depends on the mode and link quality",
+        "It can't be measured without goggles with recording",
+        "It's the same for all systems of one class"
+      ],
+      "answer": 1,
+      "explain": "The quoted figure is the minimum in the best mode; at the edge the bitrate and frame rate drop and latency grows."
+    },
+    {
+      "q": "Where do compression blocks show up first?",
+      "options": [
+        "On a static scene while hovering in place",
+        "On a fast pass over grass",
+        "Flying into the sun at sunset",
+        "At low altitude over flat asphalt"
+      ],
+      "answer": 1,
+      "explain": "Inter-frame compression works worst when neighboring frames are not alike — a fine, detailed scene in motion."
+    },
+    {
+      "q": "How does the HD OSD get into the goggles of a digital system?",
+      "options": [
+        "The flight controller overlays it on the video signal itself",
+        "Via MSP DisplayPort, the goggles draw it",
+        "The OSD reaches the goggles through the ELRS receiver",
+        "Through a separate video input on the air unit's camera"
+      ],
+      "answer": 1,
+      "explain": "The flight controller sends what to draw; the rendering happens on the digital system's side."
+    },
+    {
+      "q": "Which parameters enable HD OSD in ArduPilot?",
+      "options": [
+        "SERIALn_PROTOCOL = 42 and OSD_TYPE = 5",
+        "SERIALn_PROTOCOL = 2 and OSD_TYPE = 1",
+        "OSD_TYPE = 3 and VTX_ENABLE = 1 together",
+        "SERIALn_PROTOCOL = 33 and OSD_TYPE = 2"
+      ],
+      "answer": 0,
+      "explain": "Protocol 42 is DisplayPort on the port, OSD_TYPE 5 is MSP DisplayPort."
+    },
+    {
+      "q": "What sets HDZero apart from compressed digital systems?",
+      "options": [
+        "It's analog with a digital OSD on top",
+        "No inter-frame compression, stable latency",
+        "It only works in the 2.4 GHz band",
+        "It has the best sharpness of all systems"
+      ],
+      "answer": 1,
+      "explain": "Frame-synchronous transmission without inter-frame compression: predictable latency at the cost of sharpness."
+    },
+    {
+      "q": "Why would an autopilot aircraft use OpenIPC + WFB-ng?",
+      "options": [
+        "It has the lowest latency of all systems",
+        "Openness and MAVLink in the same channel",
+        "It doesn't need antennas on the air unit",
+        "It works without any frequency rules"
+      ],
+      "answer": 1,
+      "explain": "Open firmware and a telemetry tunnel; latency is higher than FPV systems, and you build it by hand."
+    },
+    {
+      "q": "Analog and digital are flying at the field, and a neighbor has interference. First step?",
+      "options": [
+        "Raise your VTX power to maximum",
+        "Coordinate channels, lower power",
+        "Switch to directional patch antennas",
+        "Turn off video recording in your goggles"
+      ],
+      "answer": 1,
+      "explain": "Digital channels are wider; a frequency plan and power on the ground solve most conflicts."
+    }
+  ]
+}

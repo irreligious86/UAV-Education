@@ -1,0 +1,94 @@
+{
+  "module": "tools-gazebo",
+  "pass": 80,
+  "questions": [
+    {
+      "q": "Which Gazebo version is paired with ROS 2 Jazzy?",
+      "options": [
+        "Gazebo Classic 11",
+        "Gazebo Harmonic",
+        "Gazebo Fortress",
+        "Any, the versions aren't linked"
+      ],
+      "answer": 1,
+      "explain": "Harmonic is the LTS pair for Jazzy; Classic reached end of support in January 2025."
+    },
+    {
+      "q": "Which sim_vehicle.py arguments are needed for Gazebo?",
+      "options": [
+        "-f quad --model gazebo",
+        "--gazebo --classic --model iris-sdf",
+        "-f iris --model sitl",
+        "-f gazebo-iris --model JSON"
+      ],
+      "answer": 3,
+      "explain": "The frame must contain gazebo-, the model must be JSON."
+    },
+    {
+      "q": "What does GZ_SIM_SYSTEM_PLUGIN_PATH do?",
+      "options": [
+        "Tells Gazebo where to look for plugins",
+        "Sets the path to SDF worlds",
+        "Selects the Gazebo version",
+        "Enables lockstep between SITL and the world"
+      ],
+      "answer": 0,
+      "explain": "Without it Gazebo won't find ArduPilotPlugin — the vehicle gets no physics."
+    },
+    {
+      "q": "What does @ mean in /camera@sensor_msgs/msg/Image@gz.msgs.Image?",
+      "options": [
+        "Only from ROS to Gazebo",
+        "Only from Gazebo to ROS",
+        "A bridge in both directions",
+        "A comment in the command"
+      ],
+      "answer": 2,
+      "explain": "@ is both directions, [ is from Gazebo to ROS, ] is from ROS to Gazebo."
+    },
+    {
+      "q": "Why lockstep between Gazebo and SITL?",
+      "options": [
+        "To speed up camera rendering in the world",
+        "To disable physics",
+        "To make ros_gz_bridge work",
+        "Time stays synchronized, even at RTF < 1"
+      ],
+      "answer": 3,
+      "explain": "The simulation waits for the autopilot — slower, but correct."
+    },
+    {
+      "q": "How do you launch Gazebo for a headless test?",
+      "options": [
+        "gz sim -s -r world.sdf",
+        "gz sim --gui world.sdf",
+        "gazebo --verbose world.world",
+        "gz topic -l world.sdf"
+      ],
+      "answer": 0,
+      "explain": "-s is server only, -r starts the simulation right away."
+    },
+    {
+      "q": "How does HITL differ from SITL?",
+      "options": [
+        "It doesn't, they are synonyms",
+        "In HITL the motors spin on the bench instead of being simulated",
+        "A real flight controller, sensors from the simulator",
+        "HITL works only in Gazebo Classic"
+      ],
+      "answer": 2,
+      "explain": "It tests the real hardware: timing, drivers, CPU load."
+    },
+    {
+      "q": "Why can vision from simulation fail in the field?",
+      "options": [
+        "Gazebo can't simulate cameras at all",
+        "A perfect image with no noise or blur",
+        "ROS 2 distorts images",
+        "Cameras in the field are always worse"
+      ],
+      "answer": 1,
+      "explain": "You need sensor noise, lighting, blur and testing on real recordings."
+    }
+  ]
+}

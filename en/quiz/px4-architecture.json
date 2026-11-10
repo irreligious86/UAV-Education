@@ -3,62 +3,62 @@
   "pass": 80,
   "questions": [
     {
-      "q": "Как модули PX4 обмениваются данными?",
+      "q": "How do PX4 modules exchange data?",
       "options": [
-        "Глобальные переменные",
+        "Global variables",
         "uORB publish/subscribe",
-        "MAVLink-сообщения внутри платы",
-        "Файлы"
+        "MAVLink messages inside the board",
+        "Files"
       ],
       "answer": 1,
-      "explain": "Асинхронно, подписчик просыпается на новые данные."
+      "explain": "Asynchronously; the subscriber wakes up on new data."
     },
     {
-      "q": "Что обязательно в каждом .msg?",
+      "q": "What is mandatory in every .msg?",
       "options": [
-        "Ничего",
+        "Nothing",
         "uint64 timestamp",
-        "Поле name",
-        "Поле id и имя модуля"
+        "A name field",
+        "An id field and the module name"
       ],
       "answer": 1,
-      "explain": "Заполняется при публикации."
+      "explain": "It is filled in on publication."
     },
     {
-      "q": "Как VehicleAttitude.msg превращается в имя топика?",
+      "q": "How does VehicleAttitude.msg turn into a topic name?",
       "options": [
         "VA",
         "vehicle_attitude",
         "attitude",
-        "VehicleAttitude без изменений"
+        "VehicleAttitude unchanged"
       ],
       "answer": 1,
       "explain": "CamelCase → snake_case."
     },
     {
-      "q": "Какой модуль переводит моменты в команды моторам?",
+      "q": "Which module turns torques into motor commands?",
       "options": [
-        "Commander по команде",
+        "Commander, on command",
         "Control allocation",
         "Navigator",
         "EKF2"
       ],
       "answer": 1,
-      "explain": "По геометрии CA_AIRFRAME и CA_ROTOR*."
+      "explain": "According to the CA_AIRFRAME and CA_ROTOR* geometry."
     },
     {
-      "q": "Кто отвечает за арм, режимы и failsafe?",
+      "q": "Who is responsible for arming, modes and failsafe?",
       "options": [
         "Navigator",
         "Commander",
         "Rate controller",
-        "Драйвер IMU"
+        "The IMU driver"
       ],
       "answer": 1,
-      "explain": "Commander — арбитр системы."
+      "explain": "Commander is the system's arbiter."
     },
     {
-      "q": "Как посмотреть частоты топиков в работающем PX4?",
+      "q": "How do you see topic rates in a running PX4?",
       "options": [
         "param show",
         "uorb top",
@@ -66,29 +66,29 @@
         "listener"
       ],
       "answer": 1,
-      "explain": "listener показывает содержимое, top — загрузку модулей."
+      "explain": "listener shows the content, top shows module load."
     },
     {
-      "q": "Где исполняется большинство модулей PX4 на NuttX?",
+      "q": "Where do most PX4 modules run on NuttX?",
       "options": [
-        "Отдельные процессы",
+        "Separate processes",
         "Work queue",
-        "Прерывания",
+        "Interrupts",
         "Lua"
       ],
       "answer": 1,
-      "explain": "wq:rate_ctrl выше, wq:lp_default ниже."
+      "explain": "wq:rate_ctrl is higher, wq:lp_default is lower."
     },
     {
-      "q": "Что относится к flight stack PX4, а не к middleware?",
+      "q": "What belongs to the PX4 flight stack rather than the middleware?",
       "options": [
-        "Оценка состояния, контроллеры, навигатор, commander",
-        "Драйверы датчиков",
-        "Шина uORB",
-        "Связь MAVLink и uXRCE-DDS"
+        "State estimation, controllers, navigator, commander",
+        "Sensor drivers",
+        "The uORB bus",
+        "MAVLink and uXRCE-DDS communication"
       ],
       "answer": 0,
-      "explain": "Middleware — драйверы, шина и связь; flight stack — алгоритмы."
+      "explain": "Middleware is drivers, the bus and communication; the flight stack is the algorithms."
     }
   ]
 }

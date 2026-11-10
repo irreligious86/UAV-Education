@@ -1,0 +1,94 @@
+{
+  "module": "px4-control",
+  "pass": 80,
+  "questions": [
+    {
+      "q": "The order of multirotor control loops in PX4?",
+      "options": [
+        "rate → attitude → position",
+        "position → attitude → rate",
+        "allocation → rate",
+        "attitude → position"
+      ],
+      "answer": 1,
+      "explain": "The slow outer loop is position, the fast inner one is rate."
+    },
+    {
+      "q": "What does MC_ROLLRATE_K do?",
+      "options": [
+        "P only",
+        "A multiplier for P, I and D",
+        "The roll stick rate",
+        "A filter"
+      ],
+      "answer": 1,
+      "explain": "A parallel form with a K multiplier."
+    },
+    {
+      "q": "What does Betaflight feedforward correspond to in PX4?",
+      "options": [
+        "MC_ROLL_P",
+        "MC_ROLLRATE_FF",
+        "MPC_XY_P for position",
+        "CA_ROTOR0_KM"
+      ],
+      "answer": 1,
+      "explain": "The rate loop FF."
+    },
+    {
+      "q": "What does the PX4 documentation recommend to most users?",
+      "options": [
+        "Manual tuning",
+        "Autotune",
+        "The defaults",
+        "Betaflight"
+      ],
+      "answer": 1,
+      "explain": "Faster and usually good; manual is for non-standard frames."
+    },
+    {
+      "q": "Where is the hover throttle set?",
+      "options": [
+        "CA_AIRFRAME and MC_AIRMODE",
+        "MPC_THR_HOVER",
+        "MC_ROLL_P",
+        "MPC_XY_VEL_MAX"
+      ],
+      "answer": 1,
+      "explain": "A position controller parameter."
+    },
+    {
+      "q": "Fast oscillations after autotune. What comes first?",
+      "options": [
+        "Increase K",
+        "Filters and a repeat",
+        "Change the frame",
+        "Disable autotune"
+      ],
+      "answer": 1,
+      "explain": "Autotune on a noisy signal picks gains for the noise."
+    },
+    {
+      "q": "MC_ROLLRATE_P = 0.15 means:",
+      "options": [
+        "15 % P",
+        "1 rad/s → 15 % of the torque",
+        "0.15 °/s",
+        "15 % P of the roll maximum"
+      ],
+      "answer": 1,
+      "explain": "PX4 units: rad/s at the input, a fraction of the torque at the output."
+    },
+    {
+      "q": "What does MC_AT_APPLY = 1 do?",
+      "options": [
+        "Disables autotune after landing",
+        "Applies after landing",
+        "Applies in flight",
+        "Doesn't apply"
+      ],
+      "answer": 1,
+      "explain": "0 — don't apply, 2 — immediately."
+    }
+  ]
+}

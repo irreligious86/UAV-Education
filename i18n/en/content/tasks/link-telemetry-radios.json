@@ -1,0 +1,64 @@
+{
+ "module": "link-telemetry-radios",
+ "tasks": [
+  {
+   "id": "dbm",
+   "title": "SiK RSSI in dBm",
+   "statement": "A SiK modem reports RSSI = **{r}**. Convert it to dBm (approximately dBm ≈ RSSI/1.9 − 127).",
+   "params": {
+    "r": {
+     "min": 60,
+     "max": 200,
+     "step": 5
+    }
+   },
+   "answer": "r/1.9-127",
+   "unit": "dBm",
+   "tol": 0.01,
+   "solution": "dBm ≈ RSSI / 1.9 − 127.",
+   "abs": 0.5
+  },
+  {
+   "id": "fade",
+   "title": "Fade margin",
+   "statement": "`RADIO_STATUS`: rssi = **{r}**, noise = **{n}** (SiK units, one unit ≈ 0.5 dB). Find the fade margin (dB).",
+   "params": {
+    "r": {
+     "min": 100,
+     "max": 200,
+     "step": 5
+    },
+    "n": {
+     "min": 30,
+     "max": 80,
+     "step": 5
+    }
+   },
+   "answer": "(r-n)/2",
+   "unit": "dB",
+   "tol": 0.06,
+   "abs": 0.3,
+   "solution": "Margin ≈ (RSSI − noise) / 2 dB: one SiK RSSI unit ≈ 0.5 dB."
+  },
+  {
+   "id": "range",
+   "title": "Margin and range",
+   "statement": "At the test distance the fade margin is **{m} dB**. How many times farther can you go if you keep **{k} dB** in reserve (every 6 dB doubles the range)?",
+   "params": {
+    "m": {
+     "min": 12,
+     "max": 36,
+     "step": 3
+    },
+    "k": [
+     6,
+     10
+    ]
+   },
+   "answer": "2**((m-k)/6)",
+   "unit": "×",
+   "tol": 0.03,
+   "solution": "Usable margin is m − k; range × 2^((m − k)/6)."
+  }
+ ]
+}

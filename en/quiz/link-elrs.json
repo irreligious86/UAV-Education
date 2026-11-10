@@ -3,73 +3,73 @@
   "pass": 80,
   "questions": [
     {
-      "q": "Что такое packet rate в ELRS?",
+      "q": "What is packet rate in ELRS?",
       "options": [
-        "Мощность передатчика",
-        "Пакетов в секунду",
-        "Частота видео",
-        "Скорость UART"
+        "Transmitter power",
+        "Packets per second",
+        "Video frequency",
+        "UART speed"
       ],
       "answer": 1,
-      "explain": "Больше пакетов — меньше задержка, но хуже чувствительность и дальность."
+      "explain": "More packets means lower latency, but worse sensitivity and range."
     },
     {
-      "q": "Для дальнего крыла в лесу лучше…",
+      "q": "For a long-range wing over forest, the better choice is…",
       "options": [
         "D500",
-        "900 МГц 50–100 Гц",
+        "900 MHz 50–100 Hz",
         "F1000",
-        "2.4 ГГц 500 Гц с максимальной мощностью"
+        "2.4 GHz 500 Hz at maximum power"
       ],
       "answer": 1,
-      "explain": "Длинная волна огибает препятствия, низкий packet rate даёт запас по чувствительности."
+      "explain": "The longer wavelength bends around obstacles, and a low packet rate gives you sensitivity margin."
     },
     {
-      "q": "Telem ratio 1:128 при 500 Гц даёт телеметрию раз в…",
+      "q": "Telem ratio 1:128 at 500 Hz gives telemetry once every…",
       "options": [
-        "128 мс",
-        "256 мс",
-        "500 мс",
-        "1 с"
+        "128 ms",
+        "256 ms",
+        "500 ms",
+        "1 s"
       ],
       "answer": 1,
-      "explain": "Интервал = ratio × 1000 / packet rate = 128 × 1000 / 500 = 256 мс."
+      "explain": "Interval = ratio × 1000 / packet rate = 128 × 1000 / 500 = 256 ms."
     },
     {
-      "q": "Binding phrase — это…",
+      "q": "The binding phrase is…",
       "options": [
-        "Канал VTX",
-        "Основа паттерна прыжков",
-        "Имя модели",
-        "Пароль шифрования канала управления"
+        "The VTX channel",
+        "The basis of the hopping pattern",
+        "The model name",
+        "The encryption password for the control link"
       ],
       "answer": 1,
-      "explain": "Не секрет и не защита: уникальная фраза нужна, чтобы не совпасть с соседями."
+      "explain": "Not a secret and not protection: a unique phrase is needed so you don't collide with your neighbors."
     },
     {
-      "q": "LQ 100% при RSSI у порога чувствительности означает…",
+      "q": "LQ 100% with RSSI at the sensitivity threshold means…",
       "options": [
-        "Всё отлично: пакеты доходят полностью",
-        "Край связи без запаса",
-        "Сломана антенна",
-        "Пульт выключен"
+        "Everything is great: all packets get through",
+        "The edge of the link with no margin",
+        "A broken antenna",
+        "The radio is off"
       ],
       "answer": 1,
-      "explain": "LQ — доходят ли пакеты, RSSI — сколько запаса. Оба нужны."
+      "explain": "LQ is whether the packets get through, RSSI is how much margin is left. You need both."
     },
     {
-      "q": "RXLOSS при развороте спиной к пилоту. Вероятная причина?",
+      "q": "RXLOSS when turning with the back toward the pilot. Likely cause?",
       "options": [
-        "Плохой PID",
-        "Антенна затенена рамой",
-        "Низкий packet rate и слабая АКБ пульта",
-        "Помеха от видеопередатчика 5.8 ГГц"
+        "Bad PID",
+        "The antenna is shadowed by the frame",
+        "Low packet rate and a weak radio battery",
+        "Interference from the 5.8 GHz video transmitter"
       ],
       "answer": 1,
-      "explain": "Затенение антенны — классика. Вынести и сориентировать."
+      "explain": "Antenna shadowing is a classic. Move it out and orient it."
     },
     {
-      "q": "Чувствительность ELRS 2.4 ГГц 250 Гц:",
+      "q": "Sensitivity of ELRS 2.4 GHz at 250 Hz:",
       "options": [
         "−115",
         "−108",
@@ -77,31 +77,31 @@
         "−123"
       ],
       "answer": 1,
-      "explain": "50 Гц — −115, 500 Гц — −105."
+      "explain": "50 Hz is −115, 500 Hz is −105."
     },
     {
-      "q": "Telemetry ratio 1:128 на 250 Гц даёт интервал телеметрии:",
+      "q": "Telemetry ratio 1:128 at 250 Hz gives a telemetry interval of:",
       "options": [
-        "4 мс",
-        "0.5 с",
-        "2 с",
-        "128 мс"
+        "4 ms",
+        "0.5 s",
+        "2 s",
+        "128 ms"
       ],
       "answer": 1,
-      "explain": "128/250 с."
+      "explain": "128/250 s."
     },
     {
-      "q": "Дальний полёт, ELRS 2.4 ГГц в режиме 250 Гц. Телеметрия на краю зоны:",
+      "q": "Long-range flight, ELRS 2.4 GHz in 250 Hz mode. Telemetry at the edge of the zone:",
       "kind": "apply",
-      "fragment": "RSSI1 -104 dBm  RSSI2 -106 dBm  LQ 71%  SNR -2 dB\nчувствительность режима 250 Гц ≈ -108 dBm",
+      "fragment": "RSSI1 -104 dBm  RSSI2 -106 dBm  LQ 71%  SNR -2 dB\nsensitivity of 250 Hz mode ≈ -108 dBm",
       "options": [
-        "Запас 2–4 дБ — канал на грани failsafe: снизить частоту пакетов или развернуть",
-        "LQ 71 % — норма для дальнего полёта; failsafe наступает только при LQ ниже 10 %",
-        "SNR -2 дБ означает неисправный приёмник: у исправного он всегда положительный",
-        "Нужно поднять частоту пакетов до 500 Гц — это повысит чувствительность приёмника"
+        "A 2–4 dB margin — the link is on the verge of failsafe: lower the packet rate or turn back",
+        "LQ 71 % is normal for a long-range flight; failsafe only happens at LQ below 10 %",
+        "SNR -2 dB means a faulty receiver: on a working one it's always positive",
+        "You need to raise the packet rate to 500 Hz — that will increase receiver sensitivity"
       ],
       "answer": 0,
-      "explain": "Запас считают от чувствительности режима; 500 Гц ещё менее чувствителен."
+      "explain": "The margin is counted from the mode's sensitivity; 500 Hz is even less sensitive."
     }
   ]
 }

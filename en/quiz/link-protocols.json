@@ -3,62 +3,62 @@
   "pass": 80,
   "questions": [
     {
-      "q": "Какой уровень на линии UART в покое (idle) у обычного, неинвертированного сигнала?",
+      "q": "What level is the UART line at when idle for a regular, uninverted signal?",
       "options": [
-        "Низкий",
-        "Высокий",
-        "Плавающий",
-        "Зависит от скорости"
+        "Low",
+        "High",
+        "Floating",
+        "Depends on the speed"
       ],
       "answer": 1,
-      "explain": "Idle — логическая единица, высокий уровень. Стартовый бит опускает линию в ноль."
+      "explain": "Idle is logical one, the high level. The start bit pulls the line down to zero."
     },
     {
-      "q": "SBUS — это…",
+      "q": "SBUS is…",
       "options": [
-        "100000 бод, 8E2, инверсия",
-        "420000 бод, 8N1, дуплекс",
-        "Радиопротокол ELRS",
-        "Протокол поверх I2C с адресом приёмника"
+        "100000 baud, 8E2, inverted",
+        "420000 baud, 8N1, duplex",
+        "The ELRS radio protocol",
+        "A protocol on top of I2C with a receiver address"
       ],
       "answer": 0,
-      "explain": "SBUS: 100 кбод, 8 бит, чётность even, 2 стоп-бита, инвертированный сигнал — стандарт протокола, не исключение."
+      "explain": "SBUS: 100 kbaud, 8 bits, even parity, 2 stop bits; the inverted signal is the protocol standard, not an exception."
     },
     {
-      "q": "Почему CRSF работает на любом UART любой платы?",
+      "q": "Why does CRSF work on any UART of any board?",
       "options": [
-        "Он по USB",
-        "Обычный UART без инверсии",
-        "Он медленный и не требует буфера",
-        "Он по I2C"
+        "It goes over USB",
+        "A regular UART without inversion",
+        "It's slow and doesn't need a buffer",
+        "It goes over I2C"
       ],
       "answer": 1,
-      "explain": "CRSF — стандартный 8N1 без инверсии, полный дуплекс на двух проводах."
+      "explain": "CRSF is standard 8N1 without inversion, full duplex on two wires."
     },
     {
-      "q": "Что такое «неинвертированный SBUS»?",
+      "q": "What is “uninverted SBUS”?",
       "options": [
-        "Другой протокол",
-        "Перевёрнутая электрика",
-        "SBUS на скорости 115200",
-        "SBUS по проводу CRSF без чётности"
+        "A different protocol",
+        "Flipped electrical levels",
+        "SBUS at 115200 baud",
+        "SBUS over a CRSF wire without parity"
       ],
       "answer": 1,
-      "explain": "Данные те же, сигнал перевёрнут обратно — чтобы обойти отсутствие инвертора на F4."
+      "explain": "The data is the same, the signal is flipped back — to work around the missing inverter on F4."
     },
     {
-      "q": "CRSF: каналы есть, телеметрии на пульте нет. Что проверить?",
+      "q": "CRSF: channels work, no telemetry on the radio. What do you check?",
       "options": [
-        "Антенну приёмника и канал VTX",
-        "Провод TX FC → RX и halfduplex",
-        "Частоту пакетов ELRS",
-        "Прошивку ESC"
+        "The receiver antenna and the VTX channel",
+        "The FC TX → RX wire and halfduplex",
+        "The ELRS packet rate",
+        "The ESC firmware"
       ],
       "answer": 1,
-      "explain": "Телеметрия идёт по обратному проводу. Без него или в half-duplex её нет."
+      "explain": "Telemetry goes over the return wire. Without it, or in half-duplex, there's none."
     },
     {
-      "q": "Какая скорость CRSF по спецификации для полного дуплекса на борту?",
+      "q": "What is the spec CRSF speed for onboard full duplex?",
       "options": [
         "9600",
         "100000",
@@ -66,42 +66,42 @@
         "1000000"
       ],
       "answer": 2,
-      "explain": "Спецификация TBS: 416666 бод 8N1, с возможностью договориться о более высокой скорости."
+      "explain": "The TBS spec: 416666 baud 8N1, with the option to negotiate a higher speed."
     },
     {
-      "q": "Что проверяет CRC8 в кадре CRSF?",
+      "q": "What does the CRC8 in a CRSF frame cover?",
       "options": [
-        "Весь кадр",
-        "Тип и payload",
-        "Только payload",
-        "Только адреса"
+        "The whole frame",
+        "Type and payload",
+        "Payload only",
+        "Addresses only"
       ],
       "answer": 1,
-      "explain": "Тип и payload, без sync и длины; полином 0xD5 — по спецификации TBS."
+      "explain": "Type and payload, without sync and length; polynomial 0xD5 — per the TBS spec."
     },
     {
-      "q": "992 тика в CRSF — это:",
+      "q": "992 ticks in CRSF is:",
       "options": [
-        "988 мкс",
-        "1500 мкс",
-        "2012 мкс",
-        "1000 мкс"
+        "988 µs",
+        "1500 µs",
+        "2012 µs",
+        "1000 µs"
       ],
       "answer": 1,
       "explain": "us = (ticks − 992)·5/8 + 1500."
     },
     {
-      "q": "SBUS-приёмник подключён к RX свободного UART на плате F4 без отдельного инвертора. Сигнала нет. Почему?",
+      "q": "An SBUS receiver is connected to the RX of a free UART on an F4 board without a separate inverter. No signal. Why?",
       "kind": "apply",
       "fragment": "serial 2 64 115200 57600 0 115200\nset serialrx_provider = SBUS\nset serialrx_inverted = OFF",
       "options": [
-        "SBUS инвертирован, а UART на F4 не инвертирует сам — нужен вход с инвертором",
-        "SBUS работает только на UART1, потому что требует аппаратного DMA",
-        "Скорость в команде serial должна быть 100000, иначе Betaflight не откроет порт",
-        "SBUS требует serialrx_inverted = ON на любой плате, и F4 это поддерживает"
+        "SBUS is inverted, and the F4 UART can't invert by itself — you need an input with an inverter",
+        "SBUS only works on UART1 because it requires hardware DMA",
+        "The speed in the serial command must be 100000, otherwise Betaflight won't open the port",
+        "SBUS requires serialrx_inverted = ON on any board, and F4 supports it"
       ],
       "answer": 0,
-      "explain": "На F4 инверсия делается внешней схемой; F7/H7 умеют инвертировать UART программно."
+      "explain": "On F4 inversion is done by an external circuit; F7/H7 can invert the UART in software."
     }
   ]
 }

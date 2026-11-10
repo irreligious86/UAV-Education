@@ -3,92 +3,92 @@
   "pass": 80,
   "questions": [
     {
-      "q": "Чем метод Уэлча лучше одного FFT всего лога?",
+      "q": "Why is Welch's method better than a single FFT of the whole log?",
       "options": [
-        "Считается быстрее",
-        "Усредняет перекрывающиеся окна",
-        "Не требует scipy и работает на numpy",
-        "Показывает время событий"
+        "It computes faster",
+        "It averages overlapping windows",
+        "It doesn't need scipy and runs on numpy",
+        "It shows the timing of events"
       ],
       "answer": 1,
-      "explain": "Усреднение перекрывающихся окон даёт устойчивую оценку спектра с заданным разрешением; один FFT шумный и зависит от длины записи."
+      "explain": "Averaging overlapping windows gives a stable spectrum estimate with a set resolution; a single FFT is noisy and depends on the length of the recording."
     },
     {
-      "q": "Разрешение спектра при fs = 8000 Гц и nperseg = 1024:",
+      "q": "Spectrum resolution at fs = 8000 Hz and nperseg = 1024:",
       "options": [
-        "1 Гц",
-        "7.8 Гц",
-        "125 Гц",
-        "1024 Гц"
+        "1 Hz",
+        "7.8 Hz",
+        "125 Hz",
+        "1024 Hz"
       ],
       "answer": 1,
       "explain": "Δf = fs / nperseg."
     },
     {
-      "q": "Что такое bounce-back?",
+      "q": "What is bounce-back?",
       "options": [
-        "Дрейф I-term",
-        "Отскок gyro после остановки стика",
-        "Задержка петли",
-        "Перелёт setpoint при входе в манёвр"
+        "I-term drift",
+        "Gyro rebound after the stick stops",
+        "Loop delay",
+        "Setpoint overshoot on entering a maneuver"
       ],
       "answer": 1,
-      "explain": "Признак недостаточного демпфирования."
+      "explain": "A sign of insufficient damping."
     },
     {
-      "q": "Чем читать ArduPilot .bin в Python?",
+      "q": "What do you use to read an ArduPilot .bin in Python?",
       "options": [
         "pandas.read_csv",
         "pymavlink mavutil",
-        "blackbox_decode с флагом --ardupilot",
+        "blackbox_decode with the --ardupilot flag",
         "json.load"
       ],
       "answer": 1,
-      "explain": "pymavlink декодирует DataFlash-сообщения."
+      "explain": "pymavlink decodes DataFlash messages."
     },
     {
-      "q": "Какой участок полёта брать для спектра Уэлча?",
+      "q": "Which part of the flight do you take for a Welch spectrum?",
       "options": [
-        "Любой участок длиной от 5 секунд",
-        "Ровное висение 10–20 с",
-        "Взлёт",
-        "Посадку"
+        "Any segment 5 seconds or longer",
+        "A steady hover of 10–20 s",
+        "Takeoff",
+        "Landing"
       ],
       "answer": 1,
-      "explain": "Стационарный участок — иначе пики размазываются."
+      "explain": "A stationary segment — otherwise the peaks smear."
     },
     {
-      "q": "Что показывает std интервалов между строками лога > 10 мкс при 8 кГц?",
+      "q": "What does a std of the intervals between log rows > 10 µs at 8 kHz indicate?",
       "options": [
-        "Плохая SD-карта, пишущая с задержкой",
-        "Джиттер петли, перегруз CPU",
-        "Это норма",
-        "Слишком большой P"
+        "A bad SD card that writes with a delay",
+        "Loop jitter, CPU overload",
+        "This is normal",
+        "P is too high"
       ],
       "answer": 1,
-      "explain": "Среднее 125 мкс, разброс единицы мкс — норма."
+      "explain": "A mean of 125 µs with a spread of a few µs is normal."
     },
     {
-      "q": "Как в метриках определяется задержка между setpoint и gyro?",
+      "q": "How do the metrics determine the delay between setpoint and gyro?",
       "options": [
-        "По максимуму кросс-корреляции",
-        "По разнице средних значений",
-        "По времени первого пика gyro",
-        "По частоте пика в спектре"
+        "By the cross-correlation maximum",
+        "By the difference of the mean values",
+        "By the time of the first gyro peak",
+        "By the frequency of the spectrum peak"
       ],
       "answer": 0,
-      "explain": "Задержка — сдвиг, при котором корреляция setpoint и gyro максимальна."
+      "explain": "The delay is the shift at which the correlation of setpoint and gyro is maximal."
     },
     {
-      "q": "Что показывает спектрограмма в отличие от одного спектра?",
+      "q": "What does a spectrogram show that a single spectrum doesn't?",
       "options": [
-        "Только амплитуду на одной частоте",
-        "Задержку фильтров в мс",
-        "Перелёт после ступеньки",
-        "Как частоты шума меняются во времени и с газом"
+        "Only the amplitude at one frequency",
+        "Filter delay in ms",
+        "Overshoot after a step",
+        "How noise frequencies change over time and with throttle"
       ],
       "answer": 3,
-      "explain": "Спектрограмма — спектр по окнам во времени: видно, как гармоники моторов ползут с газом."
+      "explain": "A spectrogram is a spectrum over time windows: you can see the motor harmonics crawl with throttle."
     }
   ]
 }

@@ -1,0 +1,64 @@
+{
+ "module": "math-linalg-rot",
+ "tasks": [
+  {
+   "id": "grav-body",
+   "title": "Gravity in body axes",
+   "statement": "Roll **{phi}°**, pitch **{theta}°**, any yaw. Find the z component of the gravity vector (0, 0, 9.81) in FRD axes (m/s²).",
+   "params": {
+    "phi": {
+     "min": -40,
+     "max": 40,
+     "step": 5
+    },
+    "theta": {
+     "min": -30,
+     "max": 30,
+     "step": 5
+    }
+   },
+   "answer": "9.81*math.cos(math.radians(phi))*math.cos(math.radians(theta))",
+   "unit": "m/s²",
+   "tol": 0.01,
+   "solution": "g_body = R_nbᵀ·g_ned; the z component = g·cos φ·cos θ. Yaw doesn't affect it."
+  },
+  {
+   "id": "grav-y",
+   "title": "Lateral component",
+   "statement": "Roll **{phi}°**, pitch **{theta}°**. Find the y component (right) of the gravity vector in FRD axes (m/s²).",
+   "params": {
+    "phi": {
+     "min": -40,
+     "max": 40,
+     "step": 5
+    },
+    "theta": {
+     "min": -30,
+     "max": 30,
+     "step": 5
+    }
+   },
+   "answer": "9.81*math.sin(math.radians(phi))*math.cos(math.radians(theta))",
+   "unit": "m/s²",
+   "tol": 0.01,
+   "abs": 0.02,
+   "solution": "The third row of R_nb (the third column of R_nbᵀ): (−sin θ, sin φ cos θ, cos φ cos θ)·g."
+  },
+  {
+   "id": "quat-angle",
+   "title": "Angle from a quaternion",
+   "statement": "The scalar part of a unit quaternion is w = **{w}**. By what angle (in degrees) does it rotate?",
+   "params": {
+    "w": {
+     "min": 0.5,
+     "max": 0.99,
+     "step": 0.01
+    }
+   },
+   "answer": "2*math.degrees(math.acos(w))",
+   "unit": "°",
+   "tol": 0.01,
+   "solution": "w = cos(α/2) → α = 2·acos(w)."
+  }
+ ]
+}

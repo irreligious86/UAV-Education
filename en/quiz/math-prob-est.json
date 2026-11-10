@@ -3,7 +3,7 @@
   "pass": 80,
   "questions": [
     {
-      "q": "Дисперсия среднего по N независимым отсчётам с дисперсией σ²:",
+      "q": "The variance of the mean of N independent samples with variance σ²:",
       "options": [
         "σ²/N",
         "σ²",
@@ -11,54 +11,54 @@
         "σ/N"
       ],
       "answer": 0,
-      "explain": "Усреднение 100 отсчётов снижает σ в 10 раз."
+      "explain": "Averaging 100 samples reduces σ by a factor of 10."
     },
     {
-      "q": "Доля гауссовых отсчётов за пределами ±3σ:",
+      "q": "The fraction of Gaussian samples outside ±3σ:",
       "options": [
         "≈ 0.3 %",
         "≈ 5 %",
         "≈ 32 %",
-        "0 % — гауссиана ограничена"
+        "0 % — the Gaussian is bounded"
       ],
       "answer": 0,
-      "explain": "68/95/99.7 — отсюда ворота инноваций."
+      "explain": "68/95/99.7 — that is where the innovation gates come from."
     },
     {
-      "q": "Оптимальное слияние z₁ (σ₁) и z₂ (σ₂) взвешивает их:",
+      "q": "Optimal fusion of z₁ (σ₁) and z₂ (σ₂) weights them by:",
       "options": [
-        "Обратными дисперсиями",
-        "Поровну",
-        "Дисперсиями — точный датчик меньше",
-        "Обратными σ"
+        "Inverse variances",
+        "Equally",
+        "Variances — the accurate sensor gets less weight",
+        "Inverse σ"
       ],
       "answer": 0,
       "explain": "x̂ = (z₁/σ₁² + z₂/σ₂²)/(1/σ₁² + 1/σ₂²)."
     },
     {
-      "q": "После слияния двух измерений σ результата:",
+      "q": "After fusing two measurements, the σ of the result is:",
       "options": [
-        "Меньше меньшей из σ₁, σ₂",
-        "Равна меньшей",
-        "Среднее арифметическое двух σ",
-        "Больше большей"
+        "Smaller than the smaller of σ₁, σ₂",
+        "Equal to the smaller one",
+        "The arithmetic mean of the two σ",
+        "Larger than the larger one"
       ],
       "answer": 0,
       "explain": "1/σ̂² = 1/σ₁² + 1/σ₂²."
     },
     {
-      "q": "Внедиагональный элемент ковариационной матрицы показывает:",
+      "q": "An off-diagonal element of the covariance matrix shows:",
       "options": [
-        "Связь ошибок двух компонент",
-        "Дисперсию второй компоненты",
+        "How the errors of two components are linked",
+        "The variance of the second component",
         "Bias",
-        "Корреляцию с временем"
+        "Correlation with time"
       ],
       "answer": 0,
-      "explain": "ρ = P₁₂/(σ₁σ₂); геометрически — наклон эллипса."
+      "explain": "ρ = P₁₂/(σ₁σ₂); geometrically — the tilt of the ellipse."
     },
     {
-      "q": "Ковариация после линейного преобразования y = A·x:",
+      "q": "The covariance after a linear transform y = A·x:",
       "options": [
         "A·P·Aᵀ",
         "A·P",
@@ -66,29 +66,29 @@
         "Aᵀ·P·A"
       ],
       "answer": 0,
-      "explain": "Эта же формула — предсказание EKF (A = F) и поворот эллипса (A = R)."
+      "explain": "The same formula is the EKF prediction (A = F) and the rotation of the ellipse (A = R)."
     },
     {
-      "q": "На графике Allan deviation наклон −½ соответствует:",
+      "q": "On an Allan deviation plot, a slope of −½ corresponds to:",
       "options": [
-        "Белому шуму (ARW/VRW)",
+        "White noise (ARW/VRW)",
         "Bias instability",
         "Rate random walk",
-        "Температурному дрейфу"
+        "Temperature drift"
       ],
       "answer": 0,
-      "explain": "Плато — bias instability, +½ — rate random walk."
+      "explain": "The plateau is bias instability, +½ is rate random walk."
     },
     {
-      "q": "Ошибка позиции по одному акселерометру без коррекций растёт как:",
+      "q": "The position error from an accelerometer alone, with no corrections, grows as:",
       "options": [
         "t^1.5",
         "√t",
         "t",
-        "Не растёт"
+        "It doesn't grow"
       ],
       "answer": 0,
-      "explain": "Белый шум ускорения → скорость √t → позиция t^1.5."
+      "explain": "White acceleration noise → velocity √t → position t^1.5."
     }
   ]
 }

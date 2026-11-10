@@ -3,84 +3,84 @@
   "pass": 80,
   "questions": [
     {
-      "q": "Столбцы матрицы поворота R_nb (из body в NED) — это:",
+      "q": "The columns of the rotation matrix R_nb (from body to NED) are:",
       "options": [
-        "Оси body в координатах NED",
-        "Оси NED в координатах body",
-        "Углы Эйлера по столбцам",
-        "Главные оси инерции"
+        "The body axes in NED coordinates",
+        "The NED axes in body coordinates",
+        "The Euler angles, column by column",
+        "The principal axes of inertia"
       ],
       "answer": 0,
-      "explain": "Первый столбец — куда смотрит ось x борта в NED."
+      "explain": "The first column is where the vehicle's x axis points in NED."
     },
     {
-      "q": "Обратная матрица поворота равна:",
+      "q": "The inverse of a rotation matrix equals:",
       "options": [
-        "Транспонированной",
-        "Матрице с обратными элементами",
-        "Той же матрице",
-        "Единичной"
+        "Its transpose",
+        "The matrix of reciprocal elements",
+        "The same matrix",
+        "The identity"
       ],
       "answer": 0,
-      "explain": "R ортогональна: R⁻¹ = Rᵀ. Обращать численно не нужно."
+      "explain": "R is orthogonal: R⁻¹ = Rᵀ. No need to invert it numerically."
     },
     {
-      "q": "Rx(90°)·Ry(90°) и Ry(90°)·Rx(90°):",
+      "q": "Rx(90°)·Ry(90°) and Ry(90°)·Rx(90°):",
       "options": [
-        "Разные повороты — композиция не коммутативна",
-        "Одинаковые",
-        "Одинаковы только для малых углов — это и есть малые углы",
-        "Обратны друг другу"
+        "Are different rotations — composition is not commutative",
+        "Are the same",
+        "Are the same only for small angles — and these are small angles",
+        "Are inverses of each other"
       ],
       "answer": 0,
-      "explain": "Для малых углов разница второго порядка, для 90° — совсем другие ориентации."
+      "explain": "For small angles the difference is second-order; for 90° they are completely different attitudes."
     },
     {
-      "q": "Gimbal lock у углов Эйлера ZYX наступает при:",
+      "q": "Gimbal lock in ZYX Euler angles occurs at:",
       "options": [
-        "Тангаже ±90°",
-        "Крене ±90°",
-        "Рысканье 180°",
-        "Нулевых углах"
+        "Pitch ±90°",
+        "Roll ±90°",
+        "Yaw 180°",
+        "Zero angles"
       ],
       "answer": 0,
-      "explain": "При θ = ±90° оси крена и рысканья совпадают."
+      "explain": "At θ = ±90° the roll and yaw axes coincide."
     },
     {
-      "q": "Кватернионы q и −q:",
+      "q": "The quaternions q and −q:",
       "options": [
-        "Задают один и тот же поворот",
-        "Задают обратные повороты",
-        "Отличаются на 180° по рысканью",
-        "Один из них невалиден"
+        "Represent the same rotation",
+        "Represent inverse rotations",
+        "Differ by 180° in yaw",
+        "One of them is invalid"
       ],
       "answer": 0,
-      "explain": "Двойное накрытие SO(3): при сравнении/интерполяции учитывают знак."
+      "explain": "Double cover of SO(3): account for the sign when comparing/interpolating."
     },
     {
-      "q": "Порядок компонент кватерниона в сообщении ROS geometry_msgs/Quaternion:",
+      "q": "The component order of a quaternion in the ROS geometry_msgs/Quaternion message:",
       "options": [
         "(x, y, z, w)",
         "(w, x, y, z)",
         "(roll, pitch, yaw, 1)",
-        "Любой — определяется полем order"
+        "Any — set by the order field"
       ],
       "answer": 0,
-      "explain": "ROS — (x, y, z, w); PX4 и ArduPilot — (w, x, y, z)."
+      "explain": "ROS — (x, y, z, w); PX4 and ArduPilot — (w, x, y, z)."
     },
     {
-      "q": "Малое обновление ориентации по гироскопу за шаг Δt:",
+      "q": "A small gyro attitude update over a step Δt:",
       "options": [
-        "q ← q ⊗ (1, ω·Δt/2), затем нормировка",
-        "Углы Эйлера += ω·Δt покомпонентно, затем перевод в кватернион",
+        "q ← q ⊗ (1, ω·Δt/2), then normalize",
+        "Euler angles += ω·Δt component-wise, then convert to a quaternion",
         "q ← q + ω·Δt",
         "q ← (ω·Δt, 0, 0, 0)"
       ],
       "answer": 0,
-      "explain": "Для малого угла δ кватернион ≈ (1, δ/2); нормировка не даёт ошибкам накопиться."
+      "explain": "For a small angle δ the quaternion ≈ (1, δ/2); normalization keeps errors from accumulating."
     },
     {
-      "q": "Вектор гравитации (0, 0, 9.81) в NED в осях FLU при нулевых углах равен:",
+      "q": "The gravity vector (0, 0, 9.81) in NED, expressed in FLU axes at zero angles, is:",
       "options": [
         "(0, 0, −9.81)",
         "(0, 0, 9.81)",
@@ -88,7 +88,7 @@
         "(0, −9.81, 0)"
       ],
       "answer": 0,
-      "explain": "FLU: z вверх, гравитация направлена вниз → отрицательная z."
+      "explain": "FLU: z is up, gravity points down → negative z."
     }
   ]
 }

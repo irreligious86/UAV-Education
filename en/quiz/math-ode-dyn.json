@@ -3,7 +3,7 @@
   "pass": 80,
   "questions": [
     {
-      "q": "Через время τ отклик системы первого порядка на скачок достигает:",
+      "q": "After time τ, the step response of a first-order system reaches:",
       "options": [
         "63 %",
         "50 %",
@@ -14,7 +14,7 @@
       "explain": "1 − e⁻¹ ≈ 0.632; 3τ — 95 %, 5τ — 99 %."
     },
     {
-      "q": "Коэффициент затухания ζ = 0.5 даёт перелёт около:",
+      "q": "A damping ratio ζ = 0.5 gives an overshoot of about:",
       "options": [
         "16 %",
         "0 %",
@@ -22,73 +22,73 @@
         "100 %"
       ],
       "answer": 0,
-      "explain": "100·e^(−πζ/√(1−ζ²)) ≈ 16 %; при ζ = 0.7 — 5 %."
+      "explain": "100·e^(−πζ/√(1−ζ²)) ≈ 16 %; at ζ = 0.7 — 5 %."
     },
     {
-      "q": "Полюс с положительной действительной частью означает:",
+      "q": "A pole with a positive real part means:",
       "options": [
-        "Неустойчивость",
-        "Быстрое затухание",
-        "Незатухающие колебания",
-        "Чистая задержка"
+        "Instability",
+        "Fast decay",
+        "Undamped oscillations",
+        "A pure delay"
       ],
       "answer": 0,
-      "explain": "e^(st) с Re s > 0 растёт."
+      "explain": "e^(st) with Re s > 0 grows."
     },
     {
-      "q": "У оси квадрокоптера с P-регулятором угла подъём P:",
+      "q": "For a quadcopter axis with an angle P controller, raising P:",
       "options": [
-        "Растут частота и перелёт",
-        "Падает частота колебаний",
-        "Перелёт не меняется",
-        "Добавляется задержка"
+        "Increases both frequency and overshoot",
+        "Lowers the oscillation frequency",
+        "Leaves the overshoot unchanged",
+        "Adds delay"
       ],
       "answer": 0,
-      "explain": "ω₀ = √(K_p/J), ζ = K_d/(2√(K_p J)) падает → перелёт растёт."
+      "explain": "ω₀ = √(K_p/J), ζ = K_d/(2√(K_p J)) drops → overshoot grows."
     },
     {
-      "q": "Чистая задержка e^(−sL) в контуре:",
+      "q": "A pure delay e^(−sL) in the loop:",
       "options": [
-        "Съедает запас по фазе",
-        "Ускоряет систему",
-        "Уменьшает амплитуду на высоких частотах",
-        "Равна фильтру PT1"
+        "Eats up the phase margin",
+        "Speeds the system up",
+        "Reduces the amplitude at high frequencies",
+        "Is equivalent to a PT1 filter"
       ],
       "answer": 0,
-      "explain": "Фаза −ω·L — именно это ограничивает усиление."
+      "explain": "Phase −ω·L — that's exactly what limits the gain."
     },
     {
-      "q": "Коэффициент PT1-фильтра в коде k = T_s/(τ + T_s). При f_c = 100 Гц и f_s = 8 кГц он примерно:",
+      "q": "The PT1 filter coefficient in code is k = T_s/(τ + T_s). At f_c = 100 Hz and f_s = 8 kHz it is approximately:",
       "options": [
         "0.073",
         "0.5",
         "0.99",
-        "0.5 — половина шага"
+        "0.5 — half a step"
       ],
       "answer": 0,
-      "explain": "τ = 1/(2π·100) = 1.59 мс; k = 0.125/(1.59+0.125) ≈ 0.073."
+      "explain": "τ = 1/(2π·100) = 1.59 ms; k = 0.125/(1.59+0.125) ≈ 0.073."
     },
     {
-      "q": "Правило выбора периода цикла T_s относительно τ самого быстрого процесса:",
+      "q": "The rule for choosing the loop period T_s relative to τ of the fastest process:",
       "options": [
         "T_s ≤ τ/10",
         "T_s = τ",
         "T_s ≥ 10τ",
-        "Не связаны"
+        "They are unrelated"
       ],
       "answer": 0,
-      "explain": "Иначе дискретизация искажает динамику, а Эйлер вперёд может дестабилизировать."
+      "explain": "Otherwise discretization distorts the dynamics, and forward Euler can destabilize the system."
     },
     {
-      "q": "Контур колеблется на частоте, не зависящей от P. Скорее всего причина:",
+      "q": "The loop oscillates at a frequency that doesn't depend on P. The most likely cause:",
       "options": [
-        "Суммарная задержка в контуре",
-        "Инерция мотора",
-        "Слишком маленький I и мягкий мотор",
-        "Низкая частота гироскопа"
+        "The total delay in the loop",
+        "Motor inertia",
+        "Too little I and a soft motor",
+        "A low gyro rate"
       ],
       "answer": 0,
-      "explain": "Частота задаётся условием ω·L ≈ π/2; лечится уменьшением задержки, а не P."
+      "explain": "The frequency is set by the condition ω·L ≈ π/2; the fix is reducing delay, not P."
     }
   ]
 }

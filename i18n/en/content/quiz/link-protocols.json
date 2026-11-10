@@ -1,0 +1,107 @@
+{
+  "module": "link-protocols",
+  "pass": 80,
+  "questions": [
+    {
+      "q": "What level is the UART line at when idle for a regular, uninverted signal?",
+      "options": [
+        "Low",
+        "High",
+        "Floating",
+        "Depends on the speed"
+      ],
+      "answer": 1,
+      "explain": "Idle is logical one, the high level. The start bit pulls the line down to zero."
+    },
+    {
+      "q": "SBUS is…",
+      "options": [
+        "100000 baud, 8E2, inverted",
+        "420000 baud, 8N1, duplex",
+        "The ELRS radio protocol",
+        "A protocol on top of I2C with a receiver address"
+      ],
+      "answer": 0,
+      "explain": "SBUS: 100 kbaud, 8 bits, even parity, 2 stop bits; the inverted signal is the protocol standard, not an exception."
+    },
+    {
+      "q": "Why does CRSF work on any UART of any board?",
+      "options": [
+        "It goes over USB",
+        "A regular UART without inversion",
+        "It's slow and doesn't need a buffer",
+        "It goes over I2C"
+      ],
+      "answer": 1,
+      "explain": "CRSF is standard 8N1 without inversion, full duplex on two wires."
+    },
+    {
+      "q": "What is “uninverted SBUS”?",
+      "options": [
+        "A different protocol",
+        "Flipped electrical levels",
+        "SBUS at 115200 baud",
+        "SBUS over a CRSF wire without parity"
+      ],
+      "answer": 1,
+      "explain": "The data is the same, the signal is flipped back — to work around the missing inverter on F4."
+    },
+    {
+      "q": "CRSF: channels work, no telemetry on the radio. What do you check?",
+      "options": [
+        "The receiver antenna and the VTX channel",
+        "The FC TX → RX wire and halfduplex",
+        "The ELRS packet rate",
+        "The ESC firmware"
+      ],
+      "answer": 1,
+      "explain": "Telemetry goes over the return wire. Without it, or in half-duplex, there's none."
+    },
+    {
+      "q": "What is the spec CRSF speed for onboard full duplex?",
+      "options": [
+        "9600",
+        "100000",
+        "416666",
+        "1000000"
+      ],
+      "answer": 2,
+      "explain": "The TBS spec: 416666 baud 8N1, with the option to negotiate a higher speed."
+    },
+    {
+      "q": "What does the CRC8 in a CRSF frame cover?",
+      "options": [
+        "The whole frame",
+        "Type and payload",
+        "Payload only",
+        "Addresses only"
+      ],
+      "answer": 1,
+      "explain": "Type and payload, without sync and length; polynomial 0xD5 — per the TBS spec."
+    },
+    {
+      "q": "992 ticks in CRSF is:",
+      "options": [
+        "988 µs",
+        "1500 µs",
+        "2012 µs",
+        "1000 µs"
+      ],
+      "answer": 1,
+      "explain": "us = (ticks − 992)·5/8 + 1500."
+    },
+    {
+      "q": "An SBUS receiver is connected to the RX of a free UART on an F4 board without a separate inverter. No signal. Why?",
+      "kind": "apply",
+      "fragment": "serial 2 64 115200 57600 0 115200\nset serialrx_provider = SBUS\nset serialrx_inverted = OFF",
+      "options": [
+        "SBUS is inverted, and the F4 UART can't invert by itself — you need an input with an inverter",
+        "SBUS only works on UART1 because it requires hardware DMA",
+        "The speed in the serial command must be 100000, otherwise Betaflight won't open the port",
+        "SBUS requires serialrx_inverted = ON on any board, and F4 supports it"
+      ],
+      "answer": 0,
+      "explain": "On F4 inversion is done by an external circuit; F7/H7 can invert the UART in software."
+    }
+  ]
+}

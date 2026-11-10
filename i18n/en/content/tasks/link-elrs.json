@@ -1,0 +1,42 @@
+{
+ "module": "link-elrs",
+ "tasks": [
+  {
+   "id": "period",
+   "title": "Packet period",
+   "statement": "ELRS is running at **{r} Hz**. What is the interval between packets (ms)?",
+   "params": {
+    "r": {
+     "min": 25,
+     "max": 1000,
+     "step": 25
+    }
+   },
+   "answer": "1000/r",
+   "unit": "ms",
+   "tol": 0.01,
+   "solution": "T = 1/f. For 250 Hz it's 4 ms; that's the lower bound of the radio link latency."
+  },
+  {
+   "id": "telem",
+   "title": "Telemetry rate",
+   "statement": "Packet rate **{r} Hz**, telemetry ratio 1:**{n}**. How many telemetry packets per second go down?",
+   "params": {
+    "r": {
+     "min": 50,
+     "max": 500,
+     "step": 50
+    },
+    "n": {
+     "min": 2,
+     "max": 128,
+     "step": 2
+    }
+   },
+   "answer": "r/n",
+   "unit": "packets/s",
+   "tol": 0.02,
+   "solution": "f_telem = rate / N. One out of N slots is given to the reply — that's why telemetry is always slower than control."
+  }
+ ]
+}

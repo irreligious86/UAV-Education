@@ -3,7 +3,7 @@
   "pass": 80,
   "questions": [
     {
-      "q": "Порядок контуров мультиротора в PX4?",
+      "q": "The order of multirotor control loops in PX4?",
       "options": [
         "rate → attitude → position",
         "position → attitude → rate",
@@ -11,84 +11,84 @@
         "attitude → position"
       ],
       "answer": 1,
-      "explain": "Внешний медленный — position, внутренний быстрый — rate."
+      "explain": "The slow outer loop is position, the fast inner one is rate."
     },
     {
-      "q": "Что делает MC_ROLLRATE_K?",
+      "q": "What does MC_ROLLRATE_K do?",
       "options": [
-        "Только P",
-        "Множитель для P, I и D",
-        "Рейт стика по крену",
-        "Фильтр"
+        "P only",
+        "A multiplier for P, I and D",
+        "The roll stick rate",
+        "A filter"
       ],
       "answer": 1,
-      "explain": "Параллельная форма с множителем K."
+      "explain": "A parallel form with a K multiplier."
     },
     {
-      "q": "Чему в PX4 соответствует feedforward Betaflight?",
+      "q": "What does Betaflight feedforward correspond to in PX4?",
       "options": [
         "MC_ROLL_P",
         "MC_ROLLRATE_FF",
-        "MPC_XY_P по позиции",
+        "MPC_XY_P for position",
         "CA_ROTOR0_KM"
       ],
       "answer": 1,
-      "explain": "FF rate-контура."
+      "explain": "The rate loop FF."
     },
     {
-      "q": "Что документация PX4 рекомендует большинству пользователей?",
+      "q": "What does the PX4 documentation recommend to most users?",
       "options": [
-        "Ручной тюнинг",
+        "Manual tuning",
         "Autotune",
-        "Дефолт",
+        "The defaults",
         "Betaflight"
       ],
       "answer": 1,
-      "explain": "Быстрее и обычно хорошо; ручной — для нестандартных рам."
+      "explain": "Faster and usually good; manual is for non-standard frames."
     },
     {
-      "q": "Где задаётся газ висения?",
+      "q": "Where is the hover throttle set?",
       "options": [
-        "CA_AIRFRAME и MC_AIRMODE",
+        "CA_AIRFRAME and MC_AIRMODE",
         "MPC_THR_HOVER",
         "MC_ROLL_P",
         "MPC_XY_VEL_MAX"
       ],
       "answer": 1,
-      "explain": "Параметр position controller."
+      "explain": "A position controller parameter."
     },
     {
-      "q": "Быстрые осцилляции после autotune. Что первое?",
+      "q": "Fast oscillations after autotune. What comes first?",
       "options": [
-        "Увеличить K",
-        "Фильтры и повтор",
-        "Сменить раму",
-        "Отключить autotune"
+        "Increase K",
+        "Filters and a repeat",
+        "Change the frame",
+        "Disable autotune"
       ],
       "answer": 1,
-      "explain": "Autotune на шумном сигнале подбирает гейны под шум."
+      "explain": "Autotune on a noisy signal picks gains for the noise."
     },
     {
-      "q": "MC_ROLLRATE_P = 0.15 означает:",
+      "q": "MC_ROLLRATE_P = 0.15 means:",
       "options": [
         "15 % P",
-        "1 рад/с → 15 % момента",
-        "0.15 °/с",
-        "15 % P от максимума по крену"
+        "1 rad/s → 15 % of the torque",
+        "0.15 °/s",
+        "15 % P of the roll maximum"
       ],
       "answer": 1,
-      "explain": "Единицы PX4: рад/с на входе, доля момента на выходе."
+      "explain": "PX4 units: rad/s at the input, a fraction of the torque at the output."
     },
     {
-      "q": "Что делает MC_AT_APPLY = 1?",
+      "q": "What does MC_AT_APPLY = 1 do?",
       "options": [
-        "Отключает autotune после посадки",
-        "Применяет после посадки",
-        "Применяет в полёте",
-        "Не применяет"
+        "Disables autotune after landing",
+        "Applies after landing",
+        "Applies in flight",
+        "Doesn't apply"
       ],
       "answer": 1,
-      "explain": "0 — не применять, 2 — сразу."
+      "explain": "0 — don't apply, 2 — immediately."
     }
   ]
 }

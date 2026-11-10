@@ -3,7 +3,7 @@
   "pass": 80,
   "questions": [
     {
-      "q": "Какой режим должен быть на отдельном тумблере у крыла всегда?",
+      "q": "Which mode must always be on its own switch on a wing?",
       "options": [
         "ANGLE",
         "MANUAL",
@@ -11,21 +11,21 @@
         "RTH"
       ],
       "answer": 1,
-      "explain": "Прямое управление сервами — последний резерв."
+      "explain": "Direct servo control is the last resort."
     },
     {
-      "q": "Что настраивает autotune крыла?",
+      "q": "What does wing autotune tune?",
       "options": [
-        "P и I по крену и тангажу",
-        "Feedforward и рейты",
-        "Только D",
-        "Фильтры"
+        "P and I on roll and pitch",
+        "Feedforward and rates",
+        "Only D",
+        "Filters"
       ],
       "answer": 1,
-      "explain": "P и I autotune не трогает — их настраивают вручную."
+      "explain": "Autotune doesn't touch P and I — you tune them manually."
     },
     {
-      "q": "В каком режиме autotune не работает?",
+      "q": "In which mode does autotune not work?",
       "options": [
         "ACRO",
         "ANGLE",
@@ -33,62 +33,62 @@
         "HORIZON"
       ],
       "answer": 2,
-      "explain": "В MANUAL нет стабилизации — тюнить нечего."
+      "explain": "MANUAL has no stabilization — there's nothing to tune."
     },
     {
-      "q": "Зачем нужен автозапуск NAV LAUNCH?",
+      "q": "What is NAV LAUNCH auto launch for?",
       "options": [
-        "Для красоты",
-        "Мотор после броска",
-        "Для RTH после потери связи",
-        "Для посадки"
+        "For looks",
+        "Motor after the throw",
+        "For RTH after link loss",
+        "For landing"
       ],
       "answer": 1,
-      "explain": "Детекция броска по ускорению, плавный вывод газа."
+      "explain": "Throw detection by acceleration, smooth throttle ramp-up."
     },
     {
-      "q": "Крыло теряет высоту при наборе в навигации. Что проверить?",
+      "q": "The wing loses altitude while climbing in navigation. What do you check?",
       "options": [
-        "Компас",
-        "Крейсерский и макс. газ",
-        "Канал VTX",
-        "Рейты и экспоненту стиков"
+        "The compass",
+        "Cruise and max throttle",
+        "The VTX channel",
+        "Rates and stick expo"
       ],
       "answer": 1,
-      "explain": "nav_fw_cruise_thr и nav_fw_max_thr: низкий крейсерский газ — сваливание на наборе."
+      "explain": "nav_fw_cruise_thr and nav_fw_max_thr: low cruise throttle means a stall in the climb."
     },
     {
-      "q": "Как проверить реверс элевонов до полёта?",
+      "q": "How do you check the elevon reversal before flight?",
       "options": [
-        "По пульту",
-        "Наклонить в ANGLE",
-        "Никак",
-        "По OSD-индикатору поверхностей"
+        "From the radio",
+        "Tilt it in ANGLE",
+        "You can't",
+        "With the OSD surface indicator"
       ],
       "answer": 1,
-      "explain": "Поверхности должны противодействовать наклону; если помогают — реверс в миксере."
+      "explain": "The surfaces should counteract the tilt; if they help it — reverse in the mixer."
     },
     {
-      "q": "nav_fw_pitch2thr = 10 означает:",
+      "q": "nav_fw_pitch2thr = 10 means:",
       "options": [
-        "10 % газа",
-        "Газ на градус тангажа",
-        "Угол тангажа 10° на наборе",
-        "Угол 10°"
+        "10 % throttle",
+        "Throttle per degree of pitch",
+        "A 10° pitch angle in the climb",
+        "A 10° angle"
       ],
       "answer": 1,
-      "explain": "Нос вверх → газ больше."
+      "explain": "Nose up → more throttle."
     },
     {
-      "q": "Чем детектируется бросок при автозапуске?",
+      "q": "What detects the throw in auto launch?",
       "options": [
-        "Кнопкой",
-        "Ускорением или скоростью",
-        "Таймером после арма",
+        "A button",
+        "Acceleration or velocity",
+        "A timer after arming",
         "GPS"
       ],
       "answer": 1,
-      "explain": "Затем задержка мотора и газ запуска."
+      "explain": "Then the motor delay and the launch throttle."
     }
   ]
 }

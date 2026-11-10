@@ -1,0 +1,94 @@
+{
+  "module": "px4-companion-jetson",
+  "pass": 80,
+  "questions": [
+    {
+      "q": "Which port does PX4 expect a companion on by default?",
+      "options": [
+        "TELEM1",
+        "TELEM2",
+        "GPS1",
+        "USB"
+      ],
+      "answer": 1,
+      "explain": "TELEM1 is for the GCS, TELEM2 for the companion."
+    },
+    {
+      "q": "Which parameters enable MAVLink for a companion on TELEM2?",
+      "options": [
+        "MC_AIRMODE = 1",
+        "MAV_1_CONFIG + MODE Onboard",
+        "UXRCE_DDS_CFG = TELEM2",
+        "SER_TEL2_PROTOCOL = 2 and BAUD"
+      ],
+      "answer": 1,
+      "explain": "Onboard mode is the message set for an onboard computer."
+    },
+    {
+      "q": "Can you run MAVLink and uXRCE-DDS on the same port?",
+      "options": [
+        "Yes, if the baud rate is 921600",
+        "No, you pick one",
+        "Only on H7",
+        "Only over UDP"
+      ],
+      "answer": 1,
+      "explain": "MAV_1_CONFIG = Disabled, then UXRCE_DDS_CFG = TELEM2."
+    },
+    {
+      "q": "The recommended TELEM2 baud rate for a companion?",
+      "options": [
+        "57600",
+        "115200",
+        "921600",
+        "9600"
+      ],
+      "answer": 2,
+      "explain": "SER_TEL2_BAUD = 921600 for a short wire and a heavy data stream."
+    },
+    {
+      "q": "What should happen when the companion fails?",
+      "options": [
+        "PX4 reboots via watchdog",
+        "Offboard ends on a timeout",
+        "The vehicle crashes",
+        "Offboard doesn't change"
+      ],
+      "answer": 1,
+      "explain": "The boundary of responsibility: the FC flies on its own."
+    },
+    {
+      "q": "Why add the Jetson user to the dialout group?",
+      "options": [
+        "For Wi-Fi",
+        "Access to the UART without sudo",
+        "For access to CUDA and the GPU",
+        "For autostart"
+      ],
+      "answer": 1,
+      "explain": "Otherwise the serial port is not accessible to a regular user."
+    },
+    {
+      "q": "How do you reliably find out which /dev/ttyTHS* corresponds to pins 8/10 on your JetPack version?",
+      "options": [
+        "Take the name from any article",
+        "With a loopback: a jumper on 8–10 and an echo test",
+        "By the first port in ls /dev",
+        "It is always /dev/ttyAMA0"
+      ],
+      "answer": 1,
+      "explain": "The name depends on the board and JetPack (ttyTHS0 or ttyTHS1); the echo through the jumper only comes back from the right port."
+    },
+    {
+      "q": "Can MAVLink and uXRCE-DDS share one TELEM2?",
+      "options": [
+        "Only over USB, not over UART",
+        "No, different ports",
+        "Only in SITL",
+        "Yes"
+      ],
+      "answer": 1,
+      "explain": "MAV_1_CONFIG and UXRCE_DDS_CFG on different ports."
+    }
+  ]
+}

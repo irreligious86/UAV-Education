@@ -1,0 +1,94 @@
+{
+  "module": "data-python",
+  "pass": 80,
+  "questions": [
+    {
+      "q": "Why is Welch's method better than a single FFT of the whole log?",
+      "options": [
+        "It computes faster",
+        "It averages overlapping windows",
+        "It doesn't need scipy and runs on numpy",
+        "It shows the timing of events"
+      ],
+      "answer": 1,
+      "explain": "Averaging overlapping windows gives a stable spectrum estimate with a set resolution; a single FFT is noisy and depends on the length of the recording."
+    },
+    {
+      "q": "Spectrum resolution at fs = 8000 Hz and nperseg = 1024:",
+      "options": [
+        "1 Hz",
+        "7.8 Hz",
+        "125 Hz",
+        "1024 Hz"
+      ],
+      "answer": 1,
+      "explain": "Δf = fs / nperseg."
+    },
+    {
+      "q": "What is bounce-back?",
+      "options": [
+        "I-term drift",
+        "Gyro rebound after the stick stops",
+        "Loop delay",
+        "Setpoint overshoot on entering a maneuver"
+      ],
+      "answer": 1,
+      "explain": "A sign of insufficient damping."
+    },
+    {
+      "q": "What do you use to read an ArduPilot .bin in Python?",
+      "options": [
+        "pandas.read_csv",
+        "pymavlink mavutil",
+        "blackbox_decode with the --ardupilot flag",
+        "json.load"
+      ],
+      "answer": 1,
+      "explain": "pymavlink decodes DataFlash messages."
+    },
+    {
+      "q": "Which part of the flight do you take for a Welch spectrum?",
+      "options": [
+        "Any segment 5 seconds or longer",
+        "A steady hover of 10–20 s",
+        "Takeoff",
+        "Landing"
+      ],
+      "answer": 1,
+      "explain": "A stationary segment — otherwise the peaks smear."
+    },
+    {
+      "q": "What does a std of the intervals between log rows > 10 µs at 8 kHz indicate?",
+      "options": [
+        "A bad SD card that writes with a delay",
+        "Loop jitter, CPU overload",
+        "This is normal",
+        "P is too high"
+      ],
+      "answer": 1,
+      "explain": "A mean of 125 µs with a spread of a few µs is normal."
+    },
+    {
+      "q": "How do the metrics determine the delay between setpoint and gyro?",
+      "options": [
+        "By the cross-correlation maximum",
+        "By the difference of the mean values",
+        "By the time of the first gyro peak",
+        "By the frequency of the spectrum peak"
+      ],
+      "answer": 0,
+      "explain": "The delay is the shift at which the correlation of setpoint and gyro is maximal."
+    },
+    {
+      "q": "What does a spectrogram show that a single spectrum doesn't?",
+      "options": [
+        "Only the amplitude at one frequency",
+        "Filter delay in ms",
+        "Overshoot after a step",
+        "How noise frequencies change over time and with throttle"
+      ],
+      "answer": 3,
+      "explain": "A spectrogram is a spectrum over time windows: you can see the motor harmonics crawl with throttle."
+    }
+  ]
+}

@@ -1,0 +1,94 @@
+{
+  "module": "link-telemetry-radios",
+  "pass": 80,
+  "questions": [
+    {
+      "q": "What does lowering SiK AIR_SPEED from 64 to 16 kbit/s give you?",
+      "options": [
+        "Nothing: range depends only on transmitter power",
+        "About 6 dB and roughly twice the range",
+        "Four times faster mission upload",
+        "Lower latency in the control channel"
+      ],
+      "answer": 1,
+      "explain": "Sensitivity improves by ~3 dB for every halving; 6 dB means twice the range."
+    },
+    {
+      "q": "Which parameters must match within a SiK pair?",
+      "options": [
+        "Only TXPOWER",
+        "Only SERIAL_SPEED and TXPOWER on both modem ends",
+        "Serial numbers and bootloader versions",
+        "NETID, AIR_SPEED, ECC, frequencies and channels"
+      ],
+      "answer": 3,
+      "explain": "Otherwise the modems won't link; SERIAL_SPEED is the UART baud rate on each modem's own side."
+    },
+    {
+      "q": "What is the SiK parameter MAVLINK = 1 for?",
+      "options": [
+        "Injecting RADIO_STATUS and aligning packets",
+        "Encrypting MAVLink traffic",
+        "Switching the modem to the legacy MAVLink 1 protocol",
+        "Prioritizing the video stream over telemetry"
+      ],
+      "answer": 0,
+      "explain": "The modem aligns packets to MAVLink and injects RADIO_STATUS; ArduPilot adjusts its streams based on txbuf."
+    },
+    {
+      "q": "RSSI = 190, noise = 60. What is the fade margin, approximately?",
+      "options": [
+        "130 dB",
+        "32 dB",
+        "65 dB",
+        "6 dB"
+      ],
+      "answer": 2,
+      "explain": "(RSSI − noise) / 2 = 65 dB (one RSSI unit ≈ 0.5 dB)."
+    },
+    {
+      "q": "How much does range grow with +12 dB of margin?",
+      "options": [
+        "Twofold",
+        "12 times",
+        "By 12 %",
+        "Fourfold"
+      ],
+      "answer": 3,
+      "explain": "Every 6 dB doubles it: 12 dB gives ×4."
+    },
+    {
+      "q": "Why is ECC on SiK not recommended?",
+      "options": [
+        "It is incompatible with MAVLink 2",
+        "It halves the useful data rate and doesn't work on some chips",
+        "It is banned by radio regulations in many countries",
+        "It requires a separate wire to the flight controller"
+      ],
+      "answer": 1,
+      "explain": "Golay coding doubles the transmitted data; some newer radio chips don't support it and won't work with ECC = 1."
+    },
+    {
+      "q": "What are IP radios/mesh for, rather than SiK?",
+      "options": [
+        "For the cheapest and simplest telemetry at 1–2 km",
+        "For flights within 500 m only",
+        "Video, SSH and several vehicles on one network",
+        "For replacing a 2.4 GHz RC receiver"
+      ],
+      "answer": 2,
+      "explain": "An IP radio is an Ethernet bridge: MAVLink over UDP, video, access to the companion, a fleet."
+    },
+    {
+      "q": "The main risk of LTE telemetry?",
+      "options": [
+        "Coverage dropouts and latency, NAT",
+        "Too high a channel data rate",
+        "MAVLink can't be sent over IP",
+        "Very short range in the city"
+      ],
+      "answer": 0,
+      "explain": "You need a VPN or a relay and a mandatory link-loss failsafe."
+    }
+  ]
+}

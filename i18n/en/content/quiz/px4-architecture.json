@@ -1,0 +1,94 @@
+{
+  "module": "px4-architecture",
+  "pass": 80,
+  "questions": [
+    {
+      "q": "How do PX4 modules exchange data?",
+      "options": [
+        "Global variables",
+        "uORB publish/subscribe",
+        "MAVLink messages inside the board",
+        "Files"
+      ],
+      "answer": 1,
+      "explain": "Asynchronously; the subscriber wakes up on new data."
+    },
+    {
+      "q": "What is mandatory in every .msg?",
+      "options": [
+        "Nothing",
+        "uint64 timestamp",
+        "A name field",
+        "An id field and the module name"
+      ],
+      "answer": 1,
+      "explain": "It is filled in on publication."
+    },
+    {
+      "q": "How does VehicleAttitude.msg turn into a topic name?",
+      "options": [
+        "VA",
+        "vehicle_attitude",
+        "attitude",
+        "VehicleAttitude unchanged"
+      ],
+      "answer": 1,
+      "explain": "CamelCase → snake_case."
+    },
+    {
+      "q": "Which module turns torques into motor commands?",
+      "options": [
+        "Commander, on command",
+        "Control allocation",
+        "Navigator",
+        "EKF2"
+      ],
+      "answer": 1,
+      "explain": "According to the CA_AIRFRAME and CA_ROTOR* geometry."
+    },
+    {
+      "q": "Who is responsible for arming, modes and failsafe?",
+      "options": [
+        "Navigator",
+        "Commander",
+        "Rate controller",
+        "The IMU driver"
+      ],
+      "answer": 1,
+      "explain": "Commander is the system's arbiter."
+    },
+    {
+      "q": "How do you see topic rates in a running PX4?",
+      "options": [
+        "param show",
+        "uorb top",
+        "top",
+        "listener"
+      ],
+      "answer": 1,
+      "explain": "listener shows the content, top shows module load."
+    },
+    {
+      "q": "Where do most PX4 modules run on NuttX?",
+      "options": [
+        "Separate processes",
+        "Work queue",
+        "Interrupts",
+        "Lua"
+      ],
+      "answer": 1,
+      "explain": "wq:rate_ctrl is higher, wq:lp_default is lower."
+    },
+    {
+      "q": "What belongs to the PX4 flight stack rather than the middleware?",
+      "options": [
+        "State estimation, controllers, navigator, commander",
+        "Sensor drivers",
+        "The uORB bus",
+        "MAVLink and uXRCE-DDS communication"
+      ],
+      "answer": 0,
+      "explain": "Middleware is drivers, the bus and communication; the flight stack is the algorithms."
+    }
+  ]
+}
