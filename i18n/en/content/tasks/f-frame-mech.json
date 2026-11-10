@@ -1,0 +1,42 @@
+{
+ "module": "f-frame-mech",
+ "tasks": [
+  {
+   "id": "mount-f0",
+   "title": "Natural frequency of a board mount",
+   "statement": "A board with a mass of **{m} g** sits on four grommets with a stiffness of **{k} N/m** each. Find the natural frequency f₀ of the mount (Hz).",
+   "params": {
+    "m": {
+     "min": 8,
+     "max": 30,
+     "step": 1
+    },
+    "k": {
+     "min": 500,
+     "max": 5000,
+     "step": 250
+    }
+   },
+   "answer": "1/(2*math.pi)*math.sqrt(4*k/(m/1000))",
+   "unit": "Hz",
+   "tol": 0.02,
+   "solution": "The grommets act in parallel: k_total = 4k. f₀ = (1/2π)·√(k_total/m), with the mass in kilograms. For the mount to damp vibration, f₀ must be 2–3 times below the frequency you are damping; otherwise it amplifies it."
+  },
+  {
+   "id": "resonance-rpm",
+   "title": "When the motor hits the frame resonance",
+   "statement": "The frame resonance is **{fr} Hz**. At what motor speed (rpm) will the fundamental harmonic coincide with it?",
+   "params": {
+    "fr": {
+     "min": 80,
+     "max": 400,
+     "step": 10
+    }
+   },
+   "answer": "fr*60",
+   "unit": "rpm",
+   "tol": 0.01,
+   "solution": "The motor's fundamental harmonic is f = RPM/60, so RPM = 60·f. At this speed the resonance builds up: the peak in the spectrum grows at this throttle point and stays put at others — the sign of the frame, not the motor."
+  }
+ ]
+}

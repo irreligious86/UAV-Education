@@ -3,92 +3,92 @@
   "pass": 80,
   "questions": [
     {
-      "q": "Почему соседние пропеллеры квадрокоптера вращаются в разные стороны?",
+      "q": "Why do neighboring propellers of a quadcopter spin in opposite directions?",
       "options": [
-        "Так требует прошивка для миксера",
-        "Чтобы гасить реактивные моменты",
-        "Чтобы увеличить тягу",
-        "Чтобы снизить шум"
+        "The firmware requires it for the mixer",
+        "To cancel the reaction torques",
+        "To increase thrust",
+        "To reduce noise"
       ],
       "answer": 1,
-      "explain": "Каждый мотор пытается провернуть раму в сторону, обратную вращению пропа. Две пары с противоположным вращением компенсируют этот момент."
+      "explain": "Each motor tries to turn the frame opposite to the prop's rotation. Two pairs spinning in opposite directions cancel this torque."
     },
     {
-      "q": "Как квадрокоптер поворачивает по рысканию (yaw)?",
+      "q": "How does a quadcopter turn in yaw?",
       "options": [
-        "Наклоняет все моторы сервами",
-        "Отклоняет руль",
-        "Ускоряет одну диагональ",
-        "Выключает один мотор"
+        "It tilts all motors with servos",
+        "It deflects a rudder",
+        "It speeds up one diagonal",
+        "It shuts off one motor"
       ],
       "answer": 2,
-      "explain": "Разница реактивных моментов диагональных пар создаёт момент вокруг вертикальной оси при почти неизменной суммарной тяге."
+      "explain": "The difference in the reaction torques of the diagonal pairs creates a moment about the vertical axis while total thrust stays almost unchanged."
     },
     {
-      "q": "Что такое отношение тяги к весу (T/W) 2:1?",
+      "q": "What is a thrust-to-weight ratio (T/W) of 2:1?",
       "options": [
-        "Тяга вдвое больше веса",
-        "Вес вдвое больше тяги",
-        "Два мотора на проп",
-        "Газ висения 20 % при полной АКБ"
+        "Thrust is twice the weight",
+        "Weight is twice the thrust",
+        "Two motors per prop",
+        "Hover throttle of 20 % on a full battery"
       ],
       "answer": 0,
-      "explain": "T/W = максимальная тяга всех моторов / взлётный вес. При 2:1 висение идёт примерно на половине газа — запаса на манёвр почти нет."
+      "explain": "T/W = maximum thrust of all motors / takeoff weight. At 2:1 hover is at about half throttle — there is almost no margin for maneuvering."
     },
     {
-      "q": "Что делает миксер?",
+      "q": "What does the mixer do?",
       "options": [
-        "Смешивает топливо",
-        "Раздаёт оси по моторам",
-        "Калибрует ESC",
-        "Фильтрует гироскоп перед PID"
+        "Mixes the fuel",
+        "Distributes the axes across the motors",
+        "Calibrates the ESCs",
+        "Filters the gyro before the PID"
       ],
       "answer": 1,
-      "explain": "Миксер — таблица знаков для каждого мотора по типу рамы: сколько добавить/убавить оборотов для каждой оси управления."
+      "explain": "The mixer is a table of signs for each motor by frame type: how much RPM to add/subtract for each control axis."
     },
     {
-      "q": "Дрон переворачивается сразу на взлёте. Самая вероятная причина?",
+      "q": "The drone flips over right on takeoff. The most likely cause?",
       "options": [
-        "Низкий газ висения",
-        "Порядок или вращение моторов",
-        "Высокий P и слишком мощная АКБ",
-        "Слабый GPS"
+        "Low hover throttle",
+        "Motor order or spin direction",
+        "High P and too powerful a battery",
+        "Weak GPS"
       ],
       "answer": 1,
-      "explain": "Если реальная сборка не совпадает со схемой рамы в прошивке, миксер командует не тем моторам, и дрон кувыркается за долю секунды."
+      "explain": "If the real build doesn't match the frame diagram in the firmware, the mixer commands the wrong motors, and the drone tumbles in a fraction of a second."
     },
     {
-      "q": "Какая ось управления у мультиротора самая слабая и почему?",
+      "q": "Which control axis of a multirotor is the weakest, and why?",
       "options": [
-        "Газ: моторы медленные",
-        "Тангаж: смещён центр тяжести",
-        "Yaw: реактивный момент мал",
-        "Крен: рама узкая"
+        "Throttle: the motors are slow",
+        "Pitch: the center of gravity is offset",
+        "Yaw: the reaction torque is small",
+        "Roll: the frame is narrow"
       ],
       "answer": 2,
-      "explain": "Рыскание создаётся реактивным моментом, он гораздо меньше момента от разницы тяг. Поэтому yaw медленнее и первым упирается в насыщение моторов."
+      "explain": "Yaw is produced by reaction torque, which is much smaller than the moment from a thrust difference. So yaw is slower and is the first to hit motor saturation."
     },
     {
-      "q": "Момент по yaw у квада примерно в сравнении с roll:",
+      "q": "The yaw moment of a quad, roughly, compared with roll:",
       "options": [
-        "Больше",
-        "В разы меньше",
-        "Равен",
-        "Зависит от KV"
+        "Larger",
+        "Several times smaller",
+        "Equal",
+        "Depends on KV"
       ],
       "answer": 1,
-      "explain": "Отсюда медленный yaw и насыщение."
+      "explain": "Hence the slow yaw and saturation."
     },
     {
-      "q": "Угловое ускорение = ?",
+      "q": "Angular acceleration = ?",
       "options": [
-        "Момент × инерция",
-        "Момент / инерция",
-        "Тяга / масса",
-        "Обороты / 60"
+        "Moment × inertia",
+        "Moment / inertia",
+        "Thrust / mass",
+        "RPM / 60"
       ],
       "answer": 1,
-      "explain": "У X8 J в 50–100 раз больше, чем у 5\"."
+      "explain": "An X8's J is 50–100 times larger than a 5\"'s."
     }
   ]
 }

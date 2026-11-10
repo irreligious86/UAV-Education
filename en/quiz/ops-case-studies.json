@@ -3,92 +3,92 @@
   "pass": 80,
   "questions": [
     {
-      "q": "Что активировало систему прекращения полёта Matternet M2 в Цюрихе?",
+      "q": "What activated the flight termination system of the Matternet M2 in Zurich?",
       "options": [
-        "Разряд АКБ",
-        "EKF variance после вибраций IMU",
-        "Потеря связи с пультом оператора",
-        "Команда оператора"
+        "Battery depletion",
+        "EKF variance after IMU vibration",
+        "Loss of link with the operator's radio",
+        "An operator command"
       ],
       "answer": 1,
-      "explain": "Вибрации на IMU3 → расхождение EKF → FTS."
+      "explain": "Vibration on IMU3 → EKF divergence → FTS."
     },
     {
-      "q": "Почему парашют не спас Matternet M2?",
+      "q": "Why didn't the parachute save the Matternet M2?",
       "options": [
-        "Не раскрылся",
-        "Стропа была повреждена",
-        "Ветер",
-        "Был слишком мал для такой массы"
+        "It didn't open",
+        "The line was damaged",
+        "Wind",
+        "It was too small for that mass"
       ],
       "answer": 1,
-      "explain": "Стропа не выдержала рывка из-за предварительного повреждения."
+      "explain": "The line didn't survive the jerk because of prior damage."
     },
     {
-      "q": "Что делал контроллер Airspeeder при потере связи?",
+      "q": "What did the Airspeeder's controller do on link loss?",
       "options": [
-        "Включал RTH к точке взлёта",
-        "Держал газ и горизонт",
-        "Садился",
-        "Выключал моторы"
+        "Engaged RTH to the takeoff point",
+        "Held throttle and level attitude",
+        "Landed",
+        "Shut off the motors"
       ],
       "answer": 1,
-      "explain": "Замораживал газ и держал горизонт — аппарат набрал ~7900 футов. Failsafe «держать» вместо «снижаться» — главный урок."
+      "explain": "It froze the throttle and held level — the aircraft climbed to ~7900 ft. A “hold” failsafe instead of “descend” is the main lesson."
     },
     {
-      "q": "Почему причина потери связи Airspeeder не установлена?",
+      "q": "Why was the cause of the Airspeeder's link loss not determined?",
       "options": [
-        "Засекречено",
-        "Не было бортовой записи",
-        "Комиссия не искала причину",
-        "Пилот не помнит"
+        "It's classified",
+        "There was no onboard recording",
+        "The board didn't look for the cause",
+        "The pilot doesn't remember"
       ],
       "answer": 1,
-      "explain": "Без лога расследование заканчивается словами «не установлено»."
+      "explain": "Without a log an investigation ends with the words “not determined”."
     },
     {
-      "q": "Что стало причиной падения Alta X?",
+      "q": "What caused the Alta X to crash?",
       "options": [
-        "Птица",
-        "Разряд АКБ из-за порога",
-        "Отказ мотора на висении",
-        "Потеря GPS"
+        "A bird",
+        "Battery depletion because of the threshold",
+        "Motor failure in hover",
+        "GPS loss"
       ],
       "answer": 1,
-      "explain": "Порог предупреждения снижен с 44 до 42 В, напряжение перед взлётом не проверено: отказа техники не было."
+      "explain": "The warning threshold was lowered from 44 to 42 V and the voltage wasn't checked before takeoff: there was no hardware failure."
     },
     {
-      "q": "Какой порог энергии удара принимают за риск серьёзной травмы?",
+      "q": "What impact energy is taken as the threshold for a risk of serious injury?",
       "options": [
-        "~8 Дж",
-        "~80 Дж",
-        "~800 Дж",
-        "~8000 Дж"
+        "~8 J",
+        "~80 J",
+        "~800 J",
+        "~8000 J"
       ],
       "answer": 1,
-      "explain": "Matternet без груза — уже 118 Дж."
+      "explain": "The Matternet without payload is already 118 J."
     },
     {
-      "q": "Общий вывод трёх кейсов:",
+      "q": "The common conclusion of the three cases:",
       "options": [
-        "Нужны парашюты на всех аппаратах",
-        "Поведение при отказе и данные",
-        "Нужны большие дроны",
-        "Детали ненадёжны"
+        "Every aircraft needs a parachute",
+        "Behavior on failure, and data",
+        "You need bigger drones",
+        "Parts are unreliable"
       ],
       "answer": 1,
-      "explain": "Что делает аппарат, когда что-то пошло не так, — главный вопрос инженера."
+      "explain": "What the aircraft does when something goes wrong is the engineer's main question."
     },
     {
-      "q": "Почему разбор аварии ищет корневую причину в процессе, а не в человеке?",
+      "q": "Why does a crash analysis look for the root cause in the process rather than in the person?",
       "options": [
-        "Процесс можно изменить, чтобы ошибка не повторилась у любого",
-        "Чтобы никто не отвечал за аварию",
-        "Так короче отчёт",
-        "Человеческие ошибки не случаются"
+        "The process can be changed so the error doesn't repeat with anyone",
+        "So that nobody is held responsible for the crash",
+        "It makes the report shorter",
+        "Human errors don't happen"
       ],
       "answer": 0,
-      "explain": "Изменение процесса защищает от повторения независимо от исполнителя."
+      "explain": "Changing the process protects against a repeat regardless of who does the work."
     }
   ]
 }

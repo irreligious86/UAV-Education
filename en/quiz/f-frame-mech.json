@@ -3,92 +3,92 @@
   "pass": 80,
   "questions": [
     {
-      "q": "Как сила от дисбаланса пропа зависит от оборотов?",
+      "q": "How does the force from prop imbalance depend on RPM?",
       "options": [
-        "Линейно",
-        "~ω² — квадратично",
-        "Не зависит",
-        "Падает с оборотами"
+        "Linearly",
+        "~ω² — quadratically",
+        "It doesn't depend on it",
+        "It drops with RPM"
       ],
       "answer": 1,
-      "explain": "Центробежная сила m·r·ω² растёт с квадратом угловой скорости."
+      "explain": "The centrifugal force m·r·ω² grows with the square of angular velocity."
     },
     {
-      "q": "Чем в спектре резонанс рамы отличается от пика моторов?",
+      "q": "How does a frame resonance differ from a motor peak in the spectrum?",
       "options": [
-        "Он всегда ниже 50 Гц у любой рамы и не зависит от размера",
-        "Он не движется при изменении газа",
-        "Он только на 3-й гармонике",
-        "Он виден только на акселерометре"
+        "It is always below 50 Hz on any frame and doesn't depend on size",
+        "It doesn't move when throttle changes",
+        "It is only on the 3rd harmonic",
+        "It is visible only on the accelerometer"
       ],
       "answer": 1,
-      "explain": "Резонанс привязан к конструкции, а пики моторов следуют за оборотами."
+      "explain": "A resonance is tied to the structure, while motor peaks follow RPM."
     },
     {
-      "q": "Почему RPM-фильтр не убирает резонанс рамы?",
+      "q": "Why doesn't the RPM filter remove frame resonance?",
       "options": [
-        "Работает только на рамах 5\"",
-        "Резонанс не следует за оборотами",
-        "Он слишком слабый",
-        "Выключен по умолчанию"
+        "It only works on 5\" frames",
+        "The resonance doesn't follow RPM",
+        "It's too weak",
+        "It's off by default"
       ],
       "answer": 1,
-      "explain": "RPM-фильтр ставит нотчи на гармоники оборотов моторов. Фиксированный резонанс ловит dynamic notch или устраняет конструкция."
+      "explain": "The RPM filter places notches on the harmonics of motor RPM. A fixed resonance is caught by the dynamic notch or eliminated by the structure."
     },
     {
-      "q": "Что происходит при клиппинге акселерометра в ArduPilot?",
+      "q": "What happens when the accelerometer clips in ArduPilot?",
       "options": [
-        "Барометр переходит на высоту GPS",
-        "EKF теряет оценку высоты",
-        "Моторы отключаются",
-        "Ничего"
+        "The barometer switches to GPS altitude",
+        "The EKF loses its altitude estimate",
+        "The motors shut off",
+        "Nothing"
       ],
       "answer": 1,
-      "explain": "Насыщенный акселерометр даёт неверные данные, что видно по VIBE/Clip и приводит к уходу высоты."
+      "explain": "A saturated accelerometer gives wrong data, which shows up in VIBE/Clip and leads to altitude drift."
     },
     {
-      "q": "Почему натянутый жгут проводов к FC вреден при мягком креплении?",
+      "q": "Why is a tight wire harness to the FC harmful with a soft mount?",
       "options": [
-        "Создаёт помехи GPS и компасу",
-        "Связь в обход демпферов",
-        "Он греется",
-        "Мешает Blackbox"
+        "It causes interference for the GPS and compass",
+        "It's a link that bypasses the dampers",
+        "It heats up",
+        "It interferes with Blackbox"
       ],
       "answer": 1,
-      "explain": "Вибрации идут через натянутые провода напрямую в плату, демпферы перестают работать."
+      "explain": "Vibration travels through the tight wires straight into the board, and the dampers stop working."
     },
     {
-      "q": "Какова частота 1-й гармоники мотора при 12 000 об/мин?",
+      "q": "What is the motor's 1st-harmonic frequency at 12,000 rpm?",
       "options": [
-        "12 Гц",
-        "120 Гц",
-        "200 Гц",
-        "1200 Гц"
+        "12 Hz",
+        "120 Hz",
+        "200 Hz",
+        "1200 Hz"
       ],
       "answer": 2,
-      "explain": "f = RPM/60 = 12000/60 = 200 Гц."
+      "explain": "f = RPM/60 = 12000/60 = 200 Hz."
     },
     {
-      "q": "Собственная частота плата-на-втулках для 5\" должна быть:",
+      "q": "For a 5\", the natural frequency of the board on its grommets should be:",
       "options": [
-        "Выше гармоник моторов",
-        "≈ 60–80 Гц",
-        "Около 20 Гц",
-        "Не важна"
+        "Above the motor harmonics",
+        "≈ 60–80 Hz",
+        "About 20 Hz",
+        "It doesn't matter"
       ],
       "answer": 1,
-      "explain": "В 3–5 раз ниже моторов, выше полосы управления; слишком мягко — ватность и низкочастотный пик."
+      "explain": "3–5 times below the motors, above the control bandwidth; too soft — mushiness and a low-frequency peak."
     },
     {
-      "q": "Низкочастотная тряска 20–70 Гц чаще всего от:",
+      "q": "Low-frequency shaking at 20–70 Hz most often comes from:",
       "options": [
-        "Пропвоша и турбулентности",
-        "Дисбаланса пропа на высоких оборотах",
-        "Шума гироскопа",
-        "Пульсаций BEC"
+        "Prop wash and turbulence",
+        "Prop imbalance at high RPM",
+        "Gyro noise",
+        "BEC ripple"
       ],
       "answer": 0,
-      "explain": "Пропвош — аэродинамика, низкие частоты; дисбаланс — на частоте оборотов."
+      "explain": "Prop wash is aerodynamics, low frequencies; imbalance is at the rotation frequency."
     }
   ]
 }

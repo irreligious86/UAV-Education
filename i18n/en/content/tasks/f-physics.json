@@ -1,0 +1,47 @@
+{
+ "module": "f-physics",
+ "tasks": [
+  {
+   "id": "tw",
+   "title": "Thrust-to-weight ratio",
+   "statement": "The aircraft's takeoff mass with battery is **{m} kg**, the maximum static thrust of one motor with its prop is **{t} g**, and there are four motors. Find the thrust-to-weight ratio T/W.",
+   "params": {
+    "m": {
+     "min": 0.6,
+     "max": 1.6,
+     "step": 0.05
+    },
+    "t": {
+     "min": 900,
+     "max": 2000,
+     "step": 50
+    }
+   },
+   "answer": "4*t/1000/m",
+   "unit": "",
+   "tol": 0.02,
+   "solution": "T/W = 4·t / (1000·m). It's the ratio of the total maximum thrust to the weight; freestyle needs ≥ 4–5, a cargo aircraft ≈ 2."
+  },
+  {
+   "id": "hover",
+   "title": "Hover throttle",
+   "statement": "Mass **{m} kg**, four motors, maximum thrust of one motor **{t} g**. What fraction of its maximum thrust (in percent) must each motor produce at hover?",
+   "params": {
+    "m": {
+     "min": 0.6,
+     "max": 2.0,
+     "step": 0.05
+    },
+    "t": {
+     "min": 800,
+     "max": 2200,
+     "step": 50
+    }
+   },
+   "answer": "100*m*1000/4/t",
+   "unit": "%",
+   "tol": 0.02,
+   "solution": "At hover the total thrust equals the weight: each motor gives m·1000/4 g, the fraction = (m·1000/4)/t·100 %. The throttle percentage on the OSD will be different — thrust is nonlinear in throttle."
+  }
+ ]
+}

@@ -1,0 +1,94 @@
+{
+  "module": "f-safety",
+  "pass": 80,
+  "questions": [
+    {
+      "q": "When can you keep the props on the drone on the bench?",
+      "options": [
+        "When the battery isn't plugged in",
+        "When the ARM switch is off",
+        "Never",
+        "When the configurator is open"
+      ],
+      "answer": 2,
+      "explain": "The only reliable rule: no props on the bench. Any exception will end in an injury one day."
+    },
+    {
+      "q": "What does the RXLOSS arming disable flag mean?",
+      "options": [
+        "The CLI is open",
+        "No receiver signal",
+        "The drone is tilted",
+        "Low battery voltage"
+      ],
+      "answer": 1,
+      "explain": "Without a valid receiver signal Betaflight won't let you arm."
+    },
+    {
+      "q": "The drone won't arm, the OSD shows ARMSWITCH. The cause?",
+      "options": [
+        "No GPS",
+        "The switch was on",
+        "Broken receiver or bind",
+        "Overheating"
+      ],
+      "answer": 1,
+      "explain": "Protection against arming right after power-on: turn the switch off and on again."
+    },
+    {
+      "q": "What do you do if an arming disable flag keeps you from taking off?",
+      "options": [
+        "Disable the check",
+        "Fix the cause",
+        "Reflash",
+        "Arm via the CLI"
+      ],
+      "answer": 1,
+      "explain": "The flags are a safety net. Disabling the check removes the symptom, not the danger."
+    },
+    {
+      "q": "What is PREARM mode for?",
+      "options": [
+        "For calibration",
+        "A second switch for arming",
+        "For logs",
+        "For motor tests without props"
+      ],
+      "answer": 1,
+      "explain": "Two-stage arming lowers the chance of accidental activation — especially with heavy props."
+    },
+    {
+      "q": "What do you do with a battery that heats up with no load after a crash?",
+      "options": [
+        "Charge it right away",
+        "Isolate it, don't charge it",
+        "Discharge it to zero with a flashlight",
+        "Put it in the fridge"
+      ],
+      "answer": 1,
+      "explain": "Heating with no load is a sign of an internal short. Such a battery is taken out of service."
+    },
+    {
+      "q": "The DSHOT_TELEM flag in status means:",
+      "options": [
+        "No gyro",
+        "No eRPM with the RPM filter on",
+        "The CLI is open",
+        "Throttle not at zero when arming"
+      ],
+      "answer": 1,
+      "explain": "Check dshot_bidir, the ESC firmware, the wires."
+    },
+    {
+      "q": "How do you put out a burning LiPo?",
+      "options": [
+        "Blow it out",
+        "Sand and a non-flammable container",
+        "Cover it with a cloth",
+        "Water from a bottle, a little at a time"
+      ],
+      "answer": 1,
+      "explain": "It burns with its own oxidizer; what matters is isolation and cooling."
+    }
+  ]
+}

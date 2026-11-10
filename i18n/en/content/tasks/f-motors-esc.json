@@ -1,0 +1,49 @@
+{
+ "module": "f-motors-esc",
+ "tasks": [
+  {
+   "id": "kv-rpm",
+   "title": "RPM from KV",
+   "statement": "A **{kv} KV** motor on a **{s}S** battery (4.0 V per cell under load). Estimate the no-load RPM at full throttle (rpm).",
+   "params": {
+    "kv": {
+     "min": 300,
+     "max": 2600,
+     "step": 50
+    },
+    "s": [
+     3,
+     4,
+     6,
+     8,
+     12
+    ]
+   },
+   "answer": "kv*s*4.0",
+   "unit": "rpm",
+   "tol": 0.01,
+   "solution": "n = KV·U. With a prop on, RPM is 15–30 % lower because of the load."
+  },
+  {
+   "id": "tip-speed",
+   "title": "Blade tip speed",
+   "statement": "A **{d}-inch** prop at **{rpm} rpm**. Find the blade tip speed (m/s).",
+   "params": {
+    "d": {
+     "min": 3,
+     "max": 18,
+     "step": 1
+    },
+    "rpm": {
+     "min": 3000,
+     "max": 30000,
+     "step": 500
+    }
+   },
+   "answer": "math.pi*d*0.0254*rpm/60",
+   "unit": "m/s",
+   "tol": 0.01,
+   "solution": "v = π·D·n, D in meters, n in rev/s. Above ~0.7 Mach (≈240 m/s) efficiency and noise get sharply worse."
+  }
+ ]
+}

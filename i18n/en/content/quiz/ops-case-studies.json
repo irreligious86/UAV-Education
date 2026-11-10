@@ -1,0 +1,94 @@
+{
+  "module": "ops-case-studies",
+  "pass": 80,
+  "questions": [
+    {
+      "q": "What activated the flight termination system of the Matternet M2 in Zurich?",
+      "options": [
+        "Battery depletion",
+        "EKF variance after IMU vibration",
+        "Loss of link with the operator's radio",
+        "An operator command"
+      ],
+      "answer": 1,
+      "explain": "Vibration on IMU3 → EKF divergence → FTS."
+    },
+    {
+      "q": "Why didn't the parachute save the Matternet M2?",
+      "options": [
+        "It didn't open",
+        "The line was damaged",
+        "Wind",
+        "It was too small for that mass"
+      ],
+      "answer": 1,
+      "explain": "The line didn't survive the jerk because of prior damage."
+    },
+    {
+      "q": "What did the Airspeeder's controller do on link loss?",
+      "options": [
+        "Engaged RTH to the takeoff point",
+        "Held throttle and level attitude",
+        "Landed",
+        "Shut off the motors"
+      ],
+      "answer": 1,
+      "explain": "It froze the throttle and held level — the aircraft climbed to ~7900 ft. A “hold” failsafe instead of “descend” is the main lesson."
+    },
+    {
+      "q": "Why was the cause of the Airspeeder's link loss not determined?",
+      "options": [
+        "It's classified",
+        "There was no onboard recording",
+        "The board didn't look for the cause",
+        "The pilot doesn't remember"
+      ],
+      "answer": 1,
+      "explain": "Without a log an investigation ends with the words “not determined”."
+    },
+    {
+      "q": "What caused the Alta X to crash?",
+      "options": [
+        "A bird",
+        "Battery depletion because of the threshold",
+        "Motor failure in hover",
+        "GPS loss"
+      ],
+      "answer": 1,
+      "explain": "The warning threshold was lowered from 44 to 42 V and the voltage wasn't checked before takeoff: there was no hardware failure."
+    },
+    {
+      "q": "What impact energy is taken as the threshold for a risk of serious injury?",
+      "options": [
+        "~8 J",
+        "~80 J",
+        "~800 J",
+        "~8000 J"
+      ],
+      "answer": 1,
+      "explain": "The Matternet without payload is already 118 J."
+    },
+    {
+      "q": "The common conclusion of the three cases:",
+      "options": [
+        "Every aircraft needs a parachute",
+        "Behavior on failure, and data",
+        "You need bigger drones",
+        "Parts are unreliable"
+      ],
+      "answer": 1,
+      "explain": "What the aircraft does when something goes wrong is the engineer's main question."
+    },
+    {
+      "q": "Why does a crash analysis look for the root cause in the process rather than in the person?",
+      "options": [
+        "The process can be changed so the error doesn't repeat with anyone",
+        "So that nobody is held responsible for the crash",
+        "It makes the report shorter",
+        "Human errors don't happen"
+      ],
+      "answer": 0,
+      "explain": "Changing the process protects against a repeat regardless of who does the work."
+    }
+  ]
+}

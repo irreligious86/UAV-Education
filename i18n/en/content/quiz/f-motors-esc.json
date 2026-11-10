@@ -1,0 +1,105 @@
+{
+  "module": "f-motors-esc",
+  "pass": 80,
+  "questions": [
+    {
+      "q": "What does “2207” mean in a motor designation?",
+      "options": [
+        "22 poles, 7 windings",
+        "A 22 × 7 mm stator",
+        "2207 KV",
+        "22 A, 7 V"
+      ],
+      "answer": 1,
+      "explain": "The first two digits are the stator diameter in mm, the second two the height. A bigger stator means more torque."
+    },
+    {
+      "q": "A 1750KV motor on 6S (25.2 V) with no load spins at roughly…",
+      "options": [
+        "1750 rpm",
+        "44,000 rpm",
+        "6,000 rpm",
+        "175,000 rpm"
+      ],
+      "answer": 1,
+      "explain": "KV is RPM per volt with no load: 1750 × 25.2 ≈ 44,000 rpm. Less with a prop on."
+    },
+    {
+      "q": "Why is DShot better than PWM?",
+      "options": [
+        "It's analog, so it's more precise",
+        "A digital frame with a CRC",
+        "It works without an ESC",
+        "It's cheaper"
+      ],
+      "answer": 1,
+      "explain": "No range calibration needed, and noise doesn't shift the throttle."
+    },
+    {
+      "q": "What does the ESC send back over bidirectional DShot?",
+      "options": [
+        "Battery temperature",
+        "The motor's eRPM",
+        "Cell voltages",
+        "Stick positions"
+      ],
+      "answer": 1,
+      "explain": "The DShot return channel carries electrical RPM. The RPM filter is built on this."
+    },
+    {
+      "q": "What happened to BLHeli_32 in 2024?",
+      "options": [
+        "Version 33 was released",
+        "The project shut down",
+        "It became open source",
+        "It was renamed Bluejay"
+      ],
+      "answer": 1,
+      "explain": "In June 2024 BLHeli_32 shut down. Existing ESCs work, but there are no updates. The replacement for 32-bit ESCs is AM32, for BLHeli_S it's Bluejay."
+    },
+    {
+      "q": "What is ESC desync?",
+      "options": [
+        "Different firmware on the motors",
+        "The ESC lost the rotor position",
+        "Battery overheating",
+        "The ESC frequency out of sync with the radio"
+      ],
+      "answer": 1,
+      "explain": "Sensorless control determines the rotor position from the back-EMF. On a sharp load change the estimate breaks down — the motor loses sync."
+    },
+    {
+      "q": "How do you get shaft RPM from eRPM?",
+      "options": [
+        "eRPM × number of magnets",
+        "eRPM / (magnets / 2)",
+        "eRPM / 60",
+        "eRPM as is"
+      ],
+      "answer": 1,
+      "explain": "Electrical RPM is divided by the number of pole pairs: for 14 magnets, by 7."
+    },
+    {
+      "q": "The Kt of a 1750KV motor is roughly:",
+      "options": [
+        "0.0055 N·m/A",
+        "5.5 N·m/A",
+        "0.55 N·m/A",
+        "0.055 N·m/A — from the formula 1/KV"
+      ],
+      "answer": 0,
+      "explain": "Kt = 60/(2π·KV)."
+    },
+    {
+      "q": "How many bits of throttle value are in a DShot frame, and what is the range?",
+      "options": [
+        "8 bits, 0–255",
+        "11 bits, 48–2047",
+        "16 bits, 0–65535",
+        "10 bits, 0–1023"
+      ],
+      "answer": 1,
+      "explain": "0 — stop, 1–47 — commands; plus a telemetry bit and 4 CRC bits."
+    }
+  ]
+}

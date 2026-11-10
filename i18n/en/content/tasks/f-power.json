@@ -1,0 +1,47 @@
+{
+ "module": "f-power",
+ "tasks": [
+  {
+   "id": "flight-time",
+   "title": "Hover time",
+   "statement": "A **{c} mAh** battery, hover current **{i} A**. How many minutes will the aircraft last if you use 80 % of the capacity?",
+   "params": {
+    "c": {
+     "min": 1000,
+     "max": 8000,
+     "step": 100
+    },
+    "i": {
+     "min": 8,
+     "max": 40,
+     "step": 1
+    }
+   },
+   "answer": "0.8*c/1000/i*60",
+   "unit": "min",
+   "tol": 0.02,
+   "solution": "t = 0.8·Q/I: (0.8·c/1000)/i hours, ×60 for minutes. Below 20 % remaining, the cells drop off like an avalanche."
+  },
+  {
+   "id": "c-rate",
+   "title": "Current from the C rating",
+   "statement": "A **{c} mAh** battery with a rated continuous discharge of **{k}C**. What continuous current is allowed (A)?",
+   "params": {
+    "c": {
+     "min": 1000,
+     "max": 6000,
+     "step": 100
+    },
+    "k": {
+     "min": 10,
+     "max": 100,
+     "step": 5
+    }
+   },
+   "answer": "c/1000*k",
+   "unit": "A",
+   "tol": 0.01,
+   "solution": "I_max = C·Q. Marketing C ratings are inflated — the voltage sag under load is the real guide."
+  }
+ ]
+}

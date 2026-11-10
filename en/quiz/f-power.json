@@ -3,73 +3,73 @@
   "pass": 80,
   "questions": [
     {
-      "q": "Что означает «6S 1300 mAh 100C»?",
+      "q": "What does “6S 1300 mAh 100C” mean?",
       "options": [
-        "6P, 1.3 А·ч, 100 циклов",
-        "6S, 1.3 А·ч, до 130 А",
-        "6 В, 1300 Вт, 100 °C",
-        "6 месяцев гарантии"
+        "6P, 1.3 Ah, 100 cycles",
+        "6S, 1.3 Ah, up to 130 A",
+        "6 V, 1300 W, 100 °C",
+        "6 months of warranty"
       ],
       "answer": 1,
-      "explain": "S — число банок последовательно, mAh — ёмкость, C — ток разряда в долях ёмкости: 1.3 А·ч × 100C = 130 А по этикетке."
+      "explain": "S is the number of cells in series, mAh the capacity, C the discharge current as a multiple of capacity: 1.3 Ah × 100C = 130 A according to the label."
     },
     {
-      "q": "Когда Li-Ion выгоднее LiPo?",
+      "q": "When is Li-Ion a better choice than LiPo?",
       "options": [
-        "Для гонок с большими токами",
-        "Для дальних полётов",
-        "Всегда",
-        "Никогда"
+        "For racing with high currents",
+        "For long-range flights",
+        "Always",
+        "Never"
       ],
       "answer": 1,
-      "explain": "Li-Ion даёт больше энергии на грамм, но отдаёт меньшие токи. Для крыльев и дальних 7–10\" это больше минут в воздухе."
+      "explain": "Li-Ion gives more energy per gram but delivers lower currents. For wings and long-range 7–10\" builds that means more minutes in the air."
     },
     {
-      "q": "Почему на панче срабатывает предупреждение о низком напряжении, а после посадки напряжение нормальное?",
+      "q": "Why does the low-voltage warning go off on a punch, while after landing the voltage is normal?",
       "options": [
-        "Не тот тип АКБ в настройках",
-        "Просадка на внутреннем R",
-        "Слишком холодно",
-        "Сломан датчик"
+        "The wrong battery type in the settings",
+        "Sag across the internal R",
+        "It's too cold",
+        "The sensor is broken"
       ],
       "answer": 1,
-      "explain": "Напряжение под нагрузкой = ЭДС − I × R. При большом токе просадка мгновенная, после снятия нагрузки напряжение восстанавливается."
+      "explain": "Voltage under load = EMF − I × R. At high current the sag is instant; once the load is removed the voltage recovers."
     },
     {
-      "q": "При каком напряжении на банку хранят LiPo?",
+      "q": "At what voltage per cell is a LiPo stored?",
       "options": [
-        "4.2 В",
-        "3.8 В",
-        "3.0 В",
-        "2.5 В"
+        "4.2 V",
+        "3.8 V",
+        "3.0 V",
+        "2.5 V"
       ],
       "answer": 1,
-      "explain": "Хранение полной АКБ неделями деградирует её и ведёт к вздутию. Storage-режим зарядки — около 3.8 В/банка."
+      "explain": "Storing a full battery for weeks degrades it and leads to puffing. The charger's Storage mode is about 3.8 V/cell."
     },
     {
-      "q": "Как оценить время полёта?",
+      "q": "How do you estimate flight time?",
       "options": [
-        "Ёмкость / напряжение",
-        "0.8 × А·ч / ток × 60",
-        "C-рейтинг × 2",
-        "Вес / тяга"
+        "Capacity / voltage",
+        "0.8 × Ah / current × 60",
+        "C rating × 2",
+        "Weight / thrust"
       ],
       "answer": 1,
-      "explain": "Используемая ёмкость — около 80% номинала, средний ток берётся из лога. Высаживать АКБ в ноль нельзя."
+      "explain": "Usable capacity is about 80% of nominal, the average current comes from the log. Never run the battery down to zero."
     },
     {
-      "q": "VTX перезагружается на газу. Что проверить в первую очередь?",
+      "q": "The VTX reboots on throttle. What do you check first?",
       "options": [
-        "Канал",
-        "Питание и ток BEC",
-        "Антенну",
-        "Прошивку VTX и SmartAudio"
+        "The channel",
+        "Power and BEC current",
+        "The antenna",
+        "The VTX firmware and SmartAudio"
       ],
       "answer": 1,
-      "explain": "Просадка на шине BEC или питание от пада с недостаточным током — типичная причина перезагрузок периферии под нагрузкой."
+      "explain": "Sag on the BEC rail, or power from a pad with insufficient current, is the typical cause of peripherals rebooting under load."
     },
     {
-      "q": "Доля ёмкости для расчёта времени полёта LiPo:",
+      "q": "The usable capacity fraction for a LiPo flight-time calculation:",
       "options": [
         "1.0",
         "0.8",
@@ -77,15 +77,15 @@
         "0.95"
       ],
       "answer": 1,
-      "explain": "Посадка на 3.5 В/эл.; Li-Ion — 0.85."
+      "explain": "Landing at 3.5 V/cell; for Li-Ion — 0.85."
     },
     {
-      "q": "Пакет LiPo 6S с R 36 мОм при 80 А просядет на:",
+      "q": "A 6S LiPo pack with R = 36 mΩ at 80 A will sag by:",
       "options": [
-        "0.3 В",
-        "2.9 В",
-        "0.9 В",
-        "5 В"
+        "0.3 V",
+        "2.9 V",
+        "0.9 V",
+        "5 V"
       ],
       "answer": 1,
       "explain": "ΔU = I·R."

@@ -3,51 +3,51 @@
   "pass": 80,
   "questions": [
     {
-      "q": "Что транслирует Remote ID?",
+      "q": "What does Remote ID broadcast?",
       "options": [
-        "ID, координаты аппарата и пилота",
-        "Видеопоток с камеры аппарата",
-        "Только серийный номер раз в минуту",
-        "Журнал полёта после посадки"
+        "ID, aircraft and pilot coordinates",
+        "The video stream from the aircraft's camera",
+        "Only the serial number once a minute",
+        "The flight log after landing"
       ],
       "answer": 0,
-      "explain": "Идентификатор, положение и скорость аппарата, положение пилота, время и статус."
+      "explain": "The identifier, the aircraft's position and speed, the pilot's position, time and status."
     },
     {
-      "q": "По каким каналам идёт широковещание Remote ID?",
+      "q": "Over which channels is Remote ID broadcast?",
       "options": [
-        "LTE и спутниковая связь",
-        "Bluetooth и Wi-Fi",
-        "ELRS 2.4 ГГц",
-        "Аналоговый видеоканал 5.8 ГГц"
+        "LTE and satellite link",
+        "Bluetooth and Wi-Fi",
+        "ELRS 2.4 GHz",
+        "Analog 5.8 GHz video channel"
       ],
       "answer": 1,
-      "explain": "Bluetooth 4/5 и Wi-Fi NAN/Beacon — принимает обычный смартфон."
+      "explain": "Bluetooth 4/5 and Wi-Fi NAN/Beacon — an ordinary smartphone receives it."
     },
     {
-      "q": "Что даёт подпись MAVLink 2?",
+      "q": "What does MAVLink 2 signing give you?",
       "options": [
-        "Шифрует всю телеметрию",
-        "Сжимает пакеты для дальности",
-        "Отсекает команды без верного ключа",
-        "Защищает радиоканал от глушения и помех"
+        "Encrypts all telemetry",
+        "Compresses packets for range",
+        "Rejects commands without the right key",
+        "Protects the radio link from jamming and interference"
       ],
       "answer": 2,
-      "explain": "Это аутентификация: команды без подписи не исполняются, трафик остаётся читаемым."
+      "explain": "It's authentication: unsigned commands aren't executed, the traffic stays readable."
     },
     {
-      "q": "Почему USB не защищён подписью в ArduPilot?",
+      "q": "Why isn't USB protected by signing in ArduPilot?",
       "options": [
-        "USB не поддерживает MAVLink 2",
-        "USB работает только в MAVLink 1",
-        "Ключ хранится в наземке, а не в FC",
-        "Физический доступ и так даёт всё"
+        "USB doesn't support MAVLink 2",
+        "USB works only in MAVLink 1",
+        "The key is stored in the GCS, not in the FC",
+        "Physical access gives you everything anyway"
       ],
       "answer": 3,
-      "explain": "По USB можно сменить или стереть ключ — физический доступ равен полному доступу."
+      "explain": "Over USB you can change or erase the key — physical access equals full access."
     },
     {
-      "q": "Сколько байт добавляет подпись к пакету MAVLink 2?",
+      "q": "How many bytes does signing add to a MAVLink 2 packet?",
       "options": [
         "6",
         "32",
@@ -55,40 +55,40 @@
         "64"
       ],
       "answer": 2,
-      "explain": "Link ID 1 + метка времени 6 + подпись 6 = 13 байт; сам ключ — 32 байта."
+      "explain": "Link ID 1 + timestamp 6 + signature 6 = 13 bytes; the key itself is 32 bytes."
     },
     {
-      "q": "Зачем подписи растущая метка времени?",
+      "q": "Why does signing need an increasing timestamp?",
       "options": [
-        "Чтобы отбросить повтор пакета",
-        "Для синхронизации часов GNSS",
-        "Чтобы считать задержку линка",
-        "Для сортировки логов на земле"
+        "To drop a repeated packet",
+        "To synchronize the GNSS clock",
+        "To measure link latency",
+        "To sort logs on the ground"
       ],
       "answer": 0,
-      "explain": "Повтор записанного пакета (replay) с той же меткой отбрасывается."
+      "explain": "A replay of a recorded packet with the same timestamp is dropped."
     },
     {
-      "q": "Что делает ROS_DOMAIN_ID?",
+      "q": "What does ROS_DOMAIN_ID do?",
       "options": [
-        "Шифрует трафик DDS",
-        "Включает аутентификацию узлов",
-        "Блокирует multicast в сети",
-        "Разделяет системы, не защищая их"
+        "Encrypts DDS traffic",
+        "Enables node authentication",
+        "Blocks multicast on the network",
+        "Separates systems without protecting them"
       ],
       "answer": 3,
-      "explain": "Это разделение, а не безопасность; защита — SROS2, ограничение discovery — ROS_AUTOMATIC_DISCOVERY_RANGE."
+      "explain": "It's separation, not security; protection is SROS2, restricting discovery is ROS_AUTOMATIC_DISCOVERY_RANGE."
     },
     {
-      "q": "Что даёт подписанная прошивка с защищённым загрузчиком?",
+      "q": "What does signed firmware with a secure bootloader give you?",
       "options": [
-        "Шифрование параметров в EEPROM",
-        "Загрузчик не запустит чужую сборку",
-        "Обновления без USB по воздуху",
-        "Автоматическую проверку Remote ID"
+        "Encryption of parameters in EEPROM",
+        "The bootloader won't start a foreign build",
+        "Over-the-air updates without USB",
+        "Automatic Remote ID check"
       ],
       "answer": 1,
-      "explain": "Публичный ключ в загрузчике проверяет подпись прошивки."
+      "explain": "The public key in the bootloader verifies the firmware signature."
     }
   ]
 }

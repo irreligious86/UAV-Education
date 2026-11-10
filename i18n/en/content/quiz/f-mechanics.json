@@ -1,0 +1,94 @@
+{
+  "module": "f-mechanics",
+  "pass": 80,
+  "questions": [
+    {
+      "q": "What thrust is needed to hold altitude at a 45° bank?",
+      "options": [
+        "m·g",
+        "1.15·m·g",
+        "1.41·m·g",
+        "2·m·g"
+      ],
+      "answer": 2,
+      "explain": "T·cos φ = m·g → T = m·g/cos 45° = 1.41·m·g."
+    },
+    {
+      "q": "Horizontal acceleration at a bank of φ (ignoring drag):",
+      "options": [
+        "g·sin φ",
+        "g·tan φ",
+        "g·cos φ",
+        "g/φ"
+      ],
+      "answer": 1,
+      "explain": "T·sin φ = m·a with T = m·g/cos φ → a = g·tan φ."
+    },
+    {
+      "q": "The radius of a coordinated turn at 15 m/s with a 30° bank:",
+      "options": [
+        "10 m",
+        "20 m",
+        "40 m",
+        "80 m"
+      ],
+      "answer": 2,
+      "explain": "r = v²/(g·tan φ) = 225/(9.81·0.577) ≈ 40 m."
+    },
+    {
+      "q": "Why is yaw the “laziest” axis of a multirotor?",
+      "options": [
+        "The firmware limits the yaw rate",
+        "A small moment with a large inertia",
+        "The motors are weak",
+        "Because of the gyro"
+      ],
+      "answer": 1,
+      "explain": "The difference in CW/CCW reaction torques is small, and all masses are far from the vertical axis."
+    },
+    {
+      "q": "How does the moment of inertia depend on a mass's distance to the axis?",
+      "options": [
+        "Linearly",
+        "Quadratically",
+        "It doesn't depend on it",
+        "Inversely proportionally"
+      ],
+      "answer": 1,
+      "explain": "I = Σ m·r²: mass at the arm tips is expensive."
+    },
+    {
+      "q": "What is expensive in a climb: acceleration or steady climb rate?",
+      "options": [
+        "Steady climb rate",
+        "Acceleration (m·a)",
+        "Both equally",
+        "Neither"
+      ],
+      "answer": 1,
+      "explain": "T = m·(g + a) + D; drag at 3 m/s for a 7\" is a few grams."
+    },
+    {
+      "q": "Air drag grows:",
+      "options": [
+        "Linearly with speed",
+        "With the square of speed",
+        "With the cube of speed",
+        "Independently of speed"
+      ],
+      "answer": 1,
+      "explain": "D = ½·ρ·C_d·A·v²."
+    },
+    {
+      "q": "When speed doubles, aerodynamic drag:",
+      "options": [
+        "Grows about 4 times",
+        "Grows 2 times",
+        "Doesn't change",
+        "Halves"
+      ],
+      "answer": 0,
+      "explain": "Drag ∝ v²."
+    }
+  ]
+}

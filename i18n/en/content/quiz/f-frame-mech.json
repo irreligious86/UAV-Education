@@ -1,0 +1,94 @@
+{
+  "module": "f-frame-mech",
+  "pass": 80,
+  "questions": [
+    {
+      "q": "How does the force from prop imbalance depend on RPM?",
+      "options": [
+        "Linearly",
+        "~ω² — quadratically",
+        "It doesn't depend on it",
+        "It drops with RPM"
+      ],
+      "answer": 1,
+      "explain": "The centrifugal force m·r·ω² grows with the square of angular velocity."
+    },
+    {
+      "q": "How does a frame resonance differ from a motor peak in the spectrum?",
+      "options": [
+        "It is always below 50 Hz on any frame and doesn't depend on size",
+        "It doesn't move when throttle changes",
+        "It is only on the 3rd harmonic",
+        "It is visible only on the accelerometer"
+      ],
+      "answer": 1,
+      "explain": "A resonance is tied to the structure, while motor peaks follow RPM."
+    },
+    {
+      "q": "Why doesn't the RPM filter remove frame resonance?",
+      "options": [
+        "It only works on 5\" frames",
+        "The resonance doesn't follow RPM",
+        "It's too weak",
+        "It's off by default"
+      ],
+      "answer": 1,
+      "explain": "The RPM filter places notches on the harmonics of motor RPM. A fixed resonance is caught by the dynamic notch or eliminated by the structure."
+    },
+    {
+      "q": "What happens when the accelerometer clips in ArduPilot?",
+      "options": [
+        "The barometer switches to GPS altitude",
+        "The EKF loses its altitude estimate",
+        "The motors shut off",
+        "Nothing"
+      ],
+      "answer": 1,
+      "explain": "A saturated accelerometer gives wrong data, which shows up in VIBE/Clip and leads to altitude drift."
+    },
+    {
+      "q": "Why is a tight wire harness to the FC harmful with a soft mount?",
+      "options": [
+        "It causes interference for the GPS and compass",
+        "It's a link that bypasses the dampers",
+        "It heats up",
+        "It interferes with Blackbox"
+      ],
+      "answer": 1,
+      "explain": "Vibration travels through the tight wires straight into the board, and the dampers stop working."
+    },
+    {
+      "q": "What is the motor's 1st-harmonic frequency at 12,000 rpm?",
+      "options": [
+        "12 Hz",
+        "120 Hz",
+        "200 Hz",
+        "1200 Hz"
+      ],
+      "answer": 2,
+      "explain": "f = RPM/60 = 12000/60 = 200 Hz."
+    },
+    {
+      "q": "For a 5\", the natural frequency of the board on its grommets should be:",
+      "options": [
+        "Above the motor harmonics",
+        "≈ 60–80 Hz",
+        "About 20 Hz",
+        "It doesn't matter"
+      ],
+      "answer": 1,
+      "explain": "3–5 times below the motors, above the control bandwidth; too soft — mushiness and a low-frequency peak."
+    },
+    {
+      "q": "Low-frequency shaking at 20–70 Hz most often comes from:",
+      "options": [
+        "Prop wash and turbulence",
+        "Prop imbalance at high RPM",
+        "Gyro noise",
+        "BEC ripple"
+      ],
+      "answer": 0,
+      "explain": "Prop wash is aerodynamics, low frequencies; imbalance is at the rotation frequency."
+    }
+  ]
+}
