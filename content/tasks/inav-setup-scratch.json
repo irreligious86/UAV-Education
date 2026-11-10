@@ -1,0 +1,112 @@
+{
+ "module": "inav-setup-scratch",
+ "tasks": [
+  {
+   "id": "vbat-scale",
+   "title": "Калибровка vbat_scale",
+   "statement": "Сейчас `vbat_scale` = **{s}**. Мультиметр на разъёме АКБ показывает **{vm} В**, INAV в `status` — **{vr} В**. Найдите новое `vbat_scale` (без округления).",
+   "params": {
+    "s": [
+     1050,
+     1100,
+     1150,
+     1200,
+     1210
+    ],
+    "vm": {
+     "min": 14.8,
+     "max": 16.8,
+     "step": 0.02
+    },
+    "vr": {
+     "min": 15.2,
+     "max": 16.4,
+     "step": 0.05
+    }
+   },
+   "answer": "s*vm/vr",
+   "unit": "",
+   "tol": 0.005,
+   "solution": "В battery.c напряжение пропорционально `vbat_scale`: V = ADC·scale·3300/(4095·1000). Поэтому new = old × V_мультиметр / V_INAV. Если INAV занижает, scale растёт."
+  },
+  {
+   "id": "current-scale",
+   "title": "current_meter_scale по зарядному",
+   "statement": "`current_meter_scale` = **{s}**. После полёта INAV показал **{qr} мА·ч**, зарядное вернуло **{qc} мА·ч**. Найдите новое `current_meter_scale`.",
+   "params": {
+    "s": [
+     250,
+     320,
+     400,
+     450,
+     500
+    ],
+    "qr": {
+     "min": 950,
+     "max": 1250,
+     "step": 10
+    },
+    "qc": {
+     "min": 1000,
+     "max": 1200,
+     "step": 10
+    }
+   },
+   "answer": "s*qr/qc",
+   "unit": "",
+   "tol": 0.005,
+   "solution": "I = (U_датчика − offset)/scale, показания обратно пропорциональны scale: new = old × мА·ч_INAV / мА·ч_зарядки. INAV завышает — scale нужно увеличить."
+  },
+  {
+   "id": "current-offset",
+   "title": "current_meter_offset по току покоя",
+   "statement": "`current_meter_scale` = **{s}**, `current_meter_offset` = **{o}**. Моторы стоят: INAV показывает **{ir} А**, амперметр лабораторного блока — **{it} А**. Найдите новый `current_meter_offset`.",
+   "params": {
+    "s": [
+     250,
+     320,
+     400,
+     435,
+     500
+    ],
+    "o": [
+     0,
+     20,
+     50,
+     100
+    ],
+    "ir": {
+     "min": 0.3,
+     "max": 1.2,
+     "step": 0.01
+    },
+    "it": {
+     "min": 0.2,
+     "max": 0.8,
+     "step": 0.01
+    }
+   },
+   "answer": "o+(ir-it)*s",
+   "unit": "",
+   "tol": 0.01,
+   "abs": 1,
+   "solution": "В коде из напряжения датчика вычитается offset×0.1 мВ, это убирает offset/scale ампер. Поэтому new = old + (I_INAV − I_амперметр) × scale. Отрицательный результат допустим: INAV занижал ток."
+  },
+  {
+   "id": "hover-thr",
+   "title": "Оценка nav_mc_hover_thr по T/W",
+   "statement": "Тяговооружённость квадрокоптера **{tw}:1**. Считая, что тяга пропорциональна квадрату газа (газ от 1000 до 2000 µs), оцените `nav_mc_hover_thr` в µs.",
+   "params": {
+    "tw": {
+     "min": 2.0,
+     "max": 10.0,
+     "step": 0.5
+    }
+   },
+   "answer": "1000+1000/math.sqrt(tw)",
+   "unit": "µs",
+   "tol": 0.01,
+   "solution": "На висении тяга равна весу: (газ)² · T_max = T_max / TW, отсюда доля газа = 1/√TW, nav_mc_hover_thr = 1000 + 1000/√TW. Это стартовая оценка; точное значение берут из Blackbox первого висения."
+  }
+ ]
+}

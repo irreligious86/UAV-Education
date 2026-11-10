@@ -1,0 +1,98 @@
+{
+ "module": "ap-setup-scratch",
+ "pass": 80,
+ "questions": [
+  {
+   "q": "ELRS-приёмник (CRSF по проводу) подключён к UART, который в ArduCopter 4.6 называется SERIAL4. Что поставить в первую очередь?",
+   "options": [
+    "SERIAL4_PROTOCOL = 23 (RCIN)",
+    "SERIAL4_PROTOCOL = 29 (Crossfire VTX)",
+    "SERIAL4_PROTOCOL = 2 (MAVLink2)",
+    "SERIAL4_BAUD = 420 и протокол не трогать"
+   ],
+   "answer": 0,
+   "explain": "Любой последовательный RC-приёмник в ArduPilot — протокол 23 (RCIN); скорость порта прошивка выставляет сама. 29 — управление VTX через CRSF, MAVLink — только если приёмник настроен выдавать MAVLink (другая схема, RSSI_TYPE = 5)."
+  },
+  {
+   "q": "Каналы в Mission Planner не двигаются, приёмник ELRS горит «связь есть». Где ошибка?",
+   "kind": "apply",
+   "fragment": "SERIAL3_PROTOCOL  23\nSERIAL3_BAUD      115\nRC_PROTOCOLS      8\nRC_OPTIONS        8736\nRSSI_TYPE         3",
+   "options": [
+    "RC_PROTOCOLS = 8 разрешает только SBUS; для CRSF нужен бит 9 (512) или 1",
+    "SERIAL3_BAUD = 115 слишком мало, нужно выставить 420 вручную",
+    "RC_OPTIONS = 8736 содержит бит 0 (Ignore RC Receiver) и поэтому отключает приём RC",
+    "RSSI_TYPE = 3 требует отдельного аналогового входа RSSI"
+   ],
+   "answer": 0,
+   "explain": "RC_PROTOCOLS — битовая маска: бит 3 (8) — SBUS, бит 9 (512) — CRSF, 1 — все. Скорость для RCIN задаёт прошивка, 8736 = 32 + 512 + 8192 (биты 5, 9, 13), бита 0 там нет; RSSI_TYPE 3 берёт RSSI/LQ из протокола приёмника."
+  },
+  {
+   "q": "Плата пришла с Betaflight. Чем и каким файлом ставить ArduPilot в первый раз?",
+   "options": [
+    "DFU (кнопка BOOT) + STM32CubeProgrammer, файл arducopter_with_bl.hex",
+    "Mission Planner → Load custom firmware, файл arducopter.apj",
+    "Betaflight Configurator в режиме CLI, команда flash arducopter.apj",
+    "QGroundControl → Firmware, файл arducopter.hex без загрузчика"
+   ],
+   "answer": 0,
+   "explain": "На плате ещё нет загрузчика ArduPilot, поэтому первая прошивка — через DFU файлом _with_bl.hex (загрузчик + прошивка). .apj понимает только загрузчик ArduPilot: им обновляют уже прошитую плату из Mission Planner или QGC."
+  },
+  {
+   "q": "Quad X (FRAME_TYPE = 1), Mission Planner → Motor Test. В каком порядке должны крутиться моторы по кнопкам A, B, C, D?",
+   "options": [
+    "По часовой: передний правый, задний правый, задний левый, передний левый",
+    "По номерам выходов: 1, 2, 3, 4 — передний правый, задний левый, передний левый, задний правый",
+    "Против часовой: передний левый, задний левый, задний правый, передний правый",
+    "Как в Betaflight: задний правый, передний правый, задний левый, передний левый"
+   ],
+   "answer": 0,
+   "explain": "Буквы теста идут по кругу по часовой стрелке от первого мотора справа от носа. Для Quad X это моторы 1, 4, 2, 3 — в SITL кнопки A/B/C/D подняли SERVO1, SERVO4, SERVO2, SERVO3. Порядок Betaflight — это FRAME_TYPE 12 (BetaFlightX)."
+  },
+  {
+   "q": "BATT_VOLT_MULT = 11.0, GCS показывает 16.20 В, мультиметр — 16.52 В. Новое значение?",
+   "options": [
+    "11.22",
+    "10.79",
+    "11.32",
+    "11.44"
+   ],
+   "answer": 0,
+   "explain": "V = V_pin · BATT_VOLT_MULT, значит множитель масштабируется отношением: 11.0 · 16.52 / 16.20 = 11.22. 10.79 — перевёрнутое отношение, 11.32 — разницу напряжений прибавили к множителю, 11.44 — квадрат отношения."
+  },
+  {
+   "q": "Motor Test без пропов: все четыре мотора уверенно стартуют с 6 %. Какие MOT_SPIN_ARM и MOT_SPIN_MIN по методике ArduPilot?",
+   "options": [
+    "SPIN_ARM 0.08, SPIN_MIN 0.11",
+    "SPIN_ARM 0.06, SPIN_MIN 0.06",
+    "SPIN_ARM 0.11, SPIN_MIN 0.08",
+    "SPIN_ARM 0.02, SPIN_MIN 0.08"
+   ],
+   "answer": 0,
+   "explain": "SPIN_ARM = (порог + 2 %)/100 = 0.08 — моторы гарантированно крутятся после арма; SPIN_MIN не меньше SPIN_ARM + 0.03 = 0.11 — ниже этой точки тяга не управляется. SPIN_ARM всегда меньше SPIN_MIN."
+  },
+  {
+   "q": "Проверка RC failsafe на земле: Stabilize, моторы заармлены, газ в ноль, пропов нет. Выключаешь пульт. Что должно произойти?",
+   "options": [
+    "Аппарат сразу дизармится",
+    "Включится RTL и моторы раскрутятся",
+    "Включится Land, моторы на холостых",
+    "Ничего, failsafe работает только в Loiter"
+   ],
+   "answer": 0,
+   "explain": "По документации Radio Failsafe: заармленный аппарат на земле при failsafe немедленно дизармится. RTL/Land — только в воздухе (тест с газом на середине). В SITL это видно как «Radio Failsafe - Disarming»."
+  },
+  {
+   "q": "Первое висение 60 с. Что делать до QuikTune/AutoTune?",
+   "kind": "apply",
+   "fragment": "VIBE  VibeX=18.4 VibeY=21.7 VibeZ=46.3 Clip=0/112/0\nCTUN  ThO=0.31 ThH=0.31\nMOT_THST_HOVER 0.31",
+   "options": [
+    "Устранить вибрации: балансировка пропов, демпфирование FC; Z > 30 и клиппинг",
+    "Сразу AutoTune: газ висения 0.31 в норме, вибрации AutoTune уберёт сам",
+    "Поднять MOT_SPIN_MIN до 0.25, чтобы вибрации ушли на холостых",
+    "Уменьшить MOT_THST_HOVER до 0.2, газ висения слишком высокий"
+   ],
+   "answer": 0,
+   "explain": "VibeZ 46 м/с² выше порога 30 и есть клиппинг акселерометра — высота и AltHold будут плыть, AutoTune прервётся или подберёт мусор. Газ висения 0.31 в рабочем диапазоне 0.2–0.5; MOT_THST_HOVER обучается сам (MOT_HOVER_LEARN = 2)."
+  }
+ ]
+}

@@ -28,7 +28,7 @@ SITL (Software In The Loop) — настоящая прошивка ArduPilot, �
 Скрипт `sim_vehicle.py` собирает прошивку, запускает её и консольную наземную станцию MAVProxy. Ключевые флаги:
 
 - `-v ArduCopter` или `-v ArduPlane` — тип аппарата;
-- `-f octa-quad`, `-f quad`, `-f quadplane` — модель рамы в симуляторе;
+- `-f octa-quad`, `-f quad`, `-f quadplane` — модель рамы в симуляторе (`-f quad` и запуск без `-f` — это Quad Plus, `FRAME_TYPE = 0`; Quad X — `-f X`);
 - `--console --map` — окна консоли и карты;
 - `-w` — сбросить параметры к дефолтам (полезно, когда эксперименты зашли не туда).
 

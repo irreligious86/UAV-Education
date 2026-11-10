@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="ru" data-theme="dark" data-lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>INAV-аппарат с нуля — UAV Student</title>
+  <meta name="description" content="Квадрокоптер или крыло на INAV, настроенный с пустой платы: миссия из 5 точек и проверенный failsafe с возвратом домой">
+  <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#0b0f14">
+  <link rel="alternate" hreflang="ru" href="../cap/cap-inav-gps.html">
+  <link rel="alternate" hreflang="uk" href="../uk/cap/cap-inav-gps.html">
+  <link rel="alternate" hreflang="en" href="../en/cap/cap-inav-gps.html">
+  <link rel="alternate" hreflang="uk-galych" href="../gal/cap/cap-inav-gps.html">
+  <script>/* go to the visitor's chosen language before anything paints (assets/i18n.js) */(function(){try{var c=localStorage.getItem('uav-lang'),h=document.documentElement.getAttribute('data-lang');if(!c||c===h||/[?&]lang=keep\b/.test(location.search))return;var l=document.querySelector('link[rel=alternate][hreflang="'+c+'"]');if(l)location.replace(l.href+location.search+location.hash)}catch(e){}})();</script>
+  <link rel="stylesheet" href="../lib/ground-control-ui/dist/ground-control.css">
+  <link rel="stylesheet" href="../assets/site.css">
+  <script src="../lib/ground-control-ui/dist/ground-control.js" defer></script>
+  <script src="../assets/i18n.js"></script>
+  <script src="../assets/progress-store.js" defer></script>
+  <script src="../assets/backend-config.js" defer></script>
+  <script src="../assets/account.js" defer></script>
+  <script src="../assets/grading.js" defer></script>
+  <script src="../assets/app.js" defer></script>
+  <script src="../assets/uav-quiz.js" defer></script>
+  <script src="../assets/uav-tasks.js" defer></script>
+  <script src="../assets/offline.js" defer></script>
+</head>
+<body class="gc-root" data-base="../" data-root="../">
+  <header class="site-header">
+    <div class="gc-container site-header__inner">
+      <a class="site-brand" href="../index.html"><span class="site-brand__mark" aria-hidden="true">◆</span> UAV Student</a>
+      <nav class="gc-nav" aria-label="Разделы сайта">
+        <a href="../index.html" aria-current="page">Курс</a>
+        <a href="../ref/index.html">Справочник</a>
+        <a href="../pages/glossary.html">Глоссарий</a>
+        <a href="../pages/fails.html">Фейлы</a>
+        <a href="../pages/search.html">Поиск</a>
+        <a href="../pages/progress.html">Мой прогресс</a>
+      </nav>
+      <nav class="lang-switch" aria-label="Язык"><a class="gc-tag" href="../cap/cap-inav-gps.html" data-lang-to="ru" hreflang="ru" lang="ru" title="Русский" aria-current="true" data-state="ok">RU</a><a class="gc-tag" href="../uk/cap/cap-inav-gps.html" data-lang-to="uk" hreflang="uk" lang="uk" title="Українська">UK</a><a class="gc-tag" href="../en/cap/cap-inav-gps.html" data-lang-to="en" hreflang="en" lang="en" title="English">EN</a><a class="gc-tag" href="../gal/cap/cap-inav-gps.html" data-lang-to="uk-galych" hreflang="uk-galych" lang="uk-galych" title="Галицька (експеримент)">GAL</a></nav>
+    </div>
+  </header>
+  <main class="gc-container site-main">
+    <article class="module" data-module-page="cap-inav-gps">
+      <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-inav">Электив: INAV</a><span>Итоговый проект</span></p>
+      <h1 class="module-title">INAV-аппарат с нуля</h1>
+      <div class="module-tags"><span class="gc-tag">Итоговый проект трека 0</span><span class="gc-tag" data-state="ok" data-done-badge hidden>СДАН</span></div>
+      <p class="module-lead">Результат: Квадрокоптер или крыло на INAV, настроенный с пустой платы: миссия из 5 точек и проверенный failsafe с возвратом домой</p>
+      <div class="gc-prose module-body">
+        <h2>Что сдать</h2>
+        <ul><li>Выбор платформы (квадрокоптер или крыло) и паспорт сборки: вес, моторы, АКБ, расчётное время полёта</li><li>Конфигурация `diff all` до и после настройки, с комментариями к каждому изменённому параметру</li><li>Протокол калибровок: напряжение и ток против мультиметра и зарядника, компас, акселерометр (крыло: центровка, расходы рулей)</li><li>SITL-репетиция настройки: `diff all`, флаги арминга, восстановление конфигурации на чистой плате; полёт и RTH в SITL — по желанию (нужен RealFlight или X-Plane)</li><li>Лог реального полёта: удержание позиции, миссия из 5 точек, failsafe по выключенному пульту с возвратом домой</li><li>Карточка настройки на одну страницу под свой аппарат</li></ul>
+        <h2>Критерии приёмки</h2>
+        <p class="gc-muted">Проект сдан, когда выполнены все пункты. Отмечай по мере готовности:</p>
+        <ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="cap-inav-gps:cap:0"><span>Конфигурация восстанавливается из `diff all` на чистой плате без ручных правок</span></label></li><li><label><input type="checkbox" data-check-id="cap-inav-gps:cap:1"><span>Ошибка напряжения меньше 0.05 В на банку, израсходованные мАч в пределах 5 % от зарядника</span></label></li><li><label><input type="checkbox" data-check-id="cap-inav-gps:cap:2"><span>Failsafe проверен: в логе видны потеря сигнала, переход в RTH и посадка или кружение над домом</span></label></li><li><label><input type="checkbox" data-check-id="cap-inav-gps:cap:3"><span>Посадка по RTH в пределах 5 м от точки старта (крыло: кружение над домом на заданной высоте)</span></label></li><li><label><input type="checkbox" data-check-id="cap-inav-gps:cap:4"><span>Каждая аномалия в логе объяснена или исправлена</span></label></li></ul>
+        <h2>Рубрика: как отличить сделанное от сданного</h2><p class="gc-muted">Проверь свою работу по каждой строке. Если она ближе к левой колонке — проект ещё не готов.</p><div class="widget__table-wrap"><table class="rubric"><thead><tr><th>Критерий</th><th>Плохо</th><th>Хорошо</th></tr></thead><tbody><tr><th scope="row">Калибровка батареи</th><td class="rubric__bad">Напряжение «примерно совпадает»</td><td class="rubric__good">16.62 В на мультиметре против 16.58 В в OSD до калибровки, `vbat_scale` пересчитан, после — 16.61 В; мАч: 1312 в OSD против 1290 у зарядника (1.7 %)</td></tr><tr><th scope="row">Failsafe</th><td class="rubric__bad">Failsafe настроен, но не проверялся</td><td class="rubric__good">Пульт выключен на 2-й точке миссии, в логе: потеря RX через 0.3 с, RTH, посадка в 2.8 м от старта</td></tr><tr><th scope="row">Конфигурация</th><td class="rubric__bad">Скриншоты вкладок Configurator</td><td class="rubric__good">`diff all` в репозитории, комментарий к каждой строке, восстановлен на второй плате</td></tr></tbody></table></div>
+        
+        <h2>Модули трека</h2>
+        <ol><li><a href="../m/inav-intro.html">Введение в INAV</a></li><li><a href="../m/inav-gps.html">GPS, компас и RTH в INAV</a></li><li><a href="../m/inav-setup-scratch.html">INAV с нуля: GPS-квадрокоптер</a></li><li><a href="../m/inav-setup-wing.html">INAV с нуля: крыло</a></li><li><a href="../m/inav-missions.html">Миссии INAV: waypoints и CLI wp</a></li><li><a href="../m/inav-wing.html">Крыло на INAV: миксер, автозапуск, autotune</a></li><li><a href="../m/inav-ipf.html">INAV Programming Framework</a></li></ol>
+        <div class="gc-callout" data-state="caution"><strong>Безопасность.</strong> Всё, что можно сделать в SITL или без пропов, делается там. Реальный полёт — только после наземных тестов, с проверенным failsafe.</div>
+      </div>
+      <div class="module-done"><gc-button variant="secondary" data-done-toggle="cap-inav-gps" data-done-label="сданный" data-done-past="Сдан">Отметить как сданный</gc-button></div>
+    </article>
+  </main>
+  <footer class="gc-container site-footer gc-muted">
+    <p>Открытый курс · <a href="https://github.com/irreligious86/UAV-Education">исходники на GitHub</a> · <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">план развития</a> · <a href="../curriculum/curriculum.html">для разработчика</a> · CC BY-NC-SA 4.0</p>
+  </footer>
+</body>
+</html>

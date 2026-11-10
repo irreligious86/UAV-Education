@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en" data-theme="dark" data-lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>INAV-аппарат с нуля — UAV Student</title>
+  <meta name="description" content="Квадрокоптер или крыло на INAV, настроенный с пустой платы: миссия из 5 точек и проверенный failsafe с возвратом домой">
+  <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
+  <link rel="manifest" href="../../manifest.webmanifest">
+  <meta name="theme-color" content="#0b0f14">
+  <link rel="alternate" hreflang="ru" href="../../cap/cap-inav-gps.html">
+  <link rel="alternate" hreflang="uk" href="../../uk/cap/cap-inav-gps.html">
+  <link rel="alternate" hreflang="en" href="../../en/cap/cap-inav-gps.html">
+  <link rel="alternate" hreflang="uk-galych" href="../../gal/cap/cap-inav-gps.html">
+  <script>/* go to the visitor's chosen language before anything paints (assets/i18n.js) */(function(){try{var c=localStorage.getItem('uav-lang'),h=document.documentElement.getAttribute('data-lang');if(!c||c===h||/[?&]lang=keep\b/.test(location.search))return;var l=document.querySelector('link[rel=alternate][hreflang="'+c+'"]');if(l)location.replace(l.href+location.search+location.hash)}catch(e){}})();</script>
+  <link rel="stylesheet" href="../../lib/ground-control-ui/dist/ground-control.css">
+  <link rel="stylesheet" href="../../assets/site.css">
+  <script src="../../lib/ground-control-ui/dist/ground-control.js" defer></script>
+  <script src="../../assets/i18n/en.js"></script>
+  <script src="../../assets/i18n.js"></script>
+  <script src="../../assets/progress-store.js" defer></script>
+  <script src="../../assets/backend-config.js" defer></script>
+  <script src="../../assets/account.js" defer></script>
+  <script src="../../assets/grading.js" defer></script>
+  <script src="../../assets/app.js" defer></script>
+  <script src="../../assets/uav-quiz.js" defer></script>
+  <script src="../../assets/uav-tasks.js" defer></script>
+  <script src="../../assets/offline.js" defer></script>
+</head>
+<body class="gc-root" data-base="../" data-root="../../">
+  <header class="site-header">
+    <div class="gc-container site-header__inner">
+      <a class="site-brand" href="../index.html"><span class="site-brand__mark" aria-hidden="true">◆</span> UAV Student</a>
+      <nav class="gc-nav" aria-label="Site sections">
+        <a href="../index.html" aria-current="page">Course</a>
+        <a href="../ref/index.html">Reference</a>
+        <a href="../pages/glossary.html">Glossary</a>
+        <a href="../pages/fails.html">Failures</a>
+        <a href="../pages/search.html">Search</a>
+        <a href="../pages/progress.html">My progress</a>
+      </nav>
+      <nav class="lang-switch" aria-label="Language"><a class="gc-tag" href="../../cap/cap-inav-gps.html" data-lang-to="ru" hreflang="ru" lang="ru" title="Русский">RU</a><a class="gc-tag" href="../../uk/cap/cap-inav-gps.html" data-lang-to="uk" hreflang="uk" lang="uk" title="Українська">UK</a><a class="gc-tag" href="../../en/cap/cap-inav-gps.html" data-lang-to="en" hreflang="en" lang="en" title="English" aria-current="true" data-state="ok">EN</a><a class="gc-tag" href="../../gal/cap/cap-inav-gps.html" data-lang-to="uk-galych" hreflang="uk-galych" lang="uk-galych" title="Галицька (експеримент)">GAL</a></nav>
+    </div>
+  </header>
+  <main class="gc-container site-main">
+    <article class="module" data-module-page="cap-inav-gps">
+      <p class="gc-breadcrumb"><a href="../index.html">Course</a><a href="../index.html#track-inav">Elective: INAV</a><span>Capstone project</span></p>
+      <h1 class="module-title">INAV-аппарат с нуля</h1>
+      <div class="module-tags"><span class="gc-tag">Track 0 capstone project</span><span class="gc-tag" data-state="ok" data-done-badge hidden>PASSED</span></div>
+      <p class="module-lead">Result: Квадрокоптер или крыло на INAV, настроенный с пустой платы: миссия из 5 точек и проверенный failsafe с возвратом домой</p>
+      <div class="gc-prose module-body">
+        <h2>What to submit</h2>
+        <ul><li>Выбор платформы (квадрокоптер или крыло) и паспорт сборки: вес, моторы, АКБ, расчётное время полёта</li><li>Конфигурация `diff all` до и после настройки, с комментариями к каждому изменённому параметру</li><li>Протокол калибровок: напряжение и ток против мультиметра и зарядника, компас, акселерометр (крыло: центровка, расходы рулей)</li><li>SITL-репетиция настройки: `diff all`, флаги арминга, восстановление конфигурации на чистой плате; полёт и RTH в SITL — по желанию (нужен RealFlight или X-Plane)</li><li>Лог реального полёта: удержание позиции, миссия из 5 точек, failsafe по выключенному пульту с возвратом домой</li><li>Карточка настройки на одну страницу под свой аппарат</li></ul>
+        <h2>Acceptance criteria</h2>
+        <p class="gc-muted">The project is passed when all items are done. Check them off as you go:</p>
+        <ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="cap-inav-gps:cap:0"><span>Конфигурация восстанавливается из `diff all` на чистой плате без ручных правок</span></label></li><li><label><input type="checkbox" data-check-id="cap-inav-gps:cap:1"><span>Ошибка напряжения меньше 0.05 В на банку, израсходованные мАч в пределах 5 % от зарядника</span></label></li><li><label><input type="checkbox" data-check-id="cap-inav-gps:cap:2"><span>Failsafe проверен: в логе видны потеря сигнала, переход в RTH и посадка или кружение над домом</span></label></li><li><label><input type="checkbox" data-check-id="cap-inav-gps:cap:3"><span>Посадка по RTH в пределах 5 м от точки старта (крыло: кружение над домом на заданной высоте)</span></label></li><li><label><input type="checkbox" data-check-id="cap-inav-gps:cap:4"><span>Каждая аномалия в логе объяснена или исправлена</span></label></li></ul>
+        <h2>Rubric: how to tell “done” from “passed”</h2><p class="gc-muted">Check your work against each row. If it's closer to the left column, the project isn't ready yet.</p><div class="widget__table-wrap"><table class="rubric"><thead><tr><th>Criterion</th><th>Poor</th><th>Good</th></tr></thead><tbody><tr><th scope="row">Калибровка батареи</th><td class="rubric__bad">Напряжение «примерно совпадает»</td><td class="rubric__good">16.62 В на мультиметре против 16.58 В в OSD до калибровки, `vbat_scale` пересчитан, после — 16.61 В; мАч: 1312 в OSD против 1290 у зарядника (1.7 %)</td></tr><tr><th scope="row">Failsafe</th><td class="rubric__bad">Failsafe настроен, но не проверялся</td><td class="rubric__good">Пульт выключен на 2-й точке миссии, в логе: потеря RX через 0.3 с, RTH, посадка в 2.8 м от старта</td></tr><tr><th scope="row">Configuration</th><td class="rubric__bad">Скриншоты вкладок Configurator</td><td class="rubric__good">`diff all` в репозитории, комментарий к каждой строке, восстановлен на второй плате</td></tr></tbody></table></div>
+        
+        <h2>Track modules</h2>
+        <ol><li><a href="../m/inav-intro.html">Introduction to INAV</a></li><li><a href="../m/inav-gps.html">GPS, compass and RTH in INAV</a></li><li><a href="../m/inav-setup-scratch.html">INAV с нуля: GPS-квадрокоптер</a></li><li><a href="../m/inav-setup-wing.html">INAV с нуля: крыло</a></li><li><a href="../m/inav-missions.html">INAV missions: waypoints and CLI wp</a></li><li><a href="../m/inav-wing.html">Wing on INAV: mixer, auto launch, autotune</a></li><li><a href="../m/inav-ipf.html">INAV Programming Framework</a></li></ol>
+        <div class="gc-callout" data-state="caution"><strong>Safety.</strong> Everything you can do in SITL or without props, you do there. Real flights only after ground tests, with a verified failsafe.</div>
+      </div>
+      <div class="module-done"><gc-button variant="secondary" data-done-toggle="cap-inav-gps" data-done-label="passed" data-done-past="Passed">Mark as passed</gc-button></div>
+    </article>
+  </main>
+  <footer class="gc-container site-footer gc-muted">
+    <p>Open course · <a href="https://github.com/irreligious86/UAV-Education">source on GitHub</a> · <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">roadmap</a> · <a href="../../curriculum/curriculum.html">for developers</a> · CC BY-NC-SA 4.0</p>
+  </footer>
+</body>
+</html>

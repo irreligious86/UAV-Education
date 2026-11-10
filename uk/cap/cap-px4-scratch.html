@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="uk" data-theme="dark" data-lang="uk">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PX4 с нуля до миссии — UAV Student</title>
+  <meta name="description" content="Мультиротор на PX4, настроенный в QGroundControl с пустой платы: SITL-репетиция, матрица failsafe, миссия и разбор ULog">
+  <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
+  <link rel="manifest" href="../../manifest.webmanifest">
+  <meta name="theme-color" content="#0b0f14">
+  <link rel="alternate" hreflang="ru" href="../../cap/cap-px4-scratch.html">
+  <link rel="alternate" hreflang="uk" href="../../uk/cap/cap-px4-scratch.html">
+  <link rel="alternate" hreflang="en" href="../../en/cap/cap-px4-scratch.html">
+  <link rel="alternate" hreflang="uk-galych" href="../../gal/cap/cap-px4-scratch.html">
+  <script>/* go to the visitor's chosen language before anything paints (assets/i18n.js) */(function(){try{var c=localStorage.getItem('uav-lang'),h=document.documentElement.getAttribute('data-lang');if(!c||c===h||/[?&]lang=keep\b/.test(location.search))return;var l=document.querySelector('link[rel=alternate][hreflang="'+c+'"]');if(l)location.replace(l.href+location.search+location.hash)}catch(e){}})();</script>
+  <link rel="stylesheet" href="../../lib/ground-control-ui/dist/ground-control.css">
+  <link rel="stylesheet" href="../../assets/site.css">
+  <script src="../../lib/ground-control-ui/dist/ground-control.js" defer></script>
+  <script src="../../assets/i18n/uk.js"></script>
+  <script src="../../assets/i18n.js"></script>
+  <script src="../../assets/progress-store.js" defer></script>
+  <script src="../../assets/backend-config.js" defer></script>
+  <script src="../../assets/account.js" defer></script>
+  <script src="../../assets/grading.js" defer></script>
+  <script src="../../assets/app.js" defer></script>
+  <script src="../../assets/uav-quiz.js" defer></script>
+  <script src="../../assets/uav-tasks.js" defer></script>
+  <script src="../../assets/offline.js" defer></script>
+</head>
+<body class="gc-root" data-base="../" data-root="../../">
+  <header class="site-header">
+    <div class="gc-container site-header__inner">
+      <a class="site-brand" href="../index.html"><span class="site-brand__mark" aria-hidden="true">◆</span> UAV Student</a>
+      <nav class="gc-nav" aria-label="Розділи сайту">
+        <a href="../index.html" aria-current="page">Курс</a>
+        <a href="../ref/index.html">Довідник</a>
+        <a href="../pages/glossary.html">Глосарій</a>
+        <a href="../pages/fails.html">Фейли</a>
+        <a href="../pages/search.html">Пошук</a>
+        <a href="../pages/progress.html">Мій прогрес</a>
+      </nav>
+      <nav class="lang-switch" aria-label="Мова"><a class="gc-tag" href="../../cap/cap-px4-scratch.html" data-lang-to="ru" hreflang="ru" lang="ru" title="Русский">RU</a><a class="gc-tag" href="../../uk/cap/cap-px4-scratch.html" data-lang-to="uk" hreflang="uk" lang="uk" title="Українська" aria-current="true" data-state="ok">UK</a><a class="gc-tag" href="../../en/cap/cap-px4-scratch.html" data-lang-to="en" hreflang="en" lang="en" title="English">EN</a><a class="gc-tag" href="../../gal/cap/cap-px4-scratch.html" data-lang-to="uk-galych" hreflang="uk-galych" lang="uk-galych" title="Галицька (експеримент)">GAL</a></nav>
+    </div>
+  </header>
+  <main class="gc-container site-main">
+    <article class="module" data-module-page="cap-px4-scratch">
+      <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-px4">Електив: PX4</a><span>Підсумковий проєкт</span></p>
+      <h1 class="module-title">PX4 с нуля до миссии</h1>
+      <div class="module-tags"><span class="gc-tag">Підсумковий проєкт треку 1</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ЗДАНО</span></div>
+      <p class="module-lead">Результат: Мультиротор на PX4, настроенный в QGroundControl с пустой платы: SITL-репетиция, матрица failsafe, миссия и разбор ULog</p>
+      <div class="gc-prose module-body">
+        <h2>Що здати</h2>
+        <ul><li>SITL-репетиция (Gazebo или SIH): тот же airframe, та же геометрия моторов, миссия и все failsafe-сценарии</li><li>Файл параметров после настройки с комментариями к изменённым значениям</li><li>Матрица failsafe: потеря RC, потеря телеметрии, низкий заряд, выход за геозону — ожидаемое и наблюдаемое действие в SITL и на железе</li><li>Протокол Vehicle Setup: датчики, радио, Actuators (геометрия и тест моторов), питание (делитель напряжения и датчик тока против мультиметра)</li><li>ULog реального полёта и отчёт Flight Review: висение в Position, миссия, RTL</li><li>Если железа пока нет: полный SITL-комплект сейчас, аппаратная часть сдаётся позже по тем же критериям</li></ul>
+        <h2>Критерії приймання</h2>
+        <p class="gc-muted">Проєкт здано, коли виконано всі пункти. Позначай у міру готовності:</p>
+        <ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="cap-px4-scratch:cap:0"><span>Каждая строка матрицы failsafe проверена и подтверждена логом</span></label></li><li><label><input type="checkbox" data-check-id="cap-px4-scratch:cap:1"><span>Тест моторов совпадает с геометрией в Actuators: номер, позиция и направление каждого мотора</span></label></li><li><label><input type="checkbox" data-check-id="cap-px4-scratch:cap:2"><span>Напряжение в QGC отличается от мультиметра не больше чем на 0.05 В на банку</span></label></li><li><label><input type="checkbox" data-check-id="cap-px4-scratch:cap:3"><span>В отчёте Flight Review нет необъяснённых предупреждений; вибрация и отслеживание ориентации разобраны</span></label></li></ul>
+        <h2>Рубрика: як відрізнити зроблене від зданого</h2><p class="gc-muted">Перевір свою роботу за кожним рядком. Якщо вона ближча до лівої колонки — проєкт ще не готовий.</p><div class="widget__table-wrap"><table class="rubric"><thead><tr><th>Критерій</th><th>Погано</th><th>Добре</th></tr></thead><tbody><tr><th scope="row">Failsafe</th><td class="rubric__bad">Параметры выставлены по умолчанию</td><td class="rubric__good">Матрица из 4 сценариев: в SITL через команду failure, на железе — выключенный пульт и низкий заряд; у каждого время срабатывания из ULog</td></tr><tr><th scope="row">Actuators</th><td class="rubric__bad">«Моторы крутятся»</td><td class="rubric__good">Таблица: мотор 1 — передний правый, CCW, совпадает с CA_ROTOR0_*; проверено без пропеллеров</td></tr><tr><th scope="row">Разбор лога</th><td class="rubric__bad">Ссылка на Flight Review без выводов</td><td class="rubric__good">Газ висения 0.38, вибрация в норме, перерегулирование по крену 12 %; два вывода и одно изменение параметров</td></tr></tbody></table></div>
+        
+        <h2>Модулі треку</h2>
+        <ol><li><a href="../m/px4-intro.html">Вступ до PX4</a></li><li><a href="../m/px4-setup-scratch.html">PX4 с нуля: Vehicle Setup в QGroundControl</a></li><li><a href="../m/px4-architecture.html">Архітектура PX4: модулі та uORB</a></li><li><a href="../m/px4-control.html">Контури керування та тюнінг PX4</a></li><li><a href="../m/px4-ros2.html">PX4 і ROS 2: uXRCE-DDS та offboard</a></li><li><a href="../m/px4-companion-jetson.html">PX4 + Jetson Orin: companion по UART, MAVLink і uXRCE-DDS</a></li></ol>
+        <div class="gc-callout" data-state="caution"><strong>Безпека.</strong> Усе, що можна зробити в SITL або без пропів, робиться там. Реальний політ — тільки після наземних тестів, з перевіреним failsafe.</div>
+      </div>
+      <div class="module-done"><gc-button variant="secondary" data-done-toggle="cap-px4-scratch" data-done-label="зданий" data-done-past="Складено">Позначити як зданий</gc-button></div>
+    </article>
+  </main>
+  <footer class="gc-container site-footer gc-muted">
+    <p>Відкритий курс · <a href="https://github.com/irreligious86/UAV-Education">вихідний код на GitHub</a> · <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">план розвитку</a> · <a href="../../curriculum/curriculum.html">для розробника</a> · CC BY-NC-SA 4.0</p>
+  </footer>
+</body>
+</html>

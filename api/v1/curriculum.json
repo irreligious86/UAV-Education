@@ -40,6 +40,12 @@
           ]
         },
         {
+          "title": "Настройка с нуля",
+          "modules": [
+            "bf-setup-scratch"
+          ]
+        },
+        {
           "title": "Электроника и радио",
           "modules": [
             "el-power-design",
@@ -105,7 +111,9 @@
             "eng-method-101",
             "link-protocols",
             "link-elrs",
-            "rf-antennas"
+            "rf-antennas",
+            "f-motors-esc",
+            "link-vtx"
           ]
         },
         {
@@ -120,6 +128,8 @@
           "modules": [
             "inav-intro",
             "inav-gps",
+            "inav-setup-scratch",
+            "inav-setup-wing",
             "inav-missions",
             "inav-wing",
             "inav-ipf",
@@ -161,6 +171,12 @@
             "ap-missions",
             "ap-lua",
             "diag-troubleshooting"
+          ]
+        },
+        {
+          "title": "Настройка с нуля",
+          "modules": [
+            "ap-setup-scratch"
           ]
         },
         {
@@ -271,7 +287,12 @@
             "est-sensors",
             "est-attitude",
             "comp-intro",
-            "comp-mavlink"
+            "comp-mavlink",
+            "f-power",
+            "f-motors-esc",
+            "f-regulations",
+            "link-protocols",
+            "link-elrs"
           ]
         },
         {
@@ -286,6 +307,7 @@
           "title": "PX4",
           "modules": [
             "px4-intro",
+            "px4-setup-scratch",
             "px4-architecture",
             "px4-control",
             "ctl-allocation",
@@ -921,6 +943,32 @@
             ]
           },
           "url": "m/link-vtx.html"
+        },
+        {
+          "id": "bf-setup-scratch",
+          "title": "Betaflight с нуля: от пустой платы до первого висения",
+          "level": "L2",
+          "hours": 7,
+          "status": "published",
+          "prerequisites": [
+            "bf-intro",
+            "bf-ports"
+          ],
+          "objectives": [
+            "настроить Betaflight 4.5 по 17 шагам, проверяя конфиг и failsafe в SITL",
+            "откалибровать vbat_scale, ibata_offset и ibata_scale по мультиметру и зарядному",
+            "проверить порядок и направление моторов и провести первое висение с критериями прерывания"
+          ],
+          "lab": {
+            "title": "5″ квадрокоптер с нуля: SITL, стол, первое висение",
+            "criteria": [
+              "SITL: diff all с aux ARM/ANGLE/FAILSAFE, лог арма и failsafe по тумблеру, восстановление diff проверено",
+              "Порядок и направление моторов соответствуют QUADX, таблица каналов заполнена, PWM-ESC откалиброваны",
+              "Ошибка напряжения < 0.05 В на банку в двух точках, мА·ч FC в пределах 5 % от зарядного",
+              "Stage 2 failsafe записан; Blackbox 60-секундного висения и diff all с реального аппарата сданы"
+            ]
+          },
+          "url": "m/bf-setup-scratch.html"
         },
         {
           "id": "link-digital-video",
@@ -2186,6 +2234,33 @@
           "url": "m/ap-sitl.html"
         },
         {
+          "id": "ap-setup-scratch",
+          "title": "ArduPilot с нуля: Copter через Mission Planner / QGC",
+          "level": "L2",
+          "hours": 7,
+          "status": "published",
+          "prerequisites": [
+            "ap-sitl",
+            "link-elrs",
+            "f-motors-esc"
+          ],
+          "objectives": [
+            "настроить ArduCopter 4.6 от прошивки до первого висения по 17 шагам",
+            "откалибровать датчик АКБ, моторы и радио по формулам прошивки",
+            "проверить failsafe и сохранить .param и лог"
+          ],
+          "lab": {
+            "title": "Квадрокоптер с нуля: SITL, затем стол и поле",
+            "criteria": [
+              "SITL: .param до и после сохранены и сравнены, таблица Motor Test A→1, B→4, C→2, D→3 записана",
+              "SITL: BATT_VOLT_MULT посчитан и проверен, в логе ERR Subsys 5 и 6 с переходом в RTL, MOT_THST_HOVER 0.2–0.5",
+              "Железо: .param и .BIN первого висения Stabilize → AltHold → Loiter, MOT_THST_HOVER 0.2–0.5, VIBE p95 < 30 м/с² без клиппинга",
+              "Железо: RC- и battery-failsafe в логе, напряжение < 0.02 В/банка, мА·ч в пределах 5 % от зарядки"
+            ]
+          },
+          "url": "m/ap-setup-scratch.html"
+        },
+        {
           "id": "tools-gazebo",
           "title": "Симуляция в Gazebo: миры, датчики, камера в ROS 2 и сценарные тесты",
           "level": "L3",
@@ -3262,7 +3337,43 @@
       "title": "Электив: INAV",
       "level": null,
       "goal": null,
-      "capstone": null,
+      "capstone": {
+        "id": "cap-inav-gps",
+        "title": "INAV-аппарат с нуля",
+        "result": "Квадрокоптер или крыло на INAV, настроенный с пустой платы: миссия из 5 точек и проверенный failsafe с возвратом домой",
+        "deliverables": [
+          "Выбор платформы (квадрокоптер или крыло) и паспорт сборки: вес, моторы, АКБ, расчётное время полёта",
+          "Конфигурация `diff all` до и после настройки, с комментариями к каждому изменённому параметру",
+          "Протокол калибровок: напряжение и ток против мультиметра и зарядника, компас, акселерометр (крыло: центровка, расходы рулей)",
+          "SITL-репетиция настройки: `diff all`, флаги арминга, восстановление конфигурации на чистой плате; полёт и RTH в SITL — по желанию (нужен RealFlight или X-Plane)",
+          "Лог реального полёта: удержание позиции, миссия из 5 точек, failsafe по выключенному пульту с возвратом домой",
+          "Карточка настройки на одну страницу под свой аппарат"
+        ],
+        "criteria": [
+          "Конфигурация восстанавливается из `diff all` на чистой плате без ручных правок",
+          "Ошибка напряжения меньше 0.05 В на банку, израсходованные мАч в пределах 5 % от зарядника",
+          "Failsafe проверен: в логе видны потеря сигнала, переход в RTH и посадка или кружение над домом",
+          "Посадка по RTH в пределах 5 м от точки старта (крыло: кружение над домом на заданной высоте)",
+          "Каждая аномалия в логе объяснена или исправлена"
+        ],
+        "rubric": [
+          {
+            "criterion": "Калибровка батареи",
+            "bad": "Напряжение «примерно совпадает»",
+            "good": "16.62 В на мультиметре против 16.58 В в OSD до калибровки, `vbat_scale` пересчитан, после — 16.61 В; мАч: 1312 в OSD против 1290 у зарядника (1.7 %)"
+          },
+          {
+            "criterion": "Failsafe",
+            "bad": "Failsafe настроен, но не проверялся",
+            "good": "Пульт выключен на 2-й точке миссии, в логе: потеря RX через 0.3 с, RTH, посадка в 2.8 м от старта"
+          },
+          {
+            "criterion": "Конфигурация",
+            "bad": "Скриншоты вкладок Configurator",
+            "good": "`diff all` в репозитории, комментарий к каждой строке, восстановлен на второй плате"
+          }
+        ]
+      },
       "modules": [
         {
           "id": "inav-intro",
@@ -3307,6 +3418,60 @@
             ]
           },
           "url": "m/inav-gps.html"
+        },
+        {
+          "id": "inav-setup-scratch",
+          "title": "INAV с нуля: GPS-квадрокоптер",
+          "level": "L2",
+          "hours": 7,
+          "status": "published",
+          "prerequisites": [
+            "inav-intro",
+            "inav-gps",
+            "link-elrs",
+            "f-motors-esc"
+          ],
+          "objectives": [
+            "настроить GPS-квадрокоптер INAV от пустой платы по 17 шагам, проверив конфигурацию в SITL",
+            "откалибровать vbat_scale, current_meter_scale и current_meter_offset по формулам из исходника",
+            "проверить failsafe → RTH, провести первое висение по критериям прерывания и сохранить diff all"
+          ],
+          "lab": {
+            "title": "INAV-квадрокоптер от SITL до первого RTH",
+            "criteria": [
+              "SITL: diff all с Quad X, aux ARM/ANGLE/POSHOLD/RTH, failsafe_procedure = RTH и рассчитанными калибровками; флаг RX при остановке RC; восстановление diff проверено",
+              "Железо: таблица каналов, порядок и вращение моторов совпадают с Quad X; ошибка напряжения < 50 мВ/банку, мА·ч в пределах 5 % от зарядного",
+              "Blackbox 60-секундного висения, nav_mc_hover_thr взят из лога",
+              "RTH со 100 м садится в пределах 5 м от дома (3 м в SITL с RealFlight); failsafe → RTH записан; сдан diff all с аппарата"
+            ]
+          },
+          "url": "m/inav-setup-scratch.html"
+        },
+        {
+          "id": "inav-setup-wing",
+          "title": "INAV с нуля: крыло",
+          "level": "L2",
+          "hours": 7,
+          "status": "published",
+          "prerequisites": [
+            "inav-intro",
+            "aero-wing"
+          ],
+          "objectives": [
+            "настроить крыло в INAV от пустой платы: миксер, сервы, мотор, батарею, failsafe и RTH",
+            "проверить направления и расходы рулей, центровку и автозапуск до первого броска",
+            "выполнить первый бросок, autotrim и autotune и сохранить diff all с логами"
+          ],
+          "lab": {
+            "title": "Крыло INAV: от пустой платы до RTH с кружением",
+            "criteria": [
+              "SITL: diff all с AIRPLANE, smix, failsafe RTH, failsafe_throttle_low_delay = 0, nav_rth_allow_landing = NEVER и автозапуском; ЦТ и расходы посчитаны",
+              "Таблица теста серв заполнена, ЦТ в расчётном диапазоне 15–20 % MAC",
+              "Батарея: ошибка < 0.05 В/банку, мА·ч в пределах 5 % от зарядки; failsafe проверен на столе",
+              "Логи первого броска с автозапуском и RTH с кружением, итоговый diff all после autotune/autotrim"
+            ]
+          },
+          "url": "m/inav-setup-wing.html"
         },
         {
           "id": "inav-missions",
@@ -3385,7 +3550,42 @@
       "title": "Электив: PX4",
       "level": null,
       "goal": null,
-      "capstone": null,
+      "capstone": {
+        "id": "cap-px4-scratch",
+        "title": "PX4 с нуля до миссии",
+        "result": "Мультиротор на PX4, настроенный в QGroundControl с пустой платы: SITL-репетиция, матрица failsafe, миссия и разбор ULog",
+        "deliverables": [
+          "SITL-репетиция (Gazebo или SIH): тот же airframe, та же геометрия моторов, миссия и все failsafe-сценарии",
+          "Файл параметров после настройки с комментариями к изменённым значениям",
+          "Матрица failsafe: потеря RC, потеря телеметрии, низкий заряд, выход за геозону — ожидаемое и наблюдаемое действие в SITL и на железе",
+          "Протокол Vehicle Setup: датчики, радио, Actuators (геометрия и тест моторов), питание (делитель напряжения и датчик тока против мультиметра)",
+          "ULog реального полёта и отчёт Flight Review: висение в Position, миссия, RTL",
+          "Если железа пока нет: полный SITL-комплект сейчас, аппаратная часть сдаётся позже по тем же критериям"
+        ],
+        "criteria": [
+          "Каждая строка матрицы failsafe проверена и подтверждена логом",
+          "Тест моторов совпадает с геометрией в Actuators: номер, позиция и направление каждого мотора",
+          "Напряжение в QGC отличается от мультиметра не больше чем на 0.05 В на банку",
+          "В отчёте Flight Review нет необъяснённых предупреждений; вибрация и отслеживание ориентации разобраны"
+        ],
+        "rubric": [
+          {
+            "criterion": "Failsafe",
+            "bad": "Параметры выставлены по умолчанию",
+            "good": "Матрица из 4 сценариев: в SITL через команду failure, на железе — выключенный пульт и низкий заряд; у каждого время срабатывания из ULog"
+          },
+          {
+            "criterion": "Actuators",
+            "bad": "«Моторы крутятся»",
+            "good": "Таблица: мотор 1 — передний правый, CCW, совпадает с CA_ROTOR0_*; проверено без пропеллеров"
+          },
+          {
+            "criterion": "Разбор лога",
+            "bad": "Ссылка на Flight Review без выводов",
+            "good": "Газ висения 0.38, вибрация в норме, перерегулирование по крену 12 %; два вывода и одно изменение параметров"
+          }
+        ]
+      },
       "modules": [
         {
           "id": "px4-intro",
@@ -3407,6 +3607,33 @@
             ]
           },
           "url": "m/px4-intro.html"
+        },
+        {
+          "id": "px4-setup-scratch",
+          "title": "PX4 с нуля: Vehicle Setup в QGroundControl",
+          "level": "L2",
+          "hours": 7,
+          "status": "published",
+          "prerequisites": [
+            "px4-intro",
+            "f-motors-esc",
+            "link-elrs"
+          ],
+          "objectives": [
+            "настроить порты, вход CRSF, Actuators и питание PX4 по шагам",
+            "проверить failsafe RC loss и low battery инъекцией в SITL",
+            "откалибровать BAT1_V_DIV и BAT1_A_PER_V и записать первое висение"
+          ],
+          "lab": {
+            "title": "От пустого полётника до висения в Position",
+            "criteria": [
+              "SITL: таблица моторов совпадает с CA_ROTOR*, HTE совпал с 1/(T/W) в пределах 0.01",
+              "SITL: цепочки RC loss и battery failsafe записаны с временами, autotune до/после",
+              "Железо: .params экспортирован, тест моторов по геометрии, ошибка напряжения < 0.05 В/эл, мА·ч в пределах 5 %",
+              "Железо: RC loss и low battery в ULog, отчёт Flight Review 60-секундного висения"
+            ]
+          },
+          "url": "m/px4-setup-scratch.html"
         },
         {
           "id": "px4-architecture",

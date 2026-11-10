@@ -980,6 +980,81 @@
       "term": "Десатурация миксера",
       "def": "Сдвиг команд моторов вдоль вектора одной оси, чтобы вернуть их в диапазон 0…1. Порядок задаёт приоритет: в PX4 тяга, затем крен/тангаж, рыскание режется первым; airmode разрешает поднимать тягу ради управления.",
       "module": "ctl-allocation"
+    },
+    {
+      "term": "vbat_scale / ibata_scale",
+      "def": "Коэффициенты датчиков напряжения и тока Betaflight. Напряжение прямо пропорционально vbat_scale (new = old × V_мультиметр / V_FC), ток обратно пропорционален ibata_scale в мВ на 10 А (new = old × мА·ч_FC / мА·ч_зарядки).",
+      "module": "bf-setup-scratch"
+    },
+    {
+      "term": "motor_output_reordering",
+      "def": "Массив Betaflight 4.5: мотор миксера i выводится на пад MOTOR с индексом reordering[i]. Исправляет порядок моторов без перепайки и без ремаппинга таймеров; его пишет диалог Reorder motors.",
+      "module": "bf-setup-scratch"
+    },
+    {
+      "term": "Первое висение (maiden hover)",
+      "def": "Первый подъём собранного аппарата на 1–1.5 м на 60 с в ANGLE с записью Blackbox и заранее заданными критериями прерывания: переворот при отрыве, осцилляции, газ висения вне 12–60 %, горячие моторы.",
+      "module": "bf-setup-scratch"
+    },
+    {
+      "term": "vbat_scale (INAV)",
+      "def": "Коэффициент делителя напряжения в INAV (1100 = делитель 11:1 × 100). Показания прямо пропорциональны ему: new = old × V_мультиметр / V_INAV.",
+      "module": "inav-setup-scratch"
+    },
+    {
+      "term": "current_meter_offset",
+      "def": "Смещение нуля датчика тока в INAV; по исходнику в единицах 0.1 мВ, убирает из показаний offset/scale ампер. Калибруется по току покоя: new = old + (I_INAV − I_амперметр) × scale.",
+      "module": "inav-setup-scratch"
+    },
+    {
+      "term": "MSP RX",
+      "def": "Приём RC-каналов по протоколу MSP (MSP_SET_RAW_RC) вместо радиоприёмника; в INAV SITL — способ подать стики скриптом или с наземной станции (receiver_type = MSP).",
+      "module": "inav-setup-scratch"
+    },
+    {
+      "term": "Servo autotrim",
+      "def": "Автоматическая подстройка центров серв (servo mid) в ровном полёте: INAV усредняет отклонение рулей и сохраняет новые центры при дизарме. Режим SERVO AUTOTRIM или feature FW_AUTOTRIM.",
+      "module": "inav-setup-wing"
+    },
+    {
+      "term": "Расход руля",
+      "def": "Угол отклонения поверхности управления от нейтрали при полном стике. На крыле измеряется линейкой по задней кромке: h = c·sin δ.",
+      "module": "inav-setup-wing"
+    },
+    {
+      "term": "Loiter (кружение)",
+      "def": "Полёт крыла по кругу заданного радиуса вокруг точки вместо висения. Нужный крен: tan φ = V²/(g·R), он ограничен nav_fw_bank_angle.",
+      "module": "inav-setup-wing"
+    },
+    {
+      "term": "Загрузчик ArduPilot (.apj / _with_bl.hex)",
+      "def": "Маленькая программа в начале флеша, которая принимает новую прошивку по USB. Первый раз её пишут вместе с прошивкой файлом _with_bl.hex через DFU; дальше обновляют файлом .apj из Mission Planner или QGroundControl.",
+      "module": "ap-setup-scratch"
+    },
+    {
+      "term": "MOT_SPIN_ARM / MOT_SPIN_MIN",
+      "def": "Доли выхода на моторы в ArduCopter: SPIN_ARM — обороты сразу после арма, SPIN_MIN — нижняя граница управляемой тяги (не меньше SPIN_ARM + 0.03). Подбираются по порогу трогания в Motor Test.",
+      "module": "ap-setup-scratch"
+    },
+    {
+      "term": "MOT_THST_HOVER",
+      "def": "Тяга висения ArduCopter в долях от максимальной (≈ 1/(T/W)); обучается в полёте при MOT_HOVER_LEARN = 2. Рабочий диапазон 0.2–0.5.",
+      "module": "ap-setup-scratch"
+    },
+    {
+      "term": "ULog",
+      "def": "Формат бортового лога PX4 (.ulg): записывает выбранные топики uORB с временными метками, параметры и сообщения; разбирается Flight Review или pyulog.",
+      "module": "px4-setup-scratch"
+    },
+    {
+      "term": "SIH (Simulation-In-Hardware)",
+      "def": "Встроенный в PX4 упрощённый симулятор физики: модель считается внутри прошивки (на ПК как SITL или на самом полётнике), без Gazebo и без внешнего визуализатора.",
+      "module": "px4-setup-scratch"
+    },
+    {
+      "term": "Control allocation (CA_*)",
+      "def": "Блок PX4, который раскладывает требуемые моменты и тягу по исполнителям по заданной геометрии: CA_ROTOR_COUNT, позиции CA_ROTORn_PX/PY и направление вращения CA_ROTORn_KM.",
+      "module": "px4-setup-scratch"
     }
   ]
 }
