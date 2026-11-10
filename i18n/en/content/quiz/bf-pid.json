@@ -1,0 +1,118 @@
+{
+  "module": "bf-pid",
+  "pass": 80,
+  "questions": [
+    {
+      "q": "What do you tune before PID?",
+      "options": [
+        "Rates",
+        "Filters",
+        "Stick rates",
+        "VTX"
+      ],
+      "answer": 1,
+      "explain": "PID amplifies everything from the gyro, noise included. A clean spectrum comes first."
+    },
+    {
+      "q": "What is bounce-back?",
+      "options": [
+        "Propwash",
+        "Rollback after the stick stops",
+        "Motor noise",
+        "Entry lag after the stick"
+      ],
+      "answer": 1,
+      "explain": "Measured as the opposite-sign peak within 150 ms after the stop / maneuver amplitude."
+    },
+    {
+      "q": "Why use the median over maneuvers for metrics rather than the mean?",
+      "options": [
+        "It's faster to compute",
+        "An outlier doesn't ruin the estimate",
+        "The mean isn't available in Blackbox Explorer",
+        "That's just the convention"
+      ],
+      "answer": 1,
+      "explain": "The median is robust to outliers."
+    },
+    {
+      "q": "In the case study, the SHARP profile gave 7 ms less entry lag. At what price?",
+      "options": [
+        "Loss of link at the edge of range",
+        "Motor noise +45 %",
+        "No price",
+        "Worse propwash"
+      ],
+      "answer": 1,
+      "explain": "Raising P raises the gain at all frequencies, including residual noise."
+    },
+    {
+      "q": "Why didn't the WASH profile (more D) reduce propwash on a 1.4 kg 7\"?",
+      "options": [
+        "Not enough throttle to execute D",
+        "Propwash here is aerodynamic",
+        "D doesn't work",
+        "The gyro is broken"
+      ],
+      "answer": 1,
+      "explain": "The numbers: RMS 0.97 of the control — within measurement noise."
+    },
+    {
+      "q": "How was crispness eventually brought back without more noise?",
+      "options": [
+        "Removed the RPM filter to gain phase",
+        "Reduced filter delay",
+        "Raised FF",
+        "Raised P"
+      ],
+      "answer": 1,
+      "explain": "The CRISP profile: gyro multiplier 1.10, notch Q 450 — same PID, less phase delay."
+    },
+    {
+      "q": "Two “identical” drones gave different bounce-back. The lesson?",
+      "options": [
+        "The drones are just different",
+        "Compare within one flight",
+        "The metric is broken and unfit for comparison",
+        "You need a third drone"
+      ],
+      "answer": 1,
+      "explain": "Compare profiles within a single flight or normalize to the amplitude: the pilot flew harder on one, and D-max had time to kick in."
+    },
+    {
+      "q": "How many changes are allowed per tuning flight?",
+      "options": [
+        "As many as you like",
+        "One",
+        "Two",
+        "Three"
+      ],
+      "answer": 1,
+      "explain": "Otherwise the log can't be interpreted."
+    },
+    {
+      "q": "bounce-back of 20% on a 5\" is:",
+      "options": [
+        "A good result",
+        "Tolerable for a 5\"",
+        "A problem: D/delay",
+        "Normal for a 7\" on big props"
+      ],
+      "answer": 2,
+      "explain": "Good < 8%, tolerable 8–15%."
+    },
+    {
+      "q": "A pilot complains about “jitter” in hover. What does this fragment of grader output tell you?",
+      "kind": "apply",
+      "fragment": "[PASS] tracking roll tracking error: 0.12 (limit <= 0.25)\n[FAIL] tracking roll rate with centred sticks: 14.6 (limit <= 6.0 deg/s)\n[FAIL] tracking pitch rate with centred sticks: 14.1 (limit <= 6.0 deg/s)\n[PASS] filters  roll noise after filters: 2.1",
+      "options": [
+        "Tracking and noise are fine, but a wobble remains in hover — the loop is on the edge, check P relative to D",
+        "Motor noise gets through the filters and shakes the aircraft — lower the gyro LPF frequencies",
+        "The motors saturate in hover, so the loop has no headroom left for stabilization",
+        "There's no eRPM telemetry, so the RPM filter is off, and the hover jitter comes from motor harmonics"
+      ],
+      "answer": 0,
+      "explain": "Tracking and noise are fine, but movement remains in hover — a sign of loop oscillation, not noise."
+    }
+  ]
+}

@@ -1,0 +1,107 @@
+{
+  "module": "ap-missions",
+  "pass": 80,
+  "questions": [
+    {
+      "q": "How do NAV commands differ from DO commands?",
+      "options": [
+        "DO only work on planes and in Rover",
+        "NAV is where to fly, DO is what to do",
+        "They don't — they're synonyms",
+        "NAV is used only for takeoff"
+      ],
+      "answer": 1,
+      "explain": "NAV sets where to fly; DO is what to do along the way without changing the route. The mission goes from NAV to NAV."
+    },
+    {
+      "q": "Which altitude frame do you need for a regular mission?",
+      "options": [
+        "Absolute above sea level",
+        "Relative to home",
+        "Always above terrain",
+        "Any will do"
+      ],
+      "answer": 1,
+      "explain": "Absolute altitude easily produces an error of hundreds of meters."
+    },
+    {
+      "q": "Where is home for Copter?",
+      "options": [
+        "Where the pilot stands",
+        "Where the aircraft armed",
+        "Where the ground control station is",
+        "The first mission waypoint"
+      ],
+      "answer": 1,
+      "explain": "After relocating, home stays at the old spot — reset it before takeoff."
+    },
+    {
+      "q": "How is a mission uploaded over MAVLink?",
+      "options": [
+        "As a file over a UART port",
+        "The aircraft requests waypoints by index",
+        "Through a set of parameters",
+        "In one big MISSION_ITEM_LIST packet"
+      ],
+      "answer": 1,
+      "explain": "MISSION_COUNT → MISSION_REQUEST(_INT) requests → replies → MISSION_ACK."
+    },
+    {
+      "q": "The code of MAV_CMD_NAV_WAYPOINT?",
+      "options": [
+        "16",
+        "22",
+        "20",
+        "21"
+      ],
+      "answer": 0,
+      "explain": "16 — WAYPOINT, 22 — TAKEOFF, 20 — RTL, 21 — LAND."
+    },
+    {
+      "q": "What does MIS_RESTART do?",
+      "options": [
+        "Restarts the controller",
+        "Starts from the first command when entering AUTO",
+        "Moves the home point",
+        "Deletes the mission after the flight ends"
+      ],
+      "answer": 1,
+      "explain": "By default the mission continues from the current command."
+    },
+    {
+      "q": "Which altitude frame is safe when you change sites?",
+      "options": [
+        "Altitude in feet",
+        "Above home or above terrain",
+        "Any, there's no difference",
+        "Absolute above sea level from GPS"
+      ],
+      "answer": 1,
+      "explain": "Absolute altitudes are a classic crash."
+    },
+    {
+      "q": "DO_SET_CAM_TRIGG_DIST is used for:",
+      "options": [
+        "Precision landing on a marker using the camera",
+        "Taking a shot every N meters",
+        "Changing speed",
+        "Enabling the geofence"
+      ],
+      "answer": 1,
+      "explain": "At the end of the mission — DIST 0."
+    },
+    {
+      "q": "A copter mission is uploaded, but from the ground in Auto the aircraft doesn't take off as expected. What's wrong in the first items?",
+      "kind": "apply",
+      "fragment": "seq cmd                  frame          alt\n0   HOME                 GLOBAL         0\n1   NAV_WAYPOINT         RELATIVE_ALT   20\n2   NAV_WAYPOINT         RELATIVE_ALT   20\n3   NAV_RETURN_TO_LAUNCH",
+      "options": [
+        "There's no NAV_TAKEOFF: a copter mission starting from the ground must begin with a takeoff command",
+        "Items 1 and 2 have the same altitude, and in Auto a copter requires an altitude change between adjacent mission waypoints",
+        "RELATIVE_ALT can't be mixed with HOME in GLOBAL: you need a single frame in all items",
+        "NAV_RETURN_TO_LAUNCH at the end is forbidden: a mission must end with NAV_LAND"
+      ],
+      "answer": 0,
+      "explain": "The first navigation item when starting from the ground is TAKEOFF; that way the behavior is unambiguous."
+    }
+  ]
+}

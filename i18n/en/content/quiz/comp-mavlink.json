@@ -1,0 +1,94 @@
+{
+  "module": "comp-mavlink",
+  "pass": 80,
+  "questions": [
+    {
+      "q": "What is a heartbeat?",
+      "options": [
+        "The arm command",
+        "A once-a-second “I'm alive”",
+        "A GPS position packet once a second",
+        "A reply to a command"
+      ],
+      "answer": 1,
+      "explain": "A message once a second from every participant: type, mode, arm. No heartbeat, no link."
+    },
+    {
+      "q": "How do you know a command was executed?",
+      "options": [
+        "Just wait",
+        "By COMMAND_ACK",
+        "By the heartbeat",
+        "Only by STATUSTEXT"
+      ],
+      "answer": 1,
+      "explain": "MAV_RESULT_ACCEPTED (0) means accepted; anything else is a refusal."
+    },
+    {
+      "q": "The message ID of GLOBAL_POSITION_INT?",
+      "options": [
+        "30",
+        "33",
+        "65",
+        "1"
+      ],
+      "answer": 1,
+      "explain": "0 — HEARTBEAT, 1 — SYS_STATUS, 30 — ATTITUDE, 33 — GLOBAL_POSITION_INT."
+    },
+    {
+      "q": "How do you request ATTITUDE at 10 Hz?",
+      "options": [
+        "It can't be done",
+        "SET_MESSAGE_INTERVAL 100000",
+        "Via the SR2_EXTRA1 parameter over MAVLink",
+        "Via PARAM_SET"
+      ],
+      "answer": 1,
+      "explain": "The interval is in microseconds."
+    },
+    {
+      "q": "system_id and component_id are…",
+      "options": [
+        "The protocol version",
+        "The vehicle and its component",
+        "The port and the baud rate",
+        "The radio channel and band"
+      ],
+      "answer": 1,
+      "explain": "The companion is a separate component of the same system."
+    },
+    {
+      "q": "When should you use MAVSDK instead of pymavlink?",
+      "options": [
+        "Only with PX4, ArduPilot isn't supported",
+        "For applications built on actions",
+        "Never",
+        "Always"
+      ],
+      "answer": 1,
+      "explain": "MAVSDK offers high-level arm()/takeoff() for applications; pymavlink is for learning and non-standard things."
+    },
+    {
+      "q": "The MAVLink 2 start byte:",
+      "options": [
+        "0xFE",
+        "0xFD",
+        "0xC8",
+        "0x0F"
+      ],
+      "answer": 1,
+      "explain": "0xFE is MAVLink 1."
+    },
+    {
+      "q": "What is CRC_EXTRA for?",
+      "options": [
+        "For speed",
+        "Checking that the dialects match",
+        "For compression",
+        "For signing and spoofing protection"
+      ],
+      "answer": 1,
+      "explain": "A mismatch means “silence”."
+    }
+  ]
+}

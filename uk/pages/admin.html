@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Администрация — UAV Student</title>
-  <meta name="description" content="Инженерный курс по БПЛА: от физики полёта до своих прошивок и бортовых компьютеров.">
+  <title>Адміністрація — UAV Student</title>
+  <meta name="description" content="Інженерний курс з БпЛА: від фізики польоту до власних прошивок і бортових комп&#x27;ютерів.">
   <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
   <link rel="manifest" href="../../manifest.webmanifest">
   <meta name="theme-color" content="#0b0f14">
@@ -31,69 +31,69 @@
   <header class="site-header">
     <div class="gc-container site-header__inner">
       <a class="site-brand" href="../index.html"><span class="site-brand__mark" aria-hidden="true">◆</span> UAV Student</a>
-      <nav class="gc-nav" aria-label="Разделы сайта">
+      <nav class="gc-nav" aria-label="Розділи сайту">
         <a href="../index.html">Курс</a>
-        <a href="../ref/index.html">Справочник</a>
-        <a href="../pages/glossary.html">Глоссарий</a>
-        <a href="../pages/fails.html">Фейлы</a>
-        <a href="../pages/search.html">Поиск</a>
-        <a href="../pages/progress.html" aria-current="page">Мой прогресс</a>
+        <a href="../ref/index.html">Довідник</a>
+        <a href="../pages/glossary.html">Глосарій</a>
+        <a href="../pages/fails.html">Фейли</a>
+        <a href="../pages/search.html">Пошук</a>
+        <a href="../pages/progress.html" aria-current="page">Мій прогрес</a>
       </nav>
-      <nav class="lang-switch" aria-label="Язык"><a class="gc-tag" href="../../pages/admin.html" data-lang-to="ru" hreflang="ru" lang="ru" title="Русский">RU</a><a class="gc-tag" href="../../uk/pages/admin.html" data-lang-to="uk" hreflang="uk" lang="uk" title="Українська" aria-current="true" data-state="ok">UK</a><a class="gc-tag" href="../../en/pages/admin.html" data-lang-to="en" hreflang="en" lang="en" title="English">EN</a></nav>
+      <nav class="lang-switch" aria-label="Мова"><a class="gc-tag" href="../../pages/admin.html" data-lang-to="ru" hreflang="ru" lang="ru" title="Русский">RU</a><a class="gc-tag" href="../../uk/pages/admin.html" data-lang-to="uk" hreflang="uk" lang="uk" title="Українська" aria-current="true" data-state="ok">UK</a><a class="gc-tag" href="../../en/pages/admin.html" data-lang-to="en" hreflang="en" lang="en" title="English">EN</a></nav>
     </div>
   </header>
   <main class="gc-container site-main">
-    <h1 class="gc-display">Администрация</h1>
+    <h1 class="gc-display">Адміністрація</h1>
     <section class="gc-panel" data-adm="off">
-      <p class="gc-muted">Страница для администрации курса. Нужен вход с ролью admin или superadmin — <a href="account.html">аккаунт</a>.</p>
+      <p class="gc-muted">Сторінка для адміністрації курсу. Потрібен вхід з роллю admin або superadmin — <a href="account.html">акаунт</a>.</p>
     </section>
     <section data-adm="on" hidden>
       <div class="gc-panel">
-        <p class="gc-label gc-muted">Студенты</p>
+        <p class="gc-label gc-muted">Студенти</p>
         <div class="progress-actions">
-          <input type="search" class="adm-filter" placeholder="поиск по имени или почте" data-adm-filter>
-          <select class="adm-filter adm-cohort" data-adm-cohort aria-label="Группа"><option value="">все группы</option></select>
+          <input type="search" class="adm-filter" placeholder="пошук за ім'ям або поштою" data-adm-filter>
+          <select class="adm-filter adm-cohort" data-adm-cohort aria-label="Група"><option value="">усі групи</option></select>
           <gc-button variant="secondary" data-adm-csv>CSV</gc-button>
-          <gc-button variant="secondary" data-adm-reload>Обновить</gc-button>
+          <gc-button variant="secondary" data-adm-reload>Оновити</gc-button>
         </div>
         <div class="md-table-wrap"><table class="md-table adm-table">
-          <thead><tr><th>Имя</th><th>Почта</th><th>Роль</th><th>Группы</th><th>Освоено</th><th>Балл</th><th>Активность</th></tr></thead>
+          <thead><tr><th>Ім'я</th><th>Пошта</th><th>Роль</th><th>Групи</th><th>Опановано</th><th>Бал</th><th>Активність</th></tr></thead>
           <tbody data-adm-rows></tbody>
         </table></div>
-        <p class="gc-muted">Баллы считает браузер студента (квизы и задачи проверяются на его стороне): это видимость работы, а не экзамен — <code>docs/MULTIUSER-PLAN.md</code>, раздел 6.</p>
+        <p class="gc-muted">Бали рахує браузер студента (квізи й задачі перевіряються на його боці): це видимість роботи, а не іспит — <code>docs/MULTIUSER-PLAN.md</code>, розділ 6.</p>
       </div>
       <div class="gc-panel" data-adm-detail hidden></div>
       <div class="gc-panel" data-adm-cohorts-panel>
-        <p class="gc-label gc-muted">Группы</p>
-        <p class="gc-muted">Группа — это фильтр для оценок и CSV. Студента добавляют в группу в таблице выше; сам студент видит только названия своих групп. Удаление группы не трогает оценки.</p>
+        <p class="gc-label gc-muted">Групи</p>
+        <p class="gc-muted">Група — це фільтр для оцінок і CSV. Студента додають до групи в таблиці вище; сам студент бачить лише назви своїх груп. Видалення групи не зачіпає оцінок.</p>
         <form class="progress-actions acc-form" data-adm-cohort-form>
-          <input name="name" class="adm-filter" placeholder="название, например «Весна-2027»" maxlength="100" required data-adm-cohort-name>
-          <button type="submit" class="gc-tag">создать группу</button>
+          <input name="name" class="adm-filter" placeholder="назва, наприклад «Весна-2027»" maxlength="100" required data-adm-cohort-name>
+          <button type="submit" class="gc-tag">створити групу</button>
         </form>
         <ul class="progress-labs" data-adm-cohorts></ul>
       </div>
       <div class="gc-panel" data-adm-exams-panel>
-        <p class="gc-label gc-muted">Экзамены</p>
-        <p class="gc-muted">Банк вопросов — JSON: <code>{"title", "pass_pct", "questions_per_attempt", "time_limit_min", "attempts_allowed", "show_review", "questions": [{"q", "options", "answer", "explain"}]}</code>. Файл квиза модуля тоже подходит, но его ответы публичны — для настоящего экзамена готовь закрытый банк и не кладите его в репозиторий.</p>
+        <p class="gc-label gc-muted">Іспити</p>
+        <p class="gc-muted">Банк питань — JSON: <code>{"title", "pass_pct", "questions_per_attempt", "time_limit_min", "attempts_allowed", "show_review", "questions": [{"q", "options", "answer", "explain"}]}</code>. Файл квізу модуля теж підходить, але його відповіді публічні — для справжнього іспиту готуй закритий банк і не клади його в репозиторій.</p>
         <div class="progress-actions">
-          <label class="gc-tag" style="cursor:pointer">Загрузить банк JSON <input type="file" accept="application/json" data-adm-exam-file hidden></label>
-          <gc-button variant="secondary" data-adm-exam-csv>CSV результатов</gc-button>
+          <label class="gc-tag" style="cursor:pointer">Завантажити банк JSON <input type="file" accept="application/json" data-adm-exam-file hidden></label>
+          <gc-button variant="secondary" data-adm-exam-csv>CSV результатів</gc-button>
         </div>
         <ul class="progress-labs" data-adm-exams></ul>
         <div class="md-table-wrap"><table class="md-table">
-          <thead><tr><th>Экзамен</th><th>Студент</th><th>Результат</th><th>Сдан</th><th>Когда</th></tr></thead>
+          <thead><tr><th>Іспит</th><th>Студент</th><th>Результат</th><th>Складено</th><th>Коли</th></tr></thead>
           <tbody data-adm-exam-results></tbody>
         </table></div>
       </div>
       <div class="gc-panel" data-adm-audit-panel>
-        <p class="gc-label gc-muted">Журнал смены ролей</p>
+        <p class="gc-label gc-muted">Журнал зміни ролей</p>
         <ul class="progress-labs" data-adm-audit></ul>
       </div>
     </section>
     <p class="acc-msg" data-acc-msg aria-live="polite"></p>
   </main>
   <footer class="gc-container site-footer gc-muted">
-    <p>Открытый курс · <a href="https://github.com/irreligious86/UAV-Education">исходники на GitHub</a> · <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">план развития</a> · <a href="../../curriculum/curriculum.html">для разработчика</a> · CC BY-NC-SA 4.0</p>
+    <p>Відкритий курс · <a href="https://github.com/irreligious86/UAV-Education">вихідний код на GitHub</a> · <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">план розвитку</a> · <a href="../../curriculum/curriculum.html">для розробника</a> · CC BY-NC-SA 4.0</p>
   </footer>
 </body>
 </html>

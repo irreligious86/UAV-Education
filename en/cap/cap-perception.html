@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Слежение за целью — UAV Student</title>
-  <meta name="description" content="Companion детектирует объект в видео и ведёт аппарат за ним в SITL/в поле через GUIDED/Offboard">
+  <title>Target tracking — UAV Student</title>
+  <meta name="description" content="The companion detects an object in video and makes the vehicle follow it in SITL/in the field via GUIDED/Offboard">
   <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
   <link rel="manifest" href="../../manifest.webmanifest">
   <meta name="theme-color" content="#0b0f14">
@@ -30,40 +30,40 @@
   <header class="site-header">
     <div class="gc-container site-header__inner">
       <a class="site-brand" href="../index.html"><span class="site-brand__mark" aria-hidden="true">◆</span> UAV Student</a>
-      <nav class="gc-nav" aria-label="Разделы сайта">
-        <a href="../index.html" aria-current="page">Курс</a>
-        <a href="../ref/index.html">Справочник</a>
-        <a href="../pages/glossary.html">Глоссарий</a>
-        <a href="../pages/fails.html">Фейлы</a>
-        <a href="../pages/search.html">Поиск</a>
-        <a href="../pages/progress.html">Мой прогресс</a>
+      <nav class="gc-nav" aria-label="Site sections">
+        <a href="../index.html" aria-current="page">Course</a>
+        <a href="../ref/index.html">Reference</a>
+        <a href="../pages/glossary.html">Glossary</a>
+        <a href="../pages/fails.html">Failures</a>
+        <a href="../pages/search.html">Search</a>
+        <a href="../pages/progress.html">My progress</a>
       </nav>
-      <nav class="lang-switch" aria-label="Язык"><a class="gc-tag" href="../../cap/cap-perception.html" data-lang-to="ru" hreflang="ru" lang="ru" title="Русский">RU</a><a class="gc-tag" href="../../uk/cap/cap-perception.html" data-lang-to="uk" hreflang="uk" lang="uk" title="Українська">UK</a><a class="gc-tag" href="../../en/cap/cap-perception.html" data-lang-to="en" hreflang="en" lang="en" title="English" aria-current="true" data-state="ok">EN</a></nav>
+      <nav class="lang-switch" aria-label="Language"><a class="gc-tag" href="../../cap/cap-perception.html" data-lang-to="ru" hreflang="ru" lang="ru" title="Русский">RU</a><a class="gc-tag" href="../../uk/cap/cap-perception.html" data-lang-to="uk" hreflang="uk" lang="uk" title="Українська">UK</a><a class="gc-tag" href="../../en/cap/cap-perception.html" data-lang-to="en" hreflang="en" lang="en" title="English" aria-current="true" data-state="ok">EN</a></nav>
     </div>
   </header>
   <main class="gc-container site-main">
     <article class="module" data-module-page="cap-perception">
-      <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-perception">Восприятие и интеллект</a><span>Итоговый проект</span></p>
-      <h1 class="module-title">Слежение за целью</h1>
-      <div class="module-tags"><span class="gc-tag">Итоговый проект трека 7</span><span class="gc-tag" data-state="ok" data-done-badge hidden>СДАН</span></div>
-      <p class="module-lead">Результат: Companion детектирует объект в видео и ведёт аппарат за ним в SITL/в поле через GUIDED/Offboard</p>
+      <p class="gc-breadcrumb"><a href="../index.html">Course</a><a href="../index.html#track-perception">Perception and intelligence</a><span>Capstone project</span></p>
+      <h1 class="module-title">Target tracking</h1>
+      <div class="module-tags"><span class="gc-tag">Track 7 capstone project</span><span class="gc-tag" data-state="ok" data-done-badge hidden>PASSED</span></div>
+      <p class="module-lead">Result: The companion detects an object in video and makes the vehicle follow it in SITL/in the field via GUIDED/Offboard</p>
       <div class="gc-prose module-body">
-        <h2>Что сдать</h2>
-        <ul><li>Пайплайн камера → детектор → команда</li><li>Замеры задержки и FPS</li><li>Демонстрация в SITL с симулированной камерой</li><li>Протокол безопасности: геозона, таймауты, пилот</li><li>Инженерная папка проекта: требования с ID, что и как тестировалось, журнал изменений (см. модуль «Инженерный метод 101»)</li></ul>
-        <h2>Критерии приёмки</h2>
-        <p class="gc-muted">Проект сдан, когда выполнены все пункты. Отмечай по мере готовности:</p>
-        <ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="cap-perception:cap:0"><span>Задержка от кадра до команды измерена и ниже 150 мс</span></label></li><li><label><input type="checkbox" data-check-id="cap-perception:cap:1"><span>Потеря цели ведёт к зависанию, а не к блужданию</span></label></li><li><label><input type="checkbox" data-check-id="cap-perception:cap:2"><span>Реальный полёт только с геозоной и пилотом</span></label></li><li><label><input type="checkbox" data-check-id="cap-perception:cap:3"><span>Каждое требование прослеживается до теста или измерения, результат записан</span></label></li></ul>
-        <h2>Рубрика: как отличить сделанное от сданного</h2><p class="gc-muted">Проверь свою работу по каждой строке. Если она ближе к левой колонке — проект ещё не готов.</p><div class="widget__table-wrap"><table class="rubric"><thead><tr><th>Критерий</th><th>Плохо</th><th>Хорошо</th></tr></thead><tbody><tr><th scope="row">Детектор</th><td class="rubric__bad">Запущен на ноутбуке</td><td class="rubric__good">Запущен на борту, FPS и точность измерены, ложные срабатывания проанализированы</td></tr><tr><th scope="row">Контур</th><td class="rubric__bad">Цель теряется — дрон летит дальше</td><td class="rubric__good">Потеря цели → зависание; задержка учтена; тест в SITL с логом</td></tr><tr><th scope="row">Границы</th><td class="rubric__bad">Не описаны</td><td class="rubric__good">Описаны условия отказа: освещение, текстура, динамика</td></tr></tbody></table></div>
-        <h2>Программная альтернатива</h2><p class="gc-muted">Итоговый проект трека можно заменить проектом из каталога «ПО для БАС» — с теми же требованиями к сдаче: критерии, автотесты, README.</p><ul><li><a href="../projects/proj-detect-follow.html">Проект 4: Детектор + трекер + следование в Gazebo</a></li><li><a href="../projects/proj-precision-landing.html">Проект 5: Точная посадка на маркер в симуляции</a></li><li><a href="../projects/proj-photogrammetry.html">Проект 7: Фотограмметрия на открытом наборе</a></li></ul>
-        <h2>Модули трека</h2>
-        <ol><li><a href="../m/per-camera.html">Камеры и видеопоток на companion</a></li><li><a href="../m/per-geometry.html">Геометрия камеры: от пикселя до точки на земле</a></li><li><a href="../m/per-cv.html">Компьютерное зрение: от OpenCV до нейросетей</a></li><li><a href="../m/per-edge-ml.html">ML на борту: бюджет, квантование, оценка, сопровождение</a></li><li><a href="../m/per-visual-nav.html">Визуальная навигация: оптический поток, VIO, SLAM обзорно</a></li><li><a href="../m/per-mapping.html">Картографирование: съёмка, геопривязка, фотограмметрия</a></li><li><a href="../m/per-landing.html">Точная посадка по маркеру: ArUco, LANDING_TARGET, PLND</a></li><li><a href="../m/per-depth-avoid.html">Глубина и обход препятствий: датчики, OBSTACLE_DISTANCE, алгоритмы</a></li><li><a href="../m/per-tracking.html">Слежение и управление по цели</a></li></ol>
-        <div class="gc-callout" data-state="caution"><strong>Безопасность.</strong> Всё, что можно сделать в SITL или без пропов, делается там. Реальный полёт — только после наземных тестов, с проверенным failsafe.</div>
+        <h2>What to submit</h2>
+        <ul><li>Camera → detector → command pipeline</li><li>Latency and FPS measurements</li><li>Demo in SITL with a simulated camera</li><li>Safety protocol: geofence, timeouts, pilot</li><li>Project engineering folder: requirements with IDs, what was tested and how, changelog (see the &quot;Engineering Method 101&quot; module)</li></ul>
+        <h2>Acceptance criteria</h2>
+        <p class="gc-muted">The project is passed when all items are done. Check them off as you go:</p>
+        <ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="cap-perception:cap:0"><span>Frame-to-command latency measured and below 150 ms</span></label></li><li><label><input type="checkbox" data-check-id="cap-perception:cap:1"><span>Target loss leads to a hover, not wandering</span></label></li><li><label><input type="checkbox" data-check-id="cap-perception:cap:2"><span>Real flight only with a geofence and a pilot</span></label></li><li><label><input type="checkbox" data-check-id="cap-perception:cap:3"><span>Every requirement traces to a test or measurement, with the result recorded</span></label></li></ul>
+        <h2>Rubric: how to tell “done” from “passed”</h2><p class="gc-muted">Check your work against each row. If it's closer to the left column, the project isn't ready yet.</p><div class="widget__table-wrap"><table class="rubric"><thead><tr><th>Criterion</th><th>Poor</th><th>Good</th></tr></thead><tbody><tr><th scope="row">Detector</th><td class="rubric__bad">Running on a laptop</td><td class="rubric__good">Running onboard, FPS and accuracy measured, false positives analyzed</td></tr><tr><th scope="row">Control loop</th><td class="rubric__bad">The target is lost and the drone keeps flying</td><td class="rubric__good">Target loss → hover; latency accounted for; SITL test with a log</td></tr><tr><th scope="row">Limitations</th><td class="rubric__bad">Not described</td><td class="rubric__good">Failure conditions described: lighting, texture, dynamics</td></tr></tbody></table></div>
+        <h2>Software alternative</h2><p class="gc-muted">A track's capstone project can be replaced with a project from the “UAS software” catalog — with the same submission requirements: criteria, automated tests, README.</p><ul><li><a href="../projects/proj-detect-follow.html">Project 4: Detector + tracker + following in Gazebo</a></li><li><a href="../projects/proj-precision-landing.html">Project 5: Precision landing on a marker in simulation</a></li><li><a href="../projects/proj-photogrammetry.html">Project 7: Photogrammetry on an open dataset</a></li></ul>
+        <h2>Track modules</h2>
+        <ol><li><a href="../m/per-camera.html">Cameras and video streaming on the companion</a></li><li><a href="../m/per-geometry.html">Camera geometry: from a pixel to a point on the ground</a></li><li><a href="../m/per-cv.html">Computer vision: from OpenCV to neural networks</a></li><li><a href="../m/per-edge-ml.html">Onboard ML: budget, quantization, evaluation, maintenance</a></li><li><a href="../m/per-visual-nav.html">Visual navigation: optical flow, VIO, SLAM overview</a></li><li><a href="../m/per-mapping.html">Mapping: surveying, georeferencing, photogrammetry</a></li><li><a href="../m/per-landing.html">Precision landing on a marker: ArUco, LANDING_TARGET, PLND</a></li><li><a href="../m/per-depth-avoid.html">Depth and obstacle avoidance: sensors, OBSTACLE_DISTANCE, algorithms</a></li><li><a href="../m/per-tracking.html">Tracking and target-based control</a></li></ol>
+        <div class="gc-callout" data-state="caution"><strong>Safety.</strong> Everything you can do in SITL or without props, you do there. Real flights only after ground tests, with a verified failsafe.</div>
       </div>
-      <div class="module-done"><gc-button variant="secondary" data-done-toggle="cap-perception" data-done-label="сданный" data-done-past="Сдан">Отметить как сданный</gc-button></div>
+      <div class="module-done"><gc-button variant="secondary" data-done-toggle="cap-perception" data-done-label="passed" data-done-past="Passed">Mark as passed</gc-button></div>
     </article>
   </main>
   <footer class="gc-container site-footer gc-muted">
-    <p>Открытый курс · <a href="https://github.com/irreligious86/UAV-Education">исходники на GitHub</a> · <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">план развития</a> · <a href="../../curriculum/curriculum.html">для разработчика</a> · CC BY-NC-SA 4.0</p>
+    <p>Open course · <a href="https://github.com/irreligious86/UAV-Education">source on GitHub</a> · <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">roadmap</a> · <a href="../../curriculum/curriculum.html">for developers</a> · CC BY-NC-SA 4.0</p>
   </footer>
 </body>
 </html>

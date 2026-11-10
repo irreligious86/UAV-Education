@@ -1,0 +1,94 @@
+{
+  "module": "ap-logs",
+  "pass": 80,
+  "questions": [
+    {
+      "q": "Where do you start analyzing a log?",
+      "options": [
+        "With the PID gains",
+        "With log cutoffs and vibration",
+        "With GPS quality and satellite count over the whole flight",
+        "With mode changes"
+      ],
+      "answer": 1,
+      "explain": "A cut-off log means power loss; high vibration makes everything else worthless."
+    },
+    {
+      "q": "The VIBE threshold above which altitude/position problems are almost certain?",
+      "options": [
+        "10",
+        "30",
+        "60",
+        "100"
+      ],
+      "answer": 2,
+      "explain": "Below 30 is normal, above 60 means problems almost for sure."
+    },
+    {
+      "q": "ERR with Subsys 17, ECode 1 is…",
+      "options": [
+        "Loss of the radio link to the transmitter",
+        "An EKF failsafe triggered",
+        "A GPS glitch",
+        "High vibration"
+      ],
+      "answer": 1,
+      "explain": "2 — radio, 11 — GPS, 16 — EKF variance, 17 — EKF failsafe, 29 — vibration compensation."
+    },
+    {
+      "q": "Which ATT fields do you compare to spot a mechanical problem?",
+      "options": [
+        "Alt vs. BAlt and DAlt",
+        "DesRoll vs. Roll",
+        "Roll and Yaw",
+        "Volt and Curr"
+      ],
+      "answer": 1,
+      "explain": "A sharp divergence between desired and actual means a failure or lack of thrust."
+    },
+    {
+      "q": "What is a .tlog?",
+      "options": [
+        "A Betaflight log",
+        "Telemetry as the GCS saw it",
+        "A mission file",
+        "An ESC firmware log with telemetry"
+      ],
+      "answer": 1,
+      "explain": "The telemetry the GCS saw over the radio link: lower rate and with gaps, but it survives even if the SD card burned up."
+    },
+    {
+      "q": "What do you use to read a .bin in Python?",
+      "options": [
+        "pandas.read_csv after export",
+        "pymavlink.DFReader",
+        "orangebox",
+        "json.load"
+      ],
+      "answer": 1,
+      "explain": "DFReader reads DataFlash directly."
+    },
+    {
+      "q": "CTUN.ThO = 0.78 with sagging voltage in Loiter indicates:",
+      "options": [
+        "A good tune",
+        "A lack of thrust",
+        "Vibration",
+        "GPS problems"
+      ],
+      "answer": 1,
+      "explain": "Throttle at the ceiling with sagging voltage; BAT.Volt/Curr confirm it."
+    },
+    {
+      "q": "What do you enable in LOG_BITMASK for PID tuning?",
+      "options": [
+        "Enable nothing",
+        "PID and batch sampling",
+        "Only RC",
+        "Only GPS and IMU at full rate"
+      ],
+      "answer": 1,
+      "explain": "PID (PIDR/PIDP/PIDY) and batch sampling while tuning; turn them off afterward, the log grows."
+    }
+  ]
+}

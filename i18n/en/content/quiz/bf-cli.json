@@ -1,0 +1,94 @@
+{
+  "module": "bf-cli",
+  "pass": 80,
+  "questions": [
+    {
+      "q": "How do you enter the CLI?",
+      "options": [
+        "The cli command in the OSD menu",
+        "The CLI tab or the # character",
+        "Through the OSD menu with the sticks",
+        "A stick combination on the radio"
+      ],
+      "answer": 1,
+      "explain": "The CLI tab in the configurator or the # character in a terminal switches the FC into command-line mode."
+    },
+    {
+      "q": "What does the resource command do?",
+      "options": [
+        "Shows CPU load",
+        "Reassigns the board's pins",
+        "Calibrates the ESCs",
+        "Resets the settings of the selected resource"
+      ],
+      "answer": 1,
+      "explain": "Resource remapping means moving a function to another pad, e.g. a motor to a free output."
+    },
+    {
+      "q": "After set you need to…",
+      "options": [
+        "Nothing — it's already written",
+        "save, otherwise everything is lost",
+        "reboot without save — it gets written at startup",
+        "exit to write it"
+      ],
+      "answer": 1,
+      "explain": "set changes the value in memory; save writes it to flash and reboots."
+    },
+    {
+      "q": "What does get rpm_filter print?",
+      "options": [
+        "Exactly one parameter",
+        "All parameters containing rpm_filter",
+        "A syntax error",
+        "The RPM filter version and its status"
+      ],
+      "answer": 1,
+      "explain": "get searches by substring — handy for viewing a group of settings."
+    },
+    {
+      "q": "Can you paste a diff all from another major version?",
+      "options": [
+        "Yes, it's always compatible",
+        "No: parameters change",
+        "Only on F7 boards and only in dump format",
+        "Yes, after the defaults command"
+      ],
+      "answer": 1,
+      "explain": "Parameter names and meanings change; carry settings between versions section by section, re-reading them."
+    },
+    {
+      "q": "How do you save a motor direction reversal via DShot commands?",
+      "options": [
+        "dshotprog 1 21, then dshotprog 1 12",
+        "set motor_dir = 1, then save",
+        "resource MOTOR 1 reverse, then save and reboot",
+        "You can't — only by resoldering"
+      ],
+      "answer": 0,
+      "explain": "21 — reversed, 12 — save settings; without props."
+    },
+    {
+      "q": "The msc command does:",
+      "options": [
+        "A settings reset",
+        "Flash as a USB drive",
+        "ESC flashing",
+        "Enters DFU for flashing over USB"
+      ],
+      "answer": 1,
+      "explain": "It mounts the flash as a USB drive for pulling logs; bl is for DFU."
+    },
+    {
+      "q": "What is the BUILD KEY from status for?",
+      "options": [
+        "Resetting settings to factory defaults",
+        "Enabling DFU mode",
+        "Checking and reproducing the firmware contents from the cloud build",
+        "Setting the craft name"
+      ],
+      "answer": 2,
+      "explain": "The build key shows which options are enabled, and the build can be reproduced."
+    }
+  ]
+}

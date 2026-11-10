@@ -1,0 +1,94 @@
+{
+  "module": "bf-modes-osd",
+  "pass": 80,
+  "questions": [
+    {
+      "q": "How are modes bound to switches?",
+      "options": [
+        "Through the AETR channel order",
+        "To an AUX channel and a range",
+        "Only through the CLI",
+        "Through the OSD menu by switch name"
+      ],
+      "answer": 1,
+      "explain": "A mode is active when the AUX channel value falls within the set range."
+    },
+    {
+      "q": "Why should ARM be on a separate switch with no neighbors?",
+      "options": [
+        "It's just more convenient",
+        "So you don't arm by accident",
+        "For telemetry",
+        "The firmware requires it for ARM mode"
+      ],
+      "answer": 1,
+      "explain": "Several modes on one channel is one more chance to arm at the wrong moment."
+    },
+    {
+      "q": "Why keep ANGLE on a switch if you fly ACRO?",
+      "options": [
+        "For racing",
+        "Rescue and a condition for AUTO-LAND",
+        "No reason",
+        "For OSD horizon elements"
+      ],
+      "answer": 1,
+      "explain": "Self-leveling brings back the horizon and is needed for the failsafe landing."
+    },
+    {
+      "q": "When should you use FLIP OVER AFTER CRASH?",
+      "options": [
+        "Right in flight",
+        "Only when the props are clear",
+        "At the moment of arming",
+        "On the bench with props on, as a test"
+      ],
+      "answer": 1,
+      "explain": "The mode spins the motors in reverse — with snagged props that's a burned-out motor."
+    },
+    {
+      "q": "Which voltage should you show in the OSD?",
+      "options": [
+        "The 5 V BEC voltage",
+        "Average per cell",
+        "Total",
+        "Any"
+      ],
+      "answer": 1,
+      "explain": "Average per cell reads the same on 4S and 6S and tells you the battery state right away."
+    },
+    {
+      "q": "The low-voltage warning comes too late. Why?",
+      "options": [
+        "High motor KV lowers the readings",
+        "The threshold doesn't account for sag",
+        "Too few satellites",
+        "The OSD is broken"
+      ],
+      "answer": 1,
+      "explain": "Under load the voltage is lower — set the threshold with a margin for sag."
+    },
+    {
+      "q": "Logic = 1 (AND) in the aux command means:",
+      "options": [
+        "The mode is on two channels at once",
+        "Both rules of the mode are required",
+        "Range inversion",
+        "Disabling the mode"
+      ],
+      "answer": 1,
+      "explain": "That's how two-switch combinations are made."
+    },
+    {
+      "q": "Why leave a gap between the ranges of a three-position switch?",
+      "options": [
+        "The CRSF protocol requires it for AUX",
+        "So jitter doesn't toggle modes",
+        "For looks",
+        "No gap is needed"
+      ],
+      "answer": 1,
+      "explain": "900–1300, 1300–1700, 1700–2100 with margin."
+    }
+  ]
+}

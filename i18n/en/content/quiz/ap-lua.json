@@ -1,0 +1,94 @@
+{
+  "module": "ap-lua",
+  "pass": 80,
+  "questions": [
+    {
+      "q": "How do you enable scripting?",
+      "options": [
+        "SCR_ENABLE = 1 and a reboot",
+        "Copy a script to the SD card",
+        "The lua start command in MAVProxy",
+        "It is always enabled automatically"
+      ],
+      "answer": 0,
+      "explain": "After a reboot the rest of the SCR_ parameters appear."
+    },
+    {
+      "q": "Where do scripts live on the flight controller?",
+      "options": [
+        "In the root of the SD card",
+        "APM/scripts on the SD card",
+        "On the GCS side",
+        "Inside the firmware, in the ROMFS section"
+      ],
+      "answer": 1,
+      "explain": "In SITL — the scripts folder in the directory the simulator was launched from."
+    },
+    {
+      "q": "What does update() return?",
+      "options": [
+        "It returns nothing",
+        "Itself and a delay in ms",
+        "A boolean true/false",
+        "A status string"
+      ],
+      "answer": 1,
+      "explain": "The function and the delay until the next call: the scheduler calls it again on its own — no infinite loops."
+    },
+    {
+      "q": "RCx_OPTION = 300 is…",
+      "options": [
+        "Arm/disarm",
+        "Scripting1",
+        "RTL return",
+        "Buzzer"
+      ],
+      "answer": 1,
+      "explain": "300–307 are Scripting1…8, reserved for scripts."
+    },
+    {
+      "q": "If one script exhausts the memory…",
+      "options": [
+        "The others keep running",
+        "All scripts stop",
+        "The controller reboots",
+        "Nothing noticeable happens"
+      ],
+      "answer": 1,
+      "explain": "All scripts stop until a reboot — hence the importance of SCR_HEAP_SIZE and careful coding."
+    },
+    {
+      "q": "Why don't scripts using SIM_* end up on a real aircraft?",
+      "options": [
+        "The license forbids them",
+        "A real FC has no SIM_*",
+        "They don't fit in size",
+        "They work there as is"
+      ],
+      "answer": 1,
+      "explain": "SIM_* exists only in the simulator."
+    },
+    {
+      "q": "What does the update() function return in ArduPilot Lua?",
+      "options": [
+        "It returns nothing",
+        "update and a delay in ms",
+        "A status string",
+        "A boolean true/false and an error code"
+      ],
+      "answer": 1,
+      "explain": "A timer-based execution model."
+    },
+    {
+      "q": "What the motor_failure_test.lua applet is for:",
+      "options": [
+        "PID autotuning",
+        "Motor failure testing",
+        "Compass calibration",
+        "Extended logging"
+      ],
+      "answer": 1,
+      "explain": "Stops motors per a bitmask (MOT_STOP_BITMASK) with an RCx_OPTION 300 switch to test a failure."
+    }
+  ]
+}

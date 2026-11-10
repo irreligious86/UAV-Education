@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Бортовая электрика с расчётом — UAV Student</title>
-  <meta name="description" content="Схема питания аппарата с расчётом токов и просадок, разводка, измерения мультиметром и осциллографом, бюджет радиолинка">
+  <title>Onboard electrical system, with calculations — UAV Student</title>
+  <meta name="description" content="The vehicle&#x27;s power diagram with current and sag calculations, layout, multimeter and oscilloscope measurements, radio link budget">
   <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
   <link rel="manifest" href="../../manifest.webmanifest">
   <meta name="theme-color" content="#0b0f14">
@@ -30,40 +30,40 @@
   <header class="site-header">
     <div class="gc-container site-header__inner">
       <a class="site-brand" href="../index.html"><span class="site-brand__mark" aria-hidden="true">◆</span> UAV Student</a>
-      <nav class="gc-nav" aria-label="Разделы сайта">
-        <a href="../index.html" aria-current="page">Курс</a>
-        <a href="../ref/index.html">Справочник</a>
-        <a href="../pages/glossary.html">Глоссарий</a>
-        <a href="../pages/fails.html">Фейлы</a>
-        <a href="../pages/search.html">Поиск</a>
-        <a href="../pages/progress.html">Мой прогресс</a>
+      <nav class="gc-nav" aria-label="Site sections">
+        <a href="../index.html" aria-current="page">Course</a>
+        <a href="../ref/index.html">Reference</a>
+        <a href="../pages/glossary.html">Glossary</a>
+        <a href="../pages/fails.html">Failures</a>
+        <a href="../pages/search.html">Search</a>
+        <a href="../pages/progress.html">My progress</a>
       </nav>
-      <nav class="lang-switch" aria-label="Язык"><a class="gc-tag" href="../../cap/cap-electronics.html" data-lang-to="ru" hreflang="ru" lang="ru" title="Русский">RU</a><a class="gc-tag" href="../../uk/cap/cap-electronics.html" data-lang-to="uk" hreflang="uk" lang="uk" title="Українська">UK</a><a class="gc-tag" href="../../en/cap/cap-electronics.html" data-lang-to="en" hreflang="en" lang="en" title="English" aria-current="true" data-state="ok">EN</a></nav>
+      <nav class="lang-switch" aria-label="Language"><a class="gc-tag" href="../../cap/cap-electronics.html" data-lang-to="ru" hreflang="ru" lang="ru" title="Русский">RU</a><a class="gc-tag" href="../../uk/cap/cap-electronics.html" data-lang-to="uk" hreflang="uk" lang="uk" title="Українська">UK</a><a class="gc-tag" href="../../en/cap/cap-electronics.html" data-lang-to="en" hreflang="en" lang="en" title="English" aria-current="true" data-state="ok">EN</a></nav>
     </div>
   </header>
   <main class="gc-container site-main">
     <article class="module" data-module-page="cap-electronics">
-      <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-electronics">Электроника и радио</a><span>Итоговый проект</span></p>
-      <h1 class="module-title">Бортовая электрика с расчётом</h1>
-      <div class="module-tags"><span class="gc-tag">Итоговый проект трека 2</span><span class="gc-tag" data-state="ok" data-done-badge hidden>СДАН</span></div>
-      <p class="module-lead">Результат: Схема питания аппарата с расчётом токов и просадок, разводка, измерения мультиметром и осциллографом, бюджет радиолинка</p>
+      <p class="gc-breadcrumb"><a href="../index.html">Course</a><a href="../index.html#track-electronics">Electronics and radio</a><span>Capstone project</span></p>
+      <h1 class="module-title">Onboard electrical system, with calculations</h1>
+      <div class="module-tags"><span class="gc-tag">Track 2 capstone project</span><span class="gc-tag" data-state="ok" data-done-badge hidden>PASSED</span></div>
+      <p class="module-lead">Result: The vehicle&#x27;s power diagram with current and sag calculations, layout, multimeter and oscilloscope measurements, radio link budget</p>
       <div class="gc-prose module-body">
-        <h2>Что сдать</h2>
-        <ul><li>Схема питания: шины, BEC, конденсаторы, предохранители, сечения проводов</li><li>Расчёт токов по веткам и просадок под нагрузкой</li><li>Измерения: напряжения под нагрузкой, пульсации на шине</li><li>Бюджет линка управления и видео с антеннами</li><li>Инженерная папка проекта: требования с ID, что и как тестировалось, журнал изменений (см. модуль «Инженерный метод 101»)</li></ul>
-        <h2>Критерии приёмки</h2>
-        <p class="gc-muted">Проект сдан, когда выполнены все пункты. Отмечай по мере готовности:</p>
-        <ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="cap-electronics:cap:0"><span>Каждая ветка питания рассчитана с запасом ≥ 30 %</span></label></li><li><label><input type="checkbox" data-check-id="cap-electronics:cap:1"><span>Пульсации на шине 5 В измерены и ниже допуска периферии</span></label></li><li><label><input type="checkbox" data-check-id="cap-electronics:cap:2"><span>Антенны выбраны по поляризации и диаграмме, бюджет сходится с реальной дальностью</span></label></li><li><label><input type="checkbox" data-check-id="cap-electronics:cap:3"><span>Помехи от VTX/силовых на приёмник и GPS проверены измерением</span></label></li><li><label><input type="checkbox" data-check-id="cap-electronics:cap:4"><span>Каждое требование прослеживается до теста или измерения, результат записан</span></label></li></ul>
-        <h2>Рубрика: как отличить сделанное от сданного</h2><p class="gc-muted">Проверь свою работу по каждой строке. Если она ближе к левой колонке — проект ещё не готов.</p><div class="widget__table-wrap"><table class="rubric"><thead><tr><th>Критерий</th><th>Плохо</th><th>Хорошо</th></tr></thead><tbody><tr><th scope="row">Дерево питания</th><td class="rubric__bad">Список деталей без токов</td><td class="rubric__good">Схема шин с током каждой ветки, выбором BEC и сечений с расчётом</td></tr><tr><th scope="row">Измерения</th><td class="rubric__bad">Измерений нет или только мультиметром</td><td class="rubric__good">Осциллограммы пульсаций 5 В до/после конденсатора с p-p значениями</td></tr><tr><th scope="row">Бюджет линка</th><td class="rubric__bad">«ELRS бьёт на 10 км»</td><td class="rubric__good">Таблица: мощность, чувствительность режима, FSPL, запас в дБ на 1/3/5/10 км; полевой тест сопоставлен</td></tr></tbody></table></div>
+        <h2>What to submit</h2>
+        <ul><li>Power diagram: buses, BECs, capacitors, fuses, wire gauges</li><li>Calculation of branch currents and sag under load</li><li>Measurements: voltages under load, ripple on the bus</li><li>Control and video link budget with antennas</li><li>Project engineering folder: requirements with IDs, what was tested and how, changelog (see the &quot;Engineering Method 101&quot; module)</li></ul>
+        <h2>Acceptance criteria</h2>
+        <p class="gc-muted">The project is passed when all items are done. Check them off as you go:</p>
+        <ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="cap-electronics:cap:0"><span>Every power branch sized with ≥ 30 % margin</span></label></li><li><label><input type="checkbox" data-check-id="cap-electronics:cap:1"><span>Ripple on the 5 V bus measured and below the peripherals&#x27; tolerance</span></label></li><li><label><input type="checkbox" data-check-id="cap-electronics:cap:2"><span>Antennas chosen by polarization and pattern, link budget agrees with actual range</span></label></li><li><label><input type="checkbox" data-check-id="cap-electronics:cap:3"><span>Interference from the VTX/power wiring on the receiver and GPS verified by measurement</span></label></li><li><label><input type="checkbox" data-check-id="cap-electronics:cap:4"><span>Every requirement traces to a test or measurement, with the result recorded</span></label></li></ul>
+        <h2>Rubric: how to tell “done” from “passed”</h2><p class="gc-muted">Check your work against each row. If it's closer to the left column, the project isn't ready yet.</p><div class="widget__table-wrap"><table class="rubric"><thead><tr><th>Criterion</th><th>Poor</th><th>Good</th></tr></thead><tbody><tr><th scope="row">Power tree</th><td class="rubric__bad">A parts list without currents</td><td class="rubric__good">Bus diagram with the current of each branch, BEC selection and wire gauges with calculations</td></tr><tr><th scope="row">Measurements</th><td class="rubric__bad">No measurements, or only with a multimeter</td><td class="rubric__good">Oscilloscope traces of 5 V ripple before/after the capacitor with p-p values</td></tr><tr><th scope="row">Link budget</th><td class="rubric__bad">&quot;ELRS reaches 10 km&quot;</td><td class="rubric__good">Table: power, mode sensitivity, FSPL, margin in dB at 1/3/5/10 km; field test compared</td></tr></tbody></table></div>
         
-        <h2>Модули трека</h2>
-        <ol><li><a href="../m/el-power-design.html">Схемотехника питания борта</a></li><li><a href="../m/el-measure.html">Измерения: мультиметр, осциллограф, логический анализатор</a></li><li><a href="../m/el-battery-packs.html">Сборки Li-Ion и LiFePO4: элементы, сварка, BMS</a></li><li><a href="../m/el-emi.html">Помехи и электромагнитная совместимость</a></li><li><a href="../m/rf-antennas.html">Антенны, поляризация и диаграммы направленности</a></li><li><a href="../m/rf-link-budget.html">Бюджет радиолинка и дальность</a></li><li><a href="../m/el-peripherals.html">Подключение периферии: UART, I2C, CAN на практике</a></li><li><a href="../m/el-dronecan.html">DroneCAN: шина CAN на борту, узлы, ESC и прошивка периферии</a></li><li><a href="../m/el-wiring.html">Пайка, жгуты и надёжность соединений</a></li><li><a href="../m/el-redundancy.html">Резервирование на борту: X8, гекса, питание и сигналы</a></li><li><a href="../m/el-kicad.html">Проектирование платы в KiCad: от схемы до заказа, разводка для ЭМС</a></li></ol>
-        <div class="gc-callout" data-state="caution"><strong>Безопасность.</strong> Всё, что можно сделать в SITL или без пропов, делается там. Реальный полёт — только после наземных тестов, с проверенным failsafe.</div>
+        <h2>Track modules</h2>
+        <ol><li><a href="../m/el-power-design.html">Onboard power circuit design</a></li><li><a href="../m/el-measure.html">Measurements: multimeter, oscilloscope, logic analyzer</a></li><li><a href="../m/el-battery-packs.html">Li-Ion and LiFePO4 packs: cells, welding, BMS</a></li><li><a href="../m/el-emi.html">Interference and electromagnetic compatibility</a></li><li><a href="../m/rf-antennas.html">Antennas, polarization and radiation patterns</a></li><li><a href="../m/rf-link-budget.html">Radio link budget and range</a></li><li><a href="../m/el-peripherals.html">Connecting peripherals: UART, I2C, CAN in practice</a></li><li><a href="../m/el-dronecan.html">DroneCAN: the onboard CAN bus, nodes, ESCs and peripheral firmware</a></li><li><a href="../m/el-wiring.html">Soldering, harnesses and connection reliability</a></li><li><a href="../m/el-redundancy.html">Onboard redundancy: X8, hexa, power and signals</a></li><li><a href="../m/el-kicad.html">PCB design in KiCad: from schematic to order, layout for EMC</a></li></ol>
+        <div class="gc-callout" data-state="caution"><strong>Safety.</strong> Everything you can do in SITL or without props, you do there. Real flights only after ground tests, with a verified failsafe.</div>
       </div>
-      <div class="module-done"><gc-button variant="secondary" data-done-toggle="cap-electronics" data-done-label="сданный" data-done-past="Сдан">Отметить как сданный</gc-button></div>
+      <div class="module-done"><gc-button variant="secondary" data-done-toggle="cap-electronics" data-done-label="passed" data-done-past="Passed">Mark as passed</gc-button></div>
     </article>
   </main>
   <footer class="gc-container site-footer gc-muted">
-    <p>Открытый курс · <a href="https://github.com/irreligious86/UAV-Education">исходники на GitHub</a> · <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">план развития</a> · <a href="../../curriculum/curriculum.html">для разработчика</a> · CC BY-NC-SA 4.0</p>
+    <p>Open course · <a href="https://github.com/irreligious86/UAV-Education">source on GitHub</a> · <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">roadmap</a> · <a href="../../curriculum/curriculum.html">for developers</a> · CC BY-NC-SA 4.0</p>
   </footer>
 </body>
 </html>

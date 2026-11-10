@@ -1,0 +1,94 @@
+{
+  "module": "comp-esp32",
+  "pass": 80,
+  "questions": [
+    {
+      "q": "Why can't the heartbeat be sent only from an EdgeTX widget's refresh()?",
+      "options": [
+        "refresh() is called once per second",
+        "refresh() runs only when the widget is visible",
+        "There is no refresh() in EdgeTX",
+        "The license forbids it"
+      ],
+      "answer": 1,
+      "explain": "Hide the screen and the link is gone. Call a shared tick() from refresh() and background()."
+    },
+    {
+      "q": "What does serialRead() read with no argument?",
+      "options": [
+        "One byte",
+        "Up to the newline",
+        "Nothing",
+        "The whole receive buffer"
+      ],
+      "answer": 1,
+      "explain": "A “one line = one message” protocol fits it naturally."
+    },
+    {
+      "q": "The undefined state of a radio companion should be…",
+      "options": [
+        "CONFIG with Wi-Fi",
+        "FLIGHT without Wi-Fi",
+        "A reboot that waits for the radio",
+        "Anything"
+      ],
+      "answer": 1,
+      "explain": "The access point comes up only after an explicit “disarmed” from the radio."
+    },
+    {
+      "q": "How do you verifiably turn off Wi-Fi on an ESP32?",
+      "options": [
+        "Lower the TX power",
+        "WIFI_OFF + esp_wifi_stop()",
+        "Remove the antenna",
+        "Reboot the module without WiFi.begin"
+      ],
+      "answer": 1,
+      "explain": "Turning it off must be an action, not an assumption."
+    },
+    {
+      "q": "What should you check before connecting the radio's UART to the ESP32?",
+      "options": [
+        "Internet speed",
+        "Levels and a common GND",
+        "The Lua version",
+        "The VTX channel"
+      ],
+      "answer": 1,
+      "explain": "It is usually 3.3 V on both sides, but checking is mandatory."
+    },
+    {
+      "q": "Where should the protection against writing settings in flight be?",
+      "options": [
+        "Only in Lua",
+        "Only in the ESP32 firmware",
+        "On both sides",
+        "Nowhere"
+      ],
+      "answer": 2,
+      "explain": "Defense in depth: each side checks arm independently."
+    },
+    {
+      "q": "Why is an onboard Wi-Fi bridge turned off in flight?",
+      "options": [
+        "The module heats up inside the radio case",
+        "It interferes with ELRS 2.4 GHz",
+        "There is no power",
+        "The law requires it"
+      ],
+      "answer": 1,
+      "explain": "For setup on the ground it is acceptable."
+    },
+    {
+      "q": "How does an ESP32 pass its own rangefinder to ArduPilot?",
+      "options": [
+        "Over I2C",
+        "DISTANCE_SENSOR over MAVLink",
+        "It can't",
+        "Through a PWM input of the flight controller"
+      ],
+      "answer": 1,
+      "explain": "DISTANCE_SENSOR and RNGFND1_TYPE = 10 (MAVLink); the rangefinder is used by the EKF and landing."
+    }
+  ]
+}

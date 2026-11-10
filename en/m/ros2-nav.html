@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Навигация и обход препятствий: карты, планировщики, уставки — UAV Student</title>
-  <meta name="description" content="знать встроенные средства обхода автопилотов реализовывать A* с раздуванием и сглаживанием разделять глобальное и локальное планирование превращать путь в уставки с ограничением скорости">
+  <title>Navigation and obstacle avoidance: maps, planners, setpoints — UAV Student</title>
+  <meta name="description" content="know the autopilots&#x27; built-in avoidance features implement A* with inflation and smoothing separate global and local planning turn a path into setpoints with a speed limit">
   <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
   <link rel="manifest" href="../../manifest.webmanifest">
   <meta name="theme-color" content="#0b0f14">
@@ -30,28 +30,28 @@
   <header class="site-header">
     <div class="gc-container site-header__inner">
       <a class="site-brand" href="../index.html"><span class="site-brand__mark" aria-hidden="true">◆</span> UAV Student</a>
-      <nav class="gc-nav" aria-label="Разделы сайта">
-        <a href="../index.html" aria-current="page">Курс</a>
-        <a href="../ref/index.html">Справочник</a>
-        <a href="../pages/glossary.html">Глоссарий</a>
-        <a href="../pages/fails.html">Фейлы</a>
-        <a href="../pages/search.html">Поиск</a>
-        <a href="../pages/progress.html">Мой прогресс</a>
+      <nav class="gc-nav" aria-label="Site sections">
+        <a href="../index.html" aria-current="page">Course</a>
+        <a href="../ref/index.html">Reference</a>
+        <a href="../pages/glossary.html">Glossary</a>
+        <a href="../pages/fails.html">Failures</a>
+        <a href="../pages/search.html">Search</a>
+        <a href="../pages/progress.html">My progress</a>
       </nav>
-      <nav class="lang-switch" aria-label="Язык"><a class="gc-tag" href="../../m/ros2-nav.html" data-lang-to="ru" hreflang="ru" lang="ru" title="Русский">RU</a><a class="gc-tag" href="../../uk/m/ros2-nav.html" data-lang-to="uk" hreflang="uk" lang="uk" title="Українська">UK</a><a class="gc-tag" href="../../en/m/ros2-nav.html" data-lang-to="en" hreflang="en" lang="en" title="English" aria-current="true" data-state="ok">EN</a></nav>
+      <nav class="lang-switch" aria-label="Language"><a class="gc-tag" href="../../m/ros2-nav.html" data-lang-to="ru" hreflang="ru" lang="ru" title="Русский">RU</a><a class="gc-tag" href="../../uk/m/ros2-nav.html" data-lang-to="uk" hreflang="uk" lang="uk" title="Українська">UK</a><a class="gc-tag" href="../../en/m/ros2-nav.html" data-lang-to="en" hreflang="en" lang="en" title="English" aria-current="true" data-state="ok">EN</a></nav>
     </div>
   </header>
   <main class="gc-container site-main">
     <article class="module" data-module-page="ros2-nav">
-      <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-ros2">Электив: ROS 2 на борту</a><span>Навигация и обход препятствий: карты, планировщики, уставки</span></p>
-      <h1 class="module-title">Навигация и обход препятствий: карты, планировщики, уставки</h1>
-      <div class="module-tags"><span class="gc-tag" title="Уровень">L3 — Специалист</span><span class="gc-tag">чтение 45 мин</span><span class="gc-tag">учёба ~5 ч</span><span class="gc-tag">PX4 · ArduPilot</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ОСВОЕН</span></div>
+      <p class="gc-breadcrumb"><a href="../index.html">Course</a><a href="../index.html#track-ros2">Elective: ROS 2 on board</a><span>Navigation and obstacle avoidance: maps, planners, setpoints</span></p>
+      <h1 class="module-title">Navigation and obstacle avoidance: maps, planners, setpoints</h1>
+      <div class="module-tags"><span class="gc-tag" title="Level">L3 — Specialist</span><span class="gc-tag">reading 45 min</span><span class="gc-tag">study ~5 h</span><span class="gc-tag">PX4 · ArduPilot</span><span class="gc-tag" data-state="ok" data-done-badge hidden>MASTERED</span></div>
       <p class="gc-muted module-score" data-module-score></p>
       <p class="module-lead">Автопилот умеет лететь в точку. Чтобы лететь в точку, <strong>не врезаясь</strong>, нужны карта, планировщик и цепочка от плана к уставкам — и честное понимание, что из этого автопилот уже умеет сам (ArduPilot: BendyRuler и Dijkstra, PX4: collision prevention) и где нужна своя логика на companion. Модуль разбирает представления карты (сетка занятости, стоимость, 3D-воксели), глобальное и локальное планирование (A*, Dijkstra, реактивные методы), раздувание препятствий и сглаживание пути, роль Nav2 и почему он «наземный», и как план превращается в уставки GUIDED/Offboard с ограничениями скорости и высоты. Лабораторная: A* на сетке с тестами, затем облёт препятствия в Gazebo по данным лидара.</p>
-      <div class="gc-callout" data-state="ok"><strong>После модуля ты умеешь</strong><ul><li>знать встроенные средства обхода автопилотов</li><li>реализовывать A* с раздуванием и сглаживанием</li><li>разделять глобальное и локальное планирование</li><li>превращать путь в уставки с ограничением скорости</li></ul></div><p class="gc-muted">Перед этим модулем: <a href="ros2-app-arch.html">Архитектура бортового приложения на ROS 2: узлы, lifecycle, watchdog</a>, <a href="mav-component.html">Свой компонент MAVLink: датчик, параметры, сообщения</a></p><div class="gc-callout lab"><p class="gc-label gc-muted">Лабораторная</p><strong>Облёт препятствия</strong><p class="gc-muted lab__hint">Сдано, когда отмечены все пункты:</p><ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="ros2-nav:lab:0"><span>Свой тест планировщика проходит</span></label></li><li><label><input type="checkbox" data-check-id="ros2-nav:lab:1"><span>Посчитана безопасная скорость по тормозному пути</span></label></li><li><label><input type="checkbox" data-check-id="ros2-nav:lab:2"><span>Траектория облёта в Gazebo (BendyRuler или свой узел)</span></label></li><li><label><input type="checkbox" data-check-id="ros2-nav:lab:3"><span>Разобран риск «неизвестное = свободно»</span></label></li></ul></div><div class="path-pos gc-muted"><span class="gc-label">В пути</span><ul><li data-path-pos="px4"><a href="../path/px4.html">PX4</a>: шаг 29 из 36 → <a href="per-camera.html?path=px4">Камеры и видеопоток на companion</a></li></ul></div>
+      <div class="gc-callout" data-state="ok"><strong>After this module you can</strong><ul><li>know the autopilots&#x27; built-in avoidance features</li><li>implement A* with inflation and smoothing</li><li>separate global and local planning</li><li>turn a path into setpoints with a speed limit</li></ul></div><p class="gc-muted">Before this module: <a href="ros2-app-arch.html">Architecture of an onboard ROS 2 application: nodes, lifecycle, watchdog</a>, <a href="mav-component.html">Your own MAVLink component: sensor, parameters, messages</a></p><div class="gc-callout lab"><p class="gc-label gc-muted">Lab</p><strong>Flying around an obstacle</strong><p class="gc-muted lab__hint">Submitted when all items are checked:</p><ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="ros2-nav:lab:0"><span>Your own scheduler test passes</span></label></li><li><label><input type="checkbox" data-check-id="ros2-nav:lab:1"><span>Safe speed calculated from braking distance</span></label></li><li><label><input type="checkbox" data-check-id="ros2-nav:lab:2"><span>Avoidance trajectory in Gazebo (BendyRuler or your own node)</span></label></li><li><label><input type="checkbox" data-check-id="ros2-nav:lab:3"><span>The &quot;unknown = free&quot; risk analyzed</span></label></li></ul></div><div class="path-pos gc-muted"><span class="gc-label">On the path</span><ul><li data-path-pos="px4"><a href="../path/px4.html">PX4</a>: step 29 of 36 → <a href="per-camera.html?path=px4">Cameras and video streaming on the companion</a></li></ul></div>
       <div class="gc-prose module-body">
-<div class="gc-callout" data-state="caution" data-untranslated><strong>Модуль ещё не переведён.</strong> Ниже — оригинал (Русский). Прогресс и оценки общие для всех языков.</div>
-<h2>Теория</h2>
+<div class="gc-callout" data-state="caution" data-untranslated><strong>This module hasn't been translated yet.</strong> Below is the original (Русский). Progress and scores are shared across all languages.</div>
+<h2>Theory</h2>
 <h4 class="md-subheading">Что умеет автопилот без вас</h4>
 <ul><li><strong>ArduPilot</strong>: proximity-датчики (<code>PRX1_TYPE</code>, в том числе MAVLink <code>OBSTACLE_DISTANCE</code>) → <strong>simple avoidance</strong> (остановка/скольжение в Loiter, <code>AVOID_ENABLE</code>, <code>AVOID_MARGIN</code>) и <strong>object avoidance</strong> в автоматических режимах: <code>OA_TYPE = 1</code> BendyRuler (реактивный, ищет обходное направление), <code>2</code> Dijkstra (по геозонам-полигонам, глобальный путь вокруг известных запретных зон), <code>3</code> комбинация. Параметры <code>OA_MARGIN_MAX</code>, <code>OA_BR_LOOKAHEAD</code>.</li><li><strong>PX4</strong>: <strong>collision prevention</strong> в Position-режиме (<code>CP_DIST</code> — минимальная дистанция, по <code>OBSTACLE_DISTANCE</code>/ROS 2 <code>ObstacleDistance</code>), ограничивает скорость в сторону препятствия.</li></ul>
 <p>Это работает и проверено в полёте — начинайте с этого. Своя навигация на companion нужна, когда: карту надо строить и хранить (полёт в помещении, лес), путь — глобально оптимальный в неизвестной среде, или есть цель более высокого уровня (обследовать объект, долететь до точки, найденной камерой).</p>
@@ -68,7 +68,7 @@
 <h4 class="md-subheading">От плана к уставкам</h4>
 <ol><li>Путь в фрейме <code>map</code> (ENU) → промежуточные точки с шагом 1–3 м.</li><li>Ограничения: максимальная скорость у препятствий (зависит от дальности датчика и тормозного пути: v ≤ √(2·a·d)), высота в коридоре (над землёй по дальномеру и ниже геозоны), рысканье — по направлению движения, если камера должна смотреть вперёд.</li><li>Отправка: PX4 — <code>TrajectorySetpoint</code> (позиция и/или скорость, NED — конвертировать!), ArduPilot — <code>/ap/cmd_vel</code> (ENU, frame <code>map</code>) или позиционные цели через MAVROS.</li><li>Контроль выполнения: отклонение от пути &gt; порога → остановка и перепланирование; цель недостижима → удержание и сообщение оператору.</li></ol>
 
-<h2>Практика</h2>
+<h2>Practice</h2>
 <h4 class="md-subheading">Шаг 1. A* с тестами</h4>
 <pre class="cli-block"><code>cd examples/ros2-docker/ws/src/uav_ros2_labs
 python -m pytest -q test/test_grid_planner.py</code></pre>
@@ -81,26 +81,26 @@ python -m pytest -q test/test_grid_planner.py</code></pre>
 <p>Повторите шаг 3 с <code>unknown_is_free=True</code> и <code>False</code>: покажите, где «оптимистичный» планировщик прокладывает путь через ещё не увиденное, и почему это опасно.</p>
 <p>Лабораторная засчитывается, когда проходит свой тест планировщика, посчитана безопасная скорость, есть траектории облёта (хотя бы вариант А) и разбор неизвестного пространства.</p>
 
-<h2>Диагностика</h2>
+<h2>Troubleshooting</h2>
 <div class="diag-groups"><article class="diag-item"><h4><strong>Симптом:</strong> путь проходит вплотную к препятствию, аппарат задевает</h4><ul><li>Возможная причина: нет раздувания или радиус меньше размера аппарата + ошибка позиции.</li><li>Что сделать: inflation = радиус + 2σ позиции + запас.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> аппарат «дёргается», перепланирование каждые 100 мс меняет путь</h4><ul><li>Возможная причина: глобальный планировщик на частоте локального, шумная карта.</li><li>Что сделать: глобальный план 1 Гц, гистерезис смены пути, фильтр карты (log-odds).</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> аппарат влетает в неизвестную зону и теряет препятствие из поля зрения</h4><ul><li>Возможная причина: неизвестное считается свободным; датчик смотрит не туда, куда летим.</li><li>Что сделать: unknown = occupied; рысканье по направлению движения.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> уставки по пути ведут не туда</h4><ul><li>Возможная причина: путь в ENU отправлен в PX4 как NED.</li><li>Что сделать: конвертация на границе (frames.py), тест на известной точке.</li></ul></article></div>
 
-<h2>Чек-лист</h2>
+<h2>Checklist</h2>
 <ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="ros2-nav:0"><span>Знаю, что умеют BendyRuler/Dijkstra и collision prevention без своего кода</span></label></li><li><label><input type="checkbox" data-check-id="ros2-nav:1"><span>Различаю сетку занятости, costmap и 3D-представления; неизвестное — занято</span></label></li><li><label><input type="checkbox" data-check-id="ros2-nav:2"><span>Реализую A* с допустимой эвристикой, раздуванием и сглаживанием</span></label></li><li><label><input type="checkbox" data-check-id="ros2-nav:3"><span>Разделяю глобальное и локальное планирование по частотам и ролям</span></label></li><li><label><input type="checkbox" data-check-id="ros2-nav:4"><span>Превращаю путь в уставки с ограничениями скорости по тормозному пути</span></label></li><li><label><input type="checkbox" data-check-id="ros2-nav:5"><span>Понимаю, где Nav2 полезен для дрона, а где нет</span></label></li></ul>
 
-<h2>Источники</h2>
+<h2>Sources</h2>
 <ul class="refs"><li><a href="https://ardupilot.org/copter/docs/common-object-avoidance-landing-page.html" target="_blank" rel="noopener noreferrer">ArduPilot — Object avoidance (BendyRuler, Dijkstra)</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://docs.px4.io/main/en/computer_vision/collision_prevention.html" target="_blank" rel="noopener noreferrer">PX4 — Collision prevention</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://docs.nav2.org/" target="_blank" rel="noopener noreferrer">Nav2 documentation</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://octomap.github.io/" target="_blank" rel="noopener noreferrer">OctoMap</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://ieeexplore.ieee.org/document/4082128" target="_blank" rel="noopener noreferrer">Hart, Nilsson, Raphael — A formal basis for the heuristic determination of minimum cost paths (A*)</a> <span class="gc-tag">secondary</span></li></ul>
-<h2>Задачи с числовым ответом</h2>
+<h2>Numeric problems</h2>
 <uav-tasks src="../tasks/ros2-nav.json" module="ros2-nav"></uav-tasks>
-<h2>Проверь себя</h2>
+<h2>Test yourself</h2>
 <uav-quiz src="../quiz/ros2-nav.json" module="ros2-nav"></uav-quiz>
       </div>
-      <div class="module-done"><gc-button variant="secondary" data-done-toggle="ros2-nav">Отметить как пройденный</gc-button></div>
-      <section class="related" aria-label="Смежные модули"><p class="gc-label gc-muted">Смежные модули</p><div class="gc-grid ref-grid"><a class="gc-card" href="ros2-app-arch.html"><strong>Архитектура бортового приложения на ROS 2: узлы, lifecycle, watchdog</strong><div class="gc-card__meta"><span class="gc-tag" title="L3 — Специалист">L3</span></div></a><a class="gc-card" href="mav-component.html"><strong>Свой компонент MAVLink: датчик, параметры, сообщения</strong><div class="gc-card__meta"><span class="gc-tag" title="L3 — Специалист">L3</span></div></a><a class="gc-card" href="per-visual-nav.html"><strong>Визуальная навигация: оптический поток, VIO, SLAM обзорно</strong><div class="gc-card__meta"><span class="gc-tag" title="L4 — Эксперт">L4</span></div></a></div></section>
-      <nav class="pager" aria-label="Соседние модули" data-track-pager><a class="gc-card pager__prev" href="ros2-app-arch.html"><span class="gc-label gc-muted">Назад · трек</span><br>Архитектура бортового приложения на ROS 2: узлы, lifecycle, watchdog</a><a class="gc-card pager__next" href="ros2-from-ros1.html"><span class="gc-label gc-muted">Дальше · трек</span><br>Из ROS 1 в ROS 2: читать старые проекты и переносить их</a></nav><nav class="pager" aria-label="Соседние шаги пути PX4" data-path-pager="px4" hidden><a class="gc-card pager__prev" href="ros2-app-arch.html?path=px4"><span class="gc-label gc-muted">Назад · путь PX4</span><br>Архитектура бортового приложения на ROS 2: узлы, lifecycle, watchdog</a><a class="gc-card pager__next" href="per-camera.html?path=px4"><span class="gc-label gc-muted">Дальше · шаг 30 из 36</span><br>Камеры и видеопоток на companion</a></nav>
+      <div class="module-done"><gc-button variant="secondary" data-done-toggle="ros2-nav">Mark as completed</gc-button></div>
+      <section class="related" aria-label="Related modules"><p class="gc-label gc-muted">Related modules</p><div class="gc-grid ref-grid"><a class="gc-card" href="ros2-app-arch.html"><strong>Architecture of an onboard ROS 2 application: nodes, lifecycle, watchdog</strong><div class="gc-card__meta"><span class="gc-tag" title="L3 — Специалист">L3</span></div></a><a class="gc-card" href="mav-component.html"><strong>Your own MAVLink component: sensor, parameters, messages</strong><div class="gc-card__meta"><span class="gc-tag" title="L3 — Специалист">L3</span></div></a><a class="gc-card" href="per-visual-nav.html"><strong>Visual navigation: optical flow, VIO, SLAM overview</strong><div class="gc-card__meta"><span class="gc-tag" title="L4 — Эксперт">L4</span></div></a></div></section>
+      <nav class="pager" aria-label="Adjacent modules" data-track-pager><a class="gc-card pager__prev" href="ros2-app-arch.html"><span class="gc-label gc-muted">Back · track</span><br>Architecture of an onboard ROS 2 application: nodes, lifecycle, watchdog</a><a class="gc-card pager__next" href="ros2-from-ros1.html"><span class="gc-label gc-muted">Next · track</span><br>From ROS 1 to ROS 2: reading old projects and porting them</a></nav><nav class="pager" aria-label="Adjacent steps of path PX4" data-path-pager="px4" hidden><a class="gc-card pager__prev" href="ros2-app-arch.html?path=px4"><span class="gc-label gc-muted">Back · path PX4</span><br>Architecture of an onboard ROS 2 application: nodes, lifecycle, watchdog</a><a class="gc-card pager__next" href="per-camera.html?path=px4"><span class="gc-label gc-muted">Next · step 30 of 36</span><br>Cameras and video streaming on the companion</a></nav>
     </article>
   </main>
   <footer class="gc-container site-footer gc-muted">
-    <p>Открытый курс · <a href="https://github.com/irreligious86/UAV-Education">исходники на GitHub</a> · <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">план развития</a> · <a href="../../curriculum/curriculum.html">для разработчика</a> · CC BY-NC-SA 4.0</p>
+    <p>Open course · <a href="https://github.com/irreligious86/UAV-Education">source on GitHub</a> · <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">roadmap</a> · <a href="../../curriculum/curriculum.html">for developers</a> · CC BY-NC-SA 4.0</p>
   </footer>
 </body>
 </html>

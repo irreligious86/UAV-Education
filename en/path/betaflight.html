@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Путь Betaflight — UAV Student</title>
-  <meta name="description" content="Собрать, настроить и тюнить квадрокоптер на Betaflight осознанно: порты, режимы, failsafe, фильтры, PID по данным, автоматизация.">
+  <title>Path Betaflight — UAV Student</title>
+  <meta name="description" content="Build, set up and tune a Betaflight quadcopter deliberately: ports, modes, failsafe, filters, data-driven PID, automation.">
   <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
   <link rel="manifest" href="../../manifest.webmanifest">
   <meta name="theme-color" content="#0b0f14">
@@ -30,283 +30,283 @@
   <header class="site-header">
     <div class="gc-container site-header__inner">
       <a class="site-brand" href="../index.html"><span class="site-brand__mark" aria-hidden="true">◆</span> UAV Student</a>
-      <nav class="gc-nav" aria-label="Разделы сайта">
-        <a href="../index.html" aria-current="page">Курс</a>
-        <a href="../ref/index.html">Справочник</a>
-        <a href="../pages/glossary.html">Глоссарий</a>
-        <a href="../pages/fails.html">Фейлы</a>
-        <a href="../pages/search.html">Поиск</a>
-        <a href="../pages/progress.html">Мой прогресс</a>
+      <nav class="gc-nav" aria-label="Site sections">
+        <a href="../index.html" aria-current="page">Course</a>
+        <a href="../ref/index.html">Reference</a>
+        <a href="../pages/glossary.html">Glossary</a>
+        <a href="../pages/fails.html">Failures</a>
+        <a href="../pages/search.html">Search</a>
+        <a href="../pages/progress.html">My progress</a>
       </nav>
-      <nav class="lang-switch" aria-label="Язык"><a class="gc-tag" href="../../path/betaflight.html" data-lang-to="ru" hreflang="ru" lang="ru" title="Русский">RU</a><a class="gc-tag" href="../../uk/path/betaflight.html" data-lang-to="uk" hreflang="uk" lang="uk" title="Українська">UK</a><a class="gc-tag" href="../../en/path/betaflight.html" data-lang-to="en" hreflang="en" lang="en" title="English" aria-current="true" data-state="ok">EN</a></nav>
+      <nav class="lang-switch" aria-label="Language"><a class="gc-tag" href="../../path/betaflight.html" data-lang-to="ru" hreflang="ru" lang="ru" title="Русский">RU</a><a class="gc-tag" href="../../uk/path/betaflight.html" data-lang-to="uk" hreflang="uk" lang="uk" title="Українська">UK</a><a class="gc-tag" href="../../en/path/betaflight.html" data-lang-to="en" hreflang="en" lang="en" title="English" aria-current="true" data-state="ok">EN</a></nav>
     </div>
   </header>
   <main class="gc-container site-main">
-    <p class="gc-breadcrumb"><a href="../index.html">Курс</a><span>Путь: Betaflight</span></p>
+    <p class="gc-breadcrumb"><a href="../index.html">Course</a><span>Path: Betaflight</span></p>
     <section class="home-hero">
       <h1 class="gc-display">Betaflight</h1>
-      <p class="home-hero__lead">Собрать, настроить и тюнить квадрокоптер на Betaflight осознанно: порты, режимы, failsafe, фильтры, PID по данным, автоматизация.</p>
-      <div class="home-hero__stats"><span class="gc-tag">44 шагов</span><span class="gc-tag" data-state="ok">написано 44</span><span class="gc-tag" data-state="caution">в работе 0</span></div>
-      <p class="gc-label gc-muted">Твой прогресс <span data-progress-label="f-physics,f-mechanics,f-aero-props,f-electricity-101,f-power,f-motors-esc,f-fc-sensors,f-frame-mech,f-safety,f-regulations,f-components-choice,tools-overview,eng-method-101,bf-intro,bf-ports,link-protocols,bf-modes-osd,bf-failsafe,link-elrs,link-vtx,ops-field,ops-case-studies,diag-troubleshooting,el-power-design,el-battery-packs,el-wiring,el-measure,el-emi,el-peripherals,rf-antennas,rf-link-budget,bf-pid-reg-in-bf,data-python,ctl-signals,bf-blackbox,bf-filters,bf-rpm-filter,ctl-theory,bf-pid,bf-cli,bf-cli-automation,emb-basics,bf-custom,fw-reading"></span></p>
-      <div class="gc-progress" role="progressbar" aria-label="Прогресс по пути" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" data-progress-of="f-physics,f-mechanics,f-aero-props,f-electricity-101,f-power,f-motors-esc,f-fc-sensors,f-frame-mech,f-safety,f-regulations,f-components-choice,tools-overview,eng-method-101,bf-intro,bf-ports,link-protocols,bf-modes-osd,bf-failsafe,link-elrs,link-vtx,ops-field,ops-case-studies,diag-troubleshooting,el-power-design,el-battery-packs,el-wiring,el-measure,el-emi,el-peripherals,rf-antennas,rf-link-budget,bf-pid-reg-in-bf,data-python,ctl-signals,bf-blackbox,bf-filters,bf-rpm-filter,ctl-theory,bf-pid,bf-cli,bf-cli-automation,emb-basics,bf-custom,fw-reading" style="--gc-value: 0%"></div>
-      <p class="ready-filter"><label class="gc-muted"><input type="checkbox" data-ready-only> Показывать только готовые модули</label></p>
-      <p class="path-continue"><a class="gc-card" data-path-continue="betaflight" data-path-steps="f-physics|Как летает мультиротор;;f-mechanics|Механика полёта: силы, моменты, уравнения движения;;f-aero-props|Аэродинамика пропеллера и подбор силовой установки;;f-electricity-101|Электричество и измерения 101;;f-power|Питание: LiPo, Li-Ion, BEC;;f-motors-esc|Моторы, ESC и DShot;;f-fc-sensors|Полётный контроллер и сенсоры;;f-frame-mech|Рама, механика и вибрации;;f-safety|Безопасность и предполётный чек;;f-regulations|Правила, зоны и ответственность оператора;;f-components-choice|Выбор компонентов под задачу и бюджет;;tools-overview|Инструменты: Configurator, GCS, git;;eng-method-101|Инженерный метод 101: требования, архитектура, тесты, документация;;bf-intro|Введение в Betaflight;;bf-ports|Порты и приёмник;;link-protocols|SBUS, CRSF и инверсия UART;;bf-modes-osd|Режимы и OSD;;bf-failsafe|Failsafe: стадии и тест по свитчу;;link-elrs|ExpressLRS: packet rate, телеметрия, LQ;;link-vtx|VTX-таблицы и смена видеоканала;;ops-field|Полевые операции и работа команды;;ops-case-studies|Разбор реальных аварий;;diag-troubleshooting|Дерево диагностики: дрон не взлетает;;el-power-design|Схемотехника питания борта;;el-battery-packs|Сборки Li-Ion и LiFePO4: элементы, сварка, BMS;;el-wiring|Пайка, жгуты и надёжность соединений;;el-measure|Измерения: мультиметр, осциллограф, логический анализатор;;el-emi|Помехи и электромагнитная совместимость;;el-peripherals|Подключение периферии: UART, I2C, CAN на практике;;rf-antennas|Антенны, поляризация и диаграммы направленности;;rf-link-budget|Бюджет радиолинка и дальность;;bf-pid-reg-in-bf|PID-регулятор в Betaflight;;data-python|Python для анализа полётных данных;;ctl-signals|Сигналы и спектры: что видит гироскоп;;bf-blackbox|Blackbox;;bf-filters|Фильтры;;bf-rpm-filter|RPM-фильтр: кейс «свистящего» 10&quot;;;ctl-theory|Теория управления: устойчивость, запасы, каскады;;bf-pid|PID-тюнинг по данным;;bf-cli|CLI и remap;;bf-cli-automation|Автоматизация CLI по serial;;emb-basics|Embedded: прерывания, таймеры, DMA, RTOS;;bf-custom|Свои сборки прошивок;;fw-reading|Как читать исходники прошивки: Betaflight и ArduPilot" hidden></a></p>
-      <p class="gc-muted home-hero__note">Иди по порядку: каждый шаг опирается на предыдущие. Модули с тегом «общий» входят и в другие пути — пройденный один раз, такой модуль засчитан везде. Открывай уроки отсюда: тогда кнопки «назад/дальше» ведут по шагам именно этого пути.</p>
+      <p class="home-hero__lead">Build, set up and tune a Betaflight quadcopter deliberately: ports, modes, failsafe, filters, data-driven PID, automation.</p>
+      <div class="home-hero__stats"><span class="gc-tag">44 steps</span><span class="gc-tag" data-state="ok">written 44</span><span class="gc-tag" data-state="caution">in progress 0</span></div>
+      <p class="gc-label gc-muted">Your progress <span data-progress-label="f-physics,f-mechanics,f-aero-props,f-electricity-101,f-power,f-motors-esc,f-fc-sensors,f-frame-mech,f-safety,f-regulations,f-components-choice,tools-overview,eng-method-101,bf-intro,bf-ports,link-protocols,bf-modes-osd,bf-failsafe,link-elrs,link-vtx,ops-field,ops-case-studies,diag-troubleshooting,el-power-design,el-battery-packs,el-wiring,el-measure,el-emi,el-peripherals,rf-antennas,rf-link-budget,bf-pid-reg-in-bf,data-python,ctl-signals,bf-blackbox,bf-filters,bf-rpm-filter,ctl-theory,bf-pid,bf-cli,bf-cli-automation,emb-basics,bf-custom,fw-reading"></span></p>
+      <div class="gc-progress" role="progressbar" aria-label="Path progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" data-progress-of="f-physics,f-mechanics,f-aero-props,f-electricity-101,f-power,f-motors-esc,f-fc-sensors,f-frame-mech,f-safety,f-regulations,f-components-choice,tools-overview,eng-method-101,bf-intro,bf-ports,link-protocols,bf-modes-osd,bf-failsafe,link-elrs,link-vtx,ops-field,ops-case-studies,diag-troubleshooting,el-power-design,el-battery-packs,el-wiring,el-measure,el-emi,el-peripherals,rf-antennas,rf-link-budget,bf-pid-reg-in-bf,data-python,ctl-signals,bf-blackbox,bf-filters,bf-rpm-filter,ctl-theory,bf-pid,bf-cli,bf-cli-automation,emb-basics,bf-custom,fw-reading" style="--gc-value: 0%"></div>
+      <p class="ready-filter"><label class="gc-muted"><input type="checkbox" data-ready-only> Show only ready modules</label></p>
+      <p class="path-continue"><a class="gc-card" data-path-continue="betaflight" data-path-steps="f-physics|How a multirotor flies;;f-mechanics|Flight mechanics: forces, moments, equations of motion;;f-aero-props|Propeller aerodynamics and power system selection;;f-electricity-101|Electricity and measurements 101;;f-power|Power: LiPo, Li-Ion, BEC;;f-motors-esc|Motors, ESCs and DShot;;f-fc-sensors|Flight controller and sensors;;f-frame-mech|Frame, mechanics and vibration;;f-safety|Safety and the preflight check;;f-regulations|Rules, zones and operator responsibility;;f-components-choice|Choosing components for the task and budget;;tools-overview|Tools: Configurator, GCS, git;;eng-method-101|Engineering Method 101: requirements, architecture, tests, documentation;;bf-intro|Introduction to Betaflight;;bf-ports|Ports and receiver;;link-protocols|SBUS, CRSF and UART inversion;;bf-modes-osd|Modes and OSD;;bf-failsafe|Failsafe: stages and switch test;;link-elrs|ExpressLRS: packet rate, telemetry, LQ;;link-vtx|VTX tables and changing the video channel;;ops-field|Field operations and teamwork;;ops-case-studies|Analysis of real crashes;;diag-troubleshooting|Troubleshooting tree: the drone won&#x27;t take off;;el-power-design|Onboard power circuit design;;el-battery-packs|Li-Ion and LiFePO4 packs: cells, welding, BMS;;el-wiring|Soldering, harnesses and connection reliability;;el-measure|Measurements: multimeter, oscilloscope, logic analyzer;;el-emi|Interference and electromagnetic compatibility;;el-peripherals|Connecting peripherals: UART, I2C, CAN in practice;;rf-antennas|Antennas, polarization and radiation patterns;;rf-link-budget|Radio link budget and range;;bf-pid-reg-in-bf|PID controller in Betaflight;;data-python|Python for flight data analysis;;ctl-signals|Signals and spectra: what the gyro sees;;bf-blackbox|Blackbox;;bf-filters|Filters;;bf-rpm-filter|RPM filter: the case of the &quot;whistling&quot; 10&quot;;;ctl-theory|Control theory: stability, margins, cascades;;bf-pid|Data-driven PID tuning;;bf-cli|CLI and remap;;bf-cli-automation|CLI automation over serial;;emb-basics|Embedded: interrupts, timers, DMA, RTOS;;bf-custom|Your own firmware builds;;fw-reading|How to read firmware source code: Betaflight and ArduPilot" hidden></a></p>
+      <p class="gc-muted home-hero__note">Go in order: each step builds on the previous ones. Modules tagged “shared” are part of other paths too — complete one once and it counts everywhere. Open lessons from here: then the “back/next” buttons follow the steps of this path.</p>
     </section>
       <section class="track gc-panel">
-        <p class="gc-label gc-muted">Этап</p>
-        <h2 class="gc-title">Основа</h2>
+        <p class="gc-label gc-muted">Stage</p>
+        <h2 class="gc-title">Foundations</h2>
         <ol class="track__modules">
           <li class="track-module" data-module-id="f-physics">
             <span class="track-module__num">01</span>
-            <a class="track-module__title" href="../m/f-physics.html?path=betaflight">Как летает мультиротор</a>
-            <span class="track-module__tags"><span class="gc-tag" title="L1 — Оператор">L1</span><span class="gc-tag" title="Общий модуль: засчитывается во всех путях, где он есть">общий</span><span class="gc-tag">~2 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+            <a class="track-module__title" href="../m/f-physics.html?path=betaflight">How a multirotor flies</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L1 — Оператор">L1</span><span class="gc-tag" title="Shared module: counts in every path that includes it">shared</span><span class="gc-tag">~2 h</span><span class="gc-tag" data-state="ok" data-done-badge hidden>COMPLETED</span></span>
           </li>
           <li class="track-module" data-module-id="f-mechanics">
             <span class="track-module__num">02</span>
-            <a class="track-module__title" href="../m/f-mechanics.html?path=betaflight">Механика полёта: силы, моменты, уравнения движения</a>
-            <span class="track-module__tags"><span class="gc-tag" title="L1 — Оператор">L1</span><span class="gc-tag" title="Общий модуль: засчитывается во всех путях, где он есть">общий</span><span class="gc-tag">~3 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+            <a class="track-module__title" href="../m/f-mechanics.html?path=betaflight">Flight mechanics: forces, moments, equations of motion</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L1 — Оператор">L1</span><span class="gc-tag" title="Shared module: counts in every path that includes it">shared</span><span class="gc-tag">~3 h</span><span class="gc-tag" data-state="ok" data-done-badge hidden>COMPLETED</span></span>
           </li>
           <li class="track-module" data-module-id="f-aero-props">
             <span class="track-module__num">03</span>
-            <a class="track-module__title" href="../m/f-aero-props.html?path=betaflight">Аэродинамика пропеллера и подбор силовой установки</a>
-            <span class="track-module__tags"><span class="gc-tag" title="L2 — Интегратор">L2</span><span class="gc-tag" title="Общий модуль: засчитывается во всех путях, где он есть">общий</span><span class="gc-tag">~4 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+            <a class="track-module__title" href="../m/f-aero-props.html?path=betaflight">Propeller aerodynamics and power system selection</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L2 — Интегратор">L2</span><span class="gc-tag" title="Shared module: counts in every path that includes it">shared</span><span class="gc-tag">~4 h</span><span class="gc-tag" data-state="ok" data-done-badge hidden>COMPLETED</span></span>
           </li>
           <li class="track-module" data-module-id="f-electricity-101">
             <span class="track-module__num">04</span>
-            <a class="track-module__title" href="../m/f-electricity-101.html?path=betaflight">Электричество и измерения 101</a>
-            <span class="track-module__tags"><span class="gc-tag" title="L1 — Оператор">L1</span><span class="gc-tag" title="Общий модуль: засчитывается во всех путях, где он есть">общий</span><span class="gc-tag">~3 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+            <a class="track-module__title" href="../m/f-electricity-101.html?path=betaflight">Electricity and measurements 101</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L1 — Оператор">L1</span><span class="gc-tag" title="Shared module: counts in every path that includes it">shared</span><span class="gc-tag">~3 h</span><span class="gc-tag" data-state="ok" data-done-badge hidden>COMPLETED</span></span>
           </li>
           <li class="track-module" data-module-id="f-power">
             <span class="track-module__num">05</span>
-            <a class="track-module__title" href="../m/f-power.html?path=betaflight">Питание: LiPo, Li-Ion, BEC</a>
-            <span class="track-module__tags"><span class="gc-tag" title="L1 — Оператор">L1</span><span class="gc-tag" title="Общий модуль: засчитывается во всех путях, где он есть">общий</span><span class="gc-tag">~3 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+            <a class="track-module__title" href="../m/f-power.html?path=betaflight">Power: LiPo, Li-Ion, BEC</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L1 — Оператор">L1</span><span class="gc-tag" title="Shared module: counts in every path that includes it">shared</span><span class="gc-tag">~3 h</span><span class="gc-tag" data-state="ok" data-done-badge hidden>COMPLETED</span></span>
           </li>
           <li class="track-module" data-module-id="f-motors-esc">
             <span class="track-module__num">06</span>
-            <a class="track-module__title" href="../m/f-motors-esc.html?path=betaflight">Моторы, ESC и DShot</a>
-            <span class="track-module__tags"><span class="gc-tag" title="L1 — Оператор">L1</span><span class="gc-tag" title="Общий модуль: засчитывается во всех путях, где он есть">общий</span><span class="gc-tag">~2 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+            <a class="track-module__title" href="../m/f-motors-esc.html?path=betaflight">Motors, ESCs and DShot</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L1 — Оператор">L1</span><span class="gc-tag" title="Shared module: counts in every path that includes it">shared</span><span class="gc-tag">~2 h</span><span class="gc-tag" data-state="ok" data-done-badge hidden>COMPLETED</span></span>
           </li>
           <li class="track-module" data-module-id="f-fc-sensors">
             <span class="track-module__num">07</span>
-            <a class="track-module__title" href="../m/f-fc-sensors.html?path=betaflight">Полётный контроллер и сенсоры</a>
-            <span class="track-module__tags"><span class="gc-tag" title="L1 — Оператор">L1</span><span class="gc-tag" title="Общий модуль: засчитывается во всех путях, где он есть">общий</span><span class="gc-tag">~2 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+            <a class="track-module__title" href="../m/f-fc-sensors.html?path=betaflight">Flight controller and sensors</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L1 — Оператор">L1</span><span class="gc-tag" title="Shared module: counts in every path that includes it">shared</span><span class="gc-tag">~2 h</span><span class="gc-tag" data-state="ok" data-done-badge hidden>COMPLETED</span></span>
           </li>
           <li class="track-module" data-module-id="f-frame-mech">
             <span class="track-module__num">08</span>
-            <a class="track-module__title" href="../m/f-frame-mech.html?path=betaflight">Рама, механика и вибрации</a>
-            <span class="track-module__tags"><span class="gc-tag" title="L2 — Интегратор">L2</span><span class="gc-tag" title="Общий модуль: засчитывается во всех путях, где он есть">общий</span><span class="gc-tag">~3 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+            <a class="track-module__title" href="../m/f-frame-mech.html?path=betaflight">Frame, mechanics and vibration</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L2 — Интегратор">L2</span><span class="gc-tag" title="Shared module: counts in every path that includes it">shared</span><span class="gc-tag">~3 h</span><span class="gc-tag" data-state="ok" data-done-badge hidden>COMPLETED</span></span>
           </li>
           <li class="track-module" data-module-id="f-safety">
             <span class="track-module__num">09</span>
-            <a class="track-module__title" href="../m/f-safety.html?path=betaflight">Безопасность и предполётный чек</a>
-            <span class="track-module__tags"><span class="gc-tag" title="L1 — Оператор">L1</span><span class="gc-tag" title="Общий модуль: засчитывается во всех путях, где он есть">общий</span><span class="gc-tag">~1 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+            <a class="track-module__title" href="../m/f-safety.html?path=betaflight">Safety and the preflight check</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L1 — Оператор">L1</span><span class="gc-tag" title="Shared module: counts in every path that includes it">shared</span><span class="gc-tag">~1 h</span><span class="gc-tag" data-state="ok" data-done-badge hidden>COMPLETED</span></span>
           </li>
           <li class="track-module" data-module-id="f-regulations">
             <span class="track-module__num">10</span>
-            <a class="track-module__title" href="../m/f-regulations.html?path=betaflight">Правила, зоны и ответственность оператора</a>
-            <span class="track-module__tags"><span class="gc-tag" title="L1 — Оператор">L1</span><span class="gc-tag" title="Общий модуль: засчитывается во всех путях, где он есть">общий</span><span class="gc-tag">~2 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+            <a class="track-module__title" href="../m/f-regulations.html?path=betaflight">Rules, zones and operator responsibility</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L1 — Оператор">L1</span><span class="gc-tag" title="Shared module: counts in every path that includes it">shared</span><span class="gc-tag">~2 h</span><span class="gc-tag" data-state="ok" data-done-badge hidden>COMPLETED</span></span>
           </li>
           <li class="track-module" data-module-id="f-components-choice">
             <span class="track-module__num">11</span>
-            <a class="track-module__title" href="../m/f-components-choice.html?path=betaflight">Выбор компонентов под задачу и бюджет</a>
-            <span class="track-module__tags"><span class="gc-tag" title="L1 — Оператор">L1</span><span class="gc-tag" title="Общий модуль: засчитывается во всех путях, где он есть">общий</span><span class="gc-tag">~3 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+            <a class="track-module__title" href="../m/f-components-choice.html?path=betaflight">Choosing components for the task and budget</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L1 — Оператор">L1</span><span class="gc-tag" title="Shared module: counts in every path that includes it">shared</span><span class="gc-tag">~3 h</span><span class="gc-tag" data-state="ok" data-done-badge hidden>COMPLETED</span></span>
           </li>
           <li class="track-module" data-module-id="tools-overview">
             <span class="track-module__num">12</span>
-            <a class="track-module__title" href="../m/tools-overview.html?path=betaflight">Инструменты: Configurator, GCS, git</a>
-            <span class="track-module__tags"><span class="gc-tag" title="L1 — Оператор">L1</span><span class="gc-tag" title="Общий модуль: засчитывается во всех путях, где он есть">общий</span><span class="gc-tag">~2 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+            <a class="track-module__title" href="../m/tools-overview.html?path=betaflight">Tools: Configurator, GCS, git</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L1 — Оператор">L1</span><span class="gc-tag" title="Shared module: counts in every path that includes it">shared</span><span class="gc-tag">~2 h</span><span class="gc-tag" data-state="ok" data-done-badge hidden>COMPLETED</span></span>
           </li>
           <li class="track-module" data-module-id="eng-method-101">
             <span class="track-module__num">13</span>
-            <a class="track-module__title" href="../m/eng-method-101.html?path=betaflight">Инженерный метод 101: требования, архитектура, тесты, документация</a>
-            <span class="track-module__tags"><span class="gc-tag" title="L1 — Оператор">L1</span><span class="gc-tag" title="Общий модуль: засчитывается во всех путях, где он есть">общий</span><span class="gc-tag">~3 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+            <a class="track-module__title" href="../m/eng-method-101.html?path=betaflight">Engineering Method 101: requirements, architecture, tests, documentation</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L1 — Оператор">L1</span><span class="gc-tag" title="Shared module: counts in every path that includes it">shared</span><span class="gc-tag">~3 h</span><span class="gc-tag" data-state="ok" data-done-badge hidden>COMPLETED</span></span>
           </li>
         </ol>
       </section>
       <section class="track gc-panel">
-        <p class="gc-label gc-muted">Этап</p>
-        <h2 class="gc-title">Первый полёт</h2>
+        <p class="gc-label gc-muted">Stage</p>
+        <h2 class="gc-title">First flight</h2>
         <ol class="track__modules">
           <li class="track-module" data-module-id="bf-intro">
             <span class="track-module__num">14</span>
-            <a class="track-module__title" href="../m/bf-intro.html?path=betaflight">Введение в Betaflight</a>
-            <span class="track-module__tags"><span class="gc-tag" title="L1 — Оператор">L1</span><span class="gc-tag">~2 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+            <a class="track-module__title" href="../m/bf-intro.html?path=betaflight">Introduction to Betaflight</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L1 — Оператор">L1</span><span class="gc-tag">~2 h</span><span class="gc-tag" data-state="ok" data-done-badge hidden>COMPLETED</span></span>
           </li>
           <li class="track-module" data-module-id="bf-ports">
             <span class="track-module__num">15</span>
-            <a class="track-module__title" href="../m/bf-ports.html?path=betaflight">Порты и приёмник</a>
-            <span class="track-module__tags"><span class="gc-tag" title="L1 — Оператор">L1</span><span class="gc-tag">~2 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+            <a class="track-module__title" href="../m/bf-ports.html?path=betaflight">Ports and receiver</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L1 — Оператор">L1</span><span class="gc-tag">~2 h</span><span class="gc-tag" data-state="ok" data-done-badge hidden>COMPLETED</span></span>
           </li>
           <li class="track-module" data-module-id="link-protocols">
             <span class="track-module__num">16</span>
-            <a class="track-module__title" href="../m/link-protocols.html?path=betaflight">SBUS, CRSF и инверсия UART</a>
-            <span class="track-module__tags"><span class="gc-tag" title="L1 — Оператор">L1</span><span class="gc-tag" title="Общий модуль: засчитывается во всех путях, где он есть">общий</span><span class="gc-tag">~1.5 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+            <a class="track-module__title" href="../m/link-protocols.html?path=betaflight">SBUS, CRSF and UART inversion</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L1 — Оператор">L1</span><span class="gc-tag" title="Shared module: counts in every path that includes it">shared</span><span class="gc-tag">~1.5 h</span><span class="gc-tag" data-state="ok" data-done-badge hidden>COMPLETED</span></span>
           </li>
           <li class="track-module" data-module-id="bf-modes-osd">
             <span class="track-module__num">17</span>
-            <a class="track-module__title" href="../m/bf-modes-osd.html?path=betaflight">Режимы и OSD</a>
-            <span class="track-module__tags"><span class="gc-tag" title="L1 — Оператор">L1</span><span class="gc-tag">~2 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+            <a class="track-module__title" href="../m/bf-modes-osd.html?path=betaflight">Modes and OSD</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L1 — Оператор">L1</span><span class="gc-tag">~2 h</span><span class="gc-tag" data-state="ok" data-done-badge hidden>COMPLETED</span></span>
           </li>
           <li class="track-module" data-module-id="bf-failsafe">
             <span class="track-module__num">18</span>
-            <a class="track-module__title" href="../m/bf-failsafe.html?path=betaflight">Failsafe: стадии и тест по свитчу</a>
-            <span class="track-module__tags"><span class="gc-tag" title="L1 — Оператор">L1</span><span class="gc-tag">~2 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+            <a class="track-module__title" href="../m/bf-failsafe.html?path=betaflight">Failsafe: stages and switch test</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L1 — Оператор">L1</span><span class="gc-tag">~2 h</span><span class="gc-tag" data-state="ok" data-done-badge hidden>COMPLETED</span></span>
           </li>
           <li class="track-module" data-module-id="link-elrs">
             <span class="track-module__num">19</span>
-            <a class="track-module__title" href="../m/link-elrs.html?path=betaflight">ExpressLRS: packet rate, телеметрия, LQ</a>
-            <span class="track-module__tags"><span class="gc-tag" title="L2 — Интегратор">L2</span><span class="gc-tag" title="Общий модуль: засчитывается во всех путях, где он есть">общий</span><span class="gc-tag">~2 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+            <a class="track-module__title" href="../m/link-elrs.html?path=betaflight">ExpressLRS: packet rate, telemetry, LQ</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L2 — Интегратор">L2</span><span class="gc-tag" title="Shared module: counts in every path that includes it">shared</span><span class="gc-tag">~2 h</span><span class="gc-tag" data-state="ok" data-done-badge hidden>COMPLETED</span></span>
           </li>
           <li class="track-module" data-module-id="link-vtx">
             <span class="track-module__num">20</span>
-            <a class="track-module__title" href="../m/link-vtx.html?path=betaflight">VTX-таблицы и смена видеоканала</a>
-            <span class="track-module__tags"><span class="gc-tag" title="L2 — Интегратор">L2</span><span class="gc-tag">~1.5 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+            <a class="track-module__title" href="../m/link-vtx.html?path=betaflight">VTX tables and changing the video channel</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L2 — Интегратор">L2</span><span class="gc-tag">~1.5 h</span><span class="gc-tag" data-state="ok" data-done-badge hidden>COMPLETED</span></span>
           </li>
           <li class="track-module" data-module-id="ops-field">
             <span class="track-module__num">21</span>
-            <a class="track-module__title" href="../m/ops-field.html?path=betaflight">Полевые операции и работа команды</a>
-            <span class="track-module__tags"><span class="gc-tag" title="L2 — Интегратор">L2</span><span class="gc-tag">~3 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+            <a class="track-module__title" href="../m/ops-field.html?path=betaflight">Field operations and teamwork</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L2 — Интегратор">L2</span><span class="gc-tag">~3 h</span><span class="gc-tag" data-state="ok" data-done-badge hidden>COMPLETED</span></span>
           </li>
           <li class="track-module" data-module-id="ops-case-studies">
             <span class="track-module__num">22</span>
-            <a class="track-module__title" href="../m/ops-case-studies.html?path=betaflight">Разбор реальных аварий</a>
-            <span class="track-module__tags"><span class="gc-tag" title="L1 — Оператор">L1</span><span class="gc-tag" title="Общий модуль: засчитывается во всех путях, где он есть">общий</span><span class="gc-tag">~3 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+            <a class="track-module__title" href="../m/ops-case-studies.html?path=betaflight">Analysis of real crashes</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L1 — Оператор">L1</span><span class="gc-tag" title="Shared module: counts in every path that includes it">shared</span><span class="gc-tag">~3 h</span><span class="gc-tag" data-state="ok" data-done-badge hidden>COMPLETED</span></span>
           </li>
           <li class="track-module" data-module-id="diag-troubleshooting">
             <span class="track-module__num">23</span>
-            <a class="track-module__title" href="../m/diag-troubleshooting.html?path=betaflight">Дерево диагностики: дрон не взлетает</a>
-            <span class="track-module__tags"><span class="gc-tag" title="L1 — Оператор">L1</span><span class="gc-tag" title="Общий модуль: засчитывается во всех путях, где он есть">общий</span><span class="gc-tag">~3 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+            <a class="track-module__title" href="../m/diag-troubleshooting.html?path=betaflight">Troubleshooting tree: the drone won&#x27;t take off</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L1 — Оператор">L1</span><span class="gc-tag" title="Shared module: counts in every path that includes it">shared</span><span class="gc-tag">~3 h</span><span class="gc-tag" data-state="ok" data-done-badge hidden>COMPLETED</span></span>
           </li>
         </ol>
       </section>
       <section class="track gc-panel">
-        <p class="gc-label gc-muted">Этап</p>
-        <h2 class="gc-title">Электроника и радио</h2>
+        <p class="gc-label gc-muted">Stage</p>
+        <h2 class="gc-title">Electronics and radio</h2>
         <ol class="track__modules">
           <li class="track-module" data-module-id="el-power-design">
             <span class="track-module__num">24</span>
-            <a class="track-module__title" href="../m/el-power-design.html?path=betaflight">Схемотехника питания борта</a>
-            <span class="track-module__tags"><span class="gc-tag" title="L2 — Интегратор">L2</span><span class="gc-tag" title="Общий модуль: засчитывается во всех путях, где он есть">общий</span><span class="gc-tag">~4 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+            <a class="track-module__title" href="../m/el-power-design.html?path=betaflight">Onboard power circuit design</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L2 — Интегратор">L2</span><span class="gc-tag" title="Shared module: counts in every path that includes it">shared</span><span class="gc-tag">~4 h</span><span class="gc-tag" data-state="ok" data-done-badge hidden>COMPLETED</span></span>
           </li>
           <li class="track-module" data-module-id="el-battery-packs">
             <span class="track-module__num">25</span>
-            <a class="track-module__title" href="../m/el-battery-packs.html?path=betaflight">Сборки Li-Ion и LiFePO4: элементы, сварка, BMS</a>
-            <span class="track-module__tags"><span class="gc-tag" title="L2 — Интегратор">L2</span><span class="gc-tag" title="Общий модуль: засчитывается во всех путях, где он есть">общий</span><span class="gc-tag">~4 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+            <a class="track-module__title" href="../m/el-battery-packs.html?path=betaflight">Li-Ion and LiFePO4 packs: cells, welding, BMS</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L2 — Интегратор">L2</span><span class="gc-tag" title="Shared module: counts in every path that includes it">shared</span><span class="gc-tag">~4 h</span><span class="gc-tag" data-state="ok" data-done-badge hidden>COMPLETED</span></span>
           </li>
           <li class="track-module" data-module-id="el-wiring">
             <span class="track-module__num">26</span>
-            <a class="track-module__title" href="../m/el-wiring.html?path=betaflight">Пайка, жгуты и надёжность соединений</a>
-            <span class="track-module__tags"><span class="gc-tag" title="L1 — Оператор">L1</span><span class="gc-tag">~2 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+            <a class="track-module__title" href="../m/el-wiring.html?path=betaflight">Soldering, harnesses and connection reliability</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L1 — Оператор">L1</span><span class="gc-tag">~2 h</span><span class="gc-tag" data-state="ok" data-done-badge hidden>COMPLETED</span></span>
           </li>
           <li class="track-module" data-module-id="el-measure">
             <span class="track-module__num">27</span>
-            <a class="track-module__title" href="../m/el-measure.html?path=betaflight">Измерения: мультиметр, осциллограф, логический анализатор</a>
-            <span class="track-module__tags"><span class="gc-tag" title="L2 — Интегратор">L2</span><span class="gc-tag">~3 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+            <a class="track-module__title" href="../m/el-measure.html?path=betaflight">Measurements: multimeter, oscilloscope, logic analyzer</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L2 — Интегратор">L2</span><span class="gc-tag">~3 h</span><span class="gc-tag" data-state="ok" data-done-badge hidden>COMPLETED</span></span>
           </li>
           <li class="track-module" data-module-id="el-emi">
             <span class="track-module__num">28</span>
-            <a class="track-module__title" href="../m/el-emi.html?path=betaflight">Помехи и электромагнитная совместимость</a>
-            <span class="track-module__tags"><span class="gc-tag" title="L2 — Интегратор">L2</span><span class="gc-tag" title="Общий модуль: засчитывается во всех путях, где он есть">общий</span><span class="gc-tag">~3 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+            <a class="track-module__title" href="../m/el-emi.html?path=betaflight">Interference and electromagnetic compatibility</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L2 — Интегратор">L2</span><span class="gc-tag" title="Shared module: counts in every path that includes it">shared</span><span class="gc-tag">~3 h</span><span class="gc-tag" data-state="ok" data-done-badge hidden>COMPLETED</span></span>
           </li>
           <li class="track-module" data-module-id="el-peripherals">
             <span class="track-module__num">29</span>
-            <a class="track-module__title" href="../m/el-peripherals.html?path=betaflight">Подключение периферии: UART, I2C, CAN на практике</a>
-            <span class="track-module__tags"><span class="gc-tag" title="L2 — Интегратор">L2</span><span class="gc-tag" title="Общий модуль: засчитывается во всех путях, где он есть">общий</span><span class="gc-tag">~3 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+            <a class="track-module__title" href="../m/el-peripherals.html?path=betaflight">Connecting peripherals: UART, I2C, CAN in practice</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L2 — Интегратор">L2</span><span class="gc-tag" title="Shared module: counts in every path that includes it">shared</span><span class="gc-tag">~3 h</span><span class="gc-tag" data-state="ok" data-done-badge hidden>COMPLETED</span></span>
           </li>
           <li class="track-module" data-module-id="rf-antennas">
             <span class="track-module__num">30</span>
-            <a class="track-module__title" href="../m/rf-antennas.html?path=betaflight">Антенны, поляризация и диаграммы направленности</a>
-            <span class="track-module__tags"><span class="gc-tag" title="L2 — Интегратор">L2</span><span class="gc-tag" title="Общий модуль: засчитывается во всех путях, где он есть">общий</span><span class="gc-tag">~3 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+            <a class="track-module__title" href="../m/rf-antennas.html?path=betaflight">Antennas, polarization and radiation patterns</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L2 — Интегратор">L2</span><span class="gc-tag" title="Shared module: counts in every path that includes it">shared</span><span class="gc-tag">~3 h</span><span class="gc-tag" data-state="ok" data-done-badge hidden>COMPLETED</span></span>
           </li>
           <li class="track-module" data-module-id="rf-link-budget">
             <span class="track-module__num">31</span>
-            <a class="track-module__title" href="../m/rf-link-budget.html?path=betaflight">Бюджет радиолинка и дальность</a>
-            <span class="track-module__tags"><span class="gc-tag" title="L2 — Интегратор">L2</span><span class="gc-tag" title="Общий модуль: засчитывается во всех путях, где он есть">общий</span><span class="gc-tag">~3 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+            <a class="track-module__title" href="../m/rf-link-budget.html?path=betaflight">Radio link budget and range</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L2 — Интегратор">L2</span><span class="gc-tag" title="Shared module: counts in every path that includes it">shared</span><span class="gc-tag">~3 h</span><span class="gc-tag" data-state="ok" data-done-badge hidden>COMPLETED</span></span>
           </li>
         </ol>
       </section>
       <section class="track gc-panel">
-        <p class="gc-label gc-muted">Этап</p>
-        <h2 class="gc-title">Настройка по данным</h2>
+        <p class="gc-label gc-muted">Stage</p>
+        <h2 class="gc-title">Data-driven tuning</h2>
         <ol class="track__modules">
           <li class="track-module" data-module-id="bf-pid-reg-in-bf">
             <span class="track-module__num">32</span>
-            <a class="track-module__title" href="../m/bf-pid-reg-in-bf.html?path=betaflight">PID-регулятор в Betaflight</a>
-            <span class="track-module__tags"><span class="gc-tag" title="L1 — Оператор">L1</span><span class="gc-tag">~2 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+            <a class="track-module__title" href="../m/bf-pid-reg-in-bf.html?path=betaflight">PID controller in Betaflight</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L1 — Оператор">L1</span><span class="gc-tag">~2 h</span><span class="gc-tag" data-state="ok" data-done-badge hidden>COMPLETED</span></span>
           </li>
           <li class="track-module" data-module-id="data-python">
             <span class="track-module__num">33</span>
-            <a class="track-module__title" href="../m/data-python.html?path=betaflight">Python для анализа полётных данных</a>
-            <span class="track-module__tags"><span class="gc-tag" title="L2 — Интегратор">L2</span><span class="gc-tag" title="Общий модуль: засчитывается во всех путях, где он есть">общий</span><span class="gc-tag">~4 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+            <a class="track-module__title" href="../m/data-python.html?path=betaflight">Python for flight data analysis</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L2 — Интегратор">L2</span><span class="gc-tag" title="Shared module: counts in every path that includes it">shared</span><span class="gc-tag">~4 h</span><span class="gc-tag" data-state="ok" data-done-badge hidden>COMPLETED</span></span>
           </li>
           <li class="track-module" data-module-id="ctl-signals">
             <span class="track-module__num">34</span>
-            <a class="track-module__title" href="../m/ctl-signals.html?path=betaflight">Сигналы и спектры: что видит гироскоп</a>
-            <span class="track-module__tags"><span class="gc-tag" title="L2 — Интегратор">L2</span><span class="gc-tag" title="Общий модуль: засчитывается во всех путях, где он есть">общий</span><span class="gc-tag">~3 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+            <a class="track-module__title" href="../m/ctl-signals.html?path=betaflight">Signals and spectra: what the gyro sees</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L2 — Интегратор">L2</span><span class="gc-tag" title="Shared module: counts in every path that includes it">shared</span><span class="gc-tag">~3 h</span><span class="gc-tag" data-state="ok" data-done-badge hidden>COMPLETED</span></span>
           </li>
           <li class="track-module" data-module-id="bf-blackbox">
             <span class="track-module__num">35</span>
             <a class="track-module__title" href="../m/bf-blackbox.html?path=betaflight">Blackbox</a>
-            <span class="track-module__tags"><span class="gc-tag" title="L2 — Интегратор">L2</span><span class="gc-tag">~3 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+            <span class="track-module__tags"><span class="gc-tag" title="L2 — Интегратор">L2</span><span class="gc-tag">~3 h</span><span class="gc-tag" data-state="ok" data-done-badge hidden>COMPLETED</span></span>
           </li>
           <li class="track-module" data-module-id="bf-filters">
             <span class="track-module__num">36</span>
-            <a class="track-module__title" href="../m/bf-filters.html?path=betaflight">Фильтры</a>
-            <span class="track-module__tags"><span class="gc-tag" title="L2 — Интегратор">L2</span><span class="gc-tag">~3 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+            <a class="track-module__title" href="../m/bf-filters.html?path=betaflight">Filters</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L2 — Интегратор">L2</span><span class="gc-tag">~3 h</span><span class="gc-tag" data-state="ok" data-done-badge hidden>COMPLETED</span></span>
           </li>
           <li class="track-module" data-module-id="bf-rpm-filter">
             <span class="track-module__num">37</span>
-            <a class="track-module__title" href="../m/bf-rpm-filter.html?path=betaflight">RPM-фильтр: кейс «свистящего» 10&quot;</a>
-            <span class="track-module__tags"><span class="gc-tag" title="L2 — Интегратор">L2</span><span class="gc-tag">~2 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+            <a class="track-module__title" href="../m/bf-rpm-filter.html?path=betaflight">RPM filter: the case of the &quot;whistling&quot; 10&quot;</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L2 — Интегратор">L2</span><span class="gc-tag">~2 h</span><span class="gc-tag" data-state="ok" data-done-badge hidden>COMPLETED</span></span>
           </li>
           <li class="track-module" data-module-id="ctl-theory">
             <span class="track-module__num">38</span>
-            <a class="track-module__title" href="../m/ctl-theory.html?path=betaflight">Теория управления: устойчивость, запасы, каскады</a>
-            <span class="track-module__tags"><span class="gc-tag" title="L3 — Специалист">L3</span><span class="gc-tag">~4 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+            <a class="track-module__title" href="../m/ctl-theory.html?path=betaflight">Control theory: stability, margins, cascades</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L3 — Специалист">L3</span><span class="gc-tag">~4 h</span><span class="gc-tag" data-state="ok" data-done-badge hidden>COMPLETED</span></span>
           </li>
           <li class="track-module" data-module-id="bf-pid">
             <span class="track-module__num">39</span>
-            <a class="track-module__title" href="../m/bf-pid.html?path=betaflight">PID-тюнинг по данным</a>
-            <span class="track-module__tags"><span class="gc-tag" title="L2 — Интегратор">L2</span><span class="gc-tag">~4 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+            <a class="track-module__title" href="../m/bf-pid.html?path=betaflight">Data-driven PID tuning</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L2 — Интегратор">L2</span><span class="gc-tag">~4 h</span><span class="gc-tag" data-state="ok" data-done-badge hidden>COMPLETED</span></span>
           </li>
         </ol>
       </section>
       <section class="track gc-panel">
-        <p class="gc-label gc-muted">Этап</p>
-        <h2 class="gc-title">Продвинутое</h2>
+        <p class="gc-label gc-muted">Stage</p>
+        <h2 class="gc-title">Advanced</h2>
         <ol class="track__modules">
           <li class="track-module" data-module-id="bf-cli">
             <span class="track-module__num">40</span>
-            <a class="track-module__title" href="../m/bf-cli.html?path=betaflight">CLI и remap</a>
-            <span class="track-module__tags"><span class="gc-tag" title="L3 — Специалист">L3</span><span class="gc-tag">~2 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+            <a class="track-module__title" href="../m/bf-cli.html?path=betaflight">CLI and remap</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L3 — Специалист">L3</span><span class="gc-tag">~2 h</span><span class="gc-tag" data-state="ok" data-done-badge hidden>COMPLETED</span></span>
           </li>
           <li class="track-module" data-module-id="bf-cli-automation">
             <span class="track-module__num">41</span>
-            <a class="track-module__title" href="../m/bf-cli-automation.html?path=betaflight">Автоматизация CLI по serial</a>
-            <span class="track-module__tags"><span class="gc-tag" title="L3 — Специалист">L3</span><span class="gc-tag">~3 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+            <a class="track-module__title" href="../m/bf-cli-automation.html?path=betaflight">CLI automation over serial</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L3 — Специалист">L3</span><span class="gc-tag">~3 h</span><span class="gc-tag" data-state="ok" data-done-badge hidden>COMPLETED</span></span>
           </li>
           <li class="track-module" data-module-id="emb-basics">
             <span class="track-module__num">42</span>
-            <a class="track-module__title" href="../m/emb-basics.html?path=betaflight">Embedded: прерывания, таймеры, DMA, RTOS</a>
-            <span class="track-module__tags"><span class="gc-tag" title="L3 — Специалист">L3</span><span class="gc-tag" title="Общий модуль: засчитывается во всех путях, где он есть">общий</span><span class="gc-tag">~4 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+            <a class="track-module__title" href="../m/emb-basics.html?path=betaflight">Embedded: interrupts, timers, DMA, RTOS</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L3 — Специалист">L3</span><span class="gc-tag" title="Shared module: counts in every path that includes it">shared</span><span class="gc-tag">~4 h</span><span class="gc-tag" data-state="ok" data-done-badge hidden>COMPLETED</span></span>
           </li>
           <li class="track-module" data-module-id="bf-custom">
             <span class="track-module__num">43</span>
-            <a class="track-module__title" href="../m/bf-custom.html?path=betaflight">Свои сборки прошивок</a>
-            <span class="track-module__tags"><span class="gc-tag" title="L4 — Эксперт">L4</span><span class="gc-tag">~3 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+            <a class="track-module__title" href="../m/bf-custom.html?path=betaflight">Your own firmware builds</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L4 — Эксперт">L4</span><span class="gc-tag">~3 h</span><span class="gc-tag" data-state="ok" data-done-badge hidden>COMPLETED</span></span>
           </li>
           <li class="track-module" data-module-id="fw-reading">
             <span class="track-module__num">44</span>
-            <a class="track-module__title" href="../m/fw-reading.html?path=betaflight">Как читать исходники прошивки: Betaflight и ArduPilot</a>
-            <span class="track-module__tags"><span class="gc-tag" title="L4 — Эксперт">L4</span><span class="gc-tag" title="Общий модуль: засчитывается во всех путях, где он есть">общий</span><span class="gc-tag">~4 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+            <a class="track-module__title" href="../m/fw-reading.html?path=betaflight">How to read firmware source code: Betaflight and ArduPilot</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L4 — Эксперт">L4</span><span class="gc-tag" title="Shared module: counts in every path that includes it">shared</span><span class="gc-tag">~4 h</span><span class="gc-tag" data-state="ok" data-done-badge hidden>COMPLETED</span></span>
           </li>
         </ol>
       </section>
-    <h2 class="gc-title section-title">Итоговые проекты</h2><a class="gc-card capstone-card" href="../cap/cap-first-quad.html" data-module-id="cap-first-quad"><p class="gc-label gc-muted">Итоговый проект</p><strong>Свой квадро от стола до первого полёта</strong><div class="gc-muted">diff all, отчёт о тесте failsafe, видео первого висения</div><div class="gc-card__meta"><span class="gc-tag" data-state="ok" data-done-badge hidden>СДАН</span></div></a><a class="gc-card capstone-card" href="../cap/cap-tune-by-logs.html" data-module-id="cap-tune-by-logs"><p class="gc-label gc-muted">Итоговый проект</p><strong>Настройка по логам</strong><div class="gc-muted">A/B-профили, спектры до/после, отчёт с выводами</div><div class="gc-card__meta"><span class="gc-tag" data-state="ok" data-done-badge hidden>СДАН</span></div></a>
+    <h2 class="gc-title section-title">Capstone projects</h2><a class="gc-card capstone-card" href="../cap/cap-first-quad.html" data-module-id="cap-first-quad"><p class="gc-label gc-muted">Capstone project</p><strong>Your own quad from bench to first flight</strong><div class="gc-muted">diff all, failsafe test report, video of the first hover</div><div class="gc-card__meta"><span class="gc-tag" data-state="ok" data-done-badge hidden>PASSED</span></div></a><a class="gc-card capstone-card" href="../cap/cap-tune-by-logs.html" data-module-id="cap-tune-by-logs"><p class="gc-label gc-muted">Capstone project</p><strong>Log-based tuning</strong><div class="gc-muted">A/B profiles, before/after spectra, report with conclusions</div><div class="gc-card__meta"><span class="gc-tag" data-state="ok" data-done-badge hidden>PASSED</span></div></a>
   </main>
   <footer class="gc-container site-footer gc-muted">
-    <p>Открытый курс · <a href="https://github.com/irreligious86/UAV-Education">исходники на GitHub</a> · <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">план развития</a> · <a href="../../curriculum/curriculum.html">для разработчика</a> · CC BY-NC-SA 4.0</p>
+    <p>Open course · <a href="https://github.com/irreligious86/UAV-Education">source on GitHub</a> · <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">roadmap</a> · <a href="../../curriculum/curriculum.html">for developers</a> · CC BY-NC-SA 4.0</p>
   </footer>
 </body>
 </html>

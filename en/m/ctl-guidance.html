@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Наведение и траектории: pure pursuit, L1, S-кривые, minimum snap — UAV Student</title>
-  <meta name="description" content="объяснить слои от миссии до регулятора и закон pure pursuit рассчитать дальность упреждения L1 и выбрать её по перелёту построить профиль скорости с ограничением рывка">
+  <title>Guidance and trajectories: pure pursuit, L1, S-curves, minimum snap — UAV Student</title>
+  <meta name="description" content="explain the layers from the mission to the controller and the pure pursuit law calculate the L1 lookahead distance and choose it based on overshoot build a jerk-limited velocity profile">
   <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
   <link rel="manifest" href="../../manifest.webmanifest">
   <meta name="theme-color" content="#0b0f14">
@@ -30,28 +30,28 @@
   <header class="site-header">
     <div class="gc-container site-header__inner">
       <a class="site-brand" href="../index.html"><span class="site-brand__mark" aria-hidden="true">◆</span> UAV Student</a>
-      <nav class="gc-nav" aria-label="Разделы сайта">
-        <a href="../index.html" aria-current="page">Курс</a>
-        <a href="../ref/index.html">Справочник</a>
-        <a href="../pages/glossary.html">Глоссарий</a>
-        <a href="../pages/fails.html">Фейлы</a>
-        <a href="../pages/search.html">Поиск</a>
-        <a href="../pages/progress.html">Мой прогресс</a>
+      <nav class="gc-nav" aria-label="Site sections">
+        <a href="../index.html" aria-current="page">Course</a>
+        <a href="../ref/index.html">Reference</a>
+        <a href="../pages/glossary.html">Glossary</a>
+        <a href="../pages/fails.html">Failures</a>
+        <a href="../pages/search.html">Search</a>
+        <a href="../pages/progress.html">My progress</a>
       </nav>
-      <nav class="lang-switch" aria-label="Язык"><a class="gc-tag" href="../../m/ctl-guidance.html" data-lang-to="ru" hreflang="ru" lang="ru" title="Русский">RU</a><a class="gc-tag" href="../../uk/m/ctl-guidance.html" data-lang-to="uk" hreflang="uk" lang="uk" title="Українська">UK</a><a class="gc-tag" href="../../en/m/ctl-guidance.html" data-lang-to="en" hreflang="en" lang="en" title="English" aria-current="true" data-state="ok">EN</a></nav>
+      <nav class="lang-switch" aria-label="Language"><a class="gc-tag" href="../../m/ctl-guidance.html" data-lang-to="ru" hreflang="ru" lang="ru" title="Русский">RU</a><a class="gc-tag" href="../../uk/m/ctl-guidance.html" data-lang-to="uk" hreflang="uk" lang="uk" title="Українська">UK</a><a class="gc-tag" href="../../en/m/ctl-guidance.html" data-lang-to="en" hreflang="en" lang="en" title="English" aria-current="true" data-state="ok">EN</a></nav>
     </div>
   </header>
   <main class="gc-container site-main">
     <article class="module" data-module-page="ctl-guidance">
-      <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-autonomy">Автономия</a><span>Наведение и траектории: pure pursuit, L1, S-кривые, minimum snap</span></p>
-      <h1 class="module-title">Наведение и траектории: pure pursuit, L1, S-кривые, minimum snap</h1>
-      <div class="module-tags"><span class="gc-tag" title="Уровень">L3 — Специалист</span><span class="gc-tag">чтение 40 мин</span><span class="gc-tag">учёба ~3 ч</span><span class="gc-tag">ArduPilot 4.5+ · PX4 1.15+ · Python 3</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ОСВОЕН</span></div>
+      <p class="gc-breadcrumb"><a href="../index.html">Course</a><a href="../index.html#track-autonomy">Autonomy</a><span>Guidance and trajectories: pure pursuit, L1, S-curves, minimum snap</span></p>
+      <h1 class="module-title">Guidance and trajectories: pure pursuit, L1, S-curves, minimum snap</h1>
+      <div class="module-tags"><span class="gc-tag" title="Level">L3 — Specialist</span><span class="gc-tag">reading 40 min</span><span class="gc-tag">study ~3 h</span><span class="gc-tag">ArduPilot 4.5+ · PX4 1.15+ · Python 3</span><span class="gc-tag" data-state="ok" data-done-badge hidden>MASTERED</span></div>
       <p class="gc-muted module-score" data-module-score></p>
       <p class="module-lead">Регуляторы курса держат угол, скорость и позицию. Но кто решает, *какую* позицию держать в каждый момент, чтобы аппарат прошёл по линии миссии, плавно повернул и не дёрнулся? Это наведение и генерация траекторий. Модуль разбирает слои от миссии до регулятора, закон pure pursuit и его родственника L1 в ArduPlane (с формулой дальности упреждения через <code>NAVL1_PERIOD</code>), профили скорости — трапецию и S-кривую с ограничением рывка, которой ArduCopter ведёт по точкам, — и minimum snap для квадрокоптера с объяснением, почему именно «snap». Код симуляции воспроизводит графики модуля; лабораторная — подобрать упреждение по перелёту и времени выхода на линию.</p>
-      <div class="gc-callout" data-state="ok"><strong>После модуля ты умеешь</strong><ul><li>объяснить слои от миссии до регулятора и закон pure pursuit</li><li>рассчитать дальность упреждения L1 и выбрать её по перелёту</li><li>построить профиль скорости с ограничением рывка</li></ul></div><p class="gc-muted">Перед этим модулем: <a href="ctl-theory.html">Теория управления: устойчивость, запасы, каскады</a>, <a href="ap-missions.html">Миссии и планирование</a></p><div class="gc-callout lab"><p class="gc-label gc-muted">Лабораторная</p><strong>Наведение в цифрах</strong><p class="gc-muted lab__hint">Сдано, когда отмечены все пункты:</p><ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="ctl-guidance:lab:0"><span>Выбор упреждения обоснован графиком перелёта и выхода на линию</span></label></li><li><label><input type="checkbox" data-check-id="ctl-guidance:lab:1"><span>L1 посчитан для своего самолёта</span></label></li><li><label><input type="checkbox" data-check-id="ctl-guidance:lab:2"><span>Генератор профилей даёт верные длительности и ограниченный рывок</span></label></li><li><label><input type="checkbox" data-check-id="ctl-guidance:lab:3"><span>Сравнение рывка в SITL описано числами</span></label></li></ul></div>
+      <div class="gc-callout" data-state="ok"><strong>After this module you can</strong><ul><li>explain the layers from the mission to the controller and the pure pursuit law</li><li>calculate the L1 lookahead distance and choose it based on overshoot</li><li>build a jerk-limited velocity profile</li></ul></div><p class="gc-muted">Before this module: <a href="ctl-theory.html">Control theory: stability, margins, cascades</a>, <a href="ap-missions.html">Missions and planning</a></p><div class="gc-callout lab"><p class="gc-label gc-muted">Lab</p><strong>Guidance by the numbers</strong><p class="gc-muted lab__hint">Submitted when all items are checked:</p><ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="ctl-guidance:lab:0"><span>Lookahead choice justified with a plot of overshoot and line capture</span></label></li><li><label><input type="checkbox" data-check-id="ctl-guidance:lab:1"><span>L1 calculated for your plane</span></label></li><li><label><input type="checkbox" data-check-id="ctl-guidance:lab:2"><span>Profile generator produces correct durations and bounded jerk</span></label></li><li><label><input type="checkbox" data-check-id="ctl-guidance:lab:3"><span>Jerk comparison in SITL described with numbers</span></label></li></ul></div>
       <div class="gc-prose module-body">
-<div class="gc-callout" data-state="caution" data-untranslated><strong>Модуль ещё не переведён.</strong> Ниже — оригинал (Русский). Прогресс и оценки общие для всех языков.</div>
-<h2>Теория</h2>
+<div class="gc-callout" data-state="caution" data-untranslated><strong>This module hasn't been translated yet.</strong> Below is the original (Русский). Progress and scores are shared across all languages.</div>
+<h2>Theory</h2>
 <h4 class="md-subheading">Слои: от точек к моторам</h4>
 <ol><li><strong>Миссия</strong> — список точек и действий (модуль «Миссии»).</li><li><strong>Путь</strong> — геометрия между точками: отрезки, дуги поворота, сплайны (<code>NAV_SPLINE_WAYPOINT</code>).</li><li><strong>Траектория</strong> — путь с временем: где аппарат должен быть в момент t, с какой скоростью и ускорением, в пределах ограничений скорости, ускорения и рывка.</li><li><strong>Наведение / слежение</strong> — превращает отклонение от пути или траектории в команду (ускорение, крен, скорость) для регулятора позиции.</li></ol>
 <p><strong>Следование пути</strong> (path following) не заботится о времени — главное быть на линии. <strong>Слежение за траекторией</strong> (trajectory tracking) требует быть в точке *вовремя* — для строя, синхронной съёмки, совместных манёвров.</p>
@@ -71,7 +71,7 @@
 <h4 class="md-subheading">Feedforward: не только позиция</h4>
 <p>Если companion шлёт только позицию, регулятор узнаёт, что надо разгоняться, когда ошибка уже есть, — аппарат отстаёт на поворотах. <code>SET_POSITION_TARGET_LOCAL_NED</code> позволяет передать позицию, скорость и ускорение одновременно (маска <code>type_mask</code>): регулятор позиции догоняет только остаток ошибки.</p>
 
-<h2>Практика</h2>
+<h2>Practice</h2>
 <h4 class="md-subheading">Шаг 1. Pure pursuit в симуляции</h4>
 <p>Скрипт воспроизводит график модуля и считает перелёт и расстояние до входа в коридор ±1 м:</p>
 <pre class="cli-block"><code>import math
@@ -110,26 +110,26 @@ for L in (8, 20, 45):
 <p>ArduCopter SITL, квадратная миссия 50×50 м. Два прогона с разным ограничением рывка навигации (в 2 раза меньше и по умолчанию). В логе — наклон (<code>ATT</code>) и ускорение на поворотах. Описать, как меняются время прохождения и максимальный наклон.</p>
 <p>Лабораторная засчитывается, когда выбор L обоснован графиком перелёта и выхода на линию (с шумом и без), L1 посчитан для своего самолёта, генератор профилей даёт верные длительности и ограниченный рывок, сравнение в SITL описано числами.</p>
 
-<h2>Диагностика</h2>
+<h2>Troubleshooting</h2>
 <div class="diag-groups"><article class="diag-item"><h4><strong>Симптом:</strong> аппарат виляет вокруг линии</h4><ul><li>Возможная причина: малое упреждение (L, <code>NAVL1_PERIOD</code>), шум позиции, плохо настроенный крен.</li><li>Что сделать: увеличить упреждение, проверить внутренние контуры, фильтровать позицию.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> углы маршрута сильно срезаются</h4><ul><li>Возможная причина: большое упреждение или радиус скругления относительно длины отрезков.</li><li>Что сделать: меньше упреждение или радиус, длиннее отрезки, точки на углах.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> коптер дёргается в начале и конце каждого отрезка</h4><ul><li>Возможная причина: скачки ускорения — траектория без ограничения рывка (свой генератор, только цели позиции).</li><li>Что сделать: S-кривые, ограничение рывка, feedforward скорости и ускорения.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> аппарат под управлением companion отстаёт на поворотах</h4><ul><li>Возможная причина: отправляются только цели позиции.</li><li>Что сделать: передавать скорость и ускорение в <code>SET_POSITION_TARGET_LOCAL_NED</code>.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> самолёт сносит с линии сильным ветром</h4><ul><li>Возможная причина: ветер близок к воздушной скорости, наведение не может удержать линию.</li><li>Что сделать: выше крейсер, маршрут с учётом ветра; в PX4 — смотреть поведение NPFG.</li></ul></article></div>
 
-<h2>Чек-лист</h2>
+<h2>Checklist</h2>
 <ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="ctl-guidance:0"><span>Различаю путь, траекторию и наведение; следование пути и слежение за траекторией</span></label></li><li><label><input type="checkbox" data-check-id="ctl-guidance:1"><span>Вывожу закон pure pursuit и понимаю влияние дальности упреждения</span></label></li><li><label><input type="checkbox" data-check-id="ctl-guidance:2"><span>Считаю L1 через <code>NAVL1_PERIOD</code>, <code>NAVL1_DAMPING</code> и скорость</span></label></li><li><label><input type="checkbox" data-check-id="ctl-guidance:3"><span>Объясняю, зачем ограничивать рывок, и строю S-кривую</span></label></li><li><label><input type="checkbox" data-check-id="ctl-guidance:4"><span>Объясняю minimum snap через дифференциальную плоскость квадрокоптера</span></label></li><li><label><input type="checkbox" data-check-id="ctl-guidance:5"><span>Передаю feedforward скорости и ускорения вместе с позицией</span></label></li></ul>
 
-<h2>Источники</h2>
+<h2>Sources</h2>
 <ul class="refs"><li><a href="https://arc.aiaa.org/doi/10.2514/6.2004-4900" target="_blank" rel="noopener noreferrer">Park, Deyst, How — A New Nonlinear Guidance Logic for Trajectory Tracking (AIAA GNC 2004)</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://github.com/ArduPilot/ardupilot/blob/master/libraries/AP_L1_Control/AP_L1_Control.cpp" target="_blank" rel="noopener noreferrer">ArduPilot — AP_L1_Control (source)</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://doi.org/10.1109/ICRA.2011.5980409" target="_blank" rel="noopener noreferrer">Mellinger, Kumar — Minimum snap trajectory generation and control for quadrotors (ICRA 2011)</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://github.com/ArduPilot/ardupilot/blob/master/libraries/AP_Math/SCurve.cpp" target="_blank" rel="noopener noreferrer">ArduPilot — SCurves (source)</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://docs.px4.io/main/en/config_fw/position_tuning_guide_fixedwing.html" target="_blank" rel="noopener noreferrer">PX4 — Fixed-wing position tuning (NPFG)</a> <span class="gc-tag" data-state="info">primary</span></li></ul>
-<h2>Задачи с числовым ответом</h2>
+<h2>Numeric problems</h2>
 <uav-tasks src="../tasks/ctl-guidance.json" module="ctl-guidance"></uav-tasks>
-<h2>Проверь себя</h2>
+<h2>Test yourself</h2>
 <uav-quiz src="../quiz/ctl-guidance.json" module="ctl-guidance"></uav-quiz>
       </div>
-      <div class="module-done"><gc-button variant="secondary" data-done-toggle="ctl-guidance">Отметить как пройденный</gc-button></div>
-      <section class="related" aria-label="Смежные модули"><p class="gc-label gc-muted">Смежные модули</p><div class="gc-grid ref-grid"><a class="gc-card" href="ctl-theory.html"><strong>Теория управления: устойчивость, запасы, каскады</strong><div class="gc-card__meta"><span class="gc-tag" title="L3 — Специалист">L3</span></div></a><a class="gc-card" href="ap-missions.html"><strong>Миссии и планирование</strong><div class="gc-card__meta"><span class="gc-tag" title="L2 — Интегратор">L2</span></div></a><a class="gc-card" href="ap-plane-tuning.html"><strong>Тюнинг ArduPlane: AUTOTUNE крыла, TECS, навигация L1, посадка</strong><div class="gc-card__meta"><span class="gc-tag" title="L3 — Специалист">L3</span></div></a><a class="gc-card" href="ros2-nav.html"><strong>Навигация и обход препятствий: карты, планировщики, уставки</strong><div class="gc-card__meta"><span class="gc-tag" title="L3 — Специалист">L3</span></div></a></div></section>
-      <nav class="pager" aria-label="Соседние модули" data-track-pager><a class="gc-card pager__prev" href="ap-missions.html"><span class="gc-label gc-muted">Назад · трек</span><br>Миссии и планирование</a><a class="gc-card pager__next" href="ap-logs.html"><span class="gc-label gc-muted">Дальше · трек</span><br>Логи ArduPilot: разбор полёта</a></nav>
+      <div class="module-done"><gc-button variant="secondary" data-done-toggle="ctl-guidance">Mark as completed</gc-button></div>
+      <section class="related" aria-label="Related modules"><p class="gc-label gc-muted">Related modules</p><div class="gc-grid ref-grid"><a class="gc-card" href="ctl-theory.html"><strong>Control theory: stability, margins, cascades</strong><div class="gc-card__meta"><span class="gc-tag" title="L3 — Специалист">L3</span></div></a><a class="gc-card" href="ap-missions.html"><strong>Missions and planning</strong><div class="gc-card__meta"><span class="gc-tag" title="L2 — Интегратор">L2</span></div></a><a class="gc-card" href="ap-plane-tuning.html"><strong>ArduPlane tuning: wing AUTOTUNE, TECS, L1 navigation, landing</strong><div class="gc-card__meta"><span class="gc-tag" title="L3 — Специалист">L3</span></div></a><a class="gc-card" href="ros2-nav.html"><strong>Navigation and obstacle avoidance: maps, planners, setpoints</strong><div class="gc-card__meta"><span class="gc-tag" title="L3 — Специалист">L3</span></div></a></div></section>
+      <nav class="pager" aria-label="Adjacent modules" data-track-pager><a class="gc-card pager__prev" href="ap-missions.html"><span class="gc-label gc-muted">Back · track</span><br>Missions and planning</a><a class="gc-card pager__next" href="ap-logs.html"><span class="gc-label gc-muted">Next · track</span><br>ArduPilot logs: flight analysis</a></nav>
     </article>
   </main>
   <footer class="gc-container site-footer gc-muted">
-    <p>Открытый курс · <a href="https://github.com/irreligious86/UAV-Education">исходники на GitHub</a> · <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">план развития</a> · <a href="../../curriculum/curriculum.html">для разработчика</a> · CC BY-NC-SA 4.0</p>
+    <p>Open course · <a href="https://github.com/irreligious86/UAV-Education">source on GitHub</a> · <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">roadmap</a> · <a href="../../curriculum/curriculum.html">for developers</a> · CC BY-NC-SA 4.0</p>
   </footer>
 </body>
 </html>

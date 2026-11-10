@@ -3,92 +3,92 @@
   "pass": 80,
   "questions": [
     {
-      "q": "Что такое SITL?",
+      "q": "What is SITL?",
       "options": [
-        "Отдельная прошивка-эмулятор",
-        "Настоящая прошивка на ПК",
-        "Компьютерная игра",
-        "Наземная станция"
+        "A separate emulator firmware",
+        "The real firmware running on a PC",
+        "A computer game",
+        "A ground station"
       ],
       "answer": 1,
-      "explain": "Настоящая прошивка на ПК с симулятором физики вместо мира: те же параметры, режимы, EKF и failsafe."
+      "explain": "The real firmware on a PC with a physics simulator instead of the world: the same parameters, modes, EKF and failsafes."
     },
     {
-      "q": "Флаг -w в sim_vehicle.py…",
+      "q": "The -w flag in sim_vehicle.py…",
       "options": [
-        "Включает ветер",
-        "Сбрасывает параметры",
-        "Открывает карту",
-        "Ждёт подключения GCS"
+        "Enables wind",
+        "Resets the parameters",
+        "Opens the map",
+        "Waits for a GCS connection"
       ],
       "answer": 1,
-      "explain": "Полезен, когда эксперименты с параметрами зашли не туда."
+      "explain": "Useful when parameter experiments went sideways."
     },
     {
-      "q": "Как SITL отличает маршрут от сценария в учебном проекте?",
+      "q": "How does the course SITL project tell a route from a scenario?",
       "options": [
-        "Сценарий хранит координаты, маршрут — номера",
-        "Маршрут — точки, сценарий — команды",
-        "Никак не различает",
-        "Маршрут хранит команды"
+        "The scenario stores coordinates, the route stores numbers",
+        "The route is points, the scenario is commands",
+        "It doesn't distinguish them at all",
+        "The route stores commands"
       ],
       "answer": 1,
-      "explain": "Разделение данных и логики: один маршрут — много сценариев."
+      "explain": "Separating data and logic: one route — many scenarios."
     },
     {
-      "q": "Скрипт висит на wait_heartbeat(). Вероятная причина?",
+      "q": "The script hangs on wait_heartbeat(). Likely cause?",
       "options": [
-        "Нет фикса GPS",
-        "Неверный адрес или SITL не запущен",
-        "Не хватает памяти для буфера MAVLink",
-        "Слишком низкий газ"
+        "No GPS fix",
+        "Wrong address or SITL isn't running",
+        "Not enough memory for the MAVLink buffer",
+        "Throttle too low"
       ],
       "answer": 1,
-      "explain": "Heartbeat — первый признак связи."
+      "explain": "The heartbeat is the first sign of a link."
     },
     {
-      "q": "arm throttle отказывает PreArm сразу после старта SITL. Что делать?",
+      "q": "arm throttle is refused with PreArm right after SITL starts. What do you do?",
       "options": [
-        "Перезапустить ПК",
-        "Подождать схождения EKF",
-        "Отключить проверки арма",
-        "Сменить тип рамы"
+        "Reboot the PC",
+        "Wait for the EKF to converge",
+        "Disable the arming checks",
+        "Change the frame type"
       ],
       "answer": 1,
-      "explain": "EKF нужно 10–20 с на инициализацию; читайте текст PreArm."
+      "explain": "The EKF needs 10–20 s to initialize; read the PreArm text."
     },
     {
-      "q": "Что в SITL НЕ проверяется честно?",
+      "q": "What does SITL NOT test honestly?",
       "options": [
-        "Логика failsafe по батарее и потере RC",
-        "Выполнение миссий",
-        "Фильтры и PID под вибрации",
-        "Работа Lua-скриптов"
+        "Battery and RC-loss failsafe logic",
+        "Mission execution",
+        "Filters and PIDs against vibration",
+        "Lua scripts"
       ],
       "answer": 2,
-      "explain": "Нет шума моторов и механики; PID из SITL не переносится."
+      "explain": "No motor noise and no mechanics; PIDs from SITL don't carry over."
     },
     {
-      "q": "Как смоделировать потерю RC в SITL?",
+      "q": "How do you simulate RC loss in SITL?",
       "options": [
-        "Выключить пульт",
+        "Turn off the transmitter",
         "SIM_RC_FAIL = 1",
         "FS_THR_ENABLE = 0",
-        "Отключить MAVProxy"
+        "Disconnect MAVProxy"
       ],
       "answer": 1,
-      "explain": "Затем наблюдать FS_THR_ENABLE действие."
+      "explain": "Then watch the FS_THR_ENABLE action."
     },
     {
-      "q": "Какой порт SITL обычно занимает MAVProxy?",
+      "q": "Which SITL port does MAVProxy usually take?",
       "options": [
         "5760 (SERIAL0)",
         "5763 (SERIAL2)",
-        "14550 по UDP входящий",
+        "14550 incoming UDP",
         "80 (HTTP)"
       ],
       "answer": 0,
-      "explain": "MAVProxy подключается к SERIAL0 на 5760; свои клиенты — к 5762/5763."
+      "explain": "MAVProxy connects to SERIAL0 on 5760; your own clients go to 5762/5763."
     }
   ]
 }

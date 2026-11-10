@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>QuadPlane и tilt-rotor VTOL — UAV Student</title>
-  <meta name="description" content="сверить каналы с SERVOx_FUNCTION до арма настроить переход и посадку">
+  <title>QuadPlane and tilt-rotor VTOL — UAV Student</title>
+  <meta name="description" content="check channels against SERVOx_FUNCTION before arming set up the transition and landing">
   <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
   <link rel="manifest" href="../../manifest.webmanifest">
   <meta name="theme-color" content="#0b0f14">
@@ -30,28 +30,28 @@
   <header class="site-header">
     <div class="gc-container site-header__inner">
       <a class="site-brand" href="../index.html"><span class="site-brand__mark" aria-hidden="true">◆</span> UAV Student</a>
-      <nav class="gc-nav" aria-label="Разделы сайта">
-        <a href="../index.html" aria-current="page">Курс</a>
-        <a href="../ref/index.html">Справочник</a>
-        <a href="../pages/glossary.html">Глоссарий</a>
-        <a href="../pages/fails.html">Фейлы</a>
-        <a href="../pages/search.html">Поиск</a>
-        <a href="../pages/progress.html">Мой прогресс</a>
+      <nav class="gc-nav" aria-label="Site sections">
+        <a href="../index.html" aria-current="page">Course</a>
+        <a href="../ref/index.html">Reference</a>
+        <a href="../pages/glossary.html">Glossary</a>
+        <a href="../pages/fails.html">Failures</a>
+        <a href="../pages/search.html">Search</a>
+        <a href="../pages/progress.html">My progress</a>
       </nav>
-      <nav class="lang-switch" aria-label="Язык"><a class="gc-tag" href="../../m/ap-quadplane.html" data-lang-to="ru" hreflang="ru" lang="ru" title="Русский">RU</a><a class="gc-tag" href="../../uk/m/ap-quadplane.html" data-lang-to="uk" hreflang="uk" lang="uk" title="Українська">UK</a><a class="gc-tag" href="../../en/m/ap-quadplane.html" data-lang-to="en" hreflang="en" lang="en" title="English" aria-current="true" data-state="ok">EN</a></nav>
+      <nav class="lang-switch" aria-label="Language"><a class="gc-tag" href="../../m/ap-quadplane.html" data-lang-to="ru" hreflang="ru" lang="ru" title="Русский">RU</a><a class="gc-tag" href="../../uk/m/ap-quadplane.html" data-lang-to="uk" hreflang="uk" lang="uk" title="Українська">UK</a><a class="gc-tag" href="../../en/m/ap-quadplane.html" data-lang-to="en" hreflang="en" lang="en" title="English" aria-current="true" data-state="ok">EN</a></nav>
     </div>
   </header>
   <main class="gc-container site-main">
     <article class="module" data-module-page="ap-quadplane">
-      <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-autonomy">Автономия</a><span>QuadPlane и tilt-rotor VTOL</span></p>
-      <h1 class="module-title">QuadPlane и tilt-rotor VTOL</h1>
-      <div class="module-tags"><span class="gc-tag" title="Уровень">L3 — Специалист</span><span class="gc-tag">чтение 30 мин</span><span class="gc-tag">учёба ~4 ч</span><span class="gc-tag">ArduPlane 4.5+</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ОСВОЕН</span></div>
+      <p class="gc-breadcrumb"><a href="../index.html">Course</a><a href="../index.html#track-autonomy">Autonomy</a><span>QuadPlane and tilt-rotor VTOL</span></p>
+      <h1 class="module-title">QuadPlane and tilt-rotor VTOL</h1>
+      <div class="module-tags"><span class="gc-tag" title="Level">L3 — Specialist</span><span class="gc-tag">reading 30 min</span><span class="gc-tag">study ~4 h</span><span class="gc-tag">ArduPlane 4.5+</span><span class="gc-tag" data-state="ok" data-done-badge hidden>MASTERED</span></div>
       <p class="gc-muted module-score" data-module-score></p>
       <p class="module-lead">Tilt-rotor VTOL взлетает как мультиротор и летит как самолёт, поворачивая моторы на ходу. Это одна из самых сложных платформ ArduPilot: в одном аппарате живут миксер коптера, миксер самолёта и механика наклона. Модуль написан на уровне опытного пилота и разбирает реальный bring-up крыла-трикоптера HeeWing T1 Ranger с нуля: назначение выходов, инцидент с самопроизвольно раскрутившимся мотором, ограничения F405 и проверку перехода на земле.</p>
-      <div class="gc-callout" data-state="ok"><strong>После модуля ты умеешь</strong><ul><li>сверить каналы с SERVOx_FUNCTION до арма</li><li>настроить переход и посадку</li></ul></div><p class="gc-muted">Перед этим модулем: <a href="aero-wing.html">Аэродинамика крыла и самолётные режимы</a>, <a href="ap-heavy.html">Тяжёлые платформы: X8 и окто</a></p><div class="gc-callout lab"><p class="gc-label gc-muted">Лабораторная</p><strong>Карта выходов</strong><p class="gc-muted lab__hint">Сдано, когда отмечены все пункты:</p><ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="ap-quadplane:lab:0"><span>Карта «выход → устройство» составлена вручную без пропов</span></label></li><li><label><input type="checkbox" data-check-id="ap-quadplane:lab:1"><span>SERVOn_FUNCTION совпадает с картой на всех каналах</span></label></li><li><label><input type="checkbox" data-check-id="ap-quadplane:lab:2"><span>Наклон проверен на земле в MANUAL и QSTABILIZE</span></label></li><li><label><input type="checkbox" data-check-id="ap-quadplane:lab:3"><span>Арм только с тумблера, failsafe проверен</span></label></li></ul></div><div class="path-pos gc-muted"><span class="gc-label">В пути</span><ul><li data-path-pos="ardupilot"><a href="../path/ardupilot.html">ArduPilot</a>: шаг 37 из 69 → <a href="el-power-design.html?path=ardupilot">Схемотехника питания борта</a></li></ul></div>
+      <div class="gc-callout" data-state="ok"><strong>After this module you can</strong><ul><li>check channels against SERVOx_FUNCTION before arming</li><li>set up the transition and landing</li></ul></div><p class="gc-muted">Before this module: <a href="aero-wing.html">Wing aerodynamics and plane flight modes</a>, <a href="ap-heavy.html">Heavy-lift platforms: X8 and octo</a></p><div class="gc-callout lab"><p class="gc-label gc-muted">Lab</p><strong>Output map</strong><p class="gc-muted lab__hint">Submitted when all items are checked:</p><ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="ap-quadplane:lab:0"><span>&quot;Output → device&quot; map compiled by hand without props</span></label></li><li><label><input type="checkbox" data-check-id="ap-quadplane:lab:1"><span>SERVOn_FUNCTION matches the map on all channels</span></label></li><li><label><input type="checkbox" data-check-id="ap-quadplane:lab:2"><span>Tilt checked on the ground in MANUAL and QSTABILIZE</span></label></li><li><label><input type="checkbox" data-check-id="ap-quadplane:lab:3"><span>Arming only from a switch, failsafe tested</span></label></li></ul></div><div class="path-pos gc-muted"><span class="gc-label">On the path</span><ul><li data-path-pos="ardupilot"><a href="../path/ardupilot.html">ArduPilot</a>: step 37 of 69 → <a href="el-power-design.html?path=ardupilot">Onboard power circuit design</a></li></ul></div>
       <div class="gc-prose module-body">
-<div class="gc-callout" data-state="caution" data-untranslated><strong>Модуль ещё не переведён.</strong> Ниже — оригинал (Русский). Прогресс и оценки общие для всех языков.</div>
-<h2>Теория</h2>
+<div class="gc-callout" data-state="caution" data-untranslated><strong>This module hasn't been translated yet.</strong> Below is the original (Русский). Progress and scores are shared across all languages.</div>
+<h2>Theory</h2>
 <h4 class="md-subheading">Конфигурация QuadPlane-tiltrotor</h4>
 <ul><li><code>Q_ENABLE = 1</code> — включает VTOL-часть в ArduPlane. После изменения <code>Q_ENABLE</code>, <code>Q_FRAME_CLASS</code>, <code>Q_FRAME_TYPE</code> — перезагрузка.</li><li><code>Q_FRAME_CLASS = 7</code> — трикоптер.</li><li><code>Q_TILT_TYPE</code>: 0 — continuous (обычные сервы наклона), 1 — binary (только «вверх/вперёд»), 2 — vectored yaw (левый и правый моторы наклоняются независимо и дают рыскание на висении), 3 — bicopter.</li><li><code>Q_TILT_MASK</code> — какие моторы наклоняются (бит 0 — мотор 1). Трикоптер с двумя наклоняемыми передними моторами — 3.</li><li><code>Q_TILT_MAX</code> — угол наклона в ожидании скорости перехода (дефолт 45° подходит большинству).</li><li><code>Q_TILT_RATE_UP</code> / <code>Q_TILT_RATE_DN</code> — скорость наклона, °/с; разумный старт — около 15°/с.</li><li><code>Q_TILT_YAW_ANGLE</code> — для vectored yaw: насколько моторы могут уйти за 90°.</li></ul>
 <h4 class="md-subheading">Функции выходов</h4>
@@ -73,7 +73,7 @@
 <h4 class="md-subheading">Разобранный пример: первый переход</h4>
 <p>Порядок: (1) QSTABILIZE/QHOVER висение и QLOITER (GPS) — VTOL-часть настроена; (2) FBWA/MANUAL броском или с рук проверены отдельно, если конструкция позволяет; (3) переход на высоте ≥ 60 м в FBWA с <code>AIRSPEED_MIN</code> = 1.3 V_s, <code>Q_ASSIST_SPEED</code> = 1.2 V_s, <code>Q_TRANSITION_MS</code> 5000; наблюдать airspeed (<code>ARSP</code>), наклон тилтов (<code>RCOU</code>), высоту; (4) обратный переход в QHOVER; лог → <code>QTUN</code> (VTOL), <code>TECS</code>, <code>ATT</code>. Без airspeed-датчика переход по времени — только над открытой площадкой с запасом высоты.</p>
 
-<h2>Практика</h2>
+<h2>Practice</h2>
 <h4 class="md-subheading">Протокол bring-up (без пропов!)</h4>
 <ol><li>Сохранить параметры в файл.</li><li>Составить карту «выход → физическое устройство» вручную, по одному выходу.</li><li>Назначить <code>SERVOn_FUNCTION</code> по карте. Моторы и сервы развести по группам таймеров с совместимыми протоколами.</li><li><code>Q_ENABLE</code>, <code>Q_FRAME_CLASS</code>, <code>Q_TILT_*</code> — перезагрузка.</li><li>Проверить направления сервоприводов (<code>SERVOn_REVERSED</code>): в MANUAL моторы смотрят вперёд, в QSTABILIZE — вверх.</li><li>На земле переключать MANUAL ↔ QSTABILIZE и смотреть, что наклон плавный и сервы оттриммированы.</li><li>Проверить реакцию поверхностей и наклона на крен, тангаж, рыскание в обоих режимах.</li><li>Арм только с тумблера, проверка failsafe.</li></ol>
 <h4 class="md-subheading">Первый полёт</h4>
@@ -82,24 +82,24 @@
 <ul><li><strong>Карта выходов</strong> — таблица до назначения функций: «выход → что подключено → ожидаемая функция → протокол (PWM/DShot) → группа таймера». Её заполняют, подавая сигнал по одному выходу (Motor Test, сервотестер или <code>SERVOn_*</code> вручную), а не по памяти.</li><li><strong>Сверка.</strong> Каждый <code>SERVOn_FUNCTION</code> совпадает с картой. Моторы с DShot и сервы с PWM не делят одну группу таймеров — иначе протоколы конфликтуют. В таблице не должно остаться выходов с функцией, которой нет в карте.</li><li><strong>Наклон на земле.</strong> В MANUAL моторы смотрят вперёд, в QSTABILIZE — вверх. Переход плавный, без рывков и упора сервы в механику; у упёршейся сервы слышен гул, и она греется. Запиши крайние положения (<code>SERVOn_MIN/MAX/TRIM</code>) после настройки.</li><li><strong>Реакция на стики</strong> в обоих режимах: на крен в QSTABILIZE отвечают моторы, в MANUAL — элероны. Нарисуй таблицу «стик → кто отвечает → в какую сторону» для обоих режимов.</li><li><strong>Арм и failsafe.</strong> Арм только тумблером (<code>ARMING_RUDDER = 0</code> или по документации своей версии), при выключенном пульте срабатывает failsafe — проверено на земле без пропов.</li></ul>
 <p>Лабораторная засчитывается, когда карта «выход → устройство» составлена вручную без пропов, все <code>SERVOn_FUNCTION</code> совпадают с картой, наклон проверен на земле в MANUAL и QSTABILIZE, а арм работает только с тумблера и failsafe проверен.</p>
 
-<h2>Диагностика</h2>
+<h2>Troubleshooting</h2>
 <div class="diag-groups"><article class="diag-item"><h4><strong>Симптом:</strong> мотор раскручивается без команды при проверке</h4><ul><li>Возможная причина: функция мотора назначена не тому выходу, или сигнал сервы идёт на ESC.</li><li>Что сделать: немедленно отключить питание, составить карту выходов заново, без пропов.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> сервопривод гудит и упирается при включении</h4><ul><li>Возможная причина: на выходе протокол мотора (DShot или высокая частота PWM).</li><li>Что сделать: проверить группы таймеров и частоты выходов.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> при переключении в MANUAL моторы наклоняются назад, а не вперёд</h4><ul><li>Возможная причина: не настроен реверс сервы наклона.</li><li>Что сделать: <code>SERVOn_REVERSED</code>, проверка в обоих режимах.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> на висении аппарат плохо держит рыскание</h4><ul><li>Возможная причина: мал <code>Q_TILT_YAW_ANGLE</code> или перепутаны левая и правая сервы наклона.</li><li>Что сделать: проверить функции 75/76 и направление отклонения на команду yaw.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> после перехода вперёд проседание и клевок</h4><ul><li>Возможная причина: <code>AIRSPEED_MIN</code> ниже реальной V_s, <code>Q_TRANSITION_MS</code> мал.</li><li>Что сделать: скорости по расчёту V_s, assist speed выше, переход выше.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> VTOL-моторы «подхватывают» в горизонтальном полёте</h4><ul><li>Возможная причина: <code>Q_ASSIST_SPEED</code> выше крейсера или airspeed врёт.</li><li>Что сделать: калибровка airspeed, assist ниже крейсера на 15–20%.</li></ul></article></div>
 
-<h2>Чек-лист</h2>
+<h2>Checklist</h2>
 <ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="ap-quadplane:0"><span>Карта «выход → устройство» составлена вручную без пропов</span></label></li><li><label><input type="checkbox" data-check-id="ap-quadplane:1"><span><code>SERVOn_FUNCTION</code> совпадает с картой на всех каналах</span></label></li><li><label><input type="checkbox" data-check-id="ap-quadplane:2"><span>Моторы и сервы в группах таймеров с совместимыми протоколами</span></label></li><li><label><input type="checkbox" data-check-id="ap-quadplane:3"><span>Наклон проверен на земле в MANUAL и QSTABILIZE</span></label></li><li><label><input type="checkbox" data-check-id="ap-quadplane:4"><span>Арм только с тумблера, failsafe проверен</span></label></li><li><label><input type="checkbox" data-check-id="ap-quadplane:5"><span>Ограничения железа (F405, нет компаса) учтены в выборе режимов</span></label></li></ul>
 
-<h2>Источники</h2>
+<h2>Sources</h2>
 <ul class="refs"><li><a href="https://ardupilot.org/plane/docs/guide-tilt-rotor.html" target="_blank" rel="noopener noreferrer">Tilt Rotor Planes — ArduPilot Plane</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://ardupilot.org/plane/docs/common-prearm-safety-checks.html" target="_blank" rel="noopener noreferrer">Pre-Arm Safety Checks — ArduPilot</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://ardupilot.org/copter/docs/common-lua-scripts.html" target="_blank" rel="noopener noreferrer">Lua Scripts (F4 limitation) — ArduPilot</a> <span class="gc-tag" data-state="info">primary</span></li></ul>
-<h2>Проверь себя</h2>
+<h2>Test yourself</h2>
 <uav-quiz src="../quiz/ap-quadplane.json" module="ap-quadplane"></uav-quiz>
       </div>
-      <div class="module-done"><gc-button variant="secondary" data-done-toggle="ap-quadplane">Отметить как пройденный</gc-button></div>
-      <section class="related" aria-label="Смежные модули"><p class="gc-label gc-muted">Смежные модули</p><div class="gc-grid ref-grid"><a class="gc-card" href="ap-heavy.html"><strong>Тяжёлые платформы: X8 и окто</strong><div class="gc-card__meta"><span class="gc-tag" title="L3 — Специалист">L3</span></div></a><a class="gc-card" href="ap-intro.html"><strong>Введение в ArduPilot</strong><div class="gc-card__meta"><span class="gc-tag" title="L2 — Интегратор">L2</span></div></a></div></section>
-      <nav class="pager" aria-label="Соседние модули" data-track-pager><a class="gc-card pager__prev" href="aero-wing.html"><span class="gc-label gc-muted">Назад · трек</span><br>Аэродинамика крыла и самолётные режимы</a><a class="gc-card pager__next" href="ap-tuning.html"><span class="gc-label gc-muted">Дальше · трек</span><br>Тюнинг ArduPilot: AUTOTUNE, фильтры, notch по ESC</a></nav><nav class="pager" aria-label="Соседние шаги пути ArduPilot" data-path-pager="ardupilot" hidden><a class="gc-card pager__prev" href="ap-heavy.html?path=ardupilot"><span class="gc-label gc-muted">Назад · путь ArduPilot</span><br>Тяжёлые платформы: X8 и окто</a><a class="gc-card pager__next" href="el-power-design.html?path=ardupilot"><span class="gc-label gc-muted">Дальше · шаг 38 из 69</span><br>Схемотехника питания борта</a></nav>
+      <div class="module-done"><gc-button variant="secondary" data-done-toggle="ap-quadplane">Mark as completed</gc-button></div>
+      <section class="related" aria-label="Related modules"><p class="gc-label gc-muted">Related modules</p><div class="gc-grid ref-grid"><a class="gc-card" href="ap-heavy.html"><strong>Heavy-lift platforms: X8 and octo</strong><div class="gc-card__meta"><span class="gc-tag" title="L3 — Специалист">L3</span></div></a><a class="gc-card" href="ap-intro.html"><strong>Introduction to ArduPilot</strong><div class="gc-card__meta"><span class="gc-tag" title="L2 — Интегратор">L2</span></div></a></div></section>
+      <nav class="pager" aria-label="Adjacent modules" data-track-pager><a class="gc-card pager__prev" href="aero-wing.html"><span class="gc-label gc-muted">Back · track</span><br>Wing aerodynamics and plane flight modes</a><a class="gc-card pager__next" href="ap-tuning.html"><span class="gc-label gc-muted">Next · track</span><br>ArduPilot tuning: AUTOTUNE, filters, ESC-based notch</a></nav><nav class="pager" aria-label="Adjacent steps of path ArduPilot" data-path-pager="ardupilot" hidden><a class="gc-card pager__prev" href="ap-heavy.html?path=ardupilot"><span class="gc-label gc-muted">Back · path ArduPilot</span><br>Heavy-lift platforms: X8 and octo</a><a class="gc-card pager__next" href="el-power-design.html?path=ardupilot"><span class="gc-label gc-muted">Next · step 38 of 69</span><br>Onboard power circuit design</a></nav>
     </article>
   </main>
   <footer class="gc-container site-footer gc-muted">
-    <p>Открытый курс · <a href="https://github.com/irreligious86/UAV-Education">исходники на GitHub</a> · <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">план развития</a> · <a href="../../curriculum/curriculum.html">для разработчика</a> · CC BY-NC-SA 4.0</p>
+    <p>Open course · <a href="https://github.com/irreligious86/UAV-Education">source on GitHub</a> · <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">roadmap</a> · <a href="../../curriculum/curriculum.html">for developers</a> · CC BY-NC-SA 4.0</p>
   </footer>
 </body>
 </html>

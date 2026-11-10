@@ -3,92 +3,92 @@
   "pass": 80,
   "questions": [
     {
-      "q": "Как режимы привязываются к тумблерам?",
+      "q": "How are modes bound to switches?",
       "options": [
-        "Через порядок каналов AETR",
-        "К AUX-каналу и диапазону",
-        "Только через CLI",
-        "Через меню OSD по имени тумблера"
+        "Through the AETR channel order",
+        "To an AUX channel and a range",
+        "Only through the CLI",
+        "Through the OSD menu by switch name"
       ],
       "answer": 1,
-      "explain": "Режим активен, когда значение AUX-канала попадает в заданный диапазон."
+      "explain": "A mode is active when the AUX channel value falls within the set range."
     },
     {
-      "q": "Почему ARM должен быть на отдельном тумблере без соседей?",
+      "q": "Why should ARM be on a separate switch with no neighbors?",
       "options": [
-        "Так просто удобнее",
-        "Чтобы не заармить случайно",
-        "Ради телеметрии",
-        "Этого требует прошивка для режима ARM"
+        "It's just more convenient",
+        "So you don't arm by accident",
+        "For telemetry",
+        "The firmware requires it for ARM mode"
       ],
       "answer": 1,
-      "explain": "Несколько режимов на одном канале — лишний шанс включить арм не вовремя."
+      "explain": "Several modes on one channel is one more chance to arm at the wrong moment."
     },
     {
-      "q": "Зачем оставлять ANGLE на тумблере, если летаешь в ACRO?",
+      "q": "Why keep ANGLE on a switch if you fly ACRO?",
       "options": [
-        "Для гонок",
-        "Спасение и условие AUTO-LAND",
-        "Незачем",
-        "Для элементов OSD с горизонтом"
+        "For racing",
+        "Rescue and a condition for AUTO-LAND",
+        "No reason",
+        "For OSD horizon elements"
       ],
       "answer": 1,
-      "explain": "Самовыравнивание возвращает горизонт и нужно failsafe-посадке."
+      "explain": "Self-leveling brings back the horizon and is needed for the failsafe landing."
     },
     {
-      "q": "Когда включать FLIP OVER AFTER CRASH?",
+      "q": "When should you use FLIP OVER AFTER CRASH?",
       "options": [
-        "Прямо в полёте",
-        "Только когда пропы свободны",
-        "В момент арма",
-        "На столе с пропами для проверки"
+        "Right in flight",
+        "Only when the props are clear",
+        "At the moment of arming",
+        "On the bench with props on, as a test"
       ],
       "answer": 1,
-      "explain": "Режим крутит моторы в обратную сторону — с зацепившимися пропами это сломанный мотор."
+      "explain": "The mode spins the motors in reverse — with snagged props that's a burned-out motor."
     },
     {
-      "q": "Какое напряжение показывать в OSD?",
+      "q": "Which voltage should you show in the OSD?",
       "options": [
-        "Напряжение BEC 5 В",
-        "Среднее на банку",
-        "Общее",
-        "Любое"
+        "The 5 V BEC voltage",
+        "Average per cell",
+        "Total",
+        "Any"
       ],
       "answer": 1,
-      "explain": "Среднее на банку одинаково читается на 4S и 6S и сразу говорит о состоянии АКБ."
+      "explain": "Average per cell reads the same on 4S and 6S and tells you the battery state right away."
     },
     {
-      "q": "Предупреждение о низком напряжении приходит слишком поздно. Почему?",
+      "q": "The low-voltage warning comes too late. Why?",
       "options": [
-        "Высокий KV моторов занижает показания",
-        "Порог без учёта просадки",
-        "Мало спутников",
-        "Сломан OSD"
+        "High motor KV lowers the readings",
+        "The threshold doesn't account for sag",
+        "Too few satellites",
+        "The OSD is broken"
       ],
       "answer": 1,
-      "explain": "Под нагрузкой напряжение ниже — порог ставят с запасом на просадку."
+      "explain": "Under load the voltage is lower — set the threshold with a margin for sag."
     },
     {
-      "q": "Logic = 1 (AND) в команде aux означает:",
+      "q": "Logic = 1 (AND) in the aux command means:",
       "options": [
-        "Режим на двух каналах сразу",
-        "Нужны оба правила режима",
-        "Инверсия диапазона",
-        "Отключение режима"
+        "The mode is on two channels at once",
+        "Both rules of the mode are required",
+        "Range inversion",
+        "Disabling the mode"
       ],
       "answer": 1,
-      "explain": "Так делают двухтумблерные комбинации."
+      "explain": "That's how two-switch combinations are made."
     },
     {
-      "q": "Зачем зазор между диапазонами трёхпозиционного тумблера?",
+      "q": "Why leave a gap between the ranges of a three-position switch?",
       "options": [
-        "Так требует протокол CRSF для AUX",
-        "Чтобы джиттер не переключал",
-        "Для красоты",
-        "Зазор не нужен"
+        "The CRSF protocol requires it for AUX",
+        "So jitter doesn't toggle modes",
+        "For looks",
+        "No gap is needed"
       ],
       "answer": 1,
-      "explain": "900–1300, 1300–1700, 1700–2100 с запасом."
+      "explain": "900–1300, 1300–1700, 1700–2100 with margin."
     }
   ]
 }

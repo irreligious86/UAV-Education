@@ -14,7 +14,7 @@ var T = (typeof window !== "undefined" && window.T) || function (s) { return s; 
   var docs = null;
   function norm(s) {
     // lower-case, ё→е, punctuation to spaces (keep _ and - inside identifiers)
-    return (s || "").toLowerCase().replace(/ё/g, T("е")).replace(/[^\p{L}\p{N}_\-\s]/gu, " ").replace(/\s+/g, " ");
+    return (s || "").toLowerCase().replace(/ё/g, "е").replace(/[^\p{L}\p{N}_\-\s]/gu, " ").replace(/\s+/g, " ");
   }
 
   function prep(d) {

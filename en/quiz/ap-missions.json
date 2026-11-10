@@ -3,51 +3,51 @@
   "pass": 80,
   "questions": [
     {
-      "q": "Чем NAV-команды отличаются от DO-команд?",
+      "q": "How do NAV commands differ from DO commands?",
       "options": [
-        "DO работают только на самолётах и в Rover",
-        "NAV — куда лететь, DO — что сделать",
-        "Ничем — это синонимы",
-        "NAV используются только для взлёта"
+        "DO only work on planes and in Rover",
+        "NAV is where to fly, DO is what to do",
+        "They don't — they're synonyms",
+        "NAV is used only for takeoff"
       ],
       "answer": 1,
-      "explain": "NAV задают, куда лететь; DO — что сделать по пути, не меняя маршрута. Миссия идёт от NAV к NAV."
+      "explain": "NAV sets where to fly; DO is what to do along the way without changing the route. The mission goes from NAV to NAV."
     },
     {
-      "q": "Какая система высоты нужна для обычной миссии?",
+      "q": "Which altitude frame do you need for a regular mission?",
       "options": [
-        "Абсолютная над морем",
-        "Относительно дома",
-        "Всегда над рельефом",
-        "Любая подойдёт"
+        "Absolute above sea level",
+        "Relative to home",
+        "Always above terrain",
+        "Any will do"
       ],
       "answer": 1,
-      "explain": "Абсолютная высота легко даёт ошибку в сотни метров."
+      "explain": "Absolute altitude easily produces an error of hundreds of meters."
     },
     {
-      "q": "Где дом для Copter?",
+      "q": "Where is home for Copter?",
       "options": [
-        "Где стоит пилот",
-        "Где аппарат заармился",
-        "Где находится наземная станция",
-        "Первая точка миссии"
+        "Where the pilot stands",
+        "Where the aircraft armed",
+        "Where the ground control station is",
+        "The first mission waypoint"
       ],
       "answer": 1,
-      "explain": "После переезда дом остаётся старым — переустанавливать до взлёта."
+      "explain": "After relocating, home stays at the old spot — reset it before takeoff."
     },
     {
-      "q": "Как загружается миссия по MAVLink?",
+      "q": "How is a mission uploaded over MAVLink?",
       "options": [
-        "Файлом по UART-порту",
-        "Аппарат запрашивает точки по номеру",
-        "Через набор параметров",
-        "Одним большим пакетом MISSION_ITEM_LIST"
+        "As a file over a UART port",
+        "The aircraft requests waypoints by index",
+        "Through a set of parameters",
+        "In one big MISSION_ITEM_LIST packet"
       ],
       "answer": 1,
-      "explain": "MISSION_COUNT → запросы MISSION_REQUEST(_INT) → ответы → MISSION_ACK."
+      "explain": "MISSION_COUNT → MISSION_REQUEST(_INT) requests → replies → MISSION_ACK."
     },
     {
-      "q": "Код MAV_CMD_NAV_WAYPOINT?",
+      "q": "The code of MAV_CMD_NAV_WAYPOINT?",
       "options": [
         "16",
         "22",
@@ -58,50 +58,50 @@
       "explain": "16 — WAYPOINT, 22 — TAKEOFF, 20 — RTL, 21 — LAND."
     },
     {
-      "q": "Что делает MIS_RESTART?",
+      "q": "What does MIS_RESTART do?",
       "options": [
-        "Перезапускает контроллер",
-        "Начало с первой команды при входе в AUTO",
-        "Переносит точку дома",
-        "Удаляет миссию после завершения полёта"
+        "Restarts the controller",
+        "Starts from the first command when entering AUTO",
+        "Moves the home point",
+        "Deletes the mission after the flight ends"
       ],
       "answer": 1,
-      "explain": "По умолчанию миссия продолжается с текущей команды."
+      "explain": "By default the mission continues from the current command."
     },
     {
-      "q": "Какая система высот безопасна при смене площадки?",
+      "q": "Which altitude frame is safe when you change sites?",
       "options": [
-        "Высота в футах",
-        "Над домом или над рельефом",
-        "Любая, разницы нет",
-        "Абсолютная над уровнем моря по GPS"
+        "Altitude in feet",
+        "Above home or above terrain",
+        "Any, there's no difference",
+        "Absolute above sea level from GPS"
       ],
       "answer": 1,
-      "explain": "Абсолютные высоты — классическая авария."
+      "explain": "Absolute altitudes are a classic crash."
     },
     {
-      "q": "DO_SET_CAM_TRIGG_DIST нужен для:",
+      "q": "DO_SET_CAM_TRIGG_DIST is used for:",
       "options": [
-        "Точной посадки по маркеру на камеру",
-        "Съёмки каждые N метров",
-        "Смены скорости",
-        "Включения геозоны"
+        "Precision landing on a marker using the camera",
+        "Taking a shot every N meters",
+        "Changing speed",
+        "Enabling the geofence"
       ],
       "answer": 1,
-      "explain": "В конце миссии — DIST 0."
+      "explain": "At the end of the mission — DIST 0."
     },
     {
-      "q": "Миссия для коптера загружена, но с земли в Auto аппарат не взлетает как ожидалось. Что не так в первых пунктах?",
+      "q": "A copter mission is uploaded, but from the ground in Auto the aircraft doesn't take off as expected. What's wrong in the first items?",
       "kind": "apply",
       "fragment": "seq cmd                  frame          alt\n0   HOME                 GLOBAL         0\n1   NAV_WAYPOINT         RELATIVE_ALT   20\n2   NAV_WAYPOINT         RELATIVE_ALT   20\n3   NAV_RETURN_TO_LAUNCH",
       "options": [
-        "Нет NAV_TAKEOFF: миссия коптера, стартующая с земли, должна начинаться с команды взлёта",
-        "Пункты 1 и 2 совпадают по высоте, а в Auto коптер требует изменения высоты между соседними точками миссии",
-        "RELATIVE_ALT нельзя смешивать с HOME в GLOBAL: нужен единый frame во всех пунктах",
-        "NAV_RETURN_TO_LAUNCH в конце запрещён: миссия должна заканчиваться NAV_LAND"
+        "There's no NAV_TAKEOFF: a copter mission starting from the ground must begin with a takeoff command",
+        "Items 1 and 2 have the same altitude, and in Auto a copter requires an altitude change between adjacent mission waypoints",
+        "RELATIVE_ALT can't be mixed with HOME in GLOBAL: you need a single frame in all items",
+        "NAV_RETURN_TO_LAUNCH at the end is forbidden: a mission must end with NAV_LAND"
       ],
       "answer": 0,
-      "explain": "Первый навигационный пункт при старте с земли — TAKEOFF; так поведение однозначно."
+      "explain": "The first navigation item when starting from the ground is TAKEOFF; that way the behavior is unambiguous."
     }
   ]
 }

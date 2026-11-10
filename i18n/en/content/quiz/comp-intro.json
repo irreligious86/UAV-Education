@@ -1,0 +1,94 @@
+{
+  "module": "comp-intro",
+  "pass": 80,
+  "questions": [
+    {
+      "q": "What stays on the flight controller rather than the companion?",
+      "options": [
+        "Computer vision",
+        "Stabilization and failsafe",
+        "Logs to the cloud",
+        "Internet access and cloud logs"
+      ],
+      "answer": 1,
+      "explain": "Stabilization, navigation, failsafe, mixer: whatever the aircraft would crash without goes on the FC."
+    },
+    {
+      "q": "The companion…",
+      "options": [
+        "Controls the motors",
+        "Advises, and the FC decides",
+        "Only writes logs for analysis",
+        "Replaces the FC"
+      ],
+      "answer": 1,
+      "explain": "The FC checks the geofence, the battery, the EKF and executes or refuses."
+    },
+    {
+      "q": "The companion hung in flight. What is the correct aircraft behavior?",
+      "options": [
+        "Waits forever at the last target",
+        "Timeout → safe mode",
+        "Crashes",
+        "Kills the motors"
+      ],
+      "answer": 1,
+      "explain": "GUIDED timeouts and the GCS failsafe are part of the design."
+    },
+    {
+      "q": "Which platform for telemetry on a screen and setup from a phone?",
+      "options": [
+        "Jetson",
+        "ESP32",
+        "Raspberry Pi",
+        "PC"
+      ],
+      "answer": 1,
+      "explain": "A microcontroller with Wi-Fi: instant boot, milliwatts."
+    },
+    {
+      "q": "Where should you power the companion from?",
+      "options": [
+        "The FC telemetry port",
+        "A separate BEC",
+        "The receiver",
+        "The video transmitter"
+      ],
+      "answer": 1,
+      "explain": "The telemetry port isn't rated for a computer's current."
+    },
+    {
+      "q": "The ArduPilot companion port speed for 10–50 Hz streams:",
+      "options": [
+        "57600",
+        "921600",
+        "9600",
+        "115200"
+      ],
+      "answer": 1,
+      "explain": "SERIALx_BAUD = 921."
+    },
+    {
+      "q": "What must the FC survive when the companion fails?",
+      "options": [
+        "Only a broken UART, the rest doesn't matter",
+        "A hang, a reboot, a broken link",
+        "Only a reboot",
+        "Nothing"
+      ],
+      "answer": 1,
+      "explain": "This is tested by pulling the UART in SITL/on the bench."
+    },
+    {
+      "q": "What is the component_id of an onboard computer in MAVLink?",
+      "options": [
+        "191 (MAV_COMP_ID_ONBOARD_COMPUTER)",
+        "1 — same as the autopilot",
+        "255 — same as the GCS",
+        "0 — broadcast"
+      ],
+      "answer": 0,
+      "explain": "The companion is a separate component 191 of the same system."
+    }
+  ]
+}

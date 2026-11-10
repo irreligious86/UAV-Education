@@ -3,18 +3,18 @@
   "pass": 80,
   "questions": [
     {
-      "q": "С чего начинать разбор лога?",
+      "q": "Where do you start analyzing a log?",
       "options": [
-        "С коэффициентов PID",
-        "С обрыва лога и вибраций",
-        "С качества GPS и числа спутников по всему полёту",
-        "С переключений режимов"
+        "With the PID gains",
+        "With log cutoffs and vibration",
+        "With GPS quality and satellite count over the whole flight",
+        "With mode changes"
       ],
       "answer": 1,
-      "explain": "Оборванный лог — потеря питания; высокие вибрации обесценивают всё остальное."
+      "explain": "A cut-off log means power loss; high vibration makes everything else worthless."
     },
     {
-      "q": "Порог VIBE, выше которого почти наверняка проблемы с высотой/позицией?",
+      "q": "The VIBE threshold above which altitude/position problems are almost certain?",
       "options": [
         "10",
         "30",
@@ -22,73 +22,73 @@
         "100"
       ],
       "answer": 2,
-      "explain": "Ниже 30 нормально, выше 60 — почти наверняка проблемы."
+      "explain": "Below 30 is normal, above 60 means problems almost for sure."
     },
     {
-      "q": "ERR с Subsys 17, ECode 1 — это…",
+      "q": "ERR with Subsys 17, ECode 1 is…",
       "options": [
-        "Потеря радиосвязи с пультом",
-        "Сработал EKF-failsafe",
-        "GPS-глитч",
-        "Высокие вибрации"
+        "Loss of the radio link to the transmitter",
+        "An EKF failsafe triggered",
+        "A GPS glitch",
+        "High vibration"
       ],
       "answer": 1,
-      "explain": "2 — радио, 11 — GPS, 16 — вариации EKF, 17 — EKF-failsafe, 29 — компенсация вибраций."
+      "explain": "2 — radio, 11 — GPS, 16 — EKF variance, 17 — EKF failsafe, 29 — vibration compensation."
     },
     {
-      "q": "Какие поля ATT сравнивают, чтобы увидеть механическую проблему?",
+      "q": "Which ATT fields do you compare to spot a mechanical problem?",
       "options": [
-        "Alt против BAlt и DAlt",
-        "DesRoll против Roll",
-        "Roll и Yaw",
-        "Volt и Curr"
+        "Alt vs. BAlt and DAlt",
+        "DesRoll vs. Roll",
+        "Roll and Yaw",
+        "Volt and Curr"
       ],
       "answer": 1,
-      "explain": "Резкое расхождение желаемого и фактического — отказ или нехватка тяги."
+      "explain": "A sharp divergence between desired and actual means a failure or lack of thrust."
     },
     {
-      "q": "Что такое .tlog?",
+      "q": "What is a .tlog?",
       "options": [
-        "Лог Betaflight",
-        "Телеметрия глазами GCS",
-        "Файл миссии",
-        "Лог прошивки ESC с телеметрией"
+        "A Betaflight log",
+        "Telemetry as the GCS saw it",
+        "A mission file",
+        "An ESC firmware log with telemetry"
       ],
       "answer": 1,
-      "explain": "Телеметрия, которую видела GCS по радио: реже и с дырами, но остаётся, даже если SD-карта сгорела."
+      "explain": "The telemetry the GCS saw over the radio link: lower rate and with gaps, but it survives even if the SD card burned up."
     },
     {
-      "q": "Чем прочитать .bin в Python?",
+      "q": "What do you use to read a .bin in Python?",
       "options": [
-        "pandas.read_csv после экспорта",
+        "pandas.read_csv after export",
         "pymavlink.DFReader",
         "orangebox",
         "json.load"
       ],
       "answer": 1,
-      "explain": "DFReader читает DataFlash напрямую."
+      "explain": "DFReader reads DataFlash directly."
     },
     {
-      "q": "CTUN.ThO = 0.78 при просевшем напряжении в Loiter говорит о:",
+      "q": "CTUN.ThO = 0.78 with sagging voltage in Loiter indicates:",
       "options": [
-        "О хорошем тюне",
-        "О нехватке тяги",
-        "О вибрациях",
-        "О проблемах GPS"
+        "A good tune",
+        "A lack of thrust",
+        "Vibration",
+        "GPS problems"
       ],
       "answer": 1,
-      "explain": "Газ в потолке при просевшем напряжении; BAT.Volt/Curr подтверждают."
+      "explain": "Throttle at the ceiling with sagging voltage; BAT.Volt/Curr confirm it."
     },
     {
-      "q": "Что включить в LOG_BITMASK для тюнинга PID?",
+      "q": "What do you enable in LOG_BITMASK for PID tuning?",
       "options": [
-        "Ничего не включать",
-        "PID и батч-сэмплинг",
-        "Только RC",
-        "Только GPS и IMU на полной частоте"
+        "Enable nothing",
+        "PID and batch sampling",
+        "Only RC",
+        "Only GPS and IMU at full rate"
       ],
       "answer": 1,
-      "explain": "PID (PIDR/PIDP/PIDY) и батч-сэмплинг на время тюнинга; после — выключить, лог растёт."
+      "explain": "PID (PIDR/PIDP/PIDY) and batch sampling while tuning; turn them off afterward, the log grows."
     }
   ]
 }

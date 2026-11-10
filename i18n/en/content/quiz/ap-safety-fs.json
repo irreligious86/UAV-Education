@@ -1,0 +1,96 @@
+{
+  "module": "ap-safety-fs",
+  "pass": 80,
+  "questions": [
+    {
+      "q": "Which event overrides the other failsafes?",
+      "options": [
+        "GCS loss",
+        "Critical battery",
+        "Altitude geofence breach",
+        "Dead reckoning"
+      ],
+      "answer": 1,
+      "explain": "Critical battery — usually Land from any state."
+    },
+    {
+      "q": "FS_THR_ENABLE = 5 means:",
+      "options": [
+        "RTL",
+        "Land",
+        "SmartRTL",
+        "Off"
+      ],
+      "answer": 1,
+      "explain": "1 RTL, 3 SmartRTL/RTL, 4 SmartRTL/Land, 5 Land, 6 DO_LAND_START/RTL, 7 Brake/Land."
+    },
+    {
+      "q": "What do you need to configure in the receiver for the RC failsafe to work correctly?",
+      "options": [
+        "Hold the last channel values",
+        "No pulses or throttle below FS_THR_VALUE",
+        "Nothing needs to be configured",
+        "Increase the transmitter power"
+      ],
+      "answer": 1,
+      "explain": "Otherwise the firmware won't find out that the link is lost."
+    },
+    {
+      "q": "RTL_ALT_M (RTL_ALT before 4.7) is:",
+      "options": [
+        "The geofence ceiling",
+        "The minimum return altitude",
+        "The altitude at which landing starts",
+        "The home point altitude above sea level"
+      ],
+      "answer": 1,
+      "explain": "The minimum altitude above home for the return; if the vehicle is higher, it returns at its current altitude. It must be above the obstacles at the field."
+    },
+    {
+      "q": "What is RPN in an FMEA?",
+      "options": [
+        "A parameter number",
+        "Severity × probability × detectability",
+        "The geofence radius",
+        "The battery failsafe threshold in percent"
+      ],
+      "answer": 1,
+      "explain": "Mitigations are prioritized by descending RPN."
+    },
+    {
+      "q": "FS_OPTIONS bit 0 enables:",
+      "options": [
+        "RTL without GPS",
+        "Continuing Auto on RC loss",
+        "Disabling the GCS failsafe",
+        "Landing in any case regardless of the mode"
+      ],
+      "answer": 1,
+      "explain": "For authorized BVLOS; without an authorization, keep it off."
+    },
+    {
+      "q": "What should you verify in SITL before going to the field?",
+      "options": [
+        "Only RC loss and only in Loiter",
+        "Every failsafe, one by one",
+        "Nothing, SITL isn't needed",
+        "Only the geofence"
+      ],
+      "answer": 1,
+      "explain": "RC, GCS, battery, EKF, geofence, motor failure. Record: trigger, reaction, time, log."
+    },
+    {
+      "q": "Pre-flight parameter audit. What is dangerous here?",
+      "kind": "apply",
+      "fragment": "FS_THR_ENABLE    0\nFS_GCS_ENABLE    0\nBATT_LOW_VOLT    14.0\nBATT_FS_LOW_ACT  0\nFENCE_ENABLE     1",
+      "options": [
+        "No reaction to either RC loss or low voltage: FS_THR_ENABLE = 0 and BATT_FS_LOW_ACT = 0",
+        "FENCE_ENABLE = 1 without an uploaded polygon blocks arming and sends the vehicle into RTL",
+        "BATT_LOW_VOLT 14.0 is too high for 4S — the failsafe will trigger right after takeoff",
+        "FS_GCS_ENABLE = 0 forbids flying without a connected ground station — the vehicle simply won't arm"
+      ],
+      "answer": 0,
+      "explain": "The voltage threshold is set, but the action is 0 — nothing will happen; the RC failsafe is off."
+    }
+  ]
+}

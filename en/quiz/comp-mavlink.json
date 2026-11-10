@@ -3,29 +3,29 @@
   "pass": 80,
   "questions": [
     {
-      "q": "Что такое heartbeat?",
+      "q": "What is a heartbeat?",
       "options": [
-        "Команда арма",
-        "Ежесекундное «я жив»",
-        "Пакет GPS-позиции раз в секунду",
-        "Ответ на команду"
+        "The arm command",
+        "A once-a-second “I'm alive”",
+        "A GPS position packet once a second",
+        "A reply to a command"
       ],
       "answer": 1,
-      "explain": "Сообщение раз в секунду от каждого участника: тип, режим, арм. Пока нет heartbeat — нет связи."
+      "explain": "A message once a second from every participant: type, mode, arm. No heartbeat, no link."
     },
     {
-      "q": "Как узнать, что команда выполнена?",
+      "q": "How do you know a command was executed?",
       "options": [
-        "Просто подождать",
-        "По COMMAND_ACK",
-        "По heartbeat",
-        "Только по STATUSTEXT"
+        "Just wait",
+        "By COMMAND_ACK",
+        "By the heartbeat",
+        "Only by STATUSTEXT"
       ],
       "answer": 1,
-      "explain": "MAV_RESULT_ACCEPTED (0) — принято; остальное — отказ."
+      "explain": "MAV_RESULT_ACCEPTED (0) means accepted; anything else is a refusal."
     },
     {
-      "q": "ID сообщения GLOBAL_POSITION_INT?",
+      "q": "The message ID of GLOBAL_POSITION_INT?",
       "options": [
         "30",
         "33",
@@ -36,40 +36,40 @@
       "explain": "0 — HEARTBEAT, 1 — SYS_STATUS, 30 — ATTITUDE, 33 — GLOBAL_POSITION_INT."
     },
     {
-      "q": "Как попросить ATTITUDE с частотой 10 Гц?",
+      "q": "How do you request ATTITUDE at 10 Hz?",
       "options": [
-        "Никак нельзя",
+        "It can't be done",
         "SET_MESSAGE_INTERVAL 100000",
-        "Через параметр SR2_EXTRA1 по MAVLink",
-        "Через PARAM_SET"
+        "Via the SR2_EXTRA1 parameter over MAVLink",
+        "Via PARAM_SET"
       ],
       "answer": 1,
-      "explain": "Интервал в микросекундах."
+      "explain": "The interval is in microseconds."
     },
     {
-      "q": "system_id и component_id — это…",
+      "q": "system_id and component_id are…",
       "options": [
-        "Версия протокола",
-        "Аппарат и его компонент",
-        "Порт и скорость",
-        "Канал и диапазон радиосвязи"
+        "The protocol version",
+        "The vehicle and its component",
+        "The port and the baud rate",
+        "The radio channel and band"
       ],
       "answer": 1,
-      "explain": "Companion — отдельный компонент той же системы."
+      "explain": "The companion is a separate component of the same system."
     },
     {
-      "q": "Когда брать MAVSDK вместо pymavlink?",
+      "q": "When should you use MAVSDK instead of pymavlink?",
       "options": [
-        "Только с PX4, ArduPilot не поддержан",
-        "Для приложений с действиями",
-        "Никогда",
-        "Всегда"
+        "Only with PX4, ArduPilot isn't supported",
+        "For applications built on actions",
+        "Never",
+        "Always"
       ],
       "answer": 1,
-      "explain": "MAVSDK — высокоуровневые arm()/takeoff() для приложений; pymavlink — для обучения и нестандартного."
+      "explain": "MAVSDK offers high-level arm()/takeoff() for applications; pymavlink is for learning and non-standard things."
     },
     {
-      "q": "Стартовый байт MAVLink 2:",
+      "q": "The MAVLink 2 start byte:",
       "options": [
         "0xFE",
         "0xFD",
@@ -77,18 +77,18 @@
         "0x0F"
       ],
       "answer": 1,
-      "explain": "0xFE — MAVLink 1."
+      "explain": "0xFE is MAVLink 1."
     },
     {
-      "q": "Зачем CRC_EXTRA?",
+      "q": "What is CRC_EXTRA for?",
       "options": [
-        "Для ускорения",
-        "Проверка совпадения диалектов",
-        "Для сжатия",
-        "Для подписи и защиты от подмены"
+        "For speed",
+        "Checking that the dialects match",
+        "For compression",
+        "For signing and spoofing protection"
       ],
       "answer": 1,
-      "explain": "Несовпадение — «молчание»."
+      "explain": "A mismatch means “silence”."
     }
   ]
 }

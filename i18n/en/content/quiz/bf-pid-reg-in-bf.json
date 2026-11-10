@@ -1,0 +1,94 @@
+{
+  "module": "bf-pid-reg-in-bf",
+  "pass": 80,
+  "questions": [
+    {
+      "q": "What is P responsible for in PID?",
+      "options": [
+        "It accumulates error",
+        "It pushes back based on the current error",
+        "It filters noise",
+        "It predicts motion from the stick"
+      ],
+      "answer": 1,
+      "explain": "P reacts to the current deviation: the bigger the error, the stronger the correction right now."
+    },
+    {
+      "q": "The drone is hovering, but the wind keeps pushing it and it doesn't return exactly to its spot. Which PID term is responsible for this?",
+      "options": [
+        "P",
+        "I",
+        "D",
+        "FF"
+      ],
+      "answer": 1,
+      "explain": "I accumulates a constant error and adds effort until it disappears."
+    },
+    {
+      "q": "What does D do?",
+      "options": [
+        "Amplifies P",
+        "Brakes fast changes",
+        "Changes throttle",
+        "Enables air mode at zero throttle"
+      ],
+      "answer": 1,
+      "explain": "D looks at the rate of change of the error and damps overshoot."
+    },
+    {
+      "q": "Too much D usually gives you…",
+      "options": [
+        "Sluggishness and drift",
+        "Hot motors",
+        "Slow wobble",
+        "Loss of link"
+      ],
+      "answer": 1,
+      "explain": "Hot motors and a “mushy” response: D amplifies high-frequency noise, the motors chase it and heat up."
+    },
+    {
+      "q": "What is feedforward?",
+      "options": [
+        "A gyro filter",
+        "A contribution straight from stick movement",
+        "Doubled P on fast moves",
+        "A flight mode"
+      ],
+      "answer": 1,
+      "explain": "FF reacts to the pilot's command before an error appears and speeds up the start of the move."
+    },
+    {
+      "q": "Too much P gives you…",
+      "options": [
+        "Hot motors with no visible oscillation",
+        "Fast oscillation, twitchiness",
+        "Drift",
+        "Loss of altitude"
+      ],
+      "answer": 1,
+      "explain": "P overcorrects — the drone shakes at a high frequency."
+    },
+    {
+      "q": "What is the D-term computed from in Betaflight?",
+      "options": [
+        "The pilot's setpoint",
+        "The gyro",
+        "The error",
+        "The motors"
+      ],
+      "answer": 1,
+      "explain": "From the filtered gyro: no derivative kick when the stick moves."
+    },
+    {
+      "q": "What does I-term relax do?",
+      "options": [
+        "Raises I",
+        "Doesn't accumulate I on sharp stick input",
+        "Disables I at zero throttle",
+        "Smooths D"
+      ],
+      "answer": 1,
+      "explain": "It pauses I accumulation during fast stick moves; otherwise I “carries through” after a flip."
+    }
+  ]
+}

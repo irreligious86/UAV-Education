@@ -1,0 +1,94 @@
+{
+  "module": "bf-intro",
+  "pass": 80,
+  "questions": [
+    {
+      "q": "What does Betaflight do best?",
+      "options": [
+        "Autonomous GPS missions with waypoints",
+        "Stabilization and stick response",
+        "Flying a plane",
+        "Photogrammetry"
+      ],
+      "answer": 1,
+      "explain": "Betaflight is firmware for manual flight: minimal latency and a tunable response."
+    },
+    {
+      "q": "What should you do right after the first FC flash?",
+      "options": [
+        "Go fly right away",
+        "Save diff all",
+        "Enable every mode",
+        "Put the props on"
+      ],
+      "answer": 1,
+      "explain": "A backup before changes is your restore point. The props, by the way, should already be off."
+    },
+    {
+      "q": "Where does Betaflight store its configuration?",
+      "options": [
+        "In a file on an SD card",
+        "In the flight controller's memory",
+        "In the configurator",
+        "In the cloud"
+      ],
+      "answer": 1,
+      "explain": "The configuration lives on the board and is exported with diff all / dump."
+    },
+    {
+      "q": "How does diff all differ from dump?",
+      "options": [
+        "diff doesn't include profiles and rate profiles",
+        "diff is only the differences from defaults",
+        "dump is shorter",
+        "No difference"
+      ],
+      "answer": 1,
+      "explain": "diff all is readable and can be carried between versions with some thought; dump drags along every default as an explicit value."
+    },
+    {
+      "q": "What is a target when flashing?",
+      "options": [
+        "The flight's goal",
+        "Firmware for a specific board",
+        "A PID profile",
+        "The video transmitter channel for the flight"
+      ],
+      "answer": 1,
+      "explain": "The target describes the board: processor, gyro, pins. Wrong target — NOGYRO and dead ports."
+    },
+    {
+      "q": "What does BUILD KEY in the status output show?",
+      "options": [
+        "The board's serial number",
+        "The Cloud Build build key",
+        "The configurator version",
+        "A hash of the diff all file for verification"
+      ],
+      "answer": 1,
+      "explain": "Cloud Build uses it to reproduce the same build; diff all doesn't contain it — save the status output."
+    },
+    {
+      "q": "The LOAD flag among the arming flags:",
+      "options": [
+        "The diff wasn't loaded after flashing",
+        "CPU overload",
+        "No battery",
+        "No logs"
+      ],
+      "answer": 1,
+      "explain": "CPU overload: pid_process_denom = 2 or turn features off; tasks shows the heavy tasks."
+    },
+    {
+      "q": "What does the gyro task do in Betaflight?",
+      "options": [
+        "Reads the gyro and filters the signal",
+        "Puts the OSD on the video",
+        "Writes Blackbox to flash",
+        "Handles the CLI"
+      ],
+      "answer": 0,
+      "explain": "The gyro task reads the gyro (up to 8 kHz) and runs the filters; the PID task computes the output."
+    }
+  ]
+}

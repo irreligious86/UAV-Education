@@ -3,62 +3,62 @@
   "pass": 80,
   "questions": [
     {
-      "q": "Что остаётся на полётном контроллере, а не на companion?",
+      "q": "What stays on the flight controller rather than the companion?",
       "options": [
-        "Компьютерное зрение",
-        "Стабилизация и failsafe",
-        "Логи в облако",
-        "Доступ в интернет и облачные логи"
+        "Computer vision",
+        "Stabilization and failsafe",
+        "Logs to the cloud",
+        "Internet access and cloud logs"
       ],
       "answer": 1,
-      "explain": "Стабилизация, навигация, failsafe, миксер: то, без чего аппарат упадёт, — на FC."
+      "explain": "Stabilization, navigation, failsafe, mixer: whatever the aircraft would crash without goes on the FC."
     },
     {
-      "q": "Companion…",
+      "q": "The companion…",
       "options": [
-        "Управляет моторами",
-        "Советует, а FC решает",
-        "Только пишет логи для разбора",
-        "Заменяет FC"
+        "Controls the motors",
+        "Advises, and the FC decides",
+        "Only writes logs for analysis",
+        "Replaces the FC"
       ],
       "answer": 1,
-      "explain": "FC проверяет геозону, батарею, EKF и выполняет или отказывает."
+      "explain": "The FC checks the geofence, the battery, the EKF and executes or refuses."
     },
     {
-      "q": "Companion завис в полёте. Правильное поведение аппарата?",
+      "q": "The companion hung in flight. What is the correct aircraft behavior?",
       "options": [
-        "Ждёт бесконечно на последней цели",
-        "Таймаут → безопасный режим",
-        "Падает",
-        "Глушит моторы"
+        "Waits forever at the last target",
+        "Timeout → safe mode",
+        "Crashes",
+        "Kills the motors"
       ],
       "answer": 1,
-      "explain": "Таймауты GUIDED и GCS-failsafe — часть дизайна."
+      "explain": "GUIDED timeouts and the GCS failsafe are part of the design."
     },
     {
-      "q": "Какая платформа для телеметрии на экран и настроек с телефона?",
+      "q": "Which platform for telemetry on a screen and setup from a phone?",
       "options": [
         "Jetson",
         "ESP32",
         "Raspberry Pi",
-        "ПК"
+        "PC"
       ],
       "answer": 1,
-      "explain": "Микроконтроллер с Wi-Fi: мгновенный старт, милливатты."
+      "explain": "A microcontroller with Wi-Fi: instant boot, milliwatts."
     },
     {
-      "q": "Откуда питать companion?",
+      "q": "Where should you power the companion from?",
       "options": [
-        "С порта телеметрии FC",
-        "От отдельного BEC",
-        "От приёмника",
-        "От видеопередатчика"
+        "The FC telemetry port",
+        "A separate BEC",
+        "The receiver",
+        "The video transmitter"
       ],
       "answer": 1,
-      "explain": "Порт телеметрии не рассчитан на ток компьютера."
+      "explain": "The telemetry port isn't rated for a computer's current."
     },
     {
-      "q": "Скорость companion-порта ArduPilot для потоков 10–50 Гц:",
+      "q": "The ArduPilot companion port speed for 10–50 Hz streams:",
       "options": [
         "57600",
         "921600",
@@ -69,26 +69,26 @@
       "explain": "SERIALx_BAUD = 921."
     },
     {
-      "q": "Что обязан пережить FC при отказе companion?",
+      "q": "What must the FC survive when the companion fails?",
       "options": [
-        "Только обрыв UART, остальное не важно",
-        "Зависание, перезагрузку, обрыв",
-        "Только перезагрузку",
-        "Ничего"
+        "Only a broken UART, the rest doesn't matter",
+        "A hang, a reboot, a broken link",
+        "Only a reboot",
+        "Nothing"
       ],
       "answer": 1,
-      "explain": "Проверяется выдёргиванием UART в SITL/стенде."
+      "explain": "This is tested by pulling the UART in SITL/on the bench."
     },
     {
-      "q": "Какой component_id у бортового компьютера в MAVLink?",
+      "q": "What is the component_id of an onboard computer in MAVLink?",
       "options": [
         "191 (MAV_COMP_ID_ONBOARD_COMPUTER)",
-        "1 — как у автопилота",
-        "255 — как у наземки",
-        "0 — широковещательный"
+        "1 — same as the autopilot",
+        "255 — same as the GCS",
+        "0 — broadcast"
       ],
       "answer": 0,
-      "explain": "Companion — отдельный компонент 191 той же системы."
+      "explain": "The companion is a separate component 191 of the same system."
     }
   ]
 }

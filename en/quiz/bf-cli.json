@@ -3,92 +3,92 @@
   "pass": 80,
   "questions": [
     {
-      "q": "Как войти в CLI?",
+      "q": "How do you enter the CLI?",
       "options": [
-        "Команда cli в OSD-меню",
-        "Вкладка CLI или символ #",
-        "Через меню OSD стиками",
-        "Комбинацией стиков на пульте"
+        "The cli command in the OSD menu",
+        "The CLI tab or the # character",
+        "Through the OSD menu with the sticks",
+        "A stick combination on the radio"
       ],
       "answer": 1,
-      "explain": "Вкладка CLI в конфигураторе или символ # в терминале переводит FC в режим командной строки."
+      "explain": "The CLI tab in the configurator or the # character in a terminal switches the FC into command-line mode."
     },
     {
-      "q": "Что делает команда resource?",
+      "q": "What does the resource command do?",
       "options": [
-        "Показывает загрузку CPU",
-        "Переназначает пины платы",
-        "Калибрует ESC",
-        "Сбрасывает настройки выбранного ресурса"
+        "Shows CPU load",
+        "Reassigns the board's pins",
+        "Calibrates the ESCs",
+        "Resets the settings of the selected resource"
       ],
       "answer": 1,
-      "explain": "Resource remapping — переназначение функции на другой пад, например мотора на свободный выход."
+      "explain": "Resource remapping means moving a function to another pad, e.g. a motor to a free output."
     },
     {
-      "q": "После set нужно…",
+      "q": "After set you need to…",
       "options": [
-        "Ничего — уже записано",
-        "save, иначе всё пропадёт",
-        "reboot без save — запись произойдёт при старте",
-        "exit для записи"
+        "Nothing — it's already written",
+        "save, otherwise everything is lost",
+        "reboot without save — it gets written at startup",
+        "exit to write it"
       ],
       "answer": 1,
-      "explain": "Set меняет значение в памяти; save записывает во флеш и перезагружает."
+      "explain": "set changes the value in memory; save writes it to flash and reboots."
     },
     {
-      "q": "Что выводит get rpm_filter?",
+      "q": "What does get rpm_filter print?",
       "options": [
-        "Ровно один параметр",
-        "Все параметры с rpm_filter",
-        "Ошибку синтаксиса",
-        "Версию RPM-фильтра и его статус"
+        "Exactly one parameter",
+        "All parameters containing rpm_filter",
+        "A syntax error",
+        "The RPM filter version and its status"
       ],
       "answer": 1,
-      "explain": "get ищет по подстроке — удобно смотреть группу настроек."
+      "explain": "get searches by substring — handy for viewing a group of settings."
     },
     {
-      "q": "Можно ли вставить diff all от другой мажорной версии?",
+      "q": "Can you paste a diff all from another major version?",
       "options": [
-        "Да, всегда совместим",
-        "Нет: параметры меняются",
-        "Только на платах F7 и только в формате dump",
-        "Да, после команды defaults"
+        "Yes, it's always compatible",
+        "No: parameters change",
+        "Only on F7 boards and only in dump format",
+        "Yes, after the defaults command"
       ],
       "answer": 1,
-      "explain": "Имена и смысл параметров меняются; переносить настройки между версиями — по разделам и с перечитыванием."
+      "explain": "Parameter names and meanings change; carry settings between versions section by section, re-reading them."
     },
     {
-      "q": "Как сохранить реверс направления мотора через DShot-команды?",
+      "q": "How do you save a motor direction reversal via DShot commands?",
       "options": [
-        "dshotprog 1 21, затем dshotprog 1 12",
-        "set motor_dir = 1, затем save",
-        "resource MOTOR 1 reverse, затем save и reboot",
-        "Никак — только перепайкой"
+        "dshotprog 1 21, then dshotprog 1 12",
+        "set motor_dir = 1, then save",
+        "resource MOTOR 1 reverse, then save and reboot",
+        "You can't — only by resoldering"
       ],
       "answer": 0,
-      "explain": "21 — reversed, 12 — save settings; без пропов."
+      "explain": "21 — reversed, 12 — save settings; without props."
     },
     {
-      "q": "Команда msc делает:",
+      "q": "The msc command does:",
       "options": [
-        "Сброс настроек",
-        "Флеш как USB-диск",
-        "Прошивка ESC",
-        "Вход в DFU для прошивки по USB"
+        "A settings reset",
+        "Flash as a USB drive",
+        "ESC flashing",
+        "Enters DFU for flashing over USB"
       ],
       "answer": 1,
-      "explain": "Монтирует flash как USB-диск для выгрузки логов; bl — для DFU."
+      "explain": "It mounts the flash as a USB drive for pulling logs; bl is for DFU."
     },
     {
-      "q": "Зачем BUILD KEY из status?",
+      "q": "What is the BUILD KEY from status for?",
       "options": [
-        "Сбросить настройки к заводским",
-        "Включить режим DFU",
-        "Проверить и повторить состав прошивки по облачной сборке",
-        "Задать имя аппарата"
+        "Resetting settings to factory defaults",
+        "Enabling DFU mode",
+        "Checking and reproducing the firmware contents from the cloud build",
+        "Setting the craft name"
       ],
       "answer": 2,
-      "explain": "По ключу сборки видно, какие опции включены, и сборку можно повторить."
+      "explain": "The build key shows which options are enabled, and the build can be reproduced."
     }
   ]
 }

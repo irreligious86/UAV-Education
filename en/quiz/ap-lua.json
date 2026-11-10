@@ -3,92 +3,92 @@
   "pass": 80,
   "questions": [
     {
-      "q": "Как включить скриптинг?",
+      "q": "How do you enable scripting?",
       "options": [
-        "SCR_ENABLE = 1 и перезагрузка",
-        "Скопировать скрипт на SD-карту",
-        "Команда lua start в MAVProxy",
-        "Включается автоматически всегда"
+        "SCR_ENABLE = 1 and a reboot",
+        "Copy a script to the SD card",
+        "The lua start command in MAVProxy",
+        "It is always enabled automatically"
       ],
       "answer": 0,
-      "explain": "После перезагрузки появляются остальные SCR_-параметры."
+      "explain": "After a reboot the rest of the SCR_ parameters appear."
     },
     {
-      "q": "Где лежат скрипты на полётнике?",
+      "q": "Where do scripts live on the flight controller?",
       "options": [
-        "В корне SD-карты",
-        "APM/scripts на SD",
-        "На стороне GCS",
-        "Внутри прошивки, раздел ROMFS"
+        "In the root of the SD card",
+        "APM/scripts on the SD card",
+        "On the GCS side",
+        "Inside the firmware, in the ROMFS section"
       ],
       "answer": 1,
-      "explain": "В SITL — папка scripts там, откуда запущен симулятор."
+      "explain": "In SITL — the scripts folder in the directory the simulator was launched from."
     },
     {
-      "q": "Что возвращает update()?",
+      "q": "What does update() return?",
       "options": [
-        "Ничего не возвращает",
-        "Себя и задержку в мс",
-        "Логическое true/false",
-        "Строку состояния"
+        "It returns nothing",
+        "Itself and a delay in ms",
+        "A boolean true/false",
+        "A status string"
       ],
       "answer": 1,
-      "explain": "Функцию и задержку до следующего вызова: планировщик сам вызывает её снова — без бесконечных циклов."
+      "explain": "The function and the delay until the next call: the scheduler calls it again on its own — no infinite loops."
     },
     {
-      "q": "RCx_OPTION = 300 — это…",
+      "q": "RCx_OPTION = 300 is…",
       "options": [
-        "Арм/дизарм",
+        "Arm/disarm",
         "Scripting1",
-        "Возврат RTL",
-        "Пищалка"
+        "RTL return",
+        "Buzzer"
       ],
       "answer": 1,
-      "explain": "300–307 — Scripting1…8, зарезервированы для скриптов."
+      "explain": "300–307 are Scripting1…8, reserved for scripts."
     },
     {
-      "q": "Если один скрипт исчерпал память…",
+      "q": "If one script exhausts the memory…",
       "options": [
-        "Остальные продолжают работать",
-        "Останавливаются все скрипты",
-        "Контроллер перезагружается",
-        "Ничего заметного не происходит"
+        "The others keep running",
+        "All scripts stop",
+        "The controller reboots",
+        "Nothing noticeable happens"
       ],
       "answer": 1,
-      "explain": "Все скрипты останавливаются до перезагрузки — отсюда важность SCR_HEAP_SIZE и аккуратности."
+      "explain": "All scripts stop until a reboot — hence the importance of SCR_HEAP_SIZE and careful coding."
     },
     {
-      "q": "Почему скрипты с SIM_* не попадают на реальный аппарат?",
+      "q": "Why don't scripts using SIM_* end up on a real aircraft?",
       "options": [
-        "Их запрещает лицензия",
-        "SIM_* нет на реальном FC",
-        "Они не влезают по размеру",
-        "Они там работают как есть"
+        "The license forbids them",
+        "A real FC has no SIM_*",
+        "They don't fit in size",
+        "They work there as is"
       ],
       "answer": 1,
-      "explain": "SIM_* — только симулятор."
+      "explain": "SIM_* exists only in the simulator."
     },
     {
-      "q": "Что возвращает функция update() в Lua ArduPilot?",
+      "q": "What does the update() function return in ArduPilot Lua?",
       "options": [
-        "Ничего не возвращает",
-        "update и задержку в мс",
-        "Строку состояния",
-        "Логическое true/false и код ошибки"
+        "It returns nothing",
+        "update and a delay in ms",
+        "A status string",
+        "A boolean true/false and an error code"
       ],
       "answer": 1,
-      "explain": "Таймерная модель исполнения."
+      "explain": "A timer-based execution model."
     },
     {
-      "q": "Применение applet motor_failure_test.lua:",
+      "q": "What the motor_failure_test.lua applet is for:",
       "options": [
-        "Автотюнинг PID",
-        "Тест отказа мотора",
-        "Калибровка компаса",
-        "Расширенное логирование"
+        "PID autotuning",
+        "Motor failure testing",
+        "Compass calibration",
+        "Extended logging"
       ],
       "answer": 1,
-      "explain": "Остановка моторов по битмаске (MOT_STOP_BITMASK) тумблером RCx_OPTION 300 для теста отказа."
+      "explain": "Stops motors per a bitmask (MOT_STOP_BITMASK) with an RCx_OPTION 300 switch to test a failure."
     }
   ]
 }

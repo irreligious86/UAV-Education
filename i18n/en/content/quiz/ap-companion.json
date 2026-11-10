@@ -1,0 +1,94 @@
+{
+  "module": "ap-companion",
+  "pass": 80,
+  "questions": [
+    {
+      "q": "In LOCAL_NED, climbing 10 m means Z = …",
+      "options": [
+        "+10",
+        "−10",
+        "0",
+        "+1000"
+      ],
+      "answer": 1,
+      "explain": "Z points down."
+    },
+    {
+      "q": "What happens if the companion stops sending velocity targets?",
+      "options": [
+        "It keeps flying at the last velocity",
+        "It hovers after GUID_TIMEOUT",
+        "It cuts the motors and falls",
+        "It goes into RTL immediately"
+      ],
+      "answer": 1,
+      "explain": "GUID_TIMEOUT (3 s by default) is a protection you rely on, not work around."
+    },
+    {
+      "q": "At what rate should you send velocity targets?",
+      "options": [
+        "Once",
+        "Regularly, 5–10 Hz",
+        "Once a minute",
+        "100 Hz is mandatory"
+      ],
+      "answer": 1,
+      "explain": "Within the timeout, even if the target has not changed."
+    },
+    {
+      "q": "The pilot switched the mode from GUIDED to LOITER. What should the code do?",
+      "options": [
+        "Switch back to GUIDED with a command",
+        "Stop sending targets",
+        "Reboot the controller",
+        "Keep sending targets"
+      ],
+      "answer": 1,
+      "explain": "The code must respect the pilot."
+    },
+    {
+      "q": "The vehicle stops without reaching the target. Likely cause?",
+      "options": [
+        "A bug in pymavlink",
+        "The geofence or the WPNAV_* limits",
+        "The velocity loop P in GUIDED is too low",
+        "The companion's heartbeat was lost"
+      ],
+      "answer": 1,
+      "explain": "It is an FC protection; check FENCE_* and the messages."
+    },
+    {
+      "q": "Where do you run offboard code first?",
+      "options": [
+        "On a real drone",
+        "In SITL",
+        "On the bench with props on",
+        "In your head"
+      ],
+      "answer": 1,
+      "explain": "The same code, the same port, only the address differs."
+    },
+    {
+      "q": "The default GUID_TIMEOUT:",
+      "options": [
+        "0.5 s",
+        "3 s",
+        "10 s",
+        "30 s"
+      ],
+      "answer": 1,
+      "explain": "Without setpoints the vehicle stops."
+    },
+    {
+      "q": "The mask 0b0000111111000111 in SET_POSITION_TARGET_LOCAL_NED means:",
+      "options": [
+        "Position only",
+        "Velocity only",
+        "Position and velocity",
+        "Yaw only"
+      ],
+      "answer": 1,
+      "explain": "Bits 0–2 (position) and 6–11 are set = ignore."
+    }
+  ]
+}

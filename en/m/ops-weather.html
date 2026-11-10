@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Погода и планирование полёта: ветер, плотностная высота, холод, обледенение — UAV Student</title>
-  <meta name="description" content="посчитать ветер на рабочей высоте и предел ветра своего аппарата оценить плотностную высоту и её влияние на тягу и время полёта прочитать METAR/TAF и принять решение «летим / не летим» по числам">
+  <title>Weather and flight planning: wind, density altitude, cold, icing — UAV Student</title>
+  <meta name="description" content="calculate the wind at operating altitude and your vehicle&#x27;s wind limit estimate density altitude and its effect on thrust and flight time read a METAR/TAF and make a &quot;go / no-go&quot; decision based on numbers">
   <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
   <link rel="manifest" href="../../manifest.webmanifest">
   <meta name="theme-color" content="#0b0f14">
@@ -30,28 +30,28 @@
   <header class="site-header">
     <div class="gc-container site-header__inner">
       <a class="site-brand" href="../index.html"><span class="site-brand__mark" aria-hidden="true">◆</span> UAV Student</a>
-      <nav class="gc-nav" aria-label="Разделы сайта">
-        <a href="../index.html" aria-current="page">Курс</a>
-        <a href="../ref/index.html">Справочник</a>
-        <a href="../pages/glossary.html">Глоссарий</a>
-        <a href="../pages/fails.html">Фейлы</a>
-        <a href="../pages/search.html">Поиск</a>
-        <a href="../pages/progress.html">Мой прогресс</a>
+      <nav class="gc-nav" aria-label="Site sections">
+        <a href="../index.html" aria-current="page">Course</a>
+        <a href="../ref/index.html">Reference</a>
+        <a href="../pages/glossary.html">Glossary</a>
+        <a href="../pages/fails.html">Failures</a>
+        <a href="../pages/search.html">Search</a>
+        <a href="../pages/progress.html">My progress</a>
       </nav>
-      <nav class="lang-switch" aria-label="Язык"><a class="gc-tag" href="../../m/ops-weather.html" data-lang-to="ru" hreflang="ru" lang="ru" title="Русский">RU</a><a class="gc-tag" href="../../uk/m/ops-weather.html" data-lang-to="uk" hreflang="uk" lang="uk" title="Українська">UK</a><a class="gc-tag" href="../../en/m/ops-weather.html" data-lang-to="en" hreflang="en" lang="en" title="English" aria-current="true" data-state="ok">EN</a></nav>
+      <nav class="lang-switch" aria-label="Language"><a class="gc-tag" href="../../m/ops-weather.html" data-lang-to="ru" hreflang="ru" lang="ru" title="Русский">RU</a><a class="gc-tag" href="../../uk/m/ops-weather.html" data-lang-to="uk" hreflang="uk" lang="uk" title="Українська">UK</a><a class="gc-tag" href="../../en/m/ops-weather.html" data-lang-to="en" hreflang="en" lang="en" title="English" aria-current="true" data-state="ok">EN</a></nav>
     </div>
   </header>
   <main class="gc-container site-main">
     <article class="module" data-module-page="ops-weather">
-      <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-operator">Оператор</a><span>Погода и планирование полёта: ветер, плотностная высота, холод, обледенение</span></p>
-      <h1 class="module-title">Погода и планирование полёта: ветер, плотностная высота, холод, обледенение</h1>
-      <div class="module-tags"><span class="gc-tag" title="Уровень">L2 — Интегратор</span><span class="gc-tag">чтение 30 мин</span><span class="gc-tag">учёба ~2 ч</span><span class="gc-tag">любая</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ОСВОЕН</span></div>
+      <p class="gc-breadcrumb"><a href="../index.html">Course</a><a href="../index.html#track-operator">Operator</a><span>Weather and flight planning: wind, density altitude, cold, icing</span></p>
+      <h1 class="module-title">Weather and flight planning: wind, density altitude, cold, icing</h1>
+      <div class="module-tags"><span class="gc-tag" title="Level">L2 — Integrator</span><span class="gc-tag">reading 30 min</span><span class="gc-tag">study ~2 h</span><span class="gc-tag">любая</span><span class="gc-tag" data-state="ok" data-done-badge hidden>MASTERED</span></div>
       <p class="gc-muted module-score" data-module-score></p>
       <p class="module-lead">Половина «необъяснимых» потерь аппаратов — погода, которую не посчитали: ветер на 100 м вдвое сильнее, чем у земли, жара в горах съела запас тяги, холодная батарея просела на взлёте, туман покрыл пропеллеры льдом. Модуль даёт расчёты, которые делаются до выезда: профиль ветра по высоте и порывы, предел ветра для своего аппарата, плотностная высота и что она делает с тягой и временем полёта, батарея на холоде, условия обледенения, чтение авиационных сводок METAR/TAF — и сводит их в лист «летим / не летим» с числами.</p>
-      <div class="gc-callout" data-state="ok"><strong>После модуля ты умеешь</strong><ul><li>посчитать ветер на рабочей высоте и предел ветра своего аппарата</li><li>оценить плотностную высоту и её влияние на тягу и время полёта</li><li>прочитать METAR/TAF и принять решение «летим / не летим» по числам</li></ul></div><p class="gc-muted">Перед этим модулем: <a href="f-aero-props.html">Аэродинамика пропеллера и подбор силовой установки</a>, <a href="f-power.html">Питание: LiPo, Li-Ion, BEC</a></p><div class="gc-callout lab"><p class="gc-label gc-muted">Лабораторная</p><strong>Лист «летим / не летим»</strong><p class="gc-muted lab__hint">Сдано, когда отмечены все пункты:</p><ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="ops-weather:lab:0"><span>Таблица ветра по высотам посчитана</span></label></li><li><label><input type="checkbox" data-check-id="ops-weather:lab:1"><span>Предел порывов аппарата обоснован логом</span></label></li><li><label><input type="checkbox" data-check-id="ops-weather:lab:2"><span>Плотностная высота и падение тяги посчитаны для двух случаев</span></label></li><li><label><input type="checkbox" data-check-id="ops-weather:lab:3"><span>Сводка расшифрована, лист заполнен числами</span></label></li></ul></div>
+      <div class="gc-callout" data-state="ok"><strong>After this module you can</strong><ul><li>calculate the wind at operating altitude and your vehicle&#x27;s wind limit</li><li>estimate density altitude and its effect on thrust and flight time</li><li>read a METAR/TAF and make a &quot;go / no-go&quot; decision based on numbers</li></ul></div><p class="gc-muted">Before this module: <a href="f-aero-props.html">Propeller aerodynamics and power system selection</a>, <a href="f-power.html">Power: LiPo, Li-Ion, BEC</a></p><div class="gc-callout lab"><p class="gc-label gc-muted">Lab</p><strong>Go / no-go sheet</strong><p class="gc-muted lab__hint">Submitted when all items are checked:</p><ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="ops-weather:lab:0"><span>Wind-by-altitude table calculated</span></label></li><li><label><input type="checkbox" data-check-id="ops-weather:lab:1"><span>The vehicle&#x27;s gust limit justified by the log</span></label></li><li><label><input type="checkbox" data-check-id="ops-weather:lab:2"><span>Density altitude and thrust loss calculated for two cases</span></label></li><li><label><input type="checkbox" data-check-id="ops-weather:lab:3"><span>Summary decoded, sheet filled in with numbers</span></label></li></ul></div>
       <div class="gc-prose module-body">
-<div class="gc-callout" data-state="caution" data-untranslated><strong>Модуль ещё не переведён.</strong> Ниже — оригинал (Русский). Прогресс и оценки общие для всех языков.</div>
-<h2>Теория</h2>
+<div class="gc-callout" data-state="caution" data-untranslated><strong>This module hasn't been translated yet.</strong> Below is the original (Русский). Progress and scores are shared across all languages.</div>
+<h2>Theory</h2>
 <h4 class="md-subheading">Ветер: у земли одно, на высоте другое</h4>
 <ul><li><strong>Профиль.</strong> Трение о землю тормозит воздух: ветер растёт с высотой. Простая модель — степенной закон v(h) = v₁₀·(h/10)^α, где v₁₀ — ветер на 10 м (так меряют метеостанции), α ≈ 1/7 для открытой местности, больше (0.2–0.3) над лесом и застройкой. Пример: 7 м/с на 10 м → на 100 м 7·10^(1/7) ≈ 9.7 м/с.</li><li><strong>Порывы.</strong> Средний ветер — не максимум. Сводки дают порывы отдельно (G в METAR); если их нет, закладывать коэффициент 1.3–1.5 к среднему.</li><li><strong>Механическая турбулентность.</strong> За зданиями, лесополосой, холмом — завихрения на расстоянии в несколько высот препятствия по ветру. Взлёт и посадка с подветренной стороны препятствия — самая болтанка.</li><li><strong>Термики.</strong> Днём над нагретой землёй — восходящие потоки; для лёгких аппаратов и картографии лучше утро и вечер.</li></ul>
 <h4 class="md-subheading">Предел ветра для своего аппарата</h4>
@@ -73,7 +73,7 @@
 <h4 class="md-subheading">Лист «летим / не летим»</h4>
 <p>Числа заранее, а не на месте: предел порывов для аппарата, минимальная температура батарей при взлёте, минимальный запас по разнице температуры и точки росы, видимость (визуальный контакт — по правилам своей страны), осадки — нет. Решение принимается до выезда и подтверждается на площадке по анемометру.</p>
 
-<h2>Практика</h2>
+<h2>Practice</h2>
 <h4 class="md-subheading">Шаг 1. Профиль ветра</h4>
 <p>Для ближайшей метеостанции взять ветер на 10 м и порывы. Посчитать ветер и порывы на высотах 30, 60, 100 м для открытой местности (α = 1/7) и над лесом (α = 0.25). Записать таблицу.</p>
 <h4 class="md-subheading">Шаг 2. Предел своего аппарата</h4>
@@ -97,26 +97,26 @@ print(f&quot;DA {da:.0f} м, ρ/ρ0 {r:.2f}, тяга {r:.0%}, мощность 
 <p>Заполнить для своего аппарата: предел порывов, температура батарей, точка росы, видимость, осадки. Приложить к чек-листу выезда (модуль «Полевые операции»).</p>
 <p>Лабораторная засчитывается, когда таблица ветра по высотам посчитана, предел порывов своего аппарата обоснован логом, плотностная высота и падение тяги посчитаны для двух случаев, сводка расшифрована, лист «летим / не летим» заполнен числами.</p>
 
-<h2>Диагностика</h2>
+<h2>Troubleshooting</h2>
 <div class="diag-groups"><article class="diag-item"><h4><strong>Симптом:</strong> у земли тихо, а на высоте аппарат не может вернуться</h4><ul><li>Возможная причина: ветер растёт с высотой, предел считали по ветру у земли.</li><li>Что сделать: считать предел по ветру на рабочей высоте, улетать против ветра, снизиться для возврата.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> в горах аппарат вялый и быстро садит батарею</h4><ul><li>Возможная причина: высокая плотностная высота — меньше тяги, больше мощности на висение.</li><li>Что сделать: пересчитать тяговооружённость и время полёта, снять нагрузку, винты под плотность.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> зимой предупреждение о напряжении сразу после взлёта</h4><ul><li>Возможная причина: холодная батарея, высокое внутреннее сопротивление.</li><li>Что сделать: греть до 20–25 °C, висение на малом газу в начале, короче полёт.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> в тумане растёт вибрация и падает тяга</h4><ul><li>Возможная причина: обледенение винтов.</li><li>Что сделать: немедленно посадить; не летать в видимой влаге около 0 °C.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> болтанка на взлёте и посадке при умеренном ветре</h4><ul><li>Возможная причина: турбулентность за препятствием.</li><li>Что сделать: перенести точку взлёта на наветренную сторону или на расстояние нескольких высот препятствия.</li></ul></article></div>
 
-<h2>Чек-лист</h2>
+<h2>Checklist</h2>
 <ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="ops-weather:0"><span>Считаю ветер на рабочей высоте по ветру на 10 м и учитываю порывы</span></label></li><li><label><input type="checkbox" data-check-id="ops-weather:1"><span>Знаю предел ветра своего аппарата и планирую маршрут против ветра</span></label></li><li><label><input type="checkbox" data-check-id="ops-weather:2"><span>Считаю плотностную высоту и её влияние на тягу и время полёта</span></label></li><li><label><input type="checkbox" data-check-id="ops-weather:3"><span>Готовлю батареи к холоду и не заряжаю их холодными</span></label></li><li><label><input type="checkbox" data-check-id="ops-weather:4"><span>Распознаю условия обледенения и тумана по сводке</span></label></li><li><label><input type="checkbox" data-check-id="ops-weather:5"><span>Читаю METAR и TAF и заполняю лист «летим / не летим»</span></label></li></ul>
 
-<h2>Источники</h2>
+<h2>Sources</h2>
 <ul class="refs"><li><a href="https://library.wmo.int/idurl/4/35713" target="_blank" rel="noopener noreferrer">WMO — Manual on Codes (METAR/TAF code forms)</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://aviationweather.gov/data/metar/" target="_blank" rel="noopener noreferrer">NOAA Aviation Weather Center — decoded METAR/TAF</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://www.grc.nasa.gov/www/k-12/airplane/atmosmet.html" target="_blank" rel="noopener noreferrer">NASA — Earth Atmosphere Model (standard atmosphere)</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://www.faa.gov/regulations_policies/handbooks_manuals/aviation/phak" target="_blank" rel="noopener noreferrer">FAA — Pilot&#x27;s Handbook of Aeronautical Knowledge (Weather Theory, Density Altitude)</a> <span class="gc-tag" data-state="info">primary</span></li></ul>
-<h2>Задачи с числовым ответом</h2>
+<h2>Numeric problems</h2>
 <uav-tasks src="../tasks/ops-weather.json" module="ops-weather"></uav-tasks>
-<h2>Проверь себя</h2>
+<h2>Test yourself</h2>
 <uav-quiz src="../quiz/ops-weather.json" module="ops-weather"></uav-quiz>
       </div>
-      <div class="module-done"><gc-button variant="secondary" data-done-toggle="ops-weather">Отметить как пройденный</gc-button></div>
-      <section class="related" aria-label="Смежные модули"><p class="gc-label gc-muted">Смежные модули</p><div class="gc-grid ref-grid"><a class="gc-card" href="ops-field.html"><strong>Полевые операции и работа команды</strong><div class="gc-card__meta"><span class="gc-tag" title="L2 — Интегратор">L2</span></div></a><a class="gc-card" href="f-aero-props.html"><strong>Аэродинамика пропеллера и подбор силовой установки</strong><div class="gc-card__meta"><span class="gc-tag" title="L2 — Интегратор">L2</span></div></a><a class="gc-card" href="f-power.html"><strong>Питание: LiPo, Li-Ion, BEC</strong><div class="gc-card__meta"><span class="gc-tag" title="L1 — Оператор">L1</span></div></a><a class="gc-card" href="el-battery-packs.html"><strong>Сборки Li-Ion и LiFePO4: элементы, сварка, BMS</strong><div class="gc-card__meta"><span class="gc-tag" title="L2 — Интегратор">L2</span></div></a></div></section>
-      <nav class="pager" aria-label="Соседние модули" data-track-pager><a class="gc-card pager__prev" href="link-telemetry-radios.html"><span class="gc-label gc-muted">Назад · трек</span><br>Телеметрийные радиомодемы: SiK, RFD900, ELRS MAVLink, IP-радио и LTE</a><a class="gc-card pager__next" href="ops-field.html"><span class="gc-label gc-muted">Дальше · трек</span><br>Полевые операции и работа команды</a></nav>
+      <div class="module-done"><gc-button variant="secondary" data-done-toggle="ops-weather">Mark as completed</gc-button></div>
+      <section class="related" aria-label="Related modules"><p class="gc-label gc-muted">Related modules</p><div class="gc-grid ref-grid"><a class="gc-card" href="ops-field.html"><strong>Field operations and teamwork</strong><div class="gc-card__meta"><span class="gc-tag" title="L2 — Интегратор">L2</span></div></a><a class="gc-card" href="f-aero-props.html"><strong>Propeller aerodynamics and power system selection</strong><div class="gc-card__meta"><span class="gc-tag" title="L2 — Интегратор">L2</span></div></a><a class="gc-card" href="f-power.html"><strong>Power: LiPo, Li-Ion, BEC</strong><div class="gc-card__meta"><span class="gc-tag" title="L1 — Оператор">L1</span></div></a><a class="gc-card" href="el-battery-packs.html"><strong>Li-Ion and LiFePO4 packs: cells, welding, BMS</strong><div class="gc-card__meta"><span class="gc-tag" title="L2 — Интегратор">L2</span></div></a></div></section>
+      <nav class="pager" aria-label="Adjacent modules" data-track-pager><a class="gc-card pager__prev" href="link-telemetry-radios.html"><span class="gc-label gc-muted">Back · track</span><br>Telemetry radios: SiK, RFD900, ELRS MAVLink, IP radios and LTE</a><a class="gc-card pager__next" href="ops-field.html"><span class="gc-label gc-muted">Next · track</span><br>Field operations and teamwork</a></nav>
     </article>
   </main>
   <footer class="gc-container site-footer gc-muted">
-    <p>Открытый курс · <a href="https://github.com/irreligious86/UAV-Education">исходники на GitHub</a> · <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">план развития</a> · <a href="../../curriculum/curriculum.html">для разработчика</a> · CC BY-NC-SA 4.0</p>
+    <p>Open course · <a href="https://github.com/irreligious86/UAV-Education">source on GitHub</a> · <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">roadmap</a> · <a href="../../curriculum/curriculum.html">for developers</a> · CC BY-NC-SA 4.0</p>
   </footer>
 </body>
 </html>

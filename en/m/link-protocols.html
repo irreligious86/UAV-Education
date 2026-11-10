@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>SBUS, CRSF и инверсия UART — UAV Student</title>
-  <meta name="description" content="подключить CRSF и SBUS правильно объяснить инверсию UART">
+  <title>SBUS, CRSF and UART inversion — UAV Student</title>
+  <meta name="description" content="wire CRSF and SBUS correctly explain UART inversion">
   <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
   <link rel="manifest" href="../../manifest.webmanifest">
   <meta name="theme-color" content="#0b0f14">
@@ -30,28 +30,28 @@
   <header class="site-header">
     <div class="gc-container site-header__inner">
       <a class="site-brand" href="../index.html"><span class="site-brand__mark" aria-hidden="true">◆</span> UAV Student</a>
-      <nav class="gc-nav" aria-label="Разделы сайта">
-        <a href="../index.html" aria-current="page">Курс</a>
-        <a href="../ref/index.html">Справочник</a>
-        <a href="../pages/glossary.html">Глоссарий</a>
-        <a href="../pages/fails.html">Фейлы</a>
-        <a href="../pages/search.html">Поиск</a>
-        <a href="../pages/progress.html">Мой прогресс</a>
+      <nav class="gc-nav" aria-label="Site sections">
+        <a href="../index.html" aria-current="page">Course</a>
+        <a href="../ref/index.html">Reference</a>
+        <a href="../pages/glossary.html">Glossary</a>
+        <a href="../pages/fails.html">Failures</a>
+        <a href="../pages/search.html">Search</a>
+        <a href="../pages/progress.html">My progress</a>
       </nav>
-      <nav class="lang-switch" aria-label="Язык"><a class="gc-tag" href="../../m/link-protocols.html" data-lang-to="ru" hreflang="ru" lang="ru" title="Русский">RU</a><a class="gc-tag" href="../../uk/m/link-protocols.html" data-lang-to="uk" hreflang="uk" lang="uk" title="Українська">UK</a><a class="gc-tag" href="../../en/m/link-protocols.html" data-lang-to="en" hreflang="en" lang="en" title="English" aria-current="true" data-state="ok">EN</a></nav>
+      <nav class="lang-switch" aria-label="Language"><a class="gc-tag" href="../../m/link-protocols.html" data-lang-to="ru" hreflang="ru" lang="ru" title="Русский">RU</a><a class="gc-tag" href="../../uk/m/link-protocols.html" data-lang-to="uk" hreflang="uk" lang="uk" title="Українська">UK</a><a class="gc-tag" href="../../en/m/link-protocols.html" data-lang-to="en" hreflang="en" lang="en" title="English" aria-current="true" data-state="ok">EN</a></nav>
     </div>
   </header>
   <main class="gc-container site-main">
     <article class="module" data-module-page="link-protocols">
-      <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-operator">Оператор</a><span>SBUS, CRSF и инверсия UART</span></p>
-      <h1 class="module-title">SBUS, CRSF и инверсия UART</h1>
-      <div class="module-tags"><span class="gc-tag" title="Уровень">L1 — Оператор</span><span class="gc-tag">чтение 15 мин</span><span class="gc-tag">учёба ~1.5 ч</span><span class="gc-tag">CRSF / SBUS</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ОСВОЕН</span></div>
+      <p class="gc-breadcrumb"><a href="../index.html">Course</a><a href="../index.html#track-operator">Operator</a><span>SBUS, CRSF and UART inversion</span></p>
+      <h1 class="module-title">SBUS, CRSF and UART inversion</h1>
+      <div class="module-tags"><span class="gc-tag" title="Level">L1 — Operator</span><span class="gc-tag">reading 15 min</span><span class="gc-tag">study ~1.5 h</span><span class="gc-tag">CRSF / SBUS</span><span class="gc-tag" data-state="ok" data-done-badge hidden>MASTERED</span></div>
       <p class="gc-muted module-score" data-module-score></p>
       <p class="module-lead">Приёмник передаёт полётному контроллеру положения стиков по одному из serial-протоколов. Сегодня два главных — старый SBUS (FrSky, Futaba) и CRSF (TBS Crossfire, ExpressLRS). Модуль объясняет физическую разницу между ними, что такое «инвертированный» сигнал, почему с SBUS были вечные проблемы на F4-контроллерах и как правильно подключить каждый протокол.</p>
-      <div class="gc-callout" data-state="ok"><strong>После модуля ты умеешь</strong><ul><li>подключить CRSF и SBUS правильно</li><li>объяснить инверсию UART</li></ul></div><p class="gc-muted">Перед этим модулем: <a href="bf-ports.html">Порты и приёмник</a></p><div class="gc-callout lab"><p class="gc-label gc-muted">Лабораторная</p><strong>Подключить приёмник правильно</strong><p class="gc-muted lab__hint">Сдано, когда отмечены все пункты:</p><ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="link-protocols:lab:0"><span>Протокол приёмника определён (SBUS/CRSF)</span></label></li><li><label><input type="checkbox" data-check-id="link-protocols:lab:1"><span>serialrx_inverted и serialrx_halfduplex проверены через get</span></label></li><li><label><input type="checkbox" data-check-id="link-protocols:lab:2"><span>Для CRSF: телеметрия видна на пульте</span></label></li></ul></div><div class="path-pos gc-muted"><span class="gc-label">В пути</span><ul><li data-path-pos="betaflight"><a href="../path/betaflight.html">Betaflight</a>: шаг 16 из 44 → <a href="bf-modes-osd.html?path=betaflight">Режимы и OSD</a></li><li data-path-pos="inav"><a href="../path/inav.html">INAV</a>: шаг 11 из 20 → <a href="link-elrs.html?path=inav">ExpressLRS: packet rate, телеметрия, LQ</a></li></ul></div>
+      <div class="gc-callout" data-state="ok"><strong>After this module you can</strong><ul><li>wire CRSF and SBUS correctly</li><li>explain UART inversion</li></ul></div><p class="gc-muted">Before this module: <a href="bf-ports.html">Ports and receiver</a></p><div class="gc-callout lab"><p class="gc-label gc-muted">Lab</p><strong>Wire the receiver correctly</strong><p class="gc-muted lab__hint">Submitted when all items are checked:</p><ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="link-protocols:lab:0"><span>Receiver protocol identified (SBUS/CRSF)</span></label></li><li><label><input type="checkbox" data-check-id="link-protocols:lab:1"><span>serialrx_inverted and serialrx_halfduplex checked with get</span></label></li><li><label><input type="checkbox" data-check-id="link-protocols:lab:2"><span>For CRSF: telemetry visible on the radio</span></label></li></ul></div><div class="path-pos gc-muted"><span class="gc-label">On the path</span><ul><li data-path-pos="betaflight"><a href="../path/betaflight.html">Betaflight</a>: step 16 of 44 → <a href="bf-modes-osd.html?path=betaflight">Modes and OSD</a></li><li data-path-pos="inav"><a href="../path/inav.html">INAV</a>: step 11 of 20 → <a href="link-elrs.html?path=inav">ExpressLRS: packet rate, telemetry, LQ</a></li></ul></div>
       <div class="gc-prose module-body">
-<div class="gc-callout" data-state="caution" data-untranslated><strong>Модуль ещё не переведён.</strong> Ниже — оригинал (Русский). Прогресс и оценки общие для всех языков.</div>
-<h2>Теория</h2>
+<div class="gc-callout" data-state="caution" data-untranslated><strong>This module hasn't been translated yet.</strong> Below is the original (Русский). Progress and scores are shared across all languages.</div>
+<h2>Theory</h2>
 <h4 class="md-subheading">Что такое UART-кадр</h4>
 <p>UART передаёт байты последовательно: стартовый бит, 8 бит данных, (необязательный) бит чётности, стоповые биты. В состоянии покоя (idle) линия в логической единице — высокий уровень. Стартовый бит опускает её в ноль, приёмник ловит этот фронт и начинает отсчёт.</p>
 <h4 class="md-subheading">Что значит «инвертированный»</h4>
@@ -79,7 +79,7 @@
 <h4 class="md-subheading">Разобранный пример: не работает приёмник</h4>
 <p>F405, SBUS-приёмник подключён к <code>RX3</code>, в Ports — Serial RX на UART3, в Receiver — SBUS; каналов нет. Диагностика: UART3 на этой плате без аппаратного инвертора → мусор. Решения: переставить на порт с инвертором (пад <code>SBUS</code>/<code>RX1</code> по описанию платы), или включить <code>serialrx_inverted = ON</code> только на F7/H7, или сменить приёмник на CRSF (ELRS) — тогда любой UART. Проверка анализатором: idle низкий = инвертированный сигнал (модуль «Измерения»).</p>
 
-<h2>Практика</h2>
+<h2>Practice</h2>
 <h4 class="md-subheading">Подключение CRSF / ExpressLRS к Betaflight</h4>
 <ol><li>Провода крест-накрест: TX приёмника → RX контроллера, RX приёмника → TX контроллера. Плюс 5 В и GND.</li><li>Ports: на этом UART включить Serial RX.</li><li>Receiver: Serial, провайдер CRSF, телеметрия включена.</li><li>В CLI проверить, что порт не инвертирован и не полудуплексный:</li></ol>
 <pre class="cli-block"><code>get serialrx
@@ -95,24 +95,24 @@ save</code></pre>
 <ul><li><strong>CLI.</strong> <code>get serialrx</code> выводит все настройки приёмника. Для CRSF ожидается <code>serialrx_provider = CRSF</code>, <code>serialrx_inverted = OFF</code>, <code>serialrx_halfduplex = OFF</code>. Запиши вывод до и после правки.</li><li><strong>Вкладка Receiver.</strong> Каналы ходят вместе со стиками и в правильном порядке: крен, тангаж, газ, рыскание (AETR). С CRSF/ELRS крайние значения около 988–2012, с SBUS — около 1000–2000 в зависимости от пульта. Центр стиков — 1500 ± несколько единиц, иначе нужна калибровка или subtrim на пульте.</li><li><strong>Failsafe.</strong> Выключи пульт: в Receiver каналы уходят в значения failsafe, а в <code>status</code> появляется флаг <code>RXLOSS</code>. Включи — каналы вернулись. Это проверка того, что связь действительно контролируется.</li><li><strong>Телеметрия CRSF.</strong> На пульте (EdgeTX: Model → Telemetry → Discover new sensors) появляются датчики качества связи (RSSI, LQ) и напряжение батареи аппарата. Если LQ есть, а напряжения нет, проверь, включена ли телеметрия в Betaflight и подключён ли датчик напряжения.</li><li><strong>SBUS на F4.</strong> Если каналы не двигаются вовсе, почти всегда сигнал подан на UART без аппаратного инвертора. Перенеси провод на пад SBUS по схеме платы.</li></ul>
 <p>Лабораторная засчитывается, когда протокол приёмника определён и записан, <code>serialrx_inverted</code> и <code>serialrx_halfduplex</code> проверены через <code>get</code> с записанным выводом, каналы и failsafe проверены во вкладке Receiver, а для CRSF телеметрия (LQ и напряжение) видна на пульте.</p>
 
-<h2>Диагностика</h2>
+<h2>Troubleshooting</h2>
 <div class="diag-groups"><article class="diag-item"><h4><strong>Симптом:</strong> приёмник забинден, а в Receiver каналы стоят</h4><ul><li>Возможная причина: TX/RX перепутаны или выбран не тот UART в Ports.</li><li>Что сделать: проверить пайку крест-накрест и номер UART по схеме платы.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> SBUS на F4 не работает ни на одном порту</h4><ul><li>Возможная причина: подключено к UART без инвертора.</li><li>Что сделать: найти пад с инвертором по схеме или использовать неинвертированный выход приёмника.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> каналы есть, но телеметрии на пульте нет (CRSF)</h4><ul><li>Возможная причина: не припаян провод TX контроллера → RX приёмника или включён half-duplex.</li><li>Что сделать: проверить второй провод и <code>serialrx_halfduplex = OFF</code>.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> стики «дёргаются» на месте</h4><ul><li>Возможная причина: помехи на линии, плохой GND или неверная скорость.</li><li>Что сделать: проверить общий GND, убрать провод от силовых линий.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> каналы приходят, но failsafe в FC не срабатывает при выключении пульта</h4><ul><li>Возможная причина: приёмник «держит» последние значения, флаг failsafe SBUS не читается или CRSF не настроен на «cut».</li><li>Что сделать: настроить приёмник на «no pulses»/cut или failsafe-значения; проверить реакцию FC на земле без пропов.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> LQ в OSD 100%, но RSSI dBm не показывается</h4><ul><li>Возможная причина: OSD-элемент настроен на RSSI по каналу, а не на CRSF Link Statistics.</li><li>Что сделать: включить элемент «RSSI dBm»/«Link quality» (Betaflight: <code>osd_link_quality_pos</code>, <code>osd_rssi_dbm_pos</code>), отключить <code>rssi_channel</code>.</li></ul></article></div>
 
-<h2>Чек-лист</h2>
+<h2>Checklist</h2>
 <ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="link-protocols:0"><span>Понятно, какой протокол выдаёт приёмник</span></label></li><li><label><input type="checkbox" data-check-id="link-protocols:1"><span>Для SBUS на F4 выбран UART с инвертором</span></label></li><li><label><input type="checkbox" data-check-id="link-protocols:2"><span>Для CRSF: TX/RX крест-накрест, оба провода припаяны</span></label></li><li><label><input type="checkbox" data-check-id="link-protocols:3"><span><code>serialrx_inverted</code> и <code>serialrx_halfduplex</code> проверены через <code>get</code></span></label></li><li><label><input type="checkbox" data-check-id="link-protocols:4"><span>Во вкладке Receiver каналы и их порядок проверены</span></label></li></ul>
 
-<h2>Источники</h2>
+<h2>Sources</h2>
 <ul class="refs"><li><a href="https://github.com/tbs-fpv/tbs-crsf-spec" target="_blank" rel="noopener noreferrer">CRSF Protocol Specification — TBS (GitHub)</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://www.expresslrs.org/quick-start/receivers/configuring-fc/" target="_blank" rel="noopener noreferrer">Configuring FC for ExpressLRS — ExpressLRS Docs</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://github.com/bolderflight/sbus" target="_blank" rel="noopener noreferrer">SBUS library and protocol description — Bolder Flight Systems</a> <span class="gc-tag">secondary</span></li></ul>
-<h2>Проверь себя</h2>
+<h2>Test yourself</h2>
 <uav-quiz src="../quiz/link-protocols.json" module="link-protocols"></uav-quiz>
       </div>
-      <div class="module-done"><gc-button variant="secondary" data-done-toggle="link-protocols">Отметить как пройденный</gc-button></div>
-      <section class="related" aria-label="Смежные модули"><p class="gc-label gc-muted">Смежные модули</p><div class="gc-grid ref-grid"><a class="gc-card" href="link-elrs.html"><strong>ExpressLRS: packet rate, телеметрия, LQ</strong><div class="gc-card__meta"><span class="gc-tag" title="L2 — Интегратор">L2</span></div></a><a class="gc-card" href="bf-ports.html"><strong>Порты и приёмник</strong><div class="gc-card__meta"><span class="gc-tag" title="L1 — Оператор">L1</span></div></a></div></section>
-      <nav class="pager" aria-label="Соседние модули" data-track-pager><a class="gc-card pager__prev" href="bf-ports.html"><span class="gc-label gc-muted">Назад · трек</span><br>Порты и приёмник</a><a class="gc-card pager__next" href="bf-modes-osd.html"><span class="gc-label gc-muted">Дальше · трек</span><br>Режимы и OSD</a></nav><nav class="pager" aria-label="Соседние шаги пути Betaflight" data-path-pager="betaflight" hidden><a class="gc-card pager__prev" href="bf-ports.html?path=betaflight"><span class="gc-label gc-muted">Назад · путь Betaflight</span><br>Порты и приёмник</a><a class="gc-card pager__next" href="bf-modes-osd.html?path=betaflight"><span class="gc-label gc-muted">Дальше · шаг 17 из 44</span><br>Режимы и OSD</a></nav><nav class="pager" aria-label="Соседние шаги пути INAV" data-path-pager="inav" hidden><a class="gc-card pager__prev" href="eng-method-101.html?path=inav"><span class="gc-label gc-muted">Назад · путь INAV</span><br>Инженерный метод 101: требования, архитектура, тесты, документация</a><a class="gc-card pager__next" href="link-elrs.html?path=inav"><span class="gc-label gc-muted">Дальше · шаг 12 из 20</span><br>ExpressLRS: packet rate, телеметрия, LQ</a></nav>
+      <div class="module-done"><gc-button variant="secondary" data-done-toggle="link-protocols">Mark as completed</gc-button></div>
+      <section class="related" aria-label="Related modules"><p class="gc-label gc-muted">Related modules</p><div class="gc-grid ref-grid"><a class="gc-card" href="link-elrs.html"><strong>ExpressLRS: packet rate, telemetry, LQ</strong><div class="gc-card__meta"><span class="gc-tag" title="L2 — Интегратор">L2</span></div></a><a class="gc-card" href="bf-ports.html"><strong>Ports and receiver</strong><div class="gc-card__meta"><span class="gc-tag" title="L1 — Оператор">L1</span></div></a></div></section>
+      <nav class="pager" aria-label="Adjacent modules" data-track-pager><a class="gc-card pager__prev" href="bf-ports.html"><span class="gc-label gc-muted">Back · track</span><br>Ports and receiver</a><a class="gc-card pager__next" href="bf-modes-osd.html"><span class="gc-label gc-muted">Next · track</span><br>Modes and OSD</a></nav><nav class="pager" aria-label="Adjacent steps of path Betaflight" data-path-pager="betaflight" hidden><a class="gc-card pager__prev" href="bf-ports.html?path=betaflight"><span class="gc-label gc-muted">Back · path Betaflight</span><br>Ports and receiver</a><a class="gc-card pager__next" href="bf-modes-osd.html?path=betaflight"><span class="gc-label gc-muted">Next · step 17 of 44</span><br>Modes and OSD</a></nav><nav class="pager" aria-label="Adjacent steps of path INAV" data-path-pager="inav" hidden><a class="gc-card pager__prev" href="eng-method-101.html?path=inav"><span class="gc-label gc-muted">Back · path INAV</span><br>Engineering Method 101: requirements, architecture, tests, documentation</a><a class="gc-card pager__next" href="link-elrs.html?path=inav"><span class="gc-label gc-muted">Next · step 12 of 20</span><br>ExpressLRS: packet rate, telemetry, LQ</a></nav>
     </article>
   </main>
   <footer class="gc-container site-footer gc-muted">
-    <p>Открытый курс · <a href="https://github.com/irreligious86/UAV-Education">исходники на GitHub</a> · <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">план развития</a> · <a href="../../curriculum/curriculum.html">для разработчика</a> · CC BY-NC-SA 4.0</p>
+    <p>Open course · <a href="https://github.com/irreligious86/UAV-Education">source on GitHub</a> · <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">roadmap</a> · <a href="../../curriculum/curriculum.html">for developers</a> · CC BY-NC-SA 4.0</p>
   </footer>
 </body>
 </html>

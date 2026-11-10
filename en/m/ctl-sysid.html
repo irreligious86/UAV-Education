@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Идентификация системы: чирп, частотная характеристика, модель для тюнинга — UAV Student</title>
-  <meta name="description" content="спланировать и провести эксперимент с чирпом оценить частотную характеристику и подогнать модель с задержкой рассчитать запас по фазе и цену фильтра по модели">
+  <title>System identification: chirp, frequency response, a model for tuning — UAV Student</title>
+  <meta name="description" content="plan and run a chirp experiment estimate the frequency response and fit a model with latency calculate phase margin and the cost of a filter from a model">
   <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
   <link rel="manifest" href="../../manifest.webmanifest">
   <meta name="theme-color" content="#0b0f14">
@@ -30,28 +30,28 @@
   <header class="site-header">
     <div class="gc-container site-header__inner">
       <a class="site-brand" href="../index.html"><span class="site-brand__mark" aria-hidden="true">◆</span> UAV Student</a>
-      <nav class="gc-nav" aria-label="Разделы сайта">
-        <a href="../index.html" aria-current="page">Курс</a>
-        <a href="../ref/index.html">Справочник</a>
-        <a href="../pages/glossary.html">Глоссарий</a>
-        <a href="../pages/fails.html">Фейлы</a>
-        <a href="../pages/search.html">Поиск</a>
-        <a href="../pages/progress.html">Мой прогресс</a>
+      <nav class="gc-nav" aria-label="Site sections">
+        <a href="../index.html" aria-current="page">Course</a>
+        <a href="../ref/index.html">Reference</a>
+        <a href="../pages/glossary.html">Glossary</a>
+        <a href="../pages/fails.html">Failures</a>
+        <a href="../pages/search.html">Search</a>
+        <a href="../pages/progress.html">My progress</a>
       </nav>
-      <nav class="lang-switch" aria-label="Язык"><a class="gc-tag" href="../../m/ctl-sysid.html" data-lang-to="ru" hreflang="ru" lang="ru" title="Русский">RU</a><a class="gc-tag" href="../../uk/m/ctl-sysid.html" data-lang-to="uk" hreflang="uk" lang="uk" title="Українська">UK</a><a class="gc-tag" href="../../en/m/ctl-sysid.html" data-lang-to="en" hreflang="en" lang="en" title="English" aria-current="true" data-state="ok">EN</a></nav>
+      <nav class="lang-switch" aria-label="Language"><a class="gc-tag" href="../../m/ctl-sysid.html" data-lang-to="ru" hreflang="ru" lang="ru" title="Русский">RU</a><a class="gc-tag" href="../../uk/m/ctl-sysid.html" data-lang-to="uk" hreflang="uk" lang="uk" title="Українська">UK</a><a class="gc-tag" href="../../en/m/ctl-sysid.html" data-lang-to="en" hreflang="en" lang="en" title="English" aria-current="true" data-state="ok">EN</a></nav>
     </div>
   </header>
   <main class="gc-container site-main">
     <article class="module" data-module-page="ctl-sysid">
-      <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-integrator">Интегратор</a><span>Идентификация системы: чирп, частотная характеристика, модель для тюнинга</span></p>
-      <h1 class="module-title">Идентификация системы: чирп, частотная характеристика, модель для тюнинга</h1>
-      <div class="module-tags"><span class="gc-tag" title="Уровень">L4 — Эксперт</span><span class="gc-tag">чтение 40 мин</span><span class="gc-tag">учёба ~3 ч</span><span class="gc-tag">ArduCopter 4.5+ · Python 3 + NumPy</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ОСВОЕН</span></div>
+      <p class="gc-breadcrumb"><a href="../index.html">Course</a><a href="../index.html#track-integrator">Integrator</a><span>System identification: chirp, frequency response, a model for tuning</span></p>
+      <h1 class="module-title">System identification: chirp, frequency response, a model for tuning</h1>
+      <div class="module-tags"><span class="gc-tag" title="Level">L4 — Expert</span><span class="gc-tag">reading 40 min</span><span class="gc-tag">study ~3 h</span><span class="gc-tag">ArduCopter 4.5+ · Python 3 + NumPy</span><span class="gc-tag" data-state="ok" data-done-badge hidden>MASTERED</span></div>
       <p class="gc-muted module-score" data-module-score></p>
       <p class="module-lead">Тюнинг «на глаз» и даже AUTOTUNE отвечают на вопрос «какие коэффициенты», но не «почему». Идентификация системы отвечает: аппарату подают известный сигнал (чирп — синусоиду с растущей частотой), записывают реакцию, считают частотную характеристику и подгоняют под неё модель с понятными параметрами — постоянной времени моторов, задержкой, коэффициентом усиления. С моделью тюнинг становится расчётом: запас по фазе, частота среза, что даст фильтр. Модуль разбирает чирп и требования к эксперименту, режим SYSID в ArduCopter, оценку частотной характеристики по спектрам, подгонку модели первого порядка с задержкой и использование модели для выбора коэффициентов. Код проверяется на синтетических данных, затем — на логе SITL.</p>
-      <div class="gc-callout" data-state="ok"><strong>После модуля ты умеешь</strong><ul><li>спланировать и провести эксперимент с чирпом</li><li>оценить частотную характеристику и подогнать модель с задержкой</li><li>рассчитать запас по фазе и цену фильтра по модели</li></ul></div><p class="gc-muted">Перед этим модулем: <a href="ctl-theory.html">Теория управления: устойчивость, запасы, каскады</a>, <a href="ctl-signals.html">Сигналы и спектры: что видит гироскоп</a></p><div class="gc-callout lab"><p class="gc-label gc-muted">Лабораторная</p><strong>Модель своего аппарата</strong><p class="gc-muted lab__hint">Сдано, когда отмечены все пункты:</p><ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="ctl-sysid:lab:0"><span>Синтетическая проверка восстанавливает параметры</span></label></li><li><label><input type="checkbox" data-check-id="ctl-sysid:lab:1"><span>Запас по фазе посчитан для нескольких Kp и фильтров</span></label></li><li><label><input type="checkbox" data-check-id="ctl-sysid:lab:2"><span>Модель из SITL получена</span></label></li><li><label><input type="checkbox" data-check-id="ctl-sysid:lab:3"><span>Влияние фильтра гироскопа измерено и сравнено с расчётом</span></label></li></ul></div>
+      <div class="gc-callout" data-state="ok"><strong>After this module you can</strong><ul><li>plan and run a chirp experiment</li><li>estimate the frequency response and fit a model with latency</li><li>calculate phase margin and the cost of a filter from a model</li></ul></div><p class="gc-muted">Before this module: <a href="ctl-theory.html">Control theory: stability, margins, cascades</a>, <a href="ctl-signals.html">Signals and spectra: what the gyro sees</a></p><div class="gc-callout lab"><p class="gc-label gc-muted">Lab</p><strong>Model of your vehicle</strong><p class="gc-muted lab__hint">Submitted when all items are checked:</p><ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="ctl-sysid:lab:0"><span>The synthetic test recovers the parameters</span></label></li><li><label><input type="checkbox" data-check-id="ctl-sysid:lab:1"><span>Phase margin calculated for several Kp values and filters</span></label></li><li><label><input type="checkbox" data-check-id="ctl-sysid:lab:2"><span>Model obtained from SITL</span></label></li><li><label><input type="checkbox" data-check-id="ctl-sysid:lab:3"><span>Effect of the gyro filter measured and compared with the calculation</span></label></li></ul></div>
       <div class="gc-prose module-body">
-<div class="gc-callout" data-state="caution" data-untranslated><strong>Модуль ещё не переведён.</strong> Ниже — оригинал (Русский). Прогресс и оценки общие для всех языков.</div>
-<h2>Теория</h2>
+<div class="gc-callout" data-state="caution" data-untranslated><strong>This module hasn't been translated yet.</strong> Below is the original (Русский). Progress and scores are shared across all languages.</div>
+<h2>Theory</h2>
 <h4 class="md-subheading">Зачем модель</h4>
 <ul><li>Регулятор настраивают под объект. Объект рейт-контура коптера — «команда момента → угловая скорость»: инерция корпуса, постоянная времени моторов (разгон винта), задержки (фильтры, ESC, расчётный цикл).</li><li>Модель вида G(s) = K·e^(−sτ) / (Ts + 1) (или с интегратором — для перехода к углу) описывает эту цепочку тремя числами. Зная их, можно посчитать запас по фазе для любых коэффициентов, увидеть, сколько фазы «съест» новый фильтр, и сравнить два аппарата объективно.</li><li>Модуль «Теория управления» дал язык (передаточные функции, запасы); здесь — как получить модель из полёта.</li></ul>
 <h4 class="md-subheading">Чирп и требования к эксперименту</h4>
@@ -69,7 +69,7 @@
 <h4 class="md-subheading">Модель → тюнинг</h4>
 <ul><li><strong>Запас по фазе.</strong> Для пропорционального регулятора Kp разомкнутый контур L = Kp·G. Частота среза — где |L| = 1; запас по фазе — 180° + ∠L на ней. Чем больше Kp, тем выше частота среза и тем меньше запаса из-за задержки.</li><li><strong>Цена фильтра.</strong> Фильтр нижних частот с частотой f_c добавляет примерно −arctan(f/f_c) фазы: на частоте среза контура 20 Гц фильтр 80 Гц отнимает ~14°. Это и есть «фильтры съедают запас» из модуля «Фильтры» — теперь числом.</li><li><strong>Сравнение аппаратов и изменений.</strong> Новые винты, моторы, рама — новая модель: видно, изменилась ли постоянная времени или задержка, и сколько коэффициентов это стоит.</li></ul>
 
-<h2>Практика</h2>
+<h2>Practice</h2>
 <h4 class="md-subheading">Шаг 1. Синтетическая проверка</h4>
 <p>Код идентификации и подгонки; сначала — на данных с известным ответом:</p>
 <pre class="cli-block"><code>import numpy as np
@@ -123,26 +123,26 @@ if __name__ == &quot;__main__&quot;:          # synthetic check: chirp through a
 <p>Изменить фильтр гироскопа (<code>INS_GYRO_FILTER</code> вдвое ниже) и повторить шаг 3. Сравнить τ и фазу на 20 Гц до и после; совпадает ли с оценкой шага 2?</p>
 <p>Лабораторная засчитывается, когда синтетическая проверка восстанавливает параметры с оценкой влияния шума и длительности, запас по фазе посчитан для нескольких Kp и фильтров, модель из SITL получена, влияние фильтра гироскопа измерено и сравнено с расчётом.</p>
 
-<h2>Диагностика</h2>
+<h2>Troubleshooting</h2>
 <div class="diag-groups"><article class="diag-item"><h4><strong>Симптом:</strong> точки частотной характеристики «скачут»</h4><ul><li>Возможная причина: малая амплитуда относительно шума, короткая запись, ветер или вмешательство пилота.</li><li>Что сделать: больше амплитуда (без насыщения), длиннее запись, тихая погода, руки прочь от стиков.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> на высоких частотах фаза уходит без меры</h4><ul><li>Возможная причина: реальная задержка больше модели, фильтры, резонанс рамы.</li><li>Что сделать: оценивать модель в диапазоне, где она применима; резонансы — отдельно (notch).</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> модель хорошо легла, а коэффициенты по ней раскачивают аппарат</h4><ul><li>Возможная причина: оценка «задание → выход» вместо «вход объекта → выход» в замкнутом контуре.</li><li>Что сделать: брать входом реальный сигнал на объект (выход регулятора/миксера).</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> моторы упираются в пределы во время чирпа</h4><ul><li>Возможная причина: слишком большая амплитуда, низкий запас тяги.</li><li>Что сделать: снизить <code>SID_MAGNITUDE</code>, проверить газ висения.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> не входит в режим SYSID</h4><ul><li>Возможная причина: <code>SID_AXIS = 0</code>, параметры не обновлены, аппарат на земле или переключение не из режима с ручным газом (для осей 14–19 — не из LOITER).</li><li>Что сделать: выставить ось, обновить параметры в наземке.</li></ul></article></div>
 
-<h2>Чек-лист</h2>
+<h2>Checklist</h2>
 <ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="ctl-sysid:0"><span>Объясняю, зачем модель объекта и какие у неё параметры</span></label></li><li><label><input type="checkbox" data-check-id="ctl-sysid:1"><span>Планирую чирп: диапазон, амплитуда, длительность, точка ввода</span></label></li><li><label><input type="checkbox" data-check-id="ctl-sysid:2"><span>Настраиваю и безопасно провожу SYSID в ArduCopter</span></label></li><li><label><input type="checkbox" data-check-id="ctl-sysid:3"><span>Оцениваю частотную характеристику по спектрам и понимаю когерентность</span></label></li><li><label><input type="checkbox" data-check-id="ctl-sysid:4"><span>Подгоняю модель первого порядка с задержкой и проверяю на синтетике</span></label></li><li><label><input type="checkbox" data-check-id="ctl-sysid:5"><span>Считаю запас по фазе и цену фильтра по модели</span></label></li></ul>
 
-<h2>Источники</h2>
+<h2>Sources</h2>
 <ul class="refs"><li><a href="https://ardupilot.org/copter/docs/systemid-mode.html" target="_blank" rel="noopener noreferrer">ArduPilot — System Identification mode</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://github.com/ArduPilot/ardupilot/blob/master/ArduCopter/mode_systemid.cpp" target="_blank" rel="noopener noreferrer">ArduPilot — mode_systemid.cpp (parameters and logging)</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://arc.aiaa.org/doi/book/10.2514/4.861352" target="_blank" rel="noopener noreferrer">Tischler, Remple — Aircraft and Rotorcraft System Identification (AIAA)</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://numpy.org/doc/stable/reference/routines.fft.html" target="_blank" rel="noopener noreferrer">NumPy — Discrete Fourier Transform (numpy.fft)</a> <span class="gc-tag" data-state="info">primary</span></li></ul>
-<h2>Задачи с числовым ответом</h2>
+<h2>Numeric problems</h2>
 <uav-tasks src="../tasks/ctl-sysid.json" module="ctl-sysid"></uav-tasks>
-<h2>Проверь себя</h2>
+<h2>Test yourself</h2>
 <uav-quiz src="../quiz/ctl-sysid.json" module="ctl-sysid"></uav-quiz>
       </div>
-      <div class="module-done"><gc-button variant="secondary" data-done-toggle="ctl-sysid">Отметить как пройденный</gc-button></div>
-      <section class="related" aria-label="Смежные модули"><p class="gc-label gc-muted">Смежные модули</p><div class="gc-grid ref-grid"><a class="gc-card" href="ctl-theory.html"><strong>Теория управления: устойчивость, запасы, каскады</strong><div class="gc-card__meta"><span class="gc-tag" title="L3 — Специалист">L3</span></div></a><a class="gc-card" href="ctl-signals.html"><strong>Сигналы и спектры: что видит гироскоп</strong><div class="gc-card__meta"><span class="gc-tag" title="L2 — Интегратор">L2</span></div></a><a class="gc-card" href="ap-tuning.html"><strong>Тюнинг ArduPilot: AUTOTUNE, фильтры, notch по ESC</strong><div class="gc-card__meta"><span class="gc-tag" title="L3 — Специалист">L3</span></div></a><a class="gc-card" href="bf-blackbox.html"><strong>Blackbox</strong><div class="gc-card__meta"><span class="gc-tag" title="L2 — Интегратор">L2</span></div></a></div></section>
-      <nav class="pager" aria-label="Соседние модули" data-track-pager><a class="gc-card pager__prev" href="ctl-theory.html"><span class="gc-label gc-muted">Назад · трек</span><br>Теория управления: устойчивость, запасы, каскады</a><a class="gc-card pager__next" href="bf-pid.html"><span class="gc-label gc-muted">Дальше · трек</span><br>PID-тюнинг по данным</a></nav>
+      <div class="module-done"><gc-button variant="secondary" data-done-toggle="ctl-sysid">Mark as completed</gc-button></div>
+      <section class="related" aria-label="Related modules"><p class="gc-label gc-muted">Related modules</p><div class="gc-grid ref-grid"><a class="gc-card" href="ctl-theory.html"><strong>Control theory: stability, margins, cascades</strong><div class="gc-card__meta"><span class="gc-tag" title="L3 — Специалист">L3</span></div></a><a class="gc-card" href="ctl-signals.html"><strong>Signals and spectra: what the gyro sees</strong><div class="gc-card__meta"><span class="gc-tag" title="L2 — Интегратор">L2</span></div></a><a class="gc-card" href="ap-tuning.html"><strong>ArduPilot tuning: AUTOTUNE, filters, ESC-based notch</strong><div class="gc-card__meta"><span class="gc-tag" title="L3 — Специалист">L3</span></div></a><a class="gc-card" href="bf-blackbox.html"><strong>Blackbox</strong><div class="gc-card__meta"><span class="gc-tag" title="L2 — Интегратор">L2</span></div></a></div></section>
+      <nav class="pager" aria-label="Adjacent modules" data-track-pager><a class="gc-card pager__prev" href="ctl-theory.html"><span class="gc-label gc-muted">Back · track</span><br>Control theory: stability, margins, cascades</a><a class="gc-card pager__next" href="bf-pid.html"><span class="gc-label gc-muted">Next · track</span><br>Data-driven PID tuning</a></nav>
     </article>
   </main>
   <footer class="gc-container site-footer gc-muted">
-    <p>Открытый курс · <a href="https://github.com/irreligious86/UAV-Education">исходники на GitHub</a> · <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">план развития</a> · <a href="../../curriculum/curriculum.html">для разработчика</a> · CC BY-NC-SA 4.0</p>
+    <p>Open course · <a href="https://github.com/irreligious86/UAV-Education">source on GitHub</a> · <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">roadmap</a> · <a href="../../curriculum/curriculum.html">for developers</a> · CC BY-NC-SA 4.0</p>
   </footer>
 </body>
 </html>

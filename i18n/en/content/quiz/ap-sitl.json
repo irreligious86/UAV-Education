@@ -1,0 +1,94 @@
+{
+  "module": "ap-sitl",
+  "pass": 80,
+  "questions": [
+    {
+      "q": "What is SITL?",
+      "options": [
+        "A separate emulator firmware",
+        "The real firmware running on a PC",
+        "A computer game",
+        "A ground station"
+      ],
+      "answer": 1,
+      "explain": "The real firmware on a PC with a physics simulator instead of the world: the same parameters, modes, EKF and failsafes."
+    },
+    {
+      "q": "The -w flag in sim_vehicle.py…",
+      "options": [
+        "Enables wind",
+        "Resets the parameters",
+        "Opens the map",
+        "Waits for a GCS connection"
+      ],
+      "answer": 1,
+      "explain": "Useful when parameter experiments went sideways."
+    },
+    {
+      "q": "How does the course SITL project tell a route from a scenario?",
+      "options": [
+        "The scenario stores coordinates, the route stores numbers",
+        "The route is points, the scenario is commands",
+        "It doesn't distinguish them at all",
+        "The route stores commands"
+      ],
+      "answer": 1,
+      "explain": "Separating data and logic: one route — many scenarios."
+    },
+    {
+      "q": "The script hangs on wait_heartbeat(). Likely cause?",
+      "options": [
+        "No GPS fix",
+        "Wrong address or SITL isn't running",
+        "Not enough memory for the MAVLink buffer",
+        "Throttle too low"
+      ],
+      "answer": 1,
+      "explain": "The heartbeat is the first sign of a link."
+    },
+    {
+      "q": "arm throttle is refused with PreArm right after SITL starts. What do you do?",
+      "options": [
+        "Reboot the PC",
+        "Wait for the EKF to converge",
+        "Disable the arming checks",
+        "Change the frame type"
+      ],
+      "answer": 1,
+      "explain": "The EKF needs 10–20 s to initialize; read the PreArm text."
+    },
+    {
+      "q": "What does SITL NOT test honestly?",
+      "options": [
+        "Battery and RC-loss failsafe logic",
+        "Mission execution",
+        "Filters and PIDs against vibration",
+        "Lua scripts"
+      ],
+      "answer": 2,
+      "explain": "No motor noise and no mechanics; PIDs from SITL don't carry over."
+    },
+    {
+      "q": "How do you simulate RC loss in SITL?",
+      "options": [
+        "Turn off the transmitter",
+        "SIM_RC_FAIL = 1",
+        "FS_THR_ENABLE = 0",
+        "Disconnect MAVProxy"
+      ],
+      "answer": 1,
+      "explain": "Then watch the FS_THR_ENABLE action."
+    },
+    {
+      "q": "Which SITL port does MAVProxy usually take?",
+      "options": [
+        "5760 (SERIAL0)",
+        "5763 (SERIAL2)",
+        "14550 incoming UDP",
+        "80 (HTTP)"
+      ],
+      "answer": 0,
+      "explain": "MAVProxy connects to SERIAL0 on 5760; your own clients go to 5762/5763."
+    }
+  ]
+}

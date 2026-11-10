@@ -1,0 +1,94 @@
+{
+  "module": "ap-tuning",
+  "pass": 80,
+  "questions": [
+    {
+      "q": "What do you need to do before AUTOTUNE?",
+      "options": [
+        "Nothing — it does everything by itself",
+        "Filters and a base roll/pitch tune",
+        "Remove the props and run it on the bench",
+        "Set the maximum P"
+      ],
+      "answer": 1,
+      "explain": "Filters/notch and a manual or QuikTune roll-pitch: AUTOTUNE starts from the current values and aborts on noise."
+    },
+    {
+      "q": "INS_HNTCH_MODE = 3 means frequency tracking by:",
+      "options": [
+        "Throttle",
+        "ESC telemetry",
+        "Built-in FFT",
+        "Static frequency"
+      ],
+      "answer": 1,
+      "explain": "The best mode: it tracks each motor."
+    },
+    {
+      "q": "How do you find the noise frequency for a throttle-based notch?",
+      "options": [
+        "Calculate it from the motor KV and battery voltage",
+        "A raw IMU spectrum at hover",
+        "Pick it by ear",
+        "Derive it from the prop size"
+      ],
+      "answer": 1,
+      "explain": "Batch sampling/raw IMU before the filters: INS_LOG_BAT_MASK = 1, OPT = 0, then the spectrum at hover."
+    },
+    {
+      "q": "AUTOTUNE_AXES = 1 means:",
+      "options": [
+        "All axes",
+        "Roll only",
+        "Yaw only",
+        "Pitch and roll"
+      ],
+      "answer": 1,
+      "explain": "1 roll, 2 pitch, 4 yaw, 8 yaw-D."
+    },
+    {
+      "q": "When are the AUTOTUNE results saved?",
+      "options": [
+        "After a reboot",
+        "On disarm in AUTOTUNE mode",
+        "After 10 minutes of flight",
+        "Right after each axis finishes in flight"
+      ],
+      "answer": 1,
+      "explain": "Otherwise the old gains stay."
+    },
+    {
+      "q": "What do you do if the motors get hot after AUTOTUNE?",
+      "options": [
+        "Lower I and raise P on all axes",
+        "Filters and AUTOTUNE_MIN_D",
+        "Recalibrate the accelerometer",
+        "Fit different props"
+      ],
+      "answer": 1,
+      "explain": "High D on a noisy gyro: filters/notch, AUTOTUNE_MIN_D, repeat."
+    },
+    {
+      "q": "ATC_INPUT_TC affects:",
+      "options": [
+        "Loop stability",
+        "Stick feel",
+        "Gyro filters",
+        "The notch filter"
+      ],
+      "answer": 1,
+      "explain": "Step 7 — not stability, but feel."
+    },
+    {
+      "q": "Why do you enable the batch sampler before the notch?",
+      "options": [
+        "To see the gyro spectrum before and after the filters",
+        "To speed up AUTOTUNE",
+        "To write the parameters to a file",
+        "To reduce accelerometer noise"
+      ],
+      "answer": 0,
+      "explain": "Batch sampling gives you the raw spectrum: you use it to choose the notch frequency and to verify the result."
+    }
+  ]
+}

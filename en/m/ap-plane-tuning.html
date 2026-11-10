@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Тюнинг ArduPlane: AUTOTUNE крыла, TECS, навигация L1, посадка — UAV Student</title>
-  <meta name="description" content="настроить самолёт в порядке внутренние → внешние контуры измерить пределы TECS тестовыми полётами подобрать NAVL1_PERIOD и параметры посадки по логу">
+  <title>ArduPlane tuning: wing AUTOTUNE, TECS, L1 navigation, landing — UAV Student</title>
+  <meta name="description" content="tune a plane in order from the inner loops to the outer ones measure TECS limits with test flights choose NAVL1_PERIOD and landing parameters from the log">
   <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
   <link rel="manifest" href="../../manifest.webmanifest">
   <meta name="theme-color" content="#0b0f14">
@@ -30,28 +30,28 @@
   <header class="site-header">
     <div class="gc-container site-header__inner">
       <a class="site-brand" href="../index.html"><span class="site-brand__mark" aria-hidden="true">◆</span> UAV Student</a>
-      <nav class="gc-nav" aria-label="Разделы сайта">
-        <a href="../index.html" aria-current="page">Курс</a>
-        <a href="../ref/index.html">Справочник</a>
-        <a href="../pages/glossary.html">Глоссарий</a>
-        <a href="../pages/fails.html">Фейлы</a>
-        <a href="../pages/search.html">Поиск</a>
-        <a href="../pages/progress.html">Мой прогресс</a>
+      <nav class="gc-nav" aria-label="Site sections">
+        <a href="../index.html" aria-current="page">Course</a>
+        <a href="../ref/index.html">Reference</a>
+        <a href="../pages/glossary.html">Glossary</a>
+        <a href="../pages/fails.html">Failures</a>
+        <a href="../pages/search.html">Search</a>
+        <a href="../pages/progress.html">My progress</a>
       </nav>
-      <nav class="lang-switch" aria-label="Язык"><a class="gc-tag" href="../../m/ap-plane-tuning.html" data-lang-to="ru" hreflang="ru" lang="ru" title="Русский">RU</a><a class="gc-tag" href="../../uk/m/ap-plane-tuning.html" data-lang-to="uk" hreflang="uk" lang="uk" title="Українська">UK</a><a class="gc-tag" href="../../en/m/ap-plane-tuning.html" data-lang-to="en" hreflang="en" lang="en" title="English" aria-current="true" data-state="ok">EN</a></nav>
+      <nav class="lang-switch" aria-label="Language"><a class="gc-tag" href="../../m/ap-plane-tuning.html" data-lang-to="ru" hreflang="ru" lang="ru" title="Русский">RU</a><a class="gc-tag" href="../../uk/m/ap-plane-tuning.html" data-lang-to="uk" hreflang="uk" lang="uk" title="Українська">UK</a><a class="gc-tag" href="../../en/m/ap-plane-tuning.html" data-lang-to="en" hreflang="en" lang="en" title="English" aria-current="true" data-state="ok">EN</a></nav>
     </div>
   </header>
   <main class="gc-container site-main">
     <article class="module" data-module-page="ap-plane-tuning">
-      <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-autonomy">Автономия</a><span>Тюнинг ArduPlane: AUTOTUNE крыла, TECS, навигация L1, посадка</span></p>
-      <h1 class="module-title">Тюнинг ArduPlane: AUTOTUNE крыла, TECS, навигация L1, посадка</h1>
-      <div class="module-tags"><span class="gc-tag" title="Уровень">L3 — Специалист</span><span class="gc-tag">чтение 40 мин</span><span class="gc-tag">учёба ~3 ч</span><span class="gc-tag">ArduPlane 4.5+</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ОСВОЕН</span></div>
+      <p class="gc-breadcrumb"><a href="../index.html">Course</a><a href="../index.html#track-autonomy">Autonomy</a><span>ArduPlane tuning: wing AUTOTUNE, TECS, L1 navigation, landing</span></p>
+      <h1 class="module-title">ArduPlane tuning: wing AUTOTUNE, TECS, L1 navigation, landing</h1>
+      <div class="module-tags"><span class="gc-tag" title="Level">L3 — Specialist</span><span class="gc-tag">reading 40 min</span><span class="gc-tag">study ~3 h</span><span class="gc-tag">ArduPlane 4.5+</span><span class="gc-tag" data-state="ok" data-done-badge hidden>MASTERED</span></div>
       <p class="gc-muted module-score" data-module-score></p>
       <p class="module-lead">«Аэродинамика крыла» объяснила, почему самолёт летает и что такое TECS; «Тюнинг ArduPilot» — как тюнится коптер. Здесь — порядок настройки самолёта в ArduPlane, от которого зависит, будет ли AUTO держать высоту и линию или раскачиваться: подготовка (рули, центровка, скорости), AUTOTUNE крена и тангажа в воздухе, TECS по тестовым полётам с конкретными числами, навигационный контроллер L1 на прямоугольной миссии и автоматическая посадка с выравниванием. Для PX4 соответствия даны в конце — там другие названия (в том числе навигация NPFG), но та же логика.</p>
-      <div class="gc-callout" data-state="ok"><strong>После модуля ты умеешь</strong><ul><li>настроить самолёт в порядке внутренние → внешние контуры</li><li>измерить пределы TECS тестовыми полётами</li><li>подобрать NAVL1_PERIOD и параметры посадки по логу</li></ul></div><p class="gc-muted">Перед этим модулем: <a href="aero-wing.html">Аэродинамика крыла и самолётные режимы</a>, <a href="ap-tuning.html">Тюнинг ArduPilot: AUTOTUNE, фильтры, notch по ESC</a></p><div class="gc-callout lab"><p class="gc-label gc-muted">Лабораторная</p><strong>Самолёт от AUTOTUNE до посадки</strong><p class="gc-muted lab__hint">Сдано, когда отмечены все пункты:</p><ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="ap-plane-tuning:lab:0"><span>AUTOTUNE пройден, коэффициенты сохранены</span></label></li><li><label><input type="checkbox" data-check-id="ap-plane-tuning:lab:1"><span>Параметры TECS обоснованы измерениями</span></label></li><li><label><input type="checkbox" data-check-id="ap-plane-tuning:lab:2"><span>NAVL1_PERIOD выбран по ошибке поперечного отклонения</span></label></li><li><label><input type="checkbox" data-check-id="ap-plane-tuning:lab:3"><span>Посадка в SITL с измеренной скоростью касания</span></label></li></ul></div>
+      <div class="gc-callout" data-state="ok"><strong>After this module you can</strong><ul><li>tune a plane in order from the inner loops to the outer ones</li><li>measure TECS limits with test flights</li><li>choose NAVL1_PERIOD and landing parameters from the log</li></ul></div><p class="gc-muted">Before this module: <a href="aero-wing.html">Wing aerodynamics and plane flight modes</a>, <a href="ap-tuning.html">ArduPilot tuning: AUTOTUNE, filters, ESC-based notch</a></p><div class="gc-callout lab"><p class="gc-label gc-muted">Lab</p><strong>A plane from AUTOTUNE to landing</strong><p class="gc-muted lab__hint">Submitted when all items are checked:</p><ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="ap-plane-tuning:lab:0"><span>AUTOTUNE completed, gains saved</span></label></li><li><label><input type="checkbox" data-check-id="ap-plane-tuning:lab:1"><span>TECS parameters justified with measurements</span></label></li><li><label><input type="checkbox" data-check-id="ap-plane-tuning:lab:2"><span>NAVL1_PERIOD chosen based on cross-track error</span></label></li><li><label><input type="checkbox" data-check-id="ap-plane-tuning:lab:3"><span>SITL landing with measured touchdown speed</span></label></li></ul></div>
       <div class="gc-prose module-body">
-<div class="gc-callout" data-state="caution" data-untranslated><strong>Модуль ещё не переведён.</strong> Ниже — оригинал (Русский). Прогресс и оценки общие для всех языков.</div>
-<h2>Теория</h2>
+<div class="gc-callout" data-state="caution" data-untranslated><strong>This module hasn't been translated yet.</strong> Below is the original (Русский). Progress and scores are shared across all languages.</div>
+<h2>Theory</h2>
 <h4 class="md-subheading">Порядок — главное</h4>
 <p>Внутренние контуры раньше внешних: крен и тангаж (рули → углы) → TECS (высота и скорость через газ и тангаж) → навигация (линия пути через крен) → посадка. Плохо настроенный тангаж выглядит как «TECS качает высоту», а плохой крен — как «L1 виляет». Начинать с внешнего — чинить следствие.</p>
 <h4 class="md-subheading">Подготовка до первого тюнинга</h4>
@@ -71,7 +71,7 @@
 <h4 class="md-subheading">PX4: те же этапы</h4>
 <p>Крен и тангаж — <code>FW_RR_*</code>, <code>FW_PR_*</code> и автотюн fixed-wing; TECS — <code>FW_T_*</code> (<code>FW_T_CLMB_MAX</code>, <code>FW_T_SINK_MIN</code>, <code>FW_T_SINK_MAX</code> и др.); навигация — NPFG (<code>NPFG_PERIOD</code>, <code>NPFG_DAMPING</code>), идея та же, что у L1; посадка — <code>FW_LND_*</code>. Набор параметров зависит от версии — сверяйтесь с Fixed-wing tuning своей версии.</p>
 
-<h2>Практика</h2>
+<h2>Practice</h2>
 <h4 class="md-subheading">Шаг 1. SITL-самолёт</h4>
 <p><code>sim_vehicle.py -v ArduPlane --map --console</code>. Взлёт в AUTO по стандартной миссии, переключиться в FBWA, проверить, что рули работают в нужную сторону (в SITL — по графику <code>RCOU</code>). Записать стартовые <code>RLL2SRV_TCONST</code>, <code>PTCH2SRV_TCONST</code>, <code>NAVL1_PERIOD</code>, <code>TECS_*</code>.</p>
 <h4 class="md-subheading">Шаг 2. AUTOTUNE</h4>
@@ -84,26 +84,26 @@
 <p><code>NAV_LAND</code> с заходом; поиграть <code>LAND_FLARE_ALT</code> и <code>TECS_LAND_SINK</code>. Записать вертикальную скорость касания и пробег.</p>
 <p>Лабораторная засчитывается, когда AUTOTUNE пройден с сохранёнными коэффициентами, параметры TECS обоснованы измерениями, выбор <code>NAVL1_PERIOD</code> подтверждён логом ошибки поперечного отклонения, посадка в SITL проходит с измеренной скоростью касания.</p>
 
-<h2>Диагностика</h2>
+<h2>Troubleshooting</h2>
 <div class="diag-groups"><article class="diag-item"><h4><strong>Симптом:</strong> в FBWA самолёт сразу заваливается</h4><ul><li>Возможная причина: реверс руля в стабилизации (неверное направление сервы или <code>SERVOn_REVERSED</code>).</li><li>Что сделать: проверка «наклонить рукой — рули противодействуют» до каждого первого полёта после изменений.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> AUTOTUNE идёт бесконечно</h4><ul><li>Возможная причина: перекладки недостаточно резкие, скорость ниже <code>AIRSPEED_MIN</code>, <code>RLL2SRV_RMAX</code> слишком мал.</li><li>Что сделать: резче и до упора, выше скорость, проверить пределы скоростей.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> высота качается на ±10–20 м в LOITER</h4><ul><li>Возможная причина: недотюненный тангаж, <code>TECS_TIME_CONST</code> мал, неверные <code>TECS_CLMB_MAX/SINK_*</code>.</li><li>Что сделать: сначала тангаж, затем <code>TECS_TIME_CONST</code> +1, перемерить пределы.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> в наборе теряет скорость</h4><ul><li>Возможная причина: <code>TECS_CLMB_MAX</code> больше реальной скороподъёмности, газ в <code>THR_MAX</code>.</li><li>Что сделать: снизить <code>TECS_CLMB_MAX</code> до измеренного, проверить в конце батареи.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> виляет после каждого поворота</h4><ul><li>Возможная причина: <code>NAVL1_PERIOD</code> слишком мал или плохо настроен крен.</li><li>Что сделать: <code>NAVL1_PERIOD</code> +1…2, проверить крен (<code>PIDR</code>).</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> посадка «втыкается» или перелетает</h4><ul><li>Возможная причина: ошибка высоты по барометру, поздний flare, высокая скорость захода.</li><li>Что сделать: дальномер для посадки, <code>LAND_FLARE_ALT/SEC</code>, <code>TECS_LAND_ARSPD</code>, заход против ветра.</li></ul></article></div>
 
-<h2>Чек-лист</h2>
+<h2>Checklist</h2>
 <ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="ap-plane-tuning:0"><span>Настраиваю самолёт в порядке: рули → крен/тангаж → TECS → навигация → посадка</span></label></li><li><label><input type="checkbox" data-check-id="ap-plane-tuning:1"><span>Проверяю реверсы рулей в стабилизированном режиме до полёта</span></label></li><li><label><input type="checkbox" data-check-id="ap-plane-tuning:2"><span>Провожу AUTOTUNE и понимаю, что и когда сохраняется</span></label></li><li><label><input type="checkbox" data-check-id="ap-plane-tuning:3"><span>Измеряю пределы TECS тестовыми полётами и проверяю по логу</span></label></li><li><label><input type="checkbox" data-check-id="ap-plane-tuning:4"><span>Настраиваю <code>NAVL1_PERIOD</code> по ошибке поперечного отклонения</span></label></li><li><label><input type="checkbox" data-check-id="ap-plane-tuning:5"><span>Готовлю автоматическую посадку и знаю её главные параметры</span></label></li></ul>
 
-<h2>Источники</h2>
+<h2>Sources</h2>
 <ul class="refs"><li><a href="https://ardupilot.org/plane/docs/automatic-tuning-with-autotune.html" target="_blank" rel="noopener noreferrer">ArduPlane — Automatic tuning with AUTOTUNE</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://ardupilot.org/plane/docs/tecs-total-energy-control-system-for-speed-height-tuning-guide.html" target="_blank" rel="noopener noreferrer">ArduPlane — TECS tuning guide</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://ardupilot.org/plane/docs/navigation-tuning.html" target="_blank" rel="noopener noreferrer">ArduPlane — Navigation tuning (L1)</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://ardupilot.org/plane/docs/automatic-landing.html" target="_blank" rel="noopener noreferrer">ArduPlane — Automatic landing</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://docs.px4.io/main/en/config_fw/" target="_blank" rel="noopener noreferrer">PX4 — Fixed-wing tuning</a> <span class="gc-tag" data-state="info">primary</span></li></ul>
-<h2>Задачи с числовым ответом</h2>
+<h2>Numeric problems</h2>
 <uav-tasks src="../tasks/ap-plane-tuning.json" module="ap-plane-tuning"></uav-tasks>
-<h2>Проверь себя</h2>
+<h2>Test yourself</h2>
 <uav-quiz src="../quiz/ap-plane-tuning.json" module="ap-plane-tuning"></uav-quiz>
       </div>
-      <div class="module-done"><gc-button variant="secondary" data-done-toggle="ap-plane-tuning">Отметить как пройденный</gc-button></div>
-      <section class="related" aria-label="Смежные модули"><p class="gc-label gc-muted">Смежные модули</p><div class="gc-grid ref-grid"><a class="gc-card" href="aero-wing.html"><strong>Аэродинамика крыла и самолётные режимы</strong><div class="gc-card__meta"><span class="gc-tag" title="L3 — Специалист">L3</span></div></a><a class="gc-card" href="ap-tuning.html"><strong>Тюнинг ArduPilot: AUTOTUNE, фильтры, notch по ESC</strong><div class="gc-card__meta"><span class="gc-tag" title="L3 — Специалист">L3</span></div></a><a class="gc-card" href="ap-quadplane.html"><strong>QuadPlane и tilt-rotor VTOL</strong><div class="gc-card__meta"><span class="gc-tag" title="L3 — Специалист">L3</span></div></a><a class="gc-card" href="ap-logs.html"><strong>Логи ArduPilot: разбор полёта</strong><div class="gc-card__meta"><span class="gc-tag" title="L3 — Специалист">L3</span></div></a></div></section>
-      <nav class="pager" aria-label="Соседние модули" data-track-pager><a class="gc-card pager__prev" href="ap-tuning.html"><span class="gc-label gc-muted">Назад · трек</span><br>Тюнинг ArduPilot: AUTOTUNE, фильтры, notch по ESC</a><a class="gc-card pager__next" href="ap-safety-fs.html"><span class="gc-label gc-muted">Дальше · трек</span><br>Отказоустойчивость: failsafe, геозона, FMEA полёта</a></nav>
+      <div class="module-done"><gc-button variant="secondary" data-done-toggle="ap-plane-tuning">Mark as completed</gc-button></div>
+      <section class="related" aria-label="Related modules"><p class="gc-label gc-muted">Related modules</p><div class="gc-grid ref-grid"><a class="gc-card" href="aero-wing.html"><strong>Wing aerodynamics and plane flight modes</strong><div class="gc-card__meta"><span class="gc-tag" title="L3 — Специалист">L3</span></div></a><a class="gc-card" href="ap-tuning.html"><strong>ArduPilot tuning: AUTOTUNE, filters, ESC-based notch</strong><div class="gc-card__meta"><span class="gc-tag" title="L3 — Специалист">L3</span></div></a><a class="gc-card" href="ap-quadplane.html"><strong>QuadPlane and tilt-rotor VTOL</strong><div class="gc-card__meta"><span class="gc-tag" title="L3 — Специалист">L3</span></div></a><a class="gc-card" href="ap-logs.html"><strong>ArduPilot logs: flight analysis</strong><div class="gc-card__meta"><span class="gc-tag" title="L3 — Специалист">L3</span></div></a></div></section>
+      <nav class="pager" aria-label="Adjacent modules" data-track-pager><a class="gc-card pager__prev" href="ap-tuning.html"><span class="gc-label gc-muted">Back · track</span><br>ArduPilot tuning: AUTOTUNE, filters, ESC-based notch</a><a class="gc-card pager__next" href="ap-safety-fs.html"><span class="gc-label gc-muted">Next · track</span><br>Fault tolerance: failsafe, geofence, flight FMEA</a></nav>
     </article>
   </main>
   <footer class="gc-container site-footer gc-muted">
-    <p>Открытый курс · <a href="https://github.com/irreligious86/UAV-Education">исходники на GitHub</a> · <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">план развития</a> · <a href="../../curriculum/curriculum.html">для разработчика</a> · CC BY-NC-SA 4.0</p>
+    <p>Open course · <a href="https://github.com/irreligious86/UAV-Education">source on GitHub</a> · <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">roadmap</a> · <a href="../../curriculum/curriculum.html">for developers</a> · CC BY-NC-SA 4.0</p>
   </footer>
 </body>
 </html>

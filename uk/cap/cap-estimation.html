@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Свой фильтр ориентации — UAV Student</title>
-  <meta name="description" content="Комплементарный фильтр или простой EKF на Python/ESP32, проверенный на реальных данных IMU против эталона">
+  <title>Власний фільтр орієнтації — UAV Student</title>
+  <meta name="description" content="Комплементарний фільтр або простий EKF на Python/ESP32, перевірений на реальних даних IMU проти еталона">
   <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
   <link rel="manifest" href="../../manifest.webmanifest">
   <meta name="theme-color" content="#0b0f14">
@@ -30,40 +30,40 @@
   <header class="site-header">
     <div class="gc-container site-header__inner">
       <a class="site-brand" href="../index.html"><span class="site-brand__mark" aria-hidden="true">◆</span> UAV Student</a>
-      <nav class="gc-nav" aria-label="Разделы сайта">
+      <nav class="gc-nav" aria-label="Розділи сайту">
         <a href="../index.html" aria-current="page">Курс</a>
-        <a href="../ref/index.html">Справочник</a>
-        <a href="../pages/glossary.html">Глоссарий</a>
-        <a href="../pages/fails.html">Фейлы</a>
-        <a href="../pages/search.html">Поиск</a>
-        <a href="../pages/progress.html">Мой прогресс</a>
+        <a href="../ref/index.html">Довідник</a>
+        <a href="../pages/glossary.html">Глосарій</a>
+        <a href="../pages/fails.html">Фейли</a>
+        <a href="../pages/search.html">Пошук</a>
+        <a href="../pages/progress.html">Мій прогрес</a>
       </nav>
-      <nav class="lang-switch" aria-label="Язык"><a class="gc-tag" href="../../cap/cap-estimation.html" data-lang-to="ru" hreflang="ru" lang="ru" title="Русский">RU</a><a class="gc-tag" href="../../uk/cap/cap-estimation.html" data-lang-to="uk" hreflang="uk" lang="uk" title="Українська" aria-current="true" data-state="ok">UK</a><a class="gc-tag" href="../../en/cap/cap-estimation.html" data-lang-to="en" hreflang="en" lang="en" title="English">EN</a></nav>
+      <nav class="lang-switch" aria-label="Мова"><a class="gc-tag" href="../../cap/cap-estimation.html" data-lang-to="ru" hreflang="ru" lang="ru" title="Русский">RU</a><a class="gc-tag" href="../../uk/cap/cap-estimation.html" data-lang-to="uk" hreflang="uk" lang="uk" title="Українська" aria-current="true" data-state="ok">UK</a><a class="gc-tag" href="../../en/cap/cap-estimation.html" data-lang-to="en" hreflang="en" lang="en" title="English">EN</a></nav>
     </div>
   </header>
   <main class="gc-container site-main">
     <article class="module" data-module-page="cap-estimation">
-      <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-estimation">Оценка состояния и навигация</a><span>Итоговый проект</span></p>
-      <h1 class="module-title">Свой фильтр ориентации</h1>
-      <div class="module-tags"><span class="gc-tag">Итоговый проект трека 4</span><span class="gc-tag" data-state="ok" data-done-badge hidden>СДАН</span></div>
-      <p class="module-lead">Результат: Комплементарный фильтр или простой EKF на Python/ESP32, проверенный на реальных данных IMU против эталона</p>
+      <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-estimation">Оцінювання стану та навігація</a><span>Підсумковий проєкт</span></p>
+      <h1 class="module-title">Власний фільтр орієнтації</h1>
+      <div class="module-tags"><span class="gc-tag">Підсумковий проєкт треку 4</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ЗДАНО</span></div>
+      <p class="module-lead">Результат: Комплементарний фільтр або простий EKF на Python/ESP32, перевірений на реальних даних IMU проти еталона</p>
       <div class="gc-prose module-body">
-        <h2>Что сдать</h2>
-        <ul><li>Код фильтра с тестами</li><li>Запись IMU с реального аппарата или ESP32</li><li>Сравнение с оценкой полётника (ATT) по логу</li><li>Отчёт: ошибки, дрейф, реакция на вибрации</li><li>Инженерная папка проекта: требования с ID, что и как тестировалось, журнал изменений (см. модуль «Инженерный метод 101»)</li></ul>
-        <h2>Критерии приёмки</h2>
-        <p class="gc-muted">Проект сдан, когда выполнены все пункты. Отмечай по мере готовности:</p>
-        <ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="cap-estimation:cap:0"><span>Фильтр сходится и не дрейфует на стенде за 5 минут</span></label></li><li><label><input type="checkbox" data-check-id="cap-estimation:cap:1"><span>Ошибка по крену/тангажу против эталона ≤ 2°</span></label></li><li><label><input type="checkbox" data-check-id="cap-estimation:cap:2"><span>Объяснено, что ломается при вибрациях и как это видно</span></label></li><li><label><input type="checkbox" data-check-id="cap-estimation:cap:3"><span>Каждое требование прослеживается до теста или измерения, результат записан</span></label></li></ul>
-        <h2>Рубрика: как отличить сделанное от сданного</h2><p class="gc-muted">Проверь свою работу по каждой строке. Если она ближе к левой колонке — проект ещё не готов.</p><div class="widget__table-wrap"><table class="rubric"><thead><tr><th>Критерий</th><th>Плохо</th><th>Хорошо</th></tr></thead><tbody><tr><th scope="row">Фильтр</th><td class="rubric__bad">Код взят целиком из интернета</td><td class="rubric__good">Свой комплементарный/1D-Калман с объяснением коэффициентов и графиком против ATT лога</td></tr><tr><th scope="row">Качество GPS</th><td class="rubric__bad">Число спутников не записано</td><td class="rubric__good">Таблица NSats/HDOP в 3 условиях, пример многолучёвости на логе</td></tr><tr><th scope="row">EKF</th><td class="rubric__bad">Параметры по умолчанию без объяснения</td><td class="rubric__good">EK3_SRC выбраны под сценарий, инновации в логе объяснены</td></tr></tbody></table></div>
+        <h2>Що здати</h2>
+        <ul><li>Код фільтра з тестами</li><li>Запис IMU з реального апарата або ESP32</li><li>Порівняння з оцінкою польотника (ATT) за логом</li><li>Звіт: похибки, дрейф, реакція на вібрації</li><li>Інженерна тека проєкту: вимоги з ID, що й як тестувалося, журнал змін (див. модуль «Інженерний метод 101»)</li></ul>
+        <h2>Критерії приймання</h2>
+        <p class="gc-muted">Проєкт здано, коли виконано всі пункти. Позначай у міру готовності:</p>
+        <ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="cap-estimation:cap:0"><span>Фільтр збігається й не дрейфує на стенді за 5 хвилин</span></label></li><li><label><input type="checkbox" data-check-id="cap-estimation:cap:1"><span>Похибка за креном/тангажем проти еталона ≤ 2°</span></label></li><li><label><input type="checkbox" data-check-id="cap-estimation:cap:2"><span>Пояснено, що ламається при вібраціях і як це видно</span></label></li><li><label><input type="checkbox" data-check-id="cap-estimation:cap:3"><span>Кожна вимога простежується до тесту або вимірювання, результат записано</span></label></li></ul>
+        <h2>Рубрика: як відрізнити зроблене від зданого</h2><p class="gc-muted">Перевір свою роботу за кожним рядком. Якщо вона ближча до лівої колонки — проєкт ще не готовий.</p><div class="widget__table-wrap"><table class="rubric"><thead><tr><th>Критерій</th><th>Погано</th><th>Добре</th></tr></thead><tbody><tr><th scope="row">Фільтр</th><td class="rubric__bad">Код узято цілком з інтернету</td><td class="rubric__good">Власний комплементарний/1D-Калман із поясненням коефіцієнтів і графіком проти ATT з логу</td></tr><tr><th scope="row">Якість GPS</th><td class="rubric__bad">Кількість супутників не записано</td><td class="rubric__good">Таблиця NSats/HDOP у 3 умовах, приклад багатопроменевості на логу</td></tr><tr><th scope="row">EKF</th><td class="rubric__bad">Параметри за замовчуванням без пояснення</td><td class="rubric__good">EK3_SRC вибрано під сценарій, інновації в лозі пояснено</td></tr></tbody></table></div>
         
-        <h2>Модули трека</h2>
-        <ol><li><a href="../m/est-sensors.html">Датчики IMU: физика, ошибки, калибровка</a></li><li><a href="../m/est-attitude.html">Ориентация: углы Эйлера, кватернионы, комплементарный фильтр</a></li><li><a href="../m/est-kalman.html">Фильтр Калмана на пальцах и EKF</a></li><li><a href="../m/est-gnss.html">GNSS: как работает GPS, ошибки, RTK</a></li><li><a href="../m/ap-ekf.html">EKF и навигация</a></li><li><a href="../m/est-alt-sources.html">Высота и позиция без GPS: баро, дальномер, оптический поток</a></li><li><a href="../m/nav-resilience.html">Устойчивость навигации и связи к помехам</a></li></ol>
-        <div class="gc-callout" data-state="caution"><strong>Безопасность.</strong> Всё, что можно сделать в SITL или без пропов, делается там. Реальный полёт — только после наземных тестов, с проверенным failsafe.</div>
+        <h2>Модулі треку</h2>
+        <ol><li><a href="../m/est-sensors.html">Датчики IMU: фізика, похибки, калібрування</a></li><li><a href="../m/est-attitude.html">Орієнтація: кути Ейлера, кватерніони, комплементарний фільтр</a></li><li><a href="../m/est-kalman.html">Фільтр Калмана на пальцях і EKF</a></li><li><a href="../m/est-gnss.html">GNSS: як працює GPS, похибки, RTK</a></li><li><a href="../m/ap-ekf.html">EKF і навігація</a></li><li><a href="../m/est-alt-sources.html">Висота й позиція без GPS: баро, далекомір, оптичний потік</a></li><li><a href="../m/nav-resilience.html">Стійкість навігації та зв&#x27;язку до завад</a></li></ol>
+        <div class="gc-callout" data-state="caution"><strong>Безпека.</strong> Усе, що можна зробити в SITL або без пропів, робиться там. Реальний політ — тільки після наземних тестів, з перевіреним failsafe.</div>
       </div>
-      <div class="module-done"><gc-button variant="secondary" data-done-toggle="cap-estimation" data-done-label="сданный" data-done-past="Сдан">Отметить как сданный</gc-button></div>
+      <div class="module-done"><gc-button variant="secondary" data-done-toggle="cap-estimation" data-done-label="зданий" data-done-past="Складено">Позначити як зданий</gc-button></div>
     </article>
   </main>
   <footer class="gc-container site-footer gc-muted">
-    <p>Открытый курс · <a href="https://github.com/irreligious86/UAV-Education">исходники на GitHub</a> · <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">план развития</a> · <a href="../../curriculum/curriculum.html">для разработчика</a> · CC BY-NC-SA 4.0</p>
+    <p>Відкритий курс · <a href="https://github.com/irreligious86/UAV-Education">вихідний код на GitHub</a> · <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">план розвитку</a> · <a href="../../curriculum/curriculum.html">для розробника</a> · CC BY-NC-SA 4.0</p>
   </footer>
 </body>
 </html>

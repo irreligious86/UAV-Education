@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Высота и позиция без GPS: баро, дальномер, оптический поток — UAV Student</title>
-  <meta name="description" content="объяснить ошибки барометра и как их компенсируют подключить дальномер и оптический поток в ArduPilot/INAV выбрать источники EK3_SRC под задачу (помещение, лес)">
+  <title>Altitude and position without GPS: baro, rangefinder, optical flow — UAV Student</title>
+  <meta name="description" content="explain barometer errors and how they are compensated connect a rangefinder and optical flow in ArduPilot/INAV choose EK3_SRC sources for the task (indoors, forest)">
   <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
   <link rel="manifest" href="../../manifest.webmanifest">
   <meta name="theme-color" content="#0b0f14">
@@ -30,28 +30,28 @@
   <header class="site-header">
     <div class="gc-container site-header__inner">
       <a class="site-brand" href="../index.html"><span class="site-brand__mark" aria-hidden="true">◆</span> UAV Student</a>
-      <nav class="gc-nav" aria-label="Разделы сайта">
-        <a href="../index.html" aria-current="page">Курс</a>
-        <a href="../ref/index.html">Справочник</a>
-        <a href="../pages/glossary.html">Глоссарий</a>
-        <a href="../pages/fails.html">Фейлы</a>
-        <a href="../pages/search.html">Поиск</a>
-        <a href="../pages/progress.html">Мой прогресс</a>
+      <nav class="gc-nav" aria-label="Site sections">
+        <a href="../index.html" aria-current="page">Course</a>
+        <a href="../ref/index.html">Reference</a>
+        <a href="../pages/glossary.html">Glossary</a>
+        <a href="../pages/fails.html">Failures</a>
+        <a href="../pages/search.html">Search</a>
+        <a href="../pages/progress.html">My progress</a>
       </nav>
-      <nav class="lang-switch" aria-label="Язык"><a class="gc-tag" href="../../m/est-alt-sources.html" data-lang-to="ru" hreflang="ru" lang="ru" title="Русский">RU</a><a class="gc-tag" href="../../uk/m/est-alt-sources.html" data-lang-to="uk" hreflang="uk" lang="uk" title="Українська">UK</a><a class="gc-tag" href="../../en/m/est-alt-sources.html" data-lang-to="en" hreflang="en" lang="en" title="English" aria-current="true" data-state="ok">EN</a></nav>
+      <nav class="lang-switch" aria-label="Language"><a class="gc-tag" href="../../m/est-alt-sources.html" data-lang-to="ru" hreflang="ru" lang="ru" title="Русский">RU</a><a class="gc-tag" href="../../uk/m/est-alt-sources.html" data-lang-to="uk" hreflang="uk" lang="uk" title="Українська">UK</a><a class="gc-tag" href="../../en/m/est-alt-sources.html" data-lang-to="en" hreflang="en" lang="en" title="English" aria-current="true" data-state="ok">EN</a></nav>
     </div>
   </header>
   <main class="gc-container site-main">
     <article class="module" data-module-page="est-alt-sources">
-      <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-estimation">Оценка состояния и навигация</a><span>Высота и позиция без GPS: баро, дальномер, оптический поток</span></p>
-      <h1 class="module-title">Высота и позиция без GPS: баро, дальномер, оптический поток</h1>
-      <div class="module-tags"><span class="gc-tag" title="Уровень">L3 — Специалист</span><span class="gc-tag">чтение 35 мин</span><span class="gc-tag">учёба ~3 ч</span><span class="gc-tag">ArduPilot · INAV</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ОСВОЕН</span></div>
+      <p class="gc-breadcrumb"><a href="../index.html">Course</a><a href="../index.html#track-estimation">State estimation and navigation</a><span>Altitude and position without GPS: baro, rangefinder, optical flow</span></p>
+      <h1 class="module-title">Altitude and position without GPS: baro, rangefinder, optical flow</h1>
+      <div class="module-tags"><span class="gc-tag" title="Level">L3 — Specialist</span><span class="gc-tag">reading 35 min</span><span class="gc-tag">study ~3 h</span><span class="gc-tag">ArduPilot · INAV</span><span class="gc-tag" data-state="ok" data-done-badge hidden>MASTERED</span></div>
       <p class="gc-muted module-score" data-module-score></p>
       <p class="module-lead">В помещении, под кронами и у стен GPS бесполезен, а баро «дышит». Модуль разбирает ошибки барометра и как их компенсируют, что дают дальномер (лидар/ультразвук/радар) и оптический поток, как они подключаются в ArduPilot и INAV, и как через <code>EK3_SRCn_*</code> собрать набор источников под задачу: помещение, лес, посадка на точность. Лабораторная — удержание позиции без GPS в SITL (оптический поток + дальномер) и на стенде.</p>
-      <div class="gc-callout" data-state="ok"><strong>После модуля ты умеешь</strong><ul><li>объяснить ошибки барометра и как их компенсируют</li><li>подключить дальномер и оптический поток в ArduPilot/INAV</li><li>выбрать источники EK3_SRC под задачу (помещение, лес)</li></ul></div><p class="gc-muted">Перед этим модулем: <a href="ap-ekf.html">EKF и навигация</a></p><div class="gc-callout lab"><p class="gc-label gc-muted">Лабораторная</p><strong>Полёт без GPS</strong><p class="gc-muted lab__hint">Сдано, когда отмечены все пункты:</p><ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="est-alt-sources:lab:0"><span>Оптический поток или дальномер подключён</span></label></li><li><label><input type="checkbox" data-check-id="est-alt-sources:lab:1"><span>Удержание позиции без GPS в SITL/на стенде</span></label></li><li><label><input type="checkbox" data-check-id="est-alt-sources:lab:2"><span>EK3_SRC настроены и обоснованы</span></label></li></ul></div><div class="path-pos gc-muted"><span class="gc-label">В пути</span><ul><li data-path-pos="ardupilot"><a href="../path/ardupilot.html">ArduPilot</a>: шаг 28 из 69 → <a href="nav-resilience.html?path=ardupilot">Устойчивость навигации и связи к помехам</a></li></ul></div>
+      <div class="gc-callout" data-state="ok"><strong>After this module you can</strong><ul><li>explain barometer errors and how they are compensated</li><li>connect a rangefinder and optical flow in ArduPilot/INAV</li><li>choose EK3_SRC sources for the task (indoors, forest)</li></ul></div><p class="gc-muted">Before this module: <a href="ap-ekf.html">EKF and navigation</a></p><div class="gc-callout lab"><p class="gc-label gc-muted">Lab</p><strong>GPS-denied flight</strong><p class="gc-muted lab__hint">Submitted when all items are checked:</p><ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="est-alt-sources:lab:0"><span>Optical flow sensor or rangefinder connected</span></label></li><li><label><input type="checkbox" data-check-id="est-alt-sources:lab:1"><span>Position hold without GPS in SITL/on a bench</span></label></li><li><label><input type="checkbox" data-check-id="est-alt-sources:lab:2"><span>EK3_SRC configured and justified</span></label></li></ul></div><div class="path-pos gc-muted"><span class="gc-label">On the path</span><ul><li data-path-pos="ardupilot"><a href="../path/ardupilot.html">ArduPilot</a>: step 28 of 69 → <a href="nav-resilience.html?path=ardupilot">Navigation and link resilience to interference</a></li></ul></div>
       <div class="gc-prose module-body">
-<div class="gc-callout" data-state="caution" data-untranslated><strong>Модуль ещё не переведён.</strong> Ниже — оригинал (Русский). Прогресс и оценки общие для всех языков.</div>
-<h2>Теория</h2>
+<div class="gc-callout" data-state="caution" data-untranslated><strong>This module hasn't been translated yet.</strong> Below is the original (Русский). Progress and scores are shared across all languages.</div>
+<h2>Theory</h2>
 <h4 class="md-subheading">Барометр: откуда ошибки</h4>
 <p>Высота из давления по стандартной атмосфере: Δh ≈ −8.4 м на 1 гПа у земли. Ошибки:</p>
 <ul><li><strong>Погода</strong>: давление меняется на 1–3 гПа за час при фронте → дрейф 10–25 м за час; относительная высота за 10 минут полёта — ±1–3 м.</li><li><strong>Температура</strong> чипа: прогрев после включения — уход на метры (<code>BARO_*</code> калибровка, ArduPilot <code>TCAL_ENABLED</code>/<code>TCAL_BARO_EXP</code>, поролон для тепловой стабильности).</li><li><strong>Поток от пропов и скорость</strong>: динамическое давление ½ρv² — на 20 м/с это 2.4 гПа ≈ 20 м! Баро должен стоять в «спокойном» месте, под поролоном; у крыльев — компенсация по airspeed (у коптеров — <code>BARO1_WCF_*</code>, ветровая компенсация давления; <code>BARO_GND_TEMP</code> — лишь температура у земли для расчёта высоты), у коптеров — эффект пропвоша на взлёте/посадке (−1…−3 м ложной высоты у земли).</li><li><strong>Шум</strong>: 0.2–0.5 м RMS без фильтра.</li></ul>
@@ -72,7 +72,7 @@
 <h4 class="md-subheading">INAV</h4>
 <p>Оптический поток (<code>opflow_hardware</code>, масштаб <code>opflow_scale</code>) и дальномер (<code>rangefinder_hardware</code>) входят в оценщик позиции INAV через веса <code>inav_w_xy_flow_p</code> / <code>inav_w_xy_flow_v</code> (вес потока в позиции и скорости); для полётов в помещении по потоку документация рекомендует <code>inav_allow_dead_reckoning = ON</code> («может быть полезно для навигации в помещении по OPFLOW»). Удержание позиции без GPS — режим POSHOLD с настроенным потоком и дальномером над текстурной поверхностью.</p>
 
-<h2>Практика</h2>
+<h2>Practice</h2>
 <h4 class="md-subheading">Шаг 1. Баро</h4>
 <p>Лог на земле 10 минут после включения: <code>BARO.Alt</code> — уход от прогрева. Затем висение на 2 м над ровной площадкой: <code>BARO.Alt</code> против <code>RFND.Dist</code> — увидеть пропвош-эффект на взлёте.</p>
 <h4 class="md-subheading">Шаг 2. Дальномер</h4>
@@ -82,24 +82,24 @@
 <h4 class="md-subheading">Шаг 4. Стенд/полёт</h4>
 <p>С реальным потоком и дальномером: удержание в Loiter без GPS над текстурным полом на 1–1.5 м, с наблюдателем и сеткой/привязью. Лабораторная: источник подключён, удержание без GPS показано, EK3_SRC обоснованы.</p>
 
-<h2>Диагностика</h2>
+<h2>Troubleshooting</h2>
 <div class="diag-groups"><article class="diag-item"><h4><strong>Симптом:</strong> высота «проседает» при взлёте и прыгает при посадке</h4><ul><li>Возможная причина: пропвош на баро.</li><li>Что сделать: поролон, перенос баро, дальномер как POSZ у земли.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> Loiter без GPS дрейфует по потоку</h4><ul><li>Возможная причина: плохая текстура/освещение, не откалиброван масштаб потока, нет дальномера.</li><li>Что сделать: калибровка FXSCALER, подсветка, текстура, дальномер обязателен.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> дальномер показывает max над полем</h4><ul><li>Возможная причина: поверхность не отражает (вода, чёрный асфальт), превышена дальность, угол.</li><li>Что сделать: другой тип (радар над водой), <code>RNGFND1_MAX_CM</code> реалистично.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> «EKF needs position» и Loiter не включается</h4><ul><li>Возможная причина: нет источника POSXY/VELXY (GPS выключен, поток не настроен).</li><li>Что сделать: проверить <code>EK3_SRC1_VELXY</code>, статус потока в <code>OF</code>.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> высота уходит на 10 м за полчаса на стоянке</h4><ul><li>Возможная причина: погода/температурный дрейф баро.</li><li>Что сделать: норма; относительная высота взлёта пересчитывается при арме.</li></ul></article></div>
 
-<h2>Чек-лист</h2>
+<h2>Checklist</h2>
 <ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="est-alt-sources:0"><span>Знаю три главные ошибки барометра и как они выглядят в логе</span></label></li><li><label><input type="checkbox" data-check-id="est-alt-sources:1"><span>Подключил и проверил дальномер</span></label></li><li><label><input type="checkbox" data-check-id="est-alt-sources:2"><span>Понимаю формулу v = (flow − ω)·h и зачем потоку дальномер</span></label></li><li><label><input type="checkbox" data-check-id="est-alt-sources:3"><span>Собрал набор EK3_SRC под свой сценарий и обосновал</span></label></li><li><label><input type="checkbox" data-check-id="est-alt-sources:4"><span>Удержание без GPS показано в SITL</span></label></li></ul>
 
-<h2>Источники</h2>
+<h2>Sources</h2>
 <ul class="refs"><li><a href="https://ardupilot.org/copter/docs/common-ekf-sources.html" target="_blank" rel="noopener noreferrer">ArduPilot — EKF Source Selection and Switching (EK3_SRC)</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://ardupilot.org/copter/docs/common-optical-flow-sensor-setup.html" target="_blank" rel="noopener noreferrer">ArduPilot — Optical Flow Sensors (setup and calibration)</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://ardupilot.org/copter/docs/common-rangefinder-landingpage.html" target="_blank" rel="noopener noreferrer">ArduPilot — Rangefinders (landing page)</a> <span class="gc-tag" data-state="info">primary</span></li></ul>
-<h2>Проверь себя</h2>
+<h2>Test yourself</h2>
 <uav-quiz src="../quiz/est-alt-sources.json" module="est-alt-sources"></uav-quiz>
       </div>
-      <div class="module-done"><gc-button variant="secondary" data-done-toggle="est-alt-sources">Отметить как пройденный</gc-button></div>
-      <section class="related" aria-label="Смежные модули"><p class="gc-label gc-muted">Смежные модули</p><div class="gc-grid ref-grid"><a class="gc-card" href="ap-ekf.html"><strong>EKF и навигация</strong><div class="gc-card__meta"><span class="gc-tag" title="L3 — Специалист">L3</span></div></a><a class="gc-card" href="est-kalman.html"><strong>Фильтр Калмана на пальцах и EKF</strong><div class="gc-card__meta"><span class="gc-tag" title="L3 — Специалист">L3</span></div></a><a class="gc-card" href="est-gnss.html"><strong>GNSS: как работает GPS, ошибки, RTK</strong><div class="gc-card__meta"><span class="gc-tag" title="L2 — Интегратор">L2</span></div></a><a class="gc-card" href="el-peripherals.html"><strong>Подключение периферии: UART, I2C, CAN на практике</strong><div class="gc-card__meta"><span class="gc-tag" title="L2 — Интегратор">L2</span></div></a></div></section>
-      <nav class="pager" aria-label="Соседние модули" data-track-pager><a class="gc-card pager__prev" href="ap-ekf.html"><span class="gc-label gc-muted">Назад · трек</span><br>EKF и навигация</a><a class="gc-card pager__next" href="nav-resilience.html"><span class="gc-label gc-muted">Дальше · трек</span><br>Устойчивость навигации и связи к помехам</a></nav><nav class="pager" aria-label="Соседние шаги пути ArduPilot" data-path-pager="ardupilot" hidden><a class="gc-card pager__prev" href="ap-ekf.html?path=ardupilot"><span class="gc-label gc-muted">Назад · путь ArduPilot</span><br>EKF и навигация</a><a class="gc-card pager__next" href="nav-resilience.html?path=ardupilot"><span class="gc-label gc-muted">Дальше · шаг 29 из 69</span><br>Устойчивость навигации и связи к помехам</a></nav>
+      <div class="module-done"><gc-button variant="secondary" data-done-toggle="est-alt-sources">Mark as completed</gc-button></div>
+      <section class="related" aria-label="Related modules"><p class="gc-label gc-muted">Related modules</p><div class="gc-grid ref-grid"><a class="gc-card" href="ap-ekf.html"><strong>EKF and navigation</strong><div class="gc-card__meta"><span class="gc-tag" title="L3 — Специалист">L3</span></div></a><a class="gc-card" href="est-kalman.html"><strong>The Kalman filter in plain terms, and the EKF</strong><div class="gc-card__meta"><span class="gc-tag" title="L3 — Специалист">L3</span></div></a><a class="gc-card" href="est-gnss.html"><strong>GNSS: how GPS works, errors, RTK</strong><div class="gc-card__meta"><span class="gc-tag" title="L2 — Интегратор">L2</span></div></a><a class="gc-card" href="el-peripherals.html"><strong>Connecting peripherals: UART, I2C, CAN in practice</strong><div class="gc-card__meta"><span class="gc-tag" title="L2 — Интегратор">L2</span></div></a></div></section>
+      <nav class="pager" aria-label="Adjacent modules" data-track-pager><a class="gc-card pager__prev" href="ap-ekf.html"><span class="gc-label gc-muted">Back · track</span><br>EKF and navigation</a><a class="gc-card pager__next" href="nav-resilience.html"><span class="gc-label gc-muted">Next · track</span><br>Navigation and link resilience to interference</a></nav><nav class="pager" aria-label="Adjacent steps of path ArduPilot" data-path-pager="ardupilot" hidden><a class="gc-card pager__prev" href="ap-ekf.html?path=ardupilot"><span class="gc-label gc-muted">Back · path ArduPilot</span><br>EKF and navigation</a><a class="gc-card pager__next" href="nav-resilience.html?path=ardupilot"><span class="gc-label gc-muted">Next · step 29 of 69</span><br>Navigation and link resilience to interference</a></nav>
     </article>
   </main>
   <footer class="gc-container site-footer gc-muted">
-    <p>Открытый курс · <a href="https://github.com/irreligious86/UAV-Education">исходники на GitHub</a> · <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">план развития</a> · <a href="../../curriculum/curriculum.html">для разработчика</a> · CC BY-NC-SA 4.0</p>
+    <p>Open course · <a href="https://github.com/irreligious86/UAV-Education">source on GitHub</a> · <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">roadmap</a> · <a href="../../curriculum/curriculum.html">for developers</a> · CC BY-NC-SA 4.0</p>
   </footer>
 </body>
 </html>

@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Проектирование платы в KiCad: от схемы до заказа, разводка для ЭМС — UAV Student</title>
-  <meta name="description" content="пройти цикл KiCad от схемы до выходных файлов рассчитать шунт, калибровку и ширину дорожек развести плату с учётом тока и ЭМС">
+  <title>PCB design in KiCad: from schematic to order, layout for EMC — UAV Student</title>
+  <meta name="description" content="go through the KiCad cycle from schematic to output files calculate the shunt, calibration and trace width lay out a board with current and EMC in mind">
   <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
   <link rel="manifest" href="../../manifest.webmanifest">
   <meta name="theme-color" content="#0b0f14">
@@ -30,28 +30,28 @@
   <header class="site-header">
     <div class="gc-container site-header__inner">
       <a class="site-brand" href="../index.html"><span class="site-brand__mark" aria-hidden="true">◆</span> UAV Student</a>
-      <nav class="gc-nav" aria-label="Разделы сайта">
-        <a href="../index.html" aria-current="page">Курс</a>
-        <a href="../ref/index.html">Справочник</a>
-        <a href="../pages/glossary.html">Глоссарий</a>
-        <a href="../pages/fails.html">Фейлы</a>
-        <a href="../pages/search.html">Поиск</a>
-        <a href="../pages/progress.html">Мой прогресс</a>
+      <nav class="gc-nav" aria-label="Site sections">
+        <a href="../index.html" aria-current="page">Course</a>
+        <a href="../ref/index.html">Reference</a>
+        <a href="../pages/glossary.html">Glossary</a>
+        <a href="../pages/fails.html">Failures</a>
+        <a href="../pages/search.html">Search</a>
+        <a href="../pages/progress.html">My progress</a>
       </nav>
-      <nav class="lang-switch" aria-label="Язык"><a class="gc-tag" href="../../m/el-kicad.html" data-lang-to="ru" hreflang="ru" lang="ru" title="Русский">RU</a><a class="gc-tag" href="../../uk/m/el-kicad.html" data-lang-to="uk" hreflang="uk" lang="uk" title="Українська">UK</a><a class="gc-tag" href="../../en/m/el-kicad.html" data-lang-to="en" hreflang="en" lang="en" title="English" aria-current="true" data-state="ok">EN</a></nav>
+      <nav class="lang-switch" aria-label="Language"><a class="gc-tag" href="../../m/el-kicad.html" data-lang-to="ru" hreflang="ru" lang="ru" title="Русский">RU</a><a class="gc-tag" href="../../uk/m/el-kicad.html" data-lang-to="uk" hreflang="uk" lang="uk" title="Українська">UK</a><a class="gc-tag" href="../../en/m/el-kicad.html" data-lang-to="en" hreflang="en" lang="en" title="English" aria-current="true" data-state="ok">EN</a></nav>
     </div>
   </header>
   <main class="gc-container site-main">
     <article class="module" data-module-page="el-kicad">
-      <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-electronics">Электроника и радио</a><span>Проектирование платы в KiCad: от схемы до заказа, разводка для ЭМС</span></p>
-      <h1 class="module-title">Проектирование платы в KiCad: от схемы до заказа, разводка для ЭМС</h1>
-      <div class="module-tags"><span class="gc-tag" title="Уровень">L3 — Специалист</span><span class="gc-tag">чтение 45 мин</span><span class="gc-tag">учёба ~4 ч</span><span class="gc-tag">KiCad 8+ · ArduPilot 4.5+ (проверка платы)</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ОСВОЕН</span></div>
+      <p class="gc-breadcrumb"><a href="../index.html">Course</a><a href="../index.html#track-electronics">Electronics and radio</a><span>PCB design in KiCad: from schematic to order, layout for EMC</span></p>
+      <h1 class="module-title">PCB design in KiCad: from schematic to order, layout for EMC</h1>
+      <div class="module-tags"><span class="gc-tag" title="Level">L3 — Specialist</span><span class="gc-tag">reading 45 min</span><span class="gc-tag">study ~4 h</span><span class="gc-tag">KiCad 8+ · ArduPilot 4.5+ (проверка платы)</span><span class="gc-tag" data-state="ok" data-done-badge hidden>MASTERED</span></div>
       <p class="gc-muted module-score" data-module-score></p>
       <p class="module-lead">Инженер уровня «топ» не ограничен тем, что продаётся: нужен датчик тока на 100 А с I²C, плата питания под конкретную раму, переходник для companion с правильными разъёмами — он рисует плату сам. Модуль проводит через полный цикл в KiCad на реальном примере — плате датчика тока на INA226 с шунтом: расчёт шунта и регистра калибровки, схема и проверка ERC, посадочные места, разводка с учётом тока (ширина дорожек по IPC-2221) и электромагнитной совместимости, DRC под возможности фабрики, выходные файлы для производства и проверка готовой платы на полётнике.</p>
-      <div class="gc-callout" data-state="ok"><strong>После модуля ты умеешь</strong><ul><li>пройти цикл KiCad от схемы до выходных файлов</li><li>рассчитать шунт, калибровку и ширину дорожек</li><li>развести плату с учётом тока и ЭМС</li></ul></div><p class="gc-muted">Перед этим модулем: <a href="el-power-design.html">Схемотехника питания борта</a>, <a href="el-emi.html">Помехи и электромагнитная совместимость</a></p><div class="gc-callout lab"><p class="gc-label gc-muted">Лабораторная</p><strong>Плата датчика тока</strong><p class="gc-muted lab__hint">Сдано, когда отмечены все пункты:</p><ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="el-kicad:lab:0"><span>Расчёт шунта, калибровки и дорожек выполнен</span></label></li><li><label><input type="checkbox" data-check-id="el-kicad:lab:1"><span>Схема проходит ERC</span></label></li><li><label><input type="checkbox" data-check-id="el-kicad:lab:2"><span>Плата проходит DRC под правила фабрики</span></label></li><li><label><input type="checkbox" data-check-id="el-kicad:lab:3"><span>Выходные файлы проверены в просмотрщике</span></label></li></ul></div>
+      <div class="gc-callout" data-state="ok"><strong>After this module you can</strong><ul><li>go through the KiCad cycle from schematic to output files</li><li>calculate the shunt, calibration and trace width</li><li>lay out a board with current and EMC in mind</li></ul></div><p class="gc-muted">Before this module: <a href="el-power-design.html">Onboard power circuit design</a>, <a href="el-emi.html">Interference and electromagnetic compatibility</a></p><div class="gc-callout lab"><p class="gc-label gc-muted">Lab</p><strong>Current sensor board</strong><p class="gc-muted lab__hint">Submitted when all items are checked:</p><ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="el-kicad:lab:0"><span>Shunt, calibration and trace calculations done</span></label></li><li><label><input type="checkbox" data-check-id="el-kicad:lab:1"><span>The schematic passes ERC</span></label></li><li><label><input type="checkbox" data-check-id="el-kicad:lab:2"><span>The board passes DRC against the fab&#x27;s design rules</span></label></li><li><label><input type="checkbox" data-check-id="el-kicad:lab:3"><span>Output files checked in a viewer</span></label></li></ul></div>
       <div class="gc-prose module-body">
-<div class="gc-callout" data-state="caution" data-untranslated><strong>Модуль ещё не переведён.</strong> Ниже — оригинал (Русский). Прогресс и оценки общие для всех языков.</div>
-<h2>Теория</h2>
+<div class="gc-callout" data-state="caution" data-untranslated><strong>This module hasn't been translated yet.</strong> Below is the original (Русский). Progress and scores are shared across all languages.</div>
+<h2>Theory</h2>
 <h4 class="md-subheading">Когда делать свою плату</h4>
 <ul><li>Нужной платы нет или она не подходит по размеру, разъёмам, току.</li><li>Много одинаковых аппаратов: своя плата питания и распределения убирает ручную пайку проводов — главный источник отказов в поле (модуль «Проводка»).</li><li>Учебная ценность: разводка заставляет понять, откуда берутся помехи на компасе и гироскопе.</li></ul>
 <p>Не делать: полётный контроллер с нуля как первый проект — там высокоскоростная разводка, IMU, сертифицированные прошивки; начинать с периферии.</p>
@@ -68,7 +68,7 @@
 <h4 class="md-subheading">Возможности фабрики</h4>
 <p>Дешёвые двухслойные платы: дорожка и зазор от ~0.127–0.15 мм, отверстия от ~0.3 мм, медь 1 или 2 oz. Правила конкретной фабрики загружают в Board Setup до разводки — DRC тогда проверяет именно их.</p>
 
-<h2>Практика</h2>
+<h2>Practice</h2>
 <h4 class="md-subheading">Шаг 1. Расчёт</h4>
 <p>Для своего аппарата: максимальный и продолжительный ток, напряжение батареи. Выбрать шунт (диапазон INA226, мощность, корпус), посчитать разрешение и регистр калибровки, ширину силовых дорожек (или решить, что ток идёт по проводам, припаянным к площадкам шунта).</p>
 <h4 class="md-subheading">Шаг 2. Схема и ERC</h4>
@@ -81,26 +81,26 @@
 <p>До подключения батареи — прозвонка на КЗ, проверка питания от лабораторного источника с ограничением тока. Подключить к полётнику, найти устройство на шине I²C, настроить монитор батареи, сравнить ток с клещами на трёх нагрузках. Записать погрешность.</p>
 <p>Лабораторная засчитывается, когда расчёт шунта, калибровки и дорожек выполнен, схема проходит ERC, плата проходит DRC под правила фабрики, выходные файлы проверены в просмотрщике; если плата собрана — погрешность тока измерена.</p>
 
-<h2>Диагностика</h2>
+<h2>Troubleshooting</h2>
 <div class="diag-groups"><article class="diag-item"><h4><strong>Симптом:</strong> ток показывает с постоянной ошибкой, растущей с током</h4><ul><li>Возможная причина: измерение не по Kelvin — в показания попадает падение на меди.</li><li>Что сделать: измерительная пара от площадок шунта; уточнить калибровку по эталону.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> устройство не находится на I²C</h4><ul><li>Возможная причина: неверный адрес по A0/A1, нет подтяжек, перепутаны SDA/SCL в разъёме.</li><li>Что сделать: сверить адрес, подтяжки, распиновку с Dronecode.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> шунт или дорожки сильно греются</h4><ul><li>Возможная причина: недооценена мощность I²R, узкие дорожки, мало меди.</li><li>Что сделать: корпус большей мощности или параллельные шунты, полигоны, 2 oz, провода к площадкам.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> после установки платы скачет компас или шумит гироскоп</h4><ul><li>Возможная причина: силовые токи и преобразователь рядом с датчиками, разрез земли.</li><li>Что сделать: разнести, короткие петли тока, сплошная земля, компас на мачту.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> микросхема не встаёт на плату</h4><ul><li>Возможная причина: неверное посадочное место (корпус, шаг выводов).</li><li>Что сделать: сверять посадочное место с даташитом до заказа; распечатать плату 1:1 и приложить компоненты.</li></ul></article></div>
 
-<h2>Чек-лист</h2>
+<h2>Checklist</h2>
 <ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="el-kicad:0"><span>Знаю, когда делать свою плату, а когда купить готовую</span></label></li><li><label><input type="checkbox" data-check-id="el-kicad:1"><span>Прохожу цикл KiCad: схема, ERC, посадочные места, разводка, DRC, выходные файлы</span></label></li><li><label><input type="checkbox" data-check-id="el-kicad:2"><span>Рассчитываю шунт, разрешение и калибровку INA226</span></label></li><li><label><input type="checkbox" data-check-id="el-kicad:3"><span>Выбираю ширину дорожки по току и делаю Kelvin-подключение</span></label></li><li><label><input type="checkbox" data-check-id="el-kicad:4"><span>Развожу с учётом ЭМС: земля, петли тока, чувствительные цепи</span></label></li><li><label><input type="checkbox" data-check-id="el-kicad:5"><span>Проверяю готовую плату перед подключением к аппарату</span></label></li></ul>
 
-<h2>Источники</h2>
+<h2>Sources</h2>
 <ul class="refs"><li><a href="https://docs.kicad.org/" target="_blank" rel="noopener noreferrer">KiCad — documentation</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://www.ti.com/lit/ds/symlink/ina226.pdf" target="_blank" rel="noopener noreferrer">Texas Instruments — INA226 datasheet</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://github.com/pixhawk/Pixhawk-Standards/blob/master/DS-009%20Pixhawk%20Connector%20Standard.pdf" target="_blank" rel="noopener noreferrer">Dronecode — Pixhawk Connector Standard (DS-009)</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://ardupilot.org/copter/docs/common-powermodule-landingpage.html" target="_blank" rel="noopener noreferrer">ArduPilot — Power monitors and battery setup</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://www.ti.com/lit/an/snva021c/snva021c.pdf" target="_blank" rel="noopener noreferrer">Texas Instruments — PCB layout guidelines for switching power supplies (SNVA021)</a> <span class="gc-tag" data-state="info">primary</span></li></ul>
-<h2>Задачи с числовым ответом</h2>
+<h2>Numeric problems</h2>
 <uav-tasks src="../tasks/el-kicad.json" module="el-kicad"></uav-tasks>
-<h2>Проверь себя</h2>
+<h2>Test yourself</h2>
 <uav-quiz src="../quiz/el-kicad.json" module="el-kicad"></uav-quiz>
       </div>
-      <div class="module-done"><gc-button variant="secondary" data-done-toggle="el-kicad">Отметить как пройденный</gc-button></div>
-      <section class="related" aria-label="Смежные модули"><p class="gc-label gc-muted">Смежные модули</p><div class="gc-grid ref-grid"><a class="gc-card" href="el-power-design.html"><strong>Схемотехника питания борта</strong><div class="gc-card__meta"><span class="gc-tag" title="L2 — Интегратор">L2</span></div></a><a class="gc-card" href="el-emi.html"><strong>Помехи и электромагнитная совместимость</strong><div class="gc-card__meta"><span class="gc-tag" title="L2 — Интегратор">L2</span></div></a><a class="gc-card" href="el-measure.html"><strong>Измерения: мультиметр, осциллограф, логический анализатор</strong><div class="gc-card__meta"><span class="gc-tag" title="L2 — Интегратор">L2</span></div></a><a class="gc-card" href="emb-protocols.html"><strong>UART, I2C, SPI, CAN на уровне сигналов и драйверов</strong><div class="gc-card__meta"><span class="gc-tag" title="L3 — Специалист">L3</span></div></a></div></section>
-      <nav class="pager" aria-label="Соседние модули" data-track-pager><a class="gc-card pager__prev" href="el-redundancy.html"><span class="gc-label gc-muted">Назад · трек</span><br>Резервирование на борту: X8, гекса, питание и сигналы</a></nav>
+      <div class="module-done"><gc-button variant="secondary" data-done-toggle="el-kicad">Mark as completed</gc-button></div>
+      <section class="related" aria-label="Related modules"><p class="gc-label gc-muted">Related modules</p><div class="gc-grid ref-grid"><a class="gc-card" href="el-power-design.html"><strong>Onboard power circuit design</strong><div class="gc-card__meta"><span class="gc-tag" title="L2 — Интегратор">L2</span></div></a><a class="gc-card" href="el-emi.html"><strong>Interference and electromagnetic compatibility</strong><div class="gc-card__meta"><span class="gc-tag" title="L2 — Интегратор">L2</span></div></a><a class="gc-card" href="el-measure.html"><strong>Measurements: multimeter, oscilloscope, logic analyzer</strong><div class="gc-card__meta"><span class="gc-tag" title="L2 — Интегратор">L2</span></div></a><a class="gc-card" href="emb-protocols.html"><strong>UART, I2C, SPI, CAN at the signal and driver level</strong><div class="gc-card__meta"><span class="gc-tag" title="L3 — Специалист">L3</span></div></a></div></section>
+      <nav class="pager" aria-label="Adjacent modules" data-track-pager><a class="gc-card pager__prev" href="el-redundancy.html"><span class="gc-label gc-muted">Back · track</span><br>Onboard redundancy: X8, hexa, power and signals</a></nav>
     </article>
   </main>
   <footer class="gc-container site-footer gc-muted">
-    <p>Открытый курс · <a href="https://github.com/irreligious86/UAV-Education">исходники на GitHub</a> · <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">план развития</a> · <a href="../../curriculum/curriculum.html">для разработчика</a> · CC BY-NC-SA 4.0</p>
+    <p>Open course · <a href="https://github.com/irreligious86/UAV-Education">source on GitHub</a> · <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">roadmap</a> · <a href="../../curriculum/curriculum.html">for developers</a> · CC BY-NC-SA 4.0</p>
   </footer>
 </body>
 </html>

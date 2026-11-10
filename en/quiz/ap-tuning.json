@@ -3,92 +3,92 @@
   "pass": 80,
   "questions": [
     {
-      "q": "Что нужно сделать до AUTOTUNE?",
+      "q": "What do you need to do before AUTOTUNE?",
       "options": [
-        "Ничего — он всё сделает сам",
-        "Фильтры и базовый тюн roll/pitch",
-        "Снять пропеллеры и прогнать на столе",
-        "Выставить максимальный P"
+        "Nothing — it does everything by itself",
+        "Filters and a base roll/pitch tune",
+        "Remove the props and run it on the bench",
+        "Set the maximum P"
       ],
       "answer": 1,
-      "explain": "Фильтры/notch и ручной или QuikTune roll-pitch: AUTOTUNE стартует с текущих значений и прерывается при шуме."
+      "explain": "Filters/notch and a manual or QuikTune roll-pitch: AUTOTUNE starts from the current values and aborts on noise."
     },
     {
-      "q": "INS_HNTCH_MODE = 3 означает трекинг частоты по:",
+      "q": "INS_HNTCH_MODE = 3 means frequency tracking by:",
       "options": [
-        "Газу",
-        "ESC-телеметрии",
-        "Встроенному FFT",
-        "Статической частоте"
+        "Throttle",
+        "ESC telemetry",
+        "Built-in FFT",
+        "Static frequency"
       ],
       "answer": 1,
-      "explain": "Лучший режим: следит за каждым мотором."
+      "explain": "The best mode: it tracks each motor."
     },
     {
-      "q": "Как найти частоту шума для notch по газу?",
+      "q": "How do you find the noise frequency for a throttle-based notch?",
       "options": [
-        "Рассчитать по KV мотора и напряжению АКБ",
-        "Спектр raw IMU на висении",
-        "Подобрать на слух",
-        "Взять из размера пропа"
+        "Calculate it from the motor KV and battery voltage",
+        "A raw IMU spectrum at hover",
+        "Pick it by ear",
+        "Derive it from the prop size"
       ],
       "answer": 1,
-      "explain": "Батч-сэмплинг/raw IMU до фильтров: INS_LOG_BAT_MASK = 1, OPT = 0, затем спектр на висении."
+      "explain": "Batch sampling/raw IMU before the filters: INS_LOG_BAT_MASK = 1, OPT = 0, then the spectrum at hover."
     },
     {
-      "q": "AUTOTUNE_AXES = 1 означает:",
+      "q": "AUTOTUNE_AXES = 1 means:",
       "options": [
-        "Все оси",
-        "Только roll",
-        "Только yaw",
-        "Pitch и roll"
+        "All axes",
+        "Roll only",
+        "Yaw only",
+        "Pitch and roll"
       ],
       "answer": 1,
       "explain": "1 roll, 2 pitch, 4 yaw, 8 yaw-D."
     },
     {
-      "q": "Когда сохраняются результаты AUTOTUNE?",
+      "q": "When are the AUTOTUNE results saved?",
       "options": [
-        "После перезагрузки",
-        "При дизарме в режиме AUTOTUNE",
-        "Через 10 минут полёта",
-        "Сразу по завершении каждой оси в полёте"
+        "After a reboot",
+        "On disarm in AUTOTUNE mode",
+        "After 10 minutes of flight",
+        "Right after each axis finishes in flight"
       ],
       "answer": 1,
-      "explain": "Иначе остаются старые коэффициенты."
+      "explain": "Otherwise the old gains stay."
     },
     {
-      "q": "Что сделать, если после AUTOTUNE греются моторы?",
+      "q": "What do you do if the motors get hot after AUTOTUNE?",
       "options": [
-        "Снизить I и поднять P на всех осях",
-        "Фильтры и AUTOTUNE_MIN_D",
-        "Перекалибровать акселерометр",
-        "Поставить другие пропы"
+        "Lower I and raise P on all axes",
+        "Filters and AUTOTUNE_MIN_D",
+        "Recalibrate the accelerometer",
+        "Fit different props"
       ],
       "answer": 1,
-      "explain": "Высокое D на шумном гироскопе: фильтры/notch, AUTOTUNE_MIN_D, повторить."
+      "explain": "High D on a noisy gyro: filters/notch, AUTOTUNE_MIN_D, repeat."
     },
     {
-      "q": "ATC_INPUT_TC влияет на:",
+      "q": "ATC_INPUT_TC affects:",
       "options": [
-        "Устойчивость контура",
-        "Ощущение стиков",
-        "Фильтры гироскопа",
-        "Notch-фильтр"
+        "Loop stability",
+        "Stick feel",
+        "Gyro filters",
+        "The notch filter"
       ],
       "answer": 1,
-      "explain": "Шаг 7 — не устойчивость, а ощущение."
+      "explain": "Step 7 — not stability, but feel."
     },
     {
-      "q": "Зачем перед notch включают батч-сэмплер?",
+      "q": "Why do you enable the batch sampler before the notch?",
       "options": [
-        "Увидеть спектр гироскопа до и после фильтров",
-        "Ускорить AUTOTUNE",
-        "Записать параметры в файл",
-        "Снизить шум акселерометра"
+        "To see the gyro spectrum before and after the filters",
+        "To speed up AUTOTUNE",
+        "To write the parameters to a file",
+        "To reduce accelerometer noise"
       ],
       "answer": 0,
-      "explain": "Батч-сэмплинг даёт сырой спектр: по нему выбирают частоту notch и проверяют результат."
+      "explain": "Batch sampling gives you the raw spectrum: you use it to choose the notch frequency and to verify the result."
     }
   ]
 }

@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Как читать исходники прошивки: Betaflight и ArduPilot — UAV Student</title>
-  <meta name="description" content="найти в коде путь от гироскопа до миксера прочитать реализацию PID и фильтра и сверить с теорией внести минимальное изменение, собрать, проверить в SITL">
+  <title>How to read firmware source code: Betaflight and ArduPilot — UAV Student</title>
+  <meta name="description" content="find the path from the gyro to the mixer in the code read the PID and filter implementation and compare it with theory make a minimal change, build it, test it in SITL">
   <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
   <link rel="manifest" href="../../manifest.webmanifest">
   <meta name="theme-color" content="#0b0f14">
@@ -30,28 +30,28 @@
   <header class="site-header">
     <div class="gc-container site-header__inner">
       <a class="site-brand" href="../index.html"><span class="site-brand__mark" aria-hidden="true">◆</span> UAV Student</a>
-      <nav class="gc-nav" aria-label="Разделы сайта">
-        <a href="../index.html" aria-current="page">Курс</a>
-        <a href="../ref/index.html">Справочник</a>
-        <a href="../pages/glossary.html">Глоссарий</a>
-        <a href="../pages/fails.html">Фейлы</a>
-        <a href="../pages/search.html">Поиск</a>
-        <a href="../pages/progress.html">Мой прогресс</a>
+      <nav class="gc-nav" aria-label="Site sections">
+        <a href="../index.html" aria-current="page">Course</a>
+        <a href="../ref/index.html">Reference</a>
+        <a href="../pages/glossary.html">Glossary</a>
+        <a href="../pages/fails.html">Failures</a>
+        <a href="../pages/search.html">Search</a>
+        <a href="../pages/progress.html">My progress</a>
       </nav>
-      <nav class="lang-switch" aria-label="Язык"><a class="gc-tag" href="../../m/fw-reading.html" data-lang-to="ru" hreflang="ru" lang="ru" title="Русский">RU</a><a class="gc-tag" href="../../uk/m/fw-reading.html" data-lang-to="uk" hreflang="uk" lang="uk" title="Українська">UK</a><a class="gc-tag" href="../../en/m/fw-reading.html" data-lang-to="en" hreflang="en" lang="en" title="English" aria-current="true" data-state="ok">EN</a></nav>
+      <nav class="lang-switch" aria-label="Language"><a class="gc-tag" href="../../m/fw-reading.html" data-lang-to="ru" hreflang="ru" lang="ru" title="Русский">RU</a><a class="gc-tag" href="../../uk/m/fw-reading.html" data-lang-to="uk" hreflang="uk" lang="uk" title="Українська">UK</a><a class="gc-tag" href="../../en/m/fw-reading.html" data-lang-to="en" hreflang="en" lang="en" title="English" aria-current="true" data-state="ok">EN</a></nav>
     </div>
   </header>
   <main class="gc-container site-main">
     <article class="module" data-module-page="fw-reading">
-      <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-engineer">Инженер: код на борту</a><span>Как читать исходники прошивки: Betaflight и ArduPilot</span></p>
-      <h1 class="module-title">Как читать исходники прошивки: Betaflight и ArduPilot</h1>
-      <div class="module-tags"><span class="gc-tag" title="Уровень">L4 — Эксперт</span><span class="gc-tag">чтение 45 мин</span><span class="gc-tag">учёба ~4 ч</span><span class="gc-tag">Betaflight · ArduPilot</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ОСВОЕН</span></div>
+      <p class="gc-breadcrumb"><a href="../index.html">Course</a><a href="../index.html#track-engineer">Engineer: code on board</a><span>How to read firmware source code: Betaflight and ArduPilot</span></p>
+      <h1 class="module-title">How to read firmware source code: Betaflight and ArduPilot</h1>
+      <div class="module-tags"><span class="gc-tag" title="Level">L4 — Expert</span><span class="gc-tag">reading 45 min</span><span class="gc-tag">study ~4 h</span><span class="gc-tag">Betaflight · ArduPilot</span><span class="gc-tag" data-state="ok" data-done-badge hidden>MASTERED</span></div>
       <p class="gc-muted module-score" data-module-score></p>
       <p class="module-lead">Документация описывает, что параметр «делает»; только код показывает, что он делает <strong>на самом деле</strong> — с порядком операций, ограничениями и побочными эффектами. Модуль учит ориентироваться в двух больших кодовых базах без чтения всего: как найти путь от гироскопа до моторов, где живут PID и фильтры, как сверить реализацию с теорией (и найти расхождения), и как внести минимальное изменение, собрать и проверить в SITL — не трогая реальный аппарат. Лабораторная: патч с отчётом.</p>
-      <div class="gc-callout" data-state="ok"><strong>После модуля ты умеешь</strong><ul><li>найти в коде путь от гироскопа до миксера</li><li>прочитать реализацию PID и фильтра и сверить с теорией</li><li>внести минимальное изменение, собрать, проверить в SITL</li></ul></div><p class="gc-muted">Перед этим модулем: <a href="bf-custom.html">Свои сборки прошивок</a>, <a href="emb-basics.html">Embedded: прерывания, таймеры, DMA, RTOS</a></p><div class="gc-callout lab"><p class="gc-label gc-muted">Лабораторная</p><strong>Патч прошивки</strong><p class="gc-muted lab__hint">Сдано, когда отмечены все пункты:</p><ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="fw-reading:lab:0"><span>Путь gyro → PID → mixer найден в коде с ссылками на файлы</span></label></li><li><label><input type="checkbox" data-check-id="fw-reading:lab:1"><span>Минимальный патч собран и проверен в SITL</span></label></li><li><label><input type="checkbox" data-check-id="fw-reading:lab:2"><span>Отчёт</span></label></li></ul></div><div class="path-pos gc-muted"><span class="gc-label">В пути</span><ul><li data-path-pos="betaflight"><a href="../path/betaflight.html">Betaflight</a>: шаг 44 из 44 · последний шаг</li><li data-path-pos="ardupilot"><a href="../path/ardupilot.html">ArduPilot</a>: шаг 57 из 69 → <a href="eng-systems.html?path=ardupilot">Системная инженерия: требования, FMEA, документация, тесты</a></li></ul></div>
+      <div class="gc-callout" data-state="ok"><strong>After this module you can</strong><ul><li>find the path from the gyro to the mixer in the code</li><li>read the PID and filter implementation and compare it with theory</li><li>make a minimal change, build it, test it in SITL</li></ul></div><p class="gc-muted">Before this module: <a href="bf-custom.html">Your own firmware builds</a>, <a href="emb-basics.html">Embedded: interrupts, timers, DMA, RTOS</a></p><div class="gc-callout lab"><p class="gc-label gc-muted">Lab</p><strong>Firmware patch</strong><p class="gc-muted lab__hint">Submitted when all items are checked:</p><ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="fw-reading:lab:0"><span>The gyro → PID → mixer path found in the code with file references</span></label></li><li><label><input type="checkbox" data-check-id="fw-reading:lab:1"><span>Minimal patch built and tested in SITL</span></label></li><li><label><input type="checkbox" data-check-id="fw-reading:lab:2"><span>Report</span></label></li></ul></div><div class="path-pos gc-muted"><span class="gc-label">On the path</span><ul><li data-path-pos="betaflight"><a href="../path/betaflight.html">Betaflight</a>: step 44 of 44 · last step</li><li data-path-pos="ardupilot"><a href="../path/ardupilot.html">ArduPilot</a>: step 57 of 69 → <a href="eng-systems.html?path=ardupilot">Systems engineering: requirements, FMEA, documentation, tests</a></li></ul></div>
       <div class="gc-prose module-body">
-<div class="gc-callout" data-state="caution" data-untranslated><strong>Модуль ещё не переведён.</strong> Ниже — оригинал (Русский). Прогресс и оценки общие для всех языков.</div>
-<h2>Теория</h2>
+<div class="gc-callout" data-state="caution" data-untranslated><strong>This module hasn't been translated yet.</strong> Below is the original (Русский). Progress and scores are shared across all languages.</div>
+<h2>Theory</h2>
 <h4 class="md-subheading">Инструменты чтения</h4>
 <p><code>git clone</code> + <code>grep -rn</code>/<code>rg</code> + редактор с переходом к определению (VS Code с clangd, или просто <code>rg &quot;pidController\(&quot;</code>). Для C/C++ прошивок главный приём — идти от <strong>точки входа планировщика</strong> вниз по вызовам, и от <strong>параметра</strong> (его имя в коде) к месту использования. <code>git blame</code>/<code>git log -S &quot;имя&quot;</code> показывает, когда и зачем строку добавили — комментарий к PR часто объясняет больше, чем вики.</p>
 <h4 class="md-subheading">Betaflight: путь gyro → PID → mixer</h4>
@@ -67,7 +67,7 @@
 <p>Betaflight: <code>make SITL</code> собирает прошивку под Linux (<code>obj/main/betaflight_SITL.elf</code>), связывается с симулятором (RealFlight/gazebo через UDP) или просто позволяет подключиться конфигуратором через TCP: изменения в логике CLI/параметров проверяются без железа; для PID-логики — юнит-тесты в <code>src/test/unit/</code> (<code>make test</code> — gtest), например <code>pid_unittest.cc</code>. ArduPilot: <code>Tools/autotest/sim_vehicle.py -v ArduCopter --console --map</code> собирает и запускает SITL; патч → пересборка → полёт в SITL → лог; автотесты <code>Tools/autotest/arducopter.py</code> (<code>./Tools/autotest/autotest.py build.Copter test.Copter.&lt;Test&gt;</code>).</p>
 <p>Минимальное изменение для лабораторной (безопасное, проверяемое): добавить GCS-сообщение/лог-поле (ArduPilot <code>gcs().send_text(MAV_SEVERITY_INFO, ...)</code> при событии; Betaflight — новый <code>DEBUG_</code> режим с своим значением) или изменить ограничение/значение по умолчанию параметра и увидеть эффект в SITL.</p>
 
-<h2>Практика</h2>
+<h2>Practice</h2>
 <h4 class="md-subheading">Шаг 1. Карта вызовов</h4>
 <p>Для одной прошивки — список файлов и функций пути gyro → фильтры → PID → mixer → output со ссылками (путь + строка/функция на текущем master). Для второй — только файлы.</p>
 <h4 class="md-subheading">Шаг 2. Сверка с теорией</h4>
@@ -84,24 +84,24 @@
 <ul><li>Карта вызовов: 6–10 строк «файл → функция → что делает», в порядке прохождения данных от гироскопа до выхода.</li><li>Ответы на четыре вопроса сверки, каждый с цитатой кода (2–5 строк) и ссылкой на коммит.</li><li><code>git diff</code> патча (обычно 1–10 строк), команда сборки, доказательство работы: строка из консоли или поле из лога.</li><li>Что не удалось — честный пункт отчёта, а не провал.</li></ul>
 <p>Лабораторная засчитывается, когда путь gyro → PID → mixer найден в коде со ссылками на файлы и коммит, минимальный патч собран и проверен в SITL с доказательством из консоли или лога, а отчёт содержит карту, ответы на сверку и diff.</p>
 
-<h2>Диагностика</h2>
+<h2>Troubleshooting</h2>
 <div class="diag-groups"><article class="diag-item"><h4><strong>Симптом:</strong> не нахожу, где используется параметр</h4><ul><li>Возможная причина: имя в коде отличается от имени в GUI (Betaflight: <code>pidProfile()-&gt;pid[PID_ROLL].D</code>; ArduPilot: <code>_pid_rate_roll</code> из <code>ATC_RAT_RLL_*</code>).</li><li>Что сделать: искать по <code>@Param</code>/<code>PG_REGISTER</code>/<code>parameter_names.h</code>, затем по полю структуры.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> сборка SITL падает</h4><ul><li>Возможная причина: не те зависимости/тулчейн.</li><li>Что сделать: <code>Tools/environment_install/install-prereqs-ubuntu.sh</code> (ArduPilot), <code>make arm_sdk_install</code>/<code>make SITL</code> по README Betaflight.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> патч не влияет на поведение в SITL</h4><ul><li>Возможная причина: изменён не тот путь (другой контроллер/режим), либо значение переопределено параметром.</li><li>Что сделать: <code>printf</code>/send_text в точке изменения, проверить, что код исполняется.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> «теория не сходится» с кодом</h4><ul><li>Возможная причина: это нормально — масштабы, фильтры, порядок операций; иногда — баг.</li><li>Что сделать: записать расхождение в отчёт с цитатой; при подозрении на баг — issue с воспроизведением в SITL.</li></ul></article></div>
 
-<h2>Чек-лист</h2>
+<h2>Checklist</h2>
 <ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="fw-reading:0"><span>Нашёл путь gyro → PID → mixer в Betaflight и ArduPilot с файлами</span></label></li><li><label><input type="checkbox" data-check-id="fw-reading:1"><span>Сверил реализацию D-term и anti-windup с теорией по коду</span></label></li><li><label><input type="checkbox" data-check-id="fw-reading:2"><span>Знаю порядок фильтров гироскопа по коду, а не по вики</span></label></li><li><label><input type="checkbox" data-check-id="fw-reading:3"><span>Собрал SITL и проверил минимальный патч</span></label></li><li><label><input type="checkbox" data-check-id="fw-reading:4"><span>Отчёт с diff и ссылками готов</span></label></li></ul>
 
-<h2>Источники</h2>
+<h2>Sources</h2>
 <ul class="refs"><li><a href="https://github.com/betaflight/betaflight/tree/master/src/main" target="_blank" rel="noopener noreferrer">Betaflight — source tree (src/main)</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://github.com/ArduPilot/ardupilot/tree/master/ArduCopter" target="_blank" rel="noopener noreferrer">ArduPilot — ArduCopter scheduler and attitude control sources</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://ardupilot.org/dev/docs/sitl-simulator-software-in-the-loop.html" target="_blank" rel="noopener noreferrer">ArduPilot — Developer docs: SITL setup and autotest</a> <span class="gc-tag" data-state="info">primary</span></li></ul>
-<h2>Проверь себя</h2>
+<h2>Test yourself</h2>
 <uav-quiz src="../quiz/fw-reading.json" module="fw-reading"></uav-quiz>
       </div>
-      <div class="module-done"><gc-button variant="secondary" data-done-toggle="fw-reading">Отметить как пройденный</gc-button></div>
-      <section class="related" aria-label="Смежные модули"><p class="gc-label gc-muted">Смежные модули</p><div class="gc-grid ref-grid"><a class="gc-card" href="bf-custom.html"><strong>Свои сборки прошивок</strong><div class="gc-card__meta"><span class="gc-tag" title="L4 — Эксперт">L4</span></div></a><a class="gc-card" href="emb-basics.html"><strong>Embedded: прерывания, таймеры, DMA, RTOS</strong><div class="gc-card__meta"><span class="gc-tag" title="L3 — Специалист">L3</span></div></a><a class="gc-card" href="ctl-theory.html"><strong>Теория управления: устойчивость, запасы, каскады</strong><div class="gc-card__meta"><span class="gc-tag" title="L3 — Специалист">L3</span></div></a><a class="gc-card" href="ap-sitl.html"><strong>SITL: дрон без дрона</strong><div class="gc-card__meta"><span class="gc-tag" title="L2 — Интегратор">L2</span></div></a></div></section>
-      <nav class="pager" aria-label="Соседние модули" data-track-pager><a class="gc-card pager__prev" href="bf-custom.html"><span class="gc-label gc-muted">Назад · трек</span><br>Свои сборки прошивок</a><a class="gc-card pager__next" href="eng-systems.html"><span class="gc-label gc-muted">Дальше · трек</span><br>Системная инженерия: требования, FMEA, документация, тесты</a></nav><nav class="pager" aria-label="Соседние шаги пути Betaflight" data-path-pager="betaflight" hidden><a class="gc-card pager__prev" href="bf-custom.html?path=betaflight"><span class="gc-label gc-muted">Назад · путь Betaflight</span><br>Свои сборки прошивок</a><a class="gc-card pager__next" href="../path/betaflight.html"><span class="gc-label gc-muted">Путь пройден</span><br>К итоговым проектам пути Betaflight</a></nav><nav class="pager" aria-label="Соседние шаги пути ArduPilot" data-path-pager="ardupilot" hidden><a class="gc-card pager__prev" href="comp-esp32.html?path=ardupilot"><span class="gc-label gc-muted">Назад · путь ArduPilot</span><br>ESP32 и периферия</a><a class="gc-card pager__next" href="eng-systems.html?path=ardupilot"><span class="gc-label gc-muted">Дальше · шаг 58 из 69</span><br>Системная инженерия: требования, FMEA, документация, тесты</a></nav>
+      <div class="module-done"><gc-button variant="secondary" data-done-toggle="fw-reading">Mark as completed</gc-button></div>
+      <section class="related" aria-label="Related modules"><p class="gc-label gc-muted">Related modules</p><div class="gc-grid ref-grid"><a class="gc-card" href="bf-custom.html"><strong>Your own firmware builds</strong><div class="gc-card__meta"><span class="gc-tag" title="L4 — Эксперт">L4</span></div></a><a class="gc-card" href="emb-basics.html"><strong>Embedded: interrupts, timers, DMA, RTOS</strong><div class="gc-card__meta"><span class="gc-tag" title="L3 — Специалист">L3</span></div></a><a class="gc-card" href="ctl-theory.html"><strong>Control theory: stability, margins, cascades</strong><div class="gc-card__meta"><span class="gc-tag" title="L3 — Специалист">L3</span></div></a><a class="gc-card" href="ap-sitl.html"><strong>SITL: a drone without a drone</strong><div class="gc-card__meta"><span class="gc-tag" title="L2 — Интегратор">L2</span></div></a></div></section>
+      <nav class="pager" aria-label="Adjacent modules" data-track-pager><a class="gc-card pager__prev" href="bf-custom.html"><span class="gc-label gc-muted">Back · track</span><br>Your own firmware builds</a><a class="gc-card pager__next" href="eng-systems.html"><span class="gc-label gc-muted">Next · track</span><br>Systems engineering: requirements, FMEA, documentation, tests</a></nav><nav class="pager" aria-label="Adjacent steps of path Betaflight" data-path-pager="betaflight" hidden><a class="gc-card pager__prev" href="bf-custom.html?path=betaflight"><span class="gc-label gc-muted">Back · path Betaflight</span><br>Your own firmware builds</a><a class="gc-card pager__next" href="../path/betaflight.html"><span class="gc-label gc-muted">Path completed</span><br>To the capstone projects of path Betaflight</a></nav><nav class="pager" aria-label="Adjacent steps of path ArduPilot" data-path-pager="ardupilot" hidden><a class="gc-card pager__prev" href="comp-esp32.html?path=ardupilot"><span class="gc-label gc-muted">Back · path ArduPilot</span><br>ESP32 and peripherals</a><a class="gc-card pager__next" href="eng-systems.html?path=ardupilot"><span class="gc-label gc-muted">Next · step 58 of 69</span><br>Systems engineering: requirements, FMEA, documentation, tests</a></nav>
     </article>
   </main>
   <footer class="gc-container site-footer gc-muted">
-    <p>Открытый курс · <a href="https://github.com/irreligious86/UAV-Education">исходники на GitHub</a> · <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">план развития</a> · <a href="../../curriculum/curriculum.html">для разработчика</a> · CC BY-NC-SA 4.0</p>
+    <p>Open course · <a href="https://github.com/irreligious86/UAV-Education">source on GitHub</a> · <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">roadmap</a> · <a href="../../curriculum/curriculum.html">for developers</a> · CC BY-NC-SA 4.0</p>
   </footer>
 </body>
 </html>

@@ -3,18 +3,18 @@
   "pass": 80,
   "questions": [
     {
-      "q": "За что отвечает P в PID?",
+      "q": "What is P responsible for in PID?",
       "options": [
-        "Накапливает ошибку",
-        "Толкает назад по текущей ошибке",
-        "Фильтрует шум",
-        "Предсказывает движение по стику"
+        "It accumulates error",
+        "It pushes back based on the current error",
+        "It filters noise",
+        "It predicts motion from the stick"
       ],
       "answer": 1,
-      "explain": "P реагирует на текущее отклонение: больше ошибка — сильнее коррекция прямо сейчас."
+      "explain": "P reacts to the current deviation: the bigger the error, the stronger the correction right now."
     },
     {
-      "q": "Дрон висит, но ветер постоянно сдувает его, и он не возвращается точно на место. Какой член PID за это отвечает?",
+      "q": "The drone is hovering, but the wind keeps pushing it and it doesn't return exactly to its spot. Which PID term is responsible for this?",
       "options": [
         "P",
         "I",
@@ -22,73 +22,73 @@
         "FF"
       ],
       "answer": 1,
-      "explain": "I накапливает постоянную ошибку и добавляет усилие, пока она не исчезнет."
+      "explain": "I accumulates a constant error and adds effort until it disappears."
     },
     {
-      "q": "Что делает D?",
+      "q": "What does D do?",
       "options": [
-        "Усиливает P",
-        "Тормозит быстрые изменения",
-        "Меняет газ",
-        "Включает air mode на нуле газа"
+        "Amplifies P",
+        "Brakes fast changes",
+        "Changes throttle",
+        "Enables air mode at zero throttle"
       ],
       "answer": 1,
-      "explain": "D смотрит на скорость изменения ошибки и гасит перелёт."
+      "explain": "D looks at the rate of change of the error and damps overshoot."
     },
     {
-      "q": "Слишком высокий D обычно даёт…",
+      "q": "Too much D usually gives you…",
       "options": [
-        "Вялость и дрейф",
-        "Горячие моторы",
-        "Медленную раскачку",
-        "Потерю связи"
+        "Sluggishness and drift",
+        "Hot motors",
+        "Slow wobble",
+        "Loss of link"
       ],
       "answer": 1,
-      "explain": "Горячие моторы и «мыльный» отклик: D усиливает высокочастотный шум, моторы отрабатывают его и греются."
+      "explain": "Hot motors and a “mushy” response: D amplifies high-frequency noise, the motors chase it and heat up."
     },
     {
-      "q": "Что такое feedforward?",
+      "q": "What is feedforward?",
       "options": [
-        "Фильтр гироскопа",
-        "Вклад прямо от движения стика",
-        "Удвоенный P на быстрых движениях",
-        "Режим полёта"
+        "A gyro filter",
+        "A contribution straight from stick movement",
+        "Doubled P on fast moves",
+        "A flight mode"
       ],
       "answer": 1,
-      "explain": "FF реагирует на команду пилота до появления ошибки и ускоряет начало движения."
+      "explain": "FF reacts to the pilot's command before an error appears and speeds up the start of the move."
     },
     {
-      "q": "Слишком высокий P даёт…",
+      "q": "Too much P gives you…",
       "options": [
-        "Горячие моторы без видимых осцилляций",
-        "Быструю осцилляцию, дёрганость",
-        "Дрейф",
-        "Потерю высоты"
+        "Hot motors with no visible oscillation",
+        "Fast oscillation, twitchiness",
+        "Drift",
+        "Loss of altitude"
       ],
       "answer": 1,
-      "explain": "P перекорректирует — дрон трясётся на высокой частоте."
+      "explain": "P overcorrects — the drone shakes at a high frequency."
     },
     {
-      "q": "От чего считается D-term в Betaflight?",
+      "q": "What is the D-term computed from in Betaflight?",
       "options": [
-        "От setpoint пилота",
-        "От гироскопа",
-        "От ошибки",
-        "От моторов"
+        "The pilot's setpoint",
+        "The gyro",
+        "The error",
+        "The motors"
       ],
       "answer": 1,
-      "explain": "От отфильтрованного гироскопа: нет derivative kick при движении стика."
+      "explain": "From the filtered gyro: no derivative kick when the stick moves."
     },
     {
-      "q": "Что делает I-term relax?",
+      "q": "What does I-term relax do?",
       "options": [
-        "Повышает I",
-        "Не копит I при резком стике",
-        "Отключает I на нуле газа",
-        "Сглаживает D"
+        "Raises I",
+        "Doesn't accumulate I on sharp stick input",
+        "Disables I at zero throttle",
+        "Smooths D"
       ],
       "answer": 1,
-      "explain": "Приостанавливает накопление I во время быстрых движений стика, иначе I «довозит» после флипа."
+      "explain": "It pauses I accumulation during fast stick moves; otherwise I “carries through” after a flip."
     }
   ]
 }

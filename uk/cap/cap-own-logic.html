@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Своя логика + ESP32-модуль — UAV Student</title>
-  <meta name="description" content="работающий модуль, протокол обмена, README и тесты">
+  <title>Власна логіка + ESP32-модуль — UAV Student</title>
+  <meta name="description" content="робочий модуль, протокол обміну, README і тести">
   <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
   <link rel="manifest" href="../../manifest.webmanifest">
   <meta name="theme-color" content="#0b0f14">
@@ -30,40 +30,40 @@
   <header class="site-header">
     <div class="gc-container site-header__inner">
       <a class="site-brand" href="../index.html"><span class="site-brand__mark" aria-hidden="true">◆</span> UAV Student</a>
-      <nav class="gc-nav" aria-label="Разделы сайта">
+      <nav class="gc-nav" aria-label="Розділи сайту">
         <a href="../index.html" aria-current="page">Курс</a>
-        <a href="../ref/index.html">Справочник</a>
-        <a href="../pages/glossary.html">Глоссарий</a>
-        <a href="../pages/fails.html">Фейлы</a>
-        <a href="../pages/search.html">Поиск</a>
-        <a href="../pages/progress.html">Мой прогресс</a>
+        <a href="../ref/index.html">Довідник</a>
+        <a href="../pages/glossary.html">Глосарій</a>
+        <a href="../pages/fails.html">Фейли</a>
+        <a href="../pages/search.html">Пошук</a>
+        <a href="../pages/progress.html">Мій прогрес</a>
       </nav>
-      <nav class="lang-switch" aria-label="Язык"><a class="gc-tag" href="../../cap/cap-own-logic.html" data-lang-to="ru" hreflang="ru" lang="ru" title="Русский">RU</a><a class="gc-tag" href="../../uk/cap/cap-own-logic.html" data-lang-to="uk" hreflang="uk" lang="uk" title="Українська" aria-current="true" data-state="ok">UK</a><a class="gc-tag" href="../../en/cap/cap-own-logic.html" data-lang-to="en" hreflang="en" lang="en" title="English">EN</a></nav>
+      <nav class="lang-switch" aria-label="Мова"><a class="gc-tag" href="../../cap/cap-own-logic.html" data-lang-to="ru" hreflang="ru" lang="ru" title="Русский">RU</a><a class="gc-tag" href="../../uk/cap/cap-own-logic.html" data-lang-to="uk" hreflang="uk" lang="uk" title="Українська" aria-current="true" data-state="ok">UK</a><a class="gc-tag" href="../../en/cap/cap-own-logic.html" data-lang-to="en" hreflang="en" lang="en" title="English">EN</a></nav>
     </div>
   </header>
   <main class="gc-container site-main">
     <article class="module" data-module-page="cap-own-logic">
-      <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-engineer">Инженер: код на борту</a><span>Итоговый проект</span></p>
-      <h1 class="module-title">Своя логика + ESP32-модуль</h1>
-      <div class="module-tags"><span class="gc-tag">Итоговый проект трека 6</span><span class="gc-tag" data-state="ok" data-done-badge hidden>СДАН</span></div>
-      <p class="module-lead">Результат: работающий модуль, протокол обмена, README и тесты</p>
+      <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-engineer">Інженер: код на борту</a><span>Підсумковий проєкт</span></p>
+      <h1 class="module-title">Власна логіка + ESP32-модуль</h1>
+      <div class="module-tags"><span class="gc-tag">Підсумковий проєкт треку 6</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ЗДАНО</span></div>
+      <p class="module-lead">Результат: робочий модуль, протокол обміну, README і тести</p>
       <div class="gc-prose module-body">
-        <h2>Что сдать</h2>
-        <ul><li>Репозиторий: firmware/, lua/ или companion-сервис, docs/</li><li>Протокол обмена: каждое сообщение, поля, кто имеет право слать</li><li>README с установкой и запуском</li><li>Тесты: эхо/heartbeat, таймаут, отказ companion</li><li>Демонстрация в SITL (и в воздухе — только с геозоной и пилотом)</li><li>Инженерная папка проекта: требования с ID, что и как тестировалось, журнал изменений (см. модуль «Инженерный метод 101»)</li></ul>
-        <h2>Критерии приёмки</h2>
-        <p class="gc-muted">Проект сдан, когда выполнены все пункты. Отмечай по мере готовности:</p>
-        <ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="cap-own-logic:cap:0"><span>Неопределённое состояние — безопасное (FLIGHT, радио выключено)</span></label></li><li><label><input type="checkbox" data-check-id="cap-own-logic:cap:1"><span>Защита от опасных действий в полёте дублирована на обеих сторонах</span></label></li><li><label><input type="checkbox" data-check-id="cap-own-logic:cap:2"><span>Каждая команда MAVLink подтверждается по ACK</span></label></li><li><label><input type="checkbox" data-check-id="cap-own-logic:cap:3"><span>Отказ companion не влияет на FC — показано тестом</span></label></li><li><label><input type="checkbox" data-check-id="cap-own-logic:cap:4"><span>Каждое требование прослеживается до теста или измерения, результат записан</span></label></li></ul>
-        <h2>Рубрика: как отличить сделанное от сданного</h2><p class="gc-muted">Проверь свою работу по каждой строке. Если она ближе к левой колонке — проект ещё не готов.</p><div class="widget__table-wrap"><table class="rubric"><thead><tr><th>Критерий</th><th>Плохо</th><th>Хорошо</th></tr></thead><tbody><tr><th scope="row">Код</th><td class="rubric__bad">Скрипт без тестов</td><td class="rubric__good">Репозиторий с README, тестами в SITL, CI, журналом изменений</td></tr><tr><th scope="row">Интеграция</th><td class="rubric__bad">Работает «иногда»</td><td class="rubric__good">Таймауты, обработка потери связи, лог поведения при отказе</td></tr><tr><th scope="row">Документация</th><td class="rubric__bad">Нет</td><td class="rubric__good">Другой инженер может повторить развёртывание по README за 15 минут</td></tr></tbody></table></div>
-        <h2>Программная альтернатива</h2><p class="gc-muted">Итоговый проект трека можно заменить проектом из каталога «ПО для БАС» — с теми же требованиями к сдаче: критерии, автотесты, README.</p><ul><li><a href="../projects/proj-web-gcs.html">Проект 1: Веб-GCS: телеметрия, карта, режимы</a></li><li><a href="../projects/proj-fleet-telemetry.html">Проект 2: Телеметрия флота в облако + дашборд</a></li><li><a href="../projects/proj-esp32-component.html">Проект 8: MAVLink-компонент на ESP32 + SITL-двойник</a></li><li><a href="../projects/proj-cell-bridge.html">Проект 9: Мост 4G/Wi-Fi с переподключением и шифрованием</a></li><li><a href="../projects/proj-fleet-ci.html">Проект 10: CI/CD для флота</a></li><li><a href="../projects/proj-tx16s-companion.html">Проект 12: Компаньон для пульта TX16S</a></li></ul>
-        <h2>Модули трека</h2>
-        <ol><li><a href="../m/comp-intro.html">Companion: зачем и где граница</a></li><li><a href="../m/comp-mavlink.html">MAVLink и MAVSDK</a></li><li><a href="../m/mav-protocol.html">MAVLink изнутри: кадр, CRC, диалекты, подпись</a></li><li><a href="../m/mav-services.html">Микросервисы MAVLink: команды, параметры, миссии, потоки</a></li><li><a href="../m/mav-sdk.html">Библиотеки над MAVLink: pymavlink, MAVSDK, MAVROS — что и когда</a></li><li><a href="../m/comp-esp32.html">ESP32 и периферия</a></li><li><a href="../m/emb-basics.html">Embedded: прерывания, таймеры, DMA, RTOS</a></li><li><a href="../m/emb-protocols.html">UART, I2C, SPI, CAN на уровне сигналов и драйверов</a></li><li><a href="../m/comp-raspberry.html">Raspberry Pi + ArduPilot</a></li><li><a href="../m/mav-routing.html">Маршрутизация и транспорт MAVLink: радио, 4G, несколько GCS</a></li><li><a href="../m/f-remote-id-security.html">Remote ID и безопасность аппарата: трансляция, подпись MAVLink, защита прошивки</a></li><li><a href="../m/mav-component.html">Свой компонент MAVLink: датчик, параметры, сообщения</a></li><li><a href="../m/payload-gimbal.html">Подвесы и полезная нагрузка: MAVLink Gimbal v2, камера, сброс</a></li><li><a href="../m/ap-companion.html">Companion + ArduPilot: управление из кода</a></li><li><a href="../m/mav-multi-vehicle.html">Несколько аппаратов: адресация, разнесение, строй и супервизор</a></li><li><a href="../m/bf-custom.html">Свои сборки прошивок</a></li><li><a href="../m/fw-reading.html">Как читать исходники прошивки: Betaflight и ArduPilot</a></li><li><a href="../m/eng-systems.html">Системная инженерия: требования, FMEA, документация, тесты</a></li><li><a href="../m/eng-ci-configs.html">CI и версионирование конфигов и кода</a></li></ol>
-        <div class="gc-callout" data-state="caution"><strong>Безопасность.</strong> Всё, что можно сделать в SITL или без пропов, делается там. Реальный полёт — только после наземных тестов, с проверенным failsafe.</div>
+        <h2>Що здати</h2>
+        <ul><li>Репозиторій: firmware/, lua/ або companion-сервіс, docs/</li><li>Протокол обміну: кожне повідомлення, поля, хто має право надсилати</li><li>README з установленням і запуском</li><li>Тести: ехо/heartbeat, таймаут, відмова companion</li><li>Демонстрація в SITL (і в повітрі — лише з геозоною та пілотом)</li><li>Інженерна тека проєкту: вимоги з ID, що й як тестувалося, журнал змін (див. модуль «Інженерний метод 101»)</li></ul>
+        <h2>Критерії приймання</h2>
+        <p class="gc-muted">Проєкт здано, коли виконано всі пункти. Позначай у міру готовності:</p>
+        <ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="cap-own-logic:cap:0"><span>Невизначений стан — безпечний (FLIGHT, радіо вимкнено)</span></label></li><li><label><input type="checkbox" data-check-id="cap-own-logic:cap:1"><span>Захист від небезпечних дій у польоті продубльовано на обох сторонах</span></label></li><li><label><input type="checkbox" data-check-id="cap-own-logic:cap:2"><span>Кожна команда MAVLink підтверджується через ACK</span></label></li><li><label><input type="checkbox" data-check-id="cap-own-logic:cap:3"><span>Відмова companion не впливає на FC — показано тестом</span></label></li><li><label><input type="checkbox" data-check-id="cap-own-logic:cap:4"><span>Кожна вимога простежується до тесту або вимірювання, результат записано</span></label></li></ul>
+        <h2>Рубрика: як відрізнити зроблене від зданого</h2><p class="gc-muted">Перевір свою роботу за кожним рядком. Якщо вона ближча до лівої колонки — проєкт ще не готовий.</p><div class="widget__table-wrap"><table class="rubric"><thead><tr><th>Критерій</th><th>Погано</th><th>Добре</th></tr></thead><tbody><tr><th scope="row">Код</th><td class="rubric__bad">Скрипт без тестів</td><td class="rubric__good">Репозиторій із README, тестами в SITL, CI, журналом змін</td></tr><tr><th scope="row">Інтеграція</th><td class="rubric__bad">Працює «іноді»</td><td class="rubric__good">Таймаути, обробка втрати зв&#x27;язку, лог поведінки при відмові</td></tr><tr><th scope="row">Документація</th><td class="rubric__bad">Немає</td><td class="rubric__good">Інший інженер може повторити розгортання за README за 15 хвилин</td></tr></tbody></table></div>
+        <h2>Програмна альтернатива</h2><p class="gc-muted">Підсумковий проєкт треку можна замінити проєктом з каталогу «ПЗ для БпАК» — з тими самими вимогами до здачі: критерії, автотести, README.</p><ul><li><a href="../projects/proj-web-gcs.html">Проєкт 1: Веб-GCS: телеметрія, карта, режими</a></li><li><a href="../projects/proj-fleet-telemetry.html">Проєкт 2: Телеметрія флоту в хмару + дашборд</a></li><li><a href="../projects/proj-esp32-component.html">Проєкт 8: MAVLink-компонент на ESP32 + SITL-двійник</a></li><li><a href="../projects/proj-cell-bridge.html">Проєкт 9: Міст 4G/Wi-Fi з перепідключенням і шифруванням</a></li><li><a href="../projects/proj-fleet-ci.html">Проєкт 10: CI/CD для флоту</a></li><li><a href="../projects/proj-tx16s-companion.html">Проєкт 12: Компаньйон для пульта TX16S</a></li></ul>
+        <h2>Модулі треку</h2>
+        <ol><li><a href="../m/comp-intro.html">Companion: навіщо і де межа</a></li><li><a href="../m/comp-mavlink.html">MAVLink і MAVSDK</a></li><li><a href="../m/mav-protocol.html">MAVLink зсередини: кадр, CRC, діалекти, підпис</a></li><li><a href="../m/mav-services.html">Мікросервіси MAVLink: команди, параметри, місії, потоки</a></li><li><a href="../m/mav-sdk.html">Бібліотеки над MAVLink: pymavlink, MAVSDK, MAVROS — що й коли</a></li><li><a href="../m/comp-esp32.html">ESP32 і периферія</a></li><li><a href="../m/emb-basics.html">Embedded: переривання, таймери, DMA, RTOS</a></li><li><a href="../m/emb-protocols.html">UART, I2C, SPI, CAN на рівні сигналів і драйверів</a></li><li><a href="../m/comp-raspberry.html">Raspberry Pi + ArduPilot</a></li><li><a href="../m/mav-routing.html">Маршрутизація та транспорт MAVLink: радіо, 4G, кілька GCS</a></li><li><a href="../m/f-remote-id-security.html">Remote ID і безпека апарата: трансляція, підпис MAVLink, захист прошивки</a></li><li><a href="../m/mav-component.html">Власний компонент MAVLink: датчик, параметри, повідомлення</a></li><li><a href="../m/payload-gimbal.html">Підвіси й корисне навантаження: MAVLink Gimbal v2, камера, скидання</a></li><li><a href="../m/ap-companion.html">Companion + ArduPilot: керування з коду</a></li><li><a href="../m/mav-multi-vehicle.html">Кілька апаратів: адресація, рознесення, стрій і супервізор</a></li><li><a href="../m/bf-custom.html">Власні збірки прошивок</a></li><li><a href="../m/fw-reading.html">Як читати вихідний код прошивки: Betaflight і ArduPilot</a></li><li><a href="../m/eng-systems.html">Системна інженерія: вимоги, FMEA, документація, тести</a></li><li><a href="../m/eng-ci-configs.html">CI та версіонування конфігів і коду</a></li></ol>
+        <div class="gc-callout" data-state="caution"><strong>Безпека.</strong> Усе, що можна зробити в SITL або без пропів, робиться там. Реальний політ — тільки після наземних тестів, з перевіреним failsafe.</div>
       </div>
-      <div class="module-done"><gc-button variant="secondary" data-done-toggle="cap-own-logic" data-done-label="сданный" data-done-past="Сдан">Отметить как сданный</gc-button></div>
+      <div class="module-done"><gc-button variant="secondary" data-done-toggle="cap-own-logic" data-done-label="зданий" data-done-past="Складено">Позначити як зданий</gc-button></div>
     </article>
   </main>
   <footer class="gc-container site-footer gc-muted">
-    <p>Открытый курс · <a href="https://github.com/irreligious86/UAV-Education">исходники на GitHub</a> · <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">план развития</a> · <a href="../../curriculum/curriculum.html">для разработчика</a> · CC BY-NC-SA 4.0</p>
+    <p>Відкритий курс · <a href="https://github.com/irreligious86/UAV-Education">вихідний код на GitHub</a> · <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">план розвитку</a> · <a href="../../curriculum/curriculum.html">для розробника</a> · CC BY-NC-SA 4.0</p>
   </footer>
 </body>
 </html>
