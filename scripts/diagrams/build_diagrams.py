@@ -549,6 +549,11 @@ wave2.build4(D, _arch)
 import wave3  # noqa: E402
 wave3.build(D)
 
+# Stage 6: one file per module, scripts/diagrams/s6_<module>.py with build(D) (no shared file to conflict on)
+import importlib  # noqa: E402
+for _f in sorted(Path(__file__).parent.glob("s6_*.py")):
+    importlib.import_module(_f.stem).build(D)
+
 
 def main() -> None:
     import json

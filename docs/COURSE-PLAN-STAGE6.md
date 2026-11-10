@@ -147,7 +147,17 @@ Each iteration ends with: modules published, quizzes and tasks, diagrams, glossa
 
 Rough size: an iteration of 4–5 modules ≈ 25–30k words of Russian source plus ~3× that in translations.
 
-## 5. Decisions for Alex
+## 5. Decisions (Alex, 2026-11-10)
+
+1. Order: engineering depth first — iterations as listed in §4.
+2. Exam banks: in the public repository while the course is in development; revisit when moving to a server.
+3. Hardware: SITL / calculation is the main path of every lab; each module has a separate
+   «Переход на реальное железо» part (procedure and acceptance criteria) so students move to real hardware later.
+4. Languages: new modules are written in Russian only (the source). Localisation of everything new or stale into
+   uk/en/gal runs later as one batch when Alex asks for it; until then those pages show the Russian text with the
+   "not translated" notice.
+
+## 5a. Original questions
 
 1. **Order**: the iterations above follow "engineering depth first". Alternatives: applications first
    (faster visible value) or firmware development first (closest to Alex's ESP32/C++ work).
