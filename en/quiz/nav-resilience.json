@@ -3,92 +3,92 @@
   "pass": 80,
   "questions": [
     {
-      "q": "Что первым реагирует на помеху GNSS в EKF?",
+      "q": "What reacts first to GNSS interference in the EKF?",
       "options": [
-        "Компас",
-        "Инновации измерений",
-        "Барометр",
-        "Число спутников в сообщении GPS"
+        "The compass",
+        "Measurement innovations",
+        "The barometer",
+        "The satellite count in the GPS message"
       ],
       "answer": 1,
-      "explain": "Несогласие GNSS с инерциалкой видно раньше всего; инерциальные датчики не подвержены внешней помехе."
+      "explain": "Disagreement between GNSS and the inertial sensors shows up earliest; inertial sensors aren't affected by external interference."
     },
     {
-      "q": "Спутники в норме, точность «отличная», но инновации EKF растут. Это похоже на:",
+      "q": "Satellites are normal, accuracy is “excellent,” but EKF innovations are growing. This looks like:",
       "options": [
-        "Разряд АКБ",
-        "Подмену данных приёмника",
-        "Многолучёвость",
-        "Закрытие неба зданиями и деревьями"
+        "A drained battery",
+        "Spoofing of the receiver's data",
+        "Multipath",
+        "Sky obstruction by buildings and trees"
       ],
       "answer": 1,
-      "explain": "Измерение противоречит модели при «хорошем» fix."
+      "explain": "The measurement contradicts the model despite a “good” fix."
     },
     {
-      "q": "FS_EKF_ACTION = 1 означает:",
+      "q": "FS_EKF_ACTION = 1 means:",
       "options": [
-        "Отключить EKF",
-        "Land, если нужна позиция",
-        "AltHold всегда",
-        "Только сообщение оператору на GCS"
+        "Disable the EKF",
+        "Land if position is required",
+        "Always AltHold",
+        "Only a message to the operator on the GCS"
       ],
       "answer": 1,
-      "explain": "2 — AltHold, 3 — Land из любого режима."
+      "explain": "2 — AltHold, 3 — Land from any mode."
     },
     {
-      "q": "Что делает EK3_SRC1_YAW = 3?",
+      "q": "What does EK3_SRC1_YAW = 3 do?",
       "options": [
-        "Только GPS",
-        "GPS-курс с откатом на компас",
-        "Только компас",
-        "GSF — курс по GPS-скорости"
+        "GPS only",
+        "GPS yaw with compass fallback",
+        "Compass only",
+        "GSF — yaw from GPS velocity"
       ],
       "answer": 1,
       "explain": "GPS with Compass Fallback."
     },
     {
-      "q": "Что должно быть у пилота всегда при деградации GPS?",
+      "q": "What must the pilot always have when GPS degrades?",
       "options": [
-        "Запасная АКБ",
-        "Режимы без GPS и навык",
-        "Второй пульт",
-        "RTL на тумблере и геозона"
+        "A spare battery",
+        "Non-GPS modes and the skill to fly them",
+        "A second radio",
+        "RTL on a switch and a geofence"
       ],
       "answer": 1,
-      "explain": "Геозона и RTL бесполезны без позиции."
+      "explain": "Geofence and RTL are useless without position."
     },
     {
-      "q": "Как в SITL смоделировать потерю GPS?",
+      "q": "How do you simulate GPS loss in SITL?",
       "options": [
-        "Удалить GPS",
+        "Remove the GPS",
         "SIM_GPS1_ENABLE = 0",
-        "GPS_TYPE = 0 в полёте",
+        "GPS_TYPE = 0 in flight",
         "EK3_ENABLE = 0"
       ],
       "answer": 1,
-      "explain": "В старых версиях — SIM_GPS_DISABLE = 1. Другие сценарии: SIM_GPS1_NOISE, SIM_GPS1_GLTCH_*, SIM_MAG1_OFS_*."
+      "explain": "In older versions — SIM_GPS_DISABLE = 1. Other scenarios: SIM_GPS1_NOISE, SIM_GPS1_GLTCH_*, SIM_MAG1_OFS_*."
     },
     {
-      "q": "Какая мощность передатчика правильная на площадке?",
+      "q": "What is the right transmitter power at the site?",
       "options": [
-        "Не важна",
-        "Минимально достаточная",
-        "Всегда 1 Вт",
-        "Максимальная для запаса по линку"
+        "It doesn't matter",
+        "The minimum that's sufficient",
+        "Always 1 W",
+        "Maximum, for link margin"
       ],
       "answer": 1,
-      "explain": "Лишняя мощность глушит соседей и греет VTX."
+      "explain": "Excess power jams your neighbors and heats the VTX."
     },
     {
-      "q": "Что делает INAV на мультикоптере, если GPS пропал во время RTH?",
+      "q": "What does INAV do on a multicopter if GPS is lost during RTH?",
       "options": [
-        "Аварийная посадка (Emergency Landing): позиция потеряна — RTH невозможен",
-        "Продолжает RTH по последнему курсу",
-        "Переходит в ACRO",
-        "Перезагружает полётник"
+        "Emergency Landing: position is lost, so RTH is impossible",
+        "Continues RTH on the last heading",
+        "Switches to ACRO",
+        "Reboots the flight controller"
       ],
       "answer": 0,
-      "explain": "Если позиции нет дольше ~2 с, INAV в RTH/WP переходит в Emergency Landing: коптер в ANGLE снижается на failsafe_throttle и выключает моторы через failsafe_off_delay (при нулевых значениях — фактически DROP). failsafe_procedure — реакция на потерю RC, а не GPS; крыло с inav_allow_gps_fix_estimation может продолжить возврат по оценке."
+      "explain": "If there is no position for longer than ~2 s, INAV in RTH/WP switches to Emergency Landing: the copter descends in ANGLE at failsafe_throttle and cuts the motors after failsafe_off_delay (with zero values it's effectively a DROP). failsafe_procedure is the reaction to RC loss, not GPS loss; a wing with inav_allow_gps_fix_estimation can continue returning on the estimate."
     }
   ]
 }

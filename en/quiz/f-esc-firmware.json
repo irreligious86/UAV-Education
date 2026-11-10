@@ -3,7 +3,7 @@
   "pass": 80,
   "questions": [
     {
-      "q": "Какую прошивку ставят вместо BLHeli_S на 8-битные ESC ради bidir DShot?",
+      "q": "Which firmware replaces BLHeli_S on 8-bit ESCs to get bidir DShot?",
       "options": [
         "Bluejay",
         "AM32",
@@ -11,84 +11,84 @@
         "KISS"
       ],
       "answer": 0,
-      "explain": "Bluejay — открытая прошивка для тех же EFM8-регуляторов, добавляет bidir DShot и EDT."
+      "explain": "Bluejay is open-source firmware for the same EFM8 ESCs; it adds bidir DShot and EDT."
     },
     {
-      "q": "Что передаёт ESC при двунаправленном DShot?",
+      "q": "What does the ESC send back with bidirectional DShot?",
       "options": [
-        "Напряжение батареи вместо газа",
-        "Электрические обороты мотора",
-        "Положение ротора в градусах",
-        "Команду на смену направления"
+        "Battery voltage instead of throttle",
+        "The motor's electrical RPM",
+        "Rotor position in degrees",
+        "A command to change direction"
       ],
       "answer": 1,
-      "explain": "ESC отвечает eRPM; это вход RPM-фильтра и notch по ESC."
+      "explain": "The ESC replies with eRPM; it's the input for the RPM filter and the ESC-driven notch."
     },
     {
-      "q": "Мотор 14 полюсов, ESC сообщает 70 000 eRPM. Механические обороты?",
+      "q": "A 14-pole motor, the ESC reports 70,000 eRPM. Mechanical RPM?",
       "options": [
-        "70 000 об/мин",
-        "5 000 об/мин",
-        "10 000 об/мин",
-        "140 000 об/мин"
+        "70,000 RPM",
+        "5,000 RPM",
+        "10,000 RPM",
+        "140,000 RPM"
       ],
       "answer": 2,
-      "explain": "Обороты = eRPM / (полюса / 2) = 70 000 / 7 = 10 000 об/мин."
+      "explain": "RPM = eRPM / (poles / 2) = 70,000 / 7 = 10,000 RPM."
     },
     {
-      "q": "Что добавляет EDT к ответам DShot?",
+      "q": "What does EDT add to the DShot replies?",
       "options": [
-        "Шифрование канала полётник → ESC целиком",
-        "Вторую частоту ШИМ",
-        "Автоматическую калибровку газа",
-        "Температуру, напряжение, ток ESC"
+        "Encryption of the whole flight controller → ESC link",
+        "A second PWM frequency",
+        "Automatic throttle calibration",
+        "ESC temperature, voltage, current"
       ],
       "answer": 3,
-      "explain": "Extended DShot Telemetry передаёт статус ESC без отдельного провода."
+      "explain": "Extended DShot Telemetry sends the ESC status without a separate wire."
     },
     {
-      "q": "Чем рискуете, прошивая ESC с чужим таргетом?",
+      "q": "What do you risk by flashing an ESC with the wrong target?",
       "options": [
-        "Только сбросом мелодии старта",
-        "Сменой направления вращения",
-        "Неработой или сгоревшими ключами",
-        "Потерей bidir DShot до перезагрузки"
+        "Only a reset of the startup melody",
+        "A change of rotation direction",
+        "It not working or burned MOSFETs",
+        "Losing bidir DShot until a reboot"
       ],
       "answer": 2,
-      "explain": "Таргет описывает конкретную плату; неверный может вывести ESC из строя."
+      "explain": "The target describes a specific board; a wrong one can kill the ESC."
     },
     {
-      "q": "Мотор дёргается и встаёт на резком газе. Что первым крутить в ESC?",
+      "q": "The motor twitches and stops on sharp throttle. What do you adjust first in the ESC?",
       "options": [
-        "Демагнитизацию, затем тайминг",
-        "Мелодию старта",
-        "Частоту ШИМ до максимума",
-        "Направление вращения"
+        "Demagnetization, then timing",
+        "The startup melody",
+        "PWM frequency to the maximum",
+        "Rotation direction"
       ],
       "answer": 0,
-      "explain": "Это срыв синхронизации; лечится повышением demag compensation и снижением тайминга."
+      "explain": "It's a loss of sync; the fix is raising demag compensation and lowering the timing."
     },
     {
-      "q": "Почему passthrough в ArduPilot не работает на выходах MAIN?",
+      "q": "Why doesn't passthrough work on the MAIN outputs in ArduPilot?",
       "options": [
-        "MAIN не поддерживают DShot вовсе",
-        "MAIN работают только в MAVLink 1",
-        "Для MAIN нужен BLHeliSuite32",
-        "Это выходы IOMCU, нужны FMU/AUX"
+        "MAIN doesn't support DShot at all",
+        "MAIN only works in MAVLink 1",
+        "MAIN needs BLHeliSuite32",
+        "They're IOMCU outputs, you need FMU/AUX"
       ],
       "answer": 3,
-      "explain": "Выходы сопроцессора IOMCU не прокидывают сигнал; используйте FMU/AUX."
+      "explain": "The IOMCU coprocessor outputs don't pass the signal through; use FMU/AUX."
     },
     {
-      "q": "Что изменилось с BLHeli_32 в 2024 году?",
+      "q": "What changed with BLHeli_32 in 2024?",
       "options": [
-        "Её открыли под лицензией GPL",
-        "Разработку и поддержку прекратили",
-        "Её встроили в Betaflight",
-        "Она стала платной подпиской"
+        "It was open-sourced under the GPL",
+        "Development and support ended",
+        "It was built into Betaflight",
+        "It became a paid subscription"
       ],
       "answer": 1,
-      "explain": "BLHeli_32 больше не развивается; на ARM-регуляторах с таргетом есть открытая замена — AM32."
+      "explain": "BLHeli_32 is no longer developed; for ARM ESCs with a target there's an open-source replacement, AM32."
     }
   ]
 }

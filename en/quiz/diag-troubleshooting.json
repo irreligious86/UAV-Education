@@ -3,92 +3,92 @@
   "pass": 80,
   "questions": [
     {
-      "q": "С чего начинать, если дрон не армится в Betaflight?",
+      "q": "Where do you start if the drone won't arm in Betaflight?",
       "options": [
-        "С перепайки приёмника",
-        "С команды status в CLI",
-        "С замены полётника",
-        "С перепрошивки на последнюю версию"
+        "Resoldering the receiver",
+        "The status command in the CLI",
+        "Replacing the flight controller",
+        "Flashing the latest version"
       ],
       "answer": 1,
-      "explain": "status показывает Arming disable flags — прошивка сама называет причину."
+      "explain": "status shows the Arming disable flags — the firmware names the cause itself."
     },
     {
-      "q": "Флаг RXLOSS означает:",
+      "q": "The RXLOSS flag means:",
       "options": [
-        "Низкое напряжение",
-        "Нет каналов от приёмника",
-        "Открыто меню OSD во время арма",
-        "Наклон аппарата"
+        "Low voltage",
+        "No channels from the receiver",
+        "The OSD menu is open during arming",
+        "The vehicle is tilted"
       ],
       "answer": 1,
-      "explain": "Проверять порт, протокол и инверсию, бинд и 5 В на приёмнике."
+      "explain": "Check the port, protocol and inversion, the bind and 5 V at the receiver."
     },
     {
-      "q": "Один мотор не крутится. Первый дешёвый шаг?",
+      "q": "One motor doesn't spin. What's the first cheap step?",
       "options": [
-        "Купить новый мотор",
-        "Поменять сигнальные провода",
-        "Сменить раму",
-        "Перепрошить ESC и откалибровать газ"
+        "Buy a new motor",
+        "Swap the signal wires",
+        "Change the frame",
+        "Reflash the ESC and calibrate the throttle"
       ],
       "answer": 1,
-      "explain": "Поменять местами с работающим мотором: проблема ушла с проводом — сигнал/пад FC; осталась — ESC/мотор."
+      "explain": "Swap with a working motor: if the problem moved with the wire — it's the signal/FC pad; if it stayed — it's the ESC/motor."
     },
     {
-      "q": "Лампа smoke stopper горит ярко, борт не включается:",
+      "q": "The smoke stopper bulb glows brightly, the vehicle doesn't power up:",
       "options": [
-        "АКБ разряжена ниже порога BEC",
-        "Короткое замыкание",
-        "Лампа сломана",
-        "Это норма"
+        "The battery is discharged below the BEC threshold",
+        "A short circuit",
+        "The bulb is broken",
+        "That's normal"
       ],
       "answer": 1,
-      "explain": "Отключать потребители по одному: где лампа гаснет — там КЗ."
+      "explain": "Disconnect the loads one at a time: where the bulb goes out — that's the short."
     },
     {
-      "q": "Трясёт выше 70% газа. Первое действие?",
+      "q": "It shakes above 70% throttle. What's the first action?",
       "options": [
-        "Снизить P на всех осях на 20 %",
-        "Записать Blackbox и спектр",
-        "Поменять пропы",
-        "Перепрошить"
+        "Reduce P on all axes by 20 %",
+        "Record a Blackbox log and the spectrum",
+        "Change the props",
+        "Reflash"
       ],
       "answer": 1,
-      "explain": "Без лога — угадывание; спектр отличает механику, фильтрацию и резонанс."
+      "explain": "Without a log you're guessing; the spectrum distinguishes mechanics, filtering and resonance."
     },
     {
-      "q": "Признак ESC desync в логе:",
+      "q": "The sign of an ESC desync in the log:",
       "options": [
-        "Падение LQ в момент рывка газа",
-        "Провал eRPM одного мотора",
-        "Рост VBAT",
-        "Нагрев барометра"
+        "An LQ drop at the moment of a throttle punch",
+        "An eRPM dip on one motor",
+        "VBAT rising",
+        "The barometer heating up"
       ],
       "answer": 1,
-      "explain": "Внезапный провал eRPM одного мотора с рывком: настройки ESC, DShot, фазы."
+      "explain": "A sudden eRPM dip on one motor with a jerk: ESC settings, DShot, phases."
     },
     {
-      "q": "Правило «одно изменение — одна проверка» нужно, чтобы:",
+      "q": "The “one change — one test” rule is needed in order to:",
       "options": [
-        "Экономить время",
-        "Знать, что помогло",
-        "Не трогать CLI лишний раз между полётами",
-        "Беречь паяльник"
+        "Save time",
+        "Know what helped",
+        "Avoid touching the CLI unnecessarily between flights",
+        "Spare the soldering iron"
       ],
       "answer": 1,
-      "explain": "Два изменения сразу — причина не установлена."
+      "explain": "Two changes at once — the cause isn't established."
     },
     {
-      "q": "Флаг ANGLE при арме в Betaflight означает:",
+      "q": "The ANGLE flag when arming in Betaflight means:",
       "options": [
-        "Аппарат наклонён больше small_angle",
-        "Не откалиброван гироскоп",
-        "Газ выше минимума",
-        "Нет сигнала приёмника"
+        "The vehicle is tilted more than small_angle",
+        "The gyro isn't calibrated",
+        "Throttle is above minimum",
+        "No receiver signal"
       ],
       "answer": 0,
-      "explain": "ANGLE — наклон больше small_angle: поставить ровно или откалибровать акселерометр."
+      "explain": "ANGLE means a tilt greater than small_angle: set it level or calibrate the accelerometer."
     }
   ]
 }

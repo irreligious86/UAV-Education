@@ -1,0 +1,94 @@
+{
+  "module": "est-alt-sources",
+  "pass": 80,
+  "questions": [
+    {
+      "q": "How much does barometric altitude change for a 1 hPa change in pressure near the ground?",
+      "options": [
+        "0.8 m",
+        "8.4 m",
+        "84 m",
+        "1 m"
+      ],
+      "answer": 1,
+      "explain": "Δh ≈ −8.4 m/hPa."
+    },
+    {
+      "q": "Why does the baro “sag” on takeoff?",
+      "options": [
+        "Temperature",
+        "Pressure from prop wash",
+        "The sensor heating up from the ESC",
+        "Satellites"
+      ],
+      "answer": 1,
+      "explain": "Foam, relocating the baro, a rangefinder near the ground."
+    },
+    {
+      "q": "Why does optical flow need a rangefinder?",
+      "options": [
+        "For landing",
+        "To convert flow into m/s",
+        "It doesn't",
+        "For the compass and heading"
+      ],
+      "answer": 1,
+      "explain": "v = (flow − ω)·h: without height, flow only gives an angular quantity."
+    },
+    {
+      "q": "Which EK3_SRC1_VELXY value enables optical flow?",
+      "options": [
+        "3",
+        "5",
+        "6",
+        "0"
+      ],
+      "answer": 1,
+      "explain": "5 = OpticalFlow; POSXY is 0 in that case."
+    },
+    {
+      "q": "What does EK3_SRC1_POSZ = 2 mean?",
+      "options": [
+        "Barometer",
+        "Rangefinder",
+        "GPS",
+        "External navigation"
+      ],
+      "answer": 1,
+      "explain": "1 — Baro, 2 — RangeFinder, 3 — GPS."
+    },
+    {
+      "q": "Over tall grass a rangefinder shows:",
+      "options": [
+        "An error caused by multiple reflections",
+        "The top of the grass",
+        "The ground",
+        "Max range"
+      ],
+      "answer": 1,
+      "explain": "A lidar measures to the first reflecting surface."
+    },
+    {
+      "q": "Dynamic pressure at 20 m/s is roughly:",
+      "options": [
+        "2.4 hPa, about 20 m of baro error",
+        "0.1 hPa, negligible",
+        "24 hPa, about 200 m",
+        "Zero: the baro doesn't depend on airspeed"
+      ],
+      "answer": 0,
+      "explain": "½ρv² ≈ 245 Pa ≈ 2.4 hPa; at ~8 m/hPa that's about 20 m."
+    },
+    {
+      "q": "Which rangefinder works reliably over water, in dust and fog at heights of tens of meters?",
+      "options": [
+        "MaxBotix ultrasonic",
+        "Optical flow without a rangefinder",
+        "IR proximity sensor",
+        "60 GHz radar"
+      ],
+      "answer": 3,
+      "explain": "Radar isn't bothered by water, dust, fog or lighting and reaches tens of meters; a lidar loses its return over water and in dust, ultrasonic is limited to 5–7 m and gets noisy from props and wind."
+    }
+  ]
+}

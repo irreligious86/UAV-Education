@@ -1,0 +1,94 @@
+{
+  "module": "rf-link-budget",
+  "pass": 80,
+  "questions": [
+    {
+      "q": "What is 27 dBm in milliwatts?",
+      "options": [
+        "27 mW",
+        "100 mW",
+        "500 mW",
+        "1000 mW"
+      ],
+      "answer": 2,
+      "explain": "30 dBm = 1 W, −3 dB is half: 500 mW."
+    },
+    {
+      "q": "By how many dB does FSPL grow when the range doubles?",
+      "options": [
+        "3",
+        "6",
+        "10",
+        "20"
+      ],
+      "answer": 1,
+      "explain": "20·log₁₀(2) ≈ 6 dB."
+    },
+    {
+      "q": "Going from 915 MHz to 2.4 GHz at the same range costs roughly:",
+      "options": [
+        "2 dB",
+        "8.4 dB",
+        "20 dB",
+        "Nothing"
+      ],
+      "answer": 1,
+      "explain": "20·log₁₀(2400/915) ≈ 8.4 dB."
+    },
+    {
+      "q": "The minimum sensible link budget margin for a reliable link:",
+      "options": [
+        "3 dB — a twofold margin",
+        "3 dB",
+        "10–15 dB",
+        "40 dB"
+      ],
+      "answer": 2,
+      "explain": "Fading and multipath easily eat 10 dB."
+    },
+    {
+      "q": "ELRS 2.4 GHz sensitivity in 250 Hz mode:",
+      "options": [
+        "−115 dBm",
+        "−108 dBm",
+        "−105 dBm",
+        "−90 dBm"
+      ],
+      "answer": 1,
+      "explain": "From the ELRS mode table; 50 Hz is −115, 500 Hz is −105."
+    },
+    {
+      "q": "Where should you set the RSSI warning?",
+      "options": [
+        "At the sensitivity level",
+        "8–10 dB above it",
+        "At −50 dBm",
+        "It's not needed"
+      ],
+      "answer": 1,
+      "explain": "A margin to turn back before the link is lost."
+    },
+    {
+      "q": "What usually limits range first?",
+      "options": [
+        "900 MHz RC",
+        "5.8 GHz video",
+        "868 MHz telemetry",
+        "GPS"
+      ],
+      "answer": 1,
+      "explain": "High frequency and the low sensitivity of an analog receiver."
+    },
+    {
+      "q": "Why is the real range shorter than the free-space calculation?",
+      "options": [
+        "Ground, the Fresnel zone, the airframe and antenna orientation",
+        "FSPL grows linearly with frequency",
+        "Decibels only add up in a vacuum",
+        "The calculation ignores transmitter power"
+      ],
+      "answer": 0,
+      "explain": "The calculation is an optimistic bound; the field adds losses, usually 5–10 dB."
+    }
+  ]
+}

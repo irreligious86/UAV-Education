@@ -3,62 +3,62 @@
   "pass": 80,
   "questions": [
     {
-      "q": "Усиление Калмана K стремится к 1, когда:",
+      "q": "The Kalman gain K tends to 1 when:",
       "options": [
-        "Измерение точнее предсказания",
-        "Всегда",
-        "Измерений нет",
-        "Модель процесса точна и шум мал"
+        "The measurement is more accurate than the prediction",
+        "Always",
+        "There are no measurements",
+        "The process model is accurate and the noise is small"
       ],
       "answer": 0,
-      "explain": "K = P⁻/(P⁻+R): малое R → доверие измерению."
+      "explain": "K = P⁻/(P⁻+R): small R → trust the measurement."
     },
     {
-      "q": "Что такое инновация?",
+      "q": "What is an innovation?",
       "options": [
-        "Новый параметр",
-        "Измерение минус предсказание",
-        "Ковариация",
-        "Шум процесса на шаге предсказания"
+        "A new parameter",
+        "Measurement minus prediction",
+        "Covariance",
+        "Process noise at the prediction step"
       ],
       "answer": 1,
       "explain": "y = z − h(x⁻)."
     },
     {
-      "q": "Что происходит при XKF4.SP > 1 в ArduPilot?",
+      "q": "What happens when XKF4.SP > 1 in ArduPilot?",
       "options": [
-        "Позиция принята",
-        "Позиция отброшена воротами",
-        "EKF сброшен и переинициализирован",
-        "GPS потерян"
+        "Position is accepted",
+        "Position is rejected by the gate",
+        "The EKF is reset and reinitialized",
+        "GPS is lost"
       ],
       "answer": 1,
-      "explain": "SP — квадрат отношения инновации к допустимой; >1 — отклонено."
+      "explain": "SP is the square of the ratio of the innovation to the allowed one; >1 means rejected."
     },
     {
-      "q": "Что делает длинный (10 с) выброс барометра с 1D-фильтром с воротами?",
+      "q": "What does a long (10 s) barometer outlier do to a 1D filter with gates?",
       "options": [
-        "Ворота расширяются и пропускают всё",
-        "Сначала отброшен, потом «уплывает»",
-        "Фильтр останавливается",
-        "Ничего"
+        "The gates widen and let everything through",
+        "At first it is rejected, then the filter “drifts away”",
+        "The filter stops",
+        "Nothing"
       ],
       "answer": 1,
-      "explain": "Ворота защищают от коротких выбросов, не от систематической ошибки."
+      "explain": "Gates protect against short outliers, not against a systematic error."
     },
     {
-      "q": "Что такое lane в EKF3?",
+      "q": "What is a lane in EKF3?",
       "options": [
-        "Тип GPS",
-        "Ядро EKF на свой IMU",
-        "Режим полёта",
-        "Полоса частот фильтра гироскопа"
+        "A GPS type",
+        "An EKF core running on its own IMU",
+        "A flight mode",
+        "The frequency band of the gyro filter"
       ],
       "answer": 1,
-      "explain": "XKF4.PI — индекс активного ядра."
+      "explain": "XKF4.PI is the index of the active core."
     },
     {
-      "q": "Сколько состояний у EKF3?",
+      "q": "How many states does EKF3 have?",
       "options": [
         "4",
         "12",
@@ -66,29 +66,29 @@
         "48"
       ],
       "answer": 2,
-      "explain": "Кватернион, скорость, позиция, bias гиро и accel, поле Земли и борта, ветер."
+      "explain": "Quaternion, velocity, position, gyro and accel bias, Earth and body field, wind."
     },
     {
-      "q": "Что значит большой R для измерения?",
+      "q": "What does a large R for a measurement mean?",
       "options": [
-        "Фильтр слепо следует за датчиком",
-        "Модель считается неточной",
-        "Шаг фильтра увеличивается",
-        "Фильтр меньше доверяет этому датчику"
+        "The filter blindly follows the sensor",
+        "The model is considered inaccurate",
+        "The filter step gets larger",
+        "The filter trusts this sensor less"
       ],
       "answer": 3,
-      "explain": "R — дисперсия шума измерения: чем больше, тем меньше K и вес измерения."
+      "explain": "R is the measurement noise variance: the larger it is, the smaller K and the measurement's weight."
     },
     {
-      "q": "Зачем EKF учитывает задержку датчиков?",
+      "q": "Why does the EKF account for sensor delay?",
       "options": [
-        "Чтобы реже вызывать прошивку",
-        "Чтобы уменьшить число состояний",
-        "Задержки EKF не учитывает",
-        "Измерение относится к прошлому моменту, а не к текущему"
+        "To call the firmware less often",
+        "To reduce the number of states",
+        "The EKF does not account for delays",
+        "The measurement refers to a past moment, not the current one"
       ],
       "answer": 3,
-      "explain": "Фильтр сопоставляет измерение с состоянием на момент измерения, иначе вносит ошибку."
+      "explain": "The filter matches the measurement with the state at the time of the measurement; otherwise it introduces an error."
     }
   ]
 }

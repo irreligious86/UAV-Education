@@ -1,0 +1,94 @@
+{
+  "module": "est-gnss",
+  "pass": 80,
+  "questions": [
+    {
+      "q": "The minimum number of satellites for a position solution:",
+      "options": [
+        "1",
+        "3",
+        "4",
+        "8"
+      ],
+      "answer": 2,
+      "explain": "Four unknowns: x, y, z and the clock error."
+    },
+    {
+      "q": "What is HDOP?",
+      "options": [
+        "Position accuracy in meters",
+        "An error multiplier from geometry",
+        "Satellite count",
+        "Update rate"
+      ],
+      "answer": 1,
+      "explain": "All satellites on one side of the sky means a large DOP."
+    },
+    {
+      "q": "What is more accurate from a GPS receiver?",
+      "options": [
+        "Position",
+        "Velocity",
+        "Altitude",
+        "Heading in a hover"
+      ],
+      "answer": 1,
+      "explain": "Doppler velocity: 0.05–0.2 m/s versus 1.5–3 m for position."
+    },
+    {
+      "q": "Which u-blox dynamic model suits a drone?",
+      "options": [
+        "Automotive with a 4g limit",
+        "Pedestrian",
+        "Airborne <2g/4g",
+        "Stationary"
+      ],
+      "answer": 2,
+      "explain": "The pedestrian/automotive models smooth and lag."
+    },
+    {
+      "q": "What does RTK give you?",
+      "options": [
+        "Protection against jamming and spoofing",
+        "Centimeters from the carrier phase",
+        "More satellites",
+        "Operation under a roof"
+      ],
+      "answer": 1,
+      "explain": "You need a dual-frequency receiver, a base and an RTCM stream."
+    },
+    {
+      "q": "The main technique against multipath from the frame:",
+      "options": [
+        "More power",
+        "A higher antenna, a ground plane",
+        "A 25 Hz rate",
+        "Turn off GLONASS and keep GPS only"
+      ],
+      "answer": 1,
+      "explain": "Reflections from the frame and the ground are the main source of jumps."
+    },
+    {
+      "q": "What GPS rate is reasonable for a copter in ArduPilot?",
+      "options": [
+        "5 Hz (GPS1_RATE_MS = 200; before 4.6 — GPS_RATE_MS)",
+        "1 Hz — saves traffic and less load on the UART",
+        "50 Hz — the more often, the better",
+        "The rate doesn't matter to the EKF"
+      ],
+      "answer": 0,
+      "explain": "5–10 Hz is enough; the EKF gains nothing above that, while the UART and the receiver get loaded."
+    },
+    {
+      "q": "Why is UBX better than NMEA for an autopilot?",
+      "options": [
+        "Every ground station and radio understands it without setup",
+        "It carries the camera video",
+        "NMEA can't do coordinates",
+        "It's binary, more compact and has quality status"
+      ],
+      "answer": 3,
+      "explain": "UBX is more compact and carries accuracy and status fields that NMEA lacks or has only partially."
+    }
+  ]
+}

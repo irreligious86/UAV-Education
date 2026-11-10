@@ -1,0 +1,41 @@
+{
+ "module": "f-esc-firmware",
+ "tasks": [
+  {
+   "id": "rpm",
+   "title": "eRPM to RPM",
+   "statement": "The ESC reports **{e} eRPM**, the motor has **{p} poles**. Find the mechanical RPM.",
+   "params": {
+    "e": {
+     "min": 20000,
+     "max": 180000,
+     "step": 5000
+    },
+    "p": [
+     12,
+     14
+    ]
+   },
+   "answer": "e/(p/2)",
+   "unit": "rpm",
+   "tol": 0.01,
+   "solution": "RPM = eRPM / (poles / 2)."
+  },
+  {
+   "id": "hz",
+   "title": "Motor frequency for the filter",
+   "statement": "The motor spins at **{rpm} RPM**. Find the fundamental harmonic frequency (Hz).",
+   "params": {
+    "rpm": {
+     "min": 3000,
+     "max": 30000,
+     "step": 500
+    }
+   },
+   "answer": "rpm/60",
+   "unit": "Hz",
+   "tol": 0.01,
+   "solution": "f = RPM / 60."
+  }
+ ]
+}

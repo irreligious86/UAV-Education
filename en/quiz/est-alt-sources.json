@@ -3,40 +3,40 @@
   "pass": 80,
   "questions": [
     {
-      "q": "На сколько меняется высота по барометру при изменении давления на 1 гПа у земли?",
+      "q": "How much does barometric altitude change for a 1 hPa change in pressure near the ground?",
       "options": [
-        "0.8 м",
-        "8.4 м",
-        "84 м",
-        "1 м"
+        "0.8 m",
+        "8.4 m",
+        "84 m",
+        "1 m"
       ],
       "answer": 1,
-      "explain": "Δh ≈ −8.4 м/гПа."
+      "explain": "Δh ≈ −8.4 m/hPa."
     },
     {
-      "q": "Почему баро «проседает» на взлёте?",
+      "q": "Why does the baro “sag” on takeoff?",
       "options": [
-        "Температура",
-        "Давление от пропвоша",
-        "Нагрев датчика от регулятора",
-        "Спутники"
+        "Temperature",
+        "Pressure from prop wash",
+        "The sensor heating up from the ESC",
+        "Satellites"
       ],
       "answer": 1,
-      "explain": "Поролон, перенос баро, дальномер у земли."
+      "explain": "Foam, relocating the baro, a rangefinder near the ground."
     },
     {
-      "q": "Зачем оптическому потоку дальномер?",
+      "q": "Why does optical flow need a rangefinder?",
       "options": [
-        "Для посадки",
-        "Чтобы перевести поток в м/с",
-        "Не нужен",
-        "Для компаса и курса"
+        "For landing",
+        "To convert flow into m/s",
+        "It doesn't",
+        "For the compass and heading"
       ],
       "answer": 1,
-      "explain": "v = (flow − ω)·h: без высоты поток даёт только угловую величину."
+      "explain": "v = (flow − ω)·h: without height, flow only gives an angular quantity."
     },
     {
-      "q": "Какой EK3_SRC1_VELXY включает оптический поток?",
+      "q": "Which EK3_SRC1_VELXY value enables optical flow?",
       "options": [
         "3",
         "5",
@@ -44,51 +44,51 @@
         "0"
       ],
       "answer": 1,
-      "explain": "5 = OpticalFlow; POSXY при этом 0."
+      "explain": "5 = OpticalFlow; POSXY is 0 in that case."
     },
     {
-      "q": "Что означает EK3_SRC1_POSZ = 2?",
+      "q": "What does EK3_SRC1_POSZ = 2 mean?",
       "options": [
-        "Барометр",
-        "Дальномер",
+        "Barometer",
+        "Rangefinder",
         "GPS",
-        "Внешняя навигация"
+        "External navigation"
       ],
       "answer": 1,
       "explain": "1 — Baro, 2 — RangeFinder, 3 — GPS."
     },
     {
-      "q": "Над высокой травой дальномер показывает:",
+      "q": "Over tall grass a rangefinder shows:",
       "options": [
-        "Ошибку из-за переотражений",
-        "Верх травы",
-        "Землю",
-        "Максимум"
+        "An error caused by multiple reflections",
+        "The top of the grass",
+        "The ground",
+        "Max range"
       ],
       "answer": 1,
-      "explain": "Лидар меряет до первой отражающей поверхности."
+      "explain": "A lidar measures to the first reflecting surface."
     },
     {
-      "q": "Динамическое давление на 20 м/с примерно:",
+      "q": "Dynamic pressure at 20 m/s is roughly:",
       "options": [
-        "2.4 гПа, около 20 м ошибки баро",
-        "0.1 гПа, пренебрежимо",
-        "24 гПа, около 200 м",
-        "Ноль: баро от скорости не зависит"
+        "2.4 hPa, about 20 m of baro error",
+        "0.1 hPa, negligible",
+        "24 hPa, about 200 m",
+        "Zero: the baro doesn't depend on airspeed"
       ],
       "answer": 0,
-      "explain": "½ρv² ≈ 245 Па ≈ 2.4 гПа; при ~8 м/гПа это около 20 м."
+      "explain": "½ρv² ≈ 245 Pa ≈ 2.4 hPa; at ~8 m/hPa that's about 20 m."
     },
     {
-      "q": "Какой дальномер надёжно работает над водой, в пыли и тумане на высотах в десятки метров?",
+      "q": "Which rangefinder works reliably over water, in dust and fog at heights of tens of meters?",
       "options": [
-        "Ультразвуковой MaxBotix",
-        "Оптический поток без дальномера",
-        "ИК-датчик приближения",
-        "Радар 60 ГГц"
+        "MaxBotix ultrasonic",
+        "Optical flow without a rangefinder",
+        "IR proximity sensor",
+        "60 GHz radar"
       ],
       "answer": 3,
-      "explain": "Радар не боится воды, пыли, тумана и освещения и берёт десятки метров; лидар над водой и в пыли теряет отражение, ультразвук ограничен 5–7 м и шумит от пропов и ветра."
+      "explain": "Radar isn't bothered by water, dust, fog or lighting and reaches tens of meters; a lidar loses its return over water and in dust, ultrasonic is limited to 5–7 m and gets noisy from props and wind."
     }
   ]
 }

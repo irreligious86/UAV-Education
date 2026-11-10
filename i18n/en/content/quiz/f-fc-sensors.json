@@ -1,0 +1,94 @@
+{
+  "module": "f-fc-sensors",
+  "pass": 80,
+  "questions": [
+    {
+      "q": "Which sensor is the main one for stabilization?",
+      "options": [
+        "GPS",
+        "Barometer",
+        "Gyroscope",
+        "Compass"
+      ],
+      "answer": 2,
+      "explain": "The gyro provides angular rate thousands of times a second; the whole stabilization loop runs on it."
+    },
+    {
+      "q": "Why is the compass mounted on a mast together with the GPS?",
+      "options": [
+        "For looks",
+        "To keep it away from the field of the power wires",
+        "So it picks up GPS satellites better together",
+        "So it doesn't get in the way of the props"
+      ],
+      "answer": 1,
+      "explain": "The compass measures the Earth's magnetic field; current in the power wires creates its own field and distorts the heading."
+    },
+    {
+      "q": "How does F4 differ from F7 when connecting SBUS?",
+      "options": [
+        "F4 is faster",
+        "F4 doesn't invert UARTs",
+        "No difference",
+        "F7 can't do SBUS without an adapter"
+      ],
+      "answer": 1,
+      "explain": "The STM32F4 can't invert a UART input in software, so SBUS only works on it through a hardware inverter on a dedicated pad."
+    },
+    {
+      "q": "Why do you cover the barometer with foam?",
+      "options": [
+        "Against dust and water splashes",
+        "Against prop wash and light",
+        "For warmth",
+        "Against water"
+      ],
+      "answer": 1,
+      "explain": "Airflow and sunlight distort the pressure. Foam smooths it out, and the baro altitude stops jumping."
+    },
+    {
+      "q": "How are UART devices connected?",
+      "options": [
+        "Through I2C",
+        "TX to RX, RX to TX, GND",
+        "With a single wire only",
+        "TX to TX, RX to RX and a common positive"
+      ],
+      "answer": 1,
+      "explain": "One side's transmitter goes to the other side's receiver. Without a common GND the signal has no reference level."
+    },
+    {
+      "q": "The model in the configurator rotates the wrong way. What do you do?",
+      "options": [
+        "Resolder the gyro",
+        "Set board alignment",
+        "Recalibrate the ESCs and the accelerometer",
+        "Change the firmware"
+      ],
+      "answer": 1,
+      "explain": "If the board is mounted rotated, you have to tell the firmware with the orientation parameter."
+    },
+    {
+      "q": "Why doesn't an SBUS receiver work on an arbitrary UART of an F405?",
+      "options": [
+        "Wrong speed",
+        "No inversion on F4",
+        "SBUS needs 5 V power",
+        "SBUS requires I2C"
+      ],
+      "answer": 1,
+      "explain": "F4 has no software inversion, so you need a port with a hardware inverter; F7/H7 invert any port."
+    },
+    {
+      "q": "What is softserial?",
+      "options": [
+        "CRSF mode over a single wire",
+        "A UART on GPIO, slow",
+        "An ESC protocol",
+        "A second USB"
+      ],
+      "answer": 1,
+      "explain": "A UART emulated on GPIO: up to 115200, loads the CPU; for SmartAudio and non-critical things, not for the receiver."
+    }
+  ]
+}

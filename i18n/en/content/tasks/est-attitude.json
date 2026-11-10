@@ -1,0 +1,28 @@
+{
+ "module": "est-attitude",
+ "tasks": [
+  {
+   "id": "drift",
+   "title": "Heading drift without a compass",
+   "statement": "The gyro bias on the yaw axis is **{w} °/s**. How far will the heading drift (°) in **{t} min** if nothing corrects it?",
+   "params": {
+    "w": [
+     0.05,
+     0.1,
+     0.2,
+     0.5,
+     1.0
+    ],
+    "t": {
+     "min": 1,
+     "max": 10,
+     "step": 1
+    }
+   },
+   "answer": "w*t*60",
+   "unit": "°",
+   "tol": 0.01,
+   "solution": "Heading error = bias · time."
+  }
+ ]
+}

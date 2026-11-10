@@ -1,0 +1,67 @@
+{
+ "module": "ops-weather",
+ "tasks": [
+  {
+   "id": "wind",
+   "title": "Wind at altitude",
+   "statement": "At the weather station (10 m) the wind is **{v} m/s**, open terrain (α = 1/7). What will the mean wind be at **{h} m**?",
+   "params": {
+    "v": {
+     "min": 3,
+     "max": 12,
+     "step": 1
+    },
+    "h": [
+     30,
+     50,
+     80,
+     100,
+     120,
+     150
+    ]
+   },
+   "answer": "v*(h/10)**(1/7)",
+   "unit": "m/s",
+   "tol": 0.03,
+   "solution": "v(h) = v₁₀·(h/10)^α, α ≈ 1/7."
+  },
+  {
+   "id": "da",
+   "title": "Density altitude",
+   "statement": "A site at **{e} m**, temperature **{tc} °C**. Estimate the density altitude (ISA: 15 °C at sea level, −6.5 °C/km; ≈ 36.6 m for every °C of deviation).",
+   "params": {
+    "e": {
+     "min": 0,
+     "max": 3000,
+     "step": 100
+    },
+    "tc": {
+     "min": -10,
+     "max": 40,
+     "step": 1
+    }
+   },
+   "answer": "e+36.6*(tc-(15-6.5*e/1000))",
+   "unit": "m",
+   "tol": 0.03,
+   "solution": "DA ≈ h + 36.6·(T − T_ISA(h)), T_ISA = 15 − 6.5·h/1000.",
+   "abs": 15
+  },
+  {
+   "id": "hover",
+   "title": "Hover power at altitude",
+   "statement": "Air density is **{r} %** of sea level. What power is needed to hover the same mass, as a percentage of the power at sea level?",
+   "params": {
+    "r": {
+     "min": 65,
+     "max": 100,
+     "step": 1
+    }
+   },
+   "answer": "100*math.sqrt(100/r)",
+   "unit": "%",
+   "tol": 0.03,
+   "solution": "P ∝ 1/√ρ: P/P₀ = √(ρ₀/ρ)."
+  }
+ ]
+}

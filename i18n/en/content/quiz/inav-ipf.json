@@ -1,0 +1,94 @@
+{
+  "module": "inav-ipf",
+  "pass": 80,
+  "questions": [
+    {
+      "q": "What does an IPF logic condition consist of?",
+      "options": [
+        "A mission",
+        "An operation, operands, an activator",
+        "A mission line with a condition",
+        "A Lua function with parameters"
+      ],
+      "answer": 1,
+      "explain": "One line is one command."
+    },
+    {
+      "q": "What is an activator?",
+      "options": [
+        "The number of a logic rule in the mission list",
+        "Another condition that is true",
+        "A GVAR",
+        "A timer that starts the rule"
+      ],
+      "answer": 1,
+      "explain": "−1 means “always”."
+    },
+    {
+      "q": "GVAR range?",
+      "options": [
+        "0–255, like a byte",
+        "−32768…32767",
+        "0–100",
+        "Anything"
+      ],
+      "answer": 1,
+      "explain": "16-bit integers."
+    },
+    {
+      "q": "To write to GVAR 1, operand A must be…",
+      "options": [
+        "Global Variable 1",
+        "Value 1",
+        "RC channel 1",
+        "Flight param 1"
+      ],
+      "answer": 1,
+      "explain": "The index is specified as a Value; “Global Variable 1” means the value stored in GVAR 1."
+    },
+    {
+      "q": "When is it better to replace IPF with Lua/ArduPilot?",
+      "options": [
+        "Whenever a GPS is connected",
+        "When there are dozens of rules",
+        "Never",
+        "Always"
+      ],
+      "answer": 1,
+      "explain": "IPF is rules without loops or functions."
+    },
+    {
+      "q": "Why can rules break after an INAV update?",
+      "options": [
+        "They get deleted",
+        "Operation numbers change",
+        "All GVARs are reset on flashing",
+        "No reason"
+      ],
+      "answer": 1,
+      "explain": "Check against the tables for your version."
+    },
+    {
+      "q": "Override RC channel in IPF conflicts with:",
+      "options": [
+        "GVAR",
+        "The real stick on the same channel",
+        "PID and OSD at the same time",
+        "OSD"
+      ],
+      "answer": 1,
+      "explain": "Better to use a virtual channel for modes."
+    },
+    {
+      "q": "What is a Programming PID in INAV?",
+      "options": [
+        "A configurable controller whose output is available to the logic",
+        "The rate-loop PID in the flight loop",
+        "PID autotune from Blackbox logs after a flight",
+        "A real-time ESC temperature controller based on DShot telemetry"
+      ],
+      "answer": 0,
+      "explain": "Four programmable PID controllers; their output can be used in logic conditions."
+    }
+  ]
+}

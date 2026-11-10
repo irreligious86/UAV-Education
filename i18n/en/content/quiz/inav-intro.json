@@ -1,0 +1,94 @@
+{
+  "module": "inav-intro",
+  "pass": 80,
+  "questions": [
+    {
+      "q": "How is INAV different from Betaflight?",
+      "options": [
+        "It runs only on H7 boards",
+        "It adds navigation and wings",
+        "OSD only",
+        "Only digital video support"
+      ],
+      "answer": 1,
+      "explain": "INAV is manual flight plus navigation on the same boards."
+    },
+    {
+      "q": "How do you arm INAV?",
+      "options": [
+        "With the sticks, as in old versions",
+        "Only with a switch",
+        "From the GCS",
+        "Automatically"
+      ],
+      "answer": 1,
+      "explain": "Stick arming was removed in INAV 2.2."
+    },
+    {
+      "q": "Why might INAV refuse to arm?",
+      "options": [
+        "High P and low motor KV",
+        "No fix or compass for navigation",
+        "An old configurator version",
+        "The OSD is open"
+      ],
+      "answer": 1,
+      "explain": "A safeguard: navigation modes without a fix are dangerous."
+    },
+    {
+      "q": "What is a safehome?",
+      "options": [
+        "Home Wi-Fi",
+        "An alternate landing point",
+        "The takeoff point at the first arm",
+        "A flight mode"
+      ],
+      "answer": 1,
+      "explain": "A predefined safe point that replaces home during RTH: up to 8 points, the nearest one within safehome_max_distance."
+    },
+    {
+      "q": "What does platform_type do?",
+      "options": [
+        "Receiver protocol and port",
+        "Aircraft type and mixer",
+        "Compass calibration",
+        "OSD color"
+      ],
+      "answer": 1,
+      "explain": "MULTIROTOR and AIRPLANE behave differently."
+    },
+    {
+      "q": "Which sensors does a multirotor need for RTH?",
+      "options": [
+        "GPS and a camera for optical flow",
+        "GPS, compass and barometer",
+        "Compass only",
+        "GPS only"
+      ],
+      "answer": 1,
+      "explain": "Heading from the compass, altitude from the baro, position from GPS."
+    },
+    {
+      "q": "What does INAV use to estimate position?",
+      "options": [
+        "A Kalman filter modeled on PX4's EKF2",
+        "A complementary estimator",
+        "EKF3, as in ArduPilot",
+        "GPS directly"
+      ],
+      "answer": 1,
+      "explain": "That's why GPS quality matters more than in ArduPilot."
+    },
+    {
+      "q": "How does INAV differ from ArduPilot in purpose?",
+      "options": [
+        "Navigation on a simple base that feels familiar after Betaflight, without companion computers and Lua",
+        "INAV has more modes and an EKF",
+        "INAV doesn't support GPS",
+        "ArduPilot only works on planes"
+      ],
+      "answer": 0,
+      "explain": "INAV is manual flight plus navigation; ArduPilot is a full-featured autopilot with an EKF, Lua and companion computers."
+    }
+  ]
+}

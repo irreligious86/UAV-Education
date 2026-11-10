@@ -3,40 +3,40 @@
   "pass": 80,
   "questions": [
     {
-      "q": "Из чего состоит логическое условие IPF?",
+      "q": "What does an IPF logic condition consist of?",
       "options": [
-        "Миссия",
-        "Операция, операнды, активатор",
-        "Строка миссии с условием",
-        "Lua-функция с параметрами"
+        "A mission",
+        "An operation, operands, an activator",
+        "A mission line with a condition",
+        "A Lua function with parameters"
       ],
       "answer": 1,
-      "explain": "Одна строка — одна команда."
+      "explain": "One line is one command."
     },
     {
-      "q": "Что такое активатор?",
+      "q": "What is an activator?",
       "options": [
-        "Номер логического правила в списке миссии",
-        "Другое условие, которое = true",
-        "GVAR",
-        "Таймер, запускающий правило"
+        "The number of a logic rule in the mission list",
+        "Another condition that is true",
+        "A GVAR",
+        "A timer that starts the rule"
       ],
       "answer": 1,
-      "explain": "−1 означает «всегда»."
+      "explain": "−1 means “always”."
     },
     {
-      "q": "Диапазон GVAR?",
+      "q": "GVAR range?",
       "options": [
-        "0–255, как байт",
+        "0–255, like a byte",
         "−32768…32767",
         "0–100",
-        "Любой"
+        "Anything"
       ],
       "answer": 1,
-      "explain": "Целые 16-битные."
+      "explain": "16-bit integers."
     },
     {
-      "q": "Чтобы записать в GVAR 1, операнд A должен быть…",
+      "q": "To write to GVAR 1, operand A must be…",
       "options": [
         "Global Variable 1",
         "Value 1",
@@ -44,51 +44,51 @@
         "Flight param 1"
       ],
       "answer": 1,
-      "explain": "Индекс задаётся как Value; «Global Variable 1» означает значение внутри GVAR 1."
+      "explain": "The index is specified as a Value; “Global Variable 1” means the value stored in GVAR 1."
     },
     {
-      "q": "Когда IPF лучше заменить на Lua/ArduPilot?",
+      "q": "When is it better to replace IPF with Lua/ArduPilot?",
       "options": [
-        "При любом подключённом GPS",
-        "Когда правил десятки",
-        "Никогда",
-        "Всегда"
+        "Whenever a GPS is connected",
+        "When there are dozens of rules",
+        "Never",
+        "Always"
       ],
       "answer": 1,
-      "explain": "IPF — правила без циклов и функций."
+      "explain": "IPF is rules without loops or functions."
     },
     {
-      "q": "Почему правила могут сломаться после обновления INAV?",
+      "q": "Why can rules break after an INAV update?",
       "options": [
-        "Они удаляются",
-        "Меняются номера операций",
-        "Сбрасываются все GVAR при прошивке",
-        "Нет причин"
+        "They get deleted",
+        "Operation numbers change",
+        "All GVARs are reset on flashing",
+        "No reason"
       ],
       "answer": 1,
-      "explain": "Сверять с таблицами своей версии."
+      "explain": "Check against the tables for your version."
     },
     {
-      "q": "Override RC channel в IPF конфликтует с:",
+      "q": "Override RC channel in IPF conflicts with:",
       "options": [
         "GVAR",
-        "Реальным стиком того же канала",
-        "PID и OSD одновременно",
+        "The real stick on the same channel",
+        "PID and OSD at the same time",
         "OSD"
       ],
       "answer": 1,
-      "explain": "Лучше виртуальный канал для режимов."
+      "explain": "Better to use a virtual channel for modes."
     },
     {
-      "q": "Что такое Programming PID в INAV?",
+      "q": "What is a Programming PID in INAV?",
       "options": [
-        "Настраиваемый регулятор, выход которого доступен в логике",
-        "PID контура угловых скоростей в полётном цикле",
-        "Автотюн PID по логам Blackbox после полёта",
-        "Регулятор температуры ESC по телеметрии DShot в реальном времени"
+        "A configurable controller whose output is available to the logic",
+        "The rate-loop PID in the flight loop",
+        "PID autotune from Blackbox logs after a flight",
+        "A real-time ESC temperature controller based on DShot telemetry"
       ],
       "answer": 0,
-      "explain": "Четыре программируемых PID-регулятора, их выход можно использовать в логических условиях."
+      "explain": "Four programmable PID controllers; their output can be used in logic conditions."
     }
   ]
 }

@@ -1,0 +1,94 @@
+{
+  "module": "f-esc-firmware",
+  "pass": 80,
+  "questions": [
+    {
+      "q": "Which firmware replaces BLHeli_S on 8-bit ESCs to get bidir DShot?",
+      "options": [
+        "Bluejay",
+        "AM32",
+        "BLHeli_32",
+        "KISS"
+      ],
+      "answer": 0,
+      "explain": "Bluejay is open-source firmware for the same EFM8 ESCs; it adds bidir DShot and EDT."
+    },
+    {
+      "q": "What does the ESC send back with bidirectional DShot?",
+      "options": [
+        "Battery voltage instead of throttle",
+        "The motor's electrical RPM",
+        "Rotor position in degrees",
+        "A command to change direction"
+      ],
+      "answer": 1,
+      "explain": "The ESC replies with eRPM; it's the input for the RPM filter and the ESC-driven notch."
+    },
+    {
+      "q": "A 14-pole motor, the ESC reports 70,000 eRPM. Mechanical RPM?",
+      "options": [
+        "70,000 RPM",
+        "5,000 RPM",
+        "10,000 RPM",
+        "140,000 RPM"
+      ],
+      "answer": 2,
+      "explain": "RPM = eRPM / (poles / 2) = 70,000 / 7 = 10,000 RPM."
+    },
+    {
+      "q": "What does EDT add to the DShot replies?",
+      "options": [
+        "Encryption of the whole flight controller → ESC link",
+        "A second PWM frequency",
+        "Automatic throttle calibration",
+        "ESC temperature, voltage, current"
+      ],
+      "answer": 3,
+      "explain": "Extended DShot Telemetry sends the ESC status without a separate wire."
+    },
+    {
+      "q": "What do you risk by flashing an ESC with the wrong target?",
+      "options": [
+        "Only a reset of the startup melody",
+        "A change of rotation direction",
+        "It not working or burned MOSFETs",
+        "Losing bidir DShot until a reboot"
+      ],
+      "answer": 2,
+      "explain": "The target describes a specific board; a wrong one can kill the ESC."
+    },
+    {
+      "q": "The motor twitches and stops on sharp throttle. What do you adjust first in the ESC?",
+      "options": [
+        "Demagnetization, then timing",
+        "The startup melody",
+        "PWM frequency to the maximum",
+        "Rotation direction"
+      ],
+      "answer": 0,
+      "explain": "It's a loss of sync; the fix is raising demag compensation and lowering the timing."
+    },
+    {
+      "q": "Why doesn't passthrough work on the MAIN outputs in ArduPilot?",
+      "options": [
+        "MAIN doesn't support DShot at all",
+        "MAIN only works in MAVLink 1",
+        "MAIN needs BLHeliSuite32",
+        "They're IOMCU outputs, you need FMU/AUX"
+      ],
+      "answer": 3,
+      "explain": "The IOMCU coprocessor outputs don't pass the signal through; use FMU/AUX."
+    },
+    {
+      "q": "What changed with BLHeli_32 in 2024?",
+      "options": [
+        "It was open-sourced under the GPL",
+        "Development and support ended",
+        "It was built into Betaflight",
+        "It became a paid subscription"
+      ],
+      "answer": 1,
+      "explain": "BLHeli_32 is no longer developed; for ARM ESCs with a target there's an open-source replacement, AM32."
+    }
+  ]
+}

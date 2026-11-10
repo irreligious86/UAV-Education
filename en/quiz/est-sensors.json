@@ -3,18 +3,18 @@
   "pass": 80,
   "questions": [
     {
-      "q": "Что измеряет акселерометр в установившемся висении?",
+      "q": "What does the accelerometer measure in a steady hover?",
       "options": [
-        "Ускорение движения",
-        "Удельную силу ~1 g",
-        "Ноль",
-        "Скорость"
+        "Motion acceleration",
+        "Specific force of ~1 g",
+        "Zero",
+        "Velocity"
       ],
       "answer": 1,
-      "explain": "Акселерометр измеряет реакцию опоры/удельную силу, а не ускорение относительно земли."
+      "explain": "The accelerometer measures the support reaction force/specific force, not acceleration relative to the ground."
     },
     {
-      "q": "Bias гироскопа 0.05 °/с при интегрировании даёт ошибку угла за минуту:",
+      "q": "A gyro bias of 0.05 °/s, when integrated, gives an angle error per minute of:",
       "options": [
         "0.05°",
         "0.5°",
@@ -22,73 +22,73 @@
         "30°"
       ],
       "answer": 2,
-      "explain": "0.05 °/с × 60 с = 3°."
+      "explain": "0.05 °/s × 60 s = 3°."
     },
     {
-      "q": "Что калибрует 6-позиционная калибровка акселерометра?",
+      "q": "What does the 6-position accelerometer calibration calibrate?",
       "options": [
-        "Только нуль",
-        "Bias и масштаб по осям",
-        "Температуру",
-        "Температурный дрейф гироскопа"
+        "Only the zero",
+        "Bias and scale per axis",
+        "Temperature",
+        "Gyro temperature drift"
       ],
       "answer": 1,
-      "explain": "Шесть известных ориентаций дают систему для смещений и масштабов."
+      "explain": "Six known orientations give a system of equations for the offsets and scales."
     },
     {
-      "q": "Hard iron в калибровке компаса — это:",
+      "q": "In compass calibration, hard iron is:",
       "options": [
-        "Искажение в эллипсоид",
-        "Постоянное смещение поля",
-        "Помеха от тока моторов",
-        "Ошибка ориентации"
+        "Distortion into an ellipsoid",
+        "A constant field offset",
+        "Interference from motor current",
+        "An orientation error"
       ],
       "answer": 1,
-      "explain": "Hard iron смещает сферу измерений; soft iron превращает её в эллипсоид."
+      "explain": "Hard iron shifts the measurement sphere; soft iron turns it into an ellipsoid."
     },
     {
-      "q": "Что означает VIBE.Clip > 0 в ArduPilot?",
+      "q": "What does VIBE.Clip > 0 mean in ArduPilot?",
       "options": [
-        "Барометр дрейфует от нагрева",
-        "Акселерометр насыщается",
-        "Компас врёт",
-        "Баро дрейфует"
+        "The barometer drifts from heating",
+        "The accelerometer is saturating",
+        "The compass is lying",
+        "The baro is drifting"
       ],
       "answer": 1,
-      "explain": "Клиппинг — выход за диапазон измерения датчика."
+      "explain": "Clipping means exceeding the sensor's measurement range."
     },
     {
-      "q": "Какие bias оценивает EKF3 в полёте?",
+      "q": "Which biases does EKF3 estimate in flight?",
       "options": [
-        "Только компаса и барометра",
-        "Гироскопа и акселерометра",
-        "Никакие",
-        "Магнитного склонения"
+        "Only compass and barometer",
+        "Gyro and accelerometer",
+        "None",
+        "Magnetic declination"
       ],
       "answer": 1,
-      "explain": "Bias датчиков — часть вектора состояния EKF3."
+      "explain": "Sensor biases are part of the EKF3 state vector."
     },
     {
-      "q": "Почему компас без знания крена/тангажа даёт неверный курс?",
+      "q": "Why does a compass give a wrong heading without knowing roll/pitch?",
       "options": [
-        "Поле Земли слабое",
-        "Вертикаль поля уходит в оси",
-        "Работает только горизонтально",
-        "Из-за GPS"
+        "The Earth's field is weak",
+        "The vertical component of the field leaks into the axes",
+        "It only works horizontally",
+        "Because of GPS"
       ],
       "answer": 1,
-      "explain": "Большая вертикальная составляющая (наклонение до 70°) проецируется на горизонтальные оси при наклоне."
+      "explain": "The large vertical component (inclination up to 70°) projects onto the horizontal axes when tilted."
     },
     {
-      "q": "Почему bias гироскопа меняется после включения?",
+      "q": "Why does the gyro bias change after power-up?",
       "options": [
-        "Температурный дрейф при прогреве платы",
-        "Из-за смены прошивки",
-        "Он растёт с высотой полёта",
-        "Bias не меняется никогда"
+        "Temperature drift as the board warms up",
+        "Because of a firmware change",
+        "It grows with flight altitude",
+        "Bias never changes"
       ],
       "answer": 0,
-      "explain": "Температурный дрейф 0.01–0.05 °/с на °C: прогрев платы сдвигает bias."
+      "explain": "Temperature drift of 0.01–0.05 °/s per °C: the board warming up shifts the bias."
     }
   ]
 }

@@ -1,0 +1,94 @@
+{
+  "module": "diag-troubleshooting",
+  "pass": 80,
+  "questions": [
+    {
+      "q": "Where do you start if the drone won't arm in Betaflight?",
+      "options": [
+        "Resoldering the receiver",
+        "The status command in the CLI",
+        "Replacing the flight controller",
+        "Flashing the latest version"
+      ],
+      "answer": 1,
+      "explain": "status shows the Arming disable flags — the firmware names the cause itself."
+    },
+    {
+      "q": "The RXLOSS flag means:",
+      "options": [
+        "Low voltage",
+        "No channels from the receiver",
+        "The OSD menu is open during arming",
+        "The vehicle is tilted"
+      ],
+      "answer": 1,
+      "explain": "Check the port, protocol and inversion, the bind and 5 V at the receiver."
+    },
+    {
+      "q": "One motor doesn't spin. What's the first cheap step?",
+      "options": [
+        "Buy a new motor",
+        "Swap the signal wires",
+        "Change the frame",
+        "Reflash the ESC and calibrate the throttle"
+      ],
+      "answer": 1,
+      "explain": "Swap with a working motor: if the problem moved with the wire — it's the signal/FC pad; if it stayed — it's the ESC/motor."
+    },
+    {
+      "q": "The smoke stopper bulb glows brightly, the vehicle doesn't power up:",
+      "options": [
+        "The battery is discharged below the BEC threshold",
+        "A short circuit",
+        "The bulb is broken",
+        "That's normal"
+      ],
+      "answer": 1,
+      "explain": "Disconnect the loads one at a time: where the bulb goes out — that's the short."
+    },
+    {
+      "q": "It shakes above 70% throttle. What's the first action?",
+      "options": [
+        "Reduce P on all axes by 20 %",
+        "Record a Blackbox log and the spectrum",
+        "Change the props",
+        "Reflash"
+      ],
+      "answer": 1,
+      "explain": "Without a log you're guessing; the spectrum distinguishes mechanics, filtering and resonance."
+    },
+    {
+      "q": "The sign of an ESC desync in the log:",
+      "options": [
+        "An LQ drop at the moment of a throttle punch",
+        "An eRPM dip on one motor",
+        "VBAT rising",
+        "The barometer heating up"
+      ],
+      "answer": 1,
+      "explain": "A sudden eRPM dip on one motor with a jerk: ESC settings, DShot, phases."
+    },
+    {
+      "q": "The “one change — one test” rule is needed in order to:",
+      "options": [
+        "Save time",
+        "Know what helped",
+        "Avoid touching the CLI unnecessarily between flights",
+        "Spare the soldering iron"
+      ],
+      "answer": 1,
+      "explain": "Two changes at once — the cause isn't established."
+    },
+    {
+      "q": "The ANGLE flag when arming in Betaflight means:",
+      "options": [
+        "The vehicle is tilted more than small_angle",
+        "The gyro isn't calibrated",
+        "Throttle is above minimum",
+        "No receiver signal"
+      ],
+      "answer": 0,
+      "explain": "ANGLE means a tilt greater than small_angle: set it level or calibrate the accelerometer."
+    }
+  ]
+}

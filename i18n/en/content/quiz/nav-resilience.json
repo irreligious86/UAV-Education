@@ -1,0 +1,94 @@
+{
+  "module": "nav-resilience",
+  "pass": 80,
+  "questions": [
+    {
+      "q": "What reacts first to GNSS interference in the EKF?",
+      "options": [
+        "The compass",
+        "Measurement innovations",
+        "The barometer",
+        "The satellite count in the GPS message"
+      ],
+      "answer": 1,
+      "explain": "Disagreement between GNSS and the inertial sensors shows up earliest; inertial sensors aren't affected by external interference."
+    },
+    {
+      "q": "Satellites are normal, accuracy is “excellent,” but EKF innovations are growing. This looks like:",
+      "options": [
+        "A drained battery",
+        "Spoofing of the receiver's data",
+        "Multipath",
+        "Sky obstruction by buildings and trees"
+      ],
+      "answer": 1,
+      "explain": "The measurement contradicts the model despite a “good” fix."
+    },
+    {
+      "q": "FS_EKF_ACTION = 1 means:",
+      "options": [
+        "Disable the EKF",
+        "Land if position is required",
+        "Always AltHold",
+        "Only a message to the operator on the GCS"
+      ],
+      "answer": 1,
+      "explain": "2 — AltHold, 3 — Land from any mode."
+    },
+    {
+      "q": "What does EK3_SRC1_YAW = 3 do?",
+      "options": [
+        "GPS only",
+        "GPS yaw with compass fallback",
+        "Compass only",
+        "GSF — yaw from GPS velocity"
+      ],
+      "answer": 1,
+      "explain": "GPS with Compass Fallback."
+    },
+    {
+      "q": "What must the pilot always have when GPS degrades?",
+      "options": [
+        "A spare battery",
+        "Non-GPS modes and the skill to fly them",
+        "A second radio",
+        "RTL on a switch and a geofence"
+      ],
+      "answer": 1,
+      "explain": "Geofence and RTL are useless without position."
+    },
+    {
+      "q": "How do you simulate GPS loss in SITL?",
+      "options": [
+        "Remove the GPS",
+        "SIM_GPS1_ENABLE = 0",
+        "GPS_TYPE = 0 in flight",
+        "EK3_ENABLE = 0"
+      ],
+      "answer": 1,
+      "explain": "In older versions — SIM_GPS_DISABLE = 1. Other scenarios: SIM_GPS1_NOISE, SIM_GPS1_GLTCH_*, SIM_MAG1_OFS_*."
+    },
+    {
+      "q": "What is the right transmitter power at the site?",
+      "options": [
+        "It doesn't matter",
+        "The minimum that's sufficient",
+        "Always 1 W",
+        "Maximum, for link margin"
+      ],
+      "answer": 1,
+      "explain": "Excess power jams your neighbors and heats the VTX."
+    },
+    {
+      "q": "What does INAV do on a multicopter if GPS is lost during RTH?",
+      "options": [
+        "Emergency Landing: position is lost, so RTH is impossible",
+        "Continues RTH on the last heading",
+        "Switches to ACRO",
+        "Reboots the flight controller"
+      ],
+      "answer": 0,
+      "explain": "If there is no position for longer than ~2 s, INAV in RTH/WP switches to Emergency Landing: the copter descends in ANGLE at failsafe_throttle and cuts the motors after failsafe_off_delay (with zero values it's effectively a DROP). failsafe_procedure is the reaction to RC loss, not GPS loss; a wing with inav_allow_gps_fix_estimation can continue returning on the estimate."
+    }
+  ]
+}

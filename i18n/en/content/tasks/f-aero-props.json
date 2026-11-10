@@ -1,0 +1,73 @@
+{
+ "module": "f-aero-props",
+ "tasks": [
+  {
+   "id": "disk-loading",
+   "title": "Disk loading",
+   "statement": "A quadcopter with a mass of **{m} kg** on **{d}-inch** props. Find the disk loading in N/m² (g = 9.81, the area is four disks).",
+   "params": {
+    "m": {
+     "min": 0.5,
+     "max": 3.0,
+     "step": 0.1
+    },
+    "d": {
+     "min": 5,
+     "max": 12,
+     "step": 1
+    }
+   },
+   "answer": "m*9.81/(4*math.pi*(d*0.0254/2)**2)",
+   "unit": "N/m²",
+   "tol": 0.02,
+   "solution": "A = 4·π·(D/2)², D = d·0.0254 m; loading = m·g/A. The lower it is, the less power goes into each unit of thrust."
+  },
+  {
+   "id": "ct-thrust",
+   "title": "Thrust from the coefficient",
+   "statement": "A **{d}-inch** prop with a thrust coefficient C_T = **{ct}** spins at **{rpm} RPM**. Find the static thrust in grams (ρ = 1.225 kg/m³, g = 9.81).",
+   "params": {
+    "d": {
+     "min": 5,
+     "max": 10,
+     "step": 1
+    },
+    "ct": {
+     "min": 0.09,
+     "max": 0.13,
+     "step": 0.005
+    },
+    "rpm": {
+     "min": 8000,
+     "max": 24000,
+     "step": 500
+    }
+   },
+   "answer": "ct*1.225*(rpm/60)**2*(d*0.0254)**4/9.81*1000",
+   "unit": "g",
+   "tol": 0.02,
+   "solution": "T = C_T·ρ·n²·D⁴, with n in rev/s and D in meters; divide by g and convert to grams. Thrust grows as the square of RPM."
+  },
+  {
+   "id": "ideal-power",
+   "title": "Ideal hover power",
+   "statement": "A drone with a mass of **{m} kg** hovers on four **{d}-inch** props. Estimate the ideal (induced) hover power in watts using actuator disk theory (ρ = 1.225).",
+   "params": {
+    "m": {
+     "min": 0.5,
+     "max": 4.0,
+     "step": 0.1
+    },
+    "d": {
+     "min": 5,
+     "max": 15,
+     "step": 1
+    }
+   },
+   "answer": "(m*9.81)**1.5/math.sqrt(2*1.225*4*math.pi*(d*0.0254/2)**2)",
+   "unit": "W",
+   "tol": 0.02,
+   "solution": "P = T^1.5 / √(2·ρ·A), where A is the total disk area. Real power is 1.5–2 times higher because of prop and motor losses."
+  }
+ ]
+}

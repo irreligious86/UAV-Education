@@ -3,92 +3,92 @@
   "pass": 80,
   "questions": [
     {
-      "q": "Что такое gimbal lock?",
+      "q": "What is gimbal lock?",
       "options": [
-        "Отказ подвеса камеры",
-        "Вырождение углов Эйлера",
-        "Потеря компаса",
-        "Насыщение гироскопа на флипе"
+        "A camera gimbal failure",
+        "Degeneration of Euler angles",
+        "Loss of the compass",
+        "Gyro saturation during a flip"
       ],
       "answer": 1,
-      "explain": "При тангаже ±90° roll и yaw сливаются; поэтому прошивки используют кватернионы."
+      "explain": "At ±90° pitch, roll and yaw merge; that's why firmware uses quaternions."
     },
     {
-      "q": "Сколько чисел и связей у кватерниона ориентации?",
+      "q": "How many numbers and constraints does an attitude quaternion have?",
       "options": [
-        "3 и 0",
-        "4 и 1",
-        "9 и 6",
-        "2 и 1"
+        "3 and 0",
+        "4 and 1",
+        "9 and 6",
+        "2 and 1"
       ],
       "answer": 1,
-      "explain": "Четыре компонента с единичной нормой."
+      "explain": "Four components with unit norm."
     },
     {
-      "q": "Комплементарный фильтр доверяет гироскопу:",
+      "q": "A complementary filter trusts the gyro:",
       "options": [
-        "Всегда",
-        "На высоких частотах",
-        "На низких частотах, как акселерометр",
-        "Никогда"
+        "Always",
+        "At high frequencies",
+        "At low frequencies, like the accelerometer",
+        "Never"
       ],
       "answer": 1,
-      "explain": "Гироскоп быстр, но дрейфует; акселерометр медленный, без дрейфа."
+      "explain": "The gyro is fast but drifts; the accelerometer is slow, without drift."
     },
     {
-      "q": "Что делает Ki в фильтре Mahony?",
+      "q": "What does Ki do in the Mahony filter?",
       "options": [
-        "Корректирует yaw по гравитации",
-        "Оценивает bias гироскопа",
-        "Отключает акселерометр",
-        "Усиливает шум"
+        "Corrects yaw from gravity",
+        "Estimates the gyro bias",
+        "Disables the accelerometer",
+        "Amplifies noise"
       ],
       "answer": 1,
-      "explain": "Интегральная часть сходится к постоянному bias."
+      "explain": "The integral term converges to the constant bias."
     },
     {
-      "q": "Почему yaw дрейфует без компаса?",
+      "q": "Why does yaw drift without a compass?",
       "options": [
-        "Гироскоп Z хуже",
-        "Гравитация не знает курса",
-        "Акселерометр не работает по Z",
-        "Из-за GPS"
+        "The Z gyro is worse",
+        "Gravity doesn't know the heading",
+        "The accelerometer doesn't work on Z",
+        "Because of GPS"
       ],
       "answer": 1,
-      "explain": "Нужен внешний источник: компас, GPS-курс, GSF или внешняя навигация."
+      "explain": "You need an external source: compass, GPS course, GSF or external navigation."
     },
     {
-      "q": "Чем EKF отличается от комплементарного фильтра?",
+      "q": "How does an EKF differ from a complementary filter?",
       "options": [
-        "EKF не использует гироскоп вовсе",
-        "Адаптивный K и оценка bias",
-        "EKF проще",
-        "Ничем"
+        "An EKF doesn't use the gyro at all",
+        "Adaptive K and bias estimation",
+        "An EKF is simpler",
+        "No difference"
       ],
       "answer": 1,
-      "explain": "Комплементарный фильтр — EKF с фиксированным K."
+      "explain": "A complementary filter is an EKF with a fixed K."
     },
     {
-      "q": "Где в ArduPilot основной расчёт ориентации?",
+      "q": "Where is the primary attitude calculation in ArduPilot?",
       "options": [
-        "В EKF3; DCM — резерв",
-        "Только в DCM",
-        "В модуле AHRS_ORIENTATION",
-        "В приёмнике GPS"
+        "In EKF3; DCM is the fallback",
+        "Only in DCM",
+        "In the AHRS_ORIENTATION module",
+        "In the GPS receiver"
       ],
       "answer": 0,
-      "explain": "Основная оценка — EKF3, DCM остаётся резервом."
+      "explain": "The primary estimate is EKF3, DCM remains as a fallback."
     },
     {
-      "q": "Почему углы Эйлера плохи для расчётов при θ = ±90°?",
+      "q": "Why are Euler angles bad for calculations at θ = ±90°?",
       "options": [
-        "Они требуют восемь чисел",
-        "Синус перестаёт быть периодическим",
-        "Гироскоп перестаёт работать",
-        "Крен и рыскание сливаются в одну степень свободы"
+        "They require eight numbers",
+        "Sine stops being periodic",
+        "The gyro stops working",
+        "Roll and yaw merge into one degree of freedom"
       ],
       "answer": 3,
-      "explain": "Gimbal lock: при тангаже ±90° теряется одна степень свободы."
+      "explain": "Gimbal lock: at ±90° pitch one degree of freedom is lost."
     }
   ]
 }

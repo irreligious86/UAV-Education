@@ -3,92 +3,92 @@
   "pass": 80,
   "questions": [
     {
-      "q": "Зачем мультиротору компас для POSHOLD?",
+      "q": "Why does a multirotor need a compass for POSHOLD?",
       "options": [
-        "Для высоты и вывода курса в OSD",
-        "Чтобы перевести ошибку позиции в наклон",
-        "Для барометра",
-        "Не нужен"
+        "For altitude and showing heading in the OSD",
+        "To convert position error into tilt",
+        "For the barometer",
+        "It doesn't"
       ],
       "answer": 1,
-      "explain": "Без курса контроллер не может перевести ошибку позиции в наклон."
+      "explain": "Without heading the controller can't convert position error into tilt."
     },
     {
-      "q": "nav_rth_alt_mode = AT_LEAST означает…",
+      "q": "nav_rth_alt_mode = AT_LEAST means…",
       "options": [
-        "Снизиться до земли",
-        "Набрать не ниже nav_rth_altitude",
-        "Взять максимальную высоту",
-        "Вернуться на текущей высоте без набора"
+        "Descend to the ground",
+        "Climb to no lower than nav_rth_altitude",
+        "Use the maximum altitude",
+        "Return at the current altitude without climbing"
       ],
       "answer": 1,
-      "explain": "Возврат никогда не ниже заданной высоты."
+      "explain": "The return is never lower than the set altitude."
     },
     {
-      "q": "В каких единицах nav_rth_altitude?",
+      "q": "What units is nav_rth_altitude in?",
       "options": [
-        "Метры",
-        "Сантиметры",
-        "Метры над точкой взлёта",
-        "Дециметры"
+        "Meters",
+        "Centimeters",
+        "Meters above the takeoff point",
+        "Decimeters"
       ],
       "answer": 1,
-      "explain": "5000 = 50 м."
+      "explain": "5000 = 50 m."
     },
     {
-      "q": "Что делает INAV при потере GPS во время RTH?",
+      "q": "What does INAV do if GPS is lost during RTH?",
       "options": [
-        "Летит прямо",
-        "Аварийная посадка после таймаута",
-        "Выключает моторы",
-        "Продолжает возврат по памяти курса"
+        "Flies straight ahead",
+        "Emergency landing after a timeout",
+        "Shuts off the motors",
+        "Continues the return from the remembered heading"
       ],
       "answer": 1,
-      "explain": "Как процедура LAND."
+      "explain": "Like the LAND procedure."
     },
     {
-      "q": "safehome_usage_mode = RTH_FS означает…",
+      "q": "safehome_usage_mode = RTH_FS means…",
       "options": [
-        "Safehome для миссий и ручного RTH",
-        "Safehome при RC failsafe",
-        "Safehome выключен",
-        "Safehome всегда"
+        "Safehome for missions and manual RTH",
+        "Safehome on RC failsafe",
+        "Safehome disabled",
+        "Safehome always"
       ],
       "answer": 1,
-      "explain": "При ручном RTH используется дом."
+      "explain": "On manual RTH, home is used."
     },
     {
-      "q": "Что задаёт nav_user_control_mode = GPS_CRUISE?",
+      "q": "What does nav_user_control_mode = GPS_CRUISE set?",
       "options": [
-        "Круиз крыла",
-        "Стик задаёт скорость",
-        "Отключает GPS",
-        "Стик задаёт наклон, GPS держит позицию"
+        "Wing cruise",
+        "The stick sets the speed",
+        "Disables GPS",
+        "The stick sets the tilt, GPS holds position"
       ],
       "answer": 1,
-      "explain": "В GPS_ATTI стик задаёт наклон."
+      "explain": "In GPS_ATTI the stick sets the tilt."
     },
     {
-      "q": "Что задаёт nav_rth_climb_first = ON?",
+      "q": "What does nav_rth_climb_first = ON set?",
       "options": [
-        "Отключить RTH",
-        "Сначала набор, потом домой",
-        "Лететь на текущей",
-        "Снижение перед возвратом домой"
+        "Disable RTH",
+        "Climb first, then head home",
+        "Fly at the current altitude",
+        "Descend before returning home"
       ],
       "answer": 1,
-      "explain": "Сначала набрать высоту RTH, потом поворачивать домой — для леса обязательно; ON_FW_SPIRAL — спиральный набор для крыла."
+      "explain": "Climb to the RTH altitude first, then turn home — mandatory for forests; ON_FW_SPIRAL is a spiral climb for wings."
     },
     {
-      "q": "nav_rth_abort_threshold срабатывает, когда:",
+      "q": "nav_rth_abort_threshold triggers when:",
       "options": [
-        "Нет GPS",
-        "Дистанция до дома растёт",
-        "АКБ низкая и высота мала",
-        "Пропал сигнал компаса"
+        "There is no GPS",
+        "The distance to home is growing",
+        "The battery is low and altitude is low",
+        "The compass signal is lost"
       ],
       "answer": 1,
-      "explain": "Расстояние до дома растёт во время RTH — признак неверного дома или компаса; RTH прерывается в аварийную посадку."
+      "explain": "The distance to home grows during RTH — a sign of a wrong home point or compass; RTH is aborted into an emergency landing."
     }
   ]
 }

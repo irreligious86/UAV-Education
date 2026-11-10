@@ -1,0 +1,94 @@
+{
+  "module": "inav-gps",
+  "pass": 80,
+  "questions": [
+    {
+      "q": "Why does a multirotor need a compass for POSHOLD?",
+      "options": [
+        "For altitude and showing heading in the OSD",
+        "To convert position error into tilt",
+        "For the barometer",
+        "It doesn't"
+      ],
+      "answer": 1,
+      "explain": "Without heading the controller can't convert position error into tilt."
+    },
+    {
+      "q": "nav_rth_alt_mode = AT_LEAST means…",
+      "options": [
+        "Descend to the ground",
+        "Climb to no lower than nav_rth_altitude",
+        "Use the maximum altitude",
+        "Return at the current altitude without climbing"
+      ],
+      "answer": 1,
+      "explain": "The return is never lower than the set altitude."
+    },
+    {
+      "q": "What units is nav_rth_altitude in?",
+      "options": [
+        "Meters",
+        "Centimeters",
+        "Meters above the takeoff point",
+        "Decimeters"
+      ],
+      "answer": 1,
+      "explain": "5000 = 50 m."
+    },
+    {
+      "q": "What does INAV do if GPS is lost during RTH?",
+      "options": [
+        "Flies straight ahead",
+        "Emergency landing after a timeout",
+        "Shuts off the motors",
+        "Continues the return from the remembered heading"
+      ],
+      "answer": 1,
+      "explain": "Like the LAND procedure."
+    },
+    {
+      "q": "safehome_usage_mode = RTH_FS means…",
+      "options": [
+        "Safehome for missions and manual RTH",
+        "Safehome on RC failsafe",
+        "Safehome disabled",
+        "Safehome always"
+      ],
+      "answer": 1,
+      "explain": "On manual RTH, home is used."
+    },
+    {
+      "q": "What does nav_user_control_mode = GPS_CRUISE set?",
+      "options": [
+        "Wing cruise",
+        "The stick sets the speed",
+        "Disables GPS",
+        "The stick sets the tilt, GPS holds position"
+      ],
+      "answer": 1,
+      "explain": "In GPS_ATTI the stick sets the tilt."
+    },
+    {
+      "q": "What does nav_rth_climb_first = ON set?",
+      "options": [
+        "Disable RTH",
+        "Climb first, then head home",
+        "Fly at the current altitude",
+        "Descend before returning home"
+      ],
+      "answer": 1,
+      "explain": "Climb to the RTH altitude first, then turn home — mandatory for forests; ON_FW_SPIRAL is a spiral climb for wings."
+    },
+    {
+      "q": "nav_rth_abort_threshold triggers when:",
+      "options": [
+        "There is no GPS",
+        "The distance to home is growing",
+        "The battery is low and altitude is low",
+        "The compass signal is lost"
+      ],
+      "answer": 1,
+      "explain": "The distance to home grows during RTH — a sign of a wrong home point or compass; RTH is aborted into an emergency landing."
+    }
+  ]
+}

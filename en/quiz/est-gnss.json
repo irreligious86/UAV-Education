@@ -3,7 +3,7 @@
   "pass": 80,
   "questions": [
     {
-      "q": "Минимум спутников для решения позиции:",
+      "q": "The minimum number of satellites for a position solution:",
       "options": [
         "1",
         "3",
@@ -11,84 +11,84 @@
         "8"
       ],
       "answer": 2,
-      "explain": "Четыре неизвестных: x, y, z и ошибка часов."
+      "explain": "Four unknowns: x, y, z and the clock error."
     },
     {
-      "q": "Что такое HDOP?",
+      "q": "What is HDOP?",
       "options": [
-        "Точность позиции в метрах",
-        "Множитель ошибки от геометрии",
-        "Число спутников",
-        "Частота обновления"
+        "Position accuracy in meters",
+        "An error multiplier from geometry",
+        "Satellite count",
+        "Update rate"
       ],
       "answer": 1,
-      "explain": "Все спутники с одной стороны неба — большой DOP."
+      "explain": "All satellites on one side of the sky means a large DOP."
     },
     {
-      "q": "Что точнее у GPS-приёмника?",
+      "q": "What is more accurate from a GPS receiver?",
       "options": [
-        "Позиция",
-        "Скорость",
-        "Высота",
-        "Курс на висении"
+        "Position",
+        "Velocity",
+        "Altitude",
+        "Heading in a hover"
       ],
       "answer": 1,
-      "explain": "Скорость по доплеру: 0.05–0.2 м/с против 1.5–3 м по позиции."
+      "explain": "Doppler velocity: 0.05–0.2 m/s versus 1.5–3 m for position."
     },
     {
-      "q": "Какая динамическая модель u-blox подходит дрону?",
+      "q": "Which u-blox dynamic model suits a drone?",
       "options": [
-        "Automotive с ограничением 4g",
+        "Automotive with a 4g limit",
         "Pedestrian",
         "Airborne <2g/4g",
         "Stationary"
       ],
       "answer": 2,
-      "explain": "Модели для пешехода/авто сглаживают и запаздывают."
+      "explain": "The pedestrian/automotive models smooth and lag."
     },
     {
-      "q": "Что даёт RTK?",
+      "q": "What does RTK give you?",
       "options": [
-        "Защиту от помех и подмены",
-        "Сантиметры по фазе несущей",
-        "Больше спутников",
-        "Работу под крышей"
+        "Protection against jamming and spoofing",
+        "Centimeters from the carrier phase",
+        "More satellites",
+        "Operation under a roof"
       ],
       "answer": 1,
-      "explain": "Нужны двухчастотный приёмник, база и поток RTCM."
+      "explain": "You need a dual-frequency receiver, a base and an RTCM stream."
     },
     {
-      "q": "Главный приём против многолучёвости от рамы:",
+      "q": "The main technique against multipath from the frame:",
       "options": [
-        "Больше мощность",
-        "Антенна выше, ground plane",
-        "Частота 25 Гц",
-        "Выключить GLONASS и оставить GPS"
+        "More power",
+        "A higher antenna, a ground plane",
+        "A 25 Hz rate",
+        "Turn off GLONASS and keep GPS only"
       ],
       "answer": 1,
-      "explain": "Отражения от рамы и земли — основной источник скачков."
+      "explain": "Reflections from the frame and the ground are the main source of jumps."
     },
     {
-      "q": "Какая частота GPS разумна для коптера в ArduPilot?",
+      "q": "What GPS rate is reasonable for a copter in ArduPilot?",
       "options": [
-        "5 Гц (GPS1_RATE_MS = 200; до 4.6 — GPS_RATE_MS)",
-        "1 Гц — экономия трафика и меньше нагрузка на UART",
-        "50 Гц — чем чаще, тем лучше",
-        "Частота не важна для EKF"
+        "5 Hz (GPS1_RATE_MS = 200; before 4.6 — GPS_RATE_MS)",
+        "1 Hz — saves traffic and less load on the UART",
+        "50 Hz — the more often, the better",
+        "The rate doesn't matter to the EKF"
       ],
       "answer": 0,
-      "explain": "5–10 Гц достаточно; выше EKF не выигрывает, а UART и приёмник нагружаются."
+      "explain": "5–10 Hz is enough; the EKF gains nothing above that, while the UART and the receiver get loaded."
     },
     {
-      "q": "Чем UBX лучше NMEA для автопилота?",
+      "q": "Why is UBX better than NMEA for an autopilot?",
       "options": [
-        "Его без настройки понимают все наземные станции и пульты",
-        "Он передаёт видео с камеры",
-        "NMEA не умеет координаты",
-        "Бинарный, компактнее и со статусом качества"
+        "Every ground station and radio understands it without setup",
+        "It carries the camera video",
+        "NMEA can't do coordinates",
+        "It's binary, more compact and has quality status"
       ],
       "answer": 3,
-      "explain": "UBX компактнее и несёт точность и статусы, которых в NMEA нет или они неполные."
+      "explain": "UBX is more compact and carries accuracy and status fields that NMEA lacks or has only partially."
     }
   ]
 }

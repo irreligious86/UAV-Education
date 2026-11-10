@@ -1,0 +1,47 @@
+{
+ "module": "est-gnss",
+ "tasks": [
+  {
+   "id": "hdop",
+   "title": "Position error from geometry",
+   "statement": "The range error to a satellite (UERE) is **{u} m**, HDOP = **{h}**. Estimate the horizontal position error (m, 1σ).",
+   "params": {
+    "u": {
+     "min": 1,
+     "max": 6,
+     "step": 0.5
+    },
+    "h": {
+     "min": 0.6,
+     "max": 4,
+     "step": 0.1
+    }
+   },
+   "answer": "u*h",
+   "unit": "m",
+   "tol": 0.01,
+   "solution": "σ_hor ≈ HDOP · σ_UERE: geometry multiplies the measurement error. The same receiver next to a house wall with HDOP 3 is off three times as much as in an open field."
+  },
+  {
+   "id": "lag",
+   "title": "Error from an uncompensated delay",
+   "statement": "The aircraft flies at **{v} m/s**, and a GPS delay of **{d} ms** isn't accounted for in the EKF. How far does the position lag behind (m)?",
+   "params": {
+    "v": {
+     "min": 2,
+     "max": 25,
+     "step": 1
+    },
+    "d": {
+     "min": 50,
+     "max": 300,
+     "step": 10
+    }
+   },
+   "answer": "v*d/1000",
+   "unit": "m",
+   "tol": 0.01,
+   "solution": "During the delay the aircraft travels v·t. Hence `GPS1_DELAY_MS`: the EKF matches the measurement against the state in the past, not the current one."
+  }
+ ]
+}
