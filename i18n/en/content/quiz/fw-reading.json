@@ -1,0 +1,94 @@
+{
+  "module": "fw-reading",
+  "pass": 80,
+  "questions": [
+    {
+      "q": "Where is the main PID loop in Betaflight?",
+      "options": [
+        "main/scheduler",
+        "fc/core.c: taskMainPidLoop",
+        "flight/pid.c: main() in a loop",
+        "drivers/dshot.c"
+      ],
+      "answer": 1,
+      "explain": "taskMainPidLoop → subTaskPidController → subTaskMotorUpdate: the PID and the mixer are subtasks of the loop."
+    },
+    {
+      "q": "What is the D-term computed from in Betaflight?",
+      "options": [
+        "The pilot's setpoint",
+        "The gyro",
+        "The error",
+        "The motors"
+      ],
+      "answer": 1,
+      "explain": "No derivative kick when the stick moves."
+    },
+    {
+      "q": "Where in ArduCopter is the task table with rates and time budgets?",
+      "options": [
+        "Attitude.cpp",
+        "Copter.cpp: scheduler_tasks[]",
+        "Parameters.cpp: var_info[]",
+        "motors.cpp"
+      ],
+      "answer": 1,
+      "explain": "FAST_TASK and SCHED_TASK(func, hz, max_us, prio)."
+    },
+    {
+      "q": "What does AP_MotorsMatrix::output_armed_stabilizing() do?",
+      "options": [
+        "Reads the gyro",
+        "Distributes the axes over the motors",
+        "Sends MAVLink",
+        "Runs the EKF and writes the log"
+      ],
+      "answer": 1,
+      "explain": "It distributes roll/pitch/yaw/throttle over the motor matrix with priorities; yaw goes last, within MOT_YAW_HEADROOM."
+    },
+    {
+      "q": "Where does the ArduPilot parameter wiki come from?",
+      "options": [
+        "From MAVLink",
+        "From the @Param blocks in the code",
+        "From Mission Planner",
+        "Written by hand by the dev team"
+      ],
+      "answer": 1,
+      "explain": "Description, range, @Values — in the code."
+    },
+    {
+      "q": "How do you safely test a firmware patch?",
+      "options": [
+        "Straight on the drone",
+        "SITL and tests, then the bench",
+        "You can't",
+        "In the configurator via the CLI"
+      ],
+      "answer": 1,
+      "explain": "make SITL / sim_vehicle.py; make test."
+    },
+    {
+      "q": "git log -S \"name\" is used to:",
+      "options": [
+        "Build firmware from an old commit",
+        "Find the commit with that string",
+        "Delete the line",
+        "Check the style"
+      ],
+      "answer": 1,
+      "explain": "The PR comment explains the reason for the change."
+    },
+    {
+      "q": "Why link to a commit in the report rather than to master?",
+      "options": [
+        "A link to master points to different code over time",
+        "Commits open faster",
+        "GitHub forbids links to master",
+        "master has no line numbers"
+      ],
+      "answer": 0,
+      "explain": "A link to a specific commit stays correct; master moves on."
+    }
+  ]
+}

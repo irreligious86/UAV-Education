@@ -3,105 +3,105 @@
   "pass": 80,
   "questions": [
     {
-      "q": "Бюджет задержки для контура слежения задают по:",
+      "q": "The latency budget for a tracking loop is set by:",
       "options": [
-        "p99, а не среднему",
-        "Среднему",
-        "Минимуму",
-        "Медиане первых 10 прогонов"
+        "p99, not the average",
+        "The average",
+        "The minimum",
+        "The median of the first 10 runs"
       ],
       "answer": 0,
-      "explain": "Один медленный кадр посреди манёвра — потерянная цель."
+      "explain": "One slow frame in the middle of a maneuver is a lost target."
     },
     {
-      "q": "Первый шаг квантования на GPU почти без потери точности:",
+      "q": "The first quantization step on a GPU with almost no loss of accuracy:",
       "options": [
         "FP16",
         "INT4",
-        "Бинаризация",
-        "Удаление слоёв"
+        "Binarization",
+        "Removing layers"
       ],
       "answer": 0,
-      "explain": "FP16 обычно бесплатен по точности."
+      "explain": "FP16 is usually free in terms of accuracy."
     },
     {
-      "q": "PTQ откалибровали только на дневных кадрах. Ожидаемое следствие:",
+      "q": "PTQ was calibrated on daytime frames only. The expected consequence:",
       "options": [
-        "Падение точности ночью",
-        "Ничего",
-        "Рост точности ночью из-за шума",
-        "Модель не загрузится"
+        "An accuracy drop at night",
+        "Nothing",
+        "Higher accuracy at night because of noise",
+        "The model won't load"
       ],
       "answer": 0,
-      "explain": "Диапазоны активаций в других условиях другие."
+      "explain": "Activation ranges differ under other conditions."
     },
     {
-      "q": "Почему отложенную выборку делят по полётам, а не по кадрам?",
+      "q": "Why is the held-out set split by flight rather than by frame?",
       "options": [
-        "Иначе утечка похожих кадров",
-        "Так быстрее размечать и обучать",
-        "Так требует ONNX",
-        "Кадров слишком много"
+        "Otherwise similar frames leak",
+        "It's faster to label and train that way",
+        "ONNX requires it",
+        "There are too many frames"
       ],
       "answer": 0,
-      "explain": "Утечка почти одинаковых кадров между train и test."
+      "explain": "Nearly identical frames leak between train and test."
     },
     {
-      "q": "Через 20 минут работы p99 вырос вдвое. Наиболее вероятная причина:",
+      "q": "After 20 minutes of operation p99 doubled. The most likely cause:",
       "options": [
-        "Троттлинг по температуре",
-        "Потеря GPS",
-        "Утечка памяти в весах модели",
-        "Квантование"
+        "Thermal throttling",
+        "GPS loss",
+        "A memory leak in the model weights",
+        "Quantization"
       ],
       "answer": 0,
-      "explain": "Профилировать надо в корпусе и долго."
+      "explain": "Profile inside the enclosure and for a long time."
     },
     {
-      "q": "Неподдержанный ускорителем слой модели:",
+      "q": "A model layer the accelerator doesn't support:",
       "options": [
-        "Уходит на CPU",
-        "Пропускается",
-        "Ломает модель",
-        "Ускоряется сам"
+        "Falls back to the CPU",
+        "Is skipped",
+        "Breaks the model",
+        "Speeds itself up"
       ],
       "answer": 0,
-      "explain": "Выполняется на CPU и может съесть весь выигрыш; профилировщик движка показывает это сразу."
+      "explain": "It runs on the CPU and can eat the whole gain; the engine profiler shows this right away."
     },
     {
-      "q": "В поиске людей порог детектора разумно сдвигать в сторону:",
+      "q": "In a search for people, it makes sense to shift the detector threshold toward:",
       "options": [
-        "Большего recall",
-        "Большей precision",
-        "Порог не важен",
-        "Максимального"
+        "Higher recall",
+        "Higher precision",
+        "The threshold doesn't matter",
+        "The maximum"
       ],
       "answer": 0,
-      "explain": "Ложные тревоги проверит оператор."
+      "explain": "The operator will check the false alarms."
     },
     {
-      "q": "Что обязательно писать в лог каждого полёта с ML на борту?",
+      "q": "What must be written to the log of every flight with ML on board?",
       "options": [
-        "Версию модели и порогов",
-        "Только FPS",
-        "Пароль Wi-Fi",
-        "Ничего — модель неизменна"
+        "The model and threshold version",
+        "Only FPS",
+        "The Wi-Fi password",
+        "Nothing — the model doesn't change"
       ],
       "answer": 0,
-      "explain": "Без версии разбор инцидента невозможен."
+      "explain": "Without the version, investigating an incident is impossible."
     },
     {
-      "q": "Бюджет контура слежения — 80 мс. Профиль детектора на борту:",
+      "q": "The tracking loop budget is 80 ms. The onboard detector profile:",
       "kind": "apply",
       "fragment": "n=300 mean=41.2 p50=33.8 p95=96.4 p99=211.7 max=402.3 budget_ms=80 ok=False over_budget_frac=0.07",
       "options": [
-        "Среднее укладывается, но хвост (p95/p99) — нет: 7 % кадров дольше бюджета, ищем источник",
-        "over_budget_frac = 0.07 — это погрешность таймера perf_counter, а не реальные медленные кадры",
-        "p50 = 34 мс означает, что модель недогружена и её можно заменить на более тяжёлую",
-        "Всё в порядке: бюджет проверяется по среднему, а 41 мс меньше 80"
+        "The average fits, but the tail (p95/p99) doesn't: 7 % of frames take longer than the budget, find the source",
+        "over_budget_frac = 0.07 is perf_counter timer error, not real slow frames",
+        "p50 = 34 ms means the model is underloaded and can be replaced with a heavier one",
+        "Everything is fine: the budget is checked against the average, and 41 ms is less than 80"
       ],
       "answer": 0,
-      "explain": "Бюджет контура проверяют по p99: медленные кадры посреди манёвра теряют цель."
+      "explain": "The loop budget is checked against p99: slow frames in the middle of a maneuver lose the target."
     }
   ]
 }

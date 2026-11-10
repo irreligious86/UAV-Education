@@ -3,52 +3,52 @@
   "pass": 80,
   "questions": [
     {
-      "q": "Что показывает мультиметр между CAN_H и CAN_L исправной шины без питания?",
-      "options": ["Около 120 Ом", "Около 60 Ом", "Обрыв (бесконечность)", "Около 40 Ом"],
+      "q": "What does a multimeter show between CAN_H and CAN_L of a healthy bus with the power off?",
+      "options": ["About 120 Ω", "About 60 Ω", "Open circuit (infinity)", "About 40 Ω"],
       "answer": 1,
-      "explain": "Два терминатора по 120 Ом на концах параллельно дают 60 Ом; 120 — один терминатор, 40 — три."
+      "explain": "Two 120 Ω terminators at the ends in parallel give 60 Ω; 120 means one terminator, 40 means three."
     },
     {
-      "q": "Почему CAN переносит метр провода рядом с силовой шиной, а I²C — нет?",
-      "options": ["CAN работает на более высокой частоте и успевает переотправить кадр", "CAN дифференциальная: помеха одинакова на обоих проводах", "CAN экранирован внутри разъёма", "CAN передаёт меньше данных"],
+      "q": "Why does CAN tolerate a meter of wire next to the power bus while I²C does not?",
+      "options": ["CAN runs at a higher frequency and has time to resend the frame", "CAN is differential: the interference is the same on both wires", "CAN is shielded inside the connector", "CAN carries less data"],
       "answer": 1,
-      "explain": "Приёмник смотрит на разность H−L; синфазная помеха вычитается."
+      "explain": "The receiver looks at the H−L difference; common-mode interference cancels out."
     },
     {
-      "q": "Новый узел DroneCAN подключили без настройки, и он заработал. Кто дал ему номер?",
-      "options": ["Он взял случайный", "Сервер DNA на полётнике", "Номер прошит производителем при выпуске и не меняется", "QGroundControl"],
+      "q": "A new DroneCAN node was plugged in without any setup and it works. Who gave it its ID?",
+      "options": ["It picked a random one", "The DNA server on the flight controller", "The ID is burned in by the manufacturer and never changes", "QGroundControl"],
       "answer": 1,
-      "explain": "Dynamic node allocation: полётник выдаёт свободный node ID и запоминает его по уникальному ID узла."
+      "explain": "Dynamic node allocation: the flight controller hands out a free node ID and remembers it by the node's unique ID."
     },
     {
-      "q": "После переноса GPS-узла с другого аппарата данные GPS скачут. Вероятная причина?",
-      "options": ["Плохой фикс", "Конфликт node ID", "Неверная скорость шины", "Нет терминатора у полётника"],
+      "q": "After moving a GPS node from another vehicle, the GPS data jumps. The likely cause?",
+      "options": ["A poor fix", "A node ID conflict", "Wrong bus bitrate", "No terminator at the flight controller"],
       "answer": 1,
-      "explain": "Сохранённый номер совпал с другим узлом; лечится очисткой таблицы DNA или сменой номера."
+      "explain": "The stored ID matched another node; fixed by clearing the DNA table or changing the ID."
     },
     {
-      "q": "Какой параметр ArduPilot выбирает DroneCAN как протокол первого драйвера?",
+      "q": "Which ArduPilot parameter selects DroneCAN as the protocol of the first driver?",
       "options": ["CAN_P1_DRIVER = 1", "CAN_D1_PROTOCOL = 1", "CAN_P1_BITRATE = 1000000", "GPS1_TYPE = 1"],
       "answer": 1,
-      "explain": "CAN_P1_DRIVER включает порт и назначает драйвер, CAN_D1_PROTOCOL = 1 — DroneCAN для этого драйвера."
+      "explain": "CAN_P1_DRIVER enables the port and assigns a driver; CAN_D1_PROTOCOL = 1 is DroneCAN for that driver."
     },
     {
-      "q": "Узлы видны в Mission Planner, но EKF не получает GPS. Что проверить первым?",
-      "options": ["Терминаторы", "GPS1_TYPE = 9 (DroneCAN)", "Скорость шины", "Версию прошивки узла в списке"],
+      "q": "The nodes are visible in Mission Planner, but the EKF gets no GPS. What do you check first?",
+      "options": ["The terminators", "GPS1_TYPE = 9 (DroneCAN)", "The bus bitrate", "The node firmware version in the list"],
       "answer": 1,
-      "explain": "Узел на шине ещё не значит, что автопилот использует его как GPS — тип датчика выбирают явно."
+      "explain": "A node on the bus doesn't yet mean the autopilot uses it as a GPS — the sensor type is selected explicitly."
     },
     {
-      "q": "Восемь ESC по CAN на 400 Гц плюс датчики — что разумно сделать?",
-      "options": ["Поднять скорость шины до 2 Мбит/с во всех узлах сразу", "Вынести ESC на отдельную шину CAN2", "Снять терминаторы для меньшей нагрузки", "Перевести датчики на I²C"],
+      "q": "Eight ESCs over CAN at 400 Hz plus sensors — what's a sensible move?",
+      "options": ["Raise the bus bitrate to 2 Mbit/s on all nodes at once", "Move the ESCs to a separate CAN2 bus", "Remove the terminators to reduce the load", "Move the sensors to I²C"],
       "answer": 1,
-      "explain": "Команды ESC занимают заметную долю пропускной способности; две шины разделяют нагрузку и дают резерв."
+      "explain": "ESC commands take a noticeable share of the bandwidth; two buses split the load and give redundancy."
     },
     {
-      "q": "Что такое AP_Periph?",
-      "options": ["Наземная станция для настройки узлов DroneCAN по USB", "Прошивка ArduPilot для узла DroneCAN на STM32", "Стандарт разъёма CAN", "Версия протокола Cyphal"],
+      "q": "What is AP_Periph?",
+      "options": ["A ground station for configuring DroneCAN nodes over USB", "ArduPilot firmware for a DroneCAN node on STM32", "A CAN connector standard", "A version of the Cyphal protocol"],
       "answer": 1,
-      "explain": "Тот же код драйверов ArduPilot, собранный для периферийной платы, — путь к своему датчику по CAN."
+      "explain": "The same ArduPilot driver code built for a peripheral board — the way to your own CAN sensor."
     }
   ]
 }

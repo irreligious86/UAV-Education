@@ -1,0 +1,94 @@
+{
+  "module": "el-kicad",
+  "pass": 80,
+  "questions": [
+    {
+      "q": "What does ERC catch in KiCad?",
+      "options": [
+        "Trace clearance violations on the board",
+        "Wrong layers in the output Gerber and drill files",
+        "Schematic connection errors: floating pins, output conflicts",
+        "Shunt overheating"
+      ],
+      "answer": 2,
+      "explain": "ERC checks the schematic; the fab's rules on the board are checked by DRC."
+    },
+    {
+      "q": "A shunt for an INA226 at 100 A, ±81.92 mV range. Which resistance fits?",
+      "options": [
+        "0.5 mΩ",
+        "5 mΩ",
+        "50 mΩ",
+        "0.05 Ω"
+      ],
+      "answer": 0,
+      "explain": "R ≤ 81.92 mV / 100 A ≈ 0.82 mΩ; 0.5 mΩ gives 50 mV with margin."
+    },
+    {
+      "q": "How much heat does a 0.5 mΩ shunt dissipate at 40 A?",
+      "options": [
+        "0.02 W",
+        "20 W",
+        "8 W",
+        "0.8 W"
+      ],
+      "answer": 3,
+      "explain": "I²R = 1600 · 0.0005 = 0.8 W."
+    },
+    {
+      "q": "Why use a Kelvin connection for the shunt?",
+      "options": [
+        "To protect the board from reverse battery polarity",
+        "So the drop across the copper doesn't get into the measurement",
+        "To reduce trace heating",
+        "It's required by the I²C protocol"
+      ],
+      "answer": 1,
+      "explain": "The sense pair leaves from the shunt pads, not from the power trace."
+    },
+    {
+      "q": "Width of a 1 oz outer trace for 5 A at +10 °C per IPC-2221?",
+      "options": [
+        "about 2.8 mm",
+        "about 0.3 mm",
+        "about 10 mm",
+        "about 0.1 mm"
+      ],
+      "answer": 0,
+      "explain": "From I = k·ΔT^0.44·A^0.725 for 35 µm copper ≈ 2.8 mm."
+    },
+    {
+      "q": "Why is a slot in the ground pour under a trace bad?",
+      "options": [
+        "It noticeably increases the manufacturing cost",
+        "DRC won't pass such a board",
+        "The return current goes around the slot — the loop radiates",
+        "You can't place components on it"
+      ],
+      "answer": 2,
+      "explain": "The current returns under the trace; going around the slot makes a big loop, an antenna."
+    },
+    {
+      "q": "Where do you put the input capacitor of a buck converter?",
+      "options": [
+        "At the battery connector on the edge of the board",
+        "Right next to the switch",
+        "Under the compass for filtering",
+        "Wherever is convenient"
+      ],
+      "answer": 1,
+      "explain": "The loop with fast current must be minimal."
+    },
+    {
+      "q": "What do you check before the first power-up of an assembled board?",
+      "options": [
+        "Only the look of the solder joints",
+        "Connect the battery right away to check the current in operation",
+        "The flight controller firmware",
+        "Shorts, and power from a supply with current limiting"
+      ],
+      "answer": 3,
+      "explain": "A continuity check and a current-limited bench supply save the board and the battery."
+    }
+  ]
+}

@@ -3,89 +3,89 @@
   "pass": 80,
   "questions": [
     {
-      "q": "Когда классический метод (маркер ArUco) лучше нейросети?",
+      "q": "When is a classical method (an ArUco marker) better than a neural network?",
       "options": [
-        "Никогда",
-        "Известный объект с кодом",
-        "Только ночью при ИК-подсветке",
-        "Всегда"
+        "Never",
+        "A known object with a code",
+        "Only at night with IR illumination",
+        "Always"
       ],
       "answer": 1,
-      "explain": "Для точной посадки и тестов контура."
+      "explain": "For precision landing and control-loop tests."
     },
     {
-      "q": "Что такое recall?",
+      "q": "What is recall?",
       "options": [
-        "Скорость",
-        "Доля найденных среди истинных",
-        "Площадь под кривой",
-        "Доля верных среди всех найденных"
+        "Speed",
+        "The share found among the true objects",
+        "The area under the curve",
+        "The share of correct ones among all found"
       ],
       "answer": 1,
-      "explain": "Precision — TP/(TP+FP), recall — TP/(TP+FN)."
+      "explain": "Precision is TP/(TP+FP), recall is TP/(TP+FN)."
     },
     {
-      "q": "Почему нужно дообучение на своих данных?",
+      "q": "Why is fine-tuning on your own data needed?",
       "options": [
-        "Для скорости",
-        "Модель не знает твой объект",
-        "Не нужно",
-        "Для квантования модели в INT8"
+        "For speed",
+        "The model doesn't know your object",
+        "It isn't needed",
+        "To quantize the model to INT8"
       ],
       "answer": 1,
-      "explain": "300–1000 размеченных кадров с борта."
+      "explain": "300–1000 labeled frames from the vehicle."
     },
     {
-      "q": "Как получить ×3–10 ускорение на Jetson?",
+      "q": "How do you get a ×3–10 speedup on a Jetson?",
       "options": [
-        "Поднять разрешение",
+        "Raise the resolution",
         "TensorRT FP16/INT8",
-        "Больше потоков Python",
-        "Другой кабель"
+        "More Python threads",
+        "A different cable"
       ],
       "answer": 1,
-      "explain": "Аппаратное ускорение и оптимизация графа."
+      "explain": "Hardware acceleration and graph optimization."
     },
     {
-      "q": "На каких данных оценивать модель?",
+      "q": "What data should you evaluate the model on?",
       "options": [
-        "На обучающих",
-        "На отложенных с борта",
-        "На любых",
-        "На COCO как эталоне качества"
+        "The training data",
+        "Held-out data from the vehicle",
+        "Any data",
+        "COCO as the quality benchmark"
       ],
       "answer": 1,
-      "explain": "Иначе mAP 0.9 превращается в 0.5 в поле."
+      "explain": "Otherwise mAP 0.9 turns into 0.5 in the field."
     },
     {
-      "q": "Зачем трекер поверх детектора?",
+      "q": "Why put a tracker on top of the detector?",
       "options": [
-        "Для красоты",
-        "Стабильные ID и пропуски",
-        "Для обучения",
-        "Для записи видео с разметкой"
+        "For looks",
+        "Stable IDs and surviving misses",
+        "For training",
+        "To record video with annotations"
       ],
       "answer": 1,
-      "explain": "Команды контуру — от трекера."
+      "explain": "Commands to the control loop come from the tracker."
     },
     {
-      "q": "Ложные срабатывания на тенях лечатся:",
+      "q": "False positives on shadows are cured by:",
       "options": [
-        "Только порогом",
-        "Негативы и временной фильтр",
-        "Меньшим FPS",
-        "Другой камерой с большим разрешением"
+        "Only the threshold",
+        "Negatives and a temporal filter",
+        "Lower FPS",
+        "A different, higher-resolution camera"
       ],
       "answer": 1,
-      "explain": "Классифицировать FP — каждая группа лечится по-своему."
+      "explain": "Classify the FPs — each group has its own cure."
     },
     {
-      "q": "Что такое precision?",
+      "q": "What is precision?",
       "options": [
-        "Доля верных среди всех срабатываний",
-        "Доля найденных среди всех объектов",
-        "Скорость инференса в кадрах",
-        "Размер модели в мегабайтах"
+        "The share of correct ones among all detections",
+        "The share found among all objects",
+        "Inference speed in frames",
+        "Model size in megabytes"
       ],
       "answer": 0,
       "explain": "Precision = TP / (TP + FP); recall = TP / (TP + FN)."

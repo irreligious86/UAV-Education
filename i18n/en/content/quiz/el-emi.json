@@ -1,0 +1,94 @@
+{
+  "module": "el-emi",
+  "pass": 80,
+  "questions": [
+    {
+      "q": "How does the magnetic field of a current-carrying wire depend on distance?",
+      "options": [
+        "~1/r",
+        "~1/r²",
+        "~1/r³",
+        "It doesn't"
+      ],
+      "answer": 0,
+      "explain": "B = μ₀·I/(2π·r): twice as far means half as strong."
+    },
+    {
+      "q": "Why does twisting the power + and − reduce interference on the compass?",
+      "options": [
+        "Lower capacitance",
+        "The fields of opposing currents cancel",
+        "Lower resistance of the wire pair",
+        "The wires cool better"
+      ],
+      "answer": 1,
+      "explain": "The fields of two conductors with opposite currents almost cancel each other."
+    },
+    {
+      "q": "Which signal on board is the weakest and most vulnerable to radiated interference?",
+      "options": [
+        "2.4 GHz RC at the edge of range",
+        "Video",
+        "GPS (~−130 dBm)",
+        "DShot"
+      ],
+      "answer": 2,
+      "explain": "The satellite signal is extremely weak; USB 3.0/HDMI/buck harmonics at 1.5 GHz drown it out."
+    },
+    {
+      "q": "What does compassmot show in ArduPilot?",
+      "options": [
+        "GPS quality with the motors running",
+        "Interference from motor current",
+        "Motor efficiency",
+        "ESC temperature"
+      ],
+      "answer": 1,
+      "explain": "The percentage of compass interference from motor current: > 30 % — move the compass."
+    },
+    {
+      "q": "Symptom: RSSI is normal, LQ drops. The cause?",
+      "options": [
+        "Wrong polarization of the radio's antenna",
+        "Noise near the receiver",
+        "TX power too low",
+        "The antenna is far away"
+      ],
+      "answer": 1,
+      "explain": "Wideband noise raises the reception threshold; RSSI can even rise from interference."
+    },
+    {
+      "q": "How should a cable shield be grounded?",
+      "options": [
+        "To the antenna",
+        "At one end",
+        "Not grounded",
+        "At both ends for better shielding"
+      ],
+      "answer": 1,
+      "explain": "Grounding at both ends creates a loop through which the interference flows."
+    },
+    {
+      "q": "Besides the satellite count, what should you look at on the GPS when you suspect interference?",
+      "options": [
+        "The position update rate",
+        "The receiver firmware version",
+        "The number of constellations in the settings",
+        "C/N0 — the satellites' signal-to-noise ratio"
+      ],
+      "answer": 3,
+      "explain": "Interference lowers C/N0 before satellites drop out."
+    },
+    {
+      "q": "Lines in the video that grow with throttle are a sign of:",
+      "options": [
+        "Radiation from the receiver antenna",
+        "Camera overheating",
+        "A wrong VTX frequency",
+        "Conducted ripple on the power supply"
+      ],
+      "answer": 3,
+      "explain": "Lines on throttle are power supply ripple; “snow” is radiated interference."
+    }
+  ]
+}

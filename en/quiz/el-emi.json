@@ -3,92 +3,92 @@
   "pass": 80,
   "questions": [
     {
-      "q": "Как магнитное поле провода с током зависит от расстояния?",
+      "q": "How does the magnetic field of a current-carrying wire depend on distance?",
       "options": [
         "~1/r",
         "~1/r²",
         "~1/r³",
-        "Не зависит"
+        "It doesn't"
       ],
       "answer": 0,
-      "explain": "B = μ₀·I/(2π·r): вдвое дальше — вдвое слабее."
+      "explain": "B = μ₀·I/(2π·r): twice as far means half as strong."
     },
     {
-      "q": "Почему скрутка силовых + и − уменьшает помеху на компас?",
+      "q": "Why does twisting the power + and − reduce interference on the compass?",
       "options": [
-        "Меньше ёмкость",
-        "Поля встречных токов гасятся",
-        "Меньше сопротивление пары проводов",
-        "Провода лучше остывают"
+        "Lower capacitance",
+        "The fields of opposing currents cancel",
+        "Lower resistance of the wire pair",
+        "The wires cool better"
       ],
       "answer": 1,
-      "explain": "Поля двух проводников с противоположными токами почти гасят друг друга."
+      "explain": "The fields of two conductors with opposite currents almost cancel each other."
     },
     {
-      "q": "Какой сигнал на борту самый слабый и уязвимый к излучению?",
+      "q": "Which signal on board is the weakest and most vulnerable to radiated interference?",
       "options": [
-        "RC 2.4 ГГц на краю дальности",
-        "Видео",
-        "GPS (~−130 дБм)",
+        "2.4 GHz RC at the edge of range",
+        "Video",
+        "GPS (~−130 dBm)",
         "DShot"
       ],
       "answer": 2,
-      "explain": "Сигнал спутников крайне слаб; гармоники USB 3.0/HDMI/buck в 1.5 ГГц его давят."
+      "explain": "The satellite signal is extremely weak; USB 3.0/HDMI/buck harmonics at 1.5 GHz drown it out."
     },
     {
-      "q": "Что показывает compassmot в ArduPilot?",
+      "q": "What does compassmot show in ArduPilot?",
       "options": [
-        "Качество GPS при включённых моторах",
-        "Помеху от тока моторов",
-        "КПД моторов",
-        "Температуру ESC"
+        "GPS quality with the motors running",
+        "Interference from motor current",
+        "Motor efficiency",
+        "ESC temperature"
       ],
       "answer": 1,
-      "explain": "Процент помехи на компас от тока моторов: > 30 % — разносить компас."
+      "explain": "The percentage of compass interference from motor current: > 30 % — move the compass."
     },
     {
-      "q": "Симптом: RSSI в норме, LQ падает. Причина?",
+      "q": "Symptom: RSSI is normal, LQ drops. The cause?",
       "options": [
-        "Не та поляризация антенны пульта",
-        "Шум рядом с приёмником",
-        "Мала мощность TX",
-        "Антенна далеко"
+        "Wrong polarization of the radio's antenna",
+        "Noise near the receiver",
+        "TX power too low",
+        "The antenna is far away"
       ],
       "answer": 1,
-      "explain": "Широкополосный шум повышает порог приёма; RSSI может даже расти от помехи."
+      "explain": "Wideband noise raises the reception threshold; RSSI can even rise from interference."
     },
     {
-      "q": "Как правильно заземлять экран кабеля?",
+      "q": "How should a cable shield be grounded?",
       "options": [
-        "К антенне",
-        "С одной стороны",
-        "Не заземлять",
-        "С двух сторон для лучшего экранирования"
+        "To the antenna",
+        "At one end",
+        "Not grounded",
+        "At both ends for better shielding"
       ],
       "answer": 1,
-      "explain": "Двухстороннее заземление создаёт петлю, по которой течёт помеха."
+      "explain": "Grounding at both ends creates a loop through which the interference flows."
     },
     {
-      "q": "Что смотреть у GPS при подозрении на помеху, кроме числа спутников?",
+      "q": "Besides the satellite count, what should you look at on the GPS when you suspect interference?",
       "options": [
-        "Частоту обновления позиции",
-        "Версию прошивки приёмника",
-        "Число созвездий в настройках",
-        "C/N0 — отношение сигнал/шум спутников"
+        "The position update rate",
+        "The receiver firmware version",
+        "The number of constellations in the settings",
+        "C/N0 — the satellites' signal-to-noise ratio"
       ],
       "answer": 3,
-      "explain": "Помеха снижает C/N0 раньше, чем пропадают спутники."
+      "explain": "Interference lowers C/N0 before satellites drop out."
     },
     {
-      "q": "Полосы на видео, растущие с газом, — признак:",
+      "q": "Lines in the video that grow with throttle are a sign of:",
       "options": [
-        "Излучения от антенны приёмника",
-        "Перегрева камеры",
-        "Неверной частоты VTX",
-        "Кондуктивных пульсаций по питанию"
+        "Radiation from the receiver antenna",
+        "Camera overheating",
+        "A wrong VTX frequency",
+        "Conducted ripple on the power supply"
       ],
       "answer": 3,
-      "explain": "Полосы на газу — пульсации по питанию; «снег» — излучённая помеха."
+      "explain": "Lines on throttle are power supply ripple; “snow” is radiated interference."
     }
   ]
 }

@@ -3,92 +3,92 @@
   "pass": 80,
   "questions": [
     {
-      "q": "Чем CSI-камера лучше USB для контура управления?",
+      "q": "Why is a CSI camera better than USB for a control loop?",
       "options": [
-        "Дешевле",
-        "Меньше задержка",
-        "Длиннее кабель",
-        "Не нужны драйверы"
+        "It's cheaper",
+        "Lower latency",
+        "Longer cable",
+        "No drivers needed"
       ],
       "answer": 1,
-      "explain": "1–2 кадра задержки и прямой доступ к ISP; USB добавляет буферы и контроллер."
+      "explain": "1–2 frames of latency and direct access to the ISP; USB adds buffers and a controller."
     },
     {
-      "q": "Что такое rolling shutter и чем он плох для навигации?",
+      "q": "What is a rolling shutter and why is it bad for navigation?",
       "options": [
-        "Медленный затвор",
-        "Строки в разное время",
-        "Затвор без экспозиции",
-        "Тип объектива"
+        "A slow shutter",
+        "Rows captured at different times",
+        "A shutter with no exposure",
+        "A type of lens"
       ],
       "answer": 1,
-      "explain": "Для VIO нужен global shutter."
+      "explain": "VIO needs a global shutter."
     },
     {
-      "q": "Зачем CAP_PROP_BUFFERSIZE = 1?",
+      "q": "Why set CAP_PROP_BUFFERSIZE = 1?",
       "options": [
-        "Экономия памяти",
-        "Чтобы читать свежий кадр",
-        "Для FPS",
-        "Для MJPEG-декодера на борту"
+        "To save memory",
+        "To read a fresh frame",
+        "For FPS",
+        "For the onboard MJPEG decoder"
       ],
       "answer": 1,
-      "explain": "Длинная очередь = растущая задержка при медленном алгоритме."
+      "explain": "A long queue = growing latency when the algorithm is slow."
     },
     {
-      "q": "Как измерить задержку glass-to-glass?",
+      "q": "How do you measure glass-to-glass latency?",
       "options": [
-        "По FPS и разрешению потока",
-        "Таймер и окно на одном фото",
-        "По логу",
-        "По битрейту"
+        "From the stream's FPS and resolution",
+        "A timer and the window in one photo",
+        "From the log",
+        "From the bitrate"
       ],
       "answer": 1,
-      "explain": "Самый честный метод для всей цепочки."
+      "explain": "The most honest method for the whole chain."
     },
     {
-      "q": "Главный вклад в задержку RTSP-потока до GCS обычно:",
+      "q": "The main contributor to RTSP stream latency to the GCS is usually:",
       "options": [
-        "Кодер H.264 на борту",
-        "Буфер плеера",
-        "Камера",
+        "The onboard H.264 encoder",
+        "The player buffer",
+        "The camera",
         "Wi-Fi"
       ],
       "answer": 1,
-      "explain": "Уменьшать latency в приёмнике, iframe чаще."
+      "explain": "Reduce latency in the receiver, more frequent iframes."
     },
     {
-      "q": "Что делать, если автоэкспозиция «мигает» при наклонах?",
+      "q": "What should you do if auto exposure “flickers” when the vehicle tilts?",
       "options": [
-        "Снизить FPS до 15 кадров",
-        "Зафиксировать экспозицию",
-        "Ничего",
-        "Поднять битрейт"
+        "Lower the FPS to 15 frames",
+        "Lock the exposure",
+        "Nothing",
+        "Raise the bitrate"
       ],
       "answer": 1,
-      "explain": "AE реагирует на небо/землю в кадре."
+      "explain": "AE reacts to the sky/ground in the frame."
     },
     {
-      "q": "Чем YUV420 удобен для алгоритмов?",
+      "q": "Why is YUV420 convenient for algorithms?",
       "options": [
-        "Несжатый формат: кадр не нужно декодировать",
-        "Сжимает лучше H.265",
-        "Хранит глубину кадра",
-        "Работает только с USB-камерами в режиме MJPEG"
+        "It's uncompressed: the frame doesn't need decoding",
+        "It compresses better than H.265",
+        "It stores frame depth",
+        "It only works with USB cameras in MJPEG mode"
       ],
       "answer": 0,
-      "explain": "YUV420 не требует декодирования, в отличие от MJPEG и H.264."
+      "explain": "YUV420 needs no decoding, unlike MJPEG and H.264."
     },
     {
-      "q": "Где задержка IP-камеры и HDMI-захвата уместна?",
+      "q": "Where is the latency of an IP camera or HDMI capture acceptable?",
       "options": [
-        "Контур слежения за целью",
-        "Посадка по маркеру",
-        "Стабилизация гироскопом",
-        "Видео оператору, не контур управления"
+        "A target-tracking loop",
+        "Landing on a marker",
+        "Gyro stabilization",
+        "Video for the operator, not a control loop"
       ],
       "answer": 3,
-      "explain": "100+ мс — приемлемо для просмотра, плохо для замкнутого контура."
+      "explain": "100+ ms is acceptable for viewing, bad for a closed loop."
     }
   ]
 }

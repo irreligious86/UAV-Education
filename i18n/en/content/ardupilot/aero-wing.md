@@ -20,7 +20,7 @@ related:
 next:
   - ap-heavy
 source: content/ardupilot/aero-wing.md
-source_hash: f160799ff02b
+source_hash: 623a5c3792d4
 ---
 
 ## summary

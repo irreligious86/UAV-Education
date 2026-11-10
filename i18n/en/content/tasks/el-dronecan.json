@@ -1,0 +1,43 @@
+{
+ "module": "el-dronecan",
+ "tasks": [
+  {
+   "id": "term",
+   "title": "CAN bus resistance",
+   "statement": "The bus has **{n}** terminator(s) of 120 Ω each. What will a multimeter show between CAN_H and CAN_L with the power off (Ω)?",
+   "params": {
+    "n": [
+     1,
+     2,
+     3,
+     4
+    ]
+   },
+   "answer": "120/n",
+   "unit": "Ω",
+   "tol": 0.01,
+   "solution": "Terminators in parallel: 120 / n. The correct number is two, 60 Ω."
+  },
+  {
+   "id": "load",
+   "title": "CAN bus load",
+   "statement": "The bus carries **{f} frames/s**, a frame with an extended ID and 8 bytes ≈ **{b} bits** with bit stuffing, bitrate 1 Mbit/s. Find the bus load (%).",
+   "params": {
+    "f": {
+     "min": 500,
+     "max": 4000,
+     "step": 100
+    },
+    "b": [
+     130,
+     140,
+     150
+    ]
+   },
+   "answer": "100*f*b/1e6",
+   "unit": "%",
+   "tol": 0.03,
+   "solution": "Load = frames/s · bits/frame / bus bitrate."
+  }
+ ]
+}

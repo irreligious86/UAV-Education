@@ -1,0 +1,28 @@
+{
+ "module": "payload-gimbal",
+ "tasks": [
+  {
+   "id": "shots",
+   "title": "Shots by distance",
+   "statement": "The survey leg is **{L} m**, `CAM1_TRIGG_DIST` = **{d} m**. How many shots should you expect (including the first one at the start of the leg)?",
+   "params": {
+    "L": {
+     "min": 100,
+     "max": 1000,
+     "step": 50
+    },
+    "d": [
+     2,
+     5,
+     10,
+     20
+    ]
+   },
+   "answer": "math.floor(L/d)+1",
+   "unit": "pcs",
+   "tol": 0.0001,
+   "solution": "A shot every d meters: ⌊L/d⌋ + 1.",
+   "abs": 0.5
+  }
+ ]
+}

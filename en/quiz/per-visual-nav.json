@@ -3,40 +3,40 @@
   "pass": 80,
   "questions": [
     {
-      "q": "Что даёт VIO, чего не даёт оптический поток?",
+      "q": "What does VIO give you that optical flow does not?",
       "options": [
-        "Карту",
-        "Позу 6DoF",
-        "Скорость относительно земли",
-        "Высоту"
+        "A map",
+        "A 6DoF pose",
+        "Velocity over ground",
+        "Height"
       ],
       "answer": 1,
-      "explain": "Поток — скорость; VIO — позу; SLAM — ещё карту."
+      "explain": "Flow gives velocity; VIO gives a pose; SLAM adds a map."
     },
     {
-      "q": "Откуда монокулярная VIO берёт масштаб?",
+      "q": "Where does monocular VIO get its scale from?",
       "options": [
-        "Из камеры",
-        "Из IMU или стерео",
-        "Из GPS при старте",
-        "Из компаса"
+        "From the camera",
+        "From the IMU or stereo",
+        "From GPS at startup",
+        "From the compass"
       ],
       "answer": 1,
-      "explain": "Моно-камера без IMU не знает масштаб."
+      "explain": "A mono camera without an IMU does not know scale."
     },
     {
-      "q": "Что сильнее всего ломает VIO?",
+      "q": "What breaks VIO the most?",
       "options": [
-        "Ветер",
-        "Нет текстуры, рассинхрон",
-        "Слишком частые кадры камеры",
-        "Солнечная погода и высота"
+        "Wind",
+        "No texture, desynchronization",
+        "Camera frames that are too frequent",
+        "Sunny weather and altitude"
       ],
       "answer": 1,
-      "explain": "Отсутствие текстуры, плохой свет, быстрое вращение, плохая калибровка и рассинхронизация камера–IMU: 5 мс — заметный дрейф."
+      "explain": "Lack of texture, bad light, fast rotation, bad calibration and camera–IMU desynchronization: 5 ms means noticeable drift."
     },
     {
-      "q": "Какое значение EK3_SRC1_POSXY включает внешнюю навигацию?",
+      "q": "Which EK3_SRC1_POSXY value enables external navigation?",
       "options": [
         "3",
         "5",
@@ -47,7 +47,7 @@
       "explain": "6 = ExternalNav."
     },
     {
-      "q": "Какой параметр задаёт задержку внешнего источника в ArduPilot?",
+      "q": "Which parameter sets the external source latency in ArduPilot?",
       "options": [
         "GPS1_DELAY_MS",
         "VISO_DELAY_MS",
@@ -55,40 +55,40 @@
         "VISO_TYPE"
       ],
       "answer": 1,
-      "explain": "EKF учитывает возраст измерения."
+      "explain": "The EKF accounts for the age of the measurement."
     },
     {
-      "q": "Что должен сделать companion при потере трекинга VIO?",
+      "q": "What should the companion do when VIO tracking is lost?",
       "options": [
-        "Слать последнюю позу",
-        "Прекратить публикацию",
-        "Слать нули в позиции",
-        "Перезагрузиться"
+        "Keep sending the last pose",
+        "Stop publishing",
+        "Send zeros as the position",
+        "Reboot"
       ],
       "answer": 1,
-      "explain": "«Замороженная» поза — худший вариант."
+      "explain": "A “frozen” pose is the worst option."
     },
     {
-      "q": "Как проверить ExternalNav до поля?",
+      "q": "How do you test ExternalNav before going to the field?",
       "options": [
-        "На столе, двигая руками",
-        "SITL: поза из истины с шумом",
-        "Никак",
-        "По видео"
+        "On the bench, moving it by hand",
+        "SITL: pose from truth with noise",
+        "You can't",
+        "From video"
       ],
       "answer": 1,
-      "explain": "Затем — отказ источника и резервный набор."
+      "explain": "Then source failure and the backup set."
     },
     {
-      "q": "Почему VIO плохо работает над однородной поверхностью (вода, снег)?",
+      "q": "Why does VIO work poorly over a uniform surface (water, snow)?",
       "options": [
-        "На ней нет устойчивых точек для отслеживания",
-        "Камера перегревается",
-        "IMU там не работает",
-        "GPS-приёмник создаёт помехи для камеры над водой"
+        "It has no stable points to track",
+        "The camera overheats",
+        "The IMU doesn't work there",
+        "The GPS receiver interferes with the camera over water"
       ],
       "answer": 0,
-      "explain": "Визуальной одометрии нужны текстурные особые точки; однородная поверхность их не даёт."
+      "explain": "Visual odometry needs textured feature points; a uniform surface doesn't provide them."
     }
   ]
 }

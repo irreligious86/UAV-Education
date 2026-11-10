@@ -1,0 +1,94 @@
+{
+  "module": "per-cv",
+  "pass": 80,
+  "questions": [
+    {
+      "q": "When is a classical method (an ArUco marker) better than a neural network?",
+      "options": [
+        "Never",
+        "A known object with a code",
+        "Only at night with IR illumination",
+        "Always"
+      ],
+      "answer": 1,
+      "explain": "For precision landing and control-loop tests."
+    },
+    {
+      "q": "What is recall?",
+      "options": [
+        "Speed",
+        "The share found among the true objects",
+        "The area under the curve",
+        "The share of correct ones among all found"
+      ],
+      "answer": 1,
+      "explain": "Precision is TP/(TP+FP), recall is TP/(TP+FN)."
+    },
+    {
+      "q": "Why is fine-tuning on your own data needed?",
+      "options": [
+        "For speed",
+        "The model doesn't know your object",
+        "It isn't needed",
+        "To quantize the model to INT8"
+      ],
+      "answer": 1,
+      "explain": "300–1000 labeled frames from the vehicle."
+    },
+    {
+      "q": "How do you get a ×3–10 speedup on a Jetson?",
+      "options": [
+        "Raise the resolution",
+        "TensorRT FP16/INT8",
+        "More Python threads",
+        "A different cable"
+      ],
+      "answer": 1,
+      "explain": "Hardware acceleration and graph optimization."
+    },
+    {
+      "q": "What data should you evaluate the model on?",
+      "options": [
+        "The training data",
+        "Held-out data from the vehicle",
+        "Any data",
+        "COCO as the quality benchmark"
+      ],
+      "answer": 1,
+      "explain": "Otherwise mAP 0.9 turns into 0.5 in the field."
+    },
+    {
+      "q": "Why put a tracker on top of the detector?",
+      "options": [
+        "For looks",
+        "Stable IDs and surviving misses",
+        "For training",
+        "To record video with annotations"
+      ],
+      "answer": 1,
+      "explain": "Commands to the control loop come from the tracker."
+    },
+    {
+      "q": "False positives on shadows are cured by:",
+      "options": [
+        "Only the threshold",
+        "Negatives and a temporal filter",
+        "Lower FPS",
+        "A different, higher-resolution camera"
+      ],
+      "answer": 1,
+      "explain": "Classify the FPs — each group has its own cure."
+    },
+    {
+      "q": "What is precision?",
+      "options": [
+        "The share of correct ones among all detections",
+        "The share found among all objects",
+        "Inference speed in frames",
+        "Model size in megabytes"
+      ],
+      "answer": 0,
+      "explain": "Precision = TP / (TP + FP); recall = TP / (TP + FN)."
+    }
+  ]
+}

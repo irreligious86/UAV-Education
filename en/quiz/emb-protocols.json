@@ -3,7 +3,7 @@
   "pass": 80,
   "questions": [
     {
-      "q": "Сколько бит занимает байт в UART 8N1?",
+      "q": "How many bits does one byte take in UART 8N1?",
       "options": [
         "8",
         "9",
@@ -11,84 +11,84 @@
         "11"
       ],
       "answer": 2,
-      "explain": "Старт + 8 данных + стоп."
+      "explain": "Start + 8 data + stop."
     },
     {
-      "q": "Что означает framing error?",
+      "q": "What does a framing error mean?",
       "options": [
-        "Неверный адрес ведомого на шине",
-        "Нет стоп-бита: скорость/инверсия",
-        "Потеря байта",
-        "Нет подтяжки"
+        "Wrong slave address on the bus",
+        "No stop bit: baud rate/inversion",
+        "A lost byte",
+        "No pull-up"
       ],
       "answer": 1,
-      "explain": "Приёмник ожидал стоп-бит и не увидел его."
+      "explain": "The receiver expected a stop bit and did not see it."
     },
     {
-      "q": "Зачем в I2C повторный START при чтении регистра?",
+      "q": "Why does I2C use a repeated START when reading a register?",
       "options": [
-        "Для скорости",
-        "Сменить W→R без STOP",
-        "Для повторного ACK от ведомого",
-        "Для сброса"
+        "For speed",
+        "To switch W→R without a STOP",
+        "To get a second ACK from the slave",
+        "For a reset"
       ],
       "answer": 1,
-      "explain": "Записать адрес регистра, затем читать без STOP между ними."
+      "explain": "Write the register address, then read with no STOP in between."
     },
     {
-      "q": "Как восстановить зависшую шину I2C (ведомый держит SDA)?",
+      "q": "How do you recover a stuck I2C bus (the slave holds SDA)?",
       "options": [
-        "Перезагрузить МК",
-        "9 тактов SCL, затем STOP",
-        "Снять подтяжки",
-        "Повысить скорость шины до 400 кГц"
+        "Reboot the MCU",
+        "9 SCL clocks, then STOP",
+        "Remove the pull-ups",
+        "Raise the bus speed to 400 kHz"
       ],
       "answer": 1,
-      "explain": "Bus recovery — стандартный приём."
+      "explain": "Bus recovery is the standard technique."
     },
     {
-      "q": "Почему в SPI нет ACK?",
+      "q": "Why is there no ACK in SPI?",
       "options": [
-        "Есть, но скрыт в линии MISO",
-        "Дуплекс без адресов и ACK",
-        "Он медленный",
-        "Из-за линии CS"
+        "There is one, hidden in the MISO line",
+        "Full duplex with no addresses and no ACK",
+        "It is slow",
+        "Because of the CS line"
       ],
       "answer": 1,
-      "explain": "Данные сдвигаются в обе стороны каждый такт; целостность проверяют по смыслу — WHO_AM_I и диапазон значений."
+      "explain": "Data shifts in both directions every clock; integrity is checked by meaning — WHO_AM_I and the value range."
     },
     {
-      "q": "Как CAN разрешает одновременную передачу?",
+      "q": "How does CAN resolve simultaneous transmission?",
       "options": [
-        "Случайной задержкой",
-        "Арбитражем по ID",
-        "Выбором мастера",
-        "Коллизией и повтором"
+        "With a random delay",
+        "By arbitration on the ID",
+        "By electing a master",
+        "Collision and retry"
       ],
       "answer": 1,
-      "explain": "Доминантный 0 побеждает: меньший ID выигрывает без потери времени."
+      "explain": "A dominant 0 wins: the lower ID wins with no time lost."
     },
     {
-      "q": "Что такое node ID в DroneCAN?",
+      "q": "What is the node ID in DroneCAN?",
       "options": [
-        "Скорость шины в кбит/с",
-        "Номер узла 1–127",
-        "Адрес I2C",
-        "Тип сообщения"
+        "Bus speed in kbit/s",
+        "Node number 1–127",
+        "I2C address",
+        "Message type"
       ],
       "answer": 1,
-      "explain": "Входит в 29-битный CAN ID."
+      "explain": "It is part of the 29-bit CAN ID."
     },
     {
-      "q": "Сколько времени передаётся байт UART 8N1 на 115200 бод?",
+      "q": "How long does it take to transmit one UART 8N1 byte at 115200 baud?",
       "options": [
-        "≈ 87 мкс (10 бит)",
-        "≈ 8.7 мкс",
-        "≈ 1 мс",
-        "≈ 69 мкс (8 бит)"
+        "≈ 87 µs (10 bits)",
+        "≈ 8.7 µs",
+        "≈ 1 ms",
+        "≈ 69 µs (8 bits)"
       ],
       "answer": 0,
-      "explain": "8N1 — 10 бит на байт: 10 / 115200 ≈ 87 мкс."
+      "explain": "8N1 is 10 bits per byte: 10 / 115200 ≈ 87 µs."
     }
   ]
 }

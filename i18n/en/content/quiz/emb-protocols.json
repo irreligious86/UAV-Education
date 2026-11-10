@@ -1,0 +1,94 @@
+{
+  "module": "emb-protocols",
+  "pass": 80,
+  "questions": [
+    {
+      "q": "How many bits does one byte take in UART 8N1?",
+      "options": [
+        "8",
+        "9",
+        "10",
+        "11"
+      ],
+      "answer": 2,
+      "explain": "Start + 8 data + stop."
+    },
+    {
+      "q": "What does a framing error mean?",
+      "options": [
+        "Wrong slave address on the bus",
+        "No stop bit: baud rate/inversion",
+        "A lost byte",
+        "No pull-up"
+      ],
+      "answer": 1,
+      "explain": "The receiver expected a stop bit and did not see it."
+    },
+    {
+      "q": "Why does I2C use a repeated START when reading a register?",
+      "options": [
+        "For speed",
+        "To switch W→R without a STOP",
+        "To get a second ACK from the slave",
+        "For a reset"
+      ],
+      "answer": 1,
+      "explain": "Write the register address, then read with no STOP in between."
+    },
+    {
+      "q": "How do you recover a stuck I2C bus (the slave holds SDA)?",
+      "options": [
+        "Reboot the MCU",
+        "9 SCL clocks, then STOP",
+        "Remove the pull-ups",
+        "Raise the bus speed to 400 kHz"
+      ],
+      "answer": 1,
+      "explain": "Bus recovery is the standard technique."
+    },
+    {
+      "q": "Why is there no ACK in SPI?",
+      "options": [
+        "There is one, hidden in the MISO line",
+        "Full duplex with no addresses and no ACK",
+        "It is slow",
+        "Because of the CS line"
+      ],
+      "answer": 1,
+      "explain": "Data shifts in both directions every clock; integrity is checked by meaning — WHO_AM_I and the value range."
+    },
+    {
+      "q": "How does CAN resolve simultaneous transmission?",
+      "options": [
+        "With a random delay",
+        "By arbitration on the ID",
+        "By electing a master",
+        "Collision and retry"
+      ],
+      "answer": 1,
+      "explain": "A dominant 0 wins: the lower ID wins with no time lost."
+    },
+    {
+      "q": "What is the node ID in DroneCAN?",
+      "options": [
+        "Bus speed in kbit/s",
+        "Node number 1–127",
+        "I2C address",
+        "Message type"
+      ],
+      "answer": 1,
+      "explain": "It is part of the 29-bit CAN ID."
+    },
+    {
+      "q": "How long does it take to transmit one UART 8N1 byte at 115200 baud?",
+      "options": [
+        "≈ 87 µs (10 bits)",
+        "≈ 8.7 µs",
+        "≈ 1 ms",
+        "≈ 69 µs (8 bits)"
+      ],
+      "answer": 0,
+      "explain": "8N1 is 10 bits per byte: 10 / 115200 ≈ 87 µs."
+    }
+  ]
+}

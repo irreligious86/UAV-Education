@@ -1,0 +1,57 @@
+{
+ "module": "el-battery-packs",
+ "tasks": [
+  {
+   "id": "sag",
+   "title": "Sag under load",
+   "statement": "A **{s}S** pack, internal resistance of each cell **{r} mΩ**, current **{i} A**. By how many volts will the pack sag?",
+   "params": {
+    "s": {
+     "min": 2,
+     "max": 12,
+     "step": 1
+    },
+    "r": {
+     "min": 3,
+     "max": 40,
+     "step": 1
+    },
+    "i": {
+     "min": 5,
+     "max": 100,
+     "step": 5
+    }
+   },
+   "answer": "s*r/1000*i",
+   "unit": "V",
+   "tol": 0.01,
+   "solution": "ΔU = I·R_pack = I·S·R_cell. From the sag at a known current you get R, the main indicator of cell health."
+  },
+  {
+   "id": "pack-energy",
+   "title": "Energy and mass",
+   "statement": "A **{s}S{p}P** pack of **{c} mAh** cells, 3.6 V nominal. How many Wh are in the pack?",
+   "params": {
+    "s": {
+     "min": 3,
+     "max": 6,
+     "step": 1
+    },
+    "p": {
+     "min": 1,
+     "max": 4,
+     "step": 1
+    },
+    "c": {
+     "min": 2500,
+     "max": 5000,
+     "step": 100
+    }
+   },
+   "answer": "s*p*c/1000*3.6",
+   "unit": "Wh",
+   "tol": 0.01,
+   "solution": "E = S·P·Q·U_nom. Parallel multiplies the capacity, series multiplies the voltage."
+  }
+ ]
+}

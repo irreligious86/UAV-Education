@@ -3,92 +3,92 @@
   "pass": 80,
   "questions": [
     {
-      "q": "Почему конфигурация дрона — это код?",
+      "q": "Why is a drone's configuration code?",
       "options": [
-        "Она в текстовом виде",
-        "От неё зависит полёт",
-        "Её пишут программисты",
-        "Так требует Betaflight"
+        "It is in text form",
+        "Whether it flies depends on it",
+        "Programmers write it",
+        "Betaflight requires it"
       ],
       "answer": 1,
-      "explain": "От конфигурации зависит, полетит ли аппарат: нужны история, ревью, проверка, откат."
+      "explain": "Whether the aircraft flies depends on the configuration: you need history, review, checks, rollback."
     },
     {
-      "q": "Что должно быть в сообщении коммита с изменением параметра?",
+      "q": "What should a commit message with a parameter change contain?",
       "options": [
-        "Ничего",
-        "Что, зачем и доказательство",
-        "Имя файла",
-        "Дата изменения и имя автора"
+        "Nothing",
+        "What, why, and the evidence",
+        "The file name",
+        "The change date and the author's name"
       ],
       "answer": 1,
-      "explain": "«D roll 38→42: bounce-back 18%→9%, лог …»."
+      "explain": "“D roll 38→42: bounce-back 18%→9%, log …”."
     },
     {
-      "q": "Как проверить, что SITL-тест failsafe реально работает?",
+      "q": "How do you check that a SITL failsafe test actually works?",
       "options": [
-        "Запустить его дважды подряд",
-        "Сломать конфиг и увидеть падение",
-        "Он зелёный",
-        "Прочитать код"
+        "Run it twice in a row",
+        "Break the config and watch it fail",
+        "It is green",
+        "Read the code"
       ],
       "answer": 1,
-      "explain": "Тест, который не может упасть, ничего не доказывает."
+      "explain": "A test that cannot fail proves nothing."
     },
     {
-      "q": "Зачем нормализовать diff all перед коммитом?",
+      "q": "Why normalize diff all before committing?",
       "options": [
-        "Для красоты",
-        "Чтобы diff показывал суть",
-        "Для работы Git LFS с текстом",
-        "Чтобы сжать файл"
+        "To make it pretty",
+        "So the diff shows what matters",
+        "So Git LFS works with text",
+        "To compress the file"
       ],
       "answer": 1,
-      "explain": "Иначе каждый снимок отличается целиком."
+      "explain": "Otherwise every snapshot differs completely."
     },
     {
-      "q": "Где хранить большие бинарные логи?",
+      "q": "Where should you store large binary logs?",
       "options": [
-        "В репозитории",
-        "Git LFS или релизы",
-        "В коммите",
-        "В отдельном коммите репозитория"
+        "In the repository",
+        "Git LFS or releases",
+        "In a commit",
+        "In a separate repository commit"
       ],
       "answer": 1,
-      "explain": "Репозиторий — для текста."
+      "explain": "The repository is for text."
     },
     {
-      "q": "Что такое тег релиза в контексте дрона?",
+      "q": "What is a release tag in the context of a drone?",
       "options": [
-        "Версия прошивки",
-        "Метка конфига, с которым летали",
-        "Номер полёта в журнале оператора",
-        "Имя ветки"
+        "The firmware version",
+        "A label on the config you flew with",
+        "The flight number in the operator's log",
+        "A branch name"
       ],
       "answer": 1,
-      "explain": "git checkout <tag> -- <папка> возвращает конфиг."
+      "explain": "git checkout <tag> -- <folder> brings the config back."
     },
     {
-      "q": "Что такое инвариант конфигурации?",
+      "q": "What is a configuration invariant?",
       "options": [
-        "Правило, которое проверяется на каждом конфиге",
-        "Параметр, который нельзя прочитать",
-        "Конфиг без комментариев",
-        "Резервная копия конфигурации на внешней флешке"
+        "A rule checked on every config",
+        "A parameter that cannot be read",
+        "A config without comments",
+        "A configuration backup on an external flash drive"
       ],
       "answer": 0,
-      "explain": "Например, «failsafe включён» — проверка в CI на каждом изменении."
+      "explain": "For example, “failsafe is enabled” — checked in CI on every change."
     },
     {
-      "q": "Зачем ревью изменения параметров вторым человеком?",
+      "q": "Why have a second person review parameter changes?",
       "options": [
-        "Чтобы ускорить сборку",
-        "Так требует GitHub",
-        "Чтобы сократить размер diff",
-        "Поймать ошибку до полёта, а не после"
+        "To speed up the build",
+        "GitHub requires it",
+        "To reduce the diff size",
+        "To catch a mistake before the flight, not after"
       ],
       "answer": 3,
-      "explain": "Свежий взгляд ловит опечатки и непонятые последствия до вылета."
+      "explain": "Fresh eyes catch typos and misunderstood consequences before takeoff."
     }
   ]
 }

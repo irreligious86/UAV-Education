@@ -3,105 +3,105 @@
   "pass": 80,
   "questions": [
     {
-      "q": "В OBSTACLE_DISTANCE значение UINT16_MAX (65535) в секторе означает:",
+      "q": "In OBSTACLE_DISTANCE, the value UINT16_MAX (65535) in a sector means:",
       "options": [
-        "Нет данных — неизвестно",
-        "Свободно до максимальной дистанции",
-        "Препятствие вплотную",
-        "Ошибка датчика, сообщение отбрасывается"
+        "No data — unknown",
+        "Clear up to the maximum distance",
+        "An obstacle right next to the vehicle",
+        "A sensor error, the message is discarded"
       ],
       "answer": 0,
-      "explain": "«Свободно» — это max_distance + 1."
+      "explain": "“Clear” is max_distance + 1."
     },
     {
-      "q": "Какой датчик хуже всего видит провода ЛЭП?",
+      "q": "Which sensor is worst at seeing power lines?",
       "options": [
-        "Почти все",
-        "Только радар",
-        "Только стерео",
-        "Ни один"
+        "Almost all of them",
+        "Only radar",
+        "Only stereo",
+        "None of them"
       ],
       "answer": 0,
-      "explain": "Тонкая цель без текстуры вне плоскости сканирования."
+      "explain": "A thin, textureless target outside the scan plane."
     },
     {
-      "q": "Дистанция остановки d = v·L + v²/(2a) + margin. При росте задержки L вдвое безопасная скорость:",
+      "q": "Stopping distance d = v·L + v²/(2a) + margin. If the delay L doubles, the safe speed:",
       "options": [
-        "Падает",
-        "Растёт",
-        "Не меняется",
-        "Удваивается"
+        "Drops",
+        "Rises",
+        "Doesn't change",
+        "Doubles"
       ],
       "answer": 0,
-      "explain": "Путь за время задержки съедает дальность датчика."
+      "explain": "The distance covered during the delay eats into the sensor range."
     },
     {
-      "q": "Dijkstra в ArduPilot (OA_TYPE = 2) обходит:",
+      "q": "Dijkstra in ArduPilot (OA_TYPE = 2) avoids:",
       "options": [
-        "Полигональную геозону",
-        "Людей",
-        "Препятствия от датчиков приближения",
-        "Всё сразу"
+        "A polygon geofence",
+        "People",
+        "Obstacles from proximity sensors",
+        "Everything at once"
       ],
       "answer": 0,
-      "explain": "Для датчиков — BendyRuler или Dijkstra + BendyRuler."
+      "explain": "For sensors — BendyRuler or Dijkstra + BendyRuler."
     },
     {
-      "q": "AVOID_BEHAVE = 1 в ArduPilot:",
+      "q": "AVOID_BEHAVE = 1 in ArduPilot:",
       "options": [
-        "Остановка перед препятствием",
-        "Скольжение вдоль препятствия",
-        "Подъём над препятствием",
-        "Отключение избегания"
+        "Stop in front of the obstacle",
+        "Slide along the obstacle",
+        "Climb over the obstacle",
+        "Disable avoidance"
       ],
       "answer": 0,
       "explain": "0 — Slide, 1 — Stop."
     },
     {
-      "q": "В PX4 с CP_GO_NO_DATA = 0 в направлении без данных датчиков:",
+      "q": "In PX4 with CP_GO_NO_DATA = 0, in a direction with no sensor data:",
       "options": [
-        "Двигаться нельзя",
-        "Можно двигаться свободно",
-        "Можно на половине скорости",
-        "Аппарат садится"
+        "You can't move",
+        "You can move freely",
+        "You can move at half speed",
+        "The vehicle lands"
       ],
       "answer": 0,
-      "explain": "Без заднего датчика назад не полетишь."
+      "explain": "Without a rear sensor you don't fly backward."
     },
     {
-      "q": "CP_DIST в PX4 отсчитывается:",
+      "q": "CP_DIST in PX4 is measured:",
       "options": [
-        "До датчика",
-        "До концов пропов",
-        "До центра масс",
-        "До земли"
+        "To the sensor",
+        "To the prop tips",
+        "To the center of mass",
+        "To the ground"
       ],
       "answer": 0,
-      "explain": "Добавляйте полразмаха к нужному зазору."
+      "explain": "Add half the span to the clearance you need."
     },
     {
-      "q": "Simple avoidance ArduPilot работает в:",
+      "q": "ArduPilot simple avoidance works in:",
       "options": [
-        "В режимах с пилотом",
-        "Только в Auto и Guided по маршруту",
-        "Только в Acro",
-        "Только на земле"
+        "Pilot-controlled modes",
+        "Only Auto and Guided along a route",
+        "Only Acro",
+        "Only on the ground"
       ],
       "answer": 0,
-      "explain": "Планировщики OA — в автоматических режимах."
+      "explain": "The OA planners work in automatic modes."
     },
     {
-      "q": "Аппарат в Loiter «боится» лететь назад, хотя там пусто. Что шлёт companion (фрагмент OBSTACLE_DISTANCE)?",
+      "q": "In Loiter the vehicle is “afraid” to fly backward even though it's empty there. What is the companion sending (an OBSTACLE_DISTANCE fragment)?",
       "kind": "apply",
-      "fragment": "increment=5  angle_offset=0  min_distance=20  max_distance=1000  frame=BODY_FRD\ndistances[0..8]   = 412 398 377 ... (камера, сектор вперёд)\ndistances[9..71]  = 0 0 0 0 0 ... 0",
+      "fragment": "increment=5  angle_offset=0  min_distance=20  max_distance=1000  frame=BODY_FRD\ndistances[0..8]   = 412 398 377 ... (camera, forward sector)\ndistances[9..71]  = 0 0 0 0 0 ... 0",
       "options": [
-        "Сектора вне обзора заполнены 0 вместо 65535 (нет данных) — автопилот видит «препятствие вплотную»",
-        "BODY_FRD поворачивается вместе с аппаратом, и сектор «вперёд» уехал назад при развороте на 180°",
-        "max_distance = 1000 см меньше дальности камеры, поэтому задние сектора считаются занятыми",
-        "increment = 5 даёт только 72 сектора, а ArduPilot ожидает 360 по одному градусу"
+        "The sectors outside the field of view are filled with 0 instead of 65535 (no data) — the autopilot sees “an obstacle right next to it”",
+        "BODY_FRD rotates with the vehicle, and the “forward” sector moved to the back during a 180° turn",
+        "max_distance = 1000 cm is less than the camera range, so the rear sectors are considered occupied",
+        "increment = 5 gives only 72 sectors, while ArduPilot expects 360 at one degree each"
       ],
       "answer": 0,
-      "explain": "«Нет данных» кодируется UINT16_MAX; 0 — это не «неизвестно»."
+      "explain": "“No data” is encoded as UINT16_MAX; 0 does not mean “unknown”."
     }
   ]
 }

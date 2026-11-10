@@ -1,0 +1,47 @@
+{
+ "module": "per-edge-ml",
+ "tasks": [
+  {
+   "id": "target-shift",
+   "title": "Target shift during the delay",
+   "statement": "The target moves at **{v} m/s**, the camera → command delay is **{l} ms**. How many meters will the target move?",
+   "params": {
+    "v": {
+     "min": 2,
+     "max": 25,
+     "step": 1
+    },
+    "l": {
+     "min": 40,
+     "max": 400,
+     "step": 20
+    }
+   },
+   "answer": "v*l/1000",
+   "unit": "m",
+   "tol": 0.01,
+   "solution": "Δ = v·L."
+  },
+  {
+   "id": "flight-share",
+   "title": "Compute module energy share",
+   "statement": "The vehicle uses **{p} W** to hover, the compute module **{c} W**. By what percentage will the hover time decrease because of the compute module?",
+   "params": {
+    "p": {
+     "min": 150,
+     "max": 900,
+     "step": 25
+    },
+    "c": {
+     "min": 5,
+     "max": 40,
+     "step": 1
+    }
+   },
+   "answer": "100*c/(p+c)",
+   "unit": "%",
+   "tol": 0.02,
+   "solution": "t ∝ 1/P: share = c/(p + c)."
+  }
+ ]
+}

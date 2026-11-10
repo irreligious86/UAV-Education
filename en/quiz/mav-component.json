@@ -3,92 +3,92 @@
   "pass": 80,
   "questions": [
     {
-      "q": "Компонент-датчик в HEARTBEAT указывает autopilot =",
+      "q": "A sensor component sets autopilot in its HEARTBEAT to",
       "options": [
         "MAV_AUTOPILOT_INVALID",
         "MAV_AUTOPILOT_ARDUPILOTMEGA",
         "MAV_AUTOPILOT_PX4",
-        "Любое"
+        "Anything"
       ],
       "answer": 0,
-      "explain": "Он не автопилот; иначе GCS может принять его за аппарат."
+      "explain": "It is not an autopilot; otherwise the GCS may mistake it for a vehicle."
     },
     {
-      "q": "Единицы current_distance в DISTANCE_SENSOR:",
+      "q": "Units of current_distance in DISTANCE_SENSOR:",
       "options": [
-        "Сантиметры",
-        "Метры",
-        "Миллиметры",
-        "Дюймы"
+        "Centimeters",
+        "Meters",
+        "Millimeters",
+        "Inches"
       ],
       "answer": 0,
-      "explain": "min/max/current — в см."
+      "explain": "min/max/current are in cm."
     },
     {
-      "q": "ArduPilot принимает DISTANCE_SENSOR как дальномер вниз при:",
+      "q": "ArduPilot accepts DISTANCE_SENSOR as a downward rangefinder with:",
       "options": [
         "RNGFND1_TYPE = 10, ORIENT = 25",
         "RNGFND1_TYPE = 1, ORIENT = 25",
         "PRX1_TYPE = 2, PRX1_ORIENT = 0",
-        "EK3_SRC1_POSZ = 2 без датчика"
+        "EK3_SRC1_POSZ = 2 with no sensor"
       ],
       "answer": 0,
-      "explain": "10 — MAVLink, 25 — Down; ориентация в сообщении должна совпадать."
+      "explain": "10 is MAVLink, 25 is Down; the orientation in the message must match."
     },
     {
-      "q": "Что должен делать компонент при потере измерений?",
+      "q": "What should a component do when it loses measurements?",
       "options": [
-        "Перестать слать или пометить",
-        "Перезагрузить автопилот",
-        "Слать нули вместо данных",
-        "Слать последнее значение с прежней частотой"
+        "Stop sending or flag it",
+        "Reboot the autopilot",
+        "Send zeros instead of data",
+        "Keep sending the last value at the same rate"
       ],
       "answer": 0,
-      "explain": "Автопилот обнаружит таймаут и отключит источник."
+      "explain": "The autopilot will detect the timeout and disable the source."
     },
     {
-      "q": "Быстро вывести своё число в GCS и лог без своего диалекта:",
+      "q": "Quickly show your own number in the GCS and the log without your own dialect:",
       "options": [
         "NAMED_VALUE_FLOAT",
-        "STATUSTEXT с числом",
+        "STATUSTEXT with a number",
         "PARAM_VALUE",
         "HEARTBEAT.custom_mode"
       ],
       "answer": 0,
-      "explain": "GCS показывает значение, ArduPilot пишет его в лог как NVAL."
+      "explain": "The GCS shows the value, ArduPilot writes it to the log as NVAL."
     },
     {
-      "q": "На ESP32 кадры MAVLink иногда битые. Вероятная причина:",
+      "q": "MAVLink frames from an ESP32 are sometimes broken. The likely cause:",
       "options": [
-        "Несколько задач пишут в UART",
-        "Включена подпись",
-        "Неверный CRC_EXTRA",
-        "Слишком частый heartbeat забивает буфер"
+        "Several tasks write to the UART",
+        "Signing is enabled",
+        "Wrong CRC_EXTRA",
+        "A too-frequent heartbeat clogs the buffer"
       ],
       "answer": 0,
-      "explain": "Нужна одна задача-отправитель или мьютекс на UART."
+      "explain": "You need a single sender task or a mutex on the UART."
     },
     {
-      "q": "Какой уровень теста доказывает, что автопилот использует данные компонента?",
+      "q": "Which test level proves that the autopilot uses the component's data?",
       "options": [
-        "SITL с проверкой по логу",
-        "Юнит-тест упаковки",
-        "Тест на фейковом аппарате",
-        "Успешная компиляция"
+        "SITL with a check in the log",
+        "A packing unit test",
+        "A test against a fake vehicle",
+        "A successful compile"
       ],
       "answer": 0,
-      "explain": "Только он проверяет согласование параметров и сообщения."
+      "explain": "Only it verifies that the parameters and the message agree."
     },
     {
-      "q": "2D-лидар для обхода препятствий отправляет:",
+      "q": "A 2D lidar for obstacle avoidance sends:",
       "options": [
         "OBSTACLE_DISTANCE",
-        "DISTANCE_SENSOR с ориентацией вниз",
+        "DISTANCE_SENSOR with a downward orientation",
         "ODOMETRY",
         "GPS_INPUT"
       ],
       "answer": 0,
-      "explain": "72 сектора → proximity (PRX1_TYPE = 2)."
+      "explain": "72 sectors → proximity (PRX1_TYPE = 2)."
     }
   ]
 }

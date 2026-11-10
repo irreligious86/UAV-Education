@@ -16,7 +16,7 @@ related:
 next:
   - ap-sitl
 source: content/ardupilot/ap-intro.md
-source_hash: ec30b4a1bf2d
+source_hash: ceec42b69130
 ---
 
 ## summary
@@ -24,7 +24,7 @@ ArduPilot is an autopilot, not just a stabilizer. If Betaflight makes a quadcopt
 
 ## theory
 ### Versions and parameter names
-The course is written for ArduPilot 4.5 and newer. In Copter 4.7 (stable since July 2026) some parameters were renamed and moved to SI units: `ARMING_SKIPCHK` → `ARMING_SKIPCHK` (the meaning is inverted: a list of checks to **skip**, 0 — all enabled), `WPNAV_*` → `WP_*` (m, m/s), `RTL_ALT` → `RTL_ALT_M` (m), `ATC_ACCEL_*_MAX` → `ATC_ACC_*_MAX` (°/s²), `PSC_ACCZ_*` → `PSC_D_ACC_*`. In Plane since 4.5 `ARSPD_FBW_MIN/MAX` → `AIRSPEED_MIN/MAX`. The modules give the new name with the old one in parentheses; when you update the firmware, old values are converted automatically, but you have to fix your own scripts and parameter files by hand.
+The course is written for ArduPilot 4.5 and newer. In Copter 4.7 (stable since July 2026) some parameters were renamed and moved to SI units: `ARMING_CHECK` → `ARMING_SKIPCHK` (the meaning is inverted: a list of checks to **skip**, 0 — all enabled), `WPNAV_*` → `WP_*` (m, m/s), `RTL_ALT` → `RTL_ALT_M` (m), `ATC_ACCEL_*_MAX` → `ATC_ACC_*_MAX` (°/s²), `PSC_ACCZ_*` → `PSC_D_ACC_*`. In Plane since 4.5 `ARSPD_FBW_MIN/MAX` → `AIRSPEED_MIN/MAX`. The modules give the new name with the old one in parentheses; when you update the firmware, old values are converted automatically, but you have to fix your own scripts and parameter files by hand.
 
 ### One codebase — many vehicles
 ArduPilot is shared code with separate firmware per vehicle type: Copter (multirotors and helicopters), Plane (planes, wings and QuadPlane VTOL), Rover, Sub. The frame type within a firmware is set with parameters: for Copter that is `FRAME_CLASS` (1 — Quad, 2 — Hexa, 3 — Octa, 4 — OctaQuad, 7 — Tri…) and `FRAME_TYPE` (0 — Plus, 1 — X, 2 — V, 3 — H…).
@@ -107,7 +107,7 @@ The lab counts as done when the parameters are saved to a dated file, `FRAME_CLA
 ## diagnostics
 - **Symptom:** `PreArm: ...` and the drone won't arm
   - Possible cause: an unfinished calibration or a wrong parameter; the message text names the subsystem.
-  - What to do: read the whole message, fix the cause rather than disabling the checks (`ARMING_SKIPCHK` in 4.7+, `ARMING_SKIPCHK` in 4.6 and earlier).
+  - What to do: read the whole message, fix the cause rather than disabling the checks (`ARMING_SKIPCHK` in 4.7+, `ARMING_CHECK` in 4.6 and earlier).
 - **Symptom:** nothing changed after changing a parameter
   - Possible cause: the parameter requires a reboot.
   - What to do: reboot the flight controller and re-read the value.

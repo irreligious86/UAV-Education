@@ -1,0 +1,67 @@
+{
+ "module": "per-depth-avoid",
+ "tasks": [
+  {
+   "id": "stop-dist",
+   "title": "Stopping distance",
+   "statement": "Speed **{v} m/s**, delay **{l} s**, deceleration **{a} m/s²**, margin **{m} m**. Find the stopping distance (m).",
+   "params": {
+    "v": {
+     "min": 1,
+     "max": 12,
+     "step": 0.5
+    },
+    "l": {
+     "min": 0.1,
+     "max": 0.6,
+     "step": 0.05
+    },
+    "a": {
+     "min": 1.5,
+     "max": 6,
+     "step": 0.5
+    },
+    "m": {
+     "min": 0.5,
+     "max": 3,
+     "step": 0.5
+    }
+   },
+   "answer": "v*l+v*v/(2*a)+m",
+   "unit": "m",
+   "tol": 0.01,
+   "solution": "d = v·L + v²/(2a) + margin."
+  },
+  {
+   "id": "vmax",
+   "title": "Safe speed",
+   "statement": "Reliable sensor range **{r} m**, margin **{m} m**, deceleration **{a} m/s²**, delay **{l} s**. Find the maximum safe speed (m/s).",
+   "params": {
+    "r": {
+     "min": 4,
+     "max": 40,
+     "step": 1
+    },
+    "m": {
+     "min": 1,
+     "max": 3,
+     "step": 0.5
+    },
+    "a": {
+     "min": 2,
+     "max": 5,
+     "step": 0.5
+    },
+    "l": {
+     "min": 0.1,
+     "max": 0.5,
+     "step": 0.05
+    }
+   },
+   "answer": "-a*l+math.sqrt((a*l)**2+2*a*(r-m))",
+   "unit": "m/s",
+   "tol": 0.01,
+   "solution": "Solve v·L + v²/2a = R − margin: v = −aL + √((aL)² + 2a(R − margin))."
+  }
+ ]
+}

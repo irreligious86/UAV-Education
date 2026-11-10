@@ -3,92 +3,92 @@
   "pass": 80,
   "questions": [
     {
-      "q": "Что ловит ERC в KiCad?",
+      "q": "What does ERC catch in KiCad?",
       "options": [
-        "Нарушение зазоров дорожек на плате",
-        "Неверные слои в выходных Gerber-файлах и сверловке",
-        "Ошибки связей схемы: висящие выводы, конфликт выходов",
-        "Перегрев шунта"
+        "Trace clearance violations on the board",
+        "Wrong layers in the output Gerber and drill files",
+        "Schematic connection errors: floating pins, output conflicts",
+        "Shunt overheating"
       ],
       "answer": 2,
-      "explain": "ERC проверяет схему; правила фабрики на плате проверяет DRC."
+      "explain": "ERC checks the schematic; the fab's rules on the board are checked by DRC."
     },
     {
-      "q": "Шунт для INA226 на 100 А, диапазон ±81.92 мВ. Какое сопротивление подходит?",
+      "q": "A shunt for an INA226 at 100 A, ±81.92 mV range. Which resistance fits?",
       "options": [
-        "0.5 мОм",
-        "5 мОм",
-        "50 мОм",
-        "0.05 Ом"
+        "0.5 mΩ",
+        "5 mΩ",
+        "50 mΩ",
+        "0.05 Ω"
       ],
       "answer": 0,
-      "explain": "R ≤ 81.92 мВ / 100 А ≈ 0.82 мОм; 0.5 мОм даёт 50 мВ с запасом."
+      "explain": "R ≤ 81.92 mV / 100 A ≈ 0.82 mΩ; 0.5 mΩ gives 50 mV with margin."
     },
     {
-      "q": "Сколько греется шунт 0.5 мОм на 40 А?",
+      "q": "How much heat does a 0.5 mΩ shunt dissipate at 40 A?",
       "options": [
-        "0.02 Вт",
-        "20 Вт",
-        "8 Вт",
-        "0.8 Вт"
+        "0.02 W",
+        "20 W",
+        "8 W",
+        "0.8 W"
       ],
       "answer": 3,
-      "explain": "I²R = 1600 · 0.0005 = 0.8 Вт."
+      "explain": "I²R = 1600 · 0.0005 = 0.8 W."
     },
     {
-      "q": "Зачем Kelvin-подключение шунта?",
+      "q": "Why use a Kelvin connection for the shunt?",
       "options": [
-        "Для защиты платы от переполюсовки батареи",
-        "Чтобы падение на меди не шло в измерение",
-        "Чтобы снизить нагрев дорожек",
-        "Это требование протокола I²C"
+        "To protect the board from reverse battery polarity",
+        "So the drop across the copper doesn't get into the measurement",
+        "To reduce trace heating",
+        "It's required by the I²C protocol"
       ],
       "answer": 1,
-      "explain": "Измерительная пара отходит от площадок шунта, а не от силовой дорожки."
+      "explain": "The sense pair leaves from the shunt pads, not from the power trace."
     },
     {
-      "q": "Ширина внешней дорожки 1 oz для 5 А при +10 °C по IPC-2221?",
+      "q": "Width of a 1 oz outer trace for 5 A at +10 °C per IPC-2221?",
       "options": [
-        "около 2.8 мм",
-        "около 0.3 мм",
-        "около 10 мм",
-        "около 0.1 мм"
+        "about 2.8 mm",
+        "about 0.3 mm",
+        "about 10 mm",
+        "about 0.1 mm"
       ],
       "answer": 0,
-      "explain": "Из I = k·ΔT^0.44·A^0.725 для 35 мкм меди ≈ 2.8 мм."
+      "explain": "From I = k·ΔT^0.44·A^0.725 for 35 µm copper ≈ 2.8 mm."
     },
     {
-      "q": "Почему разрез земляного полигона под дорожкой плох?",
+      "q": "Why is a slot in the ground pour under a trace bad?",
       "options": [
-        "Он заметно увеличивает стоимость изготовления",
-        "DRC не пропустит такую плату",
-        "Возвратный ток обходит разрез — петля излучает",
-        "На нём нельзя ставить компоненты"
+        "It noticeably increases the manufacturing cost",
+        "DRC won't pass such a board",
+        "The return current goes around the slot — the loop radiates",
+        "You can't place components on it"
       ],
       "answer": 2,
-      "explain": "Ток возвращается под дорожкой; обход разреза — большая петля, антенна."
+      "explain": "The current returns under the trace; going around the slot makes a big loop, an antenna."
     },
     {
-      "q": "Где ставить входной конденсатор понижающего преобразователя?",
+      "q": "Where do you put the input capacitor of a buck converter?",
       "options": [
-        "У разъёма батареи на краю платы",
-        "Вплотную к ключу",
-        "Под компасом для фильтрации",
-        "Где удобнее по месту"
+        "At the battery connector on the edge of the board",
+        "Right next to the switch",
+        "Under the compass for filtering",
+        "Wherever is convenient"
       ],
       "answer": 1,
-      "explain": "Петля с быстрым током должна быть минимальной."
+      "explain": "The loop with fast current must be minimal."
     },
     {
-      "q": "Что проверить до первого включения собранной платы?",
+      "q": "What do you check before the first power-up of an assembled board?",
       "options": [
-        "Только внешний вид пайки",
-        "Сразу подключить батарею, чтобы проверить ток в работе",
-        "Прошивку полётника",
-        "КЗ и питание от источника с ограничением тока"
+        "Only the look of the solder joints",
+        "Connect the battery right away to check the current in operation",
+        "The flight controller firmware",
+        "Shorts, and power from a supply with current limiting"
       ],
       "answer": 3,
-      "explain": "Прозвонка и лабораторный источник с ограничением тока спасают плату и батарею."
+      "explain": "A continuity check and a current-limited bench supply save the board and the battery."
     }
   ]
 }

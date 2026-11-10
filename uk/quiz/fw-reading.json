@@ -3,29 +3,29 @@
   "pass": 80,
   "questions": [
     {
-      "q": "Где в Betaflight главный цикл PID?",
+      "q": "Де в Betaflight головний цикл PID?",
       "options": [
         "main/scheduler",
         "fc/core.c: taskMainPidLoop",
-        "flight/pid.c: main() в цикле",
+        "flight/pid.c: main() у циклі",
         "drivers/dshot.c"
       ],
       "answer": 1,
-      "explain": "taskMainPidLoop → subTaskPidController → subTaskMotorUpdate: PID и миксер — подзадачи цикла."
+      "explain": "taskMainPidLoop → subTaskPidController → subTaskMotorUpdate: PID і мікшер — підзадачі циклу."
     },
     {
-      "q": "От чего считается D-term в Betaflight?",
+      "q": "Від чого рахується D-term у Betaflight?",
       "options": [
-        "От setpoint пилота",
-        "От гироскопа",
-        "От ошибки",
-        "От моторов"
+        "Від setpoint пілота",
+        "Від гіроскопа",
+        "Від помилки",
+        "Від моторів"
       ],
       "answer": 1,
-      "explain": "Нет derivative kick при движении стика."
+      "explain": "Немає derivative kick під час руху стіка."
     },
     {
-      "q": "Где в ArduCopter таблица задач с частотами и бюджетом времени?",
+      "q": "Де в ArduCopter таблиця задач із частотами й бюджетом часу?",
       "options": [
         "Attitude.cpp",
         "Copter.cpp: scheduler_tasks[]",
@@ -33,62 +33,62 @@
         "motors.cpp"
       ],
       "answer": 1,
-      "explain": "FAST_TASK и SCHED_TASK(func, hz, max_us, prio)."
+      "explain": "FAST_TASK і SCHED_TASK(func, hz, max_us, prio)."
     },
     {
-      "q": "Что делает AP_MotorsMatrix::output_armed_stabilizing()?",
+      "q": "Що робить AP_MotorsMatrix::output_armed_stabilizing()?",
       "options": [
-        "Читает гироскоп",
-        "Раздаёт оси по моторам",
-        "Шлёт MAVLink",
-        "Считает EKF и пишет лог"
+        "Читає гіроскоп",
+        "Розподіляє осі по моторах",
+        "Надсилає MAVLink",
+        "Рахує EKF і пише лог"
       ],
       "answer": 1,
-      "explain": "Распределяет roll/pitch/yaw/throttle по матрице моторов с приоритетами; yaw — последним, в пределах MOT_YAW_HEADROOM."
+      "explain": "Розподіляє roll/pitch/yaw/throttle за матрицею моторів із пріоритетами; yaw — останнім, у межах MOT_YAW_HEADROOM."
     },
     {
-      "q": "Откуда берётся вики параметров ArduPilot?",
+      "q": "Звідки береться вікі параметрів ArduPilot?",
       "options": [
-        "Из MAVLink",
-        "Из блоков @Param в коде",
-        "Из Mission Planner",
-        "Пишется вручную командой разработчиков"
+        "З MAVLink",
+        "З блоків @Param у коді",
+        "З Mission Planner",
+        "Пишеться вручну командою розробників"
       ],
       "answer": 1,
-      "explain": "Описание, диапазон, @Values — в коде."
+      "explain": "Опис, діапазон, @Values — у коді."
     },
     {
-      "q": "Как безопасно проверить патч прошивки?",
+      "q": "Як безпечно перевірити патч прошивки?",
       "options": [
-        "Сразу на дроне",
-        "SITL и тесты, затем стенд",
-        "Никак",
-        "В конфигураторе через CLI"
+        "Одразу на дроні",
+        "SITL і тести, потім стенд",
+        "Ніяк",
+        "У конфігураторі через CLI"
       ],
       "answer": 1,
       "explain": "make SITL / sim_vehicle.py; make test."
     },
     {
-      "q": "git log -S \"имя\" нужен, чтобы:",
+      "q": "git log -S \"имя\" потрібен, щоб:",
       "options": [
-        "Собрать прошивку из старого коммита",
-        "Найти коммит с этой строкой",
-        "Удалить строку",
-        "Проверить стиль"
+        "Зібрати прошивку зі старого коміту",
+        "Знайти коміт із цим рядком",
+        "Видалити рядок",
+        "Перевірити стиль"
       ],
       "answer": 1,
-      "explain": "Комментарий PR объясняет причину изменения."
+      "explain": "Коментар PR пояснює причину зміни."
     },
     {
-      "q": "Зачем ссылаться в отчёте на коммит, а не на master?",
+      "q": "Навіщо посилатися у звіті на коміт, а не на master?",
       "options": [
-        "Ссылка на master со временем указывает на другой код",
-        "Коммиты быстрее открываются",
-        "GitHub запрещает ссылки на master",
-        "В master нет номеров строк"
+        "Посилання на master з часом вказує на інший код",
+        "Коміти швидше відкриваються",
+        "GitHub забороняє посилання на master",
+        "У master немає номерів рядків"
       ],
       "answer": 0,
-      "explain": "Ссылка на конкретный коммит остаётся верной; master уезжает."
+      "explain": "Посилання на конкретний коміт залишається правильним; master поїде."
     }
   ]
 }

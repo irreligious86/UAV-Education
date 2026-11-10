@@ -1,0 +1,94 @@
+{
+  "module": "per-camera",
+  "pass": 80,
+  "questions": [
+    {
+      "q": "Why is a CSI camera better than USB for a control loop?",
+      "options": [
+        "It's cheaper",
+        "Lower latency",
+        "Longer cable",
+        "No drivers needed"
+      ],
+      "answer": 1,
+      "explain": "1–2 frames of latency and direct access to the ISP; USB adds buffers and a controller."
+    },
+    {
+      "q": "What is a rolling shutter and why is it bad for navigation?",
+      "options": [
+        "A slow shutter",
+        "Rows captured at different times",
+        "A shutter with no exposure",
+        "A type of lens"
+      ],
+      "answer": 1,
+      "explain": "VIO needs a global shutter."
+    },
+    {
+      "q": "Why set CAP_PROP_BUFFERSIZE = 1?",
+      "options": [
+        "To save memory",
+        "To read a fresh frame",
+        "For FPS",
+        "For the onboard MJPEG decoder"
+      ],
+      "answer": 1,
+      "explain": "A long queue = growing latency when the algorithm is slow."
+    },
+    {
+      "q": "How do you measure glass-to-glass latency?",
+      "options": [
+        "From the stream's FPS and resolution",
+        "A timer and the window in one photo",
+        "From the log",
+        "From the bitrate"
+      ],
+      "answer": 1,
+      "explain": "The most honest method for the whole chain."
+    },
+    {
+      "q": "The main contributor to RTSP stream latency to the GCS is usually:",
+      "options": [
+        "The onboard H.264 encoder",
+        "The player buffer",
+        "The camera",
+        "Wi-Fi"
+      ],
+      "answer": 1,
+      "explain": "Reduce latency in the receiver, more frequent iframes."
+    },
+    {
+      "q": "What should you do if auto exposure “flickers” when the vehicle tilts?",
+      "options": [
+        "Lower the FPS to 15 frames",
+        "Lock the exposure",
+        "Nothing",
+        "Raise the bitrate"
+      ],
+      "answer": 1,
+      "explain": "AE reacts to the sky/ground in the frame."
+    },
+    {
+      "q": "Why is YUV420 convenient for algorithms?",
+      "options": [
+        "It's uncompressed: the frame doesn't need decoding",
+        "It compresses better than H.265",
+        "It stores frame depth",
+        "It only works with USB cameras in MJPEG mode"
+      ],
+      "answer": 0,
+      "explain": "YUV420 needs no decoding, unlike MJPEG and H.264."
+    },
+    {
+      "q": "Where is the latency of an IP camera or HDMI capture acceptable?",
+      "options": [
+        "A target-tracking loop",
+        "Landing on a marker",
+        "Gyro stabilization",
+        "Video for the operator, not a control loop"
+      ],
+      "answer": 3,
+      "explain": "100+ ms is acceptable for viewing, bad for a closed loop."
+    }
+  ]
+}

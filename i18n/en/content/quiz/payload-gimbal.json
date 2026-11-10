@@ -1,0 +1,94 @@
+{
+  "module": "payload-gimbal",
+  "pass": 80,
+  "questions": [
+    {
+      "q": "In Gimbal Protocol v2, what usually acts as the gimbal manager?",
+      "options": [
+        "The autopilot, which knows the vehicle's attitude",
+        "The gimbal itself with its own IMU",
+        "The operator's ground control station over MAVLink",
+        "The camera attached to the gimbal"
+      ],
+      "answer": 0,
+      "explain": "The manager is the autopilot: it turns client commands into angles and decides who is in control; the device is the gimbal."
+    },
+    {
+      "q": "Why is gimbal yaw kept in lock mode when orbiting a tower?",
+      "options": [
+        "To reduce the load on the gimbal motors",
+        "So the camera doesn't turn together with the vehicle",
+        "So the gimbal doesn't overheat in the sun",
+        "To get a faster COMMAND_ACK response"
+      ],
+      "answer": 1,
+      "explain": "In follow, yaw is measured from the vehicle; in lock, from north: turning the vehicle doesn't swing the camera away."
+    },
+    {
+      "q": "What does MNT1_RC_RATE = 0 mean in ArduPilot?",
+      "options": [
+        "The radio doesn't control the gimbal",
+        "The stick sets the rate in °/s",
+        "The stick sets the gimbal angle",
+        "The gimbal goes to the retract position"
+      ],
+      "answer": 2,
+      "explain": "0 means angle control; a nonzero value is the rotation rate in °/s."
+    },
+    {
+      "q": "What is the gimbal's MAVLink component number?",
+      "options": [
+        "1 — autopilot",
+        "100 — camera",
+        "191 — onboard computer",
+        "154 — gimbal"
+      ],
+      "answer": 3,
+      "explain": "MAV_COMP_ID_GIMBAL = 154; no component in the inspector means no control over MAVLink."
+    },
+    {
+      "q": "How do you set up a shot every 5 m on a mission leg?",
+      "options": [
+        "DO_SET_ROI_LOCATION with a 5 m radius",
+        "DO_GIMBAL_MANAGER_PITCHYAW with a step of 5",
+        "DO_SET_CAM_TRIGG_DIST = 5",
+        "MNT1_RC_RATE = 5 in the parameters"
+      ],
+      "answer": 2,
+      "explain": "DO_SET_CAM_TRIGG_DIST (or CAM1_TRIGG_DIST) takes a shot per distance traveled, each one written to the CAM log."
+    },
+    {
+      "q": "Why can radio and companion commands “fight” over the gimbal?",
+      "options": [
+        "The manager has no explicit control takeover",
+        "The radio works on a different frequency",
+        "The companion sends commands in MAVLink 1",
+        "The gimbal accepts only one command per second"
+      ],
+      "answer": 0,
+      "explain": "Without MAV_CMD_DO_GIMBAL_MANAGER_CONFIGURE the manager doesn't know which client is primary."
+    },
+    {
+      "q": "What happens to the vehicle right after a payload drop?",
+      "options": [
+        "It loses altitude sharply",
+        "It switches to RTL automatically",
+        "The gimbal goes to the retract position",
+        "The mass drops in a step, and it jumps up"
+      ],
+      "answer": 3,
+      "explain": "The throttle was set for a heavier mass: after the drop the vehicle goes up; drop in a hover with altitude hold."
+    },
+    {
+      "q": "How do you check the center of mass after installing a payload?",
+      "options": [
+        "By the sound of the motors on the ground",
+        "By the motor outputs at hover in the log",
+        "By the gimbal angle when stationary",
+        "By the battery voltage after landing"
+      ],
+      "answer": 1,
+      "explain": "The spread between the average outputs of the front and rear motors shows the CoM offset."
+    }
+  ]
+}

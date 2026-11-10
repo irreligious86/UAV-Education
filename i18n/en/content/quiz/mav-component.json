@@ -1,0 +1,94 @@
+{
+  "module": "mav-component",
+  "pass": 80,
+  "questions": [
+    {
+      "q": "A sensor component sets autopilot in its HEARTBEAT to",
+      "options": [
+        "MAV_AUTOPILOT_INVALID",
+        "MAV_AUTOPILOT_ARDUPILOTMEGA",
+        "MAV_AUTOPILOT_PX4",
+        "Anything"
+      ],
+      "answer": 0,
+      "explain": "It is not an autopilot; otherwise the GCS may mistake it for a vehicle."
+    },
+    {
+      "q": "Units of current_distance in DISTANCE_SENSOR:",
+      "options": [
+        "Centimeters",
+        "Meters",
+        "Millimeters",
+        "Inches"
+      ],
+      "answer": 0,
+      "explain": "min/max/current are in cm."
+    },
+    {
+      "q": "ArduPilot accepts DISTANCE_SENSOR as a downward rangefinder with:",
+      "options": [
+        "RNGFND1_TYPE = 10, ORIENT = 25",
+        "RNGFND1_TYPE = 1, ORIENT = 25",
+        "PRX1_TYPE = 2, PRX1_ORIENT = 0",
+        "EK3_SRC1_POSZ = 2 with no sensor"
+      ],
+      "answer": 0,
+      "explain": "10 is MAVLink, 25 is Down; the orientation in the message must match."
+    },
+    {
+      "q": "What should a component do when it loses measurements?",
+      "options": [
+        "Stop sending or flag it",
+        "Reboot the autopilot",
+        "Send zeros instead of data",
+        "Keep sending the last value at the same rate"
+      ],
+      "answer": 0,
+      "explain": "The autopilot will detect the timeout and disable the source."
+    },
+    {
+      "q": "Quickly show your own number in the GCS and the log without your own dialect:",
+      "options": [
+        "NAMED_VALUE_FLOAT",
+        "STATUSTEXT with a number",
+        "PARAM_VALUE",
+        "HEARTBEAT.custom_mode"
+      ],
+      "answer": 0,
+      "explain": "The GCS shows the value, ArduPilot writes it to the log as NVAL."
+    },
+    {
+      "q": "MAVLink frames from an ESP32 are sometimes broken. The likely cause:",
+      "options": [
+        "Several tasks write to the UART",
+        "Signing is enabled",
+        "Wrong CRC_EXTRA",
+        "A too-frequent heartbeat clogs the buffer"
+      ],
+      "answer": 0,
+      "explain": "You need a single sender task or a mutex on the UART."
+    },
+    {
+      "q": "Which test level proves that the autopilot uses the component's data?",
+      "options": [
+        "SITL with a check in the log",
+        "A packing unit test",
+        "A test against a fake vehicle",
+        "A successful compile"
+      ],
+      "answer": 0,
+      "explain": "Only it verifies that the parameters and the message agree."
+    },
+    {
+      "q": "A 2D lidar for obstacle avoidance sends:",
+      "options": [
+        "OBSTACLE_DISTANCE",
+        "DISTANCE_SENSOR with a downward orientation",
+        "ODOMETRY",
+        "GPS_INPUT"
+      ],
+      "answer": 0,
+      "explain": "72 sectors → proximity (PRX1_TYPE = 2)."
+    }
+  ]
+}

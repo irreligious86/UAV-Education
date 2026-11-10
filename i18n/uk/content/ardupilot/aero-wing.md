@@ -20,7 +20,7 @@ related:
 next:
   - ap-heavy
 source: content/ardupilot/aero-wing.md
-source_hash: f160799ff02b
+source_hash: 623a5c3792d4
 ---
 
 ## summary
@@ -51,7 +51,7 @@ L = ½ · ρ · V² · S · C_L — густина повітря, квадра�
 INAV: `nav_fw_cruise_speed`, `nav_fw_min_thr/max_thr/cruise_thr`, `nav_fw_climb_angle/dive_angle`, `fw_min_throttle_down_pitch` — простіше, без енергетичної моделі, але та сама ідея: газ — набір, тангаж — швидкість.
 
 ### Запуск і посадка
-Кидок із руки/катапульта: `TKOFF_THR_MINACC` (детекція кидка за прискоренням), `TKOFF_THR_DELAY`, `TKOFF_LVL_ALT`; INAV — autolaunch (`nav_fw_launch_*`). Посадка: глісада `LAND_PITCH_DEG`, `LAND_FLARE_ALT/SEC`, далекомір для вирівнювання; у крила — на пузо за вітром, швидкість 1.1–1.2 V_s.
+Кидок із руки/катапульта: `TKOFF_THR_MINACC` (детекція кидка за прискоренням), `TKOFF_THR_DELAY`, `TKOFF_LVL_ALT`; INAV — autolaunch (`nav_fw_launch_*`). Посадка: глісада `LAND_PITCH_DEG`, `LAND_FLARE_ALT/SEC`, далекомір для вирівнювання; у крила — на пузо проти вітру, швидкість 1.1–1.2 V_s.
 
 {{diagram:tecs-energy|TECS: помилка повної енергії (висота + швидкість) закривається газом, помилка їхнього балансу — тангажем; тому набір висоти без запасу газу з'їдає швидкість.}}
 

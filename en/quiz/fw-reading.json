@@ -3,29 +3,29 @@
   "pass": 80,
   "questions": [
     {
-      "q": "Где в Betaflight главный цикл PID?",
+      "q": "Where is the main PID loop in Betaflight?",
       "options": [
         "main/scheduler",
         "fc/core.c: taskMainPidLoop",
-        "flight/pid.c: main() в цикле",
+        "flight/pid.c: main() in a loop",
         "drivers/dshot.c"
       ],
       "answer": 1,
-      "explain": "taskMainPidLoop → subTaskPidController → subTaskMotorUpdate: PID и миксер — подзадачи цикла."
+      "explain": "taskMainPidLoop → subTaskPidController → subTaskMotorUpdate: the PID and the mixer are subtasks of the loop."
     },
     {
-      "q": "От чего считается D-term в Betaflight?",
+      "q": "What is the D-term computed from in Betaflight?",
       "options": [
-        "От setpoint пилота",
-        "От гироскопа",
-        "От ошибки",
-        "От моторов"
+        "The pilot's setpoint",
+        "The gyro",
+        "The error",
+        "The motors"
       ],
       "answer": 1,
-      "explain": "Нет derivative kick при движении стика."
+      "explain": "No derivative kick when the stick moves."
     },
     {
-      "q": "Где в ArduCopter таблица задач с частотами и бюджетом времени?",
+      "q": "Where in ArduCopter is the task table with rates and time budgets?",
       "options": [
         "Attitude.cpp",
         "Copter.cpp: scheduler_tasks[]",
@@ -33,62 +33,62 @@
         "motors.cpp"
       ],
       "answer": 1,
-      "explain": "FAST_TASK и SCHED_TASK(func, hz, max_us, prio)."
+      "explain": "FAST_TASK and SCHED_TASK(func, hz, max_us, prio)."
     },
     {
-      "q": "Что делает AP_MotorsMatrix::output_armed_stabilizing()?",
+      "q": "What does AP_MotorsMatrix::output_armed_stabilizing() do?",
       "options": [
-        "Читает гироскоп",
-        "Раздаёт оси по моторам",
-        "Шлёт MAVLink",
-        "Считает EKF и пишет лог"
+        "Reads the gyro",
+        "Distributes the axes over the motors",
+        "Sends MAVLink",
+        "Runs the EKF and writes the log"
       ],
       "answer": 1,
-      "explain": "Распределяет roll/pitch/yaw/throttle по матрице моторов с приоритетами; yaw — последним, в пределах MOT_YAW_HEADROOM."
+      "explain": "It distributes roll/pitch/yaw/throttle over the motor matrix with priorities; yaw goes last, within MOT_YAW_HEADROOM."
     },
     {
-      "q": "Откуда берётся вики параметров ArduPilot?",
+      "q": "Where does the ArduPilot parameter wiki come from?",
       "options": [
-        "Из MAVLink",
-        "Из блоков @Param в коде",
-        "Из Mission Planner",
-        "Пишется вручную командой разработчиков"
+        "From MAVLink",
+        "From the @Param blocks in the code",
+        "From Mission Planner",
+        "Written by hand by the dev team"
       ],
       "answer": 1,
-      "explain": "Описание, диапазон, @Values — в коде."
+      "explain": "Description, range, @Values — in the code."
     },
     {
-      "q": "Как безопасно проверить патч прошивки?",
+      "q": "How do you safely test a firmware patch?",
       "options": [
-        "Сразу на дроне",
-        "SITL и тесты, затем стенд",
-        "Никак",
-        "В конфигураторе через CLI"
+        "Straight on the drone",
+        "SITL and tests, then the bench",
+        "You can't",
+        "In the configurator via the CLI"
       ],
       "answer": 1,
       "explain": "make SITL / sim_vehicle.py; make test."
     },
     {
-      "q": "git log -S \"имя\" нужен, чтобы:",
+      "q": "git log -S \"name\" is used to:",
       "options": [
-        "Собрать прошивку из старого коммита",
-        "Найти коммит с этой строкой",
-        "Удалить строку",
-        "Проверить стиль"
+        "Build firmware from an old commit",
+        "Find the commit with that string",
+        "Delete the line",
+        "Check the style"
       ],
       "answer": 1,
-      "explain": "Комментарий PR объясняет причину изменения."
+      "explain": "The PR comment explains the reason for the change."
     },
     {
-      "q": "Зачем ссылаться в отчёте на коммит, а не на master?",
+      "q": "Why link to a commit in the report rather than to master?",
       "options": [
-        "Ссылка на master со временем указывает на другой код",
-        "Коммиты быстрее открываются",
-        "GitHub запрещает ссылки на master",
-        "В master нет номеров строк"
+        "A link to master points to different code over time",
+        "Commits open faster",
+        "GitHub forbids links to master",
+        "master has no line numbers"
       ],
       "answer": 0,
-      "explain": "Ссылка на конкретный коммит остаётся верной; master уезжает."
+      "explain": "A link to a specific commit stays correct; master moves on."
     }
   ]
 }

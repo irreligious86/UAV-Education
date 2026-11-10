@@ -3,92 +3,92 @@
   "pass": 80,
   "questions": [
     {
-      "q": "Кто в Gimbal Protocol v2 обычно выступает gimbal manager?",
+      "q": "In Gimbal Protocol v2, what usually acts as the gimbal manager?",
       "options": [
-        "Автопилот, знающий положение аппарата",
-        "Сам подвес со своим IMU",
-        "Наземная станция оператора через MAVLink",
-        "Камера, подключённая к подвесу"
+        "The autopilot, which knows the vehicle's attitude",
+        "The gimbal itself with its own IMU",
+        "The operator's ground control station over MAVLink",
+        "The camera attached to the gimbal"
       ],
       "answer": 0,
-      "explain": "Менеджер — автопилот: он переводит команды клиентов в углы и решает, кто управляет; устройство — подвес."
+      "explain": "The manager is the autopilot: it turns client commands into angles and decides who is in control; the device is the gimbal."
     },
     {
-      "q": "Зачем при облёте опоры рыскание подвеса держат в режиме lock?",
+      "q": "Why is gimbal yaw kept in lock mode when orbiting a tower?",
       "options": [
-        "Чтобы снизить нагрузку на моторы подвеса",
-        "Чтобы камера не поворачивалась вместе с аппаратом",
-        "Чтобы подвес не перегревался на солнце",
-        "Чтобы ускорить ответ COMMAND_ACK"
+        "To reduce the load on the gimbal motors",
+        "So the camera doesn't turn together with the vehicle",
+        "So the gimbal doesn't overheat in the sun",
+        "To get a faster COMMAND_ACK response"
       ],
       "answer": 1,
-      "explain": "В follow рыскание отсчитывается от аппарата, в lock — от севера: разворот аппарата не уводит камеру."
+      "explain": "In follow, yaw is measured from the vehicle; in lock, from north: turning the vehicle doesn't swing the camera away."
     },
     {
-      "q": "Что значит MNT1_RC_RATE = 0 в ArduPilot?",
+      "q": "What does MNT1_RC_RATE = 0 mean in ArduPilot?",
       "options": [
-        "Пульт не управляет подвесом",
-        "Стик задаёт скорость в °/с",
-        "Стик задаёт угол подвеса",
-        "Подвес уходит в положение retract"
+        "The radio doesn't control the gimbal",
+        "The stick sets the rate in °/s",
+        "The stick sets the gimbal angle",
+        "The gimbal goes to the retract position"
       ],
       "answer": 2,
-      "explain": "0 — управление углом; ненулевое значение — скорость поворота в °/с."
+      "explain": "0 means angle control; a nonzero value is the rotation rate in °/s."
     },
     {
-      "q": "Какой номер компонента MAVLink у подвеса?",
+      "q": "What is the gimbal's MAVLink component number?",
       "options": [
-        "1 — автопилот",
-        "100 — камера",
+        "1 — autopilot",
+        "100 — camera",
         "191 — onboard computer",
         "154 — gimbal"
       ],
       "answer": 3,
-      "explain": "MAV_COMP_ID_GIMBAL = 154; нет компонента в инспекторе — нет управления по MAVLink."
+      "explain": "MAV_COMP_ID_GIMBAL = 154; no component in the inspector means no control over MAVLink."
     },
     {
-      "q": "Чем задать съёмку каждые 5 м на отрезке миссии?",
+      "q": "How do you set up a shot every 5 m on a mission leg?",
       "options": [
-        "DO_SET_ROI_LOCATION с радиусом 5 м",
-        "DO_GIMBAL_MANAGER_PITCHYAW с шагом 5",
+        "DO_SET_ROI_LOCATION with a 5 m radius",
+        "DO_GIMBAL_MANAGER_PITCHYAW with a step of 5",
         "DO_SET_CAM_TRIGG_DIST = 5",
-        "MNT1_RC_RATE = 5 в параметрах"
+        "MNT1_RC_RATE = 5 in the parameters"
       ],
       "answer": 2,
-      "explain": "DO_SET_CAM_TRIGG_DIST (или CAM1_TRIGG_DIST) — снимок по пройденной дистанции, каждый пишется в лог CAM."
+      "explain": "DO_SET_CAM_TRIGG_DIST (or CAM1_TRIGG_DIST) takes a shot per distance traveled, each one written to the CAM log."
     },
     {
-      "q": "Почему команды пульта и companion могут «драться» за подвес?",
+      "q": "Why can radio and companion commands “fight” over the gimbal?",
       "options": [
-        "Нет явного захвата управления у менеджера",
-        "Пульт работает на другой частоте",
-        "Companion шлёт команды в MAVLink 1",
-        "Подвес принимает только одну команду в секунду"
+        "The manager has no explicit control takeover",
+        "The radio works on a different frequency",
+        "The companion sends commands in MAVLink 1",
+        "The gimbal accepts only one command per second"
       ],
       "answer": 0,
-      "explain": "Без MAV_CMD_DO_GIMBAL_MANAGER_CONFIGURE менеджер не знает, чей клиент главный."
+      "explain": "Without MAV_CMD_DO_GIMBAL_MANAGER_CONFIGURE the manager doesn't know which client is primary."
     },
     {
-      "q": "Что происходит с аппаратом сразу после сброса груза?",
+      "q": "What happens to the vehicle right after a payload drop?",
       "options": [
-        "Он резко теряет высоту",
-        "Он переходит в RTL автоматически",
-        "Подвес уходит в положение retract",
-        "Масса падает скачком, и он подпрыгивает"
+        "It loses altitude sharply",
+        "It switches to RTL automatically",
+        "The gimbal goes to the retract position",
+        "The mass drops in a step, and it jumps up"
       ],
       "answer": 3,
-      "explain": "Газ был рассчитан на большую массу: после сброса аппарат идёт вверх; сброс — на висении с удержанием высоты."
+      "explain": "The throttle was set for a heavier mass: after the drop the vehicle goes up; drop in a hover with altitude hold."
     },
     {
-      "q": "Как проверить центр масс после установки нагрузки?",
+      "q": "How do you check the center of mass after installing a payload?",
       "options": [
-        "По звуку моторов на земле",
-        "По выходам моторов на висении в логе",
-        "По углу подвеса в неподвижном положении",
-        "По напряжению батареи после посадки"
+        "By the sound of the motors on the ground",
+        "By the motor outputs at hover in the log",
+        "By the gimbal angle when stationary",
+        "By the battery voltage after landing"
       ],
       "answer": 1,
-      "explain": "Разброс средних выходов передних и задних моторов показывает смещение ЦМ."
+      "explain": "The spread between the average outputs of the front and rear motors shows the CoM offset."
     }
   ]
 }

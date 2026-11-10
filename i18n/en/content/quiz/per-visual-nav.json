@@ -1,0 +1,94 @@
+{
+  "module": "per-visual-nav",
+  "pass": 80,
+  "questions": [
+    {
+      "q": "What does VIO give you that optical flow does not?",
+      "options": [
+        "A map",
+        "A 6DoF pose",
+        "Velocity over ground",
+        "Height"
+      ],
+      "answer": 1,
+      "explain": "Flow gives velocity; VIO gives a pose; SLAM adds a map."
+    },
+    {
+      "q": "Where does monocular VIO get its scale from?",
+      "options": [
+        "From the camera",
+        "From the IMU or stereo",
+        "From GPS at startup",
+        "From the compass"
+      ],
+      "answer": 1,
+      "explain": "A mono camera without an IMU does not know scale."
+    },
+    {
+      "q": "What breaks VIO the most?",
+      "options": [
+        "Wind",
+        "No texture, desynchronization",
+        "Camera frames that are too frequent",
+        "Sunny weather and altitude"
+      ],
+      "answer": 1,
+      "explain": "Lack of texture, bad light, fast rotation, bad calibration and camera–IMU desynchronization: 5 ms means noticeable drift."
+    },
+    {
+      "q": "Which EK3_SRC1_POSXY value enables external navigation?",
+      "options": [
+        "3",
+        "5",
+        "6",
+        "8"
+      ],
+      "answer": 2,
+      "explain": "6 = ExternalNav."
+    },
+    {
+      "q": "Which parameter sets the external source latency in ArduPilot?",
+      "options": [
+        "GPS1_DELAY_MS",
+        "VISO_DELAY_MS",
+        "FLOW_DELAY",
+        "VISO_TYPE"
+      ],
+      "answer": 1,
+      "explain": "The EKF accounts for the age of the measurement."
+    },
+    {
+      "q": "What should the companion do when VIO tracking is lost?",
+      "options": [
+        "Keep sending the last pose",
+        "Stop publishing",
+        "Send zeros as the position",
+        "Reboot"
+      ],
+      "answer": 1,
+      "explain": "A “frozen” pose is the worst option."
+    },
+    {
+      "q": "How do you test ExternalNav before going to the field?",
+      "options": [
+        "On the bench, moving it by hand",
+        "SITL: pose from truth with noise",
+        "You can't",
+        "From video"
+      ],
+      "answer": 1,
+      "explain": "Then source failure and the backup set."
+    },
+    {
+      "q": "Why does VIO work poorly over a uniform surface (water, snow)?",
+      "options": [
+        "It has no stable points to track",
+        "The camera overheats",
+        "The IMU doesn't work there",
+        "The GPS receiver interferes with the camera over water"
+      ],
+      "answer": 0,
+      "explain": "Visual odometry needs textured feature points; a uniform surface doesn't provide them."
+    }
+  ]
+}

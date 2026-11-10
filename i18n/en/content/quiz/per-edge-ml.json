@@ -1,0 +1,107 @@
+{
+  "module": "per-edge-ml",
+  "pass": 80,
+  "questions": [
+    {
+      "q": "The latency budget for a tracking loop is set by:",
+      "options": [
+        "p99, not the average",
+        "The average",
+        "The minimum",
+        "The median of the first 10 runs"
+      ],
+      "answer": 0,
+      "explain": "One slow frame in the middle of a maneuver is a lost target."
+    },
+    {
+      "q": "The first quantization step on a GPU with almost no loss of accuracy:",
+      "options": [
+        "FP16",
+        "INT4",
+        "Binarization",
+        "Removing layers"
+      ],
+      "answer": 0,
+      "explain": "FP16 is usually free in terms of accuracy."
+    },
+    {
+      "q": "PTQ was calibrated on daytime frames only. The expected consequence:",
+      "options": [
+        "An accuracy drop at night",
+        "Nothing",
+        "Higher accuracy at night because of noise",
+        "The model won't load"
+      ],
+      "answer": 0,
+      "explain": "Activation ranges differ under other conditions."
+    },
+    {
+      "q": "Why is the held-out set split by flight rather than by frame?",
+      "options": [
+        "Otherwise similar frames leak",
+        "It's faster to label and train that way",
+        "ONNX requires it",
+        "There are too many frames"
+      ],
+      "answer": 0,
+      "explain": "Nearly identical frames leak between train and test."
+    },
+    {
+      "q": "After 20 minutes of operation p99 doubled. The most likely cause:",
+      "options": [
+        "Thermal throttling",
+        "GPS loss",
+        "A memory leak in the model weights",
+        "Quantization"
+      ],
+      "answer": 0,
+      "explain": "Profile inside the enclosure and for a long time."
+    },
+    {
+      "q": "A model layer the accelerator doesn't support:",
+      "options": [
+        "Falls back to the CPU",
+        "Is skipped",
+        "Breaks the model",
+        "Speeds itself up"
+      ],
+      "answer": 0,
+      "explain": "It runs on the CPU and can eat the whole gain; the engine profiler shows this right away."
+    },
+    {
+      "q": "In a search for people, it makes sense to shift the detector threshold toward:",
+      "options": [
+        "Higher recall",
+        "Higher precision",
+        "The threshold doesn't matter",
+        "The maximum"
+      ],
+      "answer": 0,
+      "explain": "The operator will check the false alarms."
+    },
+    {
+      "q": "What must be written to the log of every flight with ML on board?",
+      "options": [
+        "The model and threshold version",
+        "Only FPS",
+        "The Wi-Fi password",
+        "Nothing — the model doesn't change"
+      ],
+      "answer": 0,
+      "explain": "Without the version, investigating an incident is impossible."
+    },
+    {
+      "q": "The tracking loop budget is 80 ms. The onboard detector profile:",
+      "kind": "apply",
+      "fragment": "n=300 mean=41.2 p50=33.8 p95=96.4 p99=211.7 max=402.3 budget_ms=80 ok=False over_budget_frac=0.07",
+      "options": [
+        "The average fits, but the tail (p95/p99) doesn't: 7 % of frames take longer than the budget, find the source",
+        "over_budget_frac = 0.07 is perf_counter timer error, not real slow frames",
+        "p50 = 34 ms means the model is underloaded and can be replaced with a heavier one",
+        "Everything is fine: the budget is checked against the average, and 41 ms is less than 80"
+      ],
+      "answer": 0,
+      "explain": "The loop budget is checked against p99: slow frames in the middle of a maneuver lose the target."
+    }
+  ]
+}
