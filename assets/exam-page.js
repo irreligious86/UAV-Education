@@ -3,6 +3,7 @@
  * The page never sees correct answers before submitting; it only shows what exam_start() returns,
  * keeps the student's picks in localStorage (resume after a reload) and submits them.
  */
+var T = (typeof window !== "undefined" && window.T) || function (s) { return s; };   // assets/i18n.js
 (function () {
   "use strict";
 
@@ -31,17 +32,17 @@
   function renderList(exams) {
     show("list");
     var box = $("[data-ex-list]");
-    if (!exams.length) { box.innerHTML = '<p class="gc-muted">Опубликованных экзаменов пока нет.</p>'; return; }
+    if (!exams.length) { box.innerHTML = T('<p class="gc-muted">Опубликованных экзаменов пока нет.</p>'); return; }
     box.innerHTML = exams.map(function (e) {
       var s = stateOf(e);
       var can = !s.closed && (s.running || s.left > 0);
-      var status = s.passed ? '<span class="gc-tag" data-state="ok">сдан' + (s.best != null ? " · " + s.best + " %" : "") + "</span>"
-        : s.best != null ? '<span class="gc-tag" data-state="caution">лучший результат ' + s.best + " %</span>" : "";
+      var status = s.passed ? T('<span class="gc-tag" data-state="ok">сдан') + (s.best != null ? " · " + s.best + " %" : "") + "</span>"
+        : s.best != null ? T('<span class="gc-tag" data-state="caution">лучший результат ') + s.best + " %</span>" : "";
       return '<div class="gc-panel exam-card"><p class="progress-headline">' + esc(e.title) + " " + status + "</p>" +
-        '<p class="gc-muted">' + e.questions_per_attempt + " вопросов · " + e.time_limit_min + " мин · порог " + e.pass_pct +
-        " % · попытки: " + s.used + " из " + e.attempts_allowed + (e.closes_at ? " · до " + when(e.closes_at) : "") + "</p>" +
-        (can ? '<gc-button data-start="' + esc(e.id) + '">' + (s.running ? "Продолжить" : "Начать") + "</gc-button>"
-             : '<p class="gc-muted">' + (s.closed ? "Сейчас закрыт." : "Попытки закончились.") + "</p>") + "</div>";
+        '<p class="gc-muted">' + e.questions_per_attempt + T(" вопросов · ") + e.time_limit_min + T(" мин · порог ") + e.pass_pct +
+        T(" % · попытки: ") + s.used + T(" из ") + e.attempts_allowed + (e.closes_at ? T(" · до ") + when(e.closes_at) : "") + "</p>" +
+        (can ? '<gc-button data-start="' + esc(e.id) + '">' + (s.running ? T("Продолжить") : T("Начать")) + "</gc-button>"
+             : '<p class="gc-muted">' + (s.closed ? T("Сейчас закрыт.") : T("Попытки закончились.")) + "</p>") + "</div>";
     }).join("");
   }
 
@@ -65,7 +66,7 @@
     if (!current) return;
     var left = Math.floor((new Date(current.deadline).getTime() - Date.now()) / 1000);
     var el = $("[data-ex-timer]");
-    if (left <= 0) { el.textContent = "время вышло"; clearInterval(timer); submit(true); return; }
+    if (left <= 0) { el.textContent = T("время вышло"); clearInterval(timer); submit(true); return; }
     el.textContent = Math.floor(left / 60) + ":" + String(left % 60).padStart(2, "0");
     el.setAttribute("data-state", left < 60 ? "critical" : left < 300 ? "caution" : "info");
   }
@@ -81,7 +82,7 @@
     if (!current || sending) return;
     var a = picks();
     var missing = current.questions.length - Object.keys(a).length;
-    if (!auto && missing > 0 && !confirm("Без ответа: " + missing + ". Сдать всё равно?")) return;
+    if (!auto && missing > 0 && !confirm(T("Без ответа: ") + missing + T(". Сдать всё равно?"))) return;
     sending = true; clearInterval(timer);
     A.submitExam(current.attempt, a).then(function (res) {
       dropDraft(current.attempt);
@@ -93,13 +94,13 @@
     show("result");
     var q = {}; current.questions.forEach(function (x) { q[x.id] = x; });
     $("[data-ex-score]").innerHTML = '<span class="gc-tag" data-state="' + (res.passed ? "ok" : "critical") + '">' +
-      (res.passed ? "Сдан" : "Не сдан") + "</span> " + res.correct + " из " + res.total + " · " + res.score_pct + " %";
+      (res.passed ? T("Сдан") : T("Не сдан")) + "</span> " + res.correct + T(" из ") + res.total + " · " + res.score_pct + " %";
     $("[data-ex-review]").innerHTML = res.review ? res.review.map(function (r) {
       var x = q[r.id] || { q: "?", options: [] };
       var ok = r.your === r.answer;
-      return '<li><strong>' + esc(x.q) + "</strong><br>" + (ok ? "✓ " : "✗ ") + "твой ответ: " + esc(r.your == null ? "—" : x.options[r.your]) +
-        (ok ? "" : " · верно: " + esc(x.options[r.answer])) + (r.explain ? '<br><span class="gc-muted">' + esc(r.explain) + "</span>" : "") + "</li>";
-    }).join("") : '<li class="gc-muted">Разбор ответов скрыт: он появится после последней попытки или когда экзамен закроется (если преподаватель его включил).</li>';
+      return '<li><strong>' + esc(x.q) + "</strong><br>" + (ok ? "✓ " : "✗ ") + T("твой ответ: ") + esc(r.your == null ? "—" : x.options[r.your]) +
+        (ok ? "" : T(" · верно: ") + esc(x.options[r.answer])) + (r.explain ? '<br><span class="gc-muted">' + esc(r.explain) + "</span>" : "") + "</li>";
+    }).join("") : T('<li class="gc-muted">Разбор ответов скрыт: он появится после последней попытки или когда экзамен закроется (если преподаватель его включил).</li>');
     current = null;
   }
 

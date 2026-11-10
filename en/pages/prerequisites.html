@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en" data-theme="dark" data-lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Входные требования и тест — UAV Student</title>
+  <meta name="description" content="Инженерный курс по БПЛА: от физики полёта до своих прошивок и бортовых компьютеров.">
+  <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
+  <link rel="manifest" href="../../manifest.webmanifest">
+  <meta name="theme-color" content="#0b0f14">
+  <link rel="alternate" hreflang="ru" href="../../pages/prerequisites.html">
+  <link rel="alternate" hreflang="uk" href="../../uk/pages/prerequisites.html">
+  <link rel="alternate" hreflang="en" href="../../en/pages/prerequisites.html">
+  <script>/* go to the visitor's chosen language before anything paints (assets/i18n.js) */(function(){try{var c=localStorage.getItem('uav-lang'),h=document.documentElement.getAttribute('data-lang');if(!c||c===h||/[?&]lang=keep\b/.test(location.search))return;var l=document.querySelector('link[rel=alternate][hreflang="'+c+'"]');if(l)location.replace(l.href+location.search+location.hash)}catch(e){}})();</script>
+  <link rel="stylesheet" href="../../lib/ground-control-ui/dist/ground-control.css">
+  <link rel="stylesheet" href="../../assets/site.css">
+  <script src="../../lib/ground-control-ui/dist/ground-control.js" defer></script>
+  <script src="../../assets/i18n/en.js"></script>
+  <script src="../../assets/i18n.js"></script>
+  <script src="../../assets/progress-store.js" defer></script>
+  <script src="../../assets/backend-config.js" defer></script>
+  <script src="../../assets/account.js" defer></script>
+  <script src="../../assets/grading.js" defer></script>
+  <script src="../../assets/app.js" defer></script>
+  <script src="../../assets/uav-quiz.js" defer></script>
+  <script src="../../assets/uav-tasks.js" defer></script>
+  <script src="../../assets/offline.js" defer></script>
+</head>
+<body class="gc-root" data-base="../" data-root="../../">
+  <header class="site-header">
+    <div class="gc-container site-header__inner">
+      <a class="site-brand" href="../index.html"><span class="site-brand__mark" aria-hidden="true">◆</span> UAV Student</a>
+      <nav class="gc-nav" aria-label="Разделы сайта">
+        <a href="../index.html">Курс</a>
+        <a href="../ref/index.html" aria-current="page">Справочник</a>
+        <a href="../pages/glossary.html">Глоссарий</a>
+        <a href="../pages/fails.html">Фейлы</a>
+        <a href="../pages/search.html">Поиск</a>
+        <a href="../pages/progress.html">Мой прогресс</a>
+      </nav>
+      <nav class="lang-switch" aria-label="Язык"><a class="gc-tag" href="../../pages/prerequisites.html" data-lang-to="ru" hreflang="ru" lang="ru" title="Русский">RU</a><a class="gc-tag" href="../../uk/pages/prerequisites.html" data-lang-to="uk" hreflang="uk" lang="uk" title="Українська">UK</a><a class="gc-tag" href="../../en/pages/prerequisites.html" data-lang-to="en" hreflang="en" lang="en" title="English" aria-current="true" data-state="ok">EN</a></nav>
+    </div>
+  </header>
+  <main class="gc-container site-main">
+    <p class="gc-breadcrumb"><a href="../ref/index.html">Справочник</a><span>Входные требования и тест</span></p>
+    <div class="gc-prose legacy-page">
+<h2>Входные требования к ступени C и далее</h2>
+<p>Треки «Оценка состояния», «Автономия», «Инженер» и «Восприятие» предполагают, что вы свободно работаете с векторами и поворотами, понимаете дифференциальное уравнение первого и второго порядка и умеете посчитать дисперсию. Ниже — что именно нужно, где это взять за 2–4 недели, и тест на 10 задач, по которому вы сами решите, идти ли сразу дальше или сначала пройти электив «Математический фундамент».</p>
+
+<h3>Что нужно знать</h3>
+<table>
+  <thead><tr><th>Область</th><th>Минимум</th><th>Модуль курса</th><th>Внешний курс</th></tr></thead>
+  <tbody>
+    <tr><td>Линейная алгебра</td><td>векторы, скалярное и векторное произведения, матрица поворота, транспонирование, собственные векторы (на уровне «что это»)</td><td><a href="../m/math-linalg-rot.html">Векторы, матрицы и вращения</a></td><td><a href="https://ocw.mit.edu/courses/18-06-linear-algebra-spring-2010/" target="_blank" rel="noopener noreferrer">MIT 18.06 Linear Algebra</a> (лекции 1–3, 21)</td></tr>
+    <tr><td>Дифференциальные уравнения</td><td>экспонента как решение ẋ = −x/τ, второй порядок и затухание, понятие полюса, численное интегрирование</td><td><a href="../m/math-ode-dyn.html">Дифференциальные уравнения и динамика</a></td><td><a href="https://ocw.mit.edu/courses/2-003sc-engineering-dynamics-fall-2011/" target="_blank" rel="noopener noreferrer">MIT 2.003 Dynamics</a>; <a href="https://fbswiki.org/" target="_blank" rel="noopener noreferrer">Åström &amp; Murray, Feedback Systems</a> (гл. 1–3, 6)</td></tr>
+    <tr><td>Вероятность</td><td>среднее, дисперсия, гауссиана, независимость, ковариация</td><td><a href="../m/math-prob-est.html">Вероятность и оценивание</a></td><td><a href="https://ocw.mit.edu/courses/6-041sc-probabilistic-systems-analysis-and-applied-probability-fall-2013/" target="_blank" rel="noopener noreferrer">MIT 6.041</a> (юниты 1–4, 7)</td></tr>
+    <tr><td>Python</td><td>numpy-массивы, matplotlib, функции, чтение CSV; pytest на уровне «запустить»</td><td><a href="../m/data-python.html">Python для данных</a></td><td><a href="https://numpy.org/learn/" target="_blank" rel="noopener noreferrer">numpy.org/learn</a></td></tr>
+    <tr><td>Физика</td><td>второй закон Ньютона, момент силы, энергия и мощность, единицы СИ</td><td><a href="../m/f-physics.html">Физика полёта</a>, <a href="../m/f-electricity-101.html">Электричество 101</a></td><td>любой школьный курс</td></tr>
+  </tbody>
+</table>
+
+<h3>Как читать результат теста</h3>
+<ul>
+  <li><strong>9–10 задач</strong> — идите сразу в треки ступени C; электив можно пройти выборочно.</li>
+  <li><strong>6–8</strong> — пройдите электив целиком (три модуля, ~13 часов с лабораторными).</li>
+  <li><strong>меньше 6</strong> — электив плюс один внешний курс по самой слабой области, потом тест ещё раз. Числа в задачах меняются при каждой загрузке.</li>
+</ul>
+
+<h3>Входной тест: 10 задач</h3>
+<p class="muted">Решайте без справочников, с калькулятором. Ответ принимается с допуском 2 %. Результат хранится в этом браузере вместе с остальным прогрессом.</p>
+<uav-tasks src="../tasks/prereq-test.json" module="prereq-test"></uav-tasks>
+
+    </div>
+  </main>
+  <footer class="gc-container site-footer gc-muted">
+    <p>Открытый курс · <a href="https://github.com/irreligious86/UAV-Education">исходники на GitHub</a> · <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">план развития</a> · <a href="../../curriculum/curriculum.html">для разработчика</a> · CC BY-NC-SA 4.0</p>
+  </footer>
+</body>
+</html>

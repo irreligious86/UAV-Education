@@ -33,13 +33,14 @@ jobs:
       - name: Rebuild site
         run: |
           python scripts/build_site.py
+          python scripts/check_i18n.py
           python scripts/build_curriculum_page.py
 
       - name: Built site must be committed in sync with content
         run: |
-          if [ -n "$(git status --porcelain -- index.html m ref pages api quiz cap path tasks projects curriculum sw.js manifest.webmanifest assets/diagrams)" ]; then
+          if [ -n "$(git status --porcelain -- index.html m ref pages api quiz cap path tasks projects curriculum sw.js manifest.webmanifest assets/diagrams assets/i18n $(python scripts/i18n.py --dirs))" ]; then
             echo "::error::Site is stale. Run 'python scripts/publish.py' locally and commit the result."
-            git status --short -- index.html m ref pages api quiz cap path tasks projects curriculum sw.js manifest.webmanifest assets/diagrams
+            git status --short -- index.html m ref pages api quiz cap path tasks projects curriculum sw.js manifest.webmanifest assets/diagrams assets/i18n $(python scripts/i18n.py --dirs)
             exit 1
           fi
 
@@ -98,6 +99,7 @@ jobs:
           NODE_PATH="$(npm root -g)" node tests/e2e/accounts.e2e.js http://localhost:8765
           NODE_PATH="$(npm root -g)" node tests/e2e/exams.e2e.js http://localhost:8765
           NODE_PATH="$(npm root -g)" node tests/e2e/cohorts.e2e.js http://localhost:8765
+          NODE_PATH="$(npm root -g)" node tests/e2e/i18n.e2e.js http://localhost:8765
 
       - name: Design system is pinned to a release tag
         run: |

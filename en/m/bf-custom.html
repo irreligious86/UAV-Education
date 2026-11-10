@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en" data-theme="dark" data-lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Свои сборки прошивок — UAV Student</title>
+  <meta name="description" content="собрать прошивку под ограничения FC">
+  <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
+  <link rel="manifest" href="../../manifest.webmanifest">
+  <meta name="theme-color" content="#0b0f14">
+  <link rel="alternate" hreflang="ru" href="../../m/bf-custom.html">
+  <link rel="alternate" hreflang="uk" href="../../uk/m/bf-custom.html">
+  <link rel="alternate" hreflang="en" href="../../en/m/bf-custom.html">
+  <script>/* go to the visitor's chosen language before anything paints (assets/i18n.js) */(function(){try{var c=localStorage.getItem('uav-lang'),h=document.documentElement.getAttribute('data-lang');if(!c||c===h||/[?&]lang=keep\b/.test(location.search))return;var l=document.querySelector('link[rel=alternate][hreflang="'+c+'"]');if(l)location.replace(l.href+location.search+location.hash)}catch(e){}})();</script>
+  <link rel="stylesheet" href="../../lib/ground-control-ui/dist/ground-control.css">
+  <link rel="stylesheet" href="../../assets/site.css">
+  <script src="../../lib/ground-control-ui/dist/ground-control.js" defer></script>
+  <script src="../../assets/i18n/en.js"></script>
+  <script src="../../assets/i18n.js"></script>
+  <script src="../../assets/progress-store.js" defer></script>
+  <script src="../../assets/backend-config.js" defer></script>
+  <script src="../../assets/account.js" defer></script>
+  <script src="../../assets/grading.js" defer></script>
+  <script src="../../assets/app.js" defer></script>
+  <script src="../../assets/uav-quiz.js" defer></script>
+  <script src="../../assets/uav-tasks.js" defer></script>
+  <script src="../../assets/offline.js" defer></script>
+</head>
+<body class="gc-root" data-base="../" data-root="../../">
+  <header class="site-header">
+    <div class="gc-container site-header__inner">
+      <a class="site-brand" href="../index.html"><span class="site-brand__mark" aria-hidden="true">◆</span> UAV Student</a>
+      <nav class="gc-nav" aria-label="Разделы сайта">
+        <a href="../index.html" aria-current="page">Курс</a>
+        <a href="../ref/index.html">Справочник</a>
+        <a href="../pages/glossary.html">Глоссарий</a>
+        <a href="../pages/fails.html">Фейлы</a>
+        <a href="../pages/search.html">Поиск</a>
+        <a href="../pages/progress.html">Мой прогресс</a>
+      </nav>
+      <nav class="lang-switch" aria-label="Язык"><a class="gc-tag" href="../../m/bf-custom.html" data-lang-to="ru" hreflang="ru" lang="ru" title="Русский">RU</a><a class="gc-tag" href="../../uk/m/bf-custom.html" data-lang-to="uk" hreflang="uk" lang="uk" title="Українська">UK</a><a class="gc-tag" href="../../en/m/bf-custom.html" data-lang-to="en" hreflang="en" lang="en" title="English" aria-current="true" data-state="ok">EN</a></nav>
+    </div>
+  </header>
+  <main class="gc-container site-main">
+    <article class="module" data-module-page="bf-custom">
+      <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-engineer">Инженер: код на борту</a><span>Свои сборки прошивок</span></p>
+      <h1 class="module-title">Свои сборки прошивок</h1>
+      <div class="module-tags"><span class="gc-tag" title="Уровень">L4 — Эксперт</span><span class="gc-tag">чтение 25 мин</span><span class="gc-tag">учёба ~3 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ОСВОЕН</span></div>
+      <p class="gc-muted module-score" data-module-score></p>
+      <p class="module-lead">Флеш-память полётника не резиновая: включить всё сразу нельзя, а значит, прошивка под твой аппарат — это выбор. Модуль объясняет, как в Betaflight собрать прошивку под свой набор функций через Cloud Build и когда нужны custom defines, и как в ArduPilot собрать свой вариант из исходников — например, убрать GPS и лишние драйверы, чтобы уместить нужное на F405. С примером из проекта HeeWing.</p>
+      <div class="gc-callout" data-state="ok"><strong>После модуля ты умеешь</strong><ul><li>собрать прошивку под ограничения FC</li></ul></div><p class="gc-muted">Перед этим модулем: <a href="bf-cli.html">CLI и remap</a></p><div class="gc-callout lab"><p class="gc-label gc-muted">Лабораторная</p><strong>Две сборки</strong><p class="gc-muted lab__hint">Сдано, когда отмечены все пункты:</p><ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="bf-custom:lab:0"><span>Собраны стандартная и урезанная прошивки</span></label></li><li><label><input type="checkbox" data-check-id="bf-custom:lab:1"><span>Размеры сравнены, вывод version/BUILD KEY сохранён</span></label></li><li><label><input type="checkbox" data-check-id="bf-custom:lab:2"><span>Отключённая подсистема исчезла из параметров — подтверждено</span></label></li><li><label><input type="checkbox" data-check-id="bf-custom:lab:3"><span>Конфигурация сборки в git</span></label></li></ul></div><div class="path-pos gc-muted"><span class="gc-label">В пути</span><ul><li data-path-pos="betaflight"><a href="../path/betaflight.html">Betaflight</a>: шаг 43 из 44 → <a href="fw-reading.html?path=betaflight">Как читать исходники прошивки: Betaflight и ArduPilot</a></li></ul></div>
+      <div class="gc-prose module-body">
+<div class="gc-callout" data-state="caution" data-untranslated><strong>Модуль ещё не переведён.</strong> Ниже — оригинал (Русский). Прогресс и оценки общие для всех языков.</div>
+<h2>Теория</h2>
+<h4 class="md-subheading">Зачем вообще собирать</h4>
+<ul><li>На F411/F405 стандартная прошивка со всеми опциями не влезает или влезает без нужной функции.</li><li>Нужна опция, которой нет в стандартном наборе (дальномер, транспондер, экзотический протокол).</li><li>Нужно убрать то, чего на борту нет и не будет (GPS, компас, OSD-чип), освободив место и память.</li></ul>
+<h4 class="md-subheading">Betaflight: Cloud Build</h4>
+<p>Начиная с 4.4, прошивку собирает облачный сервер под твой список опций. В Firmware Flasher выбираешь протокол приёмника, тип OSD, телеметрию, ESC-протокол и прочее; каждая опция — это флаг <code>USE_*</code> в исходниках, имя вводится без префикса. Выбор тянет зависимости сам: CRSF добавит CRSF-телеметрию, <code>GPS</code> — GPS Rescue и элементы OSD. Драйверы конкретной платы (гироскоп, флеш, OSD-чип) добавляются по таргету автоматически.</p>
+<p><strong>Custom defines</strong> — поле в экспертном режиме для опций вне списков. Они не тестируются на всех платах; если опции нужен пин, его назначают в CLI через <code>resource</code>. Слишком большая прошивка — сборка просто падает.</p>
+<p>Проверка на плате: команда <code>version</code> в CLI показывает версию и таргет, а <code>BUILD KEY</code> выводит <code>status</code> — ключ, по которому Cloud Build соберёт ровно такую же прошивку ещё раз. В <code>diff all</code> ключа нет — вывод <code>status</code> сохраняйте отдельно.</p>
+<h4 class="md-subheading">ArduPilot: сборка из исходников</h4>
+<p>ArduPilot собирается <code>waf</code>: <code>./waf configure --board &lt;board&gt;</code> и <code>./waf copter</code> (или <code>plane</code>). Таргет описывается в <code>libraries/AP_HAL_ChibiOS/hwdef/&lt;board&gt;/hwdef.dat</code>: пины, шины, какие драйверы включать. Там же через <code>define</code>-строки отключают ненужное.</p>
+<p>Для плат с маленькой флешью существуют урезанные конфигурации: много функций в коде обёрнуто проверками <code>#if AP_&lt;FEATURE&gt;_ENABLED</code>, и hwdef может задать <code>define AP_&lt;FEATURE&gt;_ENABLED 0</code>. Веб-инструмент Custom Firmware Builder (ссылка в документации «Building the code») делает то же через интерфейс: ставишь галочки, получаешь прошивку.</p>
+<h4 class="md-subheading">Кейс: HeeWing F405 без GPS</h4>
+<p>Стоковый F405 в проекте HeeWing T1 — плата с ограниченной флешью: нет Lua-скриптинга, часть возможностей урезана. Варианты прошивки, которые планировались для него: убрать поддержку GPS (на этой сборке он не используется для арма и базового полёта) и лишние драйверы, чтобы освободить место под нужное. Это осмысленное решение, если понимаешь последствия: без GPS в прошивке не будет ни RTL, ни геозоны по координатам — не только «сейчас», а вообще.</p>
+<h4 class="md-subheading">Правила своих сборок</h4>
+<ol><li>Хранить конфигурацию сборки в git рядом с параметрами: список опций Betaflight или <code>hwdef</code>-патч ArduPilot.</li><li>Называть сборку с датой и хешем коммита; вывод <code>version</code> и BUILD KEY из <code>status</code> должны совпадать с записью.</li><li>Перед прошивкой — полный бэкап (<code>diff all</code> / файл параметров), после — перечитать всё критичное.</li><li>Не смешивать: своя сборка + стандартный конфиг от другой версии = непредсказуемость.</li></ol>
+<h4 class="md-subheading">Локальная сборка Betaflight (когда Cloud Build не подходит)</h4>
+<pre class="cli-block"><code>git clone https://github.com/betaflight/betaflight &amp;&amp; cd betaflight
+make arm_sdk_install                      # toolchain
+make configs                              # unified target configs
+make STM32H743 EXTRA_FLAGS=&quot;-DUSE_RANGEFINDER -DUSE_GPS_LAP_TIMER&quot;   # family target + extra defines
+# или с конфигом конкретной платы:
+make SPEEDYBEEF405V4 EXTRA_FLAGS=&quot;-DUSE_...&quot;</code></pre>
+<p>Результат — <code>obj/betaflight_&lt;ver&gt;_&lt;target&gt;.hex</code>, прошивается конфигуратором «Load Firmware [Local]». Для проверки без железа — <code>make SITL</code> и <code>make test</code> (юнит-тесты gtest, модуль «Как читать исходники»). Размер прошивки — в конце сборки; F411 (512 КБ flash) требует отключать опции <code>-DUSE_*</code> через <code>EXTRA_FLAGS</code> с минусом или урезанные target-конфиги.</p>
+<h4 class="md-subheading">Что ломается после своей сборки и как проверять</h4>
+<ol><li>по BUILD KEY из <code>status</code> (<code>https://build.betaflight.com/api/builds/&lt;key&gt;/json</code>) — ожидаемые опции; 2. <code>status</code> — гироскоп найден; 3. Ports/Receiver — приёмник отвечает; 4. Motors — DShot и bidir работают без пропов; 5. OSD видно; 6. <code>diff all</code> совпадает с бэкапом по смыслу. Чек-лист — в журнал аппарата вместе с хешем коммита и <code>EXTRA_FLAGS</code>.</li></ol>
+<figure class="diagram" data-diagram="fw-build-paths"><div class="diagram__svg"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 184" width="100%" role="img" aria-labelledby="t" style="max-width:720px;display:block;margin:0 auto"><title id="t">Своя сборка прошивки: какой путь</title><style>text{font-family: var(--gc-font-mono, ui-monospace, Menlo, monospace); font-size: 12px;fill:currentColor} .m{fill:var(--gc-ink-muted, #8a93a3)} .a{fill:var(--gc-accent-hud, #5ef1d2)} .w{fill:var(--gc-signal-amber, #f0b24c)} .d{fill:var(--gc-signal-red, #e8636b)} .box{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:currentColor;stroke-width:1.2} .boxa{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6} .ln{stroke:currentColor;stroke-width:1.2;fill:none} .lna{stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6;fill:none} .lnm{stroke:var(--gc-ink-muted, #8a93a3);stroke-width:1;fill:none;stroke-dasharray:4 3} .t{font-size:11px} .b{font-weight:600}</style><defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker><marker id="ara" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--gc-accent-hud, #5ef1d2)"/></marker></defs><text x="16" y="16" text-anchor="start" class="m t">Своя сборка прошивки: какой путь</text><rect class="box" x="285.0" y="34" width="150.0" height="40" rx="6"/><text x="360.0" y="52.0" text-anchor="middle" style="font-size:10.5px">Что нужно</text><text x="360.0" y="64.0" text-anchor="middle" style="font-size:10.5px">поменять?</text><path class="ln" d="M360.0 74 L360.0 89.0 L97.5 89.0 L97.5 104" marker-end="url(#ar)"/><text x="101.5" y="85.0" text-anchor="start" class="a t" style="font-size:10px">опции BF</text><rect class="boxa" x="22.5" y="104" width="150.0" height="40" rx="18"/><text x="97.5" y="122.0" text-anchor="middle" class="b" style="font-size:10.5px">Cloud Build:</text><text x="97.5" y="134.0" text-anchor="middle" class="b" style="font-size:10.5px">драйверы, протоколы</text><path class="ln" d="M360.0 74 L360.0 89.0 L272.5 89.0 L272.5 104" marker-end="url(#ar)"/><text x="276.5" y="85.0" text-anchor="start" class="a t" style="font-size:10px">код BF</text><rect class="box" x="197.5" y="104" width="150.0" height="40" rx="18"/><text x="272.5" y="122.0" text-anchor="middle" style="font-size:10.5px">Локальная сборка</text><text x="272.5" y="134.0" text-anchor="middle" style="font-size:10.5px">make CONFIG=…</text><path class="ln" d="M360.0 74 L360.0 89.0 L447.5 89.0 L447.5 104" marker-end="url(#ar)"/><text x="451.5" y="85.0" text-anchor="start" class="a t" style="font-size:10px">опции AP</text><rect class="boxa" x="372.5" y="104" width="150.0" height="40" rx="18"/><text x="447.5" y="122.0" text-anchor="middle" class="b" style="font-size:10.5px">custom.ardupilot.org</text><text x="447.5" y="134.0" text-anchor="middle" class="b" style="font-size:10.5px">набор функций</text><path class="ln" d="M360.0 74 L360.0 89.0 L622.5 89.0 L622.5 104" marker-end="url(#ar)"/><text x="626.5" y="85.0" text-anchor="start" class="a t" style="font-size:10px">код AP</text><rect class="box" x="547.5" y="104" width="150.0" height="40" rx="18"/><text x="622.5" y="122.0" text-anchor="middle" style="font-size:10.5px">./waf configure</text><text x="622.5" y="134.0" text-anchor="middle" style="font-size:10.5px">--board X; copter</text></svg></div><figcaption class="gc-muted">Какой путь сборки выбрать: опции — Cloud Build или custom.ardupilot.org, свой код — локальная сборка.</figcaption><div class="diagram__hint">Схему можно прокрутить по горизонтали</div></figure>
+
+<h2>Практика</h2>
+<h4 class="md-subheading">Betaflight: сборка под конкретный аппарат</h4>
+<ol><li>Firmware Flasher → таргет платы → версия.</li><li>Опции: приёмник (CRSF), OSD (аналог или цифра), телеметрия, ESC-протокол (DShot), GPS только если он есть.</li><li>Expert mode → Custom Defines, если нужно что-то вне списков.</li><li>Build → Flash. После прошивки в CLI: <code>version</code> и <code>status</code> — сохранить вывод (BUILD KEY — в <code>status</code>) в папку дрона.</li><li>Восстановить конфиг из <code>diff all</code> <strong>той же</strong> мажорной версии, перечитать ключевые параметры.</li></ol>
+<h4 class="md-subheading">ArduPilot: сборка из исходников</h4>
+<pre class="cli-block"><code>git clone --recurse-submodules https://github.com/ArduPilot/ardupilot.git
+cd ardupilot
+Tools/environment_install/install-prereqs-ubuntu.sh -y
+./waf configure --board MatekF405-Wing   # example board name; use yours
+./waf plane
+ls build/MatekF405-Wing/bin/             # arduplane.apj / .bin / .hex</code></pre>
+<p>Отключение функции: добавить в <code>hwdef.dat</code> платы (или в отдельный файл extra hwdef) строку вида <code>define AP_&lt;FEATURE&gt;_ENABLED 0</code>, пересобрать, проверить размер в выводе сборки. Для первого опыта проще Custom Firmware Builder на сайте.</p>
+<h4 class="md-subheading">Лабораторная</h4>
+<p>Собери две прошивки ArduPlane для своей платы: стандартную и без одной подсистемы. Сравни размер бинарников, прошей вторую в SITL-подобный стенд (плата на столе) и убедись, что отключённая подсистема действительно исчезла из параметров.</p>
+<h4 class="md-subheading">Что должно получиться и что записать</h4>
+<ul><li><strong>Betaflight.</strong> После прошивки урезанной сборки <code>version</code> и <code>status</code> сохранены в файл рядом с конфигом (BUILD KEY позволяет пересобрать ровно ту же прошивку). Конфиг восстановлен из <code>diff all</code> той же мажорной версии, а ключевые параметры перечитаны через <code>get</code>. Настройки отключённых опций в CLI отсутствуют — проверь, например, что после сборки без GPS команда <code>get gps</code> ничего не находит.</li><li><strong>ArduPilot.</strong> Вывод сборки показывает размер прошивки и свободную flash. Запиши оба числа для двух сборок: разница — цена отключённой подсистемы в байтах. После прошивки параметры подсистемы (её префикс) исчезают из полного списка параметров в наземке — сделай скриншот поиска по префиксу до и после.</li><li><strong>Git.</strong> Файл с опциями сборки (<code>hwdef</code> с <code>define AP_&lt;FEATURE&gt;_ENABLED 0</code> или список опций Custom Firmware Build) лежит в репозитории рядом с конфигом. Через полгода на вопрос «почему на этом дроне нет X» ответит коммит, а не память.</li></ul>
+<p>Лабораторная засчитывается, когда собраны стандартная и урезанная прошивки, размеры сравнены и вывод <code>version</code>/BUILD KEY сохранён, исчезновение отключённой подсистемы из параметров подтверждено скриншотом или выводом CLI, а конфигурация сборки лежит в git.</p>
+
+<h2>Диагностика</h2>
+<div class="diag-groups"><article class="diag-item"><h4><strong>Симптом:</strong> Cloud Build падает с ошибкой размера</h4><ul><li>Возможная причина: слишком много опций для флеша платы.</li><li>Что сделать: убрать неиспользуемое (второй OSD, лишние протоколы, GPS без GPS).</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> после своей сборки функция «есть», но не работает</h4><ul><li>Возможная причина: опции нужен пин, не назначенный через <code>resource</code>.</li><li>Что сделать: <code>resource</code> в CLI, перезагрузка, проверить <code>status</code>.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> ArduPilot <code>waf configure</code> не находит плату</h4><ul><li>Возможная причина: опечатка в имени, нет сабмодулей.</li><li>Что сделать: <code>./waf list_boards</code>, <code>git submodule update --init --recursive</code>.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> после своей сборки часть параметров исчезла</h4><ul><li>Возможная причина: это и есть эффект отключённой подсистемы.</li><li>Что сделать: сверить с записью о сборке; если параметр нужен — вернуть функцию.</li></ul></article></div>
+
+<h2>Чек-лист</h2>
+<ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="bf-custom:0"><span>Знаю, какие опции реально нужны моему аппарату</span></label></li><li><label><input type="checkbox" data-check-id="bf-custom:1"><span>Сборка описана в git: опции / hwdef-патч, дата, хеш</span></label></li><li><label><input type="checkbox" data-check-id="bf-custom:2"><span>Вывод <code>version</code> и <code>status</code> (BUILD KEY) сохранён после прошивки</span></label></li><li><label><input type="checkbox" data-check-id="bf-custom:3"><span>Конфиг восстанавливается из той же мажорной версии</span></label></li><li><label><input type="checkbox" data-check-id="bf-custom:4"><span>Понимаю, что теряю, отключая подсистему</span></label></li></ul>
+
+<h2>Источники</h2>
+<ul class="refs"><li><a href="https://betaflight.com/docs/wiki/guides/current/Build-Options" target="_blank" rel="noopener noreferrer">Build Options — Betaflight Documentation</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://betaflight.com/docs/development/Defines" target="_blank" rel="noopener noreferrer">Defines — Betaflight Development</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://ardupilot.org/dev/docs/building-the-code.html" target="_blank" rel="noopener noreferrer">Building the code — ArduPilot Dev</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://ardupilot.org/dev/docs/SITL-setup-landingpage.html" target="_blank" rel="noopener noreferrer">Setting up SITL / build environment — ArduPilot Dev</a> <span class="gc-tag" data-state="info">primary</span></li></ul>
+<h2>Проверь себя</h2>
+<uav-quiz src="../quiz/bf-custom.json" module="bf-custom"></uav-quiz>
+      </div>
+      <div class="module-done"><gc-button variant="secondary" data-done-toggle="bf-custom">Отметить как пройденный</gc-button></div>
+      <section class="related" aria-label="Смежные модули"><p class="gc-label gc-muted">Смежные модули</p><div class="gc-grid ref-grid"><a class="gc-card" href="bf-cli.html"><strong>CLI и remap</strong><div class="gc-card__meta"><span class="gc-tag" title="L3 — Специалист">L3</span></div></a><a class="gc-card" href="ap-quadplane.html"><strong>QuadPlane и tilt-rotor VTOL</strong><div class="gc-card__meta"><span class="gc-tag" title="L3 — Специалист">L3</span></div></a></div></section>
+      <nav class="pager" aria-label="Соседние модули" data-track-pager><a class="gc-card pager__prev" href="mav-multi-vehicle.html"><span class="gc-label gc-muted">Назад · трек</span><br>Несколько аппаратов: адресация, разнесение, строй и супервизор</a><a class="gc-card pager__next" href="fw-reading.html"><span class="gc-label gc-muted">Дальше · трек</span><br>Как читать исходники прошивки: Betaflight и ArduPilot</a></nav><nav class="pager" aria-label="Соседние шаги пути Betaflight" data-path-pager="betaflight" hidden><a class="gc-card pager__prev" href="emb-basics.html?path=betaflight"><span class="gc-label gc-muted">Назад · путь Betaflight</span><br>Embedded: прерывания, таймеры, DMA, RTOS</a><a class="gc-card pager__next" href="fw-reading.html?path=betaflight"><span class="gc-label gc-muted">Дальше · шаг 44 из 44</span><br>Как читать исходники прошивки: Betaflight и ArduPilot</a></nav>
+    </article>
+  </main>
+  <footer class="gc-container site-footer gc-muted">
+    <p>Открытый курс · <a href="https://github.com/irreligious86/UAV-Education">исходники на GitHub</a> · <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">план развития</a> · <a href="../../curriculum/curriculum.html">для разработчика</a> · CC BY-NC-SA 4.0</p>
+  </footer>
+</body>
+</html>

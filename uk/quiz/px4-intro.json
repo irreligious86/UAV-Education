@@ -1,0 +1,94 @@
+{
+  "module": "px4-intro",
+  "pass": 80,
+  "questions": [
+    {
+      "q": "Какая GCS «родная» для PX4?",
+      "options": [
+        "Mission Planner",
+        "QGroundControl",
+        "MAVProxy",
+        "Betaflight App"
+      ],
+      "answer": 1,
+      "explain": "QGC делает всё: прошивка, airframe, калибровки, миссии, логи."
+    },
+    {
+      "q": "Как PX4 интегрируется с ROS 2?",
+      "options": [
+        "Через MAVLink только",
+        "Нативно через uXRCE-DDS",
+        "Через Lua-скрипты на борту",
+        "Никак"
+      ],
+      "answer": 1,
+      "explain": "Топики uORB выводятся прямо в ROS 2."
+    },
+    {
+      "q": "Формат логов PX4?",
+      "options": [
+        "DataFlash .bin",
+        "ULog .ulg",
+        "Blackbox .bbl",
+        "CSV"
+      ],
+      "answer": 1,
+      "explain": "Анализ — Flight Review или pyulog."
+    },
+    {
+      "q": "Какой режим требует надёжного GPS?",
+      "options": [
+        "Stabilized",
+        "Acro",
+        "Position",
+        "Altitude"
+      ],
+      "answer": 2,
+      "explain": "Position держит позицию по GPS."
+    },
+    {
+      "q": "Команда запуска SITL с Gazebo и квадрокоптером x500?",
+      "options": [
+        "sim_vehicle.py -v ArduCopter",
+        "make px4_sitl gz_x500",
+        "px4 start",
+        "ros2 launch px4"
+      ],
+      "answer": 1,
+      "explain": "Клиент uXRCE-DDS в SITL стартует сам."
+    },
+    {
+      "q": "Когда выбирать ArduPilot вместо PX4?",
+      "options": [
+        "Для ROS 2 и Gazebo",
+        "Экзотика, Lua, сообщество",
+        "Всегда",
+        "Для гонок"
+      ],
+      "answer": 1,
+      "explain": "PX4 сильнее в исследованиях и ROS 2."
+    },
+    {
+      "q": "Умолчания фильтров PX4 (IMU_GYRO_CUTOFF 40 Гц, IMU_DGYRO_CUTOFF 20 Гц) по сравнению с Betaflight:",
+      "options": [
+        "Выше",
+        "Заметно ниже",
+        "Такие же",
+        "Не настраиваются"
+      ],
+      "answer": 1,
+      "explain": "PX4 рассчитан на крупные аппараты; для 5\" их поднимают. Плюс notch по ESC-телеметрии (IMU_GYRO_DNF_EN)."
+    },
+    {
+      "q": "Что сбрасывает смена airframe в QGC?",
+      "options": [
+        "Только калибровки датчиков",
+        "Параметры аппарата",
+        "Ничего",
+        "Только миссии"
+      ],
+      "answer": 1,
+      "explain": "После смены — повторная настройка."
+    }
+  ]
+}

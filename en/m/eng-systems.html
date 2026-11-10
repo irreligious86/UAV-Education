@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en" data-theme="dark" data-lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Системная инженерия: требования, FMEA, документация, тесты — UAV Student</title>
+  <meta name="description" content="написать требования к аппарату и проследить их до тестов провести FMEA и выбрать меры вести документацию проекта так, чтобы её мог продолжить другой инженер">
+  <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
+  <link rel="manifest" href="../../manifest.webmanifest">
+  <meta name="theme-color" content="#0b0f14">
+  <link rel="alternate" hreflang="ru" href="../../m/eng-systems.html">
+  <link rel="alternate" hreflang="uk" href="../../uk/m/eng-systems.html">
+  <link rel="alternate" hreflang="en" href="../../en/m/eng-systems.html">
+  <script>/* go to the visitor's chosen language before anything paints (assets/i18n.js) */(function(){try{var c=localStorage.getItem('uav-lang'),h=document.documentElement.getAttribute('data-lang');if(!c||c===h||/[?&]lang=keep\b/.test(location.search))return;var l=document.querySelector('link[rel=alternate][hreflang="'+c+'"]');if(l)location.replace(l.href+location.search+location.hash)}catch(e){}})();</script>
+  <link rel="stylesheet" href="../../lib/ground-control-ui/dist/ground-control.css">
+  <link rel="stylesheet" href="../../assets/site.css">
+  <script src="../../lib/ground-control-ui/dist/ground-control.js" defer></script>
+  <script src="../../assets/i18n/en.js"></script>
+  <script src="../../assets/i18n.js"></script>
+  <script src="../../assets/progress-store.js" defer></script>
+  <script src="../../assets/backend-config.js" defer></script>
+  <script src="../../assets/account.js" defer></script>
+  <script src="../../assets/grading.js" defer></script>
+  <script src="../../assets/app.js" defer></script>
+  <script src="../../assets/uav-quiz.js" defer></script>
+  <script src="../../assets/uav-tasks.js" defer></script>
+  <script src="../../assets/offline.js" defer></script>
+</head>
+<body class="gc-root" data-base="../" data-root="../../">
+  <header class="site-header">
+    <div class="gc-container site-header__inner">
+      <a class="site-brand" href="../index.html"><span class="site-brand__mark" aria-hidden="true">◆</span> UAV Student</a>
+      <nav class="gc-nav" aria-label="Разделы сайта">
+        <a href="../index.html" aria-current="page">Курс</a>
+        <a href="../ref/index.html">Справочник</a>
+        <a href="../pages/glossary.html">Глоссарий</a>
+        <a href="../pages/fails.html">Фейлы</a>
+        <a href="../pages/search.html">Поиск</a>
+        <a href="../pages/progress.html">Мой прогресс</a>
+      </nav>
+      <nav class="lang-switch" aria-label="Язык"><a class="gc-tag" href="../../m/eng-systems.html" data-lang-to="ru" hreflang="ru" lang="ru" title="Русский">RU</a><a class="gc-tag" href="../../uk/m/eng-systems.html" data-lang-to="uk" hreflang="uk" lang="uk" title="Українська">UK</a><a class="gc-tag" href="../../en/m/eng-systems.html" data-lang-to="en" hreflang="en" lang="en" title="English" aria-current="true" data-state="ok">EN</a></nav>
+    </div>
+  </header>
+  <main class="gc-container site-main">
+    <article class="module" data-module-page="eng-systems">
+      <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-engineer">Инженер: код на борту</a><span>Системная инженерия: требования, FMEA, документация, тесты</span></p>
+      <h1 class="module-title">Системная инженерия: требования, FMEA, документация, тесты</h1>
+      <div class="module-tags"><span class="gc-tag" title="Уровень">L4 — Эксперт</span><span class="gc-tag">чтение 40 мин</span><span class="gc-tag">учёба ~4 ч</span><span class="gc-tag">любая прошивка</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ОСВОЕН</span></div>
+      <p class="gc-muted module-score" data-module-score></p>
+      <p class="module-lead">«Инженерный метод 101» ввёл цикл требования → архитектура → тесты → документация на одной сборке. Этот модуль — тот же цикл в полный рост, для аппарата или системы, которую будет продолжать другой человек: как писать требования, которые можно проверить (с ID, критерием и методом), как вести трассировку до тестов, как делать FMEA на уровне системы с мерами и их проверкой, как строить план верификации (SITL → стенд → поле) и как документировать так, чтобы передача заняла час, а не месяц. Лабораторная — полный пакет документации своего проекта.</p>
+      <div class="gc-callout" data-state="ok"><strong>После модуля ты умеешь</strong><ul><li>написать требования к аппарату и проследить их до тестов</li><li>провести FMEA и выбрать меры</li><li>вести документацию проекта так, чтобы её мог продолжить другой инженер</li></ul></div><p class="gc-muted">Перед этим модулем: <a href="ap-safety-fs.html">Отказоустойчивость: failsafe, геозона, FMEA полёта</a></p><div class="gc-callout lab"><p class="gc-label gc-muted">Лабораторная</p><strong>Пакет документации</strong><p class="gc-muted lab__hint">Сдано, когда отмечены все пункты:</p><ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="eng-systems:lab:0"><span>Требования с ID и трассировка до тестов</span></label></li><li><label><input type="checkbox" data-check-id="eng-systems:lab:1"><span>FMEA</span></label></li><li><label><input type="checkbox" data-check-id="eng-systems:lab:2"><span>README и журнал изменений</span></label></li></ul></div><div class="path-pos gc-muted"><span class="gc-label">В пути</span><ul><li data-path-pos="ardupilot"><a href="../path/ardupilot.html">ArduPilot</a>: шаг 58 из 69 → <a href="ros2-basics.html?path=ardupilot">ROS 2 для борта: узлы, топики, QoS, tf2, bag</a></li></ul></div>
+      <div class="gc-prose module-body">
+<div class="gc-callout" data-state="caution" data-untranslated><strong>Модуль ещё не переведён.</strong> Ниже — оригинал (Русский). Прогресс и оценки общие для всех языков.</div>
+<h2>Теория</h2>
+<h4 class="md-subheading">Требования</h4>
+<p>Хорошее требование: <strong>однозначное, проверяемое, с источником</strong>. Структура: <code>ID | формулировка | критерий приёмки | метод проверки (анализ/симуляция/стенд/полёт) | источник (задача, правило, стандарт) | приоритет</code>.</p>
+<ul><li>Плохо: «Дрон должен долго летать». Хорошо: <code>R-PWR-03 | Время висения с полезной нагрузкой 500 г не менее 25 мин при 20 °C | лог: ток висения, расчёт по ёмкости ≥ 25 мин; полёт: ≥ 25 мин до BATT_LOW | полёт | задача заказчика §2</code>.</li><li>Классы: функциональные (что делает), производительности (сколько), ограничения (масса, бюджет, закон), безопасность (failsafe, зоны), интерфейсы (MAVLink, питание нагрузки), эксплуатация (замена АКБ ≤ 2 мин без инструмента).</li><li>Требования безопасности <strong>выводятся из FMEA и правил</strong>, не придумываются из головы.</li><li>Каждое требование имеет владельца и статус (черновик/утверждено/проверено/не выполнено).</li></ul>
+<h4 class="md-subheading">Архитектура и интерфейсы</h4>
+<p>Схема системы: блоки (FC, companion, питание, RC, видео, нагрузка), <strong>интерфейсы между ними</strong> с протоколом, питанием, направлением (таблица интерфейсов — главный документ при интеграции), бюджеты: массы (с запасом 10%), мощности (по веткам, из модуля про питание), связи (бюджет линка), вычислений (CPU companion). Решения с альтернативами и причиной выбора (ADR — architecture decision record: контекст, варианты, решение, последствия) — чтобы через год не спорить заново.</p>
+<h4 class="md-subheading">FMEA на уровне системы</h4>
+<p>Отличие от модуля про failsafe: рассматриваются не только отказы в полёте, но и интеграционные (ошибка в прошивке после обновления, неверная сборка, человеческий фактор при подготовке), для каждого — <strong>мера</strong> (устранение, резервирование, обнаружение, процедура) и <strong>как мера проверена</strong> (ссылка на тест). RPN пересчитывается после мер. Таблица живёт и обновляется после каждого инцидента (разбор → новая строка/обновлённая мера).</p>
+<h4 class="md-subheading">Разобранный пример: FMEA на три строки</h4>
+<p>Оценки по шкале 1–10: S — тяжесть последствий, O — вероятность, D — насколько трудно обнаружить до вреда (10 — не обнаружим). RPN = S·O·D — порядок, в котором закрывать риски, а не абсолютная мера.</p>
+<div class="table-wrap md-table-wrap" tabindex="0"><table class="md-table"><thead><tr><th>Отказ</th><th>Последствие</th><th>S</th><th>O</th><th>D</th><th>RPN</th><th>Мера</th><th>Требование / тест</th></tr></thead><tbody><tr><td data-label="Отказ">Потеря RC на удалении</td><td data-label="Последствие">неуправляемый полёт</td><td data-label="S">9</td><td data-label="O">4</td><td data-label="D">2</td><td data-label="RPN">72</td><td data-label="Мера"><code>FS_THR_ENABLE</code> = RTL, высота RTL выше препятствий</td><td data-label="Требование / тест">R-SAF-01 / SITL <code>SIM_RC_FAIL</code></td></tr><tr><td data-label="Отказ">Холодная пайка фазы мотора</td><td data-label="Последствие">падение (квад), уход по рысканию (X8)</td><td data-label="S">8</td><td data-label="O">3</td><td data-label="D">7</td><td data-label="RPN">168</td><td data-label="Мера">проверка нагрузкой и вибротест в чек-листе сборки</td><td data-label="Требование / тест">R-MFG-04 / тест падения напряжения</td></tr><tr><td data-label="Отказ">Новая прошивка сменила имена параметров</td><td data-label="Последствие">молча не работает failsafe</td><td data-label="S">9</td><td data-label="O">3</td><td data-label="D">8</td><td data-label="RPN">216</td><td data-label="Мера">инварианты в CI, diff параметров после обновления</td><td data-label="Требование / тест">R-PRC-02 / <code>check_params.py</code></td></tr></tbody></table></div>
+<p>Сюрприз примера типичен: самый «страшный» риск по ощущениям (потеря связи) закрыт лучше всего, а самые высокие RPN — у сборки и процесса, где обнаружение плохое. FMEA ценна именно этим перекосом внимания.</p>
+<h4 class="md-subheading">ADR: решение, которое можно перечитать</h4>
+<p>Architecture Decision Record — короткий файл на каждое необратимое решение. Шаблон:</p>
+<pre class="cli-block"><code># ADR-003: Li-Ion 6S2P instead of LiPo for the survey airframe
+Status: accepted (2026-11-08)
+Context: requirement R-PWR-03 (25 min hover with 500 g); LiPo 6S 5000 gives 17 min by calculation.
+Decision: 6S2P P42A, 8.4 Ah, cruise current 22 A.
+Consequences: +180 g, sag under punch ~1.5 V, no aggressive manoeuvres; BATT_* thresholds for Li-Ion.
+Alternatives: LiPo 6S 8000 (heavier, 21 min), hybrid (out of budget).</code></pre>
+<p>Через полгода вопрос «почему тут Li-Ion?» отвечается файлом, а не памятью.</p>
+<h4 class="md-subheading">Верификация и валидация</h4>
+<ul><li><strong>Верификация</strong> — «сделали правильно?»: каждое требование → тест с методом; план тестов по ступеням: анализ/расчёт → SITL → стенд (без пропов) → привязной/низкий полёт → полёт. Результат каждого теста — запись с датой, конфигом (тег!), логом, вердиктом.</li><li><strong>Валидация</strong> — «сделали то?»: прогон реальной задачи с заказчиком/пользователем; часто выявляет требования, которых не было.</li><li>Матрица трассировки: требование ↔ тест ↔ результат. Пустые клетки — незакрытые требования; тесты без требований — лишние или требование забыто.</li><li>Регрессия: после любого изменения — набор обязательных тестов (SITL-автотест из модуля про CI + короткий полётный чек-лист).</li></ul>
+<h4 class="md-subheading">Документация, которую можно передать</h4>
+<p>Минимальный пакет:</p>
+<ol><li><code>README</code> — что это, для чего, состояние, как запустить за 15 минут.</li><li>Требования (таблица) и ADR.</li><li>Архитектура: схема, таблица интерфейсов, бюджеты.</li><li>Сборка: BOM с версиями, схема проводки, фото, моменты затяжки где важно.</li><li>Конфигурация: репозиторий конфигов с тегами (модуль про CI).</li><li>FMEA и failsafe-настройки с обоснованием.</li><li>План и журнал тестов, матрица трассировки.</li><li>Эксплуатация: чек-листы (пред/послеполётный), журнал полётов, процедуры (замена АКБ, калибровки, обновление прошивки с откатом).</li><li>Журнал изменений и известные проблемы.</li></ol>
+<p>Критерий качества: другой инженер по пакету восстанавливает аппарат и выполняет полёт без вопросов автору. Тест этого — попросить кого-то попробовать.</p>
+<h4 class="md-subheading">Процесс изменений</h4>
+<p>Запрос → оценка влияния на требования/FMEA → изменение в ветке → тесты (регрессия) → ревью → релиз с тегом → обновление документации в том же PR. Документация, обновляемая «потом», не обновляется никогда.</p>
+<figure class="diagram" data-diagram="v-model"><div class="diagram__svg"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 200" width="100%" role="img" aria-labelledby="t" style="max-width:720px;display:block;margin:0 auto"><title id="t">V-модель: каждому уровню требований — свой уровень проверки</title><style>text{font-family: var(--gc-font-mono, ui-monospace, Menlo, monospace); font-size: 12px;fill:currentColor} .m{fill:var(--gc-ink-muted, #8a93a3)} .a{fill:var(--gc-accent-hud, #5ef1d2)} .w{fill:var(--gc-signal-amber, #f0b24c)} .d{fill:var(--gc-signal-red, #e8636b)} .box{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:currentColor;stroke-width:1.2} .boxa{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6} .ln{stroke:currentColor;stroke-width:1.2;fill:none} .lna{stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6;fill:none} .lnm{stroke:var(--gc-ink-muted, #8a93a3);stroke-width:1;fill:none;stroke-dasharray:4 3} .t{font-size:11px} .b{font-weight:600}</style><defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker><marker id="ara" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--gc-accent-hud, #5ef1d2)"/></marker></defs><rect class="boxa" x="10.0" y="30" width="142.0" height="48" rx="6"/><text x="81.0" y="51.0" text-anchor="middle" class="b">Требования</text><text x="81.0" y="65.0" text-anchor="middle" class="b">к системе</text><rect class="box" x="196.0" y="30" width="142.0" height="48" rx="6"/><text x="267.0" y="51.0" text-anchor="middle">Архитектура</text><text x="267.0" y="65.0" text-anchor="middle">интерфейсы</text><rect class="box" x="382.0" y="30" width="142.0" height="48" rx="6"/><text x="453.0" y="58.0" text-anchor="middle">Компоненты</text><rect class="box" x="568.0" y="30" width="142.0" height="48" rx="6"/><text x="639.0" y="58.0" text-anchor="middle">Реализация</text><rect class="boxa" x="10.0" y="130" width="142.0" height="48" rx="6"/><text x="81.0" y="151.0" text-anchor="middle" class="b">Валидация</text><text x="81.0" y="165.0" text-anchor="middle" class="b">в поле</text><rect class="box" x="196.0" y="130" width="142.0" height="48" rx="6"/><text x="267.0" y="151.0" text-anchor="middle">Системные</text><text x="267.0" y="165.0" text-anchor="middle">тесты, SITL</text><rect class="box" x="382.0" y="130" width="142.0" height="48" rx="6"/><text x="453.0" y="158.0" text-anchor="middle">Интеграция</text><rect class="box" x="568.0" y="130" width="142.0" height="48" rx="6"/><text x="639.0" y="151.0" text-anchor="middle">Модульные</text><text x="639.0" y="165.0" text-anchor="middle">тесты</text><path class="ln" d="M152.0 54.0 L196.0 54.0" marker-end="url(#ar)"/><path class="ln" d="M338.0 54.0 L382.0 54.0" marker-end="url(#ar)"/><path class="ln" d="M524.0 54.0 L568.0 54.0" marker-end="url(#ar)"/><path class="ln" d="M639.0 78 L639.0 130" marker-end="url(#ar)"/><path class="ln" d="M568.0 154.0 L524.0 154.0" marker-end="url(#ar)"/><path class="ln" d="M382.0 154.0 L338.0 154.0" marker-end="url(#ar)"/><path class="ln" d="M196.0 154.0 L152.0 154.0" marker-end="url(#ar)"/></svg></div><figcaption class="gc-muted">V-модель: каждому уровню требований и проектирования соответствует свой уровень проверки — от модульных тестов до валидации в поле.</figcaption><div class="diagram__hint">Схему можно прокрутить по горизонтали</div></figure>
+
+<h2>Практика</h2>
+<h4 class="md-subheading">Шаг 1. Требования</h4>
+<p>20–40 требований для своего аппарата по структуре; ≥ 5 по безопасности из FMEA; каждое с методом проверки.</p>
+<h4 class="md-subheading">Шаг 2. Архитектура</h4>
+<p>Схема блоков, таблица интерфейсов, бюджеты массы/мощности/связи, 3 ADR по шаблону выше (например: Li-Ion vs LiPo; ELRS 900 vs 2.4; companion Pi vs Jetson).</p>
+<h4 class="md-subheading">Шаг 3. FMEA и план тестов</h4>
+<p>Системная FMEA (≥ 15 строк) в формате разобранного примера: S/O/D/RPN, мера, ссылка на требование и тест; три риска с наибольшим RPN закрыть первыми и показать, как изменились их O или D. План тестов по ступеням; матрица трассировки.</p>
+<h4 class="md-subheading">Шаг 4. Пакет и передача</h4>
+<p>Собрать пакет (п. 1–9), дать прочитать другому человеку (или себе через неделю) с задачей «подготовь к полёту по документации» — список вопросов, которые возникли, → исправления.</p>
+<h4 class="md-subheading">Разобранный пример: требование, тест, трассировка</h4>
+<ul><li><strong>Требование:</strong> <code>REQ-SAF-03</code> — при потере сигнала пульта дольше 1 с аппарат выполняет RTL; проверка — тест. Источник: строка FMEA <code>F-07</code> «потеря RC-линка».</li><li><strong>Тест:</strong> <code>T-12</code> — SITL: выключение RC-входа в LOITER на 50 м от дома; ожидание: режим RTL не позже 1.5 с, посадка в радиусе 3 м от дома. Ступень 2 — полевой тест на 20 м высоты с наблюдателем.</li><li><strong>Трассировка</strong> (фрагмент матрицы):</li></ul>
+<div class="table-wrap md-table-wrap" tabindex="0"><table class="md-table"><thead><tr><th>Требование</th><th>Источник</th><th>Тест</th><th>Результат</th></tr></thead><tbody><tr><td data-label="Требование">REQ-SAF-03</td><td data-label="Источник">FMEA F-07</td><td data-label="Тест">T-12 (SITL), T-31 (поле)</td><td data-label="Результат">pass 2026-11-09</td></tr><tr><td data-label="Требование">REQ-PWR-01</td><td data-label="Источник">бюджет мощности</td><td data-label="Тест">T-05 (стенд, ток висения)</td><td data-label="Результат">pass</td></tr></tbody></table></div>
+<ul><li><strong>FMEA:</strong> RPN = S × O × D (каждое 1–10). Строка «отказ BEC 5 В: S 9, O 3, D 6 → RPN 162; мера — резервное питание приёмника, проверка напряжения в предполётном чек-листе → D 3, RPN 81».</li></ul>
+<h4 class="md-subheading">Что должно получиться</h4>
+<ul><li>У каждого требования есть ID, формулировка с числом, метод проверки и хотя бы один тест. Требование без теста и тест без требования — две разновидности одной дыры.</li><li>Три верхних риска FMEA закрыты мерами, и видно, как упал их RPN.</li><li>README отвечает на вопрос «как подготовить аппарат к полёту» без автора рядом. CHANGELOG — по датам: что изменено и почему, со ссылкой на требование или тест.</li></ul>
+<p>Лабораторная засчитывается, когда требования имеют ID и трассируются до тестов в матрице, FMEA на 15+ строк с мерами по трём верхним рискам готова, а README и журнал изменений прошли проверку чтением со списком исправленных вопросов.</p>
+
+<h2>Диагностика</h2>
+<div class="diag-groups"><article class="diag-item"><h4><strong>Симптом:</strong> требования есть, но тесты «по ощущениям»</h4><ul><li>Возможная причина: критерии приёмки не числовые.</li><li>Что сделать: переписать с числами и методом; требование без метода — не требование.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> после обновления прошивки всё сломалось</h4><ul><li>Возможная причина: нет регрессии и отката.</li><li>Что сделать: тег перед обновлением, регрессионный набор, процедура отката в документации.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> передача проекта заняла недели</h4><ul><li>Возможная причина: знания в голове, не в пакете.</li><li>Что сделать: тест передачи, ADR, таблица интерфейсов.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> FMEA написана один раз и устарела</h4><ul><li>Возможная причина: нет процесса обновления после инцидентов.</li><li>Что сделать: разбор инцидента завершается строкой в FMEA и изменением меры.</li></ul></article></div>
+
+<h2>Чек-лист</h2>
+<ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="eng-systems:0"><span>Требования с ID, критерием и методом проверки</span></label></li><li><label><input type="checkbox" data-check-id="eng-systems:1"><span>Архитектура с таблицей интерфейсов, бюджетами и ADR</span></label></li><li><label><input type="checkbox" data-check-id="eng-systems:2"><span>Системная FMEA с мерами и ссылками на тесты</span></label></li><li><label><input type="checkbox" data-check-id="eng-systems:3"><span>Матрица трассировки без пустых клеток</span></label></li><li><label><input type="checkbox" data-check-id="eng-systems:4"><span>Пакет документации прошёл тест передачи</span></label></li></ul>
+
+<h2>Источники</h2>
+<ul class="refs"><li><a href="https://www.incose.org/publications/products/technical-publications" target="_blank" rel="noopener noreferrer">INCOSE — Technical publications (Systems Engineering Handbook)</a> <span class="gc-tag">secondary</span></li><li><a href="https://ntrs.nasa.gov/citations/20170001761" target="_blank" rel="noopener noreferrer">NASA — Systems Engineering Handbook, NASA/SP-2016-6105 Rev2 (NTRS)</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://ardupilot.org/dev/docs/the-ardupilot-autotest-framework.html" target="_blank" rel="noopener noreferrer">ArduPilot — Developer: testing and autotest as an example of verification practice</a> <span class="gc-tag" data-state="info">primary</span></li></ul>
+<h2>Проверь себя</h2>
+<uav-quiz src="../quiz/eng-systems.json" module="eng-systems"></uav-quiz>
+      </div>
+      <div class="module-done"><gc-button variant="secondary" data-done-toggle="eng-systems">Отметить как пройденный</gc-button></div>
+      <section class="related" aria-label="Смежные модули"><p class="gc-label gc-muted">Смежные модули</p><div class="gc-grid ref-grid"><a class="gc-card" href="eng-method-101.html"><strong>Инженерный метод 101: требования, архитектура, тесты, документация</strong><div class="gc-card__meta"><span class="gc-tag" title="L1 — Оператор">L1</span></div></a><a class="gc-card" href="ap-safety-fs.html"><strong>Отказоустойчивость: failsafe, геозона, FMEA полёта</strong><div class="gc-card__meta"><span class="gc-tag" title="L3 — Специалист">L3</span></div></a><a class="gc-card" href="eng-ci-configs.html"><strong>CI и версионирование конфигов и кода</strong><div class="gc-card__meta"><span class="gc-tag" title="L3 — Специалист">L3</span></div></a><a class="gc-card" href="el-redundancy.html"><strong>Резервирование на борту: X8, гекса, питание и сигналы</strong><div class="gc-card__meta"><span class="gc-tag" title="L2 — Интегратор">L2</span></div></a></div></section>
+      <nav class="pager" aria-label="Соседние модули" data-track-pager><a class="gc-card pager__prev" href="fw-reading.html"><span class="gc-label gc-muted">Назад · трек</span><br>Как читать исходники прошивки: Betaflight и ArduPilot</a><a class="gc-card pager__next" href="eng-ci-configs.html"><span class="gc-label gc-muted">Дальше · трек</span><br>CI и версионирование конфигов и кода</a></nav><nav class="pager" aria-label="Соседние шаги пути ArduPilot" data-path-pager="ardupilot" hidden><a class="gc-card pager__prev" href="fw-reading.html?path=ardupilot"><span class="gc-label gc-muted">Назад · путь ArduPilot</span><br>Как читать исходники прошивки: Betaflight и ArduPilot</a><a class="gc-card pager__next" href="ros2-basics.html?path=ardupilot"><span class="gc-label gc-muted">Дальше · шаг 59 из 69</span><br>ROS 2 для борта: узлы, топики, QoS, tf2, bag</a></nav>
+    </article>
+  </main>
+  <footer class="gc-container site-footer gc-muted">
+    <p>Открытый курс · <a href="https://github.com/irreligious86/UAV-Education">исходники на GitHub</a> · <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">план развития</a> · <a href="../../curriculum/curriculum.html">для разработчика</a> · CC BY-NC-SA 4.0</p>
+  </footer>
+</body>
+</html>

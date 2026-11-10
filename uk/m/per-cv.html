@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="uk" data-theme="dark" data-lang="uk">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Компьютерное зрение: от OpenCV до нейросетей — UAV Student</title>
+  <meta name="description" content="детектировать объект классическими методами и YOLO-подобной моделью запустить модель на Jetson/Pi с ускорением оценивать точность и ложные срабатывания">
+  <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
+  <link rel="manifest" href="../../manifest.webmanifest">
+  <meta name="theme-color" content="#0b0f14">
+  <link rel="alternate" hreflang="ru" href="../../m/per-cv.html">
+  <link rel="alternate" hreflang="uk" href="../../uk/m/per-cv.html">
+  <link rel="alternate" hreflang="en" href="../../en/m/per-cv.html">
+  <script>/* go to the visitor's chosen language before anything paints (assets/i18n.js) */(function(){try{var c=localStorage.getItem('uav-lang'),h=document.documentElement.getAttribute('data-lang');if(!c||c===h||/[?&]lang=keep\b/.test(location.search))return;var l=document.querySelector('link[rel=alternate][hreflang="'+c+'"]');if(l)location.replace(l.href+location.search+location.hash)}catch(e){}})();</script>
+  <link rel="stylesheet" href="../../lib/ground-control-ui/dist/ground-control.css">
+  <link rel="stylesheet" href="../../assets/site.css">
+  <script src="../../lib/ground-control-ui/dist/ground-control.js" defer></script>
+  <script src="../../assets/i18n/uk.js"></script>
+  <script src="../../assets/i18n.js"></script>
+  <script src="../../assets/progress-store.js" defer></script>
+  <script src="../../assets/backend-config.js" defer></script>
+  <script src="../../assets/account.js" defer></script>
+  <script src="../../assets/grading.js" defer></script>
+  <script src="../../assets/app.js" defer></script>
+  <script src="../../assets/uav-quiz.js" defer></script>
+  <script src="../../assets/uav-tasks.js" defer></script>
+  <script src="../../assets/offline.js" defer></script>
+</head>
+<body class="gc-root" data-base="../" data-root="../../">
+  <header class="site-header">
+    <div class="gc-container site-header__inner">
+      <a class="site-brand" href="../index.html"><span class="site-brand__mark" aria-hidden="true">◆</span> UAV Student</a>
+      <nav class="gc-nav" aria-label="Разделы сайта">
+        <a href="../index.html" aria-current="page">Курс</a>
+        <a href="../ref/index.html">Справочник</a>
+        <a href="../pages/glossary.html">Глоссарий</a>
+        <a href="../pages/fails.html">Фейлы</a>
+        <a href="../pages/search.html">Поиск</a>
+        <a href="../pages/progress.html">Мой прогресс</a>
+      </nav>
+      <nav class="lang-switch" aria-label="Язык"><a class="gc-tag" href="../../m/per-cv.html" data-lang-to="ru" hreflang="ru" lang="ru" title="Русский">RU</a><a class="gc-tag" href="../../uk/m/per-cv.html" data-lang-to="uk" hreflang="uk" lang="uk" title="Українська" aria-current="true" data-state="ok">UK</a><a class="gc-tag" href="../../en/m/per-cv.html" data-lang-to="en" hreflang="en" lang="en" title="English">EN</a></nav>
+    </div>
+  </header>
+  <main class="gc-container site-main">
+    <article class="module" data-module-page="per-cv">
+      <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-perception">Восприятие и интеллект</a><span>Компьютерное зрение: от OpenCV до нейросетей</span></p>
+      <h1 class="module-title">Компьютерное зрение: от OpenCV до нейросетей</h1>
+      <div class="module-tags"><span class="gc-tag" title="Уровень">L4 — Эксперт</span><span class="gc-tag">чтение 45 мин</span><span class="gc-tag">учёба ~5 ч</span><span class="gc-tag">ArduPilot · PX4</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ОСВОЕН</span></div>
+      <p class="gc-muted module-score" data-module-score></p>
+      <p class="module-lead">Детектор на борту — это не «запустить YOLO», а выбор между классическими методами (цвет, контуры, маркеры — дёшево, предсказуемо, хрупко) и нейросетью (устойчиво, дорого, нужно ускорение), затем измерение: FPS на целевом железе, точность (precision/recall/mAP) на <strong>своих</strong> данных, ложные срабатывания и их цена в контуре управления. Модуль проходит обе ветки с кодом, показывает запуск модели на Jetson (TensorRT) и Pi (NCNN/ONNX Runtime/Coral), и учит оценивать результат честно.</p>
+      <div class="gc-callout" data-state="ok"><strong>После модуля ты умеешь</strong><ul><li>детектировать объект классическими методами и YOLO-подобной моделью</li><li>запустить модель на Jetson/Pi с ускорением</li><li>оценивать точность и ложные срабатывания</li></ul></div><p class="gc-muted">Перед этим модулем: <a href="per-camera.html">Камеры и видеопоток на companion</a></p><div class="gc-callout lab"><p class="gc-label gc-muted">Лабораторная</p><strong>Детектор</strong><p class="gc-muted lab__hint">Сдано, когда отмечены все пункты:</p><ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="per-cv:lab:0"><span>Модель запущена на борту</span></label></li><li><label><input type="checkbox" data-check-id="per-cv:lab:1"><span>FPS и точность измерены</span></label></li><li><label><input type="checkbox" data-check-id="per-cv:lab:2"><span>Ложные срабатывания проанализированы</span></label></li></ul></div><div class="path-pos gc-muted"><span class="gc-label">В пути</span><ul><li data-path-pos="ardupilot"><a href="../path/ardupilot.html">ArduPilot</a>: шаг 63 из 69 → <a href="per-edge-ml.html?path=ardupilot">ML на борту: бюджет, квантование, оценка, сопровождение</a></li><li data-path-pos="px4"><a href="../path/px4.html">PX4</a>: шаг 32 из 36 → <a href="per-edge-ml.html?path=px4">ML на борту: бюджет, квантование, оценка, сопровождение</a></li></ul></div>
+      <div class="gc-prose module-body">
+<div class="gc-callout" data-state="caution" data-untranslated><strong>Модуль ещё не переведён.</strong> Ниже — оригинал (Русский). Прогресс и оценки общие для всех языков.</div>
+<h2>Теория</h2>
+<h4 class="md-subheading">Классика: когда её хватает</h4>
+<ul><li><strong>Маркеры</strong> (ArUco/AprilTag): известный объект с кодом → детекция + поза 6DoF с субпиксельной точностью, десятки FPS на Pi, устойчиво к освещению. Для точной посадки, калибровки, тестов контура — лучший выбор (ArduPilot precision landing умеет AprilTag через companion, <code>PLND_TYPE = 1</code> MAVLink <code>LANDING_TARGET</code>).</li><li><strong>Цвет + контуры</strong>: HSV-порог → морфология → <code>findContours</code> → фильтр по площади/форме. 2–5 мс на кадр. Ломается при смене освещения; калибровка порогов на месте.</li><li><strong>Фон/движение</strong>: вычитание фона (<code>createBackgroundSubtractorMOG2</code>) — только для неподвижной камеры; с дрона — оптический поток и компенсация движения, сложно.</li><li><strong>Шаблоны/признаки</strong> (ORB + сопоставление): для известного объекта; хрупко к масштабу и повороту.</li></ul>
+<h4 class="md-subheading">Нейросети: детекция</h4>
+<p>Однопроходные детекторы (семейство YOLO, SSD, NanoDet) — вход 320–640 px, выход — боксы с классом и уверенностью, затем NMS. Факты для борта:</p>
+<ul><li><strong>Размер модели</strong>: nano/small (2–10 млн параметров) — единственный реальный вариант на Pi/Jetson Nano/Orin Nano; medium — Orin NX/AGX.</li><li><strong>Ускорение</strong>: Jetson — экспорт в TensorRT (FP16/INT8, ×3–10 к PyTorch); Pi 4/5 — NCNN или ONNX Runtime на CPU (nano-модель 320 px: 5–15 fps на Pi 5), Coral USB (INT8-модели) или Hailo-8L (Pi AI Kit, 13 TOPS) или Hailo-8 (AI HAT+ 26 TOPS) — десятки fps; ARM-ноутбуки/мини-ПК с GPU — любой стек.</li><li><strong>Дообучение</strong> на своих данных обязательно: предобученная на COCO модель «видит» людей и машины, но не твой маркер/объект. 300–1000 размеченных кадров с борта (разные высоты, освещение, фон), аугментации, 50–100 эпох на ПК/Colab; экспорт в ONNX → TensorRT/NCNN.</li><li><strong>Квантование</strong> INT8 — ×2 по скорости, −1–3% mAP; калибровочный набор из своих данных.</li></ul>
+<h4 class="md-subheading">Метрики, которые имеют смысл</h4>
+<ul><li><strong>Precision</strong> = TP/(TP+FP) — доля правильных среди найденных; <strong>Recall</strong> = TP/(TP+FN) — доля найденных среди истинных; порог уверенности двигает одно за счёт другого (PR-кривая).</li><li><strong>mAP@0.5</strong> — площадь под PR при IoU ≥ 0.5; стандарт, но для борта важнее: recall при фиксированной precision (цена FP — ложный манёвр!) и <strong>задержка</strong> полного цикла (захват → инференс → NMS → команда).</li><li>Оценивать на <strong>отложенных</strong> кадрах с борта, не на обучающих; отдельно по условиям (высота, освещение) — модель «в среднем 0.9» может давать 0.5 на закате.</li><li><strong>FP анализ</strong>: классифицировать ложные срабатывания (похожий объект, тень, край кадра, блик) — каждая группа лечится по-своему: данные, порог, геометрический фильтр (размер объекта по высоте полёта), временная фильтрация (объект должен появиться в N кадрах подряд — трекер).</li></ul>
+<h4 class="md-subheading">Разобранный пример: метрики из счётчиков</h4>
+<p>Отложенный набор: 200 кадров, на них 250 объектов. Детектор при пороге уверенности 0.5 выдал 230 рамок: 210 совпали с разметкой по IoU ≥ 0.5 (TP), 20 — ложные (FP), 40 объектов пропущено (FN).</p>
+<ul><li>Precision = TP / (TP + FP) = 210/230 = <strong>0.91</strong> — из того, что нашли, 91 % правда.</li><li>Recall = TP / (TP + FN) = 210/250 = <strong>0.84</strong> — из того, что было, нашли 84 %.</li><li>IoU = площадь пересечения / площадь объединения рамок; 0.5 — «совпало», 0.75 — «совпало точно».</li></ul>
+<p>Порог 0.3 даёт, скажем, precision 0.80 и recall 0.93; порог 0.7 — 0.96 и 0.70. Какой выбрать — решает цена ошибки, а не красота числа: в поиске человека пропуск дороже ложной тревоги (порог ниже, ложные тревоги проверяет оператор), в автоматическом действии по цели наоборот (порог выше плюс подтверждение несколькими кадрами).</p>
+<h4 class="md-subheading">Трекер поверх детектора</h4>
+<p>Детектор на каждом кадре — шумный и дорогой. Трекер (SORT/ByteTrack: Kalman + сопоставление по IoU) даёт стабильные ID, сглаживает, переживает пропуски и позволяет детектировать на каждом 2–3-м кадре. Для контура управления команды берутся от трекера, не от сырого детектора.</p>
+<h4 class="md-subheading">Пайплайн на борту</h4>
+<p>Захват (поток, последний кадр) → препроцессинг (resize, letterbox, нормализация — на GPU/аппаратно, где возможно) → инференс → NMS → трекер → публикация (ROS 2 топик / MAVLink / ZeroMQ) с timestamp кадра. Профилировать каждую стадию (<code>time.perf_counter</code>); типичные пропорции на Jetson Orin Nano для YOLO-nano 640: захват 3 мс, препроцесс 2, инференс TensorRT FP16 8–12, постпроцесс 2 → 15–20 мс, 50 fps теоретически, 30 с запасом.</p>
+<figure class="diagram" data-diagram="cv-pipeline"><div class="diagram__svg"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 200" width="100%" role="img" aria-labelledby="t" style="max-width:720px;display:block;margin:0 auto"><title id="t">Конвейер зрения на борту</title><style>text{font-family: var(--gc-font-mono, ui-monospace, Menlo, monospace); font-size: 12px;fill:currentColor} .m{fill:var(--gc-ink-muted, #8a93a3)} .a{fill:var(--gc-accent-hud, #5ef1d2)} .w{fill:var(--gc-signal-amber, #f0b24c)} .d{fill:var(--gc-signal-red, #e8636b)} .box{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:currentColor;stroke-width:1.2} .boxa{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6} .ln{stroke:currentColor;stroke-width:1.2;fill:none} .lna{stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6;fill:none} .lnm{stroke:var(--gc-ink-muted, #8a93a3);stroke-width:1;fill:none;stroke-dasharray:4 3} .t{font-size:11px} .b{font-weight:600}</style><defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker><marker id="ara" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--gc-accent-hud, #5ef1d2)"/></marker></defs><rect class="box" x="10.0" y="30" width="111.2" height="48" rx="6"/><text x="65.6" y="51.0" text-anchor="middle" style="font-size:10.5px">Захват</text><text x="65.6" y="65.0" text-anchor="middle" style="font-size:10.5px">камера</text><rect class="box" x="157.2" y="30" width="111.2" height="48" rx="6"/><text x="212.79999999999998" y="51.0" text-anchor="middle" style="font-size:10.5px">Препроцессинг</text><text x="212.79999999999998" y="65.0" text-anchor="middle" style="font-size:10.5px">ресайз, норма</text><rect class="boxa" x="304.4" y="30" width="111.2" height="48" rx="6"/><text x="360.0" y="51.0" text-anchor="middle" class="b" style="font-size:10.5px">Детектор</text><text x="360.0" y="65.0" text-anchor="middle" class="b" style="font-size:10.5px">5–10 Гц</text><rect class="boxa" x="451.59999999999997" y="30" width="111.2" height="48" rx="6"/><text x="507.2" y="51.0" text-anchor="middle" class="b" style="font-size:10.5px">Трекер</text><text x="507.2" y="65.0" text-anchor="middle" class="b" style="font-size:10.5px">частота камеры</text><rect class="box" x="598.8" y="30" width="111.2" height="48" rx="6"/><text x="654.4" y="51.0" text-anchor="middle" style="font-size:10.5px">Цель</text><text x="654.4" y="65.0" text-anchor="middle" style="font-size:10.5px">→ управление</text><rect class="box" x="304.4" y="130" width="111.2" height="48" rx="6"/><text x="360.0" y="151.0" text-anchor="middle" style="font-size:10.5px">Метрики:</text><text x="360.0" y="165.0" text-anchor="middle" style="font-size:10.5px">precision, recall</text><rect class="box" x="598.8" y="130" width="111.2" height="48" rx="6"/><text x="654.4" y="151.0" text-anchor="middle" style="font-size:10.5px">Задержка кадра</text><text x="654.4" y="165.0" text-anchor="middle" style="font-size:10.5px">p99 в бюджете</text><path class="ln" d="M121.2 54.0 L157.2 54.0" marker-end="url(#ar)"/><path class="ln" d="M268.4 54.0 L304.4 54.0" marker-end="url(#ar)"/><path class="ln" d="M415.59999999999997 54.0 L451.59999999999997 54.0" marker-end="url(#ar)"/><path class="ln" d="M562.8 54.0 L598.8 54.0" marker-end="url(#ar)"/><path class="ln" d="M360.0 78 L360.0 130" marker-end="url(#ar)"/><path class="ln" d="M654.4 78 L654.4 130" marker-end="url(#ar)"/></svg></div><figcaption class="gc-muted">Конвейер зрения на борту: детектор на 5–10 Гц, трекер на частоте камеры, метрики качества и задержка p99 как требования.</figcaption><div class="diagram__hint">Схему можно прокрутить по горизонтали</div></figure>
+
+<h2>Практика</h2>
+<h4 class="md-subheading">Шаг 1. Классика</h4>
+<p>ArUco — детекция маркера с камеры, вывод id и углов, FPS. С OpenCV 4.7 API другой (старые <code>cv2.aruco.detectMarkers</code> из статей не работают):</p>
+<pre class="cli-block"><code>import cv2, time
+dictionary = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_4X4_50)
+detector = cv2.aruco.ArucoDetector(dictionary, cv2.aruco.DetectorParameters())
+cap = cv2.VideoCapture(0)
+t0, n = time.perf_counter(), 0
+while n &lt; 300:
+    ok, frame = cap.read()
+    if not ok:
+        break
+    corners, ids, _ = detector.detectMarkers(cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY))
+    if ids is not None:
+        c = corners[0][0]
+        print(ids.ravel()[0], &quot;centre px:&quot;, c.mean(axis=0).round(1))
+    n += 1
+print(f&quot;{n / (time.perf_counter() - t0):.1f} FPS&quot;)</code></pre>
+<p>HSV-детектор цветного объекта: пороги подобраны по гистограмме, площадь/форма фильтруют; FPS и ложные срабатывания при смене света.</p>
+<h4 class="md-subheading">Шаг 2. Данные и дообучение</h4>
+<p>Снять 300+ кадров с борта/с руки объекта в разных условиях; разметить (CVAT/LabelImg/Roboflow); обучить nano-модель (Ultralytics/NanoDet) на ПК; экспорт ONNX. Отложенный набор — 20%.</p>
+<h4 class="md-subheading">Шаг 3. На борту</h4>
+<p>Jetson: ONNX → TensorRT FP16 (<code>trtexec</code>), инференс в Python; Pi: NCNN/ONNX Runtime или Coral/Hailo. Профиль по стадиям, FPS с камерой (не с файла!).</p>
+<h4 class="md-subheading">Шаг 4. Оценка</h4>
+<p>Precision/recall/mAP на отложенном наборе, по условиям; кривая precision–recall по 5 порогам и выбранный порог с обоснованием ценой ошибки (как в разобранном примере); FP классифицированы; трекер поверх (ByteTrack/SORT) — стабильность ID на видео.</p>
+<h4 class="md-subheading">Как считать и что записать</h4>
+<ul><li><strong>FPS — с камерой, а не с файла:</strong> захват, предобработка и инференс вместе. Профиль по стадиям (мс на кадр) покажет, где узкое место. Часто это не нейросеть, а копирование кадра и изменение размера.</li><li><strong>Precision и recall на отложенном наборе.</strong> Пример: в отложенных кадрах 100 объектов, детектор нашёл 90 из них и ещё 10 раз сработал на пустом месте. Precision = 90 / (90 + 10) = 0.90, recall = 90 / 100 = 0.90. Повышение порога уверенности обычно поднимает precision и снижает recall.</li><li><strong>Выбор порога через цену ошибки.</strong> Если ложное срабатывание уводит аппарат за чужой целью, а пропуск означает только повторный заход, выбирай порог с высокой precision, даже ценой recall. Запиши кривую по 5 порогам и выбранную точку с одной фразой обоснования.</li><li><strong>Ложные срабатывания по классам:</strong> блики, тени, похожие объекты, размытие движения. Для каждого класса — пример кадра и мера: данные в обучение, фильтр по размеру или форме, трекер с подтверждением по нескольким кадрам.</li><li><strong>ArUco:</strong> id маркера и углы стабильны при неподвижной камере. Если углы «прыгают», маркер мал в кадре или камера не откалибрована (модуль «Камера»).</li></ul>
+<p>Лабораторная засчитывается, когда модель запущена на борту с FPS, измеренным с камерой по стадиям, precision/recall посчитаны на отложенном наборе с выбранным порогом и обоснованием, а ложные срабатывания классифицированы с мерой для каждого класса.</p>
+
+<h2>Диагностика</h2>
+<div class="diag-groups"><article class="diag-item"><h4><strong>Симптом:</strong> 30 fps на файле, 8 fps с камеры</h4><ul><li>Возможная причина: захват/конверсия на CPU, копии кадра.</li><li>Что сделать: профиль стадий, аппаратный препроцесс, нижнее разрешение.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> mAP 0.9 на валидации, в поле — не видит</h4><ul><li>Возможная причина: валидация из того же распределения, что обучение; поле другое.</li><li>Что сделать: отложенные кадры из других условий, дособрать данные.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> ложные срабатывания на тенях/бликах</h4><ul><li>Возможная причина: мало негативных примеров.</li><li>Что сделать: добавить «пустые» кадры с тенями в обучение, временная фильтрация.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> после INT8 точность упала сильно</h4><ul><li>Возможная причина: плохая калибровка квантования.</li><li>Что сделать: калибровочный набор из своих данных, FP16 как компромисс.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> ID объекта скачет</h4><ul><li>Возможная причина: нет трекера или слабое сопоставление.</li><li>Что сделать: ByteTrack, детекция каждый кадр для тестов.</li></ul></article></div>
+
+<h2>Чек-лист</h2>
+<ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="per-cv:0"><span>Знаю, когда хватает классики (маркеры, цвет) и когда нужна сеть</span></label></li><li><label><input type="checkbox" data-check-id="per-cv:1"><span>Дообучил nano-модель на своих данных и экспортировал</span></label></li><li><label><input type="checkbox" data-check-id="per-cv:2"><span>Модель запущена на борту с ускорением, FPS измерен с камеры</span></label></li><li><label><input type="checkbox" data-check-id="per-cv:3"><span>Precision/recall по условиям, порог выбран по цене FP</span></label></li><li><label><input type="checkbox" data-check-id="per-cv:4"><span>FP классифицированы, трекер сглаживает детекции</span></label></li></ul>
+
+<h2>Источники</h2>
+<ul class="refs"><li><a href="https://docs.opencv.org/4.x/d5/dae/tutorial_aruco_detection.html" target="_blank" rel="noopener noreferrer">OpenCV — ArUco marker detection tutorial</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://docs.nvidia.com/deeplearning/tensorrt/latest/index.html" target="_blank" rel="noopener noreferrer">NVIDIA — TensorRT documentation</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://ardupilot.org/copter/docs/precision-landing-with-irlock.html" target="_blank" rel="noopener noreferrer">ArduPilot — Precision Landing (companion with AprilTag/IR-LOCK)</a> <span class="gc-tag" data-state="info">primary</span></li></ul>
+<h2>Проверь себя</h2>
+<uav-quiz src="../quiz/per-cv.json" module="per-cv"></uav-quiz>
+      </div>
+      <div class="module-done"><gc-button variant="secondary" data-done-toggle="per-cv">Отметить как пройденный</gc-button></div>
+      <section class="related" aria-label="Смежные модули"><p class="gc-label gc-muted">Смежные модули</p><div class="gc-grid ref-grid"><a class="gc-card" href="per-camera.html"><strong>Камеры и видеопоток на companion</strong><div class="gc-card__meta"><span class="gc-tag" title="L3 — Специалист">L3</span></div></a><a class="gc-card" href="per-tracking.html"><strong>Слежение и управление по цели</strong><div class="gc-card__meta"><span class="gc-tag" title="L4 — Эксперт">L4</span></div></a><a class="gc-card" href="per-visual-nav.html"><strong>Визуальная навигация: оптический поток, VIO, SLAM обзорно</strong><div class="gc-card__meta"><span class="gc-tag" title="L4 — Эксперт">L4</span></div></a></div></section>
+      <nav class="pager" aria-label="Соседние модули" data-track-pager><a class="gc-card pager__prev" href="per-geometry.html"><span class="gc-label gc-muted">Назад · трек</span><br>Геометрия камеры: от пикселя до точки на земле</a><a class="gc-card pager__next" href="per-edge-ml.html"><span class="gc-label gc-muted">Дальше · трек</span><br>ML на борту: бюджет, квантование, оценка, сопровождение</a></nav><nav class="pager" aria-label="Соседние шаги пути ArduPilot" data-path-pager="ardupilot" hidden><a class="gc-card pager__prev" href="per-geometry.html?path=ardupilot"><span class="gc-label gc-muted">Назад · путь ArduPilot</span><br>Геометрия камеры: от пикселя до точки на земле</a><a class="gc-card pager__next" href="per-edge-ml.html?path=ardupilot"><span class="gc-label gc-muted">Дальше · шаг 64 из 69</span><br>ML на борту: бюджет, квантование, оценка, сопровождение</a></nav><nav class="pager" aria-label="Соседние шаги пути PX4" data-path-pager="px4" hidden><a class="gc-card pager__prev" href="per-geometry.html?path=px4"><span class="gc-label gc-muted">Назад · путь PX4</span><br>Геометрия камеры: от пикселя до точки на земле</a><a class="gc-card pager__next" href="per-edge-ml.html?path=px4"><span class="gc-label gc-muted">Дальше · шаг 33 из 36</span><br>ML на борту: бюджет, квантование, оценка, сопровождение</a></nav>
+    </article>
+  </main>
+  <footer class="gc-container site-footer gc-muted">
+    <p>Открытый курс · <a href="https://github.com/irreligious86/UAV-Education">исходники на GitHub</a> · <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">план развития</a> · <a href="../../curriculum/curriculum.html">для разработчика</a> · CC BY-NC-SA 4.0</p>
+  </footer>
+</body>
+</html>

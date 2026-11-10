@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en" data-theme="dark" data-lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Бортовая электрика с расчётом — UAV Student</title>
+  <meta name="description" content="Схема питания аппарата с расчётом токов и просадок, разводка, измерения мультиметром и осциллографом, бюджет радиолинка">
+  <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
+  <link rel="manifest" href="../../manifest.webmanifest">
+  <meta name="theme-color" content="#0b0f14">
+  <link rel="alternate" hreflang="ru" href="../../cap/cap-electronics.html">
+  <link rel="alternate" hreflang="uk" href="../../uk/cap/cap-electronics.html">
+  <link rel="alternate" hreflang="en" href="../../en/cap/cap-electronics.html">
+  <script>/* go to the visitor's chosen language before anything paints (assets/i18n.js) */(function(){try{var c=localStorage.getItem('uav-lang'),h=document.documentElement.getAttribute('data-lang');if(!c||c===h||/[?&]lang=keep\b/.test(location.search))return;var l=document.querySelector('link[rel=alternate][hreflang="'+c+'"]');if(l)location.replace(l.href+location.search+location.hash)}catch(e){}})();</script>
+  <link rel="stylesheet" href="../../lib/ground-control-ui/dist/ground-control.css">
+  <link rel="stylesheet" href="../../assets/site.css">
+  <script src="../../lib/ground-control-ui/dist/ground-control.js" defer></script>
+  <script src="../../assets/i18n/en.js"></script>
+  <script src="../../assets/i18n.js"></script>
+  <script src="../../assets/progress-store.js" defer></script>
+  <script src="../../assets/backend-config.js" defer></script>
+  <script src="../../assets/account.js" defer></script>
+  <script src="../../assets/grading.js" defer></script>
+  <script src="../../assets/app.js" defer></script>
+  <script src="../../assets/uav-quiz.js" defer></script>
+  <script src="../../assets/uav-tasks.js" defer></script>
+  <script src="../../assets/offline.js" defer></script>
+</head>
+<body class="gc-root" data-base="../" data-root="../../">
+  <header class="site-header">
+    <div class="gc-container site-header__inner">
+      <a class="site-brand" href="../index.html"><span class="site-brand__mark" aria-hidden="true">◆</span> UAV Student</a>
+      <nav class="gc-nav" aria-label="Разделы сайта">
+        <a href="../index.html" aria-current="page">Курс</a>
+        <a href="../ref/index.html">Справочник</a>
+        <a href="../pages/glossary.html">Глоссарий</a>
+        <a href="../pages/fails.html">Фейлы</a>
+        <a href="../pages/search.html">Поиск</a>
+        <a href="../pages/progress.html">Мой прогресс</a>
+      </nav>
+      <nav class="lang-switch" aria-label="Язык"><a class="gc-tag" href="../../cap/cap-electronics.html" data-lang-to="ru" hreflang="ru" lang="ru" title="Русский">RU</a><a class="gc-tag" href="../../uk/cap/cap-electronics.html" data-lang-to="uk" hreflang="uk" lang="uk" title="Українська">UK</a><a class="gc-tag" href="../../en/cap/cap-electronics.html" data-lang-to="en" hreflang="en" lang="en" title="English" aria-current="true" data-state="ok">EN</a></nav>
+    </div>
+  </header>
+  <main class="gc-container site-main">
+    <article class="module" data-module-page="cap-electronics">
+      <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-electronics">Электроника и радио</a><span>Итоговый проект</span></p>
+      <h1 class="module-title">Бортовая электрика с расчётом</h1>
+      <div class="module-tags"><span class="gc-tag">Итоговый проект трека 2</span><span class="gc-tag" data-state="ok" data-done-badge hidden>СДАН</span></div>
+      <p class="module-lead">Результат: Схема питания аппарата с расчётом токов и просадок, разводка, измерения мультиметром и осциллографом, бюджет радиолинка</p>
+      <div class="gc-prose module-body">
+        <h2>Что сдать</h2>
+        <ul><li>Схема питания: шины, BEC, конденсаторы, предохранители, сечения проводов</li><li>Расчёт токов по веткам и просадок под нагрузкой</li><li>Измерения: напряжения под нагрузкой, пульсации на шине</li><li>Бюджет линка управления и видео с антеннами</li><li>Инженерная папка проекта: требования с ID, что и как тестировалось, журнал изменений (см. модуль «Инженерный метод 101»)</li></ul>
+        <h2>Критерии приёмки</h2>
+        <p class="gc-muted">Проект сдан, когда выполнены все пункты. Отмечай по мере готовности:</p>
+        <ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="cap-electronics:cap:0"><span>Каждая ветка питания рассчитана с запасом ≥ 30 %</span></label></li><li><label><input type="checkbox" data-check-id="cap-electronics:cap:1"><span>Пульсации на шине 5 В измерены и ниже допуска периферии</span></label></li><li><label><input type="checkbox" data-check-id="cap-electronics:cap:2"><span>Антенны выбраны по поляризации и диаграмме, бюджет сходится с реальной дальностью</span></label></li><li><label><input type="checkbox" data-check-id="cap-electronics:cap:3"><span>Помехи от VTX/силовых на приёмник и GPS проверены измерением</span></label></li><li><label><input type="checkbox" data-check-id="cap-electronics:cap:4"><span>Каждое требование прослеживается до теста или измерения, результат записан</span></label></li></ul>
+        <h2>Рубрика: как отличить сделанное от сданного</h2><p class="gc-muted">Проверь свою работу по каждой строке. Если она ближе к левой колонке — проект ещё не готов.</p><div class="widget__table-wrap"><table class="rubric"><thead><tr><th>Критерий</th><th>Плохо</th><th>Хорошо</th></tr></thead><tbody><tr><th scope="row">Дерево питания</th><td class="rubric__bad">Список деталей без токов</td><td class="rubric__good">Схема шин с током каждой ветки, выбором BEC и сечений с расчётом</td></tr><tr><th scope="row">Измерения</th><td class="rubric__bad">Измерений нет или только мультиметром</td><td class="rubric__good">Осциллограммы пульсаций 5 В до/после конденсатора с p-p значениями</td></tr><tr><th scope="row">Бюджет линка</th><td class="rubric__bad">«ELRS бьёт на 10 км»</td><td class="rubric__good">Таблица: мощность, чувствительность режима, FSPL, запас в дБ на 1/3/5/10 км; полевой тест сопоставлен</td></tr></tbody></table></div>
+        
+        <h2>Модули трека</h2>
+        <ol><li><a href="../m/el-power-design.html">Схемотехника питания борта</a></li><li><a href="../m/el-measure.html">Измерения: мультиметр, осциллограф, логический анализатор</a></li><li><a href="../m/el-battery-packs.html">Сборки Li-Ion и LiFePO4: элементы, сварка, BMS</a></li><li><a href="../m/el-emi.html">Помехи и электромагнитная совместимость</a></li><li><a href="../m/rf-antennas.html">Антенны, поляризация и диаграммы направленности</a></li><li><a href="../m/rf-link-budget.html">Бюджет радиолинка и дальность</a></li><li><a href="../m/el-peripherals.html">Подключение периферии: UART, I2C, CAN на практике</a></li><li><a href="../m/el-dronecan.html">DroneCAN: шина CAN на борту, узлы, ESC и прошивка периферии</a></li><li><a href="../m/el-wiring.html">Пайка, жгуты и надёжность соединений</a></li><li><a href="../m/el-redundancy.html">Резервирование на борту: X8, гекса, питание и сигналы</a></li><li><a href="../m/el-kicad.html">Проектирование платы в KiCad: от схемы до заказа, разводка для ЭМС</a></li></ol>
+        <div class="gc-callout" data-state="caution"><strong>Безопасность.</strong> Всё, что можно сделать в SITL или без пропов, делается там. Реальный полёт — только после наземных тестов, с проверенным failsafe.</div>
+      </div>
+      <div class="module-done"><gc-button variant="secondary" data-done-toggle="cap-electronics" data-done-label="сданный" data-done-past="Сдан">Отметить как сданный</gc-button></div>
+    </article>
+  </main>
+  <footer class="gc-container site-footer gc-muted">
+    <p>Открытый курс · <a href="https://github.com/irreligious86/UAV-Education">исходники на GitHub</a> · <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">план развития</a> · <a href="../../curriculum/curriculum.html">для разработчика</a> · CC BY-NC-SA 4.0</p>
+  </footer>
+</body>
+</html>

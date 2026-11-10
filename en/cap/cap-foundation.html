@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en" data-theme="dark" data-lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Паспорт своей сборки — UAV Student</title>
+  <meta name="description" content="Документ с T/W, расчётом времени полёта, картой платы и предполётным чек-листом">
+  <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
+  <link rel="manifest" href="../../manifest.webmanifest">
+  <meta name="theme-color" content="#0b0f14">
+  <link rel="alternate" hreflang="ru" href="../../cap/cap-foundation.html">
+  <link rel="alternate" hreflang="uk" href="../../uk/cap/cap-foundation.html">
+  <link rel="alternate" hreflang="en" href="../../en/cap/cap-foundation.html">
+  <script>/* go to the visitor's chosen language before anything paints (assets/i18n.js) */(function(){try{var c=localStorage.getItem('uav-lang'),h=document.documentElement.getAttribute('data-lang');if(!c||c===h||/[?&]lang=keep\b/.test(location.search))return;var l=document.querySelector('link[rel=alternate][hreflang="'+c+'"]');if(l)location.replace(l.href+location.search+location.hash)}catch(e){}})();</script>
+  <link rel="stylesheet" href="../../lib/ground-control-ui/dist/ground-control.css">
+  <link rel="stylesheet" href="../../assets/site.css">
+  <script src="../../lib/ground-control-ui/dist/ground-control.js" defer></script>
+  <script src="../../assets/i18n/en.js"></script>
+  <script src="../../assets/i18n.js"></script>
+  <script src="../../assets/progress-store.js" defer></script>
+  <script src="../../assets/backend-config.js" defer></script>
+  <script src="../../assets/account.js" defer></script>
+  <script src="../../assets/grading.js" defer></script>
+  <script src="../../assets/app.js" defer></script>
+  <script src="../../assets/uav-quiz.js" defer></script>
+  <script src="../../assets/uav-tasks.js" defer></script>
+  <script src="../../assets/offline.js" defer></script>
+</head>
+<body class="gc-root" data-base="../" data-root="../../">
+  <header class="site-header">
+    <div class="gc-container site-header__inner">
+      <a class="site-brand" href="../index.html"><span class="site-brand__mark" aria-hidden="true">◆</span> UAV Student</a>
+      <nav class="gc-nav" aria-label="Разделы сайта">
+        <a href="../index.html" aria-current="page">Курс</a>
+        <a href="../ref/index.html">Справочник</a>
+        <a href="../pages/glossary.html">Глоссарий</a>
+        <a href="../pages/fails.html">Фейлы</a>
+        <a href="../pages/search.html">Поиск</a>
+        <a href="../pages/progress.html">Мой прогресс</a>
+      </nav>
+      <nav class="lang-switch" aria-label="Язык"><a class="gc-tag" href="../../cap/cap-foundation.html" data-lang-to="ru" hreflang="ru" lang="ru" title="Русский">RU</a><a class="gc-tag" href="../../uk/cap/cap-foundation.html" data-lang-to="uk" hreflang="uk" lang="uk" title="Українська">UK</a><a class="gc-tag" href="../../en/cap/cap-foundation.html" data-lang-to="en" hreflang="en" lang="en" title="English" aria-current="true" data-state="ok">EN</a></nav>
+    </div>
+  </header>
+  <main class="gc-container site-main">
+    <article class="module" data-module-page="cap-foundation">
+      <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-foundation">Фундамент</a><span>Итоговый проект</span></p>
+      <h1 class="module-title">Паспорт своей сборки</h1>
+      <div class="module-tags"><span class="gc-tag">Итоговый проект трека 0</span><span class="gc-tag" data-state="ok" data-done-badge hidden>СДАН</span></div>
+      <p class="module-lead">Результат: Документ с T/W, расчётом времени полёта, картой платы и предполётным чек-листом</p>
+      <div class="gc-prose module-body">
+        <h2>Что сдать</h2>
+        <ul><li>Паспорт сборки: вес, моторы, пропы, АКБ, T/W, расчётное время полёта</li><li>Карта платы: UART, пады питания, BEC</li><li>Фото моторов с направлением вращения</li><li>Предполётный чек-лист под свой дрон</li><li>Инженерная папка проекта: требования с ID, что и как тестировалось, журнал изменений (см. модуль «Инженерный метод 101»)</li></ul>
+        <h2>Критерии приёмки</h2>
+        <p class="gc-muted">Проект сдан, когда выполнены все пункты. Отмечай по мере готовности:</p>
+        <ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="cap-foundation:cap:0"><span>Все числа взяты из даташитов или измерений, источник указан</span></label></li><li><label><input type="checkbox" data-check-id="cap-foundation:cap:1"><span>Расчётный ток висения сверен с измерением (ваттметр, датчик тока в логе или тяговый стенд), расхождение объяснено</span></label></li><li><label><input type="checkbox" data-check-id="cap-foundation:cap:2"><span>Направления моторов проверены без пропов и совпадают со схемой</span></label></li><li><label><input type="checkbox" data-check-id="cap-foundation:cap:3"><span>Чек-лист содержит пункты про пропы, АКБ, антенны и зону</span></label></li><li><label><input type="checkbox" data-check-id="cap-foundation:cap:4"><span>Каждое требование прослеживается до теста или измерения, результат записан</span></label></li></ul>
+        <h2>Рубрика: как отличить сделанное от сданного</h2><p class="gc-muted">Проверь свою работу по каждой строке. Если она ближе к левой колонке — проект ещё не готов.</p><div class="widget__table-wrap"><table class="rubric"><thead><tr><th>Критерий</th><th>Плохо</th><th>Хорошо</th></tr></thead><tbody><tr><th scope="row">Числа и источники</th><td class="rubric__bad">T/W «примерно 3» со слов продавца</td><td class="rubric__good">T/W = 2840 г / 1120 г = 2.5; тяга из таблицы производителя мотора для пропа 5×4.3 на 4S, вес взвешен с АКБ</td></tr><tr><th scope="row">Проверка расчёта стендом/ваттметром</th><td class="rubric__bad">Ток висения не измерен</td><td class="rubric__good">Ток висения 18.4 А по ваттметру/логу против расчётных 20 А — расхождение 8%, объяснено</td></tr><tr><th scope="row">Карта платы</th><td class="rubric__bad">Фото платы без подписей</td><td class="rubric__good">Схема с подписанными UART1–UART6, падами 5 В/9 В/VBAT и током каждого BEC</td></tr><tr><th scope="row">Чек-лист</th><td class="rubric__bad">Список из 3 общих пунктов</td><td class="rubric__good">Чек-лист под свой дрон: пропы, АКБ напряжение, антенны, failsafe-тест, зона, таймер</td></tr></tbody></table></div>
+        
+        <h2>Модули трека</h2>
+        <ol><li><a href="../m/f-physics.html">Как летает мультиротор</a></li><li><a href="../m/f-mechanics.html">Механика полёта: силы, моменты, уравнения движения</a></li><li><a href="../m/f-electricity-101.html">Электричество и измерения 101</a></li><li><a href="../m/f-power.html">Питание: LiPo, Li-Ion, BEC</a></li><li><a href="../m/f-motors-esc.html">Моторы, ESC и DShot</a></li><li><a href="../m/f-aero-props.html">Аэродинамика пропеллера и подбор силовой установки</a></li><li><a href="../m/f-fc-sensors.html">Полётный контроллер и сенсоры</a></li><li><a href="../m/f-frame-mech.html">Рама, механика и вибрации</a></li><li><a href="../m/bf-pid-reg-in-bf.html">PID-регулятор в Betaflight</a></li><li><a href="../m/f-safety.html">Безопасность и предполётный чек</a></li><li><a href="../m/f-regulations.html">Правила, зоны и ответственность оператора</a></li><li><a href="../m/f-components-choice.html">Выбор компонентов под задачу и бюджет</a></li><li><a href="../m/eng-method-101.html">Инженерный метод 101: требования, архитектура, тесты, документация</a></li><li><a href="../m/tools-overview.html">Инструменты: Configurator, GCS, git</a></li></ol>
+        <div class="gc-callout" data-state="caution"><strong>Безопасность.</strong> Всё, что можно сделать в SITL или без пропов, делается там. Реальный полёт — только после наземных тестов, с проверенным failsafe.</div>
+      </div>
+      <div class="module-done"><gc-button variant="secondary" data-done-toggle="cap-foundation" data-done-label="сданный" data-done-past="Сдан">Отметить как сданный</gc-button></div>
+    </article>
+  </main>
+  <footer class="gc-container site-footer gc-muted">
+    <p>Открытый курс · <a href="https://github.com/irreligious86/UAV-Education">исходники на GitHub</a> · <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">план развития</a> · <a href="../../curriculum/curriculum.html">для разработчика</a> · CC BY-NC-SA 4.0</p>
+  </footer>
+</body>
+</html>

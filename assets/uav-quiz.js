@@ -17,6 +17,7 @@
  *   ]
  * }
  */
+var T = (typeof window !== "undefined" && window.T) || function (s) { return s; };   // assets/i18n.js
 (function () {
   "use strict";
 
@@ -48,14 +49,14 @@
       this.classList.add("uav-quiz");
       this._module = this.getAttribute("module");
       this.innerHTML = "";
-      this.appendChild(h("p", { class: "gc-muted", text: "Загружаю вопросы…" }));
+      this.appendChild(h("p", { class: "gc-muted", text: T("Загружаю вопросы…") }));
       var self = this;
       fetch(this.getAttribute("src"))
         .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
         .then(function (bank) { self._bank = bank; self.renderIntro(); })
         .catch(function () {
           self.innerHTML = "";
-          self.appendChild(h("p", { class: "gc-muted", text: "Квиз для этого модуля пока недоступен." }));
+          self.appendChild(h("p", { class: "gc-muted", text: T("Квиз для этого модуля пока недоступен.") }));
         });
     }
 
@@ -65,11 +66,11 @@
       var self = this, bank = this._bank;
       this.innerHTML = "";
       var head = h("div", { class: "uav-quiz__head" }, [
-        h("p", { class: "gc-label gc-muted", text: "Проверь себя" }),
-        h("p", { text: bank.questions.length + " вопросов · проходной балл " + (bank.pass || 80) + "%" })
+        h("p", { class: "gc-label gc-muted", text: T("Проверь себя") }),
+        h("p", { text: bank.questions.length + T(" вопросов · проходной балл ") + (bank.pass || 80) + "%" })
       ]);
       this.appendChild(head);
-      var start = h("gc-button", { text: "Начать квиз", onclick: function () { self.start(); } });
+      var start = h("gc-button", { text: T("Начать квиз"), onclick: function () { self.start(); } });
       this.appendChild(start);
       var s = this.store();
       if (s && s.getQuiz) {
@@ -78,7 +79,7 @@
           var pct = Math.round(100 * res.correct / res.total);
           var ok = pct >= (bank.pass || 80);
           head.appendChild(h("p", { class: "gc-tag", "data-state": ok ? "ok" : "caution",
-            text: (ok ? "СДАН " : "НЕ СДАН ") + pct + "%" }));
+            text: (ok ? T("СДАН ") : T("НЕ СДАН ")) + pct + "%" }));
         });
       }
     }
@@ -94,8 +95,8 @@
       var self = this, q = this._bank.questions[this._order[this._pos]];
       this.innerHTML = "";
       this.appendChild(h("p", { class: "gc-label gc-muted",
-        text: "Вопрос " + (this._pos + 1) + " из " + this._order.length }));
-      if (q.kind === "apply") this.appendChild(h("p", { class: "gc-tag uav-quiz__kind", text: "НАЙДИ ОШИБКУ" }));
+        text: T("Вопрос ") + (this._pos + 1) + T(" из ") + this._order.length }));
+      if (q.kind === "apply") this.appendChild(h("p", { class: "gc-tag uav-quiz__kind", text: T("НАЙДИ ОШИБКУ") }));
       this.appendChild(h("p", { class: "uav-quiz__q", text: q.q }));
       // optional log/config/frame fragment: textContent only, so a fragment can never inject markup
       if (q.fragment) this.appendChild(h("pre", { class: "uav-quiz__fragment", text: q.fragment }));
@@ -115,12 +116,12 @@
             else if (j === pos) b.setAttribute("data-state", "critical");
           });
           var box = h("div", { class: "gc-callout", "data-state": right ? "ok" : "caution" }, [
-            h("strong", { text: right ? "Верно. " : "Неверно. " }),
+            h("strong", { text: right ? T("Верно. ") : T("Неверно. ") }),
             h("span", { text: q.explain || "" })
           ]);
           self.appendChild(box);
           var next = h("gc-button", { variant: "secondary",
-            text: self._pos + 1 < self._order.length ? "Дальше" : "Результат",
+            text: self._pos + 1 < self._order.length ? T("Дальше") : T("Результат"),
             onclick: function () { self._pos++; self._pos < self._order.length ? self.renderQuestion() : self.renderResult(); } });
           self.appendChild(h("div", { class: "uav-quiz__nav" }, [next]));
         } });
@@ -133,14 +134,14 @@
       var self = this, total = this._order.length, pct = Math.round(100 * this._correct / total);
       var ok = pct >= (this._bank.pass || 80);
       this.innerHTML = "";
-      this.appendChild(h("p", { class: "gc-label gc-muted", text: "Результат" }));
-      this.appendChild(h("p", { class: "uav-quiz__score", text: this._correct + " из " + total + " · " + pct + "%" }));
+      this.appendChild(h("p", { class: "gc-label gc-muted", text: T("Результат") }));
+      this.appendChild(h("p", { class: "uav-quiz__score", text: this._correct + T(" из ") + total + " · " + pct + "%" }));
       this.appendChild(h("div", { class: "gc-callout", "data-state": ok ? "ok" : "caution" }, [
-        h("strong", { text: ok ? "Квиз сдан. " : "Пока не сдан. " }),
-        h("span", { text: ok ? "Засчитан лучший результат. Модуль станет «освоен», когда выполнена и лабораторная." : "Перечитай теорию и диагностику, затем попробуй ещё раз. Засчитывается лучшая попытка." })
+        h("strong", { text: ok ? T("Квиз сдан. ") : T("Пока не сдан. ") }),
+        h("span", { text: ok ? T("Засчитан лучший результат. Модуль станет «освоен», когда выполнена и лабораторная.") : T("Перечитай теорию и диагностику, затем попробуй ещё раз. Засчитывается лучшая попытка.") })
       ]));
       this.appendChild(h("div", { class: "uav-quiz__nav" }, [
-        h("gc-button", { variant: "secondary", text: "Пройти ещё раз", onclick: function () { self.start(); } })
+        h("gc-button", { variant: "secondary", text: T("Пройти ещё раз"), onclick: function () { self.start(); } })
       ]));
       var s = this.store();
       if (s && s.setQuiz) s.setQuiz(this._module, { correct: this._correct, total: total, ts: Date.now() })

@@ -6,6 +6,7 @@
  * The filter's Q and R are sliders separate from the true noise, so the student sees what a wrong
  * Q/R costs: too small Q — the estimate lags the drift; too large — it follows the noise.
  */
+var T = (typeof window !== "undefined" && window.T) || function (s) { return s; };   // assets/i18n.js
 (function () {
   "use strict";
 
@@ -20,27 +21,27 @@
       if (this._init) return; this._init = true;
       var self = this;
       this.classList.add("widget");
-      this.innerHTML = '<p class="gc-label gc-muted">Интерактив · фильтр Калмана 1D</p>' +
-        '<p class="widget__hint gc-muted">Высота медленно дрейфует (зелёная), барометр шумит (жёлтая). Верхние два ползунка — настоящий мир, нижние два — что фильтр о нём думает (Q и R). Подбери Q и R так, чтобы оценка (голубая) шла за дрейфом, но не за шумом, и сравни ошибку с ошибкой сырого датчика.</p>';
+      this.innerHTML = T('<p class="gc-label gc-muted">Интерактив · фильтр Калмана 1D</p>') +
+        T('<p class="widget__hint gc-muted">Высота медленно дрейфует (зелёная), барометр шумит (жёлтая). Верхние два ползунка — настоящий мир, нижние два — что фильтр о нём думает (Q и R). Подбери Q и R так, чтобы оценка (голубая) шла за дрейфом, но не за шумом, и сравни ошибку с ошибкой сырого датчика.</p>');
       var p = this.p = { sz: 1.0, sw: 0.05, R: 1.0, Q: 0.0025, seed: 7, n: 120 };
       var c = document.createElement("div"); c.className = "widget__controls";
       function add(o) { c.appendChild(UAVPlot.slider(o).el); }
       var f2 = function (v) { return (+v).toFixed(2); }, f4 = function (v) { return (+v).toFixed(4); };
-      add({ label: "Шум датчика σz", min: 0.1, max: 3, step: 0.05, value: p.sz, unit: "м", fmt: f2, onChange: function (v) { p.sz = v; self.update(); } });
-      add({ label: "Дрейф σw за шаг", min: 0, max: 0.5, step: 0.01, value: p.sw, unit: "м", fmt: f2, onChange: function (v) { p.sw = v; self.update(); } });
-      add({ label: "Фильтр: R", min: 0.01, max: 10, step: 0.01, value: p.R, unit: "м²", fmt: f2, onChange: function (v) { p.R = v; self.update(); } });
-      add({ label: "Фильтр: Q", min: 0, max: 0.5, step: 0.0005, value: p.Q, unit: "м²", fmt: f4, onChange: function (v) { p.Q = v; self.update(); } });
+      add({ label: T("Шум датчика σz"), min: 0.1, max: 3, step: 0.05, value: p.sz, unit: T("м"), fmt: f2, onChange: function (v) { p.sz = v; self.update(); } });
+      add({ label: T("Дрейф σw за шаг"), min: 0, max: 0.5, step: 0.01, value: p.sw, unit: T("м"), fmt: f2, onChange: function (v) { p.sw = v; self.update(); } });
+      add({ label: T("Фильтр: R"), min: 0.01, max: 10, step: 0.01, value: p.R, unit: T("м²"), fmt: f2, onChange: function (v) { p.R = v; self.update(); } });
+      add({ label: T("Фильтр: Q"), min: 0, max: 0.5, step: 0.0005, value: p.Q, unit: T("м²"), fmt: f4, onChange: function (v) { p.Q = v; self.update(); } });
       this.appendChild(c);
       var b = document.createElement("div"); b.className = "widget__presets";
-      [["Q и R по правде", function () { p.R = p.sz * p.sz; p.Q = p.sw * p.sw; }], ["Q = 0 (модель «не меняется»)", function () { p.Q = 0; }],
-       ["Q слишком большой", function () { p.Q = 0.5; }], ["Новый шум", function () { p.seed++; }]].forEach(function (x) {
+      [[T("Q и R по правде"), function () { p.R = p.sz * p.sz; p.Q = p.sw * p.sw; }], [T("Q = 0 (модель «не меняется»)"), function () { p.Q = 0; }],
+       [T("Q слишком большой"), function () { p.Q = 0.5; }], [T("Новый шум"), function () { p.seed++; }]].forEach(function (x) {
         var bt = document.createElement("button"); bt.type = "button"; bt.className = "gc-tag"; bt.textContent = x[0];
         bt.addEventListener("click", function () { x[1](); self.sync(); self.update(); }); b.appendChild(bt);
       });
       this.appendChild(b);
       var m = document.createElement("div"); m.className = "widget__metrics"; this.appendChild(m); this.metricsEl = m;
       var cv = document.createElement("canvas"); cv.className = "widget__canvas"; this.appendChild(cv);
-      this.plot = UAVPlot.create(cv, { xLabel: "шаг", yLabel: "м", height: 240 });
+      this.plot = UAVPlot.create(cv, { xLabel: T("шаг"), yLabel: T("м"), height: 240 });
       this.controls = c;
       this.update();
       window.addEventListener("resize", function () { self.update(); });
@@ -64,14 +65,14 @@
       var nn = p.n - 20, rmsE = Math.sqrt(se / nn), rmsM = Math.sqrt(sm / nn);
       var gain = rmsM / Math.max(rmsE, 1e-9);
       this.metricsEl.innerHTML =
-        '<span class="gc-tag" data-state="' + (gain > 2 ? "ok" : gain > 1.2 ? "caution" : "critical") + '">ошибка оценки ' + rmsE.toFixed(2) + ' м</span>' +
-        '<span class="gc-tag">ошибка датчика ' + rmsM.toFixed(2) + ' м</span>' +
-        '<span class="gc-tag" data-state="info">K в конце ' + K.toFixed(3) + '</span>' +
-        '<span class="gc-tag">√P ' + Math.sqrt(P).toFixed(2) + ' м</span>';
+        '<span class="gc-tag" data-state="' + (gain > 2 ? "ok" : gain > 1.2 ? "caution" : "critical") + T('">ошибка оценки ') + rmsE.toFixed(2) + T(' м</span>') +
+        T('<span class="gc-tag">ошибка датчика ') + rmsM.toFixed(2) + T(' м</span>') +
+        T('<span class="gc-tag" data-state="info">K в конце ') + K.toFixed(3) + '</span>' +
+        '<span class="gc-tag">√P ' + Math.sqrt(P).toFixed(2) + T(' м</span>');
       this.plot.draw({ x: xs, series: [
-        { y: meas, color: "amber", width: 1, label: "датчик" },
-        { y: truth, color: "green", label: "правда" },
-        { y: estv, color: "cyan", label: "оценка" },
+        { y: meas, color: "amber", width: 1, label: T("датчик") },
+        { y: truth, color: "green", label: T("правда") },
+        { y: estv, color: "cyan", label: T("оценка") },
         { y: hi, color: "muted", width: 1, dash: [3, 3] }, { y: lo, color: "muted", width: 1, dash: [3, 3] }] });
     }
   }

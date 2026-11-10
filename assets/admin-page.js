@@ -3,10 +3,11 @@
  * The database decides what this page may read or change (RLS, set_role); the page only shows it.
  * Scores are computed with the same UAVGrading.moduleGrade the student sees.
  */
+var T = (typeof window !== "undefined" && window.T) || function (s) { return s; };   // assets/i18n.js
 (function () {
   "use strict";
 
-  var ROLE = { student: "студент", admin: "админ", superadmin: "суперадмин" };
+  var ROLE = { student: T("студент"), admin: T("админ"), superadmin: T("суперадмин") };
   var base = "../";
   var model = { rows: [], meta: null, titles: {}, me: null, cohorts: [], members: [] };
 
@@ -29,7 +30,7 @@
   function roleCell(r) {
     var me = model.me;
     if (me.isSuperadmin && r.role !== "superadmin" && r.id !== me.profile.id) {
-      return '<select data-role-of="' + esc(r.id) + '" aria-label="Роль ' + esc(r.username) + '">' +
+      return '<select data-role-of="' + esc(r.id) + T('" aria-label="Роль ') + esc(r.username) + '">' +
         ["student", "admin"].map(function (k) { return '<option value="' + k + '"' + (r.role === k ? " selected" : "") + ">" + ROLE[k] + "</option>"; }).join("") + "</select>";
     }
     return '<span class="gc-tag" data-state="' + (r.role === "superadmin" ? "critical" : r.role === "admin" ? "caution" : "ok") + '">' + ROLE[r.role] + "</span>";
@@ -45,25 +46,25 @@
   function groupCell(r) {
     var mine = groupsOf(r.id);
     var chips = mine.map(function (cid) {
-      return '<button type="button" class="gc-tag" data-unjoin="' + esc(cid) + '" data-user="' + esc(r.id) + '" title="убрать из группы">' + esc(cohortName(cid)) + " ×</button>";
+      return '<button type="button" class="gc-tag" data-unjoin="' + esc(cid) + '" data-user="' + esc(r.id) + T('" title="убрать из группы">') + esc(cohortName(cid)) + " ×</button>";
     }).join(" ");
     var free = model.cohorts.filter(function (c) { return mine.indexOf(c.id) < 0; });
-    var add = free.length ? ' <select data-join-of="' + esc(r.id) + '" aria-label="Добавить ' + esc(r.username) + ' в группу"><option value="">+ группа</option>' +
+    var add = free.length ? ' <select data-join-of="' + esc(r.id) + T('" aria-label="Добавить ') + esc(r.username) + T(' в группу"><option value="">+ группа</option>') +
       free.map(function (c) { return '<option value="' + esc(c.id) + '">' + esc(c.name) + "</option>"; }).join("") + "</select>" : "";
     return (chips || (model.cohorts.length ? "" : '<span class="gc-muted">—</span>')) + add;
   }
 
   function renderCohorts() {
     var sel = $("[data-adm-cohort]"), cur = sel.value;
-    sel.innerHTML = '<option value="">все группы</option><option value="-">без группы</option>' + model.cohorts.map(function (c) {
+    sel.innerHTML = T('<option value="">все группы</option><option value="-">без группы</option>') + model.cohorts.map(function (c) {
       return '<option value="' + esc(c.id) + '">' + esc(c.name) + "</option>";
     }).join("");
     sel.value = model.cohorts.some(function (c) { return c.id === cur; }) || cur === "-" ? cur : "";
     $("[data-adm-cohorts]").innerHTML = model.cohorts.length ? model.cohorts.map(function (c) {
       var n = model.members.filter(function (m) { return m.cohort_id === c.id; }).length;
-      return "<li><strong>" + esc(c.name) + "</strong> · студентов: " + n +
-        ' <button type="button" class="gc-tag" data-cohort-del="' + esc(c.id) + '" data-name="' + esc(c.name) + '">удалить группу</button></li>';
-    }).join("") : '<li class="gc-muted">Групп пока нет</li>';
+      return "<li><strong>" + esc(c.name) + T("</strong> · студентов: ") + n +
+        ' <button type="button" class="gc-tag" data-cohort-del="' + esc(c.id) + '" data-name="' + esc(c.name) + T('">удалить группу</button></li>');
+    }).join("") : T('<li class="gc-muted">Групп пока нет</li>');
   }
 
   function visibleRows() {
@@ -81,14 +82,14 @@
     var rows = visibleRows();
     $("[data-adm-rows]").innerHTML = rows.map(function (r) {
       return "<tr>" +
-        '<td data-label="Имя"><button type="button" class="gc-tag" data-detail="' + esc(r.id) + '">' + esc(r.username) + "</button></td>" +
-        '<td data-label="Почта">' + esc(r.email) + "</td>" +
-        '<td data-label="Роль">' + roleCell(r) + "</td>" +
-        '<td data-label="Группы">' + groupCell(r) + "</td>" +
-        '<td data-label="Освоено">' + r.g.mastered + " / " + r.g.total + "</td>" +
-        '<td data-label="Балл">' + r.g.score + "</td>" +
-        '<td data-label="Активность">' + when(r.updated_at) + "</td></tr>";
-    }).join("") || '<tr><td colspan="7" class="gc-muted">Никого не нашлось</td></tr>';
+        T('<td data-label="Имя"><button type="button" class="gc-tag" data-detail="') + esc(r.id) + '">' + esc(r.username) + "</button></td>" +
+        T('<td data-label="Почта">') + esc(r.email) + "</td>" +
+        T('<td data-label="Роль">') + roleCell(r) + "</td>" +
+        T('<td data-label="Группы">') + groupCell(r) + "</td>" +
+        T('<td data-label="Освоено">') + r.g.mastered + " / " + r.g.total + "</td>" +
+        T('<td data-label="Балл">') + r.g.score + "</td>" +
+        T('<td data-label="Активность">') + when(r.updated_at) + "</td></tr>";
+    }).join("") || T('<tr><td colspan="7" class="gc-muted">Никого не нашлось</td></tr>');
   }
 
   function renderDetail(id) {
@@ -99,18 +100,18 @@
       .sort(function (a, b) { return b.score - a.score; });
     var labs = (r.data && r.data.labs) || [];
     box.hidden = false;
-    box.innerHTML = '<p class="gc-label gc-muted">' + esc(r.username) + " — модули в работе и освоенные</p>" +
-      (list.length ? '<div class="md-table-wrap"><table class="md-table"><thead><tr><th>Модуль</th><th>Статус</th><th>Квиз</th><th>Задачи</th><th>Лаб.</th><th>Балл</th></tr></thead><tbody>' +
+    box.innerHTML = '<p class="gc-label gc-muted">' + esc(r.username) + T(" — модули в работе и освоенные</p>") +
+      (list.length ? T('<div class="md-table-wrap"><table class="md-table"><thead><tr><th>Модуль</th><th>Статус</th><th>Квиз</th><th>Задачи</th><th>Лаб.</th><th>Балл</th></tr></thead><tbody>') +
         list.map(function (g) {
-          return '<tr><td data-label="Модуль"><a href="' + base + "m/" + esc(g.id) + '.html">' + esc(model.titles[g.id] || g.id) + "</a></td>" +
-            '<td data-label="Статус"><span class="gc-tag" data-state="' + window.UAVGrading.statusState(g) + '">' + (window.UAVGrading.statusLabel(g) || "—") + "</span></td>" +
-            '<td data-label="Квиз">' + (g.hasQuiz ? (g.quizPct === null ? "—" : g.quizPct + " %") : "нет") + "</td>" +
-            '<td data-label="Задачи">' + (g.tasksTotal ? g.tasksDone + " / " + g.tasksTotal : "нет") + "</td>" +
-            '<td data-label="Лаб.">' + (g.labTotal ? g.labDone + " / " + g.labTotal : "нет") + "</td>" +
-            '<td data-label="Балл">' + g.score + "</td></tr>";
-        }).join("") + "</tbody></table></div>" : '<p class="gc-muted">Пока ничего не начато.</p>') +
-      (labs.length ? '<p class="gc-label gc-muted">Результаты грейдеров</p><ul class="progress-labs">' + labs.map(function (l) {
-        return "<li>" + esc(l.grader || "грейдер") + " · " + esc((Array.isArray(l.labs) ? l.labs : []).join(", ")) + " · " + esc(l.ts || "") + "</li>";
+          return T('<tr><td data-label="Модуль"><a href="') + base + "m/" + esc(g.id) + '.html">' + esc(model.titles[g.id] || g.id) + "</a></td>" +
+            T('<td data-label="Статус"><span class="gc-tag" data-state="') + window.UAVGrading.statusState(g) + '">' + (window.UAVGrading.statusLabel(g) || "—") + "</span></td>" +
+            T('<td data-label="Квиз">') + (g.hasQuiz ? (g.quizPct === null ? "—" : g.quizPct + " %") : T("нет")) + "</td>" +
+            T('<td data-label="Задачи">') + (g.tasksTotal ? g.tasksDone + " / " + g.tasksTotal : T("нет")) + "</td>" +
+            T('<td data-label="Лаб.">') + (g.labTotal ? g.labDone + " / " + g.labTotal : T("нет")) + "</td>" +
+            T('<td data-label="Балл">') + g.score + "</td></tr>";
+        }).join("") + "</tbody></table></div>" : T('<p class="gc-muted">Пока ничего не начато.</p>')) +
+      (labs.length ? T('<p class="gc-label gc-muted">Результаты грейдеров</p><ul class="progress-labs">') + labs.map(function (l) {
+        return "<li>" + esc(l.grader || T("грейдер")) + " · " + esc((Array.isArray(l.labs) ? l.labs : []).join(", ")) + " · " + esc(l.ts || "") + "</li>";
       }).join("") + "</ul>" : "");
     box.scrollIntoView({ behavior: "smooth", block: "nearest" });
   }
@@ -150,9 +151,9 @@
   function renderAudit(items) {
     var names = {}; model.rows.forEach(function (r) { names[r.id] = r.username; });
     $("[data-adm-audit]").innerHTML = items.length ? items.map(function (a) {
-      return "<li>" + when(a.at) + " · " + esc(names[a.actor] || (a.actor ? "?" : "система")) + ": " + esc(names[a.target] || "?") + " " +
+      return "<li>" + when(a.at) + " · " + esc(names[a.actor] || (a.actor ? "?" : T("система"))) + ": " + esc(names[a.target] || "?") + " " +
         esc(ROLE[a.old_role] || "—") + " → " + esc(ROLE[a.new_role]) + "</li>";
-    }).join("") : '<li class="gc-muted">Пусто</li>';
+    }).join("") : T('<li class="gc-muted">Пусто</li>');
   }
 
   // ------------------------------------------------------------------ exams
@@ -162,17 +163,17 @@
       model.exams = r[0]; model.examResults = r[1];
       $("[data-adm-exams]").innerHTML = r[0].length ? r[0].map(function (e) {
         var n = r[1].filter(function (x) { return x.exam_id === e.id; }).length;
-        return "<li><strong>" + esc(e.title) + "</strong> · " + e.questions_per_attempt + " вопр., " + e.time_limit_min + " мин, порог " + e.pass_pct +
-          " %, попыток " + e.attempts_allowed + " · попыток сдано: " + n + " " +
+        return "<li><strong>" + esc(e.title) + "</strong> · " + e.questions_per_attempt + T(" вопр., ") + e.time_limit_min + T(" мин, порог ") + e.pass_pct +
+          T(" %, попыток ") + e.attempts_allowed + T(" · попыток сдано: ") + n + " " +
           '<button type="button" class="gc-tag" data-state="' + (e.published ? "ok" : "") + '" data-exam-pub="' + esc(e.id) + '" data-on="' + (e.published ? 0 : 1) + '">' +
-          (e.published ? "опубликован — снять" : "черновик — опубликовать") + "</button>" +
-          (n ? "" : ' <button type="button" class="gc-tag" data-exam-del="' + esc(e.id) + '">удалить</button>') + "</li>";
-      }).join("") : '<li class="gc-muted">Экзаменов нет</li>';
+          (e.published ? T("опубликован — снять") : T("черновик — опубликовать")) + "</button>" +
+          (n ? "" : ' <button type="button" class="gc-tag" data-exam-del="' + esc(e.id) + T('">удалить</button>')) + "</li>";
+      }).join("") : T('<li class="gc-muted">Экзаменов нет</li>');
       $("[data-adm-exam-results]").innerHTML = r[1].length ? r[1].map(function (x) {
-        return '<tr><td data-label="Экзамен">' + esc(x.title || "—") + '</td><td data-label="Студент">' + esc(x.username) +
-          '</td><td data-label="Результат">' + (x.submitted_at ? x.correct + " / " + x.total + " · " + x.score_pct + " %" : "не сдан") +
-          '</td><td data-label="Сдан">' + (x.passed ? "да" : "нет") + '</td><td data-label="Когда">' + when(x.submitted_at || x.started_at) + "</td></tr>";
-      }).join("") : '<tr><td colspan="5" class="gc-muted">Попыток пока нет</td></tr>';
+        return T('<tr><td data-label="Экзамен">') + esc(x.title || "—") + T('</td><td data-label="Студент">') + esc(x.username) +
+          T('</td><td data-label="Результат">') + (x.submitted_at ? x.correct + " / " + x.total + " · " + x.score_pct + " %" : T("не сдан")) +
+          T('</td><td data-label="Сдан">') + (x.passed ? T("да") : T("нет")) + T('</td><td data-label="Когда">') + when(x.submitted_at || x.started_at) + "</td></tr>";
+      }).join("") : T('<tr><td colspan="5" class="gc-muted">Попыток пока нет</td></tr>');
     });
   }
 
@@ -186,7 +187,7 @@
   function load(note) {
     var A = window.UAVAccount;
     if (typeof note !== "string") note = "";
-    if (!note) msg("Загружаю…");
+    if (!note) msg(T("Загружаю…"));
     return Promise.all([A.listStudents(), A.audit(), A.listCohorts()]).then(function (res) {
       model.rows = res[0].map(function (r) { try { r.g = gradeStudent(r.data); } catch (e) { r.g = gradeStudent({}); } return r; });
       model.cohorts = res[2].cohorts; model.members = res[2].members;
@@ -213,12 +214,12 @@
       $("[data-adm-cohort-form]").addEventListener("submit", function (e) {
         e.preventDefault();
         var inp = $("[data-adm-cohort-name]");
-        A.createCohort(inp.value).then(function () { inp.value = ""; return load("Группа создана."); }).catch(fail);
+        A.createCohort(inp.value).then(function () { inp.value = ""; return load(T("Группа создана.")); }).catch(fail);
       });
       $("[data-adm-cohorts]").addEventListener("click", function (e) {
         var d = e.target.closest("[data-cohort-del]"); if (!d) return;
-        if (!window.confirm("Удалить группу «" + d.getAttribute("data-name") + "»? Студенты и их оценки останутся.")) return;
-        A.deleteCohort(d.getAttribute("data-cohort-del")).then(function () { return load("Группа удалена."); }).catch(fail);
+        if (!window.confirm(T("Удалить группу «") + d.getAttribute("data-name") + T("»? Студенты и их оценки останутся."))) return;
+        A.deleteCohort(d.getAttribute("data-cohort-del")).then(function () { return load(T("Группа удалена.")); }).catch(fail);
       });
       $("[data-adm-reload]").addEventListener("click", load);
       $("[data-adm-csv]").addEventListener("click", csv);
@@ -229,8 +230,8 @@
           var bank = JSON.parse(t);
           if (!bank.title) bank.title = f.name.replace(/\.json$/i, "");
           return A.createExam(bank);
-        }).then(function () { msg("Экзамен загружен черновиком — проверь и опубликуй.", "ok"); return loadExams(); })
-          .catch(function (err) { msg(err instanceof SyntaxError ? "Это не JSON." : A.humanError(err), "critical"); })
+        }).then(function () { msg(T("Экзамен загружен черновиком — проверь и опубликуй."), "ok"); return loadExams(); })
+          .catch(function (err) { msg(err instanceof SyntaxError ? T("Это не JSON.") : A.humanError(err), "critical"); })
           .then(function () { e.target.value = ""; });
       });
       $("[data-adm-exams]").addEventListener("click", function (e) {
@@ -241,20 +242,20 @@
       $("[data-adm-rows]").addEventListener("click", function (e) {
         var b = e.target.closest("[data-detail]"); if (b) renderDetail(b.getAttribute("data-detail"));
         var u = e.target.closest("[data-unjoin]");
-        if (u) A.removeFromCohort(u.getAttribute("data-unjoin"), u.getAttribute("data-user")).then(function () { return load("Убран из группы."); }).catch(fail);
+        if (u) A.removeFromCohort(u.getAttribute("data-unjoin"), u.getAttribute("data-user")).then(function () { return load(T("Убран из группы.")); }).catch(fail);
       });
       $("[data-adm-rows]").addEventListener("change", function (e) {
         var j = e.target.closest("[data-join-of]");
         if (j) {
           if (!j.value) return;
           j.disabled = true;
-          A.addToCohort(j.value, j.getAttribute("data-join-of")).then(function () { return load("Добавлен в группу."); })
+          A.addToCohort(j.value, j.getAttribute("data-join-of")).then(function () { return load(T("Добавлен в группу.")); })
             .catch(function (err) { var t = A.humanError(err); return load().then(function () { msg(t, "critical"); }); });
           return;
         }
         var sel = e.target.closest("[data-role-of]"); if (!sel) return;
         sel.disabled = true;
-        A.setRole(sel.getAttribute("data-role-of"), sel.value).then(function () { return load("Роль изменена."); })
+        A.setRole(sel.getAttribute("data-role-of"), sel.value).then(function () { return load(T("Роль изменена.")); })
           .catch(function (err) { var t = A.humanError(err); return load().then(function () { msg(t, "critical"); }); });
       });
       return Promise.all([load(), loadExams()]);

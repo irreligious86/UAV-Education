@@ -24,7 +24,7 @@
 
   function rowsFor(table, db, u) {
     if (table === "profiles") return db.users.filter(function (x) { return staff(u) || (u && x.id === u.id); })
-      .map(function (x) { return { id: x.id, username: x.username, email: x.email, role: x.role, created_at: x.created_at }; });
+      .map(function (x) { return { id: x.id, username: x.username, email: x.email, role: x.role, created_at: x.created_at, lang: x.lang || null }; });
     if (table === "progress") return Object.keys(db.progress).filter(function (k) { return staff(u) || (u && k === u.id); })
       .map(function (k) { return { user_id: k, data: db.progress[k].data, updated_at: db.progress[k].updated_at }; });
     if (table === "student_progress") return rowsFor("profiles", db, u).map(function (p) {
@@ -125,6 +125,10 @@
       if (mode === "update") {
         var id = (filters.filter(function (f) { return f[0] === "id"; })[0] || [])[1];
         if (!u || id !== u.id) return ok(null);
+        if ("lang" in payload) {
+          if (!/^[a-z]{2}(-[A-Z]{2})?$/.test(payload.lang)) return fail('new row violates check constraint "profiles_lang_check"');
+          u.lang = payload.lang; save(db); return ok(null);
+        }
         if (db.users.some(function (x) { return x.username === payload.username && x.id !== u.id; })) return fail("duplicate key value violates unique constraint");
         u.username = payload.username; save(db); return ok(null);
       }

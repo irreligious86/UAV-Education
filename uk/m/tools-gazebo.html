@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="uk" data-theme="dark" data-lang="uk">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Симуляция в Gazebo: миры, датчики, камера в ROS 2 и сценарные тесты — UAV Student</title>
+  <meta name="description" content="запустить ArduPilot и PX4 SITL с Gazebo описать мир с препятствиями и камерой и передать изображение в ROS 2 написать сценарные тесты, идущие без графики">
+  <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
+  <link rel="manifest" href="../../manifest.webmanifest">
+  <meta name="theme-color" content="#0b0f14">
+  <link rel="alternate" hreflang="ru" href="../../m/tools-gazebo.html">
+  <link rel="alternate" hreflang="uk" href="../../uk/m/tools-gazebo.html">
+  <link rel="alternate" hreflang="en" href="../../en/m/tools-gazebo.html">
+  <script>/* go to the visitor's chosen language before anything paints (assets/i18n.js) */(function(){try{var c=localStorage.getItem('uav-lang'),h=document.documentElement.getAttribute('data-lang');if(!c||c===h||/[?&]lang=keep\b/.test(location.search))return;var l=document.querySelector('link[rel=alternate][hreflang="'+c+'"]');if(l)location.replace(l.href+location.search+location.hash)}catch(e){}})();</script>
+  <link rel="stylesheet" href="../../lib/ground-control-ui/dist/ground-control.css">
+  <link rel="stylesheet" href="../../assets/site.css">
+  <script src="../../lib/ground-control-ui/dist/ground-control.js" defer></script>
+  <script src="../../assets/i18n/uk.js"></script>
+  <script src="../../assets/i18n.js"></script>
+  <script src="../../assets/progress-store.js" defer></script>
+  <script src="../../assets/backend-config.js" defer></script>
+  <script src="../../assets/account.js" defer></script>
+  <script src="../../assets/grading.js" defer></script>
+  <script src="../../assets/app.js" defer></script>
+  <script src="../../assets/uav-quiz.js" defer></script>
+  <script src="../../assets/uav-tasks.js" defer></script>
+  <script src="../../assets/offline.js" defer></script>
+</head>
+<body class="gc-root" data-base="../" data-root="../../">
+  <header class="site-header">
+    <div class="gc-container site-header__inner">
+      <a class="site-brand" href="../index.html"><span class="site-brand__mark" aria-hidden="true">◆</span> UAV Student</a>
+      <nav class="gc-nav" aria-label="Разделы сайта">
+        <a href="../index.html" aria-current="page">Курс</a>
+        <a href="../ref/index.html">Справочник</a>
+        <a href="../pages/glossary.html">Глоссарий</a>
+        <a href="../pages/fails.html">Фейлы</a>
+        <a href="../pages/search.html">Поиск</a>
+        <a href="../pages/progress.html">Мой прогресс</a>
+      </nav>
+      <nav class="lang-switch" aria-label="Язык"><a class="gc-tag" href="../../m/tools-gazebo.html" data-lang-to="ru" hreflang="ru" lang="ru" title="Русский">RU</a><a class="gc-tag" href="../../uk/m/tools-gazebo.html" data-lang-to="uk" hreflang="uk" lang="uk" title="Українська" aria-current="true" data-state="ok">UK</a><a class="gc-tag" href="../../en/m/tools-gazebo.html" data-lang-to="en" hreflang="en" lang="en" title="English">EN</a></nav>
+    </div>
+  </header>
+  <main class="gc-container site-main">
+    <article class="module" data-module-page="tools-gazebo">
+      <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-autonomy">Автономия</a><span>Симуляция в Gazebo: миры, датчики, камера в ROS 2 и сценарные тесты</span></p>
+      <h1 class="module-title">Симуляция в Gazebo: миры, датчики, камера в ROS 2 и сценарные тесты</h1>
+      <div class="module-tags"><span class="gc-tag" title="Уровень">L3 — Специалист</span><span class="gc-tag">чтение 40 мин</span><span class="gc-tag">учёба ~3 ч</span><span class="gc-tag">ArduPilot 4.5+ · PX4 1.15+ · Gazebo Harmonic · ROS 2 Jazzy</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ОСВОЕН</span></div>
+      <p class="gc-muted module-score" data-module-score></p>
+      <p class="module-lead">SITL без внешнего симулятора считает физику простой встроенной моделью и не знает, что такое дерево, стена или изображение с камеры. Для зрения, обхода препятствий, точной посадки и подвесов нужен мир: Gazebo даёт физику, освещение, камеры, лидары и дальномеры, а автопилот работает с ним как с настоящим аппаратом. Модуль разбирает связку ArduPilot SITL и PX4 SITL с Gazebo (новым, <code>gz</code>), устройство мира на SDF, добавление препятствия и камеры, мост изображений в ROS 2, сценарные тесты без графики для CI и что такое HITL и чем он отличается от SITL.</p>
+      <div class="gc-callout" data-state="ok"><strong>После модуля ты умеешь</strong><ul><li>запустить ArduPilot и PX4 SITL с Gazebo</li><li>описать мир с препятствиями и камерой и передать изображение в ROS 2</li><li>написать сценарные тесты, идущие без графики</li></ul></div><p class="gc-muted">Перед этим модулем: <a href="ap-sitl.html">SITL: дрон без дрона</a></p><div class="gc-callout lab"><p class="gc-label gc-muted">Лабораторная</p><strong>Мир и тесты для своего аппарата</strong><p class="gc-muted lab__hint">Сдано, когда отмечены все пункты:</p><ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="tools-gazebo:lab:0"><span>Iris летает в Gazebo, RTF измерен</span></label></li><li><label><input type="checkbox" data-check-id="tools-gazebo:lab:1"><span>Свой мир со столбом загружается</span></label></li><li><label><input type="checkbox" data-check-id="tools-gazebo:lab:2"><span>Изображение камеры в ROS 2, частота измерена</span></label></li><li><label><input type="checkbox" data-check-id="tools-gazebo:lab:3"><span>Два сценарных теста проходят без графики</span></label></li></ul></div>
+      <div class="gc-prose module-body">
+<div class="gc-callout" data-state="caution" data-untranslated><strong>Модуль ещё не переведён.</strong> Ниже — оригинал (Русский). Прогресс и оценки общие для всех языков.</div>
+<h2>Теория</h2>
+<h4 class="md-subheading">Какой Gazebo</h4>
+<ul><li><strong>Gazebo (gz)</strong> — новая линейка (бывший Ignition). Для ROS 2 Jazzy парная LTS-версия — <strong>Gazebo Harmonic</strong>; её же рекомендует плагин ArduPilot.</li><li><strong>Gazebo Classic</strong> (gazebo11) закончил поддержку в январе 2025 — старые инструкции с <code>gazebo --verbose</code> и <code>.world</code> для Classic не переносить.</li><li>Пара «ROS 2 — Gazebo» фиксирована: смешивать версии мимо рекомендованных пар — источник трудноуловимых проблем со сборкой мостов.</li></ul>
+<h4 class="md-subheading">Как автопилот говорит с миром</h4>
+<ul><li><strong>ArduPilot</strong>: плагин <code>ardupilot_gazebo</code> (система <code>ArduPilotPlugin</code> в модели). Gazebo считает физику и датчики, плагин отправляет состояние в SITL и получает от него команды моторам/сервам; обмен — JSON по UDP, в режиме lockstep (симуляция ждёт автопилот, время согласовано). Запуск: в одном терминале <code>gz sim -v4 -r iris_runway.sdf</code>, в другом <code>sim_vehicle.py -v ArduCopter -f gazebo-iris --model JSON --map --console</code>. Имя фрейма должно содержать <code>gazebo-</code>, модель — <code>JSON</code>.</li><li><strong>PX4</strong>: Gazebo встроен в сборку SITL: <code>make px4_sitl gz_x500</code>; варианты моделей с датчиками (например <code>gz_x500_depth</code>, <code>gz_x500_mono_cam</code>) и самолёты/VTOL; мир выбирается переменной <code>PX4_GZ_WORLD</code>.</li><li>Переменные окружения: <code>GZ_SIM_SYSTEM_PLUGIN_PATH</code> — где искать плагины (сборка <code>ardupilot_gazebo</code>), <code>GZ_SIM_RESOURCE_PATH</code> — модели и миры.</li></ul>
+<h4 class="md-subheading">Мир на SDF</h4>
+<p>Мир — XML-файл SDF: физика (шаг, например 1 мс), освещение, земля, модели. Модель — звенья (<code>link</code>) с геометрией столкновений (<code>collision</code>) и видимой (<code>visual</code>), массой и инерцией, суставы (<code>joint</code>), датчики (<code>sensor</code>) и системы-плагины. Препятствие — статическая модель:</p>
+<pre class="cli-block"><code>&lt;model name=&quot;pole&quot;&gt;
+  &lt;static&gt;true&lt;/static&gt;
+  &lt;pose&gt;10 0 5 0 0 0&lt;/pose&gt;
+  &lt;link name=&quot;link&quot;&gt;
+    &lt;collision name=&quot;collision&quot;&gt;
+      &lt;geometry&gt;&lt;cylinder&gt;&lt;radius&gt;0.3&lt;/radius&gt;&lt;length&gt;10&lt;/length&gt;&lt;/cylinder&gt;&lt;/geometry&gt;
+    &lt;/collision&gt;
+    &lt;visual name=&quot;visual&quot;&gt;
+      &lt;geometry&gt;&lt;cylinder&gt;&lt;radius&gt;0.3&lt;/radius&gt;&lt;length&gt;10&lt;/length&gt;&lt;/cylinder&gt;&lt;/geometry&gt;
+    &lt;/visual&gt;
+  &lt;/link&gt;
+&lt;/model&gt;</code></pre>
+<p>Столб 10 м высотой, в 10 м к востоку от начала координат мира (ENU: x — восток, y — север, z — вверх).</p>
+<h4 class="md-subheading">Датчики и мост в ROS 2</h4>
+<ul><li>Камеры, камеры глубины, лидары (<code>gpu_lidar</code>), IMU — элементы <code>sensor</code> в модели; публикуют в шину Gazebo (gz-transport), список — <code>gz topic -l</code>.</li><li><strong>ros_gz_bridge</strong> переносит топики между Gazebo и ROS 2: <code>ros2 run ros_gz_bridge parameter_bridge /camera@sensor_msgs/msg/Image@gz.msgs.Image</code> — имя топика, тип ROS 2, тип Gazebo; <code>@</code> — в обе стороны, <code>[</code> — из Gazebo в ROS, <code>]</code> — из ROS в Gazebo.</li><li>Отдельный плагин <code>GstCameraPlugin</code> из <code>ardupilot_gazebo</code> отдаёт видео с камеры по GStreamer (H.264, UDP 5600) — как настоящая камера на companion; поток включается сообщением в топик <code>.../enable_streaming</code>. Пример мира с подвесом и камерой — <code>gimbal.sdf</code>; подвес Iris в <code>iris_runway.sdf</code> (SITL с <code>gazebo-iris-gimbal.parm</code>) управляется каналами RC6–RC8.</li><li>Реализм: идеальная камера без шума и размытия обманывает — алгоритмы зрения стоит проверять с шумом, сменой освещения и размытием движения (параметры шума в описании датчика).</li></ul>
+<h4 class="md-subheading">Скорость и ресурсы</h4>
+<ul><li><strong>Real-time factor (RTF)</strong> — отношение скорости симуляции к реальному времени; с камерами и лидарами на слабой машине падает ниже 1. Lockstep сохраняет корректность, но тест длится дольше.</li><li>Рендеринг нужен только датчикам изображения; для тестов логики без камер — сервер без графики <code>gz sim -s -r мир.sdf</code>, для камер на машине без экрана — режим <code>--headless-rendering</code>.</li></ul>
+<h4 class="md-subheading">HITL и SITL</h4>
+<ul><li><strong>SITL</strong> — прошивка собрана под компьютер, всё виртуальное.</li><li><strong>HITL</strong> (hardware in the loop) — настоящий полётник со своей прошивкой, датчики подменяются данными симулятора по USB/MAVLink, моторы не крутятся. Проверяет реальное железо: тайминги, загрузку процессора, драйверы, что SITL скрывает. Поддержка и способ настройки отличаются у PX4 и ArduPilot и между версиями — по документации своей версии.</li></ul>
+<h4 class="md-subheading">Сценарные тесты</h4>
+<p>Сценарий — воспроизводимый полёт с проверкой результата: «взлёт на 10 м, облёт столба, посадка; не ближе 2 м к столбу, высота в допуске». Запуск без графики, проверка через MAVLink и лог, результат — pass/fail для CI (модуль «Конфигурации в CI»). Один сценарий на каждую функцию безопасности (failsafe, геозона, RTL) ловит регрессии при обновлении прошивки и параметров раньше поля.</p>
+<figure class="diagram" data-diagram="gazebo-sitl"><div class="diagram__svg"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 220" width="100%" role="img" aria-labelledby="t" style="max-width:720px;display:block;margin:0 auto"><title id="t">Gazebo + SITL: кто что считает</title><style>text{font-family: var(--gc-font-mono, ui-monospace, Menlo, monospace); font-size: 12px;fill:currentColor} .m{fill:var(--gc-ink-muted, #8a93a3)} .a{fill:var(--gc-accent-hud, #5ef1d2)} .w{fill:var(--gc-signal-amber, #f0b24c)} .d{fill:var(--gc-signal-red, #e8636b)} .box{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:currentColor;stroke-width:1.2} .boxa{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6} .ln{stroke:currentColor;stroke-width:1.2;fill:none} .lna{stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6;fill:none} .lnm{stroke:var(--gc-ink-muted, #8a93a3);stroke-width:1;fill:none;stroke-dasharray:4 3} .t{font-size:11px} .b{font-weight:600}</style><defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker><marker id="ara" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--gc-accent-hud, #5ef1d2)"/></marker></defs><rect class="boxa" x="10" y="30" width="160" height="48" rx="6"/><text x="90.0" y="51.0" text-anchor="middle" class="b">Gazebo (gz sim)</text><text x="90.0" y="65.0" text-anchor="middle" class="b">физика, мир, датчики</text><rect class="box" x="280" y="30" width="160" height="48" rx="6"/><text x="360.0" y="51.0" text-anchor="middle">ArduPilotPlugin</text><text x="360.0" y="65.0" text-anchor="middle">JSON, lockstep</text><rect class="boxa" x="550" y="30" width="160" height="48" rx="6"/><text x="630.0" y="51.0" text-anchor="middle" class="b">SITL</text><text x="630.0" y="65.0" text-anchor="middle" class="b">прошивка на ПК</text><rect class="box" x="10" y="140" width="160" height="48" rx="6"/><text x="90.0" y="161.0" text-anchor="middle">ros_gz_bridge</text><text x="90.0" y="175.0" text-anchor="middle">изображение → ROS 2</text><rect class="box" x="280" y="140" width="160" height="48" rx="6"/><text x="360.0" y="161.0" text-anchor="middle">ROS 2 узлы</text><text x="360.0" y="175.0" text-anchor="middle">зрение, обход</text><rect class="box" x="550" y="140" width="160" height="48" rx="6"/><text x="630.0" y="161.0" text-anchor="middle">GCS и pytest</text><text x="630.0" y="175.0" text-anchor="middle">MAVLink</text><path class="ln" d="M170 63.0 L280 63.0" marker-end="url(#ar)"/><path class="ln" d="M280 63.0 L170 63.0" marker-end="url(#ar)"/><path class="ln" d="M440 63.0 L550 63.0" marker-end="url(#ar)"/><path class="ln" d="M550 63.0 L440 63.0" marker-end="url(#ar)"/><path class="ln" d="M90.0 78 L90.0 140" marker-end="url(#ar)"/><path class="ln" d="M170 164.0 L280 164.0" marker-end="url(#ar)"/><path class="ln" d="M630.0 78 L630.0 140" marker-end="url(#ar)"/><text x="10" y="210" text-anchor="start" class="m t">Без графики: gz sim -s -r мир.sdf; камеры без экрана: --headless-rendering</text></svg></div><figcaption class="gc-muted">Gazebo считает физику и датчики, плагин обменивается с SITL по JSON в lockstep; изображения идут в ROS 2 через ros_gz_bridge, наземка и тесты подключаются к SITL по MAVLink.</figcaption><div class="diagram__hint">Схему можно прокрутить по горизонтали</div></figure>
+
+<h2>Практика</h2>
+<h4 class="md-subheading">Шаг 1. Iris в Gazebo</h4>
+<p>Установить Gazebo Harmonic и собрать <code>ardupilot_gazebo</code> по README (зависимости, <code>cmake</code>, <code>make</code>), выставить <code>GZ_SIM_SYSTEM_PLUGIN_PATH</code> и <code>GZ_SIM_RESOURCE_PATH</code>. Запустить <code>iris_runway.sdf</code> и SITL с <code>-f gazebo-iris --model JSON</code>. Взлёт в GUIDED на 10 м из MAVProxy. Записать RTF при висении.</p>
+<h4 class="md-subheading">Шаг 2. Свой мир со столбом</h4>
+<p>Скопировать <code>iris_runway.sdf</code> в свой мир, добавить столб из теории. Миссия: взлёт, точка в 20 м к востоку на высоте 5 м, возврат. Что происходит с аппаратом без обхода препятствий? Перенести точку так, чтобы маршрут проходил в 3 м от столба.</p>
+<h4 class="md-subheading">Шаг 3. Камера в ROS 2</h4>
+<p>Запустить мир с камерой (<code>gimbal.sdf</code> или модель с камерой), найти топик изображения (<code>gz topic -l</code>), поднять мост в ROS 2 и проверить <code>ros2 topic hz</code> и <code>rqt_image_view</code> (или <code>ros2 run image_tools showimage</code>). Записать частоту кадров и разрешение.</p>
+<h4 class="md-subheading">Шаг 4. Сценарный тест</h4>
+<p>pytest-сценарий против SITL (Gazebo без графики: <code>gz sim -s -r мир.sdf</code>):</p>
+<pre class="cli-block"><code>import time
+from pymavlink import mavutil
+
+def test_takeoff_hold_land():
+    m = mavutil.mavlink_connection(&quot;udpin:0.0.0.0:14550&quot;)
+    m.wait_heartbeat(timeout=30)
+    m.set_mode(&quot;GUIDED&quot;)
+    deadline = time.time() + 60
+    while not m.motors_armed():                    # pre-arm checks pass once EKF and GPS are ready
+        assert time.time() &lt; deadline, &quot;не армится за 60 с&quot;
+        m.arducopter_arm()
+        m.recv_match(type=&quot;HEARTBEAT&quot;, blocking=True, timeout=2)
+    m.mav.command_long_send(m.target_system, m.target_component,
+                            mavutil.mavlink.MAV_CMD_NAV_TAKEOFF, 0, 0, 0, 0, 0, 0, 0, 10)
+    alts, t0 = [], time.time()
+    while time.time() - t0 &lt; 30:
+        p = m.recv_match(type=&quot;GLOBAL_POSITION_INT&quot;, blocking=True, timeout=2)
+        if p:
+            alts.append(p.relative_alt / 1000)
+    assert max(alts) &gt; 9.0, f&quot;не набрал высоту: {max(alts):.1f} м&quot;
+    assert abs(alts[-1] - 10) &lt; 1.0, f&quot;не держит высоту: {alts[-1]:.1f} м&quot;
+    m.set_mode(&quot;LAND&quot;)</code></pre>
+<p>Добавить второй тест: геозона (<code>FENCE_ENABLE = 1</code>, радиус 50 м) и полёт в точку за ней — аппарат должен уйти в действие геозоны. Записать время прогона каждого теста.</p>
+<p>Лабораторная засчитывается, когда Iris летает в Gazebo с измеренным RTF, свой мир со столбом загружается, изображение с камеры видно в ROS 2 с измеренной частотой, два сценарных теста проходят без графики.</p>
+
+<h2>Диагностика</h2>
+<div class="diag-groups"><article class="diag-item"><h4><strong>Симптом:</strong> SITL не видит Gazebo, аппарат «висит» на земле</h4><ul><li>Возможная причина: не выставлен <code>GZ_SIM_SYSTEM_PLUGIN_PATH</code>, плагин не собран, фрейм без <code>gazebo-</code> или модель не <code>JSON</code>.</li><li>Что сделать: проверить переменные, сборку плагина, аргументы <code>sim_vehicle.py</code>.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> мир не находит модели</h4><ul><li>Возможная причина: не выставлен <code>GZ_SIM_RESOURCE_PATH</code>.</li><li>Что сделать: добавить пути <code>models</code> и <code>worlds</code>.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> симуляция идёт медленнее реального времени</h4><ul><li>Возможная причина: камеры и лидары на слабой машине, мелкий шаг физики, рендеринг в окне.</li><li>Что сделать: сервер без графики, меньше датчиков и разрешение, <code>--headless-rendering</code> для камер.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> ros_gz_bridge запущен, топика в ROS 2 нет</h4><ul><li>Возможная причина: неверное имя топика или тип, несовпадение версий ROS 2 и Gazebo.</li><li>Что сделать: <code>gz topic -l</code> и <code>gz topic -i</code>, точное имя и тип, рекомендованная пара версий.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> алгоритм зрения отлично работает в симуляции и плохо в поле</h4><ul><li>Возможная причина: идеальная картинка без шума, размытия и смены освещения.</li><li>Что сделать: шум датчика в SDF, разные освещения и текстуры, проверка на записанных реальных данных.</li></ul></article></div>
+
+<h2>Чек-лист</h2>
+<ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="tools-gazebo:0"><span>Выбираю версию Gazebo в паре с ROS 2 и не путаю с Gazebo Classic</span></label></li><li><label><input type="checkbox" data-check-id="tools-gazebo:1"><span>Запускаю ArduPilot и PX4 SITL с Gazebo</span></label></li><li><label><input type="checkbox" data-check-id="tools-gazebo:2"><span>Описываю мир и модели на SDF и добавляю препятствия</span></label></li><li><label><input type="checkbox" data-check-id="tools-gazebo:3"><span>Передаю изображение камеры в ROS 2 через ros_gz_bridge</span></label></li><li><label><input type="checkbox" data-check-id="tools-gazebo:4"><span>Пишу сценарные тесты, которые идут без графики в CI</span></label></li><li><label><input type="checkbox" data-check-id="tools-gazebo:5"><span>Объясняю разницу SITL и HITL</span></label></li></ul>
+
+<h2>Источники</h2>
+<ul class="refs"><li><a href="https://github.com/ArduPilot/ardupilot_gazebo" target="_blank" rel="noopener noreferrer">ArduPilot — ardupilot_gazebo plugin (README)</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://ardupilot.org/dev/docs/sitl-with-gazebo.html" target="_blank" rel="noopener noreferrer">ArduPilot — Using SITL with Gazebo</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://docs.px4.io/main/en/sim_gazebo_gz/" target="_blank" rel="noopener noreferrer">PX4 — Gazebo simulation</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://gazebosim.org/docs/harmonic/getstarted/" target="_blank" rel="noopener noreferrer">Gazebo — documentation (Harmonic)</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://github.com/gazebosim/ros_gz" target="_blank" rel="noopener noreferrer">ros_gz — ROS 2 ↔ Gazebo bridge</a> <span class="gc-tag" data-state="info">primary</span></li></ul>
+<h2>Проверь себя</h2>
+<uav-quiz src="../quiz/tools-gazebo.json" module="tools-gazebo"></uav-quiz>
+      </div>
+      <div class="module-done"><gc-button variant="secondary" data-done-toggle="tools-gazebo">Отметить как пройденный</gc-button></div>
+      <section class="related" aria-label="Смежные модули"><p class="gc-label gc-muted">Смежные модули</p><div class="gc-grid ref-grid"><a class="gc-card" href="ap-sitl.html"><strong>SITL: дрон без дрона</strong><div class="gc-card__meta"><span class="gc-tag" title="L2 — Интегратор">L2</span></div></a><a class="gc-card" href="ros2-basics.html"><strong>ROS 2 для борта: узлы, топики, QoS, tf2, bag</strong><div class="gc-card__meta"><span class="gc-tag" title="L3 — Специалист">L3</span></div></a><a class="gc-card" href="per-camera.html"><strong>Камеры и видеопоток на companion</strong><div class="gc-card__meta"><span class="gc-tag" title="L3 — Специалист">L3</span></div></a><a class="gc-card" href="eng-ci-configs.html"><strong>CI и версионирование конфигов и кода</strong><div class="gc-card__meta"><span class="gc-tag" title="L3 — Специалист">L3</span></div></a></div></section>
+      <nav class="pager" aria-label="Соседние модули" data-track-pager><a class="gc-card pager__prev" href="ap-sitl.html"><span class="gc-label gc-muted">Назад · трек</span><br>SITL: дрон без дрона</a><a class="gc-card pager__next" href="ap-missions.html"><span class="gc-label gc-muted">Дальше · трек</span><br>Миссии и планирование</a></nav>
+    </article>
+  </main>
+  <footer class="gc-container site-footer gc-muted">
+    <p>Открытый курс · <a href="https://github.com/irreligious86/UAV-Education">исходники на GitHub</a> · <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">план развития</a> · <a href="../../curriculum/curriculum.html">для разработчика</a> · CC BY-NC-SA 4.0</p>
+  </footer>
+</body>
+</html>

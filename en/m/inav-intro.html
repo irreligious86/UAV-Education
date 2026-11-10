@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en" data-theme="dark" data-lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Введение в INAV — UAV Student</title>
+  <meta name="description" content="объяснить место INAV между Betaflight и ArduPilot настроить платформу, датчики и режимы для первого полёта">
+  <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
+  <link rel="manifest" href="../../manifest.webmanifest">
+  <meta name="theme-color" content="#0b0f14">
+  <link rel="alternate" hreflang="ru" href="../../m/inav-intro.html">
+  <link rel="alternate" hreflang="uk" href="../../uk/m/inav-intro.html">
+  <link rel="alternate" hreflang="en" href="../../en/m/inav-intro.html">
+  <script>/* go to the visitor's chosen language before anything paints (assets/i18n.js) */(function(){try{var c=localStorage.getItem('uav-lang'),h=document.documentElement.getAttribute('data-lang');if(!c||c===h||/[?&]lang=keep\b/.test(location.search))return;var l=document.querySelector('link[rel=alternate][hreflang="'+c+'"]');if(l)location.replace(l.href+location.search+location.hash)}catch(e){}})();</script>
+  <link rel="stylesheet" href="../../lib/ground-control-ui/dist/ground-control.css">
+  <link rel="stylesheet" href="../../assets/site.css">
+  <script src="../../lib/ground-control-ui/dist/ground-control.js" defer></script>
+  <script src="../../assets/i18n/en.js"></script>
+  <script src="../../assets/i18n.js"></script>
+  <script src="../../assets/progress-store.js" defer></script>
+  <script src="../../assets/backend-config.js" defer></script>
+  <script src="../../assets/account.js" defer></script>
+  <script src="../../assets/grading.js" defer></script>
+  <script src="../../assets/app.js" defer></script>
+  <script src="../../assets/uav-quiz.js" defer></script>
+  <script src="../../assets/uav-tasks.js" defer></script>
+  <script src="../../assets/offline.js" defer></script>
+</head>
+<body class="gc-root" data-base="../" data-root="../../">
+  <header class="site-header">
+    <div class="gc-container site-header__inner">
+      <a class="site-brand" href="../index.html"><span class="site-brand__mark" aria-hidden="true">◆</span> UAV Student</a>
+      <nav class="gc-nav" aria-label="Разделы сайта">
+        <a href="../index.html" aria-current="page">Курс</a>
+        <a href="../ref/index.html">Справочник</a>
+        <a href="../pages/glossary.html">Глоссарий</a>
+        <a href="../pages/fails.html">Фейлы</a>
+        <a href="../pages/search.html">Поиск</a>
+        <a href="../pages/progress.html">Мой прогресс</a>
+      </nav>
+      <nav class="lang-switch" aria-label="Язык"><a class="gc-tag" href="../../m/inav-intro.html" data-lang-to="ru" hreflang="ru" lang="ru" title="Русский">RU</a><a class="gc-tag" href="../../uk/m/inav-intro.html" data-lang-to="uk" hreflang="uk" lang="uk" title="Українська">UK</a><a class="gc-tag" href="../../en/m/inav-intro.html" data-lang-to="en" hreflang="en" lang="en" title="English" aria-current="true" data-state="ok">EN</a></nav>
+    </div>
+  </header>
+  <main class="gc-container site-main">
+    <article class="module" data-module-page="inav-intro">
+      <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-inav">Электив: INAV</a><span>Введение в INAV</span></p>
+      <h1 class="module-title">Введение в INAV</h1>
+      <div class="module-tags"><span class="gc-tag" title="Уровень">L1 — Оператор</span><span class="gc-tag">чтение 20 мин</span><span class="gc-tag">учёба ~2 ч</span><span class="gc-tag">INAV 7.0+</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ОСВОЕН</span></div>
+      <p class="gc-muted module-score" data-module-score></p>
+      <p class="module-lead">INAV вырос из той же кодовой базы, что и Betaflight, но пошёл в другую сторону: навигация. Это прошивка для тех, кому нужны удержание позиции, возврат домой и миссии на недорогом полётнике — и для крыльев, которые Betaflight не поддерживает вовсе. Модуль объясняет, где INAV между Betaflight и ArduPilot, что в нём знакомо пилоту Betaflight, что принципиально иначе (платформа, арм, навигационные режимы, safehomes) и как подготовить первый полёт.</p>
+      <div class="gc-callout" data-state="ok"><strong>После модуля ты умеешь</strong><ul><li>объяснить место INAV между Betaflight и ArduPilot</li><li>настроить платформу, датчики и режимы для первого полёта</li></ul></div><div class="gc-callout lab"><p class="gc-label gc-muted">Лабораторная</p><strong>Первый полёт на INAV</strong><p class="gc-muted lab__hint">Сдано, когда отмечены все пункты:</p><ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="inav-intro:lab:0"><span>Платформа и миксер проверены без пропов</span></label></li><li><label><input type="checkbox" data-check-id="inav-intro:lab:1"><span>Компас и акселерометр откалиброваны</span></label></li><li><label><input type="checkbox" data-check-id="inav-intro:lab:2"><span>ALTHOLD → POSHOLD → RTH проверены близко и низко</span></label></li></ul></div><div class="path-pos gc-muted"><span class="gc-label">В пути</span><ul><li data-path-pos="inav"><a href="../path/inav.html">INAV</a>: шаг 15 из 20 → <a href="inav-gps.html?path=inav">GPS, компас и RTH в INAV</a></li></ul></div>
+      <div class="gc-prose module-body">
+<div class="gc-callout" data-state="caution" data-untranslated><strong>Модуль ещё не переведён.</strong> Ниже — оригинал (Русский). Прогресс и оценки общие для всех языков.</div>
+<h2>Теория</h2>
+<h4 class="md-subheading">Место INAV</h4>
+<ul><li><strong>Betaflight</strong> — только ручной полёт, минимальная задержка.</li><li><strong>INAV</strong> — ручной полёт плюс навигация: POSHOLD, RTH, миссии, автозапуск крыла, автопосадка. Работает на тех же платах F4/F7/H7, тот же конфигуратор-подход, похожий CLI.</li><li><strong>ArduPilot</strong> — полноценный автопилот с EKF, Lua, companion, тысячей параметров и требованиями к железу.</li></ul>
+<p>INAV — компромисс: навигация без переезда на H7 и без изучения ArduPilot.</p>
+<h4 class="md-subheading">Платформа</h4>
+<p>Первое решение — <code>platform_type</code>: MULTIROTOR, AIRPLANE, TRICOPTER (значения HELICOPTER, ROVER, BOAT есть в списке, но реализованы не полностью). От платформы зависят доступные режимы, пресеты миксера, наличие флапов и логика навигации. Крыло и квадрокоптер — это разные прошивки по поведению, хоть и один бинарник.</p>
+<h4 class="md-subheading">Что знакомо после Betaflight</h4>
+<p>Вкладки Ports, Receiver, Modes, OSD, CLI с <code>set</code>/<code>get</code>/<code>save</code>/<code>diff all</code>, Blackbox. Приёмник по CRSF или SBUS подключается так же.</p>
+<h4 class="md-subheading">Что иначе</h4>
+<ul><li><strong>Арм только тумблером.</strong> Арм стиками удалён ещё в INAV 2.2.</li><li><strong>Арм блокируется без GPS-фикса</strong>, если настроены навигационные режимы (<code>nav_extra_arming_safety</code> может это обойти, но это осознанный риск).</li><li><strong>Навигационные режимы</strong>: NAV ALTHOLD, NAV POSHOLD, NAV RTH, NAV WP, NAV CRUISE (для крыльев). POSHOLD и RTH требуют откалиброванный компас у мультиротора.</li><li><strong>Дом</strong> — точка первого арма; <strong>safehomes</strong> — до 8 заранее заданных безопасных точек посадки; при RTH ближайшая из них в пределах <code>safehome_max_distance</code> заменяет дом.</li><li><strong>Failsafe</strong> с процедурами DROP, LAND (аварийная посадка), RTH, NONE. RTH как failsafe — главная причина ставить INAV.</li><li><strong>Programming Framework</strong> — логические условия прямо в прошивке, без Lua.</li></ul>
+<h4 class="md-subheading">Требования</h4>
+<p>Навигация — это GPS (обязательно), компас (мультиротор — обязательно для POSHOLD/RTH), барометр (мультиротор — практически обязателен: без него высота держится только по GPS и акселерометру, заметно хуже). У крыла курс может оцениваться по GPS, компас желателен.</p>
+<h4 class="md-subheading">Что под капотом: оценщик, не EKF</h4>
+<p>INAV считает позицию и высоту комплементарным оценщиком с весами (<code>inav_w_*</code>), а не EKF — проще, легче для F4, но без автоматического доверия/недоверия к датчикам (модуль «INAV: GPS и RTH»). Отсюда требования: компас и баро обязательны для мультиротора; качество GPS важнее, чем в ArduPilot, где EKF «переживает» плохие кадры.</p>
+<h4 class="md-subheading">Почему не армится: читаем OSD</h4>
+<p>Причина блокировки видна в трёх местах: текстом в OSD (строки вида «NAVIGATION SAFETY», «AIRCRAFT IS NOT LEVEL» — точная формулировка зависит от версии), на вкладке Setup конфигуратора и в CLI командой <code>status</code> (строка с флагами блокировки арма). Типовые причины: нет GPS-фикса при навигационных режимах (<code>nav_extra_arming_safety</code>), не откалиброваны акселерометр или компас, газ не в минимуме, наклон больше <code>small_angle</code>, тумблер арма включён при подаче питания, открыт CLI или меню OSD, первая точка миссии дальше <code>nav_wp_max_safe_distance</code>, отказ датчика. Тот же принцип, что в Betaflight (модуль «Безопасность»): причину устраняют, а не обходят.</p>
+<h4 class="md-subheading">Версии и совместимость</h4>
+<p>INAV 7/8 — H7/F7 рекомендуемы, F4 поддерживается с ограничениями по памяти (часть функций вырезана в target&#x27;ах); конфигуратор строго совпадает по мажорной версии с прошивкой; <code>diff all</code> переносится между мажорными версиями только через проверку — параметры переименовываются (<code>nav_use_midthr_for_althold</code> → <code>nav_mc_althold_throttle</code>). Обновление прошивки = полный бэкап + сравнение <code>diff</code> + перекалибровка датчиков.</p>
+<figure class="diagram" data-diagram="firmware-choice"><div class="diagram__svg"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 184" width="100%" role="img" aria-labelledby="t" style="max-width:720px;display:block;margin:0 auto"><title id="t">Какая прошивка под задачу</title><style>text{font-family: var(--gc-font-mono, ui-monospace, Menlo, monospace); font-size: 12px;fill:currentColor} .m{fill:var(--gc-ink-muted, #8a93a3)} .a{fill:var(--gc-accent-hud, #5ef1d2)} .w{fill:var(--gc-signal-amber, #f0b24c)} .d{fill:var(--gc-signal-red, #e8636b)} .box{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:currentColor;stroke-width:1.2} .boxa{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6} .ln{stroke:currentColor;stroke-width:1.2;fill:none} .lna{stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6;fill:none} .lnm{stroke:var(--gc-ink-muted, #8a93a3);stroke-width:1;fill:none;stroke-dasharray:4 3} .t{font-size:11px} .b{font-weight:600}</style><defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker><marker id="ara" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--gc-accent-hud, #5ef1d2)"/></marker></defs><text x="16" y="16" text-anchor="start" class="m t">Какая прошивка под задачу</text><rect class="box" x="285.0" y="34" width="150.0" height="40" rx="6"/><text x="360.0" y="58.0" text-anchor="middle" style="font-size:10.5px">Задача</text><path class="ln" d="M360.0 74 L360.0 89.0 L126.7 89.0 L126.7 104" marker-end="url(#ar)"/><text x="130.66666666666669" y="85.0" text-anchor="start" class="a t" style="font-size:10px">фристайл, гонки</text><rect class="box" x="51.7" y="104" width="150.0" height="40" rx="18"/><text x="126.66666666666667" y="128.0" text-anchor="middle" style="font-size:10.5px">Betaflight</text><path class="ln" d="M360.0 74 L360.0 89.0 L360.0 89.0 L360.0 104" marker-end="url(#ar)"/><text x="364.0" y="85.0" text-anchor="start" class="a t" style="font-size:10px">навигация, крыло</text><rect class="boxa" x="285.0" y="104" width="150.0" height="40" rx="18"/><text x="360.0" y="122.0" text-anchor="middle" class="b" style="font-size:10.5px">INAV: оценщик,</text><text x="360.0" y="134.0" text-anchor="middle" class="b" style="font-size:10.5px">RTH, миссии, крыло</text><path class="ln" d="M360.0 74 L360.0 89.0 L593.3 89.0 L593.3 104" marker-end="url(#ar)"/><text x="597.3333333333334" y="85.0" text-anchor="start" class="a t" style="font-size:10px">автономия</text><rect class="box" x="518.3" y="104" width="150.0" height="40" rx="18"/><text x="593.3333333333334" y="122.0" text-anchor="middle" style="font-size:10.5px">ArduPilot / PX4:</text><text x="593.3333333333334" y="134.0" text-anchor="middle" style="font-size:10.5px">EKF, MAVLink, API</text></svg></div><figcaption class="gc-muted">Место INAV среди прошивок: навигация по GPS и крыло без сложности ArduPilot/PX4.</figcaption><div class="diagram__hint">Схему можно прокрутить по горизонтали</div></figure>
+
+<h2>Практика</h2>
+<h4 class="md-subheading">Шаг 1. Платформа и миксер</h4>
+<ol><li>Прошить плату INAV нужным таргетом.</li><li>Вкладка Mixer: выбрать <code>platform_type</code> и пресет (Quad X, Flying Wing…), применить, сохранить.</li><li>Без пропов проверить выходы: моторы и сервы отвечают на правильные стики.</li></ol>
+<h4 class="md-subheading">Шаг 2. Датчики</h4>
+<ol><li>Калибровка акселерометра (6 положений).</li><li>Компас: калибровка на открытом месте, проверка ориентации (<code>align_mag</code>).</li><li>GPS на UART, в Configuration — протокол (обычно UBLOX) и скорость.</li></ol>
+<h4 class="md-subheading">Шаг 3. Режимы</h4>
+<p>ARM — отдельный тумблер. ANGLE — базовый. NAV ALTHOLD, NAV POSHOLD, NAV RTH — на трёхпозиционном тумблере по нарастанию автономности. Для крыла: MANUAL обязательно на отдельном тумблере.</p>
+<h4 class="md-subheading">Шаг 3б. Проверка оценщика на земле (до первого взлёта)</h4>
+<p>INAV летит туда, куда считает, что летит; проверить это можно без пропов:</p>
+<ol><li><strong>Компас</strong>: аппарат на ровном месте носом на север (по телефону-компасу) — курс в OSD ±10°. Повернуть на 90°, 180°, 270° — курс следует. Ошибка на одном направлении — помеха или неверный <code>align_mag</code>.</li><li><strong>Дом и стрелка</strong>: после фикса записан дом; отнести аппарат на 20–30 м — расстояние до дома в OSD совпадает с шагами, стрелка домой указывает туда, откуда пришли. Стрелка смотрит в сторону — курс неверен, RTH улетит не туда.</li><li><strong>Высота</strong>: поднять аппарат на 2 м (на вытянутых руках/лестнице) — высота в OSD меняется на ~2 м и возвращается. Дрейф метр за минуту в покое — баро под прямым солнцем или потоком воздуха.</li><li><strong>Сателлиты</strong>: 3D-фикс, ≥ 10 спутников, HDOP в OSD ≤ 1.5–2 перед первым навигационным полётом.</li></ol>
+<div class="table-wrap md-table-wrap" tabindex="0"><table class="md-table"><thead><tr><th>Проверка</th><th>Норма</th><th>Если нет</th></tr></thead><tbody><tr><td data-label="Проверка">Курс по сторонам света</td><td data-label="Норма">±10° на всех четырёх</td><td data-label="Если нет"><code>align_mag</code>, перекалибровка вдали от железа, перенос компаса</td></tr><tr><td data-label="Проверка">Расстояние до дома при переносе</td><td data-label="Норма">±2 м на 20 м</td><td data-label="Если нет">ждать лучшего фикса, проверить антенну GPS</td></tr><tr><td data-label="Проверка">Высота при подъёме на 2 м</td><td data-label="Норма">2 ± 0.5 м</td><td data-label="Если нет">закрыть баро поролоном, проверить корпус</td></tr></tbody></table></div>
+<h4 class="md-subheading">Шаг 4. Первый полёт</h4>
+<ol><li>На открытой площадке дождаться 3D-фикса (число спутников в OSD).</li><li>Арм, ANGLE, короткое висение / круг.</li><li>Переключить ALTHOLD, затем POSHOLD. Смотреть, как держит.</li><li>RTH на близком расстоянии и малой высоте, с готовностью перехватить.</li></ol>
+
+<h2>Диагностика</h2>
+<div class="diag-groups"><article class="diag-item"><h4><strong>Симптом:</strong> не армится, хотя всё настроено</h4><ul><li>Возможная причина: нет GPS-фикса при настроенных навигационных режимах или компас не откалиброван.</li><li>Что сделать: смотреть причину в OSD/конфигураторе, дождаться фикса, откалибровать компас.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> в POSHOLD «кружит» или уплывает</h4><ul><li>Возможная причина: компас — калибровка, ориентация, помехи от силовых проводов.</li><li>Что сделать: перекалибровать, вынести на мачту, проверить <code>align_mag</code>.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> RTH ведёт не туда</h4><ul><li>Возможная причина: дом записан не там (арм в другом месте) или сработал safehome.</li><li>Что сделать: проверить точку дома в OSD после арма и список safehomes.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> в MANUAL крыло неуправляемо</h4><ul><li>Возможная причина: реверс серв или неверный пресет миксера.</li><li>Что сделать: проверить направления поверхностей на столе.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> после обновления INAV часть настроек «пропала»</h4><ul><li>Возможная причина: переименованные параметры в diff не применились.</li><li>Что сделать: читать вывод CLI при загрузке diff, Settings.md новой версии, перекалибровать.</li></ul></article></div>
+
+<h2>Чек-лист</h2>
+<ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="inav-intro:0"><span>Понимаю, где INAV между Betaflight и ArduPilot</span></label></li><li><label><input type="checkbox" data-check-id="inav-intro:1"><span><code>platform_type</code> и миксер соответствуют аппарату</span></label></li><li><label><input type="checkbox" data-check-id="inav-intro:2"><span>Акселерометр и компас откалиброваны, оценщик проверен на земле (курс, дом, высота)</span></label></li><li><label><input type="checkbox" data-check-id="inav-intro:3"><span>Нахожу причину блокировки арма в OSD, конфигураторе и <code>status</code></span></label></li><li><label><input type="checkbox" data-check-id="inav-intro:4"><span>ARM на отдельном тумблере, навигационные режимы по нарастанию</span></label></li><li><label><input type="checkbox" data-check-id="inav-intro:5"><span>Первый RTH проверен близко и низко</span></label></li></ul>
+
+<h2>Источники</h2>
+<ul class="refs"><li><a href="https://github.com/iNavFlight/inav/blob/master/docs/Getting%20Started.md" target="_blank" rel="noopener noreferrer">INAV Getting Started</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://github.com/iNavFlight/inav/blob/master/docs/Navigation.md" target="_blank" rel="noopener noreferrer">INAV Navigation</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://github.com/iNavFlight/inav/blob/master/docs/Controls.md" target="_blank" rel="noopener noreferrer">INAV Controls (arming)</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://github.com/iNavFlight/inav/blob/master/docs/Safehomes.md" target="_blank" rel="noopener noreferrer">INAV Safehomes</a> <span class="gc-tag" data-state="info">primary</span></li></ul>
+<h2>Проверь себя</h2>
+<uav-quiz src="../quiz/inav-intro.json" module="inav-intro"></uav-quiz>
+      </div>
+      <div class="module-done"><gc-button variant="secondary" data-done-toggle="inav-intro">Отметить как пройденный</gc-button></div>
+      <section class="related" aria-label="Смежные модули"><p class="gc-label gc-muted">Смежные модули</p><div class="gc-grid ref-grid"><a class="gc-card" href="bf-intro.html"><strong>Введение в Betaflight</strong><div class="gc-card__meta"><span class="gc-tag" title="L1 — Оператор">L1</span></div></a><a class="gc-card" href="ap-intro.html"><strong>Введение в ArduPilot</strong><div class="gc-card__meta"><span class="gc-tag" title="L2 — Интегратор">L2</span></div></a></div></section>
+      <nav class="pager" aria-label="Соседние модули" data-track-pager><a class="gc-card pager__next" href="inav-gps.html"><span class="gc-label gc-muted">Дальше · трек</span><br>GPS, компас и RTH в INAV</a></nav><nav class="pager" aria-label="Соседние шаги пути INAV" data-path-pager="inav" hidden><a class="gc-card pager__prev" href="aero-wing.html?path=inav"><span class="gc-label gc-muted">Назад · путь INAV</span><br>Аэродинамика крыла и самолётные режимы</a><a class="gc-card pager__next" href="inav-gps.html?path=inav"><span class="gc-label gc-muted">Дальше · шаг 16 из 20</span><br>GPS, компас и RTH в INAV</a></nav>
+    </article>
+  </main>
+  <footer class="gc-container site-footer gc-muted">
+    <p>Открытый курс · <a href="https://github.com/irreligious86/UAV-Education">исходники на GitHub</a> · <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">план развития</a> · <a href="../../curriculum/curriculum.html">для разработчика</a> · CC BY-NC-SA 4.0</p>
+  </footer>
+</body>
+</html>

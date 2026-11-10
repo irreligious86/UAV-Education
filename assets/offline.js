@@ -3,10 +3,11 @@
  * status in the footer. Progress stays in localStorage, so the whole course works without network
  * once the first visit has finished precaching.
  */
+var T = (typeof window !== "undefined" && window.T) || function (s) { return s; };   // assets/i18n.js
 (function () {
   "use strict";
   if (!("serviceWorker" in navigator)) return;
-  var base = document.body.getAttribute("data-base") || "";
+  var root = document.body.getAttribute("data-root") || document.body.getAttribute("data-base") || "";   // sw.js is shared by all languages
   function note(text) {
     var el = document.querySelector("[data-offline-status]");
     if (!el) {
@@ -17,13 +18,13 @@
     el.textContent = text;
   }
   window.addEventListener("load", function () {
-    navigator.serviceWorker.register(base + "sw.js").then(function (reg) {
-      if (reg.active && !reg.installing) note("Офлайн-режим готов: курс открывается без сети.");
+    navigator.serviceWorker.register(root + "sw.js?lang=" + (document.documentElement.getAttribute("data-lang") || "ru")).then(function (reg) {
+      if (reg.active && !reg.installing) note(T("Офлайн-режим готов: курс открывается без сети."));
     }).catch(function () { /* file:// or unsupported: nothing to do */ });
     navigator.serviceWorker.addEventListener("message", function (ev) {
-      if (ev.data && ev.data.type === "offline-ready") note("Офлайн-режим готов: " + ev.data.files + " файлов сохранено для работы без сети.");
+      if (ev.data && ev.data.type === "offline-ready") note(T("Офлайн-режим готов: ") + ev.data.files + T(" файлов сохранено для работы без сети."));
     });
   });
-  window.addEventListener("offline", function () { note("Нет сети — работаем из кэша."); });
-  window.addEventListener("online", function () { note("Сеть восстановлена."); });
+  window.addEventListener("offline", function () { note(T("Нет сети — работаем из кэша.")); });
+  window.addEventListener("online", function () { note(T("Сеть восстановлена.")); });
 })();

@@ -1,0 +1,461 @@
+<!doctype html>
+<html lang="uk" data-theme="dark" data-lang="uk">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Путь ArduPilot — UAV Student</title>
+  <meta name="description" content="Строить и проверять автономные сценарии: сначала в симуляторе, потом на окто и VTOL, с разбором логов.">
+  <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
+  <link rel="manifest" href="../../manifest.webmanifest">
+  <meta name="theme-color" content="#0b0f14">
+  <link rel="alternate" hreflang="ru" href="../../path/ardupilot.html">
+  <link rel="alternate" hreflang="uk" href="../../uk/path/ardupilot.html">
+  <link rel="alternate" hreflang="en" href="../../en/path/ardupilot.html">
+  <script>/* go to the visitor's chosen language before anything paints (assets/i18n.js) */(function(){try{var c=localStorage.getItem('uav-lang'),h=document.documentElement.getAttribute('data-lang');if(!c||c===h||/[?&]lang=keep\b/.test(location.search))return;var l=document.querySelector('link[rel=alternate][hreflang="'+c+'"]');if(l)location.replace(l.href+location.search+location.hash)}catch(e){}})();</script>
+  <link rel="stylesheet" href="../../lib/ground-control-ui/dist/ground-control.css">
+  <link rel="stylesheet" href="../../assets/site.css">
+  <script src="../../lib/ground-control-ui/dist/ground-control.js" defer></script>
+  <script src="../../assets/i18n/uk.js"></script>
+  <script src="../../assets/i18n.js"></script>
+  <script src="../../assets/progress-store.js" defer></script>
+  <script src="../../assets/backend-config.js" defer></script>
+  <script src="../../assets/account.js" defer></script>
+  <script src="../../assets/grading.js" defer></script>
+  <script src="../../assets/app.js" defer></script>
+  <script src="../../assets/uav-quiz.js" defer></script>
+  <script src="../../assets/uav-tasks.js" defer></script>
+  <script src="../../assets/offline.js" defer></script>
+</head>
+<body class="gc-root" data-base="../" data-root="../../">
+  <header class="site-header">
+    <div class="gc-container site-header__inner">
+      <a class="site-brand" href="../index.html"><span class="site-brand__mark" aria-hidden="true">◆</span> UAV Student</a>
+      <nav class="gc-nav" aria-label="Разделы сайта">
+        <a href="../index.html" aria-current="page">Курс</a>
+        <a href="../ref/index.html">Справочник</a>
+        <a href="../pages/glossary.html">Глоссарий</a>
+        <a href="../pages/fails.html">Фейлы</a>
+        <a href="../pages/search.html">Поиск</a>
+        <a href="../pages/progress.html">Мой прогресс</a>
+      </nav>
+      <nav class="lang-switch" aria-label="Язык"><a class="gc-tag" href="../../path/ardupilot.html" data-lang-to="ru" hreflang="ru" lang="ru" title="Русский">RU</a><a class="gc-tag" href="../../uk/path/ardupilot.html" data-lang-to="uk" hreflang="uk" lang="uk" title="Українська" aria-current="true" data-state="ok">UK</a><a class="gc-tag" href="../../en/path/ardupilot.html" data-lang-to="en" hreflang="en" lang="en" title="English">EN</a></nav>
+    </div>
+  </header>
+  <main class="gc-container site-main">
+    <p class="gc-breadcrumb"><a href="../index.html">Курс</a><span>Путь: ArduPilot</span></p>
+    <section class="home-hero">
+      <h1 class="gc-display">ArduPilot</h1>
+      <p class="home-hero__lead">Строить и проверять автономные сценарии: сначала в симуляторе, потом на окто и VTOL, с разбором логов.</p>
+      <div class="home-hero__stats"><span class="gc-tag">69 шагов</span><span class="gc-tag" data-state="ok">написано 69</span><span class="gc-tag" data-state="caution">в работе 0</span></div>
+      <p class="gc-label gc-muted">Твой прогресс <span data-progress-label="f-physics,f-mechanics,f-aero-props,f-electricity-101,f-power,f-motors-esc,f-fc-sensors,f-frame-mech,f-safety,f-regulations,f-components-choice,tools-overview,eng-method-101,ap-intro,ops-case-studies,ap-sitl,ap-missions,ap-lua,diag-troubleshooting,math-linalg-rot,math-ode-dyn,math-prob-est,est-sensors,est-attitude,est-kalman,est-gnss,ap-ekf,est-alt-sources,nav-resilience,data-python,ctl-signals,ap-logs,ap-tuning,ap-safety-fs,aero-wing,ap-heavy,ap-quadplane,el-power-design,el-redundancy,el-battery-packs,el-emi,el-peripherals,rf-link-budget,comp-intro,comp-mavlink,mav-protocol,mav-services,mav-routing,mav-component,mav-sdk,emb-basics,emb-protocols,comp-raspberry,ap-companion,eng-ci-configs,comp-esp32,fw-reading,eng-systems,ros2-basics,ros2-ardupilot,per-camera,per-geometry,per-cv,per-edge-ml,per-visual-nav,per-mapping,per-landing,per-depth-avoid,per-tracking"></span></p>
+      <div class="gc-progress" role="progressbar" aria-label="Прогресс по пути" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" data-progress-of="f-physics,f-mechanics,f-aero-props,f-electricity-101,f-power,f-motors-esc,f-fc-sensors,f-frame-mech,f-safety,f-regulations,f-components-choice,tools-overview,eng-method-101,ap-intro,ops-case-studies,ap-sitl,ap-missions,ap-lua,diag-troubleshooting,math-linalg-rot,math-ode-dyn,math-prob-est,est-sensors,est-attitude,est-kalman,est-gnss,ap-ekf,est-alt-sources,nav-resilience,data-python,ctl-signals,ap-logs,ap-tuning,ap-safety-fs,aero-wing,ap-heavy,ap-quadplane,el-power-design,el-redundancy,el-battery-packs,el-emi,el-peripherals,rf-link-budget,comp-intro,comp-mavlink,mav-protocol,mav-services,mav-routing,mav-component,mav-sdk,emb-basics,emb-protocols,comp-raspberry,ap-companion,eng-ci-configs,comp-esp32,fw-reading,eng-systems,ros2-basics,ros2-ardupilot,per-camera,per-geometry,per-cv,per-edge-ml,per-visual-nav,per-mapping,per-landing,per-depth-avoid,per-tracking" style="--gc-value: 0%"></div>
+      <p class="ready-filter"><label class="gc-muted"><input type="checkbox" data-ready-only> Показывать только готовые модули</label></p>
+      <p class="path-continue"><a class="gc-card" data-path-continue="ardupilot" data-path-steps="f-physics|Как летает мультиротор;;f-mechanics|Механика полёта: силы, моменты, уравнения движения;;f-aero-props|Аэродинамика пропеллера и подбор силовой установки;;f-electricity-101|Электричество и измерения 101;;f-power|Питание: LiPo, Li-Ion, BEC;;f-motors-esc|Моторы, ESC и DShot;;f-fc-sensors|Полётный контроллер и сенсоры;;f-frame-mech|Рама, механика и вибрации;;f-safety|Безопасность и предполётный чек;;f-regulations|Правила, зоны и ответственность оператора;;f-components-choice|Выбор компонентов под задачу и бюджет;;tools-overview|Инструменты: Configurator, GCS, git;;eng-method-101|Инженерный метод 101: требования, архитектура, тесты, документация;;ap-intro|Введение в ArduPilot;;ops-case-studies|Разбор реальных аварий;;ap-sitl|SITL: дрон без дрона;;ap-missions|Миссии и планирование;;ap-lua|Lua: сценарии и fault injection;;diag-troubleshooting|Дерево диагностики: дрон не взлетает;;math-linalg-rot|Векторы, матрицы и вращения: язык ориентации;;math-ode-dyn|Дифференциальные уравнения и динамика: от мотора до контура;;math-prob-est|Вероятность и оценивание: шум, гауссианы, слияние;;est-sensors|Датчики IMU: физика, ошибки, калибровка;;est-attitude|Ориентация: углы Эйлера, кватернионы, комплементарный фильтр;;est-kalman|Фильтр Калмана на пальцах и EKF;;est-gnss|GNSS: как работает GPS, ошибки, RTK;;ap-ekf|EKF и навигация;;est-alt-sources|Высота и позиция без GPS: баро, дальномер, оптический поток;;nav-resilience|Устойчивость навигации и связи к помехам;;data-python|Python для анализа полётных данных;;ctl-signals|Сигналы и спектры: что видит гироскоп;;ap-logs|Логи ArduPilot: разбор полёта;;ap-tuning|Тюнинг ArduPilot: AUTOTUNE, фильтры, notch по ESC;;ap-safety-fs|Отказоустойчивость: failsafe, геозона, FMEA полёта;;aero-wing|Аэродинамика крыла и самолётные режимы;;ap-heavy|Тяжёлые платформы: X8 и окто;;ap-quadplane|QuadPlane и tilt-rotor VTOL;;el-power-design|Схемотехника питания борта;;el-redundancy|Резервирование на борту: X8, гекса, питание и сигналы;;el-battery-packs|Сборки Li-Ion и LiFePO4: элементы, сварка, BMS;;el-emi|Помехи и электромагнитная совместимость;;el-peripherals|Подключение периферии: UART, I2C, CAN на практике;;rf-link-budget|Бюджет радиолинка и дальность;;comp-intro|Companion: зачем и где граница;;comp-mavlink|MAVLink и MAVSDK;;mav-protocol|MAVLink изнутри: кадр, CRC, диалекты, подпись;;mav-services|Микросервисы MAVLink: команды, параметры, миссии, потоки;;mav-routing|Маршрутизация и транспорт MAVLink: радио, 4G, несколько GCS;;mav-component|Свой компонент MAVLink: датчик, параметры, сообщения;;mav-sdk|Библиотеки над MAVLink: pymavlink, MAVSDK, MAVROS — что и когда;;emb-basics|Embedded: прерывания, таймеры, DMA, RTOS;;emb-protocols|UART, I2C, SPI, CAN на уровне сигналов и драйверов;;comp-raspberry|Raspberry Pi + ArduPilot;;ap-companion|Companion + ArduPilot: управление из кода;;eng-ci-configs|CI и версионирование конфигов и кода;;comp-esp32|ESP32 и периферия;;fw-reading|Как читать исходники прошивки: Betaflight и ArduPilot;;eng-systems|Системная инженерия: требования, FMEA, документация, тесты;;ros2-basics|ROS 2 для борта: узлы, топики, QoS, tf2, bag;;ros2-ardupilot|ROS 2 + ArduPilot: AP_DDS и MAVROS, один узел — два маршрута;;per-camera|Камеры и видеопоток на companion;;per-geometry|Геометрия камеры: от пикселя до точки на земле;;per-cv|Компьютерное зрение: от OpenCV до нейросетей;;per-edge-ml|ML на борту: бюджет, квантование, оценка, сопровождение;;per-visual-nav|Визуальная навигация: оптический поток, VIO, SLAM обзорно;;per-mapping|Картографирование: съёмка, геопривязка, фотограмметрия;;per-landing|Точная посадка по маркеру: ArUco, LANDING_TARGET, PLND;;per-depth-avoid|Глубина и обход препятствий: датчики, OBSTACLE_DISTANCE, алгоритмы;;per-tracking|Слежение и управление по цели" hidden></a></p>
+      <p class="gc-muted home-hero__note">Иди по порядку: каждый шаг опирается на предыдущие. Модули с тегом «общий» входят и в другие пути — пройденный один раз, такой модуль засчитан везде. Открывай уроки отсюда: тогда кнопки «назад/дальше» ведут по шагам именно этого пути.</p>
+    </section>
+      <section class="track gc-panel">
+        <p class="gc-label gc-muted">Этап</p>
+        <h2 class="gc-title">Основа</h2>
+        <ol class="track__modules">
+          <li class="track-module" data-module-id="f-physics">
+            <span class="track-module__num">01</span>
+            <a class="track-module__title" href="../m/f-physics.html?path=ardupilot">Как летает мультиротор</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L1 — Оператор">L1</span><span class="gc-tag" title="Общий модуль: засчитывается во всех путях, где он есть">общий</span><span class="gc-tag">~2 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+          </li>
+          <li class="track-module" data-module-id="f-mechanics">
+            <span class="track-module__num">02</span>
+            <a class="track-module__title" href="../m/f-mechanics.html?path=ardupilot">Механика полёта: силы, моменты, уравнения движения</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L1 — Оператор">L1</span><span class="gc-tag" title="Общий модуль: засчитывается во всех путях, где он есть">общий</span><span class="gc-tag">~3 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+          </li>
+          <li class="track-module" data-module-id="f-aero-props">
+            <span class="track-module__num">03</span>
+            <a class="track-module__title" href="../m/f-aero-props.html?path=ardupilot">Аэродинамика пропеллера и подбор силовой установки</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L2 — Интегратор">L2</span><span class="gc-tag" title="Общий модуль: засчитывается во всех путях, где он есть">общий</span><span class="gc-tag">~4 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+          </li>
+          <li class="track-module" data-module-id="f-electricity-101">
+            <span class="track-module__num">04</span>
+            <a class="track-module__title" href="../m/f-electricity-101.html?path=ardupilot">Электричество и измерения 101</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L1 — Оператор">L1</span><span class="gc-tag" title="Общий модуль: засчитывается во всех путях, где он есть">общий</span><span class="gc-tag">~3 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+          </li>
+          <li class="track-module" data-module-id="f-power">
+            <span class="track-module__num">05</span>
+            <a class="track-module__title" href="../m/f-power.html?path=ardupilot">Питание: LiPo, Li-Ion, BEC</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L1 — Оператор">L1</span><span class="gc-tag" title="Общий модуль: засчитывается во всех путях, где он есть">общий</span><span class="gc-tag">~3 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+          </li>
+          <li class="track-module" data-module-id="f-motors-esc">
+            <span class="track-module__num">06</span>
+            <a class="track-module__title" href="../m/f-motors-esc.html?path=ardupilot">Моторы, ESC и DShot</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L1 — Оператор">L1</span><span class="gc-tag" title="Общий модуль: засчитывается во всех путях, где он есть">общий</span><span class="gc-tag">~2 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+          </li>
+          <li class="track-module" data-module-id="f-fc-sensors">
+            <span class="track-module__num">07</span>
+            <a class="track-module__title" href="../m/f-fc-sensors.html?path=ardupilot">Полётный контроллер и сенсоры</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L1 — Оператор">L1</span><span class="gc-tag" title="Общий модуль: засчитывается во всех путях, где он есть">общий</span><span class="gc-tag">~2 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+          </li>
+          <li class="track-module" data-module-id="f-frame-mech">
+            <span class="track-module__num">08</span>
+            <a class="track-module__title" href="../m/f-frame-mech.html?path=ardupilot">Рама, механика и вибрации</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L2 — Интегратор">L2</span><span class="gc-tag" title="Общий модуль: засчитывается во всех путях, где он есть">общий</span><span class="gc-tag">~3 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+          </li>
+          <li class="track-module" data-module-id="f-safety">
+            <span class="track-module__num">09</span>
+            <a class="track-module__title" href="../m/f-safety.html?path=ardupilot">Безопасность и предполётный чек</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L1 — Оператор">L1</span><span class="gc-tag" title="Общий модуль: засчитывается во всех путях, где он есть">общий</span><span class="gc-tag">~1 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+          </li>
+          <li class="track-module" data-module-id="f-regulations">
+            <span class="track-module__num">10</span>
+            <a class="track-module__title" href="../m/f-regulations.html?path=ardupilot">Правила, зоны и ответственность оператора</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L1 — Оператор">L1</span><span class="gc-tag" title="Общий модуль: засчитывается во всех путях, где он есть">общий</span><span class="gc-tag">~2 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+          </li>
+          <li class="track-module" data-module-id="f-components-choice">
+            <span class="track-module__num">11</span>
+            <a class="track-module__title" href="../m/f-components-choice.html?path=ardupilot">Выбор компонентов под задачу и бюджет</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L1 — Оператор">L1</span><span class="gc-tag" title="Общий модуль: засчитывается во всех путях, где он есть">общий</span><span class="gc-tag">~3 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+          </li>
+          <li class="track-module" data-module-id="tools-overview">
+            <span class="track-module__num">12</span>
+            <a class="track-module__title" href="../m/tools-overview.html?path=ardupilot">Инструменты: Configurator, GCS, git</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L1 — Оператор">L1</span><span class="gc-tag" title="Общий модуль: засчитывается во всех путях, где он есть">общий</span><span class="gc-tag">~2 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+          </li>
+          <li class="track-module" data-module-id="eng-method-101">
+            <span class="track-module__num">13</span>
+            <a class="track-module__title" href="../m/eng-method-101.html?path=ardupilot">Инженерный метод 101: требования, архитектура, тесты, документация</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L1 — Оператор">L1</span><span class="gc-tag" title="Общий модуль: засчитывается во всех путях, где он есть">общий</span><span class="gc-tag">~3 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+          </li>
+        </ol>
+      </section>
+      <section class="track gc-panel">
+        <p class="gc-label gc-muted">Этап</p>
+        <h2 class="gc-title">Симулятор</h2>
+        <ol class="track__modules">
+          <li class="track-module" data-module-id="ap-intro">
+            <span class="track-module__num">14</span>
+            <a class="track-module__title" href="../m/ap-intro.html?path=ardupilot">Введение в ArduPilot</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L2 — Интегратор">L2</span><span class="gc-tag">~2 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+          </li>
+          <li class="track-module" data-module-id="ops-case-studies">
+            <span class="track-module__num">15</span>
+            <a class="track-module__title" href="../m/ops-case-studies.html?path=ardupilot">Разбор реальных аварий</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L1 — Оператор">L1</span><span class="gc-tag" title="Общий модуль: засчитывается во всех путях, где он есть">общий</span><span class="gc-tag">~3 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+          </li>
+          <li class="track-module" data-module-id="ap-sitl">
+            <span class="track-module__num">16</span>
+            <a class="track-module__title" href="../m/ap-sitl.html?path=ardupilot">SITL: дрон без дрона</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L2 — Интегратор">L2</span><span class="gc-tag">~3 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+          </li>
+          <li class="track-module" data-module-id="ap-missions">
+            <span class="track-module__num">17</span>
+            <a class="track-module__title" href="../m/ap-missions.html?path=ardupilot">Миссии и планирование</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L2 — Интегратор">L2</span><span class="gc-tag">~3 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+          </li>
+          <li class="track-module" data-module-id="ap-lua">
+            <span class="track-module__num">18</span>
+            <a class="track-module__title" href="../m/ap-lua.html?path=ardupilot">Lua: сценарии и fault injection</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L3 — Специалист">L3</span><span class="gc-tag">~3 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+          </li>
+          <li class="track-module" data-module-id="diag-troubleshooting">
+            <span class="track-module__num">19</span>
+            <a class="track-module__title" href="../m/diag-troubleshooting.html?path=ardupilot">Дерево диагностики: дрон не взлетает</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L1 — Оператор">L1</span><span class="gc-tag" title="Общий модуль: засчитывается во всех путях, где он есть">общий</span><span class="gc-tag">~3 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+          </li>
+        </ol>
+      </section>
+      <section class="track gc-panel">
+        <p class="gc-label gc-muted">Этап</p>
+        <h2 class="gc-title">Математика</h2>
+        <ol class="track__modules">
+          <li class="track-module" data-module-id="math-linalg-rot">
+            <span class="track-module__num">20</span>
+            <a class="track-module__title" href="../m/math-linalg-rot.html?path=ardupilot">Векторы, матрицы и вращения: язык ориентации</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L2 — Интегратор">L2</span><span class="gc-tag" title="Общий модуль: засчитывается во всех путях, где он есть">общий</span><span class="gc-tag">~4 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+          </li>
+          <li class="track-module" data-module-id="math-ode-dyn">
+            <span class="track-module__num">21</span>
+            <a class="track-module__title" href="../m/math-ode-dyn.html?path=ardupilot">Дифференциальные уравнения и динамика: от мотора до контура</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L3 — Специалист">L3</span><span class="gc-tag" title="Общий модуль: засчитывается во всех путях, где он есть">общий</span><span class="gc-tag">~5 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+          </li>
+          <li class="track-module" data-module-id="math-prob-est">
+            <span class="track-module__num">22</span>
+            <a class="track-module__title" href="../m/math-prob-est.html?path=ardupilot">Вероятность и оценивание: шум, гауссианы, слияние</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L3 — Специалист">L3</span><span class="gc-tag" title="Общий модуль: засчитывается во всех путях, где он есть">общий</span><span class="gc-tag">~4 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+          </li>
+        </ol>
+      </section>
+      <section class="track gc-panel">
+        <p class="gc-label gc-muted">Этап</p>
+        <h2 class="gc-title">Датчики и оценка состояния</h2>
+        <ol class="track__modules">
+          <li class="track-module" data-module-id="est-sensors">
+            <span class="track-module__num">23</span>
+            <a class="track-module__title" href="../m/est-sensors.html?path=ardupilot">Датчики IMU: физика, ошибки, калибровка</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L2 — Интегратор">L2</span><span class="gc-tag" title="Общий модуль: засчитывается во всех путях, где он есть">общий</span><span class="gc-tag">~3 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+          </li>
+          <li class="track-module" data-module-id="est-attitude">
+            <span class="track-module__num">24</span>
+            <a class="track-module__title" href="../m/est-attitude.html?path=ardupilot">Ориентация: углы Эйлера, кватернионы, комплементарный фильтр</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L3 — Специалист">L3</span><span class="gc-tag" title="Общий модуль: засчитывается во всех путях, где он есть">общий</span><span class="gc-tag">~4 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+          </li>
+          <li class="track-module" data-module-id="est-kalman">
+            <span class="track-module__num">25</span>
+            <a class="track-module__title" href="../m/est-kalman.html?path=ardupilot">Фильтр Калмана на пальцах и EKF</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L3 — Специалист">L3</span><span class="gc-tag">~4 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+          </li>
+          <li class="track-module" data-module-id="est-gnss">
+            <span class="track-module__num">26</span>
+            <a class="track-module__title" href="../m/est-gnss.html?path=ardupilot">GNSS: как работает GPS, ошибки, RTK</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L2 — Интегратор">L2</span><span class="gc-tag">~3 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+          </li>
+          <li class="track-module" data-module-id="ap-ekf">
+            <span class="track-module__num">27</span>
+            <a class="track-module__title" href="../m/ap-ekf.html?path=ardupilot">EKF и навигация</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L3 — Специалист">L3</span><span class="gc-tag">~3 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+          </li>
+          <li class="track-module" data-module-id="est-alt-sources">
+            <span class="track-module__num">28</span>
+            <a class="track-module__title" href="../m/est-alt-sources.html?path=ardupilot">Высота и позиция без GPS: баро, дальномер, оптический поток</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L3 — Специалист">L3</span><span class="gc-tag">~3 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+          </li>
+          <li class="track-module" data-module-id="nav-resilience">
+            <span class="track-module__num">29</span>
+            <a class="track-module__title" href="../m/nav-resilience.html?path=ardupilot">Устойчивость навигации и связи к помехам</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L3 — Специалист">L3</span><span class="gc-tag">~3 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+          </li>
+        </ol>
+      </section>
+      <section class="track gc-panel">
+        <p class="gc-label gc-muted">Этап</p>
+        <h2 class="gc-title">Логи, тюнинг, отказоустойчивость</h2>
+        <ol class="track__modules">
+          <li class="track-module" data-module-id="data-python">
+            <span class="track-module__num">30</span>
+            <a class="track-module__title" href="../m/data-python.html?path=ardupilot">Python для анализа полётных данных</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L2 — Интегратор">L2</span><span class="gc-tag" title="Общий модуль: засчитывается во всех путях, где он есть">общий</span><span class="gc-tag">~4 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+          </li>
+          <li class="track-module" data-module-id="ctl-signals">
+            <span class="track-module__num">31</span>
+            <a class="track-module__title" href="../m/ctl-signals.html?path=ardupilot">Сигналы и спектры: что видит гироскоп</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L2 — Интегратор">L2</span><span class="gc-tag" title="Общий модуль: засчитывается во всех путях, где он есть">общий</span><span class="gc-tag">~3 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+          </li>
+          <li class="track-module" data-module-id="ap-logs">
+            <span class="track-module__num">32</span>
+            <a class="track-module__title" href="../m/ap-logs.html?path=ardupilot">Логи ArduPilot: разбор полёта</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L3 — Специалист">L3</span><span class="gc-tag">~3 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+          </li>
+          <li class="track-module" data-module-id="ap-tuning">
+            <span class="track-module__num">33</span>
+            <a class="track-module__title" href="../m/ap-tuning.html?path=ardupilot">Тюнинг ArduPilot: AUTOTUNE, фильтры, notch по ESC</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L3 — Специалист">L3</span><span class="gc-tag">~3 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+          </li>
+          <li class="track-module" data-module-id="ap-safety-fs">
+            <span class="track-module__num">34</span>
+            <a class="track-module__title" href="../m/ap-safety-fs.html?path=ardupilot">Отказоустойчивость: failsafe, геозона, FMEA полёта</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L3 — Специалист">L3</span><span class="gc-tag">~3 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+          </li>
+        </ol>
+      </section>
+      <section class="track gc-panel">
+        <p class="gc-label gc-muted">Этап</p>
+        <h2 class="gc-title">Платформы</h2>
+        <ol class="track__modules">
+          <li class="track-module" data-module-id="aero-wing">
+            <span class="track-module__num">35</span>
+            <a class="track-module__title" href="../m/aero-wing.html?path=ardupilot">Аэродинамика крыла и самолётные режимы</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L3 — Специалист">L3</span><span class="gc-tag" title="Общий модуль: засчитывается во всех путях, где он есть">общий</span><span class="gc-tag">~4 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+          </li>
+          <li class="track-module" data-module-id="ap-heavy">
+            <span class="track-module__num">36</span>
+            <a class="track-module__title" href="../m/ap-heavy.html?path=ardupilot">Тяжёлые платформы: X8 и окто</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L3 — Специалист">L3</span><span class="gc-tag">~3 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+          </li>
+          <li class="track-module" data-module-id="ap-quadplane">
+            <span class="track-module__num">37</span>
+            <a class="track-module__title" href="../m/ap-quadplane.html?path=ardupilot">QuadPlane и tilt-rotor VTOL</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L3 — Специалист">L3</span><span class="gc-tag">~4 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+          </li>
+          <li class="track-module" data-module-id="el-power-design">
+            <span class="track-module__num">38</span>
+            <a class="track-module__title" href="../m/el-power-design.html?path=ardupilot">Схемотехника питания борта</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L2 — Интегратор">L2</span><span class="gc-tag" title="Общий модуль: засчитывается во всех путях, где он есть">общий</span><span class="gc-tag">~4 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+          </li>
+          <li class="track-module" data-module-id="el-redundancy">
+            <span class="track-module__num">39</span>
+            <a class="track-module__title" href="../m/el-redundancy.html?path=ardupilot">Резервирование на борту: X8, гекса, питание и сигналы</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L2 — Интегратор">L2</span><span class="gc-tag">~3 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+          </li>
+          <li class="track-module" data-module-id="el-battery-packs">
+            <span class="track-module__num">40</span>
+            <a class="track-module__title" href="../m/el-battery-packs.html?path=ardupilot">Сборки Li-Ion и LiFePO4: элементы, сварка, BMS</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L2 — Интегратор">L2</span><span class="gc-tag" title="Общий модуль: засчитывается во всех путях, где он есть">общий</span><span class="gc-tag">~4 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+          </li>
+          <li class="track-module" data-module-id="el-emi">
+            <span class="track-module__num">41</span>
+            <a class="track-module__title" href="../m/el-emi.html?path=ardupilot">Помехи и электромагнитная совместимость</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L2 — Интегратор">L2</span><span class="gc-tag" title="Общий модуль: засчитывается во всех путях, где он есть">общий</span><span class="gc-tag">~3 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+          </li>
+          <li class="track-module" data-module-id="el-peripherals">
+            <span class="track-module__num">42</span>
+            <a class="track-module__title" href="../m/el-peripherals.html?path=ardupilot">Подключение периферии: UART, I2C, CAN на практике</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L2 — Интегратор">L2</span><span class="gc-tag" title="Общий модуль: засчитывается во всех путях, где он есть">общий</span><span class="gc-tag">~3 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+          </li>
+          <li class="track-module" data-module-id="rf-link-budget">
+            <span class="track-module__num">43</span>
+            <a class="track-module__title" href="../m/rf-link-budget.html?path=ardupilot">Бюджет радиолинка и дальность</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L2 — Интегратор">L2</span><span class="gc-tag" title="Общий модуль: засчитывается во всех путях, где он есть">общий</span><span class="gc-tag">~3 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+          </li>
+        </ol>
+      </section>
+      <section class="track gc-panel">
+        <p class="gc-label gc-muted">Этап</p>
+        <h2 class="gc-title">Свой код на борту</h2>
+        <ol class="track__modules">
+          <li class="track-module" data-module-id="comp-intro">
+            <span class="track-module__num">44</span>
+            <a class="track-module__title" href="../m/comp-intro.html?path=ardupilot">Companion: зачем и где граница</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L2 — Интегратор">L2</span><span class="gc-tag" title="Общий модуль: засчитывается во всех путях, где он есть">общий</span><span class="gc-tag">~2 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+          </li>
+          <li class="track-module" data-module-id="comp-mavlink">
+            <span class="track-module__num">45</span>
+            <a class="track-module__title" href="../m/comp-mavlink.html?path=ardupilot">MAVLink и MAVSDK</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L2 — Интегратор">L2</span><span class="gc-tag" title="Общий модуль: засчитывается во всех путях, где он есть">общий</span><span class="gc-tag">~3 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+          </li>
+          <li class="track-module" data-module-id="mav-protocol">
+            <span class="track-module__num">46</span>
+            <a class="track-module__title" href="../m/mav-protocol.html?path=ardupilot">MAVLink изнутри: кадр, CRC, диалекты, подпись</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L3 — Специалист">L3</span><span class="gc-tag" title="Общий модуль: засчитывается во всех путях, где он есть">общий</span><span class="gc-tag">~4 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+          </li>
+          <li class="track-module" data-module-id="mav-services">
+            <span class="track-module__num">47</span>
+            <a class="track-module__title" href="../m/mav-services.html?path=ardupilot">Микросервисы MAVLink: команды, параметры, миссии, потоки</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L3 — Специалист">L3</span><span class="gc-tag" title="Общий модуль: засчитывается во всех путях, где он есть">общий</span><span class="gc-tag">~5 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+          </li>
+          <li class="track-module" data-module-id="mav-routing">
+            <span class="track-module__num">48</span>
+            <a class="track-module__title" href="../m/mav-routing.html?path=ardupilot">Маршрутизация и транспорт MAVLink: радио, 4G, несколько GCS</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L3 — Специалист">L3</span><span class="gc-tag" title="Общий модуль: засчитывается во всех путях, где он есть">общий</span><span class="gc-tag">~4 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+          </li>
+          <li class="track-module" data-module-id="mav-component">
+            <span class="track-module__num">49</span>
+            <a class="track-module__title" href="../m/mav-component.html?path=ardupilot">Свой компонент MAVLink: датчик, параметры, сообщения</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L3 — Специалист">L3</span><span class="gc-tag" title="Общий модуль: засчитывается во всех путях, где он есть">общий</span><span class="gc-tag">~5 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+          </li>
+          <li class="track-module" data-module-id="mav-sdk">
+            <span class="track-module__num">50</span>
+            <a class="track-module__title" href="../m/mav-sdk.html?path=ardupilot">Библиотеки над MAVLink: pymavlink, MAVSDK, MAVROS — что и когда</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L3 — Специалист">L3</span><span class="gc-tag" title="Общий модуль: засчитывается во всех путях, где он есть">общий</span><span class="gc-tag">~4 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+          </li>
+          <li class="track-module" data-module-id="emb-basics">
+            <span class="track-module__num">51</span>
+            <a class="track-module__title" href="../m/emb-basics.html?path=ardupilot">Embedded: прерывания, таймеры, DMA, RTOS</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L3 — Специалист">L3</span><span class="gc-tag" title="Общий модуль: засчитывается во всех путях, где он есть">общий</span><span class="gc-tag">~4 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+          </li>
+          <li class="track-module" data-module-id="emb-protocols">
+            <span class="track-module__num">52</span>
+            <a class="track-module__title" href="../m/emb-protocols.html?path=ardupilot">UART, I2C, SPI, CAN на уровне сигналов и драйверов</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L3 — Специалист">L3</span><span class="gc-tag">~3 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+          </li>
+          <li class="track-module" data-module-id="comp-raspberry">
+            <span class="track-module__num">53</span>
+            <a class="track-module__title" href="../m/comp-raspberry.html?path=ardupilot">Raspberry Pi + ArduPilot</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L3 — Специалист">L3</span><span class="gc-tag">~4 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+          </li>
+          <li class="track-module" data-module-id="ap-companion">
+            <span class="track-module__num">54</span>
+            <a class="track-module__title" href="../m/ap-companion.html?path=ardupilot">Companion + ArduPilot: управление из кода</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L3 — Специалист">L3</span><span class="gc-tag">~3 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+          </li>
+          <li class="track-module" data-module-id="eng-ci-configs">
+            <span class="track-module__num">55</span>
+            <a class="track-module__title" href="../m/eng-ci-configs.html?path=ardupilot">CI и версионирование конфигов и кода</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L3 — Специалист">L3</span><span class="gc-tag" title="Общий модуль: засчитывается во всех путях, где он есть">общий</span><span class="gc-tag">~3 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+          </li>
+          <li class="track-module" data-module-id="comp-esp32">
+            <span class="track-module__num">56</span>
+            <a class="track-module__title" href="../m/comp-esp32.html?path=ardupilot">ESP32 и периферия</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L2 — Интегратор">L2</span><span class="gc-tag">~4 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+          </li>
+          <li class="track-module" data-module-id="fw-reading">
+            <span class="track-module__num">57</span>
+            <a class="track-module__title" href="../m/fw-reading.html?path=ardupilot">Как читать исходники прошивки: Betaflight и ArduPilot</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L4 — Эксперт">L4</span><span class="gc-tag" title="Общий модуль: засчитывается во всех путях, где он есть">общий</span><span class="gc-tag">~4 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+          </li>
+          <li class="track-module" data-module-id="eng-systems">
+            <span class="track-module__num">58</span>
+            <a class="track-module__title" href="../m/eng-systems.html?path=ardupilot">Системная инженерия: требования, FMEA, документация, тесты</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L4 — Эксперт">L4</span><span class="gc-tag">~4 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+          </li>
+        </ol>
+      </section>
+      <section class="track gc-panel">
+        <p class="gc-label gc-muted">Этап</p>
+        <h2 class="gc-title">ROS 2 (рекомендуется)</h2>
+        <ol class="track__modules">
+          <li class="track-module" data-module-id="ros2-basics">
+            <span class="track-module__num">59</span>
+            <a class="track-module__title" href="../m/ros2-basics.html?path=ardupilot">ROS 2 для борта: узлы, топики, QoS, tf2, bag</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L3 — Специалист">L3</span><span class="gc-tag" title="Общий модуль: засчитывается во всех путях, где он есть">общий</span><span class="gc-tag">~5 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+          </li>
+          <li class="track-module" data-module-id="ros2-ardupilot">
+            <span class="track-module__num">60</span>
+            <a class="track-module__title" href="../m/ros2-ardupilot.html?path=ardupilot">ROS 2 + ArduPilot: AP_DDS и MAVROS, один узел — два маршрута</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L3 — Специалист">L3</span><span class="gc-tag" title="Общий модуль: засчитывается во всех путях, где он есть">общий</span><span class="gc-tag">~5 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+          </li>
+        </ol>
+      </section>
+      <section class="track gc-panel">
+        <p class="gc-label gc-muted">Этап</p>
+        <h2 class="gc-title">Восприятие</h2>
+        <ol class="track__modules">
+          <li class="track-module" data-module-id="per-camera">
+            <span class="track-module__num">61</span>
+            <a class="track-module__title" href="../m/per-camera.html?path=ardupilot">Камеры и видеопоток на companion</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L3 — Специалист">L3</span><span class="gc-tag" title="Общий модуль: засчитывается во всех путях, где он есть">общий</span><span class="gc-tag">~3 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+          </li>
+          <li class="track-module" data-module-id="per-geometry">
+            <span class="track-module__num">62</span>
+            <a class="track-module__title" href="../m/per-geometry.html?path=ardupilot">Геометрия камеры: от пикселя до точки на земле</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L3 — Специалист">L3</span><span class="gc-tag" title="Общий модуль: засчитывается во всех путях, где он есть">общий</span><span class="gc-tag">~4 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+          </li>
+          <li class="track-module" data-module-id="per-cv">
+            <span class="track-module__num">63</span>
+            <a class="track-module__title" href="../m/per-cv.html?path=ardupilot">Компьютерное зрение: от OpenCV до нейросетей</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L4 — Эксперт">L4</span><span class="gc-tag" title="Общий модуль: засчитывается во всех путях, где он есть">общий</span><span class="gc-tag">~5 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+          </li>
+          <li class="track-module" data-module-id="per-edge-ml">
+            <span class="track-module__num">64</span>
+            <a class="track-module__title" href="../m/per-edge-ml.html?path=ardupilot">ML на борту: бюджет, квантование, оценка, сопровождение</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L4 — Эксперт">L4</span><span class="gc-tag" title="Общий модуль: засчитывается во всех путях, где он есть">общий</span><span class="gc-tag">~4 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+          </li>
+          <li class="track-module" data-module-id="per-visual-nav">
+            <span class="track-module__num">65</span>
+            <a class="track-module__title" href="../m/per-visual-nav.html?path=ardupilot">Визуальная навигация: оптический поток, VIO, SLAM обзорно</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L4 — Эксперт">L4</span><span class="gc-tag">~4 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+          </li>
+          <li class="track-module" data-module-id="per-mapping">
+            <span class="track-module__num">66</span>
+            <a class="track-module__title" href="../m/per-mapping.html?path=ardupilot">Картографирование: съёмка, геопривязка, фотограмметрия</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L3 — Специалист">L3</span><span class="gc-tag">~5 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+          </li>
+          <li class="track-module" data-module-id="per-landing">
+            <span class="track-module__num">67</span>
+            <a class="track-module__title" href="../m/per-landing.html?path=ardupilot">Точная посадка по маркеру: ArUco, LANDING_TARGET, PLND</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L4 — Эксперт">L4</span><span class="gc-tag" title="Общий модуль: засчитывается во всех путях, где он есть">общий</span><span class="gc-tag">~5 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+          </li>
+          <li class="track-module" data-module-id="per-depth-avoid">
+            <span class="track-module__num">68</span>
+            <a class="track-module__title" href="../m/per-depth-avoid.html?path=ardupilot">Глубина и обход препятствий: датчики, OBSTACLE_DISTANCE, алгоритмы</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L4 — Эксперт">L4</span><span class="gc-tag" title="Общий модуль: засчитывается во всех путях, где он есть">общий</span><span class="gc-tag">~5 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+          </li>
+          <li class="track-module" data-module-id="per-tracking">
+            <span class="track-module__num">69</span>
+            <a class="track-module__title" href="../m/per-tracking.html?path=ardupilot">Слежение и управление по цели</a>
+            <span class="track-module__tags"><span class="gc-tag" title="L4 — Эксперт">L4</span><span class="gc-tag" title="Общий модуль: засчитывается во всех путях, где он есть">общий</span><span class="gc-tag">~4 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ПРОЙДЕН</span></span>
+          </li>
+        </ol>
+      </section>
+    <h2 class="gc-title section-title">Итоговые проекты</h2><a class="gc-card capstone-card" href="../cap/cap-heavy-or-vtol.html" data-module-id="cap-heavy-or-vtol"><p class="gc-label gc-muted">Итоговый проект</p><strong>Окто X8 с нагрузкой или VTOL-крыло</strong><div class="gc-muted">параметры, миссия в SITL, реальный полёт, разбор лога</div><div class="gc-card__meta"><span class="gc-tag" data-state="ok" data-done-badge hidden>СДАН</span></div></a><a class="gc-card capstone-card" href="../cap/cap-own-logic.html" data-module-id="cap-own-logic"><p class="gc-label gc-muted">Итоговый проект</p><strong>Своя логика + ESP32-модуль</strong><div class="gc-muted">работающий модуль, протокол обмена, README и тесты</div><div class="gc-card__meta"><span class="gc-tag" data-state="ok" data-done-badge hidden>СДАН</span></div></a><a class="gc-card capstone-card" href="../cap/cap-perception.html" data-module-id="cap-perception"><p class="gc-label gc-muted">Итоговый проект</p><strong>Слежение за целью</strong><div class="gc-muted">Companion детектирует объект в видео и ведёт аппарат за ним в SITL/в поле через GUIDED/Offboard</div><div class="gc-card__meta"><span class="gc-tag" data-state="ok" data-done-badge hidden>СДАН</span></div></a>
+  </main>
+  <footer class="gc-container site-footer gc-muted">
+    <p>Открытый курс · <a href="https://github.com/irreligious86/UAV-Education">исходники на GitHub</a> · <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">план развития</a> · <a href="../../curriculum/curriculum.html">для разработчика</a> · CC BY-NC-SA 4.0</p>
+  </footer>
+</body>
+</html>

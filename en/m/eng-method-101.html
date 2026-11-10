@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en" data-theme="dark" data-lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Инженерный метод 101: требования, архитектура, тесты, документация — UAV Student</title>
+  <meta name="description" content="записать требования к аппарату с ID и измеримыми критериями нарисовать архитектуру: блоки, интерфейсы, питание, данные спланировать тесты, которые проверяют каждое требование, и вести журнал изменений вести инженерную папку так, чтобы другой человек продолжил проект">
+  <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
+  <link rel="manifest" href="../../manifest.webmanifest">
+  <meta name="theme-color" content="#0b0f14">
+  <link rel="alternate" hreflang="ru" href="../../m/eng-method-101.html">
+  <link rel="alternate" hreflang="uk" href="../../uk/m/eng-method-101.html">
+  <link rel="alternate" hreflang="en" href="../../en/m/eng-method-101.html">
+  <script>/* go to the visitor's chosen language before anything paints (assets/i18n.js) */(function(){try{var c=localStorage.getItem('uav-lang'),h=document.documentElement.getAttribute('data-lang');if(!c||c===h||/[?&]lang=keep\b/.test(location.search))return;var l=document.querySelector('link[rel=alternate][hreflang="'+c+'"]');if(l)location.replace(l.href+location.search+location.hash)}catch(e){}})();</script>
+  <link rel="stylesheet" href="../../lib/ground-control-ui/dist/ground-control.css">
+  <link rel="stylesheet" href="../../assets/site.css">
+  <script src="../../lib/ground-control-ui/dist/ground-control.js" defer></script>
+  <script src="../../assets/i18n/en.js"></script>
+  <script src="../../assets/i18n.js"></script>
+  <script src="../../assets/progress-store.js" defer></script>
+  <script src="../../assets/backend-config.js" defer></script>
+  <script src="../../assets/account.js" defer></script>
+  <script src="../../assets/grading.js" defer></script>
+  <script src="../../assets/app.js" defer></script>
+  <script src="../../assets/uav-quiz.js" defer></script>
+  <script src="../../assets/uav-tasks.js" defer></script>
+  <script src="../../assets/offline.js" defer></script>
+</head>
+<body class="gc-root" data-base="../" data-root="../../">
+  <header class="site-header">
+    <div class="gc-container site-header__inner">
+      <a class="site-brand" href="../index.html"><span class="site-brand__mark" aria-hidden="true">◆</span> UAV Student</a>
+      <nav class="gc-nav" aria-label="Разделы сайта">
+        <a href="../index.html" aria-current="page">Курс</a>
+        <a href="../ref/index.html">Справочник</a>
+        <a href="../pages/glossary.html">Глоссарий</a>
+        <a href="../pages/fails.html">Фейлы</a>
+        <a href="../pages/search.html">Поиск</a>
+        <a href="../pages/progress.html">Мой прогресс</a>
+      </nav>
+      <nav class="lang-switch" aria-label="Язык"><a class="gc-tag" href="../../m/eng-method-101.html" data-lang-to="ru" hreflang="ru" lang="ru" title="Русский">RU</a><a class="gc-tag" href="../../uk/m/eng-method-101.html" data-lang-to="uk" hreflang="uk" lang="uk" title="Українська">UK</a><a class="gc-tag" href="../../en/m/eng-method-101.html" data-lang-to="en" hreflang="en" lang="en" title="English" aria-current="true" data-state="ok">EN</a></nav>
+    </div>
+  </header>
+  <main class="gc-container site-main">
+    <article class="module" data-module-page="eng-method-101">
+      <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-foundation">Фундамент</a><span>Инженерный метод 101: требования, архитектура, тесты, документация</span></p>
+      <h1 class="module-title">Инженерный метод 101: требования, архитектура, тесты, документация</h1>
+      <div class="module-tags"><span class="gc-tag" title="Уровень">L1 — Оператор</span><span class="gc-tag">чтение 30 мин</span><span class="gc-tag">учёба ~3 ч</span><span class="gc-tag">любая прошивка</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ОСВОЕН</span></div>
+      <p class="gc-muted module-score" data-module-score></p>
+      <p class="module-lead">Разница между сборщиком и инженером не в паяльнике, а в методе: инженер знает, *что* должен делать аппарат (требования), *как* он устроен (архитектура), *чем* доказано, что он это делает (тесты), и оставляет след, по которому другой человек продолжит работу (документация). Этот модуль вводит метод в самом начале курса — на примере первой сборки — и задаёт формат «инженерной папки», которая с этого момента обязательна в каждом итоговом проекте.</p>
+      <div class="gc-callout" data-state="ok"><strong>После модуля ты умеешь</strong><ul><li>записать требования к аппарату с ID и измеримыми критериями</li><li>нарисовать архитектуру: блоки, интерфейсы, питание, данные</li><li>спланировать тесты, которые проверяют каждое требование, и вести журнал изменений</li><li>вести инженерную папку так, чтобы другой человек продолжил проект</li></ul></div><p class="gc-muted">Перед этим модулем: <a href="f-safety.html">Безопасность и предполётный чек</a></p><div class="gc-callout lab"><p class="gc-label gc-muted">Лабораторная</p><strong>Инженерная папка первой сборки</strong><p class="gc-muted lab__hint">Сдано, когда отмечены все пункты:</p><ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="eng-method-101:lab:0"><span>Требования с ID (≥8), каждое измеримо</span></label></li><li><label><input type="checkbox" data-check-id="eng-method-101:lab:1"><span>Схема архитектуры с интерфейсами</span></label></li><li><label><input type="checkbox" data-check-id="eng-method-101:lab:2"><span>Таблица тестов: требование → тест → результат</span></label></li><li><label><input type="checkbox" data-check-id="eng-method-101:lab:3"><span>README и журнал изменений заведены в git</span></label></li></ul></div><div class="path-pos gc-muted"><span class="gc-label">В пути</span><ul><li data-path-pos="betaflight"><a href="../path/betaflight.html">Betaflight</a>: шаг 13 из 44 → <a href="bf-intro.html?path=betaflight">Введение в Betaflight</a></li><li data-path-pos="inav"><a href="../path/inav.html">INAV</a>: шаг 10 из 20 → <a href="link-protocols.html?path=inav">SBUS, CRSF и инверсия UART</a></li><li data-path-pos="ardupilot"><a href="../path/ardupilot.html">ArduPilot</a>: шаг 13 из 69 → <a href="ap-intro.html?path=ardupilot">Введение в ArduPilot</a></li><li data-path-pos="px4"><a href="../path/px4.html">PX4</a>: шаг 6 из 36 → <a href="est-sensors.html?path=px4">Датчики IMU: физика, ошибки, калибровка</a></li></ul></div>
+      <div class="gc-prose module-body">
+<div class="gc-callout" data-state="caution" data-untranslated><strong>Модуль ещё не переведён.</strong> Ниже — оригинал (Русский). Прогресс и оценки общие для всех языков.</div>
+<h2>Теория</h2>
+<h4 class="md-subheading">Зачем это новичку</h4>
+<p>Без требований любая настройка «сработала» или «не сработала» по ощущениям. Без архитектуры поиск неисправности — перебор. Без тестов ты не знаешь, что сломал вчерашним изменением. Без документации через месяц ты сам себе чужой человек. Метод стоит час в начале и экономит дни потом; в больших проектах (см. разбор аварий) его отсутствие стоит аппаратов и репутаций.</p>
+<h4 class="md-subheading">1. Требования</h4>
+<p>Требование — утверждение о том, что аппарат должен делать, которое можно <strong>проверить</strong>. Формат: ID, текст, критерий, способ проверки.</p>
+<div class="table-wrap md-table-wrap" tabindex="0"><table class="md-table"><thead><tr><th>ID</th><th>Требование</th><th>Критерий</th><th>Проверка</th></tr></thead><tbody><tr><td data-label="ID">R-01</td><td data-label="Требование">Висит с полезной нагрузкой 30 г не менее 15 мин</td><td data-label="Критерий">≥ 15:00 до 3.5 В/эл.</td><td data-label="Проверка">Полёт по таймеру, лог напряжения</td></tr><tr><td data-label="ID">R-02</td><td data-label="Требование">T/W при взлётной массе ≥ 2.5</td><td data-label="Критерий">расчёт и газ висения ≤ 40%</td><td data-label="Проверка">Таблица тяги + лог</td></tr><tr><td data-label="ID">R-03</td><td data-label="Требование">При потере связи садится на месте через 1.5 с</td><td data-label="Критерий">DROP через 1.5 с</td><td data-label="Проверка">Тест на земле без пропов + лог</td></tr><tr><td data-label="ID">R-04</td><td data-label="Требование">Видео и RC не теряются до 1 км на высоте 50 м</td><td data-label="Критерий">LQ &gt; 70%, видео без срывов</td><td data-label="Проверка">Полевой тест с записью</td></tr><tr><td data-label="ID">R-05</td><td data-label="Требование">Взлётная масса ≤ 900 г</td><td data-label="Критерий">весы</td><td data-label="Проверка">Взвешивание</td></tr></tbody></table></div>
+<p>Правила: измеримо («быстрый» — не требование, «разгон до 15 м/с за 3 с» — требование); одно требование — одна проверка; требования безопасности и законности — отдельной группой (S-xx); источник каждого числа указан.</p>
+<h4 class="md-subheading">2. Архитектура</h4>
+<p>Схема блоков и связей: что с чем соединено, по какому интерфейсу, откуда питание. Для дрона — три слоя на одном листе:</p>
+<ul><li><strong>Питание</strong>: АКБ → ESC; АКБ → BEC 5 В → FC, RX, GPS; BEC 9 В → VTX. Токи на стрелках.</li><li><strong>Данные</strong>: RX —CRSF→ FC (UART1); GPS —UBX→ FC (UART2); FC —DShot→ ESC; FC —MSP/OSD→ VTX (UART3); FC —Blackbox→ флеш.</li><li><strong>Механика</strong>: где что стоит, массы, центр масс.</li></ul>
+<p>Архитектура отвечает на вопрос «почему именно так» одной фразой на каждое решение: «GPS на мачте — компас подальше от силовых (см. помехи)».</p>
+<h4 class="md-subheading">3. Тесты</h4>
+<p>Каждое требование → тест с ожидаемым результатом, фактическим результатом и датой. Тесты бывают:</p>
+<ul><li><strong>Наземные</strong> (без пропов): порты, направление моторов, failsafe, предполётные проверки прошивки.</li><li><strong>Симуляционные</strong> (SITL для INAV/ArduPilot/PX4): миссии, failsafe, геозона.</li><li><strong>Стендовые</strong>: тяга, ток, спектр вибраций.</li><li><strong>Полётные</strong>: висение, дальность, время.</li></ul>
+<p>Правило регрессии: после любого изменения конфигурации прогоняются наземные тесты и тот полётный тест, которого касается изменение. Таблица тестов — живой документ.</p>
+<h4 class="md-subheading">4. Документация и журнал изменений</h4>
+<p>Минимальная инженерная папка (репозиторий git):</p>
+<pre class="cli-block"><code>my-drone/
+  README.md          — что это, для чего, текущее состояние, как запустить
+  requirements.md    — таблица требований
+  architecture.md    — схемы питания/данных/механики (картинки + текст)
+  tests.md           — таблица тестов с результатами
+  config/            — diff all / параметры с датой и версией прошивки
+  logs/              — ключевые логи с заметкой, что в них
+  CHANGELOG.md       — дата, что изменено, зачем, чем проверено</code></pre>
+<p>Журнал изменений — одна строка на изменение: <code>2026-11-08 — D-term 25→30 на roll; цель: убрать bounce-back; проверка: лог 0042, overshoot 12%→6%</code>. Это и есть «настройка по данным».</p>
+<h4 class="md-subheading">Трассируемость</h4>
+<p>Нить требование → архитектурное решение → тест → результат. Если её нет — проект нельзя сдать: непонятно, что доказано. В рубриках итоговых проектов курса это отдельная строка.</p>
+<h4 class="md-subheading">Как это выглядит на практике у профессионалов</h4>
+<p>Отчёты расследований аварий (модуль «Разбор реальных аварий») раз за разом называют одни и те же причины: не было требований к отказам, не было тестов failsafe, конфигурация менялась без записи, документация не соответствовала аппарату. Метод — это не бюрократия, а то, что отделяет инженерный аппарат от набора деталей.</p>
+<figure class="diagram" data-diagram="traceability"><div class="diagram__svg"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 200" width="100%" role="img" aria-labelledby="t" style="max-width:720px;display:block;margin:0 auto"><title id="t">Трассируемость: от требования до записи в журнале</title><style>text{font-family: var(--gc-font-mono, ui-monospace, Menlo, monospace); font-size: 12px;fill:currentColor} .m{fill:var(--gc-ink-muted, #8a93a3)} .a{fill:var(--gc-accent-hud, #5ef1d2)} .w{fill:var(--gc-signal-amber, #f0b24c)} .d{fill:var(--gc-signal-red, #e8636b)} .box{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:currentColor;stroke-width:1.2} .boxa{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6} .ln{stroke:currentColor;stroke-width:1.2;fill:none} .lna{stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6;fill:none} .lnm{stroke:var(--gc-ink-muted, #8a93a3);stroke-width:1;fill:none;stroke-dasharray:4 3} .t{font-size:11px} .b{font-weight:600}</style><defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker><marker id="ara" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--gc-accent-hud, #5ef1d2)"/></marker></defs><rect class="boxa" x="10.0" y="30" width="142.0" height="48" rx="6"/><text x="81.0" y="51.0" text-anchor="middle" class="b">Требование</text><text x="81.0" y="65.0" text-anchor="middle" class="b">измеримое</text><rect class="box" x="196.0" y="30" width="142.0" height="48" rx="6"/><text x="267.0" y="51.0" text-anchor="middle">Архитектура</text><text x="267.0" y="65.0" text-anchor="middle">кто отвечает</text><rect class="boxa" x="382.0" y="30" width="142.0" height="48" rx="6"/><text x="453.0" y="51.0" text-anchor="middle" class="b">Тест</text><text x="453.0" y="65.0" text-anchor="middle" class="b">как проверено</text><rect class="box" x="568.0" y="30" width="142.0" height="48" rx="6"/><text x="639.0" y="51.0" text-anchor="middle">Документ</text><text x="639.0" y="65.0" text-anchor="middle">и журнал</text><rect class="box" x="382.0" y="130" width="142.0" height="48" rx="6"/><text x="453.0" y="151.0" text-anchor="middle">Изменение →</text><text x="453.0" y="165.0" text-anchor="middle">какие тесты снова</text><path class="ln" d="M152.0 54.0 L196.0 54.0" marker-end="url(#ar)"/><path class="ln" d="M338.0 54.0 L382.0 54.0" marker-end="url(#ar)"/><path class="ln" d="M524.0 54.0 L568.0 54.0" marker-end="url(#ar)"/><path class="ln" d="M453.0 78 L453.0 130" marker-end="url(#ar)"/><text x="10" y="150" text-anchor="start" class="m t">У каждого требования —</text><text x="10" y="164" text-anchor="start" class="m t">тест, у теста — требование</text></svg></div><figcaption class="gc-muted">Трассируемость: у каждого требования есть тест, у каждого теста — требование; изменение показывает, какие тесты прогнать снова.</figcaption><div class="diagram__hint">Схему можно прокрутить по горизонтали</div></figure>
+
+<h2>Практика</h2>
+<h4 class="md-subheading">Шаг 1. Репозиторий</h4>
+<p>Создать репозиторий <code>my-drone</code> с файлами по шаблону выше. В README — три абзаца: что за аппарат, для чего, текущее состояние.</p>
+<h4 class="md-subheading">Шаг 2. Требования</h4>
+<p>Таблица из ≥ 8 требований к своей первой сборке: 4–5 функциональных (время, T/W, дальность, масса), 3 безопасности (failsafe, зоны, предполётный чек-лист), 1–2 эксплуатационных (ремонтопригодность, бюджет). Каждое — с критерием и способом проверки.</p>
+<h4 class="md-subheading">Шаг 3. Архитектура</h4>
+<p>Одна схема питания и данных (от руки, фото — нормально) с подписанными интерфейсами и токами.</p>
+<h4 class="md-subheading">Шаг 4. Тесты</h4>
+<p>Таблица тестов на каждое требование. Выполнить те, что уже можно (взвешивание, расчёт T/W, наземные проверки); остальные — с пометкой «запланирован».</p>
+<h4 class="md-subheading">Шаг 5. Первый коммит и запись в журнал</h4>
+<p>Коммит с сообщением, что сделано; первая строка CHANGELOG.</p>
+<h4 class="md-subheading">Примеры требований, которые можно проверить</h4>
+<div class="table-wrap md-table-wrap" tabindex="0"><table class="md-table"><thead><tr><th>ID</th><th>Требование</th><th>Метод</th><th>Тест</th></tr></thead><tbody><tr><td data-label="ID">REQ-01</td><td data-label="Требование">Висение не меньше 12 минут с батареей 6S 4000 мА·ч</td><td data-label="Метод">тест</td><td data-label="Тест">T-01: висение до 3.5 В на элемент, таймер</td></tr><tr><td data-label="ID">REQ-02</td><td data-label="Требование">T/W не меньше 3 со всем полётным оборудованием</td><td data-label="Метод">расчёт + взвешивание</td><td data-label="Тест">T-02</td></tr><tr><td data-label="ID">REQ-03</td><td data-label="Требование">Взлётная масса не больше 900 г</td><td data-label="Метод">взвешивание</td><td data-label="Тест">T-03</td></tr><tr><td data-label="ID">REQ-06</td><td data-label="Требование">При потере RC дольше 1 с — failsafe-посадка или RTH</td><td data-label="Метод">тест</td><td data-label="Тест">T-06: выключение пульта на стенде без пропов, затем в поле</td></tr><tr><td data-label="ID">REQ-07</td><td data-label="Требование">Полёты только вне запретных зон</td><td data-label="Метод">проверка карты</td><td data-label="Тест">T-07: карта площадки в папке</td></tr></tbody></table></div>
+<p>«Аппарат должен быть надёжным» — не требование: его нельзя проверить. «Ни одного отказа за 20 полётов подряд» — уже можно.</p>
+<h4 class="md-subheading">Что должно получиться</h4>
+<ul><li>В репозитории есть <code>README.md</code>, <code>requirements.md</code>, <code>architecture.jpg</code> (фото схемы подойдёт), <code>tests.md</code>, <code>CHANGELOG.md</code>.</li><li>Каждая строка таблицы тестов ссылается на требование, у каждого требования есть хотя бы один тест. Выполненные тесты — с датой и результатом, запланированные — с пометкой.</li><li>Первая строка CHANGELOG: <code>2026-11-09 — инженерная папка создана, T/W посчитан (3.4), масса 860 г</code>. Числа — твои.</li></ul>
+<p>Лабораторная засчитывается, когда в git лежат требования с ID (8 и больше, каждое измеримо), схема архитектуры с подписанными интерфейсами и токами, таблица «требование → тест → результат» и заведённые README и журнал изменений.</p>
+
+<h2>Диагностика</h2>
+<div class="diag-groups"><article class="diag-item"><h4><strong>Симптом:</strong> требования звучат как пожелания («надёжный», «быстрый»)</h4><ul><li>Возможная причина: нет критерия и способа проверки.</li><li>Что сделать: переписать с числом и тестом; если числа нет — это не требование, а цель.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> после настройки не ясно, стало лучше или хуже</h4><ul><li>Возможная причина: нет метрики и лога «до».</li><li>Что сделать: перед изменением — лог и метрика; запись в журнал с результатом.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> через месяц непонятно, почему параметр такой</h4><ul><li>Возможная причина: изменение без записи.</li><li>Что сделать: правило «нет строки в CHANGELOG — нет изменения».</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> другой человек не может повторить сборку</h4><ul><li>Возможная причина: README описывает мечту, а не аппарат.</li><li>Что сделать: README — текущее состояние, версии прошивки, конфиг в репозитории.</li></ul></article></div>
+
+<h2>Чек-лист</h2>
+<ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="eng-method-101:0"><span>Репозиторий инженерной папки создан</span></label></li><li><label><input type="checkbox" data-check-id="eng-method-101:1"><span>≥ 8 требований с критерием и способом проверки</span></label></li><li><label><input type="checkbox" data-check-id="eng-method-101:2"><span>Схема питания и данных с интерфейсами</span></label></li><li><label><input type="checkbox" data-check-id="eng-method-101:3"><span>Таблица тестов связана с требованиями</span></label></li><li><label><input type="checkbox" data-check-id="eng-method-101:4"><span>Журнал изменений ведётся с первого изменения</span></label></li></ul>
+
+<h2>Источники</h2>
+<ul class="refs"><li><a href="https://www.nasa.gov/reference/systems-engineering-handbook/" target="_blank" rel="noopener noreferrer">Systems Engineering Handbook — NASA (free PDF)</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://en.wikipedia.org/wiki/Requirements_engineering" target="_blank" rel="noopener noreferrer">Requirements engineering (overview, further reading) — Wikipedia</a> <span class="gc-tag">secondary</span></li><li><a href="https://ardupilot.org/copter/docs/common-diagnosing-problems-using-logs.html" target="_blank" rel="noopener noreferrer">Log Analysis and Tuning Workflow — ArduPilot (example of evidence-based tuning)</a> <span class="gc-tag" data-state="info">primary</span></li></ul>
+<h2>Проверь себя</h2>
+<uav-quiz src="../quiz/eng-method-101.json" module="eng-method-101"></uav-quiz>
+      </div>
+      <div class="module-done"><gc-button variant="secondary" data-done-toggle="eng-method-101">Отметить как пройденный</gc-button></div>
+      <section class="related" aria-label="Смежные модули"><p class="gc-label gc-muted">Смежные модули</p><div class="gc-grid ref-grid"><a class="gc-card" href="f-components-choice.html"><strong>Выбор компонентов под задачу и бюджет</strong><div class="gc-card__meta"><span class="gc-tag" title="L1 — Оператор">L1</span></div></a><a class="gc-card" href="tools-overview.html"><strong>Инструменты: Configurator, GCS, git</strong><div class="gc-card__meta"><span class="gc-tag" title="L1 — Оператор">L1</span></div></a><a class="gc-card" href="f-safety.html"><strong>Безопасность и предполётный чек</strong><div class="gc-card__meta"><span class="gc-tag" title="L1 — Оператор">L1</span></div></a></div></section>
+      <nav class="pager" aria-label="Соседние модули" data-track-pager><a class="gc-card pager__prev" href="f-components-choice.html"><span class="gc-label gc-muted">Назад · трек</span><br>Выбор компонентов под задачу и бюджет</a><a class="gc-card pager__next" href="tools-overview.html"><span class="gc-label gc-muted">Дальше · трек</span><br>Инструменты: Configurator, GCS, git</a></nav><nav class="pager" aria-label="Соседние шаги пути Betaflight" data-path-pager="betaflight" hidden><a class="gc-card pager__prev" href="tools-overview.html?path=betaflight"><span class="gc-label gc-muted">Назад · путь Betaflight</span><br>Инструменты: Configurator, GCS, git</a><a class="gc-card pager__next" href="bf-intro.html?path=betaflight"><span class="gc-label gc-muted">Дальше · шаг 14 из 44</span><br>Введение в Betaflight</a></nav><nav class="pager" aria-label="Соседние шаги пути INAV" data-path-pager="inav" hidden><a class="gc-card pager__prev" href="tools-overview.html?path=inav"><span class="gc-label gc-muted">Назад · путь INAV</span><br>Инструменты: Configurator, GCS, git</a><a class="gc-card pager__next" href="link-protocols.html?path=inav"><span class="gc-label gc-muted">Дальше · шаг 11 из 20</span><br>SBUS, CRSF и инверсия UART</a></nav><nav class="pager" aria-label="Соседние шаги пути ArduPilot" data-path-pager="ardupilot" hidden><a class="gc-card pager__prev" href="tools-overview.html?path=ardupilot"><span class="gc-label gc-muted">Назад · путь ArduPilot</span><br>Инструменты: Configurator, GCS, git</a><a class="gc-card pager__next" href="ap-intro.html?path=ardupilot"><span class="gc-label gc-muted">Дальше · шаг 14 из 69</span><br>Введение в ArduPilot</a></nav><nav class="pager" aria-label="Соседние шаги пути PX4" data-path-pager="px4" hidden><a class="gc-card pager__prev" href="tools-overview.html?path=px4"><span class="gc-label gc-muted">Назад · путь PX4</span><br>Инструменты: Configurator, GCS, git</a><a class="gc-card pager__next" href="est-sensors.html?path=px4"><span class="gc-label gc-muted">Дальше · шаг 7 из 36</span><br>Датчики IMU: физика, ошибки, калибровка</a></nav>
+    </article>
+  </main>
+  <footer class="gc-container site-footer gc-muted">
+    <p>Открытый курс · <a href="https://github.com/irreligious86/UAV-Education">исходники на GitHub</a> · <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">план развития</a> · <a href="../../curriculum/curriculum.html">для разработчика</a> · CC BY-NC-SA 4.0</p>
+  </footer>
+</body>
+</html>

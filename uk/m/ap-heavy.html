@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="uk" data-theme="dark" data-lang="uk">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Тяжёлые платформы: X8 и окто — UAV Student</title>
+  <meta name="description" content="настроить coaxial-раму и моторную раскладку проверить отказоустойчивость">
+  <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
+  <link rel="manifest" href="../../manifest.webmanifest">
+  <meta name="theme-color" content="#0b0f14">
+  <link rel="alternate" hreflang="ru" href="../../m/ap-heavy.html">
+  <link rel="alternate" hreflang="uk" href="../../uk/m/ap-heavy.html">
+  <link rel="alternate" hreflang="en" href="../../en/m/ap-heavy.html">
+  <script>/* go to the visitor's chosen language before anything paints (assets/i18n.js) */(function(){try{var c=localStorage.getItem('uav-lang'),h=document.documentElement.getAttribute('data-lang');if(!c||c===h||/[?&]lang=keep\b/.test(location.search))return;var l=document.querySelector('link[rel=alternate][hreflang="'+c+'"]');if(l)location.replace(l.href+location.search+location.hash)}catch(e){}})();</script>
+  <link rel="stylesheet" href="../../lib/ground-control-ui/dist/ground-control.css">
+  <link rel="stylesheet" href="../../assets/site.css">
+  <script src="../../lib/ground-control-ui/dist/ground-control.js" defer></script>
+  <script src="../../assets/i18n/uk.js"></script>
+  <script src="../../assets/i18n.js"></script>
+  <script src="../../assets/progress-store.js" defer></script>
+  <script src="../../assets/backend-config.js" defer></script>
+  <script src="../../assets/account.js" defer></script>
+  <script src="../../assets/grading.js" defer></script>
+  <script src="../../assets/app.js" defer></script>
+  <script src="../../assets/uav-quiz.js" defer></script>
+  <script src="../../assets/uav-tasks.js" defer></script>
+  <script src="../../assets/offline.js" defer></script>
+</head>
+<body class="gc-root" data-base="../" data-root="../../">
+  <header class="site-header">
+    <div class="gc-container site-header__inner">
+      <a class="site-brand" href="../index.html"><span class="site-brand__mark" aria-hidden="true">◆</span> UAV Student</a>
+      <nav class="gc-nav" aria-label="Разделы сайта">
+        <a href="../index.html" aria-current="page">Курс</a>
+        <a href="../ref/index.html">Справочник</a>
+        <a href="../pages/glossary.html">Глоссарий</a>
+        <a href="../pages/fails.html">Фейлы</a>
+        <a href="../pages/search.html">Поиск</a>
+        <a href="../pages/progress.html">Мой прогресс</a>
+      </nav>
+      <nav class="lang-switch" aria-label="Язык"><a class="gc-tag" href="../../m/ap-heavy.html" data-lang-to="ru" hreflang="ru" lang="ru" title="Русский">RU</a><a class="gc-tag" href="../../uk/m/ap-heavy.html" data-lang-to="uk" hreflang="uk" lang="uk" title="Українська" aria-current="true" data-state="ok">UK</a><a class="gc-tag" href="../../en/m/ap-heavy.html" data-lang-to="en" hreflang="en" lang="en" title="English">EN</a></nav>
+    </div>
+  </header>
+  <main class="gc-container site-main">
+    <article class="module" data-module-page="ap-heavy">
+      <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-autonomy">Автономия</a><span>Тяжёлые платформы: X8 и окто</span></p>
+      <h1 class="module-title">Тяжёлые платформы: X8 и окто</h1>
+      <div class="module-tags"><span class="gc-tag" title="Уровень">L3 — Специалист</span><span class="gc-tag">чтение 25 мин</span><span class="gc-tag">учёба ~3 ч</span><span class="gc-tag">ArduPilot 4.5+</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ОСВОЕН</span></div>
+      <p class="gc-muted module-score" data-module-score></p>
+      <p class="module-lead">Восьмимоторный аппарат с пропами 15–17&quot; — другой зверь, чем пятидюймовик: медленные моторы, огромная инерция, низкое отношение тяги к весу и цена ошибки в виде дорогой полезной нагрузки. Модуль разбирает коаксиальную схему X8 на примере сборки на двух рамах Tarot Ironman 650, настройку тяги и вибраций в ArduPilot и проверку отказоустойчивости до первого полёта с грузом.</p>
+      <div class="gc-callout" data-state="ok"><strong>После модуля ты умеешь</strong><ul><li>настроить coaxial-раму и моторную раскладку</li><li>проверить отказоустойчивость</li></ul></div><p class="gc-muted">Перед этим модулем: <a href="ap-logs.html">Логи ArduPilot: разбор полёта</a></p><div class="gc-callout lab"><p class="gc-label gc-muted">Лабораторная</p><strong>Окто в SITL и на столе</strong><p class="gc-muted lab__hint">Сдано, когда отмечены все пункты:</p><ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="ap-heavy:lab:0"><span>Отказ мотора отработан в SITL</span></label></li><li><label><input type="checkbox" data-check-id="ap-heavy:lab:1"><span>Motor Test без пропов совпадает со схемой OctaQuad X</span></label></li><li><label><input type="checkbox" data-check-id="ap-heavy:lab:2"><span>T/W посчитан с поправкой на коаксиал</span></label></li><li><label><input type="checkbox" data-check-id="ap-heavy:lab:3"><span>Первый лог проверен: VIBE, газ висения, просадка АКБ</span></label></li></ul></div><div class="path-pos gc-muted"><span class="gc-label">В пути</span><ul><li data-path-pos="ardupilot"><a href="../path/ardupilot.html">ArduPilot</a>: шаг 36 из 69 → <a href="ap-quadplane.html?path=ardupilot">QuadPlane и tilt-rotor VTOL</a></li></ul></div>
+      <div class="gc-prose module-body">
+<div class="gc-callout" data-state="caution" data-untranslated><strong>Модуль ещё не переведён.</strong> Ниже — оригинал (Русский). Прогресс и оценки общие для всех языков.</div>
+<h2>Теория</h2>
+<h4 class="md-subheading">X8 (OctaQuad): за и против</h4>
+<p>X8 — четыре луча, на каждом два мотора соосно: верхний и нижний, вращаются в разные стороны.</p>
+<ul><li><strong>За:</strong> восемь моторов на габарите квадрокоптера; отказ одного мотора не роняет аппарат; компактность при транспортировке.</li><li><strong>Против:</strong> нижний проп работает в потоке верхнего, поэтому коаксиальная пара даёт меньше тяги, чем два отдельных пропа. Ориентир потери — порядка 15% (зависит от пропов и расстояния между ними).</li></ul>
+<p>В ArduPilot это <code>FRAME_CLASS = 4</code> (OctaQuad) и <code>FRAME_TYPE = 1</code> (X). Порядок моторов и направления — строго по схеме OctaQuad X из документации.</p>
+<h4 class="md-subheading">Пример сборки</h4>
+<p>Учебная платформа курса: две рамы Tarot Ironman 650, 8 моторов Tarot 4008 380KV, 8 ESC Flycolor 45A, питание 6S Li-Ion. Низкий KV и большие пропы — ставка на эффективность и время полёта, а не на динамику. Li-Ion выбран из-за умеренного тока на висении.</p>
+<h4 class="md-subheading">Тяга и кривая газа</h4>
+<ul><li><code>MOT_THST_HOVER</code> — газ висения, ArduPilot уточняет его сам в полёте. От него зависит работа удержания высоты.</li><li><code>MOT_THST_EXPO</code> — линеаризация тяги. Большие пропы обычно требуют большего значения, чем пятидюймовики.</li><li><code>MOT_SPIN_ARM</code> и <code>MOT_SPIN_MIN</code> — обороты при арме и минимум в полёте: моторы должны уверенно крутиться, но не поднимать аппарат.</li><li>Протокол моторов <code>MOT_PWM_TYPE</code>: DShot, если ESC его поддерживают, иначе PWM с калибровкой ESC.</li></ul>
+<p>Для стартовых значений в Mission Planner есть помощник Initial Tune Parameters: он считает базовые фильтры и ограничения по размеру пропа и напряжению.</p>
+<h4 class="md-subheading">Вибрации</h4>
+<p>Большие медленные пропы дают низкочастотные вибрации, которые хуже фильтруются. EKF на вибрациях начинает «плыть»: в логах это видно как рост <code>VIBE</code> и клиппинг акселерометра, в полёте — как потеря высоты или сообщения об отказе IMU. Лекарство в порядке приоритета: балансировка пропов и моторов, жёсткость рамы, демпфирование полётника, и только потом фильтры. Гармонический notch-фильтр (<code>INS_HNTCH_*</code>) следует за оборотами по газу или по ESC-телеметрии — аналог RPM-фильтра Betaflight.</p>
+<h4 class="md-subheading">Отказоустойчивость</h4>
+<p>Главная причина брать окто — пережить отказ мотора. Но это нужно проверить, а не предположить: в SITL с applet отказа мотора (модуль про Lua), затем на реальном аппарате на высоте и без груза.</p>
+<h4 class="md-subheading">Числа для платформы курса (X8, 2×Tarot 650, 4008 380KV, 15×5.5, 6S Li-Ion, ~6 кг)</h4>
+<p>Из модуля «Аэродинамика пропеллера»: висение ≈ 880 г тяги на мотор с учётом коаксиальных потерь, ~7 А на мотор, 56 А на пакет; Li-Ion 6S 20 А·ч → ~17 мин висения; <code>MOT_THST_HOVER</code> ≈ 0.3–0.35; <code>MOT_THST_EXPO</code> 0.65–0.7 (15&quot;); <code>INS_GYRO_FILTER</code> ≈ 30 Гц (между 40 Гц для 10&quot; и 20 Гц для 20&quot;); <code>ATC_RAT_*_FLTD</code> 10; стартовые <code>ATC_RAT_RLL_P/I</code> 0.08, D 0.003, <code>ATC_ANG_RLL_P</code> 4.5; <code>ATC_ACC_R/P_MAX</code> ≈ 500–700 °/с² (до 4.7 — <code>ATC_ACCEL_R/P_MAX</code> в cdeg/s², 50 000–70 000; медленнее, чем 5&quot;); <code>PSC_D_ACC_P</code> (до 4.7 — <code>PSC_ACCZ_P</code>; в 4.7 значение ×0.1) ≈ 0.3× газа висения. Провода лучей 12 AWG, XT90 (модуль «Резервирование»). Основная гармоника моторов на висении ~55–65 Гц (3400–3900 об/мин) — <code>INS_HNTCH_*</code> по ESC-телеметрии, <code>INS_HNTCH_HMNCS = 7</code> (гармоники 1–3 до 200 Гц), <code>INS_HNTCH_FREQ</code> минимум 50.</p>
+<h4 class="md-subheading">Отказ мотора: что делает миксер</h4>
+<p><code>AP_MotorsMatrix::output_armed_stabilizing()</code> распределяет roll/pitch, затем yaw (с минимальным запасом <code>MOT_YAW_HEADROOM</code>), а throttle — тем, что осталось в пределах <code>MOT_YAW_HEADROOM</code> (200 по умолчанию, в PWM-единицах запаса на рыскание). При отказе одного мотора X8 соосный партнёр и противоположная пара берут нагрузку; визуально — лёгкая просадка и рост <code>RCOU</code> соседних каналов. Проверка: applet <code>motor_failure_test.lua</code> (<code>MOT_STOP_BITMASK</code>, тумблер Scripting1) сначала в SITL (<code>-f octa-quad</code>), затем в поле на высоте 20+ м без груза с наблюдателем.</p>
+<h4 class="md-subheading">Эксплуатация большого аппарата</h4>
+<p>Пред-армовый ритуал удлиняется: 8 пропов (затяжка, трещины), 8 ESC (нагрев после предыдущего полёта), балансир Li-Ion по группам, GPS fix до 14+ спутников, геозона, площадка 30 м радиусом без людей, пищалка и строп для переноски. Любое изменение массы (груз, АКБ) → пересчёт <code>MOT_THST_HOVER</code> (обучится) и проверка <code>PSC_D_ACC_*</code> (до 4.7 — <code>PSC_ACCZ_*</code>). Логи — каждый полёт, <code>VIBE</code> &lt; 15 на больших пропах — норма, &gt; 30 — искать.</p>
+<figure class="diagram" data-diagram="x8-layout"><div class="diagram__svg"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 200" width="100%" role="img" aria-labelledby="t" style="max-width:720px;display:block;margin:0 auto"><title id="t">X8: четыре луча, на каждом соосная пара</title><style>text{font-family: var(--gc-font-mono, ui-monospace, Menlo, monospace); font-size: 12px;fill:currentColor} .m{fill:var(--gc-ink-muted, #8a93a3)} .a{fill:var(--gc-accent-hud, #5ef1d2)} .w{fill:var(--gc-signal-amber, #f0b24c)} .d{fill:var(--gc-signal-red, #e8636b)} .box{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:currentColor;stroke-width:1.2} .boxa{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6} .ln{stroke:currentColor;stroke-width:1.2;fill:none} .lna{stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6;fill:none} .lnm{stroke:var(--gc-ink-muted, #8a93a3);stroke-width:1;fill:none;stroke-dasharray:4 3} .t{font-size:11px} .b{font-weight:600}</style><defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker><marker id="ara" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--gc-accent-hud, #5ef1d2)"/></marker></defs><rect class="box" x="10.0" y="30" width="142.0" height="48" rx="6"/><text x="81.0" y="58.0" text-anchor="middle">АКБ 6S Li-Ion</text><rect class="boxa" x="196.0" y="30" width="142.0" height="48" rx="6"/><text x="267.0" y="58.0" text-anchor="middle" class="b">ESC ×8</text><rect class="boxa" x="382.0" y="30" width="142.0" height="48" rx="6"/><text x="453.0" y="51.0" text-anchor="middle" class="b">4 пары верх/низ</text><text x="453.0" y="65.0" text-anchor="middle" class="b">вращение встречное</text><rect class="box" x="568.0" y="30" width="142.0" height="48" rx="6"/><text x="639.0" y="51.0" text-anchor="middle">Миксер</text><text x="639.0" y="65.0" text-anchor="middle">AP_MotorsMatrix</text><rect class="boxa" x="382.0" y="130" width="142.0" height="48" rx="6"/><text x="453.0" y="151.0" text-anchor="middle" class="b">Отказ мотора:</text><text x="453.0" y="165.0" text-anchor="middle" class="b">соосный партнёр</text><rect class="box" x="568.0" y="130" width="142.0" height="48" rx="6"/><text x="639.0" y="151.0" text-anchor="middle">MOT_YAW_HEADROOM</text><text x="639.0" y="165.0" text-anchor="middle">запас на рыскание</text><path class="ln" d="M152.0 54.0 L196.0 54.0" marker-end="url(#ar)"/><path class="ln" d="M338.0 54.0 L382.0 54.0" marker-end="url(#ar)"/><path class="lna" d="M568.0 54.0 L524.0 54.0" marker-end="url(#ara)"/><path class="ln" d="M453.0 78 L453.0 130" marker-end="url(#ar)"/><path class="ln" d="M639.0 78 L639.0 130" marker-end="url(#ar)"/><text x="10" y="150" text-anchor="start" class="m t">Висение ≈ 30–35 % газа</text><text x="10" y="164" text-anchor="start" class="m t">— запас на отказ</text></svg></div><figcaption class="gc-muted">X8: четыре луча с соосными парами; при отказе мотора нагрузку берут соосный партнёр и противоположная пара, а запас газа на висении — это запас на отказ.</figcaption><div class="diagram__hint">Схему можно прокрутить по горизонтали</div></figure>
+
+<h2>Практика</h2>
+<h4 class="md-subheading">Шаг 1. Сначала SITL</h4>
+<pre class="cli-block"><code>sim_vehicle.py -v ArduCopter -f octa-quad --console --map</code></pre>
+<p>Отработай взлёт, LOITER, RTL и отказ мотора до того, как трогать железо.</p>
+<h4 class="md-subheading">Шаг 2. Конфигурация реальной рамы</h4>
+<ol><li><code>FRAME_CLASS = 4</code>, <code>FRAME_TYPE = 1</code>, перезагрузка.</li><li>Без пропов — Motor Test по каждому мотору: порядок и направление по схеме OctaQuad X.</li><li>Калибровка ESC (для PWM) или выбор DShot.</li><li>Initial Tune Parameters по размеру пропа и числу банок.</li><li>Проверка: все пропы одной модели, правильное направление и затяжка.</li></ol>
+<h4 class="md-subheading">Шаг 3. Первые полёты</h4>
+<ol><li>Висение низко в STABILIZE, затем ALT_HOLD, с логированием.</li><li>Анализ лога: <code>VIBE</code> (вибрации и клиппинг), реальный газ висения, ток и просадка АКБ.</li><li>Только потом AUTOTUNE — по одной оси за раз, в тихую погоду.</li><li>Тест отказа мотора — на высоте, без груза, с готовностью перехватить управление.</li></ol>
+<h4 class="md-subheading">Что должно получиться и что записать</h4>
+<ul><li><strong>SITL.</strong> Рама <code>octa-quad</code> в SITL — та же OctaQuad: восемь моторов, четыре коаксиальные пары. Отказ одного мотора (<code>SIM_ENGINE_FAIL</code> — маска моторов, <code>SIM_ENGINE_MUL = 0</code>) на окто переживается: аппарат кренится, оставшиеся моторы добирают тягу, позиция держится. Запиши максимальный крен и выходы моторов <code>RCOU</code> до и после отказа.</li><li><strong>Motor Test.</strong> Моторы по буквам A, B, C… по часовой стрелке начиная с переднего правого. Каждая буква — свой мотор по схеме OctaQuad X, направление — как на схеме. Таблица «буква → мотор → направление → ок» входит в паспорт аппарата.</li><li><strong>T/W с коаксиальной поправкой.</strong> Тяга пары — не две тяги одного мотора: ориентир потерь около 15 %. Пример: 8 моторов по 3000 г максимальной тяги дают 24 кг на бумаге и ≈ 20.4 кг с поправкой; при взлётной массе 9 кг T/W ≈ 2.3. Без поправки ты переоценишь запас.</li><li><strong>Первый лог.</strong> Вибрации (медиана ниже 30 м/с², клиппинг 0), газ висения (выученный <code>MOT_THST_HOVER</code> для этой сборки по расчёту ≈ 0.3–0.35; выше 0.5 — запас тяги мал), просадка батареи под газом висения. Сравни ток висения с расчётом из теории (~7 А на мотор для примера модуля).</li></ul>
+<p>Лабораторная засчитывается, когда отказ мотора отработан в SITL с записью реакции, Motor Test без пропов совпадает со схемой OctaQuad X, T/W посчитан с коаксиальной поправкой, а первый лог проверен по VIBE, газу висения и просадке батареи.</p>
+
+<h2>Диагностика</h2>
+<div class="diag-groups"><article class="diag-item"><h4><strong>Симптом:</strong> аппарат теряет высоту в ALT_HOLD без причины</h4><ul><li>Возможная причина: вибрации, EKF перестаёт доверять акселерометру.</li><li>Что сделать: смотреть <code>VIBE</code> и клиппинг в логе, балансировать пропы и моторы.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> постоянный разворот по yaw на висении</h4><ul><li>Возможная причина: перекошенный мотор или разные пропы в коаксиальных парах.</li><li>Что сделать: проверить соосность моторов, пропы одной модели и шага.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> газ висения выше 60%</h4><ul><li>Возможная причина: перегруз с учётом коаксиальных потерь.</li><li>Что сделать: пересчитать T/W с поправкой на коаксиал, облегчить.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> после отказа мотора аппарат вращается и теряет управление</h4><ul><li>Возможная причина: недостаточный запас тяги или неверный порядок моторов.</li><li>Что сделать: повторить тест в SITL, проверить Motor Test и запас тяги.</li></ul></article></div>
+
+<h2>Чек-лист</h2>
+<ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="ap-heavy:0"><span><code>FRAME_CLASS</code>/<code>FRAME_TYPE</code> соответствуют раме, Motor Test пройден без пропов</span></label></li><li><label><input type="checkbox" data-check-id="ap-heavy:1"><span>T/W посчитан с поправкой на коаксиал</span></label></li><li><label><input type="checkbox" data-check-id="ap-heavy:2"><span>Initial Tune Parameters применены</span></label></li><li><label><input type="checkbox" data-check-id="ap-heavy:3"><span>Первый лог проверен на вибрации и газ висения</span></label></li><li><label><input type="checkbox" data-check-id="ap-heavy:4"><span>Отказ мотора проверен в SITL до реального теста</span></label></li></ul>
+
+<h2>Источники</h2>
+<ul class="refs"><li><a href="https://ardupilot.org/copter/docs/connect-escs-and-motors.html" target="_blank" rel="noopener noreferrer">Connect ESCs and Motors — ArduPilot Copter</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://ardupilot.org/copter/docs/frame-type-configuration.html" target="_blank" rel="noopener noreferrer">Frame Class and Type Configuration — ArduPilot Copter</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://github.com/ArduPilot/ardupilot/blob/master/libraries/AP_Scripting/applets/motor_failure_test.md" target="_blank" rel="noopener noreferrer">Motor failure test applet — ArduPilot (GitHub)</a> <span class="gc-tag" data-state="info">primary</span></li></ul>
+<h2>Задачи с числовым ответом</h2>
+<uav-tasks src="../tasks/ap-heavy.json" module="ap-heavy"></uav-tasks>
+<h2>Проверь себя</h2>
+<uav-quiz src="../quiz/ap-heavy.json" module="ap-heavy"></uav-quiz>
+      </div>
+      <div class="module-done"><gc-button variant="secondary" data-done-toggle="ap-heavy">Отметить как пройденный</gc-button></div>
+      <section class="related" aria-label="Смежные модули"><p class="gc-label gc-muted">Смежные модули</p><div class="gc-grid ref-grid"><a class="gc-card" href="ap-lua.html"><strong>Lua: сценарии и fault injection</strong><div class="gc-card__meta"><span class="gc-tag" title="L3 — Специалист">L3</span></div></a><a class="gc-card" href="f-physics.html"><strong>Как летает мультиротор</strong><div class="gc-card__meta"><span class="gc-tag" title="L1 — Оператор">L1</span></div></a></div></section>
+      <nav class="pager" aria-label="Соседние модули" data-track-pager><a class="gc-card pager__prev" href="ap-lua.html"><span class="gc-label gc-muted">Назад · трек</span><br>Lua: сценарии и fault injection</a><a class="gc-card pager__next" href="aero-wing.html"><span class="gc-label gc-muted">Дальше · трек</span><br>Аэродинамика крыла и самолётные режимы</a></nav><nav class="pager" aria-label="Соседние шаги пути ArduPilot" data-path-pager="ardupilot" hidden><a class="gc-card pager__prev" href="aero-wing.html?path=ardupilot"><span class="gc-label gc-muted">Назад · путь ArduPilot</span><br>Аэродинамика крыла и самолётные режимы</a><a class="gc-card pager__next" href="ap-quadplane.html?path=ardupilot"><span class="gc-label gc-muted">Дальше · шаг 37 из 69</span><br>QuadPlane и tilt-rotor VTOL</a></nav>
+    </article>
+  </main>
+  <footer class="gc-container site-footer gc-muted">
+    <p>Открытый курс · <a href="https://github.com/irreligious86/UAV-Education">исходники на GitHub</a> · <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">план развития</a> · <a href="../../curriculum/curriculum.html">для разработчика</a> · CC BY-NC-SA 4.0</p>
+  </footer>
+</body>
+</html>

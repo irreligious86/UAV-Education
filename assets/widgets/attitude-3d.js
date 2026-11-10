@@ -6,6 +6,7 @@
  * (ZYX), i.e. the usual aerospace Euler sequence. The quaternion is (w, x, y, z), unit norm.
  * Gimbal lock is demonstrated at pitch = ±90°: roll and yaw sliders then move the model the same way.
  */
+var T = (typeof window !== "undefined" && window.T) || function (s) { return s; };   // assets/i18n.js
 (function () {
   "use strict";
 
@@ -34,8 +35,8 @@
       if (this._init) return; this._init = true;
       var self = this;
       this.classList.add("widget");
-      this.innerHTML = '<p class="gc-label gc-muted">Интерактив · ориентация: углы Эйлера ↔ кватернион</p>' +
-        '<p class="widget__hint gc-muted">Крути roll/pitch/yaw (последовательность ZYX, оси FRD: x вперёд, y вправо, z вниз). Справа — кватернион (w, x, y, z) и матрица поворота. Поставь pitch = 90°: roll и yaw начинают вращать модель вокруг одной и той же оси — это gimbal lock, которого у кватерниона нет.</p>';
+      this.innerHTML = T('<p class="gc-label gc-muted">Интерактив · ориентация: углы Эйлера ↔ кватернион</p>') +
+        T('<p class="widget__hint gc-muted">Крути roll/pitch/yaw (последовательность ZYX, оси FRD: x вперёд, y вправо, z вниз). Справа — кватернион (w, x, y, z) и матрица поворота. Поставь pitch = 90°: roll и yaw начинают вращать модель вокруг одной и той же оси — это gimbal lock, которого у кватерниона нет.</p>');
       var p = this.p = { roll: 20, pitch: 10, yaw: 30 };
       var sl = document.createElement("div"); sl.className = "widget__controls";
       ["roll", "pitch", "yaw"].forEach(function (k) {
@@ -47,7 +48,7 @@
       var info = document.createElement("div"); info.className = "widget__metrics"; row.appendChild(info); this.info = info;
       this.appendChild(row);
       var presets = document.createElement("div"); presets.className = "widget__presets";
-      [["Горизонт", { roll: 0, pitch: 0, yaw: 0 }], ["Крен 45°", { roll: 45, pitch: 0, yaw: 0 }], ["Gimbal lock (pitch 90°)", { roll: 30, pitch: 90, yaw: 0 }], ["Переворот", { roll: 180, pitch: 0, yaw: 0 }]].forEach(function (pr) {
+      [[T("Горизонт"), { roll: 0, pitch: 0, yaw: 0 }], [T("Крен 45°"), { roll: 45, pitch: 0, yaw: 0 }], ["Gimbal lock (pitch 90°)", { roll: 30, pitch: 90, yaw: 0 }], [T("Переворот"), { roll: 180, pitch: 0, yaw: 0 }]].forEach(function (pr) {
         var b = document.createElement("button"); b.type = "button"; b.className = "gc-tag"; b.textContent = pr[0];
         b.addEventListener("click", function () { Object.assign(p, pr[1]); sl.querySelectorAll("input").forEach(function (inp, i) { inp.value = p[["roll", "pitch", "yaw"][i]]; inp.dispatchEvent(new Event("input")); }); });
         presets.appendChild(b);
@@ -73,7 +74,7 @@
       function line(a, b, color, width) { var A = proj(a), B = proj(b); ctx.strokeStyle = color; ctx.lineWidth = width; ctx.beginPath(); ctx.moveTo(A[0], A[1]); ctx.lineTo(B[0], B[1]); ctx.stroke(); }
       // ground reference (world frame, not rotated): a horizon line and world axes
       ctx.strokeStyle = muted; ctx.lineWidth = 1; ctx.setLineDash([4, 4]); ctx.beginPath(); ctx.moveTo(cx - s * 1.4, cy); ctx.lineTo(cx + s * 1.4, cy); ctx.stroke(); ctx.setLineDash([]);
-      ctx.fillStyle = muted; ctx.font = "11px monospace"; ctx.fillText("горизонт", cx + s * 1.1, cy - 4);
+      ctx.fillStyle = muted; ctx.font = "11px monospace"; ctx.fillText(T("горизонт"), cx + s * 1.1, cy - 4);
       ARMS.forEach(function (a) { line(a[0], a[1], ink, 3); });
       line(ARROW[0], ARROW[1], accent, 3); ARROW_HEAD.forEach(function (a) { line(a[0], a[1], accent, 3); });
       line(DOWN[0], DOWN[1], "#e66", 2);
@@ -82,8 +83,8 @@
       var lock = Math.abs(Math.abs(p.pitch) - 90) < 0.5;
       this.info.innerHTML = "<code>q = (" + f(q[0]) + "," + f(q[1]) + "," + f(q[2]) + "," + f(q[3]) + ")</code><br>" +
         "<code>R = [" + M.map(function (r) { return r.map(f).join(" "); }).join(" ; ") + "]</code><br>" +
-        "<span class='gc-muted'>норма |q| = " + Math.sqrt(q[0] * q[0] + q[1] * q[1] + q[2] * q[2] + q[3] * q[3]).toFixed(3) + " · стрелка — нос, красный отрезок — «вниз» в осях аппарата</span>" +
-        (lock ? "<br><strong>Gimbal lock:</strong> при pitch = ±90° roll и yaw неразличимы для углов Эйлера; кватернион остаётся однозначным." : "");
+        T("<span class='gc-muted'>норма |q| = ") + Math.sqrt(q[0] * q[0] + q[1] * q[1] + q[2] * q[2] + q[3] * q[3]).toFixed(3) + T(" · стрелка — нос, красный отрезок — «вниз» в осях аппарата</span>") +
+        (lock ? T("<br><strong>Gimbal lock:</strong> при pitch = ±90° roll и yaw неразличимы для углов Эйлера; кватернион остаётся однозначным.") : "");
     }
   }
 

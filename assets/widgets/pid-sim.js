@@ -11,6 +11,7 @@
  * bounce-back after the step ends, settle time, motor noise (std of u above 40 Hz ~ high-pass).
  * This is a teaching model: numbers are qualitative, trends are real.
  */
+var T = (typeof window !== "undefined" && window.T) || function (s) { return s; };   // assets/i18n.js
 (function () {
   "use strict";
 
@@ -72,8 +73,8 @@
       if (this._init) return; this._init = true;
       var self = this;
       this.classList.add("widget");
-      this.innerHTML = '<p class="gc-label gc-muted">Интерактив · step response одной оси</p>' +
-        '<p class="widget__hint gc-muted">Setpoint — ступенька 300 °/с на 300 мс по одной оси. Модель учебная: моторы с запаздыванием ~20 мс, петля 2 кГц, D на отфильтрованном гироскопе; «Задержка петли» — суммарная чистая задержка (фильтры + ESC + передача), она съедает запас по фазе. Крути P, I, D, FF, шум и фильтр: смотри перелёт, bounce-back после остановки и как D превращает шум в дрожание моторов. Тренды честные, абсолютные цифры — нет.</p>';
+      this.innerHTML = T('<p class="gc-label gc-muted">Интерактив · step response одной оси</p>') +
+        T('<p class="widget__hint gc-muted">Setpoint — ступенька 300 °/с на 300 мс по одной оси. Модель учебная: моторы с запаздыванием ~20 мс, петля 2 кГц, D на отфильтрованном гироскопе; «Задержка петли» — суммарная чистая задержка (фильтры + ESC + передача), она съедает запас по фазе. Крути P, I, D, FF, шум и фильтр: смотри перелёт, bounce-back после остановки и как D превращает шум в дрожание моторов. Тренды честные, абсолютные цифры — нет.</p>');
       var p = this.p = { P: 45, I: 60, D: 25, FF: 60, noise: 2, lpf: 150, delay: 2 };
       var controls = document.createElement("div"); controls.className = "widget__controls";
       var defs = [
@@ -81,9 +82,9 @@
         { k: "I", label: "I", min: 0, max: 200, value: p.I },
         { k: "D", label: "D", min: 0, max: 80, value: p.D },
         { k: "FF", label: "FF", min: 0, max: 250, value: p.FF },
-        { k: "noise", label: "Шум гиро", min: 0, max: 15, value: p.noise, unit: "°/с" },
-        { k: "lpf", label: "Gyro LPF", min: 30, max: 500, step: 10, value: p.lpf, unit: "Гц" },
-        { k: "delay", label: "Задержка петли", min: 0, max: 12, step: 0.5, value: p.delay, unit: "мс", fmt: function (v) { return (+v).toFixed(1); } }
+        { k: "noise", label: T("Шум гиро"), min: 0, max: 15, value: p.noise, unit: T("°/с") },
+        { k: "lpf", label: "Gyro LPF", min: 30, max: 500, step: 10, value: p.lpf, unit: T("Гц") },
+        { k: "delay", label: T("Задержка петли"), min: 0, max: 12, step: 0.5, value: p.delay, unit: T("мс"), fmt: function (v) { return (+v).toFixed(1); } }
       ];
       defs.forEach(function (d) {
         controls.appendChild(UAVPlot.slider({ label: d.label, min: d.min, max: d.max, step: d.step, value: d.value, unit: d.unit, fmt: d.fmt, onChange: function (v) { p[d.k] = v; self.update(); } }).el);
@@ -91,11 +92,11 @@
       this.appendChild(controls);
       var c1 = document.createElement("canvas"); c1.className = "widget__canvas"; this.appendChild(c1);
       var c2 = document.createElement("canvas"); c2.className = "widget__canvas widget__canvas--small"; this.appendChild(c2);
-      this.plot1 = UAVPlot.create(c1, { xLabel: "мс", yLabel: "°/с", height: 220 });
-      this.plot2 = UAVPlot.create(c2, { xLabel: "мс", yLabel: "выход PID", height: 120 });
+      this.plot1 = UAVPlot.create(c1, { xLabel: T("мс"), yLabel: T("°/с"), height: 220 });
+      this.plot2 = UAVPlot.create(c2, { xLabel: T("мс"), yLabel: T("выход PID"), height: 120 });
       var m = document.createElement("div"); m.className = "widget__metrics"; this.appendChild(m); this.metricsEl = m;
       var presets = document.createElement("div"); presets.className = "widget__presets";
-      [["Базис", { P: 45, I: 60, D: 25, FF: 60, lpf: 150 }], ["Мало D", { P: 45, I: 60, D: 5, FF: 60 }], ["Много D + шум", { P: 45, I: 60, D: 70, FF: 60, noise: 8 }], ["Много P", { P: 130, I: 60, D: 25, FF: 60 }], ["Много I", { P: 45, I: 200, D: 25, FF: 60 }], ["Много FF", { P: 45, I: 60, D: 25, FF: 200 }], ["Тяжёлый фильтр", { P: 45, I: 60, D: 25, FF: 60, lpf: 40 }], ["Большая задержка", { P: 45, I: 60, D: 25, FF: 60, delay: 8 }]].forEach(function (pr) {
+      [[T("Базис"), { P: 45, I: 60, D: 25, FF: 60, lpf: 150 }], [T("Мало D"), { P: 45, I: 60, D: 5, FF: 60 }], [T("Много D + шум"), { P: 45, I: 60, D: 70, FF: 60, noise: 8 }], [T("Много P"), { P: 130, I: 60, D: 25, FF: 60 }], [T("Много I"), { P: 45, I: 200, D: 25, FF: 60 }], [T("Много FF"), { P: 45, I: 60, D: 25, FF: 200 }], [T("Тяжёлый фильтр"), { P: 45, I: 60, D: 25, FF: 60, lpf: 40 }], [T("Большая задержка"), { P: 45, I: 60, D: 25, FF: 60, delay: 8 }]].forEach(function (pr) {
         var b = document.createElement("button"); b.type = "button"; b.className = "gc-tag"; b.textContent = pr[0];
         b.addEventListener("click", function () {
           Object.keys(pr[1]).forEach(function (k) { p[k] = pr[1][k]; });
@@ -116,14 +117,14 @@
       var stride = 4, x = [], sp = [], w = [], u = [];
       for (var i = 0; i < r.t.length; i += stride) { x.push(r.t[i]); sp.push(r.sp[i]); w.push(r.w[i]); u.push(r.u[i]); }
       this.plot1.draw({ x: x, series: [{ y: sp, color: "muted", label: "setpoint", dash: [4, 4] }, { y: w, color: "cyan", label: "gyro" }], yMin: -120, yMax: 420 });
-      this.plot2.draw({ x: x, series: [{ y: u, color: "green", label: "команда моторам, %" }], yMin: -100, yMax: 100 });
+      this.plot2.draw({ x: x, series: [{ y: u, color: "green", label: T("команда моторам, %") }], yMin: -100, yMax: 100 });
       var cls = function (v, warn, bad) { return v >= bad ? "critical" : v >= warn ? "caution" : "ok"; };
       this.metricsEl.innerHTML =
-        '<span class="gc-tag" data-state="' + (mt.lag === null ? "critical" : cls(mt.lag, 24, 30)) + '">entry lag ' + (mt.lag === null ? "—" : Math.round(mt.lag) + " мс") + "</span>" +
-        '<span class="gc-tag" data-state="' + cls(mt.overshoot, 8, 20) + '">перелёт ' + mt.overshoot.toFixed(0) + "%</span>" +
+        '<span class="gc-tag" data-state="' + (mt.lag === null ? "critical" : cls(mt.lag, 24, 30)) + '">entry lag ' + (mt.lag === null ? "—" : Math.round(mt.lag) + T(" мс")) + "</span>" +
+        '<span class="gc-tag" data-state="' + cls(mt.overshoot, 8, 20) + T('">перелёт ') + mt.overshoot.toFixed(0) + "%</span>" +
         '<span class="gc-tag" data-state="' + cls(mt.bounce, 5, 12) + '">bounce-back ' + mt.bounce.toFixed(0) + "%</span>" +
-        '<span class="gc-tag" data-state="' + cls(mt.settle, 120, 200) + '">установление ' + Math.round(mt.settle) + " мс</span>" +
-        '<span class="gc-tag" data-state="' + cls(mt.noise, 20, 50) + '">шум моторов ' + mt.noise.toFixed(0) + "</span>";
+        '<span class="gc-tag" data-state="' + cls(mt.settle, 120, 200) + T('">установление ') + Math.round(mt.settle) + T(" мс</span>") +
+        '<span class="gc-tag" data-state="' + cls(mt.noise, 20, 50) + T('">шум моторов ') + mt.noise.toFixed(0) + "</span>";
     }
   }
 

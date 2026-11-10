@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en" data-theme="dark" data-lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lua: сценарии и fault injection — UAV Student</title>
+  <meta name="description" content="написать applet под тумблер сымитировать отказ мотора/сенсора в SITL">
+  <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
+  <link rel="manifest" href="../../manifest.webmanifest">
+  <meta name="theme-color" content="#0b0f14">
+  <link rel="alternate" hreflang="ru" href="../../m/ap-lua.html">
+  <link rel="alternate" hreflang="uk" href="../../uk/m/ap-lua.html">
+  <link rel="alternate" hreflang="en" href="../../en/m/ap-lua.html">
+  <script>/* go to the visitor's chosen language before anything paints (assets/i18n.js) */(function(){try{var c=localStorage.getItem('uav-lang'),h=document.documentElement.getAttribute('data-lang');if(!c||c===h||/[?&]lang=keep\b/.test(location.search))return;var l=document.querySelector('link[rel=alternate][hreflang="'+c+'"]');if(l)location.replace(l.href+location.search+location.hash)}catch(e){}})();</script>
+  <link rel="stylesheet" href="../../lib/ground-control-ui/dist/ground-control.css">
+  <link rel="stylesheet" href="../../assets/site.css">
+  <script src="../../lib/ground-control-ui/dist/ground-control.js" defer></script>
+  <script src="../../assets/i18n/en.js"></script>
+  <script src="../../assets/i18n.js"></script>
+  <script src="../../assets/progress-store.js" defer></script>
+  <script src="../../assets/backend-config.js" defer></script>
+  <script src="../../assets/account.js" defer></script>
+  <script src="../../assets/grading.js" defer></script>
+  <script src="../../assets/app.js" defer></script>
+  <script src="../../assets/uav-quiz.js" defer></script>
+  <script src="../../assets/uav-tasks.js" defer></script>
+  <script src="../../assets/offline.js" defer></script>
+</head>
+<body class="gc-root" data-base="../" data-root="../../">
+  <header class="site-header">
+    <div class="gc-container site-header__inner">
+      <a class="site-brand" href="../index.html"><span class="site-brand__mark" aria-hidden="true">◆</span> UAV Student</a>
+      <nav class="gc-nav" aria-label="Разделы сайта">
+        <a href="../index.html" aria-current="page">Курс</a>
+        <a href="../ref/index.html">Справочник</a>
+        <a href="../pages/glossary.html">Глоссарий</a>
+        <a href="../pages/fails.html">Фейлы</a>
+        <a href="../pages/search.html">Поиск</a>
+        <a href="../pages/progress.html">Мой прогресс</a>
+      </nav>
+      <nav class="lang-switch" aria-label="Язык"><a class="gc-tag" href="../../m/ap-lua.html" data-lang-to="ru" hreflang="ru" lang="ru" title="Русский">RU</a><a class="gc-tag" href="../../uk/m/ap-lua.html" data-lang-to="uk" hreflang="uk" lang="uk" title="Українська">UK</a><a class="gc-tag" href="../../en/m/ap-lua.html" data-lang-to="en" hreflang="en" lang="en" title="English" aria-current="true" data-state="ok">EN</a></nav>
+    </div>
+  </header>
+  <main class="gc-container site-main">
+    <article class="module" data-module-page="ap-lua">
+      <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-autonomy">Автономия</a><span>Lua: сценарии и fault injection</span></p>
+      <h1 class="module-title">Lua: сценарии и fault injection</h1>
+      <div class="module-tags"><span class="gc-tag" title="Уровень">L3 — Специалист</span><span class="gc-tag">чтение 25 мин</span><span class="gc-tag">учёба ~3 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ОСВОЕН</span></div>
+      <p class="gc-muted module-score" data-module-score></p>
+      <p class="module-lead">ArduPilot умеет выполнять Lua-скрипты прямо на полётнике: добавлять режимы, читать датчики, реагировать на тумблеры. В учебном проекте главное применение — fault injection: специально ломать мотор или сенсор в SITL и смотреть, как дрон и ты справляетесь. Модуль объясняет, как работает скриптинг, как привязать скрипт к тумблеру пульта и как построить набор «хаос-скриптов», каждый на своём тумблере.</p>
+      <div class="gc-callout" data-state="ok"><strong>После модуля ты умеешь</strong><ul><li>написать applet под тумблер</li><li>сымитировать отказ мотора/сенсора в SITL</li></ul></div><p class="gc-muted">Перед этим модулем: <a href="ap-sitl.html">SITL: дрон без дрона</a></p><div class="gc-callout lab"><p class="gc-label gc-muted">Лабораторная</p><strong>Хаос-скрипт на тумблере</strong><p class="gc-muted lab__hint">Сдано, когда отмечены все пункты:</p><ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="ap-lua:lab:0"><span>SCR_ENABLE включён, тестовый скрипт отвечает на тумблер</span></label></li><li><label><input type="checkbox" data-check-id="ap-lua:lab:1"><span>Applet отказа мотора проверен на octa-quad в SITL</span></label></li><li><label><input type="checkbox" data-check-id="ap-lua:lab:2"><span>Каждый скрипт на своём RCx_OPTION</span></label></li><li><label><input type="checkbox" data-check-id="ap-lua:lab:3"><span>Скрипты с SIM_* помечены «только SITL»</span></label></li></ul></div><div class="path-pos gc-muted"><span class="gc-label">В пути</span><ul><li data-path-pos="ardupilot"><a href="../path/ardupilot.html">ArduPilot</a>: шаг 18 из 69 → <a href="diag-troubleshooting.html?path=ardupilot">Дерево диагностики: дрон не взлетает</a></li></ul></div>
+      <div class="gc-prose module-body">
+<div class="gc-callout" data-state="caution" data-untranslated><strong>Модуль ещё не переведён.</strong> Ниже — оригинал (Русский). Прогресс и оценки общие для всех языков.</div>
+<h2>Теория</h2>
+<h4 class="md-subheading">Как устроен скриптинг</h4>
+<ul><li>Включается параметром <code>SCR_ENABLE = 1</code> и перезагрузкой.</li><li>Скрипты (<code>.lua</code>) лежат в <code>APM/scripts</code> на SD-карте; в SITL — в папке <code>scripts</code> там, откуда запущен симулятор.</li><li>Каждый скрипт работает в своей «песочнице» и с низким приоритетом: полётный код важнее, точного расписания скрипту никто не обещает.</li><li>Память для скриптов задаёт <code>SCR_HEAP_SIZE</code>. Мало — скрипты падают и появляется pre-arm ошибка о нехватке памяти. Много — может не инициализироваться EKF.</li><li>Если один скрипт упал с ошибкой, останавливается только он. Если кончилась общая память скриптов (или паника), останавливаются все скрипты до перезагрузки.</li><li>Скриптинг требует минимум 2 МБ флеша и не работает на F4-контроллерах.</li></ul>
+<h4 class="md-subheading">Паттерн update()</h4>
+<p>Скрипт — это функция <code>update()</code>, которая делает работу и возвращает себя и задержку в миллисекундах до следующего вызова. Никаких бесконечных циклов: планировщик сам вызывает функцию снова.</p>
+<h4 class="md-subheading">Привязка к тумблеру</h4>
+<p>Параметр <code>RCx_OPTION</code> назначает каналу пульта функцию. Значения 300–307 — Scripting1…Scripting8: зарезервированы для скриптов. Скрипт находит свой канал через <code>rc:find_channel_for_option(300)</code> и читает положение тумблера через <code>get_aux_switch_pos()</code> (0 — низ, 1 — середина, 2 — верх).</p>
+<h4 class="md-subheading">Applets и examples</h4>
+<p>В репозитории ArduPilot есть готовые скрипты: <code>libraries/AP_Scripting/applets</code> (готовы к использованию, у каждого есть <code>.md</code>-описание) и <code>libraries/AP_Scripting/examples</code> (учебные примеры). Начинать стоит с applet <code>motor_failure_test.lua</code>: он останавливает моторы, заданные битовой маской <code>MOT_STOP_BITMASK</code>, когда тумблер Scripting1 вверх. Октокоптер должен лететь на одном отказавшем моторе.</p>
+<h4 class="md-subheading">Что умеет API (по <code>docs/docs.lua</code> в AP_Scripting)</h4>
+<p>Чтение состояния: <code>ahrs:get_position()</code>, <code>ahrs:get_velocity_NED()</code>, <code>ahrs:get_yaw()</code>, <code>gps:num_sats()</code>, <code>battery:voltage()</code>, <code>rangefinder:distance_orient()</code> (в метрах; <code>distance_cm_orient</code> устарел), <code>esc_telem:get_rpm()</code>, <code>vehicle:get_mode()</code>, <code>arming:is_armed()</code>; действие: <code>vehicle:set_mode()</code>, <code>vehicle:set_target_velocity_NED()</code>, <code>vehicle:set_target_location()</code>, <code>mission:set_current_cmd()</code>, <code>SRV_Channels:set_output_pwm()</code>, <code>relay:on()</code>, <code>param:set()</code>/<code>param:add_param()</code> (свои параметры с префиксом), <code>gcs:send_text()</code>, <code>logger:write()</code> (свои лог-сообщения!), <code>notify:play_tune()</code>, <code>rc:get_aux_cached()</code> (тумблер <code>RCx_OPTION = 300..307</code> Scripting1..8), <code>serial:find_serial()</code> (свой протокол на UART), <code>CAN:get_device()</code> (DroneCAN), <code>periph</code> на AP_Periph. Таймеры — возврат <code>update, 100</code> (мс до следующего вызова). Параметры скриптинга: <code>SCR_ENABLE</code>, <code>SCR_HEAP_SIZE</code> (память; на F4 не хватает → только H7/F7 с запасом), <code>SCR_VM_I_COUNT</code> (лимит инструкций на вызов — защита от зависания), <code>SCR_DEBUG_OPTS</code>.</p>
+<h4 class="md-subheading">Applets как учебник</h4>
+<p><code>libraries/AP_Scripting/applets/</code> — готовые, с <code>.md</code>-описанием: <code>motor_failure_test.lua</code> (останавливает моторы по битмаске <code>MOT_STOP_BITMASK</code> тумблером Scripting1 — тест отказа мотора на гексе/X8 в SITL и в поле), <code>VTOL-quicktune.lua</code> (QuikTune для мультикоптеров и VTOL), <code>rover-quicktune.lua</code>, <code>copter-deadreckon-home.lua</code> (возврат по счислению при потере GPS), <code>arming-checks.lua</code> (свои пред-армовые проверки), <code>ahrs-source-extnav-optflow.lua</code> (переключение источников EKF по качеству), <code>BattEstimate.lua</code>, <code>MissionSelector.lua</code>, <code>net_webserver.lua</code>, <code>crsf-calibrate.lua</code>, <code>SmartAudio.lua</code>. Читать их — лучший способ выучить API и стиль (защитные проверки, <code>pcall</code>-подобные обёртки, параметры через <code>param:add_table</code>).</p>
+<h4 class="md-subheading">Разобранный пример: защита по температуре ESC</h4>
+<pre class="cli-block"><code>-- esc_temp_guard.lua: warn at 80 C, switch to LAND at 100 C (any ESC), check every 500 ms
+local WARN, CRIT = 80, 100
+local MODE_LAND = 9
+local warned = false
+function update()
+  for i = 0, 7 do
+    local t = esc_telem:get_temperature(i)          -- nil if no telemetry; value in centi-degrees
+    if t then
+      t = t // 100
+      if t &gt;= CRIT and arming:is_armed() and vehicle:get_mode() ~= MODE_LAND then
+        gcs:send_text(2, string.format(&quot;ESC %d %dC: LAND&quot;, i + 1, t))
+        vehicle:set_mode(MODE_LAND)
+      elseif t &gt;= WARN and not warned then
+        gcs:send_text(4, string.format(&quot;ESC %d temp %dC&quot;, i + 1, t)); warned = true
+      end
+    end
+  end
+  return update, 500
+end
+return update()</code></pre>
+<p>Проверка в SITL: <code>SIM_ESC_TELEM = 1</code>, подменить порог на 30 °C, убедиться в срабатывании; затем — на стенде. Запись в FMEA как мера с ссылкой на тест (модуль «Отказоустойчивость»).</p>
+<figure class="diagram" data-diagram="lua-runtime"><div class="diagram__svg"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 200" width="100%" role="img" aria-labelledby="t" style="max-width:720px;display:block;margin:0 auto"><title id="t">Скриптинг ArduPilot: как исполняется update()</title><style>text{font-family: var(--gc-font-mono, ui-monospace, Menlo, monospace); font-size: 12px;fill:currentColor} .m{fill:var(--gc-ink-muted, #8a93a3)} .a{fill:var(--gc-accent-hud, #5ef1d2)} .w{fill:var(--gc-signal-amber, #f0b24c)} .d{fill:var(--gc-signal-red, #e8636b)} .box{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:currentColor;stroke-width:1.2} .boxa{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6} .ln{stroke:currentColor;stroke-width:1.2;fill:none} .lna{stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6;fill:none} .lnm{stroke:var(--gc-ink-muted, #8a93a3);stroke-width:1;fill:none;stroke-dasharray:4 3} .t{font-size:11px} .b{font-weight:600}</style><defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker><marker id="ara" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--gc-accent-hud, #5ef1d2)"/></marker></defs><rect class="box" x="10.0" y="30" width="142.0" height="48" rx="6"/><text x="81.0" y="51.0" text-anchor="middle">APM/scripts/</text><text x="81.0" y="65.0" text-anchor="middle">*.lua</text><rect class="boxa" x="196.0" y="30" width="142.0" height="48" rx="6"/><text x="267.0" y="51.0" text-anchor="middle" class="b">Lua VM</text><text x="267.0" y="65.0" text-anchor="middle" class="b">SCR_HEAP_SIZE</text><rect class="boxa" x="382.0" y="30" width="142.0" height="48" rx="6"/><text x="453.0" y="51.0" text-anchor="middle" class="b">update()</text><text x="453.0" y="65.0" text-anchor="middle" class="b">→ return fn, мс</text><rect class="box" x="568.0" y="30" width="142.0" height="48" rx="6"/><text x="639.0" y="51.0" text-anchor="middle">Привязки</text><text x="639.0" y="65.0" text-anchor="middle">ahrs, vehicle, gcs</text><rect class="boxa" x="382.0" y="130" width="142.0" height="48" rx="6"/><text x="453.0" y="151.0" text-anchor="middle" class="b">pcall: ошибка</text><text x="453.0" y="165.0" text-anchor="middle" class="b">не роняет скрипт</text><rect class="box" x="568.0" y="130" width="142.0" height="48" rx="6"/><text x="639.0" y="151.0" text-anchor="middle">Режим, цель,</text><text x="639.0" y="165.0" text-anchor="middle">сообщение, лог</text><path class="ln" d="M152.0 54.0 L196.0 54.0" marker-end="url(#ar)"/><path class="ln" d="M338.0 54.0 L382.0 54.0" marker-end="url(#ar)"/><path class="ln" d="M524.0 54.0 L568.0 54.0" marker-end="url(#ar)"/><path class="ln" d="M453.0 78 L453.0 130" marker-end="url(#ar)"/><path class="ln" d="M639.0 78 L639.0 130" marker-end="url(#ar)"/><text x="10" y="150" text-anchor="start" class="m t">SCR_ENABLE=1; скрипт</text><text x="10" y="164" text-anchor="start" class="m t">не заменяет FS_*</text></svg></div><figcaption class="gc-muted">Как исполняется скрипт: файл из APM/scripts/ в Lua VM, update() возвращает себя и период, ошибки ловит pcall, действия идут через привязки API.</figcaption><div class="diagram__hint">Схему можно прокрутить по горизонтали</div></figure>
+
+<h2>Практика</h2>
+<h4 class="md-subheading">Шаг 1. Включить скриптинг в SITL</h4>
+<pre class="cli-block"><code>param set SCR_ENABLE 1
+reboot</code></pre>
+<h4 class="md-subheading">Шаг 2. Скрипт-индикатор на тумблере</h4>
+<p>Минимальный скрипт: сообщает в GCS об изменении положения тумблера Scripting2 и о состоянии арма.</p>
+<pre class="cli-block"><code>-- switch_report.lua: report Scripting2 switch position and arming state to the GCS
+local SWITCH_OPTION = 301  -- RCx_OPTION = 301 (Scripting2)
+local switch = rc:find_channel_for_option(SWITCH_OPTION)
+local last_pos = -1
+
+function update()
+  if not switch then
+    gcs:send_text(4, &quot;switch_report: no channel with RCx_OPTION=301&quot;)
+    return update, 5000
+  end
+  local pos = switch:get_aux_switch_pos()
+  if pos ~= last_pos then
+    local armed = arming:is_armed() and &quot;ARMED&quot; or &quot;disarmed&quot;
+    gcs:send_text(6, string.format(&quot;Scripting2 -&gt; %d (%s)&quot;, pos, armed))
+    last_pos = pos
+  end
+  return update, 200
+end
+
+return update, 1000</code></pre>
+<p>Положи файл в <code>scripts/</code>, назначь тумблер (<code>param set RC9_OPTION 301</code>), перезапусти SITL и пощёлкай тумблером.</p>
+<h4 class="md-subheading">Шаг 3. Отказ мотора по тумблеру</h4>
+<ol><li>Скопируй applet <code>motor_failure_test.lua</code> в <code>scripts/</code>.</li><li>Назначь тумблер на Scripting1: <code>RCx_OPTION = 300</code>.</li><li>После перезагрузки появится <code>MOT_STOP_BITMASK</code>. Поставь 1 — будет отключаться мотор 1.</li><li>В SITL с рамой <code>octa-quad</code>: взлёт, LOITER, тумблер вверх. Смотри, как дрон компенсирует отказ.</li></ol>
+<h4 class="md-subheading">Шаг 4. Набор хаос-скриптов</h4>
+<p>Идея учебного набора: каждый «отказ» — отдельный скрипт на своём тумблере, чтобы включать их независимо:</p>
+<ul><li>индикатор арма (светодиод или сообщение);</li><li>ручной отказ мотора (applet);</li><li>случайные отказы сенсоров через параметры симулятора <code>SIM_*</code>;</li><li>случайный отказ 1–3 моторов.</li></ul>
+<p>Имена параметров <code>SIM_*</code> меняются между версиями — смотри актуальные в своей сборке командой <code>param show SIM_GPS*</code> в MAVProxy. Такие скрипты — только для SITL: на реальном аппарате <code>SIM_*</code> параметров нет.</p>
+<h4 class="md-subheading">Шаг 5. Защита с тестами до SITL</h4>
+<p>Стартер проекта №11 <code>examples/lua-protection</code>: <code>guard.lua</code> — защита по вибрациям (LAND), удержание внутри полигона с запасом (RTL) и обёртка <code>pcall</code>, которая после трёх ошибок подряд в воздухе уводит аппарат в RTL. Тесты запускают <strong>этот же</strong> Lua-файл через <code>lupa</code> против заглушки привязок (<code>millis</code>, <code>ahrs</code>, <code>vehicle</code>, <code>param</code>, <code>gcs</code>, <code>logger</code>) — ошибки логики ловятся за доли секунды, а SITL остаётся приёмочным тестом. Запусти <code>python -m pytest -q examples/lua-protection/tests</code>, затем добавь третью защиту (например, просадка напряжения под нагрузкой) вместе с тестом.</p>
+
+<h2>Диагностика</h2>
+<div class="diag-groups"><article class="diag-item"><h4><strong>Симптом:</strong> скрипт не запускается, в GCS тишина</h4><ul><li>Возможная причина: <code>SCR_ENABLE</code> не включён или не было перезагрузки, файл не в той папке.</li><li>Что сделать: проверить параметр и путь <code>scripts/</code> относительно папки запуска SITL.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> pre-arm ошибка о памяти скриптов</h4><ul><li>Возможная причина: мало <code>SCR_HEAP_SIZE</code> для загруженных скриптов.</li><li>Что сделать: поднять <code>SCR_HEAP_SIZE</code> или убрать лишние скрипты.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> все скрипты перестали работать посреди полёта</h4><ul><li>Возможная причина: один скрипт упал с ошибкой или исчерпал память.</li><li>Что сделать: читать сообщения в GCS, исправить скрипт, перезагрузить.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> <code>find_channel_for_option</code> возвращает nil</h4><ul><li>Возможная причина: ни одному каналу не назначен нужный <code>RCx_OPTION</code>.</li><li>Что сделать: назначить опцию на канал с тумблером.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> скрипт не запускается, «Lua: … out of memory»</h4><ul><li>Возможная причина: <code>SCR_HEAP_SIZE</code> мал, плата без запаса RAM.</li><li>Что сделать: увеличить heap (H7 — 200–300 КБ), упростить скрипт.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> «&lt;имя&gt;.lua exceeded time limit»</h4><ul><li>Возможная причина: тяжёлый цикл в одном вызове update.</li><li>Что сделать: разбить работу по вызовам, <code>SCR_VM_I_COUNT</code> поднимать осторожно.</li></ul></article></div>
+
+<h2>Чек-лист</h2>
+<ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="ap-lua:0"><span>Скриптинг включён в SITL, тестовый скрипт отвечает на тумблер</span></label></li><li><label><input type="checkbox" data-check-id="ap-lua:1"><span>Applet отказа мотора настроен и проверен на octa-quad</span></label></li><li><label><input type="checkbox" data-check-id="ap-lua:2"><span>Каждый хаос-скрипт на своём тумблере</span></label></li><li><label><input type="checkbox" data-check-id="ap-lua:3"><span>Понимаю, почему на F4 скриптинга нет</span></label></li><li><label><input type="checkbox" data-check-id="ap-lua:4"><span>Скрипты с <code>SIM_*</code> не попадают на реальный аппарат</span></label></li></ul>
+
+<h2>Источники</h2>
+<ul class="refs"><li><a href="https://ardupilot.org/copter/docs/common-lua-scripts.html" target="_blank" rel="noopener noreferrer">Lua Scripts — ArduPilot</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://ardupilot.org/copter/docs/common-scripting-step-by-step.html" target="_blank" rel="noopener noreferrer">Script Setup and Use Examples — ArduPilot</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://github.com/ArduPilot/ardupilot/tree/master/libraries/AP_Scripting/applets" target="_blank" rel="noopener noreferrer">AP_Scripting applets (GitHub)</a> <span class="gc-tag" data-state="info">primary</span></li></ul>
+<h2>Проверь себя</h2>
+<uav-quiz src="../quiz/ap-lua.json" module="ap-lua"></uav-quiz>
+      </div>
+      <div class="module-done"><gc-button variant="secondary" data-done-toggle="ap-lua">Отметить как пройденный</gc-button></div>
+      <section class="related" aria-label="Смежные модули"><p class="gc-label gc-muted">Смежные модули</p><div class="gc-grid ref-grid"><a class="gc-card" href="ap-sitl.html"><strong>SITL: дрон без дрона</strong><div class="gc-card__meta"><span class="gc-tag" title="L2 — Интегратор">L2</span></div></a><a class="gc-card" href="ap-heavy.html"><strong>Тяжёлые платформы: X8 и окто</strong><div class="gc-card__meta"><span class="gc-tag" title="L3 — Специалист">L3</span></div></a></div></section>
+      <nav class="pager" aria-label="Соседние модули" data-track-pager><a class="gc-card pager__prev" href="ap-logs.html"><span class="gc-label gc-muted">Назад · трек</span><br>Логи ArduPilot: разбор полёта</a><a class="gc-card pager__next" href="ap-heavy.html"><span class="gc-label gc-muted">Дальше · трек</span><br>Тяжёлые платформы: X8 и окто</a></nav><nav class="pager" aria-label="Соседние шаги пути ArduPilot" data-path-pager="ardupilot" hidden><a class="gc-card pager__prev" href="ap-missions.html?path=ardupilot"><span class="gc-label gc-muted">Назад · путь ArduPilot</span><br>Миссии и планирование</a><a class="gc-card pager__next" href="diag-troubleshooting.html?path=ardupilot"><span class="gc-label gc-muted">Дальше · шаг 19 из 69</span><br>Дерево диагностики: дрон не взлетает</a></nav>
+    </article>
+  </main>
+  <footer class="gc-container site-footer gc-muted">
+    <p>Открытый курс · <a href="https://github.com/irreligious86/UAV-Education">исходники на GitHub</a> · <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">план развития</a> · <a href="../../curriculum/curriculum.html">для разработчика</a> · CC BY-NC-SA 4.0</p>
+  </footer>
+</body>
+</html>

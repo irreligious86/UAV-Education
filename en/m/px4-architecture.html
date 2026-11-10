@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en" data-theme="dark" data-lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Архитектура PX4: модули и uORB — UAV Student</title>
+  <meta name="description" content="назвать цепочку модулей от IMU до моторов читать топики uORB в работающей системе">
+  <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
+  <link rel="manifest" href="../../manifest.webmanifest">
+  <meta name="theme-color" content="#0b0f14">
+  <link rel="alternate" hreflang="ru" href="../../m/px4-architecture.html">
+  <link rel="alternate" hreflang="uk" href="../../uk/m/px4-architecture.html">
+  <link rel="alternate" hreflang="en" href="../../en/m/px4-architecture.html">
+  <script>/* go to the visitor's chosen language before anything paints (assets/i18n.js) */(function(){try{var c=localStorage.getItem('uav-lang'),h=document.documentElement.getAttribute('data-lang');if(!c||c===h||/[?&]lang=keep\b/.test(location.search))return;var l=document.querySelector('link[rel=alternate][hreflang="'+c+'"]');if(l)location.replace(l.href+location.search+location.hash)}catch(e){}})();</script>
+  <link rel="stylesheet" href="../../lib/ground-control-ui/dist/ground-control.css">
+  <link rel="stylesheet" href="../../assets/site.css">
+  <script src="../../lib/ground-control-ui/dist/ground-control.js" defer></script>
+  <script src="../../assets/i18n/en.js"></script>
+  <script src="../../assets/i18n.js"></script>
+  <script src="../../assets/progress-store.js" defer></script>
+  <script src="../../assets/backend-config.js" defer></script>
+  <script src="../../assets/account.js" defer></script>
+  <script src="../../assets/grading.js" defer></script>
+  <script src="../../assets/app.js" defer></script>
+  <script src="../../assets/uav-quiz.js" defer></script>
+  <script src="../../assets/uav-tasks.js" defer></script>
+  <script src="../../assets/offline.js" defer></script>
+</head>
+<body class="gc-root" data-base="../" data-root="../../">
+  <header class="site-header">
+    <div class="gc-container site-header__inner">
+      <a class="site-brand" href="../index.html"><span class="site-brand__mark" aria-hidden="true">◆</span> UAV Student</a>
+      <nav class="gc-nav" aria-label="Разделы сайта">
+        <a href="../index.html" aria-current="page">Курс</a>
+        <a href="../ref/index.html">Справочник</a>
+        <a href="../pages/glossary.html">Глоссарий</a>
+        <a href="../pages/fails.html">Фейлы</a>
+        <a href="../pages/search.html">Поиск</a>
+        <a href="../pages/progress.html">Мой прогресс</a>
+      </nav>
+      <nav class="lang-switch" aria-label="Язык"><a class="gc-tag" href="../../m/px4-architecture.html" data-lang-to="ru" hreflang="ru" lang="ru" title="Русский">RU</a><a class="gc-tag" href="../../uk/m/px4-architecture.html" data-lang-to="uk" hreflang="uk" lang="uk" title="Українська">UK</a><a class="gc-tag" href="../../en/m/px4-architecture.html" data-lang-to="en" hreflang="en" lang="en" title="English" aria-current="true" data-state="ok">EN</a></nav>
+    </div>
+  </header>
+  <main class="gc-container site-main">
+    <article class="module" data-module-page="px4-architecture">
+      <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-px4">Электив: PX4</a><span>Архитектура PX4: модули и uORB</span></p>
+      <h1 class="module-title">Архитектура PX4: модули и uORB</h1>
+      <div class="module-tags"><span class="gc-tag" title="Уровень">L3 — Специалист</span><span class="gc-tag">чтение 25 мин</span><span class="gc-tag">учёба ~3 ч</span><span class="gc-tag">PX4 1.14+</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ОСВОЕН</span></div>
+      <p class="gc-muted module-score" data-module-score></p>
+      <p class="module-lead">PX4 — не одна программа, а набор независимых модулей, которые обмениваются сообщениями через шину uORB по схеме publish/subscribe. Это объясняет почти всё в PX4: почему модуль можно перезапустить в полёте, почему ROS 2 видит внутренности автопилота напрямую, как устроен путь от датчика до мотора. Модуль разбирает flight stack и middleware, сообщения <code>.msg</code>, частоты обновления и инструменты для подглядывания внутрь работающей системы.</p>
+      <div class="gc-callout" data-state="ok"><strong>После модуля ты умеешь</strong><ul><li>назвать цепочку модулей от IMU до моторов</li><li>читать топики uORB в работающей системе</li></ul></div><p class="gc-muted">Перед этим модулем: <a href="px4-intro.html">Введение в PX4</a></p><div class="gc-callout lab"><p class="gc-label gc-muted">Лабораторная</p><strong>Цепочка IMU → моторы</strong><p class="gc-muted lab__hint">Сдано, когда отмечены все пункты:</p><ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="px4-architecture:lab:0"><span>Частоты топиков сняты через uorb top</span></label></li><li><label><input type="checkbox" data-check-id="px4-architecture:lab:1"><span>Отчёт с модулями и топиками написан</span></label></li><li><label><input type="checkbox" data-check-id="px4-architecture:lab:2"><span>listener на двух топиках выполнен</span></label></li></ul></div><div class="path-pos gc-muted"><span class="gc-label">В пути</span><ul><li data-path-pos="px4"><a href="../path/px4.html">PX4</a>: шаг 15 из 36 → <a href="px4-control.html?path=px4">Контуры управления и тюнинг PX4</a></li></ul></div>
+      <div class="gc-prose module-body">
+<div class="gc-callout" data-state="caution" data-untranslated><strong>Модуль ещё не переведён.</strong> Ниже — оригинал (Русский). Прогресс и оценки общие для всех языков.</div>
+<h2>Теория</h2>
+<h4 class="md-subheading">Два слоя</h4>
+<ul><li><strong>Middleware</strong> — драйверы датчиков, связь с внешним миром (MAVLink, uXRCE-DDS), шина uORB и слой симуляции.</li><li><strong>Flight stack</strong> — алгоритмы: оценка состояния (estimator), контроллеры, навигатор, commander, распределение управления (control allocation).</li></ul>
+<h4 class="md-subheading">Путь от датчика до мотора</h4>
+<ol><li>Драйверы IMU читают FIFO датчика (килогерцы, у современных IMU до 8 кГц); гироскоп после фильтров публикуется в <code>vehicle_angular_velocity</code> на <code>IMU_GYRO_RATEMAX</code> (400 Гц), интегрированные данные — в <code>vehicle_imu</code> на <code>IMU_INTEG_RATE</code> (200 Гц).</li><li><strong>EKF2</strong> объединяет IMU, GPS, баро, магнитометр в оценку ориентации, скорости и позиции.</li><li><strong>Navigator</strong> решает, куда лететь: миссия, возврат, удержание.</li><li><strong>Position controller</strong> из желаемой позиции делает желаемую ориентацию и тягу.</li><li><strong>Attitude controller</strong> → желаемые угловые скорости; <strong>rate controller</strong> → моменты.</li><li><strong>Control allocation</strong> переводит моменты и тягу в команды конкретным моторам/сервам по геометрии рамы (<code>CA_AIRFRAME</code>, <code>CA_ROTOR*</code>).</li><li>Драйверы выходов — PWM/DShot.</li></ol>
+<p><strong>Commander</strong> — «арбитр»: арм/дизарм, смена режимов, проверки готовности, failsafe.</p>
+<h4 class="md-subheading">uORB</h4>
+<p>Каждый модуль публикует топики и подписывается на чужие. Топик описан файлом <code>.msg</code> (CamelCase имя → snake_case топик: <code>VehicleAttitude.msg</code> → <code>vehicle_attitude</code>), обязательное поле — <code>uint64 timestamp</code>. Один <code>.msg</code> может задавать несколько топиков (<code># TOPICS ...</code>). Шина асинхронна: подписчик просыпается, когда появились новые данные, поэтому частоту модуля задаёт тот, кто публикует.</p>
+<p>Это та же идея, что ROS: именно поэтому мост uXRCE-DDS выглядит так естественно — он просто выносит часть топиков uORB наружу.</p>
+<h4 class="md-subheading">Исполнение</h4>
+<p>Модули — отдельные задачи (на NuttX — потоки с приоритетами; на Linux/macOS в SITL — потоки процесса). Их можно запускать и останавливать командами <code>&lt;module&gt; start/stop</code>, смотреть загрузку через <code>top</code>, частоты топиков — <code>uorb top</code>, содержимое — <code>listener &lt;topic&gt;</code>.</p>
+<h4 class="md-subheading">Зачем это знать</h4>
+<ul><li>При отладке странного поведения ты ищешь не «параметр», а <strong>модуль и топик</strong>: что опубликовано, с какой частотой, что получил контроллер.</li><li>Свой код в PX4 — это новый модуль с подпиской на топики, а не правка чужого.</li><li>Логи ULog — просто запись топиков; анализируя их, ты читаешь те же сообщения.</li></ul>
+<h4 class="md-subheading">Модули по именам (где искать в коде)</h4>
+<p><code>src/modules/</code>: <code>sensors</code> (сбор датчиков, <code>sensor_combined</code>), <code>ekf2</code> (оценка состояния), <code>commander</code> (арм, режимы, failsafe, pre-arm), <code>navigator</code> (миссии, RTL, геозона, <code>position_setpoint_triplet</code>), <code>mc_pos_control</code> (позиция → ориентация+тяга), <code>mc_att_control</code> (угол → угловая скорость), <code>mc_rate_control</code> (скорость → моменты, <code>vehicle_torque_setpoint</code>/<code>vehicle_thrust_setpoint</code>), <code>control_allocator</code> (моменты → <code>actuator_motors</code>/<code>actuator_servos</code>), <code>logger</code>, <code>mavlink</code>, <code>uxrce_dds_client</code>, <code>land_detector</code>, <code>battery_status</code>, <code>mc_autotune_attitude_control</code>. Драйверы — <code>src/drivers/</code> (imu, gps, barometer, dshot, pwm_out). Путь IMU → мотор: <code>sensors</code> → <code>ekf2</code> → <code>mc_pos_control</code> → <code>mc_att_control</code> → <code>mc_rate_control</code> → <code>control_allocator</code> → <code>dshot</code>/<code>pwm_out</code>.</p>
+<h4 class="md-subheading">Исполнение: work queue и приоритеты</h4>
+<p>На NuttX большинство модулей — не отдельные потоки, а элементы <strong>work queue</strong> с приоритетами (<code>wq:rate_ctrl</code> выше, <code>wq:nav_and_controllers</code>, <code>wq:hp_default</code>, <code>wq:lp_default</code> ниже): быстрые задачи (rate control) просыпаются по приходу данных гироскопа и выполняются первыми; <code>work_queue status</code> показывает их. Отдельные задачи — logger, mavlink; EKF2 тоже работает в work queue (ScheduledWorkItem). <code>top</code> в консоли — загрузка CPU по задачам (норма &lt; 70–80% на FMUv5); перегрузка видна как рост задержек и предупреждения.</p>
+<h4 class="md-subheading">Хранилище и конфигурация</h4>
+<p>Параметры — во flash/EEPROM (<code>param save</code>, <code>param reset_all</code>), миссии и геозона — в <code>dataman</code> (SD или flash), логи — SD. Загрузочные скрипты — <code>ROMFS/px4fmu_common/init.d/</code> (<code>rc.*</code>): какой драйвер стартовать, с какими параметрами, airframe-файлы <code>init.d/airframes/</code> — это и есть «выбор airframe» в QGC. Свой модуль добавляется в <code>boards/&lt;board&gt;/default.px4board</code> и стартует из <code>rc.*</code> или по параметру.</p>
+<h4 class="md-subheading">Разобранный пример: разбор «аппарат качает по roll»</h4>
+<ol><li><code>listener vehicle_angular_velocity</code> — частота ~400 Гц? если ниже — перегрузка (<code>top</code>).</li><li><code>listener vehicle_rates_setpoint</code> против <code>vehicle_angular_velocity</code> в логе: осцилляция только в факте → rate P/D; и в setpoint тоже → attitude P/position.</li><li><code>uorb top -1</code> — кто публикует редко/часто необычно (датчик с пропусками → EKF2 inovations).</li><li>Flight Review → спектр: пик моторов в полосе? → <code>IMU_GYRO_CUTOFF</code>/notch (<code>IMU_GYRO_NF0_FRQ</code>/<code>BW</code>, <code>IMU_GYRO_DNF_EN</code>).</li></ol>
+<p>Так архитектура превращается в метод: топик → модуль → параметр, а не «подкрутить P».</p>
+<figure class="diagram" data-diagram="px4-uorb-path"><div class="diagram__svg"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 200" width="100%" role="img" aria-labelledby="t" style="max-width:720px;display:block;margin:0 auto"><title id="t">PX4: путь от датчика до мотора через uORB</title><style>text{font-family: var(--gc-font-mono, ui-monospace, Menlo, monospace); font-size: 12px;fill:currentColor} .m{fill:var(--gc-ink-muted, #8a93a3)} .a{fill:var(--gc-accent-hud, #5ef1d2)} .w{fill:var(--gc-signal-amber, #f0b24c)} .d{fill:var(--gc-signal-red, #e8636b)} .box{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:currentColor;stroke-width:1.2} .boxa{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6} .ln{stroke:currentColor;stroke-width:1.2;fill:none} .lna{stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6;fill:none} .lnm{stroke:var(--gc-ink-muted, #8a93a3);stroke-width:1;fill:none;stroke-dasharray:4 3} .t{font-size:11px} .b{font-weight:600}</style><defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker><marker id="ara" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--gc-accent-hud, #5ef1d2)"/></marker></defs><rect class="box" x="10.0" y="30" width="111.2" height="48" rx="6"/><text x="65.6" y="51.0" text-anchor="middle" style="font-size:10.5px">sensors</text><text x="65.6" y="65.0" text-anchor="middle" style="font-size:10.5px">sensor_combined</text><rect class="boxa" x="157.2" y="30" width="111.2" height="48" rx="6"/><text x="212.79999999999998" y="51.0" text-anchor="middle" class="b" style="font-size:10.5px">ekf2</text><text x="212.79999999999998" y="65.0" text-anchor="middle" class="b" style="font-size:10.5px">поза, скорость</text><rect class="box" x="304.4" y="30" width="111.2" height="48" rx="6"/><text x="360.0" y="51.0" text-anchor="middle" style="font-size:10.5px">mc_pos_control</text><text x="360.0" y="65.0" text-anchor="middle" style="font-size:10.5px">→ attitude_sp</text><rect class="box" x="451.59999999999997" y="30" width="111.2" height="48" rx="6"/><text x="507.2" y="51.0" text-anchor="middle" style="font-size:10.5px">mc_att_control</text><text x="507.2" y="65.0" text-anchor="middle" style="font-size:10.5px">→ rates_sp</text><rect class="boxa" x="598.8" y="30" width="111.2" height="48" rx="6"/><text x="654.4" y="51.0" text-anchor="middle" class="b" style="font-size:10.5px">mc_rate_control</text><text x="654.4" y="65.0" text-anchor="middle" class="b" style="font-size:10.5px">→ torque_sp</text><rect class="boxa" x="598.8" y="130" width="111.2" height="48" rx="6"/><text x="654.4" y="151.0" text-anchor="middle" class="b" style="font-size:10.5px">Аллокатор</text><text x="654.4" y="165.0" text-anchor="middle" class="b" style="font-size:10.5px">actuator_motors</text><path class="ln" d="M121.2 54.0 L157.2 54.0" marker-end="url(#ar)"/><path class="ln" d="M268.4 54.0 L304.4 54.0" marker-end="url(#ar)"/><path class="ln" d="M415.59999999999997 54.0 L451.59999999999997 54.0" marker-end="url(#ar)"/><path class="ln" d="M562.8 54.0 L598.8 54.0" marker-end="url(#ar)"/><path class="ln" d="M654.4 78 L654.4 130" marker-end="url(#ar)"/><text x="10" y="150" text-anchor="start" class="m t">listener &lt;топик&gt; —</text><text x="10" y="164" text-anchor="start" class="m t">посмотреть любой шаг</text></svg></div><figcaption class="gc-muted">Путь данных в PX4 от датчиков до моторов: модули обмениваются топиками uORB, каждый шаг можно посмотреть командой listener.</figcaption><div class="diagram__hint">Схему можно прокрутить по горизонтали</div></figure>
+
+<h2>Практика</h2>
+<h4 class="md-subheading">Шаг 1. Заглянуть внутрь SITL</h4>
+<pre class="cli-block"><code>make px4_sitl gz_x500
+pxh&gt; top
+pxh&gt; uorb top
+pxh&gt; listener vehicle_attitude
+pxh&gt; listener sensor_combined -n 1</code></pre>
+<h4 class="md-subheading">Шаг 2. Проследить цепочку</h4>
+<p>Найди в <code>uorb top</code> частоты <code>sensor_combined</code>, <code>vehicle_attitude</code>, <code>vehicle_local_position</code>, <code>actuator_motors</code>. Сопоставь с цепочкой выше: кто быстрее, кто медленнее, почему.</p>
+<h4 class="md-subheading">Шаг 3. Остановить и запустить модуль</h4>
+<p><code>mc_rate_control stop</code> в висении SITL — аппарат теряет управление; <code>mc_rate_control start</code> — возвращает. Делать только в симуляторе: это демонстрация модульности, а не приём.</p>
+<h4 class="md-subheading">Шаг 4. Прочитать <code>.msg</code></h4>
+<p>Открой <code>msg/VehicleCommand.msg</code> (с PX4 1.16 — <code>msg/versioned/VehicleCommand.msg</code>) и <code>msg/OffboardControlMode.msg</code> в исходниках: эти два сообщения понадобятся для ROS 2.</p>
+<h4 class="md-subheading">Что должно получиться и что записать</h4>
+<ul><li><strong>Шаг 1.</strong> <code>top</code> показывает модули и их загрузку CPU: в SITL это <code>px4</code> как процесс, внутри — модули стека. <code>uorb top</code> — таблица топиков с частотой публикаций и числом подписчиков. <code>listener sensor_combined -n 1</code> печатает одно сообщение с ускорениями и угловыми скоростями, и по нему видно поля, которые потом понадобятся в ROS 2.</li><li><strong>Шаг 2.</strong> Запиши фактические частоты четырёх топиков из <code>uorb top</code>. Ожидаемая картина: датчики и ориентация — сотни герц, локальная позиция — десятки, выходы моторов — с частотой контура угловых скоростей. Частоты в SITL зависят от модели симулятора и могут отличаться от железа — сравнивай их между собой, а не с чужими цифрами. Объясни, почему позиция медленнее ориентации: она опирается на GNSS и барометр, которые сами медленные.</li><li><strong>Шаг 3.</strong> После <code>mc_rate_control stop</code> аппарат в SITL переворачивается или падает за доли секунды: без контура угловых скоростей ничто не держит ориентацию. После <code>start</code> модуль снова подписан на топики, но упавший аппарат надо перезапустить. Это наглядно показывает, что модули — отдельные процессы, связанные только топиками.</li><li><strong>Шаг 4.</strong> Выпиши поля <code>VehicleCommand</code> (команда, семь параметров, адресаты) и <code>OffboardControlMode</code> (какой тип уставок разрешён) — это прямая подготовка к модулю PX4 + ROS 2.</li></ul>
+<h4 class="md-subheading">Лабораторная</h4>
+<p>Отчёт на страницу: цепочка от IMU до моторов с именами модулей и топиков и их частотами, снятыми в SITL.</p>
+<p>Лабораторная засчитывается, когда частоты четырёх топиков сняты через <code>uorb top</code> и записаны, <code>listener</code> выполнен минимум на двух топиках с разбором полей, а отчёт описывает цепочку «датчики → оценка → контур угловых скоростей → моторы» с именами модулей и топиков.</p>
+
+<h2>Диагностика</h2>
+<div class="diag-groups"><article class="diag-item"><h4><strong>Симптом:</strong> контроллер не реагирует на setpoint</h4><ul><li>Возможная причина: топик не публикуется или публикуется с нулевой частотой.</li><li>Что сделать: <code>uorb top</code>, <code>listener &lt;topic&gt;</code> — есть ли данные.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> модуль не стартует</h4><ul><li>Возможная причина: не собран для этой платы или зависит от отсутствующего драйвера.</li><li>Что сделать: проверить board config и вывод при старте.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> в логе нет нужного топика</h4><ul><li>Возможная причина: не включён в профиль логирования (<code>SDLOG_PROFILE</code>).</li><li>Что сделать: включить профиль, повторить полёт.</li></ul></article></div>
+
+<h2>Чек-лист</h2>
+<ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="px4-architecture:0"><span>Могу назвать цепочку модулей от IMU до моторов</span></label></li><li><label><input type="checkbox" data-check-id="px4-architecture:1"><span>Понимаю publish/subscribe и роль timestamp</span></label></li><li><label><input type="checkbox" data-check-id="px4-architecture:2"><span>Использовал <code>top</code>, <code>uorb top</code>, <code>listener</code> в SITL</span></label></li><li><label><input type="checkbox" data-check-id="px4-architecture:3"><span>Знаю, где лежат <code>.msg</code> и как имя файла становится топиком</span></label></li></ul>
+
+<h2>Источники</h2>
+<ul class="refs"><li><a href="https://docs.px4.io/main/en/concept/architecture.html" target="_blank" rel="noopener noreferrer">PX4 Architectural Overview</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://docs.px4.io/main/en/middleware/uorb.html" target="_blank" rel="noopener noreferrer">PX4 uORB Messaging</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://docs.px4.io/main/en/concept/control_allocation.html" target="_blank" rel="noopener noreferrer">PX4 Control Allocation</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://github.com/PX4/PX4-Autopilot/tree/main/msg" target="_blank" rel="noopener noreferrer">PX4-Autopilot msg definitions (GitHub)</a> <span class="gc-tag" data-state="info">primary</span></li></ul>
+<h2>Проверь себя</h2>
+<uav-quiz src="../quiz/px4-architecture.json" module="px4-architecture"></uav-quiz>
+      </div>
+      <div class="module-done"><gc-button variant="secondary" data-done-toggle="px4-architecture">Отметить как пройденный</gc-button></div>
+      <section class="related" aria-label="Смежные модули"><p class="gc-label gc-muted">Смежные модули</p><div class="gc-grid ref-grid"><a class="gc-card" href="px4-intro.html"><strong>Введение в PX4</strong><div class="gc-card__meta"><span class="gc-tag" title="L2 — Интегратор">L2</span></div></a><a class="gc-card" href="px4-ros2.html"><strong>PX4 и ROS 2: uXRCE-DDS и offboard</strong><div class="gc-card__meta"><span class="gc-tag" title="L4 — Эксперт">L4</span></div></a></div></section>
+      <nav class="pager" aria-label="Соседние модули" data-track-pager><a class="gc-card pager__prev" href="px4-intro.html"><span class="gc-label gc-muted">Назад · трек</span><br>Введение в PX4</a><a class="gc-card pager__next" href="px4-control.html"><span class="gc-label gc-muted">Дальше · трек</span><br>Контуры управления и тюнинг PX4</a></nav><nav class="pager" aria-label="Соседние шаги пути PX4" data-path-pager="px4" hidden><a class="gc-card pager__prev" href="px4-intro.html?path=px4"><span class="gc-label gc-muted">Назад · путь PX4</span><br>Введение в PX4</a><a class="gc-card pager__next" href="px4-control.html?path=px4"><span class="gc-label gc-muted">Дальше · шаг 16 из 36</span><br>Контуры управления и тюнинг PX4</a></nav>
+    </article>
+  </main>
+  <footer class="gc-container site-footer gc-muted">
+    <p>Открытый курс · <a href="https://github.com/irreligious86/UAV-Education">исходники на GitHub</a> · <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">план развития</a> · <a href="../../curriculum/curriculum.html">для разработчика</a> · CC BY-NC-SA 4.0</p>
+  </footer>
+</body>
+</html>

@@ -15,6 +15,9 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 DIRS = ("m", "ref", "pages", "cap", "path", "projects", "quiz")
+sys.path.insert(0, str(ROOT / "scripts"))
+import i18n  # noqa: E402
+DIRS = DIRS + tuple(f"{l['dir']}/{d}" for l in i18n.LANGS if l["dir"] for d in DIRS)   # every language tree
 SKIP = {"pre", "code", "script", "style", "svg", "textarea", "template"}
 PATTERNS = [
     (re.compile(r"\|\s*:?-{3,}:?\s*\|"), "table separator row rendered as text (|---|)"),

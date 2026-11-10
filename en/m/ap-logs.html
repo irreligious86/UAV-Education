@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en" data-theme="dark" data-lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Логи ArduPilot: разбор полёта — UAV Student</title>
+  <meta name="description" content="найти вибрации, просадку питания, отказ сенсора в DataFlash">
+  <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
+  <link rel="manifest" href="../../manifest.webmanifest">
+  <meta name="theme-color" content="#0b0f14">
+  <link rel="alternate" hreflang="ru" href="../../m/ap-logs.html">
+  <link rel="alternate" hreflang="uk" href="../../uk/m/ap-logs.html">
+  <link rel="alternate" hreflang="en" href="../../en/m/ap-logs.html">
+  <script>/* go to the visitor's chosen language before anything paints (assets/i18n.js) */(function(){try{var c=localStorage.getItem('uav-lang'),h=document.documentElement.getAttribute('data-lang');if(!c||c===h||/[?&]lang=keep\b/.test(location.search))return;var l=document.querySelector('link[rel=alternate][hreflang="'+c+'"]');if(l)location.replace(l.href+location.search+location.hash)}catch(e){}})();</script>
+  <link rel="stylesheet" href="../../lib/ground-control-ui/dist/ground-control.css">
+  <link rel="stylesheet" href="../../assets/site.css">
+  <script src="../../lib/ground-control-ui/dist/ground-control.js" defer></script>
+  <script src="../../assets/i18n/en.js"></script>
+  <script src="../../assets/i18n.js"></script>
+  <script src="../../assets/progress-store.js" defer></script>
+  <script src="../../assets/backend-config.js" defer></script>
+  <script src="../../assets/account.js" defer></script>
+  <script src="../../assets/grading.js" defer></script>
+  <script src="../../assets/app.js" defer></script>
+  <script src="../../assets/uav-quiz.js" defer></script>
+  <script src="../../assets/uav-tasks.js" defer></script>
+  <script src="../../assets/offline.js" defer></script>
+</head>
+<body class="gc-root" data-base="../" data-root="../../">
+  <header class="site-header">
+    <div class="gc-container site-header__inner">
+      <a class="site-brand" href="../index.html"><span class="site-brand__mark" aria-hidden="true">◆</span> UAV Student</a>
+      <nav class="gc-nav" aria-label="Разделы сайта">
+        <a href="../index.html" aria-current="page">Курс</a>
+        <a href="../ref/index.html">Справочник</a>
+        <a href="../pages/glossary.html">Глоссарий</a>
+        <a href="../pages/fails.html">Фейлы</a>
+        <a href="../pages/search.html">Поиск</a>
+        <a href="../pages/progress.html">Мой прогресс</a>
+      </nav>
+      <nav class="lang-switch" aria-label="Язык"><a class="gc-tag" href="../../m/ap-logs.html" data-lang-to="ru" hreflang="ru" lang="ru" title="Русский">RU</a><a class="gc-tag" href="../../uk/m/ap-logs.html" data-lang-to="uk" hreflang="uk" lang="uk" title="Українська">UK</a><a class="gc-tag" href="../../en/m/ap-logs.html" data-lang-to="en" hreflang="en" lang="en" title="English" aria-current="true" data-state="ok">EN</a></nav>
+    </div>
+  </header>
+  <main class="gc-container site-main">
+    <article class="module" data-module-page="ap-logs">
+      <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-autonomy">Автономия</a><span>Логи ArduPilot: разбор полёта</span></p>
+      <h1 class="module-title">Логи ArduPilot: разбор полёта</h1>
+      <div class="module-tags"><span class="gc-tag" title="Уровень">L3 — Специалист</span><span class="gc-tag">чтение 30 мин</span><span class="gc-tag">учёба ~3 ч</span><span class="gc-tag">ArduPilot 4.5+</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ОСВОЕН</span></div>
+      <p class="gc-muted module-score" data-module-score></p>
+      <p class="module-lead">ArduPilot пишет на SD-карту бинарный лог DataFlash (<code>.bin</code>) с сотнями типов сообщений: ориентация, высота, моторы, батарея, EKF, ошибки. Это чёрный ящик, который отвечает на вопрос «почему» после любого странного полёта. Модуль даёт порядок разбора — от вибраций до ошибок — с конкретными именами сообщений и полей, порогами из документации и скриптом на Python для своих графиков.</p>
+      <div class="gc-callout" data-state="ok"><strong>После модуля ты умеешь</strong><ul><li>найти вибрации, просадку питания, отказ сенсора в DataFlash</li></ul></div><p class="gc-muted">Перед этим модулем: <a href="ap-ekf.html">EKF и навигация</a></p><div class="gc-callout lab"><p class="gc-label gc-muted">Лабораторная</p><strong>Разбор одного полёта</strong><p class="gc-muted lab__hint">Сдано, когда отмечены все пункты:</p><ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="ap-logs:lab:0"><span>Скрипт на DFReader выводит медиану VIBE и клиппинг</span></label></li><li><label><input type="checkbox" data-check-id="ap-logs:lab:1"><span>Найдены ERR и расшифрованы подсистемы</span></label></li><li><label><input type="checkbox" data-check-id="ap-logs:lab:2"><span>Момент отказа мотора найден по RCIN/ATT/RCOU</span></label></li><li><label><input type="checkbox" data-check-id="ap-logs:lab:3"><span>Отчёт на 5 строк сохранён рядом с логом</span></label></li></ul></div><div class="path-pos gc-muted"><span class="gc-label">В пути</span><ul><li data-path-pos="ardupilot"><a href="../path/ardupilot.html">ArduPilot</a>: шаг 32 из 69 → <a href="ap-tuning.html?path=ardupilot">Тюнинг ArduPilot: AUTOTUNE, фильтры, notch по ESC</a></li></ul></div>
+      <div class="gc-prose module-body">
+<div class="gc-callout" data-state="caution" data-untranslated><strong>Модуль ещё не переведён.</strong> Ниже — оригинал (Русский). Прогресс и оценки общие для всех языков.</div>
+<h2>Теория</h2>
+<h4 class="md-subheading">Два вида логов</h4>
+<ul><li><strong>DataFlash</strong> (<code>.bin</code>) — на борту, высокая частота, всё подряд. Основной инструмент.</li><li><strong>Telemetry log</strong> (<code>.tlog</code>) — то, что видела GCS по радио. Реже и с дырами, но есть даже если SD-карта сгорела вместе с аппаратом.</li></ul>
+<p>Параметр <code>LOG_BITMASK</code> задаёт, что писать; <code>LOG_DISARMED</code> включает запись до арма (полезно для разбора pre-arm проблем).</p>
+<h4 class="md-subheading">Сообщения, с которых начинают</h4>
+<ul><li><code>VIBE</code> — вибрации: <code>VibeX</code>, <code>VibeY</code>, <code>VibeZ</code> (м/с²) и <code>Clip</code> — счётчик насыщения акселерометра. Ниже 30 нормально, выше 60 почти наверняка проблемы с высотой и позицией. Клиппинг должен быть нулевым.</li><li><code>ATT</code> — <code>DesRoll</code> против <code>Roll</code>, <code>DesPitch</code> против <code>Pitch</code>: насколько аппарат успевает за желаемым. Резкое расхождение — механическая проблема или нехватка тяги.</li><li><code>CTUN</code> — управление высотой: <code>ThO</code> (выход газа), <code>ThH</code> (оценка газа висения), <code>DAlt</code>/<code>Alt</code> (желаемая и фактическая высота), <code>BAlt</code> (баро).</li><li><code>BAT</code> — <code>Volt</code>, <code>Curr</code>, <code>CurrTot</code>, <code>Res</code> (оценка внутреннего сопротивления). Просадка под током и реальный расход.</li><li><code>RCIN</code> — каналы с пульта <code>C1…C14</code>: что делал пилот.</li><li><code>MODE</code> — смена режимов и причина <code>Rsn</code>.</li><li><code>ERR</code> — ошибки: <code>Subsys</code> и <code>ECode</code>. Например, подсистема 2 (радио) с кодом 2 — нет кадров приёмника две секунды; 11 — GPS-глитч; 16 — плохая вариация EKF; 17 — EKF-failsafe; 29 — компенсация вибраций.</li><li><code>MSG</code> — текстовые сообщения, в том числе pre-arm.</li><li><code>GPS</code> — <code>NSats</code>, <code>HDop</code>: HDOP ниже 1.5 хорошо, выше 2.0 подозрительно; меньше 12 спутников — плохо.</li><li><code>XKF1…XKF4</code> — внутренности EKF3 по ядрам: оценки и вариации (<code>XKF4</code>: <code>SV</code>, <code>SP</code>, <code>SH</code>, <code>SM</code> — скорость, позиция, высота, компас).</li><li><code>POWR</code> — <code>VCC</code> платы: колебания больше 0.1–0.15 В намекают на проблемы питания.</li></ul>
+<h4 class="md-subheading">Порядок разбора</h4>
+<ol><li><strong>Обрывается ли лог?</strong> Лог, который кончается в воздухе, — потеря питания или перезагрузка.</li><li><strong>Вибрации</strong> (<code>VIBE</code>). Всё остальное бессмысленно, пока они высокие.</li><li><strong>Ошибки</strong> (<code>ERR</code>, <code>MSG</code>): что и когда сработало.</li><li><strong>Режимы</strong> (<code>MODE</code>): кто менял режим — пилот или failsafe.</li><li><strong>Управление</strong> (<code>ATT</code>, <code>CTUN</code>): успевал ли аппарат за командами.</li><li><strong>Питание</strong> (<code>BAT</code>, <code>POWR</code>): просадки и их совпадение с событиями.</li><li><strong>Навигация</strong> (<code>GPS</code>, <code>XKF4</code>): качество позиции и вариации в момент проблемы.</li></ol>
+<h4 class="md-subheading">Инструменты</h4>
+<p>Mission Planner (Review a Log), MAVExplorer из пакета MAVProxy (графики по именам полей, например <code>graph ATT.Roll ATT.DesRoll</code>), UAV Log Viewer в браузере. Для автоматизации — <code>pymavlink.DFReader</code>: читает <code>.bin</code> напрямую в Python.</p>
+<h4 class="md-subheading">Разобранный пример: разбор «просадка высоты на 3 м в Loiter»</h4>
+<ol><li><code>VIBE.VibeZ</code> 12 м/с², <code>Clip</code> 0 → не вибрации.</li><li><code>ERR</code>/<code>MSG</code>: нет.</li><li><code>CTUN</code>: <code>DAlt</code> 20 м постоянна, <code>Alt</code> проваливается до 17 м, <code>BAlt</code> одновременно → реальная просадка, не оценка.</li><li><code>CTUN.ThO</code> в момент — 0.78 (до — 0.42), <code>BAT.Volt</code> 21.1 → 18.9 В, <code>BAT.Curr</code> 60 → 95 А: газ упёрся в потолок на просевшей АКБ.</li><li><code>RCIN.C3</code> — пилот газ не трогал; <code>MODE</code> без смен.</li></ol>
+<p>Вывод: нехватка тяги при просадке напряжения на старой АКБ (<code>BAT.Res</code> 0.09 Ом — высоко): АКБ на замену, <code>MOT_BAT_VOLT_MIN/MAX</code> для компенсации, порог <code>BATT_LOW_VOLT</code> выше. Метод важнее вывода: каждый шаг — конкретное поле.</p>
+<h4 class="md-subheading">Python для своих метрик (pymavlink)</h4>
+<pre class="cli-block"><code>from pymavlink import mavutil
+import pandas as pd
+def df_of(log, msg):
+    m = mavutil.mavlink_connection(log); rows = []
+    while (x := m.recv_match(type=msg, blocking=False)) is not None: rows.append(x.to_dict())
+    return pd.DataFrame(rows)
+att = df_of(&quot;flight.bin&quot;, &quot;ATT&quot;)
+err = (att.DesRoll - att.Roll).abs()
+print(&quot;roll tracking RMS deg:&quot;, err.pow(2).mean() ** 0.5, &quot;p99:&quot;, err.quantile(0.99))
+vibe = df_of(&quot;flight.bin&quot;, &quot;VIBE&quot;); print(&quot;VibeZ p95:&quot;, vibe.VibeZ.quantile(0.95), &quot;clips:&quot;, vibe.Clip.max())</code></pre>
+<p><code>mavlogdump.py --types ATT,VIBE --format csv flight.bin</code> — быстрая выгрузка в CSV без кода; <code>MAVExplorer</code>: <code>graph ATT.Roll ATT.DesRoll</code>, <code>fft</code> для спектров батч-сэмплинга (<code>ISBH/ISBD</code>), <code>map</code> для траектории. Метрики переходного процесса и спектры — модуль «Python для данных».</p>
+<h4 class="md-subheading">Что писать в LOG_BITMASK</h4>
+<p>По умолчанию достаточно для разбора полёта; для тюнинга добавить <code>PID</code> (сообщения <code>PIDR/PIDP/PIDY</code> с P/I/D/FF по осям) и <code>IMU_RAW</code>/батч-сэмплинг (<code>INS_LOG_BAT_MASK</code>) на время настройки фильтров — лог растёт в разы, после — выключить. <code>LOG_FILE_DSRMROT</code> — новый файл при каждом дизарме; <code>LOG_DISARMED = 1</code> — для наземных измерений (шум, GPS), потом выключить, иначе SD забивается.</p>
+<figure class="diagram" data-diagram="log-triage"><div class="diagram__svg"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 184" width="100%" role="img" aria-labelledby="t" style="max-width:720px;display:block;margin:0 auto"><title id="t">Разбор лога ArduPilot: с чего начать</title><style>text{font-family: var(--gc-font-mono, ui-monospace, Menlo, monospace); font-size: 12px;fill:currentColor} .m{fill:var(--gc-ink-muted, #8a93a3)} .a{fill:var(--gc-accent-hud, #5ef1d2)} .w{fill:var(--gc-signal-amber, #f0b24c)} .d{fill:var(--gc-signal-red, #e8636b)} .box{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:currentColor;stroke-width:1.2} .boxa{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6} .ln{stroke:currentColor;stroke-width:1.2;fill:none} .lna{stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6;fill:none} .lnm{stroke:var(--gc-ink-muted, #8a93a3);stroke-width:1;fill:none;stroke-dasharray:4 3} .t{font-size:11px} .b{font-weight:600}</style><defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker><marker id="ara" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--gc-accent-hud, #5ef1d2)"/></marker></defs><text x="16" y="16" text-anchor="start" class="m t">Разбор лога ArduPilot: с чего начать</text><rect class="box" x="285.0" y="34" width="150.0" height="40" rx="6"/><text x="360.0" y="52.0" text-anchor="middle" style="font-size:10.5px">Что пошло</text><text x="360.0" y="64.0" text-anchor="middle" style="font-size:10.5px">не так?</text><path class="ln" d="M360.0 74 L360.0 89.0 L80.0 89.0 L80.0 104" marker-end="url(#ar)"/><text x="84.0" y="85.0" text-anchor="start" class="a t" style="font-size:10px">тряска</text><rect class="boxa" x="13.0" y="104" width="134.0" height="40" rx="18"/><text x="80.0" y="122.0" text-anchor="middle" class="b" style="font-size:9.5px">VIBE: X/Y/Z,</text><text x="80.0" y="134.0" text-anchor="middle" class="b" style="font-size:9.5px">Clip0–2</text><path class="ln" d="M360.0 74 L360.0 89.0 L220.0 89.0 L220.0 104" marker-end="url(#ar)"/><text x="224.0" y="85.0" text-anchor="start" class="a t" style="font-size:10px">питание</text><rect class="box" x="153.0" y="104" width="134.0" height="40" rx="18"/><text x="220.0" y="122.0" text-anchor="middle" style="font-size:9.5px">BAT: Volt, Curr,</text><text x="220.0" y="134.0" text-anchor="middle" style="font-size:9.5px">POWR: Vcc</text><path class="ln" d="M360.0 74 L360.0 89.0 L360.0 89.0 L360.0 104" marker-end="url(#ar)"/><text x="364.0" y="85.0" text-anchor="start" class="a t" style="font-size:10px">уплыл</text><rect class="box" x="293.0" y="104" width="134.0" height="40" rx="18"/><text x="360.0" y="122.0" text-anchor="middle" style="font-size:9.5px">XKF4: SV/SP/SH,</text><text x="360.0" y="134.0" text-anchor="middle" style="font-size:9.5px">GPS: NSats, HDop</text><path class="ln" d="M360.0 74 L360.0 89.0 L500.0 89.0 L500.0 104" marker-end="url(#ar)"/><text x="504.0" y="85.0" text-anchor="start" class="a t" style="font-size:10px">не держит</text><rect class="box" x="433.0" y="104" width="134.0" height="40" rx="18"/><text x="500.0" y="122.0" text-anchor="middle" style="font-size:9.5px">RATE, ATT:</text><text x="500.0" y="134.0" text-anchor="middle" style="font-size:9.5px">Des против факта</text><path class="ln" d="M360.0 74 L360.0 89.0 L640.0 89.0 L640.0 104" marker-end="url(#ar)"/><text x="644.0" y="85.0" text-anchor="start" class="a t" style="font-size:10px">режим</text><rect class="box" x="573.0" y="104" width="134.0" height="40" rx="18"/><text x="640.0" y="122.0" text-anchor="middle" style="font-size:9.5px">MODE, ERR, EV,</text><text x="640.0" y="134.0" text-anchor="middle" style="font-size:9.5px">RCIN, MSG</text></svg></div><figcaption class="gc-muted">С чего начинать разбор лога: симптом определяет первое сообщение — VIBE, BAT/POWR, XKF4/GPS, RATE/ATT или MODE/ERR/EV.</figcaption><div class="diagram__hint">Схему можно прокрутить по горизонтали</div></figure>
+
+<h2>Практика</h2>
+<h4 class="md-subheading">Скрипт: вибрации и клиппинг по логу</h4>
+<pre class="cli-block"><code>import sys
+from pymavlink import DFReader
+
+log = DFReader.DFReader_binary(sys.argv[1])
+vibe = {&quot;VibeX&quot;: [], &quot;VibeY&quot;: [], &quot;VibeZ&quot;: []}
+clip_max = 0
+errors = []
+while True:
+    m = log.recv_msg()
+    if m is None:
+        break
+    t = m.get_type()
+    if t == &quot;VIBE&quot; and m.IMU == 0:
+        for k in vibe:
+            vibe[k].append(getattr(m, k))
+        clip_max = max(clip_max, m.Clip)
+    elif t == &quot;ERR&quot;:
+        errors.append((m.TimeUS / 1e6, m.Subsys, m.ECode))
+
+for k, v in vibe.items():
+    v = sorted(v)
+    print(f&quot;{k}: median {v[len(v)//2]:.1f}  p95 {v[int(len(v)*0.95)]:.1f} m/s/s&quot;)
+print(&quot;accel clipping events:&quot;, clip_max)
+for t, sub, code in errors:
+    print(f&quot;ERR at {t:7.1f}s  subsys={sub} ecode={code}&quot;)</code></pre>
+<p>Запуск: <code>python vibe_report.py 00000012.BIN</code>. Медиана выше 30 или ненулевой клиппинг — сначала механика, потом всё остальное.</p>
+<h4 class="md-subheading">Лабораторная</h4>
+<ol><li>Сделай в SITL полёт с миссией и отказом мотора по тумблеру.</li><li>Скачай лог (в SITL — папка <code>logs/</code>).</li><li>Найди момент отказа по <code>RCIN</code> (тумблер) и посмотри, как разошлись <code>DesRoll</code>/<code>Roll</code> и выросли выходы моторов (<code>RCOU</code>).</li><li>Напиши отчёт на пять строк: что случилось, когда, как аппарат справился, какие параметры стоит поменять.</li></ol>
+<h4 class="md-subheading">Реальный лог</h4>
+<p>Повтори то же с логом реального висения: вибрации, газ висения (<code>CTUN.ThH</code>), просадка батареи. Сохрани лог и отчёт в папку дрона с датой.</p>
+<h4 class="md-subheading">Как устроить отказ мотора в SITL</h4>
+<p>Отказ задаётся параметрами симулятора: <code>SIM_ENGINE_FAIL</code> — маска моторов (бит 0 — выход 1), <code>SIM_ENGINE_MUL</code> — множитель их тяги. На квадрокоптере полный отказ (<code>SIM_ENGINE_MUL = 0</code>) означает падение, поэтому для учебного разбора бери частичный отказ (0.5–0.6) или раму hexa/octa, где полный отказ одного мотора переживаем. Момент отказа в логе виден по записи <code>PARM</code> с новым значением параметра или по тумблеру в <code>RCIN</code>, если отказ повешен на канал пульта.</p>
+<h4 class="md-subheading">Что должно получиться и что записать</h4>
+<ul><li><strong>Скрипт.</strong> В SITL вибрации малы (единицы м/с²), и клиппинга нет — механики нет. На реальном аппарате медиана ниже 30 м/с² и нулевой клиппинг: только тогда разбирать остальное. Запиши медиану и p95 по трём осям.</li><li><strong>ERR.</strong> Каждую запись расшифруй по таблице подсистем из теории: время, подсистема, код, что это значит.</li><li><strong>Отказ.</strong> Через доли секунды после него расходятся <code>ATT.DesRoll</code> и <code>ATT.Roll</code>, а выходы моторов в <code>RCOU</code> разъезжаются: оставшиеся моторы работают с запасом, отказавший уходит в максимум, пытаясь дать тягу. Запиши время до стабилизации и максимальное отклонение по крену.</li><li><strong>Отчёт на пять строк, пример:</strong> «12.3 с — отказ мотора 1 (×0.6). Крен отклонился до 14°, стабилизировался за 1.2 с. Выходы оставшихся моторов выросли до 75 %, запас тяги есть. Вибрации в норме (медиана 4 м/с²), клиппинга нет. Рекомендация: для этой массы запас достаточен, менять не нужно.»</li><li><strong>Реальный лог.</strong> Газ висения <code>CTUN.ThH</code> сравни с <code>MOT_THST_HOVER</code>; просадка батареи под газом видна в <code>BAT</code>.</li></ul>
+<p>Лабораторная засчитывается, когда скрипт на DFReader выводит медиану VIBE и клиппинг, все ERR расшифрованы, момент отказа найден по <code>PARM</code>/<code>RCIN</code> с реакцией в <code>ATT</code> и <code>RCOU</code>, а отчёт на пять строк сохранён рядом с логом.</p>
+
+<h2>Диагностика</h2>
+<div class="diag-groups"><article class="diag-item"><h4><strong>Симптом:</strong> лог обрывается в воздухе</h4><ul><li>Возможная причина: потеря питания платы.</li><li>Что сделать: <code>POWR.VCC</code> перед обрывом, пайка силовых разъёмов, BEC.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> <code>VIBE</code> высокие, <code>Clip</code> растёт</h4><ul><li>Возможная причина: дисбаланс пропов/моторов, жёсткое крепление FC.</li><li>Что сделать: балансировка, демпферы, проверка рамы — до любых фильтров.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> <code>DesRoll</code> и <code>Roll</code> расходятся, один мотор на максимуме в <code>RCOU</code></h4><ul><li>Возможная причина: отказ или слабость мотора/ESC, перегруз.</li><li>Что сделать: проверить мотор, пропеллер, ESC; сравнить выходы моторов на висении.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> <code>ERR</code> 16/17 перед аварией</h4><ul><li>Возможная причина: плохие вариации EKF — компас, GPS или вибрации.</li><li>Что сделать: <code>XKF4</code> в тот момент, причина по предыдущему модулю.</li></ul></article></div>
+
+<h2>Чек-лист</h2>
+<ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="ap-logs:0"><span>Знаю разницу DataFlash и tlog</span></label></li><li><label><input type="checkbox" data-check-id="ap-logs:1"><span>Разбор начинаю с обрыва лога и вибраций</span></label></li><li><label><input type="checkbox" data-check-id="ap-logs:2"><span>Умею найти <code>ERR</code> и расшифровать подсистему</span></label></li><li><label><input type="checkbox" data-check-id="ap-logs:3"><span>Скрипт на DFReader читает мой лог</span></label></li><li><label><input type="checkbox" data-check-id="ap-logs:4"><span>Логи и отчёты лежат в папке дрона с датой</span></label></li></ul>
+
+<h2>Источники</h2>
+<ul class="refs"><li><a href="https://ardupilot.org/copter/docs/common-diagnosing-problems-using-logs.html" target="_blank" rel="noopener noreferrer">Diagnosing problems using Logs — ArduPilot Copter</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://ardupilot.org/copter/docs/common-downloading-and-analyzing-data-logs-in-mission-planner.html" target="_blank" rel="noopener noreferrer">Downloading and Analyzing Data Logs — ArduPilot</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://github.com/ArduPilot/ardupilot/blob/master/libraries/AP_Logger/LogStructure.h" target="_blank" rel="noopener noreferrer">Log message reference (LogStructure.h, GitHub)</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://ardupilot.org/dev/docs/using-mavexplorer-for-log-analysis.html" target="_blank" rel="noopener noreferrer">MAVExplorer — MAVProxy</a> <span class="gc-tag" data-state="info">primary</span></li></ul>
+<h2>Проверь себя</h2>
+<uav-quiz src="../quiz/ap-logs.json" module="ap-logs"></uav-quiz>
+      </div>
+      <div class="module-done"><gc-button variant="secondary" data-done-toggle="ap-logs">Отметить как пройденный</gc-button></div>
+      <section class="related" aria-label="Смежные модули"><p class="gc-label gc-muted">Смежные модули</p><div class="gc-grid ref-grid"><a class="gc-card" href="ap-ekf.html"><strong>EKF и навигация</strong><div class="gc-card__meta"><span class="gc-tag" title="L3 — Специалист">L3</span></div></a><a class="gc-card" href="bf-blackbox.html"><strong>Blackbox</strong><div class="gc-card__meta"><span class="gc-tag" title="L2 — Интегратор">L2</span></div></a></div></section>
+      <nav class="pager" aria-label="Соседние модули" data-track-pager><a class="gc-card pager__prev" href="ctl-guidance.html"><span class="gc-label gc-muted">Назад · трек</span><br>Наведение и траектории: pure pursuit, L1, S-кривые, minimum snap</a><a class="gc-card pager__next" href="ap-lua.html"><span class="gc-label gc-muted">Дальше · трек</span><br>Lua: сценарии и fault injection</a></nav><nav class="pager" aria-label="Соседние шаги пути ArduPilot" data-path-pager="ardupilot" hidden><a class="gc-card pager__prev" href="ctl-signals.html?path=ardupilot"><span class="gc-label gc-muted">Назад · путь ArduPilot</span><br>Сигналы и спектры: что видит гироскоп</a><a class="gc-card pager__next" href="ap-tuning.html?path=ardupilot"><span class="gc-label gc-muted">Дальше · шаг 33 из 69</span><br>Тюнинг ArduPilot: AUTOTUNE, фильтры, notch по ESC</a></nav>
+    </article>
+  </main>
+  <footer class="gc-container site-footer gc-muted">
+    <p>Открытый курс · <a href="https://github.com/irreligious86/UAV-Education">исходники на GitHub</a> · <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">план развития</a> · <a href="../../curriculum/curriculum.html">для разработчика</a> · CC BY-NC-SA 4.0</p>
+  </footer>
+</body>
+</html>

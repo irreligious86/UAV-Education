@@ -1,0 +1,94 @@
+{
+  "module": "ros2-from-ros1",
+  "pass": 80,
+  "questions": [
+    {
+      "q": "Чего нет в ROS 2 по сравнению с ROS 1?",
+      "options": [
+        "roscore",
+        "Топиков",
+        "tf2",
+        "Сервисов"
+      ],
+      "answer": 0,
+      "explain": "DDS discovery без единой точки отказа."
+    },
+    {
+      "q": "Цикл while с rate.sleep() в ROS 2 заменяют:",
+      "options": [
+        "Таймером",
+        "Тем же циклом",
+        "Сервисом",
+        "Lifecycle"
+      ],
+      "answer": 0,
+      "explain": "create_timer + spin."
+    },
+    {
+      "q": "Синхронный вызов сервиса в колбэке однопоточного узла приводит к:",
+      "options": [
+        "Взаимной блокировке",
+        "Ускорению",
+        "Ничему",
+        "Ошибке QoS при ответе"
+      ],
+      "answer": 0,
+      "explain": "Используйте call_async."
+    },
+    {
+      "q": "Система сборки ROS 2:",
+      "options": [
+        "ament + colcon",
+        "make и setup.py, как в ROS 1",
+        "rosbuild",
+        "catkin_make"
+      ],
+      "answer": 0,
+      "explain": "package.xml format 3."
+    },
+    {
+      "q": "Параметр в ROS 2 перед использованием нужно:",
+      "options": [
+        "Объявить в узле",
+        "Записать в roscore",
+        "Опубликовать",
+        "Ничего"
+      ],
+      "answer": 0,
+      "explain": "Параметры принадлежат узлу."
+    },
+    {
+      "q": "ROS 1 Noetic:",
+      "options": [
+        "Без поддержки с 2025",
+        "LTS до 2030 года",
+        "Устарел в 2020",
+        "Поддерживается до выхода Jazzy LTS"
+      ],
+      "answer": 0,
+      "explain": "Перенос — правильный путь для живого кода."
+    },
+    {
+      "q": "Сконвертировать .bag ROS 1 в ROS 2:",
+      "options": [
+        "rosbags-convert",
+        "ros1_bridge",
+        "colcon",
+        "tf2_echo"
+      ],
+      "answer": 0,
+      "explain": "Пакет rosbags на чистом Python."
+    },
+    {
+      "q": "Первое, что читать в незнакомом ROS 1 проекте:",
+      "options": [
+        "Launch-файлы",
+        "Все .cpp подряд",
+        "Только README",
+        "CMakeLists целиком"
+      ],
+      "answer": 0,
+      "explain": "Launch показывает узлы, параметры и remap-ы."
+    }
+  ]
+}

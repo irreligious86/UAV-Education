@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en" data-theme="dark" data-lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>GNSS: как работает GPS, ошибки, RTK — UAV Student</title>
+  <meta name="description" content="объяснить псевдодальность, HDOP, многолучёвость, созвездия выбрать приёмник и антенну, понимать u-blox-настройки объяснить RTK/PPK и когда они нужны">
+  <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
+  <link rel="manifest" href="../../manifest.webmanifest">
+  <meta name="theme-color" content="#0b0f14">
+  <link rel="alternate" hreflang="ru" href="../../m/est-gnss.html">
+  <link rel="alternate" hreflang="uk" href="../../uk/m/est-gnss.html">
+  <link rel="alternate" hreflang="en" href="../../en/m/est-gnss.html">
+  <script>/* go to the visitor's chosen language before anything paints (assets/i18n.js) */(function(){try{var c=localStorage.getItem('uav-lang'),h=document.documentElement.getAttribute('data-lang');if(!c||c===h||/[?&]lang=keep\b/.test(location.search))return;var l=document.querySelector('link[rel=alternate][hreflang="'+c+'"]');if(l)location.replace(l.href+location.search+location.hash)}catch(e){}})();</script>
+  <link rel="stylesheet" href="../../lib/ground-control-ui/dist/ground-control.css">
+  <link rel="stylesheet" href="../../assets/site.css">
+  <script src="../../lib/ground-control-ui/dist/ground-control.js" defer></script>
+  <script src="../../assets/i18n/en.js"></script>
+  <script src="../../assets/i18n.js"></script>
+  <script src="../../assets/progress-store.js" defer></script>
+  <script src="../../assets/backend-config.js" defer></script>
+  <script src="../../assets/account.js" defer></script>
+  <script src="../../assets/grading.js" defer></script>
+  <script src="../../assets/app.js" defer></script>
+  <script src="../../assets/uav-quiz.js" defer></script>
+  <script src="../../assets/uav-tasks.js" defer></script>
+  <script src="../../assets/offline.js" defer></script>
+</head>
+<body class="gc-root" data-base="../" data-root="../../">
+  <header class="site-header">
+    <div class="gc-container site-header__inner">
+      <a class="site-brand" href="../index.html"><span class="site-brand__mark" aria-hidden="true">◆</span> UAV Student</a>
+      <nav class="gc-nav" aria-label="Разделы сайта">
+        <a href="../index.html" aria-current="page">Курс</a>
+        <a href="../ref/index.html">Справочник</a>
+        <a href="../pages/glossary.html">Глоссарий</a>
+        <a href="../pages/fails.html">Фейлы</a>
+        <a href="../pages/search.html">Поиск</a>
+        <a href="../pages/progress.html">Мой прогресс</a>
+      </nav>
+      <nav class="lang-switch" aria-label="Язык"><a class="gc-tag" href="../../m/est-gnss.html" data-lang-to="ru" hreflang="ru" lang="ru" title="Русский">RU</a><a class="gc-tag" href="../../uk/m/est-gnss.html" data-lang-to="uk" hreflang="uk" lang="uk" title="Українська">UK</a><a class="gc-tag" href="../../en/m/est-gnss.html" data-lang-to="en" hreflang="en" lang="en" title="English" aria-current="true" data-state="ok">EN</a></nav>
+    </div>
+  </header>
+  <main class="gc-container site-main">
+    <article class="module" data-module-page="est-gnss">
+      <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-estimation">Оценка состояния и навигация</a><span>GNSS: как работает GPS, ошибки, RTK</span></p>
+      <h1 class="module-title">GNSS: как работает GPS, ошибки, RTK</h1>
+      <div class="module-tags"><span class="gc-tag" title="Уровень">L2 — Интегратор</span><span class="gc-tag">чтение 35 мин</span><span class="gc-tag">учёба ~3 ч</span><span class="gc-tag">любая прошивка</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ОСВОЕН</span></div>
+      <p class="gc-muted module-score" data-module-score></p>
+      <p class="module-lead">GPS для автопилота — не «точка на карте», а шумное измерение с известной (и меняющейся) ошибкой. Модуль объясняет, как приёмник получает псевдодальности и решает позицию, откуда берутся ошибки (ионосфера, многолучёвость, геометрия спутников — HDOP), что дают несколько созвездий (GPS, GLONASS, Galileo, BeiDou), как выбрать приёмник и антенну, какие настройки u-blox важны для полёта (частота, созвездия, динамическая модель, SBAS), и что такое RTK/PPK, когда они нужны и когда — нет. Лабораторная: качество GPS в разных условиях по логу.</p>
+      <div class="gc-callout" data-state="ok"><strong>После модуля ты умеешь</strong><ul><li>объяснить псевдодальность, HDOP, многолучёвость, созвездия</li><li>выбрать приёмник и антенну, понимать u-blox-настройки</li><li>объяснить RTK/PPK и когда они нужны</li></ul></div><p class="gc-muted">Перед этим модулем: <a href="f-fc-sensors.html">Полётный контроллер и сенсоры</a></p><div class="gc-callout lab"><p class="gc-label gc-muted">Лабораторная</p><strong>Качество GPS</strong><p class="gc-muted lab__hint">Сдано, когда отмечены все пункты:</p><ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="est-gnss:lab:0"><span>HDOP и число спутников записаны в разных условиях</span></label></li><li><label><input type="checkbox" data-check-id="est-gnss:lab:1"><span>Многолучёвость показана на логе</span></label></li><li><label><input type="checkbox" data-check-id="est-gnss:lab:2"><span>Настройки u-blox проверены</span></label></li></ul></div><div class="path-pos gc-muted"><span class="gc-label">В пути</span><ul><li data-path-pos="ardupilot"><a href="../path/ardupilot.html">ArduPilot</a>: шаг 26 из 69 → <a href="ap-ekf.html?path=ardupilot">EKF и навигация</a></li></ul></div>
+      <div class="gc-prose module-body">
+<div class="gc-callout" data-state="caution" data-untranslated><strong>Модуль ещё не переведён.</strong> Ниже — оригинал (Русский). Прогресс и оценки общие для всех языков.</div>
+<h2>Теория</h2>
+<h4 class="md-subheading">Принцип</h4>
+<p>Каждый спутник передаёт время и орбиту; приёмник измеряет задержку сигнала → <strong>псевдодальность</strong> (расстояние + ошибка часов приёмника). Четыре неизвестных (x, y, z, Δt) → минимум 4 спутника; больше — лучше (избыточность, оценка качества). Сигнал на входе ~−130 дБм — слабее шума, выделяется корреляцией с известным кодом.</p>
+<h4 class="md-subheading">Ошибки и их величины (одночастотный приёмник, хорошие условия)</h4>
+<div class="table-wrap md-table-wrap" tabindex="0"><table class="md-table"><thead><tr><th>Источник</th><th>Ошибка</th><th>Как уменьшить</th></tr></thead><tbody><tr><td data-label="Источник">Ионосфера</td><td data-label="Ошибка">2–5 м</td><td data-label="Как уменьшить">двухчастотность (L1+L5/L2), SBAS-коррекция</td></tr><tr><td data-label="Источник">Тропосфера</td><td data-label="Ошибка">0.5–1 м</td><td data-label="Как уменьшить">модель</td></tr><tr><td data-label="Источник">Орбита/часы спутника</td><td data-label="Ошибка">1–2 м</td><td data-label="Как уменьшить">SBAS</td></tr><tr><td data-label="Источник">Многолучёвость (отражения от зданий, земли, рамы)</td><td data-label="Ошибка">1–10+ м, скачками</td><td data-label="Как уменьшить">антенна с ground plane, выше над рамой, вдали от строений</td></tr><tr><td data-label="Источник">Геометрия (DOP)</td><td data-label="Ошибка">множитель ×1–×5</td><td data-label="Как уменьшить">много спутников по всему небу</td></tr><tr><td data-label="Источник">Шум приёмника</td><td data-label="Ошибка">0.3–1 м</td><td data-label="Как уменьшить">хорошая антенна, нет помех</td></tr></tbody></table></div>
+<p>Итого: 1.5–3 м (CEP) в поле, 5–20 м в городе. <strong>Скорость</strong> по доплеру гораздо точнее — 0.05–0.2 м/с; EKF опирается на неё больше, чем на позицию.</p>
+<h4 class="md-subheading">DOP: геометрия</h4>
+<p>HDOP (горизонтальный) — множитель ошибки от расположения спутников: все спутники в одной стороне неба → плохо. &lt; 1 — отлично, 1–2 — хорошо, выше порога — ArduPilot не армит в GPS-режимах (<code>GPS_HDOP_GOOD</code>, хранится как HDOP × 100; по умолчанию 140 = 1.4). Число спутников — грубый показатель: 6 — минимум, 12+ — норма с несколькими созвездиями.</p>
+<h4 class="md-subheading">Созвездия</h4>
+<p>GPS (США, L1 C/A), GLONASS (Россия), Galileo (ЕС, L1 + E5), BeiDou (Китай). Многосозвездный приёмник (u-blox M8/M9/M10, F9P) видит 20–30 спутников вместо 8–10: лучше DOP, быстрее fix, устойчивее в условиях частичного закрытия неба. Цена — вычислительная нагрузка и частота обновления: M8 — 10 Гц с 2–3 созвездиями, M9/M10 — до 25 Гц, F9P — 20 Гц RTK.</p>
+<h4 class="md-subheading">Антенна</h4>
+<p>Керамический патч 25×25 мм на ground plane — стандарт; спиральные (helix) — круговая поляризация, лучше против многолучёвости, не нужна земля. Правило: антенна сверху, на мачте, ничего металлического рядом, ground plane ≥ 40 мм для патча. Активная антенна (с усилителем) — для длинного кабеля.</p>
+<h4 class="md-subheading">Настройки u-blox, которые имеет значение</h4>
+<ul><li><strong>Частота</strong>: 5–10 Гц для коптера (ArduPilot <code>GPS_RATE_MS = 200</code>, в 4.6+ <code>GPS1_RATE_MS</code> → 5 Гц; выше не нужно EKF и перегружает UART/CPU).</li><li><strong>Динамическая модель</strong>: Airborne &lt; 1g/2g/4g — фильтр внутри приёмника под динамику; Pedestrian/Automotive для дрона плохи (сглаживают и запаздывают). ArduPilot ставит <code>GPS_NAVFILTER</code>.</li><li><strong>Созвездия</strong> (<code>GPS_GNSS_MODE</code>): GPS + Galileo + GLONASS или GPS + Galileo + BeiDou — не все четыре сразу на M8 (частота падает).</li><li><strong>SBAS</strong> (<code>GPS_SBAS_MODE</code>): коррекции WAAS/EGNOS — чуть точнее, но в некоторых регионах мешает; включать там, где есть покрытие.</li><li><strong>Сообщения</strong>: UBX (бинарный) вместо NMEA — компактнее, точнее, со статусом качества; ArduPilot сам настраивает приёмник u-blox при <code>GPS_AUTO_CONFIG = 1</code>.</li></ul>
+<h4 class="md-subheading">RTK и PPK</h4>
+<p><strong>RTK</strong> (Real-Time Kinematic): базовая станция с известной позицией передаёт поправки фазы несущей (RTCM) ровер-приёмнику по радио/4G; точность 1–3 см при fix (статус RTK Fixed), 10–50 см при float. Нужен двухчастотный приёмник (F9P, UM982) на обоих концах, база в радиусе ~10–20 км, непрерывная связь. <strong>PPK</strong> — то же, но постобработка по логам: нужна для фотограмметрии, не для управления полётом.</p>
+<p>Когда нужен RTK: точная посадка, геодезия, moving baseline для курса (два GPS → yaw без компаса: ArduPilot «GPS for yaw», база <code>GPS_TYPE = 17</code>, ровер <code>GPS_TYPE2 = 18</code>; в 4.6+ — <code>GPS1_TYPE</code>/<code>GPS2_TYPE</code>). Когда не нужен: обычный полёт по точкам (EKF и 2 м ошибки достаточно), FPV. RTK не лечит многолучёвость и потерю спутников под крышей.</p>
+<h4 class="md-subheading">Как GPS входит в EKF</h4>
+<p>EKF получает позицию, скорость, их оценки точности (<code>GPA.HAcc/VAcc/SAcc</code>) и задержку (<code>GPS1_DELAY_MS</code> ~ 100–200 мс — измерение «старое», EKF учитывает). Качество проверяется (<code>EK3_GPS_CHECK</code>: HDOP, число спутников, дрейф скорости на земле) до разрешения арма в режимах с GPS. Glitch-защита — ворота инноваций (модуль про Калмана).</p>
+<figure class="diagram" data-diagram="rtk-chain"><div class="diagram__svg"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 200" width="100%" role="img" aria-labelledby="t" style="max-width:720px;display:block;margin:0 auto"><title id="t">GNSS и RTK: откуда сантиметры</title><style>text{font-family: var(--gc-font-mono, ui-monospace, Menlo, monospace); font-size: 12px;fill:currentColor} .m{fill:var(--gc-ink-muted, #8a93a3)} .a{fill:var(--gc-accent-hud, #5ef1d2)} .w{fill:var(--gc-signal-amber, #f0b24c)} .d{fill:var(--gc-signal-red, #e8636b)} .box{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:currentColor;stroke-width:1.2} .boxa{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6} .ln{stroke:currentColor;stroke-width:1.2;fill:none} .lna{stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6;fill:none} .lnm{stroke:var(--gc-ink-muted, #8a93a3);stroke-width:1;fill:none;stroke-dasharray:4 3} .t{font-size:11px} .b{font-weight:600}</style><defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker><marker id="ara" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--gc-accent-hud, #5ef1d2)"/></marker></defs><rect class="box" x="10.0" y="30" width="142.0" height="48" rx="6"/><text x="81.0" y="51.0" text-anchor="middle">Спутники</text><text x="81.0" y="65.0" text-anchor="middle">GPS/GLO/GAL/BDS</text><rect class="box" x="196.0" y="30" width="142.0" height="48" rx="6"/><text x="267.0" y="51.0" text-anchor="middle">Приёмник борта</text><text x="267.0" y="65.0" text-anchor="middle">псевдодальности</text><rect class="box" x="382.0" y="30" width="142.0" height="48" rx="6"/><text x="453.0" y="51.0" text-anchor="middle">Решение</text><text x="453.0" y="65.0" text-anchor="middle">2–5 м</text><rect class="boxa" x="568.0" y="30" width="142.0" height="48" rx="6"/><text x="639.0" y="51.0" text-anchor="middle" class="b">RTK fix</text><text x="639.0" y="65.0" text-anchor="middle" class="b">1–3 см</text><rect class="box" x="10.0" y="130" width="142.0" height="48" rx="6"/><text x="81.0" y="151.0" text-anchor="middle">База на известной</text><text x="81.0" y="165.0" text-anchor="middle">точке</text><rect class="boxa" x="196.0" y="130" width="142.0" height="48" rx="6"/><text x="267.0" y="151.0" text-anchor="middle" class="b">RTCM-поправки</text><text x="267.0" y="165.0" text-anchor="middle" class="b">радио / NTRIP</text><path class="ln" d="M152.0 54.0 L196.0 54.0" marker-end="url(#ar)"/><path class="ln" d="M338.0 54.0 L382.0 54.0" marker-end="url(#ar)"/><path class="ln" d="M524.0 54.0 L568.0 54.0" marker-end="url(#ar)"/><path class="ln" d="M152.0 154.0 L196.0 154.0" marker-end="url(#ar)"/><path class="lna" d="M267.0 130 L267.0 78" marker-end="url(#ara)"/></svg></div><figcaption class="gc-muted">Обычное решение GNSS даёт метры; поправки RTCM от базы на известной точке дают RTK fix с сантиметровой точностью.</figcaption><div class="diagram__hint">Схему можно прокрутить по горизонтали</div></figure>
+
+<h2>Практика</h2>
+<h4 class="md-subheading">Шаг 1. Три условия</h4>
+<p>Лог на земле по 5 минут (<code>LOG_DISARMED = 1</code>): открытое поле; у стены дома; под деревьями. Из <code>GPS</code>: <code>NSats</code>, <code>HDop</code>, <code>Status</code>; из <code>GPA</code>: <code>HAcc</code>, <code>SAcc</code>. Таблица: среднее и худшее по каждому условию.</p>
+<h4 class="md-subheading">Шаг 2. Многолучёвость</h4>
+<p>Во втором условии построить позицию (<code>GPS.Lat/Lng</code> → метры) за 5 минут на месте: разброс и скачки. Сравнить с полем. Сопоставить скачки с <code>XKF4.SP</code> в логе (нормированная инновация позиции, √test ratio), если EKF работал.</p>
+<h4 class="md-subheading">Шаг 3. Настройки</h4>
+<p>Проверить <code>GPS_RATE_MS</code>, <code>GPS_GNSS_MODE</code>, <code>GPS_NAVFILTER</code> (или аналоги в INAV/Betaflight: <code>gps_ublox_use_galileo</code>, динамическая модель), <code>GPS_AUTO_CONFIG</code>. Записать в паспорт сборки.</p>
+<h4 class="md-subheading">Шаг 4. Оценка потребности в RTK</h4>
+<p>Для своей задачи — нужен ли RTK? Обосновать по требованиям точности (инженерная папка).</p>
+<h4 class="md-subheading">Скрипт: разброс позиции на месте</h4>
+<pre class="cli-block"><code>import math, sys
+from pymavlink import DFReader
+
+log = DFReader.DFReader_binary(sys.argv[1])
+pts, worst_hdop, min_sats = [], 0.0, 99
+while (m := log.recv_match(type=&quot;GPS&quot;)) is not None:
+    if m.Status &lt; 3:                      # no 3D fix yet
+        continue
+    pts.append((m.Lat, m.Lng))
+    worst_hdop, min_sats = max(worst_hdop, m.HDop), min(min_sats, m.NSats)
+lat0, lon0 = pts[0]
+xy = [((la - lat0) * 111_320, (lo - lon0) * 111_320 * math.cos(math.radians(lat0))) for la, lo in pts]
+cx, cy = sum(p[0] for p in xy) / len(xy), sum(p[1] for p in xy) / len(xy)
+r = sorted(math.hypot(x - cx, y - cy) for x, y in xy)
+print(f&quot;{len(r)} fixes, median {r[len(r) // 2]:.2f} m, p95 {r[int(len(r) * 0.95)]:.2f} m, max {r[-1]:.2f} m, &quot;
+      f&quot;worst HDOP {worst_hdop:.2f}, min sats {min_sats}&quot;)</code></pre>
+<h4 class="md-subheading">Что должно получиться и что записать</h4>
+<ul><li><strong>Открытое поле:</strong> много спутников (с несколькими созвездиями — 20 и больше), HDOP около 1 и ниже, разброс на месте — метр–два. Это эталон, с которым сравниваются другие условия.</li><li><strong>У стены:</strong> спутников меньше, HDOP выше, а главное — скачки позиции на метры из-за отражённого сигнала (многолучёвость). Разброс p95 и max вырастут кратно, хотя число спутников может остаться приличным. Именно поэтому «спутников много» — не гарантия.</li><li><strong>Под деревьями:</strong> сигнал ослаблен, фиксация теряется чаще (<code>Status</code> падает), <code>HAcc</code> в <code>GPA</code> растёт.</li><li><strong>Настройки:</strong> запиши фактические значения параметров GNSS своей версии ArduPilot (в 4.6+ часть параметров приёмника — с префиксом <code>GPS1_</code>, например <code>GPS1_TYPE</code>; сверяйся со списком параметров).</li></ul>
+<p>Лабораторная засчитывается, когда HDOP, число спутников и разброс позиции записаны для трёх условий, многолучёвость показана скачками позиции на логе у стены, настройки приёмника проверены и записаны в паспорт, а решение о RTK обосновано требованиями точности.</p>
+
+<h2>Диагностика</h2>
+<div class="diag-groups"><article class="diag-item"><h4><strong>Симптом:</strong> долгий поиск спутников после включения</h4><ul><li>Возможная причина: холодный старт, антенна под карбоном, помехи от USB/камеры.</li><li>Что сделать: мачта, ground plane, модуль про EMI; дать 1–2 минуты.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> HDOP &gt; 2 при 15 спутниках</h4><ul><li>Возможная причина: спутники с одной стороны (стена, крыша).</li><li>Что сделать: открытое небо; не армить в GPS-режимах.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> позиция прыгает на 10–30 м в городе</h4><ul><li>Возможная причина: многолучёвость.</li><li>Что сделать: выше над рамой, helix-антенна, не доверять Loiter у зданий.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> «GPS glitch» в сообщениях ArduPilot</h4><ul><li>Возможная причина: скачок позиции/скорости за ворота EKF.</li><li>Что сделать: лог <code>GPS</code>/<code>XKF4</code>, источник помехи, при повторении — failsafe настройки.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> RTK не выходит в Fixed</h4><ul><li>Возможная причина: далеко от базы, плохая связь RTCM, одночастотный приёмник.</li><li>Что сделать: проверить поток RTCM, расстояние, антенны обоих концов.</li></ul></article></div>
+
+<h2>Чек-лист</h2>
+<ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="est-gnss:0"><span>Понимаю псевдодальность, HDOP и почему скорость точнее позиции</span></label></li><li><label><input type="checkbox" data-check-id="est-gnss:1"><span>Знаю главные источники ошибок и их величины</span></label></li><li><label><input type="checkbox" data-check-id="est-gnss:2"><span>Антенна на мачте с ground plane, вдали от помех</span></label></li><li><label><input type="checkbox" data-check-id="est-gnss:3"><span>Настройки частоты/созвездий/модели проверены</span></label></li><li><label><input type="checkbox" data-check-id="est-gnss:4"><span>Измерил качество GPS в трёх условиях и видел многолучёвость в логе</span></label></li></ul>
+
+<h2>Источники</h2>
+<ul class="refs"><li><a href="https://ardupilot.org/copter/docs/common-positioning-landing-page.html" target="_blank" rel="noopener noreferrer">ArduPilot — GPS/Compass (landing page)</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://ardupilot.org/copter/docs/common-gps-for-yaw.html" target="_blank" rel="noopener noreferrer">ArduPilot — GPS for Yaw (moving baseline)</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://incremental-content.u-blox.com/sites/default/files/ZED-F9P_ProductSummary_UBX-17005151.pdf" target="_blank" rel="noopener noreferrer">u-blox — ZED-F9P Product Summary (RTK, update rates)</a> <span class="gc-tag" data-state="info">primary</span></li></ul>
+<h2>Задачи с числовым ответом</h2>
+<uav-tasks src="../tasks/est-gnss.json" module="est-gnss"></uav-tasks>
+<h2>Проверь себя</h2>
+<uav-quiz src="../quiz/est-gnss.json" module="est-gnss"></uav-quiz>
+      </div>
+      <div class="module-done"><gc-button variant="secondary" data-done-toggle="est-gnss">Отметить как пройденный</gc-button></div>
+      <section class="related" aria-label="Смежные модули"><p class="gc-label gc-muted">Смежные модули</p><div class="gc-grid ref-grid"><a class="gc-card" href="f-fc-sensors.html"><strong>Полётный контроллер и сенсоры</strong><div class="gc-card__meta"><span class="gc-tag" title="L1 — Оператор">L1</span></div></a><a class="gc-card" href="el-emi.html"><strong>Помехи и электромагнитная совместимость</strong><div class="gc-card__meta"><span class="gc-tag" title="L2 — Интегратор">L2</span></div></a><a class="gc-card" href="est-kalman.html"><strong>Фильтр Калмана на пальцах и EKF</strong><div class="gc-card__meta"><span class="gc-tag" title="L3 — Специалист">L3</span></div></a><a class="gc-card" href="nav-resilience.html"><strong>Устойчивость навигации и связи к помехам</strong><div class="gc-card__meta"><span class="gc-tag" title="L3 — Специалист">L3</span></div></a></div></section>
+      <nav class="pager" aria-label="Соседние модули" data-track-pager><a class="gc-card pager__prev" href="est-kalman.html"><span class="gc-label gc-muted">Назад · трек</span><br>Фильтр Калмана на пальцах и EKF</a><a class="gc-card pager__next" href="ap-ekf.html"><span class="gc-label gc-muted">Дальше · трек</span><br>EKF и навигация</a></nav><nav class="pager" aria-label="Соседние шаги пути ArduPilot" data-path-pager="ardupilot" hidden><a class="gc-card pager__prev" href="est-kalman.html?path=ardupilot"><span class="gc-label gc-muted">Назад · путь ArduPilot</span><br>Фильтр Калмана на пальцах и EKF</a><a class="gc-card pager__next" href="ap-ekf.html?path=ardupilot"><span class="gc-label gc-muted">Дальше · шаг 27 из 69</span><br>EKF и навигация</a></nav>
+    </article>
+  </main>
+  <footer class="gc-container site-footer gc-muted">
+    <p>Открытый курс · <a href="https://github.com/irreligious86/UAV-Education">исходники на GitHub</a> · <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">план развития</a> · <a href="../../curriculum/curriculum.html">для разработчика</a> · CC BY-NC-SA 4.0</p>
+  </footer>
+</body>
+</html>

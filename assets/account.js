@@ -12,6 +12,7 @@
  *
  * Test hook: window.UAV_BACKEND.client may hold a ready client object with the same surface.
  */
+var T = (typeof window !== "undefined" && window.T) || function (s) { return s; };   // assets/i18n.js
 (function () {
   "use strict";
 
@@ -97,12 +98,13 @@
              isSuperadmin: !!(st.profile && st.profile.role === "superadmin") };
   }
 
-  function base() { return (document.body && document.body.getAttribute("data-base")) || ""; }
+  function base() { return (document.body && document.body.getAttribute("data-base")) || ""; }   // the language tree
+  function root() { return (document.body && (document.body.getAttribute("data-root") || document.body.getAttribute("data-base"))) || ""; }   // shared assets
 
   function loadScript(src) {
     return new Promise(function (resolve, reject) {
       var s = document.createElement("script"); s.src = src; s.onload = resolve;
-      s.onerror = function () { reject(new Error("не удалось загрузить " + src)); };
+      s.onerror = function () { reject(new Error(T("не удалось загрузить ") + src)); };
       document.head.appendChild(s);
     });
   }
@@ -113,29 +115,29 @@
       return window.supabase.createClient(CFG.url, CFG.anonKey, { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true } });
     };
     if (window.supabase && window.supabase.createClient) return Promise.resolve(make());
-    return loadScript(base() + "assets/vendor/supabase/supabase.js").then(make);
+    return loadScript(root() + "assets/vendor/supabase/supabase.js").then(make);
   }
 
   // ------------------------------------------------------------------ errors in plain Russian
   function humanError(err) {
-    var m = (err && (err.message || err.error_description || String(err))) || "неизвестная ошибка";
-    if (/invalid login credentials/i.test(m)) return "Неверная почта или пароль.";
-    if (/already registered|already exists/i.test(m)) return "Эта почта уже зарегистрирована. Войди или восстанови пароль.";
-    if (/email not confirmed/i.test(m)) return "Почта не подтверждена: открой ссылку из письма.";
-    if (/database error saving new user|username/i.test(m)) return "Имя пользователя занято или не подходит (3–32 символа: a-z, 0-9, _).";
-    if (/rate limit|too many/i.test(m)) return "Слишком много попыток, подожди минуту.";
-    if (/no attempts left/i.test(m)) return "Попытки на этот экзамен закончились.";
-    if (/time is up/i.test(m)) return "Время вышло: попытка не принята.";
-    if (/not open now/i.test(m)) return "Экзамен сейчас закрыт (вне окна сдачи).";
-    if (/already submitted/i.test(m)) return "Эта попытка уже сдана.";
-    if (/already has attempts/i.test(m)) return "По экзамену уже есть попытки: вопросы и сам экзамен менять нельзя, можно только снять с публикации.";
-    if (/confirmed account/i.test(m)) return "Нужен вход с подтверждённой почтой.";
-    if (/cohorts_name_unique/i.test(m)) return "Группа с таким названием уже есть.";
-    if (/cohort_members_pkey/i.test(m)) return "Студент уже в этой группе.";
-    if (/cohorts_name_check/i.test(m)) return "Название группы — от 2 до 100 символов.";
-    if (/no such exam/i.test(m)) return "Экзамен не найден или не опубликован.";
-    if (/failed to fetch|network/i.test(m)) return "Нет связи с сервером. Прогресс сохраняется локально и уйдёт позже.";
-    if (/password/i.test(m) && /least|short|weak/i.test(m)) return "Пароль слишком простой: минимум " + MIN_PASSWORD + " символов.";
+    var m = (err && (err.message || err.error_description || String(err))) || T("неизвестная ошибка");
+    if (/invalid login credentials/i.test(m)) return T("Неверная почта или пароль.");
+    if (/already registered|already exists/i.test(m)) return T("Эта почта уже зарегистрирована. Войди или восстанови пароль.");
+    if (/email not confirmed/i.test(m)) return T("Почта не подтверждена: открой ссылку из письма.");
+    if (/database error saving new user|username/i.test(m)) return T("Имя пользователя занято или не подходит (3–32 символа: a-z, 0-9, _).");
+    if (/rate limit|too many/i.test(m)) return T("Слишком много попыток, подожди минуту.");
+    if (/no attempts left/i.test(m)) return T("Попытки на этот экзамен закончились.");
+    if (/time is up/i.test(m)) return T("Время вышло: попытка не принята.");
+    if (/not open now/i.test(m)) return T("Экзамен сейчас закрыт (вне окна сдачи).");
+    if (/already submitted/i.test(m)) return T("Эта попытка уже сдана.");
+    if (/already has attempts/i.test(m)) return T("По экзамену уже есть попытки: вопросы и сам экзамен менять нельзя, можно только снять с публикации.");
+    if (/confirmed account/i.test(m)) return T("Нужен вход с подтверждённой почтой.");
+    if (/cohorts_name_unique/i.test(m)) return T("Группа с таким названием уже есть.");
+    if (/cohort_members_pkey/i.test(m)) return T("Студент уже в этой группе.");
+    if (/cohorts_name_check/i.test(m)) return T("Название группы — от 2 до 100 символов.");
+    if (/no such exam/i.test(m)) return T("Экзамен не найден или не опубликован.");
+    if (/failed to fetch|network/i.test(m)) return T("Нет связи с сервером. Прогресс сохраняется локально и уйдёт позже.");
+    if (/password/i.test(m) && /least|short|weak/i.test(m)) return T("Пароль слишком простой: минимум ") + MIN_PASSWORD + T(" символов.");
     return m;
   }
 
@@ -148,8 +150,8 @@
   function uid() { return st.session && st.session.user ? st.session.user.id : null; }
 
   function loadProfile() {
-    return st.client.from("profiles").select("id,username,email,role,created_at").eq("id", uid()).single()
-      .then(check).then(function (p) { st.profile = p; });
+    return st.client.from("profiles").select("id,username,email,role,created_at,lang").eq("id", uid()).single()
+      .then(check).then(function (p) { st.profile = p; applyLanguage(); });
   }
 
   var pushTimer = null;
@@ -182,6 +184,25 @@
       .catch(function (e) { st.sync = "offline"; st.error = humanError(e); notify(); });
   }
 
+  // ------------------------------------------------------------------ account language (docs/I18N.md)
+  // The account's language wins over the browser's: after login the site moves to it on any device.
+  // An account without a language yet takes the one the visitor is using now.
+  function applyLanguage() {
+    var I = window.UAVI18N, p = st.profile;
+    if (!I || !p) return;
+    if (!p.lang) { setLanguage(I.chosen() || I.lang); return; }
+    I.remember(p.lang);
+    if (p.lang !== I.lang) { var u = I.urlFor(p.lang); if (u) location.replace(u + location.search + location.hash); }
+  }
+
+  function setLanguage(code) {
+    if (!st.client || !uid() || !st.profile) return Promise.resolve();
+    if (st.profile.lang === code) return Promise.resolve();
+    st.profile.lang = code;
+    return st.client.from("profiles").update({ lang: code }).eq("id", uid()).then(check)
+      .catch(function (e) { st.error = humanError(e); notify(); });
+  }
+
   function setSession(session) {
     var before = uid();
     st.session = session || null;
@@ -207,13 +228,13 @@
     var a = document.getElementById("nav-account");
     if (!a) { a = document.createElement("a"); a.id = "nav-account"; nav.appendChild(a); }
     a.href = base() + "pages/account.html";
-    a.textContent = st.profile ? "👤 " + st.profile.username : "Войти";
+    a.textContent = st.profile ? "👤 " + st.profile.username : T("Войти");
     var ex = document.getElementById("nav-exams");
-    if (st.profile && !ex) { ex = document.createElement("a"); ex.id = "nav-exams"; ex.textContent = "Экзамены"; ex.href = base() + "pages/exam.html"; nav.appendChild(ex); }
+    if (st.profile && !ex) { ex = document.createElement("a"); ex.id = "nav-exams"; ex.textContent = T("Экзамены"); ex.href = base() + "pages/exam.html"; nav.appendChild(ex); }
     if (!st.profile && ex) ex.remove();
     var adm = document.getElementById("nav-admin");
     var staff = snapshot().isStaff;
-    if (staff && !adm) { adm = document.createElement("a"); adm.id = "nav-admin"; adm.textContent = "Админка"; adm.href = base() + "pages/admin.html"; nav.appendChild(adm); }
+    if (staff && !adm) { adm = document.createElement("a"); adm.id = "nav-admin"; adm.textContent = T("Админка"); adm.href = base() + "pages/admin.html"; nav.appendChild(adm); }
     if (!staff && adm) adm.remove();
   }
 
@@ -238,7 +259,7 @@
     return ready;
   }
 
-  function need() { if (!st.client) throw new Error("аккаунты выключены"); }
+  function need() { if (!st.client) throw new Error(T("аккаунты выключены")); }
 
   var api = {
     get enabled() { return !!CFG.enabled; },
@@ -251,8 +272,8 @@
     signUp: function (email, username, password) {
       need();
       username = String(username || "").trim().toLowerCase();
-      if (!USERNAME_RE.test(username)) return Promise.reject(new Error("Имя пользователя: 3–32 символа, a-z, 0-9, _."));
-      if (String(password || "").length < MIN_PASSWORD) return Promise.reject(new Error("Пароль: минимум " + MIN_PASSWORD + " символов."));
+      if (!USERNAME_RE.test(username)) return Promise.reject(new Error(T("Имя пользователя: 3–32 символа, a-z, 0-9, _.")));
+      if (String(password || "").length < MIN_PASSWORD) return Promise.reject(new Error(T("Пароль: минимум ") + MIN_PASSWORD + T(" символов.")));
       return st.client.auth.signUp({ email: email, password: password,
         options: { data: { username: username }, emailRedirectTo: location.origin + location.pathname } })
         .then(check).then(function (d) { return { needsConfirmation: !(d && d.session) }; });
@@ -269,7 +290,7 @@
       var flush = isPending() ? push(readLocal()) : Promise.resolve();
       return flush.then(function () {
         if (isPending() && !force) {
-          var e = new Error("Нет связи: часть прогресса ещё не на сервере. Выйти сейчас — эти изменения пропадут."); e.unsynced = true; throw e;
+          var e = new Error(T("Нет связи: часть прогресса ещё не на сервере. Выйти сейчас — эти изменения пропадут.")); e.unsynced = true; throw e;
         }
         return st.client.auth.signOut({ scope: "local" });
       }).then(function () {
@@ -282,13 +303,14 @@
     },
     updatePassword: function (password) {
       need();
-      if (String(password || "").length < MIN_PASSWORD) return Promise.reject(new Error("Пароль: минимум " + MIN_PASSWORD + " символов."));
+      if (String(password || "").length < MIN_PASSWORD) return Promise.reject(new Error(T("Пароль: минимум ") + MIN_PASSWORD + T(" символов.")));
       return st.client.auth.updateUser({ password: password }).then(check).then(function () { st.recovery = false; notify(); });
     },
+    setLanguage: setLanguage,
     rename: function (username) {
       need();
       username = String(username || "").trim().toLowerCase();
-      if (!USERNAME_RE.test(username)) return Promise.reject(new Error("Имя пользователя: 3–32 символа, a-z, 0-9, _."));
+      if (!USERNAME_RE.test(username)) return Promise.reject(new Error(T("Имя пользователя: 3–32 символа, a-z, 0-9, _.")));
       return st.client.from("profiles").update({ username: username }).eq("id", uid()).then(check).then(loadProfile).then(notify);
     },
     syncNow: function () { need(); return push(readLocal()); },
@@ -335,7 +357,7 @@
     createExam: function (bank) {
       need();
       var qs = (bank && bank.questions) || [];
-      if (!bank.title || qs.length < 1) return Promise.reject(new Error("Нужны название и хотя бы один вопрос."));
+      if (!bank.title || qs.length < 1) return Promise.reject(new Error(T("Нужны название и хотя бы один вопрос.")));
       var row = { title: String(bank.title).slice(0, 200), published: false };
       ["pass_pct", "questions_per_attempt", "time_limit_min", "attempts_allowed", "show_review", "module_id"].forEach(function (k) { if (bank[k] != null) row[k] = bank[k]; });
       if (row.questions_per_attempt == null) row.questions_per_attempt = Math.min(10, qs.length);

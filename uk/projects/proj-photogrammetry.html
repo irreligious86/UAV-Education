@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="uk" data-theme="dark" data-lang="uk">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Фотограмметрия на открытом наборе — UAV Student</title>
+  <meta name="description" content="Ортофотоплан и модель рельефа из открытого набора снимков с помощью OpenDroneMap; оценка точности по контрольным точкам и разбор, от чего она зависит.">
+  <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
+  <link rel="manifest" href="../../manifest.webmanifest">
+  <meta name="theme-color" content="#0b0f14">
+  <link rel="alternate" hreflang="ru" href="../../projects/proj-photogrammetry.html">
+  <link rel="alternate" hreflang="uk" href="../../uk/projects/proj-photogrammetry.html">
+  <link rel="alternate" hreflang="en" href="../../en/projects/proj-photogrammetry.html">
+  <script>/* go to the visitor's chosen language before anything paints (assets/i18n.js) */(function(){try{var c=localStorage.getItem('uav-lang'),h=document.documentElement.getAttribute('data-lang');if(!c||c===h||/[?&]lang=keep\b/.test(location.search))return;var l=document.querySelector('link[rel=alternate][hreflang="'+c+'"]');if(l)location.replace(l.href+location.search+location.hash)}catch(e){}})();</script>
+  <link rel="stylesheet" href="../../lib/ground-control-ui/dist/ground-control.css">
+  <link rel="stylesheet" href="../../assets/site.css">
+  <script src="../../lib/ground-control-ui/dist/ground-control.js" defer></script>
+  <script src="../../assets/i18n/uk.js"></script>
+  <script src="../../assets/i18n.js"></script>
+  <script src="../../assets/progress-store.js" defer></script>
+  <script src="../../assets/backend-config.js" defer></script>
+  <script src="../../assets/account.js" defer></script>
+  <script src="../../assets/grading.js" defer></script>
+  <script src="../../assets/app.js" defer></script>
+  <script src="../../assets/uav-quiz.js" defer></script>
+  <script src="../../assets/uav-tasks.js" defer></script>
+  <script src="../../assets/offline.js" defer></script>
+</head>
+<body class="gc-root" data-base="../" data-root="../../">
+  <header class="site-header">
+    <div class="gc-container site-header__inner">
+      <a class="site-brand" href="../index.html"><span class="site-brand__mark" aria-hidden="true">◆</span> UAV Student</a>
+      <nav class="gc-nav" aria-label="Разделы сайта">
+        <a href="../index.html" aria-current="page">Курс</a>
+        <a href="../ref/index.html">Справочник</a>
+        <a href="../pages/glossary.html">Глоссарий</a>
+        <a href="../pages/fails.html">Фейлы</a>
+        <a href="../pages/search.html">Поиск</a>
+        <a href="../pages/progress.html">Мой прогресс</a>
+      </nav>
+      <nav class="lang-switch" aria-label="Язык"><a class="gc-tag" href="../../projects/proj-photogrammetry.html" data-lang-to="ru" hreflang="ru" lang="ru" title="Русский">RU</a><a class="gc-tag" href="../../uk/projects/proj-photogrammetry.html" data-lang-to="uk" hreflang="uk" lang="uk" title="Українська" aria-current="true" data-state="ok">UK</a><a class="gc-tag" href="../../en/projects/proj-photogrammetry.html" data-lang-to="en" hreflang="en" lang="en" title="English">EN</a></nav>
+    </div>
+  </header>
+  <main class="gc-container site-main">
+    <article class="module" data-module-page="proj-photogrammetry">
+      <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="index.html">Проекты</a><span>Проект 7</span></p>
+      <h1 class="module-title">Фотограмметрия на открытом наборе</h1>
+      <div class="module-tags"><span class="gc-tag">Проект 7</span><span class="gc-tag">L3</span><span class="gc-tag">~20 ч</span><span class="gc-tag" data-state="ok">есть стартер</span><span class="gc-tag" data-state="ok" data-done-badge hidden>СДАН</span></div>
+      <p class="module-lead">Ортофотоплан и модель рельефа из открытого набора снимков с помощью OpenDroneMap; оценка точности по контрольным точкам и разбор, от чего она зависит.</p>
+      <div class="gc-prose module-body">
+        <figure class="diagram" data-diagram="proj-photogrammetry"><div class="diagram__svg"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 200" width="100%" role="img" aria-labelledby="t" style="max-width:720px;display:block;margin:0 auto"><title id="t">Фотограмметрия: конвейер</title><style>text{font-family: var(--gc-font-mono, ui-monospace, Menlo, monospace); font-size: 12px;fill:currentColor} .m{fill:var(--gc-ink-muted, #8a93a3)} .a{fill:var(--gc-accent-hud, #5ef1d2)} .w{fill:var(--gc-signal-amber, #f0b24c)} .d{fill:var(--gc-signal-red, #e8636b)} .box{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:currentColor;stroke-width:1.2} .boxa{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6} .ln{stroke:currentColor;stroke-width:1.2;fill:none} .lna{stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6;fill:none} .lnm{stroke:var(--gc-ink-muted, #8a93a3);stroke-width:1;fill:none;stroke-dasharray:4 3} .t{font-size:11px} .b{font-weight:600}</style><defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker><marker id="ara" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--gc-accent-hud, #5ef1d2)"/></marker></defs><rect class="box" x="10.0" y="30" width="142.0" height="48" rx="6"/><text x="81.0" y="51.0" text-anchor="middle">Снимки</text><text x="81.0" y="65.0" text-anchor="middle">с перекрытием</text><rect class="boxa" x="196.0" y="30" width="142.0" height="48" rx="6"/><text x="267.0" y="51.0" text-anchor="middle" class="b">ODM: SfM</text><text x="267.0" y="65.0" text-anchor="middle" class="b">облако точек</text><rect class="boxa" x="382.0" y="30" width="142.0" height="48" rx="6"/><text x="453.0" y="51.0" text-anchor="middle" class="b">Ортофото</text><text x="453.0" y="65.0" text-anchor="middle" class="b">DEM</text><rect class="box" x="568.0" y="30" width="142.0" height="48" rx="6"/><text x="639.0" y="51.0" text-anchor="middle">QGIS</text><text x="639.0" y="65.0" text-anchor="middle">просмотр</text><rect class="box" x="196.0" y="130" width="142.0" height="48" rx="6"/><text x="267.0" y="151.0" text-anchor="middle">Контрольные</text><text x="267.0" y="165.0" text-anchor="middle">точки GCP</text><rect class="boxa" x="382.0" y="130" width="142.0" height="48" rx="6"/><text x="453.0" y="158.0" text-anchor="middle" class="b">Метрика RMSE</text><path class="ln" d="M152.0 54.0 L196.0 54.0" marker-end="url(#ar)"/><path class="ln" d="M338.0 54.0 L382.0 54.0" marker-end="url(#ar)"/><path class="ln" d="M524.0 54.0 L568.0 54.0" marker-end="url(#ar)"/><path class="ln" d="M338.0 154.0 L382.0 154.0" marker-end="url(#ar)"/><path class="ln" d="M453.0 78 L453.0 130" marker-end="url(#ar)"/></svg></div><figcaption class="gc-muted">Архитектура проекта 7.</figcaption><div class="diagram__hint">Схему можно прокрутить по горизонтали</div></figure>
+        <h2>Стек</h2>
+        <ul><li>OpenDroneMap (Docker)</li><li>QGIS</li><li>Python для метрик</li></ul>
+        <p>Стартер: <a href="https://github.com/irreligious86/UAV-Education/tree/main/examples/perception" target="_blank" rel="noopener noreferrer"><code>examples/perception</code></a> — клонируйте и начинайте с его README.</p>
+        <p>Может заменить итоговый проект трека «<a href="../cap/cap-perception.html">Восприятие и интеллект</a>».</p>
+        <h2>Этапы</h2>
+        <ol><li>Запуск ODM на открытом наборе<br><span class="gc-muted">Проверка: демонстрация в отчёте</span></li><li>Ортофото и DEM, просмотр в QGIS<br><span class="gc-muted">Проверка: демонстрация в отчёте</span></li><li>Метрика точности по проверочным точкам (стартер: checkpoints.py; GCP в оценку не входят)<br><span class="gc-muted">Проверка:</span> <code>pytest examples/perception/tests -k checkpoints</code></li><li>Эксперимент: перекрытие и разрешение против точности<br><span class="gc-muted">Проверка:</span> <code>pytest examples/perception/tests -k gsd_and_spacing</code></li><li>План своей съёмочной миссии с расчётом GSD<br><span class="gc-muted">Проверка:</span> <code>pytest examples/perception/tests -k &quot;gsd or fx_from&quot;</code></li></ol>
+        <h2>Критерии приёмки</h2>
+        <p class="gc-muted">Проект сдан, когда выполнены все пункты. Отмечайте по мере готовности:</p>
+        <ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="proj-photogrammetry:cap:0"><span>Ортофото и DEM получены, параметры запуска сохранены</span></label></li><li><label><input type="checkbox" data-check-id="proj-photogrammetry:cap:1"><span>RMSE по контрольным точкам посчитан и объяснён</span></label></li><li><label><input type="checkbox" data-check-id="proj-photogrammetry:cap:2"><span>Эксперимент с двумя настройками и выводом</span></label></li><li><label><input type="checkbox" data-check-id="proj-photogrammetry:cap:3"><span>Расчёт GSD и перекрытия для своей миссии</span></label></li><li><label><input type="checkbox" data-check-id="proj-photogrammetry:cap:4"><span>README</span></label></li></ul>
+        <h2>Автопроверка</h2>
+        <p>скрипт метрики RMSE на эталонных точках</p>
+        <h2>Оценка</h2><p class="gc-muted">Сдан — когда выполнены все критерии приёмки. Уровень работы — по критериям ниже; каждый уровень включает предыдущий.</p><ul><li><strong>Функциональность</strong><ul><li><em>Засчитано:</em> Все этапы работают в сценарии из README</li><li><em>Хорошо:</em> Плюс отказные сценарии: потеря связи, пропуск данных, неверный ввод</li><li><em>Отлично:</em> Плюс хотя бы одно задание «на отлично» из списка проекта</li></ul></li><li><strong>Проверяемость</strong><ul><li><em>Засчитано:</em> Тесты стартера проходят, свои функции покрыты хотя бы одним тестом</li><li><em>Хорошо:</em> Тест на каждый этап; тесты запускаются в CI</li><li><em>Отлично:</em> Тесты на отказы и регрессию на собственных данных; покрытие ключевой логики видно в отчёте</li></ul></li><li><strong>Инженерный отчёт</strong><ul><li><em>Засчитано:</em> Есть замеры, которых требуют критерии приёмки</li><li><em>Хорошо:</em> Замеры с методикой и повторяемостью (несколько прогонов, разброс)</li><li><em>Отлично:</em> Сравнение вариантов решения с выводом, ограничения и что делать дальше</li></ul></li><li><strong>Код и документация</strong><ul><li><em>Засчитано:</em> README: запуск одной командой, архитектура</li><li><em>Хорошо:</em> Модули разделены, интерфейсы описаны, нет «магических чисел» без пояснения</li><li><em>Отлично:</em> Код читается без автора: docs/, примеры, история коммитов по этапам</li></ul></li></ul>
+        <h2>Задания «на отлично»</h2><ul><li>Кривая «перекрытие → точность» минимум по 4 точкам</li><li>Сравнение геопривязки по EXIF и по GCP на одном наборе</li></ul>
+        <h2>Что сдать</h2>
+        <ul><li>Отчёт с картами и таблицей точности</li></ul>
+        <h2>Нужные модули</h2>
+        <ol><li><a href="../m/per-mapping.html">Картографирование: съёмка, геопривязка, фотограмметрия</a></li><li><a href="../m/per-camera.html">Камеры и видеопоток на companion</a></li><li><a href="../m/per-visual-nav.html">Визуальная навигация: оптический поток, VIO, SLAM обзорно</a></li><li><a href="../m/est-gnss.html">GNSS: как работает GPS, ошибки, RTK</a></li><li><a href="../m/ap-missions.html">Миссии и планирование</a></li></ol>
+        <div class="gc-callout" data-state="caution"><strong>Безопасность.</strong> Всё, что управляет аппаратом, сначала проходит тесты и SITL. Реальный полёт — только с проверенным failsafe и пилотом, готовым забрать управление.</div>
+      </div>
+      <div class="module-done"><gc-button variant="secondary" data-done-toggle="proj-photogrammetry" data-done-label="сданный" data-done-past="Сдан">Отметить как сданный</gc-button></div>
+    </article>
+  </main>
+  <footer class="gc-container site-footer gc-muted">
+    <p>Открытый курс · <a href="https://github.com/irreligious86/UAV-Education">исходники на GitHub</a> · <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">план развития</a> · <a href="../../curriculum/curriculum.html">для разработчика</a> · CC BY-NC-SA 4.0</p>
+  </footer>
+</body>
+</html>

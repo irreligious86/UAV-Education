@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="uk" data-theme="dark" data-lang="uk">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Проекты — UAV Student</title>
+  <meta name="description" content="Каталог программных проектов курса: веб-GCS, сервис логов, CI для флота, компоненты MAVLink, компьютерное зрение.">
+  <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
+  <link rel="manifest" href="../../manifest.webmanifest">
+  <meta name="theme-color" content="#0b0f14">
+  <link rel="alternate" hreflang="ru" href="../../projects/index.html">
+  <link rel="alternate" hreflang="uk" href="../../uk/projects/index.html">
+  <link rel="alternate" hreflang="en" href="../../en/projects/index.html">
+  <script>/* go to the visitor's chosen language before anything paints (assets/i18n.js) */(function(){try{var c=localStorage.getItem('uav-lang'),h=document.documentElement.getAttribute('data-lang');if(!c||c===h||/[?&]lang=keep\b/.test(location.search))return;var l=document.querySelector('link[rel=alternate][hreflang="'+c+'"]');if(l)location.replace(l.href+location.search+location.hash)}catch(e){}})();</script>
+  <link rel="stylesheet" href="../../lib/ground-control-ui/dist/ground-control.css">
+  <link rel="stylesheet" href="../../assets/site.css">
+  <script src="../../lib/ground-control-ui/dist/ground-control.js" defer></script>
+  <script src="../../assets/i18n/uk.js"></script>
+  <script src="../../assets/i18n.js"></script>
+  <script src="../../assets/progress-store.js" defer></script>
+  <script src="../../assets/backend-config.js" defer></script>
+  <script src="../../assets/account.js" defer></script>
+  <script src="../../assets/grading.js" defer></script>
+  <script src="../../assets/app.js" defer></script>
+  <script src="../../assets/uav-quiz.js" defer></script>
+  <script src="../../assets/uav-tasks.js" defer></script>
+  <script src="../../assets/offline.js" defer></script>
+</head>
+<body class="gc-root" data-base="../" data-root="../../">
+  <header class="site-header">
+    <div class="gc-container site-header__inner">
+      <a class="site-brand" href="../index.html"><span class="site-brand__mark" aria-hidden="true">◆</span> UAV Student</a>
+      <nav class="gc-nav" aria-label="Разделы сайта">
+        <a href="../index.html" aria-current="page">Курс</a>
+        <a href="../ref/index.html">Справочник</a>
+        <a href="../pages/glossary.html">Глоссарий</a>
+        <a href="../pages/fails.html">Фейлы</a>
+        <a href="../pages/search.html">Поиск</a>
+        <a href="../pages/progress.html">Мой прогресс</a>
+      </nav>
+      <nav class="lang-switch" aria-label="Язык"><a class="gc-tag" href="../../projects/index.html" data-lang-to="ru" hreflang="ru" lang="ru" title="Русский">RU</a><a class="gc-tag" href="../../uk/projects/index.html" data-lang-to="uk" hreflang="uk" lang="uk" title="Українська" aria-current="true" data-state="ok">UK</a><a class="gc-tag" href="../../en/projects/index.html" data-lang-to="en" hreflang="en" lang="en" title="English">EN</a></nav>
+    </div>
+  </header>
+  <main class="gc-container site-main">
+    <p class="gc-breadcrumb"><a href="../index.html">Курс</a><span>Проекты</span></p>
+    <h1 class="gc-display">Проекты: ПО для БАС</h1>
+    <p class="module-lead">Двенадцать программных проектов от веб-GCS до точной посадки по маркеру. Каждый — с архитектурной схемой, этапами, критериями приёмки и автотестом; там, где написан стартер, он лежит в <code>examples/</code> репозитория. Проект может заменить итоговый проект своего трека.</p>
+    <div class="gc-prose module-body">
+      <p class="gc-muted">Как работать: возьмите проект, пройдите модули из его списка, сделайте этапы по порядку, сдайте по критериям. Код — в собственном репозитории с README и тестами; «работает у меня» не засчитывается.</p>
+    </div>
+    <div class="gc-grid ref-grid"><a class="gc-card capstone-card" href="../projects/proj-web-gcs.html" data-module-id="proj-web-gcs"><p class="gc-label gc-muted">Проект 1 · L3 · ~30 ч</p><strong>Веб-GCS: телеметрия, карта, режимы</strong><div class="gc-muted">Python 3, pymavlink, asyncio · WebSocket (websockets) · JS, Leaflet, без фреймворка</div><div class="gc-card__meta"><span class="gc-tag" data-state="ok">есть стартер</span><span class="gc-tag" data-state="ok" data-done-badge hidden>СДАН</span></div></a><a class="gc-card capstone-card" href="../projects/proj-fleet-telemetry.html" data-module-id="proj-fleet-telemetry"><p class="gc-label gc-muted">Проект 2 · L3 · ~35 ч</p><strong>Телеметрия флота в облако + дашборд</strong><div class="gc-muted">MQTT (Mosquitto) · Python-ingest · InfluxDB или TimescaleDB</div><div class="gc-card__meta"><span class="gc-tag" data-state="ok">есть стартер</span><span class="gc-tag" data-state="ok" data-done-badge hidden>СДАН</span></div></a><a class="gc-card capstone-card" href="../projects/proj-log-service.html" data-module-id="proj-log-service"><p class="gc-label gc-muted">Проект 3 · L3 · ~25 ч</p><strong>Сервис анализа логов</strong><div class="gc-muted">Python, pymavlink · blackbox_decode (Betaflight) · matplotlib → встроенные SVG/PNG</div><div class="gc-card__meta"><span class="gc-tag" data-state="ok">есть стартер</span><span class="gc-tag" data-state="ok" data-done-badge hidden>СДАН</span></div></a><a class="gc-card capstone-card" href="../projects/proj-detect-follow.html" data-module-id="proj-detect-follow"><p class="gc-label gc-muted">Проект 4 · L4 · ~45 ч</p><strong>Детектор + трекер + следование в Gazebo</strong><div class="gc-muted">ROS 2 Humble · Gazebo + PX4 или ArduPilot SITL · OpenCV, ONNX Runtime</div><div class="gc-card__meta"><span class="gc-tag" data-state="ok">есть стартер</span><span class="gc-tag" data-state="ok" data-done-badge hidden>СДАН</span></div></a><a class="gc-card capstone-card" href="../projects/proj-precision-landing.html" data-module-id="proj-precision-landing"><p class="gc-label gc-muted">Проект 5 · L4 · ~35 ч</p><strong>Точная посадка на маркер в симуляции</strong><div class="gc-muted">OpenCV ArUco · MAVLink LANDING_TARGET или ROS 2 · ArduPilot PLND / PX4 precision land</div><div class="gc-card__meta"><span class="gc-tag" data-state="ok">есть стартер</span><span class="gc-tag" data-state="ok" data-done-badge hidden>СДАН</span></div></a><a class="gc-card capstone-card" href="../projects/proj-inspection.html" data-module-id="proj-inspection"><p class="gc-label gc-muted">Проект 6 · L3 · ~30 ч</p><strong>Инспекция маршрута с геопривязкой находок</strong><div class="gc-muted">ArduPilot миссии, CAM1_TRIGG_DIST / DO_SET_CAM_TRIGG_DIST · EXIF/XMP геотеги · Python, Leaflet-отчёт</div><div class="gc-card__meta"><span class="gc-tag" data-state="ok">есть стартер</span><span class="gc-tag" data-state="ok" data-done-badge hidden>СДАН</span></div></a><a class="gc-card capstone-card" href="../projects/proj-photogrammetry.html" data-module-id="proj-photogrammetry"><p class="gc-label gc-muted">Проект 7 · L3 · ~20 ч</p><strong>Фотограмметрия на открытом наборе</strong><div class="gc-muted">OpenDroneMap (Docker) · QGIS · Python для метрик</div><div class="gc-card__meta"><span class="gc-tag" data-state="ok">есть стартер</span><span class="gc-tag" data-state="ok" data-done-badge hidden>СДАН</span></div></a><a class="gc-card capstone-card" href="../projects/proj-esp32-component.html" data-module-id="proj-esp32-component"><p class="gc-label gc-muted">Проект 8 · L3 · ~30 ч</p><strong>MAVLink-компонент на ESP32 + SITL-двойник</strong><div class="gc-muted">ESP-IDF или PlatformIO, C · c_library_v2 · Python-двойник (examples/mavlink)</div><div class="gc-card__meta"><span class="gc-tag" data-state="ok">есть стартер</span><span class="gc-tag" data-state="ok" data-done-badge hidden>СДАН</span></div></a><a class="gc-card capstone-card" href="../projects/proj-cell-bridge.html" data-module-id="proj-cell-bridge"><p class="gc-label gc-muted">Проект 9 · L3 · ~25 ч</p><strong>Мост 4G/Wi-Fi с переподключением и шифрованием</strong><div class="gc-muted">WireGuard · mavlink-router · Python или Go</div><div class="gc-card__meta"><span class="gc-tag" data-state="ok">есть стартер</span><span class="gc-tag" data-state="ok" data-done-badge hidden>СДАН</span></div></a><a class="gc-card capstone-card" href="../projects/proj-fleet-ci.html" data-module-id="proj-fleet-ci"><p class="gc-label gc-muted">Проект 10 · L3 · ~20 ч</p><strong>CI/CD для флота</strong><div class="gc-muted">GitHub Actions · ArduPilot SITL · pymavlink</div><div class="gc-card__meta"><span class="gc-tag" data-state="ok">есть стартер</span><span class="gc-tag" data-state="ok" data-done-badge hidden>СДАН</span></div></a><a class="gc-card capstone-card" href="../projects/proj-lua-protection.html" data-module-id="proj-lua-protection"><p class="gc-label gc-muted">Проект 11 · L3 · ~20 ч</p><strong>Пакет защит на Lua с тестами</strong><div class="gc-muted">ArduPilot Lua scripting · SITL · pymavlink-тесты</div><div class="gc-card__meta"><span class="gc-tag" data-state="ok">есть стартер</span><span class="gc-tag" data-state="ok" data-done-badge hidden>СДАН</span></div></a><a class="gc-card capstone-card" href="../projects/proj-tx16s-companion.html" data-module-id="proj-tx16s-companion"><p class="gc-label gc-muted">Проект 12 · L3 · ~30 ч</p><strong>Компаньон для пульта TX16S</strong><div class="gc-muted">ESP32, ESP-IDF/PlatformIO · CRSF · EdgeTX Lua + симулятор EdgeTX</div><div class="gc-card__meta"><span class="gc-tag" data-state="ok">есть стартер</span><span class="gc-tag" data-state="ok" data-done-badge hidden>СДАН</span></div></a></div>
+  </main>
+  <footer class="gc-container site-footer gc-muted">
+    <p>Открытый курс · <a href="https://github.com/irreligious86/UAV-Education">исходники на GitHub</a> · <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">план развития</a> · <a href="../../curriculum/curriculum.html">для разработчика</a> · CC BY-NC-SA 4.0</p>
+  </footer>
+</body>
+</html>

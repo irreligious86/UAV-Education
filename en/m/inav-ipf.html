@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en" data-theme="dark" data-lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>INAV Programming Framework — UAV Student</title>
+  <meta name="description" content="собрать логическое правило с активатором использовать GVAR как состояние">
+  <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
+  <link rel="manifest" href="../../manifest.webmanifest">
+  <meta name="theme-color" content="#0b0f14">
+  <link rel="alternate" hreflang="ru" href="../../m/inav-ipf.html">
+  <link rel="alternate" hreflang="uk" href="../../uk/m/inav-ipf.html">
+  <link rel="alternate" hreflang="en" href="../../en/m/inav-ipf.html">
+  <script>/* go to the visitor's chosen language before anything paints (assets/i18n.js) */(function(){try{var c=localStorage.getItem('uav-lang'),h=document.documentElement.getAttribute('data-lang');if(!c||c===h||/[?&]lang=keep\b/.test(location.search))return;var l=document.querySelector('link[rel=alternate][hreflang="'+c+'"]');if(l)location.replace(l.href+location.search+location.hash)}catch(e){}})();</script>
+  <link rel="stylesheet" href="../../lib/ground-control-ui/dist/ground-control.css">
+  <link rel="stylesheet" href="../../assets/site.css">
+  <script src="../../lib/ground-control-ui/dist/ground-control.js" defer></script>
+  <script src="../../assets/i18n/en.js"></script>
+  <script src="../../assets/i18n.js"></script>
+  <script src="../../assets/progress-store.js" defer></script>
+  <script src="../../assets/backend-config.js" defer></script>
+  <script src="../../assets/account.js" defer></script>
+  <script src="../../assets/grading.js" defer></script>
+  <script src="../../assets/app.js" defer></script>
+  <script src="../../assets/uav-quiz.js" defer></script>
+  <script src="../../assets/uav-tasks.js" defer></script>
+  <script src="../../assets/offline.js" defer></script>
+</head>
+<body class="gc-root" data-base="../" data-root="../../">
+  <header class="site-header">
+    <div class="gc-container site-header__inner">
+      <a class="site-brand" href="../index.html"><span class="site-brand__mark" aria-hidden="true">◆</span> UAV Student</a>
+      <nav class="gc-nav" aria-label="Разделы сайта">
+        <a href="../index.html" aria-current="page">Курс</a>
+        <a href="../ref/index.html">Справочник</a>
+        <a href="../pages/glossary.html">Глоссарий</a>
+        <a href="../pages/fails.html">Фейлы</a>
+        <a href="../pages/search.html">Поиск</a>
+        <a href="../pages/progress.html">Мой прогресс</a>
+      </nav>
+      <nav class="lang-switch" aria-label="Язык"><a class="gc-tag" href="../../m/inav-ipf.html" data-lang-to="ru" hreflang="ru" lang="ru" title="Русский">RU</a><a class="gc-tag" href="../../uk/m/inav-ipf.html" data-lang-to="uk" hreflang="uk" lang="uk" title="Українська">UK</a><a class="gc-tag" href="../../en/m/inav-ipf.html" data-lang-to="en" hreflang="en" lang="en" title="English" aria-current="true" data-state="ok">EN</a></nav>
+    </div>
+  </header>
+  <main class="gc-container site-main">
+    <article class="module" data-module-page="inav-ipf">
+      <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-inav">Электив: INAV</a><span>INAV Programming Framework</span></p>
+      <h1 class="module-title">INAV Programming Framework</h1>
+      <div class="module-tags"><span class="gc-tag" title="Уровень">L3 — Специалист</span><span class="gc-tag">чтение 25 мин</span><span class="gc-tag">учёба ~3 ч</span><span class="gc-tag">INAV 7.0+</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ОСВОЕН</span></div>
+      <p class="gc-muted module-score" data-module-score></p>
+      <p class="module-lead">INAV Programming Framework (IPF) — способ добавить аппарату логику без Lua и без companion: «если дальше 100 м — поднять мощность VTX», «если напряжение ниже порога — включить RTH», «переключить канал по условию». Логические условия выполняются прямо в прошивке, работают с телеметрией, режимами, точками миссии и глобальными переменными. Модуль объясняет модель (условие = операция + два операнда), синтаксис CLI, GVAR и типичные применения, включая сравнение с Lua в ArduPilot.</p>
+      <div class="gc-callout" data-state="ok"><strong>После модуля ты умеешь</strong><ul><li>собрать логическое правило с активатором</li><li>использовать GVAR как состояние</li></ul></div><p class="gc-muted">Перед этим модулем: <a href="inav-missions.html">Миссии INAV: waypoints и CLI wp</a></p><div class="gc-callout lab"><p class="gc-label gc-muted">Лабораторная</p><strong>Защита на IPF</strong><p class="gc-muted lab__hint">Сдано, когда отмечены все пункты:</p><ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="inav-ipf:lab:0"><span>Правило VTX по удалению работает вживую</span></label></li><li><label><input type="checkbox" data-check-id="inav-ipf:lab:1"><span>GVAR-автомат собран</span></label></li><li><label><input type="checkbox" data-check-id="inav-ipf:lab:2"><span>Защита напряжение+удаление → RTH проверена</span></label></li></ul></div><div class="path-pos gc-muted"><span class="gc-label">В пути</span><ul><li data-path-pos="inav"><a href="../path/inav.html">INAV</a>: шаг 19 из 20 → <a href="diag-troubleshooting.html?path=inav">Дерево диагностики: дрон не взлетает</a></li></ul></div>
+      <div class="gc-prose module-body">
+<div class="gc-callout" data-state="caution" data-untranslated><strong>Модуль ещё не переведён.</strong> Ниже — оригинал (Русский). Прогресс и оценки общие для всех языков.</div>
+<h2>Теория</h2>
+<h4 class="md-subheading">Модель</h4>
+<ul><li><strong>Logic Condition</strong> — одна строка «кода»: операция над одним-двумя операндами, с результатом true/false или числом.</li><li><strong>Операнд</strong> — число, канал RC, параметр полёта (расстояние до дома, напряжение, высота, скорость), режим, другое условие, GVAR, точка миссии.</li><li><strong>Активатор</strong> — другое условие, которое должно быть true, чтобы это выполнилось (−1 — всегда).</li><li><strong>GVAR</strong> — глобальные переменные, целые от −32768 до 32767; их можно читать, писать, увеличивать и использовать в миксере серв.</li><li><strong>Programming PID</strong> — четыре настраиваемых регулятора, выход которых доступен как операнд.</li></ul>
+<h4 class="md-subheading">Синтаксис CLI</h4>
+<pre class="cli-block"><code>logic &lt;rule&gt; &lt;enabled&gt; &lt;activatorId&gt; &lt;operation&gt; &lt;opA type&gt; &lt;opA value&gt; &lt;opB type&gt; &lt;opB value&gt; &lt;flags&gt;</code></pre>
+<p>Типы операндов: 0 — значение, 1 — RC-канал, 2 — параметр полёта, 3 — режим, 4 — логическое условие, 5 — GVAR, 6 — Programming PID, 7 — точки миссии. Операции: сравнения (равно, больше, меньше), логические (AND, OR, NOT), арифметика, Set/Increase/Decrease GVAR, Override Throttle Scale, Override RC Channel, Set VTX power и другие.</p>
+<h4 class="md-subheading">Пример из документации: мощность VTX по удалению</h4>
+<p>Условие 0: «расстояние до дома &gt; 100 м». Условие 1 (активатор 0): «установить мощность VTX = 3». Два правила — и передатчик сам поднимает мощность, когда аппарат далеко.</p>
+<h4 class="md-subheading">Где IPF уместен</h4>
+<ul><li>автоматика на борту без второго компьютера: VTX, свет, PINIO, сервы;</li><li>условные действия в миссии через user actions;</li><li>защиты: переключение режима по напряжению или удалению;</li><li>приборные задачи: GVAR как счётчики и состояния.</li></ul>
+<h4 class="md-subheading">Против Lua в ArduPilot</h4>
+<p>Lua — полноценный язык с доступом к API автопилота, но требует F7/H7 и памяти. IPF — набор правил без циклов и функций, зато работает на F4 и настраивается из конфигуратора. Сложная логика в IPF быстро становится нечитаемой; граница — десяток-два правил.</p>
+<h4 class="md-subheading">Разобранный пример: защита по напряжению и удалению</h4>
+<p>Задача: при напряжении &lt; 3.5 В/эл. и расстоянии &gt; 300 м включить RTH и поднять мощность VTX. Правила (<code>logic &lt;rule&gt; &lt;enabled&gt; &lt;activator&gt; &lt;op&gt; &lt;A type&gt; &lt;A&gt; &lt;B type&gt; &lt;B&gt; &lt;flags&gt;</code>):</p>
+<ul><li>0: <code>cell voltage &lt; 350</code> (операнд полёта «средн. напряжение элемента, сотые вольта» против значения 350) — результат true/false;</li><li>1: <code>distance to home &gt; 300</code> (метры);</li><li>2: AND с операндами «логическое условие 0» и «логическое условие 1» (тип операнда 4), без активатора → true, когда оба;</li><li>3 (активатор 2): Override RC channel → канал режима RTH в положение «вкл» (RTH через переопределение канала);</li><li>4 (активатор 1): Set VTX power = 3.</li></ul>
+<p>Проверка на столе без пропов: имитировать напряжение (АКБ разряженная/регулируемый БП) и расстояние (GVAR вместо реального операнда на этапе теста), смотреть статус правил на вкладке Programming конфигуратора. Правило-защита живёт в прошивке, значит, её логику надо документировать в паспорте аппарата: через месяц «сам включился RTH» будет загадкой.</p>
+<h4 class="md-subheading">Время и состояние: EDGE, STICKY, DELAY, TIMER, DELTA</h4>
+<p>Правила без памяти дают «дребезг»: напряжение под нагрузкой на секунду падает ниже порога — и RTH включается от одного рывка газа. Для этого в IPF есть операции со временем и памятью:</p>
+<ul><li><strong>DELAY</strong> — true, только если условие A держится непрерывно N мс. Защита по напряжению — всегда через DELAY (например, 3000 мс), иначе просадка на панче её сработает.</li><li><strong>STICKY</strong> — защёлка: включается по A и держится, пока не придёт B (сброс). «Один раз сработало — RTH, пока пилот не сбросит тумблером».</li><li><strong>EDGE</strong> — true на N мс по фронту A: одно событие от удержания тумблера.</li><li><strong>TIMER</strong> — периодически true/false: мигание света, пульсация зуммера.</li><li><strong>DELTA</strong> — изменение значения за короткий интервал больше порога: «резкий спад высоты».</li></ul>
+<p>Переписанная защита: правило 0 → DELAY(3000) поверх «напряжение &lt; 350», затем STICKY с установкой по AND(0, 1) и сбросом по тумблеру — и только её результат активирует переопределение канала.</p>
+<h4 class="md-subheading">Отладка</h4>
+<ul><li>Вкладка Programming показывает состояние и значение каждого правила вживую — это главный отладчик.</li><li>GVAR можно вывести в OSD (элементы GVAR 0–3): видно состояние автомата в полёте и на записи видео.</li><li><code>logic</code> и <code>gvar</code> в CLI печатают текущие правила — их дамп входит в <code>diff all</code>, то есть в резервную копию и в git (модуль «CI и версионирование конфигов»).</li></ul>
+<h4 class="md-subheading">Ограничения, о которых спотыкаются</h4>
+<p>Правила выполняются в фиксированном порядке на частоте ~10 Гц; нет циклов, функций, строк; GVAR — целые; переопределение канала (Override RC) конфликтует с реальным стиком — для режимов лучше отдельный «виртуальный» канал. Число правил фиксировано прошивкой: 64 логических условия, 8 GVAR, 4 Programming PID — одинаково на F4 и H7. Если логика требует «состояний» и истории — это уже companion.</p>
+<figure class="diagram" data-diagram="inav-ipf-model"><div class="diagram__svg"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 200" width="100%" role="img" aria-labelledby="t" style="max-width:720px;display:block;margin:0 auto"><title id="t">INAV Programming Framework: модель</title><style>text{font-family: var(--gc-font-mono, ui-monospace, Menlo, monospace); font-size: 12px;fill:currentColor} .m{fill:var(--gc-ink-muted, #8a93a3)} .a{fill:var(--gc-accent-hud, #5ef1d2)} .w{fill:var(--gc-signal-amber, #f0b24c)} .d{fill:var(--gc-signal-red, #e8636b)} .box{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:currentColor;stroke-width:1.2} .boxa{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6} .ln{stroke:currentColor;stroke-width:1.2;fill:none} .lna{stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6;fill:none} .lnm{stroke:var(--gc-ink-muted, #8a93a3);stroke-width:1;fill:none;stroke-dasharray:4 3} .t{font-size:11px} .b{font-weight:600}</style><defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker><marker id="ara" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--gc-accent-hud, #5ef1d2)"/></marker></defs><rect class="box" x="10.0" y="30" width="142.0" height="48" rx="6"/><text x="81.0" y="51.0" text-anchor="middle">Операнды</text><text x="81.0" y="65.0" text-anchor="middle">RC, высота, GVAR</text><rect class="boxa" x="196.0" y="30" width="142.0" height="48" rx="6"/><text x="267.0" y="51.0" text-anchor="middle" class="b">Logic Condition</text><text x="267.0" y="65.0" text-anchor="middle" class="b">операция</text><rect class="box" x="382.0" y="30" width="142.0" height="48" rx="6"/><text x="453.0" y="51.0" text-anchor="middle">GVAR</text><text x="453.0" y="65.0" text-anchor="middle">−32768…32767</text><rect class="box" x="568.0" y="30" width="142.0" height="48" rx="6"/><text x="639.0" y="51.0" text-anchor="middle">Действия</text><text x="639.0" y="65.0" text-anchor="middle">VTX, газ, режим</text><rect class="box" x="196.0" y="130" width="142.0" height="48" rx="6"/><text x="267.0" y="151.0" text-anchor="middle">Активатор:</text><text x="267.0" y="165.0" text-anchor="middle">другое условие</text><rect class="box" x="382.0" y="130" width="142.0" height="48" rx="6"/><text x="453.0" y="151.0" text-anchor="middle">Programming PID</text><text x="453.0" y="165.0" text-anchor="middle">×4</text><path class="ln" d="M152.0 54.0 L196.0 54.0" marker-end="url(#ar)"/><path class="ln" d="M338.0 54.0 L382.0 54.0" marker-end="url(#ar)"/><path class="ln" d="M524.0 54.0 L568.0 54.0" marker-end="url(#ar)"/><path class="ln" d="M267.0 130 L267.0 78" marker-end="url(#ar)"/><path class="ln" d="M453.0 130 L453.0 78" marker-end="url(#ar)"/></svg></div><figcaption class="gc-muted">Модель IPF: операнды → логические условия с активаторами → глобальные переменные и программные PID → действия.</figcaption><div class="diagram__hint">Схему можно прокрутить по горизонтали</div></figure>
+
+<h2>Практика</h2>
+<h4 class="md-subheading">Шаг 1. Первая пара правил в конфигураторе</h4>
+<p>Вкладка Programming: правило 0 — <code>Flight &gt; Home distance (m)</code> больше <code>100</code>; правило 1 — активатор 0, операция <code>Set VTX Power</code>, значение 3. Сохранить, проверить вкладку: состояние условий показывается вживую.</p>
+<h4 class="md-subheading">Шаг 2. То же в CLI</h4>
+<pre class="cli-block"><code>logic 0 1 -1 2 2 &lt;home_distance_operand_id&gt; 0 100 0
+logic 1 1 0  &lt;set_vtx_power_op_id&gt; 0 3 0 0 0
+save</code></pre>
+<p>Номера операций и операндов — из таблиц в документации Programming Framework для своей версии: они меняются между релизами, поэтому в модуле не зашиты.</p>
+<h4 class="md-subheading">Шаг 3. GVAR как состояние</h4>
+<p>Правило: по срабатыванию тумблера увеличить GVAR 1 на 1; другое правило — если GVAR 1 чётная, включить свет, иначе выключить. Это конечный автомат на двух строках.</p>
+<h4 class="md-subheading">Шаг 4. Таблица истинности до полёта</h4>
+<p>Для защиты из разобранного примера выписать все комбинации входов и ожидаемый выход, затем проверить каждую строку на столе (без пропов), подменяя реальные операнды на GVAR, которые меняются тумблером:</p>
+<div class="table-wrap md-table-wrap" tabindex="0"><table class="md-table"><thead><tr><th>Напряжение &lt; 3.5 В ≥ 3 с</th><th>Дом &gt; 300 м</th><th>Защёлка до этого</th><th>Ожидаемо</th></tr></thead><tbody><tr><td data-label="Напряжение &lt; 3.5 В ≥ 3 с">нет</td><td data-label="Дом &gt; 300 м">нет</td><td data-label="Защёлка до этого">нет</td><td data-label="Ожидаемо">ничего</td></tr><tr><td data-label="Напряжение &lt; 3.5 В ≥ 3 с">да</td><td data-label="Дом &gt; 300 м">нет</td><td data-label="Защёлка до этого">нет</td><td data-label="Ожидаемо">ничего (близко — пилот сам)</td></tr><tr><td data-label="Напряжение &lt; 3.5 В ≥ 3 с">нет</td><td data-label="Дом &gt; 300 м">да</td><td data-label="Защёлка до этого">нет</td><td data-label="Ожидаемо">ничего</td></tr><tr><td data-label="Напряжение &lt; 3.5 В ≥ 3 с">да</td><td data-label="Дом &gt; 300 м">да</td><td data-label="Защёлка до этого">нет</td><td data-label="Ожидаемо">RTH + мощность VTX 3, защёлка ставится</td></tr><tr><td data-label="Напряжение &lt; 3.5 В ≥ 3 с">нет</td><td data-label="Дом &gt; 300 м">нет</td><td data-label="Защёлка до этого">да</td><td data-label="Ожидаемо">RTH держится до сброса тумблером</td></tr></tbody></table></div>
+<p>Строка, которая ведёт себя не так, — ошибка в правилах, найденная на столе, а не в поле.</p>
+<h4 class="md-subheading">Лабораторная</h4>
+<p>Собрать защиту: если напряжение ниже порога дольше 3 с (DELAY) <strong>и</strong> расстояние больше 50 м — защёлкнуть (STICKY) и переопределить канал режима в положение RTH (<code>Override RC Channel</code>). Пройти таблицу истинности на столе, проверить в SITL INAV, затем в поле на малом удалении. Сдать: дамп <code>logic</code>/<code>gvar</code>, заполненную таблицу, видео OSD с GVAR-состоянием.</p>
+
+<h2>Диагностика</h2>
+<div class="diag-groups"><article class="diag-item"><h4><strong>Симптом:</strong> правило не срабатывает</h4><ul><li>Возможная причина: активатор false, неверный тип операнда (GVAR «значение 1» против «GVAR 1»).</li><li>Что сделать: смотреть живое состояние во вкладке Programming, проверить типы.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> Set GVAR пишет не в ту переменную</h4><ul><li>Возможная причина: в операнде A указан «Global Variable 1» вместо «Value 1».</li><li>Что сделать: индекс GVAR задаётся как Value.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> после обновления INAV правила сломались</h4><ul><li>Возможная причина: изменились номера операций/операндов.</li><li>Что сделать: сверить с таблицами версии, пересобрать правила.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> логика стала нечитаемой</h4><ul><li>Возможная причина: слишком много правил для IPF.</li><li>Что сделать: упростить или перейти на Lua/ArduPilot.</li></ul></article></div>
+
+<h2>Чек-лист</h2>
+<ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="inav-ipf:0"><span>Понимаю: условие = операция + операнды + активатор</span></label></li><li><label><input type="checkbox" data-check-id="inav-ipf:1"><span>Первое правило работает и видно вживую</span></label></li><li><label><input type="checkbox" data-check-id="inav-ipf:2"><span>GVAR используется как состояние</span></label></li><li><label><input type="checkbox" data-check-id="inav-ipf:3"><span>Защита по напряжению/удалению собрана и проверена</span></label></li><li><label><input type="checkbox" data-check-id="inav-ipf:4"><span>Правила задокументированы вместе с номером версии INAV</span></label></li></ul>
+
+<h2>Источники</h2>
+<ul class="refs"><li><a href="https://github.com/iNavFlight/inav/blob/master/docs/Programming%20Framework.md" target="_blank" rel="noopener noreferrer">INAV Programming Framework</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://github.com/iNavFlight/inav/blob/master/docs/Navigation.md" target="_blank" rel="noopener noreferrer">INAV Navigation — waypoint user actions</a> <span class="gc-tag" data-state="info">primary</span></li></ul>
+<h2>Проверь себя</h2>
+<uav-quiz src="../quiz/inav-ipf.json" module="inav-ipf"></uav-quiz>
+      </div>
+      <div class="module-done"><gc-button variant="secondary" data-done-toggle="inav-ipf">Отметить как пройденный</gc-button></div>
+      <section class="related" aria-label="Смежные модули"><p class="gc-label gc-muted">Смежные модули</p><div class="gc-grid ref-grid"><a class="gc-card" href="inav-missions.html"><strong>Миссии INAV: waypoints и CLI wp</strong><div class="gc-card__meta"><span class="gc-tag" title="L2 — Интегратор">L2</span></div></a><a class="gc-card" href="ap-lua.html"><strong>Lua: сценарии и fault injection</strong><div class="gc-card__meta"><span class="gc-tag" title="L3 — Специалист">L3</span></div></a></div></section>
+      <nav class="pager" aria-label="Соседние модули" data-track-pager><a class="gc-card pager__prev" href="inav-wing.html"><span class="gc-label gc-muted">Назад · трек</span><br>Крыло на INAV: миксер, автозапуск, autotune</a></nav><nav class="pager" aria-label="Соседние шаги пути INAV" data-path-pager="inav" hidden><a class="gc-card pager__prev" href="inav-wing.html?path=inav"><span class="gc-label gc-muted">Назад · путь INAV</span><br>Крыло на INAV: миксер, автозапуск, autotune</a><a class="gc-card pager__next" href="diag-troubleshooting.html?path=inav"><span class="gc-label gc-muted">Дальше · шаг 20 из 20</span><br>Дерево диагностики: дрон не взлетает</a></nav>
+    </article>
+  </main>
+  <footer class="gc-container site-footer gc-muted">
+    <p>Открытый курс · <a href="https://github.com/irreligious86/UAV-Education">исходники на GitHub</a> · <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">план развития</a> · <a href="../../curriculum/curriculum.html">для разработчика</a> · CC BY-NC-SA 4.0</p>
+  </footer>
+</body>
+</html>

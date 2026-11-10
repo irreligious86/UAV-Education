@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="uk" data-theme="dark" data-lang="uk">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Телеметрия флота в облако + дашборд — UAV Student</title>
+  <meta name="description" content="Каждый аппарат через companion публикует сжатую телеметрию в MQTT; сервис складывает её во временную БД, Grafana показывает флот, алерты срабатывают на батарею, потерю связи и EKF.">
+  <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
+  <link rel="manifest" href="../../manifest.webmanifest">
+  <meta name="theme-color" content="#0b0f14">
+  <link rel="alternate" hreflang="ru" href="../../projects/proj-fleet-telemetry.html">
+  <link rel="alternate" hreflang="uk" href="../../uk/projects/proj-fleet-telemetry.html">
+  <link rel="alternate" hreflang="en" href="../../en/projects/proj-fleet-telemetry.html">
+  <script>/* go to the visitor's chosen language before anything paints (assets/i18n.js) */(function(){try{var c=localStorage.getItem('uav-lang'),h=document.documentElement.getAttribute('data-lang');if(!c||c===h||/[?&]lang=keep\b/.test(location.search))return;var l=document.querySelector('link[rel=alternate][hreflang="'+c+'"]');if(l)location.replace(l.href+location.search+location.hash)}catch(e){}})();</script>
+  <link rel="stylesheet" href="../../lib/ground-control-ui/dist/ground-control.css">
+  <link rel="stylesheet" href="../../assets/site.css">
+  <script src="../../lib/ground-control-ui/dist/ground-control.js" defer></script>
+  <script src="../../assets/i18n/uk.js"></script>
+  <script src="../../assets/i18n.js"></script>
+  <script src="../../assets/progress-store.js" defer></script>
+  <script src="../../assets/backend-config.js" defer></script>
+  <script src="../../assets/account.js" defer></script>
+  <script src="../../assets/grading.js" defer></script>
+  <script src="../../assets/app.js" defer></script>
+  <script src="../../assets/uav-quiz.js" defer></script>
+  <script src="../../assets/uav-tasks.js" defer></script>
+  <script src="../../assets/offline.js" defer></script>
+</head>
+<body class="gc-root" data-base="../" data-root="../../">
+  <header class="site-header">
+    <div class="gc-container site-header__inner">
+      <a class="site-brand" href="../index.html"><span class="site-brand__mark" aria-hidden="true">◆</span> UAV Student</a>
+      <nav class="gc-nav" aria-label="Разделы сайта">
+        <a href="../index.html" aria-current="page">Курс</a>
+        <a href="../ref/index.html">Справочник</a>
+        <a href="../pages/glossary.html">Глоссарий</a>
+        <a href="../pages/fails.html">Фейлы</a>
+        <a href="../pages/search.html">Поиск</a>
+        <a href="../pages/progress.html">Мой прогресс</a>
+      </nav>
+      <nav class="lang-switch" aria-label="Язык"><a class="gc-tag" href="../../projects/proj-fleet-telemetry.html" data-lang-to="ru" hreflang="ru" lang="ru" title="Русский">RU</a><a class="gc-tag" href="../../uk/projects/proj-fleet-telemetry.html" data-lang-to="uk" hreflang="uk" lang="uk" title="Українська" aria-current="true" data-state="ok">UK</a><a class="gc-tag" href="../../en/projects/proj-fleet-telemetry.html" data-lang-to="en" hreflang="en" lang="en" title="English">EN</a></nav>
+    </div>
+  </header>
+  <main class="gc-container site-main">
+    <article class="module" data-module-page="proj-fleet-telemetry">
+      <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="index.html">Проекты</a><span>Проект 2</span></p>
+      <h1 class="module-title">Телеметрия флота в облако + дашборд</h1>
+      <div class="module-tags"><span class="gc-tag">Проект 2</span><span class="gc-tag">L3</span><span class="gc-tag">~35 ч</span><span class="gc-tag" data-state="ok">есть стартер</span><span class="gc-tag" data-state="ok" data-done-badge hidden>СДАН</span></div>
+      <p class="module-lead">Каждый аппарат через companion публикует сжатую телеметрию в MQTT; сервис складывает её во временную БД, Grafana показывает флот, алерты срабатывают на батарею, потерю связи и EKF.</p>
+      <div class="gc-prose module-body">
+        <figure class="diagram" data-diagram="proj-fleet-telemetry"><div class="diagram__svg"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 200" width="100%" role="img" aria-labelledby="t" style="max-width:720px;display:block;margin:0 auto"><title id="t">Телеметрия флота: архитектура</title><style>text{font-family: var(--gc-font-mono, ui-monospace, Menlo, monospace); font-size: 12px;fill:currentColor} .m{fill:var(--gc-ink-muted, #8a93a3)} .a{fill:var(--gc-accent-hud, #5ef1d2)} .w{fill:var(--gc-signal-amber, #f0b24c)} .d{fill:var(--gc-signal-red, #e8636b)} .box{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:currentColor;stroke-width:1.2} .boxa{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6} .ln{stroke:currentColor;stroke-width:1.2;fill:none} .lna{stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6;fill:none} .lnm{stroke:var(--gc-ink-muted, #8a93a3);stroke-width:1;fill:none;stroke-dasharray:4 3} .t{font-size:11px} .b{font-weight:600}</style><defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker><marker id="ara" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--gc-accent-hud, #5ef1d2)"/></marker></defs><rect class="box" x="10.0" y="30" width="111.2" height="48" rx="6"/><text x="65.6" y="51.0" text-anchor="middle" style="font-size:10.5px">Аппараты ×N</text><text x="65.6" y="65.0" text-anchor="middle" style="font-size:10.5px">companion</text><rect class="boxa" x="157.2" y="30" width="111.2" height="48" rx="6"/><text x="212.79999999999998" y="51.0" text-anchor="middle" class="b" style="font-size:10.5px">Publisher</text><text x="212.79999999999998" y="65.0" text-anchor="middle" class="b" style="font-size:10.5px">буфер</text><rect class="box" x="304.4" y="30" width="111.2" height="48" rx="6"/><text x="360.0" y="58.0" text-anchor="middle" style="font-size:10.5px">MQTT</text><rect class="boxa" x="451.59999999999997" y="30" width="111.2" height="48" rx="6"/><text x="507.2" y="51.0" text-anchor="middle" class="b" style="font-size:10.5px">Ingest</text><text x="507.2" y="65.0" text-anchor="middle" class="b" style="font-size:10.5px">схема v1</text><rect class="box" x="598.8" y="30" width="111.2" height="48" rx="6"/><text x="654.4" y="51.0" text-anchor="middle" style="font-size:10.5px">Influx /</text><text x="654.4" y="65.0" text-anchor="middle" style="font-size:10.5px">Timescale</text><rect class="box" x="304.4" y="130" width="111.2" height="48" rx="6"/><text x="360.0" y="151.0" text-anchor="middle" style="font-size:10.5px">Grafana</text><text x="360.0" y="165.0" text-anchor="middle" style="font-size:10.5px">карта, батарея</text><rect class="boxa" x="598.8" y="130" width="111.2" height="48" rx="6"/><text x="654.4" y="151.0" text-anchor="middle" class="b" style="font-size:10.5px">Алерты: АКБ,</text><text x="654.4" y="165.0" text-anchor="middle" class="b" style="font-size:10.5px">связь, EKF</text><path class="ln" d="M121.2 54.0 L157.2 54.0" marker-end="url(#ar)"/><path class="ln" d="M268.4 54.0 L304.4 54.0" marker-end="url(#ar)"/><path class="ln" d="M415.59999999999997 54.0 L451.59999999999997 54.0" marker-end="url(#ar)"/><path class="ln" d="M562.8 54.0 L598.8 54.0" marker-end="url(#ar)"/><path class="ln" d="M654.4 78 L654.4 104.0 L360.0 104.0 L360.0 130" marker-end="url(#ar)"/><path class="ln" d="M654.4 78 L654.4 130" marker-end="url(#ar)"/></svg></div><figcaption class="gc-muted">Архитектура проекта 2.</figcaption><div class="diagram__hint">Схему можно прокрутить по горизонтали</div></figure>
+        <h2>Стек</h2>
+        <ul><li>MQTT (Mosquitto)</li><li>Python-ingest</li><li>InfluxDB или TimescaleDB</li><li>Grafana</li><li>Docker Compose</li></ul>
+        <p>Стартер: <a href="https://github.com/irreligious86/UAV-Education/tree/main/examples/fleet-telemetry" target="_blank" rel="noopener noreferrer"><code>examples/fleet-telemetry</code></a> — клонируйте и начинайте с его README.</p>
+        <p>Может заменить итоговый проект трека «<a href="../cap/cap-own-logic.html">Инженер: код на борту</a>».</p>
+        <h2>Этапы</h2>
+        <ol><li>Схема топиков и формат сообщений (JSON/CBOR), версия в каждом сообщении<br><span class="gc-muted">Проверка:</span> <code>pytest examples/fleet-telemetry/tests -k schema</code></li><li>Publisher на companion: 1–5 Гц, буфер на время потери сети<br><span class="gc-muted">Проверка:</span> <code>pytest examples/fleet-telemetry/tests -k &quot;outage or overflow&quot;</code></li><li>Ingest в БД с проверкой схемы и меткой аппарата<br><span class="gc-muted">Проверка:</span> <code>pytest examples/fleet-telemetry/tests -k duplicates</code></li><li>Дашборд флота: карта, батарея, режимы, связь<br><span class="gc-muted">Проверка: демонстрация в отчёте</span></li><li>Алерты: батарея, нет данных &gt; 10 с, EKF failsafe<br><span class="gc-muted">Проверка:</span> <code>pytest examples/fleet-telemetry/tests -k alerts</code></li></ol>
+        <h2>Критерии приёмки</h2>
+        <p class="gc-muted">Проект сдан, когда выполнены все пункты. Отмечайте по мере готовности:</p>
+        <ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="proj-fleet-telemetry:cap:0"><span>Ingest-тест: 3 фейковых аппарата × 10 мин без потерь записей</span></label></li><li><label><input type="checkbox" data-check-id="proj-fleet-telemetry:cap:1"><span>Потеря сети на 60 с не теряет данные (буфер досылает)</span></label></li><li><label><input type="checkbox" data-check-id="proj-fleet-telemetry:cap:2"><span>Схема сообщений версионирована, старые клиенты не ломают ingest</span></label></li><li><label><input type="checkbox" data-check-id="proj-fleet-telemetry:cap:3"><span>Дашборд и алерты развёртываются одной командой docker compose up</span></label></li><li><label><input type="checkbox" data-check-id="proj-fleet-telemetry:cap:4"><span>Описаны объёмы трафика на аппарат в час</span></label></li></ul>
+        <h2>Автопроверка</h2>
+        <p>ingest-тест на сгенерированных потоках с разрывами</p>
+        <h2>Оценка</h2><p class="gc-muted">Сдан — когда выполнены все критерии приёмки. Уровень работы — по критериям ниже; каждый уровень включает предыдущий.</p><ul><li><strong>Функциональность</strong><ul><li><em>Засчитано:</em> Все этапы работают в сценарии из README</li><li><em>Хорошо:</em> Плюс отказные сценарии: потеря связи, пропуск данных, неверный ввод</li><li><em>Отлично:</em> Плюс хотя бы одно задание «на отлично» из списка проекта</li></ul></li><li><strong>Проверяемость</strong><ul><li><em>Засчитано:</em> Тесты стартера проходят, свои функции покрыты хотя бы одним тестом</li><li><em>Хорошо:</em> Тест на каждый этап; тесты запускаются в CI</li><li><em>Отлично:</em> Тесты на отказы и регрессию на собственных данных; покрытие ключевой логики видно в отчёте</li></ul></li><li><strong>Инженерный отчёт</strong><ul><li><em>Засчитано:</em> Есть замеры, которых требуют критерии приёмки</li><li><em>Хорошо:</em> Замеры с методикой и повторяемостью (несколько прогонов, разброс)</li><li><em>Отлично:</em> Сравнение вариантов решения с выводом, ограничения и что делать дальше</li></ul></li><li><strong>Код и документация</strong><ul><li><em>Засчитано:</em> README: запуск одной командой, архитектура</li><li><em>Хорошо:</em> Модули разделены, интерфейсы описаны, нет «магических чисел» без пояснения</li><li><em>Отлично:</em> Код читается без автора: docs/, примеры, история коммитов по этапам</li></ul></li></ul>
+        <h2>Задания «на отлично»</h2><ul><li>Дедупликация и порядок выдерживают 10 % дубликатов и перестановку пакетов</li><li>Расчёт трафика на аппарат·час и выбор формата (JSON против CBOR) по замеру</li></ul>
+        <h2>Что сдать</h2>
+        <ul><li>docker-compose.yml, publisher, ingest, дашборд в JSON</li><li>Отчёт: трафик, задержка, поведение при разрывах</li></ul>
+        <h2>Нужные модули</h2>
+        <ol><li><a href="../m/mav-routing.html">Маршрутизация и транспорт MAVLink: радио, 4G, несколько GCS</a></li><li><a href="../m/mav-sdk.html">Библиотеки над MAVLink: pymavlink, MAVSDK, MAVROS — что и когда</a></li><li><a href="../m/comp-raspberry.html">Raspberry Pi + ArduPilot</a></li><li><a href="../m/nav-resilience.html">Устойчивость навигации и связи к помехам</a></li><li><a href="../m/eng-systems.html">Системная инженерия: требования, FMEA, документация, тесты</a></li></ol>
+        <div class="gc-callout" data-state="caution"><strong>Безопасность.</strong> Всё, что управляет аппаратом, сначала проходит тесты и SITL. Реальный полёт — только с проверенным failsafe и пилотом, готовым забрать управление.</div>
+      </div>
+      <div class="module-done"><gc-button variant="secondary" data-done-toggle="proj-fleet-telemetry" data-done-label="сданный" data-done-past="Сдан">Отметить как сданный</gc-button></div>
+    </article>
+  </main>
+  <footer class="gc-container site-footer gc-muted">
+    <p>Открытый курс · <a href="https://github.com/irreligious86/UAV-Education">исходники на GitHub</a> · <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">план развития</a> · <a href="../../curriculum/curriculum.html">для разработчика</a> · CC BY-NC-SA 4.0</p>
+  </footer>
+</body>
+</html>

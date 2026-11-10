@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="uk" data-theme="dark" data-lang="uk">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Companion + ArduPilot: управление из кода — UAV Student</title>
+  <meta name="description" content="управлять дроном из скрипта (guided/offboard)">
+  <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
+  <link rel="manifest" href="../../manifest.webmanifest">
+  <meta name="theme-color" content="#0b0f14">
+  <link rel="alternate" hreflang="ru" href="../../m/ap-companion.html">
+  <link rel="alternate" hreflang="uk" href="../../uk/m/ap-companion.html">
+  <link rel="alternate" hreflang="en" href="../../en/m/ap-companion.html">
+  <script>/* go to the visitor's chosen language before anything paints (assets/i18n.js) */(function(){try{var c=localStorage.getItem('uav-lang'),h=document.documentElement.getAttribute('data-lang');if(!c||c===h||/[?&]lang=keep\b/.test(location.search))return;var l=document.querySelector('link[rel=alternate][hreflang="'+c+'"]');if(l)location.replace(l.href+location.search+location.hash)}catch(e){}})();</script>
+  <link rel="stylesheet" href="../../lib/ground-control-ui/dist/ground-control.css">
+  <link rel="stylesheet" href="../../assets/site.css">
+  <script src="../../lib/ground-control-ui/dist/ground-control.js" defer></script>
+  <script src="../../assets/i18n/uk.js"></script>
+  <script src="../../assets/i18n.js"></script>
+  <script src="../../assets/progress-store.js" defer></script>
+  <script src="../../assets/backend-config.js" defer></script>
+  <script src="../../assets/account.js" defer></script>
+  <script src="../../assets/grading.js" defer></script>
+  <script src="../../assets/app.js" defer></script>
+  <script src="../../assets/uav-quiz.js" defer></script>
+  <script src="../../assets/uav-tasks.js" defer></script>
+  <script src="../../assets/offline.js" defer></script>
+</head>
+<body class="gc-root" data-base="../" data-root="../../">
+  <header class="site-header">
+    <div class="gc-container site-header__inner">
+      <a class="site-brand" href="../index.html"><span class="site-brand__mark" aria-hidden="true">◆</span> UAV Student</a>
+      <nav class="gc-nav" aria-label="Разделы сайта">
+        <a href="../index.html" aria-current="page">Курс</a>
+        <a href="../ref/index.html">Справочник</a>
+        <a href="../pages/glossary.html">Глоссарий</a>
+        <a href="../pages/fails.html">Фейлы</a>
+        <a href="../pages/search.html">Поиск</a>
+        <a href="../pages/progress.html">Мой прогресс</a>
+      </nav>
+      <nav class="lang-switch" aria-label="Язык"><a class="gc-tag" href="../../m/ap-companion.html" data-lang-to="ru" hreflang="ru" lang="ru" title="Русский">RU</a><a class="gc-tag" href="../../uk/m/ap-companion.html" data-lang-to="uk" hreflang="uk" lang="uk" title="Українська" aria-current="true" data-state="ok">UK</a><a class="gc-tag" href="../../en/m/ap-companion.html" data-lang-to="en" hreflang="en" lang="en" title="English">EN</a></nav>
+    </div>
+  </header>
+  <main class="gc-container site-main">
+    <article class="module" data-module-page="ap-companion">
+      <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-engineer">Инженер: код на борту</a><span>Companion + ArduPilot: управление из кода</span></p>
+      <h1 class="module-title">Companion + ArduPilot: управление из кода</h1>
+      <div class="module-tags"><span class="gc-tag" title="Уровень">L3 — Специалист</span><span class="gc-tag">чтение 30 мин</span><span class="gc-tag">учёба ~3 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ОСВОЕН</span></div>
+      <p class="gc-muted module-score" data-module-score></p>
+      <p class="module-lead">Режим GUIDED — дверь, через которую бортовой компьютер управляет аппаратом: «лети в точку», «держи скорость», «смотри туда». Модуль показывает, как из Python на companion задавать цели по позиции и скорости, как ArduPilot защищает себя от молчащего или спятившего companion и как построить цикл управления так, чтобы его можно было безопасно отлаживать в SITL. Итог — каркас для capstone трека: своя логика на борту.</p>
+      <div class="gc-callout" data-state="ok"><strong>После модуля ты умеешь</strong><ul><li>управлять дроном из скрипта (guided/offboard)</li></ul></div><p class="gc-muted">Перед этим модулем: <a href="comp-raspberry.html">Raspberry Pi + ArduPilot</a>, <a href="ap-missions.html">Миссии и планирование</a></p><div class="gc-callout lab"><p class="gc-label gc-muted">Лабораторная</p><strong>GUIDED из кода</strong><p class="gc-muted lab__hint">Сдано, когда отмечены все пункты:</p><ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="ap-companion:lab:0"><span>Взлёт и цель по позиции в SITL</span></label></li><li><label><input type="checkbox" data-check-id="ap-companion:lab:1"><span>Цели по скорости шлются 5–10 Гц, таймаут проверен намеренно</span></label></li><li><label><input type="checkbox" data-check-id="ap-companion:lab:2"><span>Код прекращает слать цели при смене режима пилотом</span></label></li><li><label><input type="checkbox" data-check-id="ap-companion:lab:3"><span>Геозона включена и проверена</span></label></li></ul></div><div class="path-pos gc-muted"><span class="gc-label">В пути</span><ul><li data-path-pos="ardupilot"><a href="../path/ardupilot.html">ArduPilot</a>: шаг 54 из 69 → <a href="eng-ci-configs.html?path=ardupilot">CI и версионирование конфигов и кода</a></li></ul></div>
+      <div class="gc-prose module-body">
+<div class="gc-callout" data-state="caution" data-untranslated><strong>Модуль ещё не переведён.</strong> Ниже — оригинал (Русский). Прогресс и оценки общие для всех языков.</div>
+<h2>Теория</h2>
+<h4 class="md-subheading">GUIDED и его таймауты</h4>
+<p>В GUIDED аппарат ждёт целей от внешнего источника. Цели бывают:</p>
+<ul><li><strong>позиция</strong> — <code>SET_POSITION_TARGET_GLOBAL_INT</code> (86) с координатами или <code>SET_POSITION_TARGET_LOCAL_NED</code> (84) в метрах относительно дома/аппарата;</li><li><strong>скорость</strong> — те же сообщения с битовой маской <code>type_mask</code>, которая говорит «игнорируй позицию, используй скорость»;</li><li><strong>ориентация/тяга</strong> — <code>SET_ATTITUDE_TARGET</code> для продвинутых случаев.</li></ul>
+<p>Цели по скорости действуют ограниченное время: если companion замолчал, ArduPilot через таймаут (порядка секунд, параметр <code>GUID_TIMEOUT</code>) переводит аппарат в зависание. Это защита, на которую надо опираться, а не обходить.</p>
+<h4 class="md-subheading">Система координат</h4>
+<p><code>LOCAL_NED</code>: X — север, Y — восток, Z — <strong>вниз</strong>. Подъём на 10 м — это Z = −10. Половина ошибок offboard-кода — знак оси Z. Для целей относительно носа аппарата есть <code>MAV_FRAME_BODY_OFFSET_NED</code>.</p>
+<h4 class="md-subheading">Что проверяет FC</h4>
+<p>Геозона (<code>FENCE_*</code>), ограничения скорости и ускорения (<code>WP_*</code>, до 4.7 — <code>WPNAV_*</code>), батарейный failsafe, здоровье EKF. Companion может просить что угодно — выполнение всё равно в рамках параметров FC. Отсюда правило отладки: если аппарат «не слушается», сначала <code>STATUSTEXT</code>, потом параметры ограничений, и только потом свой код.</p>
+<h4 class="md-subheading">Цикл управления</h4>
+<p>Хороший цикл companion:</p>
+<ol><li>Читать состояние (позиция, скорость, режим, арм) из телеметрии с заданной частотой.</li><li>Считать решение.</li><li>Отправлять цель <strong>регулярно</strong> (например, 5–10 Гц для скорости), даже если она не изменилась.</li><li>Проверять, что режим всё ещё GUIDED: пилот тумблером может забрать управление в любой момент, и код обязан это уважать.</li></ol>
+<h4 class="md-subheading">Код companion как конечный автомат</h4>
+<p>Скрипт «отправил команду, поспал 10 секунд, отправил следующую» работает в SITL и ломается в поле: команда не принята, пилот переключил режим, GPS пропал. Надёжная форма — автомат состояний, где каждый переход проверяет условие и имеет таймаут:</p>
+<div class="table-wrap md-table-wrap" tabindex="0"><table class="md-table"><thead><tr><th>Состояние</th><th>Что делает</th><th>Переход дальше</th><th>Если не вышло</th></tr></thead><tbody><tr><td data-label="Состояние">WAIT_READY</td><td data-label="Что делает">ждёт GPS fix и EKF OK по телеметрии</td><td data-label="Переход дальше">готовность</td><td data-label="Если не вышло">ждать, ничего не слать</td></tr><tr><td data-label="Состояние">ARM_TAKEOFF</td><td data-label="Что делает">GUIDED, арм, <code>MAV_CMD_NAV_TAKEOFF</code>, ждёт ACK и высоту ≥ 90 % цели</td><td data-label="Переход дальше">высота достигнута</td><td data-label="Если не вышло">за 20 с нет высоты → LAND</td></tr><tr><td data-label="Состояние">TASK</td><td data-label="Что делает">шлёт цели с частотой 5–10 Гц, проверяет режим каждую итерацию</td><td data-label="Переход дальше">задача выполнена</td><td data-label="Если не вышло">режим не GUIDED → PILOT</td></tr><tr><td data-label="Состояние">RETURN</td><td data-label="Что делает"><code>RTL</code> по команде смены режима</td><td data-label="Переход дальше">дизарм</td><td data-label="Если не вышло">—</td></tr><tr><td data-label="Состояние">PILOT</td><td data-label="Что делает"><strong>молчит</strong>, только читает телеметрию</td><td data-label="Переход дальше">пилот вернул GUIDED и подтвердил</td><td data-label="Если не вышло">—</td></tr></tbody></table></div>
+<p>Каркас:</p>
+<pre class="cli-block"><code>import time
+from pymavlink import mavutil
+
+class Mission:
+    def __init__(self, m):
+        self.m, self.state, self.t0 = m, &quot;WAIT_READY&quot;, time.time()
+        self.alt, self.mode, self.armed = 0.0, &quot;&quot;, False
+
+    def go(self, state):
+        print(f&quot;{self.state} -&gt; {state}&quot;); self.state, self.t0 = state, time.time()
+
+    def read(self):
+        while (msg := self.m.recv_match(blocking=False)) is not None:
+            t = msg.get_type()
+            if t == &quot;GLOBAL_POSITION_INT&quot;: self.alt = msg.relative_alt / 1000
+            elif t == &quot;HEARTBEAT&quot; and msg.type != mavutil.mavlink.MAV_TYPE_GCS:
+                self.mode = mavutil.mode_string_v10(msg)
+                self.armed = bool(msg.base_mode &amp; mavutil.mavlink.MAV_MODE_FLAG_SAFETY_ARMED)
+
+    def step(self):
+        self.read()
+        if self.state in (&quot;TASK&quot;, &quot;ARM_TAKEOFF&quot;) and self.mode not in (&quot;GUIDED&quot;, &quot;&quot;):
+            return self.go(&quot;PILOT&quot;)                       # the pilot always wins
+        if self.state == &quot;ARM_TAKEOFF&quot; and time.time() - self.t0 &gt; 20 and self.alt &lt; 9:
+            self.m.set_mode(self.m.mode_mapping()[&quot;LAND&quot;]); return self.go(&quot;PILOT&quot;)
+        # ... the remaining transitions follow the table</code></pre>
+<p>Такой код легко тестировать: подмените <code>m</code> фейковым соединением (как в <code>examples/mavlink/tests</code>) и проверьте каждую строку таблицы, включая «пилот забрал управление посреди TASK».</p>
+<h4 class="md-subheading">Безопасность при разработке</h4>
+<ul><li>Всё сначала в SITL. Тот же код, тот же порт, только адрес другой.</li><li>Пилот с пультом и тумблером на LOITER/RTL — всегда, даже когда «точно работает».</li><li>Геозона включена и проверена.</li><li>Первые реальные тесты — только цели по позиции на малой высоте; скорость — потом.</li></ul>
+<h4 class="md-subheading">Пример: скорость в GUIDED (pymavlink)</h4>
+<pre class="cli-block"><code>from pymavlink import mavutil
+m = mavutil.mavlink_connection(&quot;tcp:127.0.0.1:5762&quot;); m.wait_heartbeat()
+m.set_mode(m.mode_mapping()[&quot;GUIDED&quot;]); m.arducopter_arm(); m.motors_armed_wait()
+m.mav.command_long_send(m.target_system, m.target_component, mavutil.mavlink.MAV_CMD_NAV_TAKEOFF, 0, 0,0,0,0,0,0, 10)
+import time; time.sleep(10)
+for _ in range(50):                          # 10 s at 5 Hz: forward 1 m/s in body frame
+    m.mav.set_position_target_local_ned_send(
+        0, m.target_system, m.target_component, mavutil.mavlink.MAV_FRAME_BODY_OFFSET_NED,
+        0b0000111111000111,                    # use velocity only (bits: ignore pos x/y/z, acc, yaw, yaw_rate)
+        0,0,0,  1.0,0.0,0.0,  0,0,0,  0,0)
+    time.sleep(0.2)
+# stop sending -&gt; after GUID_TIMEOUT (3 s default) the copter stops and hovers</code></pre>
+<p>Полный стартовый проект (квадрат, тест failsafe, CI) — <code>examples/sitl-pymavlink</code> в репозитории курса. <code>GUID_TIMEOUT</code> = 3.0 с по умолчанию (диапазон 0.1–5); <code>GUID_OPTIONS</code> биты: 0 — разрешить арм с пульта в GUIDED, 2 — игнорировать yaw пилота, 6 — навигация по точкам для позиционных целей, 7 — флюгирование.</p>
+<h4 class="md-subheading">Разобранный пример: «аппарат не двигается по команде скорости»</h4>
+<p>Проверки по порядку: (1) режим GUIDED (<code>HEARTBEAT.custom_mode</code>); (2) <code>type_mask</code> — не замаскирована ли скорость; (3) частота отправки ≥ 2 Гц (таймаут 3 с); (4) <code>WP_SPD</code> (до 4.7 — <code>WPNAV_SPEED</code>)/<code>PSC_*</code> не ограничивают до нуля; (5) геозона не держит у границы; (6) <code>STATUSTEXT</code> — «EKF needs position» и т.п. В 80% случаев — (1) или (2).</p>
+<figure class="diagram" data-diagram="guided-timeout"><div class="diagram__svg"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 300" width="100%" role="img" aria-labelledby="t" style="max-width:720px;display:block;margin:0 auto"><title id="t">GUIDED: цель по скорости живёт GUID_TIMEOUT (3 с)</title><style>text{font-family: var(--gc-font-mono, ui-monospace, Menlo, monospace); font-size: 12px;fill:currentColor} .m{fill:var(--gc-ink-muted, #8a93a3)} .a{fill:var(--gc-accent-hud, #5ef1d2)} .w{fill:var(--gc-signal-amber, #f0b24c)} .d{fill:var(--gc-signal-red, #e8636b)} .box{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:currentColor;stroke-width:1.2} .boxa{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6} .ln{stroke:currentColor;stroke-width:1.2;fill:none} .lna{stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6;fill:none} .lnm{stroke:var(--gc-ink-muted, #8a93a3);stroke-width:1;fill:none;stroke-dasharray:4 3} .t{font-size:11px} .b{font-weight:600}</style><defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker><marker id="ara" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--gc-accent-hud, #5ef1d2)"/></marker></defs><text x="16" y="16" text-anchor="start" class="m t">GUIDED: цель по скорости живёт GUID_TIMEOUT (3 с)</text><rect class="box" x="20.0" y="26" width="120" height="26" rx="5"/><text x="80.0" y="43" text-anchor="middle" class="b" style="font-size:11px">Companion</text><line class="lnm" x1="80.0" y1="52" x2="80.0" y2="290"/><rect class="box" x="410.0" y="26" width="120" height="26" rx="5"/><text x="470.0" y="43" text-anchor="middle" class="b" style="font-size:11px">ArduPilot</text><line class="lnm" x1="470.0" y1="52" x2="470.0" y2="290"/><path class="lna" d="M80.0 74 L466.0 74" marker-end="url(#ara)"/><text x="275.0" y="69" text-anchor="middle" class="a t" style="font-size:10px">SET_POSITION_TARGET_LOCAL_NED (vx, vy, vz)</text><text x="275.0" y="108" text-anchor="middle" class="w t" style="font-size:10px">— выполняет, таймер сброшен —</text><path class="ln" style="stroke-dasharray:5 4" d="M470.0 134 L84.0 134" marker-end="url(#ar)"/><text x="275.0" y="129" text-anchor="middle" class="t" style="font-size:10px">LOCAL_POSITION_NED, HEARTBEAT</text><path class="lna" d="M80.0 164 L466.0 164" marker-end="url(#ara)"/><text x="275.0" y="159" text-anchor="middle" class="a t" style="font-size:10px">та же цель каждые 100–500 мс</text><text x="275.0" y="198" text-anchor="middle" class="w t" style="font-size:10px">— companion завис / упал —</text><text x="275.0" y="228" text-anchor="middle" class="w t" style="font-size:10px">— 3 с без новой цели —</text><path class="ln" style="stroke-dasharray:5 4" d="M470.0 254 L84.0 254" marker-end="url(#ar)"/><text x="275.0" y="249" text-anchor="middle" class="t" style="font-size:10px">скорость → 0, висение</text><text x="704" y="78" text-anchor="end" class="m t" style="font-size:10px">type_mask: только скорость</text><text x="704" y="168" text-anchor="end" class="m t" style="font-size:10px">≥ 2 Гц — запас к таймауту</text><text x="704" y="258" text-anchor="end" class="m t" style="font-size:10px">защита, а не помеха</text></svg></div><figcaption class="gc-muted">Цель по скорости в GUIDED действует GUID_TIMEOUT (3 с по умолчанию): companion обязан повторять её чаще, иначе аппарат остановится и зависнет.</figcaption><div class="diagram__hint">Схему можно прокрутить по горизонтали</div></figure>
+
+<h2>Практика</h2>
+<h4 class="md-subheading">Шаг 1. Взлёт и цель по позиции (SITL)</h4>
+<pre class="cli-block"><code>import time
+from pymavlink import mavutil
+
+m = mavutil.mavlink_connection(&quot;tcp:127.0.0.1:5762&quot;)  # on the drone: tcp:127.0.0.1:5760 via router
+m.wait_heartbeat()
+
+def ack(cmd):
+    a = m.recv_match(type=&quot;COMMAND_ACK&quot;, blocking=True, timeout=3)
+    assert a and a.command == cmd and a.result == 0, f&quot;command {cmd} failed: {a}&quot;
+
+m.set_mode(m.mode_mapping()[&quot;GUIDED&quot;])
+m.mav.command_long_send(m.target_system, m.target_component,
+    mavutil.mavlink.MAV_CMD_COMPONENT_ARM_DISARM, 0, 1, 0, 0, 0, 0, 0, 0)
+ack(400)
+m.mav.command_long_send(m.target_system, m.target_component,
+    mavutil.mavlink.MAV_CMD_NAV_TAKEOFF, 0, 0, 0, 0, 0, 0, 0, 10)
+ack(22)
+time.sleep(8)
+
+# fly 20 m north, 0 east, stay at 10 m: LOCAL_NED, Z is DOWN
+POS_ONLY = 0b0000_1111_1111_1000  # use x,y,z; ignore velocity, accel, yaw
+m.mav.set_position_target_local_ned_send(
+    0, m.target_system, m.target_component,
+    mavutil.mavlink.MAV_FRAME_LOCAL_NED, POS_ONLY,
+    20, 0, -10,  0, 0, 0,  0, 0, 0,  0, 0)</code></pre>
+<h4 class="md-subheading">Шаг 2. Цель по скорости, с регулярной отправкой</h4>
+<pre class="cli-block"><code>VEL_ONLY = 0b0000_1111_1100_0111  # use vx,vy,vz; ignore position, accel, yaw
+t_end = time.time() + 5
+while time.time() &lt; t_end:
+    hb = m.recv_match(type=&quot;HEARTBEAT&quot;, blocking=False)
+    if hb and hb.type != mavutil.mavlink.MAV_TYPE_GCS and mavutil.mode_string_v10(hb) != &quot;GUIDED&quot;:
+        print(&quot;pilot took over, stop sending&quot;); break
+    m.mav.set_position_target_local_ned_send(
+        0, m.target_system, m.target_component,
+        mavutil.mavlink.MAV_FRAME_LOCAL_NED, VEL_ONLY,
+        0, 0, 0,  1.0, 0, 0,  0, 0, 0,  0, 0)   # 1 m/s north
+    time.sleep(0.2)                              # 5 Hz, inside GUID_TIMEOUT</code></pre>
+<p>Перестань слать — аппарат зависнет сам. Это и есть тест таймаута: выполни его намеренно.</p>
+<h4 class="md-subheading">Шаг 2б. Автомат на фейковом соединении</h4>
+<p>Дописать переходы из таблицы и тест: фейк отдаёт HEARTBEAT с режимом LOITER посреди TASK — автомат должен перейти в PILOT и не отправить больше ни одной цели. Второй тест: высота не растёт 20 с после взлёта — автомат командует LAND. Оба теста — в CI, как в стартере <code>examples/sitl-pymavlink</code>.</p>
+<h4 class="md-subheading">Шаг 3. Capstone-каркас</h4>
+<p>Собери из модулей трека: Raspberry Pi с маршрутизатором → сервис на Python → GUIDED-логика (например, «облететь точку интереса по кругу и вернуться»), ESP32 с индикацией состояния. Критерий сдачи: сценарий работает в SITL, документирован протокол и поведение при отказе companion, реальный полёт — только с геозоной и пилотом.</p>
+<h4 class="md-subheading">Что должно получиться и что записать</h4>
+<ul><li><strong>Позиция.</strong> После цели <code>POS_ONLY</code> аппарат летит в точку и висит там, а не возвращается: цель по позиции не требует потока. Запиши время прилёта и ошибку позиции в конце (<code>GLOBAL_POSITION_INT</code> против цели).</li><li><strong>Скорость и таймаут.</strong> Цели <code>VEL_ONLY</code> шлются 5–10 Гц. Прекрати слать — через <code>GUID_TIMEOUT</code> (по умолчанию 3 с) аппарат останавливается и зависает. Запиши по логу время от последней цели до остановки: оно должно совпасть с параметром.</li><li><strong>Смена режима пилотом.</strong> Переключи режим в LOITER посреди задания: код видит это по <code>HEARTBEAT.custom_mode</code>, переходит в состояние PILOT и больше не шлёт ни одной цели. Проверка — в MAVLink Inspector после переключения нет <code>SET_POSITION_TARGET_*</code> от companion.</li><li><strong>Геозона.</strong> <code>FENCE_ENABLE = 1</code>, тип — высота и круг, радиус 50 м, действие RTL. Отправь цель за пределами круга: в зависимости от версии цель отвергается или аппарат долетает до границы и уходит в RTL. Запиши, что именно произошло у тебя, и сохрани лог — это доказательство, что защита работает и без твоего кода.</li></ul>
+<p>Лабораторная засчитывается, когда взлёт и цель по позиции выполнены в SITL, цели по скорости шлются 5–10 Гц и таймаут проверен намеренно с временем по логу, код прекращает слать цели при смене режима пилотом, а геозона включена и проверена.</p>
+
+<h2>Диагностика</h2>
+<div class="diag-groups"><article class="diag-item"><h4><strong>Симптом:</strong> аппарат не реагирует на цели</h4><ul><li>Возможная причина: не GUIDED, не заармлен, <code>type_mask</code> игнорирует нужные поля.</li><li>Что сделать: проверить режим и арм в heartbeat, маску, <code>STATUSTEXT</code>.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> летит вверх вместо вниз (или наоборот)</h4><ul><li>Возможная причина: знак Z в NED.</li><li>Что сделать: Z вниз положительный; подъём — отрицательное Z.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> через пару секунд зависает, хотя команда была</h4><ul><li>Возможная причина: цель по скорости отправлена один раз, сработал таймаут.</li><li>Что сделать: слать регулярно (5–10 Гц).</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> останавливается на границе, не долетая до цели</h4><ul><li>Возможная причина: геозона или ограничения <code>WPNAV_*</code>.</li><li>Что сделать: проверить <code>FENCE_*</code> и сообщения FC — это защита, а не баг.</li></ul></article></div>
+
+<h2>Чек-лист</h2>
+<ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="ap-companion:0"><span>Все цели сначала в SITL</span></label></li><li><label><input type="checkbox" data-check-id="ap-companion:1"><span>Знак Z в NED проверен</span></label></li><li><label><input type="checkbox" data-check-id="ap-companion:2"><span>Цели по скорости шлются регулярно, таймаут проверен намеренно</span></label></li><li><label><input type="checkbox" data-check-id="ap-companion:3"><span>Код уважает смену режима пилотом</span></label></li><li><label><input type="checkbox" data-check-id="ap-companion:4"><span>Геозона включена, пилот с тумблером на LOITER/RTL</span></label></li><li><label><input type="checkbox" data-check-id="ap-companion:5"><span>Поведение при отказе companion задокументировано</span></label></li></ul>
+
+<h2>Источники</h2>
+<ul class="refs"><li><a href="https://ardupilot.org/dev/docs/copter-commands-in-guided-mode.html" target="_blank" rel="noopener noreferrer">Copter Commands in Guided Mode — ArduPilot Dev</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://mavlink.io/en/messages/common.html#SET_POSITION_TARGET_LOCAL_NED" target="_blank" rel="noopener noreferrer">MAVLink SET_POSITION_TARGET_LOCAL_NED (common.xml)</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://ardupilot.org/copter/docs/ac2_guidedmode.html" target="_blank" rel="noopener noreferrer">Guided Mode — ArduPilot Copter</a> <span class="gc-tag" data-state="info">primary</span></li></ul>
+<h2>Проверь себя</h2>
+<uav-quiz src="../quiz/ap-companion.json" module="ap-companion"></uav-quiz>
+      </div>
+      <div class="module-done"><gc-button variant="secondary" data-done-toggle="ap-companion">Отметить как пройденный</gc-button></div>
+      <section class="related" aria-label="Смежные модули"><p class="gc-label gc-muted">Смежные модули</p><div class="gc-grid ref-grid"><a class="gc-card" href="comp-raspberry.html"><strong>Raspberry Pi + ArduPilot</strong><div class="gc-card__meta"><span class="gc-tag" title="L3 — Специалист">L3</span></div></a><a class="gc-card" href="ap-missions.html"><strong>Миссии и планирование</strong><div class="gc-card__meta"><span class="gc-tag" title="L2 — Интегратор">L2</span></div></a></div></section>
+      <nav class="pager" aria-label="Соседние модули" data-track-pager><a class="gc-card pager__prev" href="payload-gimbal.html"><span class="gc-label gc-muted">Назад · трек</span><br>Подвесы и полезная нагрузка: MAVLink Gimbal v2, камера, сброс</a><a class="gc-card pager__next" href="mav-multi-vehicle.html"><span class="gc-label gc-muted">Дальше · трек</span><br>Несколько аппаратов: адресация, разнесение, строй и супервизор</a></nav><nav class="pager" aria-label="Соседние шаги пути ArduPilot" data-path-pager="ardupilot" hidden><a class="gc-card pager__prev" href="comp-raspberry.html?path=ardupilot"><span class="gc-label gc-muted">Назад · путь ArduPilot</span><br>Raspberry Pi + ArduPilot</a><a class="gc-card pager__next" href="eng-ci-configs.html?path=ardupilot"><span class="gc-label gc-muted">Дальше · шаг 55 из 69</span><br>CI и версионирование конфигов и кода</a></nav>
+    </article>
+  </main>
+  <footer class="gc-container site-footer gc-muted">
+    <p>Открытый курс · <a href="https://github.com/irreligious86/UAV-Education">исходники на GitHub</a> · <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">план развития</a> · <a href="../../curriculum/curriculum.html">для разработчика</a> · CC BY-NC-SA 4.0</p>
+  </footer>
+</body>
+</html>

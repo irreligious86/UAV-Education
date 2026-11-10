@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en" data-theme="dark" data-lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Полевые операции и работа команды — UAV Student</title>
+  <meta name="description" content="планировать вылет: площадка, погода, частоты, роли в команде вести предполётный/послеполётный протокол и журнал действовать при инциденте: потеря связи, падение, поиск">
+  <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
+  <link rel="manifest" href="../../manifest.webmanifest">
+  <meta name="theme-color" content="#0b0f14">
+  <link rel="alternate" hreflang="ru" href="../../m/ops-field.html">
+  <link rel="alternate" hreflang="uk" href="../../uk/m/ops-field.html">
+  <link rel="alternate" hreflang="en" href="../../en/m/ops-field.html">
+  <script>/* go to the visitor's chosen language before anything paints (assets/i18n.js) */(function(){try{var c=localStorage.getItem('uav-lang'),h=document.documentElement.getAttribute('data-lang');if(!c||c===h||/[?&]lang=keep\b/.test(location.search))return;var l=document.querySelector('link[rel=alternate][hreflang="'+c+'"]');if(l)location.replace(l.href+location.search+location.hash)}catch(e){}})();</script>
+  <link rel="stylesheet" href="../../lib/ground-control-ui/dist/ground-control.css">
+  <link rel="stylesheet" href="../../assets/site.css">
+  <script src="../../lib/ground-control-ui/dist/ground-control.js" defer></script>
+  <script src="../../assets/i18n/en.js"></script>
+  <script src="../../assets/i18n.js"></script>
+  <script src="../../assets/progress-store.js" defer></script>
+  <script src="../../assets/backend-config.js" defer></script>
+  <script src="../../assets/account.js" defer></script>
+  <script src="../../assets/grading.js" defer></script>
+  <script src="../../assets/app.js" defer></script>
+  <script src="../../assets/uav-quiz.js" defer></script>
+  <script src="../../assets/uav-tasks.js" defer></script>
+  <script src="../../assets/offline.js" defer></script>
+</head>
+<body class="gc-root" data-base="../" data-root="../../">
+  <header class="site-header">
+    <div class="gc-container site-header__inner">
+      <a class="site-brand" href="../index.html"><span class="site-brand__mark" aria-hidden="true">◆</span> UAV Student</a>
+      <nav class="gc-nav" aria-label="Разделы сайта">
+        <a href="../index.html" aria-current="page">Курс</a>
+        <a href="../ref/index.html">Справочник</a>
+        <a href="../pages/glossary.html">Глоссарий</a>
+        <a href="../pages/fails.html">Фейлы</a>
+        <a href="../pages/search.html">Поиск</a>
+        <a href="../pages/progress.html">Мой прогресс</a>
+      </nav>
+      <nav class="lang-switch" aria-label="Язык"><a class="gc-tag" href="../../m/ops-field.html" data-lang-to="ru" hreflang="ru" lang="ru" title="Русский">RU</a><a class="gc-tag" href="../../uk/m/ops-field.html" data-lang-to="uk" hreflang="uk" lang="uk" title="Українська">UK</a><a class="gc-tag" href="../../en/m/ops-field.html" data-lang-to="en" hreflang="en" lang="en" title="English" aria-current="true" data-state="ok">EN</a></nav>
+    </div>
+  </header>
+  <main class="gc-container site-main">
+    <article class="module" data-module-page="ops-field">
+      <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-operator">Оператор</a><span>Полевые операции и работа команды</span></p>
+      <h1 class="module-title">Полевые операции и работа команды</h1>
+      <div class="module-tags"><span class="gc-tag" title="Уровень">L2 — Интегратор</span><span class="gc-tag">чтение 25 мин</span><span class="gc-tag">учёба ~3 ч</span><span class="gc-tag">любая прошивка</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ОСВОЕН</span></div>
+      <p class="gc-muted module-score" data-module-score></p>
+      <p class="module-lead">Большинство аварий случается не из-за прошивки, а из-за организации: не проверили частоты у соседей, не договорились, кто смотрит за аппаратом, не было плана на потерю связи. Модуль — про операции как дисциплину: планирование вылета, роли в команде, частоты и связь, предполётный и послеполётный протокол, действия при инциденте и поиск упавшего аппарата. Основано на практике работы нескольких пилотов на одной площадке.</p>
+      <div class="gc-callout" data-state="ok"><strong>После модуля ты умеешь</strong><ul><li>планировать вылет: площадка, погода, частоты, роли в команде</li><li>вести предполётный/послеполётный протокол и журнал</li><li>действовать при инциденте: потеря связи, падение, поиск</li></ul></div><p class="gc-muted">Перед этим модулем: <a href="bf-failsafe.html">Failsafe: стадии и тест по свитчу</a>, <a href="f-regulations.html">Правила, зоны и ответственность оператора</a></p><div class="gc-callout lab"><p class="gc-label gc-muted">Лабораторная</p><strong>Протокол вылета</strong><p class="gc-muted lab__hint">Сдано, когда отмечены все пункты:</p><ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="ops-field:lab:0"><span>Карта площадки с зонами и частотами</span></label></li><li><label><input type="checkbox" data-check-id="ops-field:lab:1"><span>Распределение ролей и связь в команде</span></label></li><li><label><input type="checkbox" data-check-id="ops-field:lab:2"><span>Разбор одного инцидента по протоколу</span></label></li></ul></div><div class="path-pos gc-muted"><span class="gc-label">В пути</span><ul><li data-path-pos="betaflight"><a href="../path/betaflight.html">Betaflight</a>: шаг 21 из 44 → <a href="ops-case-studies.html?path=betaflight">Разбор реальных аварий</a></li></ul></div>
+      <div class="gc-prose module-body">
+<div class="gc-callout" data-state="caution" data-untranslated><strong>Модуль ещё не переведён.</strong> Ниже — оригинал (Русский). Прогресс и оценки общие для всех языков.</div>
+<h2>Теория</h2>
+<h4 class="md-subheading">Планирование вылета</h4>
+<p>До выезда известно: площадка и зоны (модуль про правила), погода (ветер по высотам, осадки, температура — холод режет ёмкость LiPo), цель вылета и критерии успеха, кто участвует и в каких ролях, какие частоты занимают соседи.</p>
+<h4 class="md-subheading">Роли</h4>
+<p>Даже вдвоём роли стоит назвать явно:</p>
+<ul><li><strong>Пилот</strong> — управляет, ничем другим не занят.</li><li><strong>Наблюдатель (spotter)</strong> — следит за аппаратом глазами и за окружением: люди, птицы, другие аппараты; говорит пилоту, не отвлекая.</li><li><strong>Техник / GCS</strong> — телеметрия, параметры, логи, замена АКБ, таймер.</li><li><strong>Старший</strong> — решает «летим / не летим», ведёт журнал.</li></ul>
+<p>Один человек может совмещать, но пилот в полёте — только пилот.</p>
+<h4 class="md-subheading">Частоты и связь</h4>
+<ul><li><strong>Видео</strong>: таблица занятых каналов на площадке; разнос с соседями (ориентир ≥ ~37 МГц для аналога); смена канала — по алгоритму из модуля про VTX, сначала на одном борту.</li><li><strong>RC</strong>: binding phrase уникальна; packet rate под задачу; при нескольких ELRS-пультах — разные фразы, иначе паттерны прыжков совпадут.</li><li><strong>Голос</strong>: короткие стандартные фразы: «арм», «взлёт», «связь», «низкая батарея», «садимся», «аварийно». Пилот подтверждает одним словом.</li></ul>
+<h4 class="md-subheading">Протоколы</h4>
+<p><strong>Предполётный</strong> (из модуля про безопасность, дополненный): частоты согласованы, роли названы, АКБ напряжение записано, failsafe проверен на этом аппарате, таймер запущен при арме.</p>
+<p><strong>Послеполётный</strong>: дизарм, АКБ отключена, температура моторов, осмотр пропов и рамы, запись в журнал (время, АКБ до/после, замечания), лог сохранён, если вылет тестовый.</p>
+<h4 class="md-subheading">Инциденты</h4>
+<ul><li><strong>Потеря связи</strong>: пилот сообщает, все смотрят на аппарат, никто не бежит. Аппарат делает то, что настроено в failsafe — поэтому failsafe и проверяют заранее.</li><li><strong>Падение</strong>: место по последней телеметрии/видео, пищалка (BEEPER), GPS-координаты из лога GCS. Подход к упавшему аппарату — АКБ может быть повреждена: не трогать горячую/вздутую, не заряжать.</li><li><strong>Травма</strong>: помощь, экстренные службы, потом всё остальное.</li><li><strong>Разбор</strong>: что случилось, по логу, без поиска виноватых; вывод — в журнал и в чек-лист.</li></ul>
+<h4 class="md-subheading">Кейс</h4>
+<p>Рабочий канал E5 (5885 МГц) оказался занят упавшим бортом, который продолжал вещать до конца смены. Решение: выбран F1 (5740 МГц) как ближайшая свободная частота с учётом каналов двух соседей, смена сначала на двух передатчиках и нескольких дронах для теста, затем на всех. Главный урок: таблица занятых частот по площадке должна существовать до инцидента.</p>
+<h4 class="md-subheading">Стандартный протокол радиообмена (команда из 2–4 человек)</h4>
+<div class="table-wrap md-table-wrap" tabindex="0"><table class="md-table"><thead><tr><th>Событие</th><th>Фраза</th><th>Ответ</th></tr></thead><tbody><tr><td data-label="Событие">Готовность к арму</td><td data-label="Фраза">«Борт 1, арм?»</td><td data-label="Ответ">«Арм разрешён» / «Стоп, &lt;причина&gt;»</td></tr><tr><td data-label="Событие">Взлёт</td><td data-label="Фраза">«Взлетаю»</td><td data-label="Ответ">«Вижу» (наблюдатель)</td></tr><tr><td data-label="Событие">Смена режима</td><td data-label="Фраза">«Лойтер» / «Авто»</td><td data-label="Ответ">«Принято»</td></tr><tr><td data-label="Событие">Проблема</td><td data-label="Фраза">«Внимание, &lt;что&gt;»</td><td data-label="Ответ">«Садись» / «Продолжай» (старший)</td></tr><tr><td data-label="Событие">Низкая АКБ</td><td data-label="Фраза">«Батарея 3.5»</td><td data-label="Ответ">«Возврат»</td></tr><tr><td data-label="Событие">Потеря видео/связи</td><td data-label="Фраза">«Нет видео» / «Файлсейф»</td><td data-label="Ответ">«Все смотрят, не двигаться»</td></tr><tr><td data-label="Событие">Посадка</td><td data-label="Фраза">«Сажусь»</td><td data-label="Ответ">«Чисто» (площадка свободна)</td></tr><tr><td data-label="Событие">Дизарм</td><td data-label="Фраза">«Дизарм»</td><td data-label="Ответ">«Принято, следующий»</td></tr></tbody></table></div>
+<p>Короткие, одинаковые, без жаргона; новичок учит фразы до первого выезда.</p>
+<h4 class="md-subheading">Брифинг и дебрифинг (10 минут каждый)</h4>
+<p>Брифинг: цель вылета, роли, площадка и зоны, частоты, погода, аварийные действия, кто принимает решение «стоп». Дебрифинг: что получилось, что нет, инциденты и «почти-инциденты» (near miss — главный источник улучшений), изменения в протокол/чек-лист, задачи к следующему выезду. Записывается в журнал площадки, а не в голову.</p>
+<h4 class="md-subheading">Чек-лист площадки (одна страница)</h4>
+<p>Подъезд и парковка; точка взлёта (ровная, без травы в пропах); зона полёта по правилам (модуль «Правила»); препятствия (ЛЭП, вышки, деревья) с высотами; люди/животные/дороги; ветер (анемометр или прогноз по высотам), осадки, температура (LiPo &lt; 10 °C — греть); связь (телефон, рации); аптечка, огнетушитель/песок, вода; таблица частот участников; схема «куда падает при DROP» для каждой точки маршрута.</p>
+<h4 class="md-subheading">Разобранный пример: вылет на тест RTH</h4>
+<p>Брифинг: цель — проверка RTH на 7&quot; на 100 м от дома; пилот — А, наблюдатель — Б, техник/GCS — В; площадка с запретным направлением на дорогу; ветер 4 м/с с запада — RTH против ветра, аппарат вернётся медленнее (запас АКБ); частоты: R1 аналог, ELRS 2.4 250 Гц. Выполнение: арм по фразам, висение 1 м → подъём 30 м → отлёт 100 м по ветру → «RTH» тумблером → наблюдатель ведёт глазами → возврат → зависание над домом → ручная посадка. Дебрифинг: RTH набрал 60 м как настроено, вернулся за 25 с, посадка вручную; near miss — наблюдатель отвлёкся на телефон 5 с → в протокол: телефоны в режиме «не беспокоить» у всех, кроме техника.</p>
+<figure class="diagram" data-diagram="sortie-flow"><div class="diagram__svg"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 200" width="100%" role="img" aria-labelledby="t" style="max-width:720px;display:block;margin:0 auto"><title id="t">Вылет как процесс</title><style>text{font-family: var(--gc-font-mono, ui-monospace, Menlo, monospace); font-size: 12px;fill:currentColor} .m{fill:var(--gc-ink-muted, #8a93a3)} .a{fill:var(--gc-accent-hud, #5ef1d2)} .w{fill:var(--gc-signal-amber, #f0b24c)} .d{fill:var(--gc-signal-red, #e8636b)} .box{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:currentColor;stroke-width:1.2} .boxa{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6} .ln{stroke:currentColor;stroke-width:1.2;fill:none} .lna{stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6;fill:none} .lnm{stroke:var(--gc-ink-muted, #8a93a3);stroke-width:1;fill:none;stroke-dasharray:4 3} .t{font-size:11px} .b{font-weight:600}</style><defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker><marker id="ara" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--gc-accent-hud, #5ef1d2)"/></marker></defs><rect class="box" x="10.0" y="30" width="111.2" height="48" rx="6"/><text x="65.6" y="51.0" text-anchor="middle" style="font-size:10.5px">План</text><text x="65.6" y="65.0" text-anchor="middle" style="font-size:10.5px">зона, погода</text><rect class="boxa" x="157.2" y="30" width="111.2" height="48" rx="6"/><text x="212.79999999999998" y="51.0" text-anchor="middle" class="b" style="font-size:10.5px">Брифинг</text><text x="212.79999999999998" y="65.0" text-anchor="middle" class="b" style="font-size:10.5px">10 мин</text><rect class="box" x="304.4" y="30" width="111.2" height="48" rx="6"/><text x="360.0" y="51.0" text-anchor="middle" style="font-size:10.5px">Чек-лист</text><text x="360.0" y="65.0" text-anchor="middle" style="font-size:10.5px">площадки</text><rect class="boxa" x="451.59999999999997" y="30" width="111.2" height="48" rx="6"/><text x="507.2" y="51.0" text-anchor="middle" class="b" style="font-size:10.5px">Полёт</text><text x="507.2" y="65.0" text-anchor="middle" class="b" style="font-size:10.5px">радиообмен</text><rect class="boxa" x="598.8" y="30" width="111.2" height="48" rx="6"/><text x="654.4" y="51.0" text-anchor="middle" class="b" style="font-size:10.5px">Дебрифинг</text><text x="654.4" y="65.0" text-anchor="middle" class="b" style="font-size:10.5px">+ журнал</text><rect class="box" x="451.59999999999997" y="130" width="111.2" height="48" rx="6"/><text x="507.2" y="151.0" text-anchor="middle" style="font-size:10.5px">Роли: пилот,</text><text x="507.2" y="165.0" text-anchor="middle" style="font-size:10.5px">наблюдатель</text><path class="ln" d="M121.2 54.0 L157.2 54.0" marker-end="url(#ar)"/><path class="ln" d="M268.4 54.0 L304.4 54.0" marker-end="url(#ar)"/><path class="ln" d="M415.59999999999997 54.0 L451.59999999999997 54.0" marker-end="url(#ar)"/><path class="ln" d="M562.8 54.0 L598.8 54.0" marker-end="url(#ar)"/><path class="ln" d="M507.2 78 L507.2 130" marker-end="url(#ar)"/></svg></div><figcaption class="gc-muted">Вылет как процесс: план, брифинг, чек-лист площадки, полёт с распределёнными ролями, дебрифинг и запись в журнал.</figcaption><div class="diagram__hint">Схему можно прокрутить по горизонтали</div></figure>
+
+<h2>Практика</h2>
+<h4 class="md-subheading">Шаг 1. Карта площадки</h4>
+<p>Схема: точка взлёта/посадки, зона полётов, запретные направления (люди, дорога, провода), место команды, подход при посадке. Частоты соседей в таблице.</p>
+<h4 class="md-subheading">Шаг 2. Протокол на одной странице</h4>
+<p>Распечатать: роли, стандартные фразы, предполётный и послеполётный чек-листы, действия при инциденте, телефоны.</p>
+<h4 class="md-subheading">Шаг 3. Прогон</h4>
+<p>Один вылет строго по протоколу, с таймером и журналом. После — что было неудобно, исправить в протоколе.</p>
+<h4 class="md-subheading">Шаг 4. Разбор инцидента</h4>
+<p>Взять реальный или учебный инцидент (потеря связи, падение), разобрать по логу: причина, что сработало, что нет, какое изменение в протокол.</p>
+<h4 class="md-subheading">Разобранный пример: протокол на одной странице</h4>
+<ul><li><strong>Площадка:</strong> точка взлёта — ровная грунтовка, без травы в пропах; зона полётов — сектор 120° к северу, до 150 м; запретное направление — дорога на востоке; ЛЭП в 300 м к западу, высота 25 м.</li><li><strong>Частоты:</strong> таблица участников — пилот, канал видео, частота RC-линка. Кто приезжает позже, вписывается до своего первого включения.</li><li><strong>Роли:</strong> пилот (только аппарат и пульт), наблюдатель (глаза на аппарате и небе, голосом сообщает о людях и птицах), техник или GCS (журнал, батареи, телеметрия).</li><li><strong>Стандартные фразы:</strong> «Армлю» → «Чисто» от наблюдателя; «Взлёт»; «Посадка»; «Стоп» — любой участник, после неё аппарат садится или зависает немедленно.</li><li><strong>Журнал вылета:</strong> время арма и дизарма, номер батареи, напряжение до и после, замечания. Пример строки: <code>14:05–14:12, АКБ №3, 25.1 → 22.3 В, RTH проверен, вибрации норм</code>.</li></ul>
+<h4 class="md-subheading">Что записать после прогона</h4>
+<p>Сколько минут ушло на подготовку и на сам вылет; какой пункт чек-листа был неудобен или пропущен; что сказал наблюдатель и было ли это услышано. Протокол правится сразу, пока свежо, и следующая версия получает дату.</p>
+<h4 class="md-subheading">Формат разбора инцидента</h4>
+<p>Что произошло (по времени, по логу) → непосредственная причина → почему она стала возможной (несколько «почему» до процесса, а не до человека) → что сработало (failsafe, команда «Стоп») → что не сработало → одно конкретное изменение в протокол или настройки и кто за него отвечает. Без поиска виноватых: цель — чтобы это не повторилось.</p>
+<p>Лабораторная засчитывается, когда есть карта площадки с зонами, препятствиями и таблицей частот, роли и фразы записаны и прогнаны на реальном вылете с журналом, а один инцидент (реальный или учебный) разобран по формату выше с конкретным изменением в протоколе.</p>
+
+<h2>Диагностика</h2>
+<div class="diag-groups"><article class="diag-item"><h4><strong>Симптом:</strong> помехи в видео посреди вылета</h4><ul><li>Возможная причина: сосед включился на соседней частоте.</li><li>Что сделать: таблица частот, разнос, при необходимости посадка и смена канала.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> два пульта мешают друг другу</h4><ul><li>Возможная причина: одинаковая binding phrase или перегруженный диапазон.</li><li>Что сделать: уникальные фразы, снизить мощность рядом, разнести по времени.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> упавший аппарат не найден</h4><ul><li>Возможная причина: нет последних координат, пищалка не настроена.</li><li>Что сделать: BEEPER на тумблер, GCS с записью tlog, последняя точка по видео.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> пилот отвлёкся на телеметрию и потерял аппарат из виду</h4><ul><li>Возможная причина: нет распределения ролей.</li><li>Что сделать: наблюдатель и техник — отдельные люди.</li></ul></article></div>
+
+<h2>Чек-лист</h2>
+<ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="ops-field:0"><span>Карта площадки с зонами и таблица частот есть</span></label></li><li><label><input type="checkbox" data-check-id="ops-field:1"><span>Роли названы, пилот в полёте только пилот</span></label></li><li><label><input type="checkbox" data-check-id="ops-field:2"><span>Протокол на одной странице распечатан</span></label></li><li><label><input type="checkbox" data-check-id="ops-field:3"><span>Прогон по протоколу выполнен, журнал заполнен</span></label></li><li><label><input type="checkbox" data-check-id="ops-field:4"><span>Разбор инцидента проведён и дал изменение в протоколе</span></label></li></ul>
+
+<h2>Источники</h2>
+<ul class="refs"><li><a href="https://ardupilot.org/copter/docs/safety-multicopter.html" target="_blank" rel="noopener noreferrer">Safety — ArduPilot Copter</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://github.com/iNavFlight/inav/blob/master/docs/Safety.md" target="_blank" rel="noopener noreferrer">INAV Safety</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://www.betaflight.com/docs/wiki/guides/current/Arming-Sequence-And-Safety" target="_blank" rel="noopener noreferrer">Betaflight Arming Sequence &amp; Safety</a> <span class="gc-tag" data-state="info">primary</span></li></ul>
+<h2>Проверь себя</h2>
+<uav-quiz src="../quiz/ops-field.json" module="ops-field"></uav-quiz>
+      </div>
+      <div class="module-done"><gc-button variant="secondary" data-done-toggle="ops-field">Отметить как пройденный</gc-button></div>
+      <section class="related" aria-label="Смежные модули"><p class="gc-label gc-muted">Смежные модули</p><div class="gc-grid ref-grid"><a class="gc-card" href="f-regulations.html"><strong>Правила, зоны и ответственность оператора</strong><div class="gc-card__meta"><span class="gc-tag" title="L1 — Оператор">L1</span></div></a><a class="gc-card" href="bf-failsafe.html"><strong>Failsafe: стадии и тест по свитчу</strong><div class="gc-card__meta"><span class="gc-tag" title="L1 — Оператор">L1</span></div></a><a class="gc-card" href="link-vtx.html"><strong>VTX-таблицы и смена видеоканала</strong><div class="gc-card__meta"><span class="gc-tag" title="L2 — Интегратор">L2</span></div></a></div></section>
+      <nav class="pager" aria-label="Соседние модули" data-track-pager><a class="gc-card pager__prev" href="ops-weather.html"><span class="gc-label gc-muted">Назад · трек</span><br>Погода и планирование полёта: ветер, плотностная высота, холод, обледенение</a><a class="gc-card pager__next" href="ops-case-studies.html"><span class="gc-label gc-muted">Дальше · трек</span><br>Разбор реальных аварий</a></nav><nav class="pager" aria-label="Соседние шаги пути Betaflight" data-path-pager="betaflight" hidden><a class="gc-card pager__prev" href="link-vtx.html?path=betaflight"><span class="gc-label gc-muted">Назад · путь Betaflight</span><br>VTX-таблицы и смена видеоканала</a><a class="gc-card pager__next" href="ops-case-studies.html?path=betaflight"><span class="gc-label gc-muted">Дальше · шаг 22 из 44</span><br>Разбор реальных аварий</a></nav>
+    </article>
+  </main>
+  <footer class="gc-container site-footer gc-muted">
+    <p>Открытый курс · <a href="https://github.com/irreligious86/UAV-Education">исходники на GitHub</a> · <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">план развития</a> · <a href="../../curriculum/curriculum.html">для разработчика</a> · CC BY-NC-SA 4.0</p>
+  </footer>
+</body>
+</html>

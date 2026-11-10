@@ -7,6 +7,7 @@
  * dynamic notch range and the gyro low-pass cutoff. A first-order estimate — the RPM filter
  * itself follows real eRPM from bidirectional DShot.
  */
+var T = (typeof window !== "undefined" && window.T) || function (s) { return s; };   // assets/i18n.js
 (function () {
   "use strict";
 
@@ -15,18 +16,18 @@
       if (this._init) return; this._init = true;
       var self = this;
       this.classList.add("widget");
-      this.innerHTML = '<p class="gc-label gc-muted">Интерактив · гармоники моторов против фильтров</p>' +
-        '<p class="widget__hint gc-muted">Линии — частоты 1-й, 2-й и 3-й гармоники моторов от газа. Горизонтали — настройки фильтров Betaflight. Если основная гармоника на рабочем газу ниже rpm_filter_min_hz, RPM-фильтр её не ловит — это кейс медленных моторов 10" из модуля.</p>';
+      this.innerHTML = T('<p class="gc-label gc-muted">Интерактив · гармоники моторов против фильтров</p>') +
+        T('<p class="widget__hint gc-muted">Линии — частоты 1-й, 2-й и 3-й гармоники моторов от газа. Горизонтали — настройки фильтров Betaflight. Если основная гармоника на рабочем газу ниже rpm_filter_min_hz, RPM-фильтр её не ловит — это кейс медленных моторов 10" из модуля.</p>');
       var p = this.p = { kv: 1950, cells: 6, eta: 0.8, minHz: 100, dmin: 100, dmax: 600, lpf: 250 };
       var c = document.createElement("div"); c.className = "widget__controls"; this.controls = c;
       var defs = [
-        { k: "kv", label: "KV мотора", min: 100, max: 5000, step: 10, unit: "об/мин/В" },
-        { k: "cells", label: "Ячеек S", min: 1, max: 12, step: 1, unit: "S" },
-        { k: "eta", label: "Обороты под нагрузкой", min: 0.6, max: 0.95, step: 0.01, fmt: function (v) { return Math.round(v * 100) + " %"; } },
-        { k: "minHz", label: "RPM min_hz", min: 50, max: 200, step: 5, unit: "Гц" },
-        { k: "dmin", label: "Dyn notch min", min: 50, max: 250, step: 5, unit: "Гц" },
-        { k: "dmax", label: "Dyn notch max", min: 200, max: 1000, step: 10, unit: "Гц" },
-        { k: "lpf", label: "Gyro LPF1", min: 50, max: 600, step: 10, unit: "Гц" }];
+        { k: "kv", label: T("KV мотора"), min: 100, max: 5000, step: 10, unit: T("об/мин/В") },
+        { k: "cells", label: T("Ячеек S"), min: 1, max: 12, step: 1, unit: "S" },
+        { k: "eta", label: T("Обороты под нагрузкой"), min: 0.6, max: 0.95, step: 0.01, fmt: function (v) { return Math.round(v * 100) + " %"; } },
+        { k: "minHz", label: "RPM min_hz", min: 50, max: 200, step: 5, unit: T("Гц") },
+        { k: "dmin", label: "Dyn notch min", min: 50, max: 250, step: 5, unit: T("Гц") },
+        { k: "dmax", label: "Dyn notch max", min: 200, max: 1000, step: 10, unit: T("Гц") },
+        { k: "lpf", label: "Gyro LPF1", min: 50, max: 600, step: 10, unit: T("Гц") }];
       defs.forEach(function (d) { c.appendChild(UAVPlot.slider({ label: d.label, min: d.min, max: d.max, step: d.step, value: p[d.k], unit: d.unit, fmt: d.fmt, onChange: function (v) { p[d.k] = v; self.update(); } }).el); });
       this.appendChild(c);
       var b = document.createElement("div"); b.className = "widget__presets";
@@ -42,7 +43,7 @@
       this.appendChild(b);
       var m = document.createElement("div"); m.className = "widget__metrics"; this.appendChild(m); this.metricsEl = m;
       var cv = document.createElement("canvas"); cv.className = "widget__canvas"; this.appendChild(cv);
-      this.plot = UAVPlot.create(cv, { xLabel: "газ, %", yLabel: "Гц", height: 240 });
+      this.plot = UAVPlot.create(cv, { xLabel: T("газ, %"), yLabel: T("Гц"), height: 240 });
       this.update();
       window.addEventListener("resize", function () { self.update(); });
     }
@@ -57,9 +58,9 @@
       var wc = 2 * Math.PI * p.lpf, w20 = 2 * Math.PI * 20;
       var lpfDelay = 1000 / wc / (1 + (w20 / wc) * (w20 / wc));   // PT1 group delay, ms
       this.metricsEl.innerHTML =
-        '<span class="gc-tag" data-state="info">1-я гармоника: ' + hover.toFixed(0) + ' Гц на 30 % газа, ' + full.toFixed(0) + ' Гц на 100 %</span>' +
-        '<span class="gc-tag" data-state="' + (missed ? "critical" : "ok") + '">' + (missed ? "на 30 % газа ниже rpm_filter_min_hz — RPM-фильтр не ловит" : "RPM-фильтр покрывает рабочий газ") + '</span>' +
-        '<span class="gc-tag" data-state="' + (lpfDelay > 1 ? "caution" : "ok") + '">PT1 ' + p.lpf + ' Гц: задержка ≈ ' + lpfDelay.toFixed(2) + ' мс на 20 Гц</span>';
+        T('<span class="gc-tag" data-state="info">1-я гармоника: ') + hover.toFixed(0) + T(' Гц на 30 % газа, ') + full.toFixed(0) + T(' Гц на 100 %</span>') +
+        '<span class="gc-tag" data-state="' + (missed ? "critical" : "ok") + '">' + (missed ? T("на 30 % газа ниже rpm_filter_min_hz — RPM-фильтр не ловит") : T("RPM-фильтр покрывает рабочий газ")) + '</span>' +
+        '<span class="gc-tag" data-state="' + (lpfDelay > 1 ? "caution" : "ok") + '">PT1 ' + p.lpf + T(' Гц: задержка ≈ ') + lpfDelay.toFixed(2) + T(' мс на 20 Гц</span>');
       this.plot.draw({ x: xs, yMin: 0, series: [
         { y: h1, color: "cyan", label: "1×" }, { y: h2, color: "cyan", width: 1, label: "2×" }, { y: h3, color: "cyan", width: 1, dash: [3, 3], label: "3×" },
         { y: mn, color: "red", width: 1, dash: [5, 3], label: "rpm min" }, { y: dn, color: "amber", width: 1, dash: [2, 3], label: "dyn" },

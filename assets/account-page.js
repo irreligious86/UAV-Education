@@ -1,9 +1,10 @@
 /* pages/account.html: register, log in, reset password, profile. Logic lives in account.js (UAVAccount). */
+var T = (typeof window !== "undefined" && window.T) || function (s) { return s; };   // assets/i18n.js
 (function () {
   "use strict";
 
-  var ROLE = { student: "студент", admin: "админ", superadmin: "суперадмин" };
-  var SYNC = { idle: "—", loading: "загрузка", saving: "сохраняю", saved: "сохранено", offline: "нет связи, сохранится позже" };
+  var ROLE = { student: T("студент"), admin: T("админ"), superadmin: T("суперадмин") };
+  var SYNC = { idle: "—", loading: T("загрузка"), saving: T("сохраняю"), saved: T("сохранено"), offline: T("нет связи, сохранится позже") };
 
   function $(sel) { return document.querySelector(sel); }
   function show(name) {
@@ -81,20 +82,23 @@
     wireSubmit($('[data-form="login"]'), function (d) { return A.signIn(d.email, d.password).then(function () { return ""; }); });
     wireSubmit($('[data-form="register"]'), function (d) {
       return A.signUp(d.email, d.username, d.password).then(function (r) {
-        return r.needsConfirmation ? "Готово. Открой письмо и подтверди почту, потом войди." : "Аккаунт создан.";
+        return r.needsConfirmation ? T("Готово. Открой письмо и подтверди почту, потом войди.") : T("Аккаунт создан.");
       });
     });
     wireSubmit($('[data-form="forgot"]'), function (d) {
-      return A.resetPassword(d.email).then(function () { return "Если такая почта есть, ссылка для смены пароля уже в пути."; });
+      return A.resetPassword(d.email).then(function () { return T("Если такая почта есть, ссылка для смены пароля уже в пути."); });
     });
-    wireSubmit($('[data-form="newpass"]'), function (d) { return A.updatePassword(d.password).then(function () { return "Пароль обновлён."; }); });
-    wireSubmit($('[data-form="rename"]'), function (d) { return A.rename(d.username).then(function () { return "Имя сохранено."; }); });
+    wireSubmit($('[data-form="newpass"]'), function (d) { return A.updatePassword(d.password).then(function () { return T("Пароль обновлён."); }); });
+    wireSubmit($('[data-form="rename"]'), function (d) { return A.rename(d.username).then(function () { return T("Имя сохранено."); }); });
     var armed = false;   // second click forces logout when progress is not synced
     $("[data-acc-logout]").addEventListener("click", function () {
-      A.signOut(armed).then(function () { armed = false; msg("Вышел. Копия прогресса в этом браузере стёрта.", "ok"); })
-        .catch(function (e) { if (e.unsynced) { armed = true; msg(e.message + " Нажми «Выйти» ещё раз, чтобы выйти всё равно.", "critical"); } else msg(A.humanError(e), "critical"); });
+      A.signOut(armed).then(function () { armed = false; msg(T("Вышел. Копия прогресса в этом браузере стёрта."), "ok"); })
+        .catch(function (e) { if (e.unsynced) { armed = true; msg(e.message + T(" Нажми «Выйти» ещё раз, чтобы выйти всё равно."), "critical"); } else msg(A.humanError(e), "critical"); });
     });
     $("[data-acc-sync-now]").addEventListener("click", function () { A.syncNow(); });
+    // language of the account: saved in the profile, then the page moves to that language
+    var langSel = $("[data-acc-lang]");
+    if (langSel && window.UAVI18N) langSel.addEventListener("change", function () { window.UAVI18N.switchTo(langSel.value); });
     A.onChange(render);
     A.init().then(render);
   }

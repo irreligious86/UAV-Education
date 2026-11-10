@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="uk" data-theme="dark" data-lang="uk">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Сервис анализа логов — UAV Student</title>
+  <meta name="description" content="Из лога полёта — отчёт с находками: вибрации и клиппинг, просадка и внутреннее сопротивление АКБ, ошибки, GPS, ошибка слежения по углам. Каждая находка с порогом и объяснением, отчёт — один HTML-файл.">
+  <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
+  <link rel="manifest" href="../../manifest.webmanifest">
+  <meta name="theme-color" content="#0b0f14">
+  <link rel="alternate" hreflang="ru" href="../../projects/proj-log-service.html">
+  <link rel="alternate" hreflang="uk" href="../../uk/projects/proj-log-service.html">
+  <link rel="alternate" hreflang="en" href="../../en/projects/proj-log-service.html">
+  <script>/* go to the visitor's chosen language before anything paints (assets/i18n.js) */(function(){try{var c=localStorage.getItem('uav-lang'),h=document.documentElement.getAttribute('data-lang');if(!c||c===h||/[?&]lang=keep\b/.test(location.search))return;var l=document.querySelector('link[rel=alternate][hreflang="'+c+'"]');if(l)location.replace(l.href+location.search+location.hash)}catch(e){}})();</script>
+  <link rel="stylesheet" href="../../lib/ground-control-ui/dist/ground-control.css">
+  <link rel="stylesheet" href="../../assets/site.css">
+  <script src="../../lib/ground-control-ui/dist/ground-control.js" defer></script>
+  <script src="../../assets/i18n/uk.js"></script>
+  <script src="../../assets/i18n.js"></script>
+  <script src="../../assets/progress-store.js" defer></script>
+  <script src="../../assets/backend-config.js" defer></script>
+  <script src="../../assets/account.js" defer></script>
+  <script src="../../assets/grading.js" defer></script>
+  <script src="../../assets/app.js" defer></script>
+  <script src="../../assets/uav-quiz.js" defer></script>
+  <script src="../../assets/uav-tasks.js" defer></script>
+  <script src="../../assets/offline.js" defer></script>
+</head>
+<body class="gc-root" data-base="../" data-root="../../">
+  <header class="site-header">
+    <div class="gc-container site-header__inner">
+      <a class="site-brand" href="../index.html"><span class="site-brand__mark" aria-hidden="true">◆</span> UAV Student</a>
+      <nav class="gc-nav" aria-label="Разделы сайта">
+        <a href="../index.html" aria-current="page">Курс</a>
+        <a href="../ref/index.html">Справочник</a>
+        <a href="../pages/glossary.html">Глоссарий</a>
+        <a href="../pages/fails.html">Фейлы</a>
+        <a href="../pages/search.html">Поиск</a>
+        <a href="../pages/progress.html">Мой прогресс</a>
+      </nav>
+      <nav class="lang-switch" aria-label="Язык"><a class="gc-tag" href="../../projects/proj-log-service.html" data-lang-to="ru" hreflang="ru" lang="ru" title="Русский">RU</a><a class="gc-tag" href="../../uk/projects/proj-log-service.html" data-lang-to="uk" hreflang="uk" lang="uk" title="Українська" aria-current="true" data-state="ok">UK</a><a class="gc-tag" href="../../en/projects/proj-log-service.html" data-lang-to="en" hreflang="en" lang="en" title="English">EN</a></nav>
+    </div>
+  </header>
+  <main class="gc-container site-main">
+    <article class="module" data-module-page="proj-log-service">
+      <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="index.html">Проекты</a><span>Проект 3</span></p>
+      <h1 class="module-title">Сервис анализа логов</h1>
+      <div class="module-tags"><span class="gc-tag">Проект 3</span><span class="gc-tag">L3</span><span class="gc-tag">~25 ч</span><span class="gc-tag" data-state="ok">есть стартер</span><span class="gc-tag" data-state="ok" data-done-badge hidden>СДАН</span></div>
+      <p class="module-lead">Из лога полёта — отчёт с находками: вибрации и клиппинг, просадка и внутреннее сопротивление АКБ, ошибки, GPS, ошибка слежения по углам. Каждая находка с порогом и объяснением, отчёт — один HTML-файл.</p>
+      <div class="gc-prose module-body">
+        <figure class="diagram" data-diagram="proj-log-service"><div class="diagram__svg"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 200" width="100%" role="img" aria-labelledby="t" style="max-width:720px;display:block;margin:0 auto"><title id="t">Сервис анализа логов: архитектура</title><style>text{font-family: var(--gc-font-mono, ui-monospace, Menlo, monospace); font-size: 12px;fill:currentColor} .m{fill:var(--gc-ink-muted, #8a93a3)} .a{fill:var(--gc-accent-hud, #5ef1d2)} .w{fill:var(--gc-signal-amber, #f0b24c)} .d{fill:var(--gc-signal-red, #e8636b)} .box{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:currentColor;stroke-width:1.2} .boxa{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6} .ln{stroke:currentColor;stroke-width:1.2;fill:none} .lna{stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6;fill:none} .lnm{stroke:var(--gc-ink-muted, #8a93a3);stroke-width:1;fill:none;stroke-dasharray:4 3} .t{font-size:11px} .b{font-weight:600}</style><defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker><marker id="ara" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--gc-accent-hud, #5ef1d2)"/></marker></defs><rect class="box" x="10.0" y="30" width="142.0" height="48" rx="6"/><text x="81.0" y="51.0" text-anchor="middle">DataFlash .bin</text><text x="81.0" y="65.0" text-anchor="middle">Blackbox .bbl</text><rect class="boxa" x="196.0" y="30" width="142.0" height="48" rx="6"/><text x="267.0" y="51.0" text-anchor="middle" class="b">Парсер: pymavlink,</text><text x="267.0" y="65.0" text-anchor="middle" class="b">blackbox_decode</text><rect class="boxa" x="382.0" y="30" width="142.0" height="48" rx="6"/><text x="453.0" y="51.0" text-anchor="middle" class="b">Проверки</text><text x="453.0" y="65.0" text-anchor="middle" class="b">порог + severity</text><rect class="box" x="568.0" y="30" width="142.0" height="48" rx="6"/><text x="639.0" y="51.0" text-anchor="middle">HTML-отчёт</text><text x="639.0" y="65.0" text-anchor="middle">графики, таймлайн</text><rect class="box" x="382.0" y="130" width="142.0" height="48" rx="6"/><text x="453.0" y="158.0" text-anchor="middle">findings.json</text><rect class="box" x="568.0" y="130" width="142.0" height="48" rx="6"/><text x="639.0" y="151.0" text-anchor="middle">CI: код возврата</text><text x="639.0" y="165.0" text-anchor="middle">≠ 0 при FAIL</text><path class="ln" d="M152.0 54.0 L196.0 54.0" marker-end="url(#ar)"/><path class="ln" d="M338.0 54.0 L382.0 54.0" marker-end="url(#ar)"/><path class="ln" d="M524.0 54.0 L568.0 54.0" marker-end="url(#ar)"/><path class="ln" d="M453.0 78 L453.0 130" marker-end="url(#ar)"/><path class="ln" d="M524.0 154.0 L568.0 154.0" marker-end="url(#ar)"/></svg></div><figcaption class="gc-muted">Архитектура проекта 3.</figcaption><div class="diagram__hint">Схему можно прокрутить по горизонтали</div></figure>
+        <h2>Стек</h2>
+        <ul><li>Python, pymavlink</li><li>blackbox_decode (Betaflight)</li><li>matplotlib → встроенные SVG/PNG</li><li>pytest на синтетических логах</li></ul>
+        <p>Стартер: <a href="https://github.com/irreligious86/UAV-Education/tree/main/examples/log-report" target="_blank" rel="noopener noreferrer"><code>examples/log-report</code></a> — клонируйте и начинайте с его README.</p>
+        <p>Может заменить итоговый проект трека «<a href="../cap/cap-tune-by-logs.html">Интегратор</a>».</p>
+        <h2>Этапы</h2>
+        <ol><li>Разбор DataFlash: VIBE, BAT, ERR, GPS, ATT, MODE, MSG<br><span class="gc-muted">Проверка:</span> <code>pytest examples/log-report/tests -k &quot;clean_flight or vibration or battery&quot;</code></li><li>Проверки с порогами и severity, JSON-вывод<br><span class="gc-muted">Проверка:</span> <code>pytest examples/log-report/tests -k err_and_gps</code></li><li>HTML-отчёт с графиками и таймлайном режимов<br><span class="gc-muted">Проверка:</span> <code>pytest examples/log-report/tests -k cli_writes</code></li><li>Вход Betaflight Blackbox через blackbox_decode<br><span class="gc-muted">Проверка: демонстрация в отчёте</span></li><li>Проверки EKF (XKF4) и регрессия на собственных логах<br><span class="gc-muted">Проверка: демонстрация в отчёте</span></li></ol>
+        <h2>Критерии приёмки</h2>
+        <p class="gc-muted">Проект сдан, когда выполнены все пункты. Отмечайте по мере готовности:</p>
+        <ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="proj-log-service:cap:0"><span>Тесты на синтетических логах с известными дефектами проходят</span></label></li><li><label><input type="checkbox" data-check-id="proj-log-service:cap:1"><span>Код возврата ≠ 0 при любой находке уровня FAIL (годится для CI)</span></label></li><li><label><input type="checkbox" data-check-id="proj-log-service:cap:2"><span>Каждая находка содержит значение, порог и что с этим делать</span></label></li><li><label><input type="checkbox" data-check-id="proj-log-service:cap:3"><span>Отчёт открывается без интернета</span></label></li><li><label><input type="checkbox" data-check-id="proj-log-service:cap:4"><span>Проверено минимум на 3 своих реальных логах, выводы совпадают с ручным разбором</span></label></li></ul>
+        <h2>Автопроверка</h2>
+        <p>pytest examples/log-report/tests (5 тестов на синтетических логах)</p>
+        <h2>Оценка</h2><p class="gc-muted">Сдан — когда выполнены все критерии приёмки. Уровень работы — по критериям ниже; каждый уровень включает предыдущий.</p><ul><li><strong>Функциональность</strong><ul><li><em>Засчитано:</em> Все этапы работают в сценарии из README</li><li><em>Хорошо:</em> Плюс отказные сценарии: потеря связи, пропуск данных, неверный ввод</li><li><em>Отлично:</em> Плюс хотя бы одно задание «на отлично» из списка проекта</li></ul></li><li><strong>Проверяемость</strong><ul><li><em>Засчитано:</em> Тесты стартера проходят, свои функции покрыты хотя бы одним тестом</li><li><em>Хорошо:</em> Тест на каждый этап; тесты запускаются в CI</li><li><em>Отлично:</em> Тесты на отказы и регрессию на собственных данных; покрытие ключевой логики видно в отчёте</li></ul></li><li><strong>Инженерный отчёт</strong><ul><li><em>Засчитано:</em> Есть замеры, которых требуют критерии приёмки</li><li><em>Хорошо:</em> Замеры с методикой и повторяемостью (несколько прогонов, разброс)</li><li><em>Отлично:</em> Сравнение вариантов решения с выводом, ограничения и что делать дальше</li></ul></li><li><strong>Код и документация</strong><ul><li><em>Засчитано:</em> README: запуск одной командой, архитектура</li><li><em>Хорошо:</em> Модули разделены, интерфейсы описаны, нет «магических чисел» без пояснения</li><li><em>Отлично:</em> Код читается без автора: docs/, примеры, история коммитов по этапам</li></ul></li></ul>
+        <h2>Задания «на отлично»</h2><ul><li>Регрессия: 10 своих логов с известным вердиктом, сервис ни разу не ошибается</li><li>Сравнение двух логов «до/после» тюна одним отчётом</li></ul>
+        <h2>Что сдать</h2>
+        <ul><li>Инструмент + README</li><li>Три отчёта по своим логам и сравнение с ручным разбором</li></ul>
+        <h2>Нужные модули</h2>
+        <ol><li><a href="../m/ap-logs.html">Логи ArduPilot: разбор полёта</a></li><li><a href="../m/bf-blackbox.html">Blackbox</a></li><li><a href="../m/data-python.html">Python для анализа полётных данных</a></li><li><a href="../m/diag-troubleshooting.html">Дерево диагностики: дрон не взлетает</a></li><li><a href="../m/ap-tuning.html">Тюнинг ArduPilot: AUTOTUNE, фильтры, notch по ESC</a></li></ol>
+        <div class="gc-callout" data-state="caution"><strong>Безопасность.</strong> Всё, что управляет аппаратом, сначала проходит тесты и SITL. Реальный полёт — только с проверенным failsafe и пилотом, готовым забрать управление.</div>
+      </div>
+      <div class="module-done"><gc-button variant="secondary" data-done-toggle="proj-log-service" data-done-label="сданный" data-done-past="Сдан">Отметить как сданный</gc-button></div>
+    </article>
+  </main>
+  <footer class="gc-container site-footer gc-muted">
+    <p>Открытый курс · <a href="https://github.com/irreligious86/UAV-Education">исходники на GitHub</a> · <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">план развития</a> · <a href="../../curriculum/curriculum.html">для разработчика</a> · CC BY-NC-SA 4.0</p>
+  </footer>
+</body>
+</html>

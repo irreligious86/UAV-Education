@@ -3,6 +3,7 @@
  * Scoring: title match > tags/headings > summary > body; all query words must match
  * somewhere (AND), prefix matching so "фильтр" finds "фильтры" and "rpm_filter".
  */
+var T = (typeof window !== "undefined" && window.T) || function (s) { return s; };   // assets/i18n.js
 (function () {
   "use strict";
   var input = document.getElementById("q");
@@ -13,7 +14,7 @@
   var docs = null;
   function norm(s) {
     // lower-case, ё→е, punctuation to spaces (keep _ and - inside identifiers)
-    return (s || "").toLowerCase().replace(/ё/g, "е").replace(/[^\p{L}\p{N}_\-\s]/gu, " ").replace(/\s+/g, " ");
+    return (s || "").toLowerCase().replace(/ё/g, T("е")).replace(/[^\p{L}\p{N}_\-\s]/gu, " ").replace(/\s+/g, " ");
   }
 
   function prep(d) {
@@ -55,18 +56,18 @@
   function render(q) {
     var words = norm(q).split(/\s+/).filter(function (w) { return w.length >= 2; });
     out.innerHTML = "";
-    if (!words.length) { status.textContent = "Начни вводить запрос."; return; }
+    if (!words.length) { status.textContent = T("Начни вводить запрос."); return; }
     var hits = docs.map(function (d) { return { d: d, s: score(d, words) }; })
       .filter(function (h) { return h.s > 0; })
       .sort(function (a, b) { return b.s - a.s; })
       .slice(0, 30);
-    status.textContent = hits.length ? "Найдено: " + hits.length : "Ничего не найдено. Попробуй другое слово или термин на английском.";
+    status.textContent = hits.length ? T("Найдено: ") + hits.length : T("Ничего не найдено. Попробуй другое слово или термин на английском.");
     var base = document.body.getAttribute("data-base") || "../";
     hits.forEach(function (h) {
       var d = h.d;
       var a = document.createElement("a");
       a.className = "gc-card search-hit"; a.href = base + d.url;
-      var kind = d.type === "term" ? "термин" : d.type === "capstone" ? "итоговый проект" : "модуль";
+      var kind = d.type === "term" ? T("термин") : d.type === "capstone" ? T("итоговый проект") : T("модуль");
       a.innerHTML = '<p class="gc-label gc-muted">' + kind + (d.group ? " · " + d.group : "") + (d.level ? " · " + d.level : "") + "</p>" +
         "<strong></strong><p class=\"search-hit__snippet\"></p>";
       a.querySelector("strong").textContent = d.title;
@@ -88,5 +89,5 @@
     if (q) { input.value = q; }
     render(input.value);
     input.focus();
-  }).catch(function () { status.textContent = "Индекс поиска недоступен."; });
+  }).catch(function () { status.textContent = T("Индекс поиска недоступен."); });
 })();

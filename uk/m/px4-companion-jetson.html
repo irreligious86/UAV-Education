@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="uk" data-theme="dark" data-lang="uk">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PX4 + Jetson Orin: companion по UART, MAVLink и uXRCE-DDS — UAV Student</title>
+  <meta name="description" content="подключить companion к TELEM2 и получить телеметрию запустить сервис на Jetson, общающийся с PX4">
+  <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
+  <link rel="manifest" href="../../manifest.webmanifest">
+  <meta name="theme-color" content="#0b0f14">
+  <link rel="alternate" hreflang="ru" href="../../m/px4-companion-jetson.html">
+  <link rel="alternate" hreflang="uk" href="../../uk/m/px4-companion-jetson.html">
+  <link rel="alternate" hreflang="en" href="../../en/m/px4-companion-jetson.html">
+  <script>/* go to the visitor's chosen language before anything paints (assets/i18n.js) */(function(){try{var c=localStorage.getItem('uav-lang'),h=document.documentElement.getAttribute('data-lang');if(!c||c===h||/[?&]lang=keep\b/.test(location.search))return;var l=document.querySelector('link[rel=alternate][hreflang="'+c+'"]');if(l)location.replace(l.href+location.search+location.hash)}catch(e){}})();</script>
+  <link rel="stylesheet" href="../../lib/ground-control-ui/dist/ground-control.css">
+  <link rel="stylesheet" href="../../assets/site.css">
+  <script src="../../lib/ground-control-ui/dist/ground-control.js" defer></script>
+  <script src="../../assets/i18n/uk.js"></script>
+  <script src="../../assets/i18n.js"></script>
+  <script src="../../assets/progress-store.js" defer></script>
+  <script src="../../assets/backend-config.js" defer></script>
+  <script src="../../assets/account.js" defer></script>
+  <script src="../../assets/grading.js" defer></script>
+  <script src="../../assets/app.js" defer></script>
+  <script src="../../assets/uav-quiz.js" defer></script>
+  <script src="../../assets/uav-tasks.js" defer></script>
+  <script src="../../assets/offline.js" defer></script>
+</head>
+<body class="gc-root" data-base="../" data-root="../../">
+  <header class="site-header">
+    <div class="gc-container site-header__inner">
+      <a class="site-brand" href="../index.html"><span class="site-brand__mark" aria-hidden="true">◆</span> UAV Student</a>
+      <nav class="gc-nav" aria-label="Разделы сайта">
+        <a href="../index.html" aria-current="page">Курс</a>
+        <a href="../ref/index.html">Справочник</a>
+        <a href="../pages/glossary.html">Глоссарий</a>
+        <a href="../pages/fails.html">Фейлы</a>
+        <a href="../pages/search.html">Поиск</a>
+        <a href="../pages/progress.html">Мой прогресс</a>
+      </nav>
+      <nav class="lang-switch" aria-label="Язык"><a class="gc-tag" href="../../m/px4-companion-jetson.html" data-lang-to="ru" hreflang="ru" lang="ru" title="Русский">RU</a><a class="gc-tag" href="../../uk/m/px4-companion-jetson.html" data-lang-to="uk" hreflang="uk" lang="uk" title="Українська" aria-current="true" data-state="ok">UK</a><a class="gc-tag" href="../../en/m/px4-companion-jetson.html" data-lang-to="en" hreflang="en" lang="en" title="English">EN</a></nav>
+    </div>
+  </header>
+  <main class="gc-container site-main">
+    <article class="module" data-module-page="px4-companion-jetson">
+      <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-px4">Электив: PX4</a><span>PX4 + Jetson Orin: companion по UART, MAVLink и uXRCE-DDS</span></p>
+      <h1 class="module-title">PX4 + Jetson Orin: companion по UART, MAVLink и uXRCE-DDS</h1>
+      <div class="module-tags"><span class="gc-tag" title="Уровень">L4 — Эксперт</span><span class="gc-tag">чтение 15 мин</span><span class="gc-tag">учёба ~4 ч</span><span class="gc-tag">PX4 1.15+</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ОСВОЕН</span></div>
+      <p class="gc-muted module-score" data-module-score></p>
+      <p class="module-lead">Jetson Orin Nano/NX — стандартный companion для зрения на PX4: CUDA и TensorRT в 7–25 Вт. Модуль собирает связку целиком: роли и граница ответственности, питание и тепло, физическое подключение к TELEM2, как <strong>найти</strong> правильный UART на своей версии JetPack (имя устройства у разных версий разное), два канала связи — MAVLink и uXRCE-DDS — с параметрами PX4 и проверкой, автозапуск агента через systemd, бюджет задержки цепочки «камера → команда». Первое поколение Jetson Nano снято с поддержки (JetPack 4, Ubuntu 18.04) — для новых проектов его не берут.</p>
+      <div class="gc-callout" data-state="ok"><strong>После модуля ты умеешь</strong><ul><li>подключить companion к TELEM2 и получить телеметрию</li><li>запустить сервис на Jetson, общающийся с PX4</li></ul></div><p class="gc-muted">Перед этим модулем: <a href="px4-ros2.html">PX4 и ROS 2: uXRCE-DDS и offboard</a></p><div class="gc-callout lab"><p class="gc-label gc-muted">Лабораторная</p><strong>Companion на TELEM2</strong><p class="gc-muted lab__hint">Сдано, когда отмечены все пункты:</p><ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="px4-companion-jetson:lab:0"><span>MAV_1_CONFIG/MODE/BAUD настроены, heartbeat получен</span></label></li><li><label><input type="checkbox" data-check-id="px4-companion-jetson:lab:1"><span>Сервис стартует автоматически</span></label></li><li><label><input type="checkbox" data-check-id="px4-companion-jetson:lab:2"><span>Отказ companion не влияет на PX4</span></label></li><li><label><input type="checkbox" data-check-id="px4-companion-jetson:lab:3"><span>UART найден петлёй, uXRCE-DDS проверен, частоты записаны</span></label></li><li><label><input type="checkbox" data-check-id="px4-companion-jetson:lab:4"><span>20-минутный тепловой лог tegrastats</span></label></li></ul></div><div class="path-pos gc-muted"><span class="gc-label">В пути</span><ul><li data-path-pos="px4"><a href="../path/px4.html">PX4</a>: шаг 18 из 36 → <a href="eng-ci-configs.html?path=px4">CI и версионирование конфигов и кода</a></li></ul></div>
+      <div class="gc-prose module-body">
+<div class="gc-callout" data-state="caution" data-untranslated><strong>Модуль ещё не переведён.</strong> Ниже — оригинал (Русский). Прогресс и оценки общие для всех языков.</div>
+<h2>Теория</h2>
+<h4 class="md-subheading">Роли и граница</h4>
+<p>Pixhawk (PX4) — стабилизация, EKF, failsafe, миссии; Jetson — зрение, планирование, ROS 2, сеть. Граница та же, что в модуле «Companion: роль и границы»: без Jetson аппарат обязан лететь и возвращаться, а потеря companion в offboard обрабатывается failsafe PX4 (<code>COM_OF_LOSS_T</code>, <code>COM_OBL_RC_ACT</code>), а не надеждой.</p>
+<h4 class="md-subheading">Какой Jetson и какая система</h4>
+<div class="table-wrap md-table-wrap" tabindex="0"><table class="md-table"><thead><tr><th>Плата</th><th>Что даёт</th><th>Система</th></tr></thead><tbody><tr><td data-label="Плата">Orin Nano 4/8 ГБ</td><td data-label="Что даёт">основной выбор для детекции и трекинга; режимы 7–25 Вт (<code>nvpmodel</code>)</td><td data-label="Система">JetPack 6 (Ubuntu 22.04 → ROS 2 Humble) или JetPack 7 (Ubuntu 24.04 → ROS 2 Jazzy)</td></tr><tr><td data-label="Плата">Orin NX 8/16 ГБ</td><td data-label="Что даёт">в 2 раза больше вычислений, тот же форм-фактор модуля</td><td data-label="Система">то же</td></tr><tr><td data-label="Плата">Jetson Nano (2019)</td><td data-label="Что даёт">снят с поддержки, JetPack 4</td><td data-label="Система">не для новых проектов</td></tr></tbody></table></div>
+<p>Версия JetPack определяет Ubuntu, а значит и дистрибутив ROS 2: ставить ROS 2 «не своей» Ubuntu — путь к сборке из исходников и вечным проблемам с зависимостями.</p>
+<h4 class="md-subheading">Питание и тепло</h4>
+<ul><li>Jetson — <strong>отдельный</strong> BEC или DC-DC от силовой шины с запасом по току, не от полётного контроллера; общая земля с Pixhawk.</li><li>Режим мощности: <code>sudo nvpmodel -q</code> показывает текущий, <code>nvpmodel -m &lt;N&gt;</code> переключает; <code>jetson_clocks</code> фиксирует частоты (стабильная задержка ценой энергии).</li><li>Тепло: в закрытом корпусе без обдува Orin троттлит через несколько минут, и задержка детекции растёт вдвое (модуль «ML на борту»). Радиатор с вентилятором или обдув от пропов, <code>tegrastats</code> в логе полёта.</li></ul>
+<h4 class="md-subheading">Физическое подключение</h4>
+<ul><li><strong>UART (рекомендуется для полёта)</strong>: TELEM2 Pixhawk — TX, RX, GND; Jetson — пины 8 (TX) и 10 (RX) 40-пиновой гребёнки, земля на пин 6. TX↔RX перекрёстно. Логика 3.3 В с обеих сторон; <strong>5 В с разъёма TELEM2 к Jetson не подключать</strong>.</li><li><strong>Имя устройства зависит от платы и JetPack</strong>: на Orin этот UART бывает <code>/dev/ttyTHS0</code> или <code>/dev/ttyTHS1</code>, на старом Nano — <code>/dev/ttyTHS1</code>; отладочная консоль Orin — <code>/dev/ttyTCU0</code>. Не верь статье — проверь петлёй (практика, шаг 2).</li><li><strong>Ethernet</strong> (Pixhawk 6X, 6X Pro и др.): MAVLink и uXRCE-DDS по UDP, без ограничения скорости UART — лучший вариант, если есть.</li><li><strong>USB</strong> — для стенда; в полёте USB-соединение ненадёжно: вибрация разъёма и перезапуск энумерации обрывают связь.</li></ul>
+<h4 class="md-subheading">Два канала связи</h4>
+<ol><li><strong>MAVLink</strong> (MAVSDK, pymavlink, MAVROS): <code>MAV_1_CONFIG = TELEM2</code>, <code>MAV_1_MODE = Onboard</code> (набор потоков для companion), <code>SER_TEL2_BAUD = 921600</code>. Плюс: стандарт, тот же код работает с ArduPilot; минус: ограниченный набор данных и частот.</li><li><strong>uXRCE-DDS</strong>: <code>UXRCE_DDS_CFG = TELEM2</code>, та же скорость, MAVLink на этом порту выключен (<code>MAV_1_CONFIG = Disabled</code> или перенесён на другой порт). На Jetson — <code>MicroXRCEAgent serial --dev &lt;порт&gt; -b 921600</code>; топики <code>/fmu/out/*</code>, <code>/fmu/in/*</code> из <code>px4_msgs</code> <strong>той же версии</strong>, что прошивка (с 1.16 сообщения версионируются, у части топиков суффикс <code>_v1</code>). Плюс: внутренние топики PX4 с малой задержкой; минус: только PX4, версии должны совпадать.</li></ol>
+<p>На одном порту живёт что-то одно. Нужны оба — MAVLink на TELEM1/USB/Ethernet, DDS на TELEM2.</p>
+<h4 class="md-subheading">Разобранный пример: бюджет задержки</h4>
+<p>Камера CSI 60 кадр/с (до 16 мс до готового кадра) → TensorRT YOLO-nano FP16 ~12 мс → трекер 2 мс → DDS по UART 921600 ~2 мс → контроллер скорости PX4 (постоянная времени ~0.5 с). Чистая задержка ~35 мс: контур слежения с Kp ≈ 1 1/с устойчив с запасом (модуль «Слежение»). USB-камера с MJPEG добавляет 40–80 мс, Wi-Fi-мост вместо провода — 20–50 мс с джиттером; две такие «мелочи» съедают весь запас. Отсюда правило: CSI и провод, не USB и радио.</p>
+<figure class="diagram" data-diagram="px4-jetson-link"><div class="diagram__svg"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 200" width="100%" role="img" aria-labelledby="t" style="max-width:720px;display:block;margin:0 auto"><title id="t">PX4 + Jetson: связь и роли</title><style>text{font-family: var(--gc-font-mono, ui-monospace, Menlo, monospace); font-size: 12px;fill:currentColor} .m{fill:var(--gc-ink-muted, #8a93a3)} .a{fill:var(--gc-accent-hud, #5ef1d2)} .w{fill:var(--gc-signal-amber, #f0b24c)} .d{fill:var(--gc-signal-red, #e8636b)} .box{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:currentColor;stroke-width:1.2} .boxa{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6} .ln{stroke:currentColor;stroke-width:1.2;fill:none} .lna{stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6;fill:none} .lnm{stroke:var(--gc-ink-muted, #8a93a3);stroke-width:1;fill:none;stroke-dasharray:4 3} .t{font-size:11px} .b{font-weight:600}</style><defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker><marker id="ara" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--gc-accent-hud, #5ef1d2)"/></marker></defs><rect class="box" x="10.0" y="30" width="142.0" height="48" rx="6"/><text x="81.0" y="51.0" text-anchor="middle">Камера</text><text x="81.0" y="65.0" text-anchor="middle">CSI / USB</text><rect class="boxa" x="196.0" y="30" width="142.0" height="48" rx="6"/><text x="267.0" y="51.0" text-anchor="middle" class="b">Jetson</text><text x="267.0" y="65.0" text-anchor="middle" class="b">зрение, ROS 2</text><rect class="boxa" x="382.0" y="30" width="142.0" height="48" rx="6"/><text x="453.0" y="51.0" text-anchor="middle" class="b">Pixhawk / PX4</text><text x="453.0" y="65.0" text-anchor="middle" class="b">TELEM2</text><rect class="box" x="568.0" y="30" width="142.0" height="48" rx="6"/><text x="639.0" y="58.0" text-anchor="middle">QGC</text><rect class="box" x="196.0" y="130" width="142.0" height="48" rx="6"/><text x="267.0" y="151.0" text-anchor="middle">MAVLink 921600</text><text x="267.0" y="165.0" text-anchor="middle">MAVSDK / MAVROS</text><rect class="box" x="382.0" y="130" width="142.0" height="48" rx="6"/><text x="453.0" y="151.0" text-anchor="middle">uXRCE-DDS</text><text x="453.0" y="165.0" text-anchor="middle">топики ROS 2</text><path class="ln" d="M152.0 54.0 L196.0 54.0" marker-end="url(#ar)"/><path class="ln" d="M338.0 54.0 L382.0 54.0" marker-end="url(#ar)"/><text x="360.0" y="47.0" text-anchor="middle" class="m t" style="font-size:10px">UART</text><path class="ln" d="M524.0 54.0 L568.0 54.0" marker-end="url(#ar)"/><path class="ln" d="M267.0 78 L267.0 130" marker-end="url(#ar)"/><path class="ln" d="M453.0 78 L453.0 130" marker-end="url(#ar)"/></svg></div><figcaption class="gc-muted">PX4 и Jetson: камера на Jetson, связь с полётным контроллером по TELEM2 через MAVLink или uXRCE-DDS.</figcaption><div class="diagram__hint">Схему можно прокрутить по горизонтали</div></figure>
+
+<h2>Практика</h2>
+<h4 class="md-subheading">Шаг 1. Подготовка Jetson</h4>
+<pre class="cli-block"><code>sudo usermod -aG dialout $USER        # access to serial ports (log out and in)
+systemctl status nvgetty              # on boards where the header UART is a console, stop it:
+sudo systemctl disable --now nvgetty
+sudo nvpmodel -q                      # current power mode</code></pre>
+<h4 class="md-subheading">Шаг 2. Найти «свой» UART петлёй</h4>
+<p>Перемычка между пинами 8 и 10, Pixhawk не подключён. Для каждого кандидата:</p>
+<pre class="cli-block"><code>import serial, sys
+for dev in (&quot;/dev/ttyTHS0&quot;, &quot;/dev/ttyTHS1&quot;):
+    try:
+        with serial.Serial(dev, 921600, timeout=0.2) as s:
+            s.reset_input_buffer(); s.write(b&quot;loopback-test\n&quot;)
+            print(dev, &quot;OK&quot; if s.readline() == b&quot;loopback-test\n&quot; else &quot;no echo&quot;)
+    except serial.SerialException as e:
+        print(dev, &quot;error:&quot;, e)</code></pre>
+<p>Ровно один порт должен ответить OK — это и есть пины 8/10 на вашей системе. «Permission denied» — группа dialout или консоль на порту; «no echo» на обоих — пины не те или UART выключен в device tree (Jetson-IO: <code>sudo /opt/nvidia/jetson-io/jetson-io.py</code>).</p>
+<h4 class="md-subheading">Шаг 3. MAVLink-канал</h4>
+<p>Параметры PX4 в QGC: <code>MAV_1_CONFIG = TELEM 2</code>, <code>MAV_1_MODE = Onboard</code>, <code>SER_TEL2_BAUD = 921600</code>, перезагрузка. Перемычку снять, подключить TX/RX/GND. Проверка:</p>
+<pre class="cli-block"><code>from pymavlink import mavutil
+m = mavutil.mavlink_connection(&quot;/dev/ttyTHS1&quot;, baud=921600)   # your port from step 2
+m.wait_heartbeat(); print(&quot;sys&quot;, m.target_system, &quot;comp&quot;, m.target_component)
+import time, collections
+cnt, t0 = collections.Counter(), time.time()
+while time.time() - t0 &lt; 10:
+    msg = m.recv_match(type=[&quot;ATTITUDE&quot;, &quot;LOCAL_POSITION_NED&quot;], blocking=True, timeout=1)
+    if msg: cnt[msg.get_type()] += 1
+print({k: v / 10 for k, v in cnt.items()}, &quot;Hz&quot;)</code></pre>
+<p>Записать частоты ATTITUDE и LOCAL_POSITION_NED.</p>
+<h4 class="md-subheading">Шаг 4. uXRCE-DDS-канал</h4>
+<p><code>MAV_1_CONFIG = Disabled</code>, <code>UXRCE_DDS_CFG = TELEM2</code>, перезагрузка. На Jetson:</p>
+<pre class="cli-block"><code>MicroXRCEAgent serial --dev /dev/ttyTHS1 -b 921600
+ros2 topic list | grep fmu                     # versioned names, e.g. ..._v1 since PX4 1.16/1.17
+ros2 topic hz /fmu/out/vehicle_attitude
+ros2 topic echo --once /fmu/out/timesync_status</code></pre>
+<p>Сравнить частоту <code>vehicle_attitude</code> с ATTITUDE из шага 3.</p>
+<h4 class="md-subheading">Шаг 5. Автозапуск агента</h4>
+<p><code>/etc/systemd/system/xrce-agent.service</code>:</p>
+<pre class="cli-block"><code>[Unit]
+Description=Micro XRCE-DDS Agent for PX4
+After=network.target
+
+[Service]
+ExecStart=/usr/local/bin/MicroXRCEAgent serial --dev /dev/ttyTHS1 -b 921600
+Restart=always
+RestartSec=2
+User=nvidia
+
+[Install]
+WantedBy=multi-user.target</code></pre>
+<p><code>sudo systemctl enable --now xrce-agent</code>; проверить, что после <code>sudo kill</code> агента топики возвращаются за 2–3 с. Путь к бинарнику, пользователь и порт — свои.</p>
+<h4 class="md-subheading">Шаг 6. Тепло под нагрузкой</h4>
+<p>Запустить детектор (модуль «Компьютерное зрение») на 20 минут в корпусе, писать <code>tegrastats --interval 1000 --logfile tegra.log</code>. Найти момент троттлинга (частота GPU падает, температура у предела) и задержку детекции до и после.</p>
+<p>Лабораторная засчитывается, когда найден порт петлёй, оба канала проверены с записанными частотами, агент поднимается сам после падения, есть 20-минутный тепловой лог.</p>
+
+<h2>Диагностика</h2>
+<div class="diag-groups"><article class="diag-item"><h4><strong>Симптом:</strong> <code>Permission denied: /dev/ttyTHS*</code></h4><ul><li>Возможная причина: пользователь не в dialout или на порту консоль.</li><li>Что сделать: <code>usermod -aG dialout</code>, перелогиниться, <code>systemctl disable --now nvgetty</code>.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> порт открывается, данных нет</h4><ul><li>Возможная причина: не тот ttyTHS, TX/RX не перекрещены, нет общей земли, MAVLink на TELEM2 не включён.</li><li>Что сделать: петля из шага 2, проверка проводки, <code>MAV_1_CONFIG</code>.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> MAVLink работает, uXRCE-DDS — нет</h4><ul><li>Возможная причина: MAVLink всё ещё на том же порту, агент не той скорости, <code>px4_msgs</code> другой версии.</li><li>Что сделать: <code>MAV_1_CONFIG = Disabled</code>, одинаковый baud, <code>px4_msgs</code> из ветки, совпадающей с прошивкой.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> топики есть, но <code>ros2 topic echo</code> молчит</h4><ul><li>Возможная причина: несовпадение QoS (PX4 публикует best effort).</li><li>Что сделать: подписчик с <code>qos_profile_sensor_data</code>, <code>ros2 topic echo --qos-reliability best_effort</code>.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> задержка детекции растёт через 10 минут полёта</h4><ul><li>Возможная причина: троттлинг Jetson.</li><li>Что сделать: обдув, режим <code>nvpmodel</code>, <code>tegrastats</code> в логе полёта.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> Jetson перезагружается на газу</h4><ul><li>Возможная причина: просадка общего BEC.</li><li>Что сделать: отдельный DC-DC с запасом, конденсатор на входе, измерить напряжение осциллографом под нагрузкой.</li></ul></article></div>
+
+<h2>Чек-лист</h2>
+<ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="px4-companion-jetson:0"><span>Понимаю границу Jetson и PX4 и что делает PX4 при потере companion</span></label></li><li><label><input type="checkbox" data-check-id="px4-companion-jetson:1"><span>Выбираю JetPack и ROS 2 под одну Ubuntu</span></label></li><li><label><input type="checkbox" data-check-id="px4-companion-jetson:2"><span>Питаю Jetson отдельно, слежу за теплом и режимом мощности</span></label></li><li><label><input type="checkbox" data-check-id="px4-companion-jetson:3"><span>Нахожу свой UART петлёй, не по статье</span></label></li><li><label><input type="checkbox" data-check-id="px4-companion-jetson:4"><span>Настраиваю MAVLink и uXRCE-DDS на разных портах и проверяю частоты</span></label></li><li><label><input type="checkbox" data-check-id="px4-companion-jetson:5"><span>Поднимаю агент через systemd с автоперезапуском</span></label></li><li><label><input type="checkbox" data-check-id="px4-companion-jetson:6"><span>Считаю бюджет задержки «камера → команда»</span></label></li></ul>
+
+<h2>Источники</h2>
+<ul class="refs"><li><a href="https://docs.px4.io/main/en/companion_computer/pixhawk_companion.html" target="_blank" rel="noopener noreferrer">PX4 — Pixhawk + Companion Computer</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://docs.px4.io/main/en/middleware/uxrce_dds.html" target="_blank" rel="noopener noreferrer">PX4 — uXRCE-DDS (PX4–ROS 2/DDS bridge)</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://github.com/eProsima/Micro-XRCE-DDS-Agent" target="_blank" rel="noopener noreferrer">eProsima — Micro XRCE-DDS Agent</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://forums.developer.nvidia.com/t/how-to-access-uart1-on-expansion-pins-8-10/328934" target="_blank" rel="noopener noreferrer">NVIDIA Developer Forums — UART1 on expansion pins 8/10 (Orin)</a> <span class="gc-tag">secondary</span></li></ul>
+<h2>Проверь себя</h2>
+<uav-quiz src="../quiz/px4-companion-jetson.json" module="px4-companion-jetson"></uav-quiz>
+      </div>
+      <div class="module-done"><gc-button variant="secondary" data-done-toggle="px4-companion-jetson">Отметить как пройденный</gc-button></div>
+      <section class="related" aria-label="Смежные модули"><p class="gc-label gc-muted">Смежные модули</p><div class="gc-grid ref-grid"><a class="gc-card" href="comp-intro.html"><strong>Companion: зачем и где граница</strong><div class="gc-card__meta"><span class="gc-tag" title="L2 — Интегратор">L2</span></div></a><a class="gc-card" href="px4-ros2.html"><strong>PX4 и ROS 2: uXRCE-DDS и offboard</strong><div class="gc-card__meta"><span class="gc-tag" title="L4 — Эксперт">L4</span></div></a><a class="gc-card" href="per-cv.html"><strong>Компьютерное зрение: от OpenCV до нейросетей</strong><div class="gc-card__meta"><span class="gc-tag" title="L4 — Эксперт">L4</span></div></a><a class="gc-card" href="per-edge-ml.html"><strong>ML на борту: бюджет, квантование, оценка, сопровождение</strong><div class="gc-card__meta"><span class="gc-tag" title="L4 — Эксперт">L4</span></div></a></div></section>
+      <nav class="pager" aria-label="Соседние модули" data-track-pager><a class="gc-card pager__prev" href="px4-ros2.html"><span class="gc-label gc-muted">Назад · трек</span><br>PX4 и ROS 2: uXRCE-DDS и offboard</a></nav><nav class="pager" aria-label="Соседние шаги пути PX4" data-path-pager="px4" hidden><a class="gc-card pager__prev" href="px4-ros2.html?path=px4"><span class="gc-label gc-muted">Назад · путь PX4</span><br>PX4 и ROS 2: uXRCE-DDS и offboard</a><a class="gc-card pager__next" href="eng-ci-configs.html?path=px4"><span class="gc-label gc-muted">Дальше · шаг 19 из 36</span><br>CI и версионирование конфигов и кода</a></nav>
+    </article>
+  </main>
+  <footer class="gc-container site-footer gc-muted">
+    <p>Открытый курс · <a href="https://github.com/irreligious86/UAV-Education">исходники на GitHub</a> · <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">план развития</a> · <a href="../../curriculum/curriculum.html">для разработчика</a> · CC BY-NC-SA 4.0</p>
+  </footer>
+</body>
+</html>

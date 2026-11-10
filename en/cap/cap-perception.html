@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en" data-theme="dark" data-lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Слежение за целью — UAV Student</title>
+  <meta name="description" content="Companion детектирует объект в видео и ведёт аппарат за ним в SITL/в поле через GUIDED/Offboard">
+  <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
+  <link rel="manifest" href="../../manifest.webmanifest">
+  <meta name="theme-color" content="#0b0f14">
+  <link rel="alternate" hreflang="ru" href="../../cap/cap-perception.html">
+  <link rel="alternate" hreflang="uk" href="../../uk/cap/cap-perception.html">
+  <link rel="alternate" hreflang="en" href="../../en/cap/cap-perception.html">
+  <script>/* go to the visitor's chosen language before anything paints (assets/i18n.js) */(function(){try{var c=localStorage.getItem('uav-lang'),h=document.documentElement.getAttribute('data-lang');if(!c||c===h||/[?&]lang=keep\b/.test(location.search))return;var l=document.querySelector('link[rel=alternate][hreflang="'+c+'"]');if(l)location.replace(l.href+location.search+location.hash)}catch(e){}})();</script>
+  <link rel="stylesheet" href="../../lib/ground-control-ui/dist/ground-control.css">
+  <link rel="stylesheet" href="../../assets/site.css">
+  <script src="../../lib/ground-control-ui/dist/ground-control.js" defer></script>
+  <script src="../../assets/i18n/en.js"></script>
+  <script src="../../assets/i18n.js"></script>
+  <script src="../../assets/progress-store.js" defer></script>
+  <script src="../../assets/backend-config.js" defer></script>
+  <script src="../../assets/account.js" defer></script>
+  <script src="../../assets/grading.js" defer></script>
+  <script src="../../assets/app.js" defer></script>
+  <script src="../../assets/uav-quiz.js" defer></script>
+  <script src="../../assets/uav-tasks.js" defer></script>
+  <script src="../../assets/offline.js" defer></script>
+</head>
+<body class="gc-root" data-base="../" data-root="../../">
+  <header class="site-header">
+    <div class="gc-container site-header__inner">
+      <a class="site-brand" href="../index.html"><span class="site-brand__mark" aria-hidden="true">◆</span> UAV Student</a>
+      <nav class="gc-nav" aria-label="Разделы сайта">
+        <a href="../index.html" aria-current="page">Курс</a>
+        <a href="../ref/index.html">Справочник</a>
+        <a href="../pages/glossary.html">Глоссарий</a>
+        <a href="../pages/fails.html">Фейлы</a>
+        <a href="../pages/search.html">Поиск</a>
+        <a href="../pages/progress.html">Мой прогресс</a>
+      </nav>
+      <nav class="lang-switch" aria-label="Язык"><a class="gc-tag" href="../../cap/cap-perception.html" data-lang-to="ru" hreflang="ru" lang="ru" title="Русский">RU</a><a class="gc-tag" href="../../uk/cap/cap-perception.html" data-lang-to="uk" hreflang="uk" lang="uk" title="Українська">UK</a><a class="gc-tag" href="../../en/cap/cap-perception.html" data-lang-to="en" hreflang="en" lang="en" title="English" aria-current="true" data-state="ok">EN</a></nav>
+    </div>
+  </header>
+  <main class="gc-container site-main">
+    <article class="module" data-module-page="cap-perception">
+      <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-perception">Восприятие и интеллект</a><span>Итоговый проект</span></p>
+      <h1 class="module-title">Слежение за целью</h1>
+      <div class="module-tags"><span class="gc-tag">Итоговый проект трека 7</span><span class="gc-tag" data-state="ok" data-done-badge hidden>СДАН</span></div>
+      <p class="module-lead">Результат: Companion детектирует объект в видео и ведёт аппарат за ним в SITL/в поле через GUIDED/Offboard</p>
+      <div class="gc-prose module-body">
+        <h2>Что сдать</h2>
+        <ul><li>Пайплайн камера → детектор → команда</li><li>Замеры задержки и FPS</li><li>Демонстрация в SITL с симулированной камерой</li><li>Протокол безопасности: геозона, таймауты, пилот</li><li>Инженерная папка проекта: требования с ID, что и как тестировалось, журнал изменений (см. модуль «Инженерный метод 101»)</li></ul>
+        <h2>Критерии приёмки</h2>
+        <p class="gc-muted">Проект сдан, когда выполнены все пункты. Отмечай по мере готовности:</p>
+        <ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="cap-perception:cap:0"><span>Задержка от кадра до команды измерена и ниже 150 мс</span></label></li><li><label><input type="checkbox" data-check-id="cap-perception:cap:1"><span>Потеря цели ведёт к зависанию, а не к блужданию</span></label></li><li><label><input type="checkbox" data-check-id="cap-perception:cap:2"><span>Реальный полёт только с геозоной и пилотом</span></label></li><li><label><input type="checkbox" data-check-id="cap-perception:cap:3"><span>Каждое требование прослеживается до теста или измерения, результат записан</span></label></li></ul>
+        <h2>Рубрика: как отличить сделанное от сданного</h2><p class="gc-muted">Проверь свою работу по каждой строке. Если она ближе к левой колонке — проект ещё не готов.</p><div class="widget__table-wrap"><table class="rubric"><thead><tr><th>Критерий</th><th>Плохо</th><th>Хорошо</th></tr></thead><tbody><tr><th scope="row">Детектор</th><td class="rubric__bad">Запущен на ноутбуке</td><td class="rubric__good">Запущен на борту, FPS и точность измерены, ложные срабатывания проанализированы</td></tr><tr><th scope="row">Контур</th><td class="rubric__bad">Цель теряется — дрон летит дальше</td><td class="rubric__good">Потеря цели → зависание; задержка учтена; тест в SITL с логом</td></tr><tr><th scope="row">Границы</th><td class="rubric__bad">Не описаны</td><td class="rubric__good">Описаны условия отказа: освещение, текстура, динамика</td></tr></tbody></table></div>
+        <h2>Программная альтернатива</h2><p class="gc-muted">Итоговый проект трека можно заменить проектом из каталога «ПО для БАС» — с теми же требованиями к сдаче: критерии, автотесты, README.</p><ul><li><a href="../projects/proj-detect-follow.html">Проект 4: Детектор + трекер + следование в Gazebo</a></li><li><a href="../projects/proj-precision-landing.html">Проект 5: Точная посадка на маркер в симуляции</a></li><li><a href="../projects/proj-photogrammetry.html">Проект 7: Фотограмметрия на открытом наборе</a></li></ul>
+        <h2>Модули трека</h2>
+        <ol><li><a href="../m/per-camera.html">Камеры и видеопоток на companion</a></li><li><a href="../m/per-geometry.html">Геометрия камеры: от пикселя до точки на земле</a></li><li><a href="../m/per-cv.html">Компьютерное зрение: от OpenCV до нейросетей</a></li><li><a href="../m/per-edge-ml.html">ML на борту: бюджет, квантование, оценка, сопровождение</a></li><li><a href="../m/per-visual-nav.html">Визуальная навигация: оптический поток, VIO, SLAM обзорно</a></li><li><a href="../m/per-mapping.html">Картографирование: съёмка, геопривязка, фотограмметрия</a></li><li><a href="../m/per-landing.html">Точная посадка по маркеру: ArUco, LANDING_TARGET, PLND</a></li><li><a href="../m/per-depth-avoid.html">Глубина и обход препятствий: датчики, OBSTACLE_DISTANCE, алгоритмы</a></li><li><a href="../m/per-tracking.html">Слежение и управление по цели</a></li></ol>
+        <div class="gc-callout" data-state="caution"><strong>Безопасность.</strong> Всё, что можно сделать в SITL или без пропов, делается там. Реальный полёт — только после наземных тестов, с проверенным failsafe.</div>
+      </div>
+      <div class="module-done"><gc-button variant="secondary" data-done-toggle="cap-perception" data-done-label="сданный" data-done-past="Сдан">Отметить как сданный</gc-button></div>
+    </article>
+  </main>
+  <footer class="gc-container site-footer gc-muted">
+    <p>Открытый курс · <a href="https://github.com/irreligious86/UAV-Education">исходники на GitHub</a> · <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">план развития</a> · <a href="../../curriculum/curriculum.html">для разработчика</a> · CC BY-NC-SA 4.0</p>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,94 @@
+{
+  "module": "fw-reading",
+  "pass": 80,
+  "questions": [
+    {
+      "q": "Где в Betaflight главный цикл PID?",
+      "options": [
+        "main/scheduler",
+        "fc/core.c: taskMainPidLoop",
+        "flight/pid.c: main() в цикле",
+        "drivers/dshot.c"
+      ],
+      "answer": 1,
+      "explain": "taskMainPidLoop → subTaskPidController → subTaskMotorUpdate: PID и миксер — подзадачи цикла."
+    },
+    {
+      "q": "От чего считается D-term в Betaflight?",
+      "options": [
+        "От setpoint пилота",
+        "От гироскопа",
+        "От ошибки",
+        "От моторов"
+      ],
+      "answer": 1,
+      "explain": "Нет derivative kick при движении стика."
+    },
+    {
+      "q": "Где в ArduCopter таблица задач с частотами и бюджетом времени?",
+      "options": [
+        "Attitude.cpp",
+        "Copter.cpp: scheduler_tasks[]",
+        "Parameters.cpp: var_info[]",
+        "motors.cpp"
+      ],
+      "answer": 1,
+      "explain": "FAST_TASK и SCHED_TASK(func, hz, max_us, prio)."
+    },
+    {
+      "q": "Что делает AP_MotorsMatrix::output_armed_stabilizing()?",
+      "options": [
+        "Читает гироскоп",
+        "Раздаёт оси по моторам",
+        "Шлёт MAVLink",
+        "Считает EKF и пишет лог"
+      ],
+      "answer": 1,
+      "explain": "Распределяет roll/pitch/yaw/throttle по матрице моторов с приоритетами; yaw — последним, в пределах MOT_YAW_HEADROOM."
+    },
+    {
+      "q": "Откуда берётся вики параметров ArduPilot?",
+      "options": [
+        "Из MAVLink",
+        "Из блоков @Param в коде",
+        "Из Mission Planner",
+        "Пишется вручную командой разработчиков"
+      ],
+      "answer": 1,
+      "explain": "Описание, диапазон, @Values — в коде."
+    },
+    {
+      "q": "Как безопасно проверить патч прошивки?",
+      "options": [
+        "Сразу на дроне",
+        "SITL и тесты, затем стенд",
+        "Никак",
+        "В конфигураторе через CLI"
+      ],
+      "answer": 1,
+      "explain": "make SITL / sim_vehicle.py; make test."
+    },
+    {
+      "q": "git log -S \"имя\" нужен, чтобы:",
+      "options": [
+        "Собрать прошивку из старого коммита",
+        "Найти коммит с этой строкой",
+        "Удалить строку",
+        "Проверить стиль"
+      ],
+      "answer": 1,
+      "explain": "Комментарий PR объясняет причину изменения."
+    },
+    {
+      "q": "Зачем ссылаться в отчёте на коммит, а не на master?",
+      "options": [
+        "Ссылка на master со временем указывает на другой код",
+        "Коммиты быстрее открываются",
+        "GitHub запрещает ссылки на master",
+        "В master нет номеров строк"
+      ],
+      "answer": 0,
+      "explain": "Ссылка на конкретный коммит остаётся верной; master уезжает."
+    }
+  ]
+}

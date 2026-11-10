@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="uk" data-theme="dark" data-lang="uk">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Несколько аппаратов: адресация, разнесение, строй и супервизор — UAV Student</title>
+  <meta name="description" content="организовать адресацию и маршрутизацию нескольких аппаратов рассчитать минимальную дистанцию и выбрать стратегию разнесения настроить FOLLOW и супервизор дистанций">
+  <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
+  <link rel="manifest" href="../../manifest.webmanifest">
+  <meta name="theme-color" content="#0b0f14">
+  <link rel="alternate" hreflang="ru" href="../../m/mav-multi-vehicle.html">
+  <link rel="alternate" hreflang="uk" href="../../uk/m/mav-multi-vehicle.html">
+  <link rel="alternate" hreflang="en" href="../../en/m/mav-multi-vehicle.html">
+  <script>/* go to the visitor's chosen language before anything paints (assets/i18n.js) */(function(){try{var c=localStorage.getItem('uav-lang'),h=document.documentElement.getAttribute('data-lang');if(!c||c===h||/[?&]lang=keep\b/.test(location.search))return;var l=document.querySelector('link[rel=alternate][hreflang="'+c+'"]');if(l)location.replace(l.href+location.search+location.hash)}catch(e){}})();</script>
+  <link rel="stylesheet" href="../../lib/ground-control-ui/dist/ground-control.css">
+  <link rel="stylesheet" href="../../assets/site.css">
+  <script src="../../lib/ground-control-ui/dist/ground-control.js" defer></script>
+  <script src="../../assets/i18n/uk.js"></script>
+  <script src="../../assets/i18n.js"></script>
+  <script src="../../assets/progress-store.js" defer></script>
+  <script src="../../assets/backend-config.js" defer></script>
+  <script src="../../assets/account.js" defer></script>
+  <script src="../../assets/grading.js" defer></script>
+  <script src="../../assets/app.js" defer></script>
+  <script src="../../assets/uav-quiz.js" defer></script>
+  <script src="../../assets/uav-tasks.js" defer></script>
+  <script src="../../assets/offline.js" defer></script>
+</head>
+<body class="gc-root" data-base="../" data-root="../../">
+  <header class="site-header">
+    <div class="gc-container site-header__inner">
+      <a class="site-brand" href="../index.html"><span class="site-brand__mark" aria-hidden="true">◆</span> UAV Student</a>
+      <nav class="gc-nav" aria-label="Разделы сайта">
+        <a href="../index.html" aria-current="page">Курс</a>
+        <a href="../ref/index.html">Справочник</a>
+        <a href="../pages/glossary.html">Глоссарий</a>
+        <a href="../pages/fails.html">Фейлы</a>
+        <a href="../pages/search.html">Поиск</a>
+        <a href="../pages/progress.html">Мой прогресс</a>
+      </nav>
+      <nav class="lang-switch" aria-label="Язык"><a class="gc-tag" href="../../m/mav-multi-vehicle.html" data-lang-to="ru" hreflang="ru" lang="ru" title="Русский">RU</a><a class="gc-tag" href="../../uk/m/mav-multi-vehicle.html" data-lang-to="uk" hreflang="uk" lang="uk" title="Українська" aria-current="true" data-state="ok">UK</a><a class="gc-tag" href="../../en/m/mav-multi-vehicle.html" data-lang-to="en" hreflang="en" lang="en" title="English">EN</a></nav>
+    </div>
+  </header>
+  <main class="gc-container site-main">
+    <article class="module" data-module-page="mav-multi-vehicle">
+      <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-engineer">Инженер: код на борту</a><span>Несколько аппаратов: адресация, разнесение, строй и супервизор</span></p>
+      <h1 class="module-title">Несколько аппаратов: адресация, разнесение, строй и супервизор</h1>
+      <div class="module-tags"><span class="gc-tag" title="Уровень">L3 — Специалист</span><span class="gc-tag">чтение 35 мин</span><span class="gc-tag">учёба ~3 ч</span><span class="gc-tag">ArduPilot 4.5+ · PX4 1.15+ · MAVLink 2</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ОСВОЕН</span></div>
+      <p class="gc-muted module-score" data-module-score></p>
+      <p class="module-lead">Второй аппарат в воздухе — это не «то же самое, но два раза». Появляются вопросы адресации (кому ушла команда), маршрутизации (как одна наземка видит всех), разнесения (как они не столкнутся друг с другом) и ответственности (кто отвечает, когда один аппарат потерял связь). Модуль — теоретическая база проекта «Телеметрия флота»: уникальные sysid и порты, запуск нескольких аппаратов в SITL, стратегии разнесения по высоте, секторам и времени с расчётом минимальной дистанции, режим FOLLOW и строй из кода companion, и супервизор, который следит за дистанциями и останавливает конфликт.</p>
+      <div class="gc-callout" data-state="ok"><strong>После модуля ты умеешь</strong><ul><li>организовать адресацию и маршрутизацию нескольких аппаратов</li><li>рассчитать минимальную дистанцию и выбрать стратегию разнесения</li><li>настроить FOLLOW и супервизор дистанций</li></ul></div><p class="gc-muted">Перед этим модулем: <a href="mav-routing.html">Маршрутизация и транспорт MAVLink: радио, 4G, несколько GCS</a>, <a href="ap-companion.html">Companion + ArduPilot: управление из кода</a></p><div class="gc-callout lab"><p class="gc-label gc-muted">Лабораторная</p><strong>Три аппарата без столкновений</strong><p class="gc-muted lab__hint">Сдано, когда отмечены все пункты:</p><ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="mav-multi-vehicle:lab:0"><span>Три аппарата с уникальными sysid и своими высотами RTL</span></label></li><li><label><input type="checkbox" data-check-id="mav-multi-vehicle:lab:1"><span>Схема маршрутизации записана</span></label></li><li><label><input type="checkbox" data-check-id="mav-multi-vehicle:lab:2"><span>Супервизор останавливает конфликт, дистанция измерена</span></label></li><li><label><input type="checkbox" data-check-id="mav-multi-vehicle:lab:3"><span>FOLLOW настроен, поведение при потере ведущего описано</span></label></li></ul></div>
+      <div class="gc-prose module-body">
+<div class="gc-callout" data-state="caution" data-untranslated><strong>Модуль ещё не переведён.</strong> Ниже — оригинал (Русский). Прогресс и оценки общие для всех языков.</div>
+<h2>Теория</h2>
+<h4 class="md-subheading">Адресация и маршрутизация</h4>
+<ul><li><strong>Уникальный sysid</strong> у каждого аппарата: ArduPilot — <code>MAV_SYSID</code> (до 4.7 — <code>SYSID_THISMAV</code>), PX4 — <code>MAV_SYS_ID</code>. Два аппарата с sysid 1 в одной сети — наземка видит «один» прыгающий аппарат, команды уходят обоим.</li><li><strong>Наземка и скрипты</strong> — тоже участники: GCS обычно 255, второй станции или супервизору нужен свой sysid (например 250). pymavlink по умолчанию представляется как 255 — для супервизора задайте <code>source_system</code>.</li><li><strong>target_system</strong> в каждой команде — номер аппарата. <code>target_system = 0</code> — команда *всем*; в флоте это осознанный инструмент (общий стоп), а не значение по умолчанию.</li><li><strong>Маршрутизация</strong>: каждый аппарат — свой линк (радиомодем с уникальным <code>NETID</code>, отдельный UDP-порт), всё сводится в mavlink-router или MAVProxy, к которому подключаются наземка, супервизор и логгер (модуль <code>mav-routing</code>).</li><li><strong>Failsafe по своей наземке</strong>: аппарат должен знать, какая наземка «его» (<code>MAV_GCS_SYSID</code>, до 4.7 — <code>SYSID_MYGCS</code>), иначе heartbeat чужой станции держит его «на связи».</li></ul>
+<h4 class="md-subheading">Несколько аппаратов в SITL</h4>
+<ul><li>ArduPilot: <code>sim_vehicle.py -v Copter --count 3 --auto-sysid --location CMAC --auto-offset-line 90,10 --mcast --map --console</code> — три коптера в линию через 10 м, sysid 1…3; <code>--mcast</code> пускает MAVLink между аппаратами (без него ведомый в FOLLOW из шага 4 не услышит ведущего). Только один тип аппарата на команду. Без смещения стартовой точки все появятся в одном месте.</li><li>PX4: экземпляры запускаются с ключом <code>-i N</code>; sysid и порты смещаются по номеру экземпляра — по разделу Multi-Vehicle Simulation документации своей версии.</li></ul>
+<h4 class="md-subheading">Разнесение: не надеяться на удачу</h4>
+<p>Минимальная дистанция складывается из ошибок и реакции:</p>
+<ul><li><strong>Ошибка позиции</strong>: GNSS без RTK — порядка 1–3 м по горизонтали и хуже по высоте; у двух аппаратов ошибки складываются.</li><li><strong>Задержка обнаружения и реакции</strong>: телеметрия (0.2–1 с), решение супервизора, время торможения.</li><li><strong>Сближение</strong>: два аппарата навстречу по 10 м/с — 20 м/с сближения. При 0.5 с телеметрии + 0.5 с решения + ~1.5 с торможения за это время пройдено ~50 м; с ошибками позиции минимальная дистанция для срабатывания — около 60 м. Отсюда правило: чем быстрее аппараты, тем раньше супервизор должен вмешиваться.</li></ul>
+<p>Стратегии, от простых к сложным:</p>
+<ol><li><strong>Слои по высоте</strong> — у каждого аппарата своя высота с разнесением ≥ 10 м плюс ошибка высоты. Работает, пока аппараты не меняют высоту (взлёт и посадка — отдельно, по очереди).</li><li><strong>Сектора и коридоры</strong> — каждый аппарат в своей геозоне (<code>FENCE_*</code> на каждом), переходы по выделенным коридорам.</li><li><strong>Разнесение по времени</strong> — взлёт, посадка и проход общих точек по расписанию.</li><li><strong>Супервизор</strong> — следит за парными дистанциями в реальном времени и останавливает конфликт (LOITER/BRAKE младшему по приоритету).</li><li><strong>Встроенное избегание</strong> — ArduPilot умеет уклоняться от бортов по ADS-B (<code>AVD_*</code>, сообщения <code>ADSB_VEHICLE</code>); подавать в него позиции своего же флота из companion — рабочий приём, который нужно проверить в SITL до полётов.</li></ol>
+<h4 class="md-subheading">Строй</h4>
+<ul><li><strong>FOLLOW (ArduPilot)</strong> — ведомый держит смещение от ведущего: <code>FOLL_ENABLE = 1</code>, <code>FOLL_SYSID</code> — sysid ведущего, <code>FOLL_OFS_X/Y/Z</code> — смещение в метрах, <code>FOLL_OFS_TYPE</code> — 0 север-восток-вниз, 1 относительно курса ведущего, <code>FOLL_DIST_MAX</code> — дальше этого ведомый перестаёт следовать и держит позицию. Ведомому нужны позиции ведущего: <code>GLOBAL_POSITION_INT</code> по общей шине MAVLink (лучше — <code>FOLLOW_TARGET</code> от Lua-скрипта на ведущем).</li><li><strong>Строй из кода</strong> — companion шлёт каждому аппарату в GUIDED свою цель (<code>SET_POSITION_TARGET_GLOBAL_INT</code>) с частотой 2–4 Гц: центр строя + смещение аппарата. Гибче FOLLOW, но вся логика — ваша, включая поведение при потере связи с companion.</li></ul>
+<h4 class="md-subheading">Отказ одного — не отказ всех</h4>
+<ul><li>Каждый аппарат сам по себе обязан иметь failsafe по связи, батарее и геозоне; супервизор — дополнительный слой, а не замена.</li><li>RTL нескольких аппаратов в одну точку — столкновение над домом. Разные <code>RTL_ALT_M</code> (до 4.7 — <code>RTL_ALT</code>) или разные точки возврата (rally) на каждый аппарат.</li><li>Правила: управление несколькими аппаратами одним пилотом во многих странах требует отдельного разрешения — проверяйте до полётов.</li></ul>
+<figure class="diagram" data-diagram="multi-vehicle"><div class="diagram__svg"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 230" width="100%" role="img" aria-labelledby="t" style="max-width:720px;display:block;margin:0 auto"><title id="t">Флот: адресация, маршрутизация и разнесение</title><style>text{font-family: var(--gc-font-mono, ui-monospace, Menlo, monospace); font-size: 12px;fill:currentColor} .m{fill:var(--gc-ink-muted, #8a93a3)} .a{fill:var(--gc-accent-hud, #5ef1d2)} .w{fill:var(--gc-signal-amber, #f0b24c)} .d{fill:var(--gc-signal-red, #e8636b)} .box{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:currentColor;stroke-width:1.2} .boxa{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6} .ln{stroke:currentColor;stroke-width:1.2;fill:none} .lna{stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6;fill:none} .lnm{stroke:var(--gc-ink-muted, #8a93a3);stroke-width:1;fill:none;stroke-dasharray:4 3} .t{font-size:11px} .b{font-weight:600}</style><defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker><marker id="ara" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--gc-accent-hud, #5ef1d2)"/></marker></defs><rect class="box" x="10" y="30" width="160" height="48" rx="6"/><text x="90.0" y="51.0" text-anchor="middle">GCS, sysid 255</text><text x="90.0" y="65.0" text-anchor="middle">один оператор</text><rect class="boxa" x="280" y="30" width="160" height="48" rx="6"/><text x="360.0" y="51.0" text-anchor="middle" class="b">mavlink-router</text><text x="360.0" y="65.0" text-anchor="middle" class="b">UDP на каждый аппарат</text><rect class="boxa" x="550" y="30" width="160" height="48" rx="6"/><text x="630.0" y="51.0" text-anchor="middle" class="b">Супервизор</text><text x="630.0" y="65.0" text-anchor="middle" class="b">дистанции, общий стоп</text><rect class="box" x="10" y="140" width="160" height="48" rx="6"/><text x="90.0" y="161.0" text-anchor="middle">Аппарат 1</text><text x="90.0" y="175.0" text-anchor="middle">sysid 1, слой 30 м</text><rect class="box" x="280" y="140" width="160" height="48" rx="6"/><text x="360.0" y="161.0" text-anchor="middle">Аппарат 2</text><text x="360.0" y="175.0" text-anchor="middle">sysid 2, слой 40 м</text><rect class="box" x="550" y="140" width="160" height="48" rx="6"/><text x="630.0" y="161.0" text-anchor="middle">Аппарат 3, FOLLOW</text><text x="630.0" y="175.0" text-anchor="middle">FOLL_SYSID = 2</text><path class="ln" d="M170 54.0 L280 54.0" marker-end="url(#ar)"/><path class="lna" d="M440 54.0 L550 54.0" marker-end="url(#ara)"/><path class="ln" d="M360.0 78 L360.0 109.0 L90.0 109.0 L90.0 140" marker-end="url(#ar)"/><path class="ln" d="M360.0 78 L360.0 140" marker-end="url(#ar)"/><path class="ln" d="M360.0 78 L360.0 109.0 L630.0 109.0 L630.0 140" marker-end="url(#ar)"/><text x="10" y="216" text-anchor="start" class="m t">target_system = 0 — команда всем аппаратам: только сознательно</text></svg></div><figcaption class="gc-muted">Флот: наземка и супервизор подключены к роутеру, у каждого аппарата свой sysid, линк и слой высоты; ведомый в FOLLOW следует за аппаратом 2.</figcaption><div class="diagram__hint">Схему можно прокрутить по горизонтали</div></figure>
+
+<h2>Практика</h2>
+<h4 class="md-subheading">Шаг 1. Три аппарата в SITL</h4>
+<p>Запустить три коптера командой из теории. В MAVProxy (<code>vehicle 1</code>, <code>vehicle 2</code>, …) или в наземке убедиться, что видны три sysid. Каждому — свой <code>RTL_ALT_M</code> (30/40/50 м) и свой слой высоты.</p>
+<h4 class="md-subheading">Шаг 2. Маршрутизация</h4>
+<p>Поднять mavlink-router (или <code>--out</code> MAVProxy) так, чтобы наземка, супервизор и логгер получали поток всех трёх. Записать схему: sysid, порты, кто куда подключён.</p>
+<h4 class="md-subheading">Шаг 3. Супервизор</h4>
+<p>Скрипт следит за парными дистанциями и переводит младший по номеру аппарат в LOITER при конфликте:</p>
+<pre class="cli-block"><code>import math, time
+from pymavlink import mavutil
+
+m = mavutil.mavlink_connection(&quot;udpin:0.0.0.0:14560&quot;, source_system=250)
+MIN_H, MIN_V, STALE = 15.0, 5.0, 2.0          # м, м, с
+LOITER = 5                                     # custom mode ArduCopter
+pos, held = {}, set()
+
+def sep(a, b):
+    dn = (b[0] - a[0]) * 111_320
+    de = (b[1] - a[1]) * 111_320 * math.cos(math.radians(a[0]))
+    return math.hypot(dn, de), abs(b[2] - a[2])
+
+while True:
+    msg = m.recv_match(type=&quot;GLOBAL_POSITION_INT&quot;, blocking=True, timeout=1)
+    if msg is None:
+        continue
+    pos[msg.get_srcSystem()] = (msg.lat / 1e7, msg.lon / 1e7, msg.relative_alt / 1000, time.time())
+    now = time.time()
+    live = sorted(k for k, v in pos.items() if now - v[3] &lt; STALE)
+    for i, a in enumerate(live):
+        for b in live[i + 1:]:
+            h, v = sep(pos[a], pos[b])
+            if h &lt; MIN_H and v &lt; MIN_V and b not in held:
+                print(f&quot;конфликт {a}-{b}: {h:.1f} м / {v:.1f} м → LOITER для {b}&quot;)
+                m.mav.command_long_send(b, 1, mavutil.mavlink.MAV_CMD_DO_SET_MODE, 0,
+                    mavutil.mavlink.MAV_MODE_FLAG_CUSTOM_MODE_ENABLED, LOITER, 0, 0, 0, 0, 0)
+                held.add(b)</code></pre>
+<p>Устроить конфликт: два аппарата в GUIDED навстречу на одной высоте. Проверить, что супервизор срабатывает, и записать дистанцию в момент срабатывания и минимальную дистанцию после него.</p>
+<h4 class="md-subheading">Шаг 4. FOLLOW</h4>
+<p>Аппарат 3: <code>FOLL_ENABLE = 1</code> (перезагрузка параметров), <code>FOLL_SYSID = 2</code>, <code>FOLL_OFS_X = -10</code>, <code>FOLL_OFS_Z = -5</code> (на 5 м выше), <code>FOLL_OFS_TYPE = 1</code>. Аппарат 2 летит миссию, аппарат 3 — в режиме FOLLOW. Записать отставание ведомого по логу на прямых и поворотах. Затем выключить аппарат 2 (или его линк) и описать поведение ведомого.</p>
+<h4 class="md-subheading">Шаг 5. Расчёт дистанции</h4>
+<p>Для своих скоростей и задержки телеметрии посчитать минимальную дистанцию срабатывания супервизора (как в теории) и сравнить с результатом шага 3.</p>
+<p>Лабораторная засчитывается, когда три аппарата видны с уникальными sysid и своими высотами RTL, схема маршрутизации записана, супервизор останавливает конфликт с измеренной дистанцией, FOLLOW настроен и описано поведение при потере ведущего, расчёт минимальной дистанции сделан.</p>
+
+<h2>Диагностика</h2>
+<div class="diag-groups"><article class="diag-item"><h4><strong>Симптом:</strong> в наземке один аппарат «прыгает» между двумя местами</h4><ul><li>Возможная причина: два аппарата с одинаковым sysid.</li><li>Что сделать: уникальные <code>MAV_SYSID</code>/<code>MAV_SYS_ID</code>, перезагрузка, <code>--auto-sysid</code> в SITL.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> команда ушла не тому аппарату или всем</h4><ul><li>Возможная причина: <code>target_system</code> по умолчанию или 0, скрипт взял <code>target_system</code> из первого heartbeat.</li><li>Что сделать: явный sysid в каждой команде, проверка <code>COMMAND_ACK</code> от нужного sysid.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> аппарат не уходит в failsafe при потере своей наземки</h4><ul><li>Возможная причина: его держит heartbeat другой станции или супервизора.</li><li>Что сделать: <code>MAV_GCS_SYSID</code> (до 4.7 — <code>SYSID_MYGCS</code>), свои sysid у вспомогательных скриптов.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> все аппараты на RTL сходятся над домом</h4><ul><li>Возможная причина: одинаковая высота и точка возврата.</li><li>Что сделать: разные высоты RTL и rally-точки, посадка по очереди.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> ведомый в FOLLOW стоит на месте</h4><ul><li>Возможная причина: не задан <code>FOLL_SYSID</code>, ведущий дальше <code>FOLL_DIST_MAX</code>, позиции ведущего не доходят до ведомого.</li><li>Что сделать: проверить параметры и что <code>GLOBAL_POSITION_INT</code> ведущего маршрутизируется к ведомому.</li></ul></article></div>
+
+<h2>Чек-лист</h2>
+<ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="mav-multi-vehicle:0"><span>Назначаю уникальные sysid аппаратам и вспомогательным скриптам</span></label></li><li><label><input type="checkbox" data-check-id="mav-multi-vehicle:1"><span>Запускаю несколько аппаратов в SITL и свожу их в одну наземку</span></label></li><li><label><input type="checkbox" data-check-id="mav-multi-vehicle:2"><span>Считаю минимальную дистанцию с учётом ошибок позиции и задержек</span></label></li><li><label><input type="checkbox" data-check-id="mav-multi-vehicle:3"><span>Выбираю стратегию разнесения: слои, сектора, время, супервизор</span></label></li><li><label><input type="checkbox" data-check-id="mav-multi-vehicle:4"><span>Настраиваю FOLLOW и понимаю, что происходит при потере ведущего</span></label></li><li><label><input type="checkbox" data-check-id="mav-multi-vehicle:5"><span>Развожу RTL аппаратов по высоте и точкам возврата</span></label></li></ul>
+
+<h2>Источники</h2>
+<ul class="refs"><li><a href="https://ardupilot.org/copter/docs/follow-mode.html" target="_blank" rel="noopener noreferrer">ArduPilot — Copter Follow mode</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://ardupilot.org/dev/docs/using-sitl-for-ardupilot-testing.html" target="_blank" rel="noopener noreferrer">ArduPilot — Using SITL (multiple vehicles)</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://ardupilot.org/mavproxy/docs/getting_started/multi.html" target="_blank" rel="noopener noreferrer">MAVProxy — Multiple vehicles</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://docs.px4.io/main/en/sim_gazebo_gz/multi_vehicle_simulation.html" target="_blank" rel="noopener noreferrer">PX4 — Multi-vehicle simulation</a> <span class="gc-tag" data-state="info">primary</span></li></ul>
+<h2>Задачи с числовым ответом</h2>
+<uav-tasks src="../tasks/mav-multi-vehicle.json" module="mav-multi-vehicle"></uav-tasks>
+<h2>Проверь себя</h2>
+<uav-quiz src="../quiz/mav-multi-vehicle.json" module="mav-multi-vehicle"></uav-quiz>
+      </div>
+      <div class="module-done"><gc-button variant="secondary" data-done-toggle="mav-multi-vehicle">Отметить как пройденный</gc-button></div>
+      <section class="related" aria-label="Смежные модули"><p class="gc-label gc-muted">Смежные модули</p><div class="gc-grid ref-grid"><a class="gc-card" href="mav-routing.html"><strong>Маршрутизация и транспорт MAVLink: радио, 4G, несколько GCS</strong><div class="gc-card__meta"><span class="gc-tag" title="L3 — Специалист">L3</span></div></a><a class="gc-card" href="mav-sdk.html"><strong>Библиотеки над MAVLink: pymavlink, MAVSDK, MAVROS — что и когда</strong><div class="gc-card__meta"><span class="gc-tag" title="L3 — Специалист">L3</span></div></a><a class="gc-card" href="ap-companion.html"><strong>Companion + ArduPilot: управление из кода</strong><div class="gc-card__meta"><span class="gc-tag" title="L3 — Специалист">L3</span></div></a><a class="gc-card" href="ap-sitl.html"><strong>SITL: дрон без дрона</strong><div class="gc-card__meta"><span class="gc-tag" title="L2 — Интегратор">L2</span></div></a></div></section>
+      <nav class="pager" aria-label="Соседние модули" data-track-pager><a class="gc-card pager__prev" href="ap-companion.html"><span class="gc-label gc-muted">Назад · трек</span><br>Companion + ArduPilot: управление из кода</a><a class="gc-card pager__next" href="bf-custom.html"><span class="gc-label gc-muted">Дальше · трек</span><br>Свои сборки прошивок</a></nav>
+    </article>
+  </main>
+  <footer class="gc-container site-footer gc-muted">
+    <p>Открытый курс · <a href="https://github.com/irreligious86/UAV-Education">исходники на GitHub</a> · <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">план развития</a> · <a href="../../curriculum/curriculum.html">для разработчика</a> · CC BY-NC-SA 4.0</p>
+  </footer>
+</body>
+</html>

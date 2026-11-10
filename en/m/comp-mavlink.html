@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en" data-theme="dark" data-lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MAVLink и MAVSDK — UAV Student</title>
+  <meta name="description" content="прочитать телеметрию и отправить команду">
+  <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
+  <link rel="manifest" href="../../manifest.webmanifest">
+  <meta name="theme-color" content="#0b0f14">
+  <link rel="alternate" hreflang="ru" href="../../m/comp-mavlink.html">
+  <link rel="alternate" hreflang="uk" href="../../uk/m/comp-mavlink.html">
+  <link rel="alternate" hreflang="en" href="../../en/m/comp-mavlink.html">
+  <script>/* go to the visitor's chosen language before anything paints (assets/i18n.js) */(function(){try{var c=localStorage.getItem('uav-lang'),h=document.documentElement.getAttribute('data-lang');if(!c||c===h||/[?&]lang=keep\b/.test(location.search))return;var l=document.querySelector('link[rel=alternate][hreflang="'+c+'"]');if(l)location.replace(l.href+location.search+location.hash)}catch(e){}})();</script>
+  <link rel="stylesheet" href="../../lib/ground-control-ui/dist/ground-control.css">
+  <link rel="stylesheet" href="../../assets/site.css">
+  <script src="../../lib/ground-control-ui/dist/ground-control.js" defer></script>
+  <script src="../../assets/i18n/en.js"></script>
+  <script src="../../assets/i18n.js"></script>
+  <script src="../../assets/progress-store.js" defer></script>
+  <script src="../../assets/backend-config.js" defer></script>
+  <script src="../../assets/account.js" defer></script>
+  <script src="../../assets/grading.js" defer></script>
+  <script src="../../assets/app.js" defer></script>
+  <script src="../../assets/uav-quiz.js" defer></script>
+  <script src="../../assets/uav-tasks.js" defer></script>
+  <script src="../../assets/offline.js" defer></script>
+</head>
+<body class="gc-root" data-base="../" data-root="../../">
+  <header class="site-header">
+    <div class="gc-container site-header__inner">
+      <a class="site-brand" href="../index.html"><span class="site-brand__mark" aria-hidden="true">◆</span> UAV Student</a>
+      <nav class="gc-nav" aria-label="Разделы сайта">
+        <a href="../index.html" aria-current="page">Курс</a>
+        <a href="../ref/index.html">Справочник</a>
+        <a href="../pages/glossary.html">Глоссарий</a>
+        <a href="../pages/fails.html">Фейлы</a>
+        <a href="../pages/search.html">Поиск</a>
+        <a href="../pages/progress.html">Мой прогресс</a>
+      </nav>
+      <nav class="lang-switch" aria-label="Язык"><a class="gc-tag" href="../../m/comp-mavlink.html" data-lang-to="ru" hreflang="ru" lang="ru" title="Русский">RU</a><a class="gc-tag" href="../../uk/m/comp-mavlink.html" data-lang-to="uk" hreflang="uk" lang="uk" title="Українська">UK</a><a class="gc-tag" href="../../en/m/comp-mavlink.html" data-lang-to="en" hreflang="en" lang="en" title="English" aria-current="true" data-state="ok">EN</a></nav>
+    </div>
+  </header>
+  <main class="gc-container site-main">
+    <article class="module" data-module-page="comp-mavlink">
+      <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-engineer">Инженер: код на борту</a><span>MAVLink и MAVSDK</span></p>
+      <h1 class="module-title">MAVLink и MAVSDK</h1>
+      <div class="module-tags"><span class="gc-tag" title="Уровень">L2 — Интегратор</span><span class="gc-tag">чтение 30 мин</span><span class="gc-tag">учёба ~3 ч</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ОСВОЕН</span></div>
+      <p class="gc-muted module-score" data-module-score></p>
+      <p class="module-lead">MAVLink — язык, на котором полётник говорит с наземной станцией, бортовым компьютером, телеметрией и твоими скриптами. Всё, что ты делал в SITL через pymavlink, — это MAVLink. Модуль разбирает протокол на уровне, достаточном чтобы писать свои клиенты: структуру пакета, систему и компонент, heartbeat, команды с подтверждением, параметры, потоки телеметрии. Два инструмента на выбор: pymavlink (низкий уровень, всё видно) и MAVSDK (высокоуровневый API).</p>
+      <div class="gc-callout" data-state="ok"><strong>После модуля ты умеешь</strong><ul><li>прочитать телеметрию и отправить команду</li></ul></div><p class="gc-muted">Перед этим модулем: <a href="comp-intro.html">Companion: зачем и где граница</a></p><div class="gc-callout lab"><p class="gc-label gc-muted">Лабораторная</p><strong>Слушать и командовать</strong><p class="gc-muted lab__hint">Сдано, когда отмечены все пункты:</p><ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="comp-mavlink:lab:0"><span>ATTITUDE запрошен с частотой 10 Гц</span></label></li><li><label><input type="checkbox" data-check-id="comp-mavlink:lab:1"><span>Команда арма подтверждена по COMMAND_ACK</span></label></li><li><label><input type="checkbox" data-check-id="comp-mavlink:lab:2"><span>Параметр прочитан и записан из кода</span></label></li><li><label><input type="checkbox" data-check-id="comp-mavlink:lab:3"><span>Эфир просмотрен через mavproxy watch</span></label></li></ul></div><div class="path-pos gc-muted"><span class="gc-label">В пути</span><ul><li data-path-pos="ardupilot"><a href="../path/ardupilot.html">ArduPilot</a>: шаг 45 из 69 → <a href="mav-protocol.html?path=ardupilot">MAVLink изнутри: кадр, CRC, диалекты, подпись</a></li><li data-path-pos="px4"><a href="../path/px4.html">PX4</a>: шаг 10 из 36 → <a href="math-linalg-rot.html?path=px4">Векторы, матрицы и вращения: язык ориентации</a></li></ul></div>
+      <div class="gc-prose module-body">
+<div class="gc-callout" data-state="caution" data-untranslated><strong>Модуль ещё не переведён.</strong> Ниже — оригинал (Русский). Прогресс и оценки общие для всех языков.</div>
+<h2>Теория</h2>
+<h4 class="md-subheading">Пакет</h4>
+<p>MAVLink 2 — бинарный протокол поверх UART, UDP или TCP. Пакет: стартовый байт <code>0xFD</code>, длина, флаги, порядковый номер, <code>system_id</code>, <code>component_id</code>, трёхбайтный ID сообщения, полезная нагрузка, CRC. Контрольная сумма включает «соль» из описания сообщения, поэтому обе стороны обязаны использовать одинаковые определения (диалект). Сообщения описаны в XML: <code>common.xml</code> — общие, <code>ardupilotmega.xml</code> — расширения ArduPilot. Из XML генерируются библиотеки для C, Python и других языков.</p>
+<h4 class="md-subheading">Система и компонент</h4>
+<p><code>system_id</code> — аппарат (по умолчанию 1), <code>component_id</code> — что внутри: автопилот (1), камера, гимбал, бортовой компьютер. GCS обычно система 255. Команды адресуются паре система+компонент; бортовой компьютер — это отдельный компонент той же системы.</p>
+<h4 class="md-subheading">Heartbeat</h4>
+<p><code>HEARTBEAT</code> (ID 0) раз в секунду от каждого участника: тип аппарата, автопилот, режим, состояние арма. Пока нет heartbeat, нет и связи — поэтому любой клиент начинается с <code>wait_heartbeat()</code>. Отсутствие heartbeat от GCS дольше таймаута — это GCS-failsafe.</p>
+<h4 class="md-subheading">Основные сообщения</h4>
+<ul><li>Телеметрия от аппарата: <code>SYS_STATUS</code> (1), <code>ATTITUDE</code> (30), <code>GLOBAL_POSITION_INT</code> (33), <code>RC_CHANNELS</code> (65), <code>BATTERY_STATUS</code> (147), <code>STATUSTEXT</code> (253 — текстовые сообщения, в том числе pre-arm).</li><li>Команды: <code>COMMAND_LONG</code> (76) с кодом <code>MAV_CMD_*</code> и семью параметрами; ответ — <code>COMMAND_ACK</code> (77) с результатом. Примеры кодов: <code>MAV_CMD_COMPONENT_ARM_DISARM</code> (400), <code>MAV_CMD_NAV_TAKEOFF</code> (22), <code>MAV_CMD_DO_SET_MODE</code> (176).</li><li>Частота потоков: <code>MAV_CMD_SET_MESSAGE_INTERVAL</code> (511) — попросить конкретное сообщение с нужным интервалом; <code>MAV_CMD_REQUEST_MESSAGE</code> (512) — один раз.</li><li>Параметры: <code>PARAM_REQUEST_READ</code> (20) → <code>PARAM_VALUE</code> (22); запись <code>PARAM_SET</code> (23), подтверждение тем же <code>PARAM_VALUE</code>.</li><li>Управление в GUIDED: <code>SET_POSITION_TARGET_LOCAL_NED</code> (84) и <code>SET_POSITION_TARGET_GLOBAL_INT</code> (86) — цель по позиции или скорости; основа offboard-управления с companion.</li><li>Миссии: <code>MISSION_COUNT</code> (44), <code>MISSION_ITEM_INT</code> (73), <code>MISSION_REQUEST_INT</code> (51), <code>MISSION_ACK</code> (47) — диалог из модуля про миссии.</li></ul>
+<h4 class="md-subheading">Правило подтверждений</h4>
+<p>Команда без проверки <code>COMMAND_ACK</code> — это надежда, а не управление. Результат <code>MAV_RESULT_ACCEPTED</code> (0) означает «принято»; остальные коды — отказ, и его причина обычно приходит в <code>STATUSTEXT</code>.</p>
+<h4 class="md-subheading">pymavlink против MAVSDK</h4>
+<ul><li><strong>pymavlink</strong> — тонкая обёртка над протоколом: видишь каждое сообщение, подходит для обучения, диагностики и нестандартных вещей. Код многословный.</li><li><strong>MAVSDK</strong> (C++, Python) — высокоуровневые действия: <code>arm()</code>, <code>takeoff()</code>, <code>goto_location()</code>, подписки на телеметрию. Быстрее писать приложения, меньше видно изнутри. Исторически ближе к PX4, но с ArduPilot работает.</li></ul>
+<h4 class="md-subheading">Кадр MAVLink 2 побайтно</h4>
+<p><code>FD | len | incompat_flags | compat_flags | seq | sysid | compid | msgid(3) | payload(len) | crc(2) | [signature(13)]</code>. <code>incompat_flags</code> бит 0 — пакет подписан; подпись — первые 48 бит SHA-256 от (секретный ключ + заголовок + payload + CRC + link_id + timestamp), не HMAC (защита от подмены команд по открытому радиоканалу — ключ задаётся в Mission Planner/QGC и передаётся автопилоту сообщением <code>SETUP_SIGNING</code>). CRC-16/MCRF4XX по кадру + <code>CRC_EXTRA</code> байт сообщения (из XML) — несовпадение диалектов = «молчание». Payload сжимается обрезанием нулевых байтов в конце (поэтому <code>len</code> меньше размера структуры). Параметры в <code>PARAM_VALUE</code> — всегда float (32 бит), целые ArduPilot передаёт приведением к float (C-cast), PX4 — побайтно; тип значения — в <code>param_type</code> (<code>MAV_PARAM_TYPE</code>), о чём легко споткнуться в pymavlink.</p>
+<figure class="diagram" data-diagram="mavlink2-frame"><div class="diagram__svg"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 132" width="100%" role="img" aria-labelledby="t" style="max-width:720px;display:block;margin:0 auto"><title id="t">Кадр MAVLink 2 (12 байт заголовка и CRC + полезная нагрузка + подпись)</title><style>text{font-family: var(--gc-font-mono, ui-monospace, Menlo, monospace); font-size: 12px;fill:currentColor} .m{fill:var(--gc-ink-muted, #8a93a3)} .a{fill:var(--gc-accent-hud, #5ef1d2)} .w{fill:var(--gc-signal-amber, #f0b24c)} .d{fill:var(--gc-signal-red, #e8636b)} .box{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:currentColor;stroke-width:1.2} .boxa{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6} .ln{stroke:currentColor;stroke-width:1.2;fill:none} .lna{stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6;fill:none} .lnm{stroke:var(--gc-ink-muted, #8a93a3);stroke-width:1;fill:none;stroke-dasharray:4 3} .t{font-size:11px} .b{font-weight:600}</style><defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker><marker id="ara" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--gc-accent-hud, #5ef1d2)"/></marker></defs><rect class="box" x="16.0" y="28" width="42.8" height="46" rx="3"/><text x="37.39294432567096" y="48" text-anchor="middle" style="font-size:9px">STX 0xFD</text><text x="37.39294432567096" y="64" text-anchor="middle" class="m t" style="font-size:9px">1 байт</text><rect class="box" x="58.8" y="28" width="42.8" height="46" rx="3"/><text x="80.17883297701289" y="48" text-anchor="middle" style="font-size:9px">len</text><text x="80.17883297701289" y="64" text-anchor="middle" class="m t" style="font-size:9px">1 байт</text><rect class="box" x="101.6" y="28" width="42.8" height="46" rx="3"/><text x="122.9647216283548" y="48" text-anchor="middle" style="font-size:9px">incompat</text><text x="122.9647216283548" y="64" text-anchor="middle" class="m t" style="font-size:9px">1 байт</text><line class="lnm" x1="123.0" y1="74" x2="123.0" y2="78"/><text x="122.9647216283548" y="88" text-anchor="middle" class="m t" style="font-size:9.5px">бит 0 — подпись</text><rect class="box" x="144.4" y="28" width="42.8" height="46" rx="3"/><text x="165.75061027969673" y="48" text-anchor="middle" style="font-size:9px">compat</text><text x="165.75061027969673" y="64" text-anchor="middle" class="m t" style="font-size:9px">1 байт</text><rect class="box" x="187.1" y="28" width="42.8" height="46" rx="3"/><text x="208.53649893103864" y="48" text-anchor="middle" style="font-size:9px">seq</text><text x="208.53649893103864" y="64" text-anchor="middle" class="m t" style="font-size:9px">1 байт</text><rect class="boxa" x="229.9" y="28" width="42.8" height="46" rx="3"/><text x="251.32238758238054" y="48" text-anchor="middle" class="b" style="font-size:9px">sysid</text><text x="251.32238758238054" y="64" text-anchor="middle" class="m t" style="font-size:9px">1 байт</text><rect class="boxa" x="272.7" y="28" width="42.8" height="46" rx="3"/><text x="294.10827623372245" y="48" text-anchor="middle" class="b" style="font-size:9px">compid</text><text x="294.10827623372245" y="64" text-anchor="middle" class="m t" style="font-size:9px">1 байт</text><rect class="boxa" x="315.5" y="28" width="42.8" height="46" rx="3"/><text x="336.89416488506436" y="48" text-anchor="middle" class="b" style="font-size:9px">msgid</text><text x="336.89416488506436" y="64" text-anchor="middle" class="m t" style="font-size:9px">3 байт</text><rect class="boxa" x="358.3" y="28" width="247.1" height="46" rx="3"/><text x="481.85126077711425" y="48" text-anchor="middle" class="b" style="font-size:11px">payload</text><text x="481.85126077711425" y="64" text-anchor="middle" class="m t" style="font-size:9px">255 байт</text><line class="lnm" x1="481.9" y1="74" x2="481.9" y2="78"/><text x="481.85126077711425" y="88" text-anchor="middle" class="m t" style="font-size:9.5px">до 255, нули в конце обрезаются</text><rect class="box" x="605.4" y="28" width="42.8" height="46" rx="3"/><text x="626.8083566691641" y="48" text-anchor="middle" style="font-size:9px">CRC16</text><text x="626.8083566691641" y="64" text-anchor="middle" class="m t" style="font-size:9px">2 байт</text><line class="lnm" x1="626.8" y1="74" x2="626.8" y2="92"/><text x="626.8083566691641" y="102" text-anchor="middle" class="m t" style="font-size:9.5px">+ CRC_EXTRA</text><rect class="box" x="648.2" y="28" width="55.8" height="46" rx="3"/><text x="676.1006504974175" y="48" text-anchor="middle" style="font-size:9px">signature</text><text x="676.1006504974175" y="64" text-anchor="middle" class="m t" style="font-size:9px">13 байт</text><line class="lnm" x1="676.1" y1="74" x2="676.1" y2="78"/><text x="676.1006504974175" y="88" text-anchor="end" class="m t" style="font-size:9.5px">опционально</text><text x="16" y="16" text-anchor="start" class="m t">Кадр MAVLink 2 (12 байт заголовка и CRC + полезная нагрузка + подпись)</text><text x="16" y="124" text-anchor="start" class="m t">CRC — MCRF4XX по кадру без STX, плюс CRC_EXTRA байт сообщения из XML</text></svg></div><figcaption class="gc-muted">Кадр MAVLink 2: заголовок, идентификаторы системы и компонента, полезная нагрузка, CRC с CRC_EXTRA, необязательная подпись.</figcaption><div class="diagram__hint">Схему можно прокрутить по горизонтали</div></figure>
+<h4 class="md-subheading">Потоки телеметрии: кто задаёт частоту</h4>
+<p>ArduPilot шлёт потоки по <code>SRx_*</code> параметрам порта (<code>SR2_EXTRA1</code> — ATTITUDE, <code>SR2_POSITION</code> — GLOBAL_POSITION_INT, <code>SR2_RAW_SENS</code> — RAW_IMU…) в Гц; современный способ — <code>MAV_CMD_SET_MESSAGE_INTERVAL</code> (511) от клиента: интервал в мкс (−1 — выключить, 0 — по умолчанию). PX4 — профили <code>MAV_x_MODE</code> (Normal/Onboard/OSD…). Порт 921600 бод вмещает ~90 КБ/с: ATTITUDE на 50 Гц + позиция 10 Гц + RAW_IMU 50 Гц — порядка 10 КБ/с, запас есть; на 57600 (радиомодем) — всё, что выше 5–10 Гц, захлёбывается.</p>
+<h4 class="md-subheading">Разобранный пример: надёжная команда</h4>
+<pre class="cli-block"><code>def cmd(m, command, *params, retries=3, timeout=1.0):
+    &quot;&quot;&quot;Send COMMAND_LONG and wait for a matching ACK; retry on timeout; raise on rejection.&quot;&quot;&quot;
+    p = list(params) + [0] * (7 - len(params))
+    for _ in range(retries):
+        m.mav.command_long_send(m.target_system, m.target_component, command, 0, *p)
+        t0 = time.time()
+        while time.time() - t0 &lt; timeout:
+            ack = m.recv_match(type=&quot;COMMAND_ACK&quot;, blocking=True, timeout=timeout)
+            if ack and ack.command == command:
+                if ack.result == mavutil.mavlink.MAV_RESULT_ACCEPTED: return True
+                if ack.result == mavutil.mavlink.MAV_RESULT_IN_PROGRESS: continue
+                raise RuntimeError(f&quot;cmd {command} rejected: result {ack.result}&quot;)
+    raise TimeoutError(f&quot;cmd {command}: no ACK&quot;)</code></pre>
+<p><code>STATUSTEXT</code> параллельно объясняет отказ («PreArm: …»). MAVSDK делает то же под капотом — но понимать, что внутри, нужно, чтобы читать tlog при разборе.</p>
+
+<h2>Практика</h2>
+<h4 class="md-subheading">Шаг 1. Слушать телеметрию</h4>
+<pre class="cli-block"><code>from pymavlink import mavutil
+
+m = mavutil.mavlink_connection(&quot;tcp:127.0.0.1:5762&quot;)
+m.wait_heartbeat()
+print(f&quot;system {m.target_system} component {m.target_component}&quot;)
+
+# ask for ATTITUDE at 10 Hz (interval in microseconds)
+m.mav.command_long_send(
+    m.target_system, m.target_component,
+    mavutil.mavlink.MAV_CMD_SET_MESSAGE_INTERVAL, 0,
+    mavutil.mavlink.MAVLINK_MSG_ID_ATTITUDE, 100_000, 0, 0, 0, 0, 0)
+
+for _ in range(20):
+    msg = m.recv_match(type=[&quot;ATTITUDE&quot;, &quot;STATUSTEXT&quot;], blocking=True)
+    if msg.get_type() == &quot;ATTITUDE&quot;:
+        print(f&quot;roll {msg.roll:+.2f} pitch {msg.pitch:+.2f} yaw {msg.yaw:+.2f} rad&quot;)
+    else:
+        print(&quot;FC says:&quot;, msg.text)</code></pre>
+<h4 class="md-subheading">Шаг 2. Команда с подтверждением</h4>
+<pre class="cli-block"><code>def command(m, cmd, *params):
+    m.mav.command_long_send(m.target_system, m.target_component, cmd, 0, *params)
+    ack = m.recv_match(type=&quot;COMMAND_ACK&quot;, blocking=True, timeout=3)
+    if ack is None or ack.command != cmd:
+        raise RuntimeError(f&quot;no ACK for {cmd}&quot;)
+    if ack.result != mavutil.mavlink.MAV_RESULT_ACCEPTED:
+        raise RuntimeError(f&quot;command {cmd} rejected: result {ack.result}&quot;)
+
+m.set_mode(m.mode_mapping()[&quot;GUIDED&quot;])
+command(m, mavutil.mavlink.MAV_CMD_COMPONENT_ARM_DISARM, 1, 0, 0, 0, 0, 0, 0)
+command(m, mavutil.mavlink.MAV_CMD_NAV_TAKEOFF, 0, 0, 0, 0, 0, 0, 15)</code></pre>
+<h4 class="md-subheading">Шаг 3. Параметры</h4>
+<pre class="cli-block"><code>m.mav.param_request_read_send(m.target_system, m.target_component, b&quot;FS_THR_ENABLE&quot;, -1)
+p = m.recv_match(type=&quot;PARAM_VALUE&quot;, blocking=True)
+print(p.param_id, p.param_value)</code></pre>
+<h4 class="md-subheading">Шаг 4. Прослушать эфир</h4>
+<p>Запусти <code>mavproxy.py --master=tcp:127.0.0.1:5762</code> и команду <code>watch ATTITUDE</code>: видно живой поток сообщений. Это лучший способ понять, что именно летает по линии, прежде чем писать код.</p>
+<h4 class="md-subheading">Что должно получиться и что записать</h4>
+<ul><li><strong>Шаг 1.</strong> В SITL первый heartbeat приходит от системы 1, компонента 1 (автопилот). Частоту не принимай на веру — измерь: собери 50 сообщений <code>ATTITUDE</code> и раздели число интервалов (49) на разницу <code>time_boot_ms</code> первого и последнего (в секундах). Ожидаемо 9.5–10.5 Гц при интервале 100 000 мкс. Если <code>ATTITUDE</code> не приходит вовсе, команда интервала не дошла: на порту 5762 у Copter частота по умолчанию (<code>SR1_EXTRA1</code>, в 4.7 — <code>MAV2_EXTRA1</code>) равна 0. Около 4 Гц — это частота, которую MAVProxy сам запрашивает на своём порту 5760.</li><li><strong>Шаг 2.</strong> Повтори арм сразу после старта SITL, пока EKF не сошёлся. Придёт <code>COMMAND_ACK</code> с результатом 4 (<code>MAV_RESULT_FAILED</code>), а причина — в <code>STATUSTEXT</code> с префиксом <code>PreArm:</code>. Запиши обе строки: так выглядит отказ, который код обязан обработать. Коды результата: 0 — принято, 1 — временно отклонено, 2 — запрещено, 3 — не поддерживается, 4 — ошибка, 5 — выполняется.</li><li><strong>Шаг 3.</strong> Запись параметра — это <code>PARAM_SET</code> и ответный <code>PARAM_VALUE</code> с новым значением. Пока ответ не пришёл, параметр не записан:</li></ul>
+<pre class="cli-block"><code>m.mav.param_set_send(m.target_system, m.target_component, b&quot;FS_THR_ENABLE&quot;, 1,
+                     mavutil.mavlink.MAV_PARAM_TYPE_REAL32)
+p = m.recv_match(type=&quot;PARAM_VALUE&quot;, blocking=True, timeout=3)
+assert p and p.param_id == &quot;FS_THR_ENABLE&quot; and p.param_value == 1, p</code></pre>
+<ul><li><strong>Шаг 4.</strong> В <code>watch ATTITUDE</code> видна частота и живые углы. Сравни её с измеренной в шаге 1. В полёте из модуля «SITL» углы меняются на каждом манёвре — так проверяется, что поток живой, а не застывший.</li></ul>
+<p>Лабораторная засчитывается, когда частота <code>ATTITUDE</code> измерена (а не задана) и близка к 10 Гц, отказ арма и успешный арм разобраны по <code>COMMAND_ACK</code> и <code>STATUSTEXT</code>, параметр записан с проверкой ответа <code>PARAM_VALUE</code>, эфир просмотрен в MAVProxy.</p>
+
+<h2>Диагностика</h2>
+<div class="diag-groups"><article class="diag-item"><h4><strong>Симптом:</strong> <code>wait_heartbeat()</code> не возвращается</h4><ul><li>Возможная причина: неверный адрес/порт, не тот диалект, скорость UART.</li><li>Что сделать: проверить порт, baud (57600 или 115200 на телеметрии), что SITL запущен.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> команда «выполнилась», а аппарат ничего не сделал</h4><ul><li>Возможная причина: <code>COMMAND_ACK</code> не проверен, команда отклонена.</li><li>Что сделать: читать ACK и <code>STATUSTEXT</code>.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> телеметрия приходит редко</h4><ul><li>Возможная причина: дефолтные интервалы потоков.</li><li>Что сделать: <code>MAV_CMD_SET_MESSAGE_INTERVAL</code> для нужных сообщений.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> CRC-ошибки, сообщения «unknown»</h4><ul><li>Возможная причина: разные версии определений на двух сторонах.</li><li>Что сделать: обновить pymavlink/MAVSDK, использовать тот же диалект (ardupilotmega).</li></ul></article></div>
+
+<h2>Чек-лист</h2>
+<ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="comp-mavlink:0"><span>Понимаю system_id / component_id и heartbeat</span></label></li><li><label><input type="checkbox" data-check-id="comp-mavlink:1"><span>Каждая команда проверяется по <code>COMMAND_ACK</code></span></label></li><li><label><input type="checkbox" data-check-id="comp-mavlink:2"><span>Умею запросить телеметрию с нужной частотой</span></label></li><li><label><input type="checkbox" data-check-id="comp-mavlink:3"><span>Читаю и пишу параметры из кода</span></label></li><li><label><input type="checkbox" data-check-id="comp-mavlink:4"><span>Знаю, когда брать pymavlink, а когда MAVSDK</span></label></li></ul>
+
+<h2>Источники</h2>
+<ul class="refs"><li><a href="https://mavlink.io/en/" target="_blank" rel="noopener noreferrer">MAVLink Developer Guide</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://mavlink.io/en/messages/common.html" target="_blank" rel="noopener noreferrer">MAVLink common message set</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://github.com/ArduPilot/pymavlink" target="_blank" rel="noopener noreferrer">pymavlink — source code (GitHub)</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://mavsdk.mavlink.io/main/en/" target="_blank" rel="noopener noreferrer">MAVSDK — Documentation</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://ardupilot.org/dev/docs/mavlink-basics.html" target="_blank" rel="noopener noreferrer">MAVLink Interface — ArduPilot Dev</a> <span class="gc-tag" data-state="info">primary</span></li></ul>
+<h2>Проверь себя</h2>
+<uav-quiz src="../quiz/comp-mavlink.json" module="comp-mavlink"></uav-quiz>
+      </div>
+      <div class="module-done"><gc-button variant="secondary" data-done-toggle="comp-mavlink">Отметить как пройденный</gc-button></div>
+      <section class="related" aria-label="Смежные модули"><p class="gc-label gc-muted">Смежные модули</p><div class="gc-grid ref-grid"><a class="gc-card" href="ap-sitl.html"><strong>SITL: дрон без дрона</strong><div class="gc-card__meta"><span class="gc-tag" title="L2 — Интегратор">L2</span></div></a><a class="gc-card" href="comp-esp32.html"><strong>ESP32 и периферия</strong><div class="gc-card__meta"><span class="gc-tag" title="L2 — Интегратор">L2</span></div></a></div></section>
+      <nav class="pager" aria-label="Соседние модули" data-track-pager><a class="gc-card pager__prev" href="comp-intro.html"><span class="gc-label gc-muted">Назад · трек</span><br>Companion: зачем и где граница</a><a class="gc-card pager__next" href="mav-protocol.html"><span class="gc-label gc-muted">Дальше · трек</span><br>MAVLink изнутри: кадр, CRC, диалекты, подпись</a></nav><nav class="pager" aria-label="Соседние шаги пути ArduPilot" data-path-pager="ardupilot" hidden><a class="gc-card pager__prev" href="comp-intro.html?path=ardupilot"><span class="gc-label gc-muted">Назад · путь ArduPilot</span><br>Companion: зачем и где граница</a><a class="gc-card pager__next" href="mav-protocol.html?path=ardupilot"><span class="gc-label gc-muted">Дальше · шаг 46 из 69</span><br>MAVLink изнутри: кадр, CRC, диалекты, подпись</a></nav><nav class="pager" aria-label="Соседние шаги пути PX4" data-path-pager="px4" hidden><a class="gc-card pager__prev" href="comp-intro.html?path=px4"><span class="gc-label gc-muted">Назад · путь PX4</span><br>Companion: зачем и где граница</a><a class="gc-card pager__next" href="math-linalg-rot.html?path=px4"><span class="gc-label gc-muted">Дальше · шаг 11 из 36</span><br>Векторы, матрицы и вращения: язык ориентации</a></nav>
+    </article>
+  </main>
+  <footer class="gc-container site-footer gc-muted">
+    <p>Открытый курс · <a href="https://github.com/irreligious86/UAV-Education">исходники на GitHub</a> · <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">план развития</a> · <a href="../../curriculum/curriculum.html">для разработчика</a> · CC BY-NC-SA 4.0</p>
+  </footer>
+</body>
+</html>

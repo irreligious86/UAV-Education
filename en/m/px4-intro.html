@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en" data-theme="dark" data-lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Введение в PX4 — UAV Student</title>
+  <meta name="description" content="объяснить, когда PX4, а когда ArduPilot запустить SITL с Gazebo и QGC">
+  <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
+  <link rel="manifest" href="../../manifest.webmanifest">
+  <meta name="theme-color" content="#0b0f14">
+  <link rel="alternate" hreflang="ru" href="../../m/px4-intro.html">
+  <link rel="alternate" hreflang="uk" href="../../uk/m/px4-intro.html">
+  <link rel="alternate" hreflang="en" href="../../en/m/px4-intro.html">
+  <script>/* go to the visitor's chosen language before anything paints (assets/i18n.js) */(function(){try{var c=localStorage.getItem('uav-lang'),h=document.documentElement.getAttribute('data-lang');if(!c||c===h||/[?&]lang=keep\b/.test(location.search))return;var l=document.querySelector('link[rel=alternate][hreflang="'+c+'"]');if(l)location.replace(l.href+location.search+location.hash)}catch(e){}})();</script>
+  <link rel="stylesheet" href="../../lib/ground-control-ui/dist/ground-control.css">
+  <link rel="stylesheet" href="../../assets/site.css">
+  <script src="../../lib/ground-control-ui/dist/ground-control.js" defer></script>
+  <script src="../../assets/i18n/en.js"></script>
+  <script src="../../assets/i18n.js"></script>
+  <script src="../../assets/progress-store.js" defer></script>
+  <script src="../../assets/backend-config.js" defer></script>
+  <script src="../../assets/account.js" defer></script>
+  <script src="../../assets/grading.js" defer></script>
+  <script src="../../assets/app.js" defer></script>
+  <script src="../../assets/uav-quiz.js" defer></script>
+  <script src="../../assets/uav-tasks.js" defer></script>
+  <script src="../../assets/offline.js" defer></script>
+</head>
+<body class="gc-root" data-base="../" data-root="../../">
+  <header class="site-header">
+    <div class="gc-container site-header__inner">
+      <a class="site-brand" href="../index.html"><span class="site-brand__mark" aria-hidden="true">◆</span> UAV Student</a>
+      <nav class="gc-nav" aria-label="Разделы сайта">
+        <a href="../index.html" aria-current="page">Курс</a>
+        <a href="../ref/index.html">Справочник</a>
+        <a href="../pages/glossary.html">Глоссарий</a>
+        <a href="../pages/fails.html">Фейлы</a>
+        <a href="../pages/search.html">Поиск</a>
+        <a href="../pages/progress.html">Мой прогресс</a>
+      </nav>
+      <nav class="lang-switch" aria-label="Язык"><a class="gc-tag" href="../../m/px4-intro.html" data-lang-to="ru" hreflang="ru" lang="ru" title="Русский">RU</a><a class="gc-tag" href="../../uk/m/px4-intro.html" data-lang-to="uk" hreflang="uk" lang="uk" title="Українська">UK</a><a class="gc-tag" href="../../en/m/px4-intro.html" data-lang-to="en" hreflang="en" lang="en" title="English" aria-current="true" data-state="ok">EN</a></nav>
+    </div>
+  </header>
+  <main class="gc-container site-main">
+    <article class="module" data-module-page="px4-intro">
+      <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-px4">Электив: PX4</a><span>Введение в PX4</span></p>
+      <h1 class="module-title">Введение в PX4</h1>
+      <div class="module-tags"><span class="gc-tag" title="Уровень">L2 — Интегратор</span><span class="gc-tag">чтение 20 мин</span><span class="gc-tag">учёба ~2 ч</span><span class="gc-tag">PX4 1.14+</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ОСВОЕН</span></div>
+      <p class="gc-muted module-score" data-module-score></p>
+      <p class="module-lead">PX4 — второй большой открытый автопилот рядом с ArduPilot. Он вырос из академической среды и ближе к исследовательским задачам: модульная архитектура, строгие интерфейсы, глубокая интеграция с ROS 2. Модуль объясняет, чем PX4 отличается от ArduPilot на практике — наземная станция, режимы полёта, параметры, симуляция, требования к железу, — и когда его выбирать.</p>
+      <div class="gc-callout" data-state="ok"><strong>После модуля ты умеешь</strong><ul><li>объяснить, когда PX4, а когда ArduPilot</li><li>запустить SITL с Gazebo и QGC</li></ul></div><div class="gc-callout lab"><p class="gc-label gc-muted">Лабораторная</p><strong>SITL и первый лог</strong><p class="gc-muted lab__hint">Сдано, когда отмечены все пункты:</p><ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="px4-intro:lab:0"><span>SITL gz_x500 запущен, QGC подключена</span></label></li><li><label><input type="checkbox" data-check-id="px4-intro:lab:1"><span>Миссия из QGC выполнена</span></label></li><li><label><input type="checkbox" data-check-id="px4-intro:lab:2"><span>Лог .ulg открыт в Flight Review</span></label></li></ul></div><div class="path-pos gc-muted"><span class="gc-label">В пути</span><ul><li data-path-pos="px4"><a href="../path/px4.html">PX4</a>: шаг 14 из 36 → <a href="px4-architecture.html?path=px4">Архитектура PX4: модули и uORB</a></li></ul></div>
+      <div class="gc-prose module-body">
+<div class="gc-callout" data-state="caution" data-untranslated><strong>Модуль ещё не переведён.</strong> Ниже — оригинал (Русский). Прогресс и оценки общие для всех языков.</div>
+<h2>Теория</h2>
+<h4 class="md-subheading">PX4 против ArduPilot</h4>
+<p>Обе прошивки — полноценные автопилоты с навигацией, миссиями и companion-интерфейсами. Различия в характере:</p>
+<ul><li><strong>Экосистема.</strong> PX4 — Dronecode Foundation, стандарты (Pixhawk, MAVLink, MAVSDK), QGroundControl как «родная» GCS. ArduPilot — сообщество, Mission Planner, огромная база поддерживаемого железа.</li><li><strong>Архитектура.</strong> PX4 — модули, общающиеся через шину uORB; каждый модуль можно остановить и перезапустить на лету. ArduPilot — монолитнее, но с Lua-скриптами внутри.</li><li><strong>ROS 2.</strong> В PX4 — нативно через uXRCE-DDS: топики PX4 видны в ROS 2 напрямую. В ArduPilot (4.5+) — тоже нативный DDS-клиент (AP_DDS), но с меньшим набором топиков.</li><li><strong>Тюнинг.</strong> В PX4 хорошо проработан autotune мультиротора и самолёта, параметры структурированы по контурам (<code>MC_*RATE_*</code>, <code>MC_*_P</code>, <code>MPC_*</code>).</li></ul>
+<p>Правило выбора: исследования, компьютерное зрение и ROS 2 — PX4; поддержка экзотического железа, Lua на борту, большое сообщество практиков — ArduPilot. Летают оба.</p>
+<h4 class="md-subheading">Наземная станция</h4>
+<p>QGroundControl: прошивка, выбор airframe, калибровки, параметры, миссии, анализ логов (<code>.ulg</code>). Работает с ArduPilot тоже, но для PX4 это основной инструмент.</p>
+<h4 class="md-subheading">Режимы полёта мультиротора</h4>
+<ul><li><strong>Manual/Stabilized</strong> — стабилизация углов, газ ручной.</li><li><strong>Acro</strong> — угловые скорости.</li><li><strong>Altitude</strong> — удержание высоты.</li><li><strong>Position</strong> — удержание позиции по GPS; стик — скорость.</li><li><strong>Hold</strong>, <strong>Return</strong>, <strong>Land</strong>, <strong>Takeoff</strong>, <strong>Mission</strong>, <strong>Orbit</strong>, <strong>Follow Me</strong> — автономные.</li><li><strong>Offboard</strong> — управление с companion-компьютера.</li></ul>
+<p>Как и везде: режим выбирают по тому, каким датчикам доверяешь. Position без надёжного GPS не включится.</p>
+<h4 class="md-subheading">Параметры и логи</h4>
+<p>Параметры — через QGC или консоль <code>param set/show</code>. Логи ULog (<code>.ulg</code>) содержат все топики uORB, которые включены в логирование; анализ — Flight Review (веб) или <code>pyulog</code>.</p>
+<h4 class="md-subheading">Железо</h4>
+<p>Стандарт — Pixhawk-совместимые полётники (FMUv5/v6, H7). PX4 требовательнее к ресурсам, чем Betaflight, и F4-платы для него — редкость.</p>
+<h4 class="md-subheading">Симуляция</h4>
+<p><code>make px4_sitl gz_x500</code> поднимает SITL с Gazebo и моделью квадрокоптера x500; QGC подключается сама. Для ROS 2 это тот же стенд, что и для реального аппарата.</p>
+<h4 class="md-subheading">Первая настройка в QGroundControl: порядок, который нельзя нарушать</h4>
+<ol><li><strong>Прошивка</strong> (Firmware → PX4 stable) и <strong>airframe</strong> (Airframe → тип рамы: задаёт <code>CA_AIRFRAME</code>, <code>CA_ROTOR_COUNT</code>, геометрию и стартовые параметры). Смена airframe сбрасывает параметры.</li><li><strong>Датчики</strong>: компас (вращение по всем осям), гироскоп (неподвижно), акселерометр (6 положений), уровень горизонта; ориентация платы <code>SENS_BOARD_ROT</code>, внешнего компаса — автодетект.</li><li><strong>Радио</strong>: калибровка стиков, <code>RC_MAP_*</code>; режимы на тумблерах (Flight Modes), kill switch — обязателен на тестах.</li><li><strong>Моторы</strong>: Actuators — назначение выходов, протокол (DShot/PWM — по группам таймеров в Actuators, <code>PWM_MAIN_TIMx</code>), тест каждого <strong>без пропов</strong>, направление по схеме airframe.</li><li><strong>Питание</strong>: <code>BAT1_N_CELLS</code>, калибровка делителя напряжения и тока по мультиметру/ваттметру, пороги <code>BAT_LOW_THR</code>/<code>BAT_CRIT_THR</code>.</li><li><strong>Safety</strong>: действия при потере RC (<code>COM_RC_LOSS_T</code> = 0.5 с по умолчанию, <code>NAV_RCL_ACT</code>), потере данных (<code>NAV_DLL_ACT</code>), низкой АКБ (<code>COM_LOW_BAT_ACT</code>), геозона (<code>GF_*</code>), высота возврата <code>RTL_RETURN_ALT</code>.</li></ol>
+<p>Пред-армовые проверки сообщаются в QGC текстом («Preflight Fail: …»); <code>CBRK_*</code> circuit breakers отключают их только на стенде.</p>
+<h4 class="md-subheading">Параметры: как они устроены</h4>
+<p>Имена — группами по модулю: <code>MC_*</code> (контроллеры мультиротора), <code>MPC_*</code> (позиция), <code>EKF2_*</code>, <code>IMU_*</code>, <code>COM_*</code> (commander/failsafe), <code>NAV_*</code>, <code>RTL_*</code>, <code>BAT*</code>, <code>CA_*</code> (control allocation), <code>SER_*</code>/<code>MAV_*</code>/<code>UXRCE_*</code> (порты). Полный справочник с диапазонами и умолчаниями — «Parameter Reference» в документации (генерируется из исходников, как у ArduPilot). Экспорт/импорт — QGC → Parameters → Tools (файл <code>.params</code>), версионируется (модуль «CI»).</p>
+<h4 class="md-subheading">Числа для ориентира (умолчания, мультиротор)</h4>
+<p>Внутренний контур на <code>IMU_GYRO_RATEMAX</code> = 400 Гц (до 1 кГц на быстрых платах); фильтр гироскопа <code>IMU_GYRO_CUTOFF</code> = 40 Гц, D-term <code>IMU_DGYRO_CUTOFF</code> = 20 Гц — заметно ниже Betaflight: PX4 рассчитан на более крупные и медленные аппараты, для 5&quot; их поднимают (80–120 / 40–60) вместе с notch по ESC (<code>IMU_GYRO_DNF_EN</code>, нужен DShot-телеметрия). Максимальный наклон <code>MPC_TILTMAX_AIR</code> = 45°, в ручных режимах <code>MPC_MAN_TILT_MAX</code> = 35°; максимальная скорость <code>MPC_XY_VEL_MAX</code> = 12 м/с.</p>
+<h4 class="md-subheading">Логи ULog и Flight Review</h4>
+<p>Лог включается при арме (<code>SDLOG_MODE</code>), содержит топики uORB с заданной частотой (<code>SDLOG_PROFILE</code> — профили: по умолчанию, высокая частота для тюнинга, ...). Flight Review (веб) рисует: отклик rate (setpoint vs actual), спектр вибраций (acceleration power spectral density — по нему видно моторы и резонансы), оценку GPS/EKF (innovation test ratios — те же «ворота», что в модуле про Калмана), загрузку CPU и RAM, потери RC. <code>pyulog</code> (<code>ulog2csv</code>) — для Python-анализа (модуль «Python для данных»).</p>
+<figure class="diagram" data-diagram="px4-qgc-order"><div class="diagram__svg"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 200" width="100%" role="img" aria-labelledby="t" style="max-width:720px;display:block;margin:0 auto"><title id="t">Первая настройка PX4 в QGroundControl</title><style>text{font-family: var(--gc-font-mono, ui-monospace, Menlo, monospace); font-size: 12px;fill:currentColor} .m{fill:var(--gc-ink-muted, #8a93a3)} .a{fill:var(--gc-accent-hud, #5ef1d2)} .w{fill:var(--gc-signal-amber, #f0b24c)} .d{fill:var(--gc-signal-red, #e8636b)} .box{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:currentColor;stroke-width:1.2} .boxa{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6} .ln{stroke:currentColor;stroke-width:1.2;fill:none} .lna{stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6;fill:none} .lnm{stroke:var(--gc-ink-muted, #8a93a3);stroke-width:1;fill:none;stroke-dasharray:4 3} .t{font-size:11px} .b{font-weight:600}</style><defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker><marker id="ara" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--gc-accent-hud, #5ef1d2)"/></marker></defs><rect class="boxa" x="10.0" y="30" width="111.2" height="48" rx="6"/><text x="65.6" y="51.0" text-anchor="middle" class="b" style="font-size:10.5px">Прошивка</text><text x="65.6" y="65.0" text-anchor="middle" class="b" style="font-size:10.5px">+ airframe</text><rect class="box" x="157.2" y="30" width="111.2" height="48" rx="6"/><text x="212.79999999999998" y="51.0" text-anchor="middle" style="font-size:10.5px">Датчики</text><text x="212.79999999999998" y="65.0" text-anchor="middle" style="font-size:10.5px">компас, accel</text><rect class="box" x="304.4" y="30" width="111.2" height="48" rx="6"/><text x="360.0" y="51.0" text-anchor="middle" style="font-size:10.5px">Радио</text><text x="360.0" y="65.0" text-anchor="middle" style="font-size:10.5px">режимы, kill</text><rect class="box" x="451.59999999999997" y="30" width="111.2" height="48" rx="6"/><text x="507.2" y="51.0" text-anchor="middle" style="font-size:10.5px">Моторы</text><text x="507.2" y="65.0" text-anchor="middle" style="font-size:10.5px">без пропов</text><rect class="box" x="598.8" y="30" width="111.2" height="48" rx="6"/><text x="654.4" y="51.0" text-anchor="middle" style="font-size:10.5px">Питание</text><text x="654.4" y="65.0" text-anchor="middle" style="font-size:10.5px">делитель, пороги</text><rect class="boxa" x="598.8" y="130" width="111.2" height="48" rx="6"/><text x="654.4" y="151.0" text-anchor="middle" class="b" style="font-size:10.5px">Safety: RC loss,</text><text x="654.4" y="165.0" text-anchor="middle" class="b" style="font-size:10.5px">АКБ, геозона</text><path class="ln" d="M121.2 54.0 L157.2 54.0" marker-end="url(#ar)"/><path class="ln" d="M268.4 54.0 L304.4 54.0" marker-end="url(#ar)"/><path class="ln" d="M415.59999999999997 54.0 L451.59999999999997 54.0" marker-end="url(#ar)"/><path class="ln" d="M562.8 54.0 L598.8 54.0" marker-end="url(#ar)"/><path class="ln" d="M654.4 78 L654.4 130" marker-end="url(#ar)"/><text x="10" y="150" text-anchor="start" class="m t">Смена airframe</text><text x="10" y="164" text-anchor="start" class="m t">сбрасывает параметры</text></svg></div><figcaption class="gc-muted">Порядок первой настройки PX4 в QGroundControl.</figcaption><div class="diagram__hint">Схему можно прокрутить по горизонтали</div></figure>
+
+<h2>Практика</h2>
+<h4 class="md-subheading">Шаг 1. SITL и QGC</h4>
+<pre class="cli-block"><code>git clone https://github.com/PX4/PX4-Autopilot.git --recursive
+cd PX4-Autopilot
+bash ./Tools/setup/ubuntu.sh
+make px4_sitl gz_x500</code></pre>
+<p>В консоли PX4 (<code>pxh&gt;</code>): <code>commander takeoff</code>, <code>commander land</code>. QGC подключится по UDP сама.</p>
+<h4 class="md-subheading">Шаг 2. Режимы</h4>
+<p>В QGC переключи Position → Altitude → Stabilized на симуляторе, наблюдай, как меняется реакция на стик (в QGC есть виртуальный джойстик).</p>
+<h4 class="md-subheading">Шаг 3. Параметры и лог</h4>
+<p><code>param show MPC_THR_HOVER</code> в консоли; после полёта скачай <code>.ulg</code> из QGC (Analyze → Log Download) и открой в Flight Review.</p>
+<h4 class="md-subheading">Что должно получиться и что записать</h4>
+<ul><li><strong>Шаг 1.</strong> Первая сборка и первый запуск Gazebo идут долго: сборка — минуты, модели мира скачиваются при первом старте. Дальше запуск занимает секунды. <code>commander takeoff</code> поднимает x500 на высоту взлёта <code>MIS_TAKEOFF_ALT</code> (по умолчанию 2.5 м) и держит её. QGC подключается сама по UDP. Если связи нет, проверь, что QGC запущена на той же машине и порт 14550 не занят другим клиентом.</li><li><strong>Шаг 2.</strong> В Position отпущенные стики держат точку. В Altitude держится только высота, и аппарат сносит. В Stabilized стик задаёт угол, а высоту держишь ты. Запиши одной строкой на режим, что держит автопилот и что пилот, — это главный вывод модуля.</li><li><strong>Шаг 3.</strong> Миссия в QGC (Plan): взлёт, три точки на 20 м, Return. <code>.ulg</code> в SITL лежит в <code>build/px4_sitl_default/rootfs/log/&lt;дата&gt;/</code>. В Flight Review найди графики угла по крену и тангажу (оценка против уставки) и позиции против уставки. Расхождение больше нескольких градусов в SITL значит, что что-то не так с настройкой, а не с ветром: ветра в SITL нет, пока ты его не включишь.</li></ul>
+<h4 class="md-subheading">Лабораторная</h4>
+<p>Взлёт, короткая миссия из QGC и посадка в SITL; лог загружен в Flight Review, найдены графики attitude и position setpoint против фактических.</p>
+<p>Лабораторная засчитывается, когда SITL <code>gz_x500</code> запущен и QGC подключена, миссия выполнена до посадки, лог открыт в Flight Review и в отчёте есть два скриншота (угол и позиция: уставка против факта) с одной фразой вывода к каждому.</p>
+
+<h2>Диагностика</h2>
+<div class="diag-groups"><article class="diag-item"><h4><strong>Симптом:</strong> QGC не подключается к SITL</h4><ul><li>Возможная причина: другой экземпляр PX4 или занятый UDP-порт.</li><li>Что сделать: закрыть старые процессы, перезапустить SITL.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> Position не включается</h4><ul><li>Возможная причина: нет GPS-фикса (в SITL — ждать инициализации).</li><li>Что сделать: подождать «ready for takeoff» в QGC.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> прошивка не ставится на F4-плату</h4><ul><li>Возможная причина: PX4 не поддерживает это железо.</li><li>Что сделать: Pixhawk-совместимый FMUv5/v6 или ArduPilot.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> <code>make</code> падает на зависимостях</h4><ul><li>Возможная причина: не выполнен <code>ubuntu.sh</code>.</li><li>Что сделать: запустить скрипт настройки окружения, перелогиниться.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> «Preflight Fail: Compass sensor 0 missing» / «Accel inconsistent»</h4><ul><li>Возможная причина: не выполнена калибровка или датчик не найден (ориентация, шлейф).</li><li>Что сделать: калибровать по порядку, проверить <code>SENS_BOARD_ROT</code>, лог <code>dmesg</code> в консоли.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> Position mode не включается</h4><ul><li>Возможная причина: EKF не доверяет GPS (<code>EKF2_GPS_CHECK</code>), нет fix, компас врёт.</li><li>Что сделать: QGC → MAVLink Console <code>ekf2 status</code>, число спутников, калибровка компаса в поле.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> в Flight Review высокий уровень вибраций</h4><ul><li>Возможная причина: механика, жёсткое крепление FC.</li><li>Что сделать: модуль «Рама и вибрации», демпферы, балансировка.</li></ul></article></div>
+
+<h2>Чек-лист</h2>
+<ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="px4-intro:0"><span>Могу объяснить, когда PX4, а когда ArduPilot</span></label></li><li><label><input type="checkbox" data-check-id="px4-intro:1"><span>SITL с Gazebo запущен, QGC подключена</span></label></li><li><label><input type="checkbox" data-check-id="px4-intro:2"><span>Режимы Stabilized/Altitude/Position попробованы</span></label></li><li><label><input type="checkbox" data-check-id="px4-intro:3"><span>Лог .ulg открыт в Flight Review</span></label></li></ul>
+
+<h2>Источники</h2>
+<ul class="refs"><li><a href="https://docs.px4.io/main/en/flight_modes_mc/" target="_blank" rel="noopener noreferrer">PX4 User Guide — Flight Modes (Multicopter)</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://docs.px4.io/main/en/simulation/" target="_blank" rel="noopener noreferrer">PX4 User Guide — Simulation</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://github.com/PX4/PX4-Autopilot" target="_blank" rel="noopener noreferrer">PX4-Autopilot — source code (GitHub)</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://docs.qgroundcontrol.com/Stable_V5.0/en/" target="_blank" rel="noopener noreferrer">QGroundControl — User Guide</a> <span class="gc-tag" data-state="info">primary</span></li></ul>
+<h2>Проверь себя</h2>
+<uav-quiz src="../quiz/px4-intro.json" module="px4-intro"></uav-quiz>
+      </div>
+      <div class="module-done"><gc-button variant="secondary" data-done-toggle="px4-intro">Отметить как пройденный</gc-button></div>
+      <section class="related" aria-label="Смежные модули"><p class="gc-label gc-muted">Смежные модули</p><div class="gc-grid ref-grid"><a class="gc-card" href="ap-intro.html"><strong>Введение в ArduPilot</strong><div class="gc-card__meta"><span class="gc-tag" title="L2 — Интегратор">L2</span></div></a><a class="gc-card" href="px4-architecture.html"><strong>Архитектура PX4: модули и uORB</strong><div class="gc-card__meta"><span class="gc-tag" title="L3 — Специалист">L3</span></div></a></div></section>
+      <nav class="pager" aria-label="Соседние модули" data-track-pager><a class="gc-card pager__next" href="px4-architecture.html"><span class="gc-label gc-muted">Дальше · трек</span><br>Архитектура PX4: модули и uORB</a></nav><nav class="pager" aria-label="Соседние шаги пути PX4" data-path-pager="px4" hidden><a class="gc-card pager__prev" href="math-prob-est.html?path=px4"><span class="gc-label gc-muted">Назад · путь PX4</span><br>Вероятность и оценивание: шум, гауссианы, слияние</a><a class="gc-card pager__next" href="px4-architecture.html?path=px4"><span class="gc-label gc-muted">Дальше · шаг 15 из 36</span><br>Архитектура PX4: модули и uORB</a></nav>
+    </article>
+  </main>
+  <footer class="gc-container site-footer gc-muted">
+    <p>Открытый курс · <a href="https://github.com/irreligious86/UAV-Education">исходники на GitHub</a> · <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">план развития</a> · <a href="../../curriculum/curriculum.html">для разработчика</a> · CC BY-NC-SA 4.0</p>
+  </footer>
+</body>
+</html>

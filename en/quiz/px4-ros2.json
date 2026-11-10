@@ -1,0 +1,94 @@
+{
+  "module": "px4-ros2",
+  "pass": 80,
+  "questions": [
+    {
+      "q": "Что делает MicroXRCEAgent?",
+      "options": [
+        "Калибрует датчики по ROS 2",
+        "Мост uORB ↔ DDS",
+        "Летает",
+        "Заменяет QGC"
+      ],
+      "answer": 1,
+      "explain": "Клиент — на полётнике, агент — на companion/ПК."
+    },
+    {
+      "q": "Какое сообщение должно идти потоком до перехода в Offboard?",
+      "options": [
+        "TrajectorySetpoint",
+        "OffboardControlMode",
+        "VehicleAttitude с текущей ориентацией",
+        "VehicleCommand"
+      ],
+      "answer": 1,
+      "explain": "Иначе PX4 не переключится и не заармится в Offboard."
+    },
+    {
+      "q": "При какой частоте OffboardControlMode PX4 выходит из Offboard?",
+      "options": [
+        "Ниже ~2 Гц",
+        "Ниже 50 Гц",
+        "Ниже 0.1 Гц",
+        "Никогда"
+      ],
+      "answer": 0,
+      "explain": "Таймаут — защита от замолчавшего companion."
+    },
+    {
+      "q": "Что важно про ветку px4_msgs?",
+      "options": [
+        "Только ветка main",
+        "Под версию PX4",
+        "Любая",
+        "Не нужна"
+      ],
+      "answer": 1,
+      "explain": "Иначе несовпадение определений сообщений."
+    },
+    {
+      "q": "Как в ROS 2 называются топики из PX4?",
+      "options": [
+        "/px4/*",
+        "/fmu/out/*",
+        "/uorb/*",
+        "/mavlink/*"
+      ],
+      "answer": 1,
+      "explain": "В PX4 — /fmu/in/*."
+    },
+    {
+      "q": "Высота 3 м в TrajectorySetpoint (NED) — это Z = …",
+      "options": [
+        "+3",
+        "−3",
+        "0",
+        "+300"
+      ],
+      "answer": 1,
+      "explain": "Z вниз."
+    },
+    {
+      "q": "Z = −5 в TrajectorySetpoint означает:",
+      "options": [
+        "5 м вниз",
+        "5 м вверх",
+        "Ошибку",
+        "5 м/с вниз"
+      ],
+      "answer": 1,
+      "explain": "NED: ось Z направлена вниз."
+    },
+    {
+      "q": "Какой QoS нужен подписчику на /fmu/out/*?",
+      "options": [
+        "RELIABLE",
+        "BEST_EFFORT",
+        "Только TRANSIENT_LOCAL",
+        "Любой"
+      ],
+      "answer": 1,
+      "explain": "Несовпадение QoS = топик «молчит»."
+    }
+  ]
+}

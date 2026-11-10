@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="uk" data-theme="dark" data-lang="uk">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Векторы, матрицы и вращения: язык ориентации — UAV Student</title>
+  <meta name="description" content="считать скалярное и векторное произведения и объяснять их физический смысл строить матрицу поворота из углов Эйлера и обратно, понимать gimbal lock умножать кватернионы, поворачивать вектор, делать малоугловое обновление переводить векторы между NED/FRD и ENU/FLU">
+  <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
+  <link rel="manifest" href="../../manifest.webmanifest">
+  <meta name="theme-color" content="#0b0f14">
+  <link rel="alternate" hreflang="ru" href="../../m/math-linalg-rot.html">
+  <link rel="alternate" hreflang="uk" href="../../uk/m/math-linalg-rot.html">
+  <link rel="alternate" hreflang="en" href="../../en/m/math-linalg-rot.html">
+  <script>/* go to the visitor's chosen language before anything paints (assets/i18n.js) */(function(){try{var c=localStorage.getItem('uav-lang'),h=document.documentElement.getAttribute('data-lang');if(!c||c===h||/[?&]lang=keep\b/.test(location.search))return;var l=document.querySelector('link[rel=alternate][hreflang="'+c+'"]');if(l)location.replace(l.href+location.search+location.hash)}catch(e){}})();</script>
+  <link rel="stylesheet" href="../../lib/ground-control-ui/dist/ground-control.css">
+  <link rel="stylesheet" href="../../assets/site.css">
+  <script src="../../lib/ground-control-ui/dist/ground-control.js" defer></script>
+  <script src="../../assets/i18n/uk.js"></script>
+  <script src="../../assets/i18n.js"></script>
+  <script src="../../assets/progress-store.js" defer></script>
+  <script src="../../assets/backend-config.js" defer></script>
+  <script src="../../assets/account.js" defer></script>
+  <script src="../../assets/grading.js" defer></script>
+  <script src="../../assets/app.js" defer></script>
+  <script src="../../assets/uav-quiz.js" defer></script>
+  <script src="../../assets/uav-tasks.js" defer></script>
+  <script src="../../assets/offline.js" defer></script>
+</head>
+<body class="gc-root" data-base="../" data-root="../../">
+  <header class="site-header">
+    <div class="gc-container site-header__inner">
+      <a class="site-brand" href="../index.html"><span class="site-brand__mark" aria-hidden="true">◆</span> UAV Student</a>
+      <nav class="gc-nav" aria-label="Разделы сайта">
+        <a href="../index.html" aria-current="page">Курс</a>
+        <a href="../ref/index.html">Справочник</a>
+        <a href="../pages/glossary.html">Глоссарий</a>
+        <a href="../pages/fails.html">Фейлы</a>
+        <a href="../pages/search.html">Поиск</a>
+        <a href="../pages/progress.html">Мой прогресс</a>
+      </nav>
+      <nav class="lang-switch" aria-label="Язык"><a class="gc-tag" href="../../m/math-linalg-rot.html" data-lang-to="ru" hreflang="ru" lang="ru" title="Русский">RU</a><a class="gc-tag" href="../../uk/m/math-linalg-rot.html" data-lang-to="uk" hreflang="uk" lang="uk" title="Українська" aria-current="true" data-state="ok">UK</a><a class="gc-tag" href="../../en/m/math-linalg-rot.html" data-lang-to="en" hreflang="en" lang="en" title="English">EN</a></nav>
+    </div>
+  </header>
+  <main class="gc-container site-main">
+    <article class="module" data-module-page="math-linalg-rot">
+      <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-math">Электив: Математический фундамент</a><span>Векторы, матрицы и вращения: язык ориентации</span></p>
+      <h1 class="module-title">Векторы, матрицы и вращения: язык ориентации</h1>
+      <div class="module-tags"><span class="gc-tag" title="Уровень">L2 — Интегратор</span><span class="gc-tag">чтение 45 мин</span><span class="gc-tag">учёба ~4 ч</span><span class="gc-tag">ArduPilot · PX4 · Betaflight</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ОСВОЕН</span></div>
+      <p class="gc-muted module-score" data-module-score></p>
+      <p class="module-lead">Всё, что автопилот говорит об ориентации — углы на OSD, кватернион в <code>ATT</code>/<code>AHRS</code>, вектор гравитации в осях борта, «куда смотрит камера» — это несколько операций линейной алгебры. Модуль даёт ровно их: вектор как стрелка и как столбец чисел, скалярное и векторное произведения, матрица поворота как «куда ушли оси», композиция поворотов и почему порядок важен, углы Эйлера и их вырождение, кватернион как компактная и невырожденная запись того же поворота, малые повороты и производная ориентации, и наконец — четыре системы координат, между которыми путаются чаще всего (NED/FRD у ArduPilot и PX4, ENU/FLU у ROS). Лабораторная: библиотека <code>rot.py</code> из 12 функций, проверенная против <code>scipy.spatial.transform</code>. Не уверены, нужен ли вам этот электив — пройдите [входной тест из 10 задач](../pages/prerequisites.html).</p>
+      <div class="gc-callout" data-state="ok"><strong>После модуля ты умеешь</strong><ul><li>считать скалярное и векторное произведения и объяснять их физический смысл</li><li>строить матрицу поворота из углов Эйлера и обратно, понимать gimbal lock</li><li>умножать кватернионы, поворачивать вектор, делать малоугловое обновление</li><li>переводить векторы между NED/FRD и ENU/FLU</li></ul></div><p class="gc-muted">Перед этим модулем: <a href="f-physics.html">Как летает мультиротор</a></p><div class="gc-callout lab"><p class="gc-label gc-muted">Лабораторная</p><strong>Библиотека rot.py</strong><p class="gc-muted lab__hint">Сдано, когда отмечены все пункты:</p><ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="math-linalg-rot:lab:0"><span>12 функций rot.py проходят автотест против scipy на 1000 случайных углов</span></label></li><li><label><input type="checkbox" data-check-id="math-linalg-rot:lab:1"><span>Гравитация в осях борта посчитана и объяснена независимость от рысканья</span></label></li><li><label><input type="checkbox" data-check-id="math-linalg-rot:lab:2"><span>Показана некоммутативность поворотов и малость разницы для малых углов</span></label></li><li><label><input type="checkbox" data-check-id="math-linalg-rot:lab:3"><span>Интегрирование гироскопа: возврат через 2π с, эффект шага и нормировки</span></label></li></ul></div><div class="path-pos gc-muted"><span class="gc-label">В пути</span><ul><li data-path-pos="ardupilot"><a href="../path/ardupilot.html">ArduPilot</a>: шаг 20 из 69 → <a href="math-ode-dyn.html?path=ardupilot">Дифференциальные уравнения и динамика: от мотора до контура</a></li><li data-path-pos="px4"><a href="../path/px4.html">PX4</a>: шаг 11 из 36 → <a href="math-ode-dyn.html?path=px4">Дифференциальные уравнения и динамика: от мотора до контура</a></li></ul></div>
+      <div class="gc-prose module-body">
+<div class="gc-callout" data-state="caution" data-untranslated><strong>Модуль ещё не переведён.</strong> Ниже — оригинал (Русский). Прогресс и оценки общие для всех языков.</div>
+<h2>Теория</h2>
+<h4 class="md-subheading">Вектор: стрелка и числа</h4>
+<p>Вектор — это стрелка (направление и длина), а столбец чисел — её координаты <strong>в выбранном базисе</strong>. Одна и та же стрелка «вниз к центру Земли» в базисе NED записывается как (0, 0, 9.81), а в осях борта, наклонённого на 30° по крену, — как (0, 4.9, 8.5). Поэтому у каждого вектора в коде должна быть подпись, в каких осях он выражен: <code>g_ned</code>, <code>a_body</code>. Большинство ошибок ориентации — это вектор в одном базисе, который использовали как будто в другом.</p>
+<p>Длина: |v| = √(v·v). Единичный вектор: v/|v|. Базис — три взаимно перпендикулярных единичных вектора; правый, если <strong>x × y = z</strong> (большой палец x, указательный y, средний z правой руки).</p>
+<h4 class="md-subheading">Скалярное и векторное произведения</h4>
+<p><strong>Скалярное</strong> a·b = |a||b|cos θ = aₓbₓ + a_yb_y + a_zb_z. Это «сколько a вдоль b». Применения: проекция тяги на вертикаль (T·ẑ), угол между векторами, проверка перпендикулярности (= 0). Угол наклона аппарата от вертикали: cos θ = g_body·(0,0,1)/|g_body|.</p>
+<p><strong>Векторное</strong> a × b — вектор, перпендикулярный обоим, длиной |a||b|sin θ, направление по правилу правой руки. Компоненты: (a_yb_z − a_zb_y, a_zbₓ − aₓb_z, aₓb_y − a_yb_x). Применения: момент силы M = r × F (плечо на силу — именно так считаются моменты моторов в миксере), угловая скорость точки v = ω × r, нормаль к плоскости. Антикоммутативно: b × a = −(a × b).</p>
+<h4 class="md-subheading">Матрица поворота</h4>
+<p>Поворот — линейное преобразование, сохраняющее длины и углы. Его матрица R (3×3) обладает свойствами: Rᵀ R = I (столбцы ортонормированы), det R = +1. Множество таких матриц — группа SO(3). Самое полезное прочтение: <strong>столбцы R — это оси повёрнутого базиса, записанные в исходном</strong>. Если R_nb переводит из body в NED (v_ned = R_nb · v_body), то первый столбец R_nb — куда смотрит нос аппарата в NED-координатах.</p>
+<p>Обратный поворот — транспонирование: R⁻¹ = Rᵀ. Поэтому v_body = R_nbᵀ · v_ned, и никаких обращений матриц в коде ориентации быть не должно.</p>
+<p>Элементарные повороты вокруг осей (угол φ, правило правой руки — положительный поворот против часовой стрелки, если смотреть с конца оси):</p>
+<pre class="cli-block"><code>Rx(φ) = [[1, 0, 0], [0, cos φ, −sin φ], [0, sin φ, cos φ]]
+Ry(θ) = [[cos θ, 0, sin θ], [0, 1, 0], [−sin θ, 0, cos θ]]
+Rz(ψ) = [[cos ψ, −sin ψ, 0], [sin ψ, cos ψ, 0], [0, 0, 1]]</code></pre>
+<h4 class="md-subheading">Композиция: порядок важен</h4>
+<p>Повороты не коммутируют: Rx(90°)·Ry(90°) ≠ Ry(90°)·Rx(90°) — убедитесь на кубике или в лабораторной. Правило чтения произведения R = A·B·v: сначала к вектору применяется B, потом A. Аэрокосмическая последовательность углов Эйлера «yaw → pitch → roll» (ZYX) даёт матрицу из body в NED:</p>
+<p>R_nb = Rz(ψ) · Ry(θ) · Rx(φ)</p>
+<p>Прочитать это надо так: вектор в осях борта сначала «раскручивают» по крену, потом по тангажу, потом по рысканью — и получают его в NED. В коде ArduPilot это <code>Matrix3f::from_euler(roll, pitch, yaw)</code>, в PX4 — <code>matrix::Dcmf(matrix::Eulerf(...))</code>.</p>
+<figure class="diagram" data-diagram="frames-rotations"><div class="diagram__svg"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 258" width="100%" role="img" aria-labelledby="t" style="max-width:720px;display:block;margin:0 auto"><title id="t">Системы координат NED/FRD и ENU/FLU</title><style>text{font-family: var(--gc-font-mono, ui-monospace, Menlo, monospace); font-size: 12px;fill:currentColor} .m{fill:var(--gc-ink-muted, #8a93a3)} .a{fill:var(--gc-accent-hud, #5ef1d2)} .w{fill:var(--gc-signal-amber, #f0b24c)} .d{fill:var(--gc-signal-red, #e8636b)} .box{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:currentColor;stroke-width:1.2} .boxa{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6} .ln{stroke:currentColor;stroke-width:1.2;fill:none} .lna{stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6;fill:none} .lnm{stroke:var(--gc-ink-muted, #8a93a3);stroke-width:1;fill:none;stroke-dasharray:4 3} .t{font-size:11px} .b{font-weight:600}</style><defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker><marker id="ara" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--gc-accent-hud, #5ef1d2)"/></marker></defs><text x="16" y="16" text-anchor="start" class="m t">Системы координат: NED/FRD (ArduPilot, PX4, MAVLink) и ENU/FLU (ROS, REP-103)</text><text x="100" y="28" text-anchor="middle" class="b">NED — мировая</text><path class="lna" d="M100 120 L170 120" marker-end="url(#ara)"/><text x="178" y="114" text-anchor="start" class="t">N (x)</text><path class="lna" d="M100 120 L55 80" marker-end="url(#ara)"/><text x="47" y="74" text-anchor="end" class="t">E (y)</text><path class="lna" d="M100 120 L100 180" marker-end="url(#ara)"/><text x="108" y="194" text-anchor="start" class="t">D (z) ↓</text><text x="265" y="28" text-anchor="middle" class="b">FRD — борт</text><path class="lna" d="M265 120 L335 120" marker-end="url(#ara)"/><text x="343" y="114" text-anchor="start" class="t">F (x)</text><path class="lna" d="M265 120 L220 80" marker-end="url(#ara)"/><text x="212" y="74" text-anchor="end" class="t">R (y)</text><path class="lna" d="M265 120 L265 180" marker-end="url(#ara)"/><text x="273" y="194" text-anchor="start" class="t">D (z) ↓</text><text x="430" y="28" text-anchor="middle" class="b">ENU — мировая</text><path class="ln" d="M430 120 L500 120" marker-end="url(#ar)"/><text x="508" y="114" text-anchor="start" class="t">E (x)</text><path class="ln" d="M430 120 L385 80" marker-end="url(#ar)"/><text x="377" y="74" text-anchor="end" class="t">N (y)</text><path class="ln" d="M430 120 L430 60" marker-end="url(#ar)"/><text x="438" y="54" text-anchor="start" class="t">U (z)</text><text x="595" y="28" text-anchor="middle" class="b">FLU — борт</text><path class="ln" d="M595 120 L665 120" marker-end="url(#ar)"/><text x="673" y="114" text-anchor="start" class="t">F (x)</text><path class="ln" d="M595 120 L550 80" marker-end="url(#ar)"/><text x="542" y="74" text-anchor="end" class="t">L (y)</text><path class="ln" d="M595 120 L595 60" marker-end="url(#ar)"/><text x="603" y="54" text-anchor="start" class="t">U (z)</text><text x="16" y="212" text-anchor="start" class="m t">Борт: F — нос, R/L — правое/левое крыло, D/U — вниз/вверх.</text><text x="16" y="228" text-anchor="start" class="m t">FRD → FLU: (x, y, z) → (x, −y, −z).   NED → ENU: (n, e, d) → (e, n, −d).   ψ_enu = 90° − ψ_ned.</text><text x="16" y="244" text-anchor="start" class="m t">R_nb = Rz(ψ)·Ry(θ)·Rx(φ): к вектору в FRD сначала применяется крен, потом тангаж, потом рысканье → NED.</text></svg></div><figcaption class="gc-muted">Системы координат: NED и FRD (ArduPilot, PX4) против ENU и FLU (ROS). Один и тот же аппарат, разные подписи осей — и разные знаки у «вверх».</figcaption><div class="diagram__hint">Схему можно прокрутить по горизонтали</div></figure>
+<h4 class="md-subheading">Углы Эйлера и их вырождение</h4>
+<p>Углы (крен φ, тангаж θ, рысканье ψ) удобны человеку и бесполезны как внутреннее представление: при θ = ±90° оси крена и рысканья совпадают (gimbal lock), и из матрицы нельзя однозначно восстановить φ и ψ — только их сумму или разность. Диапазоны: φ ∈ (−180°, 180°], θ ∈ [−90°, 90°], ψ ∈ [0°, 360°). Извлечение из матрицы: θ = −asin(R₃₁), φ = atan2(R₃₂, R₃₃), ψ = atan2(R₂₁, R₁₁) — <code>atan2</code>, а не <code>atan</code>, иначе потеряете квадрант. Для акробатики, вертикального зависания крыла и любой оценки состояния углы Эйлера внутри фильтра не используют.</p>
+<h4 class="md-subheading">Кватернион</h4>
+<p>Кватернион q = (w, x, y, z) = (cos(α/2), <strong>n</strong>·sin(α/2)) кодирует поворот на угол α вокруг единичной оси <strong>n</strong>. Четыре числа вместо девяти, одна нормировка вместо шести ортогональных условий, и никакого вырождения. Операции:</p>
+<ul><li>Сопряжённый q* = (w, −x, −y, −z) — обратный поворот (для единичного кватерниона).</li><li>Произведение q₁ ⊗ q₂ — композиция поворотов (сначала q₂, потом q₁, как у матриц, при соглашении Гамильтона):</li></ul>
+<p>w = w₁w₂ − x₁x₂ − y₁y₂ − z₁z₂; x = w₁x₂ + x₁w₂ + y₁z₂ − z₁y₂; y = w₁y₂ − x₁z₂ + y₁w₂ + z₁x₂; z = w₁z₂ + x₁y₂ − y₁x₂ + z₁w₂.</p>
+<ul><li>Поворот вектора: v&#x27; = q ⊗ (0, v) ⊗ q*. На практике быстрее через матрицу: R(q) с элементами R₁₁ = 1 − 2(y² + z²), R₁₂ = 2(xy − wz), R₁₃ = 2(xz + wy) и так далее.</li><li>q и −q — один и тот же поворот (двойное накрытие). Поэтому при сравнении кватернионов и при интерполяции смотрят на знак скалярного произведения.</li><li>После каждого обновления — нормировка, иначе ошибки округления накапливаются и «поворот» начинает масштабировать.</li></ul>
+<p>ArduPilot хранит ориентацию в EKF как кватернион (<code>Quaternion</code> в <code>AP_Math</code>), в логе — <code>XKQ</code>; PX4 — <code>vehicle_attitude.q</code> в порядке (w, x, y, z). ROS 2 (<code>geometry_msgs/Quaternion</code>) — порядок <strong>(x, y, z, w)</strong>. Перепутанный порядок — классическая ошибка интеграции companion.</p>
+<h4 class="md-subheading">Малые повороты и производная ориентации</h4>
+<p>Для малого угла δ: sin δ ≈ δ, cos δ ≈ 1, и поворот на вектор δ = (δₓ, δ_y, δ_z) приближается как R ≈ I + [δ]ₓ, где [δ]ₓ — кососимметричная матрица векторного произведения. Отсюда главное уравнение гироскопа: если ω — угловая скорость в осях борта, то за шаг Δt ориентация обновляется как q ← q ⊗ (1, ω·Δt/2) с последующей нормировкой. Это и есть «интегрирование гироскопа» в любом AHRS: десятки тысяч раз в секунду умножение кватерниона на почти единичный. Ошибки малого угла — то, что EKF оценивает как поправку: не «новую ориентацию», а δ, которой доворачивают текущую.</p>
+<h4 class="md-subheading">Системы координат, которые надо знать наизусть</h4>
+<div class="table-wrap md-table-wrap" tabindex="0"><table class="md-table"><thead><tr><th>Система</th><th>Оси</th><th>Кто использует</th><th>Признак</th></tr></thead><tbody><tr><td data-label="Система">NED</td><td data-label="Оси">North, East, Down</td><td data-label="Кто использует">ArduPilot, PX4 (локальная), MAVLink <code>LOCAL_POSITION_NED</code></td><td data-label="Признак">высота <strong>отрицательна</strong> (z вниз)</td></tr><tr><td data-label="Система">FRD</td><td data-label="Оси">Forward, Right, Down (body)</td><td data-label="Кто использует">ArduPilot, PX4, MAVLink</td><td data-label="Признак">g в висении = (0, 0, +9.81)</td></tr><tr><td data-label="Система">ENU</td><td data-label="Оси">East, North, Up</td><td data-label="Кто использует">ROS, REP-103, геодезия</td><td data-label="Признак">z вверх, yaw от востока против часовой</td></tr><tr><td data-label="Система">FLU</td><td data-label="Оси">Forward, Left, Up (body)</td><td data-label="Кто использует">ROS <code>base_link</code></td><td data-label="Признак">правый поворот — отрицательный yaw</td></tr></tbody></table></div>
+<p>Переход FRD → FLU: (x, y, z) → (x, −y, −z). NED → ENU: (n, e, d) → (e, n, −d). Рысканье: ψ_enu = 90° − ψ_ned. Всё это делает <code>px4_ros_com</code>/MAVROS, но когда «камера смотрит не туда» или «дрон летит на юг вместо севера», проверять надо именно эти две замены.</p>
+
+<h2>Практика</h2>
+<h4 class="md-subheading">Шаг 1. Библиотека <code>rot.py</code></h4>
+<p>Напишите без библиотек (только <code>math</code> и списки или <code>numpy</code>) 12 функций: <code>dot</code>, <code>cross</code>, <code>norm</code>, <code>rot_x/rot_y/rot_z(angle)</code>, <code>euler_to_R(roll, pitch, yaw)</code>, <code>R_to_euler(R)</code>, <code>quat_mul(q1, q2)</code>, <code>quat_conj(q)</code>, <code>quat_to_R(q)</code>, <code>R_to_quat(R)</code>, <code>rotate_vec(q, v)</code>, <code>small_angle_update(q, omega, dt)</code>.</p>
+<pre class="cli-block"><code>import numpy as np
+from scipy.spatial.transform import Rotation as Rot
+import rot
+
+for _ in range(1000):
+    e = np.random.uniform(-np.pi, np.pi, 3); e[1] = np.random.uniform(-1.4, 1.4)   # avoid gimbal lock in the check
+    R_ref = Rot.from_euler(&quot;ZYX&quot;, e[::-1]).as_matrix()                              # yaw, pitch, roll
+    R = rot.euler_to_R(*e)
+    assert np.allclose(R, R_ref, atol=1e-9)
+    assert np.allclose(rot.R_to_euler(R), e, atol=1e-9)
+    q = rot.R_to_quat(R); q_ref = Rot.from_matrix(R).as_quat()                       # scipy: (x, y, z, w)!
+    assert np.allclose(np.abs(q), np.abs([q_ref[3], *q_ref[:3]]), atol=1e-9)        # sign-agnostic
+    v = np.random.randn(3)
+    assert np.allclose(rot.rotate_vec(q, v), R @ v, atol=1e-9)
+print(&quot;rot.py: all checks passed&quot;)</code></pre>
+<p>Тест должен проходить тысячу раз на случайных углах. Если проваливается только <code>R_to_euler</code> при |θ| → 90° — это не ошибка, это gimbal lock, и тест его обходит намеренно.</p>
+<h4 class="md-subheading">Шаг 2. Гравитация в осях борта</h4>
+<p>Аппарат с углами roll = 20°, pitch = −10°, yaw = 135°. Найдите, что должен показывать акселерометр (в м/с², оси FRD) в висении без ускорения. Ответ проверьте через <code>R_nbᵀ · (0, 0, −9.81)</code>: акселерометр меряет удельную силу (−g), поэтому в горизонте в FRD он показывает (0, 0, −9.81). Обратите внимание, что yaw на результат не влияет — объясните почему.</p>
+<h4 class="md-subheading">Шаг 3. Некоммутативность</h4>
+<p>Выполните Rx(90°)·Ry(90°) и Ry(90°)·Rx(90°), примените к вектору (1, 0, 0). Нарисуйте оба результата. Затем сделайте то же самое для 1° и 1° и покажите, что разница — второго порядка малости (отсюда и работает малоугловое приближение).</p>
+<h4 class="md-subheading">Шаг 4. Интегрирование гироскопа</h4>
+<p>Сгенерируйте ω(t) = (0, 0, 1 рад/с) на 2π секунд с шагом 1 мс. Интегрируйте <code>small_angle_update</code> и покажите, что через 2π с кватернион вернулся к исходному (с точностью до знака). Повторите с шагом 50 мс — ошибка видна; с нормировкой на каждом шаге и без неё — сравните норму.</p>
+<p>Лабораторная засчитывается, когда проходят автотесты шага 1 и есть графики шагов 3–4.</p>
+
+<h2>Диагностика</h2>
+<div class="diag-groups"><article class="diag-item"><h4><strong>Симптом:</strong> после перевода в ROS дрон «летит на юг», а камера смотрит вниз-назад</h4><ul><li>Возможная причина: не сделаны обе замены NED→ENU и FRD→FLU, или сделана одна.</li><li>Что сделать: проверить знаки y и z отдельно для позиции и для ориентации; yaw_enu = 90° − yaw_ned.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> кватернион из MAVLink даёт поворот «почти правильный, но зеркальный»</h4><ul><li>Возможная причина: порядок (w,x,y,z) против (x,y,z,w).</li><li>Что сделать: проверить, что скалярная часть ≈ 1 при нулевых углах; поменять порядок на границе.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> оценка ориентации медленно «растягивается», углы плывут при неподвижности</h4><ul><li>Возможная причина: кватернион не нормируется после обновления.</li><li>Что сделать: нормировать после каждого умножения; следить за |q| − 1.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> углы Эйлера прыгают на ±180° в логе</h4><ul><li>Возможная причина: не ошибка — обёртка диапазона рысканья или прохождение pitch через 90°.</li><li>Что сделать: для анализа использовать кватернион/матрицу, углы — только для отображения.</li></ul></article></div>
+
+<h2>Чек-лист</h2>
+<ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="math-linalg-rot:0"><span>Различаю стрелку и её координаты; подписываю базис у каждого вектора</span></label></li><li><label><input type="checkbox" data-check-id="math-linalg-rot:1"><span>Умею считать скалярное и векторное произведения и знаю, что они значат физически</span></label></li><li><label><input type="checkbox" data-check-id="math-linalg-rot:2"><span>Читаю столбцы матрицы поворота как оси нового базиса; помню R⁻¹ = Rᵀ</span></label></li><li><label><input type="checkbox" data-check-id="math-linalg-rot:3"><span>Понимаю, почему порядок поворотов важен и где у углов Эйлера вырождение</span></label></li><li><label><input type="checkbox" data-check-id="math-linalg-rot:4"><span>Умножаю кватернионы, поворачиваю вектор, делаю малоугловое обновление по гироскопу</span></label></li><li><label><input type="checkbox" data-check-id="math-linalg-rot:5"><span>Перевожу между NED/FRD и ENU/FLU без ошибки знака</span></label></li></ul>
+
+<h2>Источники</h2>
+<ul class="refs"><li><a href="https://github.com/ArduPilot/ardupilot/tree/master/libraries/AP_Math" target="_blank" rel="noopener noreferrer">ArduPilot — AP_Math: Matrix3, Quaternion (source)</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://github.com/PX4/PX4-Matrix" target="_blank" rel="noopener noreferrer">PX4 — Matrix library (Dcm, Euler, Quaternion)</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://www.ros.org/reps/rep-0103.html" target="_blank" rel="noopener noreferrer">ROS REP-103 — Standard Units of Measure and Coordinate Conventions</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://ocw.mit.edu/courses/18-06-linear-algebra-spring-2010/" target="_blank" rel="noopener noreferrer">MIT OCW 18.06 — Linear Algebra (Strang)</a> <span class="gc-tag">secondary</span></li><li><a href="https://arxiv.org/abs/1711.02508" target="_blank" rel="noopener noreferrer">J. Solà — Quaternion kinematics for the error-state Kalman filter</a> <span class="gc-tag">secondary</span></li></ul>
+<h2>Задачи с числовым ответом</h2>
+<uav-tasks src="../tasks/math-linalg-rot.json" module="math-linalg-rot"></uav-tasks>
+<h2>Проверь себя</h2>
+<uav-quiz src="../quiz/math-linalg-rot.json" module="math-linalg-rot"></uav-quiz>
+      </div>
+      <div class="module-done"><gc-button variant="secondary" data-done-toggle="math-linalg-rot">Отметить как пройденный</gc-button></div>
+      <section class="related" aria-label="Смежные модули"><p class="gc-label gc-muted">Смежные модули</p><div class="gc-grid ref-grid"><a class="gc-card" href="est-attitude.html"><strong>Ориентация: углы Эйлера, кватернионы, комплементарный фильтр</strong><div class="gc-card__meta"><span class="gc-tag" title="L3 — Специалист">L3</span></div></a><a class="gc-card" href="est-kalman.html"><strong>Фильтр Калмана на пальцах и EKF</strong><div class="gc-card__meta"><span class="gc-tag" title="L3 — Специалист">L3</span></div></a><a class="gc-card" href="f-physics.html"><strong>Как летает мультиротор</strong><div class="gc-card__meta"><span class="gc-tag" title="L1 — Оператор">L1</span></div></a></div></section>
+      <nav class="pager" aria-label="Соседние модули" data-track-pager><a class="gc-card pager__next" href="math-ode-dyn.html"><span class="gc-label gc-muted">Дальше · трек</span><br>Дифференциальные уравнения и динамика: от мотора до контура</a></nav><nav class="pager" aria-label="Соседние шаги пути ArduPilot" data-path-pager="ardupilot" hidden><a class="gc-card pager__prev" href="diag-troubleshooting.html?path=ardupilot"><span class="gc-label gc-muted">Назад · путь ArduPilot</span><br>Дерево диагностики: дрон не взлетает</a><a class="gc-card pager__next" href="math-ode-dyn.html?path=ardupilot"><span class="gc-label gc-muted">Дальше · шаг 21 из 69</span><br>Дифференциальные уравнения и динамика: от мотора до контура</a></nav><nav class="pager" aria-label="Соседние шаги пути PX4" data-path-pager="px4" hidden><a class="gc-card pager__prev" href="comp-mavlink.html?path=px4"><span class="gc-label gc-muted">Назад · путь PX4</span><br>MAVLink и MAVSDK</a><a class="gc-card pager__next" href="math-ode-dyn.html?path=px4"><span class="gc-label gc-muted">Дальше · шаг 12 из 36</span><br>Дифференциальные уравнения и динамика: от мотора до контура</a></nav>
+    </article>
+  </main>
+  <footer class="gc-container site-footer gc-muted">
+    <p>Открытый курс · <a href="https://github.com/irreligious86/UAV-Education">исходники на GitHub</a> · <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">план развития</a> · <a href="../../curriculum/curriculum.html">для разработчика</a> · CC BY-NC-SA 4.0</p>
+  </footer>
+</body>
+</html>

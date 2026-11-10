@@ -1,0 +1,155 @@
+"""Site languages and translation catalogs (gettext style: the Russian source string is the key).
+
+Layout (docs/I18N.md):
+  i18n/languages.json                       languages; the first one is the source language, built at the site root
+  i18n/<lang>/ui.json                       {"<ru string>": "<translation>"} for the interface (build scripts, JS, diagrams)
+  i18n/<lang>/data.json                     the same for text values in data/*.json and the curriculum
+  i18n/<lang>/content/<path>.md             a translated module; front matter `source_hash` = hash of the ru source
+  i18n/<lang>/content/quiz|tasks/<id>.json  translated quiz / task banks (same shape as the source)
+  i18n/<lang>/content/pages/<name>.html     translated hand-written pages
+
+Anything without a translation falls back to the source text, so a partly translated language always builds.
+"""
+from __future__ import annotations
+
+import hashlib
+import json
+import re
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parent.parent
+I18N = ROOT / "i18n"
+
+LANGS: list[dict] = json.loads((I18N / "languages.json").read_text(encoding="utf-8"))["languages"]
+SOURCE = LANGS[0]["code"]
+BY_CODE = {l["code"]: l for l in LANGS}
+
+_lang = SOURCE
+_catalogs: dict[str, dict[str, str]] = {}
+missing: dict[str, set[str]] = {}          # lang -> source strings looked up without a translation
+PLACEHOLDER = re.compile(r"\{[a-z_][a-z0-9_]*\}")
+
+
+def _load(path: Path) -> dict[str, str]:
+    if not path.is_file():
+        return {}
+    data = json.loads(path.read_text(encoding="utf-8"))
+    return {k: v for k, v in data.items() if isinstance(v, str) and v.strip() and not k.startswith("@")}
+
+
+def catalog(lang: str, name: str = "ui") -> dict[str, str]:
+    key = f"{lang}/{name}"
+    if key not in _catalogs:
+        _catalogs[key] = {} if lang == SOURCE else _load(I18N / lang / f"{name}.json")
+    return _catalogs[key]
+
+
+def set_lang(code: str) -> None:
+    global _lang
+    if code not in BY_CODE:
+        raise SystemExit(f"unknown language {code}")
+    _lang = code
+
+
+def lang() -> str:
+    return _lang
+
+
+def lang_dir(code: str | None = None) -> str:
+    """'' for the source language, 'uk' for Ukrainian, ... (the URL prefix of the language tree)."""
+    return BY_CODE[code or _lang]["dir"]
+
+
+def up() -> str:
+    """Extra '../' from a page of the current language tree to the repository root (shared assets)."""
+    d = lang_dir()
+    return "../" * (d.count("/") + 1) if d else ""
+
+
+used: set[str] = set()                      # every interface string looked up by the build (any language)
+
+
+def _(s: str, **kw) -> str:
+    """Translate an interface string; {name} placeholders are filled from kw after translating."""
+    used.add(s)
+    out = s
+    if _lang != SOURCE:
+        t = catalog(_lang).get(s)
+        if t is None:
+            missing.setdefault(_lang, set()).add(s)
+        else:
+            out = t
+    return out.format(**kw) if kw else out
+
+
+def tr_data(value, name: str = "data"):
+    """Translate every string inside a JSON value through the data catalog (keys and ids are untouched)."""
+    if _lang == SOURCE:
+        return value
+    cat = catalog(_lang, name)
+    def walk(v, key=None):
+        if isinstance(v, str):
+            if key in NON_TEXT_KEYS:
+                return v
+            return cat.get(v, v)
+        if isinstance(v, list):
+            return [walk(x, key) for x in v]
+        if isinstance(v, dict):
+            return {k: walk(x, k) for k, x in v.items()}
+        return v
+    return walk(value)
+
+
+# JSON keys whose string values are identifiers, paths or code, never prose
+NON_TEXT_KEYS = {"id", "module", "modules", "prerequisites", "sourceFile", "stack", "stacks", "status", "level", "url",
+                 "diagram", "starter", "capstoneFor", "sectionKey", "key", "related", "expr", "answer", "checks",
+                 "firmware", "tags", "readingTime", "kind", "group", "ids", "capstones", "autotest_cmd"}
+
+
+def source_hash(text: str) -> str:
+    return hashlib.sha256(text.encode("utf-8")).hexdigest()[:12]
+
+
+def translated_path(src: Path, code: str | None = None) -> Path:
+    """i18n/<lang>/content/... counterpart of content/... (or of any path under the repo)."""
+    return I18N / (code or _lang) / src.resolve().relative_to(ROOT)
+
+
+def placeholders(s: str) -> set[str]:
+    return set(PLACEHOLDER.findall(s))
+
+
+# ------------------------------------------------------------------ static HTML fragments
+_TEXT_RE = re.compile(r">([^<>]*[^\s<>][^<>]*)<")
+_ATTR_RE = re.compile(r'\b(placeholder|aria-label|title|alt|data-done-label|data-done-past)="([^"]*)"')
+
+
+def tr_html(fragment: str) -> str:
+    """Translate the text nodes and the human-readable attributes of a static HTML fragment.
+    Each text node (whitespace-trimmed) is one catalog key, e.g. ">Почта <" -> "Почта"."""
+    if _lang == SOURCE:
+        return fragment
+
+    def node(m):
+        raw = m.group(1)
+        s = raw.strip()
+        if not re.search(r"[А-Яа-яЁёІіЇїЄєҐґ]", s):
+            return m.group(0)
+        lead = raw[: len(raw) - len(raw.lstrip())]
+        trail = raw[len(raw.rstrip()):]
+        return ">" + lead + _(s) + trail + "<"
+
+    def attr(m):
+        v = m.group(2)
+        if not re.search(r"[А-Яа-яЁё]", v):
+            return m.group(0)
+        return f'{m.group(1)}="{_(v)}"'
+
+    return _ATTR_RE.sub(attr, _TEXT_RE.sub(node, fragment))
+
+
+if __name__ == "__main__":
+    # `python scripts/i18n.py --dirs` prints the language tree directories (used by CI's freshness check)
+    import sys
+    if "--dirs" in sys.argv:
+        print(" ".join(l["dir"] for l in LANGS if l["dir"]))

@@ -19,6 +19,7 @@
  * Group score = mean of module scores over published modules; group passed = all passed.
  * Capstone: passed when all criteria checked or marked done.
  */
+var T = (typeof window !== "undefined" && window.T) || function (s) { return s; };   // assets/i18n.js
 (function () {
   "use strict";
 
@@ -73,8 +74,8 @@
   }
 
   function statusLabel(g) {
-    if (g.status === "passed") return g.selfMarked ? "ОТМЕЧЕН" : "ОСВОЕН";
-    if (g.status === "active") return "В РАБОТЕ";
+    if (g.status === "passed") return g.selfMarked ? T("ОТМЕЧЕН") : T("ОСВОЕН");
+    if (g.status === "active") return T("В РАБОТЕ");
     return "";
   }
 

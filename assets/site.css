@@ -17,6 +17,10 @@
   gap: var(--gc-space-4);
 }
 .site-header .gc-nav { border-bottom: 0; flex: 1; min-width: 0; }
+/* language picker (assets/i18n.js) */
+.lang-switch { display: flex; flex: none; gap: 4px; }
+.lang-switch .gc-tag { text-decoration: none; min-width: 2.4em; text-align: center; }
+.lang-switch .gc-tag[aria-current] { pointer-events: none; }
 .site-brand {
   flex: none;
   font-weight: 600;
@@ -33,6 +37,8 @@
 @media (max-width: 560px) {
   .site-header__inner { flex-direction: column; align-items: stretch; gap: 0; }
   .site-brand { padding-top: var(--gc-space-3); }
+  .lang-switch { position: absolute; top: var(--gc-space-3); right: var(--gc-space-4); }
+  .site-header__inner { position: relative; }
   .gc-display { font-size: 30px; line-height: 36px; }
 }
 

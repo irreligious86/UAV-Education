@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en" data-theme="dark" data-lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Компаньон для пульта TX16S — UAV Student</title>
+  <meta name="description" content="ESP32-модуль в отсеке пульта: принимает телеметрию CRSF, показывает её на своём экране или отдаёт по BLE/Wi-Fi в телефон, плюс EdgeTX Lua-скрипт на пульте. Разработка с эмулятором до железа.">
+  <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
+  <link rel="manifest" href="../../manifest.webmanifest">
+  <meta name="theme-color" content="#0b0f14">
+  <link rel="alternate" hreflang="ru" href="../../projects/proj-tx16s-companion.html">
+  <link rel="alternate" hreflang="uk" href="../../uk/projects/proj-tx16s-companion.html">
+  <link rel="alternate" hreflang="en" href="../../en/projects/proj-tx16s-companion.html">
+  <script>/* go to the visitor's chosen language before anything paints (assets/i18n.js) */(function(){try{var c=localStorage.getItem('uav-lang'),h=document.documentElement.getAttribute('data-lang');if(!c||c===h||/[?&]lang=keep\b/.test(location.search))return;var l=document.querySelector('link[rel=alternate][hreflang="'+c+'"]');if(l)location.replace(l.href+location.search+location.hash)}catch(e){}})();</script>
+  <link rel="stylesheet" href="../../lib/ground-control-ui/dist/ground-control.css">
+  <link rel="stylesheet" href="../../assets/site.css">
+  <script src="../../lib/ground-control-ui/dist/ground-control.js" defer></script>
+  <script src="../../assets/i18n/en.js"></script>
+  <script src="../../assets/i18n.js"></script>
+  <script src="../../assets/progress-store.js" defer></script>
+  <script src="../../assets/backend-config.js" defer></script>
+  <script src="../../assets/account.js" defer></script>
+  <script src="../../assets/grading.js" defer></script>
+  <script src="../../assets/app.js" defer></script>
+  <script src="../../assets/uav-quiz.js" defer></script>
+  <script src="../../assets/uav-tasks.js" defer></script>
+  <script src="../../assets/offline.js" defer></script>
+</head>
+<body class="gc-root" data-base="../" data-root="../../">
+  <header class="site-header">
+    <div class="gc-container site-header__inner">
+      <a class="site-brand" href="../index.html"><span class="site-brand__mark" aria-hidden="true">◆</span> UAV Student</a>
+      <nav class="gc-nav" aria-label="Разделы сайта">
+        <a href="../index.html" aria-current="page">Курс</a>
+        <a href="../ref/index.html">Справочник</a>
+        <a href="../pages/glossary.html">Глоссарий</a>
+        <a href="../pages/fails.html">Фейлы</a>
+        <a href="../pages/search.html">Поиск</a>
+        <a href="../pages/progress.html">Мой прогресс</a>
+      </nav>
+      <nav class="lang-switch" aria-label="Язык"><a class="gc-tag" href="../../projects/proj-tx16s-companion.html" data-lang-to="ru" hreflang="ru" lang="ru" title="Русский">RU</a><a class="gc-tag" href="../../uk/projects/proj-tx16s-companion.html" data-lang-to="uk" hreflang="uk" lang="uk" title="Українська">UK</a><a class="gc-tag" href="../../en/projects/proj-tx16s-companion.html" data-lang-to="en" hreflang="en" lang="en" title="English" aria-current="true" data-state="ok">EN</a></nav>
+    </div>
+  </header>
+  <main class="gc-container site-main">
+    <article class="module" data-module-page="proj-tx16s-companion">
+      <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="index.html">Проекты</a><span>Проект 12</span></p>
+      <h1 class="module-title">Компаньон для пульта TX16S</h1>
+      <div class="module-tags"><span class="gc-tag">Проект 12</span><span class="gc-tag">L3</span><span class="gc-tag">~30 ч</span><span class="gc-tag" data-state="ok">есть стартер</span><span class="gc-tag" data-state="ok" data-done-badge hidden>СДАН</span></div>
+      <p class="module-lead">ESP32-модуль в отсеке пульта: принимает телеметрию CRSF, показывает её на своём экране или отдаёт по BLE/Wi-Fi в телефон, плюс EdgeTX Lua-скрипт на пульте. Разработка с эмулятором до железа.</p>
+      <div class="gc-prose module-body">
+        <figure class="diagram" data-diagram="proj-tx16s-companion"><div class="diagram__svg"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 200" width="100%" role="img" aria-labelledby="t" style="max-width:720px;display:block;margin:0 auto"><title id="t">Компаньон TX16S: архитектура</title><style>text{font-family: var(--gc-font-mono, ui-monospace, Menlo, monospace); font-size: 12px;fill:currentColor} .m{fill:var(--gc-ink-muted, #8a93a3)} .a{fill:var(--gc-accent-hud, #5ef1d2)} .w{fill:var(--gc-signal-amber, #f0b24c)} .d{fill:var(--gc-signal-red, #e8636b)} .box{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:currentColor;stroke-width:1.2} .boxa{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6} .ln{stroke:currentColor;stroke-width:1.2;fill:none} .lna{stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6;fill:none} .lnm{stroke:var(--gc-ink-muted, #8a93a3);stroke-width:1;fill:none;stroke-dasharray:4 3} .t{font-size:11px} .b{font-weight:600}</style><defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker><marker id="ara" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--gc-accent-hud, #5ef1d2)"/></marker></defs><rect class="box" x="10.0" y="30" width="142.0" height="48" rx="6"/><text x="81.0" y="51.0" text-anchor="middle">Аппарат</text><text x="81.0" y="65.0" text-anchor="middle">ELRS RX</text><rect class="box" x="196.0" y="30" width="142.0" height="48" rx="6"/><text x="267.0" y="51.0" text-anchor="middle">Пульт TX16S</text><text x="267.0" y="65.0" text-anchor="middle">EdgeTX</text><rect class="boxa" x="382.0" y="30" width="142.0" height="48" rx="6"/><text x="453.0" y="51.0" text-anchor="middle" class="b">ESP32 в пульте</text><text x="453.0" y="65.0" text-anchor="middle" class="b">парсер CRSF</text><rect class="box" x="568.0" y="30" width="142.0" height="48" rx="6"/><text x="639.0" y="51.0" text-anchor="middle">Телефон</text><text x="639.0" y="65.0" text-anchor="middle">BLE / Wi-Fi</text><rect class="box" x="10.0" y="130" width="142.0" height="48" rx="6"/><text x="81.0" y="151.0" text-anchor="middle">Симулятор EdgeTX</text><text x="81.0" y="165.0" text-anchor="middle">+ фикстуры CRSF</text><rect class="boxa" x="196.0" y="130" width="142.0" height="48" rx="6"/><text x="267.0" y="151.0" text-anchor="middle" class="b">Lua-скрипт</text><text x="267.0" y="165.0" text-anchor="middle" class="b">EdgeTX</text><path class="ln" d="M152.0 54.0 L196.0 54.0" marker-end="url(#ar)"/><text x="174.0" y="47.0" text-anchor="middle" class="m t" style="font-size:10px">CRSF</text><path class="ln" d="M338.0 54.0 L382.0 54.0" marker-end="url(#ar)"/><text x="360.0" y="47.0" text-anchor="middle" class="m t" style="font-size:10px">UART</text><path class="ln" d="M524.0 54.0 L568.0 54.0" marker-end="url(#ar)"/><path class="ln" d="M267.0 78 L267.0 130" marker-end="url(#ar)"/><path class="ln" d="M152.0 154.0 L196.0 154.0" marker-end="url(#ar)"/></svg></div><figcaption class="gc-muted">Архитектура проекта 12.</figcaption><div class="diagram__hint">Схему можно прокрутить по горизонтали</div></figure>
+        <h2>Стек</h2>
+        <ul><li>ESP32, ESP-IDF/PlatformIO</li><li>CRSF</li><li>EdgeTX Lua + симулятор EdgeTX</li></ul>
+        <p>Стартер: <a href="https://github.com/irreligious86/UAV-Education/tree/main/examples/tx16s-companion" target="_blank" rel="noopener noreferrer"><code>examples/tx16s-companion</code></a> — клонируйте и начинайте с его README.</p>
+        <p>Может заменить итоговый проект трека «<a href="../cap/cap-own-logic.html">Инженер: код на борту</a>».</p>
+        <h2>Этапы</h2>
+        <ol><li>Разбор CRSF-телеметрии на ESP32 с тестами на записанных кадрах<br><span class="gc-muted">Проверка:</span> <code>pytest examples/tx16s-companion/tests</code></li><li>Lua-скрипт EdgeTX в симуляторе<br><span class="gc-muted">Проверка: демонстрация в отчёте</span></li><li>Передача на телефон (BLE или Wi-Fi)<br><span class="gc-muted">Проверка: демонстрация в отчёте</span></li><li>Монтаж и питание в пульте<br><span class="gc-muted">Проверка: демонстрация в отчёте</span></li><li>Полевой тест<br><span class="gc-muted">Проверка: демонстрация в отчёте</span></li></ol>
+        <h2>Критерии приёмки</h2>
+        <p class="gc-muted">Проект сдан, когда выполнены все пункты. Отмечайте по мере готовности:</p>
+        <ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="proj-tx16s-companion:cap:0"><span>Парсер CRSF проходит тесты на записанных кадрах, включая битые</span></label></li><li><label><input type="checkbox" data-check-id="proj-tx16s-companion:cap:1"><span>Пульт продолжает управлять при зависании модуля</span></label></li><li><label><input type="checkbox" data-check-id="proj-tx16s-companion:cap:2"><span>Lua-скрипт работает в симуляторе и на пульте</span></label></li><li><label><input type="checkbox" data-check-id="proj-tx16s-companion:cap:3"><span>Энергопотребление измерено</span></label></li><li><label><input type="checkbox" data-check-id="proj-tx16s-companion:cap:4"><span>README со схемой</span></label></li></ul>
+        <h2>Автопроверка</h2>
+        <p>тесты парсера CRSF на фикстурах + симулятор EdgeTX</p>
+        <h2>Оценка</h2><p class="gc-muted">Сдан — когда выполнены все критерии приёмки. Уровень работы — по критериям ниже; каждый уровень включает предыдущий.</p><ul><li><strong>Функциональность</strong><ul><li><em>Засчитано:</em> Все этапы работают в сценарии из README</li><li><em>Хорошо:</em> Плюс отказные сценарии: потеря связи, пропуск данных, неверный ввод</li><li><em>Отлично:</em> Плюс хотя бы одно задание «на отлично» из списка проекта</li></ul></li><li><strong>Проверяемость</strong><ul><li><em>Засчитано:</em> Тесты стартера проходят, свои функции покрыты хотя бы одним тестом</li><li><em>Хорошо:</em> Тест на каждый этап; тесты запускаются в CI</li><li><em>Отлично:</em> Тесты на отказы и регрессию на собственных данных; покрытие ключевой логики видно в отчёте</li></ul></li><li><strong>Инженерный отчёт</strong><ul><li><em>Засчитано:</em> Есть замеры, которых требуют критерии приёмки</li><li><em>Хорошо:</em> Замеры с методикой и повторяемостью (несколько прогонов, разброс)</li><li><em>Отлично:</em> Сравнение вариантов решения с выводом, ограничения и что делать дальше</li></ul></li><li><strong>Код и документация</strong><ul><li><em>Засчитано:</em> README: запуск одной командой, архитектура</li><li><em>Хорошо:</em> Модули разделены, интерфейсы описаны, нет «магических чисел» без пояснения</li><li><em>Отлично:</em> Код читается без автора: docs/, примеры, история коммитов по этапам</li></ul></li></ul>
+        <h2>Задания «на отлично»</h2><ul><li>Фаззинг парсера CRSF случайными байтами без падений</li><li>Энергопотребление модуля и время работы от батареи пульта</li></ul>
+        <h2>Что сдать</h2>
+        <ul><li>Прошивка, Lua-скрипт, схема, видео</li></ul>
+        <h2>Нужные модули</h2>
+        <ol><li><a href="../m/link-protocols.html">SBUS, CRSF и инверсия UART</a></li><li><a href="../m/comp-esp32.html">ESP32 и периферия</a></li><li><a href="../m/emb-protocols.html">UART, I2C, SPI, CAN на уровне сигналов и драйверов</a></li><li><a href="../m/link-elrs.html">ExpressLRS: packet rate, телеметрия, LQ</a></li></ol>
+        <div class="gc-callout" data-state="caution"><strong>Безопасность.</strong> Всё, что управляет аппаратом, сначала проходит тесты и SITL. Реальный полёт — только с проверенным failsafe и пилотом, готовым забрать управление.</div>
+      </div>
+      <div class="module-done"><gc-button variant="secondary" data-done-toggle="proj-tx16s-companion" data-done-label="сданный" data-done-past="Сдан">Отметить как сданный</gc-button></div>
+    </article>
+  </main>
+  <footer class="gc-container site-footer gc-muted">
+    <p>Открытый курс · <a href="https://github.com/irreligious86/UAV-Education">исходники на GitHub</a> · <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">план развития</a> · <a href="../../curriculum/curriculum.html">для разработчика</a> · CC BY-NC-SA 4.0</p>
+  </footer>
+</body>
+</html>

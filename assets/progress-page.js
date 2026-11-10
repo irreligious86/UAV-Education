@@ -1,4 +1,5 @@
 /* Fills pages/progress.html from UAVGrading.load(); export / import / reset. */
+var T = (typeof window !== "undefined" && window.T) || function (s) { return s; };   // assets/i18n.js
 (function () {
   "use strict";
   var base = document.body.getAttribute("data-base") || "../";
@@ -23,20 +24,20 @@
       return '<li><span class="gc-tag" data-state="' + (r.pass ? "ok" : "caution") + '">' + (r.pass ? "PASS" : "FAIL") + "</span> " +
         "<code>" + esc(r.grader) + " --lab " + esc(r.labs.join(",")) + "</code> · " + esc(r.name) + " · " + esc(r.generated.slice(0, 10)) +
         ' · <span class="gc-muted">sha256 ' + esc(r.sha256.slice(0, 12)) + "…</span>" +
-        (r.marks.length ? " · отмечено: " + r.marks.map(function (m) { return "<code>" + esc(m) + "</code>"; }).join(", ") : "") + "</li>";
-    }).join("") : '<li class="gc-muted">Пока нет. Запусти грейдер с <code>--json result.json</code> и загрузи файл.</li>';
+        (r.marks.length ? T(" · отмечено: ") + r.marks.map(function (m) { return "<code>" + esc(m) + "</code>"; }).join(", ") : "") + "</li>";
+    }).join("") : T('<li class="gc-muted">Пока нет. Запусти грейдер с <code>--json result.json</code> и загрузи файл.</li>');
   }
 
   // Validate a uav-lab-result/1 file against the grading meta; returns a summary or throws with a reason.
   function parseLabResult(data, meta) {
-    if (!data || data.schema !== "uav-lab-result/1") throw new Error("это не файл результата грейдера (нет schema uav-lab-result/1)");
+    if (!data || data.schema !== "uav-lab-result/1") throw new Error(T("это не файл результата грейдера (нет schema uav-lab-result/1)"));
     var labN = {};
     meta.modules.forEach(function (m) { labN[m.id] = m.lab || 0; });
     var marks = (data.marks || []).filter(function (m) {
       var p = /^([a-z0-9-]+):lab:(\d+)$/.exec(m);
       return p && labN[p[1]] > Number(p[2]);
     });
-    if (!data.input || !/^[0-9a-f]{64}$/.test(data.input.sha256 || "")) throw new Error("нет контрольной суммы входного лога");
+    if (!data.input || !/^[0-9a-f]{64}$/.test(data.input.sha256 || "")) throw new Error(T("нет контрольной суммы входного лога"));
     return { grader: String(data.grader || "?"), labs: (data.labs || []).map(function (l) { return String(l.lab); }),
              pass: !!data.pass, generated: String(data.generated || ""), name: String(data.input.name || ""),
              sha256: data.input.sha256, marks: marks, ignored: (data.marks || []).length - marks.length };
@@ -47,9 +48,9 @@
     document.querySelectorAll("[data-row]").forEach(function (tr) {
       var g = grades[tr.getAttribute("data-row")];
       if (!g) return;
-      tr.querySelector('[data-cell="quiz"]').textContent = (g.hasQuiz ? (g.quizPct === null ? "—" : g.quizPct + "%") : "нет") + (g.tasksTotal ? " · з. " + g.tasksDone + "/" + g.tasksTotal : "");
+      tr.querySelector('[data-cell="quiz"]').textContent = (g.hasQuiz ? (g.quizPct === null ? "—" : g.quizPct + "%") : T("нет")) + (g.tasksTotal ? T(" · з. ") + g.tasksDone + "/" + g.tasksTotal : "");
       var v = verified[g.id] || 0;
-      tr.querySelector('[data-cell="lab"]').textContent = g.labTotal ? g.labDone + "/" + g.labTotal + (v ? " · ⚙" + v : "") : "нет";
+      tr.querySelector('[data-cell="lab"]').textContent = g.labTotal ? g.labDone + "/" + g.labTotal + (v ? " · ⚙" + v : "") : T("нет");
       tr.querySelector('[data-cell="score"]').textContent = g.score;
       var st = tr.querySelector('[data-cell="status"]');
       var label = G.statusLabel(g);
@@ -58,7 +59,7 @@
     document.querySelectorAll("[data-group-summary]").forEach(function (el) {
       var ids = el.getAttribute("data-group-summary").split(",").filter(Boolean);
       var gg = G.groupGrade(ids, grades);
-      el.textContent = "Освоено " + gg.passed + " из " + gg.total + " · средний балл " + gg.score + (gg.allPassed ? " · ✓ всё освоено" : "");
+      el.textContent = T("Освоено ") + gg.passed + T(" из ") + gg.total + T(" · средний балл ") + gg.score + (gg.allPassed ? T(" · ✓ всё освоено") : "");
     });
     document.querySelectorAll("[data-progress-of]").forEach(function (bar) {
       var ids = bar.getAttribute("data-progress-of").split(",").filter(Boolean);
@@ -68,7 +69,7 @@
     document.querySelectorAll("[data-cap]").forEach(function (li) {
       var c = caps[li.getAttribute("data-cap")], tag = li.querySelector("[data-cap-status]");
       if (!c) return;
-      tag.textContent = c.passed ? (c.selfMarked ? "ОТМЕЧЕН" : "СДАН") : (c.done ? c.done + "/" + c.total : "не начат");
+      tag.textContent = c.passed ? (c.selfMarked ? T("ОТМЕЧЕН") : T("СДАН")) : (c.done ? c.done + "/" + c.total : T("не начат"));
       tag.setAttribute("data-state", c.passed ? (c.selfMarked ? "info" : "ok") : (c.done ? "caution" : ""));
     });
   }
@@ -79,7 +80,7 @@
     var labs = window.UAVProgress.getLabResults ? window.UAVProgress.getLabResults() : Promise.resolve([]);
     return labs.then(fillLabs).then(function () { return G.load(base); }).then(function (R) { lastMeta = R.meta; fill(R); }).catch(function () {
       var h = document.querySelector(".progress-headline");
-      if (h) h.textContent = "Не удалось загрузить данные оценок.";
+      if (h) h.textContent = T("Не удалось загрузить данные оценок.");
     });
   }
 
@@ -101,7 +102,7 @@
         if (!data || typeof data !== "object") throw new Error("bad");
         try { window.localStorage.setItem("uav-student:progress:v1", JSON.stringify(data)); } catch (e) {}
         return refresh();
-      }).catch(function () { alert("Не удалось прочитать файл прогресса."); });
+      }).catch(function () { alert(T("Не удалось прочитать файл прогресса.")); });
     });
     var labIn = document.querySelector("[data-lab-import]");
     if (labIn) labIn.addEventListener("change", function () {
@@ -113,18 +114,18 @@
         return meta.then(function (m) {
           var r = parseLabResult(data, m);
           return window.UAVProgress.addLabResult(r).then(function (added) {
-            if (msg) msg.textContent = !added ? "Этот результат уже загружен." :
-              (r.marks.length ? "Отмечено пунктов лабораторных: " + r.marks.length + "." : "Результат сохранён; пункты не отмечены — проверки не пройдены.") +
-              (r.ignored ? " Неизвестных пунктов пропущено: " + r.ignored + "." : "");
+            if (msg) msg.textContent = !added ? T("Этот результат уже загружен.") :
+              (r.marks.length ? T("Отмечено пунктов лабораторных: ") + r.marks.length + "." : T("Результат сохранён; пункты не отмечены — проверки не пройдены.")) +
+              (r.ignored ? T(" Неизвестных пунктов пропущено: ") + r.ignored + "." : "");
             return refresh();
           });
         });
-      }).catch(function (e) { if (msg) msg.textContent = "Не удалось загрузить: " + (e && e.message ? e.message : "неверный файл"); });
+      }).catch(function (e) { if (msg) msg.textContent = T("Не удалось загрузить: ") + (e && e.message ? e.message : T("неверный файл")); });
       labIn.value = "";
     });
     var rst = document.querySelector("[data-reset]");
     if (rst) rst.addEventListener("click", function () {
-      if (confirm("Стереть весь прогресс в этом браузере?")) window.UAVProgress.reset().then(refresh);
+      if (confirm(T("Стереть весь прогресс в этом браузере?"))) window.UAVProgress.reset().then(refresh);
     });
   });
 })();

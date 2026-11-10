@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="uk" data-theme="dark" data-lang="uk">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Настройка по логам — UAV Student</title>
+  <meta name="description" content="A/B-профили, спектры до/после, отчёт с выводами">
+  <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
+  <link rel="manifest" href="../../manifest.webmanifest">
+  <meta name="theme-color" content="#0b0f14">
+  <link rel="alternate" hreflang="ru" href="../../cap/cap-tune-by-logs.html">
+  <link rel="alternate" hreflang="uk" href="../../uk/cap/cap-tune-by-logs.html">
+  <link rel="alternate" hreflang="en" href="../../en/cap/cap-tune-by-logs.html">
+  <script>/* go to the visitor's chosen language before anything paints (assets/i18n.js) */(function(){try{var c=localStorage.getItem('uav-lang'),h=document.documentElement.getAttribute('data-lang');if(!c||c===h||/[?&]lang=keep\b/.test(location.search))return;var l=document.querySelector('link[rel=alternate][hreflang="'+c+'"]');if(l)location.replace(l.href+location.search+location.hash)}catch(e){}})();</script>
+  <link rel="stylesheet" href="../../lib/ground-control-ui/dist/ground-control.css">
+  <link rel="stylesheet" href="../../assets/site.css">
+  <script src="../../lib/ground-control-ui/dist/ground-control.js" defer></script>
+  <script src="../../assets/i18n/uk.js"></script>
+  <script src="../../assets/i18n.js"></script>
+  <script src="../../assets/progress-store.js" defer></script>
+  <script src="../../assets/backend-config.js" defer></script>
+  <script src="../../assets/account.js" defer></script>
+  <script src="../../assets/grading.js" defer></script>
+  <script src="../../assets/app.js" defer></script>
+  <script src="../../assets/uav-quiz.js" defer></script>
+  <script src="../../assets/uav-tasks.js" defer></script>
+  <script src="../../assets/offline.js" defer></script>
+</head>
+<body class="gc-root" data-base="../" data-root="../../">
+  <header class="site-header">
+    <div class="gc-container site-header__inner">
+      <a class="site-brand" href="../index.html"><span class="site-brand__mark" aria-hidden="true">◆</span> UAV Student</a>
+      <nav class="gc-nav" aria-label="Разделы сайта">
+        <a href="../index.html" aria-current="page">Курс</a>
+        <a href="../ref/index.html">Справочник</a>
+        <a href="../pages/glossary.html">Глоссарий</a>
+        <a href="../pages/fails.html">Фейлы</a>
+        <a href="../pages/search.html">Поиск</a>
+        <a href="../pages/progress.html">Мой прогресс</a>
+      </nav>
+      <nav class="lang-switch" aria-label="Язык"><a class="gc-tag" href="../../cap/cap-tune-by-logs.html" data-lang-to="ru" hreflang="ru" lang="ru" title="Русский">RU</a><a class="gc-tag" href="../../uk/cap/cap-tune-by-logs.html" data-lang-to="uk" hreflang="uk" lang="uk" title="Українська" aria-current="true" data-state="ok">UK</a><a class="gc-tag" href="../../en/cap/cap-tune-by-logs.html" data-lang-to="en" hreflang="en" lang="en" title="English">EN</a></nav>
+    </div>
+  </header>
+  <main class="gc-container site-main">
+    <article class="module" data-module-page="cap-tune-by-logs">
+      <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-integrator">Интегратор</a><span>Итоговый проект</span></p>
+      <h1 class="module-title">Настройка по логам</h1>
+      <div class="module-tags"><span class="gc-tag">Итоговый проект трека 3</span><span class="gc-tag" data-state="ok" data-done-badge hidden>СДАН</span></div>
+      <p class="module-lead">Результат: A/B-профили, спектры до/после, отчёт с выводами</p>
+      <div class="gc-prose module-body">
+        <h2>Что сдать</h2>
+        <ul><li>Контрольный diff и профили A/B/C/D</li><li>Логи всех профилей с session_notes</li><li>Спектры до/после фильтров в полосе моторов (дБ)</li><li>Таблица метрик: motor noise, bounce-back, entry lag, peak tracking — медианы</li><li>Отчёт: что выбрано и почему</li><li>Инженерная папка проекта: требования с ID, что и как тестировалось, журнал изменений (см. модуль «Инженерный метод 101»)</li></ul>
+        <h2>Критерии приёмки</h2>
+        <p class="gc-muted">Проект сдан, когда выполнены все пункты. Отмечай по мере готовности:</p>
+        <ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="cap-tune-by-logs:cap:0"><span>Фильтры настроены до PID, RPM-фильтр покрывает реальные обороты</span></label></li><li><label><input type="checkbox" data-check-id="cap-tune-by-logs:cap:1"><span>Одна программа полёта на все профили, одна сессия</span></label></li><li><label><input type="checkbox" data-check-id="cap-tune-by-logs:cap:2"><span>Решение обосновано числами, а не только ощущениями</span></label></li><li><label><input type="checkbox" data-check-id="cap-tune-by-logs:cap:3"><span>Следующий шаг — один, малый, с планом проверки</span></label></li><li><label><input type="checkbox" data-check-id="cap-tune-by-logs:cap:4"><span>Каждое требование прослеживается до теста или измерения, результат записан</span></label></li></ul>
+        <h2>Рубрика: как отличить сделанное от сданного</h2><p class="gc-muted">Проверь свою работу по каждой строке. Если она ближе к левой колонке — проект ещё не готов.</p><div class="widget__table-wrap"><table class="rubric"><thead><tr><th>Критерий</th><th>Плохо</th><th>Хорошо</th></tr></thead><tbody><tr><th scope="row">Метод</th><td class="rubric__bad">Параметры подобраны «на глаз»</td><td class="rubric__good">Для каждого изменения: гипотеза → лог до → изменение → лог после → метрика</td></tr><tr><th scope="row">Спектры</th><td class="rubric__bad">Один скриншот спектра</td><td class="rubric__good">Спектры до/после с частотами пиков, их привязкой к eRPM и ослаблением в дБ</td></tr><tr><th scope="row">Метрики</th><td class="rubric__bad">«Стало лучше»</td><td class="rubric__good">Overshoot, bounce-back и время установления посчитаны по step response и сравнены</td></tr></tbody></table></div>
+        <h2>Программная альтернатива</h2><p class="gc-muted">Итоговый проект трека можно заменить проектом из каталога «ПО для БАС» — с теми же требованиями к сдаче: критерии, автотесты, README.</p><ul><li><a href="../projects/proj-log-service.html">Проект 3: Сервис анализа логов</a></li></ul>
+        <h2>Модули трека</h2>
+        <ol><li><a href="../m/data-python.html">Python для анализа полётных данных</a></li><li><a href="../m/ctl-signals.html">Сигналы и спектры: что видит гироскоп</a></li><li><a href="../m/bf-blackbox.html">Blackbox</a></li><li><a href="../m/bf-filters.html">Фильтры</a></li><li><a href="../m/f-esc-firmware.html">Прошивка ESC: Bluejay, AM32, BLHeli_32 и настройка регулятора</a></li><li><a href="../m/bf-rpm-filter.html">RPM-фильтр: кейс «свистящего» 10&quot;</a></li><li><a href="../m/ctl-theory.html">Теория управления: устойчивость, запасы, каскады</a></li><li><a href="../m/ctl-sysid.html">Идентификация системы: чирп, частотная характеристика, модель для тюнинга</a></li><li><a href="../m/bf-pid.html">PID-тюнинг по данным</a></li><li><a href="../m/bf-cli.html">CLI и remap</a></li><li><a href="../m/bf-cli-automation.html">Автоматизация CLI по serial</a></li></ol>
+        <div class="gc-callout" data-state="caution"><strong>Безопасность.</strong> Всё, что можно сделать в SITL или без пропов, делается там. Реальный полёт — только после наземных тестов, с проверенным failsafe.</div>
+      </div>
+      <div class="module-done"><gc-button variant="secondary" data-done-toggle="cap-tune-by-logs" data-done-label="сданный" data-done-past="Сдан">Отметить как сданный</gc-button></div>
+    </article>
+  </main>
+  <footer class="gc-container site-footer gc-muted">
+    <p>Открытый курс · <a href="https://github.com/irreligious86/UAV-Education">исходники на GitHub</a> · <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">план развития</a> · <a href="../../curriculum/curriculum.html">для разработчика</a> · CC BY-NC-SA 4.0</p>
+  </footer>
+</body>
+</html>

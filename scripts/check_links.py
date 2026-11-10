@@ -12,15 +12,21 @@ from pathlib import Path
 from urllib.parse import unquote
 
 ROOT = Path(__file__).resolve().parent.parent
-SITE_DIRS = ("m", "ref", "pages", "cap", "path")
+SITE_DIRS = ("m", "ref", "pages", "cap", "path", "projects")
+sys.path.insert(0, str(ROOT / "scripts"))
+import i18n  # noqa: E402
+
+TREES = [ROOT] + [ROOT / l["dir"] for l in i18n.LANGS if l["dir"]]   # every language tree (docs/I18N.md)
 ATTR = re.compile(r'(?:href|src)="([^"]+)"')
 ID = re.compile(r'\bid="([^"]+)"')
 
 
 def main() -> int:
-    pages = [ROOT / "index.html"]
-    for d in SITE_DIRS:
-        pages += sorted((ROOT / d).rglob("*.html"))
+    pages = []
+    for tree in TREES:
+        pages.append(tree / "index.html")
+        for d in SITE_DIRS:
+            pages += sorted((tree / d).rglob("*.html"))
     ids_cache: dict[Path, set[str]] = {}
     errors = []
     for page in pages:

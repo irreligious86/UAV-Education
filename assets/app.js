@@ -3,6 +3,7 @@
  * Reads through window.UAVGrading.load() (which reads window.UAVProgress).
  * Without JS the site is fully readable; only progress tracking is missing.
  */
+var T = (typeof window !== "undefined" && window.T) || function (s) { return s; };   // assets/i18n.js
 (function () {
   "use strict";
 
@@ -34,10 +35,10 @@
       if (isCard) {
         el.setAttribute("href", href);
         el.innerHTML = next
-          ? '<span class="gc-label gc-muted">' + (passed ? "Продолжить · шаг " + (list.indexOf(next) + 1) + " из " + list.length : "Начать путь") + '</span><br><strong>' + next.title + "</strong>"
-          : '<span class="gc-label gc-muted">Все шаги пройдены</span><br><strong>Повторить последний шаг</strong>';
+          ? '<span class="gc-label gc-muted">' + (passed ? T("Продолжить · шаг ") + (list.indexOf(next) + 1) + T(" из ") + list.length : T("Начать путь")) + '</span><br><strong>' + next.title + "</strong>"
+          : T('<span class="gc-label gc-muted">Все шаги пройдены</span><br><strong>Повторить последний шаг</strong>');
       } else {
-        el.textContent = next ? (passed ? "Продолжить: " : "Начать: ") + next.title : "Все шаги пройдены";
+        el.textContent = next ? (passed ? T("Продолжить: ") : T("Начать: ")) + next.title : T("Все шаги пройдены");
         el.setAttribute("data-next-href", href);
       }
     });
@@ -78,7 +79,7 @@
       if (badge) {
         var label = window.UAVGrading.statusLabel(g);
         badge.hidden = !label;
-        badge.textContent = label === "ОСВОЕН" && caps[el.getAttribute("data-module-id")] ? "СДАН" : label;
+        badge.textContent = label === T("ОСВОЕН") && caps[el.getAttribute("data-module-id")] ? T("СДАН") : label;
         badge.setAttribute("data-state", window.UAVGrading.statusState(g) || "ok");
       }
     });
@@ -89,16 +90,16 @@
       var badge = page.querySelector(".module-tags [data-done-badge]");
       if (badge && g) {
         var label = window.UAVGrading.statusLabel(g);
-        badge.hidden = !label; badge.textContent = (label === "ОСВОЕН" && caps[id]) ? "СДАН" : label;
+        badge.hidden = !label; badge.textContent = (label === T("ОСВОЕН") && caps[id]) ? T("СДАН") : label;
         badge.setAttribute("data-state", window.UAVGrading.statusState(g) || "ok");
       }
       var sc = document.querySelector("[data-module-score]");
       if (sc && grades[id]) {
         var gr = grades[id], parts = [];
-        if (gr.hasQuiz) parts.push("квиз " + (gr.quizPct === null ? "—" : gr.quizPct + "%"));
-        if (gr.tasksTotal) parts.push("задачи " + gr.tasksDone + "/" + gr.tasksTotal);
-        if (gr.labTotal) parts.push("лаба " + gr.labDone + "/" + gr.labTotal);
-        sc.textContent = "Балл модуля: " + gr.score + "/100 · " + parts.join(" · ");
+        if (gr.hasQuiz) parts.push(T("квиз ") + (gr.quizPct === null ? "—" : gr.quizPct + "%"));
+        if (gr.tasksTotal) parts.push(T("задачи ") + gr.tasksDone + "/" + gr.tasksTotal);
+        if (gr.labTotal) parts.push(T("лаба ") + gr.labDone + "/" + gr.labTotal);
+        sc.textContent = T("Балл модуля: ") + gr.score + "/100 · " + parts.join(" · ");
       }
     }
 
@@ -112,7 +113,7 @@
     document.querySelectorAll("[data-progress-label]").forEach(function (label) {
       var list = ids(label.getAttribute("data-progress-label"));
       var gg = window.UAVGrading.groupGrade(list, grades);
-      label.textContent = list.length ? "освоено " + gg.passed + " из " + gg.total + " · балл " + gg.score : "";
+      label.textContent = list.length ? T("освоено ") + gg.passed + T(" из ") + gg.total + T(" · балл ") + gg.score : "";
     });
 
     renderPaths(G);
@@ -123,11 +124,11 @@
       var earned = g && g.status === "passed" && !g.selfMarked;
       var marked = G.state.done.has(id);
       if (earned && !marked) {
-        btn.textContent = isCap ? "✓ Сдан по критериям" : (g.tasksTotal ? "✓ Освоен: квиз сдан, задачи решены, лабораторная выполнена" : "✓ Освоен: квиз сдан, лабораторная выполнена");
+        btn.textContent = isCap ? T("✓ Сдан по критериям") : (g.tasksTotal ? T("✓ Освоен: квиз сдан, задачи решены, лабораторная выполнена") : T("✓ Освоен: квиз сдан, лабораторная выполнена"));
         btn.setAttribute("variant", "primary"); btn.setAttribute("disabled", "");
       } else {
         btn.removeAttribute("disabled");
-        btn.textContent = marked ? "✓ Отмечен вручную — снять отметку" : (isCap ? "Отметить сданным без критериев" : "Отметить пройденным без квиза и лабы");
+        btn.textContent = marked ? T("✓ Отмечен вручную — снять отметку") : (isCap ? T("Отметить сданным без критериев") : T("Отметить пройденным без квиза и лабы"));
         btn.setAttribute("variant", marked ? "primary" : "secondary");
       }
     });

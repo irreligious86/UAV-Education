@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en" data-theme="dark" data-lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Камеры и видеопоток на companion — UAV Student</title>
+  <meta name="description" content="подключить CSI/USB-камеру, получить кадры в Python с минимальной задержкой измерить задержку и FPS передать поток в GCS (RTSP/GStreamer)">
+  <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
+  <link rel="manifest" href="../../manifest.webmanifest">
+  <meta name="theme-color" content="#0b0f14">
+  <link rel="alternate" hreflang="ru" href="../../m/per-camera.html">
+  <link rel="alternate" hreflang="uk" href="../../uk/m/per-camera.html">
+  <link rel="alternate" hreflang="en" href="../../en/m/per-camera.html">
+  <script>/* go to the visitor's chosen language before anything paints (assets/i18n.js) */(function(){try{var c=localStorage.getItem('uav-lang'),h=document.documentElement.getAttribute('data-lang');if(!c||c===h||/[?&]lang=keep\b/.test(location.search))return;var l=document.querySelector('link[rel=alternate][hreflang="'+c+'"]');if(l)location.replace(l.href+location.search+location.hash)}catch(e){}})();</script>
+  <link rel="stylesheet" href="../../lib/ground-control-ui/dist/ground-control.css">
+  <link rel="stylesheet" href="../../assets/site.css">
+  <script src="../../lib/ground-control-ui/dist/ground-control.js" defer></script>
+  <script src="../../assets/i18n/en.js"></script>
+  <script src="../../assets/i18n.js"></script>
+  <script src="../../assets/progress-store.js" defer></script>
+  <script src="../../assets/backend-config.js" defer></script>
+  <script src="../../assets/account.js" defer></script>
+  <script src="../../assets/grading.js" defer></script>
+  <script src="../../assets/app.js" defer></script>
+  <script src="../../assets/uav-quiz.js" defer></script>
+  <script src="../../assets/uav-tasks.js" defer></script>
+  <script src="../../assets/offline.js" defer></script>
+</head>
+<body class="gc-root" data-base="../" data-root="../../">
+  <header class="site-header">
+    <div class="gc-container site-header__inner">
+      <a class="site-brand" href="../index.html"><span class="site-brand__mark" aria-hidden="true">◆</span> UAV Student</a>
+      <nav class="gc-nav" aria-label="Разделы сайта">
+        <a href="../index.html" aria-current="page">Курс</a>
+        <a href="../ref/index.html">Справочник</a>
+        <a href="../pages/glossary.html">Глоссарий</a>
+        <a href="../pages/fails.html">Фейлы</a>
+        <a href="../pages/search.html">Поиск</a>
+        <a href="../pages/progress.html">Мой прогресс</a>
+      </nav>
+      <nav class="lang-switch" aria-label="Язык"><a class="gc-tag" href="../../m/per-camera.html" data-lang-to="ru" hreflang="ru" lang="ru" title="Русский">RU</a><a class="gc-tag" href="../../uk/m/per-camera.html" data-lang-to="uk" hreflang="uk" lang="uk" title="Українська">UK</a><a class="gc-tag" href="../../en/m/per-camera.html" data-lang-to="en" hreflang="en" lang="en" title="English" aria-current="true" data-state="ok">EN</a></nav>
+    </div>
+  </header>
+  <main class="gc-container site-main">
+    <article class="module" data-module-page="per-camera">
+      <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-perception">Восприятие и интеллект</a><span>Камеры и видеопоток на companion</span></p>
+      <h1 class="module-title">Камеры и видеопоток на companion</h1>
+      <div class="module-tags"><span class="gc-tag" title="Уровень">L3 — Специалист</span><span class="gc-tag">чтение 35 мин</span><span class="gc-tag">учёба ~3 ч</span><span class="gc-tag">ArduPilot · PX4</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ОСВОЕН</span></div>
+      <p class="gc-muted module-score" data-module-score></p>
+      <p class="module-lead">Бортовое зрение начинается с кадра, который дошёл до программы вовремя. Модуль — про путь камера → память → алгоритм → GCS: CSI против USB, форматы (MJPEG/YUV/H.264), захват в Python с минимальной задержкой (libcamera/V4L2 через OpenCV или GStreamer), измерение реальной задержки и FPS, и передача потока в QGroundControl по RTSP/UDP через GStreamer с аппаратным кодированием. Лабораторная: кадры в OpenCV с замером FPS, RTSP-поток в QGC, измеренная задержка.</p>
+      <div class="gc-callout" data-state="ok"><strong>После модуля ты умеешь</strong><ul><li>подключить CSI/USB-камеру, получить кадры в Python с минимальной задержкой</li><li>измерить задержку и FPS</li><li>передать поток в GCS (RTSP/GStreamer)</li></ul></div><p class="gc-muted">Перед этим модулем: <a href="comp-raspberry.html">Raspberry Pi + ArduPilot</a></p><div class="gc-callout lab"><p class="gc-label gc-muted">Лабораторная</p><strong>Поток с камеры</strong><p class="gc-muted lab__hint">Сдано, когда отмечены все пункты:</p><ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="per-camera:lab:0"><span>Кадры в OpenCV с замером FPS</span></label></li><li><label><input type="checkbox" data-check-id="per-camera:lab:1"><span>RTSP-поток в QGC</span></label></li><li><label><input type="checkbox" data-check-id="per-camera:lab:2"><span>Задержка измерена</span></label></li></ul></div><div class="path-pos gc-muted"><span class="gc-label">В пути</span><ul><li data-path-pos="ardupilot"><a href="../path/ardupilot.html">ArduPilot</a>: шаг 61 из 69 → <a href="per-geometry.html?path=ardupilot">Геометрия камеры: от пикселя до точки на земле</a></li><li data-path-pos="px4"><a href="../path/px4.html">PX4</a>: шаг 30 из 36 → <a href="per-geometry.html?path=px4">Геометрия камеры: от пикселя до точки на земле</a></li></ul></div>
+      <div class="gc-prose module-body">
+<div class="gc-callout" data-state="caution" data-untranslated><strong>Модуль ещё не переведён.</strong> Ниже — оригинал (Русский). Прогресс и оценки общие для всех языков.</div>
+<h2>Теория</h2>
+<h4 class="md-subheading">Камеры и интерфейсы</h4>
+<ul><li><strong>CSI</strong> (Raspberry Pi Camera v2/v3, HQ; Jetson IMX219/IMX477): прямой интерфейс к ISP, минимальная задержка (1–2 кадра), высокая частота (120 fps в низком разрешении), короткий шлейф (до ~30 см без усилителя — на дроне это ограничение). Управление через libcamera (Pi) / Argus (Jetson).</li><li><strong>USB (UVC)</strong>: любая веб-камера; задержка выше (буферы, USB-контроллер), часто только MJPEG на высоких fps (декодирование стоит CPU), зато кабель до 3–5 м и смена камеры без драйверов. Global shutter USB-камеры (например, на OV9281) — для быстрого движения и VIO.</li><li><strong>IP-камеры/HDMI-захват</strong>: для тяжёлых платформ; задержка 100+ мс — для телеметрии оператору, не для контура управления.</li><li><strong>Затвор</strong>: rolling (строки в разное время — «желе» при вибрации и быстром вращении; ломает VIO) против global (весь кадр одновременно). Для навигации — global.</li><li><strong>Форматы</strong>: YUV420 — сырой, дёшево для алгоритмов; MJPEG — сжат, каждый кадр независим, декодировать на CPU; H.264/H.265 — для передачи, кодировать аппаратно (Pi 4: H.264 до 1080p30; Jetson: NVENC).</li></ul>
+<h4 class="md-subheading">Захват с минимальной задержкой</h4>
+<p>Принципы: (1) не копировать лишний раз, (2) короткая очередь буферов (1–2 кадра), (3) брать <strong>последний</strong> кадр, а не первый из очереди, (4) разрешение — по задаче (детектору хватает 640×480), (5) фиксированная экспозиция/усиление — иначе автоэкспозиция даёт рывки.</p>
+<p>OpenCV + V4L2 (USB):</p>
+<pre class="cli-block"><code>import cv2, time
+cap = cv2.VideoCapture(0, cv2.CAP_V4L2)
+cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc(*&quot;MJPG&quot;))
+cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640); cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
+cap.set(cv2.CAP_PROP_FPS, 60); cap.set(cv2.CAP_PROP_BUFFERSIZE, 1)
+t0 = time.perf_counter(); n = 0
+while True:
+    ok, frame = cap.read()                 # with BUFFERSIZE=1 this is the latest frame
+    if not ok: break
+    n += 1
+    if n % 60 == 0: print(f&quot;{n / (time.perf_counter() - t0):.1f} fps&quot;)</code></pre>
+<p>Pi CSI: <code>picamera2</code> (<code>Picamera2().configure(create_video_configuration(main={&quot;size&quot;: (640, 480), &quot;format&quot;: &quot;RGB888&quot;}, buffer_count=2))</code>, <code>capture_array()</code>); Jetson: GStreamer-пайплайн <code>nvarguscamerasrc ! nvvidconv ! video/x-raw,format=BGRx ! appsink</code> через <code>cv2.VideoCapture(pipeline, cv2.CAP_GSTREAMER)</code>.</p>
+<h4 class="md-subheading">Измерить задержку</h4>
+<p>«Glass-to-glass»: на экране телефона секундомер с миллисекундами (или мигающий LED с таймером), камера смотрит на него, программа показывает кадр рядом — фото обоих: разница = задержка захват+обработка+вывод. Для передачи в GCS — то же с экраном GCS. Типично: CSI + OpenCV локально 30–60 мс; USB MJPEG 60–120 мс; RTSP H.264 до QGC по Wi-Fi 150–300 мс (буферизация плеера — главный вклад; в QGC и GStreamer-приёмнике уменьшать <code>latency</code>).</p>
+<p>FPS — считать по времени между кадрами, не по заявленному; дропы — по разнице номеров кадров/timestamp.</p>
+<h4 class="md-subheading">Поток в GCS</h4>
+<p>GStreamer на борту (Pi 4, аппаратный H.264 через <code>v4l2h264enc</code>; Jetson — <code>nvv4l2h264enc</code>):</p>
+<pre class="cli-block"><code># UDP/RTP to the GCS (QGC: Video Source = UDP h.264, port 5600)
+gst-launch-1.0 libcamerasrc ! video/x-raw,width=1280,height=720,framerate=30/1 \
+  ! videoconvert ! v4l2h264enc extra-controls=&quot;controls,repeat_sequence_header=1,video_bitrate=2000000&quot; \
+  ! h264parse ! rtph264pay config-interval=1 pt=96 ! udpsink host=192.168.1.10 port=5600 sync=false</code></pre>
+<p>RTSP-сервер (QGC: RTSP URL): <code>gst-rtsp-server</code> (<code>test-launch</code> из examples) или <code>mediamtx</code> с тем же пайплайном; RTSP удобен для нескольких клиентов и переподключений, UDP — минимальная задержка. Битрейт — по бюджету линка (2–4 Мбит/с для 720p30 на Wi-Fi/4G; для дальних линков 0.5–1 Мбит/с с 480p). Ключевые кадры чаще (<code>iframe period</code> 1 с) — быстрее восстановление после потерь.</p>
+<h4 class="md-subheading">Камера и автопилот</h4>
+<p>Время кадра должно сопоставляться с данными полёта: timestamp кадра (монотонные часы) + MAVLink <code>SYSTEM_TIME</code>/<code>TIMESYNC</code> для синхронизации с FC; смещение и ориентация камеры относительно IMU (<code>CAM_*</code>/extrinsics) — для любой геометрии (VIO, слежение). Companion питается от своего BEC (модуль про периферию), камера и шлейф — вдали от силовых проводов.</p>
+<figure class="diagram" data-diagram="glass-to-glass"><div class="diagram__svg"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 274" width="100%" role="img" aria-labelledby="t" style="max-width:720px;display:block;margin:0 auto"><title id="t">Задержка «стекло → стекло» видеопотока (типично, 30 кадр/с)</title><style>text{font-family: var(--gc-font-mono, ui-monospace, Menlo, monospace); font-size: 12px;fill:currentColor} .m{fill:var(--gc-ink-muted, #8a93a3)} .a{fill:var(--gc-accent-hud, #5ef1d2)} .w{fill:var(--gc-signal-amber, #f0b24c)} .d{fill:var(--gc-signal-red, #e8636b)} .box{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:currentColor;stroke-width:1.2} .boxa{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6} .ln{stroke:currentColor;stroke-width:1.2;fill:none} .lna{stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6;fill:none} .lnm{stroke:var(--gc-ink-muted, #8a93a3);stroke-width:1;fill:none;stroke-dasharray:4 3} .t{font-size:11px} .b{font-weight:600}</style><defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker><marker id="ara" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--gc-accent-hud, #5ef1d2)"/></marker></defs><text x="16" y="16" text-anchor="start" class="m t">Задержка «стекло → стекло» видеопотока (типично, 30 кадр/с)</text><text x="112" y="67" text-anchor="end" style="font-size:11px">Экспозиция</text><line class="lnm" x1="120" y1="78" x2="704" y2="78"/><rect class="box" x="120.0" y="51" width="77.9" height="22" rx="3"/><text x="158.93333333333334" y="66" text-anchor="middle" style="font-size:10px">до 33 мс</text><text x="112" y="101" text-anchor="end" style="font-size:11px">Считывание</text><line class="lnm" x1="120" y1="112" x2="704" y2="112"/><rect class="box" x="197.9" y="85" width="68.1" height="22" rx="3"/><text x="231.93333333333334" y="100" text-anchor="middle" style="font-size:10px"></text><text x="112" y="135" text-anchor="end" style="font-size:11px">ISP + кодер</text><line class="lnm" x1="120" y1="146" x2="704" y2="146"/><rect class="boxa" x="266.0" y="119" width="121.7" height="22" rx="3"/><text x="326.83333333333337" y="134" text-anchor="middle" class="b" style="font-size:10px">H.264</text><text x="112" y="169" text-anchor="end" style="font-size:11px">Сеть</text><line class="lnm" x1="120" y1="180" x2="704" y2="180"/><rect class="boxa" x="387.7" y="153" width="146.0" height="22" rx="3"/><text x="460.66666666666674" y="168" text-anchor="middle" class="b" style="font-size:10px">Wi-Fi / 4G</text><text x="112" y="203" text-anchor="end" style="font-size:11px">Декодер</text><line class="lnm" x1="120" y1="214" x2="704" y2="214"/><rect class="box" x="533.7" y="187" width="73.0" height="22" rx="3"/><text x="570.1666666666667" y="202" text-anchor="middle" style="font-size:10px"></text><text x="112" y="237" text-anchor="end" style="font-size:11px">Экран</text><line class="lnm" x1="120" y1="248" x2="704" y2="248"/><rect class="box" x="606.7" y="221" width="97.3" height="22" rx="3"/><text x="655.3333333333334" y="236" text-anchor="middle" style="font-size:10px">vsync</text><line class="lnm" x1="120.0" y1="40" x2="120.0" y2="254"/><text x="120.0" y="268" text-anchor="middle" class="m t" style="font-size:10px">0 мс</text><line class="lnm" x1="236.8" y1="40" x2="236.8" y2="254"/><text x="236.8" y="268" text-anchor="middle" class="m t" style="font-size:10px">24 мс</text><line class="lnm" x1="353.6" y1="40" x2="353.6" y2="254"/><text x="353.6" y="268" text-anchor="middle" class="m t" style="font-size:10px">48 мс</text><line class="lnm" x1="470.4" y1="40" x2="470.4" y2="254"/><text x="470.4" y="268" text-anchor="middle" class="m t" style="font-size:10px">72 мс</text><line class="lnm" x1="587.2" y1="40" x2="587.2" y2="254"/><text x="587.2" y="268" text-anchor="middle" class="m t" style="font-size:10px">96 мс</text><line class="lnm" x1="704.0" y1="40" x2="704.0" y2="254"/><text x="704.0" y="268" text-anchor="middle" class="m t" style="font-size:10px">120 мс</text><line class="lna" x1="120.0" y1="38" x2="120.0" y2="254"/><text x="124.0" y="34" text-anchor="start" class="a t" style="font-size:10px">свет на сенсоре</text><line class="lna" x1="704.0" y1="38" x2="704.0" y2="254"/><text x="570" y="34" text-anchor="start" class="a t" style="font-size:10px"></text></svg></div><figcaption class="gc-muted">Из чего складывается задержка видеопотока от света на сенсоре до экрана (типичные доли; измеряйте свою цепочку).</figcaption><div class="diagram__hint">Схему можно прокрутить по горизонтали</div></figure>
+
+<h2>Практика</h2>
+<h4 class="md-subheading">Шаг 1. Захват</h4>
+<p>USB или CSI: код выше, 640×480, фиксированная экспозиция; 30 с — средний FPS, дропы. Сравнить BUFFERSIZE 1 и 4.</p>
+<h4 class="md-subheading">Шаг 2. Задержка glass-to-glass</h4>
+<p>Секундомер на телефоне → фото «экран vs окно OpenCV» ×5 → среднее. Затем с выводом через <code>cv2.imshow</code> отключённым (только захват + timestamp на кадре) — оценить вклад вывода.</p>
+<p>Точнее и без фото — мигающий экран. Камера смотрит на окно, которое программа переключает между чёрным и белым; задержка = момент, когда камера увидела смену, минус момент переключения (одни и те же часы, поэтому синхронизация не нужна):</p>
+<pre class="cli-block"><code>import cv2, numpy as np, time
+cap = cv2.VideoCapture(0); cap.set(cv2.CAP_PROP_BUFFERSIZE, 1)
+cv2.namedWindow(&quot;flash&quot;, cv2.WINDOW_NORMAL)
+lat = []
+for k in range(20):
+    white = k % 2 == 0
+    cv2.imshow(&quot;flash&quot;, np.full((400, 400), 255 if white else 0, np.uint8)); cv2.waitKey(1)
+    t_switch = time.perf_counter()
+    while True:
+        ok, f = cap.read()
+        if ok and (f.mean() &gt; 128) == white:          # the camera now sees the new colour
+            lat.append((time.perf_counter() - t_switch) * 1000); break
+    time.sleep(0.3)
+print(f&quot;latency median {np.median(lat):.0f} ms, p95 {np.percentile(lat, 95):.0f} ms&quot;)</code></pre>
+<p>Камеру направить так, чтобы окно занимало почти весь кадр; в результат входит и задержка самого монитора (5–20 мс) — для сравнения вариантов (USB против CSI, MJPEG против YUYV, BUFFERSIZE 1 против 4) это не мешает.</p>
+<h4 class="md-subheading">Шаг 3. Поток в QGC</h4>
+<p>GStreamer UDP H.264 на QGC; задержка glass-to-glass до экрана GCS; битрейт против качества/задержки (2 Мбит vs 8 Мбит).</p>
+<p>Порядок величин для настройки: 1280×720 при 30 кадр/с и 2 Мбит/с — в среднем ~8 КБ на кадр; ключевой кадр (I-frame) в 5–10 раз больше, и на слабом канале именно он приходит с опозданием или теряется. Отсюда настройки для низкой задержки: короткий интервал ключевых кадров (0.5–1 с), <code>config-interval=1</code> в <code>rtph264pay</code> (параметры потока повторяются — приёмник, подключившийся позже, сразу начинает декодировать), без B-кадров.</p>
+<h4 class="md-subheading">Шаг 4. RTSP</h4>
+<p>mediamtx или gst-rtsp-server; подключиться из QGC и VLC одновременно. Лабораторная: FPS измерен, задержка измерена мигающим экраном (медиана и p95) для двух вариантов захвата, RTSP в QGC, битрейт и интервал ключевых кадров обоснованы.</p>
+
+<h2>Диагностика</h2>
+<div class="diag-groups"><article class="diag-item"><h4><strong>Симптом:</strong> задержка растёт со временем</h4><ul><li>Возможная причина: алгоритм медленнее FPS — очередь буферов копится.</li><li>Что сделать: BUFFERSIZE 1, брать последний кадр, снизить разрешение/FPS, пропускать кадры.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> «желе»/изгибы на движении</h4><ul><li>Возможная причина: rolling shutter + вибрации.</li><li>Что сделать: демпфирование камеры, global shutter, короче экспозиция.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> в QGC поток дёргается</h4><ul><li>Возможная причина: битрейт выше пропускной способности, потери пакетов без ключевых кадров.</li><li>Что сделать: битрейт ниже, iframe чаще, проверить Wi-Fi/бюджет.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> CSI-камера не определяется</h4><ul><li>Возможная причина: шлейф/разъём, длина, не включён overlay.</li><li>Что сделать: <code>rpicam-hello --list-cameras</code> (до Raspberry Pi OS Bookworm — <code>libcamera-hello</code>), шлейф короче, конфиг <code>dtoverlay</code>.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> автоэкспозиция «мигает» при наклонах</h4><ul><li>Возможная причина: AE реагирует на небо/землю.</li><li>Что сделать: фиксированная экспозиция/усиление или ограничение диапазона.</li></ul></article></div>
+
+<h2>Чек-лист</h2>
+<ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="per-camera:0"><span>Знаю разницу CSI/USB, rolling/global shutter и форматов</span></label></li><li><label><input type="checkbox" data-check-id="per-camera:1"><span>Захват с очередью 1 кадр и фиксированной экспозицией</span></label></li><li><label><input type="checkbox" data-check-id="per-camera:2"><span>FPS и glass-to-glass задержка измерены</span></label></li><li><label><input type="checkbox" data-check-id="per-camera:3"><span>Поток H.264 в QGC по UDP и RTSP работает</span></label></li><li><label><input type="checkbox" data-check-id="per-camera:4"><span>Понимаю, где теряется задержка в цепочке и как её уменьшить</span></label></li></ul>
+
+<h2>Источники</h2>
+<ul class="refs"><li><a href="https://raspberrypi.com/documentation/computers/camera_software.html" target="_blank" rel="noopener noreferrer">Raspberry Pi — Camera software (libcamera, picamera2)</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://gstreamer.freedesktop.org/documentation/" target="_blank" rel="noopener noreferrer">GStreamer — Documentation</a> <span class="gc-tag">secondary</span></li><li><a href="https://docs.qgroundcontrol.com/Stable_V5.0/en/qgc-user-guide/settings_view/video.html" target="_blank" rel="noopener noreferrer">QGroundControl — Video settings (UDP/RTSP sources)</a> <span class="gc-tag" data-state="info">primary</span></li></ul>
+<h2>Проверь себя</h2>
+<uav-quiz src="../quiz/per-camera.json" module="per-camera"></uav-quiz>
+      </div>
+      <div class="module-done"><gc-button variant="secondary" data-done-toggle="per-camera">Отметить как пройденный</gc-button></div>
+      <section class="related" aria-label="Смежные модули"><p class="gc-label gc-muted">Смежные модули</p><div class="gc-grid ref-grid"><a class="gc-card" href="comp-raspberry.html"><strong>Raspberry Pi + ArduPilot</strong><div class="gc-card__meta"><span class="gc-tag" title="L3 — Специалист">L3</span></div></a><a class="gc-card" href="per-cv.html"><strong>Компьютерное зрение: от OpenCV до нейросетей</strong><div class="gc-card__meta"><span class="gc-tag" title="L4 — Эксперт">L4</span></div></a><a class="gc-card" href="link-vtx.html"><strong>VTX-таблицы и смена видеоканала</strong><div class="gc-card__meta"><span class="gc-tag" title="L2 — Интегратор">L2</span></div></a></div></section>
+      <nav class="pager" aria-label="Соседние модули" data-track-pager><a class="gc-card pager__next" href="per-geometry.html"><span class="gc-label gc-muted">Дальше · трек</span><br>Геометрия камеры: от пикселя до точки на земле</a></nav><nav class="pager" aria-label="Соседние шаги пути ArduPilot" data-path-pager="ardupilot" hidden><a class="gc-card pager__prev" href="ros2-ardupilot.html?path=ardupilot"><span class="gc-label gc-muted">Назад · путь ArduPilot</span><br>ROS 2 + ArduPilot: AP_DDS и MAVROS, один узел — два маршрута</a><a class="gc-card pager__next" href="per-geometry.html?path=ardupilot"><span class="gc-label gc-muted">Дальше · шаг 62 из 69</span><br>Геометрия камеры: от пикселя до точки на земле</a></nav><nav class="pager" aria-label="Соседние шаги пути PX4" data-path-pager="px4" hidden><a class="gc-card pager__prev" href="ros2-nav.html?path=px4"><span class="gc-label gc-muted">Назад · путь PX4</span><br>Навигация и обход препятствий: карты, планировщики, уставки</a><a class="gc-card pager__next" href="per-geometry.html?path=px4"><span class="gc-label gc-muted">Дальше · шаг 31 из 36</span><br>Геометрия камеры: от пикселя до точки на земле</a></nav>
+    </article>
+  </main>
+  <footer class="gc-container site-footer gc-muted">
+    <p>Открытый курс · <a href="https://github.com/irreligious86/UAV-Education">исходники на GitHub</a> · <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">план развития</a> · <a href="../../curriculum/curriculum.html">для разработчика</a> · CC BY-NC-SA 4.0</p>
+  </footer>
+</body>
+</html>

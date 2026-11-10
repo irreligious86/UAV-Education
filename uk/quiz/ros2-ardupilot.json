@@ -1,0 +1,94 @@
+{
+  "module": "ros2-ardupilot",
+  "pass": 80,
+  "questions": [
+    {
+      "q": "Включить AP_DDS по последовательному порту:",
+      "options": [
+        "PROTOCOL 45, DDS_ENABLE",
+        "MAV_SYSID = 45",
+        "RNGFND1_TYPE = 10",
+        "SERIALn_PROTOCOL = 2 (MAVLink2)"
+      ],
+      "answer": 0,
+      "explain": "Для UDP — DDS_UDP_PORT (2019) и DDS_IP0..3."
+    },
+    {
+      "q": "В какой системе координат /ap/pose/filtered?",
+      "options": [
+        "ENU, map",
+        "NED относительно дома",
+        "ECEF",
+        "FRD"
+      ],
+      "answer": 0,
+      "explain": "AP_DDS конвертирует сам."
+    },
+    {
+      "q": "Сервис смены режима в GUIDED для Copter:",
+      "options": [
+        "/ap/mode_switch, 4",
+        "/ap/arm_motors",
+        "/ap/cmd_vel",
+        "/mavros/set_mode, 6"
+      ],
+      "answer": 0,
+      "explain": "GUIDED = 4, LAND = 9."
+    },
+    {
+      "q": "Уставки /ap/cmd_vel на земле игнорируются. Чего не хватает?",
+      "options": [
+        "Взлёта в GUIDED",
+        "QoS RELIABLE",
+        "MAVROS",
+        "Сервиса prearm и QoS"
+      ],
+      "answer": 0,
+      "explain": "Порядок: GUIDED → arm → takeoff → уставки."
+    },
+    {
+      "q": "Если cmd_vel перестал приходить в GUIDED, ArduPilot останавливается через:",
+      "options": [
+        "GUID_TIMEOUT",
+        "COM_OF_LOSS_T",
+        "FS_GCS_TIMEOUT",
+        "DDS_TIMEOUT_MS"
+      ],
+      "answer": 0,
+      "explain": "Аналог 2 Гц у PX4."
+    },
+    {
+      "q": "Где взять типы ardupilot_msgs?",
+      "options": [
+        "Tools/ros2 в ArduPilot",
+        "В px4_msgs",
+        "В пакете px4_msgs",
+        "В ROS core"
+      ],
+      "answer": 0,
+      "explain": "Ветка должна соответствовать прошивке."
+    },
+    {
+      "q": "Когда MAVROS предпочтительнее AP_DDS?",
+      "options": [
+        "Миссии, параметры, весь MAVLink",
+        "Всегда",
+        "Ради минимальной задержки",
+        "Никогда"
+      ],
+      "answer": 0,
+      "explain": "MAVROS охватывает почти весь MAVLink."
+    },
+    {
+      "q": "frame_id \"base_link\" в /ap/cmd_vel означает:",
+      "options": [
+        "Оси корпуса",
+        "Мировые ENU",
+        "Глобальные координаты",
+        "Ошибка"
+      ],
+      "answer": 0,
+      "explain": "\"map\" — мировые ENU."
+    }
+  ]
+}

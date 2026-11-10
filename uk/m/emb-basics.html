@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="uk" data-theme="dark" data-lang="uk">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Embedded: прерывания, таймеры, DMA, RTOS — UAV Student</title>
+  <meta name="description" content="объяснить, как FC успевает 8 кГц: прерывания, DMA, приоритеты написать на ESP32 задачу FreeRTOS с очередью и таймером понимать, почему blocking-код в петле — авария">
+  <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
+  <link rel="manifest" href="../../manifest.webmanifest">
+  <meta name="theme-color" content="#0b0f14">
+  <link rel="alternate" hreflang="ru" href="../../m/emb-basics.html">
+  <link rel="alternate" hreflang="uk" href="../../uk/m/emb-basics.html">
+  <link rel="alternate" hreflang="en" href="../../en/m/emb-basics.html">
+  <script>/* go to the visitor's chosen language before anything paints (assets/i18n.js) */(function(){try{var c=localStorage.getItem('uav-lang'),h=document.documentElement.getAttribute('data-lang');if(!c||c===h||/[?&]lang=keep\b/.test(location.search))return;var l=document.querySelector('link[rel=alternate][hreflang="'+c+'"]');if(l)location.replace(l.href+location.search+location.hash)}catch(e){}})();</script>
+  <link rel="stylesheet" href="../../lib/ground-control-ui/dist/ground-control.css">
+  <link rel="stylesheet" href="../../assets/site.css">
+  <script src="../../lib/ground-control-ui/dist/ground-control.js" defer></script>
+  <script src="../../assets/i18n/uk.js"></script>
+  <script src="../../assets/i18n.js"></script>
+  <script src="../../assets/progress-store.js" defer></script>
+  <script src="../../assets/backend-config.js" defer></script>
+  <script src="../../assets/account.js" defer></script>
+  <script src="../../assets/grading.js" defer></script>
+  <script src="../../assets/app.js" defer></script>
+  <script src="../../assets/uav-quiz.js" defer></script>
+  <script src="../../assets/uav-tasks.js" defer></script>
+  <script src="../../assets/offline.js" defer></script>
+</head>
+<body class="gc-root" data-base="../" data-root="../../">
+  <header class="site-header">
+    <div class="gc-container site-header__inner">
+      <a class="site-brand" href="../index.html"><span class="site-brand__mark" aria-hidden="true">◆</span> UAV Student</a>
+      <nav class="gc-nav" aria-label="Разделы сайта">
+        <a href="../index.html" aria-current="page">Курс</a>
+        <a href="../ref/index.html">Справочник</a>
+        <a href="../pages/glossary.html">Глоссарий</a>
+        <a href="../pages/fails.html">Фейлы</a>
+        <a href="../pages/search.html">Поиск</a>
+        <a href="../pages/progress.html">Мой прогресс</a>
+      </nav>
+      <nav class="lang-switch" aria-label="Язык"><a class="gc-tag" href="../../m/emb-basics.html" data-lang-to="ru" hreflang="ru" lang="ru" title="Русский">RU</a><a class="gc-tag" href="../../uk/m/emb-basics.html" data-lang-to="uk" hreflang="uk" lang="uk" title="Українська" aria-current="true" data-state="ok">UK</a><a class="gc-tag" href="../../en/m/emb-basics.html" data-lang-to="en" hreflang="en" lang="en" title="English">EN</a></nav>
+    </div>
+  </header>
+  <main class="gc-container site-main">
+    <article class="module" data-module-page="emb-basics">
+      <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-engineer">Инженер: код на борту</a><span>Embedded: прерывания, таймеры, DMA, RTOS</span></p>
+      <h1 class="module-title">Embedded: прерывания, таймеры, DMA, RTOS</h1>
+      <div class="module-tags"><span class="gc-tag" title="Уровень">L3 — Специалист</span><span class="gc-tag">чтение 40 мин</span><span class="gc-tag">учёба ~4 ч</span><span class="gc-tag">любая прошивка</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ОСВОЕН</span></div>
+      <p class="gc-muted module-score" data-module-score></p>
+      <p class="module-lead">Полётник на STM32 опрашивает гироскоп 8000 раз в секунду, считает PID, шлёт DShot четырём ESC, принимает CRSF, пишет лог и рисует OSD — на одном ядре. Это возможно только потому, что железо делает работу без процессора (DMA, таймеры), а события приходят прерываниями. Модуль объясняет эти механизмы на уровне, нужном для чтения прошивок и написания своих устройств: прерывания и приоритеты, таймеры и захват/генерация, DMA, планировщик Betaflight, FreeRTOS в ESP32 и NuttX в PX4, джиттер и почему <code>delay()</code> в петле — авария. Лабораторная на ESP32: две задачи FreeRTOS, очередь, аппаратный таймер, замер джиттера, блокировка — показана и устранена.</p>
+      <div class="gc-callout" data-state="ok"><strong>После модуля ты умеешь</strong><ul><li>объяснить, как FC успевает 8 кГц: прерывания, DMA, приоритеты</li><li>написать на ESP32 задачу FreeRTOS с очередью и таймером</li><li>понимать, почему blocking-код в петле — авария</li></ul></div><p class="gc-muted">Перед этим модулем: <a href="comp-esp32.html">ESP32 и периферия</a></p><div class="gc-callout lab"><p class="gc-label gc-muted">Лабораторная</p><strong>Две задачи FreeRTOS</strong><p class="gc-muted lab__hint">Сдано, когда отмечены все пункты:</p><ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="emb-basics:lab:0"><span>Задача датчика и задача UART через очередь</span></label></li><li><label><input type="checkbox" data-check-id="emb-basics:lab:1"><span>Замер джиттера периода</span></label></li><li><label><input type="checkbox" data-check-id="emb-basics:lab:2"><span>Блокировка показана и устранена</span></label></li></ul></div><div class="path-pos gc-muted"><span class="gc-label">В пути</span><ul><li data-path-pos="betaflight"><a href="../path/betaflight.html">Betaflight</a>: шаг 42 из 44 → <a href="bf-custom.html?path=betaflight">Свои сборки прошивок</a></li><li data-path-pos="ardupilot"><a href="../path/ardupilot.html">ArduPilot</a>: шаг 51 из 69 → <a href="emb-protocols.html?path=ardupilot">UART, I2C, SPI, CAN на уровне сигналов и драйверов</a></li></ul></div>
+      <div class="gc-prose module-body">
+<div class="gc-callout" data-state="caution" data-untranslated><strong>Модуль ещё не переведён.</strong> Ниже — оригинал (Русский). Прогресс и оценки общие для всех языков.</div>
+<h2>Теория</h2>
+<h4 class="md-subheading">Чем занят процессор полётника</h4>
+<p>Бюджет на 8 кГц — 125 мкс на цикл. Гироскоп по SPI на 8+ МГц читает 14 байт за ~15 мкс — если ждать в цикле; с DMA — 0 мкс процессорного времени. PID по трём осям на F4 (168 МГц) — ~10–20 мкс, фильтры — столько же, DShot — через таймер+DMA (0 мкс), CRSF — UART с прерыванием/DMA. Остаток — для задач пониже (<code>src/main/fc/tasks.c</code>): <code>TASK_RX</code> — событийно по приходу кадра с запасным периодом 33 Гц, <code>TASK_SERIAL</code> 100 Гц, <code>TASK_BATTERY_CURRENT</code> 50 Гц, <code>TASK_OSD</code> по <code>osd framerate_hz</code>, <code>TASK_GPS</code> по скорости порта, blackbox — на делителе от PID-петли. Betaflight — кооперативный планировщик без RTOS (<code>scheduler.c</code>): каждая задача имеет желаемый период, приоритет и оценку времени; критические задачи (gyro/PID) ничего не вытесняют — планировщик просто не запускает задачу пониже, если её оценка времени выполнения (<code>anticipatedExecutionTime</code>) не помещается до следующего цикла гироскопа; остальные ждут «дырки».</p>
+<h4 class="md-subheading">Прерывания</h4>
+<p>Прерывание — аппаратный сигнал, который приостанавливает текущий код и вызывает обработчик (ISR). Источники: готов байт UART, завершился DMA, сработал таймер, фронт на ноге (EXTI — так гироскоп сообщает «данные готовы», Betaflight <code>gyro_sync</code> по EXTI). Правила ISR: коротко (микросекунды), без блокирующих вызовов и <code>printf</code>, без выделения памяти; тяжёлую работу — в задачу через флаг/очередь. <strong>Приоритеты</strong> (NVIC у Cortex-M): прерывание с большим приоритетом вытесняет ISR с меньшим; гироскоп/DShot — выше, UART-лог — ниже. На ESP32 — <code>ESP_INTR_FLAG_LEVEL1..3</code>, ISR в IRAM (<code>IRAM_ATTR</code>), на другом ядре — через очередь.</p>
+<h4 class="md-subheading">Таймеры</h4>
+<p>Счётчик, который тикает от шины и умеет: генерировать прерывание по периоду (планировщик, period-задачи), <strong>PWM</strong> (compare), <strong>захват</strong> входного фронта (input capture — измерение ширины импульса PWM-приёмника), запускать DMA по событию (DShot: таймер + DMA пишет последовательность длительностей в регистр compare — так один кадр DShot из 16 бит уходит без участия процессора). Разрешение — такт таймера: при 84 МГц — 12 нс.</p>
+<h4 class="md-subheading">DMA</h4>
+<p>Контроллер прямого доступа к памяти копирует данные периферия ↔ память по событиям без процессора: приём UART в кольцевой буфер, чтение SPI-гироскопа, вывод DShot, запись на SD. Ограничения: число каналов/потоков и их привязка к периферии (в STM32F4 конфликты DMA-потоков — реальная причина, почему на некоторых платах нельзя одновременно DShot на все моторы и, например, LED-ленту — target-файлы Betaflight описывают именно это), когерентность кэша на F7/H7 (буферы в некэшируемой памяти или <code>SCB_Clean/InvalidateDCache</code>).</p>
+<h4 class="md-subheading">RTOS: задачи, приоритеты, очереди</h4>
+<p>FreeRTOS (ESP32; PX4 работает на NuttX — другой RTOS с теми же понятиями задач, приоритетов и очередей): задачи с приоритетами и своим стеком; вытесняющий планировщик — задача выше приоритетом всегда получает ядро, когда готова; одинаковые — по времени (tick по умолчанию 100 Гц в ESP-IDF, <code>CONFIG_FREERTOS_HZ</code>; в Arduino-ESP32 — 1000 Гц). Примитивы: <strong>очередь</strong> (ISR → задача, задача → задача, копирует данные, потокобезопасна), <strong>семафор/нотификация</strong> (сигнал «событие»), <strong>мьютекс</strong> (защита общего ресурса — шины I2C), <strong>таймер</strong> (программный, в контексте демона — не для точных периодов). Точный период: <code>vTaskDelayUntil</code> (фиксированный период от последнего пробуждения, не от конца работы) или аппаратный таймер + нотификация.</p>
+<h4 class="md-subheading">Джиттер и блокировка</h4>
+<p>Джиттер — разброс фактического периода. Причины: ISR с длинной работой, задача с большим приоритетом, кэш-промахи, <code>delay()</code>/ожидание в цикле (busy-wait), логирование в <code>printf</code> из критичной задачи, флеш-операции (на ESP32 запись во flash останавливает выполнение кода из flash на другом ядре, если не IRAM). Норма для контура управления: джиттер &lt; 5–10% периода; PX4 и Betaflight меряют и логируют (<code>DEBUG_CYCLETIME</code>, PX4 <code>perf</code>).</p>
+<p><strong>Почему блокировка в петле — авария</strong>: задача управления ждёт UART 50 мс → 400 пропущенных циклов на 8 кГц → гироскоп устарел, D-term скачок, моторы «дёргают»; в худшем случае watchdog перезагружает контроллер в полёте. Отсюда правило: контур управления не ждёт ничего — только читает готовые данные.</p>
+<h4 class="md-subheading">Watchdog</h4>
+<p>Аппаратный таймер, который перезагружает МК, если его не «кормят». Betaflight/ArduPilot/PX4 используют: зависание = перезагрузка (лучше, чем вечный «моторы на последнем значении»); ArduPilot пишет причину в <code>WDOG</code>/<code>BRD_OPTIONS</code>. На ESP32 — task watchdog на idle-задачи: задача без <code>vTaskDelay</code> блокирует idle → TWDT срабатывает.</p>
+<figure class="diagram" data-diagram="fc-loop-125us"><div class="diagram__svg"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 274" width="100%" role="img" aria-labelledby="t" style="max-width:720px;display:block;margin:0 auto"><title id="t">Один цикл 8 кГц (125 мкс): кто занимает процессор</title><style>text{font-family: var(--gc-font-mono, ui-monospace, Menlo, monospace); font-size: 12px;fill:currentColor} .m{fill:var(--gc-ink-muted, #8a93a3)} .a{fill:var(--gc-accent-hud, #5ef1d2)} .w{fill:var(--gc-signal-amber, #f0b24c)} .d{fill:var(--gc-signal-red, #e8636b)} .box{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:currentColor;stroke-width:1.2} .boxa{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6} .ln{stroke:currentColor;stroke-width:1.2;fill:none} .lna{stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6;fill:none} .lnm{stroke:var(--gc-ink-muted, #8a93a3);stroke-width:1;fill:none;stroke-dasharray:4 3} .t{font-size:11px} .b{font-weight:600}</style><defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker><marker id="ara" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--gc-accent-hud, #5ef1d2)"/></marker></defs><text x="16" y="16" text-anchor="start" class="m t">Один цикл 8 кГц (125 мкс): кто занимает процессор</text><text x="112" y="67" text-anchor="end" style="font-size:11px">SPI DMA</text><line class="lnm" x1="120" y1="78" x2="704" y2="78"/><rect class="boxa" x="120.0" y="51" width="37.4" height="22" rx="3"/><text x="138.688" y="66" text-anchor="middle" class="b" style="font-size:10px">гиро</text><text x="112" y="101" text-anchor="end" style="font-size:11px">Фильтры</text><line class="lnm" x1="120" y1="112" x2="704" y2="112"/><rect class="box" x="157.4" y="85" width="102.8" height="22" rx="3"/><text x="208.76799999999997" y="100" text-anchor="middle" style="font-size:10px">RPM, notch, LPF</text><text x="112" y="135" text-anchor="end" style="font-size:11px">PID+миксер</text><line class="lnm" x1="120" y1="146" x2="704" y2="146"/><rect class="box" x="260.2" y="119" width="65.4" height="22" rx="3"/><text x="292.864" y="134" text-anchor="middle" style="font-size:10px"></text><text x="112" y="169" text-anchor="end" style="font-size:11px">DShot DMA</text><line class="lnm" x1="120" y1="180" x2="704" y2="180"/><rect class="boxa" x="325.6" y="153" width="126.1" height="22" rx="3"/><text x="388.64" y="168" text-anchor="middle" class="b" style="font-size:10px">кадр 27 мкс</text><text x="112" y="203" text-anchor="end" style="font-size:11px">ISR UART</text><line class="lnm" x1="120" y1="214" x2="704" y2="214"/><rect class="box" x="362.9" y="187" width="14.0" height="22" rx="3"/><text x="380.96" y="202" text-anchor="start" class="m t" style="font-size:10px">байт RX</text><text x="112" y="237" text-anchor="end" style="font-size:11px">Остаток</text><line class="lnm" x1="120" y1="248" x2="704" y2="248"/><rect class="box" x="451.7" y="221" width="252.3" height="22" rx="3"/><text x="577.856" y="236" text-anchor="middle" style="font-size:10px">OSD, телеметрия, blackbox</text><line class="lnm" x1="120.0" y1="40" x2="120.0" y2="254"/><text x="120.0" y="268" text-anchor="middle" class="m t" style="font-size:10px">0 мкс</text><line class="lnm" x1="236.8" y1="40" x2="236.8" y2="254"/><text x="236.8" y="268" text-anchor="middle" class="m t" style="font-size:10px">25 мкс</text><line class="lnm" x1="353.6" y1="40" x2="353.6" y2="254"/><text x="353.6" y="268" text-anchor="middle" class="m t" style="font-size:10px">50 мкс</text><line class="lnm" x1="470.4" y1="40" x2="470.4" y2="254"/><text x="470.4" y="268" text-anchor="middle" class="m t" style="font-size:10px">75 мкс</text><line class="lnm" x1="587.2" y1="40" x2="587.2" y2="254"/><text x="587.2" y="268" text-anchor="middle" class="m t" style="font-size:10px">100 мкс</text><line class="lnm" x1="704.0" y1="40" x2="704.0" y2="254"/><text x="704.0" y="268" text-anchor="middle" class="m t" style="font-size:10px">125 мкс</text><line class="lna" x1="120.0" y1="38" x2="120.0" y2="254"/><text x="124.0" y="34" text-anchor="start" class="a t" style="font-size:10px">прерывание гиро</text><line class="lna" x1="704.0" y1="38" x2="704.0" y2="254"/><text x="570" y="34" text-anchor="start" class="a t" style="font-size:10px"></text></svg></div><figcaption class="gc-muted">Один цикл 8 кГц: чтение гироскопа по DMA, фильтры, PID и миксер, кадр DShot по DMA; прерывание UART вклинивается, остаток цикла — медленные задачи (порядок величин, не точный профиль).</figcaption><div class="diagram__hint">Схему можно прокрутить по горизонтали</div></figure>
+
+<h2>Практика</h2>
+<h4 class="md-subheading">Шаг 1. Две задачи и очередь (ESP32, ESP-IDF или Arduino-FreeRTOS)</h4>
+<pre class="cli-block"><code>// sensor task: hardware timer notifies every 1 ms; reads IMU (or fakes it) and pushes a sample
+static QueueHandle_t q;
+static TaskHandle_t sensorTask;
+static void IRAM_ATTR on_timer(void *arg) {           // ISR: just notify
+  BaseType_t hp = pdFALSE;
+  vTaskNotifyGiveFromISR(sensorTask, &amp;hp);
+  if (hp) portYIELD_FROM_ISR();
+}
+static void sensor_task(void *arg) {
+  int64_t last = esp_timer_get_time();
+  for (;;) {
+    ulTaskNotifyTake(pdTRUE, portMAX_DELAY);          // wait for timer ISR
+    int64_t now = esp_timer_get_time();
+    sample_t s = { .t_us = now, .dt_us = (int32_t)(now - last) }; last = now;
+    s.gyro = read_gyro();                             // SPI/I2C read, non-blocking driver
+    xQueueSend(q, &amp;s, 0);                             // never block the control task
+  }
+}
+static void uart_task(void *arg) {                    // lower priority: formats and prints
+  sample_t s;
+  for (;;) if (xQueueReceive(q, &amp;s, portMAX_DELAY)) printf(&quot;%lld,%ld,%.2f\n&quot;, s.t_us, (long)s.dt_us, s.gyro);
+}
+// app_main: q = xQueueCreate(64, sizeof(sample_t)); create sensor_task prio 10, uart_task prio 3;
+// esp_timer periodic 1000 us -&gt; on_timer with dispatch_method = ESP_TIMER_ISR (needs CONFIG_ESP_TIMER_SUPPORTS_ISR_DISPATCH_METHOD); default ESP_TIMER_TASK runs the callback in the esp_timer task, not an ISR</code></pre>
+<p>Сборка, запуск, 10 с вывода в файл.</p>
+<h4 class="md-subheading">Шаг 2. Джиттер</h4>
+<p>Из <code>dt_us</code>: среднее (≈1000), std, максимум, гистограмма. Ожидаемо std &lt; 10 мкс, max &lt; 50.</p>
+<h4 class="md-subheading">Шаг 3. Сломать и починить</h4>
+<p>В <code>uart_task</code> добавить <code>vTaskDelay(0)</code>-свободный цикл busy-wait 5 мс (например, <code>while (esp_timer_get_time() &lt; t0 + 5000) {}</code>) и поднять его приоритет до 11 — увидеть, как джиттер датчика вырос до миллисекунд (или сработал TWDT). Вернуть приоритет 3 — джиттер восстановился: вытеснение работает. Затем положить блокирующую запись во flash (NVS) в <code>sensor_task</code> — увидеть провал; вынести в отдельную задачу. Лабораторная: две задачи через очередь, замер джиттера, блокировка показана и устранена.</p>
+<h4 class="md-subheading">Шаг 4. Прочитать прошивку</h4>
+<p>В Betaflight <code>src/main/fc/core.c</code>: <code>taskMainPidLoop</code> → <code>subTaskPidController</code> → <code>subTaskMotorUpdate</code>; в <code>scheduler/scheduler.c</code> — как задачи выбираются. В ArduPilot <code>ArduCopter/Copter.cpp</code> — таблица <code>scheduler_tasks[]</code>: <code>FAST_TASK</code> (на частоте петли: INS update → <code>run_rate_controller_main</code> → <code>motors_output_main</code> → AHRS…) и <code>SCHED_TASK(rc_loop, 250, …)</code> с частотой, бюджетом времени и приоритетом.</p>
+
+<h2>Диагностика</h2>
+<div class="diag-groups"><article class="diag-item"><h4><strong>Симптом:</strong> джиттер периода скачет до мс</h4><ul><li>Возможная причина: более приоритетная задача/ISR делает долгую работу; busy-wait; printf в критичной задаче.</li><li>Что сделать: приоритеты, короткие ISR, вывод в отдельную задачу через очередь.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> ESP32 перезагружается с «Task watchdog got triggered»</h4><ul><li>Возможная причина: задача не отдаёт ядро (нет vTaskDelay/блокирующего ожидания).</li><li>Что сделать: ожидание событий вместо опроса; <code>vTaskDelay(1)</code> в фоновых циклах.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> данные в буфере DMA «старые» на F7/H7</h4><ul><li>Возможная причина: кэш данных.</li><li>Что сделать: некэшируемая память или invalidate после приёма.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> ISR вызывает крах</h4><ul><li>Возможная причина: не-ISR-safe вызов (printf, malloc, обычный xQueueSend) или код не в IRAM на ESP32.</li><li>Что сделать: FromISR-версии, IRAM_ATTR, минимум работы.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> Betaflight: CPU load &gt; 90%, пропуски задач</h4><ul><li>Возможная причина: F4 с 8 кГц и всеми функциями.</li><li>Что сделать: 4 кГц, отключить лишнее, смотреть <code>tasks</code> в CLI.</li></ul></article></div>
+
+<h2>Чек-лист</h2>
+<ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="emb-basics:0"><span>Понимаю, как DMA и таймеры освобождают процессор</span></label></li><li><label><input type="checkbox" data-check-id="emb-basics:1"><span>Знаю правила ISR и приоритеты</span></label></li><li><label><input type="checkbox" data-check-id="emb-basics:2"><span>Две задачи FreeRTOS через очередь работают, джиттер измерен</span></label></li><li><label><input type="checkbox" data-check-id="emb-basics:3"><span>Показал, как блокировка ломает период, и устранил</span></label></li><li><label><input type="checkbox" data-check-id="emb-basics:4"><span>Нашёл главный цикл в Betaflight и таблицу задач в ArduPilot</span></label></li></ul>
+
+<h2>Источники</h2>
+<ul class="refs"><li><a href="https://www.github.com/FreeRTOS/FreeRTOS-Kernel-Book/blob/main/toc.md" target="_blank" rel="noopener noreferrer">FreeRTOS — Mastering the FreeRTOS Real Time Kernel (book, GitHub)</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://docs.espressif.com/projects/esp-idf/en/stable/esp32/api-reference/system/freertos.html" target="_blank" rel="noopener noreferrer">ESP-IDF — FreeRTOS (ESP-IDF additions, task watchdog)</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://github.com/betaflight/betaflight/tree/master/src/main" target="_blank" rel="noopener noreferrer">Betaflight — source: fc/core.c and scheduler</a> <span class="gc-tag" data-state="info">primary</span></li></ul>
+<h2>Проверь себя</h2>
+<uav-quiz src="../quiz/emb-basics.json" module="emb-basics"></uav-quiz>
+      </div>
+      <div class="module-done"><gc-button variant="secondary" data-done-toggle="emb-basics">Отметить как пройденный</gc-button></div>
+      <section class="related" aria-label="Смежные модули"><p class="gc-label gc-muted">Смежные модули</p><div class="gc-grid ref-grid"><a class="gc-card" href="comp-esp32.html"><strong>ESP32 и периферия</strong><div class="gc-card__meta"><span class="gc-tag" title="L2 — Интегратор">L2</span></div></a><a class="gc-card" href="emb-protocols.html"><strong>UART, I2C, SPI, CAN на уровне сигналов и драйверов</strong><div class="gc-card__meta"><span class="gc-tag" title="L3 — Специалист">L3</span></div></a><a class="gc-card" href="fw-reading.html"><strong>Как читать исходники прошивки: Betaflight и ArduPilot</strong><div class="gc-card__meta"><span class="gc-tag" title="L4 — Эксперт">L4</span></div></a></div></section>
+      <nav class="pager" aria-label="Соседние модули" data-track-pager><a class="gc-card pager__prev" href="comp-esp32.html"><span class="gc-label gc-muted">Назад · трек</span><br>ESP32 и периферия</a><a class="gc-card pager__next" href="emb-protocols.html"><span class="gc-label gc-muted">Дальше · трек</span><br>UART, I2C, SPI, CAN на уровне сигналов и драйверов</a></nav><nav class="pager" aria-label="Соседние шаги пути Betaflight" data-path-pager="betaflight" hidden><a class="gc-card pager__prev" href="bf-cli-automation.html?path=betaflight"><span class="gc-label gc-muted">Назад · путь Betaflight</span><br>Автоматизация CLI по serial</a><a class="gc-card pager__next" href="bf-custom.html?path=betaflight"><span class="gc-label gc-muted">Дальше · шаг 43 из 44</span><br>Свои сборки прошивок</a></nav><nav class="pager" aria-label="Соседние шаги пути ArduPilot" data-path-pager="ardupilot" hidden><a class="gc-card pager__prev" href="mav-sdk.html?path=ardupilot"><span class="gc-label gc-muted">Назад · путь ArduPilot</span><br>Библиотеки над MAVLink: pymavlink, MAVSDK, MAVROS — что и когда</a><a class="gc-card pager__next" href="emb-protocols.html?path=ardupilot"><span class="gc-label gc-muted">Дальше · шаг 52 из 69</span><br>UART, I2C, SPI, CAN на уровне сигналов и драйверов</a></nav>
+    </article>
+  </main>
+  <footer class="gc-container site-footer gc-muted">
+    <p>Открытый курс · <a href="https://github.com/irreligious86/UAV-Education">исходники на GitHub</a> · <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">план развития</a> · <a href="../../curriculum/curriculum.html">для разработчика</a> · CC BY-NC-SA 4.0</p>
+  </footer>
+</body>
+</html>

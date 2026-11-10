@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="uk" data-theme="dark" data-lang="uk">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Быстрые чек-листы — UAV Student</title>
+  <meta name="description" content="Инженерный курс по БПЛА: от физики полёта до своих прошивок и бортовых компьютеров.">
+  <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
+  <link rel="manifest" href="../../manifest.webmanifest">
+  <meta name="theme-color" content="#0b0f14">
+  <link rel="alternate" hreflang="ru" href="../../pages/checklists.html">
+  <link rel="alternate" hreflang="uk" href="../../uk/pages/checklists.html">
+  <link rel="alternate" hreflang="en" href="../../en/pages/checklists.html">
+  <script>/* go to the visitor's chosen language before anything paints (assets/i18n.js) */(function(){try{var c=localStorage.getItem('uav-lang'),h=document.documentElement.getAttribute('data-lang');if(!c||c===h||/[?&]lang=keep\b/.test(location.search))return;var l=document.querySelector('link[rel=alternate][hreflang="'+c+'"]');if(l)location.replace(l.href+location.search+location.hash)}catch(e){}})();</script>
+  <link rel="stylesheet" href="../../lib/ground-control-ui/dist/ground-control.css">
+  <link rel="stylesheet" href="../../assets/site.css">
+  <script src="../../lib/ground-control-ui/dist/ground-control.js" defer></script>
+  <script src="../../assets/i18n/uk.js"></script>
+  <script src="../../assets/i18n.js"></script>
+  <script src="../../assets/progress-store.js" defer></script>
+  <script src="../../assets/backend-config.js" defer></script>
+  <script src="../../assets/account.js" defer></script>
+  <script src="../../assets/grading.js" defer></script>
+  <script src="../../assets/app.js" defer></script>
+  <script src="../../assets/uav-quiz.js" defer></script>
+  <script src="../../assets/uav-tasks.js" defer></script>
+  <script src="../../assets/offline.js" defer></script>
+</head>
+<body class="gc-root" data-base="../" data-root="../../">
+  <header class="site-header">
+    <div class="gc-container site-header__inner">
+      <a class="site-brand" href="../index.html"><span class="site-brand__mark" aria-hidden="true">◆</span> UAV Student</a>
+      <nav class="gc-nav" aria-label="Разделы сайта">
+        <a href="../index.html">Курс</a>
+        <a href="../ref/index.html" aria-current="page">Справочник</a>
+        <a href="../pages/glossary.html">Глоссарий</a>
+        <a href="../pages/fails.html">Фейлы</a>
+        <a href="../pages/search.html">Поиск</a>
+        <a href="../pages/progress.html">Мой прогресс</a>
+      </nav>
+      <nav class="lang-switch" aria-label="Язык"><a class="gc-tag" href="../../pages/checklists.html" data-lang-to="ru" hreflang="ru" lang="ru" title="Русский">RU</a><a class="gc-tag" href="../../uk/pages/checklists.html" data-lang-to="uk" hreflang="uk" lang="uk" title="Українська" aria-current="true" data-state="ok">UK</a><a class="gc-tag" href="../../en/pages/checklists.html" data-lang-to="en" hreflang="en" lang="en" title="English">EN</a></nav>
+    </div>
+  </header>
+  <main class="gc-container site-main">
+    <p class="gc-breadcrumb"><a href="../ref/index.html">Справочник</a><span>Быстрые чек-листы</span></p>
+    <div class="gc-prose legacy-page">
+<h2>✅ Быстрые чек-листы перед полетом</h2>
+        <div class="grid">
+          <div class="checklist-card">
+            <h3>Перед включением питания</h3>
+            <ul>
+              <li><input type="checkbox"><label>Пропеллеры сняты (настройка) / затянуты (полет)</label></li>
+              <li><input type="checkbox"><label>Аккумулятор заряжен, напряжение в норме</label></li>
+              <li><input type="checkbox"><label>Антенны VTX и приемника установлены</label></li>
+              <li><input type="checkbox"><label>SD-карта вставлена (логи/скрипты)</label></li>
+              <li><input type="checkbox"><label>Нет видимых повреждений рамы и проводов</label></li>
+            </ul>
+          </div>
+          <div class="checklist-card">
+            <h3>После подключения к GCS</h3>
+            <ul>
+              <li><input type="checkbox"><label>Сделан backup конфигурации (diff / param)</label></li>
+              <li><input type="checkbox"><label>Калибровка акселерометра выполнена</label></li>
+              <li><input type="checkbox"><label>Калибровка компаса выполнена (если есть MAG)</label></li>
+              <li><input type="checkbox"><label>GPS fix получен (≥ 8 спутников, HDOP &lt; 1.5)</label></li>
+              <li><input type="checkbox"><label>Режимы назначены на переключатели</label></li>
+            </ul>
+          </div>
+          <div class="checklist-card">
+            <h3>Перед взлетом (armed)</h3>
+            <ul>
+              <li><input type="checkbox"><label>Проверка направления вращения моторов</label></li>
+              <li><input type="checkbox"><label>Проверка движения серв (для крыла)</label></li>
+              <li><input type="checkbox"><label>Проверка работы OSD и телеметрии</label></li>
+              <li><input type="checkbox"><label>Проверка failsafe (выключение пульта)</label></li>
+              <li><input type="checkbox"><label>Дрон в безопасной зоне, люди на расстоянии</label></li>
+            </ul>
+          </div>
+          <div class="checklist-card">
+            <h3>После полета</h3>
+            <ul>
+              <li><input type="checkbox"><label>Сохранение лога полета (Blackbox / .bin)</label></li>
+              <li><input type="checkbox"><label>Проверка температуры моторов и ESC</label></li>
+              <li><input type="checkbox"><label>Проверка остаточного напряжения батареи</label></li>
+              <li><input type="checkbox"><label>Визуальный осмотр на повреждения</label></li>
+              <li><input type="checkbox"><label>Запись наблюдений в журнал ошибок</label></li>
+            </ul>
+          </div>
+        </div>
+
+    </div>
+  </main>
+  <footer class="gc-container site-footer gc-muted">
+    <p>Открытый курс · <a href="https://github.com/irreligious86/UAV-Education">исходники на GitHub</a> · <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">план развития</a> · <a href="../../curriculum/curriculum.html">для разработчика</a> · CC BY-NC-SA 4.0</p>
+  </footer>
+</body>
+</html>
