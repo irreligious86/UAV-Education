@@ -112,7 +112,75 @@ diagram, glossary terms, and is translated into uk/en/gal and fact-checked befor
 | ml-rl-control | RL для управления: что работает, sim2real, безопасность | C | — (reading + small gym experiment) |
 | career | Портфолио и карьера: проекты, GitHub, даташиты, техписьмо, собеседование | C | portfolio page from the student's own capstones |
 
-Totals: A 18, B 20, C 11 (49 modules). Stage 6 proper = A + most of B (~35); C stays in the backlog.
+Totals: A 18, B 20, C 11 (49 modules), plus 5 setup-from-scratch modules (§2.8, priority A). Stage 6 proper = A + most of B (~40); C stays in the backlog.
+
+### 2.8 Setup from scratch — one hands-on lesson per firmware (audit 2026-11-10)
+
+**Question (Alex):** can a student take each of the four firmwares and set up their own drone from zero
+using only the course? **Answer today: Betaflight almost; ArduPilot partly; INAV and PX4 no.**
+The knowledge is spread across modules, but no module walks the whole chain end to end on one
+aircraft, and several steps are not covered anywhere.
+
+Coverage of the 17 setup steps by the current modules (✓ covered with a procedure, ~ mentioned or theory
+only, ✗ missing; "n/a" = not applicable to that firmware):
+
+| # | Step | Betaflight | INAV | ArduPilot (Copter) | PX4 (multirotor) |
+|---|---|---|---|---|---|
+| 1 | Flash the right target / board, back up the old config | ✓ bf-intro | ~ inav-intro | ~ ap-intro | ~ px4-intro |
+| 2 | Board orientation, frame type, mixer | ✓ | ✓ inav-intro | ✓ ap-intro | ~ px4-intro |
+| 3 | UART / port map (RX, GPS, VTX, telemetry) | ✓ bf-ports | ~ | ~ `SERIALn_PROTOCOL` | ✗ |
+| 4 | Receiver: protocol, bind, link check | ✓ link-elrs | ✗ | ✗ `RC_PROTOCOLS`, `SERIALn_PROTOCOL 23` absent | ✗ |
+| 5 | Channel map, endpoints, stick calibration | ~ | ✗ | ~ | ✗ |
+| 6 | Motor protocol (DShot/PWM/OneShot) | ✓ f-motors-esc | ✗ | ~ `MOT_PWM_TYPE` | ✗ |
+| 7 | Motor order and direction test, props off | ~ | ✗ | ~ | ✗ |
+| 8 | ESC calibration (PWM ESCs only) | n/a for DShot, ✗ for PWM | ✗ | ~ | ✗ |
+| 9 | Accelerometer / compass calibration | ✓ accel | ~ | ~ | ~ |
+| 10 | Battery voltage / current calibration | ✗ `vbat_scale`, `ibata_scale` | ✗ | ~ `BATT_VOLT_MULT`, `BATT_AMP_PERVLT` | ✗ `BAT1_V_DIV`, `BAT1_A_PER_V` |
+| 11 | Modes, arming switch, pre-arm checks | ✓ bf-modes-osd | ✓ inav-intro | ✓ ap-intro | ~ px4-intro |
+| 12 | Failsafe configured **and tested** | ✓ bf-failsafe | ~ | ✓ ap-safety-fs | ~ |
+| 13 | OSD and video (analog / MSP DisplayPort) | ✓ bf-modes-osd, link-vtx | ~ | ✗ `OSD_TYPE` | ✗ |
+| 14 | GPS, home, RTH / RTL / GPS Rescue | ✓ GPS Rescue | ✓ inav-gps | ~ | ~ |
+| 15 | Pre-flight check and maiden hover procedure | ✗ | ~ inav-intro step 4 | ✗ | ✗ |
+| 16 | First tune (filters, PIDs, autotune) | ✓ bf-filters, bf-pid | ~ | ✓ ap-tuning | ~ px4-control |
+| 17 | Logging on, config backup (diff / .param), restore | ✓ bf-cli | ~ | ~ | ✗ |
+
+Other gaps found:
+- The **INAV path** has no setup stage and no capstone; it also lacks f-motors-esc and link-vtx.
+- The **PX4 path** has no capstone and no f-power, f-motors-esc, link-protocols, link-elrs, f-regulations:
+  a student on that path never learns how the aircraft is powered or controlled by radio.
+- ArduPilot covers the most, but in pieces across 9 modules; ArduPlane setup exists only as tuning (ap-plane-tuning).
+
+**New modules (L2, ~6–8 h each incl. lab).** Each one is a single aircraft taken from an empty board to a
+logged maiden hover, in the order of the 17 steps above. The theory section is short and links to the
+modules that already explain each step; the module adds what is missing (bold in the table above).
+SITL is the main path (decision 3) wherever the firmware has one; steps that cannot exist in a simulator
+(bind, motor direction, ESC calibration, battery calibration, maiden hover) are done on the bench in
+«Переход на реальное железо» — **props off** until step 15.
+
+| Id | Title (ru) | SITL / main path | «Переход на реальное железо» | Lab accepted when |
+|---|---|---|---|---|
+| bf-setup-scratch | Betaflight с нуля: от пустой платы до первого висения | BF `SITL` target + Configurator over TCP for steps 1–3, 9, 11, 16–17; the rest on a USB-powered FC (no battery, no props) | full 17 steps on a 5″ quad: bind ELRS, DShot order/direction (`resource`, `motor` CLI / Motors tab), `vbat_scale` and `ibata_scale` against a multimeter and a charger's mAh, failsafe test with the TX off, maiden hover | `diff all` committed; voltage error < 0.05 V/cell, mAh within 5 % of the charger; failsafe stage 2 recorded; blackbox of a 60 s hover |
+| inav-setup-scratch | INAV с нуля: GPS-квадрокоптер | INAV SITL (built in since INAV 7, Configurator «SITL» tab) for mixer, modes, failsafe, RTH, missions | GPS quad: bind, motor order/direction, battery calibration, compass, `nav_*` checks on the ground (estimator test from inav-intro), maiden hover, PosHold, RTH from 100 m | `diff all`; RTH lands within 3 m of home in SITL and within 5 m in flight; failsafe → RTH recorded |
+| inav-setup-wing | INAV с нуля: крыло | INAV SITL with a fixed-wing model | flying wing / plane: servo direction and endpoints, surface throws and centring, CG check, motor/ESC, launch mode, `nav_fw_*` basics, first hand-launch | servo test table filled; CG within the design range; launch log; RTH loiter recorded |
+| ap-setup-scratch | ArduPilot с нуля: Copter через Mission Planner / QGC | `sim_vehicle.py -v ArduCopter` + MP/QGC: frame, `SERIALn_PROTOCOL`, `RC_PROTOCOLS`, `MOT_PWM_TYPE`, motor test, `BATT_*`, modes, FS (`SIM_RC_FAIL`), `OSD_TYPE`, param backup | real copter: flash with the bootloader, bind, RC calibration, ESC calibration (PWM) or DShot, compass and accel calibration, `BATT_VOLT_MULT` / `BATT_AMP_PERVLT`, motor order with `MOT_SPIN_ARM`/`MOT_SPIN_MIN`, maiden hover in Stabilize → AltHold → Loiter, QuickTune / AutoTune | `.param` file committed; hover throttle `MOT_THST_HOVER` 0.2–0.5; vibration < 30 m/s²; RC and battery failsafe recorded in the log |
+| px4-setup-scratch | PX4 с нуля: Vehicle Setup в QGroundControl | `make px4_sitl gz_x500` (or SIH) + QGC: airframe, sensors, radio, flight modes, power, Actuators tab (motor order and direction test), safety; failure injection (`failure` command) | real multirotor: flash, airframe, `SER_*` / RC input, radio calibration, actuator geometry and motor test, ESC calibration (PWM), `BAT1_V_DIV`, `BAT1_A_PER_V`, failsafes, maiden hover in Position mode | params exported; motor test matches the geometry; RC loss and low battery failsafes in the ULog; Flight Review report of the maiden flight |
+
+Later, optional: `ap-setup-plane` (ArduPlane from scratch: servo functions, `TRIM_*`, `TECS_*` basics,
+takeoff mode) and `px4-setup-vtol`.
+
+**Capstones** (fill the empty capstone slots):
+- `cap-inav-gps` — "INAV-аппарат с нуля": choose quad or wing, set up from an empty board, fly a
+  5-waypoint mission with failsafe-RTH tested; deliverable: `diff all`, logs, a one-page setup card.
+- `cap-px4-scratch` — "PX4 с нуля до миссии": SITL rehearsal, then the real vehicle (or SIH/Gazebo if no
+  hardware yet, with the hardware part graded later): setup, failsafe matrix, mission, ULog analysis report.
+
+**Path changes** (curriculum.json): a stage «Настройка с нуля» in every firmware path, right after the
+introduction module — Betaflight: after bf-intro/bf-ports; INAV: after inav-intro; ArduPilot: after
+ap-sitl; PX4: after px4-intro. PX4 path also gets f-power, f-motors-esc, link-protocols, link-elrs,
+f-regulations in «Основа»; INAV path gets f-motors-esc and link-vtx.
+
+**Beyond modules:** a printable one-page "setup card" per firmware (the 17 steps with the exact
+Configurator tab / CLI command / parameter for that firmware) — linked from each setup module.
 
 ## 3. Material beyond modules
 
@@ -136,6 +204,7 @@ Each iteration ends with: modules published, quizzes and tasks, diagrams, glossa
 | # | Iteration | Content |
 |---|---|---|
 | 1 | Design core | des-sizing, des-thrust-stand, aero-stability, ctl-allocation; new track "Конструктор" |
+| 1b | Setup from scratch (§2.8) | bf-setup-scratch, inav-setup-scratch, inav-setup-wing, ap-setup-scratch, px4-setup-scratch; capstones cap-inav-gps, cap-px4-scratch; path changes; setup cards |
 | 2 | Precision navigation | nav-rtk, nav-indoor, nav-terrain |
 | 3 | Firmware development elective | fw-build-ap, fw-debug, fw-driver, fw-px4-module, fw-hil-testing |
 | 4 | Autonomy | aut-planning, aut-behavior, ctl-trajectory, ctl-advanced, aut-swarm |
