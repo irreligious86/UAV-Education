@@ -49,7 +49,7 @@ L = ½ · ρ · V² · S · C_L — плотность воздуха, скор�
 INAV: `nav_fw_cruise_speed`, `nav_fw_min_thr/max_thr/cruise_thr`, `nav_fw_climb_angle/dive_angle`, `fw_min_throttle_down_pitch` — проще, без энергетической модели, но та же идея: газ — набор, тангаж — скорость.
 
 ### Запуск и посадка
-Бросок с руки/катапульта: `TKOFF_THR_MINACC` (детекция броска по ускорению), `TKOFF_THR_DELAY`, `TKOFF_LVL_ALT`; INAV — autolaunch (`nav_fw_launch_*`). Посадка: глиссада `LAND_PITCH_DEG`, `LAND_FLARE_ALT/SEC`, дальномер для выравнивания; у крыла — на пузо по ветру, скорость 1.1–1.2 V_s.
+Бросок с руки/катапульта: `TKOFF_THR_MINACC` (детекция броска по ускорению), `TKOFF_THR_DELAY`, `TKOFF_LVL_ALT`; INAV — autolaunch (`nav_fw_launch_*`). Посадка: глиссада `LAND_PITCH_DEG`, `LAND_FLARE_ALT/SEC`, дальномер для выравнивания; у крыла — на пузо против ветра, скорость 1.1–1.2 V_s.
 
 {{diagram:tecs-energy|TECS: ошибка полной энергии (высота + скорость) закрывается газом, ошибка их баланса — тангажем; поэтому набор высоты без запаса газа съедает скорость.}}
 
