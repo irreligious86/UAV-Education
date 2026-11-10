@@ -1,0 +1,94 @@
+{
+  "module": "ros2-from-ros1",
+  "pass": 80,
+  "questions": [
+    {
+      "q": "Чого нема в ROS 2 супроти ROS 1?",
+      "options": [
+        "roscore",
+        "Топіків",
+        "tf2",
+        "Сервісів"
+      ],
+      "answer": 0,
+      "explain": "DDS discovery без єдиної точки відмови."
+    },
+    {
+      "q": "Цикл while з rate.sleep() у ROS 2 заміняють:",
+      "options": [
+        "Таймером",
+        "Тим самим циклом",
+        "Сервісом",
+        "Lifecycle"
+      ],
+      "answer": 0,
+      "explain": "create_timer + spin."
+    },
+    {
+      "q": "Синхронний виклик сервісу в колбеку однопотокового вузла доводить до:",
+      "options": [
+        "Взаємного блокування",
+        "Прискорення",
+        "Нічого",
+        "Помилки QoS під час відповіді"
+      ],
+      "answer": 0,
+      "explain": "Вживай call_async."
+    },
+    {
+      "q": "Система збірки ROS 2:",
+      "options": [
+        "ament + colcon",
+        "make і setup.py, як у ROS 1",
+        "rosbuild",
+        "catkin_make"
+      ],
+      "answer": 0,
+      "explain": "package.xml format 3."
+    },
+    {
+      "q": "Параметр у ROS 2 перед тим, як ним користати, треба:",
+      "options": [
+        "Оголосити у вузлі",
+        "Записати в roscore",
+        "Опублікувати",
+        "Нічого"
+      ],
+      "answer": 0,
+      "explain": "Параметри належать вузлові."
+    },
+    {
+      "q": "ROS 1 Noetic:",
+      "options": [
+        "Без підтримки з 2025",
+        "LTS до 2030 року",
+        "Застарів у 2020",
+        "Підтримується до виходу Jazzy LTS"
+      ],
+      "answer": 0,
+      "explain": "Перенесення — правильний шлях для живого коду."
+    },
+    {
+      "q": "Сконвертувати .bag ROS 1 у ROS 2:",
+      "options": [
+        "rosbags-convert",
+        "ros1_bridge",
+        "colcon",
+        "tf2_echo"
+      ],
+      "answer": 0,
+      "explain": "Пакет rosbags на чистому Python."
+    },
+    {
+      "q": "Перше, що читати в незнайомому ROS 1 проєкті:",
+      "options": [
+        "Launch-файли",
+        "Вшиткі .cpp підряд",
+        "Лиш README",
+        "CMakeLists від початку до кінця"
+      ],
+      "answer": 0,
+      "explain": "Launch показує вузли, параметри й remap-и."
+    }
+  ]
+}

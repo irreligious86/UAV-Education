@@ -1,0 +1,64 @@
+{
+ "module": "math-linalg-rot",
+ "tasks": [
+  {
+   "id": "grav-body",
+   "title": "Гравітація в осях борту",
+   "statement": "Крен **{phi}°**, тангаж **{theta}°**, рискання яке-будь. Знайди компоненту z вектора гравітації (0, 0, 9.81) в осях FRD (м/с²).",
+   "params": {
+    "phi": {
+     "min": -40,
+     "max": 40,
+     "step": 5
+    },
+    "theta": {
+     "min": -30,
+     "max": 30,
+     "step": 5
+    }
+   },
+   "answer": "9.81*math.cos(math.radians(phi))*math.cos(math.radians(theta))",
+   "unit": "м/с²",
+   "tol": 0.01,
+   "solution": "g_body = R_nbᵀ·g_ned; z-компонента = g·cos φ·cos θ. Рискання на неї ніяк не впливає."
+  },
+  {
+   "id": "grav-y",
+   "title": "Бічна компонента",
+   "statement": "Крен **{phi}°**, тангаж **{theta}°**. Знайди компоненту y (праворуч) вектора гравітації в осях FRD (м/с²).",
+   "params": {
+    "phi": {
+     "min": -40,
+     "max": 40,
+     "step": 5
+    },
+    "theta": {
+     "min": -30,
+     "max": 30,
+     "step": 5
+    }
+   },
+   "answer": "9.81*math.sin(math.radians(phi))*math.cos(math.radians(theta))",
+   "unit": "м/с²",
+   "tol": 0.01,
+   "abs": 0.02,
+   "solution": "Ади, третій рядок R_nb (третій стовпець R_nbᵀ): (−sin θ, sin φ cos θ, cos φ cos θ)·g."
+  },
+  {
+   "id": "quat-angle",
+   "title": "Кут із кватерніона",
+   "statement": "Скалярна частина одиничного кватерніона w = **{w}**. На який кут (у градусах) він повертає?",
+   "params": {
+    "w": {
+     "min": 0.5,
+     "max": 0.99,
+     "step": 0.01
+    }
+   },
+   "answer": "2*math.degrees(math.acos(w))",
+   "unit": "°",
+   "tol": 0.01,
+   "solution": "w = cos(α/2) → α = 2·acos(w)."
+  }
+ ]
+}

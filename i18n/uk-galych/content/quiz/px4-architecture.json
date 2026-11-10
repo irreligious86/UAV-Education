@@ -1,0 +1,94 @@
+{
+  "module": "px4-architecture",
+  "pass": 80,
+  "questions": [
+    {
+      "q": "Як модулі PX4 ся обмінюють даними?",
+      "options": [
+        "Глобальні змінні",
+        "uORB publish/subscribe",
+        "MAVLink-повідомлення всередині плати",
+        "Файли"
+      ],
+      "answer": 1,
+      "explain": "Асинхронно: підписник ся будить, як прийдуть нові дані."
+    },
+    {
+      "q": "Що обов'язкове в кожному .msg?",
+      "options": [
+        "Ніц",
+        "uint64 timestamp",
+        "Поле name",
+        "Поле id та ім'я модуля"
+      ],
+      "answer": 1,
+      "explain": "Ся заповнює під час публікації."
+    },
+    {
+      "q": "Як VehicleAttitude.msg перетворюється на ім'я топіка?",
+      "options": [
+        "VA",
+        "vehicle_attitude",
+        "attitude",
+        "VehicleAttitude без змін"
+      ],
+      "answer": 1,
+      "explain": "CamelCase → snake_case."
+    },
+    {
+      "q": "Який модуль перетворює моменти на команди моторам?",
+      "options": [
+        "Commander за командою",
+        "Control allocation",
+        "Navigator",
+        "EKF2"
+      ],
+      "answer": 1,
+      "explain": "За геометрією CA_AIRFRAME і CA_ROTOR*."
+    },
+    {
+      "q": "Хто відповідає за арм, режими й failsafe?",
+      "options": [
+        "Navigator",
+        "Commander",
+        "Rate controller",
+        "Драйвер IMU"
+      ],
+      "answer": 1,
+      "explain": "Commander — то арбітр цілої системи."
+    },
+    {
+      "q": "Як підглянути частоти топіків у PX4, шо якраз працює?",
+      "options": [
+        "param show",
+        "uorb top",
+        "top",
+        "listener"
+      ],
+      "answer": 1,
+      "explain": "listener показує вміст, а top — завантаження модулів."
+    },
+    {
+      "q": "Де ся виконує більшість модулів PX4 на NuttX?",
+      "options": [
+        "Окремі процеси",
+        "Work queue",
+        "Переривання",
+        "Lua"
+      ],
+      "answer": 1,
+      "explain": "wq:rate_ctrl вище, wq:lp_default нижче."
+    },
+    {
+      "q": "Шо належить до flight stack PX4, а не до middleware?",
+      "options": [
+        "Оцінювання стану, контролери, навігатор, commander",
+        "Драйвери датчиків",
+        "Шина uORB",
+        "Зв'язок MAVLink і uXRCE-DDS"
+      ],
+      "answer": 0,
+      "explain": "Middleware — драйвери, шина й зв'язок; flight stack — то вже алгоритми."
+    }
+  ]
+}
