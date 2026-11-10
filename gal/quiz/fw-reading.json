@@ -3,7 +3,7 @@
   "pass": 80,
   "questions": [
     {
-      "q": "Де в Betaflight головний цикл PID?",
+      "q": "Де в Betaflight сидить головний цикл PID?",
       "options": [
         "main/scheduler",
         "fc/core.c: taskMainPidLoop",
@@ -11,10 +11,10 @@
         "drivers/dshot.c"
       ],
       "answer": 1,
-      "explain": "taskMainPidLoop → subTaskPidController → subTaskMotorUpdate: PID і мікшер — підзадачі циклу."
+      "explain": "taskMainPidLoop → subTaskPidController → subTaskMotorUpdate: PID і мікшер — то підзадачі циклу."
     },
     {
-      "q": "Від чого рахується D-term у Betaflight?",
+      "q": "Від чого ся рахує D-term у Betaflight?",
       "options": [
         "Від setpoint пілота",
         "Від гіроскопа",
@@ -22,10 +22,10 @@
         "Від моторів"
       ],
       "answer": 1,
-      "explain": "Немає derivative kick під час руху стіка."
+      "explain": "Тому й нема derivative kick під час руху стіка."
     },
     {
-      "q": "Де в ArduCopter таблиця задач із частотами й бюджетом часу?",
+      "q": "Де в ArduCopter лежить таблиця задач із частотами й бюджетом часу?",
       "options": [
         "Attitude.cpp",
         "Copter.cpp: scheduler_tasks[]",
@@ -44,7 +44,7 @@
         "Рахує EKF і пише лог"
       ],
       "answer": 1,
-      "explain": "Розподіляє roll/pitch/yaw/throttle за матрицею моторів із пріоритетами; yaw — останнім, у межах MOT_YAW_HEADROOM."
+      "explain": "Розподіляє roll/pitch/yaw/throttle за матрицею моторів із пріоритетами; yaw — на кінець, у межах MOT_YAW_HEADROOM."
     },
     {
       "q": "Звідки береться вікі параметрів ArduPilot?",
@@ -55,21 +55,21 @@
         "Пишеться вручну командою розробників"
       ],
       "answer": 1,
-      "explain": "Опис, діапазон, @Values — у коді."
+      "explain": "Опис, діапазон, @Values — вшитко в коді."
     },
     {
       "q": "Як безпечно перевірити патч прошивки?",
       "options": [
-        "Одразу на дроні",
+        "Зара ж на дроні",
         "SITL і тести, потім стенд",
-        "Ніяк",
+        "Та де, ніяк",
         "У конфігураторі через CLI"
       ],
       "answer": 1,
       "explain": "make SITL / sim_vehicle.py; make test."
     },
     {
-      "q": "git log -S \"имя\" потрібен, щоб:",
+      "q": "git log -S \"имя\" треба, щоби:",
       "options": [
         "Зібрати прошивку зі старого коміту",
         "Знайти коміт із цим рядком",
@@ -77,15 +77,15 @@
         "Перевірити стиль"
       ],
       "answer": 1,
-      "explain": "Коментар PR пояснює причину зміни."
+      "explain": "А коментар PR пояснює, чого ту зміну зробили."
     },
     {
-      "q": "Навіщо посилатися у звіті на коміт, а не на master?",
+      "q": "Нащо посилатися у звіті на коміт, а не на master?",
       "options": [
         "Посилання на master з часом вказує на інший код",
-        "Коміти швидше відкриваються",
+        "Коміти шпаркіше відкриваються",
         "GitHub забороняє посилання на master",
-        "У master немає номерів рядків"
+        "У master нема номерів рядків"
       ],
       "answer": 0,
       "explain": "Посилання на конкретний коміт залишається правильним; master поїде."
