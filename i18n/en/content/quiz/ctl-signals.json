@@ -1,0 +1,94 @@
+{
+  "module": "ctl-signals",
+  "pass": 80,
+  "questions": [
+    {
+      "q": "At what frequency will 10 kHz interference appear with fs = 8 kHz?",
+      "options": [
+        "10 kHz",
+        "2 kHz",
+        "4 kHz",
+        "It won't appear"
+      ],
+      "answer": 1,
+      "explain": "Aliasing: |f − fs| = 2 kHz."
+    },
+    {
+      "q": "What does a motor harmonic look like on a spectrogram?",
+      "options": [
+        "A horizontal line",
+        "A sloped line following eRPM",
+        "A single dot at the hover frequency",
+        "A vertical band"
+      ],
+      "answer": 1,
+      "explain": "The motor frequency changes with throttle."
+    },
+    {
+      "q": "What does a frame resonance look like on a spectrogram?",
+      "options": [
+        "Noise at the bottom of the spectrum near zero Hz",
+        "A horizontal line",
+        "A sloped line",
+        "It isn't visible at all"
+      ],
+      "answer": 1,
+      "explain": "The structure's natural frequency doesn't depend on RPM."
+    },
+    {
+      "q": "The group delay of a PT1 with fc = 100 Hz is about:",
+      "options": [
+        "0.16 ms",
+        "1.6 ms",
+        "16 ms",
+        "160 ms"
+      ],
+      "answer": 1,
+      "explain": "1/(2π·100) ≈ 1.6 ms."
+    },
+    {
+      "q": "Motor fundamental frequency at 15,000 RPM:",
+      "options": [
+        "15 Hz",
+        "150 Hz",
+        "250 Hz",
+        "1500 Hz"
+      ],
+      "answer": 2,
+      "explain": "RPM/60 = 250 Hz."
+    },
+    {
+      "q": "Why is a notch preferable to a wide LPF for motor noise?",
+      "options": [
+        "It needs no tuning at all",
+        "Narrow dip, little delay",
+        "It's simpler",
+        "It removes propwash"
+      ],
+      "answer": 1,
+      "explain": "A deep dip only around the noise frequency and little delay outside the band; an LPF cuts the useful signal too."
+    },
+    {
+      "q": "What can NOT be filtered without losing response?",
+      "options": [
+        "Motor harmonics",
+        "Frame resonance",
+        "Propwash at 20–80 Hz",
+        "Buck converter noise"
+      ],
+      "answer": 2,
+      "explain": "Low-frequency aerodynamics overlaps the control bandwidth."
+    },
+    {
+      "q": "How do you improve the frequency resolution of a spectrum?",
+      "options": [
+        "Use a longer window, at the cost of time resolution",
+        "Raise the sampling rate",
+        "Shorten the window to a few samples",
+        "Remove the Hann window"
+      ],
+      "answer": 0,
+      "explain": "Frequency resolution ≈ fs / N: a longer window gives a more precise frequency, but changes over time are harder to see."
+    }
+  ]
+}

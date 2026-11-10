@@ -1,0 +1,49 @@
+{
+ "module": "ros2-basics",
+ "tasks": [
+  {
+   "id": "yaw-enu",
+   "title": "Heading in ENU",
+   "statement": "The vehicle's heading in NED is ψ = **{y}°** (from north, clockwise). Find the yaw angle in ENU (degrees, from east, counterclockwise, in the range (−180…180]).",
+   "params": {
+    "y": {
+     "min": 0,
+     "max": 350,
+     "step": 10
+    }
+   },
+   "answer": "math.degrees(math.atan2(math.sin(math.radians(90-y)), math.cos(math.radians(90-y))))",
+   "unit": "°",
+   "tol": 0.001,
+   "abs": 0.5,
+   "solution": "ψ_enu = 90° − ψ_ned, then wrap to (−180°, 180°]."
+  },
+  {
+   "id": "pos-enu",
+   "title": "Position in ENU",
+   "statement": "Position in NED: (**{n}**, **{e}**, **{d}**) m. Find the z component in ENU (m).",
+   "params": {
+    "n": {
+     "min": -20,
+     "max": 20,
+     "step": 1
+    },
+    "e": {
+     "min": -20,
+     "max": 20,
+     "step": 1
+    },
+    "d": {
+     "min": -30,
+     "max": -1,
+     "step": 1
+    }
+   },
+   "answer": "-d",
+   "unit": "m",
+   "tol": 0.001,
+   "abs": 0.01,
+   "solution": "(n, e, d) → (e, n, −d)."
+  }
+ ]
+}

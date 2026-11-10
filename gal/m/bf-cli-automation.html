@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="uk-galych" data-theme="dark" data-lang="uk-galych">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Автоматизація CLI через serial — UAV Student</title>
+  <meta name="description" content="написати скрипт, який знаходить дрон за craft_name застосовувати зміни з перечитуванням">
+  <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
+  <link rel="manifest" href="../../manifest.webmanifest">
+  <meta name="theme-color" content="#0b0f14">
+  <link rel="alternate" hreflang="ru" href="../../m/bf-cli-automation.html">
+  <link rel="alternate" hreflang="uk" href="../../uk/m/bf-cli-automation.html">
+  <link rel="alternate" hreflang="en" href="../../en/m/bf-cli-automation.html">
+  <link rel="alternate" hreflang="uk-galych" href="../../gal/m/bf-cli-automation.html">
+  <script>/* go to the visitor's chosen language before anything paints (assets/i18n.js) */(function(){try{var c=localStorage.getItem('uav-lang'),h=document.documentElement.getAttribute('data-lang');if(!c||c===h||/[?&]lang=keep\b/.test(location.search))return;var l=document.querySelector('link[rel=alternate][hreflang="'+c+'"]');if(l)location.replace(l.href+location.search+location.hash)}catch(e){}})();</script>
+  <link rel="stylesheet" href="../../lib/ground-control-ui/dist/ground-control.css">
+  <link rel="stylesheet" href="../../assets/site.css">
+  <script src="../../lib/ground-control-ui/dist/ground-control.js" defer></script>
+  <script src="../../assets/i18n/uk-galych.js"></script>
+  <script src="../../assets/i18n.js"></script>
+  <script src="../../assets/progress-store.js" defer></script>
+  <script src="../../assets/backend-config.js" defer></script>
+  <script src="../../assets/account.js" defer></script>
+  <script src="../../assets/grading.js" defer></script>
+  <script src="../../assets/app.js" defer></script>
+  <script src="../../assets/uav-quiz.js" defer></script>
+  <script src="../../assets/uav-tasks.js" defer></script>
+  <script src="../../assets/offline.js" defer></script>
+</head>
+<body class="gc-root" data-base="../" data-root="../../">
+  <header class="site-header">
+    <div class="gc-container site-header__inner">
+      <a class="site-brand" href="../index.html"><span class="site-brand__mark" aria-hidden="true">◆</span> UAV Student</a>
+      <nav class="gc-nav" aria-label="Розділи сайту">
+        <a href="../index.html" aria-current="page">Курс</a>
+        <a href="../ref/index.html">Довідник</a>
+        <a href="../pages/glossary.html">Глосарій</a>
+        <a href="../pages/fails.html">Фейли</a>
+        <a href="../pages/search.html">Пошук</a>
+        <a href="../pages/progress.html">Мій прогрес</a>
+      </nav>
+      <nav class="lang-switch" aria-label="Мова"><a class="gc-tag" href="../../m/bf-cli-automation.html" data-lang-to="ru" hreflang="ru" lang="ru" title="Русский">RU</a><a class="gc-tag" href="../../uk/m/bf-cli-automation.html" data-lang-to="uk" hreflang="uk" lang="uk" title="Українська">UK</a><a class="gc-tag" href="../../en/m/bf-cli-automation.html" data-lang-to="en" hreflang="en" lang="en" title="English">EN</a><a class="gc-tag" href="../../gal/m/bf-cli-automation.html" data-lang-to="uk-galych" hreflang="uk-galych" lang="uk-galych" title="Галицька (експеримент)" aria-current="true" data-state="ok">GAL</a></nav>
+    </div>
+  </header>
+  <main class="gc-container site-main">
+    <article class="module" data-module-page="bf-cli-automation">
+      <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-integrator">Інтегратор</a><span>Автоматизація CLI через serial</span></p>
+      <h1 class="module-title">Автоматизація CLI через serial</h1>
+      <div class="module-tags"><span class="gc-tag" title="Рівень">L3 — Спеціаліст</span><span class="gc-tag">читання 25 хв</span><span class="gc-tag">навчання ~3 год</span><span class="gc-tag">Betaflight 4.5+</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ОПАНОВАНО</span></div>
+      <p class="gc-muted module-score" data-module-score></p>
+      <p class="module-lead">Коли дронів більше ніж один, налаштовувати їх кліками в Configurator — шлях до помилок. CLI Betaflight доступний через звичайний serial-порт, отже, його можна скриптувати. Модуль показує робочий шаблон на Python (<code>pyserial</code>) і збирає граблі, на які ми реально наступили під час масового налаштування кількох квадрокоптерів: плаваючі COM-порти, «тихі» виправлення параметрів, перезавантаження і несумісність diff між версіями.</p>
+      <div class="gc-callout" data-state="ok"><strong>Після модуля ти вмієш</strong><ul><li>написати скрипт, який знаходить дрон за craft_name</li><li>застосовувати зміни з перечитуванням</li></ul></div><p class="gc-muted">Перед цим модулем: <a href="bf-cli.html">CLI та remap</a></p><div class="gc-callout lab"><p class="gc-label gc-muted">Лабораторна</p><strong>Скрипт налаштування</strong><p class="gc-muted lab__hint">Здано, коли позначено всі пункти:</p><ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="bf-cli-automation:lab:0"><span>Скрипт знаходить дрон за craft_name, а не за COM</span></label></li><li><label><input type="checkbox" data-check-id="bf-cli-automation:lab:1"><span>Перед змінами зберігається diff all із датою</span></label></li><li><label><input type="checkbox" data-check-id="bf-cli-automation:lab:2"><span>Після save скрипт знову знаходить порт і перечитує значення</span></label></li><li><label><input type="checkbox" data-check-id="bf-cli-automation:lab:3"><span>Прогін на двох дронах без ручних правок</span></label></li></ul></div><div class="path-pos gc-muted"><span class="gc-label">На шляху</span><ul><li data-path-pos="betaflight"><a href="../path/betaflight.html">Betaflight</a>: крок 41 з 44 → <a href="emb-basics.html?path=betaflight">Embedded: переривання, таймери, DMA, RTOS</a></li></ul></div>
+      <div class="gc-prose module-body">
+<h2>Теорія</h2>
+<h4 class="md-subheading">Як влаштований вхід у CLI</h4>
+<p>Польотний контролер через USB — це віртуальний COM-порт (USB CDC). Швидкість у налаштуваннях порту для USB CDC ролі не відіграє, прийнято ставити 115200. Символ <code>#</code> переводить контролер у CLI, <code>exit</code> виходить із перезавантаженням. Поки FC у CLI, на мотори не йде сигнал — ESC можуть пищати, це нормально.</p>
+<h4 class="md-subheading">Граблі 1: COM-порт не постійний</h4>
+<p>Якщо до комп&#x27;ютера підключено кілька однакових плат, у них один USB VID/PID, і номер COM-порту змінюється після кожного перезавантаження. Прив&#x27;язуватися до <code>COM8</code> не можна. Надійний ідентифікатор — <code>craft_name</code> усередині конфігу: відкрити кожен порт, увійти в CLI, виконати <code>get craft_name</code> і вибрати потрібний. Звідси правило: у всіх дронів різні <code>craft_name</code> ще до початку роботи.</p>
+<h4 class="md-subheading">Граблі 2: exit noreboot перезавантажує</h4>
+<p>У Betaflight 4.5.0–4.5.3 команда <code>exit</code> завжди перезавантажує контролер (аргумент <code>noreboot</code> з&#x27;явився в 4.5.4 і 2025.12.x). Отже, після будь-якого <code>exit</code> скрипт має заново шукати порт за <code>craft_name</code>. Для «просто підглянути значення» не виходь із CLI командою — просто закрий порт.</p>
+<h4 class="md-subheading">Граблі 3: тихі виправлення</h4>
+<p><code>set</code> + <code>save</code> не гарантує, що значення залишилося таким, яким ти його записав. Betaflight під час завантаження коригує несумісні комбінації: протокол DShot, bidirectional DShot, схему таймерів на конкретній платі. У нашій практиці на F405-платі після ввімкнення bidir протокол DShot виявився не тим, що записували. Правило: після кожного <code>save</code> і перезавантаження — перечитати через <code>get</code> кожне змінене значення і порівняти з очікуваним.</p>
+<h4 class="md-subheading">Граблі 4: diff не переноситься між версіями</h4>
+<p>Імена та зміст параметрів змінюються між версіями прошивки: перейменовуються <code>debug_mode</code>, змінюється синтаксис команди <code>serial</code>, змінюється зміст PID-параметрів D-term. Вставляти <code>diff all</code> від 2025.12 у 4.5 (і навпаки) порядково не можна. Переносити налаштування між версіями — лише осмислено, за розділами, з перечитуванням.</p>
+<h4 class="md-subheading">Чому диф, а не дамп</h4>
+<p><code>diff all</code> містить лише відмінності від стандартних значень — його можна читати очима і зберігати в git. <code>dump</code> — усе підряд, під час оновлення прошивки він тягне старі стандартні значення як явні.</p>
+<h4 class="md-subheading">Мінімальний скрипт вивантаження <code>diff all</code> (pyserial)</h4>
+<pre class="cli-block"><code>import serial, time, sys, glob
+
+def cli(port, cmds, timeout=3.0):
+    &quot;&quot;&quot;Open CLI, run commands, return full text. Do not send &#x27;exit&#x27; (reboots on 4.5).&quot;&quot;&quot;
+    with serial.Serial(port, 115200, timeout=0.2) as s:
+        s.write(b&quot;#\n&quot;); time.sleep(0.5); s.read(s.in_waiting or 1)
+        out = &quot;&quot;
+        for c in cmds:
+            s.write((c + &quot;\n&quot;).encode()); t0 = time.time(); buf = &quot;&quot;
+            while time.time() - t0 &lt; timeout:
+                chunk = s.read(4096).decode(errors=&quot;replace&quot;)
+                if chunk: buf += chunk; t0 = time.time()
+                if buf.rstrip().endswith(&quot;# &quot;): break        # prompt returned
+            out += buf
+        return out
+
+ports = glob.glob(&quot;/dev/ttyACM*&quot;)                              # Linux; Windows: COM*
+for p in ports:
+    name = cli(p, [&quot;get craft_name&quot;])
+    if &quot;viking7&quot; in name:
+        text = cli(p, [&quot;version&quot;, &quot;diff all&quot;])
+        open(&quot;viking7/betaflight/diff-all.txt&quot;, &quot;w&quot;).write(text)
+        break
+else:
+    sys.exit(&quot;craft not found&quot;)</code></pre>
+<p>Нормалізація перед комітом: прибрати рядки з датою/часом із <code>version</code> і <code># </code> ехо, відсортувати блоки — інакше <code>git diff</code> шумить (модуль «CI»).</p>
+<h4 class="md-subheading">Що автоматизувати варто, а що ні</h4>
+<p>Варто: бекап <code>diff all</code> перед кожним польотним днем; перевірка інваріантів (failsafe, poles, bidir) за вивантаженням; масова зміна <code>craft_name</code>/VTX-таблиці на парку; вивантаження логів через <code>msc</code>. Не варто: масове «накочування PID» на різні апарати (різна механіка), будь-які зміни без перечитування <code>get</code> після <code>save</code>.</p>
+<figure class="diagram" data-diagram="bf-cli-session"><div class="diagram__svg"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 360" width="100%" role="img" aria-labelledby="t" style="max-width:720px;display:block;margin:0 auto"><title id="t">Сесія CLI Betaflight по serial</title><style>text{font-family: var(--gc-font-mono, ui-monospace, Menlo, monospace); font-size: 12px;fill:currentColor} .m{fill:var(--gc-ink-muted, #8a93a3)} .a{fill:var(--gc-accent-hud, #5ef1d2)} .w{fill:var(--gc-signal-amber, #f0b24c)} .d{fill:var(--gc-signal-red, #e8636b)} .box{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:currentColor;stroke-width:1.2} .boxa{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6} .ln{stroke:currentColor;stroke-width:1.2;fill:none} .lna{stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6;fill:none} .lnm{stroke:var(--gc-ink-muted, #8a93a3);stroke-width:1;fill:none;stroke-dasharray:4 3} .t{font-size:11px} .b{font-weight:600}</style><defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker><marker id="ara" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--gc-accent-hud, #5ef1d2)"/></marker></defs><text x="16" y="16" text-anchor="start" class="m t">Сесія CLI Betaflight по serial</text><rect class="box" x="20.0" y="26" width="120" height="26" rx="5"/><text x="80.0" y="43" text-anchor="middle" class="b" style="font-size:11px">Скрипт</text><line class="lnm" x1="80.0" y1="52" x2="80.0" y2="350"/><rect class="box" x="410.0" y="26" width="120" height="26" rx="5"/><text x="470.0" y="43" text-anchor="middle" class="b" style="font-size:11px">FC</text><line class="lnm" x1="470.0" y1="52" x2="470.0" y2="350"/><path class="lna" d="M80.0 74 L466.0 74" marker-end="url(#ara)"/><text x="275.0" y="69" text-anchor="middle" class="a t" style="font-size:10px">#  (вхід у CLI)</text><path class="ln" style="stroke-dasharray:5 4" d="M470.0 104 L84.0 104" marker-end="url(#ar)"/><text x="275.0" y="99" text-anchor="middle" class="t" style="font-size:10px">запрошення «# »</text><path class="ln" d="M80.0 134 L466.0 134" marker-end="url(#ar)"/><text x="275.0" y="129" text-anchor="middle" class="t" style="font-size:10px">diff all</text><path class="ln" style="stroke-dasharray:5 4" d="M470.0 164 L84.0 164" marker-end="url(#ar)"/><text x="275.0" y="159" text-anchor="middle" class="t" style="font-size:10px">текст конфігу …  # </text><path class="ln" d="M80.0 194 L466.0 194" marker-end="url(#ar)"/><text x="275.0" y="189" text-anchor="middle" class="t" style="font-size:10px">set gyro_lpf1_static_hz = 250</text><path class="ln" style="stroke-dasharray:5 4" d="M470.0 224 L84.0 224" marker-end="url(#ar)"/><text x="275.0" y="219" text-anchor="middle" class="t" style="font-size:10px">значення могло бути виправлене мовчки</text><path class="lna" d="M80.0 254 L466.0 254" marker-end="url(#ara)"/><text x="275.0" y="249" text-anchor="middle" class="a t" style="font-size:10px">get … → звірка</text><path class="ln" d="M80.0 284 L466.0 284" marker-end="url(#ar)"/><text x="275.0" y="279" text-anchor="middle" class="t" style="font-size:10px">save</text><text x="275.0" y="318" text-anchor="middle" class="w t" style="font-size:10px">— перезавантаження: порт може змінитися —</text><text x="704" y="78" text-anchor="end" class="m t" style="font-size:10px">чекати запрошення, не час</text><text x="704" y="228" text-anchor="end" class="m t" style="font-size:10px">завжди перечитувати</text><text x="704" y="318" text-anchor="end" class="m t" style="font-size:10px">шукати порт наново за VID/PID</text></svg></div><figcaption class="gc-muted">Сесія CLI через serial: чекати на запрошення, перечитувати значення після set, після save шукати порт заново.</figcaption><div class="diagram__hint">Схему можно прокрутить по горизонтали</div></figure>
+
+<h2>Практика</h2>
+<h4 class="md-subheading">Крок 1. Мінімальний клієнт CLI на Python</h4>
+<pre class="cli-block"><code>import time
+import serial
+from serial.tools import list_ports
+
+
+def cli_cmd(port: serial.Serial, cmd: str, wait: float = 0.6) -&gt; str:
+    port.write((cmd + &quot;\n&quot;).encode())
+    time.sleep(wait)
+    return port.read_all().decode(errors=&quot;replace&quot;)
+
+
+def enter_cli(port: serial.Serial) -&gt; None:
+    port.write(b&quot;\n&quot;)
+    time.sleep(0.3)
+    port.read_all()
+    port.write(b&quot;#&quot;)
+    time.sleep(1.2)
+    port.read_all()
+
+
+def find_craft(craft_name: str) -&gt; str:
+    &quot;&quot;&quot;Return the COM port of the FC whose craft_name matches. Never trust COM numbers.&quot;&quot;&quot;
+    for info in list_ports.comports():
+        try:
+            with serial.Serial(info.device, 115200, timeout=1) as p:
+                enter_cli(p)
+                out = cli_cmd(p, &quot;get craft_name&quot;)
+                # do NOT send exit here: on 4.5.x it reboots the FC
+                if f&quot;craft_name = {craft_name}&quot; in out:
+                    return info.device
+        except serial.SerialException:
+            continue
+    raise RuntimeError(f&quot;FC &#x27;{craft_name}&#x27; not found&quot;)</code></pre>
+<h4 class="md-subheading">Крок 2. Застосування змін із перевіркою</h4>
+<pre class="cli-block"><code>CHANGES = {&quot;rpm_filter_min_hz&quot;: &quot;50&quot;, &quot;failsafe_delay&quot;: &quot;15&quot;}
+
+port_name = find_craft(&quot;viking2&quot;)
+with serial.Serial(port_name, 115200, timeout=1) as p:
+    enter_cli(p)
+    backup = cli_cmd(p, &quot;diff all&quot;, wait=3.0)
+    open(&quot;viking2_before_diff.txt&quot;, &quot;w&quot;, encoding=&quot;utf-8&quot;).write(backup)
+    for key, val in CHANGES.items():
+        cli_cmd(p, f&quot;set {key} = {val}&quot;)
+    cli_cmd(p, &quot;save&quot;, wait=1.0)  # FC reboots, COM port may change
+
+time.sleep(6)
+port_name = find_craft(&quot;viking2&quot;)  # find it again after reboot
+with serial.Serial(port_name, 115200, timeout=1) as p:
+    enter_cli(p)
+    for key, val in CHANGES.items():
+        out = cli_cmd(p, f&quot;get {key}&quot;)
+        ok = f&quot;{key} = {val}&quot; in out
+        print((&quot;OK  &quot; if ok else &quot;FAIL&quot;), key, &quot;expected&quot;, val)</code></pre>
+<h4 class="md-subheading">Крок 3. Зберігати конфіги як код</h4>
+<ol><li>Тека на кожен дрон, усередині <code>configs/</code> і <code>logs/</code>.</li><li>Ім&#x27;я файлу: <code>&lt;дрон&gt;_&lt;плата&gt;_&lt;ГГГГ-ММ-ДД&gt;_diff.txt</code> (дрон, плата, дата) — сортування за іменем = сортування за датою.</li><li>Перед змінами — бекап, після — новий diff; порівнювати їх звичайним <code>git diff</code>.</li></ol>
+<h4 class="md-subheading">Крок 4. Другий дрон і порівняння</h4>
+<p>Запусти той самий скрипт для другого дрона, змінивши лише <code>craft_name</code> в аргументах — не код. Порівняй бекапи до і після через <code>git diff --no-index viking2_before_diff.txt viking2_after_diff.txt</code>: у різниці мають бути рівно рядки з <code>CHANGES</code>, і нічого більше. Зайвий рядок означає, що хтось змінював налаштування руками між бекапами, і це привід розібратися до польоту.</p>
+<h4 class="md-subheading">Що має вийти і типові збої</h4>
+<ul><li><code>find_craft</code> друкує список опитаних портів і знаходить потрібний за <code>craft_name</code>. Якщо дрон не знайдено, перевір, що <code>craft_name</code> задано (<code>get craft_name</code>) і що Configurator закрито: він тримає порт і засипає його MSP-трафіком.</li><li><code>diff all</code> на F7/H7 з великим конфігом не встигає за 3 с, і бекап обривається на середині. Надійніше читати до запрошення CLI <code># </code> наприкінці виведення, ніж чекати фіксований час.</li><li>Після <code>save</code> плата перезавантажується, а на Windows COM-порт може змінитися — тому <code>find_craft</code> викликається заново. 6 с очікування вистачає більшості плат. Якщо не вистачає, шукай порт у циклі з тайм-аутом.</li><li>Підсумок перевірки — рядки <code>OK</code> за кожним ключем. Будь-який <code>FAIL</code> означає, що значення не збереглося або в цій версії ключ називається інакше (Betaflight 2025.12 перейменував частину налаштувань — модуль «CLI»).</li></ul>
+<p>Лабораторну зараховано, коли скрипт знаходить дрон за <code>craft_name</code>, зберігає <code>diff all</code> з датою до змін, після <code>save</code> знаходить порт заново і перечитує значення з усіма <code>OK</code>, а прогін на двох дронах проходить без правки коду.</p>
+
+<h2>Діагностика</h2>
+<div class="diag-groups"><article class="diag-item"><h4><strong>Симптом:</strong> скрипт «загубив» дрон після save</h4><ul><li>Можлива причина: після перезавантаження COM-порт отримав інший номер.</li><li>Що зробити: шукати порт заново за <code>craft_name</code>, а не за номером.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> записане значення після перезавантаження інше</h4><ul><li>Можлива причина: Betaflight скоригував несумісну комбінацію.</li><li>Що зробити: перечитати пов&#x27;язані параметри, звірити з документацією плати та прошивки.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> після вставлення diff частина рядків дала помилки <code>Invalid name</code></h4><ul><li>Можлива причина: diff від іншої версії прошивки.</li><li>Що зробити: переносити налаштування за розділами, перевіряючи імена параметрів у <code>help</code> поточної версії.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> два дрони відгукуються на один <code>craft_name</code></h4><ul><li>Можлива причина: однакові імена (клон конфігу).</li><li>Що зробити: одразу перейменувати, <code>set craft_name = ...</code> + <code>save</code>.</li></ul></article></div>
+
+<h2>Чек-лист</h2>
+<ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="bf-cli-automation:0"><span>У кожного дрона унікальний <code>craft_name</code></span></label></li><li><label><input type="checkbox" data-check-id="bf-cli-automation:1"><span>Скрипт шукає порт за <code>craft_name</code>, а не за номером COM</span></label></li><li><label><input type="checkbox" data-check-id="bf-cli-automation:2"><span>Перед змінами зберігається <code>diff all</code> з датою в імені</span></label></li><li><label><input type="checkbox" data-check-id="bf-cli-automation:3"><span>Після <code>save</code> скрипт заново знаходить порт і перечитує значення</span></label></li><li><label><input type="checkbox" data-check-id="bf-cli-automation:4"><span>diff між різними версіями прошивки не вставляється порядково</span></label></li></ul>
+
+<h2>Джерела</h2>
+<ul class="refs"><li><a href="https://betaflight.com/docs/wiki/guides/current/Cli" target="_blank" rel="noopener noreferrer">Betaflight CLI — Documentation</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://pyserial.readthedocs.io/en/latest/" target="_blank" rel="noopener noreferrer">pySerial — Documentation</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://github.com/betaflight/betaflight" target="_blank" rel="noopener noreferrer">Betaflight — source code (GitHub)</a> <span class="gc-tag" data-state="info">primary</span></li></ul>
+<h2>Перевір себе</h2>
+<uav-quiz src="../quiz/bf-cli-automation.json" module="bf-cli-automation"></uav-quiz>
+      </div>
+      <div class="module-done"><gc-button variant="secondary" data-done-toggle="bf-cli-automation">Позначити як пройдений</gc-button></div>
+      <section class="related" aria-label="Суміжні модулі"><p class="gc-label gc-muted">Суміжні модулі</p><div class="gc-grid ref-grid"><a class="gc-card" href="bf-cli.html"><strong>CLI та remap</strong><div class="gc-card__meta"><span class="gc-tag" title="L3 — Специалист">L3</span></div></a><a class="gc-card" href="bf-rpm-filter.html"><strong>RPM-фільтр: кейс «свистячого» 10&quot;</strong><div class="gc-card__meta"><span class="gc-tag" title="L2 — Интегратор">L2</span></div></a></div></section>
+      <nav class="pager" aria-label="Сусідні модулі" data-track-pager><a class="gc-card pager__prev" href="bf-cli.html"><span class="gc-label gc-muted">Назад · трек</span><br>CLI та remap</a></nav><nav class="pager" aria-label="Сусідні кроки шляху Betaflight" data-path-pager="betaflight" hidden><a class="gc-card pager__prev" href="bf-cli.html?path=betaflight"><span class="gc-label gc-muted">Назад · шлях Betaflight</span><br>CLI та remap</a><a class="gc-card pager__next" href="emb-basics.html?path=betaflight"><span class="gc-label gc-muted">Далі · крок 42 з 44</span><br>Embedded: переривання, таймери, DMA, RTOS</a></nav>
+    </article>
+  </main>
+  <footer class="gc-container site-footer gc-muted">
+    <p>Відкритий курс · <a href="https://github.com/irreligious86/UAV-Education">вихідний код на GitHub</a> · <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">план розвитку</a> · <a href="../../curriculum/curriculum.html">для розробника</a> · CC BY-NC-SA 4.0</p>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,94 @@
+{
+  "module": "ros2-app-arch",
+  "pass": 80,
+  "questions": [
+    {
+      "q": "Which node must NOT sit on the “autopilot status → setpoints” path?",
+      "options": [
+        "Perception",
+        "The bridge to the autopilot",
+        "Decision",
+        "Safeguards"
+      ],
+      "answer": 0,
+      "explain": "A non-critical node must not block control."
+    },
+    {
+      "q": "A lifecycle node in the inactive state is:",
+      "options": [
+        "Configured but not running",
+        "Waiting for a service response",
+        "Not configured and not created",
+        "Finalized"
+      ],
+      "answer": 0,
+      "explain": "activate moves it to active."
+    },
+    {
+      "q": "Watchdog: losing targets from the camera gives the level",
+      "options": [
+        "DEGRADED",
+        "FAILSAFE",
+        "OK",
+        "A reboot"
+      ],
+      "answer": 0,
+      "explain": "A non-critical input — the function degrades."
+    },
+    {
+      "q": "Why do you need hysteresis on input recovery?",
+      "options": [
+        "So the input doesn't make the mode flicker",
+        "For QoS",
+        "To bring the function back faster",
+        "To save CPU"
+      ],
+      "answer": 0,
+      "explain": "recover_s ≈ 0.5–1 s."
+    },
+    {
+      "q": "Who is the last line of defense if the whole application crashes?",
+      "options": [
+        "The autopilot with its timeouts",
+        "systemd",
+        "The watchdog node on the companion",
+        "The operator"
+      ],
+      "answer": 0,
+      "explain": "Safety lives at the lowest level."
+    },
+    {
+      "q": "Neural network inference delays the setpoint timer. The fix:",
+      "options": [
+        "Separate callback groups",
+        "A faster setpoint timer",
+        "QoS RELIABLE",
+        "A smaller depth"
+      ],
+      "answer": 0,
+      "explain": "Separate callback groups and a MultiThreadedExecutor, or a separate process: heavy callbacks must not block control."
+    },
+    {
+      "q": "Store the secret VPN key:",
+      "options": [
+        "In a file with access permissions",
+        "In YAML parameters",
+        "In the launch file",
+        "In a topic"
+      ],
+      "answer": 0,
+      "explain": "Parameters are visible to all participants."
+    },
+    {
+      "q": "Ring-buffer bag recording on board is set with:",
+      "options": [
+        "--max-bag-duration",
+        "QoS depth",
+        "ROS_DOMAIN_ID",
+        "use_sim_time while recording"
+      ],
+      "answer": 0,
+      "explain": "So you don't fill up the disk."
+    }
+  ]
+}

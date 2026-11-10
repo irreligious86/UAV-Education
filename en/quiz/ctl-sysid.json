@@ -3,92 +3,92 @@
   "pass": 80,
   "questions": [
     {
-      "q": "Что такое чирп?",
+      "q": "What is a chirp?",
       "options": [
-        "Короткий импульс газа на всех моторах",
-        "Ступенька угла на 10 градусов",
-        "Белый шум на входе миксера",
-        "Синусоида с растущей частотой"
+        "A short throttle pulse on all motors",
+        "A 10-degree angle step",
+        "White noise at the mixer input",
+        "A sine wave with rising frequency"
       ],
       "answer": 3,
-      "explain": "Частота растёт от f₀ до f₁ — энергия на всех частотах диапазона по очереди."
+      "explain": "The frequency rises from f₀ to f₁ — energy at every frequency in the range, one after another."
     },
     {
-      "q": "Как оценить частотную характеристику по записи?",
+      "q": "How do you estimate the frequency response from a recording?",
       "options": [
-        "Перекрёстный спектр / спектр входа",
-        "Разделить выход на вход во времени",
-        "Взять максимум сигнала гироскопа",
-        "Посчитать среднее за весь полёт"
+        "Cross-spectrum / input spectrum",
+        "Divide the output by the input in the time domain",
+        "Take the maximum of the gyro signal",
+        "Compute the average over the whole flight"
       ],
       "answer": 0,
-      "explain": "H = (Y·U*) / |U|², усреднённое по полосам частот."
+      "explain": "H = (Y·U*) / |U|², averaged over frequency bands."
     },
     {
-      "q": "Как задержка τ проявляется на диаграмме Боде?",
+      "q": "How does a delay τ show up on a Bode plot?",
       "options": [
-        "Снижает усиление одинаково на всех частотах",
-        "Сдвигает излом усиления вправо",
-        "Добавляет фазу, растущую с частотой",
-        "Никак не проявляется на ней"
+        "It lowers the gain equally at all frequencies",
+        "It shifts the gain corner to the right",
+        "It adds phase that grows with frequency",
+        "It doesn't show up on it at all"
       ],
       "answer": 2,
-      "explain": "e^(−sτ): усиление 1, фаза −360°·f·τ."
+      "explain": "e^(−sτ): gain 1, phase −360°·f·τ."
     },
     {
-      "q": "Чем опасна оценка «задание → выход» в замкнутом контуре?",
+      "q": "What's the danger of a “setpoint → output” estimate in a closed loop?",
       "options": [
-        "Ничем, для линейной системы это одно и то же",
-        "Модель включит регулятор, не объект",
-        "Её нельзя посчитать на NumPy",
-        "Она требует вдвое больше данных"
+        "None; for a linear system it's the same thing",
+        "The model will include the controller, not the plant",
+        "It can't be computed in NumPy",
+        "It needs twice as much data"
       ],
       "answer": 1,
-      "explain": "Входом объекта должен быть реальный сигнал на объект — выход регулятора или миксера."
+      "explain": "The plant input must be the actual signal into the plant — the controller or mixer output."
     },
     {
-      "q": "Что показывает падение когерентности?",
+      "q": "What does a drop in coherence indicate?",
       "options": [
-        "Шум, нелинейность или чужой вход",
-        "Что оценка на этих частотах идеально линейна",
-        "Что задержка равна нулю",
-        "Перегрев моторов в полёте"
+        "Noise, nonlinearity or an outside input",
+        "That the estimate at these frequencies is perfectly linear",
+        "That the delay is zero",
+        "Motors overheating in flight"
       ],
       "answer": 0,
-      "explain": "Выход перестаёт объясняться входом линейно — оценке на этих частотах не верить."
+      "explain": "The output is no longer explained linearly by the input — don't trust the estimate at these frequencies."
     },
     {
-      "q": "Сколько фазы отнимет фильтр 80 Гц на частоте 20 Гц?",
+      "q": "How much phase will an 80 Hz filter take away at 20 Hz?",
       "options": [
-        "Около 45°",
-        "Около 2°",
-        "Около 14°",
-        "Около 80°"
+        "About 45°",
+        "About 2°",
+        "About 14°",
+        "About 80°"
       ],
       "answer": 2,
       "explain": "arctan(20/80) ≈ 14°."
     },
     {
-      "q": "Почему подгонка дала τ ≈ 9 мс вместо 10 мс?",
+      "q": "Why did the fit give τ ≈ 9 ms instead of 10 ms?",
       "options": [
-        "Ошибка в коде подгонки",
-        "Шум всегда уменьшает задержку",
-        "Чирп был слишком длинным",
-        "Дискретизация: полшага задержки"
+        "A bug in the fitting code",
+        "Noise always reduces the delay",
+        "The chirp was too long",
+        "Sampling: half a step of delay"
       ],
       "answer": 3,
-      "explain": "Модель непрерывная, данные дискретные с шагом 2.5 мс."
+      "explain": "The model is continuous, the data are discrete with a 2.5 ms step."
     },
     {
-      "q": "Что нужно для входа в SYSID в ArduCopter?",
+      "q": "What is needed to enter SYSID in ArduCopter?",
       "options": [
-        "SID_MAGNITUDE больше 1",
-        "Ненулевой SID_AXIS",
-        "Режим AUTOTUNE перед ним",
-        "Подключённая наземка по USB"
+        "SID_MAGNITUDE greater than 1",
+        "A nonzero SID_AXIS",
+        "AUTOTUNE mode before it",
+        "A GCS connected over USB"
       ],
       "answer": 1,
-      "explain": "При SID_AXIS = 0 вход в режим запрещён."
+      "explain": "With SID_AXIS = 0, entering the mode is not allowed."
     }
   ]
 }

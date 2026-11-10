@@ -1,5 +1,5 @@
 {
-  "@doc": "Site languages. The first entry is the source language and is built at the site root; every other one is built under /<dir>/. Adding a language: one entry here plus i18n/<code>/ (see docs/I18N.md).",
+  "@doc": "Site languages. The first entry is the source language and is built at the site root; every other one is built under /<dir>/. Adding a language: one entry here plus i18n/<code>/ (see docs/I18N.md). Optional \"fallback\": a language whose translations fill this one's gaps before the source language (a dialect or regional variant on top of its standard language).",
   "languages": [
     {
       "code": "ru",
@@ -21,6 +21,14 @@
       "name": "English",
       "short": "EN",
       "htmlLang": "en"
+    },
+    {
+      "code": "uk-galych",
+      "dir": "gal",
+      "name": "Галицька (експеримент)",
+      "short": "GAL",
+      "htmlLang": "uk-galych",
+      "fallback": "uk"
     }
   ]
 }

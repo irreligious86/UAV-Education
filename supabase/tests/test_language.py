@@ -19,7 +19,13 @@ def test_nobody_sets_someone_elses_language(db, users, who):
     assert db.execute("update public.profiles set lang = 'en' where id = %s", (users["alice"],)).rowcount == 0
 
 
-@pytest.mark.parametrize("bad", ["ukrainian", "U", "uk; drop", "", "UK"])
+@pytest.mark.parametrize("good", ["en", "uk", "pt-BR", "uk-galych"])
+def test_language_code_accepts_variants(db, users, good):
+    act(db, users["alice"])
+    assert db.execute("update public.profiles set lang = %s where id = %s", (good, users["alice"])).rowcount == 1
+
+
+@pytest.mark.parametrize("bad", ["ukrainian", "U", "uk; drop", "", "UK", "uk-ga", "uk-galych-x", "uk-Galych"])
 def test_language_code_shape(db, users, bad):
     act(db, users["alice"])
     savepoint_raises(db, errors.CheckViolation, "update public.profiles set lang = %s where id = %s", (bad, users["alice"]))

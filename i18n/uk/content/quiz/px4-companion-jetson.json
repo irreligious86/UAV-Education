@@ -1,0 +1,94 @@
+{
+  "module": "px4-companion-jetson",
+  "pass": 80,
+  "questions": [
+    {
+      "q": "На якому порту PX4 за замовчуванням очікує companion?",
+      "options": [
+        "TELEM1",
+        "TELEM2",
+        "GPS1",
+        "USB"
+      ],
+      "answer": 1,
+      "explain": "TELEM1 — GCS, TELEM2 — companion."
+    },
+    {
+      "q": "Які параметри вмикають MAVLink для companion на TELEM2?",
+      "options": [
+        "MC_AIRMODE = 1",
+        "MAV_1_CONFIG + MODE Onboard",
+        "UXRCE_DDS_CFG = TELEM2",
+        "SER_TEL2_PROTOCOL = 2 і BAUD"
+      ],
+      "answer": 1,
+      "explain": "Режим Onboard — набір повідомлень для бортового комп'ютера."
+    },
+    {
+      "q": "Чи можна на одному порту тримати MAVLink і uXRCE-DDS?",
+      "options": [
+        "Так, якщо швидкість 921600",
+        "Ні, обирається щось одне",
+        "Лише на H7",
+        "Лише через UDP"
+      ],
+      "answer": 1,
+      "explain": "MAV_1_CONFIG = Disabled, потім UXRCE_DDS_CFG = TELEM2."
+    },
+    {
+      "q": "Рекомендована швидкість TELEM2 для companion?",
+      "options": [
+        "57600",
+        "115200",
+        "921600",
+        "9600"
+      ],
+      "answer": 2,
+      "explain": "SER_TEL2_BAUD = 921600 для короткого дроту й великого потоку."
+    },
+    {
+      "q": "Що має відбуватися в разі відмови companion?",
+      "options": [
+        "Перезавантаження PX4 за watchdog",
+        "Offboard завершиться за таймаутом",
+        "Апарат падає",
+        "Offboard не змінюється"
+      ],
+      "answer": 1,
+      "explain": "Межа відповідальності: FC літає сам."
+    },
+    {
+      "q": "Навіщо додавати користувача Jetson до групи dialout?",
+      "options": [
+        "Для Wi-Fi",
+        "Доступ до UART без sudo",
+        "Для доступу до CUDA і GPU",
+        "Для автозапуску"
+      ],
+      "answer": 1,
+      "explain": "Інакше послідовний порт недоступний звичайному користувачеві."
+    },
+    {
+      "q": "Як надійно дізнатися, який /dev/ttyTHS* відповідає пінам 8/10 на твоїй версії JetPack?",
+      "options": [
+        "Взяти ім'я з будь-якої статті",
+        "Петлею: перемичка 8–10 і ехо-тест",
+        "За першим портом у ls /dev",
+        "Це завжди /dev/ttyAMA0"
+      ],
+      "answer": 1,
+      "explain": "Ім'я залежить від плати й JetPack (ttyTHS0 або ttyTHS1); ехо через перемичку відповідає лише з потрібного порту."
+    },
+    {
+      "q": "Чи можна MAVLink і uXRCE-DDS на одному TELEM2?",
+      "options": [
+        "Лише через USB, не через UART",
+        "Ні, різні порти",
+        "Лише в SITL",
+        "Так"
+      ],
+      "answer": 1,
+      "explain": "MAV_1_CONFIG і UXRCE_DDS_CFG на різних портах."
+    }
+  ]
+}

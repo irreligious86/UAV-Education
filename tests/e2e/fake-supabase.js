@@ -126,7 +126,7 @@
         var id = (filters.filter(function (f) { return f[0] === "id"; })[0] || [])[1];
         if (!u || id !== u.id) return ok(null);
         if ("lang" in payload) {
-          if (!/^[a-z]{2}(-[A-Z]{2})?$/.test(payload.lang)) return fail('new row violates check constraint "profiles_lang_check"');
+          if (!/^[a-z]{2,3}(-[A-Z]{2})?(-[a-z0-9]{5,8})?$/.test(payload.lang)) return fail('new row violates check constraint "profiles_lang_check"');
           u.lang = payload.lang; save(db); return ok(null);
         }
         if (db.users.some(function (x) { return x.username === payload.username && x.id !== u.id; })) return fail("duplicate key value violates unique constraint");

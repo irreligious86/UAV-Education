@@ -3,7 +3,7 @@
   "pass": 80,
   "questions": [
     {
-      "q": "Включить AP_DDS по последовательному порту:",
+      "q": "To enable AP_DDS over a serial port:",
       "options": [
         "PROTOCOL 45, DDS_ENABLE",
         "MAV_SYSID = 45",
@@ -11,21 +11,21 @@
         "SERIALn_PROTOCOL = 2 (MAVLink2)"
       ],
       "answer": 0,
-      "explain": "Для UDP — DDS_UDP_PORT (2019) и DDS_IP0..3."
+      "explain": "For UDP — DDS_UDP_PORT (2019) and DDS_IP0..3."
     },
     {
-      "q": "В какой системе координат /ap/pose/filtered?",
+      "q": "What coordinate frame is /ap/pose/filtered in?",
       "options": [
         "ENU, map",
-        "NED относительно дома",
+        "NED relative to home",
         "ECEF",
         "FRD"
       ],
       "answer": 0,
-      "explain": "AP_DDS конвертирует сам."
+      "explain": "AP_DDS converts it itself."
     },
     {
-      "q": "Сервис смены режима в GUIDED для Copter:",
+      "q": "The service to switch Copter to GUIDED:",
       "options": [
         "/ap/mode_switch, 4",
         "/ap/arm_motors",
@@ -36,18 +36,18 @@
       "explain": "GUIDED = 4, LAND = 9."
     },
     {
-      "q": "Уставки /ap/cmd_vel на земле игнорируются. Чего не хватает?",
+      "q": "/ap/cmd_vel setpoints are ignored on the ground. What's missing?",
       "options": [
-        "Взлёта в GUIDED",
+        "A takeoff in GUIDED",
         "QoS RELIABLE",
         "MAVROS",
-        "Сервиса prearm и QoS"
+        "The prearm service and QoS"
       ],
       "answer": 0,
-      "explain": "Порядок: GUIDED → arm → takeoff → уставки."
+      "explain": "The order: GUIDED → arm → takeoff → setpoints."
     },
     {
-      "q": "Если cmd_vel перестал приходить в GUIDED, ArduPilot останавливается через:",
+      "q": "If cmd_vel stops arriving in GUIDED, ArduPilot stops after:",
       "options": [
         "GUID_TIMEOUT",
         "COM_OF_LOSS_T",
@@ -55,40 +55,40 @@
         "DDS_TIMEOUT_MS"
       ],
       "answer": 0,
-      "explain": "Аналог 2 Гц у PX4."
+      "explain": "The counterpart of PX4's 2 Hz."
     },
     {
-      "q": "Где взять типы ardupilot_msgs?",
+      "q": "Where do you get the ardupilot_msgs types?",
       "options": [
-        "Tools/ros2 в ArduPilot",
-        "В px4_msgs",
-        "В пакете px4_msgs",
-        "В ROS core"
+        "Tools/ros2 in ArduPilot",
+        "In px4_msgs",
+        "In the px4_msgs package",
+        "In ROS core"
       ],
       "answer": 0,
-      "explain": "Ветка должна соответствовать прошивке."
+      "explain": "The branch must match the firmware."
     },
     {
-      "q": "Когда MAVROS предпочтительнее AP_DDS?",
+      "q": "When is MAVROS preferable to AP_DDS?",
       "options": [
-        "Миссии, параметры, весь MAVLink",
-        "Всегда",
-        "Ради минимальной задержки",
-        "Никогда"
+        "Missions, parameters, all of MAVLink",
+        "Always",
+        "For minimum latency",
+        "Never"
       ],
       "answer": 0,
-      "explain": "MAVROS охватывает почти весь MAVLink."
+      "explain": "MAVROS covers almost all of MAVLink."
     },
     {
-      "q": "frame_id \"base_link\" в /ap/cmd_vel означает:",
+      "q": "frame_id \"base_link\" in /ap/cmd_vel means:",
       "options": [
-        "Оси корпуса",
-        "Мировые ENU",
-        "Глобальные координаты",
-        "Ошибка"
+        "Body axes",
+        "World ENU",
+        "Global coordinates",
+        "An error"
       ],
       "answer": 0,
-      "explain": "\"map\" — мировые ENU."
+      "explain": "\"map\" is world ENU."
     }
   ]
 }

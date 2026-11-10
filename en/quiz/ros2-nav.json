@@ -3,92 +3,92 @@
   "pass": 80,
   "questions": [
     {
-      "q": "Object avoidance ArduPilot с реактивным поиском обходного направления:",
+      "q": "ArduPilot object avoidance with a reactive search for a way around:",
       "options": [
         "OA_TYPE = 1 (BendyRuler)",
         "CP_DIST",
         "AVOID_ENABLE = 0",
-        "OA_TYPE = 2 (Dijkstra) по датчикам"
+        "OA_TYPE = 2 (Dijkstra) from sensors"
       ],
       "answer": 0,
-      "explain": "Dijkstra — глобальный путь вокруг полигонов."
+      "explain": "Dijkstra is a global path around polygons."
     },
     {
-      "q": "Неизвестные клетки карты по умолчанию считают:",
+      "q": "By default, unknown map cells are treated as:",
       "options": [
-        "Занятыми",
-        "Свободными",
-        "Удаляют",
-        "Половина вероятности — свободны"
+        "Occupied",
+        "Free",
+        "Removed",
+        "Half probability — free"
       ],
       "answer": 0,
-      "explain": "Лететь только туда, где видели свободное."
+      "explain": "Fly only where you've seen free space."
     },
     {
-      "q": "Допустимая эвристика A* для 8-связной сетки:",
+      "q": "An admissible A* heuristic for an 8-connected grid:",
       "options": [
-        "Октильная дистанция",
-        "Манхэттенская",
-        "Ноль только",
-        "Квадрат евклидовой дистанции"
+        "Octile distance",
+        "Manhattan distance",
+        "Zero only",
+        "Squared Euclidean distance"
       ],
       "answer": 0,
-      "explain": "Ноль тоже допустим, но это Dijkstra."
+      "explain": "Zero is admissible too, but that's Dijkstra."
     },
     {
-      "q": "Зачем раздувают препятствия?",
+      "q": "Why are obstacles inflated?",
       "options": [
-        "Планировать точку с запасом",
-        "Чтобы ускорить поиск A*",
-        "Сгладить путь",
-        "Для визуализации"
+        "To plan for a point with a margin",
+        "To speed up the A* search",
+        "To smooth the path",
+        "For visualization"
       ],
       "answer": 0,
-      "explain": "Радиус + ошибка позиции + запас."
+      "explain": "Radius + position error + margin."
     },
     {
-      "q": "Максимальная скорость у препятствия по тормозному пути:",
+      "q": "The maximum velocity near an obstacle based on braking distance:",
       "options": [
         "v ≤ √(2·a·d)",
         "v ≤ a·d",
         "v ≤ d/a",
-        "не зависит от дальности датчика"
+        "independent of the sensor range"
       ],
       "answer": 0,
-      "explain": "Плюс запас и время реакции."
+      "explain": "Plus a margin and the reaction time."
     },
     {
-      "q": "Nav2 для мультикоптера:",
+      "q": "Nav2 for a multicopter:",
       "options": [
-        "Плоскость да, 3D нет",
-        "Встроен в PX4",
-        "Неприменим вообще",
-        "Полностью решает 3D-полёт"
+        "A plane yes, 3D no",
+        "Built into PX4",
+        "Not applicable at all",
+        "Fully solves 3D flight"
       ],
       "answer": 0,
-      "explain": "Costmap и BT полезны; 3D — нет."
+      "explain": "Costmaps and BT are useful; 3D isn't covered."
     },
     {
-      "q": "Частоты слоёв: глобальный / локальный / уставки:",
+      "q": "Layer rates: global / local / setpoints:",
       "options": [
-        "0.5–2 / 10–20 / 20–50 Гц",
-        "Все по 20 Гц",
-        "50 / 20 / 1 Гц сверху вниз",
-        "1 / 1 / 1 Гц"
+        "0.5–2 / 10–20 / 20–50 Hz",
+        "All at 20 Hz",
+        "50 / 20 / 1 Hz from top to bottom",
+        "1 / 1 / 1 Hz"
       ],
       "answer": 0,
-      "explain": "Перепланирование на частоте уставок даёт дёрганье."
+      "explain": "Replanning at the setpoint rate causes jerking."
     },
     {
-      "q": "PX4 collision prevention работает в режиме:",
+      "q": "PX4 collision prevention works in the mode:",
       "options": [
         "Position",
-        "Только Offboard",
+        "Offboard only",
         "Manual",
-        "Только Mission"
+        "Mission only"
       ],
       "answer": 0,
-      "explain": "Ограничивает скорость в сторону препятствия."
+      "explain": "It limits velocity toward the obstacle."
     }
   ]
 }

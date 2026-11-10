@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="uk-galych" data-theme="dark" data-lang="uk-galych">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Стеження та керування за ціллю — UAV Student</title>
+  <meta name="description" content="замкнути контур: помилка в кадрі → команда швидкості в GUIDED/Offboard урахувати затримку й обмежити динаміку побудувати захисти: втрата цілі, таймаути">
+  <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
+  <link rel="manifest" href="../../manifest.webmanifest">
+  <meta name="theme-color" content="#0b0f14">
+  <link rel="alternate" hreflang="ru" href="../../m/per-tracking.html">
+  <link rel="alternate" hreflang="uk" href="../../uk/m/per-tracking.html">
+  <link rel="alternate" hreflang="en" href="../../en/m/per-tracking.html">
+  <link rel="alternate" hreflang="uk-galych" href="../../gal/m/per-tracking.html">
+  <script>/* go to the visitor's chosen language before anything paints (assets/i18n.js) */(function(){try{var c=localStorage.getItem('uav-lang'),h=document.documentElement.getAttribute('data-lang');if(!c||c===h||/[?&]lang=keep\b/.test(location.search))return;var l=document.querySelector('link[rel=alternate][hreflang="'+c+'"]');if(l)location.replace(l.href+location.search+location.hash)}catch(e){}})();</script>
+  <link rel="stylesheet" href="../../lib/ground-control-ui/dist/ground-control.css">
+  <link rel="stylesheet" href="../../assets/site.css">
+  <script src="../../lib/ground-control-ui/dist/ground-control.js" defer></script>
+  <script src="../../assets/i18n/uk-galych.js"></script>
+  <script src="../../assets/i18n.js"></script>
+  <script src="../../assets/progress-store.js" defer></script>
+  <script src="../../assets/backend-config.js" defer></script>
+  <script src="../../assets/account.js" defer></script>
+  <script src="../../assets/grading.js" defer></script>
+  <script src="../../assets/app.js" defer></script>
+  <script src="../../assets/uav-quiz.js" defer></script>
+  <script src="../../assets/uav-tasks.js" defer></script>
+  <script src="../../assets/offline.js" defer></script>
+</head>
+<body class="gc-root" data-base="../" data-root="../../">
+  <header class="site-header">
+    <div class="gc-container site-header__inner">
+      <a class="site-brand" href="../index.html"><span class="site-brand__mark" aria-hidden="true">◆</span> UAV Student</a>
+      <nav class="gc-nav" aria-label="Розділи сайту">
+        <a href="../index.html" aria-current="page">Курс</a>
+        <a href="../ref/index.html">Довідник</a>
+        <a href="../pages/glossary.html">Глосарій</a>
+        <a href="../pages/fails.html">Фейли</a>
+        <a href="../pages/search.html">Пошук</a>
+        <a href="../pages/progress.html">Мій прогрес</a>
+      </nav>
+      <nav class="lang-switch" aria-label="Мова"><a class="gc-tag" href="../../m/per-tracking.html" data-lang-to="ru" hreflang="ru" lang="ru" title="Русский">RU</a><a class="gc-tag" href="../../uk/m/per-tracking.html" data-lang-to="uk" hreflang="uk" lang="uk" title="Українська">UK</a><a class="gc-tag" href="../../en/m/per-tracking.html" data-lang-to="en" hreflang="en" lang="en" title="English">EN</a><a class="gc-tag" href="../../gal/m/per-tracking.html" data-lang-to="uk-galych" hreflang="uk-galych" lang="uk-galych" title="Галицька (експеримент)" aria-current="true" data-state="ok">GAL</a></nav>
+    </div>
+  </header>
+  <main class="gc-container site-main">
+    <article class="module" data-module-page="per-tracking">
+      <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-perception">Сприйняття та інтелект</a><span>Стеження та керування за ціллю</span></p>
+      <h1 class="module-title">Стеження та керування за ціллю</h1>
+      <div class="module-tags"><span class="gc-tag" title="Рівень">L4 — Експерт</span><span class="gc-tag">читання 40 хв</span><span class="gc-tag">навчання ~4 год</span><span class="gc-tag">ArduPilot · PX4</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ОПАНОВАНО</span></div>
+      <p class="gc-muted module-score" data-module-score></p>
+      <p class="module-lead">Замкнути контур «камера → помилка в кадрі → команда швидкості» просто; зробити так, щоб він не розгойдувався й не відлітав при втраті цілі, — інженерна задача. Модуль збирає її з уже пройденого: детектор і трекер (per-cv), затримка ланцюжка (камера → інференс → команда → автопілот → відгук), теорія керування (запас за фазою при затримці 100–200 мс), інтерфейси GUIDED (ArduPilot <code>SET_POSITION_TARGET_LOCAL_NED</code> зі швидкостями) і Offboard (PX4 <code>TrajectorySetpoint</code>), захисти (ліміти швидкості/прискорення, watchdog за детекціями, таймаут втрати цілі → зависання, геозона, ручне перехоплення). Лабораторна в SITL із симульованою ціллю; стартовий код — у <code>examples/ros2-skeleton</code>.</p>
+      <div class="gc-callout" data-state="ok"><strong>Після модуля ти вмієш</strong><ul><li>замкнути контур: помилка в кадрі → команда швидкості в GUIDED/Offboard</li><li>урахувати затримку й обмежити динаміку</li><li>побудувати захисти: втрата цілі, таймаути</li></ul></div><p class="gc-muted">Перед цим модулем: <a href="per-cv.html">Комп&#x27;ютерний зір: від OpenCV до нейромереж</a>, <a href="ap-companion.html">Companion + ArduPilot: керування з коду</a></p><div class="gc-callout lab"><p class="gc-label gc-muted">Лабораторна</p><strong>Контур стеження</strong><p class="gc-muted lab__hint">Здано, коли позначено всі пункти:</p><ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="per-tracking:lab:0"><span>Контур працює в SITL</span></label></li><li><label><input type="checkbox" data-check-id="per-tracking:lab:1"><span>Затримку враховано</span></label></li><li><label><input type="checkbox" data-check-id="per-tracking:lab:2"><span>Втрата цілі → зависання</span></label></li></ul></div><div class="path-pos gc-muted"><span class="gc-label">На шляху</span><ul><li data-path-pos="ardupilot"><a href="../path/ardupilot.html">ArduPilot</a>: крок 69 з 69 · останній крок</li><li data-path-pos="px4"><a href="../path/px4.html">PX4</a>: крок 36 з 36 · останній крок</li></ul></div>
+      <div class="gc-prose module-body">
+<h2>Теорія</h2>
+<h4 class="md-subheading">Від пікселя до команди</h4>
+<p>Помилка в кадрі (e_x, e_y) у нормованих координатах [−1, 1] від центру. Для камери, що дивиться донизу: зміщення цілі в метрах ≈ h · tan(e·FOV/2) — при малих кутах лінійне за e і пропорційне висоті h. Команда швидкості: v = K_p · (зміщення) з обмеженням |v| ≤ v_max. Для камери вперед/під кутом геометрія складніша: потрібно знати кут камери й висоту (або дальність до цілі за розміром бокса), інакше K_p «пливе» з відстанню. Гімбал із керуванням за ціллю (ArduPilot <code>MNT1_*</code>/<code>GIMBAL_MANAGER</code>) розділяє задачі: гімбал тримає ціль у центрі, апарат летить за кутами гімбала.</p>
+<p>Структура контуру: <strong>зовнішній</strong> (наш, 10–30 Гц, за помилкою зображення) видає швидкість → <strong>внутрішній</strong> (автопілот: швидкість → кути → рейти, 50–400 Гц). Правило каскаду з теорії керування: наш контур має бути помітно повільнішим за контур швидкості автопілота — і він таким і буде через затримку.</p>
+<h4 class="md-subheading">Затримка — головний обмежувач</h4>
+<p>Ланцюжок: експозиція + захоплення (10–30 мс) → інференс (10–50) → трекер/команда (1–5) → MAVLink/DDS (2–10) → автопілот приймає setpoint швидкості й відпрацьовує (контур швидкості PSC_VELXY_P, стала часу 0.3–1 с). Разом 50–150 мс чистої затримки + динаміка. При затримці T_d і підсиленні K_p контур P-типу починає осцилювати на частоті порядку 1/(4·T_d) (фаза −90° від затримки + −90° від інтегратора «швидкість → позиція»): при T_d = 100 мс — близько 2.5 Гц, і межа K_p ≈ π/(2·T_d) ≈ 15 1/с в ідеалі. Але автопілот не змінює швидкість миттєво: з відпрацюванням швидкості τ ≈ 0.4 с межа падає до ~10 1/с при 100 мс і ~3.7 1/с при 300 мс, а з обмеженнями швидкості й прискорення (насичення) — ще нижче: ~7.8 і ~2.8 1/с (симуляція в практиці). Робочий K_p обирають у 3–5 разів нижчим за межу заради запасу за фазою — звідси типові 0.5–2 1/с (м/с на метр помилки). Прийоми: передбачення положення цілі трекером на T_d уперед, фільтр команди, D-складова за швидкістю цілі (з трекера), обмеження прискорення — і передусім зменшення затримки.</p>
+<h4 class="md-subheading">Інтерфейси</h4>
+<p><strong>ArduPilot GUIDED</strong>: <code>SET_POSITION_TARGET_LOCAL_NED</code> з <code>type_mask</code>, що дозволяє лише швидкості (<code>0b110111000111</code> = 3527: позиція, прискорення, курс і швидкість курсу ігноруються, працюють vx, vy, vz), frame <code>MAV_FRAME_BODY_OFFSET_NED</code> (швидкість в осях апарата — зручно для стеження) або <code>LOCAL_NED</code>; надсилати ≥ 2–3 Гц, інакше через <code>GUID_TIMEOUT</code> (3 с) цілі скидаються (апарат зависає — це і є захист). Обмеження автопілота: <code>WP_SPD</code> (до 4.7 — <code>WPNAV_SPEED</code>), <code>PSC_*</code>, <code>GUID_OPTIONS</code>. Пілот перехоплює зміною режиму з пульта — завжди. <strong>PX4 Offboard</strong>: <code>OffboardControlMode</code> (velocity=true) + <code>TrajectorySetpoint</code> (velocity, position NaN) на ≥ 2 Гц (рекомендовано 10+), <code>COM_OF_LOSS_T</code> (таймаут втрати offboard) і <code>COM_OBL_RC_ACT</code> (дія); вхід в Offboard — після потоку setpoint&#x27;ів, арм — <code>VehicleCommand</code>. Через MAVROS — <code>/mavros/setpoint_velocity/cmd_vel_unstamped</code> у режимі OFFBOARD.</p>
+<h4 class="md-subheading">Захисти (обов&#x27;язкові)</h4>
+<ol><li><strong>Ліміти</strong>: v_max (1–3 м/с для перших тестів), a_max (1–2 м/с²), висота — фіксована або з нижньою межею, геозону ввімкнено.</li><li><strong>Watchdog детекцій</strong>: немає валідної детекції 0.3–0.5 с → команда нульової швидкості (зависання), а не «остання команда».</li><li><strong>Таймаут втрати цілі</strong>: 2–5 с без цілі → зависання й вихід із режиму (Loiter/Hold), повідомлення оператору; повторне захоплення — лише за командою.</li><li><strong>Санітизація</strong>: NaN/нескінченності, стрибки помилки &gt; порога (хибна детекція) — відкидати; трекер із мінімальною кількістю кадрів підтвердження.</li><li><strong>Перехоплення</strong>: зміна режиму з пульта миттєво обриває контур; companion не повинен «боротися» — після перехоплення публікація припиняється.</li><li><strong>Логи</strong>: companion пише помилку, команду, статус трекера з timestamp; синхронізовано з логом FC — інакше розбір неможливий.</li></ol>
+<h4 class="md-subheading">Тест-план</h4>
+<p>SITL + симульована ціль (точка, що рухається за відомим законом і проєктується в «кадр» за позицією апарата) → реальна камера на стенді (апарат прив&#x27;язаний, ціль на підлозі рухається) → низький політ над відкритим майданчиком зі спостерігачем і пілотом із пальцем на тумблері.</p>
+<figure class="diagram" data-diagram="tracking-guards"><div class="diagram__svg"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 780 184" width="100%" role="img" aria-labelledby="t" style="max-width:780px;display:block;margin:0 auto"><title id="t">Стеження: обов&#x27;язкові захисти</title><style>text{font-family: var(--gc-font-mono, ui-monospace, Menlo, monospace); font-size: 12px;fill:currentColor} .m{fill:var(--gc-ink-muted, #8a93a3)} .a{fill:var(--gc-accent-hud, #5ef1d2)} .w{fill:var(--gc-signal-amber, #f0b24c)} .d{fill:var(--gc-signal-red, #e8636b)} .box{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:currentColor;stroke-width:1.2} .boxa{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6} .ln{stroke:currentColor;stroke-width:1.2;fill:none} .lna{stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6;fill:none} .lnm{stroke:var(--gc-ink-muted, #8a93a3);stroke-width:1;fill:none;stroke-dasharray:4 3} .t{font-size:11px} .b{font-weight:600}</style><defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker><marker id="ara" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--gc-accent-hud, #5ef1d2)"/></marker></defs><text x="16" y="16" text-anchor="start" class="m t">Стеження: обов&#x27;язкові захисти</text><rect class="box" x="315.0" y="34" width="150.0" height="40" rx="6"/><text x="390.0" y="58.0" text-anchor="middle" style="font-size:10.5px">Умова</text><path class="ln" d="M390.0 74 L390.0 89.0 L86.0 89.0 L86.0 104" marker-end="url(#ar)"/><text x="90.0" y="85.0" text-anchor="start" class="a t" style="font-size:10px">ціль втрачено</text><rect class="boxa" x="13.0" y="104" width="146.0" height="40" rx="18"/><text x="86.0" y="122.0" text-anchor="middle" class="b" style="font-size:10.5px">&gt; 1 с → зависати,</text><text x="86.0" y="134.0" text-anchor="middle" class="b" style="font-size:10.5px">швидкість 0</text><path class="ln" d="M390.0 74 L390.0 89.0 L238.0 89.0 L238.0 104" marker-end="url(#ar)"/><text x="242.0" y="85.0" text-anchor="start" class="a t" style="font-size:10px">низька впевн.</text><rect class="box" x="165.0" y="104" width="146.0" height="40" rx="18"/><text x="238.0" y="122.0" text-anchor="middle" style="font-size:10.5px">Не керувати</text><text x="238.0" y="134.0" text-anchor="middle" style="font-size:10.5px">за цією детекцією</text><path class="ln" d="M390.0 74 L390.0 89.0 L390.0 89.0 L390.0 104" marker-end="url(#ar)"/><text x="394.0" y="85.0" text-anchor="start" class="a t" style="font-size:10px">занадто близько</text><rect class="box" x="317.0" y="104" width="146.0" height="40" rx="18"/><text x="390.0" y="122.0" text-anchor="middle" style="font-size:10.5px">Мін. дистанція</text><text x="390.0" y="134.0" text-anchor="middle" style="font-size:10.5px">→ стоп</text><path class="ln" d="M390.0 74 L390.0 89.0 L542.0 89.0 L542.0 104" marker-end="url(#ar)"/><text x="546.0" y="85.0" text-anchor="start" class="a t" style="font-size:10px">межа</text><rect class="box" x="469.0" y="104" width="146.0" height="40" rx="18"/><text x="542.0" y="122.0" text-anchor="middle" style="font-size:10.5px">Геозона і висота</text><text x="542.0" y="134.0" text-anchor="middle" style="font-size:10.5px">— в автопілота</text><path class="ln" d="M390.0 74 L390.0 89.0 L694.0 89.0 L694.0 104" marker-end="url(#ar)"/><text x="698.0" y="85.0" text-anchor="start" class="a t" style="font-size:10px">оператор</text><rect class="boxa" x="621.0" y="104" width="146.0" height="40" rx="18"/><text x="694.0" y="122.0" text-anchor="middle" class="b" style="font-size:10.5px">Зміна режиму</text><text x="694.0" y="134.0" text-anchor="middle" class="b" style="font-size:10.5px">з пульта — одразу</text></svg></div><figcaption class="gc-muted">Обов&#x27;язкові захисти стеження: втрата цілі, низька впевненість, мінімальна дистанція, межі автопілота й пріоритет оператора.</figcaption><div class="diagram__hint">Схему можно прокрутить по горизонтали</div></figure>
+
+<h2>Практика</h2>
+<h4 class="md-subheading">Крок 1. Симульована ціль у SITL</h4>
+<p>Скрипт: ціль рухається по колу R = 10 м, 0.5 м/с; «камера» донизу з FOV 90°: помилка в кадрі = (ціль − позиція апарата)/(h·tan45°), обмежена [−1, 1]; детекція «губиться» з імовірністю 5% на кадр + «сліпе» вікно 3 с раз на хвилину. 20 Гц.</p>
+<h4 class="md-subheading">Крок 2. Межа підсилення: розрахунок і симуляція</h4>
+<p>Перш ніж летіти — порахувати. Одновимірна модель контуру: помилка з кадру із затримкою T_d → команда швидкості K_p·e → автопілот відпрацьовує швидкість зі сталою часу τ і лімітами:</p>
+<pre class="cli-block"><code>import math
+
+def run(kp, delay, tau_v=0.4, v_max=3.0, a_max=3.0, dt=0.01, T=30.0):
+    &quot;&quot;&quot;1-D loop: delayed image error -&gt; velocity command -&gt; autopilot velocity lag tau_v.
+    Start 5 m off a still target; returns peak |error| over the last 10 s (large = unstable).&quot;&quot;&quot;
+    n_d = int(round(delay / dt))
+    seen = [5.0] * (n_d + 1)                # what the camera reported n_d steps ago
+    x, v, tail = 5.0, 0.0, 0.0
+    for k in range(int(T / dt)):
+        cmd = max(-v_max, min(v_max, -kp * seen[0]))
+        dv = max(-a_max * dt, min(a_max * dt, (cmd - v) / tau_v * dt))
+        v += dv
+        x += v * dt
+        seen = seen[1:] + [x]
+        if k * dt &gt; T - 10:
+            tail = max(tail, abs(x))
+    return tail
+
+def critical_kp(delay, **kw):
+    lo, hi = 0.05, 30.0
+    for _ in range(40):                     # bisection: largest Kp that still settles
+        mid = (lo + hi) / 2
+        lo, hi = (mid, hi) if run(mid, delay, **kw) &lt; 0.05 else (lo, mid)
+    return lo
+
+def analytic_kp(delay, tau_v=0.4):
+    &quot;&quot;&quot;Zero phase margin of Kp·e^(-s·Td) / (s·(tau_v·s + 1)).&quot;&quot;&quot;
+    lo, hi = 0.01, 100.0
+    for _ in range(100):
+        w = (lo + hi) / 2
+        lo, hi = (w, hi) if math.atan(w * tau_v) + w * delay &lt; math.pi / 2 else (lo, w)
+    return w * math.hypot(1, w * tau_v)
+
+for d in (0.1, 0.3):
+    print(f&quot;T_d = {d * 1000:.0f} мс: без динаміки {math.pi / (2 * d):4.1f}, &quot;
+          f&quot;з τ = 0.4 с {analytic_kp(d):4.1f}, з лімітами v і a {critical_kp(d):4.1f}  (1/с)&quot;)
+# T_d = 100 мс: без динаміки 15.7, з τ = 0.4 с 10.4, з лімітами v і a  7.8  (1/с)
+# T_d = 300 мс: без динаміки  5.2, з τ = 0.4 с  3.7, з лімітами v і a  2.8  (1/с)</code></pre>
+<p>Змінити τ (0.2 і 0.8 с — так відрізняються легкий і важкий апарат) і <code>a_max</code>, записати, як зсувається межа. Обрати K_p для своєї затримки із запасом у 3–5 разів.</p>
+<h4 class="md-subheading">Крок 3. Контур у SITL</h4>
+<p>P-регулятор швидкості в GUIDED (<code>BODY_OFFSET_NED</code>) або Offboard з <code>examples/ros2-skeleton</code>: обраний K_p, v_max = 2, a_max = 2. Записати помилку в часі; додати штучну затримку 100 і 300 мс і піднімати K_p до розгойдування — порівняти знайдену межу із симуляцією кроку 2.</p>
+<h4 class="md-subheading">Крок 4. Захисти</h4>
+<p>Перевірити кожен: watchdog (ціль зникла на 0.5 с → швидкість 0), таймаут (3 с → Loiter), хибна детекція (стрибок помилки → відкинуто), перехоплення з пульта (перемкнути режим у SITL через RC override) — companion замовкає.</p>
+<h4 class="md-subheading">Крок 5. Розбір</h4>
+<p>Спільний графік: помилка, команда, фактична швидкість (<code>XKF1.VN/VE</code>), режим; затримка ланцюжка за крос-кореляцією команда → швидкість. Лабораторна зараховується, коли межу K_p пораховано для своєї затримки й підтверджено в SITL, контур працює з лімітами, кожен захист перевірено (watchdog, таймаут, хибна детекція, перехоплення), затримку ланцюжка виміряно за крос-кореляцією.</p>
+
+<h2>Діагностика</h2>
+<div class="diag-groups"><article class="diag-item"><h4><strong>Симптом:</strong> апарат розгойдується навколо цілі</h4><ul><li>Можлива причина: K_p завеликий для затримки.</li><li>Що зробити: знизити K_p, зменшити затримку, передбачення цілі, обмеження прискорення.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> повільно наздоганяє ціль, що рухається</h4><ul><li>Можлива причина: лише P — статична помилка за швидкістю.</li><li>Що зробити: FF за швидкістю цілі з трекера, помірний I з anti-windup.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> ривки при кожній детекції</h4><ul><li>Можлива причина: команди від сирого детектора без трекера/фільтра.</li><li>Що зробити: трекер, фільтр команди, обмеження прискорення.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> після втрати цілі апарат полетів за останньою командою</h4><ul><li>Можлива причина: немає watchdog, автопілот тримав останню швидкість до GUID_TIMEOUT.</li><li>Що зробити: watchdog 0.5 с → нульова швидкість; таймаут → Loiter.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> команди не приймаються</h4><ul><li>Можлива причина: не GUIDED/Offboard, низька частота setpoint&#x27;ів, type_mask.</li><li>Що зробити: перевірити режим, ≥ 10 Гц, маску; дивитися повідомлення <code>GUIDED</code>/<code>COM_OF_LOSS_T</code>.</li></ul></article></div>
+
+<h2>Чек-лист</h2>
+<ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="per-tracking:0"><span>Розумію геометрію «піксель → метри» і залежність від висоти</span></label></li><li><label><input type="checkbox" data-check-id="per-tracking:1"><span>Оцінив межу K_p за затримкою й підтвердив у SITL</span></label></li><li><label><input type="checkbox" data-check-id="per-tracking:2"><span>Контур швидкості в GUIDED/Offboard працює з лімітами</span></label></li><li><label><input type="checkbox" data-check-id="per-tracking:3"><span>Watchdog, таймаут втрати цілі й перехоплення перевірено</span></label></li><li><label><input type="checkbox" data-check-id="per-tracking:4"><span>Логи companion і FC синхронізовано для розбору</span></label></li></ul>
+
+<h2>Джерела</h2>
+<ul class="refs"><li><a href="https://ardupilot.org/dev/docs/copter-commands-in-guided-mode.html" target="_blank" rel="noopener noreferrer">ArduPilot — Copter commands in Guided mode (SET_POSITION_TARGET_LOCAL_NED, type_mask)</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://docs.px4.io/main/en/flight_modes/offboard.html" target="_blank" rel="noopener noreferrer">PX4 — Offboard mode (OffboardControlMode/TrajectorySetpoint, timeouts)</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://mavlink.io/en/services/offboard_control.html" target="_blank" rel="noopener noreferrer">MAVLink — Offboard Control Interface (SET_POSITION_TARGET_LOCAL_NED)</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://mavlink.io/en/messages/common.html#POSITION_TARGET_TYPEMASK" target="_blank" rel="noopener noreferrer">MAVLink — POSITION_TARGET_TYPEMASK</a> <span class="gc-tag" data-state="info">primary</span></li></ul>
+<h2>Задачі з числовою відповіддю</h2>
+<uav-tasks src="../tasks/per-tracking.json" module="per-tracking"></uav-tasks>
+<h2>Перевір себе</h2>
+<uav-quiz src="../quiz/per-tracking.json" module="per-tracking"></uav-quiz>
+      </div>
+      <div class="module-done"><gc-button variant="secondary" data-done-toggle="per-tracking">Позначити як пройдений</gc-button></div>
+      <section class="related" aria-label="Суміжні модулі"><p class="gc-label gc-muted">Суміжні модулі</p><div class="gc-grid ref-grid"><a class="gc-card" href="per-cv.html"><strong>Комп&#x27;ютерний зір: від OpenCV до нейромереж</strong><div class="gc-card__meta"><span class="gc-tag" title="L4 — Эксперт">L4</span></div></a><a class="gc-card" href="ap-companion.html"><strong>Companion + ArduPilot: керування з коду</strong><div class="gc-card__meta"><span class="gc-tag" title="L3 — Специалист">L3</span></div></a><a class="gc-card" href="ctl-theory.html"><strong>Теорія керування: стійкість, запаси, каскади</strong><div class="gc-card__meta"><span class="gc-tag" title="L3 — Специалист">L3</span></div></a><a class="gc-card" href="px4-ros2.html"><strong>PX4 і ROS 2: uXRCE-DDS та offboard</strong><div class="gc-card__meta"><span class="gc-tag" title="L4 — Эксперт">L4</span></div></a></div></section>
+      <nav class="pager" aria-label="Сусідні модулі" data-track-pager><a class="gc-card pager__prev" href="per-depth-avoid.html"><span class="gc-label gc-muted">Назад · трек</span><br>Глибина та обхід перешкод: датчики, OBSTACLE_DISTANCE, алгоритми</a></nav><nav class="pager" aria-label="Сусідні кроки шляху ArduPilot" data-path-pager="ardupilot" hidden><a class="gc-card pager__prev" href="per-depth-avoid.html?path=ardupilot"><span class="gc-label gc-muted">Назад · шлях ArduPilot</span><br>Глибина та обхід перешкод: датчики, OBSTACLE_DISTANCE, алгоритми</a><a class="gc-card pager__next" href="../path/ardupilot.html"><span class="gc-label gc-muted">Шлях пройдено</span><br>До підсумкових проєктів шляху ArduPilot</a></nav><nav class="pager" aria-label="Сусідні кроки шляху PX4" data-path-pager="px4" hidden><a class="gc-card pager__prev" href="per-depth-avoid.html?path=px4"><span class="gc-label gc-muted">Назад · шлях PX4</span><br>Глибина та обхід перешкод: датчики, OBSTACLE_DISTANCE, алгоритми</a><a class="gc-card pager__next" href="../path/px4.html"><span class="gc-label gc-muted">Шлях пройдено</span><br>До підсумкових проєктів шляху PX4</a></nav>
+    </article>
+  </main>
+  <footer class="gc-container site-footer gc-muted">
+    <p>Відкритий курс · <a href="https://github.com/irreligious86/UAV-Education">вихідний код на GitHub</a> · <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">план розвитку</a> · <a href="../../curriculum/curriculum.html">для розробника</a> · CC BY-NC-SA 4.0</p>
+  </footer>
+</body>
+</html>

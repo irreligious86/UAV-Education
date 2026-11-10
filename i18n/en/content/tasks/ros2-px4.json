@@ -1,0 +1,27 @@
+{
+ "module": "ros2-px4",
+ "tasks": [
+  {
+   "id": "timer",
+   "title": "Rate margin",
+   "statement": "The node sends OffboardControlMode on a **{f} Hz** timer, and **{l} %** of messages are randomly lost over Wi-Fi. What average rate reaches PX4 (Hz)?",
+   "params": {
+    "f": [
+     5,
+     10,
+     20,
+     50
+    ],
+    "l": {
+     "min": 0,
+     "max": 80,
+     "step": 5
+    }
+   },
+   "answer": "f*(1-l/100)",
+   "unit": "Hz",
+   "tol": 0.01,
+   "solution": "f·(1 − loss). A 20 Hz timer leaves a large margin over the 2 Hz threshold even with heavy losses."
+  }
+ ]
+}

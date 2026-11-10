@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="uk-galych" data-theme="dark" data-lang="uk-galych">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Вимірювання: мультиметр, осцилограф, логічний аналізатор — UAV Student</title>
+  <meta name="description" content="вимірювати напругу, струм, пульсації та сигнали UART/DShot читати осцилограму PWM/DShot і знаходити проблеми сигналу використовувати логічний аналізатор для протоколів">
+  <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
+  <link rel="manifest" href="../../manifest.webmanifest">
+  <meta name="theme-color" content="#0b0f14">
+  <link rel="alternate" hreflang="ru" href="../../m/el-measure.html">
+  <link rel="alternate" hreflang="uk" href="../../uk/m/el-measure.html">
+  <link rel="alternate" hreflang="en" href="../../en/m/el-measure.html">
+  <link rel="alternate" hreflang="uk-galych" href="../../gal/m/el-measure.html">
+  <script>/* go to the visitor's chosen language before anything paints (assets/i18n.js) */(function(){try{var c=localStorage.getItem('uav-lang'),h=document.documentElement.getAttribute('data-lang');if(!c||c===h||/[?&]lang=keep\b/.test(location.search))return;var l=document.querySelector('link[rel=alternate][hreflang="'+c+'"]');if(l)location.replace(l.href+location.search+location.hash)}catch(e){}})();</script>
+  <link rel="stylesheet" href="../../lib/ground-control-ui/dist/ground-control.css">
+  <link rel="stylesheet" href="../../assets/site.css">
+  <script src="../../lib/ground-control-ui/dist/ground-control.js" defer></script>
+  <script src="../../assets/i18n/uk-galych.js"></script>
+  <script src="../../assets/i18n.js"></script>
+  <script src="../../assets/progress-store.js" defer></script>
+  <script src="../../assets/backend-config.js" defer></script>
+  <script src="../../assets/account.js" defer></script>
+  <script src="../../assets/grading.js" defer></script>
+  <script src="../../assets/app.js" defer></script>
+  <script src="../../assets/uav-quiz.js" defer></script>
+  <script src="../../assets/uav-tasks.js" defer></script>
+  <script src="../../assets/offline.js" defer></script>
+</head>
+<body class="gc-root" data-base="../" data-root="../../">
+  <header class="site-header">
+    <div class="gc-container site-header__inner">
+      <a class="site-brand" href="../index.html"><span class="site-brand__mark" aria-hidden="true">◆</span> UAV Student</a>
+      <nav class="gc-nav" aria-label="Розділи сайту">
+        <a href="../index.html" aria-current="page">Курс</a>
+        <a href="../ref/index.html">Довідник</a>
+        <a href="../pages/glossary.html">Глосарій</a>
+        <a href="../pages/fails.html">Фейли</a>
+        <a href="../pages/search.html">Пошук</a>
+        <a href="../pages/progress.html">Мій прогрес</a>
+      </nav>
+      <nav class="lang-switch" aria-label="Мова"><a class="gc-tag" href="../../m/el-measure.html" data-lang-to="ru" hreflang="ru" lang="ru" title="Русский">RU</a><a class="gc-tag" href="../../uk/m/el-measure.html" data-lang-to="uk" hreflang="uk" lang="uk" title="Українська">UK</a><a class="gc-tag" href="../../en/m/el-measure.html" data-lang-to="en" hreflang="en" lang="en" title="English">EN</a><a class="gc-tag" href="../../gal/m/el-measure.html" data-lang-to="uk-galych" hreflang="uk-galych" lang="uk-galych" title="Галицька (експеримент)" aria-current="true" data-state="ok">GAL</a></nav>
+    </div>
+  </header>
+  <main class="gc-container site-main">
+    <article class="module" data-module-page="el-measure">
+      <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-electronics">Електроніка та радіо</a><span>Вимірювання: мультиметр, осцилограф, логічний аналізатор</span></p>
+      <h1 class="module-title">Вимірювання: мультиметр, осцилограф, логічний аналізатор</h1>
+      <div class="module-tags"><span class="gc-tag" title="Рівень">L2 — Інтегратор</span><span class="gc-tag">читання 30 хв</span><span class="gc-tag">навчання ~3 год</span><span class="gc-tag">любая прошивка</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ОПАНОВАНО</span></div>
+      <p class="gc-muted module-score" data-module-score></p>
+      <p class="module-lead">Інженер відрізняється від збирача тим, що вимірює, а не припускає. Модуль — про три прилади: мультиметр (напруга, струм, прозвонка, опір), осцилограф (просідання, пульсації, форма PWM/DShot, шуми) і логічний аналізатор (розшифрування UART, I2C, SPI, DShot). Що вимірювати, як підключати, як не спалити прилад і борт і як читати результат.</p>
+      <div class="gc-callout" data-state="ok"><strong>Після модуля ти вмієш</strong><ul><li>вимірювати напругу, струм, пульсації та сигнали UART/DShot</li><li>читати осцилограму PWM/DShot і знаходити проблеми сигналу</li><li>використовувати логічний аналізатор для протоколів</li></ul></div><p class="gc-muted">Перед цим модулем: <a href="el-power-design.html">Схемотехніка живлення борту</a></p><div class="gc-callout lab"><p class="gc-label gc-muted">Лабораторна</p><strong>Зняти сигнали</strong><p class="gc-muted lab__hint">Здано, коли позначено всі пункти:</p><ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="el-measure:lab:0"><span>Просідання під навантаженням виміряно</span></label></li><li><label><input type="checkbox" data-check-id="el-measure:lab:1"><span>Кадр DShot/UART знято аналізатором і розшифровано</span></label></li><li><label><input type="checkbox" data-check-id="el-measure:lab:2"><span>Пульсації BEC виміряно</span></label></li></ul></div><div class="path-pos gc-muted"><span class="gc-label">На шляху</span><ul><li data-path-pos="betaflight"><a href="../path/betaflight.html">Betaflight</a>: крок 27 з 44 → <a href="el-emi.html?path=betaflight">Завади та електромагнітна сумісність</a></li></ul></div>
+      <div class="gc-prose module-body">
+<h2>Теорія</h2>
+<h4 class="md-subheading">Мультиметр</h4>
+<ul><li><strong>Напруга</strong> — паралельно споживачу. Корисно: напруга на кожній комірці АКБ (баланс), 5 В і 9 В на BEC під навантаженням.</li><li><strong>Прозвонка</strong> — до подачі живлення: + до − на силовій шині, 5 В до GND. Писк = КЗ. У конденсатора опір зростає в міру заряджання — це норма.</li><li><strong>Струм</strong> — послідовно, через гніздо 10 А; більше — лише струмовими кліщами або через датчик струму FC. Ніколи не вимірювати напругу в режимі струму: це КЗ через прилад.</li><li><strong>Опір</strong> — перевірка обмоток мотора (три однакові значення в десяті частки Ома), обрив проводу.</li><li>Обмеження: мультиметр показує середнє/RMS, не бачить короткочасних просідань і пульсацій.</li></ul>
+<h4 class="md-subheading">Осцилограф</h4>
+<p>Показує напругу в часі. Для борту вистачає 2 каналів і 50–100 МГц; USB-осцилограф теж підійде.</p>
+<ul><li><strong>Просідання</strong>: канал на силову шину, розгортка 100 мс/под, тригер за спадом; різкий газ — видно глибину й тривалість провалу.</li><li><strong>Пульсації</strong>: AC-coupling (прибирає постійну складову), 20–50 мВ/под, розгортка 10–50 мкс/под — видно частоту комутації ESC/BEC і амплітуду p-p. Вимірювати з короткою пружинкою землі замість довгого «крокодила» — інакше ловиш заваду від самого щупа.</li><li><strong>Сигнали</strong>: PWM серв — імпульс 1–2 мс кожні 20 мс (50 Гц); UART — пачки бітів з idle на високому рівні; DShot — пачки з 16 імпульсів різної ширини.</li><li><strong>Пробник ×10</strong> зменшує навантаження на коло й розширює смугу; для логіки 3.3 В — обов&#x27;язковий.</li></ul>
+<h4 class="md-subheading">DShot на осцилографі</h4>
+<p>Кадр DShot — 16 біт: 11 біт газу, 1 біт телеметрії, 4 біти CRC. Кожен біт — імпульс: «1» — довгий (~75% періоду біта), «0» — короткий (~37%). DShot600 — 600 кбіт/с, біт ≈ 1.67 мкс, кадр ≈ 27 мкс. На екрані — пачка з 16 імпульсів, що повторюється з частотою PID-петлі (наприклад, кожні 125 мкс при 8 кГц). Проблеми, які видно: дзвін на фронтах (довгий провід, немає термінування), рівень, що не досягає 3.3 В (слабкий драйвер), пропуски кадрів.</p>
+<h4 class="md-subheading">Логічний аналізатор</h4>
+<p>Записує цифрові рівні на багатьох каналах і декодує протоколи. Дешевих 8-канальних на 24 МГц з ПЗ на кшталт PulseView/sigrok вистачає для UART до 1 Мбод, I2C 400 кГц, SPI до кількох МГц і DShot600 (потрібно ≥ 4–5 відліків на біт — краще 12–24 МГц).</p>
+<ul><li><strong>UART</strong>: підключити до лінії TX і GND, виставити швидкість (115200 для MSP/CRSF — 420000 для CRSF!), декодер покаже байти. Видно: неправильну швидкість (сміття), інверсію (SBUS — інвертований UART 100000 8E2).</li><li><strong>I2C</strong>: SDA і SCL, декодер покаже адреси та ACK/NACK. NACK на адресу — датчика немає або адреса інша; немає підтягування — лінії не піднімаються.</li><li><strong>SPI</strong>: CLK, MOSI, MISO, CS — читання регістрів гіроскопа.</li><li>Спільна земля з бортом — завжди. Рівні — 3.3 В; 5-вольтові лінії більшість аналізаторів витримують, 12 В — ні.</li></ul>
+<h4 class="md-subheading">Безпека вимірювань</h4>
+<ul><li>Пропи зняті під час будь-якого вимірювання з ESC/моторами.</li><li>Земля осцилографа з&#x27;єднана із захисним заземленням: на колі, не прив&#x27;язаному до землі (живлення від АКБ), це нормально; на мережевому джерелі — не можна чіпляти землю щупа на точку з потенціалом.</li><li>Щуп не торкається двох виводів одночасно: крихітні пади FC — головний спосіб влаштувати КЗ приладом.</li></ul>
+<figure class="diagram" data-diagram="measure-tools"><div class="diagram__svg"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 184" width="100%" role="img" aria-labelledby="t" style="max-width:720px;display:block;margin:0 auto"><title id="t">Яким приладом дивитися</title><style>text{font-family: var(--gc-font-mono, ui-monospace, Menlo, monospace); font-size: 12px;fill:currentColor} .m{fill:var(--gc-ink-muted, #8a93a3)} .a{fill:var(--gc-accent-hud, #5ef1d2)} .w{fill:var(--gc-signal-amber, #f0b24c)} .d{fill:var(--gc-signal-red, #e8636b)} .box{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:currentColor;stroke-width:1.2} .boxa{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6} .ln{stroke:currentColor;stroke-width:1.2;fill:none} .lna{stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6;fill:none} .lnm{stroke:var(--gc-ink-muted, #8a93a3);stroke-width:1;fill:none;stroke-dasharray:4 3} .t{font-size:11px} .b{font-weight:600}</style><defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker><marker id="ara" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--gc-accent-hud, #5ef1d2)"/></marker></defs><text x="16" y="16" text-anchor="start" class="m t">Яким приладом дивитися</text><rect class="box" x="285.0" y="34" width="150.0" height="40" rx="6"/><text x="360.0" y="52.0" text-anchor="middle" style="font-size:10.5px">Що потрібно</text><text x="360.0" y="64.0" text-anchor="middle" style="font-size:10.5px">побачити?</text><path class="ln" d="M360.0 74 L360.0 89.0 L126.7 89.0 L126.7 104" marker-end="url(#ar)"/><text x="130.66666666666669" y="85.0" text-anchor="start" class="a t" style="font-size:10px">U, I, R</text><rect class="box" x="51.7" y="104" width="150.0" height="40" rx="18"/><text x="126.66666666666667" y="122.0" text-anchor="middle" style="font-size:10.5px">Мультиметр</text><text x="126.66666666666667" y="134.0" text-anchor="middle" style="font-size:10.5px">сталі значення</text><path class="ln" d="M360.0 74 L360.0 89.0 L360.0 89.0 L360.0 104" marker-end="url(#ar)"/><text x="364.0" y="85.0" text-anchor="start" class="a t" style="font-size:10px">форму</text><rect class="boxa" x="285.0" y="104" width="150.0" height="40" rx="18"/><text x="360.0" y="122.0" text-anchor="middle" class="b" style="font-size:10.5px">Осцилограф</text><text x="360.0" y="134.0" text-anchor="middle" class="b" style="font-size:10.5px">пульсації, DShot</text><path class="ln" d="M360.0 74 L360.0 89.0 L593.3 89.0 L593.3 104" marker-end="url(#ar)"/><text x="597.3333333333334" y="85.0" text-anchor="start" class="a t" style="font-size:10px">протокол</text><rect class="box" x="518.3" y="104" width="150.0" height="40" rx="18"/><text x="593.3333333333334" y="122.0" text-anchor="middle" style="font-size:10.5px">Логічний аналізатор</text><text x="593.3333333333334" y="134.0" text-anchor="middle" style="font-size:10.5px">UART, I2C, SPI</text></svg></div><figcaption class="gc-muted">Який прилад для якого питання: значення — мультиметр, форма сигналу — осцилограф, протокол — логічний аналізатор.</figcaption><div class="diagram__hint">Схему можно прокрутить по горизонтали</div></figure>
+
+<h2>Практика</h2>
+<h4 class="md-subheading">Крок 1. Карта точок вимірювання</h4>
+<p>На схемі борту познач: силова шина, вихід 5 В, вихід 9 В, UART приймача, DShot на одному моторі, I2C компаса. Знайди зручні пади.</p>
+<h4 class="md-subheading">Крок 2. Просідання під навантаженням</h4>
+<p>Без пропів вимірювання безглузде — використовуй лог (VBAT під час зависання) або осцилограф на стенді з реальним навантаженням (апарат прив&#x27;язаний, пропи стоять, короткі імпульси газу, вкрай обережно й зі спостерігачем). Записати: U без навантаження, U на максимумі, тривалість провалу.</p>
+<h4 class="md-subheading">Крок 3. Пульсації BEC</h4>
+<p>AC-coupling, 5 В під навантаженням приймача/GPS. Записати p-p і частоту. Порівняти з конденсатором на силовій шині та без нього.</p>
+<h4 class="md-subheading">Крок 4. DShot і UART аналізатором</h4>
+<p>Зняти кадр DShot на малому газу без пропів: декодувати вручну 16 біт, порахувати значення газу (DShot 48–2047) і перевірити CRC. Зняти CRSF між приймачем і FC на 420000 бод: знайти кадр каналів (тип 0x16).</p>
+<h4 class="md-subheading">Крок 5. Звіт</h4>
+<p>Таблиця: точка, прилад, значення, норма, висновок.</p>
+<h4 class="md-subheading">Розібраний кадр DShot</h4>
+<p>Значення газу 1046, біт телеметрії 0. Дванадцять біт: <code>10000010110 0</code>. CRC = (v ⊕ v&gt;&gt;4 ⊕ v&gt;&gt;8) &amp; 0xF = 6 (<code>0110</code>), де v — ці 12 біт. Кадр — 16 біт <code>1000001011000110</code> (0x82C6). На осцилографі кожен біт DShot600 триває ≈ 1.67 мкс: «1» — довгий високий імпульс, «0» — короткий. Порахуй за знятим кадром значення та CRC і порівняй із газом, який ти задав.</p>
+<h4 class="md-subheading">Що має вийти і що записати</h4>
+<ul><li><strong>Просідання під навантаженням:</strong> VBAT у лозі на зависанні та на короткому повному газу — різниця та її зв&#x27;язок із внутрішнім опором із модуля «Електрика».</li><li><strong>Пульсації BEC:</strong> розмах (p-p) на 5 В під навантаженням — десятки мілівольт у доброго BEC. Сотні мілівольт — завади у відео та збої датчиків. Запиши p-p і частоту з конденсатором на силовій шині та без нього.</li><li><strong>CRSF:</strong> кадр каналів починається з байта адреси <code>0xC8</code>, далі довжина <code>0x18</code> (24) і тип <code>0x16</code> (RC channels packed): 16 каналів по 11 біт.</li><li><strong>Таблиця:</strong> точка, прилад, значення, норма, висновок — один рядок на кожне вимірювання. Без колонки «норма» вимірювання нічого не каже.</li></ul>
+<p>Лабораторна зараховується, коли просідання під навантаженням виміряне й пов&#x27;язане з внутрішнім опором, кадр DShot або UART знятий аналізатором і розшифрований з перевіркою CRC, а пульсації BEC виміряні з конденсатором і без нього та записані в таблицю з нормами.</p>
+
+<h2>Діагностика</h2>
+<div class="diag-groups"><article class="diag-item"><h4><strong>Симптом:</strong> мультиметр показує 5.0 В, а FC перезавантажується</h4><ul><li>Можлива причина: короткочасне просідання, невидиме для мультиметра.</li><li>Що зробити: осцилограф із тригером за спадом або лог.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> на осцилографі величезні пульсації на всьому</h4><ul><li>Можлива причина: довгий провід землі щупа ловить заваду.</li><li>Що зробити: пружинка землі, виміряти прямо на конденсаторі.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> аналізатор показує сміття на UART</h4><ul><li>Можлива причина: неправильна швидкість або інверсія (SBUS).</li><li>Що зробити: підібрати бодрейт, увімкнути інверсію в декодері.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> I2C-датчик не відповідає (NACK)</h4><ul><li>Можлива причина: немає підтягування, інша адреса, переплутані SDA/SCL.</li><li>Що зробити: перевірити рівні в idle (мають бути високими), просканувати адреси.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> фронти DShot із дзвоном</h4><ul><li>Можлива причина: довгі сигнальні проводи, відсутність спільної землі з ESC.</li><li>Що зробити: укоротити, додати землю поруч із сигналом, знизити DShot до 300.</li></ul></article></div>
+
+<h2>Чек-лист</h2>
+<ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="el-measure:0"><span>Знаю, що мультиметр не бачить просідань і пульсацій</span></label></li><li><label><input type="checkbox" data-check-id="el-measure:1"><span>Зняв пульсації 5 В з AC-coupling і пружинкою землі</span></label></li><li><label><input type="checkbox" data-check-id="el-measure:2"><span>Розшифрував кадр DShot вручну</span></label></li><li><label><input type="checkbox" data-check-id="el-measure:3"><span>Декодував UART/I2C аналізатором</span></label></li><li><label><input type="checkbox" data-check-id="el-measure:4"><span>Усі вимірювання з ESC — без пропів</span></label></li></ul>
+
+<h2>Джерела</h2>
+<ul class="refs"><li><a href="https://betaflight.com/docs/development/API/Dshot" target="_blank" rel="noopener noreferrer">Betaflight — DSHOT ESC Protocol</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://sigrok.org/wiki/PulseView" target="_blank" rel="noopener noreferrer">sigrok — PulseView (logic analyzer software)</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://github.com/crsf-wg/crsf/wiki" target="_blank" rel="noopener noreferrer">Crossfire/CRSF protocol — TBS (community reference)</a> <span class="gc-tag">secondary</span></li></ul>
+<h2>Задачі з числовою відповіддю</h2>
+<uav-tasks src="../tasks/el-measure.json" module="el-measure"></uav-tasks>
+<h2>Перевір себе</h2>
+<uav-quiz src="../quiz/el-measure.json" module="el-measure"></uav-quiz>
+      </div>
+      <div class="module-done"><gc-button variant="secondary" data-done-toggle="el-measure">Позначити як пройдений</gc-button></div>
+      <section class="related" aria-label="Суміжні модулі"><p class="gc-label gc-muted">Суміжні модулі</p><div class="gc-grid ref-grid"><a class="gc-card" href="el-power-design.html"><strong>Схемотехніка живлення борту</strong><div class="gc-card__meta"><span class="gc-tag" title="L2 — Интегратор">L2</span></div></a><a class="gc-card" href="el-emi.html"><strong>Завади та електромагнітна сумісність</strong><div class="gc-card__meta"><span class="gc-tag" title="L2 — Интегратор">L2</span></div></a></div></section>
+      <nav class="pager" aria-label="Сусідні модулі" data-track-pager><a class="gc-card pager__prev" href="el-power-design.html"><span class="gc-label gc-muted">Назад · трек</span><br>Схемотехніка живлення борту</a><a class="gc-card pager__next" href="el-battery-packs.html"><span class="gc-label gc-muted">Далі · трек</span><br>Збірки Li-Ion і LiFePO4: елементи, зварювання, BMS</a></nav><nav class="pager" aria-label="Сусідні кроки шляху Betaflight" data-path-pager="betaflight" hidden><a class="gc-card pager__prev" href="el-wiring.html?path=betaflight"><span class="gc-label gc-muted">Назад · шлях Betaflight</span><br>Паяння, джгути та надійність з&#x27;єднань</a><a class="gc-card pager__next" href="el-emi.html?path=betaflight"><span class="gc-label gc-muted">Далі · крок 28 з 44</span><br>Завади та електромагнітна сумісність</a></nav>
+    </article>
+  </main>
+  <footer class="gc-container site-footer gc-muted">
+    <p>Відкритий курс · <a href="https://github.com/irreligious86/UAV-Education">вихідний код на GitHub</a> · <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">план розвитку</a> · <a href="../../curriculum/curriculum.html">для розробника</a> · CC BY-NC-SA 4.0</p>
+  </footer>
+</body>
+</html>

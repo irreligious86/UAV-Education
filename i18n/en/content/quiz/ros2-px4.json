@@ -1,0 +1,94 @@
+{
+  "module": "ros2-px4",
+  "pass": 80,
+  "questions": [
+    {
+      "q": "Roles in the uXRCE-DDS bridge:",
+      "options": [
+        "Client in PX4, agent outside",
+        "Agent in PX4, client outside",
+        "Agent only",
+        "A MAVLink router"
+      ],
+      "answer": 0,
+      "explain": "MicroXRCEAgent udp4 -p 8888 for SITL."
+    },
+    {
+      "q": "Why must px4_msgs match the PX4 version?",
+      "options": [
+        "uORB structures go over the wire",
+        "Because of QoS",
+        "Because of MAVLink CRC_EXTRA",
+        "It doesn't have to"
+      ],
+      "answer": 0,
+      "explain": "Otherwise the fields won't match; since v1.16, versions and the translator help."
+    },
+    {
+      "q": "Topic /fmu/out/vehicle_status_v1 — the suffix means:",
+      "options": [
+        "Message version",
+        "QoS profile",
+        "Agent number",
+        "Vehicle number in the swarm"
+      ],
+      "answer": 0,
+      "explain": "Better to compute the name from MESSAGE_VERSION."
+    },
+    {
+      "q": "Minimum rate of OffboardControlMode:",
+      "options": [
+        "More than 2 Hz",
+        "1 Hz",
+        "50 Hz",
+        "A single message is enough"
+      ],
+      "answer": 0,
+      "explain": "Proof of life of the external controller."
+    },
+    {
+      "q": "Why must setpoints be sent before requesting Offboard?",
+      "options": [
+        "Without the stream PX4 refuses",
+        "For QoS",
+        "They don't have to be",
+        "So the agent has time to create the DDS topics"
+      ],
+      "answer": 0,
+      "explain": "STREAM_SETPOINTS ≥ 1 s in the state machine."
+    },
+    {
+      "q": "An altitude of 5 m in TrajectorySetpoint.position is given as z =",
+      "options": [
+        "−5",
+        "+5",
+        "0",
+        "5000"
+      ],
+      "answer": 0,
+      "explain": "NED: down is positive."
+    },
+    {
+      "q": "What should the node do if the pilot switched out of Offboard themselves?",
+      "options": [
+        "Stop and hand over control",
+        "Switch back to Offboard",
+        "Land the vehicle",
+        "Request Offboard again after 1 s"
+      ],
+      "answer": 0,
+      "explain": "Don't fight the human."
+    },
+    {
+      "q": "Why is the flight logic moved into a pure state machine class without ROS?",
+      "options": [
+        "It can be tested without a simulator",
+        "PX4 requires it",
+        "It runs faster that way",
+        "No agent is needed"
+      ],
+      "answer": 0,
+      "explain": "The node is a thin I/O wrapper."
+    }
+  ]
+}

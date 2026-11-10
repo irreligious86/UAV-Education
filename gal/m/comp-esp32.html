@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="uk-galych" data-theme="dark" data-lang="uk-galych">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ESP32 і периферія — UAV Student</title>
+  <meta name="description" content="пов&#x27;язати ESP32 з FC або пультом по UART">
+  <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
+  <link rel="manifest" href="../../manifest.webmanifest">
+  <meta name="theme-color" content="#0b0f14">
+  <link rel="alternate" hreflang="ru" href="../../m/comp-esp32.html">
+  <link rel="alternate" hreflang="uk" href="../../uk/m/comp-esp32.html">
+  <link rel="alternate" hreflang="en" href="../../en/m/comp-esp32.html">
+  <link rel="alternate" hreflang="uk-galych" href="../../gal/m/comp-esp32.html">
+  <script>/* go to the visitor's chosen language before anything paints (assets/i18n.js) */(function(){try{var c=localStorage.getItem('uav-lang'),h=document.documentElement.getAttribute('data-lang');if(!c||c===h||/[?&]lang=keep\b/.test(location.search))return;var l=document.querySelector('link[rel=alternate][hreflang="'+c+'"]');if(l)location.replace(l.href+location.search+location.hash)}catch(e){}})();</script>
+  <link rel="stylesheet" href="../../lib/ground-control-ui/dist/ground-control.css">
+  <link rel="stylesheet" href="../../assets/site.css">
+  <script src="../../lib/ground-control-ui/dist/ground-control.js" defer></script>
+  <script src="../../assets/i18n/uk-galych.js"></script>
+  <script src="../../assets/i18n.js"></script>
+  <script src="../../assets/progress-store.js" defer></script>
+  <script src="../../assets/backend-config.js" defer></script>
+  <script src="../../assets/account.js" defer></script>
+  <script src="../../assets/grading.js" defer></script>
+  <script src="../../assets/app.js" defer></script>
+  <script src="../../assets/uav-quiz.js" defer></script>
+  <script src="../../assets/uav-tasks.js" defer></script>
+  <script src="../../assets/offline.js" defer></script>
+</head>
+<body class="gc-root" data-base="../" data-root="../../">
+  <header class="site-header">
+    <div class="gc-container site-header__inner">
+      <a class="site-brand" href="../index.html"><span class="site-brand__mark" aria-hidden="true">◆</span> UAV Student</a>
+      <nav class="gc-nav" aria-label="Розділи сайту">
+        <a href="../index.html" aria-current="page">Курс</a>
+        <a href="../ref/index.html">Довідник</a>
+        <a href="../pages/glossary.html">Глосарій</a>
+        <a href="../pages/fails.html">Фейли</a>
+        <a href="../pages/search.html">Пошук</a>
+        <a href="../pages/progress.html">Мій прогрес</a>
+      </nav>
+      <nav class="lang-switch" aria-label="Мова"><a class="gc-tag" href="../../m/comp-esp32.html" data-lang-to="ru" hreflang="ru" lang="ru" title="Русский">RU</a><a class="gc-tag" href="../../uk/m/comp-esp32.html" data-lang-to="uk" hreflang="uk" lang="uk" title="Українська">UK</a><a class="gc-tag" href="../../en/m/comp-esp32.html" data-lang-to="en" hreflang="en" lang="en" title="English">EN</a><a class="gc-tag" href="../../gal/m/comp-esp32.html" data-lang-to="uk-galych" hreflang="uk-galych" lang="uk-galych" title="Галицька (експеримент)" aria-current="true" data-state="ok">GAL</a></nav>
+    </div>
+  </header>
+  <main class="gc-container site-main">
+    <article class="module" data-module-page="comp-esp32">
+      <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-engineer">Інженер: код на борту</a><span>ESP32 і периферія</span></p>
+      <h1 class="module-title">ESP32 і периферія</h1>
+      <div class="module-tags"><span class="gc-tag" title="Рівень">L2 — Інтегратор</span><span class="gc-tag">читання 30 хв</span><span class="gc-tag">навчання ~4 год</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ОПАНОВАНО</span></div>
+      <p class="gc-muted module-score" data-module-score></p>
+      <p class="module-lead">ESP32 — ідеальний «маленький companion»: UART, Wi-Fi, BLE, дисплей, копійчана ціна й запуск за частку секунди. Модуль розбирає три типові ролі: периферія на борту (датчики, індикація), MAVLink-міст Wi-Fi ↔ FC і компаньйон пульта. Останню — на прикладі проєкту для RadioMaster TX16S: ESP32-S3 з екраном, який у польоті показує телеметрію, а на землі піднімає точку доступу для налаштувань із телефона. Розібрано пастки: lifecycle Lua-віджета EdgeTX, рівні UART, бюджет живлення та перевірюване вимкнення радіо.</p>
+      <div class="gc-callout" data-state="ok"><strong>Після модуля ти вмієш</strong><ul><li>пов&#x27;язати ESP32 з FC або пультом по UART</li></ul></div><p class="gc-muted">Перед цим модулем: <a href="comp-mavlink.html">MAVLink і MAVSDK</a>, <a href="link-protocols.html">SBUS, CRSF та інверсія UART</a></p><div class="gc-callout lab"><p class="gc-label gc-muted">Лабораторна</p><strong>Ехо та heartbeat</strong><p class="gc-muted lab__hint">Здано, коли позначено всі пункти:</p><ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="comp-esp32:lab:0"><span>Ехо-тест із USB-UART: 200+ символів без втрат</span></label></li><li><label><input type="checkbox" data-check-id="comp-esp32:lab:1"><span>Віджет шле heartbeat з refresh() і background()</span></label></li><li><label><input type="checkbox" data-check-id="comp-esp32:lab:2"><span>ESP32 переходить у FLIGHT за таймаутом heartbeat</span></label></li><li><label><input type="checkbox" data-check-id="comp-esp32:lab:3"><span>Протокол повідомлень описано в docs/</span></label></li></ul></div><div class="path-pos gc-muted"><span class="gc-label">На шляху</span><ul><li data-path-pos="ardupilot"><a href="../path/ardupilot.html">ArduPilot</a>: крок 56 з 69 → <a href="fw-reading.html?path=ardupilot">Як читати вихідний код прошивки: Betaflight і ArduPilot</a></li></ul></div>
+      <div class="gc-prose module-body">
+<h2>Теорія</h2>
+<h4 class="md-subheading">Три ролі ESP32</h4>
+<ol><li><strong>Бортова периферія.</strong> Опитування датчиків по I2C, адресні світлодіоди, серви, реле. Зв&#x27;язок із FC по UART через MAVLink або простий текстовий протокол.</li><li><strong>MAVLink-міст.</strong> ESP32 приймає MAVLink по UART від FC і роздає через Wi-Fi (UDP) телефону або ноутбуку. Так працюють багато готових Wi-Fi-телеметрій; власна версія — це кілька десятків рядків.</li><li><strong>Компаньйон пульта.</strong> ESP32 під&#x27;єднано до AUX-порту пульта на EdgeTX, Lua-скрипт на пульті надсилає йому стан (режим, арм, телеметрію), а ESP32 показує це на своєму дисплеї й дає інтерфейс налаштувань.</li></ol>
+<h4 class="md-subheading">UART: рівні та проводи</h4>
+<p>ESP32 працює на 3.3 В. Польотні контролери й пульти на EdgeTX теж мають 3.3 В на UART, але перевір мультиметром, перш ніж з&#x27;єднувати. Проводи навхрест, спільний GND обов&#x27;язковий. Швидкість із пультом — та, що задана в налаштуваннях порту, зазвичай 115200.</p>
+<h4 class="md-subheading">EdgeTX: порт AUX і Lua</h4>
+<p>У налаштуваннях апаратури (Hardware) у портів AUX1/AUX2 є режим «Lua»: тоді скрипти отримують доступ до функцій <code>serialWrite(str)</code>, <code>serialRead([num])</code> і <code>setSerialBaudrate(baudrate)</code>. <code>serialRead</code> без аргументу читає до першого переведення рядка, тому рядковий протокол «один рядок — одне повідомлення» лягає на нього природно.</p>
+<h4 class="md-subheading">Пастка: lifecycle віджета</h4>
+<p>У віджета EdgeTX дві функції: <code>refresh()</code> викликається, коли віджет видно на екрані, <code>background()</code> — коли його приховано. Якщо покласти надсилання heartbeat лише в <code>refresh()</code>, компаньйон втратить зв&#x27;язок, щойно пілот перемкне екран. Рішення: спільна функція <code>tick()</code>, яку викликають обидві.</p>
+<h4 class="md-subheading">Безпека за замовчуванням</h4>
+<p>Дизайн-рішення проєкту: невизначений стан = режим FLIGHT, Wi-Fi вимкнено. Точка доступу піднімається лише тоді, коли ESP32 отримав від пульта явне «disarmed». Будь-який запис налаштувань проходить у два кроки: STAGE (підготувати) → APPLY (застосувати з автоматичним бекапом), а захист від запису в польоті продубльовано на обох сторонах — і в Lua, і в прошивці ESP32.</p>
+<p>Вимкнення радіо має бути перевірюваним: <code>WiFi.mode(WIFI_OFF)</code> плюс <code>esp_wifi_stop()</code>, а не припущення «ми його не вмикали».</p>
+<h4 class="md-subheading">Живлення</h4>
+<p>ESP32-S3 з активним Wi-Fi споживає піки в сотні міліампер. Від батареї пульта чи BEC це відчутно; у режимі FLIGHT з вимкненим радіо — в рази менше. Бюджет рахують за режимами, а не за середнім.</p>
+<h4 class="md-subheading">Мінімальний MAVLink-міст на ESP32 (ідея коду)</h4>
+<p>UART2 (<code>Serial2.begin(921600, SERIAL_8N1, RX_PIN, TX_PIN)</code>) ↔ WiFi UDP: усе, що прийшло з FC, — в UDP на адресу останнього клієнта (або broadcast 14550); усе, що прийшло по UDP, — в UART. Буфери 1 КБ, без парсингу MAVLink (міст прозорий); задача на другому ядрі FreeRTOS (модуль «Embedded»): ядро 0 — стек Wi-Fi, ядро 1 — UART-копіювання з пріоритетом вищим за <code>loop()</code>. Затримка такого моста — одиниці мс; втрати — при перевантаженні Wi-Fi (2.4 ГГц ділить ефір з ELRS 2.4 — на борту міст через Wi-Fi доречний лише для наземного налаштування, у польоті вимикати).</p>
+<h4 class="md-subheading">Датчик на борту через MAVLink</h4>
+<p>ESP32 як компонент системи: надсилає <code>HEARTBEAT</code> (свій component_id: <code>MAV_COMP_ID_PERIPHERAL</code> (158) або з діапазону USER1–USER75 (25–99)), дані — <code>NAMED_VALUE_FLOAT</code>/<code>NAMED_VALUE_INT</code> (видно в GCS і в лозі <code>NVAL</code>), або <code>DISTANCE_SENSOR</code> (132) для власного далекоміра — ArduPilot прийме його як <code>RNGFND1_TYPE = 10</code> (MAVLink) і використає в EKF/посадці. Бібліотека: <code>mavlink</code> C-headers з генератора (<code>common.xml</code>, 100 КБ flash), або мінімальний ручний збирач кадру з CRC (модуль «Протоколи MAVLink»).</p>
+<h4 class="md-subheading">Розібраний приклад: компаньйон пульта (проєкт TX16S)</h4>
+<p>Протокол рядків: пульт → ESP32 <code>S,&lt;mode&gt;,&lt;armed&gt;,&lt;vbat&gt;,&lt;rssi&gt;\n</code> кожні 500 мс; ESP32 → пульт <code>A,&lt;cmd&gt;,&lt;arg&gt;\n</code>. Стани ESP32: FLIGHT (радіо вимк.; за замовчуванням і при таймауті рядків &gt; 2 с) → GROUND (пульт надіслав <code>armed=0</code> ≥ 3 с поспіль: Wi-Fi AP, веб-налаштування) → FLIGHT при будь-якому <code>armed=1</code>. Налаштування: STAGE (JSON у RAM) → APPLY (запис NVS з копією попередньої версії) лише в GROUND; Lua на пульті блокує <code>APPLY</code>, якщо телеметрія показує арм. Тест: емулятор рядків із ПК через USB-UART, сценарії переходів і таймаутів, потім реальний пульт без апарата.</p>
+<figure class="diagram" data-diagram="esp32-roles"><div class="diagram__svg"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 184" width="100%" role="img" aria-labelledby="t" style="max-width:720px;display:block;margin:0 auto"><title id="t">Три ролі ESP32 у курсі</title><style>text{font-family: var(--gc-font-mono, ui-monospace, Menlo, monospace); font-size: 12px;fill:currentColor} .m{fill:var(--gc-ink-muted, #8a93a3)} .a{fill:var(--gc-accent-hud, #5ef1d2)} .w{fill:var(--gc-signal-amber, #f0b24c)} .d{fill:var(--gc-signal-red, #e8636b)} .box{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:currentColor;stroke-width:1.2} .boxa{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6} .ln{stroke:currentColor;stroke-width:1.2;fill:none} .lna{stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6;fill:none} .lnm{stroke:var(--gc-ink-muted, #8a93a3);stroke-width:1;fill:none;stroke-dasharray:4 3} .t{font-size:11px} .b{font-weight:600}</style><defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker><marker id="ara" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--gc-accent-hud, #5ef1d2)"/></marker></defs><text x="16" y="16" text-anchor="start" class="m t">Три ролі ESP32 у курсі</text><rect class="box" x="285.0" y="34" width="150.0" height="40" rx="6"/><text x="360.0" y="58.0" text-anchor="middle" style="font-size:10.5px">ESP32</text><path class="ln" d="M360.0 74 L360.0 89.0 L126.7 89.0 L126.7 104" marker-end="url(#ar)"/><text x="130.66666666666669" y="85.0" text-anchor="start" class="a t" style="font-size:10px">міст</text><rect class="box" x="51.7" y="104" width="150.0" height="40" rx="18"/><text x="126.66666666666667" y="122.0" text-anchor="middle" style="font-size:10.5px">UART ↔ Wi-Fi/BLE</text><text x="126.66666666666667" y="134.0" text-anchor="middle" style="font-size:10.5px">MAVLink до телефона</text><path class="ln" d="M360.0 74 L360.0 89.0 L360.0 89.0 L360.0 104" marker-end="url(#ar)"/><text x="364.0" y="85.0" text-anchor="start" class="a t" style="font-size:10px">датчик</text><rect class="boxa" x="285.0" y="104" width="150.0" height="40" rx="18"/><text x="360.0" y="122.0" text-anchor="middle" class="b" style="font-size:10.5px">Компонент MAVLink</text><text x="360.0" y="134.0" text-anchor="middle" class="b" style="font-size:10.5px">HEARTBEAT + дані</text><path class="ln" d="M360.0 74 L360.0 89.0 L593.3 89.0 L593.3 104" marker-end="url(#ar)"/><text x="597.3333333333334" y="85.0" text-anchor="start" class="a t" style="font-size:10px">пульт</text><rect class="box" x="518.3" y="104" width="150.0" height="40" rx="18"/><text x="593.3333333333334" y="122.0" text-anchor="middle" style="font-size:10.5px">Компаньйон TX16S</text><text x="593.3333333333334" y="134.0" text-anchor="middle" style="font-size:10.5px">CRSF з порту AUX</text></svg></div><figcaption class="gc-muted">Три ролі ESP32 у курсі: міст UART ↔ Wi-Fi/BLE, власний компонент MAVLink і компаньйон пульта на порту AUX.</figcaption><div class="diagram__hint">Схему можно прокрутить по горизонтали</div></figure>
+
+<h2>Практика</h2>
+<h4 class="md-subheading">Крок 1. Ехо між пультом і ESP32</h4>
+<ol><li>На пульті: Hardware → AUX1 → режим Lua, 115200.</li><li>Скрипт <code>/SCRIPTS/TOOLS/echo.lua</code> на пульті надсилає рядок і друкує відповідь.</li><li>На ПК замість ESP32 — USB-UART і термінал (<code>picocom -b 115200 /dev/ttyUSB0</code>). Критерій: рядок 200+ символів ходить туди й назад без втрат.</li><li>Лише після цього — ESP32.</li></ol>
+<h4 class="md-subheading">Крок 2. Каркас прошивки ESP32 (PlatformIO, Arduino)</h4>
+<pre class="cli-block"><code>#include &lt;Arduino.h&gt;
+#include &lt;WiFi.h&gt;
+#include &lt;esp_wifi.h&gt;
+
+enum class Mode { FLIGHT, GROUND };
+Mode mode = Mode::FLIGHT;            // undefined state == FLIGHT
+unsigned long lastLine = 0;          // last valid S-line from the radio
+unsigned long disarmedSince = 0;     // 0 = not continuously disarmed
+const unsigned long LINE_TIMEOUT_MS = 2000;
+const unsigned long GROUND_AFTER_MS = 3000;
+
+void radioOff() {
+  WiFi.mode(WIFI_OFF);
+  esp_wifi_stop();                   // verifiable off, not assumed off
+}
+
+void enterGround() {
+  WiFi.mode(WIFI_AP);
+  WiFi.softAP(&quot;tx16s-companion&quot;, &quot;change-me&quot;);
+  mode = Mode::GROUND;
+}
+
+void enterFlight() {
+  radioOff();
+  mode = Mode::FLIGHT;
+}
+
+void setup() {
+  Serial.begin(115200);              // USB debug
+  Serial1.begin(115200, SERIAL_8N1, 18, 17);  // RX, TX pins to the radio AUX port
+  radioOff();
+}
+
+void loop() {
+  unsigned long now = millis();
+  if (Serial1.available()) {
+    String line = Serial1.readStringUntil(&#x27;\n&#x27;);   // one line == one message
+    // S,&lt;mode&gt;,&lt;armed&gt;,&lt;vbat&gt;,&lt;rssi&gt;  — the protocol above; armed is the third field
+    if (line.startsWith(&quot;S,&quot;)) {
+      int a = line.indexOf(&#x27;,&#x27;, 2);                 // end of &lt;mode&gt;
+      if (a &gt; 0 &amp;&amp; a + 1 &lt; (int)line.length()) {
+        lastLine = now;
+        bool armed = line.charAt(a + 1) == &#x27;1&#x27;;
+        if (armed) {
+          disarmedSince = 0;
+          if (mode == Mode::GROUND) enterFlight();  // any armed=1 -&gt; FLIGHT at once
+        } else {
+          if (disarmedSince == 0) disarmedSince = now;
+          if (mode == Mode::FLIGHT &amp;&amp; now - disarmedSince &gt;= GROUND_AFTER_MS) enterGround();
+        }
+      }
+    }
+  }
+  if (now - lastLine &gt; LINE_TIMEOUT_MS) {
+    disarmedSince = 0;                // a gap breaks &quot;continuously disarmed&quot;
+    if (mode == Mode::GROUND) enterFlight();   // lost the radio: fail safe
+  }
+}</code></pre>
+<h4 class="md-subheading">Крок 3. Віджет EdgeTX зі спільним tick()</h4>
+<pre class="cli-block"><code>-- companion.lua (widget): send the S-line every 500 ms whether visible or not
+-- protocol: S,&lt;mode&gt;,&lt;armed&gt;,&lt;vbat&gt;,&lt;rssi&gt;\n  (see docs/protocol.md)
+local lastSend = 0
+
+local function tick()
+  local now = getTime()                       -- 10 ms units
+  if now - lastSend &gt;= 50 then
+    local _, fmName = getFlightMode()
+    local armed = getValue(&quot;sa&quot;) &gt; 0          -- example: arm switch on SA
+    local vbat = getValue(&quot;RxBt&quot;) or 0        -- CRSF telemetry; 0 when the sensor is missing
+    local rssi = getValue(&quot;1RSS&quot;) or 0
+    serialWrite(string.format(&quot;S,%s,%d,%.2f,%d\n&quot;, fmName or &quot;?&quot;, armed and 1 or 0, vbat, rssi))
+    lastSend = now
+  end
+end
+
+local function create(zone, options) return { zone = zone } end
+local function update(widget, options) end
+local function background(widget) tick() end
+local function refresh(widget, event, touch)
+  tick()
+  lcd.drawText(widget.zone.x, widget.zone.y, &quot;companion link&quot;, SMLSIZE)
+end
+
+return { name = &quot;Companion&quot;, create = create, update = update, refresh = refresh, background = background }</code></pre>
+<p>Джерело істини для «arm» — тумблер плюс heartbeat, а не стан із телеметрії CRSF: його може не бути, або він може запізнюватися.</p>
+<h4 class="md-subheading">Крок 4. Структура репозиторію</h4>
+<p><code>firmware/</code> (PlatformIO), <code>lua/</code> (скрипти пульта), <code>web/</code> (сторінка налаштувань, віддається з ESP32), <code>docs/</code> (протокол повідомлень). Протокол — окремий документ: кожен рядок, його поля і хто має право його надсилати.</p>
+<h4 class="md-subheading">Що має вийти і що записати</h4>
+<ul><li><strong>Ехо-тест.</strong> 200+ символів ідуть і повертаються без втрат і спотворень. Якщо губляться, майже завжди винна швидкість порту або земля. Спершу досягни чистого еха з USB-UART, лише потім під&#x27;єднуй ESP32 — інакше незрозуміло, чия помилка.</li><li><strong>Потік S-рядків.</strong> У налагоджувальному виводі ESP32 (USB-порт, <code>Serial</code>) рядки <code>S,…</code> приходять кожні 500 мс ± 50 мс, і видимість віджета на екрані пульта на це не впливає: <code>tick()</code> викликається і з <code>refresh()</code>, і з <code>background()</code>.</li><li><strong>Переходи.</strong> Запиши час кожного переходу за налагоджувальними мітками <code>millis()</code>. Дизарм — через 3 с GROUND і точка доступу Wi-Fi. Арм — одразу FLIGHT, Wi-Fi вимкнено. Кабель від пульта висмикнуто в GROUND — через 2 с FLIGHT. Сміттєвий рядок не змінює стан.</li><li><strong>Перевірка на ПК без пульта.</strong> Ті самі сценарії перевіряються емулятором: скрипт на ПК надсилає S-рядки в USB-UART з потрібним темпом і обривом. Це швидше й повторюваніше, ніж клацати тумблером.</li></ul>
+<h4 class="md-subheading">docs/protocol.md</h4>
+<p>Кожен рядок протоколу — окремий розділ: формат (<code>S,&lt;mode&gt;,&lt;armed&gt;,&lt;vbat&gt;,&lt;rssi&gt;</code>), поля й одиниці, хто надсилає і як часто, що робить отримувач при помилці формату й за відсутності рядків. Протокол, якого немає в документі, перетворюється на «як у коді» й ламається за першої правки.</p>
+<p>Лабораторну зараховано, коли ехо-тест з USB-UART проходить на 200+ символах, віджет надсилає S-рядки з <code>refresh()</code> і <code>background()</code>, ESP32 переходить у FLIGHT за таймаутом рядків із виміряним часом, а протокол описано в <code>docs/</code>.</p>
+
+<h2>Діагностика</h2>
+<div class="diag-groups"><article class="diag-item"><h4><strong>Симптом:</strong> компаньйон втрачає зв&#x27;язок при зміні екрана пульта</h4><ul><li>Можлива причина: надсилання лише в <code>refresh()</code>.</li><li>Що зробити: спільний <code>tick()</code> у <code>refresh()</code> і <code>background()</code>.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> рядки приходять обрізаними</h4><ul><li>Можлива причина: <code>serialRead</code> викликається рідше, ніж надходять дані, буфер переповнюється.</li><li>Що зробити: читати в кожному <code>tick()</code>, скоротити повідомлення, знизити частоту.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> точка доступу піднялася в польоті</h4><ul><li>Можлива причина: захист лише на одній стороні.</li><li>Що зробити: перевірка арму і в Lua, і в прошивці; таймаут heartbeat → FLIGHT.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> ESP32 перезавантажується при вмиканні Wi-Fi</h4><ul><li>Можлива причина: просідання живлення (піки 300–500 мА).</li><li>Що зробити: конденсатор 470 мкФ на 3.3 В, BEC/LDO із запасом, не живити від піна пульта без перевірки струму.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> Lua на пульті не бачить відповідей ESP32</h4><ul><li>Можлива причина: порт AUX не в режимі Lua, швидкість, TX/RX.</li><li>Що зробити: Hardware → AUX = Lua, <code>setSerialBaudrate</code>, аналізатор на лінії.</li></ul></article></div>
+
+<h2>Чек-лист</h2>
+<ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="comp-esp32:0"><span>Рівні UART перевірено мультиметром, GND спільний</span></label></li><li><label><input type="checkbox" data-check-id="comp-esp32:1"><span>Ехо-тест з USB-UART пройдено на 200+ символах</span></label></li><li><label><input type="checkbox" data-check-id="comp-esp32:2"><span>Heartbeat надсилається з <code>refresh()</code> і <code>background()</code></span></label></li><li><label><input type="checkbox" data-check-id="comp-esp32:3"><span>Невизначений стан = FLIGHT, Wi-Fi вимкнено перевірювано</span></label></li><li><label><input type="checkbox" data-check-id="comp-esp32:4"><span>Захист від запису в польоті на обох сторонах</span></label></li><li><label><input type="checkbox" data-check-id="comp-esp32:5"><span>Бюджет живлення пораховано за режимами</span></label></li></ul>
+
+<h2>Джерела</h2>
+<ul class="refs"><li><a href="https://luadoc.edgetx.org/" target="_blank" rel="noopener noreferrer">EdgeTX Lua API Reference</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://github.com/EdgeTX/edgetx/blob/main/radio/src/lua/api_general.cpp" target="_blank" rel="noopener noreferrer">EdgeTX Lua serial API source (api_general.cpp, GitHub)</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://github.com/espressif/arduino-esp32" target="_blank" rel="noopener noreferrer">ESP32 Arduino core — Wi-Fi API (GitHub)</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://docs.platformio.org/" target="_blank" rel="noopener noreferrer">PlatformIO — Documentation</a> <span class="gc-tag" data-state="info">primary</span></li></ul>
+<h2>Перевір себе</h2>
+<uav-quiz src="../quiz/comp-esp32.json" module="comp-esp32"></uav-quiz>
+      </div>
+      <div class="module-done"><gc-button variant="secondary" data-done-toggle="comp-esp32">Позначити як пройдений</gc-button></div>
+      <section class="related" aria-label="Суміжні модулі"><p class="gc-label gc-muted">Суміжні модулі</p><div class="gc-grid ref-grid"><a class="gc-card" href="comp-mavlink.html"><strong>MAVLink і MAVSDK</strong><div class="gc-card__meta"><span class="gc-tag" title="L2 — Интегратор">L2</span></div></a><a class="gc-card" href="link-protocols.html"><strong>SBUS, CRSF та інверсія UART</strong><div class="gc-card__meta"><span class="gc-tag" title="L1 — Оператор">L1</span></div></a></div></section>
+      <nav class="pager" aria-label="Сусідні модулі" data-track-pager><a class="gc-card pager__prev" href="mav-sdk.html"><span class="gc-label gc-muted">Назад · трек</span><br>Бібліотеки над MAVLink: pymavlink, MAVSDK, MAVROS — що й коли</a><a class="gc-card pager__next" href="emb-basics.html"><span class="gc-label gc-muted">Далі · трек</span><br>Embedded: переривання, таймери, DMA, RTOS</a></nav><nav class="pager" aria-label="Сусідні кроки шляху ArduPilot" data-path-pager="ardupilot" hidden><a class="gc-card pager__prev" href="eng-ci-configs.html?path=ardupilot"><span class="gc-label gc-muted">Назад · шлях ArduPilot</span><br>CI та версіонування конфігів і коду</a><a class="gc-card pager__next" href="fw-reading.html?path=ardupilot"><span class="gc-label gc-muted">Далі · крок 57 з 69</span><br>Як читати вихідний код прошивки: Betaflight і ArduPilot</a></nav>
+    </article>
+  </main>
+  <footer class="gc-container site-footer gc-muted">
+    <p>Відкритий курс · <a href="https://github.com/irreligious86/UAV-Education">вихідний код на GitHub</a> · <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">план розвитку</a> · <a href="../../curriculum/curriculum.html">для розробника</a> · CC BY-NC-SA 4.0</p>
+  </footer>
+</body>
+</html>

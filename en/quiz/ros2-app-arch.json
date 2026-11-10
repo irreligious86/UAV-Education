@@ -3,92 +3,92 @@
   "pass": 80,
   "questions": [
     {
-      "q": "Какой узел НЕ должен стоять на пути «статус автопилота → уставки»?",
+      "q": "Which node must NOT sit on the “autopilot status → setpoints” path?",
       "options": [
-        "Восприятие",
-        "Мост к автопилоту",
-        "Решение",
-        "Защиты"
+        "Perception",
+        "The bridge to the autopilot",
+        "Decision",
+        "Safeguards"
       ],
       "answer": 0,
-      "explain": "Некритичный узел не должен блокировать управление."
+      "explain": "A non-critical node must not block control."
     },
     {
-      "q": "Lifecycle-узел в состоянии inactive:",
+      "q": "A lifecycle node in the inactive state is:",
       "options": [
-        "Настроен, но не работает",
-        "Ждёт ответа сервиса",
-        "Не настроен и не создан",
-        "Завершён"
+        "Configured but not running",
+        "Waiting for a service response",
+        "Not configured and not created",
+        "Finalized"
       ],
       "answer": 0,
-      "explain": "activate переводит в active."
+      "explain": "activate moves it to active."
     },
     {
-      "q": "Watchdog: потеря целей от камеры даёт уровень",
+      "q": "Watchdog: losing targets from the camera gives the level",
       "options": [
         "DEGRADED",
         "FAILSAFE",
         "OK",
-        "Перезагрузку"
+        "A reboot"
       ],
       "answer": 0,
-      "explain": "Некритичный вход — деградация функции."
+      "explain": "A non-critical input — the function degrades."
     },
     {
-      "q": "Зачем гистерезис восстановления входа?",
+      "q": "Why do you need hysteresis on input recovery?",
       "options": [
-        "Чтобы вход не мигал режимом",
-        "Для QoS",
-        "Чтобы ускорить возврат функции",
-        "Для экономии CPU"
+        "So the input doesn't make the mode flicker",
+        "For QoS",
+        "To bring the function back faster",
+        "To save CPU"
       ],
       "answer": 0,
-      "explain": "recover_s ≈ 0.5–1 с."
+      "explain": "recover_s ≈ 0.5–1 s."
     },
     {
-      "q": "Кто последний рубеж, если упало всё приложение?",
+      "q": "Who is the last line of defense if the whole application crashes?",
       "options": [
-        "Автопилот с таймаутами",
+        "The autopilot with its timeouts",
         "systemd",
-        "Watchdog-узел на компаньоне",
-        "Оператор"
+        "The watchdog node on the companion",
+        "The operator"
       ],
       "answer": 0,
-      "explain": "Безопасность — на нижнем уровне."
+      "explain": "Safety lives at the lowest level."
     },
     {
-      "q": "Инференс нейросети задерживает таймер уставок. Решение:",
+      "q": "Neural network inference delays the setpoint timer. The fix:",
       "options": [
-        "Разные группы колбэков",
-        "Чаще таймер уставок",
+        "Separate callback groups",
+        "A faster setpoint timer",
         "QoS RELIABLE",
-        "Меньше depth"
+        "A smaller depth"
       ],
       "answer": 0,
-      "explain": "Отдельные группы колбэков и MultiThreadedExecutor или отдельный процесс: тяжёлые колбэки не должны блокировать управление."
+      "explain": "Separate callback groups and a MultiThreadedExecutor, or a separate process: heavy callbacks must not block control."
     },
     {
-      "q": "Секретный ключ VPN хранить:",
+      "q": "Store the secret VPN key:",
       "options": [
-        "В файле с правами",
-        "В YAML-параметрах",
-        "В launch-файле",
-        "В топике"
+        "In a file with access permissions",
+        "In YAML parameters",
+        "In the launch file",
+        "In a topic"
       ],
       "answer": 0,
-      "explain": "Параметры видны всем участникам."
+      "explain": "Parameters are visible to all participants."
     },
     {
-      "q": "Кольцевая запись bag на борту задаётся:",
+      "q": "Ring-buffer bag recording on board is set with:",
       "options": [
         "--max-bag-duration",
         "QoS depth",
         "ROS_DOMAIN_ID",
-        "use_sim_time при записи"
+        "use_sim_time while recording"
       ],
       "answer": 0,
-      "explain": "Чтобы не переполнить диск."
+      "explain": "So you don't fill up the disk."
     }
   ]
 }

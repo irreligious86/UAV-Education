@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="uk-galych" data-theme="dark" data-lang="uk-galych">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Місії INAV: waypoints і CLI wp — UAV Student</title>
+  <meta name="description" content="записати місію через конфігуратор і CLI wp пояснити захист від чужої місії">
+  <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
+  <link rel="manifest" href="../../manifest.webmanifest">
+  <meta name="theme-color" content="#0b0f14">
+  <link rel="alternate" hreflang="ru" href="../../m/inav-missions.html">
+  <link rel="alternate" hreflang="uk" href="../../uk/m/inav-missions.html">
+  <link rel="alternate" hreflang="en" href="../../en/m/inav-missions.html">
+  <link rel="alternate" hreflang="uk-galych" href="../../gal/m/inav-missions.html">
+  <script>/* go to the visitor's chosen language before anything paints (assets/i18n.js) */(function(){try{var c=localStorage.getItem('uav-lang'),h=document.documentElement.getAttribute('data-lang');if(!c||c===h||/[?&]lang=keep\b/.test(location.search))return;var l=document.querySelector('link[rel=alternate][hreflang="'+c+'"]');if(l)location.replace(l.href+location.search+location.hash)}catch(e){}})();</script>
+  <link rel="stylesheet" href="../../lib/ground-control-ui/dist/ground-control.css">
+  <link rel="stylesheet" href="../../assets/site.css">
+  <script src="../../lib/ground-control-ui/dist/ground-control.js" defer></script>
+  <script src="../../assets/i18n/uk-galych.js"></script>
+  <script src="../../assets/i18n.js"></script>
+  <script src="../../assets/progress-store.js" defer></script>
+  <script src="../../assets/backend-config.js" defer></script>
+  <script src="../../assets/account.js" defer></script>
+  <script src="../../assets/grading.js" defer></script>
+  <script src="../../assets/app.js" defer></script>
+  <script src="../../assets/uav-quiz.js" defer></script>
+  <script src="../../assets/uav-tasks.js" defer></script>
+  <script src="../../assets/offline.js" defer></script>
+</head>
+<body class="gc-root" data-base="../" data-root="../../">
+  <header class="site-header">
+    <div class="gc-container site-header__inner">
+      <a class="site-brand" href="../index.html"><span class="site-brand__mark" aria-hidden="true">◆</span> UAV Student</a>
+      <nav class="gc-nav" aria-label="Розділи сайту">
+        <a href="../index.html" aria-current="page">Курс</a>
+        <a href="../ref/index.html">Довідник</a>
+        <a href="../pages/glossary.html">Глосарій</a>
+        <a href="../pages/fails.html">Фейли</a>
+        <a href="../pages/search.html">Пошук</a>
+        <a href="../pages/progress.html">Мій прогрес</a>
+      </nav>
+      <nav class="lang-switch" aria-label="Мова"><a class="gc-tag" href="../../m/inav-missions.html" data-lang-to="ru" hreflang="ru" lang="ru" title="Русский">RU</a><a class="gc-tag" href="../../uk/m/inav-missions.html" data-lang-to="uk" hreflang="uk" lang="uk" title="Українська">UK</a><a class="gc-tag" href="../../en/m/inav-missions.html" data-lang-to="en" hreflang="en" lang="en" title="English">EN</a><a class="gc-tag" href="../../gal/m/inav-missions.html" data-lang-to="uk-galych" hreflang="uk-galych" lang="uk-galych" title="Галицька (експеримент)" aria-current="true" data-state="ok">GAL</a></nav>
+    </div>
+  </header>
+  <main class="gc-container site-main">
+    <article class="module" data-module-page="inav-missions">
+      <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-inav">Електив: INAV</a><span>Місії INAV: waypoints і CLI wp</span></p>
+      <h1 class="module-title">Місії INAV: waypoints і CLI wp</h1>
+      <div class="module-tags"><span class="gc-tag" title="Рівень">L2 — Інтегратор</span><span class="gc-tag">читання 20 хв</span><span class="gc-tag">навчання ~2 год</span><span class="gc-tag">INAV 7.0+</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ОПАНОВАНО</span></div>
+      <p class="gc-muted module-score" data-module-score></p>
+      <p class="module-lead">Місія INAV — список точок із діями, який апарат виконує в режимі NAV WP. Модуль показує, з чого складається точка, які є дії (WAYPOINT, POSHOLD_TIME, RTH, JUMP, SET_POI, LAND), як записати місію через конфігуратор і через CLI командою <code>wp</code>, де задається висота і як INAV захищає від зльоту з «чужою» місією.</p>
+      <div class="gc-callout" data-state="ok"><strong>Після модуля ти вмієш</strong><ul><li>записати місію через конфігуратор і CLI wp</li><li>пояснити захист від чужої місії</li></ul></div><p class="gc-muted">Перед цим модулем: <a href="inav-gps.html">GPS, компас і RTH в INAV</a></p><div class="gc-callout lab"><p class="gc-label gc-muted">Лабораторна</p><strong>Одна місія двома способами</strong><p class="gc-muted lab__hint">Здано, коли позначено всі пункти:</p><ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="inav-missions:lab:0"><span>Місію записано в конфігураторі та через CLI wp</span></label></li><li><label><input type="checkbox" data-check-id="inav-missions:lab:1"><span>Вивід wp збігається</span></label></li><li><label><input type="checkbox" data-check-id="inav-missions:lab:2"><span>Прогін із POSHOLD_TIME і RTH виконано</span></label></li></ul></div><div class="path-pos gc-muted"><span class="gc-label">На шляху</span><ul><li data-path-pos="inav"><a href="../path/inav.html">INAV</a>: крок 17 з 20 → <a href="inav-wing.html?path=inav">Крило на INAV: міксер, автозапуск, autotune</a></li></ul></div>
+      <div class="gc-prose module-body">
+<h2>Теорія</h2>
+<h4 class="md-subheading">Структура точки</h4>
+<p>У CLI: <code>wp &lt;n&gt; &lt;action&gt; &lt;lat&gt; &lt;lon&gt; &lt;alt&gt; &lt;p1&gt; &lt;p2&gt; &lt;p3&gt; &lt;flag&gt;</code>.</p>
+<ul><li><code>lat</code>, <code>lon</code> — градуси × 10⁷ (123456789 = 12.3456789°).</li><li><code>alt</code> — сантиметри; біт 0 у <code>p3</code> задає, відносно дому (0) чи над рівнем моря (1).</li><li><code>action</code>: 1 WAYPOINT, 3 POSHOLD_TIME, 4 RTH, 5 SET_POI, 6 JUMP, 7 SET_HEAD, 8 LAND.</li><li><code>p1</code>: для WAYPOINT — швидкість до точки (см/с; лише мультиротор і лише якщо 50 &lt; p1 &lt; <code>nav_auto_speed</code>); для POSHOLD_TIME — час у секундах; для RTH — p1 &gt; 0 дозволяє посадку; для JUMP — індекс цілі.</li><li><code>p2</code>: для POSHOLD_TIME — швидкість; для JUMP — кількість повторів.</li><li><code>flag</code> останньої точки — 165 (0xA5).</li></ul>
+<p><code>wp load</code> завантажує список з EEPROM, <code>wp save</code> — зберігає, <code>wp reset</code> — очищає.</p>
+<h4 class="md-subheading">Виконання</h4>
+<p>Режим NAV WP вмикається тумблером. Апарат летить від точки до точки на <code>nav_auto_speed</code> (або зі швидкістю з <code>p1</code>), радіус захоплення точки — <code>nav_wp_radius</code>. JUMP дає цикли, SET_POI — поворот камери на точку інтересу, LAND — посадку на точці.</p>
+<h4 class="md-subheading">Захист від чужої місії</h4>
+<p>Якщо завантажено місію, перша точка якої далі за <code>nav_wp_max_safe_distance</code>, арм блокується. Це захист від сценарію «приїхав на інше поле з учорашньою місією». Обхід — <code>nav_extra_arming_safety = ALLOW_BYPASS</code> плюс yaw-стік під час арму, і це саме обхід.</p>
+<h4 class="md-subheading">Кілька місій</h4>
+<p>Конфігуратор уміє зберігати кілька місій в одному списку точок і перемикатися між ними; операнди Programming Framework для точок стосуються вибраної місії.</p>
+<h4 class="md-subheading">Порівняно з ArduPilot</h4>
+<p>В INAV місія простіша: немає CONDITION-команд, немає DO-команд у чистому вигляді (частина дій — через user actions у <code>p3</code> і логічні умови), завантаження через MSP/CLI, MAVLink-протокол місій (MISSION_COUNT/MISSION_ITEM) підтримується спрощено. Для зйомки ділянки й обльоту — достатньо; для складної логіки — Programming Framework або ArduPilot.</p>
+<h4 class="md-subheading">Параметри виконання і захисту</h4>
+<p><code>nav_auto_speed</code> (500 см/с) — швидкість за замовчуванням, <code>nav_wp_radius</code> (100 см) — радіус захоплення точки (для крила — більший, 1000–3000), <code>nav_wp_max_safe_distance</code> (100 м; 0 — вимкнути) — перша точка далі за цю відстань від місця арму → арм заблоковано («учорашня місія на новому полі»). Для крила точки проходяться по дузі, для мультиротора — із зупинкою; <code>nav_mc_wp_slowdown</code> керує гальмуванням біля точки.</p>
+<h4 class="md-subheading">Розібраний приклад: обліт ділянки 200×100 м для зйомки</h4>
+<p>Висота 60 м, поперечне перекриття кадрів 70% за горизонтального FOV камери 84° (охоплення впоперек галсу ≈ 2·60·tan42° ≈ 108 м) → відстань між галсами 108 × (1 − 0.7) ≈ 32 м → на 100 м ширини 4 галси; точки: WAYPOINT ×8 з <code>p1</code> = 0 (швидкість <code>nav_auto_speed</code> = 5 м/с), наприкінці RTH з <code>p1</code> = 1 (посадку дозволено). Час: ~1 км шляху / 5 м/с ≈ 3.5 хв + розвороти. У CLI це 9 рядків <code>wp</code>, останній із прапорцем 165. Тригер камери — через PINIO/user action за <code>p3</code> або інтервальна зйомка на самій камері. Перевірка місії в конфігураторі на карті: жодна точка не над людьми/дорогою, висота вища за дерева.</p>
+<h4 class="md-subheading">Що відбувається, коли в місії щось ламається</h4>
+<ul><li><strong>Втрата RC у NAV WP</strong>: спрацьовує failsafe INAV (<code>failsafe_procedure</code>, зазвичай RTH); місію за замовчуванням <strong>не</strong> продовжує — це рішення пілота, а не прошивки. Перевіряйте, що висота RTH вища за перешкоди на всьому маршруті.</li><li><strong>Втрата GPS</strong>: навігаційні режими неможливі — апарат переходить в аварійну посадку (<code>nav_emerg_landing_speed</code>). Місія над водою чи лісом — із запасом висоти й зрозумілим планом «куди впаде».</li><li><strong>Низький заряд</strong>: плануйте місію на 60–70 % ємності й стежте за попередженнями OSD; не розраховуйте, що прошивка сама перерве місію вчасно.</li><li><strong>Пілот вимкнув NAV WP</strong>: апарат повертається в режим, вибраний тумблером; що буде при повторному ввімкненні — продовження чи початок спочатку — задає <code>nav_wp_mission_restart</code>.</li></ul>
+<figure class="diagram" data-diagram="inav-mission-flow"><div class="diagram__svg"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 200" width="100%" role="img" aria-labelledby="t" style="max-width:720px;display:block;margin:0 auto"><title id="t">Місія INAV: від планування до виконання</title><style>text{font-family: var(--gc-font-mono, ui-monospace, Menlo, monospace); font-size: 12px;fill:currentColor} .m{fill:var(--gc-ink-muted, #8a93a3)} .a{fill:var(--gc-accent-hud, #5ef1d2)} .w{fill:var(--gc-signal-amber, #f0b24c)} .d{fill:var(--gc-signal-red, #e8636b)} .box{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:currentColor;stroke-width:1.2} .boxa{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6} .ln{stroke:currentColor;stroke-width:1.2;fill:none} .lna{stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6;fill:none} .lnm{stroke:var(--gc-ink-muted, #8a93a3);stroke-width:1;fill:none;stroke-dasharray:4 3} .t{font-size:11px} .b{font-weight:600}</style><defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker><marker id="ara" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--gc-accent-hud, #5ef1d2)"/></marker></defs><rect class="box" x="10.0" y="30" width="142.0" height="48" rx="6"/><text x="81.0" y="51.0" text-anchor="middle">Точки WP</text><text x="81.0" y="65.0" text-anchor="middle">lat, lon, alt</text><rect class="box" x="196.0" y="30" width="142.0" height="48" rx="6"/><text x="267.0" y="51.0" text-anchor="middle">Завантаження</text><text x="267.0" y="65.0" text-anchor="middle">Configurator, CLI</text><rect class="box" x="382.0" y="30" width="142.0" height="48" rx="6"/><text x="453.0" y="51.0" text-anchor="middle">Збереження</text><text x="453.0" y="65.0" text-anchor="middle">в EEPROM</text><rect class="boxa" x="568.0" y="30" width="142.0" height="48" rx="6"/><text x="639.0" y="51.0" text-anchor="middle" class="b">Режим WP</text><text x="639.0" y="65.0" text-anchor="middle" class="b">з тумблера</text><rect class="box" x="568.0" y="130" width="142.0" height="48" rx="6"/><text x="639.0" y="151.0" text-anchor="middle">Остання точка:</text><text x="639.0" y="165.0" text-anchor="middle">RTH або зависання</text><path class="ln" d="M152.0 54.0 L196.0 54.0" marker-end="url(#ar)"/><path class="ln" d="M338.0 54.0 L382.0 54.0" marker-end="url(#ar)"/><path class="ln" d="M524.0 54.0 L568.0 54.0" marker-end="url(#ar)"/><path class="ln" d="M639.0 78 L639.0 130" marker-end="url(#ar)"/></svg></div><figcaption class="gc-muted">Життєвий цикл місії INAV: точки, завантаження, збереження, запуск режимом WP і поведінка після останньої точки.</figcaption><div class="diagram__hint">Схему можно прокрутить по горизонтали</div></figure>
+
+<h2>Практика</h2>
+<h4 class="md-subheading">Крок 1. Місія в конфігураторі</h4>
+<ol><li>Вкладка Mission Control: поставити 3–4 точки, висота 30 м відносно дому.</li><li>Остання — RTH із посадкою (або без для крила).</li><li>Зберегти у FC (Save to FC) і у файл.</li></ol>
+<h4 class="md-subheading">Крок 2. Та сама місія в CLI</h4>
+<pre class="cli-block"><code>wp reset
+wp 0 1 505000000 304000000 3000 0 0 0 0
+wp 1 1 505005000 304005000 3000 0 0 0 0
+wp 2 3 505010000 304000000 3000 20 0 0 0
+wp 3 4 0 0 0 1 0 0 165
+wp save
+wp</code></pre>
+<p>Точка 2 — POSHOLD_TIME 20 с, точка 3 — RTH із посадкою, останній прапорець 165.</p>
+<h4 class="md-subheading">Крок 2б. Генератор CLI зі списку координат</h4>
+<p>Вручну переводити градуси в «× 10⁷» і сантиметри — певний спосіб помилитися на порядок. Скрипт:</p>
+<pre class="cli-block"><code>def wp_cli(points, alt_m=30, rth_land=True):
+    # points: [(lat, lon), ...] in degrees -&gt; INAV CLI lines; altitude relative to home
+    lines = [&quot;wp reset&quot;]
+    for i, (lat, lon) in enumerate(points):
+        lines.append(f&quot;wp {i} 1 {round(lat * 1e7)} {round(lon * 1e7)} {round(alt_m * 100)} 0 0 0 0&quot;)
+    n = len(points)
+    lines.append(f&quot;wp {n} 4 0 0 0 {1 if rth_land else 0} 0 0 165&quot;)   # RTH, last point flag 0xA5
+    lines += [&quot;wp save&quot;, &quot;wp&quot;]
+    return &quot;\n&quot;.join(lines)
+
+print(wp_cli([(50.4500000, 30.5200000), (50.4505000, 30.5205000), (50.4510000, 30.5200000)]))</code></pre>
+<p>Вивід вставити в CLI, потім порівняти з тим, що показує вкладка Mission Control. Розбіжність у координатах на 7-му знаку — норма округлення; на 1–2-му — помилка в порядку lat/lon.</p>
+<h4 class="md-subheading">Крок 3. Політ</h4>
+<ol><li>3D-фікс, дім записано, місію завантажено (<code>wp</code> показує список).</li><li>Арм, ANGLE, зліт вручну на безпечну висоту.</li><li>Увімкнути NAV WP тумблером. Стежити за проходженням точок в OSD.</li><li>Будь-коли — вимкнути NAV WP і забрати керування.</li></ol>
+<h4 class="md-subheading">Лабораторна</h4>
+<p>Записати одну місію двома способами (конфігуратор і CLI через генератор), порівняти вивід <code>wp</code> — він має збігтися. Прогнати з POSHOLD_TIME і RTH. Для кожної точки маршруту записати, що буде при втраті RC і GPS саме там (висота RTH над перешкодами, місце аварійної посадки).</p>
+
+<h2>Діагностика</h2>
+<div class="diag-groups"><article class="diag-item"><h4><strong>Симптом:</strong> не армиться із завантаженою місією</h4><ul><li>Можлива причина: перша точка далі за <code>nav_wp_max_safe_distance</code>.</li><li>Що зробити: перезаписати місію під поточне місце або скинути.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> апарат іде до точок, але не сідає наприкінці</h4><ul><li>Можлива причина: у RTH p1 = 0 (посадку заборонено) або <code>nav_rth_allow_landing</code> = NEVER.</li><li>Що зробити: поставити p1 = 1 і перевірити <code>nav_rth_allow_landing</code>.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> висота місії не та</h4><ul><li>Можлива причина: біт 0 у p3 (абсолютна висота) або плутанина сантиметрів і метрів.</li><li>Що зробити: перевірити <code>p3</code> і одиниці <code>alt</code>.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> <code>wp</code> показує порожній список після перезавантаження</h4><ul><li>Можлива причина: не виконано <code>wp save</code>.</li><li>Що зробити: зберегти й перевірити <code>wp load</code>.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> апарат пролітає повз точки</h4><ul><li>Можлива причина: <code>nav_wp_radius</code> замалий для швидкості (особливо крило).</li><li>Що зробити: радіус більший, швидкість біля точок менша.</li></ul></article></div>
+
+<h2>Чек-лист</h2>
+<ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="inav-missions:0"><span>Розумію поля точки й одиниці (градуси × 10⁷, сантиметри)</span></label></li><li><label><input type="checkbox" data-check-id="inav-missions:1"><span>Остання точка з прапорцем 165</span></label></li><li><label><input type="checkbox" data-check-id="inav-missions:2"><span>Місію перезаписано під поточне поле, арм не заблоковано</span></label></li><li><label><input type="checkbox" data-check-id="inav-missions:3"><span>NAV WP на тумблері, керування повертається миттєво</span></label></li><li><label><input type="checkbox" data-check-id="inav-missions:4"><span>Місію збережено у файл і у FC</span></label></li></ul>
+
+<h2>Джерела</h2>
+<ul class="refs"><li><a href="https://github.com/iNavFlight/inav/blob/master/docs/Navigation.md" target="_blank" rel="noopener noreferrer">INAV Navigation — NAV WP and `wp` CLI</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://github.com/iNavFlight/inav/blob/master/docs/Controls.md" target="_blank" rel="noopener noreferrer">INAV Controls — arming safety</a> <span class="gc-tag" data-state="info">primary</span></li></ul>
+<h2>Перевір себе</h2>
+<uav-quiz src="../quiz/inav-missions.json" module="inav-missions"></uav-quiz>
+      </div>
+      <div class="module-done"><gc-button variant="secondary" data-done-toggle="inav-missions">Позначити як пройдений</gc-button></div>
+      <section class="related" aria-label="Суміжні модулі"><p class="gc-label gc-muted">Суміжні модулі</p><div class="gc-grid ref-grid"><a class="gc-card" href="inav-gps.html"><strong>GPS, компас і RTH в INAV</strong><div class="gc-card__meta"><span class="gc-tag" title="L2 — Интегратор">L2</span></div></a><a class="gc-card" href="ap-missions.html"><strong>Місії та планування</strong><div class="gc-card__meta"><span class="gc-tag" title="L2 — Интегратор">L2</span></div></a></div></section>
+      <nav class="pager" aria-label="Сусідні модулі" data-track-pager><a class="gc-card pager__prev" href="inav-gps.html"><span class="gc-label gc-muted">Назад · трек</span><br>GPS, компас і RTH в INAV</a><a class="gc-card pager__next" href="inav-wing.html"><span class="gc-label gc-muted">Далі · трек</span><br>Крило на INAV: міксер, автозапуск, autotune</a></nav><nav class="pager" aria-label="Сусідні кроки шляху INAV" data-path-pager="inav" hidden><a class="gc-card pager__prev" href="inav-gps.html?path=inav"><span class="gc-label gc-muted">Назад · шлях INAV</span><br>GPS, компас і RTH в INAV</a><a class="gc-card pager__next" href="inav-wing.html?path=inav"><span class="gc-label gc-muted">Далі · крок 18 з 20</span><br>Крило на INAV: міксер, автозапуск, autotune</a></nav>
+    </article>
+  </main>
+  <footer class="gc-container site-footer gc-muted">
+    <p>Відкритий курс · <a href="https://github.com/irreligious86/UAV-Education">вихідний код на GitHub</a> · <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">план розвитку</a> · <a href="../../curriculum/curriculum.html">для розробника</a> · CC BY-NC-SA 4.0</p>
+  </footer>
+</body>
+</html>

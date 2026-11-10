@@ -1,0 +1,94 @@
+{
+  "module": "ros2-basics",
+  "pass": 80,
+  "questions": [
+    {
+      "q": "A BEST_EFFORT publisher and a RELIABLE subscriber:",
+      "options": [
+        "Don't connect, and there's no error",
+        "Work with a retransmission delay",
+        "Work normally",
+        "Raise an exception in the publisher"
+      ],
+      "answer": 0,
+      "explain": "A QoS incompatibility means silence and a warning in the log."
+    },
+    {
+      "q": "Why do you subscribe to /fmu/out/* with the sensor data profile?",
+      "options": [
+        "PX4 sends BEST_EFFORT",
+        "It's faster",
+        "tf2 requires it",
+        "Otherwise bag doesn't work"
+      ],
+      "answer": 0,
+      "explain": "The default RELIABLE subscriber is incompatible."
+    },
+    {
+      "q": "For the world and the body, REP-103 specifies:",
+      "options": [
+        "ENU and FLU",
+        "NED and FRD",
+        "ECEF and FRD",
+        "NED and FLU"
+      ],
+      "answer": 0,
+      "explain": "Autopilots live in NED/FRD, ROS in ENU/FLU."
+    },
+    {
+      "q": "A long-running goal with feedback and cancellation in ROS 2 is:",
+      "options": [
+        "An action",
+        "A service",
+        "A parameter",
+        "A topic with QoS RELIABLE"
+      ],
+      "answer": 0,
+      "explain": "Nav2 NavigateToPose is an action."
+    },
+    {
+      "q": "tf2 “extrapolation into the future” when replaying a bag usually means:",
+      "options": [
+        "The nodes aren't on sim time",
+        "The tf tree is broken",
+        "There's no /tf_static",
+        "Wrong QoS"
+      ],
+      "answer": 0,
+      "explain": "ros2 bag play --clock and use_sim_time:=true."
+    },
+    {
+      "q": "How do you isolate the vehicle's ROS 2 from a laptop on the same Wi-Fi?",
+      "options": [
+        "Your own ROS_DOMAIN_ID",
+        "You can't",
+        "Use MCAP",
+        "Change QoS to BEST_EFFORT"
+      ],
+      "answer": 0,
+      "explain": "Otherwise DDS discovery will find everyone."
+    },
+    {
+      "q": "A positive camera pitch in FLU (static_transform_publisher):",
+      "options": [
+        "Tilts the camera down",
+        "Tilts it up",
+        "Has no effect",
+        "Turns the camera left"
+      ],
+      "answer": 0,
+      "explain": "A rotation about the y axis, which points left, takes x downward."
+    },
+    {
+      "q": "The main value of ros2 bag for debugging:",
+      "options": [
+        "Replaying a flight on the bench",
+        "Encryption",
+        "Compressing flight logs",
+        "Clock synchronization"
+      ],
+      "answer": 0,
+      "explain": "Nodes can't tell a replay from real traffic."
+    }
+  ]
+}

@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="uk-galych" data-theme="dark" data-lang="uk-galych">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Companion + ArduPilot: керування з коду — UAV Student</title>
+  <meta name="description" content="керувати дроном зі скрипта (guided/offboard)">
+  <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
+  <link rel="manifest" href="../../manifest.webmanifest">
+  <meta name="theme-color" content="#0b0f14">
+  <link rel="alternate" hreflang="ru" href="../../m/ap-companion.html">
+  <link rel="alternate" hreflang="uk" href="../../uk/m/ap-companion.html">
+  <link rel="alternate" hreflang="en" href="../../en/m/ap-companion.html">
+  <link rel="alternate" hreflang="uk-galych" href="../../gal/m/ap-companion.html">
+  <script>/* go to the visitor's chosen language before anything paints (assets/i18n.js) */(function(){try{var c=localStorage.getItem('uav-lang'),h=document.documentElement.getAttribute('data-lang');if(!c||c===h||/[?&]lang=keep\b/.test(location.search))return;var l=document.querySelector('link[rel=alternate][hreflang="'+c+'"]');if(l)location.replace(l.href+location.search+location.hash)}catch(e){}})();</script>
+  <link rel="stylesheet" href="../../lib/ground-control-ui/dist/ground-control.css">
+  <link rel="stylesheet" href="../../assets/site.css">
+  <script src="../../lib/ground-control-ui/dist/ground-control.js" defer></script>
+  <script src="../../assets/i18n/uk-galych.js"></script>
+  <script src="../../assets/i18n.js"></script>
+  <script src="../../assets/progress-store.js" defer></script>
+  <script src="../../assets/backend-config.js" defer></script>
+  <script src="../../assets/account.js" defer></script>
+  <script src="../../assets/grading.js" defer></script>
+  <script src="../../assets/app.js" defer></script>
+  <script src="../../assets/uav-quiz.js" defer></script>
+  <script src="../../assets/uav-tasks.js" defer></script>
+  <script src="../../assets/offline.js" defer></script>
+</head>
+<body class="gc-root" data-base="../" data-root="../../">
+  <header class="site-header">
+    <div class="gc-container site-header__inner">
+      <a class="site-brand" href="../index.html"><span class="site-brand__mark" aria-hidden="true">◆</span> UAV Student</a>
+      <nav class="gc-nav" aria-label="Розділи сайту">
+        <a href="../index.html" aria-current="page">Курс</a>
+        <a href="../ref/index.html">Довідник</a>
+        <a href="../pages/glossary.html">Глосарій</a>
+        <a href="../pages/fails.html">Фейли</a>
+        <a href="../pages/search.html">Пошук</a>
+        <a href="../pages/progress.html">Мій прогрес</a>
+      </nav>
+      <nav class="lang-switch" aria-label="Мова"><a class="gc-tag" href="../../m/ap-companion.html" data-lang-to="ru" hreflang="ru" lang="ru" title="Русский">RU</a><a class="gc-tag" href="../../uk/m/ap-companion.html" data-lang-to="uk" hreflang="uk" lang="uk" title="Українська">UK</a><a class="gc-tag" href="../../en/m/ap-companion.html" data-lang-to="en" hreflang="en" lang="en" title="English">EN</a><a class="gc-tag" href="../../gal/m/ap-companion.html" data-lang-to="uk-galych" hreflang="uk-galych" lang="uk-galych" title="Галицька (експеримент)" aria-current="true" data-state="ok">GAL</a></nav>
+    </div>
+  </header>
+  <main class="gc-container site-main">
+    <article class="module" data-module-page="ap-companion">
+      <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-engineer">Інженер: код на борту</a><span>Companion + ArduPilot: керування з коду</span></p>
+      <h1 class="module-title">Companion + ArduPilot: керування з коду</h1>
+      <div class="module-tags"><span class="gc-tag" title="Рівень">L3 — Спеціаліст</span><span class="gc-tag">читання 30 хв</span><span class="gc-tag">навчання ~3 год</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ОПАНОВАНО</span></div>
+      <p class="gc-muted module-score" data-module-score></p>
+      <p class="module-lead">Режим GUIDED — двері, через які бортовий комп&#x27;ютер керує апаратом: «лети в точку», «тримай швидкість», «дивись туди». Модуль показує, як із Python на companion задавати цілі за позицією і швидкістю, як ArduPilot захищає себе від companion, що замовк або збожеволів, і як побудувати цикл керування так, щоб його можна було безпечно налагоджувати в SITL. Підсумок — каркас для capstone треку: власна логіка на борту.</p>
+      <div class="gc-callout" data-state="ok"><strong>Після модуля ти вмієш</strong><ul><li>керувати дроном зі скрипта (guided/offboard)</li></ul></div><p class="gc-muted">Перед цим модулем: <a href="comp-raspberry.html">Raspberry Pi + ArduPilot</a>, <a href="ap-missions.html">Місії та планування</a></p><div class="gc-callout lab"><p class="gc-label gc-muted">Лабораторна</p><strong>GUIDED з коду</strong><p class="gc-muted lab__hint">Здано, коли позначено всі пункти:</p><ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="ap-companion:lab:0"><span>Зліт і ціль за позицією в SITL</span></label></li><li><label><input type="checkbox" data-check-id="ap-companion:lab:1"><span>Цілі за швидкістю надсилаються 5–10 Гц, таймаут перевірено навмисно</span></label></li><li><label><input type="checkbox" data-check-id="ap-companion:lab:2"><span>Код припиняє слати цілі при зміні режиму пілотом</span></label></li><li><label><input type="checkbox" data-check-id="ap-companion:lab:3"><span>Геозону увімкнено й перевірено</span></label></li></ul></div><div class="path-pos gc-muted"><span class="gc-label">На шляху</span><ul><li data-path-pos="ardupilot"><a href="../path/ardupilot.html">ArduPilot</a>: крок 54 з 69 → <a href="eng-ci-configs.html?path=ardupilot">CI та версіонування конфігів і коду</a></li></ul></div>
+      <div class="gc-prose module-body">
+<h2>Теорія</h2>
+<h4 class="md-subheading">GUIDED і його таймаути</h4>
+<p>У GUIDED апарат чекає цілей від зовнішнього джерела. Цілі бувають:</p>
+<ul><li><strong>позиція</strong> — <code>SET_POSITION_TARGET_GLOBAL_INT</code> (86) з координатами або <code>SET_POSITION_TARGET_LOCAL_NED</code> (84) у метрах відносно дому/апарата;</li><li><strong>швидкість</strong> — ті самі повідомлення з бітовою маскою <code>type_mask</code>, яка каже «ігноруй позицію, використовуй швидкість»;</li><li><strong>орієнтація/тяга</strong> — <code>SET_ATTITUDE_TARGET</code> для просунутих випадків.</li></ul>
+<p>Цілі за швидкістю діють обмежений час: якщо companion замовк, ArduPilot після таймауту (порядку секунд, параметр <code>GUID_TIMEOUT</code>) переводить апарат у зависання. Це захист, на який треба спиратися, а не обходити його.</p>
+<h4 class="md-subheading">Система координат</h4>
+<p><code>LOCAL_NED</code>: X — північ, Y — схід, Z — <strong>вниз</strong>. Підйом на 10 м — це Z = −10. Половина помилок offboard-коду — знак осі Z. Для цілей відносно носа апарата є <code>MAV_FRAME_BODY_OFFSET_NED</code>.</p>
+<h4 class="md-subheading">Що перевіряє FC</h4>
+<p>Геозона (<code>FENCE_*</code>), обмеження швидкості й прискорення (<code>WP_*</code>, до 4.7 — <code>WPNAV_*</code>), батарейний failsafe, справність EKF. Companion може просити що завгодно — виконання все одно в межах параметрів FC. Звідси правило налагодження: якщо апарат «не слухається», спершу <code>STATUSTEXT</code>, потім параметри обмежень, і лише потім власний код.</p>
+<h4 class="md-subheading">Цикл керування</h4>
+<p>Добрий цикл companion:</p>
+<ol><li>Читати стан (позиція, швидкість, режим, арм) із телеметрії із заданою частотою.</li><li>Обчислювати рішення.</li><li>Надсилати ціль <strong>регулярно</strong> (наприклад, 5–10 Гц для швидкості), навіть якщо вона не змінилася.</li><li>Перевіряти, що режим досі GUIDED: пілот тумблером може забрати керування будь-якої миті, і код зобов&#x27;язаний це поважати.</li></ol>
+<h4 class="md-subheading">Код companion як скінченний автомат</h4>
+<p>Скрипт «надіслав команду, поспав 10 секунд, надіслав наступну» працює в SITL і ламається в полі: команду не прийнято, пілот перемкнув режим, GPS зник. Надійна форма — автомат станів, де кожен перехід перевіряє умову і має таймаут:</p>
+<div class="table-wrap md-table-wrap" tabindex="0"><table class="md-table"><thead><tr><th>Стан</th><th>Що робить</th><th>Перехід далі</th><th>Якщо не вийшло</th></tr></thead><tbody><tr><td data-label="Стан">WAIT_READY</td><td data-label="Що робить">чекає GPS fix і EKF OK за телеметрією</td><td data-label="Перехід далі">готовність</td><td data-label="Якщо не вийшло">чекати, нічого не надсилати</td></tr><tr><td data-label="Стан">ARM_TAKEOFF</td><td data-label="Що робить">GUIDED, арм, <code>MAV_CMD_NAV_TAKEOFF</code>, чекає ACK і висоту ≥ 90 % цілі</td><td data-label="Перехід далі">висоту досягнуто</td><td data-label="Якщо не вийшло">за 20 с немає висоти → LAND</td></tr><tr><td data-label="Стан">TASK</td><td data-label="Що робить">надсилає цілі з частотою 5–10 Гц, перевіряє режим на кожній ітерації</td><td data-label="Перехід далі">завдання виконано</td><td data-label="Якщо не вийшло">режим не GUIDED → PILOT</td></tr><tr><td data-label="Стан">RETURN</td><td data-label="Що робить"><code>RTL</code> командою зміни режиму</td><td data-label="Перехід далі">дизарм</td><td data-label="Якщо не вийшло">—</td></tr><tr><td data-label="Стан">PILOT</td><td data-label="Що робить"><strong>мовчить</strong>, лише читає телеметрію</td><td data-label="Перехід далі">пілот повернув GUIDED і підтвердив</td><td data-label="Якщо не вийшло">—</td></tr></tbody></table></div>
+<p>Каркас:</p>
+<pre class="cli-block"><code>import time
+from pymavlink import mavutil
+
+class Mission:
+    def __init__(self, m):
+        self.m, self.state, self.t0 = m, &quot;WAIT_READY&quot;, time.time()
+        self.alt, self.mode, self.armed = 0.0, &quot;&quot;, False
+
+    def go(self, state):
+        print(f&quot;{self.state} -&gt; {state}&quot;); self.state, self.t0 = state, time.time()
+
+    def read(self):
+        while (msg := self.m.recv_match(blocking=False)) is not None:
+            t = msg.get_type()
+            if t == &quot;GLOBAL_POSITION_INT&quot;: self.alt = msg.relative_alt / 1000
+            elif t == &quot;HEARTBEAT&quot; and msg.type != mavutil.mavlink.MAV_TYPE_GCS:
+                self.mode = mavutil.mode_string_v10(msg)
+                self.armed = bool(msg.base_mode &amp; mavutil.mavlink.MAV_MODE_FLAG_SAFETY_ARMED)
+
+    def step(self):
+        self.read()
+        if self.state in (&quot;TASK&quot;, &quot;ARM_TAKEOFF&quot;) and self.mode not in (&quot;GUIDED&quot;, &quot;&quot;):
+            return self.go(&quot;PILOT&quot;)                       # the pilot always wins
+        if self.state == &quot;ARM_TAKEOFF&quot; and time.time() - self.t0 &gt; 20 and self.alt &lt; 9:
+            self.m.set_mode(self.m.mode_mapping()[&quot;LAND&quot;]); return self.go(&quot;PILOT&quot;)
+        # ... the remaining transitions follow the table</code></pre>
+<p>Такий код легко тестувати: підмініть <code>m</code> фейковим з&#x27;єднанням (як у <code>examples/mavlink/tests</code>) і перевірте кожен рядок таблиці, зокрема «пілот забрав керування посеред TASK».</p>
+<h4 class="md-subheading">Безпека під час розробки</h4>
+<ul><li>Усе спершу в SITL. Той самий код, той самий порт, лише інша адреса.</li><li>Пілот із пультом і тумблером на LOITER/RTL — завжди, навіть коли «точно працює».</li><li>Геозону ввімкнено й перевірено.</li><li>Перші реальні тести — лише цілі за позицією на малій висоті; швидкість — потім.</li></ul>
+<h4 class="md-subheading">Приклад: швидкість у GUIDED (pymavlink)</h4>
+<pre class="cli-block"><code>from pymavlink import mavutil
+m = mavutil.mavlink_connection(&quot;tcp:127.0.0.1:5762&quot;); m.wait_heartbeat()
+m.set_mode(m.mode_mapping()[&quot;GUIDED&quot;]); m.arducopter_arm(); m.motors_armed_wait()
+m.mav.command_long_send(m.target_system, m.target_component, mavutil.mavlink.MAV_CMD_NAV_TAKEOFF, 0, 0,0,0,0,0,0, 10)
+import time; time.sleep(10)
+for _ in range(50):                          # 10 s at 5 Hz: forward 1 m/s in body frame
+    m.mav.set_position_target_local_ned_send(
+        0, m.target_system, m.target_component, mavutil.mavlink.MAV_FRAME_BODY_OFFSET_NED,
+        0b0000111111000111,                    # use velocity only (bits: ignore pos x/y/z, acc, yaw, yaw_rate)
+        0,0,0,  1.0,0.0,0.0,  0,0,0,  0,0)
+    time.sleep(0.2)
+# stop sending -&gt; after GUID_TIMEOUT (3 s default) the copter stops and hovers</code></pre>
+<p>Повний стартовий проєкт (квадрат, тест failsafe, CI) — <code>examples/sitl-pymavlink</code> у репозиторії курсу. <code>GUID_TIMEOUT</code> = 3.0 с за замовчуванням (діапазон 0.1–5); біти <code>GUID_OPTIONS</code>: 0 — дозволити арм із пульта в GUIDED, 2 — ігнорувати yaw пілота, 6 — навігація за точками для позиційних цілей, 7 — флюгування.</p>
+<h4 class="md-subheading">Розібраний приклад: «апарат не рухається за командою швидкості»</h4>
+<p>Перевірки по черзі: (1) режим GUIDED (<code>HEARTBEAT.custom_mode</code>); (2) <code>type_mask</code> — чи не замаскована швидкість; (3) частота надсилання ≥ 2 Гц (таймаут 3 с); (4) <code>WP_SPD</code> (до 4.7 — <code>WPNAV_SPEED</code>)/<code>PSC_*</code> не обмежують до нуля; (5) геозона не тримає біля межі; (6) <code>STATUSTEXT</code> — «EKF needs position» тощо. У 80% випадків — (1) або (2).</p>
+<figure class="diagram" data-diagram="guided-timeout"><div class="diagram__svg"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 300" width="100%" role="img" aria-labelledby="t" style="max-width:720px;display:block;margin:0 auto"><title id="t">GUIDED: ціль за швидкістю живе GUID_TIMEOUT (3 с)</title><style>text{font-family: var(--gc-font-mono, ui-monospace, Menlo, monospace); font-size: 12px;fill:currentColor} .m{fill:var(--gc-ink-muted, #8a93a3)} .a{fill:var(--gc-accent-hud, #5ef1d2)} .w{fill:var(--gc-signal-amber, #f0b24c)} .d{fill:var(--gc-signal-red, #e8636b)} .box{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:currentColor;stroke-width:1.2} .boxa{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6} .ln{stroke:currentColor;stroke-width:1.2;fill:none} .lna{stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6;fill:none} .lnm{stroke:var(--gc-ink-muted, #8a93a3);stroke-width:1;fill:none;stroke-dasharray:4 3} .t{font-size:11px} .b{font-weight:600}</style><defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker><marker id="ara" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--gc-accent-hud, #5ef1d2)"/></marker></defs><text x="16" y="16" text-anchor="start" class="m t">GUIDED: ціль за швидкістю живе GUID_TIMEOUT (3 с)</text><rect class="box" x="20.0" y="26" width="120" height="26" rx="5"/><text x="80.0" y="43" text-anchor="middle" class="b" style="font-size:11px">Companion</text><line class="lnm" x1="80.0" y1="52" x2="80.0" y2="290"/><rect class="box" x="410.0" y="26" width="120" height="26" rx="5"/><text x="470.0" y="43" text-anchor="middle" class="b" style="font-size:11px">ArduPilot</text><line class="lnm" x1="470.0" y1="52" x2="470.0" y2="290"/><path class="lna" d="M80.0 74 L466.0 74" marker-end="url(#ara)"/><text x="275.0" y="69" text-anchor="middle" class="a t" style="font-size:10px">SET_POSITION_TARGET_LOCAL_NED (vx, vy, vz)</text><text x="275.0" y="108" text-anchor="middle" class="w t" style="font-size:10px">— виконує, таймер скинуто —</text><path class="ln" style="stroke-dasharray:5 4" d="M470.0 134 L84.0 134" marker-end="url(#ar)"/><text x="275.0" y="129" text-anchor="middle" class="t" style="font-size:10px">LOCAL_POSITION_NED, HEARTBEAT</text><path class="lna" d="M80.0 164 L466.0 164" marker-end="url(#ara)"/><text x="275.0" y="159" text-anchor="middle" class="a t" style="font-size:10px">та сама ціль кожні 100–500 мс</text><text x="275.0" y="198" text-anchor="middle" class="w t" style="font-size:10px">— companion завис / впав —</text><text x="275.0" y="228" text-anchor="middle" class="w t" style="font-size:10px">— 3 с без нової цілі —</text><path class="ln" style="stroke-dasharray:5 4" d="M470.0 254 L84.0 254" marker-end="url(#ar)"/><text x="275.0" y="249" text-anchor="middle" class="t" style="font-size:10px">швидкість → 0, зависання</text><text x="704" y="78" text-anchor="end" class="m t" style="font-size:10px">type_mask: лише швидкість</text><text x="704" y="168" text-anchor="end" class="m t" style="font-size:10px">≥ 2 Гц — запас до таймауту</text><text x="704" y="258" text-anchor="end" class="m t" style="font-size:10px">захист, а не завада</text></svg></div><figcaption class="gc-muted">Ціль за швидкістю в GUIDED діє GUID_TIMEOUT (3 с за замовчуванням): companion зобов&#x27;язаний повторювати її частіше, інакше апарат зупиниться і зависне.</figcaption><div class="diagram__hint">Схему можно прокрутить по горизонтали</div></figure>
+
+<h2>Практика</h2>
+<h4 class="md-subheading">Крок 1. Зліт і ціль за позицією (SITL)</h4>
+<pre class="cli-block"><code>import time
+from pymavlink import mavutil
+
+m = mavutil.mavlink_connection(&quot;tcp:127.0.0.1:5762&quot;)  # on the drone: tcp:127.0.0.1:5760 via router
+m.wait_heartbeat()
+
+def ack(cmd):
+    a = m.recv_match(type=&quot;COMMAND_ACK&quot;, blocking=True, timeout=3)
+    assert a and a.command == cmd and a.result == 0, f&quot;command {cmd} failed: {a}&quot;
+
+m.set_mode(m.mode_mapping()[&quot;GUIDED&quot;])
+m.mav.command_long_send(m.target_system, m.target_component,
+    mavutil.mavlink.MAV_CMD_COMPONENT_ARM_DISARM, 0, 1, 0, 0, 0, 0, 0, 0)
+ack(400)
+m.mav.command_long_send(m.target_system, m.target_component,
+    mavutil.mavlink.MAV_CMD_NAV_TAKEOFF, 0, 0, 0, 0, 0, 0, 0, 10)
+ack(22)
+time.sleep(8)
+
+# fly 20 m north, 0 east, stay at 10 m: LOCAL_NED, Z is DOWN
+POS_ONLY = 0b0000_1111_1111_1000  # use x,y,z; ignore velocity, accel, yaw
+m.mav.set_position_target_local_ned_send(
+    0, m.target_system, m.target_component,
+    mavutil.mavlink.MAV_FRAME_LOCAL_NED, POS_ONLY,
+    20, 0, -10,  0, 0, 0,  0, 0, 0,  0, 0)</code></pre>
+<h4 class="md-subheading">Крок 2. Ціль за швидкістю, з регулярним надсиланням</h4>
+<pre class="cli-block"><code>VEL_ONLY = 0b0000_1111_1100_0111  # use vx,vy,vz; ignore position, accel, yaw
+t_end = time.time() + 5
+while time.time() &lt; t_end:
+    hb = m.recv_match(type=&quot;HEARTBEAT&quot;, blocking=False)
+    if hb and hb.type != mavutil.mavlink.MAV_TYPE_GCS and mavutil.mode_string_v10(hb) != &quot;GUIDED&quot;:
+        print(&quot;pilot took over, stop sending&quot;); break
+    m.mav.set_position_target_local_ned_send(
+        0, m.target_system, m.target_component,
+        mavutil.mavlink.MAV_FRAME_LOCAL_NED, VEL_ONLY,
+        0, 0, 0,  1.0, 0, 0,  0, 0, 0,  0, 0)   # 1 m/s north
+    time.sleep(0.2)                              # 5 Hz, inside GUID_TIMEOUT</code></pre>
+<p>Перестань надсилати — апарат зависне сам. Це і є тест таймауту: виконай його навмисно.</p>
+<h4 class="md-subheading">Крок 2б. Автомат на фейковому з&#x27;єднанні</h4>
+<p>Дописати переходи з таблиці й тест: фейк віддає HEARTBEAT із режимом LOITER посеред TASK — автомат має перейти в PILOT і не надіслати більше жодної цілі. Другий тест: висота не зростає 20 с після зльоту — автомат командує LAND. Обидва тести — у CI, як у стартері <code>examples/sitl-pymavlink</code>.</p>
+<h4 class="md-subheading">Крок 3. Capstone-каркас</h4>
+<p>Збери з модулів треку: Raspberry Pi з маршрутизатором → сервіс на Python → GUIDED-логіка (наприклад, «облетіти точку інтересу по колу й повернутися»), ESP32 з індикацією стану. Критерій здачі: сценарій працює в SITL, задокументовано протокол і поведінку при відмові companion, реальний політ — лише з геозоною і пілотом.</p>
+<h4 class="md-subheading">Що має вийти і що записати</h4>
+<ul><li><strong>Позиція.</strong> Після цілі <code>POS_ONLY</code> апарат летить у точку й висить там, а не повертається: ціль за позицією не потребує потоку. Запиши час прильоту й похибку позиції наприкінці (<code>GLOBAL_POSITION_INT</code> проти цілі).</li><li><strong>Швидкість і таймаут.</strong> Цілі <code>VEL_ONLY</code> надсилаються з частотою 5–10 Гц. Припини надсилати — через <code>GUID_TIMEOUT</code> (за замовчуванням 3 с) апарат зупиняється і зависає. Запиши за логом час від останньої цілі до зупинки: він має збігтися з параметром.</li><li><strong>Зміна режиму пілотом.</strong> Перемкни режим у LOITER посеред завдання: код бачить це за <code>HEARTBEAT.custom_mode</code>, переходить у стан PILOT і більше не надсилає жодної цілі. Перевірка — у MAVLink Inspector після перемикання немає <code>SET_POSITION_TARGET_*</code> від companion.</li><li><strong>Геозона.</strong> <code>FENCE_ENABLE = 1</code>, тип — висота і коло, радіус 50 м, дія RTL. Надішли ціль за межами кола: залежно від версії ціль відхиляється або апарат долітає до межі й іде в RTL. Запиши, що саме сталося в тебе, і збережи лог — це доказ, що захист працює і без твого коду.</li></ul>
+<p>Лабораторна зараховується, коли зліт і ціль за позицією виконано в SITL, цілі за швидкістю надсилаються з частотою 5–10 Гц і таймаут перевірено навмисно з часом за логом, код припиняє надсилати цілі при зміні режиму пілотом, а геозону ввімкнено й перевірено.</p>
+
+<h2>Діагностика</h2>
+<div class="diag-groups"><article class="diag-item"><h4><strong>Симптом:</strong> апарат не реагує на цілі</h4><ul><li>Можлива причина: не GUIDED, не заармлений, <code>type_mask</code> ігнорує потрібні поля.</li><li>Що зробити: перевірити режим і арм у heartbeat, маску, <code>STATUSTEXT</code>.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> летить угору замість униз (або навпаки)</h4><ul><li>Можлива причина: знак Z у NED.</li><li>Що зробити: Z униз додатний; підйом — від&#x27;ємне Z.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> через кілька секунд зависає, хоча команда була</h4><ul><li>Можлива причина: ціль за швидкістю надіслано один раз, спрацював таймаут.</li><li>Що зробити: надсилати регулярно (5–10 Гц).</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> зупиняється на межі, не долетівши до цілі</h4><ul><li>Можлива причина: геозона або обмеження <code>WPNAV_*</code>.</li><li>Що зробити: перевірити <code>FENCE_*</code> і повідомлення FC — це захист, а не баг.</li></ul></article></div>
+
+<h2>Чек-лист</h2>
+<ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="ap-companion:0"><span>Усі цілі спершу в SITL</span></label></li><li><label><input type="checkbox" data-check-id="ap-companion:1"><span>Знак Z у NED перевірено</span></label></li><li><label><input type="checkbox" data-check-id="ap-companion:2"><span>Цілі за швидкістю надсилаються регулярно, таймаут перевірено навмисно</span></label></li><li><label><input type="checkbox" data-check-id="ap-companion:3"><span>Код поважає зміну режиму пілотом</span></label></li><li><label><input type="checkbox" data-check-id="ap-companion:4"><span>Геозону ввімкнено, пілот із тумблером на LOITER/RTL</span></label></li><li><label><input type="checkbox" data-check-id="ap-companion:5"><span>Поведінку при відмові companion задокументовано</span></label></li></ul>
+
+<h2>Джерела</h2>
+<ul class="refs"><li><a href="https://ardupilot.org/dev/docs/copter-commands-in-guided-mode.html" target="_blank" rel="noopener noreferrer">Copter Commands in Guided Mode — ArduPilot Dev</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://mavlink.io/en/messages/common.html#SET_POSITION_TARGET_LOCAL_NED" target="_blank" rel="noopener noreferrer">MAVLink SET_POSITION_TARGET_LOCAL_NED (common.xml)</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://ardupilot.org/copter/docs/ac2_guidedmode.html" target="_blank" rel="noopener noreferrer">Guided Mode — ArduPilot Copter</a> <span class="gc-tag" data-state="info">primary</span></li></ul>
+<h2>Перевір себе</h2>
+<uav-quiz src="../quiz/ap-companion.json" module="ap-companion"></uav-quiz>
+      </div>
+      <div class="module-done"><gc-button variant="secondary" data-done-toggle="ap-companion">Позначити як пройдений</gc-button></div>
+      <section class="related" aria-label="Суміжні модулі"><p class="gc-label gc-muted">Суміжні модулі</p><div class="gc-grid ref-grid"><a class="gc-card" href="comp-raspberry.html"><strong>Raspberry Pi + ArduPilot</strong><div class="gc-card__meta"><span class="gc-tag" title="L3 — Специалист">L3</span></div></a><a class="gc-card" href="ap-missions.html"><strong>Місії та планування</strong><div class="gc-card__meta"><span class="gc-tag" title="L2 — Интегратор">L2</span></div></a></div></section>
+      <nav class="pager" aria-label="Сусідні модулі" data-track-pager><a class="gc-card pager__prev" href="payload-gimbal.html"><span class="gc-label gc-muted">Назад · трек</span><br>Підвіси й корисне навантаження: MAVLink Gimbal v2, камера, скидання</a><a class="gc-card pager__next" href="mav-multi-vehicle.html"><span class="gc-label gc-muted">Далі · трек</span><br>Кілька апаратів: адресація, рознесення, стрій і супервізор</a></nav><nav class="pager" aria-label="Сусідні кроки шляху ArduPilot" data-path-pager="ardupilot" hidden><a class="gc-card pager__prev" href="comp-raspberry.html?path=ardupilot"><span class="gc-label gc-muted">Назад · шлях ArduPilot</span><br>Raspberry Pi + ArduPilot</a><a class="gc-card pager__next" href="eng-ci-configs.html?path=ardupilot"><span class="gc-label gc-muted">Далі · крок 55 з 69</span><br>CI та версіонування конфігів і коду</a></nav>
+    </article>
+  </main>
+  <footer class="gc-container site-footer gc-muted">
+    <p>Відкритий курс · <a href="https://github.com/irreligious86/UAV-Education">вихідний код на GitHub</a> · <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">план розвитку</a> · <a href="../../curriculum/curriculum.html">для розробника</a> · CC BY-NC-SA 4.0</p>
+  </footer>
+</body>
+</html>

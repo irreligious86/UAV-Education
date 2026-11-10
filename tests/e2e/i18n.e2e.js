@@ -45,7 +45,9 @@ const tree = (code) => { const l = LANGS.find((x) => x.code === code); return l.
   // 2. untranslated content says so and shows the original
   await g.goto(`${BASE}/${tree(target)}m/f-power.html?lang=keep`, { waitUntil: "networkidle" });
   const untranslated = await g.$("[data-untranslated]");
-  const translated = fs.existsSync(path.join(__dirname, "..", "..", "i18n", target, "content", "foundation", "f-power.md"));
+  // a translation counts if the language or one of its fallbacks (a dialect's standard language) has the file
+  const chain = []; for (let c = target; c && c !== LANGS[0].code; c = (LANGS.find((x) => x.code === c) || {}).fallback) chain.push(c);
+  const translated = chain.some((c) => fs.existsSync(path.join(__dirname, "..", "..", "i18n", c, "content", "foundation", "f-power.md")));
   assert.ok(translated ? !untranslated : !!untranslated, "untranslated notice must match the presence of a translation");
   ok("an untranslated module shows a notice and the original text; a translated one does not");
 

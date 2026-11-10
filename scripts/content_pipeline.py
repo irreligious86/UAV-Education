@@ -99,8 +99,10 @@ def diagram_svg(name: str) -> str | None:
     if key in _svg_cache:
         return _svg_cache[key]
     f = DIAGRAMS_DIR / f"{name}.svg"
-    if i18n.lang_dir() and (DIAGRAMS_DIR / i18n.lang_dir() / f"{name}.svg").is_file():
-        f = DIAGRAMS_DIR / i18n.lang_dir() / f"{name}.svg"
+    for code in reversed(i18n.chain(i18n.lang())):      # nearest language wins
+        d = i18n.lang_dir(code)
+        if (DIAGRAMS_DIR / d / f"{name}.svg").is_file():
+            f = DIAGRAMS_DIR / d / f"{name}.svg"
     if not f.is_file():
         return None
     svg = f.read_text(encoding="utf-8")

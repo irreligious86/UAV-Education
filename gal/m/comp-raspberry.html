@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="uk-galych" data-theme="dark" data-lang="uk-galych">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Raspberry Pi + ArduPilot — UAV Student</title>
+  <meta name="description" content="підняти mavlink-router і сервіс на борту">
+  <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
+  <link rel="manifest" href="../../manifest.webmanifest">
+  <meta name="theme-color" content="#0b0f14">
+  <link rel="alternate" hreflang="ru" href="../../m/comp-raspberry.html">
+  <link rel="alternate" hreflang="uk" href="../../uk/m/comp-raspberry.html">
+  <link rel="alternate" hreflang="en" href="../../en/m/comp-raspberry.html">
+  <link rel="alternate" hreflang="uk-galych" href="../../gal/m/comp-raspberry.html">
+  <script>/* go to the visitor's chosen language before anything paints (assets/i18n.js) */(function(){try{var c=localStorage.getItem('uav-lang'),h=document.documentElement.getAttribute('data-lang');if(!c||c===h||/[?&]lang=keep\b/.test(location.search))return;var l=document.querySelector('link[rel=alternate][hreflang="'+c+'"]');if(l)location.replace(l.href+location.search+location.hash)}catch(e){}})();</script>
+  <link rel="stylesheet" href="../../lib/ground-control-ui/dist/ground-control.css">
+  <link rel="stylesheet" href="../../assets/site.css">
+  <script src="../../lib/ground-control-ui/dist/ground-control.js" defer></script>
+  <script src="../../assets/i18n/uk-galych.js"></script>
+  <script src="../../assets/i18n.js"></script>
+  <script src="../../assets/progress-store.js" defer></script>
+  <script src="../../assets/backend-config.js" defer></script>
+  <script src="../../assets/account.js" defer></script>
+  <script src="../../assets/grading.js" defer></script>
+  <script src="../../assets/app.js" defer></script>
+  <script src="../../assets/uav-quiz.js" defer></script>
+  <script src="../../assets/uav-tasks.js" defer></script>
+  <script src="../../assets/offline.js" defer></script>
+</head>
+<body class="gc-root" data-base="../" data-root="../../">
+  <header class="site-header">
+    <div class="gc-container site-header__inner">
+      <a class="site-brand" href="../index.html"><span class="site-brand__mark" aria-hidden="true">◆</span> UAV Student</a>
+      <nav class="gc-nav" aria-label="Розділи сайту">
+        <a href="../index.html" aria-current="page">Курс</a>
+        <a href="../ref/index.html">Довідник</a>
+        <a href="../pages/glossary.html">Глосарій</a>
+        <a href="../pages/fails.html">Фейли</a>
+        <a href="../pages/search.html">Пошук</a>
+        <a href="../pages/progress.html">Мій прогрес</a>
+      </nav>
+      <nav class="lang-switch" aria-label="Мова"><a class="gc-tag" href="../../m/comp-raspberry.html" data-lang-to="ru" hreflang="ru" lang="ru" title="Русский">RU</a><a class="gc-tag" href="../../uk/m/comp-raspberry.html" data-lang-to="uk" hreflang="uk" lang="uk" title="Українська">UK</a><a class="gc-tag" href="../../en/m/comp-raspberry.html" data-lang-to="en" hreflang="en" lang="en" title="English">EN</a><a class="gc-tag" href="../../gal/m/comp-raspberry.html" data-lang-to="uk-galych" hreflang="uk-galych" lang="uk-galych" title="Галицька (експеримент)" aria-current="true" data-state="ok">GAL</a></nav>
+    </div>
+  </header>
+  <main class="gc-container site-main">
+    <article class="module" data-module-page="comp-raspberry">
+      <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-engineer">Інженер: код на борту</a><span>Raspberry Pi + ArduPilot</span></p>
+      <h1 class="module-title">Raspberry Pi + ArduPilot</h1>
+      <div class="module-tags"><span class="gc-tag" title="Рівень">L3 — Спеціаліст</span><span class="gc-tag">читання 30 хв</span><span class="gc-tag">навчання ~4 год</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ОПАНОВАНО</span></div>
+      <p class="gc-muted module-score" data-module-score></p>
+      <p class="module-lead">Raspberry Pi на борту — класичний перший companion: Linux, Python, камера, Wi-Fi. Модуль веде від проводу до робочого сервісу: підключення до телеметрійного порту ArduPilot, налаштування UART на Pi, перевірка MAVProxy, маршрутизація MAVLink одразу кільком споживачам, бюджет живлення і контроль тротлінгу, захист SD-карти від вимкнення живлення та власний скрипт як системний сервіс зі сторожовим таймером.</p>
+      <div class="gc-callout" data-state="ok"><strong>Після модуля ти вмієш</strong><ul><li>підняти mavlink-router і сервіс на борту</li></ul></div><p class="gc-muted">Перед цим модулем: <a href="comp-mavlink.html">MAVLink і MAVSDK</a></p><div class="gc-callout lab"><p class="gc-label gc-muted">Лабораторна</p><strong>Сервіс на борту</strong><p class="gc-muted lab__hint">Здано, коли позначено всі пункти:</p><ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="comp-raspberry:lab:0"><span>/dev/serial0 звільнений від консолі, heartbeat у MAVProxy</span></label></li><li><label><input type="checkbox" data-check-id="comp-raspberry:lab:1"><span>Маршрутизатор роздає потік GCS і локальному скрипту</span></label></li><li><label><input type="checkbox" data-check-id="comp-raspberry:lab:2"><span>Сервіс systemd перезапускається після падіння</span></label></li><li><label><input type="checkbox" data-check-id="comp-raspberry:lab:3"><span>Відмова Pi на стенді не впливає на FC</span></label></li></ul></div><div class="path-pos gc-muted"><span class="gc-label">На шляху</span><ul><li data-path-pos="ardupilot"><a href="../path/ardupilot.html">ArduPilot</a>: крок 53 з 69 → <a href="ap-companion.html?path=ardupilot">Companion + ArduPilot: керування з коду</a></li></ul></div>
+      <div class="gc-prose module-body">
+<h2>Теорія</h2>
+<h4 class="md-subheading">Підключення</h4>
+<p>Телеметрійний порт FC (наприклад TELEM2 = <code>SERIAL2</code>) ↔ UART Pi: TX → RX, RX → TX, спільний GND. Рівні 3.3 В з обох боків. На FC:</p>
+<ul><li><code>SERIAL2_PROTOCOL = 2</code> — MAVLink 2;</li><li><code>SERIAL2_BAUD = 921</code> — 921600 бод; для коротких проводів і великого потоку телеметрії це норма, для довгих — 57 (57600).</li></ul>
+<p>Живлення Pi — від окремого BEC 5 В із запасом за струмом (Pi 4/5 під навантаженням — понад ампер), не з порту телеметрії FC.</p>
+<h4 class="md-subheading">UART на Raspberry Pi</h4>
+<p>За замовчуванням UART зайнятий консоллю Linux. У <code>raspi-config</code> → Interfacing → Serial: консоль по serial — <strong>ні</strong>, апаратний порт — <strong>так</strong>. Після перезавантаження порт доступний як <code>/dev/serial0</code> — так на Pi 3/4. <strong>На Pi 5</strong> <code>/dev/serial0</code> вказує на налагоджувальний роз&#x27;єм (<code>/dev/ttyAMA10</code>), а UART на GPIO 14/15 вмикається рядком <code>dtparam=uart0=on</code> у <code>/boot/firmware/config.txt</code> і називається <code>/dev/ttyAMA0</code> — у прикладах нижче підстав його. На Pi 3/4 основний UART за замовчуванням віддано Bluetooth, а на GPIO лишається mini-UART, швидкість якого «пливе» разом із частотою ядра: для стабільних 921600 — <code>enable_uart=1</code> і <code>dtoverlay=disable-bt</code> у <code>config.txt</code>.</p>
+<h4 class="md-subheading">Маршрутизація</h4>
+<p>Один UART, а споживачів кілька: GCS через Wi-Fi, твій скрипт, запис tlog. Рішення — маршрутизатор MAVLink: <code>mavlink-router</code> або <code>mavp2p</code> читає порт і роздає по UDP/TCP усім під&#x27;єднаним. Скрипти тоді під&#x27;єднуються до локального UDP-порту, а не до <code>/dev/serial0</code> напряму, і не заважають одне одному.</p>
+<figure class="diagram" data-diagram="mavlink-routing"><div class="diagram__svg"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 190" width="100%" role="img" aria-labelledby="t" style="max-width:720px;display:block;margin:0 auto"><title id="t">Маршрутизація MAVLink на борту</title><style>text{font-family: var(--gc-font-mono, ui-monospace, Menlo, monospace); font-size: 12px;fill:currentColor} .m{fill:var(--gc-ink-muted, #8a93a3)} .a{fill:var(--gc-accent-hud, #5ef1d2)} .w{fill:var(--gc-signal-amber, #f0b24c)} .d{fill:var(--gc-signal-red, #e8636b)} .box{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:currentColor;stroke-width:1.2} .boxa{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6} .ln{stroke:currentColor;stroke-width:1.2;fill:none} .lna{stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6;fill:none} .lnm{stroke:var(--gc-ink-muted, #8a93a3);stroke-width:1;fill:none;stroke-dasharray:4 3} .t{font-size:11px} .b{font-weight:600}</style><defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker><marker id="ara" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--gc-accent-hud, #5ef1d2)"/></marker></defs><rect class="boxa" x="10" y="70" width="110" height="44" rx="6"/><text x="65.0" y="89.0" text-anchor="middle" class="b" style="font-size:10.5px">FC</text><text x="65.0" y="103.0" text-anchor="middle" class="b" style="font-size:10.5px">TELEM2 921600</text><rect class="boxa" x="180" y="70" width="150" height="44" rx="6"/><text x="255.0" y="89.0" text-anchor="middle" class="b">mavlink-router</text><text x="255.0" y="103.0" text-anchor="middle" class="b">UART ↔ UDP/TCP</text><rect class="box" x="400" y="10" width="130" height="44" rx="6"/><text x="465.0" y="29.0" text-anchor="middle">QGC / MP</text><text x="465.0" y="43.0" text-anchor="middle">UDP 14550</text><rect class="box" x="400" y="70" width="130" height="44" rx="6"/><text x="465.0" y="89.0" text-anchor="middle">Скрипти</text><text x="465.0" y="103.0" text-anchor="middle">udpin 14551</text><rect class="box" x="400" y="130" width="130" height="44" rx="6"/><text x="465.0" y="149.0" text-anchor="middle">tlog-логер</text><text x="465.0" y="163.0" text-anchor="middle">14552</text><rect class="box" x="580" y="10" width="130" height="44" rx="6"/><text x="645.0" y="29.0" text-anchor="middle">4G / Wi-Fi</text><text x="645.0" y="43.0" text-anchor="middle">→ віддалена GCS</text><path class="lna" d="M120 92.0 L180 92.0" marker-end="url(#ara)"/><path class="ln" d="M330 92.0 L365.0 92.0 L365.0 32.0 L400 32.0" marker-end="url(#ar)"/><path class="ln" d="M330 92.0 L400 92.0" marker-end="url(#ar)"/><path class="ln" d="M330 92.0 L365.0 92.0 L365.0 152.0 L400 152.0" marker-end="url(#ar)"/><path class="ln" d="M530 32.0 L580 32.0" marker-end="url(#ar)"/></svg></div><figcaption class="gc-muted">mavlink-router роздає один UART-потік FC кільком споживачам: GCS, твоїм скриптам і логеру.</figcaption><div class="diagram__hint">Схему можно прокрутить по горизонтали</div></figure>
+<h4 class="md-subheading">Сервіс замість «запустив руками»</h4>
+<p>Скрипт, запущений із термінала по SSH, помирає разом із сесією. На борту все має стартувати саме: <code>systemd</code>-юніт з <code>Restart=always</code>. Логи — у <code>journalctl</code>.</p>
+<h4 class="md-subheading">Час і логи</h4>
+<p>У Pi без мережі немає точного часу після завантаження. Для зіставлення логів companion з DataFlash FC використовуй <code>SYSTEM_TIME</code> з MAVLink (час GPS) або пиши в лог мітки монотонного лічильника на кшталт <code>TimeUS</code> і момент синхронізації.</p>
+<h4 class="md-subheading">Живлення: бюджет, а не «якийсь BEC»</h4>
+<p>Raspberry Pi 5 розрахований на 5.1 В / 5 А (27 Вт): у простої він бере близько 3 Вт, під повним навантаженням CPU — 7–8 Вт, зверху камера, USB-модем або Wi-Fi-адаптер. Приклад бюджету:</p>
+<div class="table-wrap md-table-wrap" tabindex="0"><table class="md-table"><thead><tr><th>Споживач</th><th>Потужність</th><th>Струм при 5 В</th></tr></thead><tbody><tr><td data-label="Споживач">Pi 5 під навантаженням</td><td data-label="Потужність">8 Вт</td><td data-label="Струм при 5 В">1.6 А</td></tr><tr><td data-label="Споживач">Камера CSI</td><td data-label="Потужність">1.5 Вт</td><td data-label="Струм при 5 В">0.3 А</td></tr><tr><td data-label="Споживач">USB Wi-Fi / LTE-модем</td><td data-label="Потужність">2.5 Вт</td><td data-label="Струм при 5 В">0.5 А</td></tr><tr><td data-label="Споживач"><strong>Разом</strong></td><td data-label="Потужність"><strong>12 Вт</strong></td><td data-label="Струм при 5 В"><strong>2.4 А</strong></td></tr></tbody></table></div>
+<p>BEC беруть із запасом щонайменше в півтора-два рази (5 А), провід — короткий і товстий: 30 см пари 22 AWG (≈ 53 мОм/м на жилу, туди й назад ≈ 32 мОм) на 2.4 А втрачають ≈ 0.08 В. Пікові кидки (запуск камери, передавання модема) просаджують напругу сильніше за середнє — тому на роз&#x27;ємі Pi має бути не менше ~4.9 В під навантаженням.</p>
+<h4 class="md-subheading">Перегрів і просідання видно в цифрах</h4>
+<p><code>vcgencmd get_throttled</code> повертає бітову маску: біт 0 — просідання живлення зараз, 1 — частоту обмежено, 2 — тротлінг, 3 — м&#x27;яка температурна межа; біти 16–19 — те саме «було від моменту завантаження». <code>0x0</code> — усе добре, <code>0x50000</code> — було просідання живлення і тротлінг; <code>0x50005</code> — це відбувається просто зараз. Температура — <code>vcgencmd measure_temp</code>; без радіатора й обдуву Pi 5 під навантаженням іде в тротлінг за хвилини, у корпусі дрона без потоку повітря — тим паче. Алгоритм зору, який «раптом став повільнішим у польоті», — майже завжди тут.</p>
+<h4 class="md-subheading">Вимкнення живлення без зламаної SD-карти</h4>
+<p>На дроні живлення зникає без <code>shutdown</code> — після крашу, при заміні батареї. Запис у момент вимкнення псує файлову систему SD-карти. Два робочі підходи:</p>
+<ul><li><strong>Overlay File System</strong> (<code>raspi-config</code> → Performance Options → Overlay File System): корінь лише для читання, зміни живуть у RAM і зникають після перезавантаження. Система невбивна, але логи й записи треба писати на окремий розділ або USB-накопичувач.</li><li><strong>Запис по-дорослому</strong>: логи на окремий розділ або USB SSD, <code>f.flush()</code> + <code>os.fsync()</code> для важливого, журнал systemd у RAM (<code>Storage=volatile</code> у <code>/etc/systemd/journald.conf</code>), щоб він не тріпав карту.</li></ul>
+<h4 class="md-subheading">Сервіс зі сторожовим таймером</h4>
+<p>Скрипт, запущений із термінала по SSH, помирає разом із сесією. На борту все стартує саме: <code>systemd</code>-юніт з <code>Restart=always</code>. Якщо скрипт може не впасти, а зависнути (сокет, камера, нескінченний цикл), потрібен ще й сторожовий таймер: <code>Type=notify</code> і <code>WatchdogSec=</code> — systemd перезапускає сервіс, якщо той перестав повідомляти «я живий». Без повідомлень від скрипта <code>WatchdogSec</code> просто вбиває його кожні N секунд — у цю пастку потрапляють майже всі. Робочий варіант — у практиці, крок 3.</p>
+<h4 class="md-subheading">Час і логи</h4>
+<p>Pi без RTC і без мережі стартує з 1970 року — абсолютні мітки до синхронізації безглузді. Практично: скрипт під час старту пише пару (<code>SYSTEM_TIME.time_unix_usec</code> з MAVLink — час GPS від польотного контролера, і свій <code>time.monotonic()</code>) і далі використовує монотонні мітки; під час розбору логи companion зіставляються з DataFlash польотного контролера за цією парою. На Pi 5 є роз&#x27;єм батарейки RTC — з нею час переживає перезавантаження без мережі.</p>
+
+<h2>Практика</h2>
+<h4 class="md-subheading">Крок 1. Порт і перевірка</h4>
+<pre class="cli-block"><code>sudo raspi-config        # Interfacing Options -&gt; Serial: console NO, hardware YES
+sudo reboot
+pip install --user pymavlink MAVProxy
+mavproxy.py --master=/dev/serial0 --baudrate 921600</code></pre>
+<p>Побачив heartbeat і параметри — зв&#x27;язок є. Команду <code>arm throttle</code> на столі давати лише без пропелерів.</p>
+<h4 class="md-subheading">Крок 2. Маршрутизатор</h4>
+<p>Приклад конфігурації <code>mavlink-router</code> (<code>/etc/mavlink-router/main.conf</code>):</p>
+<pre class="cli-block"><code>[General]
+TcpServerPort=5760
+ReportStats=false
+
+[UartEndpoint fc]
+Device=/dev/serial0
+Baud=921600
+
+[UdpEndpoint gcs]
+Mode=Normal
+Address=192.168.4.20
+Port=14550
+
+[UdpEndpoint local]
+Mode=Server
+Address=127.0.0.1
+Port=14551</code></pre>
+<p>GCS на ноутбуці отримує потік на 14550, локальні скрипти під&#x27;єднуються до <code>udpout:127.0.0.1:14551</code> або <code>tcp:127.0.0.1:5760</code>.</p>
+<h4 class="md-subheading">Крок 3. Власний сервіс зі сторожовим таймером</h4>
+<p><code>/opt/uav/telemetry_logger.py</code> — пише позицію і батарею в CSV і раз за цикл повідомляє systemd, що живий:</p>
+<pre class="cli-block"><code>import csv, os, socket, time
+from pymavlink import mavutil
+
+def sd_notify(msg: str) -&gt; bool:
+    &quot;&quot;&quot;Send a state line to systemd (READY=1, WATCHDOG=1, STATUS=...). No-op outside systemd.&quot;&quot;&quot;
+    addr = os.environ.get(&quot;NOTIFY_SOCKET&quot;)
+    if not addr:
+        return False
+    if addr[0] == &quot;@&quot;:                      # abstract socket namespace
+        addr = &quot;\0&quot; + addr[1:]
+    with socket.socket(socket.AF_UNIX, socket.SOCK_DGRAM) as s:
+        s.connect(addr)
+        s.sendall(msg.encode())
+    return True
+
+m = mavutil.mavlink_connection(&quot;tcp:127.0.0.1:5760&quot;)
+m.wait_heartbeat()
+sd_notify(&quot;READY=1&quot;)
+os.makedirs(&quot;/var/log/uav&quot;, exist_ok=True)
+with open(&quot;/var/log/uav/telemetry.csv&quot;, &quot;a&quot;, newline=&quot;&quot;) as f:
+    w = csv.writer(f)
+    while True:
+        msg = m.recv_match(type=[&quot;GLOBAL_POSITION_INT&quot;, &quot;BATTERY_STATUS&quot;], blocking=True, timeout=1)
+        if msg is not None:
+            w.writerow([time.monotonic(), msg.get_type(), msg.to_dict()])
+            f.flush()
+        sd_notify(&quot;WATCHDOG=1&quot;)             # the loop is alive even when no message came</code></pre>
+<p><code>/etc/systemd/system/uav-telemetry.service</code>:</p>
+<pre class="cli-block"><code>[Unit]
+Description=UAV telemetry logger
+After=mavlink-router.service
+Requires=mavlink-router.service
+
+[Service]
+Type=notify
+NotifyAccess=main
+ExecStart=/usr/bin/python3 /opt/uav/telemetry_logger.py
+WatchdogSec=10
+Restart=always
+RestartSec=2
+User=pi
+
+[Install]
+WantedBy=multi-user.target</code></pre>
+<pre class="cli-block"><code>sudo systemctl daemon-reload
+sudo systemctl enable --now uav-telemetry
+journalctl -u uav-telemetry -f</code></pre>
+<p>Перевірка сторожового таймера: <code>sudo kill -STOP $(systemctl show -p MainPID --value uav-telemetry)</code> заморожує процес — через 10 с у журналі буде <code>Watchdog timeout</code>, і systemd перезапустить сервіс.</p>
+<h4 class="md-subheading">Крок 4. Живлення і температура під навантаженням</h4>
+<p>Навантажити CPU (<code>stress-ng --cpu 4 --timeout 300s</code> або свій алгоритм зору) і раз на 10 с записувати <code>vcgencmd measure_temp</code> і <code>vcgencmd get_throttled</code>. Записати: через скільки секунд почався тротлінг (якщо почався), чи було просідання живлення. Повторити з радіатором або обдувом і з іншим BEC.</p>
+<h4 class="md-subheading">Крок 5. Відпрацювати відмову</h4>
+<p>Висмикни живлення Pi на стенді (FC на столі без пропелерів): FC продовжує працювати, GCS втрачає потік, після ввімкнення Pi сервіс піднімається сам. Повторити 10 разів поспіль: система завантажується щоразу? З Overlay File System — повторити ще раз і переконатися, що логи пишуться туди, де переживають перезавантаження. Це і є межа відповідальності зі вступного модуля.</p>
+<p>Лабораторну зараховано, коли MAVLink іде через маршрутизатор кільком клієнтам, сервіс зі сторожовим таймером перезапускається після заморожування, бюджет живлення пораховано, а температуру з прапорцями тротлінгу записано під навантаженням, 10 вимкнень живлення пережито без ручного втручання.</p>
+
+<h2>Діагностика</h2>
+<div class="diag-groups"><article class="diag-item"><h4><strong>Симптом:</strong> MAVProxy не бачить heartbeat</h4><ul><li>Можлива причина: консоль Linux тримає порт, не та швидкість, переплутано TX/RX.</li><li>Що зробити: <code>raspi-config</code>, порівняти <code>SERIAL2_BAUD</code>, перевірити проводи.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> сміття в даних на 921600</h4><ul><li>Можлива причина: довгі проводи, завади, поганий GND.</li><li>Що зробити: скоротити, екранувати або знизити до 57600.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> другий скрипт не може відкрити порт</h4><ul><li>Можлива причина: <code>/dev/serial0</code> зайнятий першим.</li><li>Що зробити: маршрутизатор MAVLink, клієнти по UDP/TCP.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> Pi перезавантажується на газу</h4><ul><li>Можлива причина: слабке живлення.</li><li>Що зробити: BEC із запасом, конденсатор, окрема лінія від силової шини.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> сміття або немає даних на <code>/dev/serial0</code></h4><ul><li>Можлива причина: консоль на UART, mini-UART із плаваючою швидкістю, Bluetooth на тому самому порту.</li><li>Що зробити: <code>raspi-config</code> (консоль вимк., UART увімк.), <code>disable-bt</code>, 921600 лише на повному UART.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> сервіс перезапускається кожні кілька секунд без помилок у лозі</h4><ul><li>Можлива причина: <code>WatchdogSec</code> задано, а скрипт не надсилає <code>WATCHDOG=1</code> (або юніт не <code>Type=notify</code>).</li><li>Що зробити: <code>sd_notify</code> у головному циклі або прибрати <code>WatchdogSec</code>.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> алгоритм на борту повільніший, ніж на столі</h4><ul><li>Можлива причина: тротлінг через температуру або просідання живлення.</li><li>Що зробити: <code>vcgencmd get_throttled</code>, радіатор і обдув, BEC із запасом.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> після жорсткого вимкнення Pi не завантажується</h4><ul><li>Можлива причина: пошкоджено файлову систему SD-карти.</li><li>Що зробити: Overlay File System або логи на окремий носій, <code>Storage=volatile</code> для журналу.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> скрипт працює по SSH і «помирає» після від&#x27;єднання</h4><ul><li>Можлива причина: не сервіс.</li><li>Що зробити: systemd-юніт з Restart=always.</li></ul></article></div>
+
+<h2>Чек-лист</h2>
+<ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="comp-raspberry:0"><span>Консоль Linux знято з UART, порт <code>/dev/serial0</code> доступний</span></label></li><li><label><input type="checkbox" data-check-id="comp-raspberry:1"><span><code>SERIAL2_PROTOCOL</code>/<code>SERIAL2_BAUD</code> збігаються з налаштуванням Pi</span></label></li><li><label><input type="checkbox" data-check-id="comp-raspberry:2"><span>Pi живиться від окремого BEC</span></label></li><li><label><input type="checkbox" data-check-id="comp-raspberry:3"><span>Маршрутизатор роздає MAVLink кільком клієнтам</span></label></li><li><label><input type="checkbox" data-check-id="comp-raspberry:4"><span>Скрипт запущено як <code>systemd</code>-сервіс з автоперезапуском і сторожовим таймером</span></label></li><li><label><input type="checkbox" data-check-id="comp-raspberry:5"><span>Бюджет живлення пораховано, тротлінг перевірено під навантаженням</span></label></li><li><label><input type="checkbox" data-check-id="comp-raspberry:6"><span>Файлова система переживає вимкнення живлення</span></label></li><li><label><input type="checkbox" data-check-id="comp-raspberry:7"><span>Відмова Pi на стенді не впливає на FC</span></label></li></ul>
+
+<h2>Джерела</h2>
+<ul class="refs"><li><a href="https://ardupilot.org/dev/docs/raspberry-pi-via-mavlink.html" target="_blank" rel="noopener noreferrer">Communicating with Raspberry Pi via MAVLink — ArduPilot Dev</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://www.raspberrypi.com/documentation/computers/config_txt.html" target="_blank" rel="noopener noreferrer">Raspberry Pi — Configuration (UART, vcgencmd, power supply)</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://www.freedesktop.org/software/systemd/man/latest/systemd.service.html" target="_blank" rel="noopener noreferrer">systemd.service — Type=notify, WatchdogSec</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://github.com/mavlink-router/mavlink-router" target="_blank" rel="noopener noreferrer">mavlink-router — source code (GitHub)</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://github.com/bluenviron/mavp2p" target="_blank" rel="noopener noreferrer">mavp2p — source code (GitHub)</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://ardupilot.org/mavproxy/" target="_blank" rel="noopener noreferrer">MAVProxy — Documentation</a> <span class="gc-tag" data-state="info">primary</span></li></ul>
+<h2>Задачі з числовою відповіддю</h2>
+<uav-tasks src="../tasks/comp-raspberry.json" module="comp-raspberry"></uav-tasks>
+<h2>Перевір себе</h2>
+<uav-quiz src="../quiz/comp-raspberry.json" module="comp-raspberry"></uav-quiz>
+      </div>
+      <div class="module-done"><gc-button variant="secondary" data-done-toggle="comp-raspberry">Позначити як пройдений</gc-button></div>
+      <section class="related" aria-label="Суміжні модулі"><p class="gc-label gc-muted">Суміжні модулі</p><div class="gc-grid ref-grid"><a class="gc-card" href="comp-mavlink.html"><strong>MAVLink і MAVSDK</strong><div class="gc-card__meta"><span class="gc-tag" title="L2 — Интегратор">L2</span></div></a><a class="gc-card" href="ap-companion.html"><strong>Companion + ArduPilot: керування з коду</strong><div class="gc-card__meta"><span class="gc-tag" title="L3 — Специалист">L3</span></div></a></div></section>
+      <nav class="pager" aria-label="Сусідні модулі" data-track-pager><a class="gc-card pager__prev" href="emb-protocols.html"><span class="gc-label gc-muted">Назад · трек</span><br>UART, I2C, SPI, CAN на рівні сигналів і драйверів</a><a class="gc-card pager__next" href="mav-routing.html"><span class="gc-label gc-muted">Далі · трек</span><br>Маршрутизація та транспорт MAVLink: радіо, 4G, кілька GCS</a></nav><nav class="pager" aria-label="Сусідні кроки шляху ArduPilot" data-path-pager="ardupilot" hidden><a class="gc-card pager__prev" href="emb-protocols.html?path=ardupilot"><span class="gc-label gc-muted">Назад · шлях ArduPilot</span><br>UART, I2C, SPI, CAN на рівні сигналів і драйверів</a><a class="gc-card pager__next" href="ap-companion.html?path=ardupilot"><span class="gc-label gc-muted">Далі · крок 54 з 69</span><br>Companion + ArduPilot: керування з коду</a></nav>
+    </article>
+  </main>
+  <footer class="gc-container site-footer gc-muted">
+    <p>Відкритий курс · <a href="https://github.com/irreligious86/UAV-Education">вихідний код на GitHub</a> · <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">план розвитку</a> · <a href="../../curriculum/curriculum.html">для розробника</a> · CC BY-NC-SA 4.0</p>
+  </footer>
+</body>
+</html>

@@ -3,51 +3,51 @@
   "pass": 80,
   "questions": [
     {
-      "q": "Что делает MicroXRCEAgent?",
+      "q": "Що робить MicroXRCEAgent?",
       "options": [
-        "Калибрует датчики по ROS 2",
-        "Мост uORB ↔ DDS",
-        "Летает",
-        "Заменяет QGC"
+        "Калібрує датчики за ROS 2",
+        "Міст uORB ↔ DDS",
+        "Літає",
+        "Замінює QGC"
       ],
       "answer": 1,
-      "explain": "Клиент — на полётнике, агент — на companion/ПК."
+      "explain": "Клієнт — на польотному контролері, агент — на companion/ПК."
     },
     {
-      "q": "Какое сообщение должно идти потоком до перехода в Offboard?",
+      "q": "Яке повідомлення має йти потоком до переходу в Offboard?",
       "options": [
         "TrajectorySetpoint",
         "OffboardControlMode",
-        "VehicleAttitude с текущей ориентацией",
+        "VehicleAttitude з поточною орієнтацією",
         "VehicleCommand"
       ],
       "answer": 1,
-      "explain": "Иначе PX4 не переключится и не заармится в Offboard."
+      "explain": "Інакше PX4 не перемкнеться і не заармиться в Offboard."
     },
     {
-      "q": "При какой частоте OffboardControlMode PX4 выходит из Offboard?",
+      "q": "За якої частоти OffboardControlMode PX4 виходить з Offboard?",
       "options": [
-        "Ниже ~2 Гц",
-        "Ниже 50 Гц",
-        "Ниже 0.1 Гц",
-        "Никогда"
+        "Нижче ~2 Гц",
+        "Нижче 50 Гц",
+        "Нижче 0.1 Гц",
+        "Ніколи"
       ],
       "answer": 0,
-      "explain": "Таймаут — защита от замолчавшего companion."
+      "explain": "Таймаут — захист від companion, що замовк."
     },
     {
-      "q": "Что важно про ветку px4_msgs?",
+      "q": "Що важливо щодо гілки px4_msgs?",
       "options": [
-        "Только ветка main",
-        "Под версию PX4",
-        "Любая",
-        "Не нужна"
+        "Лише гілка main",
+        "Під версію PX4",
+        "Будь-яка",
+        "Не потрібна"
       ],
       "answer": 1,
-      "explain": "Иначе несовпадение определений сообщений."
+      "explain": "Інакше визначення повідомлень не збігаються."
     },
     {
-      "q": "Как в ROS 2 называются топики из PX4?",
+      "q": "Як у ROS 2 називаються топіки з PX4?",
       "options": [
         "/px4/*",
         "/fmu/out/*",
@@ -55,10 +55,10 @@
         "/mavlink/*"
       ],
       "answer": 1,
-      "explain": "В PX4 — /fmu/in/*."
+      "explain": "У PX4 — /fmu/in/*."
     },
     {
-      "q": "Высота 3 м в TrajectorySetpoint (NED) — это Z = …",
+      "q": "Висота 3 м у TrajectorySetpoint (NED) — це Z = …",
       "options": [
         "+3",
         "−3",
@@ -66,29 +66,29 @@
         "+300"
       ],
       "answer": 1,
-      "explain": "Z вниз."
+      "explain": "Z униз."
     },
     {
-      "q": "Z = −5 в TrajectorySetpoint означает:",
+      "q": "Z = −5 у TrajectorySetpoint означає:",
       "options": [
-        "5 м вниз",
-        "5 м вверх",
-        "Ошибку",
-        "5 м/с вниз"
+        "5 м униз",
+        "5 м угору",
+        "Помилку",
+        "5 м/с униз"
       ],
       "answer": 1,
-      "explain": "NED: ось Z направлена вниз."
+      "explain": "NED: вісь Z спрямована вниз."
     },
     {
-      "q": "Какой QoS нужен подписчику на /fmu/out/*?",
+      "q": "Який QoS потрібен підписникові на /fmu/out/*?",
       "options": [
         "RELIABLE",
         "BEST_EFFORT",
-        "Только TRANSIENT_LOCAL",
-        "Любой"
+        "Лише TRANSIENT_LOCAL",
+        "Будь-який"
       ],
       "answer": 1,
-      "explain": "Несовпадение QoS = топик «молчит»."
+      "explain": "Розбіжність QoS = топік «мовчить»."
     }
   ]
 }

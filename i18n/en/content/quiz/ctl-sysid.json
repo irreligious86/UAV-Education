@@ -1,0 +1,94 @@
+{
+  "module": "ctl-sysid",
+  "pass": 80,
+  "questions": [
+    {
+      "q": "What is a chirp?",
+      "options": [
+        "A short throttle pulse on all motors",
+        "A 10-degree angle step",
+        "White noise at the mixer input",
+        "A sine wave with rising frequency"
+      ],
+      "answer": 3,
+      "explain": "The frequency rises from f₀ to f₁ — energy at every frequency in the range, one after another."
+    },
+    {
+      "q": "How do you estimate the frequency response from a recording?",
+      "options": [
+        "Cross-spectrum / input spectrum",
+        "Divide the output by the input in the time domain",
+        "Take the maximum of the gyro signal",
+        "Compute the average over the whole flight"
+      ],
+      "answer": 0,
+      "explain": "H = (Y·U*) / |U|², averaged over frequency bands."
+    },
+    {
+      "q": "How does a delay τ show up on a Bode plot?",
+      "options": [
+        "It lowers the gain equally at all frequencies",
+        "It shifts the gain corner to the right",
+        "It adds phase that grows with frequency",
+        "It doesn't show up on it at all"
+      ],
+      "answer": 2,
+      "explain": "e^(−sτ): gain 1, phase −360°·f·τ."
+    },
+    {
+      "q": "What's the danger of a “setpoint → output” estimate in a closed loop?",
+      "options": [
+        "None; for a linear system it's the same thing",
+        "The model will include the controller, not the plant",
+        "It can't be computed in NumPy",
+        "It needs twice as much data"
+      ],
+      "answer": 1,
+      "explain": "The plant input must be the actual signal into the plant — the controller or mixer output."
+    },
+    {
+      "q": "What does a drop in coherence indicate?",
+      "options": [
+        "Noise, nonlinearity or an outside input",
+        "That the estimate at these frequencies is perfectly linear",
+        "That the delay is zero",
+        "Motors overheating in flight"
+      ],
+      "answer": 0,
+      "explain": "The output is no longer explained linearly by the input — don't trust the estimate at these frequencies."
+    },
+    {
+      "q": "How much phase will an 80 Hz filter take away at 20 Hz?",
+      "options": [
+        "About 45°",
+        "About 2°",
+        "About 14°",
+        "About 80°"
+      ],
+      "answer": 2,
+      "explain": "arctan(20/80) ≈ 14°."
+    },
+    {
+      "q": "Why did the fit give τ ≈ 9 ms instead of 10 ms?",
+      "options": [
+        "A bug in the fitting code",
+        "Noise always reduces the delay",
+        "The chirp was too long",
+        "Sampling: half a step of delay"
+      ],
+      "answer": 3,
+      "explain": "The model is continuous, the data are discrete with a 2.5 ms step."
+    },
+    {
+      "q": "What is needed to enter SYSID in ArduCopter?",
+      "options": [
+        "SID_MAGNITUDE greater than 1",
+        "A nonzero SID_AXIS",
+        "AUTOTUNE mode before it",
+        "A GCS connected over USB"
+      ],
+      "answer": 1,
+      "explain": "With SID_AXIS = 0, entering the mode is not allowed."
+    }
+  ]
+}

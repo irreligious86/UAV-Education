@@ -3,18 +3,18 @@
   "pass": 80,
   "questions": [
     {
-      "q": "Что такое запас по фазе?",
+      "q": "What is the phase margin?",
       "options": [
-        "Разница между P и D",
-        "Градусы до −180° на срезе",
-        "Задержка ESC в градусах фазы",
-        "Ширина notch"
+        "The difference between P and D",
+        "The degrees remaining to −180° at crossover",
+        "ESC delay in degrees of phase",
+        "The notch width"
       ],
       "answer": 1,
-      "explain": "Сколько градусов до −180° на частоте единичного усиления: 45–60° — хороший тюн, 0 — незатухающие колебания."
+      "explain": "How many degrees remain to −180° at the unity-gain frequency: 45–60° is a good tune, 0 means sustained oscillations."
     },
     {
-      "q": "Как чистая задержка 5 мс влияет на фазу на 50 Гц?",
+      "q": "How does a 5 ms pure delay affect the phase at 50 Hz?",
       "options": [
         "0°",
         "−45°",
@@ -25,7 +25,7 @@
       "explain": "−360°·f·T_d = −360·50·0.005 = −90°."
     },
     {
-      "q": "Overshoot при ζ = 0.7:",
+      "q": "Overshoot at ζ = 0.7:",
       "options": [
         "~0%",
         "~5%",
@@ -36,59 +36,59 @@
       "explain": "exp(−πζ/√(1−ζ²)) ≈ 4.6%."
     },
     {
-      "q": "Большой bounce-back указывает на:",
+      "q": "Large bounce-back indicates:",
       "options": [
-        "Много I",
-        "Мало демпфирования",
-        "Мало FF",
-        "Большой motor_poles"
+        "Too much I",
+        "Too little damping",
+        "Too little FF",
+        "A large motor_poles"
       ],
       "answer": 1,
-      "explain": "Мало D или много задержки: недодемпфированный полюс, возбуждённый ступенькой вниз."
+      "explain": "Too little D or too much delay: an underdamped pole excited by a downward step."
     },
     {
-      "q": "Почему внутренний контур должен быть быстрее внешнего?",
+      "q": "Why must the inner loop be faster than the outer one?",
       "options": [
-        "Ради экономии процессорного времени",
-        "Иначе каскад раскачается",
-        "Так проще",
-        "Ради телеметрии"
+        "To save CPU time",
+        "Otherwise the cascade will oscillate",
+        "It's simpler that way",
+        "For telemetry"
       ],
       "answer": 1,
-      "explain": "Иначе внешний контур видит динамику внутреннего. Правило 3–10× по полосе."
+      "explain": "Otherwise the outer loop sees the inner loop's dynamics. The rule is 3–10× in bandwidth."
     },
     {
-      "q": "Какой единственный способ поднять P без осцилляций?",
+      "q": "What is the only way to raise P without oscillations?",
       "options": [
-        "Поднять FF вместе с P",
-        "Снизить задержку",
-        "Поднять I",
-        "Снизить fs"
+        "Raise FF together with P",
+        "Reduce the delay",
+        "Raise I",
+        "Lower fs"
       ],
       "answer": 1,
-      "explain": "Задержка задаёт предел запаса по фазе."
+      "explain": "The delay sets the limit on the phase margin."
     },
     {
-      "q": "Медленные колебания 0.5–3 Гц — признак:",
+      "q": "Slow oscillations at 0.5–3 Hz are a sign of:",
       "options": [
-        "Алиасинг от низкой частоты логов",
-        "Много I или быстрый внешний",
-        "Резонанс рамы",
-        "Много D"
+        "Aliasing from a low logging rate",
+        "Too much I or a fast outer loop",
+        "Frame resonance",
+        "Too much D"
       ],
       "answer": 1,
-      "explain": "Интегратор даёт −90° на низких частотах."
+      "explain": "An integrator gives −90° at low frequencies."
     },
     {
-      "q": "Что даёт feedforward в контуре?",
+      "q": "What does feedforward give the loop?",
       "options": [
-        "Быстрый отклик на изменение уставки без ожидания ошибки",
-        "Устраняет шум гироскопа",
-        "Увеличивает запас по фазе вдвое",
-        "Заменяет I-составляющую"
+        "A fast response to setpoint changes without waiting for an error",
+        "It removes gyro noise",
+        "It doubles the phase margin",
+        "It replaces the I-term"
       ],
       "answer": 0,
-      "explain": "FF подаёт команду из самой уставки; регулятор догоняет только остаток ошибки."
+      "explain": "FF derives the command from the setpoint itself; the controller only catches up with the residual error."
     }
   ]
 }

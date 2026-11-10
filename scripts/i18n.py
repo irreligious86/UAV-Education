@@ -37,10 +37,27 @@ def _load(path: Path) -> dict[str, str]:
     return {k: v for k, v in data.items() if isinstance(v, str) and v.strip() and not k.startswith("@")}
 
 
+def chain(lang: str) -> list[str]:
+    """The language and its fallbacks, nearest first, without the source: ["uk-galych", "uk"]."""
+    out = []
+    while lang and lang != SOURCE and lang not in out:
+        out.append(lang)
+        lang = BY_CODE[lang].get("fallback")
+    return out
+
+
+def own_catalog(lang: str, name: str = "ui") -> dict[str, str]:
+    return {} if lang == SOURCE else _load(I18N / lang / f"{name}.json")
+
+
 def catalog(lang: str, name: str = "ui") -> dict[str, str]:
+    """Translations of `lang` merged over its fallback languages' (a dialect inherits its standard language)."""
     key = f"{lang}/{name}"
     if key not in _catalogs:
-        _catalogs[key] = {} if lang == SOURCE else _load(I18N / lang / f"{name}.json")
+        merged: dict[str, str] = {}
+        for code in reversed(chain(lang)):
+            merged.update(own_catalog(code, name))
+        _catalogs[key] = merged
     return _catalogs[key]
 
 
@@ -128,12 +145,21 @@ if _os.environ.get("UAV_I18N_ALLOW"):
     _ALLOW = {ln.strip() for ln in Path(_os.environ["UAV_I18N_ALLOW"]).read_text(encoding="utf-8").splitlines() if ln.strip()}
 
 
-def translated_path(src: Path, code: str | None = None) -> Path:
-    """i18n/<lang>/content/... counterpart of content/... (or of any path under the repo)."""
+def own_translated_path(src: Path, code: str | None = None) -> Path:
+    """i18n/<lang>/content/... counterpart of content/... for exactly this language (no fallback)."""
     p = I18N / (code or _lang) / src.resolve().relative_to(ROOT)
     if _ALLOW is not None and p.relative_to(ROOT).as_posix() not in _ALLOW:
         return I18N / "_not_in_snapshot" / p.relative_to(I18N)
     return p
+
+
+def translated_path(src: Path, code: str | None = None) -> Path:
+    """The nearest existing translation along the fallback chain; the language's own path if there is none."""
+    for c in chain(code or _lang):
+        p = own_translated_path(src, c)
+        if p.is_file():
+            return p
+    return own_translated_path(src, code)
 
 
 def placeholders(s: str) -> set[str]:

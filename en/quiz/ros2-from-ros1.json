@@ -3,43 +3,43 @@
   "pass": 80,
   "questions": [
     {
-      "q": "Чего нет в ROS 2 по сравнению с ROS 1?",
+      "q": "What does ROS 2 lack compared to ROS 1?",
       "options": [
         "roscore",
-        "Топиков",
+        "Topics",
         "tf2",
-        "Сервисов"
+        "Services"
       ],
       "answer": 0,
-      "explain": "DDS discovery без единой точки отказа."
+      "explain": "DDS discovery with no single point of failure."
     },
     {
-      "q": "Цикл while с rate.sleep() в ROS 2 заменяют:",
+      "q": "In ROS 2, a while loop with rate.sleep() is replaced by:",
       "options": [
-        "Таймером",
-        "Тем же циклом",
-        "Сервисом",
+        "A timer",
+        "The same loop",
+        "A service",
         "Lifecycle"
       ],
       "answer": 0,
       "explain": "create_timer + spin."
     },
     {
-      "q": "Синхронный вызов сервиса в колбэке однопоточного узла приводит к:",
+      "q": "A synchronous service call in a callback of a single-threaded node leads to:",
       "options": [
-        "Взаимной блокировке",
-        "Ускорению",
-        "Ничему",
-        "Ошибке QoS при ответе"
+        "A deadlock",
+        "A speedup",
+        "Nothing",
+        "A QoS error on the response"
       ],
       "answer": 0,
-      "explain": "Используйте call_async."
+      "explain": "Use call_async."
     },
     {
-      "q": "Система сборки ROS 2:",
+      "q": "The ROS 2 build system:",
       "options": [
         "ament + colcon",
-        "make и setup.py, как в ROS 1",
+        "make and setup.py, as in ROS 1",
         "rosbuild",
         "catkin_make"
       ],
@@ -47,29 +47,29 @@
       "explain": "package.xml format 3."
     },
     {
-      "q": "Параметр в ROS 2 перед использованием нужно:",
+      "q": "Before using a parameter in ROS 2 you must:",
       "options": [
-        "Объявить в узле",
-        "Записать в roscore",
-        "Опубликовать",
-        "Ничего"
+        "Declare it in the node",
+        "Write it to roscore",
+        "Publish it",
+        "Nothing"
       ],
       "answer": 0,
-      "explain": "Параметры принадлежат узлу."
+      "explain": "Parameters belong to a node."
     },
     {
       "q": "ROS 1 Noetic:",
       "options": [
-        "Без поддержки с 2025",
-        "LTS до 2030 года",
-        "Устарел в 2020",
-        "Поддерживается до выхода Jazzy LTS"
+        "Out of support since 2025",
+        "LTS until 2030",
+        "Deprecated in 2020",
+        "Supported until the Jazzy LTS release"
       ],
       "answer": 0,
-      "explain": "Перенос — правильный путь для живого кода."
+      "explain": "Porting is the right path for living code."
     },
     {
-      "q": "Сконвертировать .bag ROS 1 в ROS 2:",
+      "q": "To convert a ROS 1 .bag to ROS 2:",
       "options": [
         "rosbags-convert",
         "ros1_bridge",
@@ -77,18 +77,18 @@
         "tf2_echo"
       ],
       "answer": 0,
-      "explain": "Пакет rosbags на чистом Python."
+      "explain": "The rosbags package, pure Python."
     },
     {
-      "q": "Первое, что читать в незнакомом ROS 1 проекте:",
+      "q": "The first thing to read in an unfamiliar ROS 1 project:",
       "options": [
-        "Launch-файлы",
-        "Все .cpp подряд",
-        "Только README",
-        "CMakeLists целиком"
+        "The launch files",
+        "Every .cpp file in a row",
+        "Only the README",
+        "The whole CMakeLists"
       ],
       "answer": 0,
-      "explain": "Launch показывает узлы, параметры и remap-ы."
+      "explain": "Launch shows the nodes, parameters and remaps."
     }
   ]
 }

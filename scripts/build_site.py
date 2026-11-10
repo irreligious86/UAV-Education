@@ -1603,7 +1603,10 @@ def main() -> None:
             ok = sum(1 for v in st.values() if v == "ok")
             stale = sum(1 for v in st.values() if v == "stale")
             miss = len(i18n.missing.get(l["code"], ()))
-            stats.append(f"  /{l['dir']}/: modules translated {ok}/{n_pub}" + (f" ({stale} stale)" if stale else "")
+            own = sum(1 for m in model["modules"].values() if m["status"] == "published"
+                      and i18n.own_translated_path(ROOT / m["articleMeta"]["sourceFile"], l["code"]).is_file())
+            via = f" ({own} own, the rest from {l['fallback']})" if l.get("fallback") else ""
+            stats.append(f"  /{l['dir']}/: modules translated {ok}/{n_pub}{via}" + (f" ({stale} stale)" if stale else "")
                          + f", interface strings missing {miss}")
     i18n.set_lang(i18n.SOURCE)
     write_pwa()

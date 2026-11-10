@@ -1,0 +1,47 @@
+{
+ "module": "ctl-sysid",
+ "tasks": [
+  {
+   "id": "corner",
+   "title": "Corner frequency",
+   "statement": "The motor time constant in a first-order model is **{T} ms**. Find the corner frequency (Hz).",
+   "params": {
+    "T": {
+     "min": 10,
+     "max": 60,
+     "step": 2
+    }
+   },
+   "answer": "1000/(2*math.pi*T)",
+   "unit": "Hz",
+   "tol": 0.03,
+   "solution": "f = 1/(2π·T)."
+  },
+  {
+   "id": "phase",
+   "title": "Filter and delay phase",
+   "statement": "At **{f} Hz**, find the phase lag (in degrees, as a positive number) from a PT1 filter with a cutoff frequency of **{fc} Hz** and a pure delay of **{tau} ms** combined.",
+   "params": {
+    "f": {
+     "min": 10,
+     "max": 40,
+     "step": 5
+    },
+    "fc": {
+     "min": 40,
+     "max": 200,
+     "step": 10
+    },
+    "tau": {
+     "min": 2,
+     "max": 15,
+     "step": 1
+    }
+   },
+   "answer": "math.degrees(math.atan(f/fc))+360*f*tau/1000",
+   "unit": "°",
+   "tol": 0.03,
+   "solution": "PT1: arctan(f/f_c); delay: 360°·f·τ."
+  }
+ ]
+}

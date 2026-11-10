@@ -1,0 +1,83 @@
+{
+ "module": "ctl-guidance",
+ "tasks": [
+  {
+   "id": "l1",
+   "title": "L1 lookahead distance",
+   "statement": "ArduPlane: ground speed **{v} m/s**, `NAVL1_PERIOD` = **{T}**, `NAVL1_DAMPING` = **{z}**. Find L1 (m).",
+   "params": {
+    "v": {
+     "min": 12,
+     "max": 30,
+     "step": 1
+    },
+    "T": {
+     "min": 10,
+     "max": 25,
+     "step": 1
+    },
+    "z": [
+     0.7,
+     0.75,
+     0.8
+    ]
+   },
+   "answer": "(1/math.pi)*z*T*v",
+   "unit": "m",
+   "tol": 0.03,
+   "solution": "L1 = (1/π)·ζ·T·V."
+  },
+  {
+   "id": "pp",
+   "title": "Pure pursuit lateral acceleration",
+   "statement": "Speed **{v} m/s**, lookahead distance **{L} m**, angle to the lookahead point **{a}°**. Find the lateral acceleration (m/s²).",
+   "params": {
+    "v": {
+     "min": 5,
+     "max": 20,
+     "step": 1
+    },
+    "L": {
+     "min": 10,
+     "max": 60,
+     "step": 5
+    },
+    "a": {
+     "min": 5,
+     "max": 40,
+     "step": 5
+    }
+   },
+   "answer": "2*v**2*math.sin(math.radians(a))/L",
+   "unit": "m/s²",
+   "tol": 0.03,
+   "solution": "a = 2·V²·sin α / L."
+  },
+  {
+   "id": "trap",
+   "title": "Trapezoidal move time",
+   "statement": "Move of **{D} m**, velocity limit **{v} m/s**, acceleration **{a} m/s²** (acceleration and deceleration are equal; the distance is long enough to reach the limit). Find the move time (s).",
+   "params": {
+    "D": {
+     "min": 80,
+     "max": 200,
+     "step": 10
+    },
+    "v": {
+     "min": 5,
+     "max": 12,
+     "step": 1
+    },
+    "a": {
+     "min": 2,
+     "max": 6,
+     "step": 1
+    }
+   },
+   "answer": "D/v+v/a",
+   "unit": "s",
+   "tol": 0.03,
+   "solution": "Acceleration v/a, deceleration v/a, covering v²/a between them; cruise (D − v²/a)/v. Total D/v + v/a."
+  }
+ ]
+}

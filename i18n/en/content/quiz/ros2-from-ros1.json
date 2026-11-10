@@ -1,0 +1,94 @@
+{
+  "module": "ros2-from-ros1",
+  "pass": 80,
+  "questions": [
+    {
+      "q": "What does ROS 2 lack compared to ROS 1?",
+      "options": [
+        "roscore",
+        "Topics",
+        "tf2",
+        "Services"
+      ],
+      "answer": 0,
+      "explain": "DDS discovery with no single point of failure."
+    },
+    {
+      "q": "In ROS 2, a while loop with rate.sleep() is replaced by:",
+      "options": [
+        "A timer",
+        "The same loop",
+        "A service",
+        "Lifecycle"
+      ],
+      "answer": 0,
+      "explain": "create_timer + spin."
+    },
+    {
+      "q": "A synchronous service call in a callback of a single-threaded node leads to:",
+      "options": [
+        "A deadlock",
+        "A speedup",
+        "Nothing",
+        "A QoS error on the response"
+      ],
+      "answer": 0,
+      "explain": "Use call_async."
+    },
+    {
+      "q": "The ROS 2 build system:",
+      "options": [
+        "ament + colcon",
+        "make and setup.py, as in ROS 1",
+        "rosbuild",
+        "catkin_make"
+      ],
+      "answer": 0,
+      "explain": "package.xml format 3."
+    },
+    {
+      "q": "Before using a parameter in ROS 2 you must:",
+      "options": [
+        "Declare it in the node",
+        "Write it to roscore",
+        "Publish it",
+        "Nothing"
+      ],
+      "answer": 0,
+      "explain": "Parameters belong to a node."
+    },
+    {
+      "q": "ROS 1 Noetic:",
+      "options": [
+        "Out of support since 2025",
+        "LTS until 2030",
+        "Deprecated in 2020",
+        "Supported until the Jazzy LTS release"
+      ],
+      "answer": 0,
+      "explain": "Porting is the right path for living code."
+    },
+    {
+      "q": "To convert a ROS 1 .bag to ROS 2:",
+      "options": [
+        "rosbags-convert",
+        "ros1_bridge",
+        "colcon",
+        "tf2_echo"
+      ],
+      "answer": 0,
+      "explain": "The rosbags package, pure Python."
+    },
+    {
+      "q": "The first thing to read in an unfamiliar ROS 1 project:",
+      "options": [
+        "The launch files",
+        "Every .cpp file in a row",
+        "Only the README",
+        "The whole CMakeLists"
+      ],
+      "answer": 0,
+      "explain": "Launch shows the nodes, parameters and remaps."
+    }
+  ]
+}

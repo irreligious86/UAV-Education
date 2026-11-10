@@ -1,0 +1,42 @@
+{
+ "module": "ctl-theory",
+ "tasks": [
+  {
+   "id": "overshoot",
+   "title": "Overshoot from the damping ratio",
+   "statement": "A second-order system with ζ = **{z}**. Find the step-response overshoot (%).",
+   "params": {
+    "z": {
+     "min": 0.2,
+     "max": 0.9,
+     "step": 0.05
+    }
+   },
+   "answer": "100*math.exp(-math.pi*z/math.sqrt(1-z*z))",
+   "unit": "%",
+   "tol": 0.02,
+   "solution": "Overshoot = exp(−π·ζ/√(1−ζ²)). ζ ≈ 0.7 gives about 5 %, the target for the rate loop; 0.3 already gives 37 %, ringing."
+  },
+  {
+   "id": "settling",
+   "title": "Settling time",
+   "statement": "ζ = **{z}**, natural frequency ωₙ = **{w} rad/s**. Estimate the settling time (s, 2 % criterion).",
+   "params": {
+    "z": {
+     "min": 0.3,
+     "max": 0.9,
+     "step": 0.05
+    },
+    "w": {
+     "min": 10,
+     "max": 120,
+     "step": 5
+    }
+   },
+   "answer": "4/(z*w)",
+   "unit": "s",
+   "tol": 0.02,
+   "solution": "t_s ≈ 4/(ζ·ωₙ): the envelope decays as exp(−ζωₙt) and reaches 2 % within four time constants."
+  }
+ ]
+}

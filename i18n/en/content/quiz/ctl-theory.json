@@ -1,0 +1,94 @@
+{
+  "module": "ctl-theory",
+  "pass": 80,
+  "questions": [
+    {
+      "q": "What is the phase margin?",
+      "options": [
+        "The difference between P and D",
+        "The degrees remaining to −180° at crossover",
+        "ESC delay in degrees of phase",
+        "The notch width"
+      ],
+      "answer": 1,
+      "explain": "How many degrees remain to −180° at the unity-gain frequency: 45–60° is a good tune, 0 means sustained oscillations."
+    },
+    {
+      "q": "How does a 5 ms pure delay affect the phase at 50 Hz?",
+      "options": [
+        "0°",
+        "−45°",
+        "−90°",
+        "−180°"
+      ],
+      "answer": 2,
+      "explain": "−360°·f·T_d = −360·50·0.005 = −90°."
+    },
+    {
+      "q": "Overshoot at ζ = 0.7:",
+      "options": [
+        "~0%",
+        "~5%",
+        "~16%",
+        "~37%"
+      ],
+      "answer": 1,
+      "explain": "exp(−πζ/√(1−ζ²)) ≈ 4.6%."
+    },
+    {
+      "q": "Large bounce-back indicates:",
+      "options": [
+        "Too much I",
+        "Too little damping",
+        "Too little FF",
+        "A large motor_poles"
+      ],
+      "answer": 1,
+      "explain": "Too little D or too much delay: an underdamped pole excited by a downward step."
+    },
+    {
+      "q": "Why must the inner loop be faster than the outer one?",
+      "options": [
+        "To save CPU time",
+        "Otherwise the cascade will oscillate",
+        "It's simpler that way",
+        "For telemetry"
+      ],
+      "answer": 1,
+      "explain": "Otherwise the outer loop sees the inner loop's dynamics. The rule is 3–10× in bandwidth."
+    },
+    {
+      "q": "What is the only way to raise P without oscillations?",
+      "options": [
+        "Raise FF together with P",
+        "Reduce the delay",
+        "Raise I",
+        "Lower fs"
+      ],
+      "answer": 1,
+      "explain": "The delay sets the limit on the phase margin."
+    },
+    {
+      "q": "Slow oscillations at 0.5–3 Hz are a sign of:",
+      "options": [
+        "Aliasing from a low logging rate",
+        "Too much I or a fast outer loop",
+        "Frame resonance",
+        "Too much D"
+      ],
+      "answer": 1,
+      "explain": "An integrator gives −90° at low frequencies."
+    },
+    {
+      "q": "What does feedforward give the loop?",
+      "options": [
+        "A fast response to setpoint changes without waiting for an error",
+        "It removes gyro noise",
+        "It doubles the phase margin",
+        "It replaces the I-term"
+      ],
+      "answer": 0,
+      "explain": "FF derives the command from the setpoint itself; the controller only catches up with the residual error."
+    }
+  ]
+}

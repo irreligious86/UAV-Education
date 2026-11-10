@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="uk-galych" data-theme="dark" data-lang="uk-galych">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Вибір компонентів під задачу та бюджет — UAV Student</title>
+  <meta name="description" content="сформулювати задачу апарата в числах: маса навантаження, час, дальність, швидкість, бюджет підібрати раму, мотори, пропелери, ESC, АКБ і FC під задачу з обґрунтуванням за таблицями оцінити компроміси: ціна, маса, запас, доступність, ремонтопридатність">
+  <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
+  <link rel="manifest" href="../../manifest.webmanifest">
+  <meta name="theme-color" content="#0b0f14">
+  <link rel="alternate" hreflang="ru" href="../../m/f-components-choice.html">
+  <link rel="alternate" hreflang="uk" href="../../uk/m/f-components-choice.html">
+  <link rel="alternate" hreflang="en" href="../../en/m/f-components-choice.html">
+  <link rel="alternate" hreflang="uk-galych" href="../../gal/m/f-components-choice.html">
+  <script>/* go to the visitor's chosen language before anything paints (assets/i18n.js) */(function(){try{var c=localStorage.getItem('uav-lang'),h=document.documentElement.getAttribute('data-lang');if(!c||c===h||/[?&]lang=keep\b/.test(location.search))return;var l=document.querySelector('link[rel=alternate][hreflang="'+c+'"]');if(l)location.replace(l.href+location.search+location.hash)}catch(e){}})();</script>
+  <link rel="stylesheet" href="../../lib/ground-control-ui/dist/ground-control.css">
+  <link rel="stylesheet" href="../../assets/site.css">
+  <script src="../../lib/ground-control-ui/dist/ground-control.js" defer></script>
+  <script src="../../assets/i18n/uk-galych.js"></script>
+  <script src="../../assets/i18n.js"></script>
+  <script src="../../assets/progress-store.js" defer></script>
+  <script src="../../assets/backend-config.js" defer></script>
+  <script src="../../assets/account.js" defer></script>
+  <script src="../../assets/grading.js" defer></script>
+  <script src="../../assets/app.js" defer></script>
+  <script src="../../assets/uav-quiz.js" defer></script>
+  <script src="../../assets/uav-tasks.js" defer></script>
+  <script src="../../assets/offline.js" defer></script>
+  <script src="../../assets/widgets/plot.js" defer></script>
+  <script src="../../assets/widgets/tw-calc.js" defer></script>
+</head>
+<body class="gc-root" data-base="../" data-root="../../">
+  <header class="site-header">
+    <div class="gc-container site-header__inner">
+      <a class="site-brand" href="../index.html"><span class="site-brand__mark" aria-hidden="true">◆</span> UAV Student</a>
+      <nav class="gc-nav" aria-label="Розділи сайту">
+        <a href="../index.html" aria-current="page">Курс</a>
+        <a href="../ref/index.html">Довідник</a>
+        <a href="../pages/glossary.html">Глосарій</a>
+        <a href="../pages/fails.html">Фейли</a>
+        <a href="../pages/search.html">Пошук</a>
+        <a href="../pages/progress.html">Мій прогрес</a>
+      </nav>
+      <nav class="lang-switch" aria-label="Мова"><a class="gc-tag" href="../../m/f-components-choice.html" data-lang-to="ru" hreflang="ru" lang="ru" title="Русский">RU</a><a class="gc-tag" href="../../uk/m/f-components-choice.html" data-lang-to="uk" hreflang="uk" lang="uk" title="Українська">UK</a><a class="gc-tag" href="../../en/m/f-components-choice.html" data-lang-to="en" hreflang="en" lang="en" title="English">EN</a><a class="gc-tag" href="../../gal/m/f-components-choice.html" data-lang-to="uk-galych" hreflang="uk-galych" lang="uk-galych" title="Галицька (експеримент)" aria-current="true" data-state="ok">GAL</a></nav>
+    </div>
+  </header>
+  <main class="gc-container site-main">
+    <article class="module" data-module-page="f-components-choice">
+      <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-foundation">Фундамент</a><span>Вибір компонентів під задачу та бюджет</span></p>
+      <h1 class="module-title">Вибір компонентів під задачу та бюджет</h1>
+      <div class="module-tags"><span class="gc-tag" title="Рівень">L1 — Оператор</span><span class="gc-tag">читання 35 хв</span><span class="gc-tag">навчання ~3 год</span><span class="gc-tag">любая прошивка</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ОПАНОВАНО</span></div>
+      <p class="gc-muted module-score" data-module-score></p>
+      <p class="module-lead">Вісімдесят відсотків реальної інженерної роботи — не налаштування, а вибір: що купити, щоб апарат розв&#x27;язував задачу, вкладався в бюджет і не розвалився. Модуль дає метод: задача в числах → клас апарата → рама і пропи → мотори та ESC → АКБ → FC і периферія → перевірка маси та T/W → дві альтернативи. З калькулятором T/W і часу польоту та з розбором двох специфікацій: 7&quot; далекий і 10&quot; вантажний.</p>
+      <div class="gc-callout" data-state="ok"><strong>Після модуля ти вмієш</strong><ul><li>сформулювати задачу апарата в числах: маса навантаження, час, дальність, швидкість, бюджет</li><li>підібрати раму, мотори, пропелери, ESC, АКБ і FC під задачу з обґрунтуванням за таблицями</li><li>оцінити компроміси: ціна, маса, запас, доступність, ремонтопридатність</li></ul></div><p class="gc-muted">Перед цим модулем: <a href="f-aero-props.html">Аеродинаміка пропелера та підбір силової установки</a>, <a href="f-power.html">Живлення: LiPo, Li-Ion, BEC</a>, <a href="f-motors-esc.html">Мотори, ESC і DShot</a></p><div class="gc-callout lab"><p class="gc-label gc-muted">Лабораторна</p><strong>Специфікація збірки</strong><p class="gc-muted lab__hint">Здано, коли позначено всі пункти:</p><ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="f-components-choice:lab:0"><span>Таблиця вимог у числах</span></label></li><li><label><input type="checkbox" data-check-id="f-components-choice:lab:1"><span>Специфікацію з цінами й масою, підсумкове T/W і час польоту пораховано</span></label></li><li><label><input type="checkbox" data-check-id="f-components-choice:lab:2"><span>Два альтернативні варіанти порівняно за критеріями</span></label></li></ul></div><div class="path-pos gc-muted"><span class="gc-label">На шляху</span><ul><li data-path-pos="betaflight"><a href="../path/betaflight.html">Betaflight</a>: крок 11 з 44 → <a href="tools-overview.html?path=betaflight">Інструменти: Configurator, GCS, git</a></li><li data-path-pos="ardupilot"><a href="../path/ardupilot.html">ArduPilot</a>: крок 11 з 69 → <a href="tools-overview.html?path=ardupilot">Інструменти: Configurator, GCS, git</a></li></ul></div>
+      <div class="gc-prose module-body">
+<h2>Теорія</h2>
+<h4 class="md-subheading">Крок 0: задача в числах</h4>
+<p>Поки задача звучить як «хочу літати далеко», вибирати нічого. Потрібні числа:</p>
+<div class="table-wrap md-table-wrap" tabindex="0"><table class="md-table"><thead><tr><th>Параметр</th><th>Приклад: далекий 7&quot;</th><th>Приклад: вантажний 10&quot;</th></tr></thead><tbody><tr><td data-label="Параметр">Корисне навантаження</td><td data-label="Приклад: далекий 7&quot;">камера 30 г</td><td data-label="Приклад: вантажний 10&quot;">вантаж 1000 г</td></tr><tr><td data-label="Параметр">Час польоту</td><td data-label="Приклад: далекий 7&quot;">≥ 15 хв</td><td data-label="Приклад: вантажний 10&quot;">≥ 12 хв із вантажем</td></tr><tr><td data-label="Параметр">Дальність</td><td data-label="Приклад: далекий 7&quot;">5 км</td><td data-label="Приклад: вантажний 10&quot;">1 км</td></tr><tr><td data-label="Параметр">Крейсерська швидкість</td><td data-label="Приклад: далекий 7&quot;">15–20 м/с</td><td data-label="Приклад: вантажний 10&quot;">8 м/с</td></tr><tr><td data-label="Параметр">Умови</td><td data-label="Приклад: далекий 7&quot;">вітер до 8 м/с</td><td data-label="Приклад: вантажний 10&quot;">вітер до 6 м/с</td></tr><tr><td data-label="Параметр">Бюджет</td><td data-label="Приклад: далекий 7&quot;">400 €</td><td data-label="Приклад: вантажний 10&quot;">700 €</td></tr><tr><td data-label="Параметр">Обмеження</td><td data-label="Приклад: далекий 7&quot;">маса &lt; 1 кг (категорія)</td><td data-label="Приклад: вантажний 10&quot;">складаний</td></tr></tbody></table></div>
+<p>Кожне число стане вимогою з ID в інженерній теці (наступний модуль).</p>
+<h4 class="md-subheading">Крок 1: клас і рама</h4>
+<p>Розмір пропа визначає все інше. Правило: маса навантаження і час задають потрібну ефективність (г/Вт), ефективність задає діаметр пропа (модуль про аеродинаміку): 5&quot; — 4–6 г/Вт, 7&quot; — 8–10, 10&quot; — 12–15, 15&quot; — 15–20. Тривале зависання з вантажем — великі пропи; швидкість і маневр — малі.</p>
+<p>Рама: карбон 3–5 мм на променях для 5–7&quot;, 5–6 мм або трубки для 10&quot;+. Дивитися: маса, вільне місце під АКБ і навантаження, захист електроніки, доступність запчастин (промінь має продаватися окремо), стек 20×20 або 30.5×30.5 мм.</p>
+<h4 class="md-subheading">Крок 2: мотори і пропи</h4>
+<p>З таблиці тяги виробника під вибраний проп і напругу: тяга під час зависання має припадати на 30–45% газу (запас на вітер і маневр) при струмі не вище 40% тривалого. Розмір мотора і KV: 7&quot; — 2806.5/2807 1300–1700 KV на 6S; 10&quot; — 3110/3115 600–900 KV на 6S; 15&quot; — 4008–4114 320–400 KV на 6S. Маса моторів — у бюджет маси.</p>
+<figure class="diagram" data-diagram="component-choice-tree"><div class="diagram__svg"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 204" width="100%" role="img" aria-labelledby="t" style="max-width:720px;display:block;margin:0 auto"><title id="t">Підбір силової установки</title><style>text{font-family: var(--gc-font-mono, ui-monospace, Menlo, monospace); font-size: 12px;fill:currentColor} .m{fill:var(--gc-ink-muted, #8a93a3)} .a{fill:var(--gc-accent-hud, #5ef1d2)} .w{fill:var(--gc-signal-amber, #f0b24c)} .d{fill:var(--gc-signal-red, #e8636b)} .box{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:currentColor;stroke-width:1.2} .boxa{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6} .ln{stroke:currentColor;stroke-width:1.2;fill:none} .lna{stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6;fill:none} .lnm{stroke:var(--gc-ink-muted, #8a93a3);stroke-width:1;fill:none;stroke-dasharray:4 3} .t{font-size:11px} .b{font-weight:600}</style><defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker><marker id="ara" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--gc-accent-hud, #5ef1d2)"/></marker></defs><text x="16" y="16" text-anchor="start" class="m t">Підбір силової установки</text><rect class="box" x="285.0" y="34" width="150.0" height="40" rx="6"/><text x="360.0" y="52.0" text-anchor="middle" style="font-size:10.5px">Задача → маса,</text><text x="360.0" y="64.0" text-anchor="middle" style="font-size:10.5px">T/W, час</text><path class="ln" d="M360.0 74 L360.0 94.0 L97.5 94.0 L97.5 114" marker-end="url(#ar)"/><text x="101.5" y="90.0" text-anchor="start" class="a t" style="font-size:10px">фристайл 5&quot;</text><rect class="box" x="22.5" y="114" width="150.0" height="40" rx="18"/><text x="97.5" y="132.0" text-anchor="middle" style="font-size:10.5px">T/W ≥ 5</text><text x="97.5" y="144.0" text-anchor="middle" style="font-size:10.5px">2207 1700–2300KV 6S</text><path class="ln" d="M360.0 74 L360.0 94.0 L272.5 94.0 L272.5 114" marker-end="url(#ar)"/><text x="276.5" y="90.0" text-anchor="start" class="a t" style="font-size:10px">long range 7&quot;</text><rect class="box" x="197.5" y="114" width="150.0" height="40" rx="18"/><text x="272.5" y="132.0" text-anchor="middle" style="font-size:10.5px">T/W 3–4</text><text x="272.5" y="144.0" text-anchor="middle" style="font-size:10.5px">2806.5 1300KV, Li-Ion</text><path class="ln" d="M360.0 74 L360.0 94.0 L447.5 94.0 L447.5 114" marker-end="url(#ar)"/><text x="451.5" y="90.0" text-anchor="start" class="a t" style="font-size:10px">вантажний 10–15&quot;</text><rect class="boxa" x="372.5" y="114" width="150.0" height="40" rx="18"/><text x="447.5" y="132.0" text-anchor="middle" class="b" style="font-size:10.5px">T/W 2–2.5</text><text x="447.5" y="144.0" text-anchor="middle" class="b" style="font-size:10.5px">4008 380KV, X8, Li-Ion</text><path class="ln" d="M360.0 74 L360.0 94.0 L622.5 94.0 L622.5 114" marker-end="url(#ar)"/><text x="626.5" y="90.0" text-anchor="start" class="a t" style="font-size:10px">крило</text><rect class="box" x="547.5" y="114" width="150.0" height="40" rx="18"/><text x="622.5" y="132.0" text-anchor="middle" style="font-size:10.5px">за V_s і крейсером</text><text x="622.5" y="144.0" text-anchor="middle" style="font-size:10.5px">тяга 0.4–0.6 ваги</text></svg></div><figcaption class="gc-muted">Орієнтири щодо силової установки для типових класів апаратів.</figcaption><div class="diagram__hint">Схему можно прокрутить по горизонтали</div></figure>
+<h4 class="md-subheading">Крок 3: ESC</h4>
+<p>Тривалий струм ESC ≥ 1.3 × максимальний струм мотора з таблиці; напруга із запасом (6S → ESC на 6S, а не «до 6S» на межі). 4-в-1 — компактно, але одна аварія = заміна всього; окремі ESC — ремонтопридатно, треба розводити живлення. Прошивка (BLHeli_32/AM32/BLHeli_S) визначає телеметрію і RPM-фільтр.</p>
+<h4 class="md-subheading">Крок 4: АКБ</h4>
+<p>Ємність зі струму: I_ср (з таблиці для крейсера/зависання × кількість моторів + борт) × t / 0.8. Хімія: LiPo — струм, Li-Ion — енергія на кілограм (але струмовіддача низька: типово 2–3C для 21700 з високою ємністю). Перевірка: маса АКБ вкладається в бюджет маси? Інакше — ітерація: важчий АКБ → більший струм → ще більший АКБ. Цей цикл збігається не завжди; якщо не зійшовся — міняти клас.</p>
+<h4 class="md-subheading">Крок 5: FC, приймач, відео, GPS</h4>
+<p>FC: F4 вистачає для Betaflight без зайвого, F7/H7 для INAV/ArduPilot з GPS, компасом і логами; кількість UART ≥ споживачів + 1; чорна скринька (флеш/SD) для налаштування за логами. Приймач: діапазон під дальність (900 МГц для 5+ км). Відео: аналог дешевий і живучий, цифра — якість і бюджет. GPS: із компасом на щоглі для INAV/ArduPilot.</p>
+<h4 class="md-subheading">Крок 6: бюджет маси і перевірка</h4>
+<p>Таблиця: деталь, маса, ціна. Підсумок: злітна маса → T/W за таблицею мотора → струм зависання → час польоту → порівняння з вимогами. Правило: якщо T/W &lt; 2 за повного навантаження — переробляти. Запас у бюджеті 15% на пропи, кріплення, дроти, ремонт.</p>
+<h4 class="md-subheading">Компроміси</h4>
+<ul><li><strong>Ціна vs маса</strong>: дешеві компоненти важчі; маса — це час польоту і струм.</li><li><strong>Ремонтопридатність</strong>: апарат на дрібних, доступних деталях живе довше за екзотику.</li><li><strong>Запас</strong>: 20% за струмом і тягою окупаються першим же вітряним днем.</li><li><strong>Доступність</strong>: деталь, якої не буде в наявності за пів року, — проблема під час першого ремонту.</li></ul>
+<p>Калькулятор нижче рахує T/W, струм зависання і час польоту за твоїми числами — використовуй його в кроці 6.</p>
+
+<h2>Практика</h2>
+<uav-tw-calc class="widget"></uav-tw-calc>
+<h4 class="md-subheading">Крок 1. Вимоги</h4>
+<p>Таблиця задачі в числах для своєї ідеї апарата (як у теорії), 8–12 рядків.</p>
+<h4 class="md-subheading">Крок 2. Специфікація</h4>
+<p>Таблиця компонентів: модель, маса, ціна, посилання на джерело даних (таблиця тяги, даташит). Підсумок за масою і ціною.</p>
+<h4 class="md-subheading">Крок 3. Розрахунок</h4>
+<p>Калькулятором: T/W, газ зависання, струм, час польоту. Порівняти з вимогами, записати, які виконано.</p>
+<h4 class="md-subheading">Крок 4. Альтернативи</h4>
+<p>Два варіанти (наприклад, 7&quot; Li-Ion vs 7&quot; LiPo; або 10&quot; квад vs 7&quot; з меншим вантажем) в одній таблиці за критеріями: час, ціна, маса, ремонтопридатність, ризик. Обґрунтувати вибір.</p>
+<h4 class="md-subheading">Розібраний розрахунок</h4>
+<p>Значення калькулятора за замовчуванням: маса 1400 г, 4 мотори по 1200 г максимальної тяги, 6.5 г/Вт під час зависання, 6S 4000 мА·год, борт 0.8 А.</p>
+<ul><li>T/W = 4 · 1200 / 1400 = 3.43, газ зависання ≈ 1 / 3.43 ≈ 29 %.</li><li>Потужність моторів під час зависання: 1400 г / 6.5 г/Вт ≈ 215 Вт; струм 215 / (6 · 3.7) + 0.8 ≈ 10.5 А.</li><li>Зависання на 80 % ємності: 4 · 0.8 / 10.5 · 60 ≈ 18 хвилин. У польоті з маневрами та вітром — на 20–40 % менше.</li><li>Додали 400 г вантажу (1800 г): T/W 2.67, газ 38 %, струм 13.3 А, зависання ≈ 14.5 хвилини. Ось ціна кожного грама у хвилинах польоту.</li></ul>
+<h4 class="md-subheading">Що записати і як перевірити себе</h4>
+<ul><li><strong>Таблиця вимог:</strong> у кожного рядка є число й одиниця вимірювання. «Літає довго» — не вимога, «≥ 15 хвилин зависання з вантажем 300 г» — вимога.</li><li><strong>Специфікація:</strong> у кожного компонента — джерело цифр: таблиця тяги виробника, даташит, зважування. Маса без дротів, роз&#x27;ємів і кріплення занижена на 5–10 %, це треба додати окремим рядком.</li><li><strong>Розрахунок:</strong> познач, які вимоги виконано, а які ні і наскільки. Якщо T/W нижче 2, в апарата немає запасу на вітер і маневр — змінюється специфікація, а не вимога.</li><li><strong>Альтернативи:</strong> таблиця з 4–6 критеріїв із вагами і підсумком. Вибір обґрунтовано числами, а не «подобається».</li></ul>
+<h4 class="md-subheading">Лабораторна</h4>
+<p>Специфікація з вимогами, розрахунком і порівнянням двох альтернатив — перший документ інженерної теки.</p>
+<p>Лабораторну зараховано, коли вимоги записано числами, у специфікації є ціни, маси і джерела даних, T/W і час польоту пораховано з урахуванням дротів і кріплення, а дві альтернативи порівняно за критеріями з обґрунтованим вибором.</p>
+
+<h2>Діагностика</h2>
+<div class="diag-groups"><article class="diag-item"><h4><strong>Симптом:</strong> розрахунок часу польоту не сходиться: АКБ зростає, час не зростає</h4><ul><li>Можлива причина: цикл маса → струм → маса розходиться; клас апарата замалий для задачі.</li><li>Що зробити: більший проп/рама або знизити вимоги.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> T/W на папері 3, а зависання на 60% газу</h4><ul><li>Можлива причина: таблиця тяги для іншої напруги або пропа; реальна маса вища.</li><li>Що зробити: переважити, перерахувати за своєю таблицею, перевірити напругу під навантаженням.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> не вистачає UART для всієї периферії</h4><ul><li>Можлива причина: FC вибрано без підрахунку портів.</li><li>Що зробити: FC з більшою кількістю UART або об&#x27;єднання функцій (наприклад, ESC-телеметрія через один порт).</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> бюджет перевищено вдвічі</h4><ul><li>Можлива причина: не враховано пропи, кріплення, зарядний пристрій, запчастини.</li><li>Що зробити: запас 15–20% у бюджеті, відкласти необов&#x27;язкове (цифрове відео) на наступну ітерацію.</li></ul></article></div>
+
+<h2>Чек-лист</h2>
+<ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="f-components-choice:0"><span>Задачу записано в числах, а не словами</span></label></li><li><label><input type="checkbox" data-check-id="f-components-choice:1"><span>Діаметр пропа вибрано з потрібної ефективності</span></label></li><li><label><input type="checkbox" data-check-id="f-components-choice:2"><span>Мотори вибрано за таблицею тяги: зависання на 30–45% газу</span></label></li><li><label><input type="checkbox" data-check-id="f-components-choice:3"><span>АКБ розраховано зі струму і часу, маса зійшлася</span></label></li><li><label><input type="checkbox" data-check-id="f-components-choice:4"><span>Дві альтернативи порівняно, вибір обґрунтовано</span></label></li></ul>
+
+<h2>Джерела</h2>
+<ul class="refs"><li><a href="https://ardupilot.org/copter/docs/choosing-a-frame.html" target="_blank" rel="noopener noreferrer">Choosing a MultiCopter Frame — ArduPilot Copter</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://m-selig.ae.illinois.edu/props/propDB.html" target="_blank" rel="noopener noreferrer">UIUC Propeller Database (efficiency data by diameter)</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://oscarliang.com/quadcopter-motor-propeller/" target="_blank" rel="noopener noreferrer">How to choose motors for FPV drones — Oscar Liang</a> <span class="gc-tag">secondary</span></li></ul>
+<h2>Задачі з числовою відповіддю</h2>
+<uav-tasks src="../tasks/f-components-choice.json" module="f-components-choice"></uav-tasks>
+<h2>Перевір себе</h2>
+<uav-quiz src="../quiz/f-components-choice.json" module="f-components-choice"></uav-quiz>
+      </div>
+      <div class="module-done"><gc-button variant="secondary" data-done-toggle="f-components-choice">Позначити як пройдений</gc-button></div>
+      <section class="related" aria-label="Суміжні модулі"><p class="gc-label gc-muted">Суміжні модулі</p><div class="gc-grid ref-grid"><a class="gc-card" href="f-aero-props.html"><strong>Аеродинаміка пропелера та підбір силової установки</strong><div class="gc-card__meta"><span class="gc-tag" title="L2 — Интегратор">L2</span></div></a><a class="gc-card" href="f-power.html"><strong>Живлення: LiPo, Li-Ion, BEC</strong><div class="gc-card__meta"><span class="gc-tag" title="L1 — Оператор">L1</span></div></a><a class="gc-card" href="f-motors-esc.html"><strong>Мотори, ESC і DShot</strong><div class="gc-card__meta"><span class="gc-tag" title="L1 — Оператор">L1</span></div></a><a class="gc-card" href="eng-method-101.html"><strong>Інженерний метод 101: вимоги, архітектура, тести, документація</strong><div class="gc-card__meta"><span class="gc-tag" title="L1 — Оператор">L1</span></div></a></div></section>
+      <nav class="pager" aria-label="Сусідні модулі" data-track-pager><a class="gc-card pager__prev" href="f-regulations.html"><span class="gc-label gc-muted">Назад · трек</span><br>Правила, зони та відповідальність оператора</a><a class="gc-card pager__next" href="eng-method-101.html"><span class="gc-label gc-muted">Далі · трек</span><br>Інженерний метод 101: вимоги, архітектура, тести, документація</a></nav><nav class="pager" aria-label="Сусідні кроки шляху Betaflight" data-path-pager="betaflight" hidden><a class="gc-card pager__prev" href="f-regulations.html?path=betaflight"><span class="gc-label gc-muted">Назад · шлях Betaflight</span><br>Правила, зони та відповідальність оператора</a><a class="gc-card pager__next" href="tools-overview.html?path=betaflight"><span class="gc-label gc-muted">Далі · крок 12 з 44</span><br>Інструменти: Configurator, GCS, git</a></nav><nav class="pager" aria-label="Сусідні кроки шляху ArduPilot" data-path-pager="ardupilot" hidden><a class="gc-card pager__prev" href="f-regulations.html?path=ardupilot"><span class="gc-label gc-muted">Назад · шлях ArduPilot</span><br>Правила, зони та відповідальність оператора</a><a class="gc-card pager__next" href="tools-overview.html?path=ardupilot"><span class="gc-label gc-muted">Далі · крок 12 з 69</span><br>Інструменти: Configurator, GCS, git</a></nav>
+    </article>
+  </main>
+  <footer class="gc-container site-footer gc-muted">
+    <p>Відкритий курс · <a href="https://github.com/irreligious86/UAV-Education">вихідний код на GitHub</a> · <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">план розвитку</a> · <a href="../../curriculum/curriculum.html">для розробника</a> · CC BY-NC-SA 4.0</p>
+  </footer>
+</body>
+</html>

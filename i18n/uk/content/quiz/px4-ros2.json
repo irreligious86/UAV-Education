@@ -1,0 +1,94 @@
+{
+  "module": "px4-ros2",
+  "pass": 80,
+  "questions": [
+    {
+      "q": "Що робить MicroXRCEAgent?",
+      "options": [
+        "Калібрує датчики за ROS 2",
+        "Міст uORB ↔ DDS",
+        "Літає",
+        "Замінює QGC"
+      ],
+      "answer": 1,
+      "explain": "Клієнт — на польотному контролері, агент — на companion/ПК."
+    },
+    {
+      "q": "Яке повідомлення має йти потоком до переходу в Offboard?",
+      "options": [
+        "TrajectorySetpoint",
+        "OffboardControlMode",
+        "VehicleAttitude з поточною орієнтацією",
+        "VehicleCommand"
+      ],
+      "answer": 1,
+      "explain": "Інакше PX4 не перемкнеться і не заармиться в Offboard."
+    },
+    {
+      "q": "За якої частоти OffboardControlMode PX4 виходить з Offboard?",
+      "options": [
+        "Нижче ~2 Гц",
+        "Нижче 50 Гц",
+        "Нижче 0.1 Гц",
+        "Ніколи"
+      ],
+      "answer": 0,
+      "explain": "Таймаут — захист від companion, що замовк."
+    },
+    {
+      "q": "Що важливо щодо гілки px4_msgs?",
+      "options": [
+        "Лише гілка main",
+        "Під версію PX4",
+        "Будь-яка",
+        "Не потрібна"
+      ],
+      "answer": 1,
+      "explain": "Інакше визначення повідомлень не збігаються."
+    },
+    {
+      "q": "Як у ROS 2 називаються топіки з PX4?",
+      "options": [
+        "/px4/*",
+        "/fmu/out/*",
+        "/uorb/*",
+        "/mavlink/*"
+      ],
+      "answer": 1,
+      "explain": "У PX4 — /fmu/in/*."
+    },
+    {
+      "q": "Висота 3 м у TrajectorySetpoint (NED) — це Z = …",
+      "options": [
+        "+3",
+        "−3",
+        "0",
+        "+300"
+      ],
+      "answer": 1,
+      "explain": "Z униз."
+    },
+    {
+      "q": "Z = −5 у TrajectorySetpoint означає:",
+      "options": [
+        "5 м униз",
+        "5 м угору",
+        "Помилку",
+        "5 м/с униз"
+      ],
+      "answer": 1,
+      "explain": "NED: вісь Z спрямована вниз."
+    },
+    {
+      "q": "Який QoS потрібен підписникові на /fmu/out/*?",
+      "options": [
+        "RELIABLE",
+        "BEST_EFFORT",
+        "Лише TRANSIENT_LOCAL",
+        "Будь-який"
+      ],
+      "answer": 1,
+      "explain": "Розбіжність QoS = топік «мовчить»."
+    }
+  ]
+}

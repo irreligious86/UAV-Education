@@ -3,92 +3,92 @@
   "pass": 80,
   "questions": [
     {
-      "q": "На какой частоте появится помеха 10 кГц при fs = 8 кГц?",
+      "q": "At what frequency will 10 kHz interference appear with fs = 8 kHz?",
       "options": [
-        "10 кГц",
-        "2 кГц",
-        "4 кГц",
-        "Не появится"
+        "10 kHz",
+        "2 kHz",
+        "4 kHz",
+        "It won't appear"
       ],
       "answer": 1,
-      "explain": "Алиасинг: |f − fs| = 2 кГц."
+      "explain": "Aliasing: |f − fs| = 2 kHz."
     },
     {
-      "q": "Как выглядит гармоника мотора на спектрограмме?",
+      "q": "What does a motor harmonic look like on a spectrogram?",
       "options": [
-        "Горизонтальная линия",
-        "Наклонная линия за eRPM",
-        "Отдельная точка на частоте висения",
-        "Вертикальная полоса"
+        "A horizontal line",
+        "A sloped line following eRPM",
+        "A single dot at the hover frequency",
+        "A vertical band"
       ],
       "answer": 1,
-      "explain": "Частота мотора меняется с газом."
+      "explain": "The motor frequency changes with throttle."
     },
     {
-      "q": "Как выглядит резонанс рамы на спектрограмме?",
+      "q": "What does a frame resonance look like on a spectrogram?",
       "options": [
-        "Шум внизу спектра у нуля Гц",
-        "Горизонтальная линия",
-        "Наклонная линия",
-        "Не видна вообще"
+        "Noise at the bottom of the spectrum near zero Hz",
+        "A horizontal line",
+        "A sloped line",
+        "It isn't visible at all"
       ],
       "answer": 1,
-      "explain": "Собственная частота конструкции не зависит от оборотов."
+      "explain": "The structure's natural frequency doesn't depend on RPM."
     },
     {
-      "q": "Групповая задержка PT1 с fc = 100 Гц примерно:",
+      "q": "The group delay of a PT1 with fc = 100 Hz is about:",
       "options": [
-        "0.16 мс",
-        "1.6 мс",
-        "16 мс",
-        "160 мс"
+        "0.16 ms",
+        "1.6 ms",
+        "16 ms",
+        "160 ms"
       ],
       "answer": 1,
-      "explain": "1/(2π·100) ≈ 1.6 мс."
+      "explain": "1/(2π·100) ≈ 1.6 ms."
     },
     {
-      "q": "Основная частота мотора при 15 000 об/мин:",
+      "q": "Motor fundamental frequency at 15,000 RPM:",
       "options": [
-        "15 Гц",
-        "150 Гц",
-        "250 Гц",
-        "1500 Гц"
+        "15 Hz",
+        "150 Hz",
+        "250 Hz",
+        "1500 Hz"
       ],
       "answer": 2,
-      "explain": "RPM/60 = 250 Гц."
+      "explain": "RPM/60 = 250 Hz."
     },
     {
-      "q": "Почему notch предпочтительнее широкого LPF для шума мотора?",
+      "q": "Why is a notch preferable to a wide LPF for motor noise?",
       "options": [
-        "Он не требует никакой настройки",
-        "Узкий провал, мало задержки",
-        "Он проще",
-        "Убирает пропвош"
+        "It needs no tuning at all",
+        "Narrow dip, little delay",
+        "It's simpler",
+        "It removes propwash"
       ],
       "answer": 1,
-      "explain": "Глубокий провал только вокруг частоты шума и малая задержка вне полосы; LPF режет и полезный сигнал."
+      "explain": "A deep dip only around the noise frequency and little delay outside the band; an LPF cuts the useful signal too."
     },
     {
-      "q": "Что НЕ фильтруется без потери отклика?",
+      "q": "What can NOT be filtered without losing response?",
       "options": [
-        "Гармоники моторов",
-        "Резонанс рамы",
-        "Пропвош 20–80 Гц",
-        "Шум buck-преобразователя"
+        "Motor harmonics",
+        "Frame resonance",
+        "Propwash at 20–80 Hz",
+        "Buck converter noise"
       ],
       "answer": 2,
-      "explain": "Низкочастотная аэродинамика совпадает с полосой управления."
+      "explain": "Low-frequency aerodynamics overlaps the control bandwidth."
     },
     {
-      "q": "Как улучшить разрешение спектра по частоте?",
+      "q": "How do you improve the frequency resolution of a spectrum?",
       "options": [
-        "Взять более длинное окно — ценой разрешения по времени",
-        "Поднять частоту дискретизации",
-        "Сократить окно до нескольких отсчётов",
-        "Убрать окно Ханна"
+        "Use a longer window, at the cost of time resolution",
+        "Raise the sampling rate",
+        "Shorten the window to a few samples",
+        "Remove the Hann window"
       ],
       "answer": 0,
-      "explain": "Разрешение по частоте ≈ fs / N: длиннее окно — точнее частота, но хуже видно изменения во времени."
+      "explain": "Frequency resolution ≈ fs / N: a longer window gives a more precise frequency, but changes over time are harder to see."
     }
   ]
 }

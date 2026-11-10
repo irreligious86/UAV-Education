@@ -125,7 +125,7 @@ def main() -> int:
             if src.parent.name in ("notes",) or src.name in ("README.md", "article-template.md"):
                 continue
             n_src += 1
-            t = i18n.translated_path(src, l["code"])
+            t = i18n.own_translated_path(src, l["code"])
             if t.is_file():
                 mods[check_module(t, src, errors)] += 1
         for t in sorted((base / "content").rglob("*")) if (base / "content").is_dir() else []:

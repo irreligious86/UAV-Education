@@ -1,0 +1,37 @@
+{
+ "module": "ctl-signals",
+ "tasks": [
+  {
+   "id": "nyquist",
+   "title": "Nyquist frequency",
+   "statement": "The gyro is sampled at **{f} kHz**. What is the highest signal frequency (Hz) that can be represented without aliasing?",
+   "params": {
+    "f": {
+     "min": 1,
+     "max": 8,
+     "step": 1
+    }
+   },
+   "answer": "f*1000/2",
+   "unit": "Hz",
+   "tol": 0.01,
+   "solution": "f_max = f_s/2. Anything above “folds” into the band below and looks like low-frequency noise."
+  },
+  {
+   "id": "lpf-delay",
+   "title": "Filter delay",
+   "statement": "A first-order filter with a cutoff frequency of **{fc} Hz**. Estimate the group delay at low frequencies (ms): τ = 1/(2π·f_c).",
+   "params": {
+    "fc": {
+     "min": 50,
+     "max": 500,
+     "step": 10
+    }
+   },
+   "answer": "1000/(2*math.pi*fc)",
+   "unit": "ms",
+   "tol": 0.02,
+   "solution": "τ = 1/(2π f_c). A 100 Hz cutoff gives 1.6 ms; every extra filter adds its share."
+  }
+ ]
+}
