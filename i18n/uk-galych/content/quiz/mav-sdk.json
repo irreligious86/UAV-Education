@@ -1,0 +1,94 @@
+{
+  "module": "mav-sdk",
+  "pass": 80,
+  "questions": [
+    {
+      "q": "MAVSDK-Python усередині — то:",
+      "options": [
+        "mavsdk_server через gRPC",
+        "Чистий Python і pymavlink",
+        "Обгортка над MAVROS",
+        "Обгортка над DroneKit"
+      ],
+      "answer": 0,
+      "explain": "Звідси async API і винятки з кодами плагінів."
+    },
+    {
+      "q": "`async for x in drone.telemetry.position()`:",
+      "options": [
+        "Сам ся не завершує",
+        "Повертає одне значення",
+        "Завершується через 1 с",
+        "Блокує event loop"
+      ],
+      "answer": 0,
+      "explain": "Підписки нескінченні — вихід мусиш зробити сам."
+    },
+    {
+      "q": "PX4 виходить з Offboard зара по старті. Причина:",
+      "options": [
+        "Уставки до start або рідше за 2 Гц",
+        "Нема фіксу GPS для режиму Offboard",
+        "Неправильний sysid",
+        "Увімкнено підпис"
+      ],
+      "answer": 0,
+      "explain": "Треба початкова уставка й потік без перерви."
+    },
+    {
+      "q": "DroneKit-Python у 2026:",
+      "options": [
+        "Не підтримується",
+        "Рекомендований для PX4",
+        "Заміна MAVSDK",
+        "Частина ArduPilot"
+      ],
+      "answer": 0,
+      "explain": "Проєкт гет не розвивається."
+    },
+    {
+      "q": "Для PX4 + ROS 2 ліпший міст:",
+      "options": [
+        "uXRCE-DDS",
+        "DroneKit",
+        "SiK",
+        "MAVProxy з модулем ROS 2"
+      ],
+      "answer": 0,
+      "explain": "MAVROS — для ArduPilot/ROS або особливих випадків."
+    },
+    {
+      "q": "Хто мусить забезпечувати безпеку при «смерті» скрипта на companion?",
+      "options": [
+        "Автопілот: таймаути й failsafe",
+        "MAVSDK",
+        "Сам скрипт через try/except",
+        "Оператор вручну"
+      ],
+      "answer": 0,
+      "explain": "Companion радить, автопілот вирішує."
+    },
+    {
+      "q": "Очікування `health.is_global_position_ok` без таймауту на апараті без GPS дасть:",
+      "options": [
+        "Вічне зависання скрипта",
+        "Ніц",
+        "Автоматичний армінг",
+        "Виняток TimeoutError через 30 с"
+      ],
+      "answer": 0,
+      "explain": "Обгортай очікування в asyncio.wait_for."
+    },
+    {
+      "q": "mission.upload_mission() на проводі — то:",
+      "options": [
+        "Той самий діалог MISSION_*",
+        "Один великий пакет через MAVFTP",
+        "Передача через MAVFTP",
+        "Власний протокол MAVSDK"
+      ],
+      "answer": 0,
+      "explain": "Верхні шари реалізують ті самі мікросервіси."
+    }
+  ]
+}
