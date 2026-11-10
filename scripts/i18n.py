@@ -119,9 +119,21 @@ def source_hash(text: str) -> str:
     return hashlib.sha256(text.encode("utf-8")).hexdigest()[:12]
 
 
+import os as _os
+
+# UAV_I18N_ALLOW=<file with repo-relative paths>: only those translation files count (used to commit a
+# consistent snapshot while other translations are still being written). Unset: every file counts.
+_ALLOW = None
+if _os.environ.get("UAV_I18N_ALLOW"):
+    _ALLOW = {ln.strip() for ln in Path(_os.environ["UAV_I18N_ALLOW"]).read_text(encoding="utf-8").splitlines() if ln.strip()}
+
+
 def translated_path(src: Path, code: str | None = None) -> Path:
     """i18n/<lang>/content/... counterpart of content/... (or of any path under the repo)."""
-    return I18N / (code or _lang) / src.resolve().relative_to(ROOT)
+    p = I18N / (code or _lang) / src.resolve().relative_to(ROOT)
+    if _ALLOW is not None and p.relative_to(ROOT).as_posix() not in _ALLOW:
+        return I18N / "_not_in_snapshot" / p.relative_to(I18N)
+    return p
 
 
 def placeholders(s: str) -> set[str]:
