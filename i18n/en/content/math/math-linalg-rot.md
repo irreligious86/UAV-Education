@@ -18,11 +18,11 @@ related:
 next:
   - math-ode-dyn
 source: content/math/math-linalg-rot.md
-source_hash: 2a6fe59aec54
+source_hash: 817f67c6eefa
 ---
 
 ## summary
-Everything the autopilot says about attitude — the angles on the OSD, the quaternion in `ATT`/`AHRS`, the gravity vector in body axes, “where the camera is pointing” — comes down to a handful of linear algebra operations. This module gives you exactly those: a vector as an arrow and as a column of numbers, the dot and cross products, a rotation matrix as “where the axes went”, composing rotations and why order matters, Euler angles and their singularity, the quaternion as a compact, singularity-free form of the same rotation, small rotations and the attitude derivative, and finally — the four coordinate frames people mix up most often (NED/FRD in ArduPilot and PX4, ENU/FLU in ROS). Lab: a `rot.py` library of 12 functions, checked against `scipy.spatial.transform`. Not sure you need this elective? Take the [10-problem entry test](../pages/prerequisites.html).
+Everything the autopilot says about attitude — the angles on the OSD, the quaternion in `ATT`/`AHRS`, the gravity vector in body axes, “where the camera is pointing” — comes down to a handful of linear algebra operations. This module gives you exactly those: a vector as an arrow and as a column of numbers, the dot and cross products, a rotation matrix as “where the axes went”, composing rotations and why order matters, Euler angles and their singularity, the quaternion as a compact, singularity-free form of the same rotation, small rotations and the attitude derivative, and finally — the four coordinate frames people mix up most often (NED/FRD in ArduPilot and PX4, ENU/FLU in ROS). Lab: a `rot.py` library of 14 functions, checked against `scipy.spatial.transform`. Not sure you need this elective? Take the [10-problem entry test](../pages/prerequisites.html).
 
 ## theory
 ### A vector: an arrow and numbers
@@ -58,7 +58,7 @@ Read it like this: a vector in body axes is first “unwound” in roll, then in
 {{diagram:frames-rotations|Coordinate frames: NED and FRD (ArduPilot, PX4) versus ENU and FLU (ROS). The same vehicle, different axis labels — and different signs for “up”.}}
 
 ### Euler angles and their singularity
-The angles (roll φ, pitch θ, yaw ψ) are convenient for humans and useless as an internal representation: at θ = ±90° the roll and yaw axes coincide (gimbal lock), and you can't uniquely recover φ and ψ from the matrix — only their sum or difference. Ranges: φ ∈ (−180°, 180°], θ ∈ [−90°, 90°], ψ ∈ [0°, 360°). Extracting them from the matrix: θ = −asin(R₃₁), φ = atan2(R₃₂, R₃₃), ψ = atan2(R₂₁, R₁₁) — `atan2`, not `atan`, or you'll lose the quadrant. For aerobatics, a wing in vertical hover and any state estimation, Euler angles are not used inside the filter.
+The angles (roll φ, pitch θ, yaw ψ) are convenient for humans and useless as an internal representation: at θ = ±90° the roll and yaw axes coincide (gimbal lock), and you can't uniquely recover φ and ψ from the matrix — only their sum or difference. Ranges: φ ∈ (−180°, 180°], θ ∈ [−90°, 90°], ψ ∈ (−180°, 180°] (the OSD usually shows heading as 0–360°). Extracting them from the matrix: θ = −asin(R₃₁), φ = atan2(R₃₂, R₃₃), ψ = atan2(R₂₁, R₁₁) — `atan2`, not `atan`, or you'll lose the quadrant. For aerobatics, a wing in vertical hover and any state estimation, Euler angles are not used inside the filter.
 
 ### The quaternion
 A quaternion q = (w, x, y, z) = (cos(α/2), **n**·sin(α/2)) encodes a rotation by angle α about the unit axis **n**. Four numbers instead of nine, one normalization instead of six orthogonality conditions, and no singularity. Operations:
@@ -72,7 +72,7 @@ A quaternion q = (w, x, y, z) = (cos(α/2), **n**·sin(α/2)) encodes a rotation
 ArduPilot stores attitude in the EKF as a quaternion (`Quaternion` in `AP_Math`), in the log — `XKQ`; PX4 — `vehicle_attitude.q` in (w, x, y, z) order. ROS 2 (`geometry_msgs/Quaternion`) uses **(x, y, z, w)** order. A swapped order is a classic companion integration bug.
 
 ### Small rotations and the attitude derivative
-For a small angle δ: sin δ ≈ δ, cos δ ≈ 1, and a rotation by the vector δ = (δₓ, δ_y, δ_z) is approximated as R ≈ I + [δ]ₓ, where [δ]ₓ is the skew-symmetric cross-product matrix. This gives the key gyro equation: if ω is the angular rate in body axes, then over a step Δt the attitude is updated as q ← q ⊗ (1, ω·Δt/2), followed by normalization. This is the “gyro integration” in any AHRS: tens of thousands of times per second, multiplying a quaternion by a nearly-unit one. Small-angle errors are what the EKF estimates as a correction: not a “new attitude”, but a δ used to nudge the current one.
+For a small angle δ: sin δ ≈ δ, cos δ ≈ 1, and a rotation by the vector δ = (δₓ, δ_y, δ_z) is approximated as R ≈ I + [δ]ₓ, where [δ]ₓ is the skew-symmetric cross-product matrix. This gives the key gyro equation: if ω is the angular rate in body axes, then over a step Δt the attitude is updated as q ← q ⊗ (1, ω·Δt/2), followed by normalization. This is the “gyro integration” in any AHRS: hundreds to thousands of times per second (at the loop rate), multiplying a quaternion by a nearly-unit one. Small-angle errors are what the EKF estimates as a correction: not a “new attitude”, but a δ used to nudge the current one.
 
 ### Coordinate frames to know by heart
 | Frame | Axes | Who uses it | Tell-tale sign |
@@ -86,7 +86,7 @@ FRD → FLU conversion: (x, y, z) → (x, −y, −z). NED → ENU: (n, e, d) �
 
 ## practice
 ### Step 1. The `rot.py` library
-Without libraries (only `math` and lists, or `numpy`), write 12 functions: `dot`, `cross`, `norm`, `rot_x/rot_y/rot_z(angle)`, `euler_to_R(roll, pitch, yaw)`, `R_to_euler(R)`, `quat_mul(q1, q2)`, `quat_conj(q)`, `quat_to_R(q)`, `R_to_quat(R)`, `rotate_vec(q, v)`, `small_angle_update(q, omega, dt)`.
+Without libraries (only `math` and lists, or `numpy`), write 14 functions: `dot`, `cross`, `norm`, `rot_x/rot_y/rot_z(angle)`, `euler_to_R(roll, pitch, yaw)`, `R_to_euler(R)`, `quat_mul(q1, q2)`, `quat_conj(q)`, `quat_to_R(q)`, `R_to_quat(R)`, `rotate_vec(q, v)`, `small_angle_update(q, omega, dt)`.
 
 ```python
 import numpy as np

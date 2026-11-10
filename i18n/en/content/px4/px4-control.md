@@ -16,7 +16,7 @@ related:
 next:
   - px4-ros2
 source: content/px4/px4-control.md
-source_hash: b80149855b5e
+source_hash: cf374c1a75b7
 ---
 
 ## summary
@@ -48,7 +48,7 @@ For most frames the documentation explicitly recommends autotune: it is faster a
 The order: filters → rate (K, then D, then I) → attitude P → position. A step: Acro or Stabilized, sharp short stick movements, a log, a plot of `vehicle_rates_setpoint` versus `vehicle_angular_velocity` in Flight Review. Overshoot — lower K or more D; slow response — more K; drift — more I. The same method and the same metrics as in the module on data-driven PID.
 
 ### Defaults and what they mean
-`MC_ROLLRATE_P` = 0.15, `I` = 0.2, `D` = 0.003, `K` = 1.0, `FF` = 0 (the output is a dimensionless torque per 1 rad/s of error); `MC_ROLL_P` = 4.0 (angular rate per radian of angle error → 1/s), `MC_YAW_P` = 2.8; position: `MPC_XY_P` = 0.95 (1/s), velocity → acceleration `MPC_XY_VEL_P_ACC` = 1.8, `I_ACC` = 0.4, `D_ACC` = 0.2; `MPC_Z_P` = 1.0. The hover throttle `MPC_THR_HOVER` = 0.5 (normalized) — refined by the hover thrust estimator (`HTE_*`). Filters: `IMU_GYRO_CUTOFF` = 40 Hz, `IMU_DGYRO_CUTOFF` = 20 Hz, the static notch `IMU_GYRO_NF0_FRQ`/`BW` (0 = off, BW 20 Hz), the dynamic one by ESC RPM `IMU_GYRO_DNF_EN` (a bitmask: bit 0 — by ESC RPM, bit 1 — by the onboard FFT `IMU_GYRO_FFT_EN`), `IMU_GYRO_DNF_MIN` = 25 Hz. Air mode `MC_AIRMODE` (0 off, 1 roll/pitch, 2 + yaw).
+`MC_ROLLRATE_P` = 0.15, `I` = 0.2, `D` = 0.003, `K` = 1.0, `FF` = 0 (the output is a dimensionless torque per 1 rad/s of error); `MC_ROLL_P` = 4.0 (angular rate per radian of angle error → 1/s; the default since PX4 1.17, 6.5 up to 1.16), `MC_YAW_P` = 2.8; position: `MPC_XY_P` = 0.95 (1/s), velocity → acceleration `MPC_XY_VEL_P_ACC` = 1.8, `I_ACC` = 0.4, `D_ACC` = 0.2; `MPC_Z_P` = 1.0. The hover throttle `MPC_THR_HOVER` = 0.5 (normalized) — refined by the hover thrust estimator (`HTE_*`). Filters: `IMU_GYRO_CUTOFF` = 40 Hz, `IMU_DGYRO_CUTOFF` = 20 Hz, the static notch `IMU_GYRO_NF0_FRQ`/`BW` (0 = off, BW 20 Hz), the dynamic one by ESC RPM `IMU_GYRO_DNF_EN` (a bitmask: bit 0 — by ESC RPM, bit 1 — by the onboard FFT `IMU_GYRO_FFT_EN`), `IMU_GYRO_DNF_MIN` = 25 Hz. Air mode `MC_AIRMODE` (0 off, 1 roll/pitch, 2 + yaw).
 
 Units matter: the error is in rad/s, the output is a fraction of the maximum torque. P = 0.15 means an error of 1 rad/s (57°/s) gives 15% of the torque. Comparison with Betaflight (dimensionless “45”) is only qualitative, via the module “Control theory” (ζ, phase margin).
 
@@ -56,7 +56,7 @@ Units matter: the error is in rad/s, the output is a fraction of the maximum tor
 `MC_AT_EN` = 1 enables the `mc_autotune_attitude_control` module; it is started from QGC (PID Tuning → Autotune) in Altitude/Position while hovering in calm air; the module injects an excitation with amplitude `MC_AT_SYSID_AMP` (0.7) on each axis, identifies the model of the rate loop and computes the gains; `MC_AT_APPLY` (0 — don't apply, 1 — after landing, 2 — immediately in flight) — the default is 1. Afterwards — a check flight and Flight Review: a response with no overshoot > 10%, D without noise. Autotune doesn't tune the filters and doesn't cure vibration — those are done **before** (spectrum!).
 
 ### Worked example: 7" 6S, 1.4 kg
-Start: airframe Generic Quad, `CA_ROTOR_COUNT` = 4, `IMU_GYRO_RATEMAX` 400 → 800 Hz (H7), `IMU_GYRO_CUTOFF` 40 → 80, `IMU_DGYRO_CUTOFF` 20 → 40; eRPM over DShot (bidirectional DShot or ESC telemetry over UART — `DSHOT_TEL_CFG`), `IMU_GYRO_DNF_EN` = 1; `MPC_THR_HOVER` will be refined by the HTE estimator; first flight in Stabilized — `MC_ROLLRATE_K` 1.0 → 0.7 if it wobbles; autotune; `MPC_XY_VEL_MAX` to suit the task. Log → Flight Review: rate tracking, spectrum, `vehicle_torque_setpoint` without saturation.
+Start: airframe Generic Quad, `CA_ROTOR_COUNT` = 4, `IMU_GYRO_RATEMAX` 400 → 800 Hz (H7), `IMU_GYRO_CUTOFF` 40 → 80, `IMU_DGYRO_CUTOFF` 20 → 40 (default 20 since 1.17, 30 up to 1.16); eRPM over DShot (bidirectional DShot or ESC telemetry over UART — `DSHOT_TEL_CFG`), `IMU_GYRO_DNF_EN` = 1; `MPC_THR_HOVER` will be refined by the HTE estimator; first flight in Stabilized — `MC_ROLLRATE_K` 1.0 → 0.7 if it wobbles; autotune; `MPC_XY_VEL_MAX` to suit the task. Log → Flight Review: rate tracking, spectrum, `vehicle_torque_setpoint` without saturation.
 
 {{diagram:px4-cascade|The PX4 cascade: position → velocity → attitude → angular rate → allocator, with the parameters of each level.}}
 

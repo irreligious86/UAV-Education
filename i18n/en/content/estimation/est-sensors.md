@@ -19,7 +19,7 @@ related:
 next:
   - est-attitude
 source: content/estimation/est-sensors.md
-source_hash: 79e03bf3c00b
+source_hash: 60595b8bcf4b
 ---
 
 ## summary
@@ -42,7 +42,7 @@ A proof mass on a spring; it measures **specific force**: at rest it reads +1 g 
 Errors: bias (tens of mg, i.e., a 1–3° horizon error without calibration), scale (1–2%), axis non-orthogonality, temperature drift, **clipping** (saturation at ±16 g from impacts and vibration — `VIBE.Clip` in ArduPilot), vibration aliasing into the band.
 
 ### 6-position accelerometer calibration
-The vehicle is placed on 6 faces (±X, ±Y, ±Z up). In each one the truth is known: exactly +1 g on one axis, 0 on the others. From the six measurements you solve a system for 3 biases + 3 scales (ArduPilot also solves for non-orthogonality during `INS_ACC*_ID` calibration via Mission Planner). Betaflight calibrates only the zero from a single position (level) — the scale error remains, but for Acro it doesn't matter. Rule: calibrate at the temperature you fly at; after a hard crash, redo it.
+The vehicle is placed on 6 faces (±X, ±Y, ±Z up). In each one the truth is known: exactly +1 g on one axis, 0 on the others. From the six measurements you solve a system for 3 biases + 3 scales (so does ArduPilot: `INS_ACCOFFS` + `INS_ACCSCAL`, an ellipsoid without cross terms — non-orthogonality is not calibrated; `INS_ACC*_ID` is only the sensor identifier). Betaflight calibrates only the zero from a single position (level) — the scale error remains, but for Acro it doesn't matter. Rule: calibrate at the temperature you fly at; after a hard crash, redo it.
 
 ### Magnetometer
 Measures the magnetic field (µT or mGauss) on three axes; the heading is the projection of the Earth's field (~25–65 µT, inclination up to 70° at mid-latitudes — a large vertical component, which is why the heading is wrong without knowing roll/pitch).

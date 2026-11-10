@@ -19,7 +19,7 @@ related:
 next:
   - est-kalman
 source: content/math/math-prob-est.md
-source_hash: 2bbf780f5b85
+source_hash: 767877ea79c3
 ---
 
 ## summary
@@ -58,7 +58,7 @@ x̂ = (z₁/σ₁² + z₂/σ₂²) / (1/σ₁² + 1/σ₂²), 1/σ̂² = 1/σ�
 ### Що з цього — у параметрах автопілота
 | Що | ArduPilot EKF3 | PX4 EKF2 |
 |---|---|---|
-| σ шуму гіроскопа (R-частина передбачення) | `EK3_GYRO_P_NSE` | `EKF2_GYR_NOISE` |
+| σ шуму гіроскопа (входить у Q — шум процесу під час передбачення) | `EK3_GYRO_P_NSE` | `EKF2_GYR_NOISE` |
 | блукання bias гіро | `EK3_GBIAS_P_NSE` | `EKF2_GYR_B_NOISE` |
 | σ GPS позиції | `EK3_POSNE_M_NSE` (+HDOP) | `EKF2_GPS_P_NOISE` |
 | σ баро | `EK3_ALT_M_NSE` | `EKF2_BARO_NOISE` |

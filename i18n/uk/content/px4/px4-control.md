@@ -16,7 +16,7 @@ related:
 next:
   - px4-ros2
 source: content/px4/px4-control.md
-source_hash: b80149855b5e
+source_hash: cf374c1a75b7
 ---
 
 ## summary
@@ -48,7 +48,7 @@ PX4 використовує паралельну форму зі спільни
 Порядок: фільтри → rate (K, потім D, потім I) → attitude P → position. Крок: Acro або Stabilized, різкі короткі рухи стіком, лог, графік `vehicle_rates_setpoint` проти `vehicle_angular_velocity` у Flight Review. Переліт — менше K або більше D; повільний відгук — більше K; дрейф — більше I. Той самий метод і ті самі метрики, що в модулі про PID за даними.
 
 ### Значення за замовчуванням і що вони означають
-`MC_ROLLRATE_P` = 0.15, `I` = 0.2, `D` = 0.003, `K` = 1.0, `FF` = 0 (вихід — безрозмірний момент на 1 рад/с помилки); `MC_ROLL_P` = 4.0 (кутова швидкість на радіан помилки кута → 1/с), `MC_YAW_P` = 2.8; позиція: `MPC_XY_P` = 0.95 (1/с), швидкість → прискорення `MPC_XY_VEL_P_ACC` = 1.8, `I_ACC` = 0.4, `D_ACC` = 0.2; `MPC_Z_P` = 1.0. Газ зависання `MPC_THR_HOVER` = 0.5 (норм.) — уточнюється оцінювачем тяги зависання (`HTE_*`, hover thrust estimator). Фільтри: `IMU_GYRO_CUTOFF` = 40 Гц, `IMU_DGYRO_CUTOFF` = 20 Гц, статичний notch `IMU_GYRO_NF0_FRQ`/`BW` (0 = вимк., BW 20 Гц), динамічний за ESC RPM `IMU_GYRO_DNF_EN` (бітова маска: біт 0 — за ESC RPM, біт 1 — за бортовим FFT `IMU_GYRO_FFT_EN`), `IMU_GYRO_DNF_MIN` = 25 Гц. Air-mode `MC_AIRMODE` (0 вимк., 1 roll/pitch, 2 + yaw).
+`MC_ROLLRATE_P` = 0.15, `I` = 0.2, `D` = 0.003, `K` = 1.0, `FF` = 0 (вихід — безрозмірний момент на 1 рад/с помилки); `MC_ROLL_P` = 4.0 (кутова швидкість на радіан помилки кута → 1/с; типове значення з PX4 1.17, до 1.16 — 6.5), `MC_YAW_P` = 2.8; позиція: `MPC_XY_P` = 0.95 (1/с), швидкість → прискорення `MPC_XY_VEL_P_ACC` = 1.8, `I_ACC` = 0.4, `D_ACC` = 0.2; `MPC_Z_P` = 1.0. Газ зависання `MPC_THR_HOVER` = 0.5 (норм.) — уточнюється оцінювачем тяги зависання (`HTE_*`, hover thrust estimator). Фільтри: `IMU_GYRO_CUTOFF` = 40 Гц, `IMU_DGYRO_CUTOFF` = 20 Гц, статичний notch `IMU_GYRO_NF0_FRQ`/`BW` (0 = вимк., BW 20 Гц), динамічний за ESC RPM `IMU_GYRO_DNF_EN` (бітова маска: біт 0 — за ESC RPM, біт 1 — за бортовим FFT `IMU_GYRO_FFT_EN`), `IMU_GYRO_DNF_MIN` = 25 Гц. Air-mode `MC_AIRMODE` (0 вимк., 1 roll/pitch, 2 + yaw).
 
 Одиниці важливі: помилка в рад/с, вихід — частка максимального моменту. P = 0.15 означає: помилка 1 рад/с (57°/с) дає 15% моменту. Порівнювати з Betaflight (безрозмірні «45») — лише якісно, через модуль «Теорія керування» (ζ, запас за фазою).
 
@@ -56,7 +56,7 @@ PX4 використовує паралельну форму зі спільни
 `MC_AT_EN` = 1 вмикає модуль `mc_autotune_attitude_control`; запуск — з QGC (PID Tuning → Autotune) в Altitude/Position під час зависання в штиль; модуль інжектує збудження амплітудою `MC_AT_SYSID_AMP` (0.7) по кожній осі, ідентифікує модель rate-контуру й обчислює коефіцієнти; `MC_AT_APPLY` (0 — не застосовувати, 1 — після посадки, 2 — одразу в польоті) — за замовчуванням 1. Після — контрольний політ і Flight Review: відгук без перельоту > 10%, D без шуму. Autotune не налаштовує фільтри й не лікує вібрації — їх роблять **до** (спектр!).
 
 ### Розібраний приклад: 7" 6S, 1.4 кг
-Старт: airframe Generic Quad, `CA_ROTOR_COUNT` = 4, `IMU_GYRO_RATEMAX` 400 → 800 Гц (H7), `IMU_GYRO_CUTOFF` 40 → 80, `IMU_DGYRO_CUTOFF` 20 → 40; eRPM через DShot (bidirectional DShot або телеметрія ESC через UART — `DSHOT_TEL_CFG`), `IMU_GYRO_DNF_EN` = 1; `MPC_THR_HOVER` уточниться оцінювачем HTE; перший політ у Stabilized — `MC_ROLLRATE_K` 1.0 → 0.7, якщо розгойдує; autotune; `MPC_XY_VEL_MAX` під задачу. Лог → Flight Review: rate tracking, спектр, `vehicle_torque_setpoint` без насичення.
+Старт: airframe Generic Quad, `CA_ROTOR_COUNT` = 4, `IMU_GYRO_RATEMAX` 400 → 800 Гц (H7), `IMU_GYRO_CUTOFF` 40 → 80, `IMU_DGYRO_CUTOFF` 20 → 40 (типове 20 з 1.17, до 1.16 — 30); eRPM через DShot (bidirectional DShot або телеметрія ESC через UART — `DSHOT_TEL_CFG`), `IMU_GYRO_DNF_EN` = 1; `MPC_THR_HOVER` уточниться оцінювачем HTE; перший політ у Stabilized — `MC_ROLLRATE_K` 1.0 → 0.7, якщо розгойдує; autotune; `MPC_XY_VEL_MAX` під задачу. Лог → Flight Review: rate tracking, спектр, `vehicle_torque_setpoint` без насичення.
 
 {{diagram:px4-cascade|Каскад PX4: позиція → швидкість → орієнтація → кутова швидкість → алокатор, з параметрами кожного рівня.}}
 

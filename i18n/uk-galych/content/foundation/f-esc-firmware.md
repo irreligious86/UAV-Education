@@ -18,7 +18,7 @@ related:
 next:
   - bf-rpm-filter
 source: content/foundation/f-esc-firmware.md
-source_hash: 5dc4f794d1c8
+source_hash: e6c1fde3e719
 ---
 
 ## summary

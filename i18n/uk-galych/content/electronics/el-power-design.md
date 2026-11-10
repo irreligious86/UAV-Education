@@ -18,7 +18,7 @@ related:
 next:
   - el-measure
 source: content/electronics/el-power-design.md
-source_hash: fd4684e06411
+source_hash: 5ed30d1d2160
 ---
 
 ## summary

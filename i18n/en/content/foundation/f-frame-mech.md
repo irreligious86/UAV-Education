@@ -16,7 +16,7 @@ related:
 next:
   - bf-pid-reg-in-bf
 source: content/foundation/f-frame-mech.md
-source_hash: eed2fd86907e
+source_hash: e0540f818c0a
 ---
 
 ## summary
@@ -42,7 +42,7 @@ A frame has natural frequencies (the arms, the FC mount, the standoffs). When a 
 The goal is to pass the frame's motion through but not the high-frequency vibration. The standard: soft rubber grommets or standoffs with dampers, wires without tension (a tight harness is a rigid link that bypasses the dampers). A mount that is too soft has its own low-frequency resonances and adds gyro lag. Big aircraft use damping plates; 5" racers often use a hard mount and a clean filter tune.
 
 ### Numbers
-Motor 1st-harmonic frequency = RPM/60. At hover: 5" ~250–350 Hz, 7" ~150–200, 10" ~80–100, 15" ~50–70. Carbon arm resonances are usually 100–400 Hz, FC mounts 50–150 Hz.
+Motor 1st-harmonic frequency = RPM/60. At hover: 5" ~250–350 Hz, 7" ~120–200, 10" ~80–100, 15" ~50–70. Carbon arm resonances are usually 100–400 Hz, FC mounts 50–150 Hz.
 
 ### Natural frequencies: a rough estimate
 An arm as a cantilever beam: f₁ ≈ 0.56·√(E·I/(μ·L⁴)) (E — Young's modulus, I — second moment of area of the cross-section, μ — mass per meter, L — length). For an engineering estimate it's easier to measure: tapping the arm with the accelerometer/gyro being logged (`LOG_DISARMED`/`blackbox_mode = ALWAYS`) gives a decaying oscillation — the frequency of the peak in the spectrum is the resonance. Typical values: 5" carbon arm 4–5 mm — 300–500 Hz (above the motor harmonics at hover, below them at full throttle); 7" 5 mm — 150–250 Hz (matches the 1st–2nd harmonics — the danger zone); 10"+ tube arms 16–25 mm — 60–150 Hz. Stiffen the arm (thicker, shorter, a tube instead of a plate) → the frequency rises as √(stiffness/mass); add mass at the tip (a heavier motor) → it drops.

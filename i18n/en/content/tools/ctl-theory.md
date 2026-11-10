@@ -19,7 +19,7 @@ related:
 next:
   - bf-pid
 source: content/tools/ctl-theory.md
-source_hash: 2d077c525ed1
+source_hash: d0b183be76ed
 ---
 
 ## summary
@@ -55,7 +55,7 @@ I removes steady-state error (wind, asymmetry). It pays in phase: an integrator 
 FF applies a command proportional to the derivative of the setpoint, bypassing the error: the output starts moving before the error has built up. It doesn't affect stability (it's outside the loop), but too much of it gives overshoot on sharp stick moves. Good FF means low response delay at the same P.
 
 ### Cascade: angle → rate
-The outer loop (angle) computes the desired angular rate from the angle error; the inner loop (rate) tracks it. The rule: the inner loop must be 3–10 times faster than the outer one (in bandwidth), otherwise the outer loop “sees” the dynamics of the inner one and the cascade oscillates. In ArduPilot: `ATC_ANG_RLL_P` (outer, ~4.5–12) and `ATC_RAT_RLL_P/I/D` (inner); on top of that, the position loop (`PSC_*`) is slower still. In Betaflight angle mode: `angle_p_gain` (4.5) on top of the rate PID. In PX4: `MC_ROLL_P` → `MC_ROLLRATE_P/I/D`. Autotune tunes the inner loop first, then the outer one — for the same reason.
+The outer loop (angle) computes the desired angular rate from the angle error; the inner loop (rate) tracks it. The rule: the inner loop must be 3–10 times faster than the outer one (in bandwidth), otherwise the outer loop “sees” the dynamics of the inner one and the cascade oscillates. In ArduPilot: `ATC_ANG_RLL_P` (outer, ~4.5–12) and `ATC_RAT_RLL_P/I/D` (inner); on top of that, the position loop (`PSC_*`) is slower still. In Betaflight angle mode: `angle_p_gain` (default 50) on top of the rate PID. In PX4: `MC_ROLL_P` → `MC_ROLLRATE_P/I/D`. Autotune tunes the inner loop first, then the outer one — for the same reason.
 
 ### What this means for tuning
 1. First reduce the delay (mechanics, filters), then raise P.

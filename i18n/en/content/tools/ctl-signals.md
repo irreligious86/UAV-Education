@@ -19,7 +19,7 @@ related:
 next:
   - bf-blackbox
 source: content/tools/ctl-signals.md
-source_hash: f49913b9c249
+source_hash: 0d2c234ee224
 ---
 
 ## summary
@@ -78,7 +78,7 @@ f2, t2, S = signal.spectrogram(x, fs, nperseg=512, noverlap=384)
 Expected: `peaks (Hz): [179, 218, 500]` — ~180 Hz is the frame (the Welch grid step ≈ 3.9 Hz), around 220 Hz is the motor (over 2 s the RPM rose from 200 to ~260 Hz, so the peak is smeared), around 500 Hz is the edge of the smeared second harmonic; on the spectrogram `S` (plot `pcolormesh(t2, f2, 10*log10(S))`, 0–1000 Hz) the motor lines are sloped and the 180 Hz line is horizontal. If your code shows something else, the bug is in the code, not in the drone.
 
 ### Step 1. Spectrogram
-From `data-python`: a `spectrogram` of roll with nperseg=512 for 8 kHz (Δf 15 Hz, Δt 32 ms). Display it with a dB color scale, 0–1000 Hz.
+From `data-python`: a `spectrogram` of roll with nperseg=512 for 8 kHz (Δf ≈ 15.6 Hz, a 64 ms window, a 32 ms time step with noverlap=256). Display it with a dB color scale, 0–1000 Hz.
 
 ### Step 2. Harmonics ↔ eRPM
 Take `eRPM[0..3]` at 5 moments in time, compute f₁ = eRPM/(poles/2)/60, and plot them as points on the spectrogram. A match means motors; find 2f₁.

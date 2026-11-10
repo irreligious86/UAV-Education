@@ -113,7 +113,7 @@ cd .. &amp;&amp; colcon build &amp;&amp; source install/setup.bash</code></pre>
 <h4 class="md-subheading">Step 3. The offboard example</h4>
 <p>Run the example from <code>px4_ros_com</code> (offboard control): the node sends <code>OffboardControlMode</code> + <code>TrajectorySetpoint</code> for 10 cycles, then switches mode and arms via <code>VehicleCommand</code>, and after that holds a point at 5 m. Read the code: the order “stream first, then mode” is the key.</p>
 <h4 class="md-subheading">Step 4. Your own node</h4>
-<p>Write a Python node (<code>rclpy</code>) that holds a quadcopter at 3 m altitude and every 10 s moves the target around a circle of 5 m radius. Check: stop the node — after ~2 s PX4 exits Offboard (in SITL it switches to Hold/Land depending on the failsafe setting).</p>
+<p>Write a Python node (<code>rclpy</code>) that holds a quadcopter at 3 m altitude and every 10 s moves the target around a circle of 5 m radius. Check: stop the node — after ~1 s (<code>COM_OF_LOSS_T</code>, 1 s by default) PX4 exits Offboard (in SITL it switches to Hold/Land depending on the failsafe setting).</p>
 <p>Skeleton (structure as in the <code>px4_ros_com</code> example; check the topic names against <code>ros2 topic list</code> for your PX4 version):</p>
 <pre class="cli-block"><code>import math
 import rclpy

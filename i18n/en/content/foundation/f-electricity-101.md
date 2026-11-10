@@ -18,7 +18,7 @@ related:
 next:
   - f-power
 source: content/foundation/f-electricity-101.md
-source_hash: 2c06199e1899
+source_hash: ad65d5a7349e
 ---
 
 ## summary
@@ -85,7 +85,7 @@ Your own one-page checklist: charging, storage, inspection, what to do after a c
 - **LiPo cells:** 4.20 V is fully charged, 3.80–3.85 V is storage. After balancing, the difference between cells is hundredths of a volt; more than 0.05 V is a reason to check the battery (the “Maintenance” module).
 - **BEC:** 5 V should be within roughly ±5% (4.75–5.25 V) with the electronics connected. If the voltage sags noticeably under load, the BEC's current rating is too small.
 - **Pack internal resistance:** 25.2 V with no load, 24.4 V at 20 A → R = (25.2 − 24.4) / 20 = 0.04 Ω for a 6S pack, ≈ 6.7 mΩ per cell. At hover current the sag will be proportionally smaller.
-- **Motor windings:** phase resistance is tenths and hundredths of an ohm, and an ordinary multimeter measures it poorly: the probes and the contact add a comparable error. Compare the three phases of one motor with each other: they should match. One that's noticeably higher means a bad solder joint; an “open” means a damaged winding. For more accuracy, pass a known current from a bench power supply (for example, 1 A) and measure the voltage drop.
+- **Motor windings:** phase resistance is tenths and hundredths of an ohm, and an ordinary multimeter measures it poorly: the probes and the contact add a comparable error. Compare the three phases of one motor with each other: they should match. A bad solder joint on a lead raises the two pairs that include that lead; one pair that stands out from the other two means a damaged winding (an inter-turn short); an “open” means a broken winding or lead. For more accuracy, pass a known current from a bench power supply (for example, 1 A) and measure the voltage drop.
 
 ### What the cross-check should show
 A 10–20% difference between the calculated hover current and the average current from the log is normal: the motor table was measured with a different prop, at a different temperature and voltage. More than 30% means you should check the current sensor calibration against a wattmeter and the drone's mass.

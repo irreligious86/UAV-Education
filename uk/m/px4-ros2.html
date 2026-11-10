@@ -113,7 +113,7 @@ cd .. &amp;&amp; colcon build &amp;&amp; source install/setup.bash</code></pre>
 <h4 class="md-subheading">Крок 3. Offboard-приклад</h4>
 <p>Запусти приклад із <code>px4_ros_com</code> (offboard control): вузол 10 циклів шле <code>OffboardControlMode</code> + <code>TrajectorySetpoint</code>, потім перемикає режим і армить через <code>VehicleCommand</code>, після чого тримає точку на 5 м. Прочитай код: порядок «спочатку потік, потім режим» — ключовий.</p>
 <h4 class="md-subheading">Крок 4. Власний вузол</h4>
-<p>Напиши вузол на Python (<code>rclpy</code>), який тримає квадрокоптер на висоті 3 м і кожні 10 с змінює ціль по колу радіусом 5 м. Перевір: зупинив вузол — через ~2 с PX4 виходить з Offboard (у SITL — перехід у Hold/Land згідно з налаштуванням failsafe).</p>
+<p>Напиши вузол на Python (<code>rclpy</code>), який тримає квадрокоптер на висоті 3 м і кожні 10 с змінює ціль по колу радіусом 5 м. Перевір: зупинив вузол — через ~1 с (<code>COM_OF_LOSS_T</code>, типово 1 с) PX4 виходить з Offboard (у SITL — перехід у Hold/Land згідно з налаштуванням failsafe).</p>
 <p>Каркас (структура як у прикладі <code>px4_ros_com</code>, імена топіків звір із <code>ros2 topic list</code> своєї версії PX4):</p>
 <pre class="cli-block"><code>import math
 import rclpy

@@ -15,7 +15,7 @@ related:
 next:
   - px4-control
 source: content/px4/px4-architecture.md
-source_hash: 5453ed2c4c43
+source_hash: a5ca6c5a9fee
 ---
 
 ## summary
@@ -90,7 +90,7 @@ Open `msg/VehicleCommand.msg` (since PX4 1.16 — `msg/versioned/VehicleCommand.
 ### What you should get and what to write down
 - **Step 1.** `top` shows the modules and their CPU load: in SITL this is `px4` as a process, with the stack's modules inside. `uorb top` is a table of topics with publication rate and number of subscribers. `listener sensor_combined -n 1` prints one message with accelerations and angular rates, and from it you can see the fields you will need later in ROS 2.
 - **Step 2.** Write down the actual rates of the four topics from `uorb top`. The expected picture: sensors and attitude — hundreds of hertz, local position — tens, motor outputs — at the rate of the angular-rate loop. Rates in SITL depend on the simulator model and may differ from hardware — compare them with each other, not with someone else's numbers. Explain why position is slower than attitude: it relies on GNSS and the barometer, which are slow themselves.
-- **Step 3.** After `mc_rate_control stop` the vehicle in SITL flips or crashes within a fraction of a second: without the angular-rate loop nothing holds the attitude. After `start` the module is subscribed to its topics again, but the crashed vehicle has to be restarted. This clearly shows that modules are separate processes connected only by topics.
+- **Step 3.** After `mc_rate_control stop` the vehicle in SITL flips or crashes within a fraction of a second: without the angular-rate loop nothing holds the attitude. After `start` the module is subscribed to its topics again, but the crashed vehicle has to be restarted. This clearly shows that modules are independent tasks (threads or work-queue items — `mc_rate_control` runs in the `rate_ctrl` work queue, not as a separate process) connected only by topics.
 - **Step 4.** Write out the fields of `VehicleCommand` (the command, seven parameters, the targets) and `OffboardControlMode` (which type of setpoint is allowed) — this is direct preparation for the PX4 + ROS 2 module.
 
 ### Lab

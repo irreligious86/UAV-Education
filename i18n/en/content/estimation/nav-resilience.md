@@ -21,7 +21,7 @@ related:
 next:
   - ap-ekf
 source: content/estimation/nav-resilience.md
-source_hash: 1b73236b97e5
+source_hash: b6c54388bc75
 ---
 
 ## summary
@@ -47,7 +47,7 @@ The main tool is **source disagreement**: the EKF compares every measurement wit
 ### Designing for resilience
 1. **Reduce your own interference** (see the EMI module): this accounts for 80% of real GPS problems.
 2. **Backup EKF sources**: optical flow + rangefinder for low altitudes; baro as the POSZ backup; a second GPS with `GPS_AUTO_SWITCH`; compass + GPS yaw + GSF.
-3. **A failsafe that fits the scenario**: what to do on loss of position depends on the location. Over a field: AltHold and a manual landing. Over people: Land. Over water: continuing to shore on inertial navigation — don't count on it, it won't last. The decision is recorded in the engineering folder with its rationale.
+3. **A failsafe that fits the scenario**: what to do on loss of position depends on the location. Over a field: AltHold and a manual landing. Over people: Land. Over water: don't count on inertial navigation to reach the shore — it won't last; AltHold and a manual return to shore by sight or video. The decision is recorded in the engineering folder with its rationale.
 4. **GPS-independent modes are always available to the pilot**: Stabilize/AltHold on a switch, and the pilot knows how to use them — this is practiced in training.
 5. **Geofence and altitude**: when position degrades, the geofence is useless — account for this in the site risk assessment.
 

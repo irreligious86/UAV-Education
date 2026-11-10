@@ -16,7 +16,7 @@ related:
 next:
   - px4-companion-jetson
 source: content/px4/px4-ros2.md
-source_hash: dc041dcb38d4
+source_hash: df1e92027766
 ---
 
 ## summary
@@ -104,7 +104,7 @@ cd .. && colcon build && source install/setup.bash
 Запусти приклад із `px4_ros_com` (offboard control): вузол 10 циклів шле `OffboardControlMode` + `TrajectorySetpoint`, потім перемикає режим і армить через `VehicleCommand`, після чого тримає точку на 5 м. Прочитай код: порядок «спочатку потік, потім режим» — ключовий.
 
 ### Крок 4. Власний вузол
-Напиши вузол на Python (`rclpy`), який тримає квадрокоптер на висоті 3 м і кожні 10 с змінює ціль по колу радіусом 5 м. Перевір: зупинив вузол — через ~2 с PX4 виходить з Offboard (у SITL — перехід у Hold/Land згідно з налаштуванням failsafe).
+Напиши вузол на Python (`rclpy`), який тримає квадрокоптер на висоті 3 м і кожні 10 с змінює ціль по колу радіусом 5 м. Перевір: зупинив вузол — через ~1 с (`COM_OF_LOSS_T`, типово 1 с) PX4 виходить з Offboard (у SITL — перехід у Hold/Land згідно з налаштуванням failsafe).
 
 Каркас (структура як у прикладі `px4_ros_com`, імена топіків звір із `ros2 topic list` своєї версії PX4):
 ```python

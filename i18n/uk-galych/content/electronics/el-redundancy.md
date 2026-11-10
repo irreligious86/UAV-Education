@@ -18,7 +18,7 @@ related:
 next:
   - rf-antennas
 source: content/electronics/el-redundancy.md
-source_hash: 394a2d018403
+source_hash: 99cc70366034
 ---
 
 ## summary

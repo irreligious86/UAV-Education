@@ -20,7 +20,7 @@ related:
 next:
   - math-prob-est
 source: content/math/math-ode-dyn.md
-source_hash: c4589e535ee6
+source_hash: d1acb9740257
 ---
 
 ## summary
@@ -41,7 +41,7 @@ The frequency side of the same equation: it's a low-pass filter with cutoff freq
 - 0 < ζ < 1 — underdamped: overshoot and decaying oscillations at frequency ω₀√(1 − ζ²); overshoot in percent ≈ 100·e^(−πζ/√(1 − ζ²)) (ζ = 0.5 → 16 %, ζ = 0.7 → 5 %).
 - ζ = 0 — undamped oscillations; ζ < 0 — instability, the amplitude grows.
 
-A quadcopter axis with an angle P controller is exactly this equation: inertia J·θ̈ = torque, torque = K_p·(θ_target − θ) − K_d·θ̇. Then ω₀ = √(K_p/J), ζ = K_d/(2√(K_p·J)). This gives the rule every tuner knows without knowing the formula: raise P — the oscillations get faster and the overshoot grows; raise D — the overshoot drops. The I-term, in turn, adds a third order and can turn ζ negative — low-frequency “I oscillations” with too much I.
+A quadcopter axis with an angle PD controller is exactly this equation: inertia J·θ̈ = torque, torque = K_p·(θ_target − θ) − K_d·θ̇. Then ω₀ = √(K_p/J), ζ = K_d/(2√(K_p·J)). This gives the rule every tuner knows without knowing the formula: raise P — the oscillations get faster and the overshoot grows; raise D — the overshoot drops. The I-term, in turn, adds a third order and can turn ζ negative — low-frequency “I oscillations” with too much I.
 
 ### Poles: the address of behavior
 Any linear equation with constant coefficients has solutions of the form e^(st); substituting gives the characteristic equation, and its roots s are the **poles**. A first-order system has one pole: s = −1/τ. A second-order one: s = −ζω₀ ± ω₀√(ζ² − 1).
@@ -58,7 +58,7 @@ Reading a pole map on the complex plane:
 For linear systems with zero initial conditions, differentiation in time turns into multiplication by s (the Laplace transform). First order: G(s) = K/(τs + 1). Second order: G(s) = ω₀²/(s² + 2ζω₀s + ω₀²). PID: C(s) = K_p + K_i/s + K_d·s. Blocks are combined by multiplication (in series) and by the closed-loop formula: T(s) = C·G/(1 + C·G). The closed-loop poles are the roots of 1 + C(s)G(s) = 0: this is where the “right” PID values live. A pure delay (packet transport, a filter) is e^(−sL): it doesn't change the amplitude, but it shifts the phase by ω·L, and that's exactly what makes the loop unstable at high gains. Phase margin is how much more delay you can add before self-oscillation; on a well-tuned 5" combat quad it's 40–60°.
 
 ### Discretization: formulas for firmware
-The controller runs in ticks with period T_s (Betaflight — PID loop 4–8 kHz, ArduPilot — 400 Hz, PX4 rate loop — up to 1 kHz). Derivatives and integrals are replaced with differences:
+The controller runs in ticks with period T_s (Betaflight — PID loop 4–8 kHz, ArduPilot — 400 Hz, PX4 rate loop — 800 Hz by default, up to 2 kHz via `IMU_GYRO_RATEMAX`). Derivatives and integrals are replaced with differences:
 - **Backward Euler**: ẋ ≈ (xₖ − xₖ₋₁)/T_s; ∫x ≈ Σ xₖ·T_s. Simple, but it adds a T_s/2 delay and distorts frequencies above f_s/10.
 - **Tustin (bilinear)**: s → (2/T_s)·(z − 1)/(z + 1). It preserves stability and the frequency response more accurately; all Betaflight filters (`biquad`) and PT1 are discretized exactly this way or through the exact RC filter formula.
 - A first-order PT1 in code: yₖ = yₖ₋₁ + k·(xₖ − yₖ₋₁), where k = T_s/(τ + T_s) — this is the backward Euler transform, practically exact when f_c ≪ f_s. In Betaflight — `pt1FilterGain()`.

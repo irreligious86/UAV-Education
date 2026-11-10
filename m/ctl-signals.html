@@ -87,7 +87,7 @@ print(&quot;peaks (Hz):&quot;, sorted(int(v) for v in f[signal.find_peaks(10 * n
 f2, t2, S = signal.spectrogram(x, fs, nperseg=512, noverlap=384)</code></pre>
 <p>Ожидаемо: <code>peaks (Hz): [179, 218, 500]</code> — ~180 Гц рама (шаг сетки Welch ≈ 3.9 Гц), около 220 Гц мотор (за 2 с обороты успели вырасти с 200 до ~260 Гц, пик размазан), около 500 Гц край размазанной второй гармоники; на спектрограмме <code>S</code> (построить <code>pcolormesh(t2, f2, 10*log10(S))</code>, 0–1000 Гц) моторные линии наклонные, линия 180 Гц горизонтальная. Если ваш код показывает иное — ошибка в коде, а не в дроне.</p>
 <h4 class="md-subheading">Шаг 1. Спектрограмма</h4>
-<p>Из <code>data-python</code>: <code>spectrogram</code> по roll с nperseg=512 для 8 кГц (Δf 15 Гц, Δt 32 мс). Вывести с цветовой шкалой дБ, 0–1000 Гц.</p>
+<p>Из <code>data-python</code>: <code>spectrogram</code> по roll с nperseg=512 для 8 кГц (Δf ≈ 15.6 Гц, окно 64 мс, шаг по времени 32 мс при noverlap=256). Вывести с цветовой шкалой дБ, 0–1000 Гц.</p>
 <h4 class="md-subheading">Шаг 2. Гармоники ↔ eRPM</h4>
 <p>Взять <code>eRPM[0..3]</code> в 5 моментах времени, посчитать f₁ = eRPM/(poles/2)/60, нанести точками на спектрограмму. Совпадение — моторы; найти 2f₁.</p>
 <h4 class="md-subheading">Шаг 3. Резонанс</h4>

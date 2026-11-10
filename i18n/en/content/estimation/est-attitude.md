@@ -19,7 +19,7 @@ related:
 next:
   - est-kalman
 source: content/estimation/est-attitude.md
-source_hash: 9c8396264f5f
+source_hash: bc09a4c0a4b6
 ---
 
 ## summary
@@ -43,7 +43,7 @@ Angular rate ω (in body axes) changes the quaternion: q̇ = ½ · q ⊗ (0, ω)
 The idea: trust the gyro at high frequencies and the accelerometer (gravity) at low frequencies. The Mahony algorithm:
 1. Predict “down” in body axes from the current q: v = R(q)ᵀ · (0, 0, 1).
 2. The measured “down” is the normalized accelerometer with a minus sign: −a/|a| (the accelerometer measures specific force; at rest in FRD it reads (0, 0, −g)).
-3. The error is the cross product e = a × v (small when they agree; its direction is the correction axis).
+3. The error is the cross product e = (−a/|a|) × v (small when they agree; its direction is the correction axis).
 4. Correct the angular rate: ω' = ω + Kp·e + Ki·∫e (Ki is the gyro bias estimate!).
 5. Integrate ω' into q.
 

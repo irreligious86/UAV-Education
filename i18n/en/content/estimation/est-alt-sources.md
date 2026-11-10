@@ -19,7 +19,7 @@ related:
 next:
   - nav-resilience
 source: content/estimation/est-alt-sources.md
-source_hash: 55142994d4b2
+source_hash: 14fba06eba02
 ---
 
 ## summary

@@ -88,7 +88,7 @@ print(&quot;peaks (Hz):&quot;, sorted(int(v) for v in f[signal.find_peaks(10 * n
 f2, t2, S = signal.spectrogram(x, fs, nperseg=512, noverlap=384)</code></pre>
 <p>Expected: <code>peaks (Hz): [179, 218, 500]</code> — ~180 Hz is the frame (the Welch grid step ≈ 3.9 Hz), around 220 Hz is the motor (over 2 s the RPM rose from 200 to ~260 Hz, so the peak is smeared), around 500 Hz is the edge of the smeared second harmonic; on the spectrogram <code>S</code> (plot <code>pcolormesh(t2, f2, 10*log10(S))</code>, 0–1000 Hz) the motor lines are sloped and the 180 Hz line is horizontal. If your code shows something else, the bug is in the code, not in the drone.</p>
 <h4 class="md-subheading">Step 1. Spectrogram</h4>
-<p>From <code>data-python</code>: a <code>spectrogram</code> of roll with nperseg=512 for 8 kHz (Δf 15 Hz, Δt 32 ms). Display it with a dB color scale, 0–1000 Hz.</p>
+<p>From <code>data-python</code>: a <code>spectrogram</code> of roll with nperseg=512 for 8 kHz (Δf ≈ 15.6 Hz, a 64 ms window, a 32 ms time step with noverlap=256). Display it with a dB color scale, 0–1000 Hz.</p>
 <h4 class="md-subheading">Step 2. Harmonics ↔ eRPM</h4>
 <p>Take <code>eRPM[0..3]</code> at 5 moments in time, compute f₁ = eRPM/(poles/2)/60, and plot them as points on the spectrogram. A match means motors; find 2f₁.</p>
 <h4 class="md-subheading">Step 3. Resonance</h4>

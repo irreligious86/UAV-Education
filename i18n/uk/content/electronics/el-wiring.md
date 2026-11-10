@@ -16,7 +16,7 @@ related:
 next:
   - el-emi
 source: content/electronics/el-wiring.md
-source_hash: c2e851b398c5
+source_hash: 62b456a1d80e
 ---
 
 ## summary

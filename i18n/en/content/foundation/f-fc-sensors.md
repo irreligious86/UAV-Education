@@ -16,7 +16,7 @@ related:
 next:
   - bf-pid-reg-in-bf
 source: content/foundation/f-fc-sensors.md
-source_hash: adf44533658a
+source_hash: d5fed3f0a90a
 ---
 
 ## summary

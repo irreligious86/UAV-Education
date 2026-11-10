@@ -16,13 +16,13 @@
     {
       "q": "What coordinate frame is /ap/pose/filtered in?",
       "options": [
-        "ENU, map",
+        "ENU relative to home",
         "NED relative to home",
         "ECEF",
         "FRD"
       ],
       "answer": 0,
-      "explain": "AP_DDS converts it itself."
+      "explain": "AP_DDS converts it itself; the firmware writes base_link into header.frame_id."
     },
     {
       "q": "The service to switch Copter to GUIDED:",
@@ -62,7 +62,7 @@
       "options": [
         "Tools/ros2 in ArduPilot",
         "In px4_msgs",
-        "In the px4_msgs package",
+        "In mavros_msgs",
         "In ROS core"
       ],
       "answer": 0,

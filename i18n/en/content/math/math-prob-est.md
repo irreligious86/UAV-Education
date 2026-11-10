@@ -19,7 +19,7 @@ related:
 next:
   - est-kalman
 source: content/math/math-prob-est.md
-source_hash: 2bbf780f5b85
+source_hash: 767877ea79c3
 ---
 
 ## summary
@@ -58,7 +58,7 @@ But the bias isn't constant either: it slowly wanders (bias instability, flicker
 ### What of this is in the autopilot parameters
 | What | ArduPilot EKF3 | PX4 EKF2 |
 |---|---|---|
-| gyro noise σ (R part of the prediction) | `EK3_GYRO_P_NSE` | `EKF2_GYR_NOISE` |
+| gyro noise σ (goes into Q, the process noise of the prediction) | `EK3_GYRO_P_NSE` | `EKF2_GYR_NOISE` |
 | gyro bias random walk | `EK3_GBIAS_P_NSE` | `EKF2_GYR_B_NOISE` |
 | GPS position σ | `EK3_POSNE_M_NSE` (+HDOP) | `EKF2_GPS_P_NOISE` |
 | baro σ | `EK3_ALT_M_NSE` | `EKF2_BARO_NOISE` |

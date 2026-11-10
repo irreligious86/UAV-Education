@@ -15,7 +15,7 @@ related:
   - ap-lua
 next: []
 source: content/inav/inav-ipf.md
-source_hash: f5b5c1bb53ac
+source_hash: f095cc06a28c
 ---
 
 ## summary

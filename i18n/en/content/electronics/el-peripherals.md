@@ -19,7 +19,7 @@ related:
 next:
   - rf-antennas
 source: content/electronics/el-peripherals.md
-source_hash: 640f4adb2205
+source_hash: a416702cb100
 ---
 
 ## summary

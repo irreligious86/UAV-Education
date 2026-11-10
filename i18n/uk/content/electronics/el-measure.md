@@ -17,7 +17,7 @@ related:
 next:
   - el-emi
 source: content/electronics/el-measure.md
-source_hash: 603b8ab39703
+source_hash: d0ba0890a07a
 ---
 
 ## summary

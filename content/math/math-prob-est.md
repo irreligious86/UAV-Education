@@ -56,7 +56,7 @@ x̂ = (z₁/σ₁² + z₂/σ₂²) / (1/σ₁² + 1/σ₂²), 1/σ̂² = 1/σ�
 ### Что из этого — в параметрах автопилота
 | Что | ArduPilot EKF3 | PX4 EKF2 |
 |---|---|---|
-| σ шума гироскопа (R-часть предсказания) | `EK3_GYRO_P_NSE` | `EKF2_GYR_NOISE` |
+| σ шума гироскопа (входит в Q — шум процесса при предсказании) | `EK3_GYRO_P_NSE` | `EKF2_GYR_NOISE` |
 | блуждание bias гиро | `EK3_GBIAS_P_NSE` | `EKF2_GYR_B_NOISE` |
 | σ GPS позиции | `EK3_POSNE_M_NSE` (+HDOP) | `EKF2_GPS_P_NOISE` |
 | σ баро | `EK3_ALT_M_NSE` | `EKF2_BARO_NOISE` |

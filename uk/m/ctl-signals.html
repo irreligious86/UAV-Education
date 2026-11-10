@@ -88,7 +88,7 @@ print(&quot;peaks (Hz):&quot;, sorted(int(v) for v in f[signal.find_peaks(10 * n
 f2, t2, S = signal.spectrogram(x, fs, nperseg=512, noverlap=384)</code></pre>
 <p>Очікувано: <code>peaks (Hz): [179, 218, 500]</code> — ~180 Гц рама (крок сітки Welch ≈ 3.9 Гц), близько 220 Гц мотор (за 2 с оберти встигли зрости з 200 до ~260 Гц, пік розмазаний), близько 500 Гц край розмазаної другої гармоніки; на спектрограмі <code>S</code> (побудувати <code>pcolormesh(t2, f2, 10*log10(S))</code>, 0–1000 Гц) моторні лінії похилі, лінія 180 Гц горизонтальна. Якщо ваш код показує інше — помилка в коді, а не в дроні.</p>
 <h4 class="md-subheading">Крок 1. Спектрограма</h4>
-<p>З <code>data-python</code>: <code>spectrogram</code> по roll з nperseg=512 для 8 кГц (Δf 15 Гц, Δt 32 мс). Вивести з кольоровою шкалою дБ, 0–1000 Гц.</p>
+<p>З <code>data-python</code>: <code>spectrogram</code> по roll з nperseg=512 для 8 кГц (Δf ≈ 15.6 Гц, вікно 64 мс, крок за часом 32 мс при noverlap=256). Вивести з кольоровою шкалою дБ, 0–1000 Гц.</p>
 <h4 class="md-subheading">Крок 2. Гармоніки ↔ eRPM</h4>
 <p>Взяти <code>eRPM[0..3]</code> у 5 моментах часу, порахувати f₁ = eRPM/(poles/2)/60, нанести точками на спектрограму. Збіг — мотори; знайти 2f₁.</p>
 <h4 class="md-subheading">Крок 3. Резонанс</h4>

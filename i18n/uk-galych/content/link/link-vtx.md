@@ -14,7 +14,7 @@ related:
   - bf-modes-osd
 next: []
 source: content/link/link-vtx.md
-source_hash: cf108e07c92f
+source_hash: 42e8a5661265
 ---
 
 ## summary
@@ -110,7 +110,7 @@ save
 
 ## references
 - VTX — Betaflight Development Docs | https://betaflight.com/docs/wiki/guides/current/VTX | primary | A
-- VTX Tables — Betaflight Documentation | https://betaflight.com/docs/wiki/guides/current/VTX | primary | A
+- VTX Tables — Betaflight Documentation | https://betaflight.com/docs/wiki/guides/current/VTX-Tables | primary | A
 - How to Setup VTX Table in Betaflight — Oscar Liang | https://oscarliang.com/smartaudio-tramp-vtx-control-vtxtables/ | secondary | B
 
 ## checklist

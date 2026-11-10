@@ -16,7 +16,7 @@ related:
 next:
   - px4-companion-jetson
 source: content/px4/px4-ros2.md
-source_hash: dc041dcb38d4
+source_hash: df1e92027766
 ---
 
 ## summary
@@ -104,7 +104,7 @@ Agent: `MicroXRCEAgent udp4 -p 8888` (build from source or snap — see the docu
 Run the example from `px4_ros_com` (offboard control): the node sends `OffboardControlMode` + `TrajectorySetpoint` for 10 cycles, then switches mode and arms via `VehicleCommand`, and after that holds a point at 5 m. Read the code: the order “stream first, then mode” is the key.
 
 ### Step 4. Your own node
-Write a Python node (`rclpy`) that holds a quadcopter at 3 m altitude and every 10 s moves the target around a circle of 5 m radius. Check: stop the node — after ~2 s PX4 exits Offboard (in SITL it switches to Hold/Land depending on the failsafe setting).
+Write a Python node (`rclpy`) that holds a quadcopter at 3 m altitude and every 10 s moves the target around a circle of 5 m radius. Check: stop the node — after ~1 s (`COM_OF_LOSS_T`, 1 s by default) PX4 exits Offboard (in SITL it switches to Hold/Land depending on the failsafe setting).
 
 Skeleton (structure as in the `px4_ros_com` example; check the topic names against `ros2 topic list` for your PX4 version):
 ```python

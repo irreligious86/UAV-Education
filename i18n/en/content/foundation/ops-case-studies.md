@@ -19,7 +19,7 @@ related:
 next:
   - diag-troubleshooting
 source: content/foundation/ops-case-studies.md
-source_hash: 7149d239f9be
+source_hash: a6b854a7320d
 ---
 
 ## summary
@@ -69,7 +69,7 @@ Distinguish three types of causes: **hardware failure** (a part broke), **config
 ### Case 3. Freefly Alta X, Henley-on-Thames, June 29, 2022 (AAIB, bulletin 01/2023)
 **Context.** Commercial filming of a regatta, a 28 kg multirotor (MTOW 34.9) on two 12S LiPos, 50.4 V when fully charged. The 21st flight of the day, the 6th on this battery set, while the intention was to swap them every three flights.
 
-**Sequence.** At ~50 m the low-voltage warning went off. During the return the voltage kept dropping and controlled flight was lost; the aircraft, almost in free fall (≈ 30 m/s), hit a boat on the river. No injuries; impact energy ≈ 13,700 J — the board noted that hitting a person would have been fatal. **No logs** — the aircraft wasn't recovered.
+**Sequence.** At ~50 m the low-voltage warning went off. During the return the voltage kept dropping and controlled flight was lost; the aircraft, almost in free fall (≈ 30 m/s), hit a boat on the river. No injuries; impact energy ≈ 13,700 J (the AAIB estimate; ½·28·30² ≈ 12,600 J, while 13,700 J matches ~31 m/s, a free fall from 50 m) — the board noted that hitting a person would have been fatal. **No logs** — the aircraft wasn't recovered.
 
 **Causes.** Configuration error: the pilot had lowered the warning threshold from 44 V (the manufacturer's default, “land as soon as possible”) to 42 V — the margin to critical voltage was cut by 2 V. Operator error: the voltage before takeoff was most likely not checked (the manufacturer requires > 48 V, the pilot “took off below 48 too”); the batteries weren't swapped as planned. No hardware failure was found.
 

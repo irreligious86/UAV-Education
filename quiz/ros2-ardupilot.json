@@ -16,13 +16,13 @@
     {
       "q": "В какой системе координат /ap/pose/filtered?",
       "options": [
-        "ENU, map",
+        "ENU относительно home",
         "NED относительно дома",
         "ECEF",
         "FRD"
       ],
       "answer": 0,
-      "explain": "AP_DDS конвертирует сам."
+      "explain": "AP_DDS конвертирует сам; в header.frame_id прошивка пишет base_link."
     },
     {
       "q": "Сервис смены режима в GUIDED для Copter:",
@@ -62,7 +62,7 @@
       "options": [
         "Tools/ros2 в ArduPilot",
         "В px4_msgs",
-        "В пакете px4_msgs",
+        "В mavros_msgs",
         "В ROS core"
       ],
       "answer": 0,
