@@ -1,0 +1,94 @@
+{
+  "module": "el-redundancy",
+  "pass": 80,
+  "questions": [
+    {
+      "q": "Which layout is the most survivable when one motor fails?",
+      "options": [
+        "Quad",
+        "Hexa",
+        "X8",
+        "Tricopter"
+      ],
+      "answer": 2,
+      "explain": "The coaxial partner and the opposite pair compensate for both thrust and moment."
+    },
+    {
+      "q": "What happens to a hexa when a motor fails without thrust margin?",
+      "options": [
+        "Automatic landing on a timer",
+        "Altitude holds, yaw gets worse",
+        "Auto-landing",
+        "Switch to Acro"
+      ],
+      "answer": 1,
+      "explain": "Five motors pull, but the CW/CCW balance is broken; with T/W < 2 it falls."
+    },
+    {
+      "q": "Why aren't fuses put on the motors?",
+      "options": [
+        "They interfere with ESC telemetry and DShot",
+        "Pulsed current: it will blow for nothing",
+        "Motors don't break",
+        "Too expensive"
+      ],
+      "answer": 1,
+      "explain": "Fuses go on the battery, the BEC and the payload branches."
+    },
+    {
+      "q": "How is the FC's BEC made redundant?",
+      "options": [
+        "Two BECs with diode ORing",
+        "One BEC with current margin",
+        "Backup from the USB connector",
+        "A big capacitor on the bus"
+      ],
+      "answer": 0,
+      "explain": "If one fails, power keeps coming from the second."
+    },
+    {
+      "q": "X8 arm current relative to motor current:",
+      "options": [
+        "The same",
+        "2 times higher",
+        "4 times higher",
+        "8 times higher"
+      ],
+      "answer": 1,
+      "explain": "There are two motors on an arm."
+    },
+    {
+      "q": "How do you simulate a motor failure in ArduPilot SITL?",
+      "options": [
+        "Lower SIM_BATT_VOLTAGE",
+        "SIM_ENGINE_FAIL and SIM_ENGINE_MUL",
+        "Disable the ESC via MOT_FAIL = 1",
+        "Remove it from the mixer"
+      ],
+      "answer": 1,
+      "explain": "SITL applies a multiplier to the output of the selected motors."
+    },
+    {
+      "q": "What do you see in the ArduPilot log when a motor fails?",
+      "options": [
+        "Battery voltage rises and current falls",
+        "RCOU at maximum, RPM 0",
+        "GPS loses satellites",
+        "Nothing"
+      ],
+      "answer": 1,
+      "explain": "One RCOU channel at maximum, its neighbor at minimum, RPM 0 in the ESC telemetry: the mixer compensates."
+    },
+    {
+      "q": "A flat octo compared with a hexa:",
+      "options": [
+        "Survives no failures at all",
+        "Needs less total thrust to hover the same mass",
+        "Loses yaw control",
+        "Bigger margin, can survive two failures in favorable positions"
+      ],
+      "answer": 3,
+      "explain": "Eight motors give a bigger margin and, with a favorable arrangement, survive two failures."
+    }
+  ]
+}

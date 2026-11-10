@@ -1,0 +1,54 @@
+{
+ "module": "per-landing",
+ "tasks": [
+  {
+   "id": "marker-px",
+   "title": "Marker size in the frame",
+   "statement": "A marker with a side of **{s} m**, camera f = **{f} px**, altitude **{h} m**. How many pixels does the marker side span?",
+   "params": {
+    "s": [
+     0.1,
+     0.15,
+     0.2,
+     0.5,
+     0.8
+    ],
+    "f": {
+     "min": 400,
+     "max": 900,
+     "step": 50
+    },
+    "h": {
+     "min": 1,
+     "max": 20,
+     "step": 1
+    }
+   },
+   "answer": "f*s/h",
+   "unit": "px",
+   "tol": 0.01,
+   "solution": "px = f·S/H; reliable detection needs ≥ 20–30 px."
+  },
+  {
+   "id": "descent-lag",
+   "title": "Descent during the latency",
+   "statement": "Camera latency **{l} ms**, descent rate **{v} m/s**. How many centimeters does the vehicle drop between the frame and the response?",
+   "params": {
+    "l": {
+     "min": 30,
+     "max": 200,
+     "step": 10
+    },
+    "v": {
+     "min": 0.2,
+     "max": 1.5,
+     "step": 0.1
+    }
+   },
+   "answer": "l/1000*v*100",
+   "unit": "cm",
+   "tol": 0.01,
+   "solution": "Δh = v·L."
+  }
+ ]
+}

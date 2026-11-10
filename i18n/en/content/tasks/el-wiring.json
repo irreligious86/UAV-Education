@@ -1,0 +1,52 @@
+{
+ "module": "el-wiring",
+ "tasks": [
+  {
+   "id": "wire-drop",
+   "title": "Voltage drop on a wire",
+   "statement": "A copper wire with a cross-section of **{a} mm²**, length from the battery to the load **{l} m** (positive and negative — the same length back), current **{i} A**. Find the voltage drop across the pair of wires (V). ρ of copper = 0.0172 Ω·mm²/m.",
+   "params": {
+    "a": {
+     "min": 0.5,
+     "max": 6,
+     "step": 0.5
+    },
+    "l": {
+     "min": 0.2,
+     "max": 2.0,
+     "step": 0.1
+    },
+    "i": {
+     "min": 5,
+     "max": 80,
+     "step": 5
+    }
+   },
+   "answer": "i*0.0172*2*l/a",
+   "unit": "V",
+   "tol": 0.02,
+   "solution": "R = ρ·(2L)/A, ΔU = I·R. Out and back — the length doubles."
+  },
+  {
+   "id": "wire-heat",
+   "title": "Wire heating",
+   "statement": "A current of **{i} A** flows through a wire with a resistance of **{r} mΩ**. How many watts are dissipated?",
+   "params": {
+    "r": {
+     "min": 2,
+     "max": 40,
+     "step": 1
+    },
+    "i": {
+     "min": 10,
+     "max": 120,
+     "step": 5
+    }
+   },
+   "answer": "i**2*r/1000",
+   "unit": "W",
+   "tol": 0.02,
+   "solution": "P = I²·R. Current is squared — doubling the current quadruples the heating."
+  }
+ ]
+}

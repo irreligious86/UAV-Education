@@ -1,0 +1,94 @@
+{
+  "module": "el-measure",
+  "pass": 80,
+  "questions": [
+    {
+      "q": "What can a multimeter not show?",
+      "options": [
+        "Motor winding resistance in mΩ",
+        "Brief sags and ripple",
+        "Battery voltage",
+        "A short during a continuity test"
+      ],
+      "answer": 1,
+      "explain": "A multimeter averages; only an oscilloscope sees fast events."
+    },
+    {
+      "q": "Why use AC coupling when measuring 5 V ripple?",
+      "options": [
+        "To enable the trigger",
+        "To remove the DC and zoom in on the scale",
+        "So you don't fry the oscilloscope input",
+        "To measure the frequency"
+      ],
+      "answer": 1,
+      "explain": "Without AC coupling, ripple of tens of mV is invisible against 5 V."
+    },
+    {
+      "q": "How many bits are in a DShot frame?",
+      "options": [
+        "8",
+        "11",
+        "16",
+        "32"
+      ],
+      "answer": 2,
+      "explain": "11 throttle bits + 1 telemetry bit + 4 CRC bits = 16."
+    },
+    {
+      "q": "Why does a long probe ground wire ruin a ripple measurement?",
+      "options": [
+        "It cuts the probe bandwidth to 1 MHz",
+        "It picks up noise like an antenna",
+        "It heats up",
+        "It discharges the capacitor"
+      ],
+      "answer": 1,
+      "explain": "The ground loop is an antenna; a ground spring removes the artifact."
+    },
+    {
+      "q": "At what baud rate do you decode CRSF between the receiver and the FC?",
+      "options": [
+        "9600",
+        "115200",
+        "420000",
+        "1000000"
+      ],
+      "answer": 2,
+      "explain": "CRSF runs at 420000 baud; MSP is usually 115200."
+    },
+    {
+      "q": "What does a NACK on an I2C address in the analyzer mean?",
+      "options": [
+        "The bus is overloaded and needs a higher speed",
+        "There is no device at that address",
+        "The sensor responded",
+        "10-bit addressing mode is enabled"
+      ],
+      "answer": 1,
+      "explain": "No acknowledge — the device didn't respond."
+    },
+    {
+      "q": "What is mandatory for any measurement on ESCs and motors?",
+      "options": [
+        "A ×1 probe",
+        "Props removed",
+        "Current measurement mode",
+        "Receiver turned off"
+      ],
+      "answer": 1,
+      "explain": "Safety: props always come off."
+    },
+    {
+      "q": "How do you find a short with a multimeter before the first power-up?",
+      "options": [
+        "A continuity test of the power bus + to − with no power",
+        "Measure current in the 10 A jack with the battery connected",
+        "Measure the voltage on the motors",
+        "Check the frequency on the signal wire"
+      ],
+      "answer": 0,
+      "explain": "Continuity test before applying power: a beep between + and − means a short circuit."
+    }
+  ]
+}

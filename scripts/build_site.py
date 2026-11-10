@@ -1315,7 +1315,11 @@ def build_task_variants(bank: dict) -> dict:
             ans = eval(t["answer"], {"__builtins__": {"min": min, "max": max, "abs": abs, "round": round}, "math": math}, dict(vals))  # authored by us, not user input
             if not math.isfinite(ans):
                 continue
-            statement = re.sub(r"\{([a-z0-9_]+)\}", lambda mm: _fmt_num(vals[mm.group(1)]), t["statement"])
+            # "labels": {"param": {"<value>": "<shown text>"}} lets a translation show a string parameter in its own
+            # language while the answer formula keeps comparing the source value
+            labels = t.get("labels", {})
+            statement = re.sub(r"\{([a-z0-9_]+)\}",
+                               lambda mm: labels.get(mm.group(1), {}).get(str(vals[mm.group(1)]), _fmt_num(vals[mm.group(1)])), t["statement"])
             variants.append({"values": vals, "statement": format_inline(statement), "answer": round(float(ans), 6)})
         if not variants:
             raise SystemExit(f"task {bank['module']}/{t['id']}: no finite variants")

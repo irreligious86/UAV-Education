@@ -3,105 +3,105 @@
   "pass": 80,
   "questions": [
     {
-      "q": "GSD камеры 1\" (13.2 мм, f 8.8 мм, 5472 px) на 100 м:",
+      "q": "GSD of a 1\" camera (13.2 mm, f 8.8 mm, 5472 px) at 100 m:",
       "options": [
-        "≈ 2.7 см/px",
-        "≈ 27 см/px",
-        "≈ 0.27 см/px",
-        "≈ 1 м/px"
+        "≈ 2.7 cm/px",
+        "≈ 27 cm/px",
+        "≈ 0.27 cm/px",
+        "≈ 1 m/px"
       ],
       "answer": 0,
-      "explain": "H·w/(f·W) = 100·13.2/(8.8·5472) = 0.0274 м."
+      "explain": "H·w/(f·W) = 100·13.2/(8.8·5472) = 0.0274 m."
     },
     {
-      "q": "Типичные перекрытия для фотограмметрии на хорошей текстуре:",
+      "q": "Typical overlaps for photogrammetry over good texture:",
       "options": [
         "75–80 / 65–70 %",
         "10 / 10 %",
         "50 / 0 %",
-        "95 / 95 % всегда"
+        "95 / 95 %, always"
       ],
       "answer": 0,
-      "explain": "Для леса и воды — выше."
+      "explain": "Higher for forest and water."
     },
     {
-      "q": "Разница между TRIG и CAM в логе ArduPilot:",
+      "q": "The difference between TRIG and CAM in the ArduPilot log:",
       "options": [
-        "Команда против факта",
-        "Одно и то же",
-        "Видео против фото",
-        "TRIG пишет только PX4"
+        "Command versus fact",
+        "They're the same thing",
+        "Video versus photo",
+        "Only PX4 writes TRIG"
       ],
       "answer": 0,
-      "explain": "TRIG — команда на спуск, CAM — фактическое срабатывание по обратной связи затвора; между ними — задержка камеры."
+      "explain": "TRIG is the shutter command, CAM is the actual firing from shutter feedback; the camera delay sits between them."
     },
     {
-      "q": "Зачем DO_SET_CAM_TRIGG_DIST с нулём в конце съёмочного участка?",
+      "q": "Why DO_SET_CAM_TRIGG_DIST with zero at the end of the survey segment?",
       "options": [
-        "Не снимать развороты",
-        "Сбросить счётчик снимков",
-        "Включить видео",
-        "Сберечь батарею камеры"
+        "So you don't shoot the turns",
+        "To reset the image counter",
+        "To start video",
+        "To save the camera battery"
       ],
       "answer": 0,
-      "explain": "Лишние кадры мешают обработке и сбивают сопоставление."
+      "explain": "Extra frames get in the way of processing and throw off the matching."
     },
     {
-      "q": "Оценивать абсолютную точность ортофото честно можно только по:",
+      "q": "You can honestly assess the absolute accuracy of an orthophoto only against:",
       "options": [
-        "Проверочным точкам",
-        "Использованным GCP",
-        "Отчёту ODM без точек",
-        "Бортовому GPS"
+        "Checkpoints",
+        "The GCPs used",
+        "The ODM report without points",
+        "The onboard GPS"
       ],
       "answer": 0,
-      "explain": "Точки, использованные как GCP, занижают ошибку."
+      "explain": "Points used as GCPs understate the error."
     },
     {
-      "q": "Смаз при 10 м/с и выдержке 1/1000 с:",
+      "q": "Motion blur at 10 m/s and a 1/1000 s shutter:",
       "options": [
-        "1 см",
-        "10 см",
-        "1 мм",
-        "1 м"
+        "1 cm",
+        "10 cm",
+        "1 mm",
+        "1 m"
       ],
       "answer": 0,
-      "explain": "10 м/с × 0.001 с."
+      "explain": "10 m/s × 0.001 s."
     },
     {
-      "q": "Почему FPV-камера 1280 px с HFOV 120° плохо подходит для картографирования с 100 м?",
+      "q": "Why is a 1280 px FPV camera with a 120° HFOV a poor choice for mapping from 100 m?",
       "options": [
-        "GSD ≈ 27 см/px",
-        "Не снимает фото",
-        "Слишком узкий угол",
-        "Нет GPS"
+        "GSD ≈ 27 cm/px",
+        "It can't take photos",
+        "The field of view is too narrow",
+        "It has no GPS"
       ],
       "answer": 0,
-      "explain": "2·100·tan 60° / 1280 ≈ 0.27 м."
+      "explain": "2·100·tan 60° / 1280 ≈ 0.27 m."
     },
     {
-      "q": "Самый дешёвый путь к абсолютной точности 1–3 GSD без RTK на борту:",
+      "q": "The cheapest path to an absolute accuracy of 1–3 GSD without RTK on board:",
       "options": [
-        "GCP с RTK-координатами",
-        "Длинная выдержка",
-        "Ниже высота и больше снимков",
-        "Камера с GPS"
+        "GCPs with RTK coordinates",
+        "A slow shutter",
+        "Lower altitude and more images",
+        "A camera with GPS"
       ],
       "answer": 0,
-      "explain": "GCP привязывают модель независимо от бортового GNSS."
+      "explain": "GCPs tie the model down independently of the onboard GNSS."
     },
     {
-      "q": "После обработки часть кадров «уехала». Сводка по полёту:",
+      "q": "After processing, some of the frames have “drifted.” The flight summary:",
       "kind": "apply",
-      "fragment": "Лог: TRIG записей 412, CAM записей 0\nКарта памяти: 405 файлов\nCAM1_FEEDBAK_PIN = -1",
+      "fragment": "Log: TRIG entries 412, CAM entries 0\nMemory card: 405 files\nCAM1_FEEDBAK_PIN = -1",
       "options": [
-        "Камера пропустила 7 спусков, а обратной связи нет — привязка по TRIG сдвинута на кадры",
-        "CAM1_FEEDBAK_PIN = -1 заставляет камеру снимать с задержкой ровно в один кадр после TRIG",
-        "412 спусков при 405 файлах означает, что камера писала RAW+JPEG в разные папки",
-        "ODM отбросил 7 кадров как размытые, и поэтому карта собрана со смещением"
+        "The camera missed 7 triggers and there's no feedback, so georeferencing by TRIG is shifted by several frames",
+        "CAM1_FEEDBAK_PIN = -1 makes the camera shoot with a delay of exactly one frame after TRIG",
+        "412 triggers with 405 files means the camera wrote RAW+JPEG to different folders",
+        "ODM dropped 7 frames as blurry, and that's why the map was assembled with an offset"
       ],
       "answer": 0,
-      "explain": "Без обратной связи по затвору CAM не пишется; при пропусках сопоставление по номеру съезжает."
+      "explain": "Without shutter feedback CAM isn't logged; with missed triggers, matching by number slides off."
     }
   ]
 }

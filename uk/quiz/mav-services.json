@@ -3,105 +3,105 @@
   "pass": 80,
   "questions": [
     {
-      "q": "PARAM_SET подтверждается:",
+      "q": "PARAM_SET підтверджується:",
       "options": [
-        "Эхом PARAM_VALUE",
-        "Сообщением PARAM_ACK",
+        "Ехом PARAM_VALUE",
+        "Повідомленням PARAM_ACK",
         "Через COMMAND_ACK",
-        "Ничем"
+        "Нічим"
       ],
       "answer": 0,
-      "explain": "Отдельного ACK нет; эхо со старым значением = отказ."
+      "explain": "Окремого ACK немає; ехо зі старим значенням = відмова."
     },
     {
-      "q": "При повторе COMMAND_LONG после потери ACK протокол требует:",
+      "q": "Під час повтору COMMAND_LONG після втрати ACK протокол вимагає:",
       "options": [
-        "Увеличить confirmation",
-        "Сменить sysid",
-        "Ничего",
-        "Отправить COMMAND_INT вместо LONG"
+        "Збільшити confirmation",
+        "Змінити sysid",
+        "Нічого",
+        "Надіслати COMMAND_INT замість LONG"
       ],
       "answer": 0,
-      "explain": "Получатель может отличить повтор."
+      "explain": "Отримувач може відрізнити повтор."
     },
     {
-      "q": "COMMAND_ACK с result IN_PROGRESS означает:",
+      "q": "COMMAND_ACK з result IN_PROGRESS означає:",
       "options": [
-        "Выполняется, ждать финала",
-        "Отказ, причина в поле progress",
-        "Не поддерживается",
-        "Повторить немедленно"
+        "Виконується, чекати фіналу",
+        "Відмова, причина в полі progress",
+        "Не підтримується",
+        "Повторити негайно"
       ],
       "answer": 0,
-      "explain": "Поле progress показывает ход."
+      "explain": "Поле progress показує хід."
     },
     {
-      "q": "Кто повторяет запрос при потере пункта при загрузке миссии?",
+      "q": "Хто повторює запит при втраті пункту під час завантаження місії?",
       "options": [
-        "Аппарат повторным запросом",
-        "Отправитель шлёт всё заново",
-        "Никто",
-        "GCS шлёт MISSION_ACK"
+        "Апарат повторним запитом",
+        "Відправник шле все заново",
+        "Ніхто",
+        "GCS шле MISSION_ACK"
       ],
       "answer": 0,
-      "explain": "Инициатива у получателя; отправитель отвечает на каждый запрос."
+      "explain": "Ініціатива в отримувача; відправник відповідає на кожен запит."
     },
     {
-      "q": "mission_type = 1 — это:",
+      "q": "mission_type = 1 — це:",
       "options": [
         "Геозона",
         "Маршрут",
-        "Точки сбора",
-        "Все сразу"
+        "Точки збору",
+        "Усі одразу"
       ],
       "answer": 0,
-      "explain": "0 — маршрут, 1 — fence, 2 — rally, 255 — все."
+      "explain": "0 — маршрут, 1 — fence, 2 — rally, 255 — усі."
     },
     {
-      "q": "Почему MISSION_ITEM_INT лучше MISSION_ITEM?",
+      "q": "Чому MISSION_ITEM_INT кращий за MISSION_ITEM?",
       "options": [
-        "Целые ×10⁷ без потери точности",
-        "Он короче и быстрее обрабатывается",
-        "Он подписан",
-        "Он быстрее"
+        "Цілі ×10⁷ без втрати точності",
+        "Він коротший і швидше обробляється",
+        "Він підписаний",
+        "Він швидший"
       ],
       "answer": 0,
-      "explain": "float даёт ошибку порядка метра на широте."
+      "explain": "float дає похибку порядку метра на широті."
     },
     {
-      "q": "Попросить ATTITUDE с частотой 50 Гц:",
+      "q": "Попросити ATTITUDE з частотою 50 Гц:",
       "options": [
         "SET_MESSAGE_INTERVAL 20000 мкс",
-        "Никак нельзя",
-        "REQUEST_DATA_STREAM всегда",
-        "PARAM_SET SR_ATT = 50 по MAVLink"
+        "Ніяк не можна",
+        "REQUEST_DATA_STREAM завжди",
+        "PARAM_SET SR_ATT = 50 через MAVLink"
       ],
       "answer": 0,
-      "explain": "param2 — интервал в микросекундах."
+      "explain": "param2 — інтервал у мікросекундах."
     },
     {
-      "q": "ArduPilot и PX4 по-разному упаковывают целые параметры в float. Где это видно клиенту?",
+      "q": "ArduPilot і PX4 по-різному пакують цілі параметри у float. Де це видно клієнту?",
       "options": [
         "AUTOPILOT_VERSION.capabilities",
         "Поля HEARTBEAT",
         "PARAM_VALUE.param_count",
-        "В поле param_count сообщения PARAM_VALUE"
+        "У полі param_count повідомлення PARAM_VALUE"
       ],
       "answer": 0,
-      "explain": "Флаги MAV_PROTOCOL_CAPABILITY_PARAM_ENCODE_*."
+      "explain": "Прапорці MAV_PROTOCOL_CAPABILITY_PARAM_ENCODE_*."
     },
     {
-      "q": "Скрипт армит аппарат, но тот не армится. В tlog:",
+      "q": "Скрипт армить апарат, але той не армиться. У tlog:",
       "kind": "apply",
       "fragment": "> COMMAND_LONG  command=400 (ARM_DISARM) param1=1 confirmation=0\n< COMMAND_ACK   command=400 result=4 (FAILED)\n< STATUSTEXT    severity=2 text=\"PreArm: Battery 1 below minimum arming voltage\"",
       "options": [
-        "Команда отклонена pre-arm проверкой: причина в STATUSTEXT — напряжение ниже порога арма",
-        "Скрипт не дождался ACK: result=4 означает «в процессе», нужно ждать дольше",
-        "Нужно повторить с confirmation=1 — без этого ArduPilot всегда отклоняет первую попытку арма",
-        "Неверный номер команды: армирование — это MAV_CMD_DO_SET_MODE, а не 400"
+        "Команду відхилено pre-arm перевіркою: причина в STATUSTEXT — напруга нижча за поріг арму",
+        "Скрипт не дочекався ACK: result=4 означає «у процесі», треба чекати довше",
+        "Потрібно повторити з confirmation=1 — без цього ArduPilot завжди відхиляє першу спробу арму",
+        "Неправильний номер команди: армування — це MAV_CMD_DO_SET_MODE, а не 400"
       ],
       "answer": 0,
-      "explain": "result=4 — отказ; причина приходит отдельно в STATUSTEXT. Повтор не поможет."
+      "explain": "result=4 — відмова; причина приходить окремо в STATUSTEXT. Повтор не допоможе."
     }
   ]
 }

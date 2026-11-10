@@ -1,0 +1,107 @@
+{
+  "module": "mav-protocol",
+  "pass": 80,
+  "questions": [
+    {
+      "q": "The length of the MAVLink 2 header including the STX byte:",
+      "options": [
+        "10 bytes",
+        "6 bytes",
+        "12 bytes",
+        "8 bytes"
+      ],
+      "answer": 0,
+      "explain": "STX, len, incompat, compat, seq, sysid, compid, msgid(3) = 10."
+    },
+    {
+      "q": "Why is CRC_EXTRA mixed into the CRC?",
+      "options": [
+        "To reject mismatched definitions",
+        "For encryption",
+        "To lengthen the checksum",
+        "For signing"
+      ],
+      "answer": 0,
+      "explain": "If message definitions diverge, the frame is dropped; otherwise different dialects with the same length would produce garbage fields."
+    },
+    {
+      "q": "The COMMAND_LONG payload length in a frame is less than 33 bytes. This is:",
+      "options": [
+        "Normal: the zeros were truncated",
+        "A sign of signing",
+        "A sender error: the frame is truncated",
+        "A sign of MAVLink 1"
+      ],
+      "answer": 0,
+      "explain": "The receiver pads it with zeros to the full size."
+    },
+    {
+      "q": "The order of message fields on the wire:",
+      "options": [
+        "By type size, extensions at the end",
+        "In random order",
+        "Alphabetical by field name",
+        "In the order the fields are declared in the XML"
+      ],
+      "answer": 0,
+      "explain": "That's how mavgen aligns the struct."
+    },
+    {
+      "q": "Adding an extension field to an existing message:",
+      "options": [
+        "Doesn't change CRC_EXTRA",
+        "Breaks old receivers",
+        "Requires a new msgid",
+        "Is forbidden"
+      ],
+      "answer": 0,
+      "explain": "Extension fields are not part of CRC_EXTRA."
+    },
+    {
+      "q": "MAVLink 2 signing protects against:",
+      "options": [
+        "Spoofing and replay of commands",
+        "Eavesdropping on telemetry",
+        "Jamming",
+        "Packet loss"
+      ],
+      "answer": 0,
+      "explain": "There's no encryption; for confidentiality — a VPN or an encrypting radio."
+    },
+    {
+      "q": "How does a receiver count lost frames?",
+      "options": [
+        "By gaps in seq",
+        "It doesn't",
+        "By the CRC",
+        "By RSSI and the CRC error counter"
+      ],
+      "answer": 0,
+      "explain": "(seq_new − seq_old − 1) mod 256."
+    },
+    {
+      "q": "The signing key is passed to ArduPilot with:",
+      "options": [
+        "SETUP_SIGNING over USB",
+        "A HEARTBEAT field",
+        "PARAM_SET over the radio with the key",
+        "A Lua script"
+      ],
+      "answer": 0,
+      "explain": "Usually over USB; it's stored in flash."
+    },
+    {
+      "q": "Your MAVLink 2 decoder rejects frames from the telemetry radio modem. Start of the frame:",
+      "kind": "apply",
+      "fragment": "fe 1c 4a 01 01 1e 0c 4f 00 00 ...",
+      "options": [
+        "Start byte 0xFE is MAVLink 1: the port is configured for v1 or the modem forwards v1",
+        "Bad CRC: the modem reorders bytes, so the decoder can't find the end of the frame",
+        "This message is signed: length 0x1c includes 13 signature bytes that are missing",
+        "msgid 0x1e doesn't exist in common.xml, so the frame is dropped as a foreign dialect"
+      ],
+      "answer": 0,
+      "explain": "MAVLink 2 starts with 0xFD, MAVLink 1 with 0xFE; the header has a different length."
+    }
+  ]
+}

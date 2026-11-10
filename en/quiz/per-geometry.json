@@ -3,18 +3,18 @@
   "pass": 80,
   "questions": [
     {
-      "q": "Из одного пикселя монокулярной камеры можно восстановить:",
+      "q": "From a single pixel of a monocular camera you can recover:",
       "options": [
-        "Луч без расстояния",
-        "Точку в 3D",
-        "Расстояние до объекта",
-        "Ничего без калибровки"
+        "A ray without a distance",
+        "A point in 3D",
+        "The distance to the object",
+        "Nothing without calibration"
       ],
       "answer": 0,
-      "explain": "Расстояние вдоль луча неизвестно; нужна высота над плоскостью, стерео, размер объекта или дальномер."
+      "explain": "The distance along the ray is unknown; you need height above a plane, stereo, the object's size or a rangefinder."
     },
     {
-      "q": "Камера 1280 px с горизонтальным полем зрения 90°. f_x в пикселях:",
+      "q": "A 1280 px camera with a 90° horizontal field of view. f_x in pixels:",
       "options": [
         "640",
         "1280",
@@ -25,83 +25,83 @@
       "explain": "f_x = (W/2)/tan(HFOV/2) = 640/tan 45° = 640."
     },
     {
-      "q": "Функция «снять дисторсию» с измеренного пикселя обычно вычисляется:",
+      "q": "The “undistort” function for a measured pixel is usually computed:",
       "options": [
-        "Итерациями",
-        "Подстановкой в ту же формулу",
-        "Делением на k₁",
-        "Не нужна для широких углов"
+        "Iteratively",
+        "By plugging into the same formula",
+        "By dividing by k₁",
+        "It isn't needed for wide angles"
       ],
       "answer": 0,
-      "explain": "Модель описывает искажение идеальной точки; обратную задачу решают итерациями (undistortPoints)."
+      "explain": "The model describes how an ideal point is distorted; the inverse problem is solved iteratively (undistortPoints)."
     },
     {
-      "q": "RMS перепроекции калибровки 1.8 px скорее всего означает:",
+      "q": "A calibration reprojection RMS of 1.8 px most likely means:",
       "options": [
-        "Плохие кадры калибровки",
-        "Отличную калибровку",
-        "Неверный размер клетки доски",
-        "Камеру fisheye"
+        "Bad calibration frames",
+        "An excellent calibration",
+        "Wrong checkerboard square size",
+        "A fisheye camera"
       ],
       "answer": 0,
-      "explain": "Смаз, мало наклонов, неплоская доска или включённая стабилизация. Хорошо < 0.5 px, приемлемо до 1 px."
+      "explain": "Motion blur, too few tilted views, a board that isn't flat, or stabilization turned on. Good is < 0.5 px, acceptable up to 1 px."
     },
     {
-      "q": "Nadir-камера, высота 100 м, ошибка крена 1°. Смещение точки под аппаратом на земле:",
+      "q": "Nadir camera, altitude 100 m, 1° roll error. The shift on the ground of the point below the vehicle:",
       "options": [
-        "≈ 1.7 м",
-        "≈ 17 см",
-        "≈ 17 м",
-        "Не зависит от высоты"
+        "≈ 1.7 m",
+        "≈ 17 cm",
+        "≈ 17 m",
+        "It doesn't depend on altitude"
       ],
       "answer": 0,
-      "explain": "100·tan 1° ≈ 1.75 м."
+      "explain": "100·tan 1° ≈ 1.75 m."
     },
     {
-      "q": "Главный источник ошибки геопривязки по кадру на манёврах:",
+      "q": "The main source of frame georeferencing error during maneuvers:",
       "options": [
-        "Рассинхрон кадра и ориентации",
-        "Размер пикселя",
-        "Шум матрицы на высоком ISO",
-        "Сжатие видео"
+        "Frame and attitude out of sync",
+        "Pixel size",
+        "Sensor noise at high ISO",
+        "Video compression"
       ],
       "answer": 0,
-      "explain": "При 100°/с сдвиг 50 мс — 5° ориентации, это метры на земле."
+      "explain": "At 100°/s a 50 ms offset is 5° of attitude, which is meters on the ground."
     },
     {
-      "q": "Ошибка глубины стереокамеры с ростом дистанции растёт как:",
+      "q": "As distance increases, a stereo camera's depth error grows:",
       "options": [
-        "Как квадрат дистанции",
-        "Линейно с расстоянием",
-        "Как корень",
-        "Не растёт"
+        "As the square of the distance",
+        "Linearly with distance",
+        "As the square root",
+        "It doesn't grow"
       ],
       "answer": 0,
       "explain": "δZ = Z²·δd/(f·B)."
     },
     {
-      "q": "Если камера на гимбале, в цепочку пиксель → земля подставляют:",
+      "q": "If the camera is on a gimbal, the pixel → ground chain uses:",
       "options": [
-        "Ориентацию гимбала",
-        "ATTITUDE аппарата",
-        "Только курс аппарата",
-        "Ничего — смотрит вниз"
+        "The gimbal attitude",
+        "The vehicle ATTITUDE",
+        "Only the vehicle heading",
+        "Nothing, it looks down"
       ],
       "answer": 0,
-      "explain": "GIMBAL_DEVICE_ATTITUDE_STATUS: камера стабилизирована, её ориентация — это ориентация гимбала."
+      "explain": "GIMBAL_DEVICE_ATTITUDE_STATUS: the camera is stabilized, so its orientation is the gimbal's orientation."
     },
     {
-      "q": "Все точки на земле смещены на десятки метров, причём сильнее при наклоне. Матрица из файла калибровки для кадра 1280×720:",
+      "q": "All ground points are off by tens of meters, more so when the vehicle tilts. The matrix from the calibration file for a 1280×720 frame:",
       "kind": "apply",
       "fragment": "K = [[812.4,   0.0,   0.0],\n     [  0.0, 811.9,   0.0],\n     [  0.0,   0.0,   1.0]]",
       "options": [
-        "Главная точка (c_x, c_y) = (0, 0) вместо ~(640, 360): калибровка испорчена или загружена не та",
-        "Фокус 812 px слишком велик для 1280 px: должно быть около 400 px при любом объективе",
-        "В матрице нет коэффициентов дисторсии — их отсутствие сдвигает все точки ровно на пол-кадра",
-        "f_x и f_y различаются на 0.5 px — этого достаточно для ошибки в десятки метров"
+        "The principal point (c_x, c_y) = (0, 0) instead of ~(640, 360): the calibration is corrupted or the wrong one was loaded",
+        "A focal length of 812 px is too large for 1280 px: it should be about 400 px with any lens",
+        "The matrix has no distortion coefficients, and their absence shifts every point by exactly half a frame",
+        "f_x and f_y differ by 0.5 px, which is enough for an error of tens of meters"
       ],
       "answer": 0,
-      "explain": "Без главной точки каждый луч отклонён на пол-кадра; ошибка растёт с высотой и наклоном."
+      "explain": "Without the principal point every ray is off by half a frame; the error grows with altitude and tilt."
     }
   ]
 }

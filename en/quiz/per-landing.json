@@ -3,105 +3,105 @@
   "pass": 80,
   "questions": [
     {
-      "q": "Зачем вложенный маркер (большой + маленький)?",
+      "q": "Why a nested marker (large + small)?",
       "options": [
-        "Высота и последний метр",
-        "Резерв при поломке камеры",
-        "Определение курса",
-        "Различать два аппарата"
+        "Altitude and the last meter",
+        "A backup if the camera breaks",
+        "Determining the heading",
+        "Telling two vehicles apart"
       ],
       "answer": 0,
-      "explain": "Большой — для захвата с высоты, маленький — для последнего метра, когда большой не помещается в кадр."
+      "explain": "The large one is for acquisition from altitude, the small one for the last meter, when the large one doesn't fit in the frame."
     },
     {
-      "q": "Поле time_usec в LANDING_TARGET должно содержать:",
+      "q": "The time_usec field in LANDING_TARGET should contain:",
       "options": [
-        "Время экспозиции кадра",
-        "Время отправки сообщения",
-        "Время загрузки автопилота",
-        "Ноль"
+        "The frame exposure time",
+        "The time the message was sent",
+        "The autopilot boot time",
+        "Zero"
       ],
       "answer": 0,
-      "explain": "Автопилот сопоставляет измерение с историей положения в момент кадра."
+      "explain": "The autopilot matches the measurement against the position history at the moment of the frame."
     },
     {
-      "q": "PLND_STRICT = 2 при потере цели означает:",
+      "q": "PLND_STRICT = 2 on target loss means:",
       "options": [
-        "Не садиться, висеть",
-        "Садиться вертикально",
-        "Повторный заход",
-        "Возврат домой"
+        "Don't land, hover",
+        "Land vertically",
+        "Retry the approach",
+        "Return home"
       ],
       "answer": 0,
-      "explain": "0 — садиться, 1 — повтор (по умолчанию), 2 — висеть."
+      "explain": "0 is land, 1 is retry (default), 2 is hover."
     },
     {
-      "q": "Ниже PLND_ALT_MIN при потере цели аппарат:",
+      "q": "Below PLND_ALT_MIN, on target loss the vehicle:",
       "options": [
-        "Продолжает посадку",
-        "Уходит вверх на повтор",
-        "Зависает",
-        "Переходит в RTL"
+        "Continues the landing",
+        "Climbs for a retry",
+        "Hovers",
+        "Switches to RTL"
       ],
       "answer": 0,
-      "explain": "У земли камера часто не видит маркер; закончить посадку безопаснее."
+      "explain": "Near the ground the camera often can't see the marker; finishing the landing is safer."
     },
     {
-      "q": "В PX4 режим Required (MAV_CMD_NAV_LAND param2 = 2) при отсутствии цели:",
+      "q": "In PX4, Required mode (MAV_CMD_NAV_LAND param2 = 2) with no target:",
       "options": [
-        "Ищет цель на PLD_SRCH_ALT",
-        "Садится обычной посадкой сразу",
-        "Возвращается домой",
-        "Отказывается садиться навсегда"
+        "Searches for the target at PLD_SRCH_ALT",
+        "Does a normal landing right away",
+        "Returns home",
+        "Refuses to land forever"
       ],
       "answer": 0,
-      "explain": "Opportunistic (1) садится обычно, Required (2) ищет."
+      "explain": "Opportunistic (1) lands normally, Required (2) searches."
     },
     {
-      "q": "Аппарат ходит над целью по спирали. Первое, что проверить:",
+      "q": "The vehicle flies a spiral over the target. The first thing to check:",
       "options": [
-        "Оси, знаки и PLND_YAW_ALIGN",
-        "Ёмкость батареи",
-        "Газ висения",
-        "Частоту ESC и вибрации рамы"
+        "Axes, signs and PLND_YAW_ALIGN",
+        "Battery capacity",
+        "Hover throttle",
+        "ESC frequency and frame vibration"
       ],
       "answer": 0,
-      "explain": "Сместите цель на север в SITL — аппарат должен пойти на север."
+      "explain": "Move the target north in SITL: the vehicle should go north."
     },
     {
-      "q": "PLND_EST_TYPE = 1 включает:",
+      "q": "PLND_EST_TYPE = 1 enables:",
       "options": [
-        "Фильтр Калмана цели",
+        "A Kalman filter on the target",
         "IR-LOCK",
-        "Сырые измерения без фильтра",
-        "Поиск цели"
+        "Raw measurements without a filter",
+        "Target search"
       ],
       "answer": 0,
-      "explain": "0 — сырые, 1 — фильтр Калмана."
+      "explain": "0 is raw, 1 is the Kalman filter."
     },
     {
-      "q": "Для перевода angle_x/angle_y в метры автопилоту практически нужен:",
+      "q": "To convert angle_x/angle_y to meters, in practice the autopilot needs:",
       "options": [
-        "Дальномер вниз",
-        "Магнитометр",
+        "A downward rangefinder",
+        "A magnetometer",
         "Airspeed",
-        "Второй GPS для разности фаз"
+        "A second GPS for phase difference"
       ],
       "answer": 0,
-      "explain": "Метры = высота × tan(угла); баровысота у земли не годится."
+      "explain": "Meters = altitude × tan(angle); baro altitude near the ground won't do."
     },
     {
-      "q": "Аппарат игнорирует цель, в сообщениях GCS — «Plnd: Frame not supported». Что отправляет companion?",
+      "q": "The vehicle ignores the target, and the GCS messages show “Plnd: Frame not supported”. What is the companion sending?",
       "kind": "apply",
       "fragment": "LANDING_TARGET time_usec=1234567 target_num=0 frame=1 (MAV_FRAME_LOCAL_NED)\n               angle_x=0.05 angle_y=-0.02 distance=6.1",
       "options": [
-        "Неподдерживаемая система координат: ArduPilot принимает только MAV_FRAME_BODY_FRD или LOCAL_FRD",
-        "angle_x = 0.05 рад выходит за поле зрения камеры, поэтому цель отбрасывается",
-        "time_usec должен совпадать со временем загрузки автопилота, иначе ArduPilot отбрасывает такое сообщение",
-        "distance должен быть 0 при угловой версии, иначе цель считается неверной"
+        "An unsupported coordinate frame: ArduPilot accepts only MAV_FRAME_BODY_FRD or LOCAL_FRD",
+        "angle_x = 0.05 rad is outside the camera's field of view, so the target is dropped",
+        "time_usec must match the autopilot boot time, otherwise ArduPilot drops such a message",
+        "distance must be 0 in the angle version, otherwise the target is considered invalid"
       ],
       "answer": 0,
-      "explain": "Обработчик LANDING_TARGET в ArduPilot отклоняет другие frame и пишет это сообщение."
+      "explain": "ArduPilot's LANDING_TARGET handler rejects other frames and prints this message."
     }
   ]
 }

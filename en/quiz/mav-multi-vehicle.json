@@ -3,92 +3,92 @@
   "pass": 80,
   "questions": [
     {
-      "q": "Что будет при двух аппаратах с sysid 1 в одной сети?",
+      "q": "What happens with two vehicles with sysid 1 on the same network?",
       "options": [
-        "Один «прыгающий» аппарат, команды обоим",
-        "Наземка покажет оба аппарата раздельно",
-        "Второй аппарат не сможет армиться вовсе",
-        "Роутер сам переназначит один из sysid"
+        "One “jumping” vehicle, commands go to both",
+        "The GCS will show both vehicles separately",
+        "The second vehicle won't be able to arm at all",
+        "The router will reassign one of the sysids itself"
       ],
       "answer": 0,
-      "explain": "Адресация по sysid: без уникальных номеров наземка и команды путают аппараты."
+      "explain": "Addressing is by sysid: without unique numbers the GCS and commands mix up the vehicles."
     },
     {
-      "q": "Почему супервизору на pymavlink задают source_system?",
+      "q": "Why do you set source_system for a pymavlink supervisor?",
       "options": [
-        "Иначе он не получит телеметрию",
-        "pymavlink без него не шлёт команд",
-        "По умолчанию он 255, как наземка",
-        "Так требует mavlink-router"
+        "Otherwise it won't receive telemetry",
+        "pymavlink doesn't send commands without it",
+        "By default it's 255, same as the GCS",
+        "mavlink-router requires it"
       ],
       "answer": 2,
-      "explain": "Два участника с sysid 255 путают failsafe и маршрутизацию."
+      "explain": "Two participants with sysid 255 confuse failsafe and routing."
     },
     {
-      "q": "Что означает target_system = 0?",
+      "q": "What does target_system = 0 mean?",
       "options": [
-        "Команда наземной станции",
-        "Команда всем аппаратам",
-        "Команда последнему аппарату",
-        "Пакет без адресата отбрасывается"
+        "A command from the ground station",
+        "A command to all vehicles",
+        "A command to the last vehicle",
+        "A packet with no addressee is dropped"
       ],
       "answer": 1,
-      "explain": "Широковещание: общий стоп — да, по умолчанию — нет."
+      "explain": "Broadcast: for a global stop — yes, as a default — no."
     },
     {
-      "q": "Сближение 20 м/с, задержки 1 с, торможение 1.5 с. Сколько пройдено до остановки примерно?",
+      "q": "Closing speed 20 m/s, delays 1 s, braking 1.5 s. Roughly how far is covered before stopping?",
       "options": [
-        "10 м",
-        "200 м",
-        "5 м",
-        "50 м"
+        "10 m",
+        "200 m",
+        "5 m",
+        "50 m"
       ],
       "answer": 3,
-      "explain": "20 м/с × 2.5 с ≈ 50 м; плюс ошибки позиции — порог срабатывания около 60 м."
+      "explain": "20 m/s × 2.5 s ≈ 50 m; plus position errors — the trigger threshold is around 60 m."
     },
     {
-      "q": "Чем опасен общий RTL нескольких аппаратов?",
+      "q": "What's the danger of a shared RTL for several vehicles?",
       "options": [
-        "Он не работает в флоте вообще",
-        "Разрядом батарей всех аппаратов сразу",
-        "Схождением над домом на одной высоте",
-        "Сбросом sysid после посадки"
+        "It doesn't work in a fleet at all",
+        "Draining all vehicles' batteries at once",
+        "Converging over home at the same altitude",
+        "Resetting the sysid after landing"
       ],
       "answer": 2,
-      "explain": "Разводят RTL_ALT_M и rally-точки, садят по очереди."
+      "explain": "Separate RTL_ALT_M and rally points, land one at a time."
     },
     {
-      "q": "Что делает FOLL_DIST_MAX в режиме FOLLOW?",
+      "q": "What does FOLL_DIST_MAX do in FOLLOW mode?",
       "options": [
-        "Дальше — ведомый перестаёт следовать",
-        "Задаёт смещение ведомого от ведущего",
-        "Ограничивает высоту полёта ведомого",
-        "Задаёт скорость догона ведущего"
+        "Beyond it the follower stops following",
+        "Sets the follower's offset from the leader",
+        "Limits the follower's flight altitude",
+        "Sets the speed for catching up with the leader"
       ],
       "answer": 0,
-      "explain": "Если ведущий дальше FOLL_DIST_MAX, ведомый держит позицию."
+      "explain": "If the leader is farther than FOLL_DIST_MAX, the follower holds position."
     },
     {
-      "q": "Почему слои по высоте не решают всё?",
+      "q": "Why don't altitude layers solve everything?",
       "options": [
-        "Высота у всех одинаково точная",
-        "Слои запрещены правилами полётов",
-        "ArduPilot не умеет держать высоту",
-        "Взлёт и посадка пересекают слои"
+        "Altitude is equally accurate for everyone",
+        "Layers are prohibited by flight rules",
+        "ArduPilot can't hold altitude",
+        "Takeoff and landing cross the layers"
       ],
       "answer": 3,
-      "explain": "Смена высоты пересекает чужие слои — взлёт и посадку разносят по времени."
+      "explain": "Changing altitude crosses other vehicles' layers — takeoff and landing are separated in time."
     },
     {
-      "q": "Зачем аппарату MAV_GCS_SYSID в флоте?",
+      "q": "Why does a vehicle in a fleet need MAV_GCS_SYSID?",
       "options": [
-        "Чтобы выбрать частоту телеметрии",
-        "Чтобы чужой heartbeat не держал связь",
-        "Чтобы включить режим FOLLOW",
-        "Чтобы задать номер роутера"
+        "To choose the telemetry rate",
+        "So another station's heartbeat doesn't keep the link alive",
+        "To enable FOLLOW mode",
+        "To set the router's number"
       ],
       "answer": 1,
-      "explain": "Failsafe по потере связи должен смотреть на свою наземку, а не на любую."
+      "explain": "The loss-of-link failsafe must watch its own GCS, not just any GCS."
     }
   ]
 }

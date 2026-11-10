@@ -1,0 +1,107 @@
+{
+  "module": "mav-services",
+  "pass": 80,
+  "questions": [
+    {
+      "q": "PARAM_SET підтверджується:",
+      "options": [
+        "Ехом PARAM_VALUE",
+        "Повідомленням PARAM_ACK",
+        "Через COMMAND_ACK",
+        "Нічим"
+      ],
+      "answer": 0,
+      "explain": "Окремого ACK немає; ехо зі старим значенням = відмова."
+    },
+    {
+      "q": "Під час повтору COMMAND_LONG після втрати ACK протокол вимагає:",
+      "options": [
+        "Збільшити confirmation",
+        "Змінити sysid",
+        "Нічого",
+        "Надіслати COMMAND_INT замість LONG"
+      ],
+      "answer": 0,
+      "explain": "Отримувач може відрізнити повтор."
+    },
+    {
+      "q": "COMMAND_ACK з result IN_PROGRESS означає:",
+      "options": [
+        "Виконується, чекати фіналу",
+        "Відмова, причина в полі progress",
+        "Не підтримується",
+        "Повторити негайно"
+      ],
+      "answer": 0,
+      "explain": "Поле progress показує хід."
+    },
+    {
+      "q": "Хто повторює запит при втраті пункту під час завантаження місії?",
+      "options": [
+        "Апарат повторним запитом",
+        "Відправник шле все заново",
+        "Ніхто",
+        "GCS шле MISSION_ACK"
+      ],
+      "answer": 0,
+      "explain": "Ініціатива в отримувача; відправник відповідає на кожен запит."
+    },
+    {
+      "q": "mission_type = 1 — це:",
+      "options": [
+        "Геозона",
+        "Маршрут",
+        "Точки збору",
+        "Усі одразу"
+      ],
+      "answer": 0,
+      "explain": "0 — маршрут, 1 — fence, 2 — rally, 255 — усі."
+    },
+    {
+      "q": "Чому MISSION_ITEM_INT кращий за MISSION_ITEM?",
+      "options": [
+        "Цілі ×10⁷ без втрати точності",
+        "Він коротший і швидше обробляється",
+        "Він підписаний",
+        "Він швидший"
+      ],
+      "answer": 0,
+      "explain": "float дає похибку порядку метра на широті."
+    },
+    {
+      "q": "Попросити ATTITUDE з частотою 50 Гц:",
+      "options": [
+        "SET_MESSAGE_INTERVAL 20000 мкс",
+        "Ніяк не можна",
+        "REQUEST_DATA_STREAM завжди",
+        "PARAM_SET SR_ATT = 50 через MAVLink"
+      ],
+      "answer": 0,
+      "explain": "param2 — інтервал у мікросекундах."
+    },
+    {
+      "q": "ArduPilot і PX4 по-різному пакують цілі параметри у float. Де це видно клієнту?",
+      "options": [
+        "AUTOPILOT_VERSION.capabilities",
+        "Поля HEARTBEAT",
+        "PARAM_VALUE.param_count",
+        "У полі param_count повідомлення PARAM_VALUE"
+      ],
+      "answer": 0,
+      "explain": "Прапорці MAV_PROTOCOL_CAPABILITY_PARAM_ENCODE_*."
+    },
+    {
+      "q": "Скрипт армить апарат, але той не армиться. У tlog:",
+      "kind": "apply",
+      "fragment": "> COMMAND_LONG  command=400 (ARM_DISARM) param1=1 confirmation=0\n< COMMAND_ACK   command=400 result=4 (FAILED)\n< STATUSTEXT    severity=2 text=\"PreArm: Battery 1 below minimum arming voltage\"",
+      "options": [
+        "Команду відхилено pre-arm перевіркою: причина в STATUSTEXT — напруга нижча за поріг арму",
+        "Скрипт не дочекався ACK: result=4 означає «у процесі», треба чекати довше",
+        "Потрібно повторити з confirmation=1 — без цього ArduPilot завжди відхиляє першу спробу арму",
+        "Неправильний номер команди: армування — це MAV_CMD_DO_SET_MODE, а не 400"
+      ],
+      "answer": 0,
+      "explain": "result=4 — відмова; причина приходить окремо в STATUSTEXT. Повтор не допоможе."
+    }
+  ]
+}

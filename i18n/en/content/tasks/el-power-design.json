@@ -1,0 +1,62 @@
+{
+ "module": "el-power-design",
+ "tasks": [
+  {
+   "id": "lin-bec",
+   "title": "Linear BEC heating",
+   "statement": "A linear regulator steps **{vin} V** down to **{vout} V** at **{i} A**. How many watts does it dissipate?",
+   "params": {
+    "vin": {
+     "min": 7.4,
+     "max": 25.2,
+     "step": 0.1
+    },
+    "vout": [
+     3.3,
+     5
+    ],
+    "i": {
+     "min": 0.2,
+     "max": 1.5,
+     "step": 0.1
+    }
+   },
+   "answer": "(vin-vout)*i",
+   "unit": "W",
+   "tol": 0.02,
+   "solution": "P = (U_in − U_out)·I. That's why a linear BEC from 6S to 5 V at 1 A means 17 W of heat; you need a switching one."
+  },
+  {
+   "id": "buck-in",
+   "title": "Switching BEC input current",
+   "statement": "A switching BEC with **{eta} %** efficiency delivers **{vout} V** at **{i} A** from a **{vin} V** bus. How much current does it draw from the bus (A)?",
+   "params": {
+    "eta": {
+     "min": 80,
+     "max": 95,
+     "step": 1
+    },
+    "vout": [
+     5,
+     9,
+     12
+    ],
+    "i": {
+     "min": 1,
+     "max": 5,
+     "step": 0.5
+    },
+    "vin": [
+     14.8,
+     16.8,
+     22.2,
+     25.2
+    ]
+   },
+   "answer": "vout*i/(vin*eta/100)",
+   "unit": "A",
+   "tol": 0.02,
+   "solution": "P_in = P_out/η; I_in = U_out·I_out/(U_in·η)."
+  }
+ ]
+}

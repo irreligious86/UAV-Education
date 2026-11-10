@@ -1,0 +1,94 @@
+{
+  "module": "per-tracking",
+  "pass": 80,
+  "questions": [
+    {
+      "q": "For a downward camera, how is the target offset in meters related to the error in the frame?",
+      "options": [
+        "It isn't related",
+        "Proportional to altitude",
+        "Inversely proportional to altitude",
+        "A constant"
+      ],
+      "answer": 1,
+      "explain": "≈ h·tan(e·FOV/2): that's why K_p “floats” if you don't account for altitude."
+    },
+    {
+      "q": "What limits the gain of the tracking loop?",
+      "options": [
+        "Motor power",
+        "The latency of the chain",
+        "Camera resolution",
+        "Bitrate"
+      ],
+      "answer": 1,
+      "explain": "The K_p limit is ≈ π/(2·T_d) in the ideal case, lower in practice."
+    },
+    {
+      "q": "What happens in ArduPilot GUIDED if setpoints stop arriving?",
+      "options": [
+        "It flies forever",
+        "It hovers after GUID_TIMEOUT",
+        "RTL",
+        "It lands where the link was lost"
+      ],
+      "answer": 1,
+      "explain": "This is a safeguard; your own watchdog should trigger earlier."
+    },
+    {
+      "q": "What should you do when there's been no detection for 0.5 s?",
+      "options": [
+        "Hold the last command",
+        "Zero velocity",
+        "Increase speed",
+        "Change mode"
+      ],
+      "answer": 1,
+      "explain": "The detection watchdog."
+    },
+    {
+      "q": "Where should the loop get its commands from?",
+      "options": [
+        "The raw detector",
+        "The tracker",
+        "The camera",
+        "GPS"
+      ],
+      "answer": 1,
+      "explain": "Otherwise you get jerks on every detection."
+    },
+    {
+      "q": "What must the companion do after the pilot takes over?",
+      "options": [
+        "Fight for control",
+        "Stop sending setpoints",
+        "Restart the loop",
+        "Land"
+      ],
+      "answer": 1,
+      "explain": "A mode switch from the radio has absolute priority."
+    },
+    {
+      "q": "How do you account for target motion so you don't lag behind?",
+      "options": [
+        "More P and lower FPS",
+        "FF on the target velocity",
+        "More latency",
+        "A low-pass filter on the error"
+      ],
+      "answer": 1,
+      "explain": "P alone gives a steady-state velocity error."
+    },
+    {
+      "q": "Why does the detection watchdog send zero velocity rather than the last command?",
+      "options": [
+        "The last command carries the vehicle off after the lost target",
+        "Zero saves battery",
+        "MAVLink requires it",
+        "The last command isn't available to the companion"
+      ],
+      "answer": 0,
+      "explain": "Without a target, the safe action is to stop and hover."
+    }
+  ]
+}

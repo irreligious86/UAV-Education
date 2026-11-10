@@ -1,0 +1,107 @@
+{
+  "module": "per-landing",
+  "pass": 80,
+  "questions": [
+    {
+      "q": "Why a nested marker (large + small)?",
+      "options": [
+        "Altitude and the last meter",
+        "A backup if the camera breaks",
+        "Determining the heading",
+        "Telling two vehicles apart"
+      ],
+      "answer": 0,
+      "explain": "The large one is for acquisition from altitude, the small one for the last meter, when the large one doesn't fit in the frame."
+    },
+    {
+      "q": "The time_usec field in LANDING_TARGET should contain:",
+      "options": [
+        "The frame exposure time",
+        "The time the message was sent",
+        "The autopilot boot time",
+        "Zero"
+      ],
+      "answer": 0,
+      "explain": "The autopilot matches the measurement against the position history at the moment of the frame."
+    },
+    {
+      "q": "PLND_STRICT = 2 on target loss means:",
+      "options": [
+        "Don't land, hover",
+        "Land vertically",
+        "Retry the approach",
+        "Return home"
+      ],
+      "answer": 0,
+      "explain": "0 is land, 1 is retry (default), 2 is hover."
+    },
+    {
+      "q": "Below PLND_ALT_MIN, on target loss the vehicle:",
+      "options": [
+        "Continues the landing",
+        "Climbs for a retry",
+        "Hovers",
+        "Switches to RTL"
+      ],
+      "answer": 0,
+      "explain": "Near the ground the camera often can't see the marker; finishing the landing is safer."
+    },
+    {
+      "q": "In PX4, Required mode (MAV_CMD_NAV_LAND param2 = 2) with no target:",
+      "options": [
+        "Searches for the target at PLD_SRCH_ALT",
+        "Does a normal landing right away",
+        "Returns home",
+        "Refuses to land forever"
+      ],
+      "answer": 0,
+      "explain": "Opportunistic (1) lands normally, Required (2) searches."
+    },
+    {
+      "q": "The vehicle flies a spiral over the target. The first thing to check:",
+      "options": [
+        "Axes, signs and PLND_YAW_ALIGN",
+        "Battery capacity",
+        "Hover throttle",
+        "ESC frequency and frame vibration"
+      ],
+      "answer": 0,
+      "explain": "Move the target north in SITL: the vehicle should go north."
+    },
+    {
+      "q": "PLND_EST_TYPE = 1 enables:",
+      "options": [
+        "A Kalman filter on the target",
+        "IR-LOCK",
+        "Raw measurements without a filter",
+        "Target search"
+      ],
+      "answer": 0,
+      "explain": "0 is raw, 1 is the Kalman filter."
+    },
+    {
+      "q": "To convert angle_x/angle_y to meters, in practice the autopilot needs:",
+      "options": [
+        "A downward rangefinder",
+        "A magnetometer",
+        "Airspeed",
+        "A second GPS for phase difference"
+      ],
+      "answer": 0,
+      "explain": "Meters = altitude × tan(angle); baro altitude near the ground won't do."
+    },
+    {
+      "q": "The vehicle ignores the target, and the GCS messages show “Plnd: Frame not supported”. What is the companion sending?",
+      "kind": "apply",
+      "fragment": "LANDING_TARGET time_usec=1234567 target_num=0 frame=1 (MAV_FRAME_LOCAL_NED)\n               angle_x=0.05 angle_y=-0.02 distance=6.1",
+      "options": [
+        "An unsupported coordinate frame: ArduPilot accepts only MAV_FRAME_BODY_FRD or LOCAL_FRD",
+        "angle_x = 0.05 rad is outside the camera's field of view, so the target is dropped",
+        "time_usec must match the autopilot boot time, otherwise ArduPilot drops such a message",
+        "distance must be 0 in the angle version, otherwise the target is considered invalid"
+      ],
+      "answer": 0,
+      "explain": "ArduPilot's LANDING_TARGET handler rejects other frames and prints this message."
+    }
+  ]
+}

@@ -3,92 +3,92 @@
   "pass": 80,
   "questions": [
     {
-      "q": "Как смещение цели в метрах связано с ошибкой в кадре для камеры вниз?",
+      "q": "For a downward camera, how is the target offset in meters related to the error in the frame?",
       "options": [
-        "Не связано",
-        "Пропорционально высоте",
-        "Обратно пропорционально высоте",
-        "Константа"
+        "It isn't related",
+        "Proportional to altitude",
+        "Inversely proportional to altitude",
+        "A constant"
       ],
       "answer": 1,
-      "explain": "≈ h·tan(e·FOV/2): поэтому K_p «плавает» без учёта высоты."
+      "explain": "≈ h·tan(e·FOV/2): that's why K_p “floats” if you don't account for altitude."
     },
     {
-      "q": "Что ограничивает усиление контура слежения?",
+      "q": "What limits the gain of the tracking loop?",
       "options": [
-        "Мощность моторов",
-        "Задержка цепочки",
-        "Разрешение камеры",
-        "Битрейт"
+        "Motor power",
+        "The latency of the chain",
+        "Camera resolution",
+        "Bitrate"
       ],
       "answer": 1,
-      "explain": "Предел K_p ≈ π/(2·T_d) в идеале, на практике ниже."
+      "explain": "The K_p limit is ≈ π/(2·T_d) in the ideal case, lower in practice."
     },
     {
-      "q": "Что происходит в ArduPilot GUIDED, если setpoint'ы перестали приходить?",
+      "q": "What happens in ArduPilot GUIDED if setpoints stop arriving?",
       "options": [
-        "Летит вечно",
-        "Через GUID_TIMEOUT зависает",
+        "It flies forever",
+        "It hovers after GUID_TIMEOUT",
         "RTL",
-        "Садится на месте потери"
+        "It lands where the link was lost"
       ],
       "answer": 1,
-      "explain": "Это защита; свой watchdog должен сработать раньше."
+      "explain": "This is a safeguard; your own watchdog should trigger earlier."
     },
     {
-      "q": "Что делать при отсутствии детекции 0.5 с?",
+      "q": "What should you do when there's been no detection for 0.5 s?",
       "options": [
-        "Держать последнюю команду",
-        "Нулевая скорость",
-        "Увеличить скорость",
-        "Сменить режим"
+        "Hold the last command",
+        "Zero velocity",
+        "Increase speed",
+        "Change mode"
       ],
       "answer": 1,
-      "explain": "Watchdog детекций."
+      "explain": "The detection watchdog."
     },
     {
-      "q": "Откуда брать команды для контура?",
+      "q": "Where should the loop get its commands from?",
       "options": [
-        "От сырого детектора",
-        "От трекера",
-        "От камеры",
-        "От GPS"
+        "The raw detector",
+        "The tracker",
+        "The camera",
+        "GPS"
       ],
       "answer": 1,
-      "explain": "Иначе рывки на каждой детекции."
+      "explain": "Otherwise you get jerks on every detection."
     },
     {
-      "q": "Что должен делать companion после перехвата пилотом?",
+      "q": "What must the companion do after the pilot takes over?",
       "options": [
-        "Бороться за управление",
-        "Прекратить уставки",
-        "Перезапустить контур",
-        "Сесть"
+        "Fight for control",
+        "Stop sending setpoints",
+        "Restart the loop",
+        "Land"
       ],
       "answer": 1,
-      "explain": "Смена режима с пульта — абсолютный приоритет."
+      "explain": "A mode switch from the radio has absolute priority."
     },
     {
-      "q": "Как учесть движение цели, чтобы не отставать?",
+      "q": "How do you account for target motion so you don't lag behind?",
       "options": [
-        "Больше P и меньше FPS",
-        "FF по скорости цели",
-        "Больше задержка",
-        "Фильтр низких частот на ошибку"
+        "More P and lower FPS",
+        "FF on the target velocity",
+        "More latency",
+        "A low-pass filter on the error"
       ],
       "answer": 1,
-      "explain": "P один даёт статическую ошибку по скорости."
+      "explain": "P alone gives a steady-state velocity error."
     },
     {
-      "q": "Почему watchdog детекций шлёт ноль скорости, а не последнюю команду?",
+      "q": "Why does the detection watchdog send zero velocity rather than the last command?",
       "options": [
-        "Последняя команда уводит аппарат за потерянной целью",
-        "Ноль экономит батарею",
-        "Так требует MAVLink",
-        "Последняя команда недоступна companion"
+        "The last command carries the vehicle off after the lost target",
+        "Zero saves battery",
+        "MAVLink requires it",
+        "The last command isn't available to the companion"
       ],
       "answer": 0,
-      "explain": "Без цели безопасное действие — остановиться и зависнуть."
+      "explain": "Without a target, the safe action is to stop and hover."
     }
   ]
 }

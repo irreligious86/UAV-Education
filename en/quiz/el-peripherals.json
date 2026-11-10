@@ -3,29 +3,29 @@
   "pass": 80,
   "questions": [
     {
-      "q": "Как подключать UART между FC и устройством?",
+      "q": "How do you wire a UART between the FC and a device?",
       "options": [
         "TX→TX, RX→RX",
-        "TX→RX крест-накрест",
-        "Только линия TX",
-        "TX к TX и RX к RX, как подписано"
+        "TX→RX crossed over",
+        "Only the TX line",
+        "TX to TX and RX to RX, as labeled"
       ],
       "answer": 1,
-      "explain": "TX FC → RX устройства, RX FC ← TX устройства, плюс общая земля."
+      "explain": "FC TX → device RX, FC RX ← device TX, plus a common ground."
     },
     {
-      "q": "Что обязательно при питании устройства от отдельного источника?",
+      "q": "What is mandatory when a device is powered from a separate source?",
       "options": [
-        "Отдельный UART",
-        "Общая земля с FC",
-        "Делитель напряжения",
-        "Терминатор"
+        "A separate UART",
+        "A common ground with the FC",
+        "A voltage divider",
+        "A terminator"
       ],
       "answer": 1,
-      "explain": "Без общей земли уровни «плавают» — мусор или сгоревший порт."
+      "explain": "Without a common ground the levels “float” — garbage or a fried port."
     },
     {
-      "q": "Какая скорость у CRSF между приёмником и FC?",
+      "q": "What is the CRSF baud rate between the receiver and the FC?",
       "options": [
         "9600",
         "57600",
@@ -33,62 +33,62 @@
         "420000"
       ],
       "answer": 3,
-      "explain": "CRSF использует 420000 бод."
+      "explain": "CRSF uses 420000 baud."
     },
     {
-      "q": "Что нужно I2C-шине, чтобы линии поднимались в «1»?",
+      "q": "What does an I2C bus need for the lines to go up to “1”?",
       "options": [
-        "Инвертор",
-        "Подтяжки 2.2–4.7 кОм",
-        "Терминаторы 120 Ом на концах",
-        "Отдельное питание"
+        "An inverter",
+        "2.2–4.7 kΩ pull-ups",
+        "120 Ω terminators at the ends",
+        "Separate power"
       ],
       "answer": 1,
-      "explain": "Open-drain выходы требуют подтяжек; обычно они уже на FC."
+      "explain": "Open-drain outputs need pull-ups; usually they're already on the FC."
     },
     {
-      "q": "Что ставят на концах шины DroneCAN?",
+      "q": "What goes at the ends of a DroneCAN bus?",
       "options": [
-        "Диоды и конденсаторы 100 нФ",
-        "Терминаторы 120 Ом",
-        "Подтяжки к 3.3 В",
-        "Ничего"
+        "Diodes and 100 nF capacitors",
+        "120 Ω terminators",
+        "Pull-ups to 3.3 V",
+        "Nothing"
       ],
       "answer": 1,
-      "explain": "Без терминаторов отражения ломают передачу."
+      "explain": "Without terminators, reflections break the transmission."
     },
     {
-      "q": "Какой параметр включает DroneCAN на первом CAN-порту в ArduPilot?",
+      "q": "Which parameter enables DroneCAN on the first CAN port in ArduPilot?",
       "options": [
-        "CAN_P1_DRIVER = 1 и CAN_D1_PROTOCOL = 1",
-        "CAN_ENABLE = 1 и BRD_CAN = 1",
-        "GPS_TYPE = 1 и CAN_ENABLE = 1",
-        "SERIAL1_PROTOCOL = 1 и CAN_D1_UC_NODE = 10 с перезагрузкой"
+        "CAN_P1_DRIVER = 1 and CAN_D1_PROTOCOL = 1",
+        "CAN_ENABLE = 1 and BRD_CAN = 1",
+        "GPS_TYPE = 1 and CAN_ENABLE = 1",
+        "SERIAL1_PROTOCOL = 1 and CAN_D1_UC_NODE = 10 with a reboot"
       ],
       "answer": 0,
-      "explain": "Драйвер порта и протокол драйвера; после — перезагрузка."
+      "explain": "The port driver and the driver's protocol; then a reboot."
     },
     {
-      "q": "Почему нельзя питать Raspberry Pi от пада 5 В полётника?",
+      "q": "Why shouldn't you power a Raspberry Pi from the flight controller's 5 V pad?",
       "options": [
-        "Напряжение другое",
-        "Перегрузка BEC → сбросы FC",
-        "Pi требует 12 В на входе питания",
-        "Нет общей земли"
+        "The voltage is different",
+        "BEC overload → FC resets",
+        "The Pi needs 12 V at its power input",
+        "There's no common ground"
       ],
       "answer": 1,
-      "explain": "BEC полётника рассчитан на 2–3 А суммарно; Pi берёт до 3–5 А пиками."
+      "explain": "The flight controller's BEC is rated for 2–3 A total; a Pi draws up to 3–5 A in peaks."
     },
     {
-      "q": "Чем опасно питать устройство одновременно от FC и от USB companion?",
+      "q": "What's dangerous about powering a device from the FC and from the companion's USB at the same time?",
       "options": [
-        "Устройство получит ровно вдвое больше тока",
-        "Пропадёт общая земля автоматически",
-        "Два источника встречно соединяются через устройство",
-        "Ничем: так надёжнее"
+        "The device gets exactly twice the current",
+        "The common ground disappears automatically",
+        "Two sources are connected against each other through the device",
+        "Nothing: it's more reliable that way"
       ],
       "answer": 2,
-      "explain": "Две точки питания соединяют выходы источников между собой — возможны токи и сгоревшие стабилизаторы."
+      "explain": "Two power points tie the outputs of the sources together — currents can flow and regulators can burn out."
     }
   ]
 }

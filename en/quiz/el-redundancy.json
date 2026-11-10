@@ -3,92 +3,92 @@
   "pass": 80,
   "questions": [
     {
-      "q": "Какая схема самая живучая к отказу одного мотора?",
+      "q": "Which layout is the most survivable when one motor fails?",
       "options": [
-        "Квад",
-        "Гекса",
+        "Quad",
+        "Hexa",
         "X8",
-        "Трикоптер"
+        "Tricopter"
       ],
       "answer": 2,
-      "explain": "Соосный партнёр и противоположная пара компенсируют и тягу, и момент."
+      "explain": "The coaxial partner and the opposite pair compensate for both thrust and moment."
     },
     {
-      "q": "Что происходит с гексой при отказе мотора без запаса тяги?",
+      "q": "What happens to a hexa when a motor fails without thrust margin?",
       "options": [
-        "Автоматическая посадка по таймеру",
-        "Высота держится, рыскание хуже",
-        "Автопосадка",
-        "Переход в Acro"
+        "Automatic landing on a timer",
+        "Altitude holds, yaw gets worse",
+        "Auto-landing",
+        "Switch to Acro"
       ],
       "answer": 1,
-      "explain": "Пять моторов тянут, но баланс CW/CCW нарушен; при T/W < 2 — падение."
+      "explain": "Five motors pull, but the CW/CCW balance is broken; with T/W < 2 it falls."
     },
     {
-      "q": "Почему не ставят предохранители на моторы?",
+      "q": "Why aren't fuses put on the motors?",
       "options": [
-        "Мешает ESC-телеметрии и DShot",
-        "Импульсный ток: сгорит зря",
-        "Моторы не ломаются",
-        "Дорого"
+        "They interfere with ESC telemetry and DShot",
+        "Pulsed current: it will blow for nothing",
+        "Motors don't break",
+        "Too expensive"
       ],
       "answer": 1,
-      "explain": "Предохранители — на АКБ, BEC и ветки нагрузки."
+      "explain": "Fuses go on the battery, the BEC and the payload branches."
     },
     {
-      "q": "Как резервируют BEC для FC?",
+      "q": "How is the FC's BEC made redundant?",
       "options": [
-        "Два BEC с диодным ORing",
-        "Один BEC с запасом по току",
-        "Резерв от USB-разъёма",
-        "Большой конденсатор на шине"
+        "Two BECs with diode ORing",
+        "One BEC with current margin",
+        "Backup from the USB connector",
+        "A big capacitor on the bus"
       ],
       "answer": 0,
-      "explain": "Отказ одного — питание продолжает идти от второго."
+      "explain": "If one fails, power keeps coming from the second."
     },
     {
-      "q": "Ток луча X8 относительно тока мотора:",
+      "q": "X8 arm current relative to motor current:",
       "options": [
-        "Такой же",
-        "В 2 раза больше",
-        "В 4 раза больше",
-        "В 8 раз больше"
+        "The same",
+        "2 times higher",
+        "4 times higher",
+        "8 times higher"
       ],
       "answer": 1,
-      "explain": "На луче два мотора."
+      "explain": "There are two motors on an arm."
     },
     {
-      "q": "Как смоделировать отказ мотора в ArduPilot SITL?",
+      "q": "How do you simulate a motor failure in ArduPilot SITL?",
       "options": [
-        "Снизить SIM_BATT_VOLTAGE",
-        "SIM_ENGINE_FAIL и SIM_ENGINE_MUL",
-        "Отключить ESC через MOT_FAIL = 1",
-        "Удалить из миксера"
+        "Lower SIM_BATT_VOLTAGE",
+        "SIM_ENGINE_FAIL and SIM_ENGINE_MUL",
+        "Disable the ESC via MOT_FAIL = 1",
+        "Remove it from the mixer"
       ],
       "answer": 1,
-      "explain": "SITL применяет множитель к выходу выбранных моторов."
+      "explain": "SITL applies a multiplier to the output of the selected motors."
     },
     {
-      "q": "Что видно в логе ArduPilot при отказе мотора?",
+      "q": "What do you see in the ArduPilot log when a motor fails?",
       "options": [
-        "Растёт напряжение и падает ток АКБ",
-        "RCOU на максимуме, RPM 0",
-        "GPS теряет спутники",
-        "Ничего"
+        "Battery voltage rises and current falls",
+        "RCOU at maximum, RPM 0",
+        "GPS loses satellites",
+        "Nothing"
       ],
       "answer": 1,
-      "explain": "Один канал RCOU на максимуме, соседний на минимуме, RPM 0 в ESC-телеметрии: миксер компенсирует."
+      "explain": "One RCOU channel at maximum, its neighbor at minimum, RPM 0 in the ESC telemetry: the mixer compensates."
     },
     {
-      "q": "Плоская окто по сравнению с гексой:",
+      "q": "A flat octo compared with a hexa:",
       "options": [
-        "Не переживает ни одного отказа",
-        "Требует меньше общей тяги для висения той же массы",
-        "Перестаёт управляться по рысканию",
-        "Больше запас, может пережить два отказа в удачных местах"
+        "Survives no failures at all",
+        "Needs less total thrust to hover the same mass",
+        "Loses yaw control",
+        "Bigger margin, can survive two failures in favorable positions"
       ],
       "answer": 3,
-      "explain": "Восемь моторов дают больший запас и при удачном расположении переживают два отказа."
+      "explain": "Eight motors give a bigger margin and, with a favorable arrangement, survive two failures."
     }
   ]
 }

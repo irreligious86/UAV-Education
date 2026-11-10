@@ -3,94 +3,94 @@
   "pass": 80,
   "questions": [
     {
-      "q": "Сколько тепла рассеивает линейный BEC при входе 25 В, выходе 5 В и токе 0.5 А?",
+      "q": "How much heat does a linear BEC dissipate with 25 V in, 5 V out and 0.5 A of current?",
       "options": [
-        "2.5 Вт",
-        "5 Вт",
-        "10 Вт",
-        "12.5 Вт"
+        "2.5 W",
+        "5 W",
+        "10 W",
+        "12.5 W"
       ],
       "answer": 2,
-      "explain": "(25 − 5) В × 0.5 А = 10 Вт — линейный стабилизатор сбрасывает всю разницу напряжений в тепло."
+      "explain": "(25 − 5) V × 0.5 A = 10 W — a linear regulator dumps the entire voltage difference as heat."
     },
     {
-      "q": "Зачем на силовой шине низкоESR-конденсатор?",
+      "q": "Why put a low-ESR capacitor on the power bus?",
       "options": [
-        "Увеличить ёмкость АКБ",
-        "Гасить выбросы от индуктивности",
-        "Повысить напряжение",
-        "Защита от переполюсовки разъёма АКБ"
+        "To increase the battery capacity",
+        "To absorb spikes caused by inductance",
+        "To raise the voltage",
+        "Reverse-polarity protection for the battery connector"
       ],
       "answer": 1,
-      "explain": "U = L·dI/dt при коммутации ESC: конденсатор работает локальным источником и срезает шипы."
+      "explain": "U = L·dI/dt when the ESC switches: the capacitor acts as a local source and clips the spikes."
     },
     {
-      "q": "Какой запас по напряжению должен иметь конденсатор на 6S (25.2 В полный заряд)?",
+      "q": "What voltage margin should the capacitor have on 6S (25.2 V fully charged)?",
       "options": [
-        "Ровно 25 В",
-        "35 В",
-        "50 В",
-        "100 В"
+        "Exactly 25 V",
+        "35 V",
+        "50 V",
+        "100 V"
       ],
       "answer": 2,
-      "explain": "Запас ≥ 30%: для 6S ставят 50 В, 35 В — для 4S."
+      "explain": "Margin ≥ 30%: for 6S use 50 V; 35 V is for 4S."
     },
     {
-      "q": "Что такое smoke stopper?",
+      "q": "What is a smoke stopper?",
       "options": [
-        "Фильтр питания",
-        "Ограничитель тока при включении",
-        "Термодатчик",
-        "Предохранитель на проводах мотора"
+        "A power filter",
+        "A current limiter for power-up",
+        "A temperature sensor",
+        "A fuse on the motor wires"
       ],
       "answer": 1,
-      "explain": "Лампа или резистор в разрыв плюса при первом включении после пайки: при КЗ лампа горит, борт не дымит."
+      "explain": "A bulb or a resistor in series with the positive lead at the first power-up after soldering: on a short the bulb lights up and the aircraft doesn't smoke."
     },
     {
-      "q": "Почему просадка напряжения опасна для FC?",
+      "q": "Why is a voltage sag dangerous for the FC?",
       "options": [
-        "Перегрев гироскопа",
-        "BEC отключится — сброс FC",
-        "Смена направления моторов",
-        "Потеря бинда"
+        "The gyro overheats",
+        "The BEC shuts off — the FC resets",
+        "The motors change direction",
+        "The bind is lost"
       ],
       "answer": 1,
-      "explain": "Buck-преобразователи имеют минимальное входное напряжение; просадка ниже него перезапускает плату."
+      "explain": "Buck converters have a minimum input voltage; a sag below it restarts the board."
     },
     {
-      "q": "Что происходит с недогруженным по току разъёмом?",
+      "q": "What happens to a connector that's underloaded for the current?",
       "options": [
-        "Снижает пульсации на силовой шине",
-        "Греется и окисляется",
-        "Становится лучше",
-        "Ничего"
+        "It reduces the ripple on the power bus",
+        "It heats up and oxidizes",
+        "It gets better",
+        "Nothing"
       ],
       "answer": 1,
-      "explain": "Нагрев → окисление → рост сопротивления → ещё больший нагрев."
+      "explain": "Heating → oxidation → rising resistance → even more heating."
     },
     {
-      "q": "Какой BEC лучше для питания приёмника и чувствительной RF-части?",
+      "q": "Which BEC is better for powering the receiver and the sensitive RF part?",
       "options": [
-        "Buck без фильтра",
-        "LDO после buck",
-        "Прямо от АКБ",
-        "От ESC"
+        "A buck with no filter",
+        "An LDO after a buck",
+        "Straight from the battery",
+        "From the ESC"
       ],
       "answer": 1,
-      "explain": "LDO не даёт пульсаций; связка buck → LDO даёт и КПД, и чистоту."
+      "explain": "An LDO produces no ripple; a buck → LDO chain gives both efficiency and a clean supply."
     },
     {
-      "q": "Raspberry Pi на борту перезагружается при манёврах. В dmesg:",
+      "q": "A Raspberry Pi on board reboots during maneuvers. In dmesg:",
       "kind": "apply",
-      "fragment": "[  812.4] hwmon hwmon1: Undervoltage detected!\n[  812.9] hwmon hwmon1: Voltage normalised\nПитание: BEC 5 В / 1 А с полётного контроллера",
+      "fragment": "[  812.4] hwmon hwmon1: Undervoltage detected!\n[  812.9] hwmon hwmon1: Voltage normalised\nPower: 5 V / 1 A BEC from the flight controller",
       "options": [
-        "BEC 1 А не тянет Pi (до 2–3 А): просадка на пиках — нужен отдельный BEC 5 В / 5 А",
-        "Перегрев процессора: hwmon сообщает о троттлинге, а не о напряжении",
-        "Карта памяти повреждена, и ядро ошибочно интерпретирует сбои записи как просадку",
-        "Сообщение штатное: Pi всегда пишет его при запуске Wi-Fi и его можно игнорировать"
+        "A 1 A BEC can't handle a Pi (up to 2–3 A): it sags on peaks — you need a separate 5 V / 5 A BEC",
+        "The CPU is overheating: hwmon is reporting throttling, not voltage",
+        "The memory card is damaged, and the kernel misinterprets write failures as a sag",
+        "The message is routine: a Pi always logs it when Wi-Fi starts and it can be ignored"
       ],
       "answer": 0,
-      "explain": "Pi сама сообщает о просадке; бортовой 5 В от FC рассчитан на лёгкие нагрузки."
+      "explain": "The Pi itself reports the sag; the on-board 5 V from the FC is meant for light loads."
     }
   ]
 }

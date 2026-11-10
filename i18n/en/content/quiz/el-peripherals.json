@@ -1,0 +1,94 @@
+{
+  "module": "el-peripherals",
+  "pass": 80,
+  "questions": [
+    {
+      "q": "How do you wire a UART between the FC and a device?",
+      "options": [
+        "TX→TX, RX→RX",
+        "TX→RX crossed over",
+        "Only the TX line",
+        "TX to TX and RX to RX, as labeled"
+      ],
+      "answer": 1,
+      "explain": "FC TX → device RX, FC RX ← device TX, plus a common ground."
+    },
+    {
+      "q": "What is mandatory when a device is powered from a separate source?",
+      "options": [
+        "A separate UART",
+        "A common ground with the FC",
+        "A voltage divider",
+        "A terminator"
+      ],
+      "answer": 1,
+      "explain": "Without a common ground the levels “float” — garbage or a fried port."
+    },
+    {
+      "q": "What is the CRSF baud rate between the receiver and the FC?",
+      "options": [
+        "9600",
+        "57600",
+        "115200",
+        "420000"
+      ],
+      "answer": 3,
+      "explain": "CRSF uses 420000 baud."
+    },
+    {
+      "q": "What does an I2C bus need for the lines to go up to “1”?",
+      "options": [
+        "An inverter",
+        "2.2–4.7 kΩ pull-ups",
+        "120 Ω terminators at the ends",
+        "Separate power"
+      ],
+      "answer": 1,
+      "explain": "Open-drain outputs need pull-ups; usually they're already on the FC."
+    },
+    {
+      "q": "What goes at the ends of a DroneCAN bus?",
+      "options": [
+        "Diodes and 100 nF capacitors",
+        "120 Ω terminators",
+        "Pull-ups to 3.3 V",
+        "Nothing"
+      ],
+      "answer": 1,
+      "explain": "Without terminators, reflections break the transmission."
+    },
+    {
+      "q": "Which parameter enables DroneCAN on the first CAN port in ArduPilot?",
+      "options": [
+        "CAN_P1_DRIVER = 1 and CAN_D1_PROTOCOL = 1",
+        "CAN_ENABLE = 1 and BRD_CAN = 1",
+        "GPS_TYPE = 1 and CAN_ENABLE = 1",
+        "SERIAL1_PROTOCOL = 1 and CAN_D1_UC_NODE = 10 with a reboot"
+      ],
+      "answer": 0,
+      "explain": "The port driver and the driver's protocol; then a reboot."
+    },
+    {
+      "q": "Why shouldn't you power a Raspberry Pi from the flight controller's 5 V pad?",
+      "options": [
+        "The voltage is different",
+        "BEC overload → FC resets",
+        "The Pi needs 12 V at its power input",
+        "There's no common ground"
+      ],
+      "answer": 1,
+      "explain": "The flight controller's BEC is rated for 2–3 A total; a Pi draws up to 3–5 A in peaks."
+    },
+    {
+      "q": "What's dangerous about powering a device from the FC and from the companion's USB at the same time?",
+      "options": [
+        "The device gets exactly twice the current",
+        "The common ground disappears automatically",
+        "Two sources are connected against each other through the device",
+        "Nothing: it's more reliable that way"
+      ],
+      "answer": 2,
+      "explain": "Two power points tie the outputs of the sources together — currents can flow and regulators can burn out."
+    }
+  ]
+}

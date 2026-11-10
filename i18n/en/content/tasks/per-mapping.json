@@ -1,0 +1,92 @@
+{
+ "module": "per-mapping",
+ "tasks": [
+  {
+   "id": "gsd",
+   "title": "Survey GSD",
+   "statement": "Altitude **{h} m**, sensor width **{sw} mm**, focal length **{f} mm**, frame width **{w} px**. Find the GSD (cm/px).",
+   "params": {
+    "h": {
+     "min": 30,
+     "max": 150,
+     "step": 5
+    },
+    "sw": [
+     6.17,
+     13.2,
+     17.3,
+     23.5
+    ],
+    "f": [
+     4.5,
+     8.8,
+     12,
+     24
+    ],
+    "w": [
+     4000,
+     5472,
+     6000
+    ]
+   },
+   "answer": "h*sw/(f*w)*100",
+   "unit": "cm/px",
+   "tol": 0.01,
+   "solution": "GSD = H·w_sensor/(f·W_px). Units: H in meters; the sensor width and focal length in millimeters cancel out, and ×100 converts to centimeters."
+  },
+  {
+   "id": "shot",
+   "title": "Trigger spacing from overlap",
+   "statement": "Altitude **{h} m**, field of view along the survey line **{fov}°**, forward overlap **{o} %**. Spacing between shots (m)?",
+   "params": {
+    "h": {
+     "min": 30,
+     "max": 150,
+     "step": 5
+    },
+    "fov": {
+     "min": 40,
+     "max": 80,
+     "step": 2
+    },
+    "o": [
+     70,
+     75,
+     80,
+     85
+    ]
+   },
+   "answer": "2*h*math.tan(math.radians(fov/2))*(1-o/100)",
+   "unit": "m",
+   "tol": 0.01,
+   "solution": "Footprint along the line = 2H·tan(FOV/2), spacing = footprint·(1 − overlap). This is the value that goes into `DO_SET_CAM_TRIGG_DIST`."
+  },
+  {
+   "id": "line",
+   "title": "Distance between survey lines",
+   "statement": "Altitude **{h} m**, field of view across the survey line **{fov}°**, side overlap **{o} %**. Distance between lines (m)?",
+   "params": {
+    "h": {
+     "min": 30,
+     "max": 150,
+     "step": 5
+    },
+    "fov": {
+     "min": 50,
+     "max": 90,
+     "step": 2
+    },
+    "o": [
+     60,
+     65,
+     70,
+     75
+    ]
+   },
+   "answer": "2*h*math.tan(math.radians(fov/2))*(1-o/100)",
+   "unit": "m",
+   "tol": 0.01,
+   "solution": "The same formula for the cross direction. The long side of the frame across the survey line means fewer lines and a shorter mission."
+  }
+ ]
+}

@@ -3,105 +3,105 @@
   "pass": 80,
   "questions": [
     {
-      "q": "Длина заголовка MAVLink 2 вместе с байтом STX:",
+      "q": "The length of the MAVLink 2 header including the STX byte:",
       "options": [
-        "10 байт",
-        "6 байт",
-        "12 байт",
-        "8 байт"
+        "10 bytes",
+        "6 bytes",
+        "12 bytes",
+        "8 bytes"
       ],
       "answer": 0,
       "explain": "STX, len, incompat, compat, seq, sysid, compid, msgid(3) = 10."
     },
     {
-      "q": "Зачем в CRC подмешивается CRC_EXTRA?",
+      "q": "Why is CRC_EXTRA mixed into the CRC?",
       "options": [
-        "Отсечь чужие определения",
-        "Для шифрования",
-        "Удлинить контрольную сумму",
-        "Для подписи"
+        "To reject mismatched definitions",
+        "For encryption",
+        "To lengthen the checksum",
+        "For signing"
       ],
       "answer": 0,
-      "explain": "При расхождении определений сообщения кадр отбрасывается; иначе разные диалекты с одной длиной дали бы мусорные поля."
+      "explain": "If message definitions diverge, the frame is dropped; otherwise different dialects with the same length would produce garbage fields."
     },
     {
-      "q": "Длина payload COMMAND_LONG в кадре меньше 33 байт. Это:",
+      "q": "The COMMAND_LONG payload length in a frame is less than 33 bytes. This is:",
       "options": [
-        "Норма: обрезаны нули",
-        "Признак подписи",
-        "Ошибка отправителя: кадр обрезан",
-        "Признак MAVLink 1"
+        "Normal: the zeros were truncated",
+        "A sign of signing",
+        "A sender error: the frame is truncated",
+        "A sign of MAVLink 1"
       ],
       "answer": 0,
-      "explain": "Получатель дополняет нулями до полного размера."
+      "explain": "The receiver pads it with zeros to the full size."
     },
     {
-      "q": "Порядок полей сообщения на проводе:",
+      "q": "The order of message fields on the wire:",
       "options": [
-        "По размеру типа, расширения в конце",
-        "В случайном порядке",
-        "По алфавиту имён полей",
-        "В порядке объявления полей в XML"
+        "By type size, extensions at the end",
+        "In random order",
+        "Alphabetical by field name",
+        "In the order the fields are declared in the XML"
       ],
       "answer": 0,
-      "explain": "Так mavgen выравнивает структуру."
+      "explain": "That's how mavgen aligns the struct."
     },
     {
-      "q": "Добавление extension-поля в существующее сообщение:",
+      "q": "Adding an extension field to an existing message:",
       "options": [
-        "Не меняет CRC_EXTRA",
-        "Ломает старых получателей",
-        "Требует нового msgid",
-        "Запрещено"
+        "Doesn't change CRC_EXTRA",
+        "Breaks old receivers",
+        "Requires a new msgid",
+        "Is forbidden"
       ],
       "answer": 0,
-      "explain": "Extension-поля не входят в CRC_EXTRA."
+      "explain": "Extension fields are not part of CRC_EXTRA."
     },
     {
-      "q": "Подпись MAVLink 2 защищает от:",
+      "q": "MAVLink 2 signing protects against:",
       "options": [
-        "Подмены и повтора команд",
-        "Прослушивания телеметрии",
-        "Глушения",
-        "Потерь пакетов"
+        "Spoofing and replay of commands",
+        "Eavesdropping on telemetry",
+        "Jamming",
+        "Packet loss"
       ],
       "answer": 0,
-      "explain": "Шифрования нет; для конфиденциальности — VPN или шифрующее радио."
+      "explain": "There's no encryption; for confidentiality — a VPN or an encrypting radio."
     },
     {
-      "q": "Как приёмник считает потерянные кадры?",
+      "q": "How does a receiver count lost frames?",
       "options": [
-        "По разрывам seq",
-        "Никак",
-        "По CRC",
-        "По RSSI и счётчику ошибок CRC"
+        "By gaps in seq",
+        "It doesn't",
+        "By the CRC",
+        "By RSSI and the CRC error counter"
       ],
       "answer": 0,
       "explain": "(seq_new − seq_old − 1) mod 256."
     },
     {
-      "q": "Ключ подписи передаётся в ArduPilot сообщением:",
+      "q": "The signing key is passed to ArduPilot with:",
       "options": [
-        "SETUP_SIGNING по USB",
-        "Полем HEARTBEAT",
-        "PARAM_SET по радио с ключом",
-        "Через Lua-скрипт"
+        "SETUP_SIGNING over USB",
+        "A HEARTBEAT field",
+        "PARAM_SET over the radio with the key",
+        "A Lua script"
       ],
       "answer": 0,
-      "explain": "Обычно по USB; хранится во флеше."
+      "explain": "Usually over USB; it's stored in flash."
     },
     {
-      "q": "Ваш декодер MAVLink 2 отвергает кадры с телеметрического радиомодема. Начало кадра:",
+      "q": "Your MAVLink 2 decoder rejects frames from the telemetry radio modem. Start of the frame:",
       "kind": "apply",
       "fragment": "fe 1c 4a 01 01 1e 0c 4f 00 00 ...",
       "options": [
-        "Стартовый байт 0xFE — это MAVLink 1: порт настроен на v1 или модем пересылает v1",
-        "Неверная CRC: модем меняет порядок байтов, поэтому декодер не находит конец кадра",
-        "Это сообщение подписано: длина 0x1c включает 13 байт подписи, которых нет",
-        "msgid 0x1e не существует в common.xml, поэтому кадр отбрасывается как чужой диалект"
+        "Start byte 0xFE is MAVLink 1: the port is configured for v1 or the modem forwards v1",
+        "Bad CRC: the modem reorders bytes, so the decoder can't find the end of the frame",
+        "This message is signed: length 0x1c includes 13 signature bytes that are missing",
+        "msgid 0x1e doesn't exist in common.xml, so the frame is dropped as a foreign dialect"
       ],
       "answer": 0,
-      "explain": "MAVLink 2 начинается с 0xFD, MAVLink 1 — с 0xFE; заголовок другой длины."
+      "explain": "MAVLink 2 starts with 0xFD, MAVLink 1 with 0xFE; the header has a different length."
     }
   ]
 }

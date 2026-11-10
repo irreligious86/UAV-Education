@@ -1,0 +1,94 @@
+{
+  "module": "mav-multi-vehicle",
+  "pass": 80,
+  "questions": [
+    {
+      "q": "What happens with two vehicles with sysid 1 on the same network?",
+      "options": [
+        "One “jumping” vehicle, commands go to both",
+        "The GCS will show both vehicles separately",
+        "The second vehicle won't be able to arm at all",
+        "The router will reassign one of the sysids itself"
+      ],
+      "answer": 0,
+      "explain": "Addressing is by sysid: without unique numbers the GCS and commands mix up the vehicles."
+    },
+    {
+      "q": "Why do you set source_system for a pymavlink supervisor?",
+      "options": [
+        "Otherwise it won't receive telemetry",
+        "pymavlink doesn't send commands without it",
+        "By default it's 255, same as the GCS",
+        "mavlink-router requires it"
+      ],
+      "answer": 2,
+      "explain": "Two participants with sysid 255 confuse failsafe and routing."
+    },
+    {
+      "q": "What does target_system = 0 mean?",
+      "options": [
+        "A command from the ground station",
+        "A command to all vehicles",
+        "A command to the last vehicle",
+        "A packet with no addressee is dropped"
+      ],
+      "answer": 1,
+      "explain": "Broadcast: for a global stop — yes, as a default — no."
+    },
+    {
+      "q": "Closing speed 20 m/s, delays 1 s, braking 1.5 s. Roughly how far is covered before stopping?",
+      "options": [
+        "10 m",
+        "200 m",
+        "5 m",
+        "50 m"
+      ],
+      "answer": 3,
+      "explain": "20 m/s × 2.5 s ≈ 50 m; plus position errors — the trigger threshold is around 60 m."
+    },
+    {
+      "q": "What's the danger of a shared RTL for several vehicles?",
+      "options": [
+        "It doesn't work in a fleet at all",
+        "Draining all vehicles' batteries at once",
+        "Converging over home at the same altitude",
+        "Resetting the sysid after landing"
+      ],
+      "answer": 2,
+      "explain": "Separate RTL_ALT_M and rally points, land one at a time."
+    },
+    {
+      "q": "What does FOLL_DIST_MAX do in FOLLOW mode?",
+      "options": [
+        "Beyond it the follower stops following",
+        "Sets the follower's offset from the leader",
+        "Limits the follower's flight altitude",
+        "Sets the speed for catching up with the leader"
+      ],
+      "answer": 0,
+      "explain": "If the leader is farther than FOLL_DIST_MAX, the follower holds position."
+    },
+    {
+      "q": "Why don't altitude layers solve everything?",
+      "options": [
+        "Altitude is equally accurate for everyone",
+        "Layers are prohibited by flight rules",
+        "ArduPilot can't hold altitude",
+        "Takeoff and landing cross the layers"
+      ],
+      "answer": 3,
+      "explain": "Changing altitude crosses other vehicles' layers — takeoff and landing are separated in time."
+    },
+    {
+      "q": "Why does a vehicle in a fleet need MAV_GCS_SYSID?",
+      "options": [
+        "To choose the telemetry rate",
+        "So another station's heartbeat doesn't keep the link alive",
+        "To enable FOLLOW mode",
+        "To set the router's number"
+      ],
+      "answer": 1,
+      "explain": "The loss-of-link failsafe must watch its own GCS, not just any GCS."
+    }
+  ]
+}

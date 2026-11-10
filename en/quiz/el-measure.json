@@ -3,29 +3,29 @@
   "pass": 80,
   "questions": [
     {
-      "q": "Что не способен показать мультиметр?",
+      "q": "What can a multimeter not show?",
       "options": [
-        "Сопротивление обмотки мотора в мОм",
-        "Короткие просадки и пульсации",
-        "Напряжение АКБ",
-        "КЗ при прозвонке"
+        "Motor winding resistance in mΩ",
+        "Brief sags and ripple",
+        "Battery voltage",
+        "A short during a continuity test"
       ],
       "answer": 1,
-      "explain": "Мультиметр усредняет; быстрые события видит только осциллограф."
+      "explain": "A multimeter averages; only an oscilloscope sees fast events."
     },
     {
-      "q": "Зачем AC-coupling при измерении пульсаций 5 В?",
+      "q": "Why use AC coupling when measuring 5 V ripple?",
       "options": [
-        "Включить триггер",
-        "Убрать DC и растянуть масштаб",
-        "Чтобы не сжечь вход осциллографа",
-        "Измерить частоту"
+        "To enable the trigger",
+        "To remove the DC and zoom in on the scale",
+        "So you don't fry the oscilloscope input",
+        "To measure the frequency"
       ],
       "answer": 1,
-      "explain": "Без AC-coupling пульсации в десятки мВ не видны на фоне 5 В."
+      "explain": "Without AC coupling, ripple of tens of mV is invisible against 5 V."
     },
     {
-      "q": "Сколько бит в кадре DShot?",
+      "q": "How many bits are in a DShot frame?",
       "options": [
         "8",
         "11",
@@ -33,21 +33,21 @@
         "32"
       ],
       "answer": 2,
-      "explain": "11 бит газа + 1 бит телеметрии + 4 бита CRC = 16."
+      "explain": "11 throttle bits + 1 telemetry bit + 4 CRC bits = 16."
     },
     {
-      "q": "Почему длинный провод земли щупа портит измерение пульсаций?",
+      "q": "Why does a long probe ground wire ruin a ripple measurement?",
       "options": [
-        "Он режет полосу щупа до 1 МГц",
-        "Ловит помеху как антенна",
-        "Он греется",
-        "Разряжает конденсатор"
+        "It cuts the probe bandwidth to 1 MHz",
+        "It picks up noise like an antenna",
+        "It heats up",
+        "It discharges the capacitor"
       ],
       "answer": 1,
-      "explain": "Петля земли — антенна; пружинка земли убирает артефакт."
+      "explain": "The ground loop is an antenna; a ground spring removes the artifact."
     },
     {
-      "q": "На какой скорости декодировать CRSF между приёмником и FC?",
+      "q": "At what baud rate do you decode CRSF between the receiver and the FC?",
       "options": [
         "9600",
         "115200",
@@ -55,40 +55,40 @@
         "1000000"
       ],
       "answer": 2,
-      "explain": "CRSF работает на 420000 бод; MSP — обычно 115200."
+      "explain": "CRSF runs at 420000 baud; MSP is usually 115200."
     },
     {
-      "q": "Что означает NACK на адрес I2C в анализаторе?",
+      "q": "What does a NACK on an I2C address in the analyzer mean?",
       "options": [
-        "Шина перегружена и нужна выше скорость",
-        "Устройства по адресу нет",
-        "Датчик ответил",
-        "Включён режим 10-битной адресации"
+        "The bus is overloaded and needs a higher speed",
+        "There is no device at that address",
+        "The sensor responded",
+        "10-bit addressing mode is enabled"
       ],
       "answer": 1,
-      "explain": "Отсутствие подтверждения — устройство не отозвалось."
+      "explain": "No acknowledge — the device didn't respond."
     },
     {
-      "q": "Что обязательно при любом измерении на ESC и моторах?",
+      "q": "What is mandatory for any measurement on ESCs and motors?",
       "options": [
-        "Пробник ×1",
-        "Снятые пропеллеры",
-        "Режим измерения тока",
-        "Выключенный приёмник"
+        "A ×1 probe",
+        "Props removed",
+        "Current measurement mode",
+        "Receiver turned off"
       ],
       "answer": 1,
-      "explain": "Безопасность: пропы снимаются всегда."
+      "explain": "Safety: props always come off."
     },
     {
-      "q": "Как мультиметром найти КЗ перед первым включением?",
+      "q": "How do you find a short with a multimeter before the first power-up?",
       "options": [
-        "Прозвонка силовой шины + к − без питания",
-        "Измерить ток в гнезде 10 А под батареей",
-        "Измерить напряжение на моторах",
-        "Проверить частоту на сигнальном проводе"
+        "A continuity test of the power bus + to − with no power",
+        "Measure current in the 10 A jack with the battery connected",
+        "Measure the voltage on the motors",
+        "Check the frequency on the signal wire"
       ],
       "answer": 0,
-      "explain": "Прозвонка до подачи питания: писк между + и − значит короткое замыкание."
+      "explain": "Continuity test before applying power: a beep between + and − means a short circuit."
     }
   ]
 }

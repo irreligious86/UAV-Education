@@ -3,51 +3,51 @@
   "pass": 80,
   "questions": [
     {
-      "q": "Скрипт на companion не получает адресованных ему ответов. Самая частая причина:",
+      "q": "A script on the companion doesn't receive replies addressed to it. The most common cause:",
       "options": [
-        "Он не шлёт heartbeat",
-        "Нет подписи",
-        "Слишком высокий бод",
-        "Неверный CRC в ответах автопилота"
+        "It doesn't send a heartbeat",
+        "No signing",
+        "Baud rate too high",
+        "Bad CRC in the autopilot's replies"
       ],
       "answer": 0,
-      "explain": "Маршрут к его compid появляется после первого пакета от адресата."
+      "explain": "The route to its compid appears after the first packet from the addressee."
     },
     {
-      "q": "Широковещательное сообщение (target_system = 0) автопилот пересылает:",
+      "q": "A broadcast message (target_system = 0) is forwarded by the autopilot:",
       "options": [
-        "Во все порты, кроме входного",
-        "Никуда",
-        "Только в порт, где висит GCS",
-        "Обратно во входной порт"
+        "To all ports except the input one",
+        "Nowhere",
+        "Only to the port with the GCS on it",
+        "Back to the input port"
       ],
       "answer": 0,
-      "explain": "Правила MAVLink_routing.cpp."
+      "explain": "The MAVLink_routing.cpp rules."
     },
     {
-      "q": "Почему для телеметрии по 4G лучше UDP, чем TCP?",
+      "q": "Why is UDP better than TCP for telemetry over 4G?",
       "options": [
-        "TCP задерживает свежее старым",
-        "UDP шифрует данные на уровне протокола",
-        "TCP не проходит NAT",
-        "UDP шире по полосе"
+        "TCP holds fresh data behind old data",
+        "UDP encrypts data at the protocol level",
+        "TCP doesn't pass through NAT",
+        "UDP has more bandwidth"
       ],
       "answer": 0,
-      "explain": "Head-of-line blocking: при потерях TCP ретранслирует старые данные и держит свежие."
+      "explain": "Head-of-line blocking: under loss TCP retransmits old data and holds back fresh data."
     },
     {
-      "q": "Аппарат с 4G-модемом за NAT оператора. Как подключиться к нему из GCS?",
+      "q": "A vehicle with a 4G modem behind the carrier's NAT. How do you connect to it from the GCS?",
       "options": [
-        "VPN или ретранслятор",
-        "Открыть порт на модеме",
-        "Прямо по IP модема",
-        "Только через SiK"
+        "A VPN or a relay",
+        "Open a port on the modem",
+        "Directly to the modem's IP",
+        "Only via SiK"
       ],
       "answer": 0,
-      "explain": "Входящие соединения к серому IP невозможны."
+      "explain": "Incoming connections to a private IP are impossible."
     },
     {
-      "q": "Типичный compid бортового компьютера:",
+      "q": "The typical compid of an onboard computer:",
       "options": [
         "191",
         "1",
@@ -58,29 +58,29 @@
       "explain": "MAV_COMP_ID_ONBOARD_COMPUTER = 191."
     },
     {
-      "q": "Две GCS с sysid 255 в одной сети приводят к:",
+      "q": "Two GCSs with sysid 255 on the same network lead to:",
       "options": [
-        "Конфликтам маршрутизации",
-        "Автоматическому выбору главной GCS",
-        "Удвоению скорости",
-        "Ничему"
+        "Routing conflicts",
+        "Automatic selection of the primary GCS",
+        "Double the speed",
+        "Nothing"
       ],
       "answer": 0,
-      "explain": "sysid должен быть уникальным."
+      "explain": "The sysid must be unique."
     },
     {
-      "q": "Запретить пересылку MAVLink через порт ArduPilot 4.7+:",
+      "q": "Disable MAVLink forwarding through a port in ArduPilot 4.7+:",
       "options": [
-        "MAVn_OPTIONS бит 1",
-        "Невозможно",
+        "MAVn_OPTIONS bit 1",
+        "Impossible",
         "SYSID_THISMAV = 0",
-        "SERIALn_BAUD = 0 на этом порту"
+        "SERIALn_BAUD = 0 on that port"
       ],
       "answer": 0,
-      "explain": "В 4.6 и ранее — SERIALn_OPTIONS бит 10."
+      "explain": "In 4.6 and earlier — SERIALn_OPTIONS bit 10."
     },
     {
-      "q": "Чем воспроизвести плохую сеть на Linux без радио?",
+      "q": "What do you use to reproduce a bad network on Linux without a radio?",
       "options": [
         "tc netem",
         "ping -f",
@@ -88,20 +88,20 @@
         "traceroute"
       ],
       "answer": 0,
-      "explain": "delay/jitter/loss на интерфейсе."
+      "explain": "delay/jitter/loss on an interface."
     },
     {
-      "q": "QGroundControl на ноутбуке перестал видеть аппарат, как только запустили скрипт. Конфигурация:",
+      "q": "QGroundControl on the laptop stopped seeing the vehicle as soon as the script was started. Configuration:",
       "kind": "apply",
-      "fragment": "SITL: --out udp:127.0.0.1:14550\nQGC: слушает UDP 14550\nscript.py: mavutil.mavlink_connection('udpin:0.0.0.0:14550')",
+      "fragment": "SITL: --out udp:127.0.0.1:14550\nQGC: listens on UDP 14550\nscript.py: mavutil.mavlink_connection('udpin:0.0.0.0:14550')",
       "options": [
-        "Скрипт и QGC слушают один UDP-порт 14550: нужен второй выход SITL (14551) или роутер",
-        "udpin в скрипте перехватывает sysid 255, и QGC отбрасывает аппарат как чужой",
-        "QGC требует MAVLink 1 на порту 14550, а pymavlink переключил весь поток SITL на MAVLink 2",
-        "SITL отправляет данные только первому подключившемуся клиенту по TCP 5760"
+        "The script and QGC listen on the same UDP port 14550: you need a second SITL output (14551) or a router",
+        "udpin in the script grabs sysid 255, and QGC drops the vehicle as foreign",
+        "QGC requires MAVLink 1 on port 14550, and pymavlink switched the whole SITL stream to MAVLink 2",
+        "SITL sends data only to the first client to connect over TCP 5760"
       ],
       "answer": 0,
-      "explain": "Один UDP-порт — один слушатель; разведите потоки маршрутизатором или отдельными выходами."
+      "explain": "One UDP port — one listener; split the streams with a router or separate outputs."
     }
   ]
 }

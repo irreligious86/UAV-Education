@@ -1,0 +1,40 @@
+{
+ "module": "mav-multi-vehicle",
+ "tasks": [
+  {
+   "id": "sep",
+   "title": "Supervisor trigger distance",
+   "statement": "Two vehicles are closing, each at **{v} m/s**. Telemetry delay is **{d1} s**, decision **{d2} s**, braking **{b} s**, and the combined position error of the two vehicles is **{e} m**. Estimate the minimum trigger distance (m), assuming constant closing speed for this whole time.",
+   "params": {
+    "v": {
+     "min": 3,
+     "max": 12,
+     "step": 1
+    },
+    "d1": [
+     0.2,
+     0.5,
+     1.0
+    ],
+    "d2": [
+     0.2,
+     0.5
+    ],
+    "b": [
+     1.0,
+     1.5,
+     2.0
+    ],
+    "e": {
+     "min": 2,
+     "max": 10,
+     "step": 1
+    }
+   },
+   "answer": "2*v*(d1+d2+b)+e",
+   "unit": "m",
+   "tol": 0.03,
+   "solution": "Closing speed is 2v; the distance covered during (delays + braking) plus position errors."
+  }
+ ]
+}

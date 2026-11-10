@@ -3,105 +3,105 @@
   "pass": 80,
   "questions": [
     {
-      "q": "PARAM_SET подтверждается:",
+      "q": "PARAM_SET is confirmed by:",
       "options": [
-        "Эхом PARAM_VALUE",
-        "Сообщением PARAM_ACK",
-        "Через COMMAND_ACK",
-        "Ничем"
+        "A PARAM_VALUE echo",
+        "A PARAM_ACK message",
+        "COMMAND_ACK",
+        "Nothing"
       ],
       "answer": 0,
-      "explain": "Отдельного ACK нет; эхо со старым значением = отказ."
+      "explain": "There's no separate ACK; an echo with the old value = rejection."
     },
     {
-      "q": "При повторе COMMAND_LONG после потери ACK протокол требует:",
+      "q": "When resending COMMAND_LONG after a lost ACK, the protocol requires you to:",
       "options": [
-        "Увеличить confirmation",
-        "Сменить sysid",
-        "Ничего",
-        "Отправить COMMAND_INT вместо LONG"
+        "Increment confirmation",
+        "Change the sysid",
+        "Nothing",
+        "Send COMMAND_INT instead of LONG"
       ],
       "answer": 0,
-      "explain": "Получатель может отличить повтор."
+      "explain": "So the receiver can tell it's a retry."
     },
     {
-      "q": "COMMAND_ACK с result IN_PROGRESS означает:",
+      "q": "A COMMAND_ACK with result IN_PROGRESS means:",
       "options": [
-        "Выполняется, ждать финала",
-        "Отказ, причина в поле progress",
-        "Не поддерживается",
-        "Повторить немедленно"
+        "Running, wait for the final result",
+        "Rejected, the reason is in the progress field",
+        "Not supported",
+        "Retry immediately"
       ],
       "answer": 0,
-      "explain": "Поле progress показывает ход."
+      "explain": "The progress field shows how far along it is."
     },
     {
-      "q": "Кто повторяет запрос при потере пункта при загрузке миссии?",
+      "q": "Who re-sends the request when an item is lost during a mission upload?",
       "options": [
-        "Аппарат повторным запросом",
-        "Отправитель шлёт всё заново",
-        "Никто",
-        "GCS шлёт MISSION_ACK"
+        "The vehicle, with a repeated request",
+        "The sender resends everything",
+        "Nobody",
+        "The GCS sends MISSION_ACK"
       ],
       "answer": 0,
-      "explain": "Инициатива у получателя; отправитель отвечает на каждый запрос."
+      "explain": "The receiver holds the initiative; the sender replies to every request."
     },
     {
-      "q": "mission_type = 1 — это:",
+      "q": "mission_type = 1 is:",
       "options": [
-        "Геозона",
-        "Маршрут",
-        "Точки сбора",
-        "Все сразу"
+        "Geofence",
+        "Route",
+        "Rally points",
+        "All at once"
       ],
       "answer": 0,
-      "explain": "0 — маршрут, 1 — fence, 2 — rally, 255 — все."
+      "explain": "0 — route, 1 — fence, 2 — rally, 255 — all."
     },
     {
-      "q": "Почему MISSION_ITEM_INT лучше MISSION_ITEM?",
+      "q": "Why is MISSION_ITEM_INT better than MISSION_ITEM?",
       "options": [
-        "Целые ×10⁷ без потери точности",
-        "Он короче и быстрее обрабатывается",
-        "Он подписан",
-        "Он быстрее"
+        "Integers ×10⁷ without precision loss",
+        "It's shorter and processed faster",
+        "It's signed",
+        "It's faster"
       ],
       "answer": 0,
-      "explain": "float даёт ошибку порядка метра на широте."
+      "explain": "float gives an error on the order of a meter in latitude."
     },
     {
-      "q": "Попросить ATTITUDE с частотой 50 Гц:",
+      "q": "Request ATTITUDE at 50 Hz:",
       "options": [
-        "SET_MESSAGE_INTERVAL 20000 мкс",
-        "Никак нельзя",
-        "REQUEST_DATA_STREAM всегда",
-        "PARAM_SET SR_ATT = 50 по MAVLink"
+        "SET_MESSAGE_INTERVAL 20000 µs",
+        "There's no way",
+        "Always REQUEST_DATA_STREAM",
+        "PARAM_SET SR_ATT = 50 over MAVLink"
       ],
       "answer": 0,
-      "explain": "param2 — интервал в микросекундах."
+      "explain": "param2 is the interval in microseconds."
     },
     {
-      "q": "ArduPilot и PX4 по-разному упаковывают целые параметры в float. Где это видно клиенту?",
+      "q": "ArduPilot and PX4 encode integer parameters into float differently. Where can the client see this?",
       "options": [
         "AUTOPILOT_VERSION.capabilities",
-        "Поля HEARTBEAT",
+        "HEARTBEAT fields",
         "PARAM_VALUE.param_count",
-        "В поле param_count сообщения PARAM_VALUE"
+        "In the param_count field of the PARAM_VALUE message"
       ],
       "answer": 0,
-      "explain": "Флаги MAV_PROTOCOL_CAPABILITY_PARAM_ENCODE_*."
+      "explain": "The MAV_PROTOCOL_CAPABILITY_PARAM_ENCODE_* flags."
     },
     {
-      "q": "Скрипт армит аппарат, но тот не армится. В tlog:",
+      "q": "The script arms the vehicle, but it doesn't arm. In the tlog:",
       "kind": "apply",
       "fragment": "> COMMAND_LONG  command=400 (ARM_DISARM) param1=1 confirmation=0\n< COMMAND_ACK   command=400 result=4 (FAILED)\n< STATUSTEXT    severity=2 text=\"PreArm: Battery 1 below minimum arming voltage\"",
       "options": [
-        "Команда отклонена pre-arm проверкой: причина в STATUSTEXT — напряжение ниже порога арма",
-        "Скрипт не дождался ACK: result=4 означает «в процессе», нужно ждать дольше",
-        "Нужно повторить с confirmation=1 — без этого ArduPilot всегда отклоняет первую попытку арма",
-        "Неверный номер команды: армирование — это MAV_CMD_DO_SET_MODE, а не 400"
+        "The command was rejected by a pre-arm check: the reason is in STATUSTEXT — voltage below the arming threshold",
+        "The script didn't wait for the ACK: result=4 means “in progress,” you need to wait longer",
+        "You need to retry with confirmation=1 — without it ArduPilot always rejects the first arming attempt",
+        "Wrong command number: arming is MAV_CMD_DO_SET_MODE, not 400"
       ],
       "answer": 0,
-      "explain": "result=4 — отказ; причина приходит отдельно в STATUSTEXT. Повтор не поможет."
+      "explain": "result=4 is a failure; the reason comes separately in STATUSTEXT. Retrying won't help."
     }
   ]
 }

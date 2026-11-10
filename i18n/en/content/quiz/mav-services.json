@@ -1,0 +1,107 @@
+{
+  "module": "mav-services",
+  "pass": 80,
+  "questions": [
+    {
+      "q": "PARAM_SET is confirmed by:",
+      "options": [
+        "A PARAM_VALUE echo",
+        "A PARAM_ACK message",
+        "COMMAND_ACK",
+        "Nothing"
+      ],
+      "answer": 0,
+      "explain": "There's no separate ACK; an echo with the old value = rejection."
+    },
+    {
+      "q": "When resending COMMAND_LONG after a lost ACK, the protocol requires you to:",
+      "options": [
+        "Increment confirmation",
+        "Change the sysid",
+        "Nothing",
+        "Send COMMAND_INT instead of LONG"
+      ],
+      "answer": 0,
+      "explain": "So the receiver can tell it's a retry."
+    },
+    {
+      "q": "A COMMAND_ACK with result IN_PROGRESS means:",
+      "options": [
+        "Running, wait for the final result",
+        "Rejected, the reason is in the progress field",
+        "Not supported",
+        "Retry immediately"
+      ],
+      "answer": 0,
+      "explain": "The progress field shows how far along it is."
+    },
+    {
+      "q": "Who re-sends the request when an item is lost during a mission upload?",
+      "options": [
+        "The vehicle, with a repeated request",
+        "The sender resends everything",
+        "Nobody",
+        "The GCS sends MISSION_ACK"
+      ],
+      "answer": 0,
+      "explain": "The receiver holds the initiative; the sender replies to every request."
+    },
+    {
+      "q": "mission_type = 1 is:",
+      "options": [
+        "Geofence",
+        "Route",
+        "Rally points",
+        "All at once"
+      ],
+      "answer": 0,
+      "explain": "0 — route, 1 — fence, 2 — rally, 255 — all."
+    },
+    {
+      "q": "Why is MISSION_ITEM_INT better than MISSION_ITEM?",
+      "options": [
+        "Integers ×10⁷ without precision loss",
+        "It's shorter and processed faster",
+        "It's signed",
+        "It's faster"
+      ],
+      "answer": 0,
+      "explain": "float gives an error on the order of a meter in latitude."
+    },
+    {
+      "q": "Request ATTITUDE at 50 Hz:",
+      "options": [
+        "SET_MESSAGE_INTERVAL 20000 µs",
+        "There's no way",
+        "Always REQUEST_DATA_STREAM",
+        "PARAM_SET SR_ATT = 50 over MAVLink"
+      ],
+      "answer": 0,
+      "explain": "param2 is the interval in microseconds."
+    },
+    {
+      "q": "ArduPilot and PX4 encode integer parameters into float differently. Where can the client see this?",
+      "options": [
+        "AUTOPILOT_VERSION.capabilities",
+        "HEARTBEAT fields",
+        "PARAM_VALUE.param_count",
+        "In the param_count field of the PARAM_VALUE message"
+      ],
+      "answer": 0,
+      "explain": "The MAV_PROTOCOL_CAPABILITY_PARAM_ENCODE_* flags."
+    },
+    {
+      "q": "The script arms the vehicle, but it doesn't arm. In the tlog:",
+      "kind": "apply",
+      "fragment": "> COMMAND_LONG  command=400 (ARM_DISARM) param1=1 confirmation=0\n< COMMAND_ACK   command=400 result=4 (FAILED)\n< STATUSTEXT    severity=2 text=\"PreArm: Battery 1 below minimum arming voltage\"",
+      "options": [
+        "The command was rejected by a pre-arm check: the reason is in STATUSTEXT — voltage below the arming threshold",
+        "The script didn't wait for the ACK: result=4 means “in progress,” you need to wait longer",
+        "You need to retry with confirmation=1 — without it ArduPilot always rejects the first arming attempt",
+        "Wrong command number: arming is MAV_CMD_DO_SET_MODE, not 400"
+      ],
+      "answer": 0,
+      "explain": "result=4 is a failure; the reason comes separately in STATUSTEXT. Retrying won't help."
+    }
+  ]
+}

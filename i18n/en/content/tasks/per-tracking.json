@@ -1,0 +1,21 @@
+{
+ "module": "per-tracking",
+ "tasks": [
+  {
+   "id": "kp",
+   "title": "Gain limit from latency",
+   "statement": "The pure delay of the tracking loop is **{d} ms**, and the autopilot executes velocity instantly. Estimate the K_p limit (1/s) at which a P-type loop starts to oscillate.",
+   "params": {
+    "d": {
+     "min": 50,
+     "max": 400,
+     "step": 25
+    }
+   },
+   "answer": "math.pi/(2*d/1000)",
+   "unit": "1/s",
+   "tol": 0.03,
+   "solution": "For K_p·e^(−sT_d)/s the limit is K_p ≈ π/(2·T_d)."
+  }
+ ]
+}

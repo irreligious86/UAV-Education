@@ -1,0 +1,94 @@
+{
+  "module": "mav-sdk",
+  "pass": 80,
+  "questions": [
+    {
+      "q": "Inside, MAVSDK-Python is:",
+      "options": [
+        "mavsdk_server over gRPC",
+        "Pure Python and pymavlink",
+        "A wrapper around MAVROS",
+        "A wrapper around DroneKit"
+      ],
+      "answer": 0,
+      "explain": "Hence the async API and exceptions with plugin codes."
+    },
+    {
+      "q": "`async for x in drone.telemetry.position()`:",
+      "options": [
+        "Never ends on its own",
+        "Returns a single value",
+        "Ends after 1 s",
+        "Blocks the event loop"
+      ],
+      "answer": 0,
+      "explain": "Subscriptions are endless."
+    },
+    {
+      "q": "PX4 exits Offboard right after starting. The cause:",
+      "options": [
+        "Setpoints before start, or slower than 2 Hz",
+        "No GPS fix for Offboard mode",
+        "Wrong sysid",
+        "Signing is enabled"
+      ],
+      "answer": 0,
+      "explain": "You need an initial setpoint and a continuous stream."
+    },
+    {
+      "q": "DroneKit-Python in 2026:",
+      "options": [
+        "Unmaintained",
+        "Recommended for PX4",
+        "A replacement for MAVSDK",
+        "Part of ArduPilot"
+      ],
+      "answer": 0,
+      "explain": "The project isn't being developed."
+    },
+    {
+      "q": "The preferred bridge for PX4 + ROS 2:",
+      "options": [
+        "uXRCE-DDS",
+        "DroneKit",
+        "SiK",
+        "MAVProxy with a ROS 2 module"
+      ],
+      "answer": 0,
+      "explain": "MAVROS — for ArduPilot/ROS or special cases."
+    },
+    {
+      "q": "Who should ensure safety when the script on the companion “dies”?",
+      "options": [
+        "The autopilot: timeouts and failsafe",
+        "MAVSDK",
+        "The script itself via try/except",
+        "The operator manually"
+      ],
+      "answer": 0,
+      "explain": "The companion advises, the autopilot decides."
+    },
+    {
+      "q": "Waiting for `health.is_global_position_ok` without a timeout on a vehicle without GPS leads to:",
+      "options": [
+        "The script hanging forever",
+        "Nothing",
+        "Automatic arming",
+        "A TimeoutError exception after 30 s"
+      ],
+      "answer": 0,
+      "explain": "Wrap waits in asyncio.wait_for."
+    },
+    {
+      "q": "On the wire, mission.upload_mission() is:",
+      "options": [
+        "The same MISSION_* dialogue",
+        "One big packet over MAVFTP",
+        "A transfer over MAVFTP",
+        "MAVSDK's own protocol"
+      ],
+      "answer": 0,
+      "explain": "The upper layers implement the same microservices."
+    }
+  ]
+}

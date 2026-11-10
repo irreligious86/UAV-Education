@@ -1,0 +1,48 @@
+{
+ "module": "mav-routing",
+ "tasks": [
+  {
+   "id": "uart-cap",
+   "title": "UART capacity",
+   "statement": "A UART at **{baud}** baud, 8N1 (10 bits per byte). How many frames of **{n}** bytes per second can it pass in theory?",
+   "params": {
+    "baud": [
+     57600,
+     115200,
+     460800,
+     921600
+    ],
+    "n": {
+     "min": 20,
+     "max": 120,
+     "step": 4
+    }
+   },
+   "answer": "baud/10/n",
+   "unit": "frames/s",
+   "tol": 0.01,
+   "solution": "Bytes/s = baud/10; divide by the frame size."
+  },
+  {
+   "id": "rtt-p",
+   "title": "Link latency",
+   "statement": "One-way 4G latency is **{d} ms**, onboard processing **{p} ms**. What is the RTT of a command until COMMAND_ACK is received (ms)?",
+   "params": {
+    "d": {
+     "min": 30,
+     "max": 250,
+     "step": 10
+    },
+    "p": {
+     "min": 1,
+     "max": 20,
+     "step": 1
+    }
+   },
+   "answer": "2*d+p",
+   "unit": "ms",
+   "tol": 0.01,
+   "solution": "There + processing + back."
+  }
+ ]
+}

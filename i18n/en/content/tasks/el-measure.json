@@ -1,0 +1,47 @@
+{
+ "module": "el-measure",
+ "tasks": [
+  {
+   "id": "crc",
+   "title": "DShot frame CRC",
+   "statement": "DShot throttle **{thr}**, telemetry bit 0. Compute the 4-bit CRC: v = throttle·2 + telemetry, CRC = (v ⊕ v>>4 ⊕ v>>8) & 0xF. The answer is a decimal number 0–15.",
+   "params": {
+    "thr": {
+     "min": 48,
+     "max": 2047,
+     "step": 1
+    }
+   },
+   "answer": "((thr*2)^((thr*2)>>4)^((thr*2)>>8))&15",
+   "unit": "",
+   "tol": 0.0001,
+   "solution": "v = throttle·2 + telemetry bit; CRC = (v ^ (v >> 4) ^ (v >> 8)) & 0xF.",
+   "abs": 0.4
+  },
+  {
+   "id": "ri",
+   "title": "Internal resistance from sag",
+   "statement": "With no load the pack reads **{u0} V**; at **{i} A** the voltage sagged by **{s} V**. Find the internal resistance of the pack (mΩ).",
+   "params": {
+    "u0": [
+     16.8,
+     25.2
+    ],
+    "i": {
+     "min": 10,
+     "max": 60,
+     "step": 5
+    },
+    "s": {
+     "min": 0.2,
+     "max": 1.6,
+     "step": 0.1
+    }
+   },
+   "answer": "1000*s/i",
+   "unit": "mΩ",
+   "tol": 0.02,
+   "solution": "R = ΔU / I = (U_no-load − U_load) / I."
+  }
+ ]
+}
