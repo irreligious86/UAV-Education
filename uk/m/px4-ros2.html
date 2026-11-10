@@ -1,7 +1,185 @@
 <!doctype html>
-<html lang="uk"><head><meta charset="utf-8">
-<title>Українська</title>
-<link rel="canonical" href="../../ua/m/px4-ros2.html">
-<meta http-equiv="refresh" content="0; url=../../ua/m/px4-ros2.html">
-<script>location.replace("../../ua/m/px4-ros2.html" + location.search + location.hash)</script>
-</head><body><p><a href="../../ua/m/px4-ros2.html">Українська</a></p></body></html>
+<html lang="uk" data-theme="dark" data-lang="uk">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PX4 і ROS 2: uXRCE-DDS та offboard — UAV Student</title>
+  <meta name="description" content="підняти міст uXRCE-DDS і побачити топіки в ROS 2 написати offboard-вузол із правильним порядком потоку й режиму">
+  <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
+  <link rel="manifest" href="../../manifest.webmanifest">
+  <meta name="theme-color" content="#0b0f14">
+  <link rel="alternate" hreflang="ru" href="../../m/px4-ros2.html">
+  <link rel="alternate" hreflang="uk" href="../../uk/m/px4-ros2.html">
+  <link rel="alternate" hreflang="en" href="../../en/m/px4-ros2.html">
+  <link rel="alternate" hreflang="uk-galych" href="../../gal/m/px4-ros2.html">
+  <script>/* go to the visitor's chosen language before anything paints (assets/i18n.js) */(function(){try{var c=localStorage.getItem('uav-lang'),h=document.documentElement.getAttribute('data-lang');if(!c||c===h||/[?&]lang=keep\b/.test(location.search))return;var l=document.querySelector('link[rel=alternate][hreflang="'+c+'"]');if(l)location.replace(l.href+location.search+location.hash)}catch(e){}})();</script>
+  <link rel="stylesheet" href="../../lib/ground-control-ui/dist/ground-control.css">
+  <link rel="stylesheet" href="../../assets/site.css">
+  <script src="../../lib/ground-control-ui/dist/ground-control.js" defer></script>
+  <script src="../../assets/i18n/uk.js"></script>
+  <script src="../../assets/i18n.js"></script>
+  <script src="../../assets/progress-store.js" defer></script>
+  <script src="../../assets/backend-config.js" defer></script>
+  <script src="../../assets/account.js" defer></script>
+  <script src="../../assets/grading.js" defer></script>
+  <script src="../../assets/app.js" defer></script>
+  <script src="../../assets/uav-quiz.js" defer></script>
+  <script src="../../assets/uav-tasks.js" defer></script>
+  <script src="../../assets/offline.js" defer></script>
+</head>
+<body class="gc-root" data-base="../" data-root="../../">
+  <header class="site-header">
+    <div class="gc-container site-header__inner">
+      <a class="site-brand" href="../index.html"><span class="site-brand__mark" aria-hidden="true">◆</span> UAV Student</a>
+      <nav class="gc-nav" aria-label="Розділи сайту">
+        <a href="../index.html" aria-current="page">Курс</a>
+        <a href="../ref/index.html">Довідник</a>
+        <a href="../pages/glossary.html">Глосарій</a>
+        <a href="../pages/fails.html">Фейли</a>
+        <a href="../pages/search.html">Пошук</a>
+        <a href="../pages/progress.html">Мій прогрес</a>
+      </nav>
+      <nav class="lang-switch" aria-label="Мова"><a class="gc-tag" href="../../m/px4-ros2.html" data-lang-to="ru" hreflang="ru" lang="ru" title="Русский">RU</a><a class="gc-tag" href="../../uk/m/px4-ros2.html" data-lang-to="uk" hreflang="uk" lang="uk" title="Українська" aria-current="true" data-state="ok">UK</a><a class="gc-tag" href="../../en/m/px4-ros2.html" data-lang-to="en" hreflang="en" lang="en" title="English">EN</a><a class="gc-tag" href="../../gal/m/px4-ros2.html" data-lang-to="uk-galych" hreflang="uk-galych" lang="uk-galych" title="Галицька (експеримент)">GAL</a></nav>
+    </div>
+  </header>
+  <main class="gc-container site-main">
+    <article class="module" data-module-page="px4-ros2">
+      <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-px4">Електив: PX4</a><span>PX4 і ROS 2: uXRCE-DDS та offboard</span></p>
+      <h1 class="module-title">PX4 і ROS 2: uXRCE-DDS та offboard</h1>
+      <div class="module-tags"><span class="gc-tag" title="Рівень">L4 — Експерт</span><span class="gc-tag">читання 30 хв</span><span class="gc-tag">навчання ~4 год</span><span class="gc-tag">PX4 1.14+</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ОПАНОВАНО</span></div>
+      <p class="gc-muted module-score" data-module-score></p>
+      <p class="module-lead">У PX4 топіки uORB можна вивести просто в ROS 2: клієнт uXRCE-DDS на польотному контролері та агент на companion-комп&#x27;ютері прокидають повідомлення в обидва боки. Це дає ROS-вузлам доступ до орієнтації, позиції та команд без MAVLink-обгортки. Модуль показує, як підняти міст на SITL, що таке <code>px4_msgs</code>, як влаштоване offboard-керування (<code>OffboardControlMode</code> + <code>TrajectorySetpoint</code> + <code>VehicleCommand</code>) і чому PX4 викидає з Offboard, якщо ти замовк.</p>
+      <div class="gc-callout" data-state="ok"><strong>Після модуля ти вмієш</strong><ul><li>підняти міст uXRCE-DDS і побачити топіки в ROS 2</li><li>написати offboard-вузол із правильним порядком потоку й режиму</li></ul></div><p class="gc-muted">Перед цим модулем: <a href="px4-control.html">Контури керування та тюнінг PX4</a></p><div class="gc-callout lab"><p class="gc-label gc-muted">Лабораторна</p><strong>Offboard-вузол</strong><p class="gc-muted lab__hint">Здано, коли позначено всі пункти:</p><ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="px4-ros2:lab:0"><span>Топіки /fmu/out видно в ROS 2</span></label></li><li><label><input type="checkbox" data-check-id="px4-ros2:lab:1"><span>Приклад offboard запущено</span></label></li><li><label><input type="checkbox" data-check-id="px4-ros2:lab:2"><span>Власний вузол тримає точку, зупинка вузла викликає вихід з Offboard</span></label></li></ul></div><div class="path-pos gc-muted"><span class="gc-label">На шляху</span><ul><li data-path-pos="px4"><a href="../path/px4.html">PX4</a>: крок 17 з 36 → <a href="px4-companion-jetson.html?path=px4">PX4 + Jetson Orin: companion по UART, MAVLink і uXRCE-DDS</a></li></ul></div>
+      <div class="gc-prose module-body">
+<h2>Теорія</h2>
+<h4 class="md-subheading">Міст uXRCE-DDS</h4>
+<ul><li><strong>Клієнт</strong> <code>uxrce_dds_client</code> у PX4 публікує/підписується на обмежений набір топіків uORB (список — <code>dds_topics.yaml</code>).</li><li><strong>Агент</strong> <code>MicroXRCEAgent</code> на companion або ПК приймає їх по UDP чи serial і виставляє в DDS — тобто в ROS 2.</li><li>Повідомлення на боці ROS 2 — пакет <code>px4_msgs</code>; <strong>гілка `px4_msgs` має відповідати версії PX4</strong>, інакше визначення не збігаються. Для різних версій є вузол-перекладач повідомлень.</li></ul>
+<p>Топіки з&#x27;являються в ROS 2 як <code>/fmu/out/*</code> (з PX4) і <code>/fmu/in/*</code> (у PX4).</p>
+<h4 class="md-subheading">Offboard: три повідомлення</h4>
+<ol><li><strong>`OffboardControlMode`</strong> — каже PX4, *чим* ти керуєш (позиція, швидкість, прискорення, орієнтація, rates). Має йти потоком <strong>до</strong> переходу в Offboard і весь час у ньому; за частоти нижче ~2 Гц PX4 виходить з Offboard.</li><li><strong>`TrajectorySetpoint`</strong> — сама ціль: позиція/швидкість у NED (Z униз!), yaw.</li><li><strong>`VehicleCommand`</strong> — команди: змінити режим (<code>VEHICLE_CMD_DO_SET_MODE</code>, Offboard = base 1, custom 6), арм (<code>VEHICLE_CMD_COMPONENT_ARM_DISARM</code>). Підтвердження — <code>VehicleCommandAck</code>.</li></ol>
+<p>Та сама філософія, що й GUIDED в ArduPilot: companion радить потоком, автопілот стежить за таймаутом, і пілот завжди може перехопити керування.</p>
+<h4 class="md-subheading">Проти MAVLink/MAVSDK</h4>
+<p>MAVLink через MAVSDK простіший для простих задач і не потребує ROS. uXRCE-DDS — коли потрібні ROS-екосистема (навігація, зір, планування), низька затримка й доступ до внутрішніх топіків.</p>
+<h4 class="md-subheading">Налаштування мосту на реальному борту</h4>
+<p>PX4: <code>UXRCE_DDS_CFG</code> = TELEM2 (порт), <code>SER_TEL2_BAUD</code> = 921600; на companion: <code>MicroXRCEAgent serial --dev /dev/ttyTHS1 -b 921600</code> (Jetson) або <code>udp4 -p 8888</code> для SITL/Wi-Fi. Перевірка: <code>ros2 topic list | grep fmu</code>, <code>ros2 topic hz /fmu/out/vehicle_odometry</code> (очікувано десятки–сотні Гц). Якщо топіків немає: порт зайнятий MAVLink (<code>MAV_1_CONFIG</code> на тому ж TELEM2 — конфлікт), швидкість, <code>uxrce_dds_client status</code> у консолі PX4.</p>
+<h4 class="md-subheading">Системи координат — головне джерело помилок</h4>
+<p>PX4 працює в NED (північ-схід-униз) і FRD (уперед-праворуч-униз); ROS 2 (REP-103) — ENU і FLU. <code>TrajectorySetpoint.position = [x, y, z]</code> — NED: z = −10 означає 10 м угору. Перетворення: ENU→NED: (x, y, z) → (y, x, −z); FLU→FRD: (x, y, z) → (x, −y, −z). Пакет <code>px4_ros_com</code> містить утиліти перетворення; MAVROS робить це сам. Помилка знака по z — класичне «апарат пішов у землю під час зльоту в симуляторі».</p>
+<h4 class="md-subheading">Мінімальний offboard-вузол (Python, rclpy)</h4>
+<pre class="cli-block"><code>import rclpy
+from rclpy.node import Node
+from px4_msgs.msg import OffboardControlMode, TrajectorySetpoint, VehicleCommand
+from rclpy.qos import QoSProfile, ReliabilityPolicy, HistoryPolicy, DurabilityPolicy
+
+class Offboard(Node):
+    def __init__(self):
+        super().__init__(&quot;offboard_min&quot;)
+        qos = QoSProfile(reliability=ReliabilityPolicy.BEST_EFFORT, durability=DurabilityPolicy.TRANSIENT_LOCAL,
+                         history=HistoryPolicy.KEEP_LAST, depth=1)   # PX4 publishes best-effort
+        self.mode_pub = self.create_publisher(OffboardControlMode, &quot;/fmu/in/offboard_control_mode&quot;, qos)
+        self.sp_pub = self.create_publisher(TrajectorySetpoint, &quot;/fmu/in/trajectory_setpoint&quot;, qos)
+        self.cmd_pub = self.create_publisher(VehicleCommand, &quot;/fmu/in/vehicle_command&quot;, qos)
+        self.n = 0
+        self.create_timer(0.1, self.step)                               # 10 Hz &gt; 2 Hz minimum
+
+    def cmd(self, command, p1=0.0, p2=0.0):
+        m = VehicleCommand(command=command, param1=p1, param2=p2, target_system=1, target_component=1,
+                           source_system=1, source_component=1, from_external=True,
+                           timestamp=int(self.get_clock().now().nanoseconds / 1000))
+        self.cmd_pub.publish(m)
+
+    def step(self):
+        now = int(self.get_clock().now().nanoseconds / 1000)
+        self.mode_pub.publish(OffboardControlMode(position=True, timestamp=now))
+        self.sp_pub.publish(TrajectorySetpoint(position=[0.0, 0.0, -5.0], yaw=0.0, timestamp=now))  # 5 m up (NED)
+        if self.n == 10:                                                # after 1 s of setpoints
+            self.cmd(VehicleCommand.VEHICLE_CMD_DO_SET_MODE, 1.0, 6.0)  # Offboard
+            self.cmd(VehicleCommand.VEHICLE_CMD_COMPONENT_ARM_DISARM, 1.0)
+        self.n += 1
+
+rclpy.init(); rclpy.spin(Offboard())</code></pre>
+<p>Захисти з модуля «Стеження» (ліміти, watchdog, таймаути <code>COM_OF_LOSS_T</code> = 1 с і дія <code>COM_OBL_RC_ACT</code>) обов&#x27;язкові й тут.</p>
+<figure class="diagram" data-diagram="px4-offboard-seq"><div class="diagram__svg"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 330" width="100%" role="img" aria-labelledby="t" style="max-width:720px;display:block;margin:0 auto"><title id="t">Offboard через uXRCE-DDS: три повідомлення</title><style>text{font-family: var(--gc-font-mono, ui-monospace, Menlo, monospace); font-size: 12px;fill:currentColor} .m{fill:var(--gc-ink-muted, #8a93a3)} .a{fill:var(--gc-accent-hud, #5ef1d2)} .w{fill:var(--gc-signal-amber, #f0b24c)} .d{fill:var(--gc-signal-red, #e8636b)} .box{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:currentColor;stroke-width:1.2} .boxa{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6} .ln{stroke:currentColor;stroke-width:1.2;fill:none} .lna{stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6;fill:none} .lnm{stroke:var(--gc-ink-muted, #8a93a3);stroke-width:1;fill:none;stroke-dasharray:4 3} .t{font-size:11px} .b{font-weight:600}</style><defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker><marker id="ara" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--gc-accent-hud, #5ef1d2)"/></marker></defs><text x="16" y="16" text-anchor="start" class="m t">Offboard через uXRCE-DDS: три повідомлення</text><rect class="box" x="20.0" y="26" width="120" height="26" rx="5"/><text x="80.0" y="43" text-anchor="middle" class="b" style="font-size:11px">ROS 2 вузол</text><line class="lnm" x1="80.0" y1="52" x2="80.0" y2="320"/><rect class="box" x="410.0" y="26" width="120" height="26" rx="5"/><text x="470.0" y="43" text-anchor="middle" class="b" style="font-size:11px">PX4</text><line class="lnm" x1="470.0" y1="52" x2="470.0" y2="320"/><path class="lna" d="M80.0 74 L466.0 74" marker-end="url(#ara)"/><text x="275.0" y="69" text-anchor="middle" class="a t" style="font-size:10px">OffboardControlMode ≥ 2 Гц</text><path class="lna" d="M80.0 104 L466.0 104" marker-end="url(#ara)"/><text x="275.0" y="99" text-anchor="middle" class="a t" style="font-size:10px">TrajectorySetpoint (NED)</text><text x="275.0" y="138" text-anchor="middle" class="w t" style="font-size:10px">— потік іде ≥ 1 с —</text><path class="ln" d="M80.0 164 L466.0 164" marker-end="url(#ar)"/><text x="275.0" y="159" text-anchor="middle" class="t" style="font-size:10px">VehicleCommand: режим OFFBOARD</text><path class="ln" d="M80.0 194 L466.0 194" marker-end="url(#ar)"/><text x="275.0" y="189" text-anchor="middle" class="t" style="font-size:10px">VehicleCommand: ARM</text><path class="ln" style="stroke-dasharray:5 4" d="M470.0 224 L84.0 224" marker-end="url(#ar)"/><text x="275.0" y="219" text-anchor="middle" class="t" style="font-size:10px">VehicleStatus</text><text x="275.0" y="258" text-anchor="middle" class="w t" style="font-size:10px">— потік перервався —</text><text x="275.0" y="288" text-anchor="middle" class="w t" style="font-size:10px">— COM_OF_LOSS_T → failsafe —</text><text x="704" y="108" text-anchor="end" class="m t" style="font-size:10px">ENU/FLU ROS → NED/FRD PX4</text><text x="704" y="168" text-anchor="end" class="m t" style="font-size:10px">без потоку режим не ввімкнеться</text><text x="704" y="288" text-anchor="end" class="m t" style="font-size:10px">COM_OBL_RC_ACT — дія</text></svg></div><figcaption class="gc-muted">Offboard з ROS 2: потік OffboardControlMode і TrajectorySetpoint до перемикання режиму, потім команди режиму та арму; у разі обриву — failsafe.</figcaption><div class="diagram__hint">Схему можно прокрутить по горизонтали</div></figure>
+
+<h2>Практика</h2>
+<h4 class="md-subheading">Крок 1. Оточення</h4>
+<pre class="cli-block"><code># ROS 2 Jazzy (Ubuntu 24.04) встановлено й source&#x27;нуто; запасний варіант — Humble (22.04)
+mkdir -p ~/ws_px4/src &amp;&amp; cd ~/ws_px4/src
+git clone https://github.com/PX4/px4_msgs.git      # branch matching your PX4 version
+git clone https://github.com/PX4/px4_ros_com.git
+cd .. &amp;&amp; colcon build &amp;&amp; source install/setup.bash</code></pre>
+<p>Агент: <code>MicroXRCEAgent udp4 -p 8888</code> (збірка з вихідних кодів або snap — за документацією).</p>
+<h4 class="md-subheading">Крок 2. SITL із клієнтом</h4>
+<p><code>make px4_sitl gz_x500</code> — у SITL клієнт uXRCE-DDS стартує сам і шукає агента на 8888. Перевірка: <code>ros2 topic list</code> показує <code>/fmu/out/vehicle_attitude</code> та інші; <code>ros2 topic echo /fmu/out/vehicle_local_position</code> (з PX4 1.17 — <code>/fmu/out/vehicle_local_position_v1</code>).</p>
+<h4 class="md-subheading">Крок 3. Offboard-приклад</h4>
+<p>Запусти приклад із <code>px4_ros_com</code> (offboard control): вузол 10 циклів шле <code>OffboardControlMode</code> + <code>TrajectorySetpoint</code>, потім перемикає режим і армить через <code>VehicleCommand</code>, після чого тримає точку на 5 м. Прочитай код: порядок «спочатку потік, потім режим» — ключовий.</p>
+<h4 class="md-subheading">Крок 4. Власний вузол</h4>
+<p>Напиши вузол на Python (<code>rclpy</code>), який тримає квадрокоптер на висоті 3 м і кожні 10 с змінює ціль по колу радіусом 5 м. Перевір: зупинив вузол — через ~1 с (<code>COM_OF_LOSS_T</code>, типово 1 с) PX4 виходить з Offboard (у SITL — перехід у Hold/Land згідно з налаштуванням failsafe).</p>
+<p>Каркас (структура як у прикладі <code>px4_ros_com</code>, імена топіків звір із <code>ros2 topic list</code> своєї версії PX4):</p>
+<pre class="cli-block"><code>import math
+import rclpy
+from rclpy.node import Node
+from rclpy.qos import QoSProfile, ReliabilityPolicy, DurabilityPolicy, HistoryPolicy
+from px4_msgs.msg import OffboardControlMode, TrajectorySetpoint, VehicleCommand
+
+QOS = QoSProfile(reliability=ReliabilityPolicy.BEST_EFFORT, durability=DurabilityPolicy.TRANSIENT_LOCAL,
+                 history=HistoryPolicy.KEEP_LAST, depth=1)
+
+class Circle(Node):
+    def __init__(self):
+        super().__init__(&quot;circle&quot;)
+        self.mode_pub = self.create_publisher(OffboardControlMode, &quot;/fmu/in/offboard_control_mode&quot;, QOS)
+        self.sp_pub = self.create_publisher(TrajectorySetpoint, &quot;/fmu/in/trajectory_setpoint&quot;, QOS)
+        self.cmd_pub = self.create_publisher(VehicleCommand, &quot;/fmu/in/vehicle_command&quot;, QOS)
+        self.ticks = 0
+        self.create_timer(0.1, self.tick)                       # 10 Hz, well above the 2 Hz minimum
+
+    def now_us(self):
+        return self.get_clock().now().nanoseconds // 1000
+
+    def command(self, cmd, p1=0.0, p2=0.0):
+        m = VehicleCommand(command=cmd, param1=p1, param2=p2, target_system=1, target_component=1,
+                           source_system=1, source_component=1, from_external=True, timestamp=self.now_us())
+        self.cmd_pub.publish(m)
+
+    def tick(self):
+        self.mode_pub.publish(OffboardControlMode(position=True, timestamp=self.now_us()))
+        a = 2 * math.pi * (self.ticks // 100) / 6               # next point on the circle every 10 s
+        sp = TrajectorySetpoint(timestamp=self.now_us())
+        sp.position = [5.0 * math.cos(a), 5.0 * math.sin(a), -3.0]   # NED: z = -3 is 3 m up
+        sp.yaw = float(a + math.pi)
+        self.sp_pub.publish(sp)
+        if self.ticks == 10:                                    # stream first, then switch mode and arm
+            self.command(VehicleCommand.VEHICLE_CMD_DO_SET_MODE, 1.0, 6.0)   # custom mode 6 = Offboard
+            self.command(VehicleCommand.VEHICLE_CMD_COMPONENT_ARM_DISARM, 1.0)
+        self.ticks += 1
+
+def main():
+    rclpy.init(); rclpy.spin(Circle())
+
+if __name__ == &quot;__main__&quot;:
+    main()</code></pre>
+<p>Що перевірити за логом: у <code>.ulg</code> <code>trajectory_setpoint</code> змінюється сходинкою кожні 10 с, <code>vehicle_local_position</code> наздоганяє за 2–4 с без перельоту понад 0.5 м; після <code>Ctrl+C</code> вузла — перехід режиму через <code>COM_OF_LOSS_T</code>.</p>
+<h4 class="md-subheading">Лабораторна</h4>
+<p>Вузол працює в SITL; лог <code>.ulg</code> показує <code>vehicle_local_position</code> проти <code>trajectory_setpoint</code>; задокументовано поведінку при зупинці вузла.</p>
+
+<h2>Діагностика</h2>
+<div class="diag-groups"><article class="diag-item"><h4><strong>Симптом:</strong> <code>ros2 topic list</code> порожній</h4><ul><li>Можлива причина: агента не запущено, не той порт, не збігається версія <code>px4_msgs</code>.</li><li>Що зробити: запустити агента на 8888, перевірити гілку <code>px4_msgs</code>.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> не перемикається в Offboard</h4><ul><li>Можлива причина: <code>OffboardControlMode</code> не йшов потоком до команди.</li><li>Що зробити: слати потік ≥ 2 Гц заздалегідь, потім режим.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> викидає з Offboard у польоті</h4><ul><li>Можлива причина: частота <code>OffboardControlMode</code> впала нижче ~2 Гц.</li><li>Що зробити: таймер вузла, перевірити завантаження companion.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> летить угору замість униз</h4><ul><li>Можлива причина: знак Z у NED.</li><li>Що зробити: Z униз додатний, висота 3 м — Z = −3.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> PX4 не входить в Offboard</h4><ul><li>Можлива причина: setpoint&#x27;и не йшли ≥ 1 с до команди, частота &lt; 2 Гц, неправильний QoS.</li><li>Що зробити: потік до зміни режиму, 10+ Гц, BEST_EFFORT QoS; <code>commander status</code>.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> зліт «у землю» в SITL</h4><ul><li>Можлива причина: знак z (NED).</li><li>Що зробити: z від&#x27;ємний угору; перевірити конверсію ENU/NED.</li></ul></article></div>
+
+<h2>Чек-лист</h2>
+<ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="px4-ros2:0"><span>Агент і клієнт пов&#x27;язані, топіки видно в ROS 2</span></label></li><li><label><input type="checkbox" data-check-id="px4-ros2:1"><span>Гілка <code>px4_msgs</code> відповідає версії PX4</span></label></li><li><label><input type="checkbox" data-check-id="px4-ros2:2"><span>Приклад offboard запущено й прочитано</span></label></li><li><label><input type="checkbox" data-check-id="px4-ros2:3"><span>Власний вузол тримає потік <code>OffboardControlMode</code> ≥ 2 Гц</span></label></li><li><label><input type="checkbox" data-check-id="px4-ros2:4"><span>Поведінку при зупинці вузла перевірено</span></label></li></ul>
+
+<h2>Джерела</h2>
+<ul class="refs"><li><a href="https://docs.px4.io/main/en/ros2/user_guide.html" target="_blank" rel="noopener noreferrer">PX4 ROS 2 User Guide</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://docs.px4.io/main/en/middleware/uxrce_dds.html" target="_blank" rel="noopener noreferrer">PX4 uXRCE-DDS</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://docs.px4.io/main/en/ros2/offboard_control.html" target="_blank" rel="noopener noreferrer">PX4 ROS 2 Offboard Control Example</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://github.com/PX4/px4_msgs" target="_blank" rel="noopener noreferrer">px4_msgs (GitHub)</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://github.com/PX4/px4_ros_com" target="_blank" rel="noopener noreferrer">px4_ros_com (GitHub)</a> <span class="gc-tag" data-state="info">primary</span></li></ul>
+<h2>Перевір себе</h2>
+<uav-quiz src="../quiz/px4-ros2.json" module="px4-ros2"></uav-quiz>
+      </div>
+      <div class="module-done"><gc-button variant="secondary" data-done-toggle="px4-ros2">Позначити як пройдений</gc-button></div>
+      <section class="related" aria-label="Суміжні модулі"><p class="gc-label gc-muted">Суміжні модулі</p><div class="gc-grid ref-grid"><a class="gc-card" href="px4-architecture.html"><strong>Архітектура PX4: модулі та uORB</strong><div class="gc-card__meta"><span class="gc-tag" title="L3 — Специалист">L3</span></div></a><a class="gc-card" href="ap-companion.html"><strong>Companion + ArduPilot: керування з коду</strong><div class="gc-card__meta"><span class="gc-tag" title="L3 — Специалист">L3</span></div></a></div></section>
+      <nav class="pager" aria-label="Сусідні модулі" data-track-pager><a class="gc-card pager__prev" href="px4-control.html"><span class="gc-label gc-muted">Назад · трек</span><br>Контури керування та тюнінг PX4</a><a class="gc-card pager__next" href="px4-companion-jetson.html"><span class="gc-label gc-muted">Далі · трек</span><br>PX4 + Jetson Orin: companion по UART, MAVLink і uXRCE-DDS</a></nav><nav class="pager" aria-label="Сусідні кроки шляху PX4" data-path-pager="px4" hidden><a class="gc-card pager__prev" href="px4-control.html?path=px4"><span class="gc-label gc-muted">Назад · шлях PX4</span><br>Контури керування та тюнінг PX4</a><a class="gc-card pager__next" href="px4-companion-jetson.html?path=px4"><span class="gc-label gc-muted">Далі · крок 18 з 36</span><br>PX4 + Jetson Orin: companion по UART, MAVLink і uXRCE-DDS</a></nav>
+    </article>
+  </main>
+  <footer class="gc-container site-footer gc-muted">
+    <p>Відкритий курс · <a href="https://github.com/irreligious86/UAV-Education">вихідний код на GitHub</a> · <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">план розвитку</a> · <a href="../../curriculum/curriculum.html">для розробника</a> · CC BY-NC-SA 4.0</p>
+  </footer>
+</body>
+</html>

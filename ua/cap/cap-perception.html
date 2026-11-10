@@ -1,70 +1,7 @@
 <!doctype html>
-<html lang="uk" data-theme="dark" data-lang="uk">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Стеження за ціллю — UAV Student</title>
-  <meta name="description" content="Companion детектує об&#x27;єкт на відео й веде апарат за ним у SITL/у полі через GUIDED/Offboard">
-  <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
-  <link rel="manifest" href="../../manifest.webmanifest">
-  <meta name="theme-color" content="#0b0f14">
-  <link rel="alternate" hreflang="ru" href="../../cap/cap-perception.html">
-  <link rel="alternate" hreflang="uk" href="../../ua/cap/cap-perception.html">
-  <link rel="alternate" hreflang="en" href="../../en/cap/cap-perception.html">
-  <link rel="alternate" hreflang="uk-galych" href="../../gal/cap/cap-perception.html">
-  <script>/* go to the visitor's chosen language before anything paints (assets/i18n.js) */(function(){try{var c=localStorage.getItem('uav-lang'),h=document.documentElement.getAttribute('data-lang');if(!c||c===h||/[?&]lang=keep\b/.test(location.search))return;var l=document.querySelector('link[rel=alternate][hreflang="'+c+'"]');if(l)location.replace(l.href+location.search+location.hash)}catch(e){}})();</script>
-  <link rel="stylesheet" href="../../lib/ground-control-ui/dist/ground-control.css">
-  <link rel="stylesheet" href="../../assets/site.css">
-  <script src="../../lib/ground-control-ui/dist/ground-control.js" defer></script>
-  <script src="../../assets/i18n/uk.js"></script>
-  <script src="../../assets/i18n.js"></script>
-  <script src="../../assets/progress-store.js" defer></script>
-  <script src="../../assets/backend-config.js" defer></script>
-  <script src="../../assets/account.js" defer></script>
-  <script src="../../assets/grading.js" defer></script>
-  <script src="../../assets/app.js" defer></script>
-  <script src="../../assets/uav-quiz.js" defer></script>
-  <script src="../../assets/uav-tasks.js" defer></script>
-  <script src="../../assets/offline.js" defer></script>
-</head>
-<body class="gc-root" data-base="../" data-root="../../">
-  <header class="site-header">
-    <div class="gc-container site-header__inner">
-      <a class="site-brand" href="../index.html"><span class="site-brand__mark" aria-hidden="true">◆</span> UAV Student</a>
-      <nav class="gc-nav" aria-label="Розділи сайту">
-        <a href="../index.html" aria-current="page">Курс</a>
-        <a href="../ref/index.html">Довідник</a>
-        <a href="../pages/glossary.html">Глосарій</a>
-        <a href="../pages/fails.html">Фейли</a>
-        <a href="../pages/search.html">Пошук</a>
-        <a href="../pages/progress.html">Мій прогрес</a>
-      </nav>
-      <nav class="lang-switch" aria-label="Мова"><a class="gc-tag" href="../../cap/cap-perception.html" data-lang-to="ru" hreflang="ru" lang="ru" title="Русский">RU</a><a class="gc-tag" href="../../ua/cap/cap-perception.html" data-lang-to="uk" hreflang="uk" lang="uk" title="Українська" aria-current="true" data-state="ok">UA</a><a class="gc-tag" href="../../en/cap/cap-perception.html" data-lang-to="en" hreflang="en" lang="en" title="English">EN</a><a class="gc-tag" href="../../gal/cap/cap-perception.html" data-lang-to="uk-galych" hreflang="uk-galych" lang="uk-galych" title="Галицька (експеримент)">GAL</a></nav>
-    </div>
-  </header>
-  <main class="gc-container site-main">
-    <article class="module" data-module-page="cap-perception">
-      <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-perception">Сприйняття та інтелект</a><span>Підсумковий проєкт</span></p>
-      <h1 class="module-title">Стеження за ціллю</h1>
-      <div class="module-tags"><span class="gc-tag">Підсумковий проєкт треку 7</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ЗДАНО</span></div>
-      <p class="module-lead">Результат: Companion детектує об&#x27;єкт на відео й веде апарат за ним у SITL/у полі через GUIDED/Offboard</p>
-      <div class="gc-prose module-body">
-        <h2>Що здати</h2>
-        <ul><li>Пайплайн камера → детектор → команда</li><li>Заміри затримки та FPS</li><li>Демонстрація в SITL із симульованою камерою</li><li>Протокол безпеки: геозона, таймаути, пілот</li><li>Інженерна тека проєкту: вимоги з ID, що й як тестувалося, журнал змін (див. модуль «Інженерний метод 101»)</li></ul>
-        <h2>Критерії приймання</h2>
-        <p class="gc-muted">Проєкт здано, коли виконано всі пункти. Позначай у міру готовності:</p>
-        <ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="cap-perception:cap:0"><span>Затримку від кадру до команди виміряно, вона нижча за 150 мс</span></label></li><li><label><input type="checkbox" data-check-id="cap-perception:cap:1"><span>Втрата цілі веде до зависання, а не до блукання</span></label></li><li><label><input type="checkbox" data-check-id="cap-perception:cap:2"><span>Реальний політ лише з геозоною та пілотом</span></label></li><li><label><input type="checkbox" data-check-id="cap-perception:cap:3"><span>Кожна вимога простежується до тесту або вимірювання, результат записано</span></label></li></ul>
-        <h2>Рубрика: як відрізнити зроблене від зданого</h2><p class="gc-muted">Перевір свою роботу за кожним рядком. Якщо вона ближча до лівої колонки — проєкт ще не готовий.</p><div class="widget__table-wrap"><table class="rubric"><thead><tr><th>Критерій</th><th>Погано</th><th>Добре</th></tr></thead><tbody><tr><th scope="row">Детектор</th><td class="rubric__bad">Запущено на ноутбуці</td><td class="rubric__good">Запущено на борту, FPS і точність виміряно, хибні спрацювання проаналізовано</td></tr><tr><th scope="row">Контур</th><td class="rubric__bad">Ціль губиться — дрон летить далі</td><td class="rubric__good">Втрата цілі → зависання; затримку враховано; тест у SITL з логом</td></tr><tr><th scope="row">Межі</th><td class="rubric__bad">Не описано</td><td class="rubric__good">Описано умови відмови: освітлення, текстура, динаміка</td></tr></tbody></table></div>
-        <h2>Програмна альтернатива</h2><p class="gc-muted">Підсумковий проєкт треку можна замінити проєктом з каталогу «ПЗ для БпАК» — з тими самими вимогами до здачі: критерії, автотести, README.</p><ul><li><a href="../projects/proj-detect-follow.html">Проєкт 4: Детектор + трекер + слідування в Gazebo</a></li><li><a href="../projects/proj-precision-landing.html">Проєкт 5: Точна посадка на маркер у симуляції</a></li><li><a href="../projects/proj-photogrammetry.html">Проєкт 7: Фотограмметрія на відкритому наборі</a></li></ul>
-        <h2>Модулі треку</h2>
-        <ol><li><a href="../m/per-camera.html">Камери та відеопотік на companion</a></li><li><a href="../m/per-geometry.html">Геометрія камери: від пікселя до точки на землі</a></li><li><a href="../m/per-cv.html">Комп&#x27;ютерний зір: від OpenCV до нейромереж</a></li><li><a href="../m/per-edge-ml.html">ML на борту: бюджет, квантування, оцінювання, супровід</a></li><li><a href="../m/per-visual-nav.html">Візуальна навігація: оптичний потік, VIO, SLAM оглядово</a></li><li><a href="../m/per-mapping.html">Картографування: зйомка, геоприв&#x27;язка, фотограмметрія</a></li><li><a href="../m/per-landing.html">Точна посадка за маркером: ArUco, LANDING_TARGET, PLND</a></li><li><a href="../m/per-depth-avoid.html">Глибина та обхід перешкод: датчики, OBSTACLE_DISTANCE, алгоритми</a></li><li><a href="../m/per-tracking.html">Стеження та керування за ціллю</a></li></ol>
-        <div class="gc-callout" data-state="caution"><strong>Безпека.</strong> Усе, що можна зробити в SITL або без пропів, робиться там. Реальний політ — тільки після наземних тестів, з перевіреним failsafe.</div>
-      </div>
-      <div class="module-done"><gc-button variant="secondary" data-done-toggle="cap-perception" data-done-label="зданий" data-done-past="Складено">Позначити як зданий</gc-button></div>
-    </article>
-  </main>
-  <footer class="gc-container site-footer gc-muted">
-    <p>Відкритий курс · <a href="https://github.com/irreligious86/UAV-Education">вихідний код на GitHub</a> · <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">план розвитку</a> · <a href="../../curriculum/curriculum.html">для розробника</a> · CC BY-NC-SA 4.0</p>
-  </footer>
-</body>
-</html>
+<html lang="uk"><head><meta charset="utf-8">
+<title>Українська</title>
+<link rel="canonical" href="../../uk/cap/cap-perception.html">
+<meta http-equiv="refresh" content="0; url=../../uk/cap/cap-perception.html">
+<script>location.replace("../../uk/cap/cap-perception.html" + location.search + location.hash)</script>
+</head><body><p><a href="../../uk/cap/cap-perception.html">Українська</a></p></body></html>

@@ -1,7 +1,58 @@
 <!doctype html>
-<html lang="uk"><head><meta charset="utf-8">
-<title>Українська</title>
-<link rel="canonical" href="../../ua/projects/index.html">
-<meta http-equiv="refresh" content="0; url=../../ua/projects/index.html">
-<script>location.replace("../../ua/projects/index.html" + location.search + location.hash)</script>
-</head><body><p><a href="../../ua/projects/index.html">Українська</a></p></body></html>
+<html lang="uk" data-theme="dark" data-lang="uk">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Проєкти — UAV Student</title>
+  <meta name="description" content="Каталог програмних проєктів курсу: веб-GCS, сервіс логів, CI для флоту, компоненти MAVLink, комп&#x27;ютерний зір.">
+  <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
+  <link rel="manifest" href="../../manifest.webmanifest">
+  <meta name="theme-color" content="#0b0f14">
+  <link rel="alternate" hreflang="ru" href="../../projects/index.html">
+  <link rel="alternate" hreflang="uk" href="../../uk/projects/index.html">
+  <link rel="alternate" hreflang="en" href="../../en/projects/index.html">
+  <link rel="alternate" hreflang="uk-galych" href="../../gal/projects/index.html">
+  <script>/* go to the visitor's chosen language before anything paints (assets/i18n.js) */(function(){try{var c=localStorage.getItem('uav-lang'),h=document.documentElement.getAttribute('data-lang');if(!c||c===h||/[?&]lang=keep\b/.test(location.search))return;var l=document.querySelector('link[rel=alternate][hreflang="'+c+'"]');if(l)location.replace(l.href+location.search+location.hash)}catch(e){}})();</script>
+  <link rel="stylesheet" href="../../lib/ground-control-ui/dist/ground-control.css">
+  <link rel="stylesheet" href="../../assets/site.css">
+  <script src="../../lib/ground-control-ui/dist/ground-control.js" defer></script>
+  <script src="../../assets/i18n/uk.js"></script>
+  <script src="../../assets/i18n.js"></script>
+  <script src="../../assets/progress-store.js" defer></script>
+  <script src="../../assets/backend-config.js" defer></script>
+  <script src="../../assets/account.js" defer></script>
+  <script src="../../assets/grading.js" defer></script>
+  <script src="../../assets/app.js" defer></script>
+  <script src="../../assets/uav-quiz.js" defer></script>
+  <script src="../../assets/uav-tasks.js" defer></script>
+  <script src="../../assets/offline.js" defer></script>
+</head>
+<body class="gc-root" data-base="../" data-root="../../">
+  <header class="site-header">
+    <div class="gc-container site-header__inner">
+      <a class="site-brand" href="../index.html"><span class="site-brand__mark" aria-hidden="true">◆</span> UAV Student</a>
+      <nav class="gc-nav" aria-label="Розділи сайту">
+        <a href="../index.html" aria-current="page">Курс</a>
+        <a href="../ref/index.html">Довідник</a>
+        <a href="../pages/glossary.html">Глосарій</a>
+        <a href="../pages/fails.html">Фейли</a>
+        <a href="../pages/search.html">Пошук</a>
+        <a href="../pages/progress.html">Мій прогрес</a>
+      </nav>
+      <nav class="lang-switch" aria-label="Мова"><a class="gc-tag" href="../../projects/index.html" data-lang-to="ru" hreflang="ru" lang="ru" title="Русский">RU</a><a class="gc-tag" href="../../uk/projects/index.html" data-lang-to="uk" hreflang="uk" lang="uk" title="Українська" aria-current="true" data-state="ok">UK</a><a class="gc-tag" href="../../en/projects/index.html" data-lang-to="en" hreflang="en" lang="en" title="English">EN</a><a class="gc-tag" href="../../gal/projects/index.html" data-lang-to="uk-galych" hreflang="uk-galych" lang="uk-galych" title="Галицька (експеримент)">GAL</a></nav>
+    </div>
+  </header>
+  <main class="gc-container site-main">
+    <p class="gc-breadcrumb"><a href="../index.html">Курс</a><span>Проєкти</span></p>
+    <h1 class="gc-display">Проєкти: ПЗ для БпАК</h1>
+    <p class="module-lead">Дванадцять програмних проєктів від веб-GCS до точної посадки за маркером. Кожен — з архітектурною схемою, етапами, критеріями приймання та автотестом; там, де написано стартер, він лежить в <code>examples/</code> репозиторію. Проєкт може замінити підсумковий проєкт свого треку.</p>
+    <div class="gc-prose module-body">
+      <p class="gc-muted">Як працювати: візьми проєкт, пройди модулі з його списку, зроби етапи по порядку, здай за критеріями. Код — у власному репозиторії з README і тестами; «у мене працює» не зараховується.</p>
+    </div>
+    <div class="gc-grid ref-grid"><a class="gc-card capstone-card" href="../projects/proj-web-gcs.html" data-module-id="proj-web-gcs"><p class="gc-label gc-muted">Проєкт 1 · L3 · ~30 год</p><strong>Веб-GCS: телеметрія, карта, режими</strong><div class="gc-muted">Python 3, pymavlink, asyncio · WebSocket (websockets) · JS, Leaflet, без фреймворка</div><div class="gc-card__meta"><span class="gc-tag" data-state="ok">є стартер</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ЗДАНО</span></div></a><a class="gc-card capstone-card" href="../projects/proj-fleet-telemetry.html" data-module-id="proj-fleet-telemetry"><p class="gc-label gc-muted">Проєкт 2 · L3 · ~35 год</p><strong>Телеметрія флоту в хмару + дашборд</strong><div class="gc-muted">MQTT (Mosquitto) · Python-ingest · InfluxDB или TimescaleDB</div><div class="gc-card__meta"><span class="gc-tag" data-state="ok">є стартер</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ЗДАНО</span></div></a><a class="gc-card capstone-card" href="../projects/proj-log-service.html" data-module-id="proj-log-service"><p class="gc-label gc-muted">Проєкт 3 · L3 · ~25 год</p><strong>Сервіс аналізу логів</strong><div class="gc-muted">Python, pymavlink · blackbox_decode (Betaflight) · matplotlib → встроенные SVG/PNG</div><div class="gc-card__meta"><span class="gc-tag" data-state="ok">є стартер</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ЗДАНО</span></div></a><a class="gc-card capstone-card" href="../projects/proj-detect-follow.html" data-module-id="proj-detect-follow"><p class="gc-label gc-muted">Проєкт 4 · L4 · ~45 год</p><strong>Детектор + трекер + слідування в Gazebo</strong><div class="gc-muted">ROS 2 Humble · Gazebo + PX4 или ArduPilot SITL · OpenCV, ONNX Runtime</div><div class="gc-card__meta"><span class="gc-tag" data-state="ok">є стартер</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ЗДАНО</span></div></a><a class="gc-card capstone-card" href="../projects/proj-precision-landing.html" data-module-id="proj-precision-landing"><p class="gc-label gc-muted">Проєкт 5 · L4 · ~35 год</p><strong>Точна посадка на маркер у симуляції</strong><div class="gc-muted">OpenCV ArUco · MAVLink LANDING_TARGET или ROS 2 · ArduPilot PLND / PX4 precision land</div><div class="gc-card__meta"><span class="gc-tag" data-state="ok">є стартер</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ЗДАНО</span></div></a><a class="gc-card capstone-card" href="../projects/proj-inspection.html" data-module-id="proj-inspection"><p class="gc-label gc-muted">Проєкт 6 · L3 · ~30 год</p><strong>Інспекція маршруту з геоприв&#x27;язкою знахідок</strong><div class="gc-muted">ArduPilot миссии, CAM1_TRIGG_DIST / DO_SET_CAM_TRIGG_DIST · EXIF/XMP геотеги · Python, Leaflet-отчёт</div><div class="gc-card__meta"><span class="gc-tag" data-state="ok">є стартер</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ЗДАНО</span></div></a><a class="gc-card capstone-card" href="../projects/proj-photogrammetry.html" data-module-id="proj-photogrammetry"><p class="gc-label gc-muted">Проєкт 7 · L3 · ~20 год</p><strong>Фотограмметрія на відкритому наборі</strong><div class="gc-muted">OpenDroneMap (Docker) · QGIS · Python для метрик</div><div class="gc-card__meta"><span class="gc-tag" data-state="ok">є стартер</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ЗДАНО</span></div></a><a class="gc-card capstone-card" href="../projects/proj-esp32-component.html" data-module-id="proj-esp32-component"><p class="gc-label gc-muted">Проєкт 8 · L3 · ~30 год</p><strong>MAVLink-компонент на ESP32 + SITL-двійник</strong><div class="gc-muted">ESP-IDF или PlatformIO, C · c_library_v2 · Python-двойник (examples/mavlink)</div><div class="gc-card__meta"><span class="gc-tag" data-state="ok">є стартер</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ЗДАНО</span></div></a><a class="gc-card capstone-card" href="../projects/proj-cell-bridge.html" data-module-id="proj-cell-bridge"><p class="gc-label gc-muted">Проєкт 9 · L3 · ~25 год</p><strong>Міст 4G/Wi-Fi з перепідключенням і шифруванням</strong><div class="gc-muted">WireGuard · mavlink-router · Python или Go</div><div class="gc-card__meta"><span class="gc-tag" data-state="ok">є стартер</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ЗДАНО</span></div></a><a class="gc-card capstone-card" href="../projects/proj-fleet-ci.html" data-module-id="proj-fleet-ci"><p class="gc-label gc-muted">Проєкт 10 · L3 · ~20 год</p><strong>CI/CD для флоту</strong><div class="gc-muted">GitHub Actions · ArduPilot SITL · pymavlink</div><div class="gc-card__meta"><span class="gc-tag" data-state="ok">є стартер</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ЗДАНО</span></div></a><a class="gc-card capstone-card" href="../projects/proj-lua-protection.html" data-module-id="proj-lua-protection"><p class="gc-label gc-muted">Проєкт 11 · L3 · ~20 год</p><strong>Пакет захистів на Lua з тестами</strong><div class="gc-muted">ArduPilot Lua scripting · SITL · pymavlink-тесты</div><div class="gc-card__meta"><span class="gc-tag" data-state="ok">є стартер</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ЗДАНО</span></div></a><a class="gc-card capstone-card" href="../projects/proj-tx16s-companion.html" data-module-id="proj-tx16s-companion"><p class="gc-label gc-muted">Проєкт 12 · L3 · ~30 год</p><strong>Компаньйон для пульта TX16S</strong><div class="gc-muted">ESP32, ESP-IDF/PlatformIO · CRSF · EdgeTX Lua + симулятор EdgeTX</div><div class="gc-card__meta"><span class="gc-tag" data-state="ok">є стартер</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ЗДАНО</span></div></a></div>
+  </main>
+  <footer class="gc-container site-footer gc-muted">
+    <p>Відкритий курс · <a href="https://github.com/irreligious86/UAV-Education">вихідний код на GitHub</a> · <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">план розвитку</a> · <a href="../../curriculum/curriculum.html">для розробника</a> · CC BY-NC-SA 4.0</p>
+  </footer>
+</body>
+</html>

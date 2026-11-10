@@ -1,7 +1,79 @@
 <!doctype html>
-<html lang="uk"><head><meta charset="utf-8">
-<title>Українська</title>
-<link rel="canonical" href="../../ua/projects/proj-esp32-component.html">
-<meta http-equiv="refresh" content="0; url=../../ua/projects/proj-esp32-component.html">
-<script>location.replace("../../ua/projects/proj-esp32-component.html" + location.search + location.hash)</script>
-</head><body><p><a href="../../ua/projects/proj-esp32-component.html">Українська</a></p></body></html>
+<html lang="uk" data-theme="dark" data-lang="uk">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MAVLink-компонент на ESP32 + SITL-двійник — UAV Student</title>
+  <meta name="description" content="ESP32 як повноцінний MAVLink-компонент: свій heartbeat і compid, датчик (далекомір або струм) у DISTANCE_SENSOR/BATTERY_STATUS, приймання команд. Python-двійник того самого компонента проходить ті сам">
+  <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
+  <link rel="manifest" href="../../manifest.webmanifest">
+  <meta name="theme-color" content="#0b0f14">
+  <link rel="alternate" hreflang="ru" href="../../projects/proj-esp32-component.html">
+  <link rel="alternate" hreflang="uk" href="../../uk/projects/proj-esp32-component.html">
+  <link rel="alternate" hreflang="en" href="../../en/projects/proj-esp32-component.html">
+  <link rel="alternate" hreflang="uk-galych" href="../../gal/projects/proj-esp32-component.html">
+  <script>/* go to the visitor's chosen language before anything paints (assets/i18n.js) */(function(){try{var c=localStorage.getItem('uav-lang'),h=document.documentElement.getAttribute('data-lang');if(!c||c===h||/[?&]lang=keep\b/.test(location.search))return;var l=document.querySelector('link[rel=alternate][hreflang="'+c+'"]');if(l)location.replace(l.href+location.search+location.hash)}catch(e){}})();</script>
+  <link rel="stylesheet" href="../../lib/ground-control-ui/dist/ground-control.css">
+  <link rel="stylesheet" href="../../assets/site.css">
+  <script src="../../lib/ground-control-ui/dist/ground-control.js" defer></script>
+  <script src="../../assets/i18n/uk.js"></script>
+  <script src="../../assets/i18n.js"></script>
+  <script src="../../assets/progress-store.js" defer></script>
+  <script src="../../assets/backend-config.js" defer></script>
+  <script src="../../assets/account.js" defer></script>
+  <script src="../../assets/grading.js" defer></script>
+  <script src="../../assets/app.js" defer></script>
+  <script src="../../assets/uav-quiz.js" defer></script>
+  <script src="../../assets/uav-tasks.js" defer></script>
+  <script src="../../assets/offline.js" defer></script>
+</head>
+<body class="gc-root" data-base="../" data-root="../../">
+  <header class="site-header">
+    <div class="gc-container site-header__inner">
+      <a class="site-brand" href="../index.html"><span class="site-brand__mark" aria-hidden="true">◆</span> UAV Student</a>
+      <nav class="gc-nav" aria-label="Розділи сайту">
+        <a href="../index.html" aria-current="page">Курс</a>
+        <a href="../ref/index.html">Довідник</a>
+        <a href="../pages/glossary.html">Глосарій</a>
+        <a href="../pages/fails.html">Фейли</a>
+        <a href="../pages/search.html">Пошук</a>
+        <a href="../pages/progress.html">Мій прогрес</a>
+      </nav>
+      <nav class="lang-switch" aria-label="Мова"><a class="gc-tag" href="../../projects/proj-esp32-component.html" data-lang-to="ru" hreflang="ru" lang="ru" title="Русский">RU</a><a class="gc-tag" href="../../uk/projects/proj-esp32-component.html" data-lang-to="uk" hreflang="uk" lang="uk" title="Українська" aria-current="true" data-state="ok">UK</a><a class="gc-tag" href="../../en/projects/proj-esp32-component.html" data-lang-to="en" hreflang="en" lang="en" title="English">EN</a><a class="gc-tag" href="../../gal/projects/proj-esp32-component.html" data-lang-to="uk-galych" hreflang="uk-galych" lang="uk-galych" title="Галицька (експеримент)">GAL</a></nav>
+    </div>
+  </header>
+  <main class="gc-container site-main">
+    <article class="module" data-module-page="proj-esp32-component">
+      <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="index.html">Проєкти</a><span>Проєкт 8</span></p>
+      <h1 class="module-title">MAVLink-компонент на ESP32 + SITL-двійник</h1>
+      <div class="module-tags"><span class="gc-tag">Проєкт 8</span><span class="gc-tag">L3</span><span class="gc-tag">~30 год</span><span class="gc-tag" data-state="ok">є стартер</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ЗДАНО</span></div>
+      <p class="module-lead">ESP32 як повноцінний MAVLink-компонент: свій heartbeat і compid, датчик (далекомір або струм) у DISTANCE_SENSOR/BATTERY_STATUS, приймання команд. Python-двійник того самого компонента проходить ті самі тести проти SITL і фейкового апарата.</p>
+      <div class="gc-prose module-body">
+        <figure class="diagram" data-diagram="proj-esp32-component"><div class="diagram__svg"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 200" width="100%" role="img" aria-labelledby="t" style="max-width:720px;display:block;margin:0 auto"><title id="t">MAVLink-компонент на ESP32: архітектура</title><style>text{font-family: var(--gc-font-mono, ui-monospace, Menlo, monospace); font-size: 12px;fill:currentColor} .m{fill:var(--gc-ink-muted, #8a93a3)} .a{fill:var(--gc-accent-hud, #5ef1d2)} .w{fill:var(--gc-signal-amber, #f0b24c)} .d{fill:var(--gc-signal-red, #e8636b)} .box{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:currentColor;stroke-width:1.2} .boxa{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6} .ln{stroke:currentColor;stroke-width:1.2;fill:none} .lna{stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6;fill:none} .lnm{stroke:var(--gc-ink-muted, #8a93a3);stroke-width:1;fill:none;stroke-dasharray:4 3} .t{font-size:11px} .b{font-weight:600}</style><defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker><marker id="ara" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--gc-accent-hud, #5ef1d2)"/></marker></defs><rect class="box" x="10.0" y="30" width="142.0" height="48" rx="6"/><text x="81.0" y="51.0" text-anchor="middle">Датчик</text><text x="81.0" y="65.0" text-anchor="middle">далекомір / струм</text><rect class="boxa" x="196.0" y="30" width="142.0" height="48" rx="6"/><text x="267.0" y="51.0" text-anchor="middle" class="b">ESP32</text><text x="267.0" y="65.0" text-anchor="middle" class="b">heartbeat, compid</text><rect class="box" x="382.0" y="30" width="142.0" height="48" rx="6"/><text x="453.0" y="51.0" text-anchor="middle">Автопілот</text><text x="453.0" y="65.0" text-anchor="middle">RNGFND1_TYPE=10</text><rect class="box" x="568.0" y="30" width="142.0" height="48" rx="6"/><text x="639.0" y="51.0" text-anchor="middle">Лог</text><text x="639.0" y="65.0" text-anchor="middle">RFND</text><rect class="box" x="10.0" y="130" width="142.0" height="48" rx="6"/><text x="81.0" y="151.0" text-anchor="middle">pytest: фейк</text><text x="81.0" y="165.0" text-anchor="middle">+ SITL</text><rect class="boxa" x="196.0" y="130" width="142.0" height="48" rx="6"/><text x="267.0" y="151.0" text-anchor="middle" class="b">Python-двійник</text><text x="267.0" y="165.0" text-anchor="middle" class="b">той самий протокол</text><path class="ln" d="M152.0 54.0 L196.0 54.0" marker-end="url(#ar)"/><path class="lna" d="M338.0 54.0 L382.0 54.0" marker-end="url(#ara)"/><path class="ln" d="M524.0 54.0 L568.0 54.0" marker-end="url(#ar)"/><path class="ln" d="M152.0 154.0 L196.0 154.0" marker-end="url(#ar)"/><path class="ln" d="M267.0 130 L267.0 78" marker-end="url(#ar)"/><text x="273.0" y="100.0" text-anchor="middle" class="m t" style="font-size:10px">ті самі тести</text></svg></div><figcaption class="gc-muted">Архітектура проєкту 8.</figcaption><div class="diagram__hint">Схему можно прокрутить по горизонтали</div></figure>
+        <h2>Стек</h2>
+        <ul><li>ESP-IDF или PlatformIO, C</li><li>c_library_v2</li><li>Python-двойник (examples/mavlink)</li><li>ArduPilot SITL</li></ul>
+        <p>Стартер: <a href="https://github.com/irreligious86/UAV-Education/tree/main/examples/mavlink" target="_blank" rel="noopener noreferrer"><code>examples/mavlink</code></a> — клонуй і починай з його README.</p>
+        <p>Може замінити підсумковий проєкт треку «<a href="../cap/cap-own-logic.html">Інженер: код на борту</a>».</p>
+        <h2>Етапи</h2>
+        <ol><li>Python-двійник проходить тести (стартер: virtual_rangefinder.py)<br><span class="gc-muted">Перевірка:</span> <code>pytest examples/mavlink/tests -k rangefinder</code></li><li>Прошивка ESP32: UART MAVLink, heartbeat, DISTANCE_SENSOR<br><span class="gc-muted">Перевірка: демонстрація у звіті</span></li><li>Приймання COMMAND_LONG з ACK<br><span class="gc-muted">Перевірка:</span> <code>pytest examples/mavlink/tests -k &quot;arm_command or rejected&quot;</code></li><li>Автопілот використовує компонент (RNGFND1_TYPE=10) — перевірено в логу<br><span class="gc-muted">Перевірка: демонстрація у звіті</span></li><li>Стенд: ESP32 ↔ USB-UART ↔ SITL на ПК<br><span class="gc-muted">Перевірка: демонстрація у звіті</span></li></ol>
+        <h2>Критерії приймання</h2>
+        <p class="gc-muted">Проєкт здано, коли виконано всі пункти. Позначай у міру готовності:</p>
+        <ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="proj-esp32-component:cap:0"><span>Двійник і прошивка поводяться однаково на одному наборі тестів</span></label></li><li><label><input type="checkbox" data-check-id="proj-esp32-component:cap:1"><span>Компонент не заважає іншим: правильні sysid/compid, частота ≤ заявленої</span></label></li><li><label><input type="checkbox" data-check-id="proj-esp32-component:cap:2"><span>Автопілот бачить датчик, у логу RFND правдоподібні значення</span></label></li><li><label><input type="checkbox" data-check-id="proj-esp32-component:cap:3"><span>Втрата UART не вішає прошивку (watchdog)</span></label></li><li><label><input type="checkbox" data-check-id="proj-esp32-component:cap:4"><span>README, схема підключення</span></label></li></ul>
+        <h2>Автоперевірка</h2>
+        <p>pytest examples/mavlink/tests як основа; додати тести свого компонента</p>
+        <h2>Оцінка</h2><p class="gc-muted">Здано — коли виконано всі критерії приймання. Рівень роботи — за критеріями нижче; кожен рівень включає попередній.</p><ul><li><strong>Функціональність</strong><ul><li><em>Зараховано:</em> Усі етапи працюють у сценарії з README</li><li><em>Добре:</em> Плюс сценарії відмов: втрата зв&#x27;язку, пропуск даних, хибне введення</li><li><em>Відмінно:</em> Плюс хоча б одне завдання «на відмінно» зі списку проєкту</li></ul></li><li><strong>Перевірюваність</strong><ul><li><em>Зараховано:</em> Тести стартера проходять, власні функції покрито хоча б одним тестом</li><li><em>Добре:</em> Тест на кожен етап; тести запускаються в CI</li><li><em>Відмінно:</em> Тести на відмови й регресію на власних даних; покриття ключової логіки видно у звіті</li></ul></li><li><strong>Інженерний звіт</strong><ul><li><em>Зараховано:</em> Є заміри, яких вимагають критерії приймання</li><li><em>Добре:</em> Заміри з методикою та повторюваністю (кілька прогонів, розкид)</li><li><em>Відмінно:</em> Порівняння варіантів рішення з висновком, обмеження та що робити далі</li></ul></li><li><strong>Код і документація</strong><ul><li><em>Зараховано:</em> README: запуск однією командою, архітектура</li><li><em>Добре:</em> Модулі розділено, інтерфейси описано, немає «магічних чисел» без пояснення</li><li><em>Відмінно:</em> Код читається без автора: docs/, приклади, історія комітів за етапами</li></ul></li></ul>
+        <h2>Завдання «на відмінно»</h2><ul><li>Параметри компонента через PARAM_* (свій компонент у списку параметрів GCS)</li><li>Підпис MAVLink 2 між ESP32 і автопілотом</li></ul>
+        <h2>Що здати</h2>
+        <ul><li>Прошивка, двійник, тести, лог SITL з датчиком</li></ul>
+        <h2>Потрібні модулі</h2>
+        <ol><li><a href="../m/mav-component.html">Власний компонент MAVLink: датчик, параметри, повідомлення</a></li><li><a href="../m/mav-protocol.html">MAVLink зсередини: кадр, CRC, діалекти, підпис</a></li><li><a href="../m/comp-esp32.html">ESP32 і периферія</a></li><li><a href="../m/emb-protocols.html">UART, I2C, SPI, CAN на рівні сигналів і драйверів</a></li><li><a href="../m/ap-sitl.html">SITL: дрон без дрона</a></li></ol>
+        <div class="gc-callout" data-state="caution"><strong>Безпека.</strong> Усе, що керує апаратом, спершу проходить тести і SITL. Реальний політ — тільки з перевіреним failsafe і пілотом, готовим перебрати керування.</div>
+      </div>
+      <div class="module-done"><gc-button variant="secondary" data-done-toggle="proj-esp32-component" data-done-label="зданий" data-done-past="Складено">Позначити як зданий</gc-button></div>
+    </article>
+  </main>
+  <footer class="gc-container site-footer gc-muted">
+    <p>Відкритий курс · <a href="https://github.com/irreligious86/UAV-Education">вихідний код на GitHub</a> · <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">план розвитку</a> · <a href="../../curriculum/curriculum.html">для розробника</a> · CC BY-NC-SA 4.0</p>
+  </footer>
+</body>
+</html>

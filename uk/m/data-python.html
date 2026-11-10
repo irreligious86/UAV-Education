@@ -1,7 +1,170 @@
 <!doctype html>
-<html lang="uk"><head><meta charset="utf-8">
-<title>Українська</title>
-<link rel="canonical" href="../../ua/m/data-python.html">
-<meta http-equiv="refresh" content="0; url=../../ua/m/data-python.html">
-<script>location.replace("../../ua/m/data-python.html" + location.search + location.hash)</script>
-</head><body><p><a href="../../ua/m/data-python.html">Українська</a></p></body></html>
+<html lang="uk" data-theme="dark" data-lang="uk">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Python для аналізу польотних даних — UAV Student</title>
+  <meta name="description" content="читати логи Betaflight/ArduPilot у pandas будувати графіки й спектри (FFT/Welch) зі scipy писати функції метрик для повторного використання">
+  <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
+  <link rel="manifest" href="../../manifest.webmanifest">
+  <meta name="theme-color" content="#0b0f14">
+  <link rel="alternate" hreflang="ru" href="../../m/data-python.html">
+  <link rel="alternate" hreflang="uk" href="../../uk/m/data-python.html">
+  <link rel="alternate" hreflang="en" href="../../en/m/data-python.html">
+  <link rel="alternate" hreflang="uk-galych" href="../../gal/m/data-python.html">
+  <script>/* go to the visitor's chosen language before anything paints (assets/i18n.js) */(function(){try{var c=localStorage.getItem('uav-lang'),h=document.documentElement.getAttribute('data-lang');if(!c||c===h||/[?&]lang=keep\b/.test(location.search))return;var l=document.querySelector('link[rel=alternate][hreflang="'+c+'"]');if(l)location.replace(l.href+location.search+location.hash)}catch(e){}})();</script>
+  <link rel="stylesheet" href="../../lib/ground-control-ui/dist/ground-control.css">
+  <link rel="stylesheet" href="../../assets/site.css">
+  <script src="../../lib/ground-control-ui/dist/ground-control.js" defer></script>
+  <script src="../../assets/i18n/uk.js"></script>
+  <script src="../../assets/i18n.js"></script>
+  <script src="../../assets/progress-store.js" defer></script>
+  <script src="../../assets/backend-config.js" defer></script>
+  <script src="../../assets/account.js" defer></script>
+  <script src="../../assets/grading.js" defer></script>
+  <script src="../../assets/app.js" defer></script>
+  <script src="../../assets/uav-quiz.js" defer></script>
+  <script src="../../assets/uav-tasks.js" defer></script>
+  <script src="../../assets/offline.js" defer></script>
+</head>
+<body class="gc-root" data-base="../" data-root="../../">
+  <header class="site-header">
+    <div class="gc-container site-header__inner">
+      <a class="site-brand" href="../index.html"><span class="site-brand__mark" aria-hidden="true">◆</span> UAV Student</a>
+      <nav class="gc-nav" aria-label="Розділи сайту">
+        <a href="../index.html" aria-current="page">Курс</a>
+        <a href="../ref/index.html">Довідник</a>
+        <a href="../pages/glossary.html">Глосарій</a>
+        <a href="../pages/fails.html">Фейли</a>
+        <a href="../pages/search.html">Пошук</a>
+        <a href="../pages/progress.html">Мій прогрес</a>
+      </nav>
+      <nav class="lang-switch" aria-label="Мова"><a class="gc-tag" href="../../m/data-python.html" data-lang-to="ru" hreflang="ru" lang="ru" title="Русский">RU</a><a class="gc-tag" href="../../uk/m/data-python.html" data-lang-to="uk" hreflang="uk" lang="uk" title="Українська" aria-current="true" data-state="ok">UK</a><a class="gc-tag" href="../../en/m/data-python.html" data-lang-to="en" hreflang="en" lang="en" title="English">EN</a><a class="gc-tag" href="../../gal/m/data-python.html" data-lang-to="uk-galych" hreflang="uk-galych" lang="uk-galych" title="Галицька (експеримент)">GAL</a></nav>
+    </div>
+  </header>
+  <main class="gc-container site-main">
+    <article class="module" data-module-page="data-python">
+      <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-integrator">Інтегратор</a><span>Python для аналізу польотних даних</span></p>
+      <h1 class="module-title">Python для аналізу польотних даних</h1>
+      <div class="module-tags"><span class="gc-tag" title="Рівень">L2 — Інтегратор</span><span class="gc-tag">читання 40 хв</span><span class="gc-tag">навчання ~4 год</span><span class="gc-tag">Betaflight · ArduPilot · INAV</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ОПАНОВАНО</span></div>
+      <p class="gc-muted module-score" data-module-score></p>
+      <p class="module-lead">Blackbox Explorer і MAVExplorer показують графіки; інженерові потрібні числа, які можна порівняти до/після і покласти у звіт. Модуль — мінімальний стек: Python + pandas + numpy + scipy + matplotlib; як прочитати лог Betaflight (через <code>blackbox_decode</code> у CSV) і ArduPilot (<code>.bin</code> через pymavlink), як побудувати спектр гіроскопа методом Велча і як написати функції метрик для повторного використання: overshoot, час встановлення, bounce-back, джитер петлі. Увесь код — робочий, з очікуваними числами.</p>
+      <div class="gc-callout" data-state="ok"><strong>Після модуля ти вмієш</strong><ul><li>читати логи Betaflight/ArduPilot у pandas</li><li>будувати графіки й спектри (FFT/Welch) зі scipy</li><li>писати функції метрик для повторного використання</li></ul></div><p class="gc-muted">Перед цим модулем: <a href="tools-overview.html">Інструменти: Configurator, GCS, git</a></p><div class="gc-callout lab"><p class="gc-label gc-muted">Лабораторна</p><strong>Власний аналізатор логів</strong><p class="gc-muted lab__hint">Здано, коли позначено всі пункти:</p><ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="data-python:lab:0"><span>Лог прочитано в DataFrame</span></label></li><li><label><input type="checkbox" data-check-id="data-python:lab:1"><span>Спектр гіроскопа побудовано методом Welch</span></label></li><li><label><input type="checkbox" data-check-id="data-python:lab:2"><span>Функцію метрики (bounce-back) написано й перевірено</span></label></li></ul></div><div class="path-pos gc-muted"><span class="gc-label">На шляху</span><ul><li data-path-pos="betaflight"><a href="../path/betaflight.html">Betaflight</a>: крок 33 з 44 → <a href="ctl-signals.html?path=betaflight">Сигнали та спектри: що бачить гіроскоп</a></li><li data-path-pos="ardupilot"><a href="../path/ardupilot.html">ArduPilot</a>: крок 30 з 69 → <a href="ctl-signals.html?path=ardupilot">Сигнали та спектри: що бачить гіроскоп</a></li></ul></div>
+      <div class="gc-prose module-body">
+<h2>Теорія</h2>
+<h4 class="md-subheading">Стек і встановлення</h4>
+<pre class="cli-block"><code>python3 -m venv ~/uav-venv &amp;&amp; source ~/uav-venv/bin/activate
+pip install pandas numpy scipy matplotlib pymavlink</code></pre>
+<p><code>blackbox_decode</code> — з репозиторію betaflight/blackbox-tools (збирається <code>make</code>), перетворює <code>.BFL</code> на CSV з одним рядком на цикл PID.</p>
+<h4 class="md-subheading">Читання логів</h4>
+<p><strong>Betaflight CSV</strong>: колонки <code>time (us)</code>, <code>gyroADC[0..2]</code> (град/с, після фільтрів — <code>gyroADC</code>, до — <code>gyroUnfilt</code> (окреме поле blackbox у 4.5, вмикається вибором полів; <code>debug_mode = GYRO_SCALED</code> пише нефільтрований гіроскоп у <code>debug[]</code>)), <code>setpoint[0..3]</code>, <code>motor[0..3]</code>, <code>rcCommand[0..3]</code>, <code>axisP/I/D/F[...]</code>, <code>eRPM[...]</code> за наявності ESC-телеметрії.</p>
+<pre class="cli-block"><code>import pandas as pd, numpy as np
+df = pd.read_csv(&quot;log.01.csv&quot;, skipinitialspace=True)
+df.columns = [c.strip() for c in df.columns]
+t = df[&quot;time (us)&quot;].to_numpy() / 1e6
+fs = 1 / np.median(np.diff(t))          # частота логування, Гц (8000/4000/2000)
+gyro_roll = df[&quot;gyroADC[0]&quot;].to_numpy()</code></pre>
+<p><strong>ArduPilot .bin</strong>:</p>
+<pre class="cli-block"><code>from pymavlink import mavutil
+m = mavutil.mavlink_connection(&quot;flight.bin&quot;)
+rows = []
+while (msg := m.recv_match(type=&quot;ATT&quot;)) is not None:
+    rows.append(msg.to_dict())
+att = pd.DataFrame(rows); att[&quot;t&quot;] = att[&quot;TimeUS&quot;] / 1e6</code></pre>
+<p>Для гіроскопа на високій частоті — <code>IMU</code> (зазвичай 1 кГц при <code>LOG_BITMASK</code> з RAW IMU) або batch-семпли <code>ISBH/ISBD</code> (до кількох кГц для спектрів; <code>INS_LOG_BAT_MASK</code>).</p>
+<h4 class="md-subheading">Спектр: чому Велч, а не один FFT</h4>
+<p>FFT усього логу — шумний і залежить від довжини. Метод Велча ріже сигнал на вікна, що перекриваються, бере FFT кожного й усереднює: оцінка спектральної густини з контрольованою роздільною здатністю (Δf = fs / nperseg).</p>
+<pre class="cli-block"><code>from scipy.signal import welch
+f, pxx = welch(gyro_roll, fs=fs, nperseg=1024, noverlap=512, window=&quot;hann&quot;)
+pxx_db = 10 * np.log10(pxx + 1e-12)</code></pre>
+<p>При fs = 8000 і nperseg = 1024 роздільна здатність 7.8 Гц; пік мотора на 250 Гц видно як горб завширшки 2–3 біни. Порівнювати логи — лише за однакових fs і nperseg. Сегмент для спектра — зависання або рівний політ 10–20 с, без газу в підлогу (інакше піки розмазуються по частотах).</p>
+<h4 class="md-subheading">Спектрограма</h4>
+<pre class="cli-block"><code>from scipy.signal import spectrogram
+f, tt, S = spectrogram(gyro_roll, fs=fs, nperseg=512, noverlap=256)
+# imshow(10*log10(S), aspect=&quot;auto&quot;, origin=&quot;lower&quot;, extent=[tt[0], tt[-1], f[0], f[-1]])</code></pre>
+<p>Показує, як піки їдуть з обертами (мотори) або стоять на місці (резонанс) — модуль «Сигнали та спектри».</p>
+<h4 class="md-subheading">Метрики перехідного процесу</h4>
+<p>За парою setpoint → gyro на одній осі:</p>
+<ul><li><strong>Похибка</strong> e(t) = setpoint − gyro.</li><li><strong>Overshoot</strong> — наскільки gyro перелітає setpoint після сходинки, у % від величини сходинки.</li><li><strong>Час встановлення</strong> — через скільки мс gyro залишається в межах ±5% (або ±2%) від setpoint.</li><li><strong>Bounce-back</strong> — після різкої зупинки стіка (setpoint → 0) gyro йде в протилежний бік: амплітуда відскоку в % від пікового значення перед зупинкою.</li><li><strong>Затримка</strong> — лаг між setpoint і gyro за максимумом крос-кореляції.</li></ul>
+<p>Зручна реалізація — не шукати сходинки вручну, а будувати <strong>step response</strong> деконволюцією (як PID Toolbox): рахувати імпульсну характеристику системи setpoint→gyro за вікнами й інтегрувати. Простіше для початку — відібрати ділянки, де |d setpoint/dt| великий, і міряти на них.</p>
+<pre class="cli-block"><code>def step_metrics(sp, gy, fs, thr=200.0):
+    &quot;&quot;&quot;Find fast setpoint steps (deg/s per sample threshold) and measure response.&quot;&quot;&quot;
+    d = np.diff(sp)
+    idx = np.where(np.abs(d) &gt; thr / fs * 1000)[0]
+    res = []
+    for i in idx:
+        seg_sp, seg_gy = sp[i:i + int(0.25 * fs)], gy[i:i + int(0.25 * fs)]
+        if len(seg_gy) &lt; 10: continue
+        target = seg_sp[-1]; base = sp[i]
+        step = target - base
+        if abs(step) &lt; 50: continue
+        resp = (seg_gy - base) / step            # normalised 0→1
+        overshoot = max(0.0, resp.max() - 1.0) * 100
+        inside = np.abs(resp - 1.0) &lt; 0.05
+        settle = next((k for k in range(len(inside)) if inside[k:].all()), None)
+        res.append({&quot;t&quot;: i / fs, &quot;step&quot;: step, &quot;overshoot_pct&quot;: overshoot,
+                    &quot;settle_ms&quot;: None if settle is None else 1000 * settle / fs})
+    return pd.DataFrame(res)</code></pre>
+<p><strong>Bounce-back</strong>:</p>
+<pre class="cli-block"><code>def bounce_back(sp, gy, fs, big=200.0):
+    &quot;&quot;&quot;After setpoint returns to ~0 from a large value (&gt; big deg/s), measure gyro reversal (% of peak).&quot;&quot;&quot;
+    out = []
+    hi = np.abs(sp) &gt; big
+    for i in range(1, len(sp)):
+        if hi[i - 1] and not hi[i]:
+            peak = sp[i - 1]
+            win = gy[i:i + int(0.2 * fs)]
+            rev = -np.sign(peak) * win
+            out.append(100 * max(0.0, rev.max()) / abs(peak))
+    return np.array(out)</code></pre>
+<p>Орієнтири для 5&quot; (Betaflight): overshoot 5–15% — добре; bounce-back &lt; 10% — добре, &gt; 25% — забагато D або погана механіка.</p>
+<h4 class="md-subheading">Джитер петлі</h4>
+<pre class="cli-block"><code>dt = np.diff(t) * 1e6   # мкс
+print(dt.mean(), dt.std(), np.percentile(dt, 99.9))</code></pre>
+<p>Для 8 кГц середнє 125 мкс, std — одиниці мкс; std &gt; 10 — перевантажений процесор, пропуски — обрив запису.</p>
+<figure class="diagram" data-diagram="log-analysis-pipeline"><div class="diagram__svg"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 200" width="100%" role="img" aria-labelledby="t" style="max-width:720px;display:block;margin:0 auto"><title id="t">Аналіз логу на Python</title><style>text{font-family: var(--gc-font-mono, ui-monospace, Menlo, monospace); font-size: 12px;fill:currentColor} .m{fill:var(--gc-ink-muted, #8a93a3)} .a{fill:var(--gc-accent-hud, #5ef1d2)} .w{fill:var(--gc-signal-amber, #f0b24c)} .d{fill:var(--gc-signal-red, #e8636b)} .box{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:currentColor;stroke-width:1.2} .boxa{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6} .ln{stroke:currentColor;stroke-width:1.2;fill:none} .lna{stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6;fill:none} .lnm{stroke:var(--gc-ink-muted, #8a93a3);stroke-width:1;fill:none;stroke-dasharray:4 3} .t{font-size:11px} .b{font-weight:600}</style><defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker><marker id="ara" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--gc-accent-hud, #5ef1d2)"/></marker></defs><rect class="box" x="10.0" y="30" width="111.2" height="48" rx="6"/><text x="65.6" y="51.0" text-anchor="middle" style="font-size:10.5px">Лог → CSV</text><text x="65.6" y="65.0" text-anchor="middle" style="font-size:10.5px">.bin / .bbl</text><rect class="box" x="157.2" y="30" width="111.2" height="48" rx="6"/><text x="212.79999999999998" y="51.0" text-anchor="middle" style="font-size:10.5px">DataFrame</text><text x="212.79999999999998" y="65.0" text-anchor="middle" style="font-size:10.5px">pandas</text><rect class="box" x="304.4" y="30" width="111.2" height="48" rx="6"/><text x="360.0" y="51.0" text-anchor="middle" style="font-size:10.5px">Ресемплінг</text><text x="360.0" y="65.0" text-anchor="middle" style="font-size:10.5px">спільна вісь t</text><rect class="boxa" x="451.59999999999997" y="30" width="111.2" height="48" rx="6"/><text x="507.2" y="51.0" text-anchor="middle" class="b" style="font-size:10.5px">Welch, спектр,</text><text x="507.2" y="65.0" text-anchor="middle" class="b" style="font-size:10.5px">step-метрики</text><rect class="box" x="598.8" y="30" width="111.2" height="48" rx="6"/><text x="654.4" y="51.0" text-anchor="middle" style="font-size:10.5px">Звіт</text><text x="654.4" y="65.0" text-anchor="middle" style="font-size:10.5px">графіки + числа</text><rect class="box" x="304.4" y="130" width="111.2" height="48" rx="6"/><text x="360.0" y="151.0" text-anchor="middle" style="font-size:10.5px">Джитер петлі</text><text x="360.0" y="165.0" text-anchor="middle" style="font-size:10.5px">за мітками t</text><path class="ln" d="M121.2 54.0 L157.2 54.0" marker-end="url(#ar)"/><path class="ln" d="M268.4 54.0 L304.4 54.0" marker-end="url(#ar)"/><path class="ln" d="M415.59999999999997 54.0 L451.59999999999997 54.0" marker-end="url(#ar)"/><path class="ln" d="M562.8 54.0 L598.8 54.0" marker-end="url(#ar)"/><path class="ln" d="M360.0 78 L360.0 130" marker-end="url(#ar)"/></svg></div><figcaption class="gc-muted">Конвеєр аналізу логу на Python: CSV → DataFrame → спільна вісь часу → спектри й метрики → звіт.</figcaption><div class="diagram__hint">Схему можно прокрутить по горизонтали</div></figure>
+
+<h2>Практика</h2>
+<h4 class="md-subheading">Крок 1. Прочитати</h4>
+<p>Свій лог (Betaflight CSV або ArduPilot .bin) → DataFrame, fs пораховано, перші 5 рядків і опис колонок виведено.</p>
+<h4 class="md-subheading">Крок 2. Спектр</h4>
+<p>Вибрати 10 с зависання, <code>welch</code> по трьох осях, графік у дБ до fs/2, піки підписані частотами. Зберегти PNG.</p>
+<h4 class="md-subheading">Крок 3. Метрики</h4>
+<p><code>step_metrics</code> і <code>bounce_back</code> на roll: таблиця кроків з overshoot і settle, медіана bounce-back. Порівняти з орієнтирами.</p>
+<h4 class="md-subheading">Крок 4. Пакет</h4>
+<p>Скласти функції в <code>uavlog.py</code> (read_bf, read_ap, spectrum, step_metrics, bounce_back) з docstring; другий лог проганяється у три рядки.</p>
+<h4 class="md-subheading">Перевірка на синтетиці до свого логу</h4>
+<p>Перш ніж вірити спектру свого логу, перевір функцію на сигналі з відомою відповіддю: синус 210 Гц плюс шум має дати пік рівно там.</p>
+<pre class="cli-block"><code>import numpy as np
+from scipy.signal import welch
+
+fs = 2000.0                                     # 8 kHz loop, blackbox 1/4
+t = np.arange(0, 10, 1 / fs)
+x = 5 * np.sin(2 * np.pi * 210 * t) + np.random.default_rng(0).normal(0, 1, t.size)
+f, p = welch(x, fs=fs, nperseg=int(fs))        # 1 s windows -&gt; 1 Hz resolution
+print(f&quot;peak at {f[np.argmax(p)]:.0f} Hz&quot;)      # expect 210</code></pre>
+<h4 class="md-subheading">Що має вийти і що записати</h4>
+<ul><li><strong>Крок 1.</strong> <code>fs</code> рахується за часовими мітками логу, а не береться з налаштувань: у Betaflight це частота циклу, поділена на дільник запису Blackbox (8 кГц / 4 = 2 кГц), в ArduPilot — частота повідомлення, яке читаєш. Помилка в <code>fs</code> зсуває всі частоти спектра в стільки ж разів.</li><li><strong>Крок 2.</strong> Роздільна здатність за частотою дорівнює <code>fs / nperseg</code>. Піки моторів 5&quot; на зависанні зазвичай лежать у сотнях герц, а їхні гармоніки видно на кратних частотах. Підпиши частоти піків і порівняй з обертами моторів із модуля про RPM-фільтр, якщо bidir DShot увімкнено.</li><li><strong>Крок 3.</strong> Орієнтири для 5&quot; з теорії: overshoot 5–15 % — добре, bounce-back менше 10 % — добре, більше 25 % — забагато D або погана механіка. Запиши медіану по 10–20 кроках, а не найкращий крок.</li><li><strong>Крок 4.</strong> Другий лог проганяється трьома рядками: <code>read_*</code>, <code>spectrum</code>, <code>bounce_back</code>. Якщо щось доводиться правити руками, функція ще не готова.</li></ul>
+<p>Лабораторна зараховується, коли лог прочитано в DataFrame з порахованою <code>fs</code>, спектр Велча побудовано по трьох осях з підписаними піками й перевірено на синтетиці, функція bounce-back дала медіану на двох логах і її порівняно з орієнтирами.</p>
+
+<h2>Діагностика</h2>
+<div class="diag-groups"><article class="diag-item"><h4><strong>Симптом:</strong> спектри двох логів неможливо порівняти</h4><ul><li>Можлива причина: різні fs або nperseg, різні режими польоту.</li><li>Що зробити: однакові параметри, один і той самий режим (зависання).</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> step_metrics порожній</h4><ul><li>Можлива причина: у логу немає різких рухів стіків або поріг не підібраний під fs.</li><li>Що зробити: політ із різкими зупинками стіка, поріг підібрати за гістограмою d setpoint.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> піки спектра розмазані</h4><ul><li>Можлива причина: оберти змінювалися всередині вікна.</li><li>Що зробити: рівна ділянка, спектрограма замість Welch.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> pymavlink читає дуже довго</h4><ul><li>Можлива причина: лог на сотні МБ, читання в Python по одному повідомленню.</li><li>Що зробити: фільтр <code>type=[...]</code>, <code>mavlogdump.py --format csv</code> для разового вивантаження.</li></ul></article></div>
+
+<h2>Чек-лист</h2>
+<ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="data-python:0"><span>Лог прочитано в DataFrame, fs визначено</span></label></li><li><label><input type="checkbox" data-check-id="data-python:1"><span>Спектр Велча побудовано з підписаними піками</span></label></li><li><label><input type="checkbox" data-check-id="data-python:2"><span>Overshoot, settle і bounce-back пораховано функціями</span></label></li><li><label><input type="checkbox" data-check-id="data-python:3"><span>Функції зібрано в модуль, і вони працюють на другому логу</span></label></li><li><label><input type="checkbox" data-check-id="data-python:4"><span>Розумію, чому Велч, а не один FFT</span></label></li></ul>
+
+<h2>Джерела</h2>
+<ul class="refs"><li><a href="https://github.com/betaflight/blackbox-tools" target="_blank" rel="noopener noreferrer">Betaflight blackbox-tools (blackbox_decode)</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://github.com/ArduPilot/pymavlink" target="_blank" rel="noopener noreferrer">pymavlink — DataFlash log reading (mavutil)</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.welch.html" target="_blank" rel="noopener noreferrer">SciPy — scipy.signal.welch</a> <span class="gc-tag" data-state="info">primary</span></li></ul>
+<h2>Перевір себе</h2>
+<uav-quiz src="../quiz/data-python.json" module="data-python"></uav-quiz>
+      </div>
+      <div class="module-done"><gc-button variant="secondary" data-done-toggle="data-python">Позначити як пройдений</gc-button></div>
+      <section class="related" aria-label="Суміжні модулі"><p class="gc-label gc-muted">Суміжні модулі</p><div class="gc-grid ref-grid"><a class="gc-card" href="tools-overview.html"><strong>Інструменти: Configurator, GCS, git</strong><div class="gc-card__meta"><span class="gc-tag" title="L1 — Оператор">L1</span></div></a><a class="gc-card" href="bf-blackbox.html"><strong>Blackbox</strong><div class="gc-card__meta"><span class="gc-tag" title="L2 — Интегратор">L2</span></div></a><a class="gc-card" href="ap-logs.html"><strong>Логи ArduPilot: розбір польоту</strong><div class="gc-card__meta"><span class="gc-tag" title="L3 — Специалист">L3</span></div></a></div></section>
+      <nav class="pager" aria-label="Сусідні модулі" data-track-pager><a class="gc-card pager__next" href="ctl-signals.html"><span class="gc-label gc-muted">Далі · трек</span><br>Сигнали та спектри: що бачить гіроскоп</a></nav><nav class="pager" aria-label="Сусідні кроки шляху Betaflight" data-path-pager="betaflight" hidden><a class="gc-card pager__prev" href="bf-pid-reg-in-bf.html?path=betaflight"><span class="gc-label gc-muted">Назад · шлях Betaflight</span><br>PID-регулятор у Betaflight</a><a class="gc-card pager__next" href="ctl-signals.html?path=betaflight"><span class="gc-label gc-muted">Далі · крок 34 з 44</span><br>Сигнали та спектри: що бачить гіроскоп</a></nav><nav class="pager" aria-label="Сусідні кроки шляху ArduPilot" data-path-pager="ardupilot" hidden><a class="gc-card pager__prev" href="nav-resilience.html?path=ardupilot"><span class="gc-label gc-muted">Назад · шлях ArduPilot</span><br>Стійкість навігації та зв&#x27;язку до завад</a><a class="gc-card pager__next" href="ctl-signals.html?path=ardupilot"><span class="gc-label gc-muted">Далі · крок 31 з 69</span><br>Сигнали та спектри: що бачить гіроскоп</a></nav>
+    </article>
+  </main>
+  <footer class="gc-container site-footer gc-muted">
+    <p>Відкритий курс · <a href="https://github.com/irreligious86/UAV-Education">вихідний код на GitHub</a> · <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">план розвитку</a> · <a href="../../curriculum/curriculum.html">для розробника</a> · CC BY-NC-SA 4.0</p>
+  </footer>
+</body>
+</html>
