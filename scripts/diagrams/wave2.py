@@ -31,7 +31,7 @@ def build(D: dict, arch) -> None:
         [L("bat", ["АКБ 6S Li-Ion"]), L("esc", ["ESC ×8"], True), L("pair", ["4 пары верх/низ", "вращение встречное"], True), L("mix", ["Миксер", "AP_MotorsMatrix"])],
         [L("fail", ["Отказ мотора:", "соосный партнёр"], True, 2), L("hdr", ["MOT_YAW_HEADROOM", "запас на рыскание"], False, 3)],
         [("bat", "esc"), ("esc", "pair"), ("mix", "pair", "", True), ("pair", "fail", "", False, "v"), ("mix", "hdr", "", False, "v")],
-        notes=[(10, 150, "Висение ≈ 30–35 % газа", "m t"), (10, 164, "— запас на отказ", "m t")])
+        notes=[(10, 150, "Висение ≈ 0.35–0.4 тяги", "m t"), (10, 164, "— запас на отказ", "m t")])
 
     D["log-triage"] = tree("Разбор лога ArduPilot: с чего начать", Node("r", ["Что пошло", "не так?"], [
         ("тряска", Node("v", ["VIBE: X/Y/Z,", "Clip0–2"], leaf=True, accent=True)),

@@ -1,0 +1,394 @@
+<!doctype html>
+<html lang="uk-galych" data-theme="dark" data-lang="uk-galych">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Тяговый стенд: тензодатчик + HX711, ток, обороты, КПД — UAV Student</title>
+  <meta name="description" content="откалибровать тензодатчик: масштаб, тара, дрейф, ползучесть, неопределённость получить кривую г/Вт, C_T и FM и сравнить с таблицей производителя при равной тяге собрать безопасный стенд на ESP32 с лимитом тока и таймаутом команды">
+  <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
+  <link rel="manifest" href="../../manifest.webmanifest">
+  <meta name="theme-color" content="#0b0f14">
+  <link rel="alternate" hreflang="ru" href="../../m/des-thrust-stand.html">
+  <link rel="alternate" hreflang="uk" href="../../uk/m/des-thrust-stand.html">
+  <link rel="alternate" hreflang="en" href="../../en/m/des-thrust-stand.html">
+  <link rel="alternate" hreflang="uk-galych" href="../../gal/m/des-thrust-stand.html">
+  <script>/* go to the visitor's chosen language before anything paints (assets/i18n.js) */(function(){try{var c=localStorage.getItem('uav-lang'),h=document.documentElement.getAttribute('data-lang');if(!c||c===h||/[?&]lang=keep\b/.test(location.search))return;var l=document.querySelector('link[rel=alternate][hreflang="'+c+'"]');if(l)location.replace(l.href+location.search+location.hash)}catch(e){}})();</script>
+  <link rel="stylesheet" href="../../lib/ground-control-ui/dist/ground-control.css">
+  <link rel="stylesheet" href="../../assets/site.css">
+  <script src="../../lib/ground-control-ui/dist/ground-control.js" defer></script>
+  <script src="../../assets/i18n/uk-galych.js"></script>
+  <script src="../../assets/i18n.js"></script>
+  <script src="../../assets/progress-store.js" defer></script>
+  <script src="../../assets/backend-config.js" defer></script>
+  <script src="../../assets/account.js" defer></script>
+  <script src="../../assets/grading.js" defer></script>
+  <script src="../../assets/app.js" defer></script>
+  <script src="../../assets/uav-quiz.js" defer></script>
+  <script src="../../assets/uav-tasks.js" defer></script>
+  <script src="../../assets/offline.js" defer></script>
+</head>
+<body class="gc-root" data-base="../" data-root="../../">
+  <header class="site-header">
+    <div class="gc-container site-header__inner">
+      <a class="site-brand" href="../index.html"><span class="site-brand__mark" aria-hidden="true">◆</span> UAV Student</a>
+      <nav class="gc-nav" aria-label="Розділи сайту">
+        <a href="../index.html" aria-current="page">Курс</a>
+        <a href="../ref/index.html">Довідник</a>
+        <a href="../pages/glossary.html">Глосарій</a>
+        <a href="../pages/fails.html">Фейли</a>
+        <a href="../pages/search.html">Пошук</a>
+        <a href="../pages/progress.html">Мій прогрес</a>
+      </nav>
+      <nav class="lang-switch" aria-label="Мова"><a class="gc-tag" href="../../m/des-thrust-stand.html" data-lang-to="ru" hreflang="ru" lang="ru" title="Русский">RU</a><a class="gc-tag" href="../../uk/m/des-thrust-stand.html" data-lang-to="uk" hreflang="uk" lang="uk" title="Українська">UK</a><a class="gc-tag" href="../../en/m/des-thrust-stand.html" data-lang-to="en" hreflang="en" lang="en" title="English">EN</a><a class="gc-tag" href="../../gal/m/des-thrust-stand.html" data-lang-to="uk-galych" hreflang="uk-galych" lang="uk-galych" title="Галицька (експеримент)" aria-current="true" data-state="ok">GAL</a></nav>
+    </div>
+  </header>
+  <main class="gc-container site-main">
+    <article class="module" data-module-page="des-thrust-stand">
+      <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-designer">Конструктор</a><span>Тяговый стенд: тензодатчик + HX711, ток, обороты, КПД</span></p>
+      <h1 class="module-title">Тяговый стенд: тензодатчик + HX711, ток, обороты, КПД</h1>
+      <div class="module-tags"><span class="gc-tag" title="Рівень">L2 — Інтегратор</span><span class="gc-tag">читання 40 хв</span><span class="gc-tag">навчання ~6 год</span><span class="gc-tag">ESP32 (Arduino core 2.x / 3.x), без автопилота</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ОПАНОВАНО</span></div>
+      <p class="gc-muted module-score" data-module-score></p>
+      <p class="module-lead">Таблица тяги производителя снята на его ESC, его пропе и при его температуре; твоя связка может отличаться на 5–15 %, и узнать это можно только на стенде. Модуль учит собрать стенд на ESP32 (тензодатчик + HX711, INA226 для тока и напряжения, оптодатчик для оборотов), откалибровать его (масштаб, тара, дрейф, ползучесть), посчитать неопределённость, кривую г/Вт, C_T и коэффициент качества FM. Основной путь — обработка реалистичного набора данных по таблице T-Motor MN4006 KV380 + 15×5; в разделе про железо — сборка и калибровка настоящего стенда.</p>
+      <div class="gc-callout" data-state="ok"><strong>Після модуля ти вмієш</strong><ul><li>откалибровать тензодатчик: масштаб, тара, дрейф, ползучесть, неопределённость</li><li>получить кривую г/Вт, C_T и FM и сравнить с таблицей производителя при равной тяге</li><li>собрать безопасный стенд на ESP32 с лимитом тока и таймаутом команды</li></ul></div><p class="gc-muted">Перед цим модулем: <a href="f-aero-props.html">Аеродинаміка пропелера та підбір силової установки</a>, <a href="el-measure.html">Вимірювання: мультиметр, осцилограф, логічний аналізатор</a></p><div class="gc-callout lab"><p class="gc-label gc-muted">Лабораторна</p><strong>Обработка данных стенда и (опционально) свой стенд</strong><p class="gc-muted lab__hint">Здано, коли позначено всі пункти:</p><ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="des-thrust-stand:lab:0"><span>Генератор и обработка запущены, k, дрейф и таблица точек совпадают с приведёнными</span></label></li><li><label><input type="checkbox" data-check-id="des-thrust-stand:lab:1"><span>Бюджет неопределённости посчитан для одной точки, U (k = 2) указана</span></label></li><li><label><input type="checkbox" data-check-id="des-thrust-stand:lab:2"><span>По C_T и г/Вт сделан вывод, где потери; FM посчитан правильной формулой</span></label></li><li><label><input type="checkbox" data-check-id="des-thrust-stand:lab:3"><span>Железо: аварийные пути проверены без пропа, ≥ 5 точек газа, остаток калибровки ≤ 3 г</span></label></li></ul></div><div class="path-pos gc-muted"><span class="gc-label">На шляху</span><ul><li data-path-pos="betaflight"><a href="../path/betaflight.html">Betaflight</a>: крок 33 з 46 → <a href="bf-pid-reg-in-bf.html?path=betaflight">PID-регулятор у Betaflight</a></li><li data-path-pos="ardupilot"><a href="../path/ardupilot.html">ArduPilot</a>: крок 43 з 72 → <a href="el-emi.html?path=ardupilot">Завади та електромагнітна сумісність</a></li></ul></div>
+      <div class="gc-prose module-body">
+<div class="gc-callout" data-state="caution" data-untranslated><strong>Модуль ещё не переведён.</strong> Ниже — оригинал (Русский). Прогресс и оценки общие для всех языков.</div>
+<h2>Теорія</h2>
+<h4 class="md-subheading">Что меряет стенд и зачем</h4>
+<p>Минимум — четыре величины с одной меткой времени: тяга T, напряжение U, ток I, обороты n. Из них: P = U·I, удельная тяга T/P (г/Вт) и C_T. Датчик реактивного момента Q добавляет мощность на валу P_вал = 2π·n·Q, а с ней КПД привода и FM пропа.</p>
+<figure class="diagram" data-diagram="stand-signal-chain"><div class="diagram__svg"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 250" width="100%" role="img" aria-labelledby="t" style="max-width:720px;display:block;margin:0 auto"><title id="t">Тяговый стенд: датчики → ESP32 → CSV → обработка</title><style>text{font-family: var(--gc-font-mono, ui-monospace, Menlo, monospace); font-size: 12px;fill:currentColor} .m{fill:var(--gc-ink-muted, #8a93a3)} .a{fill:var(--gc-accent-hud, #5ef1d2)} .w{fill:var(--gc-signal-amber, #f0b24c)} .d{fill:var(--gc-signal-red, #e8636b)} .box{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:currentColor;stroke-width:1.2} .boxa{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6} .ln{stroke:currentColor;stroke-width:1.2;fill:none} .lna{stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6;fill:none} .lnm{stroke:var(--gc-ink-muted, #8a93a3);stroke-width:1;fill:none;stroke-dasharray:4 3} .t{font-size:11px} .b{font-weight:600}</style><defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker><marker id="ara" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--gc-accent-hud, #5ef1d2)"/></marker></defs><rect class="boxa" x="10" y="20" width="150" height="44" rx="6"/><text x="85.0" y="39.0" text-anchor="middle" class="b">Тензодатчик 5 кг</text><text x="85.0" y="53.0" text-anchor="middle" class="b">1.0 мВ/В, мост</text><rect class="boxa" x="190" y="20" width="150" height="44" rx="6"/><text x="265.0" y="39.0" text-anchor="middle" class="b">HX711, 24 бит</text><text x="265.0" y="53.0" text-anchor="middle" class="b">×128, 10 Гц</text><rect class="box" x="10" y="100" width="150" height="44" rx="6"/><text x="85.0" y="119.0" text-anchor="middle">Шунт 2 мОм</text><text x="85.0" y="133.0" text-anchor="middle">в минусе АКБ</text><rect class="box" x="190" y="100" width="150" height="44" rx="6"/><text x="265.0" y="119.0" text-anchor="middle">INA226, I²C</text><text x="265.0" y="133.0" text-anchor="middle">1.25 мВ / 1.25 мА</text><rect class="box" x="10" y="180" width="150" height="44" rx="6"/><text x="85.0" y="199.0" text-anchor="middle">Метка на колоколе</text><text x="85.0" y="213.0" text-anchor="middle">мотора</text><rect class="box" x="190" y="180" width="150" height="44" rx="6"/><text x="265.0" y="199.0" text-anchor="middle">Оптодатчик</text><text x="265.0" y="213.0" text-anchor="middle">импульс/оборот</text><rect class="boxa" x="380" y="80" width="140" height="80" rx="6"/><text x="450.0" y="103.0" text-anchor="middle" class="b">ESP32</text><text x="450.0" y="117.0" text-anchor="middle" class="b">чтение 10 Гц,</text><text x="450.0" y="131.0" text-anchor="middle" class="b">лимит 16 А,</text><text x="450.0" y="145.0" text-anchor="middle" class="b">таймаут 0.5 с</text><rect class="box" x="560" y="20" width="150" height="44" rx="6"/><text x="635.0" y="39.0" text-anchor="middle">ESC → мотор</text><text x="635.0" y="53.0" text-anchor="middle">PWM 1000–2000 мкс</text><rect class="box" x="560" y="150" width="150" height="44" rx="6"/><text x="635.0" y="169.0" text-anchor="middle">ПК: CSV →</text><text x="635.0" y="183.0" text-anchor="middle">г/Вт, C_T, U</text><path class="ln" d="M160 42.0 L190 42.0" marker-end="url(#ar)"/><text x="175.0" y="35.0" text-anchor="middle" class="m t" style="font-size:10px">мВ</text><path class="lna" d="M340 42.0 L360.0 42.0 L360.0 120.0 L380 120.0" marker-end="url(#ara)"/><path class="ln" d="M160 122.0 L190 122.0" marker-end="url(#ar)"/><text x="175.0" y="115.0" text-anchor="middle" class="m t" style="font-size:10px">мВ</text><path class="ln" d="M340 122.0 L360.0 122.0 L360.0 120.0 L380 120.0" marker-end="url(#ar)"/><path class="ln" d="M160 202.0 L190 202.0" marker-end="url(#ar)"/><path class="ln" d="M340 202.0 L360.0 202.0 L360.0 120.0 L380 120.0" marker-end="url(#ar)"/><path class="lna" d="M520 120.0 L540.0 120.0 L540.0 42.0 L560 42.0" marker-end="url(#ara)"/><text x="540.0" y="36.0" text-anchor="middle" class="m t" style="font-size:10px">газ</text><path class="ln" d="M520 120.0 L540.0 120.0 L540.0 172.0 L560 172.0" marker-end="url(#ar)"/><text x="540.0" y="114.0" text-anchor="middle" class="m t" style="font-size:10px">USB</text><text x="380" y="200" text-anchor="start" class="m t">ПК шлёт команду ≥ 2 Гц;</text><text x="380" y="214" text-anchor="start" class="m t">молчит — газ 0.</text></svg></div><figcaption class="gc-muted">Стенд — это четыре канала с одной меткой времени. Безопасность (лимит тока, таймаут команды) живёт в ESP32 и не зависит ни от HX711, ни от ПК.</figcaption><div class="diagram__hint">Схему можно прокрутить по горизонтали</div></figure>
+<h4 class="md-subheading">Тензодатчик и HX711</h4>
+<p>Балочный тензодатчик — мост Уитстона из четырёх тензорезисторов. Выход пропорционален нагрузке и напряжению возбуждения: U_вых = S·U_exc·F/F_ном, где S — чувствительность в мВ/В. У типовой дешёвой балки (серия TAL220) S = 1.0 ± 0.15 мВ/В, нелинейность и гистерезис ±0.05 % FS, ползучесть ±0.1 % FS за 30 мин, температурный уход нуля ±0.2 % FS на 10 °C. Для балки на 5 кг это ±2.5 г нелинейности, ±5 г ползучести и ±10 г ухода нуля на 10 °C. Отсюда главное правило: тара до и после каждого прогона.</p>
+<p>HX711 — 24-битный АЦП для моста. Канал A с усилением 128 даёт полную шкалу ±0.5·AVDD/128 (±20 мВ при 5 В). Скорость 10 или 80 отсчётов/с (вывод RATE), формат — дополнительный код, насыщение на 800000h / 7FFFFFh. Обычно мост питается от того же AVDD, поэтому измерение ратиометрическое и не зависит от точного напряжения: S·128·2²³ / 0.5 = 2 147 484 отсчёта на полную шкалу, то есть около 430 отсчётов/г для балки 5 кг. 24 импульса PD_SCK — данные, 25-й выбирает канал A×128. Ловушка в другом: если PD_SCK держится в высоком уровне дольше 60 мкс, чип уходит в power-down. Прерывание (Wi-Fi, другой ISR) посреди чтения портит отсчёт, поэтому чтение должно идти в критической секции.</p>
+<h4 class="md-subheading">Калибровка: модель ошибок</h4>
+<p>Модель сырого отсчёта: raw = b + k·m + e_нелин + e_гист + e_полз(t) + e_дрейф(t) + шум.</p>
+<ul><li><strong>Тара b</strong> — среднее без нагрузки. Её дрейф (мотор и ESC греют балку) снимается нулём до и после прогона с линейной интерполяцией по времени.</li><li><strong>Масштаб k</strong> — МНК по 5–6 известным массам: k = Σ(m−m̄)(y−ȳ) / Σ(m−m̄)². Остатки после подгонки дают нелинейность.</li><li><strong>Гистерезис</strong> — разница показаний при той же массе на нагрузке и на разгрузке.</li><li><strong>Ползучесть</strong> — медленный рост показаний под постоянной нагрузкой: мала для ступени 10 с, заметна в прогоне на 30 мин.</li><li><strong>Геометрия.</strong> Калибруй силой вдоль оси пропа в точке приложения тяги: нить от оси мотора через блок на подшипнике к гирям или стенд, повёрнутый осью вверх. «Гиря на балку» в другом месте даёт ошибку плеча.</li></ul>
+<h4 class="md-subheading">Ток, напряжение, обороты</h4>
+<p>INA226 меряет падение на шунте (полная шкала ±81.92 мВ, LSB 2.5 мкВ) и напряжение шины (до 36 В, LSB 1.25 мВ). Регистр калибровки CAL = 0.00512 / (Current_LSB·R_шунт). С шунтом 2 мОм и Current_LSB = 1.25 мА выходит CAL = 2048 и полная шкала 40.96 А, а рассеивание шунта при 15 А — 0.45 Вт. Погрешность тока задаёт допуск шунта (обычно 1 %), а не АЦП. Напряжение меряй на входе ESC, а не на БП.</p>
+<p>Обороты берут оптодатчиком (метка на колоколе, RPM = 60·10⁶ / (период_мкс · меток)) или из телеметрии ESC. Bidirectional DShot отдаёт eRPM, и механические обороты равны eRPM / (число полюсов / 2). У MN4006 24 полюса, значит делитель 12.</p>
+<h4 class="md-subheading">Безразмерные величины</h4>
+<p>По определениям UIUC (Brandt &amp; Selig): C_T = T / (ρ·n²·D⁴), C_P = P_вал / (ρ·n³·D⁵), n — об/с, D — м. Плотность воздуха ρ = p / (287.05·T_K), при 20 °C и 101.325 кПа это 1.204 кг/м³. Меряй её в день прогона: при 35 °C она на 5 % ниже, и тяга на тех же оборотах тоже.</p>
+<p>Коэффициент качества (figure of merit) — доля идеальной мощности диска-актуатора в реальной мощности на валу:</p>
+<p><strong>FM = P_ид / P_вал, P_ид = T^1.5 / √(2·ρ·A), A = π·D²/4.</strong></p>
+<p>Через коэффициенты с n и D: FM = C_T^1.5 / (√(π/2)·C_P). Известную формулу C_T^1.5 / (√2·C_P) из вертолётных учебников можно брать только с вертолётными C_T и C_P, нормированными на Ω·R. Если подставить в неё пропеллерные коэффициенты, получишь FM на 11 % ниже правды. Без датчика момента у тебя есть только P_эл, и P_ид / P_эл = FM·η_привода — это системный КПД, а не качество пропа.</p>
+
+<h2>Практика</h2>
+<h4 class="md-subheading">Шаг 1. Набор данных</h4>
+<p>Основа — таблица T-Motor MN4006 KV380 с пропом 15×5 CF на 24 В: семь точек газа 50–100 %, ток, обороты, момент, тяга. Генератор строит по ней лог «стенда» с ошибками из теории: шум HX711, нелинейность, гистерезис 0.8 г, ползучесть 1.2 г, дрейф нуля +4 г, вибрации 0.8 % тяги, квантование INA226. Экземпляр мотора сделан «чуть хуже паспорта»: обороты на 1.5 % ниже (C_T тот же) и ток на 5 % выше (другой ESC). Задача обработки — это найти.</p>
+<pre class="cli-block"><code>#!/usr/bin/env python3
+&quot;&quot;&quot;Synthetic thrust-stand log: T-Motor MN4006 KV380 + 15x5 CF @ 24 V (store.tmotor.com table)
+plus realistic HX711 / INA226 / optical-tach errors. Reproducible: seed 42, stdlib only.&quot;&quot;&quot;
+import csv, math, random
+
+R = random.Random(42)
+# throttle %, current A, RPM, thrust g  -- manufacturer table, 15x5 CF, 24 V
+TABLE = [(50, 3.1, 3746, 805), (55, 4.1, 4089, 959), (60, 4.8, 4358, 1093), (65, 5.8, 4634, 1236),
+         (75, 8.3, 5215, 1561), (85, 10.7, 5627, 1823), (100, 15.0, 6177, 2228)]
+K, OFS, FS = 431.7, 84213, 5000.0           # counts/g, zero unbalance (counts), cell capacity g
+SPS = 10                                     # HX711 RATE=0
+
+def raw(m_g, extra_g=0.0):                  # cell + HX711: nonlinearity &lt;=0.03 %FS, noise 40 counts
+    nl = 4 * 0.0003 * FS * (m_g / FS) * (1 - m_g / FS)
+    return round(OFS + K * (m_g + nl + extra_g) + R.gauss(0, 40))
+
+with open(&quot;calib.csv&quot;, &quot;w&quot;, newline=&quot;&quot;) as f:          # 20 samples per weight, load up then down
+    w = csv.writer(f); w.writerow([&quot;dir&quot;, &quot;ref_g&quot;, &quot;raw&quot;])
+    for d, seq in ((&quot;up&quot;, [0, 100, 200, 500, 1000, 2000]), (&quot;down&quot;, [1000, 500, 0])):
+        for m in seq:
+            for _ in range(20):
+                w.writerow([d, m, raw(m, 0.8 if d == &quot;down&quot; and m else 0.0)])
+
+with open(&quot;creep.csv&quot;, &quot;w&quot;, newline=&quot;&quot;) as f:          # 1000 g left on for 600 s
+    w = csv.writer(f); w.writerow([&quot;t_s&quot;, &quot;raw&quot;])
+    for i in range(600 * SPS):
+        t = i / SPS
+        w.writerow([t, raw(1000, 1.2 * (1 - math.exp(-t / 300)))])
+
+# the specimen: 1.5 % lower RPM than the datasheet (C_T unchanged) and 5 % more current (other ESC)
+with open(&quot;run.csv&quot;, &quot;w&quot;, newline=&quot;&quot;) as f:
+    w = csv.writer(f); w.writerow([&quot;t_s&quot;, &quot;thr&quot;, &quot;raw&quot;, &quot;volt&quot;, &quot;amp&quot;, &quot;rpm&quot;])
+    t, T_END = 0.0, 20 + len(TABLE) * 10 + 20
+    def row(thr, thrust, amp, rpm):
+        global t
+        drift = 4.0 * t / T_END                              # zero drift +4 g (cell warms up)
+        vib = R.gauss(0, 0.008 * thrust + 1.5) if thrust else 0.0
+        a = amp + R.gauss(0, 0.015) if amp else R.gauss(0, 0.002)
+        v = 24.0 - 0.02 * a + R.gauss(0, 0.005)
+        r = rpm * (1 + R.gauss(0, 0.003)) if rpm else 0
+        w.writerow([f&quot;{t:.1f}&quot;, thr, raw(thrust, drift + vib), f&quot;{round(v / 0.00125) * 0.00125:.5f}&quot;,
+                    f&quot;{round(a / 0.00125) * 0.00125:.5f}&quot;, round(r)])
+        t += 1 / SPS
+    for _ in range(20 * SPS): row(0, 0, 0, 0)                # pre-tare, motor stopped
+    for thr, amp, rpm, thrust in TABLE:
+        n = rpm * 0.985
+        for _ in range(10 * SPS): row(thr, thrust * 0.985 ** 2, amp * 1.05, n)
+    for _ in range(20 * SPS): row(0, 0, 0, 0)                # post-tare
+print(&quot;calib.csv creep.csv run.csv written&quot;)</code></pre>
+<pre class="cli-block"><code>$ python3 gen_stand_data.py
+calib.csv creep.csv run.csv written
+$ wc -l *.csv
+   181 calib.csv
+  6001 creep.csv
+  1101 run.csv</code></pre>
+<h4 class="md-subheading">Шаг 2. Калибровка, ползучесть, дрейф</h4>
+<p>Один скрипт: блоки 1–3 — калибровка и точки, блок 4 — неопределённость (шаг 4).</p>
+<pre class="cli-block"><code>#!/usr/bin/env python3
+&quot;&quot;&quot;Thrust-stand processing: calibration, creep, drift, g/W, C_T, uncertainty.&quot;&quot;&quot;
+import csv, math, statistics as st
+from collections import defaultdict
+
+rd = lambda fn: list(csv.DictReader(open(fn)))
+RHO, D = 1.204, 15 * 0.0254                    # 20 C, 101.325 kPa; 15&quot; prop
+DS = {50: (805, 74), 55: (959, 98), 60: (1093, 115), 65: (1236, 139),   # datasheet: g, W
+      75: (1561, 199), 85: (1823, 257), 100: (2228, 360)}
+
+# 1. calibration: least squares raw = b + k*m on the loading branch
+g = defaultdict(list)
+for r in rd(&quot;calib.csv&quot;): g[(r[&quot;dir&quot;], int(r[&quot;ref_g&quot;]))].append(int(r[&quot;raw&quot;]))
+up = sorted((m, st.mean(v)) for (d, m), v in g.items() if d == &quot;up&quot;)
+xm, ym = st.mean(m for m, _ in up), st.mean(y for _, y in up)
+k = sum((m - xm) * (y - ym) for m, y in up) / sum((m - xm) ** 2 for m, _ in up)
+b = ym - k * xm
+res = [(y - b - k * m) / k for m, y in up]
+hyst = max((st.mean(g[(&quot;down&quot;, m)]) - st.mean(g[(&quot;up&quot;, m)])) / k for m in (500, 1000))
+noise = st.stdev(g[(&quot;up&quot;, 0)]) / k
+print(f&quot;k = {k:.2f} counts/g, offset = {b:.0f}, max residual = {max(map(abs, res)):.2f} g, &quot;
+      f&quot;hysteresis = {hyst:.2f} g, noise = {noise:.2f} g&quot;)
+
+# 2. creep: last 60 s vs first 30 s under 1000 g
+c = [int(r[&quot;raw&quot;]) for r in rd(&quot;creep.csv&quot;)]
+creep = (st.mean(c[-600:]) - st.mean(c[:300])) / k
+print(f&quot;creep 1000 g / 10 min = {creep:+.2f} g&quot;)
+
+# 3. run: zero before/after, linear drift correction, steady 2..10 s of each step
+run = rd(&quot;run.csv&quot;)
+zero = [r for r in run if r[&quot;thr&quot;] == &quot;0&quot;]
+pre = [r for r in zero if float(r[&quot;t_s&quot;]) &lt; 20]; post = [r for r in zero if float(r[&quot;t_s&quot;]) &gt;= 20]
+z0, z1 = st.mean(int(r[&quot;raw&quot;]) for r in pre), st.mean(int(r[&quot;raw&quot;]) for r in post)
+t0, t1 = st.mean(float(r[&quot;t_s&quot;]) for r in pre), st.mean(float(r[&quot;t_s&quot;]) for r in post)
+print(f&quot;zero drift over run = {(z1 - z0) / k:+.2f} g&quot;)
+GW = sorted((t, t / p) for t, p in DS.values())      # datasheet g/W vs thrust
+def gw_ds(T):                                       # linear interpolation, extrapolate at the ends
+    (a, fa), (b, fb) = next(((p, q) for p, q in zip(GW, GW[1:]) if T &lt;= q[0]), GW[-2:])
+    return fa + (fb - fa) * (T - a) / (b - a)
+steps = defaultdict(list)
+for r in run:
+    if r[&quot;thr&quot;] != &quot;0&quot;: steps[int(r[&quot;thr&quot;])].append(r)
+print(&quot;thr   T,g    I,A    P,W   g/W   rpm    C_T    T/T_ds  gW/gW_ds(same T)&quot;)
+out = []
+for thr, rows in sorted(steps.items()):
+    rows = rows[20:]                                   # drop 2 s of spool-up
+    tm = st.mean(float(r[&quot;t_s&quot;]) for r in rows)
+    zt = z0 + (z1 - z0) * (tm - t0) / (t1 - t0)
+    T = (st.mean(int(r[&quot;raw&quot;]) for r in rows) - zt) / k
+    sT = st.stdev(int(r[&quot;raw&quot;]) for r in rows) / k
+    I = st.mean(float(r[&quot;amp&quot;]) for r in rows); V = st.mean(float(r[&quot;volt&quot;]) for r in rows)
+    n = st.mean(float(r[&quot;rpm&quot;]) for r in rows) / 60
+    ct = T / 1000 * 9.80665 / (RHO * n ** 2 * D ** 4)
+    Tds, Pds = DS[thr]
+    out.append((thr, T, sT, len(rows), I, V))
+    print(f&quot;{thr:3d} {T:7.1f} {I:6.2f} {V*I:6.1f} {T/(V*I):5.2f} {n*60:5.0f} {ct:.4f} &quot;
+          f&quot;{T/Tds:6.3f} {T/(V*I)/gw_ds(T):7.3f}&quot;)
+
+# 4. uncertainty budget for the 50 % point (standard uncertainties, g)
+thr, T, sT, N, I, V = out[0]
+u = {&quot;noise+vibration s/sqrt(N/5)&quot;: sT / math.sqrt(N / 5),
+     &quot;scale factor (weights 0.05 %)&quot;: T * 0.0005 / math.sqrt(3),
+     &quot;nonlinearity (max residual)&quot;: max(map(abs, res)) / math.sqrt(3),
+     &quot;drift correction (half)&quot;: abs(z1 - z0) / k / 2 / math.sqrt(3),
+     &quot;creep&quot;: abs(creep) / math.sqrt(3), &quot;hysteresis&quot;: abs(hyst) / 2 / math.sqrt(3)}
+for name, val in u.items(): print(f&quot;  {name:31s} {val:5.2f} g&quot;)
+uT = math.sqrt(sum(v * v for v in u.values()))
+uI = 0.01 / math.sqrt(3)                               # shunt 1 % tolerance dominates
+ugw = math.sqrt((uT / T) ** 2 + uI ** 2)
+print(f&quot;T = {T:.0f} g, U(k=2) = {2*uT:.1f} g ({200*uT/T:.2f} %); g/W = {T/(V*I):.2f} +/- {2*ugw*T/(V*I):.2f} (k=2)&quot;)</code></pre>
+<pre class="cli-block"><code>$ python3 process_stand.py
+k = 432.01 counts/g, offset = 84254, max residual = 0.15 g, hysteresis = 0.81 g, noise = 0.06 g
+creep 1000 g / 10 min = +0.97 g
+zero drift over run = +3.29 g</code></pre>
+<p>Разбор. k = 432.01 отсчёта/г совпадает с оценкой из теории (≈ 430). Остаток после подгонки 0.15 г: нелинейность на диапазоне 0–2 кг меньше шума вибраций. Гистерезис 0.81 г и ползучесть +0.97 г за 10 мин видны, но малы. Дрейф нуля +3.29 г за прогон — уже 0.4 % от тяги в первой точке. Без поправки по нулю «после» вся кривая уехала бы вверх.</p>
+<h4 class="md-subheading">Шаг 3. Кривая г/Вт и C_T</h4>
+<pre class="cli-block"><code>thr   T,g    I,A    P,W   g/W   rpm    C_T    T/T_ds  gW/gW_ds(same T)
+ 50   780.7   3.25   77.9 10.03  3689 0.0798  0.970   0.907
+ 55   931.6   4.30  102.9  9.05  4027 0.0799  0.971   0.907
+ 60  1058.3   5.04  120.4  8.79  4290 0.0800  0.968   0.918
+ 65  1198.2   6.09  145.4  8.24  4564 0.0800  0.969   0.910
+ 75  1515.7   8.72  207.6  7.30  5138 0.0799  0.971   0.914
+ 85  1768.6  11.23  267.1  6.62  5539 0.0802  0.970   0.913
+100  2161.9  15.75  373.1  5.79  6085 0.0812  0.970   0.914</code></pre>
+<p>Сравнивать с паспортом надо при равной тяге, а не при равном «газе»: процент газа зависит от калибровки ESC. Последний столбец — г/Вт стенда к г/Вт таблицы на той же тяге. C_T = 0.080 постоянен по точкам и совпадает с паспортным (0.0798 на 50 %, 0.0813 на 100 % по таблице): проп и канал тяги в порядке, тяга ниже на 3 % только потому, что ниже обороты. При этом г/Вт стабильно на 8–9 % ниже паспорта, и это уже электрическая часть: ESC, провода, напряжение. Это не шум, потому что неопределённость г/Вт ±1.3 % (шаг 4).</p>
+<figure class="diagram" data-diagram="chart-stand-gpw"><div class="diagram__svg"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 360" width="100%" role="img" aria-labelledby="t" style="max-width:720px;display:block;margin:0 auto"><title id="t">Удельная тяга г/Вт: стенд против таблицы T-Motor (MN4006 KV380, 15×5, 24 В)</title><style>text{font-family: var(--gc-font-mono, ui-monospace, Menlo, monospace); font-size: 12px;fill:currentColor} .m{fill:var(--gc-ink-muted, #8a93a3)} .a{fill:var(--gc-accent-hud, #5ef1d2)} .w{fill:var(--gc-signal-amber, #f0b24c)} .d{fill:var(--gc-signal-red, #e8636b)} .box{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:currentColor;stroke-width:1.2} .boxa{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6} .ln{stroke:currentColor;stroke-width:1.2;fill:none} .lna{stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6;fill:none} .lnm{stroke:var(--gc-ink-muted, #8a93a3);stroke-width:1;fill:none;stroke-dasharray:4 3} .t{font-size:11px} .b{font-weight:600}</style><defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker><marker id="ara" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--gc-accent-hud, #5ef1d2)"/></marker></defs><text x="64" y="20" text-anchor="start" class="b" style="font-size:13px">Удельная тяга г/Вт: стенд против таблицы T-Motor (MN4006 KV380, 15×5, 24 В)</text><line x1="182.5" y1="36" x2="182.5" y2="312" stroke="var(--gc-ink-muted, #8a93a3)" stroke-width="0.5" opacity="0.4"/><text x="182.5" y="328" text-anchor="middle" class="m t">1000</text><line x1="380.0" y1="36" x2="380.0" y2="312" stroke="var(--gc-ink-muted, #8a93a3)" stroke-width="0.5" opacity="0.4"/><text x="380.0" y="328" text-anchor="middle" class="m t">1500</text><line x1="577.5" y1="36" x2="577.5" y2="312" stroke="var(--gc-ink-muted, #8a93a3)" stroke-width="0.5" opacity="0.4"/><text x="577.5" y="328" text-anchor="middle" class="m t">2000</text><line x1="64" y1="269.5" x2="696" y2="269.5" stroke="var(--gc-ink-muted, #8a93a3)" stroke-width="0.5" opacity="0.4"/><text x="58" y="273.53846153846155" text-anchor="end" class="m t">6</text><line x1="64" y1="184.6" x2="696" y2="184.6" stroke="var(--gc-ink-muted, #8a93a3)" stroke-width="0.5" opacity="0.4"/><text x="58" y="188.6153846153846" text-anchor="end" class="m t">8</text><line x1="64" y1="99.7" x2="696" y2="99.7" stroke="var(--gc-ink-muted, #8a93a3)" stroke-width="0.5" opacity="0.4"/><text x="58" y="103.69230769230768" text-anchor="end" class="m t">10</text><rect x="64" y="36" width="632" height="276" fill="none" stroke="currentColor" stroke-width="1"/><text x="380.0" y="350" text-anchor="middle" class="m">тяга, г</text><text transform="translate(16 174.0) rotate(-90)" text-anchor="middle" class="m">г/Вт</text><clipPath id="pc16e92179"><rect x="64" y="36" width="632" height="276"/></clipPath><path d="M105.5 62.4 L166.3 108.8 L219.2 120.7 L275.7 146.7 L404.1 191.2 L507.6 223.1 L667.6 261.5" fill="none" stroke="var(--gc-accent-hud, #5ef1d2)" stroke-width="2" clip-path="url(#pc16e92179)"/><circle cx="105.5" cy="62.4" r="2.2" fill="var(--gc-accent-hud, #5ef1d2)" clip-path="url(#pc16e92179)"/><circle cx="166.3" cy="108.8" r="2.2" fill="var(--gc-accent-hud, #5ef1d2)" clip-path="url(#pc16e92179)"/><circle cx="219.2" cy="120.7" r="2.2" fill="var(--gc-accent-hud, #5ef1d2)" clip-path="url(#pc16e92179)"/><circle cx="275.7" cy="146.7" r="2.2" fill="var(--gc-accent-hud, #5ef1d2)" clip-path="url(#pc16e92179)"/><circle cx="404.1" cy="191.2" r="2.2" fill="var(--gc-accent-hud, #5ef1d2)" clip-path="url(#pc16e92179)"/><circle cx="507.6" cy="223.1" r="2.2" fill="var(--gc-accent-hud, #5ef1d2)" clip-path="url(#pc16e92179)"/><circle cx="667.6" cy="261.5" r="2.2" fill="var(--gc-accent-hud, #5ef1d2)" clip-path="url(#pc16e92179)"/><path d="M95.9 98.4 L155.5 140.0 L205.5 151.1 L260.8 174.4 L386.2 214.3 L486.1 243.2 L641.5 278.5" fill="none" stroke="var(--gc-signal-amber, #f0b24c)" stroke-width="2" stroke-dasharray="6 4" clip-path="url(#pc16e92179)"/><circle cx="95.9" cy="98.4" r="2.2" fill="var(--gc-signal-amber, #f0b24c)" clip-path="url(#pc16e92179)"/><circle cx="155.5" cy="140.0" r="2.2" fill="var(--gc-signal-amber, #f0b24c)" clip-path="url(#pc16e92179)"/><circle cx="205.5" cy="151.1" r="2.2" fill="var(--gc-signal-amber, #f0b24c)" clip-path="url(#pc16e92179)"/><circle cx="260.8" cy="174.4" r="2.2" fill="var(--gc-signal-amber, #f0b24c)" clip-path="url(#pc16e92179)"/><circle cx="386.2" cy="214.3" r="2.2" fill="var(--gc-signal-amber, #f0b24c)" clip-path="url(#pc16e92179)"/><circle cx="486.1" cy="243.2" r="2.2" fill="var(--gc-signal-amber, #f0b24c)" clip-path="url(#pc16e92179)"/><circle cx="641.5" cy="278.5" r="2.2" fill="var(--gc-signal-amber, #f0b24c)" clip-path="url(#pc16e92179)"/><line x1="80" y1="268" x2="106" y2="268" stroke="var(--gc-accent-hud, #5ef1d2)" stroke-width="2"/><text x="112" y="272" text-anchor="start" class="t">таблица производителя</text><line x1="80" y1="284" x2="106" y2="284" stroke="var(--gc-signal-amber, #f0b24c)" stroke-width="2" stroke-dasharray="6 4"/><text x="112" y="288" text-anchor="start" class="t">стенд: на 8–9 % ниже</text><text x="330" y="70" text-anchor="start" class="m t">C_T стенда 0.080 = C_T таблицы: проп и тяга в норме;</text><text x="330" y="86" text-anchor="start" class="m t">г/Вт ниже из-за тока (+5 %): виноват ESC/провода.</text><text x="330" y="102" text-anchor="start" class="m t">U(k=2) по г/Вт ≈ ±1.3 % — разница не шум.</text></svg></div><figcaption class="gc-muted">Стенд даёт г/Вт на 8–9 % ниже таблицы T-Motor при той же тяге, а C_T совпадает: проп в норме, потери в приводе. Разница в 6–7 раз больше неопределённости ±1.3 %.</figcaption><div class="diagram__hint">Схему можно прокрутить по горизонтали</div></figure>
+<p>Применение. Квадрокоптеру 3.5 кг нужно 880 г на мотор. По паспорту это ток 3.1 + (880 − 805)/(959 − 805)·1.0 ≈ 3.6 А, то есть 86 Вт и 10.2 г/Вт. По стенду — около 9.4 г/Вт (интерполяция между 780.7 и 931.6 г), и время висения будет на 8 % меньше паспортного расчёта.</p>
+<h4 class="md-subheading">Шаг 4. Бюджет неопределённости</h4>
+<pre class="cli-block"><code>  noise+vibration s/sqrt(N/5)      2.08 g
+  scale factor (weights 0.05 %)    0.23 g
+  nonlinearity (max residual)      0.09 g
+  drift correction (half)          0.95 g
+  creep                            0.56 g
+  hysteresis                       0.23 g
+T = 781 g, U(k=2) = 4.7 g (0.61 %); g/W = 10.03 +/- 0.13 (k=2)</code></pre>
+<p>Систематические вклады — равномерные (делим на √3), итог — корень из суммы квадратов. Вибрационные отсчёты коррелированы, поэтому эффективное N впятеро меньше (80 → 16). Доминируют вибрация и дрейф: улучшать надо балансировку пропа и прогрев, а не разрядность АЦП. В г/Вт главный вклад — допуск шунта 1 %.</p>
+<h4 class="md-subheading">Шаг 5. FM и КПД привода по паспортному моменту</h4>
+<p>Датчика момента на стенде нет, но в таблице T-Motor есть столбец момента. По нему можно разделить потери пропа и привода:</p>
+<pre class="cli-block"><code>import math
+RHO, D = 1.204, 15 * 0.0254
+A = math.pi * D ** 2 / 4
+# datasheet 15x5 @ 24 V: throttle, thrust g, power W (electric), rpm, torque N*m
+for thr, Tg, Pel, rpm, tau in [(50, 805, 74, 3746, 0.15), (75, 1561, 199, 5215, 0.29), (100, 2228, 360, 6177, 0.40)]:
+    T, n = Tg / 1000 * 9.80665, rpm / 60
+    Psh = tau * 2 * math.pi * n                      # shaft power
+    Pid = T ** 1.5 / math.sqrt(2 * RHO * A)          # ideal induced power (actuator disk)
+    CT, CP = T / (RHO * n**2 * D**4), Psh / (RHO * n**3 * D**5)
+    print(f&quot;{thr:3d}%  P_shaft={Psh:5.1f} W  eta_drive={Psh/Pel:.2f}  P_ideal={Pid:5.1f} W  &quot;
+          f&quot;FM={Pid/Psh:.2f}  FM(CT,CP)={CT**1.5/(math.sqrt(math.pi/2)*CP):.2f}  &quot;
+          f&quot;wrong CT^1.5/(sqrt2*CP)={CT**1.5/(math.sqrt(2)*CP):.2f}  FM*eta={Pid/Pel:.2f}&quot;)</code></pre>
+<pre class="cli-block"><code> 50%  P_shaft= 58.8 W  eta_drive=0.80  P_ideal= 42.3 W  FM=0.72  FM(CT,CP)=0.72  wrong CT^1.5/(sqrt2*CP)=0.64  FM*eta=0.57
+ 75%  P_shaft=158.4 W  eta_drive=0.80  P_ideal=114.3 W  FM=0.72  FM(CT,CP)=0.72  wrong CT^1.5/(sqrt2*CP)=0.64  FM*eta=0.57
+100%  P_shaft=258.7 W  eta_drive=0.72  P_ideal=194.9 W  FM=0.75  FM(CT,CP)=0.75  wrong CT^1.5/(sqrt2*CP)=0.67  FM*eta=0.54</code></pre>
+<p>Выходит, что FM пропа 0.72–0.75 (момент в таблице дан двумя значащими цифрами, отсюда ±3–4 %), а мотор с ESC отдают на вал 72–80 % электрической мощности. На полном газе КПД привода падает до 0.72: потери в меди растут как I². Строка <code>wrong</code> показывает, что даёт вертолётная формула с пропеллерными коэффициентами.</p>
+<h4 class="md-subheading">Шаг 6. Прошивка стенда (ESP32, PlatformIO)</h4>
+<p><code>platformio.ini</code>: <code>platform = espressif32</code>, <code>board = esp32dev</code>, <code>framework = arduino</code>, <code>monitor_speed = 115200</code>. HX711 читается вручную, без библиотеки, чтобы было видно критическую секцию. Безопасность работает на своём таймере каждые 100 мс: отвалился HX711 — газ всё равно сбросится.</p>
+<pre class="cli-block"><code>// Thrust stand: HX711 (thrust) + INA226 (V, I) + optical tach (RPM) + ESC PWM. CSV at 10 Hz.
+#include &lt;Arduino.h&gt;
+#include &lt;Wire.h&gt;
+
+const int HX_DOUT = 16, HX_SCK = 17, ESC_PIN = 25, TACH_PIN = 27;
+const float I_LIMIT = 16.0f;          // A: MN4006 KV380 peak 16 A (180 s); fuse 20 A in series
+const uint32_t CMD_TIMEOUT_MS = 500;  // no command from the PC -&gt; throttle 0
+const int RAMP_PER_TICK = 2;          // % per 100 ms tick = 20 %/s
+const uint8_t INA = 0x40;
+const int TACH_PPR = 1;               // reflective marks per revolution
+
+portMUX_TYPE hxMux = portMUX_INITIALIZER_UNLOCKED;
+volatile uint32_t tachPeriodUs = 0, tachLastUs = 0;
+bool armed = false; int thrCmd = 0, thrOut = 0; uint32_t lastCmdMs = 0;
+
+int32_t hx711Read() {                 // call only when DOUT is low (data ready)
+  uint32_t v = 0;
+  portENTER_CRITICAL(&amp;hxMux);         // PD_SCK high &gt; 60 us = power-down: no interrupts here
+  for (int i = 0; i &lt; 25; i++) {      // 24 data bits + 25th pulse: channel A, gain 128
+    digitalWrite(HX_SCK, HIGH); delayMicroseconds(1);
+    if (i &lt; 24) v = (v &lt;&lt; 1) | digitalRead(HX_DOUT);
+    digitalWrite(HX_SCK, LOW);  delayMicroseconds(1);
+  }
+  portEXIT_CRITICAL(&amp;hxMux);
+  if (v &amp; 0x800000) v |= 0xFF000000;  // sign-extend 24-bit two&#x27;s complement
+  return (int32_t)v;
+}
+
+void inaWrite(uint8_t reg, uint16_t val) {
+  Wire.beginTransmission(INA); Wire.write(reg); Wire.write(val &gt;&gt; 8); Wire.write(val &amp; 0xFF);
+  Wire.endTransmission();
+}
+int16_t inaRead(uint8_t reg) {
+  Wire.beginTransmission(INA); Wire.write(reg); Wire.endTransmission(false);
+  Wire.requestFrom(INA, (uint8_t)2);
+  return (int16_t)((Wire.read() &lt;&lt; 8) | Wire.read());
+}
+
+void IRAM_ATTR tachIsr() { uint32_t now = micros(); tachPeriodUs = now - tachLastUs; tachLastUs = now; }
+
+void escWriteUs(int us) {             // 50 Hz, 16-bit: 1 us = 65536 / 20000 counts
+  uint32_t duty = ((uint32_t)us * 65536UL + 10000UL) / 20000UL;
+#if ESP_ARDUINO_VERSION_MAJOR &gt;= 3
+  ledcWrite(ESC_PIN, duty);
+#else
+  ledcWrite(0, duty);
+#endif
+}
+
+void safetyTick(float amps) {         // runs every 100 ms
+  if (millis() - lastCmdMs &gt; CMD_TIMEOUT_MS) thrCmd = 0;
+  if (armed &amp;&amp; amps &gt; I_LIMIT) { armed = false; Serial.println(&quot;#TRIP overcurrent&quot;); }
+  int target = armed ? thrCmd : 0;
+  if (!armed) thrOut = 0;             // disarm cuts immediately, ramp only upwards
+  else thrOut += constrain(target - thrOut, -100, RAMP_PER_TICK);
+  escWriteUs(1000 + thrOut * 10);
+}
+
+void handleSerial() {                 // &quot;arm&quot;, &quot;disarm&quot;, &quot;t55&quot; (throttle %), sent &gt;= 2 Hz by the PC
+  if (!Serial.available()) return;
+  String s = Serial.readStringUntil(&#x27;\n&#x27;); s.trim();
+  lastCmdMs = millis();
+  if (s == &quot;arm&quot; &amp;&amp; thrOut == 0) armed = true;
+  else if (s == &quot;disarm&quot;) armed = false;
+  else if (s.startsWith(&quot;t&quot;)) thrCmd = constrain(s.substring(1).toInt(), 0, 100);
+}
+
+void setup() {
+  Serial.begin(115200);
+  pinMode(HX_SCK, OUTPUT); digitalWrite(HX_SCK, LOW); pinMode(HX_DOUT, INPUT);
+  pinMode(TACH_PIN, INPUT_PULLUP); attachInterrupt(TACH_PIN, tachIsr, FALLING);
+  Wire.begin();
+  inaWrite(0x00, 0x4527);             // AVG 16, VBUSCT = VSHCT = 1.1 ms, continuous
+  inaWrite(0x05, 2048);               // CAL = 0.00512 / (1.25 mA * 2 mOhm)
+#if ESP_ARDUINO_VERSION_MAJOR &gt;= 3
+  ledcAttach(ESC_PIN, 50, 16);
+#else
+  ledcSetup(0, 50, 16); ledcAttachPin(ESC_PIN, 0);
+#endif
+  escWriteUs(1000);
+  Serial.println(&quot;ms,thr,raw,volt,amp,rpm&quot;);
+}
+
+void loop() {
+  handleSerial();
+  static uint32_t tSafe = 0; static float volt = 0, amp = 0;
+  if (millis() - tSafe &gt;= 100) {      // safety runs on its own clock: a dead HX711 must not stop it
+    tSafe += 100;
+    volt = inaRead(0x02) * 0.00125f; amp = inaRead(0x04) * 0.00125f;
+    safetyTick(amp);
+  }
+  if (digitalRead(HX_DOUT) == LOW) {  // HX711 RATE=0: a new sample every 100 ms
+    int32_t raw = hx711Read();
+    uint32_t per = tachPeriodUs;
+    float rpm = (per &amp;&amp; micros() - tachLastUs &lt; 500000UL) ? 60e6f / (per * TACH_PPR) : 0;
+    Serial.printf(&quot;%lu,%d,%ld,%.3f,%.3f,%.0f\n&quot;, millis(), thrOut, (long)raw, volt, amp, rpm);
+  }
+}</code></pre>
+<p>Без платы логику проверяют на ПК: тот же <code>main.cpp</code> собирается <code>g++ -std=c++17</code> с подменой Arduino API (stubs) и симуляторами HX711 и INA226; в тесте безопасности HX711 всё время «не готов». Вывод:</p>
+<pre class="cli-block"><code>HX711 decode:
+  sent         0 -&gt; read         0
+  sent         1 -&gt; read         1
+  sent        -1 -&gt; read        -1
+  sent   8388607 -&gt; read   8388607
+  sent  -8388608 -&gt; read  -8388608
+  sent    421646 -&gt; read    421646
+Safety (HX711 not ready the whole time):
+  t= 500 ms thrOut=10% ESC=1100 us
+  t= 900 ms thrOut=18% ESC=1180 us
+  t=1300 ms thrOut=26% ESC=1260 us
+  t=1700 ms thrOut=34% ESC=1340 us
+  700 ms without commands: thrOut=0% ESC=1000 us
+  re-armed: thrOut=20%
+  serial&gt; #TRIP overcurrent
+  17 A: armed=0 thrOut=0% ESC=1000 us</code></pre>
+<p>Знак расширяется верно на границах шкалы, рампа держит 20 %/с, тишина 500 мс и ток 17 А сбрасывают газ — при мёртвом HX711.</p>
+<h4 class="md-subheading">Переход на реальное железо</h4>
+<p>Железо: ESP32 DevKit, балка 5 кг (запас 2.2× к 2228 г), HX711 с RATE = 0, INA226 с шунтом 2 мОм в минусе, оптодатчик, ESC с PWM-входом, предохранитель 20 А, БП 24 В с лимитом тока или 6S. Конец лопасти 15&quot; на 6177 об/мин идёт со скоростью π·0.381·103 ≈ 123 м/с: обломок пропа — это пуля.</p>
+<ol><li><strong>Механика, пропа нет.</strong> Стенд на двух струбцинах, поток от балки и от людей, до стен, пола и потолка ≥ 1–2 диаметра пропа (ближе рециркуляция меняет тягу). Вокруг диска — кольцо или сетка. Плоскость вращения — запретная зона, работаешь в очках.</li><li><strong>Электрика, пропа нет.</strong> Первое включение через smoke stopper или БП с лимитом 2 А. Проверь, что INA226 показывает напряжение БП ±0.05 В по мультиметру, а ток растёт при газе, а не падает (полярность шунта). Проверь направление вращения и обороты на 20 % газа по оптодатчику и по тахометру.</li><li><strong>Калибровка, пропа нет.</strong> Прогрей 15 мин. Нагружай гирями 0–100–200–500–1000–2000 г вдоль оси пропа (блок на подшипнике), потом разгружай. По 20 отсчётов на точку. Посчитай k, остатки и гистерезис скриптом шага 2. Оставь 1000 г на 10 мин — это ползучесть.</li><li><strong>Аварийные пути, пропа нет.</strong> Выдерни USB — газ должен уйти в 0 за 0.5 с. Временно поставь <code>I_LIMIT</code> = 1 А — должен быть <code>#TRIP</code>. Вынь провод DOUT HX711 — безопасность должна работать дальше.</li><li><strong>Прогон, проп установлен (только здесь).</strong> Затяни гайку, убедись в направлении. Пульт скрипта на ПК шлёт команду ≥ 2 Гц. Нуль 20 с, затем 7 ступеней по 10 с (50…100 %), снова нуль 20 с. Аварийный выключатель питания ESC держишь в руке. На 100 % экземпляр из примера берёт 15.75 А — почти лимит 16 А (паспортный пик — 16 А на 180 с), поэтому верхнюю ступень держи не дольше 10 с. Запиши температуру и давление и посчитай ρ.</li><li><strong>Обработка</strong> — тем же скриптом. Сравнение с таблицей — при равной тяге.</li></ol>
+<p>Критерии железа: остаток калибровки ≤ 3 г, дрейф нуля ≤ 5 г и учтён, ≥ 5 точек газа, C_T постоянен в пределах ±5 %, расхождение г/Вт с паспортом при равной тяге объяснено с U (k = 2).</p>
+<p>Лабораторная засчитывается, когда: (основной путь) генератор и обработка запущены и k, дрейф и таблица точек совпадают с приведёнными; бюджет неопределённости посчитан для одной точки; по C_T и г/Вт сделан вывод, где потери — в пропе или в приводе; FM посчитан из паспортного момента правильной формулой; (железо) выполнены пункты 1–6, аварийные пути проверены без пропа, выполнены критерии железа.</p>
+
+<h2>Діагностика</h2>
+<div class="diag-groups"><article class="diag-item"><h4><strong>Симптом:</strong> редкие огромные скачки тяги (тысячи граммов) или значения около ±8388608</h4><ul><li>Возможная причина: прерывание (Wi-Fi, другой ISR) растянуло импульс PD_SCK дольше 60 мкс — HX711 ушёл в power-down или сдвинул биты.</li><li>Что сделать: чтение в <code>portENTER_CRITICAL</code>, Wi-Fi выключить на время прогона, отбрасывать отсчёты на границах шкалы.</li><li>Что видно в логе: одиночные выбросы на ровном сигнале.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> при постоянной нагрузке показания медленно растут, ноль после прогона не совпадает с нулём до</h4><ul><li>Возможная причина: ползучесть балки и температурный уход нуля (±0.2 % FS на 10 °C — до ±10 г у балки 5 кг).</li><li>Что сделать: прогрев 15 мин, нуль до и после, линейная поправка по времени, короткие ступени.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> тяга со знаком минус или растёт при снятии гири</h4><ul><li>Возможная причина: перепутаны A+ и A− или балка стоит вверх ногами; под мотором — перевёрнут проп или неверное вращение.</li><li>Что сделать: поменять провода сигнала или знак k, проверить проп и направление.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> тяга на 10–20 % выше паспорта при нормальном токе</h4><ul><li>Возможная причина: калибровали в другой точке приложения силы (ошибка плеча), или блок с трением съел часть веса гирь; проп близко к полу или стене.</li><li>Что сделать: калибровать вдоль оси пропа, проверить гистерезис, отодвинуть стенд на 1–2 D.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> C_T совпадает с паспортом, а г/Вт ниже на 5–15 %</h4><ul><li>Возможная причина: потери в приводе — другой ESC и тайминг, тонкие или длинные провода, напряжение меряется на БП, а не на ESC.</li><li>Что сделать: мерить U на входе ESC, сравнить с ESC из таблицы, проверить сечения.</li><li>Последствия: время висения будет меньше паспортного расчёта в той же пропорции.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> обороты вдвое выше ожидаемых или C_T скачет от точки к точке</h4><ul><li>Возможная причина: оптодатчик ловит две метки или блики от лопастей, неверный <code>TACH_PPR</code> или делитель полюсов для eRPM.</li><li>Что сделать: одна матовая метка, экран от света, сверка с внешним тахометром.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> мотор продолжает крутиться, когда завис ПК или отвалился датчик</h4><ul><li>Возможная причина: безопасность привязана к циклу чтения датчика или нет таймаута команды.</li><li>Что сделать: отдельный таймер безопасности, таймаут 0.5 с, аппаратный выключатель питания ESC.</li><li>Последствия: неуправляемый проп 15&quot; — травма.</li></ul></article></div>
+
+<h2>Чек-лист</h2>
+<ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="des-thrust-stand:0"><span>Стенд на струбцинах, проп за кольцом, до стен ≥ 1–2 D</span></label></li><li><label><input type="checkbox" data-check-id="des-thrust-stand:1"><span>Лимит тока и таймаут проверены без пропа</span></label></li><li><label><input type="checkbox" data-check-id="des-thrust-stand:2"><span>Калибровка вдоль оси пропа, k и остатки записаны</span></label></li><li><label><input type="checkbox" data-check-id="des-thrust-stand:3"><span>Ноль до и после прогона, дрейф учтён</span></label></li><li><label><input type="checkbox" data-check-id="des-thrust-stand:4"><span>г/Вт сравнено с паспортом при равной тяге, U (k = 2) указана</span></label></li></ul>
+
+<h2>Джерела</h2>
+<ul class="refs"><li><a href="https://store.tmotor.com/product/mn4006-kv380-motor-antigravity-type.html" target="_blank" rel="noopener noreferrer">T-Motor — MN4006 KV380 Antigravity: specifications and test data</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://cdn.sparkfun.com/datasheets/Sensors/ForceFlex/hx711_english.pdf" target="_blank" rel="noopener noreferrer">Avia Semiconductor — HX711 24-bit ADC for weigh scales, datasheet</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://www.ti.com/lit/ds/symlink/ina226.pdf" target="_blank" rel="noopener noreferrer">Texas Instruments — INA226 current/power monitor, datasheet</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://cdn.shopify.com/s/files/1/0761/6561/1847/files/TAL220F.pdf" target="_blank" rel="noopener noreferrer">HTC Sensor — TAL220F miniature load cell, datasheet</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://m-selig.ae.illinois.edu/pubs/BrandtSelig-2011-AIAA-2011-1255-LRN-Propellers.pdf" target="_blank" rel="noopener noreferrer">Brandt, Selig — Propeller Performance Data at Low Reynolds Numbers (AIAA 2011-1255)</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://docs.espressif.com/projects/arduino-esp32/en/latest/api/ledc.html" target="_blank" rel="noopener noreferrer">Espressif — Arduino-ESP32 LEDC API</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://github.com/bogde/HX711" target="_blank" rel="noopener noreferrer">bogde/HX711 — Arduino library for HX711 (alternative to manual reading)</a> <span class="gc-tag" data-state="info">primary</span></li></ul>
+<h2>Задачі з числовою відповіддю</h2>
+<uav-tasks src="../tasks/des-thrust-stand.json" module="des-thrust-stand"></uav-tasks>
+<h2>Перевір себе</h2>
+<uav-quiz src="../quiz/des-thrust-stand.json" module="des-thrust-stand"></uav-quiz>
+      </div>
+      <div class="module-done"><gc-button variant="secondary" data-done-toggle="des-thrust-stand">Позначити як пройдений</gc-button></div>
+      <section class="related" aria-label="Суміжні модулі"><p class="gc-label gc-muted">Суміжні модулі</p><div class="gc-grid ref-grid"><a class="gc-card" href="f-aero-props.html"><strong>Аеродинаміка пропелера та підбір силової установки</strong><div class="gc-card__meta"><span class="gc-tag" title="L2 — Интегратор">L2</span></div></a><a class="gc-card" href="f-motors-esc.html"><strong>Мотори, ESC і DShot</strong><div class="gc-card__meta"><span class="gc-tag" title="L1 — Оператор">L1</span></div></a><a class="gc-card" href="el-measure.html"><strong>Вимірювання: мультиметр, осцилограф, логічний аналізатор</strong><div class="gc-card__meta"><span class="gc-tag" title="L2 — Интегратор">L2</span></div></a><a class="gc-card" href="comp-esp32.html"><strong>ESP32 і периферія</strong><div class="gc-card__meta"><span class="gc-tag" title="L2 — Интегратор">L2</span></div></a><a class="gc-card" href="f-safety.html"><strong>Безпека та передпольотна перевірка</strong><div class="gc-card__meta"><span class="gc-tag" title="L1 — Оператор">L1</span></div></a></div></section>
+      <nav class="pager" aria-label="Сусідні модулі" data-track-pager><a class="gc-card pager__prev" href="des-sizing.html"><span class="gc-label gc-muted">Назад · трек</span><br>Проектирование под задачу: ТЗ → масса, энергия, тяга, конфигурация</a><a class="gc-card pager__next" href="aero-stability.html"><span class="gc-label gc-muted">Далі · трек</span><br>Самолёт: устойчивость, центровка, статический запас, поляра</a></nav><nav class="pager" aria-label="Сусідні кроки шляху Betaflight" data-path-pager="betaflight" hidden><a class="gc-card pager__prev" href="des-sizing.html?path=betaflight"><span class="gc-label gc-muted">Назад · шлях Betaflight</span><br>Проектирование под задачу: ТЗ → масса, энергия, тяга, конфигурация</a><a class="gc-card pager__next" href="bf-pid-reg-in-bf.html?path=betaflight"><span class="gc-label gc-muted">Далі · крок 34 з 46</span><br>PID-регулятор у Betaflight</a></nav><nav class="pager" aria-label="Сусідні кроки шляху ArduPilot" data-path-pager="ardupilot" hidden><a class="gc-card pager__prev" href="des-sizing.html?path=ardupilot"><span class="gc-label gc-muted">Назад · шлях ArduPilot</span><br>Проектирование под задачу: ТЗ → масса, энергия, тяга, конфигурация</a><a class="gc-card pager__next" href="el-emi.html?path=ardupilot"><span class="gc-label gc-muted">Далі · крок 44 з 72</span><br>Завади та електромагнітна сумісність</a></nav>
+    </article>
+  </main>
+  <footer class="gc-container site-footer gc-muted">
+    <p>Відкритий курс · <a href="https://github.com/irreligious86/UAV-Education">вихідний код на GitHub</a> · <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">план розвитку</a> · <a href="../../curriculum/curriculum.html">для розробника</a> · CC BY-NC-SA 4.0</p>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="uk" data-theme="dark" data-lang="uk">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Миксер и распределение управления: матрица, насыщение, PX4 Control Allocation, наклонные моторы — UAV Student</title>
+  <meta name="description" content="построить матрицу эффективности и миксер своей рамы через псевдообратную объяснить, какая ось уступает при насыщении в PX4, ArduPilot и Betaflight перенести матрицу в CA_*, mmix и Lua MotorsMatrix с верными знаками">
+  <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
+  <link rel="manifest" href="../../manifest.webmanifest">
+  <meta name="theme-color" content="#0b0f14">
+  <link rel="alternate" hreflang="ru" href="../../m/ctl-allocation.html">
+  <link rel="alternate" hreflang="uk" href="../../uk/m/ctl-allocation.html">
+  <link rel="alternate" hreflang="en" href="../../en/m/ctl-allocation.html">
+  <link rel="alternate" hreflang="uk-galych" href="../../gal/m/ctl-allocation.html">
+  <script>/* go to the visitor's chosen language before anything paints (assets/i18n.js) */(function(){try{var c=localStorage.getItem('uav-lang'),h=document.documentElement.getAttribute('data-lang');if(!c||c===h||/[?&]lang=keep\b/.test(location.search))return;var l=document.querySelector('link[rel=alternate][hreflang="'+c+'"]');if(l)location.replace(l.href+location.search+location.hash)}catch(e){}})();</script>
+  <link rel="stylesheet" href="../../lib/ground-control-ui/dist/ground-control.css">
+  <link rel="stylesheet" href="../../assets/site.css">
+  <script src="../../lib/ground-control-ui/dist/ground-control.js" defer></script>
+  <script src="../../assets/i18n/uk.js"></script>
+  <script src="../../assets/i18n.js"></script>
+  <script src="../../assets/progress-store.js" defer></script>
+  <script src="../../assets/backend-config.js" defer></script>
+  <script src="../../assets/account.js" defer></script>
+  <script src="../../assets/grading.js" defer></script>
+  <script src="../../assets/app.js" defer></script>
+  <script src="../../assets/uav-quiz.js" defer></script>
+  <script src="../../assets/uav-tasks.js" defer></script>
+  <script src="../../assets/offline.js" defer></script>
+</head>
+<body class="gc-root" data-base="../" data-root="../../">
+  <header class="site-header">
+    <div class="gc-container site-header__inner">
+      <a class="site-brand" href="../index.html"><span class="site-brand__mark" aria-hidden="true">◆</span> UAV Student</a>
+      <nav class="gc-nav" aria-label="Розділи сайту">
+        <a href="../index.html" aria-current="page">Курс</a>
+        <a href="../ref/index.html">Довідник</a>
+        <a href="../pages/glossary.html">Глосарій</a>
+        <a href="../pages/fails.html">Фейли</a>
+        <a href="../pages/search.html">Пошук</a>
+        <a href="../pages/progress.html">Мій прогрес</a>
+      </nav>
+      <nav class="lang-switch" aria-label="Мова"><a class="gc-tag" href="../../m/ctl-allocation.html" data-lang-to="ru" hreflang="ru" lang="ru" title="Русский">RU</a><a class="gc-tag" href="../../uk/m/ctl-allocation.html" data-lang-to="uk" hreflang="uk" lang="uk" title="Українська" aria-current="true" data-state="ok">UK</a><a class="gc-tag" href="../../en/m/ctl-allocation.html" data-lang-to="en" hreflang="en" lang="en" title="English">EN</a><a class="gc-tag" href="../../gal/m/ctl-allocation.html" data-lang-to="uk-galych" hreflang="uk-galych" lang="uk-galych" title="Галицька (експеримент)">GAL</a></nav>
+    </div>
+  </header>
+  <main class="gc-container site-main">
+    <article class="module" data-module-page="ctl-allocation">
+      <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-designer">Конструктор</a><span>Миксер и распределение управления: матрица, насыщение, PX4 Control Allocation, наклонные моторы</span></p>
+      <h1 class="module-title">Миксер и распределение управления: матрица, насыщение, PX4 Control Allocation, наклонные моторы</h1>
+      <div class="module-tags"><span class="gc-tag" title="Рівень">L3 — Спеціаліст</span><span class="gc-tag">читання 45 хв</span><span class="gc-tag">навчання ~4 год</span><span class="gc-tag">PX4 1.15–1.17 · ArduCopter 4.6 · Betaflight 4.5</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ОПАНОВАНО</span></div>
+      <p class="gc-muted module-score" data-module-score></p>
+      <p class="module-lead">Регулятор выдаёт три момента и тягу, а моторов 4, 6 или 8, и стоят они где угодно. Перевод делает миксер (в PX4 — control allocation). Ты соберёшь его на Python так же, как PX4: матрица эффективности, псевдообратная, нормировка, последовательная десатурация. Затем прогонишь неудобные случаи: dead cat с ЦТ не по центру, манёвр на упоре, гексу без мотора, наклонные моторы, и перенесёшь результат в Betaflight (<code>mmix</code>), ArduPilot (<code>FRAME_CLASS</code> 15 + Lua) и PX4 (<code>CA_*</code>, вкладка Actuators). Лабораторная: свой фрейм в Python и PX4 SITL, отказ мотора в SIH, на железе — тест моторов без пропов и лог висения.</p>
+      <div class="gc-callout" data-state="ok"><strong>Після модуля ти вмієш</strong><ul><li>построить матрицу эффективности и миксер своей рамы через псевдообратную</li><li>объяснить, какая ось уступает при насыщении в PX4, ArduPilot и Betaflight</li><li>перенести матрицу в CA_*, mmix и Lua MotorsMatrix с верными знаками</li></ul></div><p class="gc-muted">Перед цим модулем: <a href="math-linalg-rot.html">Вектори, матриці та обертання: мова орієнтації</a>, <a href="px4-control.html">Контури керування та тюнінг PX4</a></p><div class="gc-callout lab"><p class="gc-label gc-muted">Лабораторна</p><strong>Свой миксер: Python → PX4 SITL → тест моторов</strong><p class="gc-muted lab__hint">Здано, коли позначено всі пункти:</p><ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="ctl-allocation:lab:0"><span>Столбцы mix и распределение тяги своего фрейма посчитаны в Python и объяснены геометрией</span></label></li><li><label><input type="checkbox" data-check-id="ctl-allocation:lab:1"><span>Таблица насыщения (обрезка, десатурация, airmode) повторена для своего фрейма, указано, какая ось уступает первой</span></label></li><li><label><input type="checkbox" data-check-id="ctl-allocation:lab:2"><span>В SIH-гексе после failure motor off есть motor_stop_mask, записано, сработало ли удаление из матрицы, выходы сравнены с расчётом</span></label></li><li><label><input type="checkbox" data-check-id="ctl-allocation:lab:3"><span>Тест моторов без пропов совпал со схемой, лог висения: отношение выходов в пределах ±5 % от расчёта, ни один мотор не выше 90 %</span></label></li></ul></div><div class="path-pos gc-muted"><span class="gc-label">На шляху</span><ul><li data-path-pos="px4"><a href="../path/px4.html">PX4</a>: крок 17 з 37 → <a href="px4-ros2.html?path=px4">PX4 і ROS 2: uXRCE-DDS та offboard</a></li></ul></div>
+      <div class="gc-prose module-body">
+<div class="gc-callout" data-state="caution" data-untranslated><strong>Модуль ещё не переведён.</strong> Ниже — оригинал (Русский). Прогресс и оценки общие для всех языков.</div>
+<h2>Теорія</h2>
+<h4 class="md-subheading">Матрица эффективности B</h4>
+<p>Каждый мотор i с нормированной командой uᵢ ∈ [0, 1] создаёт силу и момент. PX4 считает их по формуле из <code>ActuatorEffectivenessRotors.cpp</code> (одинаково в 1.15, 1.16 и 1.17):</p>
+<ul><li>тяга: <strong>Fᵢ = CT · aᵢ</strong>, где aᵢ — единичная ось ротора (<code>CA_ROTORn_AX/AY/AZ</code>, по умолчанию (0, 0, −1), то есть вверх в осях FRD);</li><li>момент: <strong>Mᵢ = CT · (pᵢ × aᵢ) − CT · KM · aᵢ</strong>, где pᵢ — положение ротора относительно ЦТ в метрах (<code>CA_ROTORn_PX/PY/PZ</code>), <code>KM</code> — отношение реактивного момента к тяге: положительное у CCW-ротора, отрицательное у CW (умолчания <code>CT</code> = 6.5, <code>KM</code> = 0.05).</li></ul>
+<p>Столбцы [Mx My Mz Fx Fy Fz]ᵀ образуют матрицу B размером 6×N; нужно найти u, при котором B·u равно запрошенным моментам и тяге. У коптера с вертикальными моторами строки Fx и Fy нулевые, независимых осей четыре.</p>
+<h4 class="md-subheading">Псевдообратная и нормировка</h4>
+<p>При N &gt; 4 решений бесконечно много. PX4 берёт псевдообратную M = pinv(B), то есть решение с минимальной нормой u, и нормирует столбцы (<code>ControlAllocationPseudoInverse.cpp</code>): крен и тангаж приводит к общему масштабу, рыскание к максимуму 1, тягу к среднему по моторам. Так <code>MC_*RATE_K</code> значат одно и то же на любой раме, но если геометрия меняет физическую эффективность оси, меняется и усиление контура (шаг 5).</p>
+<p>Betaflight и ArduPilot получают готовые коэффициенты roll/pitch/yaw/throttle на мотор (ArduPilot приводит их к ±0.5 в <code>normalise_rpy_factors</code>). Знаки различаются — главная ошибка при переносе:</p>
+<div class="table-wrap md-table-wrap" tabindex="0"><table class="md-table"><thead><tr><th>Прошивка</th><th>Где матрица</th><th>Знак pitch у заднего мотора</th><th>Рыскание у CW</th></tr></thead><tbody><tr><td data-label="Прошивка">PX4</td><td data-label="Где матрица">считается из <code>CA_ROTORn_*</code></td><td data-label="Знак pitch у заднего мотора">отрицательный (нос вверх = +My)</td><td data-label="Рыскание у CW"><code>KM</code> &lt; 0</td></tr><tr><td data-label="Прошивка">ArduPilot</td><td data-label="Где матрица"><code>add_motor_raw(n, roll, pitch, yaw, order)</code></td><td data-label="Знак pitch у заднего мотора">отрицательный (как PX4)</td><td data-label="Рыскание у CW">−1</td></tr><tr><td data-label="Прошивка">Betaflight</td><td data-label="Где матрица"><code>mmix n THR ROLL PITCH YAW</code></td><td data-label="Знак pitch у заднего мотора"><strong>положительный</strong> (<code>mixerQuadX</code>)</td><td data-label="Рыскание у CW">−1 (документация: 1 = CCW)</td></tr></tbody></table></div>
+<h4 class="md-subheading">Насыщение: кто уступает первым</h4>
+<p>Когда команда выходит за [0, 1], кто-то уступает:</p>
+<ul><li><strong>PX4</strong> (<code>CA_METHOD</code> = 1 или 2 = Auto, которое для мультиротора выбирает последовательную десатурацию, <code>ControlAllocationSequentialDesaturation.cpp</code>). При <code>MC_AIRMODE</code> = 0 тягу разрешено только уменьшать, затем ужимаются крен и тангаж, рыскание добавляется последним и режется первым; для него верхнюю границу временно поднимают на 15 % (<code>MINIMUM_YAW_MARGIN</code>). При <code>MC_AIRMODE</code> = 1 тягу можно и поднять ради крена/тангажа, при 2 — ещё и ради рыскания. <code>CA_METHOD</code> = 0 просто обрезает выходы, и оси начинают влиять друг на друга.</li><li><strong>ArduPilot</strong> (<code>AP_MotorsMatrix::output_armed_stabilizing</code>). Сначала ограничивается рыскание до того, что влезает при «лучшем» газе, но не меньше <code>MOT_YAW_HEADROOM</code>/1000 (умолчание 200 → 0.2). Если roll+pitch+yaw всё равно шире диапазона, они масштабируются вместе, а газ сдвигается; ставятся флаги <code>limit.*</code>. Air-mode в Acro включается через <code>ACRO_OPTIONS</code> бит 0 или RC-опцию 84.</li><li><strong>Betaflight</strong> (<code>mixer.c</code>, <code>mixer_type</code> = LEGACY по умолчанию). Если размах roll+pitch+yaw больше 1, все три оси делятся на размах одинаково, после чего газ сдвигается так, чтобы всё уместилось. Без airmode при газе ниже 50 % размах дополнительно ужимается до 0.5…1. Приоритет крена над рысканием получается раньше, на PID: <code>pidsum_limit</code> = 500 против <code>pidsum_limit_yaw</code> = 400.</li></ul>
+<h4 class="md-subheading">Отказ мотора на гексе</h4>
+<p>На гексе X с чередованием вращения (PNPNPN) после потери одного мотора псевдообратная сама загоняет противоположный мотор в 0, и висение держат четыре оставшихся. Каждый тянет W/4 вместо W/6 — в 1.5 раза больше. Мотор на нуле упирается в границу, и в части направлений запаса по моменту нет (шаг 4). Раскладка PPNNPN (пример <code>MotorMatrix_fault_tolerant_hex.lua</code> в ArduPilot) часть отказов переживает с запасом по всем осям.</p>
+<p>Как реагируют прошивки:</p>
+<ul><li><strong>PX4.</strong> <code>CA_FAILURE_MODE</code> = 1 убирает отказавший мотор из матрицы (в 1.15–1.17 это единственный режим, кроме 0 = Ignore). Об отказе узнают от детектора по току ESC: <code>FD_ACT_EN</code>, <code>FD_ACT_MOT_THR</code> = 0.2, <code>FD_ACT_MOT_C2T</code> = 2.0 А/%, <code>FD_ACT_MOT_TOUT</code> = 100 мс (1.15–1.17); действие задаётся в <code>COM_ACT_FAIL_ACT</code>. В ветке main режимы расширены: 1 и 2 вдобавок останавливают или реверсируют противоположный мотор гексы.</li><li><strong>ArduPilot.</strong> Детектор <code>thrust_loss_check</code> включает thrust boost, если 1 с аппарат снижается при газе ≥ 90 % (или упоре по газу) и целевом наклоне &lt; 15°. В GCS приходит сообщение «Potential Thrust Loss (N)». Мотор с наибольшим фильтрованным выходом считается потерянным и исключается из расчёта насыщения; детектор дисбаланса тяги работает только при ≥ 6 моторах.</li><li><strong>Betaflight.</strong> Отдельной обработки отказа мотора нет.</li></ul>
+<h4 class="md-subheading">Наклонные моторы</h4>
+<p>Если ось мотора наклонить по касательной к окружности на угол θ в ту же сторону, куда действует его реактивный момент, плечо r тоже начинает работать на рыскание:</p>
+<p><strong>Mz = CT · (r · sinθ + |KM| · cosθ)</strong>, а вертикальная тяга падает как <strong>cosθ</strong>.</p>
+<p>При r = 0.246 м и KM = 0.05 наклон 10° даёт ×1.84 по рысканию ценой 1.5 % тяги; боковые силы пар взаимно гасятся. В PX4 наклон — это ось <code>CA_ROTORn_AX/AY/AZ</code>. В матрицах ArduPilot и Betaflight оси ротора нет, а одинаковое увеличение yaw у всех моторов съест нормировка.</p>
+<figure class="diagram" data-diagram="alloc-pipeline"><div class="diagram__svg"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 240" width="100%" role="img" aria-labelledby="t" style="max-width:720px;display:block;margin:0 auto"><title id="t">Распределение управления в PX4: от моментов к моторам</title><style>text{font-family: var(--gc-font-mono, ui-monospace, Menlo, monospace); font-size: 12px;fill:currentColor} .m{fill:var(--gc-ink-muted, #8a93a3)} .a{fill:var(--gc-accent-hud, #5ef1d2)} .w{fill:var(--gc-signal-amber, #f0b24c)} .d{fill:var(--gc-signal-red, #e8636b)} .box{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:currentColor;stroke-width:1.2} .boxa{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6} .ln{stroke:currentColor;stroke-width:1.2;fill:none} .lna{stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6;fill:none} .lnm{stroke:var(--gc-ink-muted, #8a93a3);stroke-width:1;fill:none;stroke-dasharray:4 3} .t{font-size:11px} .b{font-weight:600}</style><defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker><marker id="ara" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--gc-accent-hud, #5ef1d2)"/></marker></defs><rect class="boxa" x="10" y="30" width="140" height="44" rx="6"/><text x="80.0" y="49.0" text-anchor="middle" class="b">mc_rate_control</text><text x="80.0" y="63.0" text-anchor="middle" class="b">моменты + тяга</text><rect class="box" x="190" y="120" width="150" height="60" rx="6"/><text x="265.0" y="140.0" text-anchor="middle">Матрица B</text><text x="265.0" y="154.0" text-anchor="middle">CA_ROTORn_P*, A*,</text><text x="265.0" y="168.0" text-anchor="middle">CT, KM</text><rect class="boxa" x="190" y="20" width="150" height="60" rx="6"/><text x="265.0" y="40.0" text-anchor="middle" class="b">Псевдообратная</text><text x="265.0" y="54.0" text-anchor="middle" class="b">M = pinv(B),</text><text x="265.0" y="68.0" text-anchor="middle" class="b">нормировка</text><rect class="boxa" x="390" y="20" width="150" height="60" rx="6"/><text x="465.0" y="40.0" text-anchor="middle" class="b">Десатурация</text><text x="465.0" y="54.0" text-anchor="middle" class="b">CA_METHOD,</text><text x="465.0" y="68.0" text-anchor="middle" class="b">MC_AIRMODE</text><rect class="box" x="575" y="30" width="135" height="44" rx="6"/><text x="642.5" y="49.0" text-anchor="middle">actuator_motors</text><text x="642.5" y="63.0" text-anchor="middle">0…1 на мотор</text><rect class="box" x="390" y="130" width="150" height="44" rx="6"/><text x="465.0" y="149.0" text-anchor="middle">Отказ мотора</text><text x="465.0" y="163.0" text-anchor="middle">CA_FAILURE_MODE</text><rect class="box" x="575" y="130" width="135" height="44" rx="6"/><text x="642.5" y="149.0" text-anchor="middle">PWM_MAIN_FUNCn</text><text x="642.5" y="163.0" text-anchor="middle">DShot/PWM → ESC</text><path class="ln" d="M150 52.0 L170.0 52.0 L170.0 50.0 L190 50.0" marker-end="url(#ar)"/><text x="170.0" y="44.0" text-anchor="middle" class="m t" style="font-size:10px">τ, F</text><path class="ln" d="M265.0 120 L265.0 80" marker-end="url(#ar)"/><path class="ln" d="M340 50.0 L390 50.0" marker-end="url(#ar)"/><text x="365.0" y="43.0" text-anchor="middle" class="m t" style="font-size:10px">M·sp</text><path class="lna" d="M540 50.0 L557.5 50.0 L557.5 52.0 L575 52.0" marker-end="url(#ara)"/><path class="ln" d="M390 152.0 L365.0 152.0 L365.0 150.0 L340 150.0" marker-end="url(#ar)"/><text x="365.0" y="144.0" text-anchor="middle" class="m t" style="font-size:10px">−столбец</text><path class="ln" d="M642.5 74 L642.5 130" marker-end="url(#ar)"/><text x="10" y="206" text-anchor="start" class="m t">Приоритет: тяга и крен/тангаж держатся,</text><text x="10" y="220" text-anchor="start" class="m t">рыскание отдаётся первым (запас 15 %)</text></svg></div><figcaption class="gc-muted">PX4 строит B по CA_ROTORn_*, обращает её один раз при смене параметров, а в каждом цикле только умножает и десатурирует; отказ мотора — это удаление столбца, а не новый регулятор.</figcaption><div class="diagram__hint">Схему можно прокрутить по горизонтали</div></figure>
+
+<h2>Практика</h2>
+<p>Основной путь — Python 3 + numpy/scipy (numpy 2.5.3, scipy 1.18.1) и PX4 SITL. PX4 в контейнере автора не собирался (2 ядра, неполное дерево исходников), поэтому команды SITL взяты из документации PX4 1.17 и помечены как цитаты. Python-код запускался, вывод вставлен без правок.</p>
+<h4 class="md-subheading">Шаг 1. Аллокатор как в PX4</h4>
+<p>Файл <code>alloc.py</code> — это прямой перенос трёх функций PX4: <code>computeEffectivenessMatrix</code>, <code>updateControlAllocationMatrixScale</code> и <code>ControlAllocationSequentialDesaturation</code>.</p>
+<pre class="cli-block"><code># alloc.py - control allocation as PX4 control_allocator does it (v1.15-1.17)
+import numpy as np
+
+def effectiveness(rotors):
+    &quot;&quot;&quot;rotors: list of dict(p=(px,py,pz), a=(ax,ay,az), ct, km) -&gt; B 6xN (Mx,My,Mz,Fx,Fy,Fz).&quot;&quot;&quot;
+    B = np.zeros((6, len(rotors)))
+    for i, r in enumerate(rotors):
+        a = np.array(r.get(&quot;a&quot;, (0, 0, -1)), float); a /= np.linalg.norm(a)
+        p = np.array(r[&quot;p&quot;], float); ct = r.get(&quot;ct&quot;, 6.5); km = r[&quot;km&quot;]
+        B[:3, i] = ct * np.cross(p, a) - ct * km * a   # ActuatorEffectivenessRotors.cpp
+        B[3:, i] = ct * a
+    return B
+
+def mix_matrix(B):
+    &quot;&quot;&quot;Pseudo-inverse + normalisation (ControlAllocationPseudoInverse.cpp).&quot;&quot;&quot;
+    M = np.linalg.pinv(B)                                # N x 6
+    nz = lambda c: max(np.sum(np.abs(c) &gt; 1e-3), 1)
+    rs = np.sqrt(np.sum(M[:, 0]**2) / (nz(M[:, 0]) / 2))
+    ps = np.sqrt(np.sum(M[:, 1]**2) / (nz(M[:, 1]) / 2))
+    s = np.ones(6); s[0] = s[1] = max(rs, ps); s[2] = M[:, 2].max()
+    for ax in (5, 4, 3):                                 # thrust z first, x/y fall back to z
+        c = np.abs(M[:, ax]); n = np.sum(c &gt; 1e-7)
+        s[ax] = c.sum() / n if n else s[5]
+    M = M / s; M[np.abs(M) &lt; 1e-3] = 0
+    return M
+
+def desat(u, v, increase_only=False, lo=0.0, hi=1.0):
+    &quot;&quot;&quot;desaturateActuators(): shift u along v to get back into [lo, hi].&quot;&quot;&quot;
+    def gain(u):
+        kmin = kmax = 0.0
+        for ui, vi in zip(u, v):
+            if abs(vi) &lt; 0.2: continue
+            if ui &lt; lo: k = (lo - ui) / vi; kmin = min(kmin, k); kmax = max(kmax, k)
+            if ui &gt; hi: k = (hi - ui) / vi; kmin = min(kmin, k); kmax = max(kmax, k)
+        return kmin + kmax
+    g = gain(u)
+    if increase_only and g &lt; 0: return u
+    u = u + g * v
+    return u + 0.5 * gain(u) * v
+
+def allocate(M, sp, method=&quot;seq&quot;, airmode=0):
+    &quot;&quot;&quot;sp = [roll, pitch, yaw, Fx, Fy, Fz] (normalised, hover Fz &lt; 0).&quot;&quot;&quot;
+    if method == &quot;clip&quot;:                                 # CA_METHOD = 0
+        return np.clip(M @ sp, 0, 1)
+    R, P, Y, T = M[:, 0], M[:, 1], M[:, 2], M[:, 5]
+    no_yaw = sp.copy(); no_yaw[2] = 0
+    u = M @ no_yaw
+    if airmode == 2:                                     # MC_AIRMODE = 2
+        u = desat(u + Y * sp[2], T); return desat(u, Y)
+    if airmode == 1: u = desat(u, T)                     # MC_AIRMODE = 1
+    else: u = desat(desat(desat(u, T, True), R), P)      # MC_AIRMODE = 0
+    u = u + Y * sp[2]                                    # mixYaw()
+    u = desat(u, Y, hi=1.15)                             # MINIMUM_YAW_MARGIN = 0.15
+    return desat(u, T, True)</code></pre>
+<h4 class="md-subheading">Шаг 2. Свой фрейм: dead cat 7&quot;</h4>
+<p>Передние лучи у такой рамы шире и короче, ЦТ смещён назад. Блоки шагов 2–5 — это один файл <code>demo.py</code>, его запуск: <code>python3 demo.py</code>.</p>
+<pre class="cli-block"><code>import numpy as np
+from scipy.optimize import linprog
+from alloc import effectiveness, mix_matrix, allocate
+np.set_printoptions(precision=3, suppress=True)
+
+# --- 1. custom frame: &quot;dead cat&quot; 7&quot;, CG behind the geometric centre (metres, FRD)
+cat = [dict(p=( 0.13,  0.17, 0), km= 0.05),   # 0 front right, CCW
+       dict(p=(-0.15, -0.11, 0), km= 0.05),   # 1 rear left,   CCW
+       dict(p=( 0.13, -0.17, 0), km=-0.05),   # 2 front left,  CW
+       dict(p=(-0.15,  0.11, 0), km=-0.05)]   # 3 rear right,  CW
+B = effectiveness(cat); M = mix_matrix(B)
+print(&quot;mix [roll pitch yaw thrust]:\n&quot;, M[:, [0, 1, 2, 5]])
+u = M @ [0, 0, 0, 0, 0, -0.5]
+print(&quot;hover u:&quot;, u, &quot;front/rear:&quot;, round(u[0] / u[1], 3))</code></pre>
+<pre class="cli-block"><code>mix [roll pitch yaw thrust]:
+ [[-0.707  0.707  0.647 -1.071]
+ [ 0.707 -0.707  1.    -0.929]
+ [ 0.707  0.707 -0.647 -1.071]
+ [-0.707 -0.707 -1.    -0.929]]
+hover u: [0.536 0.464 0.536 0.464] front/rear: 1.154</code></pre>
+<p>Передние моторы на висении нагружены на 15.4 % сильнее задних, и это ровно 0.15/0.13 — отношение плеч до ЦТ. Крен делают диагональные пары (все коэффициенты 0.707), рыскание сильнее грузит задние моторы (1.0 против 0.647).</p>
+<h4 class="md-subheading">Шаг 3. Насыщение</h4>
+<pre class="cli-block"><code>def run(name, sp, **kw):
+    sp = np.array(sp, float); want = B @ (M @ sp); got = B @ allocate(M, sp, **kw)
+    print(f&quot;{name:20s} roll {got[0]/want[0]:.2f}  yaw &quot; +
+          (f&quot;{got[2]/want[2]:.2f}&quot; if abs(want[2]) &gt; 1e-6 else &quot; -  &quot;) + f&quot;  thrust {got[5]/want[5]:.2f}&quot;)
+hard = [0.6, 0, 0.5, 0, 0, -0.6]
+print(&quot;ideal u:&quot;, M @ hard)
+run(&quot;CA_METHOD=0 clip&quot;, hard, method=&quot;clip&quot;)
+run(&quot;seq, MC_AIRMODE=0&quot;, hard, airmode=0)
+low = [0.4, 0, 0, 0, 0, -0.05]
+run(&quot;low thr, AIRMODE=0&quot;, low, airmode=0)
+run(&quot;low thr, AIRMODE=1&quot;, low, airmode=1)</code></pre>
+<pre class="cli-block"><code>ideal u: [ 0.542  1.481  0.744 -0.367]
+CA_METHOD=0 clip     roll 0.61  yaw 0.48  thrust 0.95
+seq, MC_AIRMODE=0    roll 1.00  yaw 0.15  thrust 0.90
+low thr, AIRMODE=0   roll 0.16  yaw  -    thrust 1.00
+low thr, AIRMODE=1   roll 1.00  yaw  -    thrust 6.09</code></pre>
+<p>Обрезка даёт 61 % крена и паразитный тангаж. Десатурация даёт 100 % крена, а рыскание падает до 15 %, тяга до 90 %. При газе 5 % без airmode от крена остаётся 16 % — так аппарат кувыркается на снижении. С <code>MC_AIRMODE</code> = 1 крен полный, но тяга растёт в 6 раз: аппарат подпрыгивает. Поэтому PX4 велит выключать airmode на время тюнинга.</p>
+<h4 class="md-subheading">Шаг 4. Гекса без мотора</h4>
+<p>Геометрия, нумерация и направления вращения взяты из <code>10044_sihsim_hex</code> (плечо 1 м); CT = 1 — нормировка расчёта, в самом airframe остаётся умолчание 6.5. Аппарат с T/W = 3 висит на 2 единицах тяги из 6.</p>
+<pre class="cli-block"><code>ang = [30, 90, 150, -150, -90, -30]
+hexa = lambda s: [dict(p=(np.cos(np.radians(a)), np.sin(np.radians(a)), 0), ct=1, km=0.05 * k)
+                  for a, k in zip(ang, s)]
+PNPNPN, PPNNPN = [1, -1, 1, -1, 1, -1], [-1, -1, 1, -1, 1, 1]
+def margins(rot, lost, W=2.0):            # max |torque| per axis while the other two stay 0
+    Bh = effectiveness(rot)[[0, 1, 2, 5]]; bnd = [(0, 0) if i == lost else (0, 1) for i in range(6)]
+    out = []
+    for ax in range(3):
+        for sg in (1, -1):
+            r = linprog(-sg * Bh[ax], A_eq=np.delete(Bh, ax, 0), b_eq=[0, 0, -W], bounds=bnd)
+            out.append(max(sg * Bh[ax] @ r.x, 0) if r.success else 0)
+    return np.round(out, 2)               # +R -R +P -P +Y -Y
+Bh = effectiveness(hexa(PNPNPN))[[0, 1, 2, 5]]; Bh[:, 0] = 0          # CA_FAILURE_MODE=1
+print(&quot;PNPNPN, M0 lost, pinv hover u:&quot;, np.linalg.pinv(Bh) @ [0, 0, 0, -3.0])
+for k in range(6):
+    print(f&quot;lost M{k}: PNPNPN {margins(hexa(PNPNPN), k)}  PPNNPN {margins(hexa(PPNNPN), k)}&quot;)</code></pre>
+<pre class="cli-block"><code>PNPNPN, M0 lost, pinv hover u: [-0.    0.75  0.75 -0.    0.75  0.75]
+lost M0: PNPNPN [1.5  0.   0.   1.73 0.   0.1 ]  PPNNPN [1.   1.   0.58 1.73 0.1  0.03]
+lost M1: PNPNPN [1.5  0.   1.73 1.73 0.1  0.  ]  PPNNPN [1.   1.   1.73 1.73 0.1  0.1 ]
+lost M2: PNPNPN [1.5  0.   1.73 0.   0.   0.1 ]  PPNNPN [1.   0.   1.73 0.   0.   0.1 ]
+lost M3: PNPNPN [0.   1.5  1.73 0.   0.1  0.  ]  PPNNPN [0.   1.   1.73 0.   0.1  0.  ]
+lost M4: PNPNPN [0.   1.5  1.73 1.73 0.   0.1 ]  PPNNPN [1.   1.   1.73 1.73 0.1  0.1 ]
+lost M5: PNPNPN [0.   1.5  0.   1.73 0.1  0.  ]  PPNNPN [1.   1.   0.58 1.73 0.03 0.1 ]</code></pre>
+<p>У PNPNPN псевдообратная (при T/W = 2, W = 3) ставит противоположный мотор M3 в 0, а остальные четыре работают на 75 %. При любом отказе остаётся минимум два нуля, всегда в одну сторону по крену и в одну по рысканию. Аппарат висит, но порыв с «нулевой» стороны отработать уже нечем. PPNNPN переживает отказы M0, M1, M4 и M5 с запасом по всем шести направлениям, а при отказе M2 или M3 тоже остаётся с нулями. Вывод для проекта: гекса сама по себе от отказа мотора не страхует. Нужны раскладка вращения, проверенная таким расчётом, и запас тяги: у PNPNPN четыре мотора несут весь вес, то есть каждый в 1.5 раза больше нормы.</p>
+<h4 class="md-subheading">Шаг 5. Наклон моторов</h4>
+<pre class="cli-block"><code>P, KM = [(0.174, 0.174), (-0.174, -0.174), (0.174, -0.174), (-0.174, 0.174)], [0.05, 0.05, -0.05, -0.05]
+def tilted(deg):
+    s, c = np.sin(np.radians(deg)), np.cos(np.radians(deg))
+    return [dict(p=(x, y, 0), km=k, a=(-y / np.hypot(x, y) * np.sign(k) * s,
+                                       x / np.hypot(x, y) * np.sign(k) * s, -c)) for (x, y), k in zip(P, KM)]
+B0 = effectiveness(tilted(0))
+for d in (0, 5, 10, 15):
+    Bt = effectiveness(tilted(d))
+    print(f&quot;tilt {d:2d} deg: yaw x{Bt[2,0]/B0[2,0]:.2f}  Fz x{Bt[5,0]/B0[5,0]:.3f}&quot;)
+print(&quot;CA_ROTOR0_AX/AY/AZ @10 deg:&quot;, np.round(tilted(10)[0][&quot;a&quot;], 3))</code></pre>
+<pre class="cli-block"><code>tilt  0 deg: yaw x1.00  Fz x1.000
+tilt  5 deg: yaw x1.43  Fz x0.996
+tilt 10 deg: yaw x1.84  Fz x0.985
+tilt 15 deg: yaw x2.24  Fz x0.966
+CA_ROTOR0_AX/AY/AZ @10 deg: [-0.123  0.123 -0.985]</code></pre>
+<figure class="diagram" data-diagram="chart-alloc-tilt"><div class="diagram__svg"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 360" width="100%" role="img" aria-labelledby="t" style="max-width:720px;display:block;margin:0 auto"><title id="t">Наклон моторов по касательной (x500: r = 0.246 м, KM = 0.05)</title><style>text{font-family: var(--gc-font-mono, ui-monospace, Menlo, monospace); font-size: 12px;fill:currentColor} .m{fill:var(--gc-ink-muted, #8a93a3)} .a{fill:var(--gc-accent-hud, #5ef1d2)} .w{fill:var(--gc-signal-amber, #f0b24c)} .d{fill:var(--gc-signal-red, #e8636b)} .box{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:currentColor;stroke-width:1.2} .boxa{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6} .ln{stroke:currentColor;stroke-width:1.2;fill:none} .lna{stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6;fill:none} .lnm{stroke:var(--gc-ink-muted, #8a93a3);stroke-width:1;fill:none;stroke-dasharray:4 3} .t{font-size:11px} .b{font-weight:600}</style><defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker><marker id="ara" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--gc-accent-hud, #5ef1d2)"/></marker></defs><text x="64" y="20" text-anchor="start" class="b" style="font-size:13px">Наклон моторов по касательной (x500: r = 0.246 м, KM = 0.05)</text><line x1="64.0" y1="36" x2="64.0" y2="312" stroke="var(--gc-ink-muted, #8a93a3)" stroke-width="0.5" opacity="0.4"/><text x="64.0" y="328" text-anchor="middle" class="m t">0</text><line x1="212.0" y1="36" x2="212.0" y2="312" stroke="var(--gc-ink-muted, #8a93a3)" stroke-width="0.5" opacity="0.4"/><text x="212.0" y="328" text-anchor="middle" class="m t">5</text><line x1="360.0" y1="36" x2="360.0" y2="312" stroke="var(--gc-ink-muted, #8a93a3)" stroke-width="0.5" opacity="0.4"/><text x="360.0" y="328" text-anchor="middle" class="m t">10</text><line x1="508.0" y1="36" x2="508.0" y2="312" stroke="var(--gc-ink-muted, #8a93a3)" stroke-width="0.5" opacity="0.4"/><text x="508.0" y="328" text-anchor="middle" class="m t">15</text><line x1="656.0" y1="36" x2="656.0" y2="312" stroke="var(--gc-ink-muted, #8a93a3)" stroke-width="0.5" opacity="0.4"/><text x="656.0" y="328" text-anchor="middle" class="m t">20</text><line x1="64" y1="312.0" x2="656" y2="312.0" stroke="var(--gc-ink-muted, #8a93a3)" stroke-width="0.5" opacity="0.4"/><text x="58" y="316.0" text-anchor="end" class="m t">1</text><line x1="64" y1="243.0" x2="656" y2="243.0" stroke="var(--gc-ink-muted, #8a93a3)" stroke-width="0.5" opacity="0.4"/><text x="58" y="247.0" text-anchor="end" class="m t">1.5</text><line x1="64" y1="174.0" x2="656" y2="174.0" stroke="var(--gc-ink-muted, #8a93a3)" stroke-width="0.5" opacity="0.4"/><text x="58" y="178.0" text-anchor="end" class="m t">2</text><line x1="64" y1="105.0" x2="656" y2="105.0" stroke="var(--gc-ink-muted, #8a93a3)" stroke-width="0.5" opacity="0.4"/><text x="58" y="109.0" text-anchor="end" class="m t">2.5</text><line x1="64" y1="36.0" x2="656" y2="36.0" stroke="var(--gc-ink-muted, #8a93a3)" stroke-width="0.5" opacity="0.4"/><text x="58" y="40.0" text-anchor="end" class="m t">3</text><text x="662" y="316.0" text-anchor="start" class="m t">90</text><text x="662" y="260.8" text-anchor="start" class="m t">92</text><text x="662" y="205.6" text-anchor="start" class="m t">94</text><text x="662" y="150.4" text-anchor="start" class="m t">96</text><text x="662" y="95.19999999999999" text-anchor="start" class="m t">98</text><text x="662" y="40.0" text-anchor="start" class="m t">100</text><rect x="64" y="36" width="592" height="276" fill="none" stroke="currentColor" stroke-width="1"/><text x="360.0" y="350" text-anchor="middle" class="m">наклон оси мотора, °</text><text transform="translate(16 174.0) rotate(-90)" text-anchor="middle" class="m">момент рыскания, × от вертикали</text><text transform="translate(708 174.0) rotate(90)" text-anchor="middle" class="m">вертикальная тяга, %</text><line x1="212.0" y1="36" x2="212.0" y2="312" stroke="var(--gc-ink-muted, #8a93a3)" stroke-width="1.2" stroke-dasharray="5 3"/><text x="216.0" y="80" text-anchor="start" class="m t">5°: ×1.43, −0.4 %</text><line x1="360.0" y1="36" x2="360.0" y2="312" stroke="var(--gc-ink-muted, #8a93a3)" stroke-width="1.2" stroke-dasharray="5 3"/><text x="364.0" y="64" text-anchor="start" class="m t">10°: ×1.84, −1.5 %</text><clipPath id="pc41b1abbb"><rect x="64" y="36" width="592" height="276"/></clipPath><path d="M64.0 312.0 L67.0 310.8 L69.9 309.6 L72.9 308.4 L75.8 307.3 L78.8 306.1 L81.8 304.9 L84.7 303.7 L87.7 302.5 L90.6 301.3 L93.6 300.2 L96.6 299.0 L99.5 297.8 L102.5 296.6 L105.4 295.4 L108.4 294.3 L111.4 293.1 L114.3 291.9 L117.3 290.7 L120.2 289.6 L123.2 288.4 L126.2 287.2 L129.1 286.0 L132.1 284.9 L135.0 283.7 L138.0 282.5 L141.0 281.3 L143.9 280.2 L146.9 279.0 L149.8 277.8 L152.8 276.6 L155.8 275.5 L158.7 274.3 L161.7 273.1 L164.6 272.0 L167.6 270.8 L170.6 269.6 L173.5 268.5 L176.5 267.3 L179.4 266.1 L182.4 265.0 L185.4 263.8 L188.3 262.6 L191.3 261.5 L194.2 260.3 L197.2 259.1 L200.2 258.0 L203.1 256.8 L206.1 255.7 L209.0 254.5 L212.0 253.3 L215.0 252.2 L217.9 251.0 L220.9 249.9 L223.8 248.7 L226.8 247.5 L229.8 246.4 L232.7 245.2 L235.7 244.1 L238.6 242.9 L241.6 241.8 L244.6 240.6 L247.5 239.5 L250.5 238.3 L253.4 237.2 L256.4 236.0 L259.4 234.9 L262.3 233.7 L265.3 232.6 L268.2 231.4 L271.2 230.3 L274.2 229.1 L277.1 228.0 L280.1 226.8 L283.0 225.7 L286.0 224.5 L289.0 223.4 L291.9 222.2 L294.9 221.1 L297.8 220.0 L300.8 218.8 L303.8 217.7 L306.7 216.5 L309.7 215.4 L312.6 214.3 L315.6 213.1 L318.6 212.0 L321.5 210.9 L324.5 209.7 L327.4 208.6 L330.4 207.5 L333.4 206.3 L336.3 205.2 L339.3 204.1 L342.2 202.9 L345.2 201.8 L348.2 200.7 L351.1 199.5 L354.1 198.4 L357.0 197.3 L360.0 196.2 L363.0 195.0 L365.9 193.9 L368.9 192.8 L371.8 191.7 L374.8 190.5 L377.8 189.4 L380.7 188.3 L383.7 187.2 L386.6 186.1 L389.6 184.9 L392.6 183.8 L395.5 182.7 L398.5 181.6 L401.4 180.5 L404.4 179.4 L407.4 178.3 L410.3 177.1 L413.3 176.0 L416.2 174.9 L419.2 173.8 L422.2 172.7 L425.1 171.6 L428.1 170.5 L431.0 169.4 L434.0 168.3 L437.0 167.2 L439.9 166.1 L442.9 165.0 L445.8 163.9 L448.8 162.8 L451.8 161.7 L454.7 160.6 L457.7 159.5 L460.6 158.4 L463.6 157.3 L466.6 156.2 L469.5 155.1 L472.5 154.0 L475.4 152.9 L478.4 151.8 L481.4 150.7 L484.3 149.6 L487.3 148.5 L490.2 147.4 L493.2 146.3 L496.2 145.3 L499.1 144.2 L502.1 143.1 L505.0 142.0 L508.0 140.9 L511.0 139.8 L513.9 138.8 L516.9 137.7 L519.8 136.6 L522.8 135.5 L525.8 134.4 L528.7 133.4 L531.7 132.3 L534.6 131.2 L537.6 130.1 L540.6 129.1 L543.5 128.0 L546.5 126.9 L549.4 125.9 L552.4 124.8 L555.4 123.7 L558.3 122.7 L561.3 121.6 L564.2 120.5 L567.2 119.5 L570.2 118.4 L573.1 117.3 L576.1 116.3 L579.0 115.2 L582.0 114.2 L585.0 113.1 L587.9 112.0 L590.9 111.0 L593.8 109.9 L596.8 108.9 L599.8 107.8 L602.7 106.8 L605.7 105.7 L608.6 104.7 L611.6 103.6 L614.6 102.6 L617.5 101.5 L620.5 100.5 L623.4 99.4 L626.4 98.4 L629.4 97.4 L632.3 96.3 L635.3 95.3 L638.2 94.2 L641.2 93.2 L644.2 92.2 L647.1 91.1 L650.1 90.1 L653.0 89.1 L656.0 88.0" fill="none" stroke="var(--gc-accent-hud, #5ef1d2)" stroke-width="2" clip-path="url(#pc41b1abbb)"/><text x="415.2" y="163.80992772424096" text-anchor="end" class="a t b">рыскание, ×</text><path d="M64.0 36.0 L67.0 36.0 L69.9 36.0 L72.9 36.0 L75.8 36.1 L78.8 36.1 L81.8 36.2 L84.7 36.2 L87.7 36.3 L90.6 36.3 L93.6 36.4 L96.6 36.5 L99.5 36.6 L102.5 36.7 L105.4 36.8 L108.4 36.9 L111.4 37.1 L114.3 37.2 L117.3 37.4 L120.2 37.5 L123.2 37.7 L126.2 37.9 L129.1 38.0 L132.1 38.2 L135.0 38.4 L138.0 38.6 L141.0 38.8 L143.9 39.1 L146.9 39.3 L149.8 39.5 L152.8 39.8 L155.8 40.0 L158.7 40.3 L161.7 40.6 L164.6 40.9 L167.6 41.1 L170.6 41.4 L173.5 41.8 L176.5 42.1 L179.4 42.4 L182.4 42.7 L185.4 43.1 L188.3 43.4 L191.3 43.8 L194.2 44.1 L197.2 44.5 L200.2 44.9 L203.1 45.3 L206.1 45.7 L209.0 46.1 L212.0 46.5 L215.0 46.9 L217.9 47.4 L220.9 47.8 L223.8 48.2 L226.8 48.7 L229.8 49.2 L232.7 49.6 L235.7 50.1 L238.6 50.6 L241.6 51.1 L244.6 51.6 L247.5 52.1 L250.5 52.7 L253.4 53.2 L256.4 53.7 L259.4 54.3 L262.3 54.8 L265.3 55.4 L268.2 56.0 L271.2 56.6 L274.2 57.2 L277.1 57.8 L280.1 58.4 L283.0 59.0 L286.0 59.6 L289.0 60.2 L291.9 60.9 L294.9 61.5 L297.8 62.2 L300.8 62.9 L303.8 63.5 L306.7 64.2 L309.7 64.9 L312.6 65.6 L315.6 66.3 L318.6 67.0 L321.5 67.8 L324.5 68.5 L327.4 69.2 L330.4 70.0 L333.4 70.7 L336.3 71.5 L339.3 72.3 L342.2 73.1 L345.2 73.9 L348.2 74.7 L351.1 75.5 L354.1 76.3 L357.0 77.1 L360.0 77.9 L363.0 78.8 L365.9 79.6 L368.9 80.5 L371.8 81.3 L374.8 82.2 L377.8 83.1 L380.7 84.0 L383.7 84.9 L386.6 85.8 L389.6 86.7 L392.6 87.6 L395.5 88.6 L398.5 89.5 L401.4 90.5 L404.4 91.4 L407.4 92.4 L410.3 93.3 L413.3 94.3 L416.2 95.3 L419.2 96.3 L422.2 97.3 L425.1 98.3 L428.1 99.4 L431.0 100.4 L434.0 101.4 L437.0 102.5 L439.9 103.5 L442.9 104.6 L445.8 105.7 L448.8 106.7 L451.8 107.8 L454.7 108.9 L457.7 110.0 L460.6 111.1 L463.6 112.3 L466.6 113.4 L469.5 114.5 L472.5 115.7 L475.4 116.8 L478.4 118.0 L481.4 119.2 L484.3 120.3 L487.3 121.5 L490.2 122.7 L493.2 123.9 L496.2 125.1 L499.1 126.3 L502.1 127.6 L505.0 128.8 L508.0 130.0 L511.0 131.3 L513.9 132.6 L516.9 133.8 L519.8 135.1 L522.8 136.4 L525.8 137.7 L528.7 139.0 L531.7 140.3 L534.6 141.6 L537.6 142.9 L540.6 144.2 L543.5 145.6 L546.5 146.9 L549.4 148.3 L552.4 149.7 L555.4 151.0 L558.3 152.4 L561.3 153.8 L564.2 155.2 L567.2 156.6 L570.2 158.0 L573.1 159.4 L576.1 160.9 L579.0 162.3 L582.0 163.7 L585.0 165.2 L587.9 166.7 L590.9 168.1 L593.8 169.6 L596.8 171.1 L599.8 172.6 L602.7 174.1 L605.7 175.6 L608.6 177.1 L611.6 178.6 L614.6 180.2 L617.5 181.7 L620.5 183.2 L623.4 184.8 L626.4 186.4 L629.4 187.9 L632.3 189.5 L635.3 191.1 L638.2 192.7 L641.2 194.3 L644.2 195.9 L647.1 197.5 L650.1 199.2 L653.0 200.8 L656.0 202.4" fill="none" stroke="var(--gc-signal-amber, #f0b24c)" stroke-width="2" clip-path="url(#pc41b1abbb)"/><text x="592.8000000000001" y="191.08401502537635" text-anchor="end" class="w t b">тяга Fz, %</text><text x="80" y="300" text-anchor="start" class="m t">Рыскание = CT·(r·sinθ + KM·cosθ), тяга = CT·cosθ</text></svg></div><figcaption class="gc-muted">Наклон моторов на 10° по касательной даёт ×1.84 к моменту рыскания ценой 1.5 % вертикальной тяги. Из-за нормировки PX4 физическое усиление контура рыскания растёт во столько же раз, так что yaw-тюнинг надо проверить заново.</figcaption><div class="diagram__hint">Схему можно прокрутить по горизонтали</div></figure>
+<p>В нормированной матрице PX4 столбец рыскания остаётся [1 1 −1 −1], поэтому момент на единицу команды вырастает с 1.30 до 2.39 (×1.84). Тот же <code>MC_YAWRATE_K</code> теперь даёт в 1.84 раза более жёсткий контур.</p>
+<h4 class="md-subheading">Шаг 6. Перенос в прошивки и PX4 SITL</h4>
+<p>PX4: <code>CA_AIRFRAME</code> = 0 (Multirotor), <code>CA_ROTOR_COUNT</code> = 4, <code>CA_ROTORn_PX/PY</code> из шага 2, <code>CA_ROTORn_KM</code> = ±0.05; в Actuators → Geometry сверь схему и Direction CCW. Документация (Actuators): «The X, Y, Z positions are in FRD coordinate frame, relative to the centre of gravity». Отказ гексы в SITL (PX4 1.17, цитаты из документации SIH и Failure Injection): сборка <code>make px4_sitl sihsim_hex</code>, затем <code>SYS_FAILURE_EN</code> = 1, <code>CA_FAILURE_MODE</code> = 1, взлёт, в pxh <code>failure motor off -i 1</code>, возврат <code>failure motor ok -i 1</code>. По исходнику 1.17 инъекция только останавливает мотор (<code>motor_stop_mask</code>, в консоли «Stopping motors»). Из матрицы его убирает детектор отказа, и тогда в консоли появляется «Removing motor from allocation». В логе (Flight Review / pyulog) смотри <code>control_allocator_status.motor_stop_mask</code>, <code>handled_motor_failure_mask</code>, <code>unallocated_torque</code>, <code>actuator_motors.control[0..5]</code>. Если мотор убран, ожидание по шагу 4 такое: противоположный около 0, остальные около 75 % при T/W 2.</p>
+<p>Betaflight (конфигурация, в контейнере не выполнялась; столбец pitch взят с обратным знаком, roll и pitch приведены к ±1):</p>
+<pre class="cli-block"><code>mixer CUSTOM
+mmix reset
+mmix 0 0.929 -1.000  1.000 -1.000
+mmix 1 1.071 -1.000 -1.000  0.647
+mmix 2 0.929  1.000  1.000  1.000
+mmix 3 1.071  1.000 -1.000 -0.647
+save</code></pre>
+<p>Порядок моторов как у QUADX: 0 — RR, 1 — FR, 2 — RL, 3 — FL. ArduPilot (<code>FRAME_CLASS</code> = 15, <code>SCR_ENABLE</code> = 1, скрипт в <code>APM/scripts/</code>, в контейнере не выполнялся):</p>
+<pre class="cli-block"><code>MotorsMatrix:add_motor_raw(0, -0.707,  0.707,  0.647, 1)  -- front right, CCW
+MotorsMatrix:add_motor_raw(1,  0.707, -0.707,  1.0,   3)  -- rear left, CCW
+MotorsMatrix:add_motor_raw(2,  0.707,  0.707, -0.647, 4)  -- front left, CW
+MotorsMatrix:add_motor_raw(3, -0.707, -0.707, -1.0,   2)  -- rear right, CW
+MotorsMatrix:set_throttle_factor(0, 1.071)
+MotorsMatrix:set_throttle_factor(1, 0.929)
+MotorsMatrix:set_throttle_factor(2, 1.071)
+MotorsMatrix:set_throttle_factor(3, 0.929)
+assert(MotorsMatrix:init(4), &quot;Failed to init MotorsMatrix&quot;)
+motors:set_frame_string(&quot;deadcat 7&quot;)</code></pre>
+<p><code>set_throttle_factor</code> работает только до <code>init()</code> и только в классе 15. Коэффициенты здесь в долях тяги: линеаризацию в газ делают <code>THR_MDL_FAC</code> / <code>MOT_THST_EXPO</code>.</p>
+<h4 class="md-subheading">Переход на реальное железо</h4>
+<ol><li><strong>Пропы сняты</strong>, АКБ через smoke stopper. PX4: Actuators → Enable sliders (или Identify &amp; Assign Motors для PWM); ArduPilot: Motor Test, порядок A-B-C-D = testing order; Betaflight: вкладка Motors. Документация PX4 прямо пишет: «Remove the propellers from motors before assigning outputs or any testing».</li><li>По каждому мотору: место на раме совпадает со схемой, направление вращения совпадает с <code>KM</code> / yaw-знаком (лента на колоколе), на disarmed мотор не крутится, на minimum крутится уверенно.</li><li>Знаки без пропов: армить в Stabilize/Acro, наклонить раму рукой вправо — правые моторы должны раскрутиться; повернуть по рысканию — должна вырасти пара, компенсирующая поворот. Иначе ошибка в знаке столбца.</li><li><strong>Пропы ставятся только сейчас.</strong> Висение 30–60 с на высоте 1–2 м, в открытом месте, люди на расстоянии ≥ 10 м. Критерий прерывания: аппарат уводит при нейтральных стиках, или любой мотор выше 90 % → посадка.</li><li>Лог висения: PX4 — <code>actuator_motors</code>, ArduPilot — <code>RCOU.C1…C4</code>, Betaflight — <code>motor[0..3]</code>. На dead cat отношение средних передних выходов к задним должно совпасть с шагом 2 в пределах ±5 %: в <code>actuator_motors</code> PX4 это тяга (1.15, <code>THR_MDL_FAC</code> применяется позже, в драйвере выхода), в командах ArduPilot и Betaflight — около √1.15 ≈ 1.07, если тяга растёт как квадрат команды. Средние выходы CW-пары и CCW-пары различаются не больше чем на 5 %, иначе перекошен мотор или неверен <code>KM</code>.</li></ol>
+<p>Лабораторная засчитывается, когда: (SITL/расчёт) столбцы mix своего фрейма и отношение нагрузок посчитаны в Python и объяснены геометрией; таблица насыщения из шага 3 повторена для своего фрейма с выводом, какая ось уступает первой; в SIH-гексе после <code>failure motor off -i 1</code> в логе есть ненулевой <code>motor_stop_mask</code>, записано, сработало ли удаление из матрицы (<code>handled_motor_failure_mask</code>), а выходы моторов сравнены с прогнозом шага 4; (железо) тест моторов без пропов совпал со схемой по месту и направлению всех моторов, а лог висения показывает отношение выходов в пределах ±5 % от расчёта и ни один мотор не выше 90 %.</p>
+
+<h2>Діагностика</h2>
+<div class="diag-groups"><article class="diag-item"><h4><strong>Симптом:</strong> при отрыве аппарат резко переворачивается</h4><ul><li>Возможная причина: неверный порядок или направление мотора, либо перепутан знак столбца (в Betaflight знак pitch противоположен PX4/ArduPilot).</li><li>Что сделать: снять пропы, тест моторов по одному, проверка знаков наклоном рамы рукой (шаг 3 перехода на железо).</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> на резких креновых манёврах рыскание «отпускает» и аппарат доворачивает</h4><ul><li>Возможная причина: штатная десатурация — рыскание режется первым (PX4 <code>MINIMUM_YAW_MARGIN</code>, ArduPilot <code>MOT_YAW_HEADROOM</code>, Betaflight <code>pidsum_limit_yaw</code>).</li><li>Что сделать: поднять T/W или запас по газу; на ArduPilot поднять <code>MOT_YAW_HEADROOM</code>; на PX4 проверить <code>control_allocator_status.unallocated_torque[2]</code>.</li><li>Что видно в логе: рыскание в насыщении на пиках крена, <code>actuator_saturation</code> ≠ 0.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> кувырок или «проваливание» при нулевом газе на снижении</h4><ul><li>Возможная причина: airmode выключен, на малом газе крен ужимается (в шаге 3 — до 16 %).</li><li>Что сделать: <code>MC_AIRMODE</code> = 1 после тюнинга (PX4), <code>ACRO_OPTIONS</code> бит 0 (ArduPilot), AIRMODE (Betaflight); для PX4 airmode по рысканию требует тумблер арма.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> после замены рамы или наклона моторов рыскание осциллирует</h4><ul><li>Возможная причина: нормировка PX4 сохраняет команду, а физическое усиление выросло (×1.84 при 10°).</li><li>Что сделать: снизить <code>MC_YAWRATE_K</code>/P пропорционально росту эффективности и пере-тюнить.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> гекса после отказа мотора крутится по рысканию и сносится</h4><ul><li>Возможная причина: PNPNPN без запаса в части направлений; <code>CA_FAILURE_MODE</code> = 0 или детектор не сработал (нет телеметрии тока ESC для <code>FD_ACT_*</code>).</li><li>Что сделать: T/W ≥ 3, проверить раскладку (PPNNPN), включить <code>CA_FAILURE_MODE</code> = 1 и проверить детектор в SITL.</li><li>Последствия: без обработки отказа PX4 продолжает распределять момент на мёртвый мотор, и ошибка растёт до потери управления.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> ArduPilot со скриптовой матрицей не армится</h4><ul><li>Возможная причина: <code>SCR_ENABLE</code> = 0, скрипт не в <code>APM/scripts/</code>, <code>init()</code> раньше <code>add_motor_raw</code>, <code>FRAME_CLASS</code> ≠ 15.</li><li>Что сделать: сообщения скрипта в GCS, порядок вызовов, перезагрузка после смены <code>FRAME_CLASS</code>.</li></ul></article></div>
+
+<h2>Чек-лист</h2>
+<ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="ctl-allocation:0"><span>Могу записать столбец B для мотора по положению, оси, CT и KM</span></label></li><li><label><input type="checkbox" data-check-id="ctl-allocation:1"><span>Понимаю, зачем PX4 нормирует матрицу и как это меняет усиление после смены геометрии</span></label></li><li><label><input type="checkbox" data-check-id="ctl-allocation:2"><span>Знаю, кто уступает первым при насыщении в PX4, ArduPilot и Betaflight</span></label></li><li><label><input type="checkbox" data-check-id="ctl-allocation:3"><span>Посчитал нагрузку моторов своего фрейма на висении</span></label></li><li><label><input type="checkbox" data-check-id="ctl-allocation:4"><span>Понимаю, почему гекса PNPNPN после отказа не имеет запаса в части направлений</span></label></li><li><label><input type="checkbox" data-check-id="ctl-allocation:5"><span>Перенёс матрицу в mmix / Lua / CA_* с правильными знаками</span></label></li><li><label><input type="checkbox" data-check-id="ctl-allocation:6"><span>Проверил моторы без пропов и сверил лог висения с расчётом</span></label></li></ul>
+
+<h2>Джерела</h2>
+<ul class="refs"><li><a href="https://docs.px4.io/main/en/concept/control_allocation.html" target="_blank" rel="noopener noreferrer">PX4 Guide: Control Allocation (Mixing)</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://docs.px4.io/main/en/config/actuators.html" target="_blank" rel="noopener noreferrer">PX4 Guide: Actuator Configuration and Testing</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://docs.px4.io/main/en/debug/failure_injection.html" target="_blank" rel="noopener noreferrer">PX4 Guide: System Failure Injection</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://raw.githubusercontent.com/PX4/PX4-Autopilot/v1.17.0/src/modules/control_allocator/VehicleActuatorEffectiveness/ActuatorEffectivenessRotors.cpp" target="_blank" rel="noopener noreferrer">PX4 source: ActuatorEffectivenessRotors.cpp (v1.17.0)</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://raw.githubusercontent.com/PX4/PX4-Autopilot/v1.17.0/src/lib/control_allocation/control_allocation/ControlAllocationSequentialDesaturation.cpp" target="_blank" rel="noopener noreferrer">PX4 source: ControlAllocationSequentialDesaturation.cpp (v1.17.0)</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://raw.githubusercontent.com/PX4/PX4-Autopilot/v1.17.0/src/modules/control_allocator/module.yaml" target="_blank" rel="noopener noreferrer">PX4 source: control_allocator module.yaml (CA_* parameters, v1.17.0)</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://raw.githubusercontent.com/ArduPilot/ardupilot/Copter-4.6.3/libraries/AP_Motors/AP_MotorsMatrix.cpp" target="_blank" rel="noopener noreferrer">ArduPilot source: AP_MotorsMatrix.cpp (Copter-4.6.3)</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://raw.githubusercontent.com/ArduPilot/ardupilot/Copter-4.6.3/libraries/AP_Scripting/examples/MotorMatrix_fault_tolerant_hex.lua" target="_blank" rel="noopener noreferrer">ArduPilot example: MotorMatrix_fault_tolerant_hex.lua</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://betaflight.com/docs/wiki/guides/current/Mixer" target="_blank" rel="noopener noreferrer">Betaflight: Mixer (mmix, mixer_type)</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://raw.githubusercontent.com/betaflight/betaflight/4.5-maintenance/src/main/flight/mixer.c" target="_blank" rel="noopener noreferrer">Betaflight source: mixer.c (4.5-maintenance)</a> <span class="gc-tag" data-state="info">primary</span></li></ul>
+<h2>Задачі з числовою відповіддю</h2>
+<uav-tasks src="../tasks/ctl-allocation.json" module="ctl-allocation"></uav-tasks>
+<h2>Перевір себе</h2>
+<uav-quiz src="../quiz/ctl-allocation.json" module="ctl-allocation"></uav-quiz>
+      </div>
+      <div class="module-done"><gc-button variant="secondary" data-done-toggle="ctl-allocation">Позначити як пройдений</gc-button></div>
+      <section class="related" aria-label="Суміжні модулі"><p class="gc-label gc-muted">Суміжні модулі</p><div class="gc-grid ref-grid"><a class="gc-card" href="px4-control.html"><strong>Контури керування та тюнінг PX4</strong><div class="gc-card__meta"><span class="gc-tag" title="L3 — Специалист">L3</span></div></a><a class="gc-card" href="px4-architecture.html"><strong>Архітектура PX4: модулі та uORB</strong><div class="gc-card__meta"><span class="gc-tag" title="L3 — Специалист">L3</span></div></a><a class="gc-card" href="ap-heavy.html"><strong>Важкі платформи: X8 і окто</strong><div class="gc-card__meta"><span class="gc-tag" title="L3 — Специалист">L3</span></div></a><a class="gc-card" href="math-linalg-rot.html"><strong>Вектори, матриці та обертання: мова орієнтації</strong><div class="gc-card__meta"><span class="gc-tag" title="L2 — Интегратор">L2</span></div></a><a class="gc-card" href="ctl-theory.html"><strong>Теорія керування: стійкість, запаси, каскади</strong><div class="gc-card__meta"><span class="gc-tag" title="L3 — Специалист">L3</span></div></a><a class="gc-card" href="f-frame-mech.html"><strong>Рама, механіка та вібрації</strong><div class="gc-card__meta"><span class="gc-tag" title="L2 — Интегратор">L2</span></div></a></div></section>
+      <nav class="pager" aria-label="Сусідні модулі" data-track-pager><a class="gc-card pager__prev" href="aero-stability.html"><span class="gc-label gc-muted">Назад · трек</span><br>Самолёт: устойчивость, центровка, статический запас, поляра</a></nav><nav class="pager" aria-label="Сусідні кроки шляху PX4" data-path-pager="px4" hidden><a class="gc-card pager__prev" href="px4-control.html?path=px4"><span class="gc-label gc-muted">Назад · шлях PX4</span><br>Контури керування та тюнінг PX4</a><a class="gc-card pager__next" href="px4-ros2.html?path=px4"><span class="gc-label gc-muted">Далі · крок 18 з 37</span><br>PX4 і ROS 2: uXRCE-DDS та offboard</a></nav>
+    </article>
+  </main>
+  <footer class="gc-container site-footer gc-muted">
+    <p>Відкритий курс · <a href="https://github.com/irreligious86/UAV-Education">вихідний код на GitHub</a> · <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">план розвитку</a> · <a href="../../curriculum/curriculum.html">для розробника</a> · CC BY-NC-SA 4.0</p>
+  </footer>
+</body>
+</html>

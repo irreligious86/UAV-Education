@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="uk-galych" data-theme="dark" data-lang="uk-galych">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Аппарат под ТЗ — UAV Student</title>
+  <meta name="description" content="Проект аппарата под заданную миссию: расчёт, проверка силовой установки на стенде (или по датасету), устойчивость или миксер, сравнение прогноза с измерением">
+  <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
+  <link rel="manifest" href="../../manifest.webmanifest">
+  <meta name="theme-color" content="#0b0f14">
+  <link rel="alternate" hreflang="ru" href="../../cap/cap-designer.html">
+  <link rel="alternate" hreflang="uk" href="../../uk/cap/cap-designer.html">
+  <link rel="alternate" hreflang="en" href="../../en/cap/cap-designer.html">
+  <link rel="alternate" hreflang="uk-galych" href="../../gal/cap/cap-designer.html">
+  <script>/* go to the visitor's chosen language before anything paints (assets/i18n.js) */(function(){try{var c=localStorage.getItem('uav-lang'),h=document.documentElement.getAttribute('data-lang');if(!c||c===h||/[?&]lang=keep\b/.test(location.search))return;var l=document.querySelector('link[rel=alternate][hreflang="'+c+'"]');if(l)location.replace(l.href+location.search+location.hash)}catch(e){}})();</script>
+  <link rel="stylesheet" href="../../lib/ground-control-ui/dist/ground-control.css">
+  <link rel="stylesheet" href="../../assets/site.css">
+  <script src="../../lib/ground-control-ui/dist/ground-control.js" defer></script>
+  <script src="../../assets/i18n/uk-galych.js"></script>
+  <script src="../../assets/i18n.js"></script>
+  <script src="../../assets/progress-store.js" defer></script>
+  <script src="../../assets/backend-config.js" defer></script>
+  <script src="../../assets/account.js" defer></script>
+  <script src="../../assets/grading.js" defer></script>
+  <script src="../../assets/app.js" defer></script>
+  <script src="../../assets/uav-quiz.js" defer></script>
+  <script src="../../assets/uav-tasks.js" defer></script>
+  <script src="../../assets/offline.js" defer></script>
+</head>
+<body class="gc-root" data-base="../" data-root="../../">
+  <header class="site-header">
+    <div class="gc-container site-header__inner">
+      <a class="site-brand" href="../index.html"><span class="site-brand__mark" aria-hidden="true">◆</span> UAV Student</a>
+      <nav class="gc-nav" aria-label="Розділи сайту">
+        <a href="../index.html" aria-current="page">Курс</a>
+        <a href="../ref/index.html">Довідник</a>
+        <a href="../pages/glossary.html">Глосарій</a>
+        <a href="../pages/fails.html">Фейли</a>
+        <a href="../pages/search.html">Пошук</a>
+        <a href="../pages/progress.html">Мій прогрес</a>
+      </nav>
+      <nav class="lang-switch" aria-label="Мова"><a class="gc-tag" href="../../cap/cap-designer.html" data-lang-to="ru" hreflang="ru" lang="ru" title="Русский">RU</a><a class="gc-tag" href="../../uk/cap/cap-designer.html" data-lang-to="uk" hreflang="uk" lang="uk" title="Українська">UK</a><a class="gc-tag" href="../../en/cap/cap-designer.html" data-lang-to="en" hreflang="en" lang="en" title="English">EN</a><a class="gc-tag" href="../../gal/cap/cap-designer.html" data-lang-to="uk-galych" hreflang="uk-galych" lang="uk-galych" title="Галицька (експеримент)" aria-current="true" data-state="ok">GAL</a></nav>
+    </div>
+  </header>
+  <main class="gc-container site-main">
+    <article class="module" data-module-page="cap-designer">
+      <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-designer">Конструктор</a><span>Підсумковий проєкт</span></p>
+      <h1 class="module-title">Аппарат под ТЗ</h1>
+      <div class="module-tags"><span class="gc-tag">Підсумковий проєкт треку 3</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ЗДАНО</span></div>
+      <p class="module-lead">Результат: Проект аппарата под заданную миссию: расчёт, проверка силовой установки на стенде (или по датасету), устойчивость или миксер, сравнение прогноза с измерением</p>
+      <div class="gc-prose module-body">
+        <h2>Що здати</h2>
+        <ul><li>ТЗ в числах: полезная нагрузка, время полёта, ветер, габариты, запас</li><li>Скрипт расчёта (sizing) в репозитории с замкнутым бюджетом массы и выбором конфигурации</li><li>Данные стенда для выбранной пары мотор/проп (своего или из датасета модуля): г/Вт, C_T, бюджет погрешности</li><li>Для крыла — центровка и статический запас; для мультиротора нестандартной схемы — матрица эффективности и проверка насыщения</li><li>Если аппарат собран: лог висения или полёта и сравнение с прогнозом</li></ul>
+        <h2>Критерії приймання</h2>
+        <p class="gc-muted">Проєкт здано, коли виконано всі пункти. Позначай у міру готовності:</p>
+        <ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="cap-designer:cap:0"><span>Каждое число ТЗ прослеживается до расчёта, а расчёт — до даташита, стенда или допущения с пометкой</span></label></li><li><label><input type="checkbox" data-check-id="cap-designer:cap:1"><span>Бюджет массы замкнут, расчёт воспроизводится одной командой</span></label></li><li><label><input type="checkbox" data-check-id="cap-designer:cap:2"><span>Прогноз времени полёта или тока висения сверен с измерением (или с датасетом), расхождение объяснено</span></label></li><li><label><input type="checkbox" data-check-id="cap-designer:cap:3"><span>Выбор конфигурации обоснован сравнением хотя бы двух вариантов</span></label></li></ul>
+        <h2>Рубрика: як відрізнити зроблене від зданого</h2><p class="gc-muted">Перевір свою роботу за кожним рядком. Як вона ближча до лівої колонки — проєкт ще не готовий.</p><div class="widget__table-wrap"><table class="rubric"><thead><tr><th>Критерій</th><th>Погано</th><th>Файно</th></tr></thead><tbody><tr><th scope="row">Расчёт</th><td class="rubric__bad">Время полёта «около 25 минут» по калькулятору</td><td class="rubric__good">Скрипт: 4.29 кг, 6S3P, 28.8 мин при T/W 2.05 на просевшей АКБ; допущения перечислены</td></tr><tr><th scope="row">Проверка</th><td class="rubric__bad">Таблица производителя принята как есть</td><td class="rubric__good">Стенд: г/Вт на 8 % ниже даташита при совпадающем C_T — потери в приводе, прогноз пересчитан</td></tr><tr><th scope="row">Сравнение вариантов</th><td class="rubric__bad">Квадрокоптер, потому что привычно</td><td class="rubric__good">Квадро 15″ не проходит по T/W, квадро 17″ и гекса проходят; выбран квадро 17″ по массе</td></tr></tbody></table></div>
+        
+        <h2>Модулі треку</h2>
+        <ol><li><a href="../m/des-sizing.html">Проектирование под задачу: ТЗ → масса, энергия, тяга, конфигурация</a></li><li><a href="../m/des-thrust-stand.html">Тяговый стенд: тензодатчик + HX711, ток, обороты, КПД</a></li><li><a href="../m/aero-stability.html">Самолёт: устойчивость, центровка, статический запас, поляра</a></li><li><a href="../m/ctl-allocation.html">Миксер и распределение управления: матрица, насыщение, PX4 Control Allocation, наклонные моторы</a></li></ol>
+        <div class="gc-callout" data-state="caution"><strong>Безпека.</strong> Вшитко, що ся дасть зробити в SITL або без пропів, робиться там. Реальний політ — лиш після наземних тестів, з перевіреним failsafe.</div>
+      </div>
+      <div class="module-done"><gc-button variant="secondary" data-done-toggle="cap-designer" data-done-label="зданий" data-done-past="Складено">Позначити як зданий</gc-button></div>
+    </article>
+  </main>
+  <footer class="gc-container site-footer gc-muted">
+    <p>Відкритий курс · <a href="https://github.com/irreligious86/UAV-Education">вихідний код на GitHub</a> · <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">план розвитку</a> · <a href="../../curriculum/curriculum.html">для розробника</a> · CC BY-NC-SA 4.0</p>
+  </footer>
+</body>
+</html>
