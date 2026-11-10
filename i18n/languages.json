@@ -1,5 +1,5 @@
 {
-  "@doc": "Site languages. The first entry is the source language and is built at the site root; every other one is built under /<dir>/. Adding a language: one entry here plus i18n/<code>/ (see docs/I18N.md). Optional \"fallback\": a language whose translations fill this one's gaps before the source language (a dialect or regional variant on top of its standard language).",
+  "@doc": "Site languages. The first entry is the source language and is built at the site root; every other one is built under /<dir>/. Adding a language: one entry here plus i18n/<code>/ (see docs/I18N.md). Optional \"fallback\": a language whose translations fill this one's gaps before the source language (a dialect or regional variant on top of its standard language). Optional \"oldDirs\": former URL directories of the language; the build writes redirect pages there so old links keep working.",
   "languages": [
     {
       "code": "ru",
@@ -10,10 +10,13 @@
     },
     {
       "code": "uk",
-      "dir": "uk",
+      "dir": "ua",
       "name": "Українська",
-      "short": "UK",
-      "htmlLang": "uk"
+      "short": "UA",
+      "htmlLang": "uk",
+      "oldDirs": [
+        "uk"
+      ]
     },
     {
       "code": "en",

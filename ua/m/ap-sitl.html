@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="uk" data-theme="dark" data-lang="uk">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SITL: дрон без дрона — UAV Student</title>
+  <meta name="description" content="підняти SITL + GCS повторити сценарій скриптом">
+  <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
+  <link rel="manifest" href="../../manifest.webmanifest">
+  <meta name="theme-color" content="#0b0f14">
+  <link rel="alternate" hreflang="ru" href="../../m/ap-sitl.html">
+  <link rel="alternate" hreflang="uk" href="../../ua/m/ap-sitl.html">
+  <link rel="alternate" hreflang="en" href="../../en/m/ap-sitl.html">
+  <link rel="alternate" hreflang="uk-galych" href="../../gal/m/ap-sitl.html">
+  <script>/* go to the visitor's chosen language before anything paints (assets/i18n.js) */(function(){try{var c=localStorage.getItem('uav-lang'),h=document.documentElement.getAttribute('data-lang');if(!c||c===h||/[?&]lang=keep\b/.test(location.search))return;var l=document.querySelector('link[rel=alternate][hreflang="'+c+'"]');if(l)location.replace(l.href+location.search+location.hash)}catch(e){}})();</script>
+  <link rel="stylesheet" href="../../lib/ground-control-ui/dist/ground-control.css">
+  <link rel="stylesheet" href="../../assets/site.css">
+  <script src="../../lib/ground-control-ui/dist/ground-control.js" defer></script>
+  <script src="../../assets/i18n/uk.js"></script>
+  <script src="../../assets/i18n.js"></script>
+  <script src="../../assets/progress-store.js" defer></script>
+  <script src="../../assets/backend-config.js" defer></script>
+  <script src="../../assets/account.js" defer></script>
+  <script src="../../assets/grading.js" defer></script>
+  <script src="../../assets/app.js" defer></script>
+  <script src="../../assets/uav-quiz.js" defer></script>
+  <script src="../../assets/uav-tasks.js" defer></script>
+  <script src="../../assets/offline.js" defer></script>
+</head>
+<body class="gc-root" data-base="../" data-root="../../">
+  <header class="site-header">
+    <div class="gc-container site-header__inner">
+      <a class="site-brand" href="../index.html"><span class="site-brand__mark" aria-hidden="true">◆</span> UAV Student</a>
+      <nav class="gc-nav" aria-label="Розділи сайту">
+        <a href="../index.html" aria-current="page">Курс</a>
+        <a href="../ref/index.html">Довідник</a>
+        <a href="../pages/glossary.html">Глосарій</a>
+        <a href="../pages/fails.html">Фейли</a>
+        <a href="../pages/search.html">Пошук</a>
+        <a href="../pages/progress.html">Мій прогрес</a>
+      </nav>
+      <nav class="lang-switch" aria-label="Мова"><a class="gc-tag" href="../../m/ap-sitl.html" data-lang-to="ru" hreflang="ru" lang="ru" title="Русский">RU</a><a class="gc-tag" href="../../ua/m/ap-sitl.html" data-lang-to="uk" hreflang="uk" lang="uk" title="Українська" aria-current="true" data-state="ok">UA</a><a class="gc-tag" href="../../en/m/ap-sitl.html" data-lang-to="en" hreflang="en" lang="en" title="English">EN</a><a class="gc-tag" href="../../gal/m/ap-sitl.html" data-lang-to="uk-galych" hreflang="uk-galych" lang="uk-galych" title="Галицька (експеримент)">GAL</a></nav>
+    </div>
+  </header>
+  <main class="gc-container site-main">
+    <article class="module" data-module-page="ap-sitl">
+      <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-autonomy">Автономність</a><span>SITL: дрон без дрона</span></p>
+      <h1 class="module-title">SITL: дрон без дрона</h1>
+      <div class="module-tags"><span class="gc-tag" title="Рівень">L2 — Інтегратор</span><span class="gc-tag">читання 25 хв</span><span class="gc-tag">навчання ~3 год</span><span class="gc-tag">ArduPilot 4.5+</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ОПАНОВАНО</span></div>
+      <p class="gc-muted module-score" data-module-score></p>
+      <p class="module-lead">SITL (Software In The Loop) — справжня прошивка ArduPilot, запущена на комп&#x27;ютері замість польотного контролера, із симулятором фізики замість реального світу. Тут можна безкоштовно розбити сотню октокоптерів: переплутати параметри, вимкнути GPS у польоті, «впустити» мотор. Модуль показує, як підняти SITL, підключити наземну станцію, керувати дроном скриптом на Python і організувати проєкт так, щоб маршрути та сценарії жили окремо.</p>
+      <div class="gc-callout" data-state="ok"><strong>Після модуля ти вмієш</strong><ul><li>підняти SITL + GCS</li><li>повторити сценарій скриптом</li></ul></div><p class="gc-muted">Перед цим модулем: <a href="ap-intro.html">Вступ до ArduPilot</a></p><div class="gc-callout lab"><p class="gc-label gc-muted">Лабораторна</p><strong>Зліт, коло, посадка скриптом</strong><p class="gc-muted lab__hint">Здано, коли позначено всі пункти:</p><ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="ap-sitl:lab:0"><span>SITL запущено з потрібною рамою, GCS підключено</span></label></li><li><label><input type="checkbox" data-check-id="ap-sitl:lab:1"><span>Скрипт на pymavlink піднімає дрон і садить</span></label></li><li><label><input type="checkbox" data-check-id="ap-sitl:lab:2"><span>Маршрут у routes/, сценарій у scenarios/ — окремо</span></label></li><li><label><input type="checkbox" data-check-id="ap-sitl:lab:3"><span>Сценарій прогнано на двох маршрутах без правки коду</span></label></li></ul></div><div class="path-pos gc-muted"><span class="gc-label">На шляху</span><ul><li data-path-pos="ardupilot"><a href="../path/ardupilot.html">ArduPilot</a>: крок 16 з 69 → <a href="ap-missions.html?path=ardupilot">Місії та планування</a></li></ul></div>
+      <div class="gc-prose module-body">
+<h2>Теорія</h2>
+<h4 class="md-subheading">Як влаштований SITL</h4>
+<p>Прошивка збирається під Linux і обмінюється із симулятором фізики «показами датчиків» і «командами моторам». Усе інше — справжнє: ті самі параметри, режими, EKF, failsafe, логи. Тому все, що ти налагодив у SITL, переноситься на залізо майже без змін. Майже — бо в симуляції ідеальні вібрації, ідеальний зв&#x27;язок і чесний GPS, якщо ти не зіпсуєш їх сам.</p>
+<h4 class="md-subheading">sim_vehicle.py і MAVProxy</h4>
+<p>Скрипт <code>sim_vehicle.py</code> збирає прошивку, запускає її та консольну наземну станцію MAVProxy. Ключові прапорці:</p>
+<ul><li><code>-v ArduCopter</code> або <code>-v ArduPlane</code> — тип апарата;</li><li><code>-f octa-quad</code>, <code>-f quad</code>, <code>-f quadplane</code> — модель рами в симуляторі;</li><li><code>--console --map</code> — вікна консолі та карти;</li><li><code>-w</code> — скинути параметри до стандартних (корисно, коли експерименти зайшли не туди).</li></ul>
+<p>Наземну станцію (QGroundControl, Mission Planner) підключають до виходу MAVProxy через UDP — зазвичай вона знаходить його сама.</p>
+<h4 class="md-subheading">Сценарій проти маршруту</h4>
+<p>Головне архітектурне рішення в навчальному проєкті: маршрут і сценарій живуть окремо.</p>
+<ul><li><strong>Маршрут</strong> — лише послідовність точок в одному форматі. Перша точка — старт, остання — фініш.</li><li><strong>Сценарій</strong> — лише команди: зліт, «пролети маршрут X», посадка, відмова мотора на третій точці. Координат у сценарії немає.</li></ul>
+<p>Так один маршрут проганяється різними сценаріями, а один сценарій — різними маршрутами. Це та сама ідея, що й розділення даних і логіки в будь-якому нормальному коді.</p>
+<h4 class="md-subheading">Що вміє SITL, крім «політати»</h4>
+<ul><li><strong>Моделі рам</strong> (<code>-f</code>): quad, hexa, octa, octa-quad (X8), y6, tri, heli, plane, quadplane, quadplane-tilttri/quadplane-tilt (тілтротори), rover, boat, sub — у кожної своя фізика в <code>libraries/SITL/SIM_*.cpp</code>; параметри за замовчуванням для моделі — <code>Tools/autotest/default_params/*.parm</code>.</li><li><strong>Відмови та середовище</strong> через <code>SIM_*</code>: вітер (<code>SIM_WIND_SPD/DIR/TURB</code>), відмова мотора (<code>SIM_ENGINE_FAIL</code> + <code>SIM_ENGINE_MUL</code>), GPS (вимкнення, шум, глітч, затримка), компас (зміщення), баро (дрейф/глітч), вібрації (<code>SIM_VIB_*</code>), втрата RC (<code>SIM_RC_FAIL</code>), напруга АКБ (<code>SIM_BATT_VOLTAGE</code>), далекомір і оптичний потік (<code>RNGFND1_TYPE = 100</code>, <code>FLOW_TYPE = 10</code>). Це основа модулів «Відмовостійкість» і «Стійкість навігації».</li><li><strong>Прискорення часу</strong> <code>--speedup 10</code> для довгих місій; <code>--add-param-file</code> для своїх параметрів; <code>--out=udp:IP:14550</code> для зовнішньої GCS; <code>--no-mavproxy</code> для скриптів.</li><li><strong>Зовнішні фізичні рушії</strong>: Gazebo (<code>-f gazebo-iris</code>), RealFlight, X-Plane, JSBSim (крило), Webots — коли потрібна аеродинаміка/візуалізація; для логіки failsafe і місій вбудованої фізики достатньо.</li><li><strong>Lua і companion</strong>: скрипти (<code>SCR_ENABLE = 1</code>, тека <code>scripts/</code> поруч із запуском) і MAVLink-клієнти (<code>tcp:127.0.0.1:5760</code>, наступні — 5762/5763) працюють як на залізі.</li></ul>
+<h4 class="md-subheading">Логи SITL та їх читання</h4>
+<p>Логи пишуться в <code>logs/</code> робочої теки (<code>.BIN</code>), читаються тими самими інструментами, що й реальні (<code>mavexplorer.py</code>, Mission Planner, <code>pymavlink</code> — модуль «Python для даних»). Це і є сенс SITL: відпрацювати <strong>метод</strong> аналізу до реальних польотів.</p>
+<h4 class="md-subheading">Розібраний приклад: перевірка місії з відмовою</h4>
+<p><code>sim_vehicle.py -v ArduCopter -f hexa --console --map --speedup 5</code>; завантажити місію (<code>wp load mission.txt</code>), <code>mode auto</code>, <code>arm throttle</code>; на третій точці <code>param set SIM_ENGINE_FAIL 4</code> (мотор 3, бітова маска), спостерігати <code>RCOU</code>, висоту, рискання; повернути <code>0</code>; далі <code>param set SIM_RC_FAIL 1</code> у Loiter — перевірити <code>FS_THR_ENABLE</code>. Результат — у журнал тестів (модуль «Відмовостійкість»): сценарій, очікування, факт, лог. Сценарій можна записати як скрипт pymavlink — заготовка в <code>examples/sitl-pymavlink</code> репозиторію курсу.</p>
+<h4 class="md-subheading">Де SITL бреше</h4>
+<p>Немає вібрацій і шуму моторів (фільтри не перевірити), ідеальна механіка, ESC без затримок, GPS із заданим шумом, немає завад на компас, крім змодельованих. Параметри тюнінгу PID із SITL <strong>не переносяться</strong> на реальний апарат; переносяться логіка, місії, скрипти, failsafe і навички аналізу.</p>
+<figure class="diagram" data-diagram="sitl-arch"><div class="diagram__svg"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 200" width="100%" role="img" aria-labelledby="t" style="max-width:720px;display:block;margin:0 auto"><title id="t">SITL: той самий код автопілота, фізика замість заліза</title><style>text{font-family: var(--gc-font-mono, ui-monospace, Menlo, monospace); font-size: 12px;fill:currentColor} .m{fill:var(--gc-ink-muted, #8a93a3)} .a{fill:var(--gc-accent-hud, #5ef1d2)} .w{fill:var(--gc-signal-amber, #f0b24c)} .d{fill:var(--gc-signal-red, #e8636b)} .box{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:currentColor;stroke-width:1.2} .boxa{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6} .ln{stroke:currentColor;stroke-width:1.2;fill:none} .lna{stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6;fill:none} .lnm{stroke:var(--gc-ink-muted, #8a93a3);stroke-width:1;fill:none;stroke-dasharray:4 3} .t{font-size:11px} .b{font-weight:600}</style><defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker><marker id="ara" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--gc-accent-hud, #5ef1d2)"/></marker></defs><rect class="boxa" x="10.0" y="30" width="142.0" height="48" rx="6"/><text x="81.0" y="51.0" text-anchor="middle" class="b">Модель фізики</text><text x="81.0" y="65.0" text-anchor="middle" class="b">SIM_* параметри</text><rect class="boxa" x="196.0" y="30" width="142.0" height="48" rx="6"/><text x="267.0" y="51.0" text-anchor="middle" class="b">ArduCopter</text><text x="267.0" y="65.0" text-anchor="middle" class="b">той самий код</text><rect class="box" x="382.0" y="30" width="142.0" height="48" rx="6"/><text x="453.0" y="51.0" text-anchor="middle">MAVProxy</text><text x="453.0" y="65.0" text-anchor="middle">tcp:5760</text><rect class="box" x="568.0" y="30" width="142.0" height="48" rx="6"/><text x="639.0" y="51.0" text-anchor="middle">GCS</text><text x="639.0" y="65.0" text-anchor="middle">udp:14550</text><rect class="boxa" x="382.0" y="130" width="142.0" height="48" rx="6"/><text x="453.0" y="151.0" text-anchor="middle" class="b">pymavlink-скрипт</text><text x="453.0" y="165.0" text-anchor="middle" class="b">udp:14551</text><rect class="box" x="196.0" y="130" width="142.0" height="48" rx="6"/><text x="267.0" y="151.0" text-anchor="middle">logs/*.BIN</text><text x="267.0" y="165.0" text-anchor="middle">як у польоті</text><path class="ln" d="M152.0 54.0 L196.0 54.0" marker-end="url(#ar)"/><path class="ln" d="M338.0 54.0 L382.0 54.0" marker-end="url(#ar)"/><path class="ln" d="M524.0 54.0 L568.0 54.0" marker-end="url(#ar)"/><path class="ln" d="M453.0 78 L453.0 130" marker-end="url(#ar)"/><path class="ln" d="M267.0 78 L267.0 130" marker-end="url(#ar)"/><text x="10" y="150" text-anchor="start" class="m t">SITL бреше:</text><text x="10" y="164" text-anchor="start" class="m t">вібрації, вітер, радіо</text></svg></div><figcaption class="gc-muted">SITL: той самий код ArduCopter отримує сенсори від моделі фізики; MAVProxy роздає MAVLink на GCS і скрипти, логи пишуться як у польоті.</figcaption><div class="diagram__hint">Схему можно прокрутить по горизонтали</div></figure>
+
+<h2>Практика</h2>
+<h4 class="md-subheading">Крок 1. Встановлення (Ubuntu)</h4>
+<pre class="cli-block"><code>git clone --recurse-submodules https://github.com/ArduPilot/ardupilot.git
+cd ardupilot
+Tools/environment_install/install-prereqs-ubuntu.sh -y
+. ~/.profile</code></pre>
+<h4 class="md-subheading">Крок 2. Перший запуск</h4>
+<pre class="cli-block"><code>sim_vehicle.py -v ArduCopter -f octa-quad --console --map -w</code></pre>
+<p>У консолі MAVProxy:</p>
+<pre class="cli-block"><code>mode guided
+arm throttle
+takeoff 10</code></pre>
+<p>Дрон злетить на 10 м. <code>mode rtl</code> поверне його додому.</p>
+<h4 class="md-subheading">Крок 3. Керування скриптом (pymavlink)</h4>
+<p>SITL відкриває додаткові TCP-порти для зовнішніх клієнтів. Приклад зльоту скриптом:</p>
+<pre class="cli-block"><code>from pymavlink import mavutil
+
+master = mavutil.mavlink_connection(&quot;tcp:127.0.0.1:5762&quot;)
+master.wait_heartbeat()
+print(&quot;connected to system&quot;, master.target_system)
+
+master.set_mode(master.mode_mapping()[&quot;GUIDED&quot;])
+master.arducopter_arm()
+master.motors_armed_wait()
+
+master.mav.command_long_send(
+    master.target_system, master.target_component,
+    mavutil.mavlink.MAV_CMD_NAV_TAKEOFF,
+    0, 0, 0, 0, 0, 0, 0, 10,  # param7 = altitude, m
+)
+
+while True:
+    msg = master.recv_match(type=&quot;GLOBAL_POSITION_INT&quot;, blocking=True)
+    alt = msg.relative_alt / 1000
+    print(f&quot;alt {alt:.1f} m&quot;)
+    if alt &gt; 9.5:
+        break</code></pre>
+<h4 class="md-subheading">Крок 4. Структура проєкту</h4>
+<pre class="cli-block"><code>ardupilot-lab/
+  sitl/
+    lib/          # shared code: connection, waiting for modes, helpers
+    routes/       # data only: lists of waypoints, one format everywhere
+    scenarios/    # commands only: takeoff, fly route X, inject failure, land
+    run_sitl.sh   # start SITL + GCS with the right frame</code></pre>
+<h4 class="md-subheading">Що має вийти і що записати</h4>
+<ul><li><strong>Крок 1.</strong> Встановлення триває 10–30 хвилин. Після нього в новому терміналі має знаходитися команда <code>sim_vehicle.py</code>. Якщо її немає, значить, не перечитано <code>~/.profile</code>.</li><li><strong>Крок 2.</strong> Перше збирання триває кілька хвилин, наступні запуски — секунди. У консолі видно, як GPS отримує фіксацію і EKF починає використовувати GPS, після цього арм проходить. Арм раніше за цей момент відхиляється повідомленням <code>PreArm</code>, і це нормально. <code>takeoff 10</code> піднімає апарат на 10 м. Після <code>mode rtl</code> він спочатку набирає висоту повернення <code>RTL_ALT</code> (у Copter 4.7 — <code>RTL_ALT_M</code>; за замовчуванням 15 м), якщо перебуває нижче, і лише потім летить додому. Запиши час набору 10 м і підсумкову висоту перед поверненням: так перевіряється, що параметри працюють так, як ти їх розумієш.</li><li><strong>Крок 3.</strong> Порти SITL: 5760 — SERIAL0, його займає MAVProxy; 5762 і 5763 — SERIAL1 і SERIAL2 для своїх клієнтів. Скрипт друкує зростаючу висоту і виходить на 9.5 м — але лише якщо <code>GLOBAL_POSITION_INT</code> взагалі йде на цей порт. У Copter потоки на SERIAL1 за замовчуванням вимкнені (<code>SR1_POSITION = 0</code>, у 4.7 — <code>MAV2_POSITION</code>), тому перед циклом запроси повідомлення через <code>MAV_CMD_SET_MESSAGE_INTERVAL</code>, інакше <code>recv_match</code> чекатиме вічно. Додай виведення часу від команди до виходу — це перша метрика сценарію.</li><li><strong>Крок 4.</strong> Маршрут — дані, сценарій — код. Приклад маршруту <code>routes/square_20m.csv</code>, рядки <code>north_m,east_m,alt_m</code> відносно точки зльоту:</li></ul>
+<pre class="cli-block"><code>20,0,10
+20,20,10
+0,20,10
+0,0,10</code></pre>
+<p>Сценарій читає файл, перетворює зміщення на цілі GUIDED і чекає на прибуття в радіус 1 м. Другий маршрут — той самий формат з іншими числами.</p>
+<h4 class="md-subheading">Лабораторна</h4>
+<p>Напиши сценарій «зліт → коло → посадка» так, щоб координати лежали в <code>routes/</code>, а сценарій просто посилався на маршрут. Прожени його на двох різних маршрутах без правки коду сценарію.</p>
+<p>Лабораторну зараховано, коли SITL запускається скриптом <code>run_sitl.sh</code> з потрібною рамою і наземку підключено, сценарій на pymavlink злітає, проходить маршрут і сідає, маршрути лежать у <code>routes/</code> окремо від сценаріїв, а два маршрути прогнано одним і тим самим кодом із записаним часом проходження.</p>
+
+<h2>Діагностика</h2>
+<div class="diag-groups"><article class="diag-item"><h4><strong>Симптом:</strong> <code>sim_vehicle.py: command not found</code></h4><ul><li>Можлива причина: не перечитано профіль після встановлення.</li><li>Що зробити: <code>. ~/.profile</code> або новий термінал.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> скрипт висить на <code>wait_heartbeat</code></h4><ul><li>Можлива причина: неправильна адреса або порт, SITL не запущено.</li><li>Що зробити: перевірити, що SITL працює, і номер порту.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> <code>arm throttle</code> відмовляє з <code>PreArm</code></h4><ul><li>Можлива причина: EKF ще не зійшовся після старту.</li><li>Що зробити: зачекати 10–20 с після запуску, читати повідомлення PreArm.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> після експериментів дрон поводиться дивно</h4><ul><li>Можлива причина: залишилися змінені параметри.</li><li>Що зробити: перезапуск з <code>-w</code> для скидання.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> sim_vehicle.py не стартує / помилки «waf configure»</h4><ul><li>Можлива причина: не встановлено залежності.</li><li>Що зробити: <code>Tools/environment_install/install-prereqs-ubuntu.sh -y</code>, перелогінитися, <code>git submodule update --init --recursive</code>.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> GCS не підключається до SITL</h4><ul><li>Можлива причина: порти зайняті, MAVProxy не прокидає.</li><li>Що зробити: <code>--out=udp:127.0.0.1:14550</code> явно, перевірити <code>ss -lunp</code>.</li></ul></article></div>
+
+<h2>Чек-лист</h2>
+<ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="ap-sitl:0"><span>SITL запускається, GCS підключено</span></label></li><li><label><input type="checkbox" data-check-id="ap-sitl:1"><span>Зліт і RTL виконано з консолі MAVProxy</span></label></li><li><label><input type="checkbox" data-check-id="ap-sitl:2"><span>Скрипт на pymavlink піднімає дрон</span></label></li><li><label><input type="checkbox" data-check-id="ap-sitl:3"><span>Маршрути та сценарії рознесено по різних теках</span></label></li><li><label><input type="checkbox" data-check-id="ap-sitl:4"><span>Знаю, як скинути параметри SITL</span></label></li></ul>
+
+<h2>Джерела</h2>
+<ul class="refs"><li><a href="https://ardupilot.org/dev/docs/setting-up-sitl-on-linux.html" target="_blank" rel="noopener noreferrer">Setting up SITL on Linux — ArduPilot Dev</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://ardupilot.org/dev/docs/SITL-setup-landingpage.html" target="_blank" rel="noopener noreferrer">Setting Up SITL — ArduPilot Dev</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://github.com/ArduPilot/pymavlink" target="_blank" rel="noopener noreferrer">pymavlink — source code (GitHub)</a> <span class="gc-tag" data-state="info">primary</span></li></ul>
+<h2>Перевір себе</h2>
+<uav-quiz src="../quiz/ap-sitl.json" module="ap-sitl"></uav-quiz>
+      </div>
+      <div class="module-done"><gc-button variant="secondary" data-done-toggle="ap-sitl">Позначити як пройдений</gc-button></div>
+      <section class="related" aria-label="Суміжні модулі"><p class="gc-label gc-muted">Суміжні модулі</p><div class="gc-grid ref-grid"><a class="gc-card" href="ap-intro.html"><strong>Вступ до ArduPilot</strong><div class="gc-card__meta"><span class="gc-tag" title="L2 — Интегратор">L2</span></div></a><a class="gc-card" href="ap-lua.html"><strong>Lua: сценарії та fault injection</strong><div class="gc-card__meta"><span class="gc-tag" title="L3 — Специалист">L3</span></div></a></div></section>
+      <nav class="pager" aria-label="Сусідні модулі" data-track-pager><a class="gc-card pager__prev" href="ap-intro.html"><span class="gc-label gc-muted">Назад · трек</span><br>Вступ до ArduPilot</a><a class="gc-card pager__next" href="tools-gazebo.html"><span class="gc-label gc-muted">Далі · трек</span><br>Симуляція в Gazebo: світи, датчики, камера в ROS 2 і сценарні тести</a></nav><nav class="pager" aria-label="Сусідні кроки шляху ArduPilot" data-path-pager="ardupilot" hidden><a class="gc-card pager__prev" href="ops-case-studies.html?path=ardupilot"><span class="gc-label gc-muted">Назад · шлях ArduPilot</span><br>Розбір реальних аварій</a><a class="gc-card pager__next" href="ap-missions.html?path=ardupilot"><span class="gc-label gc-muted">Далі · крок 17 з 69</span><br>Місії та планування</a></nav>
+    </article>
+  </main>
+  <footer class="gc-container site-footer gc-muted">
+    <p>Відкритий курс · <a href="https://github.com/irreligious86/UAV-Education">вихідний код на GitHub</a> · <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">план розвитку</a> · <a href="../../curriculum/curriculum.html">для розробника</a> · CC BY-NC-SA 4.0</p>
+  </footer>
+</body>
+</html>

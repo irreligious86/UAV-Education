@@ -17,6 +17,7 @@ sys.path.insert(0, str(ROOT / "scripts"))
 import i18n  # noqa: E402
 
 TREES = [ROOT] + [ROOT / l["dir"] for l in i18n.LANGS if l["dir"]]   # every language tree (docs/I18N.md)
+TREES += [ROOT / o for l in i18n.LANGS for o in l.get("oldDirs", [])]   # redirect pages of former URLs
 ATTR = re.compile(r'(?:href|src)="([^"]+)"')
 ID = re.compile(r'\bid="([^"]+)"')
 

@@ -1577,6 +1577,25 @@ def build_language(code: str) -> dict:
     return model
 
 
+def write_redirects(code: str) -> None:
+    """Pages under a language's former URL directory ("oldDirs") that send visitors to the current one."""
+    l = i18n.BY_CODE[code]
+    new = ROOT / l["dir"]
+    for old in l.get("oldDirs", []):
+        shutil.rmtree(ROOT / old, ignore_errors=True)
+        for f in sorted(new.rglob("*.html")):
+            rel = f.relative_to(new).as_posix()
+            target = "../" * (rel.count("/") + 1) + l["dir"] + "/" + rel
+            write(ROOT / old / rel, f"""<!doctype html>
+<html lang="{l['htmlLang']}"><head><meta charset="utf-8">
+<title>{esc(l['name'])}</title>
+<link rel="canonical" href="{target}">
+<meta http-equiv="refresh" content="0; url={target}">
+<script>location.replace("{target}" + location.search + location.hash)</script>
+</head><body><p><a href="{target}">{esc(l['name'])}</a></p></body></html>
+""")
+
+
 def write_js_catalogs() -> None:
     """assets/i18n/<lang>.js: the interface catalog for the browser (window.UAV_I18N_CATALOG)."""
     d = ROOT / "assets" / "i18n"
@@ -1592,6 +1611,7 @@ def main() -> None:
     stats = []
     for l in i18n.LANGS:
         model = build_language(l["code"])
+        write_redirects(l["code"])
         st = TRANSLATION_STATE.get(l["code"], {})
         n_pub = sum(1 for m in model["modules"].values() if m["status"] == "published")
         if l["code"] == i18n.SOURCE:

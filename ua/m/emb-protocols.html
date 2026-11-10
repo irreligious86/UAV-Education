@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="uk" data-theme="dark" data-lang="uk">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>UART, I2C, SPI, CAN на рівні сигналів і драйверів — UAV Student</title>
+  <meta name="description" content="пояснити таймінги, адресацію, pull-up, швидкість і помилки кожної шини написати драйвер I2C-датчика на ESP32 розуміти DroneCAN і навіщо він на великих апаратах">
+  <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
+  <link rel="manifest" href="../../manifest.webmanifest">
+  <meta name="theme-color" content="#0b0f14">
+  <link rel="alternate" hreflang="ru" href="../../m/emb-protocols.html">
+  <link rel="alternate" hreflang="uk" href="../../ua/m/emb-protocols.html">
+  <link rel="alternate" hreflang="en" href="../../en/m/emb-protocols.html">
+  <link rel="alternate" hreflang="uk-galych" href="../../gal/m/emb-protocols.html">
+  <script>/* go to the visitor's chosen language before anything paints (assets/i18n.js) */(function(){try{var c=localStorage.getItem('uav-lang'),h=document.documentElement.getAttribute('data-lang');if(!c||c===h||/[?&]lang=keep\b/.test(location.search))return;var l=document.querySelector('link[rel=alternate][hreflang="'+c+'"]');if(l)location.replace(l.href+location.search+location.hash)}catch(e){}})();</script>
+  <link rel="stylesheet" href="../../lib/ground-control-ui/dist/ground-control.css">
+  <link rel="stylesheet" href="../../assets/site.css">
+  <script src="../../lib/ground-control-ui/dist/ground-control.js" defer></script>
+  <script src="../../assets/i18n/uk.js"></script>
+  <script src="../../assets/i18n.js"></script>
+  <script src="../../assets/progress-store.js" defer></script>
+  <script src="../../assets/backend-config.js" defer></script>
+  <script src="../../assets/account.js" defer></script>
+  <script src="../../assets/grading.js" defer></script>
+  <script src="../../assets/app.js" defer></script>
+  <script src="../../assets/uav-quiz.js" defer></script>
+  <script src="../../assets/uav-tasks.js" defer></script>
+  <script src="../../assets/offline.js" defer></script>
+</head>
+<body class="gc-root" data-base="../" data-root="../../">
+  <header class="site-header">
+    <div class="gc-container site-header__inner">
+      <a class="site-brand" href="../index.html"><span class="site-brand__mark" aria-hidden="true">◆</span> UAV Student</a>
+      <nav class="gc-nav" aria-label="Розділи сайту">
+        <a href="../index.html" aria-current="page">Курс</a>
+        <a href="../ref/index.html">Довідник</a>
+        <a href="../pages/glossary.html">Глосарій</a>
+        <a href="../pages/fails.html">Фейли</a>
+        <a href="../pages/search.html">Пошук</a>
+        <a href="../pages/progress.html">Мій прогрес</a>
+      </nav>
+      <nav class="lang-switch" aria-label="Мова"><a class="gc-tag" href="../../m/emb-protocols.html" data-lang-to="ru" hreflang="ru" lang="ru" title="Русский">RU</a><a class="gc-tag" href="../../ua/m/emb-protocols.html" data-lang-to="uk" hreflang="uk" lang="uk" title="Українська" aria-current="true" data-state="ok">UA</a><a class="gc-tag" href="../../en/m/emb-protocols.html" data-lang-to="en" hreflang="en" lang="en" title="English">EN</a><a class="gc-tag" href="../../gal/m/emb-protocols.html" data-lang-to="uk-galych" hreflang="uk-galych" lang="uk-galych" title="Галицька (експеримент)">GAL</a></nav>
+    </div>
+  </header>
+  <main class="gc-container site-main">
+    <article class="module" data-module-page="emb-protocols">
+      <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-engineer">Інженер: код на борту</a><span>UART, I2C, SPI, CAN на рівні сигналів і драйверів</span></p>
+      <h1 class="module-title">UART, I2C, SPI, CAN на рівні сигналів і драйверів</h1>
+      <div class="module-tags"><span class="gc-tag" title="Рівень">L3 — Спеціаліст</span><span class="gc-tag">читання 40 хв</span><span class="gc-tag">навчання ~3 год</span><span class="gc-tag">любая прошивка</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ОПАНОВАНО</span></div>
+      <p class="gc-muted module-score" data-module-score></p>
+      <p class="module-lead">Модуль «Підключення периферії» вчив підключати готове; цей — робити своє: як виглядають біти на лінії, навіщо стартовий біт і ACK, звідки беруться помилки кадру та NACK, як рахуються таймінги й обмежується довжина шини, і як пишеться драйвер датчика з нуля (I2C-барометр/IMU на ESP32: регістри, читання блоком, обробка помилок, таймаути). Завершується DroneCAN: кадри CAN 2.0, арбітраж, node ID, навіщо це великим апаратам і як виглядає пакет DroneCAN в аналізаторі.</p>
+      <div class="gc-callout" data-state="ok"><strong>Після модуля ти вмієш</strong><ul><li>пояснити таймінги, адресацію, pull-up, швидкість і помилки кожної шини</li><li>написати драйвер I2C-датчика на ESP32</li><li>розуміти DroneCAN і навіщо він на великих апаратах</li></ul></div><p class="gc-muted">Перед цим модулем: <a href="emb-basics.html">Embedded: переривання, таймери, DMA, RTOS</a>, <a href="el-measure.html">Вимірювання: мультиметр, осцилограф, логічний аналізатор</a></p><div class="gc-callout lab"><p class="gc-label gc-muted">Лабораторна</p><strong>Драйвер датчика</strong><p class="gc-muted lab__hint">Здано, коли позначено всі пункти:</p><ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="emb-protocols:lab:0"><span>I2C-датчик прочитано власним драйвером</span></label></li><li><label><input type="checkbox" data-check-id="emb-protocols:lab:1"><span>Шину знято аналізатором</span></label></li><li><label><input type="checkbox" data-check-id="emb-protocols:lab:2"><span>Помилку на шині відтворено й оброблено</span></label></li></ul></div><div class="path-pos gc-muted"><span class="gc-label">На шляху</span><ul><li data-path-pos="ardupilot"><a href="../path/ardupilot.html">ArduPilot</a>: крок 52 з 69 → <a href="comp-raspberry.html?path=ardupilot">Raspberry Pi + ArduPilot</a></li></ul></div>
+      <div class="gc-prose module-body">
+<h2>Теорія</h2>
+<h4 class="md-subheading">UART</h4>
+<p>Асинхронний: немає тактової лінії, обидві сторони знають швидкість. Кадр: стартовий біт (0), 5–9 біт даних (LSB першим), опційно парність, 1–2 стопових (1). 8N1 на 115200 → 10 біт на байт → 11 520 байт/с. Приймач семплює в середині біта (зазвичай ×16 передискретизація); похибка швидкості до ~3–5% допустима, більша — <strong>framing error</strong>. Помилки: framing (стоп-біт не 1 — неправильна швидкість/інверсія), overrun (не встигли забрати байт — потрібен DMA/переривання), noise. Інверсія (SBUS): рівні перевернуті, idle = 0. Рівні 3.3 В TTL; RS-232/RS-485 — інші рівні/диф. пара (довгі лінії).</p>
+<p>Драйвер: кільцевий буфер прийому за перериванням/DMA, парсер кадрів протоколу (CRSF: <code>[адрес][длина][тип][payload][CRC8 0xD5]</code>; MAVLink: magic 0xFD, довжина, seq, sysid/compid, msgid, CRC16 з CRC_EXTRA), таймаут між байтами для ресинхронізації.</p>
+<h4 class="md-subheading">I2C</h4>
+<p>Синхронний, дві лінії open-drain з підтяжками: SCL, SDA. Майстер генерує такт; транзакція: START (SDA↓ при SCL=1) → 7-біт адреса + біт R/W → ACK від веденого (SDA↓ на 9-му такті) → байти даних з ACK/NACK → STOP. Читання регістра: START, адреса+W, номер регістра, <strong>повторний START</strong>, адреса+R, дані, NACK останнього, STOP. Швидкості 100/400 кГц (fast), 1 МГц (fast-plus). Обмеження: ємність шини ≤ 400 пФ → дроти до ~30–50 см, підтяжки 2.2–4.7 кОм (менше — крутіші фронти, більший струм). Помилки: NACK на адресу (немає пристрою/адреса/живлення), NACK на дані, <strong>зависла шина</strong> (ведений тримає SDA=0 після збою майстра — лікується 9 тактами SCL вручну, «bus recovery»), clock stretching (ведений тягне SCL — майстер має вміти чекати; у деяких МК/датчиків проблеми).</p>
+<figure class="diagram" data-diagram="i2c-transaction"><div class="diagram__svg"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 132" width="100%" role="img" aria-labelledby="t" style="max-width:720px;display:block;margin:0 auto"><title id="t">Читання регістра I2C</title><style>text{font-family: var(--gc-font-mono, ui-monospace, Menlo, monospace); font-size: 12px;fill:currentColor} .m{fill:var(--gc-ink-muted, #8a93a3)} .a{fill:var(--gc-accent-hud, #5ef1d2)} .w{fill:var(--gc-signal-amber, #f0b24c)} .d{fill:var(--gc-signal-red, #e8636b)} .box{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:currentColor;stroke-width:1.2} .boxa{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6} .ln{stroke:currentColor;stroke-width:1.2;fill:none} .lna{stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6;fill:none} .lnm{stroke:var(--gc-ink-muted, #8a93a3);stroke-width:1;fill:none;stroke-dasharray:4 3} .t{font-size:11px} .b{font-weight:600}</style><defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker><marker id="ara" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--gc-accent-hud, #5ef1d2)"/></marker></defs><rect class="box" x="16.0" y="28" width="50.4" height="46" rx="3"/><text x="41.21798872056107" y="48" text-anchor="middle" style="font-size:9px">START</text><text x="41.21798872056107" y="64" text-anchor="middle" class="m t" style="font-size:9px">1 біт</text><rect class="boxa" x="66.4" y="28" width="83.7" height="46" rx="3"/><text x="108.30449718014026" y="48" text-anchor="middle" class="b" style="font-size:11px">адреса+W</text><text x="108.30449718014026" y="64" text-anchor="middle" class="m t" style="font-size:9px">8 біт</text><rect class="box" x="150.2" y="28" width="50.4" height="46" rx="3"/><text x="175.39100563971945" y="48" text-anchor="middle" style="font-size:9px">ACK</text><text x="175.39100563971945" y="64" text-anchor="middle" class="m t" style="font-size:9px">1 біт</text><rect class="box" x="200.6" y="28" width="83.7" height="46" rx="3"/><text x="242.47751409929865" y="48" text-anchor="middle" style="font-size:11px">регістр</text><text x="242.47751409929865" y="64" text-anchor="middle" class="m t" style="font-size:9px">8 біт</text><rect class="box" x="284.3" y="28" width="50.4" height="46" rx="3"/><text x="309.5640225588778" y="48" text-anchor="middle" style="font-size:9px">ACK</text><text x="309.5640225588778" y="64" text-anchor="middle" class="m t" style="font-size:9px">1 біт</text><rect class="box" x="334.8" y="28" width="50.4" height="46" rx="3"/><text x="359.99999999999994" y="48" text-anchor="middle" style="font-size:9px">re-START</text><text x="359.99999999999994" y="64" text-anchor="middle" class="m t" style="font-size:9px">1 біт</text><rect class="boxa" x="385.2" y="28" width="83.7" height="46" rx="3"/><text x="427.0865084595792" y="48" text-anchor="middle" class="b" style="font-size:11px">адреса+R</text><text x="427.0865084595792" y="64" text-anchor="middle" class="m t" style="font-size:9px">8 біт</text><rect class="box" x="469.0" y="28" width="50.4" height="46" rx="3"/><text x="494.17301691915833" y="48" text-anchor="middle" style="font-size:9px">ACK</text><text x="494.17301691915833" y="64" text-anchor="middle" class="m t" style="font-size:9px">1 біт</text><rect class="boxa" x="519.4" y="28" width="83.7" height="46" rx="3"/><text x="561.2595253787375" y="48" text-anchor="middle" class="b" style="font-size:11px">дані</text><text x="561.2595253787375" y="64" text-anchor="middle" class="m t" style="font-size:9px">8 біт</text><rect class="box" x="603.1" y="28" width="50.4" height="46" rx="3"/><text x="628.3460338383168" y="48" text-anchor="middle" style="font-size:9px">NACK</text><text x="628.3460338383168" y="64" text-anchor="middle" class="m t" style="font-size:9px">1 біт</text><rect class="box" x="653.6" y="28" width="50.4" height="46" rx="3"/><text x="678.7820112794388" y="48" text-anchor="middle" style="font-size:9px">STOP</text><text x="678.7820112794388" y="64" text-anchor="middle" class="m t" style="font-size:9px">1 біт</text><text x="16" y="16" text-anchor="start" class="m t">Читання регістра I2C — 39 біт</text><text x="16" y="124" text-anchor="start" class="m t">Open-drain з підтяжками 2.2–4.7 кОм; NACK на адресу = пристрою немає</text></svg></div><figcaption class="gc-muted">Читання регістра по I2C: адреса з бітом запису, адреса регістра, повторний старт, адреса з бітом читання, дані.</figcaption><div class="diagram__hint">Схему можно прокрутить по горизонтали</div></figure>
+<h4 class="md-subheading">SPI</h4>
+<p>Синхронний, повний дуплекс: SCLK, MOSI, MISO, CS (по лінії на пристрій). Немає адрес і ACK: майстер опускає CS, видає такти, кожен такт зсуває біт в обидва боки. Режими CPOL/CPHA (0–3) — полярність/фаза такту, мають збігатися з даташитом (ICM42688 — mode 0 або 3). Швидкості до десятків МГц (гіроскоп 8–24 МГц, flash 50+). Читання регістра: байт адреси з бітом R (часто старший біт = 1), потім N байт сміття на MOSI — дані на MISO. Burst-читання 14 байт IMU за одну транзакцію — так роблять усі прошивки. Помилок «протоколу» немає — перевірка цілісності лише за змістом (регістр WHO_AM_I, значення в діапазоні). Короткі доріжки: SPI назовні плати майже не виводять.</p>
+<h4 class="md-subheading">CAN і DroneCAN</h4>
+<p>CAN 2.0: диференціальна пара CAN_H/CAN_L, термінатори 120 Ом з обох кінців, до 1 Мбіт/с (до 40 м при 1 Мбіт, довше — повільніше). Кадр: ідентифікатор 11 або 29 біт (розширений), DLC, до 8 байт даних, CRC15, ACK від будь-якого приймача. <strong>Арбітраж</strong>: усі передають одночасно, домінантний 0 перемагає рецесивну 1 — менший ID виграє без втрати часу; пріоритет закладено в ID. Контролер CAN у МК приймає/надсилає кадри апаратно, фільтрує за ID; помилки рахуються (error passive/bus-off при 256 помилках — вузол відключається).</p>
+<p><strong>DroneCAN</strong> (колишній UAVCAN v0): поверх CAN — 29-бітний ID з пріоритетом, типом повідомлення та node ID джерела (1–127), багатокадрові повідомлення з транспортним CRC і toggle-бітом, динамічний розподіл node ID (DNA), стандартні типи: <code>uavcan.equipment.gnss.Fix2</code>, <code>ahrs.MagneticFieldStrength2</code>, <code>esc.RawCommand/Status</code>, <code>power.BatteryInfo</code>, <code>range_sensor.Measurement</code>. Навіщо на великих апаратах: одна вита пара на всі пристрої, завадостійкість диф. пари та CRC, телеметрія від кожного ESC, гаряча заміна вузлів, довгі лінії (крило 2 м), без «один UART — один пристрій». Інструмент: DroneCAN GUI Tool (SLCAN-адаптер або польотник як міст <code>CAN_SLCAN_CPORT</code>) — видно вузли, параметри вузлів, повідомлення.</p>
+<h4 class="md-subheading">Драйвер: що має бути</h4>
+<ol><li>Ініціалізація шини та перевірка пристрою (WHO_AM_I/chip id).</li><li>Конфігурація (регістри): діапазон, частота, фільтри.</li><li>Читання блоком з таймаутом; повернення помилки, а не зависання.</li><li>Перетворення сирих одиниць на фізичні (LSB → °/с, Па).</li><li>Обробка помилок: лічильники, повторна ініціалізація після N помилок поспіль, bus recovery для I2C.</li><li>Потокобезпечність: м&#x27;ютекс на шину, якщо пристроїв кілька.</li></ol>
+
+<h2>Практика</h2>
+<h4 class="md-subheading">Крок 1. Драйвер I2C-датчика (ESP32, ESP-IDF; приклад на legacy-API <code>driver/i2c.h</code>, який оголошено end-of-life з ESP-IDF v6.0 — у нових проєктах <code>driver/i2c_master.h</code>: <code>i2c_master_transmit_receive</code>/<code>i2c_master_transmit</code>)</h4>
+<p>Приклад для BMP280 (адреса 0x76/0x77, chip id 0x58 у регістрі 0xD0):</p>
+<pre class="cli-block"><code>static esp_err_t rd(uint8_t reg, uint8_t *buf, size_t n) {       // repeated-START read, 50 ms timeout
+  return i2c_master_write_read_device(I2C_NUM_0, ADDR, &amp;reg, 1, buf, n, pdMS_TO_TICKS(50));
+}
+static esp_err_t wr(uint8_t reg, uint8_t val) {
+  uint8_t b[2] = { reg, val };
+  return i2c_master_write_to_device(I2C_NUM_0, ADDR, b, 2, pdMS_TO_TICKS(50));
+}
+esp_err_t bmp280_init(void) {
+  uint8_t id; ESP_RETURN_ON_ERROR(rd(0xD0, &amp;id, 1), TAG, &quot;no response&quot;);
+  if (id != 0x58) return ESP_ERR_NOT_FOUND;
+  ESP_RETURN_ON_ERROR(rd(0x88, calib, 24), TAG, &quot;calib&quot;);         // dig_T1..dig_P9
+  return wr(0xF4, 0x57);                                            // osrs_t x2, osrs_p x16, normal mode
+}
+esp_err_t bmp280_read(float *temp_c, float *press_pa) {
+  uint8_t d[6]; esp_err_t e = rd(0xF7, d, 6); if (e != ESP_OK) { errors++; return e; }
+  int32_t adc_p = (d[0] &lt;&lt; 12) | (d[1] &lt;&lt; 4) | (d[2] &gt;&gt; 4), adc_t = (d[3] &lt;&lt; 12) | (d[4] &lt;&lt; 4) | (d[5] &gt;&gt; 4);
+  /* compensation formulas from the datasheet (bmp280_compensate_T/P) */ ...
+  return ESP_OK;
+}</code></pre>
+<p>Читати 50 Гц, виводити; після 5 помилок поспіль — переініціалізація з логом.</p>
+<h4 class="md-subheading">Крок 2. Аналізатор</h4>
+<p>Зняти транзакцію: START, адреса+W, 0xF7, повторний START, адреса+R, 6 байт, NACK, STOP. Зіставити байти з виводом. Записати тривалість транзакції при 400 кГц (очікувано ~0.2 мс).</p>
+<h4 class="md-subheading">Крок 3. Зламати шину</h4>
+<p>Від&#x27;єднати SDA на ходу → NACK/таймаут, лічильник помилок, переініціалізація; замкнути SDA на землю на секунду → зависла шина; реалізувати recovery (9 тактів SCL у GPIO-режимі) і показати відновлення.</p>
+<h4 class="md-subheading">Крок 4. DroneCAN (якщо є вузол)</h4>
+<p>DroneCAN GUI Tool через SLCAN-міст польотника: побачити node ID, <code>GetNodeInfo</code>, повідомлення GPS/компаса; зняти кадр CAN аналізатором і розібрати 29-бітний ID на пріоритет/тип/джерело.</p>
+<h4 class="md-subheading">Що має вийти і що записати</h4>
+<ul><li><strong>Читання датчика.</strong> Регістр 0xD0 BMP280 повертає chip id 0x58 — перша перевірка, що драйвер говорить із тим пристроєм. Якщо приходить 0x60, це BME280 (у нього є й вологість). Тиск і температура після компенсації за калібрувальними коефіцієнтами — правдоподібні: близько 1000 гПа і кімнатна температура. Підніми плату на метр — тиск упаде приблизно на 0.12 гПа.</li><li><strong>Тривалість транзакції.</strong> Читання 6 байт із повторним стартом на 400 кГц — близько 85 тактів шини (адреси, регістр, дані, ACK) × 2.5 мкс ≈ 0.21 мс. Порівняй з аналізатором: помітно довше — отже, драйвер робить паузи між байтами або на лінії слабкі підтяжки (пологі фронти).</li><li><strong>Помилки.</strong> Від&#x27;єднана SDA дає NACK або таймаут, лічильник помилок зростає, після п&#x27;яти поспіль — переініціалізація із записом у лог. SDA, притиснута до землі, вішає шину. Дев&#x27;ять тактів SCL у режимі GPIO звільняють ведений пристрій, і читання відновлюється. Запиши час від збою до відновлення.</li><li><strong>CAN.</strong> 29-бітний ID кадру DroneCAN розібрано на пріоритет, тип повідомлення та номер вузла-відправника, і номер збігається з тим, що показує DroneCAN GUI Tool.</li></ul>
+<p>Лабораторну зараховано, коли I²C-датчик прочитано власним драйвером із перевіркою chip id, шину знято аналізатором із тривалістю транзакції, а помилку на шині відтворено й оброблено з відновленням.</p>
+
+<h2>Діагностика</h2>
+<div class="diag-groups"><article class="diag-item"><h4><strong>Симптом:</strong> UART приймає сміття</h4><ul><li>Можлива причина: швидкість/інверсія/немає спільної землі; overrun без DMA.</li><li>Що зробити: перевірити аналізатором, DMA-прийом, лічильники framing/overrun.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> I2C-транзакція «висить»</h4><ul><li>Можлива причина: ведений тримає SDA; clock stretching без підтримки.</li><li>Що зробити: таймаути в драйвері, bus recovery, знизити до 100 кГц.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> SPI повертає 0xFF/0x00</h4><ul><li>Можлива причина: CS не опускається, режим CPOL/CPHA, занадто швидко.</li><li>Що зробити: осцилограф на CS/SCLK, режим за даташитом, тест WHO_AM_I.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> CAN-вузол іде в bus-off</h4><ul><li>Можлива причина: немає термінаторів, різна швидкість, переплутано H/L.</li><li>Що зробити: 120 Ом з обох кінців, одна швидкість, лічильники помилок.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> датчик працює на столі, але не на борту</h4><ul><li>Можлива причина: завади на I2C від силових ліній, довжина дротів.</li><li>Що зробити: коротше/виті/екран, SPI або CAN замість I2C.</li></ul></article></div>
+
+<h2>Чек-лист</h2>
+<ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="emb-protocols:0"><span>Можу намалювати кадр UART і транзакцію I2C з ACK/NACK</span></label></li><li><label><input type="checkbox" data-check-id="emb-protocols:1"><span>Знаю режими SPI і чому немає ACK</span></label></li><li><label><input type="checkbox" data-check-id="emb-protocols:2"><span>Розумію арбітраж CAN і структуру DroneCAN-ID</span></label></li><li><label><input type="checkbox" data-check-id="emb-protocols:3"><span>Написав драйвер із таймаутами, помилками та відновленням</span></label></li><li><label><input type="checkbox" data-check-id="emb-protocols:4"><span>Зняв транзакцію аналізатором і зіставив із кодом</span></label></li></ul>
+
+<h2>Джерела</h2>
+<ul class="refs"><li><a href="https://www.nxp.com/docs/en/user-guide/UM10204.pdf" target="_blank" rel="noopener noreferrer">NXP — I2C-bus specification and user manual (UM10204)</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://dronecan.github.io/Specification/1._Introduction" target="_blank" rel="noopener noreferrer">DroneCAN — Specification</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://bluerobotics.com/wp-content/uploads/2022/05/BMP280-DATASHEET.pdf" target="_blank" rel="noopener noreferrer">Bosch — BMP280 datasheet BST-BMP280-DS001 (registers, compensation)</a> <span class="gc-tag" data-state="info">primary</span></li></ul>
+<h2>Перевір себе</h2>
+<uav-quiz src="../quiz/emb-protocols.json" module="emb-protocols"></uav-quiz>
+      </div>
+      <div class="module-done"><gc-button variant="secondary" data-done-toggle="emb-protocols">Позначити як пройдений</gc-button></div>
+      <section class="related" aria-label="Суміжні модулі"><p class="gc-label gc-muted">Суміжні модулі</p><div class="gc-grid ref-grid"><a class="gc-card" href="emb-basics.html"><strong>Embedded: переривання, таймери, DMA, RTOS</strong><div class="gc-card__meta"><span class="gc-tag" title="L3 — Специалист">L3</span></div></a><a class="gc-card" href="el-measure.html"><strong>Вимірювання: мультиметр, осцилограф, логічний аналізатор</strong><div class="gc-card__meta"><span class="gc-tag" title="L2 — Интегратор">L2</span></div></a><a class="gc-card" href="el-peripherals.html"><strong>Підключення периферії: UART, I2C, CAN на практиці</strong><div class="gc-card__meta"><span class="gc-tag" title="L2 — Интегратор">L2</span></div></a></div></section>
+      <nav class="pager" aria-label="Сусідні модулі" data-track-pager><a class="gc-card pager__prev" href="emb-basics.html"><span class="gc-label gc-muted">Назад · трек</span><br>Embedded: переривання, таймери, DMA, RTOS</a><a class="gc-card pager__next" href="comp-raspberry.html"><span class="gc-label gc-muted">Далі · трек</span><br>Raspberry Pi + ArduPilot</a></nav><nav class="pager" aria-label="Сусідні кроки шляху ArduPilot" data-path-pager="ardupilot" hidden><a class="gc-card pager__prev" href="emb-basics.html?path=ardupilot"><span class="gc-label gc-muted">Назад · шлях ArduPilot</span><br>Embedded: переривання, таймери, DMA, RTOS</a><a class="gc-card pager__next" href="comp-raspberry.html?path=ardupilot"><span class="gc-label gc-muted">Далі · крок 53 з 69</span><br>Raspberry Pi + ArduPilot</a></nav>
+    </article>
+  </main>
+  <footer class="gc-container site-footer gc-muted">
+    <p>Відкритий курс · <a href="https://github.com/irreligious86/UAV-Education">вихідний код на GitHub</a> · <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">план розвитку</a> · <a href="../../curriculum/curriculum.html">для розробника</a> · CC BY-NC-SA 4.0</p>
+  </footer>
+</body>
+</html>

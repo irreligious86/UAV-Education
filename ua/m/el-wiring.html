@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="uk" data-theme="dark" data-lang="uk">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Паяння, джгути та надійність з&#x27;єднань — UAV Student</title>
+  <meta name="description" content="паяти силові та сигнальні з&#x27;єднання без холодних паяних з&#x27;єднань прокладати джгути так, щоб не перетиралися й не ловили завад перевіряти з&#x27;єднання на вібростенді й тягою">
+  <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
+  <link rel="manifest" href="../../manifest.webmanifest">
+  <meta name="theme-color" content="#0b0f14">
+  <link rel="alternate" hreflang="ru" href="../../m/el-wiring.html">
+  <link rel="alternate" hreflang="uk" href="../../ua/m/el-wiring.html">
+  <link rel="alternate" hreflang="en" href="../../en/m/el-wiring.html">
+  <link rel="alternate" hreflang="uk-galych" href="../../gal/m/el-wiring.html">
+  <script>/* go to the visitor's chosen language before anything paints (assets/i18n.js) */(function(){try{var c=localStorage.getItem('uav-lang'),h=document.documentElement.getAttribute('data-lang');if(!c||c===h||/[?&]lang=keep\b/.test(location.search))return;var l=document.querySelector('link[rel=alternate][hreflang="'+c+'"]');if(l)location.replace(l.href+location.search+location.hash)}catch(e){}})();</script>
+  <link rel="stylesheet" href="../../lib/ground-control-ui/dist/ground-control.css">
+  <link rel="stylesheet" href="../../assets/site.css">
+  <script src="../../lib/ground-control-ui/dist/ground-control.js" defer></script>
+  <script src="../../assets/i18n/uk.js"></script>
+  <script src="../../assets/i18n.js"></script>
+  <script src="../../assets/progress-store.js" defer></script>
+  <script src="../../assets/backend-config.js" defer></script>
+  <script src="../../assets/account.js" defer></script>
+  <script src="../../assets/grading.js" defer></script>
+  <script src="../../assets/app.js" defer></script>
+  <script src="../../assets/uav-quiz.js" defer></script>
+  <script src="../../assets/uav-tasks.js" defer></script>
+  <script src="../../assets/offline.js" defer></script>
+  <script src="../../assets/widgets/plot.js" defer></script>
+  <script src="../../assets/widgets/wire-drop.js" defer></script>
+</head>
+<body class="gc-root" data-base="../" data-root="../../">
+  <header class="site-header">
+    <div class="gc-container site-header__inner">
+      <a class="site-brand" href="../index.html"><span class="site-brand__mark" aria-hidden="true">◆</span> UAV Student</a>
+      <nav class="gc-nav" aria-label="Розділи сайту">
+        <a href="../index.html" aria-current="page">Курс</a>
+        <a href="../ref/index.html">Довідник</a>
+        <a href="../pages/glossary.html">Глосарій</a>
+        <a href="../pages/fails.html">Фейли</a>
+        <a href="../pages/search.html">Пошук</a>
+        <a href="../pages/progress.html">Мій прогрес</a>
+      </nav>
+      <nav class="lang-switch" aria-label="Мова"><a class="gc-tag" href="../../m/el-wiring.html" data-lang-to="ru" hreflang="ru" lang="ru" title="Русский">RU</a><a class="gc-tag" href="../../ua/m/el-wiring.html" data-lang-to="uk" hreflang="uk" lang="uk" title="Українська" aria-current="true" data-state="ok">UA</a><a class="gc-tag" href="../../en/m/el-wiring.html" data-lang-to="en" hreflang="en" lang="en" title="English">EN</a><a class="gc-tag" href="../../gal/m/el-wiring.html" data-lang-to="uk-galych" hreflang="uk-galych" lang="uk-galych" title="Галицька (експеримент)">GAL</a></nav>
+    </div>
+  </header>
+  <main class="gc-container site-main">
+    <article class="module" data-module-page="el-wiring">
+      <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-electronics">Електроніка та радіо</a><span>Паяння, джгути та надійність з&#x27;єднань</span></p>
+      <h1 class="module-title">Паяння, джгути та надійність з&#x27;єднань</h1>
+      <div class="module-tags"><span class="gc-tag" title="Рівень">L1 — Оператор</span><span class="gc-tag">читання 25 хв</span><span class="gc-tag">навчання ~2 год</span><span class="gc-tag">любая прошивка</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ОПАНОВАНО</span></div>
+      <p class="gc-muted module-score" data-module-score></p>
+      <p class="module-lead">Більшість «загадкових» відмов — холодне паяння, перетертий провід або роз&#x27;єм, що тримався на чесному слові. Модуль — ремесло: як паяти силові пади й тонкі сигнальні проводи без холодних паяних з&#x27;єднань, який припій і флюс, як лудити, як знімати ізоляцію, прокладати джгути, фіксувати й захищати від вібрації і як перевіряти з&#x27;єднання механічно та електрично до польоту.</p>
+      <div class="gc-callout" data-state="ok"><strong>Після модуля ти вмієш</strong><ul><li>паяти силові та сигнальні з&#x27;єднання без холодних паяних з&#x27;єднань</li><li>прокладати джгути так, щоб не перетиралися й не ловили завад</li><li>перевіряти з&#x27;єднання на вібростенді й тягою</li></ul></div><p class="gc-muted">Перед цим модулем: <a href="el-power-design.html">Схемотехніка живлення борту</a></p><div class="gc-callout lab"><p class="gc-label gc-muted">Лабораторна</p><strong>Збирання джгута</strong><p class="gc-muted lab__hint">Здано, коли позначено всі пункти:</p><ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="el-wiring:lab:0"><span>Силове паяння перевірено навантаженням</span></label></li><li><label><input type="checkbox" data-check-id="el-wiring:lab:1"><span>Джгут закріплено, проводи не торкаються пропелерів і гострих країв</span></label></li></ul></div><div class="path-pos gc-muted"><span class="gc-label">На шляху</span><ul><li data-path-pos="betaflight"><a href="../path/betaflight.html">Betaflight</a>: крок 26 з 44 → <a href="el-measure.html?path=betaflight">Вимірювання: мультиметр, осцилограф, логічний аналізатор</a></li></ul></div>
+      <div class="gc-prose module-body">
+<h2>Теорія</h2>
+<h4 class="md-subheading">Фізика паяння</h4>
+<p>Припій змочує метал лише за достатньої температури та чистої поверхні. Флюс розчиняє оксиди. Холодне паяння — припій застиг, не змочивши одну зі сторін: матовий, зернистий, кулькою. Воно проводить сьогодні й рветься від вібрації завтра.</p>
+<ul><li><strong>Температура</strong>: 330–370 °C для свинцевого припою (Sn63/Pb37, плавиться при 183 °C), 370–400 °C для безсвинцевого. Великі силові пади — велике жало й потужність (60–80 Вт), інакше пад не прогріється й вийде холодне паяння; маленькі пади FC — тонке жало, короткий контакт (≤ 3 с), інакше пад відшарується.</li><li><strong>Припій</strong>: 0.6–0.8 мм із флюсом в осерді для сигнальних, 1.0 мм для силових. Свинцевий простіший для новачків (нижча температура, краща плинність).</li><li><strong>Флюс</strong>: безвідмивний або каніфольний; активні (кислотні) — ніколи на електроніці. Залишки каніфолі — змити ізопропанолом: вони гігроскопічні й можуть проводити.</li><li><strong>Лудіння</strong>: перед з&#x27;єднанням лудяться обидва: провід і пад. З&#x27;єднання — притиснути залуджений провід до залудженого пада, прогріти до злиття, тримати нерухомо до застигання (1–2 с).</li></ul>
+<h4 class="md-subheading">Проводи</h4>
+<ul><li><strong>Силіконова ізоляція, багатожильний</strong> — для всього на борту: гнучкі, витримують жар паяльника.</li><li>Знімати ізоляцію стрипером за калібром, не ножем: підрізані жили ламаються.</li><li><strong>Довжина лудіння</strong> = глибина пада; зайва залуджена ділянка стає жорсткою й ламається на межі — провід має гнутися біля ізоляції, а не біля паяння.</li><li>Термоусадка на кожну відкриту ділянку, особливо на силових.</li></ul>
+<h4 class="md-subheading">Переріз: рахувати, а не вгадувати</h4>
+<p>Мідний провід — це резистор. Опір на метр (20 °C) за калібром:</p>
+<div class="table-wrap md-table-wrap" tabindex="0"><table class="md-table"><thead><tr><th>AWG</th><th>мОм/м</th><th>Де на борту</th></tr></thead><tbody><tr><td data-label="AWG">10</td><td data-label="мОм/м">3.3</td><td data-label="Де на борту">АКБ → PDB важких (60–100 А)</td></tr><tr><td data-label="AWG">12</td><td data-label="мОм/м">5.2</td><td data-label="Де на борту">АКБ 6S на 10&quot; і X8</td></tr><tr><td data-label="AWG">14</td><td data-label="мОм/м">8.3</td><td data-label="Де на борту">АКБ 5&quot;, фази потужних моторів</td></tr><tr><td data-label="AWG">16–18</td><td data-label="мОм/м">13–21</td><td data-label="Де на борту">ESC 4-в-1 на 5&quot;, фази</td></tr><tr><td data-label="AWG">20–22</td><td data-label="мОм/м">33–53</td><td data-label="Де на борту">BEC 5 В, VTX, камера</td></tr><tr><td data-label="AWG">26–28</td><td data-label="мОм/м">134–213</td><td data-label="Де на борту">сигнали UART, I²C, датчики</td></tr></tbody></table></div>
+<p>Розібраний приклад: 10&quot; на 6S, піковий струм 60 А, плюс і мінус по 15 см (0.3 м петлі). 14 AWG: R = 8.3·0.3 = 2.5 мОм, спад 0.15 В, нагрів 9 Вт у проводі на піку. 18 AWG: 0.38 В і 23 Вт — провід гріється, ізоляція м&#x27;якне, а просідання додається до просідання АКБ. 12 AWG: 0.09 В і 5.6 Вт. Висновок: силовий калібр вибирають за піковим струмом і довжиною, а не «як у всіх»; короткі силові проводи — безкоштовна прибавка до напруги.</p>
+<uav-wire-drop class="widget"></uav-wire-drop>
+<h4 class="md-subheading">Контакт: місце, де втрачають більше, ніж у проводі</h4>
+<p>Погане паяння або старий роз&#x27;єм — це 1–5 мОм замість часток мОм. При 50 А кожен зайвий міліом — 2.5 Вт тепла в точці завбільшки з горошину; пластик роз&#x27;єму плавиться раніше, ніж щось стане помітно в польоті. XT60 розрахований приблизно на 30 А тривало (пікове більше); для 40–60 А тривало — XT90 або AS150. Роз&#x27;єм, теплий після польоту за холодних проводів, — кандидат на заміну.</p>
+<h4 class="md-subheading">Обтискання проти паяння</h4>
+<p>Обтискання правильним інструментом — газощільне з&#x27;єднання, що не боїться вібрації; паяння обтискання робить жили жорсткими біля краю, і провід ламається поруч. Ознаки поганого обтискання: жили стирчать із гільзи, ізоляцію не захоплено другою парою пелюсток, провід провертається. Тест: потягнути із зусиллям 2–3 кг для 26–28 AWG — не має вийти.</p>
+<h4 class="md-subheading">Роз&#x27;єми</h4>
+<p>XT30/XT60 паяти: роз&#x27;єм у парі (щоб не повело пластик), пади прогріти до плинності, провід вставити, долити припою. Піни JST-SH/GH — обтискання, не паяння; обтискати правильним інструментом або купувати готові джгути. Роз&#x27;єми на вібрації — фіксувати (крапля гарячого клею на корпусі, не на пінах).</p>
+<h4 class="md-subheading">Джгути та вібрації</h4>
+<ul><li>Провід ламається там, де одна точка жорстка, а сусідня — ні: біля паяння, біля стяжки. Фіксація — за 3–5 см від паяння, не впритул.</li><li>Джгут — вільний вигин, не натягнутий (особливо до FC на демпферах).</li><li>Захист від перетирання: обплетення/термоусадка в місцях контакту з карбоном; гострі кромки рами — обробити.</li><li>Сигнальні проводи — скрутити із землею, прокладати окремо від силових; силові + і − — скрутити (див. завади).</li><li>Нічого — в зоні пропів і на траєкторії згину променів складаної рами.</li></ul>
+<h4 class="md-subheading">Перевірка</h4>
+<ol><li><strong>Візуально</strong>: блискучий конус припою, видно контур проводу, немає кульок і перемичок.</li><li><strong>Механічно</strong>: легкий тест на витягування кожного проводу; поворушити біля паяння.</li><li><strong>Електрично</strong>: прозвонка сусідніх падів на КЗ, опір силового з&#x27;єднання — частки мОм (мультиметром не видно, але нагрів під навантаженням покаже).</li><li><strong>Під навантаженням</strong>: пропи зняті, газ на хвилину, тепловізор або палець (обережно) на кожному з&#x27;єднанні: нагріте — погане.</li><li><strong>Вібротест</strong>: мотори на малому газу без пропів 30 с — ніщо не деренчить і не відходить.</li></ol>
+<figure class="diagram" data-diagram="wiring-chain"><div class="diagram__svg"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 200" width="100%" role="img" aria-labelledby="t" style="max-width:720px;display:block;margin:0 auto"><title id="t">Надійне з&#x27;єднання: від паяння до перевірки</title><style>text{font-family: var(--gc-font-mono, ui-monospace, Menlo, monospace); font-size: 12px;fill:currentColor} .m{fill:var(--gc-ink-muted, #8a93a3)} .a{fill:var(--gc-accent-hud, #5ef1d2)} .w{fill:var(--gc-signal-amber, #f0b24c)} .d{fill:var(--gc-signal-red, #e8636b)} .box{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:currentColor;stroke-width:1.2} .boxa{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6} .ln{stroke:currentColor;stroke-width:1.2;fill:none} .lna{stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6;fill:none} .lnm{stroke:var(--gc-ink-muted, #8a93a3);stroke-width:1;fill:none;stroke-dasharray:4 3} .t{font-size:11px} .b{font-weight:600}</style><defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker><marker id="ara" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--gc-accent-hud, #5ef1d2)"/></marker></defs><rect class="box" x="10.0" y="30" width="111.2" height="48" rx="6"/><text x="65.6" y="51.0" text-anchor="middle" style="font-size:10.5px">Підготовка</text><text x="65.6" y="65.0" text-anchor="middle" style="font-size:10.5px">зачистка, флюс</text><rect class="boxa" x="157.2" y="30" width="111.2" height="48" rx="6"/><text x="212.79999999999998" y="51.0" text-anchor="middle" class="b" style="font-size:10.5px">Паяння</text><text x="212.79999999999998" y="65.0" text-anchor="middle" class="b" style="font-size:10.5px">жало, 2–3 с</text><rect class="box" x="304.4" y="30" width="111.2" height="48" rx="6"/><text x="360.0" y="51.0" text-anchor="middle" style="font-size:10.5px">Розвантаження</text><text x="360.0" y="65.0" text-anchor="middle" style="font-size:10.5px">термоусадка</text><rect class="box" x="451.59999999999997" y="30" width="111.2" height="48" rx="6"/><text x="507.2" y="51.0" text-anchor="middle" style="font-size:10.5px">Джгут</text><text x="507.2" y="65.0" text-anchor="middle" style="font-size:10.5px">кріплення</text><rect class="boxa" x="598.8" y="30" width="111.2" height="48" rx="6"/><text x="654.4" y="51.0" text-anchor="middle" class="b" style="font-size:10.5px">Перевірка</text><text x="654.4" y="65.0" text-anchor="middle" class="b" style="font-size:10.5px">під струмом</text><rect class="box" x="598.8" y="130" width="111.2" height="48" rx="6"/><text x="654.4" y="151.0" text-anchor="middle" style="font-size:10.5px">Тягнути, прозвон,</text><text x="654.4" y="165.0" text-anchor="middle" style="font-size:10.5px">падіння U</text><path class="ln" d="M121.2 54.0 L157.2 54.0" marker-end="url(#ar)"/><path class="ln" d="M268.4 54.0 L304.4 54.0" marker-end="url(#ar)"/><path class="ln" d="M415.59999999999997 54.0 L451.59999999999997 54.0" marker-end="url(#ar)"/><path class="ln" d="M562.8 54.0 L598.8 54.0" marker-end="url(#ar)"/><path class="ln" d="M654.4 78 L654.4 130" marker-end="url(#ar)"/></svg></div><figcaption class="gc-muted">Надійне з&#x27;єднання: підготовка, паяння, розвантаження, кріплення джгута й перевірка під струмом.</figcaption><div class="diagram__hint">Схему можно прокрутить по горизонтали</div></figure>
+
+<h2>Практика</h2>
+<h4 class="md-subheading">Крок 1. Тренування</h4>
+<p>На обрізку плати/старому ESC: 10 паяних з&#x27;єднань 20 AWG, 10 паяних з&#x27;єднань 28 AWG. Розрізати одне силове паяне з&#x27;єднання поперек — припій має заповнити весь переріз без порожнин.</p>
+<h4 class="md-subheading">Крок 2. Силове паяння на збірці</h4>
+<p>XT60 → PDB/ESC 14 AWG. Перевірити: витягування, прозвонка, нагрів під навантаженням (без пропів).</p>
+<h4 class="md-subheading">Крок 3. Сигнальний джгут</h4>
+<p>Приймач → FC (5 В, GND, TX, RX): скрутити, довжина із запасом на вигин, фіксація за 3–5 см від паяння, термоусадка.</p>
+<h4 class="md-subheading">Крок 3б. Опір з&#x27;єднання методом спаду напруги</h4>
+<p>Мультиметр не виміряє частки міліома, але струм плюс мілівольтметр — виміряють. Лабораторний блок живлення в режимі обмеження струму 5 А, струм пропустити через силове з&#x27;єднання (XT60 + паяння), щупи мультиметра в режимі мВ — безпосередньо по обидва боки з&#x27;єднання.</p>
+<p>R = U / I. Приклад: 1.2 мВ при 5 А → 0.24 мОм — добре. 8 мВ → 1.6 мОм — переробити: на 50 А це 4 Вт у роз&#x27;ємі. Виміряти три з&#x27;єднання: своє найкраще паяння, старий роз&#x27;єм із коробки, свідомо погане (холодне) паяння, — і записати таблицю.</p>
+<h4 class="md-subheading">Крок 4. Трасування та фіксація</h4>
+<p>Фото збірки згори й знизу: нічого в зоні пропів, немає контакту з гострими кромками, джгути не натягнуті. Лабораторна: силове паяння перевірене навантаженням і виміряне методом спаду напруги, калібр силових проводів обґрунтований розрахунком, джгут закріплений.</p>
+
+<h2>Діагностика</h2>
+<div class="diag-groups"><article class="diag-item"><h4><strong>Симптом:</strong> мотор смикається або відвалюється на газу</h4><ul><li>Можлива причина: холодне паяння фази або перетертий провід.</li><li>Що зробити: перепаяти, прозвонити, вібротест.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> XT60 гріється</h4><ul><li>Можлива причина: погане паяння або окиснені контакти.</li><li>Що зробити: перепаяти з прогріванням, замінити роз&#x27;єм.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> періодичні втрати приймача/GPS</h4><ul><li>Можлива причина: надламана жила біля паяння або в обтисканні JST.</li><li>Що зробити: поворушити провід на працюючому борту, перепаяти з фіксацією.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> пад FC відшарувався</h4><ul><li>Можлива причина: перегрів або ривок проводу.</li><li>Що зробити: припаятися до найближчої доріжки/перехідного отвору, зафіксувати провід клеєм.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> КЗ після збирання</h4><ul><li>Можлива причина: перемичка припою між сусідніми падами, провід торкається карбону.</li><li>Що зробити: прозвонка до ввімкнення, smoke stopper.</li></ul></article></div>
+
+<h2>Чек-лист</h2>
+<ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="el-wiring:0"><span>Паяні з&#x27;єднання блискучі, конусом, без кульок</span></label></li><li><label><input type="checkbox" data-check-id="el-wiring:1"><span>Провід гнеться біля ізоляції, зафіксований за 3–5 см від паяння</span></label></li><li><label><input type="checkbox" data-check-id="el-wiring:2"><span>Силові з&#x27;єднання перевірені нагрівом під навантаженням</span></label></li><li><label><input type="checkbox" data-check-id="el-wiring:3"><span>Вибираю калібр за піковим струмом і довжиною, рахую спад і нагрів</span></label></li><li><label><input type="checkbox" data-check-id="el-wiring:4"><span>Вимірюю опір з&#x27;єднання методом спаду напруги</span></label></li><li><label><input type="checkbox" data-check-id="el-wiring:5"><span>Джгути не торкаються пропів і гострих кромок, не натягнуті</span></label></li><li><label><input type="checkbox" data-check-id="el-wiring:6"><span>Прозвонка на КЗ і smoke stopper перед першим увімкненням</span></label></li></ul>
+
+<h2>Джерела</h2>
+<ul class="refs"><li><a href="https://standards.nasa.gov/standard/nasa/nasa-std-87394" target="_blank" rel="noopener noreferrer">NASA-STD-8739.4 — Crimping, Interconnecting Cables, Harnesses, and Wiring</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://learn.adafruit.com/adafruit-guide-excellent-soldering" target="_blank" rel="noopener noreferrer">Adafruit — Guide to Excellent Soldering</a> <span class="gc-tag">secondary</span></li><li><a href="https://oscarliang.com/soldering-guide" target="_blank" rel="noopener noreferrer">Oscar Liang — A Beginner&#x27;s Guide to Soldering for FPV Drones</a> <span class="gc-tag">secondary</span></li></ul>
+<h2>Задачі з числовою відповіддю</h2>
+<uav-tasks src="../tasks/el-wiring.json" module="el-wiring"></uav-tasks>
+<h2>Перевір себе</h2>
+<uav-quiz src="../quiz/el-wiring.json" module="el-wiring"></uav-quiz>
+      </div>
+      <div class="module-done"><gc-button variant="secondary" data-done-toggle="el-wiring">Позначити як пройдений</gc-button></div>
+      <section class="related" aria-label="Суміжні модулі"><p class="gc-label gc-muted">Суміжні модулі</p><div class="gc-grid ref-grid"><a class="gc-card" href="el-power-design.html"><strong>Схемотехніка живлення борту</strong><div class="gc-card__meta"><span class="gc-tag" title="L2 — Интегратор">L2</span></div></a><a class="gc-card" href="f-frame-mech.html"><strong>Рама, механіка та вібрації</strong><div class="gc-card__meta"><span class="gc-tag" title="L2 — Интегратор">L2</span></div></a></div></section>
+      <nav class="pager" aria-label="Сусідні модулі" data-track-pager><a class="gc-card pager__prev" href="el-dronecan.html"><span class="gc-label gc-muted">Назад · трек</span><br>DroneCAN: шина CAN на борту, вузли, ESC і прошивка периферії</a><a class="gc-card pager__next" href="el-redundancy.html"><span class="gc-label gc-muted">Далі · трек</span><br>Резервування на борту: X8, гекса, живлення та сигнали</a></nav><nav class="pager" aria-label="Сусідні кроки шляху Betaflight" data-path-pager="betaflight" hidden><a class="gc-card pager__prev" href="el-battery-packs.html?path=betaflight"><span class="gc-label gc-muted">Назад · шлях Betaflight</span><br>Збірки Li-Ion і LiFePO4: елементи, зварювання, BMS</a><a class="gc-card pager__next" href="el-measure.html?path=betaflight"><span class="gc-label gc-muted">Далі · крок 27 з 44</span><br>Вимірювання: мультиметр, осцилограф, логічний аналізатор</a></nav>
+    </article>
+  </main>
+  <footer class="gc-container site-footer gc-muted">
+    <p>Відкритий курс · <a href="https://github.com/irreligious86/UAV-Education">вихідний код на GitHub</a> · <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">план розвитку</a> · <a href="../../curriculum/curriculum.html">для розробника</a> · CC BY-NC-SA 4.0</p>
+  </footer>
+</body>
+</html>

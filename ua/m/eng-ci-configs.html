@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="uk" data-theme="dark" data-lang="uk">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CI та версіонування конфігів і коду — UAV Student</title>
+  <meta name="description" content="зберігати diff all / параметри ArduPilot у git з осмисленими комітами й рев&#x27;ю написати автотест у SITL, який перевіряє місію або failsafe, і запускати його в CI перевіряти скрипти й конфіги лінтерами та схемами вести релізи: теги, журнал змін, відкат">
+  <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
+  <link rel="manifest" href="../../manifest.webmanifest">
+  <meta name="theme-color" content="#0b0f14">
+  <link rel="alternate" hreflang="ru" href="../../m/eng-ci-configs.html">
+  <link rel="alternate" hreflang="uk" href="../../ua/m/eng-ci-configs.html">
+  <link rel="alternate" hreflang="en" href="../../en/m/eng-ci-configs.html">
+  <link rel="alternate" hreflang="uk-galych" href="../../gal/m/eng-ci-configs.html">
+  <script>/* go to the visitor's chosen language before anything paints (assets/i18n.js) */(function(){try{var c=localStorage.getItem('uav-lang'),h=document.documentElement.getAttribute('data-lang');if(!c||c===h||/[?&]lang=keep\b/.test(location.search))return;var l=document.querySelector('link[rel=alternate][hreflang="'+c+'"]');if(l)location.replace(l.href+location.search+location.hash)}catch(e){}})();</script>
+  <link rel="stylesheet" href="../../lib/ground-control-ui/dist/ground-control.css">
+  <link rel="stylesheet" href="../../assets/site.css">
+  <script src="../../lib/ground-control-ui/dist/ground-control.js" defer></script>
+  <script src="../../assets/i18n/uk.js"></script>
+  <script src="../../assets/i18n.js"></script>
+  <script src="../../assets/progress-store.js" defer></script>
+  <script src="../../assets/backend-config.js" defer></script>
+  <script src="../../assets/account.js" defer></script>
+  <script src="../../assets/grading.js" defer></script>
+  <script src="../../assets/app.js" defer></script>
+  <script src="../../assets/uav-quiz.js" defer></script>
+  <script src="../../assets/uav-tasks.js" defer></script>
+  <script src="../../assets/offline.js" defer></script>
+</head>
+<body class="gc-root" data-base="../" data-root="../../">
+  <header class="site-header">
+    <div class="gc-container site-header__inner">
+      <a class="site-brand" href="../index.html"><span class="site-brand__mark" aria-hidden="true">◆</span> UAV Student</a>
+      <nav class="gc-nav" aria-label="Розділи сайту">
+        <a href="../index.html" aria-current="page">Курс</a>
+        <a href="../ref/index.html">Довідник</a>
+        <a href="../pages/glossary.html">Глосарій</a>
+        <a href="../pages/fails.html">Фейли</a>
+        <a href="../pages/search.html">Пошук</a>
+        <a href="../pages/progress.html">Мій прогрес</a>
+      </nav>
+      <nav class="lang-switch" aria-label="Мова"><a class="gc-tag" href="../../m/eng-ci-configs.html" data-lang-to="ru" hreflang="ru" lang="ru" title="Русский">RU</a><a class="gc-tag" href="../../ua/m/eng-ci-configs.html" data-lang-to="uk" hreflang="uk" lang="uk" title="Українська" aria-current="true" data-state="ok">UA</a><a class="gc-tag" href="../../en/m/eng-ci-configs.html" data-lang-to="en" hreflang="en" lang="en" title="English">EN</a><a class="gc-tag" href="../../gal/m/eng-ci-configs.html" data-lang-to="uk-galych" hreflang="uk-galych" lang="uk-galych" title="Галицька (експеримент)">GAL</a></nav>
+    </div>
+  </header>
+  <main class="gc-container site-main">
+    <article class="module" data-module-page="eng-ci-configs">
+      <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-engineer">Інженер: код на борту</a><span>CI та версіонування конфігів і коду</span></p>
+      <h1 class="module-title">CI та версіонування конфігів і коду</h1>
+      <div class="module-tags"><span class="gc-tag" title="Рівень">L3 — Спеціаліст</span><span class="gc-tag">читання 35 хв</span><span class="gc-tag">навчання ~3 год</span><span class="gc-tag">Betaflight · ArduPilot</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ОПАНОВАНО</span></div>
+      <p class="gc-muted module-score" data-module-score></p>
+      <p class="module-lead">Конфігурація дрона — це код: від неї залежить, чи полетить він. Отже, до неї застосовне все, що інженери давно роблять із кодом: історія змін з поясненням, рев&#x27;ю перед застосуванням, автоматична перевірка, релізи та відкат. Модуль налаштовує це для одного апарата або парку: <code>diff all</code> Betaflight і <code>.param</code> ArduPilot у git з осмисленими комітами, pull request як форма рев&#x27;ю, GitHub Actions із SITL-автотестом (місія/failsafe), лінтери для скриптів і схеми для конфігів, теги релізів і журнал змін. Лабораторна: CI, який падає, якщо failsafe зламано.</p>
+      <div class="gc-callout" data-state="ok"><strong>Після модуля ти вмієш</strong><ul><li>зберігати diff all / параметри ArduPilot у git з осмисленими комітами й рев&#x27;ю</li><li>написати автотест у SITL, який перевіряє місію або failsafe, і запускати його в CI</li><li>перевіряти скрипти й конфіги лінтерами та схемами</li><li>вести релізи: теги, журнал змін, відкат</li></ul></div><p class="gc-muted">Перед цим модулем: <a href="bf-cli-automation.html">Автоматизація CLI через serial</a>, <a href="ap-sitl.html">SITL: дрон без дрона</a>, <a href="tools-overview.html">Інструменти: Configurator, GCS, git</a></p><div class="gc-callout lab"><p class="gc-label gc-muted">Лабораторна</p><strong>CI для свого дрона</strong><p class="gc-muted lab__hint">Здано, коли позначено всі пункти:</p><ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="eng-ci-configs:lab:0"><span>Репозиторій із конфігами та скриптами, історія читабельна</span></label></li><li><label><input type="checkbox" data-check-id="eng-ci-configs:lab:1"><span>Автотест у SITL проходить у CI</span></label></li><li><label><input type="checkbox" data-check-id="eng-ci-configs:lab:2"><span>Одна зміна пройшла рев&#x27;ю через pull request</span></label></li></ul></div><div class="path-pos gc-muted"><span class="gc-label">На шляху</span><ul><li data-path-pos="ardupilot"><a href="../path/ardupilot.html">ArduPilot</a>: крок 55 з 69 → <a href="comp-esp32.html?path=ardupilot">ESP32 і периферія</a></li><li data-path-pos="px4"><a href="../path/px4.html">PX4</a>: крок 19 з 36 → <a href="mav-protocol.html?path=px4">MAVLink зсередини: кадр, CRC, діалекти, підпис</a></li></ul></div>
+      <div class="gc-prose module-body">
+<h2>Теорія</h2>
+<h4 class="md-subheading">Що зберігати</h4>
+<pre class="cli-block"><code>fleet/
+  viking7/
+    README.md              # що за апарат, залізо, версія прошивки
+    betaflight/diff-all.txt  # diff all після кожної зміни
+    ardupilot/params.param   # повний список параметрів (Mission Planner / mavproxy param save)
+    notes/CHANGELOG.md     # що і навіщо змінювалося, з датою
+    logs/                  # посилання або small logs за релізами (великі — в Releases/LFS)
+  tools/
+    export_bf.py           # знімає diff all через MSP/CLI
+    check_params.py        # перевірки інваріантів
+    sitl_test.py           # автотест у SITL
+.github/workflows/ci.yml</code></pre>
+<p>Правила: один коміт — одна зміна з причиною («D roll 38→42: bounce-back 18%→9%, лог 2026-11-08-03»); без причини — не коміт. Бінарні логи — не в репозиторій (Git LFS або релізи).</p>
+<h4 class="md-subheading">Зняти конфіг автоматично</h4>
+<p>Betaflight: по USB у режимі CLI (не MSP: вхід у CLI символом <code>#</code>) — <code>diff all</code> з Python (<code>pyserial</code>: <code>#</code> → чекати <code># </code> → <code>diff all</code> → читати до <code># </code>), або через експорт <code>betaflight-configurator</code>. ArduPilot: <code>mavproxy.py --master=... --cmd=&quot;param fetch; param save params.param&quot;</code> або pymavlink <code>param_fetch_all</code> → відсортований текстовий файл. Сортування й нормалізація (прибрати <code>#</code> коментарі з датою) — інакше diff шумить.</p>
+<h4 class="md-subheading">Інваріанти: перевірка конфігів</h4>
+<p>Скрипт, який читає конфіг і падає на порушенні правил, відомих із курсу:</p>
+<ul><li>Betaflight: <code>failsafe_procedure</code> задано, <code>failsafe_delay</code> у розумних межах, <code>motor_poles</code> = 14 для 2207, <code>dshot_bidir = ON</code> при rpm_filter, <code>vbat_min_cell_voltage</code> ≥ 330, немає <code>set debug_mode</code> у польотному профілі.</li><li>ArduPilot: <code>FS_THR_ENABLE ≠ 0</code>, <code>BATT_FS_LOW_ACT ≠ 0</code>, <code>FENCE_ENABLE = 1</code> для польотів за правилами, <code>RTL_ALT_M</code> ≥ висота перешкод майданчика (у README), <code>ARMING_SKIPCHK = 0</code> (до 4.7 — <code>ARMING_CHECK = 1</code>), <code>INS_HNTCH_ENABLE = 1</code> якщо notch потрібен, <code>BRD_SAFETY_DEFLT</code> за політикою.</li></ul>
+<p>Реалізація — JSON Schema/простий Python із таблицею правил; вивід — список порушень із посиланням на модуль курсу.</p>
+<h4 class="md-subheading">SITL-автотест</h4>
+<p>ArduPilot у CI (Ubuntu runner): зібрати SITL (<code>./waf configure --board sitl &amp;&amp; ./waf copter</code>) або взяти готовий образ; запустити <code>sim_vehicle.py</code> без GUI з <code>--add-param-file params.param</code>; скрипт pymavlink: арм у Guided, зліт 10 м, <code>SIM_RC_FAIL = 1</code> → очікувати режим RTL/LAND протягом 5 с → <code>assert</code>; потім місія з 4 точок → <code>assert</code> досягнення. Час — 2–4 хвилини. Ардупілотівський <code>Tools/autotest</code> — приклад, як це зроблено в розробників (<code>autotest.py test.Copter.ThrottleFailsafe</code>). Betaflight: SITL-збірка перевіряє компіляцію та CLI; для PID-логіки — юніт-тести <code>make test</code>. Для конфігів — скрипт інваріантів.</p>
+<h4 class="md-subheading">Лінтери та схеми</h4>
+<p>Python: <code>ruff</code>/<code>flake8</code> + <code>black</code>; Lua (ArduPilot): <code>luacheck</code> із конфігом ArduPilot (<code>Tools/scripts/run_luacheck.sh</code> у репозиторії ArduPilot — той самий підхід); JSON-конфіги — JSON Schema (<code>check-jsonschema</code>); YAML — <code>yamllint</code>. Усе — в CI на кожен PR.</p>
+<h4 class="md-subheading">Рев&#x27;ю</h4>
+<p>PR = зміна + причина + доказ (лог до/після, спектр, число). Чек-лист рев&#x27;юера: причина зрозуміла? ризик (failsafe, мотори, ліміти)? перевірено в SITL/на стенді? відкат описано? Для однієї людини — self-review: PR з описом, CI зелений, мерж через день (ефект «ранок вечора мудріший» реальний).</p>
+<h4 class="md-subheading">Релізи та відкат</h4>
+<p>Тег <code>viking7-v12</code> на коміт, з яким літали; <code>CHANGELOG.md</code> за версіями; реліз у GitHub із доданими <code>diff all</code>/<code>.param</code> і логом контрольного польоту. Відкат — <code>git checkout viking7-v11 -- viking7/</code> і завантаження конфігу. Прошивка — її версія та збірковий ключ (Betaflight: <code>version</code> і BUILD KEY зі <code>status</code>; ArduPilot: повідомлення <code>AUTOPILOT_VERSION</code> або <code>version</code> у MAVProxy) у README релізу.</p>
+<figure class="diagram" data-diagram="config-ci"><div class="diagram__svg"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 200" width="100%" role="img" aria-labelledby="t" style="max-width:720px;display:block;margin:0 auto"><title id="t">Конфіги як код: шлях зміни</title><style>text{font-family: var(--gc-font-mono, ui-monospace, Menlo, monospace); font-size: 12px;fill:currentColor} .m{fill:var(--gc-ink-muted, #8a93a3)} .a{fill:var(--gc-accent-hud, #5ef1d2)} .w{fill:var(--gc-signal-amber, #f0b24c)} .d{fill:var(--gc-signal-red, #e8636b)} .box{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:currentColor;stroke-width:1.2} .boxa{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6} .ln{stroke:currentColor;stroke-width:1.2;fill:none} .lna{stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6;fill:none} .lnm{stroke:var(--gc-ink-muted, #8a93a3);stroke-width:1;fill:none;stroke-dasharray:4 3} .t{font-size:11px} .b{font-weight:600}</style><defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker><marker id="ara" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--gc-accent-hud, #5ef1d2)"/></marker></defs><rect class="box" x="10.0" y="30" width="111.2" height="48" rx="6"/><text x="65.6" y="51.0" text-anchor="middle" style="font-size:10.5px">Зняти конфіг</text><text x="65.6" y="65.0" text-anchor="middle" style="font-size:10.5px">diff all / param</text><rect class="box" x="157.2" y="30" width="111.2" height="48" rx="6"/><text x="212.79999999999998" y="51.0" text-anchor="middle" style="font-size:10.5px">git: гілка</text><text x="212.79999999999998" y="65.0" text-anchor="middle" style="font-size:10.5px">+ PR</text><rect class="boxa" x="304.4" y="30" width="111.2" height="48" rx="6"/><text x="360.0" y="51.0" text-anchor="middle" class="b" style="font-size:10.5px">Інваріанти</text><text x="360.0" y="65.0" text-anchor="middle" class="b" style="font-size:10.5px">і лінтер</text><rect class="boxa" x="451.59999999999997" y="30" width="111.2" height="48" rx="6"/><text x="507.2" y="58.0" text-anchor="middle" class="b" style="font-size:10.5px">SITL-автотест</text><rect class="box" x="598.8" y="30" width="111.2" height="48" rx="6"/><text x="654.4" y="51.0" text-anchor="middle" style="font-size:10.5px">Реліз-тег</text><text x="654.4" y="65.0" text-anchor="middle" style="font-size:10.5px">і відкат</text><rect class="box" x="157.2" y="130" width="111.2" height="48" rx="6"/><text x="212.79999999999998" y="151.0" text-anchor="middle" style="font-size:10.5px">Рев&#x27;ю: людина</text><text x="212.79999999999998" y="165.0" text-anchor="middle" style="font-size:10.5px">читає diff</text><rect class="box" x="451.59999999999997" y="130" width="111.2" height="48" rx="6"/><text x="507.2" y="151.0" text-anchor="middle" style="font-size:10.5px">Червоне —</text><text x="507.2" y="165.0" text-anchor="middle" style="font-size:10.5px">немає злиття</text><path class="ln" d="M121.2 54.0 L157.2 54.0" marker-end="url(#ar)"/><path class="ln" d="M268.4 54.0 L304.4 54.0" marker-end="url(#ar)"/><path class="ln" d="M415.59999999999997 54.0 L451.59999999999997 54.0" marker-end="url(#ar)"/><path class="ln" d="M562.8 54.0 L598.8 54.0" marker-end="url(#ar)"/><path class="ln" d="M212.79999999999998 78 L212.79999999999998 130" marker-end="url(#ar)"/><path class="ln" d="M507.2 78 L507.2 130" marker-end="url(#ar)"/></svg></div><figcaption class="gc-muted">Зміна конфігу як зміна коду: зняти, закомітити, перевірити інваріанти й SITL, відрецензувати, випустити з можливістю відкату.</figcaption><div class="diagram__hint">Схему можно прокрутить по горизонтали</div></figure>
+
+<h2>Практика</h2>
+<h4 class="md-subheading">Крок 1. Репозиторій</h4>
+<p>Структура вище; перший коміт — поточні конфіги з README (залізо, версії). <code>.gitattributes</code> для LFS на <code>.bin/.BFL</code>.</p>
+<h4 class="md-subheading">Крок 2. Експорт скриптом</h4>
+<p><code>export_bf.py</code> або <code>param save</code> за командою; коміт «snapshot before tuning».</p>
+<h4 class="md-subheading">Крок 3. Інваріанти + CI</h4>
+<p><code>check_params.py</code> з 5+ правилами; <code>.github/workflows/ci.yml</code>: ruff, check_params на всіх конфігах. Зламати правило навмисно → CI червоний → полагодити.</p>
+<p>Заготовка для ArduPilot (<code>.param</code>: рядки <code>NAME,VALUE</code> або <code>NAME VALUE</code>):</p>
+<pre class="cli-block"><code>import re, sys
+
+RULES = [  # (parameter, predicate, why — with the course module to read)
+    (&quot;FS_THR_ENABLE&quot;, lambda v: v != 0, &quot;RC failsafe must act (ap-safety-fs)&quot;),
+    (&quot;BATT_FS_LOW_ACT&quot;, lambda v: v != 0, &quot;low battery must act (ap-safety-fs)&quot;),
+    (&quot;FENCE_ENABLE&quot;, lambda v: v == 1, &quot;geofence on for field flights (ap-safety-fs)&quot;),
+    (&quot;RTL_ALT_M&quot;, lambda v: v &gt;= 30, &quot;RTL altitude above site obstacles (ap-safety-fs)&quot;),
+    (&quot;INS_HNTCH_ENABLE&quot;, lambda v: v == 1, &quot;harmonic notch configured (ap-tuning)&quot;),
+]
+
+def load(path):
+    params = {}
+    for line in open(path):
+        m = re.match(r&quot;\s*([A-Z0-9_]+)[,\s]+(-?[\d.eE+-]+)&quot;, line)
+        if m:
+            params[m.group(1)] = float(m.group(2))
+    return params
+
+def check(params):
+    errs = []
+    for name, ok, why in RULES:
+        if name not in params:
+            errs.append(f&quot;{name}: missing ({why})&quot;)
+        elif not ok(params[name]):
+            errs.append(f&quot;{name} = {params[name]:g}: {why}&quot;)
+    return errs
+
+if __name__ == &quot;__main__&quot;:
+    bad = [f&quot;{p}: {e}&quot; for p in sys.argv[1:] for e in check(load(p))]
+    print(&quot;\n&quot;.join(bad) or &quot;all invariants hold&quot;)
+    sys.exit(1 if bad else 0)</code></pre>
+<p>Правила, чиї параметри перейменовано між версіями (<code>RTL_ALT</code> → <code>RTL_ALT_M</code> у 4.7), тримай з обома іменами або перевіряй версію прошивки з README апарата. Для Betaflight — той самий підхід за рядками <code>set name = value</code> з <code>diff all</code>.</p>
+<h4 class="md-subheading">Крок 4. SITL-тест у CI</h4>
+<p>Готова заготовка — в репозиторії курсу: [examples/sitl-pymavlink](https://github.com/irreligious86/UAV-Education/tree/main/examples/sitl-pymavlink) (<code>test_failsafe.py</code> + <code>ci.yml</code>). Job з ArduPilot SITL і тестом (RC failsafe → RTL/LAND). Зламати <code>FS_THR_ENABLE = 0</code> у <code>.param</code> → тест падає. Один PR зі зміною параметра, описом, CI і мержем. Лабораторна: репозиторій із читабельною історією, SITL-тест у CI, одна зміна через PR.</p>
+
+<h2>Діагностика</h2>
+<div class="diag-groups"><article class="diag-item"><h4><strong>Симптом:</strong> diff all щоразу відрізняється цілком</h4><ul><li>Можлива причина: порядок/коментарі/дата у вивантаженні.</li><li>Що зробити: нормалізація та сортування перед комітом.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> SITL у CI не стартує/таймаут</h4><ul><li>Можлива причина: збірка довга, немає <code>--no-mavproxy</code>/headless, порти.</li><li>Що зробити: кеш збірки або готовий образ, headless-запуск, очікування heartbeat із таймаутом.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> тест проходить, хоча failsafe зламано</h4><ul><li>Можлива причина: assert перевіряє не те (режим не читається) або тест не чекає.</li><li>Що зробити: перевірити, що тест падає за зламаного конфігу (mutation test).</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> не пам&#x27;ятаю, з яким конфігом літав того разу</h4><ul><li>Можлива причина: немає тегів/релізів.</li><li>Що зробити: тег на кожен польотний конфіг, лог до релізу.</li></ul></article></div>
+
+<h2>Чек-лист</h2>
+<ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="eng-ci-configs:0"><span>Конфіги в git із комітами «що і навіщо»</span></label></li><li><label><input type="checkbox" data-check-id="eng-ci-configs:1"><span>Експорт конфігів скриптом, нормалізований</span></label></li><li><label><input type="checkbox" data-check-id="eng-ci-configs:2"><span>Інваріанти перевіряються в CI</span></label></li><li><label><input type="checkbox" data-check-id="eng-ci-configs:3"><span>SITL-тест failsafe у CI, падає за зламаного конфігу</span></label></li><li><label><input type="checkbox" data-check-id="eng-ci-configs:4"><span>Релізи тегами, відкат відпрацьовано</span></label></li></ul>
+
+<h2>Джерела</h2>
+<ul class="refs"><li><a href="https://ardupilot.org/dev/docs/the-ardupilot-autotest-framework.html" target="_blank" rel="noopener noreferrer">ArduPilot — Autotest framework (Tools/autotest)</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://docs.github.com/en/actions/writing-workflows" target="_blank" rel="noopener noreferrer">GitHub Docs — GitHub Actions workflows</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://betaflight.com/docs/wiki/guides/current/Cli" target="_blank" rel="noopener noreferrer">Betaflight — Command Line Interface (CLI)</a> <span class="gc-tag" data-state="info">primary</span></li></ul>
+<h2>Перевір себе</h2>
+<uav-quiz src="../quiz/eng-ci-configs.json" module="eng-ci-configs"></uav-quiz>
+      </div>
+      <div class="module-done"><gc-button variant="secondary" data-done-toggle="eng-ci-configs">Позначити як пройдений</gc-button></div>
+      <section class="related" aria-label="Суміжні модулі"><p class="gc-label gc-muted">Суміжні модулі</p><div class="gc-grid ref-grid"><a class="gc-card" href="bf-cli-automation.html"><strong>Автоматизація CLI через serial</strong><div class="gc-card__meta"><span class="gc-tag" title="L3 — Специалист">L3</span></div></a><a class="gc-card" href="ap-sitl.html"><strong>SITL: дрон без дрона</strong><div class="gc-card__meta"><span class="gc-tag" title="L2 — Интегратор">L2</span></div></a><a class="gc-card" href="tools-overview.html"><strong>Інструменти: Configurator, GCS, git</strong><div class="gc-card__meta"><span class="gc-tag" title="L1 — Оператор">L1</span></div></a><a class="gc-card" href="eng-method-101.html"><strong>Інженерний метод 101: вимоги, архітектура, тести, документація</strong><div class="gc-card__meta"><span class="gc-tag" title="L1 — Оператор">L1</span></div></a></div></section>
+      <nav class="pager" aria-label="Сусідні модулі" data-track-pager><a class="gc-card pager__prev" href="eng-systems.html"><span class="gc-label gc-muted">Назад · трек</span><br>Системна інженерія: вимоги, FMEA, документація, тести</a></nav><nav class="pager" aria-label="Сусідні кроки шляху ArduPilot" data-path-pager="ardupilot" hidden><a class="gc-card pager__prev" href="ap-companion.html?path=ardupilot"><span class="gc-label gc-muted">Назад · шлях ArduPilot</span><br>Companion + ArduPilot: керування з коду</a><a class="gc-card pager__next" href="comp-esp32.html?path=ardupilot"><span class="gc-label gc-muted">Далі · крок 56 з 69</span><br>ESP32 і периферія</a></nav><nav class="pager" aria-label="Сусідні кроки шляху PX4" data-path-pager="px4" hidden><a class="gc-card pager__prev" href="px4-companion-jetson.html?path=px4"><span class="gc-label gc-muted">Назад · шлях PX4</span><br>PX4 + Jetson Orin: companion по UART, MAVLink і uXRCE-DDS</a><a class="gc-card pager__next" href="mav-protocol.html?path=px4"><span class="gc-label gc-muted">Далі · крок 20 з 36</span><br>MAVLink зсередини: кадр, CRC, діалекти, підпис</a></nav>
+    </article>
+  </main>
+  <footer class="gc-container site-footer gc-muted">
+    <p>Відкритий курс · <a href="https://github.com/irreligious86/UAV-Education">вихідний код на GitHub</a> · <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">план розвитку</a> · <a href="../../curriculum/curriculum.html">для розробника</a> · CC BY-NC-SA 4.0</p>
+  </footer>
+</body>
+</html>

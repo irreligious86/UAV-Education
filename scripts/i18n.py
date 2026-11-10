@@ -199,4 +199,4 @@ if __name__ == "__main__":
     # `python scripts/i18n.py --dirs` prints the language tree directories (used by CI's freshness check)
     import sys
     if "--dirs" in sys.argv:
-        print(" ".join(l["dir"] for l in LANGS if l["dir"]))
+        print(" ".join([l["dir"] for l in LANGS if l["dir"]] + [o for l in LANGS for o in l.get("oldDirs", [])]))
