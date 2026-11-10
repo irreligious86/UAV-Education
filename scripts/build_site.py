@@ -73,7 +73,7 @@ SYMPTOM_KEYS = ("**Симптом:**", "**Symptom:**", "Симптом:", "Sympt
 FIELD_KEYS = {
     "cause": ("возможная причина", "можлива причина", "possible cause"),
     "fix": ("что сделать", "что проверить", "що зробити", "що перевірити", "what to do", "what to check", "fix"),
-    "evidence": ("в логе", "что видно", "у лозі", "у журналі", "що видно", "in the log", "what you see", "evidence"),
+    "evidence": ("в логе", "что видно", "у лозі", "у логу", "в логу", "у журналі", "що видно", "in the log", "what you see", "evidence"),
     "consequence": ("последствия", "наслідки", "consequences"),
 }
 TRANSLATION_STATE: dict[str, dict[str, str]] = {}   # lang -> module id -> "ok" | "stale" | "missing"

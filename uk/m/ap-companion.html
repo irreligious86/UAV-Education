@@ -93,7 +93,7 @@ class Mission:
         if self.state == &quot;ARM_TAKEOFF&quot; and time.time() - self.t0 &gt; 20 and self.alt &lt; 9:
             self.m.set_mode(self.m.mode_mapping()[&quot;LAND&quot;]); return self.go(&quot;PILOT&quot;)
         # ... the remaining transitions follow the table</code></pre>
-<p>Такий код легко тестувати: підмініть <code>m</code> фейковим з&#x27;єднанням (як у <code>examples/mavlink/tests</code>) і перевірте кожен рядок таблиці, зокрема «пілот забрав керування посеред TASK».</p>
+<p>Такий код легко тестувати: підміни <code>m</code> фейковим з&#x27;єднанням (як у <code>examples/mavlink/tests</code>) і перевір кожен рядок таблиці, зокрема «пілот забрав керування посеред TASK».</p>
 <h4 class="md-subheading">Безпека під час розробки</h4>
 <ul><li>Усе спершу в SITL. Той самий код, той самий порт, лише інша адреса.</li><li>Пілот із пультом і тумблером на LOITER/RTL — завжди, навіть коли «точно працює».</li><li>Геозону ввімкнено й перевірено.</li><li>Перші реальні тести — лише цілі за позицією на малій висоті; швидкість — потім.</li></ul>
 <h4 class="md-subheading">Приклад: швидкість у GUIDED (pymavlink)</h4>

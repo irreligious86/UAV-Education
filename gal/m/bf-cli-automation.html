@@ -151,7 +151,7 @@ with serial.Serial(port_name, 115200, timeout=1) as p:
         ok = f&quot;{key} = {val}&quot; in out
         print((&quot;OK  &quot; if ok else &quot;FAIL&quot;), key, &quot;expected&quot;, val)</code></pre>
 <h4 class="md-subheading">Крок 3. Тримати конфіги як код</h4>
-<ol><li>Тека на кожен дрон, усередині <code>configs/</code> і <code>logs/</code> — кожному своя шуфляда.</li><li>Ім&#x27;я файлу: <code>&lt;дрон&gt;_&lt;плата&gt;_&lt;ГГГГ-ММ-ДД&gt;_diff.txt</code> (дрон, плата, дата) — сортування за іменем = сортування за датою.</li><li>Перед змінами — бекап, по них — новий diff; порівнювати звичайним <code>git diff</code>.</li></ol>
+<ol><li>Тека на кожен дрон, усередині <code>configs/</code> і <code>logs/</code>.</li><li>Ім&#x27;я файлу: <code>&lt;дрон&gt;_&lt;плата&gt;_&lt;ГГГГ-ММ-ДД&gt;_diff.txt</code> (дрон, плата, дата) — сортування за іменем = сортування за датою.</li><li>Перед змінами — бекап, по них — новий diff; порівнювати звичайним <code>git diff</code>.</li></ol>
 <h4 class="md-subheading">Крок 4. Другий дрон і порівняння</h4>
 <p>Запусти той самий скрипт для другого дрона, змінивши лиш <code>craft_name</code> в аргументах — не код. Порівняй бекапи до і після через <code>git diff --no-index viking2_before_diff.txt viking2_after_diff.txt</code>: у різниці мусять бути рівно рядки з <code>CHANGES</code>, і ніц більше. Зайвий рядок значить, шо хтось між бекапами крутив налаштування руками, і то привід розібратися ще до польоту.</p>
 <h4 class="md-subheading">Що має вийти і типові збої</h4>

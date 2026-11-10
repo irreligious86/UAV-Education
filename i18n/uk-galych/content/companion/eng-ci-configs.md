@@ -42,7 +42,7 @@ fleet/
     sitl_test.py           # автотест у SITL
 .github/workflows/ci.yml
 ```
-Правила: один коміт — одна зміна з причиною («D roll 38→42: bounce-back 18%→9%, лог 2026-11-08-03»); без причини — то не коміт, а бай знає що. Бінарні логи в репозиторій не пхай (Git LFS або релізи).
+Правила: один коміт — одна зміна з причиною («D roll 38→42: bounce-back 18%→9%, лог 2026-11-08-03»); без причини — то не коміт, а хтозна-що. Бінарні логи в репозиторій не пхай (Git LFS або релізи).
 
 ### Зняти конфіг автоматично
 Betaflight: по USB у режимі CLI (не MSP: вхід у CLI символом `#`) — `diff all` з Python (`pyserial`: `#` → чекати `# ` → `diff all` → читати до `# `), або через експорт `betaflight-configurator`. ArduPilot: `mavproxy.py --master=... --cmd="param fetch; param save params.param"` або pymavlink `param_fetch_all` → відсортований текстовий файл. Сортування й нормалізація (прибрати `#` коментарі з датою) — бо інакше diff фест шумить.
@@ -64,7 +64,7 @@ Python: `ruff`/`flake8` + `black`; Lua (ArduPilot): `luacheck` із конфіг
 PR = зміна + причина + доказ (лог до/після, спектр, число). Чек-лист рев'юера: причина зрозуміла? ризик (failsafe, мотори, ліміти)? перевірено в SITL/на стенді? відкат описано? Як ти сам-один — то self-review: PR з описом, CI зелений, мерж через день (ефект «ранок вечора мудріший» є фест реальний).
 
 ### Релізи та відкат
-Тег `viking7-v12` на коміт, з яким літали-сьте; `CHANGELOG.md` за версіями; реліз у GitHub із доданими `diff all`/`.param` і логом контрольного польоту. Відкат — `git checkout viking7-v11 -- viking7/` і завантаження конфігу. Прошивка — її версія та збірковий ключ (Betaflight: `version` і BUILD KEY зі `status`; ArduPilot: повідомлення `AUTOPILOT_VERSION` або `version` у MAVProxy) у README релізу.
+Тег `viking7-v12` на коміт, з яким літали; `CHANGELOG.md` за версіями; реліз у GitHub із доданими `diff all`/`.param` і логом контрольного польоту. Відкат — `git checkout viking7-v11 -- viking7/` і завантаження конфігу. Прошивка — її версія та збірковий ключ (Betaflight: `version` і BUILD KEY зі `status`; ArduPilot: повідомлення `AUTOPILOT_VERSION` або `version` у MAVProxy) у README релізу.
 
 {{diagram:config-ci|Зміна конфігу як зміна коду: зняти, закомітити, перевірити інваріанти й SITL, відрецензувати, випустити з можливістю відкату.}}
 

@@ -103,7 +103,7 @@ ArduPilot SITL `--add-param-file` з: `SIM_GPS1_ENABLE = 0` (у старих в�
 - ArduPilot — Rangefinders (landing page) | https://ardupilot.org/copter/docs/common-rangefinder-landingpage.html | primary | A
 
 ## checklist
-- Знаю три головні похибки барометра і як вони виглядають у лозі
+- Знаю три головні похибки барометра і як вони виглядають у логу
 - Підключив і перевірив далекомір
 - Розумію формулу v = (flow − ω)·h і навіщо потоку далекомір
 - Зібрав набір EK3_SRC під свій сценарій і обґрунтував

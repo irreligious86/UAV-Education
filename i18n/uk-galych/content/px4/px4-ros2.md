@@ -152,7 +152,7 @@ def main():
 if __name__ == "__main__":
     main()
 ```
-Що глянути в лозі: у `.ulg` `trajectory_setpoint` міняється сходинкою кожні 10 с, `vehicle_local_position` наздоганяє за 2–4 с без перельоту понад 0.5 м; після `Ctrl+C` вузла — перехід режиму через `COM_OF_LOSS_T`.
+Що глянути в логу: у `.ulg` `trajectory_setpoint` міняється сходинкою кожні 10 с, `vehicle_local_position` наздоганяє за 2–4 с без перельоту понад 0.5 м; після `Ctrl+C` вузла — перехід режиму через `COM_OF_LOSS_T`.
 
 ### Лабораторна
 Вузол працює в SITL; лог `.ulg` показує `vehicle_local_position` проти `trajectory_setpoint`; поведінку при зупинці вузла задокументовано.

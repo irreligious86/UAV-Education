@@ -118,7 +118,7 @@ The lab is passed when the `tests/test_protocol.py` tests pass, and you have the
 - **Symptom:** after enabling signing, QGC doesn't connect
   - Possible cause: the GCS doesn't have the key, and the channel doesn't accept unsigned packets.
   - What to do: enter the same key in the GCS; temporarily allow unsigned packets over USB.
-- **Symptom:** the loss counter shows 50 % with a good radio
+- **Symptom:** the loss counter shows 50 % with a good radio link
   - Possible cause: two senders with the same sysid/compid on one channel.
   - What to do: a unique compid for each script/component.
 

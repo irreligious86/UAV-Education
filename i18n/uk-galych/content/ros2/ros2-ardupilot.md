@@ -53,7 +53,7 @@ source_hash: 284f391657ba
 ArduCopter армиться лиш у режимі, що дозволяє арм (GUIDED підходить), і лиш після pre-arm перевірок. Зліт у GUIDED — окрема команда (сервіс takeoff = `MAV_CMD_NAV_TAKEOFF`); без неї апарат на землі ігнорує горизонтальні уставки. Послідовність у вузлі: GUIDED → arm → takeoff(alt) → уставки швидкості/позиції → LAND. Таймаут уставок швидкості в GUIDED — `GUID_TIMEOUT` (секунди): як `cmd_vel` перестав приходити, апарат ся зупинить. То той самий принцип «доказу життя», що й Offboard у PX4.
 
 ### MAVROS
-MAVROS — вузол, який тримає MAVLink-з'єднання і розкладає його по плагінах, як по шуфлядах: `/mavros/state` (підключення, armed, mode), `/mavros/local_position/pose`, `/mavros/setpoint_position/local`, `/mavros/setpoint_velocity/cmd_vel`, сервіси `/mavros/cmd/arming`, `/mavros/set_mode`, `/mavros/cmd/takeoff`, `/mavros/mission/push`, параметри, геозони, повний доступ до будь-якого MAVLink-повідомлення через `mavros_msgs/Mavlink`. Він теж перетворює ENU ↔ NED. Запуск: `ros2 launch mavros apm.launch fcu_url:=udp://:14550@` (підключення до SITL або до роутера на companion).
+MAVROS — вузол, який тримає MAVLink-з'єднання і розкладає його по плагінах: `/mavros/state` (підключення, armed, mode), `/mavros/local_position/pose`, `/mavros/setpoint_position/local`, `/mavros/setpoint_velocity/cmd_vel`, сервіси `/mavros/cmd/arming`, `/mavros/set_mode`, `/mavros/cmd/takeoff`, `/mavros/mission/push`, параметри, геозони, повний доступ до будь-якого MAVLink-повідомлення через `mavros_msgs/Mavlink`. Він теж перетворює ENU ↔ NED. Запуск: `ros2 launch mavros apm.launch fcu_url:=udp://:14550@` (підключення до SITL або до роутера на companion).
 
 Коли MAVROS ліпший за AP_DDS: треба функціонал, якого нема в AP_DDS (місії, параметри, камера, довільні MAVLink-повідомлення); парк мішаний (одна кодова база для ArduPilot і PX4 через MAVLink); прошивка без DDS. Коли AP_DDS ліпший: менше шарів і затримка, стандартні типи ROS, нема MAVLink-трафіку на companion для ROS-частини.
 
@@ -80,7 +80,7 @@ ros2 service call /ap/mode_switch ardupilot_msgs/srv/ModeSwitch "{mode: 4}"
 ```
 
 ### Крок 2. Квадрат через AP_DDS
-`ros2 launch uav_ros2_labs ap_square.launch.py`. Звір переходи автомата в лозі з режимами в Mission Planner/QGC. Побудуй траєкторію з `/tmp/ap_flight.csv`. Зупини вузол посеред квадрата й зміряй за логом ArduPilot, за скільки апарат ся зупинив, — порівняй з `GUID_TIMEOUT`.
+`ros2 launch uav_ros2_labs ap_square.launch.py`. Звір переходи автомата в логу з режимами в Mission Planner/QGC. Побудуй траєкторію з `/tmp/ap_flight.csv`. Зупини вузол посеред квадрата й зміряй за логом ArduPilot, за скільки апарат ся зупинив, — порівняй з `GUID_TIMEOUT`.
 
 ### Крок 3. Той самий квадрат через MAVROS
 Напиши обгортку `mavros_square.py` (той самий автомат): `/mavros/state` → armed/mode, `/mavros/local_position/pose` → позиція, `/mavros/setpoint_position/local` → уставки, сервіси `cmd/arming`, `set_mode` (custom_mode "GUIDED"), `cmd/takeoff`. Перевір, що тестів автомата не довелося чіпати.
@@ -90,7 +90,7 @@ ros2 service call /ap/mode_switch ardupilot_msgs/srv/ModeSwitch "{mode: 4}"
 
 
 ### Що має вийти і що записати
-- **Квадрат через AP_DDS.** У лозі вузла переходи автомата сходяться з режимами в наземці (GUIDED на цілому квадраті), а траєкторія з CSV — квадрат із кутами в межах пари метрів від заданих точок. Збережи графік.
+- **Квадрат через AP_DDS.** У логу вузла переходи автомата сходяться з режимами в наземці (GUIDED на цілому квадраті), а траєкторія з CSV — квадрат із кутами в межах пари метрів від заданих точок. Збережи графік.
 - **GUID_TIMEOUT.** Як зупиниш вузол посеред квадрата, апарат зависає через `GUID_TIMEOUT` (за замовчуванням 3 с). Час від останньої уставки до зупинки за логом ArduPilot мусить зійтися з параметром ± період публікації уставок.
 - **MAVROS.** Той самий автомат через обгортку проходить ті самі тести. Як поведінка інша, шукай різницю в системах координат і одиницях топіків, а не в автоматі.
 - **Таблиця порівняння:** затримка «уставка → початок зміни швидкості» (медіана й максимум за 20+ уставками) і завантаження CPU агента AP_DDS і MAVROS. Записуй свої цифри: вони залежать від машини та збірки, чужі тобі ніц не поможуть.

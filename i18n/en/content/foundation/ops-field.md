@@ -51,7 +51,7 @@ One person can combine roles, but a pilot in flight is only a pilot.
 - **Link loss**: the pilot calls it out, everyone watches the aircraft, nobody runs. The aircraft does what failsafe is configured to do — that's exactly why failsafe is tested in advance.
 - **Crash**: location from the last telemetry/video, the buzzer (BEEPER), GPS coordinates from the GCS log. Approaching a crashed aircraft — the battery may be damaged: don't touch it if hot/puffed, don't charge it.
 - **Injury**: first aid, emergency services, then everything else.
-- **Debrief**: what happened, from the log, without looking for someone to blame; the conclusion goes into the log and the checklist.
+- **Debrief**: what happened, from the log, without looking for someone to blame; the conclusion goes into the logbook and the checklist.
 
 ### Case
 The working channel E5 (5885 MHz) turned out to be occupied by a crashed aircraft that kept transmitting until the end of the shift. Solution: F1 (5740 MHz) was chosen as the nearest free frequency, taking into account the channels of two neighbors; the switch was made first on two transmitters and a few drones as a test, then on all of them. The main lesson: the site's table of occupied frequencies must exist before the incident.
