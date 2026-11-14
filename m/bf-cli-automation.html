@@ -153,7 +153,7 @@ with serial.Serial(port_name, 115200, timeout=1) as p:
         ok = f&quot;{key} = {val}&quot; in out
         print((&quot;OK  &quot; if ok else &quot;FAIL&quot;), key, &quot;expected&quot;, val)</code></pre>
 <h4 class="md-subheading">Шаг 3. Хранить конфиги как код</h4>
-<ol><li>Папка на каждый дрон, внутри <code>configs/</code> и <code>logs/</code>.</li><li>Имя файла: <code>&lt;дрон&gt;_&lt;плата&gt;_&lt;ГГГГ-ММ-ДД&gt;_diff.txt</code> — сортировка по имени = сортировка по дате.</li><li>Перед изменениями — бэкап, после — новый diff; сравнивать их обычным <code>git diff</code>.</li></ol>
+<ol><li>Папка на каждый дрон, внутри <code>configs/</code> и <code>logs/</code>.</li><li>Имя файла: <code>&lt;дрон&gt;_&lt;плата&gt;_&lt;ГГГГ-ММ-ДД&gt;_diff.txt</code> — сортировка по имени = сортировка по дате.</li><li>Перед изменениями — бэкап, после — новый <code>diff all</code> (<code>viking2_after_diff.txt</code>, той же командой, что и бэкап); сравнивать их обычным <code>git diff</code>. Именно <code>diff all</code>, а не просто <code>diff</code>: простой <code>diff</code> сохраняет только текущий PID- и рейт-профиль, остальные три пары профилей в бэкап не попадут.</li></ol>
 <h4 class="md-subheading">Шаг 4. Второй дрон и сравнение</h4>
 <p>Запусти тот же скрипт для второго дрона, поменяв только <code>craft_name</code> в аргументах — не код. Сравни бэкапы до и после через <code>git diff --no-index viking2_before_diff.txt viking2_after_diff.txt</code>: в разнице должны быть ровно строки из <code>CHANGES</code>, и ничего больше. Лишняя строка значит, что кто-то менял настройки руками между бэкапами, и это повод разобраться до полёта.</p>
 <h4 class="md-subheading">Что должно получиться и типичные сбои</h4>

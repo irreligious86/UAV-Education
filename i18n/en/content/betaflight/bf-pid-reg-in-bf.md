@@ -87,6 +87,8 @@ Software requirements: Betaflight Configurator 10.10+, Blackbox Explorer.
 1. Enable RPM Filtering: in the Motors tab turn on **Bidirectional DShot** and set Motor poles (the RPM filter enables itself); `rpm_filter_q = 500` is the default value (CLI).
 2. Set up Blackbox: choose a 2 kHz logging rate, enable logging of gyro_scaled, pid, setpoint, motor.
 3. Set the baseline filtering parameters:
+
+```text
 set gyro_lpf2_static_hz = 300
 set gyro_lpf2_type = PT2
 set dterm_lpf2_static_hz = 150
@@ -94,19 +96,26 @@ set dterm_lpf2_type = PT2
 set dyn_notch_max_hz = 600
 set dyn_notch_q = 250
 save
-
-text
+```
 
 **Step-by-step tuning**
 
 1. Determine the starting values (for a 5" frame with 2207–2306 motors):
-set p_pitch = 45\nset i_pitch = 50\nset d_pitch = 25
-set p_roll = 42, i_roll = 45, d_roll = 23
-set p_yaw = 70, i_yaw = 50, d_yaw = 20
-set d_min_roll = 20\nset d_min_pitch = 22\n# 2025.12: d_roll/d_pitch — base D, d_max_roll/d_max_pitch — peak
-save
 
-text
+```text
+set p_roll = 45
+set i_roll = 80
+set d_roll = 40
+set d_min_roll = 30
+set p_pitch = 47
+set i_pitch = 84
+set d_pitch = 46
+set d_min_pitch = 34
+set p_yaw = 45
+set i_yaw = 80
+set d_yaw = 0
+save
+```
 
 2. P-term tuning: do a sharp stick snap and return. In Blackbox look at the gyro trace (blue) and setpoint (green). If gyro crosses setpoint in the opposite direction (bounce-back) — P is low, raise it by 10. If gyro oscillates around setpoint — P is high, lower it by 5.
 

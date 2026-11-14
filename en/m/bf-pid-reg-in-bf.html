@@ -56,6 +56,7 @@
       <p class="module-lead">The PID controller is the core of stabilization in Betaflight. This article explains the physical meaning of the P, I, D coefficients, how they interact, how they affect the drone&#x27;s behavior, and how to tune them using Blackbox. After studying it, you will be able to diagnose typical problems (oscillations, bounce-back, motor overheating) and adjust parameters deliberately instead of guessing at random.</p>
       <div class="gc-callout" data-state="ok"><strong>After this module you can</strong><ul><li>explain P, I, D and feedforward with an example</li><li>predict the symptom of too much P or D</li></ul></div><p class="gc-muted">Before this module: <a href="f-fc-sensors.html">Flight controller and sensors</a></p><div class="gc-callout lab"><p class="gc-label gc-muted">Lab</p><strong>Explain PID in plain words</strong><p class="gc-muted lab__hint">Submitted when all items are checked:</p><ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="bf-pid-reg-in-bf:lab:0"><span>Explained P, I, D and FF in your own words using one example</span></label></li><li><label><input type="checkbox" data-check-id="bf-pid-reg-in-bf:lab:1"><span>Predicted the symptoms of too-high P and D and checked them against the symptom table</span></label></li></ul></div><div class="path-pos gc-muted"><span class="gc-label">On the path</span><ul><li data-path-pos="betaflight"><a href="../path/betaflight.html">Betaflight</a>: step 35 of 47 → <a href="data-python.html?path=betaflight">Python for flight data analysis</a></li></ul></div>
       <div class="gc-prose module-body">
+<div class="gc-callout" data-state="info" data-stale-translation>Оригинал модуля обновлялся после перевода — часть текста может отставать.</div>
 <h2>Theory</h2>
 <p>The PID controller (Proportional-Integral-Derivative) gets the angular rate on the roll, pitch, yaw axes from the gyro and minimizes the error between the desired rate (setpoint, from the sticks or navigation) and the current rotation rate. The controller output (PID sum) is converted into motor signals by the mixer.</p>
 <p><strong>P-term (proportional)</strong> reacts to the current error: the bigger the error, the stronger the correction. It defines the drone&#x27;s basic stiffness. Drawback: it cannot fully eliminate steady-state error (drift). Too high, and it causes fast oscillations (20–50 Hz).</p>
@@ -80,12 +81,27 @@
 <p>Software requirements: Betaflight Configurator 10.10+, Blackbox Explorer.</p>
 <p><strong>Setup before tuning</strong></p>
 <ol><li>Enable RPM Filtering: in the Motors tab turn on <strong>Bidirectional DShot</strong> and set Motor poles (the RPM filter enables itself); <code>rpm_filter_q = 500</code> is the default value (CLI).</li><li>Set up Blackbox: choose a 2 kHz logging rate, enable logging of gyro_scaled, pid, setpoint, motor.</li><li>Set the baseline filtering parameters:</li></ol>
-<p>set gyro_lpf2_static_hz = 300 set gyro_lpf2_type = PT2 set dterm_lpf2_static_hz = 150 set dterm_lpf2_type = PT2 set dyn_notch_max_hz = 600 set dyn_notch_q = 250 save</p>
-<p>text</p>
+<pre class="cli-block"><code>set gyro_lpf2_static_hz = 300
+set gyro_lpf2_type = PT2
+set dterm_lpf2_static_hz = 150
+set dterm_lpf2_type = PT2
+set dyn_notch_max_hz = 600
+set dyn_notch_q = 250
+save</code></pre>
 <p><strong>Step-by-step tuning</strong></p>
 <ol><li>Determine the starting values (for a 5&quot; frame with 2207–2306 motors):</li></ol>
-<p>set p_pitch = 45\nset i_pitch = 50\nset d_pitch = 25 set p_roll = 42, i_roll = 45, d_roll = 23 set p_yaw = 70, i_yaw = 50, d_yaw = 20 set d_min_roll = 20\nset d_min_pitch = 22\n# 2025.12: d_roll/d_pitch — base D, d_max_roll/d_max_pitch — peak save</p>
-<p>text</p>
+<pre class="cli-block"><code>set p_roll = 45
+set i_roll = 80
+set d_roll = 40
+set d_min_roll = 30
+set p_pitch = 47
+set i_pitch = 84
+set d_pitch = 46
+set d_min_pitch = 34
+set p_yaw = 45
+set i_yaw = 80
+set d_yaw = 0
+save</code></pre>
 <ol><li>P-term tuning: do a sharp stick snap and return. In Blackbox look at the gyro trace (blue) and setpoint (green). If gyro crosses setpoint in the opposite direction (bounce-back) — P is low, raise it by 10. If gyro oscillates around setpoint — P is high, lower it by 5.</li></ol>
 <ol><li>D-term tuning: after tuning P, do the same move. Add the D-term trace. If the D-term trembles with high-frequency noise — lower D by 3–5. If after the move gyro shows decaying oscillations — raise D by 3.</li></ol>
 <ol><li>I-term tuning: hover in Angle/Horizon mode, tilt the drone slightly and return to zero. If the drone drifts slowly — raise I by 10. If it overshoots neutral and starts swinging — lower I by 10.</li></ol>

@@ -56,6 +56,7 @@
       <p class="module-lead">PID-регулятор — то є ядро стабілізації в Betaflight. Стаття пояснює фізичний зміст коефіцієнтів P, I, D, як вони ся між собою взаємодіють, як впливають на поведінку дрона і як їх налаштовувати з Blackbox. Після того читач зможе діагностувати типові біди (осциляції, bounce-back, перегрів моторів) і цілеспрямовано правити параметри, а не крутити все навмання.</p>
       <div class="gc-callout" data-state="ok"><strong>Після модуля ти вмієш</strong><ul><li>пояснити P, I, D і feedforward на прикладі</li><li>передбачити симптом надто великого P або D</li></ul></div><p class="gc-muted">Перед цим модулем: <a href="f-fc-sensors.html">Польотний контролер і сенсори</a></p><div class="gc-callout lab"><p class="gc-label gc-muted">Лабораторна</p><strong>PID на пальцях — пояснити</strong><p class="gc-muted lab__hint">Здано, коли позначено всі пункти:</p><ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="bf-pid-reg-in-bf:lab:0"><span>Пояснив P, I, D і FF на одному прикладі своїми словами</span></label></li><li><label><input type="checkbox" data-check-id="bf-pid-reg-in-bf:lab:1"><span>Передбачив симптоми надто високих P і D та перевірив за таблицею симптомів</span></label></li></ul></div><div class="path-pos gc-muted"><span class="gc-label">На шляху</span><ul><li data-path-pos="betaflight"><a href="../path/betaflight.html">Betaflight</a>: крок 35 з 47 → <a href="data-python.html?path=betaflight">Python для аналізу польотних даних</a></li></ul></div>
       <div class="gc-prose module-body">
+<div class="gc-callout" data-state="info" data-stale-translation>Оригинал модуля обновлялся после перевода — часть текста может отставать.</div>
 <h2>Теорія</h2>
 <p>PID-регулятор (Proportional-Integral-Derivative) отримує від гіроскопа кутову швидкість за осями roll, pitch, yaw і мінімізує помилку між бажаною (setpoint, від стиків або навігації) і поточною швидкістю обертання. Вихід регулятора (PID sum) через мікшер перетворюється на сигнали для моторів.</p>
 <p><strong>P-term (пропорційний)</strong> реагує на поточну помилку: що більша помилка, то сильніша корекція. Він визначає основну жорсткість дрона. Біда в тому, що статичної помилки (дрейфу) він гет не прибере. Як його перекрутити — маєш швидкі осциляції (20–50 Гц).</p>
@@ -80,12 +81,27 @@
 <p>Програмні вимоги: Betaflight Configurator 10.10+, Blackbox Explorer.</p>
 <p><strong>Налаштування перед тюнінгом</strong></p>
 <ol><li>Увімкни RPM Filtering: у вкладці Motors увімкни <strong>Bidirectional DShot</strong> і задай Motor poles (RPM-фільтр увімкнеться сам); <code>rpm_filter_q = 500</code> — значення за замовчуванням (CLI).</li><li>Налаштуй Blackbox: вибери частоту запису 2 кГц, увімкни логування gyro_scaled, pid, setpoint, motor.</li><li>Встанови базові параметри фільтрації:</li></ol>
-<p>set gyro_lpf2_static_hz = 300 set gyro_lpf2_type = PT2 set dterm_lpf2_static_hz = 150 set dterm_lpf2_type = PT2 set dyn_notch_max_hz = 600 set dyn_notch_q = 250 save</p>
-<p>text</p>
+<pre class="cli-block"><code>set gyro_lpf2_static_hz = 300
+set gyro_lpf2_type = PT2
+set dterm_lpf2_static_hz = 150
+set dterm_lpf2_type = PT2
+set dyn_notch_max_hz = 600
+set dyn_notch_q = 250
+save</code></pre>
 <p><strong>Покрокове налаштування</strong></p>
 <ol><li>Визнач стартові значення (для рами 5&quot; з моторами 2207–2306):</li></ol>
-<p>set p_pitch = 45\nset i_pitch = 50\nset d_pitch = 25 set p_roll = 42, i_roll = 45, d_roll = 23 set p_yaw = 70, i_yaw = 50, d_yaw = 20 set d_min_roll = 20\nset d_min_pitch = 22\n# 2025.12: d_roll/d_pitch — базовий D, d_max_roll/d_max_pitch — піковий save</p>
-<p>text</p>
+<pre class="cli-block"><code>set p_roll = 45
+set i_roll = 80
+set d_roll = 40
+set d_min_roll = 30
+set p_pitch = 47
+set i_pitch = 84
+set d_pitch = 46
+set d_min_pitch = 34
+set p_yaw = 45
+set i_yaw = 80
+set d_yaw = 0
+save</code></pre>
 <ol><li>Налаштування P-term: дай різкий ривок стиком з поверненням. У Blackbox дивися графік gyro (синій) і setpoint (зелений). Як gyro перетинає setpoint у зворотний бік (bounce-back) — P низький, додай 10. Як gyro коливається довкола setpoint — P високий, зменш на 5.</li></ol>
 <ol><li>Налаштування D-term: після P зроби той самий рух. Додай графік D-term. Якщо D-term тремтить високочастотним шумом — знизь D на 3–5. Якщо після руху gyro йде із загасаючими коливаннями — додай D на 3.</li></ol>
 <ol><li>Налаштування I-term: зависни в режимі Angle/Horizon, злегка нахили дрон і верни в нуль. Якщо дрон помалу дрейфує — додай I на 10. Якщо проскакує нейтраль і ся розгойдує — зменш I на 10.</li></ol>

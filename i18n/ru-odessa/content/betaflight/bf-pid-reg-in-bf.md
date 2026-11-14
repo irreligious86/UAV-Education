@@ -87,6 +87,8 @@ PID-регулятор (Proportional-Integral-Derivative) получает от 
 1. Включите RPM Filtering: во вкладке Motors включите **Bidirectional DShot** и задайте Motor poles (RPM-фильтр включится сам); `rpm_filter_q = 500` — значение по умолчанию (CLI).
 2. Настройте Blackbox: выберите частоту записи 2 кГц, включите логирование gyro_scaled, pid, setpoint, motor.
 3. Установите базовые параметры фильтрации:
+
+```text
 set gyro_lpf2_static_hz = 300
 set gyro_lpf2_type = PT2
 set dterm_lpf2_static_hz = 150
@@ -94,19 +96,26 @@ set dterm_lpf2_type = PT2
 set dyn_notch_max_hz = 600
 set dyn_notch_q = 250
 save
-
-text
+```
 
 **Пошаговая настройка**
 
 1. Определите стартовые значения (для рамы 5" с моторами 2207–2306):
-set p_pitch = 45\nset i_pitch = 50\nset d_pitch = 25
-set p_roll = 42, i_roll = 45, d_roll = 23
-set p_yaw = 70, i_yaw = 50, d_yaw = 20
-set d_min_roll = 20\nset d_min_pitch = 22\n# 2025.12: d_roll/d_pitch — базовый D, d_max_roll/d_max_pitch — пиковый
-save
 
-text
+```text
+set p_roll = 45
+set i_roll = 80
+set d_roll = 40
+set d_min_roll = 30
+set p_pitch = 47
+set i_pitch = 84
+set d_pitch = 46
+set d_min_pitch = 34
+set p_yaw = 45
+set i_yaw = 80
+set d_yaw = 0
+save
+```
 
 2. Настройка P-term: выполните резкий рывок стиком с возвратом. В Blackbox смотрите график gyro (синий) и setpoint (зелёный). Если gyro пересекает setpoint в обратную сторону (bounce-back) — P низкий, увеличьте на 10. Если gyro колеблется вокруг setpoint — P высокий, уменьшите на 5.
 
