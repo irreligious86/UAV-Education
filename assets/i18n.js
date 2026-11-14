@@ -37,13 +37,23 @@
 
   document.addEventListener("click", function (e) {
     var a = e.target.closest && e.target.closest("[data-lang-to]");
-    if (!a) return;
+    if (!a) {   // a click outside the picker closes it
+      var open = document.querySelector("details.lang-switch[open]");
+      if (open && !(e.target.closest && e.target.closest(".lang-switch"))) open.removeAttribute("open");
+      return;
+    }
     e.preventDefault();
     switchTo(a.getAttribute("data-lang-to"));
   });
 
   // Only an explicit choice is remembered: a shared link to a page in another language opens as sent
   // until the visitor picks a language themselves.
+
+  document.addEventListener("keydown", function (e) {
+    if (e.key !== "Escape") return;
+    var open = document.querySelector("details.lang-switch[open]");
+    if (open) { open.removeAttribute("open"); var sm = open.querySelector("summary"); if (sm) sm.focus(); }
+  });
 
   window.UAVI18N = { T: T, lang: lang, switchTo: switchTo, urlFor: urlFor, remember: remember, chosen: chosen };
   window.T = window.T || T;

@@ -1,0 +1,94 @@
+{
+  "module": "px4-control",
+  "pass": 80,
+  "questions": [
+    {
+      "q": "Порядок контуров мультиротора в PX4?",
+      "options": [
+        "rate → attitude → position",
+        "position → attitude → rate",
+        "allocation → rate",
+        "attitude → position"
+      ],
+      "answer": 1,
+      "explain": "Внешний медленный — position, внутренний быстрый — rate."
+    },
+    {
+      "q": "Что делает MC_ROLLRATE_K?",
+      "options": [
+        "Только P",
+        "Множитель для P, I и D",
+        "Рейт стика по крену",
+        "Фильтр"
+      ],
+      "answer": 1,
+      "explain": "Параллельная форма с множителем K."
+    },
+    {
+      "q": "Чему в PX4 соответствует feedforward Betaflight?",
+      "options": [
+        "MC_ROLL_P",
+        "MC_ROLLRATE_FF",
+        "MPC_XY_P по позиции",
+        "CA_ROTOR0_KM"
+      ],
+      "answer": 1,
+      "explain": "FF rate-контура."
+    },
+    {
+      "q": "Что документация PX4 рекомендует большинству пользователей?",
+      "options": [
+        "Ручной тюнинг",
+        "Autotune",
+        "Дефолт",
+        "Betaflight"
+      ],
+      "answer": 1,
+      "explain": "Быстрее и обычно хорошо; ручной — для нестандартных рам."
+    },
+    {
+      "q": "Где задаётся газ висения?",
+      "options": [
+        "CA_AIRFRAME и MC_AIRMODE",
+        "MPC_THR_HOVER",
+        "MC_ROLL_P",
+        "MPC_XY_VEL_MAX"
+      ],
+      "answer": 1,
+      "explain": "Параметр position controller."
+    },
+    {
+      "q": "Быстрые осцилляции после autotune. Что первое?",
+      "options": [
+        "Увеличить K",
+        "Фильтры и повтор",
+        "Сменить раму",
+        "Отключить autotune"
+      ],
+      "answer": 1,
+      "explain": "Autotune на шумном сигнале подбирает гейны под шум."
+    },
+    {
+      "q": "MC_ROLLRATE_P = 0.15 означает:",
+      "options": [
+        "15 % P",
+        "1 рад/с → 15 % момента",
+        "0.15 °/с",
+        "15 % P от максимума по крену"
+      ],
+      "answer": 1,
+      "explain": "Единицы PX4: рад/с на входе, доля момента на выходе."
+    },
+    {
+      "q": "Что делает MC_AT_APPLY = 1?",
+      "options": [
+        "Отключает autotune после посадки",
+        "Применяет после посадки",
+        "Применяет в полёте",
+        "Не применяет"
+      ],
+      "answer": 1,
+      "explain": "0 — не применять, 2 — сразу."
+    }
+  ]
+}

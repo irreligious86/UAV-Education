@@ -1,0 +1,94 @@
+{
+  "module": "mav-component",
+  "pass": 80,
+  "questions": [
+    {
+      "q": "Компонент-датчик у HEARTBEAT вказує autopilot =",
+      "options": [
+        "MAV_AUTOPILOT_INVALID",
+        "MAV_AUTOPILOT_ARDUPILOTMEGA",
+        "MAV_AUTOPILOT_PX4",
+        "Будь-яке"
+      ],
+      "answer": 0,
+      "explain": "Він не автопілот; інакше GCS може сприйняти його за апарат."
+    },
+    {
+      "q": "Одиниці current_distance у DISTANCE_SENSOR:",
+      "options": [
+        "Сантиметри",
+        "Метри",
+        "Міліметри",
+        "Дюйми"
+      ],
+      "answer": 0,
+      "explain": "min/max/current — у см."
+    },
+    {
+      "q": "ArduPilot приймає DISTANCE_SENSOR як далекомір униз при:",
+      "options": [
+        "RNGFND1_TYPE = 10, ORIENT = 25",
+        "RNGFND1_TYPE = 1, ORIENT = 25",
+        "PRX1_TYPE = 2, PRX1_ORIENT = 0",
+        "EK3_SRC1_POSZ = 2 без датчика"
+      ],
+      "answer": 0,
+      "explain": "10 — MAVLink, 25 — Down; орієнтація в повідомленні має збігатися."
+    },
+    {
+      "q": "Що має робити компонент у разі втрати вимірювань?",
+      "options": [
+        "Перестати надсилати або позначити",
+        "Перезавантажити автопілот",
+        "Надсилати нулі замість даних",
+        "Надсилати останнє значення з колишньою частотою"
+      ],
+      "answer": 0,
+      "explain": "Автопілот виявить таймаут і відключить джерело."
+    },
+    {
+      "q": "Швидко вивести своє число в GCS і лог без власного діалекту:",
+      "options": [
+        "NAMED_VALUE_FLOAT",
+        "STATUSTEXT із числом",
+        "PARAM_VALUE",
+        "HEARTBEAT.custom_mode"
+      ],
+      "answer": 0,
+      "explain": "GCS показує значення, ArduPilot пише його в лог як NVAL."
+    },
+    {
+      "q": "На ESP32 кадри MAVLink іноді биті. Імовірна причина:",
+      "options": [
+        "Кілька задач пишуть в UART",
+        "Увімкнено підпис",
+        "Неправильний CRC_EXTRA",
+        "Надто частий heartbeat забиває буфер"
+      ],
+      "answer": 0,
+      "explain": "Потрібна одна задача-відправник або м'ютекс на UART."
+    },
+    {
+      "q": "Який рівень тесту доводить, що автопілот використовує дані компонента?",
+      "options": [
+        "SITL з перевіркою за логом",
+        "Юніт-тест пакування",
+        "Тест на фейковому апараті",
+        "Успішна компіляція"
+      ],
+      "answer": 0,
+      "explain": "Лише він перевіряє узгодженість параметрів і повідомлення."
+    },
+    {
+      "q": "2D-лідар для обходу перешкод надсилає:",
+      "options": [
+        "OBSTACLE_DISTANCE",
+        "DISTANCE_SENSOR з орієнтацією вниз",
+        "ODOMETRY",
+        "GPS_INPUT"
+      ],
+      "answer": 0,
+      "explain": "72 сектори → proximity (PRX1_TYPE = 2)."
+    }
+  ]
+}

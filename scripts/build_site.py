@@ -149,14 +149,14 @@ def i18n_script(a: str) -> str:
 
 def lang_switch() -> str:
     """Language picker in the header; hrefs are filled by write(). assets/i18n.js remembers the choice."""
+    cur = next(l for l in i18n.LANGS if l["code"] == i18n.lang())
     links = "".join(
-        f'<a class="gc-tag" href="#lang-{l["code"]}" data-lang-to="{l["code"]}" hreflang="{l["htmlLang"]}" lang="{l["htmlLang"]}" title="{esc(l["name"])}"'
-        + (' aria-current="true" data-state="ok"' if l["code"] == i18n.lang() else "") + f'>{esc(l["short"])}</a>'
+        f'<a href="#lang-{l["code"]}" data-lang-to="{l["code"]}" hreflang="{l["htmlLang"]}" lang="{l["htmlLang"]}"'
+        + (' aria-current="true"' if l is cur else "")
+        + f'><span class="gc-tag"{" data-state=\"ok\"" if l is cur else ""}>{esc(l["short"])}</span> {esc(l["name"])}</a>'
         for l in i18n.LANGS)
-    return f'\n      <nav class="lang-switch" aria-label="{_("Язык")}">{links}</nav>'
-
-
-# ---------------------------------------------------------------- data model
+    return (f'\n      <details class="lang-switch"><summary class="gc-tag" data-state="ok" aria-label="{_("Язык")}">'
+            f'{esc(cur["short"])} ▾</summary><nav class="lang-switch__menu" aria-label="{_("Язык")}">{links}</nav></details>')
 
 
 def load_curriculum() -> dict:

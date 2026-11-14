@@ -1,0 +1,94 @@
+{
+  "module": "tools-gazebo",
+  "pass": 80,
+  "questions": [
+    {
+      "q": "Яка версія Gazebo в парі з ROS 2 Jazzy?",
+      "options": [
+        "Gazebo Classic 11",
+        "Gazebo Harmonic",
+        "Gazebo Fortress",
+        "Будь-яка, версії не пов'язані"
+      ],
+      "answer": 1,
+      "explain": "Harmonic — LTS-пара для Jazzy; Classic завершив підтримку в січні 2025."
+    },
+    {
+      "q": "Які аргументи sim_vehicle.py потрібні для Gazebo?",
+      "options": [
+        "-f quad --model gazebo",
+        "--gazebo --classic --model iris-sdf",
+        "-f iris --model sitl",
+        "-f gazebo-iris --model JSON"
+      ],
+      "answer": 3,
+      "explain": "Фрейм має містити gazebo-, модель — JSON."
+    },
+    {
+      "q": "Що робить GZ_SIM_SYSTEM_PLUGIN_PATH?",
+      "options": [
+        "Каже, де шукати плагіни",
+        "Задає шлях до світів SDF",
+        "Вибирає версію Gazebo",
+        "Вмикає lockstep між SITL і світом"
+      ],
+      "answer": 0,
+      "explain": "Без нього Gazebo не знайде ArduPilotPlugin — апарат не отримує фізику."
+    },
+    {
+      "q": "Що означає @ у /camera@sensor_msgs/msg/Image@gz.msgs.Image?",
+      "options": [
+        "Лише з ROS у Gazebo",
+        "Лише з Gazebo в ROS",
+        "Міст в обидва боки",
+        "Коментар у команді"
+      ],
+      "answer": 2,
+      "explain": "@ — в обидва боки, [ — з Gazebo в ROS, ] — з ROS у Gazebo."
+    },
+    {
+      "q": "Навіщо lockstep між Gazebo і SITL?",
+      "options": [
+        "Щоб пришвидшити рендеринг камер у світі",
+        "Щоб вимкнути фізику",
+        "Щоб працював ros_gz_bridge",
+        "Час узгоджено, навіть за RTF < 1"
+      ],
+      "answer": 3,
+      "explain": "Симуляція чекає на автопілот — повільніше, але коректно."
+    },
+    {
+      "q": "Як запустити Gazebo для тесту без графіки?",
+      "options": [
+        "gz sim -s -r мир.sdf",
+        "gz sim --gui мир.sdf",
+        "gazebo --verbose мир.world",
+        "gz topic -l мир.sdf"
+      ],
+      "answer": 0,
+      "explain": "-s — лише сервер, -r — одразу запустити симуляцію."
+    },
+    {
+      "q": "Чим HITL відрізняється від SITL?",
+      "options": [
+        "Нічим, це синоніми",
+        "У HITL мотори крутяться на столі замість симуляції",
+        "Справжній польотний контролер, датчики із симулятора",
+        "HITL працює лише в Gazebo Classic"
+      ],
+      "answer": 2,
+      "explain": "Перевіряє реальне залізо: таймінги, драйвери, завантаження процесора."
+    },
+    {
+      "q": "Чому зір із симуляції може провалитися в полі?",
+      "options": [
+        "Gazebo взагалі не вміє симулювати камери",
+        "Ідеальна картинка без шуму й розмиття",
+        "ROS 2 спотворює зображення",
+        "Камери в полі завжди гірші"
+      ],
+      "answer": 1,
+      "explain": "Потрібні шум датчика, освітлення, розмиття та перевірка на реальних записах."
+    }
+  ]
+}
