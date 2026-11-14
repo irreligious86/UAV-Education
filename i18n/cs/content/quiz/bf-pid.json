@@ -1,0 +1,118 @@
+{
+  "module": "bf-pid",
+  "pass": 80,
+  "questions": [
+    {
+      "q": "Co se nastavuje před PID?",
+      "options": [
+        "Rates",
+        "Filtry",
+        "Rates kniplů",
+        "VTX"
+      ],
+      "answer": 1,
+      "explain": "PID zesiluje všechno z gyroskopu, včetně šumu. Nejdřív čisté spektrum."
+    },
+    {
+      "q": "Co je bounce-back?",
+      "options": [
+        "Propwash",
+        "Zpětný pohyb po zastavení kniplu",
+        "Šum motorů",
+        "Zpoždění nástupu po pohybu kniplu"
+      ],
+      "answer": 1,
+      "explain": "Měří se jako špička opačného znaménka do 150 ms po zastavení / amplituda manévru."
+    },
+    {
+      "q": "Proč se pro metriky bere medián po manévrech, a ne průměr?",
+      "options": [
+        "Počítá se rychleji",
+        "Odlehlá hodnota odhad nezkazí",
+        "Průměr není v Blackbox Exploreru dostupný",
+        "Tak je to zvykem"
+      ],
+      "answer": 1,
+      "explain": "Medián je odolný vůči odlehlým hodnotám."
+    },
+    {
+      "q": "V případové studii dal profil SHARP entry lag o 7 ms menší. Za jakou cenu?",
+      "options": [
+        "Ztráta spojení na hranici dosahu",
+        "Šum motorů +45 %",
+        "Bez ceny",
+        "Horší propwash"
+      ],
+      "answer": 1,
+      "explain": "Zvýšení P zvedá zesílení na všech frekvencích, včetně zbytkového šumu."
+    },
+    {
+      "q": "Proč profil WASH (více D) nezmenšil propwash na 7\" o hmotnosti 1.4 kg?",
+      "options": [
+        "Chybí plyn na provedení zásahu D",
+        "Propwash je tu aerodynamický",
+        "D nefunguje",
+        "Vadný gyroskop"
+      ],
+      "answer": 1,
+      "explain": "Čísla: RMS 0.97 oproti kontrole – v mezích šumu měření."
+    },
+    {
+      "q": "Jak se nakonec vrátila ostrost bez nárůstu šumu?",
+      "options": [
+        "Odstraněním RPM filtru kvůli fázi",
+        "Snížením zpoždění filtrů",
+        "Zvýšením FF",
+        "Zvýšením P"
+      ],
+      "answer": 1,
+      "explain": "Profil CRISP: gyro multiplier 1.10, notch Q 450 – stejný PID, menší fázové zpoždění."
+    },
+    {
+      "q": "Dva „stejné“ drony daly různý bounce-back. Poučení?",
+      "options": [
+        "Drony jsou prostě různé",
+        "Porovnávat v jednom letu",
+        "Metrika je vadná a k porovnání se nehodí",
+        "Je potřeba třetí dron"
+      ],
+      "answer": 1,
+      "explain": "Porovnávat profily v rámci jednoho letu, nebo normovat na amplitudu: na jednom létal pilot ostřeji – D-max se stíhal zapínat."
+    },
+    {
+      "q": "Kolik změn je přípustných v jednom ladicím letu?",
+      "options": [
+        "Libovolně mnoho",
+        "Jedna",
+        "Dvě",
+        "Tři"
+      ],
+      "answer": 1,
+      "explain": "Jinak se log nedá interpretovat."
+    },
+    {
+      "q": "bounce-back 20 % na 5\" je:",
+      "options": [
+        "Dobrý výsledek",
+        "Snesitelné pro 5\"",
+        "Problém: D/zpoždění",
+        "Norma pro 7\" na velkých vrtulích"
+      ],
+      "answer": 2,
+      "explain": "Dobré < 8 %, snesitelné 8–15 %."
+    },
+    {
+      "q": "Pilot si stěžuje na „chvění“ ve visu. Co říká tento fragment výstupu graderu?",
+      "kind": "apply",
+      "fragment": "[PASS] tracking roll tracking error: 0.12 (limit <= 0.25)\n[FAIL] tracking roll rate with centred sticks: 14.6 (limit <= 6.0 deg/s)\n[FAIL] tracking pitch rate with centred sticks: 14.1 (limit <= 6.0 deg/s)\n[PASS] filters  roll noise after filters: 2.1",
+      "options": [
+        "Sledování i šum jsou v normě, ale ve visu zůstává kmitání – smyčka je na hraně, zkontrolovat P vůči D",
+        "Šum motorů prochází filtry a rozkmitává stroj – je třeba snížit frekvence LPF gyroskopu",
+        "Motory jdou ve visu do saturace, proto smyčce chybí rezerva na stabilizaci",
+        "Chybí telemetrie eRPM, proto je RPM filtr vypnutý a chvění ve visu pochází z harmonických motorů"
+      ],
+      "answer": 0,
+      "explain": "Sledování i šum jsou v normě, ale ve visu zůstává pohyb – známka kmitání smyčky, ne šumu."
+    }
+  ]
+}

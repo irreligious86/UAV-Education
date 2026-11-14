@@ -3,92 +3,92 @@
   "pass": 80,
   "questions": [
     {
-      "q": "Почему соседние пропеллеры квадрокоптера вращаются в разные стороны?",
+      "q": "Proč se sousední vrtule kvadrokoptéry točí opačnými směry?",
       "options": [
-        "Так требует прошивка для миксера",
-        "Чтобы гасить реактивные моменты",
-        "Чтобы увеличить тягу",
-        "Чтобы снизить шум"
+        "Vyžaduje to firmware kvůli mixeru",
+        "Aby se rušily reakční momenty",
+        "Aby se zvýšil tah",
+        "Aby se snížil hluk"
       ],
       "answer": 1,
-      "explain": "Каждый мотор пытается провернуть раму в сторону, обратную вращению пропа. Две пары с противоположным вращением компенсируют этот момент."
+      "explain": "Každý motor se snaží pootočit rám proti směru otáčení vrtule. Dva páry s opačným otáčením tento moment vyrovnávají."
     },
     {
-      "q": "Как квадрокоптер поворачивает по рысканию (yaw)?",
+      "q": "Jak kvadrokoptéra zatáčí (yaw)?",
       "options": [
-        "Наклоняет все моторы сервами",
-        "Отклоняет руль",
-        "Ускоряет одну диагональ",
-        "Выключает один мотор"
+        "Naklání všechny motory servy",
+        "Vychýlí kormidlo",
+        "Zrychlí jednu úhlopříčku",
+        "Vypne jeden motor"
       ],
       "answer": 2,
-      "explain": "Разница реактивных моментов диагональных пар создаёт момент вокруг вертикальной оси при почти неизменной суммарной тяге."
+      "explain": "Rozdíl reakčních momentů úhlopříčných párů vytváří moment kolem svislé osy při téměř nezměněném celkovém tahu."
     },
     {
-      "q": "Что такое отношение тяги к весу (T/W) 2:1?",
+      "q": "Co znamená poměr tahu k tíze (T/W) 2:1?",
       "options": [
-        "Тяга вдвое больше веса",
-        "Вес вдвое больше тяги",
-        "Два мотора на проп",
-        "Газ висения 20 % при полной АКБ"
+        "Tah je dvakrát větší než tíha",
+        "Tíha je dvakrát větší než tah",
+        "Dva motory na vrtuli",
+        "Plyn ve visu 20 % při plné baterii"
       ],
       "answer": 0,
-      "explain": "T/W = максимальная тяга всех моторов / взлётный вес. При 2:1 висение идёт примерно на половине газа — запаса на манёвр почти нет."
+      "explain": "T/W = maximální tah všech motorů / vzletová tíha. Při 2:1 probíhá vis přibližně na polovině plynu – rezerva na manévr téměř není."
     },
     {
-      "q": "Что делает миксер?",
+      "q": "Co dělá mixer?",
       "options": [
-        "Смешивает топливо",
-        "Раздаёт оси по моторам",
-        "Калибрует ESC",
-        "Фильтрует гироскоп перед PID"
+        "Míchá palivo",
+        "Rozděluje osy na motory",
+        "Kalibruje ESC",
+        "Filtruje gyroskop před PID"
       ],
       "answer": 1,
-      "explain": "Миксер — таблица знаков для каждого мотора по типу рамы: сколько добавить/убавить оборотов для каждой оси управления."
+      "explain": "Mixer je tabulka znamének pro každý motor podle typu rámu: kolik otáček přidat/ubrat pro každou osu řízení."
     },
     {
-      "q": "Дрон переворачивается сразу на взлёте. Самая вероятная причина?",
+      "q": "Dron se převrací hned při vzletu. Nejpravděpodobnější příčina?",
       "options": [
-        "Низкий газ висения",
-        "Порядок или вращение моторов",
-        "Высокий P и слишком мощная АКБ",
-        "Слабый GPS"
+        "Nízký plyn ve visu",
+        "Pořadí nebo otáčení motorů",
+        "Vysoké P a příliš výkonná baterie",
+        "Slabý signál GPS"
       ],
       "answer": 1,
-      "explain": "Если реальная сборка не совпадает со схемой рамы в прошивке, миксер командует не тем моторам, и дрон кувыркается за долю секунды."
+      "explain": "Pokud se skutečná stavba neshoduje se schématem rámu ve firmwaru, mixer posílá povely nesprávným motorům a dron se převrátí za zlomek sekundy."
     },
     {
-      "q": "Какая ось управления у мультиротора самая слабая и почему?",
+      "q": "Která osa řízení je u multikoptéry nejslabší a proč?",
       "options": [
-        "Газ: моторы медленные",
-        "Тангаж: смещён центр тяжести",
-        "Yaw: реактивный момент мал",
-        "Крен: рама узкая"
+        "Plyn: motory jsou pomalé",
+        "Klopení: posunuté těžiště",
+        "Yaw: reakční moment je malý",
+        "Klonění: rám je úzký"
       ],
       "answer": 2,
-      "explain": "Рыскание создаётся реактивным моментом, он гораздо меньше момента от разницы тяг. Поэтому yaw медленнее и первым упирается в насыщение моторов."
+      "explain": "Zatáčení vzniká reakčním momentem, který je mnohem menší než moment z rozdílu tahů. Proto je yaw pomalejší a jako první narazí na saturaci motorů."
     },
     {
-      "q": "Момент по yaw у квада примерно в сравнении с roll:",
+      "q": "Moment v ose yaw je u kvadrokoptéry ve srovnání s roll přibližně:",
       "options": [
-        "Больше",
-        "В разы меньше",
-        "Равен",
-        "Зависит от KV"
+        "Větší",
+        "Několikanásobně menší",
+        "Stejný",
+        "Závisí na KV"
       ],
       "answer": 1,
-      "explain": "Отсюда медленный yaw и насыщение."
+      "explain": "Odtud pomalý yaw a saturace."
     },
     {
-      "q": "Угловое ускорение = ?",
+      "q": "Úhlové zrychlení = ?",
       "options": [
-        "Момент × инерция",
-        "Момент / инерция",
-        "Тяга / масса",
-        "Обороты / 60"
+        "Moment × setrvačnost",
+        "Moment / setrvačnost",
+        "Tah / hmotnost",
+        "Otáčky / 60"
       ],
       "answer": 1,
-      "explain": "У X8 J в 50–100 раз больше, чем у 5\"."
+      "explain": "U X8 je J 50–100krát větší než u 5\"."
     }
   ]
 }

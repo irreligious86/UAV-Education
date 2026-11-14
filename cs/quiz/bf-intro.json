@@ -3,92 +3,92 @@
   "pass": 80,
   "questions": [
     {
-      "q": "Что делает Betaflight лучше всего?",
+      "q": "Co umí Betaflight nejlépe?",
       "options": [
-        "Автономные миссии по GPS с точками",
-        "Стабилизацию и отклик на стики",
-        "Управление самолётом",
-        "Фотограмметрию"
+        "Autonomní mise podle GPS s waypointy",
+        "Stabilizaci a odezvu na kniply",
+        "Řízení letounu",
+        "Fotogrammetrii"
       ],
       "answer": 1,
-      "explain": "Betaflight — прошивка для ручного полёта: минимальная задержка и настраиваемый отклик."
+      "explain": "Betaflight je firmware pro ruční létání: minimální zpoždění a nastavitelná odezva."
     },
     {
-      "q": "Что нужно сделать сразу после первой прошивки FC?",
+      "q": "Co je třeba udělat hned po prvním nahrání firmwaru do FC?",
       "options": [
-        "Сразу полететь",
-        "Сохранить diff all",
-        "Включить все режимы",
-        "Поставить пропы"
+        "Hned letět",
+        "Uložit diff all",
+        "Zapnout všechny režimy",
+        "Nasadit vrtule"
       ],
       "answer": 1,
-      "explain": "Бэкап до изменений — точка возврата. Пропы, кстати, должны быть уже сняты."
+      "explain": "Záloha před změnami je bod návratu. Vrtule mají být mimochodem už sundané."
     },
     {
-      "q": "Где в Betaflight хранится конфигурация?",
+      "q": "Kde je v Betaflightu uložená konfigurace?",
       "options": [
-        "В файле на SD-карте",
-        "В памяти полётника",
-        "В конфигураторе",
-        "В облаке"
+        "V souboru na SD kartě",
+        "V paměti řídicí jednotky",
+        "V konfigurátoru",
+        "V cloudu"
       ],
       "answer": 1,
-      "explain": "Конфигурация живёт на плате и выгружается командой diff all / dump."
+      "explain": "Konfigurace žije na desce a exportuje se příkazem diff all / dump."
     },
     {
-      "q": "Чем diff all отличается от dump?",
+      "q": "Čím se diff all liší od dump?",
       "options": [
-        "diff не включает профили и rate-профили",
-        "diff — только отличия от дефолтов",
-        "dump короче",
-        "Ничем"
+        "diff nezahrnuje profily a profily rates",
+        "diff – jen rozdíly oproti výchozím hodnotám",
+        "dump je kratší",
+        "Ničím"
       ],
       "answer": 1,
-      "explain": "diff all читаем и переносим между версиями осмысленно; dump тащит все дефолты как явные значения."
+      "explain": "diff all je čitelný a mezi verzemi se dá přenášet s rozmyslem; dump s sebou táhne všechny výchozí hodnoty jako explicitní."
     },
     {
-      "q": "Что такое target при прошивке?",
+      "q": "Co je target při nahrávání firmwaru?",
       "options": [
-        "Цель полёта",
-        "Прошивка под конкретную плату",
-        "Профиль PID",
-        "Канал видеопередатчика для полёта"
+        "Cíl letu",
+        "Firmware pro konkrétní desku",
+        "Profil PID",
+        "Kanál videovysílače pro let"
       ],
       "answer": 1,
-      "explain": "Таргет описывает плату: процессор, гироскоп, пины. Не тот таргет — NOGYRO и неработающие порты."
+      "explain": "Target popisuje desku: procesor, gyroskop, piny. Špatný target znamená NOGYRO a nefunkční porty."
     },
     {
-      "q": "Что показывает BUILD KEY в выводе status?",
+      "q": "Co ukazuje BUILD KEY ve výpisu status?",
       "options": [
-        "Серийный номер платы",
-        "Ключ сборки Cloud Build",
-        "Версию конфигуратора",
-        "Хеш файла diff all для проверки"
+        "Sériové číslo desky",
+        "Klíč sestavení Cloud Build",
+        "Verzi konfigurátoru",
+        "Hash souboru diff all pro kontrolu"
       ],
       "answer": 1,
-      "explain": "По нему Cloud Build воспроизводит ту же сборку; в diff all его нет — сохраняйте вывод status."
+      "explain": "Podle něj Cloud Build zopakuje stejné sestavení; v diff all není – ukládejte si výpis status."
     },
     {
-      "q": "Флаг LOAD в арм-флагах:",
+      "q": "Příznak LOAD mezi příznaky armování:",
       "options": [
-        "Не загружен diff после прошивки",
-        "Перегрузка процессора",
-        "Нет АКБ",
-        "Нет логов"
+        "Po nahrání firmwaru nebyl načten diff",
+        "Přetížení procesoru",
+        "Chybí baterie",
+        "Chybí logy"
       ],
       "answer": 1,
-      "explain": "Перегрузка процессора: pid_process_denom = 2 или отключить функции; tasks показывает тяжёлые задачи."
+      "explain": "Přetížení procesoru: pid_process_denom = 2 nebo vypnout funkce; tasks ukáže náročné úlohy."
     },
     {
-      "q": "Что делает gyro task в Betaflight?",
+      "q": "Co dělá gyro task v Betaflightu?",
       "options": [
-        "Читает гироскоп и фильтрует сигнал",
-        "Выдаёт OSD на видео",
-        "Пишет Blackbox на флеш",
-        "Отвечает за CLI"
+        "Čte gyroskop a filtruje signál",
+        "Vykresluje OSD do videa",
+        "Zapisuje Blackbox do flash paměti",
+        "Obsluhuje CLI"
       ],
       "answer": 0,
-      "explain": "Gyro task — чтение гироскопа (до 8 кГц) и фильтры; PID task — расчёт выхода."
+      "explain": "Gyro task je čtení gyroskopu (až 8 kHz) a filtry; PID task je výpočet výstupu."
     }
   ]
 }

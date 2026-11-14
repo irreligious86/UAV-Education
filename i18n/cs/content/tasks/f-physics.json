@@ -1,0 +1,47 @@
+{
+ "module": "f-physics",
+ "tasks": [
+  {
+   "id": "tw",
+   "title": "Poměr tahu k tíze",
+   "statement": "Vzletová hmotnost stroje s baterií je **{m} kg**, maximální statický tah jednoho motoru s vrtulí je **{t} g**, motory jsou čtyři. Určete poměr tahu k tíze T/W.",
+   "params": {
+    "m": {
+     "min": 0.6,
+     "max": 1.6,
+     "step": 0.05
+    },
+    "t": {
+     "min": 900,
+     "max": 2000,
+     "step": 50
+    }
+   },
+   "answer": "4*t/1000/m",
+   "unit": "",
+   "tol": 0.02,
+   "solution": "T/W = 4·t / (1000·m). Je to poměr celkového maximálního tahu k tíze; pro freestyle je potřeba ≥ 4–5, pro nákladní stroj ≈ 2."
+  },
+  {
+   "id": "hover",
+   "title": "Plyn ve visu",
+   "statement": "Hmotnost **{m} kg**, čtyři motory, maximální tah jednoho motoru **{t} g**. Jaký podíl maximálního tahu (v procentech) musí ve visu dávat každý motor?",
+   "params": {
+    "m": {
+     "min": 0.6,
+     "max": 2.0,
+     "step": 0.05
+    },
+    "t": {
+     "min": 800,
+     "max": 2200,
+     "step": 50
+    }
+   },
+   "answer": "100*m*1000/4/t",
+   "unit": "%",
+   "tol": 0.02,
+   "solution": "Ve visu se celkový tah rovná tíze: každý motor dává m·1000/4 g, podíl = (m·1000/4)/t·100 %. Plyn v procentech na OSD bude jiný – tah není lineární funkcí plynu."
+  }
+ ]
+}

@@ -185,3 +185,40 @@ Source tags in brackets are the Czech sources the term was read in (key in the r
 | миссия, точка маршрута | mise, waypoint | *mise* [Červenka, Kovář]; no settled Czech word for waypoint (*bod trasy* unconfirmed) |
 | автопилот | autopilot | [Kovář, Kment, Bukovský, Denk] |
 | симулятор | simulátor | [Rot-TX]; *simulace* [Kovář] |
+
+## Additions from the pilot batch (2026-11-14)
+
+Decisions taken while translating the first five modules; binding for later batches so the same thing
+reads the same everywhere. All are unreviewed by a native speaker.
+
+| ru | cs | note |
+|---|---|---|
+| об/мин, об/с | ot/min, ot/s | `RPM` stays where the source writes RPM |
+| мкс, мОм, Н·м, рад/с, В/эл. | µs, mΩ, N·m, rad/s, V/článek | |
+| 60% | 60 % | space before % in prose and table cells; never inside code or parameter values |
+| заармился / не армится | dron se armoval / nejde armovat | |
+| флаг запрета арма | příznak blokující armování | open: collides with the diagnostics marker „Příznak:“ — keep the marker, reviewer to pick a better noun |
+| аппарат | stroj | „dron“ where the source means a multicopter specifically |
+| сборка | stavba | |
+| журнал аппарата | deník stroje | |
+| крыло (fixed wing in general) | letoun | `Flying Wing` preset name unchanged; „samokřídlo“ only for a tailless wing |
+| оценщик | estimátor | |
+| слайдеры | posuvníky | |
+| насыщение | saturace | |
+| реактивный момент | reakční moment | |
+| перелёт (overshoot) | překmit | |
+| кейс | případová studie | |
+| термический разгон | tepelný únik (thermal runaway) | |
+| тяговооружённость, T/W | poměr tahu k tíze (T/W) | |
+| вкладка | záložka | on-screen tab names themselves stay English |
+| бэкап | záloha | |
+| спутники | satelity | |
+| дом (RTH) | domov | |
+| начало работы (tag) | začínáme | |
+| любая прошивка | libovolný firmware | |
+
+Kept in English (tuning jargon): propwash, bounce-back, flip, freestyle, rates, notch, target, preset, fix,
+step response, overshoot (as a metric name; „překmit“ in running prose).
+Module titles in cross-references follow `i18n/cs/data.json` once it is filled; until then translate them
+consistently with the module's own `title`.
+Past-tense first-person checklist items are rephrased to avoid grammatical gender („mám spočítaný…“).

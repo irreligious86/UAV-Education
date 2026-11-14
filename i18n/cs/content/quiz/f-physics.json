@@ -1,0 +1,94 @@
+{
+  "module": "f-physics",
+  "pass": 80,
+  "questions": [
+    {
+      "q": "Proč se sousední vrtule kvadrokoptéry točí opačnými směry?",
+      "options": [
+        "Vyžaduje to firmware kvůli mixeru",
+        "Aby se rušily reakční momenty",
+        "Aby se zvýšil tah",
+        "Aby se snížil hluk"
+      ],
+      "answer": 1,
+      "explain": "Každý motor se snaží pootočit rám proti směru otáčení vrtule. Dva páry s opačným otáčením tento moment vyrovnávají."
+    },
+    {
+      "q": "Jak kvadrokoptéra zatáčí (yaw)?",
+      "options": [
+        "Naklání všechny motory servy",
+        "Vychýlí kormidlo",
+        "Zrychlí jednu úhlopříčku",
+        "Vypne jeden motor"
+      ],
+      "answer": 2,
+      "explain": "Rozdíl reakčních momentů úhlopříčných párů vytváří moment kolem svislé osy při téměř nezměněném celkovém tahu."
+    },
+    {
+      "q": "Co znamená poměr tahu k tíze (T/W) 2:1?",
+      "options": [
+        "Tah je dvakrát větší než tíha",
+        "Tíha je dvakrát větší než tah",
+        "Dva motory na vrtuli",
+        "Plyn ve visu 20 % při plné baterii"
+      ],
+      "answer": 0,
+      "explain": "T/W = maximální tah všech motorů / vzletová tíha. Při 2:1 probíhá vis přibližně na polovině plynu – rezerva na manévr téměř není."
+    },
+    {
+      "q": "Co dělá mixer?",
+      "options": [
+        "Míchá palivo",
+        "Rozděluje osy na motory",
+        "Kalibruje ESC",
+        "Filtruje gyroskop před PID"
+      ],
+      "answer": 1,
+      "explain": "Mixer je tabulka znamének pro každý motor podle typu rámu: kolik otáček přidat/ubrat pro každou osu řízení."
+    },
+    {
+      "q": "Dron se převrací hned při vzletu. Nejpravděpodobnější příčina?",
+      "options": [
+        "Nízký plyn ve visu",
+        "Pořadí nebo otáčení motorů",
+        "Vysoké P a příliš výkonná baterie",
+        "Slabý signál GPS"
+      ],
+      "answer": 1,
+      "explain": "Pokud se skutečná stavba neshoduje se schématem rámu ve firmwaru, mixer posílá povely nesprávným motorům a dron se převrátí za zlomek sekundy."
+    },
+    {
+      "q": "Která osa řízení je u multikoptéry nejslabší a proč?",
+      "options": [
+        "Plyn: motory jsou pomalé",
+        "Klopení: posunuté těžiště",
+        "Yaw: reakční moment je malý",
+        "Klonění: rám je úzký"
+      ],
+      "answer": 2,
+      "explain": "Zatáčení vzniká reakčním momentem, který je mnohem menší než moment z rozdílu tahů. Proto je yaw pomalejší a jako první narazí na saturaci motorů."
+    },
+    {
+      "q": "Moment v ose yaw je u kvadrokoptéry ve srovnání s roll přibližně:",
+      "options": [
+        "Větší",
+        "Několikanásobně menší",
+        "Stejný",
+        "Závisí na KV"
+      ],
+      "answer": 1,
+      "explain": "Odtud pomalý yaw a saturace."
+    },
+    {
+      "q": "Úhlové zrychlení = ?",
+      "options": [
+        "Moment × setrvačnost",
+        "Moment / setrvačnost",
+        "Tah / hmotnost",
+        "Otáčky / 60"
+      ],
+      "answer": 1,
+      "explain": "U X8 je J 50–100krát větší než u 5\"."
+    }
+  ]
+}
