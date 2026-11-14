@@ -660,6 +660,34 @@
           "article": "bf-setup-scratch"
         },
         {
+          "id": "bf-arming-safety",
+          "title": "Почему не армится и как не улететь: флаги арма, runaway takeoff, yaw spin recovery",
+          "level": "L2",
+          "hours": 4,
+          "prerequisites": [
+            "bf-setup-scratch",
+            "bf-modes-osd"
+          ],
+          "objectives": [
+            "найти причину запрета арма по status, OSD, MSP или коду пищалки и снять её",
+            "объяснить пороги runaway takeoff, yaw spin и crash recovery по исходнику 4.5",
+            "проверить порядок и направление моторов и выполнить первое низкое висение с критериями прерывания"
+          ],
+          "lab": {
+            "title": "Флаги арма и runaway: декодер, логика из исходника, первый арм и висение",
+            "criteria": [
+              "Декодер маски запущен на пяти масках и маске 2025.12 с выбором таблицы по числу флагов; своя маска расписана",
+              "Логика runaway воспроизведена: дизарм в сценарии B (217 → 292 мс), отключение в сценарии A, свой сценарий объяснён",
+              "Железо: флаги сняты по одному без пропов, три кода пищалки записаны, порядок и направление моторов соответствуют QUADX",
+              "Первое низкое висение 10–20 с без срабатывания критериев прерывания, газ отрыва записан"
+            ]
+          },
+          "stacks": [
+            "betaflight"
+          ],
+          "article": "bf-arming-safety"
+        },
+        {
           "id": "link-digital-video",
           "title": "Цифровое FPV-видео: DJI, Walksnail, HDZero, OpenIPC",
           "level": "L2",
@@ -684,6 +712,35 @@
             "link"
           ],
           "article": "link-digital-video"
+        },
+        {
+          "id": "bf-hd-osd-video",
+          "title": "Цифровое видео на Betaflight: DJI, Walksnail, HDZero — подключение, OSD и настройка",
+          "level": "L2",
+          "hours": 4,
+          "prerequisites": [
+            "bf-ports",
+            "bf-modes-osd",
+            "link-digital-video"
+          ],
+          "objectives": [
+            "подключить воздушный модуль DJI, Walksnail или HDZero по питанию и UART согласно спецификации",
+            "настроить порт 131073, vcd_video_system = HD и раскладку OSD под канву своей системы",
+            "проверить линк, OSD, нагрев и запись на столе до первого полёта"
+          ],
+          "lab": {
+            "title": "HD OSD: калькулятор масок и канвы, затем стол с обдувом",
+            "criteria": [
+              "hd_osd_calc.py запущен против serial.h 4.5 (17 bits OK); строка serial своего порта видео разложена и проверена validate()",
+              "Таблица set osd_*_pos под канву своей системы и разбор, какие элементы прижал бы osdInit() на другой канве",
+              "Таблица разводки с напряжением пада при отсоединённом модуле; status и get osd_canvas записаны, OSD виден в очках",
+              "Тест на столе с обдувом, 60-секундная запись с указанием носителя, мощность по правилам страны, diff all сдан"
+            ]
+          },
+          "stacks": [
+            "betaflight"
+          ],
+          "article": "bf-hd-osd-video"
         },
         {
           "id": "link-telemetry-radios",
@@ -1633,6 +1690,64 @@
             "betaflight"
           ],
           "article": "bf-pid"
+        },
+        {
+          "id": "bf-rates-rc",
+          "title": "Рейты, RC smoothing и feedforward: от стика до setpoint",
+          "level": "L2",
+          "hours": 3,
+          "prerequisites": [
+            "bf-intro",
+            "bf-pid-reg-in-bf",
+            "link-elrs"
+          ],
+          "objectives": [
+            "рассчитать setpoint по формулам рейтов и перевести профиль между типами",
+            "прочитать rc_smoothing_info и связать срез с packet rate",
+            "подобрать feedforward и rxrange под свой линк"
+          ],
+          "lab": {
+            "title": "Рейты и RC smoothing: расчёт из исходника, rxrange и слепое сравнение профилей",
+            "criteria": [
+              "Скрипт с формулами fc/rc.c запущен: конвертер для двух профилей Actual с RMS-ошибкой, таблица PT3 для 50–1000 Гц и расчёт jitter-фильтра сданы",
+              "Объяснено, почему Actual 7/67/0 не переводится в Betaflight с ошибкой меньше 20 °/с",
+              "Железо: rxrange настроен (упоры 1000/2000 ± 2), выводы rc_smoothing_info для двух packet rate в пределах ±3 %",
+              "Железо: слепое сравнение трёх профилей на тумблере проведено, Blackbox setpoint[0] и записи пилота сданы"
+            ]
+          },
+          "stacks": [
+            "betaflight"
+          ],
+          "article": "bf-rates-rc"
+        },
+        {
+          "id": "bf-adjustments",
+          "title": "Подстройки в полёте: вкладка Adjustments, `adjrange` и VTX на тумблере",
+          "level": "L2",
+          "hours": 3,
+          "prerequisites": [
+            "bf-modes-osd",
+            "bf-pid",
+            "link-vtx"
+          ],
+          "objectives": [
+            "настроить adjrange в шаговом, абсолютном и режиме выбора по таблице функций 4.5",
+            "сохранить подстройку стиками или CLI и проверить её в OSD, CLI и Blackbox",
+            "переключать мощность VTX тумблером командой vtx с учётом vtx_low_power_disarm"
+          ],
+          "lab": {
+            "title": "Подстройка D в висении и VTX на тумблере",
+            "criteria": [
+              "Модель: скрипт запущен на исходнике 4.5, вывод шагов 1–6 приложен, объяснён сдвиг номеров CLI с 25-го",
+              "Модель: для своего конфига посчитаны позиции селектора и значения крутилки в крайних точках",
+              "Стол: подстройка видна в OSD и CLI и пропадает после перезагрузки без save; мощность VTX переключается тумблером",
+              "Висение: diff all до/после с изменением одной переменной и событие подстройки в Blackbox сданы"
+            ]
+          },
+          "stacks": [
+            "betaflight"
+          ],
+          "article": "bf-adjustments"
         },
         {
           "id": "bf-cli",
@@ -3931,6 +4046,8 @@
             "bf-failsafe",
             "link-elrs",
             "link-vtx",
+            "link-digital-video",
+            "bf-hd-osd-video",
             "ops-field",
             "ops-case-studies",
             "diag-troubleshooting"
@@ -3939,7 +4056,8 @@
         {
           "title": "Настройка с нуля",
           "modules": [
-            "bf-setup-scratch"
+            "bf-setup-scratch",
+            "bf-arming-safety"
           ]
         },
         {
@@ -3972,7 +4090,9 @@
             "bf-filters",
             "bf-rpm-filter",
             "ctl-theory",
-            "bf-pid"
+            "bf-pid",
+            "bf-rates-rc",
+            "bf-adjustments"
           ]
         },
         {

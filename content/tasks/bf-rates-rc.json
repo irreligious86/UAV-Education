@@ -1,0 +1,62 @@
+{
+  "module": "bf-rates-rc",
+  "tasks": [
+    {
+      "id": "actual-rate",
+      "title": "Setpoint по модели Actual",
+      "statement": "Профиль `rates_type = ACTUAL`: `roll_rc_rate = {rc}`, `roll_srate = {sr}`, `roll_expo = {ex}`. Стик крена отклонён на **{x}** хода вправо. Найдите setpoint крена в °/с.",
+      "params": {
+        "rc": { "min": 5, "max": 25, "step": 1 },
+        "sr": { "min": 50, "max": 100, "step": 5 },
+        "ex": [0, 20, 40, 54, 60, 80],
+        "x": [0.25, 0.5, 0.75, 0.9]
+      },
+      "answer": "x*rc*10 + (sr*10 - rc*10)*x*(x**5*ex/100 + x*(1 - ex/100))",
+      "unit": "°/с",
+      "tol": 0.01,
+      "solution": "C = rc_rate·10, M = srate·10, e = expo/100. `applyActualRates`: rate = C·x + (M − C)·|x|·(x⁵·e + x·(1 − e)). Центр и максимум задаются напрямую, expo меняет только форму между ними."
+    },
+    {
+      "id": "bf-max-rate",
+      "title": "Максимальный рейт модели Betaflight",
+      "statement": "Модель BETAFLIGHT: RC rate **{r}**, super rate **{s}**, expo 0.30. Найдите максимальную угловую скорость на полном стике, °/с.",
+      "params": {
+        "r": { "min": 0.8, "max": 1.8, "step": 0.05 },
+        "s": { "min": 0.5, "max": 0.8, "step": 0.02 }
+      },
+      "answer": "200*r/(1 - s)",
+      "unit": "°/с",
+      "tol": 0.01,
+      "solution": "При x = 1 expo-член даёт x' = 1, а super-фактор равен 1/(1 − s). Максимум = 200·r/(1 − s). Expo влияет на центр (×(1 − e)), но не на максимум; RC rate ≤ 2.0, поэтому поправка RC_RATE_INCREMENTAL не нужна."
+    },
+    {
+      "id": "auto-cutoff",
+      "title": "Автоматический срез RC smoothing",
+      "statement": "Betaflight 4.5 измерил частоту приёмника **{f} Гц**, `rc_smoothing_auto_factor = {a}`, `rc_smoothing_setpoint_cutoff = 0`. Какой срез setpoint покажет `rc_smoothing_info`, Гц?",
+      "params": {
+        "f": [50, 100, 150, 250, 333, 500, 1000],
+        "a": [10, 20, 30, 45, 60, 90, 120]
+      },
+      "answer": "max(15, math.floor(f*1.5/(1 + a/10)))",
+      "unit": "Гц",
+      "tol": 0.001,
+      "abs": 0.5,
+      "solution": "`rcSmoothingSetFilterCutoffs`: cutoff = max(15, (uint16)(f_rx·1.5/(1 + factor/10))). Дробная часть отбрасывается, нижняя граница — 15 Гц."
+    },
+    {
+      "id": "rxrange-scale",
+      "title": "Канал после rxrange",
+      "statement": "Для крена задано `rxrange 0 {lo} {hi}`. Приёмник отдаёт **{v} мкс**. Найдите значение канала после масштабирования (rcData), мкс.",
+      "params": {
+        "lo": [980, 985, 988, 990, 995],
+        "hi": [2005, 2010, 2012, 2015, 2020],
+        "v": { "min": 1050, "max": 1950, "step": 25 }
+      },
+      "answer": "1000 + (v - lo)*1000/(hi - lo)",
+      "unit": "мкс",
+      "tol": 0.0005,
+      "abs": 0.5,
+      "solution": "`applyRxChannelRangeConfiguraton` вызывает scaleRangef(v, min, max, 1000, 2000): rcData = 1000 + (v − min)·1000/(max − min). Масштабируются только каналы 0–3 после `map`."
+    }
+  ]
+}

@@ -1055,6 +1055,66 @@
       "term": "Control allocation (CA_*)",
       "def": "Блок PX4, который раскладывает требуемые моменты и тягу по исполнителям по заданной геометрии: CA_ROTOR_COUNT, позиции CA_ROTORn_PX/PY и направление вращения CA_ROTORn_KM.",
       "module": "px4-setup-scratch"
+    },
+    {
+      "term": "adjrange",
+      "def": "CLI-команда Betaflight для подстроек в полёте: adjrange <слот 0–29> 0 <канал диапазона> <start> <end> <функция> <канал подстройки> [<center> <scale>]. Номер функции — позиция в defaultAdjustmentConfigs[] + 1, в 4.5 с 25-го не совпадает с enum. Изменения живут в RAM до сохранения.",
+      "module": "bf-adjustments"
+    },
+    {
+      "term": "Шаговая и абсолютная подстройка",
+      "def": "Два режима adjrange. Шаговый (center = 0): канал выше mid_rc + 200 даёт +1, ниже mid_rc − 200 даёт −1, повтор каждые 500 мс. Абсолютный (center ≠ 0): значение = center + (rc − 1500)·scale/500 при каждом изменении канала, с прыжком при включении слота.",
+      "module": "bf-adjustments"
+    },
+    {
+      "term": "vtx (VTX на тумблере)",
+      "def": "CLI-команда Betaflight vtx <слот 0–9> <aux> <band> <channel> <power> <start> <end>: задаёт бэнд, канал и индекс мощности VTX по положению AUX-канала. Слоты проверяются на каждом RC-кадре, слот, сработавший в прошлый раз, пропускается — перекрывающиеся слоты по очереди перебивают друг друга; бэнд и канал меняются только до первого арма, мощность — всегда.",
+      "module": "bf-adjustments"
+    },
+    {
+      "term": "Actual rates",
+      "def": "Модель рейтов Betaflight (дефолт с 4.3): rc_rate×10 — чувствительность в центре, srate×10 — максимум в °/с, expo меняет только форму кривой между ними.",
+      "module": "bf-rates-rc"
+    },
+    {
+      "term": "Super rate",
+      "def": "Параметр модели Betaflight: делит угловую скорость на (1 − |x|·s), поднимая край кривой стика; вместе с RC rate задаёт максимум 200·r/(1 − s).",
+      "module": "bf-rates-rc"
+    },
+    {
+      "term": "RC smoothing",
+      "def": "PT3-фильтр setpoint, газа и feedforward на частоте PID-цикла; в авто-режиме срез = max(15, ⌊f_rx·1.5/(1 + factor/10)⌋) Гц по измеренной частоте пакетов.",
+      "module": "bf-rates-rc"
+    },
+    {
+      "term": "Runaway takeoff prevention",
+      "def": "Защита Betaflight от «taz» на первом взлёте: дизарм и флаг RUNAWAY, если |pidSum| ≥ 600 при вращении быстрее 15 °/с (рыскание 50 °/с) дольше 75 мс. Отключается до перезагрузки после 500 мс уверенного полёта (газ ≥ 20 % со стиком или ≥ 40 %).",
+      "module": "bf-arming-safety"
+    },
+    {
+      "term": "Yaw spin recovery",
+      "def": "Режим Betaflight при раскрутке по рысканию выше порога (AUTO: max_yaw + max(25 %, 200 °/с), 500–1950 °/с): обнуляет крен/тангаж и I, отдаёт всю тягу на остановку вращения, выходит на 100 °/с ниже порога через 20 мс.",
+      "module": "bf-arming-safety"
+    },
+    {
+      "term": "PREARM",
+      "def": "Режим Betaflight — второй ключ арма: при заданном диапазоне арм возможен только при включённом PREARM, и после каждого арма его нужно переключить (флаг NOPREARM). В 2025.12 переключение можно отменить параметром prearm_allow_rearm.",
+      "module": "bf-arming-safety"
+    },
+    {
+      "term": "MSP DisplayPort",
+      "def": "Протокол, по которому полётник через UART сообщает цифровым очкам (DJI, Walksnail, HDZero), какой символ нарисовать в какой клетке сетки OSD. В Betaflight 4.4+ — функция порта VTX (MSP + DisplayPort): маска 131073 = MSP + VTX_MSP; в ArduPilot SERIALn_PROTOCOL = 42 и OSD_TYPE = 5.",
+      "module": "bf-hd-osd-video"
+    },
+    {
+      "term": "Канва HD OSD (osd_canvas)",
+      "def": "Размер сетки символов HD OSD в столбцах и строках. В Betaflight 4.5 по умолчанию 53×20, но очки сообщают свою (HDZero — 50×18) командой MSP_SET_OSD_CANVAS. Элементы за пределами канвы прошивка прижимает к краю, а не масштабирует.",
+      "module": "bf-hd-osd-video"
+    },
+    {
+      "term": "VTX_MSP (функция порта 131072)",
+      "def": "Бит 1 << 17 маски serial в Betaflight: управление VTX и DisplayPort по MSP. Один, без MSP или Serial RX, он недопустим — isSerialConfigValid() сбрасывает весь конфиг портов к умолчаниям.",
+      "module": "bf-hd-osd-video"
     }
   ]
 }
