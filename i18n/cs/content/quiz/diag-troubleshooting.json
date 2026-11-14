@@ -1,0 +1,94 @@
+{
+  "module": "diag-troubleshooting",
+  "pass": 80,
+  "questions": [
+    {
+      "q": "Čím začít, když dron v Betaflightu nejde armovat?",
+      "options": [
+        "Přepájením přijímače",
+        "Příkazem status v CLI",
+        "Výměnou řídicí jednotky",
+        "Nahráním nejnovější verze firmwaru"
+      ],
+      "answer": 1,
+      "explain": "status ukáže Arming disable flags – firmware příčinu jmenuje sám."
+    },
+    {
+      "q": "Flag RXLOSS znamená:",
+      "options": [
+        "Nízké napětí",
+        "Z přijímače nepřicházejí kanály",
+        "Při armování je otevřené menu OSD",
+        "Stroj je nakloněný"
+      ],
+      "answer": 1,
+      "explain": "Při flagu RXLOSS zkontrolujte port, protokol a inverzi, bind a 5 V na přijímači."
+    },
+    {
+      "q": "Jeden motor se netočí. Jaký je první levný krok?",
+      "options": [
+        "Koupit nový motor",
+        "Prohodit signálové vodiče",
+        "Vyměnit rám",
+        "Nahrát nový firmware do ESC a zkalibrovat plyn"
+      ],
+      "answer": 1,
+      "explain": "Prohoďte signálový vodič s motorem, který funguje: pokud se závada přestěhovala s vodičem, je to signál nebo ploška FC; pokud zůstala, je to ESC nebo motor."
+    },
+    {
+      "q": "Žárovka smoke stopperu svítí jasně, dron se nezapne:",
+      "options": [
+        "Baterie je vybitá pod práh BEC",
+        "Zkrat",
+        "Žárovka je vadná",
+        "To je normální"
+      ],
+      "answer": 1,
+      "explain": "Při zkratu odpojujte spotřebiče jeden po druhém: kde žárovka zhasne, tam je zkrat."
+    },
+    {
+      "q": "Nad 70 % plynu se dron třese. Co udělat jako první?",
+      "options": [
+        "Snížit P na všech osách o 20 %",
+        "Nahrát Blackbox a podívat se na spektrum",
+        "Vyměnit vrtule",
+        "Nahrát firmware znovu"
+      ],
+      "answer": 1,
+      "explain": "Bez logu jen hádáte; spektrum odliší mechaniku, filtraci a rezonanci."
+    },
+    {
+      "q": "Příznak ESC desync v logu:",
+      "options": [
+        "Pokles LQ v okamžiku prudkého přidání plynu",
+        "Propad eRPM jednoho motoru",
+        "Růst VBAT",
+        "Zahřívání barometru"
+      ],
+      "answer": 1,
+      "explain": "ESC desync je náhlý propad eRPM jednoho motoru s cuknutím; příčinou bývá nastavení ESC, DShot nebo fáze."
+    },
+    {
+      "q": "K čemu slouží pravidlo „jedna změna – jedno ověření“?",
+      "options": [
+        "K úspoře času",
+        "Ke zjištění, co pomohlo",
+        "K tomu, aby se mezi lety zbytečně nesahalo do CLI",
+        "K šetření páječky"
+      ],
+      "answer": 1,
+      "explain": "Po dvou současně provedených změnách příčinu nezjistíte."
+    },
+    {
+      "q": "Flag ANGLE při armování v Betaflightu znamená:",
+      "options": [
+        "Stroj je nakloněn víc než small_angle",
+        "Gyroskop není zkalibrován",
+        "Plyn je nad minimem",
+        "Chybí signál přijímače"
+      ],
+      "answer": 0,
+      "explain": "ANGLE znamená náklon větší než small_angle: postavte stroj rovně nebo zkalibrujte akcelerometr."
+    }
+  ]
+}

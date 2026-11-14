@@ -3,92 +3,92 @@
   "pass": 80,
   "questions": [
     {
-      "q": "Что активировало систему прекращения полёта Matternet M2 в Цюрихе?",
+      "q": "Co aktivovalo systém ukončení letu u Matternetu M2 v Curychu?",
       "options": [
-        "Разряд АКБ",
-        "EKF variance после вибраций IMU",
-        "Потеря связи с пультом оператора",
-        "Команда оператора"
+        "Vybití baterie",
+        "EKF variance po vibracích IMU",
+        "Ztráta spojení s vysílačkou provozovatele",
+        "Povel provozovatele"
       ],
       "answer": 1,
-      "explain": "Вибрации выросли на всех трёх IMU, данные IMU3 резко разошлись с двумя другими → расхождение EKF → FTS."
+      "explain": "Vibrace vzrostly na všech třech IMU, data IMU3 se prudce rozešla s oběma ostatními → nesoulad EKF → FTS."
     },
     {
-      "q": "Почему парашют не спас Matternet M2?",
+      "q": "Proč padák Matternet M2 nezachránil?",
       "options": [
-        "Не раскрылся",
-        "Стропа была повреждена",
-        "Ветер",
-        "Был слишком мал для такой массы"
+        "Neotevřel se",
+        "Lano padáku bylo poškozené",
+        "Vítr",
+        "Byl na takovou hmotnost příliš malý"
       ],
       "answer": 1,
-      "explain": "Стропа не выдержала рывка из-за предварительного повреждения."
+      "explain": "Lano padáku nevydrželo trhnutí, protože bylo už předtím poškozené."
     },
     {
-      "q": "Что делал контроллер Airspeeder при потере связи?",
+      "q": "Co dělala řídicí jednotka Airspeederu při ztrátě spojení?",
       "options": [
-        "Включал RTH к точке взлёта",
-        "Держал газ и горизонт",
-        "Садился",
-        "Выключал моторы"
+        "Zapnula RTH k místu vzletu",
+        "Držela plyn a vodorovnou polohu",
+        "Přistála",
+        "Vypnula motory"
       ],
       "answer": 1,
-      "explain": "Замораживал газ и держал горизонт — аппарат набрал ~7900 футов. Failsafe «держать» вместо «снижаться» — главный урок."
+      "explain": "Zmrazila plyn a držela vodorovnou polohu – stroj vystoupal do ~7900 ft. Failsafe „držet“ místo „klesat“ je hlavní poučení."
     },
     {
-      "q": "Почему причина потери связи Airspeeder не установлена?",
+      "q": "Proč nebyla zjištěna příčina ztráty spojení u Airspeederu?",
       "options": [
-        "Засекречено",
-        "Не было бортовой записи",
-        "Комиссия не искала причину",
-        "Пилот не помнит"
+        "Je utajená",
+        "Chyběl palubní záznam",
+        "Komise příčinu nehledala",
+        "Pilot si to nepamatuje"
       ],
       "answer": 1,
-      "explain": "Без лога расследование заканчивается словами «не установлено»."
+      "explain": "Bez logu vyšetřování končí slovy „nebylo zjištěno“."
     },
     {
-      "q": "Что стало причиной падения Alta X?",
+      "q": "Co bylo příčinou pádu Alta X?",
       "options": [
-        "Птица",
-        "Разряд АКБ из-за порога",
-        "Отказ мотора на висении",
-        "Потеря GPS"
+        "Pták",
+        "Vybití baterie kvůli prahu",
+        "Porucha motoru ve visu",
+        "Ztráta GPS"
       ],
       "answer": 1,
-      "explain": "Порог предупреждения снижен с 44 до 42 В, напряжение перед взлётом не проверено: отказа техники не было."
+      "explain": "Práh varování byl snížen ze 44 na 42 V a napětí před vzletem nikdo nezkontroloval: o poruchu techniky nešlo."
     },
     {
-      "q": "Какой порог энергии удара принимают за риск серьёзной травмы?",
+      "q": "Jaký práh energie nárazu se bere jako riziko vážného zranění?",
       "options": [
-        "~8 Дж",
-        "~80 Дж",
-        "~800 Дж",
-        "~8000 Дж"
+        "~8 J",
+        "~80 J",
+        "~800 J",
+        "~8000 J"
       ],
       "answer": 1,
-      "explain": "Matternet без груза — уже 118 Дж."
+      "explain": "Matternet bez nákladu měl už 118 J."
     },
     {
-      "q": "Общий вывод трёх кейсов:",
+      "q": "Společný závěr tří případových studií:",
       "options": [
-        "Нужны парашюты на всех аппаратах",
-        "Поведение при отказе и данные",
-        "Нужны большие дроны",
-        "Детали ненадёжны"
+        "Všechny stroje potřebují padáky",
+        "Chování při poruše a data",
+        "Je potřeba stavět velké drony",
+        "Díly jsou nespolehlivé"
       ],
       "answer": 1,
-      "explain": "Что делает аппарат, когда что-то пошло не так, — главный вопрос инженера."
+      "explain": "Co stroj dělá, když se něco pokazí – to je hlavní otázka inženýra."
     },
     {
-      "q": "Почему разбор аварии ищет корневую причину в процессе, а не в человеке?",
+      "q": "Proč rozbor nehody hledá kořenovou příčinu v procesu, a ne v člověku?",
       "options": [
-        "Процесс можно изменить, чтобы ошибка не повторилась у любого",
-        "Чтобы никто не отвечал за аварию",
-        "Так короче отчёт",
-        "Человеческие ошибки не случаются"
+        "Proces lze změnit tak, aby se chyba nezopakovala nikomu",
+        "Aby za nehodu nikdo neodpovídal",
+        "Zpráva je tak kratší",
+        "Lidské chyby se nestávají"
       ],
       "answer": 0,
-      "explain": "Изменение процесса защищает от повторения независимо от исполнителя."
+      "explain": "Změna procesu chrání před opakováním chyby bez ohledu na to, kdo úkon provádí."
     }
   ]
 }

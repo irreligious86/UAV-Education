@@ -330,3 +330,33 @@ expanded just enough to read unambiguously alone; never change which option is c
 Subscripts with Russian labels are Czechised consistently: Rвн → R_i, U_хх → U_0, U_борта → U_paluby,
 P_пот → P_ztr, R_сумм → R_celk, I_ср → I_stř, m_рамы → m_rámu. Voice phrases are Czech („Arm povolen“,
 „Vzlétám“, „Rozumím“, „Volno“, „Přistaň“). Russian prose inside inline code examples (log lines) is translated.
+
+## Additions from batch 2 (method, case studies, troubleshooting, ESC firmware, Remote ID) — binding, unreviewed
+
+| ru | cs | note |
+|---|---|---|
+| журнал изменений | deník změn | |
+| инженерная папка / трассируемость | inženýrská složka / trasovatelnost | |
+| паспорт аппарата | karta stroje | «паспорт сборки» stays „pasport stavby“ |
+| стендовые тесты | testy na měřicí stolici | «на стенде без пропов» (bench) → „na stole bez vrtulí“ |
+| полевой тест | test v terénu | |
+| авария / исправление / корневая причина | nehoda / náprava / kořenová příčina | |
+| система прекращения полёта | systém ukončení letu (FTS) | |
+| аварийный выключатель | nouzový vypínač | |
+| неисправность | závada | |
+| прозвонить | změřit průchodnost | noun: „test spojitosti“ |
+| холодная пайка | studený spoj | |
+| фен (паяльный) | horkovzdušná pistole | |
+| тайминг / демагнитизация | časování (timing) / demagnetizace | |
+| срыв синхронизации | ztráta synchronizace (desync) | |
+| ключи (ESC) | spínací tranzistory | |
+| загрузчик / кирпич | bootloader / cihla | |
+| безопасность (security) | zabezpečení | safety stays „bezpečnost“ |
+| поверхность атаки | plocha útoku (attack surface) | |
+| широковещание / маячок / глушение | všesměrové vysílání / maják / rušení (jamming) | |
+| полезная нагрузка (пакета) | datová část | payload of the aircraft: „užitečné zatížení“ |
+| метка времени / сборка прошивки | časová značka / sestavení firmwaru | |
+| одиночная точка отказа | jednotlivé místo poruchy (single point of failure) | |
+
+Feet stay `ft`, `ft/min` in accident reports. A quiz stem may be turned from a sentence completion into a
+question if Czech grammar needs it; options keep their order and the keyed answer.

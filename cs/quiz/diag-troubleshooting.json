@@ -3,92 +3,92 @@
   "pass": 80,
   "questions": [
     {
-      "q": "С чего начинать, если дрон не армится в Betaflight?",
+      "q": "Čím začít, když dron v Betaflightu nejde armovat?",
       "options": [
-        "С перепайки приёмника",
-        "С команды status в CLI",
-        "С замены полётника",
-        "С перепрошивки на последнюю версию"
+        "Přepájením přijímače",
+        "Příkazem status v CLI",
+        "Výměnou řídicí jednotky",
+        "Nahráním nejnovější verze firmwaru"
       ],
       "answer": 1,
-      "explain": "status показывает Arming disable flags — прошивка сама называет причину."
+      "explain": "status ukáže Arming disable flags – firmware příčinu jmenuje sám."
     },
     {
-      "q": "Флаг RXLOSS означает:",
+      "q": "Flag RXLOSS znamená:",
       "options": [
-        "Низкое напряжение",
-        "Нет каналов от приёмника",
-        "Открыто меню OSD во время арма",
-        "Наклон аппарата"
+        "Nízké napětí",
+        "Z přijímače nepřicházejí kanály",
+        "Při armování je otevřené menu OSD",
+        "Stroj je nakloněný"
       ],
       "answer": 1,
-      "explain": "Проверять порт, протокол и инверсию, бинд и 5 В на приёмнике."
+      "explain": "Při flagu RXLOSS zkontrolujte port, protokol a inverzi, bind a 5 V na přijímači."
     },
     {
-      "q": "Один мотор не крутится. Первый дешёвый шаг?",
+      "q": "Jeden motor se netočí. Jaký je první levný krok?",
       "options": [
-        "Купить новый мотор",
-        "Поменять сигнальные провода",
-        "Сменить раму",
-        "Перепрошить ESC и откалибровать газ"
+        "Koupit nový motor",
+        "Prohodit signálové vodiče",
+        "Vyměnit rám",
+        "Nahrát nový firmware do ESC a zkalibrovat plyn"
       ],
       "answer": 1,
-      "explain": "Поменять местами с работающим мотором: проблема ушла с проводом — сигнал/пад FC; осталась — ESC/мотор."
+      "explain": "Prohoďte signálový vodič s motorem, který funguje: pokud se závada přestěhovala s vodičem, je to signál nebo ploška FC; pokud zůstala, je to ESC nebo motor."
     },
     {
-      "q": "Лампа smoke stopper горит ярко, борт не включается:",
+      "q": "Žárovka smoke stopperu svítí jasně, dron se nezapne:",
       "options": [
-        "АКБ разряжена ниже порога BEC",
-        "Короткое замыкание",
-        "Лампа сломана",
-        "Это норма"
+        "Baterie je vybitá pod práh BEC",
+        "Zkrat",
+        "Žárovka je vadná",
+        "To je normální"
       ],
       "answer": 1,
-      "explain": "Отключать потребители по одному: где лампа гаснет — там КЗ."
+      "explain": "Při zkratu odpojujte spotřebiče jeden po druhém: kde žárovka zhasne, tam je zkrat."
     },
     {
-      "q": "Трясёт выше 70% газа. Первое действие?",
+      "q": "Nad 70 % plynu se dron třese. Co udělat jako první?",
       "options": [
-        "Снизить P на всех осях на 20 %",
-        "Записать Blackbox и спектр",
-        "Поменять пропы",
-        "Перепрошить"
+        "Snížit P na všech osách o 20 %",
+        "Nahrát Blackbox a podívat se na spektrum",
+        "Vyměnit vrtule",
+        "Nahrát firmware znovu"
       ],
       "answer": 1,
-      "explain": "Без лога — угадывание; спектр отличает механику, фильтрацию и резонанс."
+      "explain": "Bez logu jen hádáte; spektrum odliší mechaniku, filtraci a rezonanci."
     },
     {
-      "q": "Признак ESC desync в логе:",
+      "q": "Příznak ESC desync v logu:",
       "options": [
-        "Падение LQ в момент рывка газа",
-        "Провал eRPM одного мотора",
-        "Рост VBAT",
-        "Нагрев барометра"
+        "Pokles LQ v okamžiku prudkého přidání plynu",
+        "Propad eRPM jednoho motoru",
+        "Růst VBAT",
+        "Zahřívání barometru"
       ],
       "answer": 1,
-      "explain": "Внезапный провал eRPM одного мотора с рывком: настройки ESC, DShot, фазы."
+      "explain": "ESC desync je náhlý propad eRPM jednoho motoru s cuknutím; příčinou bývá nastavení ESC, DShot nebo fáze."
     },
     {
-      "q": "Правило «одно изменение — одна проверка» нужно, чтобы:",
+      "q": "K čemu slouží pravidlo „jedna změna – jedno ověření“?",
       "options": [
-        "Экономить время",
-        "Знать, что помогло",
-        "Не трогать CLI лишний раз между полётами",
-        "Беречь паяльник"
+        "K úspoře času",
+        "Ke zjištění, co pomohlo",
+        "K tomu, aby se mezi lety zbytečně nesahalo do CLI",
+        "K šetření páječky"
       ],
       "answer": 1,
-      "explain": "Два изменения сразу — причина не установлена."
+      "explain": "Po dvou současně provedených změnách příčinu nezjistíte."
     },
     {
-      "q": "Флаг ANGLE при арме в Betaflight означает:",
+      "q": "Flag ANGLE při armování v Betaflightu znamená:",
       "options": [
-        "Аппарат наклонён больше small_angle",
-        "Не откалиброван гироскоп",
-        "Газ выше минимума",
-        "Нет сигнала приёмника"
+        "Stroj je nakloněn víc než small_angle",
+        "Gyroskop není zkalibrován",
+        "Plyn je nad minimem",
+        "Chybí signál přijímače"
       ],
       "answer": 0,
-      "explain": "ANGLE — наклон больше small_angle: поставить ровно или откалибровать акселерометр."
+      "explain": "ANGLE znamená náklon větší než small_angle: postavte stroj rovně nebo zkalibrujte akcelerometr."
     }
   ]
 }

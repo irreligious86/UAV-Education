@@ -1,0 +1,41 @@
+{
+ "module": "f-esc-firmware",
+ "tasks": [
+  {
+   "id": "rpm",
+   "title": "eRPM na otáčky",
+   "statement": "ESC hlásí **{e} eRPM**, motor má **{p} pólů**. Určete mechanické otáčky (ot/min).",
+   "params": {
+    "e": {
+     "min": 20000,
+     "max": 180000,
+     "step": 5000
+    },
+    "p": [
+     12,
+     14
+    ]
+   },
+   "answer": "e/(p/2)",
+   "unit": "ot/min",
+   "tol": 0.01,
+   "solution": "Otáčky = eRPM / (póly / 2)."
+  },
+  {
+   "id": "hz",
+   "title": "Frekvence motoru pro filtr",
+   "statement": "Motor se točí rychlostí **{rpm} ot/min**. Určete frekvenci základní harmonické (Hz).",
+   "params": {
+    "rpm": {
+     "min": 3000,
+     "max": 30000,
+     "step": 500
+    }
+   },
+   "answer": "rpm/60",
+   "unit": "Hz",
+   "tol": 0.01,
+   "solution": "f = ot/min / 60."
+  }
+ ]
+}
