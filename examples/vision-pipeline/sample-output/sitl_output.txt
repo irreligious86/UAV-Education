@@ -1,0 +1,69 @@
+heartbeat from sysid 1, firmware: 4.6.3
+== 0. TIMESYNC
+   RTT median 4.81 ms, FC clock - companion clock = -2213530.2 ms (spread 2.52 ms)
+== 1. parameters
+   FENCE_ENABLE = 1
+   FENCE_TYPE = 3
+   FENCE_RADIUS = 60
+   FENCE_ALT_MAX = 30
+   FENCE_ACTION = 1
+   WPNAV_SPEED = 300
+   GUID_TIMEOUT = 3
+   FOLL_ENABLE = 1
+   FOLL_SYSID = 200
+   FOLL_OFS_Z = -15
+   FOLL_POS_P = 0.3
+   FOLL_DIST_MAX = 60
+   FOLL_YAW_BEHAVE = 0
+   FOLL_ALT_TYPE = 1
+== 2. takeoff
+   pre-arm checks passed after 0 s (EKF has a position, fence can be armed)
+   mode GUIDED
+   armed
+   alt 14.6 m after 11 s
+   home -35.3624930 149.1652646
+== 3. GUIDED velocity follow (replay of targets.csv at 30 fps, commands at 10 Hz)
+   t=  0.0s None->TRACK  v_fc=(+0.0,+0.0) m/s  alt=14.6 m  mode=GUIDED
+   t= 20.6s TRACK->HOLD  v_fc=(-0.8,+0.2) m/s  alt=14.9 m  mode=GUIDED
+   mode LOITER
+   t= 23.2s HOLD->LOITER  v_fc=(-0.0,-0.0) m/s  alt=14.9 m  mode=LOITER
+   t= 24.3s target is back, operator re-enables follow:   mode GUIDED
+   t= 24.3s LOITER->TRACK  v_fc=(+0.0,-0.0) m/s  alt=14.9 m  mode=GUIDED
+   t= 28.7s TRACK->HOLD  v_fc=(-0.7,-0.5) m/s  alt=14.9 m  mode=GUIDED
+   t= 30.1s HOLD->TRACK  v_fc=(-0.0,-0.0) m/s  alt=14.9 m  mode=GUIDED
+   t= 33.6s TRACK->HOLD  v_fc=(-0.6,-0.5) m/s  alt=14.9 m  mode=GUIDED
+   t= 35.1s HOLD->TRACK  v_fc=(-0.0,-0.0) m/s  alt=14.9 m  mode=GUIDED
+   sent 289 velocity setpoints; interlock states: TRACK=248, HOLD=41, LOITER=8
+   |v| before first HOLD 0.97 m/s, 1.5-2.5 s after 0.03 m/s
+== 4. FOLLOW mode: pipeline publishes the target as sysid 200 GLOBAL_POSITION_INT
+   mode FOLLOW
+   horizontal distance to target: start 18.8 m, t=10 s 13.9 m, mean over the last 5 s 1.5 m; |v| max 2.6 m/s, alt 14.9-15.0 m
+   target stream stops (dark slice: the pipeline has nothing to publish)
+   +1 s: pos=(-3.3,+5.6) m v=(-0.4,-0.2) m/s mode=FOLLOW
+   +2 s: pos=(-3.7,+5.5) m v=(-0.4,-0.1) m/s mode=FOLLOW
+   +3 s: pos=(-4.2,+5.3) m v=(-0.4,-0.1) m/s mode=FOLLOW
+   +4 s: pos=(-4.4,+5.3) m v=(-0.0,+0.0) m/s mode=FOLLOW
+   +5 s: pos=(-4.5,+5.3) m v=(+0.0,+0.0) m/s mode=FOLLOW
+== 5. speed limit and GUID_TIMEOUT: companion goes silent in GUIDED
+   mode GUIDED
+   start: pos=(-4.5,+5.3) m v=(+0.0,+0.0) m/s mode=GUIDED
+   6.0 m/s north commanded, +1 s: pos=(-3.5,+5.3) m v=(+2.2,+0.0) m/s mode=GUIDED
+   6.0 m/s north commanded, +2 s: pos=(+1.4,+5.3) m v=(+5.3,-0.0) m/s mode=GUIDED
+   6.0 m/s north commanded, +3 s: pos=(+9.4,+5.3) m v=(+5.9,-0.0) m/s mode=GUIDED
+   6.0 m/s north commanded, +4 s: pos=(+17.3,+5.3) m v=(+6.1,+0.0) m/s mode=GUIDED
+   1.5 m/s north commanded for 3 s: pos=(+30.1,+5.3) m v=(+1.4,-0.0) m/s mode=GUIDED; now silent
+   +1 s silence: pos=(+31.5,+5.3) m v=(+1.4,-0.0) m/s mode=GUIDED
+   +2 s silence: pos=(+32.9,+5.3) m v=(+1.4,+0.0) m/s mode=GUIDED
+   +3 s silence: pos=(+34.5,+5.3) m v=(+1.5,+0.0) m/s mode=GUIDED
+   +4 s silence: pos=(+35.3,+5.3) m v=(+0.2,-0.0) m/s mode=GUIDED
+   +5 s silence: pos=(+35.4,+5.3) m v=(+0.0,-0.0) m/s mode=GUIDED
+== 6. geofence: companion keeps commanding 3 m/s north, FENCE_RADIUS = 60 m
+   mode GUIDED
+   after 40 s: pos=(+58.0,+0.3) m v=(+0.0,-0.0) m/s mode=GUIDED
+   3 s later, still sending 3 m/s north: pos=(+58.0,+0.2) m v=(-0.0,-0.0) m/s mode=GUIDED
+   fence shrinks to 30 m while the vehicle is outside it (the same as flying through a fence without avoidance)
+   FENCE_RADIUS = 30
+   FC: Circle fence breached
+   3 s later, still sending 3 m/s north: pos=(+54.4,+0.2) m v=(-2.6,-0.0) m/s mode=RTL
+   mode LAND
+landed and disarmed

@@ -20,4 +20,7 @@ Each folder is self-contained; copy it out of this repository to begin a project
 | `cell-bridge/` | Project #9 starter: MAVLink uplink scheduler for a cellular tunnel (control first, token-bucket budget, per-stream coalescing, quality-driven telemetry share, reconnect backoff), tested on a simulated lossy link; 4 tests | mav-routing, nav-resilience, ap-safety-fs, projects/proj-cell-bridge |
 | `lua-protection/` | Project #11 starter: ArduPilot Lua guard (vibration → LAND, keep-in polygon → RTL, self-protection on script errors) run by a lupa mock of the bindings; 6 tests | ap-lua, ap-safety-fs, projects/proj-lua-protection |
 
+| `vision-pipeline/` | Onboard vision end to end: synthetic flight video, detector → tracker → geo-referenced target with per-stage latency log, slice scoring, ArduCopter SITL follow with timeout/speed/fence interlocks | per-vision-pipeline |
+| `nav-vtrn/` | Vision-based terrain navigation: synthetic orthophoto, visual odometry vs map matching vs fused, closed loop GPS_INPUT into ArduCopter SITL | nav-vtrn |
+
 Goal: a simulation on screen in 15 minutes, not an afternoon of dependencies.

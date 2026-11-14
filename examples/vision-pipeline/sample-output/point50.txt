@@ -1,0 +1,17 @@
+1200 frames @ 30 fps, detector=hsv, undistort=point only, select=lock, att offset +50 ms
+stage      p50 ms   p95 ms   max ms
+cap          0.26     0.81     2.98
+und          0.00     0.00     0.03
+det          0.83     1.09     5.11
+trk          0.04     0.07     0.87
+geo          0.09     0.14     0.66
+cmd          0.00     0.00     0.04
+total        1.25     1.88     5.55
+slice                 TP    FP    FN  precision  recall
+nominal              952     0     8       1.00    0.99
+dark (gain 0.25)       3     0   117       1.00    0.03
+motion blur            3     0    57       1.00    0.05
+occluded               0     3     0       0.00    0.00
+geo error on TP frames: mean 0.34 m, p95 0.50 m, max 0.76 m
+track IDs used on TP frames: [1, 13, 18, 22]  (ID switches = 3)
+interlock states: {'HOLD': 210, 'TRACK': 961, 'LOITER': 29}

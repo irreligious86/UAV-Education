@@ -201,7 +201,10 @@
             "est-gnss",
             "ap-ekf",
             "est-alt-sources",
-            "nav-resilience"
+            "nav-resilience",
+            "nav-rtk",
+            "nav-indoor",
+            "nav-terrain"
           ]
         },
         {
@@ -244,6 +247,7 @@
             "emb-basics",
             "emb-protocols",
             "comp-raspberry",
+            "comp-jetson-nano",
             "ap-companion",
             "eng-ci-configs",
             "comp-esp32",
@@ -266,10 +270,12 @@
             "per-cv",
             "per-edge-ml",
             "per-visual-nav",
+            "nav-vtrn",
             "per-mapping",
             "per-landing",
             "per-depth-avoid",
-            "per-tracking"
+            "per-tracking",
+            "per-vision-pipeline"
           ]
         }
       ],
@@ -346,11 +352,13 @@
           "modules": [
             "per-camera",
             "per-geometry",
+            "nav-vtrn",
             "per-cv",
             "per-edge-ml",
             "per-landing",
             "per-depth-avoid",
-            "per-tracking"
+            "per-tracking",
+            "per-vision-pipeline"
           ]
         }
       ],
@@ -2253,6 +2261,87 @@
             ]
           },
           "url": "m/nav-resilience.html"
+        },
+        {
+          "id": "nav-rtk",
+          "title": "RTK/PPK: база и ровер, NTRIP, moving baseline, GPS yaw",
+          "level": "L3",
+          "hours": 5,
+          "status": "published",
+          "prerequisites": [
+            "est-gnss",
+            "ap-ekf"
+          ],
+          "objectives": [
+            "настроить базу (survey-in / известная точка) и доставить RTCM3 роверу через NTRIP, Mission Planner и GPS_RTCM_DATA",
+            "читать состояния fix 5/6, возраст поправок и RTCMFU/RTCMFD в логе, снижать EK3_GPS_P_NSE под RTK осознанно",
+            "включить GPS yaw по moving baseline (GPS1_TYPE 17/18, GPSx_POS, EK3_SRC1_YAW 2/3; PX4 GPS_UBX_MODE, EKF2_GPS_CTRL) и проверить его против разметки и компаса"
+          ],
+          "lab": {
+            "title": "Moving baseline в SITL, затем два F9P на стенде",
+            "criteria": [
+              "SITL: GPS2_RAW.fix_type = 6 и yaw в пределах ±1° от курса дома; 65535 при сломанном офсете и без RELPOSNED, EKF продолжает курс",
+              "SITL: лог с GPS.Status = 6 и XKF3.IYAW; таблица fix → hAcc mean/p95 и график по CSV с долей fixed и худшим возрастом поправок",
+              "Железо: одиночный RTK по NTRIP до fix 6 с h_acc ≤ 30 мм, записано время деградации при обрыве; своя база держит fixed 10 мин",
+              "Железо: moving baseline даёт курс в пределах 2° от разметки и 3° от компаса; GPS.Status ≥ 5 95 % времени, GPA.YAcc < 2°, XKF3.IYAW < 5°"
+            ]
+          },
+          "url": "m/nav-rtk.html"
+        },
+        {
+          "id": "nav-indoor",
+          "title": "Без GNSS: оптический поток, UWB, motion capture и внешняя навигация в EKF",
+          "level": "L3",
+          "hours": 5,
+          "status": "published",
+          "prerequisites": [
+            "est-alt-sources",
+            "ap-ekf",
+            "est-kalman",
+            "ap-sitl"
+          ],
+          "objectives": [
+            "выбрать набор EK3_SRC1_* под оптический поток, UWB, mocap и псевдо-GPS и объяснить, откуда берётся курс",
+            "подать внешнюю позицию в EKF3 (VISION_POSITION_ESTIMATE / ODOMETRY / GPS_INPUT, PX4 EKF2_EV_CTRL) с верными осями, origin, VISO_DELAY_MS и reset_counter",
+            "найти в логе по XKF3 / XKF4.SP / VISP нескомпенсированную задержку, скачок источника и перепутанные оси и провести приёмку источника до первого полёта"
+          ],
+          "lab": {
+            "title": "ExternalNav в SITL без GPS: развёртка задержки и скачок источника, затем поток с дальномером в комнате",
+            "criteria": [
+              "SITL: воспроизведён «AHRS: waiting for home», затем арм в Loiter после SET_GPS_GLOBAL_ORIGIN при ARMING_CHECK = 1 и полёт с ошибкой XKF1 к истине p95 ≤ 0.05 м, XKF4.SP < 0.2",
+              "SITL: таблица развёртки задержки из ≥ 5 точек (Δτ, p95, max инновации, SP); назван Δτ, где появляется SP > 1, и объяснено, почему управление ломается раньше",
+              "SITL: два лога скачка источника на 2 м — без reset_counter (SP > 1, рывок аппарата) и с ним (сброс позиции без рывка)",
+              "Железо: FLOW_FXSCALER откалиброван по OF.flowX / OF.bodyX, проход руками 3 м с ошибкой ≤ 0.3 м, Loiter 60 с по потоку с уходом ≤ 0.5 м (или критерии приёмки UWB / mocap)"
+            ]
+          },
+          "url": "m/nav-indoor.html"
+        },
+        {
+          "id": "nav-terrain",
+          "title": "Следование рельефу: terrain data, дальномер, TERRAIN_*, безопасность",
+          "level": "L2",
+          "hours": 4,
+          "status": "published",
+          "prerequisites": [
+            "est-alt-sources",
+            "ap-missions",
+            "ap-safety-fs"
+          ],
+          "objectives": [
+            "различать высоту AMSL, над домом и над рельефом и выбирать источник рельефа: база TERRAIN_* или дальномер (WPNAV_RFND_USE, SURFTRAK_MODE)",
+            "проверять загрузку тайлов до вылета и настраивать RTL_ALT_TYPE / RTL_ALT под гребень на пути домой",
+            "находить в логе просадку высоты над землёй на склоне и terrain failsafe (ERR 23, MODE.Rsn 11, RFND.Stat) и объяснять их причины"
+          ],
+          "lab": {
+            "title": "Миссия через гору в SITL: база рельефа против дальномера, затем низкий полёт над склоном",
+            "criteria": [
+              "SITL: три лога (база, дальномер, потеря дальномера); показан pre-arm «waiting for terrain data» и его исчезновение после загрузки тайлов",
+              "SITL: на графике истинной высоты над землёй назван минимум на подъёме и объяснён через WPNAV_SPEED_UP; удар о склон при RTL_ALT_TYPE = 0 воспроизведён и предложен RTL_ALT",
+              "SITL: terrain failsafe найден в логе по ERR Subsys 23 и MODE Rsn 11",
+              "Железо: TERRAIN_REPORT.pending = 0 в поле; стендовая таблица дальномера с ошибкой ≤ 3 %; лог Loiter над склоном с SAlt в ±2 м от DSAlt без срабатывания критериев прерывания"
+            ]
+          },
+          "url": "m/nav-terrain.html"
         }
       ]
     },
@@ -2911,6 +3000,32 @@
           "url": "m/comp-raspberry.html"
         },
         {
+          "id": "comp-jetson-nano",
+          "title": "Jetson Nano как компаньон: что он может, чего нет и как выжать максимум",
+          "level": "L2",
+          "hours": 5,
+          "status": "published",
+          "prerequisites": [
+            "comp-intro",
+            "comp-raspberry"
+          ],
+          "objectives": [
+            "отличать Jetson Nano (JetPack 4.6.x, EOL) от Orin Nano (JetPack 6, Super) по вычислениям, кодеру, питанию и поддержке и выбирать плату под задачу",
+            "считать бюджет питания 5 В и падение на проводе, выбирать режим nvpmodel и читать температуру, частоту GPU и мощность из tegrastats",
+            "передавать состояние companion в автопилот как HEARTBEAT компонента 191 и NAMED_VALUE_FLOAT и находить его в логе полётника"
+          ],
+          "lab": {
+            "title": "Мост здоровья companion: tegrastats → NAMED_VALUE_FLOAT в SITL, затем стенд с платой",
+            "criteria": [
+              "SITL-путь: парсер даёт на трёх строках образца значения из модуля, ram_pct и cpu_pct пересчитаны руками",
+              "SITL (-I 5): в DataFlash есть NVAL с SCom = 191, на стороне наземки — HEARTBEAT компонента 191 и STATUSTEXT о перегреве; число NVAL объяснено",
+              "Посчитаны бюджет питания своей сборки и напряжение на плате по U = U_BEC − I·(2·L·r + R_разъёма) для своего провода",
+              "Железо (если плата есть): таблица режимов nvpmodel за 20 минут детектора; вход ≥ 4.75 В в пике, запас ≥ 10 °C до троттлинга, к/с на 20-й минуте ≥ 90 % от первой, UART-петля 100/100, NVAL 1 Гц без пропусков дольше 3 с"
+            ]
+          },
+          "url": "m/comp-jetson-nano.html"
+        },
+        {
           "id": "mav-routing",
           "title": "MAVLink routing and transport: radio, 4G, multiple GCSs",
           "level": "L3",
@@ -3336,6 +3451,34 @@
           "url": "m/per-visual-nav.html"
         },
         {
+          "id": "nav-vtrn",
+          "title": "Ориентирование по местности камерой: кадр против карты, визуальная одометрия и возврат без GNSS",
+          "level": "L3",
+          "hours": 6,
+          "status": "published",
+          "prerequisites": [
+            "per-geometry",
+            "per-visual-nav",
+            "est-gnss",
+            "ap-ekf"
+          ],
+          "objectives": [
+            "объяснить, почему VO/VIO дрейфует (масштаб, курс), а привязка к карте даёт абсолютную позицию, и посчитать бюджет дрейфа между привязками",
+            "собрать конвейер привязки: rectify по AGL и курсу, ORB/AKAZE, гомография с RANSAC, проверки, lat/lon и σ, VPR с геометрической проверкой, слияние с VO через ворота",
+            "подать оценку в автопилот (GPS_INPUT ≥ 5 Гц с horiz_accuracy, наборы EK3_SRC; PX4 EKF2_EV_CTRL / EKF2_AGP_CTRL) и проверить по логу, что EKF её принимает и отбрасывает ложную"
+          ],
+          "lab": {
+            "title": "VO против привязки к карте на синтетическом ортофото, затем возврат без GNSS в SITL",
+            "criteria": [
+              "Python-стенд: таблица ошибки VO на 100/500/1000/2295 м для трёх прогонов (AGL +1.3 %, AGL +5 %, курс из кадров) и график ошибка–путь с привязками и слиянием; названы причины дрейфа и участки без привязок",
+              "Python-стенд: медиана ошибки привязок ≤ 0.5 м, найдена привязка с ошибкой > 3σ и объяснена роль ворот; VPR top-5 и доля верных ответов после геометрической проверки",
+              "SITL: арминг с GPS2_TYPE = 14 при GPS_INPUT 5 Гц; после SIM_GPS_DISABLE = 1 маршрут и RTL пройдены на зрении, ошибка EKF против истины ≤ 3 м на рабочей высоте; ложная привязка +60 м отброшена (GPS Glitch, ошибка EKF не выросла)",
+              "Железо: офлайн-прогон записанного полёта даёт медиану ошибки привязок ≤ 3 м и p95 ≤ 10 м против GNSS без принятых выбросов > 5σ; теневой режим: GPS[1] в пределах 5 м от GPS[0] 95 % времени"
+            ]
+          },
+          "url": "m/nav-vtrn.html"
+        },
+        {
           "id": "per-mapping",
           "title": "Mapping: surveying, georeferencing, photogrammetry",
           "level": "L3",
@@ -3440,6 +3583,34 @@
             ]
           },
           "url": "m/per-tracking.html"
+        },
+        {
+          "id": "per-vision-pipeline",
+          "title": "Машинное зрение на борту от и до: калибровка → детекция → трекинг → геопривязка → команда",
+          "level": "L3",
+          "hours": 8,
+          "status": "published",
+          "prerequisites": [
+            "per-geometry",
+            "per-cv",
+            "per-tracking",
+            "ap-companion"
+          ],
+          "objectives": [
+            "собрать конвейер захват → undistort → детектор → трекер → геопривязка → команда и измерить задержку каждой стадии",
+            "перевести детекцию в точку на земле по ATTITUDE и GLOBAL_POSITION_INT на момент экспозиции и оценить ошибку от рассинхрона",
+            "замкнуть контур на автопилот (GUIDED-скорости, FOLLOW, LANDING_TARGET) с интерлоками watchdog → таймаут → Loiter и проверить их в SITL"
+          ],
+          "lab": {
+            "title": "Конвейер зрения на синтетическом полёте и follow в SITL",
+            "criteria": [
+              "pipeline.py отработал видео: таблица p50/p95/max по стадиям и бюджет glass-to-command; оценка по срезам для undistort кадра и точки, провал nominal объяснён, после исправления nominal ≥ 0.95/0.95 и ошибка на земле p95 < 0.3 м",
+              "Сдвиги времени 0 / 50 / 100 мс прогнаны, рост ошибки сопоставлен с h·tan(ω·Δt); TIMESYNC к SITL измерен",
+              "SITL (-I 4): в выводе sitl_follow.py — watchdog 0.5 с → нулевая скорость, 3 с → LOITER, остановка по GUID_TIMEOUT и по таймауту FOLLOW (3 с), остановка у геозоны и RTL при её нарушении, скорость GUIDED выше WPNAV_SPEED",
+              "Железо: калибровка RMS < 1 px; стенд с печатной целью без пропеллеров (ошибка ≤ 5 см на 1.5 м, остаточный сдвиг времени ±10 мс, знаки команд); три привязных прохода без критериев прерывания"
+            ]
+          },
+          "url": "m/per-vision-pipeline.html"
         }
       ]
     },
