@@ -38,7 +38,7 @@ const tree = (code) => { const l = LANGS.find((x) => x.code === code); return l.
   await g.waitForURL(new RegExp(`/${tree(target)}pages/glossary\\.html#top$`));
   ok(`a chosen language (${target}) sticks: later links to the source tree open in ${target}`);
 
-  await Promise.all([g.waitForURL(/\/m\/f-power\.html$|\/index\.html$|\/pages\/glossary\.html/), (async () => { await g.click(".lang-switch > summary"); await g.click(`[data-lang-to="${LANGS[0].code}"]`, { noWaitAfter: true }); })()]);
+  await Promise.all([g.waitForURL((u) => !u.pathname.includes(`/${LANGS[1].dir}/`)), (async () => { await g.click(".lang-switch > summary"); await g.click(`[data-lang-to="${LANGS[0].code}"]`, { noWaitAfter: true }); })()]);
   assert.ok(!g.url().includes(`/${LANGS[1].dir}/`), g.url());
   ok("switching back to the source language works and is remembered");
 
