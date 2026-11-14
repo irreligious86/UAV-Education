@@ -201,8 +201,8 @@ Configurator tab / CLI command / parameter for that firmware) — linked from ea
 
 ## 4. Iterations
 
-Each iteration ends with: modules published, quizzes and tasks, diagrams, glossary terms, translations
-(uk, en, gal), an independent fact-check applied, CI green.
+Each iteration ends with: modules published, quizzes and tasks, diagrams, glossary terms, the Ukrainian
+translation of everything new or changed (decision 4), an independent fact-check applied, CI green.
 
 | # | Iteration | Content |
 |---|---|---|
@@ -225,9 +225,13 @@ Rough size: an iteration of 4–5 modules ≈ 25–30k words of Russian source p
 2. Exam banks: in the public repository while the course is in development; revisit when moving to a server.
 3. Hardware: SITL / calculation is the main path of every lab; each module has a separate
    «Переход на реальное железо» part (procedure and acceptance criteria) so students move to real hardware later.
-4. Languages: new modules are written in Russian only (the source). Localisation of everything new or stale into
-   uk/en/gal runs later as one batch when Alex asks for it; until then those pages show the Russian text with the
-   "not translated" notice.
+4. Languages (revised 2026-11-15): the **main languages are Russian (source) and Ukrainian** — every new
+   or changed module is published in both at once, in the same iteration. All other languages are frozen
+   as they are until the course content is final: English and Czech (translations), and the experimental
+   dialect versions `uk-galych`, `uk-zakarpat`, `ru-odessa`. They stay on the site and fall back to the
+   source/Ukrainian text with the usual notice; no translation work is spent on them until Alex reopens it.
+   Their guides, research notes and pilot reviews are kept (`i18n/<code>/terms.md`, `docs/reviews/i18n-*`).
+   (Earlier decision, 2026-11-10: Russian only, localisation later as one batch.)
 
 ## 5a. Original questions
 
