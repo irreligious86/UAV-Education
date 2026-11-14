@@ -101,6 +101,8 @@ next:
 ### Шаг 0. Подготовка
 ESC с bidirectional DShot (BLHeli_32/Bluejay/AM32), `dshot_bidir = ON`, `motor_poles` по числу магнитов, вкладка Motors: RPM от каждого мотора, ошибки `E = 0%`. Механика по чек-листу. Blackbox на 2 кГц и выше, `debug_mode = GYRO_SCALED` (только 4.5; в 2025.12 режим удалён — нефильтрованный гироскоп пишется в поле `gyroUnfilt`). `diff all` сохранён.
 
+Что прошивка поменяет сама на F4. В таргетах STM32F405, STM32F411 и STM32G47X 4.5 включён `USE_PID_DENOM_CHECK`. Если там включён bidir DShot, `validateAndFixGyroConfig()` в `config/config.c` при загрузке конфигурации переписывает `motor_pwm_protocol` DSHOT600 → **DSHOT300** и ставит `pid_process_denom` не меньше 2, если гироскоп чаще 4 кГц (8 кГц гиро → PID 4 кГц). На F405 этого не происходит при `cpu_overclock` от 216 МГц. В `diff all` это видно как «исправленные» значения, которых ты не вводил. Для фильтров последствие одно: при 1/4 частоты PID Blackbox пишет уже 1 кГц, а не 2, и спектр выше 500 Гц не виден — для анализа шума ставь `blackbox_sample_rate = 1/2`. Нагрузку смотри в `status` (строка `CPU:…%`): флаг арма `LOAD` ставится, когда за секунду больше 1 % запусков задач планировщика (кроме serial) стартовали с опозданием (`cpu_late_limit_permille` = 10 ‰, `scheduler/scheduler.c`). Сам процент `CPU` порогом арма не является.
+
 ### Шаг 1. Базовая точка
 ```text
 set dshot_bidir = ON

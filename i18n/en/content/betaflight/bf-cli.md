@@ -127,6 +127,11 @@ An F405 board, the M2 pad came off. `resource show all` — free timer pads: `LE
 
 {{diagram:bf-resource-remap|Moving a motor to another pad: check the timer and DMA, free the old resource, assign the new one, save and check on the Motors tab.}}
 
+
+```text
+Available: RX_PPM INFLIGHT_ACC_CAL RX_SERIAL MOTOR_STOP SERVO_TILT SOFTSERIAL GPS RANGEFINDER TELEMETRY 3D RX_PARALLEL_PWM RX_MSP RSSI_ADC LED_STRIP DISPLAY OSD CHANNEL_FORWARDING TRANSPONDER AIRMODE RX_SPI ESC_SENSOR ANTI_GRAVITY
+```
+
 ## practice
 
 ### Getting into the CLI

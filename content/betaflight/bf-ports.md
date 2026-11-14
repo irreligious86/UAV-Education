@@ -83,6 +83,30 @@ next:
 ### Команда `serial`: что хранится на самом деле
 Вкладка Ports — обёртка над `serial <id> <маска функций> <msp baud> <gps baud> <telemetry baud> <blackbox baud>`: идентификатор порта (в 4.5: 0 = UART1, 1 = UART2, … 20 = VCP/USB, 30+ = SoftSerial; в 2025.12 `diff` пишет имена, например `serial UART3 64 …`), битовая маска функций (MSP = 1, GPS = 2, … Serial RX = 64, Blackbox = 128, ESC Sensor, SmartAudio, Tramp, MSP DisplayPort — свои биты; точные значения — перечисление `serialPortFunction_e` в `src/main/io/serial.h`), и скорости. Поэтому `diff all` содержит строки вроде `serial 2 64 115200 57600 0 115200` — UART3 = Serial RX. Читать их полезно при переносе конфигов между платами: номера UART у разных плат разные.
 
+Биты маски функций в 4.5 (`serialPortFunction_e`, `src/main/io/serial.h`); маска порта — сумма битов его функций:
+
+| Бит | Функция (вкладка Ports) | Бит | Функция |
+|---|---|---|---|
+| 1 | MSP | 1024 | ESC Sensor |
+| 2 | GPS | 2048 | VTX SmartAudio |
+| 4 | телеметрия FrSky Hub | 4096 | телеметрия IBUS |
+| 8 | телеметрия HoTT | 8192 | VTX IRC Tramp |
+| 16 | телеметрия LTM | 16384 | RunCam Device Protocol |
+| 32 | телеметрия SmartPort | 32768 | лидар TF |
+| 64 | Serial RX | 65536 | FrSky OSD |
+| 128 | Blackbox | 131072 | VTX (MSP + DisplayPort) |
+| 512 | телеметрия MAVLink | | |
+
+Примеры: `serial 1 64 …` — приёмник; `serial 0 131073 115200 …` — HD-система (DJI/Walksnail/HDZero): 131073 = MSP (1) + VTX_MSP (131072), один бит 131072 без MSP не даёт OSD (bf-hd-osd-video); `serial 2 2048 …` — SmartAudio. Бит 256 в 4.5 не занят. CRSF-телеметрия отдельного бита не имеет: она идёт по порту Serial RX при `feature TELEMETRY`.
+
+### Параметры приёмника, которые лежат не на вкладке Ports
+- `serialrx_inverted` (дефолт OFF) меняет полярность **относительно стандарта протокола**: для SBUS (по стандарту инвертированного) ON = обычный неинвертированный сигнал, для CRSF/FPort ON = инвертированный (`rx/sbus.c`, `rx/fport.c`, `rx/crsf.c`). На F7, H7 и G4 инверсию делает сам UART, на F4 — только аппаратный инвертор платы (ресурс `INVERTER`), если он есть на этом UART; без него SBUS на F4 — на пад с пометкой SBUS.
+- `serialrx_halfduplex` — приём и передача по одному проводу TX-пада (FPort, SRXL2). Дефолт зависит от сборки (`pg/rx.c`): ON, если в прошивке есть FPort или SRXL2, но не весь набор CRSF, GHST, IBUS, SBUS, Spektrum, XBUS; иначе OFF. После Cloud Build проверь `get serialrx_halfduplex`.
+- `crsf_use_negotiated_baud` (дефолт OFF): CRSF стартует на 420000 бод (`CRSF_BAUDRATE`); при ON FC принимает от приёмника команду смены скорости (CRSF v3) и стартует на последней согласованной скорости из persistent-области (`getCrsfCachedBaudrate()` в `telemetry/crsf.c`; если там ничего нет — снова 420000). Для ELRS с обычной проводкой не нужен.
+
+### Настройка с телефона
+Со стороны FC это обычный MSP на UART: свободный порт с функцией MSP (бит 1, 115200), не больше трёх MSP-портов. Со стороны приложения — по документации Betaflight App (2025.12.1+): веб-версия подключается по Bluetooth к платам со встроенным BLE (поддерживаемым приложением SpeedyBee и некоторым другим), нативное приложение для Android — по USB OTG и по Wi-Fi через приёмник ELRS (TCP). Внешний мост UART ↔ Bluetooth/Wi-Fi (HC-05, ESP32) работает только с тем приложением, которое умеет к нему подключиться. Сохранять конфиг с телефона так же: в конце `diff all` в файл.
+
 ### Функции по портам: совместимость
 | Функция | Провода | Может делить порт с | Замечания |
 |---|---|---|---|

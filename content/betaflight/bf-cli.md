@@ -66,6 +66,71 @@ CLI работает поверх последовательного порта 
 - `resource show`
 - `status` (версия/сборка)
 
+### Области `diff`/`dump` и флаги
+Синтаксис в 4.5: `diff [master|profile|rates|hardware|all] {defaults|bare}`, у `dump` те же слова (`printConfig()` в `cli/cli.c`). Что попадает в вывод:
+
+| Команда | Что выводит | Обёртка |
+|---|---|---|
+| `diff` = `diff master` | общие настройки (resource, timer, dma, feature, serial, mixer, beeper, map, led, aux, adjrange, rxrange, vtxtable, vtx, rxfail, все `set` уровня master) **плюс только текущий** PID-профиль и **только текущий** рейт-профиль | `batch start` … `batch end`, без `defaults nosave` и без `save` |
+| `diff profile` | только текущий PID-профиль | без обёртки |
+| `diff rates` | только текущий рейт-профиль | без обёртки |
+| `diff hardware` | resource, timer, dma, feature, serial и «железные» `set` (`blackbox_device`, шины датчиков…), без профилей | `batch` |
+| `diff all` | всё из `master`, `mcu_id` и `signature`, **все 4 PID-профиля и все 4 рейт-профиля**, в конце — возврат к активным профилям (`profile N`, `rateprofile N`) | `batch start`, `defaults nosave`, …, `save`, `batch end` |
+| флаг `defaults` | к каждой изменённой строке добавляет закомментированную строку со значением по умолчанию | — |
+| флаг `bare` | убирает `batch`/`defaults nosave`/`save`, `mcu_id`, `signature` и восстановление выбора профилей | — |
+
+Ловушка: `diff` без `all` теряет три профиля из четырёх. Бэкап «с профилем 2 под Li-Ion» через `diff` при активном профиле 1 вставится без профиля 2. Для бэкапа — только `diff all`; для сравнения версий — `diff all defaults` (видно, какой дефолт был у изменённого параметра). Флаги `defaults` и `bare` вместе не работают: обрабатывается только первый.
+
+### Все команды CLI
+Команды 4.5 с приоритетом A/B (`cmdTable[]` в `cli/cli.c`, всего 59; команды за `#ifdef` есть не в каждой сборке):
+
+| Команда | Что делает |
+|---|---|
+| `adjrange` | слоты подстроек в полёте (bf-adjustments) |
+| `aux` | режимы на AUX-каналах (bf-modes-osd) |
+| `batch start` / `batch end` | применить вставленный блок одним пакетом |
+| `beacon` | условия DShot-маячка (моторы пищат): `beacon list`, `beacon RX_LOST`, `beacon -RX_LOST` (bf-led-buzzer) |
+| `beeper` | условия пищалки: `beeper list`, `beeper -BAT_LOW` (bf-led-buzzer) |
+| `bind_rx` | перевести приёмник SPI, SRXL2 или CRSF (ELRS) в режим привязки; без поддержки — `Not supported.` |
+| `bl` | перезагрузка в загрузчик (`bl rom`; на платах с внешней flash — `bl flash`) |
+| `color`, `led`, `mode_color` | палитра, раскладка и цвета режимов LED-ленты (bf-led-buzzer) |
+| `defaults` | сброс к умолчаниям и перезагрузка; `defaults nosave` — без записи |
+| `diff`, `dump` | конфиг: изменения / полностью (таблица выше) |
+| `dma` | DMA-потоки: `dma show`, `dma <устройство> <индекс> list` |
+| `dshot_telemetry_info` | eRPM и ошибки DShot-телеметрии по моторам |
+| `dshotprog` | сырые DShot-команды ESC: `dshotprog <индекс\|255> <команда>…` |
+| `exit` | выход из CLI с перезагрузкой; `exit noreboot` (с 4.5.4) |
+| `feature` | список и переключение функций: `feature`, `feature list`, `feature GPS`, `feature -GPS` |
+| `flash_erase`, `flash_info` | стереть / показать встроенную flash для Blackbox (bf-blackbox) |
+| `get`, `set` | прочитать (поиск по подстроке: `get gps_rescue`) / изменить параметр |
+| `gpspassthrough` | мост USB ↔ UART GPS для u-center; выход — переподключение USB/питания (bf-gps-setup) |
+| `help` | список команд, `help <строка>` — поиск |
+| `map` | порядок каналов (`map AETR1234`) |
+| `mixer`, `mmix` | тип рамы (`mixer list`, `mixer QUADX`) / свой микс моторов |
+| `motor` | значение мотора на дизарме, как ползунок вкладки Motors: `motor 0 1100` (индекс с 0, 255 — все, 1000–2000), **без пропов** |
+| `msc` | перезагрузка в режим USB-накопителя (выгрузка логов с flash/SD) |
+| `profile`, `rateprofile` | выбрать PID-профиль 0–3 / рейт-профиль 0–3 (bf-rates-rc) |
+| `rc_smoothing_info` | текущие частоты RC smoothing: найденная частота RX, срезы setpoint/FF/газа (bf-rates-rc) |
+| `resource` | пины: `resource`, `resource show all`, `resource MOTOR 1 B00`, `… none` |
+| `rxfail`, `rxrange` | значения каналов в Stage 1 failsafe (bf-failsafe) / масштаб каналов |
+| `save` | сохранить и перезагрузить; `save noreboot` |
+| `sd_info` | состояние SD-карты (`Not configured` / `None inserted` / `Startup failed` / параметры карты) |
+| `serial` | функции и скорости портов (bf-ports) |
+| `serialpassthrough` | мост USB ↔ любой UART: прошивка приёмника ELRS, настройка GPS/VTX (ниже) |
+| `servo`, `smix` | концы хода и микшер серв (bf-servos-pwm) |
+| `simplified_tuning` | `apply` / `disable` — пересчитать PID и фильтры по слайдерам |
+| `status`, `tasks`, `version` | состояние и BUILD KEY / нагрузка по задачам / версия |
+| `timer` | таймеры пинов: `timer show`, `timer <pin> list` |
+| `vtx`, `vtx_info`, `vtxtable` | VTX на тумблере / что сообщил VTX / таблица частот и мощностей (link-vtx, bf-adjustments) |
+
+Список функций для `feature` — массив `featureNames[]` в `cli/cli.c`; `feature list` в 4.5 печатает (пустые слоты массива пропускаются):
+
+```text
+Available: RX_PPM INFLIGHT_ACC_CAL RX_SERIAL MOTOR_STOP SERVO_TILT SOFTSERIAL GPS RANGEFINDER TELEMETRY 3D RX_PARALLEL_PWM RX_MSP RSSI_ADC LED_STRIP DISPLAY OSD CHANNEL_FORWARDING TRANSPONDER AIRMODE RX_SPI ESC_SENSOR ANTI_GRAVITY
+```
+
+Список печатается из таблицы имён целиком: наличие имени не значит, что функция есть в этой сборке (LED_STRIP, SERVO_TILT, GPS зависят от опций Cloud Build — проверка по BUILD KEY ниже). `feature` без аргументов показывает включённые (`Enabled: …`).
+
 ### Ремаппинг ресурсов: концепция и ограничения
 
 Команда `resource` управляет привязкой «функция -> физический пин»:
@@ -114,6 +179,12 @@ https://build.betaflight.com/api/builds/<BUILD_KEY>/json
 | Войти в загрузчик DFU | `bl` (или `bl rom`) |
 | Flash как USB-диск (выгрузка логов) | `msc` |
 | Прошить ESC/настроить | `serialpassthrough`/`escprog` через конфигуратор ESC |
+| Покрутить один мотор из CLI (без пропов!) | `motor 0 1100` … `motor 0 1000`; `motor 255 1000` — все моторы |
+| Привязать ELRS/CRSF-приёмник без кнопки | `bind_rx` (если сборка с `USE_RX_BIND`; иначе — binding phrase или 3 перезапуска питания приёмника) |
+| Настроить GPS в u-center через FC | `gpspassthrough` → закрыть Configurator → u-center на тот же COM-порт; выход — переподключить USB |
+| Прошить приёмник ELRS через FC | `serialpassthrough <id UART> <baud>`: id как в `serial` (UART1 = 0); обычно это делает сам ELRS Configurator методом прошивки через Betaflight passthrough — Configurator Betaflight при этом закрыт |
+| Стереть flash Blackbox / проверить SD | `flash_erase` (ждать конца точек) / `sd_info` |
+| Какую частоту RX увидел RC smoothing | `rc_smoothing_info` (на подключённом и работающем приёмнике) |
 | Пакетная загрузка diff без промежуточных перезагрузок | `batch start` … `batch end` → `save` |
 | Диапазоны каналов, карта стиков | `rxrange`, `map AETR1234` |
 | Профили | `profile 1`, `rateprofile 2` (команды `battery_profile` в Betaflight нет) |

@@ -104,8 +104,13 @@ Betaflight — форк **Cleanflight** (наследник Baseflight / STM32-�
 | Что | Где в конфигураторе | Ключевые параметры CLI |
 |---|---|---|
 | Порты и устройства | Ports | `serial`, `resource`, `serialrx_provider` |
-| Приёмник, каналы, рейты | Receiver | `map`, `rates_type`, `roll_rc_rate`… |
+| Приёмник, каналы | Receiver | `map`, `serialrx_provider`, `rxrange`, `rc_smoothing_*` |
+| Рейты, экспо, кривая газа | PID Tuning → Rateprofile Settings | `rates_type`, `roll_rc_rate`, `roll_srate`, `roll_expo`, `thr_mid`, `thr_expo`, `rateprofile` (bf-rates-rc) |
 | Режимы на тумблерах | Modes | `aux` |
+| Подстройки в полёте | Adjustments | `adjrange` (bf-adjustments) |
+| Видеопередатчик | Video Transmitter | `vtxtable`, `vtx_band`, `vtx_channel`, `vtx_power`, `vtx` — VTX на тумблере (link-vtx, bf-adjustments) |
+| LED-лента | LED Strip | `led`, `color`, `mode_color`, `ledstrip_*` (bf-led-buzzer) |
+| Готовые наборы настроек | Presets | своих параметров нет: пресет — это блок CLI-команд из репозитория сообщества; применять поверх умолчаний, `diff all` до и после |
 | Моторы, ESC, протокол | Motors | `motor_pwm_protocol`, `dshot_bidir`, `motor_poles`, `dshot_idle_value` (2025.12: `motor_idle`) |
 | PID, фильтры, FF | PID Tuning | `set p_roll`… `simplified_*`, `gyro_lpf*`, `rpm_filter_*` |
 | OSD | OSD | `osd_*_pos`, `osd_warn_bitmask` |

@@ -97,6 +97,29 @@ Blackbox фиксирует:
 ### Параметры записи
 `blackbox_device` (SPIFLASH / SDCARD / SERIAL), `blackbox_sample_rate` (1/1, 1/2, 1/4, … от частоты PID: при 8 кГц PID и 1/4 — 2 кГц лога), `blackbox_mode` (NORMAL — по арму; MOTOR_TEST; ALWAYS — и на земле: для измерения шума/bias гироскопа), `blackbox_high_resolution` (точнее gyro/setpoint), `blackbox_disable_*` (отключить группы полей: `acc`, `rc`, `gyrounfilt`, `rpm`, `gps`… — экономия потока), `debug_mode` (какие 8 отладочных значений писать: `GYRO_SCALED` — сырой гироскоп до фильтров (только 4.5; в 2025.12 удалён, используйте поле `gyroUnfilt`), `RPM_FILTER`, `D_LPF`, `DSHOT_RPM_TELEMETRY`, `FEEDFORWARD`, `GPS_RESCUE_*`, `RTH`…). Поток: 2 кГц с полным набором полей — порядка 60–100 КБ/с → 16 МБ flash хватает на 3–4 минуты; SD — часы. Внешний логгер — функция Blackbox на UART во вкладке Ports (`serial <id> 128 …` с blackbox baud); отдельных `blackbox_uart`/`blackbox_baud` в 4.5 и 2025.12 нет.
 
+Группы полей и `blackbox_disable_*` в 4.5 (`cli/settings.c`, условия полей — `testBlackboxConditionUncached()` в `blackbox/blackbox.c`). По умолчанию всё включено (`fields_disabled_mask = 0`); группа без датчика не пишется и так. Число — сколько значений в каждом основном кадре (для квадрокоптера, 4 мотора):
+
+| Параметр | Что отключает | Значений | Когда отключать |
+|---|---|---|---|
+| `blackbox_disable_pids` | `axisP`, `axisI`, `axisD`, `axisF` | до 12 (`axisD` по рысканью — только при `d_yaw` ≠ 0) | почти никогда: без них не разобрать тюн |
+| `blackbox_disable_rc` | `rcCommand[0..3]` | 4 | если есть `setpoint` и стики не нужны |
+| `blackbox_disable_setpoint` | `setpoint[0..3]` | 4 | никогда для тюна |
+| `blackbox_disable_bat` | `vbatLatest`, `amperageLatest` | 2 | редко: нужны для просадки |
+| `blackbox_disable_mag` | `magADC[0..2]` | 3 (если есть компас) | компас есть, но не анализируется |
+| `blackbox_disable_alt` | `baroAlt`, `surfaceRaw` | 1–2 (баро/дальномер) | нет задач по высоте |
+| `blackbox_disable_rssi` | `rssi` | 1 | — |
+| `blackbox_disable_gyro` | `gyroADC[0..2]` (после фильтров) | 3 | никогда |
+| `blackbox_disable_gyrounfilt` | `gyroUnfilt[0..2]` (до фильтров) | 3 | после настройки фильтров, чтобы сэкономить поток |
+| `blackbox_disable_acc` | `accSmooth[0..2]` | 3 | первый кандидат при нехватке потока на acro-квадрокоптере |
+| `blackbox_disable_debug` | `debug[0..7]` | 8 (только при `debug_mode` ≠ NONE) | `debug_mode = NONE` даёт то же |
+| `blackbox_disable_motors` | `motor[0..3]` | 4 | никогда |
+| `blackbox_disable_rpm` | `eRPM[0..3]` | 4 (только с DShot-телеметрией) | после проверки RPM-фильтра |
+| `blackbox_disable_gps` | отдельные GPS-кадры (G/H) | — | нет GPS-анализа |
+
+Обслуживание носителя из CLI: `flash_info` — размер и заполнение встроенной flash; `flash_erase` — стереть (печатает точки до конца; то же — кнопка Erase Flash во вкладке Blackbox или режим BLACKBOX ERASE, id 31); `sd_info` — состояние SD (`Not configured`, `None inserted`, `Startup failed` или производитель, объём и дата выпуска карты); `msc` — перезагрузка FC в режим USB-накопителя, логи копируются как файлы и с flash, и с SD (если носитель не готов — `Storage not present or failed to initialize!`).
+
+События в логе (E-кадры) включают и подстройки в полёте: смена значения через Adjustments пишется событием `INFLIGHT_ADJUSTMENT` (номер функции и новое значение; в шаговом и абсолютном режиме — для всех функций, из функций выбора — только рейт-профиль и HORIZON_STRENGTH, `fc/rc_adjustments.c`), в Blackbox Explorer видно, в какой момент полёта D стал 42. Слоты и функции — bf-adjustments.
+
 ### Поля, которые нужны чаще всего
 `gyroADC[0..2]` (после фильтров), `gyroUnfilt[0..2]` (до, при включённом поле), `setpoint[0..3]`, `rcCommand[0..3]`, `axisP/I/D/F[0..2]`, `motor[0..3]`, `eRPM[0..3]`, `vbatLatest`, `amperageLatest`, `rssi`, `debug[0..7]`, `flightModeFlags`, `stateFlags`, `failsafePhase`; события (E-кадры): арм/дизарм, смена режима, failsafe. Заголовок лога содержит около 190 ключевых параметров (PID, рейты, фильтры, моторы), но не весь `diff`: нет `aux`, `serial`, OSD, failsafe — полный бэкап только через `diff all`.
 

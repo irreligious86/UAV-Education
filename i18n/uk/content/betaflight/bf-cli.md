@@ -127,6 +127,11 @@ https://build.betaflight.com/api/builds/<BUILD_KEY>/json
 
 {{diagram:bf-resource-remap|Перенесення мотора на інший пад: перевірити таймер і DMA, звільнити старий ресурс, призначити новий, зберегти й перевірити на вкладці Motors.}}
 
+
+```text
+Available: RX_PPM INFLIGHT_ACC_CAL RX_SERIAL MOTOR_STOP SERVO_TILT SOFTSERIAL GPS RANGEFINDER TELEMETRY 3D RX_PARALLEL_PWM RX_MSP RSSI_ADC LED_STRIP DISPLAY OSD CHANNEL_FORWARDING TRANSPONDER AIRMODE RX_SPI ESC_SENSOR ANTI_GRAVITY
+```
+
 ## practice
 
 ### Доступ до CLI
