@@ -59,7 +59,7 @@ Betaflight je otevřený firmware pro řídicí jednotky multikoptér s důrazem
 
 ### Co je Betaflight
 
-Betaflight je fork projektu **Cleanflight** (nástupce Baseflightu / portu MultiWii na STM32). Hlavním důrazem celého stacku je **výkon**: minimální **latency** a vysoká frekvence smyčky gyroskopu (až **8 kHz**).
+Betaflight je fork projektu **Cleanflight** (nástupce Baseflightu / portu MultiWii na STM32). Celý projekt klade hlavní důraz na **výkon**: minimální **latency** a vysoká frekvence smyčky gyroskopu (až **8 kHz**).
 
 **Podpora:** řídicí jednotky s **STM32** (F4, F7, H7). **Možnosti firmwaru:**
 
@@ -100,7 +100,7 @@ Kromě firmwaru je tu **Betaflight Configurator**. Webová aplikace byla dostupn
 Firmware se sestavuje pro **target** – popis desky: procesor, které piny jsou k čemu přivedeny (`resource`), který gyroskop je na které sběrnici SPI. Od verze 4.3 jsou téměř všechny desky **unified targets**: jeden binární soubor pro rodinu procesorů (například `STM32F405`) plus textová konfigurace desky (`board_name`, `manufacturer_id`, sada `resource`/`set`), kterou konfigurátor načte při nahrávání firmwaru. Cloud Build (4.4+) sestaví binární soubor na serveru s vybranou sadou funkcí: protokol přijímače, OSD, GPS, telemetrie, LED – co nezaškrtnete, to ve firmwaru není (typická příčina toho, že „přijímač mlčí“). Příkaz `version` v CLI ukáže verzi, target, datum a git revizi sestavení; `BUILD KEY` (klíč sestavení pro jeho zopakování) vypíše `status` a seznam voleb podle tohoto klíče vrátí build.betaflight.com.
 
 ### Co dělá plánovač každých 125 µs
-`fc/tasks.c` popisuje úlohy s periodou a prioritou; `scheduler/scheduler.c` je vybírá. Kritické jsou `GYRO` (čtení, filtry) a `PID` (`taskMainPidLoop`: RC povel → PID → mixer → DShot) – na frekvenci gyroskopu / `pid_process_denom`. Ostatní dostávají čas, který zbude: `RX` (příjem a zpracování rámců, řízené událostmi), `SERIAL`, `BATTERY_*`, `GPS`, `OSD` (podle `osd_framerate_hz`), `BLACKBOX`, `TELEMETRY`, `LED_STRIP`. Příkaz `tasks` v CLI ukáže skutečnou periodu, průměrnou a maximální dobu každé úlohy a zatížení CPU; `status` ukáže frekvenci gyroskopu, zatížení a příznaky armování. Přetížení (> 85–90 % na F4 s 8 kHz) znamená vynechané úlohy, jitter a příznak `LOAD`: řeší se nastavením `pid_process_denom = 2` nebo vypnutím funkcí.
+`fc/tasks.c` popisuje úlohy s periodou a prioritou; `scheduler/scheduler.c` je vybírá. Kritické jsou `GYRO` (čtení, filtry) a `PID` (`taskMainPidLoop`: RC povel → PID → mixer → DShot) – na frekvenci gyroskopu / `pid_process_denom`. Ostatní dostávají čas, který zbude: `RX` (příjem a zpracování rámců, řízené událostmi), `SERIAL`, `BATTERY_*`, `GPS`, `OSD` (podle `osd_framerate_hz`), `BLACKBOX`, `TELEMETRY`, `LED_STRIP`. Příkaz `tasks` v CLI ukáže skutečnou periodu, průměrnou a maximální dobu každé úlohy a zatížení CPU; `status` ukáže frekvenci gyroskopu, zatížení a flagy blokující armování. Přetížení (> 85–90 % na F4 s 8 kHz) znamená vynechané úlohy, jitter a flag `LOAD`: řeší se nastavením `pid_process_denom = 2` nebo vypnutím funkcí.
 
 ### Mapa nastavení: kde co najdete
 | Co | Kde v konfigurátoru | Klíčové parametry CLI |
@@ -116,8 +116,8 @@ Firmware se sestavuje pro **target** – popis desky: procesor, které piny jsou
 | Firmware | Firmware Flasher | — |
 Profily: až 4 PID profily (`profile`) a 4 profily rates (`rateprofile`), přepínané přepínačem/adjustments – jeden „klidný“, jeden „závodní“.
 
-### Rozebraný příklad: pořadí prvního nastavení
-Firmware (Cloud Build: CRSF, OSD HD, GPS, pokud je) → výchozí `resource`/target → Ports (UART přijímače) → Receiver (CRSF, kontrola kanálů a `map` AETR) → Motors (DShot600, `motor_poles`, `dshot_bidir`, směr bez vrtulí) → Modes (ARM, ANGLE, BEEPER, FAILSAFE) → Failsafe (DROP pro první let) → OSD (napětí, LQ, časovač, varování) → Blackbox (2 kHz) → `diff all` do repozitáře (modul „CI“). První let na výchozích hodnotách PID: Betaflight 4.5 létá na 5" „z krabice“ lépe než většina ručních nastavení začátečníka; ladění přijde až po lozích.
+### Řešený příklad: pořadí prvního nastavení
+Firmware (Cloud Build: CRSF, OSD HD, GPS, pokud je) → výchozí `resource`/target → Ports (UART přijímače) → Receiver (CRSF, kontrola kanálů a `map` AETR) → Motors (DShot600, `motor_poles`, `dshot_bidir`, směr bez vrtulí) → Modes (ARM, ANGLE, BEEPER, FAILSAFE) → Failsafe (DROP pro první let) → OSD (napětí, LQ, časovač, varování) → Blackbox (2 kHz) → `diff all` do repozitáře (modul „CI“). První let na výchozích hodnotách PID: Betaflight 4.5 létá na 5" „z krabice“ lépe než většina ručních nastavení začátečníka; ladění přijde až podle logů.
 
 {{diagram:bf-setup-map|Pořadí prvního nastavení: záloha → Ports → Receiver → Modes → Motors (bez vrtulí) → OSD → PID a filtry podle logu.}}
 
@@ -224,7 +224,7 @@ Pro každý režim: **Add Range** → zvolte kanál a rozsah polohy přepínače
 
 - **Příznak:** Řídicí jednotka se připojí, ale 3D model nereaguje na pohyb
   - Možná příčina: akcelerometr není zkalibrovaný, senzor je poškozený.
-  - Co zkontrolovat/udělat: provést kalibraci akcelerometru na vodorovné ploše. Pokud to nepomůže, zkontrolovat v CLI status a ověřit, že je ACCEL rozpoznán. Zkontrolovat neporušenost vodičů a pájení.
+  - Co zkontrolovat/udělat: provést kalibraci akcelerometru na vodorovné ploše. Pokud to nepomůže, zkontrolovat v CLI status a ověřit, že je ACCEL rozpoznán. Zkontrolovat neporušenost vodičů a pájených spojů.
 
 - **Příznak:** Dron nejde armovat, v pravém horním rohu bliká chyba (například RXLOSS)
   - Možná příčina: přijímač nedostává signál, není nastavený port, špatný protokol.
@@ -238,13 +238,13 @@ Pro každý režim: **Add Range** → zvolte kanál a rozsah polohy přepínače
   - Možná příčina: koncové body na vysílačce jsou nastavené špatně.
   - Co zkontrolovat/udělat: v nastavení vysílačky upravit Travel/Endpoints na 1000–2000 µs. Případně použít ke korekci příkaz CLI rxrange.
 
-- **Příznak:** Dron jde armovat, ale motory se netočí (při vypnutém MOTOR_STOP)
+- **Příznak:** Dron se armuje, ale motory se netočí (při vypnutém MOTOR_STOP)
   - Možná příčina: minimální plyn (min_throttle) je příliš nízký na rozběh motorů.
   - Co zkontrolovat/udělat: s DShot se `min_throttle` nepoužívá: na záložce Motors zvýšit Motor Idle (`dshot_idle_value` ve 4.5, `motor_idle` ve 2025.12; výchozí hodnota 5.5 %).
 - **Příznak:** po nahrání firmwaru nefunguje přijímač/GPS, přestože je zapojení správné
   - Možná příčina: funkce není zahrnutá v Cloud Buildu.
   - Co udělat: `version` → seznam voleb; nahrát firmware znovu s potřebnými.
-- **Příznak:** `LOAD` v příznacích armování nebo CPU > 90 %
+- **Příznak:** `LOAD` mezi flagy blokujícími armování nebo CPU > 90 %
   - Možná příčina: F4 na 8 kHz se všemi funkcemi.
   - Co udělat: `pid_process_denom = 2`, vypnout LED/zbytečné telemetrie, `tasks` k nalezení náročných úloh.
 

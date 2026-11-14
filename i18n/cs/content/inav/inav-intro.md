@@ -24,7 +24,7 @@ INAV vyrostl ze stejné kódové základny jako Betaflight, ale vydal se jiným 
 ## theory
 ### Místo INAV
 - **Betaflight** – jen ruční létání, minimální zpoždění.
-- **INAV** – ruční létání plus navigace: POSHOLD, RTH, mise, automatický vzlet letounu, automatické přistání. Běží na stejných deskách F4/F7/H7, se stejným přístupem ke konfigurátoru a podobným CLI.
+- **INAV** – ruční létání plus navigace: POSHOLD, RTH, mise, automatický vzlet letounu, automatické přistání. Běží na stejných deskách F4/F7/H7, nastavuje se stejně – přes konfigurátor – a má podobné CLI.
 - **ArduPilot** – plnohodnotný autopilot s EKF, Lua, companion počítačem, tisícovkou parametrů a nároky na hardware.
 
 INAV je kompromis: navigace bez přechodu na H7 a bez studia ArduPilotu.
@@ -39,18 +39,18 @@ Záložky Ports, Receiver, Modes, OSD, CLI se `set`/`get`/`save`/`diff all`, Bla
 - **Armování jen přepínačem.** Armování kniply bylo odstraněno už v INAV 2.2.
 - **Armování je bez GPS fixu blokováno**, pokud jsou nastavené navigační režimy (`nav_extra_arming_safety` to umí obejít, ale je to vědomé riziko).
 - **Navigační režimy**: NAV ALTHOLD, NAV POSHOLD, NAV RTH, NAV WP, NAV CRUISE (pro letouny). POSHOLD a RTH vyžadují u multikoptéry zkalibrovaný kompas.
-- **Domov** je bod prvního armování; **safehomes** je až 8 předem zadaných bezpečných bodů přistání; při RTH nahradí domov nejbližší z nich v dosahu `safehome_max_distance`.
+- **Domov** je bod prvního armování; **safehomes** – až 8 předem zadaných bezpečných bodů přistání; při RTH nahradí domov nejbližší z nich v dosahu `safehome_max_distance`.
 - **Failsafe** s procedurami DROP, LAND (nouzové přistání), RTH, NONE. RTH jako failsafe je hlavní důvod, proč INAV nasadit.
 - **Programming Framework** – logické podmínky přímo ve firmwaru, bez Lua.
 
 ### Požadavky
-Navigace znamená GPS (povinně), kompas (u multikoptéry povinný pro POSHOLD/RTH) a barometr (u multikoptéry prakticky povinný: bez něj se výška drží jen podle GPS a akcelerometru, znatelně hůř). U letounu lze kurz odhadovat z GPS, kompas je žádoucí.
+Navigace znamená GPS (povinně), kompas (u multikoptéry povinný pro POSHOLD/RTH) a barometr (u multikoptéry prakticky povinný: bez něj se výška drží jen podle GPS a akcelerometru, znatelně hůř). U letounu lze kurz odhadovat z GPS, kompas se doporučuje.
 
 ### Co je pod kapotou: estimátor, ne EKF
 INAV počítá pozici a výšku komplementárním estimátorem s váhami (`inav_w_*`), ne pomocí EKF – je to jednodušší a pro F4 méně náročné, ale bez automatické důvěry/nedůvěry k senzorům (modul „INAV: GPS a RTH“). Odtud plynou požadavky: kompas a barometr jsou u multikoptéry povinné; kvalita GPS je důležitější než v ArduPilotu, kde EKF špatné rámce „přežije“.
 
 ### Proč nejde armovat: čteme OSD
-Příčina blokování je vidět na třech místech: jako text v OSD (řádky typu „NAVIGATION SAFETY“, „AIRCRAFT IS NOT LEVEL“ – přesné znění závisí na verzi), na záložce Setup konfigurátoru a v CLI příkazem `status` (řádek s příznaky blokování armování). Typické příčiny: chybí GPS fix při navigačních režimech (`nav_extra_arming_safety`), akcelerometr nebo kompas nejsou zkalibrované, plyn není na minimu, náklon je větší než `small_angle`, přepínač armování je zapnutý při připojení napájení, je otevřené CLI nebo menu OSD, první bod mise je dál než `nav_wp_max_safe_distance`, porucha senzoru. Stejný princip jako v Betaflightu (modul „Bezpečnost“): příčina se odstraňuje, neobchází.
+Příčina blokování je vidět na třech místech: jako text v OSD (řádky typu „NAVIGATION SAFETY“, „AIRCRAFT IS NOT LEVEL“ – přesné znění závisí na verzi), na záložce Setup konfigurátoru a v CLI příkazem `status` (řádek s flagy blokujícími armování). Typické příčiny: chybí GPS fix při navigačních režimech (`nav_extra_arming_safety`), akcelerometr nebo kompas nejsou zkalibrované, plyn není na minimu, náklon je větší než `small_angle`, přepínač armování je zapnutý při připojení napájení, je otevřené CLI nebo menu OSD, první bod mise je dál než `nav_wp_max_safe_distance`, porucha senzoru. Stejný princip jako v Betaflightu (modul „Bezpečnost“): příčina se odstraňuje, neobchází.
 
 ### Verze a kompatibilita
 INAV 7/8 – doporučené jsou H7/F7, F4 je podporována s omezeními kvůli paměti (část funkcí je v targetech vyřazena); konfigurátor se musí s firmwarem přesně shodovat v hlavní verzi; `diff all` se mezi hlavními verzemi přenáší jen s kontrolou – parametry se přejmenovávají (`nav_use_midthr_for_althold` → `nav_mc_althold_throttle`). Aktualizace firmwaru = úplná záloha + porovnání `diff` + nová kalibrace senzorů.
@@ -73,8 +73,8 @@ ARM – samostatný přepínač. ANGLE – základní. NAV ALTHOLD, NAV POSHOLD,
 
 ### Krok 3b. Kontrola estimátoru na zemi (před prvním vzletem)
 INAV letí tam, kam si myslí, že letí; ověřit to lze bez vrtulí:
-1. **Kompas**: stroj na rovném místě přídí k severu (podle kompasu v telefonu) – kurz v OSD ±10°. Otočte o 90°, 180°, 270° – kurz to sleduje. Chyba v jednom směru znamená rušení nebo špatný `align_mag`.
-2. **Domov a šipka**: po fixu je domov zapsán; odneste stroj o 20–30 m – vzdálenost k domovu v OSD odpovídá krokům, šipka domů ukazuje tam, odkud jste přišli. Šipka míří stranou – kurz je špatný, RTH odletí jinam.
+1. **Kompas**: stroj na rovném místě přídí k severu (podle kompasu v telefonu) – kurz v OSD ±10°. Otočte o 90°, 180°, 270° – kurz se mění stejně. Chyba v jednom směru znamená rušení nebo špatný `align_mag`.
+2. **Domov a šipka**: po fixu je domov zapsán; odneste stroj 20–30 m daleko – vzdálenost k domovu v OSD odpovídá odkrokované vzdálenosti, šipka domů ukazuje tam, odkud jste přišli. Šipka míří stranou – kurz je špatný, RTH odletí jinam.
 3. **Výška**: zvedněte stroj o 2 m (v natažených rukou/na žebříku) – výška v OSD se změní o ~2 m a vrátí se. Drift metr za minutu v klidu – barometr je na přímém slunci nebo v proudu vzduchu.
 4. **Satelity**: 3D fix, ≥ 10 satelitů, HDOP v OSD ≤ 1.5–2 před prvním navigačním letem.
 
@@ -88,7 +88,7 @@ INAV letí tam, kam si myslí, že letí; ověřit to lze bez vrtulí:
 1. Na otevřené ploše počkejte na 3D fix (počet satelitů v OSD).
 2. Armování, ANGLE, krátký vis / okruh.
 3. Přepněte na ALTHOLD, potom na POSHOLD. Sledujte, jak drží.
-4. RTH na krátkou vzdálenost a v malé výšce, s připraveností převzít řízení.
+4. RTH na krátkou vzdálenost a v malé výšce; buďte připraveni převzít řízení.
 
 ## diagnostics
 - **Příznak:** nejde armovat, přestože je všechno nastavené
@@ -98,13 +98,13 @@ INAV letí tam, kam si myslí, že letí; ověřit to lze bez vrtulí:
   - Možná příčina: kompas – kalibrace, orientace, rušení od silových vodičů.
   - Co udělat: znovu zkalibrovat, vynést kompas na stožárek, zkontrolovat `align_mag`.
 - **Příznak:** RTH vede jinam
-  - Možná příčina: domov je zapsán jinde (armování na jiném místě), nebo zasáhl safehome.
+  - Možná příčina: domov je zapsán jinde (armování na jiném místě), nebo se uplatnil safehome.
   - Co udělat: po armování zkontrolovat bod domova v OSD a seznam safehomes.
 - **Příznak:** v MANUAL je letoun neřiditelný
   - Možná příčina: reverz serv nebo špatný preset mixeru.
   - Co udělat: zkontrolovat směry řídicích ploch na stole.
 - **Příznak:** po aktualizaci INAV se část nastavení „ztratila“
-  - Možná příčina: přejmenované parametry z diffu se nepoužily.
+  - Možná příčina: přejmenované parametry z diffu se nenačetly.
   - Co udělat: číst výstup CLI při načítání diffu, Settings.md nové verze, znovu zkalibrovat.
 
 ## references

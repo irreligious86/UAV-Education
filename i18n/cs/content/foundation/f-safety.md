@@ -23,22 +23,22 @@ source_hash: c3dbe1ced49d
 ---
 
 ## summary
-Konec listu pětipalcové vrtule se pohybuje rychlostí kolem 300 km/h a nese dost energie na to, aby rozřízl kůži až na kost; LiPo při zkratu dodá stovky ampérů a hoří s vlastním okysličovadlem: plamen lze srazit, ale hoření se obnovuje, dokud články nevychladnou. Většina úrazů v tomto hobby se nestane ve vzduchu, ale na stole: dron se při nastavování armoval s nasazenými vrtulemi. Modul podává fyziku nebezpečí v číslech, pravidla, o kterých se nediskutuje, úplný seznam příznaků blokujících armování v Betaflightu (ze zdrojového kódu, s vysvětlením) a jejich obdobu v ArduPilotu, předletový a poletový kontrolní seznam a postup při požáru baterie.
+Konec listu pětipalcové vrtule se pohybuje rychlostí kolem 300 km/h a nese dost energie na to, aby rozřízl kůži až na kost; LiPo při zkratu dodá stovky ampérů a hoří s vlastním okysličovadlem: plamen lze srazit, ale hoření se obnovuje, dokud články nevychladnou. Většina úrazů v tomto hobby se nestane ve vzduchu, ale na stole: dron se při nastavování armoval s nasazenými vrtulemi. Modul podává fyziku nebezpečí v číslech, pravidla, o kterých se nediskutuje, úplný seznam flagů blokujících armování (Arming Disable Flags) v Betaflightu (ze zdrojového kódu, s vysvětlením) a jejich obdobu v ArduPilotu, předletový a poletový kontrolní seznam a postup při požáru baterie.
 
 ## theory
 ### Nebezpečí v číslech
-- **Vrtule.** Obvodová rychlost konce listu = π · D · n. Pro 5" (D = 0.127 m) ve visu při 14 000 ot/min (233 ot/s): 0.40 m × 233 ≈ 93 m/s – asi 335 km/h; bez zátěže až 30 000 ot/min – 200 m/s. Kinetická energie rotující 5" vrtule (~4 g) jsou jednotky joulů: stačí to na hluboké řezné rány; u 7–10" jsou to desítky joulů a zlomeniny prstů; 15" na X8 – zranění neslučitelná s pokračováním v hobby.
+- **Vrtule.** Obvodová rychlost konce listu = π · D · n. Pro 5" (D = 0.127 m) ve visu při 14 000 ot/min (233 ot/s): 0.40 m × 233 ≈ 93 m/s – asi 335 km/h; bez zátěže až 30 000 ot/min – 200 m/s. Kinetická energie rotující 5" vrtule (~4 g) činí jednotky joulů: stačí to na hluboké řezné rány; u 7–10" jsou to desítky joulů a zlomeniny prstů; 15" na X8 – zranění neslučitelná s pokračováním v hobby.
 - **Motory na stole.** Test motorů v konfigurátoru bez sundaných vrtulí je klasický úraz. Firmware varuje, ale nezastaví vás.
-- **LiPo.** Vnitřní odpor 1–3 mΩ na článek: zkrat 6S baterie znamená proud ve stovkách ampérů, vodič se rozžhaví během sekundy. Článek proražený při pádu se může vznítit za několik minut i hodin po nárazu. Hoření je tepelný únik (thermal runaway), při kterém se z katody uvolňuje kyslík: srazte plamen (hasicí přístroj ABC, písek), potom **chlaďte velkým množstvím vody**, nebo baterii vyneste v nehořlavé nádobě ven a nechte ji dohořet. Hasicí přístroj třídy D je určen na kovové lithium – to v LiPo ani Li-Ion není. Nafouknutá baterie je vyřazená: vybijte ji na 0 ve slané vodě (několik dní) a odevzdejte k likvidaci.
+- **LiPo.** Vnitřní odpor 1–3 mΩ na článek: zkrat 6S baterie znamená proud ve stovkách ampérů, vodič se rozžhaví během sekundy. Článek proražený při pádu se může vznítit i několik minut nebo hodin po nárazu. Hoření je tepelný únik (thermal runaway), při kterém se z katody uvolňuje kyslík: srazte plamen (hasicí přístroj ABC, písek), potom **chlaďte velkým množstvím vody**, nebo baterii vyneste v nehořlavé nádobě ven a nechte ji dohořet. Hasicí přístroj třídy D je určen na kovové lithium – to v LiPo ani Li-Ion není. Nafouknutá baterie je vyřazená: vybijte ji na 0 ve slané vodě (několik dní) a odevzdejte k likvidaci.
 - **Ztráta spojení.** Pokud failsafe není na tomto stroji vyzkoušený, udělá to, co si nikdo nevybral (modul „Failsafe“).
 - **První let po jakékoli změně** – zaměněný motor, směr vrtule, špatný mixer, neověřený filtr: statisticky nejnebezpečnější vzlet.
 
 ### Jak firmware brání armování (Betaflight master; ve 2025.12 není `AUTOPILOT_SW`, ve 4.5 nejsou `FLIP_SWITCH`/`ALT_HOLD_SW`/`POS_HOLD_SW`/`AUTOPILOT_SW` a `ARM_SWITCH` se jmenuje `ARMSWITCH`)
-Armovat nelze, dokud je aktivní alespoň jeden příznak blokující armování. Jejich seznam je v `src/main/fc/runtime_config.c`, vidět jsou příkazem `status` v CLI a v OSD (prvek „Warnings“):
+Armovat nelze, dokud je aktivní alespoň jeden flag blokující armování. Jejich seznam je v `src/main/fc/runtime_config.c`, vypíše je příkaz `status` v CLI a ukazuje je OSD (prvek „Warnings“):
 
-{{diagram:arming-tree|Diagnostický strom „nejde armovat“: nejdřív přečteme příznak, potom ověříme konkrétní příčinu.}}
+{{diagram:arming-tree|Diagnostický strom „nejde armovat“: nejdřív přečteme flag, potom ověříme konkrétní příčinu.}}
 
-| Příznak | Co znamená | Co udělat |
+| Flag | Co znamená | Co udělat |
 |---|---|---|
 | `NOGYRO` | gyroskop nebyl nalezen | zkontrolovat desku/target, nelétat |
 | `FAILSAFE` / `BOXFAILSAFE` | aktivní failsafe (není RC) / zapnutý přepínač failsafe | obnovit spojení, vypnout přepínač |
@@ -64,7 +64,7 @@ Armovat nelze, dokud je aktivní alespoň jeden příznak blokující armování
 | `FLIP_SWITCH`, `ALT_HOLD_SW`, `POS_HOLD_SW`, `AUTOPILOT_SW` | přepínač režimu zapnutý při armování | vypnout |
 | `ARM_SWITCH` | přepínač ARM byl při připojení zapnutý | vypnout a znovu zapnout |
 
-Tyto příznaky jsou pojistka, ne překážka. Pravidlo: odstraňujte příčinu, nevypínejte kontrolu. **ArduPilot**: `ARMING_SKIPCHK` (4.7+, bitová maska **přeskakovaných** kontrol; do 4.7 `ARMING_CHECK`, bitová maska zapnutých: barometr, kompas, GPS, INS, parametry, RC, napětí, geofence…), zprávy „PreArm: …“ v GCS – stejná logika; přeskakovat kontroly je přípustné jen na zkušebním stole.
+Tyto flagy jsou pojistka, ne překážka. Pravidlo: odstraňujte příčinu, nevypínejte kontrolu. **ArduPilot**: `ARMING_SKIPCHK` (4.7+, bitová maska **přeskakovaných** kontrol; do 4.7 `ARMING_CHECK`, bitová maska zapnutých: barometr, kompas, GPS, INS, parametry, RC, napětí, geofence…), zprávy „PreArm: …“ v GCS – stejná logika; přeskakovat kontroly je přípustné jen na zkušebním stole.
 
 ### Režimy a zařízení pro ochranu
 - **PREARM** – druhý přepínač, bez kterého armovat nelze; povinný na strojích s vrtulemi 7"+.
@@ -82,15 +82,15 @@ Poloměr bezpečné zóny kolem místa vzletu je nejméně 10–15 m pro 5", 30 
 2. Baterie: bez nafouknutí a poškození, napětí článků v normě (4.1–4.2 V/článek při plném nabití), upevněná páskem, konektor XT není natavený.
 3. Antény RC a VTX: na místě, nepoškozené, mimo rovinu vrtulí; VTX s anténou (bez ní shoří).
 4. Vysílačka: správný model, nabitá, přepínače ARM/PREARM vypnuté, test failsafe na tomto stroji proveden.
-5. Video/OSD: napětí, LQ/RSSI, varování – žádné příznaky.
+5. Video/OSD: napětí, LQ/RSSI, varování – žádné flagy.
 6. Zóna: lidé a zvířata mimo poloměr, vzlet směrem od sebe, překážky zohledněné, pravidla plochy.
 7. Po armování: 2–3 s visu ve výšce 0.5–1 m – odezva, zvuk, žádné chvění; při čemkoli podezřelém přistát.
 
 ### Pravidla na stole
 1. Vrtule sundat před připojením baterie. Vždy. Včetně „jen na vteřinu“.
-2. První zapnutí nové/přepájené stavby – přes smoke stopper, předtím s multimetrem (modul „Elektřina 101“).
+2. První zapnutí nové/přepájené stavby – přes smoke stopper, předtím kontrola multimetrem (modul „Elektřina 101“).
 3. Test motorů – jen bez vrtulí, s omezeným plynem, s rukou u konektoru baterie.
-4. Konfigurátor připojen → příznak `MSP` → armovat nelze. Neobcházet.
+4. Konfigurátor připojen → flag `MSP` → armovat nelze. Neobcházet.
 5. Nabíjení LiPo – v nehořlavém vaku/boxu, pod dohledem, s balancováním, ne na hořlavém povrchu; skladování při 3.8 V/článek.
 
 ### Při požáru baterie
@@ -106,7 +106,7 @@ Poloměr bezpečné zóny kolem místa vzletu je nejméně 10–15 m pro 5", 30 
 
 ## diagnostics
 - **Příznak:** dron nejde armovat
-  - Možná příčina: je aktivní příznak blokující armování.
+  - Možná příčina: je aktivní flag blokující armování.
   - Co udělat: `status` v CLI nebo OSD Warnings; tabulka výše; odstranit příčinu.
 - **Příznak:** dron se armoval hned po připojení baterie
   - Možná příčina: přepínač ARM byl zapnutý a ochrana `ARM_SWITCH` je vypnutá/nezasáhla, nebo je armování přiřazeno špatnému kanálu.
@@ -128,8 +128,8 @@ Poloměr bezpečné zóny kolem místa vzletu je nejméně 10–15 m pro 5", 30 
 - Safety — ArduPilot Copter (multicopter safety practices) | https://ardupilot.org/copter/docs/safety-multicopter.html | primary | A
 
 ## checklist
-- Na stole nejsou vrtule – bez výjimek
-- Znám všechny příznaky blokující armování a vím, co s každým dělat
+- Na stole je dron vždy bez vrtulí – bez výjimek
+- Znám všechny flagy blokující armování a vím, co s každým dělat
 - Předletový kontrolní seznam je vytištěný a používá se
 - Failsafe je na tomto dronu vyzkoušený bez vrtulí
 - Znám postup při požáru LiPo a vím, kde je písek

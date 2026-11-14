@@ -222,3 +222,53 @@ step response, overshoot (as a metric name; „překmit“ in running prose).
 Module titles in cross-references follow `i18n/cs/data.json` once it is filled; until then translate them
 consistently with the module's own `title`.
 Past-tense first-person checklist items are rephrased to avoid grammatical gender („mám spočítaný…“).
+
+## Reviewer corrections (2026-11-14)
+
+From the independent review of the pilot batch (`docs/reviews/i18n-review-cs-pilot.md`). Where a row
+conflicts with a table above, this one wins.
+
+| ru | cs | note |
+|---|---|---|
+| флаг запрета арма | flag blokující armování; first mention in a module „flagy blokující armování (Arming Disable Flags)“, then *flag* | replaces „příznak blokující armování“. *příznak* is reserved for «симптом» and the `Příznak:` marker. Declined *flag, flagu, flagy, flagů*; avoid the locative plural (write „mezi flagy“). The only Czech source found keeps the English label: „Arming Disable Flags – důvody, proč nejde armovat“ [Rot-BF]; a Czech noun for it was not found |
+| арм-флаги, флаги арма (in `status`) | flagy blokující armování | not „příznaky armování“ |
+| взлётный вес | vzletová hmotnost | a quantity given in g or kg is *hmotnost*; *tíha* only for the force (ratio name „poměr tahu k tíze“, „tah se rovná tíze“). „vzletová tíha“ is not used |
+| разобранный пример | řešený příklad | not „rozebraný příklad“ (calque) |
+| метрики по манёврам, медиана по манёврам | metriky pro jednotlivé manévry, medián přes manévry | „po manévrech“ reads as "after the manoeuvres" |
+| лабораторная засчитывается | laboratorní úloha je splněna | per сдан → splněno; not „se uznává“ |
+| один шаг за раз | vždy jen jeden krok | not „jeden krok najednou“ |
+| фиксация (результата) | uložení | not „zafixování“ |
+| логи (locative plural) | u logů, podle logů, v logu | rephrase instead of „v lozích / po lozích“ |
+| стек (the software project) | projekt, firmware | *stack* stays reserved for the FC+ESC hardware stack |
+
+## Translator rules from the pilot review (2026-11-14) — binding
+
+1. **„příznak“ is reserved for «симптом / признак»** and the `**Příznak:**` marker. A software flag is
+   *flag*: first mention in a module „flagy blokující armování (Arming Disable Flags)“, then *flag*.
+   Before submitting, grep your files: every „příznak“ outside the marker must translate «симптом/признак».
+2. **Disarm:** verb *disarmovat*, noun *disarm* (parallel to *armovat / armování*). Unverified with a
+   native speaker; use it consistently so it can be changed in one pass.
+3. **hmotnost vs tíha:** anything in g or kg is *hmotnost* („vzletová hmotnost“); *tíha* only for the force
+   and in the fixed name „poměr tahu k tíze (T/W)“.
+4. **Banned calques → Czech pattern**
+
+   | Russian pattern | not | write |
+   |---|---|---|
+   | distributive «по X» (метрики по манёврам) | po X | pro jednotlivé X / přes X |
+   | «рабочий» (рабочий метод) | pracovní | funkční / který funguje |
+   | «на фоне» | na pozadí | při / uprostřed |
+   | «за раз», «один шаг за раз» | najednou | vždy jen (jeden krok) |
+   | «разобранный пример» | rozebraný příklad | řešený příklad |
+   | «фиксация» (результата) | fixace | uložení / zaznamenání |
+   | predicate instrumental («делает X бесполезным») | dělá X bezcenným | a verb: „znehodnotí X“ |
+   | unit after a comma («тяга, г») | …, g | … v g |
+   | «живёт» about data/settings | žije | je uložen / najdete v |
+   | «в логах» | v lozích / v logech | v logu / u logů / podle logů |
+
+5. **Telegraphic source lines** (mostly safety steps and checklists) get a full Czech verb or noun:
+   «перед этим — мультиметром» → „předtím kontrola multimetrem“; «с готовностью перехватить» →
+   „buďte připraveni převzít řízení“.
+6. **Checklist items and quiz `explain` lines must be unambiguous when read alone**
+   („Na stole je dron vždy bez vrtulí“, not „Na stole nejsou vrtule“).
+7. **State vs ability:** «армится» → „se armuje“, «не армится» → „nejde armovat“.
+8. **Quiz self-check:** for every question confirm the keyed option is still the only correct one in Czech.
