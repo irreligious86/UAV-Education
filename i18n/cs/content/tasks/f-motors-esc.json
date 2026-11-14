@@ -1,0 +1,49 @@
+{
+ "module": "f-motors-esc",
+ "tasks": [
+  {
+   "id": "kv-rpm",
+   "title": "Otáčky podle KV",
+   "statement": "Motor **{kv} KV** s baterií **{s}S** (4.0 V na článek pod zátěží). Odhadněte otáčky naprázdno při plném plynu (v ot/min).",
+   "params": {
+    "kv": {
+     "min": 300,
+     "max": 2600,
+     "step": 50
+    },
+    "s": [
+     3,
+     4,
+     6,
+     8,
+     12
+    ]
+   },
+   "answer": "kv*s*4.0",
+   "unit": "ot/min",
+   "tol": 0.01,
+   "solution": "n = KV·U. S vrtulí jsou otáčky kvůli zátěži o 15–30 % nižší."
+  },
+  {
+   "id": "tip-speed",
+   "title": "Rychlost konce listu vrtule",
+   "statement": "Vrtule o průměru **{d} palců** při **{rpm} ot/min**. Určete rychlost konce listu (v m/s).",
+   "params": {
+    "d": {
+     "min": 3,
+     "max": 18,
+     "step": 1
+    },
+    "rpm": {
+     "min": 3000,
+     "max": 30000,
+     "step": 500
+    }
+   },
+   "answer": "math.pi*d*0.0254*rpm/60",
+   "unit": "m/s",
+   "tol": 0.01,
+   "solution": "v = π·D·n, D v metrech, n v ot/s. Nad ~0.7 Machu (≈240 m/s) se účinnost i hlučnost prudce zhoršují."
+  }
+ ]
+}

@@ -3,103 +3,103 @@
   "pass": 80,
   "questions": [
     {
-      "q": "Что значит «2207» в обозначении мотора?",
+      "q": "Co znamená „2207“ ve značení motoru?",
       "options": [
-        "22 полюса, 7 обмоток",
-        "Статор 22 × 7 мм",
+        "22 pólů, 7 vinutí",
+        "Stator 22 × 7 mm",
         "2207 KV",
-        "22 А, 7 В"
+        "22 A, 7 V"
       ],
       "answer": 1,
-      "explain": "Первые две цифры — диаметр статора в мм, вторые две — высота. Больше статор — больше момент."
+      "explain": "První dvě číslice udávají průměr statoru v mm, druhé dvě jeho výšku. Větší stator znamená větší moment."
     },
     {
-      "q": "Мотор 1750KV на 6S (25.2 В) без нагрузки крутится примерно на…",
+      "q": "Motor 1750KV na 6S (25.2 V) se bez zátěže točí přibližně rychlostí…",
       "options": [
-        "1750 об/мин",
-        "44 000 об/мин",
-        "6 000 об/мин",
-        "175 000 об/мин"
+        "1750 ot/min",
+        "44 000 ot/min",
+        "6 000 ot/min",
+        "175 000 ot/min"
       ],
       "answer": 1,
-      "explain": "KV — обороты на вольт без нагрузки: 1750 × 25.2 ≈ 44 000 об/мин. Под пропом меньше."
+      "explain": "KV jsou otáčky na volt bez zátěže: 1750 × 25.2 ≈ 44 000 ot/min. S vrtulí jsou otáčky nižší."
     },
     {
-      "q": "Чем DShot лучше PWM?",
+      "q": "V čem je DShot lepší než PWM?",
       "options": [
-        "Аналоговый, поэтому точнее",
-        "Цифровой кадр с CRC",
-        "Работает без ESC",
-        "Дешевле"
+        "Je analogový, proto přesnější",
+        "Digitální rámec s CRC",
+        "Funguje bez ESC",
+        "Je levnější"
       ],
       "answer": 1,
-      "explain": "Не нужна калибровка диапазона, помехи не сдвигают газ."
+      "explain": "DShot je digitální rámec s kontrolním součtem: není potřeba kalibrace rozsahu a rušení plyn neposouvá."
     },
     {
-      "q": "Что отдаёт ESC по bidirectional DShot?",
+      "q": "Co posílá ESC přes bidirectional DShot?",
       "options": [
-        "Температуру АКБ",
-        "eRPM мотора",
-        "Напряжение банок",
-        "Положение стиков"
+        "Teplotu baterie",
+        "eRPM motoru",
+        "Napětí článků",
+        "Polohu kniplů"
       ],
       "answer": 1,
-      "explain": "Обратный канал DShot несёт электрические обороты. На этом построен RPM-фильтр."
+      "explain": "Zpětný kanál DShot přenáší elektrické otáčky motoru. Na tom je postaven RPM filtr."
     },
     {
-      "q": "Что произошло с BLHeli_32 в 2024 году?",
+      "q": "Co se stalo s BLHeli_32 v roce 2024?",
       "options": [
-        "Вышла версия 33",
-        "Проект закрыт",
-        "Стал открытым",
-        "Переименован в Bluejay"
+        "Vyšla verze 33",
+        "Projekt byl ukončen",
+        "Stal se otevřeným",
+        "Byl přejmenován na Bluejay"
       ],
       "answer": 1,
-      "explain": "В июне 2024 BLHeli_32 закрылся. Существующие ESC работают, но обновлений нет. Замена для 32-битных ESC — AM32, для BLHeli_S — Bluejay."
+      "explain": "V červnu 2024 byl projekt BLHeli_32 ukončen. Stávající ESC fungují, ale aktualizace už nejsou. Náhradou pro 32bitové ESC je AM32, pro BLHeli_S Bluejay."
     },
     {
-      "q": "Что такое десинк ESC?",
+      "q": "Co je desync ESC?",
       "options": [
-        "Разная прошивка на моторах",
-        "ESC потерял положение ротора",
-        "Перегрев АКБ",
-        "Рассинхрон частоты ESC с пультом"
+        "Různý firmware na motorech",
+        "ESC ztratil polohu rotoru",
+        "Přehřátí baterie",
+        "Rozladění frekvence ESC vůči vysílačce"
       ],
       "answer": 1,
-      "explain": "Sensorless-управление определяет положение ротора по ЭДС. При резком изменении нагрузки оценка срывается — мотор теряет синхронизацию."
+      "explain": "Bezsenzorové (sensorless) řízení určuje polohu rotoru podle indukovaného elektromotorického napětí. Při prudké změně zátěže se odhad zhroutí a motor ztratí synchronizaci."
     },
     {
-      "q": "Как из eRPM получить обороты вала?",
+      "q": "Jak z eRPM získat otáčky hřídele?",
       "options": [
-        "eRPM × число магнитов",
-        "eRPM / (магниты / 2)",
+        "eRPM × počet magnetů",
+        "eRPM / (magnety / 2)",
         "eRPM / 60",
-        "eRPM без пересчёта"
+        "eRPM bez přepočtu"
       ],
       "answer": 1,
-      "explain": "Электрические обороты делят на число пар полюсов: для 14 магнитов — на 7."
+      "explain": "Elektrické otáčky se dělí počtem pólových dvojic: u 14 magnetů sedmi."
     },
     {
-      "q": "Kt мотора 1750KV примерно:",
+      "q": "Kt motoru 1750KV je přibližně:",
       "options": [
-        "0.0055 Н·м/А",
-        "5.5 Н·м/А",
-        "0.55 Н·м/А",
-        "0.055 Н·м/А — по формуле 1/KV"
+        "0.0055 N·m/A",
+        "5.5 N·m/A",
+        "0.55 N·m/A",
+        "0.055 N·m/A – podle vzorce 1/KV"
       ],
       "answer": 0,
-      "explain": "Kt = 60/(2π·KV)."
+      "explain": "Kt = 60/(2π·KV) = 60/(2π·1750) ≈ 0.0055 N·m/A."
     },
     {
-      "q": "Сколько бит значения газа в кадре DShot и какой диапазон?",
+      "q": "Kolik bitů má hodnota plynu v rámci DShot a jaký je její rozsah?",
       "options": [
-        "8 бит, 0–255",
-        "11 бит, 48–2047",
-        "16 бит, 0–65535",
-        "10 бит, 0–1023"
+        "8 bitů, 0–255",
+        "11 bitů, 48–2047",
+        "16 bitů, 0–65535",
+        "10 bitů, 0–1023"
       ],
       "answer": 1,
-      "explain": "0 — стоп, 1–47 — команды; плюс бит телеметрии и 4 бита CRC."
+      "explain": "Hodnota má 11 bitů: 0 je stop, 1–47 jsou příkazy, 48–2047 plyn; k tomu bit telemetrie a 4 bity CRC."
     }
   ]
 }

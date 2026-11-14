@@ -3,92 +3,92 @@
   "pass": 80,
   "questions": [
     {
-      "q": "Какой датчик главный для стабилизации?",
+      "q": "Který senzor je pro stabilizaci hlavní?",
       "options": [
         "GPS",
-        "Барометр",
-        "Гироскоп",
-        "Компас"
+        "Barometr",
+        "Gyroskop",
+        "Kompas"
       ],
       "answer": 2,
-      "explain": "Гироскоп даёт угловую скорость тысячи раз в секунду — на нём работает весь контур стабилизации."
+      "explain": "Gyroskop dodává úhlovou rychlost tisíckrát za sekundu – stojí na něm celá stabilizační smyčka."
     },
     {
-      "q": "Почему компас ставят на мачту вместе с GPS?",
+      "q": "Proč se kompas umisťuje na stožárek spolu s GPS?",
       "options": [
-        "Для красоты",
-        "Подальше от поля силовых проводов",
-        "Чтобы лучше ловить спутники GPS вместе",
-        "Чтобы не мешал пропам"
+        "Kvůli vzhledu",
+        "Aby byl co nejdál od pole silových vodičů",
+        "Aby spolu s GPS lépe chytal satelity",
+        "Aby nepřekážel vrtulím"
       ],
       "answer": 1,
-      "explain": "Компас измеряет магнитное поле Земли; ток в силовых проводах создаёт своё поле и искажает курс."
+      "explain": "Kompas měří magnetické pole Země; proud v silových vodičích vytváří vlastní pole a zkresluje kurz."
     },
     {
-      "q": "Чем F4 отличается от F7 для подключения SBUS?",
+      "q": "Čím se F4 liší od F7 při připojení SBUS?",
       "options": [
-        "F4 быстрее",
-        "F4 не инвертирует UART",
-        "Ничем",
-        "F7 не умеет SBUS без адаптера"
+        "F4 je rychlejší",
+        "F4 neinvertuje UART",
+        "Ničím",
+        "F7 neumí SBUS bez adaptéru"
       ],
       "answer": 1,
-      "explain": "STM32F4 не инвертирует вход UART программно, поэтому SBUS на нём работает только через аппаратный инвертор на отдельном паде."
+      "explain": "STM32F4 neumí vstup UART softwarově invertovat, proto na něm SBUS funguje jen přes hardwarový invertor na zvláštní pájecí plošce."
     },
     {
-      "q": "Зачем закрывают барометр поролоном?",
+      "q": "Proč se barometr zakrývá molitanem?",
       "options": [
-        "От пыли и брызг воды",
-        "От потока пропов и света",
-        "Для тепла",
-        "От воды"
+        "Proti prachu a stříkající vodě",
+        "Proti proudu vzduchu od vrtulí a světlu",
+        "Kvůli teplu",
+        "Proti vodě"
       ],
       "answer": 1,
-      "explain": "Поток воздуха и солнце искажают давление. Поролон сглаживает — высота по баро перестаёт прыгать."
+      "explain": "Proud vzduchu a slunce zkreslují měřený tlak. Molitan tyto vlivy tlumí a výška podle barometru přestane skákat."
     },
     {
-      "q": "Как соединяются UART-устройства?",
+      "q": "Jak se propojují zařízení s UART?",
       "options": [
-        "Через I2C",
-        "TX к RX, RX к TX, GND",
-        "Только один провод",
-        "TX к TX, RX к RX и общий плюс"
+        "Přes I2C",
+        "TX na RX, RX na TX, GND",
+        "Jen jedním vodičem",
+        "TX na TX, RX na RX a společný plus"
       ],
       "answer": 1,
-      "explain": "Передатчик одной стороны идёт на приёмник другой. Без общего GND сигнал не имеет опорного уровня."
+      "explain": "Vysílač jedné strany vede na přijímač druhé. Bez společného GND nemá signál referenční úroveň."
     },
     {
-      "q": "Модель в конфигураторе крутится не в ту сторону. Что делать?",
+      "q": "Model v konfigurátoru se otáčí špatným směrem. Co dělat?",
       "options": [
-        "Перепаять гироскоп",
-        "Задать board alignment",
-        "Перекалибровать ESC и акселерометр",
-        "Сменить прошивку"
+        "Přepájet gyroskop",
+        "Nastavit board alignment",
+        "Znovu zkalibrovat ESC a akcelerometr",
+        "Změnit firmware"
       ],
       "answer": 1,
-      "explain": "Если плата установлена с поворотом, прошивке нужно об этом сказать — параметром ориентации."
+      "explain": "Pokud je deska namontována pootočeně, musí se to firmwaru sdělit parametrem orientace."
     },
     {
-      "q": "Почему приёмник SBUS не работает на произвольном UART F405?",
+      "q": "Proč přijímač SBUS nefunguje na libovolném UART desky F405?",
       "options": [
-        "Скорость не та",
-        "Нет инверсии на F4",
-        "Нужно питание 5 В на SBUS",
-        "SBUS требует I2C"
+        "Nesedí rychlost",
+        "Na F4 chybí inverze",
+        "SBUS potřebuje napájení 5 V",
+        "SBUS vyžaduje I2C"
       ],
       "answer": 1,
-      "explain": "На F4 нет программной инверсии — нужен порт с аппаратным инвертором; F7/H7 инвертируют любой порт."
+      "explain": "F4 nemá softwarovou inverzi – je potřeba port s hardwarovým invertorem; F7/H7 invertují libovolný port."
     },
     {
-      "q": "Что такое softserial?",
+      "q": "Co je softserial?",
       "options": [
-        "Режим CRSF по одному проводу",
-        "UART на GPIO, медленный",
-        "Протокол ESC",
-        "Второй USB"
+        "Režim CRSF po jednom vodiči",
+        "UART na GPIO, pomalý",
+        "Protokol ESC",
+        "Druhé USB"
       ],
       "answer": 1,
-      "explain": "UART, эмулированный на GPIO: до 19200, нагружает CPU — для SmartAudio и некритичного, не для приёмника."
+      "explain": "Softserial je UART emulovaný na GPIO: do 19200 baudů, zatěžuje CPU – hodí se pro SmartAudio a nekritické funkce, ne pro přijímač."
     }
   ]
 }

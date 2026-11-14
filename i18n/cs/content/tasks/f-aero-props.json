@@ -1,0 +1,73 @@
+{
+ "module": "f-aero-props",
+ "tasks": [
+  {
+   "id": "disk-loading",
+   "title": "Plošné zatížení disku",
+   "statement": "Kvadrokoptéra o hmotnosti **{m} kg** s vrtulemi **{d} palců**. Určete plošné zatížení disku v N/m² (g = 9.81, plocha jsou čtyři disky).",
+   "params": {
+    "m": {
+     "min": 0.5,
+     "max": 3.0,
+     "step": 0.1
+    },
+    "d": {
+     "min": 5,
+     "max": 12,
+     "step": 1
+    }
+   },
+   "answer": "m*9.81/(4*math.pi*(d*0.0254/2)**2)",
+   "unit": "N/m²",
+   "tol": 0.02,
+   "solution": "A = 4·π·(D/2)², D = d·0.0254 m; zatížení = m·g/A. Čím je nižší, tím méně výkonu připadá na jednotku tahu."
+  },
+  {
+   "id": "ct-thrust",
+   "title": "Tah podle součinitele",
+   "statement": "Vrtule o průměru **{d} palců** se součinitelem tahu C_T = **{ct}** se otáčí rychlostí **{rpm} ot/min**. Určete statický tah v gramech (ρ = 1.225 kg/m³, g = 9.81).",
+   "params": {
+    "d": {
+     "min": 5,
+     "max": 10,
+     "step": 1
+    },
+    "ct": {
+     "min": 0.09,
+     "max": 0.13,
+     "step": 0.005
+    },
+    "rpm": {
+     "min": 8000,
+     "max": 24000,
+     "step": 500
+    }
+   },
+   "answer": "ct*1.225*(rpm/60)**2*(d*0.0254)**4/9.81*1000",
+   "unit": "g",
+   "tol": 0.02,
+   "solution": "T = C_T·ρ·n²·D⁴, kde n je v ot/s a D v metrech; výsledek dělíme g a převádíme na gramy. Tah roste s druhou mocninou otáček."
+  },
+  {
+   "id": "ideal-power",
+   "title": "Ideální výkon ve visu",
+   "statement": "Stroj o hmotnosti **{m} kg** visí na čtyřech vrtulích o průměru **{d} palců**. Odhadněte ideální (indukovaný) výkon ve visu ve wattech podle teorie aktuátorového disku (ρ = 1.225).",
+   "params": {
+    "m": {
+     "min": 0.5,
+     "max": 4.0,
+     "step": 0.1
+    },
+    "d": {
+     "min": 5,
+     "max": 15,
+     "step": 1
+    }
+   },
+   "answer": "(m*9.81)**1.5/math.sqrt(2*1.225*4*math.pi*(d*0.0254/2)**2)",
+   "unit": "W",
+   "tol": 0.02,
+   "solution": "P = T^1.5 / √(2·ρ·A), A je celková plocha disků. Skutečný výkon je kvůli ztrátám vrtule a motoru 1.5–2krát vyšší."
+  }
+ ]
+}

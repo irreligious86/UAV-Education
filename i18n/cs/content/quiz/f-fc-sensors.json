@@ -1,0 +1,94 @@
+{
+  "module": "f-fc-sensors",
+  "pass": 80,
+  "questions": [
+    {
+      "q": "Který senzor je pro stabilizaci hlavní?",
+      "options": [
+        "GPS",
+        "Barometr",
+        "Gyroskop",
+        "Kompas"
+      ],
+      "answer": 2,
+      "explain": "Gyroskop dodává úhlovou rychlost tisíckrát za sekundu – stojí na něm celá stabilizační smyčka."
+    },
+    {
+      "q": "Proč se kompas umisťuje na stožárek spolu s GPS?",
+      "options": [
+        "Kvůli vzhledu",
+        "Aby byl co nejdál od pole silových vodičů",
+        "Aby spolu s GPS lépe chytal satelity",
+        "Aby nepřekážel vrtulím"
+      ],
+      "answer": 1,
+      "explain": "Kompas měří magnetické pole Země; proud v silových vodičích vytváří vlastní pole a zkresluje kurz."
+    },
+    {
+      "q": "Čím se F4 liší od F7 při připojení SBUS?",
+      "options": [
+        "F4 je rychlejší",
+        "F4 neinvertuje UART",
+        "Ničím",
+        "F7 neumí SBUS bez adaptéru"
+      ],
+      "answer": 1,
+      "explain": "STM32F4 neumí vstup UART softwarově invertovat, proto na něm SBUS funguje jen přes hardwarový invertor na zvláštní pájecí plošce."
+    },
+    {
+      "q": "Proč se barometr zakrývá molitanem?",
+      "options": [
+        "Proti prachu a stříkající vodě",
+        "Proti proudu vzduchu od vrtulí a světlu",
+        "Kvůli teplu",
+        "Proti vodě"
+      ],
+      "answer": 1,
+      "explain": "Proud vzduchu a slunce zkreslují měřený tlak. Molitan tyto vlivy tlumí a výška podle barometru přestane skákat."
+    },
+    {
+      "q": "Jak se propojují zařízení s UART?",
+      "options": [
+        "Přes I2C",
+        "TX na RX, RX na TX, GND",
+        "Jen jedním vodičem",
+        "TX na TX, RX na RX a společný plus"
+      ],
+      "answer": 1,
+      "explain": "Vysílač jedné strany vede na přijímač druhé. Bez společného GND nemá signál referenční úroveň."
+    },
+    {
+      "q": "Model v konfigurátoru se otáčí špatným směrem. Co dělat?",
+      "options": [
+        "Přepájet gyroskop",
+        "Nastavit board alignment",
+        "Znovu zkalibrovat ESC a akcelerometr",
+        "Změnit firmware"
+      ],
+      "answer": 1,
+      "explain": "Pokud je deska namontována pootočeně, musí se to firmwaru sdělit parametrem orientace."
+    },
+    {
+      "q": "Proč přijímač SBUS nefunguje na libovolném UART desky F405?",
+      "options": [
+        "Nesedí rychlost",
+        "Na F4 chybí inverze",
+        "SBUS potřebuje napájení 5 V",
+        "SBUS vyžaduje I2C"
+      ],
+      "answer": 1,
+      "explain": "F4 nemá softwarovou inverzi – je potřeba port s hardwarovým invertorem; F7/H7 invertují libovolný port."
+    },
+    {
+      "q": "Co je softserial?",
+      "options": [
+        "Režim CRSF po jednom vodiči",
+        "UART na GPIO, pomalý",
+        "Protokol ESC",
+        "Druhé USB"
+      ],
+      "answer": 1,
+      "explain": "Softserial je UART emulovaný na GPIO: do 19200 baudů, zatěžuje CPU – hodí se pro SmartAudio a nekritické funkce, ne pro přijímač."
+    }
+  ]
+}

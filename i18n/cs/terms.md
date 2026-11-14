@@ -272,3 +272,31 @@ conflicts with a table above, this one wins.
    („Na stole je dron vždy bez vrtulí“, not „Na stole nejsou vrtule“).
 7. **State vs ability:** «армится» → „se armuje“, «не армится» → „nejde armovat“.
 8. **Quiz self-check:** for every question confirm the keyed option is still the only correct one in Czech.
+
+## Additions from batch 0 (foundation, 2026-11-14) — binding, unreviewed by a native speaker
+
+| ru | cs | note |
+|---|---|---|
+| панч | punch | gloss once: „prudké přidání plynu naplno“ |
+| десинк | desync | |
+| колокол мотора | zvon motoru (rotor) | |
+| пакет, сборка (АКБ) | baterie / sada článků | |
+| паспорт сборки / журнал сборки | pasport stavby / deník stavby | |
+| втулки (демпферы FC) / стойки / демпфер | silentbloky / (distanční) sloupky / tlumič | |
+| поролон / мачта GPS | molitan / stožárek | |
+| пад / шина BEC | (pájecí) ploška / větev BEC | |
+| таргет / бод | target / baudů | |
+| диск-актуатор | aktuátorový disk | |
+| относительная поступь J | rychlostní poměr J | |
+| нагрузка на диск | plošné zatížení disku | |
+| КПД | účinnost | |
+| шаг (винта) | stoupání | |
+| силовая установка | pohonná jednotka | |
+| рабочая точка | pracovní bod | established term; the «рабочий → funkční» rule does not apply here |
+| тяговый стенд | měřicí stolice | |
+| клиппинг | clipping (saturace) | |
+| консольная балка | vetknutý nosník | |
+| ЭДС / ШИМ | elektromotorické napětí / PWM | |
+
+Task `unit` values are localised (min, A, ot/min, m/s, N/m², g, W, Hz). Terse quiz `explain` lines may be
+expanded just enough to read unambiguously alone; never change which option is correct.
