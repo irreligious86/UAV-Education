@@ -300,3 +300,33 @@ conflicts with a table above, this one wins.
 
 Task `unit` values are localised (min, A, ot/min, m/s, N/m², g, W, Hz). Terse quiz `explain` lines may be
 expanded just enough to read unambiguously alone; never change which option is correct.
+
+## Additions from batch 1 (regulations, field ops, mechanics, electricity, components) — binding, unreviewed
+
+| ru | cs | note |
+|---|---|---|
+| регулятор (authority) | letecký úřad / úřad pro civilní letectví | never „regulátor“ |
+| площадка / зона полётов | letová plocha / letový prostor | |
+| журнал оператора / полётов / вылета / площадки | deník provozovatele / letů / letu / letové plochy | |
+| наблюдатель / старший | pozorovatel (spotter) / vedoucí | |
+| борт | stroj; palubní elektronika | by context |
+| вылет / прогон | výjezd, let / zkouška naostro | |
+| почти-инцидент | skoroincident (near miss) | |
+| привязной стенд | zkušební stav s upoutaným strojem | |
+| гс | gf | |
+| вес (сила) / плечо L | tíha / rameno síly | frame arm stays „rameno“ |
+| предельная скорость / координированный вираж | mezní rychlost / koordinovaná zatáčka | |
+| крен 30° / наклон | úhel klonění 30° / náklon | |
+| А·ч, мА·ч, Вт·ч | Ah, mAh, Wh | |
+| C-рейтинг | hodnocení C (C-rating) | |
+| прозвонка | test spojitosti | |
+| межвитковое замыкание | mezizávitový zkrat | |
+| разбаланс | nevyvážené články | |
+| LiPo-пакет (сумка) | LiPo vak | |
+| чёрный ящик / даташит | blackbox / datasheet | |
+| крепёж | spojovací materiál | |
+| цифра (видео) | digitál | |
+
+Subscripts with Russian labels are Czechised consistently: Rвн → R_i, U_хх → U_0, U_борта → U_paluby,
+P_пот → P_ztr, R_сумм → R_celk, I_ср → I_stř, m_рамы → m_rámu. Voice phrases are Czech („Arm povolen“,
+„Vzlétám“, „Rozumím“, „Volno“, „Přistaň“). Russian prose inside inline code examples (log lines) is translated.
