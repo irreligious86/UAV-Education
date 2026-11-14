@@ -51,10 +51,9 @@
       <h1 class="module-title">Миссии INAV: waypoints и CLI wp</h1>
       <div class="module-tags"><span class="gc-tag" title="Уровень">L2 — Интегратор</span><span class="gc-tag">чтение 20 мин</span><span class="gc-tag">учёба ~2 ч</span><span class="gc-tag">INAV 7.0+</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ОСВОЕН</span></div>
       <p class="gc-muted module-score" data-module-score></p>
-      <p class="module-lead">Миссия INAV — список точек с действиями, который аппарат выполняет в режиме NAV WP. Модуль показывает, из чего состоит точка, какие действия есть (WAYPOINT, POSHOLD_TIME, RTH, JUMP, SET_POI, LAND), как записать миссию через конфигуратор и через CLI командой <code>wp</code>, где лежит высота, и как INAV защищает от взлёта с «чужой» миссией.</p>
+      <p class="module-lead">Миссия INAV — список точек с действиями, который аппарат выполняет в режиме NAV WP. Поговорим за то, из чего состоит точка, какие действия есть (WAYPOINT, POSHOLD_TIME, RTH, JUMP, SET_POI, LAND), как записать миссию через конфигуратор и через CLI командой <code>wp</code>, где лежит высота, и как INAV защищает от взлёта с «чужой» миссией.</p>
       <div class="gc-callout" data-state="ok"><strong>После модуля ты умеешь</strong><ul><li>записать миссию через конфигуратор и CLI wp</li><li>объяснить защиту от чужой миссии</li></ul></div><p class="gc-muted">Перед этим модулем: <a href="inav-gps.html">GPS, компас и RTH в INAV</a></p><div class="gc-callout lab"><p class="gc-label gc-muted">Лабораторная</p><strong>Одна миссия двумя способами</strong><p class="gc-muted lab__hint">Сдано, когда отмечены все пункты:</p><ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="inav-missions:lab:0"><span>Миссия записана в конфигураторе и через CLI wp</span></label></li><li><label><input type="checkbox" data-check-id="inav-missions:lab:1"><span>Вывод wp совпадает</span></label></li><li><label><input type="checkbox" data-check-id="inav-missions:lab:2"><span>Прогон с POSHOLD_TIME и RTH выполнен</span></label></li></ul></div><div class="path-pos gc-muted"><span class="gc-label">В пути</span><ul><li data-path-pos="inav"><a href="../path/inav.html">INAV</a>: шаг 22 из 25 → <a href="inav-wing.html?path=inav">Крыло на INAV: миксер, автозапуск, autotune</a></li></ul></div>
       <div class="gc-prose module-body">
-<div class="gc-callout" data-state="caution" data-untranslated><strong>Модуль ещё не переведён.</strong> Ниже — оригинал (Русский). Прогресс и оценки общие для всех языков.</div>
 <h2>Теория</h2>
 <h4 class="md-subheading">Структура точки</h4>
 <p>В CLI: <code>wp &lt;n&gt; &lt;action&gt; &lt;lat&gt; &lt;lon&gt; &lt;alt&gt; &lt;p1&gt; &lt;p2&gt; &lt;p3&gt; &lt;flag&gt;</code>.</p>
@@ -67,7 +66,7 @@
 <h4 class="md-subheading">Несколько миссий</h4>
 <p>Конфигуратор умеет хранить несколько миссий в одном списке точек и переключаться между ними; операнды Programming Framework для точек относятся к выбранной миссии.</p>
 <h4 class="md-subheading">Против ArduPilot</h4>
-<p>В INAV миссия проще: нет CONDITION-команд, нет DO-команд в чистом виде (часть действий — через user actions в <code>p3</code> и логические условия), загрузка через MSP/CLI, MAVLink-протокол миссий (MISSION_COUNT/MISSION_ITEM) поддерживается упрощённо. Для съёмки участка и облёта — достаточно; для сложной логики — Programming Framework или ArduPilot.</p>
+<p>В INAV миссия проще: нет CONDITION-команд, нет DO-команд в чистом виде (часть действий — через user actions в <code>p3</code> и логические условия), загрузка через MSP/CLI, MAVLink-протокол миссий (MISSION_COUNT/MISSION_ITEM) поддерживается упрощённо. Для съёмки участка и облёта — таки достаточно; для сложной логики — Programming Framework или ArduPilot.</p>
 <h4 class="md-subheading">Параметры выполнения и защиты</h4>
 <p><code>nav_auto_speed</code> (500 см/с) — скорость по умолчанию, <code>nav_wp_radius</code> (100 см) — радиус захвата точки (для крыла — больше, 1000–3000), <code>nav_wp_max_safe_distance</code> (100 м; 0 — выключить) — первая точка дальше этого от места арма → арм заблокирован («вчерашняя миссия на новом поле»). Для крыла точки проходятся по дуге, для мультиротора — с остановкой; <code>nav_mc_wp_slowdown</code> управляет торможением у точки.</p>
 <h4 class="md-subheading">Разобранный пример: облёт участка 200×100 м для съёмки</h4>
@@ -89,7 +88,7 @@ wp save
 wp</code></pre>
 <p>Точка 2 — POSHOLD_TIME 20 с, точка 3 — RTH с посадкой, последний флаг 165.</p>
 <h4 class="md-subheading">Шаг 2б. Генератор CLI из списка координат</h4>
-<p>Руками переводить градусы в «× 10⁷» и сантиметры — верный способ ошибиться на порядок. Скрипт:</p>
+<p>Руками переводить градусы в «× 10⁷» и сантиметры — это, шоб вы знали, верный способ ошибиться на порядок. Скрипт:</p>
 <pre class="cli-block"><code>def wp_cli(points, alt_m=30, rth_land=True):
     # points: [(lat, lon), ...] in degrees -&gt; INAV CLI lines; altitude relative to home
     lines = [&quot;wp reset&quot;]
