@@ -208,7 +208,7 @@ fact-check applied, CI green. Translations are not part of an iteration (decisio
 |---|---|---|
 | 1 | Design core — **done** | des-sizing, des-thrust-stand, aero-stability, ctl-allocation; new track "Конструктор", capstone cap-designer; X8 example rebuilt on the MN4006 table |
 | 1b | Setup from scratch (§2.8) — **done** | bf-setup-scratch, inav-setup-scratch, inav-setup-wing, ap-setup-scratch, px4-setup-scratch; capstones cap-inav-gps, cap-px4-scratch; path changes; setup cards |
-| 2 | Precision navigation and vision (Alex, 2026-11-11: add machine vision, vision-based terrain navigation, Jetson Nano) | nav-rtk, nav-indoor, nav-terrain, nav-vtrn, per-vision-pipeline, comp-jetson-nano |
+| 2 | **done** — Precision navigation and vision (Alex, 2026-11-11: add machine vision, vision-based terrain navigation, Jetson Nano) | nav-rtk, nav-indoor, nav-terrain, nav-vtrn, per-vision-pipeline, comp-jetson-nano |
 | 3 | Firmware development elective | fw-build-ap, fw-debug, fw-driver, fw-px4-module, fw-hil-testing |
 | 4 | Autonomy | aut-planning, aut-behavior, ctl-trajectory, ctl-advanced, aut-swarm |
 | 5 | Operations and safety | ops-flight-test, ops-risk-sora, ops-human-factors, safety-parachute, sec-threats |
