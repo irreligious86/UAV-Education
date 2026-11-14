@@ -70,12 +70,12 @@ esc = html.escape
 # ---------------------------------------------------------------- languages (scripts/i18n.py, docs/I18N.md)
 
 # Field names of the diagnostics blocks in every course language (translated modules keep the structure).
-SYMPTOM_KEYS = ("**Симптом:**", "**Symptom:**", "Симптом:", "Symptom:")
+SYMPTOM_KEYS = ("**Симптом:**", "**Symptom:**", "**Příznak:**", "Симптом:", "Symptom:", "Příznak:")
 FIELD_KEYS = {
-    "cause": ("возможная причина", "можлива причина", "possible cause"),
-    "fix": ("что сделать", "что проверить", "що зробити", "що перевірити", "what to do", "what to check", "fix"),
-    "evidence": ("в логе", "что видно", "у лозі", "у логу", "в логу", "у журналі", "що видно", "in the log", "what you see", "evidence"),
-    "consequence": ("последствия", "наслідки", "consequences"),
+    "cause": ("возможная причина", "можлива причина", "possible cause", "možná příčina"),
+    "fix": ("что сделать", "что проверить", "що зробити", "що перевірити", "what to do", "what to check", "fix", "co udělat", "co zkontrolovat"),
+    "evidence": ("в логе", "что видно", "у лозі", "у логу", "в логу", "у журналі", "що видно", "in the log", "what you see", "evidence", "v logu", "co je vidět"),
+    "consequence": ("последствия", "наслідки", "consequences", "důsledky"),
 }
 TRANSLATION_STATE: dict[str, dict[str, str]] = {}   # lang -> module id -> "ok" | "stale" | "missing"
 

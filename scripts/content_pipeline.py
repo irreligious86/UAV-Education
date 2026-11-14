@@ -10,6 +10,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 MANIFEST_PATH = ROOT / "data" / "content-manifest.json"
 
+SYMPTOM_WORDS = ("Симптом:", "Symptom:", "Příznak:")   # diagnostics card marker in every site language
 REQUIRED_MD_HEADINGS = ("summary", "theory", "practice", "diagnostics", "references")
 
 # Article lifecycle:
@@ -284,7 +285,7 @@ def diagnostics_to_html(block: str) -> str:
         stripped = raw_lines[i].strip()
         is_symptom = (
             stripped.startswith("- ")
-            and ("Симптом:" in stripped or "Symptom:" in stripped)
+            and any(k in stripped for k in SYMPTOM_WORDS)
         )
         if not is_symptom:
             i += 1
@@ -296,9 +297,7 @@ def diagnostics_to_html(block: str) -> str:
             cur = raw_lines[i]
             cur_stripped = cur.strip()
             # Следующий симптом — новая карточка.
-            if cur_stripped.startswith("- ") and (
-                "Симптом:" in cur_stripped or "Symptom:" in cur_stripped
-            ):
+            if cur_stripped.startswith("- ") and any(k in cur_stripped for k in SYMPTOM_WORDS):
                 break
             # Дочерние пункты внутри симптома.
             if cur.startswith("  - ") or cur.startswith("\t- "):
