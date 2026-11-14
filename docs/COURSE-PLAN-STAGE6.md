@@ -201,8 +201,8 @@ Configurator tab / CLI command / parameter for that firmware) — linked from ea
 
 ## 4. Iterations
 
-Each iteration ends with: modules published, quizzes and tasks, diagrams, glossary terms, the Ukrainian
-translation of everything new or changed (decision 4), an independent fact-check applied, CI green.
+Each iteration ends with: modules published, quizzes and tasks, diagrams, glossary terms, an independent
+fact-check applied, CI green. Translations are not part of an iteration (decision 4).
 
 | # | Iteration | Content |
 |---|---|---|
@@ -225,13 +225,13 @@ Rough size: an iteration of 4–5 modules ≈ 25–30k words of Russian source p
 2. Exam banks: in the public repository while the course is in development; revisit when moving to a server.
 3. Hardware: SITL / calculation is the main path of every lab; each module has a separate
    «Переход на реальное железо» part (procedure and acceptance criteria) so students move to real hardware later.
-4. Languages (revised 2026-11-15): the **main languages are Russian (source) and Ukrainian** — every new
-   or changed module is published in both at once, in the same iteration. All other languages are frozen
-   as they are until the course content is final: English and Czech (translations), and the experimental
-   dialect versions `uk-galych`, `uk-zakarpat`, `ru-odessa`. They stay on the site and fall back to the
-   source/Ukrainian text with the usual notice; no translation work is spent on them until Alex reopens it.
-   Their guides, research notes and pilot reviews are kept (`i18n/<code>/terms.md`, `docs/reviews/i18n-*`).
-   (Earlier decision, 2026-11-10: Russian only, localisation later as one batch.)
+4. Languages (revised 2026-11-15, second revision the same day): **Russian is the only working language
+   while the course is being filled.** New and changed modules are written in Russian only. Ukrainian and
+   English are brought up to date in one pass after the content is complete; the experimental dialect
+   versions (`uk-galych`, `uk-zakarpat`, `ru-odessa`) and Czech are decided after that. Until then every
+   other language stays on the site as it is and falls back to the Russian text with the usual notice.
+   Guides, research notes and pilot reviews are kept (`i18n/<code>/terms.md`, `docs/reviews/i18n-*`).
+   (History: 2026-11-10 Russian only, localisation later; 2026-11-15 morning ru+uk together — withdrawn.)
 
 ## 5a. Original questions
 
