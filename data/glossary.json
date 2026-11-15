@@ -1205,6 +1205,66 @@
       "term": "TensorRT engine",
       "def": "Скомпилированный под конкретный GPU и версию TensorRT план исполнения нейросети (файл .engine), получаемый из ONNX с выбранной точностью FP32, FP16 или INT8. Между платами не переносится: переносят ONNX, а engine собирают на целевом Jetson.",
       "module": "comp-jetson-nano"
+    },
+    {
+      "term": "WS2812 (адресный светодиод)",
+      "def": "Светодиод со встроенным драйвером: 5 В, GND и одна линия данных 800 кГц, 24 бита на светодиод (GRB), цепочка DIN → DOUT. До ~60 мА при полном белом; вход считает «1» от 0.7·VDD, поэтому 3.3 В с FC на грани. В Betaflight — `resource LED_STRIP`, таймер и DMA пина, до 32 светодиодов (64 с LED_STRIP_64).",
+      "module": "bf-led-buzzer"
+    },
+    {
+      "term": "DShot beacon",
+      "def": "Писк моторами: Betaflight шлёт ESC DShot-команду BEACON1…5 (`beeper_dshot_beacon_tone`) по условиям RX_LOST и RX_SET команды `beacon` (в 4.5 по умолчанию оба выключены). Не в арме и не при работающих моторах, не раньше 1.2 с после дизарма, не чаще ~0.5 с (RX_SET) или ~1 с (RX_LOST).",
+      "module": "bf-led-buzzer"
+    },
+    {
+      "term": "Профиль ленты (RACE / BEACON / STATUS)",
+      "def": "`ledstrip_profile` Betaflight: STATUS — каждый светодиод по строке `led` (функции и оверлеи), RACE — вся лента одним цветом (`ledstrip_race_color`, BLACK = по частоте VTX), BEACON — мигание 2 раза в секунду по умолчанию. В RACE/BEACON активный failsafe и режим BEEPER включают мигание 4 раза в секунду. С пульта — функция 30 в `adjrange`.",
+      "module": "bf-led-buzzer"
+    },
+    {
+      "term": "Таймер MCU (группа выходов)",
+      "def": "Аппаратный счётчик STM32/AT32 (TIMx) с общими предделителем и периодом и до 4 каналов на ножках. Все выходы одного таймера работают на одной частоте и в одном протоколе: серва 50 Гц и DShot на одном таймере несовместимы. Карта — timer show, timer <pin> list.",
+      "module": "bf-servos-pwm"
+    },
+    {
+      "term": "SERVO_TILT",
+      "def": "Фича Betaflight: две сервы подвеса (тангаж, крен) и режим CAMSTAB. В CAMSTAB импульс = middle + rate·угол_в_десятых_градуса/50, то есть rate/5 мкс на градус наклона рамы.",
+      "module": "bf-servos-pwm"
+    },
+    {
+      "term": "Channel forwarding",
+      "def": "Фича Betaflight CHANNEL_FORWARDING: AUX-каналы приёмника, начиная с channel_forwarding_start, выводятся на оставшиеся выходы серв как есть, без ограничения min/max команды servo.",
+      "module": "bf-servos-pwm"
+    },
+    {
+      "term": "TTFF (холодный, тёплый, горячий старт)",
+      "def": "Время до первого фикса GNSS. Холодный — без эфемерид и времени (u-blox M8/M10: 26–29 с), тёплый — эфемериды устарели (> 4 ч), горячий — свежие эфемериды в BBR при живом V_BCKP (1 с).",
+      "module": "bf-gps-setup"
+    },
+    {
+      "term": "PDOP",
+      "def": "Множитель ошибки 3D-позиции GNSS от геометрии спутников. Betaflight 4.5 показывает и использует именно PDOP (не HDOP): около 1.0 — хорошо.",
+      "module": "bf-gps-setup"
+    },
+    {
+      "term": "gpspassthrough",
+      "def": "Команда CLI Betaflight: прямой мост USB ↔ UART GPS до перезагрузки, чтобы u-center читал и настраивал модуль через полётник.",
+      "module": "bf-gps-setup"
+    },
+    {
+      "term": "Turtle mode (crash flip)",
+      "def": "Режим Betaflight FLIP OVER AFTER CRASH (aux id 35): при арме с включённым режимом FC шлёт ESC DShot-команду 21 (реверс), и стик крутит назад моторы одной стороны, чтобы перевернуть аппарат со спины. Только DShot; выход — дизарм, тумблер выкл., новый арм.",
+      "module": "bf-features-tour"
+    },
+    {
+      "term": "Dynamic idle",
+      "def": "Регулятор Betaflight, который по eRPM двунаправленного DShot держит самый медленный мотор не ниже dyn_idle_min_rpm × 100 об/мин, поднимая нижнюю границу всех моторов (до 15 %, на земле до 5 %). При нём dshot_idle_value игнорируется; без телеметрии молча выключен.",
+      "module": "bf-features-tour"
+    },
+    {
+      "term": "Launch control",
+      "def": "Режим Betaflight для гоночного старта (aux id 49): после арма в ACRO аппарат держит наклон, заданный стиком, I-членом с коэффициентом launch_control_gain, пока газ не превысит launch_trigger_throttle_percent (20 %).",
+      "module": "bf-features-tour"
     }
   ]
 }

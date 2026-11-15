@@ -1750,6 +1750,35 @@
           "article": "bf-adjustments"
         },
         {
+          "id": "bf-features-tour",
+          "title": "Остальные режимы и функции Betaflight: turtle, launch control, 3D, acro trainer, Angle/Horizon, dynamic idle, camera control",
+          "level": "L2",
+          "hours": 4,
+          "prerequisites": [
+            "bf-modes-osd",
+            "bf-arming-safety",
+            "bf-rates-rc"
+          ],
+          "objectives": [
+            "настроить turtle, launch control, 3D, acro trainer и camera control по коду 4.5 и строкам aux",
+            "рассчитать уставку Angle, силу Horizon и прибавку dynamic idle по формулам прошивки",
+            "проверить turtle, launch control, 3D и dynamic idle на железе с критериями прерывания"
+          ],
+          "lab": {
+            "title": "Режимы Betaflight из исходника: Angle/Horizon, dynamic idle, turtle; проверка на столе и в поле",
+            "criteria": [
+              "Python: три части скрипта запущены, выводы совпадают; угол Angle и сила Horizon посчитаны для своих рейтов",
+              "Python: найдена цель dyn_idle_min_rpm, при которой прибавка в падении упирается в 15 %; выход DShot turtle посчитан для своего crashflip_expo",
+              "Конфигурация: строки aux по таблице permanentId, dyn_idle_min_rpm проверен во всех используемых профилях",
+              "Железо: turtle на столе и на траве, launch control 5 с удержания, 3D без пропов, лог dynamic idle в плоском падении"
+            ]
+          },
+          "stacks": [
+            "betaflight"
+          ],
+          "article": "bf-features-tour"
+        },
+        {
           "id": "bf-cli",
           "title": "CLI и remap",
           "level": "L3",
@@ -1799,6 +1828,93 @@
             "betaflight"
           ],
           "article": "bf-cli-automation"
+        },
+        {
+          "id": "bf-gps-setup",
+          "title": "GPS в Betaflight: модули M8/M10, конфигурация, точность и домашняя точка",
+          "level": "L2",
+          "hours": 4,
+          "prerequisites": [
+            "bf-ports",
+            "bf-cli",
+            "est-gnss"
+          ],
+          "objectives": [
+            "выбрать, подключить и разместить модуль u-blox M8 или M10 с учётом помех VTX",
+            "настроить GPS в Betaflight 4.5 и проверить по status, что модуль сконфигурирован",
+            "проверить фикс, спутники, PDOP и точку дома до полёта с GPS Rescue"
+          ],
+          "lab": {
+            "title": "GPS: парсер UBX по правилам 4.5, затем холодный старт и тест VTX на столе",
+            "criteria": [
+              "gps_lab.py запущен: DOP по реальной записи M8030 совпал с NAV-DOP не хуже 0.03, шесть синтетических сценариев объяснены",
+              "Скорость UART GPS выбрана по расчёту загрузки (< 50 %), status показывает connected, configured и версию модуля",
+              "Холодный старт засечён, 10-минутная запись .ubx своего модуля прогнана через gps_lab.py (CEP50, R95, PDOP, v95)",
+              "Таблица «VTX выкл. / ступени мощности» заполнена, наклон 45° и дом при арме проверены, diff all сдан"
+            ]
+          },
+          "stacks": [
+            "betaflight"
+          ],
+          "article": "bf-gps-setup"
+        },
+        {
+          "id": "bf-servos-pwm",
+          "title": "Сервы, PWM и таймеры: `resource SERVO`, `servo`, `smix`, SERVO_TILT и channel forwarding",
+          "level": "L2",
+          "hours": 3,
+          "prerequisites": [
+            "bf-cli",
+            "f-motors-esc",
+            "el-power-design"
+          ],
+          "objectives": [
+            "выбрать пад для сервы по карте таймеров, не сломав DShot моторов",
+            "настроить servo, SERVO_TILT и channel forwarding и посчитать импульс сервы",
+            "запитать серву от отдельного BEC и проверить импульс прибором"
+          ],
+          "lab": {
+            "title": "Серва подвеса на свободном паде F405",
+            "criteria": [
+              "Модель: таблица таймеров платы из конфига 4.5 и исходника построена, пад сервы выбран и обоснован",
+              "Модель: rate SERVO_TILT посчитан по паспорту сервы, импульс при наклоне 10° и 20° найден",
+              "Стол: timer show после save показывает серву на своём таймере, моторы без ошибок, импульс 20 мс и 1500 ± 5 мкс",
+              "Стол: серва на отдельном BEC с общей землёй, ток упора записан, наклон 20° компенсируется с ошибкой ≤ 3°"
+            ]
+          },
+          "stacks": [
+            "betaflight"
+          ],
+          "article": "bf-servos-pwm"
+        },
+        {
+          "id": "bf-led-buzzer",
+          "title": "Светодиоды, пищалка и маячки: LED_STRIP, `led` / `color` / `mode_color`, beeper, DShot beacon",
+          "level": "L2",
+          "hours": 3,
+          "prerequisites": [
+            "bf-cli",
+            "bf-modes-osd",
+            "el-power-design"
+          ],
+          "objectives": [
+            "подключить и запитать ленту WS2812 без конфликта таймера с моторами",
+            "собрать раскладку led, палитру color и профили ленты по правилам парсера 4.5",
+            "настроить beeper и DShot beacon для поиска аппарата и проверить их без пропов"
+          ],
+          "lab": {
+            "title": "Лента, пищалка и маяк: расчёт по исходнику и стенд без пропов",
+            "criteria": [
+              "Расчёт: скрипт запущен на исходнике 4.5, вывод шагов 1–5 приложен, объяснены «SE» → фиолетовый и обрезка ленты строкой 0,0::C:0",
+              "Расчёт: для своей раскладки посчитан худший ток и запас BEC, выбор питания обоснован",
+              "Стол: timer show / dma show без конфликта LED–MOTOR и замеры тока на 100 и 30 % приложены",
+              "Стол: RX_LOST только после арма, DShot-маяк не раньше 1.2 с после дизарма, BEEPER MUTE глушит всё"
+            ]
+          },
+          "stacks": [
+            "betaflight"
+          ],
+          "article": "bf-led-buzzer"
         }
       ]
     },
@@ -4273,7 +4389,8 @@
             "ctl-theory",
             "bf-pid",
             "bf-rates-rc",
-            "bf-adjustments"
+            "bf-adjustments",
+            "bf-features-tour"
           ]
         },
         {
@@ -4281,6 +4398,9 @@
           "modules": [
             "bf-cli",
             "bf-cli-automation",
+            "bf-gps-setup",
+            "bf-servos-pwm",
+            "bf-led-buzzer",
             "emb-basics",
             "bf-custom",
             "fw-reading"
