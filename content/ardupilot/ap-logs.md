@@ -76,7 +76,7 @@ vibe = df_of("flight.bin", "VIBE"); print("VibeZ p95:", vibe.VibeZ.quantile(0.95
 `mavlogdump.py --types ATT,VIBE --format csv flight.bin` — быстрая выгрузка в CSV без кода; `MAVExplorer`: `graph ATT.Roll ATT.DesRoll`, `fft` для спектров батч-сэмплинга (`ISBH/ISBD`), `map` для траектории. Метрики переходного процесса и спектры — модуль «Python для данных».
 
 ### Что писать в LOG_BITMASK
-По умолчанию достаточно для разбора полёта; для тюнинга добавить `PID` (сообщения `PIDR/PIDP/PIDY` с P/I/D/FF по осям) и `IMU_RAW`/батч-сэмплинг (`INS_LOG_BAT_MASK`) на время настройки фильтров — лог растёт в разы, после — выключить. `LOG_FILE_DSRMROT` — новый файл при каждом дизарме; `LOG_DISARMED = 1` — для наземных измерений (шум, GPS), потом выключить, иначе SD забивается.
+По умолчанию (Copter: `LOG_BITMASK = 180222`) достаточно для разбора полёта, и `PID` (бит 12, сообщения `PIDR/PIDP/PIDY` с P/I/D/FF по осям) в нём уже есть, но на 10 Гц. Для тюнинга добавить бит 0 Fast Attitude (+1: `ANG`, `RATE` и `PIDx` на частоте цикла) и `IMU_RAW`/батч-сэмплинг (`INS_LOG_BAT_MASK`) на время настройки фильтров — лог растёт в разы, после — выключить. `LOG_FILE_DSRMROT` — новый файл при каждом дизарме; `LOG_DISARMED = 1` — для наземных измерений (шум, GPS), потом выключить, иначе SD забивается.
 
 {{diagram:log-triage|С чего начинать разбор лога: симптом определяет первое сообщение — VIBE, BAT/POWR, XKF4/GPS, RATE/ATT или MODE/ERR/EV.}}
 

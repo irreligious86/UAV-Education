@@ -3,7 +3,7 @@ id: inav-setup-scratch
 title: "INAV с нуля: GPS-квадрокоптер"
 level: L2
 readingTime: 50 мин
-firmware: INAV 7/8 (проверено на 8.0.1; имена параметров совпадают в 9.x)
+firmware: INAV 7/8 (проверено на 8.0.1; имена параметров совпадают в 9.x, но часть дефолтов в 9.1 другая — Galileo и BeiDou ON, gps_ublox_nav_hz 8, веса inav_w_z_*)
 status: published
 added: 2026-11-10
 tags:
@@ -222,7 +222,7 @@ set nav_rth_altitude = 3000
 
 **7. Failsafe на столе.** Пропы сняты, АКБ подключена, пульт включён. Выключи пульт: на вкладке Receiver каналы замирают, в `status` появляется флаг `RX`, в OSD — предупреждение о failsafe. Включи пульт — флаг уходит. Армить на столе ради этого теста не нужно, процедуру RTH проверяют в поле.
 
-**8. OSD и видео.** Аналог: `osd_video_system = AUTO` или PAL. HD (DJI, Walksnail, HDZero): функция MSP_OSD на UART VTX и `osd_video_system = DJIWTF`, AVATAR или HDZERO. Минимум элементов: напряжение, мА·ч, спутники, дистанция и стрелка домой, режим полёта, LQ/RSSI. Подробно — bf-modes-osd и link-vtx.
+**8. OSD и видео.** Аналог: `osd_video_system = AUTO` или PAL. HD: функция MSP_OSD (DisplayPort, 115200) на UART воздушного модуля, `osd_video_system` — по системе: HDZero — `HDZERO` (сетка 50×18); Walksnail Avatar — `AVATAR` (53×20); DJI O4 и очки Goggles 2/3/N3/Integra на прошивке с INAV-шрифтом — `DJI_NATIVE` (53×20), а в меню очков тип OSD «INAV»; DJI O3 на стоковой прошивке — `BFHDCOMPAT` (53×20, шрифт Betaflight: часть значков будет «?», в очках включить HD-канву); старые Air Unit/Vista с очками V1/V2 под WTFOS — `DJIWTF` (60×22). Чужое значение даёт сдвинутый или пустой OSD. Если O4 на старой прошивке не видит арм — обнови очки или `set enable_broken_o4_workaround = ON`. В 9.1 значения и сетки те же. Минимум элементов: напряжение, мА·ч, спутники, дистанция и стрелка домой, режим полёта, LQ/RSSI. Подробно — bf-modes-osd и link-vtx.
 
 **9. Предполётная проверка и первое висение (пропы ставятся здесь).** Пропы проверь по направлению вращения. На площадке: 3D-фикс, не меньше 10 спутников (`gps_min_sats` = 6 — это минимум для фикса, а не для навигации), HDOP ≤ 2, дом записан. Blackbox включён. Арм в ANGLE, висение на 1–2 м 60 с. Прерывай и сажай, если:
 - аппарат трясётся или осциллирует на висении;
@@ -294,3 +294,6 @@ set nav_rth_altitude = 3000
 - INAV Controls (стики, throttle_idle, min_check) | https://github.com/iNavFlight/inav/blob/master/docs/Controls.md | primary | A
 - INAV Configurator (вкладки SITL, Mixer Wizard) | https://github.com/iNavFlight/inav-configurator | primary | A
 - INAV-X-Plane-HITL setup (только Airplane) | https://github.com/RomanLut/INAV-X-Plane-HITL/blob/main/doc/setup.md | secondary | B
+- INAV OSD (таблица HD-систем и сеток) | https://github.com/iNavFlight/inav/blob/8.0.1/docs/OSD.md | primary | A
+- INAV displayport_msp_osd.c (osd_video_system → сетка) | https://github.com/iNavFlight/inav/blob/8.0.1/src/main/io/displayport_msp_osd.c | primary | A
+- INAV 8.0.1 release notes (DJI O4, DJI_NATIVE) | https://github.com/iNavFlight/inav/releases/tag/8.0.1 | primary | A

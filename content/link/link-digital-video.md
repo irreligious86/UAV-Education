@@ -42,7 +42,7 @@ next:
 ### HD OSD: MSP DisplayPort
 В цифровых системах OSD рисуют очки или воздушный модуль, а полётник только присылает, **что** рисовать, по протоколу MSP DisplayPort через UART.
 - **Betaflight 4.4+**: UART на вкладке Ports — функция MSP для воздушного модуля (Peripherals: VTX (MSP + DisplayPort)); в CLI `set osd_displayport_device = MSP`, видеосистема `set vcd_video_system = HD`. Элементы OSD расставляются на большем холсте.
-- **INAV**: UART с MSP DisplayPort для HD OSD, тип OSD — по документации своей системы.
+- **INAV**: UART с функцией MSP_OSD (DisplayPort), `osd_video_system` — по системе: HDZERO, AVATAR (Walksnail), DJI_NATIVE (DJI O4 и очки с INAV-шрифтом), BFHDCOMPAT (DJI O3 на стоковой прошивке), DJIWTF (WTFOS); подробно — `bf-hd-osd-video`, раздел «INAV и ArduPilot — коротко».
 - **ArduPilot**: `SERIALn_PROTOCOL = 42` (DisplayPort), `OSD_TYPE = 5` (MSP DisplayPort).
 - Управление VTX (канал, мощность) у цифровых систем идёт либо через тот же MSP, либо из меню очков — VTX-таблицы аналога здесь не нужны.
 
@@ -62,7 +62,7 @@ next:
 Модель воздушного модуля и очков, версия прошивки, режимы (разрешение, частота кадров, битрейт), антенны и их поляризация, канал. Записать в паспорт аппарата.
 
 ### Шаг 2. HD OSD
-Подключить воздушный модуль к UART полётника, настроить MSP DisplayPort (Betaflight: `osd_displayport_device = MSP`, `vcd_video_system = HD`; ArduPilot: `SERIALn_PROTOCOL = 42`, `OSD_TYPE = 5`). Вывести напряжение, ток, RSSI/LQ, время полёта, предупреждения. Проверить, что элементы не перекрывают центр кадра.
+Подключить воздушный модуль к UART полётника, настроить MSP DisplayPort (Betaflight: `osd_displayport_device = MSP`, `vcd_video_system = HD`; INAV: MSP_OSD на порту и `osd_video_system` под свою систему; ArduPilot: `SERIALn_PROTOCOL = 42`, `OSD_TYPE = 5`). Вывести напряжение, ток, RSSI/LQ, время полёта, предупреждения. Проверить, что элементы не перекрывают центр кадра.
 
 ### Шаг 3. Задержка
 Метод из модуля «Камеры и видеопоток»: секундомер с миллисекундами на экране телефона, камера аппарата смотрит на него, очки (или их выход/запись) снимаются вторым телефоном вместе с исходным экраном. 10 замеров в каждом режиме (например, 60 и 100 кадр/с или два режима битрейта), медиана и максимум. Записать таблицу.

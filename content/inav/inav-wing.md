@@ -3,7 +3,7 @@ id: inav-wing
 title: "Крыло на INAV: миксер, автозапуск, autotune"
 level: L2
 readingTime: 25 мин
-firmware: INAV 7.0+
+firmware: INAV 7.0+ (сверено с 8.0.1)
 status: published
 added: 2026-11-08
 tags:
@@ -97,7 +97,7 @@ MANUAL — отдельный тумблер. ARM — отдельный. На �
   - Что сделать: порог выше, держать спокойно, проверять без пропа.
 - **Симптом:** в loiter крыло «валится» внутрь круга
   - Возможная причина: радиус мал для скорости, крен ограничен.
-  - Что сделать: `nav_fw_loiter_radius` больше, `max_angle` по расчёту V_s в вираже.
+  - Что сделать: `nav_fw_loiter_radius` больше, `nav_fw_bank_angle` (дефолт 35°) по расчёту V_s в вираже.
 
 ## references
 - INAV Mixer (platform type) | https://github.com/iNavFlight/inav/blob/master/docs/Mixer.md | primary | A

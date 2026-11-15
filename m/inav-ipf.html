@@ -55,7 +55,7 @@
       <div class="gc-prose module-body">
 <h2>Теория</h2>
 <h4 class="md-subheading">Модель</h4>
-<ul><li><strong>Logic Condition</strong> — одна строка «кода»: операция над одним-двумя операндами, с результатом true/false или числом.</li><li><strong>Операнд</strong> — число, канал RC, параметр полёта (расстояние до дома, напряжение, высота, скорость), режим, другое условие, GVAR, точка миссии.</li><li><strong>Активатор</strong> — другое условие, которое должно быть true, чтобы это выполнилось (−1 — всегда).</li><li><strong>GVAR</strong> — глобальные переменные, целые от −32768 до 32767; их можно читать, писать, увеличивать и использовать в миксере серв.</li><li><strong>Programming PID</strong> — четыре настраиваемых регулятора, выход которых доступен как операнд.</li></ul>
+<ul><li><strong>Logic Condition</strong> — одна строка «кода»: операция над одним-двумя операндами, с результатом true/false или числом.</li><li><strong>Операнд</strong> — число, канал RC, параметр полёта (расстояние до дома, напряжение, высота, скорость), режим, другое условие, GVAR, точка миссии.</li><li><strong>Активатор</strong> — другое условие, которое должно быть true, чтобы это выполнилось (−1 — всегда).</li><li><strong>GVAR</strong> — глобальные переменные, целые; по умолчанию границы −32768…32767, командой <code>gvar &lt;i&gt; &lt;default&gt; &lt;min&gt; &lt;max&gt;</code> их можно расширить (хранятся как int32); их можно читать, писать, увеличивать и использовать в миксере серв.</li><li><strong>Programming PID</strong> — четыре настраиваемых регулятора, выход которых доступен как операнд.</li></ul>
 <h4 class="md-subheading">Синтаксис CLI</h4>
 <pre class="cli-block"><code>logic &lt;rule&gt; &lt;enabled&gt; &lt;activatorId&gt; &lt;operation&gt; &lt;opA type&gt; &lt;opA value&gt; &lt;opB type&gt; &lt;opB value&gt; &lt;flags&gt;</code></pre>
 <p>Типы операндов: 0 — значение, 1 — RC-канал, 2 — параметр полёта, 3 — режим, 4 — логическое условие, 5 — GVAR, 6 — Programming PID, 7 — точки миссии. Операции: сравнения (равно, больше, меньше), логические (AND, OR, NOT), арифметика, Set/Increase/Decrease GVAR, Override Throttle Scale, Override RC Channel, Set VTX power и другие.</p>
@@ -83,10 +83,10 @@
 <h4 class="md-subheading">Шаг 1. Первая пара правил в конфигураторе</h4>
 <p>Вкладка Programming: правило 0 — <code>Flight &gt; Home distance (m)</code> больше <code>100</code>; правило 1 — активатор 0, операция <code>Set VTX Power</code>, значение 3. Сохранить, проверить вкладку: состояние условий показывается вживую.</p>
 <h4 class="md-subheading">Шаг 2. То же в CLI</h4>
-<pre class="cli-block"><code>logic 0 1 -1 2 2 &lt;home_distance_operand_id&gt; 0 100 0
-logic 1 1 0  &lt;set_vtx_power_op_id&gt; 0 3 0 0 0
+<pre class="cli-block"><code>logic 0 1 -1 2 2 1 0 100 0
+logic 1 1 0 25 0 3 0 0 0
 save</code></pre>
-<p>Номера операций и операндов — из таблиц в документации Programming Framework для своей версии: они меняются между релизами, поэтому в модуле не зашиты.</p>
+<p>Формат: <code>logic &lt;правило&gt; &lt;вкл&gt; &lt;активатор&gt; &lt;операция&gt; &lt;тип A&gt; &lt;значение A&gt; &lt;тип B&gt; &lt;значение B&gt; &lt;флаги&gt;</code>. Здесь операция 2 — GREATER_THAN, 25 — SET_VTX_POWER_LEVEL, операнд полёта 1 — расстояние до дома (м). Номера взяты из <code>programming/logic_condition.h</code> 8.0.1; в 9.1 они те же (новые операции и операнды только добавлены в конец), но перед вставкой сверяйся с документацией Programming Framework своей версии.</p>
 <h4 class="md-subheading">Шаг 3. GVAR как состояние</h4>
 <p>Правило: по срабатыванию тумблера увеличить GVAR 1 на 1; другое правило — если GVAR 1 чётная, включить свет, иначе выключить. Это конечный автомат на двух строках.</p>
 <h4 class="md-subheading">Шаг 4. Таблица истинности до полёта</h4>

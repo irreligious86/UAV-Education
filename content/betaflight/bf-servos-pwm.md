@@ -131,7 +131,7 @@ DShot бывает двух видов. **Timer + DMA**: каждый мотор
 ### INAV и ArduPilot для сравнения
 | Задача | Betaflight 4.5 | INAV 8 | ArduPilot 4.6 |
 |---|---|---|---|
-| назначить выход | `resource SERVO n <pin>` + миксер/фича | вкладка Mixer, `timer_output_mode <timer> AUTO\|MOTORS\|SERVOS` | `SERVOn_FUNCTION` (7 — тилт подвеса, 8 — крен) |
+| назначить выход | `resource SERVO n <pin>` + миксер/фича | вкладка Mixer, `timer_output_mode <timer> AUTO\|MOTORS\|SERVOS\|LED` | `SERVOn_FUNCTION` (7 — тилт подвеса, 8 — крен) |
 | конечные точки | `servo i min max mid rate fwd` | `servo n min max middle rate` | `SERVOn_MIN/MAX/TRIM`, `SERVOn_REVERSED` |
 | микшер | `smix … min max box`, только самолётные миксеры | `smix rule servo source rate speed conditionId` на любой платформе | функции выходов, без smix |
 | частота | `servo_pwm_rate` 50 (50–498) | `servo_pwm_rate` 50 (50–498) | `SERVO_RATE` 50 (25–400) |

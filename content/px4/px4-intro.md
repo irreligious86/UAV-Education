@@ -3,7 +3,7 @@ id: px4-intro
 title: "Введение в PX4"
 level: L2
 readingTime: 20 мин
-firmware: PX4 1.14+
+firmware: PX4 1.14+ (умолчания сверены с v1.15.4)
 status: published
 added: 2026-11-08
 tags:
@@ -58,14 +58,14 @@ QGroundControl: прошивка, выбор airframe, калибровки, п�
 3. **Радио**: калибровка стиков, `RC_MAP_*`; режимы на тумблерах (Flight Modes), kill switch — обязателен на тестах.
 4. **Моторы**: Actuators — назначение выходов, протокол (DShot/PWM — по группам таймеров в Actuators, `PWM_MAIN_TIMx`), тест каждого **без пропов**, направление по схеме airframe.
 5. **Питание**: `BAT1_N_CELLS`, калибровка делителя напряжения и тока по мультиметру/ваттметру, пороги `BAT_LOW_THR`/`BAT_CRIT_THR`.
-6. **Safety**: действия при потере RC (`COM_RC_LOSS_T` = 0.5 с по умолчанию, `NAV_RCL_ACT`), потере данных (`NAV_DLL_ACT`), низкой АКБ (`COM_LOW_BAT_ACT`), геозона (`GF_*`), высота возврата `RTL_RETURN_ALT`.
+6. **Safety**: действия при потере RC (`COM_RC_LOSS_T` = 0.5 с по умолчанию, `NAV_RCL_ACT`), потере канала данных с GCS (`NAV_DLL_ACT`, по умолчанию 0 — выключено, включают сами), низкой АКБ (`COM_LOW_BAT_ACT`), геозона (`GF_*`), высота возврата `RTL_RETURN_ALT`.
 Пред-армовые проверки сообщаются в QGC текстом («Preflight Fail: …»); `CBRK_*` circuit breakers отключают их только на стенде.
 
 ### Параметры: как они устроены
 Имена — группами по модулю: `MC_*` (контроллеры мультиротора), `MPC_*` (позиция), `EKF2_*`, `IMU_*`, `COM_*` (commander/failsafe), `NAV_*`, `RTL_*`, `BAT*`, `CA_*` (control allocation), `SER_*`/`MAV_*`/`UXRCE_*` (порты). Полный справочник с диапазонами и умолчаниями — «Parameter Reference» в документации (генерируется из исходников, как у ArduPilot). Экспорт/импорт — QGC → Parameters → Tools (файл `.params`), версионируется (модуль «CI»).
 
 ### Числа для ориентира (умолчания, мультиротор)
-Внутренний контур на `IMU_GYRO_RATEMAX` = 400 Гц (до 1 кГц на быстрых платах); фильтр гироскопа `IMU_GYRO_CUTOFF` = 40 Гц, D-term `IMU_DGYRO_CUTOFF` = 20 Гц — заметно ниже Betaflight: PX4 рассчитан на более крупные и медленные аппараты, для 5" их поднимают (80–120 / 40–60) вместе с notch по ESC (`IMU_GYRO_DNF_EN`, нужен DShot-телеметрия). Максимальный наклон `MPC_TILTMAX_AIR` = 45°, в ручных режимах `MPC_MAN_TILT_MAX` = 35°; максимальная скорость `MPC_XY_VEL_MAX` = 12 м/с.
+Значения — для PX4 1.14–1.16 (сверено с v1.15.4), отличия 1.17 помечены. Внутренний контур на `IMU_GYRO_RATEMAX` = 800 Гц: у самого параметра умолчание 400, но airframe мультиротора поднимает его до 800 (`rc.mc_defaults`); максимум — 2000 Гц. Фильтр гироскопа `IMU_GYRO_CUTOFF` = 40 Гц, D-term `IMU_DGYRO_CUTOFF` = 30 Гц (с 1.17 — 20) — заметно ниже Betaflight: PX4 рассчитан на более крупные и медленные аппараты, для 5" их поднимают (80–120 / 40–60) вместе с notch по ESC (`IMU_GYRO_DNF_EN`, нужна телеметрия оборотов ESC: в 1.15 — по UART, bidirectional DShot — с 1.16). Максимальный наклон `MPC_TILTMAX_AIR` = 45°, в ручных режимах `MPC_MAN_TILT_MAX` = 35°; максимальная скорость `MPC_XY_VEL_MAX` = 12 м/с.
 
 ### Логи ULog и Flight Review
 Лог включается при арме (`SDLOG_MODE`), содержит топики uORB с заданной частотой (`SDLOG_PROFILE` — профили: по умолчанию, высокая частота для тюнинга, ...). Flight Review (веб) рисует: отклик rate (setpoint vs actual), спектр вибраций (acceleration power spectral density — по нему видно моторы и резонансы), оценку GPS/EKF (innovation test ratios — те же «ворота», что в модуле про Калмана), загрузку CPU и RAM, потери RC. `pyulog` (`ulog2csv`) — для Python-анализа (модуль «Python для данных»).

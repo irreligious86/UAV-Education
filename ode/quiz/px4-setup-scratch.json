@@ -3,7 +3,7 @@
  "pass": 80,
  "questions": [
   {
-   "q": "ELRS-приёмник нужно подключить к Pixhawk 6X на TELEM2 через драйвер rc_input. Что делаешь перед RC_PORT_CONFIG = TELEM 2?",
+   "q": "На Pixhawk 6X TELEM2 занимал companion по MAVLink (MAV_1_CONFIG = TELEM 2), теперь туда подключают ELRS-приёмник через драйвер rc_input. Что делаешь перед RC_PORT_CONFIG = TELEM 2?",
    "options": [
     "MAV_1_CONFIG = Disabled",
     "SER_TEL2_BAUD = 420000",
@@ -11,7 +11,7 @@
     "COM_RC_IN_MODE = 1"
    ],
    "answer": 0,
-   "explain": "По умолчанию TELEM2 занят MAVLink (MAV_1_CONFIG). Два драйвера на одном порту PX4 не запрещает, поэтому порт сначала освобождают. Скорость CRSF выставляет драйвер, 2 в RC_INPUT_PROTO — это SBUS, а COM_RC_IN_MODE = 1 — «только джойстик»."
+   "explain": "На этом аппарате TELEM2 занят MAVLink для companion (MAV_1_CONFIG = TELEM 2; на чистой прошивке умолчание 0 = Disabled). Два драйвера на одном порту PX4 не запрещает, поэтому порт сначала освобождают. Скорость CRSF выставляет драйвер, 2 в RC_INPUT_PROTO — это SBUS, а COM_RC_IN_MODE = 1 — «только джойстик»."
   },
   {
    "q": "QGC показывает 16.42 В, мультиметр на разъёме АКБ — 16.71 В, BAT1_V_DIV = 18.000. Какое новое значение?",
@@ -58,7 +58,7 @@
    "explain": "Потеря фиксируется по COM_RC_LOSS_T = 0.5 с, затем Hold на COM_FAIL_ACT_T = 5 с, затем NAV_RCL_ACT = 2 (Return). В журнале модуля: Hold на 39.4 с, RTL на 44.5 с."
   },
   {
-   "q": "Аппарат в висении (газ 0.49), напряжение 14.4 В на 4S, BAT1_V_EMPTY 3.6, BAT1_V_CHARGED 4.05, BAT1_V_LOAD_DROP 0.1, датчика тока нет. Какой уровень предупреждения при умолчаниях порогов?",
+   "q": "PX4 1.15. Аппарат в висении (газ 0.49), напряжение 14.4 В на 4S, BAT1_V_EMPTY 3.6, BAT1_V_CHARGED 4.05, BAT1_V_LOAD_DROP 0.1, датчика тока нет. Какой уровень предупреждения при умолчаниях порогов?",
    "kind": "apply",
    "fragment": "BAT_LOW_THR      0.15\nBAT_CRIT_THR     0.07\nBAT_EMERGEN_THR  0.05\nbattery_status.voltage_v = 14.40\nvehicle_thrust_setpoint |xyz| = 0.49",
    "options": [

@@ -27,7 +27,7 @@ ArduPilot умеет выполнять Lua-скрипты прямо на по�
 - Каждый скрипт работает в своей «песочнице» и с низким приоритетом: полётный код важнее, точного расписания скрипту никто не обещает.
 - Память для скриптов задаёт `SCR_HEAP_SIZE`. Мало — скрипты падают и появляется pre-arm ошибка о нехватке памяти. Много — может не инициализироваться EKF.
 - Если один скрипт упал с ошибкой, останавливается только он. Если кончилась общая память скриптов (или паника), останавливаются все скрипты до перезагрузки.
-- Скриптинг требует минимум 2 МБ флеша и не работает на F4-контроллерах.
+- Скриптинг собирается только для плат с флешем больше 1 МБ (`AP_Scripting_config.h`): на F405/F411 с 1 МБ его нет, F427/F429 с 2 МБ (Pixhawk 1, Cube Black), F7 и H7 — с ним.
 
 ### Паттерн update()
 Скрипт — это функция `update()`, которая делает работу и возвращает себя и задержку в миллисекундах до следующего вызова. Никаких бесконечных циклов: планировщик сам вызывает функцию снова.
@@ -42,7 +42,7 @@ ArduPilot умеет выполнять Lua-скрипты прямо на по�
 Чтение состояния: `ahrs:get_position()`, `ahrs:get_velocity_NED()`, `ahrs:get_yaw()`, `gps:num_sats()`, `battery:voltage()`, `rangefinder:distance_orient()` (в метрах; `distance_cm_orient` устарел), `esc_telem:get_rpm()`, `vehicle:get_mode()`, `arming:is_armed()`; действие: `vehicle:set_mode()`, `vehicle:set_target_velocity_NED()`, `vehicle:set_target_location()`, `mission:set_current_cmd()`, `SRV_Channels:set_output_pwm()`, `relay:on()`, `param:set()`/`param:add_param()` (свои параметры с префиксом), `gcs:send_text()`, `logger:write()` (свои лог-сообщения!), `notify:play_tune()`, `rc:get_aux_cached()` (тумблер `RCx_OPTION = 300..307` Scripting1..8), `serial:find_serial()` (свой протокол на UART), `CAN:get_device()` (DroneCAN), `periph` на AP_Periph. Таймеры — возврат `update, 100` (мс до следующего вызова). Параметры скриптинга: `SCR_ENABLE`, `SCR_HEAP_SIZE` (память; на F4 не хватает → только H7/F7 с запасом), `SCR_VM_I_COUNT` (лимит инструкций на вызов — защита от зависания), `SCR_DEBUG_OPTS`.
 
 ### Applets как учебник
-`libraries/AP_Scripting/applets/` — готовые, с `.md`-описанием: `motor_failure_test.lua` (останавливает моторы по битмаске `MOT_STOP_BITMASK` тумблером Scripting1 — тест отказа мотора на гексе/X8 в SITL и в поле), `VTOL-quicktune.lua` (QuikTune для мультикоптеров и VTOL), `rover-quicktune.lua`, `copter-deadreckon-home.lua` (возврат по счислению при потере GPS), `arming-checks.lua` (свои пред-армовые проверки), `ahrs-source-extnav-optflow.lua` (переключение источников EKF по качеству), `BattEstimate.lua`, `MissionSelector.lua`, `net_webserver.lua`, `crsf-calibrate.lua`, `SmartAudio.lua`. Читать их — лучший способ выучить API и стиль (защитные проверки, `pcall`-подобные обёртки, параметры через `param:add_table`).
+`libraries/AP_Scripting/applets/` — готовые, с `.md`-описанием: `motor_failure_test.lua` (останавливает моторы по битмаске `MOT_STOP_BITMASK` тумблером Scripting1 — тест отказа мотора на гексе/X8 в SITL и в поле), `VTOL-quicktune.lua` (QuikTune для мультикоптеров и VTOL), `rover-quicktune.lua`, `copter-deadreckon-home.lua` (возврат по счислению при потере GPS), `arming-checks.lua` (свои пред-армовые проверки), `ahrs-source-extnav-optflow.lua` (переключение источников EKF по качеству), `BattEstimate.lua`, `MissionSelector.lua`, `net_webserver.lua`, `crsf-calibrate.lua` (появился в 4.7, в 4.6.3 его нет), `SmartAudio.lua`. Читать их — лучший способ выучить API и стиль (защитные проверки, `pcall`-подобные обёртки, параметры через `param:add_table`).
 
 ### Разобранный пример: защита по температуре ESC
 ```lua
@@ -154,5 +154,5 @@ return update, 1000
 - Скриптинг включён в SITL, тестовый скрипт отвечает на тумблер
 - Applet отказа мотора настроен и проверен на octa-quad
 - Каждый хаос-скрипт на своём тумблере
-- Понимаю, почему на F4 скриптинга нет
+- Понимаю, почему на F405 (1 МБ флеша) скриптинга нет
 - Скрипты с `SIM_*` не попадают на реальный аппарат
