@@ -234,8 +234,10 @@ Rough size: an iteration of 4–5 modules ≈ 25–30k words of Russian source p
    (History: 2026-11-10 Russian only, localisation later; 2026-11-15 morning ru+uk together — withdrawn.)
 
 5. Firmware versions (Alex, 2026-11-17): the course targets **today's stable releases** — by release tags
-   on 2026-11-17: ArduCopter/ArduPlane 4.7.2, PX4 1.17.0, INAV 9.1.0, Betaflight 2026.6.2 (to be confirmed
-   as the stable line from the release notes), ExpressLRS 4.1.0. Rules:
+   on 2026-11-17: ArduCopter/ArduPlane 4.7.2, PX4 1.17.0, INAV 9.1.0, Betaflight **2025.12** (Alex, 2026-11-17: treat the 2025.12 line as
+   the stable one, latest patch 2025.12.5; **4.5.3** is the significant release before it and the one renames
+   are mapped from; the 2026.6 tags are not the course's target — mention them only where a student would
+   trip over a difference), ExpressLRS 4.1.0. Rules:
    - Every parameter, default, command and procedure is given for the current stable release.
    - **Fallback:** where reliable information exists only for an older release (source not readable, feature
      undocumented in the new one, lab only reproducible on the old one), the older information is used and
@@ -246,6 +248,8 @@ Rough size: an iteration of 4–5 modules ≈ 25–30k words of Russian source p
      an older guide can map it. Each firmware track keeps one migration table (old → new, with the version
      where it changed) and modules link to it.
    - The front matter `firmware:` field states the release the module was verified against.
+   - Betaflight 4.5 patch levels: the existing modules were verified on tag 4.5.5 / branch 4.5.6; differences
+     inside 4.5.x that matter (e.g. `noreboot` from 4.5.4) are stated with the patch number.
 
 ## 5a. Original questions
 
