@@ -1,6 +1,6 @@
-# Theory completion plan (proposal for approval, 2026-11-17)
+# Theory completion plan (approved 2026-11-17)
 
-**Status: proposed — nothing here is started until Alex approves it.**
+**Status: approved by Alex on 2026-11-17 ("at your discretion") — phases, wave order and scope as written; the C-priority backlog stays out. Progress is tracked in §9.**
 
 Goal (Alex, 2026-11-17): no holes in the theory first; practice is raised to the same level afterwards.
 Language: Russian only until the content is complete (decision 4 in `COURSE-PLAN-STAGE6.md`). Firmware
@@ -161,3 +161,9 @@ Phase 2 is not estimated yet; SITL labs cost roughly as much again per module.
    the course's home region)?
 3. The C-priority backlog stays out — confirm.
 4. Phase 0 first (recommended, so that new modules are written once, for the target releases) — confirm.
+
+## 9. Progress
+
+| Wave | State |
+|---|---|
+| 0 — migration M1–M5, immediate corrections | in progress (started 2026-11-17) |
