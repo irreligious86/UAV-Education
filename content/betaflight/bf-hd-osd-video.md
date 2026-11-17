@@ -3,7 +3,7 @@ id: bf-hd-osd-video
 title: "Цифровое видео на Betaflight: DJI, Walksnail, HDZero — подключение, OSD и настройка"
 level: L2
 readingTime: 50 мин
-firmware: Betaflight 2025.12 (сверено с 2025.12.5); лабораторная снята на исходнике 4.5.6 · INAV 8 · ArduPilot 4.7 (сверено с 4.7.2)
+firmware: Betaflight 2025.12 (сверено с 2025.12.5); лабораторная снята на исходнике 4.5.6 · INAV 9.1 (сверено с 9.1.0) · ArduPilot 4.7 (сверено с 4.7.2)
 status: published
 added: 2026-11-14
 tags:
@@ -109,14 +109,14 @@ next: []
 EIRP по спецификациям. DJI O3/O4 Pro: FCC < 33 дБм (≈ 2 Вт), CE < 14 дБм (25 мВт), SRRC < 30 дБм. Walksnail: FCC < 30 дБм (Mini V3 — < 27 дБм), CE < 14 дБм, MIC < 25 дБм, а каналы 1, 2, 6, 7 в FCC-регионах попадают в любительский диапазон. HDZero: 25/200 мВт, 500 мВт и 1 Вт — только по любительской лицензии и отдельной прошивке. Режим (FCC/CE) выбирают в очках по правилам своей страны. В ЕС разрешён только CE, < 14 дБм. Больше мощности — больше нагрева и помех соседям, а дальности добавляет мало (`rf-link-budget`).
 
 ### INAV и ArduPilot — коротко
-| | Betaflight 2025.12 | INAV 8 | ArduPilot 4.7 |
+| | Betaflight 2025.12 | INAV 9.1 | ArduPilot 4.7 |
 |---|---|---|---|
 | Функция порта | VTX (MSP + DisplayPort), маска 131073 | MSP DisplayPort (`FUNCTION_MSP_OSD` = 1 << 25) | `SERIALn_PROTOCOL = 42` (DisplayPort); 33 — старый «DJI FPV» |
 | Тип OSD | `osd_displayport_device = MSP` | выбор порта | `OSD_TYPE = 5` (MSP_DISPLAYPORT); 3 — MSP |
 | Сетка | `vcd_video_system = HD`, канва от очков | `osd_video_system` = HDZERO, DJIWTF, AVATAR, BF43COMPAT, BFHDCOMPAT, DJI_NATIVE | задаёт полётник, на каждый экран: `OSDn_TXT_RES` 0 — 30×16 (по умолчанию: HD-очки покажут SD-сетку), 1 — 50×18, 2 — 60×22; `MSP_OPTIONS` бит 2 — символы Betaflight |
 | Скорость | 115200 | 115200 | `SERIALn_BAUD = 115` |
 
-Какое значение INAV 8 (в 9.1 так же) ставить под систему: HDZero — HDZERO (50×18), Walksnail — AVATAR (53×20), DJI O4 и очки с INAV-шрифтом — DJI_NATIVE (53×20, в очках тип OSD «INAV»), DJI O3 на стоковой прошивке — BFHDCOMPAT (53×20, шрифт Betaflight, часть значков «?»), Air Unit/Vista под WTFOS — DJIWTF (60×22), старый DJI без WTFOS — BF43COMPAT (30×16).
+Какое значение INAV 9.1 (в 8.0.1 так же) ставить под систему: HDZero — HDZERO (50×18), Walksnail — AVATAR (53×20), DJI O4 и очки с INAV-шрифтом — DJI_NATIVE (53×20, в очках тип OSD «INAV»), DJI O3 на стоковой прошивке — BFHDCOMPAT (53×20, шрифт Betaflight, часть значков «?»), Air Unit/Vista под WTFOS — DJIWTF (60×22), старый DJI без WTFOS — BF43COMPAT (30×16).
 
 Номера битов в масках у прошивок разные: 131072 в INAV — это `FUNCTION_VTX_FFPV`. Строки `serial` между прошивками не копируют.
 

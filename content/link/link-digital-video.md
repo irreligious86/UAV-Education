@@ -3,7 +3,7 @@ id: link-digital-video
 title: "Цифровое FPV-видео: DJI, Walksnail, HDZero, OpenIPC"
 level: L2
 readingTime: 30 мин
-firmware: Betaflight 2025.12 (сверено с 2025.12.5) · INAV 7+ · ArduPilot 4.5+
+firmware: Betaflight 2025.12 (сверено с 2025.12.5) · INAV 9.1 (сверено с 9.1.0) · ArduPilot 4.5+
 status: published
 tags:
   - цифровое видео

@@ -129,7 +129,7 @@ DShot бывает двух видов. **Timer + DMA**: каждый мотор
 | `timer show`, `timer <pin> list`, `dma show` | — | — | карта таймеров, AF ножки, потоки DMA |
 
 ### INAV и ArduPilot для сравнения
-| Задача | Betaflight 2025.12 | INAV 8 | ArduPilot 4.6 |
+| Задача | Betaflight 2025.12 | INAV 9.1 | ArduPilot 4.6 |
 |---|---|---|---|
 | назначить выход | `resource SERVO n <pin>` + миксер/фича | вкладка Mixer, `timer_output_mode <timer> AUTO\|MOTORS\|SERVOS\|LED` | `SERVOn_FUNCTION` (7 — тилт подвеса, 8 — крен) |
 | конечные точки | `servo i min max mid rate fwd` | `servo n min max middle rate` | `SERVOn_MIN/MAX/TRIM`, `SERVOn_REVERSED` |
@@ -328,7 +328,7 @@ speed 10, PID 8000 Hz: 0 -> 500 (1500 -> 2000 us) in 50 loops =    6.2 ms
 - Servos & Servo Tilt — Betaflight docs | https://betaflight.com/docs/wiki/guides/current/Servos-And-SERVO_TILT-for-3-1 | primary | B
 - Mixer (servo and smix sections) — Betaflight docs | https://betaflight.com/docs/wiki/guides/current/Mixer | primary | C
 - Cloud Build API (build options SERVOS, WING) — Betaflight docs | https://betaflight.com/docs/development/API/Cloud-Build-API | primary | B
-- INAV 8.0.1 settings.yaml (servo_pwm_rate, servo_lpf_hz) | https://raw.githubusercontent.com/iNavFlight/inav/8.0.1/src/main/fc/settings.yaml | primary | B
+- INAV 9.1.0 settings.yaml (servo_pwm_rate, servo_lpf_hz) | https://raw.githubusercontent.com/iNavFlight/inav/9.1.0/src/main/fc/settings.yaml | primary | B
 - ArduPilot SRV_Channels.cpp, ArduCopter-stable (SERVO_RATE) | https://raw.githubusercontent.com/ArduPilot/ardupilot/ArduCopter-stable/libraries/SRV_Channel/SRV_Channels.cpp | primary | B
 - MG996R datasheet — Tower Pro (stall current 2.5 A at 6 V) | https://people.ece.cornell.edu/land/courses/ece4760/FinalProjects/f2017/kmv48_rp625/kmv48_rp625/kmv48_rp625/MG996RTowerPro.pdf | secondary | B
 

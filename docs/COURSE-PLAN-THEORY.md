@@ -174,6 +174,6 @@ Phase 2 is not estimated yet; SITL labs cost roughly as much again per module.
 
 | Wave | State |
 |---|---|
-| 0 — migration M1–M5, immediate corrections | corrections published; M1 ArduPilot, M2 Betaflight, M3 PX4, M5 ELRS published 2026-11-18 (reports `docs/reviews/migration-*-2026-11.md`); M4 INAV in progress; independent fact-check of the migrations pending |
+| 0 — migration M1–M5, immediate corrections | corrections published; M1 ArduPilot, M2 Betaflight, M3 PX4, M5 ELRS published 2026-11-18 (reports `docs/reviews/migration-*-2026-11.md`); M4 INAV published 2026-11-18; independent fact-check of the migrations pending |
 | «Системность» criterion in rubrics | done 2026-11-18 (`411ae49`) |
 | «Место в системе» block in 140 modules | approved 2026-11-18, starts after wave 0 |

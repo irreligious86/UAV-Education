@@ -144,7 +144,7 @@ LR1121 — радиочип, работающий и на 900 МГц, и на 2.
 |---|---|
 | ArduPilot | `SERIALn_PROTOCOL = 2` (MAVLink2), `SERIALn_BAUD = 460`, `RSSI_TYPE = 5` (TelemetryRadioRSSI); потоки `MAVn_*` (до 4.7 — `SRn_*`) этого порта = 1, кроме `MAVn_ADSB`, `MAVn_PARAMS` и `MAVn_RAW_CTRL` = 0 |
 | PX4 | скорость порта 460800 8N1 (`SER_TELn_BAUD`), `MAV_0_CONFIG` = этот порт, `MAV_0_RATE` = 9600 Б/с |
-| INAV 8+ | Ports: телеметрия MAVLink, 460800, RX Serial выключен; Receiver: `SERIAL`, провайдер MAVLink; `set mavlink_radio_type = ELRS`. Только мониторинг, не полная настройка |
+| INAV 8+ (сверено с 9.1.0) | Ports: телеметрия MAVLink, 460800, RX Serial выключен; Receiver: `SERIAL`, провайдер MAVLink; `set mavlink_radio_type = ELRS`. Только мониторинг, не полная настройка |
 | Betaflight 2025.12+ | Ports: Serial RX включён, Telemetry Output = MAVLink, 460800; провайдер приёмника `MAVLINK` |
 
 Обычный CRSF-режим для ArduPilot — другие значения: `SERIALn_PROTOCOL = 23` (RCIN), `RSSI_TYPE = 3`, в `RC_OPTIONS` биты 9 (не сообщать о частоте ELRS) и 13 (420 кбод), при ложном определении протокола — `RC_PROTOCOLS = 512` (бит 9, CRSF); пошагово — модуль ap-setup-scratch.
