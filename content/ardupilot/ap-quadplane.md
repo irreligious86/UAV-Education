@@ -3,7 +3,7 @@ id: ap-quadplane
 title: "QuadPlane и tilt-rotor VTOL"
 level: L3
 readingTime: 30 мин
-firmware: ArduPlane 4.5+
+firmware: ArduPlane 4.7 (сверено с 4.7.2)
 status: published
 added: 2026-11-07
 tags:
@@ -65,7 +65,7 @@ Tilt-rotor VTOL взлетает как мультиротор и летит к�
 ### Переходы: параметры, которые определяют безопасность
 - **Вперёд** (VTOL → крыло): в режимах крыла с `Q_ENABLE` аппарат держится VTOL-моторами, пока airspeed не достигнет `AIRSPEED_MIN` (минимальная скорость крыла; до 4.5 — `ARSPD_FBW_MIN`) или не пройдёт `Q_TRANSITION_MS` (мс, при отсутствии airspeed — по времени); тилт-моторы наклоняются с `Q_TILT_RATE_UP`. Слишком маленький `AIRSPEED_MIN` относительно V_s (модуль «Аэродинамика крыла») = сваливание сразу после перехода.
 - **Назад** (крыло → VTOL): при переходе в Q-режимы VTOL-моторы включаются сразу; `Q_TRANS_DECEL` (м/с²) задаёт торможение; `Q_ASSIST_SPEED` (м/с) — ниже этой скорости в самолётных режимах VTOL-моторы помогают автоматически (assist) — защита от сваливания; `Q_ASSIST_ANGLE`, `Q_ASSIST_ALT` — помощь при большом крене/низко.
-- **VTOL-контур**: `Q_A_RAT_*` (rate PID VTOL), `Q_A_ANG_*`, `Q_P_*` (позиция), `Q_M_THST_HOVER`, `Q_M_SPIN_MIN/ARM`, `Q_WVANE_*` (флюгирование на ветер). QAUTOTUNE — для VTOL-части; TECS, `RLL_RATE_*`/`PTCH_RATE_*` (rate PID крыла) и `RLL2SRV_*`/`PTCH2SRV_*` (`TCONST`, `RMAX`) — для крыла.
+- **VTOL-контур**: `Q_A_RAT_*` (rate PID VTOL), `Q_A_ANG_*`, `Q_P_*` (позиция; в 4.7 — `Q_P_NE_*` и `Q_P_D_*` вместо `Q_P_POSXY/VELXY/POSZ/VELZ/ACCZ_*` из 4.6), `Q_M_THST_HOVER`, `Q_M_SPIN_MIN/ARM`, `Q_WVANE_*` (флюгирование на ветер). QAUTOTUNE — для VTOL-части; TECS, `RLL_RATE_*`/`PTCH_RATE_*` (rate PID крыла) и `RLL2SRV_*`/`PTCH2SRV_*` (`TCONST`, `RMAX`) — для крыла.
 - **Посадка**: `Q_LAND_FINAL_SPD` (м/с), `Q_LAND_FINAL_ALT`; RTL как VTOL (`Q_RTL_MODE`) или по-самолётному с переходом в QLAND у дома.
 
 {{diagram:quadplane-transition|Переход VTOL → крыло: VTOL-моторы держат аппарат, пока не набрана AIRSPEED_MIN или не истёк Q_TRANSITION_MS.}}

@@ -135,7 +135,7 @@ print("bias:", est[-1, 2].round(3), "RMS h error:", np.sqrt(np.mean((est[:, 0] -
 ## references
 - ArduPilot — EKF overview and lanes | https://ardupilot.org/copter/docs/common-apm-navigation-extended-kalman-filter-overview.html | primary | A
 - ArduPilot — EKF3 source (AP_NavEKF3, state vector and fusion) | https://github.com/ArduPilot/ardupilot/tree/master/libraries/AP_NavEKF3 | primary | A
-- PX4 — ECL EKF tuning (innovations, gates, noise parameters) | https://docs.px4.io/main/en/advanced_config/tuning_the_ecl_ekf.html | primary | A
+- PX4 — ECL EKF tuning (innovations, gates, noise parameters) | https://docs.px4.io/v1.17/en/advanced_config/tuning_the_ecl_ekf.html | primary | A
 - Welch, Bishop — An Introduction to the Kalman Filter (UNC TR 95-041) | https://www.cs.unc.edu/~welch/media/pdf/kalman_intro.pdf | secondary | A
 - R. Labbe — Kalman and Bayesian Filters in Python (open book, notebooks) | https://github.com/rlabbe/Kalman-and-Bayesian-Filters-in-Python | secondary | A
 

@@ -41,7 +41,7 @@ def topic(base, msg_cls):
 ### Правила Offboard
 1. Внешний контроллер обязан непрерывно слать `OffboardControlMode` (какие уставки активны: position, velocity, acceleration, attitude, body_rate…) с частотой **выше 2 Гц** — это «доказательство жизни». Реальные уставки — в `TrajectorySetpoint` (position/velocity/acceleration/yaw, неиспользуемые поля = NaN).
 2. Поток должен идти **до** переключения в Offboard (и до арминга в Offboard), иначе PX4 откажет.
-3. Если поток прервался дольше `COM_OF_LOSS_T`, PX4 выходит из Offboard и переключается в режим из `COM_OBL_RC_ACT` (Position, Altitude, Manual, Return, Land).
+3. Если поток прервался дольше `COM_OF_LOSS_T`, PX4 выходит из Offboard и переключается в режим из `COM_OBL_RC_ACT` (Position, Altitude, Stabilized, Return, Land, Hold, Terminate, Disarm; значение 2 до 1.16 называлось Manual). В 1.17 при выборе Position, Altitude или Stabilized без ручного управления выполняется `NAV_RCL_ACT`.
 4. Команды — `VehicleCommand` в `/fmu/in/vehicle_command`: арм `VEHICLE_CMD_COMPONENT_ARM_DISARM` (param1 = 1), режим `VEHICLE_CMD_DO_SET_MODE` (param1 = 1 — custom, param2 = 6 — Offboard), посадка `VEHICLE_CMD_NAV_LAND`. Подтверждение — в `/fmu/out/vehicle_command_ack`; состояние — `VehicleStatus.arming_state`, `nav_state`.
 5. Координаты в `TrajectorySetpoint` — **NED, локальные**, начало — точка инициализации EKF; высота отрицательная.
 
@@ -101,10 +101,10 @@ ros2 launch uav_ros2_labs px4_square.launch.py
   - Что сделать: распознать вмешательство и прекратить команды (состояние DONE).
 
 ## references
-- PX4 — ROS 2 user guide | https://docs.px4.io/main/en/ros2/user_guide.html | primary | A
-- PX4 — uXRCE-DDS middleware | https://docs.px4.io/main/en/middleware/uxrce_dds.html | primary | A
-- PX4 — Offboard mode (2 Hz proof of life, COM_OF_LOSS_T) | https://docs.px4.io/main/en/flight_modes/offboard.html | primary | A
-- PX4 — ROS 2 message translation node (versioned topics) | https://docs.px4.io/main/en/ros2/px4_ros2_msg_translation_node.html | primary | A
+- PX4 — ROS 2 user guide | https://docs.px4.io/v1.17/en/ros2/user_guide.html | primary | A
+- PX4 — uXRCE-DDS middleware | https://docs.px4.io/v1.17/en/middleware/uxrce_dds.html | primary | A
+- PX4 — Offboard mode (2 Hz proof of life, COM_OF_LOSS_T) | https://docs.px4.io/v1.17/en/flight_modes/offboard.html | primary | A
+- PX4 — ROS 2 message translation node (versioned topics) | https://docs.px4.io/v1.17/en/ros2/px4_ros2_msg_translation_node.html | primary | A
 - PX4 — px4_msgs | https://github.com/PX4/px4_msgs | primary | A
 
 ## checklist

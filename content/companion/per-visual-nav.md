@@ -87,7 +87,7 @@ ArduPilot SITL: скрипт pymavlink, публикующий `VISION_POSITION_
 
 ## references
 - ArduPilot — Non-GPS Navigation (landing page: VIO cameras, ExternalNav) | https://ardupilot.org/copter/docs/common-non-gps-navigation-landing-page.html | primary | A
-- PX4 — Using Vision or Motion Capture Systems for Position Estimation (EKF2_EV_*) | https://docs.px4.io/main/en/ros/external_position_estimation.html | primary | A
+- PX4 — Using Vision or Motion Capture Systems for Position Estimation (EKF2_EV_*) | https://docs.px4.io/v1.17/en/ros/external_position_estimation.html | primary | A
 - OpenVINS — repository and documentation (VIO, calibration requirements) | https://github.com/rpng/open_vins | primary | A
 
 ## checklist

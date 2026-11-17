@@ -58,15 +58,15 @@
    "explain": "writeServos() сначала пишет servo[0] и servo[1] подвеса, затем forwardAuxChannelsToServos(servoIndex) с индекса 2, то есть SERVO 3."
   },
   {
-   "q": "Прошивка собрана в Configurator через Cloud Build для F405, в CLI нет команд `servo` и `smix`. Почему?",
+   "q": "Прошивка 2025.12 собрана в Betaflight App через Cloud Build для F405, в CLI нет команд `servo` и `smix`. Почему?",
    "options": [
     "USE_SERVOS стоит в блоке common_pre.h только для некоудовых сборок; в облачной нужна опция SERVOS",
-    "Команды servo и smix в 4.5 перенесли во вкладку Servos Configurator, из CLI они удалены совсем",
-    "Сервы в Betaflight 4.5 поддерживаются только на F7/H7, у F405 не хватает таймеров для серв",
+    "Команды servo и smix в 2025.12 перенесли во вкладку Servos приложения, из CLI они удалены совсем",
+    "Сервы в Betaflight 2025.12 поддерживаются только на F7/H7, у F405 не хватает таймеров для серв",
     "Нужно сначала включить feature SERVO_TILT и перезагрузиться, команды появятся только после save"
    ],
    "answer": 0,
-   "explain": "Блок `#if !defined(CLOUD_BUILD) && !defined(SITL)` в target/common_pre.h определяет USE_SERVOS. Cloud Build получает его только с опцией SERVOS (в 2025.12 — также через пакет WING)."
+   "explain": "Блок `#if !defined(CLOUD_BUILD) && !defined(SITL)` в target/common_pre.h определяет USE_SERVOS. Cloud Build получает его только с опцией SERVOS или, с 2025.12, через пакет WING (в 4.5 — только SERVOS)."
   },
   {
    "q": "Пилот подключил две сервы MG996R (2.5 А на упоре при 6 В по паспорту) к пяти вольтам полётника. Что вероятнее всего случится и как правильно?",

@@ -34,7 +34,7 @@ next:
 ### Датчик расстояния: DISTANCE_SENSOR (132)
 Поля: `time_boot_ms`, `min_distance`/`max_distance`/`current_distance` в **сантиметрах**, `type` (`MAV_DISTANCE_SENSOR_LASER`, `_ULTRASOUND`, `_RADAR`…), `id`, `orientation` (`MAV_SENSOR_ROTATION_PITCH_270` = вниз, `_NONE` = вперёд…), `covariance` (255 — неизвестна), а в extension-полях — `horizontal_fov`, `vertical_fov`, `quaternion`, `signal_quality` (0 — неизвестно, 1 — сигнал недостоверен … 100 — отлично).
 
-ArduPilot: `RNGFND1_TYPE = 10` (MAVLink), `RNGFND1_ORIENT = 25` (вниз), `RNGFND1_MIN`/`RNGFND1_MAX` (в новых версиях в метрах, в старых `_MIN_CM`/`_MAX_CM`). Значения вне диапазона [min, max] автопилот считает «вне дальности», а не измерением. Частота — 10–50 Гц; таймаут MAVLink-дальномера в ArduPilot — 500 мс: если пакеты приходят реже ~2 Гц или с пропусками дольше 0.5 с, датчик считается отвалившимся. Дальномер вниз используется для высоты над землёй (`RFND` в логе, EKF источник POSZ = дальномер, посадка, террейн-фоллоуинг); датчики по другим ориентациям — для обхода препятствий (`PRX` proximity, `PRX1_TYPE = 2` MAVLink).
+ArduPilot: `RNGFND1_TYPE = 10` (MAVLink), `RNGFND1_ORIENT = 25` (вниз), `RNGFND1_MIN`/`RNGFND1_MAX` (метры; до 4.7 — `RNGFND1_MIN_CM`/`RNGFND1_MAX_CM`, сантиметры). Значения вне диапазона [min, max] автопилот считает «вне дальности», а не измерением. Частота — 10–50 Гц; таймаут MAVLink-дальномера в ArduPilot — 500 мс: если пакеты приходят реже ~2 Гц или с пропусками дольше 0.5 с, датчик считается отвалившимся. Дальномер вниз используется для высоты над землёй (`RFND` в логе, EKF источник POSZ = дальномер, посадка, террейн-фоллоуинг); датчики по другим ориентациям — для обхода препятствий (`PRX` proximity, `PRX1_TYPE = 2` MAVLink).
 
 ### Препятствия и внешняя навигация
 - `OBSTACLE_DISTANCE` (330): массив из 72 расстояний по секторам (`increment` градусов на сектор, `angle_offset`), для 2D-лидаров и стереокамер → proximity в ArduPilot (`PRX1_TYPE = 2`), collision prevention в PX4.
@@ -80,7 +80,7 @@ python -m pytest -q tests/test_component.py
 Прочитайте, что проверяют тесты: compid отправителя, ориентация, диапазон значений.
 
 ### Шаг 2. ArduPilot SITL принимает дальномер
-Запустите SITL (модуль ap-sitl), задайте `RNGFND1_TYPE = 10`, `RNGFND1_ORIENT = 25`, `RNGFND1_MAX` = 40 м (или `RNGFND1_MAX_CM = 4000` на старых версиях), перезагрузите. Запустите `virtual_rangefinder.py --master udpin:0.0.0.0:14551` (скрипт слушает отдельный выход SITL/роутера `--out=udp:127.0.0.1:14551` и отвечает на адрес, с которого пришёл поток). Взлетите на 10 м: в Mission Planner `rangefinder1` показывает ~10 м минус «рельеф», в логе — `RFND`. Остановите скрипт — через несколько сотен миллисекунд автопилот должен перестать считать дальномер здоровым.
+Запустите SITL (модуль ap-sitl), задайте `RNGFND1_TYPE = 10`, `RNGFND1_ORIENT = 25`, `RNGFND1_MAX = 40` (на 4.6 и раньше — `RNGFND1_MAX_CM = 4000`), перезагрузите. Запустите `virtual_rangefinder.py --master udpin:0.0.0.0:14551` (скрипт слушает отдельный выход SITL/роутера `--out=udp:127.0.0.1:14551` и отвечает на адрес, с которого пришёл поток). Взлетите на 10 м: в Mission Planner `rangefinder1` показывает ~10 м минус «рельеф», в логе — `RFND`. Остановите скрипт — через несколько сотен миллисекунд автопилот должен перестать считать дальномер здоровым.
 
 ### Шаг 3. Параметр компонента
 Добавьте компоненту параметр `RF_OFFSET_CM` (смещение установки): ответы на `PARAM_REQUEST_LIST`/`READ`/`SET` для своего compid, хранение в JSON-файле. Проверьте, что QGC видит его в группе компонента и что изменение из QGC сразу меняет `DISTANCE_SENSOR`.
@@ -109,7 +109,7 @@ python -m pytest -q tests/test_component.py
 - ArduPilot — Rangefinder parameters (RNGFND1_TYPE 10: MAVLink) | https://ardupilot.org/copter/docs/common-rangefinder-landingpage.html | primary | A
 - ArduPilot — AP_RangeFinder (source) | https://github.com/ArduPilot/ardupilot/tree/master/libraries/AP_RangeFinder | primary | A
 - MAVLink — c_library_v2 (generated C headers) | https://github.com/mavlink/c_library_v2 | primary | A
-- PX4 — Distance sensors and MAVLink | https://docs.px4.io/main/en/sensor/rangefinders.html | primary | A
+- PX4 — Distance sensors and MAVLink | https://docs.px4.io/v1.17/en/sensor/rangefinders.html | primary | A
 
 ## checklist
 - Знаю обязанности компонента: heartbeat, ответы, свои параметры, честная деградация

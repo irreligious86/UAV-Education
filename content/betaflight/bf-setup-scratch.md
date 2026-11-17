@@ -3,7 +3,7 @@ id: bf-setup-scratch
 title: "Betaflight с нуля: от пустой платы до первого висения"
 level: L2
 readingTime: 55 мин
-firmware: Betaflight 4.5 (проверено на 4.5.6 SITL, ветка 4.5-maintenance)
+firmware: Betaflight 2025.12 (сверено с 2025.12.5); SITL-лабораторная снята на 4.5.6
 status: published
 added: 2026-11-10
 tags:
@@ -32,13 +32,13 @@ next:
 ---
 
 ## summary
-Один 5″ квадрокоптер (Betaflight 4.5, приёмник ELRS, ESC с DShot, аналоговый или цифровой VTX) проходит путь от пустой платы до записанного висения. Порядок — 17 шагов настройки курса. Шаги, которые уже разобраны в других модулях, здесь даны одной строкой: что нажать в этой прошивке и куда идти за подробностями. Подробно расписано то, чего в курсе раньше не было: калибровка `vbat_scale`, `ibata_scale` и `ibata_offset` по мультиметру и мА·ч зарядного (формулы проверены по исходникам 4.5), порядок и направление моторов (`motor_output_reordering`, `resource`, DShot-команды через `dshotprog` и диалог Motor direction), калибровка PWM-ESC, предполётная проверка и первое висение с критериями прерывания, основы GPS Rescue. Основной путь — Betaflight SITL, собранный из исходников. Лабораторная: конфиг и тест failsafe в SITL, затем тот же конфиг на реальном аппарате, калибровка АКБ, `diff all` и лог 60-секундного висения.
+Один 5″ квадрокоптер (Betaflight 2025.12, приёмник ELRS, ESC с DShot, аналоговый или цифровой VTX) проходит путь от пустой платы до записанного висения. Порядок — 17 шагов настройки курса. Шаги, которые уже разобраны в других модулях, здесь даны одной строкой: что нажать в этой прошивке и куда идти за подробностями. Подробно расписано то, чего в курсе раньше не было: калибровка `vbat_scale`, `ibata_scale` и `ibata_offset` по мультиметру и мА·ч зарядного (формулы проверены по исходникам 4.5 и 2025.12 — они одинаковы), порядок и направление моторов (`motor_output_reordering`, `resource`, DShot-команды через `dshotprog` и диалог Motor direction), калибровка PWM-ESC, предполётная проверка и первое висение с критериями прерывания, основы GPS Rescue. Основной путь — Betaflight SITL, собранный из исходников. Лабораторная: конфиг и тест failsafe в SITL, затем тот же конфиг на реальном аппарате, калибровка АКБ, `diff all` и лог 60-секундного висения.
 
 ## theory
 ### Карта шагов: что, где и чем
 {{diagram:bf-setup-flow|17 шагов идут строго по порядку: конфигурация, режимы, failsafe и бэкап проверяются в SITL; приёмник, моторы, ESC и АКБ — только на столе без пропов; пропы ставятся на шаге 15.}}
 
-| # | Шаг | Где | Betaflight 4.5: вкладка / CLI | Подробно |
+| # | Шаг | Где | Betaflight 2025.12: вкладка / CLI | Подробно |
 |---|---|---|---|---|
 | 1 | Прошивка, бэкап старого конфига | SITL, USB | Firmware Flasher, `diff all` | bf-intro |
 | 2 | Ориентация, миксер | SITL, USB | Setup, `mixer QUADX`, `align_board_*` | bf-intro |
@@ -53,21 +53,21 @@ next:
 | 11 | Режимы, арм, блокировки | SITL | Modes, `aux`, `status` | bf-modes-osd |
 | 12 | Failsafe: настроить и проверить | SITL + стол | Failsafe, `failsafe_*` | bf-failsafe |
 | 13 | OSD и видео | стол | OSD, Video Transmitter | bf-modes-osd, link-vtx |
-| 14 | GPS и GPS Rescue (если есть GPS) | стол + поле | `gps_rescue_*` | здесь, bf-failsafe |
+| 14 | GPS и GPS Rescue (если есть GPS) | стол + поле | `gps_rescue_*`, `ap_hover_throttle` | здесь, bf-failsafe |
 | 15 | Предполётка и первое висение | поле | — | здесь |
 | 16 | Первая настройка | поле | фильтры, PID, ползунки | bf-filters, bf-pid |
 | 17 | Лог, `diff all`, восстановление | SITL + поле | Blackbox, CLI | bf-blackbox, bf-cli |
 
 ### Что умеет Betaflight SITL, а что нет
-SITL — та же прошивка 4.5, собранная обычным gcc под Linux (`make TARGET=SITL`). Датчики виртуальные (`GYRO=VIRTUAL, ACC=VIRTUAL, BARO=VIRTUAL`), UART заменены TCP-портами `127.0.0.1:576x`: UART1 = 5761, UART2 = 5762. Конфиг хранится в `eeprom.bin` в текущей папке, а `save` и `exit` завершают процесс — его нужно запустить заново. С симулятором SITL общается по UDP: принимает состояние аппарата (FDM) на порт 9003 и RC-каналы на 9004, отдаёт моторы на 9002 (Gazebo) и 9001 (RealFlight). Без симулятора аппарат не летит, но CLI, режимы, блокировки арма, failsafe и `diff all` работают как на плате.
+Раздел и лабораторная ниже проверены на SITL 4.5.6; для 2025.12 лабораторная будет перезапущена, известные отличия названы по ходу. SITL — та же прошивка, собранная обычным gcc под Linux (`make TARGET=SITL`). Датчики виртуальные (`GYRO=VIRTUAL, ACC=VIRTUAL, BARO=VIRTUAL`), UART заменены TCP-портами `127.0.0.1:576x`: UART1 = 5761, UART2 = 5762. Конфиг хранится в `eeprom.bin` в текущей папке, а `save` и `exit` завершают процесс — его нужно запустить заново. С симулятором SITL общается по UDP: принимает состояние аппарата (FDM) на порт 9003 и RC-каналы на 9004, отдаёт моторы на 9002 (Gazebo) и 9001 (RealFlight). Без симулятора аппарат не летит, но CLI, режимы, блокировки арма, failsafe и `diff all` работают как на плате.
 
-Чего в SITL нет: это видно в `src/main/target/SITL/target.h`, где отключены нужные `USE_*`, и в ответах CLI:
-- **DShot.** Протокол по умолчанию `DISABLED`, поэтому висит флаг `MOTOR_PROTO`. В SITL ставят `PWM`, DShot-настроек (`dshot_idle_value`, `dshot_bidir`) в CLI нет.
-- **Последовательный приёмник, ADC, OSD, VTX, GPS, Blackbox, `resource`.** На `get gps_provider` и `get blackbox_device` CLI отвечает `INVALID NAME`, на `resource` — `UNKNOWN COMMAND`.
+Чего в SITL 4.5 нет: это видно в `src/main/target/SITL/target.h` (в 2025.12 файл лежит в `src/platform/SIMULATOR/target/SITL/`), где отключены нужные `USE_*`, и в ответах CLI:
+- **DShot.** Протокол по умолчанию `DISABLED`, поэтому висит флаг `MOTOR_PROTO`. В SITL ставят `PWM`, DShot-настроек (`dshot_bidir` и `dshot_idle_value` — имя 4.5; в 2025.12 это `motor_idle`) в CLI SITL 4.5 нет.
+- **Последовательный приёмник, ADC, OSD, VTX, GPS, Blackbox, `resource`.** На `get gps_provider` и `get blackbox_device` CLI отвечает `INVALID NAME`, на `resource` — `UNKNOWN COMMAND`. В SITL 2025.12 виртуальные GPS (`gps_provider = VIRTUAL`) и Blackbox (`blackbox_device = VIRTUAL`) включены в `target.h`.
 - **Потеря связи.** Как только пришёл первый UDP-пакет RC, `rxRCFrameStatus()` в `sitl.c` всегда возвращает «кадр получен». Если остановить поток RC, флага `RXLOSS` не будет. Failsafe в SITL проверяют режимом FAILSAFE на тумблере.
 
 ### Датчики напряжения и тока: формулы из исходника
-`src/main/sensors/voltage.c` (4.5) переводит отсчёт АЦП в напряжение (единица 0.01 В):
+`src/main/sensors/voltage.c` (формула не изменилась в 2025.12) переводит отсчёт АЦП в напряжение (единица 0.01 В):
 
 `V = ((ADC · vbat_scale · Vref_мВ / 10 + 0xFFF · 5) / (0xFFF · vbat_divider)) / vbat_multiplier`
 
@@ -82,15 +82,15 @@ SITL — та же прошивка 4.5, собранная обычным gcc �
 ### Моторы: порядок, направление, протокол
 В миксере `QUADX` (`flight/mixer_init.c`) моторы идут так: 1 — задний правый, 2 — передний правый, 3 — задний левый, 4 — передний левый. При `yaw_motors_reversed = OFF` (props in) вращение такое: 1 — CW, 2 — CCW, 3 — CCW, 4 — CW, если смотреть сверху. `ON` (props out) меняет все четыре направления. Ошибку исправляют по-разному:
 - **Порядок.** Самый простой способ — диалог Reorder motors на вкладке Motors. Он пишет массив `motor_output_reordering` (команда MSP `MSP2_SET_MOTOR_OUTPUT_REORDERING`). В драйвере мотор миксера `i` выводится на пад `resource MOTOR` с номером `motor_output_reordering[i] + 1`. По умолчанию массив `0,1,2,3,4,5,6,7`. Второй способ — переназначить пины командой `resource MOTOR n <pin>`: это уже ремаппинг таймеров и DMA, он разобран в bf-cli.
-- **Направление.** В 4.5 **нет** параметра `motor_direction`: направление хранится в ESC. DShot-ESC (BLHeli_S, Bluejay, BLHeli_32, AM32) принимают команды `DSHOT_CMD_SPIN_DIRECTION_1` (7), `_2` (8) и `DSHOT_CMD_SAVE_SETTINGS` (12). Диалог Motor direction в Configurator шлёт именно 7 или 8, затем 12 (`MSP2_SEND_DSHOT_COMMAND`). Из CLI то же делает `dshotprog <индекс> <команды>`, где индекс с 0, а 255 — все моторы. FC сам повторяет команды направления и сохранения 10 раз, как требует спецификация DShot. Какое из направлений 1/2 окажется «нормальным», зависит от того, как распаяны фазы, поэтому после команды всегда проверяй глазами. Без DShot направление меняют в конфигураторе ESC или перекидкой двух фазных проводов.
-- **Протокол.** DShot калибровать не нужно: газ передаётся числом 48…2047. Холостой ход — `dshot_idle_value` = 550 (5.5 %), то есть 48 + 0.055 · 1999 ≈ 158. PWM, OneShot и Multishot передают газ длительностью импульса, поэтому ESC надо один раз научить границам 1000 и 2000 мкс (`min_command` = 1000, `max_throttle` = 2000, холостой ход `min_throttle` = 1070).
+- **Направление.** Параметра `motor_direction` **нет** (ни в 4.5, ни в 2025.12): направление хранится в ESC. DShot-ESC (BLHeli_S, Bluejay, BLHeli_32, AM32) принимают команды `DSHOT_CMD_SPIN_DIRECTION_1` (7), `_2` (8) и `DSHOT_CMD_SAVE_SETTINGS` (12). Диалог Motor direction в Betaflight App шлёт именно 7 или 8, затем 12 (`MSP2_SEND_DSHOT_COMMAND`). Из CLI то же делает `dshotprog <индекс> <команды>`, где индекс с 0, а 255 — все моторы. FC сам повторяет команды направления и сохранения 10 раз, как требует спецификация DShot. Какое из направлений 1/2 окажется «нормальным», зависит от того, как распаяны фазы, поэтому после команды всегда проверяй глазами. Без DShot направление меняют в конфигураторе ESC или перекидкой двух фазных проводов.
+- **Протокол.** DShot калибровать не нужно: газ передаётся числом 48…2047. Холостой ход — `motor_idle` = 550 (5.5 %; до 2025.12 — `dshot_idle_value`), то есть 48 + 0.055 · 1999 ≈ 158. PWM, OneShot и Multishot передают газ длительностью импульса, поэтому ESC надо один раз научить границам 1000 и 2000 мкс (`min_command` = 1000, `max_throttle` = 2000; холостой ход в 2025.12 задаёт тот же `motor_idle`, а в 4.5 для PWM был отдельный `min_throttle` = 1070, в 2025.12 он удалён).
 
 ### Газ висения: зачем знать заранее
-Тяга примерно пропорциональна квадрату оборотов, а обороты — газу. Поэтому газ висения ≈ √(m / T_max). Для 5″ массой 650 г с моторами по 1600 г тяги (T/W ≈ 9.8) это √(650/6400) ≈ 0.32, то есть около 30 %. Реальные 5″ на 6S висят на 20–35 %. Это число нужно трижды: как критерий прерывания первого висения (газ выше 60 % — что-то не так), как `gps_rescue_throttle_hover` и как газ AUTO-LAND в failsafe (bf-failsafe).
+Тяга примерно пропорциональна квадрату оборотов, а обороты — газу. Поэтому газ висения ≈ √(m / T_max). Для 5″ массой 650 г с моторами по 1600 г тяги (T/W ≈ 9.8) это √(650/6400) ≈ 0.32, то есть около 30 %. Реальные 5″ на 6S висят на 20–35 %. Это число нужно трижды: как критерий прерывания первого висения (газ выше 60 % — что-то не так), как `ap_hover_throttle` (газ висения автопилота: GPS Rescue, ALTHOLD, POS HOLD; до 2025.12 — `gps_rescue_throttle_hover`) и как газ AUTO-LAND в failsafe (bf-failsafe).
 
 ## practice
-### Шаг 1. Собрать SITL, подключить Configurator, сохранить исходный конфиг
-Шаг 1 из 17. Сборка из ветки 4.5-maintenance (коммит 7dcc851, версия 4.5.6) на gcc 13.3 заняла около минуты:
+### Шаг 1. Собрать SITL, подключить Betaflight App, сохранить исходный конфиг
+Шаг 1 из 17. Команды и вывод сняты на 4.5.6 (ветка 4.5-maintenance, коммит 7dcc851); для 2025.12 бери `-b 2025.12.5`, размер ELF будет другим. Сборка на gcc 13.3 заняла около минуты:
 
 ```bash
 git clone --depth 1 -b 4.5-maintenance https://github.com/betaflight/betaflight.git && cd betaflight
@@ -106,14 +106,14 @@ mkdir -p ~/bfsitl && cd ~/bfsitl && ~/betaflight/obj/main/betaflight_SITL.elf
  291764	  16456	  73832	 382052	  5d464	./obj/main/betaflight_SITL.elf
 ```
 
-Официальный путь к Configurator — Betaflight App 2025.12 и новее (веб-версия) через websockify. Включи в Options «manual connection mode» и в поле порта впиши `ws://127.0.0.1:6761`:
+Официальный путь подключения — Betaflight App 2025.12 (веб-версия) через websockify. Включи в Options «manual connection mode» и в поле порта впиши `ws://127.0.0.1:6761`:
 
 ```bash
 pip3 install --user websockify
 python3 -m websockify 127.0.0.1:6761 127.0.0.1:5761
 ```
 
-Мост я проверил MSP-запросами через websocket: `MSP_API_VERSION` вернул 1.46, `MSP_FC_VARIANT` — `BTFL`. CLI доступен и без Configurator: отправь `#` в TCP 5761. Первым делом выполни `diff all` и сохрани результат. На реальной плате это бэкап старого конфига перед прошивкой.
+Мост я проверил MSP-запросами через websocket: `MSP_API_VERSION` вернул 1.46 (это 4.5.6), `MSP_FC_VARIANT` — `BTFL`. CLI доступен и без приложения: отправь `#` в TCP 5761. Первым делом выполни `diff all` и сохрани результат. На реальной плате это бэкап старого конфига перед прошивкой.
 
 ### Шаг 2. Quad X, ориентация, порты
 Шаги 2–3. В SITL `mixer` отвечает `Mixer: QUADX`, `align_board_yaw = 0`. Порты в SITL настраиваются только командой `serial` (функция 64 = Serial RX), но последовательного приёмника в сборке нет. Поэтому распределение UART для ELRS, GPS и VTX отрабатывай по таблице из bf-ports, а проверяй уже на плате.
@@ -123,6 +123,8 @@ python3 -m websockify 127.0.0.1:6761 127.0.0.1:5761
 
 ### Шаг 4. Расчёт калибровки АКБ
 Шаг 10, расчётная часть. Измерения делаются на железе, но формулы проверяешь до этого. Пример: 6S 1300 мА·ч. Мультиметр на XT60 показал 24.42 В, FC — 24.04 В. На столе (моторы стоят, VTX 25 мВт) амперметр показал 0.42 А, FC — 0.19 А. После полёта с уже исправленным offset в OSD было 905 мА·ч, зарядное залило 1032 мА·ч.
+
+Формулы скрипта не изменились в 2025.12 (`sensors/voltage.c`, `sensors/current.c`).
 
 ```python
 # Betaflight 4.5 battery-sensor calibration (formulas from sensors/voltage.c and sensors/current.c)
@@ -184,6 +186,8 @@ SITL exit code after save: 0
 
 ### Шаг 6. Арм и failsafe по тумблеру
 Шаг 12. Скрипт запускает SITL и делает три вещи: шлёт RC-пакеты (`double` timestamp + 16 × `uint16`) на UDP 9004, подаёт FDM неподвижного аппарата на 9003 и читает выходы моторов с 9002. Флаги арма он берёт из `MSP_STATUS_EX` (150) через TCP 5761:
+
+Скрипт и вывод сняты на 4.5.6; в 2025.12 последний флаг называется `ARM_SWITCH` и стоит на бите 28, на битах 25–27 — `FLIP_SWITCH`, `ALT_HOLD_SW`, `POS_HOLD_SW`, поэтому таблицу `NAMES` для 2025.12 нужно дополнить.
 
 ```python
 # Betaflight SITL: arming + failsafe check over MSP (TCP 5761) with RC over UDP 9004
@@ -257,11 +261,11 @@ t=  8.6s re-arm                             armed=1 motors=[0.07, 0.07, 0.07, 0.
 Что видно в выводе:
 - Без FDM висит флаг `ANGLE`: горизонт не оценён. С FDM он пропадает, `BOOTGRACE` уходит через 3–4 с. На железе тот же флаг ставит наклон: `isUpright()` в `flight/imu.c` требует оценённый горизонт **и** наклон меньше `small_angle` (25° по умолчанию, 0–180). Флаг не ставится, пока включён FLIP OVER AFTER CRASH.
 - Газ 1300 при арме даёт `THROTTLE`: армить можно только при газе ниже `min_check` (1050).
-- Холостой ход 0.07 — это `min_throttle` 1070 в шкале 1000–2000. При газе 1400 выход 0.412 = 0.07 + 0.93 × (1400 − 1050) / (2000 − 1050).
-- С `failsafe_switch_mode = STAGE2` тумблер сразу запускает Stage 2. Процедура по умолчанию `DROP`, поэтому через 0.1 с арм снят. Флаг `ARMSWITCH` не даёт переармиться, пока тумблер арма не опущен. Это защита от случайного рестарта моторов после восстановления связи.
+- Холостой ход 0.07 — это `min_throttle` 1070 в шкале 1000–2000 (SITL 4.5 с протоколом PWM; в 2025.12 `min_throttle` нет, холостой ход задаёт `motor_idle`). При газе 1400 выход 0.412 = 0.07 + 0.93 × (1400 − 1050) / (2000 − 1050).
+- С `failsafe_switch_mode = STAGE2` тумблер сразу запускает Stage 2. Процедура по умолчанию `DROP`, поэтому через 0.1 с арм снят. Флаг `ARMSWITCH` (в 2025.12 — `ARM_SWITCH`) не даёт переармиться, пока тумблер арма не опущен. Это защита от случайного рестарта моторов после восстановления связи.
 
 ### Шаг 7. Первая настройка и бэкап
-Шаги 16–17. Фильтры и PID 4.5 по умолчанию годятся для первого висения. Без физической модели SITL их не проверит, они настраиваются по логу (bf-filters, bf-pid). `diff all` из SITL содержит только то, что ты изменил:
+Шаги 16–17. Фильтры и PID по умолчанию годятся для первого висения. Без физической модели SITL их не проверит, они настраиваются по логу (bf-filters, bf-pid). `diff all` из SITL содержит только то, что ты изменил:
 
 ```text
 # name: SCRATCH5
@@ -280,11 +284,11 @@ set craft_name = SCRATCH5
 ### Переход на реальное железо
 Пропы сняты до пункта 13. Первое включение после пайки — через smoke stopper. Перед подключением АКБ мультиметр между + и − должен показывать не меньше сотен Ом.
 
-**1. Прошивка (шаг 1).** `diff all` старой прошивки — в файл. В Configurator: target платы, Cloud Build с опциями под этот аппарат (CRSF, DShot, OSD SD или HD, GPS, протокол VTX), Full chip erase (bf-intro).
+**1. Прошивка (шаг 1).** `diff all` старой прошивки — в файл. В Betaflight App: target платы, Cloud Build с опциями под этот аппарат (CRSF, DShot, OSD SD или HD, GPS, магнитометр если есть, протокол VTX), Full chip erase (bf-intro; там же чек-лист перехода с 4.5).
 
 **2. Ориентация и порты (шаги 2–3).** На вкладке Setup наклони аппарат: модель должна повторять движение. Если плата повёрнута, выставь `align_board_yaw`. На Ports: UART приёмника → Serial RX; GPS (если есть) → GPS; VTX → Peripherals: SmartAudio или Tramp для аналога, MSP + `osd_displayport_device = MSP` для HD (bf-ports, link-vtx).
 
-**3. Приёмник и каналы (шаги 4–5).** Receiver: Serial, `serialrx_provider = CRSF`. Bind ELRS — binding phrase, версии 3.x на TX и RX совпадают (link-elrs). Пульт: `map AETR1234`. CRSF в Betaflight даёт 988–2012 мкс (`rx/crsf.c`: 172 → 988, 1811 → 2012). Заполни таблицу каналов:
+**3. Приёмник и каналы (шаги 4–5).** Receiver: Serial, `serialrx_provider = CRSF`. Bind ELRS — binding phrase, мажорные версии ELRS на TX и RX совпадают (4.x с 4.x; 3.x и 4.x между собой не связываются). Встроенный SPI-приёмник под Betaflight 2025.12 — это ELRS 3: для модуля на 4.x нужен отдельный приёмник на UART (link-elrs). Пульт: `map AETR1234`. CRSF в Betaflight даёт 988–2012 мкс (`rx/crsf.c`: 172 → 988, 1811 → 2012). Заполни таблицу каналов:
 
 | Проверка | Норма |
 |---|---|
@@ -310,12 +314,12 @@ set craft_name = SCRATCH5
 
 **11. OSD и видео (шаг 13).** Минимум элементов: среднее напряжение на банку, мА·ч, LQ/RSSI, режим, таймер, предупреждения. VTX на столе — 25 мВт и только с антенной (link-vtx).
 
-**12. GPS Rescue, если стоит GPS (шаг 14).** `gps_provider = UBLOX`, 5 Гц и выше. Дефолты конфигурации модуля (`pg/gps.c`): `gps_auto_config = ON` (FC сам настраивает u-blox при каждом старте; при OFF все настройки ниже не отправляются), `gps_update_rate_hz` = 10, `gps_ublox_flight_model = AIRBORNE_4G`, `gps_ublox_use_galileo = OFF`, `gps_sbas_mode = NONE` (AUTO, EGNOS, WAAS, MSAS, GAGAN, NONE), `gps_set_home_point_once = OFF`. Для M8/M10: `gps_ublox_use_galileo = ON` (больше спутников — быстрее fix), `gps_sbas_mode = AUTO` или своя региональная система (в Европе — `EGNOS`). При NONE прошивка выключает SBAS в модуле. Подробно — bf-gps-setup. Значения по умолчанию в 4.5 (`pg/gps_rescue.c`): `gps_rescue_min_sats` = 8 (документация советует 10), `gps_rescue_min_start_dist` = 15 м, `gps_rescue_alt_mode = MAX_ALT`, `gps_rescue_initial_climb` = 10 м, `gps_rescue_return_alt` = 30 м, `gps_rescue_ground_speed` = 750 см/с, `gps_rescue_throttle_hover` = 1275, `gps_rescue_sanity_checks = RESCUE_SANITY_FS_ONLY`, `gps_rescue_allow_arming_without_fix = OFF`. Без подтверждённой точки дома не армить: при реальном failsafe аппарат упадёт. `failsafe_procedure = GPS-RESCUE` включай только после пункта 13, когда `gps_rescue_throttle_hover` взят из лога. Первые тесты — тумблером с `failsafe_switch_mode = STAGE1` над травой, на 30–50 м.
+**12. GPS Rescue, если стоит GPS (шаг 14).** `gps_provider = UBLOX`, 5 Гц и выше. Дефолты конфигурации модуля (`pg/gps.c`): `gps_auto_config = ON` (FC сам настраивает u-blox при каждом старте; при OFF все настройки ниже не отправляются), `gps_update_rate_hz` = 10, `gps_ublox_flight_model = AIRBORNE_4G`, `gps_ublox_use_galileo = OFF`, `gps_sbas_mode = NONE` (AUTO, EGNOS, WAAS, MSAS, GAGAN, NONE), `gps_set_home_point_once = OFF`. Для M8/M10: `gps_ublox_use_galileo = ON` (больше спутников — быстрее fix), `gps_sbas_mode = AUTO` или своя региональная система (в Европе — `EGNOS`). При NONE прошивка выключает SBAS в модуле. Подробно — bf-gps-setup. Значения по умолчанию в 2025.12 (`pg/gps_rescue_multirotor.c`, `pg/autopilot_multirotor.c`; те же числа, что в 4.5): `gps_rescue_min_sats` = 8 (документация советует 10), `gps_rescue_min_start_dist` = 15 м, `gps_rescue_alt_mode = MAX_ALT`, `gps_rescue_initial_climb` = 10 м, `gps_rescue_return_alt` = 30 м, `gps_rescue_ground_speed` = 750 см/с, `ap_hover_throttle` = 1275 (до 2025.12 — `gps_rescue_throttle_hover`), `gps_rescue_sanity_checks = RESCUE_SANITY_FS_ONLY`, `gps_rescue_allow_arming_without_fix = OFF`. Без подтверждённой точки дома не армить: при реальном failsafe аппарат упадёт. `failsafe_procedure = GPS-RESCUE` включай только после пункта 13, когда `ap_hover_throttle` взят из лога. Первые тесты — тумблером с `failsafe_switch_mode = STAGE1` над травой, на 30–50 м.
 
 **13. Предполётка и первое висение (шаг 15) — пропы ставятся здесь.** Перед вылетом:
 - пропы стоят по схеме props in и затянуты;
 - АКБ на ремне, антенны далеко от пропов;
-- `status` без флагов, кроме `ARMSWITCH`;
+- `status` без флагов, кроме `ARM_SWITCH` (в 4.5 — `ARMSWITCH`);
 - в OSD напряжение 4.15–4.20 В на банку;
 - Blackbox стёрт, режим ANGLE.
 
@@ -327,19 +331,19 @@ set craft_name = SCRATCH5
 - LQ упал или пропало видео;
 - после 60 с мотор горячий: палец не держится 5 с.
 
-Запиши газ висения: `rcCommand[3]` в Blackbox Explorer, медиана за 60 с. Это значение идёт в `gps_rescue_throttle_hover`.
+Запиши газ висения: `rcCommand[3]` в Blackbox Explorer, медиана за 60 с. Это значение идёт в `ap_hover_throttle` (диапазон 1100–1700; в 4.5 — `gps_rescue_throttle_hover`).
 
 **14. Первая настройка и бэкап (шаги 16–17).** Спектр гироскопа из лога висения → фильтры и RPM-фильтр (bf-filters, bf-rpm-filter). Затем ползунки PID (bf-pid). После каждого изменения — `diff all` с датой и версией в файле и в git.
 
 Лабораторная засчитывается, когда:
-- **SITL**: собран Betaflight 4.5 SITL. Сдан `diff all` с `aux` для ARM, ANGLE и FAILSAFE и `failsafe_switch_mode`. Лог скрипта показывает арм, блокировку `THROTTLE`, срабатывание `FAILSAFE`/`BOXFAILSAFE` и блокировку `ARMSWITCH` после failsafe. Восстановление diff в чистый SITL проверено. Расчёт `vbat_scale`, `ibata_offset` и `ibata_scale` выполнен по формулам из исходника.
+- **SITL**: собран Betaflight SITL (лабораторная снята на 4.5.6). Сдан `diff all` с `aux` для ARM, ANGLE и FAILSAFE и `failsafe_switch_mode`. Лог скрипта показывает арм, блокировку `THROTTLE`, срабатывание `FAILSAFE`/`BOXFAILSAFE` и блокировку `ARMSWITCH` (в 2025.12 — `ARM_SWITCH`) после failsafe. Восстановление diff в чистый SITL проверено. Расчёт `vbat_scale`, `ibata_offset` и `ibata_scale` выполнен по формулам из исходника.
 - **Железо**: таблица каналов заполнена, порядок и направление моторов соответствуют `QUADX`, для PWM-ESC выполнена калибровка. Ошибка напряжения меньше 0.05 В на банку в двух точках, мА·ч FC в пределах 5 % от зарядного. Stage 2 failsafe записан. Сдан Blackbox 60-секундного висения с газом висения в отчёте и `diff all` с реального аппарата.
 
 ## diagnostics
 - **Симптом:** `make TARGET=SITL` останавливается с `arm-none-eabi-gcc not in the PATH`
   - Возможная причина: `mk/tools.mk` проверяет ARM-тулчейн для любого target.
   - Что сделать: `make arm_sdk_install` или фиктивный скрипт `arm-none-eabi-gcc` в PATH, печатающий требуемую версию (10.3.1).
-- **Симптом:** Configurator или CLI видят не Betaflight, а INAV (`MSP_FC_VARIANT` = `INAV`)
+- **Симптом:** Betaflight App или CLI видят не Betaflight, а INAV (`MSP_FC_VARIANT` = `INAV`)
   - Возможная причина: на той же машине запущен INAV SITL, он занимает те же TCP 5760–5761.
   - Что сделать: закрыть его или запустить Betaflight SITL в отдельном сетевом пространстве (`unshare -n`, поднять `lo`).
 - **Симптом:** в SITL арм не проходит с флагом `ANGLE`
@@ -365,7 +369,7 @@ set craft_name = SCRATCH5
   - Возможная причина: ESC не откалиброваны по 1000/2000 мкс.
   - Что сделать: калибровка мастер-ползунком без пропов; перейти на DShot, если ESC поддерживает.
 - **Симптом:** после реального failsafe GPS Rescue снимает арм и аппарат падает
-  - Возможная причина: не было точки дома, мало спутников или `gps_rescue_throttle_hover` слишком мал.
+  - Возможная причина: не было точки дома, мало спутников или `ap_hover_throttle` (до 2025.12 — `gps_rescue_throttle_hover`) слишком мал.
   - Что сделать: армить только с домом, газ висения из лога, тесты тумблером с `STAGE1` на малой дистанции.
 
 ## checklist
@@ -391,4 +395,4 @@ set craft_name = SCRATCH5
 - Betaflight Configurator: диалог Motor direction (команды 7/8 + 12) | https://github.com/betaflight/betaflight-configurator/blob/master/src/composables/motors/escDshotDirection/EscDshotDirectionMotorDriver.ts | primary | A
 
 ## notes
-GPS Rescue: страница документации 4.5 называет минимальную дистанцию запуска 30 м, а `pg/gps_rescue.c` в ветке 4.5-maintenance задаёт `minStartDistM = 15` (диапазон 10–30). Верь исходнику своей прошивки: `get gps_rescue_min_start_dist`.
+GPS Rescue: страница документации 4.5 называет минимальную дистанцию запуска 30 м, а исходник (`pg/gps_rescue.c` в 4.5, `pg/gps_rescue_multirotor.c` в 2025.12.5) задаёт `minStartDistM = 15` (диапазон 10–30). Верь исходнику своей прошивки: `get gps_rescue_min_start_dist`.

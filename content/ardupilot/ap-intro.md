@@ -3,7 +3,7 @@ id: ap-intro
 title: "Введение в ArduPilot"
 level: L2
 readingTime: 20 мин
-firmware: ArduPilot 4.5+
+firmware: ArduCopter / ArduPlane 4.7 (сверено с 4.7.2)
 status: published
 added: 2026-11-07
 tags:
@@ -22,7 +22,73 @@ ArduPilot — автопилот, а не просто стабилизатор.
 
 ## theory
 ### Версии и имена параметров
-Курс написан для ArduPilot 4.5 и новее. В Copter 4.7 (стабильная с июля 2026) часть параметров переименована и переведена в единицы СИ: `ARMING_CHECK` → `ARMING_SKIPCHK` (смысл обратный: список **пропускаемых** проверок, 0 — все включены), `WPNAV_*` → `WP_*` (м, м/с), `RTL_ALT` → `RTL_ALT_M` (м), `ATC_ACCEL_*_MAX` → `ATC_ACC_*_MAX` (°/с²), `PSC_ACCZ_*` → `PSC_D_ACC_*`. В Plane с 4.5 `ARSPD_FBW_MIN/MAX` → `AIRSPEED_MIN/MAX`. В модулях указано новое имя и старое в скобках; при обновлении прошивки старые значения конвертируются автоматически, но свои скрипты и файлы параметров нужно поправить руками.
+Курс написан для стабильного выпуска ArduPilot 4.7 (Copter и Plane 4.7.2 от 11 октября 2026; 4.7.0 вышел 21 июля 2026). Имена, единицы и значения по умолчанию сверены с исходником тега 4.7.2 и с параметрами SITL этой сборки. Предыдущий выпуск — 4.6.3: там, где параметр в 4.7 переименован или сменил единицу, модули дают новое имя и один раз старое в скобках, а все замены собраны в таблице ниже. Лабораторные выводы, снятые на 4.6.3, оставлены как есть и помечены версией. Более ранние переименования, которые ещё встречаются в старых руководствах: в Plane с 4.5 `ARSPD_FBW_MIN/MAX` → `AIRSPEED_MIN/MAX`, с 4.6 `GPS_TYPE` → `GPS1_TYPE`.
+
+### Переход 4.6 → 4.7: что переименовано и изменилось
+1. **До прошивки:** сохрани полный список параметров в файл (`.param`) и скачай логи с полётника. По сообщению разработчиков в ветке релиза 4.7.0, на платах с логами во встроенной флеш-памяти (LittleFS) обновление стирает логи; по исходнику это не проверено.
+2. **Прошивать поверх, без стирания параметров:** при первой загрузке 4.7 сама переносит старые значения в новые имена и пересчитывает единицы (см → м, сантиградусы → градусы). Полное стирание нужно только если хочешь начать с заводских значений — тогда калибровки и настройку придётся повторить.
+3. **Что не переносится:** частоты потоков `SRn_*` (в `MAVn_*` они встают по умолчанию — выставь заново); файлы `.param`, Lua-скрипты, скрипты pymavlink и правила CI со старыми именами — параметра с таким именем больше нет, запись молча не сработает; `AVOID_ANGLE_MAX` — уклонение наклоном убрано из стандартных сборок.
+4. **Откат на 4.6** возможен, но значения, изменённые уже в 4.7 под новыми именами, назад не конвертируются: для отката загрузи сохранённый файл параметров 4.6.
+5. **Наземная станция:** обнови Mission Planner или QGroundControl — старая версия показывает ошибки на переименованных параметрах и не знает новых.
+6. **После обновления сравни** новый список параметров со старым файлом по таблице ниже; обязательно проверь `ARMING_SKIPCHK` (должен быть 0), `RTL_ALT_M`, `ATC_ANGLE_MAX`, `MAVn_*` и поведение Loiter.
+7. **Ловушки первого полёта:** Loiter по умолчанию делает координированные развороты (`LOIT_OPTIONS = 1`; 0 возвращает поведение 4.6); `ATC_INPUT_TC` по умолчанию стал 0.10 вместо 0.15 — стики острее; старые тайлы рельефа дают отказ pre-arm «terrain data expired, possible errors» — удали папку `APM/TERRAIN` на SD-карте; режимы Simple и Super Simple не работают в 4.7.0 — исправлено в 4.7.1.
+
+| Было (4.6.3) | Стало (4.7.2) | Что изменилось | С версии |
+|---|---|---|---|
+| `ARMING_CHECK` | `ARMING_SKIPCHK` | смысл обратный: маска **пропускаемых** проверок; 0 — все включены (было 1), −1 — пропустить все необязательные (было 0). Биты: 1 баро, 2 компас, 3 GPS, 4 INS, 5 параметры, 6 RC, 7 напряжение платы, 8 АКБ | 4.7.0 |
+| `ANGLE_MAX` (сантиградусы, 3000) | `ATC_ANGLE_MAX` (градусы, 30); в QuadPlane `Q_ANGLE_MAX` → `Q_A_ANGLE_MAX` | имя и единица | 4.7.0 |
+| `ATC_ACCEL_R/P/Y_MAX` (сантиградусы/с², 110000 / 110000 / 27000) | `ATC_ACC_R/P/Y_MAX` (°/с², 1100 / 1100 / 270) | имя и единица | 4.7.0 |
+| `ATC_SLEW_YAW` (сантиградусы/с, 6000) | `ATC_RATE_WPY_MAX` (°/с, 60) | имя и единица | 4.7.0 |
+| `ATC_INPUT_TC` = 0.15 | `ATC_INPUT_TC` = 0.10 (в QuadPlane `Q_A_INPUT_TC` 0.2 → 0.15) | только значение по умолчанию | 4.7.0 |
+| `RTL_ALT` (см, 1500) | `RTL_ALT_M` (м, 15) | имя и единица | 4.7.0 |
+| `RTL_ALT_FINAL`, `RTL_CLIMB_MIN` (см) | `RTL_ALT_FINAL_M`, `RTL_CLIMB_MIN_M` (м) | имя и единица | 4.7.0 |
+| `RTL_SPEED` (см/с) | `RTL_SPEED_MS` (м/с; 0 — брать `WP_SPD`) | имя и единица | 4.7.0 |
+| `WPNAV_SPEED` (см/с, 1000) | `WP_SPD` (м/с, 10) | имя и единица | 4.7.0 |
+| `WPNAV_SPEED_UP` / `WPNAV_SPEED_DN` (см/с, 250 / 150) | `WP_SPD_UP` / `WP_SPD_DN` (м/с, 2.5 / 1.5) | имя и единица | 4.7.0 |
+| `WPNAV_RADIUS` (см, 200) | `WP_RADIUS_M` (м, 2) | имя и единица | 4.7.0 |
+| `WPNAV_ACCEL`, `WPNAV_ACCEL_Z`, `WPNAV_ACCEL_C` (см/с², 250 / 100 / 0) | `WP_ACC`, `WP_ACC_Z`, `WP_ACC_CNR` (м/с², 2.5 / 1 / 0) | имя и единица | 4.7.0 |
+| `WPNAV_JERK`, `WPNAV_RFND_USE`, `WPNAV_TER_MARGIN` | `WP_JERK`, `WP_RFND_USE`, `WP_TER_MARGIN` | только префикс (единицы уже были м/с³ и м) | 4.7.0 |
+| `LAND_SPEED`, `LAND_SPEED_HIGH` (см/с, 50 / 0) | `LAND_SPD_MS`, `LAND_SPD_HIGH_MS` (м/с, 0.5 / 0) | имя и единица | 4.7.0 |
+| `LAND_ALT_LOW` (см, 1000) | `LAND_ALT_LOW_M` (м, 10) | имя и единица | 4.7.0 |
+| `PILOT_SPEED_UP` / `PILOT_SPEED_DN` (см/с, 250 / 0) | `PILOT_SPD_UP` / `PILOT_SPD_DN` (м/с, 2.5 / 0) | имя и единица | 4.7.0 |
+| `PILOT_ACCEL_Z` (см/с², 250) | `PILOT_ACC_Z` (м/с², 2.5) | имя и единица | 4.7.0 |
+| `PILOT_TKOFF_ALT` (см) | `PILOT_TKO_ALT_M` (м) | имя и единица | 4.7.0 |
+| `LOIT_SPEED` (см/с, 1250) | `LOIT_SPEED_MS` (м/с, 12.5) | имя и единица | 4.7.0 |
+| `LOIT_ACC_MAX`, `LOIT_BRK_ACCEL` (см/с², 500 / 250), `LOIT_BRK_JERK` (см/с³, 500) | `LOIT_ACC_MAX_M`, `LOIT_BRK_ACC_M` (м/с², 5 / 2.5), `LOIT_BRK_JRK_M` (м/с³, 5) | имя и единица | 4.7.0 |
+| — | `LOIT_OPTIONS` (бит 0 — координированные развороты, по умолчанию 1) | новый параметр; 0 — Loiter как в 4.6 | 4.7.0 |
+| — | `AUTOTUNE_GMBK` (0.25) | новый параметр: после AutoTune найденные P и D уменьшаются на 25 % | 4.7.0 |
+| `PHLD_BRAKE_ANGLE` (сантиградусы, 3000), `PHLD_BRAKE_RATE` | `PHLD_BRK_ANGLE` (градусы, 30), `PHLD_BRK_RATE` (°/с, 8) | имя; у угла — единица | 4.7.0 |
+| `CIRCLE_RADIUS` (см, 1000) | `CIRCLE_RADIUS_M` (м, 10) | имя и единица | 4.7.0 |
+| `PSC_POSXY_P`, `PSC_VELXY_P/I/D` | `PSC_NE_POS_P`, `PSC_NE_VEL_P/I/D` | только имя (1 и 2 / 1 / 0.25) | 4.7.0 |
+| `PSC_POSZ_P`, `PSC_VELZ_P/I/D` | `PSC_D_POS_P`, `PSC_D_VEL_P/I/D` | только имя (1 и 5 / 0 / 0) | 4.7.0 |
+| `PSC_ACCZ_P/I/D` (0.5 / 1 / 0) | `PSC_D_ACC_P/I/D` (0.05 / 0.1 / 0) | имя; значения × 0.1 | 4.7.0 |
+| `PSC_VELXY_IMAX`, `PSC_VELZ_IMAX` (1000) | `PSC_NE_VEL_IMAX`, `PSC_D_VEL_IMAX` (10) | имя; значения × 0.01 | 4.7.0 |
+| `PSC_ACCZ_IMAX` (800) | `PSC_D_ACC_IMAX` (0.8) | имя; значение × 0.001 | 4.7.0 |
+| `PSC_JERK_XY`, `PSC_JERK_Z` (м/с³, 5) | `PSC_NE_JERK`, `PSC_D_JERK` (в 4.7.0 — `PSC_JERK_NE`, `PSC_JERK_D`) | только имя, дважды | 4.7.0, 4.7.1 |
+| `Q_P_POSXY/VELXY/POSZ/VELZ/ACCZ_*` (QuadPlane) | `Q_P_NE_POS/NE_VEL/D_POS/D_VEL/D_ACC_*` | те же правила и множители, что у `PSC_*` | 4.7.0 |
+| `Q_WP_SPEED*`, `Q_WP_RADIUS`, `Q_WP_ACCEL*`, `Q_LOIT_*` (см) | `Q_WP_SPD*`, `Q_WP_RADIUS_M`, `Q_WP_ACC*`, `Q_LOIT_SPEED_MS`, `Q_LOIT_ACC_MAX_M`, `Q_LOIT_BRK_ACC_M`, `Q_LOIT_BRK_JRK_M` (м) | как у Copter | 4.7.0 |
+| `SR0_*` … `SR6_*` (частоты потоков по каналам, с нуля) | `MAV1_*` … `MAV7_*` (с единицы: `SR0` → `MAV1`, `SR1` → `MAV2`) | имя и нумерация; значения не переносятся | 4.7.0 |
+| `SERIALn_OPTIONS` бит 10 (не пересылать MAVLink), бит 12 (игнорировать запрос частот) | `MAVn_OPTIONS` бит 1, бит 2 | перенесено в параметры канала; старый бит, оставленный в `SERIALn_OPTIONS`, даёт отказ pre-arm | 4.7.0 |
+| `SYSID_THISMAV` | `MAV_SYSID` | только имя | 4.7.0 |
+| `SYSID_MYGCS` | `MAV_GCS_SYSID` (+ новый `MAV_GCS_SYSID_HI` — диапазон наземок) | только имя | 4.7.0 |
+| `SYSID_ENFORCE` | `MAV_OPTIONS` бит 0 | параметр стал битом | 4.7.0 |
+| `TELEM_DELAY` | `MAV_TELEM_DELAY` | только имя | 4.7.0 |
+| `RNGFNDn_MIN_CM` / `RNGFNDn_MAX_CM` (см) | `RNGFNDn_MIN` / `RNGFNDn_MAX` (м) | имя и единица | 4.7.0 |
+| `RNGFNDn_GNDCLEAR` (см) | `RNGFNDn_GNDCLR` (м) | имя и единица | 4.7.0 |
+| `EK3_MAX_FLOW` | `EK3_FLOW_MAX` (рад/с, 2.5) | только имя | 4.7.0 |
+| `EK3_SRC_OPTIONS` = 1 | `EK3_SRC_OPTIONS` = 0 | по умолчанию бит 0 FuseAllVelocities снят; новый бит 3 — свой набор источников на каждое ядро EKF | 4.7.0 |
+| `FS_EKF_ACTION` 1 / 2 / 3 | добавлено 0 — только сообщение | новое значение; по умолчанию по-прежнему 1 | 4.7.0 |
+| `AVOID_ANGLE_MAX` (сантиградусы) | `AVOID_ANG_MAX` (градусы) | уклонение наклоном убрано из стандартных сборок — параметр есть только в прошивке с custom build server | 4.7.0 |
+| `FS_SHORT_TIMEOUT` (Plane) | удалён | короткий failsafe упрощён, длинный — `FS_LONG_TIMEOUT` | 4.7.0 |
+| `GLIDE_SLOPE_MIN`, `GLIDE_SLOPE_THR` (Plane) | `ALT_SLOPE_MIN`, `ALT_SLOPE_MAXHGT` | имя | 4.7.0 |
+| — (Plane) | режим `AUTOLAND` (номер 26), `AUTOLAND_*`, `RCx_OPTION = 183` | новый режим автопосадки без миссии | 4.7.0 |
+| `CAM_RC_*` (RunCam) | `CAM1_RC_*`, тип камеры `CAM1_TYPE = 8` | RunCam стал типом камеры | 4.7.0 |
+| `SIM_GPS_DISABLE = 1`, `SIM_GPS2_DISABLE` (SITL) | `SIM_GPS1_ENABLE = 0`, `SIM_GPS2_ENABLE` | смысл обратный | 4.7.0 |
+| `SIM_GPS_*` (первый приёмник в SITL): `SIM_GPS_NOISE`, `SIM_GPS_GLITCH_X`, `SIM_GPS_ACC`, `SIM_GPS_HDG`, `SIM_GPS_POS_Y` | `SIM_GPS1_NOISE`, `SIM_GPS1_GLTCH_X`, `SIM_GPS1_ACC`, `SIM_GPS1_HDG`, `SIM_GPS1_POS_Y` | индекс приёмника в имени, часть имён укорочена | 4.7.0 |
+| лог Copter `CTUN.CRt`, `CTUN.DCRt`: целое, см/с | те же поля: число с плавающей точкой, м/с | свои скрипты, читающие сырые значения, пересчитать | 4.7.0 |
+| лог `GEN` (генератор RichenPower) | `RICH` | имя сообщения | 4.7.0 |
+
+Имена без изменений, о которых чаще всего спрашивают: `FRAME_CLASS`, `FRAME_TYPE`, `FLTMODE1..6`, `FS_THR_ENABLE`, `FS_GCS_ENABLE`, `BATT_*`, `FENCE_*`, `EK3_SRCn_*`, `MOT_*`, `ATC_RAT_*`, `ATC_ANG_*`, `INS_*`, `SERIALn_PROTOCOL`, `RCx_OPTION`, `RTL_ALT_TYPE`, `RTL_LOIT_TIME` (мс), `RTL_CONE_SLOPE`, `PSC_ANGLE_MAX`, `WP_YAW_BEHAVIOR`, `WP_NAVALT_MIN`; номера режимов Copter не менялись.
 
 ### Один код — много аппаратов
 ArduPilot — общий код и отдельные прошивки под тип аппарата: Copter (мультироторы и вертолёты), Plane (самолёты, крылья и QuadPlane-VTOL), Rover, Sub. Тип рамы внутри прошивки задаётся параметрами: для Copter это `FRAME_CLASS` (1 — Quad, 2 — Hexa, 3 — Octa, 4 — OctaQuad, 7 — Tri…) и `FRAME_TYPE` (0 — Plus, 1 — X, 2 — V, 3 — H…).
@@ -70,18 +136,18 @@ ArduPilot заметно тяжелее Betaflight. На F4-контроллер
 1. Прошивка по типу платы (`hwdef`), выбор frame class/type (`FRAME_CLASS`, `FRAME_TYPE`).
 2. Калибровки: акселерометр (6 положений), уровень, компас (в поле), радио (`RC1..4_MIN/MAX/TRIM`), ESC (`MOT_PWM_TYPE` DShot — калибровка не нужна), датчик напряжения/тока (`BATT_MONITOR`, `BATT_VOLT_MULT`, `BATT_AMP_PERVLT` по ваттметру).
 3. Режимы на тумблерах, `RCx_OPTION` (ARM/DISARM, Motor E-Stop, EKF source set…).
-4. Failsafe (модуль «Отказоустойчивость»), геозона, `RTL_ALT` (в 4.6, см; в 4.7+ — `RTL_ALT_M`, м).
-5. Стартовые параметры тюнинга по размеру пропа (модуль «Тюнинг ArduPilot»): `INS_GYRO_FILTER`, `ATC_RAT_*_FLT*`, `MOT_THST_EXPO`, `ATC_INPUT_TC`, `PSC_D_ACC_*` (до 4.7 — `PSC_ACCZ_*`).
+4. Failsafe (модуль «Отказоустойчивость»), геозона, `RTL_ALT_M` (метры; до 4.7 — `RTL_ALT`, сантиметры).
+5. Стартовые параметры тюнинга по размеру пропа (модуль «Тюнинг ArduPilot»): `INS_GYRO_FILTER`, `ATC_RAT_*_FLT*`, `MOT_THST_EXPO`, `ATC_INPUT_TC`, `PSC_D_ACC_*`.
 6. Логи (`LOG_BITMASK`), `LOG_DISARMED` для наземных измерений.
 7. Motor test (Mission Planner → Optional Hardware → Motor Test) без пропов: порядок и направление по схеме frame type.
 
 ### Разобранный пример: перевод пилота с Betaflight
-«Почему не армится?» — сообщение `PreArm: …` в GCS называет причину текстом (компас, GPS, INS, параметры, RC не откалибровано), а `ARMING_CHECK` (в 4.7+ — `ARMING_SKIPCHK`) только выбирает, какие проверки выполнять; «почему не держит высоту в Stabilize?» — потому что Stabilize = Betaflight Angle, высоту держит AltHold; «где rates?» — `ACRO_RP_RATE`/`ACRO_Y_RATE`, `ACRO_RP_EXPO`; «где PID?» — `ATC_RAT_RLL_P/I/D/FF/FLTD/FLTE/FLTT` (rate) и `ATC_ANG_RLL_P` (angle); «где фильтры?» — `INS_GYRO_FILTER`, `INS_HNTCH_*`; «где Blackbox?» — DataFlash на SD, Log Review; «где diff all?» — Full Parameter List → Save/Compare, или `param save` в MAVProxy.
+«Почему не армится?» — сообщение `PreArm: …` в GCS называет причину текстом (компас, GPS, INS, параметры, RC не откалибровано), а `ARMING_SKIPCHK` (до 4.7 — `ARMING_CHECK` с обратным смыслом) только выбирает, какие проверки пропустить; «почему не держит высоту в Stabilize?» — потому что Stabilize = Betaflight Angle, высоту держит AltHold; «где rates?» — `ACRO_RP_RATE`/`ACRO_Y_RATE`, `ACRO_RP_EXPO`; «где PID?» — `ATC_RAT_RLL_P/I/D/FF/FLTD/FLTE/FLTT` (rate) и `ATC_ANG_RLL_P` (angle); «где фильтры?» — `INS_GYRO_FILTER`, `INS_HNTCH_*`; «где Blackbox?» — DataFlash на SD, Log Review; «где diff all?» — Full Parameter List → Save/Compare, или `param save` в MAVProxy.
 
 ## practice
 ### Первое знакомство без риска
 1. Пройди модуль про SITL: всё ниже можно сделать на симуляторе.
-2. Открой полный список параметров в GCS и найди `FRAME_CLASS`, `FRAME_TYPE`, `ARMING_CHECK`, `FS_THR_ENABLE` (SITL курса — 4.6.3; в 4.7+ вместо `ARMING_CHECK` будет `ARMING_SKIPCHK`).
+2. Открой полный список параметров в GCS и найди `FRAME_CLASS`, `FRAME_TYPE`, `ARMING_SKIPCHK`, `FS_THR_ENABLE` (в SITL 4.6.3 вместо `ARMING_SKIPCHK` будет `ARMING_CHECK`).
 3. Сохрани параметры в файл с датой в имени.
 4. Переключи режимы STABILIZE → ALT_HOLD → LOITER в SITL и посмотри, какие требуют GPS.
 
@@ -95,7 +161,7 @@ ArduPilot заметно тяжелее Betaflight. На F4-контроллер
 **Автопроверка первого висения:** `examples/sitl-pymavlink/check_lab_log.py <лог.bin> --lab hover` — вибрации p95 < 30, без клиппинга, газ висения 0.2–0.6, трекинг углов p99 < 10°, просадка АКБ < 15%.
 
 ### Что должно получиться и что записать
-- **Параметры.** `FRAME_CLASS = 1` (Quad), `FRAME_TYPE = 0` (Plus) — это рама SITL по умолчанию (`sim_vehicle.py -v ArduCopter` без `-f` или с `-f quad`); Quad X (`FRAME_TYPE = 1`) запускают с `-f X`. `FS_THR_ENABLE` — действие при потере сигнала пульта (по умолчанию 1 — RTL). Проверки перед армом в SITL 4.6.3 задаёт `ARMING_CHECK` (1 — все); в Copter 4.7+ — `ARMING_SKIPCHK` с обратным смыслом. Для каждого параметра запиши значение и одну фразу о том, что оно делает.
+- **Параметры.** `FRAME_CLASS = 1` (Quad), `FRAME_TYPE = 0` (Plus) — это рама SITL по умолчанию (`sim_vehicle.py -v ArduCopter` без `-f` или с `-f quad`); Quad X (`FRAME_TYPE = 1`) запускают с `-f X`. `FS_THR_ENABLE` — действие при потере сигнала пульта (по умолчанию 1 — RTL). Проверки перед армом задаёт `ARMING_SKIPCHK` (0 — ни одна не пропущена); в SITL 4.6.3 это `ARMING_CHECK` с обратным смыслом (1 — все включены). Для каждого параметра запиши значение и одну фразу о том, что оно делает.
 - **Файл параметров:** `2026-11-09_sitl-quad.param`. Сохраняй до любых изменений — это точка отката.
 - **Режимы.** STABILIZE работает сразу: стик задаёт угол, газ — твой. ALT_HOLD держит высоту по барометру, а горизонтально аппарат сносит. LOITER держит точку и требует оценки позиции (GPS и сошедшийся EKF). Если переключиться в LOITER до фиксации GPS, режим не включится, а наземка покажет отказ. Запиши, какое сообщение пришло, — это проверка того, что ты понимаешь зависимость режимов от датчиков.
 - **Автопроверка висения.** Скрипт печатает пройденные и проваленные пункты. Прогони его на логе SITL (всё должно пройти) и сохрани вывод рядом с логом.
@@ -105,7 +171,7 @@ ArduPilot заметно тяжелее Betaflight. На F4-контроллер
 ## diagnostics
 - **Симптом:** `PreArm: ...` и дрон не армится
   - Возможная причина: незавершённая калибровка или неверный параметр, текст сообщения указывает подсистему.
-  - Что сделать: читать сообщение целиком, устранять причину, а не отключать проверки (`ARMING_SKIPCHK` в 4.7+, `ARMING_CHECK` в 4.6 и раньше).
+  - Что сделать: читать сообщение целиком, устранять причину, а не отключать проверки (`ARMING_SKIPCHK`).
 - **Симптом:** после изменения параметра ничего не изменилось
   - Возможная причина: параметр требует перезагрузки.
   - Что сделать: перезагрузить полётник и перечитать значение.

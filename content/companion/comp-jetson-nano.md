@@ -3,7 +3,7 @@ id: comp-jetson-nano
 title: "Jetson Nano как компаньон: что он может, чего нет и как выжать максимум"
 level: L2
 readingTime: 50 мин
-firmware: ArduPilot 4.6 · PX4 1.15+ · JetPack 4.6.6 / 6.2
+firmware: ArduPilot 4.7 (сверено с 4.7.2; лабораторная снята на 4.6.3) · PX4 1.17 (сверено с v1.17.0) · JetPack 4.6.6 / 6.2
 status: published
 added: 2026-11-14
 tags:
@@ -492,7 +492,7 @@ WantedBy=multi-user.target
 - Getting Started with Jetson Nano Developer Kit (microSD, headless) | https://developer.nvidia.com/embedded/learn/get-started-jetson-nano-devkit | primary | A
 - Jetson Nano Brings AI Computing to Everyone (бенчмарки NVIDIA, кодер) | https://developer.nvidia.com/blog/jetson-nano-ai-computing/ | primary | B
 - ArduPilot 4.6.3 — GCS_Common.cpp, handle_named_value → NVAL | https://github.com/ArduPilot/ardupilot/blob/Copter-4.6.3/libraries/GCS_MAVLink/GCS_Common.cpp | primary | A
-- PX4 1.15 — mavlink_receiver.cpp, NAMED_VALUE_FLOAT → debug_key_value | https://github.com/PX4/PX4-Autopilot/blob/v1.15.4/src/modules/mavlink/mavlink_receiver.cpp | primary | A
+- PX4 1.17 — mavlink_receiver.cpp, NAMED_VALUE_FLOAT → debug_key_value | https://github.com/PX4/PX4-Autopilot/blob/v1.17.0/src/modules/mavlink/mavlink_receiver.cpp | primary | A
 - MAVLink common.xml (NAMED_VALUE_FLOAT, MAV_COMP_ID_ONBOARD_COMPUTER, MAV_CMD_PREFLIGHT_REBOOT_SHUTDOWN) | https://github.com/mavlink/mavlink/blob/master/message_definitions/v1.0/common.xml | primary | A
 - ArduPilot Dev — Companion Computers | https://ardupilot.org/dev/docs/companion-computers.html | primary | A
 - mavlink-router — исходники и README | https://github.com/mavlink-router/mavlink-router | primary | A

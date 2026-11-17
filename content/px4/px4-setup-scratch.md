@@ -3,7 +3,7 @@ id: px4-setup-scratch
 title: "PX4 с нуля: Vehicle Setup в QGroundControl"
 level: L2
 readingTime: 55 мин
-firmware: PX4 1.15 (проверено на v1.15.4, SITL SIH)
+firmware: PX4 1.17 (сверено с v1.17.0 по исходникам; вывод SITL снят на v1.15.4, SIH)
 status: published
 tags:
   - PX4
@@ -23,7 +23,7 @@ next:
 ---
 
 ## summary
-Один мультиротор от пустого полётника до записанного первого висения на PX4 1.15 — в порядке 17 шагов настройки. Половину шагов проходишь в SITL (`make px4_sitl sihsim_quadx` или `gz_x500` + QGroundControl): airframe, геометрия моторов, тест моторов, режимы, failsafe с инъекцией отказов, autotune, лог и экспорт параметров. Остальное — на столе без пропов и в поле: порты `*_CONFIG`, приёмник CRSF/ELRS, калибровка радио, DShot или PWM с калибровкой ESC, `BAT1_V_DIV` и `BAT1_A_PER_V` по мультиметру и зарядке, первое висение в Position. Лабораторная: экспортированные параметры, тест моторов по геометрии, RC loss и low battery в ULog, отчёт Flight Review первого полёта.
+Один мультиротор от пустого полётника до записанного первого висения на PX4 1.17 (лабораторный вывод снят на v1.15.4) — в порядке 17 шагов настройки. Половину шагов проходишь в SITL (`make px4_sitl sihsim_quadx` или `gz_x500` + QGroundControl): airframe, геометрия моторов, тест моторов, режимы, failsafe с инъекцией отказов, autotune, лог и экспорт параметров. Остальное — на столе без пропов и в поле: порты `*_CONFIG`, приёмник CRSF/ELRS, калибровка радио, DShot или PWM с калибровкой ESC, `BAT1_V_DIV` и `BAT1_A_PER_V` по мультиметру и зарядке, первое висение в Position. Лабораторная: экспортированные параметры, тест моторов по геометрии, RC loss и low battery в ULog, отчёт Flight Review первого полёта.
 
 ## theory
 ### Что здесь нового, а что — ссылка
@@ -34,10 +34,10 @@ next:
 ### Три вещи, которые в PX4 устроены иначе
 - **Порт назначается функции, а не функция порту.** У каждой службы свой параметр `*_CONFIG` / `*_CFG`: `MAV_0_CONFIG` (по умолчанию TELEM1), `MAV_1_CONFIG` (обычно для TELEM2, по умолчанию 0 = Disabled), `GPS_1_CONFIG` (GPS1), `RC_PORT_CONFIG`, `RC_CRSF_PRT_CFG`, `MSP_OSD_CONFIG`, `DSHOT_TEL_CFG`. После выбора порта — перезагрузка, затем появляется скорость порта `SER_<порт>_BAUD`: `SER_GPS1_BAUD` (0 = Auto), для MAVLink на TELEM1 — `SER_TEL1_BAUD` (57600). `MAV_0_RATE` — не скорость порта, а потолок потока MAVLink в байтах/с (1200; 0 = baud/20). Два драйвера на одном порту PX4 не запретит и не предупредит: порт нужно освободить, поставив чужой `*_CONFIG` в Disabled.
 - **Выход назначается функции.** В Actuators каждому выходу ставится функция: `PWM_MAIN_FUNCn` / `PWM_AUX_FUNCn` = 101…112 — Motor 1…12. Протокол выбирается на группу таймера (`PWM_MAIN_TIMx` / `PWM_AUX_TIMx`: −5…−2 = DShot150…1200, −1 = OneShot, 50…400 = PWM, Гц). Геометрия — в `CA_*`: `CA_ROTOR_COUNT`, `CA_ROTORn_PX/PY` (м, FRD от центра масс), `CA_ROTORn_KM` (> 0 — CCW, < 0 — CW).
-- **Failsafe — с задержкой.** Большинство действий сначала дают Hold на `COM_FAIL_ACT_T` = 5 с (пилот может перехватить), потом — действие. SITL стартует с другими умолчаниями, чем полётник: `COM_RC_IN_MODE` = 1 (только джойстик), `COM_LOW_BAT_ACT` = 2, `SYS_FAILURE_EN` = 1, `MC_AT_EN` = 1, `SDLOG_MODE` = 1. Файл `.params` из SITL на аппарат не переносят.
+- **Failsafe — с задержкой.** Большинство действий сначала дают Hold на `COM_FAIL_ACT_T` = 5 с (пилот может перехватить), потом — действие. SITL стартует с другими умолчаниями, чем полётник: `COM_RC_IN_MODE` = 1 (только MAVLink-джойстик), `COM_LOW_BAT_ACT` = 3 (до 1.16 — 2), `SYS_FAILURE_EN` = 1, `MC_AT_EN` = 1, `SDLOG_MODE` = 1. Файл `.params` из SITL на аппарат не переносят.
 
-### Вход RC: CRSF/ELRS в PX4 1.15
-Два драйвера. `rc_input` разбирает CRSF (`RC_INPUT_PROTO`: −1 авто, 6 CRSF) на порту `RC_PORT_CONFIG`. Отдельный `crsf_rc` (порт `RC_CRSF_PRT_CFG`, телеметрия `RC_CRSF_TEL_EN`) по документации 1.15 требует своей сборки через `make <board> boardconfig` с выключенным `rc_input`. Что есть в твоей прошивке, видно по тому, какой параметр показывает QGC. Порт RC IN через IO-процессор Pixhawk понимает SBUS/DSM/PPM/ST24/SUMD, но не CRSF: ELRS подключают к UART (TELEM2, GPS2). В default-сборке fmu-v6x `rc_input` есть, в fmu-v6c — нет (проверено по `default.px4board` v1.15.4).
+### Вход RC: CRSF/ELRS
+Два драйвера. `crsf_rc` — отдельный драйвер CRSF: порт `RC_CRSF_PRT_CFG`, телеметрия `RC_CRSF_TEL_EN`. `rc_input` — общий: разбирает CRSF среди прочих (`RC_INPUT_PROTO`: −1 авто, 6 CRSF) на порту `RC_PORT_CONFIG`. Что есть в твоей прошивке, зависит от платы и версии и видно по тому, какой параметр показывает QGC. В 1.17 default-сборки fmu-v6x, fmu-v6xrt и fmu-v5x включают набор `crsf_rc`, `sbus_rc`, `dsm_rc`, `ghst_rc` и не включают `rc_input`: ELRS там настраивают через `RC_CRSF_PRT_CFG`. В fmu-v5 есть и этот набор, и `rc_input`; в fmu-v6c нет ни того, ни другого (проверено по `default.px4board` v1.17.0). До 1.17 было иначе: в default-сборке fmu-v6x стоял `rc_input` (`RC_PORT_CONFIG`), а `crsf_rc` требовал своей сборки через `make <board> boardconfig` с выключенным `rc_input` — страница CRSF Telemetry документации 1.17 всё ещё описывает этот порядок. Порт RC IN через IO-процессор Pixhawk понимает SBUS/DSM/PPM/ST24/SUMD, но не CRSF: ELRS подключают к UART (TELEM2, GPS2).
 
 ### Питание: как PX4 считает напряжение, ток и остаток
 Из `analog_battery.cpp`: `V = V_adc · BAT1_V_DIV`, `I = (V_adc − BAT_V_OFFS_CURR) · BAT1_A_PER_V`. Оба коэффициента стоят в числителе, поэтому калибровка — пропорция:
@@ -47,7 +47,7 @@ next:
 | Делитель | `BAT1_V_DIV_new = BAT1_V_DIV_old × V_мультиметр / V_QGC` | мультиметр на балансире или XT60 |
 | Ток | `BAT1_A_PER_V_new = BAT1_A_PER_V_old × мА·ч_зарядка / мА·ч_лог` | зарядка после полёта; клещи — для проверки |
 
-Остаток (`battery.cpp`): напряжение элемента, исправленное на нагрузку (`+ BAT1_R_INTERNAL · I`, а без датчика тока `+ газ · BAT1_V_LOAD_DROP`), линейно интерполируется между `BAT1_V_EMPTY` (3.6 В) и `BAT1_V_CHARGED` (4.05 В). С `BAT1_CAPACITY` > 0 к этому добавляется интеграл тока; документация советует ≈ 90 % паспортной ёмкости. Пороги: `BAT_LOW_THR` 0.15, `BAT_CRIT_THR` 0.07, `BAT_EMERGEN_THR` 0.05. Это формула 1.15: в 1.16 `BAT1_V_LOAD_DROP` удалён, а `BAT1_R_INTERNAL` по умолчанию −1 (сопротивление оценивается в полёте). Действие — `COM_LOW_BAT_ACT`: 0 предупреждение (умолчание на полётнике), 2 Land, 3 Return на critical и Land на emergency.
+Остаток (`battery.cpp`): напряжение элемента, исправленное на нагрузку (`+ R · I`, где R — `BAT1_R_INTERNAL`, если он ≥ 0, иначе сопротивление, которое PX4 оценивает в полёте; умолчание −1, стартовая оценка 0.005 Ом на элемент; без датчика тока поправки нет), линейно интерполируется между `BAT1_V_EMPTY` (3.6 В) и `BAT1_V_CHARGED` (4.05 В). С `BAT1_CAPACITY` > 0 к этому добавляется интеграл тока; документация советует ≈ 90 % паспортной ёмкости. Пороги: `BAT_LOW_THR` 0.15, `BAT_CRIT_THR` 0.07, `BAT_EMERGEN_THR` 0.05. До 1.16 формула была другой: `BAT1_R_INTERNAL` по умолчанию 0.005 Ом, а без датчика тока прибавлялось `газ · BAT1_V_LOAD_DROP` (параметр удалён в 1.16). Действие — `COM_LOW_BAT_ACT`: 0 предупреждение (умолчание на полётнике), 2 Land, 3 Return на critical и Land на emergency.
 
 ### Газ висения и тяговооружённость
 `MPC_THR_HOVER` (0.5) — стартовое значение. В полёте его уточняет оценщик тяги висения (`MPC_USE_HTE` = 1, топик `hover_thrust_estimate`). При линейной тяге доля висения = m·g / (n·T_max) = 1/(T/W). Реальный проп даёт тягу ближе к квадрату сигнала, это учитывает `THR_MDL_FAC`: `тяга = f·s² + (1 − f)·s`.
@@ -56,6 +56,7 @@ next:
 ### Шаг 1. Прошивка → сборка SITL (шаг 1 из 17)
 Вместо прошивки — сборка SITL. Я собирал v1.15.4 в контейнере (2 ядра, 7 ГБ): `make px4_sitl_default` — 1024 цели. Python-зависимости ставил в venv по `Tools/setup/requirements.txt`, а не скриптом `ubuntu.sh`. Gazebo в контейнере нет, поэтому основной путь здесь — SIH: физика считается внутри самого PX4. С Gazebo команда та же, что в px4-intro: `make px4_sitl gz_x500`.
 
+Вывод снят на v1.15.4; в 1.17 цели `sihsim_quadx` и `gz_x500` называются так же, для целевого релиза клонируй `--branch v1.17.0`.
 ```
 git clone --branch v1.15.4 --recursive https://github.com/PX4/PX4-Autopilot.git
 cd PX4-Autopilot && bash ./Tools/setup/ubuntu.sh --no-nuttx
@@ -100,10 +101,10 @@ pxh> listener actuator_outputs -n 1
 pxh> commander check
 INFO  [commander] Preflight check: OK
 ```
-В QGC → Flight Modes: канал `RC_MAP_FLTMODE`, слоты `COM_FLTMODE1…6` (0 Manual, 1 Altitude, 2 Position, 4 Hold, 5 Return, 8 Stabilized). Арм-тумблер — `RC_MAP_ARM_SW`, `COM_ARM_SWISBTN` = 0 (тумблер) или 1 (кнопка). Kill — `RC_MAP_KILL_SW`. Без взлёта PX4 сам снимет арм через `COM_DISARM_PRFLT` = 10 с.
+В QGC → Flight Modes: канал `RC_MAP_FLTMODE`, слоты `COM_FLTMODE1…6` (0 Manual, 1 Altitude, 2 Position, 4 Hold, 5 Return, 8 Stabilized; в 1.17 добавлен 16 — Altitude Cruise). Арм-тумблер — `RC_MAP_ARM_SW`, `COM_ARM_SWISBTN` = 0 (тумблер) или 1 (кнопка). Kill — `RC_MAP_KILL_SW`. Без взлёта PX4 сам снимет арм через `COM_DISARM_PRFLT` = 10 с.
 
 ### Шаг 6. Failsafe с инъекцией отказов (12, 14)
-Инъекция работает при `SYS_FAILURE_EN` = 1 (в SITL — по умолчанию). `failure rc_signal off` в SIH 1.15 не реализован:
+Инъекция работает при `SYS_FAILURE_EN` = 1 (в SITL — по умолчанию). `failure rc_signal off` в SIH не реализован. Вывод этого шага снят на v1.15.4; в 1.17 обработчика инъекции `rc_signal` в исходниках симуляторов тоже нет (батарею обрабатывает `battery_simulator`, моторы — `FailureInjector`), текст ответа может отличаться:
 ```
 pxh> failure rc_signal off
 ERROR [failure] Timeout waiting for ack
@@ -120,7 +121,7 @@ INFO  [commander] Disarmed by landing
 ```
 Цепочка: 0.5 с `COM_RC_LOSS_T` (плюс задержка детектора) → Hold на `COM_FAIL_ACT_T` = 5 с → `NAV_RCL_ACT` = 2 (Return) → посадка → дизарм по посадке (`COM_DISARM_LAND` = 2 с). Аппарат был в 3 м от дома, поэтому RTL не набирал `RTL_RETURN_ALT`.
 
-Батарея: `failure battery off` подменяет напряжение на 3.6 В/эл (14.4 В). С умолчаниями (`BAT_CRIT_THR` 0.07) в висении приходит только LOW: компенсация нагрузки добавляет 0.49 × 0.1 = 0.049 В, остаток (3.649 − 3.6)/0.45 = 0.109. Для теста я поставил `COM_LOW_BAT_ACT 3`, `BAT_CRIT_THR 0.12`, `BAT_LOW_THR 0.20`:
+Батарея: `failure battery off` подменяет напряжение на 3.6 В/эл (14.4 В). С умолчаниями 1.15 (`BAT_CRIT_THR` 0.07) в висении приходит только LOW: компенсация нагрузки `BAT1_V_LOAD_DROP` добавляет 0.49 × 0.1 = 0.049 В, остаток (3.649 − 3.6)/0.45 = 0.109. В 1.17 этого параметра нет (поправка — `R · I` по току), а SITL сам ставит `COM_LOW_BAT_ACT` = 3, поэтому уровни и времена на 1.17 будут другими — журнал ниже снят на v1.15.4. Для теста я поставил `COM_LOW_BAT_ACT 3`, `BAT_CRIT_THR 0.12`, `BAT_LOW_THR 0.20`:
 ```
 [  38.0 s] failure cmd output: WARN  [failure] inject failure unit: battery (100), type: off (1), instance: 0
 [  40.1 s] vehicle_status: nav_state=POSCTL armed; battery 14.40000 V warning=1
@@ -137,7 +138,7 @@ INFO  [commander] Disarmed by landing
 
 {{diagram:chart-px4-hte|HTE сходится к 0.488–0.493 за ~25 с и совпадает с расчётом 1/(T/W) = 0.4905; MPC_THR_HOVER = 0.5 — только стартовая точка.}}
 
-Autotune: Position на 2.5 м, `MAV_CMD_DO_AUTOTUNE_ENABLE` (в QGC — PID Tuning → Autotune). По `autotune_attitude_control_status` идентификация заняла 26 с (35.4 → 61.2 с от арма), коэффициенты применились после дизарма (`MC_AT_APPLY` = 1):
+Autotune: Position на 2.5 м, `MAV_CMD_DO_AUTOTUNE_ENABLE` (в QGC — PID Tuning → Autotune). По `autotune_attitude_control_status` идентификация заняла 26 с (35.4 → 61.2 с от арма), коэффициенты применились после дизарма (`MC_AT_APPLY` = 1). Таблица снята на v1.15.4: стартовое `MC_ROLL_P` там 6.5, в 1.17 умолчание — 4.0:
 
 | Параметр | До | После |
 |---|---|---|
@@ -163,7 +164,7 @@ param set-default MC_ROLLRATE_P 0.1564
 
 1. **Прошивка.** QGC → Vehicle Setup → Firmware, USB подключаешь после открытия экрана, PX4 Pro Stable. Если прошивка уже стояла — сначала Parameters → Save to file (старый конфиг).
 2. **Airframe** (Generic Quadcopter, 4001) → Apply and Restart. Ориентация платы `SENS_BOARD_ROT`, компас GPS определяется сам (`SENS_MAG_AUTOROT` = 1).
-3. **Порты.** GPS — GPS1 (`GPS_1_CONFIG`), телеметрия — TELEM1 (`MAV_0_CONFIG`). Для ELRS на TELEM2: проверить, что `MAV_1_CONFIG` = Disabled (это умолчание; если TELEM2 был отдан companion — выключить), затем `RC_PORT_CONFIG` = TELEM 2 (`rc_input`) или `RC_CRSF_PRT_CFG` = TELEM 2 (`crsf_rc`), перезагрузка. TX контроллера идёт на RX приёмника, RX — на TX.
+3. **Порты.** GPS — GPS1 (`GPS_1_CONFIG`), телеметрия — TELEM1 (`MAV_0_CONFIG`). Для ELRS на TELEM2: проверить, что `MAV_1_CONFIG` = Disabled (это умолчание; если TELEM2 был отдан companion — выключить), затем `RC_CRSF_PRT_CFG` = TELEM 2 (`crsf_rc`; default-сборка fmu-v6x в 1.17) или `RC_PORT_CONFIG` = TELEM 2 (`rc_input`; fmu-v6x до 1.17, fmu-v5), перезагрузка. TX контроллера идёт на RX приёмника, RX — на TX.
 4. **Приёмник.** Бинд и packet rate — по link-elrs. Проверка: Radio — все ползунки двигаются, каналов ≥ 8.
 5. **Калибровка радио.** QGC → Radio → Calibrate: пишутся `RC1_MIN/TRIM/MAX`…, `RC_MAP_*`. Норма — около 1000/1500/2000 мкс. Потом режимы и арм/kill из шага 5 SITL.
 6. **Протокол.** Actuators: моторы на выходах FMU. На Pixhawk с IO DShot работает только на AUX, MAIN идёт через IO. Группа таймера → DShot600 (если ESC умеет) или PWM 400 Гц.
@@ -172,7 +173,7 @@ param set-default MC_ROLLRATE_P 0.1564
 9. **Датчики.** Accelerometer (6 положений), Gyroscope (неподвижно), Compass (вращение, вдали от железа), Level Horizon (на ровной поверхности).
 10. **Питание.** QGC → Power: `BAT1_N_CELLS` 4, `BAT1_V_EMPTY` 3.6, `BAT1_V_CHARGED` 4.05. Напряжение: QGC показывает 16.42 В, мультиметр — 16.71 В, `BAT1_V_DIV` 18.000 → 18.000 × 16.71 / 16.42 = 18.318 (ошибка была 0.072 В/эл). Кнопка Calculate в QGC считает ту же пропорцию. Ток проверяется после первого полёта: в логе 2310 мА·ч, зарядка залила 2465 → `BAT1_A_PER_V` 36.0 × 2465 / 2310 = 38.416. `BAT1_CAPACITY` = 4500.
 11. **Failsafe.** `COM_LOW_BAT_ACT` = 3, `NAV_RCL_ACT` = 2, `RTL_RETURN_ALT` выше препятствий (airframe мультиротора ставит 30 м, `RTL_DESCEND_ALT` 10 м; 60 м — умолчание самого параметра), `GF_ACTION` по задаче. На столе без пропов и без арма: выключить пульт → в QGC сообщение о потере ручного управления, в консоли `listener failsafe_flags` → `manual_control_signal_lost: True`.
-12. **OSD и телеметрия.** MSP OSD (DJI/Walksnail) — `MSP_OSD_CONFIG` на свободный UART, если драйвер есть в сборке платы. Иначе телеметрия на пульте через CRSF (`RC_CRSF_TEL_EN`).
+12. **OSD и телеметрия.** MSP OSD — `MSP_OSD_CONFIG` на свободный UART, если драйвер есть в сборке платы; с 1.16 драйвер шлёт MSP DisplayPort (до 1.16 — элементы DJI legacy MSP), совместимость с конкретными очками PX4 не документирует. Иначе телеметрия на пульте через CRSF (`RC_CRSF_TEL_EN`).
 13. **Предполётная проверка и висение.** Пропы — по схеме CW/CCW. GPS ≥ 10 спутников, «Ready to fly», kill-тумблер под пальцем, 10 м до людей. Взлёт в Position, 2–3 м, 60 с висения, по 2 м в стороны, посадка. Прерывай (kill или Land), если: раскачка больше ±5°, дрейф больше 1 м при отпущенных стиках, «toilet bowl» (раскрутка по кругу — компас), газ висения выше 0.7.
 14. **Тест failsafe в воздухе.** Position на 10 м, пульт выключить → Hold 5 с → Return. Включить пульт, сменой режима перехватить.
 15. **Autotune.** Сначала `MC_AT_EN` = 1 и перезагрузка: на полётнике умолчание 0 и модуль не запущен, а SITL ставит 1 сам. Altitude, 4–20 м, штиль. Порядок — как в шаге 7 SITL, но фильтры и вибрации заранее проверены по px4-control.
@@ -187,7 +188,7 @@ param set-default MC_ROLLRATE_P 0.1564
   - Возможная причина: приёмник подключён к RC IN через IO (CRSF там не разбирается), порт занят MAVLink (`MAV_1_CONFIG`) или перепутаны TX/RX.
   - Что сделать: UART + `RC_PORT_CONFIG` или `RC_CRSF_PRT_CFG`, освободить порт, перезагрузка; в MAVLink Console — `rc_input status` или `crsf_rc status`.
 - **Симптом:** `RC_CRSF_PRT_CFG` нет в списке параметров
-  - Возможная причина: драйвер `crsf_rc` не собран для этой платы.
+  - Возможная причина: драйвер `crsf_rc` не собран для этой платы (до 1.17 — обычное дело; в 1.17 в fmu-v6x он есть, а нет уже `RC_PORT_CONFIG`).
   - Что сделать: `rc_input` на UART или своя сборка через `boardconfig`.
 - **Симптом:** мотор не крутится в тесте Actuators, остальные крутятся
   - Возможная причина: выход не назначен Motor N или DShot стоит на MAIN через IO.
@@ -210,24 +211,24 @@ param set-default MC_ROLLRATE_P 0.1564
   - Возможная причина: это норма — Hold на `COM_FAIL_ACT_T`.
   - Что сделать: учитывать при планировании дистанции; уменьшать задержку осознанно.
 - **Симптом:** `failure rc_signal off` в SITL отвечает «Timeout waiting for ack»
-  - Возможная причина: в SIH/gz 1.15 эта инъекция не обрабатывается.
+  - Возможная причина: эта инъекция в симуляторах не обрабатывается (ответ снят на 1.15.4; в исходниках 1.17 обработчика тоже нет).
   - Что сделать: имитировать потерю, прекратив `MANUAL_CONTROL` (джойстик QGC или скрипт).
 
 ## references
-- PX4 User Guide v1.15 — Actuator Configuration and Testing | https://docs.px4.io/v1.15/en/config/actuators.html | primary | A
-- PX4 User Guide v1.15 — ESC Calibration | https://docs.px4.io/v1.15/en/advanced_config/esc_calibration.html | primary | A
-- PX4 User Guide v1.15 — Battery Estimation Tuning | https://docs.px4.io/v1.15/en/config/battery.html | primary | A
-- PX4 User Guide v1.15 — Serial Port Configuration | https://docs.px4.io/v1.15/en/peripherals/serial_configuration.html | primary | A
-- PX4 User Guide v1.15 — CRSF Telemetry (TBS Crossfire / ExpressLRS) | https://docs.px4.io/v1.15/en/telemetry/crsf_telemetry.html | primary | A
-- PX4 User Guide v1.15 — DShot ESCs | https://docs.px4.io/v1.15/en/peripherals/dshot.html | primary | A
+- PX4 User Guide v1.17 — Actuator Configuration and Testing | https://docs.px4.io/v1.17/en/config/actuators.html | primary | A
+- PX4 User Guide v1.17 — ESC Calibration | https://docs.px4.io/v1.17/en/advanced_config/esc_calibration.html | primary | A
+- PX4 User Guide v1.17 — Battery Estimation Tuning | https://docs.px4.io/v1.17/en/config/battery.html | primary | A
+- PX4 User Guide v1.17 — Serial Port Configuration | https://docs.px4.io/v1.17/en/peripherals/serial_configuration.html | primary | A
+- PX4 User Guide v1.17 — CRSF Telemetry (TBS Crossfire / ExpressLRS) | https://docs.px4.io/v1.17/en/telemetry/crsf_telemetry.html | primary | A
+- PX4 User Guide v1.17 — DShot ESCs | https://docs.px4.io/v1.17/en/peripherals/dshot.html | primary | A
 - PX4 User Guide v1.15 — Safety Configuration (Failsafes) | https://docs.px4.io/v1.15/en/config/safety.html | primary | A
-- PX4 User Guide v1.15 — System Failure Injection | https://docs.px4.io/v1.15/en/debug/failure_injection.html | primary | A
-- PX4 User Guide v1.15 — Autotuning | https://docs.px4.io/v1.15/en/config/autotune.html | primary | A
-- PX4 User Guide v1.15 — Simulation-In-Hardware (SIH) | https://docs.px4.io/v1.15/en/sim_sih/ | primary | A
-- PX4-Autopilot v1.15.4 — analog_battery.cpp (V_DIV, A_PER_V) | https://github.com/PX4/PX4-Autopilot/blob/v1.15.4/src/modules/battery_status/analog_battery.cpp | primary | A
-- PX4-Autopilot v1.15.4 — battery.cpp (state of charge) | https://github.com/PX4/PX4-Autopilot/blob/v1.15.4/src/lib/battery/battery.cpp | primary | A
+- PX4 User Guide v1.17 — System Failure Injection | https://docs.px4.io/v1.17/en/debug/failure_injection.html | primary | A
+- PX4 User Guide v1.17 — Multicopter Auto-Tuning | https://docs.px4.io/v1.17/en/config/autotune_mc.html | primary | A
+- PX4 User Guide v1.17 — Simulation-In-Hardware (SIH) | https://docs.px4.io/v1.17/en/sim_sih/ | primary | A
+- PX4-Autopilot v1.17.0 — analog_battery.cpp (V_DIV, A_PER_V) | https://github.com/PX4/PX4-Autopilot/blob/v1.17.0/src/modules/battery_status/analog_battery.cpp | primary | A
+- PX4-Autopilot v1.17.0 — battery.cpp (state of charge) | https://github.com/PX4/PX4-Autopilot/blob/v1.17.0/src/lib/battery/battery.cpp | primary | A
 - QGroundControl User Guide — Power Setup | https://docs.qgroundcontrol.com/Stable_V4.3/en/qgc-user-guide/setup_view/power.html | primary | A
-- PX4 User Guide v1.15 — Radio Control Systems | https://docs.px4.io/v1.15/en/getting_started/rc_transmitter_receiver.html | primary | B
+- PX4 User Guide v1.17 — Radio Control Systems | https://docs.px4.io/v1.17/en/getting_started/rc_transmitter_receiver.html | primary | B
 
 ## checklist
 - Сборка SITL работает, QGC подключена

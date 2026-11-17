@@ -3,7 +3,7 @@ id: nav-indoor
 title: "Без GNSS: оптический поток, UWB, motion capture и внешняя навигация в EKF"
 level: L3
 readingTime: 50 мин
-firmware: ArduCopter 4.6.3 (SITL, отличия 4.7) · PX4 1.15+
+firmware: ArduCopter 4.7 (сверено с 4.7.2; лабораторная снята на 4.6.3) · PX4 1.17 (сверено с v1.17.0)
 status: published
 tags:
   - ExternalNav
@@ -40,7 +40,7 @@ GNSS даёт EKF позицию, скорость, иногда высоту и
 {{diagram:nav-indoor-sources|Четыре пути в EKF3 сходятся в одном месте — наборе EK3_SRC1_*: у каждого источника свой драйвер, своя задержка и свои значения POSXY / VELXY / YAW; перепутать строку — получить «Need Position Estimate».}}
 
 ### EK3_SRC: кто за что отвечает
-Значения в 4.6.3 (`AP_NavEKF_Source.cpp`): `EK3_SRC1_POSXY` — 0 None, 3 GPS, 4 Beacon, 6 ExternalNav; `EK3_SRC1_VELXY` — те же плюс 5 OpticalFlow и 7 WheelEncoder; `EK3_SRC1_POSZ` — 0, 1 Baro, 2 RangeFinder, 3 GPS, 4 Beacon, 6 ExternalNav; `EK3_SRC1_VELZ` — 0, 3, 4, 6; `EK3_SRC1_YAW` — 0, 1 Compass, 2 GPS, 3 GPS с откатом на компас, 6 ExternalNav, 8 GSF. `EK3_SRC_OPTIONS`: бит 0 FuseAllVelocities (по умолчанию включён), бит 1 AlignExtNavPosWhenUsingOptFlow. Три набора и тумблер `RCx_OPTION = 90` — в est-alt-sources.
+Значения (`AP_NavEKF_Source.cpp`, одинаковы в 4.6.3 и 4.7.2): `EK3_SRC1_POSXY` — 0 None, 3 GPS, 4 Beacon, 6 ExternalNav; `EK3_SRC1_VELXY` — те же плюс 5 OpticalFlow и 7 WheelEncoder; `EK3_SRC1_POSZ` — 0, 1 Baro, 2 RangeFinder, 3 GPS, 4 Beacon, 6 ExternalNav; `EK3_SRC1_VELZ` — 0, 3, 4, 6; `EK3_SRC1_YAW` — 0, 1 Compass, 2 GPS, 3 GPS с откатом на компас, 6 ExternalNav, 8 GSF. `EK3_SRC_OPTIONS`: бит 0 FuseAllVelocities (в 4.7 по умолчанию снят, `EK3_SRC_OPTIONS = 0`; в 4.6 был включён, значение 1), бит 1 AlignExtNavPosWhenUsingOptFlow, бит 3 UsePerCoreEKFSources (с 4.7: каждому ядру EKF свой набор источников). Три набора и тумблер `RCx_OPTION = 90` — в est-alt-sources.
 
 | Сценарий | POSXY | VELXY | POSZ | VELZ | YAW |
 |---|---|---|---|---|---|
@@ -52,9 +52,9 @@ GNSS даёт EKF позицию, скорость, иногда высоту и
 Компас в помещении врёт от арматуры на десятки градусов: с mocap курс берут из него же (`EK3_SRC1_YAW = 6`, `COMPASS_USE = 0`), с потоком и UWB компас остаётся слабым местом.
 
 ### Оптический поток как источник скорости
-Датчик выдаёт угловую скорость картинки (рад/с); скорость над полом `v = (flow − ω_gyro) · h` (est-alt-sources), поэтому без дальномера потока нет. Параметры: `FLOW_TYPE` (1 PX4Flow, 2 Pixart, 4 CXOF, 5 MAVLink, 6 DroneCAN, 7 MSP, 8 UPFLOW), `FLOW_ORIENT_YAW` (сантиградусы), `FLOW_POS_X/Y/Z`, масштаб `FLOW_FXSCALER` / `FLOW_FYSCALER` в тысячных: поток умножается на `1 + FXSCALER/1000`, диапазон ±800. В EKF: `EK3_FLOW_USE` (1 — навигация, 2 — только оценка рельефа), `EK3_FLOW_DELAY` (10 мс по умолчанию, 0–250), `EK3_FLOW_M_NSE` (0.25 рад/с), `EK3_FLOW_I_GATE` (300 = 3σ), `EK3_MAX_FLOW` (2.5 рад/с).
+Датчик выдаёт угловую скорость картинки (рад/с); скорость над полом `v = (flow − ω_gyro) · h` (est-alt-sources), поэтому без дальномера потока нет. Параметры: `FLOW_TYPE` (1 PX4Flow, 2 Pixart, 4 CXOF, 5 MAVLink, 6 DroneCAN, 7 MSP, 8 UPFLOW, 10 SITL), `FLOW_ORIENT_YAW` (сантиградусы), `FLOW_POS_X/Y/Z`, масштаб `FLOW_FXSCALER` / `FLOW_FYSCALER` в тысячных: поток умножается на `1 + FXSCALER/1000`, диапазон ±800. В EKF: `EK3_FLOW_USE` (1 — навигация, 2 — только оценка рельефа), `EK3_FLOW_DELAY` (10 мс по умолчанию, 0–250), `EK3_FLOW_M_NSE` (0.25 рад/с), `EK3_FLOW_I_GATE` (300 = 3σ), `EK3_FLOW_MAX` (2.5 рад/с; до 4.7 — `EK3_MAX_FLOW`).
 
-Два следствия. EKF ограничивает путевую скорость: `ekfGndSpdLimit = (EK3_MAX_FLOW − 1) · h` — 1.5 м/с на высоте 1 м. И позиции поток не даёт (`POSXY = 0`): EKF интегрирует скорость, точка удержания ползёт, а Loiter не поднимется выше `RNGFND1_MAX_CM`.
+Два следствия. EKF ограничивает путевую скорость: `ekfGndSpdLimit = (EK3_FLOW_MAX − 1) · h` — 1.5 м/с на высоте 1 м. И позиции поток не даёт (`POSXY = 0`): EKF интегрирует скорость, точка удержания ползёт, а Loiter не поднимется выше `RNGFND1_MAX` (метры; до 4.7 — `RNGFND1_MAX_CM`, сантиметры).
 
 ### Внешняя позиция: три двери в один EKF
 - **`VISO_TYPE = 1` (MAVLink).** Принимаются `VISION_POSITION_ESTIMATE`, `GLOBAL_VISION_POSITION_ESTIMATE`, `VICON_POSITION_ESTIMATE`, `ATT_POS_MOCAP` (позиция + ориентация), `VISION_SPEED_ESTIMATE` и `ODOMETRY` (поза + скорость; только `frame_id = MAV_FRAME_LOCAL_FRD` и `child_frame_id = MAV_FRAME_BODY_FRD`, иначе сообщение молча выбрасывается). `VISO_TYPE = 2` — T265, 3 — VOXL. Шум: ковариация из сообщения, но не меньше `VISO_POS_M_NSE` (0.2 м), `VISO_YAW_M_NSE` (0.2 рад), `VISO_VEL_M_NSE` (0.1 м/с); `NaN` в `covariance[0]` — «бери из параметров». EKF принимает позу не чаще раза в 20 мс (`extNavIntervalMin_ms`), слать быстрее 50 Гц бессмысленно.
@@ -71,7 +71,7 @@ EKF сливает измерение с состоянием того моме�
 SLAM после замыкания петли или mocap после перекалибровки сдвигают позу скачком. Для EKF это глитч: измерения вне ворот отбрасываются (`XKF4.SP > 1`), а когда ворота откроются, аппарат полетит «исправлять» ошибку. Правильно — увеличить `reset_counter` в том же сообщении: EKF мгновенно переставит позицию (`posReset`), а контроллер позиции сдвинет цель вместе с ней. В `GPS_INPUT`, `VICON_POSITION_ESTIMATE`, `ATT_POS_MOCAP` и `/ap/tf` счётчика нет. Ворота: `(ΔN² + ΔE²) < (EK3_POS_I_GATE/100)² · (var_N + var_E)`, `var = P + VISO_POS_M_NSE²`; при 500 и σ = 0.2 м это около 1.5 м.
 
 ### Ловушка 4: арминг и origin
-Без GPS у EKF нет начала координат в lat/lon, а без него нет «дома»: pre-arm отвечает `AHRS: waiting for home`. Origin задаёт GCS или скрипт сообщением `SET_GPS_GLOBAL_ORIGIN` (lat/lon в 1e-7°, высота в мм) — один раз: повторная попытка даёт `EKF3: origin already set`, сменить можно только перезагрузкой. Координаты нужны правдоподобные (от них берётся магнитное склонение), но не точные. Маяки origin берут сами из `BCN_LATITUDE/LONGITUDE/ALT`. В 4.7 `AHRS_OPTIONS` бит 3 сохраняет origin, бит 4 восстанавливает при загрузке без GPS. Остальной pre-arm: `VisOdom: not healthy`, если поза не приходила 300 мс; `Need Position Estimate` — EKF ещё не взял источник. Отключать `ARMING_CHECK` не нужно: в лабораторной арм в Loiter проходит с `ARMING_CHECK = 1` и `GPS1_TYPE = 0`.
+Без GPS у EKF нет начала координат в lat/lon, а без него нет «дома»: pre-arm отвечает `AHRS: waiting for home`. Origin задаёт GCS или скрипт сообщением `SET_GPS_GLOBAL_ORIGIN` (lat/lon в 1e-7°, высота в мм) — один раз: повторная попытка даёт `EKF3: origin already set`, сменить можно только перезагрузкой. Координаты нужны правдоподобные (от них берётся магнитное склонение), но не точные. Маяки origin берут сами из `BCN_LATITUDE/LONGITUDE/ALT`. `AHRS_OPTIONS` бит 3 сохраняет origin (в `AHRS_ORIGIN_LAT/LON/ALT`), бит 4 восстанавливает его при загрузке без GPS — оба бита появились в 4.7. Остальной pre-arm: `VisOdom: not healthy`, если поза не приходила 300 мс; `Need Position Estimate` — EKF ещё не взял источник. Пропускать проверки через `ARMING_SKIPCHK` (до 4.7 — `ARMING_CHECK`) не нужно: в лабораторной арм в Loiter проходит с `ARMING_CHECK = 1` и `GPS1_TYPE = 0`.
 
 ### UWB-маяки
 `BCN_TYPE`: 1 Pozyx, 2 Marvelmind (ультразвук, тот же драйвер), 3 Nooploop (10 — SITL), подключение по UART с `SERIALx_PROTOCOL = 13`. Якорей не больше четырёх (`AP_BEACON_MAX_BEACONS = 4`) — это одна комната или зал, не склад. Якоря ставят прямоугольником, origin — якорь с младшим ID (Pozyx) или якорь 0 (Nooploop); `BCN_ORIENT_YAW` — компасный курс от origin на второй якорь. В EKF: `EK3_BCN_M_NSE` (1 м), `EK3_BCN_I_GTE` (500), `EK3_BCN_DELAY` (50 мс; для Nooploop документация ставит 20). Компас обязателен: EKF начинает использовать маяки только после выравнивания курса. Якоря на одной высоте не наблюдают Z — тогда `EK3_SRC1_POSZ = 1`. На платах с флешем меньше 2 МБ драйвера маяков в стандартной сборке нет.
@@ -80,10 +80,12 @@ SLAM после замыкания петли или mocap после перек
 Цепочка: камеры → ПО трекинга (Motive, Tracker) → сеть (NatNet / VRPN) → ROS 2-узел, публикующий `PoseStamped` твёрдого тела → MAVROS `vision_pose` или AP_DDS `/ap/tf` → полётник. На каждом звене своя задержка (оценки автора, кроме камеры): камера и трекинг 5–10 мс (у OptiTrack PrimeX 22 по паспорту 2.8 мс на камеру, плюс реконструкция в ПО), Wi-Fi 5–50 мс с выбросами, UART 921600 — около 1.4 мс на пакет (`VISION_POSITION_ESTIMATE` MAVLink 2 ≈ 130 байт × 10 бит). Wi-Fi-выброс в 300 мс для EKF означает «источник нездоров»; мост обязан прекращать публикацию, когда mocap потерял тело, а не повторять последнюю позу (per-visual-nav, отказ источника). Центр твёрдого тела ставят в IMU или задают `VISO_POS_X/Y/Z`.
 
 ### PX4 коротко
-EKF2 (1.15): `EKF2_EV_CTRL` — битовая маска (0 — горизонтальная позиция, 1 — вертикальная, 2 — скорость, 3 — yaw; по умолчанию 15), `EKF2_HGT_REF` (0 баро, 1 GPS, 2 дальномер, 3 vision), `EKF2_EV_DELAY` (0 мс по умолчанию, максимум 300) при общем `EKF2_DELAY_MAX` 200 мс, `EKF2_GPS_CTRL = 0` выключает GNSS. Поток: `EKF2_OF_CTRL = 1` (по умолчанию 0), `EKF2_OF_DELAY` 20 мс, дальномер обязателен. Принимаются `VISION_POSITION_ESTIMATE` и `ODOMETRY` (`MAV_FRAME_LOCAL_FRD`) на 30–50 Гц; `VICON_POSITION_ESTIMATE` и `GLOBAL_VISION_POSITION_ESTIMATE` не поддерживаются.
+EKF2 (1.17): `EKF2_EV_CTRL` — битовая маска (0 — горизонтальная позиция, 1 — вертикальная, 2 — скорость, 3 — yaw; по умолчанию 0 — выключено, нужные биты ставят сами; в 1.15 умолчание было 15), `EKF2_HGT_REF` (0 баро, 1 GPS, 2 дальномер, 3 vision), `EKF2_EV_DELAY` (0 мс по умолчанию, максимум 300) при общем `EKF2_DELAY_MAX` 200 мс, `EKF2_GPS_CTRL = 0` выключает GNSS. Поток: `EKF2_OF_CTRL = 1` (умолчание с 1.16; в 1.15 — 0), `EKF2_OF_DELAY` 20 мс, дальномер обязателен. Принимаются `VISION_POSITION_ESTIMATE` и `ODOMETRY` (`MAV_FRAME_LOCAL_FRD`) на 30–50 Гц; `VICON_POSITION_ESTIMATE` и `GLOBAL_VISION_POSITION_ESTIMATE` не поддерживаются.
 
 ## practice
 Стенд: ArduCopter из тега Copter-4.6.3 (сборка — ap-sitl), запуск напрямую, свой экземпляр `-I 1` (MAVLink на TCP 5770): `arducopter -w -S -I 1 --model + --speedup 1 --home -35.363261,149.165230,584,353 --defaults defaults.parm`. Параметры поверх `copter.parm`:
+
+Параметры и выводы ниже сняты на Copter-4.6.3; в 4.7.2 `ARMING_CHECK 1` называется `ARMING_SKIPCHK 0`, а GPS симулятора в 4.6.3 выключает `SIM_GPS_DISABLE 1` (имя `SIM_GPS1_ENABLE` — из 4.7).
 
 ```text
 SIM_GPS1_ENABLE 0      GPS1_TYPE 0          AHRS_EKF_TYPE 3
@@ -207,7 +209,7 @@ t=100.0  truth N +435.44 E -480.68   XKF1 PN -481.69 PE +436.38
 
 ### Переход на реальное железо
 **А. Поток + дальномер в комнате (от 3 × 3 м, текстурный пол, свет).** Пример: Matek 3901-L0X по MSP — `SERIALx_PROTOCOL = 32`, `FLOW_TYPE = 7`, `RNGFND1_TYPE = 32`, `RNGFND1_ORIENT = 25`; его дальномер работает до 2 м, под высоту больше — отдельный лидар.
-1. **Пропы сняты.** `LOG_DISARMED = 1`. В GCS `opt_m_x`, `opt_m_y`, `opt_qua` не нули; дальномер на полу показывает `RNGFND1_GNDCLEAR` ± 10 см, в руках на 1 м — 1.0 ± 0.05 м.
+1. **Пропы сняты.** `LOG_DISARMED = 1`. В GCS `opt_m_x`, `opt_m_y`, `opt_qua` не нули; дальномер на полу показывает `RNGFND1_GNDCLR` ± 0.1 м (до 4.7 — `RNGFND1_GNDCLEAR`, см), в руках на 1 м — 1.0 ± 0.05 м.
 2. **Калибровка масштаба, пропы сняты.** Аппарат на уровне глаз, крен ±15° за секунду туда и обратно, 5–10 раз; то же по тангажу. В логе `OF.flowX` против `OF.bodyX` и `IMU.GyrX`: формы совпадают, масштаб выравнивается `FLOW_FXSCALER = (body/flow − 1) · 1000`. Знак обратный или корреляции нет — `FLOW_ORIENT_YAW` или датчик смотрит не вниз.
 3. **Проход руками, пропы сняты.** `EK3_SRC1_VELXY = 5`, `POSXY = 0`, `POSZ = 1`, `YAW = 1`, origin задан с GCS. Пронеси аппарат на высоте 1 м по прямой 3 м и обратно: на карте он должен уйти на 3 ± 0.3 м в ту же сторону и вернуться в ±0.3 м.
 4. **Пропы ставятся только здесь.** Первый подлёт — AltHold, `EK3_SRC1_VELXY = 0`: 30 с на 0.5–1.5 м, в логе `XKF5.rng` следует за высотой, `OF.bodyX/Y` повторяют гироскоп. Затем `VELXY = 5`, взлёт в Loiter на 1 м, палец на тумблере AltHold; свободное место вокруг: аппарат на плохом потоке набирает максимальный наклон без предупреждения. Прерывание: уход больше 1 м, качание, любое `EKF variance`.
@@ -218,12 +220,12 @@ t=100.0  truth N +435.44 E -480.68   XKF1 PN -481.69 PE +436.38
 - UWB (4 якоря, тег на UART): на земле через минуту позиция прыгает в `BCN_LATITUDE/LONGITUDE` и стоит в пределах ±0.3 м; `BCN.D0…D3` совпадают с рулеткой до 0.2 м в четырёх точках площадки; проход руками по периметру повторяет форму на карте; `XKF4.SP < 0.5`. Полёт: AltHold → Loiter, удержание ±0.5 м.
 - Mocap: поза приходит на полётник ≥ 30 Гц без пропусков длиннее 100 мс (`VISP` в логе, `LOG_DISARMED = 1`); проверка осей руками из ловушки 1 пройдена; `VISO_DELAY_MS` подобран, `|XKF3.IPN/IPE| < 0.1 м` на рывках; закрытие маркеров рукой на 2 с даёт `VisOdom: not healthy`, а не замёрзшую позу; перекалибровка объёма увеличивает `reset_counter`. Первый полёт — на привязи или в сетке, Stabilize → AltHold → Loiter → Guided, тумблер Stabilize под пальцем. Приёмка: висение 60 с в ±5 см от точки по данным mocap.
 
-Лабораторная засчитывается, когда (SITL): воспроизведён отказ `AHRS: waiting for home` и арм в Loiter после `SET_GPS_GLOBAL_ORIGIN` при `ARMING_CHECK = 1`; базовый полёт дал ошибку `XKF1` к истине p95 ≤ 0.05 м и `XKF4.SP < 0.2`; собрана таблица развёртки минимум из пяти точек с Δτ, p95, max инновации и `SP`, назван Δτ, на котором появляется `SP > 1`, и объяснено, почему раньше ломается управление; показаны оба лога скачка 2 м — с отбраковкой и рывком аппарата без `reset_counter` и без них со сбросом. (Железо, если есть): таблица `OF.flowX` / `OF.bodyX` до и после `FLOW_FXSCALER`; лог прохода руками 3 м с ошибкой ≤ 0.3 м; Loiter 60 с по потоку с уходом ≤ 0.5 м; для UWB или mocap — выполнены критерии раздела Б.
+Лабораторная засчитывается, когда (SITL): воспроизведён отказ `AHRS: waiting for home` и арм в Loiter после `SET_GPS_GLOBAL_ORIGIN` без пропуска проверок (`ARMING_SKIPCHK = 0`; в прогоне на 4.6.3 — `ARMING_CHECK = 1`); базовый полёт дал ошибку `XKF1` к истине p95 ≤ 0.05 м и `XKF4.SP < 0.2`; собрана таблица развёртки минимум из пяти точек с Δτ, p95, max инновации и `SP`, назван Δτ, на котором появляется `SP > 1`, и объяснено, почему раньше ломается управление; показаны оба лога скачка 2 м — с отбраковкой и рывком аппарата без `reset_counter` и без них со сбросом. (Железо, если есть): таблица `OF.flowX` / `OF.bodyX` до и после `FLOW_FXSCALER`; лог прохода руками 3 м с ошибкой ≤ 0.3 м; Loiter 60 с по потоку с уходом ≤ 0.5 м; для UWB или mocap — выполнены критерии раздела Б.
 
 ## diagnostics
 - **Симптом:** `PreArm: AHRS: waiting for home` при работающем источнике
   - Возможная причина: не задан origin — без GPS его некому поставить.
-  - Что сделать: `SET_GPS_GLOBAL_ORIGIN` с GCS («Set EKF origin here») или из моста сразу после старта потока; в 4.7 — `AHRS_OPTIONS` биты 3 и 4.
+  - Что сделать: `SET_GPS_GLOBAL_ORIGIN` с GCS («Set EKF origin here») или из моста сразу после старта потока; `AHRS_OPTIONS` биты 3 и 4 (с 4.7).
 - **Симптом:** `PreArm: Need Position Estimate` или `VisOdom: not healthy`
   - Возможная причина: поза не доходит (не тот порт или sysid, пауза больше 300 мс); `ODOMETRY` с `frame_id` не `MAV_FRAME_LOCAL_FRD`; `VISO_TYPE = 0`; `EK3_SRC1_POSXY` не 6.
   - Что видно в логе: сообщений `VISP` нет или в них `Ign = 1`.
@@ -242,7 +244,7 @@ t=100.0  truth N +435.44 E -480.68   XKF1 PN -481.69 PE +436.38
   - Что видно в логе: `VISP.PX/PY` ступенькой, `XKF4.SP > 1` на 1–2 с, `VISP.Rst` не изменился.
   - Что сделать: мост увеличивает `reset_counter`; для `GPS_INPUT` и `/ap/tf` — не допускать скачков или перейти на `VISION_POSITION_ESTIMATE`.
 - **Симптом:** по потоку Loiter медленно ползёт, по кругу или в одну сторону
-  - Возможная причина: это свойство — позиции нет, интегрируется скорость; сильнее при неверном `FLOW_FXSCALER`, `FLOW_ORIENT_YAW`, ошибке дальномера. Срыв на высоте или скорости — дальномер вне диапазона (`RFND.Stat` не 4) или скорость выше `(EK3_MAX_FLOW − 1) · h`.
+  - Возможная причина: это свойство — позиции нет, интегрируется скорость; сильнее при неверном `FLOW_FXSCALER`, `FLOW_ORIENT_YAW`, ошибке дальномера. Срыв на высоте или скорости — дальномер вне диапазона (`RFND.Stat` не 4) или скорость выше `(EK3_FLOW_MAX − 1) · h`.
   - Что сделать: калибровка масштаба; лидар с запасом по дальности; принять дрейф 1–3 % пути или добавить источник позиции.
 - **Симптом:** UWB-позиция прыгает на 0.5–2 м у стен, высота гуляет
   - Возможная причина: отражения, якорь без прямой видимости; якоря в одной плоскости.
@@ -263,13 +265,13 @@ t=100.0  truth N +435.44 E -480.68   XKF1 PN -481.69 PE +436.38
 - ArduPilot source — время измерения ExternalNav и предел задержки 250 мс (`AP_NavEKF3_Measurements.cpp`, `AP_NavEKF3_core.cpp`) | https://github.com/ArduPilot/ardupilot/blob/Copter-4.6.3/libraries/AP_NavEKF3/AP_NavEKF3_Measurements.cpp | primary | A
 - ArduPilot source — внешняя одометрия через DDS, `/ap/tf` (`libraries/AP_DDS/AP_DDS_External_Odom.cpp`) | https://github.com/ArduPilot/ardupilot/blob/Copter-4.6.3/libraries/AP_DDS/AP_DDS_External_Odom.cpp | primary | A
 - ArduPilot Copter — EKF Source Selection and Switching (наборы, тумблер, EK3_SRC_OPTIONS) | https://ardupilot.org/copter/docs/common-ekf-sources.html | primary | A
-- ArduPilot Copter — Non-GPS Navigation (список систем, origin, AHRS_OPTIONS в 4.7) | https://ardupilot.org/copter/docs/common-non-gps-navigation-landing-page.html | primary | A
+- ArduPilot Copter — Non-GPS Navigation (список систем, origin, AHRS_OPTIONS) | https://ardupilot.org/copter/docs/common-non-gps-navigation-landing-page.html | primary | A
 - ArduPilot Copter — Optical Flow Sensor Testing and Setup (калибровка, первые полёты) | https://ardupilot.org/copter/docs/common-optical-flow-sensor-setup.html | primary | A
 - ArduPilot Copter — Vicon Positioning System (GPS_INPUT, GPS1_TYPE 14) | https://ardupilot.org/copter/docs/common-vicon-for-nongps-navigation.html | primary | A
 - ArduPilot Copter — Pozyx / Nooploop Beacons (BCN_*, раскладка якорей) | https://ardupilot.org/copter/docs/common-nooploop.html | primary | A
-- PX4 source — параметры EKF2 v1.15.4 (`src/modules/ekf2/module.yaml`) | https://github.com/PX4/PX4-Autopilot/blob/v1.15.4/src/modules/ekf2/module.yaml | primary | A
-- PX4 Guide — Using Vision or Motion Capture Systems for Position Estimation | https://docs.px4.io/main/en/ros/external_position_estimation.html | primary | A
+- PX4 source — параметры EKF2 v1.17.0 (`src/modules/ekf2/module.yaml`, `params_external_vision.yaml`, `params_optical_flow.yaml`) | https://github.com/PX4/PX4-Autopilot/tree/v1.17.0/src/modules/ekf2 | primary | A
+- PX4 Guide — Using Vision or Motion Capture Systems for Position Estimation | https://docs.px4.io/v1.17/en/ros/external_position_estimation.html | primary | A
 - MAVLink common.xml — VISION_POSITION_ESTIMATE (102), SET_GPS_GLOBAL_ORIGIN (48), reset_counter | https://github.com/mavlink/mavlink/blob/master/message_definitions/v1.0/common.xml | primary | A
 
 ## notes
-Числа лабораторной — ArduCopter 4.6.3 SITL без ветра; на железе вибрации расширяют P, и пороги по Δτ сдвигаются. В документации 4.7 вместо `ARMING_CHECK` используется `ARMING_SKIPCHK`, `RNGFND1_MAX_CM` — на `RNGFND1_MAX` (м); значения `EK3_SRCx` и `VISO_*` те же. Точности UWB и mocap в таблице — типичные значения производителей, не измерения автора.
+Числа лабораторной — ArduCopter 4.6.3 SITL без ветра; на железе вибрации расширяют P, и пороги по Δτ сдвигаются. Имена параметров в тексте — для 4.7.2; в 4.6 `ARMING_SKIPCHK` назывался `ARMING_CHECK` (смысл обратный), `RNGFND1_MAX` — `RNGFND1_MAX_CM` (см), `EK3_FLOW_MAX` — `EK3_MAX_FLOW`; значения `EK3_SRCx` и `VISO_*` те же. Точности UWB и mocap в таблице — типичные значения производителей, не измерения автора.

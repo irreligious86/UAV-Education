@@ -36,7 +36,7 @@
    "explain": "ibata_offset задан в мА и просто прибавляется к току: 0 + (0.42 − 0.19) × 1000 = 230 мА."
   },
   {
-   "q": "Как в Betaflight 4.5 развернуть вращение мотора 3 на DShot-ESC без перепайки?",
+   "q": "Как в Betaflight развернуть вращение мотора 3 на DShot-ESC без перепайки?",
    "options": [
     "set motor_direction = 3",
     "dshotprog 2 8 12 (или диалог Motor direction)",
@@ -44,7 +44,7 @@
     "resource MOTOR 3 none"
    ],
    "answer": 1,
-   "explain": "Параметра motor_direction в 4.5 нет: направление хранится в ESC. dshotprog принимает индекс с нуля, команду 8 (SPIN_DIRECTION_2) и 12 (SAVE_SETTINGS). yaw_motors_reversed меняет все четыре мотора и миксер (props out)."
+   "explain": "Параметра motor_direction в Betaflight нет (ни в 4.5, ни в 2025.12): направление хранится в ESC. dshotprog принимает индекс с нуля, команду 8 (SPIN_DIRECTION_2) и 12 (SAVE_SETTINGS). yaw_motors_reversed меняет все четыре мотора и миксер (props out)."
   },
   {
    "q": "Тест моторов: ползунок 1 крутит передний правый, ползунок 2 — задний правый, 3 и 4 на месте. Какой motor_output_reordering исправит порядок?",
@@ -73,13 +73,13 @@
   {
    "q": "Аппарат с PWM-ESC (min_command 1000, max_throttle 2000): один мотор стартует заметно позже остальных. Что сделать?",
    "options": [
-    "Поднять dshot_idle_value до 700, чтобы мотор раньше трогался",
+    "Поднять motor_idle до 700, чтобы мотор раньше трогался",
     "Калибровка ESC мастер-ползунком 2000 → 1000 без пропов",
     "Поменять motor_poles с 14 на 12 и сохранить",
     "Включить dshot_bidir и RPM-фильтр на всех ESC"
    ],
    "answer": 1,
-   "explain": "PWM-ESC сами определяют границы импульса, их надо научить 1000/2000 мкс. dshot_idle_value, dshot_bidir и motor_poles к PWM не относятся."
+   "explain": "PWM-ESC сами определяют границы импульса, их надо научить 1000/2000 мкс. motor_idle (до 2025.12 — dshot_idle_value) калибровку границ не заменяет, а dshot_bidir и motor_poles к PWM не относятся."
   },
   {
    "q": "Первое висение: при отрыве аппарат резко кренится и крутится на месте. Правильная реакция?",

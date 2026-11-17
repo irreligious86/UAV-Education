@@ -121,7 +121,7 @@ def send_target(u, v, t_exposure_s, distance_m=0.0):
 - MAVLink — LANDING_TARGET | https://mavlink.io/en/messages/common.html#LANDING_TARGET | primary | A
 - ArduPilot — Precision Landing and Loiter | https://ardupilot.org/copter/docs/precision-landing-with-irlock.html | primary | A
 - ArduPilot — AC_PrecLand source (PLND_* parameters, MAVLink backend) | https://github.com/ArduPilot/ardupilot/tree/master/libraries/AC_PrecLand | primary | A
-- PX4 — Precision Landing | https://docs.px4.io/main/en/advanced_features/precland | primary | A
+- PX4 — Precision Landing | https://docs.px4.io/v1.17/en/advanced_features/precland.html | primary | A
 - OpenCV — Detection of ArUco markers | https://docs.opencv.org/4.x/d5/dae/tutorial_aruco_detection.html | primary | A
 
 ## checklist

@@ -3,7 +3,7 @@ id: aero-stability
 title: "Самолёт: устойчивость, центровка, статический запас, поляра"
 level: L3
 readingTime: 45 мин
-firmware: ArduPlane 4.5+ · INAV 7+
+firmware: ArduPlane 4.7 (сверено с 4.7.2) · INAV 7+
 status: published
 tags:
   - центровка

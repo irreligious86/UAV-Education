@@ -32,7 +32,7 @@
     {
       "id": "auto-cutoff",
       "title": "Автоматический срез RC smoothing",
-      "statement": "Betaflight 4.5 измерил частоту приёмника **{f} Гц**, `rc_smoothing_auto_factor = {a}`, `rc_smoothing_setpoint_cutoff = 0`. Какой срез setpoint покажет `rc_smoothing_info`, Гц?",
+      "statement": "Betaflight 2025.12 измерил частоту приёмника **{f} Гц**, `rc_smoothing_auto_factor = {a}`, `rc_smoothing_setpoint_cutoff = 0`. Какой срез setpoint (строка «Active setpoint and FF cutoff») покажет `rc_smoothing_info`, Гц?",
       "params": {
         "f": [50, 100, 150, 250, 333, 500, 1000],
         "a": [10, 20, 30, 45, 60, 90, 120]
@@ -41,7 +41,7 @@
       "unit": "Гц",
       "tol": 0.001,
       "abs": 0.5,
-      "solution": "`rcSmoothingSetFilterCutoffs`: cutoff = max(15, (uint16)(f_rx·1.5/(1 + factor/10))). Дробная часть отбрасывается, нижняя граница — 15 Гц."
+      "solution": "`rcSmoothingSetFilterCutoffs`: cutoff = max(15, (uint16)(f_rx·1.5/(1 + factor/10))). Дробная часть отбрасывается, нижняя граница — 15 Гц. Формула одинакова в 4.5 и 2025.12."
     },
     {
       "id": "rxrange-scale",

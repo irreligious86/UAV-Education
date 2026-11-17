@@ -86,7 +86,7 @@ I по крену/тангажу: моторы+пропы на L, АКБ и FC �
   - Что сделать: перевзвесить, свериться с таблицей на своём напряжении, осмотреть пропы.
 
 ## references
-- Multicopter Dynamics (equations of motion) — PX4 Autopilot documentation | https://docs.px4.io/main/en/flight_stack/controller_diagrams.html | primary | A
+- Multicopter Dynamics (equations of motion) — PX4 Autopilot documentation | https://docs.px4.io/v1.17/en/flight_stack/controller_diagrams.html | primary | A
 - Quadrotor dynamics — Beard, "Quadrotor Dynamics and Control", BYU (PDF) | https://scholarsarchive.byu.edu/facpub/1325/ | primary | A
 - Newton's laws and drag — NASA Glenn Beginner's Guide to Aeronautics | https://www1.grc.nasa.gov/beginners-guide-to-aeronautics/ | secondary | B
 

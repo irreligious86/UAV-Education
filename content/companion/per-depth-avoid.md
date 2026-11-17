@@ -55,7 +55,7 @@ v_max = −a·L + √((a·L)² + 2a·(R − d_margin)).
 Пример: стереокамера с надёжной дальностью 6 м, запас 2 м, a = 3 м/с², L = 0.3 с → v_max ≈ 4.1 м/с. Летите быстрее — и обход превращается в надежду. PX4 прямо пишет, что дальность датчика ограничивает скорость; в ArduPilot то же следует из `AVOID_ACCEL_MAX` и `AVOID_MARGIN`.
 
 ### ArduPilot: два уровня
-**Простое избегание (simple avoidance)** — в режимах с пилотом (Loiter, AltHold и др.): аппарат не даёт подлететь к препятствию ближе `AVOID_MARGIN` (м), либо скользя вдоль (`AVOID_BEHAVE = 0`, Slide), либо останавливаясь (`AVOID_BEHAVE = 1`, Stop). Источники включаются битами `AVOID_ENABLE`: 0 — геозона, 1 — датчики приближения, 2 — маяки. В режимах без GPS действует `AVOID_DIST_MAX` — расстояние, с которого начинается отталкивание. Есть ограничение ускорения `AVOID_ACCEL_MAX` и параметры отступа назад (`AVOID_BACKUP_SPD`).
+**Простое избегание (simple avoidance)** — в режимах с пилотом (Loiter, PosHold и др.; про AltHold — оговорка в конце абзаца): аппарат не даёт подлететь к препятствию ближе `AVOID_MARGIN` (м), либо скользя вдоль (`AVOID_BEHAVE = 0`, Slide), либо останавливаясь (`AVOID_BEHAVE = 1`, Stop). Источники включаются битами `AVOID_ENABLE`: 0 — геозона, 1 — датчики приближения, 2 — маяки. В режимах без GPS (AltHold) отталкивание делается наклоном: `AVOID_DIST_MAX` — расстояние, с которого оно начинается, `AVOID_ANG_MAX` — предельный наклон (градусы; до ArduPilot 4.7 — `AVOID_ANGLE_MAX`, сантиградусы). С 4.7 эта часть убрана из стандартных сборок Copter: в AltHold избегания нет, пока прошивка не собрана на custom build server с этой опцией; в Loiter и других режимах с позицией всё работает как раньше. Есть ограничение ускорения `AVOID_ACCEL_MAX` и параметры отступа назад (`AVOID_BACKUP_SPD`).
 
 **Планировщики пути (object avoidance, `OA_*`)** — в автоматических режимах (Auto, Guided, RTL): аппарат сам меняет траекторию. `OA_TYPE`: 1 — BendyRuler, 2 — Dijkstra, 3 — Dijkstra с BendyRuler.
 - **BendyRuler** — локальный: «прощупывает» направления вокруг курса на дистанцию `OA_BR_LOOKAHEAD` и выбирает ближайшее к цели, где зазор больше `OA_MARGIN_MAX`. Работает с датчиками приближения (через базу препятствий `OA_DB_*`) и геозоной. Быстрый, но может застрять в «кармане».
@@ -108,7 +108,7 @@ ArduPilot SITL: `PRX1_TYPE = 10` (встроенный SITL-датчик при�
 - ArduPilot — Object Avoidance (landing page) | https://ardupilot.org/copter/docs/common-object-avoidance-landing-page.html | primary | A
 - ArduPilot — BendyRuler | https://ardupilot.org/copter/docs/common-oa-bendyruler.html | primary | A
 - ArduPilot — AC_Avoidance source (AVOID_*, OA_*) | https://github.com/ArduPilot/ardupilot/tree/master/libraries/AC_Avoidance | primary | A
-- PX4 — Collision Prevention | https://docs.px4.io/main/en/computer_vision/collision_prevention | primary | A
+- PX4 — Collision Prevention | https://docs.px4.io/v1.17/en/computer_vision/collision_prevention.html | primary | A
 
 ## checklist
 - Знаю пределы каждого типа датчика глубины, особенно для проводов

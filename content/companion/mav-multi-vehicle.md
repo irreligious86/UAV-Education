@@ -3,7 +3,7 @@ id: mav-multi-vehicle
 title: "Несколько аппаратов: адресация, разнесение, строй и супервизор"
 level: L3
 readingTime: 35 мин
-firmware: ArduPilot 4.5+ · PX4 1.15+ · MAVLink 2
+firmware: ArduPilot 4.7 (сверено с 4.7.2) · PX4 1.17 (сверено с v1.17.0) · MAVLink 2
 status: published
 tags:
   - флот
@@ -128,7 +128,7 @@ while True:
 - ArduPilot — Copter Follow mode | https://ardupilot.org/copter/docs/follow-mode.html | primary | A
 - ArduPilot — Using SITL (multiple vehicles) | https://ardupilot.org/dev/docs/using-sitl-for-ardupilot-testing.html | primary | A
 - MAVProxy — Multiple vehicles | https://ardupilot.org/mavproxy/docs/getting_started/multi.html | primary | A
-- PX4 — Multi-vehicle simulation | https://docs.px4.io/main/en/sim_gazebo_gz/multi_vehicle_simulation.html | primary | A
+- PX4 — Multi-vehicle simulation | https://docs.px4.io/v1.17/en/sim_gazebo_gz/multi_vehicle_simulation.html | primary | A
 
 ## checklist
 - Назначаю уникальные sysid аппаратам и вспомогательным скриптам

@@ -3,7 +3,7 @@ id: el-dronecan
 title: "DroneCAN: шина CAN на борту, узлы, ESC и прошивка периферии"
 level: L3
 readingTime: 35 мин
-firmware: ArduPilot 4.5+ · PX4 1.15+
+firmware: ArduPilot 4.7 (сверено с 4.7.2) · PX4 1.17 (сверено с v1.17.0)
 status: published
 tags:
   - DroneCAN
@@ -108,7 +108,7 @@ SLCAN через полётник (или USB-CAN адаптер): DroneCAN GUI 
 - ArduPilot — CAN Bus Setup (DroneCAN) | https://ardupilot.org/copter/docs/common-canbus-setup-advanced.html | primary | A
 - DroneCAN — Specification | https://dronecan.github.io/Specification/1._Introduction | primary | A
 - ArduPilot — AP_Periph (DroneCAN peripherals) source | https://github.com/ArduPilot/ardupilot/tree/master/Tools/AP_Periph | primary | A
-- PX4 — DroneCAN | https://docs.px4.io/main/en/dronecan/ | primary | A
+- PX4 — DroneCAN | https://docs.px4.io/v1.17/en/dronecan/index.html | primary | A
 
 ## checklist
 - Объясняю, когда DroneCAN лучше UART/I²C

@@ -3,7 +3,7 @@ id: bf-failsafe
 title: "Failsafe: стадии, процедуры и тест по свитчу"
 level: L1
 readingTime: 20 мин
-firmware: Betaflight 4.5+
+firmware: Betaflight 2025.12 (сверено с 2025.12.5)
 status: published
 added: 2026-11-07
 tags:
@@ -26,20 +26,20 @@ Failsafe — то, что дрон делает, когда пропала св�
 {{diagram:failsafe-stages|Временная диаграмма failsafe: детекция потери, короткое удержание, Stage 1 и Stage 2.}}
 
 ### Stage 1 — защитный интервал
-Длится `failsafe_delay` (в десятых долях секунды: 15 = 1.5 с; дефолт 1.5 с (так же в 4.3–4.4; между 4.4 и 4.5 изменился `failsafe_recovery_delay`: 1.0 → 0.5 с)). По умолчанию стики в центре, газ на нуле, положения тумблеров удерживаются. Значения для каждого канала задаются в Configurator (Channel fallback) или командой `rxfail`. Если связь вернулась во время Stage 1, управление возвращается мгновенно.
+Длится `failsafe_delay` (в десятых долях секунды: 15 = 1.5 с; дефолт 1.5 с (так же в 4.3–4.4; между 4.4 и 4.5 изменился `failsafe_recovery_delay`: 1.0 → 0.5 с)). По умолчанию стики в центре, газ на нуле, положения тумблеров удерживаются. Значения для каждого канала задаются в Betaflight App (Channel fallback) или командой `rxfail`. Если связь вернулась во время Stage 1, управление возвращается мгновенно.
 
 ### Stage 2 — процедура
 Выбирается параметром `failsafe_procedure`:
 
-- `DROP` (дефолт) — мгновенный дизарм, моторы стоп. Повторный арм возможен после `failsafe_recovery_delay` стабильной связи (0.5 с по умолчанию в 4.5) и выключенного тумблера ARM.
-- `AUTO-LAND` — стики в центре, газ на `failsafe_throttle`, режимы Stage 1 применены, через `failsafe_off_delay` — дизарм. Повторный арм — после `failsafe_recovery_delay` стабильной связи, как и в DROP.
+- `DROP` (дефолт) — мгновенный дизарм, моторы стоп. Повторный арм возможен после `failsafe_recovery_delay` стабильной связи (0.5 с по умолчанию в 4.5 и 2025.12) и выключенного тумблера ARM.
+- `AUTO-LAND` — стики в центре, газ на `failsafe_throttle`, режимы Stage 1 применены, через `failsafe_landing_time` секунд (до 2025.12 — `failsafe_off_delay`, в десятых долях секунды, дефолт 10 = 1 с) — дизарм. Повторный арм — после `failsafe_recovery_delay` стабильной связи, как и в DROP.
 - `GPS_RESCUE` — нужен GPS: дрон летит домой и садится. Для возврата управления нужна связь `failsafe_recovery_delay` и отклонение стиков больше `failsafe_stick_threshold` (30% хода стика).
 
 Тонкость: если газ был на минимуме ≥10 с перед Stage 2, срабатывает простой дизарм (кроме GPS Rescue). Stage 2 невозможен первые 5 с после загрузки.
 
 Видео после дизарма: `vtx_low_power_disarm` (ON или UNTIL_FIRST_ARM) снижает мощность VTX на земле, но **не пока активен failsafe** (`vtxGetSettings()` в `io/vtx.c` проверяет `!failsafeIsActive()`). После DROP аппарат дизармлен, а failsafe остаётся активным до восстановления связи — VTX продолжает вещать на полётной мощности, и упавший аппарат можно найти по картинке (link-vtx).
 
-2025.12: `failsafe_off_delay` заменён на `failsafe_landing_time` (секунды, дефолт 60). Если в сборке есть удержание высоты и есть источник высоты (баро или GPS), AUTO-LAND снижается через ALT_HOLD (`flight/alt_hold_multirotor.c`): быстрее высоко, медленнее у земли. Новый параметр PID-профиля `landing_disarm_threshold` (0–250, дефолт 0 = выкл.) дизармит по удару о землю: после взлёта, при стиках в центре и нулевом газе **или** в ALT_HOLD (а значит, и в AUTO-LAND), если рывок по акселерометру больше порога × 10 (`disarmOnImpact()` в `flight/pid.c`; в комментарии исходника «относительно безопасные значения — около 100»). Без него AUTO-LAND дизармит по истечении `failsafe_landing_time` (или раньше, если сработал crash recovery). В 4.5 этого параметра нет.
+`failsafe_landing_time` — в секундах, дефолт 60, диапазон 0–250 (в 4.5 на его месте `failsafe_off_delay`: десятые доли секунды, дефолт 10, диапазон 0–200). Если в сборке есть удержание высоты и есть источник высоты (баро или GPS), AUTO-LAND снижается через ALT_HOLD (`flight/alt_hold_multirotor.c`): быстрее высоко, медленнее у земли. Новый параметр PID-профиля `landing_disarm_threshold` (0–250, дефолт 0 = выкл.) дизармит по удару о землю: после взлёта, при стиках в центре и нулевом газе **или** в ALT_HOLD (а значит, и в AUTO-LAND), если рывок по акселерометру больше порога × 10 (`disarmOnImpact()` в `flight/pid.c`; в комментарии исходника «относительно безопасные значения — около 100»). Без него AUTO-LAND дизармит по истечении `failsafe_landing_time` (или раньше, если сработал crash recovery). В 4.5 этого параметра нет.
 
 ### Что выбрать
 DROP — честный выбор для фристайла над безопасной зоной: дрон падает рядом, а не улетает. AUTO-LAND с газом чуть ниже висения даёт контролируемое снижение — разумно для тяжёлых 7–10" и полётов над людьми/техникой, но требует подобрать `failsafe_throttle` под конкретный дрон. В Stage 2 (AUTO-LAND и GPS Rescue) Betaflight сам включает ANGLE при наличии акселерометра; fallback канала ANGLE влияет только на Stage 1.
@@ -52,13 +52,13 @@ DROP — честный выбор для фристайла над безопа
 - `KILL` — мгновенный дизарм. Один глитч канала = падение. Не для полётов.
 
 ### Параметры целиком (CLI)
-`failsafe_delay` (десятые секунды, Stage 1), `failsafe_off_delay` (десятые, время AUTO-LAND до дизарма; в 2025.12 заменён на `failsafe_landing_time` в секундах, дефолт 60), `failsafe_throttle` (газ AUTO-LAND, 1000–2000), `failsafe_throttle_low_delay` (десятые: если газ был ниже минимума дольше этого — просто дизарм; дефолт 100 = 10 с; 0 — дизарм при любом низком газе в момент потери связи), `failsafe_procedure` (DROP / AUTO-LAND / GPS-RESCUE), `failsafe_switch_mode` (STAGE1 / KILL / STAGE2), `failsafe_recovery_delay` (десятые, сколько связь должна быть стабильной до возврата), `failsafe_stick_threshold` (%, отклонение стика для выхода из GPS Rescue). Значения каналов на Stage 1 — `rxfail <channel> <mode> [value]`: `a` (auto: центр/мин газа), `h` (hold — удерживать последнее), `s <value>` (set — фиксированное значение, например 1700 на канале ANGLE). Проверка: `rxfail` без аргументов печатает таблицу.
+`failsafe_delay` (десятые секунды, Stage 1), `failsafe_landing_time` (секунды, время AUTO-LAND до дизарма, дефолт 60), `failsafe_throttle` (газ AUTO-LAND, 1000–2000), `failsafe_throttle_low_delay` (десятые: если газ был ниже минимума дольше этого — просто дизарм; дефолт 100 = 10 с; 0 — дизарм при любом низком газе в момент потери связи), `failsafe_procedure` (DROP / AUTO-LAND / GPS-RESCUE), `failsafe_switch_mode` (STAGE1 / KILL / STAGE2), `failsafe_recovery_delay` (десятые, сколько связь должна быть стабильной до возврата), `failsafe_stick_threshold` (%, отклонение стика для выхода из GPS Rescue). Значения каналов на Stage 1 — `rxfail <channel> <mode> [value]`: `a` (auto: центр/мин газа), `h` (hold — удерживать последнее), `s <value>` (set — фиксированное значение, например 1700 на канале ANGLE). Проверка: `rxfail` без аргументов печатает таблицу.
 
 ### GPS Rescue: что нужно, чтобы он работал
 GPS с fix ≥ `gps_rescue_min_sats` (8 по умолчанию) **до арма** (дом записывается при арме), `gps_rescue_min_start_dist` (минимальная дистанция, ближе — просто посадка/DROP логика), высота возврата `gps_rescue_alt_mode` (MAX_ALT / FIXED_ALT / CURRENT_ALT) и `gps_rescue_return_alt`, скорости `gps_rescue_ground_speed`, `gps_rescue_ascend_rate/descend_rate`, снижение и посадка `gps_rescue_descent_dist` (дистанция, с которой начинается снижение), `gps_rescue_descend_rate`, `gps_rescue_disarm_threshold` (дизарм при ударе), `gps_rescue_initial_climb`; без компаса курс берётся по GPS в движении — поэтому Rescue сначала набирает высоту и летит, «нащупывая» курс; с компасом (`mag_hardware`) надёжнее. Санитарные проверки (`gps_rescue_sanity_checks`) прерывают Rescue, если расстояние растёт или аппарат падает. Тест — только на открытой площадке, тумблером GPS RESCUE на умеренной высоте и дистанции, с пальцем на тумблере режима и наблюдателем; `gps_rescue_allow_arming_without_fix` оставить OFF — иначе Rescue без дома бесполезен.
 
 ### Разобранный пример: 7" long range
-`failsafe_procedure = GPS-RESCUE`, `failsafe_delay = 10` (1 с: на 250 Гц это 250 потерянных пакетов — явная потеря), `gps_rescue_min_sats = 8`, `gps_rescue_alt_mode = MAX_ALT` (вернуться на максимальной высоте полёта + запас), `gps_rescue_return_alt = 50`, `gps_rescue_ground_speed = 1000` (10 м/с), `gps_rescue_descend_rate = 150`, `rxfail 5 s 1700` (канал ANGLE), ELRS: failsafe «no pulses» в приёмнике (иначе Stage 1 не начнётся), предупреждение LQ в OSD. Проверка: на земле без пропов — выключить пульт: без арма failsafe не запускается, в OSD будет только `RXLOSS`; стадии проверять тумблером FAILSAFE в арме без пропов; в поле — тумблером на 30 м высоты и 60 м от дома, наблюдатель, готовность перехватить.
+`failsafe_procedure = GPS-RESCUE`, `failsafe_delay = 10` (1 с: на 250 Гц это 250 потерянных пакетов — явная потеря), `gps_rescue_min_sats = 8`, `gps_rescue_alt_mode = MAX_ALT` (вернуться на максимальной высоте полёта + запас), `gps_rescue_return_alt = 50`, `gps_rescue_ground_speed = 1000` (10 м/с), `gps_rescue_descend_rate = 150`, `rxfail 5 s 1700` (канал ANGLE), ELRS: по CRSF приёмник при потере связи сам перестаёт слать каналы; настройка «No Pulses» нужна только для выхода SBUS/PWM (иначе Stage 1 не начнётся), предупреждение LQ в OSD. Проверка: на земле без пропов — выключить пульт: без арма failsafe не запускается, в OSD будет только `RXLOSS`; стадии проверять тумблером FAILSAFE в арме без пропов; в поле — тумблером на 30 м высоты и 60 м от дома, наблюдатель, готовность перехватить.
 
 ## practice
 ### Шаг 1. Посмотреть текущие значения
@@ -77,7 +77,7 @@ set failsafe_procedure = AUTO-LAND
 set failsafe_switch_mode = STAGE1
 set failsafe_delay = 15
 set failsafe_throttle = 1250
-set failsafe_off_delay = 100
+set failsafe_landing_time = 10
 save
 ```
 
@@ -108,7 +108,7 @@ save
   - Что сделать: смотреть RSSI/LQ в логе, см. модуль про ExpressLRS.
 - **Симптом:** при выключении пульта аппарат продолжает лететь по последним стикам
   - Возможная причина: приёмник не в режиме «no pulses»/cut — Stage 1 не начинается.
-  - Что сделать: настроить failsafe приёмника (ELRS: по умолчанию «no pulses»; FrSky — выбрать), проверить без пропов.
+  - Что сделать: настроить failsafe приёмника (ELRS по CRSF молчит всегда, для выхода SBUS — `SBUS Failsafe = No Pulses`; FrSky — выбрать), проверить без пропов.
 - **Симптом:** GPS Rescue летит не домой / «сходит с ума»
   - Возможная причина: дом записан при плохом fix, нет компаса и мало скорости для курса по GPS, магнитные помехи.
   - Что сделать: армить после fix с 8+ спутниками, компас на мачте, проверить `gps_rescue_sanity_checks`.

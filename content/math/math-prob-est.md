@@ -111,7 +111,7 @@ def allan_dev(x, fs, taus):
 - MIT OCW 6.041 — Probabilistic Systems Analysis | https://ocw.mit.edu/courses/6-041sc-probabilistic-systems-analysis-and-applied-probability-fall-2013/ | secondary | A
 - IEEE Std 952 — Allan variance for gyros (summary in Kalibr wiki) | https://github.com/ethz-asl/kalibr/wiki/IMU-Noise-Model | secondary | A
 - ArduPilot — EKF3 parameters (EK3_*_NSE, gates) | https://ardupilot.org/copter/docs/parameters.html#ek3-parameters | primary | A
-- PX4 — EKF2 tuning and parameters | https://docs.px4.io/main/en/advanced_config/tuning_the_ecl_ekf.html | primary | A
+- PX4 — EKF2 tuning and parameters | https://docs.px4.io/v1.17/en/advanced_config/tuning_the_ecl_ekf.html | primary | A
 
 ## checklist
 - Оцениваю bias и σ датчика по записи и знаю, как σ среднего зависит от N

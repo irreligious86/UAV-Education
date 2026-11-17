@@ -90,7 +90,7 @@ python -m pytest -q test/test_grid_planner.py
 
 ## references
 - ArduPilot — Object avoidance (BendyRuler, Dijkstra) | https://ardupilot.org/copter/docs/common-object-avoidance-landing-page.html | primary | A
-- PX4 — Collision prevention | https://docs.px4.io/main/en/computer_vision/collision_prevention.html | primary | A
+- PX4 — Collision prevention | https://docs.px4.io/v1.17/en/computer_vision/collision_prevention.html | primary | A
 - Nav2 documentation | https://docs.nav2.org/ | primary | A
 - OctoMap | https://octomap.github.io/ | primary | A
 - Hart, Nilsson, Raphael — A formal basis for the heuristic determination of minimum cost paths (A*) | https://ieeexplore.ieee.org/document/4082128 | secondary | A

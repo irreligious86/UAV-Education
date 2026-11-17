@@ -3,7 +3,7 @@ id: bf-modes-osd
 title: "Режимы и OSD"
 level: L1
 readingTime: 20 мин
-firmware: Betaflight 4.5+
+firmware: Betaflight 2025.12 (сверено с 2025.12.5)
 status: published
 added: 2026-11-07
 tags:
@@ -50,15 +50,17 @@ next:
 Аналоговый OSD (чип MAX7456) и цифровой (MSP DisplayPort для Walksnail/HDZero/DJI) настраиваются в одной вкладке, но набор элементов и разрешение отличаются.
 
 ### Команда `aux` и логика режимов
-`aux <index> <mode id> <aux channel> <start> <end> <logic>`: индекс правила, id режима — `permanentId` из `msp/msp_box.c` (ARM = 0, ANGLE = 1, HORIZON = 2, FAILSAFE = 27, PREARM = 36), а не номер из enum в `fc/rc_modes.h`, AUX-канал (0 = AUX1), диапазон 900–2100 с шагом 25, logic 0 = OR, 1 = AND (режим активен, только если **и** это правило, **и** предыдущее правило того же режима выполнены — так делают «ARM только если PREARM в том же канале» или двухтумблерные комбинации). Диапазоны для трёхпозиционного тумблера: 900–1300, 1300–1700, 1700–2100 — с зазором, чтобы джиттер не переключал режимы на границе. `adjrange` — то же для «подстроек в полёте» (PID, рейты, выбор профиля) тумблером или крутилкой; из профилей так переключаются только рейт-, OSD- и LED-профиль, для PID-профиля adjustment в 4.5 нет. Слоты, функции и VTX на тумблере (`vtx`) — в модуле bf-adjustments.
+`aux <index> <mode id> <aux channel> <start> <end> <logic>`: индекс правила, id режима — `permanentId` из `msp/msp_box.c` (ARM = 0, ANGLE = 1, HORIZON = 2, FAILSAFE = 27, PREARM = 36), а не номер из enum в `fc/rc_modes.h`, AUX-канал (0 = AUX1), диапазон 900–2100 с шагом 25, logic 0 = OR, 1 = AND (режим активен, только если **и** это правило, **и** предыдущее правило того же режима выполнены — так делают «ARM только если PREARM в том же канале» или двухтумблерные комбинации). Диапазоны для трёхпозиционного тумблера: 900–1300, 1300–1700, 1700–2100 — с зазором, чтобы джиттер не переключал режимы на границе. `adjrange` — то же для «подстроек в полёте» (PID, рейты, выбор профиля) тумблером или крутилкой; из профилей так переключаются только рейт-, OSD- и LED-профиль, для PID-профиля adjustment нет (ни в 4.5, ни в 2025.12). Слоты, функции и VTX на тумблере (`vtx`) — в модуле bf-adjustments.
 
-Все `permanentId` режимов 4.5 (`boxes[]` в `msp/msp_box.c`; номера 3, 9–11, 14, 16, 18, 21, 22, 38 заняты удалёнными режимами и не используются). Во вкладке Modes видны только режимы, которые есть в сборке и имеют смысл для конфигурации (например, SERVO1–3 — только с сервами):
+Все `permanentId` режимов 2025.12 (`boxes[]` в `msp/msp_box.c`; номера 9, 10, 14, 16, 18, 21, 22, 38 заняты удалёнными режимами и не используются). От 4.5 список отличается четырьмя строками: id 3 ALTHOLD и id 11 POS HOLD (в 4.5 эти номера пусты), id 55 CHIRP (в 4.5 нет) и имя id 29 — в 4.5 «3D DISABLE / SWITCH». Во вкладке Modes видны только режимы, которые есть в сборке и имеют смысл для конфигурации (например, SERVO1–3 — только с сервами):
 
 | id | Режим | id | Режим |
 |---|---|---|---|
 | 0 | ARM | 32–34 | CAMERA CONTROL 1–3 (RunCam, bf-features-tour) |
 | 1 | ANGLE | 35 | FLIP OVER AFTER CRASH (turtle) |
 | 2 | HORIZON | 36 | PREARM |
+| 3 | ALTHOLD (удержание высоты, с 2025.12) | 55 | CHIRP (с 2025.12, ctl-sysid) |
+| 11 | POS HOLD (удержание позиции по GPS, с 2025.12) | | |
 | 4 | ANTI GRAVITY | 37 | GPS BEEP SATELLITE COUNT |
 | 5 | MAG | 39 | VTX PIT MODE (link-vtx) |
 | 6 / 7 | HEADFREE / HEADADJ | 40–43 | USER1–4 (PINIO: питание VTX/камеры) |
@@ -73,7 +75,7 @@ next:
 | 26 | BLACKBOX | 52 | BEEPER MUTE |
 | 27 | FAILSAFE | 53 | READY |
 | 28 | AIR MODE | 54 | LAP TIMER RESET |
-| 29 | 3D DISABLE / SWITCH | 30 / 31 | FPV ANGLE MIX / BLACKBOX ERASE |
+| 29 | 3D DISABLE | 30 / 31 | FPV ANGLE MIX / BLACKBOX ERASE |
 
 Turtle, launch control, 3D, acro trainer и настройки Angle/Horizon разобраны в bf-features-tour, причины «не армится» — в bf-arming-safety.
 
@@ -97,8 +99,8 @@ Turtle, launch control, 3D, acro trainer и настройки Angle/Horizon р�
 
 ### OSD: настройка по смыслу, не по красоте
 - **Профили OSD** (`osd_profile`, до 3) — на тумблере: «минимум» для гонок, «полный» для дальних, «пустой» для записи.
-- **Предупреждения** (`osd_warn_bitmask`): ARMING_DISABLE, BATTERY_WARNING/CRITICAL, FAIL_SAFE, LINK_QUALITY, RSSI, CORE_TEMP, GPS_RESCUE_*, OVER_CAP — включать все, кроме шумных; `osd_cap_alarm`, `osd_alt_alarm`, `osd_rssi_alarm`, `osd_link_quality_alarm` — пороги. Дефолты 4.5 (`pgResetFn_osdConfig()` в `osd/osd.c`): `osd_rssi_alarm` 20 %, `osd_link_quality_alarm` 80 %, `osd_cap_alarm` 2200 мА·ч, `osd_alt_alarm` 100 (м, или футы при `osd_units = IMPERIAL`); для CRSF/ELRS ещё `osd_rssi_dbm_alarm` −60 дБм и `osd_rsnr_alarm` 4 дБ; `osd_core_temp_alarm` 70 °C (температура MCU: зависания сообщались выше 80 °C); `osd_esc_temp_alarm`, `osd_esc_rpm_alarm`, `osd_esc_current_alarm` и `osd_distance_alarm` по умолчанию выключены. Порог работает, только если включено само предупреждение: по умолчанию все предупреждения включены, **кроме** RSSI, LINK_QUALITY, RSSI_DBM, RSNR и OVER_CAP — их надо отметить в `osd_warn_bitmask` (вкладка OSD → Warnings). `osd_cap_alarm` — ровно мА·ч, а не процент: для другой АКБ его надо менять.
-- **Статистика после полёта** — страница, которая появляется в очках после дизарма. Состав задаёт `osd_stat_bitmask` (битовая маска, удобнее ставить галочки во вкладке OSD → Statistics). По умолчанию в 4.5 включены: максимальная скорость, минимальное напряжение, минимальный RSSI, максимальный ток, израсходованные мА·ч, состояние и номер лога Blackbox, таймер 2, время и число выходов на полный газ, средний газ (последние три — в сборках с `USE_RC_STATS`). Отдельно — счётчики «пробега» аппарата: `stats_total_flights`, `stats_total_time_s`, `stats_total_dist_m` (дистанция — только с GPS). Они выключены, пока `stats_min_armed_time_s` = −1; при значении N ≥ 0 полёт длиннее N секунд прибавляется к счётчикам и сохраняется через 0.5 с после дизарма (`fc/stats.c`). Сохранение пропускается, если в конфиге есть несохранённые изменения (например, подстройки в полёте), — счётчики живут в той же EEPROM, что и весь конфиг.
+- **Предупреждения** (`osd_warn_bitmask`): ARMING_DISABLE, BATTERY_WARNING/CRITICAL, FAIL_SAFE, LINK_QUALITY, RSSI, CORE_TEMP, GPS_RESCUE_*, OVER_CAP — включать все, кроме шумных; `osd_cap_alarm`, `osd_alt_alarm`, `osd_rssi_alarm`, `osd_link_quality_alarm` — пороги. Дефолты (`pgResetFn_osdConfig()` в `osd/osd.c`, одинаковы в 4.5 и 2025.12): `osd_rssi_alarm` 20 %, `osd_link_quality_alarm` 80 %, `osd_cap_alarm` 2200 мА·ч, `osd_alt_alarm` 100 (м, или футы при `osd_units = IMPERIAL`); для CRSF/ELRS ещё `osd_rssi_dbm_alarm` −60 дБм и `osd_rsnr_alarm` 4 дБ; `osd_core_temp_alarm` 70 °C (температура MCU: зависания сообщались выше 80 °C); `osd_esc_temp_alarm`, `osd_esc_rpm_alarm`, `osd_esc_current_alarm` и `osd_distance_alarm` по умолчанию выключены. Порог работает, только если включено само предупреждение: по умолчанию все предупреждения включены, **кроме** RSSI, LINK_QUALITY, RSSI_DBM, RSNR и OVER_CAP — их надо отметить в `osd_warn_bitmask` (вкладка OSD → Warnings). Числовую маску из 4.5 в 2025.12 не переноси: предупреждение RC_SMOOTHING (бит 8) удалено, биты 9–18 сдвинулись на один вниз, на бите 18 новое POSHOLD_FAILED. `osd_cap_alarm` — ровно мА·ч, а не процент: для другой АКБ его надо менять.
+- **Статистика после полёта** — страница, которая появляется в очках после дизарма. Состав задаёт `osd_stat_bitmask` (битовая маска, удобнее ставить галочки во вкладке OSD → Statistics). По умолчанию включены: максимальная скорость, минимальное напряжение, минимальный RSSI, максимальный ток, израсходованные мА·ч, состояние и номер лога Blackbox, таймер 2, время и число выходов на полный газ, средний газ (последние три — в сборках с `USE_RC_STATS`). Отдельно — счётчики «пробега» аппарата: `stats_total_flights`, `stats_total_time_s`, `stats_total_dist_m` (дистанция — только с GPS). Они выключены, пока `stats_min_armed_time_s` = −1; при значении N ≥ 0 полёт длиннее N секунд прибавляется к счётчикам и сохраняется через 0.5 с после дизарма (`fc/stats.c`). Сохранение пропускается, если в конфиге есть несохранённые изменения (например, подстройки в полёте), — счётчики живут в той же EEPROM, что и весь конфиг.
 - **Напряжение**: показывать среднее на элемент (`osd_avg_cell_voltage_pos`) и ставить `vbat_warning_cell_voltage` по просадке под нагрузкой (3.5 В для LiPo 5", 3.3 для Li-Ion), `vbat_min_cell_voltage` — критический; `vbat_sag_compensation` — не индикация: она поднимает выход моторов при просадке напряжения, чтобы отклик не «плыл» по ходу разряда.
 - **Связь**: LQ и RSSI dBm от CRSF (не `rssi_channel`), предупреждение LQ < 70% на 250 Гц ELRS (модуль «Бюджет линка»).
 - **Таймер**: `osd_tim1`/`osd_tim2` (источник, точность, порог) — по арму; для Li-Ion — mAh drawn важнее.
@@ -127,7 +129,7 @@ AUX1 ARM (1700–2100), AUX2 режим: ACRO (900–1300, ничего не а�
 Без пропов: арм/дизарм, ANGLE (модель в конфигураторе выравнивается), пищалка, failsafe-тумблер (в OSD `FAILSAFE`). Только после этого — в поле.
 
 ## diagnostics
-- **Симптом:** арм не включается, в OSD `ARMSWITCH` (в 2025.12 — `ARM_SWITCH`) или `NOPREARM`
+- **Симптом:** арм не включается, в OSD `ARM_SWITCH` (до 2025.12 — `ARMSWITCH`) или `NOPREARM`
   - Возможная причина: тумблер ARM был включён при подаче питания, или не включён PREARM.
   - Что сделать: выключить-включить ARM, проверить PREARM.
 - **Симптом:** режим включается не тем тумблером

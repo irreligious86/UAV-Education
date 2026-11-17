@@ -3,7 +3,7 @@ id: ap-setup-scratch
 title: "ArduPilot с нуля: Copter через Mission Planner / QGC"
 level: L2
 readingTime: 55 мин
-firmware: ArduCopter 4.6 (проверено на Copter-4.6.3, SITL)
+firmware: ArduCopter 4.7 (сверено с 4.7.2; выводы SITL сняты на Copter-4.6.3)
 status: published
 tags:
   - ArduPilot
@@ -25,16 +25,16 @@ next:
 ---
 
 ## summary
-Один квадрокоптер от пустого полётного контроллера до записанного в лог первого висения, в порядке 17 шагов настройки: прошивка с загрузчиком, карта портов `SERIALn_PROTOCOL`, ELRS-приёмник (`SERIALn_PROTOCOL = 23`, `RC_PROTOCOLS`), калибровка радио, DShot или PWM с калибровкой ESC, Motor Test и `MOT_SPIN_ARM/MIN`, акселерометр и компас, калибровка датчика АКБ по мультиметру и зарядке, OSD, failsafe, висение Stabilize → AltHold → Loiter, `MOT_THST_HOVER`, QuikTune/AutoTune и бэкап `.param`. Основной путь — SITL (`sim_vehicle.py`, всё ниже прогнано на Copter-4.6.3), шаги, которых в симуляторе нет, — на столе без пропов и в поле. Лабораторная: `.param` до и после, лог висения с `MOT_THST_HOVER` 0.2–0.5 и записанные RC- и battery-failsafe.
+Один квадрокоптер от пустого полётного контроллера до записанного в лог первого висения, в порядке 17 шагов настройки: прошивка с загрузчиком, карта портов `SERIALn_PROTOCOL`, ELRS-приёмник (`SERIALn_PROTOCOL = 23`, `RC_PROTOCOLS`), калибровка радио, DShot или PWM с калибровкой ESC, Motor Test и `MOT_SPIN_ARM/MIN`, акселерометр и компас, калибровка датчика АКБ по мультиметру и зарядке, OSD, failsafe, висение Stabilize → AltHold → Loiter, `MOT_THST_HOVER`, QuikTune/AutoTune и бэкап `.param`. Основной путь — SITL (`sim_vehicle.py`; имена параметров — для Copter 4.7.2, выводы сняты на Copter-4.6.3), шаги, которых в симуляторе нет, — на столе без пропов и в поле. Лабораторная: `.param` до и после, лог висения с `MOT_THST_HOVER` 0.2–0.5 и записанные RC- и battery-failsafe.
 
 ## theory
 ### Что считаем аппаратом
 Пример по всему модулю: квадрик X на 7" пропах, 1.4 кг, 6S LiPo 4000 мА·ч, H7-полётник с барометром и SD-картой, 4-в-1 ESC на BLHeli32/AM32, ELRS-приёмник, GPS с компасом на мачте, аналоговое видео. Тяга мотора 2806.5 с пропом 7×3.5 — около 1200 г (модуль f-aero-props), T/W ≈ 4 × 1.2 / 1.4 = 3.4, ожидаемый газ висения `MOT_THST_HOVER` ≈ 1/3.4 ≈ 0.29.
 
-Версия: ArduCopter 4.6. Имена, которые в 4.7 переименованы (модуль ap-intro): `ARMING_CHECK` (в 4.7 — `ARMING_SKIPCHK`), `RTL_ALT` в см (`RTL_ALT_M`), `PSC_ACCZ_P/I` (`PSC_D_ACC_P/I`, значения ×0.1).
+Версия: ArduCopter 4.7 (сверено с исходником и параметрами 4.7.2). Имена, которые отличаются от 4.6 (полная таблица — модуль ap-intro): `ARMING_SKIPCHK` (до 4.7 — `ARMING_CHECK`, смысл обратный), `RTL_ALT_M` в метрах (до 4.7 — `RTL_ALT` в сантиметрах), `PSC_D_ACC_P/I` (до 4.7 — `PSC_ACCZ_P/I`, значения в 10 раз больше). Выводы SITL в практике сняты на Copter-4.6.3 и оставлены без правки.
 
 ### 17 шагов и где каждый делается
-| # | Шаг | Что в ArduCopter 4.6 | Где | Подробно |
+| # | Шаг | Что в ArduCopter 4.7 | Где | Подробно |
 |---|---|---|---|---|
 | 1 | Прошивка, бэкап | `_with_bl.hex` по DFU, дальше `.apj`; `.param` до изменений | стол, SITL | этот модуль |
 | 2 | Рама, ориентация | `FRAME_CLASS`, `FRAME_TYPE`, `AHRS_ORIENTATION` | SITL | ap-intro |
@@ -49,7 +49,7 @@ next:
 | 11 | Режимы, арм | `FLTMODE_CH`, `FLTMODE1..6`, `RCx_OPTION`, pre-arm | SITL | ap-intro |
 | 12 | Failsafe | `FS_THR_ENABLE/VALUE`, `BATT_FS_LOW_ACT/CRT_ACT` | SITL, стол | ap-safety-fs |
 | 13 | OSD | `OSD_TYPE`: 1 MAX7456, 5 MSP DisplayPort | стол | этот модуль |
-| 14 | GPS, дом, RTL | `GPS1_TYPE`, `RTL_ALT` | SITL | ap-ekf |
+| 14 | GPS, дом, RTL | `GPS1_TYPE`, `RTL_ALT_M` | SITL | ap-ekf |
 | 15 | Первое висение | Stabilize → AltHold → Loiter, `MOT_HOVER_LEARN = 2` | SITL → поле | этот модуль |
 | 16 | Первый тюн | notch, QuikTune или AutoTune | поле | ap-tuning |
 | 17 | Лог и бэкап | `.BIN`, `.param`, сравнение файлов | SITL, поле | ap-logs |
@@ -57,7 +57,7 @@ next:
 {{diagram:ap-setup-flow|17 шагов настройки ArduCopter 4.6: SITL проходит больше половины цепочки, а bind, калибровки радио и ESC, OSD и тюн существуют только на железе — и пропы появляются только на шаге 15.}}
 
 ### Загрузчик и два формата файла
-ArduPilot на ChibiOS ставится в два этапа. Первый раз на плате нет загрузчика ArduPilot (стоит Betaflight или завод), поэтому пишут `arducopter_with_bl.hex` — загрузчик плюс прошивка — через DFU: зажать BOOT, вставить USB, STM32CubeProgrammer. Файл `.apj` этим путём не прошить: его понимает только загрузчик ArduPilot. Все следующие обновления — `.apj` через Mission Planner (Install Firmware или Load custom firmware) или QGroundControl (Vehicle Setup → Firmware, плату вставлять после открытия вкладки). Файлы лежат на firmware.ardupilot.org в папке Copter → stable-4.6.x → имя платы, совпадающее с её hwdef. DFU-загрузчик STM32 зашит в ПЗУ, поэтому вернуться на Betaflight можно тем же DFU; перед прошивкой сохрани `diff all` из Betaflight CLI.
+ArduPilot на ChibiOS ставится в два этапа. Первый раз на плате нет загрузчика ArduPilot (стоит Betaflight или завод), поэтому пишут `arducopter_with_bl.hex` — загрузчик плюс прошивка — через DFU: зажать BOOT, вставить USB, STM32CubeProgrammer. Файл `.apj` этим путём не прошить: его понимает только загрузчик ArduPilot. Все следующие обновления — `.apj` через Mission Planner (Install Firmware или Load custom firmware) или QGroundControl (Vehicle Setup → Firmware, плату вставлять после открытия вкладки). Файлы лежат на firmware.ardupilot.org в папке Copter → stable (или stable-4.7.2) → имя платы, совпадающее с её hwdef. DFU-загрузчик STM32 зашит в ПЗУ, поэтому вернуться на Betaflight можно тем же DFU; перед прошивкой сохрани `diff all` из Betaflight CLI.
 
 ### Калибровки, которые считаются формулами
 Аналоговый датчик АКБ в `AP_BattMonitor_Analog.cpp`: V = (V_pin − `BATT_VLT_OFFSET`) × `BATT_VOLT_MULT`, I = (V_pin − `BATT_AMP_OFFSET`) × `BATT_AMP_PERVLT`. Отсюда:
@@ -73,7 +73,7 @@ ArduPilot на ChibiOS ставится в два этапа. Первый ра�
 Моторы: выход = `MOT_SPIN_MIN` + (`MOT_SPIN_MAX` − `MOT_SPIN_MIN`) × r, где r — тяга после линеаризации `MOT_THST_EXPO`; PWM = `MOT_PWM_MIN` + выход × (`MOT_PWM_MAX` − `MOT_PWM_MIN`). `MOT_THST_HOVER` (0.125–0.6875, по умолчанию 0.35) — тяга висения в долях от максимальной, поэтому ≈ 1 / (T/W). Значение 0.2–0.5 соответствует T/W от 5 до 2: ниже — газ слишком «резкий», выше — нет запаса на манёвр и ветер.
 
 ## practice
-Запуск SITL для всего раздела (модуль ap-sitl объясняет установку). Рама `-f X` — это Quad X; `-f quad` в 4.6 даёт Plus (`FRAME_TYPE = 0`), не перепутай.
+Запуск SITL для всего раздела (модуль ap-sitl объясняет установку). Рама `-f X` — это Quad X; `-f quad` даёт Plus (`FRAME_TYPE = 0`), не перепутай.
 
 ```bash
 sim_vehicle.py -v ArduCopter -f X --console --map -w
@@ -81,7 +81,7 @@ sim_vehicle.py -v ArduCopter -f X --console --map -w
 # без MAVProxy, для своего скрипта: sim_vehicle.py -v ArduCopter -f X -w --no-mavproxy  -> tcp:127.0.0.1:5760
 ```
 
-Все выводы ниже — из прогона скрипта на pymavlink (команды те же, что кнопки Mission Planner) против SITL, собранного из тега Copter-4.6.3: сборка `./waf copter` на 2 ядрах — 12 мин 24 с.
+Все выводы ниже — из прогона скрипта на pymavlink (команды те же, что кнопки Mission Planner) против SITL, собранного из тега Copter-4.6.3: сборка `./waf copter` на 2 ядрах — 12 мин 24 с. В 4.7.2 иначе называются только `RTL_ALT` (стал `RTL_ALT_M`, метры) и `ARMING_CHECK` (стал `ARMING_SKIPCHK`), а полный список насчитывает другое число параметров.
 
 ### Шаг 1. Прошивка и бэкап
 В SITL прошивка — это сборка; на железе — DFU и `_with_bl.hex` (см. теорию). Сразу после первого подключения сохрани полный список: Mission Planner → Config → Full Parameter List → Save, QGC → Parameters → Tools → Save to file, MAVProxy `param save 00_defaults.param`.
@@ -165,10 +165,12 @@ SITL моделирует датчик 3DR Power Brick: V_pin = V / 10.1, I_pin 
 Показание напряжения и тока прямо пропорционально множителю (33.09 / 28.10 = 1.178 ≈ 20/17), формула из теории сходится до третьего знака. Запиши «эталон» (здесь `SIM_BATT_VOLTAGE`), показание, расчёт и проверку.
 
 ### Шаг 11. Режимы и арм
-`FLTMODE_CH = 5`, границы позиций 1230/1360/1490/1620/1749 мкс. Трёхпозиционный тумблер даёт ≈ 1000/1500/2000 мкс, то есть позиции 1, 4 и 6 — поэтому ставь парами: `FLTMODE1 = FLTMODE2 = 0` (Stabilize), `FLTMODE3 = FLTMODE4 = 2` (AltHold), `FLTMODE5 = FLTMODE6 = 5` (Loiter). Арм — тумблером `RCx_OPTION = 153` (ArmDisarm) или стиком (`ARMING_RUDDER = 2`); аварийный стоп — `RCx_OPTION = 31` (Motor Emergency Stop). `ARMING_CHECK = 1` не трогать.
+`FLTMODE_CH = 5`, границы позиций 1230/1360/1490/1620/1749 мкс. Трёхпозиционный тумблер даёт ≈ 1000/1500/2000 мкс, то есть позиции 1, 4 и 6 — поэтому ставь парами: `FLTMODE1 = FLTMODE2 = 0` (Stabilize), `FLTMODE3 = FLTMODE4 = 2` (AltHold), `FLTMODE5 = FLTMODE6 = 5` (Loiter). Арм — тумблером `RCx_OPTION = 153` (ArmDisarm) или стиком (`ARMING_RUDDER = 2`); аварийный стоп — `RCx_OPTION = 31` (Motor Emergency Stop). `ARMING_SKIPCHK = 0` не трогать (до 4.7 — `ARMING_CHECK = 1`).
 
 ### Шаг 12. Failsafe
 RC: `FS_THR_ENABLE = 1` (RTL), `FS_THR_VALUE = 975`, `RC_FS_TIMEOUT = 1` с. АКБ для SITL: `BATT_LOW_VOLT = 11.0`, `BATT_LOW_TIMER = 5`, `BATT_FS_LOW_ACT = 2` (RTL). Ловушка SITL: RC-override от GCS или скрипта считается живым RC и маскирует `SIM_RC_FAIL` — отпусти override, он истекает через `RC_OVERRIDE_TIME` = 3 с.
+
+Вывод снят на Copter-4.6.3; в 4.7.2 `RTL_ALT = 1500` (см) называется `RTL_ALT_M = 15` (м).
 
 ```text
 == step 12: RC failsafe (SIM_RC_FAIL=1) in Loiter
@@ -186,7 +188,7 @@ RC: `FS_THR_ENABLE = 1` (RTL), `FS_THR_VALUE = 975`, `RC_FS_TIMEOUT = 1` с. А�
 `OSD_TYPE = 1` для MAX7456 (аналог), 5 — MSP DisplayPort (DJI O3, Walksnail, HDZero) вместе с `SERIALn_PROTOCOL = 42` на порту VTX; `OSD_CHAN` — канал переключения экранов, `OSDn_ENABLE` — дополнительные экраны. Окно OSD в SITL требует сборки с SFML (`sim_vehicle.py --osd`), поэтому здесь только параметр, проверка — на очках.
 
 ### Шаг 14. GPS и RTL
-В SITL GPS есть сразу (`GPS1_TYPE = 1`): дождись «EKF3 IMU0 is using GPS» — без этого не включится Loiter. `RTL_ALT` в 4.6 в сантиметрах: 1500 = 15 м; выше самых высоких препятствий площадки.
+В SITL GPS есть сразу (`GPS1_TYPE = 1`): дождись «EKF3 IMU0 is using GPS» — без этого не включится Loiter. `RTL_ALT_M` — в метрах, по умолчанию 15 (до 4.7 — `RTL_ALT` в сантиметрах, 1500); выше самых высоких препятствий площадки.
 
 ### Шаг 15. Висение Stabilize → AltHold → Loiter
 ```text
@@ -227,7 +229,7 @@ ERR Subsys 5 — радио, 6 — АКБ; MODE reason 3 и 4 — RADIO_FAILSAFE
 9. **Режимы и failsafe на столе.** Режимы парами (`FLTMODE1/2` Stabilize, `3/4` AltHold, `5/6` Loiter) — проверить по вкладке Flight Modes, что каждая позиция тумблера подсвечивает нужный режим; тумблер арма, E-Stop. АКБ 6S LiPo: `BATT_LOW_VOLT = 21.6` (3.6 В/банка под нагрузкой), `BATT_CRT_VOLT = 21.0` (3.5 В/банка), `BATT_FS_LOW_ACT = 2` (RTL), `BATT_FS_CRT_ACT = 1` (Land), `BATT_CAPACITY = 4000`, `BATT_LOW_MAH = 1000`, `BATT_ARM_VOLT = 22.1` — те же напряжения запишет Initial Parameter Setup в пункте 11 для 6S с минимумом 3.3 В/банка; `MOT_BAT_VOLT_MAX = 25.2`, `MOT_BAT_VOLT_MIN = 19.8`. Тест без пропов: Stabilize, арм, газ в ноль, выключить пульт → немедленный дизарм.
 10. **OSD и видео.** `OSD_TYPE = 1` (аналог) или `5` + `SERIALn_PROTOCOL = 42` (цифра); на очках видно напряжение, режим, RSSI/LQ.
 11. **Предполётная проверка.** Стартовые параметры тюна по размеру пропа и числу банок (Mission Planner → SETUP → Mandatory Hardware → Initial Parameter Setup, ap-tuning), `MOT_THST_HOVER = 0.25`, `ATC_THR_MIX_MAN = 0.1`, `MOT_HOVER_LEARN = 2`, `LOG_DISARMED = 0`, SD-карта есть. Пропы на место: направление лопастей по Motor Test, гайки затянуты. Площадка 20 × 20 м без людей, ветер < 5 м/с, наблюдатель.
-12. **Первое висение.** Stabilize: арм → дизарм → арм (проверка дизарма), газ медленно до отрыва, сразу посадить и дизармить. Затем висение на 1 м с отклонениями стиков ±5°. Потом Stabilize до 5 м → AltHold ≥ 30 с без входов → посадка; `PSC_ACCZ_P` = `MOT_THST_HOVER`, `PSC_ACCZ_I` = 2 × `MOT_THST_HOVER` (масштаб 4.6). Потом Loiter 30 с: аппарат стоит в круге 1–2 м. Критерии прерывания: рывок или вращение на отрыве — газ в ноль, дизарм (порядок или направление моторов); слышимые или видимые колебания — посадка и все `ATC_RAT_RLL/PIT_P/I/D` −50 %; «унитаз» в Loiter — в AltHold и на посадку (компас); «PreArm»/«EKF variance» — не взлетать.
+12. **Первое висение.** Stabilize: арм → дизарм → арм (проверка дизарма), газ медленно до отрыва, сразу посадить и дизармить. Затем висение на 1 м с отклонениями стиков ±5°. Потом Stabilize до 5 м → AltHold ≥ 30 с без входов → посадка; `PSC_D_ACC_P` = 0.1 × `MOT_THST_HOVER`, `PSC_D_ACC_I` = 0.2 × `MOT_THST_HOVER` (правило проверено на 4.6: `PSC_ACCZ_P` = `MOT_THST_HOVER`, `PSC_ACCZ_I` = 2 × `MOT_THST_HOVER`; для 4.7 пересчитано по множителю конверсии 0.1 из исходника 4.7.2). Потом Loiter 30 с: аппарат стоит в круге 1–2 м. Критерии прерывания: рывок или вращение на отрыве — газ в ноль, дизарм (порядок или направление моторов); слышимые или видимые колебания — посадка и все `ATC_RAT_RLL/PIT_P/I/D` −50 %; «унитаз» в Loiter — в AltHold и на посадку (компас); «PreArm»/«EKF variance» — не взлетать.
 13. **Первый тюн.** `INS_LOG_BAT_MASK = 1`, висение 30 с → harmonic notch по спектру (ap-tuning). Потом QuikTune: `VTOL-quicktune.lua` в `APM/scripts`, `SCR_ENABLE = 1`, перезагрузка, `QUIK_ENABLE = 1`, тумблер `RCx_OPTION = 300`; Loiter на 3 м, тумблер в середину — тюн, вверх — сохранить. Lua нужно ≥ 2 МБ флеша: на F405 скриптов нет, там AutoTune (`RCx_OPTION = 17`, `AUTOTUNE_AXES = 1` для roll, AltHold/Loiter, сохранение при дизарме с включённым тумблером).
 14. **Лог и бэкап.** Скачать `.BIN` (Mission Planner → DataFlash Logs), `check_lab_log.py --lab hover`, сохранить `01_after_setup.param` и сравнить с `00_defaults.param`.
 
@@ -298,5 +300,6 @@ ERR Subsys 5 — радио, 6 — АКБ; MODE reason 3 и 4 — RADIO_FAILSAFE
 - Initial Tuning Flight — ArduPilot Copter | https://ardupilot.org/copter/docs/initial-tuning-flight.html | primary | A
 - QuikTune — ArduPilot Copter | https://ardupilot.org/copter/docs/quiktune.html | primary | A
 - ArduPilot source, tag Copter-4.6.3 (AP_BattMonitor_Analog.cpp, AP_MotorsMulticopter.cpp, RC_Channels_VarInfo.h, AP_SerialManager.cpp) | https://github.com/ArduPilot/ardupilot/tree/Copter-4.6.3 | primary | A
+- ArduPilot source, tag Copter-4.7.2 (имена и значения по умолчанию 4.7: ArduCopter/Parameters.cpp, mode_rtl.cpp, AP_Arming.cpp, AC_PosControl.cpp) | https://github.com/ArduPilot/ardupilot/tree/Copter-4.7.2 | primary | A
 - Firmware tab — QGroundControl User Guide | https://docs.qgroundcontrol.com/master/en/qgc-user-guide/setup_view/firmware.html | primary | A
 - ArduPilot setup — ExpressLRS documentation | https://www.expresslrs.org/quick-start/ardupilot-setup | secondary | A

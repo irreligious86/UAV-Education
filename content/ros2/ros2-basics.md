@@ -101,7 +101,7 @@ ros2 doctor --report | head -20
 - ROS 2 — About Quality of Service settings (compatibility table) | https://docs.ros.org/en/jazzy/Concepts/Intermediate/About-Quality-of-Service-Settings.html | primary | A
 - REP-103 — Standard units and coordinate conventions | https://www.ros.org/reps/rep-0103.html | primary | A
 - REP-105 — Coordinate frames for mobile platforms | https://www.ros.org/reps/rep-0105.html | primary | A
-- PX4 — ROS 2 user guide (QoS for /fmu/out topics) | https://docs.px4.io/main/en/ros2/user_guide.html | primary | A
+- PX4 — ROS 2 user guide (QoS for /fmu/out topics) | https://docs.px4.io/v1.17/en/ros2/user_guide.html | primary | A
 
 ## checklist
 - Различаю топик, сервис, действие и параметр и выбираю нужный

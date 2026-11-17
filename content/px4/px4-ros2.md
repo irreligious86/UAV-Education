@@ -3,7 +3,7 @@ id: px4-ros2
 title: "PX4 и ROS 2: uXRCE-DDS и offboard"
 level: L4
 readingTime: 30 мин
-firmware: PX4 1.15+ / ROS 2 Jazzy (Humble — запасной)
+firmware: PX4 1.17 (сверено с v1.17.0) / ROS 2 Jazzy (Humble — запасной)
 status: published
 added: 2026-11-08
 tags:
@@ -24,7 +24,7 @@ next:
 ### Мост uXRCE-DDS
 - **Клиент** `uxrce_dds_client` в PX4 публикует/подписывает ограниченный набор топиков uORB (список — `dds_topics.yaml`).
 - **Агент** `MicroXRCEAgent` на companion или ПК принимает их по UDP или serial и выставляет в DDS — то есть в ROS 2.
-- Сообщения на стороне ROS 2 — пакет `px4_msgs`; **ветка `px4_msgs` должна соответствовать версии PX4**, иначе несовпадение определений. Для разных версий есть узел-переводчик сообщений.
+- Сообщения на стороне ROS 2 — пакет `px4_msgs`; **ветка `px4_msgs` должна соответствовать версии PX4**, иначе несовпадение определений. С 1.16 сообщения версионируются: топик сообщения с версией больше 0 получает суффикс `_vN` (в 1.17 — `vehicle_status_v1`, `vehicle_local_position_v1`, `battery_status_v1`, `home_position_v1`, `airspeed_validated_v1` и входной `vehicle_attitude_setpoint_v1`; в 1.16 — только `vehicle_status_v1`, в 1.15 суффиксов нет). Для разных версий есть узел-переводчик сообщений.
 
 Топики появляются в ROS 2 как `/fmu/out/*` (из PX4) и `/fmu/in/*` (в PX4).
 
@@ -79,7 +79,7 @@ class Offboard(Node):
 
 rclpy.init(); rclpy.spin(Offboard())
 ```
-Защиты из модуля «Слежение» (лимиты, watchdog, таймауты `COM_OF_LOSS_T` = 1 с и действие `COM_OBL_RC_ACT`) обязательны и здесь.
+Защиты из модуля «Слежение» (лимиты, watchdog, таймауты `COM_OF_LOSS_T` = 1 с и действие `COM_OBL_RC_ACT`) обязательны и здесь. В 1.17, если действием выбран переход в Position, Altitude или Stabilized, а ручного управления в этот момент нет, PX4 выполняет действие потери RC `NAV_RCL_ACT` (в 1.15 и 1.16 этой проверки не было).
 
 {{diagram:px4-offboard-seq|Offboard из ROS 2: поток OffboardControlMode и TrajectorySetpoint до переключения режима, затем команды режима и арма; при обрыве — failsafe.}}
 
@@ -96,7 +96,7 @@ cd .. && colcon build && source install/setup.bash
 Агент: `MicroXRCEAgent udp4 -p 8888` (сборка из исходников или snap — по документации).
 
 ### Шаг 2. SITL с клиентом
-`make px4_sitl gz_x500` — в SITL клиент uXRCE-DDS стартует сам и ищет агента на 8888. Проверка: `ros2 topic list` показывает `/fmu/out/vehicle_attitude` и прочие; `ros2 topic echo /fmu/out/vehicle_local_position` (с PX4 1.17 — `/fmu/out/vehicle_local_position_v1`).
+`make px4_sitl gz_x500` — в SITL клиент uXRCE-DDS стартует сам и ищет агента на 8888. Проверка: `ros2 topic list` показывает `/fmu/out/vehicle_attitude` и прочие; `ros2 topic echo /fmu/out/vehicle_local_position_v1` (до 1.17 — `/fmu/out/vehicle_local_position`, без суффикса).
 
 ### Шаг 3. Offboard-пример
 Запусти пример из `px4_ros_com` (offboard control): узел 10 циклов шлёт `OffboardControlMode` + `TrajectorySetpoint`, затем переключает режим и армит через `VehicleCommand`, после чего держит точку на 5 м. Прочитай код: порядок «сначала поток, потом режим» — ключевой.
@@ -176,9 +176,9 @@ if __name__ == "__main__":
   - Что сделать: z отрицательный вверх; проверить конверсию ENU/NED.
 
 ## references
-- PX4 ROS 2 User Guide | https://docs.px4.io/main/en/ros2/user_guide.html | primary | A
-- PX4 uXRCE-DDS | https://docs.px4.io/main/en/middleware/uxrce_dds.html | primary | A
-- PX4 ROS 2 Offboard Control Example | https://docs.px4.io/main/en/ros2/offboard_control.html | primary | A
+- PX4 ROS 2 User Guide | https://docs.px4.io/v1.17/en/ros2/user_guide.html | primary | A
+- PX4 uXRCE-DDS | https://docs.px4.io/v1.17/en/middleware/uxrce_dds.html | primary | A
+- PX4 ROS 2 Offboard Control Example | https://docs.px4.io/v1.17/en/ros2/offboard_control.html | primary | A
 - px4_msgs (GitHub) | https://github.com/PX4/px4_msgs | primary | A
 - px4_ros_com (GitHub) | https://github.com/PX4/px4_ros_com | primary | A
 

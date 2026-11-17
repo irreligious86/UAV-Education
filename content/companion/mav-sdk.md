@@ -123,7 +123,7 @@ asyncio.run(main())
 - MAVSDK — Guide and Python API | https://mavsdk.mavlink.io/main/en/ | primary | A
 - MAVSDK-Python (source, examples) | https://github.com/mavlink/MAVSDK-Python | primary | A
 - MAVROS | https://github.com/mavlink/mavros | primary | A
-- PX4 — Offboard mode (timeouts, COM_OF_LOSS_T) | https://docs.px4.io/main/en/flight_modes/offboard.html | primary | A
+- PX4 — Offboard mode (timeouts, COM_OF_LOSS_T) | https://docs.px4.io/v1.17/en/flight_modes/offboard.html | primary | A
 - ArduPilot — Copter commands in Guided mode | https://ardupilot.org/dev/docs/copter-commands-in-guided-mode.html | primary | A
 
 ## checklist

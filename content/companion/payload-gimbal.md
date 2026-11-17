@@ -3,7 +3,7 @@ id: payload-gimbal
 title: "Подвесы и полезная нагрузка: MAVLink Gimbal v2, камера, сброс"
 level: L3
 readingTime: 35 мин
-firmware: ArduPilot 4.5+ · PX4 1.15+
+firmware: ArduPilot 4.7 (сверено с 4.7.2) · PX4 1.17 (сверено с v1.17.0)
 status: published
 tags:
   - подвес
@@ -44,7 +44,7 @@ next:
 | Режим по умолчанию | `MNT1_DEFLT_MODE` | 0 retract, 1 neutral, 2 MAVLink, 3 RC, 4 GPS point, 5 SysID, 6 Home |
 | Пределы | `MNT1_PITCH_MIN/MAX`, `MNT1_YAW_MIN/MAX`, `MNT1_ROLL_MIN/MAX` | механика подвеса, в градусах |
 | Пульт: угол или скорость | `MNT1_RC_RATE` | 0 — стик задаёт угол, > 0 — скорость в °/с |
-| Каналы пульта | `RCx_OPTION` | 212 Mount1 Roll, 213 Mount1 Pitch, 214 Mount1 Yaw, 163 Mount Lock (удержание курса) |
+| Каналы пульта | `RCx_OPTION` | 212 Mount1 Roll, 213 Mount1 Pitch, 214 Mount1 Yaw, 163 Mount Yaw Lock (удержание курса; до 4.7 — «Mount Lock») |
 | Сервоподвес | `SERVOn_FUNCTION` | 6 Mount1 Yaw, 7 Mount1 Pitch, 8 Mount1 Roll |
 | Порт умного подвеса | `SERIALn_PROTOCOL` | 8 = Gimbal (Siyi, ViewPro и др.); для MAVLink-подвеса — MAVLink 2 |
 
@@ -120,7 +120,7 @@ look(-30, 45, True)   # 45° от севера, удерживать при ра
 - ArduPilot — Mount targeting and RC control | https://ardupilot.org/copter/docs/common-mount-targeting.html | primary | A
 - MAVLink — Gimbal Protocol v2 | https://mavlink.io/en/services/gimbal_v2.html | primary | A
 - MAVLink — Camera Protocol v2 | https://mavlink.io/en/services/camera.html | primary | A
-- PX4 — Gimbal (Mount) configuration | https://docs.px4.io/main/en/advanced/gimbal_control.html | primary | A
+- PX4 — Gimbal (Mount) configuration | https://docs.px4.io/v1.17/en/advanced/gimbal_control.html | primary | A
 
 ## checklist
 - Объясняю роли gimbal manager и gimbal device в протоколе v2

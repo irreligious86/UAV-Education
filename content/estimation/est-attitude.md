@@ -126,7 +126,7 @@ def mahony(gyro, acc, dt, kp=0.5, ki=0.01):
 
 ## references
 - ArduPilot — EKF (Extended Kalman Filter) overview | https://ardupilot.org/copter/docs/common-apm-navigation-extended-kalman-filter-overview.html | primary | A
-- PX4 — Using the ECL EKF (attitude/state estimation) | https://docs.px4.io/main/en/advanced_config/tuning_the_ecl_ekf.html | primary | A
+- PX4 — Using the ECL EKF (attitude/state estimation) | https://docs.px4.io/v1.17/en/advanced_config/tuning_the_ecl_ekf.html | primary | A
 - Mahony et al., "Nonlinear Complementary Filters on the Special Orthogonal Group" (IEEE TAC 2008) — исходник алгоритма | https://hal.archives-ouvertes.fr/hal-00488376 | primary | A
 
 ## checklist

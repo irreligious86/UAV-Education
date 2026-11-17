@@ -50,7 +50,7 @@ Companion предлагает «лети в точку X со скорость�
 ArduPilot ждёт MAVLink 2 на `SERIALx_PROTOCOL = 2`; PX4 на companion-порту — тот же MAVLink либо uXRCE-DDS для ROS 2. Для Betaflight/INAV companion в классическом смысле редок: там есть MSP, и бортовой компьютер обычно нужен только для видео и телеметрии.
 
 ### Маршрутизация MAVLink
-Один порт FC — несколько потребителей (GCS по 4G, скрипт на companion, логгер): нужен маршрутизатор. `mavlink-router` (C++, systemd-сервис, конфиг с endpoint'ами UART/UDP/TCP) или `mavproxy.py --master=/dev/ttyAMA0 --out=udp:gcs-ip:14550 --out=udp:127.0.0.1:14551` — каждый клиент получает копию потока, команды идут обратно к FC. Скорость UART companion-порта: 921600 бод (`SERIALx_BAUD = 921`) — иначе при `SRx_*` потоках на 10–50 Гц порт захлёбывается. Поток настраивается с companion (`REQUEST_DATA_STREAM`/`SET_MESSAGE_INTERVAL`), не по умолчанию.
+Один порт FC — несколько потребителей (GCS по 4G, скрипт на companion, логгер): нужен маршрутизатор. `mavlink-router` (C++, systemd-сервис, конфиг с endpoint'ами UART/UDP/TCP) или `mavproxy.py --master=/dev/ttyAMA0 --out=udp:gcs-ip:14550 --out=udp:127.0.0.1:14551` — каждый клиент получает копию потока, команды идут обратно к FC. Скорость UART companion-порта: 921600 бод (`SERIALx_BAUD = 921`) — иначе при потоках `MAVn_*` (до ArduPilot 4.7 — `SRn_*`) на 10–50 Гц порт захлёбывается. Поток настраивается с companion (`REQUEST_DATA_STREAM`/`SET_MESSAGE_INTERVAL`), не по умолчанию.
 
 {{diagram:mavlink-routing|Типовая схема маршрутизации MAVLink на борту с companion.}}
 
@@ -101,7 +101,7 @@ with open("companion_track.csv", "a") as f:
             f.flush()
 ```
 - В наземке (MAVLink Inspector) появляется второй участник: компонент 191 той же системы. Так и выглядит companion для остальной сети.
-- На порту 5762 (SERIAL1) у Copter потоки по умолчанию выключены (`SR1_POSITION = 0`, в 4.7 — `MAV2_POSITION`), поэтому без запроса файл останется пустым. Сначала запроси интервал `GLOBAL_POSITION_INT` 1 000 000 мкс (`MAV_CMD_SET_MESSAGE_INTERVAL`) — тогда в файле будет одна строка в секунду.
+- На порту 5762 (SERIAL1) у Copter потоки по умолчанию выключены (`MAV2_POSITION = 0`; до 4.7 — `SR1_POSITION`), поэтому без запроса файл останется пустым. Сначала запроси интервал `GLOBAL_POSITION_INT` 1 000 000 мкс (`MAV_CMD_SET_MESSAGE_INTERVAL`) — тогда в файле будет одна строка в секунду.
 - **Отказ.** Останови процесс (Ctrl+C или `kill`) в полёте в LOITER. Аппарат продолжает делать то, что делал, потому что ничего от companion не ждал. Запиши это как факт. Если бы companion управлял (GUIDED), остановка привела бы к таймауту уставок — это следующий модуль.
 
 ### Лабораторная
@@ -123,7 +123,7 @@ with open("companion_track.csv", "a") as f:
 ## references
 - Companion Computers — ArduPilot Dev | https://ardupilot.org/dev/docs/companion-computers.html | primary | A
 - Communicating with Raspberry Pi via MAVLink — ArduPilot Dev | https://ardupilot.org/dev/docs/raspberry-pi-via-mavlink.html | primary | A
-- Companion Computers — PX4 User Guide | https://docs.px4.io/main/en/companion_computer/ | primary | A
+- Companion Computers — PX4 User Guide | https://docs.px4.io/v1.17/en/companion_computer/index.html | primary | A
 
 ## checklist
 - Могу объяснить, что остаётся на FC и почему

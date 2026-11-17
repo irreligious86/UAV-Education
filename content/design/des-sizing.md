@@ -3,7 +3,7 @@ id: des-sizing
 title: "Проектирование под задачу: ТЗ → масса, энергия, тяга, конфигурация"
 level: L3
 readingTime: 45 мин
-firmware: любая прошивка · ArduPilot 4.6+ для сверки с логом
+firmware: любая прошивка · ArduPilot 4.7 (сверено с 4.7.2) для сверки с логом
 status: published
 added: 2026-11-10
 tags:
@@ -72,7 +72,7 @@ next:
 4. **T/W на просевшей АКБ**: таблица снята при 22.2 В, а Li-Ion под нагрузкой во второй половине разряда даёт около 3.4 В/банку (20.4 В). Тяга ∝ U², так что максимум падает в (20.4/22.2)² = 0.84 раза.
 
 ### Ветер и запас тяги
-В ветер V аппарат наклоняется на угол θ = atan(D / mg), где D = ½·ρ·V²·CdA. Для возврата против ветра нужна воздушная скорость с запасом — берём 1.5 × ветер. Тяга в установившемся полёте √((mg)² + D²) должна оставлять запас на управление: не больше 80 % максимума. T/W ≥ 2 закладываем отдельно — это запас на манёвр и стабилизацию. CdA — самое слабое место модели (в примере 0.06 м² принято, а не измерено); на железе его уточняют по углу наклона в известный ветер. Ограничение наклона в ArduPilot: `ANGLE_MAX` в Copter 4.6 (сантиградусы, по умолчанию 3000), в ветке master — `ATC_ANGLE_MAX` в градусах (30).
+В ветер V аппарат наклоняется на угол θ = atan(D / mg), где D = ½·ρ·V²·CdA. Для возврата против ветра нужна воздушная скорость с запасом — берём 1.5 × ветер. Тяга в установившемся полёте √((mg)² + D²) должна оставлять запас на управление: не больше 80 % максимума. T/W ≥ 2 закладываем отдельно — это запас на манёвр и стабилизацию. CdA — самое слабое место модели (в примере 0.06 м² принято, а не измерено); на железе его уточняют по углу наклона в известный ветер. Ограничение наклона в ArduPilot: `ATC_ANGLE_MAX` в градусах (по умолчанию 30; до Copter 4.7 — `ANGLE_MAX` в сантиградусах, 3000).
 
 Энергию считаем по висению: на 8–12 м/с индуктивная мощность падает, так что это консервативно. Таблицы производителей сняты на новом моторе в комнате и обычно оптимистичны на 5–10 %.
 
@@ -257,7 +257,7 @@ VTOL +25% mass: m=5.36 kg, cruise 201 W, hover 658 W x 2 min -> 55 min
   - Последствия: нет запаса на ветер и стабилизацию к концу разряда.
   - Что сделать: проп большего диаметра, мотор с запасом или облегчение; повторить расчёт.
 - **Симптом:** в ветер аппарат не держит точку и ложится на предельный угол
-  - Возможная причина: CdA занижен, ограничение наклона `ANGLE_MAX` (4.6) / `ATC_ANGLE_MAX` (master) достигнуто.
+  - Возможная причина: CdA занижен, ограничение наклона `ATC_ANGLE_MAX` достигнуто.
   - Что сделать: оценить CdA по углу наклона в известный ветер (tg θ = D/mg), пересчитать запас, ограничить работу по ветру.
 - **Симптом:** моторы горячие после висения
   - Возможная причина: ток висения выше ~40 % длительного тока мотора.
@@ -279,7 +279,7 @@ VTOL +25% mass: m=5.36 kg, cruise 201 W, hover 658 W x 2 min -> 55 min
 - Propeller Thrust — NASA Glenn Research Center (диск-актуатор) | https://www1.grc.nasa.gov/beginners-guide-to-aeronautics/propeller-thrust/ | primary | A
 - ArduPilot: AP_MotorsMulticopter.cpp (`MOT_THST_HOVER`, `MOT_HOVER_LEARN`, `MOT_BAT_VOLT_MAX`) | https://github.com/ArduPilot/ardupilot/blob/master/libraries/AP_Motors/AP_MotorsMulticopter.cpp | primary | A
 - ArduPilot: ArduCopter/Log.cpp (поля CTUN: ThO, ThH) | https://github.com/ArduPilot/ardupilot/blob/master/ArduCopter/Log.cpp | primary | A
-- ArduPilot Copter 4.6.3: Parameters.cpp (`ANGLE_MAX`, cdeg) | https://github.com/ArduPilot/ardupilot/blob/Copter-4.6.3/ArduCopter/Parameters.cpp | primary | A
+- ArduPilot Copter 4.7.2: AC_AttitudeControl.cpp (`ATC_ANGLE_MAX`, градусы; в 4.6 — `ANGLE_MAX` в Parameters.cpp, cdeg) | https://github.com/ArduPilot/ardupilot/blob/Copter-4.7.2/libraries/AC_AttitudeControl/AC_AttitudeControl.cpp | primary | A
 - Lift to Drag Ratio — NASA Glenn Research Center | https://www1.grc.nasa.gov/beginners-guide-to-aeronautics/lift-to-drag-ratio/ | primary | B
 - Simões C. M. Optimizing a Coaxial Propulsion System to a Quadcopter, extended abstract, IST Lisboa (κ_int = 1.281 по теории импульсов) | https://fenix.tecnico.ulisboa.pt/downloadFile/566729524644716/CedricSimoes_ExtendedAbstract.pdf | secondary | B
 

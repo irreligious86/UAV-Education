@@ -39,7 +39,7 @@ GNSS и компас — самые уязвимые датчики на бор�
 
 ### Что делает прошивка сама
 - **ArduPilot**: GPS glitch-защита (ворота инноваций; при радиальном расхождении больше `EK3_GLITCH_RAD`, 25 м по умолчанию, — сброс позиции и скорости к GPS), lane switch между ядрами EKF, **EKF failsafe** (`FS_EKF_ACTION`: 0 только сообщение, 1 Land если режим требует позицию, 2 AltHold если требует позицию, 3 Land из любого режима; порог `FS_EKF_THRESH`), **GPS failsafe** через EKF (при потере позиции в режиме, требующем её — переход в Land/AltHold), **yaw source fallback** (`EK3_SRC1_YAW = 3` GPS with compass fallback; GSF-оценка yaw по движению — `EK3_SRC1_YAW = 8` или автоматически при `COMPASS_USE = 0`). Dead reckoning по инерциалке и ветру — десятки секунд приемлемой точности, не минуты.
-- **PX4**: `EKF2_GPS_CHECK` (маска проверок качества GPS), порог точности `COM_POS_FS_EPH`; failsafe потери позиции `COM_POSCTL_NAVL` (0 — есть RC: переход в Altitude/Stabilized; 1 — RC нет: Descend или прекращение полёта); у u-blox есть встроенная детекция подавления (jamming detection, параметр чувствительности в драйвере GPS), состояние публикуется в сообщении `sensor_gps`.
+- **PX4**: `EKF2_GPS_CHECK` (маска проверок качества GPS), порог точности `COM_POS_FS_EPH`; при потере позиции в Position PX4 1.17 сам переходит в Altitude, а без оценки высоты — в Stabilized (до 1.17 это выбирал `COM_POSCTL_NAVL`: 0 — Altitude, 1 — Land; параметр удалён); в Mission и Hold при низкой точности позиции действует `COM_POS_LOW_ACT` (с 1.16, по умолчанию Return; порог `COM_POS_LOW_EPH` по умолчанию выключен); у u-blox есть встроенная детекция подавления (jamming detection, параметр чувствительности в драйвере GPS), состояние публикуется в сообщении `sensor_gps`.
 - **INAV**: если позиции нет дольше `nav_position_timeout` (5 с; 0 — отключено) в RTH/WP — Emergency Landing: снижение со скоростью `nav_emerg_landing_speed` (5 м/с), пока высота валидна, до детектора посадки (`nav_disarm_on_landing`); `failsafe_throttle` используется, только когда нет и высоты; `failsafe_procedure` — реакция на потерю RC, не GPS; dead reckoning (`inav_allow_dead_reckoning`), `inav_allow_gps_fix_estimation` (только крыло: курс по компасу (без него курс быстро уходит), высота по баро, скорость — питот или постоянная `fw_reference_airspeed`, плюс ветер, оценённый до потери; фикс и дом должны быть до взлёта).
 
 ### Проектирование устойчивости
@@ -64,14 +64,14 @@ GNSS и компас — самые уязвимые датчики на бор�
 ## practice
 ### Шаг 1. Отпечатки в SITL
 ArduPilot SITL, Loiter на 20 м:
-- **Потеря GPS**: `SIM_GPS1_ENABLE = 0` (старые версии: `SIM_GPS_DISABLE = 1`) на 30 с → что делает аппарат, когда срабатывает EKF failsafe, как ведут себя `XKF4.SP`, `XKF1.PN/PE`, сообщения в `MSG`.
-- **Шум GNSS**: `SIM_GPS1_NOISE` (старые: `SIM_GPS_NOISE`) = 5 м → инновации, дрейф Loiter.
-- **Скачок позиции (glitch)**: `SIM_GPS1_GLTCH_X` (старые: `SIM_GPS_GLITCH_X`) = 0.0005° (~50 м) → отбраковка воротами; при расхождении больше `EK3_GLITCH_RAD` (по умолчанию 25 м) EKF сбрасывает позицию к GPS.
+- **Потеря GPS**: `SIM_GPS1_ENABLE = 0` (до 4.7 — `SIM_GPS_DISABLE = 1`) на 30 с → что делает аппарат, когда срабатывает EKF failsafe, как ведут себя `XKF4.SP`, `XKF1.PN/PE`, сообщения в `MSG`.
+- **Шум GNSS**: `SIM_GPS1_NOISE` (до 4.7 — `SIM_GPS_NOISE`) = 5 м → инновации, дрейф Loiter.
+- **Скачок позиции (glitch)**: `SIM_GPS1_GLTCH_X` (до 4.7 — `SIM_GPS_GLITCH_X`) = 0.0005° (~50 м) → отбраковка воротами; при расхождении больше `EK3_GLITCH_RAD` (по умолчанию 25 м) EKF сбрасывает позицию к GPS.
 - **Сбой компаса**: `SIM_MAG1_OFS_X` (старые: `SIM_MAG_OFS_X`) = 300 → `XKF4.SM`, Compass variance, yaw reset.
 Записать таблицу: сценарий → признаки → реакция прошивки → время до реакции.
 
 ### Шаг 2. Настроить реакцию
-`FS_EKF_ACTION`, `FS_EKF_THRESH`, `EK3_SRC1_YAW = 3`, `EK3_SRC2_*` с потоком (если есть), `GPS_AUTO_SWITCH`. Повторить сценарии — сравнить поведение. В PX4: `COM_POSCTL_NAVL`, `EKF2_GPS_CHECK`.
+`FS_EKF_ACTION`, `FS_EKF_THRESH`, `EK3_SRC1_YAW = 3`, `EK3_SRC2_*` с потоком (если есть), `GPS_AUTO_SWITCH`. Повторить сценарии — сравнить поведение. В PX4: `COM_POS_LOW_ACT` с порогом `COM_POS_LOW_EPH`, `EKF2_GPS_CHECK` (до 1.17 — ещё `COM_POSCTL_NAVL`).
 
 ### Шаг 3. Полевая проверка (гражданская)
 На площадке, где GPS заведомо плох (под навесом/у здания): на земле — лог NSats/HDOP/инноваций; в полёте — только AltHold/Stabilize, наблюдать статус EKF в GCS. Отработать ручной переход из Loiter в AltHold при сообщении EKF.

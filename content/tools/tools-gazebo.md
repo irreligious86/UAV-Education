@@ -130,7 +130,7 @@ def test_takeoff_hold_land():
 ## references
 - ArduPilot — ardupilot_gazebo plugin (README) | https://github.com/ArduPilot/ardupilot_gazebo | primary | A
 - ArduPilot — Using SITL with Gazebo | https://ardupilot.org/dev/docs/sitl-with-gazebo.html | primary | A
-- PX4 — Gazebo simulation | https://docs.px4.io/main/en/sim_gazebo_gz/ | primary | A
+- PX4 — Gazebo simulation | https://docs.px4.io/v1.17/en/sim_gazebo_gz/ | primary | A
 - Gazebo — documentation (Harmonic) | https://gazebosim.org/docs/harmonic/getstarted/ | primary | A
 - ros_gz — ROS 2 ↔ Gazebo bridge | https://github.com/gazebosim/ros_gz | primary | A
 

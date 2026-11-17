@@ -3,7 +3,7 @@
  "pass": 80,
  "questions": [
   {
-   "q": "Betaflight 4.5, gps_auto_config = ON. Когда модуль u-blox получает динамическую модель gps_ublox_flight_model (AIRBORNE_4G)?",
+   "q": "Betaflight 2025.12, gps_auto_config = ON. Когда модуль u-blox получает динамическую модель gps_ublox_flight_model (AIRBORNE_4G)?",
    "options": [
     "На первом 3D fix после включения",
     "В момент первого арма аппарата",
@@ -11,10 +11,10 @@
     "Сразу после перевода UART на 57600"
    ],
    "answer": 0,
-   "explain": "gpsUpdate(): в состоянии RECEIVING_DATA при первом STATE(GPS_FIX) отправляется NAV5/VALSET с flight model. Арм тут ни при чём, хотя страница GPS в документации пишет «Stationary before arming». До фикса действует gps_ublox_acquire_model (STATIONARY)."
+   "explain": "gpsUpdate(): в состоянии RECEIVING_DATA при первом STATE(GPS_FIX) отправляется NAV5/VALSET с flight model. Арм тут ни при чём, хотя страница GPS в документации пишет «Stationary before arming». До фикса действует gps_ublox_acquire_model (STATIONARY). Так же в 4.5."
   },
   {
-   "q": "Что делает переменная gps_auto_baud = ON в Betaflight 4.5 для gps_provider = UBLOX?",
+   "q": "Что делает переменная gps_auto_baud = ON в Betaflight 2025.12 для gps_provider = UBLOX?",
    "kind": "apply",
    "fragment": "# status\nGPS: connected, UART2 57600 (set to AUTO), configured, version =  M10\n# get gps_auto_baud\ngps_auto_baud = ON",
    "options": [
@@ -24,7 +24,7 @@
     "Включает поиск скорости заново после каждой потери связи на 2.5 с"
    ],
    "answer": 1,
-   "explain": "В 4.5 autoBaud читается только в cli.c (строка «set to AUTO») и в MSP. gpsConfigureUblox() перебирает скорости MON-VER-запросами всегда; комментарий в LOST_COMMUNICATION прямо говорит, что код auto-baud удалён."
+   "explain": "И в 2025.12, и в 4.5 autoBaud читается только в cli.c (строка «set to AUTO») и в MSP. gpsConfigureUblox() перебирает скорости MON-VER-запросами всегда; комментарий в LOST_COMMUNICATION прямо говорит, что код auto-baud удалён."
   },
   {
    "q": "Настроен GPS Rescue (failsafe_procedure = GPS-RESCUE), gps_rescue_min_sats = 8. Модуль даёт 3D fix и 7 спутников. Что будет при попытке арма?",
@@ -71,7 +71,7 @@
    "explain": "Чувствительность холодного старта у M10 −148 дБм, слежения −167 дБм. Слабые спутники видны, но их эфемериды не скачаны, и в решение они не идут. Betaflight никаких спутников не отбирает, он берёт numSV из NAV-PVT."
   },
   {
-   "q": "M10 по умолчанию принимает Galileo. В Betaflight 4.5: gps_ublox_use_galileo = OFF, gps_sbas_mode = AUTO. Что будет с Galileo?",
+   "q": "M10 по умолчанию принимает Galileo. В Betaflight 2025.12: gps_ublox_use_galileo = OFF, gps_sbas_mode = AUTO. Что будет с Galileo?",
    "options": [
     "Выключится: Betaflight запишет это в CFG-SIGNAL",
     "Выключится после первого арма аппарата",
@@ -79,10 +79,10 @@
     "Включится принудительно вместе с SBAS"
    ],
    "answer": 2,
-   "explain": "Шаг UBLOX_MSG_CFG_GNSS выполняется только при SBAS = NONE или Galileo = ON. При SBAS AUTO и Galileo OFF он пропускается, и Galileo остаётся таким, как задано в модуле. CFG-SIGNAL Betaflight 4.5 вообще не пишет."
+   "explain": "Шаг UBLOX_MSG_CFG_GNSS выполняется только при SBAS = NONE или Galileo = ON. При SBAS AUTO и Galileo OFF он пропускается, и Galileo остаётся таким, как задано в модуле. CFG-SIGNAL Betaflight вообще не пишет (проверено на 4.5.6; условие шага CFG-GNSS в 2025.12.5 то же)."
   },
   {
-   "q": "Компаса нет. Сразу после взлёта стрелка дома в OSD смотрит не туда. Что по коду imu.c 4.5 исправит курс?",
+   "q": "Компаса нет. Сразу после взлёта стрелка дома в OSD смотрит не туда. Что по коду imu.c (2025.12, так же в 4.5) исправит курс?",
    "options": [
     "Висение на месте 30 с, пока GPS усреднит курс",
     "Прямой ровный пролёт быстрее 1–2 м/с",

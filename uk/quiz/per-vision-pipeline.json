@@ -77,7 +77,7 @@
         "Из GPS_INPUT с sysid FOLL_SYSID; продолжает лететь по последней скорости цели до FOLL_DIST_MAX"
       ],
       "answer": 1,
-      "explain": "AP_Follow::handle_msg принимает оба сообщения от sysid FOLL_SYSID (0 — первый увиденный). Таймаут 3 с зашит в AP_FOLLOW_TIMEOUT_MS; отдельный параметр FOLL_TIMEOUT появился позже 4.6."
+      "explain": "AP_Follow::handle_msg принимает оба сообщения от sysid FOLL_SYSID (0 — первый увиденный). Таймаут 3 с: в 4.7 это параметр FOLL_TIMEOUT (по умолчанию 3 с), в 4.6 значение зашито в AP_FOLLOW_TIMEOUT_MS."
     },
     {
       "q": "Конвейер на Pi: захват 8 мс, undistort 6, YOLO 60, трекер 1, геопривязка 1, MAVLink 5. Камера с экспозицией и readout 25 мс. Какая задержка glass-to-command и что дешевле всего сократить?",

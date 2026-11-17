@@ -47,7 +47,7 @@ PID-тюнинг без теории — перебор. Модуль объяс
 **Overshoot ≈ exp(−π·ζ/√(1−ζ²))**: 0.7 → 4.6%, 0.5 → 16%, 0.3 → 37%. Время установления ≈ 4/(ζ·ωₙ). Bounce-back после остановки стика — тот же недодемпфированный полюс, только возбуждённый ступенькой «вниз»: большой bounce-back = низкое ζ = либо мало D, либо много P/задержки. D-term повышает демпфирование (ζ) — поэтому «много D» убирает отскок, но D усиливает шум ∝ частоте, и фильтры D добавляют задержку, которая снова снижает запас. Это и есть компромисс тюнинга.
 
 ### I-term: статическая ошибка и windup
-I убирает установившуюся ошибку (ветер, несимметрия). Платит фазой: интегратор даёт −90° на низких частотах, поэтому слишком большой I — медленные колебания (0.5–3 Гц, «плавание»). Windup — накопление I при насыщении выходов (стик в упоре, моторы в потолке): прошивки ограничивают (`iterm_limit`, `iterm_relax`, в ArduPilot `ATC_RAT_*_IMAX`).
+I убирает установившуюся ошибку (ветер, несимметрия). Платит фазой: интегратор даёт −90° на низких частотах, поэтому слишком большой I — медленные колебания (0.5–3 Гц, «плавание»). Windup — накопление I при насыщении выходов (стик в упоре, моторы в потолке): прошивки ограничивают (в Betaflight 2025.12 — `iterm_windup` и `iterm_relax`; `iterm_limit` был до 4.5 включительно; в ArduPilot `ATC_RAT_*_IMAX`).
 
 ### Feedforward
 FF подаёт команду пропорционально производной setpoint, минуя ошибку: выход начинает двигаться до того, как накопилась ошибка. Не влияет на устойчивость (вне контура), но даёт overshoot при резких стиках, если его много. Хороший FF — малая задержка отклика при том же P.
@@ -114,7 +114,7 @@ ArduPilot SITL: `ATC_ANG_RLL_P` поднять с 4.5 до 15 при станд�
 
 ## references
 - ArduPilot — Tuning Process Instructions (rate → angle, filters first) | https://ardupilot.org/copter/docs/tuning-process-instructions.html | primary | A
-- PX4 — Multicopter PID Tuning Guide (cascaded controllers) | https://docs.px4.io/main/en/config_mc/pid_tuning_guide_multicopter.html | primary | A
+- PX4 — Multicopter PID Tuning Guide (cascaded controllers) | https://docs.px4.io/v1.17/en/config_mc/pid_tuning_guide_multicopter.html | primary | A
 - Betaflight — PID Tuning Guide | https://betaflight.com/docs/wiki/guides/current/PID-Tuning-Guide | primary | A
 
 ## checklist

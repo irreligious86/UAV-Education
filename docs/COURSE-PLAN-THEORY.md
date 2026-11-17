@@ -63,6 +63,14 @@ Input for the migration: 27 community questions caused by these releases (FAQ re
 | In-flight disarm / fly-away tree and the recovery reflex; digital "black screen" branch | `diag-troubleshooting` |
 | Finding a lost aircraft; post-crash checklist | `ops-field`, `ops-maintenance` |
 
+### 4.0b Systems thinking (added 2026-11-18, requested by Alex)
+
+Assessment side is done: criterion «Системность» in the project rubric and in every track capstone.
+Learning side: every module gets a block «Место в системе» — what the module's subject receives from
+neighbouring subsystems, what it hands on, and what breaks elsewhere when it is set wrong (with module ids).
+The validator requires the block; new modules are written with it from wave 1 on. Existing 140 modules:
+one pass after wave 0, track by track.
+
 ### 4.1 New modules — newcomer and industry block (community study)
 
 | Id | Title (ru) | Track |
@@ -166,4 +174,6 @@ Phase 2 is not estimated yet; SITL labs cost roughly as much again per module.
 
 | Wave | State |
 |---|---|
-| 0 — migration M1–M5, immediate corrections | in progress (started 2026-11-17) |
+| 0 — migration M1–M5, immediate corrections | corrections published; M1 ArduPilot, M2 Betaflight, M3 PX4, M5 ELRS published 2026-11-18 (reports `docs/reviews/migration-*-2026-11.md`); M4 INAV in progress; independent fact-check of the migrations pending |
+| «Системность» criterion in rubrics | done 2026-11-18 (`411ae49`) |
+| «Место в системе» block in 140 modules | approved 2026-11-18, starts after wave 0 |

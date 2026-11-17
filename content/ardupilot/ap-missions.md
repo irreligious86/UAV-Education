@@ -3,7 +3,7 @@ id: ap-missions
 title: "Миссии и планирование"
 level: L2
 readingTime: 25 мин
-firmware: ArduPilot 4.5+
+firmware: ArduPilot 4.7 (сверено с 4.7.2)
 status: published
 added: 2026-11-07
 tags:
@@ -44,7 +44,7 @@ next:
 GCS сохраняют миссию в текстовый файл формата `QGC WPL 110`: по строке на команду — номер, флаг текущей, frame, код команды, четыре параметра, широта, долгота, высота, флаг автопродолжения. Такой файл удобно хранить в git рядом с параметрами.
 
 ### Команды, которые стоит знать наизусть
-NAV: `NAV_WAYPOINT` (p1 — задержка в точке, с), `NAV_TAKEOFF` (alt), `NAV_LAND`, `NAV_RETURN_TO_LAUNCH`, `NAV_LOITER_TIME/TURNS/UNLIM`, `NAV_SPLINE_WAYPOINT` (сплайн), `NAV_DELAY`; DO: `DO_SET_SERVO`, `DO_SET_RELAY`, `DO_DIGICAM_CONTROL`, `DO_SET_CAM_TRIGG_DIST` (съёмка через каждые N м — основа фотограмметрии), `DO_CHANGE_SPEED`, `DO_SET_ROI` (нацелить гимбал/нос), `DO_JUMP` (цикл, с счётчиком), `DO_LAND_START` (точка входа посадочной последовательности для failsafe), `DO_SET_HOME`; CONDITION: `CONDITION_DELAY`, `CONDITION_DISTANCE`, `CONDITION_YAW`. Параметры выполнения: `WP_SPD` (м/с горизонталь), `WP_SPD_UP/DN`, `WP_RADIUS_M` (радиус захвата), `WP_ACC` (до 4.7 — `WPNAV_SPEED` в см/с, `WPNAV_SPEED_UP/DN`, `WPNAV_RADIUS`, `WPNAV_ACCEL`), `WP_YAW_BEHAVIOR` (нос по курсу/нет), `MIS_RESTART` (0 — продолжить с последней команды при входе в Auto, 1 — с начала), `MIS_OPTIONS` (бит 0 — стирать миссию при перезагрузке; бит 1 — учитывать расстояние до посадки в failsafe АКБ (только Plane); бит 2 — продолжать после посадки), `RTL_*` для конца миссии.
+NAV: `NAV_WAYPOINT` (p1 — задержка в точке, с), `NAV_TAKEOFF` (alt), `NAV_LAND`, `NAV_RETURN_TO_LAUNCH`, `NAV_LOITER_TIME/TURNS/UNLIM`, `NAV_SPLINE_WAYPOINT` (сплайн), `NAV_DELAY`; DO: `DO_SET_SERVO`, `DO_SET_RELAY`, `DO_DIGICAM_CONTROL`, `DO_SET_CAM_TRIGG_DIST` (съёмка через каждые N м — основа фотограмметрии), `DO_CHANGE_SPEED`, `DO_SET_ROI` (нацелить гимбал/нос), `DO_JUMP` (цикл, с счётчиком), `DO_LAND_START` (точка входа посадочной последовательности для failsafe), `DO_SET_HOME`; CONDITION: `CONDITION_DELAY`, `CONDITION_DISTANCE`, `CONDITION_YAW`. Параметры выполнения: `WP_SPD` (м/с горизонталь, по умолчанию 10), `WP_SPD_UP/DN` (2.5 и 1.5 м/с), `WP_RADIUS_M` (радиус захвата, 2 м), `WP_ACC` (2.5 м/с²) (до 4.7 — `WPNAV_SPEED`, `WPNAV_SPEED_UP/DN`, `WPNAV_RADIUS`, `WPNAV_ACCEL` в см/с, см и см/с²), `WP_YAW_BEHAVIOR` (нос по курсу/нет), `MIS_RESTART` (0 — продолжить с последней команды при входе в Auto, 1 — с начала), `MIS_OPTIONS` (бит 0 — стирать миссию при перезагрузке; бит 1 — учитывать расстояние до посадки в failsafe АКБ (только Plane); бит 2 — продолжать после посадки), `RTL_*` для конца миссии.
 
 ### Высоты: три системы и одна ошибка
 Относительная (над домом, `MAV_FRAME_GLOBAL_RELATIVE_ALT`, по умолчанию), абсолютная (над уровнем моря — ошибка при другом месте взлёта), terrain (над рельефом по данным SRTM с GCS или дальномера, `TERRAIN_ENABLE`, frame «Terrain» у точек и `WP_RFND_USE`/`RTL_ALT_TYPE`). Классическая авария: миссия с абсолютными высотами, составленная для другой площадки на 300 м выше — аппарат пытается уйти под землю или в небо. Правило: относительные высоты, проверка в GCS профилем высот над рельефом.

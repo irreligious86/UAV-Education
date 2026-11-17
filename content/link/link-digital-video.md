@@ -3,7 +3,7 @@ id: link-digital-video
 title: "Цифровое FPV-видео: DJI, Walksnail, HDZero, OpenIPC"
 level: L2
 readingTime: 30 мин
-firmware: Betaflight 4.4+ · INAV 7+ · ArduPilot 4.5+
+firmware: Betaflight 2025.12 (сверено с 2025.12.5) · INAV 7+ · ArduPilot 4.5+
 status: published
 tags:
   - цифровое видео
@@ -41,7 +41,7 @@ next:
 
 ### HD OSD: MSP DisplayPort
 В цифровых системах OSD рисуют очки или воздушный модуль, а полётник только присылает, **что** рисовать, по протоколу MSP DisplayPort через UART.
-- **Betaflight 4.4+**: UART на вкладке Ports — функция MSP для воздушного модуля (Peripherals: VTX (MSP + DisplayPort)); в CLI `set osd_displayport_device = MSP`, видеосистема `set vcd_video_system = HD`. Элементы OSD расставляются на большем холсте.
+- **Betaflight 2025.12** (так же с 4.4): UART на вкладке Ports — функция MSP для воздушного модуля (Peripherals: VTX (MSP + DisplayPort)); в CLI `set osd_displayport_device = MSP`, видеосистема `set vcd_video_system = HD`. В Cloud Build должен быть отмечен HD OSD: без него после прошивки 2025.12 OSD в очках не появится. Элементы OSD расставляются на большем холсте.
 - **INAV**: UART с функцией MSP_OSD (DisplayPort), `osd_video_system` — по системе: HDZERO, AVATAR (Walksnail), DJI_NATIVE (DJI O4 и очки с INAV-шрифтом), BFHDCOMPAT (DJI O3 на стоковой прошивке), DJIWTF (WTFOS); подробно — `bf-hd-osd-video`, раздел «INAV и ArduPilot — коротко».
 - **ArduPilot**: `SERIALn_PROTOCOL = 42` (DisplayPort), `OSD_TYPE = 5` (MSP DisplayPort).
 - Управление VTX (канал, мощность) у цифровых систем идёт либо через тот же MSP, либо из меню очков — VTX-таблицы аналога здесь не нужны.

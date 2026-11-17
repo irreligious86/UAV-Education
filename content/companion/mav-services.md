@@ -47,7 +47,7 @@ MAVLink — это не набор сообщений, а набор **диал�
 - Список: `PARAM_REQUEST_LIST` (21) → поток `PARAM_VALUE` (22) с `param_count` и `param_index`. Пропуски досчитывают по индексу через `PARAM_REQUEST_READ` (20) с `param_index`.
 - Чтение одного: `PARAM_REQUEST_READ` по имени (16 символов, без завершающего нуля при длине 16!) или индексу.
 - Запись: `PARAM_SET` (23). **Отдельного ACK нет** — подтверждение это `PARAM_VALUE` с тем же именем и новым значением. Если эхо пришло со старым значением — запись отклонена (вне диапазона, только для чтения).
-- Все значения передаются в поле `float param_value`. Целые типы ArduPilot передаёт как приведённое к float число (C-cast), PX4 — побайтно (биты целого в битах float). Какую схему использует автопилот, сообщает флаг в `AUTOPILOT_VERSION.capabilities` (`MAV_PROTOCOL_CAPABILITY_PARAM_ENCODE_C_CAST` или `..._BYTEWISE`). Ошибка в схеме превращает `SYSID_THISMAV = 1` в 1.4e-45.
+- Все значения передаются в поле `float param_value`. Целые типы ArduPilot передаёт как приведённое к float число (C-cast), PX4 — побайтно (биты целого в битах float). Какую схему использует автопилот, сообщает флаг в `AUTOPILOT_VERSION.capabilities` (`MAV_PROTOCOL_CAPABILITY_PARAM_ENCODE_C_CAST` или `..._BYTEWISE`). Ошибка в схеме превращает `MAV_SYSID = 1` (до ArduPilot 4.7 — `SYSID_THISMAV`) в 1.4e-45.
 
 Для массовой загрузки параметров, чтобы не делать 1000 диалогов по радио, есть MAVFTP: ArduPilot отдаёт файл `@PARAM/param.pck` целиком.
 
@@ -67,7 +67,7 @@ MAVLink — это не набор сообщений, а набор **диал�
 {{diagram:mavlink-mission-seq|Загрузка миссии: аппарат запрашивает пункты по одному и сам повторяет запрос при потере; завершает MISSION_ACK.}}
 
 ### Потоки телеметрии
-Аппарат шлёт телеметрию либо по своим настройкам (ArduPilot — группы потоков на порт, параметры `SRn_*` в 4.6 и `MAVn_*` в 4.7+; PX4 — профили `MAV_n_MODE`), либо по запросу клиента:
+Аппарат шлёт телеметрию либо по своим настройкам (ArduPilot — группы потоков на порт, параметры `MAVn_*`, нумерация с 1; до 4.7 — `SRn_*` с нуля, то есть `SR0_*` стал `MAV1_*`; PX4 — профили `MAV_n_MODE`), либо по запросу клиента:
 - `MAV_CMD_SET_MESSAGE_INTERVAL` (511): param1 — msgid, param2 — интервал в мкс (−1 — выключить, 0 — по умолчанию).
 - `MAV_CMD_REQUEST_MESSAGE` (512): одно сообщение сейчас (например, `AUTOPILOT_VERSION`, `HOME_POSITION`).
 
@@ -100,7 +100,7 @@ python -m pytest -q tests/test_services.py
 Тем же клиентом загрузите миссию из 10 точек в ArduPilot SITL, скачайте и сравните поэлементно; затем сделайте то же для геозоны (`mission_type = 1`, команды `MAV_CMD_NAV_FENCE_POLYGON_VERTEX_INCLUSION`). Убедитесь, что Mission Planner видит обе.
 
 ### Шаг 4. Параметры с упаковкой
-Прочитайте `SYSID_THISMAV` (или `MAV_SYSID` на 4.7+) в ArduPilot SITL и `MAV_SYS_ID` в PX4 SITL через `PARAM_REQUEST_READ`; посмотрите сырое `param_value` и `param_type`. Объясните разницу схем C-cast и bytewise на этих двух значениях.
+Прочитайте `MAV_SYSID` (на 4.6 и раньше — `SYSID_THISMAV`) в ArduPilot SITL и `MAV_SYS_ID` в PX4 SITL через `PARAM_REQUEST_READ`; посмотрите сырое `param_value` и `param_type`. Объясните разницу схем C-cast и bytewise на этих двух значениях.
 
 Лабораторная засчитывается, когда свой клиент миссий проходит тесты при потерях, миссия и геозона совпадают после скачивания в SITL и объяснена упаковка параметров.
 

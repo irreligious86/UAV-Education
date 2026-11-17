@@ -3,7 +3,7 @@ id: ctl-allocation
 title: "Миксер и распределение управления: матрица, насыщение, PX4 Control Allocation, наклонные моторы"
 level: L3
 readingTime: 45 мин
-firmware: PX4 1.15–1.17 · ArduCopter 4.6 · Betaflight 4.5
+firmware: PX4 1.17 (сверено с v1.17.0; в 1.15 и 1.16 то же) · ArduCopter 4.7 (сверено с 4.7.2) · Betaflight 2025.12 (сверено с 2025.12.5)
 status: published
 tags:
   - миксер
@@ -321,13 +321,13 @@ motors:set_frame_string("deadcat 7")
 - Проверил моторы без пропов и сверил лог висения с расчётом
 
 ## references
-- PX4 Guide: Control Allocation (Mixing) | https://docs.px4.io/main/en/concept/control_allocation.html | primary | A
-- PX4 Guide: Actuator Configuration and Testing | https://docs.px4.io/main/en/config/actuators.html | primary | A
-- PX4 Guide: System Failure Injection | https://docs.px4.io/main/en/debug/failure_injection.html | primary | A
+- PX4 Guide: Control Allocation (Mixing) | https://docs.px4.io/v1.17/en/concept/control_allocation.html | primary | A
+- PX4 Guide: Actuator Configuration and Testing | https://docs.px4.io/v1.17/en/config/actuators.html | primary | A
+- PX4 Guide: System Failure Injection | https://docs.px4.io/v1.17/en/debug/failure_injection.html | primary | A
 - PX4 source: ActuatorEffectivenessRotors.cpp (v1.17.0) | https://raw.githubusercontent.com/PX4/PX4-Autopilot/v1.17.0/src/modules/control_allocator/VehicleActuatorEffectiveness/ActuatorEffectivenessRotors.cpp | primary | A
 - PX4 source: ControlAllocationSequentialDesaturation.cpp (v1.17.0) | https://raw.githubusercontent.com/PX4/PX4-Autopilot/v1.17.0/src/lib/control_allocation/control_allocation/ControlAllocationSequentialDesaturation.cpp | primary | A
 - PX4 source: control_allocator module.yaml (CA_* parameters, v1.17.0) | https://raw.githubusercontent.com/PX4/PX4-Autopilot/v1.17.0/src/modules/control_allocator/module.yaml | primary | A
-- ArduPilot source: AP_MotorsMatrix.cpp (Copter-4.6.3) | https://raw.githubusercontent.com/ArduPilot/ardupilot/Copter-4.6.3/libraries/AP_Motors/AP_MotorsMatrix.cpp | primary | A
+- ArduPilot source: AP_MotorsMatrix.cpp (Copter-4.7.2; в 4.6.3 алгоритм тот же) | https://raw.githubusercontent.com/ArduPilot/ardupilot/Copter-4.7.2/libraries/AP_Motors/AP_MotorsMatrix.cpp | primary | A
 - ArduPilot example: MotorMatrix_fault_tolerant_hex.lua | https://raw.githubusercontent.com/ArduPilot/ardupilot/Copter-4.6.3/libraries/AP_Scripting/examples/MotorMatrix_fault_tolerant_hex.lua | primary | A
 - Betaflight: Mixer (mmix, mixer_type) | https://betaflight.com/docs/wiki/guides/current/Mixer | primary | A
-- Betaflight source: mixer.c (4.5-maintenance) | https://raw.githubusercontent.com/betaflight/betaflight/4.5-maintenance/src/main/flight/mixer.c | primary | A
+- Betaflight source: mixer.c (тег 2025.12.5; функции микширования те же, что в 4.5) | https://raw.githubusercontent.com/betaflight/betaflight/2025.12.5/src/main/flight/mixer.c | primary | A

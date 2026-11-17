@@ -52,7 +52,7 @@ L1 = (1/π)·ζ·T·V, где T = `NAVL1_PERIOD`, ζ = `NAVL1_DAMPING`, V — п
 ### Профили скорости: трапеция и S-кривая
 - **Трапеция**: разгон с постоянным ускорением, крейсер, торможение. Ускорение меняется скачком — рывок (производная ускорения) бесконечен. Для коптера скачок ускорения = скачок наклона: дёрганье, раскачка груза и камеры, перерегулирование.
 - **S-кривая** (jerk-limited): ускорение нарастает с ограниченным рывком. Перемещение на 50 м при v ≤ 10 м/с, a ≤ 5 м/с², рывок ≤ 10 м/с³: трапеция — 7.0 с, S-кривая — 7.5 с (+0.5 с за время нарастания ускорения), но без скачков.
-- **ArduCopter** (с 4.1) строит путь по точкам S-кривыми: скорость, ускорение и рывок задаются параметрами навигации (`WPNAV_SPEED`, см/с; `WPNAV_ACCEL`, см/с²; `WPNAV_JERK`, м/с³; в Copter 4.7 — `WP_SPD`, м/с; `WP_ACC`, м/с²; `WP_JERK`, м/с³), углы маршрута скругляются с радиусом `WPNAV_RADIUS` (4.7 — `WP_RADIUS_M`).
+- **ArduCopter** (с 4.1) строит путь по точкам S-кривыми: скорость, ускорение и рывок задаются параметрами навигации (`WP_SPD`, м/с; `WP_ACC`, м/с²; `WP_JERK`, м/с³; до Copter 4.7 — `WPNAV_SPEED`, см/с; `WPNAV_ACCEL`, см/с²; `WPNAV_JERK`, м/с³), углы маршрута скругляются с радиусом `WP_RADIUS_M` (м; до 4.7 — `WPNAV_RADIUS`, см).
 
 {{diagram:chart-scurve|Ускорение при перемещении на 50 м: трапеция переключает ускорение скачком, S-кривая — с ограниченным рывком, ценой 0.5 с.}}
 
@@ -129,7 +129,7 @@ ArduCopter SITL, квадратная миссия 50×50 м. Два прого�
 - ArduPilot — AP_L1_Control (source) | https://github.com/ArduPilot/ardupilot/blob/master/libraries/AP_L1_Control/AP_L1_Control.cpp | primary | A
 - Mellinger, Kumar — Minimum snap trajectory generation and control for quadrotors (ICRA 2011) | https://doi.org/10.1109/ICRA.2011.5980409 | primary | A
 - ArduPilot — SCurves (source) | https://github.com/ArduPilot/ardupilot/blob/master/libraries/AP_Math/SCurve.cpp | primary | A
-- PX4 — Fixed-wing position tuning (NPFG) | https://docs.px4.io/main/en/config_fw/position_tuning_guide_fixedwing.html | primary | B
+- PX4 — Fixed-wing position tuning (NPFG) | https://docs.px4.io/v1.17/en/config_fw/position_tuning_guide_fixedwing.html | primary | B
 
 ## checklist
 - Различаю путь, траекторию и наведение; следование пути и слежение за траекторией

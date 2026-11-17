@@ -3,7 +3,7 @@ id: bf-cli
 title: "CLI и ремаппинг ресурсов в Betaflight"
 level: L3
 readingTime: 45 мин
-firmware: Betaflight 4.5+
+firmware: Betaflight 2025.12 (сверено с 2025.12.5)
 status: published
 tags:
   - CLI
@@ -67,7 +67,7 @@ CLI работает поверх последовательного порта 
 - `status` (версия/сборка)
 
 ### Области `diff`/`dump` и флаги
-Синтаксис в 4.5: `diff [master|profile|rates|hardware|all] {defaults|bare}`, у `dump` те же слова (`printConfig()` в `cli/cli.c`). Что попадает в вывод:
+Синтаксис (одинаков в 4.5 и 2025.12): `diff [master|profile|rates|hardware|all] {defaults|bare}`, у `dump` те же слова (`printConfig()` в `cli/cli.c`). Что попадает в вывод:
 
 | Команда | Что выводит | Обёртка |
 |---|---|---|
@@ -82,7 +82,7 @@ CLI работает поверх последовательного порта 
 Ловушка: `diff` без `all` теряет три профиля из четырёх. Бэкап «с профилем 2 под Li-Ion» через `diff` при активном профиле 1 вставится без профиля 2. Для бэкапа — только `diff all`; для сравнения версий — `diff all defaults` (видно, какой дефолт был у изменённого параметра). Флаги `defaults` и `bare` вместе не работают: обрабатывается только первый.
 
 ### Все команды CLI
-Команды 4.5 с приоритетом A/B (`cmdTable[]` в `cli/cli.c`, всего 59; команды за `#ifdef` есть не в каждой сборке):
+Команды с приоритетом A/B (`cmdTable[]` в `cli/cli.c`, всего 59 — набор одинаков в 4.5 и 2025.12; изменился только порядок аргументов `flash_read`: в 2025.12 `<address> <length>`, в 4.5 `<length> <address>`; команды за `#ifdef` есть не в каждой сборке):
 
 | Команда | Что делает |
 |---|---|
@@ -113,7 +113,7 @@ CLI работает поверх последовательного порта 
 | `rc_smoothing_info` | текущие частоты RC smoothing: найденная частота RX, срезы setpoint/FF/газа (bf-rates-rc) |
 | `resource` | пины: `resource`, `resource show all`, `resource MOTOR 1 B00`, `… none` |
 | `rxfail`, `rxrange` | значения каналов в Stage 1 failsafe (bf-failsafe) / масштаб каналов |
-| `save` | сохранить и перезагрузить; `save noreboot` |
+| `save` | сохранить и перезагрузить; `save noreboot` (с 4.5.4) |
 | `sd_info` | состояние SD-карты (`Not configured` / `None inserted` / `Startup failed` / параметры карты) |
 | `serial` | функции и скорости портов (bf-ports) |
 | `serialpassthrough` | мост USB ↔ любой UART: прошивка приёмника ELRS, настройка GPS/VTX (ниже) |
@@ -123,13 +123,13 @@ CLI работает поверх последовательного порта 
 | `timer` | таймеры пинов: `timer show`, `timer <pin> list` |
 | `vtx`, `vtx_info`, `vtxtable` | VTX на тумблере / что сообщил VTX / таблица частот и мощностей (link-vtx, bf-adjustments) |
 
-Список функций для `feature` — массив `featureNames[]` в `cli/cli.c`; `feature list` в 4.5 печатает (пустые слоты массива пропускаются):
+Список функций для `feature` — массив `featureNames[]` в `cli/cli.c`; `feature list` печатает список имён. Вывод снят на 4.5; в 2025.12 `feature` и `feature list` печатают три строки — `Enabled:`, `Available:` и `Unavailable:` (функции, которых нет в сборке), имени `RX_MSP` в списке нет, добавлено `OPTICALFLOW`:
 
 ```text
 Available: RX_PPM INFLIGHT_ACC_CAL RX_SERIAL MOTOR_STOP SERVO_TILT SOFTSERIAL GPS RANGEFINDER TELEMETRY 3D RX_PARALLEL_PWM RX_MSP RSSI_ADC LED_STRIP DISPLAY OSD CHANNEL_FORWARDING TRANSPONDER AIRMODE RX_SPI ESC_SENSOR ANTI_GRAVITY
 ```
 
-Список печатается из таблицы имён целиком: наличие имени не значит, что функция есть в этой сборке (LED_STRIP, SERVO_TILT, GPS зависят от опций Cloud Build — проверка по BUILD KEY ниже). `feature` без аргументов показывает включённые (`Enabled: …`).
+В 2025.12 отсутствующие в сборке функции (LED_STRIP, SERVO_TILT, GPS зависят от опций Cloud Build) попадают в строку `Unavailable:`, а попытка включить такую функцию отвечает `Unavailable <имя>`. В 4.5 список `Available:` печатался из таблицы имён целиком, и наличие имени не значило, что функция есть в сборке (проверка по BUILD KEY ниже).
 
 ### Ремаппинг ресурсов: концепция и ограничения
 
@@ -145,19 +145,20 @@ resource MOTOR 5 NONE
 - UART ограничен аппаратными блоками контроллера — не любой пин можно использовать как сериал.
 - Для DShot критичны таймеры и DMA: неверный пин/канал приводит к неработающим моторам.
 
-### Специфика Betaflight 4.5
+### Специфика Betaflight 2025.12 (что изменилось после 4.5)
 
 Между версиями меняются названия и логика части параметров:
 
-- D-term naming: в 4.5 `d_roll` — пиковый D, `d_min_roll` — базовый; в 2025.12 наоборот: `d_roll` — базовый, `d_max_roll` — пиковый (`d_min_*` удалены).
-- GPS rescue: часть переменных переработана.
-- Failsafe landing: появились отличия в naming/поведении.
+- D-term naming: в 2025.12 `d_roll` — базовый D, `d_max_roll` — пиковый (в 4.5 наоборот: `d_roll` — пиковый, `d_min_roll` — базовый; `d_min_*` удалены).
+- GPS rescue: газ и контур высоты переехали в общие `ap_*` (`ap_hover_throttle` — до 2025.12 `gps_rescue_throttle_hover`).
+- Failsafe landing: `failsafe_landing_time` в секундах (до 2025.12 — `failsafe_off_delay` в десятых долях секунды).
+- `serial`: `diff` пишет имена портов (`serial UART3 64 …`); номера из 4.5 (`serial 2 64 …`) принимаются.
 
-Из-за этого старые бэкапы нельзя бездумно вставлять в новую прошивку.
+Из-за этого старые бэкапы нельзя бездумно вставлять в новую прошивку. Полная таблица — в модуле «Введение в Betaflight», раздел «Переход 4.5.3 → 2025.12: что переименовано и изменилось».
 
 ### Проверка состава прошивки через BUILD KEY
 
-В `status` у Betaflight 4.5+ отображается `BUILD KEY`. Подставив его в URL ниже, можно получить JSON со списком включённых опций (`Options`):
+В `status` (4.5 и 2025.12) отображается `BUILD KEY`. Подставив его в URL ниже, можно получить JSON со списком включённых опций (`Options`):
 
 ```text
 https://build.betaflight.com/api/builds/<BUILD_KEY>/json
@@ -182,7 +183,7 @@ https://build.betaflight.com/api/builds/<BUILD_KEY>/json
 | Покрутить один мотор из CLI (без пропов!) | `motor 0 1100` … `motor 0 1000`; `motor 255 1000` — все моторы |
 | Привязать ELRS/CRSF-приёмник без кнопки | `bind_rx` (если сборка с `USE_RX_BIND`; иначе — binding phrase или 3 перезапуска питания приёмника) |
 | Настроить GPS в u-center через FC | `gpspassthrough` → закрыть Configurator → u-center на тот же COM-порт; выход — переподключить USB |
-| Прошить приёмник ELRS через FC | `serialpassthrough <id UART> <baud>`: id как в `serial` (UART1 = 0); обычно это делает сам ELRS Configurator методом прошивки через Betaflight passthrough — Configurator Betaflight при этом закрыт |
+| Прошить приёмник ELRS через FC | `serialpassthrough <id UART> <baud>`: id как в `serial` (UART1 = 0; в 2025.12 можно и именем — `UART1`); обычно это делает сам ELRS Configurator методом прошивки через Betaflight passthrough — Configurator Betaflight при этом закрыт |
 | Стереть flash Blackbox / проверить SD | `flash_erase` (ждать конца точек) / `sd_info` |
 | Какую частоту RX увидел RC smoothing | `rc_smoothing_info` (на подключённом и работающем приёмнике) |
 | Пакетная загрузка diff без промежуточных перезагрузок | `batch start` … `batch end` → `save` |
@@ -200,7 +201,7 @@ https://build.betaflight.com/api/builds/<BUILD_KEY>/json
 
 ### Доступ к CLI
 
-1. Подключите полётный контроллер по USB и откройте Betaflight Configurator.
+1. Подключите полётный контроллер по USB и откройте Betaflight App (для 4.5 — Configurator 10.10).
 2. Перейдите на вкладку CLI.
 3. Нажмите `Connect`, если соединение не поднялось автоматически.
 
@@ -375,7 +376,7 @@ defaults
 
 - Симптом: не удаётся получить BUILD KEY или URL возвращает ошибку.
   - Возможная причина: старая версия Betaflight (< 4.4, до Cloud Build), ключ скопирован не полностью, неверный URL.
-  - Что сделать: убедиться, что версия 4.5+, повторно скопировать ключ, при необходимости проверить альтернативный endpoint `.../<BUILD_KEY>/log`.
+  - Что сделать: убедиться, что версия не ниже 4.4, повторно скопировать ключ, при необходимости проверить альтернативный endpoint `.../<BUILD_KEY>/log`.
 
 ## references
 

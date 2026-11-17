@@ -3,7 +3,7 @@ id: el-kicad
 title: "Проектирование платы в KiCad: от схемы до заказа, разводка для ЭМС"
 level: L3
 readingTime: 45 мин
-firmware: KiCad 8+ · ArduPilot 4.5+ (проверка платы)
+firmware: KiCad 8+ · ArduPilot 4.7 (сверено с 4.7.2) (проверка платы)
 status: published
 tags:
   - KiCad

@@ -3,7 +3,7 @@ id: bf-intro
 title: "Введение в Betaflight"
 level: L1
 readingTime: 25 мин
-firmware: Betaflight 4.5+
+firmware: Betaflight 2025.12 (сверено с 2025.12.5)
 status: published
 tags:
   - Betaflight
@@ -13,6 +13,10 @@ tags:
 references:
   - title: "Getting Started — Betaflight Documentation"
     url: "https://betaflight.com/docs/wiki/getting-started"
+    tier: primary
+    stack: betaflight
+  - title: "Betaflight 2025.12 Release Notes"
+    url: "https://betaflight.com/docs/wiki/release/Betaflight-2025-12-Release-Notes"
     tier: primary
     stack: betaflight
   - title: "Betaflight 4.5 Release Notes"
@@ -59,7 +63,7 @@ Betaflight — открытая прошивка для полётных кон�
 
 Betaflight — форк **Cleanflight** (наследник Baseflight / STM32-порт MultiWii). Главный акцент стека — **производительность**: минимальная **latency** и высокая частота контура гироскопа (до **8 кГц**).
 
-**Поддержка:** полётные контроллеры на **STM32** (F4, F7, H7, G4) и **AT32F435**; в 2025.12 добавлены APM32 и RP2350. **Возможности прошивки:**
+**Поддержка:** полётные контроллеры на **STM32** (F4, F7, H7, G4) **AT32F435**, **APM32** и **RP2350** (последние два — с 2025.12; в 4.5 их нет). **Возможности прошивки:**
 
 - многопрофильные **PID**;
 - фильтрация гироскопа и **D-term**;
@@ -76,26 +80,28 @@ Betaflight — форк **Cleanflight** (наследник Baseflight / STM32-�
 - **RX task** — приёмник (CRSF, SBUS, ELRS и др.).
 - **Scheduler** — распределение времени между задачами.
 
-**PID-цикл:** параметр `pid_process_denom` задаёт частоту контура PID. Пример: gyro **8 кГц**, `pid_process_denom = 1` (дефолт 4.5) → PID **8 кГц**; `= 2` → **4 кГц**. На F4/G4 с bidirectional DShot и gyro выше 4 кГц прошивка сама поднимает denom минимум до 2 и меняет DSHOT600 на DSHOT300.
+**PID-цикл:** параметр `pid_process_denom` задаёт частоту контура PID. Пример: gyro **8 кГц**, `pid_process_denom = 1` (дефолт) → PID **8 кГц**; `= 2` → **4 кГц**. На F4/G4 с bidirectional DShot и gyro выше 4 кГц прошивка сама поднимает denom минимум до 2 и меняет DSHOT600 на DSHOT300.
 
 ### Версии прошивки и совместимость
 
-**Betaflight 4.5** — предыдущая стабильная ветка (последний выпуск 4.5.5; ветка `4.5-maintenance` уже несёт номер 4.5.6, из неё собран SITL в модуле «Betaflight с нуля»); актуальные — 2025.12.x и 2026.6.x. Ключевые изменения:
+Курс ведётся по **Betaflight 2025.12** (сверено с 2025.12.5). С этой ветки номер версии календарный: год.месяц.патч. Предыдущая значимая ветка — **4.5** (в курсе отсчёт переименований идёт от 4.5.3; последний выпуск 4.5.5, ветка `4.5-maintenance` несёт номер 4.5.6, из неё собран SITL в модуле «Betaflight с нуля»). Теги 2026.6 существуют, но целевой версией курса не являются. Что добавила 2025.12 к 4.5:
 
-- GPS (в т.ч. модули **M10**) и **GPS Rescue**;
-- магнитометры;
-- **Angle / Horizon** с опцией *Earth referencing*;
-- шрифты для HD VTX (Walksnail);
-- фильтрация с учётом гармоник **RPM**.
+- удержание высоты и позиции (режимы ALTHOLD и POS HOLD), общий автопилот `ap_*` для них и GPS Rescue;
+- дизарм по удару при посадке (`landing_disarm_threshold`), новый turtle (`crashflip_rate`);
+- для крыла: S-term, TPA по скорости, кривые TPA;
+- генератор чирпа для идентификации (режим CHIRP);
+- новые гироскопы (IIM-42653, ICM-456xx), платформы APM32 и RP2350.
 
-**Важно:** при переходе **4.4 → 4.5** нужен **Full Chip Erase** и настройка с нуля. Старые **CLI-дампы** с 4.3 и ниже часто **несовместимы** из‑за переименований и диапазонов параметров.
+Ветка 4.5 в своё время принесла GPS M10 и переработанный GPS Rescue, *Earth referencing* для Angle / Horizon, шрифты для HD VTX и RPM-фильтр с весами гармоник — всё это в 2025.12 сохранено.
+
+**Важно:** при переходе **4.5 → 2025.12** (как и раньше 4.4 → 4.5) нужен **Full Chip Erase** и настройка по разделам. Старые **CLI-дампы** построчно **несовместимы** из‑за переименований, диапазонов и сменившегося смысла параметров — см. таблицу в конце теории.
 
 ### Экосистема Betaflight
 
-Помимо прошивки — **Betaflight Configurator**. Веб-приложение было доступно уже для 4.5 (Configurator 10.10), а с версии **2025.12** основным стал **веб-конфигуратор** (`https://app.betaflight.com`) через **WebUSB / WebSerial**. Для Android по-прежнему есть нативные приложения.
+Помимо прошивки — конфигуратор. С **2025.12** это **Betaflight App**: веб-приложение и PWA (`https://app.betaflight.com`), работает через **WebUSB / WebSerial**, номер версии совпадает с прошивкой (до 2025.12 — Betaflight Configurator 10.10, отдельная программа с собственной нумерацией; веб-версия была доступна уже для 4.5). Для Android есть нативное приложение. В курсе слово «конфигуратор» означает Betaflight App, названия вкладок те же.
 
 ### Target, unified target и Cloud Build
-Прошивка собирается под **target** — описание платы: процессор, какие ноги на что заведены (`resource`), какой гироскоп на каком SPI. С 4.3 почти все платы — **unified targets**: один бинарник на семейство процессора (например, `STM32F405`) плюс текстовый конфиг платы (`board_name`, `manufacturer_id`, набор `resource`/`set`), который конфигуратор подгружает при прошивке. Cloud Build (4.4+) собирает бинарник на сервере с выбранным набором функций: протокол приёмника, OSD, GPS, телеметрия, LED — чего не отметил, того в прошивке нет (типичная причина «приёмник молчит»). `version` в CLI показывает версию, target, дату и git-ревизию сборки; `BUILD KEY` (ключ сборки для воспроизведения) печатает `status`, а список опций отдаёт build.betaflight.com по этому ключу.
+Прошивка собирается под **target** — описание платы: процессор, какие ноги на что заведены (`resource`), какой гироскоп на каком SPI. С 4.3 почти все платы — **unified targets**: один бинарник на семейство процессора (например, `STM32F405`) плюс текстовый конфиг платы (`board_name`, `manufacturer_id`, набор `resource`/`set`), который конфигуратор подгружает при прошивке. Cloud Build (4.4+) собирает бинарник на сервере с выбранным набором функций: протокол приёмника, OSD (аналоговый `USE_OSD_SD` и/или HD `USE_OSD_HD`), GPS, магнитометр, телеметрия, LED, сервы или пакет WING, удержание высоты и позиции — чего не отметил, того в прошивке нет (типичные причины «приёмник молчит» и «после 2025.12 пропал OSD»). `version` в CLI показывает версию, target, дату и git-ревизию сборки; `BUILD KEY` (ключ сборки для воспроизведения) печатает `status`, а список опций отдаёт build.betaflight.com по этому ключу.
 
 ### Что делает планировщик каждые 125 мкс
 `fc/tasks.c` описывает задачи с периодом и приоритетом; `scheduler/scheduler.c` выбирает их. Критичные: `GYRO` (чтение, фильтры) и `PID` (`taskMainPidLoop`: RC-команда → PID → миксер → DShot) — на частоте гироскопа / `pid_process_denom`. Остальные — по остаточному принципу: `RX` (приём и обработка кадров, событийно), `SERIAL`, `BATTERY_*`, `GPS`, `OSD` (по `osd_framerate_hz`), `BLACKBOX`, `TELEMETRY`, `LED_STRIP`. CLI `tasks` показывает фактический период, среднее и максимальное время каждой задачи и загрузку CPU; `status` — частоту гироскопа, загрузку и флаги арма. Перегрузка (> 85–90% на F4 с 8 кГц) — пропуски задач, джиттер, флаг `LOAD`: лечится `pid_process_denom = 2` или отключением функций.
@@ -111,22 +117,84 @@ Betaflight — форк **Cleanflight** (наследник Baseflight / STM32-�
 | Видеопередатчик | Video Transmitter | `vtxtable`, `vtx_band`, `vtx_channel`, `vtx_power`, `vtx` — VTX на тумблере (link-vtx, bf-adjustments) |
 | LED-лента | LED Strip | `led`, `color`, `mode_color`, `ledstrip_*` (bf-led-buzzer) |
 | Готовые наборы настроек | Presets | своих параметров нет: пресет — это блок CLI-команд из репозитория сообщества; применять поверх умолчаний, `diff all` до и после |
-| Моторы, ESC, протокол | Motors | `motor_pwm_protocol`, `dshot_bidir`, `motor_poles`, `dshot_idle_value` (2025.12: `motor_idle`) |
+| Моторы, ESC, протокол | Motors | `motor_pwm_protocol`, `dshot_bidir`, `motor_poles`, `motor_idle` (до 2025.12 — `dshot_idle_value`) |
 | PID, фильтры, FF | PID Tuning | `set p_roll`… `simplified_*`, `gyro_lpf*`, `rpm_filter_*` |
 | OSD | OSD | `osd_*_pos`, `osd_warn_bitmask` |
 | Blackbox | Blackbox | `blackbox_device`, `blackbox_sample_rate`, `debug_mode` |
 | Failsafe | Failsafe | `failsafe_procedure`, `failsafe_delay`, `rxfail` |
 | Прошивка | Firmware Flasher | — |
-Профили: до 4 PID-профилей (`profile`) и 4 профилей рейтов (`rateprofile`) — один «спокойный», один «гоночный». Тумблером/adjustment в полёте переключается только рейт-профиль; PID-профиль в 4.5 — на земле при снятом арме (стиками, OSD-меню, `profile N`).
+Профили: до 4 PID-профилей (`profile`) и 4 профилей рейтов (`rateprofile`) — один «спокойный», один «гоночный». Тумблером/adjustment в полёте переключается только рейт-профиль; PID-профиль — на земле при снятом арме (стиками, OSD-меню, `profile N`).
 
 ### Разобранный пример: порядок первой настройки
-Прошивка (Cloud Build: CRSF, OSD HD, GPS если есть) → `resource`/target по умолчанию → Ports (UART приёмника) → Receiver (CRSF, проверка каналов и `map` AETR) → Motors (DShot600, `motor_poles`, `dshot_bidir`, направление без пропов) → Modes (ARM, ANGLE, BEEPER, FAILSAFE) → Failsafe (DROP для первого полёта) → OSD (напряжение, LQ, таймер, предупреждения) → Blackbox (2 кГц) → `diff all` в репозиторий (модуль «CI»). Первый полёт — на умолчаниях PID: Betaflight 4.5 «из коробки» летает на 5" лучше, чем большинство ручных тюнов новичка; тюнинг — после логов.
+Прошивка (Cloud Build: CRSF, OSD HD, GPS если есть) → `resource`/target по умолчанию → Ports (UART приёмника) → Receiver (CRSF, проверка каналов и `map` AETR) → Motors (DShot600, `motor_poles`, `dshot_bidir`, направление без пропов) → Modes (ARM, ANGLE, BEEPER, FAILSAFE) → Failsafe (DROP для первого полёта) → OSD (напряжение, LQ, таймер, предупреждения) → Blackbox (2 кГц) → `diff all` в репозиторий (модуль «CI»). Первый полёт — на умолчаниях PID: Betaflight «из коробки» летает на 5" лучше, чем большинство ручных тюнов новичка; тюнинг — после логов.
 
 {{diagram:bf-setup-map|Порядок первой настройки: резервная копия → Ports → Receiver → Modes → Motors (без пропеллеров) → OSD → PID и фильтры по логу.}}
 
+### Переход 4.5.3 → 2025.12: что переименовано и изменилось
+Этот раздел — чек-лист перехода и единая таблица курса: остальные модули ссылаются сюда. Таблица получена сравнением `cli/settings.c`, `cli/cli.c`, `fc/runtime_config.c`, `io/beeper.c`, `msp/msp_box.c`, `osd/osd.h` и умолчаний PG на тегах 4.5.3 и 2025.12.5. Между 4.5.3 и 4.5.5 таблица настроек не менялась; единственное заметное отличие внутри 4.5.x — аргумент `noreboot` (с 4.5.4).
+
+Порядок обновления и ловушки:
+
+1. На старой прошивке сохрани в файл `diff all` и `dump all`, запиши вывод `version` и `status` (имя платы, BUILD KEY), сними скриншоты вкладок Modes, OSD, Failsafe. Скачай логи Blackbox: Full chip erase их сотрёт.
+2. Проверь, что плата есть в списке target для 2025.12 во Firmware Flasher. Плату без поддержки оставляй на 4.5.x: «чужой» target даёт неверные `resource` (типичная жалоба — газ доходит до 30 %).
+3. Работай в **Betaflight App** (`https://app.betaflight.com`) той же версии, что и прошивка: с 2025.12 номер приложения совпадает с номером прошивки. Configurator 10.10 рассчитан на 4.5.
+4. В Cloud Build отметь всё, чем пользуешься: протокол приёмника, OSD (аналоговый и/или HD), GPS, магнитометр, LED Strip, SERVOS или пакет WING, удержание высоты и позиции. Нет OSD после прошивки — не та опция OSD в сборке.
+5. Прошивай с **Full chip erase**. Старый `diff all` целиком не вставляй: строки с удалёнными именами дают `INVALID NAME`, а строки, чьё имя сохранилось при другом смысле (`d_roll`, `iterm_windup`, `osd_warn_bitmask`, `beeper`), молча дают другой результат. Переноси по разделам, сверяясь с таблицей.
+6. Не переносятся вообще: D-составляющая PID (смысл `d_*` перевёрнут), числовые маски `osd_warn_bitmask` и пищалки (поле `beeper_off_flags` в MSP), номера битов флагов арма, `failsafe_off_delay` (другие единицы), газ GPS Rescue (`gps_rescue_throttle_*`), выравнивание гироскопа `gyro_1_sensor_align`.
+7. После настройки: `status` без лишних флагов арма, тест моторов без пропов, проверка failsafe на столе, первый полёт на умолчаниях PID 2025.12.
+8. Плата со встроенным SPI-приёмником ELRS под 2025.12 остаётся на ELRS 3 (`ELRS_OTA_VERSION_ID 3` в исходнике 2025.12.5): с передатчиком на ELRS 4 она не свяжется. Поддержка ELRS 4 для SPI-приёмников появляется только в 2026.6; до этого — передатчик на 3.x для этой модели или отдельный приёмник на UART.
+
+| Старое (4.5.3) | Новое (2025.12) | Что изменилось | С какого выпуска |
+|---|---|---|---|
+| `d_min_roll`, `d_min_pitch`, `d_min_yaw` (база 30 / 34 / 0) | `d_roll`, `d_pitch`, `d_yaw` (база 30 / 34 / 0) | в 2025.12 `d_*` — базовый D; `d_min_*` удалены | 2025.12 |
+| `d_roll`, `d_pitch`, `d_yaw` (пик 40 / 46 / 0) | `d_max_roll`, `d_max_pitch`, `d_max_yaw` (пик 40 / 46 / 0) | пиковый D получил своё имя; `d_max_gain` 37 и `d_max_advance` 20 без изменений | 2025.12 |
+| `simplified_dmax_gain` | `simplified_d_max_gain` | только имя | 2025.12 |
+| `iterm_limit` (400) | — | удалён; потолок I теперь задаёт `iterm_windup` | 2025.12 |
+| `iterm_windup` 85, 30–100 | `iterm_windup` 80, 20–100 | другой смысл: было «порог насыщения моторов, выше которого I ослабляется», стало «потолок I в % от `pidsum_limit`» | 2025.12 |
+| `dshot_idle_value` (550) | `motor_idle` (550) | имя; единицы те же (×0.01 %), 0–2000 | 2025.12 |
+| `min_throttle` (1070) | — | удалён; для коллекторных моторов умолчание `motor_idle` = 700 | 2025.12 |
+| `dyn_idle_start_increase` (50) | — | удалён; предел прибавки до airmode берётся из `motor_idle` | 2025.12 |
+| `feedforward_averaging` OFF, `feedforward_smooth_factor` 25 | 2_POINT и 65 | новые умолчания; добавлены `feedforward_yaw_hold_gain` (15) и `feedforward_yaw_hold_time` (100) | 2025.12 |
+| `rc_smoothing_feedforward_cutoff` | — | удалён; срез FF считается вместе с setpoint | 2025.12 |
+| `tpa_mode` PD / D | PD / D / PDS | добавлено PDS; в сборке WING ещё `tpa_curve_*`, `tpa_speed_*` и отрицательные значения `tpa_low_rate` (на коптере `tpa_low_rate` по-прежнему 0–100, умолчание 20) | 2025.12 |
+| `angle_limit` 10–85 | `angle_limit` 10–80 | умолчание 60 не менялось; в сборке WING добавлен `angle_pitch_offset` | 2025.12 |
+| `dyn_notch_count` 0–5 | `dyn_notch_count` 0–7 | диапазон | 2025.12 |
+| `debug_mode = GYRO_SCALED` | поле лога `gyroUnfilt` | режим удалён; `DUAL_GYRO_*` → `MULTI_GYRO_*`, `D_MIN` → `D_MAX`, `GPS_RESCUE_THROTTLE_PID` → `AUTOPILOT_ALTITUDE`; добавлены TPA, S_TERM, SPA, TASK, GIMBAL, WING_SETPOINT, AUTOPILOT_POSITION, CHIRP, OPTICALFLOW, FLASH_TEST_PRBS, MAVLINK_TELEMETRY | 2025.12 |
+| `failsafe_off_delay` (10 = 1 с; 0–200, десятые секунды) | `failsafe_landing_time` (60 с; 0–250, секунды) | имя, единицы и умолчание; значение пересчитывать: старое ÷ 10 | 2025.12 |
+| `gps_rescue_throttle_hover` / `_min` / `_max` (1275 / 1100 / 1700) | `ap_hover_throttle` (1275; 1100–1700), `ap_throttle_min` (1100; 1050–1400), `ap_throttle_max` (1700; 1400–2000) | общие переменные автопилота: их используют GPS Rescue, ALTHOLD и POS HOLD | 2025.12 |
+| `gps_rescue_throttle_p` / `_i` / `_d` (15 / 15 / 20) | `ap_altitude_p` / `_i` / `_d` / `_f` (15 / 15 / 15 / 15) | контур высоты общий; диапазон 0–200 | 2025.12 |
+| `gps_rescue_landing_alt` (4 м; 1–15) | `ap_landing_altitude_m` (4 м; 0–200) | имя и диапазон | 2025.12 |
+| `gps_rescue_disarm_threshold` 20 | 30 | умолчание | 2025.12 |
+| `gps_rescue_velocity_p/i/d`, `gps_rescue_yaw_p` 0–255 | 0–200 | диапазон; в 2026.6 эти переменные удалены | 2025.12 |
+| `gps_provider` NMEA / UBLOX / MSP | + VIRTUAL | GPS в SITL; автопоиск скорости знает 230400 | 2025.12 |
+| `mag_declination` 0–3599 | −300…300 | по-прежнему десятые доли градуса; западное склонение пишется отрицательным | 2025.12 |
+| — | `alt_hold_climb_rate` (50), `alt_hold_deadband` (20), `pos_hold_deadband` (5), `pos_hold_without_mag` (OFF), `ap_position_*`, `ap_max_angle` (50) | новые режимы ALTHOLD (id 3) и POS HOLD (id 11) | 2025.12 |
+| — | `landing_disarm_threshold` (0 = выкл; 0–250) | дизарм по удару при посадке | 2025.12 |
+| — | `prearm_allow_rearm` (OFF) | переарм без переключения PREARM | 2025.12 |
+| флаг арма `ARMSWITCH`, бит 25 (всего 26) | `ARM_SWITCH`, бит 28 (всего 29) | на битах 25–27 новые `FLIP_SWITCH`, `ALT_HOLD_SW`, `POS_HOLD_SW`; hex-маску расшифровывать таблицей своей версии | 2025.12 |
+| `beeper` … `CRASH_FLIP`, `RC_SMOOTHING_INIT_FAIL` | `CRASHFLIP`; `RC_SMOOTHING_INIT_FAIL` удалён | номер `ALL` 24 → 23; числовая маска пищалки (MSP) сдвинута — переносить именами | 2025.12 |
+| предупреждение OSD `RC_SMOOTHING` (бит 8 `osd_warn_bitmask`) | — | удалено; биты 9–18 сдвинулись на один вниз, на бите 18 новое `POSHOLD_FAILED` | 2025.12 |
+| `crashflip_expo` (35; 0–100) | `crashflip_rate` (0; 0–250), `crashflip_auto_rearm` (OFF) | другой алгоритм turtle; звук и предупреждение `CRASH_FLIP` → `CRASHFLIP` | 2025.12 |
+| `launch_control_mode` NORMAL | PITCHONLY | умолчание | 2025.12 |
+| adjustments 0–30 | + 31 `LED_DIMMER` | функция `SIMPLIFIED_MASTER_MULTIPLIER` из документации в 2025.12 отсутствует | 2025.12 |
+| режим id 29 «3D DISABLE / SWITCH» | «3D DISABLE» | добавлены id 3 ALTHOLD, 11 POS HOLD, 55 CHIRP; остальные permanentId те же | 2025.12 |
+| `serial 2 64 …` (номер порта) | `serial UART3 64 …` (имя порта) | `diff` пишет имена; старые номера принимаются (0 = UART1) | 2025.12 |
+| `save`, `exit` — всегда с перезагрузкой | `save noreboot`, `exit noreboot` | необязательный аргумент | 4.5.4 |
+| `flash_read <length> <address>` | `flash_read <address> <length>` | порядок аргументов | 2025.12 |
+| `gyro_to_use` FIRST / SECOND / BOTH | `gyro_enabled_bitmask`, `gyro_1_enabled` … `gyro_8_enabled` | до 8 гироскопов; `gyro_1_sensor_align`, `gyro_1_align_*`, `gyro_2_*` удалены — после обновления проверь, что стрелка на плате смотрит вперёд, а `align_board_*` верны | 2025.12 |
+| `dshot_edt` OFF / ON | OFF / ON / FORCE | новое значение | 2025.12 |
+| `expresslrs_rate_index`, `expresslrs_switch_mode` | — | удалены (SPI-приёмник ELRS) | 2025.12 |
+| `serialrx_provider` … SPEK1024 | + MAVLINK | новый протокол приёмника | 2025.12 |
+| `blackbox_device` NONE / SPIFLASH / SDCARD / SERIAL | + VIRTUAL | добавлены `blackbox_disable_attitude`, `blackbox_disable_servos` | 2025.12 |
+| порт: функции до 131072 | + GIMBAL = 262144 | последовательный подвес `gimbal_*` | 2025.12 |
+| компас IST8310, адрес I2C 0x0C | 0x0E | компас «пропал» после обновления — `set mag_i2c_address = 12` | 2025.12 |
+| Betaflight Configurator 10.10 | Betaflight App 2025.12 | веб-приложение и PWA; версия совпадает с прошивкой | 2025.12 |
+
+Не затронуто и переносится как есть: `aux`, `adjrange` (номера функций 0–30), `rxrange`, `map`, `vtxtable`, `led`, `color`, `mode_color`, рейты (`rates_type`, `*_rc_rate`, `*_srate`, `*_expo`), фильтры (`gyro_lpf*`, `dterm_lpf*`, `rpm_filter_*`, `dyn_notch_*` кроме верхней границы числа notch), `failsafe_delay`, `failsafe_procedure`, `failsafe_throttle`, `vbat_*`, `ibata_*`. Отличия 2026.6 в курсе не разбираются, кроме трёх, о которые спотыкаются: ELRS 4 для SPI-приёмников, удаление `gps_rescue_velocity_*` и исправленный диапазон гироскопа IIM-42652 (по примечаниям к выпуску 2026.6 после обновления PID фактически удваиваются).
+
 ## practice
 
-### Установка Betaflight Configurator
+### Установка Betaflight App (конфигуратора)
 
 **Вариант А — веб (рекомендуется для ПК):**
 
@@ -134,9 +202,10 @@ Betaflight — форк **Cleanflight** (наследник Baseflight / STM32-�
 2. Открыть `https://app.betaflight.com`.
 3. При первом подключении FC разрешить доступ к **USB**.
 
-**Вариант Б — офлайн или старая среда:**
+**Вариант Б — офлайн или прошивка 4.5:**
 
-- установщик с репозитория GitHub Releases: `https://github.com/betaflight/betaflight-configurator/releases` (Windows / macOS / Linux).
+- установить Betaflight App как PWA из того же адреса (кнопка установки в адресной строке браузера); приложение обновляется из сети;
+- для плат, оставшихся на 4.5.x, — Configurator 10.10 с GitHub Releases: `https://github.com/betaflight/betaflight-configurator/releases` (Windows / macOS / Linux).
 
 ### Подключение полётного контроллера
 
@@ -159,10 +228,10 @@ diff all
 ### Обновление прошивки (Firmware Flasher)
 
 1. **Firmware Flasher** — целевой контроллер (часто определяется по USB).
-2. Версия — последняя стабильная **4.5.x**.
-3. Включить **Full chip erase** при смене мажорной ветки.
+2. Версия — последняя из ветки **2025.12.x** (курс сверен с 2025.12.5); в Cloud Build отметить протокол приёмника, тип OSD, GPS и остальные нужные опции.
+3. Включить **Full chip erase** при смене ветки (4.5 → 2025.12 — обязательно).
 4. **Load Firmware [Online]** → **Flash Firmware**; не отключать USB до конца.
-5. После перезагрузки — восстановить конфиг из бэкапа (**CLI**) или настроить заново.
+5. После перезагрузки — настроить заново или перенести конфиг из бэкапа по разделам; бэкап от 4.5 целиком не вставлять (раздел «Переход 4.5.3 → 2025.12» в теории).
 
 ### Вкладка Configuration
 
@@ -242,8 +311,8 @@ diff all
   - Что проверить/сделать: в настройках пульта отрегулировать Travel/Endpoints до 1000–2000 мкс. Альтернативно использовать CLI-команду rxrange для коррекции.
 
 - **Симптом:** Дрон армуется, но моторы не вращаются (при выключенном MOTOR_STOP)
-  - Возможная причина: минимальный газ (min_throttle) слишком низкий для старта моторов.
-  - Что проверить/сделать: с DShot `min_throttle` не используется: на вкладке Motors поднять Motor Idle (`dshot_idle_value` в 4.5, `motor_idle` в 2025.12; дефолт 5.5%).
+  - Возможная причина: холостой ход моторов слишком низкий для старта.
+  - Что проверить/сделать: переменной `min_throttle` в 2025.12 нет (в 4.5 она была, но с DShot не использовалась): на вкладке Motors поднять Motor Idle (`motor_idle`, до 2025.12 — `dshot_idle_value`; дефолт 5.5%).
 - **Симптом:** после прошивки приёмник/GPS не работают, хотя проводка верна
   - Возможная причина: функция не включена в Cloud Build.
   - Что сделать: `status` → BUILD KEY, по нему на build.betaflight.com — список опций сборки (`version` печатает только версию, target, дату и git-ревизию); перепрошить с нужными.
@@ -253,7 +322,10 @@ diff all
 
 ## references
 - Getting Started — Betaflight Documentation | https://betaflight.com/docs/wiki/getting-started | primary | A
+- Betaflight 2025.12 Release Notes | https://betaflight.com/docs/wiki/release/Betaflight-2025-12-Release-Notes | primary | A
 - Betaflight 4.5 Release Notes | https://www.betaflight.com/docs/wiki/release/Betaflight-4-5-Release-Notes | primary | A
+- Betaflight cli/settings.c, тег 2025.12.5 (таблица настроек) | https://github.com/betaflight/betaflight/blob/2025.12.5/src/main/cli/settings.c | primary | A
+- Betaflight cli/settings.c, тег 4.5.3 | https://github.com/betaflight/betaflight/blob/4.5.3/src/main/cli/settings.c | primary | A
 - Betaflight Configurator — Official Web App | https://app.betaflight.com | primary | A
 - Betaflight CLI Documentation — Command Reference | https://betaflight.com/docs/wiki/guides/current/Cli | primary | A
 - Betaflight Configurator — GitHub Releases | https://github.com/betaflight/betaflight-configurator/releases | primary | A

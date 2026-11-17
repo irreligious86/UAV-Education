@@ -3,7 +3,7 @@ id: px4-architecture
 title: "Архитектура PX4: модули и uORB"
 level: L3
 readingTime: 25 мин
-firmware: PX4 1.14+
+firmware: PX4 1.17 (сверено с v1.17.0)
 status: published
 added: 2026-11-08
 tags:
@@ -83,7 +83,7 @@ pxh> listener sensor_combined -n 1
 `mc_rate_control stop` в висении SITL — аппарат теряет управление; `mc_rate_control start` — возвращает. Делать только в симуляторе: это демонстрация модульности, а не приём.
 
 ### Шаг 4. Прочитать `.msg`
-Открой `msg/VehicleCommand.msg` (с PX4 1.16 — `msg/versioned/VehicleCommand.msg`) и `msg/OffboardControlMode.msg` в исходниках: эти два сообщения понадобятся для ROS 2.
+Открой `msg/versioned/VehicleCommand.msg` (до 1.16 — `msg/VehicleCommand.msg`) и `msg/OffboardControlMode.msg` в исходниках: эти два сообщения понадобятся для ROS 2.
 
 ### Что должно получиться и что записать
 - **Шаг 1.** `top` показывает модули и их загрузку CPU: в SITL это `px4` как процесс, внутри — модули стека. `uorb top` — таблица топиков с частотой публикаций и числом подписчиков. `listener sensor_combined -n 1` печатает одно сообщение с ускорениями и угловыми скоростями, и по нему видно поля, которые потом понадобятся в ROS 2.
@@ -108,10 +108,10 @@ pxh> listener sensor_combined -n 1
   - Что сделать: включить профиль, повторить полёт.
 
 ## references
-- PX4 Architectural Overview | https://docs.px4.io/main/en/concept/architecture.html | primary | A
-- PX4 uORB Messaging | https://docs.px4.io/main/en/middleware/uorb.html | primary | A
-- PX4 Control Allocation | https://docs.px4.io/main/en/concept/control_allocation.html | primary | A
-- PX4-Autopilot msg definitions (GitHub) | https://github.com/PX4/PX4-Autopilot/tree/main/msg | primary | A
+- PX4 Architectural Overview | https://docs.px4.io/v1.17/en/concept/architecture.html | primary | A
+- PX4 uORB Messaging | https://docs.px4.io/v1.17/en/middleware/uorb.html | primary | A
+- PX4 Control Allocation | https://docs.px4.io/v1.17/en/concept/control_allocation.html | primary | A
+- PX4-Autopilot msg definitions (GitHub) | https://github.com/PX4/PX4-Autopilot/tree/v1.17.0/msg | primary | A
 
 ## checklist
 - Могу назвать цепочку модулей от IMU до моторов

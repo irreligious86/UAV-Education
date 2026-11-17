@@ -3,7 +3,7 @@ id: ap-lua
 title: "Lua: сценарии и fault injection"
 level: L3
 readingTime: 25 мин
-firmware: ArduPilot 4.5+
+firmware: ArduPilot 4.7 (сверено с 4.7.2)
 status: published
 added: 2026-11-07
 tags:

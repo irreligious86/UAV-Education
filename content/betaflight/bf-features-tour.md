@@ -3,7 +3,7 @@ id: bf-features-tour
 title: "Остальные режимы и функции Betaflight: turtle, launch control, 3D, acro trainer, Angle/Horizon, dynamic idle, camera control"
 level: L2
 readingTime: 55 мин
-firmware: Betaflight 4.5 (исходники 4.5-maintenance, 4.5.6; отличия 2025.12 отмечены)
+firmware: Betaflight 2025.12 (сверено с 2025.12.5); лабораторная снята на исходниках 4.5.6
 status: published
 added: 2026-11-15
 tags:
@@ -32,13 +32,13 @@ next:
 ---
 
 ## summary
-Справочник по режимам и функциям Betaflight 4.5 за пределами базовой настройки: turtle mode, launch control, 3D, acro trainer, Angle и Horizon в редакции 4.5, dynamic idle и `MOTOR_STOP`, camera control, PARALYZE и USER1–4. Для каждой функции: что делает код (файл и функция), переменные с умолчаниями и диапазонами, когда включать, ловушки. Есть таблица всех режимов с `permanentId` для `aux` и сводная таблица `set`-переменных. Лабораторная на Python повторяет математику прошивки: закон Angle и сила Horizon, регулятор dynamic idle на синтетических оборотах, выходы моторов в turtle. На железе: turtle на траве, launch control на земле, 3D сначала без пропов.
+Справочник по режимам и функциям Betaflight 2025.12 за пределами базовой настройки: turtle mode, launch control, 3D, acro trainer, Angle и Horizon (редакция 4.5, в 2025.12 та же), dynamic idle и `MOTOR_STOP`, camera control, PARALYZE и USER1–4. Для каждой функции: что делает код (файл и функция), переменные с умолчаниями и диапазонами, когда включать, ловушки. Есть таблица всех режимов с `permanentId` для `aux` и сводная таблица `set`-переменных. Лабораторная на Python повторяет математику прошивки: закон Angle и сила Horizon, регулятор dynamic idle на синтетических оборотах, выходы моторов в turtle. На железе: turtle на траве, launch control на земле, 3D сначала без пропов.
 
 ## theory
 ### Режимы: таблица `permanentId` для `aux`
-Формат `aux` в 4.5 (`cli/cli.c`): `aux <слот 0–19> <permanentId> <AUX-канал, 0 = AUX1> <начало> <конец> <логика 0 OR / 1 AND> <связанный режим>`. Второе поле берётся из `msp/msp_box.c`, не из `rc_modes.h`. Вкладка Modes показывает только режимы, разрешённые `initActiveBoxIds()`: нет режима — не выполнено условие из правой колонки.
+Формат `aux` (`cli/cli.c`, одинаков в 4.5 и 2025.12): `aux <слот 0–19> <permanentId> <AUX-канал, 0 = AUX1> <начало> <конец> <логика 0 OR / 1 AND> <связанный режим>`. Второе поле берётся из `msp/msp_box.c`, не из `rc_modes.h`. Вкладка Modes показывает только режимы, разрешённые `initActiveBoxIds()`: нет режима — не выполнено условие из правой колонки.
 
-| id | Режим | Что делает (4.5) | Когда виден |
+| id | Режим | Что делает | Когда виден |
 |---|---|---|---|
 | 0 / 1 / 2 | ARM / ANGLE / HORIZON | арм; самовыравнивание; смешанный режим (ниже) | ARM всегда; ANGLE и HORIZON при акселерометре |
 | 4 | ANTI GRAVITY | включает anti-gravity тумблером | только если `feature ANTI_GRAVITY` выключена (по умолчанию она включена) |
@@ -54,7 +54,7 @@ next:
 | 26 / 31 | BLACKBOX / BLACKBOX ERASE | лог только по тумблеру / стирание флеш | всегда; 31 при бортовой флеш |
 | 27 | FAILSAFE | тест failsafe тумблером | всегда |
 | 28 | AIR MODE | airmode тумблером | только если `feature AIRMODE` выключена |
-| 29 | 3D DISABLE / SWITCH | 3D: отключить реверс или реверс на тумблере (ниже) | `feature 3D` |
+| 29 | 3D DISABLE (в 4.5 — «3D DISABLE / SWITCH») | 3D: отключить реверс или реверс на тумблере (ниже) | `feature 3D` |
 | 30 | FPV ANGLE MIX | смешивание рыскания и крена под наклон камеры `fpv_mix_degrees` | при акселерометре |
 | 32–34 | CAMERA CONTROL 1–3 | кнопки камеры по RunCam Device Protocol (ниже) | всегда (`USE_RCDEVICE`) |
 | 35 | FLIP OVER AFTER CRASH | turtle mode | только если выбран DShot |
@@ -72,23 +72,24 @@ next:
 | 53 | READY | надпись READY в OSD до арма (для гонок) | всегда |
 | 54 | LAP TIMER RESET | сброс GPS-таймера круга | сборки с `USE_GPS_LAP_TIMER` |
 
-В 2025.12 номера 0–54 сохранены. Id 3 и 11 заняли ALTHOLD и POS HOLD, 29 переименован в `3D DISABLE`, добавлен 55 CHIRP. USER1–4 остались на 40–43, но имя теперь задаётся через `box_user_N_name` (в 4.5 эти переменные тоже есть: до 16 символов).
+Номера 0–54 в 4.5 и 2025.12 одни и те же. В 2025.12 добавлены id 3 ALTHOLD (удержание высоты), id 11 POS HOLD (удержание позиции по GPS) и id 55 CHIRP (генератор чирпа, `ctl-sysid`) — каждый виден только с соответствующей опцией сборки; в 4.5 этих номеров нет. Включённые ALTHOLD и POS HOLD запрещают арм (флаги `ALT_HOLD_SW`, `POS_HOLD_SW`). USER1–4 стоят на 40–43, имя задаётся через `box_user_N_name` (до 16 символов, есть и в 4.5).
 
 **PARALYZE (45)** — «липкий» режим (`fc/rc_modes.c`). Он взводится, только если тумблер хоть раз был выключен позже 5 с от старта (`STICKY_MODE_BOOT_DELAY_US`): включённый на старте тумблер ничего не делает. После срабатывания флаг `PARALYZE` запрещает арм, а без арма отключены стик-команды, подстройки и меню OSD. Снимается только перезагрузкой. В воздухе не дизармит. Назначение — гонки: разбитый аппарат не заармят случайно, пока несут с трассы.
 
 **USER1–4 и PINIO.** Пин PINIO на многих платах коммутирует питание VTX или камеры. Связка: `set pinio_box = 40,255,255,255` (PINIO1 следует за USER1, 255 — не назначено), затем `aux` с id 40. `pinio_config` (1 — выход, +128 — инверсия) задан в target платы.
 
 ### Turtle mode (FLIP OVER AFTER CRASH)
-Аппарат на спине, моторы крутятся назад, стик выбирает, какая сторона толкает. Код: `tryArm()` в `fc/core.c`, `applyFlipOverAfterCrashModeToMotors()` в `flight/mixer.c`.
+Аппарат на спине, моторы крутятся назад, стик выбирает, какая сторона толкает. Код 2025.12: `tryArm()` и `updateArmingStatus()` в `fc/core.c`, `applyCrashFlipModeToMotors()` в `flight/mixer.c` (в 4.5 — `applyFlipOverAfterCrashModeToMotors()`; алгоритм там другой, он разобран в шаге 3 практики).
 
 - **Требования.** Режим виден только при DShot. При арме с режимом FC шлёт всем ESC DShot-команду 21 `SPIN_DIRECTION_REVERSED`, при дизарме — 20 `SPIN_DIRECTION_NORMAL`: прошивка ESC должна их выполнять (Bluejay, BLHeli_32, AM32 — проверь на столе). Двунаправленный DShot не нужен. При `feature 3D` команды не шлются, миксер просто берёт обратную половину диапазона.
-- **Вход.** Сначала тумблер turtle, потом ARM. Флаги `ANGLE` и `GPS` при включённом режиме не ставятся. OSD: до арма `CRASH FLIP SWITCH`, после — `> CRASH FLIP <`, пищалка пищит.
-- **Выход.** Дизарм, turtle выкл., снова ARM. Выключенный при арме тумблер ничего не меняет: состояние сбрасывается только дизармом. С забытым тумблером аппарат после арма крутит моторы назад и не взлетит.
-- **Стик.** Крен — пара моторов одной стороны, тангаж — передняя или задняя пара, диагональ (до 30° от биссектрисы) — один мотор, доминирует рыскание — диагональная пара. Моторы «другой стороны» стоят или крутятся на `crashflip_motor_percent`. Мёртвая зона 15 %, кривая `crashflip_expo`: x' = (1 − e)·x + e·x³, e = expo/100. Выход ниже «минимум + 20» DShot — стоп (шаг 3 практики).
-- **Почему греются моторы.** В turtle `motorRangeMax = motorOutputHigh`: полный стик — почти полный газ (2027 из 2047). Проп упирается в траву, ротор почти стоит, противо-ЭДС нет, ток ограничен сопротивлением обмотки. Таймера в 4.5 нет. Правило: толчки по 0.5–1 с; не перевернулся за 3 попытки — иди пешком.
+- **Вход.** Сначала тумблер turtle, потом ARM. Флаги `ANGLE` и `GPS` при включённом режиме не ставятся. OSD: до арма `CRASHFLIP SW`, после — `>CRASH FLIP<` (в 4.5 — `CRASH FLIP SWITCH` и `> CRASH FLIP <`), пищалка пищит.
+- **Выход.** Дизарм, turtle выкл., снова ARM — это работает в любой версии. В 2025.12 можно и выключить тумблер turtle, не трогая ARM: при `crashflip_auto_rearm = OFF` (умолчание) FC дизармится сам и ставит флаг `FLIP_SWITCH`, который снимается только ручным дизармом (опустить ARM), после чего армишься заново; при `crashflip_auto_rearm = ON` аппарат остаётся в арме, моторы переключаются на нормальное вращение — пропы закрутятся вперёд сразу, руки и лицо убери заранее. В 4.5 выключенный при арме тумблер ничего не меняет: состояние сбрасывается только дизармом. С забытым тумблером аппарат после арма крутит моторы назад и не взлетит.
+- **Стик.** Крен — пара моторов одной стороны, тангаж — передняя или задняя пара, диагональ (до 30° от биссектрисы) — один мотор, доминирует рыскание — диагональная пара. Моторы «другой стороны» стоят или крутятся на `crashflip_motor_percent`. Мёртвая зона стика 15 %; выше неё мощность в 2025.12 равна отклонению стика (линейно, без кривой), выход меньше 2 % диапазона — стоп. В 4.5 была кривая `crashflip_expo` (35): x' = (1 − e)·x + e·x³, e = expo/100, и стоп ниже «минимум + 20» DShot; в 2025.12 `crashflip_expo` удалён.
+- **Автоостановка (`crashflip_rate`, с 2025.12).** 0 (умолчание) — выключено, моторы тянут, пока держишь стик. При значении больше 0 мощность снижается двумя множителями: по скорости вращения (без ослабления до половины порога `crashflip_rate` × 10 °/с, дальше линейно до нуля на пороге) и, если есть акселерометр, по пройденному углу (ноль после поворота примерно на 90° от исходного положения). Аппарат перестаёт толкать, когда уже переворачивается. В сборке RACE_PRO умолчания другие: `crashflip_rate = 30`, `crashflip_auto_rearm = ON`.
+- **Почему греются моторы.** В turtle `motorRangeMax = motorOutputHigh`: полный стик — полный газ (2047; в 4.5 — 2027 из-за вычитаемой мёртвой зоны). Проп упирается в траву, ротор почти стоит, противо-ЭДС нет, ток ограничен сопротивлением обмотки. Таймера нет ни в 4.5, ни в 2025.12 (при `crashflip_rate = 0`). Правило: толчки по 0.5–1 с; не перевернулся за 3 попытки — иди пешком.
 - Runaway takeoff в turtle не проверяется, а арм в turtle снова включает защиту для следующего взлёта.
 
-**2025.12:** `crashflip_expo` удалён. Вместо него `crashflip_rate` (0–250, по умолчанию 0): мощность снижается по угловой скорости и по пройденному углу, аппарат останавливает моторы сам, перевернувшись. Добавлены `crashflip_auto_rearm` и флаг арма `FLIP_SWITCH`.
+Перенос настроек с 4.5: строку `set crashflip_expo = …` из старого `diff` 2025.12 не примет (`INVALID NAME`); `crashflip_motor_percent` переносится как есть.
 
 ### Launch control
 Гоночный старт: аппарат стоит на батарее или стенде, наклонён вперёд и держит угол до газа. Код: `canUseLaunchControl()` и `processRx()` в `fc/core.c`, `applyLaunchControl()` в `flight/pid.c`.
@@ -98,12 +99,12 @@ next:
 - **Старт.** Газ выше `launch_trigger_throttle_percent` (20 %) — I сбрасывается, launch окончен, аппарат летит в обычном ACRO. `launch_angle_limit` > 0 (нужен акселерометр) запрещает наклон вперёд больше заданного. За 10° до предела скорость наклона плавно падает до 5 °/с.
 - **Повтор.** `launch_trigger_allow_reset = ON` — после дизарма переключи тумблер режима; `OFF` — только перезагрузка. До старта арм и дизарм можно повторять. OSD: `LAUNCH 25` (тангаж), мигает за 10 % до порога.
 
-**2025.12:** по умолчанию `launch_control_mode = PITCHONLY` (в 4.5 — `NORMAL`).
+По умолчанию `launch_control_mode = PITCHONLY` (в 4.5 умолчание было `NORMAL`); остальная логика launch control в 2025.12 не менялась.
 
 ### 3D (реверсивные моторы)
 `feature 3D`: газ в центре — ноль, вниз — тяга назад, вверх — вперёд. Это **не** двунаправленный DShot из bf-rpm-filter: нужен ESC в режиме Bidirectional (3D) (f-esc-firmware). Betaflight сам ESC не переключает: это делают в конфигураторе ESC или `dshotprog 255 10 12` (3D_MODE_ON + сохранение), если прошивка ESC это поддерживает.
 
-- **DShot.** Разделение задаёт протокол (`drivers/dshot.c`): 48–1047 — назад, 1048–2047 — вперёд, 0 — стоп. `3d_deadband_low/high`, `3d_neutral`, `3d_limit_low/high` при DShot **не используются**: это конечные точки для PWM/OneShot (`analogInitEndpoints()` в `drivers/motor.c`). Холостой ход `dshot_idle_value` действует в обе стороны.
+- **DShot.** Разделение задаёт протокол (`drivers/dshot.c`): 48–1047 — назад, 1048–2047 — вперёд, 0 — стоп. `3d_deadband_low/high`, `3d_neutral`, `3d_limit_low/high` при DShot **не используются**: это конечные точки для PWM/OneShot (`analogInitEndpoints()` в `drivers/motor.c`). Холостой ход `motor_idle` (до 2025.12 — `dshot_idle_value`) действует в обе стороны.
 - **Стик.** `3d_deadband_throttle` (50 мкс) — мёртвая зона вокруг `mid_rc` и «газ внизу» для арма: арм только при 1451–1549 мкс. В зоне миксер держит направление, с которого стик вошёл. После смены направления I обнуляется на 250 мс. Дизарм тумблером — мгновенно (`processRx`).
 - **Режим 29.** `3d_switched_mode = OFF`: режим отключает реверс, весь ход стика — вперёд. `ON`: тумблер выбирает направление, ход стика — от нуля до полного газа в эту сторону.
 - **Что отключается:** dynamic idle (его код в ветке «не 3D»), `MOTOR_STOP`, launch control, GPS Rescue, команды turtle.
@@ -111,7 +112,7 @@ next:
 ### Acro trainer
 ACRO с ограничением крена и тангажа углом `acro_trainer_angle_limit` (20°), `applyAcroTrainer()` в `flight/pid.c`. Не действует в ANGLE, HORIZON и GPS Rescue. Нужен акселерометр и опция сборки ACRO_TRAINER в Cloud Build: без неё нет режима 47, а `set acro_trainer_*` даёт `INVALID NAME`. Угол за пределом и стик тянет дальше — уставка = (предел − угол)·`acro_trainer_gain`/10 (не больше ±1000 °/с), I обнуляется. До предела угол прогнозируется на `acro_trainer_lookahead_ms` (50 мс), окно пропорционально гиро до 500 °/с, и при выходе прогноза за предел уставка тормозит заранее. Стик в обратную сторону снимает ограничение. Флип невозможен по построению.
 
-### Angle и Horizon в 4.5
+### Angle и Horizon (редакция 4.5, действует и в 2025.12)
 Код `pidLevel()` и `calcHorizonLevelStrength()` в `flight/pid.c`, коэффициенты в `flight/pid_init.c`. Закон Angle:
 
 - Цель = `angle_limit` · setpoint / max_rate, где setpoint — уставка ACRO по твоим рейтам, max_rate — скорость на полном стике. **Форма рейтов задаёт форму Angle:** при умолчаниях (Actual 7/67/0) полстика — 185 из 670 °/с, то есть 16.6°, а не 30° (шаг 1 практики).
@@ -119,25 +120,25 @@ ACRO с ограничением крена и тангажа углом `acro_t
 - `angle_earth_ref` (100): рыскание в Angle умножается на cos(угла цели), часть переносится в крен и тангаж — разворот вокруг вертикали Земли. 0 — старое поведение.
 - `level_race_mode = ON` (по умолчанию OFF) — Angle только по крену, тангаж в ACRO (гоночный «NFE»-режим).
 
-Horizon 4.5: уставка = acro·(1 − s) + angle·s, где s = `horizon_level_strength`/100 · (1 − наклон/`horizon_limit_degrees`) · (1 − стик/`horizon_limit_sticks`), множители не меньше 0, наклон — больший из |крен|, |тангаж|. При 75/135/75: горизонт и стик в центре — s = 0.75; стик 75 % или наклон ≥ 135° — s = 0, чистый ACRO, поэтому флип проходит без «борьбы» на спине. Рост s сглажен PT1 `horizon_delay_ms` (500 мс), спад мгновенный. `horizon_ignore_sticks = ON` убирает зависимость от стика.
+Horizon: уставка = acro·(1 − s) + angle·s, где s = `horizon_level_strength`/100 · (1 − наклон/`horizon_limit_degrees`) · (1 − стик/`horizon_limit_sticks`), множители не меньше 0, наклон — больший из |крен|, |тангаж|. При 75/135/75: горизонт и стик в центре — s = 0.75; стик 75 % или наклон ≥ 135° — s = 0, чистый ACRO, поэтому флип проходит без «борьбы» на спине. Рост s сглажен PT1 `horizon_delay_ms` (500 мс), спад мгновенный. `horizon_ignore_sticks = ON` убирает зависимость от стика.
 
-{{diagram:chart-bf-horizon-strength|В Horizon 4.5 выравнивание линейно гаснет к наклону 135° и к 75 % хода стика: на полстика у горизонта остаётся только треть силы (0.25 из 0.75), а вверх ногами аппарат летит как в ACRO.}}
+{{diagram:chart-bf-horizon-strength|В Horizon (4.5 и 2025.12) выравнивание линейно гаснет к наклону 135° и к 75 % хода стика: на полстика у горизонта остаётся только треть силы (0.25 из 0.75), а вверх ногами аппарат летит как в ACRO.}}
 
-Переименования 4.4 → 4.5: `level_limit` (55, до 90) → `angle_limit` (60, до 85); `angle_level_strength` → `angle_p_gain`; `horizon_transition` → `horizon_limit_sticks`; `horizon_tilt_effect` и `horizon_tilt_expert_mode` → `horizon_limit_degrees`; `roll_level_expo`/`pitch_level_expo` удалены, их роль играют рейты. Старый `diff all` из 4.4 эти строки не применит. **2025.12** добавляет `angle_pitch_offset`.
+Переименования 4.4 → 4.5: `level_limit` (55, до 90) → `angle_limit` (60; до 85 в 4.5, до 80 в 2025.12); `angle_level_strength` → `angle_p_gain`; `horizon_transition` → `horizon_limit_sticks`; `horizon_tilt_effect` и `horizon_tilt_expert_mode` → `horizon_limit_degrees`; `roll_level_expo`/`pitch_level_expo` удалены, их роль играют рейты. Старый `diff all` из 4.4 эти строки не применит. В 2025.12 добавлен `angle_pitch_offset` (только в сборке WING), а в режиме POS HOLD угол, запрошенный стиком, ограничен половиной `ap_max_angle`.
 
-Ещё одна функция 4.5 из этой группы — EZ landing: при `mixer_type = EZLANDING` миксер ограничивает «подъём газа ради PID» (то, что делает airmode) при малом газе, стиках у центра и малой скорости по GPS. Пороги — `ez_landing_threshold/limit/speed` (25/15/50). Аппарат меньше подпрыгивает при посадке. Без этого типа миксера переменные ничего не делают.
+Ещё одна функция из этой группы (появилась в 4.5) — EZ landing: при `mixer_type = EZLANDING` миксер ограничивает «подъём газа ради PID» (то, что делает airmode) при малом газе, стиках у центра и малой скорости по GPS. Пороги — `ez_landing_threshold/limit/speed` (25/15/50). Аппарат меньше подпрыгивает при посадке. Без этого типа миксера переменные ничего не делают.
 
 ### Dynamic idle и MOTOR_STOP
-Без dynamic idle нижний предел мотора — `dshot_idle_value` (550 = 5.5 % диапазона DShot), обороты не контролируются: в плоском падении поток снизу тормозит пропы до порога desync. Dynamic idle (`calculateThrottleAndCurrentMotorEndpoints()` в `mixer.c`) читает обороты самого медленного мотора по двунаправленному DShot и регулятором PID поднимает **нижнюю границу всех моторов**:
+Без dynamic idle нижний предел мотора — `motor_idle` (550 = 5.5 % диапазона DShot; до 2025.12 — `dshot_idle_value`), обороты не контролируются: в плоском падении поток снизу тормозит пропы до порога desync. Dynamic idle (`calculateThrottleAndCurrentMotorEndpoints()` в `mixer.c`) читает обороты самого медленного мотора по двунаправленному DShot и регулятором PID поднимает **нижнюю границу всех моторов**:
 
 - цель: `dyn_idle_min_rpm` × 100 об/мин (30 → 3000 об/мин = 50 об/с), по умолчанию 0 — выключено;
 - P = ошибка (об/с) · `dyn_idle_p_gain` · 0.00015, I = Σ ошибка · `dyn_idle_i_gain` · 0.01 · dT (вниз I спускается медленно: ошибка ограничена −0.1 об/с), D — от сглаженных (~20 мс) оборотов с коэффициентом `dyn_idle_d_gain` · 3·10⁻⁷ · f_PID;
-- прибавка ограничена `dyn_idle_max_increase` (150 = 15 %) после защёлкивания airmode и `dyn_idle_start_increase` (50 = 5 %) до него, то есть на земле;
-- при включённом dynamic idle `dshot_idle_value` **игнорируется**: нижняя граница становится 48 (0 %) плюс прибавка, а газ не опускается ниже 1 %;
+- прибавка ограничена `dyn_idle_max_increase` (150 = 15 %) после первого подъёма газа выше порога airmode, а до него, то есть на земле, — значением `motor_idle` (550 = 5.5 %). В 4.5 предел на земле задавала отдельная переменная `dyn_idle_start_increase` (50 = 5 %), в 2025.12 её нет;
+- при включённом dynamic idle `motor_idle` как пол **не действует**: нижняя граница становится 48 (0 %) плюс прибавка, а газ не опускается ниже 1 %. В 2025.12 `motor_idle` при этом остаётся пределом прибавки на земле (пункт выше), в 4.5 `dshot_idle_value` игнорировался полностью;
 - нужны `dshot_bidir = ON` и `motor_poles`. Без телеметрии `mixerInitProfile()` молча обнуляет цель: ошибки нет, функции тоже нет. В 3D функция не работает;
-- в 4.5 все `dyn_idle_*` хранятся в профиле PID: в другом профиле может быть 0.
+- все `dyn_idle_*` хранятся в профиле PID: в другом профиле может быть 0.
 
-Документация советует 30–40 для 5″. **2025.12:** `dyn_idle_start_increase` удалён, предел до airmode берётся из `motor_idle` (бывший `dshot_idle_value`).
+Документация советует 30–40 для 5″. Перед включением dynamic idle на вупах сначала подбери `motor_idle` так, чтобы моторы уверенно стартовали (комментарий в `mixer_init.c` 2025.12).
 
 {{diagram:chart-bf-dyn-idle|Регулятор из mixer.c на синтетическом моторе: со статическим idle 5.5 % самый медленный мотор в плоском падении проседает до 2100 об/мин, dynamic idle добавляет 6.3 % тяги и держит 3000; на земле тот же регулятор опускает холостой ход с 6100 до 3000 об/мин.}}
 
@@ -153,12 +154,13 @@ Horizon 4.5: уставка = acro·(1 − s) + angle·s, где s = `horizon_le
 
 **Эмуляция джойстика** (`drivers/*/camera_control.c`) — для камер с одним проводом OSD и резистивной клавиатурой (HS1177 и родственные). Опция сборки CAMERA_CONTROL, `resource CAMERA_CONTROL <пин с таймером>`, резистор 150–600 Ом в разрыв. Нажатие имитируется напряжением U = U_ref · R_кн / (R_вн + R_кн): `camera_control_ref_voltage` 330 (3.3 В), `camera_control_internal_resistance` 470 (47 кОм), `camera_control_button_resistance` 450,270,150,68,0 (×100 Ом: Enter, Left, Up, Right, Down), нажатие `camera_control_key_delay` 180 мс. Стики без арма (`rc_controls.c`): газ в середине + рыскание вправо — Enter, крен и тангаж — стрелки, газ вниз + тангаж вверх — «Up» на 2 с.
 
-### Справочник параметров (4.5)
+### Справочник параметров (2025.12)
 | Параметр | По умолчанию | Диапазон | Смысл |
 |---|---|---|---|
 | `crashflip_motor_percent` | 0 | 0–100 % | доля для моторов «другой стороны» в turtle |
-| `crashflip_expo` | 35 | 0–100 | кривая стика turtle (2025.12: `crashflip_rate`) |
-| `launch_control_mode` | NORMAL | NORMAL / PITCHONLY / FULL | что удерживается (2025.12: PITCHONLY) |
+| `crashflip_rate` | 0 | 0–250 (×10 °/с) | автоостановка turtle по скорости и углу, 0 — выкл. (с 2025.12; в 4.5 на этом месте `crashflip_expo` 35, 0–100 — кривая стика) |
+| `crashflip_auto_rearm` | OFF | OFF/ON | при выключении тумблера turtle остаться в арме (с 2025.12) |
+| `launch_control_mode` | PITCHONLY | NORMAL / PITCHONLY / FULL | что удерживается (в 4.5 умолчание NORMAL) |
 | `launch_trigger_throttle_percent` | 20 | 0–90 % | газ старта |
 | `launch_angle_limit` | 0 | 0–80° | предел наклона вперёд (0 — нет) |
 | `launch_control_gain` | 40 | 0–200 | I удержания позиции |
@@ -169,7 +171,7 @@ Horizon 4.5: уставка = acro·(1 − s) + angle·s, где s = `horizon_le
 | `acro_trainer_angle_limit` | 20 | 10–80° | предел угла |
 | `acro_trainer_lookahead_ms` / `_gain` | 50 / 75 | 10–200 мс / 25–255 | прогноз; жёсткость (/10) |
 | `acro_trainer_debug_axis` | ROLL | ROLL/PITCH | ось для debug |
-| `angle_limit` | 60 | 10–85° | угол на полном стике |
+| `angle_limit` | 60 | 10–80° | угол на полном стике (в 4.5 — до 85°) |
 | `angle_p_gain` | 50 | 0–200 | °/с на градус ошибки ×10 |
 | `angle_feedforward` / `_smoothing_ms` | 50 / 80 | 0–200 / 10–250 мс | FF от стика и его сглаживание |
 | `angle_earth_ref` | 100 | 0–100 % | разворот в Angle относительно Земли |
@@ -183,8 +185,8 @@ Horizon 4.5: уставка = acro·(1 − s) + angle·s, где s = `horizon_le
 | `dyn_idle_min_rpm` | 0 | 0–200 (×100 об/мин) | цель dynamic idle, 0 = выкл |
 | `dyn_idle_p_gain` / `_i_gain` / `_d_gain` | 50 / 50 / 50 | 1–250 / 1–250 / 0–250 | коэффициенты регулятора |
 | `dyn_idle_max_increase` | 150 | 10–255 (×0.1 %) | предел прибавки после airmode |
-| `dyn_idle_start_increase` | 50 | 10–255 (×0.1 %) | предел прибавки до airmode (нет в 2025.12) |
-| `dshot_idle_value` | 550 | 0–2000 (×0.01 %) | статический idle; при dynamic idle игнорируется |
+| `motor_idle` | 550 | 0–2000 (×0.01 %) | статический idle (до 2025.12 — `dshot_idle_value`); при dynamic idle — предел прибавки на земле |
+| `dyn_idle_start_increase` | — | — | только 4.5: 50, 10–255 (×0.1 %), предел прибавки до airmode; в 2025.12 удалён |
 | `anti_gravity_gain` / `_cutoff_hz` / `_p_gain` | 80 / 5 / 100 | 0–250 / 2–50 / 0–250 | anti-gravity |
 | `iterm_relax` / `_type` / `_cutoff` | RP / SETPOINT / 15 | OFF…RPY_INC / GYRO, SETPOINT / 1–50 | I-term relax |
 | `camera_control_mode` | HARDWARE_PWM | HARDWARE_PWM / SOFTWARE_PWM / DAC | способ эмуляции (SOFTWARE_PWM — с конденсатором) |
@@ -199,7 +201,7 @@ Horizon 4.5: уставка = acro·(1 − s) + angle·s, где s = `horizon_le
 Функции: `feature 3D`, `feature MOTOR_STOP`, `feature ANTI_GRAVITY` (вкл.), `feature AIRMODE` (вкл.).
 
 ## practice
-Основной путь — Python, повторяющий математику прошивки построчно: те же формулы, константы и умолчания 4.5 (SITL Betaflight здесь не собирается). Модели аппарата и мотора — учебные заглушки, так и помечены. Три блока ниже склеиваются в один файл `lab.py`.
+Основной путь — Python, повторяющий математику прошивки построчно: те же формулы, константы и умолчания 4.5 (SITL Betaflight здесь не собирается). Что из этого действительно для 2025.12: шаг 1 (Angle, Horizon) — формулы не изменились в 2025.12; шаг 2 (dynamic idle) — регулятор тот же, но предел до взлёта там `motor_idle` (5.5 %), а не `dyn_idle_start_increase` (5 %); шаг 3 (turtle) — алгоритм 4.5, в 2025.12 он заменён (кривой `crashflip_expo` и вычитания 20 единиц DShot нет). Модели аппарата и мотора — учебные заглушки, так и помечены. Три блока ниже склеиваются в один файл `lab.py`.
 
 ### Шаг 1. Закон Angle и сила Horizon из `pidLevel()`
 Цель: увидеть, что рейты меняют Angle, что `angle_p_gain` — это постоянная времени, и как Horizon 4.5 смешивает ACRO и Angle.
@@ -426,7 +428,7 @@ Part 2b. Slowest motor, synthetic flight: ground idle 0-0.3 s, climb 0.3-0.8 s, 
 - **2b, после.** I спускается медленно (−0.1 об/с в ошибке), но отрицательный P сразу гасит прибавку.
 
 ### Шаг 3. Turtle: что получает каждый мотор
-Перенос `applyFlipOverAfterCrashModeToMotors()` для QUADX (`mixerQuadX`: M1 задний правый, M2 передний правый, M3 задний левый, M4 передний левый), без dynamic idle, `dshot_idle_value` 5.5 % → нижняя граница 157.9.
+Вывод снят на алгоритме 4.5; в 2025.12 функция называется `applyCrashFlipModeToMotors()`, `crashflip_expo` нет, мощность равна отклонению стика выше мёртвой зоны 15 %, полный стик даёт 2047. Перенос `applyFlipOverAfterCrashModeToMotors()` для QUADX (`mixerQuadX`: M1 задний правый, M2 передний правый, M3 задний левый, M4 передний левый), без dynamic idle, `dshot_idle_value` 5.5 % → нижняя граница 157.9.
 
 ```python
 # Part 3: crash flip motor outputs (flight/mixer.c applyFlipOverAfterCrashModeToMotors, QUADX mixer).
@@ -501,6 +503,7 @@ set dshot_bidir = ON
 set motor_poles = 14
 set dyn_idle_min_rpm = 30
 set crashflip_motor_percent = 0
+set crashflip_rate = 0
 set launch_trigger_throttle_percent = 20
 save
 ```
@@ -508,7 +511,7 @@ save
 `dyn_idle_*` и `launch_*` — переменные профиля PID: они записываются в текущий профиль (`profile`), остальные три PID-профиля остаются с умолчаниями. После `save` проверь `get dyn_idle_min_rpm` в каждом профиле, которым летаешь.
 
 ### Переход на реальное железо
-Пропы сняты до пункта 3. АКБ на столе — через smoke stopper. Арм — без подключённого Configurator (иначе флаг `MSP`).
+Пропы сняты до пункта 3. АКБ на столе — через smoke stopper. Арм — без подключённого Betaflight App (иначе флаг `MSP`).
 
 **1. Стол.** Вкладка Motors, ползунки на ~1100: у всех моторов есть обороты, ошибок DShot < 1 % (или CLI `dshot_telemetry_info`). Вкладка Modes: каждый тумблер подсвечивает только свой режим. Turtle: тумблер turtle, затем ARM — в OSD `> CRASH FLIP <`, пищит. Крен вправо — крутятся только правые моторы и **назад** (полоска скотча на колоколе). Дизарм, turtle выкл., ARM — моторы снова вперёд. Dynamic idle на столе не проверить: разгруженный мотор и на 1 % крутится быстрее цели. Его проверка — пункт 5.
 
@@ -523,14 +526,14 @@ save
 **Критерии засчёта железной части:** turtle на столе крутит нужные моторы назад, после дизарма направление восстанавливается; на траве переворот за ≤ 3 толчка без перегрева. Launch control держит угол 5 с и стартует на пороге газа. 3D проверен без пропов в четырёх точках (вперёд, назад, центр, дизарм). Лог dynamic idle показывает удержание цели в плоском падении.
 
 Лабораторная засчитывается, когда:
-- **Расчётный путь (Python):** три части скрипта запущены, выводы совпадают с приведёнными. По шагу 1 для своих рейтов посчитан целевой угол Angle на 25/50/75 % стика и сила Horizon при наклоне 45° и стике 30 %. По шагу 2 найдена минимальная цель `dyn_idle_min_rpm`, при которой прибавка в падении из сценария упирается в 15 %, с объяснением. По шагу 3 посчитан выход DShot для своего `crashflip_expo` на 50 % стика.
+- **Расчётный путь (Python):** три части скрипта запущены, выводы совпадают с приведёнными. По шагу 1 для своих рейтов посчитан целевой угол Angle на 25/50/75 % стика и сила Horizon при наклоне 45° и стике 30 %. По шагу 2 найдена минимальная цель `dyn_idle_min_rpm`, при которой прибавка в падении из сценария упирается в 15 %, с объяснением. По шагу 3 посчитан выход DShot для своего `crashflip_expo` на 50 % стика (алгоритм 4.5) и рядом — что даст 2025.12 при том же стике.
 - **Конфигурация:** строки `aux` для своей раскладки написаны по таблице `permanentId`, `get dyn_idle_min_rpm` проверен во всех используемых профилях.
 - **Железо:** выполнены критерии засчёта железной части выше.
 
 ## diagnostics
 - **Симптом:** режима FLIP OVER AFTER CRASH нет во вкладке Modes
   - Возможная причина: протокол моторов не DShot.
-  - Что сделать: DSHOT300/600; без DShot turtle в 4.5 невозможен.
+  - Что сделать: DSHOT300/600; без DShot turtle невозможен (ни в 4.5, ни в 2025.12).
 - **Симптом:** turtle включён, а моторы при арме крутятся вперёд или стоят
   - Возможная причина: ESC не выполняет DShot-команды 20/21; тумблер turtle поднят после ARM; стик в мёртвой зоне 15 %.
   - Что сделать: порядок «turtle → ARM», выход — только дизармом; проверить на столе; обновить прошивку ESC (f-esc-firmware).
@@ -543,7 +546,7 @@ save
   - Что сделать: арм тумблером в ACRO; переключить тумблер режима или перезагрузиться.
 - **Симптом:** 3D не армится, или правка `3d_deadband_low/high` ничего не меняет
   - Возможная причина: газ вне 1451–1549 мкс; `3d_deadband_*` действуют только на PWM, при DShot разделение фиксировано.
-  - Что сделать: газ в центр; холостой при DShot — `dshot_idle_value`, он действует в обе стороны.
+  - Что сделать: газ в центр; холостой при DShot — `motor_idle` (до 2025.12 — `dshot_idle_value`), он действует в обе стороны.
 - **Симптом:** Angle вялый у центра стика, Horizon не выравнивает в крутых виражах
   - Возможная причина: Angle повторяет рейты (16.6° на полстика по умолчанию); Horizon гаснет к 75 % стика и 135°.
   - Что сделать: поднять `roll_rc_rate` или взять отдельный профиль рейтов; для Horizon — `horizon_limit_sticks` > 100 или `horizon_ignore_sticks = ON`.
@@ -560,12 +563,12 @@ save
 ## checklist
 - Знаю формат `aux` (7 полей) и нахожу `permanentId` в таблице, а не в `rc_modes.h`
 - Turtle: DShot, порядок «turtle → ARM», выход через дизарм; короткие толчки, нагрев проверен
-- `crashflip_motor_percent` и `crashflip_expo` понимаю по выходам моторов (шаг 3)
+- `crashflip_motor_percent` понимаю по выходам моторов (шаг 3); знаю, что `crashflip_expo` есть только в 4.5, а в 2025.12 — `crashflip_rate` и `crashflip_auto_rearm`
 - Launch control: условия активации и `launch_trigger_allow_reset` под свою раскладку
 - 3D: ESC в Bidirectional, `3d_deadband_*` только для PWM, проверка без пропов
 - Acro trainer есть в сборке, предел угла задан
-- Angle в 4.5 повторяет рейты; Horizon гаснет к 75 % стика и 135°
-- Dynamic idle: bidir DShot работает, `dyn_idle_min_rpm` задан во всех профилях, `dshot_idle_value` при нём не действует
+- Angle повторяет рейты; Horizon гаснет к 75 % стика и 135°
+- Dynamic idle: bidir DShot работает, `dyn_idle_min_rpm` задан во всех профилях, `motor_idle` при нём — только предел прибавки на земле
 - `MOTOR_STOP` без airmode понимаю как исключение, а не норму
 - Camera control: тип камеры определён (UART или провод OSD), меню открывается без арма
 
@@ -580,7 +583,9 @@ save
 - Betaflight dshot.c, 4.5-maintenance (конечные точки DShot и 3D, обороты моторов) | https://raw.githubusercontent.com/betaflight/betaflight/4.5-maintenance/src/main/drivers/dshot.c | primary | A
 - Betaflight rcdevice_cam.c, 4.5-maintenance (кнопки камеры, стики меню) | https://raw.githubusercontent.com/betaflight/betaflight/4.5-maintenance/src/main/io/rcdevice_cam.c | primary | A
 - Betaflight rc_controls.c, 4.5-maintenance (стик-команды camera control, умолчания 3D) | https://raw.githubusercontent.com/betaflight/betaflight/4.5-maintenance/src/main/fc/rc_controls.c | primary | A
-- Betaflight mixer.c, 2025.12-maintenance (crashflip_rate) | https://raw.githubusercontent.com/betaflight/betaflight/2025.12-maintenance/src/main/flight/mixer.c | primary | A
+- Betaflight mixer.c, тег 2025.12.5 (applyCrashFlipModeToMotors, crashflip_rate, dynamic idle) | https://raw.githubusercontent.com/betaflight/betaflight/2025.12.5/src/main/flight/mixer.c | primary | A
+- Betaflight core.c, тег 2025.12.5 (crashflip_auto_rearm, FLIP_SWITCH, ALT_HOLD_SW, POS_HOLD_SW) | https://raw.githubusercontent.com/betaflight/betaflight/2025.12.5/src/main/fc/core.c | primary | A
+- Betaflight cli/settings.c, тег 2025.12.5 (имена, умолчания и диапазоны) | https://raw.githubusercontent.com/betaflight/betaflight/2025.12.5/src/main/cli/settings.c | primary | A
 - Betaflight docs: Dynamic Idle | https://raw.githubusercontent.com/betaflight/betaflight.com/master/docs/wiki/guides/current/Dynamic-Idle.md | primary | A
 - Betaflight docs: Launch Control | https://raw.githubusercontent.com/betaflight/betaflight.com/master/docs/wiki/guides/current/Launch-Control.md | primary | A
 - Betaflight docs: 3D Setup | https://raw.githubusercontent.com/betaflight/betaflight.com/master/docs/wiki/guides/current/3D-Setup.md | primary | B
@@ -589,7 +594,7 @@ save
 - Betaflight docs: FPV Camera Control (joystick emulation) | https://raw.githubusercontent.com/betaflight/betaflight.com/master/docs/wiki/guides/current/FPV-Camera-Control-Joystick-Emulation.md | primary | B
 
 ## notes
-Где документация расходится с исходником 4.5, модуль следует исходнику:
-- Страница Dynamic Idle пишет, что до airmode прибавка ограничена «фиксированными 4 %». В 4.5 это `dyn_idle_start_increase` = 50, то есть 5 %. Секцию «4.2» с подбором через `dshot_idle_value` к 4.3+ не применяй: значение игнорируется.
+Где документация расходится с исходником, модуль следует исходнику:
+- Страница Dynamic Idle пишет, что до airmode прибавка ограничена «фиксированными 4 %». В 4.5 это `dyn_idle_start_increase` = 50, то есть 5 %, в 2025.12 — `motor_idle`, по умолчанию 5.5 %. Секцию «4.2» с подбором через `dshot_idle_value` к 4.3+ не применяй: как пол значение не действует.
 - Страница 3D Setup описывает `3d_deadband_*` без оговорки про DShot. В коде они используются только в `analogInitEndpoints()`.
 - Модели мотора (шаг 2) и внутреннего контура (шаг 1) учебные. Числа оборотов и миллисекунд на твоём аппарате будут другими, а логика регуляторов взята из прошивки построчно.

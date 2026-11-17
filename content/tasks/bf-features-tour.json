@@ -4,7 +4,7 @@
   {
    "id": "angle-target",
    "title": "Целевой угол Angle по рейтам",
-   "statement": "Betaflight 4.5, рейты Actual: `roll_rc_rate` = **{rc}**, `roll_srate` = **{sr}**, `roll_expo` = 0; `angle_limit` = **{lim}**. Стик крена отклонён на **{x}** хода. Найдите целевой угол крена в Angle (°).",
+   "statement": "Betaflight 2025.12 (формула та же, что в 4.5), рейты Actual: `roll_rc_rate` = **{rc}**, `roll_srate` = **{sr}**, `roll_expo` = 0; `angle_limit` = **{lim}**. Стик крена отклонён на **{x}** хода. Найдите целевой угол крена в Angle (°).",
    "params": {
     "rc": [5, 7, 10, 15, 20],
     "sr": [50, 67, 80, 100],
@@ -20,7 +20,7 @@
   {
    "id": "horizon-strength",
    "title": "Сила выравнивания Horizon",
-   "statement": "Horizon 4.5 с умолчаниями (`horizon_level_strength` 75, `horizon_limit_sticks` 75, `horizon_limit_degrees` 135). Наклон аппарата **{a}°**, стик отклонён на **{s}** хода. Найдите силу выравнивания (0…1) в установившемся режиме.",
+   "statement": "Horizon (2025.12, формула та же, что в 4.5) с умолчаниями (`horizon_level_strength` 75, `horizon_limit_sticks` 75, `horizon_limit_degrees` 135). Наклон аппарата **{a}°**, стик отклонён на **{s}** хода. Найдите силу выравнивания (0…1) в установившемся режиме.",
    "params": {
     "a": {"min": 0, "max": 120, "step": 10},
     "s": [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6]
@@ -43,12 +43,12 @@
    "answer": "(n*100 - r)/60*p*0.00015*100",
    "unit": "%",
    "tol": 0.003,
-   "solution": "`mixerInitProfile()`: цель = n·100/60 об/с, коэффициент P = p·0.00015 на 1 об/с. Ошибка (n·100 − r)/60 об/с. При 30/50 и 2000 об/мин: 16.67 · 0.0075 = 12.5 %. Сумма P + I + D потом ограничивается `dyn_idle_max_increase` (15 %) или до airmode `dyn_idle_start_increase` (5 %)."
+   "solution": "`mixerInitProfile()`: цель = n·100/60 об/с, коэффициент P = p·0.00015 на 1 об/с. Ошибка (n·100 − r)/60 об/с. При 30/50 и 2000 об/мин: 16.67 · 0.0075 = 12.5 %. Сумма P + I + D потом ограничивается `dyn_idle_max_increase` (15 %) или, до первого подъёма газа, значением `motor_idle` (5.5 %; в 4.5 — `dyn_idle_start_increase`, 5 %)."
   },
   {
    "id": "crashflip-dshot",
    "title": "Выход DShot в turtle mode",
-   "statement": "Turtle mode, QUADX, `dshot_idle_value` 550 (5.5 %), dynamic idle выключен, `crashflip_expo` = **{e}**, `crashflip_motor_percent` = 0. Стик крена отклонён на **{x}** хода, тангаж и рыскание в центре. Найдите значение DShot для работающих моторов (до округления).",
+   "statement": "Betaflight 4.5 (в 2025.12 `crashflip_expo` удалён и мощность turtle считается иначе — задача оставлена для 4.5). Turtle mode, QUADX, `dshot_idle_value` 550 (5.5 %), dynamic idle выключен, `crashflip_expo` = **{e}**, `crashflip_motor_percent` = 0. Стик крена отклонён на **{x}** хода, тангаж и рыскание в центре. Найдите значение DShot для работающих моторов (до округления).",
    "params": {
     "e": [0, 20, 35, 50, 70],
     "x": {"min": 0.3, "max": 0.9, "step": 0.05}

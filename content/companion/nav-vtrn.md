@@ -3,7 +3,7 @@ id: nav-vtrn
 title: "Ориентирование по местности камерой: кадр против карты, визуальная одометрия и возврат без GNSS"
 level: L3
 readingTime: 55 мин
-firmware: ArduPilot 4.6 · PX4 1.15+
+firmware: ArduPilot 4.7 (сверено с 4.7.2; лабораторная снята на 4.6.3) · PX4 1.17 (сверено с v1.17.0)
 status: published
 added: 2026-11-14
 tags:
@@ -79,7 +79,7 @@ VIO (per-visual-nav) берёт масштаб из акселерометра, 
 
 **Путь 2 — ExternalNav.** `VISION_POSITION_ESTIMATE` (#102: x, y, z в локальной системе, `covariance[21]`, `reset_counter`) или `ODOMETRY`, `VISO_TYPE = 1`, `EK3_SRC2_POSXY = 6`; переключение наборов — тумблер `RCx_OPTION = 90` или `MAV_CMD_SET_EKF_SOURCE_SET` (per-visual-nav, nav-resilience). Нужен origin и своя пересчётка lat/lon → локальные метры. `GPS_INPUT` проще для абсолютных привязок: глобальные координаты и автоматический UseBest; ExternalNav честнее разделяет источники и не маскирует зрение под GNSS в логах.
 
-**PX4.** `GPS_INPUT` приёмник MAVLink PX4 1.15 не обрабатывает. Внешнее зрение — `VISION_POSITION_ESTIMATE`/`ODOMETRY` в локальной NED, `EKF2_EV_CTRL` (биты: 0 — горизонтальная позиция, 1 — вертикальная, 2 — скорость, 3 — yaw), шум из сообщения или `EKF2_EVP_NOISE` (`EKF2_EV_NOISE_MD`), ворота `EKF2_EVP_GATE` 5σ, `EKF2_EV_DELAY`. Для абсолютных lat/lon есть отдельный вход: топик `aux_global_position` (uXRCE-DDS `/fmu/in/aux_global_position`), `EKF2_AGP_CTRL` бит 0, `EKF2_AGP_NOISE` 0.9 м, `EKF2_AGP_GATE` 3σ.
+**PX4.** `GPS_INPUT` приёмник MAVLink PX4 1.17 не обрабатывает (как и в 1.15, 1.16). Внешнее зрение — `VISION_POSITION_ESTIMATE`/`ODOMETRY` в локальной NED, `EKF2_EV_CTRL` (биты: 0 — горизонтальная позиция, 1 — вертикальная, 2 — скорость, 3 — yaw; по умолчанию 0, в 1.15 было 15), шум из сообщения или `EKF2_EVP_NOISE` (`EKF2_EV_NOISE_MD`), ворота `EKF2_EVP_GATE` 5σ, `EKF2_EV_DELAY`. Для абсолютных lat/lon есть отдельный вход: топик `aux_global_position` (uXRCE-DDS `/fmu/in/aux_global_position`), `EKF2_AGP_CTRL` бит 0 (по умолчанию 0 — вход выключен; в 1.15 было 1), `EKF2_AGP_NOISE` 0.9 м, `EKF2_AGP_GATE` 3σ.
 
 ## practice
 Спутниковых тайлов и своих кадров в песочнице нет, поэтому карта **синтетическая**: `vtrn_lab.py` рисует «ортофото» 4096×4096 px по 0.25 м/px (1024×1024 м) — поля с разной текстурой, грядки, дороги, 900 куп деревьев, 80 строений и озеро 220 м без текстуры; геопривязка условная (угол 55.7000° N, 37.5000° E). Камера видит ту же местность «в другой день»: тон каждого поля изменён на ±35 %, размытие, 150 новых куп, на каждом кадре случайные яркость, контраст и шум. VO, привязка, RANSAC и фильтр — настоящий код OpenCV 5.0, истина известна точно. На синтетике нет наклона, параллакса, теней и смаза — на реальных кадрах цифры будут хуже.
@@ -174,7 +174,9 @@ $ python3 sitl_vtrn.py tcp:127.0.0.1:5790
 На земле узел шлёт известную точку взлёта с `horiz_accuracy` 5 м — иначе арминга нет. Первая версия слала сырые привязки на 2 Гц и получила `PreArm: GPS 2: not healthy`, результат арминга 4 (FAILED).
 
 ### Шаг 6. Потеря GNSS, ложная привязка, возврат
-Маршрут: взлёт на 100 м, 400 м на север с GNSS (зрение в тени), `SIM_GPS_DISABLE = 1`, 250 м на восток и 400 м на юг на зрении, затем RTL.
+Маршрут: взлёт на 100 м, 400 м на север с GNSS (зрение в тени), `SIM_GPS1_ENABLE = 0` (в прогоне на 4.6.3 — `SIM_GPS_DISABLE = 1`), 250 м на восток и 400 м на юг на зрении, затем RTL.
+
+Вывод снят на Copter-4.6.3; в 4.7.2 `SIM_GPS_DISABLE = 1` называется `SIM_GPS1_ENABLE = 0`.
 
 ```text
   A: reached in 43 s; EKF-vs-truth error mean 0.23 m, max 0.30 m; GPS2(vision)-vs-truth mean 2.19 m, max 3.38 m
@@ -216,7 +218,7 @@ on GPS2 (vision) from t = 127.7 s: 1498 XKF4 samples, SP max 8.13, SP median 0.0
 5. **Теневой режим в полёте**: `GPS2_TYPE = 14`, GNSS основной (у зрения 8 «спутников»). Приёмка по логу: `GPS[1]` в пределах 5 м от `GPS[0]` 95 % времени, интервал сообщений 200 ± 45 мс.
 6. **Живой режим** — только после п. 4 и 5, пропы установлены: высота ≥ 60 м над полем без людей, геозона, `FS_EKF_ACTION = 1`, пилот готов уйти в AltHold. GNSS не глушить: `GPS_AUTO_SWITCH = 0`, `GPS_PRIMARY = 1` переводят EKF на зрение, а настоящий приёмник остаётся в логе эталоном. Прерывание: `EKF variance`, `GPS Glitch` дольше 10 с, расхождение с GNSS > 10 м.
 
-Лабораторная засчитывается, когда (SITL-путь): есть таблица ошибки VO для трёх прогонов и график «ошибка — путь» с названными причинами дрейфа; медиана ошибки привязок ≤ 0.5 м, найдена привязка с ошибкой > 3σ; арминг с `GPS2_TYPE = 14` прошёл, после `SIM_GPS_DISABLE = 1` маршрут и RTL пройдены с ошибкой EKF против истины ≤ 3 м на рабочей высоте; ложная привязка +60 м отброшена (`GPS Glitch`, в логе `XKF4.SP` > 1), воспроизведён хотя бы один отказ из шага 7. (Железо): офлайн-прогон записи укладывается в критерии п. 4, теневой режим — в критерии п. 5; живой режим не обязателен.
+Лабораторная засчитывается, когда (SITL-путь): есть таблица ошибки VO для трёх прогонов и график «ошибка — путь» с названными причинами дрейфа; медиана ошибки привязок ≤ 0.5 м, найдена привязка с ошибкой > 3σ; арминг с `GPS2_TYPE = 14` прошёл, после `SIM_GPS1_ENABLE = 0` маршрут и RTL пройдены с ошибкой EKF против истины ≤ 3 м на рабочей высоте; ложная привязка +60 м отброшена (`GPS Glitch`, в логе `XKF4.SP` > 1), воспроизведён хотя бы один отказ из шага 7. (Железо): офлайн-прогон записи укладывается в критерии п. 4, теневой режим — в критерии п. 5; живой режим не обязателен.
 
 ## diagnostics
 - **Симптом:** `PreArm: GPS 2: not healthy`, арминг отказан, хотя `GPS2_RAW.fix_type = 3`
@@ -262,9 +264,9 @@ on GPS2 (vision) from t = 127.7 s: 1498 XKF4 samples, SP max 8.13, SP median 0.0
 - ArduPilot source — шум измерения GPS и ворота в EKF3 (`libraries/AP_NavEKF3/AP_NavEKF3_PosVelFusion.cpp`) | https://github.com/ArduPilot/ardupilot/blob/Copter-4.6.3/libraries/AP_NavEKF3/AP_NavEKF3_PosVelFusion.cpp | primary | A
 - ArduPilot Copter — EKF Source Selection and Switching (EK3_SRCn_*, RCx_OPTION 90, MAV_CMD_SET_EKF_SOURCE_SET) | https://ardupilot.org/copter/docs/common-ekf-sources.html | primary | A
 - ArduPilot Copter — Non-GPS Navigation | https://ardupilot.org/copter/docs/common-non-gps-navigation-landing-page.html | primary | A
-- PX4 source — параметры EKF2_EV_*, EKF2_AGP_* (`src/modules/ekf2/module.yaml`, v1.15.4) | https://github.com/PX4/PX4-Autopilot/blob/v1.15.4/src/modules/ekf2/module.yaml | primary | A
-- PX4 source — приёмник MAVLink: VISION_POSITION_ESTIMATE, ODOMETRY (`src/modules/mavlink/mavlink_receiver.cpp`, v1.15.4) | https://github.com/PX4/PX4-Autopilot/blob/v1.15.4/src/modules/mavlink/mavlink_receiver.cpp | primary | A
-- PX4 User Guide — Using PX4's Navigation Filter (EKF2): External Vision System | https://docs.px4.io/main/en/advanced_config/tuning_the_ecl_ekf.html | primary | A
+- PX4 source — параметры EKF2_EV_*, EKF2_AGP_* (`src/modules/ekf2/params_external_vision.yaml`, `params_aux_global_position.yaml`, v1.17.0) | https://github.com/PX4/PX4-Autopilot/tree/v1.17.0/src/modules/ekf2 | primary | A
+- PX4 source — приёмник MAVLink: VISION_POSITION_ESTIMATE, ODOMETRY (`src/modules/mavlink/mavlink_receiver.cpp`, v1.17.0) | https://github.com/PX4/PX4-Autopilot/blob/v1.17.0/src/modules/mavlink/mavlink_receiver.cpp | primary | A
+- PX4 User Guide — Using PX4's Navigation Filter (EKF2): External Vision System | https://docs.px4.io/v1.17/en/advanced_config/tuning_the_ecl_ekf.html | primary | A
 - OpenCV — Camera Calibration and 3D Reconstruction: findHomography, RANSAC | https://docs.opencv.org/4.x/d9/d0c/group__calib3d.html | primary | A
 - OpenCV — ORB (Oriented FAST and Rotated BRIEF) | https://docs.opencv.org/4.x/d1/d89/tutorial_py_orb.html | primary | A
 - DeTone, Malisiewicz, Rabinovich — SuperPoint: Self-Supervised Interest Point Detection and Description (2018) | https://arxiv.org/abs/1712.07629 | primary | B

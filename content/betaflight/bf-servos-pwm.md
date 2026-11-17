@@ -3,7 +3,7 @@ id: bf-servos-pwm
 title: "Сервы, PWM и таймеры: `resource SERVO`, `servo`, `smix`, SERVO_TILT и channel forwarding"
 level: L2
 readingTime: 50 мин
-firmware: Betaflight 4.5 (исходник 4.5-maintenance, 4.5.6); отличия 2025.12 отмечены
+firmware: Betaflight 2025.12 (сверено с 2025.12.5); лабораторная снята на исходнике 4.5.6
 status: published
 added: 2026-11-14
 tags:
@@ -27,13 +27,13 @@ next:
 ---
 
 ## summary
-Серва на квадрике Betaflight — это не «подключил и работает»: прошивка должна уметь сервы (в Cloud Build — опция SERVOS), выход должен сидеть на таймере, который не занят DShot, питание — от отдельного BEC, а `smix` на квадрике вообще не применяется. Модуль разводит три разных «PWM» (моторный PWM/OneShot, DShot, сервоимпульс 1000–2000 мкс на 50–333 Гц), объясняет таймеры и каналы STM32/AT32, чтение `timer`, `resource`, `dma show` и перенос сервы на свободный пад, разбирает по исходнику 4.5 команды `servo` и `smix`, фичи SERVO_TILT и CHANNEL_FORWARDING и собирает простой подвес пан/тилт. Лабораторная: Python-скрипт разбирает настоящий конфиг SpeedyBee F405 V4 из ветки `4.5-config` и таблицу таймеров F405 из исходника, находит пады под 50 Гц при DShot600 на моторах и считает импульс сервы по формулам `servos.c`; затем стол без пропов, серва от отдельного BEC, тестер или осциллограф, и тест подвеса.
+Серва на квадрике Betaflight — это не «подключил и работает»: прошивка должна уметь сервы (в Cloud Build — опция SERVOS), выход должен сидеть на таймере, который не занят DShot, питание — от отдельного BEC, а `smix` на квадрике вообще не применяется. Модуль разводит три разных «PWM» (моторный PWM/OneShot, DShot, сервоимпульс 1000–2000 мкс на 50–333 Гц), объясняет таймеры и каналы STM32/AT32, чтение `timer`, `resource`, `dma show` и перенос сервы на свободный пад, разбирает по исходнику команды `servo` и `smix` (одинаковы в 4.5 и 2025.12), фичи SERVO_TILT и CHANNEL_FORWARDING и собирает простой подвес пан/тилт. Лабораторная: Python-скрипт разбирает настоящий конфиг SpeedyBee F405 V4 из ветки `4.5-config` и таблицу таймеров F405 из исходника, находит пады под 50 Гц при DShot600 на моторах и считает импульс сервы по формулам `servos.c`; затем стол без пропов, серва от отдельного BEC, тестер или осциллограф, и тест подвеса.
 
 ## theory
 ### Три разных «ШИМ» на одной плате
 Новичок называет «ШИМом» всё, что идёт из пада. На деле это три разных сигнала:
 
-| Сигнал | Что передаётся | Период / частота | В Betaflight 4.5 |
+| Сигнал | Что передаётся | Период / частота | В Betaflight 2025.12 |
 |---|---|---|---|
 | Моторный PWM | импульс 1000–2000 мкс | `motor_pwm_rate` 480 Гц (200–32000); для PWM всегда асинхронно и не выше 480 Гц, для OneShot/Multishot — только при `use_unsynced_pwm` | `motor_pwm_protocol = PWM`, старые ESC с калибровкой |
 | OneShot125 / 42 / Multishot | короткий импульс 125–250 / 42–84 / 5–25 мкс | раз в цикл PID (синхронно) | там же; аналог, нужна калибровка |
@@ -42,7 +42,7 @@ next:
 
 DShot — не ШИМ: ESC читает биты, а не ширину импульса. Серве всё равно, как часто приходит импульс (в пределах её спецификации), важна **ширина**. Аналоговая серва на 333 Гц может гудеть и греться — частоту выше 50 Гц ставь только для цифровых и по паспорту (в описании `servo_pwm_rate` в INAV: «большинство цифровых серв поддерживают около 330 Гц»). На 498 Гц период 2008 мкс — импульс 2000 ещё влезает, но предел CLI `servo` (до 2500 мкс) уже нет.
 
-PWM-*входы* тоже живы: `feature RX_PPM` и `RX_PARALLEL_PWM` (`input_filtering_mode`, по умолчанию OFF) захватывают импульсы приёмника таймером в режиме input capture. В 4.5 `USE_RX_PPM`/`USE_RX_PWM` стоят в некоудовом блоке `common_pre.h`, а в списке опций Cloud Build API их нет. Для облачной сборки считай, что их нет.
+PWM-*входы* тоже живы: `feature RX_PPM` и `RX_PARALLEL_PWM` (`input_filtering_mode`, по умолчанию OFF) захватывают импульсы приёмника таймером в режиме input capture. `USE_RX_PPM`/`USE_RX_PWM` (и в 4.5, и в 2025.12) стоят в некоудовом блоке `common_pre.h`, а в списке опций Cloud Build API их нет. Для облачной сборки считай, что их нет.
 
 ### Таймер, канал, пад
 В STM32 (и AT32F435) ШИМ делает аппаратный **таймер** TIMx: счётчик с предделителем PSC и периодом ARR. У таймера до 4 **каналов** CH1–CH4 (у TIM1/TIM8 ещё инверсные CH1N–CH3N), каждый канал выведен на одну-две ножки через альтернативную функцию AF. Канал выбирает только **ширину** импульса (регистр CCR), а **период и тактирование общие** для всего таймера. Отсюда главное правило: все выходы одного таймера работают в одном протоколе и на одной частоте.
@@ -57,7 +57,7 @@ DShot бывает двух видов. **Timer + DMA**: каждый мотор
 
 ### Как читать карту платы
 - `resource` — какие функции назначены на какие пины (`resource SERVO 1 B15`). `resource show` — кто реально владеет пинами после загрузки, `resource show all` — плюс `timer show` и `dma show`.
-- `timer show` — какие каналы каких таймеров заняты и кем (`TIM12: CH2 : SERVO 1`), `timer <pin> list` — какие таймеры есть у ножки (`# AF9: TIM12 CH2`), `timer <pin> AF<n>` — выбрать. `timer list` без пина в 4.5 печатает «NOT IMPLEMENTED YET».
+- `timer show` — какие каналы каких таймеров заняты и кем (`TIM12: CH2 : SERVO 1`), `timer <pin> list` — какие таймеры есть у ножки (`# AF9: TIM12 CH2`), `timer <pin> AF<n>` — выбрать. `timer list` без пина печатает «NOT IMPLEMENTED YET» (и в 4.5, и в 2025.12).
 - `dma show` — занятые потоки DMA, `dma pin <pin> <opt>` — сменить поток.
 - Нумерация: `resource SERVO` и `resource MOTOR` считают **с 1**, а `servo`, `smix` и вкладка Servos — **с 0**. `resource SERVO 1` = серва 0 во вкладке.
 - `resource SERVO 2 B10`, когда B10 держит `MOTOR 7`, только печатает `NOTE: B10 already assigned to MOTOR 7.` и не отвязывает мотор. Освобождай явно: `resource MOTOR 7 NONE`.
@@ -73,8 +73,8 @@ DShot бывает двух видов. **Timer + DMA**: каждый мотор
 4. Электролит 470–1000 мкФ на шине серв у разъёма гасит броски при старте. Если серва дёргается при газе — ищи общую землю и наводки, а не «баг прошивки».
 5. Сервы двигаются **и в дизарме**: `writeServos()` идёт каждый цикл PID без проверки арма (кроме хвостовой сервы трикоптера при `tri_unarmed_servo = OFF`). Подвес дёрнется при подаче питания.
 
-### Сервы в Betaflight 4.5: что собрано и как выходы раздаются
-`USE_SERVOS` стоит в блоке `#if !defined(CLOUD_BUILD) && !defined(SITL)` файла `target/common_pre.h`. Локальная «полная» сборка сервы имеет, а **Cloud Build — только с опцией SERVOS** (Other Options в Cloud Build API; в 2025.12 их включает и пакет WING). SITL 4.5 серв не имеет вовсе, поэтому лабораторная — модель на Python. Нет команд `servo`/`smix` в CLI и вкладки Servos — значит, нет опции в сборке. До 8 серв (`MAX_SUPPORTED_SERVOS`), 1 при `USE_QUAD_MIXER_ONLY`.
+### Сервы в Betaflight 2025.12: что собрано и как выходы раздаются
+`USE_SERVOS` стоит в блоке `#if !defined(CLOUD_BUILD) && !defined(SITL)` файла `target/common_pre.h`. Локальная «полная» сборка сервы имеет, а **Cloud Build — только с опцией SERVOS** (Other Options в Cloud Build API) или с пакетом WING, который включает `USE_SERVOS` сам (WING — с 2025.12, в 4.5 только SERVOS). SITL серв не имеет вовсе (ни в 4.5, ни в 2025.12), поэтому лабораторная — модель на Python. Нет команд `servo`/`smix` в CLI и вкладки Servos — значит, нет опции в сборке. До 8 серв (`MAX_SUPPORTED_SERVOS`), 1 при `USE_QUAD_MIXER_ONLY`.
 
 Сервы включаются, если их требует миксер (`TRI`, `FLYING_WING`, `AIRPLANE`, `CUSTOMAIRPLANE`, `CUSTOMTRI`, `GIMBAL`…) или включена `feature SERVO_TILT` / `feature CHANNEL_FORWARDING`. Порядок физических выходов задаёт `writeServos()` (вывод модели, шаг 3):
 - сначала сервы миксера (для `CUSTOMAIRPLANE`: SERVO 1 ← servo[2] FLAPS, SERVO 2 ← servo[3] FLAPPERON_1, … SERVO 6 ← servo[7] THROTTLE);
@@ -84,9 +84,9 @@ DShot бывает двух видов. **Timer + DMA**: каждый мотор
 **`smix` на квадрике не делает ничего.** `servoTable()` вызывает `servoMixer()` только для самолётных и прочих «серво»-миксеров. Свои правила `smix` грузятся только для `CUSTOMAIRPLANE` и `CUSTOMTRI` (`servoConfigureOutput()`). У `QUADX` подвес работает по отдельной формуле SERVO_TILT.
 
 ### `servo`: конечные точки, rate, forward
-`servo <i> <min> <max> <middle> <rate> <forward>` — 6 чисел, i = 0…7. По умолчанию `servo 0 1000 2000 1500 100 -1`. CLI требует 500 ≤ min ≤ middle ≤ max ≤ 2500 и rate −100…100. `forward` — индекс RC-канала с 0 (4 = AUX1, 5 = AUX2), −1 — нет. Документация betaflight.com (Mixer) даёт старый синтаксис с `angleMin/angleMax` — в 4.5 его нет. Если задан `forward`, вместо `middle` берётся канал, пересчитанный из 1000…2000 в min…max (`determineServoMiddleOrForwardFromChannel()`). Результат всегда обрезается в min…max. Реверс подвеса SERVO_TILT — отрицательным `rate`. Реверс forward-канала — на пульте: min > max CLI не примет.
+`servo <i> <min> <max> <middle> <rate> <forward>` — 6 чисел, i = 0…7. По умолчанию `servo 0 1000 2000 1500 100 -1`. CLI требует 500 ≤ min ≤ middle ≤ max ≤ 2500 и rate −100…100. `forward` — индекс RC-канала с 0 (4 = AUX1, 5 = AUX2), −1 — нет. Документация betaflight.com (Mixer) даёт старый синтаксис с `angleMin/angleMax` — ни в 4.5, ни в 2025.12 его нет. Если задан `forward`, вместо `middle` берётся канал, пересчитанный из 1000…2000 в min…max (`determineServoMiddleOrForwardFromChannel()`). Результат всегда обрезается в min…max. Реверс подвеса SERVO_TILT — отрицательным `rate`. Реверс forward-канала — на пульте: min > max CLI не примет.
 
-`servo_center_pulse` (1500) в 4.5 используется только в `servoDevInit()` как начальное значение канала, и `pwmOutConfig()` тут же обнуляет CCR. Центр задаёт `middle` в `servo`.
+`servo_center_pulse` (1500) используется только в `servoDevInit()` как начальное значение канала, и `pwmOutConfig()` тут же обнуляет CCR. Центр задаёт `middle` в `servo`.
 
 ### `smix`: правила миксера серв
 `smix <rule> <servo> <source> <rate> <speed> <min> <max> <box>`: rule 0…15 (`MAX_SERVO_RULES` = 2 × 8), servo 0…7, source 0…13, rate −100…100, speed 0…255, min/max 0…100 (min < max), box 0…3. Источники: 0–2 — стабилизированные крен/тангаж/рыскание (`pidSum × 0.7`, в PASSTHRU — команда стика), 3 — газ, 4–7 — RC крен/тангаж/рыскание/газ, 8–11 — AUX1–AUX4, 12–13 — тангаж/крен подвеса. Правила суммируются. Каждое правило режется в min…max процентов хода **целевой** сервы (0 % = min, 50 % = центр). Сумма умножается на `rate` из `servo` и прибавляется к `middle`. Особенности кода:
@@ -95,7 +95,7 @@ DShot бывает двух видов. **Timer + DMA**: каждый мотор
 - `smix reverse <servo> <source> r|n` переворачивает знак после ограничения правила; `smix reset` стирает правила и все реверсы;
 - box 1–3 — правило работает только в режиме SERVO1–3 (есть в Modes только при `CUSTOMAIRPLANE`).
 
-Таблица номеров серв на странице Mixer (2 = ELEVATOR, 6 = THROTTLE, 7 = FLAPS) **не совпадает** с `servoIndex_e` в 4.5: 2 = FLAPS, 3/4 = FLAPPERON_1/2, 5 = RUDDER, 6 = ELEVATOR, 7 = THROTTLE. Верь исходнику.
+Таблица номеров серв на странице Mixer (2 = ELEVATOR, 6 = THROTTLE, 7 = FLAPS) **не совпадает** с `servoIndex_e` (4.5 и 2025.12): 2 = FLAPS, 3/4 = FLAPPERON_1/2, 5 = RUDDER, 6 = ELEVATOR, 7 = THROTTLE. Верь исходнику.
 
 ### SERVO_TILT, CAMSTAB и channel forwarding
 `feature SERVO_TILT` даёт две сервы подвеса и режим CAMSTAB (id 8) в Modes. Без CAMSTAB сервы стоят в `middle` (или идут за forward-каналом). С CAMSTAB в режиме `gimbal_mode = NORMAL` (по умолчанию):
@@ -117,7 +117,7 @@ DShot бывает двух видов. **Timer + DMA**: каждый мотор
 | `smix reset` / `load <mixer>` / `reverse <s> <src> r\|n` | — | — | стереть / загрузить шаблон / реверс источника |
 | `servo_pwm_rate` | 50 Гц | 50–498 | частота кадров всех серв |
 | `servo_center_pulse` | 1500 | 750–2250 | начальное значение канала при инициализации |
-| `servo_lowpass_hz` | 0 (выкл.) | 0–400 | biquad ФНЧ серв на частоте PID (в docs — `servo_lowpass_freq`/`_enable`, таких имён в 4.5 нет) |
+| `servo_lowpass_hz` | 0 (выкл.) | 0–400 | biquad ФНЧ серв на частоте PID (в docs — `servo_lowpass_freq`/`_enable`, таких имён нет ни в 4.5, ни в 2025.12) |
 | `channel_forwarding_start` | 4 (AUX1) | 4–18 | первый RC-канал для forwarding |
 | `tri_unarmed_servo` | ON | OFF/ON | хвостовая серва трикоптера в дизарме |
 | `gimbal_mode` | NORMAL | NORMAL/MIXTILT | формула SERVO_TILT |
@@ -129,7 +129,7 @@ DShot бывает двух видов. **Timer + DMA**: каждый мотор
 | `timer show`, `timer <pin> list`, `dma show` | — | — | карта таймеров, AF ножки, потоки DMA |
 
 ### INAV и ArduPilot для сравнения
-| Задача | Betaflight 4.5 | INAV 8 | ArduPilot 4.6 |
+| Задача | Betaflight 2025.12 | INAV 8 | ArduPilot 4.6 |
 |---|---|---|---|
 | назначить выход | `resource SERVO n <pin>` + миксер/фича | вкладка Mixer, `timer_output_mode <timer> AUTO\|MOTORS\|SERVOS\|LED` | `SERVOn_FUNCTION` (7 — тилт подвеса, 8 — крен) |
 | конечные точки | `servo i min max mid rate fwd` | `servo n min max middle rate` | `SERVOn_MIN/MAX/TRIM`, `SERVOn_REVERSED` |
@@ -139,10 +139,10 @@ DShot бывает двух видов. **Timer + DMA**: каждый мотор
 
 Правило «один таймер — один протокол» общее для всех трёх (в ArduPilot — группы выходов, см. модуль про QuadPlane). Самолётные сервы INAV — модуль про настройку крыла, подвесы ArduPilot — модуль про полезную нагрузку.
 
-**2025.12:** имена `servo_*`, `smix`, `servo` те же. Добавлены `SERVO5_PIN`…`SERVO8_PIN` в конфигах плат, пакет WING (включает SERVOS) и последовательный подвес `gimbal_*` (функция порта GIMBAL, опция GIMBAL). Последний к сервам не относится.
+**Отличия от 4.5:** имена, умолчания и диапазоны `servo_*`, команды `smix` и `servo` и формулы `servos.c` одинаковы. В 2025.12 добавлены: чтение `SERVO5_PIN`…`SERVO8_PIN` из конфига платы в `pgResetFn_servoConfig()` (в 4.5 по умолчанию назначались только четыре), пакет WING (включает SERVOS), запись серв в Blackbox (`servo[0..7]`, `blackbox_disable_servos`) и последовательный подвес `gimbal_*` (функция порта GIMBAL, опция GIMBAL). Последний к сервам не относится.
 
 ## practice
-Основной путь — Python-модель. Betaflight SITL 4.5 собран без `USE_SERVOS` (условие `!defined(SITL)` в `common_pre.h`), а сборка SITL в этой среде всё равно запрещена политикой. Скрипт `bf-servos-pwm.servo_lab.py` (рабочая папка курса, этап 6) читает конфиг платы из `betaflight/config` ветки `4.5-config` и исходник 4.5: таблицу `fullTimerHardware[]` (`timer_stm32f4xx.c`), константы `servos.h`, `servos.c`, `dshot_dpwm.h`. Затем он повторяет `timerGetByTagAndIndex()`, `servoDevInit()`, `writeServos()`, `servoTable()` и `servoMixer()` с целочисленной арифметикой C. Всё ниже — реальный прогон.
+Основной путь — Python-модель. Скрипт и вывод сняты на исходнике 4.5.6 и конфиге ветки `4.5-config`; формулы `servos.c` (`servoTable()`, `servoMixer()`, `writeServos()`) в 2025.12 не изменились, а драйверы таймеров переехали из `src/main/drivers/stm32/` в `src/platform/STM32/`, поэтому путь к `timer_stm32f4xx.c` для дерева 2025.12 другой. Betaflight SITL (4.5 и 2025.12) собран без `USE_SERVOS` (условие `!defined(SITL)` в `common_pre.h`), а сборка SITL в этой среде всё равно запрещена политикой. Скрипт `bf-servos-pwm.servo_lab.py` (рабочая папка курса, этап 6) читает конфиг платы из `betaflight/config` ветки `4.5-config` и исходник 4.5: таблицу `fullTimerHardware[]` (`timer_stm32f4xx.c`), константы `servos.h`, `servos.c`, `dshot_dpwm.h`. Затем он повторяет `timerGetByTagAndIndex()`, `servoDevInit()`, `writeServos()`, `servoTable()` и `servoMixer()` с целочисленной арифметикой C. Всё ниже — реальный прогон.
 
 ### Шаг 1. Карта таймеров настоящей платы
 ```
@@ -260,7 +260,7 @@ speed 10, PID 8000 Hz: 0 -> 500 (1500 -> 2000 us) in 50 loops =    6.2 ms
 2. Введи конфиг шага 2 под свою плату: сначала `timer <pin> list` и `resource show all`. Пад сервы не должен делить таймер с моторами, LED_STRIP, CAMERA_CONTROL и пейсером bitbang. После `save` проверь `timer show`.
 3. Питание: отдельный BEC 5–6 В (по серве), земля BEC ↔ GND полётника, сигнал с пада. Конденсатор 470–1000 мкФ на шине. Мультиметром на упоре (рукой придержи качалку на 1 с) запиши ток. Он должен быть меньше номинала BEC.
 4. Импульс: тестер серв в режиме измерения или осциллограф/логический анализатор на паде. Ожидаемо: период 20.0 мс (50 Гц), ширина 1500 ± 5 мкс в центре. Пульт → AUX: 1000/2000 мкс на краях forward-канала.
-5. Configurator → Servos (номера с 0) или Motors: значения совпадают с замером. Подбери `min`/`max` так, чтобы серва не упиралась в механику: гул и ток на краю — признак упора. Сократи ход на 20–50 мкс.
+5. Betaflight App → Servos (номера с 0) или Motors: значения совпадают с замером. Подбери `min`/`max` так, чтобы серва не упиралась в механику: гул и ток на краю — признак упора. Сократи ход на 20–50 мкс.
 6. Моторы: на вкладке Motors без пропов каждый мотор крутится от своего ползунка, DShot-ошибок нет. Серва при этом не дёргается.
 7. Подвес: `feature SERVO_TILT`, CAMSTAB на тумблер. Наклони раму рукой на 20° по тангажу — камера должна остаться горизонтальной (уровень или приложение-уровнемер на камере, допуск ±3°). Уходит вдвое дальше — уменьши `rate`. Уходит не в ту сторону — смени знак.
 
@@ -269,7 +269,7 @@ speed 10, PID 8000 Hz: 0 -> 500 (1500 -> 2000 us) in 50 loops =    6.2 ms
 **Полёт (опционально):** висение 1–2 м в ANGLE, CAMSTAB включён. Прерывание: дрожь картинки сильнее, чем без стабилизации (включи `servo_lowpass_hz` 20–40), сброс полётника, просадка 5 В в OSD.
 
 Лабораторная засчитывается, когда:
-- (модель) скрипт запущен на конфиге своей или учебной платы и исходнике 4.5; приложена таблица таймеров и выбран пад сервы с объяснением, почему он не ломает DShot;
+- (модель) скрипт запущен на конфиге своей или учебной платы и исходнике (укажи версию); приложена таблица таймеров и выбран пад сервы с объяснением, почему он не ломает DShot;
 - (модель) посчитан `rate` SERVO_TILT для своей сервы (мкс/° из паспорта) и импульс при наклоне 10° и 20°;
 - (железо) `timer show` после `save` показывает серву на своём таймере, моторы без ошибок, на осциллографе или тестере 20 мс и 1500 ± 5 мкс;
 - (железо) серва питается от отдельного BEC с общей землёй, ток упора записан, наклон рамы на 20° компенсируется с ошибкой ≤ 3°.
@@ -315,6 +315,7 @@ speed 10, PID 8000 Hz: 0 -> 500 (1500 -> 2000 us) in 50 loops =    6.2 ms
 - `diff all` до и после сохранён
 
 ## references
+- servos.c — Betaflight 2025.12.5 (те же формулы; SERVO5_PIN…SERVO8_PIN) | https://raw.githubusercontent.com/betaflight/betaflight/2025.12.5/src/main/flight/servos.c | primary | A
 - servos.c — Betaflight 4.5-maintenance (servoTable, servoMixer, writeServos) | https://raw.githubusercontent.com/betaflight/betaflight/4.5-maintenance/src/main/flight/servos.c | primary | A
 - servos.h — servoIndex_e, input sources, defaults, Betaflight 4.5-maintenance | https://raw.githubusercontent.com/betaflight/betaflight/4.5-maintenance/src/main/flight/servos.h | primary | A
 - pwm_output.c — servoDevInit, pwmOutConfig, Betaflight 4.5-maintenance | https://raw.githubusercontent.com/betaflight/betaflight/4.5-maintenance/src/main/drivers/stm32/pwm_output.c | primary | A
@@ -332,4 +333,4 @@ speed 10, PID 8000 Hz: 0 -> 500 (1500 -> 2000 us) in 50 loops =    6.2 ms
 - MG996R datasheet — Tower Pro (stall current 2.5 A at 6 V) | https://people.ece.cornell.edu/land/courses/ece4760/FinalProjects/f2017/kmv48_rp625/kmv48_rp625/kmv48_rp625/MG996RTowerPro.pdf | secondary | B
 
 ## notes
-Страница Mixer на betaflight.com в части серв устарела относительно 4.5: синтаксис `servo` с `angleMin/angleMax` (в 4.5 — 6 чисел), `servo_lowpass_freq`/`servo_lowpass_enable` (в 4.5 — одна `servo_lowpass_hz`), таблица номеров серв для `smix` (в 4.5 2 = FLAPS, 6 = ELEVATOR, 7 = THROTTLE), «speed per loop (1 ms default)» (цикл PID сейчас 8 кГц), «smix reverse per-profile» (в 4.5 реверсы лежат в `servoParams`, профилей серв нет). Страница Servos & Servo Tilt верно говорит про нумерацию `resource` с 1, но её примеры для F1/F3 (NAZE32, SPRacing F3) к 4.5 не относятся. Аудит курса предполагал серво-лабораторную в SITL. В 4.5 SITL собран без `USE_SERVOS`, поэтому здесь модель.
+Страница Mixer на betaflight.com в части серв устарела относительно кода 4.5 и 2025.12: синтаксис `servo` с `angleMin/angleMax` (в коде — 6 чисел), `servo_lowpass_freq`/`servo_lowpass_enable` (в коде — одна `servo_lowpass_hz`), таблица номеров серв для `smix` (в коде 2 = FLAPS, 6 = ELEVATOR, 7 = THROTTLE), «speed per loop (1 ms default)» (цикл PID сейчас 8 кГц), «smix reverse per-profile» (реверсы лежат в `servoParams`, профилей серв нет). Страница Servos & Servo Tilt верно говорит про нумерацию `resource` с 1, но её примеры для F1/F3 (NAZE32, SPRacing F3) к 4.5 не относятся. Аудит курса предполагал серво-лабораторную в SITL. SITL (4.5 и 2025.12) собран без `USE_SERVOS`, поэтому здесь модель.

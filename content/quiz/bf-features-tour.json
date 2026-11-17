@@ -3,7 +3,7 @@
  "pass": 80,
  "questions": [
   {
-   "q": "Аппарат лежит вверх ногами. Как в Betaflight 4.5 правильно войти в turtle mode и выйти из него?",
+   "q": "Аппарат лежит вверх ногами. Как в Betaflight 2025.12 правильно войти в turtle mode и выйти из него (способ, работающий в любой версии)?",
    "options": [
     "ARM, затем тумблер turtle; выход — выключить тумблер turtle в любой момент",
     "Тумблер turtle, затем ARM; выход — дизарм, turtle выкл., снова ARM",
@@ -11,23 +11,23 @@
     "ARM стиками с газом в центре; выход — повторный жест арма"
    ],
    "answer": 1,
-   "explain": "tryArm() отправляет DShot-команду 21 (реверс), только если режим активен в момент арма. Состояние flipOverAfterCrashActive сбрасывается при дизарме, а следующий арм без режима отправляет команду 20 (нормальное направление). Выключенный при арме тумблер ничего не меняет."
+   "explain": "tryArm() отправляет DShot-команду 21 (реверс), только если режим активен в момент арма. Состояние crashFlipModeActive (в 4.5 — flipOverAfterCrashActive) сбрасывается при дизарме, а следующий арм без режима отправляет команду 20 (нормальное направление). В 4.5 выключенный при арме тумблер ничего не меняет; в 2025.12 его выключение при crashflip_auto_rearm = OFF вызывает дизарм и флаг FLIP_SWITCH, так что ручной дизарм и новый арм нужны всё равно."
   },
   {
    "q": "Фрагмент CLI. Почему dynamic idle не работает?",
    "kind": "apply",
-   "fragment": "# get dyn_idle_min_rpm\ndyn_idle_min_rpm = 35\n# get dshot_bidir\ndshot_bidir = OFF\n# get motor_pwm_protocol\nmotor_pwm_protocol = DSHOT600\n# get dshot_idle_value\ndshot_idle_value = 550",
+   "fragment": "# get dyn_idle_min_rpm\ndyn_idle_min_rpm = 35\n# get dshot_bidir\ndshot_bidir = OFF\n# get motor_pwm_protocol\nmotor_pwm_protocol = DSHOT600\n# get motor_idle\nmotor_idle = 550",
    "options": [
     "35 больше допустимого предела, нужно ≤ 20",
-    "dshot_idle_value 550 перекрывает цель dynamic idle и отключает его регулятор",
+    "motor_idle 550 перекрывает цель dynamic idle и отключает его регулятор",
     "Без телеметрии eRPM цель dynamic idle обнуляется при инициализации",
     "DSHOT600 несовместим с dynamic idle, нужен DSHOT300"
    ],
    "answer": 2,
-   "explain": "mixerInitProfile(): dynIdleMinRps = dyn_idle_min_rpm·100/60, только если useDshotTelemetry, иначе 0. Ошибки нет, функция просто не работает. Диапазон dyn_idle_min_rpm 0–200, а dshot_idle_value при работающем dynamic idle игнорируется."
+   "explain": "mixerInitProfile(): dynIdleMinRps = dyn_idle_min_rpm·100/60, только если useDshotTelemetry, иначе 0. Ошибки нет, функция просто не работает. Диапазон dyn_idle_min_rpm 0–200, а motor_idle (до 2025.12 — dshot_idle_value) при работающем dynamic idle полом не служит."
   },
   {
-   "q": "Betaflight 4.5, рейты по умолчанию (Actual, roll_rc_rate 7, roll_srate 67, expo 0), angle_limit 60. Какой целевой угол крена в Angle при стике на 50 % хода?",
+   "q": "Betaflight 2025.12, рейты по умолчанию (Actual, roll_rc_rate 7, roll_srate 67, expo 0), angle_limit 60. Какой целевой угол крена в Angle при стике на 50 % хода?",
    "options": [
     "30°",
     "16.6°",
@@ -38,7 +38,7 @@
    "explain": "pidLevel(): цель = angle_limit · setpoint / max_rate. Setpoint на полстика = 0.5·70 + 600·0.5·0.5 = 185 °/с, максимум 670 °/с, 60·185/670 = 16.6°. 30° было бы при линейных рейтах, 27.5° — по старой формуле 4.4 с level_limit 55."
   },
   {
-   "q": "Horizon в 4.5 с умолчаниями (horizon_level_strength 75, horizon_limit_sticks 75, horizon_limit_degrees 135). Аппарат ровный, стик крена на 50 %. Какая сила выравнивания?",
+   "q": "Horizon в 2025.12 с умолчаниями (horizon_level_strength 75, horizon_limit_sticks 75, horizon_limit_degrees 135). Аппарат ровный, стик крена на 50 %. Какая сила выравнивания?",
    "options": [
     "0.75",
     "0.50",
@@ -60,7 +60,7 @@
    "explain": "3d_deadband_low/high, 3d_neutral и 3d_limit_* читает только analogInitEndpoints() (drivers/motor.c). При DShot разделение фиксировано в dshot.c: 48–1047 — назад, 1048–2047 — вперёд. Арм зависит от 3d_deadband_throttle вокруг mid_rc."
   },
   {
-   "q": "Тумблер LAUNCH CONTROL включён, но после арма OSD не показывает LAUNCH. Какая из причин действительно блокирует launch control в 4.5?",
+   "q": "Тумблер LAUNCH CONTROL включён, но после арма OSD не показывает LAUNCH. Какая из причин действительно блокирует launch control в 2025.12?",
    "options": [
     "Включён airmode",
     "Не задан launch_angle_limit, поэтому режиму не на что опереться",
@@ -90,7 +90,7 @@
     "12.5 %"
    ],
    "answer": 3,
-   "explain": "Ошибка (3000 − 2000)/60 = 16.67 об/с, P = 50·0.00015 = 0.0075 на 1 об/с, итого 0.125 = 12.5 %. Это меньше предела dyn_idle_max_increase (15 %). Предел 5 % (dyn_idle_start_increase) действует только до защёлкивания airmode."
+   "explain": "Ошибка (3000 − 2000)/60 = 16.67 об/с, P = 50·0.00015 = 0.0075 на 1 об/с, итого 0.125 = 12.5 %. Это меньше предела dyn_idle_max_increase (15 %). До первого подъёма газа выше порога airmode действует меньший предел: в 2025.12 это motor_idle (5.5 %), в 4.5 — dyn_idle_start_increase (5 %)."
   }
  ]
 }

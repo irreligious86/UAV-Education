@@ -3,7 +3,7 @@ id: px4-companion-jetson
 title: "PX4 + Jetson Orin: companion по UART, MAVLink и uXRCE-DDS"
 level: L3
 readingTime: 35 мин
-firmware: PX4 1.15+ · JetPack 6/7
+firmware: PX4 1.17 (сверено с v1.17.0) · JetPack 6/7
 status: published
 tags:
   - Jetson
@@ -48,7 +48,7 @@ Pixhawk (PX4) — стабилизация, EKF, failsafe, миссии; Jetson 
 
 ### Два канала связи
 1. **MAVLink** (MAVSDK, pymavlink, MAVROS): `MAV_1_CONFIG = TELEM2`, `MAV_1_MODE = Onboard` (набор потоков для companion), `SER_TEL2_BAUD = 921600`. Плюс: стандарт, тот же код работает с ArduPilot; минус: ограниченный набор данных и частот.
-2. **uXRCE-DDS**: `UXRCE_DDS_CFG = TELEM2`, та же скорость, MAVLink на этом порту выключен (`MAV_1_CONFIG = Disabled` или перенесён на другой порт). На Jetson — `MicroXRCEAgent serial --dev <порт> -b 921600`; топики `/fmu/out/*`, `/fmu/in/*` из `px4_msgs` **той же версии**, что прошивка (с 1.16 сообщения версионируются, у части топиков суффикс `_v1`). Плюс: внутренние топики PX4 с малой задержкой; минус: только PX4, версии должны совпадать.
+2. **uXRCE-DDS**: `UXRCE_DDS_CFG = TELEM2`, та же скорость, MAVLink на этом порту выключен (`MAV_1_CONFIG = Disabled` или перенесён на другой порт). На Jetson — `MicroXRCEAgent serial --dev <порт> -b 921600`; топики `/fmu/out/*`, `/fmu/in/*` из `px4_msgs` **той же версии**, что прошивка (сообщения версионируются: в 1.17 у части топиков суффикс `_v1` — `vehicle_status_v1`, `vehicle_local_position_v1`, `battery_status_v1`; в 1.16 — только у `vehicle_status`, в 1.15 суффиксов нет). Плюс: внутренние топики PX4 с малой задержкой; минус: только PX4, версии должны совпадать.
 
 На одном порту живёт что-то одно. Нужны оба — MAVLink на TELEM1/USB/Ethernet, DDS на TELEM2.
 
@@ -149,8 +149,8 @@ WantedBy=multi-user.target
   - Что сделать: отдельный DC-DC с запасом, конденсатор на входе, измерить напряжение осциллографом под нагрузкой.
 
 ## references
-- PX4 — Pixhawk + Companion Computer | https://docs.px4.io/main/en/companion_computer/pixhawk_companion.html | primary | A
-- PX4 — uXRCE-DDS (PX4–ROS 2/DDS bridge) | https://docs.px4.io/main/en/middleware/uxrce_dds.html | primary | A
+- PX4 — Pixhawk + Companion Computer | https://docs.px4.io/v1.17/en/companion_computer/pixhawk_companion.html | primary | A
+- PX4 — uXRCE-DDS (PX4–ROS 2/DDS bridge) | https://docs.px4.io/v1.17/en/middleware/uxrce_dds.html | primary | A
 - eProsima — Micro XRCE-DDS Agent | https://github.com/eProsima/Micro-XRCE-DDS-Agent | primary | A
 - NVIDIA Developer Forums — UART1 on expansion pins 8/10 (Orin) | https://forums.developer.nvidia.com/t/how-to-access-uart1-on-expansion-pins-8-10/328934 | secondary | B
 

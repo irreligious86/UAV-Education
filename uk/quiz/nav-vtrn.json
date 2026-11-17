@@ -82,7 +82,7 @@
       "explain": "В AP_NavEKF3_PosVelFusion.cpp: R = sq(constrain(gpsPosAccuracy, EK3_POSNE_M_NSE, 100)). Честная σ от узла зрения (1 м с привязками, 10+ м после долгого счисления) реально меняет вес измерения; до использования приёмника EK3_GPS_CHECK требует hAcc ≤ 5 м."
     },
     {
-      "q": "PX4 1.15: узел привязки выдаёт широту и долготу с σ. Каким входом EKF2 их принять как абсолютную позицию?",
+      "q": "PX4 1.17: узел привязки выдаёт широту и долготу с σ. Каким входом EKF2 их принять как абсолютную позицию?",
       "options": [
         "MAVLink GPS_INPUT и EKF2_GPS_CTRL бит 0",
         "Топик aux_global_position и EKF2_AGP_CTRL бит 0",
@@ -90,7 +90,7 @@
         "ODOMETRY и EKF2_HGT_REF = 3"
       ],
       "answer": 1,
-      "explain": "Приёмник MAVLink PX4 1.15 не обрабатывает GPS_INPUT. EKF2_EV_CTRL принимает внешнее зрение в локальной системе (бит 0 — горизонтальная позиция, бит 3 — yaw), а для глобальных lat/lon есть aux_global_position (uXRCE-DDS /fmu/in/aux_global_position) с EKF2_AGP_NOISE и воротами EKF2_AGP_GATE."
+      "explain": "Приёмник MAVLink PX4 1.17 (как и 1.15) не обрабатывает GPS_INPUT. EKF2_EV_CTRL принимает внешнее зрение в локальной системе (бит 0 — горизонтальная позиция, бит 3 — yaw), а для глобальных lat/lon есть aux_global_position (uXRCE-DDS /fmu/in/aux_global_position) с EKF2_AGP_NOISE и воротами EKF2_AGP_GATE; с 1.16 EKF2_AGP_CTRL по умолчанию 0, бит 0 включают сами."
     }
   ]
 }

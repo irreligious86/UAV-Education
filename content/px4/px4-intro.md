@@ -3,7 +3,7 @@ id: px4-intro
 title: "Введение в PX4"
 level: L2
 readingTime: 20 мин
-firmware: PX4 1.14+ (умолчания сверены с v1.15.4)
+firmware: PX4 1.17 (сверено с v1.17.0)
 status: published
 added: 2026-11-08
 tags:
@@ -65,10 +65,64 @@ QGroundControl: прошивка, выбор airframe, калибровки, п�
 Имена — группами по модулю: `MC_*` (контроллеры мультиротора), `MPC_*` (позиция), `EKF2_*`, `IMU_*`, `COM_*` (commander/failsafe), `NAV_*`, `RTL_*`, `BAT*`, `CA_*` (control allocation), `SER_*`/`MAV_*`/`UXRCE_*` (порты). Полный справочник с диапазонами и умолчаниями — «Parameter Reference» в документации (генерируется из исходников, как у ArduPilot). Экспорт/импорт — QGC → Parameters → Tools (файл `.params`), версионируется (модуль «CI»).
 
 ### Числа для ориентира (умолчания, мультиротор)
-Значения — для PX4 1.14–1.16 (сверено с v1.15.4), отличия 1.17 помечены. Внутренний контур на `IMU_GYRO_RATEMAX` = 800 Гц: у самого параметра умолчание 400, но airframe мультиротора поднимает его до 800 (`rc.mc_defaults`); максимум — 2000 Гц. Фильтр гироскопа `IMU_GYRO_CUTOFF` = 40 Гц, D-term `IMU_DGYRO_CUTOFF` = 30 Гц (с 1.17 — 20) — заметно ниже Betaflight: PX4 рассчитан на более крупные и медленные аппараты, для 5" их поднимают (80–120 / 40–60) вместе с notch по ESC (`IMU_GYRO_DNF_EN`, нужна телеметрия оборотов ESC: в 1.15 — по UART, bidirectional DShot — с 1.16). Максимальный наклон `MPC_TILTMAX_AIR` = 45°, в ручных режимах `MPC_MAN_TILT_MAX` = 35°; максимальная скорость `MPC_XY_VEL_MAX` = 12 м/с.
+Значения — для PX4 1.17 (сверено с v1.17.0), прежние умолчания — в скобках. Внутренний контур на `IMU_GYRO_RATEMAX` = 800 Гц: у самого параметра умолчание 400, но airframe мультиротора поднимает его до 800 (`rc.mc_defaults`); максимум — 2000 Гц. Фильтр гироскопа `IMU_GYRO_CUTOFF` = 40 Гц, D-term `IMU_DGYRO_CUTOFF` = 20 Гц (до 1.17 — 30) — заметно ниже Betaflight: PX4 рассчитан на более крупные и медленные аппараты, для 5" их поднимают (80–120 / 40–60) вместе с notch по ESC (`IMU_GYRO_DNF_EN`, нужны обороты ESC: bidirectional DShot `DSHOT_BIDIR_EN` — есть с 1.16, в 1.15 была только телеметрия ESC по UART `DSHOT_TEL_CFG`). Максимальный наклон `MPC_TILTMAX_AIR` = 45°, в ручных режимах `MPC_MAN_TILT_MAX` = 35°; максимальная скорость `MPC_XY_VEL_MAX` = 12 м/с.
 
 ### Логи ULog и Flight Review
 Лог включается при арме (`SDLOG_MODE`), содержит топики uORB с заданной частотой (`SDLOG_PROFILE` — профили: по умолчанию, высокая частота для тюнинга, ...). Flight Review (веб) рисует: отклик rate (setpoint vs actual), спектр вибраций (acceleration power spectral density — по нему видно моторы и резонансы), оценку GPS/EKF (innovation test ratios — те же «ворота», что в модуле про Калмана), загрузку CPU и RAM, потери RC. `pyulog` (`ulog2csv`) — для Python-анализа (модуль «Python для данных»).
+
+### Переход 1.15 → 1.17: что переименовано и изменилось
+Курс сверен с PX4 v1.17.0; предыдущие релизы — 1.15 (v1.15.4) и 1.16 (v1.16.2). Таблица получена сравнением определений параметров и airframe-умолчаний трёх тегов. Порядок обновления:
+- **Бэкап до прошивки.** QGC → Parameters → Tools → Save to file (`.params`), логи с SD, версия из `ver all`. Этот файл — справка, а не то, что потом загружают целиком.
+- **Обновление через QGC параметры не стирает, но хранятся только значения, которые ты менял.** Всё, что стояло на умолчании, после прошивки молча получает умолчание 1.17: `MC_ROLL_P`/`MC_PITCH_P` 4.0 вместо 6.5, `IMU_DGYRO_CUTOFF` 20 вместо 30. Аппарат, который летал на умолчаниях, полетит иначе — тюн проверяют заново.
+- **Удалённые параметры не переносятся.** Автоматически переводятся только единичные имена (в `param_translation.cpp` 1.17 из актуального — `SDLOG_MODE` = −1 → `SDLOG_BACKEND` = 0 и `ASPD_FALLBACK_GW` → `ASPD_FALLBACK`). `MPC_HOLD_DZ` → `MAN_DEADZONE`, `BAT1_V_LOAD_DROP`, `COM_POSCTL_NAVL` и остальные строки таблицы — руками.
+- **Чистый старт надёжнее.** Parameters → Tools → Reset all to firmware's defaults (`param reset_all`), заново airframe, калибровки датчиков и радио, затем перенос своих значений из файла по списку, сверяясь с таблицей.
+- **Не переносится вообще:** `.params` из SITL на аппарат; сборка ROS 2 со старым `px4_msgs` (ветка должна соответствовать прошивке, часть топиков получила суффикс `_v1`); на fmu-v6x — настройка приёмника через `RC_PORT_CONFIG` (в сборке 1.17 другой набор RC-драйверов).
+- **После обновления:** тест моторов без пропов, проверка failsafe на столе, короткое висение с логом — как при первой настройке (px4-setup-scratch).
+
+| Было (1.15 / 1.16) | Стало (1.17) | Что изменилось | С версии |
+|---|---|---|---|
+| `BAT1_V_LOAD_DROP` (и `BAT2_`, `BAT3_`) | удалён | поправки на нагрузку «газ × падение» больше нет; без датчика тока напряжение элемента не исправляется | 1.16 |
+| `BAT1_R_INTERNAL` = 0.005 Ом | `BAT1_R_INTERNAL` = −1 | −1 — сопротивление оценивается в полёте; значение ≥ 0 задаёт его вручную | 1.16 |
+| `BAT_N_CELLS`, `BAT_V_EMPTY`, `BAT_V_CHARGED`, `BAT_V_LOAD_DROP` | `BAT1_N_CELLS`, `BAT1_V_EMPTY`, `BAT1_V_CHARGED` | старые имена без номера батареи удалены | 1.16 |
+| `COM_ARM_BAT_MIN` = 0 | `COM_ARM_BAT_MIN` = −1 | −1 — порогом запрета арма служит `BAT_CRIT_THR` | 1.16 |
+| только телеметрия ESC по UART (`DSHOT_TEL_CFG`) | `DSHOT_BIDIR_EN` | bidirectional DShot (eRPM для динамического notch) появился в 1.16; только на поддерживаемых платах и выходах FMU | 1.16 |
+| `DSHOT_MIN`, единица % | `DSHOT_MIN`, единица norm (0…1) | значение по умолчанию 0.055 то же, изменилась только подпись единицы | 1.17 |
+| `msp_osd`: элементы DJI legacy MSP | `msp_osd`: MSP DisplayPort, новый `OSD_RC_STICK` | драйвер переписан; совместимость с конкретными очками PX4 не документирует | 1.16 |
+| `EKF2_EV_CTRL` = 15 | `EKF2_EV_CTRL` = 0 | внешнее зрение по умолчанию выключено — биты включают сами | 1.16 |
+| `EKF2_OF_CTRL` = 0 | `EKF2_OF_CTRL` = 1 | оптический поток по умолчанию включён | 1.16 |
+| `EKF2_AGP_CTRL` = 1 | `EKF2_AGP_CTRL` = 0; новый `EKF2_AGP_MODE` | вход абсолютной позиции по умолчанию выключен (1.16); режим сброса — 1.17 | 1.16 / 1.17 |
+| `EKF2_GPS_CHECK` = 245 (макс. 511) | `EKF2_GPS_CHECK` = 2047 | 1.16: 1023, добавлен бит 9 «Spoofing»; 1.17: бит 10 — тип fix (`EKF2_REQ_FIX`, по умолчанию 3D) | 1.16 / 1.17 |
+| `EKF2_TERR_MASK` | удалён | — | 1.16 |
+| `COM_ARM_EKF_HGT/POS/VEL/YAW`, `COM_POS_FS_DELAY` | удалены | пороги pre-arm по EKF и задержка failsafe позиции больше не настраиваются | 1.16 |
+| — | `COM_POS_LOW_ACT` (3 = Return) | действие при низкой точности позиции в Mission/Hold; порог `COM_POS_LOW_EPH` был и раньше, по умолчанию −1 (выключено) | 1.16 |
+| — | `COM_DLL_EXCEPT` | режимы, в которых потеря канала данных игнорируется | 1.16 |
+| `COM_POSCTL_NAVL` (0 — Altitude, 1 — Land) | удалён | при потере позиции в Position всегда Altitude, без оценки высоты — Stabilized | 1.17 |
+| `COM_FLTT_LOW_ACT` = 3 (Return) | `COM_FLTT_LOW_ACT` = 0 (None) | возврат по остатку времени полёта по умолчанию выключен | 1.17 |
+| `COM_RC_IN_MODE` 0…4 | `COM_RC_IN_MODE` 0…8 | добавлены приоритеты 5–8 (RC и два MAVLink-источника); «Joystick» в подписях заменён на «MAVLink»; умолчание 3 то же | 1.17 |
+| `COM_OBL_RC_ACT`: 2 = Manual | 2 = Stabilized | подпись значения (1.16); в 1.17, если выбран переход в Position/Altitude/Stabilized, а ручного управления нет, выполняется `NAV_RCL_ACT` | 1.16 / 1.17 |
+| `COM_FLTMODEn`: до 13 | добавлено 16 — Altitude Cruise | новый режим полёта | 1.17 |
+| `RC_MAP_ACRO_SW`, `RC_MAP_MAN_SW`, `RC_MAP_POSCTL_SW`, `RC_MAP_RATT_SW`, `RC_MAP_STAB_SW` | удалены | режимы — только через `RC_MAP_FLTMODE` и `COM_FLTMODEn` | 1.16 |
+| `MPC_HOLD_DZ` | `MAN_DEADZONE` (0.1) | мёртвая зона стиков, общая для режимов | 1.17 |
+| `MPC_XY_MAN_EXPO`, `MPC_Z_MAN_EXPO`, `MPC_YAW_EXPO` | удалены | экспонента стиков в Position больше не настраивается (используется прежнее умолчание) | 1.17 |
+| `RCn_DZ` (`RC1_DZ`…`RC18_DZ`) | удалены | мёртвой зоны на канал больше нет; для режимов — `MAN_DEADZONE` | 1.17 |
+| `MC_ROLL_P`, `MC_PITCH_P` = 6.5 | = 4.0 | мягче контур угла; после обновления проверить отклик | 1.17 |
+| `IMU_DGYRO_CUTOFF` = 30 Гц | = 20 Гц | фильтр D-составляющей ниже | 1.17 |
+| `MPC_YAWRAUTO_MAX` = 45 °/с, `MPC_YAWRAUTO_ACC` = 60 °/с² | 60 °/с, 20 °/с² | рыскание в автоматических режимах | 1.17 |
+| `GPS_UBX_DYNMODEL` = 6 у мультиротора (`rc.mc_defaults`) | 7 (умолчание параметра) | airframe больше не переопределяет динамическую модель u-blox | 1.17 |
+| `MAV_PROTO_VER` = 0 | = 2 | MAVLink 2 с первого пакета (значения 0 больше нет: 1 — версия 1 с автопереходом на 2, 2 — версия 2) | 1.17 |
+| `MIS_PD_TO` | `MIS_COMMAND_TOUT` | переименован | 1.16 |
+| `MIS_DIST_1WP` = 900 м | = 10000 м | допустимое расстояние до первой точки миссии | 1.16 |
+| `COM_OBS_AVOID`, сообщения `TRAJECTORY_REPRESENTATION_*` | удалены | интерфейс внешнего планировщика обхода убран; Collision Prevention (`CP_*`) остался | 1.16 |
+| `SDLOG_MODE` = −1 (выключено) | `SDLOG_BACKEND` = 0 | новый параметр: бит 0 — SD, бит 1 — MAVLink, по умолчанию 3 | 1.17 |
+| `msg/VehicleCommand.msg` | `msg/versioned/VehicleCommand.msg` | версионируемые сообщения перенесены в `msg/versioned/` | 1.16 |
+| `/fmu/out/vehicle_status` | `/fmu/out/vehicle_status_v1` | суффикс `_vN` у топиков с версией сообщения > 0 | 1.16 |
+| `/fmu/out/vehicle_local_position`, `battery_status`, `home_position`, `airspeed_validated`; `/fmu/in/vehicle_attitude_setpoint` | те же имена с `_v1` | версия сообщений поднята | 1.17 |
+| — | `UXRCE_DDS_RX_TO`, `UXRCE_DDS_TX_TO` (1.16), `UXRCE_DDS_NS_IDX` (1.17) | таймауты и индексное пространство имён клиента; `UXRCE_DDS_CFG` без изменений | 1.16 / 1.17 |
+| fmu-v6x, default-сборка: `rc_input` (`RC_PORT_CONFIG`) | `crsf_rc`, `sbus_rc`, `dsm_rc`, `ghst_rc` (`RC_CRSF_PRT_CFG`, `RC_SBUS_PRT_CFG`, `RC_DSM_PRT_CFG`, `RC_GHST_PRT_CFG`) | CRSF/ELRS работает без своей сборки, `rc_input` в сборке нет (так же fmu-v5x, fmu-v6xrt) | 1.17 |
+| SITL: `COM_LOW_BAT_ACT` = 2 | SITL: `COM_LOW_BAT_ACT` = 3 | умолчание симулятора (`init.d-posix/rcS`); на полётнике по-прежнему 0 | 1.16 |
+| SITL `gz_x500`: `NAV_DLL_ACT` = 0 | = 2 (Return) | только airframe 4001 симулятора; на полётнике 0 | 1.16 |
+
+Не изменилось и перепроверено по v1.17.0: `IMU_GYRO_RATEMAX` 400 (у мультиротора 800), `RTL_RETURN_ALT` 60 м (у мультиротора 30 м, `RTL_DESCEND_ALT` 10 м), `NAV_DLL_ACT` 0, `NAV_RCL_ACT` 2, `COM_RC_LOSS_T` 0.5 с, `COM_FAIL_ACT_T` 5 с, `COM_OF_LOSS_T` 1 с, `MC_AT_EN` 0 (SITL — 1), пороги `BAT_*_THR`, `MAV_1_CONFIG` = Disabled, цели `make px4_sitl gz_x500` и `make px4_sitl sihsim_quadx`.
 
 {{diagram:px4-qgc-order|Порядок первой настройки PX4 в QGroundControl.}}
 
@@ -123,8 +177,8 @@ make px4_sitl gz_x500
   - Что сделать: модуль «Рама и вибрации», демпферы, балансировка.
 
 ## references
-- PX4 User Guide — Flight Modes (Multicopter) | https://docs.px4.io/main/en/flight_modes_mc/ | primary | A
-- PX4 User Guide — Simulation | https://docs.px4.io/main/en/simulation/ | primary | A
+- PX4 User Guide — Flight Modes (Multicopter) | https://docs.px4.io/v1.17/en/flight_modes_mc/index.html | primary | A
+- PX4 User Guide — Simulation | https://docs.px4.io/v1.17/en/simulation/ | primary | A
 - PX4-Autopilot — source code (GitHub) | https://github.com/PX4/PX4-Autopilot | primary | A
 - QGroundControl — User Guide | https://docs.qgroundcontrol.com/Stable_V5.0/en/ | primary | A
 

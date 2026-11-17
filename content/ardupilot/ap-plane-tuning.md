@@ -3,7 +3,7 @@ id: ap-plane-tuning
 title: "Тюнинг ArduPlane: AUTOTUNE крыла, TECS, навигация L1, посадка"
 level: L3
 readingTime: 40 мин
-firmware: ArduPlane 4.5+
+firmware: ArduPlane 4.7 (сверено с 4.7.2)
 status: published
 tags:
   - ArduPlane
@@ -109,7 +109,7 @@ TECS настраивается *после* тангажа. Начальные 
 - ArduPlane — TECS tuning guide | https://ardupilot.org/plane/docs/tecs-total-energy-control-system-for-speed-height-tuning-guide.html | primary | A
 - ArduPlane — Navigation tuning (L1) | https://ardupilot.org/plane/docs/navigation-tuning.html | primary | A
 - ArduPlane — Automatic landing | https://ardupilot.org/plane/docs/automatic-landing.html | primary | A
-- PX4 — Fixed-wing tuning | https://docs.px4.io/main/en/config_fw/ | primary | A
+- PX4 — Fixed-wing tuning | https://docs.px4.io/v1.17/en/config_fw/index.html | primary | A
 
 ## checklist
 - Настраиваю самолёт в порядке: рули → крен/тангаж → TECS → навигация → посадка

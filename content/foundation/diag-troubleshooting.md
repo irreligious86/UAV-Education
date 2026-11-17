@@ -32,7 +32,7 @@ next:
 5. **Записывай путь.** Шаги с результатами — в заметку; найденная причина — в дерево и в журнал аппарата.
 
 ### Дерево 1. Не армится
-Прочитай причину: Betaflight CLI → `status` → `Arming disable flags: ...`. CLI печатает короткие имена из `runtime_config.c` (FAILSAFE, CALIB, NO_ACC_CAL, CMS, BOOTGRACE, MOTOR_PROTO, DSHOT_TELEM, ARMSWITCH в 4.5 / ARM_SWITCH в 2025.12+); ниже часть флагов названа по документации. Самые частые:
+Прочитай причину: Betaflight CLI → `status` → `Arming disable flags: ...`. CLI печатает короткие имена из `runtime_config.c` (FAILSAFE, CALIB, NO_ACC_CAL, CMS, BOOTGRACE, MOTOR_PROTO, DSHOT_TELEM, ARM_SWITCH — до 2025.12 он назывался ARMSWITCH); ниже часть флагов названа по документации. Самые частые:
 - **RXLOSS / RX_FAILSAFE** — приёмник не даёт каналов. → Порт и протокол (UART, CRSF/SBUS, инверсия для SBUS на F4), бинд, питание приёмника (5 В мультиметром), вкладка Receiver — двигаются ли каналы.
 - **THROTTLE** — газ выше минимума. → Калибровка стиков в пульте, `min_check`, реверс канала.
 - **ANGLE** — аппарат наклонён больше `small_angle`. → Поверхность, калибровка акселерометра.

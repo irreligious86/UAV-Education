@@ -3,7 +3,7 @@ id: f-esc-firmware
 title: "Прошивка ESC: Bluejay, AM32, BLHeli_32 и настройка регулятора"
 level: L2
 readingTime: 30 мин
-firmware: Betaflight 4.4+ · ArduPilot 4.5+ · Bluejay 0.21+ · AM32 2.x
+firmware: Betaflight 2025.12 (сверено с 2025.12.5) · ArduPilot 4.5+ · Bluejay 0.21+ · AM32 2.x
 status: published
 tags:
   - ESC
@@ -47,7 +47,7 @@ next:
 - **Мелодии и beacon.** Звук «потерянного аппарата» после краша — полезная функция, а не игрушка.
 
 ### Как прошивать
-- **Через полётник (passthrough).** Полётник прокидывает сигнальный провод ESC к компьютеру. Betaflight: подключить USB, Configurator закрыть (порт занят), открыть ESC Configurator (esc-configurator.com) в Chrome — для BLHeli_S/Bluejay и AM32; для BLHeli_32 — BLHeliSuite32 (архивная версия). ArduPilot: `SERVO_BLH_AUTO = 1` для моторов (у самолётов — `SERVO_BLH_MASK`), протокол DShot, наземку отключить, USB оставить, в конфигураторе — интерфейс «BLHeli32/AM32 Bootloader (Betaflight/Cleanflight)». Выходы IOMCU (MAIN) passthrough не поддерживают — нужны выходы FMU/AUX.
+- **Через полётник (passthrough).** Полётник прокидывает сигнальный провод ESC к компьютеру. Betaflight: подключить USB, Betaflight App (Configurator) закрыть (порт занят), открыть ESC Configurator (esc-configurator.com) в Chrome — для BLHeli_S/Bluejay и AM32; для BLHeli_32 — BLHeliSuite32 (архивная версия). ArduPilot: `SERVO_BLH_AUTO = 1` для моторов (у самолётов — `SERVO_BLH_MASK`), протокол DShot, наземку отключить, USB оставить, в конфигураторе — интерфейс «BLHeli32/AM32 Bootloader (Betaflight/Cleanflight)». Выходы IOMCU (MAIN) passthrough не поддерживают — нужны выходы FMU/AUX.
 - **Правило таргета.** Прошивка выбирается под конкретную плату ESC (layout/таргет). Неверный таргет — от неправильной работы до сгоревших ключей. Конфигуратор обычно показывает текущий layout — ставить только совпадающий.
 - **Перед прошивкой**: снять винты, сохранить текущие настройки (скриншот или файл), прошивать по одному ESC при сомнениях, батарея с защитой (smoke stopper).
 
