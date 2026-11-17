@@ -34,7 +34,17 @@ Remote ID (Drone ID) — широковещательная трансляция
 Транспорт — Bluetooth (4 legacy и 5 long range) и Wi-Fi (NAN и Beacon). Это **широковещание**, без связи с сервером, поэтому работает без интернета.
 
 ### Кому и когда обязательно
-В США — правило FAA Part 89 (обязательно для большинства полётов с марта 2024): встроенный Remote ID, внешний модуль-«маячок» или полёты только в специально отведённых зонах (FRIA). В ЕС прямой Remote ID — часть требований к классам C1–C3 и к категории specific, плюс регистрационный номер оператора. В других странах правила свои и меняются — проверяйте у своего авиационного регулятора до первого полёта; модуль `f-regulations` — отправная точка.
+Сверено по страницам регуляторов 2026-11-17; правила меняются, перед полётом проверяйте официальную страницу. Это не юридическая консультация.
+
+| Где | Кому обязательно | Как выполнить | Даты |
+|---|---|---|---|
+| США (FAA, Part 89) | каждому аппарату, который обязан быть зарегистрирован: любой полёт по Part 107 и полёты для отдыха на аппарате тяжелее 250 г | встроенный Remote ID, внешний модуль-«маячок» или полёты только в отведённых зонах FRIA | действует (обязательно для большинства полётов с марта 2024) |
+| США, исключение | аппарат не тяжелее 0.55 фунта (250 г), который летает только для отдыха, не регистрируется (14 CFR 48.15) — Remote ID не нужен | — | — |
+| ЕС (EASA) | прямой Remote ID — часть требований к классам C1–C3 и к категории specific; регистрационный номер оператора загружается в систему Remote ID аппарата | встроенный или модуль | действует |
+| Великобритания (CAA) | UK1, UK2, UK3, UK5, UK6 | встроенная функция Direct Remote ID: внести свой Remote ID и включить перед полётом | с 1 января 2026 года |
+| Великобритания, второй этап | UK0 от 100 г с камерой; UK4 (модели), если нет освобождения; самодельные и legacy от 100 г с камерой | встроенный или модуль | с 1 января 2028 года |
+
+Для самодельного FPV-аппарата это значит: в США — модуль-«маячок» (или FRIA), если аппарат зарегистрирован; в Великобритании — срок до 1 января 2028 года, если аппарат от 100 г и с камерой; в ЕС — по классу и категории операции. В других странах правила свои и меняются — проверяйте у своего авиационного регулятора до первого полёта; модуль `f-regulations` — отправная точка и там же таблица официальных страниц.
 
 ### Remote ID на ArduPilot и PX4
 - **Модуль по MAVLink или DroneCAN** берёт координаты у автопилота и транслирует их. Готовые модули (Cube ID, Holybro и другие с поддержкой OpenDroneID) или открытый **ArduRemoteID** — прошивка ArduPilot для плат ESP32-S3/ESP32-C3, подключаемых по MAVLink или DroneCAN (для CAN нужен внешний трансивер).
@@ -124,6 +134,10 @@ m.setup_signing(key, sign_outgoing=True)
 - ArduPilot — Remote ID (OpenDroneID) | https://ardupilot.org/copter/docs/common-remoteid.html | primary | A
 - ArduRemoteID — open Remote ID firmware | https://github.com/ArduPilot/ArduRemoteID | primary | A
 - FAA — Remote Identification of drones | https://www.faa.gov/uas/getting_started/remote_id | primary | A
+- FAA — Recreational Flyers (Remote ID для аппаратов с регистрацией, FRIA; дата обращения 2026-11-17) | https://www.faa.gov/uas/recreational_flyers | primary | A
+- eCFR — 14 CFR Part 48, § 48.15 (кто не регистрируется; дата обращения 2026-11-17) | https://www.ecfr.gov/current/title-14/chapter-I/subchapter-C/part-48 | primary | A
+- UK CAA — Remote ID (классы и даты 2026/2028; дата обращения 2026-11-17) | https://www.caa.co.uk/drones/drone-regulations/policy-programmes/remote-id-rid/ | primary | A
+- EASA — FAQ: Open category (регистрационный номер в системе Remote ID; дата обращения 2026-11-17) | https://www.easa.europa.eu/en/the-agency/faqs/open-category | primary | A
 - ROS 2 — Security (SROS2) | https://docs.ros.org/en/jazzy/Concepts/Intermediate/About-Security.html | primary | A
 
 ## checklist
