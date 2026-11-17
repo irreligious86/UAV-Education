@@ -233,6 +233,20 @@ Rough size: an iteration of 4–5 modules ≈ 25–30k words of Russian source p
    Guides, research notes and pilot reviews are kept (`i18n/<code>/terms.md`, `docs/reviews/i18n-*`).
    (History: 2026-11-10 Russian only, localisation later; 2026-11-15 morning ru+uk together — withdrawn.)
 
+5. Firmware versions (Alex, 2026-11-17): the course targets **today's stable releases** — by release tags
+   on 2026-11-17: ArduCopter/ArduPlane 4.7.2, PX4 1.17.0, INAV 9.1.0, Betaflight 2026.6.2 (to be confirmed
+   as the stable line from the release notes), ExpressLRS 4.1.0. Rules:
+   - Every parameter, default, command and procedure is given for the current stable release.
+   - **Fallback:** where reliable information exists only for an older release (source not readable, feature
+     undocumented in the new one, lab only reproducible on the old one), the older information is used and
+     marked with the version it was verified on. Never present old-version facts as current.
+   - **Renames are always shown for the previous one or two releases**: wherever a parameter, command or
+     setting was renamed, removed or changed its unit/default, the module names the old form next to the new
+     one (e.g. `RTL_ALT_M` — in 4.6 `RTL_ALT`, in centimetres), so a student on an older firmware or reading
+     an older guide can map it. Each firmware track keeps one migration table (old → new, with the version
+     where it changed) and modules link to it.
+   - The front matter `firmware:` field states the release the module was verified against.
+
 ## 5a. Original questions
 
 1. **Order**: the iterations above follow "engineering depth first". Alternatives: applications first
