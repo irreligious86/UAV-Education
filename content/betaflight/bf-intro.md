@@ -156,7 +156,7 @@ Betaflight — форк **Cleanflight** (наследник Baseflight / STM32-�
 | `dyn_idle_start_increase` (50) | — | удалён; предел прибавки до airmode берётся из `motor_idle` | 2025.12 |
 | `feedforward_averaging` OFF, `feedforward_smooth_factor` 25 | 2_POINT и 65 | новые умолчания; добавлены `feedforward_yaw_hold_gain` (15) и `feedforward_yaw_hold_time` (100) | 2025.12 |
 | `rc_smoothing_feedforward_cutoff` | — | удалён; срез FF считается вместе с setpoint | 2025.12 |
-| `tpa_mode` PD / D | PD / D / PDS | добавлено PDS; в сборке WING ещё `tpa_curve_*`, `tpa_speed_*` и отрицательные значения `tpa_low_rate` (на коптере `tpa_low_rate` по-прежнему 0–100, умолчание 20) | 2025.12 |
+| `tpa_mode` PD / D | PD / D; в сборке WING — ещё PDS | на коптере набор значений не менялся; PDS, `tpa_curve_*`, `tpa_speed_*` и отрицательные значения `tpa_low_rate` есть только в сборке WING (на коптере `tpa_low_rate` по-прежнему 0–100, умолчание 20) | 2025.12 |
 | `angle_limit` 10–85 | `angle_limit` 10–80 | умолчание 60 не менялось; в сборке WING добавлен `angle_pitch_offset` | 2025.12 |
 | `dyn_notch_count` 0–5 | `dyn_notch_count` 0–7 | диапазон | 2025.12 |
 | `debug_mode = GYRO_SCALED` | поле лога `gyroUnfilt` | режим удалён; `DUAL_GYRO_*` → `MULTI_GYRO_*`, `D_MIN` → `D_MAX`, `GPS_RESCUE_THROTTLE_PID` → `AUTOPILOT_ALTITUDE`; добавлены TPA, S_TERM, SPA, TASK, GIMBAL, WING_SETPOINT, AUTOPILOT_POSITION, CHIRP, OPTICALFLOW, FLASH_TEST_PRBS, MAVLINK_TELEMETRY | 2025.12 |

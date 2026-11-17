@@ -20,7 +20,7 @@ var T = (typeof window !== "undefined" && window.T) || function (s) { return s; 
     { name: "250Hz", rate: 250, sens: -108, kind: "LoRa" },
     { name: "333Hz Full", rate: 333, sens: -105, kind: T("LoRa, полное разрешение") },
     { name: "500Hz", rate: 500, sens: -105, kind: "LoRa" },
-    { name: "D250", rate: 250, sens: -104, kind: T("DVDA (пакет ×2)") },
+    { name: "D250", rate: 250, sens: -104, kind: T("DVDA (пакет ×4)") },
     { name: "D500", rate: 500, sens: -104, kind: T("DVDA (пакет ×2)") },
     { name: "F500", rate: 500, sens: -104, kind: "FLRC" },
     { name: "F1000", rate: 1000, sens: -104, kind: "FLRC" }

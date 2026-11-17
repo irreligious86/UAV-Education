@@ -58,7 +58,7 @@ PX4 — не одна программа, а набор независимых �
 Параметры — во flash/EEPROM (`param save`, `param reset_all`), миссии и геозона — в `dataman` (SD или flash), логи — SD. Загрузочные скрипты — `ROMFS/px4fmu_common/init.d/` (`rc.*`): какой драйвер стартовать, с какими параметрами, airframe-файлы `init.d/airframes/` — это и есть «выбор airframe» в QGC. Свой модуль добавляется в `boards/<board>/default.px4board` и стартует из `rc.*` или по параметру.
 
 ### Разобранный пример: разбор «аппарат качает по roll»
-1. `listener vehicle_angular_velocity` — частота ~400 Гц? если ниже — перегрузка (`top`).
+1. `listener vehicle_angular_velocity` — частота около `IMU_GYRO_RATEMAX` (у мультиротора 800 Гц, умолчание параметра для остальных — 400)? если заметно ниже — перегрузка (`top`).
 2. `listener vehicle_rates_setpoint` против `vehicle_angular_velocity` в логе: осцилляция только в факте → rate P/D; и в setpoint тоже → attitude P/position.
 3. `uorb top -1` — кто публикует редко/часто необычно (датчик с пропусками → EKF2 inovations).
 4. Flight Review → спектр: пик моторов в полосе? → `IMU_GYRO_CUTOFF`/notch (`IMU_GYRO_NF0_FRQ`/`BW`, `IMU_GYRO_DNF_EN`).
