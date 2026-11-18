@@ -1,6 +1,6 @@
-"""Stage 6 diagrams for module bf-arming-safety (Betaflight 4.5 arming flags, runaway takeoff, yaw spin).
+"""Stage 6 diagrams for module bf-arming-safety (Betaflight 2025.12 arming flags, runaway takeoff, yaw spin).
 
-bf-arming-flag-groups   — the 26 arming-disable flags of 4.5 grouped by what the pilot does about them (svg.tree).
+bf-arming-flag-groups   — the 29 arming-disable flags of 2025.12 (armingDisableFlagNames[] in fc/runtime_config.c) grouped by what the pilot does about them (svg.tree).
 chart-bf-runaway-trip   — the module's worked example B: roll motors swapped, pidSum and gyro after lift-off,
                           trip at 217 ms (|pidSum| >= 600 and gyro > 15 deg/s), disarm 75 ms later at 292 ms
                           (fc/core.c constants; same plant model and numbers as the practice script).
@@ -46,15 +46,16 @@ def build(D: dict) -> None:
     W = 140
     leaf = lambda i, lines: Node(i, lines, leaf=True)
     D["bf-arming-flag-groups"] = tree(
-        "Betaflight 4.5: 26 флагов запрета арма по тому, что делать",
+        "Betaflight 2025.12: 29 флагов запрета арма по тому, что делать",
         Node("r", ["status / OSD /", "пищалка: флаги"], [
-            ("тумблеры, стики", leaf("g1", ["THROTTLE ARMSWITCH", "NOT_DISARMED", "NOPREARM BOXFAILSAFE", "RESCUE_SW"])),
+            ("тумблеры, стики", leaf("g1", ["THROTTLE ARM_SWITCH", "NOT_DISARMED", "NOPREARM BOXFAILSAFE", "RESCUE_SW FLIP_SWITCH",
+                                              "ALT_HOLD_SW", "POS_HOLD_SW"])),
             ("датчики, поза", leaf("g2", ["ANGLE CALIB", "NO_ACC_CAL GPS", "NOGYRO", "BOOTGRACE"])),
             ("связь, меню", leaf("g3", ["RXLOSS FAILSAFE", "MSP CLI CMS", "REBOOT_REQD", "BST"])),
             ("моторы, CPU", leaf("g4", ["MOTOR_PROTO", "DSHOT_TELEM", "DSHOT_BBANG", "LOAD"])),
             ("после сбоя", leaf("g5", ["RUNAWAY CRASH", "PARALYZE", "→ дизарм /", "перезагрузка"])),
         ], accent=True),
-        width=720, box_w=W, box_h=62, gap_y=96)
+        width=720, box_w=W, box_h=80, gap_y=114)
 
     ts, ps, gs, t_trip, t_disarm = _runaway_trace()
     D["chart-bf-runaway-trip"] = chart(

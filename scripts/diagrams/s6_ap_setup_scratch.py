@@ -1,4 +1,4 @@
-"""Stage 6 diagrams for ap-setup-scratch (ArduCopter 4.6 from an empty board to a logged hover).
+"""Stage 6 diagrams for ap-setup-scratch (ArduCopter 4.7 from an empty board to a logged hover).
 
 ap-setup-flow       — the 17 setup steps in order, marked SITL / bench / field (svg.flow)
 chart-ap-batt-cal   — current-sensor calibration from the module's worked example (plot.chart)
@@ -24,7 +24,7 @@ STEPS = [
     (11, "Режимы, арм", "SITL"),
     (12, "FS_THR, BATT_FS", "SITL + стол"),
     (13, "OSD_TYPE", "стол"),
-    (14, "GPS, RTL_ALT", "SITL"),
+    (14, "GPS, RTL_ALT_M", "SITL"),
     (15, "Висение S→AH→L", "SITL → поле"),
     (16, "QuikTune/AutoTune", "поле"),
     (17, "Лог + .param", "SITL + поле"),
@@ -50,7 +50,7 @@ def _flow() -> str:
         (12, h - 20, "До шага 15 пропы сняты: арм, Motor Test, ESC cal и failsafe — без пропов.", "m t"),
         (12, h - 6, "SITL: 1–3, 6, 7, 9–12, 14, 15, 17; bind, RC cal, ESC cal, OSD, тюн — только железо.", "m t"),
     ]
-    return flow("ArduCopter 4.6 с нуля: 17 шагов, где каждый делается", boxes, links, 720, h, notes)
+    return flow("ArduCopter 4.7 с нуля: 17 шагов, где каждый делается", boxes, links, 720, h, notes)
 
 
 def _batt_chart() -> str:

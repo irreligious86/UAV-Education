@@ -54,7 +54,7 @@ next:
 | 16 | Первый тюн | notch, QuikTune или AutoTune | поле | ap-tuning |
 | 17 | Лог и бэкап | `.BIN`, `.param`, сравнение файлов | SITL, поле | ap-logs |
 
-{{diagram:ap-setup-flow|17 шагов настройки ArduCopter 4.6: SITL проходит больше половины цепочки, а bind, калибровки радио и ESC, OSD и тюн существуют только на железе — и пропы появляются только на шаге 15.}}
+{{diagram:ap-setup-flow|17 шагов настройки ArduCopter 4.7: SITL проходит больше половины цепочки, а bind, калибровки радио и ESC, OSD и тюн существуют только на железе — и пропы появляются только на шаге 15.}}
 
 ### Загрузчик и два формата файла
 ArduPilot на ChibiOS ставится в два этапа. Первый раз на плате нет загрузчика ArduPilot (стоит Betaflight или завод), поэтому пишут `arducopter_with_bl.hex` — загрузчик плюс прошивка — через DFU: зажать BOOT, вставить USB, STM32CubeProgrammer. Файл `.apj` этим путём не прошить: его понимает только загрузчик ArduPilot. Все следующие обновления — `.apj` через Mission Planner (Install Firmware или Load custom firmware) или QGroundControl (Vehicle Setup → Firmware, плату вставлять после открытия вкладки). Файлы лежат на firmware.ardupilot.org в папке Copter → stable (или stable-4.7.2) → имя платы, совпадающее с её hwdef. DFU-загрузчик STM32 зашит в ПЗУ, поэтому вернуться на Betaflight можно тем же DFU; перед прошивкой сохрани `diff all` из Betaflight CLI.
