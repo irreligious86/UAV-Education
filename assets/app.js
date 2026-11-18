@@ -124,11 +124,11 @@ var T = (typeof window !== "undefined" && window.T) || function (s) { return s; 
       var earned = g && g.status === "passed" && !g.selfMarked;
       var marked = G.state.done.has(id);
       if (earned && !marked) {
-        btn.textContent = isCap ? T("✓ Сдан по критериям") : (g.tasksTotal ? T("✓ Освоен: квиз сдан, задачи решены, лабораторная выполнена") : T("✓ Освоен: квиз сдан, лабораторная выполнена"));
+        btn.textContent = isCap ? T("✓ Завершён по критериям") : (g.tasksTotal ? T("✓ Освоен: квиз пройден, задачи решены, лабораторная выполнена") : T("✓ Освоен: квиз пройден, лабораторная выполнена"));
         btn.setAttribute("variant", "primary"); btn.setAttribute("disabled", "");
       } else {
         btn.removeAttribute("disabled");
-        btn.textContent = marked ? T("✓ Отмечен вручную — снять отметку") : (isCap ? T("Отметить сданным без критериев") : T("Отметить пройденным без квиза и лабы"));
+        btn.textContent = marked ? T("✓ Отмечен вручную — снять отметку") : (isCap ? T("Отметить завершённым без критериев") : T("Отметить пройденным без квиза и лабы"));
         btn.setAttribute("variant", marked ? "primary" : "secondary");
       }
     });

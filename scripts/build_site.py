@@ -454,6 +454,7 @@ def render_home(model: dict) -> str:
 
     <section class="choose" aria-labelledby="choose-title">
       <h2 class="gc-title" id="choose-title">{_("Как учиться")}</h2>
+      <p>{_("Курс рассчитан на самостоятельное прохождение: наставника и проверяющего нет, весь процесс — на этих страницах. Цикл одного модуля: теория → практика по шагам → самопроверка по критериям в конце практики (число, лог или тест, которые ты получаешь сам) → квиз → расчётные задачи → чек-лист. Модуль отмечаешь пройденным ты сам, когда сошлись критерии и пройдены квиз и задачи. Итоговый проект пути проверяешь по его критериям готовности, автотестам и рубрике самооценки.")}</p>
       <p class="gc-muted">{_("Пути по прошивкам независимы: можно идти по нескольким параллельно в своём темпе — у каждого свой прогресс и своя кнопка «Продолжить». Общие модули засчитываются во всех путях сразу.")}</p>
       <div class="gc-grid ref-grid">
 {chr(10).join(render_path_card(p, model, base) for p in model["paths"])}
@@ -752,7 +753,7 @@ def render_capstone(g: dict, model: dict) -> str:
         for r in c.get("rubric", [])
     )
     rubric_html = (
-        f'<h2>{_("Рубрика: как отличить сделанное от сданного")}</h2>'
+        f'<h2>{_("Рубрика самопроверки: как отличить готовое от сделанного наполовину")}</h2>'
         f'<p class="gc-muted">{_("Проверь свою работу по каждой строке. Если она ближе к левой колонке — проект ещё не готов.")}</p>'
         f'<div class="widget__table-wrap"><table class="rubric"><thead><tr><th>{_("Критерий")}</th><th>{_("Плохо")}</th><th>{_("Хорошо")}</th></tr></thead><tbody>{rubric_rows}</tbody></table></div>'
         if rubric_rows else ""
@@ -763,10 +764,10 @@ def render_capstone(g: dict, model: dict) -> str:
       <div class="module-tags"><span class="gc-tag">{_("Итоговый проект трека {n}", n=g['index'])}</span><span class="gc-tag" data-state="ok" data-done-badge hidden>{_("СДАН")}</span></div>
       <p class="module-lead">{_("Результат:")} {esc(c['result'])}</p>
       <div class="gc-prose module-body">
-        <h2>{_("Что сдать")}</h2>
+        <h2>{_("Что должно получиться")}</h2>
         <ul>{deliver}</ul>
-        <h2>{_("Критерии приёмки")}</h2>
-        <p class="gc-muted">{_("Проект сдан, когда выполнены все пункты. Отмечай по мере готовности:")}</p>
+        <h2>{_("Критерии готовности")}</h2>
+        <p class="gc-muted">{_("Проверяешь себя сам: проект готов, когда каждый пункт выполнен и ты можешь это показать числом, логом или тестом. Отмечай по мере готовности:")}</p>
         <ul class="gc-checklist">{crit}</ul>
         {rubric_html}
         {project_alternatives(g, model, base)}
@@ -774,7 +775,7 @@ def render_capstone(g: dict, model: dict) -> str:
         <ol>{prereq}</ol>
         <div class="gc-callout" data-state="caution"><strong>{_("Безопасность.")}</strong> {_("Всё, что можно сделать в SITL или без пропов, делается там. Реальный полёт — только после наземных тестов, с проверенным failsafe.")}</div>
       </div>
-      <div class="module-done"><gc-button variant="secondary" data-done-toggle="{esc(c['id'])}" data-done-label="{_("сданный")}" data-done-past="{_("Сдан")}">{_("Отметить как сданный")}</gc-button></div>
+      <div class="module-done"><gc-button variant="secondary" data-done-toggle="{esc(c['id'])}" data-done-label="{_("завершённый")}" data-done-past="{_("Завершён")}">{_("Отметить как завершённый")}</gc-button></div>
     </article>"""
     return layout(title=c["title"], base=base, body=body, active="course", description=c.get("result", ""))
 
@@ -790,7 +791,7 @@ def project_alternatives(g: dict, model: dict, base: str) -> str:
         return ""
     items = "".join(f'<li><a href="{base}projects/{esc(p["id"])}.html">{_("Проект {n}", n=p["num"])}: {esc(p["title"])}</a></li>' for p in alts)
     return (f'<h2>{_("Программная альтернатива")}</h2><p class="gc-muted">'
-            + _("Итоговый проект трека можно заменить проектом из каталога «ПО для БАС» — с теми же требованиями к сдаче: критерии, автотесты, README.")
+            + _("Итоговый проект трека можно заменить проектом из каталога «ПО для БАС» — с теми же требованиями: критерии готовности, автотесты, README.")
             + f'</p><ul>{items}</ul>')
 
 
@@ -811,9 +812,9 @@ def render_projects_index(model: dict) -> str:
     cards = "".join(project_card(p, base) for p in sorted(model["projects"], key=lambda p: p["num"]))
     body = f"""    <p class="gc-breadcrumb"><a href="{base}index.html">{_("Курс")}</a><span>{_("Проекты")}</span></p>
     <h1 class="gc-display">{_("Проекты: ПО для БАС")}</h1>
-    <p class="module-lead">{_("Двенадцать программных проектов от веб-GCS до точной посадки по маркеру. Каждый — с архитектурной схемой, этапами, критериями приёмки и автотестом; там, где написан стартер, он лежит в <code>examples/</code> репозитория. Проект может заменить итоговый проект своего трека.")}</p>
+    <p class="module-lead">{_("Двенадцать программных проектов от веб-GCS до точной посадки по маркеру. Каждый — с архитектурной схемой, этапами, критериями готовности и автотестом; там, где написан стартер, он лежит в <code>examples/</code> репозитория. Проект может заменить итоговый проект своего трека.")}</p>
     <div class="gc-prose module-body">
-      <p class="gc-muted">{_("Как работать: возьмите проект, пройдите модули из его списка, сделайте этапы по порядку, сдайте по критериям. Код — в собственном репозитории с README и тестами; «работает у меня» не засчитывается.")}</p>
+      <p class="gc-muted">{_("Как работать: возьмите проект, пройдите модули из его списка, сделайте этапы по порядку, проверьте себя по критериям готовности и автотестам. Код — в собственном репозитории с README и тестами; «работает у меня» критерием не считается.")}</p>
     </div>
     <div class="gc-grid ref-grid">{cards}</div>"""
     return layout(title=_("Проекты"), base=base, body=body, active="course",
@@ -835,10 +836,10 @@ def render_project(p: dict, model: dict) -> str:
     rubric = model.get("project_rubric") or []
     rub_html = ""
     if rubric:
-        names = (_("Засчитано"), _("Хорошо"), _("Отлично"))
+        names = (_("Базовый"), _("Хорошо"), _("Отлично"))
         items = "".join(f"<li><strong>{esc(r['criterion'])}</strong><ul>" +
                         "".join(f"<li><em>{names[k]}:</em> {esc(l)}</li>" for k, l in enumerate(r["levels"])) + "</ul></li>" for r in rubric)
-        rub_html = (f'<h2>{_("Оценка")}</h2><p class="gc-muted">{_("Сдан — когда выполнены все критерии приёмки. Уровень работы — по критериям ниже; каждый уровень включает предыдущий.")}</p>'
+        rub_html = (f'<h2>{_("Самооценка")}</h2><p class="gc-muted">{_("Проект готов, когда выполнены все критерии готовности. Уровень своей работы определи сам по критериям ниже; каждый уровень включает предыдущий.")}</p>'
                     f"<ul>{items}</ul>")
     stretch = "".join(f"<li>{esc(x)}</li>" for x in p.get("stretch", []))
     stretch_html = f"<h2>{_('Задания «на отлично»')}</h2><ul>{stretch}</ul>" if stretch else ""
@@ -865,20 +866,20 @@ def render_project(p: dict, model: dict) -> str:
         {replaces}
         <h2>{_("Этапы")}</h2>
         <ol>{miles}</ol>
-        <h2>{_("Критерии приёмки")}</h2>
-        <p class="gc-muted">{_("Проект сдан, когда выполнены все пункты. Отмечайте по мере готовности:")}</p>
+        <h2>{_("Критерии готовности")}</h2>
+        <p class="gc-muted">{_("Проверяешь себя сам: проект готов, когда каждый пункт выполнен и ты можешь это показать числом, логом или тестом. Отмечай по мере готовности:")}</p>
         <ul class="gc-checklist">{crit}</ul>
         <h2>{_("Автопроверка")}</h2>
         <p>{esc(p.get('autotest', ''))}</p>
         {rub_html}
         {stretch_html}
-        <h2>{_("Что сдать")}</h2>
+        <h2>{_("Что должно получиться")}</h2>
         <ul>{deliver}</ul>
         <h2>{_("Нужные модули")}</h2>
         <ol>{mods}</ol>
         <div class="gc-callout" data-state="caution"><strong>{_("Безопасность.")}</strong> {_("Всё, что управляет аппаратом, сначала проходит тесты и SITL. Реальный полёт — только с проверенным failsafe и пилотом, готовым забрать управление.")}</div>
       </div>
-      <div class="module-done"><gc-button variant="secondary" data-done-toggle="{esc(p['id'])}" data-done-label="{_("сданный")}" data-done-past="{_("Сдан")}">{_("Отметить как сданный")}</gc-button></div>
+      <div class="module-done"><gc-button variant="secondary" data-done-toggle="{esc(p['id'])}" data-done-label="{_("завершённый")}" data-done-past="{_("Завершён")}">{_("Отметить как завершённый")}</gc-button></div>
     </article>"""
     return layout(title=p["title"], base=base, body=body, active="course", description=p["summary"][:200])
 
@@ -1371,7 +1372,7 @@ def render_progress(model: dict) -> str:
 {tracks}
 """ + tr_html("""    <section class="gc-panel">
       <p class="gc-label gc-muted">Данные</p>
-      <p class="gc-muted">Прогресс хранится в этом браузере. Экспортируй, чтобы перенести на другое устройство или показать наставнику.</p>
+      <p class="gc-muted">Прогресс хранится в этом браузере. Экспортируй, чтобы перенести на другое устройство или сохранить копию.</p>
       <div class="progress-actions">
         <gc-button variant="secondary" data-export>Скачать JSON</gc-button>
         <label class="gc-tag" style="cursor:pointer">Импорт JSON <input type="file" accept="application/json" data-import hidden></label>

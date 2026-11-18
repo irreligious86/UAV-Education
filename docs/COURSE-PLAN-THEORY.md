@@ -71,6 +71,16 @@ neighbouring subsystems, what it hands on, and what breaks elsewhere when it is 
 The validator requires the block; new modules are written with it from wave 1 on. Existing 140 modules:
 one pass after wave 0, track by track.
 
+### 4.0c Self-study format (added 2026-11-18, requested by Alex)
+
+The course is self-study: no mentors, no reviewers, no hidden process. Everything that checks the work is on
+the page. Decisions: (1) accounts / exams / admin pages stay in the code but hidden (backend disabled in
+`assets/backend-config.js`; not to be enabled without a new decision); (2) wording: nothing is "handed in" —
+labs end with «Самопроверка: лабораторная выполнена, когда …», projects have «Критерии готовности» and a
+self-assessment rubric; (3) every completion criterion must be checkable by the reader alone — a number, a
+test, or an «Эталон для самопроверки» block; (4) emphasis on quizzes and numeric tasks: every module gets a
+task bank where the topic has formulas (currently 55 of 144), tracked as a Phase 2 item.
+
 ### 4.1 New modules — newcomer and industry block (community study)
 
 | Id | Title (ru) | Track |
@@ -176,4 +186,5 @@ Phase 2 is not estimated yet; SITL labs cost roughly as much again per module.
 |---|---|
 | 0 — migration M1–M5, immediate corrections | corrections published; M1 ArduPilot, M2 Betaflight, M3 PX4, M5 ELRS published 2026-11-18 (reports `docs/reviews/migration-*-2026-11.md`); M4 INAV published 2026-11-18; independent fact-check done (213 statements, 3 errors and 4 imprecise wordings fixed; `docs/reviews/factcheck/migrations-2026-11.md`). Wave 0 complete |
 | «Системность» criterion in rubrics | done 2026-11-18 (`411ae49`) |
+| Self-study format (§4.0c) | UI wording and home-page loop done 2026-11-18; content pass pending |
 | «Место в системе» block in 140 modules | done 2026-11-18; the validator requires it. 28 cross-module inconsistencies reported by the pass — fix pass pending |

@@ -137,8 +137,8 @@ var T = (typeof window !== "undefined" && window.T) || function (s) { return s; 
       this.appendChild(h("p", { class: "gc-label gc-muted", text: T("Результат") }));
       this.appendChild(h("p", { class: "uav-quiz__score", text: this._correct + T(" из ") + total + " · " + pct + "%" }));
       this.appendChild(h("div", { class: "gc-callout", "data-state": ok ? "ok" : "caution" }, [
-        h("strong", { text: ok ? T("Квиз сдан. ") : T("Пока не сдан. ") }),
-        h("span", { text: ok ? T("Засчитан лучший результат. Модуль станет «освоен», когда выполнена и лабораторная.") : T("Перечитай теорию и диагностику, затем попробуй ещё раз. Засчитывается лучшая попытка.") })
+        h("strong", { text: ok ? T("Квиз пройден. ") : T("Пока не пройден. ") }),
+        h("span", { text: ok ? T("Учитывается лучший результат. Модуль станет «освоен», когда выполнена и лабораторная.") : T("Перечитай теорию и диагностику, затем попробуй ещё раз. Засчитывается лучшая попытка.") })
       ]));
       this.appendChild(h("div", { class: "uav-quiz__nav" }, [
         h("gc-button", { variant: "secondary", text: T("Пройти ещё раз"), onclick: function () { self.start(); } })

@@ -86,7 +86,7 @@ ros2 doctor --report | head -20
 ### Шаг 5. tf2
 Опубликуйте статическое преобразование камеры (`ros2 run tf2_ros static_transform_publisher --x 0.1 --z -0.05 --pitch 0.5 --frame-id base_link --child-frame-id camera_link`) и запросите `ros2 run tf2_ros tf2_echo base_link camera_link`. Объясните, почему pitch положительный означает «камера смотрит вниз» в FLU.
 
-Лабораторная засчитывается, когда показан эффект QoS (вывод topic info), CSV логгера получен в SITL и из bag, и объяснено преобразование камеры.
+Самопроверка: лабораторная выполнена, когда показан эффект QoS (вывод topic info), CSV логгера получен в SITL и из bag, и объяснено преобразование камеры.
 
 ## diagnostics
 - **Симптом:** `ros2 topic echo /fmu/out/...` молчит, хотя `topic list` его показывает

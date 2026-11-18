@@ -39,7 +39,7 @@ next:
 MAVLink через MAVSDK проще для простых задач и не требует ROS. uXRCE-DDS — когда нужны ROS-экосистема (навигация, зрение, планирование), низкая задержка и доступ к внутренним топикам.
 
 ### Настройка моста на реальном борту
-PX4: `UXRCE_DDS_CFG` = TELEM2 (порт), `SER_TEL2_BAUD` = 921600; на companion: `MicroXRCEAgent serial --dev /dev/ttyTHS1 -b 921600` (Jetson) или `udp4 -p 8888` для SITL/Wi-Fi. Проверка: `ros2 topic list | grep fmu`, `ros2 topic hz /fmu/out/vehicle_odometry` (ожидаемо десятки–сотни Гц). Если топиков нет: порт занят MAVLink (`MAV_1_CONFIG` на том же TELEM2 — конфликт), скорость, `uxrce_dds_client status` в консоли PX4.
+PX4: `UXRCE_DDS_CFG` = TELEM2 (порт), `SER_TEL2_BAUD` = 921600; на companion: `MicroXRCEAgent serial --dev /dev/ttyTHS1 -b 921600` (Jetson; имя порта зависит от платы и JetPack — `ttyTHS0` или `ttyTHS1`, проверка петлёй в px4-companion-jetson) или `udp4 -p 8888` для SITL/Wi-Fi. Проверка: `ros2 topic list | grep fmu`, `ros2 topic hz /fmu/out/vehicle_odometry` (ожидаемо десятки–сотни Гц). Если топиков нет: порт занят MAVLink (`MAV_1_CONFIG` на том же TELEM2 — конфликт), скорость, `uxrce_dds_client status` в консоли PX4.
 
 ### Системы координат — главный источник ошибок
 PX4 работает в NED (север-восток-вниз) и FRD (вперёд-вправо-вниз); ROS 2 (REP-103) — ENU и FLU. `TrajectorySetpoint.position = [x, y, z]` — NED: z = −10 означает 10 м вверх. Переводы: ENU→NED: (x, y, z) → (y, x, −z); FLU→FRD: (x, y, z) → (x, −y, −z). Пакет `px4_ros_com` содержит утилиты преобразования; MAVROS делает это сам. Ошибка знака по z — классический «аппарат ушёл в землю при взлёте в симуляторе».

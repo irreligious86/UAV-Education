@@ -59,7 +59,7 @@ Pixhawk (PX4) — стабилизация, EKF, failsafe, миссии; Jetson 
 
 ### Место в системе
 
-- **Получает:** питание от отдельного BEC с общей землёй (`el-power-design`); топики и команды PX4 по TELEM2 (`px4-ros2`); кадры камеры CSI (`per-camera`); порт, освобождённый от других драйверов (`px4-setup-scratch`).
+- **Получает:** питание от отдельного BEC с запасом по току (`el-power-design`); топики и команды PX4 по TELEM2 (`px4-ros2`); кадры камеры CSI (`per-camera`); порт, освобождённый от других драйверов (`px4-setup-scratch`).
 - **Отдаёт:** уставки Offboard — контроллеру скорости PX4 (`px4-control`); бюджет задержки «камера → команда» — контуру слежения (`per-tracking`); систему с ROS 2 — узлам (`ros2-px4`).
 - **Если ошибиться здесь:** Jetson в закрытом корпусе без обдува → троттлинг → задержка детекции растёт вдвое → контур слежения теряет запас и раскачивается (`per-edge-ml`, `per-tracking`). MAVLink и uXRCE-DDS на одном TELEM2 → топиков `/fmu/*` нет, узел молчит (`px4-ros2`).
 
@@ -104,7 +104,7 @@ print({k: v / 10 for k, v in cnt.items()}, "Hz")
 ### Шаг 4. uXRCE-DDS-канал
 `MAV_1_CONFIG = Disabled`, `UXRCE_DDS_CFG = TELEM2`, перезагрузка. На Jetson:
 ```bash
-MicroXRCEAgent serial --dev /dev/ttyTHS1 -b 921600
+MicroXRCEAgent serial --dev /dev/ttyTHS1 -b 921600   # your port from step 2
 ros2 topic list | grep fmu                     # versioned names, e.g. ..._v1 since PX4 1.16/1.17
 ros2 topic hz /fmu/out/vehicle_attitude
 ros2 topic echo --once /fmu/out/timesync_status
@@ -112,7 +112,7 @@ ros2 topic echo --once /fmu/out/timesync_status
 Сравнить частоту `vehicle_attitude` с ATTITUDE из шага 3.
 
 ### Шаг 5. Автозапуск агента
-`/etc/systemd/system/xrce-agent.service`:
+`/etc/systemd/system/xrce-agent.service` (в `ExecStart` — свой порт из шага 2, `ttyTHS0` или `ttyTHS1`):
 ```ini
 [Unit]
 Description=Micro XRCE-DDS Agent for PX4
@@ -132,7 +132,7 @@ WantedBy=multi-user.target
 ### Шаг 6. Тепло под нагрузкой
 Запустить детектор (модуль «Компьютерное зрение») на 20 минут в корпусе, писать `tegrastats --interval 1000 --logfile tegra.log`. Найти момент троттлинга (частота GPU падает, температура у предела) и задержку детекции до и после.
 
-Лабораторная засчитывается, когда найден порт петлёй, оба канала проверены с записанными частотами, агент поднимается сам после падения, есть 20-минутный тепловой лог.
+Самопроверка: лабораторная выполнена, когда найден порт петлёй, оба канала проверены с записанными частотами, агент поднимается сам после падения, есть 20-минутный тепловой лог.
 
 ## diagnostics
 - **Симптом:** `Permission denied: /dev/ttyTHS*`
