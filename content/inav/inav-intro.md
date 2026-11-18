@@ -70,6 +70,7 @@ INAV считает позицию и высоту комплементарны�
 | `controlrate_profile` | `use_control_profile` | настройка батарейного профиля: какой control-профиль включать вместе с ним (0 — не менять); только имя | 9.0 |
 | `mixer_pid_profile_linking` | `mixer_control_profile_linking` | только имя; ON — control-профиль следует за профилем миксера (VTOL) | 9.0 |
 | `osd_pan_servo_pwm2centideg` | `osd_pan_servo_range_decadegrees` | имя; число то же (серва на 180° — 18, диапазон −36…36) | 9.0 |
+| входы `smix` 0…59 | 0…60 | новый вход 60 — служебный `MIXER_SWITCH_HELPER`: значение всегда 0, такие правила прошивка создаёт сама при смене профиля миксера, чтобы ограничитель `speed` доработал плавно; номера 0…59 не сдвинулись | 9.x (в 9.1.0 есть) |
 | `reboot_character` | — | убрана | 9.0 |
 | `profile` в старых инструкциях | `control_profile` | команда CLI называется `control_profile` уже в 8.0.1; в 9.1 под это имя приведена документация (`docs/Cli.md`), а ошибка появляется, только если набирать `profile` по старым инструкциям | 9.1 (документация) |
 | `gps_ublox_use_galileo` = OFF, `gps_ublox_use_beidou` = OFF | ON, ON | умолчание; GLONASS по-прежнему OFF | 9.1 |

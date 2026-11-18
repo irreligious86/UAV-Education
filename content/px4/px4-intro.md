@@ -85,6 +85,8 @@ QGroundControl: прошивка, выбор airframe, калибровки, п�
 | `BAT1_R_INTERNAL` = 0.005 Ом | `BAT1_R_INTERNAL` = −1 | −1 — сопротивление оценивается в полёте; значение ≥ 0 задаёт его вручную | 1.16 |
 | `BAT_N_CELLS`, `BAT_V_EMPTY`, `BAT_V_CHARGED`, `BAT_V_LOAD_DROP` | `BAT1_N_CELLS`, `BAT1_V_EMPTY`, `BAT1_V_CHARGED` | старые имена без номера батареи удалены | 1.16 |
 | `COM_ARM_BAT_MIN` = 0 | `COM_ARM_BAT_MIN` = −1 | −1 — порогом запрета арма служит `BAT_CRIT_THR` | 1.16 |
+| `COM_ARM_WO_GPS`: 0 — нужен GPS, 1 — не нужен | 0 — запрет арма, 1 — только предупреждение, 2 — проверка выключена | умолчание 1 то же, смысл значений другой: это реакция на проваленную проверку `EKF2_GPS_CHECK` | 1.16 |
+| — | `COM_RAM_MAX` = 95 % | запрет арма, когда занято больше памяти, чем порог; −1 — проверка выключена (так в SITL) | 1.16 |
 | только телеметрия ESC по UART (`DSHOT_TEL_CFG`) | `DSHOT_BIDIR_EN` | bidirectional DShot (eRPM для динамического notch) появился в 1.16; только на поддерживаемых платах и выходах FMU | 1.16 |
 | `DSHOT_MIN`, единица % | `DSHOT_MIN`, единица norm (0…1) | значение по умолчанию 0.055 то же, изменилась только подпись единицы | 1.17 |
 | `msp_osd`: элементы DJI legacy MSP | `msp_osd`: MSP DisplayPort, новый `OSD_RC_STICK` | драйвер переписан; совместимость с конкретными очками PX4 не документирует | 1.16 |
@@ -95,7 +97,9 @@ QGroundControl: прошивка, выбор airframe, калибровки, п�
 | `EKF2_TERR_MASK` | удалён | — | 1.16 |
 | `COM_ARM_EKF_HGT/POS/VEL/YAW`, `COM_POS_FS_DELAY` | удалены | пороги pre-arm по EKF и задержка failsafe позиции больше не настраиваются | 1.16 |
 | — | `COM_POS_LOW_ACT` (3 = Return) | действие при низкой точности позиции в Mission/Hold; порог `COM_POS_LOW_EPH` был и раньше, по умолчанию −1 (выключено) | 1.16 |
-| — | `COM_DLL_EXCEPT` | режимы, в которых потеря канала данных игнорируется | 1.16 |
+| — | `COM_DLL_EXCEPT` | режимы, в которых потеря канала данных игнорируется: бит 0 Mission, бит 1 Hold, бит 2 Offboard | 1.16 |
+| `COM_RCL_EXCEPT`: биты 0–2 (Mission, Hold, Offboard) | + бит 3 External Mode, бит 4 Altitude Cruise | новые исключения потери RC | 1.17 |
+| `COM_POS_FS_EPH` = 50 м у самолёта и VTOL (`rc.fw_defaults`, `rc.vtol_defaults`) | 5 м (умолчание параметра) | airframe больше не переопределяет порог: позиция теряется при eph > 2.5 × 5 = 12.5 м вместо 125 м | 1.17 |
 | `COM_POSCTL_NAVL` (0 — Altitude, 1 — Land) | удалён | при потере позиции в Position всегда Altitude, без оценки высоты — Stabilized | 1.17 |
 | `COM_FLTT_LOW_ACT` = 3 (Return) | `COM_FLTT_LOW_ACT` = 0 (None) | возврат по остатку времени полёта по умолчанию выключен | 1.17 |
 | `COM_RC_IN_MODE` 0…4 | `COM_RC_IN_MODE` 0…8 | добавлены приоритеты 5–8 (RC и два MAVLink-источника); «Joystick» в подписях заменён на «MAVLink»; умолчание 3 то же | 1.17 |
@@ -112,6 +116,8 @@ QGroundControl: прошивка, выбор airframe, калибровки, п�
 | `MAV_PROTO_VER` = 0 | = 2 | MAVLink 2 с первого пакета (значения 0 больше нет: 1 — версия 1 с автопереходом на 2, 2 — версия 2) | 1.17 |
 | `MIS_PD_TO` | `MIS_COMMAND_TOUT` | переименован | 1.16 |
 | `MIS_DIST_1WP` = 900 м | = 10000 м | допустимое расстояние до первой точки миссии | 1.16 |
+| `RTL_TYPE` 0…3 | `RTL_TYPE` 0…4 | 4 — посадка миссии или дом по миссии в обратном порядке, что ближе по числу точек; rally-точки не учитываются | 1.16 |
+| Return мультиротора и VTOL в висении: всегда остановка и снижение до `RTL_DESCEND_ALT` | при `RTL_LAND_DELAY` = 0 посадка начинается прямо с высоты возврата | остановка на `RTL_DESCEND_ALT` с ожиданием — только при ненулевой задержке | 1.16 |
 | `COM_OBS_AVOID`, сообщения `TRAJECTORY_REPRESENTATION_*` | удалены | интерфейс внешнего планировщика обхода убран; Collision Prevention (`CP_*`) остался | 1.16 |
 | `SDLOG_MODE` = −1 (выключено) | `SDLOG_BACKEND` = 0 | новый параметр: бит 0 — SD, бит 1 — MAVLink, по умолчанию 3 | 1.17 |
 | `msg/VehicleCommand.msg` | `msg/versioned/VehicleCommand.msg` | версионируемые сообщения перенесены в `msg/versioned/` | 1.16 |

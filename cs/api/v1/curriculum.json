@@ -144,8 +144,10 @@
             "inav-gps",
             "inav-setup-scratch",
             "inav-setup-wing",
+            "inav-osd-hd",
             "inav-missions",
             "inav-wing",
+            "inav-mixer-vtol",
             "inav-ipf",
             "diag-troubleshooting"
           ]
@@ -191,7 +193,8 @@
         {
           "title": "Настройка с нуля",
           "modules": [
-            "ap-setup-scratch"
+            "ap-setup-scratch",
+            "ap-osd-video"
           ]
         },
         {
@@ -330,6 +333,7 @@
           "modules": [
             "px4-intro",
             "px4-setup-scratch",
+            "px4-safety-return",
             "px4-architecture",
             "px4-control",
             "ctl-allocation",
@@ -2718,6 +2722,33 @@
           "url": "m/ap-setup-scratch.html"
         },
         {
+          "id": "ap-osd-video",
+          "title": "OSD и видео в ArduPilot: MAX7456, MSP DisplayPort (DJI, Walksnail, HDZero), экраны OSDn, VTX",
+          "level": "L2",
+          "hours": 4.5,
+          "status": "published",
+          "prerequisites": [
+            "ap-setup-scratch",
+            "link-digital-video",
+            "link-vtx"
+          ],
+          "objectives": [
+            "подобрать OSD_TYPE, SERIALn_PROTOCOL и MSP_OPTIONS под аналог, HDZero, Walksnail, DJI O3/O4 и старый DJI",
+            "определить активный экран OSD для любого OSD_SW_METHOD и проверить раскладку на попадание в сетку OSDn_TXT_RES",
+            "настроить пороги OSD_W_*, экраны событий и управление VTX (VTX_POWER, VTX_OPTIONS, пит-режим)"
+          ],
+          "lab": {
+            "title": "OSD без железа: экраны, сетка, порт и три ошибки по учебному файлу параметров",
+            "criteria": [
+              "Экраны по шагу 1 совпали с эталоном: способ 1 — 1, 1, 2, 3, 3 и экран 2 на 2100; способ 0 — 1, 2, 3, 1, 2; способ 2 — экран 1 после 3.0 с; арм — 2, дизарм — 3",
+              "Вне сетки 50×18 найдены ALTITUDE, SATS, FLTMODE и строка STATS; вне 30×16 — HOME, ALTITUDE, STATS, SATS, FLTMODE и два символа MESSAGE",
+              "Для четырёх систем получены тройки (42, 5, 0), (42, 5, 0), (42, 5, 4), (33, 3, 0); маска OSD_OPTIONS равна 49",
+              "В конфигурации аппарата Б найдены ровно три ошибки; для VTX получены 200 мВт, 23.0 ± 0.1 дБм, разница 6.0 ± 0.1 дБ и VTX_OPTIONS = 7"
+            ]
+          },
+          "url": "m/ap-osd-video.html"
+        },
+        {
           "id": "tools-gazebo",
           "title": "Симуляция в Gazebo: миры, датчики, камера в ROS 2 и сценарные тесты",
           "level": "L3",
@@ -4028,6 +4059,32 @@
           "url": "m/inav-setup-wing.html"
         },
         {
+          "id": "inav-osd-hd",
+          "title": "OSD в INAV: аналог и HD (DJI O3/O4, Walksnail, HDZero), раскладки, тревоги, свои элементы",
+          "level": "L2",
+          "hours": 4.5,
+          "status": "published",
+          "prerequisites": [
+            "inav-setup-scratch",
+            "link-digital-video"
+          ],
+          "objectives": [
+            "выбрать функцию порта и osd_video_system под аналог, HDZero, Walksnail, DJI O3/O4 и WTFOS",
+            "читать и составлять строки osd_layout и osd_custom_elements, проверять раскладку на границы сетки",
+            "задать тревоги OSD в единицах прошивки и настроить переключение раскладок"
+          ],
+          "lab": {
+            "title": "OSD без железа: порт и сетка для четырёх систем, разбор osd_layout, пороги тревог",
+            "criteria": [
+              "Для HDZero, Walksnail, DJI O4 и DJI O3 записаны маска 33554432 и значения HDZERO, AVATAR, DJI_NATIVE, BFHDCOMPAT",
+              "По десяти строкам osd_layout: вне 50×18 — элементы 14, 30, 12; вне 30×16 — 15, 23, 14, 30, 12, 7; у элемента 147 ширина 10 клеток, 2 символа за краем 30×16",
+              "Слова раскладки 8258, 9388, 194 получены, 0x2118 и 0x03D5 расшифрованы как (24, 4, виден) и (21, 15, скрыт)",
+              "Пороги тревог совпали с эталоном: 121, 2414, 18, 800, 1112, 3055, 45, 25 (воздушная скорость ±1)"
+            ]
+          },
+          "url": "m/inav-osd-hd.html"
+        },
+        {
           "id": "inav-missions",
           "title": "Миссии INAV: waypoints и CLI wp",
           "level": "L2",
@@ -4072,6 +4129,32 @@
             ]
           },
           "url": "m/inav-wing.html"
+        },
+        {
+          "id": "inav-mixer-vtol",
+          "title": "Миксер INAV целиком: mmix/smix, выходы и таймеры, флапероны, подвесы, mixer profiles и VTOL",
+          "level": "L2",
+          "hours": 6,
+          "status": "published",
+          "prerequisites": [
+            "inav-setup-scratch",
+            "inav-setup-wing"
+          ],
+          "objectives": [
+            "вывести строки mmix из геометрии рамы и посчитать импульс сервы по правилам smix и параметрам servo",
+            "разложить моторы, сервы и LED по таймерам платы и задать timer_output_mode без конфликтов",
+            "собрать два профиля миксера для VTOL и проверить, что делает каждый выход в висении, переходе и самолётном режиме"
+          ],
+          "lab": {
+            "title": "Миксер без железа: mmix гексы, импульсы серв, таймеры MATEKF405TE, три ошибки VTOL 4+1",
+            "criteria": [
+              "Шесть строк mmix гексы X совпали с пресетом Hex X (roll −0.500/±1.000, pitch ±0.866), моторы 1359, 1462, 1538, 1641, 1440, 1560 (±1)",
+              "Импульсы серв 3 и 4 в случаях A–E: 1748/1308, 1369/1792, 1900/1500, 1535/2000, 1900/1442 мкс (±1); обрезка только в случае E; выпуск флаперонов 1.0 с",
+              "MATEKF405TE: при 4 моторах сервам 7 выходов (S5–S11); для 4+1 найдены оба конфликта, решение — timer_output_mode 1 SERVOS и 3 MOTORS, моторы S1–S4 и S11, сервы S5–S8",
+              "Таблица состояний 4+1 совпала с эталоном (мотор 4: стоп / 1300 мкс / газ; серва 1: 1600 / 1600 / 1700 мкс) и названы три ошибки: пустышка −1.000, таймер 4 вместо 40, связка профилей OFF"
+            ]
+          },
+          "url": "m/inav-mixer-vtol.html"
         },
         {
           "id": "inav-ipf",
@@ -4193,6 +4276,32 @@
             ]
           },
           "url": "m/px4-setup-scratch.html"
+        },
+        {
+          "id": "px4-safety-return",
+          "title": "PX4: арм, failsafe, Return и геозона — полная матрица",
+          "level": "L2",
+          "hours": 6,
+          "status": "published",
+          "prerequisites": [
+            "px4-intro",
+            "px4-setup-scratch"
+          ],
+          "objectives": [
+            "найти причину запрета арма по таблице проверок COM_ARM_* и CBRK_*",
+            "определить действие и время failsafe по параметрам и хронологии событий",
+            "рассчитать высоту Return по конусу и согласовать её с геозоной и порогами батареи"
+          ],
+          "lab": {
+            "title": "Разбор набора параметров и хронологии отказов",
+            "criteria": [
+              "Расчёт: времена порогов батареи 90, 234 и 270 с совпали в пределах 1 с",
+              "Расчёт: таблица действий по хронологии совпала с эталоном, времена 200.5 и 205.5 с в пределах 0.2 с",
+              "Расчёт: шесть высот возврата по конусу совпали в пределах 0.1 м",
+              "Найдены три ошибки настройки из эталона, для каждой назван параметр и новое значение"
+            ]
+          },
+          "url": "m/px4-safety-return.html"
         },
         {
           "id": "px4-architecture",

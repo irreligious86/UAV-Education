@@ -188,4 +188,6 @@ Phase 2 is not estimated yet; SITL labs cost roughly as much again per module.
 | «Системность» criterion in rubrics | done 2026-11-18 (`411ae49`) |
 | Self-study format (§4.0c) | done 2026-11-18: UI wording, home-page loop, content pass over all modules (76 «Эталон для самопроверки» blocks, independently verified). Open: ~40 modules lack a reference result for at least one step and 11 have no self-check at all — list in `docs/reviews/self-study-open-items-2026-11.md`, input for Phase 2 |
 | 1 — ops-pilot-training, f-starter-kit, f-micro-whoop, link-edgetx | done 2026-11-18 (fact-check `docs/reviews/factcheck/theory-wave1.md`); course at 144 modules |
+| Self-study repairs (stages 1–3) | done 2026-11-18: broken labs in math-ode-dyn / est-kalman, self-check exercises in the eleven modules that had none, judgement-call criteria and contradictions |
+| 2 — inav-osd-hd, ap-osd-video, px4-safety-return, inav-mixer-vtol | done 2026-11-18 (fact-check `docs/reviews/factcheck/theory-wave2.md`: 5 errors, 6 imprecisions fixed); course at 148 modules. Unverified: DJI O3/O4 recipes in both OSD modules, HDZero text-resolution claim in ap-osd-video |
 | «Место в системе» block in 140 modules | done 2026-11-18; the validator requires it. 28 cross-module inconsistencies fixed or reconciled (2 open), `docs/reviews/cross-module-fixes-2026-11.md` |
