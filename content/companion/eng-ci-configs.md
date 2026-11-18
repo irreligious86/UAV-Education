@@ -119,7 +119,7 @@ if __name__ == "__main__":
 Правила, чьи параметры переименованы между версиями (`RTL_ALT` → `RTL_ALT_M` в 4.7), держите с обоими именами, или проверяйте версию прошивки из README аппарата. Для Betaflight — тот же подход по строкам `set name = value` из `diff all`.
 
 ### Шаг 4. SITL-тест в CI
-Готовая заготовка — в репозитории курса: [examples/sitl-pymavlink](https://github.com/irreligious86/UAV-Education/tree/main/examples/sitl-pymavlink) (`test_failsafe.py` + `ci.yml`). Job с ArduPilot SITL и тестом (RC failsafe → RTL/LAND). Сломать `FS_THR_ENABLE = 0` в `.param` → тест падает. Один PR с изменением параметра, описанием, CI и мержем. Лабораторная: репозиторий с читаемой историей, SITL-тест в CI, одно изменение через PR.
+Готовая заготовка — в репозитории курса: [examples/sitl-pymavlink](https://github.com/irreligious86/UAV-Education/tree/main/examples/sitl-pymavlink) (`test_failsafe.py` + `ci.yml`). Job с ArduPilot SITL и тестом (RC failsafe → RTL/LAND). Сломать `FS_THR_ENABLE = 0` в `.param` → тест падает. Один PR с изменением параметра, описанием, CI и мержем. Лабораторная: репозиторий с читаемой историей, SITL-тест в CI, одно изменение через PR. Самопроверка: на исправных конфигах `check_params.py` печатает `all invariants hold` и возвращает код 0; нарочно сломанное правило делает CI красным, починка возвращает зелёный; с `FS_THR_ENABLE = 0` в `.param` SITL-тест падает; в PR есть изменение, причина и доказательство, и перед мержем ты сам прошёл по нему чек-лист self-review из теории.
 
 ## diagnostics
 - **Симптом:** diff all каждый раз отличается целиком

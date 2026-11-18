@@ -219,7 +219,7 @@ events:
     167.8 s  MODE RTL (reason 4)
 ```
 
-ERR Subsys 5 — радио, 6 — АКБ; MODE reason 3 и 4 — RADIO_FAILSAFE и BATTERY_FAILSAFE. Курсовой проверяльщик `check_lab_log.py --lab failsafe` на этом логе: PASS (реакция 0.0 с). `--lab hover` дал FAIL по просадке АКБ (13.72 → 10.80 В) — её устроили мы сами в шагах 10 и 12, поэтому висение для зачёта пиши отдельным чистым логом. Второй `.param` после настройки и сравнение с первым (Mission Planner → Compare Params или `diff` двух файлов) — это и есть «diff all» ArduPilot.
+ERR Subsys 5 — радио, 6 — АКБ; MODE reason 3 и 4 — RADIO_FAILSAFE и BATTERY_FAILSAFE. Курсовой проверяльщик `check_lab_log.py --lab failsafe` на этом логе: PASS (реакция 0.0 с). `--lab hover` дал FAIL по просадке АКБ (13.72 → 10.80 В) — её устроили мы сами в шагах 10 и 12, поэтому для проверки висения (`--lab hover`) пиши отдельный чистый лог. Второй `.param` после настройки и сравнение с первым (Mission Planner → Compare Params или `diff` двух файлов) — это и есть «diff all» ArduPilot.
 
 ### Переход на реальное железо
 Пропы сняты до пункта 11. АКБ подключать только когда пункт этого требует, полётник — на USB.

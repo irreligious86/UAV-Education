@@ -186,5 +186,6 @@ Phase 2 is not estimated yet; SITL labs cost roughly as much again per module.
 |---|---|
 | 0 — migration M1–M5, immediate corrections | corrections published; M1 ArduPilot, M2 Betaflight, M3 PX4, M5 ELRS published 2026-11-18 (reports `docs/reviews/migration-*-2026-11.md`); M4 INAV published 2026-11-18; independent fact-check done (213 statements, 3 errors and 4 imprecise wordings fixed; `docs/reviews/factcheck/migrations-2026-11.md`). Wave 0 complete |
 | «Системность» criterion in rubrics | done 2026-11-18 (`411ae49`) |
-| Self-study format (§4.0c) | UI wording and home-page loop done 2026-11-18; content pass pending |
-| «Место в системе» block in 140 modules | done 2026-11-18; the validator requires it. 28 cross-module inconsistencies reported by the pass — fix pass pending |
+| Self-study format (§4.0c) | done 2026-11-18: UI wording, home-page loop, content pass over all modules (76 «Эталон для самопроверки» blocks, independently verified). Open: ~40 modules lack a reference result for at least one step and 11 have no self-check at all — list in `docs/reviews/self-study-open-items-2026-11.md`, input for Phase 2 |
+| 1 — ops-pilot-training, f-starter-kit, f-micro-whoop, link-edgetx | done 2026-11-18 (fact-check `docs/reviews/factcheck/theory-wave1.md`); course at 144 modules |
+| «Место в системе» block in 140 modules | done 2026-11-18; the validator requires it. 28 cross-module inconsistencies fixed or reconciled (2 open), `docs/reviews/cross-module-fixes-2026-11.md` |

@@ -186,7 +186,7 @@ param set-default MC_ROLLRATE_P 0.1564
 16. **Лог и бэкап.** ULog в Flight Review: вибрации, газ висения, RC и батарея. `.params` из QGC — в репозиторий аппарата.
 
 Самопроверка: лабораторная выполнена, когда:
-- **SITL:** таблица моторов (номер, позиция, KM) совпадает с `CA_ROTOR*`; в журнале есть цепочка RC loss → Hold → Return → дизарм и battery → Hold → Return → Land с временами; HTE совпал с расчётом 1/(T/W) в пределах 0.01; есть таблица autotune до/после и вывод `param show-for-airframe`.
+- **SITL:** таблица моторов (номер, позиция, KM) совпадает с `CA_ROTOR*`; в журнале есть цепочка RC loss → Hold → Return → дизарм и battery → Hold → Return → Land с временами; HTE совпал с расчётом 1/(T/W) в пределах 0.01; таблица autotune до/после заполнена (в SIH `MC_ROLLRATE_D` после тюна около нуля — модель без задержек и шума) и сохранён вывод `param show-for-airframe`.
 - **Железо:** экспортированный `.params`; таблица теста моторов совпадает с геометрией airframe; ошибка напряжения < 0.05 В/эл; мА·ч по логу в пределах 5 % от зарядки после правки `BAT1_A_PER_V`; RC loss и low battery видны в ULog (`failsafe_flags`, смена `nav_state`); отчёт Flight Review первого 60-секундного висения в Position.
 
 ## diagnostics
