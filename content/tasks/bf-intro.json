@@ -1,0 +1,41 @@
+{
+  "module": "bf-intro",
+  "tasks": [
+    {
+      "id": "pid-loop-period",
+      "title": "Период PID-цикла",
+      "statement": "Гироскоп читается на **{g} Гц**, `pid_process_denom` = **{d}**. Найдите период PID-цикла в микросекундах.",
+      "params": {
+        "g": [
+          4000,
+          8000
+        ],
+        "d": [
+          1,
+          2,
+          4
+        ]
+      },
+      "answer": "1000000*d/g",
+      "unit": "мкс",
+      "tol": 0.001,
+      "solution": "Частота PID = частота гироскопа / `pid_process_denom`, период = 10⁶ · denom / частота гироскопа. 8 кГц и denom 1 — 125 мкс; denom 2 — 4 кГц и 250 мкс."
+    },
+    {
+      "id": "failsafe-landing-time",
+      "title": "Пересчёт failsafe_off_delay",
+      "statement": "В бэкапе от 4.5.3 стоит `set failsafe_off_delay = {v}`. Какое значение `failsafe_landing_time` даст то же время посадки в 2025.12?",
+      "params": {
+        "v": {
+          "min": 10,
+          "max": 200,
+          "step": 10
+        }
+      },
+      "answer": "v/10",
+      "unit": "с",
+      "tol": 0.001,
+      "solution": "`failsafe_off_delay` хранился в десятых долях секунды, `failsafe_landing_time` — в секундах: старое значение делится на 10. Перенесённое числом «50» дало бы 50 с вместо 5."
+    }
+  ]
+}

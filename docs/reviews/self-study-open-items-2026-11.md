@@ -42,3 +42,8 @@ Heading changed by editor: el-measure «### Шаг 5. Отчёт» → «### Ш�
 - ctl-sysid:129 "близкую к расчёту шага 2" — step 2 uses 80→40 Hz but Copter default INS_GYRO_FILTER is 20 Hz
 - ap-safety-fs:81 RPN threshold not stated; ap-plane-tuning:91 no metric; per-landing:110 no tolerance; el-wiring:101 judgement call
 - est-gnss:114 "12 и больше" vs block "20 и больше"; eng-ci-configs:122 checklist name; ros2-nav:54 reaction-delay formula only in Эталон; inav-missions:110 "первая строка" = first wp line
+
+## Status 2026-11-18 (later)
+- DONE: math-ode-dyn steps 1–3 and est-kalman step 1b repaired (commit d6a7325b).
+- DONE: the eleven modules without any self-check now have a no-hardware exercise, criteria and a reference block; 18 task-bank items added (7 new banks).
+- Still open: everything else above; bf-pid-reg-in-bf in-flight tuning steps 2–6 have no numeric pass criteria; est-kalman steps 2–3 qualitative only.
