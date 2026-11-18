@@ -66,6 +66,12 @@ TECS настраивается *после* тангажа. Начальные 
 ### PX4: те же этапы
 Крен и тангаж — `FW_RR_*`, `FW_PR_*` и автотюн fixed-wing; TECS — `FW_T_*` (`FW_T_CLMB_MAX`, `FW_T_SINK_MIN`, `FW_T_SINK_MAX` и др.); навигация — NPFG (`NPFG_PERIOD`, `NPFG_DAMPING`), идея та же, что у L1; посадка — `FW_LND_*`. Набор параметров зависит от версии — сверяйтесь с Fixed-wing tuning своей версии.
 
+### Место в системе
+
+- **Получает:** V_s, крейсер и центровку из `aero-wing` — под них `AIRSPEED_MIN` и `SCALING_SPEED`; правило «внутренний контур раньше внешнего» (`ctl-theory`); закон L1 и смысл `NAVL1_PERIOD` (`ctl-guidance`).
+- **Отдаёт:** `RLL_RATE_*`, `PTCH_RATE_*`, TECS и L1 — режимам AUTO и RTL (`ap-missions`); настройку самолётной части — QuadPlane (`ap-quadplane`).
+- **Если ошибиться здесь:** настроил TECS или L1 раньше крена и тангажа → в миссии «TECS качает высоту» и «L1 виляет», хотя причина во внутренних контурах (`ap-missions`). `TECS_CLMB_MAX` замерен на свежей батарее → в конце полёта самолёт упирается в `THR_MAX` и теряет скорость к `AIRSPEED_MIN`, то есть к сваливанию (`aero-wing`).
+
 ## practice
 ### Шаг 1. SITL-самолёт
 `sim_vehicle.py -v ArduPlane --map --console`. Взлёт в AUTO по стандартной миссии, переключиться в FBWA, проверить, что рули работают в нужную сторону (в SITL — по графику `RCOU`). Записать стартовые `RLL2SRV_TCONST`, `PTCH2SRV_TCONST`, `NAVL1_PERIOD`, `TECS_*`.

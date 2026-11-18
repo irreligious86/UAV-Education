@@ -82,6 +82,12 @@ SLAM после замыкания петли или mocap после перек
 ### PX4 коротко
 EKF2 (1.17): `EKF2_EV_CTRL` — битовая маска (0 — горизонтальная позиция, 1 — вертикальная, 2 — скорость, 3 — yaw; по умолчанию 0 — выключено, нужные биты ставят сами; в 1.15 умолчание было 15), `EKF2_HGT_REF` (0 баро, 1 GPS, 2 дальномер, 3 vision), `EKF2_EV_DELAY` (0 мс по умолчанию, максимум 300) при общем `EKF2_DELAY_MAX` 200 мс, `EKF2_GPS_CTRL = 0` выключает GNSS. Поток: `EKF2_OF_CTRL = 1` (умолчание с 1.16; в 1.15 — 0), `EKF2_OF_DELAY` 20 мс, дальномер обязателен. Принимаются `VISION_POSITION_ESTIMATE` и `ODOMETRY` (`MAV_FRAME_LOCAL_FRD`) на 30–50 Гц; `VICON_POSITION_ESTIMATE` и `GLOBAL_VISION_POSITION_ESTIMATE` не поддерживаются.
 
+### Место в системе
+
+- **Получает:** скорость по потоку и высоту дальномера (`est-alt-sources`); позу от VIO или SLAM (`per-visual-nav`); позу motion capture через ROS 2 (`ros2-ardupilot`); ворота инноваций и задержанный горизонт (`est-kalman`).
+- **Отдаёт:** позицию, скорость и курс в набор `EK3_SRC1_*` — на них работают Loiter, Guided и Auto без GNSS (`ap-ekf`); устойчивую позицию — управлению с companion (`ap-companion`).
+- **Если ошибиться здесь:** поза подана в ENU вместо NED → на земле pre-arm проходит, а в полёте аппарат уходит от цели; ловится проносом руками до установки пропов. Скачок SLAM без `reset_counter` → `XKF4.SP` больше 1, измерения отброшены, затем рывок «исправлять» ошибку (`ap-ekf`, `per-visual-nav`). Занижен `VISO_DELAY_MS` → оценка отстаёт, в контуре позиции фазовый лаг (`est-kalman`).
+
 ## practice
 Стенд: ArduCopter из тега Copter-4.6.3 (сборка — ap-sitl), запуск напрямую, свой экземпляр `-I 1` (MAVLink на TCP 5770): `arducopter -w -S -I 1 --model + --speedup 1 --home -35.363261,149.165230,584,353 --defaults defaults.parm`. Параметры поверх `copter.parm`:
 

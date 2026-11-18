@@ -70,6 +70,12 @@ SITL без внешнего симулятора считает физику п
 
 {{diagram:gazebo-sitl|Gazebo считает физику и датчики, плагин обменивается с SITL по JSON в lockstep; изображения идут в ROS 2 через ros_gz_bridge, наземка и тесты подключаются к SITL по MAVLink.}}
 
+### Место в системе
+
+- **Получает:** команды моторам и сервам от SITL (`ap-sitl`, `px4-intro`); модели и миры SDF; парную версию ROS 2 (`ros2-basics`).
+- **Отдаёт:** физику и показания датчиков — автопилоту; изображения и лидар — в ROS 2 через `ros_gz_bridge` (`ros2-nav`, `per-cv`); видео по GStreamer, как с настоящей камеры (`per-camera`); сценарные тесты — в CI (`eng-ci-configs`).
+- **Если ошибиться здесь:** оставил идеальную камеру без шума и размытия → детектор «работает» в симуляции и теряет цель в поле (`per-cv`). Смешал версии ROS 2 и Gazebo мимо рекомендованной пары → проблемы со сборкой мостов, топиков камеры в ROS 2 нет (`ros2-basics`).
+
 ## practice
 ### Шаг 1. Iris в Gazebo
 Установить Gazebo Harmonic и собрать `ardupilot_gazebo` по README (зависимости, `cmake`, `make`), выставить `GZ_SIM_SYSTEM_PLUGIN_PATH` и `GZ_SIM_RESOURCE_PATH`. Запустить `iris_runway.sdf` и SITL с `-f gazebo-iris --model JSON`. Взлёт в GUIDED на 10 м из MAVProxy. Записать RTF при висении.

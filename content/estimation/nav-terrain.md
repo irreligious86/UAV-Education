@@ -66,6 +66,12 @@ PX4 1.17: базы рельефа на борту нет, следование �
 ### Что было иначе в 4.6
 До 4.7 те же параметры назывались иначе: `WPNAV_RFND_USE`, `WPNAV_SPEED`, `WPNAV_SPEED_UP`, `WPNAV_SPEED_DN` (см/с), `WPNAV_TER_MARGIN` → `WP_RFND_USE`, `WP_SPD`, `WP_SPD_UP`, `WP_SPD_DN` (м/с), `WP_TER_MARGIN`; `RNGFND1_MIN_CM/MAX_CM` (см) → `RNGFND1_MIN/MAX` (м); `RNGFND1_GNDCLEAR` (см) → `RNGFND1_GNDCLR` (м); `RTL_ALT` (см) → `RTL_ALT_M` (м). Только в 4.7: `TERRAIN_OPTIONS` бит 2 и pre-arm на старые DAT; по release notes 4.7.0-beta6 (PR 32943) terrain failsafe срабатывает и тогда, когда не удалось получить высоту рельефа точки миссии: срыв `wp_start()` вызывал его и в 4.6.3, в 4.7.2 в `mode_auto.cpp` добавлены проверки на получение самой точки (10 вызовов `failsafe_terrain_on_event()` против 8). Выбор источника и 5-секундный таймаут те же. Лабораторная ниже снята на 4.6.3: числа в выводах не зависят от имён параметров.
 
+### Место в системе
+
+- **Получает:** высоту от баро, GPS и дальномера (`est-alt-sources`); frame каждой точки миссии (`ap-missions`); тайлы рельефа от GCS по телеметрии.
+- **Отдаёт:** цель по высоте над землёй — контроллеру позиции в AUTO и RTL; terrain failsafe — общей схеме отказов (`ap-safety-fs`); запас высоты над деревьями и строениями — в планирование миссии (`ap-missions`).
+- **Если ошибиться здесь:** `RTL_ALT_TYPE = 0` и гребень выше `RTL_ALT_M` между аппаратом и домом → при RTL по любому failsafe — столкновение со склоном (`ap-safety-fs`). Лидар над водой при `WP_RFND_USE = 1` → данных нет, через 5 с terrain failsafe и RTL; в логе `ERR` Subsys 23 (`ap-logs`). Тайлы не загружены до выезда → terrain-миссия не армится.
+
 ## practice
 SITL из тега Copter-4.6.3 (сборка — модуль ap-sitl), ArduCopter запущен напрямую: `arducopter -S -I 2 --model + --speedup 8 --defaults copter.parm -w --home -35.238,149.150,588,90`. Дом — западное подножие горы Маджура (Канберра), 588 м по SRTM; вершина 876 м в 2.9 км на восток; восточная долина 625 м в 4.5 км. Миссия: `NAV_TAKEOFF` 40 м (frame 3), три `NAV_WAYPOINT` во frame 10 на 40 м — склон (1.4 км), вершина, долина — и `NAV_RETURN_TO_LAUNCH`.
 

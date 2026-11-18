@@ -83,6 +83,12 @@ rclpy.init(); rclpy.spin(Offboard())
 
 {{diagram:px4-offboard-seq|Offboard из ROS 2: поток OffboardControlMode и TrajectorySetpoint до переключения режима, затем команды режима и арма; при обрыве — failsafe.}}
 
+### Место в системе
+
+- **Получает:** топики uORB через `uxrce_dds_client` (`px4-architecture`); порт и скорость `UXRCE_DDS_CFG` на борту (`px4-companion-jetson`); QoS и соглашения об осях ROS 2 (`ros2-basics`).
+- **Отдаёт:** `/fmu/out/*` — узлам ROS 2; `TrajectorySetpoint` — контроллеру позиции (`px4-control`); три сообщения Offboard — автомату состояний (`ros2-px4`) и контуру слежения (`per-tracking`).
+- **Если ошибиться здесь:** отправил уставку в ENU без перевода в NED → z со знаком «вверх» уводит аппарат в землю на взлёте (`math-linalg-rot`). Поток `OffboardControlMode` упал ниже 2 Гц, потому что узел занят инференсом → PX4 выходит из Offboard по `COM_OBL_RC_ACT`, со стороны — самопроизвольная смена режима (`ros2-app-arch`).
+
 ## practice
 ### Шаг 1. Окружение
 ```

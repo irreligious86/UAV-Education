@@ -86,6 +86,8 @@
                 raise RuntimeError(f&quot;cmd {command} rejected: result {ack.result}&quot;)
     raise TimeoutError(f&quot;cmd {command}: no ACK&quot;)</code></pre>
 <p><code>STATUSTEXT</code> параллельно объясняет отказ («PreArm: …»). MAVSDK делает то же под капотом — но понимать, что внутри, нужно, чтобы читать tlog при разборе.</p>
+<h4 class="md-subheading">Место в системе</h4>
+<ul><li><strong>Получает:</strong> байты от транспорта — UART, UDP, радиомодем (<code>mav-routing</code>, <code>link-telemetry-radios</code>); определения сообщений из XML-диалекта, одинаковые на обеих сторонах (<code>mav-protocol</code>).</li><li><strong>Отдаёт:</strong> телеметрию (<code>ATTITUDE</code>, <code>GLOBAL_POSITION_INT</code>, <code>STATUSTEXT</code>) скриптам и GCS; команды, параметры и уставки GUIDED автопилоту (<code>ap-companion</code>); диалог загрузки миссий (<code>ap-missions</code>).</li><li><strong>Если ошибиться здесь:</strong> команда без проверки <code>COMMAND_ACK</code> → скрипт считает, что арм или взлёт прошёл, а автопилот отказал по pre-arm; причина лежит в <code>STATUSTEXT</code>, диалог разобран в <code>mav-services</code>. Потоки выше 5–10 Гц на 57600 → радиомодем захлёбывается, наземка теряет пакеты (<code>link-telemetry-radios</code>).</li></ul>
 
 <h2>Практика</h2>
 <h4 class="md-subheading">Шаг 1. Слушать телеметрию</h4>

@@ -63,6 +63,12 @@ def topic(base, msg_cls):
 ### Gazebo и SITL
 `make px4_sitl gz_x500` — квадрокоптер x500 в Gazebo Harmonic; Документация PX4 (main) рекомендует ROS 2 Jazzy на Ubuntu 24.04; на Ubuntu 22.04 — Humble (так же указано в документации релизов v1.16/v1.17). Агент: `MicroXRCEAgent udp4 -p 8888`. Для повторяемых тестов — headless (`HEADLESS=1`) и фиксированный мир. QGroundControl подключается по UDP 14550 параллельно — им удобно наблюдать режимы и прерывать полёт.
 
+### Место в системе
+
+- **Получает:** топики `/fmu/out/*` и правила Offboard (`px4-ros2`); QoS и время (`ros2-basics`); `px4_msgs` той же версии, что прошивка (`px4-intro`); мир для полёта квадрата (`tools-gazebo`).
+- **Отдаёт:** поток `OffboardControlMode` и `TrajectorySetpoint` — контроллеру позиции PX4 (`px4-control`); автомат `OffboardFSM` — обёртке ArduPilot (`ros2-ardupilot`); роль «решение» — архитектуре приложения (`ros2-app-arch`).
+- **Если ошибиться здесь:** имя топика вписано руками, прошивка обновлена → `vehicle_status` публикуется с суффиксом `_v1` → статус «устарел» → автомат уходит в ABORT на земле (`px4-intro`). Поток прервался дольше `COM_OF_LOSS_T` → PX4 выполняет `COM_OBL_RC_ACT`, а в 1.17 без ручного управления — `NAV_RCL_ACT` (`px4-setup-scratch`).
+
 ## practice
 ### Шаг 1. Тест автомата
 ```bash

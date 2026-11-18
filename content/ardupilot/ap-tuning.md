@@ -54,6 +54,12 @@ Stabilize/AltHold на минимальном весе, полной АКБ («m
 
 {{diagram:ap-tuning-order|Порядок тюнинга: базовые параметры → гармонический notch → QuikTune или ручная настройка → AUTOTUNE → input shaping, с логом после каждого шага.}}
 
+### Место в системе
+
+- **Получает:** спектр шума из батч-сэмплинга (`ctl-signals`, `data-python`); обороты от ESC-телеметрии или bidirectional DShot для notch (`f-motors-esc`); обученный `MOT_THST_HOVER` и первый лог (`ap-setup-scratch`).
+- **Отдаёт:** `ATC_RAT_*` и `ATC_ANG_*` — контурам скорости и угла, поверх которых работают режимы с позицией; гармонический notch — тяжёлым аппаратам (`ap-heavy`); QuikTune и автотюн — VTOL-части QuadPlane (`ap-quadplane`).
+- **Если ошибиться здесь:** вместо notch занизил LPF → задержка съела запас по фазе → осцилляции при прежнем P (`ctl-theory`). Запустил AUTOTUNE без настроенного notch → шум в D-term → прерванный тюнинг или D на уровне `AUTOTUNE_MIN_D`, горячие моторы; видно по `ATUN` и `PIDR` (`ap-logs`).
+
 ## practice
 ### Шаг 1. SITL
 `sim_vehicle.py -v ArduCopter -f quad`: выставить стартовые параметры под 10", AUTOTUNE roll (`AUTOTUNE_AXES = 1`) в AltHold; посмотреть `ATUN` в логе, итоговые `ATC_RAT_RLL_*`. Повторить с `AUTOTUNE_AGGR = 0.05` — сравнить.

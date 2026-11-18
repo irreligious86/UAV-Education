@@ -82,6 +82,8 @@
 <p>Вывод курса: новые сборки — CRSF (ELRS/Crossfire/Tracer); SBUS — только для старого железа.</p>
 <h4 class="md-subheading">Разобранный пример: не работает приёмник</h4>
 <p>F405, SBUS-приёмник подключён к <code>RX3</code>, в Ports — Serial RX на UART3, в Receiver — SBUS; каналов нет. Диагностика: UART3 на этой плате без аппаратного инвертора → мусор. Решения: переставить на порт с инвертором (пад <code>SBUS</code>/<code>RX1</code> по описанию платы), или включить <code>serialrx_inverted = ON</code> только на F7/H7, или сменить приёмник на CRSF (ELRS) — тогда любой UART. Проверка анализатором: idle низкий = инвертированный сигнал (модуль «Измерения»).</p>
+<h4 class="md-subheading">Место в системе</h4>
+<ul><li><strong>Получает:</strong> принятые по радио каналы от приёмника (<code>link-elrs</code>); UART полётника нужной полярности — с инвертором или без (<code>bf-ports</code>, <code>f-fc-sensors</code>).</li><li><strong>Отдаёт:</strong> 16 каналов в шкале 988…2012 мкс — цепочке стика (<code>bf-rates-rc</code>); Link Statistics — LQ и RSSI dBm для OSD (<code>bf-modes-osd</code>); признак потери связи — тишину в CRSF или флаг failsafe в SBUS (<code>bf-failsafe</code>).</li><li><strong>Если ошибиться здесь:</strong> инвертированный SBUS подан на обычный UART платы F4 → вместо кадров мусор, каналов нет, арм запрещён флагом <code>RXLOSS</code> (<code>bf-ports</code>, <code>bf-arming-safety</code>). Концы 988…2012 не приведены к 1000…2000 → последние 2.3 % хода стика мертвы; исправляется командой <code>rxrange</code> (<code>bf-rates-rc</code>).</li></ul>
 
 <h2>Практика</h2>
 <h4 class="md-subheading">Подключение CRSF / ExpressLRS к Betaflight</h4>

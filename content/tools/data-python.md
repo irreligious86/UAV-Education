@@ -128,6 +128,12 @@ print(dt.mean(), dt.std(), np.percentile(dt, 99.9))
 
 {{diagram:log-analysis-pipeline|Конвейер анализа лога на Python: CSV → DataFrame → общая ось времени → спектры и метрики → отчёт.}}
 
+### Место в системе
+
+- **Получает:** логи: CSV из `blackbox_decode` (`bf-blackbox`), DataFlash `.bin` (`ap-logs`), ULog через `pyulog` (`px4-intro`); частоту логирования; смысл спектра и спектрограммы (`ctl-signals`).
+- **Отдаёт:** числа «до/после» — overshoot, время установления, bounce-back, спектры — тюнингу (`bf-pid`, `ap-tuning`); оценки по спектрам — идентификации (`ctl-sysid`).
+- **Если ошибиться здесь:** сравнил спектры с разными fs и `nperseg` → «улучшение» оказалось артефактом → фильтры меняют зря (`bf-filters`). Взял участок с газом в пол → пики размазались по частотам → гармонику мотора не видно, notch ставят мимо (`ctl-signals`).
+
 ## practice
 ### Шаг 1. Прочитать
 Свой лог (Betaflight CSV или ArduPilot .bin) → DataFrame, fs посчитана, первые 5 строк и описание колонок выведены.

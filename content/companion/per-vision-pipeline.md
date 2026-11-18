@@ -91,6 +91,12 @@ next:
 
 Два факта из лабораторной. ArduCopter **не ограничивает** GUIDED-скорость параметром `WP_SPD` (до 4.7 — `WPNAV_SPEED`, см/с): в прогоне на 4.6.3 при `WPNAV_SPEED = 300` (3 м/с) команда 6 м/с исполняется как 6.1 м/с, в исходнике 4.7.2 путь скоростной цели тот же — лимит обязан стоять на companion. И LOITER держит высоту только при газе в середине: без пилота с пультом таймаут должен вести в BRAKE или оставаться нулевой скоростью в GUIDED.
 
+### Место в системе
+
+- **Получает:** кадр с меткой экспозиции (`per-camera`); калибровку и геометрию (`per-geometry`); детектор и трекер (`per-cv`); `ATTITUDE` и `TIMESYNC` от автопилота (`mav-services`).
+- **Отдаёт:** `LANDING_TARGET` точной посадке (`per-landing`); скоростные уставки GUIDED или координаты цели для FOLLOW (`per-tracking`); измеренную glass-to-command — в `PLND_LAG` и предел K_p.
+- **Если ошибиться здесь:** метка `time.time()` после чтения кадра вместо метки буфера → ориентация берётся не на тот момент, точка на земле «плавает» при манёврах (`per-geometry`). Цель потеряна, а watchdog нет → companion шлёт последнюю скорость, `GUID_TIMEOUT` не срабатывает, аппарат летит до геозоны (`ap-safety-fs`).
+
 ## practice
 Код — `examples/vision-pipeline/` (`gen_video.py`, `pipeline.py`, `score.py`, `sitl_follow.py`, `make_dataset.py`), геометрия — из `examples/perception/camgeo.py`. Зависимости: `opencv-python`, `numpy`, `pymavlink`; для ветки YOLO — `ultralytics`. Числа — с 2 ядер Xeon 2.1 ГГц, Python 3.13, OpenCV 5.0; SITL — ArduCopter 4.6.3 (сборка — ap-sitl), экземпляр `-I 4`.
 

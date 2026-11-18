@@ -77,6 +77,8 @@
 sudo tc qdisc del dev lo root</code></pre>
 <h4 class="md-subheading">Безопасность канала</h4>
 <p>Подпись MAVLink защищает от подмены команд, VPN — от прослушивания и подмены на IP-сегменте, частотные хопы и AES в радиомодеме — на радиосегменте. Ни одно из этого не защищает от глушения — от него защищают failsafe-процедуры и автономия (модуль nav-resilience).</p>
+<h4 class="md-subheading">Место в системе</h4>
+<ul><li><strong>Получает:</strong> кадры с sysid/compid и seq (<code>mav-protocol</code>); heartbeat каждого участника — без него маршрута нет; пропускную способность транспорта (<code>link-telemetry-radios</code>, <code>rf-link-budget</code>).</li><li><strong>Отдаёт:</strong> копию потока каждому клиенту — GCS, скриптам, логгеру (<code>comp-raspberry</code>); адресные команды компонентам борта (<code>mav-component</code>); метрики RTT, потерь и джиттера.</li><li><strong>Если ошибиться здесь:</strong> скрипт на companion молчит → маршрута до него нет, адресные команды GCS не доходят; выглядит как «компонент завис» (<code>mav-component</code>). TCP поверх 4G при потерях → телеметрия «из прошлого» с секундной задержкой, оператор реагирует на устаревшую картину; выбор канала — <code>link-telemetry-radios</code>.</li></ul>
 
 <h2>Практика</h2>
 <h4 class="md-subheading">Шаг 1. Роутер с тремя клиентами</h4>

@@ -78,6 +78,8 @@
 <h4 class="md-subheading">Три типовые архитектуры</h4>
 <ol><li><strong>Телеметрия и мост</strong>: ESP32 с прошивкой-мостом (MAVLink по Wi-Fi/BLE в телефон, DroneBridge-класс) — ничего не решает, только транслирует.</li><li><strong>Pi + камера + скрипты</strong>: Raspberry Pi 4/5, mavlink-router, Python-скрипты миссий, видеопоток в GCS, оптический поток/дальномер через MAVLink. Стандарт для обучения и прототипов.</li><li><strong>Jetson + ROS 2</strong>: детекция/VIO на GPU, PX4 через uXRCE-DDS или ArduPilot через MAVROS/AP_DDS, узлы с защитами (модуль «Слежение»). Для серьёзной автономии.</li></ol>
 <p>Стартовые репозитории для 2 и 3 — <code>examples/</code> в репозитории курса.</p>
+<h4 class="md-subheading">Место в системе</h4>
+<ul><li><strong>Получает:</strong> телеметрию и параметры полётника по UART в MAVLink (<code>comp-mavlink</code>); питание 5 В от отдельного BEC, а не с пада FC (<code>el-peripherals</code>).</li><li><strong>Отдаёт:</strong> цели GUIDED по позиции и скорости, миссии (<code>ap-companion</code>); данные дальномера и ExternalNav как источник для EKF (<code>mav-component</code>); копии потока для GCS и логгера через маршрутизатор (<code>mav-routing</code>).</li><li><strong>Если ошибиться здесь:</strong> companion на слабом BEC перезагружается на газу → уставки GUIDED пропадают, автопилот по таймауту уходит в безопасный режим; в логе это похоже на отказ связи, разбор — <code>ap-safety-fs</code>. Порт на низкой скорости при потоках 10–50 Гц захлёбывается → рвётся телеметрия у всех потребителей; полосу считают в <code>comp-mavlink</code>.</li></ul>
 
 <h2>Практика</h2>
 <h4 class="md-subheading">Выбор платформы под задачу</h4>

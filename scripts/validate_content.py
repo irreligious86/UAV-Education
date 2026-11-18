@@ -223,6 +223,18 @@ def validate_published_sections(md_path, published):
         token = f"## {sec}"
         if token not in body:
             errors.append(f"{rel}: нет секции «{token}» (обязательно для published)")
+    # systems thinking: theory ends with «Место в системе» (what the topic receives, hands on, breaks elsewhere)
+    tm = re.search(r"^## theory\n(.*?)(?=^## |\Z)", raw_body, re.M | re.S)
+    theory = tm.group(1) if tm else ""
+    if theory.count("### Место в системе") != 1:
+        errors.append(f"{rel}: в theory должен быть ровно один подраздел «### Место в системе»")
+    else:
+        block = theory.split("### Место в системе", 1)[1]
+        if "\n### " in block:
+            errors.append(f"{rel}: «### Место в системе» должен быть последним подразделом theory")
+        for label in ("**Получает:**", "**Отдаёт:**", "**Если ошибиться здесь:**"):
+            if label not in block:
+                errors.append(f"{rel}: в «Место в системе» нет пункта {label}")
     for marker in PLACEHOLDER_MARKERS:
         if marker.lower() in text.lower():
             errors.append(f"{rel}: published-статья содержит заглушку «{marker}» — допиши или поставь status: planned")

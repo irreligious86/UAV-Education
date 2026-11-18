@@ -144,6 +144,12 @@ ArduPilot заметно тяжелее Betaflight. На F4-контроллер
 ### Разобранный пример: перевод пилота с Betaflight
 «Почему не армится?» — сообщение `PreArm: …` в GCS называет причину текстом (компас, GPS, INS, параметры, RC не откалибровано), а `ARMING_SKIPCHK` (до 4.7 — `ARMING_CHECK` с обратным смыслом) только выбирает, какие проверки пропустить; «почему не держит высоту в Stabilize?» — потому что Stabilize = Betaflight Angle, высоту держит AltHold; «где rates?» — `ACRO_RP_RATE`/`ACRO_Y_RATE`, `ACRO_RP_EXPO`; «где PID?» — `ATC_RAT_RLL_P/I/D/FF/FLTD/FLTE/FLTT` (rate) и `ATC_ANG_RLL_P` (angle); «где фильтры?» — `INS_GYRO_FILTER`, `INS_HNTCH_*`; «где Blackbox?» — DataFlash на SD, Log Review; «где diff all?» — Full Parameter List → Save/Compare, или `param save` в MAVProxy.
 
+### Место в системе
+
+- **Получает:** оценку EKF, от которой зависит, какие режимы доступны (`ap-ekf`); калибровки акселерометра и компаса для pre-arm (`est-sensors`); ресурсы платы — на F4 часть функций недоступна (`f-fc-sensors`).
+- **Отдаёт:** имена параметров 4.7 и таблицу переименований — всем модулям трека; порядок первой настройки — в `ap-setup-scratch`; режим GUIDED — в `ap-companion`.
+- **Если ошибиться здесь:** загрузил после обновления старый `.param` или скрипт с именами 4.6 → запись молча не срабатывает → failsafe и RTL работают на умолчаниях, а не на твоих значениях (`ap-safety-fs`). `ARMING_SKIPCHK` не 0 → часть pre-arm проверок пропущена → плохой компас или GPS всплывает уже в полёте как «EKF variance» (`ap-ekf`).
+
 ## practice
 ### Первое знакомство без риска
 1. Пройди модуль про SITL: всё ниже можно сделать на симуляторе.
