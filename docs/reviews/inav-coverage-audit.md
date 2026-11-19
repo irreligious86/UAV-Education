@@ -130,7 +130,7 @@ by hand.
 | 10 | `cli_delay` | delay in ms between CLI lines | ✗ | C |
 | 11 | `defaults` | reset to defaults and reboot (`defaults noreboot`) | ✗ | A |
 | 12 | `dfu` | reboot to DFU bootloader | ✗ | B |
-| 13 | `diff` | changes from default; scopes `master\|battery_profile\|control_profile\|mixer_profile\|rates\|all`, flag `showdefaults` | ✓ inav-setup-scratch (`diff all` only; that plain `diff` = **master only**, without any profile, is not said) | A |
+| 13 | `diff` | changes from default; scopes `master\|battery_profile\|control_profile\|mixer_profile\|rates\|all`, flag `showdefaults` | ✓ inav-setup-scratch (`diff all` only; that plain `diff` = **master only**, without any profile, is not said. Correction 2026-11-18: wrong — plain `diff` prints master plus the active control, mixer and battery profile (cli.c `printConfig`, `else` branch of `if (dumpMask & DUMP_ALL)`, same in 8.0.1 and 9.1.0); only the non-active profiles are missing; see docs/reviews/factcheck/theory-wave3.md) | A |
 | 14 | `dump` | full config, same scopes | ✗ | B |
 | 15 | `eleres_bind` | bind EleRes RX [USE_RX_ELERES] | ✗ | C |
 | 16 | `exit` | leave CLI and reboot | ✗ | B |
@@ -185,7 +185,7 @@ by hand.
 `defaults`, `version`, `safehome`, `control_profile`), **B 27** (✓ 0, ~ 3: `batch`, `rxrange` and `gvar`, ✗ 24), **C 14** (all ✗).
 
 Two INAV-specific traps are missing from the course:
-1. **`diff` without arguments prints only `master`.** `cliDiff` starts with `dumpMask = DUMP_MASTER`, so no
+1. **`diff` without arguments prints only `master`.** (Correction 2026-11-18: wrong — plain `diff` prints master plus the active control, mixer and battery profile (cli.c `printConfig`, `else` branch of `if (dumpMask & DUMP_ALL)`, same in 8.0.1 and 9.1.0); only the non-active profiles are missing; see docs/reviews/factcheck/theory-wave3.md.) `cliDiff` starts with `dumpMask = DUMP_MASTER`, so no
    `control_profile`, `mixer_profile` or `battery_profile` blocks are printed. A backup made with `diff` loses the PIDs, the
    rates, `platform_type`, `mmix`/`smix` (these sit in the mixer profile) and the battery settings. `diff all` prints every profile:
    for each one it emits `control_profile N` / `mixer_profile N` / `battery_profile N` (1-based) followed by that profile's
@@ -691,7 +691,7 @@ not read in full), INAV docs in the repo. I could not read reaction counts.
 | 48 | MAVLink to Mission Planner/QGC, ELRS MAVLink | O G | function `TELEMETRY_MAVLINK` 256, `mavlink_*_rate`, `mavlink_radio_type = ELRS`; 9.1 `mavlink_sysid`, `mavlink_autopilot_type` | ✗ |
 | 49 | Configure from a phone / Bluetooth | F | MSP over a UART with a BT/ESP32 bridge; mwp, apps | ✗ |
 | 50 | Upgrading 7 → 8 → 9 | O F | full `diff all`, compare renamed settings; 9.1 Configurator auto-backup + migration | ~ inav-intro |
-| 51 | `diff` vs `diff all` | O | plain `diff` = master only, profiles lost | ✗ |
+| 51 | `diff` vs `diff all` | O | plain `diff` = master only, profiles lost. Correction 2026-11-18: wrong — plain `diff` prints master plus the active control, mixer and battery profile (cli.c `printConfig`, `else` branch of `if (dumpMask & DUMP_ALL)`, same in 8.0.1 and 9.1.0); only the non-active profiles are missing; see docs/reviews/factcheck/theory-wave3.md | ✗ |
 | 52 | Motor stop / idle / airmode | O | `motorstop_on_low`, `throttle_idle` 8 %, `nav_overrides_motor_stop`, `airmode_type` | ~ |
 | 53 | Turtle mode | O | TURTLE mode (52), DShot, `turtle_mode_power_factor` 55 | ✗ (C) |
 | 54 | Companion/GCS control (MSP RC override) | O G | `receiver_type = MSP` or MSP RC OVERRIDE mode + `msp_override_channels` (8.0.1: custom build; 9.1: standard) | ✗ (SITL uses `receiver_type = MSP`) |

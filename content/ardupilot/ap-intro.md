@@ -82,6 +82,16 @@ ArduPilot — автопилот, а не просто стабилизатор.
 | `FS_SHORT_TIMEOUT` (Plane) | удалён | короткий failsafe упрощён, длинный — `FS_LONG_TIMEOUT` | 4.7.0 |
 | `GLIDE_SLOPE_MIN`, `GLIDE_SLOPE_THR` (Plane) | `ALT_SLOPE_MIN`, `ALT_SLOPE_MAXHGT` | имя | 4.7.0 |
 | — (Plane) | режим `AUTOLAND` (номер 26), `AUTOLAND_*`, `RCx_OPTION = 183` | новый режим автопосадки без миссии | 4.7.0 |
+| `SERVOn_FUNCTION`: моторы 33–40 и 82–85 (Motor1–12) | добавлены 160–179 — Motor13…Motor32 | до 32 моторов | 4.7.0 |
+| `BRD_SAFETY_MASK`: в описании биты 0–13 (выходы 1–14) | биты 0–31 (выходы 1–32) | расширен список битов; умолчание Copter прежнее — «все немоторные выходы из 1–14», а не 0 (`ap-outputs`); прошивка читает только младшие 16 бит маски | 4.7.0 |
+| — | `MOT_IDLE_SEC` (0…5 с, по умолчанию 0) | задержка на холостом ходу после арма, чтобы ESC успели запуститься | 4.7.0 |
+| одна крутилка: `RCx_OPTION = 219`, `TUNE`, `TUNE_MIN` / `TUNE_MAX` | + вторая: `RCx_OPTION = 220`, `TUNE2`, `TUNE2_MIN` / `TUNE2_MAX` | 220 нет в списке значений `RCx_OPTION` — вводится числом (`ap-aux-tune`) | 4.7.0 |
+| подстройка `TUNE` выключена, только если `TUNE_MIN` и `TUNE_MAX` оба равны 0 | выключена, когда `TUNE_MIN` = `TUNE_MAX` | условие отключения | 4.7.0 |
+| `TUNE` до 59 | + 60 — Loiter Speed (м/с) | новое значение; `TUNE = 10` (WP Speed) по-прежнему задаёт скорость в **см/с**, хотя `WP_SPD` стал в м/с | 4.7.0 |
+| лог `PTUN`: `Param`, `TunVal`, `TunMin`, `TunMax` | + поле `NIn` | нормированный вход крутилки (−1…1) | 4.7.0 |
+| `RCx_OPTION` 300–307 (Scripting1–8) | 300–315 (Scripting1–16); 316 — остановить / перезапустить скрипты | больше скриптовых тумблеров (`ap-lua`) | 4.7.0 |
+| `RCx_OPTION = 163` Mount Lock | 163 Mount Yaw Lock; новые 185 Mount Roll/Pitch Lock, 186 Mount POI Lock | имя и две новые функции | 4.7.0 |
+| — | `RCx_OPTION = 182` AHRS AutoTrim | новая функция тумблера | 4.7.0 |
 | `CAM_RC_*` (RunCam) | `CAM1_RC_*`, тип камеры `CAM1_TYPE = 8` | RunCam стал типом камеры | 4.7.0 |
 | `SIM_GPS_DISABLE = 1`, `SIM_GPS2_DISABLE` (SITL) | `SIM_GPS1_ENABLE = 0`, `SIM_GPS2_ENABLE` | смысл обратный | 4.7.0 |
 | `SIM_GPS_*` (первый приёмник в SITL): `SIM_GPS_NOISE`, `SIM_GPS_GLITCH_X`, `SIM_GPS_ACC`, `SIM_GPS_HDG`, `SIM_GPS_POS_Y` | `SIM_GPS1_NOISE`, `SIM_GPS1_GLTCH_X`, `SIM_GPS1_ACC`, `SIM_GPS1_HDG`, `SIM_GPS1_POS_Y` | индекс приёмника в имени, часть имён укорочена | 4.7.0 |
