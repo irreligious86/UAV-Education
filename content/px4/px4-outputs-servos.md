@@ -120,7 +120,7 @@ next:
 |---|---|---|
 | `DSHOT_MIN` | 0.055 | минимальная команда при арме, доля от полной (в 1.15–1.16 единица подписана как %) |
 | `DSHOT_BIDIR_EN` | 0 | bidirectional DShot: eRPM по сигнальному проводу. **Появился в 1.16**, нужна перезагрузка |
-| `DSHOT_TEL_CFG` | 0 (Disabled) | порт UART для телеметрии ESC по отдельному проводу |
+| `DSHOT_TEL_CFG` | 0 (Disabled) | порт UART для телеметрии ESC по отдельному проводу; номера портов — в `px4-hardware-peripherals` |
 | `DSHOT_3D_ENABLE` | 0 | 3D-режим: диапазон делится на два направления, `DSHOT_MIN` ставят в 0 |
 | `DSHOT_3D_DEAD_L` / `DSHOT_3D_DEAD_H` | 1000 / 1000 | мёртвая зона 3D в единицах 0…1999 |
 | `MOT_POLE_COUNT` | 14 | число магнитов ротора: пересчёт eRPM → RPM |
@@ -198,7 +198,7 @@ next:
 
 ### Место в системе
 
-- **Получает:** матрицу эффективности от аллокатора (`ctl-allocation`); флаги armed, prearmed, kill, termination от commander (`px4-safety-return`); протокол ESC и eRPM (`f-esc-firmware`); первый проход экрана Actuators (`px4-setup-scratch`); схему питания серв (`bf-servos-pwm`).
+- **Получает:** матрицу эффективности от аллокатора (`ctl-allocation`); флаги armed, prearmed, kill, termination от commander (`px4-safety-return`); протокол ESC и eRPM (`f-esc-firmware`); первый проход экрана Actuators (`px4-setup-scratch`); номера портов UART и включение выходов DroneCAN (`px4-hardware-peripherals`); схему питания серв (`bf-servos-pwm`).
 - **Отдаёт:** импульсы и кадры DShot моторам и сервам; обороты в `esc_status` — динамическому notch и детектору отказа мотора (`px4-control`); выходы нагрузки — миссиям и companion; значения `FAILn` — flight termination (`px4-safety-return`).
 - **Если ошибиться здесь:** серва в группе DShot или на 400 Гц — отказ руля в полёте; неверный знак `CA_SV_CSn_TRQ_*` или лишний бит `REV` — стабилизация раскачивает самолёт (`ctl-allocation`); `MOT_POLE_COUNT` не по мотору — notch мимо, вибрации в гироскопе (`px4-control`); `FAILn` парашюта не проверен — termination не раскроет купол (`px4-safety-return`). Версии — по таблице в `px4-intro`.
 

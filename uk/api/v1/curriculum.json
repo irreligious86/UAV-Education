@@ -144,6 +144,7 @@
             "inav-gps",
             "inav-setup-scratch",
             "inav-cli-backup",
+            "inav-mc-tuning",
             "inav-setup-wing",
             "inav-osd-hd",
             "inav-missions",
@@ -239,6 +240,7 @@
             "aero-wing",
             "aero-stability",
             "ap-heavy",
+            "ap-setup-plane",
             "ap-quadplane",
             "el-power-design",
             "el-redundancy",
@@ -339,6 +341,7 @@
             "px4-safety-return",
             "px4-outputs-servos",
             "px4-architecture",
+            "px4-hardware-peripherals",
             "px4-control",
             "ctl-allocation",
             "px4-ros2",
@@ -2950,6 +2953,33 @@
           "url": "m/aero-wing.html"
         },
         {
+          "id": "ap-setup-plane",
+          "title": "ArduPlane с нуля: сервы, рули, airspeed, failsafe крыла",
+          "level": "L2",
+          "hours": 6,
+          "status": "published",
+          "prerequisites": [
+            "ap-setup-scratch",
+            "ap-outputs",
+            "aero-wing"
+          ],
+          "objectives": [
+            "назначить функции выходов для классического хвоста, элевонов и V-хвоста и проверить направление каждого руля в FBWA и в MANUAL",
+            "настроить датчик воздушной скорости, границы скоростей и углов и объяснить, чем управляет TECS без датчика",
+            "настроить и предсказать по времени RC-failsafe самолёта, арм и автоматический взлёт с руки, резинки и полосы"
+          ],
+          "lab": {
+            "title": "ArduPlane без железа: импульсы рулей через смеситель, хронология failsafe, поправка ARSPD_RATIO и три ошибки в файле параметров",
+            "criteria": [
+              "Шестнадцать импульсов трёх самолётов совпали точно: 1700, 1310, 1288, 1740, 1475, 1275, 1700, 1496 для стика и 1376, 1638, 1595, 1438, 1522, 1633, 1456, 1492 для наклона; в неверном файле найдены выходы 5, 2 и 4 с правильным реверсом 1, 1 и 0",
+              "Хронология пяти сценариев: короткое событие на 1.2 с (0.2 с при низком газе) с допуском 0.05 с, длинное на 5.0–5.4 с; итоговые режимы RTL, RTL, AUTO, RTL, FBWA",
+              "Воздушная скорость: 131.2 ± 0.5 Па, новый ARSPD_RATIO 2.47 ± 0.01; пределы крена 32.8°, 45° и 25° с допуском 0.2°; крен 18.4 ± 0.2° для круга 60 м и радиус 20 ± 0.5 м при 45°",
+              "В файле параметров найдены ровно три ошибки: RC3_MIN ниже THR_FS_VALUE, ARSPD_USE = 0, нулевые TKOFF_THR_MINACC и TKOFF_THR_MINSPD для броска с толкающим винтом"
+            ]
+          },
+          "url": "m/ap-setup-plane.html"
+        },
+        {
           "id": "ap-quadplane",
           "title": "QuadPlane і tilt-rotor VTOL",
           "level": "L3",
@@ -4091,6 +4121,32 @@
           "url": "m/inav-setup-scratch.html"
         },
         {
+          "id": "inav-mc-tuning",
+          "title": "Настройка мультиротора в INAV: PID, рейты, фильтры, EZ Tune и навигационные PID",
+          "level": "L2",
+          "hours": 6,
+          "status": "published",
+          "prerequisites": [
+            "inav-setup-scratch",
+            "inav-gps"
+          ],
+          "objectives": [
+            "перевести целые числа PID, рейтов и навигационных PID из diff INAV в физические коэффициенты и скорости",
+            "назвать фильтры гироскопа INAV в порядке применения и посчитать, что запишет EZ Tune по положению ползунков",
+            "по симптому в ALTHOLD и POSHOLD и полям Blackbox выбрать настройку и направление изменения"
+          ],
+          "lab": {
+            "title": "Настройка без железа: коэффициенты по diff, три набора EZ Tune, симптомы навигации, три ошибки в конфиге",
+            "criteria": [
+              "По фрагменту diff: kP/kI/kD/kCD крена 1.419 / 8.25 / 0.01312 / 0.00825 и тангажа 1.548 / 9.0 / 0.01417 / 0.00963; рейт на 60 % стика 133 °/с (±1); множитель TPA 0.90; setpoint ANGLE 39.6 °/с (±0.2)",
+              "EZ Tune: таблицы наборов B и C совпали с эталоном (B: тангаж 38 / 90 / 33 / 72, рейт 48, срез 90 / 85 Гц; C: крен 46 / 84 / 20 / 150, setpoint_kalman_q 213, d_boost_min 0.6) и названы ползунки для трёх вопросов",
+              "Четыре симптома: nav_mc_pos_deceleration_time вверх до 160, nav_mc_auto_climb_rate вверх, компас вместо PID, nav_mc_vel_z_p вниз до 100 с hover_thr 1480 — с причиной из структуры контуров",
+              "В конфиге найдены три ошибки (RPM-фильтр без порта ESC-телеметрии, ручные PID при включённом EZ Tune, nav_mc_bank_angle больше max_angle_inclination) и посчитан предел ускорения 5.66 м/с² (±0.05)"
+            ]
+          },
+          "url": "m/inav-mc-tuning.html"
+        },
+        {
           "id": "inav-cli-backup",
           "title": "CLI INAV: все команды, diff/dump и профили, бэкап, восстановление и переезд 7 → 8 → 9",
           "level": "L2",
@@ -4437,6 +4493,33 @@
             ]
           },
           "url": "m/px4-architecture.html"
+        },
+        {
+          "id": "px4-hardware-peripherals",
+          "title": "Периферия PX4: GPS/компас, дальномер, airspeed, телеметрия, DroneCAN, OSD, LED и пищалка",
+          "level": "L2",
+          "hours": 6,
+          "status": "published",
+          "prerequisites": [
+            "px4-setup-scratch",
+            "px4-architecture",
+            "el-dronecan"
+          ],
+          "objectives": [
+            "разложить периферию по портам платы параметрами *_CONFIG, SENS_EN_* и UAVCAN_* без конфликтов и проверить каждый драйвер командами status и listener",
+            "посчитать лимит и множитель потока MAVLink по скорости порта, MAV_n_RATE и набору сообщений",
+            "расшифровать цвета светодиода состояния и мелодии PX4 в состояние аппарата и действие"
+          ],
+          "lab": {
+            "title": "Порты Pixhawk 6X, бюджет MAVLink и индикация на бумаге",
+            "criteria": [
+              "Восемь устройств разложены по fmu-v6x: шесть UART-устройств на портах 101, 102, 103, 201, 202, 401 без повторов, airspeed на I²C, ESC на CAN с UAVCAN_ENABLE = 3; в неправильном фрагменте названы три ошибки (два конфликта портов и MAV_0_RATE в бодах)",
+              "Бюджет SiK совпал с эталоном: предел порта 5760 Б/с, сумма потоков 2344.5 Б/с, множитель 0.50 при 1200 Б/с и 1.0 при MAV_0_RATE = 0, ATTITUDE 7.5 Гц; набор Onboard — 22680 Б/с, множитель 0.052 на радио и 1.0 на 921600 бод",
+              "Девять наблюдений LED и пищалки переведены в состояния, совпавшие с эталоном (красное мигание — проверки, синее дыхание — нет позиции, горящий фиолетовый — failsafe, мигающий фиолетовый — перегрузка)",
+              "GPS_1_GNSS = 21 раскодирован в GPS, Galileo, GLONASS; маски 13 и 5906 получены точно; во фрагменте найдены три ошибки (UAVCAN_ENABLE = 2 при CAN-ESC, UAVCAN_SUB_ASPD = 0, SYS_HAS_NUM_DIST = 2), ловушки в ошибки не записаны"
+            ]
+          },
+          "url": "m/px4-hardware-peripherals.html"
         },
         {
           "id": "px4-control",

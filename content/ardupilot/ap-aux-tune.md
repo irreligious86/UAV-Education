@@ -74,7 +74,7 @@ next:
 | Группа | Номер: функция |
 |---|---|
 | Режимы Copter (HIGH — включить; иначе вернуться к режимному каналу, если этот режим ещё активен) | 4 RTL, 16 AUTO, 18 LAND, 33 BRAKE, 42 SmartRTL, 52 ACRO, 55 GUIDED, 56 LOITER, 68 STABILIZE, 69 POSHOLD, 70 ALTHOLD, 72 CIRCLE, 99 AUTO RTL, 2 FLIP, 37 THROW, 151 TURTLE |
-| Режимы Plane | 4 RTL, 16 AUTO, 51 MANUAL, 52 ACRO, 55 GUIDED, 56 LOITER, 72 CIRCLE, 77 TAKEOFF, 92 FBWA, 98 TRAINING, 108 QRTL, 150 CRUISE, 170 QSTABILIZE, 183 AUTOLAND (новая в 4.7), 96 перечитать режимный канал |
+| Режимы Plane | 4 RTL, 16 AUTO, 51 MANUAL, 52 ACRO, 55 GUIDED, 56 LOITER, 72 CIRCLE, 77 TAKEOFF, 92 FBWA, 98 TRAINING, 108 QRTL, 150 CRUISE, 170 QSTABILIZE, 183 AUTOLAND (новая в 4.7), 96 перечитать режимный канал; сами режимы, их номера и `FLTMODE_CH` самолёта — в `ap-setup-plane` |
 | Арм и моторы (C, P) | 153 ArmDisarm, 154 ArmDisarm с AirMode, 81 Disarm, 165 Arm/E-Stop, 31 Motor Emergency Stop, 32 Motor Interlock (C) |
 | Точки и триммеры | 5 Save Trim (C), 7 Save WP (C), 24 сброс миссии на начало, 58 стереть миссию, 155 триммеры по текущим рулям (P) |
 | Ощущение и помощь пилоту (C) | 3 Simple, 13 Super Simple (середина — Simple, верх — Super Simple), 152 сброс курса Simple, 14 Acro Trainer (выкл / выравнивание / ограничение), 84 AirMode (также P), 39 Precision Loiter, 10 дальномер, 40 обход препятствий |

@@ -82,6 +82,8 @@ INAV считает позицию и высоту комплементарны�
 | `osd_snr_alarm` до 99 | до 30 | предел | 9.0 |
 | `vbat_meter_type`, `current_meter_type` | + значение `SMARTPORT` | напряжение и ток с датчика SmartPort | 9.0 |
 | — | `blackbox_arm_control` = 0 | 0…60 — писать лог ещё столько секунд после дизарма; −1 — писать с включения питания | 9.0 |
+| поправки высоты от барометра и GPS — на каждом шаге оценщика | один раз на каждое обновление датчика (`updateDt`) | между обновлениями оценка идёт по акселерометру; завышенные `nav_mc_vel_z_p` / `nav_mc_pos_z_p` дают колебания газа (`inav-mc-tuning`) | 9.x (в 9.1.0 есть) |
+| группа `PG_CONTROL_RATE_PROFILES` | `PG_CONTROL_PROFILES` | только имя группы в исходнике; имена настроек и команда `control_profile` те же | 9.x (в 9.1.0 есть) |
 | — | `acc_temp_correction`, `baro_temp_correction` = 0 | температурная поправка акселерометра и барометра; 51 запускает автокалибровку | 9.0 |
 | — | `mavlink_sysid` = 1, `mavlink_autopilot_type` = GENERIC | System ID и тип автопилота в MAVLink-телеметрии (GENERIC или ARDUPILOT) | 9.0 |
 | — | `osd_adsb_warning_style`, `stats_flight_count`, `transition_pid_mmix_multiplier_roll/pitch/yaw` | стиль предупреждения ADS-B, счётчик полётов, множители PID в переходном режиме VTOL | 9.0 |
