@@ -75,6 +75,28 @@ Betaflight по умолчанию принимает CRSF на 420000 бод (`
 ### Разобранный пример: не работает приёмник
 F405, SBUS-приёмник подключён к `RX3`, в Ports — Serial RX на UART3, в Receiver — SBUS; каналов нет. Диагностика: UART3 на этой плате без аппаратного инвертора → мусор. Решения: переставить на порт с инвертором (пад `SBUS`/`RX1` по описанию платы), или включить на приёмнике неинвертированный выход SBUS и поставить `serialrx_inverted = ON` (для SBUS ON означает «сигнал не инвертирован», см. bf-ports), или сменить приёмник на CRSF (ELRS) — тогда любой UART. На F7/H7/G4 этой проблемы нет: UART инвертирует сам при `serialrx_inverted = OFF`. Проверка анализатором: idle низкий = инвертированный сигнал (модуль «Измерения»).
 
+### TBS Crossfire и Tracer против ELRS сегодня
+Со стороны полётника разницы нет: все три системы отдают CRSF, поэтому провода, UART без инвертора и `serialrx_provider = CRSF` одинаковы, и замена приёмника Crossfire на ELRS не требует правок в прошивке FC. В эфире они несовместимы: модуль Crossfire не видит приёмник ELRS, и наоборот.
+
+Что отличает TBS (руководства Crossfire и Tracer, ревизия 2022-08-08, прошивки 6.16 и 6.17):
+
+| | Crossfire | Tracer | ELRS 4.1 (`link-elrs`) |
+|---|---|---|---|
+| Диапазон | 868 или 915 МГц, по региону | 2.4 ГГц | 2.4 ГГц, 900 МГц, оба на LR1121 |
+| Частота пакетов | Dynamic (150 ↔ 50 Гц по качеству связи; руководство называет его лучшим для большинства случаев), 50 или 150 Гц; 4 Гц — только в режиме принудительной телеметрии | постоянно 250 Гц | 25–1000 Гц, выбирается в Lua |
+| Мощность передатчика | Micro TX V2 — 25 мВт…1 Вт, Standard/Lite — 10 мВт…2 Вт; по USB — 10 мВт | 25–100 мВт | по модулю |
+| Привязка | передатчик в режим Bind (Lua Agent Lite, Agent Desktop/Web, кнопка Micro TX), затем кнопка на приёмнике в течение минуты после включения | так же | binding phrase, кнопка не нужна |
+| Перепривязка нужна | после смены региона, обновления прошивки передатчика, включения Multi-bind, сброса приёмника, смены Model ID, смены шифрования | то же, кроме региона (диапазон один); ещё — при другом передатчике без Multi-bind | при смене фразы |
+| Обновление | TBS Agent по USB; приёмник прошивается по воздуху при следующей привязке | так же | Wi-Fi, USB, Passthrough |
+| Failsafe приёмника | `FS. Mode`: Cut (рекомендуется при failsafe в FC) или заданное положение | так же | для CRSF — тишина, решает FC |
+
+Правило выбора:
+1. **Парк уже на Crossfire и пульт с модулем TBS** — оставить: аппараты работают, а второй системе нужен второй радиомодуль (внутренний ELRS плюс внешний TBS в отсеке пульта, `link-edgetx`).
+2. **Новая сборка** — ELRS: открытая прошивка, оба диапазона, режим MAVLink (`link-telemetry-radios`), привязка фразой без кнопок.
+3. **Дальний полёт на 900 МГц** — обе системы годятся; чувствительность каждого режима ELRS опубликована (`link-elrs`), у Crossfire в руководстве одна цифра «до −130 дБм» без привязки к режиму, поэтому сравнение дальности двух систем в курсе не проверено.
+
+Как проверить замену приёмника: в Receiver каналы AETR с краями 988–2012, в OSD есть LQ, при выключенном пульте появляется `RXLOSS`; у приёмника Crossfire перед этим выставлен `FS. Mode = Cut`.
+
 ### Место в системе
 
 - **Получает:** принятые по радио каналы от приёмника (`link-elrs`); UART полётника нужной полярности — с инвертором или без (`bf-ports`, `f-fc-sensors`).
@@ -138,6 +160,8 @@ save
 ## references
 - CRSF Protocol Specification — TBS (GitHub) | https://github.com/tbs-fpv/tbs-crsf-spec | primary | A
 - Configuring FC for ExpressLRS — ExpressLRS Docs | https://www.expresslrs.org/quick-start/receivers/configuring-fc/ | primary | A
+- TBS CROSSFIRE manual, rev. 2022-08-08, FW 6.16 (открыто 2026-11-22) | https://www.team-blacksheep.com/media/files/tbs-crossfire-manual.pdf | primary | A
+- TBS TRACER manual, rev. 2022-08-08, FW 6.17 (открыто 2026-11-22) | https://www.team-blacksheep.com/media/files/tbs-tracer-manual.pdf | primary | A
 - SBUS library and protocol description — Bolder Flight Systems | https://github.com/bolderflight/sbus | secondary | B
 
 ## checklist
@@ -146,3 +170,4 @@ save
 - Для CRSF: TX/RX крест-накрест, оба провода припаяны
 - `serialrx_inverted` и `serialrx_halfduplex` проверены через `get`
 - Во вкладке Receiver каналы и их порядок проверены
+- Знаю, что Crossfire, Tracer и ELRS одинаковы для FC (CRSF), но не связываются друг с другом по эфиру

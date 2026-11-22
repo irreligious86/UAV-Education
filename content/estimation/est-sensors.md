@@ -50,6 +50,23 @@ next:
 - **Помехи от токов** (модуль про EMI): зависят от газа → `compassmot`, `COMPASS_MOT_*`.
 - Ориентация компаса относительно FC (`COMPASS_ORIENT`) — частая ошибка при внешнем компасе; ArduPilot умеет определить автоматически при калибровке.
 
+### Калибровка компаса: какой способ и как проверить
+Вход — три вопроса: можно ли аппарат вращать в руках; зависит ли поле от тока (длина `MAG` в логе меняется с газом); какая прошивка. Порядок всегда один: сначала механика (компас на мачте, дальше от силовых проводов — `el-emi`), потом ориентация, потом калибровка, и только остаток помехи вычитают программно.
+
+| Ситуация | ArduPilot 4.7.2 | PX4 1.17.0 | INAV 9.1.0 |
+|---|---|---|---|
+| Ориентация внешнего компаса | `COMPASS_AUTO_ROT = 2` (по умолчанию): проверяет и исправляет после калибровки | `SENS_MAG_AUTOROT = 1` (по умолчанию) | вручную: `align_mag` шагами по 90° или `align_mag_roll/pitch/yaw` в десятых градуса |
+| Аппарат можно вращать | калибровка вращением, порог `COMPASS_CAL_FIT = 16` для первого компаса, если он внешний; 32 для внутренних и остальных | калибровка в QGC, `SENS_MAG_SIDES = 63` — все шесть сторон (`CAL_MAG_SIDES` оставлен для старых QGC) | `mag_calibration_time` = 30 с (20–120); пишет `magzero_*` (смещения) и `maggain_*` (масштаб по оси) |
+| Вращать нельзя | Large Vehicle MagCal (`MAV_CMD_FIXED_MAG_CAL_YAW`, известный курс) — только смещения | та же команда; `commander calibrate mag quick` без курса считает, что нос смотрит на север | аналога в исходнике нет |
+| Помеха от тока | CompassMot (только Copter, кроме вертолётов; раскручивает моторы с пропеллерами) или MagFit по логу с током | `CAL_MAG_COMP_TYP`: 1 — по газу, 2/3 — по току батареи 0/1; коэффициенты `CAL_MAGn_XCOMP/YCOMP/ZCOMP` считает `mag_compensation.py` по ULog | компенсации по току нет — только перенос компаса |
+
+MagFit (ArduPilot, WebTools MAGFit или MAVExplorer) подгоняет параметры к уже записанному полёту по модели поля Земли. Требования документации: несколько полных разворотов, хотя бы несколько минут лога, участки на земле и в руках исключить; обычно достаточно смещений. Результат принимается, если отклонение курса после подгонки меньше 10°; если поправка курса больше 20°, сначала искать другую неисправность. Калибровку вращением перед полётом MagFit не отменяет. Разбор с числами — `ap-sensors`.
+
+Как проверить, что калибровка удалась:
+- длина поля постоянна в пределах ±5 % при любом повороте (Шаг 4);
+- ArduPilot: длина вектора смещений меньше `COMPASS_OFFS_MAX` = 1800, отличие от модели поля меньше `ARMING_MAGTHRESH` = 100 мГс по горизонтали (по вертикали — вдвое больше, 200 мГс); помеха CompassMot меньше 30 % (`ap-sensors`);
+- INAV: `magzero_*` все нули и `maggain_*` = 1024 — калибровки нет или она не удалась.
+
 ### Барометр (кратко, подробнее в модуле про высоту)
 Давление → высота по стандартной атмосфере; ошибки: температурный дрейф, поток воздуха от пропов, погода (дрейф 1–3 м за полчаса), солнечный нагрев. Разрешение хороших MEMS-баро ~10 см, шум ~0.5 м без фильтра.
 
@@ -60,7 +77,7 @@ ArduPilot: `INS_GYRO_FILTER`/`INS_ACCEL_FILTER` (LPF 20 Гц для accel по �
 
 ### Место в системе
 
-- **Получает:** сырые данные чипов по SPI и I²C (`f-fc-sensors`); вибрации рамы — через g-чувствительность гироскопа и клиппинг акселерометра (`f-frame-mech`); магнитные помехи от токов (`el-emi`).
+- **Получает:** сырые данные чипов по SPI и I²C (`f-fc-sensors`); вибрации рамы — через g-чувствительность гироскопа и клиппинг акселерометра (`f-frame-mech`); магнитные помехи от токов (`el-emi`) и ток батареи для их вычитания — CompassMot, MagFit (`ap-sensors`).
 - **Отдаёт:** калиброванные гироскоп, акселерометр и компас — фильтру ориентации и EKF (`est-attitude`, `est-kalman`); гироскоп — фильтрам перед PID (`bf-filters`); барометр — источникам высоты (`est-alt-sources`).
 - **Если ошибиться здесь:** у внешнего компаса неверный `COMPASS_ORIENT` → измеренное поле не согласуется с ориентацией, курс прыгает, «воронка» в Loiter (`nav-resilience`, `ap-ekf`). Акселерометр не перекалиброван после удара → горизонт смещён на градусы, аппарат в режиме с самовыравниванием уходит в сторону (`est-attitude`). Клиппинг от вибраций → EKF теряет высоту (`ap-logs`).
 
@@ -100,6 +117,10 @@ ArduPilot: `INS_GYRO_FILTER`/`INS_ACCEL_FILTER` (LPF 20 Гц для accel по �
 - ArduPilot — Accelerometer Calibration | https://ardupilot.org/copter/docs/common-accelerometer-calibration.html | primary | A
 - ArduPilot — Compass Calibration | https://ardupilot.org/copter/docs/common-compass-calibration-in-mission-planner.html | primary | A
 - ArduPilot — IMU Temperature Calibration | https://ardupilot.org/copter/docs/common-imutempcal.html | primary | A
+- ArduPilot — Compass Calibration with MagFit (открыто 2026-11-22) | https://ardupilot.org/copter/docs/common-magfit.html | primary | A
+- ArduPilot Copter-4.7.2 libraries/AP_Compass/AP_Compass.cpp (CAL_FIT, AUTO_ROT, OFFS_MAX) | https://github.com/ArduPilot/ardupilot/blob/Copter-4.7.2/libraries/AP_Compass/AP_Compass.cpp | primary | A
+- PX4 v1.17.0 sensor_params_mag.c и mag_compensation.py (SENS_MAG_SIDES, CAL_MAG_COMP_TYP, компенсация по ULog) | https://github.com/PX4/PX4-Autopilot/blob/v1.17.0/src/modules/sensors/sensor_params_mag.c | primary | A
+- INAV 9.1.0 src/main/fc/settings.yaml (align_mag, magzero, maggain, mag_calibration_time) | https://github.com/iNavFlight/inav/blob/9.1.0/src/main/fc/settings.yaml | primary | A
 
 ## checklist
 - Знаю, что такое bias, шум, температурный дрейф и масштаб
@@ -107,3 +128,4 @@ ArduPilot: `INS_GYRO_FILTER`/`INS_ACCEL_FILTER` (LPF 20 Гц для accel по �
 - Измерил bias и шум гироскопа своего FC
 - Выполнил 6-позиционную калибровку и проверил горизонт
 - Оценил hard-iron offset компаса и проверил постоянство |B|
+- Выбираю способ калибровки компаса по трём входам (вращение, помеха от тока, прошивка) и проверяю результат по порогам
