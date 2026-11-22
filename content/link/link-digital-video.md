@@ -57,10 +57,35 @@ next:
 
 {{diagram:fpv-video-choice|Выбор системы FPV-видео по задаче: постоянная низкая задержка — аналог или HDZero, картинка и запись — DJI/Walksnail, открытость и MAVLink в канале — OpenIPC.}}
 
+### Очки: совместимость и выбор
+Очки живут дольше аппаратов, и каждый следующий видеопередатчик (VTX) обязан к ним подходить. Поэтому вопрос ставится так: **какие VTX уже стоят на твоих аппаратах и какие ты готов покупать дальше**. Цены и полная матрица DJI с задержками — в `f-starter-kit`; здесь — что какие очки принимают (по данным производителей и обзоров на ноябрь 2026).
+
+| Очки | Принимают сами | Через модуль или вход | Не принимают |
+|---|---|---|---|
+| DJI Goggles 3 | O4, O4 Pro; O3 — после обновления (очки v01.00.0300, O3 v01.03.0000) | — | аналог, HDZero, Walksnail, Vista и первый DJI FPV Air Unit |
+| DJI Goggles N3 | O4, O4 Pro | — | O3 и всё не-DJI |
+| DJI Goggles 2 / Integra | O3, O4, O4 Pro; Vista и первый DJI FPV Air Unit — на совместимой прошивке очков | — | аналог и всё не-DJI |
+| HDZero Goggle 2, BoxPro | HDZero и аналог (встроенный приёмник) | Walksnail — внешний VRX в HDMI-вход | DJI |
+| HDZero Goggle (первые) | HDZero | аналог — модуль расширения с отсеком под аналоговый приёмник | DJI |
+| Walksnail Goggles X | Walksnail | аналог и HDZero — внешний приёмник во вход AV/HDMI | DJI |
+| Walksnail Goggles L | Walksnail | — | остальное |
+| Аналоговые очки | аналог 5.8 ГГц | цифра — только отдельным VRX с HDMI-выходом, если у очков есть HDMI-вход (**не проверено** по моделям) | DJI |
+
+Две закономерности. DJI работает только с DJI, и внутри DJI совместимость идёт по поколениям: N3 — очки только под O4, пульт DJI тоже привязан к поколению очков. HDZero и Walksnail открыты в сторону аналога, но друг друга принимают только через внешний приёмник.
+
+**Правило выбора.**
+
+1. Выпиши свой парк: сколько аппаратов на каждой системе. Смена системы стоит «очки + VTX на каждый аппарат» (`f-starter-kit`).
+2. Аналоговые аппараты должны летать дальше → очки с аналоговым приёмником: HDZero Goggle 2 или BoxPro, Walksnail Goggles X с внешним приёмником. Очки DJI здесь не подходят вообще.
+3. Остаёшься на DJI и у тебя есть O3 → Goggles 3 или Goggles 2/Integra; N3 бери, только если весь парк на O4.
+4. Перед покупкой сверь список совместимости на странице производителя для текущей прошивки: O3 в Goggles 3 появился обновлением, и списки меняются.
+
+**Как проверить после покупки.** Обнови прошивку очков и воздушного модуля, привяжи, на столе без пропов убедись, что есть картинка и OSD (настройка OSD — `bf-hd-osd-video`). Затем сравни запись в очках с записью на борту: на борту чисто, а в очках блоки — проблема в радио, а не в совместимости.
+
 ### Место в системе
 
 - **Получает:** UART с MSP DisplayPort и содержимое OSD от полётника (`bf-hd-osd-video`); полосу в 5.8 ГГц, которую приходится делить с соседями (`link-vtx`); запас по дальности из бюджета линка (`rf-link-budget`, `rf-antennas`).
-- **Отдаёт:** картинку и OSD пилоту с задержкой, зависящей от режима; запись HD на борту для разбора полёта; занятый канал — в общую таблицу частот площадки (`ops-field`).
+- **Отдаёт:** картинку и OSD пилоту с задержкой, зависящей от режима; запись HD на борту для разбора полёта; выбор очков, который определяет VTX каждого следующего аппарата (`f-starter-kit`); занятый канал — в общую таблицу частот площадки (`ops-field`).
 - **Если ошибиться здесь:** система выбрана по задержке «с коробки» → на краю дальности битрейт и частота кадров падают, задержка растёт, затем фриз: картинка пропадает без плавного предупреждения, как у аналога; поведение на краю измеряется заранее (`rf-link-budget`). В Cloud Build не отмечен HD OSD → видео есть, OSD в очках нет (`bf-hd-osd-video`).
 
 ## practice
@@ -102,6 +127,10 @@ next:
 - ArduPilot — MSP DisplayPort OSD | https://ardupilot.org/copter/docs/common-msp-osd-overview-4.2.html | primary | A
 - OpenIPC — open firmware for IP cameras (FPV) | https://github.com/OpenIPC | primary | B
 - WFB-ng — long-range Wi-Fi broadcast link | https://github.com/svpcom/wfb-ng | primary | B
+- DJI — O4 Air Unit Series, Specs (совместимые очки; дата обращения 2026-11-18) | https://www.dji.com/o4-air-unit/specs | primary | A
+- Oscar Liang — DJI Goggles 3 Supports O3 (версии прошивок, обновлено 2024-10-11) | https://oscarliang.com/dji-goggles-3-supports-o3/ | secondary | B
+- Unmanned Tech — DJI Goggles 3 vs N3 compatibility (2026-06-09) | https://www.unmannedtechshop.co.uk/de/blogs/knowledge-base/dji-goggles-3-vs-n3-compatibility-guide-what-nobody-tells-you | secondary | B
+- RCDrone — HDZero Goggle 2 compatibility: analog, Walksnail VRX (2026-11-13) | https://rcdrone.top/blogs/articles/hdzero-goggle-2-compatibility-analog-walksnail-vrx | secondary | C
 
 ## checklist
 - Объясняю разницу аналога, кадрово-синхронной цифры и сжатого видео

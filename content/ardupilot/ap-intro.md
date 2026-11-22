@@ -145,6 +145,26 @@ ArduPilot не армится, пока что-то не так: не откал
 ### Требования к железу
 ArduPilot заметно тяжелее Betaflight. На F4-контроллерах часть функций недоступна: например, Lua-скриптинг собирается только для плат с флешем больше 1 МБ, поэтому на F405/F411 (1 МБ и меньше) его нет; F427/F429 с 2 МБ (Pixhawk 1, Cube Black) Lua выполняют. Для сложных платформ берут H7.
 
+### Какую плату брать
+Плату выбирают от функций, а не от цены. Порог в исходниках один — `HAL_PROGRAM_SIZE_LIMIT_KB` (`FLASH_SIZE_KB` из hwdef плюс внешняя флеш, если в hwdef задан `EXT_FLASH_SIZE_MB`; `AP_HAL/board/chibios.h`), и каждая функция включена в сборку только выше своего порога (ArduPilot 4.7.2, файлы `*_config.h`):
+
+| Нужна функция | Порог флеша | Что это |
+|---|---|---|
+| Lua-скрипты (`SCR_*`) | > 1 МБ | `ap-lua` |
+| FFT-анализ гироскопа в полёте (`FFT_*`) | > 1 МБ | notch по спектру, `ap-tuning` |
+| ADS-B, датчики препятствий (proximity), визуальная одометрия | > 1 МБ | `nav-indoor`, `per-depth-avoid` |
+| подвесы по MAVLink, ViewPro, Xacti, XFRobot | > 1 МБ | `payload-gimbal` |
+| декодирование RTCM, EFI (ДВС), посадка deepstall | > 1 МБ | `nav-rtk` |
+| внешний AHRS (VectorNav и др.), маяки, генератор, лебёдка, сервы Volz | > 2 МБ (на 2 МБ, то есть на F765 и H743, в стандартной сборке **нет**) | — |
+
+**Шаг 1. Флеш.** Нужна функция с порогом > 1 МБ → 2 МБ: STM32F7 (F765/F767) или H7 (H743). Функции с порогом > 2 МБ на таких платах в стандартную сборку не входят: порог строгий, а у H743 ровно 2048 КБ. Они есть только на платах с внешней флеш (`EXT_FLASH_SIZE_MB` в hwdef, например H750-платы и CubeRedPrimary) или в своей сборке на custom.ardupilot.org. Чипы по даташитам ST: F405 — 1 МБ, 168 МГц, 192 КБ ОЗУ; F765 — 2 МБ, 216 МГц, 512 КБ; H743 — 2 МБ, 480 МГц, 1 МБ ОЗУ. Плат на H743 в 4.7.2 больше, чем на любом другом чипе. F405 оправдан только для простого самолёта или коптера без скриптов; часть таких плат дополнительно урезана (`minimize_features.inc`: без OSD, CRSF-телеметрии, MSP). Точный состав сборки лежит в `features.txt` в папке платы на firmware.ardupilot.org. Недостающее на 1 МБ можно собрать на custom.ardupilot.org, но только ценой других функций.
+
+**Шаг 2. Число IMU.** EKF3 по умолчанию запускает ядро на каждый из двух первых IMU (`EK3_IMU_MASK = 3`) и при отказе одного переключается на другое. С одним IMU переключаться некуда. Аппарат дороже вупа или с полётом вне прямой видимости — бери плату с ≥ 2 IMU; для тяжёлых аппаратов и BVLOS — три IMU и демпфированный блок (**оценка**, подробно — `el-redundancy`).
+
+**Шаг 3. Плата в релизе.** Найди её в `libraries/AP_HAL_ChibiOS/hwdef` своей версии или в списке прошивок; рекомендованный перечень — страница «Choosing an Autopilot».
+
+**Шаг 4. Проверка после прошивки.** Есть ли в списке параметров `SCR_ENABLE` и `FFT_ENABLE`: нет — значит, в сборке нет этих функций. Клоны Pixhawk 2.4.8 стоят на F427, а у части этих чипов прошивка может использовать только 1 МБ (как часто это встречается у клонов — **не проверено**): прошивка 2 МБ на такой плате сама пишет `ERROR: 1M flash use Pixhawk1-1M` (сборка `Pixhawk1`) или `ERROR: 1M flash use fmuv2` (сборка `fmuv3`) — ставь ту, которую называет сообщение. Для учёбы такая плата годится, для аппарата с Lua и FFT — нет.
+
 ### Что меняется для пилота Betaflight
 - Не дифы, а файлы параметров.
 - Не «прошил и полетел», а калибровки (акселерометр, компас, радио, ESC) и pre-arm.
@@ -169,7 +189,7 @@ ArduPilot заметно тяжелее Betaflight. На F4-контроллер
 ### Место в системе
 
 - **Получает:** оценку EKF, от которой зависит, какие режимы доступны (`ap-ekf`); калибровки акселерометра и компаса для pre-arm (`est-sensors`); ресурсы платы — у F4 меньше UART и нет аппаратной инверсии (`f-fc-sensors`), а при 1 МБ флеша нет Lua (`ap-lua`).
-- **Отдаёт:** имена параметров 4.7 и таблицу переименований — всем модулям трека; порядок первой настройки — в `ap-setup-scratch`; режим GUIDED — в `ap-companion`.
+- **Отдаёт:** имена параметров 4.7 и таблицу переименований — всем модулям трека; выбор платы по флешу — `ap-lua`; порядок первой настройки — в `ap-setup-scratch`; режим GUIDED — в `ap-companion`.
 - **Если ошибиться здесь:** загрузил после обновления старый `.param` или скрипт с именами 4.6 → запись молча не срабатывает → failsafe и RTL работают на умолчаниях, а не на твоих значениях (`ap-safety-fs`). `ARMING_SKIPCHK` не 0 → часть pre-arm проверок пропущена → плохой компас или GPS всплывает уже в полёте как «EKF variance» (`ap-ekf`).
 
 ## practice
@@ -223,6 +243,9 @@ ArduPilot заметно тяжелее Betaflight. На F4-контроллер
 - Pre-Arm Safety Checks — ArduPilot Copter | https://ardupilot.org/copter/docs/common-prearm-safety-checks.html | primary | A
 - Choosing an Autopilot — ArduPilot Copter | https://ardupilot.org/copter/docs/common-autopilots.html | primary | A
 - Lua Scripts — ArduPilot | https://ardupilot.org/copter/docs/common-lua-scripts.html | primary | A
+- Firmware Limitations on AutoPilot Hardware — ArduPilot (features.txt, custom.ardupilot.org; открыто 2026-11-22) | https://ardupilot.org/copter/docs/common-limited-firmware.html | primary | A
+- ArduPilot Copter-4.7.2 — AP_HAL_Boards.h и *_config.h (пороги HAL_PROGRAM_SIZE_LIMIT_KB) | https://github.com/ArduPilot/ardupilot/blob/Copter-4.7.2/libraries/AP_HAL/AP_HAL_Boards.h | primary | A
+- ArduPilot Copter-4.7.2 — hwdef Pixhawk1-1M и fmuv3 (сообщение о 1 МБ флеша) | https://github.com/ArduPilot/ardupilot/blob/Copter-4.7.2/libraries/AP_HAL_ChibiOS/hwdef/Pixhawk1/hwdef.dat | primary | A
 
 ## checklist
 - Понимаю разницу Copter/Plane и что задают `FRAME_CLASS` и `FRAME_TYPE`

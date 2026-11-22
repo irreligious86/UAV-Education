@@ -54,6 +54,26 @@ ESP32 как компонент системы: шлёт `HEARTBEAT` (свой c
 
 {{diagram:esp32-roles|Три роли ESP32 в курсе: мост UART ↔ Wi-Fi/BLE, собственный компонент MAVLink и компаньон пульта на порту AUX.}}
 
+### ESP32 как полётный контроллер: что есть и чего ждать
+Вопрос «можно ли ESP32 вместо полётника» решается не по цене платы, а по тому, есть ли твой чип в списке целей **той версии прошивки, на которой ты летаешь**. Состояние на 22.11.2026, проверено по исходникам целевых версий курса:
+
+| Прошивка | ESP32 в целевой версии | Что это значит |
+|---|---|---|
+| ArduPilot 4.7.2 | есть HAL `AP_HAL_ESP32`, 10 описаний плат (`esp32buzz`, `esp32s3devkit`, `esp32s3m5stampfly` и др.) | только сборка из исходников под Linux; в README порта DShot, GPIO и телеметрия ESC — в списке «ещё не сделано»; у StampFly `SCHED_LOOP_RATE 150` с комментарием «flash won't go faster» при 400 Гц по умолчанию у Copter, коллекторные моторы, лог по MAVLink |
+| Betaflight 2025.12.5 | нет: платформы STM32, AT32, APM32, PICO | в 2026.6 ESP32-S3 и ESP32-WROOM добавлены как **experimental** (DShot150/300, blackbox на SD; release notes, в исходниках не проверено) |
+| INAV 9.1.0 | нет ни одной цели | — |
+| PX4 1.17.0 | `boards/espressif/esp32`, версия 0.1 | в конфиге сборки нет ни EKF2, ни регуляторов ориентации: это заготовка, а не полётник |
+| ESP-FC (отдельный проект, MIT, тег v0.2.1) | ESP32 и ESP32-S3 рекомендованы, S2, C3, RP2040, RP2350 — экспериментально | совместим с Betaflight Configurator; до 4 кГц цикла с SPI-гироскопом; ACRO, ANGLE, AIRMODE, только Quad X; удержания высоты и GPS нет; автор пишет, что это не Betaflight и часть вкладок Configurator не работает |
+| ExpressLRS 4.1.0 | приёмники на ESP32, ESP32-C3, ESP32-S3 | выходы приёмника дают PWM 50–400 Гц и DShot300 прямо на ESC и сервы, но без стабилизации: для простого самолёта, не для коптера |
+
+Почему ESP32 упирается в потолок: код исполняется из внешней SPI-флеш через кеш — отсюда 150 Гц у ArduPilot на StampFly. Радио Wi-Fi на том же кристалле делит 2.4 ГГц с ELRS (раздел про мост выше). У STM32 — встроенная флеш и DShot во всех четырёх прошивках курса.
+
+**Правило выбора.**
+
+1. Цель — разобраться в коде регулятора, комнатный коллекторный вуп, стенд → ESP32 подходит: ESP-FC или ArduPilot на StampFly.
+2. GPS-навигация, масса больше 250 г, полёт вне прямой видимости, полезная нагрузка → STM32: F405 для Betaflight и INAV, H7 для ArduPilot и PX4 (`ap-intro`, раздел «Какую плату брать»).
+3. Проверка: открой в исходниках своей версии список целей (`src/platform` у Betaflight, `libraries/AP_HAL_*/hwdef` у ArduPilot) и найди там свою плату. Не нашёл — плата не входит в релиз, и для задач из пункта 2 она не годится. На ArduPilot сверь фактическую частоту основного цикла `PM.LR` в логе с `SCHED_LOOP_RATE` и посмотри `PM.NLon` (число затянувшихся циклов): если `LR` заметно ниже заданной частоты, а `NLon` растёт — процессор не успевает.
+
 ### Место в системе
 
 - **Получает:** MAVLink от FC по UART 3.3 В (`comp-mavlink`); строки состояния (режим, арм, батарея, RSSI) от Lua-скрипта пульта по порту AUX; питание от BEC или батареи пульта.
@@ -196,6 +216,11 @@ return { name = "Companion", create = create, update = update, refresh = refresh
 - EdgeTX Lua serial API source (api_general.cpp, GitHub) | https://github.com/EdgeTX/edgetx/blob/main/radio/src/lua/api_general.cpp | primary | A
 - ESP32 Arduino core — Wi-Fi API (GitHub) | https://github.com/espressif/arduino-esp32 | primary | A
 - PlatformIO — Documentation | https://docs.platformio.org/ | primary | A
+- ArduPilot Copter-4.7.2 — AP_HAL_ESP32 README и hwdef esp32s3m5stampfly | https://github.com/ArduPilot/ardupilot/tree/Copter-4.7.2/libraries/AP_HAL_ESP32 | primary | A
+- Betaflight 2026.6 Release Notes (ESP32 experimental; открыто 2026-11-22) | https://betaflight.com/docs/wiki/release/Betaflight-2026-6-Release-Notes | primary | A
+- PX4 v1.17.0 — boards/espressif/esp32 | https://github.com/PX4/PX4-Autopilot/tree/v1.17.0/boards/espressif/esp32 | primary | A
+- ExpressLRS 4.1.0 — src/targets и include/common.h (режимы выходов PWM/DShot) | https://github.com/ExpressLRS/ExpressLRS/blob/4.1.0/src/include/common.h | primary | A
+- ESP-FC — README (MCU, функции, ограничения; открыто 2026-11-22) | https://github.com/rtlopez/esp-fc | primary | B
 
 ## checklist
 - Уровни UART проверены мультиметром, GND общий
