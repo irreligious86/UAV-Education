@@ -42,13 +42,16 @@ var T = (typeof window !== "undefined" && window.T) || function (s) { return s; 
       var volts = p.cells * 3.7;
       var current = powerMotors / volts + p.aux;           // A
       var minutes = (p.cap / 1000) * p.usable / current * 60;
-      return { tw: tw, throttle: 100 / tw, current: current, power: powerMotors, minutes: minutes };
+      // hover throttle from the course thrust curve T = 0.35u + 0.65u^2 (f-physics), f = thrust fraction 1/(T/W)
+      var f = Math.min(1, 1 / tw);
+      var throttle = 100 * (-0.35 + Math.sqrt(0.35 * 0.35 + 4 * 0.65 * f)) / 1.3;
+      return { tw: tw, throttle: throttle, current: current, power: powerMotors, minutes: minutes };
     }
 
     update() {
       var p = this.p, r = this.calc(p.mass);
       var twState = r.tw < 1.6 ? "critical" : r.tw < 2.2 ? "caution" : "ok";
-      var thrState = r.throttle > 60 ? "critical" : r.throttle > 45 ? "caution" : "ok";
+      var thrState = r.tw < 2 ? "critical" : r.tw < 2.5 ? "caution" : "ok";  // 65 % / 56 % throttle on the course curve
       this.metricsEl.innerHTML =
         '<span class="gc-tag" data-state="' + twState + '">T/W ' + r.tw.toFixed(2) + "</span>" +
         '<span class="gc-tag" data-state="' + thrState + T('">газ висения ≈ ') + r.throttle.toFixed(0) + " %</span>" +
