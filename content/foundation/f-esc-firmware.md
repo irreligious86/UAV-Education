@@ -88,6 +88,7 @@ ESC меняет напряжение на обмотке не плавно, а 
 | 7" long range, 6S | 24 кГц или переменная 24–48 кГц; на Bluejay допустимо 48 кГц | висение 110–130 Гц (`bf-rpm-filter`) — это около 50 000 eRPM: на 24 кГц N ≈ 4.8, запас уже есть | Oscar Liang: Bluejay — 48, BLHeli_32 — нижняя 24 и «By RPM»; число N — расчёт | ток висения, температура ESC, помехи в видео |
 | 10" и больше, heavy lift, X8, моторы с низким KV | 24 кГц, фиксированная | большая L, большие U·I: пульсация мала, а потери переключения наибольшие | оценка: источника с числом для этого класса нет; AM32 ниже 16 кГц Oscar Liang не советует — растёт ток | температура ESC под полной нагрузкой, десинк на резком газе, N на висении |
 | Самолёт (один-два мотора) | 24 кГц | газ меняется медленно, торможение мотором не нужно, ESC долго работает на большом токе | оценка | температура ESC в наборе высоты, уверенный старт мотора |
+| Ограничение для любого класса: на борту DJI O3/O4, запись стабилизируется в Gyroflow | 48 кГц и выше, даже если по классу выходит 24 | по документации Gyroflow ШИМ 24 кГц по умолчанию интерферирует с частотой опроса IMU модуля, гироскоп в файле портится; 48 кГц и выше этого избегают | Gyroflow docs, DJI (O3/O4 Air Unit); там же — мягкое крепление камеры или Optical correction | после Gyroflow нет «желе» и дрожания по гироскопу модуля; затем — как по классу: температура ESC, низ газа (`per-fpv-footage`) |
 
 **Порядок подбора для любого аппарата.**
 1. Взять стартовое значение по классу.
@@ -199,6 +200,7 @@ ESC меняет напряжение на обмотке не плавно, а 
 - Bluejay v0.21.0 — release notes | https://github.com/bird-sanctuary/bluejay/releases/tag/v0.21.0 | primary | A
 - BLHeli_32 manual ARM Rev32.x (PWM frequency, By RPM) | https://github.com/bitdump/BLHeli/blob/master/BLHeli_32%20ARM/BLHeli_32%20manual%20ARM%20Rev32.x.pdf | primary | A
 - BLHeli_S manual SiLabs Rev16.x (motor PWM 24 kHz) | https://github.com/bitdump/BLHeli/blob/master/BLHeli_S%20SiLabs/BLHeli_S%20manual%20SiLabs%20Rev16.x.pdf | primary | A
+- Gyroflow — Supported cameras: DJI (O3/O4: ШИМ ESC 24 кГц интерферирует с опросом IMU, 48 кГц и выше) | https://docs.gyroflow.xyz/app/getting-started/supported-cameras/dji.md | primary | A
 - Oscar Liang — Best BLHeli_32 settings (PWM frequency by use) | https://oscarliang.com/best-blheli-32-settings | secondary | B
 - Oscar Liang — Bluejay firmware and best settings | https://oscarliang.com/bluejay-blheli-s/ | secondary | B
 - Oscar Liang — Best AM32 settings | https://oscarliang.com/best-am32-settings | secondary | B
