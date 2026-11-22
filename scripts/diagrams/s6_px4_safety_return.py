@@ -43,7 +43,7 @@ def build(D: dict) -> None:
         Box("run", ["Действие выполняется"], xs[0], ys[1], w, h),
         Box("can", ["Режим недоступен →", "Hold → RTL → Land →", "Descend → Terminate"], xs[0], ys[2], w, h,
             note="нет позиции, дома, высоты"),
-        Box("take", ["Перехват пилотом:", "режим или стики >", "COM_RC_STICK_OV"], xs[1], ys[2], w, h, accent=True,
+        Box("take", ["Перехват пилотом:", "режим или быстрое", "движение стика (STICK_OV)"], xs[1], ys[2], w, h, accent=True,
             note="стики — только мультиротор"),
         Box("clear", ["Снятие: условие ушло", "+ смена режима", "или дизарм"], xs[2], ys[2], w, h,
             note="Terminate не снимается"),

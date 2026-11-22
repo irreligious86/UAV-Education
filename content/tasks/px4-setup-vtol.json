@@ -1,0 +1,137 @@
+{
+ "module": "px4-setup-vtol",
+ "tasks": [
+  {
+   "id": "vtol-stall-speed",
+   "title": "Скорость сваливания из массы и крыла",
+   "statement": "Масса **{m}** кг, площадь крыла **{S}** м², C_Lmax = **{cl}**, ρ = 1.225 кг/м³. Найди скорость сваливания V_s.",
+   "params": {
+    "m": {
+     "min": 1.5,
+     "max": 6.0,
+     "step": 0.5
+    },
+    "S": [
+     0.35,
+     0.45,
+     0.55,
+     0.65,
+     0.75,
+     0.9
+    ],
+    "cl": [
+     1.0,
+     1.1,
+     1.2,
+     1.3
+    ]
+   },
+   "answer": "math.sqrt(2*m*9.81/(1.225*S*cl))",
+   "unit": "м/с",
+   "tol": 0.01,
+   "solution": "V_s = √(2·m·g / (ρ·S·C_Lmax)). Пример модуля: 4.5 кг, 0.75 м², 1.2 → 8.95 м/с. Дальше по правилам модуля: FW_AIRSPD_STALL = V_s, FW_AIRSPD_MIN = 1.25·V_s (вверх до 0.5)."
+  },
+  {
+   "id": "vtol-turn-min-airspeed",
+   "title": "Минимальная скорость в вираже",
+   "statement": "`FW_AIRSPD_MIN` = **{vmin}** м/с, заданный крен **{phi}**°. Какую минимальную скорость TECS будет держать в этом вираже (`WEIGHT_*` не заданы)?",
+   "params": {
+    "vmin": {
+     "min": 8,
+     "max": 18,
+     "step": 0.5
+    },
+    "phi": [
+     20,
+     30,
+     35,
+     40,
+     45,
+     50,
+     55,
+     60
+    ]
+   },
+   "answer": "vmin*math.sqrt(1/math.cos(math.radians(phi)))",
+   "unit": "м/с",
+   "tol": 0.01,
+   "solution": "PerformanceModel::getMinimumCalibratedAirspeed: MIN·√n, n = 1/cos φ. При 50° n = 1.556, √n = 1.247: 11.5 → 14.34 м/с. Скорость сваливания в вираже растёт так же."
+  },
+  {
+   "id": "vtol-backtrans-distance",
+   "title": "Дистанция начала перехода назад",
+   "statement": "Путевая скорость перед пунктом VTOL_LAND **{v}** м/с, `VT_B_DEC_MSS` = **{a}** м/с². С какой дистанции до точки миссия начнёт переход назад?",
+   "params": {
+    "v": {
+     "min": 12,
+     "max": 26,
+     "step": 1
+    },
+    "a": [
+     1.0,
+     1.5,
+     2.0,
+     2.5,
+     3.0
+    ]
+   },
+   "answer": "v**2/(2*a)",
+   "unit": "м",
+   "tol": 0.01,
+   "solution": "mission_block.cpp: радиус принятия точки = v²/(2·VT_B_DEC_MSS). 16 м/с и 2 м/с² → 64 м. По коду переход заканчивается раньше — на MPC_XY_CRUISE (5 м/с), через (v² − 25)/(2a) метров."
+  },
+  {
+   "id": "vtol-front-trans-time",
+   "title": "Время перехода вперёд",
+   "statement": "Стандартный VTOL с датчиком, ρ = 1.225. Скорость после тумблера растёт равномерно с ускорением **{acc}** м/с². `VT_ARSP_TRANS` = **{vt}** м/с, `VT_TRANS_MIN_TM` = **{tm}** с, остальное по умолчанию (`VT_ARSP_BLEND` = 8 м/с, `VT_F_TR_OL_TM` = 6 с, `VT_TRANS_TIMEOUT` = 15 с). Через сколько секунд аппарат станет самолётом?",
+   "params": {
+    "acc": [
+     1.5,
+     2.0,
+     2.5,
+     3.0
+    ],
+    "vt": {
+     "min": 9,
+     "max": 16,
+     "step": 0.5
+    },
+    "tm": [
+     2,
+     3,
+     4,
+     5
+    ]
+   },
+   "answer": "max(tm, vt/acc)",
+   "unit": "с",
+   "tol": 0.01,
+   "solution": "isFrontTransitionCompletedBase: нужны оба условия — время > VT_TRANS_MIN_TM и V ≥ VT_ARSP_TRANS. Время до скорости vt/acc, итог max(VT_TRANS_MIN_TM, vt/acc). Проверь отдельно, что скорость VT_ARSP_BLEND набирается раньше VT_F_TR_OL_TM, иначе — quad-chute."
+  },
+  {
+   "id": "vtol-timeout-density",
+   "title": "Таймаут перехода на высоте",
+   "statement": "`VT_TRANS_TIMEOUT` = **{to}** с, плотность воздуха **{rho}** кг/м³. Через сколько секунд сработает таймаут перехода?",
+   "params": {
+    "to": [
+     10,
+     12,
+     15,
+     18,
+     20
+    ],
+    "rho": [
+     0.8,
+     0.9,
+     1.0,
+     1.1,
+     1.225
+    ]
+   },
+   "answer": "to*(1.225/max(0.7,min(1.5,rho)))**1.5",
+   "unit": "с",
+   "tol": 0.01,
+   "solution": "getFrontTransitionTimeFactor: множитель (ρ₀/ρ)^1.5, ρ ограничена 0.7…1.5 кг/м³. При ρ = 1.0 множитель 1.356: 15 с → 20.3 с. Тот же множитель — у VT_TRANS_MIN_TM и VT_F_TR_OL_TM."
+  }
+ ]
+}

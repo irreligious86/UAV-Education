@@ -97,6 +97,14 @@ ArduPilot — автопилот, а не просто стабилизатор.
 | `RCx_OPTION = 163` Mount Lock | 163 Mount Yaw Lock; новые 185 Mount Roll/Pitch Lock, 186 Mount POI Lock | имя и две новые функции | 4.7.0 |
 | — | `RCx_OPTION = 182` AHRS AutoTrim | новая функция тумблера | 4.7.0 |
 | `CAM_RC_*` (RunCam) | `CAM1_RC_*`, тип камеры `CAM1_TYPE = 8` | RunCam стал типом камеры | 4.7.0 |
+| `COMPASS_LEARN = 1` Internal-Learning | значения 1 нет | остались 0, 2 EKF-Learning, 3 InFlight-Learning (`ap-sensors`) | 4.7.0 |
+| `ARSPD_SKIP_CAL`: 0 / 1 | + 2 | 2 — не калибровать ноль при загрузке, но требовать ручную калибровку раз за включение | 4.7.0 |
+| `ARSPD_TYPE` до 16 | + 17–19 AUAV (10in, 5in, 30in) | новые датчики | 4.7.0 |
+| `BATT_MONITOR` до 29 | + 30 INA3221, + 31 Analog Current Only (32 TI BQ76952 — только AP_Periph) | новые мониторы; у типа 31 напряжение всегда 0 (`ap-sensors`) | 4.7.0 |
+| `NTF_LED_TYPES` до бита 18 | + бит 19 ProfiLED_IOMCU (524288) | светодиод через сопроцессор Cube (`ap-notify`) | 4.7.0 |
+| `MNT1_TYPE` до 13 | + 14 XFRobot | новый подвес (только в сборках для флеша больше 1 МБ) | 4.7.0 |
+| `RCx_OPTION = 19` Gripper: исполнялся при загрузке, без приёмника положение считалось LOW — захват открывался сам | то же значение; при загрузке не исполняется, захват стоит на `GRIP_NEUTRAL` | LOW исполняется уже на первом кадре приёмника — захват откроется при включении пульта с тумблером в LOW (`ap-payload`) | 4.7.0 |
+| лебёдка `WINCH_*` во всех сборках | только при флеше больше 2048 КБ | на платах с 2 МБ флеша `WINCH_*` пропадают после обновления, нужна своя сборка (`ap-payload`) | 4.7.0 |
 | `SIM_GPS_DISABLE = 1`, `SIM_GPS2_DISABLE` (SITL) | `SIM_GPS1_ENABLE = 0`, `SIM_GPS2_ENABLE` | смысл обратный | 4.7.0 |
 | `SIM_GPS_*` (первый приёмник в SITL): `SIM_GPS_NOISE`, `SIM_GPS_GLITCH_X`, `SIM_GPS_ACC`, `SIM_GPS_HDG`, `SIM_GPS_POS_Y` | `SIM_GPS1_NOISE`, `SIM_GPS1_GLTCH_X`, `SIM_GPS1_ACC`, `SIM_GPS1_HDG`, `SIM_GPS1_POS_Y` | индекс приёмника в имени, часть имён укорочена | 4.7.0 |
 | лог Copter `CTUN.CRt`, `CTUN.DCRt`: целое, см/с | те же поля: число с плавающей точкой, м/с | свои скрипты, читающие сырые значения, пересчитать | 4.7.0 |

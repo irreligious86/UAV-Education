@@ -31,7 +31,7 @@ next:
 | Радио (RC) | приёмник перестал выдавать кадры (no pulses) или канал газа ≤ `FS_THR_VALUE` (PWM, 910–1100) | `FS_THR_ENABLE`, `FS_THR_VALUE` | 0 выкл, 1 RTL, 3 Land, 4 SmartRTL/RTL, 5 SmartRTL/Land, 6 DO_LAND_START или RTL, 7 Brake/Land |
 | GCS | нет heartbeat от наземки > `FS_GCS_TIMEOUT` (5 с по умолчанию) | `FS_GCS_ENABLE`, `FS_GCS_TIMEOUT` | 0 выкл, 1 RTL, 3 SmartRTL/RTL, 4 SmartRTL/Land, 5 Land, 6 DO_LAND_START или RTL, 7 Brake/Land (нумерация отличается от `FS_THR_ENABLE`); актуален для Guided/телеметрии |
 | АКБ низкая | напряжение < `BATT_LOW_VOLT` (с таймером `BATT_LOW_TIMER`) или остаток < `BATT_LOW_MAH` | `BATT_FS_LOW_ACT` | 0 предупреждение, 1 Land, 2 RTL, 3 SmartRTL/RTL, 4 SmartRTL/Land, 5 Terminate, 6 DO_LAND_START/RTL, 7 Brake/Land |
-| АКБ критическая | < `BATT_CRT_VOLT` / `BATT_CRT_MAH` | `BATT_FS_CRT_ACT` | те же, обычно Land |
+| АКБ критическая | напряжение < `BATT_CRT_VOLT` (тот же таймер `BATT_LOW_TIMER`) или остаток < `BATT_CRT_MAH` | `BATT_FS_CRT_ACT` | те же значения; умолчание 0 — только предупреждение, поэтому действие (обычно 1 Land) задают явно |
 | EKF | дисперсии > `FS_EKF_THRESH` | `FS_EKF_ACTION` | 0 только сообщение (появилось в 4.7), 1 Land если режим требует позицию, 2 AltHold, 3 Land всегда |
 | Dead reckoning | EKF потерял источники позиции/скорости и идёт по ветру | `FS_DR_ENABLE`, `FS_DR_TIMEOUT` | Land / RTL / SmartRTL… |
 | Вибрации | клиппинг акселерометра, ошибка высоты | `FS_VIBE_ENABLE` | изменённая оценка высоты и управление |
