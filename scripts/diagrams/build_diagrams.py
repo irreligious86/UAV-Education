@@ -29,7 +29,7 @@ D["fc-signal-path"] = flow(
     720, 230, notes=[(580, 130, "eRPM → RPM-фильтр", "m t", "start")])
 
 D["ardupilot-fast-loop"] = flow(
-    "ArduCopter: задачи быстрой петли (Copter.cpp scheduler_tasks[])",
+    "ArduCopter: задачи быстрого цикла (fast loop) (Copter.cpp scheduler_tasks[])",
     [Box("ins", ["AP_InertialSensor", "update()"], 10, 30, 150, accent=True), Box("rate", ["run_rate_controller", "AC_PID по осям"], 190, 30, 150, accent=True),
      Box("mot", ["motors_output", "AP_MotorsMatrix"], 370, 30, 150, accent=True), Box("out", ["RCOutput", "DShot/PWM"], 550, 30, 150),
      Box("ahrs", ["read_AHRS", "EKF3"], 10, 120, 150), Box("nav", ["read_inertia", "позиция/скорость"], 190, 120, 150),

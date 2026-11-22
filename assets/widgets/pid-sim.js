@@ -74,7 +74,7 @@ var T = (typeof window !== "undefined" && window.T) || function (s) { return s; 
       var self = this;
       this.classList.add("widget");
       this.innerHTML = T('<p class="gc-label gc-muted">Интерактив · step response одной оси</p>') +
-        T('<p class="widget__hint gc-muted">Setpoint — ступенька 300 °/с на 300 мс по одной оси. Модель учебная: моторы с запаздыванием ~20 мс, петля 2 кГц, D на отфильтрованном гироскопе; «Задержка петли» — суммарная чистая задержка (фильтры + ESC + передача), она съедает запас по фазе. Крути P, I, D, FF, шум и фильтр: смотри перелёт, bounce-back после остановки и как D превращает шум в дрожание моторов. Тренды честные, абсолютные цифры — нет.</p>');
+        T('<p class="widget__hint gc-muted">Setpoint — ступенька 300 °/с на 300 мс по одной оси. Модель учебная: моторы с запаздыванием ~20 мс, цикл PID 2 кГц, D на отфильтрованном гироскопе; «Задержка в контуре» — суммарная чистая задержка (фильтры + ESC + передача), она съедает запас по фазе. Крути P, I, D, FF, шум и фильтр: смотри перелёт, bounce-back после остановки и как D превращает шум в дрожание моторов. Тренды честные, абсолютные цифры — нет.</p>');
       var p = this.p = { P: 45, I: 60, D: 25, FF: 60, noise: 2, lpf: 150, delay: 2 };
       var controls = document.createElement("div"); controls.className = "widget__controls";
       var defs = [
@@ -84,7 +84,7 @@ var T = (typeof window !== "undefined" && window.T) || function (s) { return s; 
         { k: "FF", label: "FF", min: 0, max: 250, value: p.FF },
         { k: "noise", label: T("Шум гиро"), min: 0, max: 15, value: p.noise, unit: T("°/с") },
         { k: "lpf", label: "Gyro LPF", min: 30, max: 500, step: 10, value: p.lpf, unit: T("Гц") },
-        { k: "delay", label: T("Задержка петли"), min: 0, max: 12, step: 0.5, value: p.delay, unit: T("мс"), fmt: function (v) { return (+v).toFixed(1); } }
+        { k: "delay", label: T("Задержка в контуре"), min: 0, max: 12, step: 0.5, value: p.delay, unit: T("мс"), fmt: function (v) { return (+v).toFixed(1); } }
       ];
       defs.forEach(function (d) {
         controls.appendChild(UAVPlot.slider({ label: d.label, min: d.min, max: d.max, step: d.step, value: d.value, unit: d.unit, fmt: d.fmt, onChange: function (v) { p[d.k] = v; self.update(); } }).el);

@@ -31,7 +31,7 @@ var T = (typeof window !== "undefined" && window.T) || function (s) { return s; 
       var self = this;
       this.classList.add("widget");
       this.innerHTML = T('<p class="gc-label gc-muted">Интерактив · задержка от стика до мотора</p>') +
-        T('<p class="widget__hint gc-muted">Сумма средних задержек по цепочке: пульт → радио → приёмник → FC (сглаживание, петля, фильтры) → ESC → мотор. Модель учебная: показывает, какие звенья реально весят. Видео — отдельной строкой, по типичным опубликованным диапазонам.</p>');
+        T('<p class="widget__hint gc-muted">Сумма средних задержек по цепочке: пульт → радио → приёмник → FC (сглаживание, цикл PID, фильтры) → ESC → мотор. Модель учебная: показывает, какие звенья реально весят. Видео — отдельной строкой, по типичным опубликованным диапазонам.</p>');
       var p = this.p = { link: 2, smooth: 4, loop: 8000, filt: 1.5, esc: 8000, tau: 20 };
       var sl = document.createElement("div"); sl.className = "widget__controls";
       function add(o) { var s = UAVPlot.slider(o); sl.appendChild(s.el); return s; }

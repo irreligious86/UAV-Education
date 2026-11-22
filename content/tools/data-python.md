@@ -20,7 +20,7 @@ next:
 ---
 
 ## summary
-Blackbox Explorer и MAVExplorer показывают графики; инженеру нужны числа, которые можно сравнить до/после и положить в отчёт. Модуль — минимальный стек: Python + pandas + numpy + scipy + matplotlib; как прочитать лог Betaflight (через `blackbox_decode` в CSV) и ArduPilot (`.bin` через pymavlink), как построить спектр гироскопа методом Уэлча, и как написать переиспользуемые функции метрик: overshoot, время установления, bounce-back, джиттер петли. Весь код — рабочий, с ожидаемыми числами.
+Blackbox Explorer и MAVExplorer показывают графики; инженеру нужны числа, которые можно сравнить до/после и положить в отчёт. Модуль — минимальный стек: Python + pandas + numpy + scipy + matplotlib; как прочитать лог Betaflight (через `blackbox_decode` в CSV) и ArduPilot (`.bin` через pymavlink), как построить спектр гироскопа методом Уэлча, и как написать переиспользуемые функции метрик: overshoot, время установления, bounce-back, джиттер цикла. Весь код — рабочий, с ожидаемыми числами.
 
 ## theory
 ### Стек и установка
@@ -119,7 +119,7 @@ def bounce_back(sp, gy, fs, big=200.0):
 ```
 Ориентиры для 5" (Betaflight): overshoot 5–15% — хорошо; bounce-back < 10% — хорошо, > 25% — много D или плохая механика.
 
-### Джиттер петли
+### Джиттер цикла
 ```python
 dt = np.diff(t) * 1e6   # мкс
 print(dt.mean(), dt.std(), np.percentile(dt, 99.9))

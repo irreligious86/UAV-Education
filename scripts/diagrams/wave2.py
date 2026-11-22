@@ -399,7 +399,7 @@ def build3(D: dict, arch) -> None:
 
     D["log-analysis-pipeline"] = arch("Анализ лога на Python",
         [L("log", ["Лог → CSV", ".bin / .bbl"]), L("df", ["DataFrame", "pandas"]), L("rs", ["Ресемплинг", "общая ось t"]), L("an", ["Welch, спектр,", "step-метрики"], True), L("rep", ["Отчёт", "графики + числа"])],
-        [L("jit", ["Джиттер петли", "по меткам t"], False, 2)],
+        [L("jit", ["Джиттер цикла", "по меткам t"], False, 2)],
         [("log", "df"), ("df", "rs"), ("rs", "an"), ("an", "rep"), ("rs", "jit", "", False, "v")])
 
     D["toolbox-map"] = tree("Рабочее место инженера", Node("r", ["Инструменты"], [

@@ -43,7 +43,7 @@ next:
 ### ArduPilot: путь IMU → rate → motors
 Репозиторий `ArduPilot/ardupilot`, транспорт в `ArduCopter/`, библиотеки в `libraries/`:
 
-{{diagram:ardupilot-fast-loop|Быстрая петля ArduCopter: задачи, которые планировщик вызывает каждый тик, и медленные задачи с собственной частотой.}}
+{{diagram:ardupilot-fast-loop|Быстрый цикл ArduCopter (fast loop): задачи, которые планировщик вызывает каждый тик, и медленные задачи с собственной частотой.}}
 
 1. **Планировщик**: `ArduCopter/Copter.cpp` — таблица `scheduler_tasks[]`: `FAST_TASK_CLASS(AP_InertialSensor, &copter.ins, update)` → `FAST_TASK(run_rate_controller_main)` → `FAST_TASK(motors_output_main)` → `FAST_TASK(read_AHRS)` → … → `FAST_TASK(update_flight_mode)`; медленные задачи `SCHED_TASK(rc_loop, 250, 130, 3)` с частотой, бюджетом (мкс) и приоритетом. Новые версии умеют выделенный rate-поток (`ArduCopter/rate_thread.cpp`, `FSTRATE_ENABLE`) на частоте гироскопа.
 2. **IMU и фильтры**: `libraries/AP_InertialSensor/` — `AP_InertialSensor.cpp` (`update()`), backend драйверы (`AP_InertialSensor_Invensensev3.cpp`), гармонический notch `libraries/Filter/HarmonicNotchFilter.cpp`, LPF `Filter/LowPassFilter2p.cpp`.
