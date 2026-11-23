@@ -72,6 +72,60 @@ ArduPilot на ChibiOS ставится в два этапа. Первый ра�
 
 Моторы: выход = `MOT_SPIN_MIN` + (`MOT_SPIN_MAX` − `MOT_SPIN_MIN`) × r, где r — тяга после линеаризации `MOT_THST_EXPO`; PWM = `MOT_PWM_MIN` + выход × (`MOT_PWM_MAX` − `MOT_PWM_MIN`). `MOT_THST_HOVER` (0.125–0.6875, по умолчанию 0.35) — тяга висения в долях от максимальной, поэтому ≈ 1 / (T/W). Значение 0.2–0.5 соответствует T/W от 5 до 2: ниже — газ слишком «резкий», выше — нет запаса на манёвр и ветер.
 
+### Почему не армится: `ARMING_SKIPCHK` и сообщения PreArm
+Пока аппарат не заармлен, прошивка раз в секунду прогоняет предарм-проверки (pre-arm checks), а в момент команды арма — ещё раз и плюс финальные проверки арма. Причина отказа приходит текстом в сообщении STATUSTEXT (`AP_Arming.cpp`, `check_failed`). Префикс говорит, когда, а не что: `PreArm:` — фоновый прогон, текст повторяется раз в 30 с, а если проверки только что перестали проходить — сразу, но не раньше чем через 4 с после предыдущего показа; `Arm:` — тот же текст в ответ на попытку арма, плюс финальные проверки, которые фоном не выполняются (газ, наклон, режим, дубли `RCx_OPTION`). Поэтому в таблице ниже сообщение `PreArm: X` при попытке арма приходит как `Arm: X`. Mission Planner показывает текст на HUD и во вкладке Messages, QGC — в окне сообщений. Параметр причину не сообщает: `ARMING_SKIPCHK` только выбирает, какие группы проверок пропустить.
+
+`ARMING_SKIPCHK` (с 4.7, по умолчанию 0 — ничего не пропускать) — маска **пропускаемых** групп. В 4.6 был `ARMING_CHECK` с обратным смыслом: маска выполняемых, 1 = все. При первом запуске 4.7 прошивка переносит старое значение сама (`AP_Arming::init`): `ARMING_CHECK = 1` (и любое значение с битом 0) → 0, `ARMING_CHECK = 0` → −1, любая другая маска → её инверсия по битам 1–20.
+
+| Бит | Значение | Группа (имя в GCS) | Что проверяет |
+|---|---|---|---|
+| 1 | 2 | Barometer | здоровье баро; у коптера ещё расхождение высоты баро и EKF (`Altitude disparity`) |
+| 2 | 4 | Compass | здоровье, калибровка, смещения, модуль поля, согласие компасов |
+| 3 | 8 | GPS lock | фикс, HDOP, согласие приёмников между собой и с AHRS, точка дома |
+| 4 | 16 | INS | гироскопы и акселерометры: здоровье, калибровка, согласие; наклон в момент арма |
+| 5 | 32 | Parameters | противоречивые параметры: `FS_THR_VALUE`, `FRAME_CLASS`, `PILOT_SPD_UP`, `PSC`/`ATC` |
+| 6 | 64 | RC Channels | RC есть, калибровка, газ выше порога failsafe; в момент арма — газ внизу и дубли `RCx_OPTION` |
+| 7 | 128 | Board voltage | питание платы от `BRD_VBUS_MIN` (4.3 В) до 5.8 В |
+| 8 | 256 | Battery Level | монитор здоров, напряжение и ёмкость выше `BATT_ARM_VOLT/MAH` и порогов failsafe |
+| 9 | 512 | Airspeed | только ArduPlane; у коптера бита в описании нет |
+| 10 | 1024 | Logging Available | лог пишется, SD-карта есть |
+| 11 | 2048 | Hardware safety switch | кнопка безопасности нажата |
+| 12 | 4096 | GPS Configuration | GPS принял конфигурацию от полётника |
+| 13 | 8192 | System | хранилище параметров, частота основного цикла, память terrain и ADS-B, CAN |
+| 14 | 16384 | Mission | обязательные пункты миссии, rally |
+| 15 | 32768 | Rangefinder | дальномер |
+| 16 | 65536 | Camera | камера и подвес |
+| 17 | 131072 | AuxAuth | внешнее разрешение арма (скрипт, компаньон) |
+| 18 | 262144 | VisualOdometry | визуальная одометрия |
+| 19 | 524288 | FFT | FFT для гармонического notch |
+| 20 | 1048576 | — (OSD) | есть в `AP_Arming.h`, но не в описании параметра: GCS не покажет для него галочку |
+
+Значение −1 пропускает все группы, включая будущие, и при арме приходит `Warning: Arming Checks Disabled`. Обязательные проверки остаются и тогда: оценка положения и высоты для выбранного режима (`AHRS: …`, `Need Position Estimate`, `Need Alt Estimate`, `EKF … variance`), идущая калибровка радио, два порта с протоколом приёмника, проверки моторов и `Motor Interlock`, а при арме — здоровье AHRS и компаса и то, что режим разрешает арм (`AP_Arming_Copter::arm_checks`). Газ, наклон, кнопку безопасности и E-Stop при −1 прошивка уже не проверяет. Правило: маску не трогать; сообщение читать целиком и устранять причину. Пропуск одной группы — временная мера на столе (например, бит 10 без SD-карты), и после неё значение возвращается в 0.
+
+Семнадцать сообщений первой сборки (строки — из `AP_Arming.cpp` и `AP_Arming_Copter.cpp` тега Copter-4.7.2; «—» в столбце бита — проверку маской не отключить):
+
+| Сообщение | Бит | Причина | Что сделать |
+|---|---|---|---|
+| `PreArm: RC not found` | 6 | при `FS_THR_ENABLE` ≠ 0: с загрузки не пришло ни одного кадра RC и ни одного override | порт `SERIALn_PROTOCOL = 23`, `RC_PROTOCOLS`, RX↔TX, bind (шаг 4) |
+| `PreArm: Throttle below failsafe` | 6 | при `FS_THR_ENABLE` ≠ 0: вход газа ниже `FS_THR_VALUE` (975): пульт выключен или приёмник в failsafe отдаёт низкий газ | включить пульт; калибровка радио (шаг 5) |
+| `PreArm: Throttle radio min too high` (`… radio max too low`, то же для Roll/Pitch/Yaw) | 6 | у одного из четырёх основных каналов `RCn_MIN` > 1300 или `RCn_MAX` < 1700 мкс: калибровку записали без крайних положений | Radio Calibration со стиками до упора |
+| `PreArm: Check FS_THR_VALUE` | 5 | при `FS_THR_ENABLE` ≠ 0: `RC3_MIN` ≤ `FS_THR_VALUE` + 10 или `FS_THR_VALUE` < 910 | `FS_THR_VALUE` хотя бы на 10 мкс ниже `RC3_MIN` (шаг 12) |
+| `Arm: Duplicate Aux Switch Options`, `Arm: Mode channel and RC5_OPTION conflict` (только при попытке арма) | 6 | одна функция на двух каналах; функция назначена на канал режимов `FLTMODE_CH` | одна функция — один канал (`ap-aux-tune`) |
+| `PreArm: 3D Accel calibration needed` | 4 | акселерометр не калиброван | Accel Calibration (шаг 9) |
+| `PreArm: Gyros inconsistent`, `PreArm: Accels inconsistent` | 4 | IMU расходятся: плату двигали при старте, идёт прогрев, IMU неисправен | перезагрузить неподвижно; не проходит — IMU |
+| `PreArm: Compass not calibrated` | 2 | у компаса, используемого для курса, нет калибровки | Onboard Mag Calibration (шаг 9, `ap-sensors`) |
+| `PreArm: Compass calibrated requires reboot` | — | калибровка прошла, значения применятся после перезагрузки | перезагрузить |
+| `PreArm: Compass offsets too high` | 2 | длина вектора смещений больше `COMPASS_OFFS_MAX` (1800) | убрать металл и силовые провода от компаса, перекалибровать |
+| `PreArm: Check mag field: 1050, max 875, min 185` | 2 | модуль поля вне 185–875 мГс (530 мГс ± 65 %) | калибровать на улице, вдали от арматуры и машин |
+| `PreArm: Compasses inconsistent` | 2 | компасы показывают разные курсы: чаще всего неверна ориентация внешнего | `COMPASS_ORIENTn` или `COMPASS_AUTO_ROT = 2` и повторная калибровка; лишний компас — `COMPASS_USEn = 0` |
+| `PreArm: High GPS HDOP` | 3 | HDOP больше `GPS_HDOP_GOOD` (140 = 1.4) в режиме, которому нужен GPS | ждать на открытом небе; GPS дальше от VTX |
+| `PreArm: AHRS: EKF3 still initialising`, `PreArm: Need Position Estimate` | — | EKF не сошёлся; выбран режим с позицией (Loiter, PosHold, Auto) без оценки положения | подождать «EKF3 IMU0 is using GPS» (шаг 14) или армить в Stabilize/AltHold |
+| `PreArm: Battery 1 below minimum arming voltage` (`… low voltage failsafe`) | 8 | напряжение ниже `BATT_ARM_VOLT` или уже ниже порога failsafe | зарядить; проверить `BATT_VOLT_MULT` (шаг 10) |
+| `PreArm: Hardware safety switch`, `Arm: Safety Switch` | 11 / — | кнопка безопасности не нажата | нажать; на плате без кнопки — `BRD_SAFETY_DEFLT = 0` (`ap-outputs`) |
+| `Arm: Throttle too high`, `Arm: Leaning` | 6 / 4 | газ выше мёртвой зоны вокруг центра (любой режим) или не в нуле в режиме с ручным газом (Stabilize, Acro); наклон больше `ATC_ANGLE_MAX` (30°) | газ в ноль; поставить ровно, Calibrate Level |
+
+Проверка себя: по тексту сообщения ты находишь строку таблицы и бит; если бит есть, `ARMING_SKIPCHK` с этим битом уберёт сообщение, но не причину — например, при `Compass offsets too high` EKF всё равно получит плохой курс (`ap-ekf`).
+
 ### Место в системе
 
 - **Получает:** тягу мотора с пропом → T/W → ожидаемый `MOT_THST_HOVER` (`f-aero-props`); протокол моторов (`f-motors-esc`); приёмник и bind (`link-elrs`); имена параметров 4.7 (`ap-intro`).
@@ -104,7 +158,7 @@ params received: 1397 of 1397
 `BATT_FS_LOW_ACT = 0` по умолчанию: низкая АКБ только пищит. Запиши это — на шаге 12 исправим.
 
 ### Шаг 2. Рама и ориентация
-`FRAME_CLASS = 1` (Quad), `FRAME_TYPE = 1` (X); для рам с порядком моторов Betaflight — `FRAME_TYPE = 12` (BetaFlightX). `AHRS_ORIENTATION` — если плата повёрнута стрелкой не вперёд. Оба параметра рамы требуют перезагрузки.
+`FRAME_CLASS = 1` (Quad), `FRAME_TYPE = 1` (X); для рам с порядком моторов Betaflight — `FRAME_TYPE = 12` (BetaFlightX). `AHRS_ORIENTATION` — если плата повёрнута стрелкой не вперёд. Оба параметра рамы требуют перезагрузки. Значения по умолчанию у прошивки и у SITL разные: на чистой плате `FRAME_CLASS = 0` (рама не задана — арм закрыт, моторы не настроены) и `FRAME_TYPE = 1`, а `copter.parm`, который грузит `sim_vehicle.py`, ставит `FRAME_CLASS = 1` и `FRAME_TYPE = 0`, поверх чего ключ `-f X` выбирает X. Поэтому на железе раму задаёшь всегда сам.
 
 ### Шаг 3. Карта портов
 `SERIALn` — логический номер, к физическому UARTx его привязывает hwdef платы (таблица UART в описании платы на ardupilot.org). Типичная раскладка для примера: SERIAL0 — USB, SERIAL1 — телеметрия (2, MAVLink2), SERIAL3 — GPS (5), SERIAL4 — DisplayPort (42) или ESC-телеметрия (16), SERIAL6 — приёмник (23). Протокол порта применяется после перезагрузки.
@@ -123,7 +177,7 @@ SITL подаёт RC по своему каналу, поэтому после �
 В SITL каналы уже откалиброваны (`RC1..8_MIN/MAX` = 1000/2000 в параметрах SITL по умолчанию — `copter.parm`, который грузит `sim_vehicle.py`; у прошивки на чистой плате 1100/1900), шаг делается на железе: Mission Planner → Radio Calibration или QGC → Radio, все стики и тумблеры в крайние положения, затем центр. Порядок каналов по умолчанию AETR (`RCMAP_ROLL/PITCH/THROTTLE/YAW` = 1/2/3/4).
 
 ### Шаг 6. Протокол моторов
-`MOT_PWM_TYPE`: 0 Normal (PWM), 1 OneShot, 2 OneShot125, 4/5/6/7 — DShot150/300/600/1200, перезагрузка обязательна. Для DShot: `SERVO_DSHOT_ESC = 1` (BLHeli32/AM32/Kiss) или 2 (BLHeli_S/Bluejay), `SERVO_BLH_AUTO = 1` (passthrough на всех моторах: BLHeliSuite32 или AM32 Configurator, для BLHeli_S — BLHeliSuite/JESC; веб-ESC Configurator — с 4.5, связь через ArduPilot нестабильна; нужны DShot, нажатый или отключённый safety и выходы не через IOMCU), двунаправленный DShot — `SERVO_BLH_BDMASK` (битовая маска выходов, 15 = выходы 1–4) и `SERVO_BLH_POLES` (по умолчанию 14). В SITL параметр принимается, но `SERVO_BLH_*` в сборке нет:
+`MOT_PWM_TYPE`: 0 Normal (PWM), 1 OneShot, 2 OneShot125, 4/5/6/7 — DShot150/300/600/1200, перезагрузка обязательна. Для DShot: `SERVO_DSHOT_ESC = 1` (BLHeli32/AM32/Kiss) или 2 (BLHeli_S/Bluejay), `SERVO_BLH_AUTO = 1` (passthrough на всех моторах: BLHeliSuite32 или AM32 Configurator, для BLHeli_S — BLHeliSuite/JESC; веб-ESC Configurator — с 4.5, связь через ArduPilot нестабильна; нужны DShot, нажатый или отключённый safety и выходы не через IOMCU), двунаправленный DShot — `SERVO_BLH_BDMASK` (битовая маска выходов, 15 = выходы 1–4) и `SERVO_BLH_POLES` (по умолчанию 14). `SERVO_DSHOT_ESC` 3 и 4 — те же типы ESC с EDT (температура, напряжение и ток ESC в обратном канале BDShot); ставить только при прошивке ESC с EDT. `SERVO_BLH_BDMASK` есть только в сборке, где таймерам выдан DMA на приём: если его нет в списке параметров, а у платы есть вариант `-bdshot` (MatekH743-bdshot, CubeOrange-bdshot), прошивай его — раскладка таймеров там другая, план выходов составляется заново. `RC_SPEED` (490 Гц) — частота только PWM-моторов; при DShot не используется. Таймерные группы, EDT и passthrough целиком — модуль `ap-outputs`. В SITL параметр принимается, но `SERVO_BLH_*` в сборке нет:
 
 ```text
   set MOT_PWM_TYPE = 6   set SERVO_DSHOT_ESC = 1
@@ -144,7 +198,7 @@ SITL подаёт RC по своему каналу, поэтому после �
   seq 4 (D): ack 0, SERVO1-4 = [1000, 1000, 1100, 1000] -> output [3]
 ```
 
-A → выход 1, B → 4, C → 2, D → 3: по кругу передний правый → задний правый → задний левый → передний левый. 10 % газа = 1000 + 0.10 × 1000 = 1100 мкс. Запиши таблицу «кнопка → выход → позиция → направление»: на железе её заполняешь глазами.
+A → выход 1, B → 4, C → 2, D → 3: по кругу передний правый → задний правый → задний левый → передний левый. 10 % газа = 1000 + 0.10 × 1000 = 1100 мкс. Запиши таблицу «кнопка → выход → позиция → направление»: на железе её заполняешь глазами. Те же выходы видны в Mission Planner на экране SETUP → Mandatory Hardware → Servo Output: на каждый выход — функция (`SERVOn_FUNCTION`), Min/Trim/Max, Reverse и живая полоска текущего импульса. Решение «мотор не на своей позиции» принимается здесь: функция 33–36 (Motor1–4) переносится на нужный выход, а не буква в Motor Test. Проверка — повторный Motor Test даёт ту же таблицу A→1, B→4, C→2, D→3.
 
 ### Шаг 8. Холостые обороты: MOT_SPIN_ARM и MOT_SPIN_MIN
 Заармили в Stabilize с газом в ноль:
@@ -156,7 +210,7 @@ A → выход 1, B → 4, C → 2, D → 3: по кругу передний 
 Это `MOT_PWM_MIN` + `MOT_SPIN_ARM` × (2000 − 1000) = 1000 + 0.10 × 1000. Реальные значения подбираются на столе по порогу трогания (см. железо). Калибровка ESC в SITL не существует.
 
 ### Шаг 9. Акселерометр и компас
-В SITL датчики «откалиброваны» стандартными параметрами; MAVProxy умеет `accelcal` и `magcal`, но учиться этому лучше на плате — USB достаточно, АКБ не нужна.
+В SITL датчики «откалиброваны» стандартными параметрами; MAVProxy умеет `accelcal` и `magcal`, но учиться этому лучше на плате — USB достаточно, АКБ не нужна. Два параметра решают, примет ли прошивка калибровку компаса: `COMPASS_CAL_FIT` (по умолчанию 16; 4 очень строго, 8 строго, 32 мягко) — предел fitness, для внешнего компаса в первом слоте он берётся как есть, для остальных удваивается; `COMPASS_AUTO_ROT` (по умолчанию 2) — в конце калибровки проверить ориентацию внешнего компаса и исправить `COMPASS_ORIENT`. Правило: калибровка не проходит — сначала место и ориентация, `COMPASS_CAL_FIT = 32` последним; подробно — `ap-sensors`.
 
 ### Шаг 10. Датчик АКБ
 SITL моделирует датчик 3DR Power Brick: V_pin = V / 10.1, I_pin = I / 17. Значит, неверный множитель виден так же, как на железе. В висении (ток есть только с моторами):
@@ -171,7 +225,17 @@ SITL моделирует датчик 3DR Power Brick: V_pin = V / 10.1, I_pin 
 Показание напряжения и тока прямо пропорционально множителю (33.09 / 28.10 = 1.178 ≈ 20/17), формула из теории сходится до третьего знака. Запиши «эталон» (здесь `SIM_BATT_VOLTAGE`), показание, расчёт и проверку.
 
 ### Шаг 11. Режимы и арм
-`FLTMODE_CH = 5`, границы позиций 1230/1360/1490/1620/1749 мкс. Трёхпозиционный тумблер даёт ≈ 1000/1500/2000 мкс, то есть позиции 1, 4 и 6 — поэтому ставь парами: `FLTMODE1 = FLTMODE2 = 0` (Stabilize), `FLTMODE3 = FLTMODE4 = 2` (AltHold), `FLTMODE5 = FLTMODE6 = 5` (Loiter). Арм — тумблером `RCx_OPTION = 153` (ArmDisarm) или стиком (`ARMING_RUDDER = 2`); аварийный стоп — `RCx_OPTION = 31` (Motor Emergency Stop). `ARMING_SKIPCHK = 0` не трогать (до 4.7 — `ARMING_CHECK = 1`).
+`FLTMODE_CH = 5`, границы позиций 1230/1360/1490/1620/1749 мкс. Трёхпозиционный тумблер даёт ≈ 1000/1500/2000 мкс, то есть позиции 1, 4 и 6 — поэтому ставь парами: `FLTMODE1 = FLTMODE2 = 0` (Stabilize), `FLTMODE3 = FLTMODE4 = 2` (AltHold), `FLTMODE5 = FLTMODE6 = 5` (Loiter). Арм — тумблером `RCx_OPTION = 153` (ArmDisarm) или стиком (`ARMING_RUDDER = 2`); аварийный стоп — `RCx_OPTION = 31` (Motor Emergency Stop). `ARMING_SKIPCHK = 0` не трогать (до 4.7 — `ARMING_CHECK = 1`). Если арм не проходит, текст `PreArm: …` в Messages ищешь в таблице раздела «Почему не армится» теории: она даёт бит, причину и шаг, на котором причина устраняется. В SITL проверь три строки сам (прогон на SITL Copter-4.7.2, `copter.parm`, RC через override, газ 1000 мкс): `RC5_OPTION = 153` при `FLTMODE_CH = 5` и попытка арма; затем `RC5_OPTION = 0`, `FS_THR_VALUE = 1000` при `RC3_MIN = 1000`; затем `FS_THR_VALUE = 975` и газ override 950 мкс:
+
+```text
+RC5_OPTION=153:     ['Arm: Mode channel and RC5_OPTION conflict']
+FS_THR_VALUE=1000:  ['Arm: Check FS_THR_VALUE']
+  40 s idle:        ['PreArm: Check FS_THR_VALUE', 'PreArm: Check FS_THR_VALUE']
+throttle 950:       ['Arm: Throttle below failsafe', 'Arm: Radio failsafe on',
+                     'PreArm: Throttle below failsafe', 'PreArm: Radio failsafe on']
+```
+
+Первая строка — финальная проверка, фоном её нет; вторая — та же проверка параметров при арме и фоном раз в 30 с; третья — сразу две причины, и обе не уходят, пока газ ниже `FS_THR_VALUE`. После прогона верни `FS_THR_VALUE = 975`, `RC5_OPTION = 0`.
 
 ### Шаг 12. Failsafe
 RC: `FS_THR_ENABLE = 1` (RTL), `FS_THR_VALUE = 975`, `RC_FS_TIMEOUT = 1` с. АКБ для SITL: `BATT_LOW_VOLT = 11.0`, `BATT_LOW_TIMER = 5`, `BATT_FS_LOW_ACT = 2` (RTL). Ловушка SITL: RC-override от GCS или скрипта считается живым RC и маскирует `SIM_RC_FAIL` — отпусти override, он истекает через `RC_OVERRIDE_TIME` = 3 с.
@@ -191,7 +255,7 @@ RC: `FS_THR_ENABLE = 1` (RTL), `FS_THR_VALUE = 975`, `RC_FS_TIMEOUT = 1` с. А�
 На земле тот же `SIM_RC_FAIL = 1` дал «Radio Failsafe - Disarming»: заармленный аппарат на земле при потере RC сразу дизармится — это и проверяют на столе. Полная матрица отказов — модуль ap-safety-fs.
 
 ### Шаг 13. OSD
-`OSD_TYPE = 1` для MAX7456 (аналог), 5 — MSP DisplayPort (DJI O3, Walksnail, HDZero) вместе с `SERIALn_PROTOCOL = 42` на порту VTX; `OSD_CHAN` — канал переключения экранов, `OSDn_ENABLE` — дополнительные экраны. Окно OSD в SITL требует сборки с SFML (`sim_vehicle.py --osd`), поэтому здесь только параметр, проверка — на очках.
+`OSD_TYPE = 1` для MAX7456 (аналог), 5 — MSP DisplayPort (DJI O3, Walksnail, HDZero) вместе с `SERIALn_PROTOCOL = 42` на порту VTX; `OSD_CHAN` — канал переключения экранов, `OSDn_ENABLE` — дополнительные экраны. Для DisplayPort сетку задаёт полётник, отдельно для каждого экрана: `OSDn_TXT_RES` 0 — 30×16 (по умолчанию), 1 — 50×18, 2 — 60×22; с 0 HD-очки показывают крупную SD-сетку. `MSP_OPTIONS` (по умолчанию 0): бит 0 для DisplayPort не ставить, бит 2 (4) — шрифт Betaflight в очках (штатные DJI O3/O4), бит 3 (8) — шрифт INAV; после смены — перезагрузка. Готовые тройки «порт — `OSD_TYPE` — `MSP_OPTIONS`» для каждой системы — модуль `ap-osd-video`. Окно OSD в SITL требует сборки с SFML (`sim_vehicle.py --osd`), поэтому здесь только параметр, проверка — на очках.
 
 ### Шаг 14. GPS и RTL
 В SITL GPS есть сразу (`GPS1_TYPE = 1`): дождись «EKF3 IMU0 is using GPS» — без этого не включится Loiter. `RTL_ALT_M` — в метрах, по умолчанию 15 (до 4.7 — `RTL_ALT` в сантиметрах, 1500); выше самых высоких препятствий площадки.
@@ -236,13 +300,13 @@ ERR Subsys 5 — радио, 6 — АКБ; MODE reason 3 и 4 — RADIO_FAILSAFE
 10. **OSD и видео.** `OSD_TYPE = 1` (аналог) или `5` + `SERIALn_PROTOCOL = 42` (цифра); на очках видно напряжение, режим, RSSI/LQ.
 11. **Предполётная проверка.** Стартовые параметры тюна по размеру пропа и числу банок (Mission Planner → SETUP → Mandatory Hardware → Initial Parameter Setup, ap-tuning), `MOT_THST_HOVER = 0.25`, `ATC_THR_MIX_MAN = 0.1`, `MOT_HOVER_LEARN = 2`, `LOG_DISARMED = 0`, SD-карта есть. Пропы на место: направление лопастей по Motor Test, гайки затянуты. Площадка 20 × 20 м без людей, ветер < 5 м/с, наблюдатель.
 12. **Первое висение.** Stabilize: арм → дизарм → арм (проверка дизарма), газ медленно до отрыва, сразу посадить и дизармить. Затем висение на 1 м с отклонениями стиков ±5°. Потом Stabilize до 5 м → AltHold ≥ 30 с без входов → посадка; `PSC_D_ACC_P` = 0.1 × `MOT_THST_HOVER`, `PSC_D_ACC_I` = 0.2 × `MOT_THST_HOVER` (правило проверено на 4.6: `PSC_ACCZ_P` = `MOT_THST_HOVER`, `PSC_ACCZ_I` = 2 × `MOT_THST_HOVER`; для 4.7 пересчитано по множителю конверсии 0.1 из исходника 4.7.2). Потом Loiter 30 с: аппарат стоит в круге 1–2 м. Критерии прерывания: рывок или вращение на отрыве — газ в ноль, дизарм (порядок или направление моторов); слышимые или видимые колебания — посадка и все `ATC_RAT_RLL/PIT_P/I/D` −50 %; «унитаз» в Loiter — в AltHold и на посадку (компас); «PreArm»/«EKF variance» — не взлетать.
-13. **Первый тюн.** `INS_LOG_BAT_MASK = 1`, висение 30 с → harmonic notch по спектру (ap-tuning). Потом QuikTune: `VTOL-quicktune.lua` в `APM/scripts`, `SCR_ENABLE = 1`, перезагрузка, `QUIK_ENABLE = 1`, тумблер `RCx_OPTION = 300`; Loiter на 3 м, тумблер в середину — тюн, вверх — сохранить. Lua нужно ≥ 2 МБ флеша: на F405 скриптов нет, там AutoTune (`RCx_OPTION = 17`, `AUTOTUNE_AXES = 1` для roll, AltHold/Loiter, сохранение при дизарме с включённым тумблером).
+13. **Первый тюн.** `INS_LOG_BAT_MASK = 1`, висение 30 с → harmonic notch по спектру (ap-tuning). Потом QuikTune: `VTOL-quicktune.lua` в `APM/scripts`, `SCR_ENABLE = 1`, перезагрузка, `QUIK_ENABLE = 1`, тумблер `RCx_OPTION = 300`; Loiter на 3 м, тумблер в середину — тюн, вверх — сохранить. Lua собирается только при флеше больше 1 МБ (`AP_Scripting_config.h`): на F405 с 1 МБ скриптов нет, там AutoTune (`RCx_OPTION = 17`, `AUTOTUNE_AXES = 1` для roll, AltHold/Loiter, сохранение при дизарме с включённым тумблером).
 14. **Лог и бэкап.** Скачать `.BIN` (Mission Planner → DataFlash Logs), `check_lab_log.py --lab hover`, сохранить `01_after_setup.param` и сравнить с `00_defaults.param`.
 
 Приёмка железа: Motor Test совпадает со схемой рамы по позиции и направлению; ошибка напряжения < 0.02 В/банка, мА·ч в пределах 5 % от зарядки; RC failsafe на земле дизармит, в воздухе на 5 м — RTL или Land; `MOT_THST_HOVER` 0.2–0.5; `VIBE` p95 < 30 м/с², `Clip` = 0.
 
 Самопроверка: лабораторная выполнена, когда:
-- SITL: `00_defaults.param` и `01_after_setup.param` сохранены и сравнены, таблица Motor Test (A→1, B→4, C→2, D→3) записана, калибровка `BATT_VOLT_MULT` посчитана и проверена, в логе SITL есть `ERR Subsys=5` и `Subsys=6` с переходом в RTL, `MOT_THST_HOVER` из лога в пределах 0.2–0.5;
+- SITL: `00_defaults.param` и `01_after_setup.param` сохранены и сравнены, таблица Motor Test (A→1, B→4, C→2, D→3) записана, калибровка `BATT_VOLT_MULT` посчитана и проверена, три отказа арма шага 11 получены с теми же текстами, что в выводе (`Arm: Mode channel and RC5_OPTION conflict`, `Check FS_THR_VALUE`, `Throttle below failsafe`), и параметры возвращены, в логе SITL есть `ERR Subsys=5` и `Subsys=6` с переходом в RTL, `MOT_THST_HOVER` из лога в пределах 0.2–0.5;
 - железо: `.param` после настройки закоммичен вместе с `.BIN` первого висения (60 с, Stabilize → AltHold → Loiter), `MOT_THST_HOVER` 0.2–0.5, `VIBE` p95 < 30 м/с² без клиппинга, RC- и battery-failsafe записаны в лог (battery — порогом `BATT_LOW_VOLT` чуть ниже текущего напряжения на висении), ошибка напряжения < 0.02 В/банка, мА·ч в пределах 5 %.
 
 ## diagnostics

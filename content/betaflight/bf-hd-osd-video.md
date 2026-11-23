@@ -84,7 +84,7 @@ next: []
 | `displayport_msp_use_device_blink` | OFF | OFF, ON | мигание делает очко, а не FC |
 | `displayport_msp_col_adjust` / `row_adjust` | 0 / 0 | −6…0 / −3…0 | только SD-режим MSP |
 | `osd_framerate_hz` | 12 | 1–60 | частота обновления OSD |
-| `osd_*_pos` | центр, скрыт | 0–65535 | `x \| x5<<10 \| y<<5 \| профили<<11` |
+| `osd_*_pos` | центр, скрыт | 0–65535 | `(x & 31) + (y<<5) + ((x>>5)<<10) + (профили<<11)` |
 | `osd_sys_*_pos` (`goggle_voltage`, `vtx_voltage`, `vtx_temp`, `bitrate`, `delay`, `lq`, `goggle_dvr`, `vtx_dvr`, `fan_speed`, `warnings`, `distance`) | скрыт | 0–65535 | элементы, которые рисуют сами очки (`USE_MSP_DISPLAYPORT`) |
 | `vtx_power` | 0 | индекс таблицы | мощность MSP-VTX (HDZero) |
 | `vtx_low_power_disarm` | OFF | OFF, ON, UNTIL_FIRST_ARM | при дизарме MSP-VTX получает индекс 1 (`vtx_msp.c`) |
@@ -113,7 +113,7 @@ EIRP по спецификациям. DJI O3/O4 Pro: FCC < 33 дБм (≈ 2 Вт
 |---|---|---|---|
 | Функция порта | VTX (MSP + DisplayPort), маска 131073 | MSP DisplayPort (`FUNCTION_MSP_OSD` = 1 << 25) | `SERIALn_PROTOCOL = 42` (DisplayPort); 33 — старый «DJI FPV» |
 | Тип OSD | `osd_displayport_device = MSP` | выбор порта | `OSD_TYPE = 5` (MSP_DISPLAYPORT); 3 — MSP |
-| Сетка | `vcd_video_system = HD`, канва от очков | `osd_video_system` = HDZERO, DJIWTF, AVATAR, BF43COMPAT, BFHDCOMPAT, DJI_NATIVE | задаёт полётник, на каждый экран: `OSDn_TXT_RES` 0 — 30×16 (по умолчанию: HD-очки покажут SD-сетку), 1 — 50×18, 2 — 60×22; `MSP_OPTIONS` бит 2 — символы Betaflight |
+| Сетка | `vcd_video_system = HD`, канва от очков | `osd_video_system` = HDZERO, DJIWTF, AVATAR, BF43COMPAT, BFHDCOMPAT, DJI_NATIVE | задаёт полётник, на каждый экран: `OSDn_TXT_RES` 0 — 30×16 (по умолчанию: HD-очки покажут SD-сетку), 1 — 50×18, 2 — 60×22; `MSP_OPTIONS` бит 2 — символы Betaflight, бит 3 — INAV (бит 0 — только для протокола 33); полная таблица по системам — `ap-osd-video` |
 | Скорость | 115200 | 115200 | `SERIALn_BAUD = 115` |
 
 Какое значение INAV 9.1 (в 8.0.1 так же) ставить под систему: HDZero — HDZERO (50×18), Walksnail — AVATAR (53×20), DJI O4 и очки с INAV-шрифтом — DJI_NATIVE (53×20, в очках тип OSD «INAV»), DJI O3 на стоковой прошивке — BFHDCOMPAT (53×20, шрифт Betaflight, часть значков «?»), Air Unit/Vista под WTFOS — DJIWTF (60×22), старый DJI без WTFOS — BF43COMPAT (30×16).

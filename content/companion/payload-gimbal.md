@@ -40,13 +40,25 @@ next:
 ### ArduPilot: `MNT1_*`
 | Что | Параметр | Комментарий |
 |---|---|---|
-| Тип подвеса | `MNT1_TYPE` | серво, Brushless PWM, SToRM32, Siyi, ViewPro, Gremsy/MAVLink и др. — значение по списку своей версии |
-| Режим по умолчанию | `MNT1_DEFLT_MODE` | 0 retract, 1 neutral, 2 MAVLink, 3 RC, 4 GPS point, 5 SysID, 6 Home |
+| Тип подвеса | `MNT1_TYPE` | ArduPilot 4.7.2: 0 нет, 1 Servo, 2 3DR Solo, 3 Alexmos Serial, 4 SToRM32 MAVLink, 5 SToRM32 Serial, 6 MAVLink (Gremsy, AVT), 7 BrushlessPWM, 8 Siyi, 9 Scripting, 10 Xacti, 11 Viewpro, 12 Topotek, 13 CADDX, 14 XFRobot (новое в 4.7; в 4.6 список кончался на 13). Пока 0 — остальные `MNT1_*` скрыты; после смены — перезагрузка |
+| Режим по умолчанию | `MNT1_DEFLT_MODE` | 0 retract, 1 neutral, 2 MAVLink, 3 RC, 4 GPS point, 5 SysID, 6 Home; по умолчанию 3 — подвес после загрузки слушает пульт |
 | Пределы | `MNT1_PITCH_MIN/MAX`, `MNT1_YAW_MIN/MAX`, `MNT1_ROLL_MIN/MAX` | механика подвеса, в градусах |
 | Пульт: угол или скорость | `MNT1_RC_RATE` | 0 — стик задаёт угол, > 0 — скорость в °/с |
 | Каналы пульта | `RCx_OPTION` | 212 Mount1 Roll, 213 Mount1 Pitch, 214 Mount1 Yaw, 163 Mount Yaw Lock (удержание курса; до 4.7 — «Mount Lock») |
 | Сервоподвес | `SERVOn_FUNCTION` | 6 Mount1 Yaw, 7 Mount1 Pitch, 8 Mount1 Roll |
 | Порт умного подвеса | `SERIALn_PROTOCOL` | 8 = Gimbal (Siyi, ViewPro и др.); для MAVLink-подвеса — MAVLink 2 |
+
+Проводка по типу — правило выбора (полная таблица драйверов и параметров — `ap-payload`):
+
+| `MNT1_TYPE` | Куда подключать | Что ещё задать |
+|---|---|---|
+| 1 Servo, 7 BrushlessPWM | выходы полётника | `SERVOn_FUNCTION` 6/7/8 (yaw/pitch/roll); для 1 полётник сам вычитает наклон аппарата, для 7 подвес стабилизирует себя сам |
+| 3 Alexmos Serial | UART | `SERIALn_PROTOCOL = 7`, скорость 115 ставится сама |
+| 5 SToRM32 Serial, 8 Siyi, 11 Viewpro, 12 Topotek, 13 CADDX, 14 XFRobot | UART: TX полётника → RX подвеса, RX → TX, общая земля | `SERIALn_PROTOCOL = 8` (Gimbal); камера в подвесе — `CAM1_TYPE = 4` (Mount) |
+| 4 SToRM32 MAVLink, 6 MAVLink | порт MAVLink 2 | подвес — компонент 154; камера Gremsy/AVT — `CAM1_TYPE = 6` |
+| 10 Xacti | DroneCAN | `CAM1_TYPE = 4` |
+
+Проверка: после перезагрузки нет `PreArm: Mount: …`, а стик канала `RCx_OPTION = 213` двигает наклон в режиме 3.
 
 Подвес по MAVLink должен появиться как отдельный компонент (`MAV_COMP_ID_GIMBAL`, 154) — видно в инспекторе MAVLink наземки. Нет компонента — нет и управления.
 
@@ -54,7 +66,7 @@ next:
 `MNT_MODE_IN` выбирает источник команд (RC, MAVLink Gimbal v1/v2), `MNT_MODE_OUT` — как PX4 управляет подвесом (выходы AUX/PWM или MAVLink Gimbal v2). Для подвеса по MAVLink — порт с MAVLink, а выходы на сервы — через вкладку Actuators. Детали меняются между версиями — сверяйтесь с разделом Gimbal (Mount) документации PX4.
 
 ### Камера: захват по команде и по дистанции
-- ArduPilot: `CAM1_TYPE` — как спускать затвор (серво, реле, через подвес, MAVLink, MAVLink Camera v2). `CAM1_TRIGG_DIST` или команда миссии `DO_SET_CAM_TRIGG_DIST` — снимок каждые N метров. Каждый снимок пишется в лог (`CAM`) с координатами — это основа геопривязки в картографии.
+- ArduPilot: `CAM1_TYPE` — как спускать затвор: 1 серво, 2 реле, 4 через драйвер подвеса (Siyi, Topotek, Viewpro, Xacti — камера внутри «умного» подвеса), 5 MAVLink (`DO_DIGICAM_CONTROL`), 6 MAVLink Camera v2, 7 скрипт, 8 RunCam; подробно — `ap-payload`. `CAM1_TRIGG_DIST` или команда миссии `DO_SET_CAM_TRIGG_DIST` — снимок каждые N метров. Каждый снимок пишется в лог (`CAM`) с координатами — это основа геопривязки в картографии.
 - MAVLink Camera Protocol v2: `MAV_CMD_IMAGE_START_CAPTURE`, `MAV_CMD_VIDEO_START_CAPTURE`, ответ `CAMERA_IMAGE_CAPTURED` с координатами и индексом кадра.
 - Миссия: `DO_SET_ROI_LOCATION` — смотреть на точку, `DO_SET_ROI_NONE` — вернуть, `DO_GIMBAL_MANAGER_PITCHYAW` — задать углы; для надира — тангаж −90°.
 
