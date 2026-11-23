@@ -193,6 +193,21 @@ DIAGRAM_LINE = re.compile(r"^\{\{diagram:([^}]*)\}\}$", re.MULTILINE)
 DIAGRAMS_DIR = ROOT / "assets" / "diagrams"
 
 
+LESSON_LINE = re.compile(r"^\{\{lesson:([^}]*)\}\}$", re.MULTILINE)
+
+
+def validate_lessons(md_path, all_ids):
+    errs = []
+    rel = md_path.relative_to(ROOT)
+    for body in LESSON_LINE.findall(md_path.read_text(encoding="utf-8")):
+        name, _, why = body.partition("|")
+        if name not in all_ids:
+            errs.append(f"{rel}: ссылка на урок «{name}» — такого модуля нет в манифесте")
+        if not why.strip():
+            errs.append(f"{rel}: у ссылки на урок «{name}» нет пояснения (формат {{{{lesson:id|Зачем читать}}}})")
+    return errs
+
+
 def validate_diagrams(md_path):
     errs = []
     text = md_path.read_text(encoding="utf-8")
@@ -510,6 +525,7 @@ def main():
         errs.extend(validate_related_in_frontmatter(p, all_ids_set))
         errs.extend(validate_widgets(p))
         errs.extend(validate_diagrams(p))
+        errs.extend(validate_lessons(p, all_ids_set))
         st = status_by_file.get(p)
         errs.extend(validate_front_matter_status(p, st))
         errs.extend(validate_published_sections(p, st == "published"))

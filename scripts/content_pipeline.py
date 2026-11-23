@@ -121,6 +121,35 @@ def render_diagram(name: str, caption: str) -> str:
             '<div class="diagram__hint">Схему можно прокрутить по горизонтали</div></figure>')
 
 
+# Lesson cards: a line "{{lesson:id|Why to read it}}" becomes a highlighted link card to another module
+# (title from the manifest, translated through the data catalog). The validator checks the id exists.
+LESSON_RE = re.compile(r"^\{\{lesson:([a-z0-9-]+)\|(.+?)\}\}$")
+_titles: dict[str, str] = {}
+
+
+def module_title(mid: str) -> str | None:
+    if not _titles:
+        import json
+        man = json.loads((ROOT / "data" / "content-manifest.json").read_text(encoding="utf-8"))
+        for sec in man.get("sections", []):
+            for a in sec.get("articles", []):
+                _titles[a["id"]] = a.get("title", a["id"])
+    return _titles.get(mid)
+
+
+def render_lesson(mid: str, why: str) -> str:
+    import i18n
+    title = module_title(mid)
+    if title is None:
+        return ""
+    title = i18n.tr_data(title)
+    label = i18n._("Отдельный урок")
+    return (f'<a class="gc-callout lesson-card" data-state="ok" href="../m/{mid}.html">'
+            f'<span class="gc-label gc-muted">{html.escape(label)} →</span>'
+            f'<strong class="lesson-card__title">{html.escape(title)}</strong>'
+            f'<span class="lesson-card__why">{format_inline(why)}</span></a>')
+
+
 TABLE_SEP_RE = re.compile(r"^\|?\s*:?-+:?\s*(\|\s*:?-+:?\s*)*\|?\s*$")
 
 
@@ -209,6 +238,10 @@ def block_to_paragraphs(block: str) -> str:
                 name = wm.group(1)
                 if name in WIDGETS:
                     chunks.append(f'<uav-{name} class="widget"></uav-{name}>')
+                continue
+            lm = LESSON_RE.match(para_l)
+            if lm:
+                chunks.append(render_lesson(lm.group(1), lm.group(2).strip()))
                 continue
             dm = DIAGRAM_RE.match(para_l)
             if dm:
