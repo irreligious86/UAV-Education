@@ -114,7 +114,7 @@ DShot бывает двух видов. **Timer + DMA**: каждый мотор
 | `resource SERVO <n> <pin>` | из конфига платы (`SERVO1_PIN`…) | n 1–8, пин или NONE | пад сервы; номера с 1 |
 | `servo <i> <min> <max> <mid> <rate> <fwd>` | `1000 2000 1500 100 -1` | i 0–7; 500–2500; rate ±100; fwd −1…17 | конечные точки, масштаб, forward-канал |
 | `smix <r> <servo> <src> <rate> <speed> <min> <max> <box>` | пусто | r 0–15, src 0–13, speed 0–255, box 0–3 | правило миксера; только `CUSTOMAIRPLANE`/`CUSTOMTRI` |
-| `smix reset` / `load <mixer>` / `reverse <s> <src> r\|n` | — | — | стереть / загрузить шаблон / реверс источника |
+| `smix reset` / `load <mixer>` / `reverse <s> <src> <r или n>` | — | — | стереть / загрузить шаблон / реверс источника |
 | `servo_pwm_rate` | 50 Гц | 50–498 | частота кадров всех серв |
 | `servo_center_pulse` | 1500 | 750–2250 | начальное значение канала при инициализации |
 | `servo_lowpass_hz` | 0 (выкл.) | 0–400 | biquad ФНЧ серв на частоте PID (в docs — `servo_lowpass_freq`/`_enable`, таких имён нет ни в 4.5, ни в 2025.12) |
@@ -131,7 +131,7 @@ DShot бывает двух видов. **Timer + DMA**: каждый мотор
 ### INAV и ArduPilot для сравнения
 | Задача | Betaflight 2025.12 | INAV 9.1 | ArduPilot 4.6 |
 |---|---|---|---|
-| назначить выход | `resource SERVO n <pin>` + миксер/фича | вкладка Mixer, `timer_output_mode <timer> AUTO\|MOTORS\|SERVOS\|LED` | `SERVOn_FUNCTION` (7 — тилт подвеса, 8 — крен) |
+| назначить выход | `resource SERVO n <pin>` + миксер/фича | вкладка Mixer, `timer_output_mode <timer> <режим>`, режим AUTO, MOTORS, SERVOS или LED | `SERVOn_FUNCTION` (7 — тилт подвеса, 8 — крен) |
 | конечные точки | `servo i min max mid rate fwd` | `servo n min max middle rate` | `SERVOn_MIN/MAX/TRIM`, `SERVOn_REVERSED` |
 | микшер | `smix … min max box`, только самолётные миксеры | `smix rule servo source rate speed conditionId` на любой платформе | функции выходов, без smix |
 | частота | `servo_pwm_rate` 50 (50–498) | `servo_pwm_rate` 50 (50–498) | `SERVO_RATE` 50 (25–400) |
