@@ -56,6 +56,8 @@ v_max = −a·L + √((a·L)² + 2a·(R − d_margin)).
 
 Example: a stereo camera with a reliable range of 6 m, a 2 m margin, a = 3 m/s², L = 0.3 s → v_max ≈ 4.1 m/s. Fly faster and avoidance turns into hope. PX4 says outright that sensor range limits speed; in ArduPilot the same follows from `AVOID_ACCEL_MAX` and `AVOID_MARGIN`.
 
+{{diagram:chart-avoid-stop-distance|v_max — точка, где дистанция остановки доходит до дальности датчика: при 6 м и запасе 2 м задержка 0.3 с снижает предел с 4.9 до 4.1 м/с, а 0.5 с — до 3.6 м/с.}}
+
 ### ArduPilot: two levels
 **Simple avoidance** — in pilot-controlled modes (Loiter, AltHold, etc.): the vehicle won't let you get closer to an obstacle than `AVOID_MARGIN` (m), either sliding along it (`AVOID_BEHAVE = 0`, Slide) or stopping (`AVOID_BEHAVE = 1`, Stop). Sources are enabled by `AVOID_ENABLE` bits: 0 — geofence, 1 — proximity sensors, 2 — beacons. In non-GPS modes `AVOID_DIST_MAX` applies — the distance at which the push-back begins. There's an acceleration limit `AVOID_ACCEL_MAX` and back-away parameters (`AVOID_BACKUP_SPD`).
 

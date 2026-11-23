@@ -55,6 +55,8 @@ What breaks VIO: **too little texture** (white wall, water, snow, featureless gr
 ### Source failure
 VIO can silently output garbage (tracking loss → the pose “freezes” or jumps). Protections: (1) the companion monitors the tracking status and **stops sending** on loss (the EKF falls back to inertial, then failsafe/dead reckoning); (2) EKF gates reject jumps; (3) a backup source set (GPS/flow) and `FS_EKF_ACTION`; (4) a pilot with AltHold on a switch. Test this in SITL before the field.
 
+{{diagram:vio-failure-tree|Из четырёх сценариев отказа VIO опасен один — замёрзшая поза с прежней частотой: ворота её не ловят, поэтому companion должен прекращать публикацию сам.}}
+
 {{diagram:visual-nav-levels|Three levels of visual navigation and how each one enters the autopilot.}}
 
 ## practice

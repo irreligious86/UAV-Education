@@ -59,6 +59,8 @@ Enabling it: `PLND_ENABLED = 1`, source `PLND_TYPE` (1: MAVLink from a companion
 
 In practice a rangefinder is mandatory: both for converting angles to meters and for `PLND_ALT_MIN/MAX`.
 
+{{diagram:precland-lost-target|Поведение без цели решает высота по дальномеру: выше PLND_ALT_MAX это ещё не проблема, ниже PLND_ALT_MIN посадка продолжается, а между ними решает PLND_STRICT — 0 садится сразу, 1 и 2 после PLND_TIMEOUT идут на повторный заход и расходятся только в том, садиться ли без цели.}}
+
 ### PX4: precision landing
 The standard path is the IR-LOCK beacon: the `irlock` driver → `landing_target_estimator` → the `landing_target_pose` topic. Newer versions add a Vision Target Estimator for visual targets; check the documentation for your version for the supported sources (including targets coming from a companion over MAVLink). The modes are set by `param2` of the `MAV_CMD_NAV_LAND` command: 0 is a normal landing, 1 is **Opportunistic** (precise only if the beacon is visible at the start of the landing), 2 is **Required** (if it isn't visible, search). Parameters:
 - `PLD_HACC_RAD`: horizontal acceptance radius: while the offset is larger, the vehicle approaches horizontally instead of descending.

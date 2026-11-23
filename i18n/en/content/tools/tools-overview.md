@@ -56,6 +56,8 @@ drones/
 
 The file name starts with the date `YYYY-MM-DD` — sorting by name gives you the chronology. Before any change — a “before” file, after it — an “after” file, and `git diff` shows the difference.
 
+{{diagram:config-change-flow|Правило «до/после»: файл до изменения, коммит, одно изменение — и git diff должен показать ровно одну строку; лишние строки разбирают до полёта.}}
+
 ### SITL
 For ArduPilot — SITL, for PX4 — Gazebo/jMAVSim. Every scenario, script and parameter goes to the simulator first.
 

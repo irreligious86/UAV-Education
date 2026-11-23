@@ -33,6 +33,8 @@ Onboard vision starts with a frame that reached the program on time. This module
 - **Shutter**: rolling (rows exposed at different times — “jello” under vibration and fast rotation; breaks VIO) versus global (the whole frame at once). For navigation — global.
 - **Formats**: YUV420 — raw, cheap for algorithms; MJPEG — compressed, every frame independent, decoded on the CPU; H.264/H.265 — for transmission, encode in hardware (Pi 4: H.264 up to 1080p30; Jetson: NVENC).
 
+{{diagram:camera-choice-tree|Выбор камеры начинается с вопроса, идёт ли кадр в контур: картинке оператору хватает IP-камеры со 100+ мс, навигации нужен global shutter, а CSI против USB решает длина кабеля — около 30 см против 3–5 м.}}
+
 ### Low-latency capture
 Principles: (1) don't make extra copies, (2) a short buffer queue (1–2 frames), (3) take the **latest** frame, not the first one in the queue, (4) resolution to suit the task (640×480 is enough for a detector), (5) fixed exposure/gain — otherwise auto exposure causes jumps.
 

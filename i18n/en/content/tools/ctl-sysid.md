@@ -64,6 +64,8 @@ The fit minimizes the difference between the complex H and G over the points (gr
 - **The cost of a filter.** A low-pass filter with frequency f_c adds approximately −arctan(f/f_c) of phase: at a 20 Hz loop crossover, an 80 Hz filter takes away ~14°. This is the “filters eat the margin” from the “Filters” module — now as a number.
 - **Comparing vehicles and changes.** New props, motors, frame — a new model: you can see whether the time constant or the delay changed, and how much in gains it costs.
 
+{{diagram:chart-sysid-phase-margin|По модели шага 1 запас по фазе падает с частотой среза: на 20 Гц он 47°, ФНЧ 80 Гц отнимает 14°, ФНЧ 40 Гц — 27°, а выше ~32 Гц запаса нет даже без фильтра.}}
+
 ## practice
 ### Step 1. Synthetic check
 The identification and fitting code; first on data with a known answer:

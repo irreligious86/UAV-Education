@@ -121,6 +121,8 @@ def bounce_back(sp, gy, fs, big=200.0):
 ```
 Reference values for a 5" (Betaflight): overshoot 5–15% is good; bounce-back < 10% is good, > 25% means too much D or poor mechanics.
 
+{{diagram:step-metrics-anatomy|Что считают функции: overshoot — перелёт над нормированной ступенькой, время установления — вход в ±5 % навсегда, bounce-back — отскок после отпущенного стика в процентах от пика (форма отклика условная).}}
+
 ### Loop jitter
 ```python
 dt = np.diff(t) * 1e6   # µs
