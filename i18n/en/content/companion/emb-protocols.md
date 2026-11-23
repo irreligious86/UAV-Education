@@ -39,6 +39,8 @@ Synchronous, two open-drain lines with pull-ups: SCL, SDA. The master generates 
 ### SPI
 Synchronous, full duplex: SCLK, MOSI, MISO, CS (one line per device). No addresses and no ACK: the master pulls CS low, outputs clocks, and every clock shifts a bit in both directions. CPOL/CPHA modes (0–3) — clock polarity/phase, must match the datasheet (ICM42688 — mode 0 or 3). Speeds up to tens of MHz (gyro 8–24 MHz, flash 50+). Register read: an address byte with the R bit (often the MSB = 1), then N garbage bytes on MOSI — the data comes back on MISO. A 14-byte IMU burst read in a single transaction — that is how every firmware does it. There are no “protocol” errors — integrity is checked only by meaning (the WHO_AM_I register, values within range). Short traces: SPI is almost never routed off the board.
 
+{{diagram:chart-bus-imu-read-time|Блок IMU из 14 байт: SPI укладывается в 5–15 мкс, а I2C даже на 1 МГц (156 мкс) и UART 921600 (152 мкс) длиннее всего цикла 8 кГц.}}
+
 ### CAN and DroneCAN
 CAN 2.0: a differential pair CAN_H/CAN_L, 120 Ω terminators at both ends, up to 1 Mbit/s (up to 40 m at 1 Mbit, longer — slower). Frame: an 11- or 29-bit (extended) identifier, DLC, up to 8 data bytes, CRC15, ACK from any receiver. **Arbitration**: everyone transmits at once, a dominant 0 beats a recessive 1 — the lower ID wins with no time lost; priority is built into the ID. The CAN controller in the MCU receives/sends frames in hardware and filters by ID; errors are counted (error passive/bus-off at 256 errors — the node disconnects itself).
 

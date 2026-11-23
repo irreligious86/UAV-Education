@@ -52,7 +52,10 @@ Betaflight: по USB в режиме CLI (не MSP: вход в CLI символ
 Реализация — JSON Schema/простой Python с таблицей правил; вывод — список нарушений с ссылкой на модуль курса.
 
 ### SITL-автотест
-ArduPilot в CI (Ubuntu runner): собрать SITL (`./waf configure --board sitl && ./waf copter`) или взять готовый образ; запустить `sim_vehicle.py` без GUI с `--add-param-file params.param`; скрипт pymavlink: арм в Guided, взлёт 10 м, `SIM_RC_FAIL = 1` → ожидать режим RTL/LAND в течение 5 с → `assert`; затем миссия из 4 точек → `assert` достижение. Время — 2–4 минуты. ArduPilot-овский `Tools/autotest` — пример, как это сделано у разработчиков (`autotest.py test.Copter.ThrottleFailsafe`).
+ArduPilot в CI (Ubuntu runner): собрать SITL (`./waf configure --board sitl && ./waf copter`) или взять готовый образ; запустить `sim_vehicle.py` без GUI с `--add-param-file params.param`; скрипт pymavlink: арм в Guided, взлёт 10 м, `SIM_RC_FAIL = 1` → ожидать режим RTL/LAND в течение 5 с → `assert`; затем отдельным прогоном (с `SIM_RC_FAIL = 0`) — миссия из 4 точек → `assert` достижение. Время — 2–4 минуты. ArduPilot-овский `Tools/autotest` — пример, как это сделано у разработчиков (`autotest.py test.Copter.ThrottleFailsafe`).
+
+{{diagram:ci-sitl-failsafe-seq|SITL-автотест по шагам: после SIM_RC_FAIL = 1 режим обязан смениться на RTL или LAND за 5 с, иначе assert падает и PR не сливается.}}
+
 Betaflight: SITL-сборка проверяет компиляцию и CLI; для PID-логики — юнит-тесты `make test`. Для конфигов — скрипт инвариантов.
 
 ### Линтеры и схемы

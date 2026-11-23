@@ -54,6 +54,8 @@ The ESP32 as a system component: it sends `HEARTBEAT` (its own component_id: `MA
 ### Worked example: a radio companion (the TX16S project)
 The line protocol: radio → ESP32 `S,<mode>,<armed>,<vbat>,<rssi>\n` every 500 ms; ESP32 → radio `A,<cmd>,<arg>\n`. ESP32 states: FLIGHT (radio off; the default and on a line timeout > 2 s) → GROUND (the radio sent `armed=0` for ≥ 3 s in a row: Wi-Fi AP, web settings) → FLIGHT on any `armed=1`. Settings: STAGE (JSON in RAM) → APPLY (NVS write with a copy of the previous version) only in GROUND; the Lua on the radio blocks `APPLY` if telemetry shows armed. Testing: a line emulator from a PC over USB-UART, transition and timeout scenarios, then the real radio without an aircraft.
 
+{{diagram:esp32-tx-companion-states|Состояния компаньона пульта: по умолчанию и при тишине дольше 2 с — FLIGHT с выключенным радио; GROUND и настройки — только после 3 с подряд armed=0.}}
+
 {{diagram:esp32-roles|Three roles of the ESP32 in the course: a UART ↔ Wi-Fi/BLE bridge, its own MAVLink component and a radio companion on the AUX port.}}
 
 ## practice

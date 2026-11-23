@@ -73,6 +73,8 @@ def cmd(m, command, *params, retries=3, timeout=1.0):
 ```
 `STATUSTEXT` explains the refusal in parallel (“PreArm: …”). MAVSDK does the same under the hood — but you need to understand what's inside to read a tlog during an analysis.
 
+{{diagram:mav-cmd-ack-flow|Разобранная команда как схема: ждать ACK именно этой команды, IN_PROGRESS — ждать дальше, отказ — исключение с причиной в STATUSTEXT, тишина — повтор, после трёх — TimeoutError.}}
+
 ## practice
 ### Step 1. Listen to telemetry
 ```python

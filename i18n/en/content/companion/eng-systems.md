@@ -52,6 +52,8 @@ Ratings on a 1–10 scale: S — severity of consequences, O — occurrence, D �
 
 The surprise in this example is typical: the risk that feels “scariest” (link loss) is the best covered, while the highest RPNs belong to the build and the process, where detection is poor. That shift of attention is exactly what makes an FMEA valuable.
 
+{{diagram:eng-trace-chain|Строка FMEA с RPN 216 проходит цепочку мера → требование R-PRC-02 → тест check_params.py → запись → матрица; результат теста возвращается в FMEA пересчётом RPN.}}
+
 ### ADR: a decision you can reread
 An Architecture Decision Record is a short file for every irreversible decision. Template:
 ```

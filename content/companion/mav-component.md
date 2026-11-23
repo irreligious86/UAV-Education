@@ -36,6 +36,8 @@ next:
 
 ArduPilot: `RNGFND1_TYPE = 10` (MAVLink), `RNGFND1_ORIENT = 25` (вниз), `RNGFND1_MIN`/`RNGFND1_MAX` (метры; до 4.7 — `RNGFND1_MIN_CM`/`RNGFND1_MAX_CM`, сантиметры). Значения вне диапазона [min, max] автопилот считает «вне дальности», а не измерением. Частота — 10–50 Гц; таймаут MAVLink-дальномера в ArduPilot — 500 мс: если пакеты приходят реже ~2 Гц или с пропусками дольше 0.5 с, датчик считается отвалившимся. Дальномер вниз используется для высоты над землёй (`RFND` в логе, EKF источник POSZ = дальномер, посадка, террейн-фоллоуинг); датчики по другим ориентациям — для обхода препятствий (`PRX` proximity, `PRX1_TYPE = 2` MAVLink).
 
+{{diagram:mav-rangefinder-timeout|Таймаут 0.5 с работает только на честный компонент: замолчавший датчик отключается через 0.5 с, повторяющий последнее значение не отключается никогда, а пауза больше 0.5 с даёт «мигание».}}
+
 ### Препятствия и внешняя навигация
 - `OBSTACLE_DISTANCE` (330): массив из 72 расстояний по секторам (`increment` градусов на сектор, `angle_offset`), для 2D-лидаров и стереокамер → proximity в ArduPilot (`PRX1_TYPE = 2`), collision prevention в PX4.
 - `VISION_POSITION_ESTIMATE` (102), `VISION_SPEED_ESTIMATE` (103), `ODOMETRY` (331): поза/скорость от VIO или motion capture → EKF ArduPilot как ExternalNav (`EK3_SRC1_POSXY = 6`), PX4 — как vision (`EKF2_EV_CTRL`). Здесь важно время (`usec` метки, TIMESYNC) и системы координат (FRD/NED против FLU/ENU — модуль math-linalg-rot).

@@ -55,6 +55,9 @@ Implementation — JSON Schema/plain Python with a rule table; output — a list
 
 ### SITL autotest
 ArduPilot in CI (Ubuntu runner): build SITL (`./waf configure --board sitl && ./waf copter`) or take a prebuilt image; run `sim_vehicle.py` without a GUI with `--add-param-file params.param`; a pymavlink script: arm in Guided, take off to 10 m, `SIM_RC_FAIL = 1` → expect RTL/LAND mode within 5 s → `assert`; then a 4-waypoint mission → `assert` it is reached. Time — 2–4 minutes. ArduPilot's own `Tools/autotest` is an example of how the developers do it (`autotest.py test.Copter.ThrottleFailsafe`).
+
+{{diagram:ci-sitl-failsafe-seq|SITL-автотест по шагам: после SIM_RC_FAIL = 1 режим обязан смениться на RTL или LAND за 5 с, иначе assert падает и PR не сливается.}}
+
 Betaflight: a SITL build checks compilation and the CLI; for PID logic — the `make test` unit tests. For configs — the invariant script.
 
 ### Linters and schemas

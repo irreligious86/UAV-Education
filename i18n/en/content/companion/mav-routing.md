@@ -43,6 +43,8 @@ Consequences you need to know by heart:
 - The routing table is reset on reboot; the GCS must notice `time_boot_ms` decreasing in `SYSTEM_TIME` and relearn the routes.
 - A port can be excluded from forwarding: in ArduPilot 4.7+ — `MAVn_OPTIONS` bit 1 “Don't forward mavlink to/from,” in 4.6 and earlier — `SERIALn_OPTIONS` bit 10. You need this, for example, for a port with a “chatty” device on it.
 
+{{diagram:mav-forward-tree|Правила пересылки как дерево: широковещательный пакет уходит во все порты, где кого-то видели, адресный — только туда, где видели адресата; молчащий компонент недостижим.}}
+
 {{diagram:mavlink-topology|Typical topology: the autopilot and the companion router connect the GCS over radio and over 4G to the onboard components.}}
 
 ### Tools

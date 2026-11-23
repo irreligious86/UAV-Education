@@ -38,6 +38,8 @@ Fields: `time_boot_ms`, `min_distance`/`max_distance`/`current_distance` in **ce
 
 ArduPilot: `RNGFND1_TYPE = 10` (MAVLink), `RNGFND1_ORIENT = 25` (down), `RNGFND1_MIN`/`RNGFND1_MAX` (in meters in new versions, `_MIN_CM`/`_MAX_CM` in old ones). The autopilot treats values outside the [min, max] range as “out of range”, not as a measurement. Rate — 10–50 Hz; the MAVLink rangefinder timeout in ArduPilot is 500 ms: if packets arrive less often than ~2 Hz or with gaps longer than 0.5 s, the sensor is considered lost. A downward rangefinder is used for height above ground (`RFND` in the log, EKF source POSZ = rangefinder, landing, terrain following); sensors in other orientations — for obstacle avoidance (`PRX` proximity, `PRX1_TYPE = 2` MAVLink).
 
+{{diagram:mav-rangefinder-timeout|Таймаут 0.5 с работает только на честный компонент: замолчавший датчик отключается через 0.5 с, повторяющий последнее значение не отключается никогда, а пауза больше 0.5 с даёт «мигание».}}
+
 ### Obstacles and external navigation
 - `OBSTACLE_DISTANCE` (330): an array of 72 distances by sector (`increment` degrees per sector, `angle_offset`), for 2D lidars and stereo cameras → proximity in ArduPilot (`PRX1_TYPE = 2`), collision prevention in PX4.
 - `VISION_POSITION_ESTIMATE` (102), `VISION_SPEED_ESTIMATE` (103), `ODOMETRY` (331): pose/velocity from VIO or motion capture → the ArduPilot EKF as ExternalNav (`EK3_SRC1_POSXY = 6`), PX4 — as vision (`EKF2_EV_CTRL`). What matters here is time (`usec` timestamps, TIMESYNC) and coordinate frames (FRD/NED versus FLU/ENU — the math-linalg-rot module).

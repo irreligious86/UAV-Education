@@ -60,6 +60,8 @@ Pick the BEC with at least one and a half to two times headroom (5 A), and the w
 ### Overheating and voltage sag show up in numbers
 `vcgencmd get_throttled` returns a bitmask: bit 0 — undervoltage right now, 1 — frequency capped, 2 — throttling, 3 — soft temperature limit; bits 16–19 — the same, “has occurred since boot”. `0x0` — all good, `0x50000` — there was undervoltage and throttling; `0x50005` — it's happening right now. Temperature — `vcgencmd measure_temp`; without a heatsink and airflow a Pi 5 under load starts throttling within minutes, and even more so inside a drone body with no airflow. A vision algorithm that “suddenly got slower in flight” is almost always this.
 
+{{diagram:rpi-throttled-bits|Маска get_throttled по битам: старшая тетрада повторяет младшую как «было с загрузки», поэтому 0x50000 — было, а 0x50005 — происходит сейчас.}}
+
 ### Power loss without a broken SD card
 On a drone the power disappears without a `shutdown` — after a crash, when swapping batteries. A write at the moment of power loss corrupts the SD card's file system. Two approaches that work:
 - **Overlay File System** (`raspi-config` → Performance Options → Overlay File System): the root is read-only, changes live in RAM and vanish after a reboot. The system is unkillable, but logs and records have to be written to a separate partition or a USB drive.

@@ -57,6 +57,8 @@ source_hash: 6ae3972e9635
 
 Перевірка на теорію: в `AC_PID::update_all()` побачити, що D рахується від помилки, пропущеної через `FLTD`, а не від сирого гіроскопа; що I обмежується `IMAX` і не накопичується при `limit` (насичення моторів) — це anti-windup; `AP_MotorsMatrix::output_armed_stabilizing()` — порядок: спочатку roll/pitch, потім yaw — скільки вміщається (`MOT_YAW_HEADROOM` — гарантований мінімум), і лише потім добирається throttle, який влазить у залишковий діапазон.
 
+{{diagram:fw-gyro-motor-paths|Один и тот же путь гироскоп → моторы в двух кодовых базах с файлом на каждом шаге; выделен PID: D от гироскопа в Betaflight и от ошибки через FLTD в ArduPilot.}}
+
 ### Мінімальний патч і SITL
 Betaflight: `make SITL` збирає прошивку під Linux (`obj/main/betaflight_SITL.elf`), зв'язується із симулятором (RealFlight/gazebo через UDP) або просто дає змогу підключитися конфігуратором через TCP: зміни в логіці CLI/параметрів перевіряються без заліза; для PID-логіки — юніт-тести в `src/test/unit/` (`make test` — gtest), наприклад `pid_unittest.cc`.
 ArduPilot: `Tools/autotest/sim_vehicle.py -v ArduCopter --console --map` збирає й запускає SITL; патч → перезбирання → політ у SITL → лог; автотести `Tools/autotest/arducopter.py` (`./Tools/autotest/autotest.py build.Copter test.Copter.<Test>`).

@@ -90,6 +90,8 @@ asyncio.run(main())
 
 Проєктуй так, аби безпеку забезпечував нижній рівень (автопілот), а верхній — лиш відновлював роботу.
 
+{{diagram:mav-offboard-loss-timeline|После kill -9 скрипта PX4 через 1 с выходит из Offboard, а ArduPilot ещё 3 с летит с прежней скоростью и только потом останавливается, оставаясь в GUIDED.}}
+
 {{diagram:mav-sdk-layers|pymavlink, MAVSDK і MAVROS — різні рівні абстракції над одним і тим самим MAVLink.}}
 
 ## practice

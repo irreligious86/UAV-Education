@@ -90,6 +90,8 @@ High-level control from the companion: in PX4 — Offboard mode (MAVSDK `offboar
 
 Design it so that safety is provided by the lower level (the autopilot), and the upper level only restores operation.
 
+{{diagram:mav-offboard-loss-timeline|После kill -9 скрипта PX4 через 1 с выходит из Offboard, а ArduPilot ещё 3 с летит с прежней скоростью и только потом останавливается, оставаясь в GUIDED.}}
+
 {{diagram:mav-sdk-layers|pymavlink, MAVSDK and MAVROS are different levels of abstraction over the same MAVLink.}}
 
 ## practice

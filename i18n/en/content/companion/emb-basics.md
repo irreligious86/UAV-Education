@@ -46,6 +46,8 @@ Jitter is the spread of the actual period. Causes: an ISR doing long work, a hig
 
 **Why blocking in the loop is a disaster**: the control task waits for the UART for 50 ms → 400 missed cycles at 8 kHz → the gyro data is stale, the D-term jumps, the motors “twitch”; in the worst case the watchdog reboots the controller in flight. Hence the rule: the control loop waits for nothing — it only reads data that is ready.
 
+{{diagram:emb-blocking-timeline|50 мс ожидания UART — это 400 невыполненных циклов на 8 кГц; правильный цикл не ждёт, байты собирает прерывание или DMA в кольцевой буфер.}}
+
 ### Watchdog
 A hardware timer that reboots the MCU if it isn't “fed”. Betaflight/ArduPilot/PX4 use it: a hang = a reboot (better than an eternal “motors stuck at the last value”); ArduPilot writes the reason to `WDOG`/`BRD_OPTIONS`. On the ESP32 there's the task watchdog on the idle tasks: a task without `vTaskDelay` blocks idle → the TWDT fires.
 
