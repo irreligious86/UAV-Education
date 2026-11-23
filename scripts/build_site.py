@@ -38,6 +38,8 @@ from content_pipeline import (  # noqa: E402
     parse_pipe_references,
     parse_yaml_references,
     render_diagram,
+    render_lesson,
+    LESSON_RE,
     strip_front_matter,
 )
 
@@ -576,6 +578,11 @@ def article_sections(m: dict) -> tuple[str, str]:
     body = strip_front_matter(raw)
     summary = extract_section(body, "summary")
     parts = []
+    # {{lesson:…}} lines in the summary become cards right under the lead, before the theory
+    cards = [LESSON_RE.match(l.strip()) for l in summary.splitlines()] if summary else []
+    if any(cards):
+        summary = "\n".join(l for l, c in zip(summary.splitlines(), cards) if not c)
+        parts.append("\n".join(render_lesson(c.group(1), c.group(2).strip()) for c in cards if c))
     for key, heading in (("theory", _("Теория")), ("practice", _("Практика"))):
         block = extract_section(body, key)
         if block:
@@ -1212,7 +1219,8 @@ def search_index(model: dict) -> list[dict]:
             continue
         raw = module_source(m)
         body = strip_front_matter(raw)
-        summary = " ".join(extract_section(body, "summary").split())
+        summary = " ".join(l for l in extract_section(body, "summary").splitlines() if not LESSON_RE.match(l.strip()))
+        summary = " ".join(summary.split())
         headings = " ".join(h.strip() for h in re.findall(r"^###\s+(.+)$", body, flags=re.M))
         docs.append({
             "id": m["id"], "type": "module", "title": m["title"], "url": f"m/{m['id']}.html",

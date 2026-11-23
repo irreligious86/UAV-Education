@@ -1,0 +1,74 @@
+{
+  "module": "ap-vtol-modes",
+  "tasks": [
+    {
+      "id": "airbrake-distance",
+      "title": "Дистанция начала airbrake",
+      "statement": "VTOL-посадка в миссии: путевая скорость сближения **{v} м/с**, `Q_TRANS_DECEL` = **{a} м/с²**. С какой дистанции до точки посадки ArduPlane 4.7.2 начнёт этап AIRBRAKE, м?",
+      "params": {
+        "v": {"min": 14, "max": 28, "step": 0.5},
+        "a": [1.0, 1.5, 2.0, 2.5, 3.0]
+      },
+      "answer": "v**2/(2*a) + 2*v",
+      "unit": "м",
+      "tol": 0.01,
+      "solution": "stop_distance = V²/(2·`Q_TRANS_DECEL`) + 2·V: дистанция остановки плюс две секунды на раскрутку подъёмных моторов. SITL: 19.2 м/с, 2 м/с² → 92.2 + 38.4 = 130.6 м, в логе «VTOL airbrake v=19.2 d=130 sd=130»."
+    },
+    {
+      "id": "transition-distance",
+      "title": "Путь перехода вперёд (оценка снизу)",
+      "statement": "`AIRSPEED_MIN` = **{vmin} м/с**, `Q_ASSIST_SPEED` = **{vas} м/с**, `Q_TRANSITION_MS` = **{tms} мс**, разгон в фазе AIRSPEED_WAIT с постоянным ускорением **{acc} м/с²** из висения без ветра. Найдите нижнюю оценку пути от «Transition started» до «Transition done», м.",
+      "params": {
+        "vmin": [11, 12, 13, 14, 15, 16],
+        "vas": [9, 10, 11, 12, 14, 16, 18],
+        "tms": [3000, 4000, 5000, 6000, 8000],
+        "acc": [2.0, 2.5, 3.0, 4.0, 5.0]
+      },
+      "answer": "max(vmin, vas)**2/(2*acc) + max(vmin, vas)*tms/1000",
+      "unit": "м",
+      "tol": 0.01,
+      "solution": "Порог — max(`AIRSPEED_MIN`, `Q_ASSIST_SPEED`): пока скорость ниже `Q_ASSIST_SPEED`, Q-assist не выпускает из AIRSPEED_WAIT. Разгон V²/(2a), затем таймер T = `Q_TRANSITION_MS` не медленнее порога: d ≥ V²/(2a) + V·T. SITL: 18 м/с, 5 м/с², 5 с → 122 м (реально 159 м — аппарат продолжал разгоняться)."
+    },
+    {
+      "id": "vtol-land-too-short",
+      "title": "Проверка «VTOL land too short»",
+      "statement": "В миссии `NAV_VTOL_LAND` идёт сразу после `NAV_WAYPOINT`. `TECS_LAND_ARSPD` не задан (−1), `AIRSPEED_CRUISE` = **{vc} м/с**, `Q_TRANS_DECEL` = **{a} м/с²**. Какое минимальное расстояние между этими точками пропустит pre-arm проверка, м?",
+      "params": {
+        "vc": [16, 18, 20, 22, 25, 28],
+        "a": [1.0, 1.5, 2.0, 2.5, 3.0]
+      },
+      "answer": "0.75*vc**2/(2*a)",
+      "unit": "м",
+      "tol": 0.01,
+      "solution": "AP_Arming_Plane: min = 0.75 · stopping_distance(V²) = 0.75 · V²/(2·`Q_TRANS_DECEL`), V = `TECS_LAND_ARSPD`, а если он не задан — `AIRSPEED_CRUISE`. SITL: 25 м/с, 2 м/с² → 117 м."
+    },
+    {
+      "id": "q-assist-speed",
+      "title": "Выбор Q_ASSIST_SPEED",
+      "statement": "Аппарат с датчиком воздушной скорости: V_s = **{vs} м/с**, `AIRSPEED_MIN` = **{k}** · V_s. По правилу модуля (на 3 м/с ниже `AIRSPEED_MIN`, но не ниже V_s) найдите `Q_ASSIST_SPEED`, м/с.",
+      "params": {
+        "vs": {"min": 9, "max": 20, "step": 0.5},
+        "k": [1.2, 1.25, 1.3, 1.35, 1.4]
+      },
+      "answer": "max(k*vs - 3, vs)",
+      "unit": "м/с",
+      "tol": 0.01,
+      "solution": "`Q_ASSIST_SPEED` = max(`AIRSPEED_MIN` − 3, V_s). Выше `AIRSPEED_MIN` нельзя: CRUISE и FBWB на нулевом газе держат `AIRSPEED_MIN`, и помощь будет включаться циклически, как в шаге 2 практики."
+    },
+    {
+      "id": "qrtl-cone",
+      "title": "Высота подъёма QRTL у дома",
+      "statement": "QRTL включён в висении в **{d} м** от дома на высоте 3 м. `WP_LOITER_RAD` = **{r} м**, `RTL_RADIUS` = 0, `Q_RTL_ALT` = **{h} м**, `Q_RTL_ALT_MIN` = **{hmin} м**, `Q_LAND_FINAL_ALT` = 6 м. До какой высоты над домом аппарат поднимется перед возвратом, м?",
+      "params": {
+        "d": [10, 20, 30, 40, 50, 60, 70, 80],
+        "r": [60, 70, 80, 100],
+        "h": [15, 20, 25, 30, 40],
+        "hmin": [5, 8, 10, 12]
+      },
+      "answer": "max(h*d/max(1.5*r, d), min(max(hmin, 6), h))",
+      "unit": "м",
+      "tol": 0.01,
+      "solution": "Радиус возврата R = 1.5·max(`WP_LOITER_RAD`, `RTL_RADIUS`); цель = max(`Q_RTL_ALT`·d/max(R, d), `Q_RTL_ALT_MIN`, ограниченный диапазоном `Q_LAND_FINAL_ALT`…`Q_RTL_ALT`). Пример модуля: 60 м → R = 90 м; d = 50 м → max(8.3, 10) = 10 м."
+    }
+  ]
+}

@@ -1725,6 +1725,46 @@
       "term": "Part 137 AAOC (Agricultural Aircraft Operator Certificate)",
       "def": "Сертификат эксплуатанта сельскохозяйственной авиации FAA (форма 8710-3); для БПЛА выдаётся после получения номера освобождения (exemption), в том числе от § 107.36, который запрещает малому БПЛА нести опасные вещества.",
       "module": "ops-applications"
+    },
+    {
+      "term": "Синтетическая воздушная скорость (synthetic airspeed)",
+      "def": "Оценка воздушной скорости без датчика: путевая скорость минус оценка ветра EKF3 (или DCM по GPS). ArduPlane использует её для перехода QuadPlane и TECS; без GPS её нет.",
+      "module": "ap-vtol-anatomy"
+    },
+    {
+      "term": "Tailsitter",
+      "def": "VTOL, который взлетает и садится на хвосте, а для полёта на крыле поворачивается на 90° по тангажу; в ArduPlane — Q_TAILSIT_ENABLE, переход заканчивается по углу Q_TAILSIT_ANGLE (45°).",
+      "module": "ap-vtol-anatomy"
+    },
+    {
+      "term": "Q-assist",
+      "def": "Помощь подъёмных моторов QuadPlane в самолётном режиме без смены режима: при скорости ниже Q_ASSIST_SPEED (сразу), высоте ниже Q_ASSIST_ALT или угловой ошибке больше Q_ASSIST_ANGLE (после Q_ASSIST_DELAY).",
+      "module": "ap-vtol-modes"
+    },
+    {
+      "term": "Airbrake (этап VTOL-посадки)",
+      "def": "Этап посадки QuadPlane, на котором подъёмные моторы раскручиваются как воздушный тормоз; начинается с дистанции V²/(2·Q_TRANS_DECEL) + 2V до точки, длится не меньше 1 с.",
+      "module": "ap-vtol-modes"
+    },
+    {
+      "term": "QRTL",
+      "def": "Режим возврата QuadPlane с вертикальной посадкой (номер 21): вблизи дома возвращается в висении на Q_RTL_ALT, издалека летит самолётом и садится через этапы airbrake и POSITION1.",
+      "module": "ap-vtol-modes"
+    },
+    {
+      "term": "AHRS (AP_AHRS)",
+      "def": "В ArduPilot — front end оценки ориентации, скорости и позиции: на каждом цикле выбирает активный backend (EKF3, DCM, EKF2, внешний AHRS, SIM) и отдаёт его ответ контурам управления; смена видна строкой «AHRS: EKF3 active» или «AHRS: DCM active», параметр выбора — AHRS_EKF_TYPE.",
+      "module": "ap-ahrs-choice"
+    },
+    {
+      "term": "GSF (EKF-GSF, оценщик курса)",
+      "def": "Банк из пяти малых фильтров с разными начальными курсами внутри EKF3, который по согласию ускорений IMU со скоростью GPS находит курс без компаса; EK3_SRC1_YAW = 8 делает его источником курса, при компасе он используется для аварийного сброса курса (EK3_GSF_USE_MASK, не больше EK3_GSF_RST_MAX раз за полёт). Лог XKY0.",
+      "module": "ap-ahrs-choice"
+    },
+    {
+      "term": "Набор источников EKF (EK3_SRCn)",
+      "def": "Пять параметров EK3_SRCn_POSXY, _VELXY, _POSZ, _VELZ, _YAW, задающих, откуда EKF3 берёт позицию, скорость, высоту и курс; наборов три, активный меняется в полёте тумблером RCx_OPTION = 90, командой MAV_CMD_SET_EKF_SOURCE_SET или из Lua и пишется в XKFS.SS.",
+      "module": "ap-ahrs-choice"
     }
   ]
 }
