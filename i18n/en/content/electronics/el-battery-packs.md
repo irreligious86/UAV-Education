@@ -45,6 +45,8 @@ Rule: Li-Ion wins when the average pack current is ≤ 1–2C and the flight is 
 - **Heat**: P = I²·R on the pack: 60 A × 60 A × 0.05 Ω = 180 W over the whole pack — noticeable heating in 10 minutes. Rule of thumb: average current ≤ 1.5C for 21700 without forced cooling.
 - **Mass budget**: 6S4P 21700 ≈ 24 × 70 g = 1.7 kg + strip/case ≈ 1.85 kg for 363 Wh (≈ 195 Wh/kg including hardware).
 
+{{diagram:chart-pack-sag-sp|Просадка растёт линейно с током и обратно пропорционально P; кривая кончается на пределе правила 0.6, и 4P из примера при 60 А теряет 2.3–3.5 В — почти элемент.}}
+
 ### Spot welding
 You must not solder to cells: overheating the terminal damages the separator and the protection. Weld with nickel strip:
 

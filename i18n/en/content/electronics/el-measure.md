@@ -42,6 +42,8 @@ Shows voltage over time. For on-board work 2 channels and 50–100 MHz are enoug
 ### DShot on the oscilloscope
 A DShot frame is 16 bits: 11 throttle bits, 1 telemetry bit, 4 CRC bits. Each bit is a pulse: “1” is long (~75% of the bit period), “0” is short (~37%). DShot600 is 600 kbit/s, a bit ≈ 1.67 µs, a frame ≈ 27 µs. On screen — a burst of 16 pulses repeating at the PID loop rate (for example, every 125 µs at 8 kHz). Problems you can see: ringing on the edges (long wire, no termination), a level that doesn't reach 3.3 V (weak driver), dropped frames.
 
+{{diagram:dshot600-pulse-train|Кадр 0x82C6 по времени: бит несёт ширина импульса — «1» держится ~75 % бита, «0» ~37 %, а 16 бит DShot600 занимают ≈ 27 мкс.}}
+
 ### Logic analyzer
 Records digital levels on many channels and decodes protocols. A cheap 8-channel 24 MHz one with software like PulseView/sigrok is enough for UART up to 1 Mbaud, I2C at 400 kHz, SPI up to a few MHz and DShot600 (you need ≥ 4–5 samples per bit — 12–24 MHz is better).
 

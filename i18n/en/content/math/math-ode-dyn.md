@@ -64,8 +64,12 @@ The controller runs in ticks with period T_s (Betaflight — PID loop 4–8 kHz,
 - A first-order PT1 in code: yₖ = yₖ₋₁ + k·(xₖ − yₖ₋₁), where k = T_s/(τ + T_s) — this is the backward Euler transform, practically exact when f_c ≪ f_s. In Betaflight — `pt1FilterGain()`.
 - What breaks with a large T_s: the Nyquist frequency f_s/2 — everything above it folds back (aliases); the derivative of noise grows as 1/T_s; with T_s comparable to τ, forward Euler can make a stable system unstable. Rule: the loop period should be no more than τ/10 of the fastest process the loop has to handle.
 
+{{diagram:chart-pt1-discrete-phase|Чем крупнее шаг, тем дальше фаза дискретного PT1 от непрерывных −26.6°; Эйлер вперёд уходит первым и при T_s > 2τ ≈ 3.18 мс неустойчив.}}
+
 ### Delay versus inertia
 People confuse them, but they're different: inertia (τ) is a smooth response that starts immediately; delay (L) is nothing happening, then an exact copy of the input. A loop with inertia can be “pushed” with gain almost without limit; a loop with delay can't: with gain K the phase margin gets eaten up, and at ω·L ≈ 1–1.5 rad the loop oscillates no matter what you do. For a 5": L ≈ 2–4 ms (filters + RC) with τ ≈ 20 ms. That's why the mantra “fewer filters — a sharper drone” holds right up to the moment the noise starts heating the motors.
+
+{{diagram:chart-delay-gain-limit|Граничное K_p падает примерно обратно пропорционально задержке, а τ_m его почти не двигает: кривые для 20 и 100 мс почти совпадают; без задержки предела нет.}}
 
 ## practice
 ### Step 1. One axis with a PID in numpy

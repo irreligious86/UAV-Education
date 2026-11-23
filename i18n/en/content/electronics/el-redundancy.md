@@ -49,6 +49,8 @@ Each arm has two motors: arm current = 2 × motor current. Hover 14 A, maximum 5
 
 Drop across a 30 cm 12 AWG arm wire at 50 A: R = 0.0172 × 0.6 / 3.31 ≈ 3.1 mΩ → 0.16 V, 7.8 W of heat at peak — acceptable; with 14 AWG it's 0.25 V and 12 W, already hot over long sessions.
 
+{{diagram:x8-power-redundancy|Схема питания X8 из модуля: отказ одной АКБ или одного BEC борт переживает, на моторах предохранителей нет, а для луча на ~32 А XT60 на пределе, XT90 — с запасом.}}
+
 ### Firmware behavior on a failure
 - **ArduPilot**: the mixer normalizes the outputs; on saturation the priority is roll/pitch, then throttle, yaw last (`MOT_YAW_HEADROOM`). A motor failure shows up in `RCOU` (one channel at maximum, its neighbor at minimum) and in the `ESC` telemetry (RPM 0). There's a thrust loss check (the message “Potential Thrust Loss (n)”): the mixer enables thrust boost and excludes the lost motor from yaw control; but survivability is still determined by thrust margin and geometry.
 - **PX4**: has motor failure detection from ESC telemetry (`FD_ACT_EN`, `FD_ACT_MOT_TOUT`) and an action: the `COM_ACT_FAIL_ACT` failsafe (warning/Hold/Land/Return/Terminate), while `CA_FAILURE_MODE = 1` removes the motor from the mixer.

@@ -39,6 +39,8 @@ Don't: a flight controller from scratch as your first project — that means hig
 4. **DRC** (design rules check) — the fab's rules: minimum trace width and clearance, holes, edge clearances.
 5. **Output**: Gerber files for the layers, a drill file, a BOM (bill of materials), a position file for automated assembly; a 3D view to check packages and connectors.
 
+{{diagram:kicad-design-flow|Каждая проверка — ERC, DRC, 3D-вид — при ошибке возвращает к шагу, где ошибка сделана; правила фабрики загружают в Board Setup до разводки.}}
+
 ### Example: an INA226 current sensor
 The INA226 is a digital current and voltage monitor over I²C: it measures the drop across a shunt (±81.92 mV range, 2.5 µV step) and the bus voltage (up to 36 V — up to 8S), and computes current and power.
 - **Shunt.** Maximum current 100 A with an 81.92 mV range → R ≤ 0.82 mΩ; take 0.5 mΩ: 50 mV at 100 A, with margin. Power in the shunt, I²R: 5 W at 100 A, 0.8 W at 40 A continuous — a 2512 package or two shunts in parallel, wide copper pads for heat dissipation.

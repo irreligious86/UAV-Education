@@ -65,6 +65,8 @@ When: the aircraft is large (long wires → UART/I2C pick up noise), there are m
 6. Firmware: port → function → protocol/speed. Check the data (GPS: satellites; compass: heading changes when you rotate; ESC telemetry: RPM on the motors tab).
 7. If there's no data — analyzer on the line: are there bytes, what speed, inversion.
 
+{{diagram:periph-connect-flow|Мультиметр и smoke stopper — до прошивки; если данных нет, следующий шаг — анализатор на линии: есть ли байты, какая скорость, нет ли инверсии.}}
+
 ## practice
 ### Step 1. GPS with compass (UART + I2C)
 Connect the GPS to UARTx (TX↔RX), the compass to SDA/SCL, 5 V power. Betaflight: Ports → GPS on UARTx, Configuration → GPS UBLOX, 57600/115200; enable the magnetometer. ArduPilot: `SERIALx_PROTOCOL = 5`, `GPS_TYPE = 2` (`GPS1_TYPE` in 4.6+, u-blox), compass — autodetect. Check: NSats ≥ 6 outdoors, the heading rotates.

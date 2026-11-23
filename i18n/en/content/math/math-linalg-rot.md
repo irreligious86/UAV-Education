@@ -55,6 +55,8 @@ R_nb = Rz(ψ) · Ry(θ) · Rx(φ)
 
 Read it like this: a vector in body axes is first “unwound” in roll, then in pitch, then in yaw — and you get it in NED. In ArduPilot code this is `Matrix3f::from_euler(roll, pitch, yaw)`, in PX4 — `matrix::Dcmf(matrix::Eulerf(...))`.
 
+{{diagram:rot-order-noncommute|Rx(90°)·Ry(90°) и Ry(90°)·Rx(90°) переводят (1, 0, 0) в разные векторы — (0, 1, 0) и (0, 0, −1): правый множитель действует первым.}}
+
 {{diagram:frames-rotations|Coordinate frames: NED and FRD (ArduPilot, PX4) versus ENU and FLU (ROS). The same vehicle, different axis labels — and different signs for “up”.}}
 
 ### Euler angles and their singularity
