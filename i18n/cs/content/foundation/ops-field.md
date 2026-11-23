@@ -53,6 +53,8 @@ Jeden člověk může role spojovat, ale pilot je za letu jen pilotem.
 - **Úraz**: první pomoc, záchranné složky, teprve potom všechno ostatní.
 - **Rozbor**: co se stalo, podle logu, bez hledání viníků; závěr se zapíše do deníku a do kontrolního seznamu.
 
+{{diagram:crash-search-flow|Поиск начинается в первую минуту на месте: последняя точка по самому точному источнику плюс поправка на инерцию, затем схема поиска и решение старшего через 30–40 минут, пока АКБ не села.}}
+
 ### Případová studie
 Ukázalo se, že používaný kanál E5 (5885 MHz) obsadil spadlý stroj, který vysílal až do konce směny. Řešení: jako nejbližší volná frekvence s ohledem na kanály dvou sousedů byl vybrán F1 (5740 MHz); změna proběhla nejdřív na dvou vysílačích a několika dronech na zkoušku, potom na všech. Hlavní poučení: tabulka obsazených frekvencí na letové ploše musí existovat dřív, než dojde k incidentu.
 

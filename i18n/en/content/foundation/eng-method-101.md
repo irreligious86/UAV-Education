@@ -48,6 +48,8 @@ A diagram of blocks and connections: what connects to what, over which interface
 - **Mechanics**: where everything sits, masses, center of gravity.
 The architecture answers “why exactly this way” with one sentence per decision: “GPS on a mast — keeps the compass away from the power wiring (see interference).”
 
+{{diagram:eng-architecture-layers|Архитектура примера на одном листе: питание и данные — разными линиями, у каждой стрелки данных подписаны интерфейс и порт; токи на стрелках питания подписываешь своими числами.}}
+
 ### 3. Tests
 Every requirement → a test with an expected result, an actual result and a date. Tests can be:
 - **Ground** (no props): ports, motor direction, failsafe, the firmware's preflight checks.

@@ -50,6 +50,8 @@ Rameno jako vetknutý nosník: f₁ ≈ 0.56·√(E·I/(μ·L⁴)) (E – modul 
 ### Tlumení FC: jak vybírat
 Gumový silentblok je pružina s tlumičem: vlastní frekvence soustavy „deska na silentblocích“ je f₀ = (1/2π)·√(k/m). Je potřeba, aby f₀ byla 3–5krát nižší než nejnižší harmonická motorů, ale vyšší než pásmo řízení (≥ 50–80 Hz): pro 5" (motory 250 Hz a více) f₀ ≈ 60–80 Hz; pro X8 (motory 55 Hz) jsou tlumiče s f₀ 15–20 Hz už „měkké“ a způsobují zpoždění – tam se pracuje vyvažováním a notchem, ne měkkostí. Příznak příliš měkkého upevnění: nízkofrekvenční špička 20–40 Hz ve spektru a „vatový“ let. Vodiče a ploché kabely tlumiče obcházejí, pokud jsou napnuté.
 
+{{diagram:chart-fc-damper-window|Окно мягкого крепления (f₀ в 3–5 раз ниже гармоники моторов, но не ниже 50–80 Гц) есть только при гармониках от 150–240 Гц: у 5" (250 Гц) это 50–83 Гц, у 7" из примера (125 Гц), 10" и X8 окна нет — там балансировка и notch.}}
+
 ### Řešený příklad: 7" se špičkou na 180 Hz
 Spektrogram: vodorovná čára na 180 Hz nezávislá na plynu, 25 dB nad pozadím; harmonická motorů ve visu je 125 Hz, 2. harmonická 250 Hz (při přidávání plynu prochází přes 180 Hz – rezonance „zvoní“). Test cvrnknutím do ramene dá 182 Hz: je to rameno. Možnosti: rameno 6 mm místo 5 (f ↑ ~20 % → 215 Hz, vzdálí se od 1. harmonické, ale 2. jím stejně prochází) – to není řešení; dynamický notch na 180 Hz (pomáhá, ale přidává zpoždění) – dočasně; skutečné řešení je změnit bod upevnění motoru nebo zkrátit rameno (f ↑ 1.3–1.5krát), nebo rezonanci přijmout a nastavit statický notch `gyro_notch1_hz = 180`, `cutoff = 150`. Do pasportu stavby zapište: „rezonance ramene 180 Hz, notch“. Bez spektra by to celé vypadalo jako „je třeba snížit D“.
 

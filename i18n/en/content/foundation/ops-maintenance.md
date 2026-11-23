@@ -48,6 +48,10 @@ A hobbyist fixes the aircraft after a crash; an operator never lets it get to a 
 
 The intervals are starting values; your own come from the logbook: if bearings die within 30 h, the schedule is 20.
 
+{{diagram:maint-inspection-timeline|Регламент по налёту: проверки перед и после каждого полёта и после удара идут всегда, плановые — по часам, а интервал подшипников подгоняется по журналу (умирают за 30 ч — осмотр каждые 20 ч).}}
+
+{{diagram:post-crash-recheck-flow|После аварии порядок важен: АКБ первой и в карантин, затем механика и проводка, затем проверка без пропов — и только потом новые пропы и контрольное висение.}}
+
 ### Logs as a maintenance tool
 A log is not only “why it crashed” but also “what is wearing out”:
 - **Vibration** (`VIBE` in ArduPilot, gyro in Betaflight Blackbox): growth from flight to flight with the same props — bearings, a prop, a loose mount.

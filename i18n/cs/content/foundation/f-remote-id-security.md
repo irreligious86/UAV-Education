@@ -45,6 +45,8 @@ V USA platí pravidlo FAA Part 89 (od března 2024 povinné pro většinu letů)
 - **PX4**: podporuje zprávy OpenDroneID a externí moduly; zapnutí a kontroly najdete v oddílu Remote ID dokumentace své verze.
 - Zprávy MAVLink: rodina `OPEN_DRONE_ID_*` (`OPEN_DRONE_ID_BASIC_ID`, `_LOCATION`, `_SYSTEM`, `_OPERATOR_ID`); souřadnice pilota posílá modulu pozemní stanice (`OPEN_DRONE_ID_SYSTEM`).
 
+{{diagram:remote-id-data-path|Модуль Remote ID сам координат не знает: их даёт автопилот по MAVLink или DroneCAN, позицию пилота — наземка; на сертифицированной сборке неработающий модуль блокирует арм.}}
+
 ### Plocha útoku
 | Kanál | Hrozba | Ochrana |
 |---|---|---|

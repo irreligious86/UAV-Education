@@ -50,6 +50,8 @@ An arm as a cantilever beam: f₁ ≈ 0.56·√(E·I/(μ·L⁴)) (E — Young's 
 ### FC damping: how to choose
 A rubber grommet is a spring with a damper: the natural frequency of the “board on grommets” system is f₀ = (1/2π)·√(k/m). You want f₀ 3–5 times below the lowest motor harmonic but above the control bandwidth (≥ 50–80 Hz): for a 5" (motors at 250+ Hz) — f₀ ≈ 60–80 Hz; for an X8 (motors at 55 Hz), dampers with f₀ of 15–20 Hz are already “soft” and add lag — there you work through balancing and notches, not softness. Sign of a mount that is too soft: a low-frequency peak at 20–40 Hz in the spectrum and a “mushy” feel. Wires and ribbon cables bypass the dampers if they are tight.
 
+{{diagram:chart-fc-damper-window|Окно мягкого крепления (f₀ в 3–5 раз ниже гармоники моторов, но не ниже 50–80 Гц) есть только при гармониках от 150–240 Гц: у 5" (250 Гц) это 50–83 Гц, у 7" из примера (125 Гц), 10" и X8 окна нет — там балансировка и notch.}}
+
 ### Worked example: a 7" with a 180 Hz peak
 Spectrogram: a horizontal line at 180 Hz regardless of throttle, 25 dB above the noise floor; the motor harmonic at hover is 125 Hz, the 2nd is 250 Hz (when throttling up it passes through 180 Hz — the resonance “rings”). Tap test on the arm — 182 Hz: it's the arm. Options: a 6 mm arm instead of 5 (f ↑ ~20% → 215 Hz, moves away from the 1st harmonic, but the 2nd still passes through) — not a solution; a dynamic notch at 180 (helps, but adds delay) — a stopgap; the real fix — move the motor mounting point/shorten the arm (f ↑ by 1.3–1.5×), or accept it and set a static notch `gyro_notch1_hz = 180`, `cutoff = 150`. Write it into the build sheet: “arm resonance 180 Hz, notch”. Without a spectrum all of this would have looked like “you need to lower D”.
 

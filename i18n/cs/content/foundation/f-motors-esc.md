@@ -71,6 +71,8 @@ Desync znamená, že ESC ztratil polohu rotoru: motor sebou škube, piští, kle
 ### Řešený příklad: výběr dvojice motor–vrtule
 5" freestyle 6S, 700 g: je potřeba T/W ≥ 5 → 3500 g celkem, maximálně 875 g na motor. Tabulka motoru 2207 1750KV s vrtulí 5.1×3: maximum ~1600 g při 38 A – rezerva je, vis ~180 g na motor při ~4 A. ESC 45 A 4-in-1 – trvalých 45 A při špičce 38 A na kanál: stačí, ale při agresivním letu s čerstvou baterií je to „na hraně“; s 55–60 A budete klidnější. 7" long range 6S 1.4 kg: 2806.5 1300KV + 7×3.5: maximum ~1200 g při ~22 A → ESC 35–45 A. Rozdíl KV mezi 5" a 7" je dán právě momentem na vrtuli (Kt).
 
+{{diagram:motor-esc-selection|Цепочка подбора: ток ESC считают от пикового тока мотора по таблице тяги — 38 А × 1.3 = 49.4 А, поэтому 45 А впритык, а для 7" с 22 А хватает 35–45 А.}}
+
 ## practice
 ### Kontrola motorů a ESC na stole
 1. Sundejte vrtule.

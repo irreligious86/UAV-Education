@@ -85,6 +85,8 @@ Rozlišujte tři typy příčin: **porucha techniky** (díl se rozbil), **chyba 
 - Ani v jednom případě nebyl nikdo zraněn – **a je to štěstí**, ne výsledek: 50 m od dětí, 40 m od domů, loď místo člověka.
 - Energie nárazu 118 J, 13 700 J a 24 800 J proti prahu vážného zranění ~80 J: i lehký stroj je nebezpečný, těžký je smrtelný.
 
+{{diagram:chart-impact-energy|Энергия удара даже лёгкого Matternet в 1.5 раза выше порога серьёзной травмы, у тяжёлых аппаратов — в 171 и 310 раз (шкала логарифмическая).}}
+
 {{diagram:incident-analysis|Schéma rozboru nehody podle logiky zpráv komisí – a poslední krok: co změnit ve vlastním procesu.}}
 
 ## practice

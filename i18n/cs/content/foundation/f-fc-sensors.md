@@ -68,6 +68,8 @@ Gyroskop je čip MEMS na sběrnici SPI. Rozšířené typy: MPU6000 (starý, vý
 ### Co omezuje výběr desky
 Počet UART (přijímač + GPS + VTX + companion = minimálně 4), přítomnost barometru a kompasu (pro INAV/ArduPilot jsou povinné), proud BEC podle zátěže, podpora targetu potřebným firmwarem **a jeho verzí** (ArduPilot – `hwdef`, Betaflight – unified target), rozměry a hmotnost, upevnění 30.5/20 mm, přítomnost CAN (DroneCAN na velkých strojích), počet výstupů pro motory/serva (VTOL – 8 a více).
 
+{{diagram:fc-board-choice-tree|Выбор платы идёт от прошивки: навигации нужны баро, компас и не меньше 4 UART, а VTOL и большим аппаратам — H7 с CAN и 8+ выходами.}}
+
 ### Řešený příklad: čteme rozložení pinů
 Typická deska H743 (30.5 mm): `UART1` – RX s invertorem (označen SBUS), `UART2` – GPS (vedle jsou `SDA/SCL` pro kompas), `UART4` – VTX/DisplayPort (vedle je ploška `9V`), `UART6`/`UART7` – companion/telemetrie, `M1–M8` – DShot, `CURR` – senzor proudu z ESC, `LED` – adresovatelný pásek, `BZ-` – bzučák, `VBAT` – měření napětí, `5V` – přijímač/GPS, `4V5` – je napájena z USB (pro nastavování bez baterie). Pravidlo čtení: nejdřív napájení (co odkud, jaký proud), potom UART podle funkcí, pak I2C a nakonec „zvláštní“ plošky. Tabulku „ploška → funkce → zařízení → proud“ zapište do pasportu stavby.
 

@@ -71,6 +71,8 @@ Desync means the ESC lost the rotor position: the motor stutters, screams, thrus
 ### Worked example: matching a motor and prop
 A 5" freestyle on 6S, 700 g: you need T/W ≥ 5 → 3500 g total, 875 g max per motor. The table for a 2207 1750KV with a 5.1×3 prop: max ~1600 g at 38 A — there's margin; hover ~180 g per motor at ~4 A. A 45 A 4-in-1 ESC — 45 A continuous against a 38 A peak per channel: enough, but “cutting it close” in aggressive flying on a fresh battery; 55–60 A is more relaxed. A 7" long range on 6S at 1.4 kg: 2806.5 1300KV + 7×3.5: max ~1200 g at ~22 A → a 35–45 A ESC. The KV difference between 5" and 7" is precisely because of the torque on the prop (Kt).
 
+{{diagram:motor-esc-selection|Цепочка подбора: ток ESC считают от пикового тока мотора по таблице тяги — 38 А × 1.3 = 49.4 А, поэтому 45 А впритык, а для 7" с 22 А хватает 35–45 А.}}
+
 ## practice
 ### Checking motors and ESCs on the bench
 1. Remove the props.

@@ -53,6 +53,8 @@ Minimum, které vedou profesionálové:
 - **FAA (USA)**: **Part 107** pro komerční provoz (zkouška, osvědčení, ≤ 400 stop, VLOS, Remote ID), **Recreational** (test TRUST, registrace od 250 g, 400 stop, Remote ID), povolení k letům v řízeném vzdušném prostoru přes LAANC; BVLOS – waiver.
 Oba systémy mají společné: registraci a identifikaci (Remote ID / třída C), kategorii podle rizika, výšku ~120 m/400 stop, VLOS, zóny, odpovědnost provozovatele. Svou zemi si ověřte podle stejné struktury: „jaká kategorie, jaká hranice registrace, jaká výška, jaká identifikace, jak je to s BVLOS“.
 
+{{diagram:easa-open-category-tree|Самодельный аппарат без маркировки класса попадает в A1 только при массе < 250 г и скорости < 19 м/с, иначе — в A3 до 25 кг; BVLOS, полёты над скоплениями людей и аппараты от 25 кг — Specific.}}
+
 ### Rádiové frekvence: co bývá omezeno
 Pásma ISM (2.4 GHz, 5.8 GHz, 868/915 MHz) jsou otevřená pro použití bez licence s omezením výkonu (v EU 2.4 GHz – 100 mW EIRP, 5.8 GHz video – 25 mW EIRP podle obecných pravidel; 868 MHz – 25 mW s omezením duty cycle; v USA je to jinak, pásmo 900 MHz je širší) – výkon 1 W u VTX nebo ELRS je ve většině zemí formálně mimo obecné normy a vyžaduje radioamatérskou licenci nebo zvláštní povolení. Moduly kurzu o rozpočtu spoje počítají fyziku; zákonnost výkonu je samostatná otázka, která se řeší před letem.
 

@@ -551,7 +551,7 @@ wave3.build(D)
 
 # Stage 6: one file per module, scripts/diagrams/s6_<module>.py with build(D) (no shared file to conflict on)
 import importlib  # noqa: E402
-for _f in sorted(Path(__file__).parent.glob("s6_*.py")):
+for _f in sorted(Path(__file__).parent.glob("s[67]_*.py")):   # s7_*: visual pass batches
     importlib.import_module(_f.stem).build(D)
 
 

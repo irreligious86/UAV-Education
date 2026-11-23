@@ -81,6 +81,8 @@ Disconnect immediately. From here on — only through a smoke stopper (a bulb/li
 - **The link drops when the vehicle turns** → polarization/a null in the radiation pattern: a second antenna at 90°.
 - **GPS won't get a fix** → under carbon, near interference sources, no power (the module's LED), wrong UART protocol/baud rate.
 
+{{diagram:inair-disarm-tree|Дерево 6 в виде схемы: сначала — есть ли в логе событие дизарма; нет — ищи питание, есть — иди по ветке причины, а сработавший детектор аварии считай следствием.}}
+
 ### How to extend the tree
 Every case of your own: symptom → steps (with facts) → cause → which branch to add it to. In a year this will be your main reference. Some of the course's branches are already collected automatically: the “Failures” page is all the “Troubleshooting” sections of all the modules.
 

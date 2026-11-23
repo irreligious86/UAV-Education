@@ -53,6 +53,8 @@ One person can combine roles, but a pilot in flight is only a pilot.
 - **Injury**: first aid, emergency services, then everything else.
 - **Debrief**: what happened, from the log, without looking for someone to blame; the conclusion goes into the logbook and the checklist.
 
+{{diagram:crash-search-flow|Поиск начинается в первую минуту на месте: последняя точка по самому точному источнику плюс поправка на инерцию, затем схема поиска и решение старшего через 30–40 минут, пока АКБ не села.}}
+
 ### Case
 The working channel E5 (5885 MHz) turned out to be occupied by a crashed aircraft that kept transmitting until the end of the shift. Solution: F1 (5740 MHz) was chosen as the nearest free frequency, taking into account the channels of two neighbors; the switch was made first on two transmitters and a few drones as a test, then on all of them. The main lesson: the site's table of occupied frequencies must exist before the incident.
 

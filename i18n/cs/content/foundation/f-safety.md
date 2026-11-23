@@ -77,6 +77,7 @@ Tyto flagy jsou pojistka, ne překážka. Pravidlo: odstraňujte příčinu, nev
 Poloměr bezpečné zóny kolem místa vzletu je nejméně 10–15 m pro 5", 30 m pro těžké stroje; při armování nikdo nestojí v rovině vrtulí; vzlet směrem od sebe. Pravidla a zóny – modul „Pravidla“, organizace týmu – „Provoz v terénu“.
 
 ## practice
+
 ### Předletový kontrolní seznam (vytisknout)
 1. Vrtule: nepoškozené, dotažené, směr podle schématu motorů, v rovině vrtulí žádné cizí předměty.
 2. Baterie: bez nafouknutí a poškození, napětí článků v normě (4.1–4.2 V/článek při plném nabití), upevněná páskem, konektor XT není natavený.
@@ -85,6 +86,8 @@ Poloměr bezpečné zóny kolem místa vzletu je nejméně 10–15 m pro 5", 30 
 5. Video/OSD: napětí, LQ/RSSI, varování – žádné flagy.
 6. Zóna: lidé a zvířata mimo poloměr, vzlet směrem od sebe, překážky zohledněné, pravidla plochy.
 7. Po armování: 2–3 s visu ve výšce 0.5–1 m – odezva, zvuk, žádné chvění; při čemkoli podezřelém přistát.
+
+{{diagram:preflight-go-nogo|Предполётный чек-лист как цепочка «да/нет»: любой непройденный пункт останавливает вылет, а странность на первом висении заканчивается посадкой.}}
 
 ### Pravidla na stole
 1. Vrtule sundat před připojením baterie. Vždy. Včetně „jen na vteřinu“.

@@ -33,6 +33,8 @@ The thrust-to-weight ratio (T/W) is the maximum thrust of all motors divided by 
 
 At a 2:1 T/W, hover is at about half throttle, and there is almost no margin for maneuvering or a gust of wind. That's the main argument for why you can't tune a heavy drone like a five-inch.
 
+{{diagram:chart-hover-throttle|Газ висения лежит между долей тяги f и квадратом: при T/W 4.1 это 24–49 %, по кривой 0.65 — 40 %; 60 % газа — уже T/W 2.25–2.8, для 5–7" это стоп.}}
+
 ### Reaction torque and spin directions
 A motor spinning up a prop simultaneously tries to turn the frame the opposite way — that's reaction torque. If all props spun the same way, the frame would rotate about the vertical axis. So a quadcopter has two pairs: diagonal props spin one way, neighboring props the opposite way. The torques cancel out as long as the RPMs are equal.
 

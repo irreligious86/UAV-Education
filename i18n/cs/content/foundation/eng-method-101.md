@@ -48,6 +48,8 @@ Schéma bloků a vazeb: co je s čím spojeno, jakým rozhraním a odkud se nap�
 - **Mechanika**: co je kde umístěno, hmotnosti, těžiště.
 Architektura odpovídá na otázku „proč právě takhle“ jednou větou ke každému rozhodnutí: „GPS je na stožárku – kompas dál od silových vodičů (viz rušení)“.
 
+{{diagram:eng-architecture-layers|Архитектура примера на одном листе: питание и данные — разными линиями, у каждой стрелки данных подписаны интерфейс и порт; токи на стрелках питания подписываешь своими числами.}}
+
 ### 3. Testy
 Každý požadavek → test s očekávaným výsledkem, skutečným výsledkem a datem. Testy jsou:
 - **Pozemní** (bez vrtulí): porty, směr otáčení motorů, failsafe, předletové kontroly firmwaru.

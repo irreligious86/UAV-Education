@@ -45,6 +45,8 @@ In the USA it's the FAA Part 89 rule (mandatory for most flights since March 202
 - **PX4**: supports OpenDroneID messages and external modules; enabling and checks follow the Remote ID section of the docs for your version.
 - MAVLink messages: the `OPEN_DRONE_ID_*` family (`OPEN_DRONE_ID_BASIC_ID`, `_LOCATION`, `_SYSTEM`, `_OPERATOR_ID`); the pilot's coordinates are sent to the module by the GCS (`OPEN_DRONE_ID_SYSTEM`).
 
+{{diagram:remote-id-data-path|Модуль Remote ID сам координат не знает: их даёт автопилот по MAVLink или DroneCAN, позицию пилота — наземка; на сертифицированной сборке неработающий модуль блокирует арм.}}
+
 ### Attack surface
 | Channel | Threat | Protection |
 |---|---|---|

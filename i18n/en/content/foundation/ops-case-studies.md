@@ -85,6 +85,8 @@ Distinguish three types of causes: **hardware failure** (a part broke), **config
 - In none of the cases was anyone injured — **and that's luck**, not a result: 50 m from children, 40 m from houses, a boat instead of a person.
 - Impact energies of 118 J, 13,700 J, 24,800 J versus the ~80 J serious-injury threshold: even a light aircraft is dangerous, a heavy one is lethal.
 
+{{diagram:chart-impact-energy|Энергия удара даже лёгкого Matternet в 1.5 раза выше порога серьёзной травмы, у тяжёлых аппаратов — в 171 и 310 раз (шкала логарифмическая).}}
+
 {{diagram:incident-analysis|Crash analysis scheme following the logic of board reports — and the last step: what to change in your own process.}}
 
 ## practice

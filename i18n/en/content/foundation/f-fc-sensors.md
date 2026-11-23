@@ -68,6 +68,8 @@ The gyro is a MEMS chip on SPI. Common ones: MPU6000 (old, 8 kHz output, low noi
 ### What limits your choice of board
 The number of UARTs (receiver + GPS + VTX + companion = 4 minimum), whether it has a baro and compass (mandatory for INAV/ArduPilot), BEC current for the load, support for the target by the firmware you need **and its version** (ArduPilot: `hwdef`, Betaflight: unified target), size and mass, 30.5/20 mm mounting, whether it has CAN (DroneCAN on big aircraft), the number of motor/servo outputs (VTOL needs 8+).
 
+{{diagram:fc-board-choice-tree|Выбор платы идёт от прошивки: навигации нужны баро, компас и не меньше 4 UART, а VTOL и большим аппаратам — H7 с CAN и 8+ выходами.}}
+
 ### Worked example: reading a pinout
 A typical H743 board (30.5 mm): `UART1` is RX with an inverter (labeled SBUS), `UART2` is GPS (with `SDA/SCL` next to it for the compass), `UART4` is VTX/DisplayPort (the `9V` pad is next to it), `UART6`/`UART7` are companion/telemetry, `M1–M8` are DShot, `CURR` is the current sensor from the ESC, `LED` is the addressable strip, `BZ-` is the buzzer, `VBAT` is voltage measurement, `5V` is for the receiver/GPS, `4V5` is powered from USB (for setup without a battery). The reading rule: power first (what comes from where, how much current), then the UARTs by function, then I2C, then the “special” pads. Put the “pad → function → device → current” table into the build passport.
 

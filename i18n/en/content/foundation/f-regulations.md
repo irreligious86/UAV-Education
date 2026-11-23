@@ -53,6 +53,8 @@ The minimum professionals keep:
 - **FAA (USA)**: **Part 107** for commercial flying (exam, certificate, ≤ 400 ft, VLOS, Remote ID), **Recreational** (TRUST test, registration from 250 g, 400 ft, Remote ID), authorization for flights in controlled airspace via LAANC; BVLOS — waiver.
 What both have in common: registration and identification (Remote ID / C class), risk-based category, altitude ~120 m/400 ft, VLOS, zones, operator responsibility. Check your own country against the same structure: “which category, what registration threshold, what altitude, what identification, what about BVLOS”.
 
+{{diagram:easa-open-category-tree|Самодельный аппарат без маркировки класса попадает в A1 только при массе < 250 г и скорости < 19 м/с, иначе — в A3 до 25 кг; BVLOS, полёты над скоплениями людей и аппараты от 25 кг — Specific.}}
+
 ### Radio frequencies: what is usually restricted
 The ISM bands (2.4 GHz, 5.8 GHz, 868/915 MHz) are open for license-free use with a power limit (in the EU 2.4 GHz — 100 mW EIRP, 5.8 GHz video — 25 mW EIRP under the general rules; 868 MHz — 25 mW with a duty cycle limit; in the USA it's different, 900 MHz is wider) — a 1 W VTX or ELRS is formally outside the general rules in most countries and requires an amateur radio license or a separate authorization. The course modules on link budget compute the physics; whether the power is legal is a separate question you settle before the flight.
 

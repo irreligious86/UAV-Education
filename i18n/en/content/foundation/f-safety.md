@@ -77,6 +77,7 @@ These flags are a safety net, not a nuisance. The rule: fix the cause, don't dis
 The safe zone radius around takeoff is at least 10–15 m for a 5", 30 m for heavy aircraft; nobody stands in the plane of the props during arming; take off away from yourself. Rules and zones — module “Rules”, team organization — “Field Operations”.
 
 ## practice
+
 ### Pre-flight checklist (print it)
 1. Props: intact, tightened, direction matches the motor diagram, no foreign objects in the prop plane.
 2. Battery: no puffing or damage, per-cell voltage normal (4.1–4.2 V/cell when full), secured with a strap, XT connector not melted.
@@ -85,6 +86,8 @@ The safe zone radius around takeoff is at least 10–15 m for a 5", 30 m for hea
 5. Video/OSD: voltage, LQ/RSSI, warnings — no flags.
 6. Zone: people and animals outside the radius, takeoff away from yourself, obstacles accounted for, site rules.
 7. After arming: 2–3 s of hover at 0.5–1 m — response, sound, no shaking; at the slightest oddity — land.
+
+{{diagram:preflight-go-nogo|Предполётный чек-лист как цепочка «да/нет»: любой непройденный пункт останавливает вылет, а странность на первом висении заканчивается посадкой.}}
 
 ### Bench rules
 1. Props off before you plug in the battery. Always. Including “just for a second”.

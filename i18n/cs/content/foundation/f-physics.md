@@ -33,6 +33,8 @@ Poměr tahu k tíze (thrust-to-weight, T/W) je maximální tah všech motorů d�
 
 Při T/W 2:1 probíhá vis přibližně na polovině plynu a rezerva na manévr a poryv větru téměř není. To je hlavní argument, proč těžký dron nelze ladit jako pětipalec.
 
+{{diagram:chart-hover-throttle|Газ висения лежит между долей тяги f и квадратом: при T/W 4.1 это 24–49 %, по кривой 0.65 — 40 %; 60 % газа — уже T/W 2.25–2.8, для 5–7" это стоп.}}
+
 ### Reakční moment a směry otáčení
 Motor, který roztáčí vrtuli, se zároveň snaží pootočit rám opačným směrem – to je reakční moment. Kdyby se všechny vrtule točily stejným směrem, rám by se otáčel kolem svislé osy. Proto má kvadrokoptéra dva páry: vrtule na úhlopříčce se točí stejným směrem, sousední opačným. Momenty se navzájem ruší, dokud jsou otáčky stejné.
 

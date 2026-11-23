@@ -81,6 +81,8 @@ Okamžitě odpojte. Dál už jen přes smoke stopper (žárovka nebo omezovač z
 - **Spojení vypadává při otočení stroje** → polarizace nebo minimum vyzařovacího diagramu: druhá anténa pod úhlem 90°.
 - **GPS nechytá satelity** → modul je pod karbonem, blízko zdroje rušení, nemá napájení (LED na modulu), špatný protokol nebo rychlost UART.
 
+{{diagram:inair-disarm-tree|Дерево 6 в виде схемы: сначала — есть ли в логе событие дизарма; нет — ищи питание, есть — иди по ветке причины, а сработавший детектор аварии считай следствием.}}
+
 ### Jak strom rozšiřovat
 Každý vlastní případ: příznak → kroky (s fakty) → příčina → do které větve ho doplnit. Za rok to bude vaše hlavní příručka. Část větví kurzu je už poskládaná automaticky: stránka „Poruchy a chyby“ obsahuje všechny oddíly „Řešení problémů“ ze všech modulů.
 
