@@ -62,6 +62,8 @@ make SPEEDYBEEF405V4 EXTRA_FLAGS="-DUSE_..."
 ### Що ламається після власної збірки і як перевіряти
 1. за BUILD KEY зі `status` (`https://build.betaflight.com/api/builds/<key>/json`) — очікувані опції; 2. `status` — гіроскоп знайдено; 3. Ports/Receiver — приймач відповідає; 4. Motors — DShot і bidir працюють без пропів; 5. OSD видно; 6. `diff all` збігається з бекапом за змістом. Чек-лист — у журнал апарата разом із хешем коміту та `EXTRA_FLAGS`.
 
+{{diagram:bf-custom-verify-flow|Шесть проверок после своей сборки: молчащий приёмник или пропавший OSD — это обычно состав сборки, а не проводка.}}
+
 {{diagram:fw-build-paths|Який шлях збірки вибрати: опції — Cloud Build або custom.ardupilot.org, свій код — локальна збірка.}}
 
 ## practice

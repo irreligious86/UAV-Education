@@ -42,6 +42,8 @@ A subtlety: if throttle was at minimum for ≥10 s before Stage 2, a plain disar
 ### What to choose
 DROP is the honest choice for freestyle over a safe area: the drone falls nearby instead of flying away. AUTO-LAND with throttle just below hover gives a controlled descent — sensible for heavy 7–10" quads and flights over people/vehicles, but it requires tuning `failsafe_throttle` for the specific drone. In Stage 2 (AUTO-LAND and GPS Rescue) Betaflight enables ANGLE by itself if an accelerometer is present; the ANGLE channel fallback only affects Stage 1.
 
+{{diagram:chart-failsafe-landing-time|Время AUTO-LAND по правилу h_max / v × 1.5: при 1 м/с с 30 м нужно 45 с, а с 150 м — 225 с, почти предел параметра 250 с, поэтому 7" long range летает с GPS-RESCUE; чем медленнее снижение, тем раньше упираешься в предел.}}
+
 ### Switch test: failsafe_switch_mode
 The FAILSAFE mode on an AUX channel lets you trigger failsafe without turning off the radio:
 

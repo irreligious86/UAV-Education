@@ -62,6 +62,8 @@ The result is `obj/betaflight_<ver>_<target>.hex`, flashed with the configurator
 ### What breaks after a custom build and how to check
 1. via the BUILD KEY from `status` (`https://build.betaflight.com/api/builds/<key>/json`) — the expected options; 2. `status` — the gyro is detected; 3. Ports/Receiver — the receiver responds; 4. Motors — DShot and bidir work without props; 5. the OSD is visible; 6. `diff all` matches the backup in meaning. Put the checklist in the aircraft's log together with the commit hash and `EXTRA_FLAGS`.
 
+{{diagram:bf-custom-verify-flow|Шесть проверок после своей сборки: молчащий приёмник или пропавший OSD — это обычно состав сборки, а не проводка.}}
+
 {{diagram:fw-build-paths|Which build path to choose: options — Cloud Build or custom.ardupilot.org, your own code — a local build.}}
 
 ## practice

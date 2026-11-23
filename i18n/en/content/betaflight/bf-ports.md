@@ -82,6 +82,8 @@ Since **4.4.0**, when building via **Cloud Build**, only the selected **receiver
 
 **Tip:** the **USB** connection to the PC usually takes a separate channel; don't reassign it to the receiver without understanding the board's schematic.
 
+{{diagram:bf-serial-valid-tree|Проверка портов при загрузке: больше трёх портов с MSP или недопустимая пара функций на одном порту — и вся конфигурация портов сбрасывается к умолчаниям.}}
+
 ### The `serial` command: what is actually stored
 The Ports tab is a wrapper around `serial <id> <function mask> <msp baud> <gps baud> <telemetry baud> <blackbox baud>`: the port identifier (in 4.5: 0 = UART1, 1 = UART2, … 20 = VCP/USB, 30+ = SoftSerial; in 2025.12 `diff` writes names, e.g. `serial UART3 64 …`), the function bitmask (MSP = 1, GPS = 2, … Serial RX = 64, Blackbox = 128, ESC Sensor, SmartAudio, Tramp, MSP DisplayPort — their own bits; the exact values are the `serialPortFunction_e` enum in `src/main/io/serial.h`), and the baud rates. That's why `diff all` contains lines like `serial 2 64 115200 57600 0 115200` — UART3 = Serial RX. Reading them is useful when moving configs between boards: UART numbering differs between boards.
 

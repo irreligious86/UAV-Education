@@ -121,6 +121,8 @@ Betaflight — форк **Cleanflight** (спадкоємця Baseflight / STM32
 
 {{diagram:bf-setup-map|Порядок першого налаштування: резервна копія → Ports → Receiver → Modes → Motors (без пропелерів) → OSD → PID і фільтри за логом.}}
 
+{{diagram:bf-migrate-line-tree|Строку старого diff all переносят только если имя, смысл и единицы те же; опасны строки с прежним именем и новым смыслом — они принимаются молча.}}
+
 ## practice
 
 ### Встановлення Betaflight Configurator

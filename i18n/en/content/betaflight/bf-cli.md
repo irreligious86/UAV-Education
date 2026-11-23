@@ -68,6 +68,8 @@ It is recommended to save separately:
 - `resource show`
 - `status` (version/build)
 
+{{diagram:bf-diff-scopes|Простой diff пишет только активные PID- и рейт-профиль; все 4 + 4 профиля, mcu_id и обёртку с save содержит только diff all.}}
+
 ### Resource remapping: concept and limits
 
 The `resource` command manages the “function -> physical pin” binding:

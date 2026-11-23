@@ -121,6 +121,8 @@ Firmware (Cloud Build: CRSF, OSD HD, GPS, pokud je) → výchozí `resource`/tar
 
 {{diagram:bf-setup-map|Pořadí prvního nastavení: záloha → Ports → Receiver → Modes → Motors (bez vrtulí) → OSD → PID a filtry podle logu.}}
 
+{{diagram:bf-migrate-line-tree|Строку старого diff all переносят только если имя, смысл и единицы те же; опасны строки с прежним именем и новым смыслом — они принимаются молча.}}
+
 ## practice
 
 ### Instalace Betaflight Configuratoru

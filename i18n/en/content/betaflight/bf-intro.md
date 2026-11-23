@@ -121,6 +121,8 @@ Firmware (Cloud Build: CRSF, OSD HD, GPS if you have one) → default `resource`
 
 {{diagram:bf-setup-map|First-setup order: backup → Ports → Receiver → Modes → Motors (without propellers) → OSD → PID and filters from the log.}}
 
+{{diagram:bf-migrate-line-tree|Строку старого diff all переносят только если имя, смысл и единицы те же; опасны строки с прежним именем и новым смыслом — они принимаются молча.}}
+
 ## practice
 
 ### Installing Betaflight Configurator

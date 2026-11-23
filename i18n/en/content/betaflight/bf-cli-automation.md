@@ -144,6 +144,8 @@ with serial.Serial(port_name, 115200, timeout=1) as p:
 ### Step 4. A second drone and comparison
 Run the same script for the second drone, changing only the `craft_name` in the arguments — not the code. Compare the before and after backups with `git diff --no-index viking2_before_diff.txt viking2_after_diff.txt`: the difference should be exactly the lines from `CHANGES` and nothing more. An extra line means someone changed settings by hand between backups, and that's a reason to sort it out before you fly.
 
+{{diagram:bf-cli-apply-verify|Скрипт правки: бэкап, set и save, поиск порта заново после перезагрузки, get по каждому ключу и второй бэкап — git diff должен показать ровно строки CHANGES.}}
+
 ### What you should get and typical failures
 - `find_craft` prints the list of polled ports and finds the right one by `craft_name`. If the drone isn't found, check that `craft_name` is set (`get craft_name`) and that Configurator is closed: it holds the port and floods it with MSP traffic.
 - `diff all` on an F7/H7 with a large config doesn't finish within 3 s, and the backup gets cut off in the middle. It's more reliable to read until the CLI prompt `# ` at the end of the output than to wait a fixed time.

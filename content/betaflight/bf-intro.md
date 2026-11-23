@@ -192,6 +192,8 @@ Betaflight — форк **Cleanflight** (наследник Baseflight / STM32-�
 
 Не затронуто и переносится как есть: `aux`, `adjrange` (номера функций 0–30), `rxrange`, `map`, `vtxtable`, `led`, `color`, `mode_color`, рейты (`rates_type`, `*_rc_rate`, `*_srate`, `*_expo`), фильтры (`gyro_lpf*`, `dterm_lpf*`, `rpm_filter_*`, `dyn_notch_*` кроме верхней границы числа notch), `failsafe_delay`, `failsafe_procedure`, `failsafe_throttle`, `vbat_*`, `ibata_*`. Отличия 2026.6 в курсе не разбираются, кроме трёх, о которые спотыкаются: ELRS 4 для SPI-приёмников, удаление `gps_rescue_velocity_*` и исправленный диапазон гироскопа IIM-42652 (по примечаниям к выпуску 2026.6 после обновления PID фактически удваиваются).
 
+{{diagram:bf-migrate-line-tree|Строку старого diff all переносят только если имя, смысл и единицы те же; опасны строки с прежним именем и новым смыслом — они принимаются молча.}}
+
 ### Место в системе
 
 - **Получает:** target платы и набор опций Cloud Build (`bf-custom`); гироскоп на частоте до 8 кГц; кадры приёмника в задаче RX (`bf-ports`, `link-protocols`).

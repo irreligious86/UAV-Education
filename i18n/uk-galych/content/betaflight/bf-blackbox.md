@@ -99,6 +99,8 @@ Blackbox фіксує:
 ### Параметри запису
 `blackbox_device` (SPIFLASH / SDCARD / SERIAL), `blackbox_sample_rate` (1/1, 1/2, 1/4, … від частоти PID: за 8 кГц PID і 1/4 — 2 кГц логу), `blackbox_mode` (NORMAL — за армом; MOTOR_TEST; ALWAYS — і на землі: для вимірювання шуму/bias гіроскопа), `blackbox_high_resolution` (точніше gyro/setpoint), `blackbox_disable_*` (вимкнути групи полів: `acc`, `rc`, `gyrounfilt`, `rpm`, `gps`… — економія потоку), `debug_mode` (які 8 налагоджувальних значень писати: `GYRO_SCALED` — сирий гіроскоп до фільтрів (лише 4.5; у 2025.12 вилучено, використовуй поле `gyroUnfilt`), `RPM_FILTER`, `D_LPF`, `DSHOT_RPM_TELEMETRY`, `FEEDFORWARD`, `GPS_RESCUE_*`, `RTH`…). Потік: 2 кГц з повним набором полів — десь 60–100 КБ/с → 16 МБ flash вистачає на 3–4 хвилини; SD — на години. Зовнішній логер — функція Blackbox на UART у вкладці Ports (`serial <id> 128 …` з blackbox baud); окремих `blackbox_uart`/`blackbox_baud` у 4.5 і 2025.12 нема.
 
+{{diagram:chart-blackbox-flash-minutes|При 60–100 КБ/с (2 кГц, все поля) 16 МБ flash хватает на 2.7–4.6 минуты, 8 МБ при 80 КБ/с — на 102 с, 2 МБ — на 26 с; для длинных сессий нужна SD.}}
+
 ### Поля, які треба найчастіше
 `gyroADC[0..2]` (після фільтрів), `gyroUnfilt[0..2]` (до, як поле ввімкнене), `setpoint[0..3]`, `rcCommand[0..3]`, `axisP/I/D/F[0..2]`, `motor[0..3]`, `eRPM[0..3]`, `vbatLatest`, `amperageLatest`, `rssi`, `debug[0..7]`, `flightModeFlags`, `stateFlags`, `failsafePhase`; події (E-кадри): арм/дизарм, зміна режиму, failsafe. Заголовок логу містить коло 190 ключових параметрів (PID, рейти, фільтри, мотори), але не весь `diff`: нема `aux`, `serial`, OSD, failsafe — повний бекап лиш через `diff all`.
 

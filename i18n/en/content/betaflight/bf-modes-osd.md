@@ -54,6 +54,8 @@ Analog OSD (MAX7456 chip) and digital (MSP DisplayPort for Walksnail/HDZero/DJI)
 ### The `aux` command and mode logic
 `aux <index> <mode id> <aux channel> <start> <end> <logic>`: rule index, mode id — the `permanentId` from `msp/msp_box.c` (ARM = 0, ANGLE = 1, HORIZON = 2, FAILSAFE = 27, PREARM = 36), not the enum number from `fc/rc_modes.h`, AUX channel (0 = AUX1), range 900–2100 in steps of 25, logic 0 = OR, 1 = AND (the mode is active only if **both** this rule **and** the previous rule of the same mode are satisfied — this is how you make “ARM only if PREARM on the same channel” or two-switch combinations). Ranges for a three-position switch: 900–1300, 1300–1700, 1700–2100 — with a gap, so jitter doesn't toggle modes at the boundary. `adjrange` does the same for “in-flight adjustments” (PID, rates, profiles) from a switch or a knob.
 
+{{diagram:bf-aux-ranges|Раскладка команды на оси AUX: положения тумблера ≈988 / 1500 / 2012 мкс лежат в 200–312 мкс от границ диапазонов, поэтому джиттер не переключает режим.}}
+
 ### OSD: set it up for meaning, not looks
 - **OSD profiles** (`osd_profile`, up to 3) — on a switch: “minimal” for racing, “full” for long range, “empty” for recording.
 - **Warnings** (`osd_warn_bitmask`): ARMING_DISABLE, BATTERY_WARNING/CRITICAL, FAIL_SAFE, LINK_QUALITY, RSSI, CORE_TEMP, GPS_RESCUE_*, OVER_CAP — enable all except the noisy ones; `osd_cap_alarm`, `osd_alt_alarm`, `osd_rssi_alarm`, `osd_link_quality_alarm` are the thresholds.

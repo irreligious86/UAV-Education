@@ -65,6 +65,8 @@ With `MAVLINK = 1` the modem injects the `RADIO_STATUS` message (id 109) into th
 - **LoRa** — very long range at a few kbit/s: fine for a minimal set (position, status), not for parameters and missions.
 - **LTE/4G** — beyond-the-horizon link through a carrier network (the “Cellular Bridge” project): range is limited by coverage, latency is 50–200 ms with unpredictable dropouts; you need a VPN or a relay because of NAT, and a mandatory link-loss failsafe.
 
+{{diagram:chart-elrs-param-download|Время загрузки пропорционально числу параметров (на логарифмических осях — параллельные прямые): 1000 параметров — 15.6 с на F1000 и 336 с на 50Hz, поэтому параметры грузят на быстром режиме на земле.}}
+
 ### How to choose
 | Task | Channel |
 |---|---|
