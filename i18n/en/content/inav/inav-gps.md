@@ -53,6 +53,8 @@ Up to 8 points. On arming, the nearest enabled one within `safehome_max_distance
 ### GPS loss in flight
 If a required sensor is lost during RTH, INAV performs an emergency landing after a short timeout (like the LAND procedure). For wings (INAV 8.0+) there is a position estimate without GPS using the compass and barometer (`inav_allow_gps_fix_estimation`) — it is a safety net, not a GPS replacement.
 
+{{diagram:inav-gps-loss-modes|Без позиции RTH и миссия ждут nav_position_timeout и садят аппарат, CRUISE и COURSE HOLD отдают управление пилоту; при 0 failsafe-RTH садит сразу, а без оценки высоты остаётся только failsafe_throttle.}}
+
 ### The INAV position estimator (instead of an EKF)
 INAV does not use an EKF: position and velocity are computed by the `inav` complementary estimator with source **weights** — the same division of trust as in the “Attitude” module, only for position: `inav_w_xy_gps_p` = 1.0 (GPS position weight), `inav_w_xy_gps_v` = 2.0 (GPS velocity weight — velocity is trusted more, just as in the EKF), `inav_w_z_baro_p` = 0.35 (baro weight in altitude); optical flow/rangefinder/GPS altitude have their own weights. The estimate is considered valid as long as the uncertainty is below `inav_max_eph_epv` (1000 cm): with poor GPS the navigation modes drop out with a warning in the OSD. For short GPS dropouts there is `inav_allow_dead_reckoning = ON` (dead reckoning from the accelerometer, seconds, not minutes).
 

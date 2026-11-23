@@ -48,6 +48,8 @@ Název firmwaru na krabici vypovídá o mikrokontroléru regulátoru: „BLHeli_
 - **Směr otáčení.** Mění se ve firmwaru ESC nebo příkazem DShot z řídicí jednotky – vodiče není třeba přepájet.
 - **Melodie a beacon.** Zvuk „ztraceného stroje“ po pádu je užitečná funkce, ne hračka.
 
+{{diagram:esc-pwm-class-map|Чем меньше аппарат, тем выше стартовая частота; DJI O3/O4 с Gyroflow сдвигает все классы со стартом 24 кГц на 48, а окончательное значение проверяется по N = 10·f/eRPM на висении.}}
+
 ### Jak nahrávat firmware
 - **Přes řídicí jednotku (passthrough).** Řídicí jednotka propojí signálový vodič ESC s počítačem. Betaflight: připojte USB, Configurator zavřete (port je obsazený) a otevřete ESC Configurator (esc-configurator.com) v Chromu – pro BLHeli_S/Bluejay a AM32; pro BLHeli_32 použijte BLHeliSuite32 (archivní verze). ArduPilot: `SERVO_BLH_AUTO = 1` pro motory (u letounů `SERVO_BLH_MASK`), protokol DShot, pozemní stanici odpojte, USB nechte připojené, v konfigurátoru zvolte rozhraní „BLHeli32/AM32 Bootloader (Betaflight/Cleanflight)“. Výstupy IOMCU (MAIN) passthrough nepodporují – jsou potřeba výstupy FMU/AUX.
 - **Pravidlo targetu.** Firmware se vybírá pro konkrétní desku ESC (layout/target). Špatný target znamená cokoli od nesprávné funkce až po spálené spínací tranzistory. Konfigurátor obvykle ukazuje aktuální layout – nahrávejte jen ten, který se shoduje.

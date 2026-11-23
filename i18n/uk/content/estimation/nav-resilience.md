@@ -44,6 +44,8 @@ GNSS і компас — найвразливіші датчики на борт
 - **PX4**: `EKF2_GPS_CHECK` (маска перевірок якості GPS), поріг точності `COM_POS_FS_EPH`; failsafe втрати позиції `COM_POSCTL_NAVL` (0 — є RC: перехід в Altitude/Stabilized; 1 — RC немає: Descend або припинення польоту); u-blox має вбудоване виявлення придушення (jamming detection, параметр чутливості в драйвері GPS), стан публікується в повідомленні `sensor_gps`.
 - **INAV**: якщо позиції немає довше ніж ~2 с у RTH/WP — Emergency Landing (зниження в ANGLE на `failsafe_throttle`, мотори вимикаються через `failsafe_off_delay`); `failsafe_procedure` — реакція на втрату RC, не GPS; dead reckoning (`inav_allow_dead_reckoning`), `inav_allow_gps_fix_estimation` (оцінка без fix для крила за airspeed+компасом).
 
+{{diagram:gps-loss-ladder|Каждая прошивка по-своему спускается по ступеням деградации, но последняя ступень у всех — режим без позиции и пилот, который умеет им лететь, а выбор действия зависит от места полёта.}}
+
 ### Проєктування стійкості
 1. **Зменшити власні завади** (модуль про EMI): це 80% реальних проблем із GPS.
 2. **Резервні джерела EKF**: оптичний потік + далекомір для малих висот; баро як POSZ-резерв; другий GPS із `GPS_AUTO_SWITCH`; компас + GPS-yaw + GSF.

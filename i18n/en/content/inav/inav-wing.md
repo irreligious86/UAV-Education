@@ -42,6 +42,8 @@ NAV LAUNCH mode: the aircraft waits for the throw, detects the start by accelera
 ### Autotune
 AUTOTUNE is a modifier on top of ANGLE/HORIZON/ACRO; it doesn't work in MANUAL. It tunes **feedforward** on each axis and, in ACRO/HORIZON, the rates. **Autotune doesn't touch P and I** — that's a change compared to older versions; you tune them manually before or after. You need to fly with sharp inputs on all three axes for several minutes; an axis without sharp inputs won't get tuned. The result isn't saved automatically: after landing, disarm and use the save stick command (or `save` in the CLI).
 
+{{diagram:inav-autotune-tree|Что меняет autotune, решает режим под ним: в ANGLE — только feedforward, рейты — лишь в ACRO/HORIZON и не при FIXED, P и I — никогда; без резких отклонений стика больше 50 % не меняется ничего.}}
+
 ### Wing failsafe
 The RTH procedure is the obvious choice when you have GPS. LAND on a wing is a downward spiral at preset angles, i.e. a controlled crash. For a wing, checking `failsafe_throttle` under load is mandatory (for LAND without altitude sensors; DROP simply cuts the motor).
 

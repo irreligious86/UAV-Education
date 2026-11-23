@@ -55,6 +55,8 @@ A MAVLink gimbal has to show up as a separate component (`MAV_COMP_ID_GIMBAL`, 1
 ### PX4: `MNT_*`
 `MNT_MODE_IN` selects the command source (RC, MAVLink Gimbal v1/v2), `MNT_MODE_OUT` sets how PX4 drives the gimbal (AUX/PWM outputs or MAVLink Gimbal v2). For a MAVLink gimbal you need a port running MAVLink; servo outputs go through the Actuators tab. Details change between versions — check against the Gimbal (Mount) section of the PX4 docs.
 
+{{diagram:gimbal-control-paths|В ArduPilot подвес слушает пульт сразу после загрузки (MNT1_DEFLT_MODE = 3), в PX4 по умолчанию модуль gimbal даже не запущен (MNT_MODE_IN = −1), а MAVLink-подвес без GIMBAL_DEVICE_INFORMATION получает уставки без адреса.}}
+
 ### Camera: capture on command and by distance
 - ArduPilot: `CAM1_TYPE` — how to fire the shutter (servo, relay, via the gimbal, MAVLink, MAVLink Camera v2). `CAM1_TRIGG_DIST` or the mission command `DO_SET_CAM_TRIGG_DIST` — a shot every N meters. Every shot is written to the log (`CAM`) with coordinates — that is the basis of georeferencing in mapping.
 - MAVLink Camera Protocol v2: `MAV_CMD_IMAGE_START_CAPTURE`, `MAV_CMD_VIDEO_START_CAPTURE`, with the reply `CAMERA_IMAGE_CAPTURED` carrying coordinates and the frame index.

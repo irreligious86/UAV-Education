@@ -48,6 +48,8 @@ The firmware name on the box tells you about the ESC's microcontroller: “BLHel
 - **Rotation direction.** Changed in the ESC firmware or with a DShot command from the flight controller; no need to resolder wires.
 - **Melodies and beacon.** The “lost drone” sound after a crash is a useful feature, not a toy.
 
+{{diagram:esc-pwm-class-map|Чем меньше аппарат, тем выше стартовая частота; DJI O3/O4 с Gyroflow сдвигает все классы со стартом 24 кГц на 48, а окончательное значение проверяется по N = 10·f/eRPM на висении.}}
+
 ### How to flash
 - **Through the flight controller (passthrough).** The flight controller routes the ESC signal wire through to the computer. Betaflight: connect USB, close the Configurator (the port is busy), open ESC Configurator (esc-configurator.com) in Chrome for BLHeli_S/Bluejay and AM32; for BLHeli_32 use BLHeliSuite32 (the archived version). ArduPilot: `SERVO_BLH_AUTO = 1` for the motors (on planes, `SERVO_BLH_MASK`), DShot protocol, disconnect the GCS, keep USB, and in the configurator choose the “BLHeli32/AM32 Bootloader (Betaflight/Cleanflight)” interface. IOMCU outputs (MAIN) don't support passthrough; you need the FMU/AUX outputs.
 - **The target rule.** The firmware is chosen for the specific ESC board (layout/target). A wrong target ranges from misbehavior to burned MOSFETs. The configurator usually shows the current layout; flash only a matching one.

@@ -36,6 +36,8 @@ logic <rule> <enabled> <activatorId> <operation> <opA type> <opA value> <opB typ
 
 Operand types: 0 — value, 1 — RC channel, 2 — flight parameter, 3 — mode, 4 — logic condition, 5 — GVAR, 6 — Programming PID, 7 — mission waypoints. Operations: comparisons (equal, greater than, less than), logical (AND, OR, NOT), arithmetic, Set/Increase/Decrease GVAR, Override Throttle Scale, Override RC Channel, Set VTX power and others.
 
+{{diagram:inav-logic-line-fields|Девять полей строки logic на примере шага 2: активатор правила 1 — это номер правила 0, порог записан в единицах операнда (метры), а действие берёт уровень мощности как значение.}}
+
 ### An example from the documentation: VTX power by distance
 Condition 0: “distance to home > 100 m”. Condition 1 (activator 0): “set VTX power = 3”. Two rules — and the transmitter raises its power by itself when the aircraft is far away.
 

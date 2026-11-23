@@ -71,6 +71,8 @@ next:
 4. **Пульт.** `MNT_MAN_PITCH` (и `_ROLL`, `_YAW`) = номер AUX 1…6, а `RC_MAP_AUXn` с тем же n — номер канала приёмника; нужны оба, иначе ось получает постоянный ноль. `MNT_RC_IN_MODE`: 0 — ручка задаёт угол, 1 (умолчание) — скорость `MNT_RATE_PITCH` = 30 °/с.
 5. **Проверка.** `gimbal status` — модуль жив; `gimbal test pitch -45` — подвес наклоняется вниз на 45° (руки и кабели из зоны хода). Не наклоняется до надира — `MNT_RANGE_PITCH` меньше 180 (умолчание 90 даёт только ±45°).
 
+{{diagram:gimbal-control-paths|В ArduPilot подвес слушает пульт сразу после загрузки (MNT1_DEFLT_MODE = 3), в PX4 по умолчанию модуль gimbal даже не запущен (MNT_MODE_IN = −1), а MAVLink-подвес без GIMBAL_DEVICE_INFORMATION получает уставки без адреса.}}
+
 ### Камера: захват по команде и по дистанции
 - ArduPilot: `CAM1_TYPE` — как спускать затвор: 1 серво, 2 реле, 4 через драйвер подвеса (Siyi, Topotek, Viewpro, Xacti — камера внутри «умного» подвеса), 5 MAVLink (`DO_DIGICAM_CONTROL`), 6 MAVLink Camera v2, 7 скрипт, 8 RunCam; подробно — `ap-payload`. `CAM1_TRIGG_DIST` или команда миссии `DO_SET_CAM_TRIGG_DIST` — снимок каждые N метров. Каждый снимок пишется в лог (`CAM`) с координатами — это основа геопривязки в картографии.
 - MAVLink Camera Protocol v2: `MAV_CMD_IMAGE_START_CAPTURE`, `MAV_CMD_VIDEO_START_CAPTURE`, ответ `CAMERA_IMAGE_CAPTURED` с координатами и индексом кадра.

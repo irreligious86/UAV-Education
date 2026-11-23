@@ -44,6 +44,8 @@ The main tool is **source disagreement**: the EKF compares every measurement wit
 - **PX4**: `EKF2_GPS_CHECK` (GPS quality check bitmask), accuracy threshold `COM_POS_FS_EPH`; loss-of-position failsafe `COM_POSCTL_NAVL` (0 — RC available: switch to Altitude/Stabilized; 1 — no RC: Descend or flight termination); u-blox receivers have built-in jamming detection (a sensitivity parameter in the GPS driver), and the state is published in the `sensor_gps` message.
 - **INAV**: if there is no position for longer than ~2 s in RTH/WP — Emergency Landing (descent in ANGLE at `failsafe_throttle`, motors cut after `failsafe_off_delay`); `failsafe_procedure` is the reaction to RC loss, not GPS loss; dead reckoning (`inav_allow_dead_reckoning`), `inav_allow_gps_fix_estimation` (estimation without a fix for a wing, based on airspeed + compass).
 
+{{diagram:gps-loss-ladder|Каждая прошивка по-своему спускается по ступеням деградации, но последняя ступень у всех — режим без позиции и пилот, который умеет им лететь, а выбор действия зависит от места полёта.}}
+
 ### Designing for resilience
 1. **Reduce your own interference** (see the EMI module): this accounts for 80% of real GPS problems.
 2. **Backup EKF sources**: optical flow + rangefinder for low altitudes; baro as the POSZ backup; a second GPS with `GPS_AUTO_SWITCH`; compass + GPS yaw + GSF.

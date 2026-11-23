@@ -55,6 +55,8 @@ The reason for the arming block is visible in three places: as text in the OSD (
 ### Versions and compatibility
 INAV 7/8 — H7/F7 are recommended, F4 is supported with memory limitations (some features are cut out in the targets); the configurator must match the firmware's major version exactly; `diff all` carries over between major versions only after review — parameters get renamed (`nav_use_midthr_for_althold` → `nav_mc_althold_throttle`). A firmware update = a full backup + a `diff` comparison + sensor recalibration.
 
+{{diagram:inav-upgrade-8-to-9|Обновление 8.0 → 9.1: после Full chip erase шаги 3–4 делаешь вручную или окном миграции Configurator, но в обоих случаях нетронутое получает умолчания 9.x, а завышенные nav_mc_pos_z_p / nav_mc_vel_z_p надо вернуть.}}
+
 {{diagram:firmware-choice|Where INAV sits among firmwares: GPS navigation and wings without the complexity of ArduPilot/PX4.}}
 
 ## practice

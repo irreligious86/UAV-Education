@@ -55,6 +55,8 @@ Příčina blokování je vidět na třech místech: jako text v OSD (řádky ty
 ### Verze a kompatibilita
 INAV 7/8 – doporučené jsou H7/F7, F4 je podporována s omezeními kvůli paměti (část funkcí je v targetech vyřazena); konfigurátor se musí s firmwarem přesně shodovat v hlavní verzi; `diff all` se mezi hlavními verzemi přenáší jen s kontrolou – parametry se přejmenovávají (`nav_use_midthr_for_althold` → `nav_mc_althold_throttle`). Aktualizace firmwaru = úplná záloha + porovnání `diff` + nová kalibrace senzorů.
 
+{{diagram:inav-upgrade-8-to-9|Обновление 8.0 → 9.1: после Full chip erase шаги 3–4 делаешь вручную или окном миграции Configurator, но в обоих случаях нетронутое получает умолчания 9.x, а завышенные nav_mc_pos_z_p / nav_mc_vel_z_p надо вернуть.}}
+
 {{diagram:firmware-choice|Místo INAV mezi firmwary: navigace podle GPS a letoun bez složitosti ArduPilotu/PX4.}}
 
 ## practice

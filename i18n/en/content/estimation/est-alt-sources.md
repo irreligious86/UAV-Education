@@ -67,6 +67,8 @@ EKF3 has three source sets (`EK3_SRC1_*`, `SRC2`, `SRC3`), switched with a switc
 ### INAV
 Optical flow (`opflow_hardware`, scale `opflow_scale`) and the rangefinder (`rangefinder_hardware`) feed into the INAV position estimator via the weights `inav_w_xy_flow_p` / `inav_w_xy_flow_v` (the flow weight in position and velocity); for indoor flights on flow the documentation recommends `inav_allow_dead_reckoning = ON` (“may be useful for indoor navigation with OPFLOW”). Position hold without GPS is POSHOLD mode with flow and a rangefinder set up, over a textured surface.
 
+{{diagram:inav-surface-limits|Полный газ в SURFACE должен давать высоту ниже inav_max_surface_altitude: при 250 над пределом 200 верхние 20 % хода газа уводят туда, где дальномер уже не учитывается.}}
+
 ## practice
 ### Step 1. Baro
 A 10-minute log on the ground after power-on: `BARO.Alt` — the drift from warm-up. Then a hover at 2 m over a flat pad: `BARO.Alt` against `RFND.Dist` — see the prop-wash effect on takeoff.

@@ -43,6 +43,8 @@ If a mission is loaded whose first point is farther than `nav_wp_max_safe_distan
 ### Multiple missions
 The configurator can store several missions in one waypoint list and switch between them; Programming Framework operands for waypoints refer to the selected mission.
 
+{{diagram:inav-wp-user-action-chain|Бит p3 включает PINIO только через цепочку логика → подмена канала → режим USER → pinio_box; операнд 6 помечает участок от точки, операнд 10 — к точке.}}
+
 ### Versus ArduPilot
 In INAV a mission is simpler: no CONDITION commands, no DO commands as such (some actions go through user actions in `p3` and logic conditions), upload via MSP/CLI, and the MAVLink mission protocol (MISSION_COUNT/MISSION_ITEM) is supported in a simplified way. For surveying an area or flying a circuit it's enough; for complex logic — Programming Framework or ArduPilot.
 

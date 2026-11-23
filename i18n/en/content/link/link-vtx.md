@@ -59,6 +59,8 @@ Doubling power = +3 dB = ×1.41 (√2) in free-space range (the “Link Budget�
 - **MSP** (digital systems over MSP DisplayPort): VTX settings go over the same UART as the OSD; the table is built from what the air unit reports.
 Check: CLI `get vtx` → `vtx_band/channel/power/freq`; `vtx_info` → what the device reported; `vtxtable` → the table.
 
+{{diagram:vtx-power-index-map|Одна и та же строка set vtx_power = 3 даёт 400, 500 или 200 мВт в зависимости от таблицы передатчика, а уровня 4 в таблице модуля нет вовсе.}}
+
 ### Worked example: four vehicles at the field
 Analog, Raceband (37 MHz step: R1 5658 … R8 5917), 200 mW power. Four vehicles — R1, R3, R5, R7: at least 74 MHz between any two, no interference. A fifth one asks for the “free” F2 (5760): it sits between R3 (5732) and R5 (5806) with 28 and 46 MHz of spacing — R3 will get interference. The right options: put the fifth on a digital system (different modulation, but it still occupies bandwidth — its channel goes into the table too), or switch to a 6-channel grid with 37 MHz steps at ≤ 100 mW and spread the pilots across the field — tight, but it works. The wrong option is “I'll switch to whatever isn't taken in the OSD”: the field's table of occupied frequencies (the “Field Operations” module) is kept before anyone powers up.
 

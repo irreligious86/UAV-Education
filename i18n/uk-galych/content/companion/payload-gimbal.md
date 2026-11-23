@@ -55,6 +55,8 @@ source_hash: 01805bd541c9
 ### PX4: `MNT_*`
 `MNT_MODE_IN` вибирає джерело команд (RC, MAVLink Gimbal v1/v2), `MNT_MODE_OUT` — як PX4 керує підвісом (виходи AUX/PWM або MAVLink Gimbal v2). Для підвісу по MAVLink — порт із MAVLink, а виходи на серви — через вкладку Actuators. Деталі ся міняють між версіями — звіряй ся з розділом Gimbal (Mount) документації PX4.
 
+{{diagram:gimbal-control-paths|В ArduPilot подвес слушает пульт сразу после загрузки (MNT1_DEFLT_MODE = 3), в PX4 по умолчанию модуль gimbal даже не запущен (MNT_MODE_IN = −1), а MAVLink-подвес без GIMBAL_DEVICE_INFORMATION получает уставки без адреса.}}
+
 ### Камера: захоплення за командою та за відстанню
 - ArduPilot: `CAM1_TYPE` — як спускати затвор (серво, реле, через підвіс, MAVLink, MAVLink Camera v2). `CAM1_TRIGG_DIST` або команда місії `DO_SET_CAM_TRIGG_DIST` — знімок кожні N метрів. Кожен знімок ся записує в лог (`CAM`) з координатами — то основа геоприв'язки в картографії.
 - MAVLink Camera Protocol v2: `MAV_CMD_IMAGE_START_CAPTURE`, `MAV_CMD_VIDEO_START_CAPTURE`, відповідь `CAMERA_IMAGE_CAPTURED` з координатами та індексом кадру.
