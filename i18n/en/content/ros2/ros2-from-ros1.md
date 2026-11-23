@@ -68,6 +68,8 @@ The result is a node graph (as in ros2-basics) and a list of external dependenci
 
 The main shift in thinking: **the `while` loop with `rate.sleep()` is replaced by a timer and callbacks**, and a synchronous service call inside a callback by an asynchronous one, otherwise the node will block itself (the same executor services the response).
 
+{{diagram:ros2-sync-call-deadlock|Синхронный cli.call() в колбэке занимает единственный поток executor: ответ некому доставить, тики таймера пропадают; call_async() возвращается сразу, и уставки идут каждые 50 мс.}}
+
 ### MAVROS 1 → MAVROS 2
 The topic names are mostly the same (`/mavros/state`, `/mavros/local_position/pose`, `/mavros/setpoint_position/local`), but: telemetry QoS is sensor data; some services and parameters have been renamed; launch is `ros2 launch mavros apm.launch fcu_url:=...` (or `px4.launch`). For PX4 in ROS 2, people usually move from MAVROS to uXRCE-DDS (module ros2-px4); for ArduPilot — to AP_DDS where its features are enough (module ros2-ardupilot).
 

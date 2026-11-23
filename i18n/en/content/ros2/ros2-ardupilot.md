@@ -52,6 +52,8 @@ Important: AP_DDS converts ENU ↔ NED itself — for `cmd_vel` based on `header
 ### The order of actions in ArduPilot
 ArduCopter arms only in a mode that allows arming (GUIDED does) and only after the pre-arm checks. Takeoff in GUIDED is a separate command (the takeoff service = `MAV_CMD_NAV_TAKEOFF`); without it, the vehicle on the ground ignores horizontal setpoints. The sequence in the node: GUIDED → arm → takeoff(alt) → velocity/position setpoints → LAND. The velocity setpoint timeout in GUIDED is `GUID_TIMEOUT` (seconds): if `cmd_vel` stops arriving, the vehicle stops. This is the same “proof of life” principle as Offboard in PX4.
 
+{{diagram:ap-dds-guided-seq|Порядок важен: GUIDED, арм, отдельный takeoff и только потом поток cmd_vel в фрейме map; замолчал — через GUID_TIMEOUT аппарат встаёт.}}
+
 ### MAVROS
 MAVROS is a node that holds the MAVLink connection and distributes it across plugins: `/mavros/state` (connection, armed, mode), `/mavros/local_position/pose`, `/mavros/setpoint_position/local`, `/mavros/setpoint_velocity/cmd_vel`, the services `/mavros/cmd/arming`, `/mavros/set_mode`, `/mavros/cmd/takeoff`, `/mavros/mission/push`, parameters, geofences, full access to any MAVLink message via `mavros_msgs/Mavlink`. It also converts ENU ↔ NED. Launch: `ros2 launch mavros apm.launch fcu_url:=udp://:14550@` (connecting to SITL or to a router on the companion).
 

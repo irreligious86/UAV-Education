@@ -68,6 +68,8 @@ source_hash: a1ec2f4af0ee
 
 Головна зміна в голові — **цикл `while` з `rate.sleep()` заміняється таймером і колбеками**, а синхронний виклик сервісу всередині колбека — асинхронним, бо інакше вузол сам себе заблокує (той самий executor обслуговує відповідь).
 
+{{diagram:ros2-sync-call-deadlock|Синхронный cli.call() в колбэке занимает единственный поток executor: ответ некому доставить, тики таймера пропадают; call_async() возвращается сразу, и уставки идут каждые 50 мс.}}
+
 ### MAVROS 1 → MAVROS 2
 Імена топіків здебільшого ті самі (`/mavros/state`, `/mavros/local_position/pose`, `/mavros/setpoint_position/local`), але: QoS телеметрії — sensor data; деякі сервіси й параметри перейменовано; запуск — `ros2 launch mavros apm.launch fcu_url:=...` (або `px4.launch`). Для PX4 у ROS 2 замість MAVROS звичайно переходять на uXRCE-DDS (модуль ros2-px4), для ArduPilot — на AP_DDS там, де його функцій стає (модуль ros2-ardupilot).
 

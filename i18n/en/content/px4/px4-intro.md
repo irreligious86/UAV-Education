@@ -45,6 +45,8 @@ QGroundControl: firmware, airframe selection, calibrations, parameters, missions
 
 As everywhere: you pick a mode by which sensors you trust. Position won't engage without a reliable GPS.
 
+{{diagram:px4-mode-ladder|Каждый следующий режим требует ещё одну оценку и держит за пилота ещё одну величину; при потере оценки PX4 спускается на ступень ниже.}}
+
 ### Parameters and logs
 Parameters — via QGC or the console `param set/show`. ULog logs (`.ulg`) contain all the uORB topics enabled for logging; analysis — Flight Review (web) or `pyulog`.
 
@@ -71,6 +73,8 @@ The inner loop runs at `IMU_GYRO_RATEMAX` = 400 Hz (up to 1 kHz on fast boards);
 
 ### ULog logs and Flight Review
 Logging starts on arming (`SDLOG_MODE`) and contains uORB topics at a set rate (`SDLOG_PROFILE` — profiles: default, high rate for tuning, ...). Flight Review (web) plots: the rate response (setpoint vs actual), the vibration spectrum (acceleration power spectral density — it shows the motors and resonances), the GPS/EKF estimate (innovation test ratios — the same “gates” as in the Kalman module), CPU and RAM load, RC losses. `pyulog` (`ulog2csv`) — for analysis in Python (module “Python for data”).
+
+{{diagram:px4-upgrade-param-tree|Опаснее всего правая ветка: параметр, который совпадал со старым умолчанием, после прошивки молча получает новое — MC_ROLL_P 4.0 вместо 6.5.}}
 
 {{diagram:px4-qgc-order|The order of the first PX4 setup in QGroundControl.}}
 

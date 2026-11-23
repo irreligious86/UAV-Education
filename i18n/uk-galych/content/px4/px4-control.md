@@ -55,6 +55,8 @@ PX4 використовує паралельну форму зі спільни
 ### Autotune докладніше
 `MC_AT_EN` = 1 вмикає модуль `mc_autotune_attitude_control`; запуск — з QGC (PID Tuning → Autotune) в Altitude/Position під час зависання в штиль; модуль інжектує збудження амплітудою `MC_AT_SYSID_AMP` (0.7) по кожній осі, ідентифікує модель rate-контуру й обчислює коефіцієнти; `MC_AT_APPLY` (0 — не застосовувати, 1 — після посадки, 2 — зара в польоті) — за замовчуванням 1. Після того — контрольний політ і Flight Review: відгук без перельоту > 10%, D без шуму. Autotune не налаштовує фільтри й не лікує вібрації — то ся робить **до** (спектр!).
 
+{{diagram:px4-tune-order-flow|Фильтры настраивают до всего; autotune заменяет ручной rate и attitude P, а контуры скорости и позиции настраивают уже после него — сначала скорость.}}
+
 ### Розібраний приклад: 7" 6S, 1.4 кг
 Старт: airframe Generic Quad, `CA_ROTOR_COUNT` = 4, `IMU_GYRO_RATEMAX` 400 → 800 Гц (H7), `IMU_GYRO_CUTOFF` 40 → 80, `IMU_DGYRO_CUTOFF` 20 → 40 (типове 20 з 1.17, до 1.16 — 30); eRPM через DShot (bidirectional DShot або телеметрія ESC через UART — `DSHOT_TEL_CFG`), `IMU_GYRO_DNF_EN` = 1; `MPC_THR_HOVER` ся уточнить оцінювачем HTE; перший політ у Stabilized — `MC_ROLLRATE_K` 1.0 → 0.7, якщо розгойдує; autotune; `MPC_XY_VEL_MAX` під задачу. Лог → Flight Review: rate tracking, спектр, `vehicle_torque_setpoint` без насичення.
 

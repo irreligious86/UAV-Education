@@ -52,6 +52,8 @@ source_hash: 284f391657ba
 ### Порядок дій в ArduPilot
 ArduCopter армиться лише в режимі, що дозволяє арм (GUIDED підходить), і лише після pre-arm перевірок. Зліт у GUIDED — окрема команда (сервіс takeoff = `MAV_CMD_NAV_TAKEOFF`), без неї апарат на землі ігнорує горизонтальні уставки. Послідовність у вузлі: GUIDED → arm → takeoff(alt) → уставки швидкості/позиції → LAND. Таймаут уставок швидкості в GUIDED — `GUID_TIMEOUT` (секунди): якщо `cmd_vel` перестав надходити, апарат зупиниться. Це той самий принцип «доказу життя», що й Offboard у PX4.
 
+{{diagram:ap-dds-guided-seq|Порядок важен: GUIDED, арм, отдельный takeoff и только потом поток cmd_vel в фрейме map; замолчал — через GUID_TIMEOUT аппарат встаёт.}}
+
 ### MAVROS
 MAVROS — вузол, який тримає MAVLink-з'єднання і розкладає його по плагінах: `/mavros/state` (підключення, armed, mode), `/mavros/local_position/pose`, `/mavros/setpoint_position/local`, `/mavros/setpoint_velocity/cmd_vel`, сервіси `/mavros/cmd/arming`, `/mavros/set_mode`, `/mavros/cmd/takeoff`, `/mavros/mission/push`, параметри, геозони, повний доступ до будь-якого MAVLink-повідомлення через `mavros_msgs/Mavlink`. Він теж перетворює ENU ↔ NED. Запуск: `ros2 launch mavros apm.launch fcu_url:=udp://:14550@` (підключення до SITL або до роутера на companion).
 

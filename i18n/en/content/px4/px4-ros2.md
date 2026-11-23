@@ -30,6 +30,8 @@ In PX4 you can expose uORB topics directly to ROS 2: the uXRCE-DDS client on the
 
 The topics show up in ROS 2 as `/fmu/out/*` (from PX4) and `/fmu/in/*` (to PX4).
 
+{{diagram:px4-dds-topic-naming|Суффикс _v1 зависит от версии сообщения, а не от направления: старое имя без суффикса после обновления до 1.17 молчит.}}
+
 ### Offboard: three messages
 1. **`OffboardControlMode`** — tells PX4 *what* you control (position, velocity, acceleration, attitude, rates). It must be streamed **before** switching to Offboard and the whole time you are in it; below ~2 Hz PX4 exits Offboard.
 2. **`TrajectorySetpoint`** — the target itself: position/velocity in NED (Z points down!), yaw.

@@ -57,6 +57,8 @@ Only one thing lives on one port. If you need both — MAVLink on TELEM1/USB/Eth
 ### Worked example: the latency budget
 CSI camera at 60 fps (up to 16 ms until a frame is ready) → TensorRT YOLO-nano FP16 ~12 ms → tracker 2 ms → DDS over UART at 921600 ~2 ms → PX4 velocity controller (time constant ~0.5 s). The pure delay is ~35 ms: a tracking loop with Kp ≈ 1 1/s is stable with margin (module “Tracking”). A USB camera with MJPEG adds 40–80 ms, a Wi-Fi bridge instead of a wire adds 20–50 ms with jitter; two such “small things” eat the whole margin. Hence the rule: CSI and a wire, not USB and radio.
 
+{{diagram:jetson-latency-budget|На проводе и CSI цепочка укладывается в 32 мс; USB-камера и Wi-Fi-мост вместе дают 92–162 мс — в 3–5 раз больше.}}
+
 {{diagram:px4-jetson-link|PX4 and Jetson: the camera is on the Jetson, the link to the flight controller is over TELEM2 via MAVLink or uXRCE-DDS.}}
 
 ## practice

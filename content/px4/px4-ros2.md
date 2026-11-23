@@ -26,7 +26,9 @@ next:
 - **Агент** `MicroXRCEAgent` на companion или ПК принимает их по UDP или serial и выставляет в DDS — то есть в ROS 2.
 - Сообщения на стороне ROS 2 — пакет `px4_msgs`; **ветка `px4_msgs` должна соответствовать версии PX4**, иначе несовпадение определений. С 1.16 сообщения версионируются: топик сообщения с версией больше 0 получает суффикс `_vN` (в 1.17 — `vehicle_status_v1`, `vehicle_local_position_v1`, `battery_status_v1`, `home_position_v1`, `airspeed_validated_v1` и входной `vehicle_attitude_setpoint_v1`; в 1.16 — только `vehicle_status_v1`, в 1.15 суффиксов нет). Для разных версий есть узел-переводчик сообщений.
 
-Топики появляются в ROS 2 как `/fmu/out/*` (из PX4) и `/fmu/in/*` (в PX4).
+Топики появляются в ROS 2 как `/fmu/out/*` (из PX4) и `/fmu/in/*` (в PX4). Имя собирает клиент: строка из `dds_topics.yaml` плюс `_vN`, если в `.msg` задано `MESSAGE_VERSION` = N > 0 (`generate_topic_name()` в `src/modules/uxrce_dds_client/utilities.hpp`). Поэтому `VehicleLocalPosition.msg` (версия 1) даёт `/fmu/out/vehicle_local_position_v1`, а `TrajectorySetpoint.msg` (версия 0) — `/fmu/in/trajectory_setpoint` без суффикса. Топика нет в `dds_topics.yaml` — нет его и в ROS 2, сколько ни ищи.
+
+{{diagram:px4-dds-topic-naming|Суффикс _v1 зависит от версии сообщения, а не от направления: старое имя без суффикса после обновления до 1.17 молчит.}}
 
 ### Offboard: три сообщения
 1. **`OffboardControlMode`** — говорит PX4, *чем* ты управляешь (позиция, скорость, ускорение, ориентация, rates). Должен идти потоком **до** перехода в Offboard и всё время в нём; при частоте ниже ~2 Гц PX4 выходит из Offboard.

@@ -66,6 +66,8 @@ ROS 1 Noetic закончил поддержку в мае 2025 года, но �
 
 Главная смена мышления — **цикл `while` с `rate.sleep()` заменяется таймером и колбэками**, а синхронный вызов сервиса внутри колбэка — асинхронным, иначе узел заблокирует сам себя (тот же executor обслуживает ответ).
 
+{{diagram:ros2-sync-call-deadlock|Синхронный cli.call() в колбэке занимает единственный поток executor: ответ некому доставить, тики таймера пропадают; call_async() возвращается сразу, и уставки идут каждые 50 мс.}}
+
 ### MAVROS 1 → MAVROS 2
 Имена топиков в основном те же (`/mavros/state`, `/mavros/local_position/pose`, `/mavros/setpoint_position/local`), но: QoS телеметрии — sensor data; некоторые сервисы и параметры переименованы; запуск — `ros2 launch mavros apm.launch fcu_url:=...` (или `px4.launch`). Для PX4 в ROS 2 вместо MAVROS обычно переходят на uXRCE-DDS (модуль ros2-px4), для ArduPilot — на AP_DDS там, где его функций хватает (модуль ros2-ardupilot).
 

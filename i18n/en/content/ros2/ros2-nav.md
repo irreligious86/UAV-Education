@@ -68,6 +68,8 @@ Read `grid_planner.py`: inflation, the octile heuristic, the no-corner-cutting r
 ### Step 2. Braking distance
 For a vehicle with a maximum deceleration of 3 m/s² and a lidar with a reliable range of 8 m, calculate the maximum safe velocity with a 2 m margin and a 0.3 s reaction delay. Compare with the simple avoidance parameters of your firmware.
 
+{{diagram:chart-nav-brake-speed|Задержка реакции 0.3 с срезает безопасную скорость при d = 6 м с 6.0 до 5.2 м/с, а забытый запас добавляет ещё ошибку до 6.9 м/с.}}
+
 ### Step 3. Flying around an obstacle in Gazebo
 A world with a pillar in the path of the square. Option A (no code of your own): ArduPilot SITL with proximity from a simulated lidar, `OA_TYPE = 1`, a mission through the pillar — record the BendyRuler trajectory. Option B (your own node): an occupancy grid from `/scan` or `OBSTACLE_DISTANCE`, A* + shortcut, setpoints via the state machine from ros2-px4. Compare the trajectories and the time.
 
