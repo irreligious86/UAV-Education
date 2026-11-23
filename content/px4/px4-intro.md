@@ -58,8 +58,29 @@ QGroundControl: прошивка, выбор airframe, калибровки, п�
 3. **Радио**: калибровка стиков, `RC_MAP_*`; режимы на тумблерах (Flight Modes), kill switch — обязателен на тестах.
 4. **Моторы**: Actuators — назначение выходов, протокол (DShot/PWM — по группам таймеров в Actuators, `PWM_MAIN_TIMx`), тест каждого **без пропов**, направление по схеме airframe.
 5. **Питание**: `BAT1_N_CELLS`, калибровка делителя напряжения и тока по мультиметру/ваттметру, пороги `BAT_LOW_THR`/`BAT_CRIT_THR`.
-6. **Safety**: действия при потере RC (`COM_RC_LOSS_T` = 0.5 с по умолчанию, `NAV_RCL_ACT`), потере канала данных с GCS (`NAV_DLL_ACT`, по умолчанию 0 — выключено, включают сами), низкой АКБ (`COM_LOW_BAT_ACT`), геозона (`GF_*`), высота возврата `RTL_RETURN_ALT`.
+6. **Safety**: действия при потере RC (`COM_RC_LOSS_T` = 0.5 с по умолчанию, `NAV_RCL_ACT`), потере канала данных с GCS (`NAV_DLL_ACT`, по умолчанию 0 — выключено, включают сами), низкой АКБ (`COM_LOW_BAT_ACT`), геозона (`GF_*`), высота возврата `RTL_RETURN_ALT`; kill switch `RC_MAP_KILL_SW` — моторы останавливаются сразу, в любом режиме и в воздухе (полная матрица — `px4-safety-return`).
 Пред-армовые проверки сообщаются в QGC текстом («Preflight Fail: …»); `CBRK_*` circuit breakers отключают их только на стенде.
+
+### Экраны QGC: что где настраивается
+Правило: вход — что нужно настроить; решение — экран по таблице; проверка — параметр из столбца «Что пишет» в Parameters после перезагрузки. Названия экранов — QGC Stable 5.0 (PX4); в более новых сборках QGC страницы Safety и Power разбиты на отдельные (порты, батарея, ESC, failsafe, Return и Land) — названия зависят от версии QGC, параметры те же.
+
+| Экран | Что пишет (PX4 1.17) | Где в курсе |
+|---|---|---|
+| Summary | ничего: красные/зелёные плашки готовности страниц | — |
+| Firmware | прошивка PX4 stable / beta / свой `.px4`, загрузчик | `px4-setup-scratch` |
+| Airframe | `SYS_AUTOSTART` → умолчания airframe (геометрия `CA_*`, усиления, `rc.mc_defaults`); Apply and Restart сбрасывает параметры, кроме калибровок `CAL_*`, `RC*` и `COM_FLTMODE*` | `px4-setup-scratch` |
+| Sensors | калибровки компаса, гироскопа, акселерометра, горизонта, датчика скорости; ориентации `SENS_BOARD_ROT`, `CAL_MAGn_ROT` | `px4-setup-scratch`, `px4-hardware-peripherals` |
+| Radio | `RCn_MIN/TRIM/MAX/REV`, `RC_MAP_ROLL…THROTTLE`; Copy Trims; каналы AUX `RC_MAP_AUX1…6`; каналы подстройки `RC_MAP_PARAM1…3` | `px4-setup-scratch`, `px4-rc-tuning` |
+| Flight Modes | `RC_MAP_FLTMODE` + `COM_FLTMODE1…6`, `RC_MAP_ARM_SW`, `RC_MAP_KILL_SW`, `RC_MAP_RETURN_SW`, `RC_MAP_LOITER_SW`, `RC_MAP_OFFB_SW` | `px4-rc-tuning` |
+| Power | `BAT1_N_CELLS`, `BAT1_V_CHARGED/EMPTY`, `BAT1_V_DIV`, `BAT1_A_PER_V` (кнопки Calculate), калибровка ESC, настройки UAVCAN | `px4-setup-scratch` |
+| Actuators | геометрия `CA_*`, функция каждого выхода `PWM_MAIN_FUNCn`, протокол группы `PWM_MAIN_TIMn`, Disarmed/Min/Max/Failsafe на выход, реверс `PWM_MAIN_REV`, слайдеры теста, Set Spin Direction (DShot) | `px4-outputs-servos` |
+| Safety | low battery, потеря RC и канала данных, геозона, Return, Land, kill switch | `px4-safety-return` |
+| PID Tuning | кнопка Autotune (нужен `MC_AT_EN` = 1), ползунки rate / attitude / velocity / position, графики отклика | `px4-control` |
+| Camera | триггер камеры `TRIG_*`, обратная связь `CAM_CAP_*` | `px4-camera-gimbal` |
+| Parameters | весь список, Save/Load `.params`, Reset all to firmware's / vehicle's defaults, Set RC to Param, Reboot | `px4-console-params`, `px4-rc-tuning` |
+| Joystick | геймпад вместо пульта по MAVLink (`COM_RC_IN_MODE`) | `px4-setup-scratch` |
+| Analyze Tools | MAVLink Console (`nsh>`), Log Download (ULog), MAVLink Inspector | `px4-console-params` |
+| Plan → Geofence, Rally | полигоны и круги геозоны, rally-точки для Return | `px4-safety-return` |
 
 ### Параметры: как они устроены
 Имена — группами по модулю: `MC_*` (контроллеры мультиротора), `MPC_*` (позиция), `EKF2_*`, `IMU_*`, `COM_*` (commander/failsafe), `NAV_*`, `RTL_*`, `BAT*`, `CA_*` (control allocation), `SER_*`/`MAV_*`/`UXRCE_*` (порты). Полный справочник с диапазонами и умолчаниями — «Parameter Reference» в документации (генерируется из исходников, как у ArduPilot). Экспорт/импорт — QGC → Parameters → Tools (файл `.params`), версионируется (модуль «CI»).

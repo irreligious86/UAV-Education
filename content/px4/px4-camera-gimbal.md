@@ -69,7 +69,7 @@ next:
 
 - `MNT_RANGE_*`, `MNT_OFF_*`, `MNT_DO_STAB`, `MNT_LND_P_MIN/MAX` для выхода v2 **не применяются**: функция расчёта углов для него не вызывается. Пределы и стабилизация — дело самого подвеса.
 - `MNT_MAV_SYSID` и `MNT_MAV_COMPID` читает только выход v1. В v2 адрес устройства берётся из принятого `GIMBAL_DEVICE_INFORMATION`: compid отправителя, system id — свой (`MAV_SYS_ID`). Описание `MNT_MAV_COMPID` в справочнике параметров упоминает v2, но код его там не использует.
-- Пока `GIMBAL_DEVICE_INFORMATION` не получено, выход v2 ничего не шлёт и раз в секунду запрашивает его через `MAV_CMD_REQUEST_MESSAGE`. В `gimbal status` это строка «gimbal device compid not found».
+- Пока `GIMBAL_DEVICE_INFORMATION` не получено, выход v2 раз в секунду запрашивает его через `MAV_CMD_REQUEST_MESSAGE`, а в остальных циклах продолжает слать `GIMBAL_DEVICE_SET_ATTITUDE` с id устройства 0 (без адреса компонента; `gimbal/output_mavlink.cpp`, v1.17.0) — подвес, который ждёт сообщения на свой компонент, их не выполнит. В `gimbal status` это строка «gimbal device compid not found».
 - Порт MAVLink-подвеса: `MAV_n_CONFIG` = номер порта, `MAV_n_MODE` = 10 (Gimbal). В этом наборе PX4 шлёт `GIMBAL_DEVICE_SET_ATTITUDE` и `AUTOPILOT_STATE_FOR_GIMBAL_DEVICE` по 20 Гц, а принимает только `HEARTBEAT`, `GIMBAL_MANAGER_SET_ATTITUDE`, `GIMBAL_MANAGER_SET_MANUAL_CONTROL`, `GIMBAL_DEVICE_INFORMATION` и `GIMBAL_DEVICE_ATTITUDE_STATUS`. Номера портов — в `px4-hardware-peripherals`.
 
 ### Управление с пульта
