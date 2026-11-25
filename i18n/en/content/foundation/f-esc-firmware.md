@@ -50,6 +50,8 @@ The firmware name on the box tells you about the ESC's microcontroller: “BLHel
 
 {{diagram:esc-pwm-class-map|Чем меньше аппарат, тем выше стартовая частота; DJI O3/O4 с Gyroflow сдвигает все классы со стартом 24 кГц на 48, а окончательное значение проверяется по N = 10·f/eRPM на висении.}}
 
+{{diagram:chart-esc-temp-derate|При пороге 100 °C Bluejay снимает мощность ступенями до 20 %, а AM32 на 101 °C сразу оставляет 25 % и к 110 °C — ноль: низкий порог AM32 в жару роняет аппарат.}}
+
 ### How to flash
 - **Through the flight controller (passthrough).** The flight controller routes the ESC signal wire through to the computer. Betaflight: connect USB, close the Configurator (the port is busy), open ESC Configurator (esc-configurator.com) in Chrome for BLHeli_S/Bluejay and AM32; for BLHeli_32 use BLHeliSuite32 (the archived version). ArduPilot: `SERVO_BLH_AUTO = 1` for the motors (on planes, `SERVO_BLH_MASK`), DShot protocol, disconnect the GCS, keep USB, and in the configurator choose the “BLHeli32/AM32 Bootloader (Betaflight/Cleanflight)” interface. IOMCU outputs (MAIN) don't support passthrough; you need the FMU/AUX outputs.
 - **The target rule.** The firmware is chosen for the specific ESC board (layout/target). A wrong target ranges from misbehavior to burned MOSFETs. The configurator usually shows the current layout; flash only a matching one.
