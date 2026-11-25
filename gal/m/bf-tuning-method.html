@@ -1,0 +1,473 @@
+<!doctype html>
+<html lang="uk-galych" data-theme="dark" data-lang="uk-galych">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Метод A/B: тюнинг как эксперимент — UAV Student</title>
+  <meta name="description" content="спланировать A/B-сравнение: гипотеза, одно изменение, программа полёта, порядок ABBA и число полётов переключать A и B средствами Betaflight 4.5: PID-профиль на земле, профиль рейтов и абсолютный слот adjrange в полёте посчитать по логам метрики полёта, |Δ|/SE и p перестановочного теста и принять решение">
+  <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
+  <link rel="manifest" href="../../manifest.webmanifest">
+  <meta name="theme-color" content="#0b0f14">
+  <link rel="alternate" hreflang="ru" href="../../m/bf-tuning-method.html">
+  <link rel="alternate" hreflang="uk" href="../../uk/m/bf-tuning-method.html">
+  <link rel="alternate" hreflang="en" href="../../en/m/bf-tuning-method.html">
+  <link rel="alternate" hreflang="uk-galych" href="../../gal/m/bf-tuning-method.html">
+  <link rel="alternate" hreflang="uk-zakarpat" href="../../zak/m/bf-tuning-method.html">
+  <link rel="alternate" hreflang="ru-odessa" href="../../ode/m/bf-tuning-method.html">
+  <link rel="alternate" hreflang="cs" href="../../cs/m/bf-tuning-method.html">
+  <script>/* go to the visitor's chosen language before anything paints (assets/i18n.js) */(function(){try{var c=localStorage.getItem('uav-lang'),h=document.documentElement.getAttribute('data-lang');if(!c||c===h||/[?&]lang=keep\b/.test(location.search))return;var l=document.querySelector('link[rel=alternate][hreflang="'+c+'"]');if(l)location.replace(l.href+location.search+location.hash)}catch(e){}})();</script>
+  <link rel="stylesheet" href="../../lib/ground-control-ui/dist/ground-control.css">
+  <link rel="stylesheet" href="../../assets/site.css">
+  <script src="../../lib/ground-control-ui/dist/ground-control.js" defer></script>
+  <script src="../../assets/i18n/uk-galych.js"></script>
+  <script src="../../assets/i18n.js"></script>
+  <script src="../../assets/progress-store.js" defer></script>
+  <script src="../../assets/backend-config.js" defer></script>
+  <script src="../../assets/account.js" defer></script>
+  <script src="../../assets/grading.js" defer></script>
+  <script src="../../assets/app.js" defer></script>
+  <script src="../../assets/uav-quiz.js" defer></script>
+  <script src="../../assets/uav-tasks.js" defer></script>
+  <script src="../../assets/offline.js" defer></script>
+</head>
+<body class="gc-root" data-base="../" data-root="../../">
+  <header class="site-header">
+    <div class="gc-container site-header__inner">
+      <a class="site-brand" href="../index.html"><span class="site-brand__mark" aria-hidden="true">◆</span> UAV Student</a>
+      <nav class="gc-nav" aria-label="Розділи сайту">
+        <a href="../index.html" aria-current="page">Курс</a>
+        <a href="../ref/index.html">Довідник</a>
+        <a href="../pages/glossary.html">Глосарій</a>
+        <a href="../pages/fails.html">Фейли</a>
+        <a href="../pages/search.html">Пошук</a>
+        <a href="../pages/progress.html">Мій прогрес</a>
+      </nav>
+      <details class="lang-switch"><summary class="gc-tag" data-state="ok" aria-label="Мова">GAL ▾</summary><nav class="lang-switch__menu" aria-label="Мова"><a href="../../m/bf-tuning-method.html" data-lang-to="ru" hreflang="ru" lang="ru"><span class="gc-tag">RU</span> Русский</a><a href="../../uk/m/bf-tuning-method.html" data-lang-to="uk" hreflang="uk" lang="uk"><span class="gc-tag">UK</span> Українська</a><a href="../../en/m/bf-tuning-method.html" data-lang-to="en" hreflang="en" lang="en"><span class="gc-tag">EN</span> English</a><a href="../../gal/m/bf-tuning-method.html" data-lang-to="uk-galych" hreflang="uk-galych" lang="uk-galych" aria-current="true"><span class="gc-tag" data-state="ok">GAL</span> Галицька (експеримент)</a><a href="../../zak/m/bf-tuning-method.html" data-lang-to="uk-zakarpat" hreflang="uk-zakarpat" lang="uk-zakarpat"><span class="gc-tag">ZAK</span> Закарпатська говірка (експеримент)</a><a href="../../ode/m/bf-tuning-method.html" data-lang-to="ru-odessa" hreflang="ru-odessa" lang="ru-odessa"><span class="gc-tag">ODE</span> Одесский говор (эксперимент)</a><a href="../../cs/m/bf-tuning-method.html" data-lang-to="cs" hreflang="cs" lang="cs"><span class="gc-tag">CS</span> Čeština</a></nav></details>
+    </div>
+  </header>
+  <main class="gc-container site-main">
+    <article class="module" data-module-page="bf-tuning-method">
+      <p class="gc-breadcrumb"><a href="../index.html">Курс</a><a href="../index.html#track-integrator">Інтегратор</a><span>Метод A/B: тюнинг как эксперимент</span></p>
+      <h1 class="module-title">Метод A/B: тюнинг как эксперимент</h1>
+      <div class="module-tags"><span class="gc-tag" title="Рівень">L2 — Інтегратор</span><span class="gc-tag">читання 45 хв</span><span class="gc-tag">навчання ~3 год</span><span class="gc-tag">Betaflight 4.5 (сверено с исходником 4.5.3); отличия 2025.12 отмечены</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ОПАНОВАНО</span></div>
+      <p class="gc-muted module-score" data-module-score></p>
+      <p class="module-lead">«С новым D стало мягче» — гипотеза, а не результат. Модуль превращает сравнение двух настроек в эксперимент: одно изменение, одна программа полёта, порядок ABBA в одном окне условий, метрики лога с точными определениями и минимальная статистика — разброс, отношение эффекта к стандартной ошибке, перестановочный тест (permutation test). Разобрано, что Betaflight 4.5 переключает в полёте: профиль рейтов — да, PID-профиль — штатно нет, один PID-коэффициент — да, абсолютным слотом <code>adjrange</code>. Лабораторная — скрипт на Python: CSV от <code>blackbox_decode</code> → манёвры → пять метрик → вердикт с p. На синтетике с известным эффектом (−15 % пропвоша) одна пара полётов ничего не решает, пять пар в порядке ABBA эффект находят, тот же объём блоками AAAAA BBBBB его теряет.</p>
+      <div class="gc-callout" data-state="ok"><strong>Після модуля ти вмієш</strong><ul><li>спланировать A/B-сравнение: гипотеза, одно изменение, программа полёта, порядок ABBA и число полётов</li><li>переключать A и B средствами Betaflight 4.5: PID-профиль на земле, профиль рейтов и абсолютный слот adjrange в полёте</li><li>посчитать по логам метрики полёта, |Δ|/SE и p перестановочного теста и принять решение</li></ul></div><p class="gc-muted">Перед цим модулем: <a href="bf-pid.html">PID-тюнінг за даними</a>, <a href="bf-blackbox.html">Blackbox</a>, <a href="bf-motor-balance.html">Механика до PID: баланс моторов по логу</a></p><div class="gc-callout lab"><p class="gc-label gc-muted">Лабораторна</p><strong>A/B по логам: синтетическая сессия и своя сессия ABBA</strong><p class="gc-muted lab__hint">Здано, коли позначено всі пункти:</p><ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="bf-tuning-method:lab:0"><span>Расчёт: минимальное p для n = 3, 4, 5 равно 0.100, 0.0286, 0.0079 (±0.0001); план для CV 8 %, Δ 15 % — 5 полётов на плечо</span></label></li><li><label><input type="checkbox" data-check-id="bf-tuning-method:lab:1"><span>Расчёт: вывод --demo совпал с модулем — одна пара p = 1.000; ABBA пропвош −20.5 %, |Δ|/SE = 3.73, p = 0.016, accept B; блоки −3.1 %, p = 0.595; мощность при n = 4 и 5 — 67.2 и 92.5 %</span></label></li><li><label><input type="checkbox" data-check-id="bf-tuning-method:lab:2"><span>Расчёт: объяснение, почему блоки AAAAA BBBBB потеряли эффект, а ABBA нет, совпало с эталоном модуля</span></label></li><li><label><input type="checkbox" data-check-id="bf-tuning-method:lab:3"><span>Железо: сессия 5 + 5 полётов ABBA с журналом, все сегменты найдены в каждом полёте, вердикт записан с |Δ|/SE и p, моторы в B не горячее, чем в A</span></label></li></ul></div>
+      <div class="gc-prose module-body">
+<div class="gc-callout" data-state="caution" data-untranslated><strong>Модуль ещё не переведён.</strong> Ниже — оригинал (Русский). Прогресс и оценки общие для всех языков.</div>
+<h2>Теорія</h2>
+<h4 class="md-subheading">Почему один полёт ничего не доказывает</h4>
+<p>Метрика пропвоша по двум полётам одной и той же настройки отличается на 5–15 % (ориентир курса; в модели лабораторной CV ≈ 8 %): другой порыв, другая банка, пилот раньше подхватил газ. Один полёт A против одного полёта B не даёт оценить разброс внутри плеча, и разницу в 13 % не отличить от шума. В лабораторной одна пара полётов показывает −32 % по перелёту и −33 % по запасу моторов, хотя B их не меняет вообще.</p>
+<p>Ощущения — источник гипотез, а не решение. Пилот, который знает, что включил «новый лучший» профиль, летит и оценивает иначе (плацебо). В кейсе <code>bf-pid</code> (по одному полёту на профиль) лог поддержал «чётче» у SHARP и показал цену +45 % шума на моторах, которую руками не почувствуешь; по меркам этого модуля это гипотеза для A/B на 4–5 полётах на плечо.</p>
+<p>Смешивающие факторы (confounders) меняются вместе с настройкой и сами сдвигают метрику:</p>
+<div class="table-wrap md-table-wrap" tabindex="0"><table class="md-table"><thead><tr><th>Фактор</th><th>Как искажает</th><th>Как держать</th></tr></thead><tbody><tr><td data-label="Фактор">АКБ: заряд, просадка</td><td data-label="Как искажает">на пустой банке растут задержка и пропвош</td><td data-label="Как держать">одна партия, одинаковый заряд и посадочное напряжение; ABBA; <code>vbat_sag_compensation</code> одинаковый</td></tr><tr><td data-label="Фактор">Нагрев моторов и ESC</td><td data-label="Как искажает">метрики дрейфуют к концу сессии</td><td data-label="Как держать">одинаковая пауза между полётами, ABBA</td></tr><tr><td data-label="Фактор">Ветер</td><td data-label="Как искажает">пропвош и ошибка слежения</td><td data-label="Как держать">до 5 м/с (<code>bf-pid</code>), запись в журнал, ABBA</td></tr><tr><td data-label="Фактор">Пропы</td><td data-label="Как искажает">зазубрина или другая партия меняют вибрации</td><td data-label="Как держать">одни пропы на сессию; сменил — сессия заново</td></tr><tr><td data-label="Фактор">Пилот</td><td data-label="Как искажает">разная резкость манёвров</td><td data-label="Как держать">одна программа, один пилот, слепой выбор</td></tr><tr><td data-label="Фактор">Аппарат</td><td data-label="Как искажает">у «одинаковых» дронов разные ЦТ и моторы</td><td data-label="Как держать">A и B на одном аппарате (<code>bf-motor-balance</code>)</td></tr></tbody></table></div>
+<a class="gc-callout lesson-card" data-state="ok" href="../m/bf-motor-balance.html"><span class="gc-label gc-muted">Отдельный урок →</span><strong class="lesson-card__title">Механика до PID: баланс моторов по логу</strong><span class="lesson-card__why">Перекос моторов и смещённый ЦТ сдвигают все метрики сильнее, чем шаг слайдера: сначала механика, потом A/B.</span></a>
+<h4 class="md-subheading">Дизайн эксперимента</h4>
+<ol><li><strong>Гипотеза</strong> с целевой метрикой и порогом — до полётов. Пример: «B (<code>d_roll</code>/<code>d_pitch</code> 40/46 → 46/52 в 4.5) снизит пропвош не меньше чем на 10 %, не подняв шум на висении больше чем на 10 %». Заранее записанный порог не даёт потом выбрать метрику, которая «получилась».</li><li><strong>Одно изменение.</strong> A — контроль без правок, B отличается одним параметром или слайдером.</li><li><strong>Программа полёта</strong> одна для всех полётов (ниже), каждый манёвр кормит свою метрику.</li><li><strong>Порядок.</strong> ABA: среднее двух A гасит линейный дрейф. ABBA ABBA…: плечи получают почти одинаковый дрейф. ABAB тоже работает, но у B всегда на полёт больше дрейфа. Блоки AAAAA BBBBB — худший вариант: весь дрейф сессии ложится на разницу.</li><li><strong>A/A-тест.</strong> A против A той же программой показывает собственный шум метрики. Если он сравним с ожидаемым эффектом, нужно больше полётов или крупнее шаг.</li><li><strong>Слепой выбор.</strong> Профиль на земле ставит помощник, пилот не знает, что летит, и записывает оценку 1–5 до разбора лога.</li></ol>
+<figure class="diagram" data-diagram="bf-ab-order"><div class="diagram__svg"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 228" width="100%" role="img" aria-labelledby="t" style="max-width:720px;display:block;margin:0 auto"><title id="t">Порядок полётов в A/B: блоки против ABBA</title><style>text{font-family: var(--gc-font-mono, ui-monospace, Menlo, monospace); font-size: 12px;fill:currentColor} .m{fill:var(--gc-ink-muted, #8a93a3)} .a{fill:var(--gc-accent-hud, #5ef1d2)} .w{fill:var(--gc-signal-amber, #f0b24c)} .d{fill:var(--gc-signal-red, #e8636b)} .box{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:currentColor;stroke-width:1.2} .boxa{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6} .ln{stroke:currentColor;stroke-width:1.2;fill:none} .lna{stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6;fill:none} .lnm{stroke:var(--gc-ink-muted, #8a93a3);stroke-width:1;fill:none;stroke-dasharray:4 3} .t{font-size:11px} .b{font-weight:600}</style><defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker><marker id="ara" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--gc-accent-hud, #5ef1d2)"/></marker></defs><text x="16" y="18" text-anchor="start" class="m t">Одна сессия из 10 полётов, ветер растёт: +3 % пропвоша на каждый следующий полёт</text><text x="142" y="52" text-anchor="end" style="font-size:11px">дрейф пропвоша</text><text x="177.0" y="52" text-anchor="middle" class="w t" style="font-size:11px">+0 %</text><text x="231.0" y="52" text-anchor="middle" class="w t" style="font-size:11px">+3 %</text><text x="285.0" y="52" text-anchor="middle" class="w t" style="font-size:11px">+6 %</text><text x="339.0" y="52" text-anchor="middle" class="w t" style="font-size:11px">+9 %</text><text x="393.0" y="52" text-anchor="middle" class="w t" style="font-size:11px">+12 %</text><text x="447.0" y="52" text-anchor="middle" class="w t" style="font-size:11px">+15 %</text><text x="501.0" y="52" text-anchor="middle" class="w t" style="font-size:11px">+18 %</text><text x="555.0" y="52" text-anchor="middle" class="w t" style="font-size:11px">+21 %</text><text x="609.0" y="52" text-anchor="middle" class="w t" style="font-size:11px">+24 %</text><text x="663.0" y="52" text-anchor="middle" class="w t" style="font-size:11px">+27 %</text><text x="142" y="87" text-anchor="end" style="font-size:11px">AAAAA BBBBB</text><rect class="box" x="152.0" y="66" width="50.0" height="30" rx="4"/><text x="177.0" y="86" text-anchor="middle" style="font-size:12px">A1</text><rect class="box" x="206.0" y="66" width="50.0" height="30" rx="4"/><text x="231.0" y="86" text-anchor="middle" style="font-size:12px">A2</text><rect class="box" x="260.0" y="66" width="50.0" height="30" rx="4"/><text x="285.0" y="86" text-anchor="middle" style="font-size:12px">A3</text><rect class="box" x="314.0" y="66" width="50.0" height="30" rx="4"/><text x="339.0" y="86" text-anchor="middle" style="font-size:12px">A4</text><rect class="box" x="368.0" y="66" width="50.0" height="30" rx="4"/><text x="393.0" y="86" text-anchor="middle" style="font-size:12px">A5</text><rect class="boxa" x="422.0" y="66" width="50.0" height="30" rx="4"/><text x="447.0" y="86" text-anchor="middle" class="b" style="font-size:12px">B6</text><rect class="boxa" x="476.0" y="66" width="50.0" height="30" rx="4"/><text x="501.0" y="86" text-anchor="middle" class="b" style="font-size:12px">B7</text><rect class="boxa" x="530.0" y="66" width="50.0" height="30" rx="4"/><text x="555.0" y="86" text-anchor="middle" class="b" style="font-size:12px">B8</text><rect class="boxa" x="584.0" y="66" width="50.0" height="30" rx="4"/><text x="609.0" y="86" text-anchor="middle" class="b" style="font-size:12px">B9</text><rect class="boxa" x="638.0" y="66" width="50.0" height="30" rx="4"/><text x="663.0" y="86" text-anchor="middle" class="b" style="font-size:12px">B10</text><text x="150" y="116" text-anchor="start" class="d t">дрейф в среднем: A +6 %, B +21 % → лишние +15 % у B съели эффект: оценка −3.1 %</text><text x="142" y="155" text-anchor="end" style="font-size:11px">ABBA ABBA AB</text><rect class="box" x="152.0" y="134" width="50.0" height="30" rx="4"/><text x="177.0" y="154" text-anchor="middle" style="font-size:12px">A1</text><rect class="boxa" x="206.0" y="134" width="50.0" height="30" rx="4"/><text x="231.0" y="154" text-anchor="middle" class="b" style="font-size:12px">B2</text><rect class="boxa" x="260.0" y="134" width="50.0" height="30" rx="4"/><text x="285.0" y="154" text-anchor="middle" class="b" style="font-size:12px">B3</text><rect class="box" x="314.0" y="134" width="50.0" height="30" rx="4"/><text x="339.0" y="154" text-anchor="middle" style="font-size:12px">A4</text><rect class="box" x="368.0" y="134" width="50.0" height="30" rx="4"/><text x="393.0" y="154" text-anchor="middle" style="font-size:12px">A5</text><rect class="boxa" x="422.0" y="134" width="50.0" height="30" rx="4"/><text x="447.0" y="154" text-anchor="middle" class="b" style="font-size:12px">B6</text><rect class="boxa" x="476.0" y="134" width="50.0" height="30" rx="4"/><text x="501.0" y="154" text-anchor="middle" class="b" style="font-size:12px">B7</text><rect class="box" x="530.0" y="134" width="50.0" height="30" rx="4"/><text x="555.0" y="154" text-anchor="middle" style="font-size:12px">A8</text><rect class="box" x="584.0" y="134" width="50.0" height="30" rx="4"/><text x="609.0" y="154" text-anchor="middle" style="font-size:12px">A9</text><rect class="boxa" x="638.0" y="134" width="50.0" height="30" rx="4"/><text x="663.0" y="154" text-anchor="middle" class="b" style="font-size:12px">B10</text><text x="150" y="184" text-anchor="start" class="a t">дрейф в среднем: A +13.2 %, B +13.8 % → разница 0.6 %: оценка −20.5 %, p = 0.016</text><text x="16" y="214" text-anchor="start" class="m t">Истинный эффект B в модели −15 %. Порядок не меняет число полётов, он решает, на кого ляжет дрейф.</text></svg></div><figcaption class="gc-muted">Число полётов одинаковое, решает порядок: в блоках AAAAA BBBBB дрейф ветра добавил B лишние +15 % пропвоша и съел эффект −15 %, в порядке ABBA дрейф разделился почти поровну (+13.2 % и +13.8 %).</figcaption><div class="diagram__hint">Схему можно прокрутить по горизонтали</div></figure>
+<p>Программа полёта (около 30 с, повторяется в каждом полёте; пороги разметки — ориентиры курса, ими пользуется скрипт лабораторной):</p>
+<div class="table-wrap md-table-wrap" tabindex="0"><table class="md-table"><thead><tr><th>Манёвр</th><th>Как</th><th>Метрика</th><th>Как скрипт находит участок</th></tr></thead><tbody><tr><td data-label="Манёвр">Висение</td><td data-label="Как">5 с на 1.5–2 м, стики в центре</td><td data-label="Метрика">шум гироскопа</td><td data-label="Как скрипт находит участок">|setpoint| &lt; 20 °/с по всем осям, газ 1300–1600, ≥ 2 с</td></tr><tr><td data-label="Манёвр">Броски по крену</td><td data-label="Как">5 рывков на полный стик по 0.25 с, пауза 0.75 с, знак чередуется</td><td data-label="Метрика">ошибка слежения, перелёт</td><td data-label="Как скрипт находит участок">|setpoint[0]| &gt; 200 °/с дольше 50 мс</td></tr><tr><td data-label="Манёвр">Панч</td><td data-label="Как">газ 100 % на 1–1.5 с</td><td data-label="Метрика">запас моторов</td><td data-label="Как скрипт находит участок"><code>rcCommand[3]</code> &gt; 1900 дольше 0.3 с</td></tr><tr><td data-label="Манёвр">Спуски</td><td data-label="Как">3 раза: газ в ноль на 1–1.5 с, подхват на 70 %</td><td data-label="Метрика">пропвош</td><td data-label="Как скрипт находит участок"><code>rcCommand[3]</code> &lt; 1150 дольше 0.5 с</td></tr></tbody></table></div>
+<p>Первые и последние 3 с лога отбрасываются (взлёт и посадка), как в <code>bf-pid</code>.</p>
+<h4 class="md-subheading">Как переключать A и B в Betaflight 4.5</h4>
+<p>Лучшие условия у A и B в одном полёте: одна банка, один ветер. Что умеет прошивка (проверено по исходнику):</p>
+<ul><li><strong>Штатного способа переключить PID-профиль в полёте нет.</strong> Функции нет в <code>fc/rc_adjustments.h</code>, режима — в <code>fc/rc_modes.h</code> (4.5.3 и 2025.12); <code>MSP_SELECT_SETTING</code> при арме PID-профиль молча игнорирует (<code>msp/msp.c</code>), стик-команды и вход в OSD-меню стиками работают только без арма. На земле: стиками (газ вниз + рыскание влево + крен влево / тангаж от себя / крен вправо → профили 1/2/3 в нумерации App, то есть <code>profile 0</code>/<code>1</code>/<code>2</code>, <code>fc/rc_controls.c</code>), OSD-меню, Betaflight App или <code>profile N</code> (N = 0–3; четвёртый профиль — только CLI, OSD или App). Сравнение PID-профилей — это отдельные полёты. Сами коэффициенты по MSP в полёте записать можно (<code>MSP_SET_PID</code>, <code>MSP_SET_PID_ADVANCED</code>, <code>MSP_SET_SIMPLIFIED_TUNING</code>, например Lua-скриптом пульта): только в RAM, без события в Blackbox — для A/B это не метод. В 4.5.3 есть ещё дыра: OSD-меню, открытое через CRSF-телеметрию, не проверяет арм и даёт сменить профиль в воздухе (в 2025.12 закрыто) — это опасно и методом не является.</li><li><strong>Профиль рейтов — тумблером:</strong> функция 12 RATE_PROFILE, режим выбора, 3 позиции (6 при <code>rate_6pos_switch = ON</code>, но профилей рейтов 4, позиции 5–6 ничего не делают): <code>adjrange 0 0 3 900 2100 12 3 0 0</code> для 3-позиционного AUX4. Только для рейтов, экспо и кривой газа: PID там нет.</li><li><strong>Один PID-коэффициент — абсолютным слотом.</strong> Если у шаговой функции задан <code>center</code>, значение берётся прямо из канала: <code>center + (rc − 1500) · scale / 500</code>, деление C отбрасывает дробь к нулю (<code>processContinuosAdjustments</code>). Двухпозиционный тумблер даёт ровно два значения:</li></ul>
+<pre class="cli-block"><code># AUX4 (индекс 3), 2-позиционный тумблер: вниз = A, вверх = B (Betaflight 4.5)
+adjrange 0 0 3 900 2100 20 3 43 3      # ROLL_D:  1000 -&gt; 40, 2000 -&gt; 46
+adjrange 1 0 3 900 2100 17 3 49 3      # PITCH_D: 1000 -&gt; 46, 2000 -&gt; 52</code></pre>
+<p>20 и 17 — номера CLI функций ROLL_D и PITCH_D (номер CLI — позиция в <code>defaultAdjustmentConfigs[]</code> плюс 1, <code>bf-adjustments</code>). Комбинированная 8 PITCH_ROLL_D поставила бы обеим осям одно значение, а умолчания разные (40 и 46). Эндпоинты 988 и 2012 мкс дают −3.07 → −3 и +3.07 → +3, то есть 40 и 46; тумблер на 1100 мкс даст −2.4 → −2 и <code>d_roll</code> = 41. Диапазон 900–2100 — «всегда активен», и значение задаёт положение тумблера уже при включении. После эксперимента убери слоты и впиши выбранное значение через <code>set</code>.</p>
+<p>Изменения пишутся событием <code>INFLIGHT_ADJUSTMENT</code> (код 13, <code>blackbox/blackbox.h</code>). В абсолютном режиме событие пишется при каждом изменении значения канала, даже если D не изменился: дрожащий канал (988 ↔ 989) засыпает <code>.event</code> повторами, граница A/B — первое событие с новым <code>value</code>. <code>blackbox_decode</code> кладёт события в <code>LOG00001.01.event</code> строками JSON: <code>{&quot;name&quot;:&quot;Inflight adjustment&quot;, &quot;time&quot;:…, &quot;data&quot;:{&quot;adjustmentFunction&quot;:&quot;ROLL_D&quot;,&quot;value&quot;:46}}</code>, время — тот же счётчик в микросекундах, что <code>time (us)</code> в CSV. Так находятся границы участков A и B. Действующий D в 4.5 показывает <code>debug_mode = D_MIN</code>: <code>debug[2]</code> — крен, <code>debug[3]</code> — тангаж, оба ×10 (<code>flight/pid.c</code>). В 2025.12 режим называется <code>D_MAX</code>, и поля другие: <code>debug[2]</code> — действующий D ×10 только по оси <code>gyro_filter_debug_axis</code>, <code>debug[3]</code> — множитель ×100. <code>d_roll</code> там база (30), верх — <code>d_max_roll</code> (40), и слот двигает базу: центр 43 поднял бы базу до 40/46 ≥ <code>d_max</code>, и динамический D выключился бы (он работает, только пока <code>d_max</code> &gt; D, <code>flight/pid_init.c</code>). Для 2025.12 центр считай от базы: <code>adjrange 0 0 3 900 2100 20 3 33 3</code> (30/36) и <code>adjrange 1 0 3 900 2100 17 3 37 3</code> (34/40); верх <code>d_max_*</code> слотом не меняется (<code>bf-adjustments</code>).</p>
+<p>Номера и имени профиля в заголовке лога нет, профиль узнаётся по значениям: <code>rollPID:45,80,40</code>, <code>d_min:…</code> (<code>grep -a rollPID LOG00001.BFL</code>). Перед взлётом проверяй профиль по OSD (<code>osd_pid_profile_name_pos</code>, имя — <code>profile_name</code>, до 8 символов).</p>
+<h4 class="md-subheading">Метрики: точные определения</h4>
+<p>Пять метрик ощущений (motor noise, propwash RMS, bounce-back, entry lag, peak tracking) определены в <code>bf-pid</code>. Здесь пять величин для A/B, каждая сводится к одному числу на полёт:</p>
+<div class="table-wrap md-table-wrap" tabindex="0"><table class="md-table"><thead><tr><th>Метрика</th><th>Определение</th><th>Участок</th><th>Лучше</th></tr></thead><tbody><tr><td data-label="Метрика">шум гироскопа</td><td data-label="Определение">RMS <code>gyroADC[0]</code> и <code>gyroADC[1]</code> после полосового фильтра 100–250 Гц, °/с</td><td data-label="Участок">висение</td><td data-label="Лучше">меньше</td></tr><tr><td data-label="Метрика">ошибка слежения (tracking error)</td><td data-label="Определение">RMS(<code>setpoint[0]</code> − <code>gyroADC[0]</code>), °/с</td><td data-label="Участок">бросок + 150 мс после</td><td data-label="Лучше">меньше</td></tr><tr><td data-label="Метрика">перелёт</td><td data-label="Определение">(max gyro / max setpoint − 1) · 100 % в направлении броска</td><td data-label="Участок">бросок + 150 мс</td><td data-label="Лучше">меньше (до нуля)</td></tr><tr><td data-label="Метрика">пропвош</td><td data-label="Определение">RMS гироскопа крена и тангажа в полосе 20–70 Гц, °/с</td><td data-label="Участок">от 0.3 с после сброса газа до 0.6 с после подхвата</td><td data-label="Лучше">меньше</td></tr><tr><td data-label="Метрика">запас моторов (headroom)</td><td data-label="Определение">100 % − 99-й перцентиль самого нагруженного мотора, % хода по заголовку <code>motorOutput</code></td><td data-label="Участок">панч</td><td data-label="Лучше">больше</td></tr><tr><td data-label="Метрика">температура моторов</td><td data-label="Определение">вручную: ИК-термометр или палец в первые 30 с после посадки</td><td data-label="Участок">после полёта</td><td data-label="Лучше">не выше A</td></tr></tbody></table></div>
+<p>Значение полёта — медиана по манёврам: один кривой бросок не портит число. Полоса шума лежит выше полосы управления и пропвоша, поэтому лог нужен не реже 1 кГц (<code>blackbox_sample_rate</code> 1/8 при цикле PID 8 кГц; умолчание 1/4 даёт 2 кГц).</p>
+<a class="gc-callout lesson-card" data-state="ok" href="../m/bf-pid.html"><span class="gc-label gc-muted">Отдельный урок →</span><strong class="lesson-card__title">PID-тюнінг за даними</strong><span class="lesson-card__why">Пять метрик ощущений, ориентиры «хорошо/терпимо/проблема» для 5&quot; и кейс с четырьмя профилями — там.</span></a>
+<h4 class="md-subheading">Минимальная статистика</h4>
+<p>Единица повторения — полёт (или участок при переключении тумблером), а не манёвр: манёвры одного полёта делят батарею и ветер.</p>
+<ul><li><strong>Эффект</strong> Δ = x̄_B − x̄_A, в процентах от x̄_A.</li><li><strong>Объединённый разброс</strong> s_p = √[((n_A − 1)s_A² + (n_B − 1)s_B²) / (n_A + n_B − 2)], s — стандартное отклонение плеча. При одном полёте на плечо s не определено.</li><li><strong>Стандартная ошибка разницы</strong> SE = s_p · √(1/n_A + 1/n_B). <strong>Ориентир курса:</strong> эффект реален, если |Δ|/SE &gt; 2 и перестановочный тест дал p &lt; 0.05. При n = 5 само правило «2 SE» соответствует уровню около 0.08, так что решающим обычно становится p &lt; 0.05.</li><li><strong>Перестановочный тест.</strong> Если B ничего не меняет, метки «A» и «B» случайны. Перебери все разбиения n_A + n_B чисел на две группы: p — доля разбиений, где |разница средних| не меньше наблюдённой. Нормальность не нужна, но есть предел: минимальное p = 2 / C(2n, n) при n полётах на плечо.</li></ul>
+<div class="table-wrap md-table-wrap" tabindex="0"><table class="md-table"><thead><tr><th>n на плечо</th><th>разбиений C(2n, n)</th><th>минимальное p</th></tr></thead><tbody><tr><td data-label="n на плечо">1</td><td data-label="разбиений C(2n, n)">2</td><td data-label="минимальное p">1.000</td></tr><tr><td data-label="n на плечо">2</td><td data-label="разбиений C(2n, n)">6</td><td data-label="минимальное p">0.333</td></tr><tr><td data-label="n на плечо">3</td><td data-label="разбиений C(2n, n)">20</td><td data-label="минимальное p">0.100</td></tr><tr><td data-label="n на плечо">4</td><td data-label="разбиений C(2n, n)">70</td><td data-label="минимальное p">0.029</td></tr><tr><td data-label="n на плечо">5</td><td data-label="разбиений C(2n, n)">252</td><td data-label="минимальное p">0.0079</td></tr><tr><td data-label="n на плечо">6</td><td data-label="разбиений C(2n, n)">924</td><td data-label="минимальное p">0.0022</td></tr></tbody></table></div>
+<p>При трёх полётах на плечо p &lt; 0.05 недостижим даже при идеальном разделении, при четырёх все B должны оказаться лучше всех A.</p>
+<ul><li><strong>План:</strong> n ≈ 16 · (CV/Δ)², CV — разброс от полёта к полёту, Δ — ожидаемый эффект, оба в долях среднего. Это около 80 % шанса поймать эффект правилом «2 SE» (16 ≈ 2 · (2 + 0.84)²), но не меньше 4. CV 8 %, Δ 15 % → 4.6 → 5 полётов. CV 12 %, Δ 10 % → 23.04 → 24: такой эффект за сессию не поймать, бери шаг крупнее.</li></ul>
+<figure class="diagram" data-diagram="chart-bf-ab-power"><div class="diagram__svg"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 360" width="100%" role="img" aria-labelledby="t" style="max-width:720px;display:block;margin:0 auto"><title id="t">Сколько полётов на плечо нужно, чтобы увидеть −15 % пропвоша (CV ≈ 8 %)</title><style>text{font-family: var(--gc-font-mono, ui-monospace, Menlo, monospace); font-size: 12px;fill:currentColor} .m{fill:var(--gc-ink-muted, #8a93a3)} .a{fill:var(--gc-accent-hud, #5ef1d2)} .w{fill:var(--gc-signal-amber, #f0b24c)} .d{fill:var(--gc-signal-red, #e8636b)} .box{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:currentColor;stroke-width:1.2} .boxa{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6} .ln{stroke:currentColor;stroke-width:1.2;fill:none} .lna{stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6;fill:none} .lnm{stroke:var(--gc-ink-muted, #8a93a3);stroke-width:1;fill:none;stroke-dasharray:4 3} .t{font-size:11px} .b{font-weight:600}</style><defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker><marker id="ara" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--gc-accent-hud, #5ef1d2)"/></marker></defs><text x="64" y="20" text-anchor="start" class="b" style="font-size:13px">Сколько полётов на плечо нужно, чтобы увидеть −15 % пропвоша (CV ≈ 8 %)</text><rect x="64.0" y="36" width="225.7" height="276" fill="var(--gc-signal-amber, #f0b24c)" opacity="0.10"/><text x="176.85714285714286" y="50" text-anchor="middle" class="w t">n ≤ 3: p &lt; 0.05 недостижим</text><line x1="64.0" y1="36" x2="64.0" y2="312" stroke="var(--gc-ink-muted, #8a93a3)" stroke-width="0.5" opacity="0.4"/><text x="64.0" y="328" text-anchor="middle" class="m t">1</text><line x1="154.3" y1="36" x2="154.3" y2="312" stroke="var(--gc-ink-muted, #8a93a3)" stroke-width="0.5" opacity="0.4"/><text x="154.28571428571428" y="328" text-anchor="middle" class="m t">2</text><line x1="244.6" y1="36" x2="244.6" y2="312" stroke="var(--gc-ink-muted, #8a93a3)" stroke-width="0.5" opacity="0.4"/><text x="244.57142857142856" y="328" text-anchor="middle" class="m t">3</text><line x1="334.9" y1="36" x2="334.9" y2="312" stroke="var(--gc-ink-muted, #8a93a3)" stroke-width="0.5" opacity="0.4"/><text x="334.85714285714283" y="328" text-anchor="middle" class="m t">4</text><line x1="425.1" y1="36" x2="425.1" y2="312" stroke="var(--gc-ink-muted, #8a93a3)" stroke-width="0.5" opacity="0.4"/><text x="425.1428571428571" y="328" text-anchor="middle" class="m t">5</text><line x1="515.4" y1="36" x2="515.4" y2="312" stroke="var(--gc-ink-muted, #8a93a3)" stroke-width="0.5" opacity="0.4"/><text x="515.4285714285714" y="328" text-anchor="middle" class="m t">6</text><line x1="605.7" y1="36" x2="605.7" y2="312" stroke="var(--gc-ink-muted, #8a93a3)" stroke-width="0.5" opacity="0.4"/><text x="605.7142857142857" y="328" text-anchor="middle" class="m t">7</text><line x1="696.0" y1="36" x2="696.0" y2="312" stroke="var(--gc-ink-muted, #8a93a3)" stroke-width="0.5" opacity="0.4"/><text x="696.0" y="328" text-anchor="middle" class="m t">8</text><line x1="64" y1="312.0" x2="696" y2="312.0" stroke="var(--gc-ink-muted, #8a93a3)" stroke-width="0.5" opacity="0.4"/><text x="58" y="316.0" text-anchor="end" class="m t">0</text><line x1="64" y1="256.8" x2="696" y2="256.8" stroke="var(--gc-ink-muted, #8a93a3)" stroke-width="0.5" opacity="0.4"/><text x="58" y="260.8" text-anchor="end" class="m t">20</text><line x1="64" y1="201.6" x2="696" y2="201.6" stroke="var(--gc-ink-muted, #8a93a3)" stroke-width="0.5" opacity="0.4"/><text x="58" y="205.6" text-anchor="end" class="m t">40</text><line x1="64" y1="146.4" x2="696" y2="146.4" stroke="var(--gc-ink-muted, #8a93a3)" stroke-width="0.5" opacity="0.4"/><text x="58" y="150.4" text-anchor="end" class="m t">60</text><line x1="64" y1="91.2" x2="696" y2="91.2" stroke="var(--gc-ink-muted, #8a93a3)" stroke-width="0.5" opacity="0.4"/><text x="58" y="95.19999999999999" text-anchor="end" class="m t">80</text><line x1="64" y1="36.0" x2="696" y2="36.0" stroke="var(--gc-ink-muted, #8a93a3)" stroke-width="0.5" opacity="0.4"/><text x="58" y="40.0" text-anchor="end" class="m t">100</text><rect x="64" y="36" width="632" height="276" fill="none" stroke="currentColor" stroke-width="1"/><text x="380.0" y="350" text-anchor="middle" class="m">полётов на каждое плечо (A и B)</text><text transform="translate(16 174.0) rotate(-90)" text-anchor="middle" class="m">доля серий, %</text><line x1="64" y1="91.2" x2="696" y2="91.2" stroke="var(--gc-ink-muted, #8a93a3)" stroke-width="1.2" stroke-dasharray="5 3"/><text x="692" y="86.19999999999999" text-anchor="end" class="m t">80 % — ориентир курса</text><clipPath id="pc8321618"><rect x="64" y="36" width="632" height="276"/></clipPath><path d="M64.0 312.0 L154.3 312.0 L244.6 312.0 L334.9 126.5 L425.1 56.7 L515.4 39.3 L605.7 36.6 L696.0 36.0" fill="none" stroke="var(--gc-accent-hud, #5ef1d2)" stroke-width="2" clip-path="url(#pc8321618)"/><circle cx="64.0" cy="312.0" r="2.2" fill="var(--gc-accent-hud, #5ef1d2)" clip-path="url(#pc8321618)"/><circle cx="154.3" cy="312.0" r="2.2" fill="var(--gc-accent-hud, #5ef1d2)" clip-path="url(#pc8321618)"/><circle cx="244.6" cy="312.0" r="2.2" fill="var(--gc-accent-hud, #5ef1d2)" clip-path="url(#pc8321618)"/><circle cx="334.9" cy="126.5" r="2.2" fill="var(--gc-accent-hud, #5ef1d2)" clip-path="url(#pc8321618)"/><circle cx="425.1" cy="56.7" r="2.2" fill="var(--gc-accent-hud, #5ef1d2)" clip-path="url(#pc8321618)"/><circle cx="515.4" cy="39.3" r="2.2" fill="var(--gc-accent-hud, #5ef1d2)" clip-path="url(#pc8321618)"/><circle cx="605.7" cy="36.6" r="2.2" fill="var(--gc-accent-hud, #5ef1d2)" clip-path="url(#pc8321618)"/><circle cx="696.0" cy="36.0" r="2.2" fill="var(--gc-accent-hud, #5ef1d2)" clip-path="url(#pc8321618)"/><path d="M64.0 312.0 L154.3 312.0 L244.6 312.0 L334.9 303.2 L425.1 298.2 L515.4 297.6 L605.7 288.5 L696.0 290.5" fill="none" stroke="var(--gc-signal-amber, #f0b24c)" stroke-width="2" stroke-dasharray="6 4" clip-path="url(#pc8321618)"/><text x="692.0" y="282.472" text-anchor="end" class="w t b">A против A: ложная тревога</text><text x="470" y="170" text-anchor="start" class="a b t">B против A: эффект найден</text><text x="470" y="186" text-anchor="start" class="a t">n = 4: 67 %,  n = 5: 92 %</text></svg></div><figcaption class="gc-muted">При разбросе 8 % эффект −15 % находится в 67 % серий при 4 полётах на плечо и в 92 % при 5; при 1–3 полётах — никогда, а сравнение A с A даёт ложную тревогу примерно в 5 % серий.</figcaption><div class="diagram__hint">Схему можно прокрутить по горизонтали</div></figure>
+<p>«Не доказано» не значит «эффекта нет»: шум +6 % в лабораторной на пяти парах не виден, по формуле для него нужно около 30 полётов на плечо (16 · (0.08/0.06)² = 28.4). Такие побочные эффекты страхует порог: моторы не горячее, чем у A.</p>
+<h4 class="md-subheading">Справочная таблица (Betaflight 4.5)</h4>
+<div class="table-wrap md-table-wrap" tabindex="0"><table class="md-table"><thead><tr><th>Команда / параметр</th><th>Умолчание</th><th>Диапазон</th><th>Роль в A/B</th></tr></thead><tbody><tr><td data-label="Команда / параметр"><code>profile N</code></td><td data-label="Умолчание">0</td><td data-label="Диапазон">0–3</td><td data-label="Роль в A/B">выбрать PID-профиль, только на земле</td></tr><tr><td data-label="Команда / параметр"><code>rateprofile N</code></td><td data-label="Умолчание">0</td><td data-label="Диапазон">0–3</td><td data-label="Роль в A/B">выбрать профиль рейтов</td></tr><tr><td data-label="Команда / параметр"><code>diff all</code></td><td data-label="Умолчание">—</td><td data-label="Диапазон">—</td><td data-label="Роль в A/B">бэкап всех профилей; <code>diff</code> — только текущие PID-профиль и профиль рейтов</td></tr><tr><td data-label="Команда / параметр"><code>adjrange i 0 ch start end fn adjch center scale</code></td><td data-label="Умолчание">пусто</td><td data-label="Диапазон">i 0–29</td><td data-label="Роль в A/B">12 RATE_PROFILE, 17 PITCH_D, 20 ROLL_D, 8 PITCH_ROLL_D</td></tr><tr><td data-label="Команда / параметр"><code>profile_name</code>, <code>osd_pid_profile_name_pos</code></td><td data-label="Умолчание">пусто, скрыт</td><td data-label="Диапазон">до 8 символов</td><td data-label="Роль в A/B">видеть в OSD, что летит</td></tr><tr><td data-label="Команда / параметр"><code>d_roll</code> / <code>d_pitch</code></td><td data-label="Умолчание">40 / 46</td><td data-label="Диапазон">0–250 (слот подстройки — 0–200)</td><td data-label="Роль в A/B">в 4.5 верх D (2025.12: база 30/34, верх <code>d_max_*</code>)</td></tr><tr><td data-label="Команда / параметр"><code>d_min_roll</code> / <code>d_min_pitch</code></td><td data-label="Умолчание">30 / 34</td><td data-label="Диапазон">0–250</td><td data-label="Роль в A/B">база D в 4.5</td></tr><tr><td data-label="Команда / параметр"><code>blackbox_sample_rate</code></td><td data-label="Умолчание">1/4</td><td data-label="Диапазон">1/1 … 1/16</td><td data-label="Роль в A/B">≥ 1 кГц</td></tr><tr><td data-label="Команда / параметр"><code>blackbox_high_resolution</code></td><td data-label="Умолчание">OFF</td><td data-label="Диапазон">OFF, ON</td><td data-label="Роль в A/B">ON → gyro, setpoint, rcCommand ×10</td></tr><tr><td data-label="Команда / параметр"><code>debug_mode</code></td><td data-label="Умолчание">NONE</td><td data-label="Диапазон">таблица</td><td data-label="Роль в A/B">D_MIN (2025.12: D_MAX) — действующий D</td></tr><tr><td data-label="Команда / параметр"><code>vbat_sag_compensation</code></td><td data-label="Умолчание">0</td><td data-label="Диапазон">0–150 %</td><td data-label="Роль в A/B">одинаковый в A и B; только с ADC-датчиком напряжения</td></tr><tr><td data-label="Команда / параметр"><code>auto_profile_cell_count</code></td><td data-label="Умолчание">0</td><td data-label="Диапазон">−1…8</td><td data-label="Роль в A/B">≠ 0 сам меняет PID-профиль: на время A/B — 0</td></tr></tbody></table></div>
+<p>Профиль в профиль копируют Betaflight App (<code>MSP_COPY_PROFILE</code>, 183) и OSD-меню (COPY PROF); CLI-команды нет ни в 4.5, ни в 2025.12. Бэкап — <code>diff all</code>, не <code>diff</code>: тот сохраняет только текущие PID-профиль и профиль рейтов.</p>
+<h4 class="md-subheading">Кейс: два одинаковых 7&quot; с разными профилями</h4>
+<p>Два 7-дюймовых квадрокоптера одной сборки, на первом профиль A, на втором B, по логам у B пропвош на 12 % меньше. Вывод «B лучше» не следует: аппарат и профиль меняются вместе. Масштаб показал кейс <code>bf-pid</code>: один профиль SHARP дал на двух таких дронах bounce-back 2.9 % и 8.5 % — по разбору <code>bf-pid</code>, из-за разной резкости пилотирования; разница «дрон/сессия» оказалась больше разницы профилей (6.0 и 8.5 % на одном дроне).</p>
+<p>Правильный дизайн — перекрёстный (crossover): каждый аппарат летает оба профиля в своей сессии ABBA, эффект считается внутри аппарата (Δ₁, Δ₂). Совпали по знаку и прошли |Δ|/SE &gt; 2 — эффект переносится. Δ₁ ≈ −15 %, а Δ₂ ≈ 0 — ищи причину во втором аппарате (баланс моторов, ЦТ, пропы), прежде чем копировать профиль. «A на одном, B на другом» годится только для поиска гипотез.</p>
+<h4 class="md-subheading">Место в системе</h4>
+<ul><li><strong>Получает:</strong> лог с <code>setpoint</code>, <code>gyroADC</code>, <code>motor</code>, <code>rcCommand</code> и события подстроек (<code>bf-blackbox</code>); выверенную механику (<code>bf-motor-balance</code>); чистый спектр (<code>bf-filters</code>); кандидатов на изменение и метрики ощущений (<code>bf-pid</code>); слоты подстроек для переключения в полёте (<code>bf-adjustments</code>).</li><li><strong>Отдаёт:</strong> решение «принять B / оставить A / летать ещё» с эффектом, разбросом и p — в журнал настройки и <code>diff all</code> в репозитории (<code>eng-ci-configs</code>); оценку шума метрики (A/A-тест) — для планирования следующих изменений (<code>bf-pid</code>).</li><li><strong>Если ошибиться здесь:</strong> профиль «победил» по одной паре полётов, хотя разница была шумом. Через неделю он «перестал работать», и пилот крутит PID дальше (<code>bf-pid</code>), каждый раз принимая ветер за эффект. Или профиль скопировали на второй аппарат, а там другой ЦТ, и B хуже A (<code>bf-motor-balance</code>).</li></ul>
+
+<h2>Практика</h2>
+<p>Основной путь не требует железа. Скрипт режет CSV от <code>blackbox_decode</code> на манёвры по правилам из таблицы программы, считает метрики и печатает вердикт. Без своих логов он генерирует синтетические полёты с известной правдой: B снижает амплитуду пропвоша на 15 % и поднимает шум гироскопа на 6 %. Разброс: пропвош полёта ×e^N(0, 0.05), каждого спуска ×e^N(0, 0.08), шум ×e^N(0, 0.08); в сессиях ветер добавляет +3 % пропвоша на каждый следующий полёт. Нужен Python 3.8+ (<code>math.comb</code>), только стандартная библиотека.</p>
+<h4 class="md-subheading">Шаг 1. Предел теста и план</h4>
+<p>Посчитай руками до полётов. Минимальное p = 2 / C(2n, n): n = 4 → 2/70 = 0.0286, n = 3 → 2/20 = 0.100. План n ≈ 16 · (CV/Δ)²: CV 8 %, Δ 15 % → 4.55 → 5 полётов; CV 10 %, Δ 20 % → 4.0 → 4. Меньше 4 полётов на плечо при этом тесте не имеют смысла ни при каком эффекте.</p>
+<h4 class="md-subheading">Шаг 2. Скрипт</h4>
+<p>Сохрани как <code>ab_compare.py</code>. <code>make_flight</code> пишет CSV со столбцами <code>blackbox_decode</code> (<code>time (us)</code>, <code>rcCommand[3]</code>, <code>setpoint[0..3]</code>, <code>gyroADC[0..2]</code>, <code>motor[0..3]</code>), 1 кГц. Отклик гироскопа — звено второго порядка (16 Гц, демпфирование 0.55), пропвош — синус 30–45 Гц, нарастающий после сброса газа и затухающий с постоянной 0.2 с, начиная через 0.3 с после подхвата. Полосовой фильтр — биквад, прогнанный вперёд и назад, без сдвига фазы.</p>
+<pre class="cli-block"><code>#!/usr/bin/env python3
+&quot;&quot;&quot;A/B comparison of Betaflight tunes from blackbox_decode CSVs (one value per flight, then statistics).
+
+  python3 ab_compare.py --a A1.csv A2.csv ... --b B1.csv B2.csv ... [--target propwash] [--motor-range 158,2047]
+  python3 ab_compare.py --a LOG.01.csv@40-95 --b LOG.01.csv@95-150     # windows (s from log start), in-flight A/B
+  python3 ab_compare.py --demo                                         # synthetic flights with a known effect
+Standard library only. Metrics per flight (medians over manoeuvres of the scripted program):
+  noise     gyro roll+pitch RMS in 100-250 Hz on hover (|setpoint| &lt; 20 deg/s, throttle 1300-1600, &gt;= 2 s)
+  track     RMS(setpoint - gyro) roll on each roll manoeuvre (|setpoint| &gt; 200 deg/s for &gt; 50 ms) + 150 ms after
+  overshoot (max gyro / max setpoint - 1) * 100 % on the same windows, same sign as the setpoint
+  propwash  gyro roll+pitch RMS in 20-70 Hz from 0.3 s into a dive (throttle &lt; 1150 for &gt;= 0.5 s) to 0.6 s after it
+  headroom  100 % - 99th percentile of the highest motor output on a punch-out (throttle &gt; 1900 for &gt;= 0.3 s)
+The first and last 3 s of every log are ignored (take-off, landing). Thresholds are course guidelines, not firmware values.
+&quot;&quot;&quot;
+import argparse, csv, itertools, math, os, random, re, statistics, sys, tempfile
+
+LOWER_IS_BETTER = {&quot;noise&quot;: True, &quot;track&quot;: True, &quot;overshoot&quot;: True, &quot;propwash&quot;: True, &quot;headroom&quot;: False}
+UNIT = {&quot;noise&quot;: &quot;deg/s&quot;, &quot;track&quot;: &quot;deg/s&quot;, &quot;overshoot&quot;: &quot;%&quot;, &quot;propwash&quot;: &quot;deg/s&quot;, &quot;headroom&quot;: &quot;%&quot;}
+TRIM_S = 3.0
+
+
+# ---------------------------------------------------------------- reading and segmenting
+def read_csv(spec, scale=1.0):
+    path, _, win = spec.partition(&quot;@&quot;)
+    with open(path, newline=&quot;&quot;) as f:
+        rd = csv.reader(f)
+        head = [re.sub(r&quot;\s*\(.*\)$&quot;, &quot;&quot;, h.strip()) for h in next(rd)]
+        need = [&quot;time&quot;, &quot;rcCommand[3]&quot;, &quot;setpoint[0]&quot;, &quot;setpoint[1]&quot;, &quot;setpoint[2]&quot;, &quot;gyroADC[0]&quot;, &quot;gyroADC[1]&quot;]
+        need += [f&quot;motor[{i}]&quot; for i in range(4)]
+        miss = [n for n in need if n not in head]
+        if miss:
+            sys.exit(f&quot;{path}: no columns {miss}&quot;)
+        pos = [head.index(n) for n in need]
+        rows = [[float(r[p]) for p in pos] for r in rd if len(r) &gt;= len(head)]
+    c = {n: [r[k] for r in rows] for k, n in enumerate(need)}
+    for n in need[1:7]:                                   # rcCommand, setpoint, gyro x10 with high resolution
+        c[n] = [v / scale for v in c[n]]
+    t0 = c[&quot;time&quot;][0]
+    c[&quot;t&quot;] = [(v - t0) / 1e6 for v in c[&quot;time&quot;]]
+    lo, hi = (0.0, 1e9)
+    if win:
+        lo, hi = (float(x) for x in win.split(&quot;-&quot;))
+    keep = [i for i, t in enumerate(c[&quot;t&quot;]) if max(lo, TRIM_S) &lt;= t &lt;= min(hi, c[&quot;t&quot;][-1] - TRIM_S)]
+    c[&quot;keep&quot;] = set(keep)
+    c[&quot;fs&quot;] = (len(c[&quot;t&quot;]) - 1) / (c[&quot;t&quot;][-1] - c[&quot;t&quot;][0])
+    return c
+
+
+def runs(c, cond, min_s):
+    &quot;&quot;&quot;Index ranges [i0, i1) where cond(i) holds for at least min_s seconds, inside the kept part.&quot;&quot;&quot;
+    out, start = [], None
+    for i in range(len(c[&quot;t&quot;]) + 1):
+        ok = i &lt; len(c[&quot;t&quot;]) and i in c[&quot;keep&quot;] and cond(i)
+        if ok and start is None:
+            start = i
+        elif not ok and start is not None:
+            if c[&quot;t&quot;][i - 1] - c[&quot;t&quot;][start] &gt;= min_s:
+                out.append((start, i))
+            start = None
+    return out
+
+
+def bandpass(x, fs, f1, f2):
+    &quot;&quot;&quot;RBJ band-pass biquad (0 dB at the centre sqrt(f1*f2)), run forward and backward: no phase shift.&quot;&quot;&quot;
+    f0 = math.sqrt(f1 * f2)
+    q = f0 / (f2 - f1)
+    w = 2 * math.pi * f0 / fs
+    al = math.sin(w) / (2 * q)
+    b0, b2, a0, a1, a2 = al, -al, 1 + al, -2 * math.cos(w), 1 - al
+
+    def run(s):
+        y, x1, x2, y1, y2 = [], 0.0, 0.0, 0.0, 0.0
+        for v in s:
+            o = (b0 * v + b2 * x2 - a1 * y1 - a2 * y2) / a0
+            x2, x1, y2, y1 = x1, v, y1, o
+            y.append(o)
+        return y
+    return run(run(x)[::-1])[::-1]
+
+
+def rms(xs):
+    return math.sqrt(sum(v * v for v in xs) / len(xs)) if xs else float(&quot;nan&quot;)
+
+
+def flight_metrics(c, lo, hi):
+    fs, n = c[&quot;fs&quot;], len(c[&quot;t&quot;])
+    thr, sp, g = c[&quot;rcCommand[3]&quot;], c[&quot;setpoint[0]&quot;], c[&quot;gyroADC[0]&quot;]
+    m = {}
+    hover = runs(c, lambda i: max(abs(c[f&quot;setpoint[{a}]&quot;][i]) for a in range(3)) &lt; 20 and 1300 &lt;= thr[i] &lt;= 1600, 2.0)
+    hp = [bandpass(c[f&quot;gyroADC[{a}]&quot;], fs, 100, 250) for a in (0, 1)]
+    m[&quot;noise&quot;] = statistics.median([rms(hp[0][a:b] + hp[1][a:b]) for a, b in hover]) if hover else float(&quot;nan&quot;)
+    man = runs(c, lambda i: abs(sp[i]) &gt; 200, 0.05)
+    tr, ov = [], []
+    for a, b in man:
+        b2 = min(n, b + int(0.15 * fs))
+        tr.append(rms([sp[i] - g[i] for i in range(a, b2)]))
+        s = 1 if sp[a] &gt; 0 else -1
+        ov.append((max(s * g[i] for i in range(a, b2)) / max(s * sp[i] for i in range(a, b)) - 1) * 100)
+    m[&quot;track&quot;] = statistics.median(tr) if tr else float(&quot;nan&quot;)
+    m[&quot;overshoot&quot;] = statistics.median(ov) if ov else float(&quot;nan&quot;)
+    dives = runs(c, lambda i: thr[i] &lt; 1150, 0.5)
+    bp = [bandpass(c[f&quot;gyroADC[{a}]&quot;], fs, 20, 70) for a in (0, 1)]
+    pw = []
+    for a, b in dives:
+        a2, b2 = a + int(0.3 * fs), min(n, b + int(0.6 * fs))
+        pw.append(rms(bp[0][a2:b2] + bp[1][a2:b2]))
+    m[&quot;propwash&quot;] = statistics.median(pw) if pw else float(&quot;nan&quot;)
+    punch = runs(c, lambda i: thr[i] &gt; 1900, 0.3)
+    hr = []
+    for a, b in punch:
+        top = sorted(max((c[f&quot;motor[{k}]&quot;][i] - lo) / (hi - lo) * 100 for k in range(4)) for i in range(a, b))
+        hr.append(100 - top[int(0.99 * (len(top) - 1))])
+    m[&quot;headroom&quot;] = statistics.median(hr) if hr else float(&quot;nan&quot;)
+    m[&quot;_count&quot;] = (len(hover), len(man), len(dives), len(punch))
+    return m
+
+
+# ---------------------------------------------------------------- statistics
+def perm_p(a, b, limit=20000, seed=7):
+    &quot;&quot;&quot;Two-sided permutation test on the difference of means: share of relabellings at least as extreme.&quot;&quot;&quot;
+    pool, na = a + b, len(a)
+    obs = abs(statistics.fmean(b) - statistics.fmean(a))
+    if math.comb(len(pool), na) &lt;= limit:
+        splits = itertools.combinations(range(len(pool)), na)
+    else:
+        rnd = random.Random(seed)
+        splits = (rnd.sample(range(len(pool)), na) for _ in range(limit))
+    hit = tot = 0
+    for idx in splits:
+        s = set(idx)
+        xa = [pool[i] for i in s]
+        xb = [pool[i] for i in range(len(pool)) if i not in s]
+        hit += abs(statistics.fmean(xb) - statistics.fmean(xa)) &gt;= obs - 1e-12
+        tot += 1
+    return hit / tot
+
+
+def compare(a, b):
+    ma, mb = statistics.fmean(a), statistics.fmean(b)
+    d = mb - ma
+    if len(a) &lt; 2 or len(b) &lt; 2:
+        return dict(ma=ma, mb=mb, d=d, rel=d / ma * 100, sp=float(&quot;nan&quot;), se=float(&quot;nan&quot;), z=float(&quot;nan&quot;), p=perm_p(a, b))
+    sp = math.sqrt(((len(a) - 1) * statistics.variance(a) + (len(b) - 1) * statistics.variance(b)) / (len(a) + len(b) - 2))
+    se = sp * math.sqrt(1 / len(a) + 1 / len(b))
+    return dict(ma=ma, mb=mb, d=d, rel=d / ma * 100, sp=sp, se=se, z=abs(d) / se if se else float(&quot;inf&quot;), p=perm_p(a, b))
+
+
+def verdict(r, lower_better):
+    if math.isnan(r[&quot;se&quot;]):
+        return &quot;no spread estimate (1 flight per arm)&quot;
+    if r[&quot;z&quot;] &lt;= 2 or r[&quot;p&quot;] &gt;= 0.05:
+        return &quot;within noise&quot;
+    better = (r[&quot;d&quot;] &lt; 0) == lower_better
+    return &quot;B better&quot; if better else &quot;B WORSE&quot;
+
+
+def report(title, A, B, target):
+    print(f&quot;== {title}: {len(A)} flight(s) A, {len(B)} flight(s) B, target metric &#x27;{target}&#x27;&quot;)
+    print(f&quot;  {&#x27;metric&#x27;:9s} {&#x27;A mean&#x27;:&gt;8s} {&#x27;B mean&#x27;:&gt;8s} {&#x27;B-A&#x27;:&gt;7s} {&#x27;s_p&#x27;:&gt;6s} {&#x27;|d|/SE&#x27;:&gt;6s} {&#x27;p&#x27;:&gt;6s}  verdict&quot;)
+    res = {}
+    for k in LOWER_IS_BETTER:
+        a, b = [f[k] for f in A], [f[k] for f in B]
+        r = compare(a, b)
+        res[k] = (r, verdict(r, LOWER_IS_BETTER[k]))
+        print(f&quot;  {k:9s} {r[&#x27;ma&#x27;]:8.2f} {r[&#x27;mb&#x27;]:8.2f} {r[&#x27;rel&#x27;]:+6.1f}% {r[&#x27;sp&#x27;]:6.2f} {r[&#x27;z&#x27;]:6.2f} {r[&#x27;p&#x27;]:6.3f}  {res[k][1]}&quot;)
+    worse = [k for k, (r, v) in res.items() if v == &quot;B WORSE&quot;]
+    if res[target][1] == &quot;B better&quot; and not worse:
+        print(f&quot;  DECISION: accept B ({target} {res[target][0][&#x27;rel&#x27;]:+.1f} %, no side metric worse beyond noise)&quot;)
+    elif res[target][1] == &quot;B better&quot;:
+        print(f&quot;  DECISION: trade-off, B improves {target} but worsens {&#x27;, &#x27;.join(worse)}: decide by the task&quot;)
+    else:
+        print(f&quot;  DECISION: keep A, effect on {target} not shown; fly more pairs or drop the change&quot;)
+    return res
+
+
+# ---------------------------------------------------------------- synthetic flights
+def lognorm(rnd, cv):
+    return math.exp(rnd.gauss(0, cv))
+
+
+def make_flight(path, arm, seed, slot=0, drift=0.0, fs=1000, dur=26.0, lo=158, hi=2047):
+    &quot;&quot;&quot;Scripted program: take-off, hover 2-6 s, five roll steps +-500 deg/s at 6.5-10.5 s, punch-out 12.3-13.5 s,
+    three zero-throttle dives at 14, 17, 20 s (1.2 s cut, 0.8 s recovery at 1700), hover, landing.
+    Arm B: propwash amplitude x0.85, gyro noise x1.06. drift: +share of propwash per flight slot (wind rising).&quot;&quot;&quot;
+    rnd = random.Random(seed)
+    pw_amp = 40.0 * (0.85 if arm == &quot;B&quot; else 1.0) * lognorm(rnd, 0.05) * (1 + drift * slot)
+    noise = 3.0 * (1.06 if arm == &quot;B&quot; else 1.0) * lognorm(rnd, 0.08)
+    zeta, wn = 0.55 * lognorm(rnd, 0.05), 2 * math.pi * 16 * lognorm(rnd, 0.04)
+    dive_amp = [lognorm(rnd, 0.08) for _ in range(3)]
+    dive_f = [rnd.uniform(30, 45) for _ in range(3)]
+    punch_top = 93.0 * lognorm(rnd, 0.01)
+    x = v = 0.0
+    with open(path, &quot;w&quot;, newline=&quot;&quot;) as f:
+        wr = csv.writer(f)
+        wr.writerow([&quot;loopIteration&quot;, &quot;time (us)&quot;, &quot;rcCommand[3]&quot;] + [f&quot;setpoint[{a}]&quot; for a in range(4)]
+                    + [f&quot;gyroADC[{a}]&quot; for a in range(3)] + [f&quot;motor[{i}]&quot; for i in range(4)])
+        for n in range(int(dur * fs)):
+            t = n / fs
+            thr, sp, env, fpw, kd = 1450.0, 0.0, 0.0, 35.0, 0
+            if t &lt; 2:
+                thr = 1000 + 225 * t
+            elif 6.5 &lt;= t &lt; 11.5 and (t - 6.5) % 1.0 &lt; 0.25:
+                sp = 500.0 if int(t - 6.5) % 2 == 0 else -500.0
+            elif 12.3 &lt;= t &lt; 13.5:
+                thr = 2000.0
+            elif 14 &lt;= t &lt; 22:
+                kd = int((t - 14) // 3)
+                u = (t - 14) - 3 * kd
+                thr = 1000.0 if u &lt; 1.2 else (1700.0 if u &lt; 2.0 else 1450.0)
+                env = 0 if u &lt; 0.4 else (min(1, (u - 0.4) / 0.8) if u &lt; 1.5 else math.exp(-(u - 1.5) / 0.2))
+                fpw = dive_f[kd]
+            elif t &gt;= 24.5:
+                thr = 1450 - 300 * (t - 24.5)
+            acc = wn * wn * (sp - x) - 2 * zeta * wn * v              # second-order rate response
+            v += acc / fs
+            x += v / fs
+            burst = pw_amp * dive_amp[kd] * env
+            g0 = x + burst * math.sin(2 * math.pi * fpw * t) + rnd.gauss(0, noise)
+            g1 = burst * math.sin(2 * math.pi * fpw * 1.07 * t + 1.3) + rnd.gauss(0, noise)
+            base = punch_top if thr &gt; 1900 else 8 + 0.085 * (thr - 1000)
+            mot = []
+            for s in (-1, -1, 1, 1):                                # roll signs of mixerQuadX
+                p = base + s * 0.015 * (sp - g0) + rnd.gauss(0, 1.0)
+                mot.append(int(round(lo + max(0.0, min(100.0, p)) / 100 * (hi - lo))))
+            wr.writerow([n, int(t * 1e6), int(thr), round(sp), 0, 0, int(thr)] + [round(g0), round(g1), 0] + mot)
+
+
+def demo():
+    d = tempfile.mkdtemp(prefix=&quot;bfab_&quot;)
+    gen = lambda name, arm, seed, slot=0, drift=0.0: (make_flight(os.path.join(d, name), arm, seed, slot, drift),
+                                                     os.path.join(d, name))[1]
+    met = lambda p: flight_metrics(read_csv(p), 158, 2047)
+    print(&quot;Synthetic truth: B = propwash x0.85 (-15 %), gyro noise x1.06; flight-to-flight scatter as in real sessions&quot;)
+    order = &quot;ABBAABBAAB&quot;
+    sess = [(arm, met(gen(f&quot;S1_{k:02d}{arm}.csv&quot;, arm, 100 + k, k, 0.03))) for k, arm in enumerate(order)]
+    c = sess[0][1][&quot;_count&quot;]
+    print(f&quot;segments found in flight 1: hover {c[0]}, roll manoeuvres {c[1]}, dives {c[2]}, punch-outs {c[3]}&quot;)
+    print(&quot;session 1, order &quot; + order + &quot;, wind rising +3 % propwash per flight:&quot;)
+    print(&quot;  propwash per flight: &quot; + &quot;  &quot;.join(f&quot;{a}{k + 1} {m[&#x27;propwash&#x27;]:.2f}&quot; for k, (a, m) in enumerate(sess)))
+    report(&quot;1 flight per arm (A1, B2)&quot;, [sess[0][1]], [sess[1][1]], &quot;propwash&quot;)
+    report(&quot;5 flights per arm, ABBA order&quot;, [m for a, m in sess if a == &quot;A&quot;], [m for a, m in sess if a == &quot;B&quot;], &quot;propwash&quot;)
+    blk = [(arm, met(gen(f&quot;S2_{k:02d}{arm}.csv&quot;, arm, 200 + k, k, 0.03))) for k, arm in enumerate(&quot;AAAAABBBBB&quot;)]
+    report(&quot;5 flights per arm, blocked AAAAA BBBBB, same wind drift&quot;, [m for a, m in blk if a == &quot;A&quot;],
+           [m for a, m in blk if a == &quot;B&quot;], &quot;propwash&quot;)
+    print(&quot;== power: draws from pools of 30 flights per arm (no drift), 400 draws with replacement per n, target propwash&quot;)
+    pools = {arm: [met(gen(f&quot;P_{arm}{k:02d}.csv&quot;, arm[0], 1000 * (i + 1) + k))[&quot;propwash&quot;] for k in range(30)]
+             for i, arm in enumerate((&quot;A&quot;, &quot;B&quot;, &quot;A2&quot;))}
+    cv = statistics.stdev(pools[&quot;A&quot;]) / statistics.fmean(pools[&quot;A&quot;]) * 100
+    print(f&quot;  flight-to-flight CV of propwash in pool A: {cv:.1f} %&quot;)
+    rnd = random.Random(42)
+    print(&quot;  n/arm  B vs A: detected  median effect  5..95 % of estimates   A vs A2 (no effect): false alarm&quot;)
+    for n in range(1, 9):
+        det = fa = 0
+        est = []
+        for _ in range(400):
+            a, b, a2 = (rnd.choices(pools[k], k=n) for k in (&quot;A&quot;, &quot;B&quot;, &quot;A2&quot;))
+            r = compare(a, b)
+            est.append(r[&quot;rel&quot;])
+            det += verdict(r, True) == &quot;B better&quot;
+            fa += verdict(compare(a, a2), True) != &quot;within noise&quot; and n &gt; 1
+        est.sort()
+        print(f&quot;  {n:5d}  {det / 4:16.1f} % {statistics.median(est):+12.1f} % {est[20]:+9.1f} .. {est[379]:+6.1f} %&quot;
+              f&quot; {fa / 4:27.1f} %&quot;)
+
+
+if __name__ == &quot;__main__&quot;:
+    ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap.add_argument(&quot;--a&quot;, nargs=&quot;*&quot;, default=[])
+    ap.add_argument(&quot;--b&quot;, nargs=&quot;*&quot;, default=[])
+    ap.add_argument(&quot;--target&quot;, default=&quot;propwash&quot;, choices=list(LOWER_IS_BETTER))
+    ap.add_argument(&quot;--motor-range&quot;, default=&quot;158,2047&quot;, help=&quot;log header line motorOutput: low,high&quot;)
+    ap.add_argument(&quot;--hires&quot;, action=&quot;store_true&quot;, help=&quot;blackbox_high_resolution = ON: rcCommand, setpoint, gyro x10&quot;)
+    ap.add_argument(&quot;--demo&quot;, action=&quot;store_true&quot;)
+    o = ap.parse_args()
+    if o.demo or not (o.a and o.b):
+        demo()
+        sys.exit()
+    lo, hi = (float(v) for v in o.motor_range.split(&quot;,&quot;))
+    sc = 10.0 if o.hires else 1.0
+    A = [flight_metrics(read_csv(p, sc), lo, hi) for p in o.a]
+    B = [flight_metrics(read_csv(p, sc), lo, hi) for p in o.b]
+    for name, S, files in ((&quot;A&quot;, A, o.a), (&quot;B&quot;, B, o.b)):
+        for m, p in zip(S, files):
+            print(f&quot;{name} {os.path.basename(p)}: &quot; + &quot;  &quot;.join(f&quot;{k} {m[k]:.2f}&quot; for k in LOWER_IS_BETTER)
+                  + f&quot;  segments h/m/d/p {m[&#x27;_count&#x27;]}&quot;)
+    report(&quot;own logs&quot;, A, B, o.target)</code></pre>
+<h4 class="md-subheading">Шаг 3. Прогон на синтетике</h4>
+<p><code>python3 ab_compare.py --demo</code>. Генератор детерминирован (<code>random.Random(seed)</code>), прогон занимает около минуты, вывод должен совпасть до сотых:</p>
+<pre class="cli-block"><code>Synthetic truth: B = propwash x0.85 (-15 %), gyro noise x1.06; flight-to-flight scatter as in real sessions
+segments found in flight 1: hover 1, roll manoeuvres 5, dives 3, punch-outs 1
+session 1, order ABBAABBAAB, wind rising +3 % propwash per flight:
+  propwash per flight: A1 18.20  B2 15.80  B3 16.04  A4 20.66  A5 22.48  B6 17.99  B7 18.25  A8 22.58  A9 24.50  B10 18.10
+== 1 flight per arm (A1, B2): 1 flight(s) A, 1 flight(s) B, target metric &#x27;propwash&#x27;
+  metric      A mean   B mean     B-A    s_p |d|/SE      p  verdict
+  noise         1.42     1.35   -5.4%    nan    nan  1.000  no spread estimate (1 flight per arm)
+  track       108.43   106.74   -1.6%    nan    nan  1.000  no spread estimate (1 flight per arm)
+  overshoot    12.00     8.20  -31.7%    nan    nan  1.000  no spread estimate (1 flight per arm)
+  propwash     18.20    15.80  -13.2%    nan    nan  1.000  no spread estimate (1 flight per arm)
+  headroom      5.29     3.55  -33.0%    nan    nan  1.000  no spread estimate (1 flight per arm)
+  DECISION: keep A, effect on propwash not shown; fly more pairs or drop the change
+== 5 flights per arm, ABBA order: 5 flight(s) A, 5 flight(s) B, target metric &#x27;propwash&#x27;
+  metric      A mean   B mean     B-A    s_p |d|/SE      p  verdict
+  noise         1.37     1.35   -1.6%   0.12   0.29  0.778  within noise
+  track       107.13   105.81   -1.2%   2.48   0.84  0.460  within noise
+  overshoot    11.56    10.24  -11.4%   1.87   1.11  0.294  within noise
+  propwash     21.68    17.23  -20.5%   1.88   3.73  0.016  B better
+  headroom      3.90     4.54  +16.6%   1.17   0.88  0.460  within noise
+  DECISION: accept B (propwash -20.5 %, no side metric worse beyond noise)
+== 5 flights per arm, blocked AAAAA BBBBB, same wind drift: 5 flight(s) A, 5 flight(s) B, target metric &#x27;propwash&#x27;
+  metric      A mean   B mean     B-A    s_p |d|/SE      p  verdict
+  noise         1.30     1.42   +8.8%   0.09   1.98  0.079  within noise
+  track       105.03   105.91   +0.8%   1.54   0.90  0.444  within noise
+  overshoot    12.68    11.84   -6.6%   1.49   0.89  0.413  within noise
+  propwash     19.04    18.45   -3.1%   1.66   0.56  0.595  within noise
+  headroom      4.30     3.78  -12.1%   0.80   1.03  0.333  within noise
+  DECISION: keep A, effect on propwash not shown; fly more pairs or drop the change
+== power: draws from pools of 30 flights per arm (no drift), 400 draws with replacement per n, target propwash
+  flight-to-flight CV of propwash in pool A: 7.9 %
+  n/arm  B vs A: detected  median effect  5..95 % of estimates   A vs A2 (no effect): false alarm
+      1               0.0 %        -16.7 %     -29.4 ..   -3.4 %                         0.0 %
+      2               0.0 %        -16.3 %     -26.5 ..   -7.1 %                         0.0 %
+      3               0.0 %        -16.2 %     -24.3 ..   -7.9 %                         0.0 %
+      4              67.2 %        -16.2 %     -23.0 ..   -8.9 %                         3.2 %
+      5              92.5 %        -16.2 %     -22.3 ..  -10.1 %                         5.0 %
+      6              98.8 %        -17.1 %     -22.8 ..  -11.2 %                         5.2 %
+      7              99.8 %        -16.6 %     -22.6 ..  -11.4 %                         8.5 %
+      8             100.0 %        -16.7 %     -21.0 ..  -11.6 %                         7.8 %</code></pre>
+<p>Разбор. <strong>Одна пара</strong>: пропвош −13.2 %, похоже на правду, но рядом overshoot −31.7 % и headroom −33.0 %, которые B не меняет. Без разброса внутри плеча эти числа не различить, p = 1.000. <strong>ABBA, 5 + 5</strong>: пропвош −20.5 %, |Δ|/SE = 3.73, p = 0.016, B принят. Шум +6 %, заложенный в B, остался «в пределах шума», его страхует правило про температуру моторов. −20.5 % при правде −15 % — обычный разброс серии: при n = 5 90 % оценок лежат от −22.3 до −10.1 %. <strong>Блоки</strong> с тем же ветром: −3.1 %, p = 0.595, эффект потерян — дрейф у A +6 %, у B +21 %. <strong>Мощность</strong>: при n ≤ 3 обнаружений 0 % (предел теста), при n = 4 — 67 %, при n = 5 — 92.5 %. Ложная тревога A против A2 около 5 % (3–8.5 %) — цена порога p &lt; 0.05. Даже пулы по 30 полётов дают медиану −16…−17 %, а не ровно −15 %.</p>
+<h4 class="md-subheading">Шаг 4. Свои логи</h4>
+<a class="gc-callout lesson-card" data-state="ok" href="../m/bf-blackbox.html"><span class="gc-label gc-muted">Отдельный урок →</span><strong class="lesson-card__title">Blackbox</strong><span class="lesson-card__why">Запись лога, частота, поля <code>blackbox_disable_*</code> и расшифровка в CSV разобраны там: без полей <code>setpoint</code> и <code>motor</code> скрипту нечего считать.</span></a>
+<p><code>blackbox_decode LOG00001.BFL</code> даёт <code>LOG00001.01.csv</code> и <code>LOG00001.01.event</code>. При <code>grep -a blackbox_high_resolution LOG00001.BFL</code> = 1 запускай с <code>--hires</code>; диапазон моторов — <code>grep -a motorOutput LOG00001.BFL</code> → <code>--motor-range</code>. Отдельные полёты: <code>python3 ab_compare.py --a A1.csv A4.csv A5.csv A8.csv A9.csv --b B2.csv B3.csv B6.csv B7.csv B10.csv</code>. Тумблер в одном полёте: время события из <code>.event</code> минус первое <code>time (us)</code> CSV, делённое на 10⁶, — секунды от начала лога, их передаёшь окнами: <code>--a LOG.01.csv@40-75 LOG.01.csv@110-145 --b LOG.01.csv@75-110 …</code>; в каждом окне — вся программа. Строка <code>segments h/m/d/p</code> с нулём значит, что манёвр не распознан и его метрика будет <code>nan</code>.</p>
+<h4 class="md-subheading">Переход на реальное железо</h4>
+<p><strong>Дома, пропы сняты.</strong> <code>diff all</code> в файл с датой; механика (<code>bf-motor-balance</code>) и спектр (<code>bf-filters</code>) в порядке; гипотеза, метрика, порог и план n записаны в журнал. Отдельные полёты: B в соседнем PID-профиле, <code>profile_name</code> «A» и «B», имя профиля в OSD. Тумблер: два слота <code>adjrange</code> из теории, эндпоинты 1000/2000 во вкладке Receiver, <code>get d_roll</code> в обоих положениях (40 и 46), <code>debug_mode = D_MIN</code>. Лог не реже 1 кГц, flash очищена.</p>
+<p><strong>Поле.</strong> Ветер до 5 м/с, одна партия АКБ, одни пропы. Порядок ABBA ABBA AB, 5 полётов на плечо, одинаковая пауза (5 мин), посадка на одном напряжении (например, 3.6 В на банку под нагрузкой, ориентир курса). Перед взлётом — профиль по OSD (если ставит помощник, пилот не смотрит). После каждого полёта — строка в журнале:</p>
+<div class="table-wrap md-table-wrap" tabindex="0"><table class="md-table"><thead><tr><th>№</th><th>Время</th><th>Плечо</th><th>Профиль / значение</th><th>АКБ № и V покоя после</th><th>Ветер, м/с</th><th>Т моторов, °C</th><th>Оценка пилота 1–5</th><th>Лог</th><th>Заметки</th></tr></thead><tbody><tr><td data-label="№">1</td><td data-label="Время">10:05</td><td data-label="Плечо">A</td><td data-label="Профиль / значение">profile 0 «A»</td><td data-label="АКБ № и V покоя после">3, 3.78</td><td data-label="Ветер, м/с">2–3</td><td data-label="Т моторов, °C">41</td><td data-label="Оценка пилота 1–5">3</td><td data-label="Лог">LOG00001</td><td data-label="Заметки">—</td></tr><tr><td data-label="№">2</td><td data-label="Время">10:12</td><td data-label="Плечо">B</td><td data-label="Профиль / значение">profile 1 «B»</td><td data-label="АКБ № и V покоя после">4, 3.77</td><td data-label="Ветер, м/с">3</td><td data-label="Т моторов, °C">44</td><td data-label="Оценка пилота 1–5">4</td><td data-label="Лог">LOG00002</td><td data-label="Заметки">порыв на 2-м спуске</td></tr></tbody></table></div>
+<p><strong>Прерви полёт и садись, если:</strong> появились осцилляции или «звон», которых у A не было; OSD показывает не тот профиль или не то значение; моторы после посадки не удержать пальцем 5 с (<code>bf-pid</code>) — тогда B отклоняется без статистики; задел что-то или сменил проп — сессия заново с A. После сессии: слоты <code>adjrange</code> удалены, принятое значение вписано через <code>set</code>, <code>diff all</code> «после» и вердикт скрипта — в журнале.</p>
+<p>Самопроверка: лабораторная выполнена, когда:</p>
+<ul><li><strong>Расчёт (основной путь):</strong> минимальное p для n = 3, 4, 5 равно 0.100, 0.0286, 0.0079 (±0.0001); план для CV 8 %, Δ 15 % — 5 полётов.</li><li><strong>Расчёт:</strong> вывод <code>--demo</code> совпал с выводом выше: одна пара — p = 1.000 по всем метрикам; ABBA — пропвош −20.5 %, |Δ|/SE = 3.73, p = 0.016, <code>accept B</code>; блоки — −3.1 %, p = 0.595, <code>keep A</code>; мощность при n = 4 и 5 — 67.2 % и 92.5 %.</li><li><strong>Расчёт:</strong> ты своими словами записал, почему блоки потеряли эффект, а ABBA — нет, и сверил с эталоном ниже.</li><li><strong>Железо:</strong> сессия 5 + 5 полётов в порядке ABBA с заполненным журналом. Скрипт на твоих логах нашёл все сегменты в каждом полёте (h/m/d/p ≥ 1/1/1/1), вердикт записан вместе с |Δ|/SE и p, температура моторов в B не выше, чем в A.</li></ul>
+<p><strong>Эталон для самопроверки.</strong> В блоках плечо B летало позже и получило от ветра на 15 % пропвоша больше, чем A (+21 % против +6 %), — почти ровно столько, сколько эффект (1.21/1.06 = +14.2 %, 0.85 · 1.142 = 0.97). В ABBA дрейф плеч +13.2 % и +13.8 %, эффект остаётся. Типичные ошибки. «На одной паре −13 %, значит работает» — без разброса это не отличить от −33 % по запасу моторов, который B не меняет. «Три полёта, p = 0.10, почти значимо» — при n = 3 меньше 0.10 не бывает, это предел теста. «Шум не вырос, раз within noise» — +6 % заложены в B, пять пар их просто не видят.</p>
+
+<h2>Діагностика</h2>
+<div class="diag-groups"><article class="diag-item"><h4><strong>Симптом:</strong> вчерашний «лучший» профиль сегодня не лучше</h4><ul><li>Возможная причина: решение принято по одной паре полётов, разница была шумом или ветром.</li><li>Что сделать: A/A-тест для оценки шума метрики, затем 4–5 полётов на плечо в порядке ABBA.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> скрипт пишет <code>nan</code> по одной метрике</h4><ul><li>Возможная причина: манёвр не попал в правило: спуск короче 0.5 с, броски слабее 200 °/с, панч ниже 1900, висение короче 2 с; или окно <code>@t0-t1</code> его обрезало.</li><li>Что видно в логе: в строке <code>segments h/m/d/p</code> ноль на месте манёвра.</li><li>Что сделать: лети по программе с запасом по длительности, проверь окна; при <code>blackbox_high_resolution = 1</code> запускай с <code>--hires</code>.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> тумблер даёт <code>d_roll</code> 41 вместо 40 (положение A) или 45 вместо 46 (положение B)</h4><ul><li>Возможная причина: эндпоинты канала не доходят до 1000/2000 мкс, деление C отбрасывает дробную часть.</li><li>Что сделать: эндпоинты в пульте до 988–1000 и 2000–2012 мкс, проверка <code>get d_roll</code> в обоих положениях.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> в полёте не получается переключить PID-профиль тумблером</h4><ul><li>Возможная причина: в 4.5 и 2025.12 такой функции нет, в режиме выбора <code>adjrange</code> умеет только профиль рейтов, OSD и LED, HORIZON_STRENGTH и PID_AUDIO (в 2025.12 ещё LED_DIMMER).</li><li>Что сделать: отдельные полёты с выбором профиля на земле или абсолютный слот на один коэффициент.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> профиль сам меняется после смены АКБ</h4><ul><li>Возможная причина: <code>auto_profile_cell_count</code> ≠ 0 в одном из профилей.</li><li>Что сделать: на время эксперимента 0 во всех профилях, проверка имени профиля в OSD перед взлётом.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> эффект на одном аппарате есть, на втором такого же нет</h4><ul><li>Возможная причина: аппараты отличаются механикой или пропами сильнее, чем профили.</li><li>Что сделать: перекрёстный дизайн, эффект внутри каждого аппарата; баланс моторов по логу (<code>bf-motor-balance</code>).</li></ul></article></div>
+
+<h2>Заметки</h2>
+<p>Пороги |Δ|/SE &gt; 2, p &lt; 0.05, 80 %, правила разметки манёвров, полосы 100–250 и 20–70 Гц, обрезка 3 с, посадочное напряжение и пауза — ориентиры курса, в прошивке их нет. n ≈ 16 · (CV/Δ)² — нормальное приближение. Числа практики получены на синтетике, CV пропвоша около 8 % — допущение модели; свой разброс меряется A/A-тестом. Строки журнала — пример заполнения, не данные сессии.</p>
+
+<h2>Чек-лист</h2>
+<ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="bf-tuning-method:0"><span>Механика и фильтры в порядке до эксперимента</span></label></li><li><label><input type="checkbox" data-check-id="bf-tuning-method:1"><span>Гипотеза, целевая метрика, порог и план n записаны до полётов</span></label></li><li><label><input type="checkbox" data-check-id="bf-tuning-method:2"><span>B отличается от A одним параметром; <code>diff all</code> до и после</span></label></li><li><label><input type="checkbox" data-check-id="bf-tuning-method:3"><span>Одна программа полёта, одни пропы, одна партия АКБ, ветер до 5 м/с</span></label></li><li><label><input type="checkbox" data-check-id="bf-tuning-method:4"><span>Порядок ABA или ABBA, не блоки; не меньше 4 полётов на плечо</span></label></li><li><label><input type="checkbox" data-check-id="bf-tuning-method:5"><span>Профиль или значение проверены по OSD перед каждым взлётом</span></label></li><li><label><input type="checkbox" data-check-id="bf-tuning-method:6"><span>Вердикт: |Δ|/SE &gt; 2 и p &lt; 0.05 по целевой метрике, побочные не хуже, моторы не горячее</span></label></li><li><label><input type="checkbox" data-check-id="bf-tuning-method:7"><span>Слоты <code>adjrange</code> после эксперимента удалены, принятое значение вписано через <code>set</code></span></label></li></ul>
+
+<h2>Джерела</h2>
+<ul class="refs"><li><a href="https://raw.githubusercontent.com/betaflight/betaflight/4.5.3/src/main/fc/rc_adjustments.c" target="_blank" rel="noopener noreferrer">Betaflight `fc/rc_adjustments.c`, 4.5.3 (defaultAdjustmentConfigs, режим выбора RATE_PROFILE, абсолютный режим, событие подстройки)</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://raw.githubusercontent.com/betaflight/betaflight/4.5.3/src/main/fc/rc_adjustments.h" target="_blank" rel="noopener noreferrer">Betaflight `fc/rc_adjustments.h`, 4.5.3 (список функций, нет функции PID-профиля, 30 слотов)</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://raw.githubusercontent.com/betaflight/betaflight/4.5.3/src/main/cli/cli.c" target="_blank" rel="noopener noreferrer">Betaflight `cli/cli.c`, 4.5.3 (adjrange, diff, dump, profile, rateprofile)</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://raw.githubusercontent.com/betaflight/betaflight/4.5.3/src/main/cli/settings.c" target="_blank" rel="noopener noreferrer">Betaflight `cli/settings.c`, 4.5.3 (blackbox_*, debug_mode, vbat_sag_compensation, d_roll, d_min_roll, имена профилей)</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://raw.githubusercontent.com/betaflight/betaflight/4.5.3/src/main/blackbox/blackbox.c" target="_blank" rel="noopener noreferrer">Betaflight `blackbox/blackbox.c`, 4.5.3 (поля setpoint, gyroADC, motor; заголовки rollPID, d_min)</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://raw.githubusercontent.com/betaflight/betaflight/4.5.3/src/main/fc/rc_controls.c" target="_blank" rel="noopener noreferrer">Betaflight `fc/rc_controls.c`, 4.5.3 (выбор PID-профиля стиками на земле)</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://raw.githubusercontent.com/betaflight/betaflight/4.5.3/src/main/fc/rc_modes.h" target="_blank" rel="noopener noreferrer">Betaflight `fc/rc_modes.h`, 4.5.3 (список режимов: режима PID-профиля нет)</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://raw.githubusercontent.com/betaflight/betaflight/4.5.3/src/main/msp/msp.c" target="_blank" rel="noopener noreferrer">Betaflight `msp/msp.c`, 4.5.3 (MSP_SELECT_SETTING игнорирует PID-профиль при арме; MSP_SET_PID без проверки арма; MSP_COPY_PROFILE)</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://raw.githubusercontent.com/betaflight/betaflight/2025.12-maintenance/src/main/fc/rc_adjustments.c" target="_blank" rel="noopener noreferrer">Betaflight `fc/rc_adjustments.c`, 2025.12-maintenance (те же номера 12, 17, 20; PID-профиля по-прежнему нет)</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://raw.githubusercontent.com/betaflight/blackbox-tools/master/src/blackbox_decode.c" target="_blank" rel="noopener noreferrer">blackbox-tools `blackbox_decode.c` (файл .event, JSON события Inflight adjustment)</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://raw.githubusercontent.com/betaflight/betaflight.com/master/docs/wiki/guides/current/PID-Tuning-Guide.md" target="_blank" rel="noopener noreferrer">PID Tuning Guide — Betaflight Documentation</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://raw.githubusercontent.com/scipy/scipy/main/scipy/stats/_resampling.py" target="_blank" rel="noopener noreferrer">SciPy `stats/_resampling.py`, permutation_test (точный перебор разбиений, двустороннее p)</a> <span class="gc-tag">secondary</span></li></ul>
+<h2>Задачі з числовою відповіддю</h2>
+<uav-tasks src="../tasks/bf-tuning-method.json" module="bf-tuning-method"></uav-tasks>
+<h2>Перевір себе</h2>
+<uav-quiz src="../quiz/bf-tuning-method.json" module="bf-tuning-method"></uav-quiz>
+      </div>
+      <div class="module-done"><gc-button variant="secondary" data-done-toggle="bf-tuning-method">Позначити як пройдений</gc-button></div>
+      <section class="related" aria-label="Суміжні модулі"><p class="gc-label gc-muted">Суміжні модулі</p><div class="gc-grid ref-grid"><a class="gc-card" href="bf-pid.html"><strong>PID-тюнінг за даними</strong><div class="gc-card__meta"><span class="gc-tag" title="L2 — Интегратор">L2</span></div></a><a class="gc-card" href="bf-blackbox.html"><strong>Blackbox</strong><div class="gc-card__meta"><span class="gc-tag" title="L2 — Интегратор">L2</span></div></a><a class="gc-card" href="bf-motor-balance.html"><strong>Механика до PID: баланс моторов по логу</strong><div class="gc-card__meta"><span class="gc-tag" title="L2 — Интегратор">L2</span></div></a><a class="gc-card" href="bf-adjustments.html"><strong>Подстройки в полёте: вкладка Adjustments, `adjrange` и VTX на тумблере</strong><div class="gc-card__meta"><span class="gc-tag" title="L2 — Интегратор">L2</span></div></a><a class="gc-card" href="bf-filters.html"><strong>Фільтри</strong><div class="gc-card__meta"><span class="gc-tag" title="L2 — Интегратор">L2</span></div></a><a class="gc-card" href="data-python.html"><strong>Python для аналізу польотних даних</strong><div class="gc-card__meta"><span class="gc-tag" title="L2 — Интегратор">L2</span></div></a><a class="gc-card" href="math-prob-est.html"><strong>Ймовірність і оцінювання: шум, гауссіани, злиття</strong><div class="gc-card__meta"><span class="gc-tag" title="L3 — Специалист">L3</span></div></a></div></section>
+      <nav class="pager" aria-label="Сусідні модулі" data-track-pager><a class="gc-card pager__prev" href="bf-pid.html"><span class="gc-label gc-muted">Назад · трек</span><br>PID-тюнінг за даними</a><a class="gc-card pager__next" href="bf-rates-rc.html"><span class="gc-label gc-muted">Далі · трек</span><br>Рейты, RC smoothing и feedforward: от стика до setpoint</a></nav>
+    </article>
+  </main>
+  <footer class="gc-container site-footer gc-muted">
+    <p>Відкритий курс · <a href="https://github.com/irreligious86/UAV-Education">вихідний код на GitHub</a> · <a href="https://github.com/irreligious86/UAV-Education/blob/main/ROADMAP.md">план розвитку</a> · <a href="../../curriculum/curriculum.html">для розробника</a> · CC BY-NC-SA 4.0</p>
+  </footer>
+</body>
+</html>
