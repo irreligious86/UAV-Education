@@ -27,7 +27,7 @@ next: []
 ---
 
 ## summary
-Обзор четырёх семейств цифрового видео — в `link-digital-video`, VTX-таблицы аналога — в `link-vtx`. Здесь — как подключить конкретный воздушный модуль к полётнику Betaflight 2025.12, чтобы он не сгорел, OSD появился в очках, а запись и мощность были настроены. Для DJI (O3, O4, старые Air Unit и Vista), Walksnail Avatar и HDZero: питание, разводка, маска порта, `osd_displayport_device`, `vcd_video_system`, канва, шрифты, сторона очков, порядок включения, нагрев, запись, мощность, задержка и аналоги в INAV и ArduPilot. Лабораторная — Python-калькулятор по логике прошивки (маски портов, проверка `isSerialConfigValid()`, перенос элементов OSD между канвами по `osd.h`), затем стол: прозвонка, вентилятор, линк, OSD, запись.
+Обзор четырёх семейств цифрового видео — в `link-digital-video`, VTX-таблицы аналога — в `link-vtx`. Здесь — как подключить конкретный воздушный модуль к полётнику Betaflight 2025.12, чтобы он не сгорел, OSD появился в очках, а запись и мощность были настроены. Для DJI (O3, O4, старые Air Unit и Vista), Walksnail Avatar и HDZero: питание, разводка, маска порта, `osd_displayport_device`, `vcd_video_system`, канва, шрифты и загрузочный логотип (аналог и HD), сторона очков, порядок включения, нагрев, запись, мощность, задержка и аналоги в INAV и ArduPilot. Лабораторная — Python-калькулятор по логике прошивки (маски портов, проверка `isSerialConfigValid()`, перенос элементов OSD между канвами по `osd.h`), затем стол: прозвонка, вентилятор, линк, OSD, запись.
 
 ## theory
 ### Кто что делает
@@ -73,6 +73,19 @@ next: []
 - Шрифты: `displayport_msp_fonts` — четыре номера страниц шрифта для уровней важности (обычный, info, warning, critical), по умолчанию `0,1,2,3`. Так прошивка (4.5 и 2025.12) красит предупреждения, если в очках четырёхстраничный цветной шрифт Betaflight. С одностраничным шрифтом часть элементов пропадёт — тогда `set displayport_msp_fonts = 0,0,0,0` (документация msp-osd). В 4.3 это была `displayport_msp_attrs`.
 - `displayport_msp_col_adjust/row_adjust` работают только в SD-режиме MSP-дисплея, при `HD` их не читают.
 
+### Загрузочный логотип и шрифт: что хранит чип OSD, а что — очки
+**Что рисует прошивка (4.5 и 2025.12).** При старте OSD `osdCompleteInitialization()` (`osd/osd.c`) чистит экран и вызывает `osdDrawLogo()`: 24 × 4 символа подряд, начиная с кода 160 (0xA0) до `SYM_END_OF_FONT` 255 (0xFF), с левым верхним углом в (`середина − 12`, `середина − 5`) канвы. Под логотипом — версия прошивки и, если собран CMS, подсказка входа в меню «MENU:THR MID / + YAW LEFT / + PITCH UP». Если в полётнике есть часы (RTC), ниже выводится строка даты и времени. Экран держится 4 с; газ или тангаж вверх (> 1750 мкс) в дизарме, а также тумблер режима переворота (FLIP OVER AFTER CRASH, в 2025.12 — CRASHFLIP) убирают его раньше. Логотипа как картинки в прошивке нет: это 96 символов шрифта, и в очках видно то, что лежит в ячейках 160–255 того шрифта, которым рисуют.
+
+**Аналог: MAX7456 и совместимые.** Символ — 12 × 18 пикселей по 2 бита (`OSD_CHAR_WIDTH/HEIGHT`, `drivers/osd.h`), 54 значимых байта из 64 в записи. Весь шрифт, 256 символов, лежит в энергонезависимой памяти (NVM) самого чипа OSD, а не во flash полётника. Прошивка пишет туда только по команде `MSP_OSD_CHAR_WRITE` (`max7456WriteNvm()` в `drivers/max7456.c`; других вызовов в исходнике нет), поэтому перепрошивка полётника шрифт и логотип не трогает. Логотип 24 × 4 символа — картинка 288 × 72 пикселя.
+
+**Betaflight Configurator 10.10, Font Manager.** Шрифт — файл `.mcm`: пресеты default, bold, large, extra_large, betaflight, digital, clarity, vision, impact, impact_mini или свой файл. Кнопка «Select custom image…» принимает PNG или BMP ровно 288 × 72 px из трёх цветов: 0,255,0 — зелёный, становится прозрачным (код пикселя 01), 0,0,0 — чёрный (00), 255,255,255 — белый (10). На любом другом пикселе, в том числе от сглаживания при экспорте, приложение отказывает и пишет его координаты (`src/js/LogoManager.js`). Картинка режется на 96 клеток и подставляется в символы 160–255 шрифта, **загруженного в приложение**. В чип она попадает только кнопкой «Upload Font»: та пишет все 256 символов по `MSP_OSD_CHAR_WRITE` и перезагружает полётник (`FONT.upload()` в `src/js/tabs/osd.js`). Отсюда правило: логотип живёт в памяти чипа как часть шрифта, и следующая заливка любого другого шрифта вернёт в 160–255 логотип из того шрифта. Порядок: выбрать шрифт → подставить логотип → Upload Font; ориентир курса — свой `.mcm` с логотипом сохрани рядом с `diff all` аппарата. Бери приложение той же версии, что прошивка: Configurator 10.10 рассчитан на API до 1.46 (4.5), а 2025.12 сообщает API 1.47 — для неё Betaflight App 2025.12, где Font Manager по исходнику я не проверял. Font Manager активен, только если OSD-устройство — MAX7456 или FrSky OSD и оно обнаружено (флаги `MSP_OSD_CONFIG` в `msp/msp.c`). При `osd_displayport_device = MSP` кнопка серая.
+
+{{diagram:bf-osd-logo-grid|Логотип — это символы шрифта 160–255, 24 × 4 клетки по 12 × 18 px; Upload Font переписывает все 256 символов, поэтому новый шрифт приносит свой логотип.}}
+
+**HD: DJI, Walksnail, HDZero и другие MSP DisplayPort.** Полётник отправляет те же коды 160–255, версию и подсказку CMS обычными символами по MSP, а картинку рисует шрифт очков (или VTX — где система держит шрифт, зависит от неё). Залить шрифт в HD-систему из Betaflight нельзя: в 4.5.3 у MSP-дисплея нет функции записи символа, а в 2025.12 она есть только под опцией `USE_MSP_DISPLAYPORT_FONT` (команда `MSP_DP_FONTCHAR_WRITE` = 7, в комментарии «New OSD chip works over MSP»), которую в исходниках 2025.12.5 не определяет ни `common_pre.h`, ни один таргет (это вывод по дереву исходников; опции Cloud Build не проверены); флаг связан с чипом AIRBOT THEIA OSD (`OSD_FLAGS_OSD_HARDWARE_AIRBOT_THEIA_OSD` в `msp/msp.c`). Поэтому на HD свой логотип — это правка шрифта на стороне очков по инструкции производителя. **Не проверено по исходникам Betaflight:** форматы и способ замены шрифта у DJI O3/O4, Walksnail, HDZero и WTFOS; есть ли в их стоковых шрифтах логотип Betaflight в 160–255; возможна ли своя картинка на стоковой прошивке DJI.
+
+**Логотип при арме.** `osd_logo_on_arming`: OFF (по умолчанию), ON — при каждом арме, FIRST_ARMING — только при первом арме после включения. `osd_logo_on_arming_duration` — в десятых долях секунды, 5–50 (0.5–5 с), по умолчанию 5 = 0.5 с. Без логотипа надпись ARMED висит те же 0.5 с. Пока висит экран арма, остальные элементы OSD не рисуются: пока не наступит `resumeRefreshAt`, `osdProcessStats2()` ничего не делает, а автомат `osdUpdate()` пропускает отрисовку элементов (`osd/osd.c`). В 2025.12 добавлен `osd_arming_logo` (0–3, по умолчанию 0): уровень важности, которым рисуется логотип при арме. На MSP-дисплее он через `displayport_msp_fonts` выбирает страницу шрифта очков, поэтому в четырёхстраничном HD-шрифте можно показать при арме другую картинку со страницы 1–3 (есть ли она в конкретном шрифте, по исходникам не проверить); MAX7456 уровень игнорирует. Ориентир курса: на гоночном аппарате — OFF, на остальных FIRST_ARMING с 10–15 (1–1.5 с): на первом арме видно, тот ли аппарат и та ли прошивка, а дольше слепой экран на взлёте не нужен.
+
 ### Справочник: переменные и команды (2025.12; имена, умолчания и диапазоны те же, что в 4.5)
 | Переменная / команда | Умолчание | Диапазон | Смысл |
 |---|---|---|---|
@@ -84,6 +97,9 @@ next: []
 | `displayport_msp_use_device_blink` | OFF | OFF, ON | мигание делает очко, а не FC |
 | `displayport_msp_col_adjust` / `row_adjust` | 0 / 0 | −6…0 / −3…0 | только SD-режим MSP |
 | `osd_framerate_hz` | 12 | 1–60 | частота обновления OSD |
+| `osd_logo_on_arming` | OFF | OFF, ON, FIRST_ARMING | логотип на экране арма |
+| `osd_logo_on_arming_duration` | 5 (0.5 с) | 5–50, в 0.1 с | сколько держать логотип при арме |
+| `osd_arming_logo` (только 2025.12) | 0 | 0–3 | уровень важности (страница шрифта через `displayport_msp_fonts`) для логотипа при арме |
 | `osd_*_pos` | центр, скрыт | 0–65535 | `(x & 31) + (y<<5) + ((x>>5)<<10) + (профили<<11)` |
 | `osd_sys_*_pos` (`goggle_voltage`, `vtx_voltage`, `vtx_temp`, `bitrate`, `delay`, `lq`, `goggle_dvr`, `vtx_dvr`, `fan_speed`, `warnings`, `distance`) | скрыт | 0–65535 | элементы, которые рисуют сами очки (`USE_MSP_DISPLAYPORT`) |
 | `vtx_power` | 0 | индекс таблицы | мощность MSP-VTX (HDZero) |
@@ -446,6 +462,12 @@ save
 - **Симптом:** DJI-пульт связан, но в Receiver ползунки стоят
   - Возможная причина: жёлтый S.Bus не на S.Bus-паде (F4 без инвертора), `serialrx_provider` не SBUS.
   - Что сделать: S.Bus-пад, Serial RX на этом UART, `serialrx_provider = SBUS` (`bf-ports`).
+- **Симптом:** свой логотип пропал, при включении снова стандартный (аналог)
+  - Возможная причина: залит другой шрифт — «Upload Font» переписывает все 256 символов, в том числе 160–255 с логотипом.
+  - Что сделать: выбрать шрифт, заново подставить картинку 288 × 72, Upload Font; хранить свой `.mcm` с логотипом.
+- **Симптом:** Font Manager серый или «Select custom image…» отказывает
+  - Возможная причина: OSD-устройство — MSP (HD) или MAX7456 не обнаружен; картинка не 288 × 72 px или в ней есть пиксели не из трёх цветов (сглаживание, PNG с палитрой оттенков).
+  - Что сделать: для HD шрифт меняется в очках; для аналога проверить `status` (тип OSD), экспортировать картинку без сглаживания строго в 0,255,0 / 0,0,0 / 255,255,255.
 - **Симптом:** на аналоговом аппарате OSD нет или он дрожит (вопрос № 12)
   - Возможная причина: в сборке есть «OSD (HD)», и умолчание — `HD`/`MSP`; не та видеосистема у камеры.
   - Что сделать: `set vcd_video_system = PAL` (или NTSC/AUTO), `osd_displayport_device = MAX7456` или AUTO, центровка `vcd_h_offset`/`vcd_v_offset`.
@@ -458,6 +480,7 @@ save
 - `vcd_video_system = HD`, `osd_displayport_device = MSP`, OSD включён
 - Знаю, что `displayport_msp_serial` удалена в 4.4
 - Раскладка OSD сделана под канву своей системы, `displayport_msp_fonts` соответствует шрифту в очках
+- Знаю, что логотип — символы 160–255 шрифта: на аналоге он в памяти MAX7456 и затирается заливкой шрифта, на HD — в шрифте очков
 - На столе работает обдув, порядок включения: антенна → очки → АКБ → USB
 - Запись проверена, мощность выставлена по правилам страны
 
@@ -469,6 +492,10 @@ save
 - Betaflight cli/settings.c — displayport_msp_*, vcd_video_system, osd_canvas_*, 4.5-maintenance | https://raw.githubusercontent.com/betaflight/betaflight/4.5-maintenance/src/main/cli/settings.c | primary | A
 - Betaflight cli/settings.c 4.3-maintenance — displayport_msp_serial, displayport_msp_attrs | https://raw.githubusercontent.com/betaflight/betaflight/4.3-maintenance/src/main/cli/settings.c | primary | A
 - Betaflight App — OSD tab (HD 53×20, канва от VTX) | https://betaflight.com/docs/wiki/app/osd-tab | primary | A
+- Betaflight osd/osd.c — osdDrawLogo, osd_logo_on_arming, osd_arming_logo, 2025.12.5 | https://raw.githubusercontent.com/betaflight/betaflight/2025.12.5/src/main/osd/osd.c | primary | A
+- Betaflight drivers/max7456.c — max7456WriteNvm (font NVM), 2025.12.5 | https://raw.githubusercontent.com/betaflight/betaflight/2025.12.5/src/main/drivers/max7456.c | primary | A
+- Betaflight Configurator 10.10 — LogoManager.js (288×72, three colours, PNG/BMP) | https://raw.githubusercontent.com/betaflight/betaflight-configurator/10.10.0/src/js/LogoManager.js | primary | A
+- Betaflight Configurator 10.10 — tabs/osd.js (Font Manager, .mcm, Upload Font) | https://raw.githubusercontent.com/betaflight/betaflight-configurator/10.10.0/src/js/tabs/osd.js | primary | A
 - DJI O3 Air Unit User Manual v1.0 (распиновка, Canvas mode, перегрев, линковка) | https://xcopter.com/download/DJI_O3_Air_Unit_User_Manual_v1.0_ENo.pdf | primary | A
 - DJI O3 Air Unit specifications | https://www.cliftoncameras.co.uk/uploads/specifications/DJI%20O3%20Air%20Unit.pdf | primary | A
 - DJI O4 Air Unit / O4 Air Unit Pro specs | https://www.dji.com/o4-air-unit/specs | primary | A
@@ -487,4 +514,4 @@ save
 - Caddx Vista unit specifications (retailer listing) | https://www.getfpv.com/caddx-vista-unit-for-dji-digital-hd-fpv-no-camera.html | secondary | B
 
 ## notes
-Имена, умолчания и диапазоны Betaflight — из исходника 4.5.6, сверены с таблицей настроек 2025.12.5 (отличий в переменных справочника нет); маски проверены программой по `serial.h`, позиции — по `osd.h`. Питание, мощность и задержка — заявления производителей; задержка HDZero — оценка по модели Divimath. Не проверено: канва, которую сообщают DJI O3/O4 и Walksnail (читай `get osd_canvas`); MSP-VTX у DJI и Walksnail; версия прошивки DJI, давшая старым очкам Canvas mode. Порядок «очки → аппарат» — практика, а не требование производителя.
+Имена, умолчания и диапазоны Betaflight — из исходника 4.5.6, сверены с таблицей настроек 2025.12.5 (отличий в переменных справочника нет); маски проверены программой по `serial.h`, позиции — по `osd.h`. Питание, мощность и задержка — заявления производителей; задержка HDZero — оценка по модели Divimath. Логотип и шрифты: прошивка — `osd/osd.c`, `drivers/max7456.c`, `io/displayport_msp.c` (4.5.3 и 2025.12.5), приложение — Configurator 10.10.0 (`LogoManager.js`, `tabs/osd.js`). Не проверено: как менять шрифт и логотип на стороне HD-очков. Не проверено: канва, которую сообщают DJI O3/O4 и Walksnail (читай `get osd_canvas`); MSP-VTX у DJI и Walksnail; версия прошивки DJI, давшая старым очкам Canvas mode. Порядок «очки → аппарат» — практика, а не требование производителя.

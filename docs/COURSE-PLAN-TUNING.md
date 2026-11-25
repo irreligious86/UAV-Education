@@ -26,7 +26,7 @@ deepened wherever a topic already has a home; new modules are created only where
 | 3 | `f-esc-firmware` | deepen | Bluejay and AM32 settings tables from source, symptom → setting cheat sheet, ESC beacon vs DShot beacon |
 | 3 | `bf-custom`, `link-elrs` | deepen | Cloud Build option groups, Core Only, Custom Defines, verifying a build via `status`; ELRS UID derivation, model match, regulatory domains and LBT, packet-rate sensitivity → link margin (`rf-link-budget`), telemetry ratio |
 | 4 | `bf-led-buzzer`, `bf-failsafe` | deepen | `rxfail` + BEEPER mode, RX_LOST / RX_LOST_LANDED / WAS_EVER_ARMED, finding a downed quad, LED profiles and strip current |
-| 4 | `bf-modes-osd`, `bf-adjustments`, `bf-hd-osd-video` | deepen | `osd_*_pos` bit layout, OSD profiles on a switch (`adjrange` function 33), warning / stats masks, boot logo 288×72, HD OSD fonts and logos per system |
+| 4 | `bf-modes-osd`, `bf-adjustments`, `bf-hd-osd-video` | deepen | `osd_*_pos` bit layout, OSD profiles on a switch (`adjrange` function 29; enum value 33), warning / stats masks, boot logo 288×72, HD OSD fonts and logos per system |
 | 5 | `tx-lua-widgets`, `link-edgetx` | new + links | script types, widget lifecycle, LVGL API (2.12), CRSF sensors, simulator debugging; project: LinkBox widget |
 | 6 | cross-links, curriculum, glossary | finish | `{{lesson:…}}` cards, curriculum tracks, ~25 glossary terms, i18n mirrors, full fact-check pass |
 
@@ -39,7 +39,8 @@ deepened wherever a topic already has a home; new modules are created only where
 | 2 | done: bf-tuning-method (new), bf-pid-reg-in-bf + bf-rpm-filter (deepened); fact-checked | 15cb34ce, 4a1e3046, d66a1429 |
 | 3a | done: f-esc-firmware (deepened), f-motors-esc desync advice fixed; fact-checked | b20a30c0 |
 | 3b | done: bf-custom (Cloud Build), link-elrs (UID, model match, domains, LBT, margin); fact-checked | 4c2324ee |
-| 4a | done: bf-led-buzzer (beeper, rxfail, beacons, LED current), bf-failsafe buzzer link and timing fix; fact-checked | this |
+| 4a | done: bf-led-buzzer (beeper, rxfail, beacons, LED current), bf-failsafe buzzer link and timing fix; fact-checked | 0e437eae |
+| 4b | done: bf-modes-osd (pos bits, profiles, masks), bf-adjustments (fn 29), bf-hd-osd-video (boot logo); fact-checked; shorts P2 script fixed (fn 29, not 33) | this |
 
 ## Follow-ups
 

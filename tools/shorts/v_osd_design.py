@@ -2,7 +2,7 @@
 
 Facts checked against Betaflight 4.5.3: osd/osd.h position encoding (x bits 0-4, y bits 5-9, extra X bit 10 for HD,
 profile flags bits 11-13), cli/settings.c (osd_profile 1..3, osd_profile_N_name, osd_warn_bitmask, osd_stat_bitmask,
-craft_name, pilot_name, osd_profile_name_pos), fc/rc_adjustments.h/.c (ADJUSTMENT_OSD_PROFILE = 33, select mode with
+craft_name, pilot_name, osd_profile_name_pos), fc/rc_adjustments.h/.c (ADJUSTMENT_OSD_PROFILE enum 33 = CLI function 29 (array index 28 + 1), select mode with
 3 positions over 900..2100), cli/cli.c adjrange format; Configurator 10.10 font presets (resources/osd/2: default, bold,
 large, extra_large, betaflight, digital, clarity, vision, impact, impact_mini) and «Open Font File» (.mcm). Silent.
 usage: python3 v_osd_design.py [preview|render]"""
@@ -125,8 +125,8 @@ def s_bits(t, dur=15):
 def s_switch(t, dur=14):
     im, d = base(); TB(d, "ТУМБЛЕР", 4)
     ty = title(d, "Профиль с трёхпозиционного тумблера")
-    y = code_block(d, 60, ty + 30, ["# AUX2 = индекс 1; функция 33 = OSD profile",
-                                    "adjrange 0 0 1 900 2100 33 1 0 0"], ease((t - 0.4) / 0.5), 27)
+    y = code_block(d, 60, ty + 30, ["# AUX2 = индекс 1; функция 29 = OSD profile",
+                                    "adjrange 0 0 1 900 2100 29 1 0 0"], ease((t - 0.4) / 0.5), 27)
     a = ease((t - 1.4) / 0.5)
     x0, w = 90, 900
     for i, (lo, hi, lab, col) in enumerate([(900, 1300, "профиль 1", OR), (1300, 1700, "профиль 2", TE), (1700, 2100, "профиль 3", GR)]):
@@ -136,7 +136,7 @@ def s_switch(t, dur=14):
         text(d, ((xa + xb) / 2, y + 100), lab, F(30, "Bold"), BG, "mm", aa)
         text(d, (xa + 4, y + 170), str(lo), F(22, "Medium"), MUTED, "la", aa)
     text(d, (x0 + w - 4, y + 170), "2100", F(22, "Medium"), MUTED, "ra", a)
-    rows = [("Как читать строку", "слот 0 · всегда активен (AUX2 900–2100) · функция 33 · канал переключения AUX2", TE),
+    rows = [("Как читать строку", "слот 0 · всегда активен (AUX2 900–2100) · функция 29 · канал переключения AUX2", TE),
             ("Позиции", "900–2100 делится на три: тумблер ≈1000 / 1500 / 2000 попадает в 1 / 2 / 3", OR),
             ("Проверка", "щёлкни тумблер в Configurator: имя профиля в превью OSD должно меняться", GR)]
     cards(d, t, rows, y + 230, gap=18, t0=3.0, step=1.0, hs=34, bs=29)
@@ -156,7 +156,7 @@ def s_warn(t, dur=12):
 
 def s_end(t, dur=6):
     return end_card(t, dur, [("Шрифт — читаемость важнее красоты", OR), ("Центр свободен, углы работают", TE),
-                             ("Три профиля = три флажка у каждого элемента", GR), ("adjrange …33… — профиль с тумблера", PU),
+                             ("Три профиля = три флажка у каждого элемента", GR), ("adjrange …29… — профиль с тумблера", PU),
                              ("Предупреждения не прячь", RD)], "персонализация · блок 3")
 
 

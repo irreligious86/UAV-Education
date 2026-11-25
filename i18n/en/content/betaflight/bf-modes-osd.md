@@ -64,6 +64,8 @@ Analog OSD (MAX7456 chip) and digital (MSP DisplayPort for Walksnail/HDZero/DJI)
 - **Timer**: `osd_tim1`/`osd_tim2` (source, precision, threshold) — on arm; for Li-Ion, mAh drawn matters more.
 - HD (MSP DisplayPort): `osd_displayport_device`, canvas 50×18/60×22 — elements outside the analog canvas are not displayed; `osd_canvas_width/height`.
 
+{{diagram:bf-osd-pos-bits|Разобранный пример: напряжение на банку в (40, 17), видимое в профилях 1 и 3, — это 8 + 544 + 1024 + 2048 + 8192 = 11816; без бита 10 элемент уедет в столбец 8.}}
+
 ### Worked example: a team layout
 AUX1 ARM (1700–2100), AUX2 mode: ACRO (900–1300, nothing active) / ANGLE (1300–1700) / HORIZON (1700–2100); AUX3 PREARM (1700–2100, logic AND with ARM on the 7"+ drones); AUX4 BEEPER (1700–2100); AUX5 FAILSAFE STAGE1 (1700–2100) — for testing on the ground and in the first flights; AUX6 BLACKBOX (1700–2100) if the flash is small; AUX7 OSD profile 1/2/3. Written into the aircraft's logbook and into the radio model; identical on every aircraft.
 
@@ -82,6 +84,30 @@ AUX1 ARM (1700–2100), AUX2 mode: ACRO (900–1300, nothing active) / ANGLE (13
 2. Arrange them so the center of the screen stays clear.
 3. Voltage warning thresholds — for your battery and flying style (a reference point: a warning at about 3.5 V per cell under load, landing — based on your own experience).
 4. Check in the goggles on the bench without props: all elements are visible and don't overlap.
+
+Python model of the `osd.h` position macros (`OSD_POS`, `OSD_X`, `OSD_Y`, profile bits) and its real output:
+
+```python
+def osd_pos(x, y, profiles=(), variant=0):          # OSD_POS + OSD_PROFILE_FLAG, osd/osd.h
+    v = (x & 31) | ((x << 5) & 0x400) | ((y & 31) << 5)
+    for p in profiles:
+        v |= 1 << (p - 1 + 11)
+    return v | (variant << 14)
+
+def osd_decode(v):                                   # OSD_X, OSD_Y, profile bits, OSD_TYPE
+    x = (v & 31) | ((v & 0x400) >> 5)
+    return x, (v >> 5) & 31, [p for p in (1, 2, 3) if v >> (p + 10) & 1], v >> 14
+
+print(osd_pos(40, 17, profiles=(1, 3)))              # avg cell voltage, HD 53x20
+print(osd_decode(21665))
+print(osd_decode(341), osd_decode(14772))            # defaults of an HD build
+```
+
+```text
+11816
+(33, 5, [2], 1)
+(21, 10, [], 0) (20, 13, [1, 2, 3], 0)
+```
 
 ### Step 3. Ground test
 Without props: arm/disarm, ANGLE (the model in the configurator levels out), beeper, failsafe switch (`FAILSAFE` in the OSD). Only after that — out to the field.
