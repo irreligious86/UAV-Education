@@ -58,6 +58,7 @@
 <h2>Теория</h2>
 <h4 class="md-subheading">Порядок: сначала фильтры, потом PID</h4>
 <p>PID усиливает всё, что приходит с гироскопа, включая шум. Тюнить PID на плохих фильтрах — настраивать усилитель на фоне помех. Поэтому: RPM-фильтр и динамический notch работают, спектр чистый (модули про фильтры и RPM-фильтр), и только потом — PID.</p>
+<a class="gc-callout lesson-card" data-state="ok" href="../m/bf-motor-balance.html"><span class="gc-label gc-muted">Отдельный урок →</span><strong class="lesson-card__title">Механика до PID: баланс моторов по логу</strong><span class="lesson-card__why">Ещё раньше фильтров — механика: медианы моторов из лога показывают смещённый центр тяжести, слабый мотор и завал по рысканию, которые PID только «держит током».</span></a>
 <h4 class="md-subheading">Слайдеры Betaflight 4.3+</h4>
 <p>Простой режим тюнинга крутит группы параметров сразу:</p>
 <ul><li><strong>Damping</strong> (D) — сопротивление быстрым движениям, гасит перелёт; выше — греются моторы.</li><li><strong>Tracking</strong> (P и I) — точность следования за стиком и возмущениями; выше — осцилляции.</li><li><strong>Stick Response</strong> (FF) — реакция на быстрые движения стика; выше — перелёт в конце флипа.</li><li><strong>Dynamic Damping</strong> (D max) — насколько D может вырасти на быстрых движениях.</li><li><strong>Drift – Wobble</strong> (I) — удержание в поворотах и на нулевом газу.</li><li><strong>Master Multiplier</strong> — всё разом; трогают, когда остальным не хватает хода.</li></ul>
