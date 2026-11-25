@@ -1780,6 +1780,21 @@
       "term": "motorOutput (заголовок Blackbox)",
       "def": "Строка заголовка лога Betaflight с нижней и верхней границей команды моторов. Для DShot по умолчанию 158,2047 (dshot_idle_value 550, motor_output_limit 100), с dynamic idle — 48,2047. Процент хода = (motor − low)/(high − low)·100.",
       "module": "bf-motor-balance"
+    },
+    {
+      "term": "Jitter-множитель feedforward",
+      "def": "Коэффициент 0…1, которым Betaflight гасит FF при малом шаге стика за пакет: в 4.5.3 — 1 − (1 − (Δ + Δпред)/(2j))² при Δ < j, где j = feedforward_jitter_factor (дефолт 7); в 2025.12 — min(1, ((Δ + Δпред)/2 + 1)/(1 + j)). Пишется в debug FEEDFORWARD_LIMIT[0] в процентах.",
+      "module": "bf-rates-rc"
+    },
+    {
+      "term": "Feedforward boost",
+      "def": "Добавка к feedforward от ускорения setpoint: boost/1000·Δv·f_rx (feedforward_boost, дефолт 15, 0…50). Компенсирует задержку раскрутки моторов в начале резкого движения стика; в 4.5.3 на всех осях, в 2025.12 только roll/pitch.",
+      "module": "bf-rates-rc"
+    },
+    {
+      "term": "Дубликат RC-пакета",
+      "def": "Пакет, в котором канал не изменился, потому что пульт обновляет каналы реже, чем шлёт линк (например, микшер EdgeTX 4 мс на ELRS 500 Гц). Betaflight 4.5.3 подставляет для первого дубликата прошлую скорость setpoint, для следующих — ноль; в 2025.12 для CRSF эта экстраполяция выключена.",
+      "module": "bf-rates-rc"
     }
   ]
 }

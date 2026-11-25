@@ -5,12 +5,16 @@ chart-bf-rates-curves      — the module's converter run: Actual 20/67/54 vs Be
 chart-bf-rc-smoothing-step — the module's PT3 run: stick step 0 -> 670 deg/s, first packet T/2 after the snap,
                              8 kHz PID loop, auto cutoff floor(0.375 * f_rx): 50/150/500/1000 Hz -> 18/56/187/375 Hz,
                              plus the unsmoothed 50 Hz step.
+chart-bf-actual-two-profiles — applyActualRates (4.5.3 fc/rc.c:209) for the module's worked example:
+                             70/670/0 vs 200/850/0.20; 185 vs 232 deg/s at half stick, dashed C·x = linear part.
+flow-bf-ff-pipeline        — calculateFeedforward() of 4.5.3 (fc/rc.c:499-626) step by step, then PT3 and Kf (pid.c).
 """
 from __future__ import annotations
 
 import math
 
 from plot import Axis, chart
+from svg import Box, flow
 
 
 def _bf(x, rc_rate, srate, expo):            # applyBetaflightRates
@@ -52,6 +56,7 @@ def _pt3_step(rx_hz, cutoff, smoothing=True, dt=125e-6, t_end=0.04, target=670.0
 
 
 def build(D: dict) -> None:
+    build_ff(D)
     xs = [i / 100 for i in range(101)]
     series = [
         dict(name="Actual 20/67/54", xs=xs, ys=[_actual(x, 20, 67, 54) for x in xs], cls="a",
@@ -90,3 +95,41 @@ def build(D: dict) -> None:
         hmarks=[(335, "50 %", "m")],
         notes=[(px10 + 4, 200, "50 Гц без", "m"), (px10 + 4, 214, "сглаживания", "m"),
                (72, 56, "подпись: packet rate / срез PT3", "m")])
+
+
+def build_ff(D: dict) -> None:
+    xs = [i / 100 for i in range(101)]
+    D["chart-bf-actual-two-profiles"] = chart(
+        "Actual: C·x + (M − C)·|x|·(x⁵·e + x·(1 − e))",
+        [dict(name="200/850/0.20", xs=xs, ys=[_actual(x, 20, 85, 20) for x in xs], cls="a",
+              label_at=0.80, label_dy=-10),
+         dict(name="70/670/0 (дефолт)", xs=xs, ys=[_actual(x, 7, 67, 0) for x in xs], cls="w",
+              label_at=0.62, label_dy=24, label_anchor="start"),
+         dict(name="200·x", xs=xs, ys=[200 * x for x in xs], cls="a", dash=True, w=1.2, label_at=1.0, label_dy=-6),
+         dict(name="70·x", xs=xs, ys=[70 * x for x in xs], cls="w", dash=True, w=1.2, label_at=1.0, label_dy=-6)],
+        Axis("отклонение стика x", 0, 1, ticks=[0, 0.25, 0.5, 0.75, 1.0]),
+        Axis("setpoint, °/с", 0, 900, ticks=[0, 185, 232, 400, 600, 670, 850]),
+        marks=[(0.5, "x = 0.5: 185 и 232 °/с", "m", 62)],
+        notes=[(72, 56, "пунктир — C·x", "m"),
+               (72, 72, "у упора 12.7 / 20.2 °/с на 1 %", "m")])
+
+    W, H, G, X0 = 128, 48, 14, 10
+    col = [X0 + i * (W + G) for i in range(5)]
+    boxes = [
+        Box("pkt", ["Новый RC-пакет", "rcCommand, sp"], col[0], 40, W, H),
+        Box("spd", ["Скорость sp", "Δsp · f_rx"], col[1], 40, W, H, accent=True, note="дубликат: экстраполяция"),
+        Box("pt1", ["PT1 скорости", "k = 1 − smooth/100"], col[2], 40, W, H, accent=True),
+        Box("bst", ["+ boost", "Δv·f·boost/1000"], col[3], 40, W, H),
+        Box("trn", ["transition", "× |x|/tr у центра"], col[4], 40, W, H),
+        Box("avg", ["averaging", "среднее 2…4 пак."], col[4], 140, W, H),
+        Box("jit", ["× jitter_att", "Δ rcCommand < j"], col[3], 140, W, H, accent=True),
+        Box("lim", ["max_rate_limit", "≤ (max−|sp|)·90"], col[2], 140, W, H, accent=True),
+        Box("pt3", ["PT3 RC smoothing", "срез FF (авто)"], col[1], 140, W, H),
+        Box("kf", ["× Kf → F-член", "Kf=0.013754·F/100"], col[0], 140, W, H),
+    ]
+    links = [("pkt", "spd"), ("spd", "pt1"), ("pt1", "bst"), ("bst", "trn"), ("trn", "avg", "", False, "v"),
+             ("avg", "jit"), ("jit", "lim"), ("lim", "pt3"), ("pt3", "kf")]
+    D["flow-bf-ff-pipeline"] = flow(
+        "Feedforward 4.5.3: что делает calculateFeedforward() с каждым пакетом", boxes, links, 720, 260,
+        notes=[(10, 220, "jitter_att = 1 − max(0, 1 − (Δ + Δпред)/(2·j))², при Δ < j (j = jitter_factor)", "m t"),
+               (10, 238, "всё до limit — раз на RC-пакет; PT3 и ×Kf — каждый PID-цикл; limit — roll/pitch", "m t")])

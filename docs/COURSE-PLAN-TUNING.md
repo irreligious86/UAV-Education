@@ -34,4 +34,5 @@ deepened wherever a topic already has a home; new modules are created only where
 
 | Wave | Status | Commit |
 |---|---|---|
-| 0 | done | — |
+| 0 | done | 680c34e5 |
+| 1 | done: bf-motor-balance (new), bf-rates-rc (deepened); both fact-checked | 13cf75e9 + this |
