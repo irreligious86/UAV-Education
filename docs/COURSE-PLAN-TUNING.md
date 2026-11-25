@@ -38,7 +38,8 @@ deepened wherever a topic already has a home; new modules are created only where
 | 1 | done: bf-motor-balance (new), bf-rates-rc (deepened); both fact-checked | 13cf75e9, 1a7e45a5 |
 | 2 | done: bf-tuning-method (new), bf-pid-reg-in-bf + bf-rpm-filter (deepened); fact-checked | 15cb34ce, 4a1e3046, d66a1429 |
 | 3a | done: f-esc-firmware (deepened), f-motors-esc desync advice fixed; fact-checked | b20a30c0 |
-| 3b | done: bf-custom (Cloud Build), link-elrs (UID, model match, domains, LBT, margin); fact-checked | this |
+| 3b | done: bf-custom (Cloud Build), link-elrs (UID, model match, domains, LBT, margin); fact-checked | 4c2324ee |
+| 4a | done: bf-led-buzzer (beeper, rxfail, beacons, LED current), bf-failsafe buzzer link and timing fix; fact-checked | this |
 
 ## Follow-ups
 

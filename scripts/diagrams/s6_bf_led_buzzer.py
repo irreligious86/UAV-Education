@@ -7,11 +7,16 @@ bf-led-grid-layout  — the module's lab layout (10 LEDs, `led 0 1,1:NW:FW:0` ..
 chart-bf-led-current — lab step 3b: strip current vs ledstrip_brightness for 10 and 32 LEDs at full white and for the
                       STATUS layout (380 mA at 100 %), model 20 mA per channel at 255; line = 1.1 A left on a 2 A FC BEC
                       after 0.9 A of other 5 V loads (the module's example budget).
+bf-buzzer-find-tree  — theory "Найти упавший аппарат": what can still beep after a crash (2025.12, 4.5 difference in
+                      the leaf), from flight/failsafe.c (RX_LOST: no RC data and no USB; 4.5: armed or WAS_EVER_ARMED),
+                      io/beeper.c (DShot beacon gate: 1.2 s after disarm, RX_SET beacon only with a live link in
+                      2025.12), drivers/usb_io.c (USB = detect pin OR VCP connected) and the Bluejay beacon-delay
+                      row of f-esc-firmware (own leaf: needs only battery + DShot frames); lab2 section 4 reproduces the leaves.
 """
 from __future__ import annotations
 
 from plot import Axis, chart
-from svg import svg, text
+from svg import Node, svg, text, tree
 
 # lab output (bf-led-buzzer.led_lab.py, step 1 and step 3): (x, y, functions, rgb)
 LEDS = [
@@ -70,8 +75,26 @@ def _grid() -> str:
     return svg(720, oy + 16 * cell + 30, "LED-раскладка лабораторной bf-led-buzzer", "".join(out))
 
 
+def _find_tree() -> str:
+    usb = Node("usb", ["FC видит USB?", "(VCP или", "пин detect)"], [
+        ("да", Node("mute", ["RX_LOST молчит", "(2025.12)"], leaf=True)),
+        ("нет", Node("lost", ["RX_LOST 0.5/0.5 с", "через failsafe_", "delay (4.5 — после", "арма); моторы", "≥ 1.2 с после", "дизарма"], leaf=True, accent=True)),
+    ])
+    link = Node("link", ["FC жив, пульт", "на связи?"], [
+        ("да", Node("set", ["Тумблер BEEPER:", "RX_SET 0.1/0.1 с,", "лента 4 Гц,", "моторы при", "beacon RX_SET"], leaf=True)),
+        ("нет", usb),
+    ])
+    root = Node("root", ["Аппарат упал:", "что ещё пищит?"], [
+        ("батарея отлетела", Node("self", ["Только", "автономная", "пищалка со", "своей ячейкой"], leaf=True, accent=True)),
+        ("на месте", link),
+        ("+ DShot", Node("blj", ["Маяк Bluejay", "(батарея + DShot", "от FC): через", "beacon delay;", "от пульта и USB", "не зависит"], leaf=True)),
+    ])
+    return tree("Поиск упавшего аппарата, Betaflight 2025.12", root, width=720, box_w=134, box_h=86, gap_y=118)
+
+
 def build(D: dict) -> None:
     D["bf-led-grid-layout"] = _grid()
+    D["bf-buzzer-find-tree"] = _find_tree()
 
     br = list(range(5, 101, 5))
 
