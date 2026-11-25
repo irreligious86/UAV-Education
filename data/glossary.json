@@ -1925,6 +1925,21 @@
       "term": "Шрифт MAX7456 (.mcm)",
       "def": "256 символов 12×18 px по 2 бита в энергонезависимой памяти чипа аналогового OSD; символы 160–255 — загрузочный логотип 288×72 px, поэтому заливка другого шрифта заменяет и логотип.",
       "module": "bf-hd-osd-video"
+    },
+    {
+      "term": "Lua-виджет (EdgeTX)",
+      "def": "Скрипт /WIDGETS/<имя>/main.lua цветного пульта, возвращающий таблицу name, options, create, update, refresh, background; рисует в зоне экрана, пока она видна, иначе работает его background.",
+      "module": "tx-lua-widgets"
+    },
+    {
+      "term": "getSourceValue (EdgeTX Lua)",
+      "def": "Функция Lua API EdgeTX 2.12: возвращает значение источника и флаги isCurrent и isFresh; после потери телеметрии отдаёт последнее значение с isCurrent = false, тогда как getValue возвращает 0.",
+      "module": "tx-lua-widgets"
+    },
+    {
+      "term": "CPU limit (EdgeTX Lua)",
+      "def": "Ошибка, которой EdgeTX останавливает вызов виджета дольше ~20 000 инструкций Lua (хук каждые 200 инструкций); виджет выключается, текст ошибки пишется в его зону.",
+      "module": "tx-lua-widgets"
     }
   ]
 }

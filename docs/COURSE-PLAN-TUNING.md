@@ -40,7 +40,8 @@ deepened wherever a topic already has a home; new modules are created only where
 | 3a | done: f-esc-firmware (deepened), f-motors-esc desync advice fixed; fact-checked | b20a30c0 |
 | 3b | done: bf-custom (Cloud Build), link-elrs (UID, model match, domains, LBT, margin); fact-checked | 4c2324ee |
 | 4a | done: bf-led-buzzer (beeper, rxfail, beacons, LED current), bf-failsafe buzzer link and timing fix; fact-checked | 0e437eae |
-| 4b | done: bf-modes-osd (pos bits, profiles, masks), bf-adjustments (fn 29), bf-hd-osd-video (boot logo); fact-checked; shorts P2 script fixed (fn 29, not 33) | this |
+| 4b | done: bf-modes-osd (pos bits, profiles, masks), bf-adjustments (fn 29), bf-hd-osd-video (boot logo); fact-checked; shorts P2 script fixed (fn 29, not 33) | c548c653 |
+| 5 | done: tx-lua-widgets (new) + tools/lua/LinkBox; fact-checked; shorts P3 script fixed | this |
 
 ## Follow-ups
 
