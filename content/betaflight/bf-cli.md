@@ -75,7 +75,7 @@ CLI работает поверх последовательного порта 
 | `diff profile` | только текущий PID-профиль | без обёртки |
 | `diff rates` | только текущий рейт-профиль | без обёртки |
 | `diff hardware` | resource, timer, dma, feature, serial и «железные» `set` (`blackbox_device`, шины датчиков…), без профилей | `batch` |
-| `diff all` | всё из `master`, `mcu_id` и `signature`, **все 4 PID-профиля и все 4 рейт-профиля**, в конце — возврат к активным профилям (`profile N`, `rateprofile N`) | `batch start`, `defaults nosave`, …, `save`, `batch end` |
+| `diff all` | всё из `master`, `mcu_id` и `signature`, **все 4 PID-профиля и все 4 рейт-профиля**, в конце — возврат к активным профилям (`profile N`, `rateprofile N`) | `batch start`, `defaults nosave`, …, `save` (без `batch end`: он печатается только у `diff`/`dump` без `all`) |
 | флаг `defaults` | к каждой изменённой строке добавляет закомментированную строку со значением по умолчанию | — |
 | флаг `bare` | убирает `batch`/`defaults nosave`/`save`, `mcu_id`, `signature` и восстановление выбора профилей | — |
 

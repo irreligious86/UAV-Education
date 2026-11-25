@@ -73,6 +73,8 @@ else:
 ### Що автоматизувати варто, а що ні
 Варто: бекап `diff all` перед кожним польотним днем; перевірка інваріантів (failsafe, poles, bidir) за вивантаженням; масова зміна `craft_name`/VTX-таблиці на парку; вивантаження логів через `msc`. Не варто: масове «накочування PID» на різні апарати (різна механіка), будь-які зміни без перечитування `get` після `save`.
 
+{{diagram:bf-cli-silent-fix|validateAndFixConfig работает дважды — в save и при загрузке, поэтому подтверждение «set to» ничего не гарантирует: проверка только чтением get после перезагрузки.}}
+
 {{diagram:bf-cli-session|Сесія CLI через serial: чекати на запрошення, перечитувати значення після set, після save шукати порт заново.}}
 
 ## practice
@@ -153,6 +155,80 @@ with serial.Serial(port_name, 115200, timeout=1) as p:
 - Підсумок перевірки — рядки `OK` за кожним ключем. Будь-який `FAIL` означає, що значення не збереглося або в цій версії ключ називається інакше (Betaflight 2025.12 перейменував частину налаштувань — модуль «CLI»).
 
 Лабораторну зараховано, коли скрипт знаходить дрон за `craft_name`, зберігає `diff all` з датою до змін, після `save` знаходить порт заново і перечитує значення з усіма `OK`, а прогін на двох дронах проходить без правки коду.
+
+Код і вивід лабораторної (дослівно з вихідного модуля):
+
+```text
+== 1. MSP identify (no CLI, no reboot)
+   {'api': '1.46', 'variant': 'BTFL', 'version': '4.5.3', 'name': '', 'uid': '000000000100000002000000'}
+== 2. CLI: batch of set, then save
+   Command batch started
+   craft_name set to viking2
+   failsafe_delay set to 10
+   failsafe_procedure set to GPS-RESCUE
+   d_roll set to 30
+   d_min_roll set to 20
+   Command batch ended
+   save -> FC reboots, SITL exit code 0
+== 3. after reboot: find by MSP_NAME, re-read every key with get
+   MSP_NAME = viking2
+   raw `get d_roll`: align_board_roll = 0 | Allowed range: -180 - 360 |  | d_roll = 30 | profile 0 | Allowed range: 0 - 250 | Default value: 40
+   OK   craft_name           wrote viking2    read viking2
+   OK   failsafe_delay       wrote 10         read 10
+   OK   failsafe_procedure   wrote GPS-RESCUE read GPS-RESCUE
+   OK   d_roll               wrote 30         read 30
+   OK   d_min_roll           wrote 20         read 20
+   diff all: 51 lines saved
+== 4. paste the 4.5.3 diff into 2025.12.5 as is
+   {'api': '1.47', 'variant': 'BTFL', 'version': '25.12.5', 'name': '', 'uid': '000000000100000002000000'}
+   ERROR ('set', 'INVALID NAME: d_min_roll = 20')
+   ###ERROR IN save: ERRORS WERE DETECTED - PLEASE REVIEW BEFORE CONTINUING### | ###ERROR IN save: PLEASE FIX ERRORS THEN 'SAVE'###
+== 5. 'port' by renaming d_min_roll -> d_max_roll, save noreboot
+   # saving
+   OK   craft_name           wrote viking2    read viking2
+   OK   failsafe_delay       wrote 10         read 10
+   FAIL failsafe_procedure   wrote GPS-RESCUE read DROP
+   OK   d_roll               wrote 30         read 30
+   FAIL d_max_roll           wrote 20         read 0
+   exit noreboot |  | # leaving CLI mode, no reboot | SITL alive: True | MSP_NAME: viking2
+   STX/ETX: b'\x02failsafe_delay = 10\r\nAllowed range: 1 - 200\r\nDefault value: 15\r\n\x03'
+== 6. semantic diff 4.5.3 -> 2025.12.5 (by key, not by text line)
+   master     failsafe_procedure   GPS-RESCUE -> -
+   profile 0  d_max_roll                    - -> 0
+   profile 0  d_min_roll                   20 -> -
+   profile 0  d_roll                       30 -> -
+```
+
+```python
+"""Find an FC by craft_name over MSP: no CLI, no reboot, no arming lock. Usage: find_craft.py NAME [port ...]"""
+import sys
+import serial
+from serial.tools import list_ports
+from bf_cli_lab import identify   # msp() + MSP_API_VERSION/FC_VARIANT/FC_VERSION/NAME/UID from the lab
+
+
+def find_craft(name, ports=None):
+    ports = ports or [p.device for p in list_ports.comports()]   # /dev/ttyACM*, COM*
+    for dev in ports:
+        try:
+            with serial.serial_for_url(dev, baudrate=115200, timeout=0.2) as p:
+                info = identify(p)
+        except (serial.SerialException, OSError, TimeoutError) as e:
+            print(f"  {dev}: no MSP ({type(e).__name__})")
+            continue
+        print(f"  {dev}: {info['variant']} {info['version']} name={info['name']!r} uid={info['uid']}")
+        if info["name"] == name:
+            return dev, info
+    raise RuntimeError(f"FC {name!r} not found")
+
+
+if __name__ == "__main__":
+    print(find_craft(sys.argv[1], sys.argv[2:] or None))
+# python3 find_craft.py viking2 socket://127.0.0.1:5768 socket://127.0.0.1:5761   (SITL 2025.12.5 running)
+#   socket://127.0.0.1:5768: no MSP (SerialException)
+#   socket://127.0.0.1:5761: BTFL 25.12.5 name='viking2' uid=000000000100000002000000
+# ('socket://127.0.0.1:5761', {'api': '1.47', 'variant': 'BTFL', 'version': '25.12.5', 'name': 'viking2', 'uid': '000000000100000002000000'})
+```
 
 ## diagnostics
 - **Симптом:** скрипт «загубив» дрон після save

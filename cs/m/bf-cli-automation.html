@@ -51,133 +51,388 @@
       <h1 class="module-title">Автоматизация CLI по serial</h1>
       <div class="module-tags"><span class="gc-tag" title="Уровень">L3 — Специалист</span><span class="gc-tag">чтение 25 мин</span><span class="gc-tag">учёба ~3 ч</span><span class="gc-tag">Betaflight 4.5+</span><span class="gc-tag" data-state="ok" data-done-badge hidden>ОСВОЕН</span></div>
       <p class="gc-muted module-score" data-module-score></p>
-      <p class="module-lead">Когда дронов больше одного, настраивать их кликами в Configurator — путь к ошибкам. CLI Betaflight доступен через обычный serial-порт, значит его можно скриптовать. Модуль показывает рабочий шаблон на Python (<code>pyserial</code>) и собирает грабли, на которые мы реально наступили при массовой настройке нескольких квадрокоптеров: плавающие COM-порты, «тихие» исправления параметров, перезагрузки и несовместимость diff между версиями.</p>
+      <p class="module-lead">Когда дронов больше одного, настраивать их кликами в Configurator — путь к ошибкам. CLI Betaflight доступен через обычный serial-порт, значит его можно скриптовать, а опознать плату можно вообще без CLI — по протоколу MSP. Модуль разбирает, как прошивка переключает порт между MSP и CLI, в каком формате отвечает CLI и как отличить ответ от приглашения, и собирает грабли массовой настройки: плавающие COM-порты, <code>save</code> и <code>exit</code>, которые перезагружают (в 4.5.3 — даже с <code>noreboot</code>), «тихие» исправления значений при сохранении и загрузке, поиск по подстроке в <code>get</code>, пакетный режим и несовместимость <code>diff all</code> между 4.5 и 2025.12. Лабораторная идёт без железа: на собранных из исходников SITL Betaflight 4.5.3 и 2025.12.5 скрипт на Python делает всё то же, что делал бы с платой по USB, и ловит реальные исправления значений прошивкой.</p>
       <div class="gc-callout" data-state="ok"><strong>После модуля ты умеешь</strong><ul><li>написать скрипт, который находит дрон по craft_name</li><li>применять изменения с перечитыванием</li></ul></div><p class="gc-muted">Перед этим модулем: <a href="bf-cli.html">CLI и remap</a></p><div class="gc-callout lab"><p class="gc-label gc-muted">Лабораторная</p><strong>Скрипт настройки</strong><p class="gc-muted lab__hint">Сдано, когда отмечены все пункты:</p><ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="bf-cli-automation:lab:0"><span>Скрипт находит дрон по craft_name, а не по COM</span></label></li><li><label><input type="checkbox" data-check-id="bf-cli-automation:lab:1"><span>Перед изменениями сохраняется diff all с датой</span></label></li><li><label><input type="checkbox" data-check-id="bf-cli-automation:lab:2"><span>После save скрипт заново находит порт и перечитывает значения</span></label></li><li><label><input type="checkbox" data-check-id="bf-cli-automation:lab:3"><span>Прогон на двух дронах без ручных правок</span></label></li></ul></div><div class="path-pos gc-muted"><span class="gc-label">В пути</span><ul><li data-path-pos="betaflight"><a href="../path/betaflight.html">Betaflight</a>: шаг 54 из 60 → <a href="bf-gps-setup.html?path=betaflight">GPS в Betaflight: модули M8/M10, конфигурация, точность и домашняя точка</a></li></ul></div>
       <div class="gc-prose module-body">
 <div class="gc-callout" data-state="caution" data-untranslated><strong>Модуль ещё не переведён.</strong> Ниже — оригинал (Русский). Прогресс и оценки общие для всех языков.</div>
 <h2>Теория</h2>
 <h4 class="md-subheading">Как устроен вход в CLI</h4>
-<p>Полётный контроллер по USB — это виртуальный COM-порт (USB CDC). Скорость в настройках порта для USB CDC роли не играет, принято ставить 115200. Символ <code>#</code> переводит контроллер в CLI, <code>exit</code> выходит с перезагрузкой. Пока FC в CLI, на моторы не идёт сигнал — ESC могут пищать, это нормально.</p>
+<p>Полётный контроллер по USB — это виртуальный COM-порт (USB CDC). Скорость в настройках порта для USB CDC роли не играет, принято ставить 115200. Символ <code>#</code> переводит контроллер в CLI, <code>exit</code> выходит с перезагрузкой.</p>
+<p>Механизм — из исходников (<code>msp/msp_serial.c</code>, <code>cli/cli.c</code>, 4.5.3 и 2025.12.5 одинаково, если не оговорено). Порт по умолчанию слушает MSP. Каждый байт, который не является частью MSP-кадра, прошивка рассматривает как «не-MSP данные»: байт <code>#</code> ставит запрос на вход в CLI, байт <code>reboot_character</code> (по умолчанию <code>R</code>, код 82, диапазон 48–126) — запрос на перезагрузку в загрузчик. Запрос выполняется, только когда порт молчал 100 мс, и версии ведут себя по-разному: в 4.5.3 любой байт, пришедший до истечения этих 100 мс в следующем проходе задачи, отменяет вход (<code>msp_serial.c:519–522</code>: «abort pending request») — <code>#</code> и следом команда дают «CLI не открылся»; в 2025.12 запрос сбрасывает только <code>$</code> (<code>msp_serial.c:535–539</code>), но байты, пришедшие до входа, теряются. Порядок для обеих: <code>#</code>, дождаться приглашения, потом команды. Пока аппарат заармлен, не-MSP байты игнорируются (<code>fc/tasks.c</code>: <code>ARMING_FLAG(ARMED) ? MSP_SKIP_NON_MSP_DATA</code>): на армленом дроне <code>#</code> ничего не сделает, и это защита, а не баг. Отсюда же грабля: скрипт, который шлёт в порт произвольный текст до входа в CLI, может случайно отправить <code>R</code> и уронить плату в DFU.</p>
+<p>После входа прошивка печатает <code>Entering CLI Mode, type &#x27;exit&#x27; to return, or &#x27;help&#x27;</code> (в 2025.12 — <code>... to reboot ...</code>), ставит флаг запрета арма <code>CLI</code> и выводит приглашение — ровно 4 байта <code>\r\n# </code>. Каждый принятый символ CLI возвращает эхом, поэтому ответ на команду — это эхо, перевод строки, вывод и снова <code>\r\n# </code>. Строка длиннее 256 символов (<code>CLI_IN_BUFFER_SIZE</code>) молча обрезается, всё после <code>#</code> в строке считается комментарием (поэтому, если плата уже в CLI с прошлого сеанса, одиночный <code>#</code> начинает комментарий и съедает следующую команду: в проверке короткого скрипта ниже так пропала команда <code>version</code>; безопасный вход — <code>#\n</code>, отправленный одной записью в порт: тогда оба байта приходят в одном проходе, и он работает в обоих состояниях), ошибки печатаются в формате <code>###ERROR IN &lt;команда&gt;: &lt;текст&gt;###</code>. В CLI все байты порта идут в CLI: MSP на этом порту не отвечает (в 4.5.3 — ни на одном порту: <code>fc/tasks.c</code> выходит до <code>mspSerialProcess</code>; в 2025.12 состояние CLI хранится у порта, и другие MSP-порты работают), Blackbox не пишет (<code>fc/core.c</code>: <code>if (!cliMode &amp;&amp; blackboxConfig()-&gt;device)</code>), задача телеметрии не работает (<code>fc/tasks.c</code>: <code>if (!cliMode &amp;&amp; featureIsEnabled(FEATURE_TELEMETRY))</code>). Configurator в это время показывает «нет связи» — это нормально.</p>
+<h4 class="md-subheading">MSP: опознать плату, не входя в CLI</h4>
+<p>MSP v1 — двоичный протокол Configurator: запрос <code>$M&lt;</code>, байт длины, байт команды, данные и контрольная сумма — XOR длины, команды и данных; ответ начинается с <code>$M&gt;</code>, неподдерживаемая команда — <code>$M!</code>. Для поиска нужной платы хватает пяти команд, и ни одна не требует CLI, не перезагружает и не ставит запрет арма:</p>
+<div class="table-wrap md-table-wrap" tabindex="0"><table class="md-table"><thead><tr><th>Команда (номер)</th><th>Ответ</th><th>4.5.3 (SITL)</th><th>2025.12.5 (SITL)</th></tr></thead><tbody><tr><td data-label="Команда (номер)"><code>MSP_API_VERSION</code> (1)</td><td data-label="Ответ">протокол, major, minor</td><td data-label="4.5.3 (SITL)">1.46</td><td data-label="2025.12.5 (SITL)">1.47</td></tr><tr><td data-label="Команда (номер)"><code>MSP_FC_VARIANT</code> (2)</td><td data-label="Ответ">4 символа</td><td data-label="4.5.3 (SITL)"><code>BTFL</code></td><td data-label="2025.12.5 (SITL)"><code>BTFL</code></td></tr><tr><td data-label="Команда (номер)"><code>MSP_FC_VERSION</code> (3)</td><td data-label="Ответ">3 байта версии (в 2025.12 — ещё строка Pascal)</td><td data-label="4.5.3 (SITL)">4.5.3</td><td data-label="2025.12.5 (SITL)">25.12.5 (год − 2000, месяц, патч) + <code>2025.12.5</code>, всего 13 байт</td></tr><tr><td data-label="Команда (номер)"><code>MSP_NAME</code> (10)</td><td data-label="Ответ"><code>craft_name</code></td><td data-label="4.5.3 (SITL)">строка</td><td data-label="2025.12.5 (SITL)">строка</td></tr><tr><td data-label="Команда (номер)"><code>MSP_UID</code> (160)</td><td data-label="Ответ">3 × uint32, уникальный ID MCU</td><td data-label="4.5.3 (SITL)">12 байт</td><td data-label="2025.12.5 (SITL)">12 байт</td></tr></tbody></table></div>
+<p>Грабля в третьей строке: с переходом на календарные версии <code>MSP_FC_VERSION</code> в 2025.12 отдаёт <code>25, 12, 5</code> (<code>msp.c</code>: <code>FC_VERSION_YEAR - FC_CALVER_BASE_YEAR</code>). Скрипт с проверкой «major ≥ 4 — значит новая» примет 2025.12 за 25-ю версию, а скрипт с «major == 4» — за неизвестную прошивку. Версию сравнивай по <code>MSP_API_VERSION</code>, по полной строке из <code>version</code> или по строке, которую 2025.12 добавляет в ответ <code>MSP_FC_VERSION</code> после трёх байт (<code>sbufWritePString(FC_VERSION_STRING)</code>, <code>msp.c:646</code>). <code>MSP_UID</code> на реальной плате — заводской номер микроконтроллера, он не меняется при перепрошивке и <code>defaults</code>; в SITL он фиксированный (<code>000000000100000002000000</code> в обеих версиях), поэтому в лабораторной опознание идёт по имени.</p>
 <h4 class="md-subheading">Грабли 1: COM-порт не постоянный</h4>
-<p>Если к компьютеру подключено несколько одинаковых плат, у них один USB VID/PID, и номер COM-порта меняется после каждой перезагрузки. Привязываться к <code>COM8</code> нельзя. Надёжный идентификатор — <code>craft_name</code> внутри конфига: открыть каждый порт, войти в CLI, выполнить <code>get craft_name</code> и выбрать нужный. Отсюда правило: у всех дронов разные <code>craft_name</code> ещё до начала работы.</p>
-<h4 class="md-subheading">Грабли 2: exit noreboot перезагружает</h4>
-<p>Команда <code>exit</code> по умолчанию перезагружает контроллер. В 2025.12 (и в 4.5.4+) есть <code>exit noreboot</code> и <code>save noreboot</code>; в 4.5.0–4.5.3 аргумента нет, и <code>exit</code> перезагружает всегда. Скрипт, который должен работать на любой из этих версий, после любого <code>exit</code> должен заново искать порт по <code>craft_name</code>. Для «просто подсмотреть значение» не выходи из CLI командой — просто закрой порт.</p>
+<p>Если к компьютеру подключено несколько одинаковых плат, у них один USB VID/PID, и номер COM-порта меняется после каждой перезагрузки. Привязываться к <code>COM8</code> нельзя. Надёжный идентификатор — <code>craft_name</code> внутри конфига, и читать его надо по MSP (<code>MSP_NAME</code>), а не входом в CLI на каждом порту: вход в CLI ставит запрет арма до перезагрузки, а на 4.5.3 из CLI нельзя выйти без перезагрузки. Отсюда правило: у всех дронов разные <code>craft_name</code> ещё до начала работы; для парка из одинаковых плат храни рядом с именем ещё и <code>MSP_UID</code> — он ловит клон конфига, когда два аппарата получили одно имя.</p>
+<h4 class="md-subheading">Грабли 2: exit noreboot перезагружает на 4.5.3</h4>
+<p>Команда <code>exit</code> по умолчанию перезагружает контроллер и печатает <code>leaving CLI mode, unsaved changes lost</code> — всё, что не сохранено <code>save</code>, теряется. В 2025.12 (и в 4.5.5, проверено по исходникам; по истории изменений — с 4.5.4) есть <code>exit noreboot</code> и <code>save noreboot</code>; в 4.5.0–4.5.3 аргумента нет, и <code>exit</code> перезагружает всегда. Хуже того: в 4.5.3 <code>cliSave</code> и <code>cliExit</code> аргумент просто не читают (<code>UNUSED(cmdline)</code>), поэтому <code>save noreboot</code>, отправленный на 4.5.3, сохранит и перезагрузит плату без ошибки. Скрипт, который должен работать на любой из этих версий, после любого <code>exit</code> и <code>save</code> должен заново искать порт по <code>craft_name</code>. Для «просто подсмотреть значение» не выходи из CLI командой — просто закрой порт. И ещё одна деталь 2025.12: после <code>exit noreboot</code> флаг запрета арма <code>CLI</code> остаётся до перезагрузки — в исходниках он только ставится (<code>setArmingDisabled(ARMING_DISABLED_CLI)</code> в <code>cliEnter</code>, комментарий «arming flag not released if exiting cli with no reboot for safety»).</p>
+<h4 class="md-subheading">Неинтерактивный режим 4.5.5 и 2025.12: STX … ETX</h4>
+<p>В 4.5.5 и 2025.12 есть режим для программ (в 4.5.3 его нет; <code>msp_serial.c:547</code> в 4.5.5): байт <code>0x02</code> (STX) вместо <code>#</code> входит в CLI без эха, без приглашения и без запрета арма; прошивка отвечает <code>0x02</code>, выполняет присланные строки и печатает только их вывод (неизвестная команда — <code>ERR_CMD_NA: &lt;строка&gt;</code>), а байт <code>0x03</code> (ETX) или первый байт, пришедший позже чем через 2 с после входа, завершают сеанс — прошивка отвечает <code>0x03</code> и остаётся работать без перезагрузки (<code>cli.c</code>, <code>cliProcess</code>). Двухсекундный предел проверяется только при приходе байта: если после ответа ничего не прислать, порт так и остаётся в CLI (MSP на нём молчит, Blackbox и телеметрия стоят), поэтому сеанс всегда заканчивают байтом <code>0x03</code>. В лабораторной <code>\x02get failsafe_delay\n\x03</code> вернул <code>\x02failsafe_delay = 10\r\nAllowed range: 1 - 200\r\nDefault value: 15\r\n\x03</code>. Для чтения значений на 4.5.5 и 2025.12 это самый безопасный путь; в 4.5.3 байт <code>0x02</code> — просто мусор для MSP.</p>
 <h4 class="md-subheading">Грабли 3: тихие исправления</h4>
-<p><code>set</code> + <code>save</code> не гарантирует, что значение осталось таким, каким ты его записал. Betaflight при загрузке корректирует несовместимые комбинации: протокол DShot, bidirectional DShot, схема таймеров на конкретной плате. В нашей практике на F405-плате после включения bidir протокол DShot оказался не тем, что записывали. Правило: после каждого <code>save</code> и перезагрузки — перечитать через <code>get</code> каждое изменённое значение и сравнить с ожидаемым.</p>
-<h4 class="md-subheading">Грабли 4: diff не переносится между версиями</h4>
+<p><code>set</code> + <code>save</code> не гарантирует, что значение осталось таким, каким ты его записал. Betaflight корректирует несовместимые комбинации функцией <code>validateAndFixConfig()</code> (<code>config/config.c</code>) — и делает это дважды: внутри <code>save</code> перед записью в EEPROM и при каждой загрузке. Ответ <code>x set to 20</code> означает только «записано в RAM». Примеры, проверенные по исходникам и в SITL:</p>
+<ul><li>2025.12: если <code>d_max_&lt;ось&gt;</code> меньше <code>d_&lt;ось&gt;</code>, <code>d_max</code> обнуляется (<code>config.c:268</code>); в 4.5.3 зеркально — <code>d_min</code> больше <code>D</code> обнуляется (<code>config.c:281</code>).</li><li>Обе версии, полётная плата с GPS-сборкой: <code>failsafe_procedure = GPS-RESCUE</code> при выключенной <code>feature GPS</code> (или 3D, или самолётном миксере) сбрасывается в <code>DROP</code> (<code>config.c:370</code> в 4.5.3, <code>:357</code> в 2025.12; вывод из кода, в SITL не проверено).</li><li>4.5.5 и 2025.12: любое значение <code>failsafe_procedure</code> вне перечня процедур этой сборки сбрасывается в <code>DROP</code> (<code>config.c:373</code> в 4.5.5, <code>:360–361</code> в 2025.12); в 4.5.3 такой проверки нет. Именно это сработало в лабораторной: в SITL обеих версий GPS-спасение не собрано (<code>target/common_pre.h:72</code>: GPS-драйверы только при <code>!defined(SITL)</code>), строка <code>GPS-RESCUE</code> принимается таблицей значений, но такой процедуры в прошивке нет. 2025.12.5 на <code>save noreboot</code> сбросил её в <code>DROP</code>, 4.5.3 оставил как есть.</li><li>Обе версии: двунаправленный DShot (<code>dshot_bidir</code>) выключается, если протокол моторов не DShot, или bitbang выключен и при этом включён burst DShot либо мотор висит на N-канале таймера (<code>config.c:556</code> в 4.5.3, <code>:472</code> в 2025.12). Наблюдение из практики без сохранённого лога: на F405-плате после включения bidir связка «протокол + bidir» после перезагрузки оказалась не той, что записывали.</li></ul>
+<p>Правило: после каждого <code>save</code> и перезагрузки — перечитать через <code>get</code> каждое изменённое значение и сравнить с ожидаемым.</p>
+<figure class="diagram" data-diagram="bf-cli-silent-fix"><div class="diagram__svg"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 250" width="100%" role="img" aria-labelledby="t" style="max-width:720px;display:block;margin:0 auto"><title id="t">Где значение после set меняется без сообщений</title><style>text{font-family: var(--gc-font-mono, ui-monospace, Menlo, monospace); font-size: 12px;fill:currentColor} .m{fill:var(--gc-ink-muted, #8a93a3)} .a{fill:var(--gc-accent-hud, #5ef1d2)} .w{fill:var(--gc-signal-amber, #f0b24c)} .d{fill:var(--gc-signal-red, #e8636b)} .box{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:currentColor;stroke-width:1.2} .boxa{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6} .ln{stroke:currentColor;stroke-width:1.2;fill:none} .lna{stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6;fill:none} .lnm{stroke:var(--gc-ink-muted, #8a93a3);stroke-width:1;fill:none;stroke-dasharray:4 3} .t{font-size:11px} .b{font-weight:600}</style><defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker><marker id="ara" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--gc-accent-hud, #5ef1d2)"/></marker></defs><rect class="box" x="10" y="16" width="120" height="48" rx="6"/><text x="70.0" y="37.0" text-anchor="middle" style="font-size:10.5px">set → RAM</text><text x="70.0" y="51.0" text-anchor="middle" style="font-size:10.5px">«set to 20»</text><rect class="box" x="150" y="16" width="190" height="48" rx="6"/><text x="245.0" y="37.0" text-anchor="middle">save</text><text x="245.0" y="51.0" text-anchor="middle">(ошибка в batch → отказ)</text><rect class="boxa" x="360" y="16" width="180" height="48" rx="6"/><text x="450.0" y="37.0" text-anchor="middle" class="b">validateAndFixConfig</text><text x="450.0" y="51.0" text-anchor="middle" class="b">① перед записью</text><rect class="box" x="560" y="16" width="150" height="48" rx="6"/><text x="635.0" y="44.0" text-anchor="middle">EEPROM</text><rect class="box" x="560" y="120" width="150" height="48" rx="6"/><text x="635.0" y="141.0" text-anchor="middle">перезагрузка:</text><text x="635.0" y="155.0" text-anchor="middle">save / exit</text><rect class="boxa" x="360" y="120" width="180" height="48" rx="6"/><text x="450.0" y="141.0" text-anchor="middle" class="b">validateAndFixConfig</text><text x="450.0" y="155.0" text-anchor="middle" class="b">② при загрузке</text><rect class="boxa" x="130" y="120" width="190" height="48" rx="6"/><text x="225.0" y="141.0" text-anchor="middle" class="b">get / diff all:</text><text x="225.0" y="155.0" text-anchor="middle" class="b">фактическое значение</text><rect class="box" x="10" y="120" width="104" height="48" rx="6"/><text x="62.0" y="141.0" text-anchor="middle" style="font-size:10.5px">сравнить</text><text x="62.0" y="155.0" text-anchor="middle" style="font-size:10.5px">с записанным</text><path class="ln" d="M130 40.0 L150 40.0" marker-end="url(#ar)"/><path class="ln" d="M340 40.0 L360 40.0" marker-end="url(#ar)"/><path class="ln" d="M540 40.0 L560 40.0" marker-end="url(#ar)"/><path class="ln" d="M635.0 64 L635.0 120" marker-end="url(#ar)"/><path class="ln" d="M560 144.0 L540 144.0" marker-end="url(#ar)"/><path class="ln" d="M360 144.0 L320 144.0" marker-end="url(#ar)"/><path class="lna" d="M130 144.0 L114 144.0" marker-end="url(#ara)"/><text x="10" y="198" text-anchor="start" class="m t">SITL 2025.12.5: d_max_roll = 20 при d_roll = 30 → 0; GPS-RESCUE вне перечня сборки (GPS нет) → DROP.</text><text x="10" y="214" text-anchor="start" class="m t">По config.c: d_min &gt; D → 0 (4.5.3); GPS-RESCUE без feature GPS → DROP; bidir без DShot → OFF.</text><text x="10" y="236" text-anchor="start" class="a t">Правило скрипта: после save перечитать get каждый изменённый ключ; ответ «set to» ничего не гарантирует.</text></svg></div><figcaption class="gc-muted">validateAndFixConfig работает дважды — в save и при загрузке, поэтому подтверждение «set to» ничего не гарантирует: проверка только чтением get после перезагрузки.</figcaption><div class="diagram__hint">Схему можно прокрутить по горизонтали</div></figure>
+<h4 class="md-subheading">Грабли 4: get ищет по подстроке</h4>
+<p><code>get d_roll</code> печатает все параметры, в имени которых есть <code>d_roll</code>, — в 4.5.3 это <code>align_board_roll = 0</code> и только потом <code>d_roll = 30</code> (реальный вывод SITL в лабораторной: <code>align_boar[d_roll]</code> совпал). Проверка <code>if &quot;d_roll = &quot; in out</code> в таком выводе случайно сработает на чужой строке, а наивный разбор «первая строка с <code> = </code>» вернёт 0 вместо 30 — так в первой версии лабораторного скрипта появился ложный <code>FAIL</code>. Разбирай ответ регулярным выражением с якорем начала строки: <code>^d_roll = (.*)$</code> в многострочном режиме. Заодно <code>get</code> печатает строку профиля (<code>profile 0</code>) и <code>Default value:</code> для изменённых значений — эти строки тоже не значение.</p>
+<h4 class="md-subheading">Грабли 5: пакетный режим</h4>
+<p><code>batch start</code> … <code>batch end</code> — режим вставки: команды выполняются по одной, но если хотя бы одна дала ошибку, <code>batch end</code> печатает <code>###ERROR IN batch: ERRORS WERE DETECTED - PLEASE REVIEW BEFORE CONTINUING###</code>, а <code>save</code> внутри такого пакета отказывается: <code>###ERROR IN save: PLEASE FIX ERRORS THEN &#x27;SAVE&#x27;###</code>. Это защита от наполовину применённого конфига, но одноразовая: и <code>batch end</code>, и отказавший <code>save</code> закрывают пакет (<code>resetCommandBatch()</code>), так что следующий <code>save</code> молча сохранит всё, что успело примениться в RAM. Скрипт должен собирать ошибки <code>###ERROR…###</code> после каждой команды и при любой ошибке не слать <code>save</code>, а перезагрузить плату без сохранения. Нюанс: <code>defaults nosave</code> внутри пакета сбрасывает флаг ошибки, но не сам пакет (<code>cli.c:4296</code> в 4.5.3, <code>:4374</code> в 2025.12). Вывод <code>diff all</code> сам начинается с <code>batch start</code> и <code>defaults nosave</code> — вставка <code>diff all</code> сначала сбрасывает всё к умолчаниям.</p>
+<h4 class="md-subheading">Грабли 6: diff не переносится между версиями</h4>
 <p>Имена и смысл параметров меняются между версиями прошивки: переименовываются <code>debug_mode</code>, меняется синтаксис команды <code>serial</code>, меняется смысл PID-параметров D-term. Вставлять <code>diff all</code> от 4.5 в 2025.12 (и наоборот) построчно нельзя: таблица отличий — в модуле «Введение в Betaflight», раздел «Переход 4.5.3 → 2025.12». Переносить настройки между версиями — только осмысленно, по разделам, с перечитыванием.</p>
+<p>Что происходит на деле — из лабораторной. <code>diff all</code> 4.5.3 с <code>d_roll = 30</code> и <code>d_min_roll = 20</code>, вставленный в 2025.12.5 как есть, дал одну ошибку <code>INVALID NAME: d_min_roll = 20</code>, и пакет не сохранился — это хороший исход. Плохой — «починить» переименованием: <code>d_max_roll = 20</code> при <code>d_roll = 30</code> прошивка обнулила при сохранении, а <code>d_roll = 30</code>, принятый без ошибок, в 2025.12 означает базовый D, а не пиковый (умолчания: 4.5.3 — D 40 и <code>d_min</code> 30; 2025.12 — D 30 и <code>d_max</code> 40; <code>flight/pid.h</code>). Строка «без ошибок» — не значит «тот же тюн».</p>
+<a class="gc-callout lesson-card" data-state="ok" href="../m/bf-intro.html"><span class="gc-label gc-muted">Отдельный урок →</span><strong class="lesson-card__title">Введение в Betaflight</strong><span class="lesson-card__why">Полная таблица переименований и смены смысла параметров 4.5.3 → 2025.12 — там.</span></a>
 <h4 class="md-subheading">Почему диф, а не дамп</h4>
 <p><code>diff all</code> содержит только отличия от дефолтов — его можно читать глазами и хранить в git. <code>dump</code> — всё подряд, при обновлении прошивки он тащит старые дефолты как явные значения.</p>
+<p>Формат вывода (<code>cli.c</code>, <code>printConfig</code>): строка <code># version</code> и строка версии с датой сборки, <code>batch start</code>, <code>defaults nosave</code>, <code>mcu_id</code>, <code>signature</code> (для <code>diff all</code>), <code># name: …</code>, блоки <code># feature</code>, <code># master</code> с <code>set …</code>, затем <code>profile 0…3</code> и <code>rateprofile 0…3</code> со своими <code>set</code>, возврат к активным профилям и в конце <code>save</code>. После <code>save</code> строки <code>batch end</code> нет: прошивка снимает флаг пакета, раз сохранение уже в выводе (в лабораторном выводе это видно). Ловушка для скрипта, который читает вывод: строки-комментарии <code>\r\n# version</code>, <code>\r\n# master</code> начинаются ровно как приглашение. Если кусок данных случайно закончился на <code>\r\n# </code>, наивный «читать до приглашения» оборвёт бэкап на середине. Надёжный признак конца — приглашение в конце буфера и после него 0.3 с тишины (ориентир курса; на USB и TCP хватает с запасом).</p>
+<div class="table-wrap md-table-wrap" tabindex="0"><table class="md-table"><thead><tr><th>Команда</th><th>4.5.3</th><th>2025.12.5</th><th>Что вернёт / сделает</th></tr></thead><tbody><tr><td data-label="Команда"><code>#</code> (байт)</td><td data-label="4.5.3">вход в CLI</td><td data-label="2025.12.5">вход в CLI</td><td data-label="Что вернёт / сделает">после 100 мс тишины; не на армленом аппарате</td></tr><tr><td data-label="Команда"><code>0x02</code> … <code>0x03</code></td><td data-label="4.5.3">нет (в 4.5.5 есть)</td><td data-label="2025.12.5">один сеанс без эха и перезагрузки</td><td data-label="Что вернёт / сделает">вывод команд, окно 2 с; заканчивать <code>0x03</code></td></tr><tr><td data-label="Команда"><code>get &lt;подстрока&gt;</code></td><td data-label="4.5.3">есть</td><td data-label="2025.12.5">есть</td><td data-label="Что вернёт / сделает">все совпадения по подстроке + диапазон/умолчание</td></tr><tr><td data-label="Команда"><code>set &lt;имя&gt; = &lt;v&gt;</code></td><td data-label="4.5.3">есть</td><td data-label="2025.12.5">есть</td><td data-label="Что вернёт / сделает"><code>&lt;имя&gt; set to &lt;v&gt;</code> или <code>###ERROR IN set: INVALID NAME/VALUE###</code></td></tr><tr><td data-label="Команда"><code>batch start</code> / <code>batch end</code></td><td data-label="4.5.3">есть</td><td data-label="2025.12.5">есть</td><td data-label="Что вернёт / сделает">при ошибке в пакете <code>save</code> отказывает</td></tr><tr><td data-label="Команда"><code>diff all</code></td><td data-label="4.5.3">есть</td><td data-label="2025.12.5">есть</td><td data-label="Что вернёт / сделает"><code>batch start</code>, <code>defaults nosave</code>, …, <code>save</code></td></tr><tr><td data-label="Команда"><code>save</code></td><td data-label="4.5.3">сохранить + перезагрузка</td><td data-label="2025.12.5">сохранить + перезагрузка</td><td data-label="Что вернёт / сделает"><code># saving</code>; перед записью — <code>validateAndFixConfig</code></td></tr><tr><td data-label="Команда"><code>save noreboot</code></td><td data-label="4.5.3">аргумент игнорируется: перезагрузка</td><td data-label="2025.12.5">без перезагрузки</td><td data-label="Что вернёт / сделает">в 4.5.5 тоже есть</td></tr><tr><td data-label="Команда"><code>exit</code></td><td data-label="4.5.3">перезагрузка</td><td data-label="2025.12.5">перезагрузка</td><td data-label="Что вернёт / сделает"><code>unsaved changes lost</code></td></tr><tr><td data-label="Команда"><code>exit noreboot</code></td><td data-label="4.5.3">аргумент игнорируется: перезагрузка</td><td data-label="2025.12.5">без перезагрузки</td><td data-label="Что вернёт / сделает">запрет арма <code>CLI</code> остаётся до перезагрузки</td></tr></tbody></table></div>
 <h4 class="md-subheading">Минимальный скрипт выгрузки <code>diff all</code> (pyserial)</h4>
-<pre class="cli-block"><code>import serial, time, sys, glob
+<pre class="cli-block"><code>import serial, time, sys, glob, re
 
 def cli(port, cmds, timeout=3.0):
-    &quot;&quot;&quot;Open CLI, run commands, return full text. Do not send &#x27;exit&#x27; (reboots on 4.5).&quot;&quot;&quot;
+    &quot;&quot;&quot;Open CLI, run commands, return full text. Do not send &#x27;exit&#x27; (reboots on 4.5.3).&quot;&quot;&quot;
     with serial.Serial(port, 115200, timeout=0.2) as s:
-        s.write(b&quot;#\n&quot;); time.sleep(0.5); s.read(s.in_waiting or 1)
+        s.write(b&quot;#\n&quot;); time.sleep(0.5); s.read(4096)   # &quot;#\n&quot;: safe if the FC is already in CLI
         out = &quot;&quot;
         for c in cmds:
             s.write((c + &quot;\n&quot;).encode()); t0 = time.time(); buf = &quot;&quot;
             while time.time() - t0 &lt; timeout:
                 chunk = s.read(4096).decode(errors=&quot;replace&quot;)
                 if chunk: buf += chunk; t0 = time.time()
-                if buf.rstrip().endswith(&quot;# &quot;): break        # prompt returned
+                elif buf.endswith(&quot;\r\n# &quot;): break   # prompt AND a quiet read: end of output
             out += buf
         return out
 
 ports = glob.glob(&quot;/dev/ttyACM*&quot;)                              # Linux; Windows: COM*
 for p in ports:
     name = cli(p, [&quot;get craft_name&quot;])
-    if &quot;viking7&quot; in name:
+    if re.search(r&quot;^craft_name = viking7\r?$&quot;, name, re.M):   # anchored: not viking70
         text = cli(p, [&quot;version&quot;, &quot;diff all&quot;])
         open(&quot;viking7/betaflight/diff-all.txt&quot;, &quot;w&quot;).write(text)
         break
 else:
     sys.exit(&quot;craft not found&quot;)</code></pre>
-<p>Нормализация перед коммитом: убрать строки с датой/временем из <code>version</code> и <code># </code> эхо, отсортировать блоки — иначе <code>git diff</code> шумит (модуль «CI»).</p>
+<p>Нормализация перед коммитом: убрать строки с датой/временем из <code>version</code> и <code># </code> эхо, отсортировать блоки — иначе <code>git diff</code> шумит (модуль «CI»). Этот короткий вариант входит в CLI на каждом порту ради имени — для разового бэкапа терпимо (порт закрывается без <code>exit</code>, плата остаётся в CLI с запретом арма до переподключения питания); для парка ищи плату по <code>MSP_NAME</code>, как в практике.</p>
 <h4 class="md-subheading">Что автоматизировать стоит, а что нет</h4>
 <p>Стоит: бэкап <code>diff all</code> перед каждым полётным днём; проверка инвариантов (failsafe, poles, bidir) по выгрузке; массовая смена <code>craft_name</code>/VTX-таблицы на парке; выгрузка логов через <code>msc</code>. Не стоит: массовая «накатка PID» на разные аппараты (разная механика), любые изменения без перечитывания <code>get</code> после <code>save</code>.</p>
 <figure class="diagram" data-diagram="bf-cli-session"><div class="diagram__svg"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 360" width="100%" role="img" aria-labelledby="t" style="max-width:720px;display:block;margin:0 auto"><title id="t">Сессия CLI Betaflight по serial</title><style>text{font-family: var(--gc-font-mono, ui-monospace, Menlo, monospace); font-size: 12px;fill:currentColor} .m{fill:var(--gc-ink-muted, #8a93a3)} .a{fill:var(--gc-accent-hud, #5ef1d2)} .w{fill:var(--gc-signal-amber, #f0b24c)} .d{fill:var(--gc-signal-red, #e8636b)} .box{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:currentColor;stroke-width:1.2} .boxa{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6} .ln{stroke:currentColor;stroke-width:1.2;fill:none} .lna{stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6;fill:none} .lnm{stroke:var(--gc-ink-muted, #8a93a3);stroke-width:1;fill:none;stroke-dasharray:4 3} .t{font-size:11px} .b{font-weight:600}</style><defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker><marker id="ara" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--gc-accent-hud, #5ef1d2)"/></marker></defs><text x="16" y="16" text-anchor="start" class="m t">Сессия CLI Betaflight по serial</text><rect class="box" x="20.0" y="26" width="120" height="26" rx="5"/><text x="80.0" y="43" text-anchor="middle" class="b" style="font-size:11px">Скрипт</text><line class="lnm" x1="80.0" y1="52" x2="80.0" y2="350"/><rect class="box" x="410.0" y="26" width="120" height="26" rx="5"/><text x="470.0" y="43" text-anchor="middle" class="b" style="font-size:11px">FC</text><line class="lnm" x1="470.0" y1="52" x2="470.0" y2="350"/><path class="lna" d="M80.0 74 L466.0 74" marker-end="url(#ara)"/><text x="275.0" y="69" text-anchor="middle" class="a t" style="font-size:10px">#  (вход в CLI)</text><path class="ln" style="stroke-dasharray:5 4" d="M470.0 104 L84.0 104" marker-end="url(#ar)"/><text x="275.0" y="99" text-anchor="middle" class="t" style="font-size:10px">приглашение «# »</text><path class="ln" d="M80.0 134 L466.0 134" marker-end="url(#ar)"/><text x="275.0" y="129" text-anchor="middle" class="t" style="font-size:10px">diff all</text><path class="ln" style="stroke-dasharray:5 4" d="M470.0 164 L84.0 164" marker-end="url(#ar)"/><text x="275.0" y="159" text-anchor="middle" class="t" style="font-size:10px">текст конфига …  # </text><path class="ln" d="M80.0 194 L466.0 194" marker-end="url(#ar)"/><text x="275.0" y="189" text-anchor="middle" class="t" style="font-size:10px">set gyro_lpf1_static_hz = 250</text><path class="ln" style="stroke-dasharray:5 4" d="M470.0 224 L84.0 224" marker-end="url(#ar)"/><text x="275.0" y="219" text-anchor="middle" class="t" style="font-size:10px">значение могло быть исправлено молча</text><path class="lna" d="M80.0 254 L466.0 254" marker-end="url(#ara)"/><text x="275.0" y="249" text-anchor="middle" class="a t" style="font-size:10px">get … → сверка</text><path class="ln" d="M80.0 284 L466.0 284" marker-end="url(#ar)"/><text x="275.0" y="279" text-anchor="middle" class="t" style="font-size:10px">save</text><text x="275.0" y="318" text-anchor="middle" class="w t" style="font-size:10px">— перезагрузка: порт может смениться —</text><text x="704" y="78" text-anchor="end" class="m t" style="font-size:10px">ждать приглашение, не время</text><text x="704" y="228" text-anchor="end" class="m t" style="font-size:10px">всегда перечитывать</text><text x="704" y="318" text-anchor="end" class="m t" style="font-size:10px">искать порт заново по VID/PID</text></svg></div><figcaption class="gc-muted">Сессия CLI по serial: ждать приглашение, перечитывать значения после set, после save искать порт заново.</figcaption><div class="diagram__hint">Схему можно прокрутить по горизонтали</div></figure>
 <h4 class="md-subheading">Место в системе</h4>
-<ul><li><strong>Получает:</strong> текстовый CLI по USB и команды <code>diff all</code>, <code>get</code>, <code>set</code>, <code>save</code> (<code>bf-cli</code>); таблицу переименований между 4.5 и 2025.12 (<code>bf-intro</code>); уникальный <code>craft_name</code> каждого аппарата.</li><li><strong>Отдаёт:</strong> <code>diff all</code> перед полётным днём — в git (<code>eng-ci-configs</code>); проверку инвариантов failsafe, числа полюсов и bidir по выгрузке (<code>bf-failsafe</code>, <code>bf-rpm-filter</code>).</li><li><strong>Если ошибиться здесь:</strong> не перечитал <code>get</code> после <code>save</code> → прошивка при загрузке тихо исправила протокол DShot → на аппарате не тот протокол, что в твоей записи; сверять по фактическим значениям (<code>f-motors-esc</code>, <code>bf-rpm-filter</code>). Вставил <code>diff all</code> от 4.5 в 2025.12 построчно → <code>d_roll</code> принят, но означает уже базовый D, а не пиковый → тюн другой; таблица — в <code>bf-intro</code>, симптомы — в <code>bf-pid</code>.</li></ul>
+<ul><li><strong>Получает:</strong> текстовый CLI по USB и команды <code>diff all</code>, <code>get</code>, <code>set</code>, <code>save</code> (<code>bf-cli</code>); MSP для опознания платы; таблицу переименований между 4.5 и 2025.12 (<code>bf-intro</code>); уникальный <code>craft_name</code> каждого аппарата.</li><li><strong>Отдаёт:</strong> <code>diff all</code> перед полётным днём — в git и на проверку инвариантов в CI (<code>eng-ci-configs</code>); фактические значения после перезагрузки для failsafe, числа полюсов и bidir (<code>bf-failsafe</code>, <code>bf-rpm-filter</code>).</li><li><strong>Если ошибиться здесь:</strong> не перечитал <code>get</code> после <code>save</code> → прошивка тихо обнулила <code>d_max</code> или вернула failsafe в <code>DROP</code> → на аппарате не то, что в твоей записи; вскроется в полёте как другой тюн (<code>bf-pid</code>) или как падение вместо возврата (<code>bf-failsafe</code>). Вставил <code>diff all</code> от 4.5 в 2025.12 построчно и «починил» имена → <code>d_roll</code> принят, но означает уже базовый D, а не пиковый → тюн другой; таблица — в <code>bf-intro</code>.</li></ul>
 
 <h2>Практика</h2>
-<h4 class="md-subheading">Шаг 1. Минимальный клиент CLI на Python</h4>
-<pre class="cli-block"><code>import time
+<p>Главный путь — без платы: Betaflight 4.5.3 и 2025.12.5 собираются под Linux как SITL (программа, в которой работает настоящий код прошивки), и её UART1 доступен как TCP-порт 5761. pyserial открывает его той же функцией, что и USB-порт (<code>serial.serial_for_url(&quot;socket://127.0.0.1:5761&quot;)</code>), поэтому скрипт отличается от «железного» одной строкой. <code>save</code> в SITL вызывает <code>systemReset()</code>, а она — <code>exit(0)</code> (<code>target/SITL/sitl.c</code>): перезагрузка выглядит как завершение процесса, и скрипт перезапускает его в той же папке, где лежит <code>eeprom.bin</code>, — ровно как плата загружается со своей flash.</p>
+<h4 class="md-subheading">Шаг 1. Собрать SITL двух версий</h4>
+<p>Исходники — теги <code>4.5.3</code> и <code>2025.12.5</code> репозитория betaflight/betaflight. Makefile требует <code>arm-none-eabi-gcc</code> даже для SITL (<code>mk/tools.mk:266</code>); официальный путь — <code>make arm_sdk_install</code>. Для SITL кросс-компилятор на деле не используется, поэтому хватает подставить системный gcc под ожидаемыми именами; 2025.12 ещё требует папку <code>src/config</code> (её заполняет <code>make configs</code> клоном betaflight/config; для SITL достаточно пустой <code>src/config/configs</code> — вывод из <code>mk/config.mk</code>). Сборка заняла 12 с и 8 с.</p>
+<pre class="cli-block"><code>mkdir -p fakesdk/bin &amp;&amp; for t in gcc g++ gdb objcopy objdump readelf size; do
+  ln -sf /usr/bin/$t fakesdk/bin/arm-none-eabi-$t; done
+(cd bf453 &amp;&amp; make TARGET=SITL ARM_SDK_DIR=$PWD/../fakesdk -j8)      # -&gt; obj/main/betaflight_SITL.elf
+(cd bf2025 &amp;&amp; mkdir -p src/config/configs &amp;&amp; make SITL ARM_SDK_DIR=$PWD/../fakesdk -j8)
+                                                                     # -&gt; obj/betaflight_2025.12.5_SITL</code></pre>
+<h4 class="md-subheading">Шаг 2. Лабораторный скрипт</h4>
+<p>Скрипт делает шесть шагов: (1) опознание по MSP; (2) пакет <code>set</code> и <code>save</code> на 4.5.3; (3) поиск по <code>MSP_NAME</code> после «перезагрузки», перечитывание каждого ключа и выгрузка <code>diff all</code>; (4) вставка этого <code>diff all</code> в 2025.12.5 как есть; (5) «перенос» переименованием <code>d_min_roll → d_max_roll</code>, <code>save noreboot</code>, перечитывание, неинтерактивный запрос STX/ETX; (6) сравнение двух <code>diff all</code> по ключам. Запуск: <code>python3 -I bf_cli_lab.py &lt;SITL 4.5.3&gt; &lt;SITL 2025.12.5&gt; work</code>; порт 5761 должен быть свободен — скрипт проверяет это сам, иначе ответил бы чужой SITL (так и случилось при первом прогоне: оставшийся процесс 2025.12 отвечал вместо свежего 4.5.3).</p>
+<pre class="cli-block"><code>&quot;&quot;&quot;Betaflight CLI + MSP automation lab on SITL (4.5.3 and 2025.12.5).
+
+The same functions work on a real FC over USB: replace open_port() with
+serial.Serial(&quot;/dev/ttyACM0&quot;, 115200, timeout=0.2) (Windows: &quot;COM8&quot;).
+Usage: python3 bf_cli_lab.py &lt;sitl-4.5.3&gt; &lt;sitl-2025.12.5&gt; &lt;workdir&gt;
+&quot;&quot;&quot;
+import os, re, socket, subprocess, sys, time
+import serial  # pyserial 3.5
+
+PROMPT = b&quot;\r\n# &quot;
+ERR = re.compile(r&quot;###ERROR IN (\w+): (.*?)###&quot;)
+
+
+def open_port(url=&quot;socket://127.0.0.1:5761&quot;, tries=50):
+    for _ in range(tries):               # SITL needs ~0.5 s to bind its TCP &quot;UART1&quot;
+        try:
+            return serial.serial_for_url(url, timeout=0.2)
+        except (serial.SerialException, OSError):
+            time.sleep(0.1)
+    raise RuntimeError(&quot;port did not open&quot;)
+
+
+def msp(port, cmd, payload=b&quot;&quot;):
+    &quot;&quot;&quot;MSP v1: &#x27;$M&lt;&#x27; size cmd payload xor; reply &#x27;$M&gt;&#x27; (or &#x27;$M!&#x27; = unsupported).&quot;&quot;&quot;
+    body = bytes([len(payload), cmd]) + payload
+    ck = 0
+    for b in body:
+        ck ^= b
+    port.reset_input_buffer()
+    port.write(b&quot;$M&lt;&quot; + body + bytes([ck]))
+    buf, t_end = b&quot;&quot;, time.time() + 1.0
+    while time.time() &lt; t_end:
+        buf += port.read(256)
+        i = buf.find(b&quot;$M&quot;)
+        if i &gt;= 0 and len(buf) &gt;= i + 6 and len(buf) &gt;= i + 6 + buf[i + 3]:
+            n = buf[i + 3]
+            if buf[i + 2:i + 3] != b&quot;&gt;&quot;:
+                raise IOError(f&quot;MSP {cmd}: error reply&quot;)
+            ck = 0
+            for b in buf[i + 3:i + 5 + n]:
+                ck ^= b
+            if ck != buf[i + 5 + n]:
+                raise IOError(f&quot;MSP {cmd}: bad checksum&quot;)
+            return buf[i + 5:i + 5 + n]
+    raise TimeoutError(f&quot;MSP {cmd}: no reply&quot;)
+
+
+def identify(port):
+    api = msp(port, 1)            # MSP_API_VERSION: protocol, major, minor
+    variant = msp(port, 2)        # MSP_FC_VARIANT: &#x27;BTFL&#x27;
+    ver = msp(port, 3)            # MSP_FC_VERSION: 4.5.3 or 25.12.5 (calver: year-2000)
+    name = msp(port, 10)          # MSP_NAME: craft_name
+    uid = msp(port, 160)          # MSP_UID: 3 x uint32 MCU unique id
+    return {&quot;api&quot;: f&quot;{api[1]}.{api[2]}&quot;, &quot;variant&quot;: variant.decode(),
+            &quot;version&quot;: &quot;.&quot;.join(str(x) for x in ver[:3]),
+            &quot;name&quot;: name.decode(errors=&quot;replace&quot;), &quot;uid&quot;: uid.hex()}
+
+
+def read_prompt(port, timeout=8.0, quiet=0.3):
+    &quot;&quot;&quot;Read until the CLI prompt AND then `quiet` s of silence: comment lines of
+    `diff` (&#x27;\\r\\n# version&#x27;) look exactly like the prompt at a chunk boundary.&quot;&quot;&quot;
+    buf, t_end = b&quot;&quot;, time.time() + timeout
+    while time.time() &lt; t_end:
+        chunk = port.read(4096)
+        buf += chunk
+        if buf.endswith(PROMPT) and not chunk:
+            t_quiet = time.time() + quiet
+            while time.time() &lt; t_quiet and not (chunk := port.read(4096)):
+                pass
+            if not chunk:
+                return buf.decode(errors=&quot;replace&quot;)
+            buf += chunk
+    raise TimeoutError(f&quot;no prompt after {len(buf)} bytes&quot;)
+
+
+def cli_enter(port):
+    port.write(b&quot;#&quot;)              # non-MSP &#x27;#&#x27;, handled after 100 ms idle; ignored while ARMED
+    return read_prompt(port)
+
+
+def cli(port, cmd, timeout=8.0):
+    port.write(cmd.encode() + b&quot;\n&quot;)
+    out = read_prompt(port, timeout)
+    lines = out.replace(&quot;\r&quot;, &quot;&quot;).split(&quot;\n&quot;)[1:-1]  # drop echo and prompt
+    return &quot;\n&quot;.join(lines).strip(&quot;\n&quot;), ERR.findall(out)
+
+
+def get(port, key):
+    &quot;&quot;&quot;`get` is a substring search: `get d_roll` also prints align_board_roll.&quot;&quot;&quot;
+    out, _ = cli(port, f&quot;get {key}&quot;)
+    return re.search(rf&quot;^{re.escape(key)} = (.*)$&quot;, out, re.M)[1].strip()
+
+
+def start_sitl(binary, workdir):
+    with socket.socket() as s:            # a leftover SITL would answer instead of ours
+        if s.connect_ex((&quot;127.0.0.1&quot;, 5761)) == 0:
+            sys.exit(&quot;port 5761 busy: another SITL is running&quot;)
+    os.makedirs(workdir, exist_ok=True)
+    PROCS.append(subprocess.Popen([binary], cwd=workdir, stdout=subprocess.DEVNULL,
+                                  stderr=subprocess.DEVNULL))
+    return PROCS[-1]
+
+
+def wait_reboot(port, proc):
+    &quot;&quot;&quot;On SITL `save` = systemReset() = exit(0); on a real FC the USB device re-enumerates.&quot;&quot;&quot;
+    try:
+        while port.read(4096):
+            pass
+    except (serial.SerialException, OSError):
+        pass
+    port.close()
+    return proc.wait(timeout=5)
+
+
+def parse_diff(text):
+    &quot;&quot;&quot;`diff all` -&gt; {(context, key): value}; context = master / profile N / rateprofile N.&quot;&quot;&quot;
+    ctx, out = &quot;master&quot;, {}
+    for line in text.replace(&quot;\r&quot;, &quot;&quot;).split(&quot;\n&quot;):
+        line = line.strip()
+        if m := re.match(r&quot;(profile|rateprofile) (\d)$&quot;, line):
+            ctx = f&quot;{m[1]} {m[2]}&quot;
+        elif m := re.match(r&quot;set (\S+) = (.*)$&quot;, line):
+            out[(ctx, m[1])] = m[2]
+        elif line and not line.startswith(&quot;#&quot;) and line.split()[0] in (
+                &quot;feature&quot;, &quot;serial&quot;, &quot;aux&quot;, &quot;resource&quot;, &quot;beacon&quot;, &quot;map&quot;, &quot;led&quot;, &quot;vtxtable&quot;):
+            out[(ctx, line)] = &quot;line&quot;
+    return out
+
+
+CHANGES = {&quot;craft_name&quot;: &quot;viking2&quot;, &quot;failsafe_delay&quot;: &quot;10&quot;,
+           &quot;failsafe_procedure&quot;: &quot;GPS-RESCUE&quot;, &quot;d_roll&quot;: &quot;30&quot;, &quot;d_min_roll&quot;: &quot;20&quot;}
+
+PROCS = []
+
+
+def run(bin453, bin2025, work):
+    w453 = os.path.join(work, &quot;fc453&quot;)
+    print(&quot;== 1. MSP identify (no CLI, no reboot)&quot;)
+    proc = start_sitl(bin453, w453)
+    p = open_port()
+    print(&quot;  &quot;, identify(p))
+
+    print(&quot;== 2. CLI: batch of set, then save&quot;)
+    cli_enter(p)
+    print(&quot;  &quot;, cli(p, &quot;batch start&quot;)[0])
+    for k, v in CHANGES.items():
+        print(&quot;  &quot;, cli(p, f&quot;set {k} = {v}&quot;)[0].splitlines()[0])
+    print(&quot;  &quot;, cli(p, &quot;batch end&quot;)[0])
+    p.write(b&quot;save\n&quot;)
+    print(&quot;   save -&gt; FC reboots, SITL exit code&quot;, wait_reboot(p, proc))
+
+    print(&quot;== 3. after reboot: find by MSP_NAME, re-read every key with get&quot;)
+    proc = start_sitl(bin453, w453)
+    p = open_port()
+    print(&quot;   MSP_NAME =&quot;, identify(p)[&quot;name&quot;])
+    cli_enter(p)
+    print(&quot;   raw `get d_roll`:&quot;, cli(p, &quot;get d_roll&quot;)[0].replace(&quot;\n&quot;, &quot; | &quot;))
+    for k, v in CHANGES.items():
+        got = get(p, k)
+        print(f&quot;   {&#x27;OK  &#x27; if got == v else &#x27;FAIL&#x27;} {k:20s} wrote {v:10s} read {got}&quot;)
+    diff453, _ = cli(p, &quot;diff all&quot;, timeout=15)
+    open(os.path.join(work, &quot;viking2_4.5.3_diff.txt&quot;), &quot;w&quot;).write(diff453 + &quot;\n&quot;)
+    print(f&quot;   diff all: {len(diff453.splitlines())} lines saved&quot;)
+    p.close(); proc.terminate(); proc.wait()
+
+    print(&quot;== 4. paste the 4.5.3 diff into 2025.12.5 as is&quot;)
+    proc = start_sitl(bin2025, os.path.join(work, &quot;fc2025&quot;))
+    p = open_port()
+    print(&quot;  &quot;, identify(p))
+    cli_enter(p)
+    errors = []
+    for line in diff453.splitlines():
+        if line.strip() and not line.startswith(&quot;#&quot;) and line.strip() != &quot;save&quot;:
+            errors += cli(p, line)[1]
+    for e in errors:
+        print(&quot;   ERROR&quot;, e)
+    print(&quot;  &quot;, cli(p, &quot;save noreboot&quot;)[0].replace(&quot;\n&quot;, &quot; | &quot;))
+
+    print(&quot;== 5. &#x27;port&#x27; by renaming d_min_roll -&gt; d_max_roll, save noreboot&quot;)
+    cli(p, &quot;defaults nosave&quot;)
+    ported = {(&quot;d_max_roll&quot; if k == &quot;d_min_roll&quot; else k): v for k, v in CHANGES.items()}
+    for k, v in ported.items():
+        cli(p, f&quot;set {k} = {v}&quot;)
+    print(&quot;  &quot;, cli(p, &quot;save noreboot&quot;)[0])
+    for k, v in ported.items():
+        got = get(p, k)
+        print(f&quot;   {&#x27;OK  &#x27; if got == v else &#x27;FAIL&#x27;} {k:20s} wrote {v:10s} read {got}&quot;)
+    diff2025, _ = cli(p, &quot;diff all&quot;, timeout=15)
+    open(os.path.join(work, &quot;viking2_2025.12.5_diff.txt&quot;), &quot;w&quot;).write(diff2025 + &quot;\n&quot;)
+    p.write(b&quot;exit noreboot\n&quot;); time.sleep(1.0)
+    print(&quot;  &quot;, p.read(4096).decode().strip().replace(&quot;\r\n&quot;, &quot; | &quot;),
+          &quot;| SITL alive:&quot;, proc.poll() is None, &quot;| MSP_NAME:&quot;, identify(p)[&quot;name&quot;])
+    p.write(b&quot;\x02get failsafe_delay\n\x03&quot;); time.sleep(0.5)  # 2025.12: one-shot CLI, STX..ETX
+    print(&quot;   STX/ETX:&quot;, p.read(4096))
+    p.close(); proc.terminate(); proc.wait()
+
+    print(&quot;== 6. semantic diff 4.5.3 -&gt; 2025.12.5 (by key, not by text line)&quot;)
+    a, b = parse_diff(diff453), parse_diff(diff2025)
+    for key in sorted(set(a) | set(b)):
+        if a.get(key) != b.get(key):
+            print(f&quot;   {key[0]:10s} {key[1]:20s} {a.get(key, &#x27;-&#x27;):&gt;10s} -&gt; {b.get(key, &#x27;-&#x27;)}&quot;)
+
+
+if __name__ == &quot;__main__&quot;:
+    try:
+        run(*sys.argv[1:4])
+    finally:
+        for pr in PROCS:
+            if pr.poll() is None:
+                pr.terminate()</code></pre>
+<pre class="cli-block"><code>== 1. MSP identify (no CLI, no reboot)
+   {&#x27;api&#x27;: &#x27;1.46&#x27;, &#x27;variant&#x27;: &#x27;BTFL&#x27;, &#x27;version&#x27;: &#x27;4.5.3&#x27;, &#x27;name&#x27;: &#x27;&#x27;, &#x27;uid&#x27;: &#x27;000000000100000002000000&#x27;}
+== 2. CLI: batch of set, then save
+   Command batch started
+   craft_name set to viking2
+   failsafe_delay set to 10
+   failsafe_procedure set to GPS-RESCUE
+   d_roll set to 30
+   d_min_roll set to 20
+   Command batch ended
+   save -&gt; FC reboots, SITL exit code 0
+== 3. after reboot: find by MSP_NAME, re-read every key with get
+   MSP_NAME = viking2
+   raw `get d_roll`: align_board_roll = 0 | Allowed range: -180 - 360 |  | d_roll = 30 | profile 0 | Allowed range: 0 - 250 | Default value: 40
+   OK   craft_name           wrote viking2    read viking2
+   OK   failsafe_delay       wrote 10         read 10
+   OK   failsafe_procedure   wrote GPS-RESCUE read GPS-RESCUE
+   OK   d_roll               wrote 30         read 30
+   OK   d_min_roll           wrote 20         read 20
+   diff all: 51 lines saved
+== 4. paste the 4.5.3 diff into 2025.12.5 as is
+   {&#x27;api&#x27;: &#x27;1.47&#x27;, &#x27;variant&#x27;: &#x27;BTFL&#x27;, &#x27;version&#x27;: &#x27;25.12.5&#x27;, &#x27;name&#x27;: &#x27;&#x27;, &#x27;uid&#x27;: &#x27;000000000100000002000000&#x27;}
+   ERROR (&#x27;set&#x27;, &#x27;INVALID NAME: d_min_roll = 20&#x27;)
+   ###ERROR IN save: ERRORS WERE DETECTED - PLEASE REVIEW BEFORE CONTINUING### | ###ERROR IN save: PLEASE FIX ERRORS THEN &#x27;SAVE&#x27;###
+== 5. &#x27;port&#x27; by renaming d_min_roll -&gt; d_max_roll, save noreboot
+   # saving
+   OK   craft_name           wrote viking2    read viking2
+   OK   failsafe_delay       wrote 10         read 10
+   FAIL failsafe_procedure   wrote GPS-RESCUE read DROP
+   OK   d_roll               wrote 30         read 30
+   FAIL d_max_roll           wrote 20         read 0
+   exit noreboot |  | # leaving CLI mode, no reboot | SITL alive: True | MSP_NAME: viking2
+   STX/ETX: b&#x27;\x02failsafe_delay = 10\r\nAllowed range: 1 - 200\r\nDefault value: 15\r\n\x03&#x27;
+== 6. semantic diff 4.5.3 -&gt; 2025.12.5 (by key, not by text line)
+   master     failsafe_procedure   GPS-RESCUE -&gt; -
+   profile 0  d_max_roll                    - -&gt; 0
+   profile 0  d_min_roll                   20 -&gt; -
+   profile 0  d_roll                       30 -&gt; -</code></pre>
+<h4 class="md-subheading">Шаг 3. Что доказывает каждая строка вывода</h4>
+<ul><li>Шаг 1 вывода: опознание прошло по MSP, плата не входила в CLI. Версия 4.5.3 пришла как <code>4.5.3</code>, 2025.12.5 — как <code>25.12.5</code>: проверка версии по первому байту сломалась бы.</li><li>Шаг 2–3: все пять значений на 4.5.3 пережили <code>save</code> и загрузку — <code>OK</code>. Строка <code>raw get d_roll</code> показывает, почему разбирать ответ надо с якорем: первой пришла <code>align_board_roll = 0</code>.</li><li>Шаг 4: единственная ошибка — <code>d_min_roll</code>, и из-за неё пакет не сохранился вовсе; это правильное поведение, а не сбой.</li><li>Шаг 5: после «переноса» переименованием два <code>FAIL</code>: <code>failsafe_procedure</code> стал <code>DROP</code> (GPS-спасения в SITL нет, значение вне перечня — проверка 2025.12), <code>d_max_roll</code> стал 0 (меньше <code>d_roll</code>). Ни одна команда не напечатала ошибку — это и есть тихие исправления. <code>exit noreboot</code> оставил SITL живым, MSP снова отвечает.</li><li>Шаг 6: построчный <code>git diff</code> двух файлов показал бы и смену строки версии с датой сборки; сравнение по ключам показывает четыре настоящих изменения смысла, в том числе исчезновение <code>d_roll = 30</code> из diff 2025.12 — там 30 уже умолчание.</li></ul>
+<figure class="diagram" data-diagram="bf-cli-apply-verify"><div class="diagram__svg"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 316" width="100%" role="img" aria-labelledby="t" style="max-width:720px;display:block;margin:0 auto"><title id="t">Скрипт CLI: изменить, перечитать, сверить</title><style>text{font-family: var(--gc-font-mono, ui-monospace, Menlo, monospace); font-size: 12px;fill:currentColor} .m{fill:var(--gc-ink-muted, #8a93a3)} .a{fill:var(--gc-accent-hud, #5ef1d2)} .w{fill:var(--gc-signal-amber, #f0b24c)} .d{fill:var(--gc-signal-red, #e8636b)} .box{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:currentColor;stroke-width:1.2} .boxa{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6} .ln{stroke:currentColor;stroke-width:1.2;fill:none} .lna{stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6;fill:none} .lnm{stroke:var(--gc-ink-muted, #8a93a3);stroke-width:1;fill:none;stroke-dasharray:4 3} .t{font-size:11px} .b{font-weight:600}</style><defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker><marker id="ara" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--gc-accent-hud, #5ef1d2)"/></marker></defs><rect class="boxa" x="10" y="40" width="150" height="50" rx="6"/><text x="85.0" y="62.0" text-anchor="middle" class="b">find_craft:</text><text x="85.0" y="76.0" text-anchor="middle" class="b">порт по craft_name</text><rect class="box" x="186" y="40" width="150" height="50" rx="6"/><text x="261.0" y="62.0" text-anchor="middle">diff all →</text><text x="261.0" y="76.0" text-anchor="middle">*_before_diff.txt</text><rect class="box" x="362" y="40" width="150" height="50" rx="6"/><text x="437.0" y="62.0" text-anchor="middle">set из CHANGES,</text><text x="437.0" y="76.0" text-anchor="middle">save</text><rect class="box" x="550" y="34" width="160" height="62" rx="6"/><text x="630.0" y="55.0" text-anchor="middle">перезагрузка:</text><text x="630.0" y="69.0" text-anchor="middle">ждать 6 с, порт</text><text x="630.0" y="83.0" text-anchor="middle">мог смениться</text><rect class="boxa" x="550" y="140" width="160" height="50" rx="6"/><text x="630.0" y="162.0" text-anchor="middle" class="b">find_craft</text><text x="630.0" y="176.0" text-anchor="middle" class="b">заново</text><rect class="box" x="362" y="140" width="150" height="50" rx="6"/><text x="437.0" y="162.0" text-anchor="middle">get по каждому</text><text x="437.0" y="176.0" text-anchor="middle">ключу: все OK?</text><rect class="box" x="186" y="140" width="150" height="50" rx="6"/><text x="261.0" y="162.0" text-anchor="middle">diff all →</text><text x="261.0" y="176.0" text-anchor="middle">*_after_diff.txt</text><rect class="boxa" x="10" y="140" width="150" height="50" rx="6"/><text x="85.0" y="162.0" text-anchor="middle" class="b">git diff: ровно</text><text x="85.0" y="176.0" text-anchor="middle" class="b">строки CHANGES</text><rect class="box" x="352" y="236" width="170" height="50" rx="6"/><text x="437.0" y="258.0" text-anchor="middle">FAIL: не сохранилось</text><text x="437.0" y="272.0" text-anchor="middle">или ключ переименован</text><rect class="box" x="10" y="236" width="150" height="50" rx="6"/><text x="85.0" y="258.0" text-anchor="middle">лишняя строка:</text><text x="85.0" y="272.0" text-anchor="middle">правили руками</text><path class="ln" d="M160 65.0 L186 65.0" marker-end="url(#ar)"/><path class="ln" d="M336 65.0 L362 65.0" marker-end="url(#ar)"/><path class="ln" d="M512 65.0 L550 65.0" marker-end="url(#ar)"/><path class="ln" d="M630.0 96 L630.0 140" marker-end="url(#ar)"/><path class="ln" d="M550 165.0 L512 165.0" marker-end="url(#ar)"/><path class="lna" d="M362 165.0 L336 165.0" marker-end="url(#ara)"/><path class="lna" d="M186 165.0 L160 165.0" marker-end="url(#ara)"/><path class="ln" d="M437.0 190 L437.0 236" marker-end="url(#ar)"/><path class="ln" d="M85.0 190 L85.0 236" marker-end="url(#ar)"/><text x="10" y="20" text-anchor="start" class="m t">Правка через скрипт: каждое значение перечитать после save, итог сверить двумя бэкапами</text><text x="560" y="236" text-anchor="start" class="m t">exit не слать: он</text><text x="560" y="252" text-anchor="start" class="m t">перезагружает FC,</text><text x="560" y="268" text-anchor="start" class="m t">а noreboot нет</text><text x="560" y="284" text-anchor="start" class="m t">до 4.5.4</text><text x="352" y="304" text-anchor="start" class="m t">переименования — таблица в bf-intro</text><text x="10" y="304" text-anchor="start" class="m t">diff all читать до «# », не по таймеру</text></svg></div><figcaption class="gc-muted">Скрипт правки: бэкап, set и save, поиск порта заново после перезагрузки, get по каждому ключу и второй бэкап — git diff должен показать ровно строки CHANGES.</figcaption><div class="diagram__hint">Схему можно прокрутить по горизонтали</div></figure>
+<h4 class="md-subheading">Шаг 4. Хранить конфиги как код</h4>
+<ol><li>Папка на каждый дрон, внутри <code>configs/</code> и <code>logs/</code>.</li><li>Имя файла: <code>&lt;дрон&gt;_&lt;плата&gt;_&lt;ГГГГ-ММ-ДД&gt;_diff.txt</code> — сортировка по имени = сортировка по дате.</li><li>Перед изменениями — бэкап, после — новый <code>diff all</code> (<code>viking2_after_diff.txt</code>, той же командой, что и бэкап); сравнивать их обычным <code>git diff</code>. Именно <code>diff all</code>, а не просто <code>diff</code>: простой <code>diff</code> сохраняет только текущий PID- и рейт-профиль, остальные три пары профилей в бэкап не попадут.</li><li>Строку <code># Betaflight / … &lt;дата сборки&gt;</code> перед коммитом оставь, но сравнивай файлы по ключам (<code>parse_diff</code> из скрипта): дата сборки меняется при каждой перепрошивке и в построчном diff выглядит как изменение конфига.</li></ol>
+<h4 class="md-subheading">Переход на реальное железо</h4>
+<p>Пропеллеры сняты на всё время работы; батарея не нужна — USB питает FC, и ESC без силового питания не крутят моторы. Подключи по USB две платы, закрой Configurator (он держит порт и засыпает его MSP-трафиком). Порты на реальной машине — <code>/dev/ttyACM*</code> или <code>COM*</code>; поиск по <code>MSP_NAME</code> — тот же <code>identify()</code> из лабораторного скрипта, только по списку портов <code>list_ports.comports()</code>. Проверено на SITL с одним мёртвым и одним живым портом:</p>
+<pre class="cli-block"><code>&quot;&quot;&quot;Find an FC by craft_name over MSP: no CLI, no reboot, no arming lock. Usage: find_craft.py NAME [port ...]&quot;&quot;&quot;
+import sys
 import serial
 from serial.tools import list_ports
+from bf_cli_lab import identify   # msp() + MSP_API_VERSION/FC_VARIANT/FC_VERSION/NAME/UID from the lab
 
 
-def cli_cmd(port: serial.Serial, cmd: str, wait: float = 0.6) -&gt; str:
-    port.write((cmd + &quot;\n&quot;).encode())
-    time.sleep(wait)
-    return port.read_all().decode(errors=&quot;replace&quot;)
-
-
-def enter_cli(port: serial.Serial) -&gt; None:
-    port.write(b&quot;\n&quot;)
-    time.sleep(0.3)
-    port.read_all()
-    port.write(b&quot;#&quot;)
-    time.sleep(1.2)
-    port.read_all()
-
-
-def find_craft(craft_name: str) -&gt; str:
-    &quot;&quot;&quot;Return the COM port of the FC whose craft_name matches. Never trust COM numbers.&quot;&quot;&quot;
-    for info in list_ports.comports():
+def find_craft(name, ports=None):
+    ports = ports or [p.device for p in list_ports.comports()]   # /dev/ttyACM*, COM*
+    for dev in ports:
         try:
-            with serial.Serial(info.device, 115200, timeout=1) as p:
-                enter_cli(p)
-                out = cli_cmd(p, &quot;get craft_name&quot;)
-                # do NOT send exit here: on 4.5.x it reboots the FC
-                if f&quot;craft_name = {craft_name}&quot; in out:
-                    return info.device
-        except serial.SerialException:
+            with serial.serial_for_url(dev, baudrate=115200, timeout=0.2) as p:
+                info = identify(p)
+        except (serial.SerialException, OSError, TimeoutError) as e:
+            print(f&quot;  {dev}: no MSP ({type(e).__name__})&quot;)
             continue
-    raise RuntimeError(f&quot;FC &#x27;{craft_name}&#x27; not found&quot;)</code></pre>
-<h4 class="md-subheading">Шаг 2. Применение изменений с проверкой</h4>
-<pre class="cli-block"><code>CHANGES = {&quot;rpm_filter_min_hz&quot;: &quot;50&quot;, &quot;failsafe_delay&quot;: &quot;15&quot;}
+        print(f&quot;  {dev}: {info[&#x27;variant&#x27;]} {info[&#x27;version&#x27;]} name={info[&#x27;name&#x27;]!r} uid={info[&#x27;uid&#x27;]}&quot;)
+        if info[&quot;name&quot;] == name:
+            return dev, info
+    raise RuntimeError(f&quot;FC {name!r} not found&quot;)
 
-port_name = find_craft(&quot;viking2&quot;)
-with serial.Serial(port_name, 115200, timeout=1) as p:
-    enter_cli(p)
-    backup = cli_cmd(p, &quot;diff all&quot;, wait=3.0)
-    open(&quot;viking2_before_diff.txt&quot;, &quot;w&quot;, encoding=&quot;utf-8&quot;).write(backup)
-    for key, val in CHANGES.items():
-        cli_cmd(p, f&quot;set {key} = {val}&quot;)
-    cli_cmd(p, &quot;save&quot;, wait=1.0)  # FC reboots, COM port may change
 
-time.sleep(6)
-port_name = find_craft(&quot;viking2&quot;)  # find it again after reboot
-with serial.Serial(port_name, 115200, timeout=1) as p:
-    enter_cli(p)
-    for key, val in CHANGES.items():
-        out = cli_cmd(p, f&quot;get {key}&quot;)
-        ok = f&quot;{key} = {val}&quot; in out
-        print((&quot;OK  &quot; if ok else &quot;FAIL&quot;), key, &quot;expected&quot;, val)</code></pre>
-<h4 class="md-subheading">Шаг 3. Хранить конфиги как код</h4>
-<ol><li>Папка на каждый дрон, внутри <code>configs/</code> и <code>logs/</code>.</li><li>Имя файла: <code>&lt;дрон&gt;_&lt;плата&gt;_&lt;ГГГГ-ММ-ДД&gt;_diff.txt</code> — сортировка по имени = сортировка по дате.</li><li>Перед изменениями — бэкап, после — новый <code>diff all</code> (<code>viking2_after_diff.txt</code>, той же командой, что и бэкап); сравнивать их обычным <code>git diff</code>. Именно <code>diff all</code>, а не просто <code>diff</code>: простой <code>diff</code> сохраняет только текущий PID- и рейт-профиль, остальные три пары профилей в бэкап не попадут.</li></ol>
-<h4 class="md-subheading">Шаг 4. Второй дрон и сравнение</h4>
-<p>Запусти тот же скрипт для второго дрона, поменяв только <code>craft_name</code> в аргументах — не код. Сравни бэкапы до и после через <code>git diff --no-index viking2_before_diff.txt viking2_after_diff.txt</code>: в разнице должны быть ровно строки из <code>CHANGES</code>, и ничего больше. Лишняя строка значит, что кто-то менял настройки руками между бэкапами, и это повод разобраться до полёта.</p>
-<figure class="diagram" data-diagram="bf-cli-apply-verify"><div class="diagram__svg"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 316" width="100%" role="img" aria-labelledby="t" style="max-width:720px;display:block;margin:0 auto"><title id="t">Скрипт CLI: изменить, перечитать, сверить</title><style>text{font-family: var(--gc-font-mono, ui-monospace, Menlo, monospace); font-size: 12px;fill:currentColor} .m{fill:var(--gc-ink-muted, #8a93a3)} .a{fill:var(--gc-accent-hud, #5ef1d2)} .w{fill:var(--gc-signal-amber, #f0b24c)} .d{fill:var(--gc-signal-red, #e8636b)} .box{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:currentColor;stroke-width:1.2} .boxa{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6} .ln{stroke:currentColor;stroke-width:1.2;fill:none} .lna{stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6;fill:none} .lnm{stroke:var(--gc-ink-muted, #8a93a3);stroke-width:1;fill:none;stroke-dasharray:4 3} .t{font-size:11px} .b{font-weight:600}</style><defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker><marker id="ara" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--gc-accent-hud, #5ef1d2)"/></marker></defs><rect class="boxa" x="10" y="40" width="150" height="50" rx="6"/><text x="85.0" y="62.0" text-anchor="middle" class="b">find_craft:</text><text x="85.0" y="76.0" text-anchor="middle" class="b">порт по craft_name</text><rect class="box" x="186" y="40" width="150" height="50" rx="6"/><text x="261.0" y="62.0" text-anchor="middle">diff all →</text><text x="261.0" y="76.0" text-anchor="middle">*_before_diff.txt</text><rect class="box" x="362" y="40" width="150" height="50" rx="6"/><text x="437.0" y="62.0" text-anchor="middle">set из CHANGES,</text><text x="437.0" y="76.0" text-anchor="middle">save</text><rect class="box" x="550" y="34" width="160" height="62" rx="6"/><text x="630.0" y="55.0" text-anchor="middle">перезагрузка:</text><text x="630.0" y="69.0" text-anchor="middle">ждать 6 с, порт</text><text x="630.0" y="83.0" text-anchor="middle">мог смениться</text><rect class="boxa" x="550" y="140" width="160" height="50" rx="6"/><text x="630.0" y="162.0" text-anchor="middle" class="b">find_craft</text><text x="630.0" y="176.0" text-anchor="middle" class="b">заново</text><rect class="box" x="362" y="140" width="150" height="50" rx="6"/><text x="437.0" y="162.0" text-anchor="middle">get по каждому</text><text x="437.0" y="176.0" text-anchor="middle">ключу: все OK?</text><rect class="box" x="186" y="140" width="150" height="50" rx="6"/><text x="261.0" y="162.0" text-anchor="middle">diff all →</text><text x="261.0" y="176.0" text-anchor="middle">*_after_diff.txt</text><rect class="boxa" x="10" y="140" width="150" height="50" rx="6"/><text x="85.0" y="162.0" text-anchor="middle" class="b">git diff: ровно</text><text x="85.0" y="176.0" text-anchor="middle" class="b">строки CHANGES</text><rect class="box" x="352" y="236" width="170" height="50" rx="6"/><text x="437.0" y="258.0" text-anchor="middle">FAIL: не сохранилось</text><text x="437.0" y="272.0" text-anchor="middle">или ключ переименован</text><rect class="box" x="10" y="236" width="150" height="50" rx="6"/><text x="85.0" y="258.0" text-anchor="middle">лишняя строка:</text><text x="85.0" y="272.0" text-anchor="middle">правили руками</text><path class="ln" d="M160 65.0 L186 65.0" marker-end="url(#ar)"/><path class="ln" d="M336 65.0 L362 65.0" marker-end="url(#ar)"/><path class="ln" d="M512 65.0 L550 65.0" marker-end="url(#ar)"/><path class="ln" d="M630.0 96 L630.0 140" marker-end="url(#ar)"/><path class="ln" d="M550 165.0 L512 165.0" marker-end="url(#ar)"/><path class="lna" d="M362 165.0 L336 165.0" marker-end="url(#ara)"/><path class="lna" d="M186 165.0 L160 165.0" marker-end="url(#ara)"/><path class="ln" d="M437.0 190 L437.0 236" marker-end="url(#ar)"/><path class="ln" d="M85.0 190 L85.0 236" marker-end="url(#ar)"/><text x="10" y="20" text-anchor="start" class="m t">Правка через скрипт: каждое значение перечитать после save, итог сверить двумя бэкапами</text><text x="560" y="236" text-anchor="start" class="m t">exit не слать: он</text><text x="560" y="252" text-anchor="start" class="m t">перезагружает FC,</text><text x="560" y="268" text-anchor="start" class="m t">а noreboot нет</text><text x="560" y="284" text-anchor="start" class="m t">до 4.5.4</text><text x="352" y="304" text-anchor="start" class="m t">переименования — таблица в bf-intro</text><text x="10" y="304" text-anchor="start" class="m t">diff all читать до «# », не по таймеру</text></svg></div><figcaption class="gc-muted">Скрипт правки: бэкап, set и save, поиск порта заново после перезагрузки, get по каждому ключу и второй бэкап — git diff должен показать ровно строки CHANGES.</figcaption><div class="diagram__hint">Схему можно прокрутить по горизонтали</div></figure>
-<h4 class="md-subheading">Что должно получиться и типичные сбои</h4>
-<ul><li><code>find_craft</code> печатает список опрошенных портов и находит нужный по <code>craft_name</code>. Если дрон не найден, проверь, что <code>craft_name</code> задан (<code>get craft_name</code>) и что Configurator закрыт: он держит порт и засыпает его MSP-трафиком.</li><li><code>diff all</code> на F7/H7 с большим конфигом не успевает за 3 с, и бэкап обрывается на середине. Надёжнее читать до приглашения CLI <code># </code> в конце вывода, чем ждать фиксированное время.</li><li>После <code>save</code> плата перезагружается, а на Windows COM-порт может смениться — поэтому <code>find_craft</code> вызывается заново. 6 с ожидания хватает большинству плат. Если не хватает, ищи порт в цикле с таймаутом.</li><li>Итог проверки — строки <code>OK</code> по каждому ключу. Любой <code>FAIL</code> значит, что значение не сохранилось или на этой версии ключ называется иначе (Betaflight 2025.12 переименовал часть настроек 4.5 — таблица в модуле «Введение в Betaflight»).</li></ul>
-<p>Самопроверка: лабораторная выполнена, когда скрипт находит дрон по <code>craft_name</code>, сохраняет <code>diff all</code> с датой до изменений, после <code>save</code> находит порт заново и перечитывает значения со всеми <code>OK</code>, а прогон на двух дронах проходит без правки кода.</p>
+if __name__ == &quot;__main__&quot;:
+    print(find_craft(sys.argv[1], sys.argv[2:] or None))
+# python3 find_craft.py viking2 socket://127.0.0.1:5768 socket://127.0.0.1:5761   (SITL 2025.12.5 running)
+#   socket://127.0.0.1:5768: no MSP (SerialException)
+#   socket://127.0.0.1:5761: BTFL 25.12.5 name=&#x27;viking2&#x27; uid=000000000100000002000000
+# (&#x27;socket://127.0.0.1:5761&#x27;, {&#x27;api&#x27;: &#x27;1.47&#x27;, &#x27;variant&#x27;: &#x27;BTFL&#x27;, &#x27;version&#x27;: &#x27;25.12.5&#x27;, &#x27;name&#x27;: &#x27;viking2&#x27;, &#x27;uid&#x27;: &#x27;000000000100000002000000&#x27;})</code></pre>
+<p>Затем на каждой плате: бэкап <code>diff all</code>, пакет <code>set</code> из <code>CHANGES</code>, <code>save</code>, поиск порта заново (на Windows номер COM может смениться; жди до 10 с в цикле — ориентир курса), перечитывание каждого ключа. Прервать: плата не нашлась за 10 с после <code>save</code> — не повторять запись, переподключить USB и начать с бэкапа; любая строка <code>###ERROR</code> в пакете — не слать <code>save</code>. Критерии на железе: обе платы найдены по имени без входа в CLI; после <code>save</code> каждый ключ из <code>CHANGES</code> перечитан со статусом <code>OK</code> или объяснённым <code>FAIL</code> (исправление прошивкой, которое ты можешь назвать по таблице выше); <code>diff all</code> до и после различается ровно строками из <code>CHANGES</code> и ничем больше; прогон на второй плате идёт без правки кода — меняется только <code>craft_name</code> в аргументах.</p>
+<p>Самопроверка: лабораторная выполнена, когда (SITL) обе версии собраны и отвечают по MSP: 4.5.3 — API 1.46 и версия <code>4.5.3</code>, 2025.12.5 — API 1.47 и версия <code>25.12.5</code>; после <code>save</code> на 4.5.3 процесс завершается с кодом 0, а после перезапуска все пять ключей — <code>OK</code>; вставка <code>diff all</code> 4.5.3 в 2025.12.5 даёт ровно одну ошибку <code>INVALID NAME: d_min_roll = 20</code> и отказ <code>save</code>; после переименования ровно два <code>FAIL</code> — <code>failsafe_procedure → DROP</code> и <code>d_max_roll → 0</code>; запрос STX/ETX возвращает <code>failsafe_delay = 10</code>, обрамлённый байтами <code>\x02</code> и <code>\x03</code>; сравнение по ключам выводит 4 строки. На железе — критерии из раздела «Переход на реальное железо».</p>
+<p><strong>Эталон для самопроверки.</strong> Верный вывод совпадает с приведённым выше, кроме даты сборки в строке версии и хэша коммита. Типичные неверные: (1) на шаге 3 <code>FAIL d_roll … read 0</code> — ответ <code>get</code> разобран без якоря, совпала строка <code>align_board_roll</code>; (2) шаг 1 сразу показывает <code>25.12.5</code> и <code>name: viking2</code> — на порту 5761 ответил оставшийся с прошлого запуска SITL 2025.12, а свой не смог занять порт; (3) скрипт виснет после <code>exit noreboot</code> — после выхода из CLI приглашения нет, читать надо по таймауту, а не до <code># </code>; (4) на 4.5.3 нет ни одного <code>FAIL</code>, а ты ждал исправления failsafe — в 4.5.3 нет проверки «значение вне перечня → DROP», а правило «GPS-RESCUE без feature GPS» в SITL не собрано (GPS в SITL нет); на полётной плате с GPS-сборкой оно сработает.</p>
 
 <h2>Диагностика</h2>
-<div class="diag-groups"><article class="diag-item"><h4><strong>Симптом:</strong> скрипт «потерял» дрон после save</h4><ul><li>Возможная причина: после перезагрузки COM-порт получил другой номер.</li><li>Что сделать: искать порт заново по <code>craft_name</code>, а не по номеру.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> записанное значение после перезагрузки другое</h4><ul><li>Возможная причина: Betaflight скорректировал несовместимую комбинацию.</li><li>Что сделать: перечитать связанные параметры, сверить с документацией платы и прошивки.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> после вставки diff часть строк дала ошибки <code>Invalid name</code></h4><ul><li>Возможная причина: diff от другой версии прошивки.</li><li>Что сделать: переносить настройки по разделам, проверяя имена параметров в <code>help</code> текущей версии.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> два дрона откликаются на один <code>craft_name</code></h4><ul><li>Возможная причина: одинаковые имена (клон конфига).</li><li>Что сделать: сразу переименовать, <code>set craft_name = ...</code> + <code>save</code>.</li></ul></article></div>
+<div class="diag-groups"><article class="diag-item"><h4><strong>Симптом:</strong> скрипт «потерял» дрон после save</h4><ul><li>Возможная причина: после перезагрузки COM-порт получил другой номер.</li><li>Что сделать: искать порт заново по <code>craft_name</code> через <code>MSP_NAME</code>, а не по номеру.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> записанное значение после перезагрузки другое</h4><ul><li>Возможная причина: Betaflight скорректировал несовместимую комбинацию в <code>validateAndFixConfig</code> (<code>d_max</code> &lt; D, GPS-RESCUE без GPS, bidir без DShot).</li><li>Что сделать: перечитать связанные параметры, сверить с таблицей исправлений выше и с документацией платы и прошивки.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> после вставки diff часть строк дала ошибки <code>Invalid name</code></h4><ul><li>Возможная причина: diff от другой версии прошивки.</li><li>Что сделать: переносить настройки по разделам, проверяя имена параметров в <code>help</code> текущей версии.</li><li>Последствия: если пакет был открыт <code>batch start</code>, первый <code>save</code> откажет и ничего не сохранится (в RAM изменения остаются до перезагрузки; повторный <code>save</code> их сохранит); без пакета применится всё, кроме ошибочных строк.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> два дрона откликаются на один <code>craft_name</code></h4><ul><li>Возможная причина: одинаковые имена (клон конфига).</li><li>Что сделать: сразу переименовать, <code>set craft_name = ...</code> + <code>save</code>; хранить рядом с именем <code>MSP_UID</code>.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> <code>save noreboot</code> перезагрузил плату</h4><ul><li>Возможная причина: прошивка 4.5.3 или старше: аргумент не читается.</li><li>Что сделать: определить версию по MSP до записи и на 4.5.3 всегда ждать перезагрузки.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> после <code>exit noreboot</code> аппарат не армится</h4><ul><li>Возможная причина: 2025.12 оставляет флаг запрета арма <code>CLI</code> до перезагрузки.</li><li>Что видно в логе: <code>status</code> → <code>Arming disable flags: CLI</code>.</li><li>Что сделать: перезагрузить плату перед полётом; для чтения значений использовать MSP или STX/ETX.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> бэкап <code>diff all</code> обрывается на середине</h4><ul><li>Возможная причина: чтение «до <code># </code>» сработало на строке-комментарии <code># master</code> на границе куска данных; или фиксированный таймаут меньше времени вывода на большом конфиге F7/H7.</li><li>Что сделать: конец вывода — приглашение и 0.3 с тишины; проверять, что файл заканчивается строкой <code>save</code>.</li></ul></article></div>
 
 <h2>Чек-лист</h2>
-<ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="bf-cli-automation:0"><span>У каждого дрона уникальный <code>craft_name</code></span></label></li><li><label><input type="checkbox" data-check-id="bf-cli-automation:1"><span>Скрипт ищет порт по <code>craft_name</code>, а не по номеру COM</span></label></li><li><label><input type="checkbox" data-check-id="bf-cli-automation:2"><span>Перед изменениями сохраняется <code>diff all</code> с датой в имени</span></label></li><li><label><input type="checkbox" data-check-id="bf-cli-automation:3"><span>После <code>save</code> скрипт заново находит порт и перечитывает значения</span></label></li><li><label><input type="checkbox" data-check-id="bf-cli-automation:4"><span>diff между разными версиями прошивки не вставляется построчно</span></label></li></ul>
+<ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="bf-cli-automation:0"><span>У каждого дрона уникальный <code>craft_name</code>, рядом записан <code>MSP_UID</code></span></label></li><li><label><input type="checkbox" data-check-id="bf-cli-automation:1"><span>Скрипт ищет порт по <code>MSP_NAME</code>, а не по номеру COM и не входом в CLI</span></label></li><li><label><input type="checkbox" data-check-id="bf-cli-automation:2"><span>Перед изменениями сохраняется <code>diff all</code> с датой в имени</span></label></li><li><label><input type="checkbox" data-check-id="bf-cli-automation:3"><span>После <code>save</code> скрипт заново находит порт и перечитывает значения <code>get</code> с якорем <code>^имя = </code></span></label></li><li><label><input type="checkbox" data-check-id="bf-cli-automation:4"><span><code>save noreboot</code> на 4.5.3 считается перезагрузкой</span></label></li><li><label><input type="checkbox" data-check-id="bf-cli-automation:5"><span>Ошибки <code>###ERROR</code> в пакете останавливают <code>save</code></span></label></li><li><label><input type="checkbox" data-check-id="bf-cli-automation:6"><span>diff между разными версиями прошивки не вставляется построчно</span></label></li></ul>
 
 <h2>Источники</h2>
-<ul class="refs"><li><a href="https://betaflight.com/docs/wiki/guides/current/Cli" target="_blank" rel="noopener noreferrer">Betaflight CLI — Documentation</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://pyserial.readthedocs.io/en/latest/" target="_blank" rel="noopener noreferrer">pySerial — Documentation</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://github.com/betaflight/betaflight" target="_blank" rel="noopener noreferrer">Betaflight — source code (GitHub)</a> <span class="gc-tag" data-state="info">primary</span></li></ul>
+<ul class="refs"><li><a href="https://github.com/betaflight/betaflight" target="_blank" rel="noopener noreferrer">Betaflight — source code: src/main/cli/cli.c, msp/msp_serial.c, msp/msp.c, config/config.c (теги 4.5.3, 2025.12.5)</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://betaflight.com/docs/wiki/guides/current/Cli" target="_blank" rel="noopener noreferrer">Betaflight CLI — Documentation</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://pyserial.readthedocs.io/en/latest/" target="_blank" rel="noopener noreferrer">pySerial — Documentation (serial_for_url, socket://)</a> <span class="gc-tag" data-state="info">primary</span></li></ul>
+<h2>Задачи с числовым ответом</h2>
+<uav-tasks src="../tasks/bf-cli-automation.json" module="bf-cli-automation"></uav-tasks>
 <h2>Проверь себя</h2>
 <uav-quiz src="../quiz/bf-cli-automation.json" module="bf-cli-automation"></uav-quiz>
       </div>
       <div class="module-done"><gc-button variant="secondary" data-done-toggle="bf-cli-automation">Отметить как пройденный</gc-button></div>
-      <section class="related" aria-label="Смежные модули"><p class="gc-label gc-muted">Смежные модули</p><div class="gc-grid ref-grid"><a class="gc-card" href="bf-cli.html"><strong>CLI и remap</strong><div class="gc-card__meta"><span class="gc-tag" title="L3 — Специалист">L3</span></div></a><a class="gc-card" href="bf-rpm-filter.html"><strong>RPM-фильтр: кейс «свистящего» 10&quot;</strong><div class="gc-card__meta"><span class="gc-tag" title="L2 — Интегратор">L2</span></div></a></div></section>
+      <section class="related" aria-label="Смежные модули"><p class="gc-label gc-muted">Смежные модули</p><div class="gc-grid ref-grid"><a class="gc-card" href="bf-cli.html"><strong>CLI и remap</strong><div class="gc-card__meta"><span class="gc-tag" title="L3 — Специалист">L3</span></div></a><a class="gc-card" href="bf-rpm-filter.html"><strong>RPM-фильтр: кейс «свистящего» 10&quot;</strong><div class="gc-card__meta"><span class="gc-tag" title="L2 — Интегратор">L2</span></div></a><a class="gc-card" href="eng-ci-configs.html"><strong>CI и версионирование конфигов и кода</strong><div class="gc-card__meta"><span class="gc-tag" title="L3 — Специалист">L3</span></div></a></div></section>
       <nav class="pager" aria-label="Соседние модули" data-track-pager><a class="gc-card pager__prev" href="bf-cli.html"><span class="gc-label gc-muted">Назад · трек</span><br>CLI и remap</a><a class="gc-card pager__next" href="bf-gps-setup.html"><span class="gc-label gc-muted">Дальше · трек</span><br>GPS в Betaflight: модули M8/M10, конфигурация, точность и домашняя точка</a></nav><nav class="pager" aria-label="Соседние шаги пути Betaflight" data-path-pager="betaflight" hidden><a class="gc-card pager__prev" href="bf-cli.html?path=betaflight"><span class="gc-label gc-muted">Назад · путь Betaflight</span><br>CLI и remap</a><a class="gc-card pager__next" href="bf-gps-setup.html?path=betaflight"><span class="gc-label gc-muted">Дальше · шаг 55 из 60</span><br>GPS в Betaflight: модули M8/M10, конфигурация, точность и домашняя точка</a></nav>
     </article>
   </main>

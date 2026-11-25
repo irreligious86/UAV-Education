@@ -78,6 +78,7 @@
 <p>Implementation — JSON Schema/plain Python with a rule table; output — a list of violations with a link to the course module.</p>
 <h4 class="md-subheading">SITL autotest</h4>
 <p>ArduPilot in CI (Ubuntu runner): build SITL (<code>./waf configure --board sitl &amp;&amp; ./waf copter</code>) or take a prebuilt image; run <code>sim_vehicle.py</code> without a GUI with <code>--add-param-file params.param</code>; a pymavlink script: arm in Guided, take off to 10 m, <code>SIM_RC_FAIL = 1</code> → expect RTL/LAND mode within 5 s → <code>assert</code>; then a 4-waypoint mission → <code>assert</code> it is reached. Time — 2–4 minutes. ArduPilot&#x27;s own <code>Tools/autotest</code> is an example of how the developers do it (<code>autotest.py test.Copter.ThrottleFailsafe</code>).</p>
+<figure class="diagram" data-diagram="ci-config-check-chain"><div class="diagram__svg"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 262" width="100%" role="img" aria-labelledby="t" style="max-width:720px;display:block;margin:0 auto"><title id="t">Четыре проверки job config-ci и что каждая ловит (A, C, D, E — случаи лабораторной)</title><style>text{font-family: var(--gc-font-mono, ui-monospace, Menlo, monospace); font-size: 12px;fill:currentColor} .m{fill:var(--gc-ink-muted, #8a93a3)} .a{fill:var(--gc-accent-hud, #5ef1d2)} .w{fill:var(--gc-signal-amber, #f0b24c)} .d{fill:var(--gc-signal-red, #e8636b)} .box{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:currentColor;stroke-width:1.2} .boxa{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6} .ln{stroke:currentColor;stroke-width:1.2;fill:none} .lna{stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6;fill:none} .lnm{stroke:var(--gc-ink-muted, #8a93a3);stroke-width:1;fill:none;stroke-dasharray:4 3} .t{font-size:11px} .b{font-weight:600}</style><defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker><marker id="ara" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--gc-accent-hud, #5ef1d2)"/></marker></defs><rect class="box" x="10" y="16" width="160" height="48" rx="6"/><text x="90.0" y="37.0" text-anchor="middle">yamllint --strict</text><text x="90.0" y="51.0" text-anchor="middle">весь репозиторий</text><rect class="box" x="190" y="16" width="160" height="48" rx="6"/><text x="270.0" y="37.0" text-anchor="middle">check-jsonschema</text><text x="270.0" y="51.0" text-anchor="middle">fleet.yaml</text><rect class="box" x="370" y="16" width="160" height="48" rx="6"/><text x="450.0" y="37.0" text-anchor="middle">check-jsonschema</text><text x="450.0" y="51.0" text-anchor="middle">workflow (builtin)</text><rect class="boxa" x="550" y="16" width="160" height="48" rx="6"/><text x="630.0" y="37.0" text-anchor="middle" class="b">check_configs.py</text><text x="630.0" y="51.0" text-anchor="middle" class="b">инварианты</text><rect class="box" x="10" y="110" width="160" height="48" rx="6"/><text x="90.0" y="131.0" text-anchor="middle">стиль YAML:</text><text x="90.0" y="145.0" text-anchor="middle">отступы, truthy</text><rect class="box" x="190" y="110" width="160" height="48" rx="6"/><text x="270.0" y="131.0" text-anchor="middle">E: stack: inav,</text><text x="270.0" y="145.0" text-anchor="middle">firmware &quot;4.7&quot;</text><rect class="box" x="370" y="110" width="160" height="48" rx="6"/><text x="450.0" y="131.0" text-anchor="middle">опечатка в ключе</text><text x="450.0" y="145.0" text-anchor="middle">job / step</text><rect class="box" x="542.5" y="110" width="175" height="62" rx="6"/><text x="630.0" y="131.0" text-anchor="middle">A: 6 ошибок экспорта</text><text x="630.0" y="145.0" text-anchor="middle">C: FS_THR_ENABLE = 0</text><text x="630.0" y="159.0" text-anchor="middle">D: 4.5.3 под 2025.12</text><rect class="boxa" x="280" y="200" width="200" height="36" rx="6"/><text x="380.0" y="222.0" text-anchor="middle" class="b">exit 1: PR не сливается</text><path class="ln" d="M170 40.0 L190 40.0" marker-end="url(#ar)"/><text x="180.0" y="33.0" text-anchor="middle" class="m t" style="font-size:10px">&amp;&amp;</text><path class="ln" d="M350 40.0 L370 40.0" marker-end="url(#ar)"/><text x="360.0" y="33.0" text-anchor="middle" class="m t" style="font-size:10px">&amp;&amp;</text><path class="ln" d="M530 40.0 L550 40.0" marker-end="url(#ar)"/><text x="540.0" y="33.0" text-anchor="middle" class="m t" style="font-size:10px">&amp;&amp;</text><path class="ln" d="M90.0 64 L90.0 110" marker-end="url(#ar)"/><path class="ln" d="M270.0 64 L270.0 110" marker-end="url(#ar)"/><path class="ln" d="M450.0 64 L450.0 110" marker-end="url(#ar)"/><path class="ln" d="M630.0 64 L630.0 110" marker-end="url(#ar)"/><path class="lna" d="M270.0 158 L270.0 179.0 L380.0 179.0 L380.0 200" marker-end="url(#ara)"/><path class="lna" d="M630.0 172 L630.0 186.0 L380.0 186.0 L380.0 200" marker-end="url(#ara)"/><text x="10" y="256" text-anchor="start" class="m t">Первая красная проверка останавливает job; зелёный — только когда прошли все четыре.</text></svg></div><figcaption class="gc-muted">Job config-ci — четыре проверки подряд через &amp;&amp;: схема ловит опечатку в манифесте, скрипт инвариантов — сломанный failsafe и diff не той версии; любая красная проверка останавливает слияние.</figcaption><div class="diagram__hint">Схему можно прокрутить по горизонтали</div></figure>
 <figure class="diagram" data-diagram="ci-sitl-failsafe-seq"><div class="diagram__svg"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 428" width="100%" role="img" aria-labelledby="t" style="max-width:720px;display:block;margin:0 auto"><title id="t">SITL-автотест в CI: падает, если failsafe сломан (2–4 мин)</title><style>text{font-family: var(--gc-font-mono, ui-monospace, Menlo, monospace); font-size: 12px;fill:currentColor} .m{fill:var(--gc-ink-muted, #8a93a3)} .a{fill:var(--gc-accent-hud, #5ef1d2)} .w{fill:var(--gc-signal-amber, #f0b24c)} .d{fill:var(--gc-signal-red, #e8636b)} .box{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:currentColor;stroke-width:1.2} .boxa{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6} .ln{stroke:currentColor;stroke-width:1.2;fill:none} .lna{stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6;fill:none} .lnm{stroke:var(--gc-ink-muted, #8a93a3);stroke-width:1;fill:none;stroke-dasharray:4 3} .t{font-size:11px} .b{font-weight:600}</style><defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker><marker id="ara" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--gc-accent-hud, #5ef1d2)"/></marker></defs><text x="16" y="16" text-anchor="start" class="m t">SITL-автотест в CI: падает, если failsafe сломан (2–4 мин)</text><rect class="box" x="20.0" y="26" width="120" height="26" rx="5"/><text x="80.0" y="43" text-anchor="middle" class="b" style="font-size:11px">sitl_test.py</text><line class="lnm" x1="80.0" y1="52" x2="80.0" y2="380"/><rect class="box" x="410.0" y="26" width="120" height="26" rx="5"/><text x="470.0" y="43" text-anchor="middle" class="b" style="font-size:11px">SITL ArduCopter</text><line class="lnm" x1="470.0" y1="52" x2="470.0" y2="380"/><text x="275.0" y="78" text-anchor="middle" class="w t" style="font-size:10px">— sim_vehicle.py --add-param-file params.param —</text><path class="ln" d="M80.0 104 L466.0 104" marker-end="url(#ar)"/><text x="275.0" y="99" text-anchor="middle" class="t" style="font-size:10px">режим GUIDED, арм (COMMAND_LONG)</text><path class="ln" style="stroke-dasharray:5 4" d="M470.0 134 L84.0 134" marker-end="url(#ar)"/><text x="275.0" y="129" text-anchor="middle" class="t" style="font-size:10px">COMMAND_ACK ACCEPTED</text><path class="ln" d="M80.0 164 L466.0 164" marker-end="url(#ar)"/><text x="275.0" y="159" text-anchor="middle" class="t" style="font-size:10px">взлёт на 10 м (MAV_CMD_NAV_TAKEOFF)</text><path class="ln" style="stroke-dasharray:5 4" d="M470.0 194 L84.0 194" marker-end="url(#ar)"/><text x="275.0" y="189" text-anchor="middle" class="t" style="font-size:10px">GLOBAL_POSITION_INT: 10 м</text><path class="lna" d="M80.0 224 L466.0 224" marker-end="url(#ara)"/><text x="275.0" y="219" text-anchor="middle" class="a t" style="font-size:10px">PARAM_SET SIM_RC_FAIL = 1 — пульт «пропал»</text><path class="lna" style="stroke-dasharray:5 4" d="M470.0 254 L84.0 254" marker-end="url(#ara)"/><text x="275.0" y="249" text-anchor="middle" class="a t" style="font-size:10px">HEARTBEAT: режим RTL или LAND за ≤ 5 с</text><text x="275.0" y="288" text-anchor="middle" class="w t" style="font-size:10px">— отдельный прогон: SIM_RC_FAIL = 0 —</text><path class="ln" d="M80.0 314 L466.0 314" marker-end="url(#ar)"/><text x="275.0" y="309" text-anchor="middle" class="t" style="font-size:10px">миссия из 4 точек, AUTO</text><path class="ln" style="stroke-dasharray:5 4" d="M470.0 344 L84.0 344" marker-end="url(#ar)"/><text x="275.0" y="339" text-anchor="middle" class="t" style="font-size:10px">все 4 точки достигнуты</text><text x="704" y="138" text-anchor="end" class="m t" style="font-size:10px">assert арм</text><text x="704" y="198" text-anchor="end" class="m t" style="font-size:10px">assert высота</text><text x="704" y="258" text-anchor="end" class="m t" style="font-size:10px">assert: нет → CI красный</text><text x="704" y="348" text-anchor="end" class="m t" style="font-size:10px">assert: миссия пройдена</text><text x="16" y="406.0" text-anchor="start" class="m t">Сломан failsafe (FS_THR_ENABLE = 0 или параметр переименован) → режим за 5 с</text><text x="16" y="422.0" text-anchor="start" class="m t">не сменился → assert падает → CI красный, PR не сливается</text></svg></div><figcaption class="gc-muted">SITL-автотест по шагам: после SIM_RC_FAIL = 1 режим обязан смениться на RTL или LAND за 5 с, иначе assert падает и PR не сливается.</figcaption><div class="diagram__hint">Схему можно прокрутить по горизонтали</div></figure>
 <p>Betaflight: a SITL build checks compilation and the CLI; for PID logic — the <code>make test</code> unit tests. For configs — the invariant script.</p>
 <h4 class="md-subheading">Linters and schemas</h4>
@@ -130,6 +131,235 @@ if __name__ == &quot;__main__&quot;:
 <p>Keep rules whose parameters were renamed between versions (<code>RTL_ALT</code> → <code>RTL_ALT_M</code> in 4.7) with both names, or check the firmware version from the aircraft&#x27;s README. For Betaflight — the same approach over the <code>set name = value</code> lines of <code>diff all</code>.</p>
 <h4 class="md-subheading">Step 4. SITL test in CI</h4>
 <p>A ready-made starter is in the course repository: [examples/sitl-pymavlink](https://github.com/irreligious86/UAV-Education/tree/main/examples/sitl-pymavlink) (<code>test_failsafe.py</code> + <code>ci.yml</code>). A job with ArduPilot SITL and the test (RC failsafe → RTL/LAND). Break it with <code>FS_THR_ENABLE = 0</code> in the <code>.param</code> → the test fails. One PR with a parameter change, a description, CI and a merge. The lab: a repository with a readable history, a SITL test in CI, one change through a PR.</p>
+<p>Lab code and output (verbatim from the source module):</p>
+<pre class="cli-block"><code>&quot;&quot;&quot;Check every config listed in fleet.yaml against invariants. Exit 1 on any ERROR.
+Betaflight: `diff all` text (4.5.x / 2025.12.x). ArduPilot: .param (&quot;NAME,VALUE&quot; or &quot;NAME VALUE&quot;).
+&quot;&quot;&quot;
+import os, re, sys
+import yaml  # PyYAML 6.0.4
+
+BF_RENAMED_2025 = {f&quot;d_min_{a}&quot;: f&quot;d_max_{a}&quot; for a in (&quot;roll&quot;, &quot;pitch&quot;, &quot;yaw&quot;)}  # meaning flipped too
+
+
+def load_bf(path):
+    text = open(path, encoding=&quot;utf-8&quot;).read()
+    ver = re.search(r&quot;^# Betaflight / \S+ \(\S+\) (\S+)&quot;, text, re.M)
+    ctx, vals = &quot;master&quot;, {}
+    for line in text.splitlines():
+        if m := re.match(r&quot;(profile|rateprofile) (\d)\s*$&quot;, line):
+            ctx = f&quot;{m[1]} {m[2]}&quot;
+        elif m := re.match(r&quot;set (\S+) = (.*?)\s*$&quot;, line):
+            vals[(ctx, m[1])] = m[2]
+    features = set(re.findall(r&quot;^feature (-?\w+)&quot;, text, re.M))
+    return (ver[1] if ver else None), vals, features
+
+
+def check_bf(craft, errs):
+    ver, vals, feats = load_bf(craft[&quot;config&quot;])
+    if ver != craft[&quot;firmware&quot;]:
+        errs.append(f&quot;firmware in file {ver} != fleet.yaml {craft[&#x27;firmware&#x27;]} (bf-cli-automation)&quot;)
+    major = int(craft[&quot;firmware&quot;].split(&quot;.&quot;)[0])
+    master = {k: v for (c, k), v in vals.items() if c == &quot;master&quot;}
+    if major &gt;= 2025:
+        for (c, k) in vals:
+            if k in BF_RENAMED_2025:
+                errs.append(f&quot;{c}: {k} does not exist in 2025.12, now {BF_RENAMED_2025[k]} &quot;
+                            &quot;with the opposite meaning (bf-intro)&quot;)
+    if master.get(&quot;failsafe_procedure&quot;) == &quot;GPS-RESCUE&quot; and &quot;-GPS&quot; in feats:
+        errs.append(&quot;failsafe_procedure = GPS-RESCUE without feature GPS: firmware resets it &quot;
+                    &quot;to DROP on save (config.c validateAndFixConfig) (bf-failsafe)&quot;)
+    if int(master.get(&quot;failsafe_delay&quot;, 15)) &gt; 20:
+        errs.append(f&quot;failsafe_delay = {master[&#x27;failsafe_delay&#x27;]} x0.1 s &gt; 2.0 s (bf-failsafe)&quot;)
+    for (c, k), v in vals.items():
+        if major &gt;= 2025 and (m := re.match(r&quot;d_max_(roll|pitch|yaw)$&quot;, k)):
+            d = vals.get((c, f&quot;d_{m[1]}&quot;))
+            if d is not None and 0 &lt; int(v) &lt; int(d):
+                errs.append(f&quot;{c}: {k} = {v} &lt; d_{m[1]} = {d}: zeroed on save (bf-pid)&quot;)
+
+
+def load_ap(path):
+    params = {}
+    for line in open(path, encoding=&quot;utf-8&quot;):
+        if m := re.match(r&quot;\s*([A-Z][A-Z0-9_]*)[,\s]+(-?[\d.]+(?:[eE][-+]?\d+)?)\s*(#.*)?$&quot;, line):
+            params[m[1]] = float(m[2])
+    return params
+
+
+def check_ap(craft, site, errs):
+    p = load_ap(craft[&quot;config&quot;])
+    if len(p) &lt; 300:
+        errs.append(f&quot;only {len(p)} parameters: partial export? (eng-ci-configs)&quot;)
+    rtl_m = p[&quot;RTL_ALT_M&quot;] if &quot;RTL_ALT_M&quot; in p else p.get(&quot;RTL_ALT&quot;, -100) / 100  # cm before 4.7
+    skip = p.get(&quot;ARMING_SKIPCHK&quot;, 0 if p.get(&quot;ARMING_CHECK&quot;, 1) == 1 else 1)   # 4.7 rename
+    rules = [(&quot;FS_THR_ENABLE&quot;, p.get(&quot;FS_THR_ENABLE&quot;, 0) != 0, &quot;RC failsafe must act (ap-safety-fs)&quot;),
+             (&quot;BATT_FS_LOW_ACT&quot;, p.get(&quot;BATT_FS_LOW_ACT&quot;, 0) != 0, &quot;low battery must act (ap-safety-fs)&quot;),
+             (&quot;FENCE_ENABLE&quot;, p.get(&quot;FENCE_ENABLE&quot;, 0) == 1, &quot;geofence on for field flights (ap-safety-fs)&quot;),
+             (&quot;RTL_ALT_M&quot;, rtl_m &gt;= site[&quot;obstacle_m&quot;],
+              f&quot;RTL altitude {rtl_m:g} m must clear obstacles {site[&#x27;obstacle_m&#x27;]} m (ap-safety-fs)&quot;),
+             (&quot;ARMING_SKIPCHK&quot;, skip == 0, &quot;no arming checks skipped (ap-safety-fs)&quot;),
+             (&quot;INS_HNTCH_ENABLE&quot;, p.get(&quot;INS_HNTCH_ENABLE&quot;, 0) == 1, &quot;harmonic notch configured (ap-tuning)&quot;)]
+    errs += [f&quot;{name}: {why}&quot; for name, ok, why in rules if not ok]
+
+
+if __name__ == &quot;__main__&quot;:
+    fleet = yaml.safe_load(open(sys.argv[1], encoding=&quot;utf-8&quot;))
+    os.chdir(os.path.dirname(os.path.abspath(sys.argv[1])))
+    bad = 0
+    for craft in fleet[&quot;craft&quot;]:
+        errs = []
+        if not os.path.isfile(craft[&quot;config&quot;]):
+            errs.append(f&quot;config file {craft[&#x27;config&#x27;]} missing&quot;)
+        elif craft[&quot;stack&quot;] == &quot;betaflight&quot;:
+            check_bf(craft, errs)
+        else:
+            check_ap(craft, fleet[&quot;site&quot;], errs)
+        print(f&quot;{craft[&#x27;name&#x27;]:8s} {craft[&#x27;stack&#x27;]:10s} {craft[&#x27;firmware&#x27;]:9s} &quot;
+              f&quot;{&#x27;OK&#x27; if not errs else str(len(errs)) + &#x27; ERROR(S)&#x27;}&quot;)
+        for e in errs:
+            print(&quot;   ERROR&quot;, e)
+        bad += len(errs)
+    sys.exit(1 if bad else 0)</code></pre>
+<pre class="cli-block"><code># .github/workflows/config-ci.yml
+name: config-ci
+on:
+  pull_request:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0  # v7.1.0
+        with:
+          python-version: &quot;3.13&quot;
+      - run: pip install yamllint==1.38.0 check-jsonschema==0.39.0
+      - name: YAML style
+        run: yamllint --strict .
+      - name: Fleet manifest schema
+        run: check-jsonschema --schemafile schema/fleet.schema.json fleet.yaml
+      - name: Workflow schema
+        run: check-jsonschema --builtin-schema vendor.github-workflows .github/workflows/*.yml
+      - name: Config invariants
+        run: python3 tools/check_configs.py fleet.yaml</code></pre>
+<pre class="cli-block"><code>#!/bin/bash
+# Local run of the config-ci job, step by step (same commands as .github/workflows/config-ci.yml).
+cd &quot;$1&quot; || exit 2
+ci() { yamllint --strict . &amp;&amp; check-jsonschema --schemafile schema/fleet.schema.json fleet.yaml \
+       &amp;&amp; check-jsonschema --builtin-schema vendor.github-workflows .github/workflows/*.yml \
+       &amp;&amp; python3 -I tools/check_configs.py fleet.yaml; echo &quot;CI exit code: $?&quot;; }
+p=hex1/ardupilot/params.param; d=viking2/betaflight/diff-all.txt
+echo &quot;== A. snapshot as exported&quot;; ci
+echo &quot;== B. fix: RC/battery failsafe, fence, RTL 30 m, notch; BF failsafe DROP&quot;
+sed -i -e &#x27;s/^FS_THR_ENABLE,0$/FS_THR_ENABLE,1/&#x27; -e &#x27;s/^BATT_FS_LOW_ACT,0$/BATT_FS_LOW_ACT,2/&#x27; \
+       -e &#x27;s/^FENCE_ENABLE,0$/FENCE_ENABLE,1/&#x27; -e &#x27;s/^RTL_ALT_M,15$/RTL_ALT_M,30/&#x27; \
+       -e &#x27;s/^INS_HNTCH_ENABLE,0$/INS_HNTCH_ENABLE,1/&#x27; $p
+sed -i &#x27;s/^set failsafe_procedure = GPS-RESCUE$/set failsafe_procedure = DROP/&#x27; $d; ci
+echo &quot;== C. mutation test: FS_THR_ENABLE back to 0&quot;
+sed -i &#x27;s/^FS_THR_ENABLE,1$/FS_THR_ENABLE,0/&#x27; $p; ci
+sed -i &#x27;s/^FS_THR_ENABLE,0$/FS_THR_ENABLE,1/&#x27; $p
+echo &quot;== D. firmware bumped in fleet.yaml, diff left from 4.5.3&quot;
+sed -i &#x27;s/firmware: &quot;4.5.3&quot;/firmware: &quot;2025.12.5&quot;/&#x27; fleet.yaml; ci
+echo &quot;== E. typo in the manifest: stack: inav, firmware: 4.7&quot;
+sed -i -e &#x27;s/stack: ardupilot/stack: inav/&#x27; -e &#x27;s/firmware: &quot;4.7.2&quot;/firmware: &quot;4.7&quot;/&#x27; fleet.yaml; ci</code></pre>
+<pre class="cli-block"><code>== A. snapshot as exported
+ok -- validation done
+ok -- validation done
+viking2  betaflight 4.5.3     1 ERROR(S)
+   ERROR failsafe_procedure = GPS-RESCUE without feature GPS: firmware resets it to DROP on save (config.c validateAndFixConfig) (bf-failsafe)
+hex1     ardupilot  4.7.2     5 ERROR(S)
+   ERROR FS_THR_ENABLE: RC failsafe must act (ap-safety-fs)
+   ERROR BATT_FS_LOW_ACT: low battery must act (ap-safety-fs)
+   ERROR FENCE_ENABLE: geofence on for field flights (ap-safety-fs)
+   ERROR RTL_ALT_M: RTL altitude 15 m must clear obstacles 25 m (ap-safety-fs)
+   ERROR INS_HNTCH_ENABLE: harmonic notch configured (ap-tuning)
+CI exit code: 1
+== B. fix: RC/battery failsafe, fence, RTL 30 m, notch; BF failsafe DROP
+ok -- validation done
+ok -- validation done
+viking2  betaflight 4.5.3     OK
+hex1     ardupilot  4.7.2     OK
+CI exit code: 0
+== C. mutation test: FS_THR_ENABLE back to 0
+ok -- validation done
+ok -- validation done
+viking2  betaflight 4.5.3     OK
+hex1     ardupilot  4.7.2     1 ERROR(S)
+   ERROR FS_THR_ENABLE: RC failsafe must act (ap-safety-fs)
+CI exit code: 1
+== D. firmware bumped in fleet.yaml, diff left from 4.5.3
+ok -- validation done
+ok -- validation done
+viking2  betaflight 2025.12.5 2 ERROR(S)
+   ERROR firmware in file 4.5.3 != fleet.yaml 2025.12.5 (bf-cli-automation)
+   ERROR profile 0: d_min_roll does not exist in 2025.12, now d_max_roll with the opposite meaning (bf-intro)
+hex1     ardupilot  4.7.2     OK
+CI exit code: 1
+== E. typo in the manifest: stack: inav, firmware: 4.7
+Schema validation errors were encountered.
+  fleet.yaml::$.craft[1].stack: &#x27;inav&#x27; is not one of [&#x27;betaflight&#x27;, &#x27;ardupilot&#x27;]
+  fleet.yaml::$.craft[1].firmware: &#x27;4.7&#x27; does not match &#x27;^[0-9]+\\.[0-9]+\\.[0-9]+$&#x27;
+CI exit code: 1</code></pre>
+<pre class="cli-block"><code>&quot;&quot;&quot;RC-failsafe test of the FLEET config in ArduCopter SITL: loads copter.parm + the aircraft&#x27;s .param,
+never sets FS_THR_ENABLE itself. Exit 0 = RTL/LAND within 5 s of SIM_RC_FAIL=1, else 1.
+Usage: python3 -I sitl_fs_test.py &lt;arducopter&gt; &lt;copter.parm&gt; &lt;aircraft.param&gt; &lt;workdir&gt;
+&quot;&quot;&quot;
+import os, subprocess, sys, time
+from pymavlink import mavutil
+
+ardu, parm, fleet, work = sys.argv[1:5]
+os.makedirs(work, exist_ok=True)
+I = 23                                                 # TCP 5990
+sitl = subprocess.Popen([ardu, &quot;-S&quot;, &quot;--model&quot;, &quot;+&quot;, &quot;--speedup&quot;, &quot;1&quot;, &quot;-I&quot;, str(I), &quot;-w&quot;,
+                         &quot;--defaults&quot;, f&quot;{parm},{os.path.abspath(fleet)}&quot;, &quot;--home&quot;, &quot;50.45,30.52,100,0&quot;],
+                        cwd=work, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+code = 1
+try:
+    time.sleep(2)
+    m = mavutil.mavlink_connection(f&quot;tcp:127.0.0.1:{5760 + 10 * I}&quot;)
+    m.wait_heartbeat(timeout=30)
+    m.mav.request_data_stream_send(m.target_system, m.target_component,
+                                   mavutil.mavlink.MAV_DATA_STREAM_ALL, 10, 1)
+    m.param_fetch_one(&quot;FS_THR_ENABLE&quot;)
+    p = m.recv_match(type=&quot;PARAM_VALUE&quot;, blocking=True, timeout=5)
+    print(&quot;FS_THR_ENABLE in SITL =&quot;, p.param_value)
+    t_end = time.time() + 180
+    while time.time() &lt; t_end:                         # wait for GPS-based EKF
+        msg = m.recv_match(type=&quot;STATUSTEXT&quot;, blocking=True, timeout=1)
+        if msg and &quot;using GPS&quot; in msg.text:
+            break
+    m.set_mode(&quot;GUIDED&quot;)
+    for _ in range(60):
+        m.arducopter_arm(); time.sleep(1)
+        m.recv_match(type=&quot;HEARTBEAT&quot;, blocking=True, timeout=2)
+        if m.motors_armed():
+            break
+    m.mav.command_long_send(m.target_system, m.target_component,
+                            mavutil.mavlink.MAV_CMD_NAV_TAKEOFF, 0, 0, 0, 0, 0, 0, 0, 10)
+    time.sleep(12)
+    m.mav.param_set_send(m.target_system, m.target_component, b&quot;SIM_RC_FAIL&quot;, 1,
+                         mavutil.mavlink.MAV_PARAM_TYPE_REAL32)  # simulated RC loss
+    t0 = time.time(); seen = None
+    while time.time() - t0 &lt; 5:
+        hb = m.recv_match(type=&quot;HEARTBEAT&quot;, blocking=True, timeout=1)
+        seen = mavutil.mode_string_v10(hb) if hb else seen
+        if seen in (&quot;RTL&quot;, &quot;LAND&quot;, &quot;SMART_RTL&quot;):
+            print(f&quot;PASS: mode {seen} {time.time() - t0:.1f} s after RC loss&quot;); code = 0
+            break
+    else:
+        print(f&quot;FAIL: mode still {seen} 5 s after RC loss&quot;)
+finally:
+    sitl.terminate(); sitl.wait()
+sys.exit(code)
+# python3 -I sitl_fs_test.py arducopter copter.parm run/hex1/ardupilot/params.param fs_ok   (after case B)
+# FS_THR_ENABLE in SITL = 1.0
+# PASS: mode RTL 1.0 s after RC loss          exit=0, 60 s
+# python3 -I sitl_fs_test.py arducopter copter.parm mut.param fs_mut                     (FS_THR_ENABLE,0)
+# FS_THR_ENABLE in SITL = 0.0
+# FAIL: mode still GUIDED 5 s after RC loss   exit=1, 64 s</code></pre>
 
 <h2>Troubleshooting</h2>
 <div class="diag-groups"><article class="diag-item"><h4><strong>Symptom:</strong> diff all differs completely every time</h4><ul><li>Possible cause: order/comments/date in the export.</li><li>What to do: normalize and sort before committing.</li></ul></article><article class="diag-item"><h4><strong>Symptom:</strong> SITL in CI does not start/times out</h4><ul><li>Possible cause: the build is slow, no <code>--no-mavproxy</code>/headless, ports.</li><li>What to do: build cache or a prebuilt image, headless launch, wait for heartbeat with a timeout.</li></ul></article><article class="diag-item"><h4><strong>Symptom:</strong> the test passes even though failsafe is broken</h4><ul><li>Possible cause: the assert checks the wrong thing (mode is not read) or the test does not wait.</li><li>What to do: verify that the test fails on a broken config (mutation test).</li></ul></article><article class="diag-item"><h4><strong>Symptom:</strong> I don&#x27;t remember which config I flew with that time</h4><ul><li>Possible cause: no tags/releases.</li><li>What to do: a tag on every flight config, a log attached to the release.</li></ul></article></div>
@@ -139,6 +369,8 @@ if __name__ == &quot;__main__&quot;:
 
 <h2>Sources</h2>
 <ul class="refs"><li><a href="https://ardupilot.org/dev/docs/the-ardupilot-autotest-framework.html" target="_blank" rel="noopener noreferrer">ArduPilot — Autotest framework (Tools/autotest)</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://docs.github.com/en/actions/writing-workflows" target="_blank" rel="noopener noreferrer">GitHub Docs — GitHub Actions workflows</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://betaflight.com/docs/wiki/guides/current/Cli" target="_blank" rel="noopener noreferrer">Betaflight — Command Line Interface (CLI)</a> <span class="gc-tag" data-state="info">primary</span></li></ul>
+<h2>Numeric problems</h2>
+<uav-tasks src="../tasks/eng-ci-configs.json" module="eng-ci-configs"></uav-tasks>
 <h2>Test yourself</h2>
 <uav-quiz src="../quiz/eng-ci-configs.json" module="eng-ci-configs"></uav-quiz>
       </div>
