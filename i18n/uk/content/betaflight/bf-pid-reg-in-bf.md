@@ -71,6 +71,10 @@ PID-регулятор (Proportional-Integral-Derivative) отримує від 
 
 {{diagram:bf-pid-terms|PID у Betaflight: P та I від помилки, D — за гіроскопом (з d_min), FF — від похідної setpoint; усе складається в pidSum.}}
 
+{{diagram:chart-bf-thrust-linear|thrust_linear поднимает наклон команды у нуля до 1 + k, при x = 1/3 наклон снова равен 1, выше он чуть меньше 1: функция полезна на малом газу и почти не трогает висение 5″.}}
+
+{{diagram:chart-bf-tpa-factor|TPA линейно снижает множитель D от tpa_breakpoint до 1 − tpa_rate/100 на полном газу (0.35 при умолчаниях); TPA малого газа (0.8 на нуле) действует только до первого прохода 1050 после включения.}}
+
 ## practice
 
 {{widget:pid-sim}}
@@ -130,6 +134,49 @@ save
 **Завершальні кроки**
 
 Збережи фінальні параметри: `diff all`. Виконай короткий політ (2–3 хвилини) і перевір температуру моторів. Якщо мотори гарячі, знизь D-term на 10–15%.
+
+
+```python
+# Тракт газа Betaflight 4.5.3: flight/pid.c, pid_init.c, mixer.c, mixer_init.c
+def tl(x, k):                                   # pidApplyThrustLinearization
+    return x * (1 + k * (1 - x) ** 2)
+
+def tl_comp(t, k):                              # pidCompensateThrustLinearization
+    return t / (1 + (k - 0.5 * k * k) * (1 - t) ** 2)
+
+def tpa(thr, rate=65, bp=1350, low_rate=20, low_bp=1050, faded=True):
+    t, tbp = (thr - 1000) / 1000, min((bp - 1000) / 1000, 0.99)
+    lbp = min(max((low_bp - 1000) / 1000, 0.01), tbp)
+    if t >= lbp or faded:                       # pidUpdateTpaFactor
+        return 1 - rate / 100 / (1 - tbp) * max(t - tbp, 0)
+    return 1 - low_rate / (100 * lbp) * (lbp - t)
+
+def sag(cell_v, comp=100, warn=3.50):           # доля верха диапазона, которую срезает vbat_sag
+    rng = 4.20 - warn
+    good = 1 - min(max((4.20 - cell_v) / rng, 0), 1)
+    return rng / 4.20 * good * comp / 100
+
+print("TL 40: x=0.10 ->", round(tl(0.10, 0.4), 3), "| x=0.50 ->", round(tl(0.50, 0.4), 3))
+t = tl_comp(0.30, 0.4)
+print("TL 40, висение 0.30: газ после компенсации", round(t, 4), "выход", round(tl(t, 0.4), 4))
+for thr in (1000, 1500, 2000):
+    print(f"TPA {thr}: до прохода 1050 {tpa(thr, faded=False):.3f}, после {tpa(thr):.3f}")
+for warn in (3.50, 3.00):
+    print(f"sag 100, warn {warn:.2f}: 4.20 В -> {sag(4.20, 100, warn)*100:.1f} %,"
+          f" 3.80 В -> {sag(3.80, 100, warn)*100:.1f} %, 3.30 В -> {sag(3.30, 100, warn)*100:.1f} %")
+print("dyn idle 30 ->", 30 * 100 / 60, "об/с; нижняя граница DShot:", round(48 + 0.055 * 1999, 1), "-> 48")
+```
+
+```text
+TL 40: x=0.10 -> 0.132 | x=0.50 -> 0.55
+TL 40, висение 0.30: газ после компенсации 0.2593 выход 0.3162
+TPA 1000: до прохода 1050 0.800, после 1.000
+TPA 1500: до прохода 1050 0.850, после 0.850
+TPA 2000: до прохода 1050 0.350, после 0.350
+sag 100, warn 3.50: 4.20 В -> 16.7 %, 3.80 В -> 7.1 %, 3.30 В -> 0.0 %
+sag 100, warn 3.00: 4.20 В -> 28.6 %, 3.80 В -> 19.0 %, 3.30 В -> 7.1 %
+dyn idle 30 -> 50.0 об/с; нижняя граница DShot: 157.9 -> 48
+```
 
 ## diagnostics
 

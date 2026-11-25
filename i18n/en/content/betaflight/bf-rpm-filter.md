@@ -31,6 +31,8 @@ The frequency of a motor's fundamental harmonic: `f = RPM / 60`. A five-inch in 
 
 The `rpm_filter_min_hz` parameter sets the lower bound: the notch doesn't go below it. If the bound is above the motor's real frequency, the filter sits “off target” from the noise. That's exactly what happened in the case below.
 
+{{diagram:chart-bf-rpm-notch-weight|Вес RPM-notch от оборотов при умолчаниях: 1-я гармоника выключена ниже 6000 об/мин и в полную силу выше 9000, поэтому на dynamic idle 30 (3000 об/мин) фильтруется только 3-я; min_hz 50 включает 1-ю уже с 3000 об/мин.}}
+
 ### Hardware requirements
 - An ESC with DShot telemetry support: BLHeli_32 from 32.7.0, AM32, Bluejay (BLHeli_S) or JESC.
 - `dshot_bidir = ON` and a correct `motor_poles` (the number of magnets in the bell, not the number of stator teeth).
@@ -111,6 +113,49 @@ For a 5" the default is usually enough; for 7–10" check it explicitly — the 
 
 ### Step 4. Remove the crutches
 Static notches set “from an old log” before the RPM filter was enabled — delete them: after the RPM filter they often cut the wrong thing and add delay.
+
+```python
+# RPM-фильтр Betaflight 4.5.3: drivers/dshot.c (eRPM -> Гц), flight/rpm_filter.c (вес notch), common/filter.c
+import math
+
+def motor_hz(erpm_raw, poles=14):                 # erpmToHz = 100 / 60 / (poles / 2)
+    return erpm_raw * 100 / 60 / (poles / 2)
+
+def weight(rpm, k, min_hz=100, fade=50, w=1.0):   # rpmFilterUpdate()
+    f = max(k * rpm / 60, min_hz)                 # constrainf(f, minHz, maxHz)
+    margin = f - min_hz
+    return (margin / fade if margin < fade else 1.0) * w
+
+print("eRPM raw 350, 14 магнитов ->", round(motor_hz(350), 1), "Гц; при motor_poles 12 ->", round(motor_hz(350, 12), 1), "Гц")
+for loop in (8000, 4000, 3200):
+    upd = math.ceil(4 * 3 / (0.001 * loop))
+    print(f"цикл {loop} Гц: maxHz {0.48 * loop:.0f} Гц, notch-обновлений за цикл {upd}")
+for min_hz in (100, 50):
+    for rpm in (3000, 4500, 6000, 9000):
+        ws = [round(weight(rpm, k, min_hz), 2) for k in (1, 2, 3)]
+        print(f"min_hz {min_hz}, {rpm} об/мин ({rpm/60:.0f} Гц): веса 1-й/2-й/3-й = {ws}")
+for w in (1.0, 0.8, 0.5):
+    depth = "без предела" if w == 1 else f"{20 * math.log10(1 - w):.1f} дБ"
+    print(f"rpm_filter_weights {int(w*100)}: глубина в центре notch {depth}")
+```
+
+```text
+eRPM raw 350, 14 магнитов -> 83.3 Гц; при motor_poles 12 -> 97.2 Гц
+цикл 8000 Гц: maxHz 3840 Гц, notch-обновлений за цикл 2
+цикл 4000 Гц: maxHz 1920 Гц, notch-обновлений за цикл 3
+цикл 3200 Гц: maxHz 1536 Гц, notch-обновлений за цикл 4
+min_hz 100, 3000 об/мин (50 Гц): веса 1-й/2-й/3-й = [0.0, 0.0, 1.0]
+min_hz 100, 4500 об/мин (75 Гц): веса 1-й/2-й/3-й = [0.0, 1.0, 1.0]
+min_hz 100, 6000 об/мин (100 Гц): веса 1-й/2-й/3-й = [0.0, 1.0, 1.0]
+min_hz 100, 9000 об/мин (150 Гц): веса 1-й/2-й/3-й = [1.0, 1.0, 1.0]
+min_hz 50, 3000 об/мин (50 Гц): веса 1-й/2-й/3-й = [0.0, 1.0, 1.0]
+min_hz 50, 4500 об/мин (75 Гц): веса 1-й/2-й/3-й = [0.5, 1.0, 1.0]
+min_hz 50, 6000 об/мин (100 Гц): веса 1-й/2-й/3-й = [1.0, 1.0, 1.0]
+min_hz 50, 9000 об/мин (150 Гц): веса 1-й/2-й/3-й = [1.0, 1.0, 1.0]
+rpm_filter_weights 100: глубина в центре notch без предела
+rpm_filter_weights 80: глубина в центре notch -14.0 дБ
+rpm_filter_weights 50: глубина в центре notch -6.0 дБ
+```
 
 ### Automatic log check
 Decode the log with `blackbox_decode` and run the course grader: `python examples/blackbox-grader/check_bf_log.py LOG.01.csv --lab rpm --motor-range <motorOutput from the log header>`. It prints PASS/FAIL for each check (rpm, filters) with the value, the threshold and an explanation; the thresholds are reference points for a 5", you can override them with `--set`, writing down the reason. Before you have your own logs, you can practice on synthetic ones: `make_bf_fixture.py --kind noisy` (or `sluggish`, `oscillating`, `saturated`, `imbalanced`, `no_rpm`).
