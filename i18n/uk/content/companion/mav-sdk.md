@@ -42,35 +42,42 @@ MAVSDK — ядро на C++; Python-пакет `mavsdk` запускає вбу
 
 ```python
 import asyncio
-from mavsdk import System
-from mavsdk.mission import MissionItem, MissionPlan
+from mavsdk.asyncio import Mavsdk, Configuration, ComponentType
+from mavsdk.asyncio.plugins.action import ActionAsync
+from mavsdk.asyncio.plugins.telemetry import TelemetryAsync
+from mavsdk.asyncio.plugins.mission import MissionAsync, MissionItem, MissionPlan
 
 async def main():
-    drone = System()
-    await drone.connect(system_address="udpin://0.0.0.0:14540")    # older releases: "udp://:14540"
-    async for state in drone.core.connection_state():
-        if state.is_connected:
-            break
-    async for health in drone.telemetry.health():
-        if health.is_global_position_ok and health.is_home_position_ok:
-            break
-    items = [MissionItem(lat, lon, 20, 5, True, float("nan"), float("nan"),
-                         MissionItem.CameraAction.NONE, float("nan"), float("nan"),
-                         float("nan"), float("nan"), float("nan"), MissionItem.VehicleAction.NONE)
-             for lat, lon in [(47.3978, 8.5456), (47.3982, 8.5460), (47.3980, 8.5465)]]
-    await drone.mission.upload_mission(MissionPlan(items))
-    await drone.action.arm()
-    await drone.mission.start_mission()
-    async for p in drone.mission.mission_progress():
-        print(f"{p.current}/{p.total}")
-        if p.current == p.total:
-            break
-    await drone.action.return_to_launch()
+    cfg = Configuration.create_with_component_type(ComponentType.GROUND_STATION)
+    async with Mavsdk(cfg) as sdk:
+        await sdk.add_any_connection("udpin://0.0.0.0:14540")      # older gRPC package: drone.connect(...)
+        drone = await sdk.first_autopilot(timeout_s=10.0)
+        if drone is None:
+            raise SystemExit("no autopilot in 10 s")
+        tel, act, mis = TelemetryAsync(drone), ActionAsync(drone), MissionAsync(drone)
+        async def ready():
+            async for h in tel.subscribe_health():
+                if h.is_global_position_ok and h.is_home_position_ok:
+                    return
+        await asyncio.wait_for(ready(), 120)                        # never wait without a timeout
+        items = [MissionItem(latitude_deg=lat, longitude_deg=lon, relative_altitude_m=20, speed_m_s=5,
+                             is_fly_through=True, vehicle_action=MissionItem.VehicleAction.NONE)
+                 for lat, lon in [(47.3978, 8.5456), (47.3982, 8.5460), (47.3980, 8.5465)]]
+        await mis.upload_mission(MissionPlan(items))
+        await act.arm()
+        await mis.start_mission()
+        async for p in mis.subscribe_mission_progress():
+            print(f"{p.current}/{p.total}")
+            if p.current == p.total:
+                break
+        await act.return_to_launch()
 
 asyncio.run(main())
 ```
 
 Конструктор `MissionItem` змінюється між версіями MAVSDK (додаються поля) — звіряйся з документацією встановленої версії; це нормальна плата за високий рівень.
+
+{{diagram:mav-sdk-ap-startup-seq|Скрипт MAVSDK против ArduCopter 4.7 сначала просит потоки (по умолчанию их нет), потом ждёт здоровья из EKF_STATUS_REPORT, а при загрузке миссии теряет seq 0 под дом — отсюда пункт-подставка.}}
 
 ### Асинхронність без сюрпризів
 - **Підписки нескінченні**: `async for x in telemetry.position()` сам не закінчиться. Вихід — `break` за умовою або окрема задача зі скасуванням.
@@ -108,6 +115,163 @@ asyncio.run(main())
 Між SITL і скриптом постав `tc netem loss 100%` на 5 с під час місії. Що зробив MAVSDK (`connection_state`), що зробив автопілот, чи відновився скрипт після повернення зв'язку без перезапуску? Доопрацюй скрипт, щоб відновлювався.
 
 Лабораторна зараховується, коли є порівняння tlog двох клієнтів, місія з прогресом і таймаутами, offboard-квадрат із тестом «вбитого» скрипта й сценарій обриву з відновленням.
+
+### Крок 5. MAVSDK 4.2.1 проти ArduCopter 4.7.2 SITL (журнал прогону)
+Детальний розбір прогону (п'ять пасток ArduPilot, розшифрована сира місія) — у російському оригіналі. Встановлення, скрипт і його реальний вивід:
+
+```bash
+python3 -m venv venv && ./venv/bin/pip install mavsdk==4.2.1 pymavlink
+./venv/bin/python -c "import mavsdk; print(mavsdk.__version__)"
+# 4.2.1
+./venv/bin/python -c "from mavsdk import System; System()"
+# TypeError: System is not constructed directly, get it from Mavsdk instead. Since v4, the 'mavsdk' package
+# is the native MAVSDK binding ... To keep the old API, install 'mavsdk-grpc' ...
+```
+
+```python
+"""MAVSDK-Python 4.x lab against ArduCopter 4.7.2 SITL: connect, health, GUIDED arm, takeoff,
+telemetry subscription, mission upload + progress, RTL. Every wait has a timeout."""
+import asyncio, json, sys, time
+from mavsdk import log_subscribe, LogLevel
+from mavsdk.asyncio import Mavsdk, Configuration, ComponentType
+from mavsdk.asyncio.plugins.action import ActionAsync
+from mavsdk.asyncio.plugins.telemetry import TelemetryAsync, FlightMode
+from mavsdk.asyncio.plugins.mission import MissionAsync, MissionItem, MissionPlan, MissionError
+from mavsdk.asyncio.plugins.mission_raw import MissionRawAsync
+from mavsdk.asyncio.plugins.mavlink_direct import MavlinkDirectAsync, MavlinkMessage
+
+URL = sys.argv[1] if len(sys.argv) > 1 else "tcpout://127.0.0.1:5830"
+T0 = time.monotonic()
+# keep only warnings/errors of the C++ core; print autopilot STATUSTEXT ourselves
+log_subscribe(lambda lvl, msg, f, l: lvl < LogLevel.WARN)
+def log(*a): print(f"[{time.monotonic()-T0:6.1f} s]", *a, flush=True)
+
+async def first(gen, cond, timeout, what):
+    """First item of an endless subscription that satisfies cond, or TimeoutError."""
+    async def run():
+        async for x in gen:
+            if cond(x):
+                return x
+    try:
+        return await asyncio.wait_for(run(), timeout)
+    except asyncio.TimeoutError:
+        raise TimeoutError(f"{what}: no result in {timeout} s") from None
+
+async def main():
+    cfg = Configuration.create_with_component_type(ComponentType.GROUND_STATION)
+    async with Mavsdk(cfg) as sdk:
+        log("MAVSDK", await sdk.version())
+        await sdk.add_any_connection(URL)
+        drone = await sdk.first_autopilot(timeout_s=10.0)
+        if drone is None:
+            raise TimeoutError("no autopilot in 10 s")
+        log("autopilot:", (await drone.autopilot_type()).name, "sysid", await drone.get_system_id(),
+            "vehicle:", (await drone.vehicle_type()).name)
+        tel, act, mis = TelemetryAsync(drone), ActionAsync(drone), MissionAsync(drone)
+        # ArduCopter 4.7: MAVn_* stream rates default to 0 -> ask for what we subscribe to
+        await tel.set_rate_health(2.0)        # SYS_STATUS + EKF_STATUS_REPORT
+        await tel.set_rate_position(5.0)      # GLOBAL_POSITION_INT
+        # Mission progress comes from MISSION_CURRENT (id 42): no MAVSDK set_rate_* for it -> raw command
+        ack = await MavlinkDirectAsync(drone).send_command(MavlinkMessage(
+            message_name="COMMAND_LONG", system_id=245, component_id=190, target_system_id=1, target_component_id=1,
+            fields_json=json.dumps({"target_system": 1, "target_component": 1, "command": 511,   # SET_MESSAGE_INTERVAL
+                                    "param1": 42, "param2": 500000})))                       # 42 = MISSION_CURRENT, 2 Hz
+        log("rates requested: health 2 Hz, position 5 Hz, MISSION_CURRENT 2 Hz -> ack", json.loads(ack.fields_json)["result"])
+        last = None
+        def ready(h):
+            nonlocal last
+            k = (h.is_global_position_ok, h.is_home_position_ok, h.is_armable)
+            if k != last:
+                log(f"health: global_pos={k[0]} home={k[1]} armable={k[2]}"); last = k
+            return k[0] and k[1]
+        await first(tel.subscribe_health(), ready, 120, "health")
+
+        home = await tel.home()
+        wp = lambda dn: MissionItem(latitude_deg=home.latitude_deg + dn / 111_320, longitude_deg=home.longitude_deg,
+                                        relative_altitude_m=20, speed_m_s=5, is_fly_through=True,
+                                        vehicle_action=MissionItem.VehicleAction.NONE)
+        # ArduPilot keeps seq 0 for home and overwrites it: without a placeholder the first point is lost
+        plan = MissionPlan([wp(0)] + [wp(dn) for dn in (40, 80, 120)])
+        t = time.monotonic(); await mis.upload_mission(plan)
+        log(f"mission uploaded: {len(plan.mission_items)} items in {time.monotonic()-t:.2f} s")
+        try:
+            await mis.download_mission()
+        except MissionError as e:
+            log("Mission.download_mission ->", e.result.name)   # ArduPilot item 0 = home
+            await mis.upload_mission(plan)                       # the failed download dropped the plan: upload again
+            log("re-uploaded after the failed download")
+        raw = await MissionRawAsync(drone).download_mission()
+        for it in raw:
+            log(f"  raw seq={it.seq} frame={it.frame} cmd={it.command} x={it.x} y={it.y} z={it.z:.1f}")
+
+        await act.set_takeoff_altitude(10.0)
+        await act.arm(); log("armed in", FlightMode(await tel.flight_mode()).name)
+        await act.takeoff(); log("takeoff accepted, mode now", FlightMode(await tel.flight_mode()).name, "(= ArduCopter GUIDED)")
+        p = await first(tel.subscribe_position(), lambda p: p.relative_altitude_m > 9.0, 40, "climb to 9 m")
+        log(f"altitude {p.relative_altitude_m:.1f} m reached")
+
+        await mis.start_mission(); log("mission started, mode:", FlightMode(await tel.flight_mode()).name, "(= AUTO)")
+        n = 0
+        async def progress():
+            async for pr in mis.subscribe_mission_progress():
+                log(f"progress {pr.current}/{pr.total}")
+                if pr.current == pr.total:
+                    return
+        async def pos_log():
+            nonlocal n
+            async for p in tel.subscribe_position():
+                n += 1
+        async def raw_current():
+            async for msg in MavlinkDirectAsync(drone).subscribe_message("MISSION_CURRENT"):
+                f = json.loads(msg.fields_json)
+                if f["seq"] != getattr(raw_current, "seq", None):
+                    raw_current.seq = f["seq"]; log(f"MISSION_CURRENT seq={f['seq']} total={f.get('total')} state={f.get('mission_state')}")
+        logger = asyncio.create_task(pos_log()); rc = asyncio.create_task(raw_current())
+        await asyncio.wait_for(progress(), 150); rc.cancel()
+        logger.cancel()
+        log(f"position samples received during mission: {n}")
+        await act.return_to_launch(); log("RTL sent, mode:", FlightMode(await tel.flight_mode()).name)
+        await first(tel.subscribe_armed(), lambda a: not a, 120, "disarm after RTL")
+        log("landed and disarmed")
+
+asyncio.run(main())
+```
+
+```text
+[   0.0 s] MAVSDK v4.2.1
+[   0.9 s] autopilot: ARDUPILOT sysid 1 vehicle: MULTICOPTER
+[   1.1 s] rates requested: health 2 Hz, position 5 Hz, MISSION_CURRENT 2 Hz -> ack 0
+[   1.9 s] health: global_pos=False home=False armable=False
+[  20.0 s] health: global_pos=False home=True armable=False
+[  23.5 s] health: global_pos=False home=True armable=True
+[  42.0 s] health: global_pos=True home=True armable=True
+[  42.1 s] mission uploaded: 4 items in 0.09 s
+[09:25:53|Error] Waypoint frame 0 not supported (mission_impl.cpp:709)
+[  42.1 s] Mission.download_mission -> UNSUPPORTED
+[  42.2 s] re-uploaded after the failed download
+[  42.3 s]   raw seq=0 frame=0 cmd=16 x=-353632610 y=1491652299 z=584.1
+[  42.3 s]   raw seq=1 frame=0 cmd=178 x=0 y=0 z=0.0
+[  42.3 s]   raw seq=2 frame=3 cmd=16 x=-353629017 y=1491652299 z=20.0
+[  42.3 s]   raw seq=3 frame=0 cmd=178 x=0 y=0 z=0.0
+[  42.3 s]   raw seq=4 frame=3 cmd=16 x=-353625424 y=1491652299 z=20.0
+[  42.3 s]   raw seq=5 frame=0 cmd=178 x=0 y=0 z=0.0
+[  42.3 s]   raw seq=6 frame=3 cmd=16 x=-353621830 y=1491652299 z=20.0
+[  42.3 s]   raw seq=7 frame=0 cmd=178 x=0 y=0 z=0.0
+[  42.3 s] armed in STABILIZED
+[  42.3 s] takeoff accepted, mode now OFFBOARD (= ArduCopter GUIDED)
+[  50.8 s] altitude 9.2 m reached
+[  50.8 s] mission started, mode: MISSION (= AUTO)
+[  51.0 s] progress 1/4
+[  51.0 s] MISSION_CURRENT seq=2 total=7 state=3
+[  61.5 s] progress 2/4
+[  61.5 s] MISSION_CURRENT seq=4 total=7 state=3
+[  69.5 s] progress 3/4
+[  69.5 s] MISSION_CURRENT seq=6 total=7 state=3
+[  80.0 s] progress 4/4
+[  80.0 s] position samples received during mission: 146
+[  80.0 s] RTL sent, mode: RETURN_TO_LAUNCH
+[ 137.0 s] landed and disarmed
+```
 
 ## diagnostics
 - **Симптом:** скрипт MAVSDK висить на старті

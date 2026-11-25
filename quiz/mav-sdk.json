@@ -3,18 +3,18 @@
   "pass": 80,
   "questions": [
     {
-      "q": "MAVSDK-Python внутри:",
+      "q": "MAVSDK-Python 4.x (`pip install mavsdk`) внутри:",
       "options": [
-        "mavsdk_server по gRPC",
+        "C++-ядро через libcmavsdk",
         "Чистый Python и pymavlink",
         "Обёртка над MAVROS",
-        "Обёртка над DroneKit"
+        "mavsdk_server по gRPC"
       ],
       "answer": 0,
-      "explain": "Отсюда async API и исключения с кодами плагинов."
+      "explain": "С v4 (сентябрь 2026) пакет `mavsdk` — нативная привязка через C-обёртку, без gRPC и без второго процесса; старый gRPC-клиент живёт как `mavsdk-grpc`."
     },
     {
-      "q": "`async for x in drone.telemetry.position()`:",
+      "q": "`async for x in tel.subscribe_position()` (MAVSDK 4.x):",
       "options": [
         "Сам не завершается",
         "Возвращает одно значение",
@@ -22,13 +22,13 @@
         "Блокирует event loop"
       ],
       "answer": 0,
-      "explain": "Подписки бесконечны."
+      "explain": "Подписки бесконечны; разовое значение в 4.x даёт `await tel.position()`."
     },
     {
       "q": "PX4 выходит из Offboard сразу после старта. Причина:",
       "options": [
         "Уставки до start или реже 2 Гц",
-        "Нет фикса GPS для режима Offboard",
+        "Неверный baudrate SERIAL",
         "Неверный sysid",
         "Включена подпись"
       ],

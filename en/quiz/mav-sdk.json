@@ -3,18 +3,18 @@
   "pass": 80,
   "questions": [
     {
-      "q": "Inside, MAVSDK-Python is:",
+      "q": "MAVSDK-Python 4.x (`pip install mavsdk`) inside:",
       "options": [
-        "mavsdk_server over gRPC",
+        "C++ core via libcmavsdk",
         "Pure Python and pymavlink",
-        "A wrapper around MAVROS",
-        "A wrapper around DroneKit"
+        "A wrapper over MAVROS",
+        "mavsdk_server over gRPC"
       ],
       "answer": 0,
-      "explain": "Hence the async API and exceptions with plugin codes."
+      "explain": "Since v4 (September 2026) the `mavsdk` package is a native binding through the C wrapper, no gRPC and no second process; the old gRPC client lives on as `mavsdk-grpc`."
     },
     {
-      "q": "`async for x in drone.telemetry.position()`:",
+      "q": "`async for x in tel.subscribe_position()` (MAVSDK 4.x):",
       "options": [
         "Never ends on its own",
         "Returns a single value",
@@ -22,13 +22,13 @@
         "Blocks the event loop"
       ],
       "answer": 0,
-      "explain": "Subscriptions are endless."
+      "explain": "Subscriptions never end; in 4.x a one-off value comes from `await tel.position()`."
     },
     {
       "q": "PX4 exits Offboard right after starting. The cause:",
       "options": [
         "Setpoints before start, or slower than 2 Hz",
-        "No GPS fix for Offboard mode",
+        "Wrong SERIAL baud rate",
         "Wrong sysid",
         "Signing is enabled"
       ],

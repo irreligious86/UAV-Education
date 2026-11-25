@@ -60,6 +60,7 @@
 <p>У прошивці сидить клієнт DDS (<code>libraries/AP_DDS</code>), а зовні — агент micro-ROS (<code>micro_ros_agent</code>), який виводить дані в DDS-мережу ROS 2.</p>
 <ul><li>Параметри: <code>DDS_ENABLE = 1</code>; транспорт UDP — <code>DDS_UDP_PORT</code> (за замовчуванням 2019) і адреса агента <code>DDS_IP0..3</code>; транспорт serial — <code>SERIALn_PROTOCOL = 45</code> на потрібному порту. <code>DDS_DOMAIN_ID</code> — домен ROS 2.</li><li>SITL: збірка з підтримкою DDS (<code>./waf configure --board sitl --enable-DDS</code>), запуск <code>sim_vehicle.py -v ArduCopter --enable-DDS</code>, агент: <code>ros2 run micro_ros_agent micro_ros_agent udp4 -p 2019</code>.</li><li>Типи ArduPilot-специфічних повідомлень — пакет <code>ardupilot_msgs</code> (у репозиторії ArduPilot, <code>Tools/ros2/ardupilot_msgs</code>): <code>Status</code>, <code>GlobalPosition</code>, сервіси <code>ArmMotors</code>, <code>ModeSwitch</code>, <code>Takeoff</code>.</li></ul>
 <figure class="diagram" data-diagram="uxrce-scheme"><div class="diagram__svg"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 200" width="100%" role="img" aria-labelledby="t" style="max-width:720px;display:block;margin:0 auto"><title id="t">Два мости в ROS 2: PX4 uXRCE-DDS і ArduPilot AP_DDS</title><style>text{font-family: var(--gc-font-mono, ui-monospace, Menlo, monospace); font-size: 12px;fill:currentColor} .m{fill:var(--gc-ink-muted, #8a93a3)} .a{fill:var(--gc-accent-hud, #5ef1d2)} .w{fill:var(--gc-signal-amber, #f0b24c)} .d{fill:var(--gc-signal-red, #e8636b)} .box{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:currentColor;stroke-width:1.2} .boxa{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6} .ln{stroke:currentColor;stroke-width:1.2;fill:none} .lna{stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6;fill:none} .lnm{stroke:var(--gc-ink-muted, #8a93a3);stroke-width:1;fill:none;stroke-dasharray:4 3} .t{font-size:11px} .b{font-weight:600}</style><defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker><marker id="ara" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--gc-accent-hud, #5ef1d2)"/></marker></defs><rect class="boxa" x="10" y="30" width="150" height="44" rx="6"/><text x="85.0" y="49.0" text-anchor="middle" class="b">PX4: uORB</text><text x="85.0" y="63.0" text-anchor="middle" class="b">uxrce_dds_client</text><rect class="box" x="220" y="30" width="150" height="44" rx="6"/><text x="295.0" y="49.0" text-anchor="middle">MicroXRCEAgent</text><text x="295.0" y="63.0" text-anchor="middle">udp4 :8888</text><rect class="boxa" x="10" y="130" width="150" height="44" rx="6"/><text x="85.0" y="149.0" text-anchor="middle" class="b">ArduPilot</text><text x="85.0" y="163.0" text-anchor="middle" class="b">AP_DDS (DDS_ENABLE)</text><rect class="box" x="220" y="130" width="150" height="44" rx="6"/><text x="295.0" y="149.0" text-anchor="middle">micro_ros_agent</text><text x="295.0" y="163.0" text-anchor="middle">udp4 :2019</text><rect class="boxa" x="440" y="80" width="160" height="44" rx="6"/><text x="520.0" y="99.0" text-anchor="middle" class="b">DDS-мережа ROS 2</text><text x="520.0" y="113.0" text-anchor="middle" class="b">/fmu/in|out/*, /ap/*</text><rect class="box" x="640" y="80" width="70" height="44" rx="6"/><text x="675.0" y="106.0" text-anchor="middle" style="font-size:10.5px">Твої вузли</text><path class="ln" d="M160 52.0 L220 52.0" marker-end="url(#ar)"/><text x="190.0" y="45.0" text-anchor="middle" class="m t" style="font-size:10px">XRCE</text><path class="ln" d="M370 52.0 L405.0 52.0 L405.0 102.0 L440 102.0" marker-end="url(#ar)"/><path class="ln" d="M160 152.0 L220 152.0" marker-end="url(#ar)"/><text x="190.0" y="145.0" text-anchor="middle" class="m t" style="font-size:10px">XRCE</text><path class="ln" d="M370 152.0 L405.0 152.0 L405.0 102.0 L440 102.0" marker-end="url(#ar)"/><path class="ln" d="M600 102.0 L640 102.0" marker-end="url(#ar)"/><text x="10" y="192" text-anchor="start" class="m t">Послідовний порт замість UDP: PX4 — UXRCE_DDS_CFG, ArduPilot — SERIALn_PROTOCOL = 45.</text></svg></div><figcaption class="gc-muted">Схема та сама, що в PX4: клієнт у прошивці, агент на companion, звичайні топіки ROS 2 зовні.</figcaption><div class="diagram__hint">Схему можно прокрутить по горизонтали</div></figure>
+<figure class="diagram" data-diagram="ros2-ap-dds-boot-race"><div class="diagram__svg"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 138" width="100%" role="img" aria-labelledby="t" style="max-width:720px;display:block;margin:0 auto"><title id="t">Гонка загрузки: DDS-клиент ArduPilot 4.7.2 ждёт агента пачками по 10 с</title><style>text{font-family: var(--gc-font-mono, ui-monospace, Menlo, monospace); font-size: 12px;fill:currentColor} .m{fill:var(--gc-ink-muted, #8a93a3)} .a{fill:var(--gc-accent-hud, #5ef1d2)} .w{fill:var(--gc-signal-amber, #f0b24c)} .d{fill:var(--gc-signal-red, #e8636b)} .box{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:currentColor;stroke-width:1.2} .boxa{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6} .ln{stroke:currentColor;stroke-width:1.2;fill:none} .lna{stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6;fill:none} .lnm{stroke:var(--gc-ink-muted, #8a93a3);stroke-width:1;fill:none;stroke-dasharray:4 3} .t{font-size:11px} .b{font-weight:600}</style><defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker><marker id="ara" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--gc-accent-hud, #5ef1d2)"/></marker></defs><text x="16" y="16" text-anchor="start" class="m t">Гонка загрузки: DDS-клиент ArduPilot 4.7.2 ждёт агента пачками по 10 с</text><text x="112" y="67" text-anchor="end" style="font-size:11px">Автопілот</text><line class="lnm" x1="120" y1="78" x2="704" y2="78"/><rect class="box" x="120.0" y="51" width="23.4" height="22" rx="3"/><text x="147.36" y="66" text-anchor="start" class="m t" style="font-size:10px"></text><rect class="box" x="143.4" y="51" width="116.8" height="22" rx="3"/><text x="201.76" y="66" text-anchor="middle" style="font-size:10px">10 × 1 с</text><rect class="box" x="260.2" y="51" width="116.8" height="22" rx="3"/><text x="318.55999999999995" y="66" text-anchor="middle" style="font-size:10px">10 × 1 с</text><rect class="box" x="377.0" y="51" width="116.8" height="22" rx="3"/><text x="435.36" y="66" text-anchor="middle" style="font-size:10px">10 × 1 с</text><rect class="box" x="493.8" y="51" width="46.7" height="22" rx="3"/><text x="517.12" y="66" text-anchor="middle" style="font-size:10px">пинги</text><rect class="boxa" x="540.5" y="51" width="163.5" height="22" rx="3"/><text x="622.24" y="66" text-anchor="middle" class="b" style="font-size:10px">сессия, топики /ap/*</text><text x="112" y="101" text-anchor="end" style="font-size:11px">Companion</text><line class="lnm" x1="120" y1="112" x2="704" y2="112"/><rect class="box" x="120.0" y="85" width="408.8" height="22" rx="3"/><text x="324.4" y="100" text-anchor="middle" style="font-size:10px">Linux грузится, агента нет</text><rect class="boxa" x="528.8" y="85" width="175.2" height="22" rx="3"/><text x="616.4" y="100" text-anchor="middle" class="b" style="font-size:10px">агент на UDP 2019</text><line class="lnm" x1="120.0" y1="40" x2="120.0" y2="118"/><text x="120.0" y="132" text-anchor="middle" class="m t" style="font-size:10px">0 с</text><line class="lnm" x1="236.8" y1="40" x2="236.8" y2="118"/><text x="236.8" y="132" text-anchor="middle" class="m t" style="font-size:10px">10 с</text><line class="lnm" x1="353.6" y1="40" x2="353.6" y2="118"/><text x="353.6" y="132" text-anchor="middle" class="m t" style="font-size:10px">20 с</text><line class="lnm" x1="470.4" y1="40" x2="470.4" y2="118"/><text x="470.4" y="132" text-anchor="middle" class="m t" style="font-size:10px">30 с</text><line class="lnm" x1="587.2" y1="40" x2="587.2" y2="118"/><text x="587.2" y="132" text-anchor="middle" class="m t" style="font-size:10px">40 с</text><line class="lnm" x1="704.0" y1="40" x2="704.0" y2="118"/><text x="704.0" y="132" text-anchor="middle" class="m t" style="font-size:10px">50 с</text><line class="lna" x1="260.2" y1="38" x2="260.2" y2="118"/><text x="264.15999999999997" y="34" text-anchor="start" class="a t" style="font-size:10px">«No ping response, exiting» на 12, 22, 32 с</text><line class="lna" x1="377.0" y1="38" x2="377.0" y2="118"/><text x="380.96" y="34" text-anchor="start" class="a t" style="font-size:10px"></text><line class="lna" x1="493.8" y1="38" x2="493.8" y2="118"/><text x="497.76" y="34" text-anchor="start" class="a t" style="font-size:10px"></text></svg></div><figcaption class="gc-muted">Клиент ArduPilot пингует агента пачками по 10 × 1 с и после каждой пишет «exiting», но не сдаётся: агент, поднявшийся на 35-й секунде, подключается при следующем пинге.</figcaption><div class="diagram__hint">Схему можно прокрутить по горизонтали</div></figure>
 <h4 class="md-subheading">Що публікує і приймає AP_DDS</h4>
 <div class="table-wrap md-table-wrap" tabindex="0"><table class="md-table"><thead><tr><th>Топік/сервіс</th><th>Тип</th><th>Призначення</th></tr></thead><tbody><tr><td data-label="Топік/сервіс"><code>/ap/pose/filtered</code></td><td data-label="Тип"><code>geometry_msgs/PoseStamped</code></td><td data-label="Призначення">локальна поза з EKF відносно home, ENU (у <code>header.frame_id</code> прошивка пише <code>base_link</code>)</td></tr><tr><td data-label="Топік/сервіс"><code>/ap/twist/filtered</code></td><td data-label="Тип"><code>geometry_msgs/TwistStamped</code></td><td data-label="Призначення">швидкість</td></tr><tr><td data-label="Топік/сервіс"><code>/ap/geopose/filtered</code>, <code>/ap/navsat</code></td><td data-label="Тип"><code>geographic_msgs/GeoPoseStamped</code>, <code>sensor_msgs/NavSatFix</code></td><td data-label="Призначення">глобальна поза, GNSS</td></tr><tr><td data-label="Топік/сервіс"><code>/ap/battery</code>, <code>/ap/status</code>, <code>/ap/rc</code></td><td data-label="Тип"><code>sensor_msgs/BatteryState</code>, <code>ardupilot_msgs/Status</code>, <code>ardupilot_msgs/Rc</code></td><td data-label="Призначення">батарея; armed, mode, flying, external_control, failsafe</td></tr><tr><td data-label="Топік/сервіс"><code>/ap/tf_static</code>, <code>/ap/clock</code>, <code>/ap/time</code></td><td data-label="Тип">tf2, час</td><td data-label="Призначення">кріплення, годинник для sim time</td></tr><tr><td data-label="Топік/сервіс"><code>/ap/cmd_vel</code> (вхід)</td><td data-label="Тип"><code>geometry_msgs/TwistStamped</code></td><td data-label="Призначення">швидкість у GUIDED; frame <code>map</code> (ENU) або <code>base_link</code></td></tr><tr><td data-label="Топік/сервіс"><code>/ap/cmd_gps_pose</code> (вхід)</td><td data-label="Тип"><code>ardupilot_msgs/GlobalPosition</code></td><td data-label="Призначення">глобальна ціль у GUIDED</td></tr><tr><td data-label="Топік/сервіс"><code>/ap/arm_motors</code>, <code>/ap/mode_switch</code>, <code>/ap/prearm_check</code>, <code>/ap/experimental/takeoff</code></td><td data-label="Тип">сервіси</td><td data-label="Призначення">арм, режим (номер режиму Copter: GUIDED = 4, LAND = 9), предарм, зліт</td></tr></tbody></table></div>
 <p>Важливо: AP_DDS сам перетворює ENU ↔ NED — для <code>cmd_vel</code> за <code>header.frame_id</code> (<code>map</code> — світові ENU, <code>base_link</code> — корпус). Тобто, не так, як у PX4, твій ROS-вузол живе гет повністю в угодах ROS. QoS: пози та швидкості — BEST_EFFORT, <code>/ap/status</code> і <code>tf_static</code> — RELIABLE + TRANSIENT_LOCAL (підписник BEST_EFFORT ся зійде і з тим, і з другим).</p>
@@ -76,11 +77,27 @@
 
 <h2>Практика</h2>
 <h4 class="md-subheading">Крок 1. SITL з DDS</h4>
-<pre class="cli-block"><code>docker compose --profile ardupilot up --build    # або нативно: waf configure --enable-DDS, sim_vehicle.py --enable-DDS
-docker compose run --rm ros bash
+<pre class="cli-block"><code>mkdir -p ~/ardu_ws/src &amp;&amp; cd ~/ardu_ws
+vcs import --recursive --input https://raw.githubusercontent.com/ArduPilot/ardupilot/master/Tools/ros2/ros2.repos src
+(cd src/ardupilot &amp;&amp; git checkout Copter-4.7.2 &amp;&amp; git submodule update --init --recursive)   # match firmware and ardupilot_msgs
+sudo apt update &amp;&amp; rosdep update &amp;&amp; source /opt/ros/humble/setup.bash
+rosdep install --from-paths src --ignore-src -r -y
+sudo apt install default-jre
+git clone --recurse-submodules --branch v4.7.0 https://github.com/ardupilot/Micro-XRCE-DDS-Gen.git
+(cd Micro-XRCE-DDS-Gen &amp;&amp; ./gradlew assemble) &amp;&amp; export PATH=$PATH:$PWD/Micro-XRCE-DDS-Gen/scripts
+colcon build --packages-up-to ardupilot_sitl &amp;&amp; source install/setup.bash
+ros2 launch ardupilot_sitl sitl_dds_udp.launch.py transport:=udp4 synthetic_clock:=True wipe:=False model:=quad \
+  speedup:=1 slave:=0 instance:=0 \
+  defaults:=$(ros2 pkg prefix ardupilot_sitl)/share/ardupilot_sitl/config/default_params/copter.parm,$(ros2 pkg prefix ardupilot_sitl)/share/ardupilot_sitl/config/default_params/dds_udp.parm \
+  sim_address:=127.0.0.1 master:=tcp:127.0.0.1:5760 sitl:=127.0.0.1:5501
+# second terminal
+source ~/ardu_ws/install/setup.bash
+ros2 node list                      # /ap
 ros2 topic list | grep /ap/
 ros2 topic echo /ap/status --once
-ros2 service call /ap/mode_switch ardupilot_msgs/srv/ModeSwitch &quot;{mode: 4}&quot;</code></pre>
+ros2 service call /ap/mode_switch ardupilot_msgs/srv/ModeSwitch &quot;{mode: 4}&quot;
+ros2 service call /ap/arm_motors ardupilot_msgs/srv/ArmMotors &quot;{arm: True}&quot;
+ros2 service call /ap/experimental/takeoff ardupilot_msgs/srv/Takeoff &quot;{alt: 10.5}&quot;</code></pre>
 <h4 class="md-subheading">Крок 2. Квадрат через AP_DDS</h4>
 <p><code>ros2 launch uav_ros2_labs ap_square.launch.py</code>. Звір переходи автомата в логу з режимами в Mission Planner/QGC. Побудуй траєкторію з <code>/tmp/ap_flight.csv</code>. Зупини вузол посеред квадрата й зміряй за логом ArduPilot, за скільки апарат ся зупинив, — порівняй з <code>GUID_TIMEOUT</code>.</p>
 <h4 class="md-subheading">Крок 3. Той самий квадрат через MAVROS</h4>
@@ -90,6 +107,71 @@ ros2 service call /ap/mode_switch ardupilot_msgs/srv/ModeSwitch &quot;{mode: 4}&
 <h4 class="md-subheading">Що має вийти і що записати</h4>
 <ul><li><strong>Квадрат через AP_DDS.</strong> У логу вузла переходи автомата сходяться з режимами в наземці (GUIDED на цілому квадраті), а траєкторія з CSV — квадрат із кутами в межах пари метрів від заданих точок. Збережи графік.</li><li><strong>GUID_TIMEOUT.</strong> Як зупиниш вузол посеред квадрата, апарат зависає через <code>GUID_TIMEOUT</code> (за замовчуванням 3 с). Час від останньої уставки до зупинки за логом ArduPilot мусить зійтися з параметром ± період публікації уставок.</li><li><strong>MAVROS.</strong> Той самий автомат через обгортку проходить ті самі тести. Як поведінка інша, шукай різницю в системах координат і одиницях топіків, а не в автоматі.</li><li><strong>Таблиця порівняння:</strong> затримка «уставка → початок зміни швидкості» (медіана й максимум за 20+ уставками) і завантаження CPU агента AP_DDS і MAVROS. Записуй свої цифри: вони залежать від машини та збірки, чужі тобі ніц не поможуть.</li></ul>
 <p>Лабораторну зараховано, коли квадрат пролетіли через AP_DDS (графік, переходи), перевірено <code>GUID_TIMEOUT</code>, є обгортка MAVROS із тим самим автоматом і таблиця порівняння з вимірюваннями.</p>
+<h4 class="md-subheading">Крок 8. Перевірки, котрі можна виконати (прогнано автором)</h4>
+<p>Перевірка наявності DDS у збірці та чисельне відтворення перетворень кадрів AP_DDS 4.7.2 зі справжнім виводом; кожен рядок пояснено в російськім оригіналі (увага: <code>base_link</code> linear.y у 4.7.2 не інвертується).</p>
+<pre class="cli-block"><code>strings build/sitl/bin/arducopter | grep -c &quot;rt/ap/&quot;      # stock 4.7.2 SITL build (./waf copter)
+# 0
+# param audit of the same SITL (companion_lab.py from ap-companion):
+# DDS_ENABLE        = None</code></pre>
+<pre class="cli-block"><code>&quot;&quot;&quot;Re-implementation of the AP_DDS frame conversions of ArduPilot 4.7.2 (AP_DDS_Client.cpp,
+AP_DDS_ExternalControl.cpp) to check by numbers what a ROS 2 node sends and receives.&quot;&quot;&quot;
+import math
+
+def qmul(a, b):
+    w1, x1, y1, z1 = a; w2, x2, y2, z2 = b
+    return (w1*w2 - x1*x2 - y1*y2 - z1*z2, w1*x2 + x1*w2 + y1*z2 - z1*y2,
+            w1*y2 - x1*z2 + y1*w2 + z1*x2, w1*z2 + x1*y2 - y1*x2 + z1*w2)
+
+def yaw_q(yaw):                                   # rotation about z (NED: about Down)
+    return (math.cos(yaw / 2), 0.0, 0.0, math.sin(yaw / 2))
+
+def q_yaw_deg(q):
+    w, x, y, z = q
+    return math.degrees(math.atan2(2 * (w * z + x * y), 1 - 2 * (y * y + z * z)))
+
+# /ap/pose/filtered: position NED -&gt; ENU, orientation NED -&gt; ENU with a 90 deg z rotation
+def pose_out(pos_ned, q_ned):
+    pos_enu = (pos_ned[1], pos_ned[0], -pos_ned[2])
+    aux = (q_ned[0], q_ned[2], q_ned[1], -q_ned[3])
+    return pos_enu, qmul(aux, (math.sqrt(2) * 0.5, 0, 0, math.sqrt(2) * 0.5))
+
+# /ap/cmd_vel in: frame &quot;map&quot; (ENU) or &quot;base_link&quot;
+def cmd_vel_in(frame, lin, yaw_rate_ros, heading_ned):
+    if frame == &quot;map&quot;:
+        v_ned = (lin[1], lin[0], -lin[2])
+    elif frame == &quot;base_link&quot;:
+        body = (lin[0], lin[1], -lin[2])          # as in 4.7.2: only z is negated
+        c, s = math.cos(heading_ned), math.sin(heading_ned)
+        v_ned = (c * body[0] - s * body[1], s * body[0] + c * body[1], body[2])   # body_to_earth, level flight
+    else:
+        return None                                # any other frame_id is ignored (returns false)
+    return v_ned, -yaw_rate_ros
+
+print(&quot;pose: vehicle 10 m north, 5 m east, 20 m up, heading north (NED yaw 0)&quot;)
+p, q = pose_out((10, 5, -20), yaw_q(0))
+print(f&quot;  /ap/pose/filtered position ENU = {p}, ENU yaw = {q_yaw_deg(q):.1f} deg&quot;)
+p, q = pose_out((0, 0, -20), yaw_q(math.radians(90)))
+print(f&quot;  heading east (NED yaw 90): ENU yaw = {q_yaw_deg(q):.1f} deg&quot;)
+
+print(&quot;cmd_vel frame &#x27;map&#x27;: linear (x=1 east, y=2 north, z=0.5 up), angular.z = 0.3 rad/s (CCW)&quot;)
+v, r = cmd_vel_in(&quot;map&quot;, (1, 2, 0.5), 0.3, 0)
+print(f&quot;  -&gt; NED velocity {v} (north, east, down), yaw rate {r} rad/s (NED, CW positive)&quot;)
+
+for hdg in (0, 90):
+    print(f&quot;cmd_vel frame &#x27;base_link&#x27;, heading {hdg} deg: linear.y = +1 (REP-103: to the LEFT)&quot;)
+    v, _ = cmd_vel_in(&quot;base_link&quot;, (0, 1, 0), 0, math.radians(hdg))
+    print(f&quot;  -&gt; NED velocity ({v[0]:.2f}, {v[1]:.2f}, {v[2]:.2f})&quot;)
+print(&quot;cmd_vel frame &#x27;odom&#x27; -&gt;&quot;, cmd_vel_in(&quot;odom&quot;, (1, 0, 0), 0, 0))</code></pre>
+<pre class="cli-block"><code>pose: vehicle 10 m north, 5 m east, 20 m up, heading north (NED yaw 0)
+  /ap/pose/filtered position ENU = (5, 10, 20), ENU yaw = 90.0 deg
+  heading east (NED yaw 90): ENU yaw = 0.0 deg
+cmd_vel frame &#x27;map&#x27;: linear (x=1 east, y=2 north, z=0.5 up), angular.z = 0.3 rad/s (CCW)
+  -&gt; NED velocity (2, 1, -0.5) (north, east, down), yaw rate -0.3 rad/s (NED, CW positive)
+cmd_vel frame &#x27;base_link&#x27;, heading 0 deg: linear.y = +1 (REP-103: to the LEFT)
+  -&gt; NED velocity (0.00, 1.00, 0.00)
+cmd_vel frame &#x27;base_link&#x27;, heading 90 deg: linear.y = +1 (REP-103: to the LEFT)
+  -&gt; NED velocity (-1.00, 0.00, 0.00)
+cmd_vel frame &#x27;odom&#x27; -&gt; None</code></pre>
 
 <h2>Діагностика</h2>
 <div class="diag-groups"><article class="diag-item"><h4><strong>Симптом:</strong> топіків <code>/ap/*</code> нема</h4><ul><li>Можлива причина: SITL зібрано без <code>--enable-DDS</code>, <code>DDS_ENABLE = 0</code>, агент на іншому порту або в іншому домені.</li><li>Що зробити: збірка з DDS; порт 2019; однаковий <code>ROS_DOMAIN_ID</code>/<code>DDS_DOMAIN_ID</code>.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> <code>arm_motors</code> вертає false</h4><ul><li>Можлива причина: режим не дозволяє арм або не пройдено pre-arm перевірки.</li><li>Що зробити: спершу GUIDED; <code>/ap/prearm_check</code>; STATUSTEXT у GCS.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> уставки <code>cmd_vel</code> ігноруються на землі</h4><ul><li>Можлива причина: не виконано takeoff у GUIDED.</li><li>Що зробити: сервіс takeoff, дочекатися висоти, потім швидкості.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> апарат летить «на схід замість півночі»</h4><ul><li>Можлива причина: уставку в ENU вислано як NED (або навпаки), frame_id не той.</li><li>Що зробити: frame_id <code>map</code> для світових ENU; конвертація лиш на межі.</li></ul></article></div>
@@ -99,6 +181,8 @@ ros2 service call /ap/mode_switch ardupilot_msgs/srv/ModeSwitch &quot;{mode: 4}&
 
 <h2>Джерела</h2>
 <ul class="refs"><li><a href="https://github.com/ArduPilot/ardupilot/blob/master/libraries/AP_DDS/README.md" target="_blank" rel="noopener noreferrer">ArduPilot — AP_DDS README (setup, topics, services)</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://ardupilot.org/dev/docs/ros2.html" target="_blank" rel="noopener noreferrer">ArduPilot — ROS 2 with ArduPilot (dev docs)</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://github.com/ArduPilot/ardupilot/tree/master/libraries/AP_DDS" target="_blank" rel="noopener noreferrer">ArduPilot — AP_DDS topic and service tables (source)</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://github.com/mavlink/mavros" target="_blank" rel="noopener noreferrer">MAVROS</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://ardupilot.org/dev/docs/copter-commands-in-guided-mode.html" target="_blank" rel="noopener noreferrer">ArduPilot — Copter commands in Guided mode</a> <span class="gc-tag" data-state="info">primary</span></li></ul>
+<h2>Задачі з числовою відповіддю</h2>
+<uav-tasks src="../tasks/ros2-ardupilot.json" module="ros2-ardupilot"></uav-tasks>
 <h2>Перевір себе</h2>
 <uav-quiz src="../quiz/ros2-ardupilot.json" module="ros2-ardupilot"></uav-quiz>
       </div>

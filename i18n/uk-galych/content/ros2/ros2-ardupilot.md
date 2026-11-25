@@ -35,6 +35,8 @@ source_hash: 284f391657ba
 
 {{diagram:uxrce-scheme|Схема та сама, що в PX4: клієнт у прошивці, агент на companion, звичайні топіки ROS 2 зовні.}}
 
+{{diagram:ros2-ap-dds-boot-race|Клиент ArduPilot пингует агента пачками по 10 × 1 с и после каждой пишет «exiting», но не сдаётся: агент, поднявшийся на 35-й секунде, подключается при следующем пинге.}}
+
 ### Що публікує і приймає AP_DDS
 | Топік/сервіс | Тип | Призначення |
 |---|---|---|
@@ -74,11 +76,27 @@ MAVROS — вузол, який тримає MAVLink-з'єднання і роз
 ## practice
 ### Крок 1. SITL з DDS
 ```bash
-docker compose --profile ardupilot up --build    # або нативно: waf configure --enable-DDS, sim_vehicle.py --enable-DDS
-docker compose run --rm ros bash
+mkdir -p ~/ardu_ws/src && cd ~/ardu_ws
+vcs import --recursive --input https://raw.githubusercontent.com/ArduPilot/ardupilot/master/Tools/ros2/ros2.repos src
+(cd src/ardupilot && git checkout Copter-4.7.2 && git submodule update --init --recursive)   # match firmware and ardupilot_msgs
+sudo apt update && rosdep update && source /opt/ros/humble/setup.bash
+rosdep install --from-paths src --ignore-src -r -y
+sudo apt install default-jre
+git clone --recurse-submodules --branch v4.7.0 https://github.com/ardupilot/Micro-XRCE-DDS-Gen.git
+(cd Micro-XRCE-DDS-Gen && ./gradlew assemble) && export PATH=$PATH:$PWD/Micro-XRCE-DDS-Gen/scripts
+colcon build --packages-up-to ardupilot_sitl && source install/setup.bash
+ros2 launch ardupilot_sitl sitl_dds_udp.launch.py transport:=udp4 synthetic_clock:=True wipe:=False model:=quad \
+  speedup:=1 slave:=0 instance:=0 \
+  defaults:=$(ros2 pkg prefix ardupilot_sitl)/share/ardupilot_sitl/config/default_params/copter.parm,$(ros2 pkg prefix ardupilot_sitl)/share/ardupilot_sitl/config/default_params/dds_udp.parm \
+  sim_address:=127.0.0.1 master:=tcp:127.0.0.1:5760 sitl:=127.0.0.1:5501
+# second terminal
+source ~/ardu_ws/install/setup.bash
+ros2 node list                      # /ap
 ros2 topic list | grep /ap/
 ros2 topic echo /ap/status --once
 ros2 service call /ap/mode_switch ardupilot_msgs/srv/ModeSwitch "{mode: 4}"
+ros2 service call /ap/arm_motors ardupilot_msgs/srv/ArmMotors "{arm: True}"
+ros2 service call /ap/experimental/takeoff ardupilot_msgs/srv/Takeoff "{alt: 10.5}"
 ```
 
 ### Крок 2. Квадрат через AP_DDS
@@ -98,6 +116,81 @@ ros2 service call /ap/mode_switch ardupilot_msgs/srv/ModeSwitch "{mode: 4}"
 - **Таблиця порівняння:** затримка «уставка → початок зміни швидкості» (медіана й максимум за 20+ уставками) і завантаження CPU агента AP_DDS і MAVROS. Записуй свої цифри: вони залежать від машини та збірки, чужі тобі ніц не поможуть.
 
 Лабораторну зараховано, коли квадрат пролетіли через AP_DDS (графік, переходи), перевірено `GUID_TIMEOUT`, є обгортка MAVROS із тим самим автоматом і таблиця порівняння з вимірюваннями.
+
+### Крок 8. Перевірки, котрі можна виконати (прогнано автором)
+Перевірка наявності DDS у збірці та чисельне відтворення перетворень кадрів AP_DDS 4.7.2 зі справжнім виводом; кожен рядок пояснено в російськім оригіналі (увага: `base_link` linear.y у 4.7.2 не інвертується).
+
+```bash
+strings build/sitl/bin/arducopter | grep -c "rt/ap/"      # stock 4.7.2 SITL build (./waf copter)
+# 0
+# param audit of the same SITL (companion_lab.py from ap-companion):
+# DDS_ENABLE        = None
+```
+
+```python
+"""Re-implementation of the AP_DDS frame conversions of ArduPilot 4.7.2 (AP_DDS_Client.cpp,
+AP_DDS_ExternalControl.cpp) to check by numbers what a ROS 2 node sends and receives."""
+import math
+
+def qmul(a, b):
+    w1, x1, y1, z1 = a; w2, x2, y2, z2 = b
+    return (w1*w2 - x1*x2 - y1*y2 - z1*z2, w1*x2 + x1*w2 + y1*z2 - z1*y2,
+            w1*y2 - x1*z2 + y1*w2 + z1*x2, w1*z2 + x1*y2 - y1*x2 + z1*w2)
+
+def yaw_q(yaw):                                   # rotation about z (NED: about Down)
+    return (math.cos(yaw / 2), 0.0, 0.0, math.sin(yaw / 2))
+
+def q_yaw_deg(q):
+    w, x, y, z = q
+    return math.degrees(math.atan2(2 * (w * z + x * y), 1 - 2 * (y * y + z * z)))
+
+# /ap/pose/filtered: position NED -> ENU, orientation NED -> ENU with a 90 deg z rotation
+def pose_out(pos_ned, q_ned):
+    pos_enu = (pos_ned[1], pos_ned[0], -pos_ned[2])
+    aux = (q_ned[0], q_ned[2], q_ned[1], -q_ned[3])
+    return pos_enu, qmul(aux, (math.sqrt(2) * 0.5, 0, 0, math.sqrt(2) * 0.5))
+
+# /ap/cmd_vel in: frame "map" (ENU) or "base_link"
+def cmd_vel_in(frame, lin, yaw_rate_ros, heading_ned):
+    if frame == "map":
+        v_ned = (lin[1], lin[0], -lin[2])
+    elif frame == "base_link":
+        body = (lin[0], lin[1], -lin[2])          # as in 4.7.2: only z is negated
+        c, s = math.cos(heading_ned), math.sin(heading_ned)
+        v_ned = (c * body[0] - s * body[1], s * body[0] + c * body[1], body[2])   # body_to_earth, level flight
+    else:
+        return None                                # any other frame_id is ignored (returns false)
+    return v_ned, -yaw_rate_ros
+
+print("pose: vehicle 10 m north, 5 m east, 20 m up, heading north (NED yaw 0)")
+p, q = pose_out((10, 5, -20), yaw_q(0))
+print(f"  /ap/pose/filtered position ENU = {p}, ENU yaw = {q_yaw_deg(q):.1f} deg")
+p, q = pose_out((0, 0, -20), yaw_q(math.radians(90)))
+print(f"  heading east (NED yaw 90): ENU yaw = {q_yaw_deg(q):.1f} deg")
+
+print("cmd_vel frame 'map': linear (x=1 east, y=2 north, z=0.5 up), angular.z = 0.3 rad/s (CCW)")
+v, r = cmd_vel_in("map", (1, 2, 0.5), 0.3, 0)
+print(f"  -> NED velocity {v} (north, east, down), yaw rate {r} rad/s (NED, CW positive)")
+
+for hdg in (0, 90):
+    print(f"cmd_vel frame 'base_link', heading {hdg} deg: linear.y = +1 (REP-103: to the LEFT)")
+    v, _ = cmd_vel_in("base_link", (0, 1, 0), 0, math.radians(hdg))
+    print(f"  -> NED velocity ({v[0]:.2f}, {v[1]:.2f}, {v[2]:.2f})")
+print("cmd_vel frame 'odom' ->", cmd_vel_in("odom", (1, 0, 0), 0, 0))
+```
+
+```text
+pose: vehicle 10 m north, 5 m east, 20 m up, heading north (NED yaw 0)
+  /ap/pose/filtered position ENU = (5, 10, 20), ENU yaw = 90.0 deg
+  heading east (NED yaw 90): ENU yaw = 0.0 deg
+cmd_vel frame 'map': linear (x=1 east, y=2 north, z=0.5 up), angular.z = 0.3 rad/s (CCW)
+  -> NED velocity (2, 1, -0.5) (north, east, down), yaw rate -0.3 rad/s (NED, CW positive)
+cmd_vel frame 'base_link', heading 0 deg: linear.y = +1 (REP-103: to the LEFT)
+  -> NED velocity (0.00, 1.00, 0.00)
+cmd_vel frame 'base_link', heading 90 deg: linear.y = +1 (REP-103: to the LEFT)
+  -> NED velocity (-1.00, 0.00, 0.00)
+cmd_vel frame 'odom' -> None
+```
 
 ## diagnostics
 - **Симптом:** топіків `/ap/*` нема

@@ -1940,6 +1940,41 @@
       "term": "CPU limit (EdgeTX Lua)",
       "def": "Ошибка, которой EdgeTX останавливает вызов виджета дольше ~20 000 инструкций Lua (хук каждые 200 инструкций); виджет выключается, текст ошибки пишется в его зону.",
       "module": "tx-lua-widgets"
+    },
+    {
+      "term": "mavsdk-grpc",
+      "def": "Пакет PyPI со старым gRPC-клиентом MAVSDK-Python (импорт mavsdk_grpc): с MAVSDK v4 имя mavsdk занято нативной привязкой, а прежний API живёт под этим именем.",
+      "module": "mav-sdk"
+    },
+    {
+      "term": "Пункт-подставка миссии (ArduPilot)",
+      "def": "Первый элемент плана, загружаемый в seq 0 только ради места: ArduPilot хранит там дом и затирает загруженное, поэтому без подставки первая точка маршрута теряется.",
+      "module": "mav-sdk"
+    },
+    {
+      "term": "MAVn_* (каналы MAVLink, ArduPilot 4.7)",
+      "def": "Группа параметров канала MAVLink в ArduPilot 4.7+: частоты потоков (MAVn_EXT_STAT, MAVn_POSITION …) и опции; номер n — порядковый номер MAVLink-канала (консоль — MAV1), а не SERIAL. До 4.7 — SRn_*.",
+      "module": "ap-companion"
+    },
+    {
+      "term": "GUID_TIMEOUT",
+      "def": "Параметр ArduCopter: через сколько секунд без новых целей скорости, ускорения или углов GUIDED обнуляет уставку (по умолчанию 3 с, 0.1–5 с); у целей по позиции таймаута нет.",
+      "module": "ap-companion"
+    },
+    {
+      "term": "MAV_COMP_ID_ONBOARD_COMPUTER (191)",
+      "def": "Стандартный compid бортового компьютера: companion работает под sysid своего аппарата и этим compid, чтобы автопилот принимал его как свой компонент.",
+      "module": "ap-companion"
+    },
+    {
+      "term": "micro-ROS Agent",
+      "def": "Процесс на companion (micro_ros_agent), который принимает сессию Micro XRCE-DDS от клиента в прошивке по UDP или UART и создаёт от его имени участника, топики и сервисы в DDS-сети ROS 2.",
+      "module": "ros2-ardupilot"
+    },
+    {
+      "term": "DDS_MAX_RETRY",
+      "def": "Параметр AP_DDS: число пингов агента в одной пачке (по умолчанию 10, 0 — без пачек); после неудачной пачки GCS получает «No ping response, exiting», но в 4.7.2 клиент продолжает попытки.",
+      "module": "ros2-ardupilot"
     }
   ]
 }
