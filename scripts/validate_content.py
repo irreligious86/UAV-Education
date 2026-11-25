@@ -208,6 +208,20 @@ def validate_lessons(md_path, all_ids):
     return errs
 
 
+def validate_heading_levels(md_path):
+    """The pipeline renders ## sections and ### subheadings only; deeper headings stay raw text."""
+    errs = []
+    rel = md_path.relative_to(ROOT)
+    in_code = False
+    for n, line in enumerate(md_path.read_text(encoding="utf-8").splitlines(), 1):
+        if line.lstrip().startswith("```"):
+            in_code = not in_code
+            continue
+        if not in_code and line.startswith("####"):
+            errs.append(f"{rel}:{n}: heading level 4+ is not rendered, use ###: {line[:60]}")
+    return errs
+
+
 def validate_diagrams(md_path):
     errs = []
     text = md_path.read_text(encoding="utf-8")
@@ -526,6 +540,7 @@ def main():
         errs.extend(validate_widgets(p))
         errs.extend(validate_diagrams(p))
         errs.extend(validate_lessons(p, all_ids_set))
+        errs.extend(validate_heading_levels(p))
         st = status_by_file.get(p)
         errs.extend(validate_front_matter_status(p, st))
         errs.extend(validate_published_sections(p, st == "published"))

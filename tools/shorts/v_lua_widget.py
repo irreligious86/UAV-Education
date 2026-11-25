@@ -3,7 +3,7 @@
 Facts checked against EdgeTX 2.12.5 source: radio/src/sdcard.h (WIDGETS, SCRIPTS, SCRIPTS/MIXES paths),
 radio/src/lua/widgets.cpp (widget table keys name/options/create/update/refresh/background/useLvgl; file /main.lua in a
 folder under /WIDGETS), lua/interface.cpp (telemetry scripts only for PCBTARANIS, i.e. B&W radios), dataconstants.h
-(LEN_SCRIPT_FILENAME 6 for SCRIPTS files), translations/untranslated.h CRSF sensor names (1RSS, RQly, RSNR, ANT, RFMD,
+(LEN_SCRIPT_FILENAME 6 for mix/telemetry scripts, LEN_FUNCTION_NAME 8 for function scripts; LUA_MIXER ON by default), translations/untranslated.h CRSF sensor names (1RSS, RQly, RSNR, ANT, RFMD,
 TPWR, TRSS, TQly, RxBt, Curr, Capa, FM). Silent. The widget code shown is an original minimal example.
 usage: python3 v_lua_widget.py [preview|render]"""
 import math, os, sys
@@ -52,8 +52,8 @@ def s_types(t, dur=14):
     ty = title(d, "Пять типов Lua-скриптов в EdgeTX")
     rows = [("Widget  /WIDGETS/<имя>/main.lua", "окно на главном экране цветного пульта — наш случай", GR),
             ("Telemetry  /SCRIPTS/TELEMETRY", "экран телеметрии только на ч/б пультах (Taranis-подобные). На TX16S вместо него — виджеты", MUTED),
-            ("Function  /SCRIPTS/FUNCTIONS", "запускается из Special Functions; имя файла до 6 символов", TE),
-            ("Mix  /SCRIPTS/MIXES", "свои миксы; нужен флаг сборки LUA_MIXER, есть не на всех пультах", OR),
+            ("Function  /SCRIPTS/FUNCTIONS", "запускается из Special Functions; имя файла до 8 символов (у mix и telemetry — до 6)", TE),
+            ("Mix  /SCRIPTS/MIXES", "свои миксы; флаг сборки LUA_MIXER, в 2.12 включён по умолчанию", OR),
             ("Tool  /SCRIPTS/TOOLS", "запускается вручную из меню, как ELRS Lua", PU)]
     cards(d, t, rows, ty + 30, gap=16, t0=0.4, step=0.9, hs=32, bs=28)
     return fade(im, t, dur)
