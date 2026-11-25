@@ -34,6 +34,8 @@ Since 4.4, a cloud server builds the firmware for your list of options. In Firmw
 
 Checking on the board: the `version` command in the CLI shows the version and target, and `status` prints the `BUILD KEY` — the key Cloud Build uses to build exactly the same firmware again. `diff all` doesn't contain the key — save the `status` output separately.
 
+{{diagram:bf-cloud-build-pipeline|Путь Cloud Build: опция, которой не было в запросе, отсутствует в коде — исчезают настройка, команда CLI и вкладка, без единого сообщения об ошибке.}}
+
 ### ArduPilot: building from source
 ArduPilot is built with `waf`: `./waf configure --board <board>` and `./waf copter` (or `plane`). The target is described in `libraries/AP_HAL_ChibiOS/hwdef/<board>/hwdef.dat`: pins, buses, which drivers to include. That's also where `define` lines switch off what you don't need.
 

@@ -1865,6 +1865,36 @@
       "term": "EDT safety arm",
       "def": "Настройка ESC (Bluejay — EDT safety arm, AM32 — `input_type` = 4): мотор не принимает газ, пока полётник не прислал DShot-команду 13 (включить EDT). Betaflight шлёт её при каждой попытке арма, только если `dshot_edt = ON` и работает bidir DShot; иначе аппарат армится, а моторы стоят.",
       "module": "f-esc-firmware"
+    },
+    {
+      "term": "BUILD KEY",
+      "def": "32-символьный ключ облачной сборки Betaflight, вшитый в прошивку (BUILD_KEY): печатается командой status строкой «BUILD KEY: …»; по нему build.betaflight.com/api/builds/<ключ>/json отдаёт список опций сборки. У локальной сборки ключа нет.",
+      "module": "bf-custom"
+    },
+    {
+      "term": "Custom Defines",
+      "def": "Поле Expert Mode во флешере Betaflight: дополнительные флаги сборки через пробел без префикса USE_ (сервер добавляет его сам), например RANGEFINDER, GPS_LAP_TIMER, TRANSPONDER.",
+      "module": "bf-custom"
+    },
+    {
+      "term": "CLOUD_BUILD",
+      "def": "Флаг, с которым собирается облачная прошивка Betaflight: выключает классический набор функций common_pre.h, и в прошивку попадает только перечисленное в списке опций (DShot тоже надо указать явно). Локально задаётся через OPTIONS=\"CLOUD_BUILD USE_…\".",
+      "module": "bf-custom"
+    },
+    {
+      "term": "UID (ExpressLRS)",
+      "def": "6 байт адреса линка ELRS: первые 6 байт MD5 от строки -DMY_BINDING_PHRASE=\"фраза\". Байты 2–5 задают seed прыжков, 4–5 — начало CRC, UID4 и UID5 открыто передаются в пакете SYNC. Не шифрование.",
+      "module": "link-elrs"
+    },
+    {
+      "term": "Model Match",
+      "def": "Функция ELRS: модуль подмешивает номер приёмника из EdgeTX (0…63) в младшие 6 бит UID5 пакета SYNC; приёмник с другим записанным номером держит связь, но не выдаёт каналы в полётник («Model Mismatch»).",
+      "module": "link-elrs"
+    },
+    {
+      "term": "LBT (Listen Before Talk)",
+      "def": "Режим сборки ELRS CE_LBT для ЕС (EN 300 328): перед каждой передачей радио меряет RSSI канала и пропускает пакет, если он не ниже порога (−71 дБм для LoRa при 100 мВт). Мощность ограничена 100 мВт, TQly показывает долю разрешённых передач.",
+      "module": "link-elrs"
     }
   ]
 }

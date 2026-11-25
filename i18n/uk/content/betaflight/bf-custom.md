@@ -34,6 +34,8 @@ source_hash: ae19af8cef46
 
 Перевірка на платі: команда `version` у CLI показує версію й таргет, а `BUILD KEY` виводить `status` — ключ, за яким Cloud Build збере рівно таку саму прошивку ще раз. У `diff all` ключа немає — вивід `status` зберігай окремо.
 
+{{diagram:bf-cloud-build-pipeline|Путь Cloud Build: опция, которой не было в запросе, отсутствует в коде — исчезают настройка, команда CLI и вкладка, без единого сообщения об ошибке.}}
+
 ### ArduPilot: збірка з вихідного коду
 ArduPilot збирається `waf`: `./waf configure --board <board>` і `./waf copter` (або `plane`). Таргет описується в `libraries/AP_HAL_ChibiOS/hwdef/<board>/hwdef.dat`: піни, шини, які драйвери вмикати. Там само через `define`-рядки вимикають непотрібне.
 
