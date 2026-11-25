@@ -87,7 +87,7 @@ The lab counts as done when the ESC table is filled in, the ESC RPM is visible i
   - What to do: DShot300 instead of 600, short wires, a common ground, ferrites if needed.
 - **Symptom:** the motor twitches or stops on sharp throttle
   - Possible cause: loss of sync (desync).
-  - What to do: raise demag compensation, lower the timing or the throttle sharpness, check the bearings and windings.
+  - What to do: raise demag compensation first, then timing one step up (watch motor temperature; if the motors get hot, put the timing back and use a smaller prop), check the bearings, windings and phase wire length.
 - **Symptom:** passthrough doesn't find the ESC
   - Possible cause: the Configurator/GCS is open, the ESC isn't powered from the battery, IOMCU outputs in ArduPilot, the protocol isn't DShot.
   - What to do: close other programs, plug in the battery, move to the FMU/AUX outputs, enable DShot.

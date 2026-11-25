@@ -59,11 +59,11 @@ Rozměr statoru určuje moment (objem magnetického materiálu): statory 2207 a 
 ### Co ESC dělá každých pár mikrosekund
 ESC je třífázový střídač se 6 tranzistory MOSFET. Komutuje fáze podle polohy rotoru, kterou odhaduje ze zpětného elektromotorického napětí v nenapájené fázi (zero-crossing). Parametry firmwaru ESC, které má smysl řešit:
 - **PWM frequency** (24/48/96 kHz) – frekvence PWM na spínacích tranzistorech: vyšší znamená tišší a plynulejší chod při malém plynu, ale větší spínací ztráty a ohřev ESC; 48 kHz je kompromis pro 5".
-- **Timing** (motor timing, 16–24°) – předstih komutace: vyšší dává víc otáček a výkonu při vysokých RPM, nižší spolehlivější synchronizaci a nižší teplotu.
-- **Demag compensation** – ochrana před desyncem při prudkém ubrání plynu (demagnetizační proud); „High“ pro těžké vrtule.
+- **Timing** (motor timing; ve firmwarech 0–30°, výchozí AM32 15°, Bluejay 22.5°) – předstih komutace: vyšší dává víc otáček a proudu a víc tepla, ale větší rezervu proti demagnetizaci; nižší je chladnější a účinnější, ale těžké vrtule a motory s velkou indukčností častěji ztrácejí synchronizaci při prudkém plynu.
+- **Demag compensation** – ochrana před desyncem při prudkých změnách plynu, hlavně při zrychlení z malých otáček s těžkou vrtulí (demagnetizační proud roste s proudem motoru); „High“ pro těžké vrtule.
 - **Startup power / rampup** – plynulý rozběh velkých vrtulí.
 - **Current limit / temperature protection** – ESC při přehřátí snižuje výkon: v logu to vypadá jako „propad tahu“.
-Desync znamená, že ESC ztratil polohu rotoru: motor sebou škube, piští, klesá tah; příčinami jsou dlouhé fázové vodiče, vysoký timing, příliš velká vrtule pro dané KV, starý firmware.
+Desync znamená, že ESC ztratil polohu rotoru: motor sebou škube, piští, klesá tah; příčinami jsou dlouhé fázové vodiče, slabá kompenzace demagnetizace nebo nízký timing pro těžkou vrtuli, příliš velká vrtule pro dané KV, starý firmware.
 
 ### DShot: jak je rámec uspořádán
 16 bitů: 11 bitů hodnoty (0 – stop, 1–47 – speciální příkazy, 48–2047 – plyn), 1 bit žádosti o telemetrii, 4 bity CRC. Bit je kódován šířkou impulzu: „1“ ≈ 75 % periody bitu, „0“ ≈ 37 %; DShot300 – bit 3.33 µs, rámec 53 µs; DShot600 – 1.67 µs a 27 µs. Rámec se odesílá v každém cyklu PID. **Bidirectional DShot**: po rámci se směr linky obrátí a ESC odpoví rámcem s eRPM (perioda elektrické otáčky) zakódovaným v GCR; chyby této odpovědi jsou vidět jako `E%` na záložce Motors – normální hodnota je 0, při více než 1–2 % staví RPM filtr notche mimo skutečné frekvence. Speciální příkazy DShot (1–47): bzučák, obrácení směru otáčení (`dshot_cmd` 7/8 – `motor direction`), zapnutí/vypnutí 3D, dotaz na informace o ESC – ty používá konfigurátor na záložce Motors.
@@ -111,8 +111,8 @@ Laboratorní úloha je splněna, když první zapnutí proběhlo bez vrtulí a p
   - Možná příčina: firmware ESC bez bidirectional DShot nebo špatná hodnota `motor_poles`.
   - Co udělat: nahrát Bluejay nebo AM32, přepočítat magnety.
 - **Příznak:** motor sebou škube nebo piští při prudkém přidání plynu
-  - Možná příčina: desync – timing, dlouhé vodiče, vrtule příliš těžká pro dané KV.
-  - Co udělat: snížit timing, zvýšit demag, zkontrolovat fázové vodiče, použít menší vrtuli.
+  - Možná příčina: desync – demag/timing, dlouhé vodiče, vrtule příliš těžká pro dané KV.
+  - Co udělat: nejdřív zvýšit demag, pak timing o stupeň výš (hlídat teplotu motorů), zkontrolovat fázové vodiče; když to nepomůže, menší vrtule (podrobně – `f-esc-firmware`).
 - **Příznak:** `E%` na záložce Motors je vyšší než nula
   - Možná příčina: chyby bidirectional DShot – firmware ESC, rušení signálu, rychlost DShot.
   - Co udělat: aktualizovat ESC (Bluejay/AM32), použít DShot300 místo 600, zkrátit signálové vodiče.

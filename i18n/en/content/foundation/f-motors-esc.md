@@ -59,11 +59,11 @@ Stator size sets the torque (volume of magnetic material): 2207 and 2306 have al
 ### What the ESC does every few microseconds
 An ESC is a three-phase inverter on 6 MOSFETs. It commutates the phases according to the rotor position, which it estimates from the back-EMF in the unpowered phase (zero-crossing). The ESC firmware parameters that matter:
 - **PWM frequency** (24/48/96 kHz) — the PWM frequency on the switches: higher is quieter and smoother at low throttle, but more switching losses and ESC heating; 48 kHz is the compromise for a 5".
-- **Timing** (motor timing, 16–24°) — commutation advance: higher gives more RPM/power at high RPM, lower gives more reliable sync and runs cooler.
-- **Demag compensation** — protection against desync on a sharp throttle chop (demagnetization current); “High” for heavy props.
+- **Timing** (motor timing; 0–30° in the firmwares, default AM32 15°, Bluejay 22.5°) — commutation advance: higher gives more RPM and current and more heat, but more margin against demagnetization; lower runs cooler and more efficiently, but heavy props and high-inductance motors lose sync more often on sharp throttle.
+- **Demag compensation** — protection against desync on sharp throttle changes, especially accelerating from low RPM on a heavy prop (demagnetization current grows with motor current); “High” for heavy props.
 - **Startup power / rampup** — a smooth start for big props.
 - **Current limit / temperature protection** — the ESC reduces power when it overheats: in the log it looks like a “thrust drop”.
-Desync means the ESC lost the rotor position: the motor stutters, screams, thrust drops; causes — long phase wires, high timing, a prop too big for the KV, old firmware.
+Desync means the ESC lost the rotor position: the motor stutters, screams, thrust drops; causes — long phase wires, too little demag compensation or too low timing for a heavy prop, a prop too big for the KV, old firmware.
 
 ### DShot: how a frame is built
 16 bits: 11 bits of value (0 — stop, 1–47 — special commands, 48–2047 — throttle), 1 telemetry request bit, 4 CRC bits. A bit is encoded by pulse width: “1” ≈ 75% of the bit period, “0” ≈ 37%; DShot300 — a 3.33 µs bit, a 53 µs frame; DShot600 — 1.67 µs and 27 µs. A frame is sent every PID loop. **Bidirectional DShot**: after the frame the line is turned around, and the ESC replies with a frame carrying eRPM (the period of an electrical revolution), GCR-encoded; errors in this reply show up as `E%` on the Motors tab — normal is 0, and at > 1–2% the RPM filter places its notches in the wrong spot. Special DShot commands (1–47): beeper, spin direction reversal (`dshot_cmd` 7/8 — `motor direction`), 3D on/off, ESC info request — the configurator uses these on the Motors tab.
@@ -111,8 +111,8 @@ The lab counts as done when the first power-up was made without props through a 
   - Possible cause: ESC firmware without bidirectional DShot, or a wrong `motor_poles`.
   - What to do: Bluejay or AM32, count the magnets again.
 - **Symptom:** a motor stutters/screams on sharp throttle
-  - Possible cause: desync — timing, long wires, a prop too heavy for the KV.
-  - What to do: lower timing, higher demag, check the phase wires, a smaller prop.
+  - Possible cause: desync — demag/timing, long wires, a prop too heavy for the KV.
+  - What to do: raise demag first, then timing one step up (watch motor temperature), check the phase wires; if that does not help, a smaller prop (details in `f-esc-firmware`).
 - **Symptom:** `E%` on the Motors tab is above zero
   - Possible cause: bidirectional DShot errors — ESC firmware, noise on the signal, DShot speed.
   - What to do: update the ESC (Bluejay/AM32), DShot300 instead of 600, shorter signal wires.

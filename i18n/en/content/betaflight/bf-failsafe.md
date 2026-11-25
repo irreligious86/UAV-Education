@@ -23,7 +23,7 @@ Failsafe is what the drone does when the link to the radio is lost. In Betafligh
 
 ## theory
 ### How Betaflight decides the link is lost
-If there are no valid packets for 100 ms, the signal is considered lost. The last values are held for another 300 ms, after which Stage 1 kicks in. The countdown to Stage 2 runs from the last good packet.
+After 150 ms without valid packets (100 ms in 4.5) the FC shows RXLOSS. The channels hold their last values for 300 ms from the last good packet (not from the moment the loss is detected), then take the `rxfail` values. This is Stage 1; Stage 2 begins when the link has been gone for longer than `failsafe_delay` since the last good packet.
 
 {{diagram:failsafe-stages|Failsafe timing diagram: loss detection, a short hold, Stage 1 and Stage 2.}}
 

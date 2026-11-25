@@ -41,9 +41,13 @@ deepened wherever a topic already has a home; new modules are created only where
 | 3b | done: bf-custom (Cloud Build), link-elrs (UID, model match, domains, LBT, margin); fact-checked | 4c2324ee |
 | 4a | done: bf-led-buzzer (beeper, rxfail, beacons, LED current), bf-failsafe buzzer link and timing fix; fact-checked | 0e437eae |
 | 4b | done: bf-modes-osd (pos bits, profiles, masks), bf-adjustments (fn 29), bf-hd-osd-video (boot logo); fact-checked; shorts P2 script fixed (fn 29, not 33) | c548c653 |
-| 5 | done: tx-lua-widgets (new) + tools/lua/LinkBox; fact-checked; shorts P3 script fixed | this |
+| 5 | done: tx-lua-widgets (new) + tools/lua/LinkBox; fact-checked; shorts P3 script fixed | d729ed53 |
+| 6 | done: 26 lesson cards, related lists, consistency sweep across the set and recurring wrong claims elsewhere, translation follow-ups | this |
 
 ## Follow-ups
 
-- Translated copies (cs, en, uk, uk-galych) of `f-motors-esc` still carry the old «lower timing for desync» advice; fix in the translation pass.
-- `bf-modes-osd` vbat_sag sentence fixed in ru and ru-odessa only; same for other translations.
+- Done in wave 6: f-motors-esc desync advice and bf-modes-osd vbat_sag sentence fixed in all translations; f-esc-firmware and bf-failsafe translated lines aligned.
+- Translations of the deepened modules carry only the mirrored diagram lines and code blocks; full re-translation belongs to the Phase 3 language pass (`source_hash` deliberately left stale).
+- Published shorts with corrected facts (scripts fixed in tools/shorts): P2 adjrange OSD profile is function 29, not 33; P3 function-script names up to 8 characters, LUA_MIXER on by default.
+
+**Status: plan complete (2026-11-26).**

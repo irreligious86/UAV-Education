@@ -87,7 +87,7 @@ Laboratorní úloha je splněna, když je tabulka ESC vyplněná, RPM z ESC jsou
   - Co udělat: DShot300 místo 600, krátké vodiče, společná zem, podle potřeby ferity.
 - **Příznak:** motor při prudkém přidání plynu cuká nebo se zastaví
   - Možná příčina: ztráta synchronizace (desync).
-  - Co udělat: zvyšte demag compensation, snižte časování nebo strmost změn plynu, zkontrolujte ložiska a vinutí.
+  - Co udělat: nejdřív zvyšte demag compensation, pak časování o stupeň výš (hlídejte teplotu motorů; když se přehřívají, vraťte časování a dejte menší vrtuli), zkontrolujte ložiska, vinutí a délku fázových vodičů.
 - **Příznak:** passthrough nenajde ESC
   - Možná příčina: je otevřený Configurator nebo pozemní stanice, ESC nemají napájení z baterie, v ArduPilotu jde o výstupy IOMCU, protokol není DShot.
   - Co udělat: zavřete ostatní programy, připojte baterii, přejděte na výstupy FMU/AUX, zapněte DShot.

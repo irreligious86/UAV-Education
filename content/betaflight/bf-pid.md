@@ -14,6 +14,8 @@ related:
   - bf-pid-reg-in-bf
   - bf-filters
   - bf-blackbox
+  - bf-tuning-method
+  - bf-motor-balance
 next:
   - bf-cli
 ---

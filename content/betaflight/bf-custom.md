@@ -13,6 +13,8 @@ tags:
 related:
   - bf-cli
   - ap-quadplane
+  - bf-hd-osd-video
+  - bf-led-buzzer
 next: []
 ---
 
@@ -64,6 +66,8 @@ next: []
 - `LED_STRIP` даёт 32 светодиода, `LED_STRIP_64` — 64 (`LED_STRIP_MAX_LENGTH`); на F411 `LED_STRIP_64` не поддерживается: `#error` в `target/STM32F411/target.h:87–88`, сборка упадёт;
 - `VTX` тянет SmartAudio, Tramp, MSP VTX и таблицы VTX;
 - без `MAG` нет компаса, без `GPS` нет GPS Rescue, и вкладка GPS скрыта.
+
+{{lesson:bf-hd-osd-video|Какие умолчания `vcd_video_system` и `osd_displayport_device` даёт опция OSD (HD), маска порта MSP + VTX_MSP и настройка DJI, Walksnail и HDZero.}}
 
 ### Core Only и Custom Defines
 **Core Only** (чекбокс `coreBuildModeCheckbox`) шлёт вместо списка одну строку `CORE_BUILD`. По описанию в Configurator это драйверы железа и ограниченный набор функций: сборка нужна, чтобы проверить, видит ли плата гироскоп, флеш и OSD-чип, а не для полёта. В исходниках 4.5.3 `CORE_BUILD` напрямую отключает немногое (например, Launch Control, `common_pre.h:380–389`); полный набор того, что сервер добавляет к такому запросу, в открытом коде не виден.

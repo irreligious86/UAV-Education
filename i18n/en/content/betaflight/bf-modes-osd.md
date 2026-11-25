@@ -59,7 +59,7 @@ Analog OSD (MAX7456 chip) and digital (MSP DisplayPort for Walksnail/HDZero/DJI)
 ### OSD: set it up for meaning, not looks
 - **OSD profiles** (`osd_profile`, up to 3) — on a switch: “minimal” for racing, “full” for long range, “empty” for recording.
 - **Warnings** (`osd_warn_bitmask`): ARMING_DISABLE, BATTERY_WARNING/CRITICAL, FAIL_SAFE, LINK_QUALITY, RSSI, CORE_TEMP, GPS_RESCUE_*, OVER_CAP — enable all except the noisy ones; `osd_cap_alarm`, `osd_alt_alarm`, `osd_rssi_alarm`, `osd_link_quality_alarm` are the thresholds.
-- **Voltage**: show the average per cell (`osd_avg_cell_voltage_pos`) and set `vbat_warning_cell_voltage` based on sag under load (3.5 V for 5" LiPo, 3.3 for Li-Ion), `vbat_min_cell_voltage` is the critical one; `vbat_sag_compensation` is not an indicator: it raises motor output when the voltage sags so the response doesn't “drift” as the battery discharges.
+- **Voltage**: show the average per cell (`osd_avg_cell_voltage_pos`) and set `vbat_warning_cell_voltage` based on sag under load (3.5 V for 5" LiPo, 3.3 for Li-Ion), `vbat_min_cell_voltage` is the critical one; `vbat_sag_compensation` is not an indicator: it trims the top of the motor range on a fresh battery (from 4.20 V down to `vbat_warning_cell_voltage`) so the response doesn't “drift” as the battery discharges (`bf-pid-reg-in-bf`).
 - **Link**: LQ and RSSI dBm from CRSF (not `rssi_channel`), warning at LQ < 70% on 250 Hz ELRS (the “Link budget” module).
 - **Timer**: `osd_tim1`/`osd_tim2` (source, precision, threshold) — on arm; for Li-Ion, mAh drawn matters more.
 - HD (MSP DisplayPort): `osd_displayport_device`, canvas 50×18/60×22 — elements outside the analog canvas are not displayed; `osd_canvas_width/height`.

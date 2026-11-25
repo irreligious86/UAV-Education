@@ -21,6 +21,8 @@ related:
   - link-elrs
   - link-protocols
   - bf-cli
+  - bf-adjustments
+  - link-edgetx
 next:
   - bf-pid
 ---
@@ -100,10 +102,15 @@ float applyActualRates(const int axis, float rcCommandf, const float rcCommandfA
 - OSD-элемент `osd_rate_profile_name_pos`, имя задаётся в `rateprofile_name` (до 8 символов).
 Профиль PID таким способом не переключается: у Adjustments нет функции PID-профиля.
 
+{{lesson:bf-adjustments|Все функции `adjrange` с номерами CLI, режим выбора, бипы и почему подстройка в воздухе не сохраняется сама.}}
+
 ### Концы каналов: `rxrange` и почему 988–2012
+
 Синтаксис: `rxrange <0..3> <min> <max>`, где каналы 0–3 — roll, pitch, yaw, throttle после `map`, а min и max лежат в пределах 750…2250. Без аргументов команда печатает текущие значения, `rxrange reset` ставит дефолт 1000 2000. Масштабирование: `1000 + (raw − min)·1000/(max − min)`.
 
 С ELRS/CRSF без калибровки стик доходит до 2012. `rcCommand` ограничен 500, поэтому полный рейт наступает уже на 2000 мкс, и последние 12 из 512 мкс от центра до упора (≈ 2.3 % половины хода) мертвы. То же с газом: `constrain(rcData, min_check, 2000)`. Внизу 988 < `min_check` 1050, так что арм не страдает. Решение — `rxrange 0 988 2012` для всех четырёх каналов. Тогда полный ход стика даёт ровно 1000…2000, а центр 1500 ± 1.
+
+{{lesson:link-edgetx|Почему пульт отдаёт 988 / 1500 / 2012 мкс: формулы Inputs → Mixes → Outputs и перевод процентов в единицы CRSF.}}
 
 Входные пороги (вопрос FAQ «min_check vs min_command»): `min_check` 1050 и `max_check` 1900 — пороги газа и стиков для арма и стик-команд. Газ ниже `min_check` считается нулём. `mid_rc` 1500 — центр стиков. `rx_min_usec`/`rx_max_usec` 885/2115 — окно валидности сигнала. `min_command` и `motor_idle` (до 2025.12 — `dshot_idle_value`) — выходы на моторы, к RC не относятся. `deadband`/`yaw_deadband` (0…32/0…100) вырезают зону у центра. Они нужны только для изношенных гимбалов, потому что сужают ход стика.
 

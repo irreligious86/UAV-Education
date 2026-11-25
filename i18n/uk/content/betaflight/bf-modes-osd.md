@@ -59,7 +59,7 @@ source_hash: 824a1129635a
 ### OSD: налаштування за змістом, а не за красою
 - **Профілі OSD** (`osd_profile`, до 3) — на тумблері: «мінімум» для гонок, «повний» для дальніх, «порожній» для запису.
 - **Попередження** (`osd_warn_bitmask`): ARMING_DISABLE, BATTERY_WARNING/CRITICAL, FAIL_SAFE, LINK_QUALITY, RSSI, CORE_TEMP, GPS_RESCUE_*, OVER_CAP — вмикати всі, крім шумних; `osd_cap_alarm`, `osd_alt_alarm`, `osd_rssi_alarm`, `osd_link_quality_alarm` — пороги.
-- **Напруга**: показувати середню на елемент (`osd_avg_cell_voltage_pos`) і ставити `vbat_warning_cell_voltage` за просіданням під навантаженням (3.5 В для LiPo 5", 3.3 для Li-Ion), `vbat_min_cell_voltage` — критична; `vbat_sag_compensation` — не індикація: вона піднімає вихід моторів при просіданні напруги, щоб відгук не «плив» у міру розряду.
+- **Напруга**: показувати середню на елемент (`osd_avg_cell_voltage_pos`) і ставити `vbat_warning_cell_voltage` за просіданням під навантаженням (3.5 В для LiPo 5", 3.3 для Li-Ion), `vbat_min_cell_voltage` — критична; `vbat_sag_compensation` — не індикація: вона зрізає верх діапазону моторів на свіжій батареї (від 4.20 В до `vbat_warning_cell_voltage`), щоб відгук не «плив» у міру розряду (`bf-pid-reg-in-bf`).
 - **Зв'язок**: LQ і RSSI дБм від CRSF (не `rssi_channel`), попередження LQ < 70% на 250 Гц ELRS (модуль «Бюджет лінку»).
 - **Таймер**: `osd_tim1`/`osd_tim2` (джерело, точність, поріг) — за армом; для Li-Ion — mAh drawn важливіше.
 - HD (MSP DisplayPort): `osd_displayport_device`, канва 50×18/60×22 — елементи поза канвою аналогового режиму не відображаються; `osd_canvas_width/height`.
