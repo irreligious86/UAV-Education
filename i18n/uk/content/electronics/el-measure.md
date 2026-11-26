@@ -39,6 +39,8 @@ source_hash: d0ba0890a07a
 - **Сигнали**: PWM серв — імпульс 1–2 мс кожні 20 мс (50 Гц); UART — пачки бітів з idle на високому рівні; DShot — пачки з 16 імпульсів різної ширини.
 - **Пробник ×10** зменшує навантаження на коло й розширює смугу; для логіки 3.3 В — обов'язковий.
 
+{{diagram:chart-measure-current-calibration|Калибровка по одному полёту точна только на его среднем токе: датчик со смещением 50 мВ врёт на +74 % при 2 А, а две точки по клещам дают < 0.5 % во всём диапазоне.}}
+
 ### DShot на осцилографі
 Кадр DShot — 16 біт: 11 біт газу, 1 біт телеметрії, 4 біти CRC. Кожен біт — імпульс: «1» — довгий (~75% періоду біта), «0» — короткий (~37%). DShot600 — 600 кбіт/с, біт ≈ 1.67 мкс, кадр ≈ 27 мкс. На екрані — пачка з 16 імпульсів, що повторюється з частотою PID-петлі (наприклад, кожні 125 мкс при 8 кГц). Проблеми, які видно: дзвін на фронтах (довгий провід, немає термінування), рівень, що не досягає 3.3 В (слабкий драйвер), пропуски кадрів.
 
@@ -71,6 +73,78 @@ AC-coupling, 5 В під навантаженням приймача/GPS. Зап
 
 ### Крок 4. DShot і UART аналізатором
 Зняти кадр DShot на малому газу без пропів: декодувати вручну 16 біт, порахувати значення газу (DShot 48–2047) і перевірити CRC. Зняти CRSF між приймачем і FC на 420000 бод: знайти кадр каналів (тип 0x16).
+
+Розрахункова лабораторна (без заліза): `calib_lab.py` рахує нові коефіцієнти калібрування напруги й струму для Betaflight, ArduPilot і PX4 за стендовими вимірюваннями, порівнює одноточкове (мА·год) калібрування з двоточковим і перевіряє аліасинг. Скрипт і його реальний вивід:
+
+```python
+# calib_lab.py — FC voltage/current sensor calibration for Betaflight, ArduPilot and PX4.
+# python3 calib_lab.py   (pure Python 3). Inputs = bench measurements, props off.
+V_METER, V_FC = 24.12, 23.71            # multimeter on XT60 vs FC reading (all three FCs read the same)
+I_CLAMP = [2.0, 10.0, 25.0]             # DC clamp meter, A (bench load: resistor bank / motor test, props off)
+BF_FC = [2.63, 8.13, 18.44]             # Betaflight OSD amps,  ibata_scale 400, ibata_offset 0
+AP_FC = [4.20, 13.00, 29.50]            # ArduPilot CURR,  BATT_AMP_PERVLT 40.0, BATT_AMP_OFFSET 0
+PX_FC = [3.82, 11.82, 26.82]            # PX4 battery_status.current_a, BAT1_A_PER_V 36.367515, BAT_V_OFFS_CURR 0
+
+def fit(x, y):                          # least squares y = k*x + c
+    n = len(x); mx, my = sum(x) / n, sum(y) / n
+    k = sum((a - mx) * (b - my) for a, b in zip(x, y)) / sum((a - mx) ** 2 for a in x)
+    return k, my - k * mx
+
+print("VOLTAGE (proportional in all three)")
+print(f"  BF vbat_scale     110    -> {110 * V_METER / V_FC:.1f} -> 112 (uint8); "
+      f"check: {V_FC * 112 / 110:.2f} V vs {V_METER} V")
+print(f"  AP BATT_VOLT_MULT 11.0   -> {11.0 * V_METER / V_FC:.3f}")
+print(f"  PX4 BAT1_V_DIV    18.1   -> {18.1 * V_METER / V_FC:.3f}")
+
+print("CURRENT, two-parameter fit over 3 clamp points")
+k, c = fit(BF_FC, I_CLAMP)              # I_true = k*I_fc + c ;  I_mA = 10000*mV/scale + offset
+# new scale = old / k ; new offset = k*old_offset + c*1000 (old offset 0 mA)
+print(f"  BF  fit I_true = {k:.4f}*I_fc {c:+.3f} A -> ibata_scale {400 / k:.0f}, "
+      f"ibata_offset {c * 1000:.0f} mA")
+for name, rd, P, off in (("AP ", AP_FC, 40.0, 0.0), ("PX4", PX_FC, 36.367515, 0.0)):
+    v = [i / P + off for i in rd]       # sensor volts the FC saw: I = (V - off) * P
+    P2, c2 = fit(v, I_CLAMP)            # I_true = P2*V + c2 = P2*(V - off2)
+    print(f"  {name} sensor V = {[round(x, 4) for x in v]} -> A_PER_V {P2:.3f}, offset {-c2 / P2:.4f} V")
+
+print("SCALE-ONLY calibration from mAh (no offset), BF example")
+mah_fc, mah_charger = 1018, 1350        # one flight: FC counted vs charger put back
+s1 = 400 * mah_fc / mah_charger
+print(f"  ibata_scale 400 * {mah_fc}/{mah_charger} = {s1:.0f}")
+for i_true in (2.0, 10.0, 25.0):
+    mv = 50 + 27.5 * i_true             # the sensor used to make the readings above: 50 mV + 27.5 mV/A
+    i1 = 10000 * mv / s1 / 1000
+    i2 = 10000 * mv / round(400 / k) / 1000 + c
+    print(f"  {i_true:5.1f} A true: scale-only {i1:6.2f} A ({(i1 / i_true - 1) * 100:+5.1f} %), "
+          f"two-point {i2:6.2f} A ({(i2 / i_true - 1) * 100:+5.1f} %)")
+
+print("ALIASING: what a sampled reading shows")
+for f, fs, who in ((24000, 10000, "scope 100 ms/div, 10 kpts"), (24000, 50, "BF current task 50 Hz"),
+                   (117, 100, "BF attitude task 100 Hz, 117 Hz vibration"), (1010, 1000, "1 kHz log")):
+    fa = abs(f - round(f / fs) * fs)
+    print(f"  {f} Hz sampled at {fs} Hz ({who}) -> looks like {fa:g} Hz")
+```
+
+
+```text
+VOLTAGE (proportional in all three)
+  BF vbat_scale     110    -> 111.9 -> 112 (uint8); check: 24.14 V vs 24.12 V
+  AP BATT_VOLT_MULT 11.0   -> 11.190
+  PX4 BAT1_V_DIV    18.1   -> 18.413
+CURRENT, two-parameter fit over 3 clamp points
+  BF  fit I_true = 1.4548*I_fc -1.827 A -> ibata_scale 275, ibata_offset -1827 mA
+  AP  sensor V = [0.105, 0.325, 0.7375] -> A_PER_V 36.364, offset 0.0500 V
+  PX4 sensor V = [0.105, 0.325, 0.7375] -> A_PER_V 36.368, offset 0.0500 V
+SCALE-ONLY calibration from mAh (no offset), BF example
+  ibata_scale 400 * 1018/1350 = 302
+    2.0 A true: scale-only   3.48 A (+74.1 %), two-point   1.99 A ( -0.4 %)
+   10.0 A true: scale-only  10.77 A ( +7.7 %), two-point   9.99 A ( -0.1 %)
+   25.0 A true: scale-only  24.45 A ( -2.2 %), two-point  24.99 A ( -0.0 %)
+ALIASING: what a sampled reading shows
+  24000 Hz sampled at 10000 Hz (scope 100 ms/div, 10 kpts) -> looks like 4000 Hz
+  24000 Hz sampled at 50 Hz (BF current task 50 Hz) -> looks like 0 Hz
+  117 Hz sampled at 100 Hz (BF attitude task 100 Hz, 117 Hz vibration) -> looks like 17 Hz
+  1010 Hz sampled at 1000 Hz (1 kHz log) -> looks like 10 Hz
+```
 
 ### Крок 5. Звіт
 Таблиця: точка, прилад, значення, норма, висновок.
