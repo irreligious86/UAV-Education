@@ -64,6 +64,7 @@
 <p>A regular node starts working as soon as it is launched. A lifecycle node (<code>rclpy.lifecycle</code> / <code>rclcpp_lifecycle</code>) goes through explicit states: <strong>unconfigured → inactive → active → finalized</strong>, with the transitions <code>configure</code>, <code>activate</code>, <code>deactivate</code>, <code>cleanup</code>, <code>shutdown</code>, each with its own callback that can return an error. What this gives you on board:</p>
 <ul><li>configuration (open the camera, load the model) is separated from operation — you see the error before takeoff;</li><li>a node can be “paused” (deactivate) without killing the process — for example, to turn perception off during landing;</li><li>a manager (<code>nav2_lifecycle_manager</code> or your own) brings the system up in the right order and knows who failed to come up.</li></ul>
 <figure class="diagram" data-diagram="ros2-lifecycle"><div class="diagram__svg"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 250" width="100%" role="img" aria-labelledby="t" style="max-width:720px;display:block;margin:0 auto"><title id="t">ROS 2 lifecycle node: explicit states, transitions</title><style>text{font-family: var(--gc-font-mono, ui-monospace, Menlo, monospace); font-size: 12px;fill:currentColor} .m{fill:var(--gc-ink-muted, #8a93a3)} .a{fill:var(--gc-accent-hud, #5ef1d2)} .w{fill:var(--gc-signal-amber, #f0b24c)} .d{fill:var(--gc-signal-red, #e8636b)} .box{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:currentColor;stroke-width:1.2} .boxa{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6} .ln{stroke:currentColor;stroke-width:1.2;fill:none} .lna{stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6;fill:none} .lnm{stroke:var(--gc-ink-muted, #8a93a3);stroke-width:1;fill:none;stroke-dasharray:4 3} .t{font-size:11px} .b{font-weight:600}</style><defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker><marker id="ara" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--gc-accent-hud, #5ef1d2)"/></marker></defs><rect class="box" x="10" y="40" width="140" height="44" rx="6"/><text x="80.0" y="66.0" text-anchor="middle">unconfigured</text><rect class="box" x="210" y="40" width="170" height="44" rx="6"/><text x="295.0" y="59.0" text-anchor="middle">inactive</text><text x="295.0" y="73.0" text-anchor="middle">configured, not working</text><rect class="boxa" x="450" y="40" width="190" height="44" rx="6"/><text x="545.0" y="59.0" text-anchor="middle" class="b">active</text><text x="545.0" y="73.0" text-anchor="middle" class="b">publishes, processes</text><rect class="box" x="450" y="140" width="190" height="44" rx="6"/><text x="545.0" y="166.0" text-anchor="middle">finalized</text><path class="ln" d="M150 71.0 L210 71.0" marker-end="url(#ar)"/><text x="180.0" y="64.0" text-anchor="middle" class="m t" style="font-size:10px">configure</text><path class="lna" d="M380 71.0 L450 71.0" marker-end="url(#ara)"/><text x="415.0" y="64.0" text-anchor="middle" class="m t" style="font-size:10px">activate</text><path class="ln" d="M450 71.0 L380 71.0" marker-end="url(#ar)"/><text x="415.0" y="84.0" text-anchor="middle" class="m t" style="font-size:10px">deactivate</text><path class="ln" d="M210 71.0 L150 71.0" marker-end="url(#ar)"/><text x="180.0" y="84.0" text-anchor="middle" class="m t" style="font-size:10px">cleanup</text><path class="ln" d="M545.0 84 L545.0 140" marker-end="url(#ar)"/><text x="551.0" y="108.0" text-anchor="middle" class="m t" style="font-size:10px">shutdown</text><text x="10" y="215" text-anchor="start" class="m t">configure: open camera, load model — errors show before takeoff;</text><text x="10" y="231" text-anchor="start" class="m t">deactivate: pause without killing the process (perception on landing).</text></svg></div><figcaption class="gc-muted">Lifecycle node states: configuration is separated from operation, pausing doesn&#x27;t kill the process.</figcaption><div class="diagram__hint">Схему можно прокрутить по горизонтали</div></figure>
+<figure class="diagram" data-diagram="ros2-executor-gaps"><div class="diagram__svg"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 206" width="100%" role="img" aria-labelledby="t" style="max-width:720px;display:block;margin:0 auto"><title id="t">(1) одна группа колбэков, (2) инференс в своей группе; модель шага 3, 0 = 2.95 с</title><style>text{font-family: var(--gc-font-mono, ui-monospace, Menlo, monospace); font-size: 12px;fill:currentColor} .m{fill:var(--gc-ink-muted, #8a93a3)} .a{fill:var(--gc-accent-hud, #5ef1d2)} .w{fill:var(--gc-signal-amber, #f0b24c)} .d{fill:var(--gc-signal-red, #e8636b)} .box{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:currentColor;stroke-width:1.2} .boxa{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6} .ln{stroke:currentColor;stroke-width:1.2;fill:none} .lna{stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6;fill:none} .lnm{stroke:var(--gc-ink-muted, #8a93a3);stroke-width:1;fill:none;stroke-dasharray:4 3} .t{font-size:11px} .b{font-weight:600}</style><defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker><marker id="ara" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--gc-accent-hud, #5ef1d2)"/></marker></defs><text x="16" y="16" text-anchor="start" class="m t">(1) одна группа колбэков, (2) инференс в своей группе; модель шага 3, 0 = 2.95 с</text><text x="112" y="67" text-anchor="end" style="font-size:11px">инференс (1)</text><line class="lnm" x1="120" y1="78" x2="704" y2="78"/><rect class="box" x="120.0" y="51" width="42.2" height="22" rx="3"/><text x="141.08888888888873" y="66" text-anchor="middle" style="font-size:10px"></text><rect class="box" x="170.1" y="51" width="389.3" height="22" rx="3"/><text x="364.7933333333333" y="66" text-anchor="middle" style="font-size:10px">зависание 400 мс</text><rect class="box" x="560.9" y="51" width="58.4" height="22" rx="3"/><text x="590.1200000000001" y="66" text-anchor="middle" style="font-size:10px"></text><rect class="box" x="622.9" y="51" width="58.4" height="22" rx="3"/><text x="652.0888888888892" y="66" text-anchor="middle" style="font-size:10px"></text><rect class="box" x="687.8" y="51" width="16.2" height="22" rx="3"/><text x="708.0" y="66" text-anchor="start" class="m t" style="font-size:10px"></text><text x="112" y="101" text-anchor="end" style="font-size:11px">уставки (1)</text><line class="lnm" x1="120" y1="112" x2="704" y2="112"/><rect class="boxa" x="162.2" y="85" width="5.8" height="22" rx="3"/><text x="172.0177777777775" y="100" text-anchor="start" class="m t" style="font-size:10px"></text><rect class="boxa" x="168.7" y="85" width="5.8" height="22" rx="3"/><text x="178.50666666666652" y="100" text-anchor="start" class="m t" style="font-size:10px"></text><rect class="boxa" x="559.5" y="85" width="5.8" height="22" rx="3"/><text x="569.3000000000001" y="100" text-anchor="start" class="m t" style="font-size:10px"></text><rect class="boxa" x="619.3" y="85" width="5.8" height="22" rx="3"/><text x="629.1600000000002" y="100" text-anchor="start" class="m t" style="font-size:10px"></text><rect class="boxa" x="681.3" y="85" width="5.8" height="22" rx="3"/><text x="691.1288888888892" y="100" text-anchor="start" class="m t" style="font-size:10px"></text><text x="112" y="135" text-anchor="end" style="font-size:11px">инференс (2)</text><line class="lnm" x1="120" y1="146" x2="704" y2="146"/><rect class="box" x="120.0" y="119" width="42.2" height="22" rx="3"/><text x="141.08888888888873" y="134" text-anchor="middle" style="font-size:10px"></text><rect class="box" x="168.7" y="119" width="389.3" height="22" rx="3"/><text x="363.33333333333326" y="134" text-anchor="middle" style="font-size:10px">зависание 400 мс</text><rect class="box" x="558.0" y="119" width="58.4" height="22" rx="3"/><text x="587.2" y="134" text-anchor="middle" style="font-size:10px"></text><rect class="box" x="622.9" y="119" width="58.4" height="22" rx="3"/><text x="652.0888888888892" y="134" text-anchor="middle" style="font-size:10px"></text><rect class="box" x="687.8" y="119" width="16.2" height="22" rx="3"/><text x="708.0" y="134" text-anchor="start" class="m t" style="font-size:10px"></text><text x="112" y="169" text-anchor="end" style="font-size:11px">уставки (2)</text><line class="lnm" x1="120" y1="180" x2="704" y2="180"/><rect class="boxa" x="120.0" y="153" width="5.8" height="22" rx="3"/><text x="129.84" y="168" text-anchor="start" class="m t" style="font-size:10px"></text><rect class="boxa" x="168.7" y="153" width="5.8" height="22" rx="3"/><text x="178.50666666666652" y="168" text-anchor="start" class="m t" style="font-size:10px"></text><rect class="boxa" x="217.3" y="153" width="5.8" height="22" rx="3"/><text x="227.1733333333335" y="168" text-anchor="start" class="m t" style="font-size:10px"></text><rect class="boxa" x="266.0" y="153" width="5.8" height="22" rx="3"/><text x="275.84000000000003" y="168" text-anchor="start" class="m t" style="font-size:10px"></text><rect class="boxa" x="314.7" y="153" width="5.8" height="22" rx="3"/><text x="324.50666666666694" y="168" text-anchor="start" class="m t" style="font-size:10px"></text><rect class="boxa" x="363.3" y="153" width="5.8" height="22" rx="3"/><text x="373.1733333333335" y="168" text-anchor="start" class="m t" style="font-size:10px"></text><rect class="boxa" x="412.0" y="153" width="5.8" height="22" rx="3"/><text x="421.84000000000003" y="168" text-anchor="start" class="m t" style="font-size:10px"></text><rect class="boxa" x="460.7" y="153" width="5.8" height="22" rx="3"/><text x="470.50666666666694" y="168" text-anchor="start" class="m t" style="font-size:10px"></text><rect class="boxa" x="509.3" y="153" width="5.8" height="22" rx="3"/><text x="519.1733333333335" y="168" text-anchor="start" class="m t" style="font-size:10px"></text><rect class="boxa" x="558.0" y="153" width="5.8" height="22" rx="3"/><text x="567.8400000000004" y="168" text-anchor="start" class="m t" style="font-size:10px"></text><rect class="boxa" x="606.7" y="153" width="5.8" height="22" rx="3"/><text x="616.5066666666669" y="168" text-anchor="start" class="m t" style="font-size:10px"></text><rect class="boxa" x="655.3" y="153" width="5.8" height="22" rx="3"/><text x="665.1733333333334" y="168" text-anchor="start" class="m t" style="font-size:10px"></text><line class="lnm" x1="120.0" y1="40" x2="120.0" y2="186"/><text x="120.0" y="200" text-anchor="middle" class="m t" style="font-size:10px">0 ms</text><line class="lnm" x1="236.8" y1="40" x2="236.8" y2="186"/><text x="236.8" y="200" text-anchor="middle" class="m t" style="font-size:10px">120 ms</text><line class="lnm" x1="353.6" y1="40" x2="353.6" y2="186"/><text x="353.6" y="200" text-anchor="middle" class="m t" style="font-size:10px">240 мс</text><line class="lnm" x1="470.4" y1="40" x2="470.4" y2="186"/><text x="470.40000000000003" y="200" text-anchor="middle" class="m t" style="font-size:10px">360 мс</text><line class="lnm" x1="587.2" y1="40" x2="587.2" y2="186"/><text x="587.2" y="200" text-anchor="middle" class="m t" style="font-size:10px">480 мс</text><line class="lnm" x1="704.0" y1="40" x2="704.0" y2="186"/><text x="704.0" y="200" text-anchor="middle" class="m t" style="font-size:10px">600 мс</text><line class="lna" x1="168.7" y1="38" x2="168.7" y2="186"/><text x="172.66666666666669" y="34" text-anchor="start" class="a t" style="font-size:10px">зависание 400 мс</text><line class="lna" x1="559.0" y1="38" x2="559.0" y2="186"/><text x="562.9733333333336" y="34" text-anchor="start" class="a t" style="font-size:10px">уставки снова (1 группа)</text></svg></div><figcaption class="gc-muted">В одной группе с инференсом таймер уставок 20 Гц ждёт: зависание на 400 мс рвёт поток уставок на 400 мс; инференс в своей группе на втором потоке оставляет ровный шаг 50 мс.</figcaption><div class="diagram__hint">Схему можно прокрутить по горизонтали</div></figure>
 <h4 class="md-subheading">Freshness watchdog</h4>
 <p>Every input message has a maximum allowed age. The watchdog (<code>examples/ros2-docker/.../watchdog.py</code>, no ROS inside) stores the time of the last message for each input and outputs a single system level:</p>
 <ul><li><strong>OK</strong> — everything is fresh;</li><li><strong>DEGRADED</strong> — a non-critical input (targets from the camera) is stale: the mission continues, the function (tracking) is suspended;</li><li><strong>FAILSAFE</strong> — a critical input (autopilot status, pose) is stale: decision stops commanding and requests a hold/landing.</li></ul>
@@ -87,6 +88,157 @@ python -m pytest -q test/test_watchdog.py</code></pre>
 <h4 class="md-subheading">Step 4. Autostart</h4>
 <p>Write a systemd unit (or compose with restart) for the companion: start after the network, restart on crash, ring-buffer bag recording. Reboot the machine/container and show that the system came up on its own.</p>
 <p>The lab counts as done when the watchdog tests pass, the four-node skeleton handles both failures in SITL (with logs) and you have a working autostart.</p>
+<pre class="cli-block"><code>import os
+import rclpy
+from rclpy.lifecycle import LifecycleNode, LifecycleState, TransitionCallbackReturn
+from rclpy.qos import qos_profile_sensor_data
+from geometry_msgs.msg import PointStamped
+
+class Perception(LifecycleNode):
+    def __init__(self):
+        super().__init__(&quot;perception&quot;)
+        self.declare_parameter(&quot;model_path&quot;, &quot;/opt/models/det.onnx&quot;)
+        self.pub = None
+        self.timer = None
+
+    def on_configure(self, state: LifecycleState) -&gt; TransitionCallbackReturn:
+        path = self.get_parameter(&quot;model_path&quot;).value
+        if not os.path.exists(path):
+            self.get_logger().error(f&quot;model not found: {path}&quot;)
+            return TransitionCallbackReturn.FAILURE          # back to Unconfigured, visible before take-off
+        self.pub = self.create_lifecycle_publisher(PointStamped, &quot;targets&quot;, qos_profile_sensor_data)
+        return TransitionCallbackReturn.SUCCESS
+
+    def on_activate(self, state: LifecycleState) -&gt; TransitionCallbackReturn:
+        self.timer = self.create_timer(1 / 15, self.step)    # work starts only here
+        return super().on_activate(state)                    # enables lifecycle publishers
+
+    def on_deactivate(self, state: LifecycleState) -&gt; TransitionCallbackReturn:
+        self.destroy_timer(self.timer)                       # timers do NOT pause by themselves
+        self.timer = None
+        return super().on_deactivate(state)
+
+    def on_cleanup(self, state: LifecycleState) -&gt; TransitionCallbackReturn:
+        self.destroy_lifecycle_publisher(self.pub)
+        self.pub = None
+        return TransitionCallbackReturn.SUCCESS
+
+    def on_shutdown(self, state: LifecycleState) -&gt; TransitionCallbackReturn:
+        if self.timer:                                       # shutdown may come straight from Active
+            self.destroy_timer(self.timer)
+            self.timer = None
+        return TransitionCallbackReturn.SUCCESS
+
+    def step(self):
+        msg = PointStamped()
+        msg.header.stamp = self.get_clock().now().to_msg()
+        self.pub.publish(msg)
+
+def main():
+    rclpy.init()
+    rclpy.spin(Perception())
+
+if __name__ == &quot;__main__&quot;:
+    main()</code></pre>
+<pre class="cli-block"><code>&quot;&quot;&quot;Request-vs-offered QoS check (rules: ROS 2 docs, &#x27;QoS compatibilities&#x27;). No ROS needed.&quot;&quot;&quot;
+INF = float(&quot;inf&quot;)                      # &quot;default&quot; duration = unspecified = infinite
+REL = {&quot;best_effort&quot;: 0, &quot;reliable&quot;: 1}
+DUR = {&quot;volatile&quot;: 0, &quot;transient_local&quot;: 1}
+LIV = {&quot;automatic&quot;: 0, &quot;manual_by_topic&quot;: 1}
+
+def compatible(pub, sub):
+    &quot;&quot;&quot;pub offers, sub requests; returns list of reasons why there is NO connection.&quot;&quot;&quot;
+    why = []
+    if REL[pub[&quot;rel&quot;]] &lt; REL[sub[&quot;rel&quot;]]:
+        why.append(&quot;reliability: BEST_EFFORT offered, RELIABLE requested&quot;)
+    if DUR[pub[&quot;dur&quot;]] &lt; DUR[sub[&quot;dur&quot;]]:
+        why.append(&quot;durability: VOLATILE offered, TRANSIENT_LOCAL requested&quot;)
+    if pub.get(&quot;deadline&quot;, INF) &gt; sub.get(&quot;deadline&quot;, INF):
+        why.append(f&quot;deadline: offered {pub.get(&#x27;deadline&#x27;, INF)} s &gt; requested {sub.get(&#x27;deadline&#x27;, INF)} s&quot;)
+    if LIV[pub.get(&quot;liv&quot;, &quot;automatic&quot;)] &lt; LIV[sub.get(&quot;liv&quot;, &quot;automatic&quot;)]:
+        why.append(&quot;liveliness: AUTOMATIC offered, MANUAL_BY_TOPIC requested&quot;)
+    if pub.get(&quot;lease&quot;, INF) &gt; sub.get(&quot;lease&quot;, INF):
+        why.append(&quot;lease duration: offered longer than requested&quot;)
+    return why
+
+DEFAULT = dict(rel=&quot;reliable&quot;, dur=&quot;volatile&quot;)            # rmw_qos_profile_default, depth 10
+SENSOR = dict(rel=&quot;best_effort&quot;, dur=&quot;volatile&quot;)          # rmw_qos_profile_sensor_data, depth 5
+cases = [
+    # topic, publisher (offered), subscriber (requested)
+    (&quot;/fmu/out/vehicle_odometry  PX4 -&gt; default sub&quot;, dict(rel=&quot;best_effort&quot;, dur=&quot;transient_local&quot;), DEFAULT),
+    (&quot;/fmu/out/vehicle_odometry  PX4 -&gt; sensor_data&quot;, dict(rel=&quot;best_effort&quot;, dur=&quot;transient_local&quot;), SENSOR),
+    (&quot;/fmu/in/trajectory_setpoint default pub -&gt; PX4&quot;, DEFAULT, dict(rel=&quot;best_effort&quot;, dur=&quot;volatile&quot;)),
+    (&quot;/ap/pose/filtered          AP  -&gt; default sub&quot;, dict(rel=&quot;best_effort&quot;, dur=&quot;volatile&quot;), DEFAULT),
+    (&quot;/ap/status                 AP  -&gt; latched sub&quot;, dict(rel=&quot;reliable&quot;, dur=&quot;transient_local&quot;),
+     dict(rel=&quot;reliable&quot;, dur=&quot;transient_local&quot;)),
+    (&quot;/app/level  watchdog default -&gt; latched sub&quot;, DEFAULT, dict(rel=&quot;reliable&quot;, dur=&quot;transient_local&quot;)),
+    (&quot;/app/targets 10 Hz, deadline 0.2 -&gt; sub deadline 0.15&quot;, dict(SENSOR, deadline=0.2), dict(SENSOR, deadline=0.15)),
+    (&quot;/app/targets 10 Hz, deadline 0.2 -&gt; sub deadline 0.5&quot;, dict(SENSOR, deadline=0.2), dict(SENSOR, deadline=0.5)),
+]
+for name, p, s in cases:
+    why = compatible(p, s)
+    print(f&quot;{&#x27;OK &#x27; if not why else &#x27;NO &#x27;} {name}&quot; + (&quot;&quot; if not why else &quot;\n      &quot; + &quot;; &quot;.join(why)))</code></pre>
+<pre class="cli-block"><code>NO  /fmu/out/vehicle_odometry  PX4 -&gt; default sub
+      reliability: BEST_EFFORT offered, RELIABLE requested
+OK  /fmu/out/vehicle_odometry  PX4 -&gt; sensor_data
+OK  /fmu/in/trajectory_setpoint default pub -&gt; PX4
+NO  /ap/pose/filtered          AP  -&gt; default sub
+      reliability: BEST_EFFORT offered, RELIABLE requested
+OK  /ap/status                 AP  -&gt; latched sub
+NO  /app/level  watchdog default -&gt; latched sub
+      durability: VOLATILE offered, TRANSIENT_LOCAL requested
+NO  /app/targets 10 Hz, deadline 0.2 -&gt; sub deadline 0.15
+      deadline: offered 0.2 s &gt; requested 0.15 s
+OK  /app/targets 10 Hz, deadline 0.2 -&gt; sub deadline 0.5</code></pre>
+<pre class="cli-block"><code>&quot;&quot;&quot;Executor model (not rclpy): N worker threads; like rclpy, ready timers are taken before ready
+subscriptions, then the oldest first; a MutuallyExclusive
+group runs one callback at a time; a node&#x27;s default group is MutuallyExclusive; an overdue timer fires
+once (missed periods are skipped), the camera subscription is KEEP_LAST 1.&quot;&quot;&quot;
+SOURCES = [(&quot;setpoint&quot;, 0.050, 0.001),        # 20 Hz timer, 1 ms
+           (&quot;watchdog&quot;, 0.100, 0.0005),       # 10 Hz timer
+           (&quot;inference&quot;, 1 / 15, 0.060)]      # camera 15 Hz, 60 ms per frame
+
+def simulate(threads, group_of, T=30.0):
+    jobs = []
+    for name, per, cost in SOURCES:
+        for k in range(round(T / per)):
+            stall = name == &quot;inference&quot; and k &gt; 0 and k % 45 == 0      # 400 ms stall every 3 s
+            jobs.append((k * per, name, 0.400 if stall else cost))
+    jobs.sort()
+    free, busy, late, starts, skipped = [0.0] * threads, {}, [], [], {&quot;setpoint&quot;: 0, &quot;inference&quot;: 0}
+    while jobs:
+        w = min(range(threads), key=free.__getitem__)
+        now = free[w]
+        for src in (&quot;setpoint&quot;, &quot;watchdog&quot;, &quot;inference&quot;):
+            due = [j for j in jobs if j[1] == src and j[0] &lt;= now]
+            for old in due[:-1]:                  # only the newest tick / frame survives
+                jobs.remove(old)
+                if src in skipped:
+                    skipped[src] += 1
+        ready = [j for j in jobs if j[0] &lt;= now and busy.get(group_of[j[1]], 0) &lt;= now]
+        if not ready:                             # sleep until something can run
+            free[w] = min(max(j[0], busy.get(group_of[j[1]], 0)) for j in jobs)
+            continue
+        ready.sort(key=lambda j: (j[1] == &quot;inference&quot;, j[0]))    # timers first, then subscriptions
+        t, name, cost = ready[0]
+        jobs.remove(ready[0])
+        free[w] = busy[group_of[name]] = now + cost
+        if name == &quot;setpoint&quot;:
+            starts.append(now); late.append(now - t)
+    gaps = [b - a for a, b in zip(starts, starts[1:])]
+    late.sort()
+    return max(gaps), late[int(0.99 * len(late))], skipped[&quot;setpoint&quot;], skipped[&quot;inference&quot;]
+
+for label, n, groups in [
+        (&quot;SingleThreadedExecutor, one default group&quot;, 1, dict(setpoint=&quot;A&quot;, watchdog=&quot;A&quot;, inference=&quot;A&quot;)),
+        (&quot;MultiThreaded(2), one default group&quot;, 2, dict(setpoint=&quot;A&quot;, watchdog=&quot;A&quot;, inference=&quot;A&quot;)),
+        (&quot;MultiThreaded(2), inference in own ME group&quot;, 2, dict(setpoint=&quot;A&quot;, watchdog=&quot;A&quot;, inference=&quot;B&quot;))]:
+    gap, p99, sp, fr = simulate(n, groups)
+    print(f&quot;{label:&lt;45s} max gap {gap*1000:3.0f} ms  p99 late {p99*1000:3.0f} ms  &quot;
+          f&quot;setpoints skipped {sp:3d}  frames dropped {fr}&quot;)</code></pre>
+<pre class="cli-block"><code>SingleThreadedExecutor, one default group     max gap 402 ms  p99 late  43 ms  setpoints skipped 115  frames dropped 45
+MultiThreaded(2), one default group           max gap 402 ms  p99 late  43 ms  setpoints skipped 115  frames dropped 45
+MultiThreaded(2), inference in own ME group   max gap  50 ms  p99 late   0 ms  setpoints skipped   0  frames dropped 45</code></pre>
 
 <h2>Troubleshooting</h2>
 <div class="diag-groups"><article class="diag-item"><h4><strong>Symptom:</strong> when the neural network hangs, the vehicle “freezes” with its setpoints</h4><ul><li>Possible cause: inference and the setpoint timer are on the same executor thread.</li><li>What to do: separate callback groups, MultiThreadedExecutor, or perception as a separate process.</li></ul></article><article class="diag-item"><h4><strong>Symptom:</strong> tracking switches on and off several times a second</h4><ul><li>Possible cause: no hysteresis on input recovery.</li><li>What to do: recover_s ≥ 0.5–1 s.</li></ul></article><article class="diag-item"><h4><strong>Symptom:</strong> after the companion reboots, the application doesn&#x27;t start</h4><ul><li>Possible cause: the service starts before the serial port/network appears.</li><li>What to do: systemd dependencies (After/BindsTo), connection retries in the bridge.</li></ul></article><article class="diag-item"><h4><strong>Symptom:</strong> the bag and the autopilot log don&#x27;t line up in time</h4><ul><li>Possible cause: the companion&#x27;s clock isn&#x27;t synchronized.</li><li>What to do: chrony, use the autopilot&#x27;s timestamps in the messages.</li></ul></article></div>
@@ -96,11 +248,13 @@ python -m pytest -q test/test_watchdog.py</code></pre>
 
 <h2>Sources</h2>
 <ul class="refs"><li><a href="https://design.ros2.org/articles/node_lifecycle.html" target="_blank" rel="noopener noreferrer">ROS 2 — Managed nodes (lifecycle) design</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://docs.ros.org/en/jazzy/Concepts/Intermediate/About-Executors.html" target="_blank" rel="noopener noreferrer">ROS 2 Jazzy — Executors and callback groups</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://github.com/ros2/ros2_tracing" target="_blank" rel="noopener noreferrer">ros2_tracing</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://api.nav2.org/nav2-jazzy/html/md_nav2_lifecycle_manager_README.html" target="_blank" rel="noopener noreferrer">Nav2 — lifecycle manager</a> <span class="gc-tag" data-state="info">primary</span></li></ul>
+<h2>Numeric problems</h2>
+<uav-tasks src="../tasks/ros2-app-arch.json" module="ros2-app-arch"></uav-tasks>
 <h2>Test yourself</h2>
 <uav-quiz src="../quiz/ros2-app-arch.json" module="ros2-app-arch"></uav-quiz>
       </div>
       <div class="module-done"><gc-button variant="secondary" data-done-toggle="ros2-app-arch">Mark as completed</gc-button></div>
-      <section class="related" aria-label="Related modules"><p class="gc-label gc-muted">Related modules</p><div class="gc-grid ref-grid"><a class="gc-card" href="ros2-px4.html"><strong>ROS 2 + PX4: uXRCE-DDS, an offboard node as a state machine</strong><div class="gc-card__meta"><span class="gc-tag" title="L3 — Специалист">L3</span></div></a><a class="gc-card" href="eng-systems.html"><strong>Systems engineering: requirements, FMEA, documentation, tests</strong><div class="gc-card__meta"><span class="gc-tag" title="L4 — Эксперт">L4</span></div></a><a class="gc-card" href="comp-raspberry.html"><strong>Raspberry Pi + ArduPilot</strong><div class="gc-card__meta"><span class="gc-tag" title="L3 — Специалист">L3</span></div></a></div></section>
+      <section class="related" aria-label="Related modules"><p class="gc-label gc-muted">Related modules</p><div class="gc-grid ref-grid"><a class="gc-card" href="ros2-basics.html"><strong>ROS 2 onboard: nodes, topics, QoS, tf2, bag</strong><div class="gc-card__meta"><span class="gc-tag" title="L3 — Специалист">L3</span></div></a><a class="gc-card" href="ros2-px4.html"><strong>ROS 2 + PX4: uXRCE-DDS, an offboard node as a state machine</strong><div class="gc-card__meta"><span class="gc-tag" title="L3 — Специалист">L3</span></div></a><a class="gc-card" href="eng-systems.html"><strong>Systems engineering: requirements, FMEA, documentation, tests</strong><div class="gc-card__meta"><span class="gc-tag" title="L4 — Эксперт">L4</span></div></a><a class="gc-card" href="comp-raspberry.html"><strong>Raspberry Pi + ArduPilot</strong><div class="gc-card__meta"><span class="gc-tag" title="L3 — Специалист">L3</span></div></a></div></section>
       <nav class="pager" aria-label="Adjacent modules" data-track-pager><a class="gc-card pager__prev" href="ros2-ardupilot.html"><span class="gc-label gc-muted">Back · track</span><br>ROS 2 + ArduPilot: AP_DDS and MAVROS, one node, two routes</a><a class="gc-card pager__next" href="ros2-nav.html"><span class="gc-label gc-muted">Next · track</span><br>Navigation and obstacle avoidance: maps, planners, setpoints</a></nav><nav class="pager" aria-label="Adjacent steps of path PX4" data-path-pager="px4" hidden><a class="gc-card pager__prev" href="ros2-ardupilot.html?path=px4"><span class="gc-label gc-muted">Back · path PX4</span><br>ROS 2 + ArduPilot: AP_DDS and MAVROS, one node, two routes</a><a class="gc-card pager__next" href="ros2-nav.html?path=px4"><span class="gc-label gc-muted">Next · step 44 of 53</span><br>Navigation and obstacle avoidance: maps, planners, setpoints</a></nav>
     </article>
   </main>

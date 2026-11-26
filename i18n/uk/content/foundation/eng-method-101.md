@@ -82,6 +82,10 @@ my-drone/
 
 {{diagram:traceability|Трасованість: у кожної вимоги є тест, у кожного тесту — вимога; зміна показує, які тести прогнати знову.}}
 
+{{diagram:eng-method-loop|Цикл метода замкнут: решение «не доказано» возвращает к новому эксперименту, а не к ощущениям; каждый шаг оставляет файл в инженерной папке.}}
+
+{{diagram:eng-error-budget|Бюджет ошибок R-02: весы и калибровка стенда почти ничего не весят, больше половины дисперсии — разброс экземпляров (измерен один мотор из четырёх); нижнюю границу T/W выше 2.5 поднимает только обмер всех четырёх моторов вместе с замером при 14.0 В.}}
+
 ## practice
 ### Крок 1. Репозиторій
 Створити репозиторій `my-drone` з файлами за шаблоном вище. У README — три абзаци: що за апарат, для чого, поточний стан.
@@ -115,6 +119,85 @@ my-drone/
 - Перший рядок CHANGELOG: `2026-11-09 — інженерну папку створено, T/W пораховано (3.4), маса 860 г`. Числа — твої.
 
 Лабораторну зараховано, коли в git лежать вимоги з ID (8 і більше, кожна вимірювана), схема архітектури з підписаними інтерфейсами та струмами, таблиця «вимога → тест → результат» і заведені README та журнал змін.
+
+```python
+"""eng-method-101: error budget for requirement R-02 (T/W >= 2.5) with GUM-style propagation + Monte Carlo.
+
+Measured: one of the four installed motor+prop units on the stand at 16.0 V (4.0 V/cell under load), 20 C: T1 = 750 g.
+Its own deviation from the batch mean enters all four motors at once: u = 3% * sqrt(12)/4 = 2.60%.
+Requirement condition (rewritten R-02): end of flight 3.5 V/cell = 14.0 V, air 35 C, take-off mass.
+Model: TW = 4 * T1 * (V/V0)^a * (T0/T) / m
+"""
+import math
+import numpy as np
+
+T1, V0, V, a, t0, t, m = 750.0, 16.0, 14.0, 1.8, 20.0, 35.0, 860.0
+rho_ratio = (273.15 + t0) / (273.15 + t)           # same pressure: rho ~ 1/T_abs
+volt = (V / V0) ** a
+TW = 4 * T1 * volt * rho_ratio / m
+print(f"corrections: voltage (14/16)^1.8 = {volt:.4f}, air density 293.15/308.15 = {rho_ratio:.4f}")
+print(f"T/W at requirement conditions = 4*{T1:.0f}*{volt:.4f}*{rho_ratio:.4f}/{m:.0f} = {TW:.3f}")
+
+# relative standard uncertainties (k=1) of each input, and sensitivity of ln(TW)
+rows = [
+    ("stand calibration (des-thrust-stand U=0.61% k=2)", 0.0061 / 2, "B, normal"),
+    ("motor/prop spread 3%/unit; one measured unit stands for 4", 0.03 * math.sqrt(12) / 4, "B, normal"),
+    ("exponent a in [1.6, 2.0], uniform: |ln(14/16)|*0.2/sqrt3", abs(math.log(V / V0)) * 0.2 / math.sqrt(3), "B, rect"),
+    ("pack voltage under load +-0.2 V, uniform: a*0.2/sqrt3/14", a * 0.2 / math.sqrt(3) / V, "B, rect"),
+    ("scale +-2 g, uniform", 2 / math.sqrt(3) / m, "B, rect"),
+]
+tot = math.sqrt(sum(u * u for _, u, _ in rows))
+print("\n contribution                                              u_rel     share of variance")
+for name, u, kind in sorted(rows, key=lambda r: -r[1]):
+    print(f" {name:<58s} {u*100:5.2f} %   {u*u/tot/tot*100:5.1f} %")
+U = 2 * tot * TW
+print(f"\ncombined u_rel = {tot*100:.2f} %, u = {tot*TW:.3f}; expanded U (k=2) = {U:.3f}")
+print(f"interval: {TW-U:.2f} ... {TW+U:.2f}")
+print("decision with guard band (accept if TW - U >= 2.5):", "PASS" if TW - U >= 2.5 else "NOT PROVEN")
+
+# Monte Carlo check of the linear propagation
+rng = np.random.default_rng(42)
+N = 200_000
+Tst = T1 * (1 + rng.normal(0, 0.0061 / 2, N))                          # one calibration for all 4 (correlated)
+e = rng.normal(0, 0.03, (N, 4))                                        # e[:,0] - the measured motor (installed)
+units = (4 + e.sum(1)) / (1 + e[:, 0])                                 # true sum of 4 / measured one
+aa = rng.uniform(1.6, 2.0, N)
+VV = V + rng.uniform(-0.2, 0.2, N)
+mm = m + rng.uniform(-2, 2, N)
+tw = Tst * units * (VV / V0) ** aa * rho_ratio / mm
+lo, hi = np.percentile(tw, [2.5, 97.5])
+print(f"\nMonte Carlo {N}: mean {tw.mean():.3f}, sd {tw.std():.3f}, 95% interval {lo:.2f} ... {hi:.2f}, P(TW<2.5) = {(tw<2.5).mean()*100:.1f} %")
+
+# what each next experiment buys
+def comb(skip):
+    return math.sqrt(sum(u * u for n_, u, _ in rows if not n_.startswith(skip)))
+for label, skip in [("measure all four motors on the stand", "motor/prop"), ("measure at 14.0 V directly", "exponent"),
+                    ("buy a 0.1 g scale", "scale"), ("all four motors AND at 14.0 V", ("motor/prop", "exponent"))]:
+    c = comb(skip)
+    print(f"next experiment: {label:<38s} -> U(k=2) = {2*c*TW:.3f}, lower bound {TW-2*c*TW:.3f}")
+```
+
+```text
+corrections: voltage (14/16)^1.8 = 0.7863, air density 293.15/308.15 = 0.9513
+T/W at requirement conditions = 4*750*0.7863*0.9513/860 = 2.610
+
+ contribution                                              u_rel     share of variance
+ motor/prop spread 3%/unit; one measured unit stands for 4   2.60 %    59.0 %
+ exponent a in [1.6, 2.0], uniform: |ln(14/16)|*0.2/sqrt3    1.54 %    20.8 %
+ pack voltage under load +-0.2 V, uniform: a*0.2/sqrt3/14    1.48 %    19.3 %
+ stand calibration (des-thrust-stand U=0.61% k=2)            0.30 %     0.8 %
+ scale +-2 g, uniform                                        0.13 %     0.2 %
+
+combined u_rel = 3.38 %, u = 0.088; expanded U (k=2) = 0.177
+interval: 2.43 ... 2.79
+decision with guard band (accept if TW - U >= 2.5): NOT PROVEN
+
+Monte Carlo 200000: mean 2.612, sd 0.089, 95% interval 2.44 ... 2.79, P(TW<2.5) = 10.3 %
+next experiment: measure all four motors on the stand   -> U(k=2) = 0.113, lower bound 2.496
+next experiment: measure at 14.0 V directly             -> U(k=2) = 0.157, lower bound 2.452
+next experiment: buy a 0.1 g scale                      -> U(k=2) = 0.176, lower bound 2.433
+next experiment: all four motors AND at 14.0 V          -> U(k=2) = 0.079, lower bound 2.530
+```
 
 ## diagnostics
 - **Симптом:** вимоги звучать як побажання («надійний», «швидкий»)

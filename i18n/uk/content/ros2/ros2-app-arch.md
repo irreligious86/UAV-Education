@@ -46,6 +46,8 @@ source_hash: 086713db5f3e
 
 {{diagram:ros2-lifecycle|Стани lifecycle-вузла: конфігурацію відокремлено від роботи, пауза — без убивства процесу.}}
 
+{{diagram:ros2-executor-gaps|В одной группе с инференсом таймер уставок 20 Гц ждёт: зависание на 400 мс рвёт поток уставок на 400 мс; инференс в своей группе на втором потоке оставляет ровный шаг 50 мс.}}
+
 ### Watchdog свіжості
 Кожне вхідне повідомлення має максимальний допустимий вік. Watchdog (`examples/ros2-docker/.../watchdog.py`, без ROS усередині) зберігає час останнього повідомлення для кожного входу і видає один рівень системи:
 - **OK** — усе свіже;
@@ -87,6 +89,172 @@ python -m pytest -q test/test_watchdog.py
 Оформи systemd-юніт (або compose з restart) для companion: старт після мережі, перезапуск у разі падіння, кільцевий запис bag. Перезавантаж машину/контейнер і покажи, що система піднялася сама.
 
 Лабораторну зараховано, коли проходять тести watchdog, скелет із чотирьох вузлів відпрацьовує обидві відмови в SITL (з логами) і є робочий автозапуск.
+
+```python
+import os
+import rclpy
+from rclpy.lifecycle import LifecycleNode, LifecycleState, TransitionCallbackReturn
+from rclpy.qos import qos_profile_sensor_data
+from geometry_msgs.msg import PointStamped
+
+class Perception(LifecycleNode):
+    def __init__(self):
+        super().__init__("perception")
+        self.declare_parameter("model_path", "/opt/models/det.onnx")
+        self.pub = None
+        self.timer = None
+
+    def on_configure(self, state: LifecycleState) -> TransitionCallbackReturn:
+        path = self.get_parameter("model_path").value
+        if not os.path.exists(path):
+            self.get_logger().error(f"model not found: {path}")
+            return TransitionCallbackReturn.FAILURE          # back to Unconfigured, visible before take-off
+        self.pub = self.create_lifecycle_publisher(PointStamped, "targets", qos_profile_sensor_data)
+        return TransitionCallbackReturn.SUCCESS
+
+    def on_activate(self, state: LifecycleState) -> TransitionCallbackReturn:
+        self.timer = self.create_timer(1 / 15, self.step)    # work starts only here
+        return super().on_activate(state)                    # enables lifecycle publishers
+
+    def on_deactivate(self, state: LifecycleState) -> TransitionCallbackReturn:
+        self.destroy_timer(self.timer)                       # timers do NOT pause by themselves
+        self.timer = None
+        return super().on_deactivate(state)
+
+    def on_cleanup(self, state: LifecycleState) -> TransitionCallbackReturn:
+        self.destroy_lifecycle_publisher(self.pub)
+        self.pub = None
+        return TransitionCallbackReturn.SUCCESS
+
+    def on_shutdown(self, state: LifecycleState) -> TransitionCallbackReturn:
+        if self.timer:                                       # shutdown may come straight from Active
+            self.destroy_timer(self.timer)
+            self.timer = None
+        return TransitionCallbackReturn.SUCCESS
+
+    def step(self):
+        msg = PointStamped()
+        msg.header.stamp = self.get_clock().now().to_msg()
+        self.pub.publish(msg)
+
+def main():
+    rclpy.init()
+    rclpy.spin(Perception())
+
+if __name__ == "__main__":
+    main()
+```
+
+```python
+"""Request-vs-offered QoS check (rules: ROS 2 docs, 'QoS compatibilities'). No ROS needed."""
+INF = float("inf")                      # "default" duration = unspecified = infinite
+REL = {"best_effort": 0, "reliable": 1}
+DUR = {"volatile": 0, "transient_local": 1}
+LIV = {"automatic": 0, "manual_by_topic": 1}
+
+def compatible(pub, sub):
+    """pub offers, sub requests; returns list of reasons why there is NO connection."""
+    why = []
+    if REL[pub["rel"]] < REL[sub["rel"]]:
+        why.append("reliability: BEST_EFFORT offered, RELIABLE requested")
+    if DUR[pub["dur"]] < DUR[sub["dur"]]:
+        why.append("durability: VOLATILE offered, TRANSIENT_LOCAL requested")
+    if pub.get("deadline", INF) > sub.get("deadline", INF):
+        why.append(f"deadline: offered {pub.get('deadline', INF)} s > requested {sub.get('deadline', INF)} s")
+    if LIV[pub.get("liv", "automatic")] < LIV[sub.get("liv", "automatic")]:
+        why.append("liveliness: AUTOMATIC offered, MANUAL_BY_TOPIC requested")
+    if pub.get("lease", INF) > sub.get("lease", INF):
+        why.append("lease duration: offered longer than requested")
+    return why
+
+DEFAULT = dict(rel="reliable", dur="volatile")            # rmw_qos_profile_default, depth 10
+SENSOR = dict(rel="best_effort", dur="volatile")          # rmw_qos_profile_sensor_data, depth 5
+cases = [
+    # topic, publisher (offered), subscriber (requested)
+    ("/fmu/out/vehicle_odometry  PX4 -> default sub", dict(rel="best_effort", dur="transient_local"), DEFAULT),
+    ("/fmu/out/vehicle_odometry  PX4 -> sensor_data", dict(rel="best_effort", dur="transient_local"), SENSOR),
+    ("/fmu/in/trajectory_setpoint default pub -> PX4", DEFAULT, dict(rel="best_effort", dur="volatile")),
+    ("/ap/pose/filtered          AP  -> default sub", dict(rel="best_effort", dur="volatile"), DEFAULT),
+    ("/ap/status                 AP  -> latched sub", dict(rel="reliable", dur="transient_local"),
+     dict(rel="reliable", dur="transient_local")),
+    ("/app/level  watchdog default -> latched sub", DEFAULT, dict(rel="reliable", dur="transient_local")),
+    ("/app/targets 10 Hz, deadline 0.2 -> sub deadline 0.15", dict(SENSOR, deadline=0.2), dict(SENSOR, deadline=0.15)),
+    ("/app/targets 10 Hz, deadline 0.2 -> sub deadline 0.5", dict(SENSOR, deadline=0.2), dict(SENSOR, deadline=0.5)),
+]
+for name, p, s in cases:
+    why = compatible(p, s)
+    print(f"{'OK ' if not why else 'NO '} {name}" + ("" if not why else "\n      " + "; ".join(why)))
+```
+
+```text
+NO  /fmu/out/vehicle_odometry  PX4 -> default sub
+      reliability: BEST_EFFORT offered, RELIABLE requested
+OK  /fmu/out/vehicle_odometry  PX4 -> sensor_data
+OK  /fmu/in/trajectory_setpoint default pub -> PX4
+NO  /ap/pose/filtered          AP  -> default sub
+      reliability: BEST_EFFORT offered, RELIABLE requested
+OK  /ap/status                 AP  -> latched sub
+NO  /app/level  watchdog default -> latched sub
+      durability: VOLATILE offered, TRANSIENT_LOCAL requested
+NO  /app/targets 10 Hz, deadline 0.2 -> sub deadline 0.15
+      deadline: offered 0.2 s > requested 0.15 s
+OK  /app/targets 10 Hz, deadline 0.2 -> sub deadline 0.5
+```
+
+```python
+"""Executor model (not rclpy): N worker threads; like rclpy, ready timers are taken before ready
+subscriptions, then the oldest first; a MutuallyExclusive
+group runs one callback at a time; a node's default group is MutuallyExclusive; an overdue timer fires
+once (missed periods are skipped), the camera subscription is KEEP_LAST 1."""
+SOURCES = [("setpoint", 0.050, 0.001),        # 20 Hz timer, 1 ms
+           ("watchdog", 0.100, 0.0005),       # 10 Hz timer
+           ("inference", 1 / 15, 0.060)]      # camera 15 Hz, 60 ms per frame
+
+def simulate(threads, group_of, T=30.0):
+    jobs = []
+    for name, per, cost in SOURCES:
+        for k in range(round(T / per)):
+            stall = name == "inference" and k > 0 and k % 45 == 0      # 400 ms stall every 3 s
+            jobs.append((k * per, name, 0.400 if stall else cost))
+    jobs.sort()
+    free, busy, late, starts, skipped = [0.0] * threads, {}, [], [], {"setpoint": 0, "inference": 0}
+    while jobs:
+        w = min(range(threads), key=free.__getitem__)
+        now = free[w]
+        for src in ("setpoint", "watchdog", "inference"):
+            due = [j for j in jobs if j[1] == src and j[0] <= now]
+            for old in due[:-1]:                  # only the newest tick / frame survives
+                jobs.remove(old)
+                if src in skipped:
+                    skipped[src] += 1
+        ready = [j for j in jobs if j[0] <= now and busy.get(group_of[j[1]], 0) <= now]
+        if not ready:                             # sleep until something can run
+            free[w] = min(max(j[0], busy.get(group_of[j[1]], 0)) for j in jobs)
+            continue
+        ready.sort(key=lambda j: (j[1] == "inference", j[0]))    # timers first, then subscriptions
+        t, name, cost = ready[0]
+        jobs.remove(ready[0])
+        free[w] = busy[group_of[name]] = now + cost
+        if name == "setpoint":
+            starts.append(now); late.append(now - t)
+    gaps = [b - a for a, b in zip(starts, starts[1:])]
+    late.sort()
+    return max(gaps), late[int(0.99 * len(late))], skipped["setpoint"], skipped["inference"]
+
+for label, n, groups in [
+        ("SingleThreadedExecutor, one default group", 1, dict(setpoint="A", watchdog="A", inference="A")),
+        ("MultiThreaded(2), one default group", 2, dict(setpoint="A", watchdog="A", inference="A")),
+        ("MultiThreaded(2), inference in own ME group", 2, dict(setpoint="A", watchdog="A", inference="B"))]:
+    gap, p99, sp, fr = simulate(n, groups)
+    print(f"{label:<45s} max gap {gap*1000:3.0f} ms  p99 late {p99*1000:3.0f} ms  "
+          f"setpoints skipped {sp:3d}  frames dropped {fr}")
+```
+
+```text
+SingleThreadedExecutor, one default group     max gap 402 ms  p99 late  43 ms  setpoints skipped 115  frames dropped 45
+MultiThreaded(2), one default group           max gap 402 ms  p99 late  43 ms  setpoints skipped 115  frames dropped 45
+MultiThreaded(2), inference in own ME group   max gap  50 ms  p99 late   0 ms  setpoints skipped   0  frames dropped 45
+```
 
 ## diagnostics
 - **Симптом:** під час зависання нейромережі апарат «підвисає» з уставками
