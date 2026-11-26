@@ -323,6 +323,9 @@ def module_row(m: dict, n: int, base: str, path_id: str | None = None, shared: b
     if planned:
         tags.append(status_tag("planned"))
     tags.append(f'<span class="gc-tag" data-state="ok" data-done-badge hidden>{_("ПРОЙДЕН")}</span>')
+    sec_title = (m.get("articleMeta") or {}).get("stackTitle")
+    if sec_title:
+        tags.insert(0, f'<span class="gc-tag sec-chip"{sec_attr(module_section(m))}>{esc(sec_title)}</span>')
     return f"""          <li class="track-module{' track-module--planned' if planned else ''}" data-module-id="{esc(m['id'])}"{sec_attr(module_section(m))}>
             <span class="track-module__num">{n:02d}</span>
             <a class="track-module__title" href="{base}m/{esc(m['id'])}.html{q}">{esc(m['title'])}</a>
@@ -649,6 +652,8 @@ def render_module(m: dict, model: dict) -> str:
     crumbs.append(f"<span>{esc(m['title'])}</span>")
 
     tags = [f'<span class="gc-tag" title="{_("Уровень")}">{esc(_(LEVEL_LABELS.get(m["level"], m["level"])))}</span>']
+    if art.get("stack"):
+        tags.insert(0, f'<a class="gc-tag sec-chip" href="{base}ref/{esc(art["stack"])}.html"{sec_attr(art["stack"])}>{esc(art["stackTitle"])}</a>')
     if art.get("readingTime") and not planned:
         tags.append(f'<span class="gc-tag">{_("чтение {t}", t=esc(_(str(art["readingTime"]))))}</span>')
     if m.get("hours"):

@@ -328,6 +328,31 @@ lib/ground-control-ui   design system (pinned release)"""
       </p>
     </header>
 
+    <section class="card hub" id="hub" aria-labelledby="hub-title">
+      <h2 id="hub-title">Все входы проекта</h2>
+      <p class="muted">Одна страница со всеми адресами: добавь её в закладки браузера или на главный экран телефона. Права проверяет сервер, поэтому ссылки не секретные: админку откроет только админ.</p>
+      <div class="hub-groups">
+        <div class="hub-group"><h3>Студенту</h3><ul>
+          <li><a href="{SITE}">Сайт курса</a></li>
+          <li><a href="{SITE}pages/account.html">Вход и аккаунт</a></li>
+          <li><a href="{SITE}pages/progress.html">Мой прогресс и история</a></li>
+          <li><a href="{SITE}pages/exam.html">Экзамены</a> <span class="muted">— после входа</span></li>
+        </ul></div>
+        <div class="hub-group"><h3>Администрации</h3><ul>
+          <li><a href="{SITE}pages/admin.html">Админка</a> <span class="muted">— роли, группы, экзамены, обратная связь</span></li>
+          <li><a href="curriculum.html">Учебная программа</a> <span class="muted">— эта страница</span></li>
+          <li><a href="growth.html">Рост курса</a> <span class="muted">— дашборд разработки</span></li>
+        </ul></div>
+        <div class="hub-group"><h3>Разработчику</h3><ul>
+          <li><a href="https://github.com/irreligious86/UAV-Education">Репозиторий</a></li>
+          <li><a href="https://github.com/irreligious86/UAV-Education/commits/main">Коммиты</a> · <a href="https://github.com/irreligious86/UAV-Education/actions">проверки (Actions)</a></li>
+          <li><a href="https://github.com/irreligious86/UAV-Education/settings/pages">Настройки GitHub Pages</a></li>
+          <li><a href="https://github.com/irreligious86/UAV-Education/blob/main/docs/MULTIUSER-PLAN.md">Как включить аккаунты</a></li>
+          <li><a href="https://supabase.com/dashboard/projects">Supabase</a> <span class="muted">— база аккаунтов, когда проект будет создан</span></li>
+        </ul></div>
+      </div>
+    </section>
+
     <div class="tabs">
 {inputs}
 
