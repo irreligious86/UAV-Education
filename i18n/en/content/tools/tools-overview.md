@@ -89,6 +89,8 @@ Check: `mavproxy.py --master=tcp:127.0.0.1:5760` connects to `sim_vehicle.py -v 
 ### Where things get logged (so you can find them later)
 Betaflight: flash on the FC → download through the configurator (Blackbox tab) into a `.BFL`; ArduPilot: SD card `/APM/LOGS/*.BIN` or MAVFtp from Mission Planner; GCS telemetry logs (`.tlog`) are separate and contain everything that went over MAVLink; PX4: `.ulg` on the SD card, viewed in Flight Review (web) or with `pyulog`. Naming: `YYYY-MM-DD_vehicle_purpose.ext` in the vehicle's folder.
 
+{{diagram:tools-firmware-tree|Сначала прошивка, потом инструмент: у каждой прошивки свой конфигуратор и свой формат логов, а совпадение версий конфигуратора и прошивки проверяют до подключения.}}
+
 {{diagram:toolbox-map|The engineer's minimal toolset by task.}}
 
 ## practice
@@ -124,6 +126,72 @@ If the diff has more lines than you changed, unexpected changes got into it: a d
 Make two diffs that differ by one parameter and show the `git diff` between them. This is your first “code review” of your own drone.
 
 The lab counts as done when the `drones/` repository is created with the structure, a config is saved with the date and board in its name and committed with a description, and `git diff` of two configs shows exactly one change with an explanation in the commit message.
+
+### Лабораторная на SITL (текст — в русской версии)
+
+```python
+"""tools-overview lab: versions of the Python stack, then config-as-code with ArduCopter SITL:
+save .param (Mission Planner format NAME,VALUE) -> git commit -> change one parameter -> save -> git diff."""
+import subprocess, sys, time
+from importlib.metadata import version
+from pathlib import Path
+from pymavlink import mavutil
+for p in ("pymavlink", "MAVProxy", "pyulog", "mavsdk", "orangebox", "pyserial", "numpy", "scipy", "matplotlib"):
+    print(f"{p:11s} {version(p)}")
+repo = Path(sys.argv[2]); cfg = repo / "drones/sitl-copter/configs"; cfg.mkdir(parents=True, exist_ok=True)
+def git(*a): return subprocess.run(["git", "-C", str(repo), *a], capture_output=True, text=True).stdout.strip()
+m = mavutil.mavlink_connection(sys.argv[1]); m.wait_heartbeat()
+def fetch():
+    m.param_fetch_all(); got = {}; total = None
+    while total is None or len(got) < total:
+        p = m.recv_match(type="PARAM_VALUE", blocking=True, timeout=10)
+        if p is None: break
+        got[p.param_id] = p.param_value; total = p.param_count
+    return got
+def save(name, params):
+    (cfg / name).write_text("".join(f"{k},{v:g}\n" for k, v in sorted(params.items())))
+    return len(params)
+time.sleep(60)     # baseline only after boot calibrations (gyro offsets, baro ground pressure) are done
+def setp(name, val):
+    m.mav.param_set_send(m.target_system, m.target_component, name.encode(), val, mavutil.mavlink.MAV_PARAM_TYPE_REAL32)
+    ack = m.recv_match(type="PARAM_VALUE", blocking=True, timeout=3,
+                       condition=f"PARAM_VALUE.param_id=='{name}'")
+    print(f"set {name}={val}: " + (f"ack {ack.param_value:g}" if ack else "no answer - no such parameter"))
+git("init", "-q"); git("config", "user.email", "me@example.invalid"); git("config", "user.name", "me")
+n = save("2026-11-26_sitl-copter_SITL.param", fetch()); print(f"saved {n} params")
+git("add", "-A"); git("commit", "-q", "-m", "sitl-copter: baseline 2026-11-26 (ArduCopter 4.7.2 SITL)")
+setp("RTL_ALT", 3000)     # the 4.6 name, centimetres
+setp("RTL_ALT_M", 30)     # the 4.7 name, metres
+time.sleep(20)            # let the vehicle run a while, like a real bench session
+save("2026-11-26_sitl-copter_SITL.param", fetch())
+git("commit", "-q", "-am", "sitl-copter: RTL_ALT_M 15->30: return above 25 m trees")
+print(git("log", "--oneline"))
+print(git("diff", "-U0", "HEAD~1", "--", "drones"))
+```
+
+```text
+pymavlink   2.4.50
+MAVProxy    1.8.75
+pyulog      1.3.0
+mavsdk      4.2.1
+orangebox   0.5.0
+pyserial    3.5
+numpy       2.5.5
+scipy       1.18.1
+matplotlib  3.11.2
+saved 1370 params
+set RTL_ALT=3000: no answer - no such parameter
+set RTL_ALT_M=30: ack 30
+89ad5f7 sitl-copter: RTL_ALT_M 15->30: return above 25 m trees
+7487194 sitl-copter: baseline 2026-11-26 (ArduCopter 4.7.2 SITL)
+diff --git a/drones/sitl-copter/configs/2026-11-26_sitl-copter_SITL.param b/drones/sitl-copter/configs/2026-11-26_sitl-copter_SITL.param
+index 4a5d4f5..2c809a9 100644
+--- a/drones/sitl-copter/configs/2026-11-26_sitl-copter_SITL.param
++++ b/drones/sitl-copter/configs/2026-11-26_sitl-copter_SITL.param
+@@ -824 +824 @@ RTL_ALT_FINAL_M,0
+-RTL_ALT_M,15
++RTL_ALT_M,30
+```
 
 ## diagnostics
 - **Symptom:** the configurator doesn't see the board

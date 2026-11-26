@@ -66,6 +66,7 @@
 <h4 class="md-subheading">Типові заміни в коді (Python)</h4>
 <div class="table-wrap md-table-wrap" tabindex="0"><table class="md-table"><thead><tr><th>ROS 1 (rospy)</th><th>ROS 2 (rclpy)</th></tr></thead><tbody><tr><td data-label="ROS 1 (rospy)"><code>rospy.init_node(&quot;n&quot;)</code></td><td data-label="ROS 2 (rclpy)"><code>rclpy.init(); node = Node(&quot;n&quot;)</code></td></tr><tr><td data-label="ROS 1 (rospy)"><code>rospy.Subscriber(&quot;/t&quot;, T, cb)</code></td><td data-label="ROS 2 (rclpy)"><code>node.create_subscription(T, &quot;/t&quot;, cb, qos)</code></td></tr><tr><td data-label="ROS 1 (rospy)"><code>rospy.Publisher(&quot;/t&quot;, T, queue_size=10)</code></td><td data-label="ROS 2 (rclpy)"><code>node.create_publisher(T, &quot;/t&quot;, 10)</code></td></tr><tr><td data-label="ROS 1 (rospy)"><code>rospy.Rate(20); while not rospy.is_shutdown(): ... rate.sleep()</code></td><td data-label="ROS 2 (rclpy)"><code>node.create_timer(0.05, tick); rclpy.spin(node)</code></td></tr><tr><td data-label="ROS 1 (rospy)"><code>rospy.get_param(&quot;~alt&quot;, 5.0)</code></td><td data-label="ROS 2 (rclpy)"><code>node.declare_parameter(&quot;alt&quot;, 5.0); node.get_parameter(&quot;alt&quot;).value</code></td></tr><tr><td data-label="ROS 1 (rospy)"><code>rospy.ServiceProxy(&quot;/s&quot;, S)(req)</code></td><td data-label="ROS 2 (rclpy)"><code>cli = node.create_client(S, &quot;/s&quot;); cli.call_async(req)</code></td></tr><tr><td data-label="ROS 1 (rospy)"><code>rospy.Time.now()</code></td><td data-label="ROS 2 (rclpy)"><code>node.get_clock().now()</code></td></tr><tr><td data-label="ROS 1 (rospy)"><code>rospy.loginfo(...)</code></td><td data-label="ROS 2 (rclpy)"><code>node.get_logger().info(...)</code></td></tr></tbody></table></div>
 <p>Головна зміна мислення — <strong>цикл `while` з `rate.sleep()` замінюється таймером і колбеками</strong>, а синхронний виклик сервісу всередині колбека — асинхронним, інакше вузол заблокує сам себе (той самий executor обслуговує відповідь).</p>
+<figure class="diagram" data-diagram="ros2-distro-timeline"><div class="diagram__svg"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 296" width="100%" role="img" aria-labelledby="t" style="max-width:720px;display:block;margin:0 auto"><title id="t">Окна поддержки ROS 1 Noetic и ROS 2 по годам</title><style>text{font-family: var(--gc-font-mono, ui-monospace, Menlo, monospace); font-size: 12px;fill:currentColor} .m{fill:var(--gc-ink-muted, #8a93a3)} .a{fill:var(--gc-accent-hud, #5ef1d2)} .w{fill:var(--gc-signal-amber, #f0b24c)} .d{fill:var(--gc-signal-red, #e8636b)} .box{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:currentColor;stroke-width:1.2} .boxa{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6} .ln{stroke:currentColor;stroke-width:1.2;fill:none} .lna{stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6;fill:none} .lnm{stroke:var(--gc-ink-muted, #8a93a3);stroke-width:1;fill:none;stroke-dasharray:4 3} .t{font-size:11px} .b{font-weight:600}</style><defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker><marker id="ara" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--gc-accent-hud, #5ef1d2)"/></marker></defs><text x="16" y="18" text-anchor="start" class="m t">Поддержка дистрибутивов ROS: что ещё живо в ноябре 2026</text><line class="lnm" x1="150.0" y1="40" x2="150.0" y2="270"/><text x="150.0" y="284" text-anchor="middle" class="m t" style="font-size:10px">2020</text><line class="lnm" x1="197.4" y1="40" x2="197.4" y2="270"/><text x="197.41379310344865" y="284" text-anchor="middle" class="m t" style="font-size:10px">2021</text><line class="lnm" x1="244.8" y1="40" x2="244.8" y2="270"/><text x="244.8275862068973" y="284" text-anchor="middle" class="m t" style="font-size:10px">2022</text><line class="lnm" x1="292.2" y1="40" x2="292.2" y2="270"/><text x="292.2413793103459" y="284" text-anchor="middle" class="m t" style="font-size:10px">2023</text><line class="lnm" x1="339.7" y1="40" x2="339.7" y2="270"/><text x="339.6551724137946" y="284" text-anchor="middle" class="m t" style="font-size:10px">2024</text><line class="lnm" x1="387.1" y1="40" x2="387.1" y2="270"/><text x="387.0689655172432" y="284" text-anchor="middle" class="m t" style="font-size:10px">2025</text><line class="lnm" x1="434.5" y1="40" x2="434.5" y2="270"/><text x="434.48275862069187" y="284" text-anchor="middle" class="m t" style="font-size:10px">2026</text><line class="lnm" x1="481.9" y1="40" x2="481.9" y2="270"/><text x="481.8965517241405" y="284" text-anchor="middle" class="m t" style="font-size:10px">2027</text><line class="lnm" x1="529.3" y1="40" x2="529.3" y2="270"/><text x="529.3103448275892" y="284" text-anchor="middle" class="m t" style="font-size:10px">2028</text><line class="lnm" x1="576.7" y1="40" x2="576.7" y2="270"/><text x="576.7241379310378" y="284" text-anchor="middle" class="m t" style="font-size:10px">2029</text><line class="lnm" x1="624.1" y1="40" x2="624.1" y2="270"/><text x="624.1379310344864" y="284" text-anchor="middle" class="m t" style="font-size:10px">2030</text><line class="lnm" x1="671.6" y1="40" x2="671.6" y2="270"/><text x="671.5517241379351" y="284" text-anchor="middle" class="m t" style="font-size:10px">2031</text><text x="142" y="64" text-anchor="end" class="m" style="font-size:11px">Noetic (ROS 1)</text><rect class="box" x="168.0" y="50" width="238.5" height="20" rx="3" opacity="0.55"/><text x="287.26293103448836" y="64" text-anchor="middle" style="font-size:10px">EOL 31.05.2025 · Ubuntu 20.04</text><text x="142" y="94" text-anchor="end" class="m" style="font-size:11px">Foxy</text><rect class="box" x="170.4" y="80" width="144.1" height="20" rx="3" opacity="0.55"/><text x="318.5258620689681" y="94" text-anchor="start" class="m t" style="font-size:10px">EOL 06.2023 · Ubuntu 20.04</text><text x="142" y="124" text-anchor="end" class="b" style="font-size:11px">Humble LTS</text><rect class="boxa" x="263.3" y="110" width="238.5" height="20" rx="3"/><text x="382.56465517241975" y="124" text-anchor="middle" style="font-size:10px">до 05.2027 · Ubuntu 22.04</text><text x="142" y="154" text-anchor="end" class="m" style="font-size:11px">Iron</text><rect class="box" x="310.7" y="140" width="73.0" height="20" rx="3" opacity="0.55"/><text x="387.7500000000049" y="154" text-anchor="start" class="m t" style="font-size:10px">EOL 12.2024 · Ubuntu 22.04</text><text x="142" y="184" text-anchor="end" class="b" style="font-size:11px">Jazzy LTS</text><rect class="boxa" x="358.1" y="170" width="238.5" height="20" rx="3"/><text x="477.392241379317" y="184" text-anchor="middle" style="font-size:10px">до 05.2029 · Ubuntu 24.04</text><text x="142" y="214" text-anchor="end" class="b" style="font-size:11px">Kilted</text><rect class="boxa" x="405.6" y="200" width="76.3" height="20" rx="3"/><text x="485.8965517241405" y="214" text-anchor="start" class="m t" style="font-size:10px">до 12.2026 · Ubuntu 24.04</text><text x="142" y="244" text-anchor="end" class="b" style="font-size:11px">Lyrical LTS</text><rect class="boxa" x="453.0" y="230" width="238.5" height="20" rx="3"/><text x="572.2198275862143" y="244" text-anchor="middle" style="font-size:10px">до 05.2031 · Ubuntu 26.04</text><line x1="477.2" y1="36" x2="477.2" y2="270" stroke="var(--gc-signal-red, #e8636b)" stroke-width="1.6"/><text x="481.15517241379996" y="32" text-anchor="start" class="d t" style="font-size:10px">ноябрь 2026</text></svg></div><figcaption class="gc-muted">Окна поддержки по годам: в ноябре 2026 живы Humble (до мая 2027), Jazzy, Lyrical и уходящий Kilted; Noetic и мост к нему уже за чертой.</figcaption><div class="diagram__hint">Схему можно прокрутить по горизонтали</div></figure>
 <figure class="diagram" data-diagram="ros2-sync-call-deadlock"><div class="diagram__svg"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 322" width="100%" role="img" aria-labelledby="t" style="max-width:720px;display:block;margin:0 auto"><title id="t">Синхронный вызов сервиса в колбэке блокирует узел</title><style>text{font-family: var(--gc-font-mono, ui-monospace, Menlo, monospace); font-size: 12px;fill:currentColor} .m{fill:var(--gc-ink-muted, #8a93a3)} .a{fill:var(--gc-accent-hud, #5ef1d2)} .w{fill:var(--gc-signal-amber, #f0b24c)} .d{fill:var(--gc-signal-red, #e8636b)} .box{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:currentColor;stroke-width:1.2} .boxa{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6} .ln{stroke:currentColor;stroke-width:1.2;fill:none} .lna{stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6;fill:none} .lnm{stroke:var(--gc-ink-muted, #8a93a3);stroke-width:1;fill:none;stroke-dasharray:4 3} .t{font-size:11px} .b{font-weight:600}</style><defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker><marker id="ara" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--gc-accent-hud, #5ef1d2)"/></marker></defs><text x="16" y="30" text-anchor="start" class="d b" style="font-size:11.5px">cli.call(req) внутри колбэка таймера: синхронный вызов</text><text x="16" y="64" text-anchor="start" class="b" style="font-size:11px">executor</text><text x="16" y="78" text-anchor="start" class="m t" style="font-size:10.5px">(один поток)</text><text x="16" y="126" text-anchor="start" style="font-size:11px">узел-сервер /s</text><line class="lnm" x1="180" y1="80" x2="700" y2="80"/><line class="lnm" x1="180" y1="134" x2="700" y2="134"/><rect class="box" x="180.0" y="52" width="520.0" height="26" rx="3" style="stroke:var(--gc-signal-red, #e8636b)"/><text x="326.5454545454545" y="69" text-anchor="start" class="d" style="font-size:10.5px">tick(): cli.call(req) ждёт ответ — и не возвращается</text><path class="ln" d="M194.2 78 L217.8 106" marker-end="url(#ar)"/><text x="200.0" y="96.0" text-anchor="end" class="m t" style="font-size:10.5px">запрос</text><rect class="box" x="217.8" y="106.0" width="75.6" height="26.0" rx="3"/><text x="255.63636363636363" y="123" text-anchor="middle" style="font-size:10.5px">обработка</text><path class="ln" d="M293.5 106 L312.4 78" marker-end="url(#ar)" style="stroke:var(--gc-signal-red, #e8636b)"/><text x="321.8181818181818" y="123" text-anchor="start" class="m t" style="font-size:10.5px">ответ ждёт в очереди: доставить его должен тот же executor</text><text x="298.1818181818182" y="48" text-anchor="middle" class="d b" style="font-size:12px">×</text><text x="416.3636363636364" y="48" text-anchor="middle" class="d b" style="font-size:12px">×</text><text x="534.5454545454545" y="48" text-anchor="middle" class="d b" style="font-size:12px">×</text><text x="652.7272727272727" y="48" text-anchor="middle" class="d b" style="font-size:12px">×</text><text x="180.0" y="48" text-anchor="start" class="m t" style="font-size:10.5px">тик 0</text><text x="307.6363636363636" y="48" text-anchor="start" class="d t" style="font-size:10.5px">тик пропущен</text><text x="16" y="172" text-anchor="start" class="a b" style="font-size:11.5px">rclpy: cli.call_async(req) — колбэк возвращается сразу</text><text x="16" y="206" text-anchor="start" class="b" style="font-size:11px">executor</text><text x="16" y="220" text-anchor="start" class="m t" style="font-size:10.5px">(один поток)</text><text x="16" y="268" text-anchor="start" style="font-size:11px">узел-сервер /s</text><line class="lnm" x1="180" y1="222" x2="700" y2="222"/><line class="lnm" x1="180" y1="276" x2="700" y2="276"/><rect class="boxa" x="180.0" y="194.0" width="21.3" height="26.0" rx="3"/><rect class="boxa" x="298.2" y="194.0" width="21.3" height="26.0" rx="3"/><rect class="boxa" x="416.4" y="194.0" width="21.3" height="26.0" rx="3"/><rect class="boxa" x="534.5" y="194.0" width="21.3" height="26.0" rx="3"/><rect class="boxa" x="652.7" y="194.0" width="21.3" height="26.0" rx="3"/><text x="207.63636363636363" y="190" text-anchor="start" class="a t" style="font-size:10.5px">tick() каждые 50 мс: уставки идут</text><path class="ln" d="M194.2 220 L217.8 248" marker-end="url(#ar)"/><text x="200.0" y="238.0" text-anchor="end" class="m t" style="font-size:10.5px">запрос</text><rect class="box" x="217.8" y="248.0" width="99.3" height="26.0" rx="3"/><text x="267.45454545454544" y="265" text-anchor="middle" style="font-size:10.5px">обработка</text><path class="lna" d="M317.1 248 L336.0 220" marker-end="url(#ara)"/><rect class="box" x="336.0" y="194.0" width="33.1" height="26.0" rx="3"/><text x="373.8181818181818" y="238" text-anchor="start" class="a t" style="font-size:10.5px">done-колбэк future: ответ обработан между тиками</text><line x1="180" y1="294" x2="700" y2="294" stroke="var(--gc-ink-muted, #8a93a3)" stroke-width="1"/><line x1="180.0" y1="294" x2="180.0" y2="299" stroke="var(--gc-ink-muted, #8a93a3)" stroke-width="1"/><text x="180.0" y="312" text-anchor="middle" class="m t" style="font-size:10.5px">0 мс</text><line x1="298.2" y1="294" x2="298.2" y2="299" stroke="var(--gc-ink-muted, #8a93a3)" stroke-width="1"/><text x="298.1818181818182" y="312" text-anchor="middle" class="m t" style="font-size:10.5px">50 мс</text><line x1="416.4" y1="294" x2="416.4" y2="299" stroke="var(--gc-ink-muted, #8a93a3)" stroke-width="1"/><text x="416.3636363636364" y="312" text-anchor="middle" class="m t" style="font-size:10.5px">100 мс</text><line x1="534.5" y1="294" x2="534.5" y2="299" stroke="var(--gc-ink-muted, #8a93a3)" stroke-width="1"/><text x="534.5454545454545" y="312" text-anchor="middle" class="m t" style="font-size:10.5px">150 мс</text><line x1="652.7" y1="294" x2="652.7" y2="299" stroke="var(--gc-ink-muted, #8a93a3)" stroke-width="1"/><text x="652.7272727272727" y="312" text-anchor="middle" class="m t" style="font-size:10.5px">200 мс</text><text x="16" y="312" text-anchor="start" class="m t" style="font-size:10.5px">таймер 0.05 с</text></svg></div><figcaption class="gc-muted">Синхронный cli.call() в колбэке занимает единственный поток executor: ответ некому доставить, тики таймера пропадают; call_async() возвращается сразу, и уставки идут каждые 50 мс.</figcaption><div class="diagram__hint">Схему можно прокрутить по горизонтали</div></figure>
 <h4 class="md-subheading">MAVROS 1 → MAVROS 2</h4>
 <p>Імена топіків здебільшого ті самі (<code>/mavros/state</code>, <code>/mavros/local_position/pose</code>, <code>/mavros/setpoint_position/local</code>), але: QoS телеметрії — sensor data; деякі сервіси й параметри перейменовано; запуск — <code>ros2 launch mavros apm.launch fcu_url:=...</code> (або <code>px4.launch</code>). Для PX4 у ROS 2 замість MAVROS зазвичай переходять на uXRCE-DDS (модуль ros2-px4), для ArduPilot — на AP_DDS там, де його функцій вистачає (модуль ros2-ardupilot).</p>
@@ -81,6 +82,160 @@
 <h4 class="md-subheading">Крок 4. Звіт</h4>
 <p>Таблиця: що замінено, скільки рядків логіки стало придатними до тестування без ROS, які відмінності в поведінці знайдено (зазвичай — QoS і час).</p>
 <p>Лабораторну зараховано, коли є граф вихідного проєкту, перенесений вузол із тестами логіки й порівняння виходів на тих самих даних.</p>
+<h4 class="md-subheading">Шаг 5 (текст — в русской версии)</h4>
+<pre class="cli-block"><code># ROS 1 (rospy) — the node being ported; shown for reading, not run (no ROS 1 here)
+import rospy
+from geometry_msgs.msg import PoseStamped
+from std_msgs.msg import Float32
+from descent_guard import descent_cmd
+
+z = None
+def on_pose(msg):
+    global z
+    z = msg.pose.position.z
+
+rospy.init_node(&quot;descent_guard&quot;)
+rospy.Subscriber(&quot;/mavros/local_position/pose&quot;, PoseStamped, on_pose)
+pub = rospy.Publisher(&quot;/descent_guard/vz&quot;, Float32, queue_size=10)
+rate = rospy.Rate(20)
+while not rospy.is_shutdown():
+    if z is not None:
+        pub.publish(Float32(descent_cmd(z)))
+    rate.sleep()</code></pre>
+<pre class="cli-block"><code>&quot;&quot;&quot;ROS-free logic of the ported node: vertical speed command for a guarded descent (ENU, up positive).&quot;&quot;&quot;
+def descent_cmd(z, z_land=0.0, k=0.5, v_max=1.5, slow_alt=2.0, v_slow=0.3):
+    &quot;&quot;&quot;z — altitude above the landing point, m. Returns vz, m/s (negative = down).&quot;&quot;&quot;
+    err = z - z_land
+    if err &lt;= 0.05:
+        return 0.0
+    limit = v_slow if err &lt; slow_alt else v_max
+    return -min(k * err, limit)</code></pre>
+<pre class="cli-block"><code>from descent_guard import descent_cmd
+def test_high_altitude_is_limited():   assert descent_cmd(10.0) == -1.5
+def test_proportional_zone():           assert descent_cmd(2.4) == -1.2
+def test_slow_zone_below_2m():          assert descent_cmd(1.0) == -0.3
+def test_stop_on_ground():              assert descent_cmd(0.03) == 0.0</code></pre>
+<pre class="cli-block"><code># ROS 2 (rclpy) — thin wrapper around the same logic; syntax checked, not run (no ROS 2 here)
+import rclpy
+from rclpy.node import Node
+from rclpy.qos import qos_profile_sensor_data
+from geometry_msgs.msg import PoseStamped
+from std_msgs.msg import Float32
+from descent_guard import descent_cmd
+
+
+class Guard(Node):
+    def __init__(self):
+        super().__init__(&quot;descent_guard&quot;)
+        self.z = None
+        # MAVROS 2 publishes pose with SensorDataQoS (best effort): a default (reliable) subscription gets nothing
+        self.create_subscription(PoseStamped, &quot;/mavros/local_position/pose&quot;, self.on_pose, qos_profile_sensor_data)
+        self.pub = self.create_publisher(Float32, &quot;/descent_guard/vz&quot;, 10)
+        self.create_timer(0.05, self.tick)          # replaces rospy.Rate(20) + while loop
+
+    def on_pose(self, msg):
+        self.z = msg.pose.position.z
+
+    def tick(self):
+        if self.z is not None:
+            self.pub.publish(Float32(data=descent_cmd(self.z)))
+
+
+def main():
+    rclpy.init()
+    rclpy.spin(Guard())
+
+
+if __name__ == &quot;__main__&quot;:
+    main()</code></pre>
+<pre class="cli-block"><code>&quot;&quot;&quot;ros2-from-ros1 lab without ROS: ROS 1 bag (reference) -&gt; rosbags-convert -&gt; ROS 2 bag -&gt; ported logic -&gt; compare.&quot;&quot;&quot;
+import subprocess, sys, shutil
+from pathlib import Path
+from rosbags.rosbag1 import Writer as W1
+from rosbags.highlevel import AnyReader
+from rosbags.typesys import Stores, get_typestore
+from descent_guard import descent_cmd
+work = Path(sys.argv[1]); shutil.rmtree(work, ignore_errors=True); work.mkdir()
+ts1 = get_typestore(Stores.ROS1_NOETIC)
+Pose, Stamped, Hdr, Time = (ts1.types[n] for n in (&quot;geometry_msgs/msg/Pose&quot;, &quot;geometry_msgs/msg/PoseStamped&quot;,
+                                                    &quot;std_msgs/msg/Header&quot;, &quot;builtin_interfaces/msg/Time&quot;))
+P, Q, F32 = ts1.types[&quot;geometry_msgs/msg/Point&quot;], ts1.types[&quot;geometry_msgs/msg/Quaternion&quot;], ts1.types[&quot;std_msgs/msg/Float32&quot;]
+NS = 1_000_000_000; T0 = 100 * NS
+def alt(t): return max(0.0, 8.0 - 1.0 * t)          # descent from 8 m at 1 m/s (synthetic flight)
+# 1) ROS 1 bag: pose at 30 Hz + output of the OLD node (rospy.Rate(20) loop, latest pose) as the reference
+bag1 = work / &quot;flight_ros1.bag&quot;
+with W1(bag1) as w:
+    cp = w.add_connection(&quot;/mavros/local_position/pose&quot;, Stamped.__msgtype__, typestore=ts1)
+    cc = w.add_connection(&quot;/descent_guard/vz&quot;, F32.__msgtype__, typestore=ts1)
+    poses = [(T0 + i * NS // 30, alt(i / 30)) for i in range(300)]          # 10 s
+    for t, z in poses:
+        m = Stamped(Hdr(seq=0, stamp=Time(sec=t // NS, nanosec=t % NS), frame_id=&quot;map&quot;),
+                    Pose(P(x=0.0, y=0.0, z=z), Q(x=0.0, y=0.0, z=0.0, w=1.0)))
+        w.write(cp, t, ts1.serialize_ros1(m, Stamped.__msgtype__))
+    latest = None; j = 0
+    for n in range(200):                                                     # while not shutdown: ... rate.sleep()
+        tick = T0 + n * NS // 20
+        while j &lt; len(poses) and poses[j][0] &lt;= tick: latest = poses[j][1]; j += 1
+        if latest is not None:
+            w.write(cc, tick, ts1.serialize_ros1(F32(data=descent_cmd(latest)), F32.__msgtype__))
+# 2) convert to ROS 2 (MCAP, Jazzy message definitions)
+bag2 = work / &quot;flight_ros2&quot;
+r = subprocess.run([&quot;rosbags-convert&quot;, &quot;--src&quot;, str(bag1), &quot;--dst&quot;, str(bag2), &quot;--dst-storage&quot;, &quot;mcap&quot;,
+                    &quot;--dst-typestore&quot;, &quot;ros2_jazzy&quot;], capture_output=True, text=True)
+print(&quot;rosbags-convert exit&quot;, r.returncode, &quot;-&gt;&quot;, sorted(p.name for p in bag2.iterdir()))
+# 3) read the ROS 2 bag, run the ported node two ways
+ts2 = get_typestore(Stores.ROS2_JAZZY)
+pose_in, ref = [], []
+with AnyReader([bag2], default_typestore=ts2) as rd:
+    for c in rd.connections: print(f&quot;  {c.topic:30s} {c.msgtype:28s} {c.msgcount} msgs&quot;)
+    for c, t, raw in rd.messages():
+        msg = rd.deserialize(raw, c.msgtype)
+        (pose_in if c.topic.endswith(&quot;pose&quot;) else ref).append((t, msg.pose.position.z if c.topic.endswith(&quot;pose&quot;) else msg.data))
+def timer_port():                      # node.create_timer(0.05, tick): latest pose, same 20 Hz grid
+    out, latest, j = [], None, 0
+    for n in range(200):
+        tick = T0 + n * NS // 20
+        while j &lt; len(pose_in) and pose_in[j][0] &lt;= tick: latest = pose_in[j][1]; j += 1
+        if latest is not None: out.append((tick, descent_cmd(latest)))
+    return out
+def callback_port():                   # naive port: publish inside the pose callback (30 Hz)
+    return [(t, descent_cmd(z)) for t, z in pose_in]
+import struct
+f32 = lambda v: struct.unpack(&quot;f&quot;, struct.pack(&quot;f&quot;, v))[0]     # Float32 on the wire
+for name, out in ((&quot;timer port&quot;, timer_port()), (&quot;callback port&quot;, callback_port())):
+    same = len(out) == len(ref) and all(abs(f32(a[1]) - b[1]) &lt; 1e-6 and a[0] == b[0] for a, b in zip(out, ref))
+    print(f&quot;{name:13s}: {len(out)} outputs vs {len(ref)} reference -&gt; {&#x27;MATCH&#x27; if same else &#x27;DIFFERENT&#x27;}&quot;)</code></pre>
+<pre class="cli-block"><code>&quot;&quot;&quot;Request-vs-offered QoS rules from the ROS 2 docs (reliability, durability) applied to typical migration cases.&quot;&quot;&quot;
+RANK_REL = {&quot;best_effort&quot;: 0, &quot;reliable&quot;: 1}
+RANK_DUR = {&quot;volatile&quot;: 0, &quot;transient_local&quot;: 1}
+def compatible(pub, sub):
+    &quot;&quot;&quot;pub/sub: (reliability, durability). A subscription may request no more than the publisher offers.&quot;&quot;&quot;
+    return RANK_REL[pub[0]] &gt;= RANK_REL[sub[0]] and RANK_DUR[pub[1]] &gt;= RANK_DUR[sub[1]]
+DEFAULT, SENSOR = (&quot;reliable&quot;, &quot;volatile&quot;), (&quot;best_effort&quot;, &quot;volatile&quot;)
+LATCHED = (&quot;reliable&quot;, &quot;transient_local&quot;)
+cases = [
+    (&quot;MAVROS 2 telemetry (sensor data) -&gt; port with default QoS&quot;, SENSOR, DEFAULT),
+    (&quot;MAVROS 2 telemetry (sensor data) -&gt; port with sensor data&quot;, SENSOR, SENSOR),
+    (&quot;default publisher -&gt; sensor-data subscriber&quot;, DEFAULT, SENSOR),
+    (&quot;ROS 1 latched map, ported as default -&gt; late subscriber wants transient_local&quot;, DEFAULT, LATCHED),
+    (&quot;transient_local publisher -&gt; default subscriber (no old samples)&quot;, LATCHED, DEFAULT),
+]
+for name, pub, sub in cases:
+    print(f&quot;{&#x27;OK &#x27; if compatible(pub, sub) else &#x27;NO &#x27;} {name}&quot;)</code></pre>
+<pre class="cli-block"><code>$ python -m pytest -q test_descent_guard.py
+4 passed in 0.01s
+$ python migrate_lab.py ./work
+rosbags-convert exit 0 -&gt; [&#x27;flight_ros2.mcap&#x27;, &#x27;metadata.yaml&#x27;]
+  /mavros/local_position/pose    geometry_msgs/msg/PoseStamped 300 msgs
+  /descent_guard/vz              std_msgs/msg/Float32         200 msgs
+timer port   : 200 outputs vs 200 reference -&gt; MATCH
+callback port: 300 outputs vs 200 reference -&gt; DIFFERENT
+$ python qos_check.py
+NO  MAVROS 2 telemetry (sensor data) -&gt; port with default QoS
+OK  MAVROS 2 telemetry (sensor data) -&gt; port with sensor data
+OK  default publisher -&gt; sensor-data subscriber
+NO  ROS 1 latched map, ported as default -&gt; late subscriber wants transient_local
+OK  transient_local publisher -&gt; default subscriber (no old samples)</code></pre>
 
 <h2>Діагностика</h2>
 <div class="diag-groups"><article class="diag-item"><h4><strong>Симптом:</strong> перенесений вузол «зависає» на виклику сервісу</h4><ul><li>Можлива причина: синхронний виклик у колбеку однопотокового executor-а.</li><li>Що зробити: call_async + обробка future, або окрема група колбеків.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> вузол не отримує телеметрію MAVROS 2</h4><ul><li>Можлива причина: QoS (sensor data у видавця) або інше ім&#x27;я топіка.</li><li>Що зробити: <code>ros2 topic info -v</code>, профіль підписки.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> параметри «не застосовуються»</h4><ul><li>Можлива причина: у ROS 2 параметр треба оголосити (<code>declare_parameter</code>) і передати конкретному вузлу.</li><li>Що зробити: оголошення в конструкторі, YAML з іменем вузла в launch.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> ros1_bridge не передає власний тип повідомлення</h4><ul><li>Можлива причина: міст зібрано без цього типу або визначення відрізняються.</li><li>Що зробити: зібрати міст із вихідних кодів з обома воркспейсами; краще — переносити.</li></ul></article></div>

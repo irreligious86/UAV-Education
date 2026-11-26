@@ -68,6 +68,8 @@ The result is a node graph (as in ros2-basics) and a list of external dependenci
 
 The main shift in thinking: **the `while` loop with `rate.sleep()` is replaced by a timer and callbacks**, and a synchronous service call inside a callback by an asynchronous one, otherwise the node will block itself (the same executor services the response).
 
+{{diagram:ros2-distro-timeline|Окна поддержки по годам: в ноябре 2026 живы Humble (до мая 2027), Jazzy, Lyrical и уходящий Kilted; Noetic и мост к нему уже за чертой.}}
+
 {{diagram:ros2-sync-call-deadlock|Синхронный cli.call() в колбэке занимает единственный поток executor: ответ некому доставить, тики таймера пропадают; call_async() возвращается сразу, и уставки идут каждые 50 мс.}}
 
 ### MAVROS 1 → MAVROS 2
@@ -89,6 +91,182 @@ Port one node (up to ~200 lines): the logic without ROS goes into a separate mod
 A table: what was replaced, how many lines of logic became testable without ROS, what behavior differences were found (usually QoS and time).
 
 The lab counts as done when you have the graph of the original project, the ported node with logic tests and a comparison of the outputs on the same data.
+
+### Шаг 5 (текст — в русской версии)
+
+```python
+# ROS 1 (rospy) — the node being ported; shown for reading, not run (no ROS 1 here)
+import rospy
+from geometry_msgs.msg import PoseStamped
+from std_msgs.msg import Float32
+from descent_guard import descent_cmd
+
+z = None
+def on_pose(msg):
+    global z
+    z = msg.pose.position.z
+
+rospy.init_node("descent_guard")
+rospy.Subscriber("/mavros/local_position/pose", PoseStamped, on_pose)
+pub = rospy.Publisher("/descent_guard/vz", Float32, queue_size=10)
+rate = rospy.Rate(20)
+while not rospy.is_shutdown():
+    if z is not None:
+        pub.publish(Float32(descent_cmd(z)))
+    rate.sleep()
+```
+
+```python
+"""ROS-free logic of the ported node: vertical speed command for a guarded descent (ENU, up positive)."""
+def descent_cmd(z, z_land=0.0, k=0.5, v_max=1.5, slow_alt=2.0, v_slow=0.3):
+    """z — altitude above the landing point, m. Returns vz, m/s (negative = down)."""
+    err = z - z_land
+    if err <= 0.05:
+        return 0.0
+    limit = v_slow if err < slow_alt else v_max
+    return -min(k * err, limit)
+```
+
+```python
+from descent_guard import descent_cmd
+def test_high_altitude_is_limited():   assert descent_cmd(10.0) == -1.5
+def test_proportional_zone():           assert descent_cmd(2.4) == -1.2
+def test_slow_zone_below_2m():          assert descent_cmd(1.0) == -0.3
+def test_stop_on_ground():              assert descent_cmd(0.03) == 0.0
+```
+
+```python
+# ROS 2 (rclpy) — thin wrapper around the same logic; syntax checked, not run (no ROS 2 here)
+import rclpy
+from rclpy.node import Node
+from rclpy.qos import qos_profile_sensor_data
+from geometry_msgs.msg import PoseStamped
+from std_msgs.msg import Float32
+from descent_guard import descent_cmd
+
+
+class Guard(Node):
+    def __init__(self):
+        super().__init__("descent_guard")
+        self.z = None
+        # MAVROS 2 publishes pose with SensorDataQoS (best effort): a default (reliable) subscription gets nothing
+        self.create_subscription(PoseStamped, "/mavros/local_position/pose", self.on_pose, qos_profile_sensor_data)
+        self.pub = self.create_publisher(Float32, "/descent_guard/vz", 10)
+        self.create_timer(0.05, self.tick)          # replaces rospy.Rate(20) + while loop
+
+    def on_pose(self, msg):
+        self.z = msg.pose.position.z
+
+    def tick(self):
+        if self.z is not None:
+            self.pub.publish(Float32(data=descent_cmd(self.z)))
+
+
+def main():
+    rclpy.init()
+    rclpy.spin(Guard())
+
+
+if __name__ == "__main__":
+    main()
+```
+
+```python
+"""ros2-from-ros1 lab without ROS: ROS 1 bag (reference) -> rosbags-convert -> ROS 2 bag -> ported logic -> compare."""
+import subprocess, sys, shutil
+from pathlib import Path
+from rosbags.rosbag1 import Writer as W1
+from rosbags.highlevel import AnyReader
+from rosbags.typesys import Stores, get_typestore
+from descent_guard import descent_cmd
+work = Path(sys.argv[1]); shutil.rmtree(work, ignore_errors=True); work.mkdir()
+ts1 = get_typestore(Stores.ROS1_NOETIC)
+Pose, Stamped, Hdr, Time = (ts1.types[n] for n in ("geometry_msgs/msg/Pose", "geometry_msgs/msg/PoseStamped",
+                                                    "std_msgs/msg/Header", "builtin_interfaces/msg/Time"))
+P, Q, F32 = ts1.types["geometry_msgs/msg/Point"], ts1.types["geometry_msgs/msg/Quaternion"], ts1.types["std_msgs/msg/Float32"]
+NS = 1_000_000_000; T0 = 100 * NS
+def alt(t): return max(0.0, 8.0 - 1.0 * t)          # descent from 8 m at 1 m/s (synthetic flight)
+# 1) ROS 1 bag: pose at 30 Hz + output of the OLD node (rospy.Rate(20) loop, latest pose) as the reference
+bag1 = work / "flight_ros1.bag"
+with W1(bag1) as w:
+    cp = w.add_connection("/mavros/local_position/pose", Stamped.__msgtype__, typestore=ts1)
+    cc = w.add_connection("/descent_guard/vz", F32.__msgtype__, typestore=ts1)
+    poses = [(T0 + i * NS // 30, alt(i / 30)) for i in range(300)]          # 10 s
+    for t, z in poses:
+        m = Stamped(Hdr(seq=0, stamp=Time(sec=t // NS, nanosec=t % NS), frame_id="map"),
+                    Pose(P(x=0.0, y=0.0, z=z), Q(x=0.0, y=0.0, z=0.0, w=1.0)))
+        w.write(cp, t, ts1.serialize_ros1(m, Stamped.__msgtype__))
+    latest = None; j = 0
+    for n in range(200):                                                     # while not shutdown: ... rate.sleep()
+        tick = T0 + n * NS // 20
+        while j < len(poses) and poses[j][0] <= tick: latest = poses[j][1]; j += 1
+        if latest is not None:
+            w.write(cc, tick, ts1.serialize_ros1(F32(data=descent_cmd(latest)), F32.__msgtype__))
+# 2) convert to ROS 2 (MCAP, Jazzy message definitions)
+bag2 = work / "flight_ros2"
+r = subprocess.run(["rosbags-convert", "--src", str(bag1), "--dst", str(bag2), "--dst-storage", "mcap",
+                    "--dst-typestore", "ros2_jazzy"], capture_output=True, text=True)
+print("rosbags-convert exit", r.returncode, "->", sorted(p.name for p in bag2.iterdir()))
+# 3) read the ROS 2 bag, run the ported node two ways
+ts2 = get_typestore(Stores.ROS2_JAZZY)
+pose_in, ref = [], []
+with AnyReader([bag2], default_typestore=ts2) as rd:
+    for c in rd.connections: print(f"  {c.topic:30s} {c.msgtype:28s} {c.msgcount} msgs")
+    for c, t, raw in rd.messages():
+        msg = rd.deserialize(raw, c.msgtype)
+        (pose_in if c.topic.endswith("pose") else ref).append((t, msg.pose.position.z if c.topic.endswith("pose") else msg.data))
+def timer_port():                      # node.create_timer(0.05, tick): latest pose, same 20 Hz grid
+    out, latest, j = [], None, 0
+    for n in range(200):
+        tick = T0 + n * NS // 20
+        while j < len(pose_in) and pose_in[j][0] <= tick: latest = pose_in[j][1]; j += 1
+        if latest is not None: out.append((tick, descent_cmd(latest)))
+    return out
+def callback_port():                   # naive port: publish inside the pose callback (30 Hz)
+    return [(t, descent_cmd(z)) for t, z in pose_in]
+import struct
+f32 = lambda v: struct.unpack("f", struct.pack("f", v))[0]     # Float32 on the wire
+for name, out in (("timer port", timer_port()), ("callback port", callback_port())):
+    same = len(out) == len(ref) and all(abs(f32(a[1]) - b[1]) < 1e-6 and a[0] == b[0] for a, b in zip(out, ref))
+    print(f"{name:13s}: {len(out)} outputs vs {len(ref)} reference -> {'MATCH' if same else 'DIFFERENT'}")
+```
+
+```python
+"""Request-vs-offered QoS rules from the ROS 2 docs (reliability, durability) applied to typical migration cases."""
+RANK_REL = {"best_effort": 0, "reliable": 1}
+RANK_DUR = {"volatile": 0, "transient_local": 1}
+def compatible(pub, sub):
+    """pub/sub: (reliability, durability). A subscription may request no more than the publisher offers."""
+    return RANK_REL[pub[0]] >= RANK_REL[sub[0]] and RANK_DUR[pub[1]] >= RANK_DUR[sub[1]]
+DEFAULT, SENSOR = ("reliable", "volatile"), ("best_effort", "volatile")
+LATCHED = ("reliable", "transient_local")
+cases = [
+    ("MAVROS 2 telemetry (sensor data) -> port with default QoS", SENSOR, DEFAULT),
+    ("MAVROS 2 telemetry (sensor data) -> port with sensor data", SENSOR, SENSOR),
+    ("default publisher -> sensor-data subscriber", DEFAULT, SENSOR),
+    ("ROS 1 latched map, ported as default -> late subscriber wants transient_local", DEFAULT, LATCHED),
+    ("transient_local publisher -> default subscriber (no old samples)", LATCHED, DEFAULT),
+]
+for name, pub, sub in cases:
+    print(f"{'OK ' if compatible(pub, sub) else 'NO '} {name}")
+```
+
+```text
+$ python -m pytest -q test_descent_guard.py
+4 passed in 0.01s
+$ python migrate_lab.py ./work
+rosbags-convert exit 0 -> ['flight_ros2.mcap', 'metadata.yaml']
+  /mavros/local_position/pose    geometry_msgs/msg/PoseStamped 300 msgs
+  /descent_guard/vz              std_msgs/msg/Float32         200 msgs
+timer port   : 200 outputs vs 200 reference -> MATCH
+callback port: 300 outputs vs 200 reference -> DIFFERENT
+$ python qos_check.py
+NO  MAVROS 2 telemetry (sensor data) -> port with default QoS
+OK  MAVROS 2 telemetry (sensor data) -> port with sensor data
+OK  default publisher -> sensor-data subscriber
+NO  ROS 1 latched map, ported as default -> late subscriber wants transient_local
+OK  transient_local publisher -> default subscriber (no old samples)
+```
 
 ## diagnostics
 - **Symptom:** the ported node “hangs” on a service call
