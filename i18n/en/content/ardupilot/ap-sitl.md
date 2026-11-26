@@ -60,6 +60,8 @@ Logs are written to `logs/` in the working folder (`.BIN`) and are read with the
 ### Where SITL lies
 No vibration or motor noise (you can't test filters), perfect mechanics, ESCs without latency, GPS with a configured noise level, no compass interference except what is modeled. PID tuning parameters from SITL **do not carry over** to a real vehicle; what carries over is logic, missions, scripts, failsafes and analysis skills.
 
+{{diagram:sitl-param-layers|Слои параметров SITL: файл defaults задаёт значения по умолчанию, но eeprom.bin их перебивает; -w стирает eeprom.bin, иначе правка .parm может не подействовать.}}
+
 {{diagram:sitl-arch|SITL: the same ArduCopter code gets sensor data from a physics model; MAVProxy distributes MAVLink to the GCS and scripts, logs are written just like in flight.}}
 
 ## practice
@@ -96,9 +98,17 @@ master = mavutil.mavlink_connection("tcp:127.0.0.1:5762")
 master.wait_heartbeat()
 print("connected to system", master.target_system)
 
+# Copter streams on SERIAL1 are off by default (MAV2_* = 0): ask for GLOBAL_POSITION_INT at 5 Hz
+master.mav.command_long_send(
+    master.target_system, master.target_component,
+    mavutil.mavlink.MAV_CMD_SET_MESSAGE_INTERVAL, 0,
+    mavutil.mavlink.MAVLINK_MSG_ID_GLOBAL_POSITION_INT, 200000, 0, 0, 0, 0, 0)
+
 master.set_mode(master.mode_mapping()["GUIDED"])
-master.arducopter_arm()
-master.motors_armed_wait()
+while not master.motors_armed():      # PreArm refuses until the EKF uses GPS: retry
+    master.arducopter_arm()
+    master.recv_match(type="HEARTBEAT", blocking=True)
+    master.recv_match(type="HEARTBEAT", blocking=True)
 
 master.mav.command_long_send(
     master.target_system, master.target_component,
@@ -106,12 +116,19 @@ master.mav.command_long_send(
     0, 0, 0, 0, 0, 0, 0, 10,  # param7 = altitude, m
 )
 
+t0 = None
 while True:
     msg = master.recv_match(type="GLOBAL_POSITION_INT", blocking=True)
+    t0 = t0 or msg.time_boot_ms
     alt = msg.relative_alt / 1000
-    print(f"alt {alt:.1f} m")
     if alt > 9.5:
+        print(f"alt {alt:.1f} m after {(msg.time_boot_ms - t0) / 1000:.1f} s (sim time)")
         break
+```
+
+```text
+connected to system 1
+alt 9.5 m after 6.6 s (sim time)
 ```
 
 ### Step 4. Project structure
@@ -143,6 +160,118 @@ The scenario reads the file, converts the offsets into GUIDED targets and waits 
 Write a “takeoff → loop → landing” scenario so that the coordinates live in `routes/` and the scenario just references a route. Run it on two different routes without editing the scenario code.
 
 The lab counts as done when SITL starts from the `run_sitl.sh` script with the right frame and the ground station is connected, the pymavlink scenario takes off, flies the route and lands, the routes live in `routes/` separately from the scenarios, and two routes have been run by the same code with the completion time recorded.
+
+SITL run of this step (ArduCopter 4.7.2); walkthrough and expected output are in the Russian source.
+
+```
+build/sitl/bin/arducopter --model + --speedup 10 -w \
+  --defaults Tools/autotest/default_params/copter.parm,lab.parm \
+  --home -35.363261,149.165230,584,353
+```
+
+```python
+"""SITL lab: layered defaults, speedup, wind and RC-loss injection (ArduCopter 4.7.2, no MAVProxy).
+Usage: python3 sitl_lab.py ~/ardupilot   (run from an empty folder; logs/ and eeprom.bin appear here)"""
+import math, subprocess, sys, time
+from pymavlink import mavutil
+
+AP = sys.argv[1]
+open("lab.parm", "w").write("RTL_ALT_M 20\n")          # applied after copter.parm, so it wins
+sitl = subprocess.Popen([AP + "/build/sitl/bin/arducopter", "--model", "+", "--speedup", "10", "-w",
+                         "--defaults", AP + "/Tools/autotest/default_params/copter.parm,lab.parm",
+                         "--home", "-35.363261,149.165230,584,353"], stdout=open("sitl.out", "w"), stderr=subprocess.STDOUT)
+time.sleep(1)
+m = mavutil.mavlink_connection("tcp:127.0.0.1:5760")   # SERIAL0 waits for this client
+m.wait_heartbeat()
+for name in ("GLOBAL_POSITION_INT", "ATTITUDE", "LOCAL_POSITION_NED"):   # 10 Hz each
+    m.mav.command_long_send(1, 1, mavutil.mavlink.MAV_CMD_SET_MESSAGE_INTERVAL, 0,
+                            getattr(mavutil.mavlink, "MAVLINK_MSG_ID_" + name), 100000, 0, 0, 0, 0, 0)
+
+
+def param(name, value=None):
+    if value is None:
+        m.mav.param_request_read_send(1, 1, name.encode(), -1)
+    else:
+        m.param_set_send(name, value)
+    while (r := m.recv_match(type="PARAM_VALUE", blocking=True)).param_id != name:
+        pass
+    return r.param_value
+
+
+def sim_t():  # simulated seconds since boot, from a fresh message
+    while m.recv_match(blocking=False):
+        pass
+    return m.recv_match(type="GLOBAL_POSITION_INT", blocking=True).time_boot_ms / 1000
+
+
+def fly_until(test):  # read messages until test(msg) is true, return that message
+    while not test(r := m.recv_match(blocking=True)):
+        pass
+    return r
+
+
+def takeoff(alt):
+    m.set_mode("GUIDED")
+    while not m.motors_armed():      # PreArm refuses until the EKF uses GPS
+        m.arducopter_arm()
+        m.recv_match(type="HEARTBEAT", blocking=True); m.recv_match(type="HEARTBEAT", blocking=True)
+    m.mav.command_long_send(1, 1, mavutil.mavlink.MAV_CMD_NAV_TAKEOFF, 0, 0, 0, 0, 0, 0, 0, alt)
+    fly_until(lambda r: r.get_type() == "GLOBAL_POSITION_INT" and r.relative_alt > (alt - 0.5) * 1000)
+
+
+def mean_tilt(sec):
+    t_end, tilt = sim_t() + sec, []
+    while (r := m.recv_match(type=["ATTITUDE", "GLOBAL_POSITION_INT"], blocking=True)).time_boot_ms / 1000 < t_end:
+        if r.get_type() == "ATTITUDE":
+            tilt.append(math.degrees(math.hypot(r.roll, r.pitch)))
+    return sum(tilt) / len(tilt)
+
+
+def rtl_max_alt():  # watch RTL until disarm, return the highest altitude
+    top = 0
+    while (r := m.recv_match(type=["GLOBAL_POSITION_INT", "HEARTBEAT"], blocking=True)):
+        if r.get_type() == "GLOBAL_POSITION_INT":
+            top = max(top, r.relative_alt / 1000)
+        elif r.get_srcSystem() == 1 and not r.base_mode & 128 and top > 1:
+            return top
+
+
+for n in ("FS_THR_ENABLE", "RC_FS_TIMEOUT", "RTL_ALT_M", "RTL_CONE_SLOPE", "SIM_WIND_DIR", "SIM_GPS1_ENABLE"):
+    print(f"{n} = {param(n):g}")
+t0, w0 = sim_t(), time.time(); time.sleep(10)
+print(f"speedup: {(sim_t() - t0) / (time.time() - w0):.1f}x")
+takeoff(10)
+print(f"airborne at sim t = {sim_t():.0f} s; calm: mean tilt {mean_tilt(10):.1f} deg")
+param("SIM_WIND_DIR", 0); param("SIM_WIND_SPD", 8)                  # 8 m/s FROM the north
+mean_tilt(5)                                                         # let the controller settle
+print(f"wind 8 m/s: mean tilt {mean_tilt(15):.1f} deg")
+param("SIM_WIND_SPD", 0)
+m.set_mode("RTL")
+print(f"A: RTL straight above home -> max alt {rtl_max_alt():.1f} m")
+takeoff(10)
+m.mav.set_position_target_local_ned_send(0, 1, 1, mavutil.mavlink.MAV_FRAME_LOCAL_NED, 0b110111111000,
+                                         40, 0, -10, 0, 0, 0, 0, 0, 0, 0, 0)
+pos = fly_until(lambda r: r.get_type() == "LOCAL_POSITION_NED" and abs(r.x - 40) < 1 and abs(r.vx) < 0.3)
+t_fail = sim_t(); param("SIM_RC_FAIL", 1)
+fly_until(lambda r: r.get_type() == "HEARTBEAT" and r.get_srcSystem() == 1 and r.custom_mode == 6)
+print(f"B: {pos.x:.1f} m north, SIM_RC_FAIL=1 -> RTL after {sim_t() - t_fail:.1f} s, max alt {rtl_max_alt():.1f} m")
+sitl.terminate()
+```
+
+```text
+FS_THR_ENABLE = 1
+RC_FS_TIMEOUT = 1
+RTL_ALT_M = 20
+RTL_CONE_SLOPE = 3
+SIM_WIND_DIR = 180
+SIM_GPS1_ENABLE = 1
+speedup: 10.0x
+airborne at sim t = 112 s; calm: mean tilt 0.3 deg
+wind 8 m/s: mean tilt 6.5 deg
+A: RTL straight above home -> max alt 10.0 m
+B: 40.7 m north, SIM_RC_FAIL=1 -> RTL after 1.1 s, max alt 20.0 m
+```
+
 
 ## diagnostics
 - **Symptom:** `sim_vehicle.py: command not found`

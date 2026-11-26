@@ -91,7 +91,8 @@ function update()
 end
 return update()</code></pre>
 <p>Перевірка в SITL: <code>SIM_ESC_TELEM = 1</code>, підмінити поріг на 30 °C, переконатися в спрацюванні; потім — на стенді. Запис у FMEA як захід з посиланням на тест (модуль «Відмовостійкість»).</p>
-<figure class="diagram" data-diagram="lua-runtime"><div class="diagram__svg"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 200" width="100%" role="img" aria-labelledby="t" style="max-width:720px;display:block;margin:0 auto"><title id="t">Скриптинг ArduPilot: як виконується update()</title><style>text{font-family: var(--gc-font-mono, ui-monospace, Menlo, monospace); font-size: 12px;fill:currentColor} .m{fill:var(--gc-ink-muted, #8a93a3)} .a{fill:var(--gc-accent-hud, #5ef1d2)} .w{fill:var(--gc-signal-amber, #f0b24c)} .d{fill:var(--gc-signal-red, #e8636b)} .box{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:currentColor;stroke-width:1.2} .boxa{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6} .ln{stroke:currentColor;stroke-width:1.2;fill:none} .lna{stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6;fill:none} .lnm{stroke:var(--gc-ink-muted, #8a93a3);stroke-width:1;fill:none;stroke-dasharray:4 3} .t{font-size:11px} .b{font-weight:600}</style><defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker><marker id="ara" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--gc-accent-hud, #5ef1d2)"/></marker></defs><rect class="box" x="10.0" y="30" width="142.0" height="48" rx="6"/><text x="81.0" y="51.0" text-anchor="middle">APM/scripts/</text><text x="81.0" y="65.0" text-anchor="middle">*.lua</text><rect class="boxa" x="196.0" y="30" width="142.0" height="48" rx="6"/><text x="267.0" y="51.0" text-anchor="middle" class="b">Lua VM</text><text x="267.0" y="65.0" text-anchor="middle" class="b">SCR_HEAP_SIZE</text><rect class="boxa" x="382.0" y="30" width="142.0" height="48" rx="6"/><text x="453.0" y="51.0" text-anchor="middle" class="b">update()</text><text x="453.0" y="65.0" text-anchor="middle" class="b">→ return fn, мс</text><rect class="box" x="568.0" y="30" width="142.0" height="48" rx="6"/><text x="639.0" y="51.0" text-anchor="middle">Прив&#x27;язки</text><text x="639.0" y="65.0" text-anchor="middle">ahrs, vehicle, gcs</text><rect class="boxa" x="382.0" y="130" width="142.0" height="48" rx="6"/><text x="453.0" y="151.0" text-anchor="middle" class="b">pcall: помилка</text><text x="453.0" y="165.0" text-anchor="middle" class="b">не валить скрипт</text><rect class="box" x="568.0" y="130" width="142.0" height="48" rx="6"/><text x="639.0" y="151.0" text-anchor="middle">Режим, ціль,</text><text x="639.0" y="165.0" text-anchor="middle">повідомлення, лог</text><path class="ln" d="M152.0 54.0 L196.0 54.0" marker-end="url(#ar)"/><path class="ln" d="M338.0 54.0 L382.0 54.0" marker-end="url(#ar)"/><path class="ln" d="M524.0 54.0 L568.0 54.0" marker-end="url(#ar)"/><path class="ln" d="M453.0 78 L453.0 130" marker-end="url(#ar)"/><path class="ln" d="M639.0 78 L639.0 130" marker-end="url(#ar)"/><text x="10" y="150" text-anchor="start" class="m t">SCR_ENABLE=1; скрипт</text><text x="10" y="164" text-anchor="start" class="m t">не замінює FS_*</text></svg></div><figcaption class="gc-muted">Як виконується скрипт: файл з APM/scripts/ у Lua VM, update() повертає себе й період, помилки ловить pcall, дії йдуть через прив&#x27;язки API.</figcaption><div class="diagram__hint">Схему можно прокрутить по горизонтали</div></figure>
+<figure class="diagram" data-diagram="lua-script-lifecycle"><div class="diagram__svg"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 336" width="100%" role="img" aria-labelledby="t" style="max-width:720px;display:block;margin:0 auto"><title id="t">Жизнь Lua-скрипта: перепланирование или снятие</title><style>text{font-family: var(--gc-font-mono, ui-monospace, Menlo, monospace); font-size: 12px;fill:currentColor} .m{fill:var(--gc-ink-muted, #8a93a3)} .a{fill:var(--gc-accent-hud, #5ef1d2)} .w{fill:var(--gc-signal-amber, #f0b24c)} .d{fill:var(--gc-signal-red, #e8636b)} .box{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:currentColor;stroke-width:1.2} .boxa{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6} .ln{stroke:currentColor;stroke-width:1.2;fill:none} .lna{stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6;fill:none} .lnm{stroke:var(--gc-ink-muted, #8a93a3);stroke-width:1;fill:none;stroke-dasharray:4 3} .t{font-size:11px} .b{font-weight:600}</style><defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker><marker id="ara" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--gc-accent-hud, #5ef1d2)"/></marker></defs><rect class="box" x="12" y="46" width="190" height="58" rx="6"/><text x="107.0" y="65.0" text-anchor="middle">Загрузка при старте</text><text x="107.0" y="79.0" text-anchor="middle">scripts/*.lua</text><text x="107.0" y="93.0" text-anchor="middle">SCR_ENABLE = 1</text><rect class="boxa" x="236" y="46" width="200" height="58" rx="6"/><text x="336.0" y="65.0" text-anchor="middle" class="b">вызов update()</text><text x="336.0" y="79.0" text-anchor="middle" class="b">лимит инструкций</text><text x="336.0" y="93.0" text-anchor="middle" class="b">SCR_VM_I_COUNT 10000</text><rect class="box" x="470" y="46" width="238" height="58" rx="6"/><text x="589.0" y="65.0" text-anchor="middle">return update, 100</text><text x="589.0" y="79.0" text-anchor="middle">следующий вызов</text><text x="589.0" y="93.0" text-anchor="middle">через ≥ 100 мс</text><rect class="box" x="236" y="170" width="200" height="50" rx="6"/><text x="336.0" y="192.0" text-anchor="middle">ошибка / превышение /</text><text x="336.0" y="206.0" text-anchor="middle">1 или ≥ 3 значения</text><rect class="box" x="470" y="170" width="238" height="50" rx="6"/><text x="589.0" y="192.0" text-anchor="middle">скрипт снят до</text><text x="589.0" y="206.0" text-anchor="middle">перезапуска скриптинга</text><rect class="boxa" x="470" y="270" width="238" height="50" rx="6"/><text x="589.0" y="292.0" text-anchor="middle" class="b">PreArm: Scripting: …</text><text x="589.0" y="306.0" text-anchor="middle" class="b">арм отклонён (ACK 4)</text><path class="ln" d="M202 75.0 L236 75.0" marker-end="url(#ar)"/><path class="lna" d="M436 75.0 L470 75.0" marker-end="url(#ara)"/><text x="453.0" y="68.0" text-anchor="middle" class="m t" style="font-size:10px">ок</text><path class="ln" d="M336.0 104 L336.0 170" marker-end="url(#ar)"/><path class="ln" d="M436 195.0 L470 195.0" marker-end="url(#ar)"/><path class="ln" d="M589.0 220 L589.0 270" marker-end="url(#ar)"/><text x="470" y="122" text-anchor="start" class="m t">прогон SITL: запрошено 100 мс,</text><text x="470" y="136" text-anchor="start" class="m t">измерено ≈ 113 мс</text><text x="236" y="240" text-anchor="start" class="m t">return без значений — снят молча</text><text x="470" y="36" text-anchor="start" class="m t">планировщик вызовет снова</text><text x="12" y="262" text-anchor="start" class="m t">Остальные скрипты работают дальше.</text><text x="12" y="278" text-anchor="start" class="m t">Повтор ошибки: раз в 10 с, до 10 раз.</text><text x="12" y="294" text-anchor="start" class="m t">Исправить файл → перезагрузка</text><text x="12" y="310" text-anchor="start" class="m t">или MAV_CMD_SCRIPTING (3), RCx 316.</text></svg></div><figcaption class="gc-muted">Скрипт перепланируется, пока update() возвращает функцию и задержку; любая ошибка снимает его до перезагрузки и блокирует арм через PreArm: Scripting.</figcaption><div class="diagram__hint">Схему можно прокрутить по горизонтали</div></figure>
+<figure class="diagram" data-diagram="lua-runtime"><div class="diagram__svg"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 200" width="100%" role="img" aria-labelledby="t" style="max-width:720px;display:block;margin:0 auto"><title id="t">Скриптинг ArduPilot: як виконується update()</title><style>text{font-family: var(--gc-font-mono, ui-monospace, Menlo, monospace); font-size: 12px;fill:currentColor} .m{fill:var(--gc-ink-muted, #8a93a3)} .a{fill:var(--gc-accent-hud, #5ef1d2)} .w{fill:var(--gc-signal-amber, #f0b24c)} .d{fill:var(--gc-signal-red, #e8636b)} .box{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:currentColor;stroke-width:1.2} .boxa{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6} .ln{stroke:currentColor;stroke-width:1.2;fill:none} .lna{stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6;fill:none} .lnm{stroke:var(--gc-ink-muted, #8a93a3);stroke-width:1;fill:none;stroke-dasharray:4 3} .t{font-size:11px} .b{font-weight:600}</style><defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker><marker id="ara" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--gc-accent-hud, #5ef1d2)"/></marker></defs><rect class="box" x="10.0" y="30" width="142.0" height="48" rx="6"/><text x="81.0" y="51.0" text-anchor="middle">APM/scripts/</text><text x="81.0" y="65.0" text-anchor="middle">*.lua</text><rect class="boxa" x="196.0" y="30" width="142.0" height="48" rx="6"/><text x="267.0" y="51.0" text-anchor="middle" class="b">Lua VM</text><text x="267.0" y="65.0" text-anchor="middle" class="b">SCR_HEAP_SIZE</text><rect class="boxa" x="382.0" y="30" width="142.0" height="48" rx="6"/><text x="453.0" y="51.0" text-anchor="middle" class="b">update()</text><text x="453.0" y="65.0" text-anchor="middle" class="b">→ return fn, мс</text><rect class="box" x="568.0" y="30" width="142.0" height="48" rx="6"/><text x="639.0" y="51.0" text-anchor="middle">Прив&#x27;язки</text><text x="639.0" y="65.0" text-anchor="middle">ahrs, vehicle, gcs</text><rect class="boxa" x="382.0" y="130" width="142.0" height="48" rx="6"/><text x="453.0" y="151.0" text-anchor="middle" class="b">pcall: прошивка</text><text x="453.0" y="165.0" text-anchor="middle" class="b">цела, скрипт снят</text><rect class="box" x="568.0" y="130" width="142.0" height="48" rx="6"/><text x="639.0" y="151.0" text-anchor="middle">Режим, ціль,</text><text x="639.0" y="165.0" text-anchor="middle">повідомлення, лог</text><path class="ln" d="M152.0 54.0 L196.0 54.0" marker-end="url(#ar)"/><path class="ln" d="M338.0 54.0 L382.0 54.0" marker-end="url(#ar)"/><path class="ln" d="M524.0 54.0 L568.0 54.0" marker-end="url(#ar)"/><path class="ln" d="M453.0 78 L453.0 130" marker-end="url(#ar)"/><path class="ln" d="M639.0 78 L639.0 130" marker-end="url(#ar)"/><text x="10" y="150" text-anchor="start" class="m t">SCR_ENABLE=1; скрипт</text><text x="10" y="164" text-anchor="start" class="m t">не замінює FS_*</text></svg></div><figcaption class="gc-muted">Як виконується скрипт: файл з APM/scripts/ у Lua VM, update() повертає себе й період, помилки ловить pcall, дії йдуть через прив&#x27;язки API.</figcaption><div class="diagram__hint">Схему можно прокрутить по горизонтали</div></figure>
 
 <h2>Практика</h2>
 <h4 class="md-subheading">Крок 1. Увімкнути скриптинг у SITL</h4>
@@ -128,6 +129,171 @@ return update, 1000</code></pre>
 <p>Імена параметрів <code>SIM_*</code> змінюються між версіями — дивись актуальні у своїй збірці командою <code>param show SIM_GPS*</code> у MAVProxy. Такі скрипти — лише для SITL: на реальному апараті параметрів <code>SIM_*</code> немає.</p>
 <h4 class="md-subheading">Крок 5. Захист із тестами до SITL</h4>
 <p>Стартер проєкту №11 <code>examples/lua-protection</code>: <code>guard.lua</code> — захист за вібраціями (LAND), утримання всередині полігона із запасом (RTL) і обгортка <code>pcall</code>, яка після трьох помилок поспіль у повітрі відводить апарат у RTL. Тести запускають <strong>цей самий</strong> Lua-файл через <code>lupa</code> проти заглушки прив&#x27;язок (<code>millis</code>, <code>ahrs</code>, <code>vehicle</code>, <code>param</code>, <code>gcs</code>, <code>logger</code>) — помилки логіки ловляться за частки секунди, а SITL лишається приймальним тестом. Запусти <code>python -m pytest -q examples/lua-protection/tests</code>, потім додай третій захист (наприклад, просідання напруги під навантаженням) разом із тестом.</p>
+<p>Прогін цього кроку в SITL (ArduCopter 4.7.2); розбір і очікуваний результат — у російському оригіналі.</p>
+<pre class="cli-block"><code>-- fault_inject.lua (SITL only): N s after climbing above 8 m, cut thrust of the motors in FLT_MASK
+local PARAM_KEY = 72
+assert(param:add_table(PARAM_KEY, &quot;FLT_&quot;, 2), &quot;add_table failed&quot;)
+assert(param:add_param(PARAM_KEY, 1, &quot;DELAY&quot;, 5), &quot;add DELAY failed&quot;)   -- s after passing 8 m
+assert(param:add_param(PARAM_KEY, 2, &quot;MASK&quot;, 1), &quot;add MASK failed&quot;)     -- bitmask, 1 = motor 1
+local t_above, fired = nil, false
+local calls, t_last, dt_sum = 0, millis(), 0
+
+function update()
+  local now = millis()
+  calls = calls + 1
+  dt_sum = dt_sum + (now - t_last):tofloat()
+  t_last = now
+  if calls % 50 == 0 then
+    gcs:send_text(6, string.format(&quot;FLT: 50 calls, mean period %.1f ms&quot;, dt_sum / 50))
+    dt_sum = 0
+  end
+  local d = ahrs:get_relative_position_D_home()       -- metres, positive down
+  if not fired and d and arming:is_armed() and -d &gt; 8 then
+    t_above = t_above or now
+    if (now - t_above):tofloat() &gt; param:get(&quot;FLT_DELAY&quot;) * 1000 then
+      local mask = math.floor(param:get(&quot;FLT_MASK&quot;))
+      param:set(&quot;SIM_ENGINE_MUL&quot;, 0)
+      param:set(&quot;SIM_ENGINE_FAIL&quot;, mask)
+      gcs:send_text(2, string.format(&quot;FLT: motors mask %d cut at %.1f m&quot;, mask, -d))
+      logger:write(&quot;FLT&quot;, &quot;Alt,Mask&quot;, &quot;fi&quot;, &quot;m-&quot;, &quot;0-&quot;, -d, mask)
+      fired = true
+    end
+  end
+  return update, 100
+end
+
+gcs:send_text(6, &quot;FLT: loaded&quot;)
+return update, 100</code></pre>
+<pre class="cli-block"><code>&quot;&quot;&quot;Lua lab: fault_inject.lua on a SITL hexa; run 1 adds a broken script to see what it does to arming.
+Usage: python3 lua_lab.py ~/ardupilot   (run from a folder that holds scripts/fault_inject.lua)&quot;&quot;&quot;
+import os, subprocess, sys, time
+from pymavlink import mavutil
+
+AP, DP = sys.argv[1], sys.argv[1] + &quot;/Tools/autotest/default_params/&quot;
+open(&quot;lua.parm&quot;, &quot;w&quot;).write(&quot;SCR_ENABLE 1\n&quot;)
+open(&quot;scripts/bad.lua&quot;, &quot;w&quot;).write(          # runtime error on the 3rd call
+    &quot;local n = 0\nfunction update() n = n + 1; if n == 3 then local t = nil; return t.x end\n&quot;
+    &quot;  return update, 1000 end\nreturn update, 1000\n&quot;)
+
+
+def start(wipe):
+    sitl = subprocess.Popen([AP + &quot;/build/sitl/bin/arducopter&quot;, &quot;--model&quot;, &quot;hexa&quot;, &quot;--speedup&quot;, &quot;5&quot;, *wipe,
+                             &quot;--defaults&quot;, DP + &quot;copter.parm,&quot; + DP + &quot;copter-hexa.parm,lua.parm&quot;,
+                             &quot;--home&quot;, &quot;-35.363261,149.165230,584,353&quot;],
+                            stdout=open(&quot;sitl.out&quot;, &quot;a&quot;), stderr=subprocess.STDOUT)
+    time.sleep(1)
+    m = mavutil.mavlink_connection(&quot;tcp:127.0.0.1:5760&quot;); m.wait_heartbeat()
+    for msg_id in (33, 36):  # GLOBAL_POSITION_INT, SERVO_OUTPUT_RAW at 5 Hz
+        m.mav.command_long_send(1, 1, mavutil.mavlink.MAV_CMD_SET_MESSAGE_INTERVAL, 0, msg_id, 200000, 0, 0, 0, 0, 0)
+    return sitl, m
+
+
+def wait(m, sec, until=None):  # print STATUSTEXT for sec simulated seconds or until a text appears
+    t_end = None
+    while True:
+        r = m.recv_match(type=[&quot;STATUSTEXT&quot;, &quot;GLOBAL_POSITION_INT&quot;, &quot;SERVO_OUTPUT_RAW&quot;], blocking=True)
+        if r.get_type() == &quot;GLOBAL_POSITION_INT&quot;:
+            wait.t, wait.alt = r.time_boot_ms / 1000, r.relative_alt / 1000
+            t_end = t_end or wait.t + sec
+            if wait.t &gt; t_end:
+                return
+        elif r.get_type() == &quot;SERVO_OUTPUT_RAW&quot;:
+            wait.pwm = [getattr(r, f&quot;servo{i}_raw&quot;) for i in range(1, 7)]
+        elif &quot;50 calls&quot; not in r.text or &quot;50 calls&quot; not in wait.seen:
+            print(f&quot;[{wait.t:6.1f} s] {r.text}&quot;)
+            wait.seen += r.text
+            if until and until in r.text:
+                return
+
+
+wait.t, wait.seen = 0, &quot;&quot;
+print(&quot;--- run 1: fault_inject.lua + bad.lua&quot;)
+sitl, m = start([&quot;-w&quot;])
+wait(m, 45)
+m.set_mode(&quot;GUIDED&quot;); m.arducopter_arm()
+ack = m.recv_match(type=&quot;COMMAND_ACK&quot;, condition=&quot;COMMAND_ACK.command==400&quot;, blocking=True)
+print(f&quot;arm: COMMAND_ACK result {ack.result} (0 = accepted, 4 = failed)&quot;)
+wait(m, 2); sitl.terminate(); sitl.wait()
+os.remove(&quot;scripts/bad.lua&quot;)
+print(&quot;--- run 2: bad.lua removed, same eeprom.bin (no -w)&quot;)
+sitl, m = start([])
+wait(m, 45)
+m.set_mode(&quot;GUIDED&quot;)
+while not m.motors_armed():
+    m.arducopter_arm(); m.recv_match(type=&quot;HEARTBEAT&quot;, blocking=True); m.recv_match(type=&quot;HEARTBEAT&quot;, blocking=True)
+m.mav.command_long_send(1, 1, mavutil.mavlink.MAV_CMD_NAV_TAKEOFF, 0, 0, 0, 0, 0, 0, 0, 15)
+wait(m, 300, until=&quot;cut at&quot;)
+print(f&quot;PWM at the cut: {wait.pwm}&quot;)
+t_cut, low = wait.t, 99
+while wait.t &lt; t_cut + 25:
+    wait(m, 0.2); low = min(low, wait.alt)
+print(f&quot;25 s after the cut: lowest alt {low:.1f} m, PWM {wait.pwm}&quot;)
+sitl.terminate()</code></pre>
+<pre class="cli-block"><code>--- run 1: fault_inject.lua + bad.lua
+[   0.0 s] Barometer 1 calibration complete
+[   0.0 s] Barometer 2 calibration complete
+[   0.0 s] ArduPilot Ready
+[   0.0 s] AHRS: DCM active
+[   0.0 s] FLT: loaded
+[   2.5 s] RC7: SaveWaypoint LOW
+[   4.3 s] EKF3 IMU0 initialised
+[   4.3 s] EKF3 IMU1 initialised
+[   4.3 s] AHRS: EKF3 active
+[   5.3 s] Lua: ./scripts/bad.lua:2: attempt to index a nil v
+[   5.3 s] alue (local &#x27;t&#x27;)
+[   5.7 s] EKF3 IMU0 tilt alignment complete
+[   5.7 s] EKF3 IMU1 tilt alignment complete
+[   5.7 s] EKF3 IMU0 MAG0 initial yaw alignment complete
+[   5.7 s] EKF3 IMU1 MAG0 initial yaw alignment complete
+[   7.9 s] FLT: 50 calls, mean period 112.8 ms
+[   9.7 s] GPS 1: probing for u-blox at 230400 baud
+[   9.7 s] GPS 1: detected u-blox
+[  15.5 s] Lua: ./scripts/bad.lua:2: attempt to index a nil v
+[  15.5 s] alue (local &#x27;t&#x27;)
+[  19.9 s] EKF3 IMU0 origin set
+[  19.9 s] Field Elevation Set: 584m
+[  20.1 s] EKF3 IMU1 origin set
+[  25.5 s] Lua: ./scripts/bad.lua:2: attempt to index a nil v
+[  25.5 s] alue (local &#x27;t&#x27;)
+[  30.3 s] PreArm: Scripting: ./scripts/bad.lua:2: attempt to
+[  30.3 s]  index a
+[  35.5 s] Lua: ./scripts/bad.lua:2: attempt to index a nil v
+[  35.5 s] alue (local &#x27;t&#x27;)
+[  41.5 s] EKF3 IMU0 is using GPS
+[  41.5 s] EKF3 IMU1 is using GPS
+[  45.5 s] Lua: ./scripts/bad.lua:2: attempt to index a nil v
+[  45.5 s] alue (local &#x27;t&#x27;)
+arm: COMMAND_ACK result 4 (0 = accepted, 4 = failed)
+[  47.7 s] Arm: Scripting: ./scripts/bad.lua:2: attempt to in
+[  47.7 s] dex a
+--- run 2: bad.lua removed, same eeprom.bin (no -w)
+[  50.1 s] Barometer 1 calibration complete
+[  50.1 s] Barometer 2 calibration complete
+[  50.1 s] ArduPilot Ready
+[  50.1 s] AHRS: DCM active
+[  50.1 s] FLT: loaded
+[   2.6 s] RC7: SaveWaypoint LOW
+[   4.2 s] EKF3 IMU0 initialised
+[   4.2 s] EKF3 IMU1 initialised
+[   4.2 s] AHRS: EKF3 active
+[   5.6 s] EKF3 IMU1 tilt alignment complete
+[   5.6 s] EKF3 IMU0 tilt alignment complete
+[   5.8 s] EKF3 IMU1 MAG0 initial yaw alignment complete
+[   5.8 s] EKF3 IMU0 MAG0 initial yaw alignment complete
+[   9.6 s] GPS 1: probing for u-blox at 230400 baud
+[   9.6 s] GPS 1: detected u-blox
+[  19.8 s] EKF3 IMU1 origin set
+[  19.8 s] Field Elevation Set: 584m
+[  20.0 s] EKF3 IMU0 origin set
+[  41.4 s] EKF3 IMU0 is using GPS
+[  41.4 s] EKF3 IMU1 is using GPS
+[  53.2 s] EKF3 IMU0 MAG0 in-flight yaw alignment complete
+[  53.2 s] EKF3 IMU1 MAG0 in-flight yaw alignment complete
+[  60.4 s] FLT: motors mask 1 cut at 14.9 m
+PWM at the cut: [1594, 1594, 1594, 1594, 1594, 1595]
+[  63.6 s] Potential Thrust Loss (1)
+[  84.6 s] SIM Hit ground at 1.578218 m/s
+25 s after the cut: lowest alt -0.0 m, PWM [1950, 1207, 1862, 1915, 1913, 1864]</code></pre>
 
 <h2>Діагностика</h2>
 <div class="diag-groups"><article class="diag-item"><h4><strong>Симптом:</strong> скрипт не запускається, у GCS тиша</h4><ul><li>Можлива причина: <code>SCR_ENABLE</code> не ввімкнено або не було перезавантаження, файл не в тій папці.</li><li>Що зробити: перевірити параметр і шлях <code>scripts/</code> відносно папки запуску SITL.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> pre-arm помилка про пам&#x27;ять скриптів</h4><ul><li>Можлива причина: замало <code>SCR_HEAP_SIZE</code> для завантажених скриптів.</li><li>Що зробити: підняти <code>SCR_HEAP_SIZE</code> або прибрати зайві скрипти.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> усі скрипти перестали працювати посеред польоту</h4><ul><li>Можлива причина: один скрипт упав з помилкою або вичерпав пам&#x27;ять.</li><li>Що зробити: читати повідомлення в GCS, виправити скрипт, перезавантажити.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> <code>find_channel_for_option</code> повертає nil</h4><ul><li>Можлива причина: жодному каналу не призначено потрібний <code>RCx_OPTION</code>.</li><li>Що зробити: призначити опцію на канал із тумблером.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> скрипт не запускається, «Lua: … out of memory»</h4><ul><li>Можлива причина: <code>SCR_HEAP_SIZE</code> замалий, плата без запасу RAM.</li><li>Що зробити: збільшити heap (H7 — 200–300 КБ), спростити скрипт.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> «&lt;ім&#x27;я&gt;.lua exceeded time limit»</h4><ul><li>Можлива причина: важкий цикл в одному виклику update.</li><li>Що зробити: розбити роботу по викликах, <code>SCR_VM_I_COUNT</code> піднімати обережно.</li></ul></article></div>
@@ -137,6 +303,8 @@ return update, 1000</code></pre>
 
 <h2>Джерела</h2>
 <ul class="refs"><li><a href="https://ardupilot.org/copter/docs/common-lua-scripts.html" target="_blank" rel="noopener noreferrer">Lua Scripts — ArduPilot</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://ardupilot.org/copter/docs/common-scripting-step-by-step.html" target="_blank" rel="noopener noreferrer">Script Setup and Use Examples — ArduPilot</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://github.com/ArduPilot/ardupilot/tree/master/libraries/AP_Scripting/applets" target="_blank" rel="noopener noreferrer">AP_Scripting applets (GitHub)</a> <span class="gc-tag" data-state="info">primary</span></li></ul>
+<h2>Задачі з числовою відповіддю</h2>
+<uav-tasks src="../tasks/ap-lua.json" module="ap-lua"></uav-tasks>
 <h2>Перевір себе</h2>
 <uav-quiz src="../quiz/ap-lua.json" module="ap-lua"></uav-quiz>
       </div>

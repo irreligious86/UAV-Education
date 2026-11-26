@@ -43,7 +43,7 @@ def build(D: dict, arch) -> None:
 
     D["lua-runtime"] = arch("Скриптинг ArduPilot: как исполняется update()",
         [L("sd", ["APM/scripts/", "*.lua"]), L("vm", ["Lua VM", "SCR_HEAP_SIZE"], True), L("up", ["update()", "→ return fn, мс"], True), L("api", ["Привязки", "ahrs, vehicle, gcs"])],
-        [L("pc", ["pcall: ошибка", "не роняет скрипт"], True, 2), L("act", ["Режим, цель,", "сообщение, лог"], False, 3)],
+        [L("pc", ["pcall: прошивка", "цела, скрипт снят"], True, 2), L("act", ["Режим, цель,", "сообщение, лог"], False, 3)],
         [("sd", "vm"), ("vm", "up"), ("up", "api"), ("up", "pc", "", False, "v"), ("api", "act", "", False, "v")],
         notes=[(10, 150, "SCR_ENABLE=1; скрипт", "m t"), (10, 164, "не заменяет FS_*", "m t")])
 

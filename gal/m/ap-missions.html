@@ -76,6 +76,8 @@
 <p>Відносна (над домом, <code>MAV_FRAME_GLOBAL_RELATIVE_ALT</code>, за замовчуванням), абсолютна (над рівнем моря — помилка, як злітаєш з іншого місця), terrain (над рельєфом за даними SRTM з GCS або далекоміра, <code>TERRAIN_ENABLE</code>, frame «Terrain» у точок і <code>WP_RFND_USE</code>/<code>RTL_ALT_TYPE</code>). Класична аварія: місія з абсолютними висотами, складена для іншого майданчика на 300 м вище, — апарат силується піти під землю або в небо. Правило: відносні висоти, перевірка в GCS профілем висот над рельєфом.</p>
 <h4 class="md-subheading">Розібраний приклад: зйомка ділянки 300×200 м</h4>
 <p>Mission Planner → Survey (Grid): камера (сенсор, фокус), висота 80 м, перекриття 75/65% → план сам рахує відстань між галсами й <code>DO_SET_CAM_TRIGG_DIST</code>; швидкість 8 м/с (за витримкою камери: змаз ≤ 1 px → v·t_exp ≤ GSD); <code>NAV_TAKEOFF</code> 80, галси, <code>DO_SET_CAM_TRIGG_DIST 0</code> наприкінці, <code>NAV_RETURN_TO_LAUNCH</code>. Перевірка: профіль висот, час місії проти ємності АКБ (<code>BATT_LOW_MAH</code> із запасом на RTL + запас ємності на повернення), геозона довкола ділянки. Прогін у SITL з тим самим файлом місії — обов&#x27;язковий, без жодного «бай там».</p>
+<figure class="diagram" data-diagram="mavlink-mission-seq"><div class="diagram__svg"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 360" width="100%" role="img" aria-labelledby="t" style="max-width:720px;display:block;margin:0 auto"><title id="t">Завантаження місії (mission microservice): веде апарат, клієнт відповідає</title><style>text{font-family: var(--gc-font-mono, ui-monospace, Menlo, monospace); font-size: 12px;fill:currentColor} .m{fill:var(--gc-ink-muted, #8a93a3)} .a{fill:var(--gc-accent-hud, #5ef1d2)} .w{fill:var(--gc-signal-amber, #f0b24c)} .d{fill:var(--gc-signal-red, #e8636b)} .box{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:currentColor;stroke-width:1.2} .boxa{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6} .ln{stroke:currentColor;stroke-width:1.2;fill:none} .lna{stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6;fill:none} .lnm{stroke:var(--gc-ink-muted, #8a93a3);stroke-width:1;fill:none;stroke-dasharray:4 3} .t{font-size:11px} .b{font-weight:600}</style><defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker><marker id="ara" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--gc-accent-hud, #5ef1d2)"/></marker></defs><text x="16" y="16" text-anchor="start" class="m t">Завантаження місії (mission microservice): веде апарат, клієнт відповідає</text><rect class="box" x="20.0" y="26" width="120" height="26" rx="5"/><text x="80.0" y="43" text-anchor="middle" class="b" style="font-size:11px">GCS / клієнт</text><line class="lnm" x1="80.0" y1="52" x2="80.0" y2="350"/><rect class="box" x="410.0" y="26" width="120" height="26" rx="5"/><text x="470.0" y="43" text-anchor="middle" class="b" style="font-size:11px">Автопілот</text><line class="lnm" x1="470.0" y1="52" x2="470.0" y2="350"/><path class="lna" d="M80.0 74 L466.0 74" marker-end="url(#ara)"/><text x="275.0" y="69" text-anchor="middle" class="a t" style="font-size:10px">MISSION_COUNT (count = N, mission_type)</text><path class="ln" d="M470.0 104 L84.0 104" marker-end="url(#ar)"/><text x="275.0" y="99" text-anchor="middle" class="t" style="font-size:10px">MISSION_REQUEST_INT seq = 0</text><path class="ln" d="M80.0 134 L466.0 134" marker-end="url(#ar)"/><text x="275.0" y="129" text-anchor="middle" class="t" style="font-size:10px">MISSION_ITEM_INT seq = 0</text><path class="ln" d="M470.0 164 L84.0 164" marker-end="url(#ar)"/><text x="275.0" y="159" text-anchor="middle" class="t" style="font-size:10px">MISSION_REQUEST_INT seq = 1</text><path class="ln" style="stroke-dasharray:5 4" d="M80.0 194 L466.0 194" marker-end="url(#ar)"/><text x="275.0" y="189" text-anchor="middle" class="t" style="font-size:10px">MISSION_ITEM_INT seq = 1 — втрачено</text><text x="275.0" y="228" text-anchor="middle" class="w t" style="font-size:10px">— таймаут: повтор того самого seq —</text><path class="ln" d="M470.0 254 L84.0 254" marker-end="url(#ar)"/><text x="275.0" y="249" text-anchor="middle" class="t" style="font-size:10px">MISSION_REQUEST_INT seq = 1</text><path class="ln" d="M80.0 284 L466.0 284" marker-end="url(#ar)"/><text x="275.0" y="279" text-anchor="middle" class="t" style="font-size:10px">MISSION_ITEM_INT seq = 1 … N−1</text><path class="lna" d="M470.0 314 L84.0 314" marker-end="url(#ara)"/><text x="275.0" y="309" text-anchor="middle" class="a t" style="font-size:10px">MISSION_ACK (ACCEPTED / помилка)</text><text x="704" y="78" text-anchor="end" class="m t" style="font-size:10px">клієнт оголошує розмір</text><text x="704" y="258" text-anchor="end" class="m t" style="font-size:10px">повтор — турбота запитувача</text><text x="704" y="318" text-anchor="end" class="m t" style="font-size:10px">без ACK місії немає</text></svg></div><figcaption class="gc-muted">Загрузка миссии ведёт аппарат: он сам запрашивает каждую команду по номеру, а потерянный ответ запрашивает повторно.</figcaption><div class="diagram__hint">Схему можно прокрутить по горизонтали</div></figure>
+<figure class="diagram" data-diagram="mission-jump-order"><div class="diagram__svg"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 362" width="100%" role="img" aria-labelledby="t" style="max-width:720px;display:block;margin:0 auto"><title id="t">Порядок выполнения миссии с DO_JUMP (прогон SITL 4.7.2)</title><style>text{font-family: var(--gc-font-mono, ui-monospace, Menlo, monospace); font-size: 12px;fill:currentColor} .m{fill:var(--gc-ink-muted, #8a93a3)} .a{fill:var(--gc-accent-hud, #5ef1d2)} .w{fill:var(--gc-signal-amber, #f0b24c)} .d{fill:var(--gc-signal-red, #e8636b)} .box{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:currentColor;stroke-width:1.2} .boxa{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6} .ln{stroke:currentColor;stroke-width:1.2;fill:none} .lna{stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6;fill:none} .lnm{stroke:var(--gc-ink-muted, #8a93a3);stroke-width:1;fill:none;stroke-dasharray:4 3} .t{font-size:11px} .b{font-weight:600}</style><defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker><marker id="ara" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--gc-accent-hud, #5ef1d2)"/></marker></defs><rect class="box" x="12" y="50" width="150" height="58" rx="6"/><text x="87.0" y="83.0" text-anchor="middle">1 TAKEOFF 20 м</text><rect class="box" x="190" y="50" width="150" height="58" rx="6"/><text x="265.0" y="76.0" text-anchor="middle">2 CHANGE_SPEED</text><text x="265.0" y="90.0" text-anchor="middle">5 м/с</text><rect class="boxa" x="368" y="50" width="150" height="58" rx="6"/><text x="443.0" y="69.0" text-anchor="middle" class="b">3 WP A</text><text x="443.0" y="83.0" text-anchor="middle" class="b">100 м N</text><text x="443.0" y="97.0" text-anchor="middle" class="b">≈ 21–23 с</text><rect class="boxa" x="546" y="50" width="150" height="58" rx="6"/><text x="621.0" y="69.0" text-anchor="middle" class="b">4 WP B</text><text x="621.0" y="83.0" text-anchor="middle" class="b">+100 м E</text><text x="621.0" y="97.0" text-anchor="middle" class="b">≈ 21 с</text><rect class="box" x="546" y="180" width="150" height="58" rx="6"/><text x="621.0" y="206.0" text-anchor="middle">5 DO_JUMP → 3</text><text x="621.0" y="220.0" text-anchor="middle">повтор 1</text><rect class="box" x="368" y="180" width="150" height="58" rx="6"/><text x="443.0" y="206.0" text-anchor="middle">6 CHANGE_SPEED</text><text x="443.0" y="220.0" text-anchor="middle">10 м/с</text><rect class="box" x="190" y="180" width="150" height="58" rx="6"/><text x="265.0" y="199.0" text-anchor="middle">7 WP C</text><text x="265.0" y="213.0" text-anchor="middle">100 м S</text><text x="265.0" y="227.0" text-anchor="middle">14.0 с</text><rect class="box" x="12" y="180" width="150" height="58" rx="6"/><text x="87.0" y="199.0" text-anchor="middle">8 WP D</text><text x="87.0" y="213.0" text-anchor="middle">дом</text><text x="87.0" y="227.0" text-anchor="middle">14.8 с</text><rect class="boxa" x="12" y="300" width="190" height="50" rx="6"/><text x="107.0" y="322.0" text-anchor="middle" class="b">конец списка:</text><text x="107.0" y="336.0" text-anchor="middle" class="b">LOITER в AUTO, 20 м</text><path class="ln" d="M162 79.0 L190 79.0" marker-end="url(#ar)"/><path class="ln" d="M340 79.0 L368 79.0" marker-end="url(#ar)"/><path class="ln" d="M518 79.0 L546 79.0" marker-end="url(#ar)"/><path class="ln" d="M621.0 108 L621.0 180" marker-end="url(#ar)"/><path class="ln" d="M546 209.0 L518 209.0" marker-end="url(#ar)"/><path class="ln" d="M368 209.0 L340 209.0" marker-end="url(#ar)"/><path class="ln" d="M190 209.0 L162 209.0" marker-end="url(#ar)"/><path class="lna" d="M87.0 238 L87.0 269.0 L107.0 269.0 L107.0 300" marker-end="url(#ara)"/><text x="368" y="258" text-anchor="start" class="w t">пунктир: 5 → 3 (Jump 1/1), A и B ещё раз</text><text x="240" y="320" text-anchor="start" class="m t">Миссия без RTL: через 20 с — AUTO, 20.0 м, заармлен.</text><text x="240" y="336" text-anchor="start" class="m t">100 м без остановки: 5 м/с ≈ 21 с, 10 м/с ≈ 14 с (≈ d/v + поворот).</text><path class="lna" style="stroke-dasharray:5 4" d="M566 180 L566 150 L498 150 L498 108" marker-end="url(#ara)"/></svg></div><figcaption class="gc-muted">Порядок выполнения миссии шага 4: DO-команды срабатывают на границе участков, DO_JUMP с повтором 1 даёт второй проход A–B, а без RTL в конце аппарат висит в AUTO.</figcaption><div class="diagram__hint">Схему можно прокрутить по горизонтали</div></figure>
 <figure class="diagram" data-diagram="mission-alt-frames"><div class="diagram__svg"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 184" width="100%" role="img" aria-labelledby="t" style="max-width:720px;display:block;margin:0 auto"><title id="t">Висота в місії: яку систему обрати</title><style>text{font-family: var(--gc-font-mono, ui-monospace, Menlo, monospace); font-size: 12px;fill:currentColor} .m{fill:var(--gc-ink-muted, #8a93a3)} .a{fill:var(--gc-accent-hud, #5ef1d2)} .w{fill:var(--gc-signal-amber, #f0b24c)} .d{fill:var(--gc-signal-red, #e8636b)} .box{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:currentColor;stroke-width:1.2} .boxa{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6} .ln{stroke:currentColor;stroke-width:1.2;fill:none} .lna{stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6;fill:none} .lnm{stroke:var(--gc-ink-muted, #8a93a3);stroke-width:1;fill:none;stroke-dasharray:4 3} .t{font-size:11px} .b{font-weight:600}</style><defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker><marker id="ara" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--gc-accent-hud, #5ef1d2)"/></marker></defs><text x="16" y="16" text-anchor="start" class="m t">Висота в місії: яку систему обрати</text><rect class="box" x="285.0" y="34" width="150.0" height="40" rx="6"/><text x="360.0" y="52.0" text-anchor="middle" style="font-size:10.5px">Рельєф під</text><text x="360.0" y="64.0" text-anchor="middle" style="font-size:10.5px">маршрутом?</text><path class="ln" d="M360.0 74 L360.0 89.0 L97.5 89.0 L97.5 104" marker-end="url(#ar)"/><text x="101.5" y="85.0" text-anchor="start" class="a t" style="font-size:10px">рівний</text><rect class="boxa" x="22.5" y="104" width="150.0" height="40" rx="18"/><text x="97.5" y="122.0" text-anchor="middle" class="b" style="font-size:10.5px">Relative</text><text x="97.5" y="134.0" text-anchor="middle" class="b" style="font-size:10.5px">від точки дому</text><path class="ln" d="M360.0 74 L360.0 89.0 L272.5 89.0 L272.5 104" marker-end="url(#ar)"/><text x="276.5" y="85.0" text-anchor="start" class="a t" style="font-size:10px">перепади</text><rect class="boxa" x="197.5" y="104" width="150.0" height="40" rx="18"/><text x="272.5" y="122.0" text-anchor="middle" class="b" style="font-size:10.5px">Terrain</text><text x="272.5" y="134.0" text-anchor="middle" class="b" style="font-size:10.5px">над рельєфом</text><path class="ln" d="M360.0 74 L360.0 89.0 L447.5 89.0 L447.5 104" marker-end="url(#ar)"/><text x="451.5" y="85.0" text-anchor="start" class="a t" style="font-size:10px">потрібна AMSL</text><rect class="box" x="372.5" y="104" width="150.0" height="40" rx="18"/><text x="447.5" y="122.0" text-anchor="middle" style="font-size:10.5px">Absolute</text><text x="447.5" y="134.0" text-anchor="middle" style="font-size:10.5px">над рівнем моря</text><path class="ln" d="M360.0 74 L360.0 89.0 L622.5 89.0 L622.5 104" marker-end="url(#ar)"/><text x="626.5" y="85.0" text-anchor="start" class="a t" style="font-size:10px">дім вище</text><rect class="box" x="547.5" y="104" width="150.0" height="40" rx="18"/><text x="622.5" y="122.0" text-anchor="middle" style="font-size:10.5px">Relative на</text><text x="622.5" y="134.0" text-anchor="middle" style="font-size:10.5px">схилі небезпечний</text></svg></div><figcaption class="gc-muted">Вибір системи висот у місії: Relative для рівної ділянки, Terrain при перепадах рельєфу, Absolute коли задано висоту над рівнем моря.</figcaption><div class="diagram__hint">Схему можно прокрутить по горизонтали</div></figure>
 
 <h2>Практика</h2>
@@ -115,6 +117,117 @@ print(&quot;mission upload:&quot;, ack.type)  # 0 = MAV_MISSION_ACCEPTED</code><
 <h4 class="md-subheading">Крок 3. Сценарії поверх маршруту</h4>
 <p>Напиши три сценарії, котрі беруть маршрут як параметр: «пролетіти», «пролетіти й зробити фото на кожній точці» (<code>DO_DIGICAM_CONTROL</code>), «пролетіти з відмовою мотора на другій точці» (тумблер із модуля про Lua). Один маршрут — три сценарії, і жодної правки координат.</p>
 <p><strong>Автоперевірка логу:</strong> <code>check_lab_log.py &lt;лог.bin&gt; --lab mission</code> — AUTO увімкнено, ≥ 3 навігаційних команд, повідомлення «Reached», RTL/LAND наприкінці, супутників ≥ 6, нема помилок EKF/GPS.</p>
+<p>Прогін цього кроку в SITL (ArduCopter 4.7.2); розбір і очікуваний результат — у російському оригіналі.</p>
+<pre class="cli-block"><code>&quot;&quot;&quot;Mission lab: upload, download to a QGC WPL 110 file and fly a mission with DO_CHANGE_SPEED and DO_JUMP
+in ArduCopter 4.7.2 SITL; no RTL at the end, to see what the copter does when the list runs out.
+Usage: python3 mission_lab.py ~/ardupilot   (run from an empty folder)&quot;&quot;&quot;
+import math, subprocess, sys, time
+from pymavlink import mavutil
+
+AP, C = sys.argv[1], mavutil.mavlink
+sitl = subprocess.Popen([AP + &quot;/build/sitl/bin/arducopter&quot;, &quot;--model&quot;, &quot;+&quot;, &quot;--speedup&quot;, &quot;10&quot;, &quot;-w&quot;,
+                         &quot;--defaults&quot;, AP + &quot;/Tools/autotest/default_params/copter.parm&quot;,
+                         &quot;--home&quot;, &quot;-35.363261,149.165230,584,353&quot;], stdout=open(&quot;sitl.out&quot;, &quot;w&quot;), stderr=subprocess.STDOUT)
+time.sleep(1)
+m = mavutil.mavlink_connection(&quot;tcp:127.0.0.1:5760&quot;); m.wait_heartbeat()
+m.mav.command_long_send(1, 1, C.MAV_CMD_SET_MESSAGE_INTERVAL, 0, 33, 200000, 0, 0, 0, 0, 0)  # GLOBAL_POSITION_INT 5 Hz
+LAT0, LON0, K = -35.363261, 149.165230, 111319.5   # home and metres per degree (latitude)
+ROUTE = {&quot;A&quot;: (100, 0), &quot;B&quot;: (100, 100), &quot;C&quot;: (0, 100), &quot;D&quot;: (0, 0)}   # data: north_m, east_m
+
+
+def nav(cmd, n=0, e=0, alt=20.0, p=(0, 0, 0, 0)):
+    lat, lon = LAT0 + n / K, LON0 + e / (K * math.cos(math.radians(LAT0)))
+    return [cmd, *p, int(lat * 1e7), int(lon * 1e7), alt]
+
+
+def do(cmd, *p):
+    return [cmd, *p, *[0] * (4 - len(p)), 0, 0, 0]
+
+
+plan = [nav(C.MAV_CMD_NAV_WAYPOINT, alt=0),           # 0: home, the vehicle overwrites it
+        nav(C.MAV_CMD_NAV_TAKEOFF),                    # 1
+        do(C.MAV_CMD_DO_CHANGE_SPEED, 1, 5, -1),       # 2: ground speed 5 m/s, throttle unchanged
+        nav(C.MAV_CMD_NAV_WAYPOINT, *ROUTE[&quot;A&quot;]),      # 3
+        nav(C.MAV_CMD_NAV_WAYPOINT, *ROUTE[&quot;B&quot;]),      # 4
+        do(C.MAV_CMD_DO_JUMP, 3, 1),                   # 5: back to 3, repeat once
+        do(C.MAV_CMD_DO_CHANGE_SPEED, 1, 10, -1),      # 6: 10 m/s
+        nav(C.MAV_CMD_NAV_WAYPOINT, *ROUTE[&quot;C&quot;]),      # 7
+        nav(C.MAV_CMD_NAV_WAYPOINT, *ROUTE[&quot;D&quot;])]      # 8: last item, no RTL after it
+F = C.MAV_FRAME_GLOBAL_RELATIVE_ALT_INT
+while m.recv_match(type=&quot;GLOBAL_POSITION_INT&quot;, blocking=True).time_boot_ms &lt; 10000:
+    pass                                                  # right after boot the upload is refused (ACK 4 = MAV_MISSION_NO_SPACE)
+m.mav.mission_count_send(1, 1, len(plan))                 # upload: the vehicle pulls each item by seq
+while (r := m.recv_match(type=[&quot;MISSION_REQUEST_INT&quot;, &quot;MISSION_REQUEST&quot;, &quot;MISSION_ACK&quot;], blocking=True)).get_type() != &quot;MISSION_ACK&quot;:
+    c, p1, p2, p3, p4, x, y, z = plan[r.seq]
+    m.mav.mission_item_int_send(1, 1, r.seq, F, c, 0, 1, p1, p2, p3, p4, x, y, z)
+print(f&quot;upload: MISSION_ACK type {r.type} (0 = MAV_MISSION_ACCEPTED)&quot;)
+m.mav.mission_request_list_send(1, 1)                     # download: we pull each item by seq
+n = m.recv_match(type=&quot;MISSION_COUNT&quot;, blocking=True).count
+with open(&quot;mission.waypoints&quot;, &quot;w&quot;) as f:
+    f.write(&quot;QGC WPL 110\n&quot;)
+    for s in range(n):
+        m.mav.mission_request_int_send(1, 1, s)
+        i = m.recv_match(type=&quot;MISSION_ITEM_INT&quot;, blocking=True)
+        f.write(f&quot;{i.seq}\t{int(s == 0)}\t{i.frame}\t{i.command}\t{i.param1:g}\t{i.param2:g}\t{i.param3:g}\t{i.param4:g}&quot;
+                f&quot;\t{i.x / 1e7:.7f}\t{i.y / 1e7:.7f}\t{i.z:g}\t{i.autocontinue}\n&quot;)
+m.mav.mission_ack_send(1, 1, 0)
+print(open(&quot;mission.waypoints&quot;).read(), end=&quot;&quot;)
+m.set_mode(&quot;GUIDED&quot;)
+while not m.motors_armed():
+    m.arducopter_arm(); m.recv_match(type=&quot;HEARTBEAT&quot;, blocking=True); m.recv_match(type=&quot;HEARTBEAT&quot;, blocking=True)
+m.set_mode(&quot;AUTO&quot;)
+m.mav.command_long_send(1, 1, C.MAV_CMD_MISSION_START, 0, 0, 0, 0, 0, 0, 0, 0)  # throttle stays low in this SITL
+t0, last, v, t = None, None, [], 0.0
+while True:
+    r = m.recv_match(type=[&quot;STATUSTEXT&quot;, &quot;GLOBAL_POSITION_INT&quot;], blocking=True)
+    if r.get_type() == &quot;GLOBAL_POSITION_INT&quot;:
+        t = r.time_boot_ms / 1000; t0 = t0 or t
+        v.append(math.hypot(r.vx, r.vy) / 100)
+    elif r.text.startswith((&quot;Mission:&quot;, &quot;Reached&quot;)):
+        t0 = t0 or t
+        leg = f&quot;  leg {t - last:5.1f} s, top speed {max(v):4.1f} m/s&quot; if r.text.startswith(&quot;Reached&quot;) and last else &quot;&quot;
+        print(f&quot;[{t - t0:6.1f} s] {r.text}{leg}&quot;)
+        if r.text.startswith(&quot;Reached&quot;):
+            last, v = t, []
+        elif last is None and &quot;WP&quot; in r.text:
+            last, v = t, []
+        if r.text == &quot;Reached command #8&quot;:
+            break
+end = t
+while (r := m.recv_match(type=&quot;GLOBAL_POSITION_INT&quot;, blocking=True)).time_boot_ms / 1000 &lt; end + 20:
+    pass
+hb = m.recv_match(type=&quot;HEARTBEAT&quot;, blocking=True)
+print(f&quot;+20 s after the last item: mode {mavutil.mode_string_v10(hb)}, armed {bool(hb.base_mode &amp; 128)}, &quot;
+      f&quot;alt {r.relative_alt / 1000:.1f} m, speed {math.hypot(r.vx, r.vy) / 100:.2f} m/s&quot;)
+sitl.terminate()</code></pre>
+<pre class="cli-block"><code>upload: MISSION_ACK type 0 (0 = MAV_MISSION_ACCEPTED)
+QGC WPL 110
+0	1	0	16	0	0	0	0	0.0000000	0.0000000	0	1
+1	0	3	22	0	0	0	0	-35.3632610	149.1652300	20	1
+2	0	0	178	1	5	-1	0	0.0000000	0.0000000	0	1
+3	0	3	16	0	0	0	0	-35.3623626	149.1652300	20	1
+4	0	3	16	0	0	0	0	-35.3623626	149.1663315	20	1
+5	0	0	177	3	1	0	0	0.0000000	0.0000000	0	1
+6	0	0	178	1	10	-1	0	0.0000000	0.0000000	0	1
+7	0	3	16	0	0	0	0	-35.3632610	149.1663315	20	1
+8	0	3	16	0	0	0	0	-35.3632610	149.1652300	20	1
+[   0.0 s] Mission: 1 Takeoff
+[  11.4 s] Mission: 2 ChangeSpeed
+[  11.4 s] Mission: 3 WP
+[  34.6 s] Reached command #3  leg  23.2 s, top speed  5.0 m/s
+[  34.6 s] Mission: 4 WP
+[  55.2 s] Reached command #4  leg  20.6 s, top speed  5.0 m/s
+[  55.2 s] Mission: 5 Jump 1/1
+[  55.2 s] Mission: 3 WP
+[  76.8 s] Reached command #3  leg  21.6 s, top speed  5.0 m/s
+[  76.8 s] Mission: 4 WP
+[  98.0 s] Reached command #4  leg  21.2 s, top speed  5.0 m/s
+[  98.0 s] Mission: 6 ChangeSpeed
+[  98.0 s] Mission: 7 WP
+[ 112.0 s] Reached command #7  leg  14.0 s, top speed  9.9 m/s
+[ 112.0 s] Mission: 8 WP
+[ 126.8 s] Reached command #8  leg  14.8 s, top speed  9.9 m/s
++20 s after the last item: mode AUTO, armed True, alt 20.0 m, speed 0.01 m/s</code></pre>
 
 <h2>Діагностика</h2>
 <div class="diag-groups"><article class="diag-item"><h4><strong>Симптом:</strong> AUTO не запускається, апарат стоїть</h4><ul><li>Можлива причина: місію не завантажено, нема <code>NAV_TAKEOFF</code> першою командою або апарат не заармлено.</li><li>Що зробити: прочитай місію з апарата, перевір першу команду й повідомлення GCS.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> апарат летить на 100 м вище, ніж мав би</h4><ul><li>Можлива причина: абсолютна висота замість відносної.</li><li>Що зробити: перевір frame кожної точки у файлі місії.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> RTL вертає не туди, де пілот</h4><ul><li>Можлива причина: дім — місце арму.</li><li>Що зробити: перевстановлюй дім перед зльотом після переїзду.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> завантаження місії зависає</h4><ul><li>Можлива причина: точки шлються без очікування запитів або неправильний <code>seq</code>.</li><li>Що зробити: відповідай на <code>MISSION_REQUEST(_INT)</code> за номером, перевір <code>MISSION_ACK</code>.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> в Auto апарат пішов у землю/набір після зміни майданчика</h4><ul><li>Можлива причина: абсолютні висоти в місії.</li><li>Що зробити: відносні/terrain; перевіряй профіль висот у GCS.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> після посадки в місії апарат не дизармиться або летить далі</h4><ul><li>Можлива причина: <code>MIS_OPTIONS</code> біт 2 (ContinueAfterLand), <code>LAND_*</code>.</li><li>Що зробити: виставляй свідомо; перевір у SITL.</li></ul></article></div>
@@ -124,6 +237,8 @@ print(&quot;mission upload:&quot;, ack.type)  # 0 = MAV_MISSION_ACCEPTED</code><
 
 <h2>Джерела</h2>
 <ul class="refs"><li><a href="https://ardupilot.org/copter/docs/common-planning-a-mission-with-waypoints-and-events.html" target="_blank" rel="noopener noreferrer">Planning a Mission with Waypoints and Events — ArduPilot Copter</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://ardupilot.org/copter/docs/mission-command-list.html" target="_blank" rel="noopener noreferrer">Copter Mission Command List — ArduPilot</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://mavlink.io/en/services/mission.html" target="_blank" rel="noopener noreferrer">MAVLink Mission Protocol</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://github.com/mavlink/mavlink/blob/master/message_definitions/v1.0/common.xml" target="_blank" rel="noopener noreferrer">MAVLink common message set (common.xml)</a> <span class="gc-tag" data-state="info">primary</span></li></ul>
+<h2>Задачі з числовою відповіддю</h2>
+<uav-tasks src="../tasks/ap-missions.json" module="ap-missions"></uav-tasks>
 <h2>Перевір себе</h2>
 <uav-quiz src="../quiz/ap-missions.json" module="ap-missions"></uav-quiz>
       </div>

@@ -45,7 +45,7 @@ Plus the **pre-arm checks** (`ARMING_SKIPCHK` in 4.7+, `ARMING_CHECK` before tha
 ### How they interact
 - Priority: **critical battery** overrides everything (Land); a low battery during a radio-loss RTL triggers the battery action (usually RTL as well, but it can be Land — set it deliberately).
 - RTL requires position: during an EKF failsafe the action degrades to Land/AltHold.
-- RTL first climbs to `RTL_ALT_M` (in 4.6 and earlier — `RTL_ALT` in cm; the minimum altitude above home for the return, 15 m by default; if the vehicle is already higher, it returns at its current altitude), flies home, loiters for `RTL_LOIT_TIME`, and lands (`RTL_ALT_FINAL = 0`). Obstacles taller than RTL_ALT_M mean a collision; the altitude geofence is yet another limiter.
+- RTL first climbs to `RTL_ALT_M` (in 4.6 and earlier — `RTL_ALT` in cm; the minimum altitude above home for the return, 15 m by default; if the vehicle is already higher, it returns at its current altitude), near home the cone `RTL_CONE_SLOPE` (3 by default) limits the altitude: h_ret = min(max(`RTL_ALT_M`, h), max(3·d, h)), d being the distance to home, so there is no climb right above home (see `ap-sitl`); flies home, loiters for `RTL_LOIT_TIME`, and lands (`RTL_ALT_FINAL = 0`). Obstacles taller than RTL_ALT_M mean a collision; the altitude geofence is yet another limiter.
 - SmartRTL returns along the path it flew (stored points, `SRTL_POINTS`) — good in a forest or between buildings, but it needs the point memory not to overflow.
 - Geofence: on a breach — the action; `FENCE_MARGIN` and an early warning; the pre-arm check won't let you arm outside the fence.
 - `FS_OPTIONS` “continue Auto on RC loss” is for BVLOS missions with an authorization; without one, keep it off.
