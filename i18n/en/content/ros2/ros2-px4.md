@@ -41,7 +41,7 @@ def topic(base, msg_cls):
 ```
 
 ### Offboard rules
-1. The external controller must continuously send `OffboardControlMode` (which setpoints are active: position, velocity, acceleration, attitude, body_rate…) at **more than 2 Hz** — this is the “proof of life.” The actual setpoints go in `TrajectorySetpoint` (position/velocity/acceleration/yaw, unused fields = NaN).
+1. The external controller must continuously send `OffboardControlMode` (which setpoints are active: position, velocity, acceleration, attitude, body_rate…) well **above 2 Hz** (the docs name 2 Hz; in the code PX4 loses the signal when the last message's timestamp is older than `COM_OF_LOSS_T`, see `px4-ros2`) — this is the “proof of life.” The actual setpoints go in `TrajectorySetpoint` (position/velocity/acceleration/yaw, unused fields = NaN).
 2. The stream must be running **before** the switch to Offboard (and before arming in Offboard), otherwise PX4 refuses.
 3. If the stream stops for longer than `COM_OF_LOSS_T`, PX4 leaves Offboard and switches to the mode set in `COM_OBL_RC_ACT` (Position, Altitude, Manual, Return, Land).
 4. Commands are `VehicleCommand` on `/fmu/in/vehicle_command`: arm with `VEHICLE_CMD_COMPONENT_ARM_DISARM` (param1 = 1), mode with `VEHICLE_CMD_DO_SET_MODE` (param1 = 1 — custom, param2 = 6 — Offboard), land with `VEHICLE_CMD_NAV_LAND`. The acknowledgement comes on `/fmu/out/vehicle_command_ack`; the state is in `VehicleStatus.arming_state`, `nav_state`.

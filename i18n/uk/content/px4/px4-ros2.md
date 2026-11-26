@@ -39,6 +39,8 @@ source_hash: df1e92027766
 
 Та сама філософія, що й GUIDED в ArduPilot: companion радить потоком, автопілот стежить за таймаутом, і пілот завжди може перехопити керування.
 
+{{diagram:px4-offboard-loss-timeline|PX4 выходит из Offboard через COM_OF_LOSS_T после метки последнего сообщения (4.9 → 5.9 с); с метками из прошлого Offboard недоступен вовсе, даже при потоке 10 Гц.}}
+
 ### Проти MAVLink/MAVSDK
 MAVLink через MAVSDK простіший для простих задач і не потребує ROS. uXRCE-DDS — коли потрібні ROS-екосистема (навігація, зір, планування), низька затримка й доступ до внутрішніх топіків.
 
@@ -88,6 +90,98 @@ rclpy.init(); rclpy.spin(Offboard())
 {{diagram:px4-offboard-seq|Offboard з ROS 2: потік OffboardControlMode і TrajectorySetpoint до перемикання режиму, потім команди режиму та арму; у разі обриву — failsafe.}}
 
 ## practice
+### Крок 0. Міст на папері: імена, частоти, навантаження, таймаут
+Виконується на будь-якому комп'ютері з Python 3 та інтернетом, без ROS. Скрипт читає `dds_topics.yaml` і файли `.msg` тегу PX4, будує імена ROS 2 із суфіксом `_vN`, розміри CDR, граничні частоти, навантаження на UART і момент втрати Offboard (`offboardCheck.cpp`: остання мітка + `COM_OF_LOSS_T`). Збережи як `px4_dds_lab.py`:
+```python
+import math, re, sys, urllib.request
+
+TAG = sys.argv[1] if len(sys.argv) > 1 else "v1.17.0"
+RAW = f"https://raw.githubusercontent.com/PX4/PX4-Autopilot/{TAG}/"
+SIZE = {"bool": 1, "char": 1, "int8": 1, "uint8": 1, "int16": 2, "uint16": 2,
+        "int32": 4, "uint32": 4, "float32": 4, "int64": 8, "uint64": 8, "float64": 8}
+MSG = {}
+
+def get(rel):
+    try:
+        return urllib.request.urlopen(RAW + rel, timeout=20).read().decode()
+    except Exception:
+        return None
+
+def msg(name):                       # -> (MESSAGE_VERSION, [(type, count)])
+    if name not in MSG:
+        ver, fields = 0, []
+        for line in (get(f"msg/versioned/{name}.msg") or get(f"msg/{name}.msg")).splitlines():
+            s = line.split("#")[0].strip()
+            m = re.match(r"uint32\s+MESSAGE_VERSION\s*=\s*(\d+)", s)
+            ver = int(m.group(1)) if m else ver
+            if s and "=" not in s:
+                t = s.split()[0]
+                n = int(t[t.index("[") + 1:-1]) if "[" in t else 1
+                fields.append((t.split("[")[0].split("/")[-1], n))
+        MSG[name] = (ver, fields)
+    return MSG[name]
+
+def cdr(name, off=0):                # same walk as Tools/msg/templates/ucdr/msg.h.em
+    for t, n in msg(name)[1]:
+        if t in SIZE:
+            off += (SIZE[t] - off % SIZE[t]) & (SIZE[t] - 1)
+            off += SIZE[t] * n
+        else:
+            for _ in range(n):
+                off = cdr(t, off)
+    return off
+
+sec, rows = None, []
+for line in get("src/modules/uxrce_dds_client/dds_topics.yaml").splitlines():
+    s = line.split("#")[0].strip()
+    if re.match(r"^[a-z_]+:$", s):
+        sec = s[:-1]
+    elif s.startswith("- topic:"):
+        rows.append([sec, s.split(":", 1)[1].strip(), None, None])
+    elif s.startswith("type:"):
+        rows[-1][2] = s.split("::")[-1]
+    elif s.startswith("rate_limit:"):
+        rows[-1][3] = float(s.split(":")[1])
+
+total = 0
+for sec, topic, typ, r in rows:
+    ver = msg(typ)[0]
+    name = topic + (f"_v{ver}" if ver else "")
+    if sec == "publications":
+        cap = 1000 / (int(1e3 / r) if r else 10)          # orb_set_interval in whole ms, 10 ms default
+        total += cap * (cdr(typ) + 23)                    # +23 B XRCE/serial overhead (course estimate)
+    if ver or typ in ("TrajectorySetpoint", "OffboardControlMode", "VehicleOdometry"):
+        print(f"{name:40s} v{ver}  {cdr(typ):4d} B" + (f"  cap {cap:5.1f} Hz" if sec == "publications" else ""))
+print(f"out {sum(r[0] == 'publications' for r in rows)}, in {sum(r[0] != 'publications' for r in rows)}; "
+      f"all /fmu/out at caps: {total:.0f} B/s vs {921600 // 10} B/s on UART 921600")
+
+LOSS_T = 1.0                                              # COM_OF_LOSS_T, s
+for hz, stop, shift in ((10, 5.0, 0.0), (2, 5.0, 0.0), (10, 99.0, -1.5)):
+    last = math.floor((stop - 1e-9) * hz) / hz + shift    # timestamp PX4 sees for the last message
+    print(f"{hz:2d} Hz, stop {stop:4.1f} s, stamp shift {shift:+.1f} s -> " +
+          ("never available" if shift <= -LOSS_T else f"signal lost at {last + LOSS_T:.1f} s"))
+```
+Вивід `python3 px4_dds_lab.py v1.17.0` (2026-11-26); з `v1.18.0` у списку з'являється `vehicle_status_v4`, а сума зростає до 117077 B/s:
+```
+/fmu/out/arming_check_request_v1         v1    16 B  cap   5.0 Hz
+/fmu/out/battery_status_v1               v1   176 B  cap   1.0 Hz
+/fmu/out/vehicle_local_position_v1       v1   216 B  cap  50.0 Hz
+/fmu/out/vehicle_odometry                v0   114 B  cap 100.0 Hz
+/fmu/out/vehicle_status_v1               v1    80 B  cap   5.0 Hz
+/fmu/out/airspeed_validated_v1           v1    44 B  cap  50.0 Hz
+/fmu/out/home_position_v1                v1    60 B  cap   5.0 Hz
+/fmu/in/arming_check_reply_v1            v1   227 B
+/fmu/in/offboard_control_mode            v0    15 B
+/fmu/in/trajectory_setpoint              v0    64 B
+/fmu/in/vehicle_attitude_setpoint_v1     v1    40 B
+/fmu/in/vehicle_mocap_odometry           v0   114 B
+/fmu/in/vehicle_visual_odometry          v0   114 B
+out 27, in 38; all /fmu/out at caps: 107495 B/s vs 92160 B/s on UART 921600
+10 Hz, stop  5.0 s, stamp shift +0.0 s -> signal lost at 5.9 s
+ 2 Hz, stop  5.0 s, stamp shift +0.0 s -> signal lost at 5.5 s
+10 Hz, stop 99.0 s, stamp shift -1.5 s -> never available
+```
+
 ### Крок 1. Оточення
 ```
 # ROS 2 Jazzy (Ubuntu 24.04) встановлено й source'нуто; запасний варіант — Humble (22.04)

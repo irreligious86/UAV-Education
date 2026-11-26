@@ -53,6 +53,8 @@ Frying a flight controller port is easier than it seems: 5 V on a 3.3 V pin, swa
 
 {{diagram:i2c-transaction|An I2C transaction bit by bit — exactly what the logic analyzer sees when “the sensor can't be found.”}}
 
+{{diagram:chart-i2c-pullup-window|Подтяжка должна лежать между красной линией (0.97 кОм) и кривой режима: при 100 пФ одиночные 4.7 кОм для 400 кГц слишком слабы, а две параллельные (2.35 кОм) — в окне.}}
+
 ### DroneCAN: when and how
 When: the aircraft is large (long wires → UART/I2C pick up noise), there are many devices, you need ESC and sensor telemetry on one bus, redundancy. In ArduPilot: `CAN_P1_DRIVER = 1` (enable port 1), `CAN_D1_PROTOCOL = 1` (DroneCAN), reboot; GPS `GPS_TYPE = 9` (`GPS1_TYPE` in 4.6+) — DroneCAN, the compass is detected automatically. The bus: twisted pair, 120 Ω terminators at both ends (many devices have a terminator jumper), node power per the spec (usually 5 V), unique node IDs (the autopilot hands them out as a DNA server with dynamic allocation; `CAN_D1_UC_NODE` is the autopilot's own node ID).
 
@@ -68,11 +70,99 @@ When: the aircraft is large (long wires → UART/I2C pick up noise), there are m
 {{diagram:periph-connect-flow|Мультиметр и smoke stopper — до прошивки; если данных нет, следующий шаг — анализатор на линии: есть ли байты, какая скорость, нет ли инверсии.}}
 
 ## practice
+### Step 0. Bus calculation before soldering
+Checks four decisions from the theory: the I2C pull-up window versus bus capacitance, sensor address overlaps, the UART load of UBX-NAV-PVT and the CAN bus resistance. Runs on any computer with Python 3; save as `periph_lab.py`:
+```python
+"""Peripheral bus checks: I2C pull-up window, address conflicts, UART load of a GPS, CAN termination."""
+import itertools
+
+# I2C: TI SLVA689 (from the I2C-bus spec): Rp_min = (Vcc - VOL) / IOL, Rp_max = tr / (0.8473 * Cb)
+VCC, VOL, IOL = 3.3, 0.4, 3e-3
+TR = {"100 kHz": 1000e-9, "400 kHz": 300e-9, "1 MHz (Fm+)": 120e-9}
+rp_min = (VCC - VOL) / IOL
+print(f"1) I2C pull-up window at {VCC} V: Rp_min = {rp_min:.0f} Ohm")
+for cb_pf in (50, 100, 200, 400):
+    cells = []
+    for mode, tr in TR.items():
+        rmax = tr / (0.8473 * cb_pf * 1e-12)
+        bad = "Fm+" not in mode and rmax < rp_min          # Fm+: the I2C spec (UM10204) allows 20 mA sink, so Rp_min is lower; not checked here
+        cells.append(f"{mode} {rmax / 1000:5.2f} k" + (" (impossible)" if bad else ""))
+    print(f"   Cb {cb_pf:3d} pF: Rp_max " + " | ".join(cells))
+
+
+def par(*r):
+    return 1 / sum(1 / x for x in r)
+
+
+print(f"   pull-ups in parallel: FC 4.7k || GPS 4.7k = {par(4700, 4700):.0f} Ohm, "
+      f"+ third 2.2k = {par(4700, 4700, 2200):.0f} Ohm (min {rp_min:.0f})")
+for r in (4700, 2350, 1000):
+    tr = 0.8473 * r * 100e-12
+    print(f"   rise time with {r} Ohm and 100 pF: {tr * 1e9:.0f} ns")
+
+# Address conflicts (7-bit) from ArduPilot 4.7.2 drivers
+DEV = {"QMC5883L": [0x0D], "IST8310": [0x0C, 0x0D, 0x0E, 0x0F], "HMC5883": [0x1E],
+       "MS5611": [0x76, 0x77], "BMP280": [0x76, 0x77], "MS4525DO": [0x28, 0x36, 0x46], "PX4Flow": [0x42]}
+print("\n2) I2C address overlaps (possible addresses per driver):")
+for a, b in itertools.combinations(DEV, 2):
+    common = sorted(set(DEV[a]) & set(DEV[b]))
+    if common:
+        print(f"   {a} / {b}: " + ", ".join(f"0x{x:02X}" for x in common))
+
+# UART load: UBX-NAV-PVT payload is the ubx_nav_pvt struct in AP_GPS_UBLOX.h
+pvt = 4 + 2 + 5 * 1 + 1 + 4 + 4 + 4 * 1 + 2 * 4 + 2 * 4 + 2 * 4 + 4 * 4 + 4 + 4 + 4 + 2 + 1 + 5 + 4 + 2 + 2
+frame = pvt + 8                                   # sync 2 + class 1 + id 1 + length 2 + checksum 2
+print(f"\n3) UBX-NAV-PVT: payload {pvt} B, frame {frame} B")
+for baud in (9600, 38400, 115200, 230400):
+    for hz in (5, 10):
+        load = frame * hz * 10 / baud
+        print(f"   {baud:>6} baud, {hz:>2} Hz: {100 * load:5.1f} % of the line")
+
+print("\n4) CAN: resistance CAN_H-CAN_L, power off")
+for n in (1, 2, 3):
+    print(f"   {n} x 120 Ohm -> {120 / n:.0f} Ohm" + ("  <- correct" if n == 2 else ""))
+for rate in (1_000_000, 500_000):
+    print(f"   {rate // 1000} kbit/s: bit time {1e9 / rate:.0f} ns")
+```
+Output of `python3 periph_lab.py` (2026-11-26):
+```
+1) I2C pull-up window at 3.3 V: Rp_min = 967 Ohm
+   Cb  50 pF: Rp_max 100 kHz 23.60 k | 400 kHz  7.08 k | 1 MHz (Fm+)  2.83 k
+   Cb 100 pF: Rp_max 100 kHz 11.80 k | 400 kHz  3.54 k | 1 MHz (Fm+)  1.42 k
+   Cb 200 pF: Rp_max 100 kHz  5.90 k | 400 kHz  1.77 k | 1 MHz (Fm+)  0.71 k
+   Cb 400 pF: Rp_max 100 kHz  2.95 k | 400 kHz  0.89 k (impossible) | 1 MHz (Fm+)  0.35 k
+   pull-ups in parallel: FC 4.7k || GPS 4.7k = 2350 Ohm, + third 2.2k = 1136 Ohm (min 967)
+   rise time with 4700 Ohm and 100 pF: 398 ns
+   rise time with 2350 Ohm and 100 pF: 199 ns
+   rise time with 1000 Ohm and 100 pF: 85 ns
+
+2) I2C address overlaps (possible addresses per driver):
+   QMC5883L / IST8310: 0x0D
+   MS5611 / BMP280: 0x76, 0x77
+
+3) UBX-NAV-PVT: payload 92 B, frame 100 B
+     9600 baud,  5 Hz:  52.1 % of the line
+     9600 baud, 10 Hz: 104.2 % of the line
+    38400 baud,  5 Hz:  13.0 % of the line
+    38400 baud, 10 Hz:  26.0 % of the line
+   115200 baud,  5 Hz:   4.3 % of the line
+   115200 baud, 10 Hz:   8.7 % of the line
+   230400 baud,  5 Hz:   2.2 % of the line
+   230400 baud, 10 Hz:   4.3 % of the line
+
+4) CAN: resistance CAN_H-CAN_L, power off
+   1 x 120 Ohm -> 120 Ohm
+   2 x 120 Ohm -> 60 Ohm  <- correct
+   3 x 120 Ohm -> 40 Ohm
+   1000 kbit/s: bit time 1000 ns
+   500 kbit/s: bit time 2000 ns
+```
+
 ### Step 1. GPS with compass (UART + I2C)
 Connect the GPS to UARTx (TX↔RX), the compass to SDA/SCL, 5 V power. Betaflight: Ports → GPS on UARTx, Configuration → GPS UBLOX, 57600/115200; enable the magnetometer. ArduPilot: `SERIALx_PROTOCOL = 5`, `GPS_TYPE = 2` (`GPS1_TYPE` in 4.6+, u-blox), compass — autodetect. Check: NSats ≥ 6 outdoors, the heading rotates.
 
 ### Step 2. ESC telemetry
-The common telemetry wire from all ESCs → RX of a free UART. Betaflight: Ports → ESC on UARTx, `esc_sensor` enabled; check — RPM/temperature on the Motors tab without props. ArduPilot: `SERIALx_PROTOCOL = 16`.
+The common telemetry wire from all ESCs → RX of a free UART. Betaflight: Ports → ESC on UARTx, `feature ESC_SENSOR` (Configuration → ESC Sensor) enabled; check — RPM/temperature on the Motors tab without props. ArduPilot: `SERIALx_PROTOCOL = 16`.
 
 ### Step 3. A rangefinder or another UART/I2C device
 Follow the procedure from the theory; check in the firmware (ArduPilot `RNGFND1_TYPE`, Betaflight/INAV — the sensors tab).

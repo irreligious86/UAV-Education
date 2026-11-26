@@ -54,6 +54,8 @@ Pixhawk (PX4) — стабілізація, EKF, failsafe, місії; Jetson �
 
 На одному порту живе щось одне. Потрібні обидва — MAVLink на TELEM1/USB/Ethernet, DDS на TELEM2.
 
+{{diagram:jetson-link-choice|Ethernet снимает вопрос полосы; на UART DDS со всеми топиками не помещается в 921600 (117 %), поэтому либо 3 Мбод и контроль Payload tx, либо MAVLink, а два протокола — на разных портах.}}
+
 ### Розібраний приклад: бюджет затримки
 Камера CSI 60 кадр/с (до 16 мс до готового кадру) → TensorRT YOLO-nano FP16 ~12 мс → трекер 2 мс → DDS через UART 921600 ~2 мс → контролер швидкості PX4 (стала часу ~0.5 с). Чиста затримка ~35 мс: контур стеження з Kp ≈ 1 1/с стійкий із запасом (модуль «Стеження»). USB-камера з MJPEG додає 40–80 мс, Wi-Fi-міст замість дроту — 20–50 мс із джитером; дві такі «дрібниці» з'їдають увесь запас. Звідси правило: CSI і провід, не USB і радіо.
 
@@ -62,6 +64,84 @@ Pixhawk (PX4) — стабілізація, EKF, failsafe, місії; Jetson �
 {{diagram:px4-jetson-link|PX4 і Jetson: камера на Jetson, зв'язок із польотним контролером через TELEM2 за MAVLink або uXRCE-DDS.}}
 
 ## practice
+### Крок 0. Бюджет каналу й живлення (розрахунок, без заліза)
+Запускається на будь-якому комп'ютері з Python 3. `DDS_ALL_CAPS` і `DDS_TYPICAL` — результат лабораторної `px4-ros2` для PX4 1.17.0. Збережи як `link_lab.py`:
+```python
+"""Jetson <-> PX4 link budget: UART capacity, MAVLink auto rate, uXRCE-DDS load, agent IP, latency, power."""
+import ipaddress
+import struct
+
+BAUDS = (921600, 1500000, 3000000)       # 921600 = SER_TEL2_BAUD default; 3000000 = uxrce_dds_client -b max
+DDS_ALL_CAPS = 107495                    # B/s, px4-ros2 lab: all 27 /fmu/out topics of PX4 1.17.0 at their caps
+DDS_TYPICAL = {"vehicle_odometry": 13700, "vehicle_local_position_v1": 11950,
+               "vehicle_status_v1": 515, "timesync_status": 670}     # same lab, B/s at cap
+SETPOINT_FRAME = 64 + 23                 # TrajectorySetpoint CDR 64 B + ~23 B XRCE/serial overhead (course estimate)
+
+print("1) UART capacity (8N1 = 10 bit per byte) and MAV_1_RATE = 0 (PX4 uses baud/20):")
+for b in BAUDS:
+    print(f"   {b:>8} baud: {b // 10:>6} B/s raw, MAVLink auto rate {b // 20:>6} B/s")
+
+print("\n2) uXRCE-DDS load on the same UART:")
+typ = sum(DDS_TYPICAL.values())
+for b in BAUDS:
+    print(f"   {b:>8}: all topics at caps {100 * DDS_ALL_CAPS / (b / 10):5.0f} %, "
+          f"odometry+local_position+status+timesync {100 * typ / (b / 10):4.0f} %")
+
+print("\n3) Time to send one TrajectorySetpoint frame (%d B):" % SETPOINT_FRAME)
+for b in BAUDS:
+    print(f"   {b:>8}: {SETPOINT_FRAME * 10 / b * 1000:.2f} ms")
+
+print("\n4) UXRCE_DDS_AG_IP is the IPv4 address as a signed int32:")
+for ip in ("127.0.0.1", "192.168.1.2", "10.41.10.1"):
+    u = int(ipaddress.IPv4Address(ip))
+    s = struct.unpack("<i", struct.pack("<I", u))[0]
+    print(f"   {ip:>12} -> {s}")
+
+print("\n5) Latency budget camera -> setpoint, ms (module worked example):")
+chains = {"CSI + wire": [16, 12, 2, 2], "USB MJPEG + wire": [16 + 40, 12, 2, 2], "USB MJPEG + Wi-Fi": [16 + 80, 12, 2, 2 + 50]}
+for name, parts in chains.items():
+    print(f"   {name:18s} {' + '.join(map(str, parts))} = {sum(parts)} ms")
+
+print("\n6) Battery-side current of the Jetson DC-DC (module + 5 W carrier/camera, efficiency 0.9):")
+for mode_w in (15, 25):
+    for cells, vmin in ((4, 13.2), (6, 19.8)):
+        i = (mode_w + 5) / 0.9 / vmin
+        print(f"   {mode_w} W mode, {cells}S at {vmin} V: {i:.2f} A, size the converter for {1.5 * (mode_w + 5):.0f} W")
+```
+Вивід `python3 link_lab.py` (2026-11-26):
+```
+1) UART capacity (8N1 = 10 bit per byte) and MAV_1_RATE = 0 (PX4 uses baud/20):
+     921600 baud:  92160 B/s raw, MAVLink auto rate  46080 B/s
+    1500000 baud: 150000 B/s raw, MAVLink auto rate  75000 B/s
+    3000000 baud: 300000 B/s raw, MAVLink auto rate 150000 B/s
+
+2) uXRCE-DDS load on the same UART:
+     921600: all topics at caps   117 %, odometry+local_position+status+timesync   29 %
+    1500000: all topics at caps    72 %, odometry+local_position+status+timesync   18 %
+    3000000: all topics at caps    36 %, odometry+local_position+status+timesync    9 %
+
+3) Time to send one TrajectorySetpoint frame (87 B):
+     921600: 0.94 ms
+    1500000: 0.58 ms
+    3000000: 0.29 ms
+
+4) UXRCE_DDS_AG_IP is the IPv4 address as a signed int32:
+      127.0.0.1 -> 2130706433
+    192.168.1.2 -> -1062731518
+     10.41.10.1 -> 170461697
+
+5) Latency budget camera -> setpoint, ms (module worked example):
+   CSI + wire         16 + 12 + 2 + 2 = 32 ms
+   USB MJPEG + wire   56 + 12 + 2 + 2 = 72 ms
+   USB MJPEG + Wi-Fi  96 + 12 + 2 + 52 = 162 ms
+
+6) Battery-side current of the Jetson DC-DC (module + 5 W carrier/camera, efficiency 0.9):
+   15 W mode, 4S at 13.2 V: 1.68 A, size the converter for 30 W
+   15 W mode, 6S at 19.8 V: 1.12 A, size the converter for 30 W
+   25 W mode, 4S at 13.2 V: 2.53 A, size the converter for 45 W
+   25 W mode, 6S at 19.8 V: 1.68 A, size the converter for 45 W
+```
+
 ### Крок 1. Підготовка Jetson
 ```bash
 sudo usermod -aG dialout $USER        # access to serial ports (log out and in)
@@ -125,7 +205,7 @@ User=nvidia
 [Install]
 WantedBy=multi-user.target
 ```
-`sudo systemctl enable --now xrce-agent`; перевірити, що після `sudo kill` агента топіки повертаються за 2–3 с. Шлях до бінарника, користувач і порт — свої.
+`sudo systemctl enable --now xrce-agent`; перевірити, що після `sudo kill` агента топіки повертаються самі, у межах ~10 с (орієнтир курсу: 2 с `RestartSec` + ~3 с на три пропущені пінги + перестворення сесії); заміряй і запиши свій час. Шлях до бінарника, користувач і порт — свої.
 
 ### Крок 6. Тепло під навантаженням
 Запустити детектор (модуль «Комп'ютерний зір») на 20 хвилин у корпусі, писати `tegrastats --interval 1000 --logfile tegra.log`. Знайти момент тротлінгу (частота GPU падає, температура біля межі) і затримку детекції до і після.

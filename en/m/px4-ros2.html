@@ -63,6 +63,7 @@
 <h4 class="md-subheading">Offboard: three messages</h4>
 <ol><li><strong>`OffboardControlMode`</strong> — tells PX4 *what* you control (position, velocity, acceleration, attitude, rates). It must be streamed <strong>before</strong> switching to Offboard and the whole time you are in it; below ~2 Hz PX4 exits Offboard.</li><li><strong>`TrajectorySetpoint`</strong> — the target itself: position/velocity in NED (Z points down!), yaw.</li><li><strong>`VehicleCommand`</strong> — commands: change mode (<code>VEHICLE_CMD_DO_SET_MODE</code>, Offboard = base 1, custom 6), arm (<code>VEHICLE_CMD_COMPONENT_ARM_DISARM</code>). The acknowledgment is <code>VehicleCommandAck</code>.</li></ol>
 <p>Same philosophy as GUIDED in ArduPilot: the companion gives advice as a stream, the autopilot watches the timeout, and the pilot can always take over.</p>
+<figure class="diagram" data-diagram="px4-offboard-loss-timeline"><div class="diagram__svg"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 172" width="100%" role="img" aria-labelledby="t" style="max-width:720px;display:block;margin:0 auto"><title id="t">Выход из Offboard: последняя метка + COM_OF_LOSS_T (1 с), а не «частота ниже 2 Гц»</title><style>text{font-family: var(--gc-font-mono, ui-monospace, Menlo, monospace); font-size: 12px;fill:currentColor} .m{fill:var(--gc-ink-muted, #8a93a3)} .a{fill:var(--gc-accent-hud, #5ef1d2)} .w{fill:var(--gc-signal-amber, #f0b24c)} .d{fill:var(--gc-signal-red, #e8636b)} .box{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:currentColor;stroke-width:1.2} .boxa{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6} .ln{stroke:currentColor;stroke-width:1.2;fill:none} .lna{stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6;fill:none} .lnm{stroke:var(--gc-ink-muted, #8a93a3);stroke-width:1;fill:none;stroke-dasharray:4 3} .t{font-size:11px} .b{font-weight:600}</style><defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker><marker id="ara" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--gc-accent-hud, #5ef1d2)"/></marker></defs><text x="16" y="16" text-anchor="start" class="m t">Выход из Offboard: последняя метка + COM_OF_LOSS_T (1 с), а не «частота ниже 2 Гц»</text><text x="112" y="67" text-anchor="end" style="font-size:11px">Узел, 10 Гц</text><line class="lnm" x1="120" y1="78" x2="704" y2="78"/><rect class="boxa" x="120.0" y="51" width="365.0" height="22" rx="3"/><text x="302.5" y="66" text-anchor="middle" class="b" style="font-size:10px">OffboardControlMode + уставка</text><rect class="box" x="485.0" y="51" width="219.0" height="22" rx="3"/><text x="594.5" y="66" text-anchor="middle" style="font-size:10px">тишина</text><text x="112" y="101" text-anchor="end" style="font-size:11px">PX4 1.17</text><line class="lnm" x1="120" y1="112" x2="704" y2="112"/><rect class="box" x="120.0" y="85" width="73.0" height="22" rx="3"/><text x="156.5" y="100" text-anchor="middle" style="font-size:10px">поток</text><rect class="boxa" x="193.0" y="85" width="357.7" height="22" rx="3"/><text x="371.85" y="100" text-anchor="middle" class="b" style="font-size:10px">Offboard</text><rect class="box" x="550.7" y="85" width="153.3" height="22" rx="3"/><text x="627.35" y="100" text-anchor="middle" style="font-size:10px">COM_OBL_RC_ACT</text><text x="112" y="135" text-anchor="end" style="font-size:11px">метки −1.5 с</text><line class="lnm" x1="120" y1="146" x2="704" y2="146"/><rect class="box" x="120.0" y="119" width="584.0" height="22" rx="3"/><text x="412.0" y="134" text-anchor="middle" style="font-size:10px">сигнал «старый» всегда: в Offboard не войти</text><line class="lnm" x1="120.0" y1="40" x2="120.0" y2="152"/><text x="120.0" y="166" text-anchor="middle" class="m t" style="font-size:10px">0 s</text><line class="lnm" x1="236.8" y1="40" x2="236.8" y2="152"/><text x="236.8" y="166" text-anchor="middle" class="m t" style="font-size:10px">1.6 с</text><line class="lnm" x1="353.6" y1="40" x2="353.6" y2="152"/><text x="353.6" y="166" text-anchor="middle" class="m t" style="font-size:10px">3.2 с</text><line class="lnm" x1="470.4" y1="40" x2="470.4" y2="152"/><text x="470.4" y="166" text-anchor="middle" class="m t" style="font-size:10px">4.8 с</text><line class="lnm" x1="587.2" y1="40" x2="587.2" y2="152"/><text x="587.2" y="166" text-anchor="middle" class="m t" style="font-size:10px">6.4 с</text><line class="lnm" x1="704.0" y1="40" x2="704.0" y2="152"/><text x="704.0" y="166" text-anchor="middle" class="m t" style="font-size:10px">8 с</text><line class="lna" x1="477.7" y1="38" x2="477.7" y2="152"/><text x="481.70000000000005" y="34" text-anchor="start" class="a t" style="font-size:10px">4.9 с</text><line class="lna" x1="550.7" y1="38" x2="550.7" y2="152"/><text x="554.7" y="34" text-anchor="start" class="a t" style="font-size:10px">5.9 с: откат</text></svg></div><figcaption class="gc-muted">PX4 выходит из Offboard через COM_OF_LOSS_T после метки последнего сообщения (4.9 → 5.9 с); с метками из прошлого Offboard недоступен вовсе, даже при потоке 10 Гц.</figcaption><div class="diagram__hint">Схему можно прокрутить по горизонтали</div></figure>
 <h4 class="md-subheading">Versus MAVLink/MAVSDK</h4>
 <p>MAVLink via MAVSDK is simpler for simple tasks and doesn&#x27;t require ROS. uXRCE-DDS is for when you need the ROS ecosystem (navigation, vision, planning), low latency and access to internal topics.</p>
 <h4 class="md-subheading">Setting up the bridge on a real aircraft</h4>
@@ -106,6 +107,93 @@ rclpy.init(); rclpy.spin(Offboard())</code></pre>
 <figure class="diagram" data-diagram="px4-offboard-seq"><div class="diagram__svg"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 330" width="100%" role="img" aria-labelledby="t" style="max-width:720px;display:block;margin:0 auto"><title id="t">Offboard via uXRCE-DDS: three messages</title><style>text{font-family: var(--gc-font-mono, ui-monospace, Menlo, monospace); font-size: 12px;fill:currentColor} .m{fill:var(--gc-ink-muted, #8a93a3)} .a{fill:var(--gc-accent-hud, #5ef1d2)} .w{fill:var(--gc-signal-amber, #f0b24c)} .d{fill:var(--gc-signal-red, #e8636b)} .box{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:currentColor;stroke-width:1.2} .boxa{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6} .ln{stroke:currentColor;stroke-width:1.2;fill:none} .lna{stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6;fill:none} .lnm{stroke:var(--gc-ink-muted, #8a93a3);stroke-width:1;fill:none;stroke-dasharray:4 3} .t{font-size:11px} .b{font-weight:600}</style><defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker><marker id="ara" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--gc-accent-hud, #5ef1d2)"/></marker></defs><text x="16" y="16" text-anchor="start" class="m t">Offboard via uXRCE-DDS: three messages</text><rect class="box" x="20.0" y="26" width="120" height="26" rx="5"/><text x="80.0" y="43" text-anchor="middle" class="b" style="font-size:11px">ROS 2 node</text><line class="lnm" x1="80.0" y1="52" x2="80.0" y2="320"/><rect class="box" x="410.0" y="26" width="120" height="26" rx="5"/><text x="470.0" y="43" text-anchor="middle" class="b" style="font-size:11px">PX4</text><line class="lnm" x1="470.0" y1="52" x2="470.0" y2="320"/><path class="lna" d="M80.0 74 L466.0 74" marker-end="url(#ara)"/><text x="275.0" y="69" text-anchor="middle" class="a t" style="font-size:10px">OffboardControlMode ≥ 2 Hz</text><path class="lna" d="M80.0 104 L466.0 104" marker-end="url(#ara)"/><text x="275.0" y="99" text-anchor="middle" class="a t" style="font-size:10px">TrajectorySetpoint (NED)</text><text x="275.0" y="138" text-anchor="middle" class="w t" style="font-size:10px">— streaming ≥ 1 s —</text><path class="ln" d="M80.0 164 L466.0 164" marker-end="url(#ar)"/><text x="275.0" y="159" text-anchor="middle" class="t" style="font-size:10px">VehicleCommand: OFFBOARD mode</text><path class="ln" d="M80.0 194 L466.0 194" marker-end="url(#ar)"/><text x="275.0" y="189" text-anchor="middle" class="t" style="font-size:10px">VehicleCommand: ARM</text><path class="ln" style="stroke-dasharray:5 4" d="M470.0 224 L84.0 224" marker-end="url(#ar)"/><text x="275.0" y="219" text-anchor="middle" class="t" style="font-size:10px">VehicleStatus</text><text x="275.0" y="258" text-anchor="middle" class="w t" style="font-size:10px">— stream lost —</text><text x="275.0" y="288" text-anchor="middle" class="w t" style="font-size:10px">— COM_OF_LOSS_T → failsafe —</text><text x="704" y="108" text-anchor="end" class="m t" style="font-size:10px">ENU/FLU ROS → NED/FRD PX4</text><text x="704" y="168" text-anchor="end" class="m t" style="font-size:10px">no flow, mode won&#x27;t engage</text><text x="704" y="288" text-anchor="end" class="m t" style="font-size:10px">COM_OBL_RC_ACT — action</text></svg></div><figcaption class="gc-muted">Offboard from ROS 2: a stream of OffboardControlMode and TrajectorySetpoint before the mode switch, then the mode and arm commands; on a link loss — failsafe.</figcaption><div class="diagram__hint">Схему можно прокрутить по горизонтали</div></figure>
 
 <h2>Practice</h2>
+<h4 class="md-subheading">Step 0. The bridge on paper: names, rates, load, timeout</h4>
+<p>Runs anywhere with Python 3 and internet, no ROS needed. The script reads <code>dds_topics.yaml</code> and the <code>.msg</code> files of a PX4 tag, builds the ROS 2 names with the <code>_vN</code> suffix, the CDR sizes, the rate caps and the UART load, and the offboard-loss time (<code>offboardCheck.cpp</code>: last timestamp + <code>COM_OF_LOSS_T</code>). Save as <code>px4_dds_lab.py</code>:</p>
+<pre class="cli-block"><code>import math, re, sys, urllib.request
+
+TAG = sys.argv[1] if len(sys.argv) &gt; 1 else &quot;v1.17.0&quot;
+RAW = f&quot;https://raw.githubusercontent.com/PX4/PX4-Autopilot/{TAG}/&quot;
+SIZE = {&quot;bool&quot;: 1, &quot;char&quot;: 1, &quot;int8&quot;: 1, &quot;uint8&quot;: 1, &quot;int16&quot;: 2, &quot;uint16&quot;: 2,
+        &quot;int32&quot;: 4, &quot;uint32&quot;: 4, &quot;float32&quot;: 4, &quot;int64&quot;: 8, &quot;uint64&quot;: 8, &quot;float64&quot;: 8}
+MSG = {}
+
+def get(rel):
+    try:
+        return urllib.request.urlopen(RAW + rel, timeout=20).read().decode()
+    except Exception:
+        return None
+
+def msg(name):                       # -&gt; (MESSAGE_VERSION, [(type, count)])
+    if name not in MSG:
+        ver, fields = 0, []
+        for line in (get(f&quot;msg/versioned/{name}.msg&quot;) or get(f&quot;msg/{name}.msg&quot;)).splitlines():
+            s = line.split(&quot;#&quot;)[0].strip()
+            m = re.match(r&quot;uint32\s+MESSAGE_VERSION\s*=\s*(\d+)&quot;, s)
+            ver = int(m.group(1)) if m else ver
+            if s and &quot;=&quot; not in s:
+                t = s.split()[0]
+                n = int(t[t.index(&quot;[&quot;) + 1:-1]) if &quot;[&quot; in t else 1
+                fields.append((t.split(&quot;[&quot;)[0].split(&quot;/&quot;)[-1], n))
+        MSG[name] = (ver, fields)
+    return MSG[name]
+
+def cdr(name, off=0):                # same walk as Tools/msg/templates/ucdr/msg.h.em
+    for t, n in msg(name)[1]:
+        if t in SIZE:
+            off += (SIZE[t] - off % SIZE[t]) &amp; (SIZE[t] - 1)
+            off += SIZE[t] * n
+        else:
+            for _ in range(n):
+                off = cdr(t, off)
+    return off
+
+sec, rows = None, []
+for line in get(&quot;src/modules/uxrce_dds_client/dds_topics.yaml&quot;).splitlines():
+    s = line.split(&quot;#&quot;)[0].strip()
+    if re.match(r&quot;^[a-z_]+:$&quot;, s):
+        sec = s[:-1]
+    elif s.startswith(&quot;- topic:&quot;):
+        rows.append([sec, s.split(&quot;:&quot;, 1)[1].strip(), None, None])
+    elif s.startswith(&quot;type:&quot;):
+        rows[-1][2] = s.split(&quot;::&quot;)[-1]
+    elif s.startswith(&quot;rate_limit:&quot;):
+        rows[-1][3] = float(s.split(&quot;:&quot;)[1])
+
+total = 0
+for sec, topic, typ, r in rows:
+    ver = msg(typ)[0]
+    name = topic + (f&quot;_v{ver}&quot; if ver else &quot;&quot;)
+    if sec == &quot;publications&quot;:
+        cap = 1000 / (int(1e3 / r) if r else 10)          # orb_set_interval in whole ms, 10 ms default
+        total += cap * (cdr(typ) + 23)                    # +23 B XRCE/serial overhead (course estimate)
+    if ver or typ in (&quot;TrajectorySetpoint&quot;, &quot;OffboardControlMode&quot;, &quot;VehicleOdometry&quot;):
+        print(f&quot;{name:40s} v{ver}  {cdr(typ):4d} B&quot; + (f&quot;  cap {cap:5.1f} Hz&quot; if sec == &quot;publications&quot; else &quot;&quot;))
+print(f&quot;out {sum(r[0] == &#x27;publications&#x27; for r in rows)}, in {sum(r[0] != &#x27;publications&#x27; for r in rows)}; &quot;
+      f&quot;all /fmu/out at caps: {total:.0f} B/s vs {921600 // 10} B/s on UART 921600&quot;)
+
+LOSS_T = 1.0                                              # COM_OF_LOSS_T, s
+for hz, stop, shift in ((10, 5.0, 0.0), (2, 5.0, 0.0), (10, 99.0, -1.5)):
+    last = math.floor((stop - 1e-9) * hz) / hz + shift    # timestamp PX4 sees for the last message
+    print(f&quot;{hz:2d} Hz, stop {stop:4.1f} s, stamp shift {shift:+.1f} s -&gt; &quot; +
+          (&quot;never available&quot; if shift &lt;= -LOSS_T else f&quot;signal lost at {last + LOSS_T:.1f} s&quot;))</code></pre>
+<p>Output of <code>python3 px4_dds_lab.py v1.17.0</code> (2026-11-26); with <code>v1.18.0</code> the list shows <code>vehicle_status_v4</code> and the sum grows to 117077 B/s:</p>
+<pre class="cli-block"><code>/fmu/out/arming_check_request_v1         v1    16 B  cap   5.0 Hz
+/fmu/out/battery_status_v1               v1   176 B  cap   1.0 Hz
+/fmu/out/vehicle_local_position_v1       v1   216 B  cap  50.0 Hz
+/fmu/out/vehicle_odometry                v0   114 B  cap 100.0 Hz
+/fmu/out/vehicle_status_v1               v1    80 B  cap   5.0 Hz
+/fmu/out/airspeed_validated_v1           v1    44 B  cap  50.0 Hz
+/fmu/out/home_position_v1                v1    60 B  cap   5.0 Hz
+/fmu/in/arming_check_reply_v1            v1   227 B
+/fmu/in/offboard_control_mode            v0    15 B
+/fmu/in/trajectory_setpoint              v0    64 B
+/fmu/in/vehicle_attitude_setpoint_v1     v1    40 B
+/fmu/in/vehicle_mocap_odometry           v0   114 B
+/fmu/in/vehicle_visual_odometry          v0   114 B
+out 27, in 38; all /fmu/out at caps: 107495 B/s vs 92160 B/s on UART 921600
+10 Hz, stop  5.0 s, stamp shift +0.0 s -&gt; signal lost at 5.9 s
+ 2 Hz, stop  5.0 s, stamp shift +0.0 s -&gt; signal lost at 5.5 s
+10 Hz, stop 99.0 s, stamp shift -1.5 s -&gt; never available</code></pre>
 <h4 class="md-subheading">Step 1. Environment</h4>
 <pre class="cli-block"><code># ROS 2 Jazzy (Ubuntu 24.04) installed and sourced; fallback option is Humble (22.04)
 mkdir -p ~/ws_px4/src &amp;&amp; cd ~/ws_px4/src
@@ -175,6 +263,8 @@ if __name__ == &quot;__main__&quot;:
 
 <h2>Sources</h2>
 <ul class="refs"><li><a href="https://docs.px4.io/main/en/ros2/user_guide.html" target="_blank" rel="noopener noreferrer">PX4 ROS 2 User Guide</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://docs.px4.io/main/en/middleware/uxrce_dds.html" target="_blank" rel="noopener noreferrer">PX4 uXRCE-DDS</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://docs.px4.io/main/en/ros2/offboard_control.html" target="_blank" rel="noopener noreferrer">PX4 ROS 2 Offboard Control Example</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://github.com/PX4/px4_msgs" target="_blank" rel="noopener noreferrer">px4_msgs (GitHub)</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://github.com/PX4/px4_ros_com" target="_blank" rel="noopener noreferrer">px4_ros_com (GitHub)</a> <span class="gc-tag" data-state="info">primary</span></li></ul>
+<h2>Numeric problems</h2>
+<uav-tasks src="../tasks/px4-ros2.json" module="px4-ros2"></uav-tasks>
 <h2>Test yourself</h2>
 <uav-quiz src="../quiz/px4-ros2.json" module="px4-ros2"></uav-quiz>
       </div>

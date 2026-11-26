@@ -39,7 +39,7 @@ def topic(base, msg_cls):
 ```
 
 ### Правила Offboard
-1. Внешний контроллер обязан непрерывно слать `OffboardControlMode` (какие уставки активны: position, velocity, acceleration, attitude, body_rate…) с частотой **выше 2 Гц** — это «доказательство жизни». Реальные уставки — в `TrajectorySetpoint` (position/velocity/acceleration/yaw, неиспользуемые поля = NaN).
+1. Внешний контроллер обязан непрерывно слать `OffboardControlMode` (какие уставки активны: position, velocity, acceleration, attitude, body_rate…) с частотой заметно **выше 2 Гц** (документация называет 2 Гц; по коду PX4 теряет сигнал, когда метка последнего сообщения старше `COM_OF_LOSS_T`, см. `px4-ros2`) — это «доказательство жизни». Реальные уставки — в `TrajectorySetpoint` (position/velocity/acceleration/yaw, неиспользуемые поля = NaN).
 2. Поток должен идти **до** переключения в Offboard (и до арминга в Offboard), иначе PX4 откажет.
 3. Если поток прервался дольше `COM_OF_LOSS_T`, PX4 выходит из Offboard и переключается в режим из `COM_OBL_RC_ACT` (Position, Altitude, Stabilized, Return, Land, Hold, Terminate, Disarm; значение 2 до 1.16 называлось Manual). В 1.17 при выборе Position, Altitude или Stabilized без ручного управления выполняется `NAV_RCL_ACT`.
 4. Команды — `VehicleCommand` в `/fmu/in/vehicle_command`: арм `VEHICLE_CMD_COMPONENT_ARM_DISARM` (param1 = 1), режим `VEHICLE_CMD_DO_SET_MODE` (param1 = 1 — custom, param2 = 6 — Offboard), посадка `VEHICLE_CMD_NAV_LAND`. Подтверждение — в `/fmu/out/vehicle_command_ack`; состояние — `VehicleStatus.arming_state`, `nav_state`.
