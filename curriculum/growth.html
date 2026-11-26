@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>UAV Student — Рост курса</title>
+  <link rel="stylesheet" href="growth.css">
+</head>
+<body>
+  <div class="gr-wrap">
+    <header class="gr-hero">
+      <p class="gr-eyebrow"><a href="curriculum.html">Учебная программа</a> · <a href="../index.html">Сайт курса</a></p>
+      <h1>Рост курса</h1>
+      <p class="gr-lede" id="gr-lede">Загружаю историю репозитория…</p>
+      <p class="gr-meta" id="gr-meta"></p>
+    </header>
+
+    <section class="gr-kpis" id="gr-kpis" aria-label="Итоги"></section>
+
+    <section class="gr-card" aria-labelledby="gr-h-sections">
+      <div class="gr-head">
+        <h2 id="gr-h-sections">Разделы курса сейчас</h2>
+        <p class="gr-note">Каждый раздел — свой цвет на всей странице. Нажми на раздел, чтобы оставить в ленте только его коммиты.</p>
+      </div>
+      <div class="gr-sections" id="gr-sections"></div>
+    </section>
+
+    <section class="gr-card" aria-labelledby="gr-h-area">
+      <div class="gr-head">
+        <h2 id="gr-h-area">Объём курса по разделам</h2>
+        <p class="gr-note">Слова во всех русских модулях на конец каждого дня с коммитами. Ось — дни с коммитами, а не календарь.</p>
+      </div>
+      <div class="gr-chart" id="gr-area"></div>
+    </section>
+
+    <div class="gr-grid2">
+      <section class="gr-card" aria-labelledby="gr-h-kinds">
+        <div class="gr-head">
+          <h2 id="gr-h-kinds">Что делалось каждый день</h2>
+          <p class="gr-note">Коммиты по виду работы. Вид определяется по тому, что коммит изменил.</p>
+        </div>
+        <div class="gr-legend" id="gr-kinds-legend"></div>
+        <div class="gr-chart" id="gr-kinds"></div>
+      </section>
+      <section class="gr-card" aria-labelledby="gr-h-fc">
+        <div class="gr-head">
+          <h2 id="gr-h-fc">Что нашли проверки фактов</h2>
+          <p class="gr-note">Каждый модуль проверяет отдельный агент по исходникам прошивок. Здесь найденное и исправленное до публикации.</p>
+        </div>
+        <div class="gr-legend" id="gr-fc-legend"></div>
+        <div class="gr-chart" id="gr-fc"></div>
+      </section>
+    </div>
+
+    <section class="gr-card" aria-labelledby="gr-h-feed">
+      <div class="gr-head">
+        <h2 id="gr-h-feed">Лента коммитов</h2>
+      </div>
+      <div class="gr-filters">
+        <label class="gr-field">Вид работы
+          <select id="gr-kind"><option value="">Все</option></select>
+        </label>
+        <label class="gr-field">Раздел
+          <select id="gr-section"><option value="">Все</option></select>
+        </label>
+        <span class="gr-note" id="gr-count"></span>
+      </div>
+      <ol class="gr-feed" id="gr-feed"></ol>
+      <button class="gr-more" id="gr-more" type="button" hidden>Показать ещё</button>
+    </section>
+
+    <footer class="gr-foot">
+      Данные собирает <code>scripts/build_activity.py</code> из истории git при каждой сборке сайта (<a href="../docs/activity/activity.json">activity.json</a>, <a href="../docs/activity/commits.csv">commits.csv</a>, <a href="../docs/activity/sections.csv">sections.csv</a>). Итоги проверок взяты из сообщений коммитов: в ранних коммитах их не записывали.
+    </footer>
+  </div>
+  <div class="gr-tip" id="gr-tip" hidden></div>
+  <script src="../assets/growth-page.js"></script>
+</body>
+</html>

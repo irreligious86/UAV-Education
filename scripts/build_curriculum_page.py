@@ -319,7 +319,7 @@ lib/ground-control-ui   design system (pinned release)"""
   <div class="wrap">
     <header class="hero">
       <h1>UAV Student — Учебная программа</h1>
-      <p class="muted">Обзор курса для администрации и разработчиков: состав, оценивание, проекты, стандарты и состояние планов. Для студентов — <a href="{SITE}">сайт курса</a>.</p>
+      <p class="muted">Обзор курса для администрации и разработчиков: состав, оценивание, проекты, стандарты и состояние планов. Для студентов — <a href="{SITE}">сайт курса</a>. Как курс растёт по дням — <a href="growth.html">рост курса</a>.</p>
       <p>
         <span class="tag">{n_mod} модулей</span>
         <span class="tag">{hours} учебных часов</span>

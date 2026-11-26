@@ -75,6 +75,7 @@ def commits() -> list[dict]:
                "modules_touched": 0, "content_lines_added": 0, "content_lines_removed": 0,
                "i18n_files": 0, "diagram_scripts": 0, "task_banks": 0, "quiz_banks": 0}
         touched = set()
+        touched_paths = []
         for line in (stats or "").splitlines():
             parts = line.split("\t")
             if len(parts) != 3:
@@ -83,6 +84,7 @@ def commits() -> list[dict]:
             path = path.split(" => ")[-1].replace("}", "").replace("{", "")
             if is_module(path):
                 touched.add(Path(path).stem)
+                touched_paths.append(path)
                 if a.isdigit():
                     rec["content_lines_added"] += int(a)
                     rec["content_lines_removed"] += int(d)
@@ -95,6 +97,8 @@ def commits() -> list[dict]:
             elif path.startswith("content/quiz/"):
                 rec["quiz_banks"] += 1
         rec["modules_touched"] = len(touched)
+        secs = [Path(p).parts[1] for p in touched_paths]
+        rec["section"] = max(set(secs), key=secs.count) if secs else ""
         rec["modules"] = sorted(touched)
         text = subject + "\n" + body
         for key, rx in FC_RE.items():
@@ -121,19 +125,27 @@ def snapshot(sha: str) -> dict:
     """Module count and word count of the Russian sources at one commit."""
     files = [p for p in git("ls-tree", "-r", "--name-only", sha, "content").splitlines() if is_module(p)]
     words = 0
+    per = defaultdict(lambda: {"modules": 0, "words": 0})
     if files:
         batch = "\n".join(f"{sha}:{p}" for p in files) + "\n"
         raw = subprocess.run(["git", "cat-file", "--batch"], cwd=ROOT, input=batch.encode(), capture_output=True, check=True).stdout
         i = 0
+        per_seen = []
         while i < len(raw):
             nl = raw.index(b"\n", i)
             size = int(raw[i:nl].split()[2])
             body = raw[nl + 1: nl + 1 + size].decode("utf-8", "replace")
-            words += len(WORD_RE.findall(body))
+            name = raw[i:nl].split()[0].decode()
+            n = len(WORD_RE.findall(body))
+            words += n
+            sec = files[len(per_seen)].split("/")[1]
+            per_seen.append(name)
+            per[sec]["modules"] += 1
+            per[sec]["words"] += n
             i = nl + 1 + size + 1
     diagrams = sum(1 for p in git("ls-tree", "--name-only", f"{sha}:assets/diagrams").splitlines() if p.endswith(".svg")) \
         if "assets/diagrams" in git("ls-tree", "-d", "-r", "--name-only", sha, "assets") else 0
-    return {"modules_total": len(files), "words_total": words, "diagrams_total": diagrams}
+    return {"modules_total": len(files), "words_total": words, "diagrams_total": diagrams, "sections": dict(per)}
 
 
 def main() -> None:
@@ -142,6 +154,13 @@ def main() -> None:
     for r in recs:
         by_day[r["day"]].append(r)
     daily = []
+    section_rows = []
+    titles = {}
+    try:
+        man = json.loads((ROOT / "data" / "content-manifest.json").read_text(encoding="utf-8"))
+        titles = {sec["sectionKey"]: sec["title"] for sec in man["sections"]}
+    except (OSError, KeyError, ValueError):
+        pass
     for day in sorted(by_day):
         rs = by_day[day]
         snap = snapshot(rs[-1]["sha"])
@@ -154,8 +173,10 @@ def main() -> None:
             "fc_errors": sum(r["fc_errors"] for r in rs),
             "fc_imprecise": sum(r["fc_imprecise"] for r in rs),
             "fc_nits": sum(r["fc_nits"] for r in rs),
-            **snap,
+            **{k: v for k, v in snap.items() if k != "sections"},
         })
+        for sec, v in sorted(snap["sections"].items()):
+            section_rows.append({"day": day, "section": sec, "title": titles.get(sec, sec), **v})
     head = recs[-1]["sha"] if recs else ""
     data = {
         "generated_at": datetime.now(timezone.utc).replace(microsecond=0).isoformat(),
@@ -165,6 +186,7 @@ def main() -> None:
                    "fc_imprecise_total": sum(r["fc_imprecise"] for r in recs),
                    "fc_nits_total": sum(r["fc_nits"] for r in recs)},
         "daily": daily,
+        "sections": section_rows,
         "commits": recs,
     }
     OUT.parent.mkdir(parents=True, exist_ok=True)
@@ -177,12 +199,17 @@ def main() -> None:
         for r in daily:
             w.writerow([r[c] for c in cols])
     with (OUT.parent / "commits.csv").open("w", newline="", encoding="utf-8") as f:
-        cols = ["date", "sha", "kind", "subject", "modules_touched", "modules_added", "content_lines_added",
+        cols = ["date", "sha", "kind", "section", "subject", "modules_touched", "modules_added", "content_lines_added",
                 "content_lines_removed", "fc_errors", "fc_imprecise", "fc_nits", "modules"]
         w = csv.writer(f)
         w.writerow(cols)
         for r in reversed(recs):
             w.writerow([" ".join(r[c]) if c == "modules" else r[c] for c in cols])
+    with (OUT.parent / "sections.csv").open("w", newline="", encoding="utf-8") as f:
+        w = csv.writer(f)
+        w.writerow(["day", "section", "title", "modules", "words"])
+        for r in section_rows:
+            w.writerow([r["day"], r["section"], r["title"], r["modules"], r["words"]])
     print(f"activity: {len(recs)} commits, {len(daily)} days, {data['totals'].get('modules_total', 0)} modules -> {OUT.relative_to(ROOT)}")
 
 

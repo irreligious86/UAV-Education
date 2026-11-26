@@ -273,7 +273,7 @@ def layout(*, title: str, base: str, body: str, active: str, description: str = 
 {body}
   </main>
   <footer class="gc-container site-footer gc-muted">
-    <p>{_('Открытый курс')} · <a href="{REPO_URL}">{_('исходники на GitHub')}</a> · <a href="{ROADMAP_URL}">{_('план развития')}</a> · <a href="{a}curriculum/curriculum.html">{_('для разработчика')}</a> · CC BY-NC-SA 4.0</p>
+    <p>{_('Открытый курс')} · <a href="{REPO_URL}">{_('исходники на GitHub')}</a> · <a href="{ROADMAP_URL}">{_('план развития')}</a> · <a href="{a}curriculum/curriculum.html">{_('для разработчика')}</a> · <a href="{a}curriculum/growth.html">{_('рост курса')}</a> · CC BY-NC-SA 4.0</p>
   </footer>
 </body>
 </html>
