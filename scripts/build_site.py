@@ -268,7 +268,8 @@ def layout(*, title: str, base: str, body: str, active: str, description: str = 
   <script src="{a}assets/app.js" defer></script>
   <script src="{a}assets/uav-quiz.js" defer></script>
   <script src="{a}assets/uav-tasks.js" defer></script>
-  <script src="{a}assets/offline.js" defer></script>{extra_head}
+  <script src="{a}assets/offline.js" defer></script>
+  <script src="{a}assets/history.js" defer></script>{extra_head}
 </head>
 <body class="gc-root" data-base="{base}" data-root="{a}"{sec_attr(section)}>
   <header class="site-header">
@@ -449,7 +450,8 @@ def render_home(model: dict) -> str:
     )
     cap = model["curriculum"].get("capstoneElective")
     backlog = ", ".join(model["curriculum"].get("backlogTopics", []))
-    body = f"""    <section class="home-hero">
+    body = f"""    <a class="gc-card resume-card" data-resume hidden></a>
+    <section class="home-hero">
       <h1 class="gc-display">{_("Инженерный курс по БПЛА")}</h1>
       <p class="home-hero__lead">{_("От «почему он летает» до настройки по логам, автономных миссий и своего кода на борту.")}
       {_('Выбери прошивку и иди по шагам от простого к сложному — или пройди инженерный путь по трекам. Нужна конкретная тема — <a href="pages/search.html">поиск</a> или <a href="ref/index.html">справочник</a>.')}</p>
@@ -1120,6 +1122,7 @@ def render_account() -> str:
       <h2 class="acc-h">Настройки</h2>
       <p class="gc-muted">Работают уже сейчас и хранятся в этом браузере; после входа поедут вместе с аккаунтом на все устройства.</p>
       <label class="acc-check"><input type="checkbox" data-ready-only> Показывать только готовые модули</label>
+      <label class="acc-check"><input type="checkbox" data-setting="resumeOnOpen"> Открывать курс сразу на уроке, где я остановился</label>
       <label class="acc-check"><input type="checkbox" data-setting="notesPanel"> Открывать панель конспекта на странице урока</label>
       <label class="acc-form acc-form--inline"><span>Мой путь по прошивке</span>
         <select data-setting="firmwarePath">
@@ -1135,6 +1138,7 @@ def render_account() -> str:
       <h2 class="acc-h">Мои материалы</h2>
       <div class="acc-tiles">
         <a class="gc-card" href="progress.html"><strong>Ведомость</strong><div class="gc-muted">пройденные модули, квизы, лабораторные</div></a>
+        <a class="gc-card" href="progress.html#history"><strong>История</strong><div class="gc-muted">последние открытые уроки и место, где остановился</div></a>
         <div class="gc-card" data-state="pending"><strong>Закладки</strong><div class="gc-muted">модули и разделы, к которым хочешь вернуться · скоро</div></div>
         <div class="gc-card" data-state="pending"><strong>Конспекты</strong><div class="gc-muted">твои заметки к урокам и разделам · скоро</div></div>
       </div>
@@ -1413,6 +1417,11 @@ def render_progress(model: dict) -> str:
       <p class="gc-label gc-muted">{_("Итоговые проекты")}</p>
       <ul class="progress-caps">{caps}</ul>
       {projs_html}
+    </section>
+    <section class="gc-panel" id="history">
+      <h2 class="gc-title">{_("История")}</h2>
+      <p class="gc-muted">{_("Последние открытые уроки и раздел, на котором ты остановился. Хранится в этом браузере.")}</p>
+      <div data-history-list></div>
     </section>
     <h2 class="gc-title section-title">{_("По прошивке")}</h2>
 {paths}
