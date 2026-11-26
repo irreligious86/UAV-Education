@@ -47,6 +47,39 @@ var T = (typeof window !== "undefined" && window.T) || function (s) { return s; 
     }).catch(function () { groupsFor = null; });
   }
 
+  // the student's own feedback and its status (RLS returns only their rows; staff_note is not readable)
+  var FB_KIND = { error: T("ошибка"), unclear: T("непонятно"), idea: T("пожелание"), other: T("другое") };
+  var FB_STATUS = { new: [T("новое"), ""], in_progress: [T("в работе"), "caution"], done: [T("сделано"), "ok"], rejected: [T("отклонено"), "critical"] };
+  var feedbackFor = null;
+  function loadFeedback(s) {
+    var uidNow = s.user && s.user.id;
+    if (!uidNow || feedbackFor === uidNow || !window.UAVAccount.myFeedback) return;
+    feedbackFor = uidNow;
+    var map = {};
+    try { map = JSON.parse(($("#nb-modules") || {}).textContent || "{}"); } catch (e) { /* no map */ }
+    window.UAVAccount.myFeedback().then(function (rows) {
+      var ul = $("[data-acc-feedback]");
+      ul.replaceChildren();
+      (rows || []).forEach(function (f) {
+        var li = document.createElement("li"); li.className = "nb-item";
+        var head = document.createElement("div"); head.className = "nb-item__head";
+        var m = map[f.module_id];
+        var where = document.createElement(m ? "a" : "span");
+        if (m) where.href = "../" + m.u + (f.anchor ? "#" + encodeURIComponent(f.anchor) : "");
+        where.textContent = m ? m.t : (f.module_id || f.section_key || "—");
+        var st = FB_STATUS[f.status] || [f.status, ""];
+        var tag = document.createElement("span"); tag.className = "gc-tag"; tag.setAttribute("data-state", st[1]); tag.textContent = st[0];
+        var meta = document.createElement("span"); meta.className = "gc-muted nb-when";
+        meta.textContent = (FB_KIND[f.kind] || f.kind) + " · " + new Date(f.created_at).toLocaleDateString();
+        head.append(where, tag, meta);
+        var body = document.createElement("p"); body.className = "nb-excerpt"; body.textContent = f.body;
+        li.append(head, body); ul.append(li);
+      });
+      ul.hidden = !rows || !rows.length;
+      $("[data-acc-feedback-empty]").hidden = !ul.hidden;
+    }).catch(function () { feedbackFor = null; });
+  }
+
   function render(s) {
     if (!s.enabled) return;
     if (s.recovery && s.user) return show("recovery");
@@ -63,6 +96,7 @@ var T = (typeof window !== "undefined" && window.T) || function (s) { return s; 
     sync.setAttribute("data-state", s.sync === "saved" ? "ok" : s.sync === "offline" ? "caution" : "");
     $("[data-acc-admin]").hidden = !s.isStaff;
     loadGroups(s);
+    loadFeedback(s);
     var rename = document.querySelector('[data-form="rename"] input');
     if (rename && !rename.value && p.username) rename.value = p.username;
   }
@@ -90,7 +124,8 @@ var T = (typeof window !== "undefined" && window.T) || function (s) { return s; 
       el.addEventListener("change", function () {
         var next = readSettings();
         next[key] = el.type === "checkbox" ? el.checked : el.value;
-        try { localStorage.setItem(SETTINGS, JSON.stringify(next)); if (note) note.textContent = T("Сохранено в этом браузере."); }
+        var acc = window.UAVUserData && window.UAVUserData.signedIn();
+        try { localStorage.setItem(SETTINGS, JSON.stringify(next)); if (note) note.textContent = acc ? T("Сохранено; уходит в аккаунт.") : T("Сохранено в этом браузере."); }
         catch (e) { if (note) note.textContent = T("Браузер не даёт сохранить настройки (приватный режим?)."); }
       });
     });

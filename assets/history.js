@@ -1,6 +1,6 @@
 /* Reading history: remembers the lesson and the section you were reading, for guests and signed-in users alike.
- * Stored in this browser (localStorage "uav-student:history:v1"); a signed-in account will sync it later
- * (docs/MULTIUSER-PLAN.md). Used by:
+ * Stored in this browser (localStorage "uav-student:history:v1"); for a signed-in account assets/user-data.js syncs it
+ * (table user_history, docs/MULTIUSER-PLAN.md §14). Used by:
  *   - lesson pages (<article data-module-page>): records the lesson and the heading in view;
  *   - the home page ([data-resume]): a "continue where you stopped" card, and an optional jump to the last
  *     lesson when the course is opened (setting resumeOnOpen on the account page);
@@ -28,6 +28,19 @@ var T = (typeof window !== "undefined" && window.T) || function (s) { return s; 
     if (s < 86400) return Math.round(s / 3600) + " " + T("ч назад");
     return Math.round(s / 86400) + " " + T("дн назад");
   }
+  // Section headings of a lesson body. Ones without an id get a positional one ("sec-3") so a link can return there;
+  // notes, bookmarks and feedback (assets/notes.js) use the same ids. Idempotent.
+  function headings(article) {
+    var heads = Array.prototype.slice.call(article.querySelectorAll(".module-body h2, .module-body h3, .module-body h4.md-subheading"));
+    heads.forEach(function (el, i) { if (!el.id) el.id = "sec-" + (i + 1); });
+    return heads;
+  }
+  // heading text without the buttons notes.js puts inside it
+  function headingText(el) {
+    var c = el.cloneNode(true);
+    c.querySelectorAll(".nb-tools").forEach(function (t) { t.remove(); });
+    return c.textContent.replace(/[#¶]\s*$/, "").trim();
+  }
   function hrefOf(item) { return base() + item.path + (item.anchor ? "#" + encodeURIComponent(item.anchor) : ""); }
 
   // ------------------------------------------------------------------ lesson page: record
@@ -39,8 +52,7 @@ var T = (typeof window !== "undefined" && window.T) || function (s) { return s; 
     var item = { id: article.getAttribute("data-module-page"), path: path, title: h1 ? h1.textContent.trim() : document.title,
                  anchor: "", heading: "", at: Date.now() };
     // section headings of the lesson; ones without an id get a positional one ("sec-3") so a link can return there
-    var heads = Array.prototype.slice.call(article.querySelectorAll(".module-body h2, .module-body h3, .module-body h4.md-subheading"));
-    heads.forEach(function (el, i) { if (!el.id) el.id = "sec-" + (i + 1); });
+    var heads = headings(article);
     if (location.hash) { var target = document.getElementById(decodeURIComponent(location.hash.slice(1))); if (target) setTimeout(function () { target.scrollIntoView(); }, 0); }
 
     function save() {
@@ -49,12 +61,13 @@ var T = (typeof window !== "undefined" && window.T) || function (s) { return s; 
       h.items = [item].concat(h.items.filter(function (x) { return x.id !== item.id; })).slice(0, MAX);
       h.last = item.id;
       write(h);
+      if (window.UAVUserData) window.UAVUserData.touched("history");
     }
     function current() {
       var top = 120, best = null;
       heads.forEach(function (el) { if (el.getBoundingClientRect().top <= top) best = el; });
       item.anchor = best ? best.id : "";
-      item.heading = best ? best.textContent.replace(/[#¶]\s*$/, "").trim() : "";
+      item.heading = best ? headingText(best) : "";
     }
     var timer = null;
     window.addEventListener("scroll", function () {
@@ -113,6 +126,6 @@ var T = (typeof window !== "undefined" && window.T) || function (s) { return s; 
     document.querySelectorAll("[data-resume]").forEach(resumeCard);
     document.querySelectorAll("[data-history-list]").forEach(historyList);
   }
-  window.UAVHistory = { read: read };
+  window.UAVHistory = { read: read, headings: headings, headingText: headingText };
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", start); else start();
 })();

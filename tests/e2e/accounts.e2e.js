@@ -19,12 +19,12 @@ const LOCAL = "uav-student:progress:v1";
   {
     const ctx = await browser.newContext(); const p = await ctx.newPage(); watch(p);
     await p.goto(`${BASE}/pages/account.html`, { waitUntil: "networkidle" });
-    assert.strictEqual(await p.isVisible('[data-acc="off"]'), true);
-    assert.strictEqual(await p.$("#nav-account"), null);
+    assert.strictEqual(await p.isVisible("[data-acc-preview]"), true);           // preview of the account page
+    assert.strictEqual(await p.textContent("#nav-account"), "Войти");             // the entry is shown, it leads to the preview
     assert.strictEqual(await p.evaluate(() => window.UAVAccount.enabled), false);
     await p.goto(`${BASE}/index.html`, { waitUntil: "networkidle" });
     assert.strictEqual(await p.evaluate(() => [...document.scripts].some((s) => /vendor\/supabase/.test(s.src))), false);
-    await ctx.close(); ok("flag off: account page explains, no nav link, supabase not loaded");
+    await ctx.close(); ok("flag off: account page shows the preview, supabase not loaded");
   }
 
   const ctx = await browser.newContext({ viewport: { width: 390, height: 860 } });

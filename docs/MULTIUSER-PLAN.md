@@ -1,6 +1,7 @@
 # Multi-user system: accounts, roles, progress on a server
 
-Status: phases 1–2 implemented behind a feature flag (2026-11-09). The site keeps working exactly as
+Status: phases 1–3 implemented behind a feature flag (2026-11-09); notes, bookmarks, settings sync, reading history
+sync and feedback added 2026-11-26 (section 14). The site keeps working exactly as
 before until a backend is configured in `assets/backend-config.js`.
 
 ## 1. Requirements (from Alex)
@@ -46,6 +47,13 @@ table is protected by RLS. Moving to self-hosted Supabase or plain Postgres late
 | Create / delete study groups, add or remove students | — | ✓ | ✓ |
 | See the names of **own** groups | ✓ | ✓ | ✓ |
 | See who else is in a group | — | ✓ | ✓ |
+| Own notes, bookmarks, settings, reading history: read / write | ✓ | ✓ | ✓ |
+| Someone else's notes, bookmarks, settings, history | — | — | — |
+| Send feedback (signed in, **confirmed email**, ≤ 10/h, ≤ 50/day) | ✓ | ✓ | ✓ |
+| Read own feedback and its status (not the staff note) | ✓ | ✓ | ✓ |
+| Read all feedback, change status and staff note | — | ✓ | ✓ |
+| Edit the text of a feedback message | — | — | — |
+| Delete a feedback message (spam) | — | — | ✓ |
 
 Rules enforced in the database:
 - `profiles.role` cannot be changed by an UPDATE from the browser (column privileges); only
@@ -69,6 +77,13 @@ auth.users (Supabase)            1 ── 1  profiles(id, username, email, role,
                                          1 ── 1  progress(user_id, data jsonb, updated_at)
 role_audit(id, actor, target, old_role, new_role, at)
 view student_progress (security_invoker): profiles ⋈ progress — RLS of both tables applies
+
+profiles 1 ── n  user_notes(user_id, module_id, anchor, label, body ≤ 8000, created_at, updated_at)   cap 2000/user
+profiles 1 ── n  user_bookmarks(user_id, module_id, anchor, label, created_at, updated_at)          cap 1000/user
+profiles 1 ── 1  user_settings(user_id, data jsonb: readyOnly, resumeOnOpen, notesPanel, firmwarePath)
+profiles 1 ── 1  user_history(user_id, items jsonb ≤ 30 lessons)
+profiles 1 ── n  feedback(id, user_id → set null, module_id, section_key, anchor, kind, body, page_lang,
+                          status, staff_note, created_at, updated_at)
 ```
 
 `progress.data` has the same shape as the browser store (`done`, `checks`, `quiz`, `tasks`, `labs`), so the
@@ -106,7 +121,8 @@ owner's registration (the database also refuses unconfirmed or mismatched accoun
 
 1. Create a project at supabase.com (free tier), region close to students.
 2. SQL editor → run every file in `supabase/migrations/` in order: `0001_accounts_roles_progress.sql`,
-   `0002_exams.sql`, `0003_cohorts.sql`, `0004_exam_hardening.sql` (each is one transaction; a later one needs the earlier ones).
+   `0002_exams.sql`, `0003_cohorts.sql`, `0004_exam_hardening.sql`, `0005_profile_language.sql`, `0006_language_codes.sql`,
+   `0007_notes_bookmarks_feedback_settings.sql` (each is one transaction; a later one needs the earlier ones).
 3. Authentication → Providers → Email: keep "Confirm email" on; minimum password length ≥ 10.
    Authentication → Emails → SMTP: set a custom SMTP sender — the built-in sender only delivers to the
    project team and is heavily rate-limited, students would never get the confirmation mail.
@@ -129,13 +145,15 @@ accepted: it reveals who is enrolled, not emails or grades.
 
 | Piece | File |
 |---|---|
-| Schema, roles, RLS | `supabase/migrations/0001_accounts_roles_progress.sql`, `0002_exams.sql`, `0003_cohorts.sql`, `0004_exam_hardening.sql` |
-| Policy tests (Postgres 16, CI job `database-access-rules`) | `supabase/tests/test_rls.py`, `test_exams.py`, `test_cohorts.py`, `test_zz_concurrency.py` (races, several connections), `supabase_stub.sql` |
+| Schema, roles, RLS | `supabase/migrations/0001_accounts_roles_progress.sql` … `0007_notes_bookmarks_feedback_settings.sql` |
+| Policy tests (Postgres 16, CI job `database-access-rules`) | `supabase/tests/test_rls.py`, `test_exams.py`, `test_cohorts.py`, `test_language.py`, `test_notes_bookmarks_feedback.py`, `test_zz_concurrency.py` (races, several connections), `supabase_stub.sql` |
+| Notes, bookmarks, settings, history: local store and sync | `assets/user-data.js` (merge rules tested in `tests/js/userdata.test.js`) |
+| Lesson-page bar, heading buttons, notes panel, feedback dialog, lists | `assets/notes.js`; lists on `pages/progress.html`, `pages/account.html`; feedback panel on `pages/admin.html` |
 | Feature flag and keys | `assets/backend-config.js` |
 | Auth, sync, merge, staff API | `assets/account.js` (merge rules tested in `tests/js/merge.test.js`) |
 | Pages | `pages/account.html` + `assets/account-page.js`, `pages/admin.html` + `assets/admin-page.js` |
 | supabase-js 2.45.4 (MIT), vendored, loaded only when enabled | `assets/vendor/supabase/` |
-| UI end-to-end with an in-memory fake backend | `tests/e2e/accounts.e2e.js`, `exams.e2e.js`, `cohorts.e2e.js`, `fake-supabase.js` |
+| UI end-to-end with an in-memory fake backend | `tests/e2e/accounts.e2e.js`, `exams.e2e.js`, `cohorts.e2e.js`, `notes.e2e.js`, `fake-supabase.js` |
 
 Login is by email; the username is the public handle shown to the administration (logging in by
 username would need a lookup that reveals which emails exist).
@@ -199,3 +217,88 @@ and grading settings could change (L3); the review of attempt 1 was the key for 
 survived logout on a shared browser (L5); browser roles kept sequence privileges; CSV quoting missed `\r`.
 Cohorts were found sound.
 
+
+## 14. Notes, bookmarks, feedback, settings
+
+Migration `supabase/migrations/0007_notes_bookmarks_feedback_settings.sql`, tests
+`supabase/tests/test_notes_bookmarks_feedback.py` (52), `tests/js/userdata.test.js`, `tests/e2e/notes.e2e.js`.
+Independent review (2026-11-26) fixes are folded in: conflict copies instead of overwrites, versioned saves on
+every push, no cap-state oracle, Unicode white space in feedback, kept unsynced rows on an expired session,
+per-row pushes, settings tied to their account, staff paging.
+
+### What the student gets
+
+- On every lesson page: «☆ В закладки» for the lesson, «✎ Конспект» (a side panel; a bottom sheet on a phone),
+  «⚑ Сообщить разработчику», and the same three as small buttons in every section heading.
+- Notes are plain text (≤ 8000 characters per note: one for the whole lesson, one per section), saved
+  automatically after a pause, with a visible saved / not saved state and a counter near the limit.
+- `pages/progress.html`: «Закладки» and «Конспекты» with search, a course-section filter, editing in place,
+  delete, and one `.md` export of every note. `pages/account.html`: the newest five of each, the settings, and
+  the student's own feedback with its status.
+- `pages/admin.html` (staff): «Обратная связь» with filters by status, type and section, a link to the exact
+  place (lesson + heading anchor), status change and an internal staff note.
+
+### Anchors
+
+A place in a lesson is `(module_id, anchor)`; `anchor` is the id of a section heading, `''` = the whole lesson.
+Headings get positional ids `sec-N` in the browser (`assets/history.js`, shared by history, notes, bookmarks and
+feedback). They move when a lesson gains or loses a heading above them; every note and bookmark also keeps the
+heading text (`label`), so a moved anchor is still recognisable. Text highlights (phase B) need a different
+anchor (text quote + offsets) and will get their own table; nothing here blocks that.
+
+### Sync rules
+
+- Guests and accounts-off: everything lives in localStorage (`uav-student:notes:v1`, `…:bookmarks:v1`,
+  `…:settings` + `…:ready-only`, `…:history:v1`). The site works exactly as before with `enabled: false`.
+- Signed in: after login the browser pulls its rows, merges and pushes; each local change is pushed after a
+  short pause (history after 10 s). Logout pushes first and refuses (as for progress) when something would be
+  lost; then notes, bookmarks and history are wiped from the browser (settings stay).
+- The row version is the server's `updated_at` (`clock_timestamp()`); the browser compares it only with the
+  version it last saw, never with its own clock.
+- At login and when the tab comes back into focus (at most once a minute) the browser pulls and merges: unchanged
+  server row → ours goes up; clean local row → the server's comes down.
+- Every push of a note goes through `save_note(module, anchor, label, body, expected)`, which writes only over the
+  version the browser saw and otherwise returns the stored one. So two signed-in devices never overwrite each
+  other; a conflict is merged on the spot.
+- A conflict (at login or on a push) never loses text: equal texts → nothing to do; otherwise one note with both
+  texts, the server's first and this device's under «— копия с этого устройства, … —». If both together exceed
+  8000 characters, the server note stays untouched and this device's text becomes its own note with the anchor
+  `<anchor>-copy-N` (`copy-N` for the whole lesson) and the label «(копия с другого устройства)» — both live on the
+  server. A note deleted on one device and edited on another survives (the delete is conditional on the version).
+- Each row is its own request: a row the server refuses (shape) stays local with the reason shown on the progress
+  page and in the logout message, and does not hold the other rows back.
+- A session that ends by itself (expired or revoked token) keeps the notes and bookmarks that never reached the
+  server, together with the owner mark; the same account pushes them at its next login, any other account wipes
+  them first (as for progress, review 2026-11-09 M3). Only a logout by the user wipes everything.
+- Settings: last write wins (row level). They carry the id of the account that last synced them
+  (`uav-student:settings-owner`); another account signing in on the same browser gets its own settings (or the
+  defaults), never the previous person's. A guest's change makes them a guest's settings again, which the next
+  login takes into that account. History: newest `at` per lesson wins, 30 lessons at most.
+
+### Feedback rules
+
+Only `send_feedback()` creates a message: caller signed in, email confirmed (`profiles.confirmed_at`), at most
+10 per hour and 50 per 24 h (the caller's profile row is locked, so parallel calls cannot exceed it), type
+`error / unclear / idea / other`, up to 4000 characters with at least 10 that are not white space of any kind
+(newlines, tabs, NBSP and other Unicode spaces do not count), a lesson or a course section.
+The author reads their messages and the status; `staff_note` is an internal working note and is not granted to
+the browser role — staff read it through `feedback_for_staff()` and change status and note through
+`feedback_set()` (no direct UPDATE grant, so nobody edits the text). `feedback_for_staff(p_before, p_limit)` pages
+by date (500 per page, «Показать более старые» on the admin page). The superadmin can delete a message
+(`feedback_delete()`, spam). Deleting an account deletes notes, bookmarks, settings and history and keeps
+feedback without an author.
+
+### Security review of the new tables (2026-11-26)
+
+- RLS on all five tables; every function `security definer` with `set search_path = ''`; default Supabase grants
+  revoked; column-level grants: the browser cannot write `created_at` / `updated_at` (set by the server) or
+  `staff_note`, cannot insert or update `feedback` at all; sequences without browser privileges.
+- Personal data is owner-only for every role, staff included (notes can be private thoughts; history is not a
+  grade, so it is not in `progress.data`, which staff read).
+- Abuse limits: row caps by trigger (2000 notes, 1000 bookmarks, serialised per user with an advisory lock, an
+  upsert of an existing row passes at the cap; a row for another user is left to RLS, so the trigger reveals
+  nothing about other users' rows and takes no lock on their key), size checks on every text and jsonb column, settings accept known
+  keys and types only, history accepts ≤ 30 objects with `id` and `at`.
+- Rendering: notes and feedback are shown with `textContent` / escaped HTML only, never as markup.
+- Accepted: anchors are positional (see above); a student can write any text into their own notes (only they
+  see it); feedback text is visible to staff with the author's username (said in the dialog).

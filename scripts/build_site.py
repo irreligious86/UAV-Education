@@ -269,7 +269,9 @@ def layout(*, title: str, base: str, body: str, active: str, description: str = 
   <script src="{a}assets/uav-quiz.js" defer></script>
   <script src="{a}assets/uav-tasks.js" defer></script>
   <script src="{a}assets/offline.js" defer></script>
-  <script src="{a}assets/history.js" defer></script>{extra_head}
+  <script src="{a}assets/history.js" defer></script>
+  <script src="{a}assets/user-data.js" defer></script>
+  <script src="{a}assets/notes.js" defer></script>{extra_head}
 </head>
 <body class="gc-root" data-base="{base}" data-root="{a}"{sec_attr(section)}>
   <header class="site-header">
@@ -1066,7 +1068,25 @@ def render_glossary(model: dict) -> str:
     return layout(title=_("Глоссарий"), base=base, body=body, active="glossary")
 
 
-def render_account() -> str:
+def module_map_tag(model: dict) -> str:
+    """<script id="nb-modules">: id -> title, url, course section of every page that can hold notes, bookmarks and
+    feedback (assets/notes.js, assets/account-page.js, assets/admin-page.js)."""
+    stacks = {s["key"]: s["title"] for s in model["stacks"]}
+    out = {}
+    for m in model["modules"].values():
+        if m["status"] == "published":
+            sec = module_section(m)
+            out[m["id"]] = {"t": m["title"], "u": f"m/{m['id']}.html", "s": sec, "st": stacks.get(sec, "")}
+    for g in model["groups"]:
+        if g.get("capstone"):
+            out[g["capstone"]["id"]] = {"t": g["capstone"]["title"], "u": f"cap/{g['capstone']['id']}.html", "s": "", "st": _("Итоговые проекты")}
+    for p in model.get("projects", []):
+        out[p["id"]] = {"t": p["title"], "u": f"projects/{p['id']}.html", "s": "", "st": _("Проекты")}
+    data = json.dumps(out, ensure_ascii=False, sort_keys=True).replace("</", "<\\/")
+    return f'\n    <script type="application/json" id="nb-modules">{data}</script>'
+
+
+def render_account(model: dict) -> str:
     base = "../"
     body = """    <h1 class="gc-display">Аккаунт</h1>
     <section class="gc-panel acc-preview" data-acc-preview hidden>
@@ -1144,13 +1164,18 @@ def render_account() -> str:
       <div class="acc-tiles">
         <a class="gc-card" href="progress.html"><strong>Ведомость</strong><div class="gc-muted">пройденные модули, квизы, лабораторные</div></a>
         <a class="gc-card" href="progress.html#history"><strong>История</strong><div class="gc-muted">последние открытые уроки и место, где остановился</div></a>
-        <div class="gc-card" data-state="pending"><strong>Закладки</strong><div class="gc-muted">модули и разделы, к которым хочешь вернуться · скоро</div></div>
-        <div class="gc-card" data-state="pending"><strong>Конспекты</strong><div class="gc-muted">твои заметки к урокам и разделам · скоро</div></div>
+        <a class="gc-card" href="progress.html#bookmarks"><strong>Закладки</strong><div class="gc-muted">модули и разделы, к которым хочешь вернуться</div></a>
+        <a class="gc-card" href="progress.html#notes"><strong>Конспекты</strong><div class="gc-muted">твои заметки к урокам и разделам, поиск и выгрузка</div></a>
+      </div>
+      <div class="acc-lists">
+        <div><p class="gc-label gc-muted">Последние закладки</p><div data-nb-list="bookmarks" data-nb-compact="5"></div></div>
+        <div><p class="gc-label gc-muted">Последние конспекты</p><div data-nb-list="notes" data-nb-compact="5"></div></div>
       </div>
     </section>
     <section class="gc-panel acc-block">
       <h2 class="acc-h">Обратная связь</h2>
-      <p class="gc-muted">Ошибка, непонятное место или пожелание — кнопка «Сообщить разработчику» будет у каждого урока и раздела. Отправлять можно после входа; здесь ты увидишь свои сообщения и их статус.</p>
+      <p class="gc-muted">Ошибка, непонятное место или пожелание — кнопка «⚑ Сообщить разработчику» есть у каждого урока и у каждого раздела урока. Отправлять можно после входа с подтверждённой почтой; здесь видно твои сообщения и их статус.</p>
+      <ul class="nb-list" data-acc-feedback hidden></ul>
       <p class="gc-muted" data-acc-feedback-empty>Сообщений пока нет.</p>
     </section>
     <p class="acc-msg" data-acc-msg aria-live="polite"></p>"""
@@ -1158,7 +1183,7 @@ def render_account() -> str:
                       for l in i18n.LANGS)
     body = tr_html(body).replace("LANG_SELECT", f'<select data-acc-lang aria-describedby="acc-lang-note">{options}</select>'
                                   f'<small class="gc-muted" id="acc-lang-note">{_("Закреплён за аккаунтом: после входа курс откроется на этом языке на любом устройстве.")}</small>')
-    return layout(title=_("Аккаунт"), base=base, body=body, active="account",
+    return layout(title=_("Аккаунт"), base=base, body=body + module_map_tag(model), active="account",
                   extra_head=f'\n  <script src="{base}{up()}assets/account-page.js" defer></script>')
 
 
@@ -1186,7 +1211,7 @@ def render_exam() -> str:
                   extra_head=f'\n  <script src="{base}{up()}assets/exam-page.js" defer></script>')
 
 
-def render_admin() -> str:
+def render_admin(model: dict) -> str:
     base = "../"
     body = """    <h1 class="gc-display">Администрация</h1>
     <section class="gc-panel" data-adm="off">
@@ -1230,13 +1255,25 @@ def render_admin() -> str:
           <tbody data-adm-exam-results></tbody>
         </table></div>
       </div>
+      <div class="gc-panel" data-adm-feedback-panel>
+        <p class="gc-label gc-muted">Обратная связь</p>
+        <p class="gc-muted">Сообщения студентов о уроках и разделах. Текст менять нельзя; статус и служебную заметку видит администрация, автор видит только статус.</p>
+        <div class="progress-actions">
+          <select class="adm-filter adm-cohort" data-fb-status aria-label="Статус"><option value="">все статусы</option><option value="new">новое</option><option value="in_progress">в работе</option><option value="done">сделано</option><option value="rejected">отклонено</option></select>
+          <select class="adm-filter adm-cohort" data-fb-kind aria-label="Тип"><option value="">все типы</option><option value="error">ошибка</option><option value="unclear">непонятно</option><option value="idea">пожелание</option><option value="other">другое</option></select>
+          <select class="adm-filter adm-cohort" data-fb-section aria-label="Раздел курса"><option value="">все разделы</option></select>
+          <gc-button variant="secondary" data-fb-reload>Обновить</gc-button>
+        </div>
+        <ul class="nb-list adm-fb" data-adm-feedback></ul>
+        <div class="progress-actions"><gc-button variant="secondary" data-fb-more hidden>Показать более старые</gc-button></div>
+      </div>
       <div class="gc-panel" data-adm-audit-panel>
         <p class="gc-label gc-muted">Журнал смены ролей</p>
         <ul class="progress-labs" data-adm-audit></ul>
       </div>
     </section>
     <p class="acc-msg" data-acc-msg aria-live="polite"></p>"""
-    return layout(title=_("Администрация"), base=base, body=tr_html(body), active="progress",
+    return layout(title=_("Администрация"), base=base, body=tr_html(body) + module_map_tag(model), active="progress",
                   extra_head=f'\n  <script src="{base}{up()}assets/admin-page.js" defer></script>')
 
 
@@ -1425,8 +1462,18 @@ def render_progress(model: dict) -> str:
     </section>
     <section class="gc-panel" id="history">
       <h2 class="gc-title">{_("История")}</h2>
-      <p class="gc-muted">{_("Последние открытые уроки и раздел, на котором ты остановился. Хранится в этом браузере.")}</p>
+      <p class="gc-muted">{_("Последние открытые уроки и раздел, на котором ты остановился. Хранится в этом браузере, после входа — и в аккаунте.")}</p>
       <div data-history-list></div>
+    </section>
+    <section class="gc-panel" id="bookmarks">
+      <h2 class="gc-title">{_("Закладки")}</h2>
+      <p class="gc-muted">{_("Уроки и разделы, отмеченные ☆. После входа в аккаунт они есть на всех устройствах.")}</p>
+      <div data-nb-list="bookmarks"></div>
+    </section>
+    <section class="gc-panel" id="notes">
+      <h2 class="gc-title">{_("Конспекты")}</h2>
+      <p class="gc-muted">{_("Твои заметки к урокам и разделам — только текст. Выгрузка — один файл .md со всеми заметками.")}</p>
+      <div data-nb-list="notes"></div>
     </section>
     <h2 class="gc-title section-title">{_("По прошивке")}</h2>
 {paths}
@@ -1450,7 +1497,7 @@ def render_progress(model: dict) -> str:
       </div>
       <ul class="progress-labs" data-lab-results></ul>
     </section>""")
-    return layout(title=_("Мой прогресс"), base=base, body=body, active="progress",
+    return layout(title=_("Мой прогресс"), base=base, body=body + module_map_tag(model), active="progress",
                   extra_head=f'\n  <script src="{base}{up()}assets/progress-page.js" defer></script>')
 
 
@@ -1632,8 +1679,8 @@ def build_language(code: str) -> dict:
             write(out / "tasks" / t.name, json.dumps(build_task_variants(bank), ensure_ascii=False) + "\n")
     write(out / "pages" / "search.html", render_search())
     write(out / "pages" / "progress.html", render_progress(model))
-    write(out / "pages" / "account.html", render_account())
-    write(out / "pages" / "admin.html", render_admin())
+    write(out / "pages" / "account.html", render_account(model))
+    write(out / "pages" / "admin.html", render_admin(model))
     write(out / "pages" / "exam.html", render_exam())
     write(out / "api" / "v1" / "grading.json", json.dumps(grading_meta(model), ensure_ascii=False, indent=2) + "\n")
     write(out / "api" / "v1" / "search.json", json.dumps(search_index(model), ensure_ascii=False) + "\n")

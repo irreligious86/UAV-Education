@@ -184,6 +184,71 @@ var T = (typeof window !== "undefined" && window.T) || function (s) { return s; 
     download(rows, "uav-exam-results");
   }
 
+  // ------------------------------------------------------------------ feedback (docs/MULTIUSER-PLAN.md §14)
+  var FB_KIND = { error: T("ошибка"), unclear: T("непонятно"), idea: T("пожелание"), other: T("другое") };
+  var FB_STATUS = { new: T("новое"), in_progress: T("в работе"), done: T("сделано"), rejected: T("отклонено") };
+  var FB_STATE = { new: "", in_progress: "caution", done: "ok", rejected: "critical" };
+  function pages() { try { return JSON.parse(($("#nb-modules") || {}).textContent || "{}"); } catch (e) { return {}; } }
+
+  function renderFeedback() {
+    var map = pages(), rows = model.feedback || [];
+    var fs = $("[data-fb-status]").value, fk = $("[data-fb-kind]").value, fsec = $("[data-fb-section]");
+    var cur = fsec.value, secs = {};
+    rows.forEach(function (f) { var k = f.section_key || "-"; var m = map[f.module_id]; secs[k] = (m && m.st) || f.section_key || T("без раздела"); });
+    fsec.innerHTML = T('<option value="">все разделы</option>') + Object.keys(secs).sort().map(function (k) {
+      return '<option value="' + esc(k) + '">' + esc(secs[k]) + "</option>"; }).join("");
+    fsec.value = secs[cur] ? cur : "";
+    var shown = rows.filter(function (f) {
+      return (!fs || f.status === fs) && (!fk || f.kind === fk) && (!fsec.value || (f.section_key || "-") === fsec.value);
+    });
+    $("[data-adm-feedback]").innerHTML = shown.length ? shown.map(function (f) {
+      var m = map[f.module_id];
+      var where = m ? '<a href="' + base + esc(m.u) + (f.anchor ? "#" + esc(encodeURIComponent(f.anchor)) : "") + '">' + esc(m.t) + (f.anchor ? " · #" + esc(f.anchor) : "") + "</a>"
+                    : esc(f.module_id || secs[f.section_key || "-"] || "—");
+      return '<li class="nb-item" data-fb="' + esc(f.id) + '"><div class="nb-item__head">' + where +
+        ' <span class="gc-tag" data-state="' + FB_STATE[f.status] + '">' + esc(FB_STATUS[f.status] || f.status) + "</span>" +
+        ' <span class="gc-muted nb-when">' + esc(FB_KIND[f.kind] || f.kind) + " · " + esc(f.username || T("аккаунт удалён")) + " · " + when(f.created_at) +
+        (f.page_lang ? " · " + esc(f.page_lang) : "") + "</span></div>" +
+        '<p class="nb-excerpt">' + esc(f.body) + "</p>" +
+        '<div class="progress-actions"><select data-fb-set-status aria-label="' + T("Статус сообщения") + '">' +
+        Object.keys(FB_STATUS).map(function (k) { return '<option value="' + k + '"' + (k === f.status ? " selected" : "") + ">" + FB_STATUS[k] + "</option>"; }).join("") +
+        '</select><input class="adm-filter" maxlength="2000" data-fb-note value="' + esc(f.staff_note || "") + T('" placeholder="служебная заметка (автор её не видит)" aria-label="Служебная заметка">') +
+        T('<button type="button" class="gc-tag" data-fb-save>сохранить</button>') +
+        (model.me.isSuperadmin ? T(' <button type="button" class="gc-tag" data-fb-del>удалить (спам)</button>') : "") + "</div></li>";
+    }).join("") : T('<li class="gc-muted">Сообщений нет</li>');
+  }
+
+  var FB_PAGE = 500;
+  function loadFeedback(more) {
+    var have = more === true ? model.feedback || [] : [];
+    var before = have.length ? have[have.length - 1].created_at : null;
+    return window.UAVAccount.staffFeedback(before, FB_PAGE).then(function (rows) {
+      rows = rows || [];
+      model.feedback = have.concat(rows);
+      $("[data-fb-more]").hidden = rows.length < FB_PAGE;
+      renderFeedback();
+    })
+      .catch(function (e) { msg(window.UAVAccount.humanError(e), "critical"); });
+  }
+
+  function wireFeedback() {
+    var A = window.UAVAccount;
+    ["[data-fb-status]", "[data-fb-kind]", "[data-fb-section]"].forEach(function (sel) { $(sel).addEventListener("change", renderFeedback); });
+    $("[data-fb-reload]").addEventListener("click", function () { loadFeedback(); });
+    $("[data-fb-more]").addEventListener("click", function () { loadFeedback(true); });
+    $("[data-adm-feedback]").addEventListener("click", function (e) {
+      var li = e.target.closest("[data-fb]"); if (!li) return;
+      var id = Number(li.getAttribute("data-fb"));
+      if (e.target.closest("[data-fb-save]")) {
+        A.setFeedback(id, li.querySelector("[data-fb-set-status]").value, li.querySelector("[data-fb-note]").value)
+          .then(function () { msg(T("Сохранено."), "ok"); return loadFeedback(); }).catch(function (err) { msg(A.humanError(err), "critical"); });
+      }
+      if (e.target.closest("[data-fb-del]") && window.confirm(T("Удалить это сообщение навсегда?"))) {
+        A.deleteFeedback(id).then(loadFeedback).catch(function (err) { msg(A.humanError(err), "critical"); });
+      }
+    });
+  }
+
   function load(note) {
     var A = window.UAVAccount;
     if (typeof note !== "string") note = "";
@@ -258,7 +323,8 @@ var T = (typeof window !== "undefined" && window.T) || function (s) { return s; 
         A.setRole(sel.getAttribute("data-role-of"), sel.value).then(function () { return load(T("Роль изменена.")); })
           .catch(function (err) { var t = A.humanError(err); return load().then(function () { msg(t, "critical"); }); });
       });
-      return Promise.all([load(), loadExams()]);
+      wireFeedback();
+      return Promise.all([load(), loadExams(), loadFeedback()]);
     });
   }
 

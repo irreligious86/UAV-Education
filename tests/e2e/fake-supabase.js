@@ -22,7 +22,14 @@
   function emit(ev, s) { listeners.forEach(function (cb) { cb(ev, s); }); }
   window.__fakeCalls = [];
 
+  // personal tables of 0007: owner-only rows; key columns per table
+  var OWN = { user_notes: ["module_id", "anchor"], user_bookmarks: ["module_id", "anchor"], user_settings: [], user_history: [] };
+  function ownRows(db, table) { db.tables = db.tables || {}; return (db.tables[table] = db.tables[table] || []); }
+
   function rowsFor(table, db, u) {
+    if (OWN[table]) return ownRows(db, table).filter(function (r) { return u && r.user_id === u.id; }).map(function (r) { return Object.assign({}, r); });
+    if (table === "feedback") return (db.feedback || []).filter(function (f) { return u && (f.user_id === u.id || staff(u)); })
+      .map(function (f) { var o = Object.assign({}, f); delete o.staff_note; return o; });
     if (table === "profiles") return db.users.filter(function (x) { return staff(u) || (u && x.id === u.id); })
       .map(function (x) { return { id: x.id, username: x.username, email: x.email, role: x.role, created_at: x.created_at, lang: x.lang || null }; });
     if (table === "progress") return Object.keys(db.progress).filter(function (k) { return staff(u) || (u && k === u.id); })
@@ -61,6 +68,23 @@
     function run() {
       var db = load(), u = me(db);
       window.__fakeCalls.push({ table: table, mode: mode, payload: payload });
+      if (mode === "upsert" && OWN[table]) {
+        var list = Array.isArray(payload) ? payload : [payload], keys = OWN[table], store = ownRows(db, table), back = [];
+        for (var pi = 0; pi < list.length; pi++) {
+          var nr = list[pi];
+          if (!u || nr.user_id !== u.id) return fail("new row violates row-level security policy");
+          if (table === "user_settings" && Object.keys(nr.data || {}).some(function (k) { return ["readyOnly", "resumeOnOpen", "notesPanel", "firmwarePath"].indexOf(k) < 0; }))
+            return fail('new row violates check constraint "user_settings_shape"');
+          if (table === "user_notes" && !(nr.body && nr.body.length <= 8000)) return fail('new row violates check constraint "user_notes_body_check"');
+          var same = function (r) { return r.user_id === nr.user_id && keys.every(function (k) { return r[k] === (nr[k] || ""); }); };
+          var row = store.filter(same)[0];
+          if (!row) { row = { user_id: nr.user_id, anchor: "", created_at: new Date().toISOString() }; store.push(row); }
+          Object.assign(row, nr, { updated_at: new Date(Date.now() + pi).toISOString() });
+          back.push(Object.assign({}, row));
+        }
+        save(db);
+        return single ? ok(back[0]) : ok(back);
+      }
       if (mode === "upsert") {
         if (!u || payload.user_id !== u.id) return fail("new row violates row-level security policy");
         db.progress[u.id] = { data: payload.data, updated_at: new Date().toISOString() }; save(db); return ok(null);
@@ -100,6 +124,10 @@
         }
         save(db);
         return single ? ok(made[0]) : ok(made);
+      }
+      if (mode === "delete" && OWN[table]) {
+        var hitOwn = function (r) { return u && r.user_id === u.id && filters.every(function (f) { return String(r[f[0]]) === String(f[1]); }); };
+        db.tables[table] = ownRows(db, table).filter(function (r) { return !hitOwn(r); }); save(db); return ok(null);
       }
       if (mode === "delete") {
         var did = (filters.filter(function (f) { return f[0] === "id"; })[0] || [])[1];
@@ -204,6 +232,43 @@
         var usedN = db.exam_attempts.filter(function (x) { return x.exam_id === a.exam_id && x.user_id === a.user_id; }).length;
         var last = usedN >= ex.attempts_allowed || (ex.closes_at && Date.now() > new Date(ex.closes_at).getTime());   // as in 0004
         return ok({ correct: a.correct, total: a.total, score_pct: a.score_pct, passed: a.passed, review: ex.show_review && last ? review : null });
+      }
+      if (name === "save_note") {           // as 0007: writes only over the version the caller saw
+        if (!u) return fail("permission denied");
+        if (!(args.p_body && args.p_body.length <= 8000)) return fail('new row violates check constraint "user_notes_body_check"');
+        var ns = ownRows(db, "user_notes"), cur = ns.filter(function (r) { return r.user_id === u.id && r.module_id === args.p_module && r.anchor === args.p_anchor; })[0];
+        if (cur && cur.updated_at !== args.p_expected) return ok({ conflict: true, body: cur.body, label: cur.label, updated_at: cur.updated_at });
+        if (!cur) { cur = { user_id: u.id, module_id: args.p_module, anchor: args.p_anchor, created_at: new Date().toISOString() }; ns.push(cur); }
+        cur.body = args.p_body; cur.label = args.p_label || ""; cur.updated_at = new Date(Date.now() + ns.length).toISOString();
+        save(db); return ok({ conflict: false, updated_at: cur.updated_at });
+      }
+      if (name === "send_feedback") {
+        if (!u || u.unconfirmed) return fail("log in with a confirmed account");
+        db.feedback = db.feedback || [];
+        var hour = db.feedback.filter(function (f) { return f.user_id === u.id && Date.now() - Date.parse(f.created_at) < 3600e3; }).length;
+        if (hour >= 10) return fail("feedback rate limit: at most 10 per hour and 50 per day");
+        if (String(args.p_body || "").trim().length < 10) return fail('new row violates check constraint "feedback_body_check"');
+        var fb = { id: db.feedback.length + 1, user_id: u.id, module_id: args.p_module || null, section_key: args.p_section || null, anchor: args.p_anchor || "",
+                   kind: args.p_kind, body: args.p_body, page_lang: args.p_lang || null, status: "new", staff_note: "",
+                   created_at: new Date().toISOString(), updated_at: new Date().toISOString() };
+        db.feedback.push(fb); save(db); return ok(fb.id);
+      }
+      if (name === "feedback_for_staff") {
+        if (!staff(u)) return fail("only staff can read all feedback");
+        return ok((db.feedback || []).slice().reverse().filter(function (f) { return !args.p_before || f.created_at < args.p_before; }).slice(0, args.p_limit || 500).map(function (f) {
+          var a0 = db.users.filter(function (x) { return x.id === f.user_id; })[0]; return Object.assign({ username: a0 ? a0.username : null }, f); }));
+      }
+      if (name === "feedback_set") {
+        if (!staff(u)) return fail("only staff can change feedback");
+        var ff = (db.feedback || []).filter(function (f) { return f.id === args.p_id; })[0];
+        if (!ff) return fail("no such feedback");
+        if (args.p_status != null) ff.status = args.p_status;
+        if (args.p_staff_note != null) ff.staff_note = args.p_staff_note;
+        ff.updated_at = new Date().toISOString(); save(db); return ok(null);
+      }
+      if (name === "feedback_delete") {
+        if (!u || u.role !== "superadmin") return fail("only the superadmin can delete feedback");
+        db.feedback = (db.feedback || []).filter(function (f) { return f.id !== args.p_id; }); save(db); return ok(null);
       }
       if (name !== "set_role") return fail("unknown rpc");
       if (!u || u.role !== "superadmin") return fail("only the superadmin can change roles");

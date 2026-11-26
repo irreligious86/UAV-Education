@@ -20,6 +20,10 @@ var T = (typeof window !== "undefined" && window.T) || function (s) { return s; 
   var KEY = "uav-student:progress:v1";
   var PENDING = "uav-student:sync-pending";
   var OWNER = "uav-student:owner";            // whose progress sits in this browser (shared computers)
+  var PRIVATE = ["uav-student:notes:v1", "uav-student:bookmarks:v1", "uav-student:history:v1", "uav-student:userdata-sync"];   // assets/user-data.js
+  // personal tables (0007) and the columns the browser reads back
+  var DATA_TABLES = { user_notes: "module_id,anchor,label,body,updated_at", user_bookmarks: "module_id,anchor,label,updated_at" };
+  var DOC_TABLES = { user_settings: "data", user_history: "items" };
   var USERNAME_RE = /^[a-z0-9_]{3,32}$/;
   var MIN_PASSWORD = 10;
 
@@ -72,11 +76,17 @@ var T = (typeof window !== "undefined" && window.T) || function (s) { return s; 
   // ------------------------------------------------------------------ local storage helpers
   function readLocal() { try { return JSON.parse(localStorage.getItem(KEY) || "{}"); } catch (e) { return {}; } }
   function writeLocal(d) { try { localStorage.setItem(KEY, JSON.stringify(d)); } catch (e) { /* storage off */ } }
-  function clearLocal() {
+  // keepUnsynced: the session ended by itself (expired, revoked) — notes and bookmarks that never reached the server
+  // stay, with the owner mark, so the same account pushes them at its next login and any other account wipes them
+  function clearLocal(keepUnsynced) {
+    var kept = keepUnsynced && window.UAVUserData && window.UAVUserData.keepUnsynced ? window.UAVUserData.keepUnsynced() : 0;
     try {
-      localStorage.removeItem(KEY); localStorage.removeItem(PENDING); localStorage.removeItem(OWNER);
+      localStorage.removeItem(KEY); localStorage.removeItem(PENDING);
+      if (!kept) localStorage.removeItem(OWNER);
       // exam picks of this account must not stay for the next person on a shared browser (review 2026-11-09, L5)
       Object.keys(localStorage).forEach(function (k) { if (k.indexOf("uav-student:exam-draft:") === 0) localStorage.removeItem(k); });
+      // notes, bookmarks and reading history are personal too (they are on the server); settings stay
+      if (!kept) PRIVATE.forEach(function (k) { localStorage.removeItem(k); });
     } catch (e) { /* ignore */ }
   }
   // Progress of another account left in this browser is wiped, never merged into the next account;
@@ -125,6 +135,13 @@ var T = (typeof window !== "undefined" && window.T) || function (s) { return s; 
     if (/already registered|already exists/i.test(m)) return T("Эта почта уже зарегистрирована. Войди или восстанови пароль.");
     if (/email not confirmed/i.test(m)) return T("Почта не подтверждена: открой ссылку из письма.");
     if (/database error saving new user|username/i.test(m)) return T("Имя пользователя занято или не подходит (3–32 символа: a-z, 0-9, _).");
+    if (/feedback rate limit/i.test(m)) return T("Слишком много сообщений: не больше 10 в час и 50 в сутки. Попробуй позже.");
+    if (/user_notes limit reached/i.test(m)) return T("Достигнут предел: не больше 2000 заметок на аккаунт.");
+    if (/user_bookmarks limit reached/i.test(m)) return T("Достигнут предел: не больше 1000 закладок на аккаунт.");
+    if (/feedback_body_check|feedback_kind_check|feedback_target/i.test(m)) return T("Сообщение: от 10 до 4000 символов и тип из списка.");
+    if (/feedback_(anchor|page_lang|module_id|section_key)_check/i.test(m)) return T("Сообщение не принято: неверная ссылка на урок или раздел.");
+    if (/user_(notes|bookmarks)_(module_id|anchor)_check|bad module or anchor/i.test(m)) return T("Заметка или закладка с неверной ссылкой на урок — сервер её не примет.");
+    if (/user_notes_body_check|bad note text/i.test(m)) return T("Заметка пустая или длиннее 8000 символов.");
     if (/rate limit|too many/i.test(m)) return T("Слишком много попыток, подожди минуту.");
     if (/no attempts left/i.test(m)) return T("Попытки на этот экзамен закончились.");
     if (/time is up/i.test(m)) return T("Время вышло: попытка не принята.");
@@ -169,8 +186,10 @@ var T = (typeof window !== "undefined" && window.T) || function (s) { return s; 
     pushTimer = setTimeout(function () { push(readLocal()); }, 1200);
   }
 
+  var loginHooks = [];
   function syncDown() {
     claimLocal(uid());
+    loginHooks.forEach(function (cb) { try { cb(uid()); } catch (e) { console.error(e); } });   // assets/user-data.js
     st.sync = "loading"; notify();
     return st.client.from("progress").select("data,updated_at").eq("user_id", uid()).maybeSingle().then(check)
       .then(function (row) {
@@ -248,7 +267,8 @@ var T = (typeof window !== "undefined" && window.T) || function (s) { return s; 
       st.client = c;
       c.auth.onAuthStateChange(function (event, session) {
         if (event === "PASSWORD_RECOVERY") st.recovery = true;
-        if (event === "SIGNED_OUT") clearLocal();   // also when the session was revoked elsewhere
+        // a logout of ours wipes everything; an expired or revoked session keeps what never reached the server
+        if (event === "SIGNED_OUT") clearLocal(!st.leaving);
         setSession(session);
       });
       return c.auth.getSession();
@@ -288,14 +308,19 @@ var T = (typeof window !== "undefined" && window.T) || function (s) { return s; 
       need();
       clearTimeout(pushTimer);
       var flush = isPending() ? push(readLocal()) : Promise.resolve();
+      var UD = window.UAVUserData, udOk = true;
+      if (UD && UD.flush) flush = flush.then(function () { return UD.flush(); }).then(function (ok) { udOk = ok; }, function () { udOk = false; });
       return flush.then(function () {
-        if (isPending() && !force) {
-          var e = new Error(T("Нет связи: часть прогресса ещё не на сервере. Выйти сейчас — эти изменения пропадут.")); e.unsynced = true; throw e;
+        if ((isPending() || !udOk) && !force) {
+          var e = new Error(isPending() || !UD.error() ? T("Нет связи: часть прогресса ещё не на сервере. Выйти сейчас — эти изменения пропадут.")
+            : T("Часть заметок или закладок не сохранилась на сервере: ") + UD.error() + T(" Выйти сейчас — эти изменения пропадут."));
+          e.unsynced = true; throw e;
         }
+        st.leaving = true;
         return st.client.auth.signOut({ scope: "local" });
       }).then(function () {
-        clearLocal(); st.recovery = false; return setSession(null);
-      });
+        st.leaving = false; clearLocal(); st.recovery = false; return setSession(null);
+      }, function (err) { st.leaving = false; throw err; });
     },
     resetPassword: function (email) {
       need();
@@ -313,7 +338,65 @@ var T = (typeof window !== "undefined" && window.T) || function (s) { return s; 
       if (!USERNAME_RE.test(username)) return Promise.reject(new Error(T("Имя пользователя: 3–32 символа, a-z, 0-9, _.")));
       return st.client.from("profiles").update({ username: username }).eq("id", uid()).then(check).then(loadProfile).then(notify);
     },
-    syncNow: function () { need(); return push(readLocal()); },
+    syncNow: function () {
+      need();
+      return Promise.all([push(readLocal()), window.UAVUserData ? window.UAVUserData.syncAll() : null]);
+    },
+    onLogin: function (cb) { loginHooks.push(cb); if (uid() && st.profile) { try { cb(uid()); } catch (e) { console.error(e); } } },
+
+    // personal data (docs/MULTIUSER-PLAN.md §14): own rows only, the database enforces it
+    userRows: function (table) {
+      need();
+      if (!DATA_TABLES[table]) return Promise.reject(new Error("unknown table " + table));
+      return st.client.from(table).select(DATA_TABLES[table]).eq("user_id", uid()).then(check).then(function (r) { return r || []; });
+    },
+    upsertRows: function (table, rows) {
+      need();
+      if (!DATA_TABLES[table]) return Promise.reject(new Error("unknown table " + table));
+      var me = uid();
+      return st.client.from(table).upsert(rows.map(function (r) { return Object.assign({ user_id: me }, r); }))
+        .select("module_id,anchor,updated_at").then(check);
+    },
+    // expected: delete only that version (a note edited on another device meanwhile stays and comes back at the next pull)
+    deleteRow: function (table, moduleId, anchor, expected) {
+      need();
+      if (!DATA_TABLES[table]) return Promise.reject(new Error("unknown table " + table));
+      var q = st.client.from(table).delete().eq("user_id", uid()).eq("module_id", moduleId).eq("anchor", anchor || "");
+      if (expected) q = q.eq("updated_at", expected);
+      return q.then(check);
+    },
+    // saves over the version this browser last saw, or returns {conflict: true, body, label, updated_at} (0007 save_note)
+    saveNote: function (moduleId, anchor, label, body, expected) {
+      need();
+      return st.client.rpc("save_note", { p_module: moduleId, p_anchor: anchor || "", p_label: label || "", p_body: body, p_expected: expected || null }).then(check);
+    },
+    getDoc: function (table) {
+      need();
+      if (!DOC_TABLES[table]) return Promise.reject(new Error("unknown table " + table));
+      return st.client.from(table).select(DOC_TABLES[table] + ",updated_at").eq("user_id", uid()).maybeSingle().then(check);
+    },
+    putDoc: function (table, value) {
+      need();
+      if (!DOC_TABLES[table]) return Promise.reject(new Error("unknown table " + table));
+      var row = { user_id: uid() }; row[DOC_TABLES[table]] = value;
+      return st.client.from(table).upsert(row).select("updated_at").single().then(check);
+    },
+
+    // feedback (§14): only signed-in users with a confirmed email; the database checks both and the rate limit
+    sendFeedback: function (f) {
+      need();
+      if (!uid()) return Promise.reject(new Error("log in with a confirmed account"));
+      return st.client.rpc("send_feedback", { p_module: f.module || "", p_section: f.section || "", p_anchor: f.anchor || "",
+        p_kind: f.kind, p_body: f.body, p_lang: f.lang || "" }).then(check);
+    },
+    myFeedback: function () {
+      need();
+      return st.client.from("feedback").select("id,module_id,section_key,anchor,kind,body,status,created_at,updated_at")
+        .eq("user_id", uid()).order("created_at", { ascending: false }).limit(100).then(check);
+    },
+    staffFeedback: function (before, limit) { need(); return st.client.rpc("feedback_for_staff", { p_before: before || null, p_limit: limit || 500 }).then(check); },
+    setFeedback: function (id, status, note) { need(); return st.client.rpc("feedback_set", { p_id: id, p_status: status, p_staff_note: note }).then(check); },
+    deleteFeedback: function (id) { need(); return st.client.rpc("feedback_delete", { p_id: id }).then(check); },
 
     // staff
     listStudents: function () {
@@ -394,7 +477,7 @@ var T = (typeof window !== "undefined" && window.T) || function (s) { return s; 
 
   window.UAVAccount = api;
   // accounts off: still show where the sign-in will be, so the account page (preview) is reachable
-  if (!CFG.enabled) {
+  if (!CFG.enabled && typeof document !== "undefined") {
     var addEntry = function () {
       var nav = document.querySelector(".site-header .gc-nav");
       if (!nav || document.getElementById("nav-account")) return;
