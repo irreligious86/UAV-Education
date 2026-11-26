@@ -53,6 +53,8 @@ INAV: `nav_fw_cruise_speed`, `nav_fw_min_thr/max_thr/cruise_thr`, `nav_fw_climb_
 ### Запуск і посадка
 Кидок із руки/катапульта: `TKOFF_THR_MINACC` (детекція кидка за прискоренням), `TKOFF_THR_DELAY`, `TKOFF_LVL_ALT`; INAV — autolaunch (`nav_fw_launch_*`). Посадка: глісада `LAND_PITCH_DEG`, `LAND_FLARE_ALT/SEC`, далекомір для вирівнювання; у крила — на пузо проти вітру, швидкість 1.1–1.2 V_s.
 
+{{diagram:chart-wing-stall-prevention|С AIRSPEED_STALL = 0 ArduPlane 4.7 считает сваливанием AIRSPEED_MIN и держит крен на 25° до 10.5 м/с; с AIRSPEED_STALL = 8.5 полный ROLL_LIMIT_DEG 45° доступен уже с 10.1 м/с.}}
+
 {{diagram:tecs-energy|TECS: помилка повної енергії (висота + швидкість) закривається газом, помилка їхнього балансу — тангажем; тому набір висоти без запасу газу з'їдає швидкість.}}
 
 ## practice
@@ -61,6 +63,117 @@ INAV: `nav_fw_cruise_speed`, `nav_fw_min_thr/max_thr/cruise_thr`, `nav_fw_climb_
 
 ### Крок 2. Центрування
 Знайти нейтральну точку (калькулятор для крила або 25% MAC для класичної схеми без урахування стабілізатора — з ним формула складніша, використовувати калькулятор), вибрати запас 10%, позначити точку ЦВ, збалансувати з АКБ. Записати масу, ЦВ і запас.
+
+### Крок 2a. Скрипт: формули ArduPlane на твоїх числах (код і вивід як у вихідному модулі)
+
+```python
+#!/usr/bin/env python3
+"""Wing lab for module aero-wing: the module's worked example plus the ArduPlane 4.7.2 formulas
+for stall prevention and the TECS energy split (stdlib only). Run: python3 wing_lab.py
+
+Firmware references (ArduPilot tag ArduPlane-4.7.2):
+  ArduPlane/Attitude.cpp:677-762  update_load_factor(), apply_load_factor_roll_limits()
+  libraries/AP_TECS/AP_TECS.cpp:420-433  _TASmin = AIRSPEED_MIN*EAS2TAS, raised by sqrt(load factor)
+  libraries/AP_TECS/AP_TECS.cpp:1250-1251  STEdot_max = TECS_CLMB_MAX*g, STEdot_min = -TECS_SINK_MIN*g
+"""
+import math
+
+G, RHO0 = 9.81, 1.225
+
+
+def isa_rho(h_m):
+    """ISA troposphere density, kg/m^3."""
+    t = 288.15 - 0.0065 * h_m
+    p = 101325 * (t / 288.15) ** 5.2559
+    return p / (287.05 * t)
+
+
+def stall_speed(m, s, cl_max, rho=RHO0):
+    return math.sqrt(2 * m * G / (rho * s * cl_max))
+
+
+def ap_roll_limit(v, airspeed_min, airspeed_stall=0.0, roll_limit=45, level_roll_limit=5):
+    """apply_load_factor_roll_limits() for a demanded bank of 85 deg, default FLIGHT_OPTIONS."""
+    vs1g = airspeed_stall if airspeed_stall > 0 else airspeed_min
+    n_max = (v / max(vs1g, 1)) ** 2
+    n_dem = 1 / math.cos(math.radians(85))
+    if n_max <= 1:
+        lim = 25
+    elif n_max < n_dem:
+        lim = max(math.degrees(math.acos(1 / n_max)), 25, level_roll_limit)
+    else:
+        lim = roll_limit
+    return min(lim, roll_limit)
+
+
+def tecs_min_speed(bank_deg, airspeed_min, airspeed_stall=0.0):
+    """_TASmin at sea level with STALL_PREVENTION=1 (EAS2TAS = 1)."""
+    n = 1 / math.cos(math.radians(bank_deg))
+    if airspeed_stall > 0:
+        return max(airspeed_min, airspeed_stall * math.sqrt(n))
+    return airspeed_min * math.sqrt(n)
+
+
+m, S, CL = 2.0, 0.4, 1.1
+vs = stall_speed(m, S, CL)
+print(f"1) W/S = {m / S:.1f} kg/m^2 = {m * 1000 / (S * 100):.0f} g/dm^2; V_s = {vs:.2f} m/s; "
+      f"cruise 1.4*V_s = {1.4 * vs:.1f} m/s; AIRSPEED_MIN >= 1.2*V_s = {1.2 * vs:.1f} m/s")
+for phi in (30, 45, 60):
+    n = 1 / math.cos(math.radians(phi))
+    print(f"   bank {phi:2} deg: n = {n:.2f} g, V_s(bank) = {vs * math.sqrt(n):.2f} m/s")
+
+print("2) EAS vs TAS (AIRSPEED_* are EAS; TECS multiplies by EAS2TAS):")
+for h in (0, 1500, 3000):
+    rho = isa_rho(h)
+    print(f"   {h:4} m ISA: rho = {rho:.3f}, EAS2TAS = {math.sqrt(RHO0 / rho):.3f}, "
+          f"stall TAS = {vs * math.sqrt(RHO0 / rho):.2f} m/s, stall EAS = {vs:.2f} m/s")
+
+print("3) Stall prevention bank limit (ROLL_LIMIT_DEG 45, LEVEL_ROLL_LIMIT 5):")
+print("   V m/s | AIRSPEED_STALL=0 (uses MIN=10) | AIRSPEED_STALL=8.5")
+for v in (9, 10, 11, 12, 13, 15):
+    print(f"   {v:5} | {ap_roll_limit(v, 10):26.1f} | {ap_roll_limit(v, 10, 8.5):12.1f}")
+
+print("4) TECS minimum airspeed in a turn (STALL_PREVENTION=1):")
+for phi in (0, 30, 45, 60):
+    print(f"   bank {phi:2}: MIN=10,STALL=0 -> {tecs_min_speed(phi, 10):5.2f} m/s; "
+          f"MIN=10,STALL=8.5 -> {tecs_min_speed(phi, 10, 8.5):5.2f} m/s")
+
+print("5) Energy trade at cruise:")
+v1, v2 = 12.0, 10.0
+print(f"   slowing {v1:.0f} -> {v2:.0f} m/s frees dh = (v1^2 - v2^2)/(2g) = {(v1**2 - v2**2) / (2 * G):.2f} m")
+clmb, sink = 5.0, 2.0     # TECS_CLMB_MAX, TECS_SINK_MIN defaults (AP_TECS.cpp:27,35)
+print(f"   STEdot_max = CLMB_MAX*g = {clmb * G:.1f} W/kg, STEdot_min = -SINK_MIN*g = {-sink * G:.1f} W/kg")
+print(f"   climb demand 5 m/s while accelerating 1 m/s^2 at 12 m/s needs "
+      f"{5 * G + 12 * 1.0:.1f} W/kg > STEdot_max -> speed or height has to give")
+```
+
+```text
+1) W/S = 5.0 kg/m^2 = 50 g/dm^2; V_s = 8.53 m/s; cruise 1.4*V_s = 11.9 m/s; AIRSPEED_MIN >= 1.2*V_s = 10.2 m/s
+   bank 30 deg: n = 1.15 g, V_s(bank) = 9.17 m/s
+   bank 45 deg: n = 1.41 g, V_s(bank) = 10.15 m/s
+   bank 60 deg: n = 2.00 g, V_s(bank) = 12.07 m/s
+2) EAS vs TAS (AIRSPEED_* are EAS; TECS multiplies by EAS2TAS):
+      0 m ISA: rho = 1.225, EAS2TAS = 1.000, stall TAS = 8.53 m/s, stall EAS = 8.53 m/s
+   1500 m ISA: rho = 1.058, EAS2TAS = 1.076, stall TAS = 9.18 m/s, stall EAS = 8.53 m/s
+   3000 m ISA: rho = 0.909, EAS2TAS = 1.161, stall TAS = 9.90 m/s, stall EAS = 8.53 m/s
+3) Stall prevention bank limit (ROLL_LIMIT_DEG 45, LEVEL_ROLL_LIMIT 5):
+   V m/s | AIRSPEED_STALL=0 (uses MIN=10) | AIRSPEED_STALL=8.5
+       9 |                       25.0 |         26.9
+      10 |                       25.0 |         43.7
+      11 |                       34.3 |         45.0
+      12 |                       45.0 |         45.0
+      13 |                       45.0 |         45.0
+      15 |                       45.0 |         45.0
+4) TECS minimum airspeed in a turn (STALL_PREVENTION=1):
+   bank  0: MIN=10,STALL=0 -> 10.00 m/s; MIN=10,STALL=8.5 -> 10.00 m/s
+   bank 30: MIN=10,STALL=0 -> 10.75 m/s; MIN=10,STALL=8.5 -> 10.00 m/s
+   bank 45: MIN=10,STALL=0 -> 11.89 m/s; MIN=10,STALL=8.5 -> 10.11 m/s
+   bank 60: MIN=10,STALL=0 -> 14.14 m/s; MIN=10,STALL=8.5 -> 12.02 m/s
+5) Energy trade at cruise:
+   slowing 12 -> 10 m/s frees dh = (v1^2 - v2^2)/(2g) = 2.24 m
+   STEdot_max = CLMB_MAX*g = 49.1 W/kg, STEdot_min = -SINK_MIN*g = -19.6 W/kg
+   climb demand 5 m/s while accelerating 1 m/s^2 at 12 m/s needs 61.1 W/kg > STEdot_max -> speed or height has to give
+```
 
 ### Крок 3. Параметри
 ArduPlane: `AIRSPEED_MIN/CRUISE/MAX`, стартові `TECS_*`, `TRIM_THROTTLE`, `ARSPD_*`, якщо є трубка. INAV: `nav_fw_*`. Обґрунтувати кожну цифру розрахунком із кроку 1.

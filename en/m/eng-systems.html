@@ -75,10 +75,10 @@
 <p>An Architecture Decision Record is a short file for every irreversible decision. Template:</p>
 <pre class="cli-block"><code># ADR-003: Li-Ion 6S2P instead of LiPo for the survey airframe
 Status: accepted (2026-11-08)
-Context: requirement R-PWR-03 (25 min hover with 500 g); LiPo 6S 5000 gives 17 min by calculation.
-Decision: 6S2P P42A, 8.4 Ah, cruise current 22 A.
+Context: requirement R-PWR-03 (25 min hover with 500 g); hover current 16 A (R-PWR-01); LiPo 6S 5000 gives 15 min at 80 % DoD.
+Decision: 6S2P P42A, 8.4 Ah: 6.7 Ah usable at 80 % DoD / 16 A = 25 min.
 Consequences: +180 g, sag under punch ~1.5 V, no aggressive manoeuvres; BATT_* thresholds for Li-Ion.
-Alternatives: LiPo 6S 8000 (heavier, 21 min), hybrid (out of budget).</code></pre>
+Alternatives: LiPo 6S 8000 (heavier, hover ~18 A, 21 min at 80 % DoD), hybrid (out of budget).</code></pre>
 <p>Six months later, the question “why Li-Ion here?” is answered by a file, not by memory.</p>
 <h4 class="md-subheading">Verification and validation</h4>
 <ul><li><strong>Verification</strong> — “did we build it right?”: every requirement → a test with a method; a staged test plan: analysis/calculation → SITL → bench (no props) → tethered/low flight → flight. The result of every test is a record with a date, a config (a tag!), a log, a verdict.</li><li><strong>Validation</strong> — “did we build the right thing?”: a run of the real task with the customer/user; it often uncovers requirements that did not exist.</li><li>Traceability matrix: requirement ↔ test ↔ result. Empty cells are open requirements; tests without requirements are either unnecessary or a requirement was forgotten.</li><li>Regression: after any change — a set of mandatory tests (the SITL autotest from the CI module + a short flight checklist).</li></ul>
@@ -88,6 +88,7 @@ Alternatives: LiPo 6S 8000 (heavier, 21 min), hybrid (out of budget).</code></pr
 <p>Quality criterion: another engineer restores the aircraft from the package and performs a flight without asking the author anything. The test for this — ask someone to try.</p>
 <h4 class="md-subheading">Change process</h4>
 <p>Request → impact assessment on requirements/FMEA → change in a branch → tests (regression) → review → tagged release → documentation update in the same PR. Documentation updated “later” is never updated.</p>
+<figure class="diagram" data-diagram="eng-verify-method-tree"><div class="diagram__svg"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 364" width="100%" role="img" aria-labelledby="t" style="max-width:720px;display:block;margin:0 auto"><title id="t">Какой метод проверки у требования (NASA SEH §5.3)</title><style>text{font-family: var(--gc-font-mono, ui-monospace, Menlo, monospace); font-size: 12px;fill:currentColor} .m{fill:var(--gc-ink-muted, #8a93a3)} .a{fill:var(--gc-accent-hud, #5ef1d2)} .w{fill:var(--gc-signal-amber, #f0b24c)} .d{fill:var(--gc-signal-red, #e8636b)} .box{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:currentColor;stroke-width:1.2} .boxa{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6} .ln{stroke:currentColor;stroke-width:1.2;fill:none} .lna{stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6;fill:none} .lnm{stroke:var(--gc-ink-muted, #8a93a3);stroke-width:1;fill:none;stroke-dasharray:4 3} .t{font-size:11px} .b{font-weight:600}</style><defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker><marker id="ara" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--gc-accent-hud, #5ef1d2)"/></marker></defs><text x="16" y="16" text-anchor="start" class="m t">Какой метод проверки у требования (NASA SEH §5.3)</text><rect class="box" x="275.0" y="34" width="170.0" height="50" rx="6"/><text x="360.0" y="51.0" text-anchor="middle" style="font-size:10.5px">Свойство видно или</text><text x="360.0" y="63.0" text-anchor="middle" style="font-size:10.5px">измеряется на готовом</text><text x="360.0" y="75.0" text-anchor="middle" style="font-size:10.5px">изделии без работы?</text><path class="ln" d="M360.0 84 L360.0 99.0 L97.5 99.0 L97.5 114" marker-end="url(#ar)"/><text x="101.5" y="95.0" text-anchor="start" class="a t" style="font-size:10px">yes</text><rect class="box" x="13.0" y="114" width="169.0" height="50" rx="18"/><text x="97.5" y="131.0" text-anchor="middle" style="font-size:10.5px">Осмотр (I)</text><text x="97.5" y="143.0" text-anchor="middle" style="font-size:10.5px">маркировка, разъёмы,</text><text x="97.5" y="155.0" text-anchor="middle" style="font-size:10.5px">комплектность по BOM</text><path class="ln" d="M360.0 84 L360.0 99.0 L447.5 99.0 L447.5 114" marker-end="url(#ar)"/><text x="451.5" y="95.0" text-anchor="start" class="a t" style="font-size:10px">no</text><rect class="box" x="362.5" y="114" width="170.0" height="50" rx="6"/><text x="447.5" y="131.0" text-anchor="middle" style="font-size:10.5px">Изделие можно</text><text x="447.5" y="143.0" text-anchor="middle" style="font-size:10.5px">безопасно запустить</text><text x="447.5" y="155.0" text-anchor="middle" style="font-size:10.5px">в нужных условиях?</text><path class="ln" d="M447.5 164 L447.5 179.0 L272.5 179.0 L272.5 194" marker-end="url(#ar)"/><text x="276.5" y="175.0" text-anchor="start" class="a t" style="font-size:10px">no</text><rect class="boxa" x="188.0" y="194" width="169.0" height="50" rx="18"/><text x="272.5" y="211.0" text-anchor="middle" class="b" style="font-size:10.5px">Анализ (A)</text><text x="272.5" y="223.0" text-anchor="middle" class="b" style="font-size:10.5px">расчёт, SITL-модель,</text><text x="272.5" y="235.0" text-anchor="middle" class="b" style="font-size:10.5px">бюджет линка</text><path class="ln" d="M447.5 164 L447.5 179.0 L535.0 179.0 L535.0 194" marker-end="url(#ar)"/><text x="539.0" y="175.0" text-anchor="start" class="a t" style="font-size:10px">yes</text><rect class="box" x="450.0" y="194" width="170.0" height="50" rx="6"/><text x="535.0" y="211.0" text-anchor="middle" style="font-size:10.5px">Нужно число</text><text x="535.0" y="223.0" text-anchor="middle" style="font-size:10.5px">с допуском, а не</text><text x="535.0" y="235.0" text-anchor="middle" style="font-size:10.5px">только «работает»?</text><path class="ln" d="M535.0 244 L535.0 259.0 L447.5 259.0 L447.5 274" marker-end="url(#ar)"/><text x="451.5" y="255.0" text-anchor="start" class="a t" style="font-size:10px">no</text><rect class="box" x="363.0" y="274" width="169.0" height="50" rx="18"/><text x="447.5" y="291.0" text-anchor="middle" style="font-size:10.5px">Демонстрация (D)</text><text x="447.5" y="303.0" text-anchor="middle" style="font-size:10.5px">арм по чек-листу,</text><text x="447.5" y="315.0" text-anchor="middle" style="font-size:10.5px">RTH-переключатель</text><path class="ln" d="M535.0 244 L535.0 259.0 L622.5 259.0 L622.5 274" marker-end="url(#ar)"/><text x="626.5" y="255.0" text-anchor="start" class="a t" style="font-size:10px">yes</text><rect class="boxa" x="538.0" y="274" width="169.0" height="50" rx="18"/><text x="622.5" y="291.0" text-anchor="middle" class="b" style="font-size:10.5px">Испытание (T)</text><text x="622.5" y="303.0" text-anchor="middle" class="b" style="font-size:10.5px">ток висения на стенде,</text><text x="622.5" y="315.0" text-anchor="middle" class="b" style="font-size:10.5px">RTL в поле (T-31)</text></svg></div><figcaption class="gc-muted">Метод проверки выбирают по трём вопросам: видно ли свойство без работы изделия, можно ли его безопасно запустить и нужно ли число с допуском; SITL попадает в анализ, поэтому требование безопасности им одним не закрывается.</figcaption><div class="diagram__hint">Схему можно прокрутить по горизонтали</div></figure>
 <figure class="diagram" data-diagram="v-model"><div class="diagram__svg"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 200" width="100%" role="img" aria-labelledby="t" style="max-width:720px;display:block;margin:0 auto"><title id="t">V-model: each requirement level has its own test level</title><style>text{font-family: var(--gc-font-mono, ui-monospace, Menlo, monospace); font-size: 12px;fill:currentColor} .m{fill:var(--gc-ink-muted, #8a93a3)} .a{fill:var(--gc-accent-hud, #5ef1d2)} .w{fill:var(--gc-signal-amber, #f0b24c)} .d{fill:var(--gc-signal-red, #e8636b)} .box{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:currentColor;stroke-width:1.2} .boxa{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6} .ln{stroke:currentColor;stroke-width:1.2;fill:none} .lna{stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6;fill:none} .lnm{stroke:var(--gc-ink-muted, #8a93a3);stroke-width:1;fill:none;stroke-dasharray:4 3} .t{font-size:11px} .b{font-weight:600}</style><defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker><marker id="ara" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--gc-accent-hud, #5ef1d2)"/></marker></defs><rect class="boxa" x="10.0" y="30" width="142.0" height="48" rx="6"/><text x="81.0" y="51.0" text-anchor="middle" class="b">Requirements</text><text x="81.0" y="65.0" text-anchor="middle" class="b">system-level</text><rect class="box" x="196.0" y="30" width="142.0" height="48" rx="6"/><text x="267.0" y="51.0" text-anchor="middle">Architecture</text><text x="267.0" y="65.0" text-anchor="middle">interfaces</text><rect class="box" x="382.0" y="30" width="142.0" height="48" rx="6"/><text x="453.0" y="58.0" text-anchor="middle">Components</text><rect class="box" x="568.0" y="30" width="142.0" height="48" rx="6"/><text x="639.0" y="58.0" text-anchor="middle">Implementation</text><rect class="boxa" x="10.0" y="130" width="142.0" height="48" rx="6"/><text x="81.0" y="151.0" text-anchor="middle" class="b">Validation</text><text x="81.0" y="165.0" text-anchor="middle" class="b">on site</text><rect class="box" x="196.0" y="130" width="142.0" height="48" rx="6"/><text x="267.0" y="151.0" text-anchor="middle">System</text><text x="267.0" y="165.0" text-anchor="middle">tests, SITL</text><rect class="box" x="382.0" y="130" width="142.0" height="48" rx="6"/><text x="453.0" y="158.0" text-anchor="middle">Integration</text><rect class="box" x="568.0" y="130" width="142.0" height="48" rx="6"/><text x="639.0" y="151.0" text-anchor="middle">Unit</text><text x="639.0" y="165.0" text-anchor="middle">tests</text><path class="ln" d="M152.0 54.0 L196.0 54.0" marker-end="url(#ar)"/><path class="ln" d="M338.0 54.0 L382.0 54.0" marker-end="url(#ar)"/><path class="ln" d="M524.0 54.0 L568.0 54.0" marker-end="url(#ar)"/><path class="ln" d="M639.0 78 L639.0 130" marker-end="url(#ar)"/><path class="ln" d="M568.0 154.0 L524.0 154.0" marker-end="url(#ar)"/><path class="ln" d="M382.0 154.0 L338.0 154.0" marker-end="url(#ar)"/><path class="ln" d="M196.0 154.0 L152.0 154.0" marker-end="url(#ar)"/></svg></div><figcaption class="gc-muted">The V-model: each level of requirements and design has its own level of verification — from unit tests to validation in the field.</figcaption><div class="diagram__hint">Схему можно прокрутить по горизонтали</div></figure>
 
 <h2>Practice</h2>
@@ -97,11 +98,125 @@ Alternatives: LiPo 6S 8000 (heavier, 21 min), hybrid (out of budget).</code></pr
 <p>Block diagram, interface table, mass/power/link budgets, 3 ADRs using the template above (for example: Li-Ion vs LiPo; ELRS 900 vs 2.4; companion Pi vs Jetson).</p>
 <h4 class="md-subheading">Step 3. FMEA and test plan</h4>
 <p>A system FMEA (≥ 15 rows) in the format of the worked example: S/O/D/RPN, mitigation, a link to the requirement and the test; close the three risks with the highest RPN first and show how their O or D changed. A staged test plan; a traceability matrix.</p>
+<h4 class="md-subheading">Step 3a. Script: requirement lint, trace matrix and FMEA ranking (code and output as in the source module)</h4>
+<pre class="cli-block"><code>#!/usr/bin/env python3
+&quot;&quot;&quot;Traceability and FMEA checker for module eng-systems (stdlib only).
+
+Keep requirements, tests, results and FMEA as CSV files in the project repo; this script is the
+self-check: it lints requirement wording, finds holes in the trace matrix and ranks FMEA rows.
+Exit code 1 when a hole is found, so the same script can run in CI (module eng-ci-configs).
+Run: python3 trace_lab.py
+&quot;&quot;&quot;
+import csv
+import io
+import re
+import sys
+
+REQS = &quot;&quot;&quot;id,text,method,source,test
+R-SAF-01,When the RC signal is lost for more than 1 s the vehicle shall switch to RTL,T,FMEA F-07,T-12;T-31
+R-PWR-01,Hover current with 500 g payload shall not exceed 16 A,T,power budget,T-05
+R-PWR-03,Hover endurance with 500 g payload shall be at least 25 min at 20 C,A;T,customer 2,
+R-OPS-02,Battery swap shall be fast and easy,D,operator,T-40
+R-LNK-01,RC link margin at 3 km shall be at least 12 dB,A,mission 3 km,T-20
+&quot;&quot;&quot;
+TESTS = &quot;&quot;&quot;id,stage,result,date
+T-12,SITL,pass,2026-11-09
+T-31,field,pass,2026-11-09
+T-05,bench,pass,2026-11-10
+T-20,analysis,pass,2026-11-10
+T-40,bench,,
+T-77,SITL,pass,2026-11-11
+&quot;&quot;&quot;
+FMEA = &quot;&quot;&quot;id,failure,S,O,D,S_after,O_after,D_after
+F-07,RC link lost far away,9,4,2,9,4,2
+F-11,cold solder joint on motor phase,8,3,7,8,3,3
+F-12,firmware update renamed failsafe parameters,9,3,8,9,3,2
+F-14,BEC 5 V fails,9,3,6,9,3,3
+F-15,battery strap fails in flight,10,2,3,10,2,3
+&quot;&quot;&quot;
+
+VAGUE = r&quot;\b(fast|easy|quick|reliable|enough|good|user-friendly|as soon as possible|long)\b&quot;
+NUMBER = r&quot;\d&quot;
+
+
+def rows(text):
+    return list(csv.DictReader(io.StringIO(text)))
+
+
+reqs, tests, fmea = rows(REQS), rows(TESTS), rows(FMEA)
+test_ids = {t[&quot;id&quot;]: t for t in tests}
+holes = 0
+
+print(&quot;1) Requirement lint (INCOSE R7 vague terms, R34 measurable, method in I/A/D/T):&quot;)
+for r in reqs:
+    issues = []
+    if re.search(VAGUE, r[&quot;text&quot;], re.I):
+        issues.append(&quot;vague term&quot;)
+    if not re.search(NUMBER, r[&quot;text&quot;]):
+        issues.append(&quot;no number&quot;)
+    if not set(r[&quot;method&quot;].split(&quot;;&quot;)) &lt;= set(&quot;IADT&quot;):
+        issues.append(&quot;bad method&quot;)
+    if not r[&quot;source&quot;]:
+        issues.append(&quot;no source&quot;)
+    print(f&quot;   {r[&#x27;id&#x27;]:&lt;10} {&#x27;OK&#x27; if not issues else &#x27;, &#x27;.join(issues)}&quot;)
+    holes += bool(issues)
+
+print(&quot;2) Trace matrix:&quot;)
+linked = set()
+for r in reqs:
+    ids = [x for x in r[&quot;test&quot;].split(&quot;;&quot;) if x]
+    linked.update(ids)
+    if not ids:
+        print(f&quot;   {r[&#x27;id&#x27;]:&lt;10} -&gt; NO TEST&quot;)
+        holes += 1
+        continue
+    res = [f&quot;{i}:{test_ids[i][&#x27;result&#x27;] or &#x27;not run&#x27;}&quot; if i in test_ids else f&quot;{i}:MISSING&quot; for i in ids]
+    print(f&quot;   {r[&#x27;id&#x27;]:&lt;10} -&gt; {&#x27;, &#x27;.join(res)}&quot;)
+    holes += sum(1 for i in ids if i not in test_ids or test_ids[i][&quot;result&quot;] != &quot;pass&quot;)
+for t in tests:
+    if t[&quot;id&quot;] not in linked:
+        print(f&quot;   {t[&#x27;id&#x27;]:&lt;10} -&gt; test without requirement&quot;)
+        holes += 1
+
+print(&quot;3) FMEA ranking, RPN = S*O*D before -&gt; after the measure:&quot;)
+for f in sorted(fmea, key=lambda f: -int(f[&quot;S&quot;]) * int(f[&quot;O&quot;]) * int(f[&quot;D&quot;])):
+    before = int(f[&quot;S&quot;]) * int(f[&quot;O&quot;]) * int(f[&quot;D&quot;])
+    after = int(f[&quot;S_after&quot;]) * int(f[&quot;O_after&quot;]) * int(f[&quot;D_after&quot;])
+    flag = &quot;  &lt;- S&gt;=9: review regardless of RPN&quot; if int(f[&quot;S&quot;]) &gt;= 9 and before &lt; 100 else &quot;&quot;
+    print(f&quot;   {f[&#x27;id&#x27;]} RPN {before:3} -&gt; {after:3}  S={f[&#x27;S&#x27;]}{flag}&quot;)
+
+distinct = {s * o * d for s in range(1, 11) for o in range(1, 11) for d in range(1, 11)}
+print(f&quot;4) RPN takes {len(distinct)} distinct values out of 1..1000; RPN 72 arises from &quot;
+      f&quot;{sum(1 for s in range(1, 11) for o in range(1, 11) for d in range(1, 11) if s * o * d == 72)} (S,O,D) triples&quot;)
+
+print(f&quot;holes: {holes}&quot;)
+sys.exit(1 if holes else 0)</code></pre>
+<pre class="cli-block"><code>1) Requirement lint (INCOSE R7 vague terms, R34 measurable, method in I/A/D/T):
+   R-SAF-01   OK
+   R-PWR-01   OK
+   R-PWR-03   OK
+   R-OPS-02   vague term, no number
+   R-LNK-01   OK
+2) Trace matrix:
+   R-SAF-01   -&gt; T-12:pass, T-31:pass
+   R-PWR-01   -&gt; T-05:pass
+   R-PWR-03   -&gt; NO TEST
+   R-OPS-02   -&gt; T-40:not run
+   R-LNK-01   -&gt; T-20:pass
+   T-77       -&gt; test without requirement
+3) FMEA ranking, RPN = S*O*D before -&gt; after the measure:
+   F-12 RPN 216 -&gt;  54  S=9
+   F-11 RPN 168 -&gt;  72  S=8
+   F-14 RPN 162 -&gt;  81  S=9
+   F-07 RPN  72 -&gt;  72  S=9  &lt;- S&gt;=9: review regardless of RPN
+   F-15 RPN  60 -&gt;  60  S=10  &lt;- S&gt;=9: review regardless of RPN
+4) RPN takes 120 distinct values out of 1..1000; RPN 72 arises from 24 (S,O,D) triples
+holes: 4</code></pre>
 <h4 class="md-subheading">Step 4. Package and handover</h4>
 <p>Assemble the package (items 1–9), have another person read it (or yourself a week later) with the task “prepare it for flight from the documentation” — the list of questions that came up → fixes.</p>
 <h4 class="md-subheading">Worked example: requirement, test, traceability</h4>
-<ul><li><strong>Requirement:</strong> <code>REQ-SAF-03</code> — on loss of the radio signal for longer than 1 s the aircraft performs RTL; verification — test. Source: FMEA row <code>F-07</code> “RC link loss”.</li><li><strong>Test:</strong> <code>T-12</code> — SITL: RC input switched off in LOITER 50 m from home; expected: RTL mode no later than 1.5 s, landing within 3 m of home. Stage 2 — a field test at 20 m altitude with an observer.</li><li><strong>Traceability</strong> (a fragment of the matrix):</li></ul>
-<div class="table-wrap md-table-wrap" tabindex="0"><table class="md-table"><thead><tr><th>Requirement</th><th>Source</th><th>Test</th><th>Result</th></tr></thead><tbody><tr><td data-label="Requirement">REQ-SAF-03</td><td data-label="Source">FMEA F-07</td><td data-label="Test">T-12 (SITL), T-31 (field)</td><td data-label="Result">pass 2026-11-09</td></tr><tr><td data-label="Requirement">REQ-PWR-01</td><td data-label="Source">power budget</td><td data-label="Test">T-05 (bench, hover current)</td><td data-label="Result">pass</td></tr></tbody></table></div>
+<ul><li><strong>Requirement:</strong> <code>R-SAF-01</code> — on loss of the radio signal for longer than 1 s the aircraft performs RTL; verification — test. Source: FMEA row <code>F-07</code> “RC link loss”.</li><li><strong>Test:</strong> <code>T-12</code> — SITL: RC input switched off in LOITER 50 m from home; expected: RTL mode no later than 1.5 s, landing within 3 m of home. Stage 2 — a field test at 20 m altitude with an observer.</li><li><strong>Traceability</strong> (a fragment of the matrix):</li></ul>
+<div class="table-wrap md-table-wrap" tabindex="0"><table class="md-table"><thead><tr><th>Requirement</th><th>Source</th><th>Test</th><th>Result</th></tr></thead><tbody><tr><td data-label="Requirement">R-SAF-01</td><td data-label="Source">FMEA F-07</td><td data-label="Test">T-12 (SITL), T-31 (field)</td><td data-label="Result">pass 2026-11-09</td></tr><tr><td data-label="Requirement">R-PWR-01</td><td data-label="Source">power budget</td><td data-label="Test">T-05 (bench, hover current)</td><td data-label="Result">pass</td></tr></tbody></table></div>
 <ul><li><strong>FMEA:</strong> RPN = S × O × D (each 1–10). The row “5 V BEC failure: S 9, O 3, D 6 → RPN 162; mitigation — backup power for the receiver, voltage check in the preflight checklist → D 3, RPN 81”.</li></ul>
 <h4 class="md-subheading">What you should get</h4>
 <ul><li>Every requirement has an ID, a statement with a number, a verification method and at least one test. A requirement without a test and a test without a requirement are two kinds of the same hole.</li><li>The top three FMEA risks are closed with mitigations, and you can see how their RPN dropped.</li><li>The README answers the question “how do I prepare the aircraft for flight” without the author nearby. The CHANGELOG is by date: what changed and why, with a link to a requirement or a test.</li></ul>
@@ -115,6 +230,8 @@ Alternatives: LiPo 6S 8000 (heavier, 21 min), hybrid (out of budget).</code></pr
 
 <h2>Sources</h2>
 <ul class="refs"><li><a href="https://www.incose.org/publications/products/technical-publications" target="_blank" rel="noopener noreferrer">INCOSE — Technical publications (Systems Engineering Handbook)</a> <span class="gc-tag">secondary</span></li><li><a href="https://ntrs.nasa.gov/citations/20170001761" target="_blank" rel="noopener noreferrer">NASA — Systems Engineering Handbook, NASA/SP-2016-6105 Rev2 (NTRS)</a> <span class="gc-tag" data-state="info">primary</span></li><li><a href="https://ardupilot.org/dev/docs/the-ardupilot-autotest-framework.html" target="_blank" rel="noopener noreferrer">ArduPilot — Developer: testing and autotest as an example of verification practice</a> <span class="gc-tag" data-state="info">primary</span></li></ul>
+<h2>Numeric problems</h2>
+<uav-tasks src="../tasks/eng-systems.json" module="eng-systems"></uav-tasks>
 <h2>Test yourself</h2>
 <uav-quiz src="../quiz/eng-systems.json" module="eng-systems"></uav-quiz>
       </div>

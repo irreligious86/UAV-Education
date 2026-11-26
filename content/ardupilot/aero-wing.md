@@ -3,7 +3,7 @@ id: aero-wing
 title: "Аэродинамика крыла и самолётные режимы"
 level: L3
 readingTime: 40 мин
-firmware: ArduPlane 4.7 (сверено с 4.7.2) · INAV
+firmware: ArduPlane 4.7.2 · INAV 9.1.0
 status: published
 added: 2026-11-08
 tags:
@@ -41,17 +41,64 @@ L = ½ · ρ · V² · S · C_L — плотность воздуха, скор�
 Проверка на земле: баланс на пальцах/стойках в расчётной точке с АКБ и всей нагрузкой. Проверка в полёте: «dive test» — с горизонтального полёта отпустить стики в небольшом пикировании: самолёт сам выходит в горизонт (передний ЦТ — резко, задний — продолжает пикировать/затягивает).
 
 ### Органы управления и режимы
-Элевоны (крыло) смешивают руль высоты и элероны; у классики — отдельные рули. Автопилот стабилизирует крен и тангаж (`FBWA`), держит высоту и курс (`FBWB`, `CRUISE`), летит по точкам (`AUTO`), возвращается (`RTL`), приземляется (режим `AUTOLAND`, появившийся в ArduPlane 4.7: заход против направления взлёта без миссии; в миссии — `NAV_LAND`). Без airspeed-датчика автопилот оценивает скорость по GPS и ветру — хуже в ветер; с трубкой Пито (`ARSPD_TYPE`, калибровка `ARSPD_AUTOCAL`, `ARSPD_RATIO`) — точно.
+Элевоны (крыло) смешивают руль высоты и элероны; у классики — отдельные рули. Автопилот стабилизирует крен и тангаж (`FBWA`), держит высоту и курс (`FBWB`, `CRUISE`), летит по точкам (`AUTO`), возвращается (`RTL`), приземляется (режим `AUTOLAND`, появившийся в ArduPlane 4.7: посадка без миссии по направлению взлёта — точка захода ставится позади по курсу взлёта, со смещением `AUTOLAND_DIR_OFF`; в миссии — `NAV_LAND`). Без airspeed-датчика автопилот оценивает скорость по GPS и ветру — хуже в ветер; с трубкой Пито (`ARSPD_TYPE`, калибровка `ARSPD_AUTOCAL`, `ARSPD_RATIO`) — точно.
+
+### Какую скорость меряет автопилот: IAS, EAS, TAS
+Трубка Пито меряет динамическое давление q = ½·ρ·V². ArduPilot переводит его в скорость как V = √(`ARSPD_RATIO`·Δp) (`AP_Airspeed.cpp:697–708`; `ARSPD_RATIO` по умолчанию 2, уточняется калибровкой). При верной калибровке это эквивалентная воздушная скорость EAS — скорость, которая при плотности у земли 1.225 кг/м³ дала бы то же давление. Подъёмная сила зависит от q, а не от истинной скорости: L = q·S·C_L. Поэтому скорость сваливания в EAS одна на любой высоте, а истинная (TAS) растёт как √(ρ₀/ρ). ArduPlane задаёт все `AIRSPEED_*` в EAS, а TECS переводит их в TAS умножением на EAS2TAS (`AP_TECS.cpp:420`). Пример модуля (V_s = 8.53 м/с EAS) по стандартной атмосфере: на 1500 м ρ = 1.058, EAS2TAS = 1.076, V_s по TAS 9.18 м/с; на 3000 м ρ = 0.909, EAS2TAS = 1.161, V_s по TAS 9.90 м/с. Вывод: `AIRSPEED_MIN` для горного поля менять не нужно, но при той же EAS выше путевая скорость касания — длиннее пробег. Путевая скорость = TAS ± ветер, поэтому по GPS сваливание не видно: на попутном ветре 8 м/с крыло с V_s 8.5 сваливается при путевой 16.5 м/с.
+
+### Нужен ли датчик воздушной скорости
+Для FPV-крыла в FBWA — нет; для AUTO, RTL и особенно VTOL-переходов — очень желателен. Без датчика TECS переводит вес скорости в 0 (`AP_TECS.cpp:995–996`): тангаж держит только высоту, а газ берётся от `TRIM_THROTTLE` и линейно растёт с тангажем до `THR_MAX` на максимальном тангаже набора (падает до `THR_MIN` на пикировании), плюс добавка на вираж `TECS_RLL2THR` (`AP_TECS.cpp:930–958`) — почти как в INAV. Значит, `TRIM_THROTTLE` должен быть газом реального крейсера, иначе в ветер и на развороте скорость не контролируется. Синтетическая скорость (`TECS_SYNAIRSPEED`, по умолчанию 0) существует, но сама прошивка в описании параметра предупреждает о плохой оценке при неточном ветре. Датчик подключают с двумя ловушками. `ARSPD_USE` по умолчанию 0: скорость пишется в лог, но в управление не идёт, для управления нужно 1. `ARSPD_AUTOCAL` нужен на один калибровочный полёт: прошивка сохраняет новое `ARSPD_RATIO` раз в 2 мин, если оно изменилось больше чем на 5 %, и оставлять его включённым не рекомендуется. Установку трубки и калибровку разбирает модуль тюнинга.
+
+{{lesson:ap-plane-tuning|Где ставить трубку Пито, как калибровать ARSPD_* и настраивать TECS по тестовым полётам.}}
 
 ### TECS: управление энергией
-Полная энергия самолёта = потенциальная (высота) + кинетическая (скорость). Газ меняет **сумму** энергии, руль высоты — **распределение** между высотой и скоростью. TECS (Total Energy Control System) именно так и управляет: `TECS_CLMB_MAX` (макс. набор, м/с при полном газу), `TECS_SINK_MIN` (снижение на холостом), `TECS_SINK_MAX`, `TECS_TIME_CONST`, `TECS_SPDWEIGHT` (0 — держать высоту ценой скорости, 2 — держать скорость ценой высоты; 1 — баланс, по умолчанию; 2 — тангаж держит только скорость, газ — высоту, рекомендовано для планеров), `TECS_PTCH_DAMP`, `TECS_THR_DAMP`. Скорости: `AIRSPEED_MIN` (≥ 1.2 V_s), `AIRSPEED_CRUISE`, `AIRSPEED_MAX`, `TRIM_THROTTLE` (газ на крейсере), `THR_MIN/MAX`. `AIRSPEED_STALL` — используется для предупреждения/защиты.
+Полная энергия самолёта = потенциальная (высота) + кинетическая (скорость). Газ меняет **сумму** энергии, руль высоты — **распределение** между высотой и скоростью. TECS (Total Energy Control System) считает удельные энергии на килограмм массы: SPE = g·h и SKE = ½·V². Ошибку суммы STE закрывает газ, ошибку баланса SEB = SPE·w_h − SKE·w_v — тангаж (`AP_TECS.cpp:738`, `:1022`). Курс обмена легко посчитать: торможение с 12 до 10 м/с отдаёт (12² − 10²)/(2g) ≈ 2.2 м высоты. Поэтому крыло проседает, когда ему велят одновременно лезть вверх и разгоняться.
 
-INAV: `nav_fw_cruise_speed`, `nav_fw_min_thr/max_thr/cruise_thr`, `nav_fw_climb_angle/dive_angle`, `fw_min_throttle_down_pitch` — проще, без энергетической модели, но та же идея: газ — набор, тангаж — скорость.
+`TECS_CLMB_MAX` (по умолчанию 5 м/с) — не пожелание, а модель самолёта. TECS считает, что полный газ даёт прирост удельной энергии CLMB_MAX·g = 49 Вт/кг, а газ `THR_MIN` при `TECS_SINK_MIN` = 2 м/с — убыль 19.6 Вт/кг (`AP_TECS.cpp:1250–1251`). Между этими точками газ интерполируется линейно (`:756`). Если CLMB_MAX завышен, TECS просит набор, которого мотор не даёт: газ упирается в максимум, разницу оплачивает скорость. Запрос «набирать 5 м/с и разгоняться на 1 м/с² при 12 м/с» требует 5·9.81 + 12·1 = 61 Вт/кг — больше модели, и что-то уступит.
+
+`TECS_SPDWEIGHT` (0…2, по умолчанию 1) решает, что именно уступит. 0 — тангаж держит только высоту, скорость держит газ; при упоре газа уходит скорость. 2 — тангаж держит только скорость, высоту держит газ (рекомендовано для планеров); при упоре газа уходит высота. 1 — смесь. Прошивка переопределяет вес сама (`AP_TECS.cpp:994–1013`): без воздушной скорости и в VTOL-фазе QuadPlane — 0; при недоборе скорости (underspeed), на взлёте, при прерванной посадке и в планировании с нулевым газом — 2; на посадке вес плавно уменьшается к нулю, если не задан `TECS_LAND_SPDWGT`. Остальные ручки: `TECS_SINK_MAX` (5 м/с), `TECS_TIME_CONST` (5 с), `TECS_PTCH_DAMP` (0.3), `TECS_THR_DAMP` (0.5), `TECS_PITCH_MAX` (15°, ограничивает набор в автоматических режимах). Скорости: `AIRSPEED_MIN` (≥ 1.2 V_s), `AIRSPEED_CRUISE`, `AIRSPEED_MAX`, `TRIM_THROTTLE` (газ на крейсере), `THR_MIN/MAX`. `AIRSPEED_STALL` — скорость сваливания для STALL_PREVENTION и минимальная скорость на финальном участке посадки (описание параметра в `Parameters.cpp:306–312`).
+
+INAV 9.1 устроен иначе, без энергетической модели. Высоту держит тангаж в пределах `nav_fw_climb_angle` (20°) и `nav_fw_dive_angle` (15°). Газ задаётся от тангажа: газ = `nav_fw_cruise_thr` − `nav_fw_pitch2thr`·тангаж (1400 мкс и 10 по умолчанию; тангаж в наборе отрицателен, поэтому газ растёт), в пределах `nav_fw_min_thr`…`nav_fw_max_thr` (1200…1700). Воздушную скорость этот контур не держит; код добавляет газ, если GPS-скорость ниже 7 м/с. `nav_fw_cruise_speed` (см/с) нужен только для оценки остатка времени и дистанции, а не как цель скорости (описания в `src/main/fc/settings.yaml`). `fw_min_throttle_down_pitch` опускает нос при убранном газе в ANGLE.
+
+### Вираж: перегрузка и STALL_PREVENTION
+В координированном вираже с креном φ подъёмная сила должна быть в n = 1/cos φ раз больше веса: 1.15 при 30°, 1.41 при 45°, 2.0 при 60°. Скорость сваливания растёт как √n: для примера модуля 9.17, 10.15 и 12.07 м/с. ArduPlane считает это сам, если `STALL_PREVENTION` = 1 (по умолчанию). По запрошенному крену он получает перегрузку (`Attitude.cpp:686`) и при текущей скорости V допускает не больше n_max = (V/V_s1g)², то есть крен не больше arccos(1/n_max) (`Attitude.cpp:723–746`). Нижний предел — 25°, «чтобы можно было рулить при плохой оценке скорости». С `FLIGHT_OPTIONS` бит 16, датчиком и заданным `AIRSPEED_STALL` предел опускается до `LEVEL_ROLL_LIMIT` (5°). Одновременно TECS поднимает минимальную скорость в √n раз (`AP_TECS.cpp:426–433`).
+
+Ловушка — `AIRSPEED_STALL` = 0 (по умолчанию). Тогда прошивка принимает за скорость сваливания `AIRSPEED_MIN`, то есть 1.2 V_s из нашего правила, и режет крен ещё на ней. Для примера модуля (`AIRSPEED_MIN` 10 м/с): на 10 м/с разрешено 25°, на 11 м/с — 34°, и только на 12 м/с — все 45° `ROLL_LIMIT_DEG`. С `AIRSPEED_STALL` = 8.5 (расчётная V_s) на 10 м/с уже 43.7°. Минимальная скорость TECS в вираже 45° — 11.9 м/с против 10.1. Описание параметра советует ставить `AIRSPEED_STALL` чуть выше истинной скорости сваливания, поэтому бери измеренную в шаге 5 практики, а не расчётную.
+
+{{diagram:chart-wing-stall-prevention|С AIRSPEED_STALL = 0 ArduPlane 4.7 считает сваливанием AIRSPEED_MIN и держит крен на 25° до 10.5 м/с; с AIRSPEED_STALL = 8.5 полный ROLL_LIMIT_DEG 45° доступен уже с 10.1 м/с.}}
 
 ### Запуск и посадка
 Бросок с руки/катапульта: `TKOFF_THR_MINACC` (детекция броска по ускорению), `TKOFF_THR_DELAY`, `TKOFF_LVL_ALT`; INAV — autolaunch (`nav_fw_launch_*`). Посадка: глиссада `LAND_PITCH_DEG`, `LAND_FLARE_ALT/SEC`, дальномер для выравнивания; у крыла — на пузо против ветра, скорость 1.1–1.2 V_s.
 
 {{diagram:tecs-energy|TECS: ошибка полной энергии (высота + скорость) закрывается газом, ошибка их баланса — тангажем; поэтому набор высоты без запаса газа съедает скорость.}}
+
+### Справочник параметров ArduPlane 4.7.2
+Значения по умолчанию — из исходников тега 4.7.2 (`ArduPlane/Parameters.cpp`, `config.h`, `libraries/AP_TECS/AP_TECS.cpp`, `AP_Landing.cpp`, `AP_Airspeed_Params.cpp`). Старые имена действовали до 4.4 включительно и переименованы в 4.5.0 (`ArduPlane/ReleaseNotes.txt:2239–2253`).
+
+| Параметр | По умолчанию | Ед. | Что задаёт, как выбрать | Старое имя |
+|---|---|---|---|---|
+| `AIRSPEED_MIN` | 9 | м/с EAS | нижний предел скорости в авто-режимах; ≥ 1.2·V_s | `ARSPD_FBW_MIN` |
+| `AIRSPEED_CRUISE` | 12 | м/с EAS | крейсер; 1.3–1.6·V_s | `TRIM_ARSPD_CM` (см/с) |
+| `AIRSPEED_MAX` | 22 | м/с EAS | верхний предел; ниже флаттера и Vne рамы | `ARSPD_FBW_MAX` |
+| `AIRSPEED_STALL` | 0 | м/с EAS | 1g-сваливание для STALL_PREVENTION; 0 = взять `AIRSPEED_MIN` | — |
+| `STALL_PREVENTION` | 1 | — | ограничение крена и подъём минимальной скорости по перегрузке | — |
+| `ROLL_LIMIT_DEG` | 45 | ° | максимальный крен | `LIM_ROLL_CD` (сантиградусы) |
+| `PTCH_LIM_MAX_DEG` / `PTCH_LIM_MIN_DEG` | 20 / −25 | ° | пределы тангажа | `LIM_PITCH_MAX` / `LIM_PITCH_MIN` |
+| `TRIM_THROTTLE` | 45 | % | газ горизонтального крейсера; без датчика — основа газа TECS | — |
+| `THR_MIN` / `THR_MAX` | 0 / 100 | % | пределы газа в авто-режимах | — |
+| `TECS_CLMB_MAX` | 5 | м/с | набор на `THR_MAX` и крейсере — по тесту, не «с запасом» | — |
+| `TECS_SINK_MIN` / `TECS_SINK_MAX` | 2 / 5 | м/с | снижение на `THR_MIN` / максимум запроса | — |
+| `TECS_TIME_CONST` | 5 | с | быстрота контура высоты и скорости | — |
+| `TECS_SPDWEIGHT` | 1 | — | 0 приоритет высоты, 2 приоритет скорости | — |
+| `TECS_PTCH_DAMP` / `TECS_THR_DAMP` | 0.3 / 0.5 | — | демпфирование тангажа и газа | — |
+| `TECS_PITCH_MAX` / `TECS_PITCH_MIN` | 15 / 0 | ° | тангаж в авто-режимах; 0 = взять `PTCH_LIM_*` | — |
+| `TECS_SYNAIRSPEED` | 0 | — | синтетическая скорость без датчика | — |
+| `ARSPD_USE` | 0 | — | 1 — датчик идёт в управление, 0 — только лог | — |
+| `ARSPD_RATIO` / `ARSPD_AUTOCAL` | 2 / 0 | — | V = √(ratio·Δp); автокалибровка на один полёт | — |
+| `TKOFF_THR_MINACC` / `TKOFF_THR_DELAY` | 0 / 2 | м/с² / 0.1 с | детекция броска и задержка газа | — |
+| `LAND_PITCH_DEG` | 0 | ° | тангаж на выравнивании | `LAND_PITCH_CD` |
+| `LAND_FLARE_ALT` / `LAND_FLARE_SEC` | 3 / 2 | м / с | начало выравнивания | — |
+| режим `AUTOLAND` (номер 26) | — | — | посадка без миссии по направлению взлёта (точка захода `AUTOLAND_WP_DIST` позади по курсу взлёта, смещение `AUTOLAND_DIR_OFF`), с 4.7.0 | — |
 
 ### Место в системе
 
@@ -66,11 +113,129 @@ INAV: `nav_fw_cruise_speed`, `nav_fw_min_thr/max_thr/cruise_thr`, `nav_fw_climb_
 ### Шаг 2. Центровка
 Найти нейтральную точку (калькулятор для крыла или 25% MAC для классики без учёта стабилизатора — с ним формула сложнее, использовать калькулятор), выбрать запас 10%, отметить точку ЦТ, сбалансировать с АКБ. Записать массу, ЦТ и запас.
 
-### Шаг 3. Параметры
-ArduPlane: `AIRSPEED_MIN/CRUISE/MAX`, `TECS_*` стартовые, `TRIM_THROTTLE`, `ARSPD_*` если есть трубка. INAV: `nav_fw_*`. Обосновать каждую цифру расчётом из шага 1.
+### Шаг 3. Скрипт: формулы ArduPlane на твоих числах
+Чтобы обоснование параметров в шаге 4 было не «на глаз», прогони расчёт скриптом. Он повторяет пример модуля и три функции прошивки 4.7.2, разобранные в теории: ограничение крена `apply_load_factor_roll_limits()`, подъём минимальной скорости TECS в вираже и модель энергии `TECS_CLMB_MAX`/`TECS_SINK_MIN`. Нужен только Python 3. Сохрани как `wing_lab.py`, запусти `python3 wing_lab.py`, потом замени `m, S, CL` и скорости на свои.
 
-### Шаг 4. Сверка с полётом
+```python
+#!/usr/bin/env python3
+"""Wing lab for module aero-wing: the module's worked example plus the ArduPlane 4.7.2 formulas
+for stall prevention and the TECS energy split (stdlib only). Run: python3 wing_lab.py
+
+Firmware references (ArduPilot tag ArduPlane-4.7.2):
+  ArduPlane/Attitude.cpp:677-762  update_load_factor(), apply_load_factor_roll_limits()
+  libraries/AP_TECS/AP_TECS.cpp:420-433  _TASmin = AIRSPEED_MIN*EAS2TAS, raised by sqrt(load factor)
+  libraries/AP_TECS/AP_TECS.cpp:1250-1251  STEdot_max = TECS_CLMB_MAX*g, STEdot_min = -TECS_SINK_MIN*g
+"""
+import math
+
+G, RHO0 = 9.81, 1.225
+
+
+def isa_rho(h_m):
+    """ISA troposphere density, kg/m^3."""
+    t = 288.15 - 0.0065 * h_m
+    p = 101325 * (t / 288.15) ** 5.2559
+    return p / (287.05 * t)
+
+
+def stall_speed(m, s, cl_max, rho=RHO0):
+    return math.sqrt(2 * m * G / (rho * s * cl_max))
+
+
+def ap_roll_limit(v, airspeed_min, airspeed_stall=0.0, roll_limit=45, level_roll_limit=5):
+    """apply_load_factor_roll_limits() for a demanded bank of 85 deg, default FLIGHT_OPTIONS."""
+    vs1g = airspeed_stall if airspeed_stall > 0 else airspeed_min
+    n_max = (v / max(vs1g, 1)) ** 2
+    n_dem = 1 / math.cos(math.radians(85))
+    if n_max <= 1:
+        lim = 25
+    elif n_max < n_dem:
+        lim = max(math.degrees(math.acos(1 / n_max)), 25, level_roll_limit)
+    else:
+        lim = roll_limit
+    return min(lim, roll_limit)
+
+
+def tecs_min_speed(bank_deg, airspeed_min, airspeed_stall=0.0):
+    """_TASmin at sea level with STALL_PREVENTION=1 (EAS2TAS = 1)."""
+    n = 1 / math.cos(math.radians(bank_deg))
+    if airspeed_stall > 0:
+        return max(airspeed_min, airspeed_stall * math.sqrt(n))
+    return airspeed_min * math.sqrt(n)
+
+
+m, S, CL = 2.0, 0.4, 1.1
+vs = stall_speed(m, S, CL)
+print(f"1) W/S = {m / S:.1f} kg/m^2 = {m * 1000 / (S * 100):.0f} g/dm^2; V_s = {vs:.2f} m/s; "
+      f"cruise 1.4*V_s = {1.4 * vs:.1f} m/s; AIRSPEED_MIN >= 1.2*V_s = {1.2 * vs:.1f} m/s")
+for phi in (30, 45, 60):
+    n = 1 / math.cos(math.radians(phi))
+    print(f"   bank {phi:2} deg: n = {n:.2f} g, V_s(bank) = {vs * math.sqrt(n):.2f} m/s")
+
+print("2) EAS vs TAS (AIRSPEED_* are EAS; TECS multiplies by EAS2TAS):")
+for h in (0, 1500, 3000):
+    rho = isa_rho(h)
+    print(f"   {h:4} m ISA: rho = {rho:.3f}, EAS2TAS = {math.sqrt(RHO0 / rho):.3f}, "
+          f"stall TAS = {vs * math.sqrt(RHO0 / rho):.2f} m/s, stall EAS = {vs:.2f} m/s")
+
+print("3) Stall prevention bank limit (ROLL_LIMIT_DEG 45, LEVEL_ROLL_LIMIT 5):")
+print("   V m/s | AIRSPEED_STALL=0 (uses MIN=10) | AIRSPEED_STALL=8.5")
+for v in (9, 10, 11, 12, 13, 15):
+    print(f"   {v:5} | {ap_roll_limit(v, 10):26.1f} | {ap_roll_limit(v, 10, 8.5):12.1f}")
+
+print("4) TECS minimum airspeed in a turn (STALL_PREVENTION=1):")
+for phi in (0, 30, 45, 60):
+    print(f"   bank {phi:2}: MIN=10,STALL=0 -> {tecs_min_speed(phi, 10):5.2f} m/s; "
+          f"MIN=10,STALL=8.5 -> {tecs_min_speed(phi, 10, 8.5):5.2f} m/s")
+
+print("5) Energy trade at cruise:")
+v1, v2 = 12.0, 10.0
+print(f"   slowing {v1:.0f} -> {v2:.0f} m/s frees dh = (v1^2 - v2^2)/(2g) = {(v1**2 - v2**2) / (2 * G):.2f} m")
+clmb, sink = 5.0, 2.0     # TECS_CLMB_MAX, TECS_SINK_MIN defaults (AP_TECS.cpp:27,35)
+print(f"   STEdot_max = CLMB_MAX*g = {clmb * G:.1f} W/kg, STEdot_min = -SINK_MIN*g = {-sink * G:.1f} W/kg")
+print(f"   climb demand 5 m/s while accelerating 1 m/s^2 at 12 m/s needs "
+      f"{5 * G + 12 * 1.0:.1f} W/kg > STEdot_max -> speed or height has to give")
+```
+
+Вывод скрипта (Python 3, запущен при подготовке модуля):
+
+```text
+1) W/S = 5.0 kg/m^2 = 50 g/dm^2; V_s = 8.53 m/s; cruise 1.4*V_s = 11.9 m/s; AIRSPEED_MIN >= 1.2*V_s = 10.2 m/s
+   bank 30 deg: n = 1.15 g, V_s(bank) = 9.17 m/s
+   bank 45 deg: n = 1.41 g, V_s(bank) = 10.15 m/s
+   bank 60 deg: n = 2.00 g, V_s(bank) = 12.07 m/s
+2) EAS vs TAS (AIRSPEED_* are EAS; TECS multiplies by EAS2TAS):
+      0 m ISA: rho = 1.225, EAS2TAS = 1.000, stall TAS = 8.53 m/s, stall EAS = 8.53 m/s
+   1500 m ISA: rho = 1.058, EAS2TAS = 1.076, stall TAS = 9.18 m/s, stall EAS = 8.53 m/s
+   3000 m ISA: rho = 0.909, EAS2TAS = 1.161, stall TAS = 9.90 m/s, stall EAS = 8.53 m/s
+3) Stall prevention bank limit (ROLL_LIMIT_DEG 45, LEVEL_ROLL_LIMIT 5):
+   V m/s | AIRSPEED_STALL=0 (uses MIN=10) | AIRSPEED_STALL=8.5
+       9 |                       25.0 |         26.9
+      10 |                       25.0 |         43.7
+      11 |                       34.3 |         45.0
+      12 |                       45.0 |         45.0
+      13 |                       45.0 |         45.0
+      15 |                       45.0 |         45.0
+4) TECS minimum airspeed in a turn (STALL_PREVENTION=1):
+   bank  0: MIN=10,STALL=0 -> 10.00 m/s; MIN=10,STALL=8.5 -> 10.00 m/s
+   bank 30: MIN=10,STALL=0 -> 10.75 m/s; MIN=10,STALL=8.5 -> 10.00 m/s
+   bank 45: MIN=10,STALL=0 -> 11.89 m/s; MIN=10,STALL=8.5 -> 10.11 m/s
+   bank 60: MIN=10,STALL=0 -> 14.14 m/s; MIN=10,STALL=8.5 -> 12.02 m/s
+5) Energy trade at cruise:
+   slowing 12 -> 10 m/s frees dh = (v1^2 - v2^2)/(2g) = 2.24 m
+   STEdot_max = CLMB_MAX*g = 49.1 W/kg, STEdot_min = -SINK_MIN*g = -19.6 W/kg
+   climb demand 5 m/s while accelerating 1 m/s^2 at 12 m/s needs 61.1 W/kg > STEdot_max -> speed or height has to give
+```
+
+Как читать. Строка 1 — таблица шага 1 для примера: 50 г/дм², V_s 8.53 м/с, крейсер 11.9, нижняя граница `AIRSPEED_MIN` 10.2. Блок 2 показывает, что с высотой растёт только TAS: в EAS, то есть в единицах `AIRSPEED_*`, сваливание остаётся 8.53 м/с. Блок 3 — главный для настройки: с `AIRSPEED_STALL` = 0 крыло на 11 м/с получает 34.3° крена вместо 45°. Блок 4 — то же для скорости: в вираже 45° TECS не даст лететь медленнее 11.89 м/с. Блок 5 переводит энергию в метры и показывает, когда запрос превышает модель `TECS_CLMB_MAX`.
+
+### Шаг 4. Параметры
+ArduPlane: `AIRSPEED_MIN/CRUISE/MAX`, `AIRSPEED_STALL` (после шага 5 — измеренная скорость сваливания), `TECS_*` стартовые, `TRIM_THROTTLE`, `ARSPD_*` если есть трубка (и `ARSPD_USE` = 1). INAV: `nav_fw_*`. Обосновать каждую цифру расчётом из шагов 1 и 3.
+
+### Шаг 5. Сверка с полётом
 Первый полёт в FBWA на высоте: медленно сбросить скорость до начала сваливания (покачивание, клевок) — записать скорость по airspeed/GPS; сравнить с расчётной V_s (разница обычно 10–20% из-за C_Lmax и ошибок измерения). Dive test на ЦТ. Лог: `TECS`, `ARSP`, `CTUN.NavPitch`.
+
+Порядок и прерывание. Высота не меньше 50 м над препятствиями (запас на сваливание и выход), `STALL_PREVENTION` = 1, рядом наблюдатель. Скорость снижай плавно, по 1 м/с за несколько секунд, крылья горизонтально. Прерывание: при первом признаке сваливания (покачивание, клевок, крыло опускается) — газ вперёд, стик от себя до набора крейсера. Если крыло резко уходит в крен (срыв на одной консоли), тест на этом аппарате прекращают до проверки ЦТ и симметрии. Критерий приёмки: два захода дали скорости начала сваливания, отличающиеся не больше чем на 1 м/с; их среднее и есть `AIRSPEED_STALL` с небольшим запасом сверху.
 
 ### Разобранный расчёт для самопроверки
 Крыло площадью 0.4 м², взлётная масса 2 кг: нагрузка на крыло 5 кг/м². Скорость сваливания V_s = √(2·m·g / (ρ·S·C_Lmax)) = √(2·2·9.81 / (1.225·0.4·1.1)) ≈ 8.5 м/с. Крейсер ≈ 1.4·V_s ≈ 12 м/с. В вираже с креном 45° скорость сваливания растёт в 1/√cos45° ≈ 1.19 раза — до ≈ 10.1 м/с. Поэтому `AIRSPEED_MIN` ставят не ниже ~1.2·V_s ≈ 10 м/с: на прямой это ещё запас, в крутом вираже — уже граница.
@@ -83,9 +248,9 @@ ArduPlane: `AIRSPEED_MIN/CRUISE/MAX`, `TECS_*` стартовые, `TRIM_THROTTL
 - **Сверка с полётом:** измеренная скорость начала сваливания обычно на 10–20 % отличается от расчётной — из-за C_Lmax и ошибки измерения скорости. Запиши обе и разницу, а `AIRSPEED_MIN` уточни по измерению.
 - **Параметры:** для `AIRSPEED_MIN/CRUISE/MAX`, `TRIM_THROTTLE` и стартовых `TECS_*` — одна строка обоснования из расчёта или измерения. Дальше их уточняет модуль «Тюнинг ArduPlane».
 
-Самопроверка: лабораторная выполнена, когда твои формулы на данных разобранного расчёта (0.4 м², 2 кг, C_Lmax 1.1) дают те же ≈ 8.5, 12 и 10.1 м/с и только после этого посчитана своя таблица, точка ЦТ с запасом 10 % MAC отмечена на крыле и самолёт на пальцах в этой точке висит чуть носом вниз, измеренная в полёте скорость начала сваливания записана рядом с расчётной и расходится с ней не больше чем на 10–20 %, `AIRSPEED_MIN` не ниже ~1.2·V_s, а у каждого параметра скоростей и TECS есть строка обоснования из расчёта или измерения.
+Самопроверка: лабораторная выполнена, когда твои формулы на данных разобранного расчёта (0.4 м², 2 кг, C_Lmax 1.1) дают те же ≈ 8.5, 12 и 10.1 м/с и только после этого посчитана своя таблица, точка ЦТ с запасом 10 % MAC отмечена на крыле и самолёт на пальцах в этой точке висит чуть носом вниз, измеренная в полёте скорость начала сваливания записана рядом с расчётной и расходится с ней не больше чем на 10–20 %, `AIRSPEED_MIN` не ниже ~1.2·V_s, а у каждого параметра скоростей и TECS есть строка обоснования из расчёта или измерения. Для скрипта шага 3 (путь без железа): на исходных примера твой вывод совпадает с эталонным до последней цифры — V_s 8.53 м/с, на 1500 м stall TAS 9.18 м/с, предел крена 34.3° на 11 м/с при `AIRSPEED_STALL` = 0 и 43.7° на 10 м/с при 8.5, минимум TECS 11.89 м/с в вираже 45°, обмен 12 → 10 м/с = 2.24 м.
 
-**Эталон для самопроверки.** Верный результат: каждая цифра таблицы повторяется по формуле, расчёт и полёт расходятся на 10–20 %, `AIRSPEED_MIN` уточнён по измеренной скорости. Типичные неверные: (1) расхождение заметно больше 20 % — ошибка в принятом C_Lmax или в измерении скорости, тогда верь измерению, а не расчёту; (2) `AIRSPEED_MIN` равен V_s прямого полёта — в вираже 45° сваливание наступает уже на ≈ 1.19·V_s, запаса нет.
+**Эталон для самопроверки.** Верный результат: каждая цифра таблицы повторяется по формуле, расчёт и полёт расходятся на 10–20 %, `AIRSPEED_MIN` уточнён по измеренной скорости. Типичные неверные: (1) расхождение заметно больше 20 % — ошибка в принятом C_Lmax или в измерении скорости, тогда верь измерению, а не расчёту; (2) `AIRSPEED_MIN` равен V_s прямого полёта — в вираже 45° сваливание наступает уже на ≈ 1.19·V_s, запаса нет; (3) в блоке 3 скрипта у тебя 45° на любой скорости — функция не берёт `AIRSPEED_MIN`, когда `AIRSPEED_STALL` = 0 (так делает прошивка, `Attitude.cpp:719–721`), или перегрузка посчитана как cos φ вместо 1/cos φ.
 
 ## diagnostics
 - **Симптом:** самолёт «клюёт» и проваливается в вираже
@@ -100,6 +265,16 @@ ArduPlane: `AIRSPEED_MIN/CRUISE/MAX`, `TECS_*` стартовые, `TRIM_THROTTL
 - **Симптом:** airspeed показывает ерунду на земле
   - Возможная причина: трубка не откалибрована, закрыта, конденсат.
   - Что сделать: `ARSPD_AUTOCAL`, прогрев, продувка; пред-армовая проверка airspeed.
+- **Симптом:** в FBWA или AUTO крыло не даёт заложить крен больше 25–35° на нормальной скорости
+  - Возможная причина: `AIRSPEED_STALL` = 0, и STALL_PREVENTION считает сваливанием `AIRSPEED_MIN`: на скорости ниже ≈ 1.19·`AIRSPEED_MIN` крен режется ниже 45° (`Attitude.cpp:719–746`).
+  - Что видно в логе: `CTUN.NavRoll` упирается в одно значение ниже `ROLL_LIMIT_DEG`, воздушная скорость близка к `AIRSPEED_MIN`.
+  - Что сделать: задать `AIRSPEED_STALL` = измеренная скорость сваливания (чуть выше), проверить калибровку датчика; отключать `STALL_PREVENTION` не нужно.
+- **Симптом:** без датчика скорости крыло в ветер то тормозит до сваливания, то разгоняется на развороте
+  - Возможная причина: без воздушной скорости TECS держит только высоту, газ идёт от `TRIM_THROTTLE` по тангажу (`AP_TECS.cpp:930–958`); `TRIM_THROTTLE` ниже реального крейсера.
+  - Что сделать: выставить `TRIM_THROTTLE` по логу горизонтального полёта, крейсер выше с запасом на ветер; для AUTO и VTOL — поставить датчик (`ARSPD_USE` = 1).
+- **Симптом:** датчик подключён, в логе `ARSP` есть, а TECS ведёт себя как без него
+  - Возможная причина: `ARSPD_USE` = 0 — скорость только пишется в лог.
+  - Что сделать: `ARSPD_USE` = 1 после проверки показаний на земле и калибровки.
 - **Симптом:** при броске автопилот не даёт газ
   - Возможная причина: `TKOFF_THR_MINACC` не достигнут / задержка.
   - Что сделать: бросок сильнее, порог ниже, проверить арм и режим.
@@ -107,11 +282,16 @@ ArduPlane: `AIRSPEED_MIN/CRUISE/MAX`, `TECS_*` стартовые, `TRIM_THROTTL
 ## references
 - ArduPlane — TECS (Total Energy Control System) tuning | https://ardupilot.org/plane/docs/tecs-total-energy-control-system-for-speed-height-tuning-guide.html | primary | A
 - ArduPlane — Airspeed sensor setup and calibration | https://ardupilot.org/plane/docs/airspeed.html | primary | A
+- ArduPilot source, tag Copter-4.7.2 (contains ArduPlane V4.7.2): ArduPlane/Attitude.cpp (load factor roll limits) | https://github.com/ArduPilot/ardupilot/blob/Copter-4.7.2/ArduPlane/Attitude.cpp | primary | A
+- ArduPilot source, tag Copter-4.7.2: libraries/AP_TECS/AP_TECS.cpp (parameters, weighting, min airspeed) | https://github.com/ArduPilot/ardupilot/blob/Copter-4.7.2/libraries/AP_TECS/AP_TECS.cpp | primary | A
+- INAV 9.1.0 source: src/main/fc/settings.yaml (nav_fw_* descriptions and defaults) | https://github.com/iNavFlight/inav/blob/9.1.0/src/main/fc/settings.yaml | primary | A
 - NASA Glenn — Lift equation (Beginner's Guide to Aeronautics) | https://www1.grc.nasa.gov/beginners-guide-to-aeronautics/lift-equation/ | primary | A
+- NASA — Earth Atmosphere Model (standard atmosphere) | https://www.grc.nasa.gov/www/k-12/airplane/atmosmet.html | primary | B
 
 ## checklist
 - Посчитал S, MAC, нагрузку на крыло и V_s для своего крыла
 - Знаю, как растёт V_s в вираже и зачем AIRSPEED_MIN ≥ 1.2 V_s
 - ЦТ выставлен с запасом 5–15% и проверен dive test
 - Понимаю TECS: газ — энергия, тангаж — распределение
+- Знаю, что `AIRSPEED_*` — это EAS, и задал `AIRSPEED_STALL` по измерению, а `ARSPD_USE` = 1 при живом датчике
 - Параметры скоростей и TECS обоснованы расчётом и сверены с полётом
