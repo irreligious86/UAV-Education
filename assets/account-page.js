@@ -48,7 +48,7 @@ var T = (typeof window !== "undefined" && window.T) || function (s) { return s; 
   }
 
   function render(s) {
-    if (!s.enabled) return show("off");
+    if (!s.enabled) return;
     if (s.recovery && s.user) return show("recovery");
     if (!s.user) return show("guest");
     show("user");
@@ -67,10 +67,7 @@ var T = (typeof window !== "undefined" && window.T) || function (s) { return s; 
     if (rename && !rename.value && p.username) rename.value = p.username;
   }
 
-  function start() {
-    var A = window.UAVAccount;
-    if (!A || !A.enabled) return show("off");
-    show("loading");
+  function wireTabs() {
     document.querySelectorAll("[data-tab]").forEach(function (t) {
       t.addEventListener("click", function () {
         var name = t.getAttribute("data-tab");
@@ -79,6 +76,69 @@ var T = (typeof window !== "undefined" && window.T) || function (s) { return s; 
         msg("");
       });
     });
+  }
+
+  // ------------------------------------------------------------------ settings (this browser; synced once accounts are on)
+  var SETTINGS = "uav-student:settings";
+  function readSettings() { try { var v = JSON.parse(localStorage.getItem(SETTINGS) || "{}"); return v && typeof v === "object" ? v : {}; } catch (e) { return {}; } }
+  function wireSettings() {
+    var cur = readSettings();
+    var note = $("[data-setting-saved]");
+    document.querySelectorAll("[data-setting]").forEach(function (el) {
+      var key = el.getAttribute("data-setting");
+      if (el.type === "checkbox") el.checked = !!cur[key]; else if (cur[key] != null) el.value = cur[key];
+      el.addEventListener("change", function () {
+        var next = readSettings();
+        next[key] = el.type === "checkbox" ? el.checked : el.value;
+        try { localStorage.setItem(SETTINGS, JSON.stringify(next)); if (note) note.textContent = T("Сохранено в этом браузере."); }
+        catch (e) { if (note) note.textContent = T("Браузер не даёт сохранить настройки (приватный режим?)."); }
+      });
+    });
+  }
+
+  // ------------------------------------------------------------------ preview: the server is not connected yet
+  function preview() {
+    show("guest");
+    $("[data-acc-preview]").hidden = false;
+    wireTabs();
+    document.querySelectorAll(".acc-forms [data-form]").forEach(function (form) {
+      form.addEventListener("submit", function (e) {
+        e.preventDefault();
+        msg(T("Аккаунты ещё не подключены к серверу. Как только заработают, этой же формой можно будет войти."), "caution");
+      });
+      form.querySelectorAll("gc-button[type=submit]").forEach(function (b) { b.addEventListener("click", function () { form.requestSubmit(); }); });
+    });
+    var demoBtn = $("[data-acc-demo]"), demo = false;
+    demoBtn.addEventListener("click", function () {
+      demo = !demo;
+      if (demo) {
+        show("user");
+        $("[data-acc-demo-note]").hidden = false;
+        $("[data-acc-username]").textContent = "pilot_demo";
+        $("[data-acc-email]").textContent = "pilot@example.com";
+        var role = $("[data-acc-role]"); role.textContent = ROLE.student; role.setAttribute("data-state", "ok");
+        var sync = $("[data-acc-sync]"); sync.textContent = SYNC.saved; sync.setAttribute("data-state", "ok");
+        var rn = document.querySelector('[data-form="rename"] input'); if (rn) rn.value = "pilot_demo";
+        demoBtn.textContent = T("Вернуться к форме входа");
+      } else {
+        show("guest");
+        demoBtn.textContent = T("Показать пример кабинета");
+      }
+      msg("");
+    });
+    document.querySelectorAll("[data-acc-sync-now], [data-acc-logout]").forEach(function (b) {
+      b.addEventListener("click", function () { msg(T("Это пример: в предпросмотре кнопка ничего не делает."), "caution"); });
+    });
+    var rename = $('[data-form="rename"]');
+    if (rename) rename.addEventListener("submit", function (e) { e.preventDefault(); msg(T("Это пример: в предпросмотре имя не меняется."), "caution"); });
+  }
+
+  function start() {
+    var A = window.UAVAccount;
+    wireSettings();
+    if (!A || !A.enabled) return preview();
+    show("loading");
+    wireTabs();
     wireSubmit($('[data-form="login"]'), function (d) { return A.signIn(d.email, d.password).then(function () { return ""; }); });
     wireSubmit($('[data-form="register"]'), function (d) {
       return A.signUp(d.email, d.username, d.password).then(function (r) {

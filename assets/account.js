@@ -393,6 +393,17 @@ var T = (typeof window !== "undefined" && window.T) || function (s) { return s; 
   };
 
   window.UAVAccount = api;
+  // accounts off: still show where the sign-in will be, so the account page (preview) is reachable
+  if (!CFG.enabled) {
+    var addEntry = function () {
+      var nav = document.querySelector(".site-header .gc-nav");
+      if (!nav || document.getElementById("nav-account")) return;
+      var a = document.createElement("a"); a.id = "nav-account"; a.href = base() + "pages/account.html"; a.textContent = T("Войти");
+      if (/\/pages\/account\.html$/.test(location.pathname)) a.setAttribute("aria-current", "page");
+      nav.appendChild(a);
+    };
+    if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", addEntry); else addEntry();
+  }
   if (CFG.enabled) {
     if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init); else init();
   }

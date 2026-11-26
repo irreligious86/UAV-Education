@@ -1062,8 +1062,9 @@ def render_glossary(model: dict) -> str:
 def render_account() -> str:
     base = "../"
     body = """    <h1 class="gc-display">Аккаунт</h1>
-    <section class="gc-panel" data-acc="off">
-      <p class="gc-muted">Аккаунты ещё не включены: прогресс хранится только в этом браузере — <a href="progress.html">моя ведомость</a>. Как включить — <code>docs/MULTIUSER-PLAN.md</code>.</p>
+    <section class="gc-panel acc-preview" data-acc-preview hidden>
+      <p><span class="gc-tag" data-state="caution">Предпросмотр</span> Аккаунты скоро заработают. Пока сервер не подключён, войти нельзя: прогресс, настройки и заметки хранятся в этом браузере и перейдут в аккаунт после регистрации.</p>
+      <div class="progress-actions"><gc-button variant="secondary" data-acc-demo>Показать пример кабинета</gc-button></div>
     </section>
     <section class="gc-panel" data-acc="loading" hidden><p class="gc-muted">Подключаюсь к серверу…</p></section>
     <section class="gc-panel acc-forms" data-acc="guest" hidden>
@@ -1098,6 +1099,7 @@ def render_account() -> str:
       </form>
     </section>
     <section class="gc-panel" data-acc="user" hidden>
+      <p class="gc-muted" data-acc-demo-note hidden><span class="gc-tag" data-state="caution">Пример</span> Так будет выглядеть твой кабинет после входа. Данные ниже придуманы.</p>
       <p class="progress-headline"><span data-acc-username></span> <span class="gc-tag" data-acc-role></span></p>
       <p class="gc-muted">Почта: <span data-acc-email></span> · синхронизация: <span class="gc-tag" data-acc-sync></span></p>
       <p class="gc-muted" data-acc-groups hidden>Группы: <span data-acc-group-names></span></p>
@@ -1114,12 +1116,40 @@ def render_account() -> str:
       </div>
       <p class="gc-muted">При выходе копия прогресса в этом браузере стирается — на сервере он остаётся.</p>
     </section>
+    <section class="gc-panel acc-block" data-acc-settings>
+      <h2 class="acc-h">Настройки</h2>
+      <p class="gc-muted">Работают уже сейчас и хранятся в этом браузере; после входа поедут вместе с аккаунтом на все устройства.</p>
+      <label class="acc-check"><input type="checkbox" data-ready-only> Показывать только готовые модули</label>
+      <label class="acc-check"><input type="checkbox" data-setting="notesPanel"> Открывать панель конспекта на странице урока</label>
+      <label class="acc-form acc-form--inline"><span>Мой путь по прошивке</span>
+        <select data-setting="firmwarePath">
+          <option value="">не выбран</option>
+          <option value="betaflight">Betaflight</option>
+          <option value="inav">INAV</option>
+          <option value="ardupilot">ArduPilot</option>
+          <option value="px4">PX4</option>
+        </select></label>
+      <p class="gc-muted acc-saved" data-setting-saved aria-live="polite"></p>
+    </section>
+    <section class="gc-panel acc-block">
+      <h2 class="acc-h">Мои материалы</h2>
+      <div class="acc-tiles">
+        <a class="gc-card" href="progress.html"><strong>Ведомость</strong><div class="gc-muted">пройденные модули, квизы, лабораторные</div></a>
+        <div class="gc-card" data-state="pending"><strong>Закладки</strong><div class="gc-muted">модули и разделы, к которым хочешь вернуться · скоро</div></div>
+        <div class="gc-card" data-state="pending"><strong>Конспекты</strong><div class="gc-muted">твои заметки к урокам и разделам · скоро</div></div>
+      </div>
+    </section>
+    <section class="gc-panel acc-block">
+      <h2 class="acc-h">Обратная связь</h2>
+      <p class="gc-muted">Ошибка, непонятное место или пожелание — кнопка «Сообщить разработчику» будет у каждого урока и раздела. Отправлять можно после входа; здесь ты увидишь свои сообщения и их статус.</p>
+      <p class="gc-muted" data-acc-feedback-empty>Сообщений пока нет.</p>
+    </section>
     <p class="acc-msg" data-acc-msg aria-live="polite"></p>"""
     options = "".join(f'<option value="{l["code"]}"' + (" selected" if l["code"] == i18n.lang() else "") + f'>{esc(l["name"])}</option>'
                       for l in i18n.LANGS)
     body = tr_html(body).replace("LANG_SELECT", f'<select data-acc-lang aria-describedby="acc-lang-note">{options}</select>'
                                   f'<small class="gc-muted" id="acc-lang-note">{_("Закреплён за аккаунтом: после входа курс откроется на этом языке на любом устройстве.")}</small>')
-    return layout(title=_("Аккаунт"), base=base, body=body, active="progress",
+    return layout(title=_("Аккаунт"), base=base, body=body, active="account",
                   extra_head=f'\n  <script src="{base}{up()}assets/account-page.js" defer></script>')
 
 

@@ -41,15 +41,16 @@
         <a href="../pages/glossary.html">Glossary</a>
         <a href="../pages/fails.html">Failures</a>
         <a href="../pages/search.html">Search</a>
-        <a href="../pages/progress.html" aria-current="page">My progress</a>
+        <a href="../pages/progress.html">My progress</a>
       </nav>
       <details class="lang-switch"><summary class="gc-tag" data-state="ok" aria-label="Language">EN ▾</summary><nav class="lang-switch__menu" aria-label="Language"><a href="../../pages/account.html" data-lang-to="ru" hreflang="ru" lang="ru"><span class="gc-tag">RU</span> Русский</a><a href="../../uk/pages/account.html" data-lang-to="uk" hreflang="uk" lang="uk"><span class="gc-tag">UK</span> Українська</a><a href="../../en/pages/account.html" data-lang-to="en" hreflang="en" lang="en" aria-current="true"><span class="gc-tag" data-state="ok">EN</span> English</a><a href="../../gal/pages/account.html" data-lang-to="uk-galych" hreflang="uk-galych" lang="uk-galych"><span class="gc-tag">GAL</span> Галицька (експеримент)</a><a href="../../zak/pages/account.html" data-lang-to="uk-zakarpat" hreflang="uk-zakarpat" lang="uk-zakarpat"><span class="gc-tag">ZAK</span> Закарпатська говірка (експеримент)</a><a href="../../ode/pages/account.html" data-lang-to="ru-odessa" hreflang="ru-odessa" lang="ru-odessa"><span class="gc-tag">ODE</span> Одесский говор (эксперимент)</a><a href="../../cs/pages/account.html" data-lang-to="cs" hreflang="cs" lang="cs"><span class="gc-tag">CS</span> Čeština</a></nav></details>
     </div>
   </header>
   <main class="gc-container site-main">
     <h1 class="gc-display">Account</h1>
-    <section class="gc-panel" data-acc="off">
-      <p class="gc-muted">Accounts aren't enabled yet: progress is stored only in this browser — <a href="progress.html">my report</a>. How to enable it — <code>docs/MULTIUSER-PLAN.md</code>.</p>
+    <section class="gc-panel acc-preview" data-acc-preview hidden>
+      <p><span class="gc-tag" data-state="caution">Предпросмотр</span> Аккаунты скоро заработают. Пока сервер не подключён, войти нельзя: прогресс, настройки и заметки хранятся в этом браузере и перейдут в аккаунт после регистрации.</p>
+      <div class="progress-actions"><gc-button variant="secondary" data-acc-demo>Показать пример кабинета</gc-button></div>
     </section>
     <section class="gc-panel" data-acc="loading" hidden><p class="gc-muted">Connecting to the server…</p></section>
     <section class="gc-panel acc-forms" data-acc="guest" hidden>
@@ -84,6 +85,7 @@
       </form>
     </section>
     <section class="gc-panel" data-acc="user" hidden>
+      <p class="gc-muted" data-acc-demo-note hidden><span class="gc-tag" data-state="caution">Пример</span> Так будет выглядеть твой кабинет после входа. Данные ниже придуманы.</p>
       <p class="progress-headline"><span data-acc-username></span> <span class="gc-tag" data-acc-role></span></p>
       <p class="gc-muted">Email: <span data-acc-email></span> · sync: <span class="gc-tag" data-acc-sync></span></p>
       <p class="gc-muted" data-acc-groups hidden>Groups: <span data-acc-group-names></span></p>
@@ -99,6 +101,34 @@
         <gc-button variant="secondary" data-acc-logout>Sign out</gc-button>
       </div>
       <p class="gc-muted">When you sign out, the copy of your progress in this browser is erased — it stays on the server.</p>
+    </section>
+    <section class="gc-panel acc-block" data-acc-settings>
+      <h2 class="acc-h">Настройки</h2>
+      <p class="gc-muted">Работают уже сейчас и хранятся в этом браузере; после входа поедут вместе с аккаунтом на все устройства.</p>
+      <label class="acc-check"><input type="checkbox" data-ready-only> Show only ready modules</label>
+      <label class="acc-check"><input type="checkbox" data-setting="notesPanel"> Открывать панель конспекта на странице урока</label>
+      <label class="acc-form acc-form--inline"><span>Мой путь по прошивке</span>
+        <select data-setting="firmwarePath">
+          <option value="">не выбран</option>
+          <option value="betaflight">Betaflight</option>
+          <option value="inav">INAV</option>
+          <option value="ardupilot">ArduPilot</option>
+          <option value="px4">PX4</option>
+        </select></label>
+      <p class="gc-muted acc-saved" data-setting-saved aria-live="polite"></p>
+    </section>
+    <section class="gc-panel acc-block">
+      <h2 class="acc-h">Мои материалы</h2>
+      <div class="acc-tiles">
+        <a class="gc-card" href="progress.html"><strong>Ведомость</strong><div class="gc-muted">пройденные модули, квизы, лабораторные</div></a>
+        <div class="gc-card" data-state="pending"><strong>Закладки</strong><div class="gc-muted">модули и разделы, к которым хочешь вернуться · скоро</div></div>
+        <div class="gc-card" data-state="pending"><strong>Конспекты</strong><div class="gc-muted">твои заметки к урокам и разделам · скоро</div></div>
+      </div>
+    </section>
+    <section class="gc-panel acc-block">
+      <h2 class="acc-h">Обратная связь</h2>
+      <p class="gc-muted">Ошибка, непонятное место или пожелание — кнопка «Сообщить разработчику» будет у каждого урока и раздела. Отправлять можно после входа; здесь ты увидишь свои сообщения и их статус.</p>
+      <p class="gc-muted" data-acc-feedback-empty>Сообщений пока нет.</p>
     </section>
     <p class="acc-msg" data-acc-msg aria-live="polite"></p>
   </main>
