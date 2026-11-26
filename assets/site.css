@@ -346,3 +346,52 @@ a.lesson-card, a.lesson-card:visited { display: block; margin: var(--gc-space-4)
 .lesson-card:hover, .lesson-card:focus-visible { outline: 2px solid var(--gc-accent-hud); outline-offset: 2px; }
 .lesson-card .lesson-card__title { display: block; color: var(--gc-accent-hud); font-size: 1.05em; margin: var(--gc-space-1) 0; }
 .lesson-card .lesson-card__why { display: block; color: var(--gc-ink); }
+
+/* ---------- section hues ----------
+ * Every course section has its own hue; an element with data-section takes it as --sec.
+ * These are course-specific tokens (the sections exist only here), so they live in the site layer,
+ * not in Ground Control. The base palette stays --gc-*; the hue only marks which section you are in. */
+:root {
+  --uav-sec-foundation: #c9a886;
+  --uav-sec-betaflight: #ff9a3d;
+  --uav-sec-inav: #46d39a;
+  --uav-sec-ardupilot: #5fa8ff;
+  --uav-sec-px4: #a98bff;
+  --uav-sec-companion: #ff7ab8;
+  --uav-sec-link: #3fd5e0;
+  --uav-sec-tools: #9aa9c4;
+  --uav-sec-electronics: #f2cf4a;
+  --uav-sec-estimation: #7fd0ff;
+  --uav-sec-math: #d29bf0;
+  --uav-sec-ros2: #ff8a6b;
+  --uav-sec-design: #b5d35a;
+}
+[data-section] { --sec: var(--gc-accent-hud); }
+[data-section="foundation"] { --sec: var(--uav-sec-foundation); }
+[data-section="betaflight"] { --sec: var(--uav-sec-betaflight); }
+[data-section="inav"] { --sec: var(--uav-sec-inav); }
+[data-section="ardupilot"] { --sec: var(--uav-sec-ardupilot); }
+[data-section="px4"] { --sec: var(--uav-sec-px4); }
+[data-section="companion"] { --sec: var(--uav-sec-companion); }
+[data-section="link"] { --sec: var(--uav-sec-link); }
+[data-section="tools"] { --sec: var(--uav-sec-tools); }
+[data-section="electronics"] { --sec: var(--uav-sec-electronics); }
+[data-section="estimation"] { --sec: var(--uav-sec-estimation); }
+[data-section="math"] { --sec: var(--uav-sec-math); }
+[data-section="ros2"] { --sec: var(--uav-sec-ros2); }
+[data-section="design"] { --sec: var(--uav-sec-design); }
+
+/* a page that belongs to a section: hue line under the header, on the title and on prose headings */
+body[data-section] .site-header { border-bottom-color: var(--sec); box-shadow: 0 1px 0 var(--sec); }
+body[data-section] .site-brand__mark { color: var(--sec); }
+body[data-section] .module-title, body[data-section] .site-main > .gc-display { border-left: 4px solid var(--sec); padding-left: var(--gc-space-3); }
+body[data-section] .gc-breadcrumb a:hover { color: var(--sec); }
+body[data-section] .module-body h2::before { content: ""; display: inline-block; width: 10px; height: 10px; margin-right: var(--gc-space-2); background: var(--sec); border-radius: var(--gc-radius-sm); }
+body[data-section] .module-body h3 { color: var(--sec); }
+body[data-section] .module-body blockquote { border-left-color: var(--sec); }
+
+/* lists and cards: a section-coloured mark so mixed tracks read at a glance */
+.track-module[data-section] .track-module__num { color: var(--sec); }
+.track-module[data-section].is-done .track-module__num { color: var(--gc-accent-hud); }
+.gc-card[data-section] { border-left: 3px solid var(--sec); }
+.gc-card[data-section]:hover, .gc-card[data-section]:focus-visible { border-color: var(--sec); }

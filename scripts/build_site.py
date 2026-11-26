@@ -221,7 +221,17 @@ def build_model() -> dict:
 # ---------------------------------------------------------------- layout
 
 
-def layout(*, title: str, base: str, body: str, active: str, description: str = "", extra_head: str = "") -> str:
+def sec_attr(section: str) -> str:
+    """data-section attribute: the course section whose hue the element takes (assets/site.css)."""
+    return f' data-section="{esc(section)}"' if section else ""
+
+
+def module_section(m: dict) -> str:
+    art = m.get("articleMeta") or {}
+    return art.get("stack") or (m.get("stacks") or [""])[0]
+
+
+def layout(*, title: str, base: str, body: str, active: str, description: str = "", extra_head: str = "", section: str = "") -> str:
     nav_items = [
         ("course", f"{base}index.html", _("Курс")),
         ("ref", f"{base}ref/index.html", _("Справочник")),
@@ -260,7 +270,7 @@ def layout(*, title: str, base: str, body: str, active: str, description: str = 
   <script src="{a}assets/uav-tasks.js" defer></script>
   <script src="{a}assets/offline.js" defer></script>{extra_head}
 </head>
-<body class="gc-root" data-base="{base}" data-root="{a}">
+<body class="gc-root" data-base="{base}" data-root="{a}"{sec_attr(section)}>
   <header class="site-header">
     <div class="gc-container site-header__inner">
       <a class="site-brand" href="{base}index.html"><span class="site-brand__mark" aria-hidden="true">◆</span> {SITE_TITLE}</a>
@@ -312,7 +322,7 @@ def module_row(m: dict, n: int, base: str, path_id: str | None = None, shared: b
     if planned:
         tags.append(status_tag("planned"))
     tags.append(f'<span class="gc-tag" data-state="ok" data-done-badge hidden>{_("ПРОЙДЕН")}</span>')
-    return f"""          <li class="track-module{' track-module--planned' if planned else ''}" data-module-id="{esc(m['id'])}">
+    return f"""          <li class="track-module{' track-module--planned' if planned else ''}" data-module-id="{esc(m['id'])}"{sec_attr(module_section(m))}>
             <span class="track-module__num">{n:02d}</span>
             <a class="track-module__title" href="{base}m/{esc(m['id'])}.html{q}">{esc(m['title'])}</a>
             <span class="track-module__tags">{''.join(tags)}</span>
@@ -735,7 +745,7 @@ def render_module(m: dict, model: dict) -> str:
       {related_html}
       {pager_html}
     </article>"""
-    return layout(title=m["title"], base=base, body=body, active="course", description=" ".join(m.get("objectives", [])),
+    return layout(title=m["title"], base=base, body=body, active="course", description=" ".join(m.get("objectives", [])), section=module_section(m),
                   extra_head=widget_scripts(content if not planned else "", base))
 
 
@@ -901,7 +911,7 @@ def render_ref_index(model: dict) -> str:
         mods = [model["modules"][i] for i in s["ids"] if i in model["modules"]]
         done = sum(1 for m in mods if m["status"] == "published")
         cards.append(
-            f'<a class="gc-card" href="{esc(s["key"])}.html"><strong>{esc(s["title"])}</strong>'
+            f'<a class="gc-card" href="{esc(s["key"])}.html"{sec_attr(s["key"])}><strong>{esc(s["title"])}</strong>'
             f'<div class="gc-card__meta"><span class="gc-tag" data-state="ok">{_("написано {n}", n=done)}</span>'
             f'<span class="gc-tag">{_("всего {n}", n=len(mods))}</span></div></a>'
         )
@@ -936,7 +946,7 @@ def render_ref_stack(stack: dict, model: dict) -> str:
     body = f"""    <p class="gc-breadcrumb"><a href="index.html">{_("Справочник")}</a><span>{esc(stack['title'])}</span></p>
     <h1 class="gc-display">{esc(stack['title'])}</h1>
     <div class="gc-grid ref-grid">{''.join(cards)}</div>"""
-    return layout(title=stack["title"], base=base, body=body, active="ref")
+    return layout(title=stack["title"], base=base, body=body, active="ref", section=stack["key"])
 
 
 def parse_diagnostics(block: str) -> list[tuple[str, list[str]]]:
