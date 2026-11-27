@@ -53,7 +53,7 @@ Held-out set: 200 frames with 250 objects in them. At a confidence threshold of 
 
 A threshold of 0.3 gives, say, precision 0.80 and recall 0.93; a threshold of 0.7 — 0.96 and 0.70. Which one to choose is decided by the cost of an error, not by how pretty the number is: in a search for a person a miss costs more than a false alarm (lower threshold, the operator checks the false alarms), in an automatic action on a target it's the other way around (higher threshold plus confirmation over several frames).
 
-{{diagram:chart-cv-threshold|Рост порога поднимает precision (0.80 → 0.91 → 0.96) и роняет recall (0.93 → 0.84 → 0.70): точку выбирает цена ошибки — низкий порог для поиска человека, высокий плюс подтверждение кадрами для действия по цели.}}
+{{diagram:chart-cv-threshold|Raising the threshold increases precision (0.80 → 0.91 → 0.96) and lowers recall (0.93 → 0.84 → 0.70): the cost of an error picks the point — a low threshold for searching for a person, a high one plus confirmation over frames for acting on a target.}}
 
 ### A tracker on top of the detector
 A detector on every frame is noisy and expensive. A tracker (SORT/ByteTrack: Kalman + IoU matching) gives stable IDs, smooths, survives misses and lets you detect on every 2nd–3rd frame. For the control loop, commands come from the tracker, not from the raw detector.

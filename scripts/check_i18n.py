@@ -1,9 +1,13 @@
 #!/usr/bin/env python3
 """Check translations (docs/I18N.md). Fails on anything that would break a page or change grading;
-prints coverage. A missing translation is never an error: the site falls back to the source language.
+prints coverage. A missing translation is not an error (the site falls back to the source language), except an
+empty value in an English catalog.
 
 Errors:
   - catalog not a flat {string: string} object
+  - an empty value in an English catalog (ui, data, diagrams): English is becoming the source language
+    (docs/I18N.md), so every interface, data and diagram string must have its English text; other languages
+    only count empty values as untranslated
   - a translation with different {placeholders}, or different leading/trailing spaces, than its key
   - a translated module: no source_hash, different section set, different diagram/widget directives,
     different number of fenced code blocks
@@ -32,7 +36,10 @@ def edges(s: str) -> tuple[str, str]:
     return s[: len(s) - len(s.lstrip())], s[len(s.rstrip()):]
 
 
-def check_catalog(path: Path, errors: list[str]) -> tuple[int, int]:
+STRICT_LANGS = {"en"}   # languages whose catalogs may not contain empty values
+
+
+def check_catalog(path: Path, errors: list[str], strict: bool = False) -> tuple[int, int]:
     try:
         data = json.loads(path.read_text(encoding="utf-8"))
     except json.JSONDecodeError as e:
@@ -50,6 +57,8 @@ def check_catalog(path: Path, errors: list[str]) -> tuple[int, int]:
             errors.append(f"{path.relative_to(ROOT)}: value of «{k[:60]}» is not a string")
             continue
         if not v:
+            if strict:
+                errors.append(f"{path.relative_to(ROOT)}: empty translation of «{k[:60]}»")
             continue
         done += 1
         if i18n.placeholders(k) != i18n.placeholders(v):
@@ -117,7 +126,7 @@ def main() -> int:
         for name in ("ui", "data", "diagrams"):
             p = base / f"{name}.json"
             if p.is_file():
-                d, t = check_catalog(p, errors)
+                d, t = check_catalog(p, errors, strict=l["code"] in STRICT_LANGS)
                 parts.append(f"{name} {d}/{t}")
         mods = {"ok": 0, "stale": 0}
         n_src = 0

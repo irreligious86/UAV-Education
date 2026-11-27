@@ -68,9 +68,9 @@ The result is a node graph (as in ros2-basics) and a list of external dependenci
 
 The main shift in thinking: **the `while` loop with `rate.sleep()` is replaced by a timer and callbacks**, and a synchronous service call inside a callback by an asynchronous one, otherwise the node will block itself (the same executor services the response).
 
-{{diagram:ros2-distro-timeline|Окна поддержки по годам: в ноябре 2026 живы Humble (до мая 2027), Jazzy, Lyrical и уходящий Kilted; Noetic и мост к нему уже за чертой.}}
+{{diagram:ros2-distro-timeline|Support windows by year: in November 2026 Humble (until May 2027), Jazzy, Lyrical and the outgoing Kilted are alive; Noetic and the bridge to it are already past the line.}}
 
-{{diagram:ros2-sync-call-deadlock|Синхронный cli.call() в колбэке занимает единственный поток executor: ответ некому доставить, тики таймера пропадают; call_async() возвращается сразу, и уставки идут каждые 50 мс.}}
+{{diagram:ros2-sync-call-deadlock|A synchronous cli.call() in a callback takes the executor's only thread: there is no one to deliver the reply, and timer ticks are lost; call_async() returns at once, and setpoints go out every 50 ms.}}
 
 ### MAVROS 1 → MAVROS 2
 The topic names are mostly the same (`/mavros/state`, `/mavros/local_position/pose`, `/mavros/setpoint_position/local`), but: telemetry QoS is sensor data; some services and parameters have been renamed; launch is `ros2 launch mavros apm.launch fcu_url:=...` (or `px4.launch`). For PX4 in ROS 2, people usually move from MAVROS to uXRCE-DDS (module ros2-px4); for ArduPilot — to AP_DDS where its features are enough (module ros2-ardupilot).
@@ -92,7 +92,9 @@ A table: what was replaced, how many lines of logic became testable without ROS,
 
 The lab counts as done when you have the graph of the original project, the ported node with logic tests and a comparison of the outputs on the same data.
 
-### Шаг 5 (текст — в русской версии)
+### Step 5. A worked port on a synthetic flight (done, without ROS)
+
+Steps 1–4 need a real project and ROS; this step runs on any machine with Python 3 and shows the whole cycle on a small node. The “descent guard” node subscribes to the MAVROS pose and publishes a vertical speed 20 times per second: no faster than 1.5 m/s, below 2 m no faster than 0.3 m/s, on the ground 0. The old rospy node (for reading, not run):
 
 ```python
 # ROS 1 (rospy) — the node being ported; shown for reading, not run (no ROS 1 here)
@@ -116,6 +118,8 @@ while not rospy.is_shutdown():
     rate.sleep()
 ```
 
+The logic without ROS is moved into a module and covered by tests — it carries over without a single change:
+
 ```python
 """ROS-free logic of the ported node: vertical speed command for a guarded descent (ENU, up positive)."""
 def descent_cmd(z, z_land=0.0, k=0.5, v_max=1.5, slow_alt=2.0, v_slow=0.3):
@@ -134,6 +138,8 @@ def test_proportional_zone():           assert descent_cmd(2.4) == -1.2
 def test_slow_zone_below_2m():          assert descent_cmd(1.0) == -0.3
 def test_stop_on_ground():              assert descent_cmd(0.03) == 0.0
 ```
+
+The rclpy wrapper (syntax checked with `py_compile`; the author's environment has no ROS 2, so it was not run). Note the subscription QoS and the timer instead of a loop:
 
 ```python
 # ROS 2 (rclpy) — thin wrapper around the same logic; syntax checked, not run (no ROS 2 here)
@@ -170,6 +176,8 @@ def main():
 if __name__ == "__main__":
     main()
 ```
+
+Checking the behavior without ROS: the script writes a ROS 1 bag (pose at 30 Hz, a 10 s descent from 8 m at 1 m/s, plus the old node's reference output on a 20 Hz grid), converts it with `rosbags-convert` into a ROS 2 bag in MCAP with Jazzy types, reads it back and runs the logic two ways: as a timer on the same grid and “naively”, publishing right in the pose callback. All you need is `pip install rosbags pytest`.
 
 ```python
 """ros2-from-ros1 lab without ROS: ROS 1 bag (reference) -> rosbags-convert -> ROS 2 bag -> ported logic -> compare."""
@@ -231,6 +239,8 @@ for name, out in (("timer port", timer_port()), ("callback port", callback_port(
     print(f"{name:13s}: {len(out)} outputs vs {len(ref)} reference -> {'MATCH' if same else 'DIFFERENT'}")
 ```
 
+The last script checks the ROS 2 documentation's QoS compatibility rules on typical porting cases:
+
 ```python
 """Request-vs-offered QoS rules from the ROS 2 docs (reliability, durability) applied to typical migration cases."""
 RANK_REL = {"best_effort": 0, "reliable": 1}
@@ -251,6 +261,8 @@ for name, pub, sub in cases:
     print(f"{'OK ' if compatible(pub, sub) else 'NO '} {name}")
 ```
 
+Output in the author's environment (Python 3.13, rosbags 0.11.10, pytest 9.2.0):
+
 ```text
 $ python -m pytest -q test_descent_guard.py
 4 passed in 0.01s
@@ -267,6 +279,12 @@ OK  default publisher -> sensor-data subscriber
 NO  ROS 1 latched map, ported as default -> late subscriber wants transient_local
 OK  transient_local publisher -> default subscriber (no old samples)
 ```
+
+What this shows. The logic passed the tests and, on the converted bag, gave the same 200 values at the same moments as the reference — when the timer ticks on the grid of the old `rospy.Rate(20)`. The “naive” port into the callback gave 300 outputs: the output rate became the input rate (30 Hz), and the comparison with the reference fails — an example of a “timing difference” without a single error in the logic. A subscription with the default profile to MAVROS 2 telemetry (best effort) is incompatible; a transient local subscriber to a late “latched” topic gets anything only if the publisher is transient local too.
+
+Self-check: the lab is done when **(step 5, without ROS)** the 4 tests pass, `rosbags-convert` exits with code 0 and creates `flight_ros2.mcap`, the ROS 2 bag has 300 pose messages and 200 reference ones, “timer port” gives 200 outputs and MATCH, “callback port” 300 and DIFFERENT, and `qos_check.py` prints NO for exactly two cases: sensor data → default and default → transient local; **(your own project, steps 1–4)** the graph of the original project is drawn (nodes, topics, dependencies and the place where the project controls the aircraft), the ported node is a thin `rclpy` wrapper around a ROS-free logic module, the logic tests pass under pytest, the ported node's outputs on the converted bag match the reference outputs from step 2, and in the step 4 table every behavior difference found is traced to its cause.
+
+**Reference for the self-check.** The correct result: on the same inputs the old and the new node give the same outputs, and the differences are explained by QoS and timing. Typical wrong ones: (1) the ported node “hangs” on a service call — a synchronous call inside a callback, you need `call_async`; (2) the node gets no telemetry or parameters “are not applied” — the subscription is incompatible with the publisher's QoS or the parameter was not declared with `declare_parameter`; (3) a `while` loop with `rate.sleep()` is left in the node — in ROS 2 a timer and callbacks replace it; (4) in step 5 your “timer port” gave 199 or 201 outputs — the timer grid is shifted relative to the reference (it does not start at T0 or the step is not 50 ms); (5) `rosbags-convert` fails on your own type — the type is not registered in the typestore.
 
 ## diagnostics
 - **Symptom:** the ported node “hangs” on a service call

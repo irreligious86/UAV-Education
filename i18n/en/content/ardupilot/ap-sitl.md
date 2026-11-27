@@ -60,7 +60,7 @@ Logs are written to `logs/` in the working folder (`.BIN`) and are read with the
 ### Where SITL lies
 No vibration or motor noise (you can't test filters), perfect mechanics, ESCs without latency, GPS with a configured noise level, no compass interference except what is modeled. PID tuning parameters from SITL **do not carry over** to a real vehicle; what carries over is logic, missions, scripts, failsafes and analysis skills.
 
-{{diagram:sitl-param-layers|Слои параметров SITL: файл defaults задаёт значения по умолчанию, но eeprom.bin их перебивает; -w стирает eeprom.bin, иначе правка .parm может не подействовать.}}
+{{diagram:sitl-param-layers|SITL parameter layers: the defaults file sets the default values, but eeprom.bin overrides them; -w erases eeprom.bin, otherwise a .parm edit may have no effect.}}
 
 {{diagram:sitl-arch|SITL: the same ArduCopter code gets sensor data from a physics model; MAVProxy distributes MAVLink to the GCS and scripts, logs are written just like in flight.}}
 

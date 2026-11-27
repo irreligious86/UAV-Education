@@ -45,7 +45,7 @@ import math
 import re
 
 from plot import Axis, chart
-from svg import ACCENT, DANGER, INK, MUTED, WARN, Box, Node, flow, svg, text, tree
+from svg import ACCENT, DANGER, INK, MUTED, WARN, Box, Node, esc, flow, svg, text, tree
 
 
 # ---------------------------------------------------------------- helpers
@@ -314,7 +314,7 @@ def step_metrics_anatomy() -> str:
     o.append(f'<line x1="{L}" y1="{T}" x2="{L}" y2="{B}" stroke="{INK}" stroke-width="1"/>')
     for v, lab in ((0, "0"), (1, "1")):
         o.append(text(L - 6, sy(v) + 4, lab, "m t", "end"))
-    o.append(f'<text transform="translate(18 {(T + B) / 2}) rotate(-90)" text-anchor="middle" class="m t">(gyro − база) / ступенька</text>')
+    o.append(f'<text transform="translate(18 {(T + B) / 2}) rotate(-90)" text-anchor="middle" class="m t">{esc("(gyro − база) / ступенька")}</text>')
     o.append(text((L + W - R) / 2, B + 18, "время (масштаб условный: окна 0.25 с и 0.2 с — из кода)", "m t"))
     # curves
     o.append(f'<path d="{path(sp)}" fill="none" stroke="{MUTED}" stroke-width="1.6" stroke-dasharray="6 4"/>')

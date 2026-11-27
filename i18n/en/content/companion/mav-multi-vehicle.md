@@ -42,7 +42,7 @@ Minimum distance is built from errors and reaction time:
 - **Detection and reaction delay**: telemetry (0.2–1 s), the supervisor's decision, braking time.
 - **Closing speed**: two vehicles flying toward each other at 10 m/s each — 20 m/s closing speed. With 0.5 s of telemetry + 0.5 s of decision + ~1.5 s of braking, ~50 m is covered in that time; add position errors and the minimum trigger distance is around 60 m. Hence the rule: the faster the vehicles, the earlier the supervisor has to step in.
 
-{{diagram:chart-fleet-min-separation|Дистанция срабатывания растёт линейно со скоростью: при 10 м/с и 0.5 с телеметрии нужно 56 м, а порог 15 м из лабораторной хватает лишь до 1.8 м/с.}}
+{{diagram:chart-fleet-min-separation|The trigger distance grows linearly with speed: at 10 m/s and 0.5 s telemetry you need 56 m, and the lab's 15 m threshold is enough only up to 1.8 m/s.}}
 
 Strategies, from simple to complex:
 1. **Altitude layers** — each vehicle has its own altitude with a separation of ≥ 10 m plus altitude error. Works as long as the vehicles don't change altitude (takeoff and landing are handled separately, one at a time).

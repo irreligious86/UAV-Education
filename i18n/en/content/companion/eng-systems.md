@@ -52,7 +52,7 @@ Ratings on a 1–10 scale: S — severity of consequences, O — occurrence, D �
 
 The surprise in this example is typical: the risk that feels “scariest” (link loss) is the best covered, while the highest RPNs belong to the build and the process, where detection is poor. That shift of attention is exactly what makes an FMEA valuable.
 
-{{diagram:eng-trace-chain|Строка FMEA с RPN 216 проходит цепочку мера → требование R-PRC-02 → тест check_params.py → запись → матрица; результат теста возвращается в FMEA пересчётом RPN.}}
+{{diagram:eng-trace-chain|An FMEA line with RPN 216 goes along the chain measure → requirement R-PRC-02 → test check_params.py → record → matrix; the test result returns to the FMEA as a recomputed RPN.}}
 
 ### ADR: a decision you can reread
 An Architecture Decision Record is a short file for every irreversible decision. Template:
@@ -88,7 +88,7 @@ Quality criterion: another engineer restores the aircraft from the package and p
 ### Change process
 Request → impact assessment on requirements/FMEA → change in a branch → tests (regression) → review → tagged release → documentation update in the same PR. Documentation updated “later” is never updated.
 
-{{diagram:eng-verify-method-tree|Метод проверки выбирают по трём вопросам: видно ли свойство без работы изделия, можно ли его безопасно запустить и нужно ли число с допуском; SITL попадает в анализ, поэтому требование безопасности им одним не закрывается.}}
+{{diagram:eng-verify-method-tree|The verification method is chosen by three questions: is the property visible without operating the item, can it be operated safely, and do you need a number with a tolerance; SITL counts as analysis, so it cannot close a safety requirement on its own.}}
 
 {{diagram:v-model|The V-model: each level of requirements and design has its own level of verification — from unit tests to validation in the field.}}
 

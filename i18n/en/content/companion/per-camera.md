@@ -33,7 +33,7 @@ Onboard vision starts with a frame that reached the program on time. This module
 - **Shutter**: rolling (rows exposed at different times — “jello” under vibration and fast rotation; breaks VIO) versus global (the whole frame at once). For navigation — global.
 - **Formats**: YUV420 — raw, cheap for algorithms; MJPEG — compressed, every frame independent, decoded on the CPU; H.264/H.265 — for transmission, encode in hardware (Pi 4: H.264 up to 1080p30; Jetson: NVENC).
 
-{{diagram:camera-choice-tree|Выбор камеры начинается с вопроса, идёт ли кадр в контур: картинке оператору хватает IP-камеры со 100+ мс, навигации нужен global shutter, а CSI против USB решает длина кабеля — около 30 см против 3–5 м.}}
+{{diagram:camera-choice-tree|Choosing a camera starts with whether the frame goes into a control loop: a picture for the operator is fine with an IP camera at 100+ ms, navigation needs a global shutter, and CSI vs USB is decided by the cable length — about 30 cm vs 3–5 m.}}
 
 ### Low-latency capture
 Principles: (1) don't make extra copies, (2) a short buffer queue (1–2 frames), (3) take the **latest** frame, not the first one in the queue, (4) resolution to suit the task (640×480 is enough for a detector), (5) fixed exposure/gain — otherwise auto exposure causes jumps.
@@ -74,7 +74,7 @@ Frame time has to be matched to flight data: the frame timestamp (monotonic cloc
 
 {{diagram:glass-to-glass|What makes up the video stream latency from light on the sensor to the screen (typical shares; measure your own chain).}}
 
-{{diagram:camera-motion-blur|Смаз растёт линейно с экспозицией, но вращение 90°/с смазывает в восемь раз сильнее, чем полёт 10 м/с на высоте 50 м: при 1/500 с это 5.3 px против 0.7 px.}}
+{{diagram:camera-motion-blur|Blur grows linearly with exposure, but a 90°/s rotation blurs eight times more than flying at 10 m/s at 50 m: at 1/500 s that is 5.3 px vs 0.7 px.}}
 
 ## practice
 ### Step 1. Capture

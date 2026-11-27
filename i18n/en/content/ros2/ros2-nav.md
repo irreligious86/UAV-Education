@@ -209,9 +209,9 @@ FENCE_ENABLE = 0
 time 21.2 s, path 80.4 m vs straight 80.0 m, max |E| 0.0 m, min clearance to square -1.0 m
 ```
 
-{{diagram:chart-nav-oa-dijkstra-track|Трек SITL совпал с планом Dijkstra до 0.5 м по длине: вершины зоны вынесены на 5/√2 = 3.54 м, путь 87.0 м вместо 80 м и 31.8 с вместо 21.2 с из-за остановок в углах.}}
+{{diagram:chart-nav-oa-dijkstra-track|The SITL track matched the Dijkstra plan within 0.5 m in length: the zone vertices were moved out by 5/√2 = 3.54 m, the path is 87.0 m instead of 80 m and 31.8 s instead of 21.2 s because of the stops at the corners.}}
 
-{{diagram:chart-nav-brake-speed|Задержка реакции 0.3 с срезает безопасную скорость при d = 6 м с 6.0 до 5.2 м/с, а забытый запас добавляет ещё ошибку до 6.9 м/с.}}
+{{diagram:chart-nav-brake-speed|A 0.3 s reaction delay cuts the safe speed at d = 6 m from 6.0 to 5.2 m/s, and a forgotten margin adds another error, up to 6.9 m/s.}}
 
 ### Step 3. Flying around an obstacle in Gazebo
 A world with a pillar in the path of the square. Option A (no code of your own): ArduPilot SITL with proximity from a simulated lidar, `OA_TYPE = 1`, a mission through the pillar — record the BendyRuler trajectory. Option B (your own node): an occupancy grid from `/scan` or `OBSTACLE_DISTANCE`, A* + shortcut, setpoints via the state machine from ros2-px4. Compare the trajectories and the time.

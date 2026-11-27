@@ -56,7 +56,7 @@ The sag isn't dangerous in itself, but because the BEC on the flight controller 
 ### Ripple and the capacitor
 ESCs switch the windings at tens of kHz, and the current in the battery wires jerks. The inductance of the wires L (≈1 µH per meter) turns dI/dt into voltage spikes: U = L·dI/dt. These are **ripple and spikes** on the power bus that pass into the FC supply, into the gyro (noise in the log) and into the video (lines). The fix is a low-ESR electrolytic or polymer capacitor right on the ESC/PDB power pads: 470–1000 µF at 35 V for 4S, 1000 µF at 50 V for 6S (≥ 30% voltage margin). It acts as a local source: it delivers energy on the edge and absorbs the spike. Short leads — otherwise the lead inductance spoils the effect.
 
-{{diagram:chart-power-lc-filter|LC-фильтр 22 мкГн + 470 мкФ ослабляет пульсации ESC на 24 кГц на десятки дБ, но на резонансе 1.6 кГц усиливает: низкий ESR даёт +11 дБ подъёма, ESR 0.15 Ом гасит его ценой ослабления на высоких частотах.}}
+{{diagram:chart-power-lc-filter|A 22 µH + 470 µF LC filter attenuates the 24 kHz ESC ripple by tens of dB but amplifies at its 1.6 kHz resonance: a low ESR gives an +11 dB peak, an ESR of 0.15 Ω damps it at the cost of high-frequency attenuation.}}
 
 ### Protection
 - **Smoke stopper** — a bulb or a resistor/current limiter in series with the positive lead at the first power-up. A short circuit — the bulb lights up, the aircraft doesn't smoke.

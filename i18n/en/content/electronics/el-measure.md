@@ -39,12 +39,12 @@ Shows voltage over time. For on-board work 2 channels and 50–100 MHz are enoug
 - **Signals**: PWM servos — a 1–2 ms pulse every 20 ms (50 Hz); UART — bursts of bits with idle at the high level; DShot — bursts of 16 pulses of different widths.
 - **A ×10 probe** reduces the load on the circuit and extends the bandwidth; for 3.3 V logic it's mandatory.
 
-{{diagram:chart-measure-current-calibration|Калибровка по одному полёту точна только на его среднем токе: датчик со смещением 50 мВ врёт на +74 % при 2 А, а две точки по клещам дают < 0.5 % во всём диапазоне.}}
+{{diagram:chart-measure-current-calibration|A calibration from one flight is accurate only at that flight's average current: a sensor with a 50 mV offset is off by +74 % at 2 A, while two clamp-meter points give < 0.5 % over the whole range.}}
 
 ### DShot on the oscilloscope
 A DShot frame is 16 bits: 11 throttle bits, 1 telemetry bit, 4 CRC bits. Each bit is a pulse: “1” is long (~75% of the bit period), “0” is short (~37%). DShot600 is 600 kbit/s, a bit ≈ 1.67 µs, a frame ≈ 27 µs. On screen — a burst of 16 pulses repeating at the PID loop rate (for example, every 125 µs at 8 kHz). Problems you can see: ringing on the edges (long wire, no termination), a level that doesn't reach 3.3 V (weak driver), dropped frames.
 
-{{diagram:dshot600-pulse-train|Кадр 0x82C6 по времени: бит несёт ширина импульса — «1» держится ~75 % бита, «0» ~37 %, а 16 бит DShot600 занимают ≈ 27 мкс.}}
+{{diagram:dshot600-pulse-train|Frame 0x82C6 over time: the pulse width carries the bit — a “1” stays high for ~75 % of the bit, a “0” for ~37 %, and the 16 bits of DShot600 take ≈ 27 µs.}}
 
 ### Logic analyzer
 Records digital levels on many channels and decodes protocols. A cheap 8-channel 24 MHz one with software like PulseView/sigrok is enough for UART up to 1 Mbaud, I2C at 400 kHz, SPI up to a few MHz and DShot600 (you need ≥ 4–5 samples per bit — 12–24 MHz is better).

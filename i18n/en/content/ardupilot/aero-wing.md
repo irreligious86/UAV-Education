@@ -53,7 +53,7 @@ INAV: `nav_fw_cruise_speed`, `nav_fw_min_thr/max_thr/cruise_thr`, `nav_fw_climb_
 ### Launch and landing
 Hand launch/catapult: `TKOFF_THR_MINACC` (launch detection by acceleration), `TKOFF_THR_DELAY`, `TKOFF_LVL_ALT`; INAV — autolaunch (`nav_fw_launch_*`). Landing: glide slope `LAND_PITCH_DEG`, `LAND_FLARE_ALT/SEC`, a rangefinder for the flare; a wing lands on its belly into the wind at 1.1–1.2 V_s.
 
-{{diagram:chart-wing-stall-prevention|С AIRSPEED_STALL = 0 ArduPlane 4.7 считает сваливанием AIRSPEED_MIN и держит крен на 25° до 10.5 м/с; с AIRSPEED_STALL = 8.5 полный ROLL_LIMIT_DEG 45° доступен уже с 10.1 м/с.}}
+{{diagram:chart-wing-stall-prevention|With AIRSPEED_STALL = 0 ArduPlane 4.7 treats AIRSPEED_MIN as the stall speed and holds the bank at 25° up to 10.5 m/s; with AIRSPEED_STALL = 8.5 the full ROLL_LIMIT_DEG of 45° is available from 10.1 m/s.}}
 
 {{diagram:tecs-energy|TECS: the total energy error (altitude + speed) is closed with throttle, the error in their balance with pitch; that is why climbing without throttle headroom eats your airspeed.}}
 
@@ -184,7 +184,7 @@ First flight in FBWA at altitude: slowly bleed off speed until the stall begins 
 ### Worked calculation for self-check
 A wing with an area of 0.4 m², takeoff mass 2 kg: wing loading 5 kg/m². Stall speed V_s = √(2·m·g / (ρ·S·C_Lmax)) = √(2·2·9.81 / (1.225·0.4·1.1)) ≈ 8.5 m/s. Cruise ≈ 1.4·V_s ≈ 12 m/s. In a turn with 45° of bank the stall speed grows by a factor of 1/√cos45° ≈ 1.19 — to ≈ 10.1 m/s. That is why `AIRSPEED_MIN` is set no lower than ~1.2·V_s ≈ 10 m/s: in a straight line that is still a margin, in a steep turn it is already the edge.
 
-{{diagram:chart-wing-stall-bank|Для крыла 0.4 м², 2 кг (V_s ≈ 8.5 м/с) скорость сваливания в вираже догоняет AIRSPEED_MIN = 1.2·V_s при крене 46°, а крейсер 1.4·V_s — при 59°.}}
+{{diagram:chart-wing-stall-bank|For a 0.4 m², 2 kg wing (V_s ≈ 8.5 m/s) the stall speed in a turn reaches AIRSPEED_MIN = 1.2·V_s at a 46° bank, and cruise 1.4·V_s at 59°.}}
 
 ### What you should end up with and what to record
 - **Calculation table:** S, MAC, loading, V_s, cruise, V_s in a 45° bank. Every number can be reproduced from the formula.

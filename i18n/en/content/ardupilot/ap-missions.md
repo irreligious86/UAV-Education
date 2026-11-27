@@ -54,9 +54,9 @@ Relative (above home, `MAV_FRAME_GLOBAL_RELATIVE_ALT`, the default), absolute (a
 ### Worked example: surveying a 300×200 m area
 Mission Planner → Survey (Grid): camera (sensor, focal length), altitude 80 m, overlap 75/65% → the planner calculates the spacing between survey lines and `DO_SET_CAM_TRIGG_DIST` itself; speed 8 m/s (based on camera exposure: motion blur ≤ 1 px → v·t_exp ≤ GSD); `NAV_TAKEOFF` 80, survey lines, `DO_SET_CAM_TRIGG_DIST 0` at the end, `NAV_RETURN_TO_LAUNCH`. Checks: the altitude profile, mission time vs. battery capacity (`BATT_LOW_MAH` with margin for RTL + capacity margin for the return), a geofence around the area. A run in SITL with the same mission file is mandatory.
 
-{{diagram:mavlink-mission-seq|Загрузка миссии ведёт аппарат: он сам запрашивает каждую команду по номеру, а потерянный ответ запрашивает повторно.}}
+{{diagram:mavlink-mission-seq|The aircraft drives a mission upload: it requests every command by number itself and asks again for a lost reply.}}
 
-{{diagram:mission-jump-order|Порядок выполнения миссии шага 4: DO-команды срабатывают на границе участков, DO_JUMP с повтором 1 даёт второй проход A–B, а без RTL в конце аппарат висит в AUTO.}}
+{{diagram:mission-jump-order|The execution order of the step 4 mission: DO commands fire at leg boundaries, DO_JUMP with a repeat of 1 gives a second pass of A–B, and without an RTL at the end the aircraft hovers in AUTO.}}
 
 {{diagram:mission-alt-frames|Choosing the altitude frame in a mission: Relative for flat ground, Terrain for varying terrain, Absolute when altitude above sea level is given.}}
 

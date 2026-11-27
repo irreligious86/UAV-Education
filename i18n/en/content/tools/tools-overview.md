@@ -56,7 +56,7 @@ drones/
 
 The file name starts with the date `YYYY-MM-DD` — sorting by name gives you the chronology. Before any change — a “before” file, after it — an “after” file, and `git diff` shows the difference.
 
-{{diagram:config-change-flow|Правило «до/после»: файл до изменения, коммит, одно изменение — и git diff должен показать ровно одну строку; лишние строки разбирают до полёта.}}
+{{diagram:config-change-flow|The “before/after” rule: the file before the change, a commit, one change — and git diff must show exactly one line; extra lines are sorted out before flying.}}
 
 ### SITL
 For ArduPilot — SITL, for PX4 — Gazebo/jMAVSim. Every scenario, script and parameter goes to the simulator first.
@@ -89,7 +89,7 @@ Check: `mavproxy.py --master=tcp:127.0.0.1:5760` connects to `sim_vehicle.py -v 
 ### Where things get logged (so you can find them later)
 Betaflight: flash on the FC → download through the configurator (Blackbox tab) into a `.BFL`; ArduPilot: SD card `/APM/LOGS/*.BIN` or MAVFtp from Mission Planner; GCS telemetry logs (`.tlog`) are separate and contain everything that went over MAVLink; PX4: `.ulg` on the SD card, viewed in Flight Review (web) or with `pyulog`. Naming: `YYYY-MM-DD_vehicle_purpose.ext` in the vehicle's folder.
 
-{{diagram:tools-firmware-tree|Сначала прошивка, потом инструмент: у каждой прошивки свой конфигуратор и свой формат логов, а совпадение версий конфигуратора и прошивки проверяют до подключения.}}
+{{diagram:tools-firmware-tree|Firmware first, then the tool: every firmware has its own configurator and log format, and the configurator and firmware versions are checked for a match before connecting.}}
 
 {{diagram:toolbox-map|The engineer's minimal toolset by task.}}
 
@@ -127,7 +127,9 @@ Make two diffs that differ by one parameter and show the `git diff` between them
 
 The lab counts as done when the `drones/` repository is created with the structure, a config is saved with the date and board in its name and committed with a description, and `git diff` of two configs shows exactly one change with an explanation in the commit message.
 
-### Лабораторная на SITL (текст — в русской версии)
+### SITL lab (done): the stack, `.param`, git
+
+You do not need an aircraft: the same “save → commit → change one thing → compare” cycle runs on ArduCopter 4.7.2 SITL. Setup: `python3 -m venv ~/uav && . ~/uav/bin/activate && pip install pymavlink MAVProxy pyulog mavsdk pyserial numpy scipy matplotlib`, then `pip install orangebox` as a separate, last command. It ends with an ERROR about `bb2csv` and exit code 1, but the library gets installed (`from orangebox import Parser` works). In one command with the other packages this error aborts installing the rest, and the script fails on its very first line with the versions. Start SITL: `arducopter -S --model + -I 6 -w --defaults Tools/autotest/default_params/copter.parm --home -35.363261,149.165230,584,353`, then `python3 tools_lab.py tcp:127.0.0.1:5820 ~/lab-repo`. The script prints the stack versions, waits 60 s, saves all parameters to `drones/sitl-copter/configs/2026-11-26_sitl-copter_SITL.param`, commits, tries to write `RTL_ALT` (the pre-4.7 name) and `RTL_ALT_M` (the 4.7 name), saves again after 20 s and shows `git diff`.
 
 ```python
 """tools-overview lab: versions of the Python stack, then config-as-code with ArduCopter SITL:
@@ -169,6 +171,8 @@ print(git("log", "--oneline"))
 print(git("diff", "-U0", "HEAD~1", "--", "drones"))
 ```
 
+Output of a run in the author's environment (ArduCopter 4.7.2 SITL, Python 3.13):
+
 ```text
 pymavlink   2.4.50
 MAVProxy    1.8.75
@@ -192,6 +196,8 @@ index 4a5d4f5..2c809a9 100644
 -RTL_ALT_M,15
 +RTL_ALT_M,30
 ```
+
+What this shows. Of the two writes only `RTL_ALT_M` is confirmed; `RTL_ALT` does not exist in 4.7.2, and the firmware simply stayed silent — a `.param` with the old names would load “successfully”, just without this parameter. The diff has exactly one line because the baseline file was taken after the boot calibrations had finished. In the author's first run the baseline was taken right after startup, and `git diff` showed 17 parameters that had changed by themselves: `BARO1_GND_PRESS` and `BARO2_GND_PRESS` (ground pressure), `INS_GYROFFS_*` and `INS_GYR2OFFS_*` (gyro offsets), `INS_GYR1_CALTEMP`, the sensor IDs `INS_*_ID`, `COMPASS_DEC`, `MIS_TOTAL`. Such parameters in a diff are not your edit but the aircraft's state; recognize them by name and do not mistake them for a settings change.
 
 ## diagnostics
 - **Symptom:** the configurator doesn't see the board

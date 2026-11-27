@@ -234,12 +234,13 @@ def diagram_svg(name: str) -> str | None:
 
 
 def render_diagram(name: str, caption: str) -> str:
+    import i18n   # the scroll hint is an interface string (i18n/<lang>/ui.json)
     svg = diagram_svg(name)
     if svg is None:
         return ""
     return (f'<figure class="diagram" data-diagram="{name}"><div class="diagram__svg">{svg}</div>'
             f'<figcaption class="gc-muted">{format_inline(caption)}</figcaption>'
-            '<div class="diagram__hint">Схему можно прокрутить по горизонтали</div></figure>')
+            f'<div class="diagram__hint">{html.escape(i18n._("Схему можно прокрутить по горизонтали"))}</div></figure>')
 
 
 # Lesson cards: a line "{{lesson:id|Why to read it}}" becomes a highlighted link card to another module

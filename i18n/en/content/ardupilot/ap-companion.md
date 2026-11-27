@@ -32,7 +32,7 @@ In GUIDED the vehicle waits for targets from an external source. Targets can be:
 
 Velocity targets are valid for a limited time: if the companion goes silent, after a timeout (on the order of seconds, the `GUID_TIMEOUT` parameter) ArduPilot puts the vehicle into a hover. This is a protection you should rely on, not work around.
 
-{{diagram:guided-silence-tree|Таймаут есть только у целей скорости, ускорения и углов: после цели по позиции замолчавший companion оставляет аппарат лететь в точку и висеть там.}}
+{{diagram:guided-silence-tree|Only velocity, acceleration and angle targets have a timeout: after a position target, a companion that goes silent leaves the aircraft flying to the point and hovering there.}}
 
 ### Coordinate frame
 `LOCAL_NED`: X is north, Y is east, Z is **down**. Climbing 10 m means Z = −10. Half of all offboard-code bugs are the sign of the Z axis. For targets relative to the vehicle's nose there is `MAV_FRAME_BODY_OFFSET_NED`.
@@ -296,7 +296,7 @@ LAND ACK = 0
 disarmed after landing: True (13 s)
 ```
 
-{{diagram:chart-ap-guided-silence-stop|Скорость держится все 3 с GUID_TIMEOUT после последней цели и падает до нуля примерно за секунду торможения: остановка < 0.2 м/с — через 4.4 с.}}
+{{diagram:chart-ap-guided-silence-stop|The speed holds for the full 3 s of GUID_TIMEOUT after the last target and drops to zero in about a second of braking: below 0.2 m/s after 4.4 s.}}
 
 ## diagnostics
 - **Symptom:** the vehicle does not respond to targets

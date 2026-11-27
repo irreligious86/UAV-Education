@@ -67,7 +67,7 @@ A pole 10 m tall, 10 m east of the world origin (ENU: x — east, y — north, z
 - **SITL** — the firmware is built for the computer, everything is virtual.
 - **HITL** (hardware in the loop) — a real flight controller with its own firmware; the sensors are replaced with simulator data over USB/MAVLink, the motors don't spin. It tests the real hardware: timing, CPU load, drivers — what SITL hides. Support and the setup method differ between PX4 and ArduPilot and between versions — follow the documentation for your version.
 
-{{diagram:sim-stand-choice-tree|Стенд выбирают по тому, что проверяют: логике без мира хватает SITL, миру без камер и CI — Gazebo без графики, зрению — Gazebo с камерой, а таймингам и драйверам полётника — HITL.}}
+{{diagram:sim-stand-choice-tree|The test setup is chosen by what you check: logic without a world needs only SITL, a world without cameras and CI need Gazebo without graphics, vision needs Gazebo with a camera, and flight controller timing and drivers need HITL.}}
 
 ### Scenario tests
 A scenario is a reproducible flight with a check of the result: “take off to 10 m, fly around the pole, land; no closer than 2 m to the pole, altitude within tolerance.” It runs headless, is checked via MAVLink and the log, and the result is pass/fail for CI (the “Configurations in CI” module). One scenario per safety function (failsafe, geofence, RTL) catches regressions on firmware and parameter updates before the field does.

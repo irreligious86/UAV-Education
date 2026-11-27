@@ -56,9 +56,9 @@ Implementation — JSON Schema/plain Python with a rule table; output — a list
 ### SITL autotest
 ArduPilot in CI (Ubuntu runner): build SITL (`./waf configure --board sitl && ./waf copter`) or take a prebuilt image; run `sim_vehicle.py` without a GUI with `--add-param-file params.param`; a pymavlink script: arm in Guided, take off to 10 m, `SIM_RC_FAIL = 1` → expect RTL/LAND mode within 5 s → `assert`; then a 4-waypoint mission → `assert` it is reached. Time — 2–4 minutes. ArduPilot's own `Tools/autotest` is an example of how the developers do it (`autotest.py test.Copter.ThrottleFailsafe`).
 
-{{diagram:ci-config-check-chain|Job config-ci — четыре проверки подряд через &&: схема ловит опечатку в манифесте, скрипт инвариантов — сломанный failsafe и diff не той версии; любая красная проверка останавливает слияние.}}
+{{diagram:ci-config-check-chain|The config-ci job is four checks chained with &&: the schema catches a typo in the manifest, the invariant script a broken failsafe and a diff for the wrong version; any red check blocks the merge.}}
 
-{{diagram:ci-sitl-failsafe-seq|SITL-автотест по шагам: после SIM_RC_FAIL = 1 режим обязан смениться на RTL или LAND за 5 с, иначе assert падает и PR не сливается.}}
+{{diagram:ci-sitl-failsafe-seq|The SITL autotest step by step: after SIM_RC_FAIL = 1 the mode must change to RTL or LAND within 5 s, otherwise the assert fails and the PR cannot be merged.}}
 
 Betaflight: a SITL build checks compilation and the CLI; for PID logic — the `make test` unit tests. For configs — the invariant script.
 

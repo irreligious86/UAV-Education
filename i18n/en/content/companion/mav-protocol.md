@@ -65,7 +65,7 @@ def x25_crc(data: bytes, crc: int = 0xFFFF) -> int:
 ### Payload zero truncation
 MAVLink 2 strips **trailing zero bytes** from the payload before sending: a `COMMAND_LONG` with param5–param7 = 0 goes out shorter than 33 bytes. The receiver must pad the payload with zeros to the full struct size before unpacking. A homemade parser that checks `len == sizeof(struct)` will drop half the messages, and it will look like “random losses.” At least one payload byte is always kept.
 
-{{diagram:mav-rx-frame-flow|Приём кадра по шагам: битый байт и разошедшиеся диалекты одинаково дают тихое отбрасывание на проверке CRC с CRC_EXTRA, а обрезанные нули надо дополнить, а не отбрасывать.}}
+{{diagram:mav-rx-frame-flow|Receiving a frame step by step: a corrupted byte and mismatched dialects both end in a silent drop at the CRC check with CRC_EXTRA, and truncated zeros must be padded, not dropped.}}
 
 ### Field order on the wire
 Fields in the XML are in an order convenient for humans. On the wire they are **sorted by type size in descending order** (uint64/double → uint32/int32/float → uint16 → uint8/char), stable within the same size, and the **extension fields** (after the `<extensions/>` tag) go at the end in XML order. This way the struct is aligned without holes. In pymavlink this is `ordered_fieldnames`; in the C headers — the field order in `mavlink_*_t`. CRC_EXTRA uses the fields in wire order, without extension fields: that's why adding an extension field doesn't break compatibility, while changing an old field does.

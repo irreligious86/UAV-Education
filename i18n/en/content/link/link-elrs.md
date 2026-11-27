@@ -40,7 +40,7 @@ The telemetry ratio shows which packet out of N is given to the return channel. 
 ### Binding phrase
 The binding phrase is not a password and not encryption. A UID is computed from it, which sets the frequency hopping pattern. A unique phrase is needed so you don't interfere with neighbors that have the same pattern. The radio and the receiver must have the same phrase and the same major ELRS version.
 
-{{diagram:elrs-uid-model-match|Фраза → MD5 → UID: байты 2–5 задают прыжки, 4–5 — CRC, а младшие 6 бит UID5 при Model Match несут номер модели. Связь появляется по старшим битам, каналы в FC — только при совпадении всех.}}
+{{diagram:elrs-uid-model-match|Phrase → MD5 → UID: bytes 2–5 set the hopping, 4–5 the CRC, and with Model Match the low 6 bits of UID5 carry the model number. The link comes up on the high bits, channels reach the FC only when everything matches.}}
 
 ### LQ and RSSI
 - RQly (uplink LQ) — how many of the radio's last 100 packets reached the receiver;

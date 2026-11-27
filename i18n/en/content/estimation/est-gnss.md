@@ -63,9 +63,9 @@ A 25×25 mm ceramic patch on a ground plane is the standard; helical antennas ar
 
 When you need RTK: precision landing, surveying, moving baseline for heading (two GPS units → yaw without a compass: ArduPilot “GPS for yaw,” base `GPS_TYPE = 17`, rover `GPS_TYPE2 = 18`; in 4.6+ — `GPS1_TYPE`/`GPS2_TYPE`). When you don't: regular waypoint flying (the EKF and a 2 m error are enough), FPV. RTK doesn't cure multipath or satellite loss under a roof.
 
-{{diagram:chart-gnss-hdop-wall|Стена в 180° убирает 4 спутника из 10, а HDOP растёт с 0.82 до 3.48 — выше порога ArduPilot 1.4 и порога EKF3 2.5; число спутников падает медленно, геометрия — резко.}}
+{{diagram:chart-gnss-hdop-wall|A 180° wall removes 4 of 10 satellites, and HDOP rises from 0.82 to 3.48 — above the ArduPilot threshold of 1.4 and the EKF3 threshold of 2.5; the satellite count drops slowly, the geometry sharply.}}
 
-{{diagram:gnss-rtk-choice-tree|RTK нужен, только когда задаче нужны сантиметры в полёте; для полёта по точкам хватает 1.5–3 м обычного GNSS, для фотограмметрии — PPK.}}
+{{diagram:gnss-rtk-choice-tree|You need RTK only when the task needs centimeters in flight; for waypoint flight 1.5–3 m of plain GNSS is enough, for photogrammetry use PPK.}}
 
 ### How GPS enters the EKF
 The EKF receives position, velocity, their accuracy estimates (`GPA.HAcc/VAcc/SAcc`) and the delay (`GPS1_DELAY_MS` ~ 100–200 ms — the measurement is “old,” the EKF accounts for that). Quality is checked (`EK3_GPS_CHECK`: HDOP, satellite count, velocity drift on the ground) before arming is allowed in GPS modes. Glitch protection is the innovation gate (see the Kalman module).

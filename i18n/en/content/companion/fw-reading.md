@@ -57,7 +57,7 @@ Repository `ArduPilot/ardupilot`, the vehicle in `ArduCopter/`, libraries in `li
 
 Checking against theory: in `AC_PID::update_all()` see that D is computed from the error passed through `FLTD`, not from the raw gyro; that I is limited by `IMAX` and does not accumulate under `limit` (motor saturation) — that is the anti-windup; `AP_MotorsMatrix::output_armed_stabilizing()` — the order: roll/pitch first, then yaw — as much as fits (`MOT_YAW_HEADROOM` is the guaranteed minimum), and only then the throttle that fits into the remaining range is chosen.
 
-{{diagram:fw-gyro-motor-paths|Один и тот же путь гироскоп → моторы в двух кодовых базах с файлом на каждом шаге; выделен PID: D от гироскопа в Betaflight и от ошибки через FLTD в ArduPilot.}}
+{{diagram:fw-gyro-motor-paths|The same gyro → motors path in two code bases, with the file for every step; the PID is highlighted: D on the gyro in Betaflight and on the error through FLTD in ArduPilot.}}
 
 ### Minimal patch and SITL
 Betaflight: `make SITL` builds the firmware for Linux (`obj/main/betaflight_SITL.elf`), connects to a simulator (RealFlight/gazebo over UDP) or simply lets you connect the configurator over TCP: changes to CLI/parameter logic are tested without hardware; for PID logic — unit tests in `src/test/unit/` (`make test` — gtest), for example `pid_unittest.cc`.

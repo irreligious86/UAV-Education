@@ -30,7 +30,7 @@ In PX4 you can expose uORB topics directly to ROS 2: the uXRCE-DDS client on the
 
 The topics show up in ROS 2 as `/fmu/out/*` (from PX4) and `/fmu/in/*` (to PX4).
 
-{{diagram:px4-dds-topic-naming|Суффикс _v1 зависит от версии сообщения, а не от направления: старое имя без суффикса после обновления до 1.17 молчит.}}
+{{diagram:px4-dds-topic-naming|The _v1 suffix depends on the message version, not on the direction: the old name without a suffix goes silent after upgrading to 1.17.}}
 
 ### Offboard: three messages
 1. **`OffboardControlMode`** — tells PX4 *what* you control (position, velocity, acceleration, attitude, rates). It must be streamed **before** switching to Offboard and the whole time you are in it; below ~2 Hz PX4 exits Offboard.
@@ -39,7 +39,7 @@ The topics show up in ROS 2 as `/fmu/out/*` (from PX4) and `/fmu/in/*` (to PX4).
 
 Same philosophy as GUIDED in ArduPilot: the companion gives advice as a stream, the autopilot watches the timeout, and the pilot can always take over.
 
-{{diagram:px4-offboard-loss-timeline|PX4 выходит из Offboard через COM_OF_LOSS_T после метки последнего сообщения (4.9 → 5.9 с); с метками из прошлого Offboard недоступен вовсе, даже при потоке 10 Гц.}}
+{{diagram:px4-offboard-loss-timeline|PX4 leaves Offboard COM_OF_LOSS_T after the timestamp of the last message (4.9 → 5.9 s); with timestamps from the past Offboard is not available at all, even with a 10 Hz stream.}}
 
 ### Versus MAVLink/MAVSDK
 MAVLink via MAVSDK is simpler for simple tasks and doesn't require ROS. uXRCE-DDS is for when you need the ROS ecosystem (navigation, vision, planning), low latency and access to internal topics.

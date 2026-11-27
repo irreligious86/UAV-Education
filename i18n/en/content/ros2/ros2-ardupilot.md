@@ -35,7 +35,7 @@ In the firmware there is a DDS client (`libraries/AP_DDS`); outside, there is a 
 
 {{diagram:uxrce-scheme|The scheme is the same as in PX4: a client in the firmware, an agent on the companion, regular ROS 2 topics outside.}}
 
-{{diagram:ros2-ap-dds-boot-race|Клиент ArduPilot пингует агента пачками по 10 × 1 с и после каждой пишет «exiting», но не сдаётся: агент, поднявшийся на 35-й секунде, подключается при следующем пинге.}}
+{{diagram:ros2-ap-dds-boot-race|The ArduPilot client pings the agent in batches of 10 × 1 s and writes “exiting” after each, but does not give up: an agent that comes up at the 35th second connects on the next ping.}}
 
 ### What AP_DDS publishes and accepts
 | Topic/service | Type | Purpose |
@@ -54,7 +54,7 @@ Important: AP_DDS converts ENU ↔ NED itself — for `cmd_vel` based on `header
 ### The order of actions in ArduPilot
 ArduCopter arms only in a mode that allows arming (GUIDED does) and only after the pre-arm checks. Takeoff in GUIDED is a separate command (the takeoff service = `MAV_CMD_NAV_TAKEOFF`); without it, the vehicle on the ground ignores horizontal setpoints. The sequence in the node: GUIDED → arm → takeoff(alt) → velocity/position setpoints → LAND. The velocity setpoint timeout in GUIDED is `GUID_TIMEOUT` (seconds): if `cmd_vel` stops arriving, the vehicle stops. This is the same “proof of life” principle as Offboard in PX4.
 
-{{diagram:ap-dds-guided-seq|Порядок важен: GUIDED, арм, отдельный takeoff и только потом поток cmd_vel в фрейме map; замолчал — через GUID_TIMEOUT аппарат встаёт.}}
+{{diagram:ap-dds-guided-seq|The order matters: GUIDED, arm, a separate takeoff and only then the cmd_vel stream in the map frame; if it goes silent, the aircraft stops after GUID_TIMEOUT.}}
 
 ### MAVROS
 MAVROS is a node that holds the MAVLink connection and distributes it across plugins: `/mavros/state` (connection, armed, mode), `/mavros/local_position/pose`, `/mavros/setpoint_position/local`, `/mavros/setpoint_velocity/cmd_vel`, the services `/mavros/cmd/arming`, `/mavros/set_mode`, `/mavros/cmd/takeoff`, `/mavros/mission/push`, parameters, geofences, full access to any MAVLink message via `mavros_msgs/Mavlink`. It also converts ENU ↔ NED. Launch: `ros2 launch mavros apm.launch fcu_url:=udp://:14550@` (connecting to SITL or to a router on the companion).

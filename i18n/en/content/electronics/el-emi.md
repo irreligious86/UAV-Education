@@ -41,7 +41,7 @@ Current 60 A, Earth's field ~50 µT. Single wire, B = 2·10⁻⁷·I/r:
 
 The field of a pair with opposing currents is the difference between the fields of the two wires: B ≈ 2·10⁻⁷·I·d/r², falling off as 1/r², not 1/r. Hence two rules that do more than any shielding: power + and − always run together (twisted or tightly bundled), and the compass sits at least 10 cm from the power bus, preferably on a mast. The magnetic field of a DC current is not shielded by foil — only by distance, geometry or mu-metal.
 
-{{diagram:chart-emi-wire-field|При 60 А одиночный провод даже в 20 см даёт поле больше земного, а скрученная пара уже в 5 см ниже 30 % поля Земли: её поле падает как 1/r², а не 1/r.}}
+{{diagram:chart-emi-wire-field|At 60 A a single wire gives a field stronger than Earth's even at 20 cm, while a twisted pair is below 30 % of Earth's field already at 5 cm: its field falls as 1/r², not 1/r.}}
 
 ### Current-based compass compensation
 If you can't separate them, ArduPilot can subtract the interference: `compassmot` (with props on, the vehicle rigidly secured) measures the field on board as a function of current and writes coefficients to `COMPASS_MOT_X/Y/Z`; the mode is `COMPASS_MOTCT` (1 — by throttle, 2 — by current, needs a current sensor). This compensates the linear part of the interference; the nonlinear part (saturation, eddy currents) it does not. If the interference is above ~30 % of the Earth's field after compensation, the compass still has to be moved.

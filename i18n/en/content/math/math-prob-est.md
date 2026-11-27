@@ -50,7 +50,7 @@ For a state vector x (for example, position N, E) the covariance matrix is P = E
 
 A linear transform y = A·x carries the covariance as P_y = A·P·Aᵀ. This is the formula both for prediction (A = F, the model matrix) and for switching between coordinate frames (A = R — the covariance rotates together with the ellipse). Independence: zero covariance, P is diagonal; that is exactly what you assume when you set `EK3_*_NOISE` with one number per source.
 
-{{diagram:cov-ellipse-rotation|Поворот на 45° поворачивает эллипс 2σ на те же 45°: собственные значения не меняются, а дисперсии компонент становятся 0.725 и 5.525.}}
+{{diagram:cov-ellipse-rotation|A 45° rotation turns the 2σ ellipse by the same 45°: the eigenvalues do not change, and the component variances become 0.725 and 5.525.}}
 
 ### Noise over time: white, random walk, Allan deviation
 White noise — the samples are independent; its integral is a **random walk**, whose σ grows as √t. For a gyro: the angular rate noise σ_g (°/s per sample) after integration gives an angle error σ_θ(t) = ARW·√t, where ARW = σ_g·√T_s (angle random walk, in °/√h in datasheets). For an accelerometer it is VRW: the velocity error grows as √t, the position error as t^1.5. This explains why without GPS an IMU-only position drifts by meters in seconds, while the gyro angle holds for minutes.

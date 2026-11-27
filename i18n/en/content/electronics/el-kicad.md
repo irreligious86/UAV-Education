@@ -39,7 +39,7 @@ Don't: a flight controller from scratch as your first project — that means hig
 4. **DRC** (design rules check) — the fab's rules: minimum trace width and clearance, holes, edge clearances.
 5. **Output**: Gerber files for the layers, a drill file, a BOM (bill of materials), a position file for automated assembly; a 3D view to check packages and connectors.
 
-{{diagram:kicad-design-flow|Каждая проверка — ERC, DRC, 3D-вид — при ошибке возвращает к шагу, где ошибка сделана; правила фабрики загружают в Board Setup до разводки.}}
+{{diagram:kicad-design-flow|Every check — ERC, DRC, the 3D view — sends you back on an error to the step where the mistake was made; the fab's rules are loaded into Board Setup before routing.}}
 
 ### Example: an INA226 current sensor
 The INA226 is a digital current and voltage monitor over I²C: it measures the drop across a shunt (±81.92 mV range, 2.5 µV step) and the bus voltage (up to 36 V — up to 8S), and computes current and power.

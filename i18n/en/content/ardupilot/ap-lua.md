@@ -71,7 +71,7 @@ return update()
 ```
 Testing in SITL: `SIM_ESC_TELEM = 1`, temporarily set the threshold to 30 °C, make sure it triggers; then — on the test bench. Record it in the FMEA as a mitigation with a reference to the test (the “Fault Tolerance” module).
 
-{{diagram:lua-script-lifecycle|Скрипт перепланируется, пока update() возвращает функцию и задержку; любая ошибка снимает его до перезагрузки и блокирует арм через PreArm: Scripting.}}
+{{diagram:lua-script-lifecycle|The script is rescheduled as long as update() returns a function and a delay; any error stops it until reboot and blocks arming with PreArm: Scripting.}}
 
 {{diagram:lua-runtime|How a script runs: a file from APM/scripts/ goes into the Lua VM, update() returns itself and the period, pcall catches errors, actions go through API bindings.}}
 

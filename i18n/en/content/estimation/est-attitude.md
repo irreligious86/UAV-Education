@@ -49,7 +49,7 @@ The idea: trust the gyro at high frequencies and the accelerometer (gravity) at 
 
 Kp sets the time constant of “trust” in the accelerometer: τ ≈ 1/Kp; Kp = 0.5 → ~2 s. During maneuvers |a| ≠ 1 g — the accelerometer lies; the standard protection is to reduce Kp when | |a| − g | is large (ArduPilot DCM: `AHRS_GPS_GAIN`, using GPS for centripetal correction; Betaflight: `imu_dcm_kp`, disabling correction under large accelerations). The compass is added the same way for the yaw axis: the error between the measured and expected direction of the field's horizontal component.
 
-{{diagram:chart-attitude-kp-sweep|Ошибка оценки наклона имеет минимум по Kp: слева её делает дрейф гироскопа (ошибка b/Kp), справа — доверие ложному «низу» при разгоне; защита по модулю |a| сдвигает минимум с 0.1 к 0.25–0.5 и вдвое уменьшает ошибку.}}
+{{diagram:chart-attitude-kp-sweep|The tilt estimate error has a minimum in Kp: on the left gyro drift causes it (error b/Kp), on the right trusting a false “down” during acceleration; the |a| guard moves the minimum from 0.1 to 0.25–0.5 and halves the error.}}
 
 ### What this is in firmware
 - **Betaflight**: a Mahony-like quaternion filter, `imu_dcm_kp` (default 2500 → 0.25 after scaling), `imu_dcm_ki`; without a compass yaw drifts — irrelevant for Acro, and GPS Rescue uses the GPS course.
@@ -62,7 +62,7 @@ Gravity carries no information about heading: without a compass or GPS course, y
 
 {{diagram:complementary-filter|Complementary filter: the gyro integral is accurate over a short interval, the accelerometer angle over a long one; the weights α and 1 − α blend them.}}
 
-{{diagram:attitude-mahony-loop|Цикл Mahony в Betaflight: гироскоп интегрируется всегда, а поправка Kp·e от акселерометра включается только после фильтра 25 Гц и проверки 0.9–1.1 g; Ki в Betaflight по умолчанию 0.}}
+{{diagram:attitude-mahony-loop|The Mahony loop in Betaflight: the gyro is always integrated, while the Kp·e correction from the accelerometer is applied only after a 25 Hz filter and a 0.9–1.1 g check; Ki is 0 by default in Betaflight.}}
 
 ## practice
 

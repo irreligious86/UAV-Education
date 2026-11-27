@@ -59,7 +59,7 @@ Digital systems also work in 5.8 GHz and occupy a wider band, so fewer of them f
 
 {{diagram:fpv-video-choice|Choosing an FPV video system by task: constant low latency — analog or HDZero, picture and recording — DJI/Walksnail, openness and MAVLink in the channel — OpenIPC.}}
 
-{{diagram:goggles-vtx-links|DJI замкнут на себе и делится по поколениям; HDZero и Walksnail открыты к аналогу (сами принимают его только HDZero Goggle 2 и BoxPro, остальные — через модуль или приёмник), а друг друга — только через внешний приёмник.}}
+{{diagram:goggles-vtx-links|DJI is closed on itself and split by generation; HDZero and Walksnail are open to analog (only the HDZero Goggle 2 and BoxPro receive it natively, the rest through a module or a receiver), and to each other only through an external receiver.}}
 
 ## practice
 ### Step 1. Inventory your system
