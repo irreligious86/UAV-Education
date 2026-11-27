@@ -57,6 +57,8 @@ VIO can silently output garbage (tracking loss → the pose “freezes” or jum
 
 {{diagram:vio-failure-tree|Из четырёх сценариев отказа VIO опасен один — замёрзшая поза с прежней частотой: ворота её не ловят, поэтому companion должен прекращать публикацию сам.}}
 
+{{diagram:chart-vio-fault-gap|Замёрзшая поза даёт расхождение 6.3 м за 20 с при SP ≤ 0.01 и ещё 7 с ухода после конца отказа; остановка публикации — единственный отказ, после которого автопилот сам садится через 7.9 с.}}
+
 {{diagram:visual-nav-levels|Three levels of visual navigation and how each one enters the autopilot.}}
 
 ## practice
@@ -71,6 +73,72 @@ ArduPilot SITL: a pymavlink script publishing `VISION_POSITION_ESTIMATE` from th
 
 ### Step 4. Failure
 Stop publishing for 10 s in flight → EKF behavior (`XKF4`, messages), failsafe; then “garbage” (frozen pose) → gates; then the `EK3_SRC2` backup set on GPS enabled by a switch → recovery. Lab: ExternalNav source fed in, hold without GPS, failure drilled.
+
+```text
+SIM_GPS1_ENABLE 0
+GPS1_TYPE 0
+VISO_TYPE 1
+VISO_DELAY_MS 50
+VISO_POS_M_NSE 0.2
+VISO_YAW_M_NSE 0.2
+EK3_SRC1_POSXY 6
+EK3_SRC1_VELXY 0
+EK3_SRC1_POSZ 6
+EK3_SRC1_VELZ 0
+EK3_SRC1_YAW 6
+COMPASS_USE 0
+FS_EKF_ACTION 1
+SIM_WIND_SPD 3
+SIM_WIND_DIR 180
+```
+
+```python
+while queue and queue[0][0] <= t_boot:          # deliver lagged samples (FC time)
+    s = queue.popleft()[1]
+    if fault_on and args.fault == "stop":
+        continue                                  # companion went silent
+    if fault_on and args.fault == "freeze":
+        s = (s[0],) + last_pose[1:]               # fresh timestamp, frozen pose
+    elif fault_on and args.fault == "jump":
+        s = (s[0], s[1] + args.jump) + s[2:]      # relocalisation jump north
+    else:
+        last_pose = s
+    t_us, n, e, d, r, p, y = s
+    m.mav.vision_position_estimate_send(t_us, n, e, d, r, p, y, [float("nan")] + [0.0] * 20, 0)
+```
+
+```text
+[   49.9s] >>> fault ON (freeze)
+[   54.1s] t+ 14.1 truth N  -0.07 E  +0.15 | est N  -0.01 E  +0.00 | gap  0.16 | drift  0.15 m | ratio 0.01 | LOITER FAULT
+[   59.1s] t+ 19.2 truth N  -0.31 E  +0.94 | est N  -0.01 E  +0.00 | gap  0.99 | drift  0.97 m | ratio 0.01 | LOITER FAULT
+[   64.1s] t+ 24.2 truth N  -0.73 E  +2.78 | est N  -0.01 E  +0.00 | gap  2.87 | drift  2.85 m | ratio 0.01 | LOITER FAULT
+[   69.2s] t+ 29.3 truth N  -1.36 E  +6.12 | est N  -0.01 E  -0.00 | gap  6.27 | drift  6.24 m | ratio 0.01 | LOITER FAULT
+[   69.9s] <<< fault OFF
+[   70.2s] t+ 30.3 truth N  -1.49 E  +6.99 | est N  -0.01 E  -0.00 | gap  7.15 | drift  7.12 m | ratio 4.68 | LOITER
+[   76.3s] t+ 36.3 truth N  -2.24 E +13.51 | est N  -0.03 E  +0.01 | gap 13.68 | drift 13.67 m | ratio 1.52 | LOITER
+[   77.3s] t+ 37.3 truth N  -2.30 E +14.81 | est N  -2.32 E +14.55 | gap  0.26 | drift 14.96 m | ratio 0.04 | LOITER
+```
+
+```text
+[   49.9s] >>> fault ON (stop)
+[   57.8s] MSG EKF variance
+[   57.8s] MSG EKF Failsafe: changed to Land Mode
+[   64.9s] MSG EKF3 IMU0 stopped aiding
+[   68.3s] MSG SIM Hit ground at 0.488822 m/s
+[   69.2s] t+ 29.3 truth N  +5.59 E  -2.10 | est N  +1.70 E  +0.83 | gap  4.87 | drift  5.97 m | ratio 0.01 | LAND FAULT
+[   70.0s] MSG EKF3 IMU0 is using external nav data
+```
+
+```text
+[   49.9s] >>> fault ON (freeze)
+[   50.4s] detector: pose frozen 0.5 s, stop publishing
+[   58.3s] MSG EKF variance
+[   58.3s] MSG EKF Failsafe: changed to Land Mode
+[   65.4s] MSG EKF3 IMU0 stopped aiding
+[   68.8s] MSG SIM Hit ground at 0.490478 m/s
+[   70.0s] detector: pose moves again, publishing
+[   70.3s] t+ 30.3 truth N  +6.14 E  -1.97 | est N  +6.13 E  -1.97 | gap  0.01 | drift  6.45 m | ratio 0.04 | LAND
+```
 
 ## diagnostics
 - **Symptom:** the EKF does not accept VIO (XKF4.SP > 1 constantly)

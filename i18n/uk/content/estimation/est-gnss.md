@@ -63,6 +63,8 @@ GPS (США, L1 C/A), GLONASS (Росія), Galileo (ЄС, L1 + E5), BeiDou (К�
 
 Коли потрібен RTK: точна посадка, геодезія, moving baseline для курсу (два GPS → yaw без компаса: ArduPilot «GPS for yaw», база `GPS_TYPE = 17`, ровер `GPS_TYPE2 = 18`; у 4.6+ — `GPS1_TYPE`/`GPS2_TYPE`). Коли не потрібен: звичайний політ за точками (EKF і 2 м похибки достатньо), FPV. RTK не лікує багатопроменевість і втрату супутників під дахом.
 
+{{diagram:chart-gnss-hdop-wall|Стена в 180° убирает 4 спутника из 10, а HDOP растёт с 0.82 до 3.48 — выше порога ArduPilot 1.4 и порога EKF3 2.5; число спутников падает медленно, геометрия — резко.}}
+
 {{diagram:gnss-rtk-choice-tree|RTK нужен, только когда задаче нужны сантиметры в полёте; для полёта по точкам хватает 1.5–3 м обычного GNSS, для фотограмметрии — PPK.}}
 
 ### Як GPS входить в EKF
@@ -110,6 +112,75 @@ print(f"{len(r)} fixes, median {r[len(r) // 2]:.2f} m, p95 {r[int(len(r) * 0.95)
 - **Налаштування:** запиши фактичні значення параметрів GNSS своєї версії ArduPilot (у 4.6+ частина параметрів приймача — з префіксом `GPS1_`, наприклад `GPS1_TYPE`; звіряйся зі списком параметрів).
 
 Лабораторну зараховано, коли HDOP, кількість супутників і розкид позиції записано для трьох умов, багатопроменевість показано стрибками позиції на логу біля стіни, налаштування приймача перевірено й записано в паспорт, а рішення щодо RTK обґрунтовано вимогами до точності.
+
+```python
+"""est-gnss lab: pseudorange least squares, DOP from geometry, open sky vs a wall.
+Local ENU frame, satellites at 22 000 km slant range; UERE sigma 3 m; receiver clock bias 1 ms."""
+import math
+import numpy as np
+
+C = 299_792_458.0
+SKY = [(0, 75), (40, 30), (85, 50), (130, 20), (175, 60), (220, 35), (260, 15), (300, 45), (335, 25), (20, 10)]
+#        azimuth, elevation in degrees: 10 satellites spread over the whole sky
+
+
+def unit(az, el):
+    a, e = math.radians(az), math.radians(el)
+    return np.array([math.cos(e) * math.sin(a), math.cos(e) * math.cos(a), math.sin(e)])   # E, N, U
+
+
+def dop(sats):
+    G = np.array([np.append(-unit(az, el), 1.0) for az, el in sats])
+    Q = np.linalg.inv(G.T @ G)
+    return math.sqrt(Q[0, 0] + Q[1, 1]), math.sqrt(Q[2, 2]), math.sqrt(np.trace(Q[:3, :3])), math.sqrt(np.trace(Q))
+
+
+def solve(sats, rng, sigma=3.0, bias_s=1e-3, iters=6):
+    truth = np.zeros(3)
+    pos = np.array([unit(az, el) * 22_000e3 for az, el in sats])
+    rho = np.linalg.norm(pos - truth, axis=1) + C * bias_s + rng.normal(0, sigma, len(sats))
+    x = np.array([100e3, -100e3, 0.0, 0.0])            # E, N, U, c*dt; start 141 km off, zero clock
+    for k in range(iters):
+        r = np.linalg.norm(pos - x[:3], axis=1)
+        H = np.hstack([-(pos - x[:3]) / r[:, None], np.ones((len(sats), 1))])
+        dx = np.linalg.lstsq(H, rho - (r + x[3]), rcond=None)[0]
+        x += dx
+        if np.linalg.norm(dx) < 1e-3:
+            break
+    return x, k + 1
+
+
+rng = np.random.default_rng(42)
+for name, sats in (("open sky, 10 sats", SKY),
+                   ("wall to the south (az 90..270 blocked)", [s for s in SKY if not 90 <= s[0] <= 270]),
+                   ("4 sats, all low in the north", [(300, 15), (335, 25), (20, 10), (40, 30)])):
+    h, v, p, g = dop(sats)
+    x, n = solve(sats, rng)
+    print(f"{name}: {len(sats)} sats, HDOP {h:.2f} VDOP {v:.2f} PDOP {p:.2f}")
+    print(f"   one fix: E {x[0]:+6.2f} N {x[1]:+6.2f} U {x[2]:+6.2f} m, clock {x[3] / C * 1e3:.6f} ms, {n} iterations")
+    errs = np.array([solve(sats, rng)[0][:3] for _ in range(2000)])
+    sh = math.sqrt(np.mean(errs[:, 0] ** 2 + errs[:, 1] ** 2))
+    print(f"   2000 fixes: horizontal RMS {sh:.2f} m  vs  HDOP*UERE = {h * 3.0:.2f} m")
+```
+
+```text
+open sky, 10 sats: 10 sats, HDOP 0.82 VDOP 1.29 PDOP 1.53
+   one fix: E  -0.93 N  +0.10 U  +1.29 m, clock 0.999999 ms, 4 iterations
+   2000 fixes: horizontal RMS 2.52 m  vs  HDOP*UERE = 2.47 m
+wall to the south (az 90..270 blocked): 6 sats, HDOP 3.48 VDOP 4.07 PDOP 5.36
+   one fix: E  +7.62 N +11.36 U +11.70 m, clock 1.000050 ms, 4 iterations
+   2000 fixes: horizontal RMS 10.40 m  vs  HDOP*UERE = 10.45 m
+4 sats, all low in the north: 4 sats, HDOP 3.98 VDOP 4.30 PDOP 5.86
+   one fix: E  -4.13 N +22.34 U +10.57 m, clock 1.000067 ms, 4 iterations
+   2000 fixes: horizontal RMS 12.03 m  vs  HDOP*UERE = 11.94 m
+```
+
+```text
+[ 40.0s] Arm: AHRS: waiting for home
+[ 40.4s] PreArm: AHRS: waiting for home
+GPS_RAW_INT: fix 6, sats 5, HDOP 1.21, h_acc 0.30 m
+NOT armed after 60 s
+```
 
 ## diagnostics
 - **Симптом:** довгий пошук супутників після ввімкнення

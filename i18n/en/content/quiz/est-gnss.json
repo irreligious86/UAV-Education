@@ -89,6 +89,28 @@
       ],
       "answer": 3,
       "explain": "UBX is more compact and carries accuracy and status fields that NMEA lacks or has only partially."
+    },
+    {
+      "q": "ArduCopter 4.7.2, GPS с 3D fix видит 5 спутников. Что ответит автопилот на попытку армить в Loiter?",
+      "options": [
+        "Армится: 5 спутников достаточно для 3D fix",
+        "«PreArm: AHRS: waiting for home» — EKF3 не взял GPS (нужно 6), дома нет",
+        "«Arm: High GPS HDOP» — порог `GPS_HDOP_GOOD`",
+        "«GPS 1: Bad fix» — нужен fix 4 и выше"
+      ],
+      "answer": 1,
+      "explain": "EKF3 требует ≥ 6 спутников (`EK3_GPS_CHECK` бит 0); без GPS в EKF дом не ставится, и сообщение арма называет следствие. В SITL: 5 спутников — отказ, 6 — арм."
+    },
+    {
+      "q": "u-blox MAX-M10S с набором созвездий по умолчанию (GPS + Galileo + BeiDou B1I) в обычном режиме выдаёт навигационное решение с частотой до:",
+      "options": [
+        "3 Гц",
+        "10 Гц",
+        "18 Гц",
+        "25 Гц"
+      ],
+      "answer": 0,
+      "explain": "По даташиту UBX-20035208: 3 Гц для GPS + GAL + BDS B1I, 10 Гц для GPS + GAL; 25 Гц на четырёх созвездиях — это NEO-M9N."
     }
   ]
 }

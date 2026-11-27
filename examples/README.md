@@ -22,5 +22,6 @@ Each folder is self-contained; copy it out of this repository to begin a project
 
 | `vision-pipeline/` | Onboard vision end to end: synthetic flight video, detector → tracker → geo-referenced target with per-stage latency log, slice scoring, ArduCopter SITL follow with timeout/speed/fence interlocks | per-vision-pipeline |
 | `nav-vtrn/` | Vision-based terrain navigation: synthetic orthophoto, visual odometry vs map matching vs fused, closed loop GPS_INPUT into ArduCopter SITL | nav-vtrn |
+| `sitl-nav-labs/` | ArduCopter 4.7.2 SITL labs: Dijkstra object avoidance around an exclusion fence, ExternalNav fault injection (frozen pose, stopped feed, jump, frozen-pose detector), GNSS pre-arm thresholds; one runner keeps run folders and logs | ros2-nav, per-visual-nav, est-gnss |
 
 Goal: a simulation on screen in 15 minutes, not an afternoon of dependencies.

@@ -68,6 +68,149 @@ python -m pytest -q test/test_grid_planner.py
 ### Крок 2. Гальмівний шлях
 Для апарата з максимальним уповільненням 3 м/с² і лідаром із надійною дальністю 8 м порахуй максимальну безпечну швидкість із запасом 2 м і затримкою реакції 0.3 с. Порівняй з параметрами simple avoidance твоєї прошивки.
 
+```python
+"""ros2-nav lab: Dijkstra vs A* vs weighted A*, inflation, shortcut, unknown cells, log-odds.
+Run from examples/ros2-docker/ws/src/uav_ros2_labs:  python3 nav_lab.py"""
+import heapq, math, random, sys
+sys.path.insert(0, ".")
+from uav_ros2_labs.grid_planner import inflate, line_free, path_length, shortcut
+
+
+def search(grid, s, g, w):
+    """8-connected grid search; w = heuristic weight (0 Dijkstra, 1 A*, >1 weighted A*)."""
+    def h(c):
+        dx, dy = abs(c[0] - g[0]), abs(c[1] - g[1])
+        return (dx + dy) + (math.sqrt(2) - 2) * min(dx, dy)
+    free = lambda c: 0 <= c[0] < len(grid[0]) and 0 <= c[1] < len(grid) and grid[c[1]][c[0]] == 0
+    openq, best, parent, closed = [(w * h(s), 0.0, s)], {s: 0.0}, {}, set()
+    while openq:
+        _, gc, c = heapq.heappop(openq)
+        if c in closed:
+            continue
+        closed.add(c)
+        if c == g:
+            p = [c]
+            while c in parent:
+                c = parent[c]; p.append(c)
+            return p[::-1], len(closed)
+        for dx in (-1, 0, 1):
+            for dy in (-1, 0, 1):
+                n = (c[0] + dx, c[1] + dy)
+                if (dx, dy) == (0, 0) or not free(n):
+                    continue
+                if dx and dy and not (free((c[0] + dx, c[1])) and free((c[0], c[1] + dy))):
+                    continue
+                ng = gc + math.hypot(dx, dy)
+                if ng < best.get(n, math.inf):
+                    best[n], parent[n] = ng, c
+                    heapq.heappush(openq, (ng + w * h(n), ng, n))
+    return None, len(closed)
+
+
+W, H = 60, 40                          # 0.5 m cells -> 30 x 20 m
+grid = [[0] * W for _ in range(H)]
+for y in range(0, 30):                 # wall from the bottom edge, gap at the top
+    grid[y][30] = 1
+S, G = (5, 5), (55, 5)
+print("1) search on the raw grid, 0.5 m cells")
+for name, w in (("Dijkstra  w=0  ", 0), ("A*        w=1  ", 1), ("weighted  w=2  ", 2)):
+    p, n = search(grid, S, G, w)
+    print(f"   {name} expanded {n:5d} cells, path {path_length(p) * 0.5:6.2f} m")
+
+forest = random.Random(1)                                # 25 % random obstacles, seed 1
+fg = [[1 if forest.random() < 0.25 else 0 for _ in range(W)] for _ in range(H)]
+fg[5][5] = fg[35][55] = 0
+print("   'forest' 60x40, 25 % occupied, (5,5) -> (55,35):")
+for name, w in (("Dijkstra  w=0  ", 0), ("A*        w=1  ", 1), ("weighted  w=2  ", 2)):
+    p, n = search(fg, (5, 5), (55, 35), w)
+    print(f"   {name} expanded {n:5d} cells, path {path_length(p) * 0.5:6.2f} m")
+
+print("2) inflation for a 0.6 m radius + 0.4 m margin = 2 cells")
+gi = inflate(grid, 2)
+p0, _ = search(grid, S, G, 1)
+p1, _ = search(gi, S, G, 1)
+s1 = shortcut(gi, p1)
+print(f"   raw {path_length(p0) * 0.5:.2f} m, inflated {path_length(p1) * 0.5:.2f} m, "
+      f"inflated+shortcut {path_length(s1) * 0.5:.2f} m in {len(s1) - 1} segments, straight {math.dist(S, G) * 0.5:.2f} m")
+print(f"   shortcut stays free: {all(line_free(gi, a, b) for a, b in zip(s1, s1[1:]))}")
+
+print("3) unseen cells: the gap at the top was never observed (-1)")
+gu = [row[:] for row in grid]
+for y in range(30, 40):
+    gu[y][30] = -1
+blocked = [[0 if v == 0 else 1 for v in row] for row in gu]       # unknown = occupied
+optim = [[0 if v in (0, -1) else 1 for v in row] for row in gu]   # unknown = free
+print(f"   unknown=occupied: path {'found' if search(blocked, S, G, 1)[0] else 'none -> hold and explore'}")
+po, _ = search(optim, S, G, 1)
+thru = [c for c in po if gu[c[1]][c[0]] == -1]
+print(f"   unknown=free: path {path_length(po) * 0.5:.2f} m, crosses {len(thru)} unseen cells at x=30, y={thru[0][1]}..{thru[-1][1]}")
+
+print("4) log-odds occupancy: p_hit = 0.7, p_miss = 0.4 per beam")
+l_hit, l_miss = math.log(0.7 / 0.3), math.log(0.4 / 0.6)
+l = 0.0
+for k, z in enumerate("HHHMM", 1):
+    l += l_hit if z == "H" else l_miss
+    print(f"   beam {k} {'hit ' if z == 'H' else 'miss'}  L = {l:+.3f}  p = {1 - 1 / (1 + math.exp(l)):.3f}")
+```
+
+```text
+1) search on the raw grid, 0.5 m cells
+   Dijkstra  w=0   expanded  2290 cells, path  35.94 m
+   A*        w=1   expanded   785 cells, path  35.94 m
+   weighted  w=2   expanded   537 cells, path  35.94 m
+   'forest' 60x40, 25 % occupied, (5,5) -> (55,35):
+   Dijkstra  w=0   expanded  1778 cells, path  33.56 m
+   A*        w=1   expanded   462 cells, path  33.56 m
+   weighted  w=2   expanded    86 cells, path  37.85 m
+2) inflation for a 0.6 m radius + 0.4 m margin = 2 cells
+   raw 35.94 m, inflated 37.94 m, inflated+shortcut 36.80 m in 2 segments, straight 25.00 m
+   shortcut stays free: True
+3) unseen cells: the gap at the top was never observed (-1)
+   unknown=occupied: path none -> hold and explore
+   unknown=free: path 35.94 m, crosses 1 unseen cells at x=30, y=30..30
+4) log-odds occupancy: p_hit = 0.7, p_miss = 0.4 per beam
+   beam 1 hit   L = +0.847  p = 0.700
+   beam 2 hit   L = +1.695  p = 0.845
+   beam 3 hit   L = +2.542  p = 0.927
+   beam 4 miss  L = +2.136  p = 0.894
+   beam 5 miss  L = +1.731  p = 0.850
+```
+
+```text
+OA_TYPE 2
+FENCE_ENABLE 1
+FENCE_TYPE 4
+GUID_OPTIONS 64
+WP_SPD 5
+```
+
+```text
+$ ./run_lab.sh oa oa.parm "" oa_dijkstra_lab.py
+home -35.363261 149.165230
+fence upload ack type 0
+DO_FENCE_ENABLE ack result 4
+FENCE_ENABLE = 1
+armed, takeoff 10 m
+goal 80 m north sent
+time 31.8 s, path 87.0 m vs straight 80.0 m, max |E| 13.7 m, min clearance to square 3.6 m
+$ python3 oadj.py sitl-run/oa/logs/00000001.BIN
+OADJ State 0 point 0/0 OA -35.362542 149.165230
+OADJ State 2 point 1/4 OA -35.363023 149.165379
+OADJ State 2 point 2/4 OA -35.362780 149.165379
+```
+
+```text
+$ ./run_lab.sh oa_nofence_enable oa_nofence.parm "" oa_dijkstra_lab.py
+DO_FENCE_ENABLE ack result 4
+FENCE_ENABLE = 0
+time 21.2 s, path 80.4 m vs straight 80.0 m, max |E| 0.0 m, min clearance to square -1.0 m
+$ ./run_lab.sh oa_nofence oa_nofence.parm "" oa_dijkstra_lab.py --no-enable
+FENCE_ENABLE = 0
+time 21.2 s, path 80.4 m vs straight 80.0 m, max |E| 0.0 m, min clearance to square -1.0 m
+```
+
+{{diagram:chart-nav-oa-dijkstra-track|Трек SITL совпал с планом Dijkstra до 0.5 м по длине: вершины зоны вынесены на 5/√2 = 3.54 м, путь 87.0 м вместо 80 м и 31.8 с вместо 21.2 с из-за остановок в углах.}}
+
 {{diagram:chart-nav-brake-speed|Задержка реакции 0.3 с срезает безопасную скорость при d = 6 м с 6.0 до 5.2 м/с, а забытый запас добавляет ещё ошибку до 6.9 м/с.}}
 
 ### Крок 3. Обліт у Gazebo
