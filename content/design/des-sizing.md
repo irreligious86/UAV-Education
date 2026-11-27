@@ -3,7 +3,7 @@ id: des-sizing
 title: "Проектирование под задачу: ТЗ → масса, энергия, тяга, конфигурация"
 level: L3
 readingTime: 45 мин
-firmware: любая прошивка · ArduPilot 4.7 (сверено с 4.7.2) для сверки с логом
+firmware: любая прошивка · ArduPilot 4.7 (сверено с 4.7.3) для сверки с логом
 status: published
 added: 2026-11-10
 tags:

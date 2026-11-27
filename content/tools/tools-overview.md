@@ -3,7 +3,7 @@ id: tools-overview
 title: "Инструменты: Configurator, GCS, git"
 level: L1
 readingTime: 35 мин
-firmware: Betaflight 2025.12 · INAV 9.1 · ArduPilot 4.7.2 · PX4 1.17
+firmware: Betaflight 2025.12 · INAV 9.1 · ArduPilot 4.7 (сверено с 4.7.3; лабораторная снята на SITL 4.7.2) · PX4 1.17
 status: published
 added: 2026-11-07
 tags:
@@ -80,7 +80,7 @@ drones/
 | Версионирование | git + GitHub; `.gitattributes` с LFS для `.bin/.BFL` | конфиги и скрипты, модуль «CI» |
 
 ### Версии на ноябрь 2026
-Версии сверены по тегам релизов на GitHub и по PyPI 25–26 ноября 2026 года. Курс опирается на прошивки ArduPilot 4.7.2, PX4 1.17.0, Betaflight 2025.12.5, INAV 9.1.0, ExpressLRS 4.1.0; новее уже вышли Copter-4.7.3 (тег от 14.11.2026), PX4 v1.18.0 (23.11.2026) и Betaflight 2026.6.2 (17.09.2026) — разбор их отличий в курс пока не входит.
+Версии сверены по тегам релизов на GitHub и по PyPI 25–26 ноября 2026 года. Курс опирается на прошивки ArduPilot 4.7.3 (Copter и Plane, тег от 14.11.2026; отличия от 4.7.2 — в `ap-intro`), PX4 1.17.0, Betaflight 2025.12.5, INAV 9.1.0, ExpressLRS 4.1.0; новее уже вышли PX4 v1.18.0 (23.11.2026) и Betaflight 2026.6.2 (17.09.2026) — их отличия в курсе разобраны только там, где о них спотыкаются (для Betaflight — заметки «в 2026.6 …» в `bf-intro`).
 
 | Инструмент | Версия (дата тега) | Для чего | Совместимость, что проверено |
 |---|---|---|---|
@@ -96,7 +96,7 @@ drones/
 | PlotJuggler | 4.2.0 (дата тега не сверялась) | графики `.ulg`, CSV, ROS 2 bag | — |
 | ExpressLRS Configurator | 1.8.5 (14.11.2026) | сборка и прошивка ELRS | обе стороны линка — одной мажорной версии ELRS (`link-elrs`) |
 | EdgeTX / Companion | 2.12.5 (17.10.2026) | прошивка пульта, модели | Companion той же версии, что пульт |
-| ArduPilot SITL | Copter 4.7.2 (курс) | симуляция ArduPilot | `sim_vehicle.py` или бинарник `arducopter` |
+| ArduPilot SITL | Copter 4.7.3 (курс; лабораторная ниже снята на 4.7.2) | симуляция ArduPilot | `sim_vehicle.py` или бинарник `arducopter` |
 | PX4 SITL | 1.17.0 (курс), Gazebo Harmonic | симуляция PX4 | `Tools/setup/ubuntu.sh` ставит `gz-harmonic` на Ubuntu 22.04 и 24.04 |
 
 Даты — это даты коммита под тегом; «стабильная» у каждого проекта своя: Mission Planner обновляется внутри 1.3.83, а у Betaflight App и Betaflight-прошивки номера версий совпадают с годом и месяцем выпуска.

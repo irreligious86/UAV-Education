@@ -3,7 +3,7 @@ id: el-measure
 title: "Измерения: мультиметр, осциллограф, логический анализатор"
 level: L2
 readingTime: 50 мин
-firmware: Betaflight 2025.12.5 · ArduPilot 4.7.2 · PX4 1.17.0 · INAV 9.1.0 (калибровка датчиков — сверено по исходникам)
+firmware: Betaflight 2025.12.5 · ArduPilot 4.7 (сверено с 4.7.3) · PX4 1.17.0 · INAV 9.1.0 (калибровка датчиков — сверено по исходникам)
 status: published
 added: 2026-11-08
 tags:

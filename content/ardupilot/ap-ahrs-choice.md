@@ -3,7 +3,7 @@ id: ap-ahrs-choice
 title: "EKF3, EKF2 или DCM: как ArduPilot оценивает положение и что выбрать"
 level: L3
 readingTime: 55 мин
-firmware: ArduPilot 4.7 (сверено с 4.7.2)
+firmware: ArduPilot 4.7 (сверено с 4.7.3; лабораторная снята на SITL 4.7.2)
 status: published
 added: 2026-11-23
 tags:
@@ -43,13 +43,13 @@ next:
 | DCM | комплементарный фильтр на матрице поворота (`est-attitude`) плюс позиция по GPS или счислению | везде, считается всегда | `AHRS_EKF_TYPE = 0` (только Plane и Rover) или автоматический откат | `AHR2`, когда активен EKF |
 | EKF3 | расширенный фильтр Калмана, 24 состояния (`est-kalman`) | везде | `AHRS_EKF_TYPE = 3` (умолчание) | `XKF1…XKF5`, `XKFS`, `XKQ`, `XKY0` |
 | EKF2 | предыдущее поколение фильтра | только SITL и сборки custom-сервера с опцией EKF2 | `AHRS_EKF_TYPE = 2`, `EK2_ENABLE = 1` | `NKF1…NKF5`, `NKQ` |
-| External AHRS | готовый INS (VectorNav, MicroStrain, InertialLabs, SBG и др., `EAHRS_TYPE`) | на платах с драйвером | `AHRS_EKF_TYPE = 11` | сообщения драйвера |
+| External AHRS | готовый INS (VectorNav, MicroStrain, InertialLabs, SBG, Trimble, SensAItion, с 4.7.3 — Aeron PLX3 = 10; `EAHRS_TYPE`) | на платах с драйвером | `AHRS_EKF_TYPE = 11` | сообщения драйвера |
 | SIM | идеальная ориентация из симулятора | только SITL | `AHRS_EKF_TYPE = 10` (новое в 4.7) | — |
 
 Три важных следствия. Первое: DCM обновляется на каждом цикле независимо от выбора (`AP_AHRS::update()` вызывает `update_DCM()` безусловно), поэтому он всегда готов подхватить управление. Второе: в логе `AHR2` пишется «второй» оценщик — DCM, когда активен EKF3, и EKF3, когда при `AHRS_EKF_TYPE = 3` сработал откат на DCM (при `AHRS_EKF_TYPE = 0` строк `AHR2` нет); сравнение `ATT` и `AHR2` — первая проверка, не врёт ли основной. Третье: EKF3 считается и тогда, когда он не активен (при `EK3_ENABLE = 1`), — самолёт на DCM пишет полный `XKF*` в лог.
 
 ### AHRS_EKF_TYPE: что допустимо на каком аппарате
-Значения параметра в 4.7.2: 0 — Disabled (то есть DCM), 2 — EKF2, 3 — EKF3, 10 — Sim, 11 — ExternalAHRS. Значение 1 (EKF1) удалено давно: при нём плата выдаёт ошибку конфигурации `EKF1 not available`.
+Значения параметра в 4.7.3 (как и в 4.7.2): 0 — Disabled (то есть DCM), 2 — EKF2, 3 — EKF3, 10 — Sim, 11 — ExternalAHRS. Значение 1 (EKF1) удалено давно: при нём плата выдаёт ошибку конфигурации `EKF1 not available`.
 
 - **Copter, Heli, Sub.** В конструкторе `AP_AHRS` для них ставится флаг `FLAG_ALWAYS_USE_EKF`: летать на DCM они не умеют. `AHRS_EKF_TYPE = 0` прошивка молча превращает в EKF (EKF2, если он вкомпилирован, иначе EKF3), но pre-arm сравнивает сохранённое значение с фактическим и не даёт армить: `PreArm: AHRS: not using configured AHRS type` (проверено в SITL, шаг 2). DCM у коптера работает только первые секунды после загрузки, пока EKF3 не стартовал, и если EKF3 сообщает о числовых сбоях фильтра (`getFilterFaults` ≠ 0).
 - **Plane и Rover.** `AHRS_EKF_TYPE = 0` — законная конфигурация: аппарат летает на DCM, режимы с позицией берут её прямо из GPS. Так летал HeeWing без компаса из `ap-ekf`. Цена: нет вариаций, ворот и счисления по воздушной скорости с оценкой ветра, ниже точность при GPS-глитчах.

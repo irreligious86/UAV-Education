@@ -3,7 +3,7 @@ id: est-gnss
 title: "GNSS: как работает GPS, ошибки, RTK"
 level: L2
 readingTime: 50 мин
-firmware: ArduPilot 4.7.2 · PX4 1.17.0 · u-blox M8/M9/M10/F9
+firmware: ArduPilot 4.7 (сверено с 4.7.3; лабораторная снята на SITL 4.7.2) · PX4 1.17.0 · u-blox M8/M9/M10/F9
 status: published
 added: 2026-11-08
 tags:

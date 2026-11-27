@@ -3,7 +3,7 @@ id: ap-setup-plane
 title: "ArduPlane с нуля: сервы, рули, airspeed, failsafe крыла"
 level: L2
 readingTime: 65 мин
-firmware: ArduPlane 4.7 (сверено с 4.7.2)
+firmware: ArduPlane 4.7 (сверено с 4.7.3)
 status: published
 tags:
   - ArduPilot

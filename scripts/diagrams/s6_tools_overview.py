@@ -13,7 +13,7 @@ def firmware_tree() -> str:
     root = Node("fw", ["Какая прошивка", "на аппарате?"], [
         ("", Node("bf", ["Betaflight", "2025.12"], [("", leaf("bfl", ["App 2026.6.2:", "MSP API ≥ 1.44", "BB Explorer", "SITL: make"]))], accent=True)),
         ("", Node("inav", ["INAV 9.1"], [("", leaf("inl", ["Configurator", "только 9.x", "BB Explorer", "INAV SITL"]))], accent=True)),
-        ("", Node("ap", ["ArduPilot", "4.7.2"], [("", leaf("apl", ["MP 1.3.83 / QGC", "имена 4.7!", "MAVExplorer", "SITL 4.7.2"]))], accent=True)),
+        ("", Node("ap", ["ArduPilot", "4.7.3"], [("", leaf("apl", ["MP 1.3.83 / QGC", "имена 4.7!", "MAVExplorer", "SITL 4.7.3"]))], accent=True)),
         ("", Node("px4", ["PX4 1.17"], [("", leaf("pxl", ["QGC 5.1.5", "Flight Review", "PlotJuggler", "SITL + Gazebo"]))], accent=True)),
     ])
     return tree("Сначала прошивка, потом инструмент (версии на ноябрь 2026)", root, width=720, box_w=160, box_h=60,

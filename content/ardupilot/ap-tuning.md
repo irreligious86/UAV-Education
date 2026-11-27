@@ -3,7 +3,7 @@ id: ap-tuning
 title: "Тюнинг ArduPilot: AUTOTUNE, фильтры, notch по ESC"
 level: L3
 readingTime: 40 мин
-firmware: ArduPilot 4.7 (сверено с 4.7.2)
+firmware: ArduPilot 4.7 (сверено с 4.7.3)
 status: published
 added: 2026-11-08
 tags:

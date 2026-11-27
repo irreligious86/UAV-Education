@@ -3,7 +3,7 @@ id: est-attitude
 title: "Ориентация: углы Эйлера, кватернионы, комплементарный фильтр"
 level: L3
 readingTime: 60 мин
-firmware: Betaflight 2025.12.5 · INAV 9.1.0 · ArduPilot 4.7.2 · PX4 1.17.0 (сверено по исходникам)
+firmware: Betaflight 2025.12.5 · INAV 9.1.0 · ArduPilot 4.7 (сверено с 4.7.3) · PX4 1.17.0 (сверено по исходникам)
 status: published
 added: 2026-11-08
 tags:

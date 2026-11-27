@@ -79,7 +79,7 @@ next:
 
 Старые имена с форумов: `RPMFILTER` = `DSHOT_TELEM`, `BADRX` = `NOT_DISARMED`; `RESC` — имя в enum для `RESCUE_SW`. Флага `LAUNCH` нет: launch control арм не запрещает.
 
-Отличие от **4.5**: там нет `FLIP_SWITCH` (бит 25), `ALT_HOLD_SW` (26) и `POS_HOLD_SW` (27), а последний флаг называется `ARMSWITCH` и стоит на бите 25, а не 28. В 2026.6 (вышла 17.09.2026, вне базовой версии курса) добавлен ещё и `AUTOPILOT_SW` (`runtime_config.c` тега 2026.6.2), а `ARM_SWITCH` стоит на бите 29. Номера битов и коды пищалки после 24-го зависят от версии, поэтому декодер выбирает таблицу по числу флагов из `MSP_STATUS_EX`.
+Отличие от **4.5**: там нет `FLIP_SWITCH` (бит 25), `ALT_HOLD_SW` (26) и `POS_HOLD_SW` (27), а последний флаг называется `ARMSWITCH` и стоит на бите 25, а не 28. В 2026.6 (2026.6.2 вышла 17.09.2026, вне базовой версии курса) на бит 28 встал `AUTOPILOT_SW` (код 29: включён тумблер режима AUTOPILOT; `fc/core.c` взводит его только под `#if ENABLE_FLIGHT_PLAN && !defined(USE_WING)`, а в теге 2026.6.2 `USE_FLIGHT_PLAN` задан лишь в цели SITL), `ARM_SWITCH` сдвинулся на бит 29 (код 30), флагов стало 30 (`fc/runtime_config.h` и `runtime_config.c` тега 2026.6.2). В декодере ниже это таблица `F2606` под ключом 30. Номера битов и коды пищалки после 24-го зависят от версии, поэтому декодер выбирает таблицу по числу флагов из `MSP_STATUS_EX`.
 
 ### Арм тумблером и стиками, PREARM, дизарм
 `fc/rc_controls.c`: арм стиками включается, только если **нет** диапазона ARM на вкладке Modes **и** `enable_stick_arming = ON` (по умолчанию OFF). Жест арма — газ вниз + рыскание вправо, жест дизарма — газ вниз + рыскание влево, оба удерживаются 500 мс (`ARM_DELAY_MS`). Жест арма игнорируется, если включён режим STICK COMMANDS DISABLE.
@@ -170,7 +170,8 @@ F45 = ("NOGYRO FAILSAFE RXLOSS NOT_DISARMED BOXFAILSAFE RUNAWAY CRASH THROTTLE A
        "CALIB CLI CMS BST MSP PARALYZE GPS RESCUE_SW DSHOT_TELEM REBOOT_REQD DSHOT_BBANG NO_ACC_CAL "
        "MOTOR_PROTO ARMSWITCH").split()                                          # 4.5: 26 flags
 F2512 = F45[:25] + ["FLIP_SWITCH", "ALT_HOLD_SW", "POS_HOLD_SW", "ARM_SWITCH"]  # 2025.12: 29 flags
-TABLE = {26: F45, 29: F2512}
+F2606 = F2512[:28] + ["AUTOPILOT_SW", "ARM_SWITCH"]                     # 2026.6: 30 flags
+TABLE = {26: F45, 29: F2512, 30: F2606}
 
 def decode(mask, count=26):
     names = TABLE[count]

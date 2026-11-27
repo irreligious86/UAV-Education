@@ -3,7 +3,7 @@ id: ap-aux-tune
 title: "Тумблеры и крутилки: RCx_OPTION, TUNE и подстройка в полёте"
 level: L2
 readingTime: 55 мин
-firmware: ArduCopter 4.7 (сверено с 4.7.2)
+firmware: ArduCopter 4.7 (сверено с 4.7.3; числа SITL в практике сняты на 4.6.3)
 status: published
 added: 2026-11-18
 tags:

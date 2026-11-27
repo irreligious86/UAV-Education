@@ -3,7 +3,7 @@ id: ap-osd-video
 title: "OSD и видео в ArduPilot: MAX7456, MSP DisplayPort (DJI, Walksnail, HDZero), экраны OSDn, VTX"
 level: L2
 readingTime: 50 мин
-firmware: ArduCopter 4.7 (сверено с 4.7.2)
+firmware: ArduCopter 4.7 (сверено с 4.7.3)
 status: published
 added: 2026-11-18
 tags:

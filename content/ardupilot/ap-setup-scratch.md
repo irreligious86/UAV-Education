@@ -3,7 +3,7 @@ id: ap-setup-scratch
 title: "ArduPilot с нуля: Copter через Mission Planner / QGC"
 level: L2
 readingTime: 55 мин
-firmware: ArduCopter 4.7 (сверено с 4.7.2; выводы SITL сняты на Copter-4.6.3)
+firmware: ArduCopter 4.7 (сверено с 4.7.3; выводы SITL сняты на Copter-4.6.3)
 status: published
 tags:
   - ArduPilot

@@ -3,7 +3,7 @@ id: ap-quadplane
 title: "QuadPlane и tilt-rotor VTOL"
 level: L3
 readingTime: 30 мин
-firmware: ArduPlane 4.7 (сверено с 4.7.2)
+firmware: ArduPlane 4.7 (сверено с 4.7.3)
 status: published
 added: 2026-11-07
 tags:

@@ -3,7 +3,7 @@ id: nav-indoor
 title: "Без GNSS: оптический поток, UWB, motion capture и внешняя навигация в EKF"
 level: L3
 readingTime: 50 мин
-firmware: ArduCopter 4.7 (сверено с 4.7.2; лабораторная снята на 4.6.3) · PX4 1.17 (сверено с v1.17.0)
+firmware: ArduCopter 4.7 (сверено с 4.7.3; лабораторная снята на 4.6.3) · PX4 1.17 (сверено с v1.17.0)
 status: published
 tags:
   - ExternalNav

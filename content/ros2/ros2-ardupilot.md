@@ -3,7 +3,7 @@ id: ros2-ardupilot
 title: "ROS 2 + ArduPilot: AP_DDS и MAVROS, один узел — два маршрута"
 level: L3
 readingTime: 60 мин
-firmware: ArduPilot 4.7.2 (AP_DDS) · ROS 2 Humble
+firmware: ArduPilot 4.7 (AP_DDS; сверено с 4.7.3, лабораторная снята на SITL 4.7.2) · ROS 2 Humble
 status: published
 added: 2026-11-08
 tags:

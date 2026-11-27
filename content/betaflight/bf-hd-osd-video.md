@@ -3,7 +3,7 @@ id: bf-hd-osd-video
 title: "Цифровое видео на Betaflight: DJI, Walksnail, HDZero — подключение, OSD и настройка"
 level: L2
 readingTime: 50 мин
-firmware: Betaflight 2025.12 (сверено с 2025.12.5); лабораторная снята на исходнике 4.5.6 · INAV 9.1 (сверено с 9.1.0) · ArduPilot 4.7 (сверено с 4.7.2)
+firmware: Betaflight 2025.12 (сверено с 2025.12.5); лабораторная снята на исходнике 4.5.6 · INAV 9.1 (сверено с 9.1.0) · ArduPilot 4.7 (сверено с 4.7.3)
 status: published
 added: 2026-11-14
 tags:

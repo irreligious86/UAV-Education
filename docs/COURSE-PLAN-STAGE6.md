@@ -234,7 +234,8 @@ Rough size: an iteration of 4–5 modules ≈ 25–30k words of Russian source p
    (History: 2026-11-10 Russian only, localisation later; 2026-11-15 morning ru+uk together — withdrawn.)
 
 5. Firmware versions (Alex, 2026-11-17): the course targets **today's stable releases** — by release tags
-   on 2026-11-17: ArduCopter/ArduPlane 4.7.2, PX4 1.17.0, INAV 9.1.0, Betaflight **2025.12** (Alex, 2026-11-17: treat the 2025.12 line as
+   on 2026-11-17: ArduCopter/ArduPlane 4.7.2 (bumped to **4.7.3** on 2026-11-27: one default changed,
+   `LOIT_OPTIONS` 1 → 0, two parameters added, no renames; labs run on SITL 4.7.2 stay labelled 4.7.2), PX4 1.17.0, INAV 9.1.0, Betaflight **2025.12** (Alex, 2026-11-17: treat the 2025.12 line as
    the stable one, latest patch 2025.12.5; **4.5.3** is the significant release before it and the one renames
    are mapped from; the 2026.6 tags are not the course's target — mention them only where a student would
    trip over a difference), ExpressLRS 4.1.0. Rules:

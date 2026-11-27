@@ -3,7 +3,7 @@ id: el-dronecan
 title: "DroneCAN: шина CAN на борту, узлы, ESC и прошивка периферии"
 level: L3
 readingTime: 35 мин
-firmware: ArduPilot 4.7 (сверено с 4.7.2) · PX4 1.17 (сверено с v1.17.0)
+firmware: ArduPilot 4.7 (сверено с 4.7.3) · PX4 1.17 (сверено с v1.17.0)
 status: published
 tags:
   - DroneCAN

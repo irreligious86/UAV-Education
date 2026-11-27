@@ -3,7 +3,7 @@ id: ap-companion
 title: "Companion + ArduPilot: управление из кода"
 level: L3
 readingTime: 50 мин
-firmware: ArduPilot 4.7.2 (Copter; SITL + MAVProxy 1.8.75 + pymavlink 2.4.50)
+firmware: ArduPilot 4.7 (сверено с 4.7.3; лабораторная — Copter SITL 4.7.2 + MAVProxy 1.8.75 + pymavlink 2.4.50)
 status: published
 added: 2026-11-07
 tags:

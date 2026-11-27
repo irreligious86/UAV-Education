@@ -3,7 +3,7 @@ id: ctl-allocation
 title: "Миксер и распределение управления: матрица, насыщение, PX4 Control Allocation, наклонные моторы"
 level: L3
 readingTime: 45 мин
-firmware: PX4 1.17 (сверено с v1.17.0; в 1.15 и 1.16 то же) · ArduCopter 4.7 (сверено с 4.7.2) · Betaflight 2025.12 (сверено с 2025.12.5)
+firmware: PX4 1.17 (сверено с v1.17.0; в 1.15 и 1.16 то же) · ArduCopter 4.7 (сверено с 4.7.3) · Betaflight 2025.12 (сверено с 2025.12.5)
 status: published
 tags:
   - миксер

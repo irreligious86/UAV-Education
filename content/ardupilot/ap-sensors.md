@@ -3,7 +3,7 @@ id: ap-sensors
 title: "Датчики ArduPilot на столе: компас (MagFit, Large Vehicle), airspeed, несколько АКБ"
 level: L2
 readingTime: 65 мин
-firmware: ArduCopter 4.7 (сверено с 4.7.2)
+firmware: ArduCopter 4.7 (сверено с 4.7.3)
 status: published
 added: 2026-11-22
 tags:

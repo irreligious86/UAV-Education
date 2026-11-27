@@ -3,7 +3,7 @@ id: ops-applications
 title: "Прикладные сегменты: агро, инспекция, доставка, шоу"
 level: L2
 readingTime: 45 мин
-firmware: ArduCopter 4.7.2 (AC_Sprayer, ZigZag) · Skybrush-форк ArduCopter · любая прошивка
+firmware: ArduCopter 4.7 (AC_Sprayer, ZigZag; сверено с 4.7.3) · Skybrush-форк ArduCopter · любая прошивка
 status: published
 added: 2026-11-22
 tags:

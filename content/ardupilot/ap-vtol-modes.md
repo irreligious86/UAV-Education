@@ -3,7 +3,7 @@ id: ap-vtol-modes
 title: "Режимы и переходы VTOL в ArduPilot"
 level: L3
 readingTime: 60 мин
-firmware: ArduPlane 4.7 (сверено с 4.7.2)
+firmware: ArduPlane 4.7 (сверено с 4.7.3; лабораторная снята на SITL 4.7.2)
 status: published
 added: 2026-11-23
 tags:

@@ -147,7 +147,7 @@ Betaflight — форк **Cleanflight** (наследник Baseflight / STM32-�
 | Старое (4.5.3) | Новое (2025.12) | Что изменилось | С какого выпуска |
 |---|---|---|---|
 | `d_min_roll`, `d_min_pitch`, `d_min_yaw` (база 30 / 34 / 0) | `d_roll`, `d_pitch`, `d_yaw` (база 30 / 34 / 0) | в 2025.12 `d_*` — базовый D; `d_min_*` удалены | 2025.12 |
-| `d_roll`, `d_pitch`, `d_yaw` (пик 40 / 46 / 0) | `d_max_roll`, `d_max_pitch`, `d_max_yaw` (пик 40 / 46 / 0) | пиковый D получил своё имя; `d_max_gain` 37 и `d_max_advance` 20 без изменений | 2025.12 |
+| `d_roll`, `d_pitch`, `d_yaw` (пик 40 / 46 / 0) | `d_max_roll`, `d_max_pitch`, `d_max_yaw` (пик 40 / 46 / 0) | пиковый D получил своё имя; `d_max_gain` 37 и `d_max_advance` 20 без изменений; в 2026.6 умолчания `d_max_gain` 0 и `d_max_advance` 35: D поднимается к пику только от скорости стика, а не от гироскопа (пропвош) | 2025.12 |
 | `simplified_dmax_gain` | `simplified_d_max_gain` | только имя | 2025.12 |
 | `iterm_limit` (400) | — | удалён; потолок I теперь задаёт `iterm_windup` | 2025.12 |
 | `iterm_windup` 85, 30–100 | `iterm_windup` 80, 20–100 | другой смысл: было «порог насыщения моторов, выше которого I ослабляется», стало «потолок I в % от `pidsum_limit`» | 2025.12 |
@@ -161,14 +161,14 @@ Betaflight — форк **Cleanflight** (наследник Baseflight / STM32-�
 | `dyn_notch_count` 0–5 | `dyn_notch_count` 0–7 | диапазон | 2025.12 |
 | `debug_mode = GYRO_SCALED` | поле лога `gyroUnfilt` | режим удалён; `DUAL_GYRO_*` → `MULTI_GYRO_*`, `D_MIN` → `D_MAX`, `GPS_RESCUE_THROTTLE_PID` → `AUTOPILOT_ALTITUDE`; добавлены TPA, S_TERM, SPA, TASK, GIMBAL, WING_SETPOINT, AUTOPILOT_POSITION, CHIRP, OPTICALFLOW, FLASH_TEST_PRBS, MAVLINK_TELEMETRY | 2025.12 |
 | `failsafe_off_delay` (10 = 1 с; 0–200, десятые секунды) | `failsafe_landing_time` (60 с; 0–250, секунды) | имя, единицы и умолчание; значение пересчитывать: старое ÷ 10 | 2025.12 |
-| `gps_rescue_throttle_hover` / `_min` / `_max` (1275 / 1100 / 1700) | `ap_hover_throttle` (1275; 1100–1700), `ap_throttle_min` (1100; 1050–1400), `ap_throttle_max` (1700; 1400–2000) | общие переменные автопилота: их используют GPS Rescue, ALTHOLD и POS HOLD | 2025.12 |
-| `gps_rescue_throttle_p` / `_i` / `_d` (15 / 15 / 20) | `ap_altitude_p` / `_i` / `_d` / `_f` (15 / 15 / 15 / 15) | контур высоты общий; диапазон 0–200 | 2025.12 |
+| `gps_rescue_throttle_hover` / `_min` / `_max` (1275 / 1100 / 1700) | `ap_hover_throttle` (1275; 1100–1700), `ap_throttle_min` (1100; 1050–1400), `ap_throttle_max` (1700; 1400–2000) | общие переменные автопилота: их используют GPS Rescue, ALTHOLD и POS HOLD; в 2026.6 `ap_throttle_max` по умолчанию 1900, а `ap_hover_throttle` принимает 0–1700 | 2025.12 |
+| `gps_rescue_throttle_p` / `_i` / `_d` (15 / 15 / 20) | `ap_altitude_p` / `_i` / `_d` / `_f` (15 / 15 / 15 / 15) | контур высоты общий; диапазон 0–200; в 2026.6 умолчания 30 / 30 / 30 / 30, `altitude_lpf` и `altitude_d_lpf` — до 5000 (было до 1000) | 2025.12 |
 | `gps_rescue_landing_alt` (4 м; 1–15) | `ap_landing_altitude_m` (4 м; 0–200) | имя и диапазон | 2025.12 |
-| `gps_rescue_disarm_threshold` 20 | 30 | умолчание | 2025.12 |
-| `gps_rescue_velocity_p/i/d`, `gps_rescue_yaw_p` 0–255 | 0–200 | диапазон; в 2026.6 эти переменные удалены | 2025.12 |
+| `gps_rescue_disarm_threshold` 20 | 30 | умолчание; в 2026.6 переменная удалена | 2025.12 |
+| `gps_rescue_velocity_p/i/d`, `gps_rescue_yaw_p` 0–255 | 0–200 | диапазон; в 2026.6 `gps_rescue_velocity_p/i/d` удалены, `gps_rescue_yaw_p` остался (20; 0–200) | 2025.12 |
 | `gps_provider` NMEA / UBLOX / MSP | + VIRTUAL | GPS в SITL; автопоиск скорости знает 230400 | 2025.12 |
 | `mag_declination` 0–3599 | −300…300 | по-прежнему десятые доли градуса; западное склонение пишется отрицательным | 2025.12 |
-| — | `alt_hold_climb_rate` (50), `alt_hold_deadband` (20), `pos_hold_deadband` (5), `pos_hold_without_mag` (OFF), `ap_position_*`, `ap_max_angle` (50) | новые режимы ALTHOLD (id 3) и POS HOLD (id 11) | 2025.12 |
+| — | `alt_hold_climb_rate` (50), `alt_hold_deadband` (20), `pos_hold_deadband` (5), `pos_hold_without_mag` (OFF), `ap_position_*`, `ap_max_angle` (50) | новые режимы ALTHOLD (id 3) и POS HOLD (id 11); в 2026.6 `pos_hold_without_mag` удалён (POS HOLD нужен курс от GPS или от компаса при `trust_mag = ON`, по умолчанию OFF), `ap_position_cutoff` 80 → 30 при диапазоне 10–50 вместо 10–250 | 2025.12 |
 | — | `landing_disarm_threshold` (0 = выкл; 0–250) | дизарм по удару при посадке | 2025.12 |
 | — | `prearm_allow_rearm` (OFF) | переарм без переключения PREARM | 2025.12 |
 | флаг арма `ARMSWITCH`, бит 25 (всего 26) | `ARM_SWITCH`, бит 28 (всего 29) | на битах 25–27 новые `FLIP_SWITCH`, `ALT_HOLD_SW`, `POS_HOLD_SW`; hex-маску расшифровывать таблицей своей версии | 2025.12 |
@@ -190,7 +190,7 @@ Betaflight — форк **Cleanflight** (наследник Baseflight / STM32-�
 | компас IST8310, адрес I2C 0x0C | 0x0E | компас «пропал» после обновления — `set mag_i2c_address = 12` | 2025.12 |
 | Betaflight Configurator 10.10 | Betaflight App 2025.12 | веб-приложение и PWA; версия совпадает с прошивкой | 2025.12 |
 
-Не затронуто и переносится как есть: `aux`, `adjrange` (номера функций 0–30), `rxrange`, `map`, `vtxtable`, `led`, `color`, `mode_color`, рейты (`rates_type`, `*_rc_rate`, `*_srate`, `*_expo`), фильтры (`gyro_lpf*`, `dterm_lpf*`, `rpm_filter_*`, `dyn_notch_*` кроме верхней границы числа notch), `failsafe_delay`, `failsafe_procedure`, `failsafe_throttle`, `vbat_*`, `ibata_*`. Отличия 2026.6 в курсе не разбираются, кроме трёх, о которые спотыкаются: ELRS 4 для SPI-приёмников, удаление `gps_rescue_velocity_*` и исправленный диапазон гироскопа IIM-42652 (по примечаниям к выпуску 2026.6 после обновления PID фактически удваиваются).
+Не затронуто и переносится как есть: `aux`, `adjrange` (номера функций 0–30), `rxrange`, `map`, `vtxtable`, `led`, `color`, `mode_color`, рейты (`rates_type`, `*_rc_rate`, `*_srate`, `*_expo`), фильтры (`gyro_lpf*`, `dterm_lpf*`, `rpm_filter_*`, `dyn_notch_*` кроме верхней границы числа notch), `failsafe_delay`, `failsafe_procedure`, `failsafe_throttle`, `vbat_*`, `ibata_*`. Отличия 2026.6 в курсе не разбираются, кроме тех, о которые спотыкаются: ELRS 4 для SPI-приёмников, исправленный диапазон гироскопа IIM-42652 (по примечаниям к выпуску 2026.6 после обновления PID фактически удваиваются) и заметки «в 2026.6» в таблице выше (по исходнику тега 2026.6.2). `diff all` из 2025.12 загрузится в 2026.6 не целиком: на удалённые имена `set` отвечает `INVALID NAME` (`cli/cli.c`). Удалены 15 переменных: `gps_rescue_velocity_p/i/d`, `gps_rescue_max_angle`, `gps_rescue_roll_mix`, `gps_rescue_pitch_cutoff`, `gps_rescue_imu_yaw_gain`, `gps_rescue_use_mag`, `gps_rescue_disarm_threshold`, `pos_hold_without_mag`, `abs_control_gain/limit/error_limit/cutoff`, `transient_throttle_limit`. Новый флаг арма `AUTOPILOT_SW` сдвигает `ARM_SWITCH` на бит 29 (`bf-arming-safety`).
 
 {{diagram:bf-migrate-line-tree|Строку старого diff all переносят только если имя, смысл и единицы те же; опасны строки с прежним именем и новым смыслом — они принимаются молча.}}
 

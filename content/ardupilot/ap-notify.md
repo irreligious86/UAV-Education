@@ -3,7 +3,7 @@ id: ap-notify
 title: "Светодиоды и пищалка в ArduPilot: NTF_*, NeoPixel/ProfiLED, buzzer, DShot-маяк"
 level: L2
 readingTime: 45 мин
-firmware: ArduCopter 4.7 (сверено с 4.7.2)
+firmware: ArduCopter 4.7 (сверено с 4.7.3)
 status: published
 added: 2026-11-22
 tags:

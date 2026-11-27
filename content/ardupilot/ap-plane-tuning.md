@@ -3,7 +3,7 @@ id: ap-plane-tuning
 title: "Тюнинг ArduPlane: AUTOTUNE крыла, TECS, навигация L1, посадка"
 level: L3
 readingTime: 40 мин
-firmware: ArduPlane 4.7 (сверено с 4.7.2)
+firmware: ArduPlane 4.7 (сверено с 4.7.3)
 status: published
 tags:
   - ArduPlane

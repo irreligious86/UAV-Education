@@ -61,8 +61,8 @@ ESP32 как компонент системы: шлёт `HEARTBEAT` (свой c
 
 | Прошивка | ESP32 в целевой версии | Что это значит |
 |---|---|---|
-| ArduPilot 4.7.2 | есть HAL `AP_HAL_ESP32`, 10 описаний плат (`esp32buzz`, `esp32s3devkit`, `esp32s3m5stampfly` и др.) | только сборка из исходников под Linux; в README порта DShot, GPIO и телеметрия ESC — в списке «ещё не сделано»; у StampFly `SCHED_LOOP_RATE 150` с комментарием «flash won't go faster» при 400 Гц по умолчанию у Copter, коллекторные моторы, лог по MAVLink |
-| Betaflight 2025.12.5 | нет: платформы STM32, AT32, APM32, PICO | в 2026.6 ESP32-S3 и ESP32-WROOM добавлены как **experimental** (DShot150/300, blackbox на SD; release notes, в исходниках не проверено) |
+| ArduPilot 4.7.3 | есть HAL `AP_HAL_ESP32`, 10 описаний плат (`esp32buzz`, `esp32s3devkit`, `esp32s3m5stampfly` и др.) | только сборка из исходников под Linux; в README порта DShot, GPIO и телеметрия ESC — в списке «ещё не сделано»; у StampFly `SCHED_LOOP_RATE 150` с комментарием «flash won't go faster» при 400 Гц по умолчанию у Copter, коллекторные моторы, лог по MAVLink |
+| Betaflight 2025.12.5 | нет: платформы STM32, AT32, APM32, PICO | в 2026.6 (вне целевой версии курса) появилась платформа `src/platform/ESP32` с целями ESP32S3, ESP32WROOM, ESP32C5 и ESP32P4 (исходник тега 2026.6.2): DShot есть (`dshot_esp32.c`), bidirectional DShot и bit-bang выключены (`#undef USE_DSHOT_TELEMETRY`, `USE_DSHOT_BITBANG` в `target.h`), blackbox по умолчанию в UART; по release notes статус **experimental** |
 | INAV 9.1.0 | нет ни одной цели | — |
 | PX4 1.17.0 | `boards/espressif/esp32`, версия 0.1 | в конфиге сборки нет ни EKF2, ни регуляторов ориентации: это заготовка, а не полётник |
 | ESP-FC (отдельный проект, MIT, тег v0.2.1) | ESP32 и ESP32-S3 рекомендованы, S2, C3, RP2040, RP2350 — экспериментально | совместим с Betaflight Configurator; до 4 кГц цикла с SPI-гироскопом; ACRO, ANGLE, AIRMODE, только Quad X; удержания высоты и GPS нет; автор пишет, что это не Betaflight и часть вкладок Configurator не работает |

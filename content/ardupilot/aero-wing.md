@@ -3,7 +3,7 @@ id: aero-wing
 title: "Аэродинамика крыла и самолётные режимы"
 level: L3
 readingTime: 40 мин
-firmware: ArduPlane 4.7.2 · INAV 9.1.0
+firmware: ArduPlane 4.7 (сверено с 4.7.3) · INAV 9.1.0
 status: published
 added: 2026-11-08
 tags:

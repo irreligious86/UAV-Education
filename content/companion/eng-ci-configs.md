@@ -3,7 +3,7 @@ id: eng-ci-configs
 title: "CI и версионирование конфигов и кода"
 level: L3
 readingTime: 50 мин
-firmware: "Betaflight 4.5.3 / 2025.12.5 · ArduPilot 4.7.2 · GitHub Actions: actions/checkout v7.0.1, actions/setup-python v7.1.0 · yamllint 1.38.0, check-jsonschema 0.39.0"
+firmware: "Betaflight 4.5.3 / 2025.12.5 · ArduPilot 4.7 (сверено с 4.7.3; лабораторная — на логе SITL 4.7.2) · GitHub Actions: actions/checkout v7.0.1, actions/setup-python v7.1.0 · yamllint 1.38.0, check-jsonschema 0.39.0"
 status: published
 added: 2026-11-08
 tags:

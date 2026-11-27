@@ -3,7 +3,7 @@ id: ap-vtol-anatomy
 title: "QuadPlane изнутри: где самолёт, а где коптер"
 level: L2
 readingTime: 50 мин
-firmware: ArduPlane 4.7 (сверено с 4.7.2)
+firmware: ArduPlane 4.7 (сверено с 4.7.3; лабораторная снята на SITL 4.7.2)
 status: published
 added: 2026-11-23
 tags:

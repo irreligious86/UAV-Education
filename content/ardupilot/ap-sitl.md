@@ -3,7 +3,7 @@ id: ap-sitl
 title: "SITL: дрон без дрона"
 level: L2
 readingTime: 35 мин
-firmware: ArduPilot 4.7 (сверено с 4.7.2)
+firmware: ArduPilot 4.7 (сверено с 4.7.3; лабораторная снята на SITL 4.7.2)
 status: published
 added: 2026-11-07
 tags:
@@ -143,7 +143,7 @@ Tools/environment_install/install-prereqs-ubuntu.sh -y
 . ~/.profile
 ```
 
-Клон по умолчанию стоит на ветке `master` — это разработка следующего выпуска, имена параметров в ней могут уже отличаться от курса. Чтобы симулятор совпадал с модулями, переключись на стабильный тег: `git checkout Copter-4.7.2`, затем `git submodule update --init --recursive`.
+Клон по умолчанию стоит на ветке `master` — это разработка следующего выпуска, имена параметров в ней могут уже отличаться от курса. Чтобы симулятор совпадал с модулями, переключись на стабильный тег: `git checkout Copter-4.7.3`, затем `git submodule update --init --recursive`. Выводы ниже сняты на `Copter-4.7.2`; в 4.7.3 для этих шагов ничего не меняется (отличия выпусков — в `ap-intro`).
 
 ### Шаг 2. Первый запуск
 ```

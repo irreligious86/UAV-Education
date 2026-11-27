@@ -3,7 +3,7 @@ id: ap-ekf
 title: "EKF и навигация"
 level: L3
 readingTime: 25 мин
-firmware: ArduPilot 4.7 (сверено с 4.7.2)
+firmware: ArduPilot 4.7 (сверено с 4.7.3)
 status: published
 added: 2026-11-07
 tags:

@@ -3,7 +3,7 @@ id: el-peripherals
 title: "Подключение периферии: UART, I2C, CAN на практике"
 level: L2
 readingTime: 45 мин
-firmware: Betaflight 2025.12.5 · ArduPilot 4.7.2 · PX4 1.17.0 (параметры сверены с исходниками); INAV — по аналогии с Betaflight
+firmware: Betaflight 2025.12.5 · ArduPilot 4.7 (сверено с 4.7.3) · PX4 1.17.0 (параметры сверены с исходниками); INAV — по аналогии с Betaflight
 status: published
 added: 2026-11-08
 tags:

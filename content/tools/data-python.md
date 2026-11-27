@@ -3,7 +3,7 @@ id: data-python
 title: "Python для анализа полётных данных"
 level: L2
 readingTime: 55 мин
-firmware: "Betaflight 4.5.3 / 2025.12.5 · ArduPilot 4.7.2 · Python 3.13: pandas 3.1.1, numpy 2.5.5, scipy 1.18.1, pymavlink 2.4.50"
+firmware: "Betaflight 4.5.3 / 2025.12.5 · ArduPilot 4.7 (сверено с 4.7.3; лабораторная снята на SITL 4.7.2) · Python 3.13: pandas 3.1.1, numpy 2.5.5, scipy 1.18.1, pymavlink 2.4.50"
 status: published
 added: 2026-11-08
 tags:

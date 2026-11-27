@@ -3,7 +3,7 @@ id: ap-outputs
 title: "Выходы ArduPilot: SERVOn_FUNCTION, таймерные группы, DShot/BDShot, BLHeli, сервы, GPIO и реле"
 level: L2
 readingTime: 60 мин
-firmware: ArduCopter 4.7 (сверено с 4.7.2)
+firmware: ArduCopter 4.7 (сверено с 4.7.3)
 status: published
 added: 2026-11-18
 tags:
