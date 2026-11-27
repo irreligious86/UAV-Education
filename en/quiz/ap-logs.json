@@ -6,15 +6,15 @@
       "q": "Where do you start analyzing a log?",
       "options": [
         "With the PID gains",
-        "With log cutoffs and vibration",
-        "With GPS quality and satellite count over the whole flight",
-        "With mode changes"
+        "With an abrupt log end and vibration",
+        "With GPS quality and the satellite count over the whole flight",
+        "With the mode changes"
       ],
       "answer": 1,
-      "explain": "A cut-off log means power loss; high vibration makes everything else worthless."
+      "explain": "A log that ends abruptly means a power loss; high vibration devalues everything else."
     },
     {
-      "q": "The VIBE threshold above which altitude/position problems are almost certain?",
+      "q": "What is the VIBE limit above which altitude and position problems are almost certain?",
       "options": [
         "10",
         "30",
@@ -22,29 +22,29 @@
         "100"
       ],
       "answer": 2,
-      "explain": "Below 30 is normal, above 60 means problems almost for sure."
+      "explain": "Below 30 is normal, above 60 almost certainly means problems."
     },
     {
-      "q": "ERR with Subsys 17, ECode 1 is…",
+      "q": "An ERR with Subsys 17, ECode 1 is…",
       "options": [
         "Loss of the radio link to the transmitter",
-        "An EKF failsafe triggered",
+        "The EKF failsafe triggered",
         "A GPS glitch",
         "High vibration"
       ],
       "answer": 1,
-      "explain": "2 — radio, 11 — GPS, 16 — EKF variance, 17 — EKF failsafe, 29 — vibration compensation."
+      "explain": "2 is radio, 11 is GPS, 16 is EKF variance, 17 is the EKF failsafe, 29 is vibration compensation."
     },
     {
       "q": "Which ATT fields do you compare to spot a mechanical problem?",
       "options": [
-        "Alt vs. BAlt and DAlt",
-        "DesRoll vs. Roll",
+        "Alt against BAlt and DAlt",
+        "DesRoll against Roll",
         "Roll and Yaw",
         "Volt and Curr"
       ],
       "answer": 1,
-      "explain": "A sharp divergence between desired and actual means a failure or lack of thrust."
+      "explain": "A sharp divergence between desired and actual means a failure or a lack of thrust."
     },
     {
       "q": "What is a .tlog?",
@@ -55,12 +55,12 @@
         "An ESC firmware log with telemetry"
       ],
       "answer": 1,
-      "explain": "The telemetry the GCS saw over the radio link: lower rate and with gaps, but it survives even if the SD card burned up."
+      "explain": "The telemetry the GCS saw over the radio: lower rate and with gaps, but it survives even if the SD card burned."
     },
     {
-      "q": "What do you use to read a .bin in Python?",
+      "q": "What do you read a .bin with in Python?",
       "options": [
-        "pandas.read_csv after export",
+        "pandas.read_csv after an export",
         "pymavlink.DFReader",
         "orangebox",
         "json.load"
@@ -77,18 +77,18 @@
         "GPS problems"
       ],
       "answer": 1,
-      "explain": "Throttle at the ceiling with sagging voltage; BAT.Volt/Curr confirm it."
+      "explain": "The throttle is at the ceiling with sagging voltage; BAT.Volt/Curr confirm it."
     },
     {
-      "q": "What do you enable in LOG_BITMASK for PID tuning?",
+      "q": "What do you enable for PID tuning?",
       "options": [
-        "Enable nothing",
-        "PID and batch sampling",
-        "Only RC",
-        "Only GPS and IMU at full rate"
+        "Nothing at all",
+        "Fast Attitude and batch sampling",
+        "RC only",
+        "Only GPS and the IMU at full rate"
       ],
       "answer": 1,
-      "explain": "PID (PIDR/PIDP/PIDY) and batch sampling while tuning; turn them off afterward, the log grows."
+      "explain": "PID (PIDR/PIDP/PIDY) is already in the default mask, but at 10 Hz; bit 0, Fast Attitude, logs ANG/RATE/PID at the loop rate, and batch sampling (INS_LOG_BAT_MASK, not a LOG_BITMASK bit) gives the spectrum for the filters. Only while tuning; turn them off afterwards, because the log grows."
     }
   ]
 }

@@ -1,0 +1,116 @@
+{
+ "module": "ap-notify",
+ "pass": 80,
+ "questions": [
+  {
+   "q": "An RGB LED (`NTF_LED_OVERRIDE = 0`) shows this in flight: 0.5 s yellow, 0.5 s dark. What is it?",
+   "options": [
+    "Armed with no 3D GPS fix",
+    "A radio, battery or GCS failsafe",
+    "Pre-arm checks are failing, and the reason is in the `PreArm` message",
+    "EKF bad"
+   ],
+   "answer": 1,
+   "explain": "`sequence_failsafe_radio_or_battery` is five yellow steps and five dark ones. Armed with no fix is solid blue; failing checks are a double yellow flash and only when disarmed; the EKF is yellow with red."
+  },
+  {
+   "q": "The vehicle is disarmed, and every second the LED gives two yellow flashes of 0.2 s. What do you do?",
+   "options": [
+    "Wait for a 3D fix: it is searching for satellites",
+    "Replace the battery: it is a voltage failsafe",
+    "Read the `PreArm: …` message in Messages and remove the cause",
+    "Do not touch or move the vehicle: the gyro calibration at boot is running"
+   ],
+   "answer": 2,
+   "explain": "`sequence_prearm_failing`: yellow, yellow, dark, dark, yellow, yellow and four dark steps. No fix with passing checks is blue 0.5 / 0.5 s; a failsafe is yellow for exactly half a second; initialising is red and blue for 0.1 s each."
+  },
+  {
+   "q": "The board has its own LEDs, and a WS2812B strip and the LED of a GPS module on the CAN bus were added. Which `NTF_LED_TYPES` value enables exactly these three drivers?",
+   "options": [
+    "257",
+    "288",
+    "289",
+    "545"
+   ],
+   "answer": 2,
+   "explain": "Bit 0 (board) = 1, bit 5 (DroneCAN) = 32, bit 8 (NeoPixel) = 256; the sum is 289. 257 lacks CAN, 288 lacks the board LEDs, 545 has ProfiLED (bit 9) in place of NeoPixel."
+  },
+  {
+   "q": "`NTF_LED_TYPES = 2305`. Which drivers are enabled?",
+   "options": [
+    "The board, NeoPixel and ESC LEDs over DShot",
+    "The board, ProfiLED and handing the status color to a Lua script",
+    "The board, NeoPixel and DroneCAN",
+    "NeoPixel, NeoPixelRGB and the board"
+   ],
+   "answer": 0,
+   "explain": "2305 = 2048 + 256 + 1: bits 11 (DShot), 8 (NeoPixel) and 0 (board)."
+  },
+  {
+   "q": "Bit 1 (DShot) is set in `NTF_BUZZ_TYPES` and the motors are on DShot600, but they beep neither at boot nor from the lost vehicle switch. The vehicle is disarmed and the battery is connected. What is the most likely cause?",
+   "options": [
+    "`NTF_BUZZ_VOLUME` is below 50",
+    "`SERVO_BLH_AUTO = 0`",
+    "`SERVO_DSHOT_ESC = 0`",
+    "`NTF_BUZZ_PIN = -1`"
+   ],
+   "answer": 2,
+   "explain": "`toneAlarm_set_buzzer_tone` returns without a command if the ESC type is `DSHOT_ESC_NONE`. Motor beeps do not depend on `SERVO_BLH_AUTO` or `NTF_BUZZ_PIN`, and the volume has no effect on DShot commands."
+  },
+  {
+   "q": "A NeoPixel strip of 8 LEDs on output 13, `NTF_LED_TYPES = 257`, `SERVO13_FUNCTION = 120`. Only the first LED is lit. What is wrong?",
+   "options": [
+    "`NTF_LED_BRIGHT = 1`",
+    "`NTF_LED_LEN = 1`",
+    "Bit 18 is needed instead of bit 8",
+    "Output 13 has no DMA"
+   ],
+   "answer": 1,
+   "explain": "`NTF_LED_LEN` defaults to 1: the driver declares a strip of one LED. Bit 18 changes the color order, brightness 1 makes all LEDs dim, and without DMA the strip would not work at all."
+  },
+  {
+   "q": "A copter crashed in the grass 800 m away; the receiver link is lost, there is no telemetry, the vehicle is disarmed. Channel 9 has `RC9_OPTION = 30`. What happens when you flip the switch?",
+   "options": [
+    "Nothing: without frames from the receiver the firmware does not read switches",
+    "The motors start beeping: the command is stored in the receiver",
+    "The lost vehicle tune plays, but only on the board buzzer, and the motors stay silent",
+    "The vehicle arms and signals with the motors"
+   ],
+   "answer": 0,
+   "explain": "`RC_Channels::read_aux_all` returns at once if there is no valid RC input. That is why flights beyond visual line of sight need a self-powered beacon with its own battery; function 30 never arms."
+  },
+  {
+   "q": "`NTF_LED_OVERRIDE = 1`, there are no scripts on board, and the ground station sends no `LED_CONTROL` message. What does the RGB LED show?",
+   "options": [
+    "The normal table of states",
+    "Red when armed and green when disarmed",
+    "Nothing: no color is set, the LED is dark",
+    "Yellow: no color source found"
+   ],
+   "answer": 2,
+   "explain": "With the `mavlink` source `RGBLed::update` calls only `update_override`, and the default color is all zeros. Red and green is value 2 (OutbackChallenge)."
+  },
+  {
+   "q": "Which of these is true of the battery failsafe tune (`LOUD_BATTERY_ALERT_CTS`) in ArduCopter 4.7.2?",
+   "options": [
+    "It plays once when the failsafe triggers",
+    "It repeats until the voltage recovers",
+    "It keeps repeating after disarm until power is removed",
+    "It repeats until disarm, then stops"
+   ],
+   "answer": 3,
+   "explain": "The tune is marked continuous (`continuous = true`), and on disarm `ToneAlarm.cpp` calls `stop_cont_tone()`. So you cannot rely on it as a search beacon."
+  },
+  {
+   "q": "A quadcopter on a MatekH743: motors on outputs 1–4 (DShot), servos on 7 and 8 (TIM4: outputs 7–10). Where do you put a NeoPixel strip as the status LED?",
+   "options": [
+    "Output 9, `SERVO9_FUNCTION = 120`",
+    "Output 13, `SERVO13_FUNCTION = 120`",
+    "Output 5, `SERVO5_FUNCTION = 120`",
+    "Output 13, `SERVO13_FUNCTION = 129`"
+   ],
+   "answer": 1,
+   "explain": "Output 13 is alone on TIM1. A strip on output 9 switches TIM4 to its mode and disables the servos (`PreArm … on disabled channel`); output 5 shares TIM5 with motors 3 and 4, which lose DShot while the pre-arm check excludes motor outputs and stays silent; 129 is ProfiLED, which also needs the clock output 132."
+  }
+ ]
+}

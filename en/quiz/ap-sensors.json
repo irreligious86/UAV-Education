@@ -3,116 +3,116 @@
  "pass": 80,
  "questions": [
   {
-   "q": "Внешний компас стоит в слоте приоритета 1, внутренний — в слоте 2. `COMPASS_CAL_FIT = 16`. Калибровка вращением дала fitness 18.4 у внешнего и 29.0 у внутреннего. Что примет прошивка 4.7.2?",
+   "q": "An external compass is in priority slot 1 and an internal one in slot 2. `COMPASS_CAL_FIT = 16`. A rotation calibration gave a fitness of 18.4 for the external one and 29.0 for the internal one. What does firmware 4.7.2 accept?",
    "options": [
-    "Оба компаса: порог для всех слотов равен 2 × 16 = 32, и оба fitness ниже",
-    "Только внутренний: порог внешнего в слоте 1 равен 16",
-    "Только внешний: у первого слота порог мягче, чем у остальных",
-    "Ни один: fitness должен быть ниже 16 у каждого компаса"
+    "Both compasses: the threshold for all slots is 2 × 16 = 32, and both fitness values are below it",
+    "Only the internal one: the threshold of the external compass in slot 1 is 16",
+    "Only the external one: the first slot has a more relaxed threshold than the other slots do",
+    "Neither: the fitness must be below 16 for every compass"
    ],
    "answer": 1,
-   "explain": "`_start_calibration`: строгий порог `COMPASS_CAL_FIT` получает только внешний компас в слоте 1, все остальные (и внутренний в слоте 1) — удвоенный. 18.4 > 16 — отказ, 29.0 ≤ 32 — принят."
+   "explain": "`_start_calibration`: only an external compass in slot 1 gets the strict `COMPASS_CAL_FIT` threshold, all the others (including an internal one in slot 1) get double. 18.4 > 16 is a failure, 29.0 ≤ 32 is accepted."
   },
   {
-   "q": "`COMPASS_MOTCT = 2`, `COMPASS_MOT_X = -1.5`. Монитор 1 показывает ток 40 А. Что прошивка сделает с осью X исправленного поля?",
+   "q": "`COMPASS_MOTCT = 2`, `COMPASS_MOT_X = -1.5`. Monitor 1 shows a current of 40 A. What does the firmware do with the X axis of the corrected field?",
    "options": [
-    "Прибавит −60 мГс после смещений и матрицы",
-    "Прибавит −60 мГс к сырому измерению, до смещений и матрицы",
-    "Вычтет −60 мГс, то есть увеличит поле на 60 мГс",
-    "Умножит поле на (1 − 1.5 × 40 / 530)"
+    "It adds −60 mG after the offsets and the matrix",
+    "It adds −60 mG to the raw measurement, before the offsets and the matrix",
+    "It subtracts −60 mG, that is, it increases the field by 60 mG",
+    "It multiplies the field by (1 − 1.5 × 40 / 530)"
    ],
    "answer": 0,
-   "explain": "`correct_field`: B = M·((B_сырое + OFS)·SCALE) + MOT·I. Компенсация −1.5 × 40 = −60 мГс прибавляется последней, после эллиптической коррекции — так же, как её измеряет `compassmot`."
+   "explain": "`correct_field`: B = M·((B_raw + OFS)·SCALE) + MOT·I. The compensation −1.5 × 40 = −60 mG is added last, after the elliptical correction, the same way `compassmot` measures it."
   },
   {
-   "q": "После калибровки `COMPASS_OFS_X = 1100`, `COMPASS_OFS_Y = 1100`, `COMPASS_OFS_Z = 1100`, `COMPASS_OFFS_MAX = 1800`. Что произойдёт?",
+   "q": "After a calibration `COMPASS_OFS_X = 1100`, `COMPASS_OFS_Y = 1100`, `COMPASS_OFS_Z = 1100`, `COMPASS_OFFS_MAX = 1800`. What happens?",
    "options": [
-    "Калибровка отклонена: сумма смещений 3300 больше 1800",
-    "Калибровка принята, арм разрешён: каждое смещение меньше 1800",
-    "Калибровка принята, арм запрещён: `Compass offsets too high`",
-    "Калибровка принята, арм запрещён: `Check mag field`"
+    "The calibration is rejected: the sum of the offsets, 3300, is above 1800",
+    "The calibration is accepted and arming is allowed: each offset is below 1800",
+    "The calibration is accepted, arming is refused: `Compass offsets too high`",
+    "The calibration is accepted, arming is refused: `Check mag field`"
    ],
    "answer": 2,
-   "explain": "Калибратор сравнивает с порогом каждое смещение по отдельности (1100 < 1800), а `compass_checks` — длину вектора: √(3 × 1100²) = 1905 > 1800."
+   "explain": "The calibrator compares each offset with the threshold separately (1100 < 1800), while `compass_checks` uses the length of the vector: √(3 × 1100²) = 1905 > 1800."
   },
   {
-   "q": "Large Vehicle MagCal (`MAV_CMD_FIXED_MAG_CAL_YAW`). Что команда запишет в параметры?",
+   "q": "Large Vehicle MagCal (`MAV_CMD_FIXED_MAG_CAL_YAW`). What does the command save to the parameters?",
    "options": [
-    "Смещения, диагональ, внедиагональные элементы и масштаб — то же, что калибровка вращением",
-    "Смещения = ожидаемое − измеренное; `DIA` = 1, `ODI` = 0",
-    "Только `COMPASS_ORIENT`, подобранный по известному курсу",
-    "Смещения = измеренное − ожидаемое поле и новый `COMPASS_DEC`"
+    "Offsets, diagonal, off-diagonal elements and scale factor, the same as a rotation calibration",
+    "Offsets = expected − measured; `DIA` = 1, `ODI` = 0",
+    "Only `COMPASS_ORIENT`, picked from the known heading",
+    "Offsets = measured − expected field and a new `COMPASS_DEC`"
    ],
    "answer": 1,
-   "explain": "`mag_cal_fixed_yaw`: `offsets = field - measurement`, затем диагональ 1 и внедиагональные 0. Ориентация должна быть верной заранее, иначе команда «успешно» запишет мусор."
+   "explain": "`mag_cal_fixed_yaw`: `offsets = field - measurement`, then a diagonal of 1 and off-diagonals of 0. The orientation must be right beforehand, otherwise the command \"successfully\" saves garbage."
   },
   {
-   "q": "Оператор Large Vehicle MagCal ввёл курс по компасу телефона 52°, склонение в этом месте +8°. Что нужно было ввести?",
+   "q": "The Large Vehicle MagCal operator entered a phone compass heading of 52°, and the declination at this place is +8°. What should have been entered?",
    "options": [
-    "44° — из магнитного курса склонение вычитают",
-    "52° — прошивка сама учтёт склонение по `COMPASS_AUTODEC`",
-    "60° — команда ждёт истинный курс",
-    "8° — команда ждёт только поправку к курсу"
+    "44°: the declination is subtracted from a magnetic heading",
+    "52°: the firmware accounts for declination itself via `COMPASS_AUTODEC`",
+    "60°: the command expects the true heading",
+    "8°: the command expects only the heading correction"
    ],
    "answer": 2,
-   "explain": "Ожидаемое поле строится из модели в географических осях и поворачивается на заданный курс, поэтому курс истинный: магнитный 52° + склонение 8° = 60°."
+   "explain": "The expected field is built from the model in geographic axes and rotated by the given heading, so the heading is true: magnetic 52° + declination 8° = 60°."
   },
   {
-   "q": "Перед взлётом на коптере оставлено `COMPASS_LEARN = 3`. Что из этого следует в 4.7.2?",
+   "q": "`COMPASS_LEARN = 3` was left set on a copter before takeoff. What follows from that in 4.7.2?",
    "options": [
-    "EKF копирует свои смещения в параметры при дизарме, а компас всё это время работает как обычно",
-    "Компас не используется для курса до `CompassLearn: Finished`",
-    "Прошивка откажет в арме строкой `Compass not calibrated`",
-    "Смещения подбираются в висении по вращению вокруг вертикали за 30 с"
+    "The EKF copies its offsets into the parameters on disarm, and the compass works as usual the whole time",
+    "The compass is not used for yaw until `CompassLearn: Finished`",
+    "The firmware refuses to arm with the string `Compass not calibrated`",
+    "The offsets are fitted in hover from a rotation about the vertical over 30 s"
    ],
    "answer": 1,
-   "explain": "`use_for_yaw` возвращает false при `LearnType::INFLIGHT`; `CompassLearn::update` ждёт сходимости GSF до 5°, вызывает `mag_cal_fixed_yaw` и сбрасывает параметр в 0. Копирование из EKF — это значение 2."
+   "explain": "`use_for_yaw` returns false with `LearnType::INFLIGHT`; `CompassLearn::update` waits for GSF convergence to 5°, calls `mag_cal_fixed_yaw` and resets the parameter to 0. Copying from the EKF is the value 2."
   },
   {
-   "q": "Найдите причину, по которой компенсация компаса по току не работает.",
+   "q": "Find the reason the current-based compass compensation does not work.",
    "kind": "apply",
    "fragment": "COMPASS_MOTCT,2\nCOMPASS_MOT_X,-1.8\nCOMPASS_MOT_Y,0.6\nCOMPASS_MOT_Z,-3.1\nBATT_MONITOR,3\nBATT2_MONITOR,4\nBATT2_AMP_PERVLT,40\nMAG  I=0  MagX=282  MagY=-59  MagZ=544  MOX=0  MOY=0  MOZ=0\nBAT  Inst=1  Volt=23.1  Curr=40.2",
    "options": [
-    "`COMPASS_MOT_*` слишком малы: при таком типе нужны значения в мГс при полном газе, а не на ампер",
-    "Компенсация берёт ток монитора 1, а у него тип «только напряжение»",
-    "`COMPASS_MOTCT = 2` означает компенсацию по газу, а газ в логе не записан",
-    "Компенсация действует только на компас в слоте 2"
+    "`COMPASS_MOT_*` are too small: this type needs values in mG at full throttle, not per ampere",
+    "The compensation takes the current of monitor 1, and its type is voltage only",
+    "`COMPASS_MOTCT = 2` means throttle compensation, and throttle is not in the log",
+    "The compensation applies only to the compass in slot 2"
    ],
    "answer": 1,
-   "explain": "`correct_field` вызывает `battery.current_amps(current)` без номера экземпляра — это монитор 1. У типа 3 тока нет, функция возвращает false, поправка остаётся нулевой: `MOX/MOY/MOZ` = 0."
+   "explain": "`correct_field` calls `battery.current_amps(current)` with no instance number, which is monitor 1. Type 3 has no current, the function returns false, and the correction stays zero: `MOX/MOY/MOZ` = 0."
   },
   {
-   "q": "Монитор 1 — сумма (`BATT_MONITOR = 10`), мониторы 2 и 3 — силовые батареи, монитор 4 — батарея авионики 3S. `BATT_SUM_MASK = 0`. Что покажет монитор 1?",
+   "q": "Monitor 1 is a sum (`BATT_MONITOR = 10`), monitors 2 and 3 are the power batteries, monitor 4 is a 3S avionics battery. `BATT_SUM_MASK = 0`. What does monitor 1 show?",
    "options": [
-    "Ничего: маска 0 выключает сумму, `Battery 1 unhealthy`",
-    "Ток мониторов 2 и 3, напряжение — среднее по мониторам 2 и 3",
-    "Ток мониторов 2 и 3, напряжение — среднее по мониторам 2, 3 и 4",
-    "Сумму напряжений мониторов 2, 3 и 4"
+    "Nothing: a mask of 0 turns the sum off, `Battery 1 unhealthy`",
+    "The current of monitors 2 and 3, and the voltage averaged over monitors 2 and 3",
+    "The current of monitors 2 and 3, and the voltage averaged over monitors 2, 3 and 4",
+    "The sum of the voltages of monitors 2, 3 and 4"
    ],
    "answer": 2,
-   "explain": "Маска 0 — «все мониторы с номером больше моего»: 2, 3 и 4. Токи складываются (у авионики тока нет), напряжения усредняются — среднее с 3S окажется заниженным, и при порогах напряжения на сумме арм запретит `PreArm: Battery 1 low voltage failsafe`. Нужна маска 6."
+   "explain": "A mask of 0 means \"all monitors with a number higher than mine\": 2, 3 and 4. The currents are added (the avionics has no current) and the voltages are averaged, so the average with the 3S comes out low, and with voltage thresholds on the sum arming is refused with `PreArm: Battery 1 low voltage failsafe`. The mask has to be 6."
   },
   {
-   "q": "`BATT_LOW_VOLT = 21.6`, `BATT_LOW_MAH = 5000`, `BATT_CAPACITY = 20000`, `BATT_LOW_TIMER = 0`, `BATT_FS_LOW_ACT = 2`. В арме напряжение 20.9 В держится минуту, израсходовано 9000 мА·ч. Что сделает прошивка?",
+   "q": "`BATT_LOW_VOLT = 21.6`, `BATT_LOW_MAH = 5000`, `BATT_CAPACITY = 20000`, `BATT_LOW_TIMER = 0`, `BATT_FS_LOW_ACT = 2`. While armed, the voltage stays at 20.9 V for a minute, and 9000 mAh are consumed. What does the firmware do?",
    "options": [
-    "RTL сразу: таймер 0 означает срабатывание без какой-либо задержки",
-    "RTL через 10 с: при нуле прошивка берёт таймер по умолчанию",
-    "Ничего: таймер 0 отключает failsafe по напряжению",
-    "Посадку: напряжение ниже порога дольше минуты считается критическим"
+    "RTL at once: a timer of 0 means triggering with no delay at all",
+    "RTL after 10 s: with zero the firmware takes the default timer",
+    "Nothing: a timer of 0 disables the voltage failsafe",
+    "Land: a voltage below the threshold for over a minute counts as critical"
    ],
    "answer": 2,
-   "explain": "`update_failsafes`: событие по напряжению требует `_low_voltage_timeout > 0`. Порог по ёмкости от таймера не зависит, но остаток 20000 − 9000 = 11000 больше 5000."
+   "explain": "`update_failsafes`: a voltage event requires `_low_voltage_timeout > 0`. The capacity threshold does not depend on the timer, but the remaining 20000 − 9000 = 11000 is more than 5000."
   },
   {
-   "q": "Самолёт включили на ветру без колпачка на трубке, `ARSPD_SKIP_CAL = 0`. Что будет с показаниями?",
+   "q": "A plane was powered up in wind with no cap on the tube, `ARSPD_SKIP_CAL = 0`. What happens to the readings?",
    "options": [
-    "Прошивка откажет в калибровке нуля и запретит арм до ручной калибровки под колпачком",
-    "Ноль запишется с давлением ветра, скорость в полёте занижена",
-    "Ноль не изменится: он хранится в `ARSPD_OFFSET` с прошлого включения",
-    "Скорость окажется завышенной на величину ветра"
+    "The firmware rejects the zero calibration and refuses to arm until a manual calibration under a cap",
+    "The zero is saved with the wind pressure in it, and the airspeed reads low in flight",
+    "The zero does not change: it is kept in `ARSPD_OFFSET` from the previous power-up",
+    "The airspeed comes out high by the amount of the wind"
    ],
    "answer": 1,
-   "explain": "`update_calibration` усредняет давление за секунду и записывает его в `ARSPD_OFFSET` при каждой загрузке. Давление от ветра станет «нулём» и будет вычитаться в полёте. Сохранённый ноль берётся только при `ARSPD_SKIP_CAL = 1`."
+   "explain": "`update_calibration` averages the pressure over a second and saves it to `ARSPD_OFFSET` at every boot. The wind pressure becomes the \"zero\" and is subtracted in flight. The saved zero is used only with `ARSPD_SKIP_CAL = 1`."
   }
  ]
 }

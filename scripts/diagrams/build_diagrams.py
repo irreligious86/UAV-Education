@@ -276,12 +276,12 @@ D["frames-rotations"] = frames_rotations()
 # ---------------------------------------------------------------- MAVLink mini-course
 D["mavlink-mission-seq"] = sequence("Загрузка миссии (mission microservice): ведёт аппарат, клиент отвечает", ["GCS / клиент", "Автопилот"], [
     (0, 1, "MISSION_COUNT (count = N, mission_type)", True),
-    (1, 0, "MISSION_REQUEST_INT seq = 0"),
+    (1, 0, "MISSION_REQUEST seq = 0 (AP 4.7; spec: _INT)"),
     (0, 1, "MISSION_ITEM_INT seq = 0"),
-    (1, 0, "MISSION_REQUEST_INT seq = 1"),
+    (1, 0, "MISSION_REQUEST seq = 1"),
     (0, 1, "MISSION_ITEM_INT seq = 1 — потерян", False, True),
     (1, 1, "таймаут: повтор того же seq"),
-    (1, 0, "MISSION_REQUEST_INT seq = 1"),
+    (1, 0, "MISSION_REQUEST seq = 1"),
     (0, 1, "MISSION_ITEM_INT seq = 1 … N−1"),
     (1, 0, "MISSION_ACK (ACCEPTED / ошибка)", True),
 ], notes=[(0, "клиент объявляет размер"), (6, "повтор — забота запрашивающего"), (8, "без ACK миссии нет")])

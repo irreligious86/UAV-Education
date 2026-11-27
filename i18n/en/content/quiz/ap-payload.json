@@ -1,0 +1,116 @@
+{
+ "module": "ap-payload",
+ "pass": 80,
+ "questions": [
+  {
+   "q": "The camera is triggered through a relay: `CAM1_TYPE = 2`, `RELAY1_PIN = 58`, output 9 has `SERVO9_FUNCTION = -1`, `RELAY1_FUNCTION = 1`. What happens in flight with `DO_SET_CAM_TRIGG_DIST`?",
+   "options": [
+    "Arming is refused: a relay with function 1 cannot be used for a camera",
+    "The pin does not change, but `CAM` records are logged for every \"picture\"",
+    "The camera shoots normally: the relay driver takes the first configured relay",
+    "The pin toggles, but the `CAM` log is not written without shutter feedback"
+   ],
+   "answer": 1,
+   "explain": "`AP_Camera_Relay` calls `AP_Relay::set(FUNCTION::CAMERA, …)`, which looks for a relay with function 4. With function 1 no pin changes, yet `take_picture()` counts the trigger as done and writes `CAM`. There is no pre-arm check for this."
+  },
+  {
+   "q": "`CAM1_FEEDBAK_PIN = -1`. Which picture messages will be in the log, and what does their time mean?",
+   "options": [
+    "Only `TRIG`, and the time is the moment of the trigger command",
+    "`TRIG` and `CAM`, and the `CAM` time is the moment the shutter fires",
+    "Only `CAM`, and the time is the moment of the trigger command",
+    "None: without shutter feedback pictures are not logged at all"
+   ],
+   "answer": 2,
+   "explain": "`log_picture()`: without a pin, `Write_Camera()` is written at the moment of the trigger; `TRIG` is written only when the pin is set, and `CAM` is then written on the edge at the pin."
+  },
+  {
+   "q": "`CAM1_TRIGG_DIST = 24`, `CAM1_INTRVAL_MIN = 1.5`, ground speed 18 m/s. What is the spacing between pictures?",
+   "options": [
+    "24 m: the vehicle slows down to 16 m/s by itself",
+    "48 m: every second trigger is skipped by the driver",
+    "24 m: the interval limits only a manual trigger",
+    "27 m: the trigger waits 1.5 s, the vehicle does not slow down"
+   ],
+   "answer": 3,
+   "explain": "When the interval has not elapsed, `take_picture()` sets `trigger_pending` and takes the picture as soon as the 1.5 s are up: the spacing is 18 · 1.5 = 27 m. 48 m would be the result of `CAM1_INTRVAL_MIN = 0` and a camera that misses a trigger."
+  },
+  {
+   "q": "Servo gimbal: `MNT1_PITCH_MIN = -90`, `MNT1_PITCH_MAX = 20`, `SERVO8_MIN = 1100`, `SERVO8_MAX = 1900`, `SERVO8_TRIM = 1500`. What is the pulse at a pitch of 0°?",
+   "options": [
+    "1500 µs",
+    "1754 µs",
+    "1755 µs",
+    "1900 µs"
+   ],
+   "answer": 1,
+   "explain": "`move_servo`: v = (0 − (−900)) / 1100 = 0.818; 1100 + ⌊0.818 · 800⌋ = 1100 + 654 = 1754. TRIM is not in the formula; 1755 is rounding instead of truncation."
+  },
+  {
+   "q": "A brushless gimbal with its own controller and a PWM input per axis. Which `MNT1_TYPE` do you choose?",
+   "options": [
+    "1, Servo, so that the flight controller adds its stabilization",
+    "7, BrushlessPWM: the flight controller sets the angle and does not subtract the tilt",
+    "8, Siyi: it is the general type for gimbals with a controller",
+    "6, MAVLink: PWM gimbals are polled over MAVLink by the firmware"
+   ],
+   "answer": 1,
+   "explain": "Type 7 creates `AP_Mount_Servo` with `requires_stabilization = false`. Type 1 would subtract the vehicle attitude on top of the gimbal's own stabilization, doubling the compensation."
+  },
+  {
+   "q": "A Siyi on `SERIAL2`. Which set of parameters is needed?",
+   "options": [
+    "`SERIAL2_PROTOCOL = 2`, `MNT1_TYPE = 6`, `CAM1_TYPE = 6`",
+    "`SERIAL2_PROTOCOL = 7`, `MNT1_TYPE = 8`, `CAM1_TYPE = 5`",
+    "`SERIAL2_PROTOCOL = 8`, `MNT1_TYPE = 8`, `CAM1_TYPE = 4`",
+    "`SERIAL2_PROTOCOL = 8`, `MNT1_TYPE = 5`, `CAM1_TYPE = 1`"
+   ],
+   "answer": 2,
+   "explain": "Siyi is a driver on a serial port with protocol 8 (Gimbal, 115200 is set automatically), mount type 8; the camera inside the gimbal is triggered through the gimbal driver, `CAM1_TYPE = 4`. Protocol 7 is Alexmos only, and type 5 is SToRM32 Serial."
+  },
+  {
+   "q": "The gripper is a servo with a pin, but the parameters have `GRIP_TYPE = 2`. What happens after a \"grab\" command?",
+   "options": [
+    "After 0.5 s the output returns to `GRIP_NEUTRAL`",
+    "Nothing: type 2 works only over CAN",
+    "The servo goes to `GRIP_GRAB` and stays there",
+    "Arming is refused until the type is corrected"
+   ],
+   "answer": 0,
+   "explain": "The EPM driver gives a pulse and after `EPM_RETURN_TO_NEUTRAL_MS` = 500 ms sets `GRIP_NEUTRAL` (1500): the servo goes to the middle position. The CAN branch is not built in 4.7.2."
+  },
+  {
+   "q": "Copter 4.7.2, a board with a safety switch, motors on outputs 1–4, `BRD_SAFETY_MASK` was never set. The gripper servo is on output 7, a relay is on the GPIO pin of output 9. What works while the safety is on?",
+   "options": [
+    "Nothing: the safety holds all outputs until the switch is pressed",
+    "Only the relay: GPIO pins are not checked against the safety state",
+    "Only the gripper: output 7 is in the default mask",
+    "Both the gripper and the relay"
+   ],
+   "answer": 3,
+   "explain": "The Copter default is all non-motor outputs 1–14 (16368), so the bit of output 7 is set. A write to a GPIO pin bypasses the safety. To hold the gripper you have to write a mask without bit 64."
+  },
+  {
+   "q": "Mission: `NAV_WAYPOINT` (the release point) → `DO_GRIPPER` → `CONDITION_DELAY` 2 s → `DO_DIGICAM_CONTROL` → `NAV_RETURN_TO_LAUNCH`. What executes at the point?",
+   "options": [
+    "Everything: DO commands run before the next navigation command starts",
+    "The release; the picture only if RTL lasts longer than 2 s",
+    "Nothing: DO commands have to be placed before `NAV_WAYPOINT`",
+    "The picture, while the release is postponed until landing"
+   ],
+   "answer": 1,
+   "explain": "DO commands between two navigation commands start together with the second one (RTL here) and execute while it is running. `DO_GRIPPER` runs at once and the picture after the 2 s delay, but by then the vehicle is already flying home; if RTL completes earlier, the remainder is discarded. That is why the module puts `NAV_LOITER_TIME` after the DO commands."
+  },
+  {
+   "q": "The transmitter was turned on while the `RC7_OPTION = 19` switch was in the low position, and the payload was already hung. What does Copter 4.7.2 do?",
+   "options": [
+    "Nothing: the position on the first frame is only stored",
+    "It opens the gripper on the first receiver frame",
+    "It opens the gripper only after arming",
+    "It refuses to arm with a message about the switch position"
+   ],
+   "answer": 1,
+   "explain": "`init_position_on_first_radio_read` returns true only for arming and parachute release. For the gripper the first position read is executed: LOW is `gripper.release()`."
+  }
+ ]
+}

@@ -3,114 +3,114 @@
   "pass": 80,
   "questions": [
     {
-      "q": "AIRSPEED_MIN = 13, Q_ASSIST_SPEED = 18. На какой скорости переход вперёд выйдет из AIRSPEED_WAIT?",
+      "q": "AIRSPEED_MIN = 13, Q_ASSIST_SPEED = 18. At what airspeed does the forward transition leave AIRSPEED_WAIT?",
       "options": [
-        "13 м/с",
-        "15.5 м/с",
-        "Выше 18 м/с",
-        "Через Q_TRANSITION_MS независимо от скорости"
+        "13 m/s",
+        "15.5 m/s",
+        "Above 18 m/s",
+        "After Q_TRANSITION_MS, whatever the airspeed"
       ],
       "answer": 2,
-      "explain": "Условие — aspeed > AIRSPEED_MIN и нет помощи; пока скорость ниже Q_ASSIST_SPEED, помощь активна. В SITL — «Transition airspeed reached 18.3»."
+      "explain": "The condition is aspeed > AIRSPEED_MIN with no assistance; while the airspeed is below Q_ASSIST_SPEED, assistance is active. In SITL: \"Transition airspeed reached 18.3\"."
     },
     {
-      "q": "Что такое Q_TRANSITION_MS в ArduPlane 4.7.2?",
+      "q": "What is Q_TRANSITION_MS in ArduPlane 4.7.2?",
       "options": [
-        "Таймаут перехода: если порог скорости не набран за это время, включается QLAND",
-        "Время после достижения порога скорости, за которое газ подъёмных моторов уходит к нулю",
-        "Время перехода без датчика скорости",
-        "Время наклона моторов tilt-rotor от вертикали до горизонта"
+        "The transition timeout: if the airspeed threshold is not reached in this time, QLAND engages",
+        "The time after the airspeed threshold is reached over which the VTOL motor throttle goes to zero",
+        "The transition time when there is no airspeed sensor",
+        "The time a tiltrotor takes to tilt its motors from vertical to horizontal"
       ],
       "answer": 1,
-      "explain": "Описание параметра: «Transition time in milliseconds after minimum airspeed is reached». Таймаут — отдельный Q_TRANS_FAIL."
+      "explain": "The parameter description: \"Transition time in milliseconds after minimum airspeed is reached\". The timeout is the separate Q_TRANS_FAIL."
     },
     {
-      "q": "В CRUISE с газом в ноль подъёмные моторы включаются каждые несколько секунд. Причина?",
+      "q": "In CRUISE with the throttle at zero the VTOL motors start every few seconds. What is the cause?",
       "options": [
-        "Q_ASSIST_SPEED выше AIRSPEED_MIN",
-        "Q_TRANS_DECEL слишком мал",
+        "Q_ASSIST_SPEED is above AIRSPEED_MIN",
+        "Q_TRANS_DECEL is too low",
         "Q_RTL_MODE = 0",
-        "Q_TRANSITION_MS слишком велик для этого аппарата"
+        "Q_TRANSITION_MS is too long for this vehicle"
       ],
       "answer": 0,
-      "explain": "CRUISE на нулевом газе держит AIRSPEED_MIN; если он ниже Q_ASSIST_SPEED, помощь по скорости включается сразу и циклически."
+      "explain": "CRUISE at zero throttle holds AIRSPEED_MIN; if that is below Q_ASSIST_SPEED, speed-based assistance starts immediately and cyclically."
     },
     {
-      "q": "Скорость 20 м/с, Q_TRANS_DECEL = 2 м/с². С какой дистанции до точки начнётся этап airbrake?",
+      "q": "Speed 20 m/s, Q_TRANS_DECEL = 2 m/s². From what distance to the destination does the airbrake stage begin?",
       "options": [
-        "100 м",
-        "140 м",
-        "200 м",
-        "50 м"
+        "100 m",
+        "140 m",
+        "200 m",
+        "50 m"
       ],
       "answer": 1,
-      "explain": "d = V²/(2·a) + 2V = 400/4 + 40 = 140 м: дистанция остановки плюс две секунды на раскрутку моторов."
+      "explain": "d = V²/(2·a) + 2V = 400/4 + 40 = 140 m: the stopping distance plus two seconds for motor spin-up."
     },
     {
-      "q": "Что делает ArduPlane при потере RC в QLOITER, если биты 5 и 20 Q_OPTIONS не заданы?",
+      "q": "What does ArduPlane do on RC loss in QLOITER if bits 5 and 20 of Q_OPTIONS are not set?",
       "options": [
         "RTL",
         "QRTL",
         "QLAND",
-        "Продолжает висеть в QLOITER"
+        "It keeps hovering in QLOITER"
       ],
       "answer": 2,
-      "explain": "events.cpp: в QSTABILIZE, QHOVER, QLOITER, QACRO, QAUTOTUNE — QLAND; бит 5 — QRTL, бит 20 — RTL."
+      "explain": "events.cpp: in QSTABILIZE, QHOVER, QLOITER, QACRO, QAUTOTUNE it is QLAND; bit 5 gives QRTL, bit 20 gives RTL."
     },
     {
-      "q": "Датчик скорости застыл на 3 м/с, Q_TRANS_FAIL = 0. Что будет после включения FBWA с полным газом?",
+      "q": "The airspeed sensor is stuck at 3 m/s, Q_TRANS_FAIL = 0. What happens after you switch to FBWA at full throttle?",
       "options": [
-        "Через 5 с переход завершится по Q_TRANSITION_MS",
-        "Прошивка сразу заметит расхождение с GPS и перейдёт на синтетическую скорость",
-        "Переход не завершится, подъёмные моторы будут работать, пока не кончится батарея",
-        "Сработает QLAND через Q_ASSIST_DELAY"
+        "After 5 s the transition completes on Q_TRANSITION_MS",
+        "The firmware notices the mismatch with GPS at once and switches to synthetic airspeed",
+        "The transition does not complete and the VTOL motors run until the battery is empty",
+        "QLAND triggers after Q_ASSIST_DELAY"
       ],
       "answer": 2,
-      "explain": "Без порога скорости AIRSPEED_WAIT не кончается, а без Q_TRANS_FAIL нет таймаута. ARSPD_WIND_MAX по умолчанию 0 — проверки расхождения нет; даже с ней в SITL синтетическая скорость DCM после отключения датчика была занижена «выученным» ветром. С Q_TRANS_FAIL = 8 через 8.0 с был QLAND."
+      "explain": "Without the airspeed threshold AIRSPEED_WAIT never ends, and without Q_TRANS_FAIL there is no timeout. ARSPD_WIND_MAX defaults to 0, so there is no mismatch check; even with it, in SITL the synthetic DCM airspeed after the sensor was disabled was biased low by the \"learned\" wind. With Q_TRANS_FAIL = 8, QLAND came after 8.0 s."
     },
     {
-      "q": "Q_RTL_MODE = 1, RTL на 25 м/с, WP_LOITER_RAD = 60, RTL_RADIUS = 0, Q_TRANS_DECEL = 2. На какой дистанции RTL сменится на QRTL?",
+      "q": "Q_RTL_MODE = 1, RTL at 25 m/s, WP_LOITER_RAD = 60, RTL_RADIUS = 0, Q_TRANS_DECEL = 2. At what distance does RTL change to QRTL?",
       "options": [
-        "60 м",
-        "90 м",
-        "234 м",
-        "156 м"
+        "60 m",
+        "90 m",
+        "234 m",
+        "156 m"
       ],
       "answer": 3,
-      "explain": "switch_QRTL(): при wp_distance < max(радиус, d_ост); d_ост = 25²/4 = 156 м больше 60 м. В SITL на 25.2 м/с — 158 м."
+      "explain": "switch_QRTL(): when wp_distance < max(radius, d_stop); d_stop = 25²/4 = 156 m is greater than 60 m. In SITL at 25.2 m/s it was 158 m."
     },
     {
-      "q": "Что делает команда миссии DO_VTOL_TRANSITION с param1 = 3?",
+      "q": "What does the mission command DO_VTOL_TRANSITION with param1 = 3 do?",
       "options": [
-        "Переводит аппарат в QLAND",
-        "Следующие точки миссии летятся в VTOL",
-        "Запускает переход вперёд из висения",
-        "Включает спиральный заход"
+        "It switches the vehicle to QLAND",
+        "The following mission waypoints are flown in VTOL",
+        "It starts a forward transition from a hover",
+        "It enables the fixed-wing loiter approach"
       ],
       "answer": 1,
-      "explain": "3 — MAV_VTOL_STATE_MC: auto_state.vtol_mode = true. Работает только в AUTO: «VTOL transition only in AUTO»."
+      "explain": "3 is MAV_VTOL_STATE_MC: auto_state.vtol_mode = true. It works only in AUTO: \"VTOL transition only in AUTO\"."
     },
     {
-      "q": "Из CRUISE 28 м/с включили QLOITER. Что показал прогон SITL 4.7.2?",
+      "q": "QLOITER was selected from CRUISE at 28 m/s. What did the SITL 4.7.2 run show?",
       "options": [
-        "Остановка за 91 м с набором около 19 м высоты, тангаж до 30°",
-        "Плавное торможение с 2 м/с² по Q_TRANS_DECEL без заметного изменения высоты",
-        "Сваливание и потеря 20 м",
-        "Аппарат остался в самолётном режиме до AIRSPEED_MIN"
+        "A stop in 91 m with an altitude gain of about 19 m, pitch up to 30°",
+        "Smooth braking at 2 m/s² per Q_TRANS_DECEL with no noticeable change in altitude",
+        "A stall and a loss of 20 m",
+        "The vehicle stayed in the fixed-wing mode down to AIRSPEED_MIN"
       ],
       "answer": 0,
-      "explain": "Тангаж растёт до min(Q_A_ANGLE_MAX, PTCH_LIM_MAX_DEG) — в SITL 30° — за Q_BACKTRANS_MS 3 с, а крыло на скорости продолжает нести — отсюда набор высоты; Q_TRANS_DECEL задаёт только плановое торможение миссии и QRTL."
+      "explain": "The pitch grows to min(Q_A_ANGLE_MAX, PTCH_LIM_MAX_DEG), 30° in SITL, over the 3 s of Q_BACKTRANS_MS, while the wing keeps lifting at speed, hence the climb; Q_TRANS_DECEL sets only the planned deceleration of a mission and of QRTL."
     },
     {
-      "q": "Чем Q-assist ArduPlane отличается от quad-chute PX4?",
+      "q": "How does ArduPlane Q-assist differ from the PX4 quad-chute?",
       "options": [
-        "Q-assist выключает маршевый мотор",
-        "Q-assist включает подъёмные моторы без смены режима",
-        "Q-assist срабатывает только на обратном переходе в висение",
-        "Q-assist требует внешней команды MAVLink"
+        "Q-assist switches off the forward motor",
+        "Q-assist starts the VTOL motors without a mode change",
+        "Q-assist triggers only on the back transition to a hover",
+        "Q-assist requires an external MAVLink command"
       ],
       "answer": 1,
-      "explain": "Quad-chute — принудительный переход в висение; Q-assist лишь добавляет тягу подъёмных моторов в текущем самолётном режиме."
+      "explain": "A quad-chute is a forced transition to hover; Q-assist only adds VTOL motor thrust in the current fixed-wing mode."
     }
   ]
 }

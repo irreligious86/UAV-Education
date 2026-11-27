@@ -1,0 +1,195 @@
+{
+ "module": "ap-setup-plane",
+ "tasks": [
+  {
+   "id": "elevon-left-us",
+   "title": "Left elevon pulse width through the mixer",
+   "statement": "A flying wing in MANUAL mode. RC inputs: `RCn_MIN = 1000`, `RCn_TRIM = 1500`, `RCn_MAX = 2000`, expo 0. Roll channel **{r1} µs**, pitch channel **{r2} µs**. `MIXING_GAIN = {g}`, `MIXING_OFFSET = 0`. Left elevon (function 77): `SERVOn_MIN = 1000`, `SERVOn_TRIM = 1500`, `SERVOn_MAX = 2000`, `SERVOn_REVERSED = 0`. Find the pulse width of the left elevon the way the firmware computes it.",
+   "params": {
+    "r1": [
+     1000,
+     1100,
+     1150,
+     1230,
+     1300,
+     1375,
+     1420,
+     1500,
+     1585,
+     1640,
+     1700,
+     1750,
+     1810,
+     1900,
+     2000
+    ],
+    "r2": [
+     1000,
+     1090,
+     1200,
+     1260,
+     1340,
+     1400,
+     1500,
+     1555,
+     1600,
+     1690,
+     1700,
+     1780,
+     1850,
+     1925,
+     2000
+    ],
+    "g": [
+     0.5,
+     1.0
+    ]
+   },
+   "answer": "(1500 + min(500, ((r2 - r1)*g*4500)//4500)) if r2 >= r1 else (1500 - min(500, ((r1 - r2)*g*4500)//4500))",
+   "unit": "µs",
+   "tol": 1e-05,
+   "abs": 0.01,
+   "solution": "Channel demand = 9 × (pulse − 1500): 4500 units per 500 µs. Left elevon = (elevator − aileron) × `MIXING_GAIN`, and the result is limited to ±4500. Pulse = 1500 ± ⌊|s| × 500 / 4500⌋: the fraction is dropped. The module's example: roll 1750, pitch 1700, 0.5 → (1800 − 2250) × 0.5 = −225 → 1500 − 25 = 1475 µs. With `MIXING_GAIN = 1.0` a difference of more than 500 µs hits the limit: the pulse is 1000 or 2000."
+  },
+  {
+   "id": "fs-circle-time",
+   "title": "How many seconds in CIRCLE before RTL",
+   "statement": "ArduPlane 4.7, FBWA mode, `THR_FAILSAFE = 1`, `FS_SHORT_ACTN = 0`, `FS_LONG_ACTN = 1`. The receiver stops sending frames. `RC_FS_TIMEOUT = {t} s`, `FS_LONG_TIMEOUT = {l} s`, the radio is read 50 times a second. How many seconds does the plane spend in CIRCLE before it changes to RTL? (Take the long event as occurring exactly at `FS_LONG_TIMEOUT`.)",
+   "params": {
+    "t": [
+     0.5,
+     1,
+     1.5,
+     2,
+     2.5,
+     3
+    ],
+    "l": [
+     5,
+     6,
+     8,
+     10,
+     12,
+     15,
+     20,
+     30
+    ]
+   },
+   "answer": "l - (t + 0.2)",
+   "unit": "s",
+   "tol": 0.01,
+   "abs": 0.35,
+   "solution": "The short event: `RC_FS_TIMEOUT` without frames plus 10 radio read cycles of 20 ms = t + 0.2 s, and at that moment FBWA changes to CIRCLE. The long event is counted from the last valid frame: `FS_LONG_TIMEOUT`. The difference is the time in CIRCLE. The module's example: 5 − (1 + 0.2) = 3.8 s. There is no `FS_SHORT_TIMEOUT` in 4.7. The tolerance allows for the long event being tested three times a second."
+  },
+  {
+   "id": "arspd-speed",
+   "title": "Airspeed from differential pressure",
+   "statement": "The airspeed sensor reads a differential pressure of **{dp} Pa** (zero already subtracted), `ARSPD_RATIO = {k}`. What airspeed does ArduPlane compute?",
+   "params": {
+    "dp": {
+     "min": 40,
+     "max": 400,
+     "step": 10
+    },
+    "k": [
+     1.6,
+     1.8,
+     2.0,
+     2.2,
+     2.5,
+     2.8,
+     3.0
+    ]
+   },
+   "answer": "math.sqrt(dp*k)",
+   "unit": "m/s",
+   "tol": 0.01,
+   "solution": "V = √(Δp × `ARSPD_RATIO`). The module's example: 131.2 Pa with 2.0 → 16.2 m/s, with 2.47 → 18.0 m/s."
+  },
+  {
+   "id": "arspd-ratio",
+   "title": "Correcting ARSPD_RATIO against GPS",
+   "statement": "`ARSPD_RATIO = {k}`. Over two straight legs in opposite directions the indicated airspeed is **{vi} m/s**, and the mean GPS ground speed differs from it by **{d} m/s** (positive means GPS is higher). Find the new value of `ARSPD_RATIO`.",
+   "params": {
+    "k": [
+     1.8,
+     2.0,
+     2.2
+    ],
+    "vi": {
+     "min": 14,
+     "max": 22,
+     "step": 0.5
+    },
+    "d": [
+     -1.5,
+     -1,
+     -0.5,
+     0.5,
+     1,
+     1.5,
+     2
+    ]
+   },
+   "answer": "k*((vi + d)/vi)**2",
+   "unit": "",
+   "tol": 0.01,
+   "solution": "Airspeed is proportional to √RATIO, so the new RATIO = old × (V_GPS / V_indicated)², where V_GPS = V_indicated + the difference. The module's example: indicated 16.2, GPS higher by 1.8 → 2.0 × (18.0 / 16.2)² = 2.47. A result outside 1.5–3.0 is a reason to look for a leak in the tubing, not to write the number."
+  },
+  {
+   "id": "turn-radius",
+   "title": "Turn radius",
+   "statement": "A plane flies at **{v} m/s** and holds a bank of **{phi}°** in a steady turn with no wind. Find the turn radius (g = 9.81 m/s²).",
+   "params": {
+    "v": {
+     "min": 10,
+     "max": 26,
+     "step": 1
+    },
+    "phi": [
+     20,
+     25,
+     30,
+     35,
+     40,
+     45,
+     50,
+     55,
+     60
+    ]
+   },
+   "answer": "v*v/(9.81*math.tan(math.radians(phi)))",
+   "unit": "m",
+   "tol": 0.02,
+   "solution": "R = V² / (g × tan φ). The module's example: 14 m/s and 45° → 196 / 9.81 = 20 m. If the radius is larger than `WP_LOITER_RAD`, a loiter of the set radius is not achievable at that speed with that bank."
+  },
+  {
+   "id": "stall-roll-limit",
+   "title": "Bank limit from stall prevention",
+   "statement": "`STALL_PREVENTION = 1`, `AIRSPEED_STALL = 0`, `AIRSPEED_MIN = {vm}` m/s, `ROLL_LIMIT_DEG = 60`. Navigation demands a 60° bank, and the airspeed is **{dv} m/s** above `AIRSPEED_MIN`. To what bank does the firmware limit the demand?",
+   "params": {
+    "vm": [
+     9,
+     10,
+     11,
+     12,
+     14
+    ],
+    "dv": [
+     0.5,
+     1,
+     1.5,
+     2,
+     2.5,
+     3,
+     3.5
+    ]
+   },
+   "answer": "min(60, max(25, math.degrees(math.acos((vm/(vm + dv))**2))))",
+   "unit": "°",
+   "tol": 0.01,
+   "abs": 0.2,
+   "solution": "The allowed load factor is n = (V / `AIRSPEED_MIN`)², the bank limit = arccos(1 / n), but not less than 25° and not more than `ROLL_LIMIT_DEG`. The module's example: 12 m/s with `AIRSPEED_MIN = 11` → n = 1.19 → 32.8°. With n ≥ 2 the demanded 60° passes unlimited."
+  }
+ ]
+}

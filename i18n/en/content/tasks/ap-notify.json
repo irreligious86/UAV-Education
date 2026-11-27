@@ -1,0 +1,113 @@
+{
+ "module": "ap-notify",
+ "tasks": [
+  {
+   "id": "led-types-encode",
+   "title": "Building NTF_LED_TYPES",
+   "statement": "You need the board LEDs (bit 0) and two more `AP_Notify` drivers: bits **{a}** and **{b}**. What value do you write to `NTF_LED_TYPES`?",
+   "params": {
+    "a": [
+     5,
+     6,
+     8,
+     9,
+     10
+    ],
+    "b": [
+     11,
+     13,
+     15,
+     19
+    ]
+   },
+   "answer": "1 + 2**a + 2**b",
+   "unit": "",
+   "tol": 1e-05,
+   "abs": 0.01,
+   "solution": "The value of a mask is the sum of 2^n over the bits that are set: 1 + 2^a + 2^b. Examples from the module: the board and NeoPixel (bit 8) give 1 + 256 = 257; the board, NeoPixel and ESC LEDs (bit 11) give 1 + 256 + 2048 = 2305. Bits 8 and 18 (NeoPixel and NeoPixelRGB) are not set together: it is one and the same output, and with both set bit 8 wins."
+  },
+  {
+   "id": "led-types-decode",
+   "title": "How many drivers in the mask",
+   "statement": "`NTF_LED_TYPES = {v}`. How many LED drivers are enabled (how many of bits 0–19 are one)?",
+   "params": {
+    "v": [
+     1,
+     97,
+     231,
+     257,
+     289,
+     455,
+     487,
+     512,
+     2305,
+     24775,
+     123079,
+     263169,
+     647367
+    ]
+   },
+   "answer": "(v>>0&1) + (v>>1&1) + (v>>2&1) + (v>>3&1) + (v>>4&1) + (v>>5&1) + (v>>6&1) + (v>>7&1) + (v>>8&1) + (v>>9&1) + (v>>10&1) + (v>>11&1) + (v>>12&1) + (v>>13&1) + (v>>14&1) + (v>>15&1) + (v>>16&1) + (v>>17&1) + (v>>18&1) + (v>>19&1)",
+   "unit": "",
+   "tol": 1e-05,
+   "abs": 0.01,
+   "solution": "Decompose the number into powers of two; each set bit is one driver. Examples from the module: 455 = 256 + 128 + 64 + 4 + 2 + 1 is six drivers (bits 0, 1, 2, 6, 7, 8); 123079 is nine (bits 0, 1, 2, 6, 7, 13, 14, 15, 16); 647367 = 123079 + 524288 is ten."
+  },
+  {
+   "id": "led-current",
+   "title": "Strip current in a status color",
+   "statement": "A strip of **{n}** LEDs shows a color with this many channels lit: **{k}** (1 is red, green or blue; 2 is yellow; 3 is white). `NTF_LED_BRIGHT = {l}`. The course model: 20 mA per channel at brightness byte 255; the strip brightness bytes are 51, 127 and 255 for levels 1, 2 and 3. Find the strip current.",
+   "params": {
+    "n": [
+     4,
+     6,
+     8,
+     10,
+     12,
+     16,
+     24,
+     32
+    ],
+    "k": [
+     1,
+     2,
+     3
+    ],
+    "l": [
+     1,
+     2,
+     3
+    ]
+   },
+   "answer": "n*k*0.02*(51 if l == 1 else (127 if l == 2 else 255))/255",
+   "unit": "A",
+   "tol": 0.02,
+   "abs": 0.002,
+   "solution": "I = N · k · 0.02 A · (brightness byte / 255). The module's example: 8 LEDs, yellow (2 channels), level 2 → 8 · 2 · 0.02 · 127 / 255 = 0.159 A. At full brightness in white this gives the course rule of 0.06 A per LED."
+  },
+  {
+   "id": "led-bec-max",
+   "title": "How many LEDs the BEC can carry",
+   "statement": "A 5 V BEC is rated for **{b} A**, and the other loads of the branch draw **{i} A**. By the course rule (0.06 A per LED, BEC rating at least 1.5 × the sum of the branch currents) find the largest number of strip LEDs.",
+   "params": {
+    "b": [
+     2,
+     2.5,
+     3
+    ],
+    "i": [
+     0.4,
+     0.5,
+     0.7,
+     0.9,
+     1.1
+    ]
+   },
+   "answer": "math.floor((b/1.5 - i)/0.06 + 1e-9)",
+   "unit": "pcs",
+   "tol": 1e-05,
+   "abs": 0.01,
+   "solution": "The allowed sum for the branch is b / 1.5; that leaves b / 1.5 − i for the strip; divide by 0.06 A and drop the fraction. The module's example: a 2 A BEC, 0.9 A of other loads → 1.333 − 0.9 = 0.433 A → 7.2 → 7 LEDs; the eighth gives 1.5 · 1.38 = 2.07 A > 2 A. `NTF_LED_LEN` does not accept more than 32 on one output, so put a second strip on another output."
+  }
+ ]
+}

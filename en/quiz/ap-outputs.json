@@ -3,40 +3,40 @@
  "pass": 80,
  "questions": [
   {
-   "q": "MatekH743, стандартная сборка: TIM8 — выходы 1–2, TIM5 — выходы 3–6. Моторы на выходах 1–4 с `MOT_PWM_TYPE = 6`. На выход 5 назначена серва захвата (`SERVO5_FUNCTION = 28`). Что произойдёт?",
+   "q": "MatekH743, standard build: TIM8 has outputs 1–2, TIM5 has outputs 3–6. Motors are on outputs 1–4 with `MOT_PWM_TYPE = 6`. A gripper servo is assigned to output 5 (`SERVO5_FUNCTION = 28`). What happens?",
    "options": [
-    "Серва будет работать на 50 Гц, потому что режим и частота задаются на каждый выход отдельно",
-    "Выход 5 отключится, арм запрещён: `SERVO5_FUNCTION=28 on disabled channel`",
-    "Вся группа TIM5 вернётся к PWM, моторы 3 и 4 останутся без DShot",
-    "Серва получит кадры DShot, предупреждений в Messages не будет"
+    "The servo runs at 50 Hz, because the mode and rate are set separately for every output",
+    "Output 5 is disabled and arming is refused: `SERVO5_FUNCTION=28 on disabled channel`",
+    "The whole TIM5 group falls back to PWM, and motors 3 and 4 are left without DShot",
+    "The servo gets DShot frames, with no warnings in Messages"
    ],
    "answer": 1,
-   "explain": "Протокол задаётся на таймер. DShot на выходах 3 и 4 переводит весь TIM5 в цифровой режим; остальные выходы группы прошивка отключает (`get_disabled_channels`), а проверка перед армом для обычных функций даёт отказ (AP_Arming.cpp, `servo_checks`)."
+   "explain": "The protocol is set per timer. DShot on outputs 3 and 4 switches the whole of TIM5 to digital mode; the firmware disables the other outputs of the group (`get_disabled_channels`), and the pre-arm check fails for ordinary functions (AP_Arming.cpp, `servo_checks`)."
   },
   {
-   "q": "Моторы с обычным PWM (`MOT_PWM_TYPE = 0`, `RC_SPEED = 490`) и аналоговая серва стоят в одной таймерной группе основного процессора. `SERVO_RATE = 50`. Какую частоту получит серва?",
+   "q": "Motors on plain PWM (`MOT_PWM_TYPE = 0`, `RC_SPEED = 490`) and an analog servo are in the same timer group of the main processor. `SERVO_RATE = 50`. What rate does the servo get?",
    "options": [
-    "50 Гц — `SERVO_RATE` действует на все выходы с функцией сервы",
-    "490 Гц — ровно значение `RC_SPEED`",
-    "400 Гц, без предупреждений",
-    "Выход сервы будет отключён, арм запрещён"
+    "50 Hz: `SERVO_RATE` applies to every output with a servo function",
+    "490 Hz: exactly the `RC_SPEED` value",
+    "400 Hz, with no warnings",
+    "The servo output is disabled and arming is refused"
    ],
    "answer": 2,
-   "explain": "`set_freq` применяет частоту моторов ко всей группе и ограничивает её 400 Гц; `set_default_rate` «быстрые» группы пропускает. Отказа перед армом нет: он есть только для групп с DShot и лентой. Аналоговая серва на 400 Гц перегревается."
+   "explain": "`set_freq` applies the motor rate to the whole group and limits it to 400 Hz; `set_default_rate` skips the \"fast\" groups. There is no pre-arm failure: that exists only for groups with DShot and a strip. An analog servo at 400 Hz overheats."
   },
   {
-   "q": "Выход с функцией типа «угол» (полный ход 4500): `SERVOn_MIN = 1000`, `SERVOn_MAX = 2000`, `SERVOn_TRIM = 1400`, `REVERSED = 0`. На вход пришло +3000. Какой импульс выдаст прошивка?",
+   "q": "An output with an \"angle\" function (full travel 4500): `SERVOn_MIN = 1000`, `SERVOn_MAX = 2000`, `SERVOn_TRIM = 1400`, `REVERSED = 0`. The input is +3000. What pulse does the firmware output?",
    "options": [
-    "1733 мкс",
-    "1833 мкс",
-    "1800 мкс",
-    "1900 мкс"
+    "1733 µs",
+    "1833 µs",
+    "1800 µs",
+    "1900 µs"
    ],
    "answer": 2,
-   "explain": "Для положительного входа: TRIM + ⌊s · (MAX − TRIM) / 4500⌋ = 1400 + ⌊3000 · 600 / 4500⌋ = 1400 + 400 = 1800. 1733 получится, если взять половину полного размаха (500) вместо MAX − TRIM; 1833 — если считать от 1500."
+   "explain": "For a positive input: TRIM + ⌊s · (MAX − TRIM) / 4500⌋ = 1400 + ⌊3000 · 600 / 4500⌋ = 1400 + 400 = 1800. You get 1733 if you take half of the full span (500) instead of MAX − TRIM, and 1833 if you count from 1500."
   },
   {
-   "q": "Октокоптер на сборке с двунаправленным DShot: обороты нужны от моторов на выходах 5–8. Какое значение `SERVO_BLH_BDMASK` включает именно их?",
+   "q": "An octocopter on a build with bidirectional DShot: you need RPM from the motors on outputs 5–8. Which `SERVO_BLH_BDMASK` value enables exactly those?",
    "options": [
     "15",
     "120",
@@ -44,75 +44,75 @@
     "240"
    ],
    "answer": 3,
-   "explain": "Бит 0 — выход 1, вес выхода n равен 2^(n − 1): 16 + 32 + 64 + 128 = 240. 480 — ошибка с весом 2^n; 15 — выходы 1–4."
+   "explain": "Bit 0 is output 1, and the weight of output n is 2^(n − 1): 16 + 32 + 64 + 128 = 240. 480 is the mistake with the weight 2^n; 15 is outputs 1–4."
   },
   {
-   "q": "Фрагмент параметров (учебный пример). Полётник не армится. Какое сообщение даст прошивка и что исправить?",
+   "q": "A parameter fragment (a training example). The flight controller does not arm. Which message does the firmware give, and what do you fix?",
    "kind": "apply",
    "fragment": "SERVO5_FUNCTION,0\nRELAY1_FUNCTION,1\nRELAY1_PIN,54\nRELAY1_DEFAULT,0\nRC7_OPTION,28",
    "options": [
-    "`RELAY1_PIN=54, set SERVO5_FUNCTION=-1` — перевести выход 5 в GPIO и перезагрузить",
-    "`RELAY1_PIN=54 invalid` — ножки 54 не существует, нужна 105",
-    "`pin conflict RELAY1_PIN = RELAY2_PIN` — задать `RELAY2_PIN = -1`",
-    "`Hardware safety switch` — нажать кнопку безопасности"
+    "`RELAY1_PIN=54, set SERVO5_FUNCTION=-1`: switch output 5 to GPIO and reboot",
+    "`RELAY1_PIN=54 invalid`: pin 54 does not exist, you need 105",
+    "`pin conflict RELAY1_PIN = RELAY2_PIN`: set `RELAY2_PIN = -1`",
+    "`Hardware safety switch`: press the safety switch"
    ],
    "answer": 0,
-   "explain": "Ножка 54 принадлежит выходу 5 (на платах с нумерацией от 50), а он не GPIO. Проверка `AP_Relay::arming_checks` находит выход по номеру ножки и подсказывает параметр. Сообщение `invalid` появляется, когда ножки с таким номером у платы нет вовсе."
+   "explain": "Pin 54 belongs to output 5 (on boards numbered from 50), and it is not a GPIO. The `AP_Relay::arming_checks` check finds the output from the pin number and names the parameter. The `invalid` message appears when the board has no pin with that number at all."
   },
   {
-   "q": "`MOT_PWM_TYPE = 6`, `SERVO_BLH_RVMASK = 5`, `SERVO_DSHOT_ESC = 0`. Моторы 1 и 3 продолжают вращаться в прежнюю сторону. Почему?",
+   "q": "`MOT_PWM_TYPE = 6`, `SERVO_BLH_RVMASK = 5`, `SERVO_DSHOT_ESC = 0`. Motors 1 and 3 keep spinning the same way. Why?",
    "options": [
-    "Маска 5 означает выходы 5 и 1, а не 1 и 3",
-    "При типе ESC 0 команды DShot не посылаются",
-    "Разворот работает только вместе с `SERVO_BLH_3DMASK`",
-    "Команда разворота посылается только после арма"
+    "Mask 5 means outputs 5 and 1, not 1 and 3",
+    "With ESC type 0, DShot commands are not sent",
+    "Reversal works only together with `SERVO_BLH_3DMASK`",
+    "The reverse command is sent only after arming"
    ],
    "answer": 1,
-   "explain": "`update_channel_masks` посылает команды разворота и 3D только для типов ESC 1–4 и только в дизарме. Маска 5 = 4 + 1 — это как раз выходы 1 и 3."
+   "explain": "`update_channel_masks` sends the reverse and 3D commands only for ESC types 1–4 and only while disarmed. Mask 5 = 4 + 1 is exactly outputs 1 and 3."
   },
   {
-   "q": "ESC по двунаправленному DShot сообщает E = 1260 (в единицах 100 eRPM), `SERVO_BLH_POLES = 12`. Какие обороты запишет прошивка в поле `RPM` сообщения `ESC`?",
+   "q": "An ESC on bidirectional DShot reports E = 1260 (in units of 100 eRPM), `SERVO_BLH_POLES = 12`. What RPM does the firmware write to the `RPM` field of the `ESC` message?",
    "options": [
-    "10500 об/мин",
-    "18000 об/мин",
-    "126000 об/мин",
-    "21000 об/мин"
+    "10500 RPM",
+    "18000 RPM",
+    "126000 RPM",
+    "21000 RPM"
    ],
    "answer": 3,
-   "explain": "RPM = ⌊E · 200 / полюсы⌋ = 1260 · 200 / 12 = 21000. Делить нужно на число пар полюсов (6), а не на число полюсов: 10500 — эта ошибка. 18000 получится при 14 полюсах."
+   "explain": "RPM = ⌊E · 200 / poles⌋ = 1260 · 200 / 12 = 21000. You divide by the number of pole pairs (6), not by the number of poles: 10500 is that mistake. You get 18000 with 14 poles."
   },
   {
-   "q": "Что содержит файл `@SYS/timers.txt`, скачанный с полётника по MAVFTP?",
+   "q": "What does the `@SYS/timers.txt` file, downloaded from the flight controller over MAVFTP, contain?",
    "options": [
-    "Список выходов с назначенными `SERVOn_FUNCTION`",
-    "По строке на таймер: частота тактирования, режим, фактическая и целевая частота",
-    "Таблицу «пад — таймер — номер ножки GPIO» из `hwdef`",
-    "Счётчики ошибок двунаправленного DShot по каждому мотору"
+    "A list of outputs with their assigned `SERVOn_FUNCTION`",
+    "One line per timer: clock frequency, mode, actual and target rate",
+    "The \"pad, timer, GPIO pin number\" table from the `hwdef`",
+    "Bidirectional DShot error counters for every motor"
    ],
    "answer": 1,
-   "explain": "`RCOutput::timer_info` печатает заголовок `TIMERV1` и строки с полями `CLK`, `MODE`, `FREQ`, `TGT`. Номеров выходов там нет — их сопоставляют с таймерами по `hwdef.dat`; режим по выходам показывает баннер `RCOut:`."
+   "explain": "`RCOutput::timer_info` prints the `TIMERV1` header and lines with the fields `CLK`, `MODE`, `FREQ`, `TGT`. There are no output numbers in it; you match them to timers through `hwdef.dat`, and the `RCOut:` banner shows the mode per output."
   },
   {
-   "q": "Плата с IOMCU, ESC подключены к MAIN 1–4, `SERVO_BLH_AUTO = 1`, аппарат в дизарме. Программа настройки ESC через passthrough регуляторы не находит. Главная причина?",
+   "q": "A board with an IOMCU, ESCs connected to MAIN 1–4, `SERVO_BLH_AUTO = 1`, the vehicle disarmed. The ESC configuration program does not find the ESCs through passthrough. What is the main cause?",
    "options": [
-    "Выходы IOMCU не работают как мост к ESC — регуляторы нужно перенести на AUX",
-    "Passthrough на MAIN требует `BRD_IO_DSHOT = 1` и перезагрузки с новой прошивкой сопроцессора",
-    "Нужно задать `SERVO_BLH_PORT = 8`",
-    "Passthrough работает только в арме"
+    "IOMCU outputs do not work as a bridge to the ESCs, so the ESCs have to be moved to AUX",
+    "Passthrough on MAIN requires `BRD_IO_DSHOT = 1` and a reboot with the new coprocessor firmware",
+    "You need to set `SERVO_BLH_PORT = 8`",
+    "Passthrough works only while armed"
    ],
    "answer": 0,
-   "explain": "`serial_setup_output` ищет выход только среди таймерных групп основного процессора; выходы 1–8 на плате с IOMCU в них не входят. `BRD_IO_DSHOT` даёт DShot на MAIN, но не passthrough. В арме обработчик запросы как раз отбрасывает."
+   "explain": "`serial_setup_output` looks for the output only among the main processor's timer groups; outputs 1–8 on a board with an IOMCU are not in them. `BRD_IO_DSHOT` gives DShot on MAIN, but not passthrough. While armed, the handler in fact drops the requests."
   },
   {
-   "q": "`RELAY1_FUNCTION = 1`, `RC8_OPTION = 28`, канал 8 — трёхпозиционный тумблер. В каком положении реле включено?",
+   "q": "`RELAY1_FUNCTION = 1`, `RC8_OPTION = 28`, channel 8 is a three-position switch. In which position is the relay on?",
    "options": [
-    "В среднем и верхнем",
-    "Только в нижнем",
-    "Только в верхнем",
-    "В любом, кроме среднего"
+    "In the middle and high positions",
+    "Only in the low position",
+    "Only in the high position",
+    "In any position except the middle"
    ],
    "answer": 2,
-   "explain": "В `RC_Channel.cpp` реле получает состояние `ch_flag == HIGH`: включено только в верхнем положении, среднее и нижнее выключают."
+   "explain": "In `RC_Channel.cpp` the relay gets the state `ch_flag == HIGH`: it is on only in the high position, and the middle and low positions turn it off."
   }
  ]
 }

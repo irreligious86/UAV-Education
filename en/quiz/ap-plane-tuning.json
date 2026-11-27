@@ -11,54 +11,54 @@
         "Landing → TECS → roll/pitch"
       ],
       "answer": 0,
-      "explain": "Inner loops before outer ones: bad pitch looks like bad TECS."
+      "explain": "Inner loops before outer loops: a poor pitch loop looks like poor TECS."
     },
     {
-      "q": "How do you check control surface reversals before a flight in FBWA?",
+      "q": "How do you check surface reversals before flying in FBWA?",
       "options": [
-        "Wiggle the sticks in MANUAL and watch the surfaces",
-        "Tilt the plane: the surfaces counteract",
+        "Move the sticks in MANUAL and watch the surfaces",
+        "Tilt the plane: the surfaces oppose the tilt",
         "Run AUTOTUNE on the ground",
         "Look at the throttle level in the log"
       ],
       "answer": 1,
-      "explain": "In a stabilized mode the surfaces must counter the tilt; getting it wrong means a crash on launch."
+      "explain": "In a stabilized mode the surfaces must counter the tilt; a mistake is a crash on launch."
     },
     {
       "q": "When does AUTOTUNE save P and D?",
       "options": [
         "Only on disarm",
-        "When you exit the mode",
+        "When you leave the mode",
         "When each axis finishes",
-        "After a flight controller reboot"
+        "After the flight controller reboots"
       ],
       "answer": 2,
-      "explain": "P and D — when an axis finishes, FF and I — when you exit the mode."
+      "explain": "P and D when an axis finishes, FF and I when you leave the mode."
     },
     {
       "q": "What does RLL2SRV_TCONST set?",
       "options": [
-        "The bank limit in degrees",
+        "The roll limit in degrees",
         "The gyro filter frequency",
-        "The maximum aileron servo speed in °/s",
+        "The maximum aileron servo speed in deg/s",
         "The time constant of the roll response"
       ],
       "answer": 3,
-      "explain": "Within τ the plane covers ~63 % of the requested angle; 0.5 s by default."
+      "explain": "Within τ the plane covers ~63% of the demanded angle; the default is 0.5 s."
     },
     {
       "q": "How do you get TECS_CLMB_MAX?",
       "options": [
-        "Calculate it from weight, thrust and wing area",
+        "Calculate it from mass, thrust, and wing area",
         "Take half of AIRSPEED_CRUISE",
         "Measure the climb at THR_MAX in FBWA",
         "Leave the default value"
       ],
       "answer": 2,
-      "explain": "TECS limits are measured with test flights; for electric planes — at the end of the battery."
+      "explain": "The TECS limits are measured with test flights; on electric planes, at the end of the battery."
     },
     {
-      "q": "Altitude oscillates in LOITER, pitch is tuned. What do you adjust?",
+      "q": "Altitude oscillates in LOITER and pitch is tuned. What do you adjust?",
       "options": [
         "Increase TECS_TIME_CONST by 1",
         "Decrease NAVL1_PERIOD",
@@ -77,18 +77,18 @@
         "Increase NAVL1_PERIOD by 1–2"
       ],
       "answer": 3,
-      "explain": "Weaving means L1 is too sharp; sluggish turns are the opposite — decrease by 5."
+      "explain": "Weaving means L1 is too sharp; for sluggish turns do the opposite and decrease it by 5."
     },
     {
-      "q": "Why do you install a rangefinder for auto landing?",
+      "q": "Why do you fit a rangefinder for automatic landing?",
       "options": [
-        "The barometer doesn't work at low altitude",
-        "Barometric altitude error is meters",
-        "NAV_LAND isn't accepted without it",
+        "The barometer does not work at low altitude",
+        "Barometer altitude error is in meters",
+        "NAV_LAND is not accepted without one",
         "It replaces the airspeed sensor"
       ],
       "answer": 1,
-      "explain": "A baro error of a few meters makes the flare a lottery; RNGFND_LANDING = 1 makes it repeatable."
+      "explain": "A baro error of several meters makes the flare a lottery; RNGFND_LANDING = 1 makes it repeatable."
     }
   ]
 }

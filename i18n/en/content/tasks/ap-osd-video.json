@@ -1,0 +1,206 @@
+{
+ "module": "ap-osd-video",
+ "tasks": [
+  {
+   "id": "screen-pwm-range",
+   "title": "Screen by PWM range (OSD_SW_METHOD = 1)",
+   "statement": "`OSD_SW_METHOD = 1`. Screens 1, 2, and 3 are enabled with the `CHAN_MIN`–`CHAN_MAX` ranges 900–1300, 1300–1700, 1700–2100. The `OSD_CHAN` channel is at **{v} µs**. What is the number of the screen shown?",
+   "params": {
+    "v": [
+     950,
+     1000,
+     1150,
+     1299,
+     1300,
+     1301,
+     1450,
+     1500,
+     1699,
+     1700,
+     1701,
+     1850,
+     2000,
+     2099
+    ]
+   },
+   "answer": "1 + (v >= 1300) + (v >= 1700)",
+   "unit": "",
+   "tol": 1e-05,
+   "abs": 0.01,
+   "solution": "The firmware condition is `CHAN_MIN ≤ PWM < CHAN_MAX`. The lower bound is part of the range, the upper is not: 1300 is already screen 2, 1700 is already screen 3."
+  },
+  {
+   "id": "screen-toggle",
+   "title": "Screen after several flicks (OSD_SW_METHOD = 0)",
+   "statement": "`OSD_SW_METHOD = 0`. The first **{k}** of the six screens (`OSD1`…) are enabled, and the rest are disabled. Screen 1 is shown. The switch was flicked **{n}** times, and each time the channel changed by 500 µs. What is the number of the screen shown?",
+   "params": {
+    "k": [
+     2,
+     3,
+     4
+    ],
+    "n": {
+     "min": 1,
+     "max": 9,
+     "step": 1
+    }
+   },
+   "answer": "n % k + 1",
+   "unit": "",
+   "tol": 1e-05,
+   "abs": 0.01,
+   "solution": "Every channel change of more than 200 µs is a step to the next enabled screen around the circle, and the direction of the flick does not matter. After n steps from screen 1: (n mod k) + 1. Example: 3 screens, 4 flicks → 1 → 2 → 3 → 1 → 2."
+  },
+  {
+   "id": "message-fit",
+   "title": "How many MESSAGE characters are past the edge of the grid",
+   "statement": "The `MESSAGE` item (visible width 26 cells) is at column `OSDn_MESSAGE_X = {x}`. The screen uses `OSDn_TXT_RES = {r}` (0 is 30×16, 1 is 50×18, 2 is 60×22). How many cells of a long message end up past the right edge of the grid? If it fits entirely, the answer is 0.",
+   "params": {
+    "x": {
+     "min": 0,
+     "max": 40,
+     "step": 1
+    },
+    "r": [
+     0,
+     1,
+     2
+    ]
+   },
+   "answer": "min(26, max(0, x + 26 - (30 + 20*(r >= 1) + 10*(r >= 2))))",
+   "unit": "",
+   "tol": 1e-05,
+   "abs": 0.01,
+   "solution": "Columns: 30, 50, or 60. The message takes columns x … x + 25, and the grid is 0 … C − 1. Past the edge: max(0, x + 26 − C), but no more than 26. The module's example: x = 6, a grid of 30 → 2."
+  },
+  {
+   "id": "osd-options-encode",
+   "title": "Build OSD_OPTIONS from bits",
+   "statement": "You need these OSD options: decimal packing **{d}**, miles at 5280 feet **{m}**, crosshair removed **{c}**, arrows translated for the Betaflight font **{a}** (1 is on, 0 is off). The other bits are zero. What value do you write to `OSD_OPTIONS`?",
+   "params": {
+    "d": [
+     0,
+     1
+    ],
+    "m": [
+     0,
+     1
+    ],
+    "c": [
+     0,
+     1
+    ],
+    "a": [
+     0,
+     1
+    ]
+   },
+   "answer": "d + 8*m + 16*c + 32*a",
+   "unit": "",
+   "tol": 1e-05,
+   "abs": 0.01,
+   "solution": "Bits: 0 is decimal packing (1), 3 is miles (8), 4 is the crosshair (16), 5 is the arrows (32). The value is the sum of the weights of the bits that are set. The module's example: 1 + 16 + 32 = 49."
+  },
+  {
+   "id": "msp-options-table",
+   "title": "MSP_OPTIONS: which character table",
+   "statement": "`MSP_OPTIONS = {v}`, and the OSD runs over DisplayPort. Which character table does the flight controller use? Answer with a number: 0 for ArduPilot, 1 for Betaflight, 2 for INAV.",
+   "params": {
+    "v": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9,
+     10,
+     12,
+     13,
+     15
+    ]
+   },
+   "answer": "2*((v // 8) % 2) + (1 - (v // 8) % 2) * ((v // 4) % 2)",
+   "unit": "",
+   "tol": 1e-05,
+   "abs": 0.01,
+   "solution": "Bit 2 (weight 4) is Betaflight characters, bit 3 (weight 8) is INAV characters, and it overrides bit 2. Bits 0 and 1 do not affect the table. 12 = 8 + 4 → INAV; 5 = 4 + 1 → Betaflight; 3 = 2 + 1 → ArduPilot."
+  },
+  {
+   "id": "vtx-power-round",
+   "title": "VTX_POWER: what the firmware stores",
+   "statement": "**{p} mW** was written to `VTX_POWER`. What value does the firmware round it to at startup? The 4.7.2 level table: 0, 25, 100, 200, 400, 500, 600, 800, 1000 mW.",
+   "params": {
+    "p": [
+     30,
+     50,
+     90,
+     150,
+     250,
+     300,
+     450,
+     550,
+     700,
+     750,
+     900,
+     999
+    ]
+   },
+   "answer": "25*(p >= 25) + 75*(p >= 100) + 100*(p >= 200) + 200*(p >= 400) + 100*(p >= 500) + 100*(p >= 600) + 200*(p >= 800) + 200*(p >= 1000)",
+   "unit": "mW",
+   "tol": 1e-05,
+   "abs": 0.01,
+   "solution": "It only rounds down, to the nearest level in the table: 300 → 200, 450 → 400, 700 → 600, 999 → 800."
+  },
+  {
+   "id": "vtx-mw-dbm",
+   "title": "VTX power: mW to dBm",
+   "statement": "A VTX runs at **{p} mW**. How much is that in dBm (to one decimal place)?",
+   "params": {
+    "p": [
+     25,
+     100,
+     200,
+     400,
+     500,
+     600,
+     800,
+     1000
+    ]
+   },
+   "answer": "10*math.log10(p)",
+   "unit": "dBm",
+   "tol": 0.004,
+   "abs": 0.06,
+   "solution": "dBm = 10 · log₁₀(P, mW). 25 mW → 13.98; 200 → 23.01; 800 → 29.03. The firmware table has the rounded values 14, 23, and 29."
+  },
+  {
+   "id": "cell-count-auto",
+   "title": "OSD_CELL_COUNT = 0: how many cells the firmware counts",
+   "statement": "`OSD_CELL_COUNT = 0` (autodetection). The highest battery voltage the flight controller has seen is **{v} V**. How many cells does the firmware formula `floor(V · 0.2381 + 1)` give?",
+   "params": {
+    "v": [
+     11.1,
+     12.3,
+     12.5,
+     15.9,
+     16.5,
+     16.7,
+     20.4,
+     20.9,
+     22.8,
+     24.6,
+     25.1
+    ]
+   },
+   "answer": "math.floor(v*0.2381 + 1)",
+   "unit": "",
+   "tol": 1e-05,
+   "abs": 0.01,
+   "solution": "0.2381 ≈ 1 / 4.2. 16.5 · 0.2381 = 3.93 → +1 = 4.93 → 4 cells. At exactly 4.20 V per cell (12.6, 16.8, 25.2 V) the formula gives one cell too many, which is why it is better to set the cell count manually."
+  }
+ ]
+}

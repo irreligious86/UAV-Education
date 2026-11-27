@@ -4,7 +4,7 @@
   {
    "id": "stall",
    "title": "Stall speed",
-   "statement": "A wing with a mass of **{m} kg**, area **{s} dm²**, C_L,max = **{cl}**. Find the stall speed (m/s) at ρ = 1.225.",
+   "statement": "A wing with a mass of **{m} kg**, an area of **{s} dm²**, and C_L,max = **{cl}**. Find the stall speed (m/s) at ρ = 1.225.",
    "params": {
     "m": {
      "min": 0.6,
@@ -25,12 +25,12 @@
    "answer": "math.sqrt(2*m*9.81/(1.225*s/100*cl))",
    "unit": "m/s",
    "tol": 0.02,
-   "solution": "V_s = √(2·m·g/(ρ·S·C_L,max)), S in m² (dm² ÷ 100). Pick cruise 1.3–1.5 times higher."
+   "solution": "V_s = √(2·m·g/(ρ·S·C_L,max)), with S in m² (dm² ÷ 100). Choose a cruise speed 1.3–1.5 times higher."
   },
   {
    "id": "wing-loading",
    "title": "Wing loading",
-   "statement": "Mass **{m} kg**, wing area **{s} dm²**. Find the wing loading (g/dm²).",
+   "statement": "A mass of **{m} kg** and a wing area of **{s} dm²**. Find the wing loading (g/dm²).",
    "params": {
     "m": {
      "min": 0.5,
@@ -46,12 +46,12 @@
    "answer": "m*1000/s",
    "unit": "g/dm²",
    "tol": 0.01,
-   "solution": "W/S = m/S. Below 30 g/dm² is a slow trainer, 60–100 is a fast wing with a hard landing."
+   "solution": "W/S = m/S. Below 30 g/dm² is a slow trainer; 60–100 is a fast wing with a hard landing."
   },
   {
    "id": "eas-to-tas",
-   "title": "EAS и истинная скорость",
-   "statement": "`AIRSPEED_MIN` = **{v} м/с** (ArduPlane задаёт его как EAS). Плотность воздуха на поле **{rho} кг/м³**. Какой истинной скорости (TAS) это соответствует, м/с?",
+   "title": "EAS and true airspeed",
+   "statement": "`AIRSPEED_MIN` = **{v} m/s** (ArduPlane sets it as EAS). The air density at the field is **{rho} kg/m³**. What true airspeed (TAS) does that correspond to, in m/s?",
    "params": {
     "v": {
      "min": 8,
@@ -67,14 +67,14 @@
     ]
    },
    "answer": "v*math.sqrt(1.225/rho)",
-   "unit": "м/с",
+   "unit": "m/s",
    "tol": 0.01,
-   "solution": "Подъёмная сила зависит от динамического давления, поэтому сваливание постоянно в EAS. TAS = EAS·√(ρ₀/ρ), ρ₀ = 1.225; так же TECS умножает `AIRSPEED_MIN` на EAS2TAS (`AP_TECS.cpp:420`). Пример модуля: 8.53 м/с при ρ = 1.058 (1500 м) → 9.18 м/с."
+   "solution": "Lift depends on dynamic pressure, so the stall is constant in EAS. TAS = EAS·√(ρ₀/ρ), ρ₀ = 1.225; this is how TECS multiplies `AIRSPEED_MIN` by EAS2TAS (`AP_TECS.cpp:420`). The module's example: 8.53 m/s at ρ = 1.058 (1500 m) → 9.18 m/s."
   },
   {
    "id": "stall-roll-limit",
-   "title": "Предел крена STALL_PREVENTION",
-   "statement": "Крыло летит со скоростью в **{k}** раза выше `AIRSPEED_STALL`; `ROLL_LIMIT_DEG` = 60 и не ограничивает. Какой крен разрешит STALL_PREVENTION ArduPlane 4.7, °?",
+   "title": "STALL_PREVENTION roll limit",
+   "statement": "A wing flies at **{k}** times `AIRSPEED_STALL`; `ROLL_LIMIT_DEG` = 60 and is not limiting. What roll does ArduPlane 4.7 STALL_PREVENTION allow, in °?",
    "params": {
     "k": {
      "min": 1.06,
@@ -85,12 +85,12 @@
    "answer": "math.degrees(math.acos(1/k**2))",
    "unit": "°",
    "tol": 0.01,
-   "solution": "n_max = (V/V_s)² = k², крен ≤ arccos(1/n_max) (`Attitude.cpp:723–746`); ниже 25° прошивка не опускает предел без `FLIGHT_OPTIONS` бит 16. Пример модуля: V = 10, `AIRSPEED_STALL` = 8.5 → k = 1.176 → 43.7°."
+   "solution": "n_max = (V/V_s)² = k², roll ≤ arccos(1/n_max) (`Attitude.cpp:723–746`); the firmware does not lower the limit below 25° without `FLIGHT_OPTIONS` bit 16. The module's example: V = 10, `AIRSPEED_STALL` = 8.5 → k = 1.176 → 43.7°."
   },
   {
    "id": "energy-trade",
-   "title": "Обмен скорости на высоту",
-   "statement": "Крыло тормозит с **{v1} м/с** до **{v2} м/с** без газа и потерь на сопротивление. Сколько метров высоты можно получить за счёт кинетической энергии?",
+   "title": "Trading speed for altitude",
+   "statement": "A wing slows from **{v1} m/s** to **{v2} m/s** with no throttle and no drag losses. How many meters of altitude can it gain from the kinetic energy?",
    "params": {
     "v1": {
      "min": 14,
@@ -104,9 +104,9 @@
     }
    },
    "answer": "(v1**2 - v2**2)/(2*9.81)",
-   "unit": "м",
+   "unit": "m",
    "tol": 0.01,
-   "solution": "Удельные энергии TECS: SKE = ½V², SPE = g·h. Δh = (v₁² − v₂²)/(2g). Пример модуля: 12 → 10 м/с даёт 2.24 м — столько высоты крыло отдаёт или берёт, когда TECS перераспределяет энергию тангажем."
+   "solution": "The TECS specific energies: SKE = ½V², SPE = g·h. Δh = (v₁² − v₂²)/(2g). The module's example: 12 → 10 m/s gives 2.24 m, which is how much altitude the wing gives up or takes when TECS redistributes energy with pitch."
   }
  ]
 }

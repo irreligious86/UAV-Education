@@ -190,7 +190,7 @@ ArduPilot заметно тяжелее Betaflight. На F4-контроллер
 - Тюнинг чаще начинают с AUTOTUNE, а не с ручного PID.
 
 ### Режимы Copter по номерам (`FLTMODE1..6`, значения из `Parameters.cpp`)
-0 Stabilize, 1 Acro, 2 AltHold, 3 Auto, 4 Guided, 5 Loiter, 6 RTL, 7 Circle, 9 Land, 11 Drift, 13 Sport, 14 Flip, 15 AutoTune, 16 PosHold, 17 Brake, 18 Throw, 20 Guided_NoGPS, 21 Smart_RTL, 22 FlowHold, 23 Follow, 24 ZigZag, 25 SystemID, 27 Auto RTL, 28 Turtle. Шесть позиций канала `FLTMODE_CH` (границы PWM 1230/1360/1490/1620/1749) + любые режимы на `RCx_OPTION`. Группы по требованиям к датчикам: без позиции — Stabilize, Acro, AltHold (баро), Land (частично), FlowHold (поток); с позицией — Loiter, PosHold, Auto, Guided, RTL, Smart_RTL, Circle, Follow, ZigZag, Brake. Первый полёт любой сборки — Stabilize → AltHold → Loiter в этом порядке.
+0 Stabilize, 1 Acro, 2 AltHold, 3 Auto, 4 Guided, 5 Loiter, 6 RTL, 7 Circle, 9 Land, 11 Drift, 13 Sport, 14 Flip, 15 AutoTune, 16 PosHold, 17 Brake, 18 Throw, 19 Avoid_ADSB, 20 Guided_NoGPS, 21 Smart_RTL, 22 FlowHold, 23 Follow, 24 ZigZag, 25 SystemID, 26 Heli_Autorotate, 27 Auto RTL, 28 Turtle. Шесть позиций канала `FLTMODE_CH` (границы PWM 1230/1360/1490/1620/1749) + любые режимы на `RCx_OPTION`. Группы по требованиям к датчикам: без позиции — Stabilize, Acro, AltHold (баро), Land (частично), FlowHold (поток); с позицией — Loiter, PosHold, Auto, Guided, RTL, Smart_RTL, Circle, Follow, ZigZag, Brake. Первый полёт любой сборки — Stabilize → AltHold → Loiter в этом порядке.
 
 ### Порядок первой настройки (Mission Planner / QGC)
 1. Прошивка по типу платы (`hwdef`), выбор frame class/type (`FRAME_CLASS`, `FRAME_TYPE`).
@@ -202,7 +202,7 @@ ArduPilot заметно тяжелее Betaflight. На F4-контроллер
 7. Motor test (Mission Planner → Optional Hardware → Motor Test) без пропов: порядок и направление по схеме frame type.
 
 ### Разобранный пример: перевод пилота с Betaflight
-«Почему не армится?» — сообщение `PreArm: …` в GCS называет причину текстом (компас, GPS, INS, параметры, RC не откалибровано), а `ARMING_SKIPCHK` (до 4.7 — `ARMING_CHECK` с обратным смыслом) только выбирает, какие проверки пропустить; «почему не держит высоту в Stabilize?» — потому что Stabilize = Betaflight Angle, высоту держит AltHold; «где rates?» — `ACRO_RP_RATE`/`ACRO_Y_RATE`, `ACRO_RP_EXPO`; «где PID?» — `ATC_RAT_RLL_P/I/D/FF/FLTD/FLTE/FLTT` (rate) и `ATC_ANG_RLL_P` (angle); «где фильтры?» — `INS_GYRO_FILTER`, `INS_HNTCH_*`; «где Blackbox?» — DataFlash на SD, Log Review; «где diff all?» — Full Parameter List → Save/Compare, или `param save` в MAVProxy.
+«Почему не армится?» — сообщение `PreArm: …` в GCS называет причину текстом (компас, GPS, INS, параметры, RC не откалибровано), а `ARMING_SKIPCHK` (до 4.7 — `ARMING_CHECK` с обратным смыслом) только выбирает, какие проверки пропустить; «почему не держит высоту в Stabilize?» — потому что Stabilize = Betaflight Angle, высоту держит AltHold; «где rates?» — `ACRO_RP_RATE`/`ACRO_Y_RATE`, `ACRO_RP_EXPO`; «где PID?» — `ATC_RAT_RLL_P/I/D/FF/FLTD/FLTE/FLTT` (rate) и `ATC_ANG_RLL_P` (angle); «где фильтры?» — `INS_GYRO_FILTER`, `INS_HNTCH_*`; «где Blackbox?» — DataFlash на SD, Review a Log; «где diff all?» — Full Parameter List → Save to file / Compare Params, или `param save` в MAVProxy.
 
 ### Место в системе
 
@@ -263,7 +263,7 @@ ArduPilot заметно тяжелее Betaflight. На F4-контроллер
 - Lua Scripts — ArduPilot | https://ardupilot.org/copter/docs/common-lua-scripts.html | primary | A
 - Firmware Limitations on AutoPilot Hardware — ArduPilot (features.txt, custom.ardupilot.org; открыто 2026-11-22) | https://ardupilot.org/copter/docs/common-limited-firmware.html | primary | A
 - ArduPilot Copter-4.7.3 — ReleaseNotes.txt (изменения от 4.7.2) | https://github.com/ArduPilot/ardupilot/blob/Copter-4.7.3/ArduCopter/ReleaseNotes.txt | primary | A
-- ArduPilot Copter-4.7.2 — AP_HAL_Boards.h и *_config.h (пороги HAL_PROGRAM_SIZE_LIMIT_KB) | https://github.com/ArduPilot/ardupilot/blob/Copter-4.7.2/libraries/AP_HAL/AP_HAL_Boards.h | primary | A
+- ArduPilot Copter-4.7.2 — AP_HAL/board/chibios.h (HAL_PROGRAM_SIZE_LIMIT_KB) и *_config.h (пороги функций) | https://github.com/ArduPilot/ardupilot/blob/Copter-4.7.2/libraries/AP_HAL/board/chibios.h | primary | A
 - ArduPilot Copter-4.7.2 — hwdef Pixhawk1-1M и fmuv3 (сообщение о 1 МБ флеша) | https://github.com/ArduPilot/ardupilot/blob/Copter-4.7.2/libraries/AP_HAL_ChibiOS/hwdef/Pixhawk1/hwdef.dat | primary | A
 
 ## checklist

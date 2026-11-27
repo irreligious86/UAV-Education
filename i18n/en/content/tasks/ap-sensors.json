@@ -1,0 +1,301 @@
+{
+  "module": "ap-sensors",
+  "tasks": [
+    {
+      "id": "compassmot-vector",
+      "title": "Current interference compensation",
+      "statement": "CompassMot: at zero throttle `MAG.MagX` = **{b0}** mG, at a current of **{i} A** it is **{b1}** mG (compensation off). Which `COMPASS_MOT_X` value does the firmware save with `COMPASS_MOTCT = 2`, in mG/A?",
+      "params": {
+        "b0": {
+          "min": 180,
+          "max": 280,
+          "step": 10
+        },
+        "b1": {
+          "min": 150,
+          "max": 330,
+          "step": 12
+        },
+        "i": [
+          20,
+          25,
+          30,
+          40,
+          50
+        ]
+      },
+      "answer": "-(b1 - b0)/i",
+      "unit": "mG/A",
+      "tol": 0.01,
+      "abs": 0.01,
+      "solution": "`compassmot.cpp`: the interference is ΔB = B − B₀, and the coefficient is MOT = −ΔB / I. The minus sign: in `correct_field` the compensation MOT·I is added to the field and must cancel the interference. If the field dropped with current, the coefficient is positive."
+    },
+    {
+      "id": "compassmot-percent",
+      "title": "CompassMot interference percentage",
+      "statement": "After CompassMot: `COMPASS_MOT_X = {mx}`, `COMPASS_MOT_Y = {my}`, `COMPASS_MOT_Z = {mz}` mG/A; the highest current of the procedure, **{i} A**, was reached at the highest throttle of **{g} %**. Which interference percentage does the procedure show (the reference field in the firmware is 530 mG)?",
+      "params": {
+        "mx": [
+          -2.4,
+          -1.8,
+          -1.2,
+          -0.6,
+          0.5,
+          1.1,
+          1.9
+        ],
+        "my": [
+          -1.5,
+          -0.6,
+          0.0,
+          0.6,
+          1.2
+        ],
+        "mz": [
+          -3.1,
+          -2.2,
+          -1.0,
+          0.8,
+          2.5
+        ],
+        "i": [
+          20,
+          30,
+          40,
+          60,
+          80,
+          120
+        ],
+        "g": [
+          50,
+          75,
+          100
+        ]
+      },
+      "answer": "math.sqrt(mx**2 + my**2 + mz**2)*(i/(g/100))/530*100",
+      "unit": "%",
+      "tol": 0.01,
+      "solution": "`compassmot.cpp`: percentage = |MOT| · (I_max / throttle_max) / 530 · 100, where |MOT| = √(x² + y² + z²), throttle_max is the highest throttle of the procedure from 0 to 1 (the current is scaled to full throttle; at full throttle throttle_max = 1), and 530 mG is `AP_ARMING_COMPASS_MAGFIELD_EXPECTED`. Per the wiki, under 30 % is acceptable, 31–60 % is a gray zone, and above 60 % means move the compass."
+    },
+    {
+      "id": "offset-length",
+      "title": "Offset vector length and the arming threshold",
+      "statement": "After a calibration: `COMPASS_OFS_X = {x}`, `COMPASS_OFS_Y = {y}`, `COMPASS_OFS_Z = {z}`. Find the length of the offset vector in mG: that is what the pre-arm check compares with `COMPASS_OFFS_MAX` (1800 by default).",
+      "params": {
+        "x": {
+          "min": -1200,
+          "max": 1200,
+          "step": 80
+        },
+        "y": {
+          "min": -1300,
+          "max": 1300,
+          "step": 130
+        },
+        "z": {
+          "min": -1100,
+          "max": 1100,
+          "step": 110
+        }
+      },
+      "answer": "math.sqrt(x**2 + y**2 + z**2)",
+      "unit": "mG",
+      "tol": 0.005,
+      "abs": 0.5,
+      "solution": "`AP_Arming.cpp`: `offsets.length() > get_offsets_max()` → `PreArm: Compass offsets too high`. Length = √(x² + y² + z²). The calibrator, by contrast, checks each offset separately, so a calibration can pass while arming does not: three offsets of 1100 give a length of 1905."
+    },
+    {
+      "id": "fixed-yaw-offset-x",
+      "title": "Large Vehicle MagCal: the X axis offset",
+      "statement": "The vehicle sits level, true heading **{psi}°**. The model field at the point: north N = **{n}** mG, east E = **{e}** mG. The compass, with no old offsets, shows `MagX` = **{m}** mG. Which `COMPASS_OFS_X` does `MAV_CMD_FIXED_MAG_CAL_YAW` save, in mG?",
+      "params": {
+        "psi": [
+          0,
+          30,
+          45,
+          60,
+          90,
+          120,
+          135,
+          180,
+          225,
+          270,
+          300
+        ],
+        "n": {
+          "min": 150,
+          "max": 300,
+          "step": 10
+        },
+        "e": [
+          -40,
+          -20,
+          0,
+          15,
+          30,
+          45
+        ],
+        "m": {
+          "min": -300,
+          "max": 400,
+          "step": 25
+        }
+      },
+      "answer": "n*math.cos(math.radians(psi)) + e*math.sin(math.radians(psi)) - m",
+      "unit": "mG",
+      "tol": 0.01,
+      "abs": 0.5,
+      "solution": "`mag_cal_fixed_yaw`: the expected field on the X axis of a level vehicle is X = N·cos ψ + E·sin ψ; offset = expected − measured, because in `correct_field` the offset is added to the measurement."
+    },
+    {
+      "id": "volt-mult",
+      "title": "BATT_VOLT_MULT correction",
+      "statement": "`BATT2_VOLT_MULT = {k}`. The ground station shows **{g} V** for monitor 2, and a multimeter on the same battery reads **{m} V**. Find the new `BATT2_VOLT_MULT`.",
+      "params": {
+        "k": [
+          10.1,
+          11.0,
+          11.05,
+          12.02,
+          15.7,
+          21.0
+        ],
+        "g": {
+          "min": 22.0,
+          "max": 25.0,
+          "step": 0.1
+        },
+        "m": {
+          "min": 22.0,
+          "max": 25.2,
+          "step": 0.08
+        }
+      },
+      "answer": "k*m/g",
+      "unit": "",
+      "tol": 0.002,
+      "solution": "`AP_BattMonitor_Analog.cpp`: V = (V_in − `VLT_OFFSET`) × `VOLT_MULT`, so the reading is directly proportional to the multiplier. New = old × reference / reading. A reading below the reference means the multiplier grows."
+    },
+    {
+      "id": "amp-pervlt",
+      "title": "BATT_AMP_PERVLT correction from the charge",
+      "statement": "`BATT_AMP_PERVLT = {k}` A/V, the current zero is set. Over a flight the flight controller counted **{f} mAh**, and the charger put in **{c} mAh**. Find the new `BATT_AMP_PERVLT`.",
+      "params": {
+        "k": [
+          17.0,
+          27.32,
+          40.0,
+          50.0,
+          80.0
+        ],
+        "f": {
+          "min": 3800,
+          "max": 4600,
+          "step": 50
+        },
+        "c": {
+          "min": 3900,
+          "max": 4700,
+          "step": 40
+        }
+      },
+      "answer": "k*c/f",
+      "unit": "A/V",
+      "tol": 0.002,
+      "solution": "I = (V_in − `AMP_OFFSET`) × `AMP_PERVLT`: the current and the accumulated mAh are proportional to the multiplier. New = old × charger mAh / flight controller mAh. First the zero (`BATT_AMP_OFFSET`), then the scale, otherwise the sensor is right at one point only (`ap-setup-scratch`)."
+    },
+    {
+      "id": "sum-mask",
+      "title": "The \"sum\" monitor mask",
+      "statement": "Monitor 1 is a sum (`BATT_MONITOR = 10`). It must include monitors **{a}**, **{b}** and **{c}**. Find `BATT_SUM_MASK`.",
+      "params": {
+        "a": [
+          2,
+          3
+        ],
+        "b": [
+          4,
+          5,
+          6
+        ],
+        "c": [
+          7,
+          8,
+          9
+        ]
+      },
+      "answer": "2**(a-1) + 2**(b-1) + 2**(c-1)",
+      "unit": "",
+      "tol": 0.0001,
+      "abs": 0.4,
+      "solution": "`AP_BattMonitor_Sum.cpp`: the check is `_sum_mask & (1 << i)`, where i is the monitor number minus 1. Bit 0 is monitor 1, so monitor n contributes 2^(n − 1). The sum never includes itself; a mask of 0 means \"all monitors with a number higher than mine\"."
+    },
+    {
+      "id": "time-to-low-mah",
+      "title": "Time to BATT_LOW_MAH",
+      "statement": "`BATT_CAPACITY = {cap}` mAh, `BATT_LOW_MAH = {low}` mAh. **{used} mAh** are consumed and the current stays at **{i} A**. In how many minutes does the low capacity failsafe trigger?",
+      "params": {
+        "cap": [
+          5000,
+          10000,
+          16000,
+          20000,
+          22000
+        ],
+        "low": [
+          1000,
+          1500,
+          2000
+        ],
+        "used": {
+          "min": 500,
+          "max": 2500,
+          "step": 100
+        },
+        "i": [
+          18,
+          25,
+          36,
+          54,
+          60,
+          90
+        ]
+      },
+      "answer": "(cap - low - used)/(i*1000)*60",
+      "unit": "min",
+      "tol": 0.01,
+      "solution": "`check_failsafe_types`: low on capacity when `CAPACITY` − consumed < `LOW_MAH`. (cap − low − used) mAh remain to the threshold; time = mAh / (I · 1000) hours, times 60. The capacity threshold triggers at once, and `BATT_LOW_TIMER` does not apply to it."
+    },
+    {
+      "id": "resting-voltage",
+      "title": "Resting voltage for BATT_FS_VOLTSRC = 1",
+      "statement": "The monitor shows **{v} V** at a current of **{i} A**; the resistance estimate `BAT.Res` = **{r} Ω**. Which voltage, in V, does the firmware compare with `BATT_LOW_VOLT` when `BATT_FS_VOLTSRC = 1`?",
+      "params": {
+        "v": {
+          "min": 20.0,
+          "max": 23.5,
+          "step": 0.1
+        },
+        "i": [
+          20,
+          35,
+          50,
+          60,
+          80,
+          110
+        ],
+        "r": [
+          0.008,
+          0.012,
+          0.018,
+          0.025,
+          0.04
+        ]
+      },
+      "answer": "v + i*r",
+      "unit": "V",
+      "tol": 0.002,
+      "solution": "`update_resistance_estimate`: V_rest = V + I · R; `voltage_resting_estimate` never returns less than the measured voltage. With source 1 the `BATT_LOW_VOLT` and `BATT_CRT_VOLT` thresholds are compared with this number, so they are set from the no-load voltage."
+    }
+  ]
+}

@@ -11,7 +11,7 @@
         "It is always enabled automatically"
       ],
       "answer": 0,
-      "explain": "After a reboot the rest of the SCR_ parameters appear."
+      "explain": "After the reboot the other SCR_ parameters appear."
     },
     {
       "q": "Where do scripts live on the flight controller?",
@@ -22,47 +22,47 @@
         "Inside the firmware, in the ROMFS section"
       ],
       "answer": 1,
-      "explain": "In SITL — the scripts folder in the directory the simulator was launched from."
+      "explain": "In SITL, the scripts folder of the directory the simulator was started from."
     },
     {
       "q": "What does update() return?",
       "options": [
-        "It returns nothing",
+        "It does not return anything",
         "Itself and a delay in ms",
         "A boolean true/false",
         "A status string"
       ],
       "answer": 1,
-      "explain": "The function and the delay until the next call: the scheduler calls it again on its own — no infinite loops."
+      "explain": "A function and the delay until the next call: the scheduler calls it again, so there are no infinite loops."
     },
     {
       "q": "RCx_OPTION = 300 is…",
       "options": [
         "Arm/disarm",
         "Scripting1",
-        "RTL return",
-        "Buzzer"
+        "Return, RTL",
+        "The buzzer"
       ],
       "answer": 1,
-      "explain": "300–307 are Scripting1…8, reserved for scripts."
+      "explain": "300–315 are Scripting1…16 (in 4.6, 300–307), reserved for scripts."
     },
     {
-      "q": "If one script exhausts the memory…",
+      "q": "If the Lua engine itself dies (Lua: Engine Error)…",
       "options": [
-        "The others keep running",
+        "The other scripts keep running",
         "All scripts stop",
-        "The controller reboots",
+        "The flight controller reboots",
         "Nothing noticeable happens"
       ],
       "answer": 1,
-      "explain": "All scripts stop until a reboot — hence the importance of SCR_HEAP_SIZE and careful coding."
+      "explain": "All scripts stop until scripting is restarted; an error in one script, including running out of memory inside its own call, removes only that script."
     },
     {
-      "q": "Why don't scripts using SIM_* end up on a real aircraft?",
+      "q": "Why do scripts that use SIM_* never go onto a real vehicle?",
       "options": [
-        "The license forbids them",
-        "A real FC has no SIM_*",
-        "They don't fit in size",
+        "The license forbids it",
+        "A real FC has no SIM_* parameters",
+        "They are too large to fit",
         "They work there as is"
       ],
       "answer": 1,
@@ -77,18 +77,18 @@
         "A boolean true/false and an error code"
       ],
       "answer": 1,
-      "explain": "A timer-based execution model."
+      "explain": "The timer-based execution model."
     },
     {
-      "q": "What the motor_failure_test.lua applet is for:",
+      "q": "What is the motor_failure_test.lua applet used for?",
       "options": [
         "PID autotuning",
-        "Motor failure testing",
-        "Compass calibration",
+        "A motor failure test",
+        "Calibrating the compass",
         "Extended logging"
       ],
       "answer": 1,
-      "explain": "Stops motors per a bitmask (MOT_STOP_BITMASK) with an RCx_OPTION 300 switch to test a failure."
+      "explain": "It stops motors by a bitmask (MOT_STOP_BITMASK) with an RCx_OPTION 300 switch to test a failure."
     }
   ]
 }

@@ -1,0 +1,51 @@
+{
+  "module": "ap-lua",
+  "tasks": [
+    {
+      "id": "engine-mask",
+      "title": "Motor failure mask",
+      "statement": "A fault injection script must cut motors **{a}** and **{b}** through `SIM_ENGINE_FAIL`. What number do you write to the parameter?",
+      "params": {
+        "a": [
+          1,
+          2,
+          3
+        ],
+        "b": [
+          4,
+          5,
+          6,
+          7,
+          8
+        ]
+      },
+      "answer": "2**(a-1) + 2**(b-1)",
+      "unit": "",
+      "tol": 0.0001,
+      "abs": 0.5,
+      "solution": "`SIM_ENGINE_FAIL` is a bitmask: bit 0 is motor (output) 1, bit k − 1 is motor k. Mask = 2^(a−1) + 2^(b−1). The module's example: motor 3 → 4, motor 1 → 1."
+    },
+    {
+      "id": "vm-calls",
+      "title": "How many update() calls it takes",
+      "statement": "A script processes an array of **{n}** elements, and each element takes about **{k}** Lua VM instructions. `SCR_VM_I_COUNT` = 10000, and by the course rule one call uses no more than half of the limit. In how many `update()` calls does the script process the array (an integer)?",
+      "params": {
+        "n": {
+          "min": 200,
+          "max": 3000,
+          "step": 100
+        },
+        "k": {
+          "min": 20,
+          "max": 120,
+          "step": 10
+        }
+      },
+      "answer": "math.ceil(n / math.floor(5000 / k))",
+      "unit": "",
+      "tol": 0.0001,
+      "abs": 0.5,
+      "solution": "Per call, no more than floor(5000 / k) elements (half of the 10000 instructions is a course guideline, leaving room for the rest of the call's code). Calls = ceil(n / floor(5000 / k)). Exceeding 10000 gives `exceeded time limit`, and the script is removed."
+    }
+  ]
+}

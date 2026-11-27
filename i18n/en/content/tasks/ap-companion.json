@@ -1,0 +1,53 @@
+{
+  "module": "ap-companion",
+  "tasks": [
+    {
+      "id": "uart-load",
+      "title": "Companion UART load",
+      "statement": "A companion receives LOCAL_POSITION_NED and ATTITUDE (28 bytes of payload each, MAVLink2 without a signature: +12 bytes of framing) at **{f} Hz** each. The FC port runs at **{b} baud** (8N1). What share of the link (in %) do these two streams take?",
+      "params": {
+        "f": [
+          10,
+          20,
+          25,
+          50
+        ],
+        "b": [
+          57600,
+          115200,
+          230400,
+          460800,
+          921600
+        ]
+      },
+      "answer": "2*f*(28 + 12)/(b/10)*100",
+      "unit": "%",
+      "tol": 0.01,
+      "solution": "Bytes on the wire = 2 · f · 40. An 8N1 UART uses 10 bits per byte, so the capacity = baud / 10 bytes/s (in the `SERIALn_BAUD` parameter these are the codes 57 … 921). Share = 2·f·40 / (baud/10) · 100%. The module's example: 50 Hz at 57600 → 69%, at 921600 → 4.3%. The course guideline is no higher than 50%."
+    },
+    {
+      "id": "guided-lost-setpoints",
+      "title": "How many targets in a row can be lost",
+      "statement": "A companion sends a velocity target at **{f} Hz**, with `GUID_TIMEOUT = {t}` s. How many targets in a row can be lost on the link **with a margin**, so that the pause between received targets stays strictly below the timeout (the largest integer)?",
+      "params": {
+        "f": [
+          2,
+          5,
+          10,
+          20
+        ],
+        "t": [
+          1.0,
+          2.0,
+          3.0,
+          5.0
+        ]
+      },
+      "answer": "math.ceil(f*t - 1e-9) - 2",
+      "unit": "pcs",
+      "tol": 0.001,
+      "abs": 0.01,
+      "solution": "Targets go out with a period of 1/f; if k in a row are lost, the pause = (k + 1)/f. The condition with a margin: (k + 1)/f < t → k < f·t − 1; the largest integer is k = ⌈f·t⌉ − 2. When f·t is an integer, the boundary (k + 1)/f = t is exactly the timeout: the comparison in the code is strict, but a 400 Hz loop counting milliseconds and the link jitter make such a pause a lottery, so we do not allow it. 5 Hz and 3 s → 13 targets; 2 Hz and 1 s → 0: any loss comes right up to the timeout."
+    }
+  ]
+}

@@ -1,0 +1,116 @@
+{
+ "module": "ap-setup-plane",
+ "pass": 80,
+ "questions": [
+  {
+   "q": "A flying wing, `MIXING_GAIN = 0.5`. In MANUAL the sticks work correctly. In FBWA you bank the plane to the right by hand, and the right elevon goes up while the left goes down. What does that mean?",
+   "options": [
+    "All is well: the autopilot repeats a right stick movement",
+    "The response is reversed: with a right bank the right elevon must go down; the direction was fixed through `RCn_REVERSED` or the transmitter",
+    "You need to raise `MIXING_GAIN` to 1.0, the response is too weak, and the direction will then be right as well",
+    "`SERVO_AUTO_TRIM = 1` is missing; after trimming, the direction will correct itself"
+   ],
+   "answer": 1,
+   "explain": "In FBWA the surfaces must bring the plane back: with a right bank the right elevon goes down and the left one up. If the stick in MANUAL still works correctly, both the output and the input are reversed: fix `SERVOn_REVERSED` (or swapped functions 77/78), then `RCn_REVERSED`."
+  },
+  {
+   "q": "Which functions are assigned to the halves of a V-tail, and how are they mixed in 4.7.2?",
+   "options": [
+    "79 and 80; left = (elevator + rudder) × `MIXING_GAIN`, right = (elevator − rudder) × `MIXING_GAIN`",
+    "77 and 78; left = (elevator − aileron) × `MIXING_GAIN`, right = (elevator + aileron) × `MIXING_GAIN`",
+    "19 and 21; the transmitter does the mixing, `MIXING_GAIN` is not used",
+    "79 and 80; left = elevator × `MIXING_GAIN`, right = rudder × `MIXING_GAIN`"
+   ],
+   "answer": 0,
+   "explain": "VTailLeft = 79, VTailRight = 80. `servos.cpp`: the mixer is called with rudder and elevator, and outputs (elevator − rudder) × gain to the right half and (elevator + rudder) × gain to the left. 77 and 78 are elevons."
+  },
+  {
+   "q": "Left elevon: MIN 1000, TRIM 1500, MAX 2000, not reversed, `MIXING_GAIN = 0.5`. Demands: aileron +2250, elevator +1800. What pulse width does the output get?",
+   "options": [
+    "1525 µs",
+    "1450 µs",
+    "1475 µs",
+    "1725 µs"
+   ],
+   "answer": 2,
+   "explain": "(1800 − 2250) × 0.5 = −225; 225 × 500 / 4500 = 25; 1500 − 25 = 1475 µs. 1450 is what you get without `MIXING_GAIN`, 1725 is the right elevon (the sum), 1525 has the sign wrong."
+  },
+  {
+   "q": "ArduPlane 4.7.2, default values (`RC_FS_TIMEOUT = 1`, `FS_SHORT_ACTN = 0`, `FS_LONG_ACTN = 0`, `FS_LONG_TIMEOUT = 5`). In FBWA the receiver stops sending frames. What happens?",
+   "options": [
+    "After 1.5 s (`FS_SHORT_TIMEOUT`) CIRCLE, and after 5 s the plane continues in FBWA",
+    "At about 1.2 s CIRCLE, at about 5 s RTL",
+    "RTL at once: a plane has no short failsafe",
+    "At about 1.2 s CIRCLE, then no change: 0 means \"Continue\""
+   ],
+   "answer": 1,
+   "explain": "The loss is detected after `RC_FS_TIMEOUT` plus 10 cycles of 20 ms. Short action 0 from a manual mode is CIRCLE. Long action 0 \"continues\" only AUTO and GUIDED; from CIRCLE and the manual modes it gives RTL (`events.cpp`). `FS_SHORT_TIMEOUT` was removed in 4.7."
+  },
+  {
+   "q": "A mission in AUTO, `FS_SHORT_ACTN = 1`, `FS_LONG_ACTN = 0`. The link to the transmitter is lost for good. How does it end?",
+   "options": [
+    "The mission runs to the end: long action 0 is \"Continue\", and it applies to the mode the mission was flown in",
+    "The plane stays in CIRCLE until the battery is flat",
+    "CIRCLE, then RTL: the long action is chosen by the mode at the time of the long event, which is already CIRCLE",
+    "CIRCLE, then back to AUTO in the fifth second"
+   ],
+   "answer": 2,
+   "explain": "Short action 1 puts AUTO into CIRCLE. After `FS_LONG_TIMEOUT` the firmware looks at the current mode, and CIRCLE is in the group for which values 0 and 1 give RTL. For the mission to continue without a link you need `FS_SHORT_ACTN = 0`."
+  },
+  {
+   "q": "An MS4525 sensor is connected, airspeed shows in the OSD, `ARSPD_TYPE = 1`, `ARSPD_USE = 0`. How does TECS control the throttle in CRUISE mode?",
+   "options": [
+    "From the sensor: `ARSPD_USE` affects only logging and has no influence on control",
+    "It holds `AIRSPEED_CRUISE` using GPS speed",
+    "The throttle stays manual until `ARSPD_USE` is 1",
+    "From pitch around `TRIM_THROTTLE`: the sensor is only displayed and logged"
+   ],
+   "answer": 3,
+   "explain": "`ARSPD_USE = 0` (the default) means the sensor takes no part in control. Without airspeed TECS sets the throttle by interpolation: `TRIM_THROTTLE` in level flight, up to `THR_MAX` at the pitch-up limit and down to `THR_MIN` at the pitch-down limit."
+  },
+  {
+   "q": "`ARSPD_RATIO = 2.0`. Over opposite legs the mean GPS speed is 18.0 m/s and the indicated airspeed is 16.2 m/s. What is the new value?",
+   "options": [
+    "2.47",
+    "2.22",
+    "1.62",
+    "1.80"
+   ],
+   "answer": 0,
+   "explain": "V = √(Δp × RATIO), so RATIO changes as the square of the speed ratio: 2.0 × (18.0 / 16.2)² = 2.47. 2.22 is the ratio without the square, 1.62 and 1.80 are corrections in the wrong direction."
+  },
+  {
+   "q": "A parameter file from firmware 4.4 had `TRIM_ARSPD_CM = 1400` and `ALT_HOLD_RTL = 10000`. What do you write in 4.7 when transferring by hand?",
+   "options": [
+    "`AIRSPEED_CRUISE = 1400`, `RTL_ALTITUDE = 10000`: new names, same numbers",
+    "`AIRSPEED_CRUISE = 14`, `RTL_ALTITUDE = 100`",
+    "`AIRSPEED_MIN = 14`, `RTL_ALT_M = 100`",
+    "`AIRSPEED_CRUISE = 14`, `RTL_ALTITUDE = 10000`"
+   ],
+   "answer": 1,
+   "explain": "Since 4.5 `AIRSPEED_CRUISE` is in m/s (it was cm/s) and `RTL_ALTITUDE` is in meters (it was cm). On an update the firmware converts them itself; in a manual transfer the old number gives 1400 m/s and 10 km. `RTL_ALT_M` is a Copter parameter."
+  },
+  {
+   "q": "A pusher wing is hand launched in TAKEOFF mode. `TKOFF_THR_MINACC = 0`, `TKOFF_THR_MINSPD = 0`, `TKOFF_THR_DELAY = 2`. When does the motor start?",
+   "options": [
+    "After the throw, once GPS shows 4 m/s of ground speed",
+    "Only after climbing to `TKOFF_LVL_ALT`",
+    "2 s after arming: the `TKOFF_THR_DELAY` delay is in seconds",
+    "0.2 s after arming with a 3D fix, still in your hand"
+   ],
+   "answer": 3,
+   "explain": "Zero values turn off the acceleration and speed checks; what remains is the `TKOFF_THR_DELAY` pause in tenths of a second, 0.2 s. For a throw with a pusher prop you set 15 m/s² and 4 m/s."
+  },
+  {
+   "q": "`STALL_PREVENTION = 1`, `AIRSPEED_STALL = 0`, `AIRSPEED_MIN = 11`, `ROLL_LIMIT_DEG = 45`. Navigation demands a 45° bank at 12 m/s. What bank do you get?",
+   "options": [
+    "45°: only `ROLL_LIMIT_DEG` sets the limit",
+    "25°: below `AIRSPEED_CRUISE` the bank is always 25°",
+    "About 33°: arccos(1 / (12 / 11)²)",
+    "0°: below 1.2 × `AIRSPEED_MIN` turns are not allowed"
+   ],
+   "answer": 2,
+   "explain": "The allowed load factor is n = (V / V_st)² = (12 / 11)² = 1.19, where V_st with `AIRSPEED_STALL = 0` is `AIRSPEED_MIN`. The bank limit is arccos(1 / 1.19) = 32.8°; the firmware does not take the limit below 25°."
+  }
+ ]
+}

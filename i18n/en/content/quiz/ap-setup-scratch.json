@@ -1,0 +1,98 @@
+{
+ "module": "ap-setup-scratch",
+ "pass": 80,
+ "questions": [
+  {
+   "q": "An ELRS receiver (CRSF over a wire) is connected to the UART that ArduCopter 4.6 calls SERIAL4. What do you set first?",
+   "options": [
+    "SERIAL4_PROTOCOL = 23 (RCIN)",
+    "SERIAL4_PROTOCOL = 29 (Crossfire VTX)",
+    "SERIAL4_PROTOCOL = 2 (MAVLink2)",
+    "SERIAL4_BAUD = 420 and leave the protocol alone"
+   ],
+   "answer": 0,
+   "explain": "Any serial RC receiver in ArduPilot uses protocol 23 (RCIN); the firmware sets the port baud rate itself. 29 is VTX control over CRSF, and MAVLink applies only if the receiver is configured to output MAVLink (a different setup, RSSI_TYPE = 5)."
+  },
+  {
+   "q": "The channels in Mission Planner do not move, while the ELRS receiver indicates a link. Where is the mistake?",
+   "kind": "apply",
+   "fragment": "SERIAL3_PROTOCOL  23\nSERIAL3_BAUD      115\nRC_PROTOCOLS      8\nRC_OPTIONS        8736\nRSSI_TYPE         3",
+   "options": [
+    "RC_PROTOCOLS = 8 enables SBUS only; CRSF needs bit 9 (512) or the value 1",
+    "SERIAL3_BAUD = 115 is too low, you have to set 420 manually",
+    "RC_OPTIONS = 8736 contains bit 0 (Ignore RC Receiver) and so disables RC input",
+    "RSSI_TYPE = 3 requires a separate analog RSSI input"
+   ],
+   "answer": 0,
+   "explain": "RC_PROTOCOLS is a bitmask: bit 3 (8) is SBUS, bit 9 (512) is CRSF, 1 enables all. The firmware sets the baud rate for RCIN, 8736 = 32 + 512 + 8192 (bits 5, 9, 13) with no bit 0 in it; RSSI_TYPE 3 takes RSSI/LQ from the receiver protocol."
+  },
+  {
+   "q": "The board arrived with Betaflight. How, and with which file, do you install ArduPilot the first time?",
+   "options": [
+    "DFU (BOOT button) + STM32CubeProgrammer, file arducopter_with_bl.hex",
+    "Mission Planner → Load custom firmware, file arducopter.apj",
+    "Betaflight Configurator in CLI mode, the command flash arducopter.apj",
+    "QGroundControl → Firmware, file arducopter.hex without the bootloader"
+   ],
+   "answer": 0,
+   "explain": "The board has no ArduPilot bootloader yet, so the first flash goes over DFU with the _with_bl.hex file (bootloader plus firmware). Only the ArduPilot bootloader understands .apj: it is used to update an already flashed board from Mission Planner or QGC."
+  },
+  {
+   "q": "Quad X (FRAME_TYPE = 1), Mission Planner → Motor Test. In what order should the motors spin for buttons A, B, C, D?",
+   "options": [
+    "Clockwise: front right, rear right, rear left, front left",
+    "By output number: 1, 2, 3, 4, that is front right, rear left, front left, rear right",
+    "Counterclockwise: front left, rear left, rear right, front right",
+    "As in Betaflight: rear right, front right, rear left, front left"
+   ],
+   "answer": 0,
+   "explain": "The test letters go around clockwise from the first motor to the right of the nose. For Quad X these are motors 1, 4, 2, 3: in SITL buttons A/B/C/D raised SERVO1, SERVO4, SERVO2, SERVO3. The Betaflight order is FRAME_TYPE 12 (BetaFlightX)."
+  },
+  {
+   "q": "BATT_VOLT_MULT = 11.0, the GCS shows 16.20 V, the multimeter shows 16.52 V. What is the new value?",
+   "options": [
+    "11.22",
+    "10.79",
+    "11.32",
+    "11.44"
+   ],
+   "answer": 0,
+   "explain": "V = V_pin · BATT_VOLT_MULT, so the multiplier scales by the ratio: 11.0 · 16.52 / 16.20 = 11.22. 10.79 is the inverted ratio, 11.32 adds the voltage difference to the multiplier, 11.44 uses the square of the ratio."
+  },
+  {
+   "q": "Motor Test with the props off: all four motors start reliably at 6 %. Which MOT_SPIN_ARM and MOT_SPIN_MIN does the ArduPilot procedure give?",
+   "options": [
+    "SPIN_ARM 0.08, SPIN_MIN 0.11",
+    "SPIN_ARM 0.06, SPIN_MIN 0.06",
+    "SPIN_ARM 0.11, SPIN_MIN 0.08",
+    "SPIN_ARM 0.02, SPIN_MIN 0.08"
+   ],
+   "answer": 0,
+   "explain": "SPIN_ARM = (threshold + 2 %)/100 = 0.08, so the motors are guaranteed to spin after arming; SPIN_MIN is at least SPIN_ARM + 0.03 = 0.11, below which thrust is not controllable. SPIN_ARM is always lower than SPIN_MIN."
+  },
+  {
+   "q": "An RC failsafe check on the ground: Stabilize, motors armed, throttle at zero, no props. You switch off the transmitter. What should happen?",
+   "options": [
+    "The vehicle disarms immediately",
+    "RTL engages and the motors spin up",
+    "Land engages with the motors at idle",
+    "Nothing, the failsafe works only in Loiter"
+   ],
+   "answer": 0,
+   "explain": "Per the Radio Failsafe documentation, an armed vehicle on the ground disarms immediately on failsafe. RTL/Land happen only in the air (a test with the throttle at mid-stick). In SITL you see it as \"Radio Failsafe - Disarming\"."
+  },
+  {
+   "q": "A first hover of 60 s. What do you do before QuikTune/AutoTune?",
+   "kind": "apply",
+   "fragment": "VIBE  VibeX=18.4 VibeY=21.7 VibeZ=46.3 Clip=0/112/0\nCTUN  ThO=0.31 ThH=0.31\nMOT_THST_HOVER 0.31",
+   "options": [
+    "Remove the vibration: balance the props, damp the FC; Z > 30 plus clipping",
+    "Run AutoTune right away: hover throttle 0.31 is fine, and AutoTune removes the vibration itself",
+    "Raise MOT_SPIN_MIN to 0.25 so the vibration moves down to idle",
+    "Reduce MOT_THST_HOVER to 0.2, the hover throttle is too high"
+   ],
+   "answer": 0,
+   "explain": "VibeZ 46 m/s² is above the limit of 30 and the accelerometer is clipping, so altitude and AltHold will drift and AutoTune will abort or converge on garbage. A hover throttle of 0.31 is inside the working range 0.2–0.5; MOT_THST_HOVER is learned automatically (MOT_HOVER_LEARN = 2)."
+  }
+ ]
+}

@@ -30,13 +30,13 @@ source_hash: 11f9b2c648f9
 ### Карта failsafe ArduCopter
 | Failsafe | Тригер | Параметри | Дії (значення) |
 |---|---|---|---|
-| Радіо (RC) | приймач перестав видавати кадри (no pulses) або канал газу ≤ `FS_THR_VALUE` (PWM, 910–1100) | `FS_THR_ENABLE`, `FS_THR_VALUE` | 0 вимк., 1 RTL, 3 Land, 4 SmartRTL/RTL, 5 SmartRTL/Land, 6 DO_LAND_START або RTL, 7 Brake/Land |
+| Радіо (RC) | приймач перестав видавати кадри (no pulses) або канал газу нижче за `FS_THR_VALUE` три зчитування поспіль (PWM, 910–1100) | `FS_THR_ENABLE`, `FS_THR_VALUE` | 0 вимк., 1 RTL, 3 Land, 4 SmartRTL/RTL, 5 SmartRTL/Land, 6 DO_LAND_START або RTL, 7 Brake/Land |
 | GCS | немає heartbeat від наземки > `FS_GCS_TIMEOUT` (5 с за замовчуванням) | `FS_GCS_ENABLE`, `FS_GCS_TIMEOUT` | 0 вимк., 1 RTL, 3 SmartRTL/RTL, 4 SmartRTL/Land, 5 Land, 6 DO_LAND_START або RTL, 7 Brake/Land (нумерація відрізняється від `FS_THR_ENABLE`); актуальний для Guided/телеметрії |
 | АКБ низька | напруга < `BATT_LOW_VOLT` (з таймером `BATT_LOW_TIMER`) або залишок < `BATT_LOW_MAH` | `BATT_FS_LOW_ACT` | 0 попередження, 1 Land, 2 RTL, 3 SmartRTL/RTL, 4 SmartRTL/Land, 5 Terminate, 6 DO_LAND_START/RTL, 7 Brake/Land |
 | АКБ критична | < `BATT_CRT_VOLT` / `BATT_CRT_MAH` | `BATT_FS_CRT_ACT` | ті самі, зазвичай Land |
 | EKF | дисперсії > `FS_EKF_THRESH` | `FS_EKF_ACTION` | 0 повідомлення, 1 Land, якщо режим потребує позицію, 2 AltHold, 3 Land завжди |
 | Dead reckoning | EKF втратив джерела позиції/швидкості й іде за вітром | `FS_DR_ENABLE`, `FS_DR_TIMEOUT` | Land / RTL / SmartRTL… |
-| Вібрації | кліпінг акселерометра, помилка висоти | `FS_VIBE_ENABLE` | змінене оцінювання висоти та керування |
+| Вібрації | вертикальні інновації швидкості й позиції EKF обидві додатні за високої дисперсії швидкості 1 с (ознака кліпінгу/аліасингу) | `FS_VIBE_ENABLE` | змінене оцінювання висоти та керування (`ERR` FAILSAFE_VIBE, «Vibration compensation ON») |
 | Геозона | вихід за коло/багатокутник/висоту | `FENCE_ENABLE`, `FENCE_TYPE`, `FENCE_ACTION`, `FENCE_ALT_MAX`, `FENCE_RADIUS`, `FENCE_MARGIN` | 0 повідомлення, 1 RTL/Land, 2 Land завжди, 3 SmartRTL/RTL, 4 Brake/Land, 5 SmartRTL/Land |
 | Опції | що робити замість дії за замовчуванням | `FS_OPTIONS` (бітова маска) | продовжувати Auto при втраті RC (біт 0), продовжувати Auto при втраті GCS (біт 1), Guided при втраті RC (біт 2), продовжувати посадку (біт 3), пілотовані режими при втраті GCS (біт 4) |
 
@@ -47,7 +47,7 @@ source_hash: 11f9b2c648f9
 - RTL потребує позицію: при EKF failsafe дія деградує до Land/AltHold.
 - RTL спочатку набирає `RTL_ALT_M` (у 4.6 і раніше — `RTL_ALT` у см; мінімальна висота над домом для повернення, за замовчуванням 15 м; якщо апарат уже вище — повертається на поточній), біля дому висоту обмежує конус `RTL_CONE_SLOPE` (за замовчуванням 3): h_ret = min(max(`RTL_ALT_M`, h), max(3·d, h)), де d — відстань до дому, тому просто над домом набору немає (розбір — `ap-sitl`); летить додому, зависає `RTL_LOIT_TIME`, сідає (`RTL_ALT_FINAL = 0`). Над перешкодами, вищими за RTL_ALT_M, — зіткнення; геозона за висотою — ще один обмежувач.
 - SmartRTL повертається пройденим шляхом (пам'ять точок, `SRTL_POINTS`) — добрий у лісі/між будівлями, але потребує, щоб пам'ять не переповнилася.
-- Геозона: у разі порушення — дія; `FENCE_MARGIN` і попередження заздалегідь; передармова перевірка не дає армити поза зоною.
+- Геозона: у разі порушення — дія; `FENCE_MARGIN` — відстань, яку автоматичні режими тримають від межі (попередження при вході в цю смугу — лише з бітом 2 `FENCE_OPTIONS`); передармова перевірка не дає армити поза зоною.
 - `FS_OPTIONS` «продовжувати Auto при втраті RC» — для BVLOS-місій за дозволом; без дозволу — вимкнено.
 
 ### FMEA польоту

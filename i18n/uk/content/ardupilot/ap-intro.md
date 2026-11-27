@@ -66,7 +66,7 @@ ArduPilot помітно важчий за Betaflight. На F4-контроле�
 - Тюнінг частіше починають з AUTOTUNE, а не з ручного PID.
 
 ### Режими Copter за номерами (`FLTMODE1..6`, значення з `Parameters.cpp`)
-0 Stabilize, 1 Acro, 2 AltHold, 3 Auto, 4 Guided, 5 Loiter, 6 RTL, 7 Circle, 9 Land, 11 Drift, 13 Sport, 14 Flip, 15 AutoTune, 16 PosHold, 17 Brake, 18 Throw, 20 Guided_NoGPS, 21 Smart_RTL, 22 FlowHold, 23 Follow, 24 ZigZag, 25 SystemID, 27 Auto RTL, 28 Turtle. Шість позицій каналу `FLTMODE_CH` (межі PWM 1230/1360/1490/1620/1749) + будь-які режими на `RCx_OPTION`. Групи за вимогами до датчиків: без позиції — Stabilize, Acro, AltHold (баро), Land (частково), FlowHold (потік); з позицією — Loiter, PosHold, Auto, Guided, RTL, Smart_RTL, Circle, Follow, ZigZag, Brake. Перший політ будь-якої збірки — Stabilize → AltHold → Loiter саме в такому порядку.
+0 Stabilize, 1 Acro, 2 AltHold, 3 Auto, 4 Guided, 5 Loiter, 6 RTL, 7 Circle, 9 Land, 11 Drift, 13 Sport, 14 Flip, 15 AutoTune, 16 PosHold, 17 Brake, 18 Throw, 19 Avoid_ADSB, 20 Guided_NoGPS, 21 Smart_RTL, 22 FlowHold, 23 Follow, 24 ZigZag, 25 SystemID, 26 Heli_Autorotate, 27 Auto RTL, 28 Turtle. Шість позицій каналу `FLTMODE_CH` (межі PWM 1230/1360/1490/1620/1749) + будь-які режими на `RCx_OPTION`. Групи за вимогами до датчиків: без позиції — Stabilize, Acro, AltHold (баро), Land (частково), FlowHold (потік); з позицією — Loiter, PosHold, Auto, Guided, RTL, Smart_RTL, Circle, Follow, ZigZag, Brake. Перший політ будь-якої збірки — Stabilize → AltHold → Loiter саме в такому порядку.
 
 ### Порядок першого налаштування (Mission Planner / QGC)
 1. Прошивка за типом плати (`hwdef`), вибір frame class/type (`FRAME_CLASS`, `FRAME_TYPE`).
@@ -78,7 +78,7 @@ ArduPilot помітно важчий за Betaflight. На F4-контроле�
 7. Motor test (Mission Planner → Optional Hardware → Motor Test) без пропелерів: порядок і напрямок за схемою frame type.
 
 ### Розібраний приклад: перехід пілота з Betaflight
-«Чому не армиться?» — `ARMING_SKIPCHK` повідомляє причину текстом (компас, GPS, INS, параметри, RC не відкалібровано); «чому не тримає висоту в Stabilize?» — бо Stabilize = Betaflight Angle, висоту тримає AltHold; «де rates?» — `ACRO_RP_RATE`/`ACRO_Y_RATE`, `ACRO_RP_EXPO`; «де PID?» — `ATC_RAT_RLL_P/I/D/FF/FLTD/FLTE/FLTT` (rate) і `ATC_ANG_RLL_P` (angle); «де фільтри?» — `INS_GYRO_FILTER`, `INS_HNTCH_*`; «де Blackbox?» — DataFlash на SD, Log Review; «де diff all?» — Full Parameter List → Save/Compare, або `param save` у MAVProxy.
+«Чому не армиться?» — `ARMING_SKIPCHK` повідомляє причину текстом (компас, GPS, INS, параметри, RC не відкалібровано); «чому не тримає висоту в Stabilize?» — бо Stabilize = Betaflight Angle, висоту тримає AltHold; «де rates?» — `ACRO_RP_RATE`/`ACRO_Y_RATE`, `ACRO_RP_EXPO`; «де PID?» — `ATC_RAT_RLL_P/I/D/FF/FLTD/FLTE/FLTT` (rate) і `ATC_ANG_RLL_P` (angle); «де фільтри?» — `INS_GYRO_FILTER`, `INS_HNTCH_*`; «де Blackbox?» — DataFlash на SD, Review a Log; «де diff all?» — Full Parameter List → Save to file / Compare Params, або `param save` у MAVProxy.
 
 ## practice
 ### Перше знайомство без ризику

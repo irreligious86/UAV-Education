@@ -3,62 +3,62 @@
  "pass": 80,
  "questions": [
   {
-   "q": "Камера спускается через реле: `CAM1_TYPE = 2`, `RELAY1_PIN = 58`, у выхода 9 `SERVO9_FUNCTION = -1`, `RELAY1_FUNCTION = 1`. Что будет в полёте с `DO_SET_CAM_TRIGG_DIST`?",
+   "q": "The camera is triggered through a relay: `CAM1_TYPE = 2`, `RELAY1_PIN = 58`, output 9 has `SERVO9_FUNCTION = -1`, `RELAY1_FUNCTION = 1`. What happens in flight with `DO_SET_CAM_TRIGG_DIST`?",
    "options": [
-    "Арм запрещён: реле с функцией 1 нельзя использовать для камеры",
-    "Ножка не меняется, но записи `CAM` в логе идут на каждый «кадр»",
-    "Камера снимает нормально: драйвер реле берёт первое настроенное реле",
-    "Ножка переключается, но лог `CAM` не пишется без обратной связи"
+    "Arming is refused: a relay with function 1 cannot be used for a camera",
+    "The pin does not change, but `CAM` records are logged for every \"picture\"",
+    "The camera shoots normally: the relay driver takes the first configured relay",
+    "The pin toggles, but the `CAM` log is not written without shutter feedback"
    ],
    "answer": 1,
-   "explain": "`AP_Camera_Relay` вызывает `AP_Relay::set(FUNCTION::CAMERA, …)` — ищется реле с функцией 4. С функцией 1 ни одна ножка не меняется, а `take_picture()` считает спуск выполненным и пишет `CAM`. Проверки перед армом на это нет."
+   "explain": "`AP_Camera_Relay` calls `AP_Relay::set(FUNCTION::CAMERA, …)`, which looks for a relay with function 4. With function 1 no pin changes, yet `take_picture()` counts the trigger as done and writes `CAM`. There is no pre-arm check for this."
   },
   {
-   "q": "`CAM1_FEEDBAK_PIN = -1`. Какие сообщения о кадрах будут в логе и что означает их время?",
+   "q": "`CAM1_FEEDBAK_PIN = -1`. Which picture messages will be in the log, and what does their time mean?",
    "options": [
-    "Только `TRIG`, время — момент команды на спуск",
-    "`TRIG` и `CAM`, время `CAM` — момент срабатывания затвора",
-    "Только `CAM`, время — момент команды на спуск",
-    "Никаких: без обратной связи кадры не логируются"
+    "Only `TRIG`, and the time is the moment of the trigger command",
+    "`TRIG` and `CAM`, and the `CAM` time is the moment the shutter fires",
+    "Only `CAM`, and the time is the moment of the trigger command",
+    "None: without shutter feedback pictures are not logged at all"
    ],
    "answer": 2,
-   "explain": "`log_picture()`: без ножки пишется `Write_Camera()` в момент спуска; `TRIG` пишется только при заданной ножке, а `CAM` тогда — по фронту на ножке."
+   "explain": "`log_picture()`: without a pin, `Write_Camera()` is written at the moment of the trigger; `TRIG` is written only when the pin is set, and `CAM` is then written on the edge at the pin."
   },
   {
-   "q": "`CAM1_TRIGG_DIST = 24`, `CAM1_INTRVAL_MIN = 1.5`, путевая скорость 18 м/с. Какой будет шаг между кадрами?",
+   "q": "`CAM1_TRIGG_DIST = 24`, `CAM1_INTRVAL_MIN = 1.5`, ground speed 18 m/s. What is the spacing between pictures?",
    "options": [
-    "24 м: аппарат сам замедлится до 16 м/с",
-    "48 м: каждый второй спуск пропускается",
-    "24 м: интервал ограничивает только ручной спуск",
-    "27 м: спуск ждёт 1.5 с, аппарат не тормозит"
+    "24 m: the vehicle slows down to 16 m/s by itself",
+    "48 m: every second trigger is skipped by the driver",
+    "24 m: the interval limits only a manual trigger",
+    "27 m: the trigger waits 1.5 s, the vehicle does not slow down"
    ],
    "answer": 3,
-   "explain": "`take_picture()` при недошедшем интервале ставит `trigger_pending` и делает кадр, как только 1.5 с истекут: шаг 18 · 1.5 = 27 м. 48 м было бы при `CAM1_INTRVAL_MIN = 0` и камере, которая пропускает спуск."
+   "explain": "When the interval has not elapsed, `take_picture()` sets `trigger_pending` and takes the picture as soon as the 1.5 s are up: the spacing is 18 · 1.5 = 27 m. 48 m would be the result of `CAM1_INTRVAL_MIN = 0` and a camera that misses a trigger."
   },
   {
-   "q": "Сервоподвес: `MNT1_PITCH_MIN = -90`, `MNT1_PITCH_MAX = 20`, `SERVO8_MIN = 1100`, `SERVO8_MAX = 1900`, `SERVO8_TRIM = 1500`. Какой импульс при наклоне 0°?",
+   "q": "Servo gimbal: `MNT1_PITCH_MIN = -90`, `MNT1_PITCH_MAX = 20`, `SERVO8_MIN = 1100`, `SERVO8_MAX = 1900`, `SERVO8_TRIM = 1500`. What is the pulse at a pitch of 0°?",
    "options": [
-    "1500 мкс",
-    "1754 мкс",
-    "1755 мкс",
-    "1900 мкс"
+    "1500 µs",
+    "1754 µs",
+    "1755 µs",
+    "1900 µs"
    ],
    "answer": 1,
-   "explain": "`move_servo`: v = (0 − (−900)) / 1100 = 0.818; 1100 + ⌊0.818 · 800⌋ = 1100 + 654 = 1754. TRIM в формуле нет; 1755 — округление вместо отбрасывания."
+   "explain": "`move_servo`: v = (0 − (−900)) / 1100 = 0.818; 1100 + ⌊0.818 · 800⌋ = 1100 + 654 = 1754. TRIM is not in the formula; 1755 is rounding instead of truncation."
   },
   {
-   "q": "Бесколлекторный подвес со своим контроллером и входами PWM на каждую ось. Какой `MNT1_TYPE` выбрать?",
+   "q": "A brushless gimbal with its own controller and a PWM input per axis. Which `MNT1_TYPE` do you choose?",
    "options": [
-    "1 — Servo, чтобы полётник добавлял стабилизацию",
-    "7 — BrushlessPWM: полётник задаёт угол, наклон не вычитает",
-    "8 — Siyi: это общий тип для подвесов с контроллером",
-    "6 — MAVLink: PWM-подвесы опрашиваются по MAVLink"
+    "1, Servo, so that the flight controller adds its stabilization",
+    "7, BrushlessPWM: the flight controller sets the angle and does not subtract the tilt",
+    "8, Siyi: it is the general type for gimbals with a controller",
+    "6, MAVLink: PWM gimbals are polled over MAVLink by the firmware"
    ],
    "answer": 1,
-   "explain": "Тип 7 создаёт `AP_Mount_Servo` с `requires_stabilization = false`. Тип 1 вычитал бы наклон аппарата поверх собственной стабилизации — компенсация вдвое."
+   "explain": "Type 7 creates `AP_Mount_Servo` with `requires_stabilization = false`. Type 1 would subtract the vehicle attitude on top of the gimbal's own stabilization, doubling the compensation."
   },
   {
-   "q": "Siyi на `SERIAL2`. Какой набор параметров нужен?",
+   "q": "A Siyi on `SERIAL2`. Which set of parameters is needed?",
    "options": [
     "`SERIAL2_PROTOCOL = 2`, `MNT1_TYPE = 6`, `CAM1_TYPE = 6`",
     "`SERIAL2_PROTOCOL = 7`, `MNT1_TYPE = 8`, `CAM1_TYPE = 5`",
@@ -66,51 +66,51 @@
     "`SERIAL2_PROTOCOL = 8`, `MNT1_TYPE = 5`, `CAM1_TYPE = 1`"
    ],
    "answer": 2,
-   "explain": "Siyi — драйвер с последовательным портом протокола 8 (Gimbal, 115200 ставится сам), тип подвеса 8; камера внутри подвеса спускается через драйвер подвеса — `CAM1_TYPE = 4`. Протокол 7 — только Alexmos, тип 5 — SToRM32 Serial."
+   "explain": "Siyi is a driver on a serial port with protocol 8 (Gimbal, 115200 is set automatically), mount type 8; the camera inside the gimbal is triggered through the gimbal driver, `CAM1_TYPE = 4`. Protocol 7 is Alexmos only, and type 5 is SToRM32 Serial."
   },
   {
-   "q": "Захват — серва со штифтом, но в параметрах `GRIP_TYPE = 2`. Что произойдёт после команды «захватить»?",
+   "q": "The gripper is a servo with a pin, but the parameters have `GRIP_TYPE = 2`. What happens after a \"grab\" command?",
    "options": [
-    "Через 0.5 с выход вернётся на `GRIP_NEUTRAL`",
-    "Ничего: тип 2 работает только по CAN",
-    "Серва встанет на `GRIP_GRAB` и останется там",
-    "Арм запрещён до исправления типа"
+    "After 0.5 s the output returns to `GRIP_NEUTRAL`",
+    "Nothing: type 2 works only over CAN",
+    "The servo goes to `GRIP_GRAB` and stays there",
+    "Arming is refused until the type is corrected"
    ],
    "answer": 0,
-   "explain": "Драйвер EPM даёт импульс и через `EPM_RETURN_TO_NEUTRAL_MS` = 500 мс ставит `GRIP_NEUTRAL` (1500): серва уходит в среднее положение. Ветка CAN в 4.7.2 не собирается."
+   "explain": "The EPM driver gives a pulse and after `EPM_RETURN_TO_NEUTRAL_MS` = 500 ms sets `GRIP_NEUTRAL` (1500): the servo goes to the middle position. The CAN branch is not built in 4.7.2."
   },
   {
-   "q": "Copter 4.7.2, плата с кнопкой безопасности, моторы на выходах 1–4, `BRD_SAFETY_MASK` не задавали. Серва захвата на выходе 7, реле на ножке GPIO выхода 9. Что сработает при включённой блокировке?",
+   "q": "Copter 4.7.2, a board with a safety switch, motors on outputs 1–4, `BRD_SAFETY_MASK` was never set. The gripper servo is on output 7, a relay is on the GPIO pin of output 9. What works while the safety is on?",
    "options": [
-    "Ничего: блокировка держит все выходы, пока кнопку не нажали",
-    "Только реле: ножки GPIO блокировка не проверяет",
-    "Только захват: выход 7 в маске по умолчанию",
-    "И захват, и реле"
+    "Nothing: the safety holds all outputs until the switch is pressed",
+    "Only the relay: GPIO pins are not checked against the safety state",
+    "Only the gripper: output 7 is in the default mask",
+    "Both the gripper and the relay"
    ],
    "answer": 3,
-   "explain": "Умолчание Copter — все немоторные выходы 1–14 (16368), бит выхода 7 установлен. Запись в ножку GPIO идёт мимо блокировки. Чтобы удержать захват, нужно записать маску без бита 64."
+   "explain": "The Copter default is all non-motor outputs 1–14 (16368), so the bit of output 7 is set. A write to a GPIO pin bypasses the safety. To hold the gripper you have to write a mask without bit 64."
   },
   {
-   "q": "Миссия: `NAV_WAYPOINT` (точка сброса) → `DO_GRIPPER` → `CONDITION_DELAY` 2 с → `DO_DIGICAM_CONTROL` → `NAV_RETURN_TO_LAUNCH`. Что исполнится в точке?",
+   "q": "Mission: `NAV_WAYPOINT` (the release point) → `DO_GRIPPER` → `CONDITION_DELAY` 2 s → `DO_DIGICAM_CONTROL` → `NAV_RETURN_TO_LAUNCH`. What executes at the point?",
    "options": [
-    "Всё: DO-команды выполняются до старта следующей навигационной",
-    "Сброс; кадр — только если RTL продлится больше 2 с",
-    "Ничего: DO-команды надо ставить до `NAV_WAYPOINT`",
-    "Кадр, а сброс отложится до посадки"
+    "Everything: DO commands run before the next navigation command starts",
+    "The release; the picture only if RTL lasts longer than 2 s",
+    "Nothing: DO commands have to be placed before `NAV_WAYPOINT`",
+    "The picture, while the release is postponed until landing"
    ],
    "answer": 1,
-   "explain": "DO-команды между двумя навигационными стартуют вместе со второй (здесь RTL) и исполняются, пока она идёт. `DO_GRIPPER` — сразу, кадр — после задержки 2 с, но аппарат при этом уже летит домой; если RTL завершится раньше, остаток отбросится. Поэтому в модуле после DO-команд стоит `NAV_LOITER_TIME`."
+   "explain": "DO commands between two navigation commands start together with the second one (RTL here) and execute while it is running. `DO_GRIPPER` runs at once and the picture after the 2 s delay, but by then the vehicle is already flying home; if RTL completes earlier, the remainder is discarded. That is why the module puts `NAV_LOITER_TIME` after the DO commands."
   },
   {
-   "q": "Пульт включили, когда тумблер `RC7_OPTION = 19` стоял в нижнем положении, груз уже подвешен. Что сделает Copter 4.7.2?",
+   "q": "The transmitter was turned on while the `RC7_OPTION = 19` switch was in the low position, and the payload was already hung. What does Copter 4.7.2 do?",
    "options": [
-    "Ничего: положение при первом кадре только запоминается",
-    "Откроет захват при первом кадре приёмника",
-    "Откроет захват только после арма",
-    "Запретит арм сообщением о положении тумблера"
+    "Nothing: the position on the first frame is only stored",
+    "It opens the gripper on the first receiver frame",
+    "It opens the gripper only after arming",
+    "It refuses to arm with a message about the switch position"
    ],
    "answer": 1,
-   "explain": "`init_position_on_first_radio_read` возвращает true только для арма и выпуска парашюта. Для захвата первое прочитанное положение исполняется: LOW — `gripper.release()`."
+   "explain": "`init_position_on_first_radio_read` returns true only for arming and parachute release. For the gripper the first position read is executed: LOW is `gripper.release()`."
   }
  ]
 }

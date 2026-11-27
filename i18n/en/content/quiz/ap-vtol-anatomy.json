@@ -1,0 +1,116 @@
+{
+  "module": "ap-vtol-anatomy",
+  "pass": 80,
+  "questions": [
+    {
+      "q": "What happens in ArduPlane 4.7.2 with Q_ENABLE = 1 and a reboot?",
+      "options": [
+        "A separate VTOL firmware is loaded instead of ArduPlane",
+        "The copter objects are created: the Q_M_ mixer, the Q_A_ and Q_P_ controllers, Q_WP_ navigation",
+        "The fixed-wing RLL_RATE_ and TECS_ controllers are disabled until the next reboot of the flight controller",
+        "The ATC_ and PSC_ parameters from ArduCopter become available in ArduPlane"
+      ],
+      "answer": 1,
+      "explain": "QuadPlane::setup() creates objects from the ArduCopter libraries once; the plane half stays, and the copter names get a Q_ prefix."
+    },
+    {
+      "q": "A 4+1 aircraft oscillates in roll in FBWA at a 25 m/s cruise, and there are no QTUN records at that moment. What do you tune?",
+      "options": [
+        "Q_A_RAT_RLL_P and Q_A_RAT_RLL_D",
+        "Q_ASSIST_ANGLE and Q_ASSIST_DELAY",
+        "RLL_RATE_* with AUTOTUNE",
+        "Q_M_THST_HOVER and Q_M_THST_EXPO"
+      ],
+      "answer": 2,
+      "explain": "QTUN is logged only while the lift motors are active. No QTUN means a pure plane was flying, and the surfaces hold roll through RLL_RATE_*."
+    },
+    {
+      "q": "Which outputs do Motor1–Motor4 land on after Q_ENABLE = 1 with Q_FRAME_CLASS = 1, if SERVO5…SERVO8_FUNCTION were 0?",
+      "options": [
+        "Outputs 1–4, displacing the surfaces",
+        "None: motor functions are always set by hand",
+        "Outputs 5–8",
+        "Outputs 9–12"
+      ],
+      "answer": 2,
+      "explain": "setup_default_channels(4) assigns Motor1…Motor4 to outputs 5…8, only where the function is 0 and only if the motor is not assigned anywhere yet."
+    },
+    {
+      "q": "Which parameter with the Q_ prefix does the same job as ATC_RAT_PIT_P in ArduCopter?",
+      "options": [
+        "Q_A_RAT_PIT_P",
+        "Q_P_D_VEL_P",
+        "PTCH_RATE_P",
+        "Q_M_THST_EXPO"
+      ],
+      "answer": 0,
+      "explain": "Q_A_ is AC_AttitudeControl, the same class as the copter's ATC_; in 4.7.2 each has 61 parameters: Q_A_ in the ArduPlane definitions and ATC_ in the ArduCopter SITL dump."
+    },
+    {
+      "q": "Why do the ailerons move in a Q mode in hover?",
+      "options": [
+        "The surface and motor output functions are mixed up",
+        "The Q modes also call the fixed-wing stabilization, stabilize_roll() and stabilize_pitch()",
+        "Angle-based Q-assist is active",
+        "It is SERVO_AUTO_TRIM auto-trimming: in the Q modes it adjusts the surfaces continuously"
+      ],
+      "answer": 1,
+      "explain": "This is normal: the surfaces stabilize together with the motors (mode_q*.cpp), and at zero airspeed their contribution is small."
+    },
+    {
+      "q": "Arming is refused: \"Q_ASSIST_SPEED is not set\". What does that mean?",
+      "options": [
+        "The default value of 0: you must set a positive value or −1",
+        "The zero offset of the airspeed sensor, ARSPD_OFFSET, is not calibrated",
+        "Q_ASSIST_SPEED is above AIRSPEED_MIN",
+        "Q_ASSIST_SPEED is not supported on a tilt-rotor"
+      ],
+      "answer": 0,
+      "explain": "AP_Arming_Plane::quadplane_checks() rejects 0 for every layout except a tailsitter. A positive value enables assistance, and −1 leaves it in transitions only."
+    },
+    {
+      "q": "You set Q_TILT_ENABLE = 1, but the station does not show Q_TILT_MAX, and arming reports \"tiltrotor setup not complete, reboot\". What do you do?",
+      "options": [
+        "Set Q_FRAME_CLASS = 7",
+        "Reboot the flight controller and refresh the parameter list",
+        "Set Q_TAILSIT_ENABLE = 1",
+        "Set Q_OPTIONS bit 10"
+      ],
+      "answer": 1,
+      "explain": "ENABLE parameters hide their group while they are 0; the tilt subsystem is initialized only at boot."
+    },
+    {
+      "q": "In what order do you tune a QuadPlane by the module's rules?",
+      "options": [
+        "Fixed-wing AUTOTUNE and TECS, then the transition and Q-assist, and hover last of all, once the wing is already tuned",
+        "The transition, then TECS, then Q_A_RAT_*",
+        "Hover (notch, Q_A_RAT_*, hover throttle, Q_P_*), then the wing (AUTOTUNE, TECS, L1), then the transition and Q-assist",
+        "QAUTOTUNE and AUTOTUNE at the same time in one flight"
+      ],
+      "answer": 2,
+      "explain": "A Q mode is the recovery mode, so hover is tuned before the first transition; the transition is tuned last, when both halves are stable."
+    },
+    {
+      "q": "You loaded a copter parameter file with ATC_RAT_RLL_P = 0.12 into ArduPlane. What happens?",
+      "options": [
+        "The value is applied to Q_A_RAT_RLL_P automatically",
+        "The value is applied to RLL_RATE_P",
+        "Arming is refused with \"Bad parameter\" until the line is removed",
+        "The line is not applied: ArduPlane has no such parameter"
+      ],
+      "answer": 3,
+      "explain": "Copter names do not exist in Plane; you have to rename it to Q_A_RAT_RLL_P and treat the value as a starting point only."
+    },
+    {
+      "q": "On a tilt-rotor in MANUAL the throttle is raised. What do the tilting motors do?",
+      "options": [
+        "They are stopped, like all the other lift motors in MANUAL",
+        "They point vertically and hold altitude",
+        "They idle at SPIN_ARM",
+        "They are tilted forward and work as cruise motors"
+      ],
+      "answer": 3,
+      "explain": "In a fixed-wing mode without assistance Tiltrotor::continuous_update() tilts them forward and passes the stick throttle through; only the fixed lift motors are stopped."
+    }
+  ]
+}

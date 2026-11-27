@@ -1,0 +1,177 @@
+{
+ "module": "ap-payload",
+ "tasks": [
+  {
+   "id": "mount-pitch-us",
+   "title": "Gimbal pitch servo pulse",
+   "statement": "A servo gimbal with `MNT1_TYPE = 1`, the vehicle sits level. `MNT1_PITCH_MIN = {pmin}`, `MNT1_PITCH_MAX = {pmax}`, the pitch output has `SERVOn_MIN = {mn}`, `SERVOn_MAX = {mx}`, `SERVOn_TRIM = 1500`, `SERVOn_REVERSED = {r}`. The pitch target is **{t}°**. Which pulse (µs) does the firmware output?",
+   "params": {
+    "pmin": [
+     -90,
+     -80,
+     -60
+    ],
+    "pmax": [
+     0,
+     10,
+     20,
+     30
+    ],
+    "mn": [
+     1000,
+     1050,
+     1100
+    ],
+    "mx": [
+     1900,
+     1950,
+     2000
+    ],
+    "r": [
+     0,
+     1
+    ],
+    "t": [
+     -90,
+     -75,
+     -60,
+     -45,
+     -30,
+     -15,
+     0,
+     15,
+     30,
+     45
+    ]
+   },
+   "answer": "mn + math.floor(((1 - min(max((t - pmin) / (pmax - pmin), 0), 1)) if r else min(max((t - pmin) / (pmax - pmin), 0), 1)) * (mx - mn))",
+   "unit": "µs",
+   "tol": 0.0001,
+   "abs": 1.01,
+   "solution": "`move_servo`: v = (θ − MIN) / (MAX − MIN), constrained to 0…1; with REVERSED = 1 take 1 − v; PWM = `SERVOn_MIN` + ⌊v · (`SERVOn_MAX` − `SERVOn_MIN`)⌋. `SERVOn_TRIM` takes no part. An angle outside the limits gives the end pulse. The module example: −90…20, 1100…1900, 0° → 1754 µs, −45° → 1427 µs."
+  },
+  {
+   "id": "trigger-count",
+   "title": "Trigger distance and number of pictures on a line",
+   "statement": "The picture footprint along the flight line is **{f} m**, the forward overlap is **{o} %**. The line is **{L} m** long, and the `DO_SET_CAM_TRIGG_DIST` command at the start of the line is given with p3 = 0. How many pictures does the camera take on the line? A picture that would fall exactly on the end of the line is not taken.",
+   "params": {
+    "f": [
+     60,
+     80,
+     100,
+     120,
+     150
+    ],
+    "o": [
+     60,
+     70,
+     75,
+     80
+    ],
+    "L": {
+     "min": 200,
+     "max": 1200,
+     "step": 50
+    }
+   },
+   "answer": "math.ceil(L / (f * (1 - o / 100)) - 1e-9) - 1",
+   "unit": "pictures",
+   "tol": 0.0001,
+   "abs": 0.01,
+   "solution": "The spacing is d = footprint · (1 − overlap). The first position after the command is only stored, and a picture is taken every d meters. The check runs 50 times a second, so the actual spacing is slightly more than d, and a picture that would fall exactly on the end of the line is already past it: N = ⌈L / d⌉ − 1 (if L is not a multiple of d, this is the same as ⌊L / d⌋). With p3 = 1 a picture at the start would be added. The module example: 120 · 0.2 = 24 m, 610 / 24 → 25 pictures; a 600 m line would give 24."
+  },
+  {
+   "id": "spacing-intrval",
+   "title": "Actual spacing in a tailwind",
+   "statement": "`CAM1_TRIGG_DIST = {d}` m, `CAM1_INTRVAL_MIN = {T}` s. The ground speed on the line is **{v} m/s**. What is the distance (m) between adjacent pictures?",
+   "params": {
+    "d": [
+     15,
+     20,
+     24,
+     30,
+     40
+    ],
+    "T": [
+     1.0,
+     1.5,
+     2.0,
+     2.5
+    ],
+    "v": [
+     8,
+     10,
+     12,
+     14,
+     16,
+     18,
+     20
+    ]
+   },
+   "answer": "max(d, v * T)",
+   "unit": "m",
+   "tol": 0.01,
+   "abs": 0.05,
+   "solution": "If d / v ≥ T, the picture is taken by distance and the spacing is d. Otherwise the trigger waits for `CAM1_INTRVAL_MIN`, the vehicle does not slow down, and the spacing is v · T. The result is max(d, v · T). The module example: 24 m, 1.5 s, 18 m/s → 27 m. The check once every 20 ms adds up to v · 0.02 m more, which is neglected here."
+  },
+  {
+   "id": "geotag-error",
+   "title": "Georeferencing error without shutter feedback",
+   "statement": "The `CAM1_FEEDBAK_PIN` pin is not connected, and the delay from the command to the shutter firing is **{tau} ms**. The ground speed is **{v} m/s**. By how many meters are the pictures of adjacent opposite flight lines shifted relative to each other?",
+   "params": {
+    "tau": [
+     40,
+     60,
+     80,
+     100,
+     120,
+     150,
+     200,
+     250
+    ],
+    "v": [
+     5,
+     8,
+     10,
+     12,
+     15,
+     18
+    ]
+   },
+   "answer": "2 * v * tau / 1000",
+   "unit": "m",
+   "tol": 0.01,
+   "abs": 0.01,
+   "solution": "Without the pin a `CAM` record is the moment of the command; the shutter fires v · τ farther along the track. On opposite lines the errors point in opposite directions: the mutual shift is 2 · v · τ. The module example: 12 m/s, 0.12 s → 1.44 m per picture, 2.88 m between lines."
+  },
+  {
+   "id": "drop-lead",
+   "title": "Release lead distance (no air drag)",
+   "statement": "A payload is released in level flight: the height above level ground is **{h} m**, the ground speed is **{v} m/s**, the vertical speed is zero. Ignore air drag and wind, g = 9.81 m/s². How many meters before the target, measured horizontally, do you release the payload?",
+   "params": {
+    "h": [
+     5,
+     10,
+     15,
+     20,
+     30,
+     40,
+     50
+    ],
+    "v": [
+     2,
+     4,
+     6,
+     8,
+     10,
+     12
+    ]
+   },
+   "answer": "v * math.sqrt(2 * h / 9.81)",
+   "unit": "m",
+   "tol": 0.01,
+   "abs": 0.05,
+   "solution": "The fall time is t = √(2h / g), and the payload keeps its horizontal speed: x = v · t. Assumptions: a point payload, no drag and no wind, level ground. A real payload lands closer. The module example: 30 m and 10 m/s → 2.47 s, 24.7 m."
+  }
+ ]
+}

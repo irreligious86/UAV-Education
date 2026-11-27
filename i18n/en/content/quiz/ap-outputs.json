@@ -1,0 +1,118 @@
+{
+ "module": "ap-outputs",
+ "pass": 80,
+ "questions": [
+  {
+   "q": "MatekH743, standard build: TIM8 has outputs 1–2, TIM5 has outputs 3–6. Motors are on outputs 1–4 with `MOT_PWM_TYPE = 6`. A gripper servo is assigned to output 5 (`SERVO5_FUNCTION = 28`). What happens?",
+   "options": [
+    "The servo runs at 50 Hz, because the mode and rate are set separately for every output",
+    "Output 5 is disabled and arming is refused: `SERVO5_FUNCTION=28 on disabled channel`",
+    "The whole TIM5 group falls back to PWM, and motors 3 and 4 are left without DShot",
+    "The servo gets DShot frames, with no warnings in Messages"
+   ],
+   "answer": 1,
+   "explain": "The protocol is set per timer. DShot on outputs 3 and 4 switches the whole of TIM5 to digital mode; the firmware disables the other outputs of the group (`get_disabled_channels`), and the pre-arm check fails for ordinary functions (AP_Arming.cpp, `servo_checks`)."
+  },
+  {
+   "q": "Motors on plain PWM (`MOT_PWM_TYPE = 0`, `RC_SPEED = 490`) and an analog servo are in the same timer group of the main processor. `SERVO_RATE = 50`. What rate does the servo get?",
+   "options": [
+    "50 Hz: `SERVO_RATE` applies to every output with a servo function",
+    "490 Hz: exactly the `RC_SPEED` value",
+    "400 Hz, with no warnings",
+    "The servo output is disabled and arming is refused"
+   ],
+   "answer": 2,
+   "explain": "`set_freq` applies the motor rate to the whole group and limits it to 400 Hz; `set_default_rate` skips the \"fast\" groups. There is no pre-arm failure: that exists only for groups with DShot and a strip. An analog servo at 400 Hz overheats."
+  },
+  {
+   "q": "An output with an \"angle\" function (full travel 4500): `SERVOn_MIN = 1000`, `SERVOn_MAX = 2000`, `SERVOn_TRIM = 1400`, `REVERSED = 0`. The input is +3000. What pulse does the firmware output?",
+   "options": [
+    "1733 µs",
+    "1833 µs",
+    "1800 µs",
+    "1900 µs"
+   ],
+   "answer": 2,
+   "explain": "For a positive input: TRIM + ⌊s · (MAX − TRIM) / 4500⌋ = 1400 + ⌊3000 · 600 / 4500⌋ = 1400 + 400 = 1800. You get 1733 if you take half of the full span (500) instead of MAX − TRIM, and 1833 if you count from 1500."
+  },
+  {
+   "q": "An octocopter on a build with bidirectional DShot: you need RPM from the motors on outputs 5–8. Which `SERVO_BLH_BDMASK` value enables exactly those?",
+   "options": [
+    "15",
+    "120",
+    "480",
+    "240"
+   ],
+   "answer": 3,
+   "explain": "Bit 0 is output 1, and the weight of output n is 2^(n − 1): 16 + 32 + 64 + 128 = 240. 480 is the mistake with the weight 2^n; 15 is outputs 1–4."
+  },
+  {
+   "q": "A parameter fragment (a training example). The flight controller does not arm. Which message does the firmware give, and what do you fix?",
+   "kind": "apply",
+   "fragment": "SERVO5_FUNCTION,0\nRELAY1_FUNCTION,1\nRELAY1_PIN,54\nRELAY1_DEFAULT,0\nRC7_OPTION,28",
+   "options": [
+    "`RELAY1_PIN=54, set SERVO5_FUNCTION=-1`: switch output 5 to GPIO and reboot",
+    "`RELAY1_PIN=54 invalid`: pin 54 does not exist, you need 105",
+    "`pin conflict RELAY1_PIN = RELAY2_PIN`: set `RELAY2_PIN = -1`",
+    "`Hardware safety switch`: press the safety switch"
+   ],
+   "answer": 0,
+   "explain": "Pin 54 belongs to output 5 (on boards numbered from 50), and it is not a GPIO. The `AP_Relay::arming_checks` check finds the output from the pin number and names the parameter. The `invalid` message appears when the board has no pin with that number at all."
+  },
+  {
+   "q": "`MOT_PWM_TYPE = 6`, `SERVO_BLH_RVMASK = 5`, `SERVO_DSHOT_ESC = 0`. Motors 1 and 3 keep spinning the same way. Why?",
+   "options": [
+    "Mask 5 means outputs 5 and 1, not 1 and 3",
+    "With ESC type 0, DShot commands are not sent",
+    "Reversal works only together with `SERVO_BLH_3DMASK`",
+    "The reverse command is sent only after arming"
+   ],
+   "answer": 1,
+   "explain": "`update_channel_masks` sends the reverse and 3D commands only for ESC types 1–4 and only while disarmed. Mask 5 = 4 + 1 is exactly outputs 1 and 3."
+  },
+  {
+   "q": "An ESC on bidirectional DShot reports E = 1260 (in units of 100 eRPM), `SERVO_BLH_POLES = 12`. What RPM does the firmware write to the `RPM` field of the `ESC` message?",
+   "options": [
+    "10500 RPM",
+    "18000 RPM",
+    "126000 RPM",
+    "21000 RPM"
+   ],
+   "answer": 3,
+   "explain": "RPM = ⌊E · 200 / poles⌋ = 1260 · 200 / 12 = 21000. You divide by the number of pole pairs (6), not by the number of poles: 10500 is that mistake. You get 18000 with 14 poles."
+  },
+  {
+   "q": "What does the `@SYS/timers.txt` file, downloaded from the flight controller over MAVFTP, contain?",
+   "options": [
+    "A list of outputs with their assigned `SERVOn_FUNCTION`",
+    "One line per timer: clock frequency, mode, actual and target rate",
+    "The \"pad, timer, GPIO pin number\" table from the `hwdef`",
+    "Bidirectional DShot error counters for every motor"
+   ],
+   "answer": 1,
+   "explain": "`RCOutput::timer_info` prints the `TIMERV1` header and lines with the fields `CLK`, `MODE`, `FREQ`, `TGT`. There are no output numbers in it; you match them to timers through `hwdef.dat`, and the `RCOut:` banner shows the mode per output."
+  },
+  {
+   "q": "A board with an IOMCU, ESCs connected to MAIN 1–4, `SERVO_BLH_AUTO = 1`, the vehicle disarmed. The ESC configuration program does not find the ESCs through passthrough. What is the main cause?",
+   "options": [
+    "IOMCU outputs do not work as a bridge to the ESCs, so the ESCs have to be moved to AUX",
+    "Passthrough on MAIN requires `BRD_IO_DSHOT = 1` and a reboot with the new coprocessor firmware",
+    "You need to set `SERVO_BLH_PORT = 8`",
+    "Passthrough works only while armed"
+   ],
+   "answer": 0,
+   "explain": "`serial_setup_output` looks for the output only among the main processor's timer groups; outputs 1–8 on a board with an IOMCU are not in them. `BRD_IO_DSHOT` gives DShot on MAIN, but not passthrough. While armed, the handler in fact drops the requests."
+  },
+  {
+   "q": "`RELAY1_FUNCTION = 1`, `RC8_OPTION = 28`, channel 8 is a three-position switch. In which position is the relay on?",
+   "options": [
+    "In the middle and high positions",
+    "Only in the low position",
+    "Only in the high position",
+    "In any position except the middle"
+   ],
+   "answer": 2,
+   "explain": "In `RC_Channel.cpp` the relay gets the state `ch_flag == HIGH`: it is on only in the high position, and the middle and low positions turn it off."
+  }
+ ]
+}

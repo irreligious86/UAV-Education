@@ -3,21 +3,21 @@
   "pass": 80,
   "questions": [
     {
-      "q": "What fundamentally sets ArduPilot apart from Betaflight?",
+      "q": "How does ArduPilot fundamentally differ from Betaflight?",
       "options": [
-        "Nothing except the interface",
+        "It does not, apart from the user interface",
         "It knows its position and flies by itself",
         "It is meant for planes only",
         "It works without PID controllers"
       ],
       "answer": 1,
-      "explain": "An autopilot: it knows its position, runs missions, flies without a pilot. Betaflight is a stabilizer for stick input."
+      "explain": "An autopilot: it knows its position, flies missions, and flies without a pilot. Betaflight is a stabilizer under the sticks."
     },
     {
       "q": "Does ArduPilot have a save command?",
       "options": [
-        "Yes, like Betaflight",
-        "No, changes are written immediately",
+        "Yes, the same as in Betaflight",
+        "No, writes are immediate",
         "Only in CLI mode",
         "Only through MAVProxy"
       ],
@@ -25,7 +25,7 @@
       "explain": "Some parameters require a reboot, but the write happens instantly."
     },
     {
-      "q": "Which Copter modes need GPS?",
+      "q": "Which Copter modes require GPS?",
       "options": [
         "STABILIZE and ACRO",
         "LOITER, AUTO, RTL",
@@ -44,29 +44,29 @@
         "The name of a mode"
       ],
       "answer": 1,
-      "explain": "Disabling pre-arm checks (ARMING_SKIPCHK, before 4.7 — ARMING_CHECK) to take off is the road to a crash."
+      "explain": "Disabling the pre-arm checks (ARMING_SKIPCHK; before 4.7, ARMING_CHECK) just to take off is the road to a crash."
     },
     {
       "q": "What does FRAME_CLASS = 4 set?",
       "options": [
-        "Quadcopter",
+        "A quadcopter",
         "OctaQuad (X8)",
-        "Hexacopter in X layout",
-        "Tricopter"
+        "A hexacopter in the X layout",
+        "A tricopter"
       ],
       "answer": 1,
-      "explain": "1 — Quad, 2 — Hexa, 3 — Octa, 4 — OctaQuad, 7 — Tri."
+      "explain": "1 is Quad, 2 is Hexa, 3 is Octa, 4 is OctaQuad, 7 is Tri."
     },
     {
-      "q": "Why don't Lua scripts work on F4?",
+      "q": "Why do Lua scripts not work on F405 boards?",
       "options": [
-        "The license forbids it",
-        "Not enough flash and memory",
-        "F4 is too fast",
+        "They are forbidden by the license",
+        "Too little flash and memory",
+        "An F4 is too fast",
         "They work fine"
       ],
       "answer": 1,
-      "explain": "They need at least 2 MB of flash and memory that the F4 doesn't have."
+      "explain": "Scripting is built only for boards with more than 1 MB of flash; an F405 has 1 MB. An F427 with 2 MB (Pixhawk 1) does run Lua."
     },
     {
       "q": "Mode 5 in FLTMODE means:",
@@ -80,7 +80,7 @@
       "explain": "0 Stabilize, 2 AltHold, 3 Auto, 4 Guided, 5 Loiter, 6 RTL, 9 Land, 16 PosHold."
     },
     {
-      "q": "The ArduCopter counterpart of Betaflight Angle:",
+      "q": "The counterpart of Betaflight Angle in ArduCopter is:",
       "options": [
         "AltHold",
         "Stabilize",
@@ -88,7 +88,7 @@
         "Acro"
       ],
       "answer": 1,
-      "explain": "Stabilize stabilizes the angles but does not hold altitude."
+      "explain": "Stabilize stabilizes the angles and does not hold altitude."
     }
   ]
 }

@@ -4,7 +4,7 @@
   {
    "id": "tconst",
    "title": "Roll response",
-   "statement": "The roll time constant `RLL2SRV_TCONST` = **{tau} s**, a bank of **{phi}°** is requested as a step. What will the bank be after **{t} s** (first-order model, no delay)?",
+   "statement": "The roll time constant `RLL2SRV_TCONST` = **{tau} s**, and a roll of **{phi}°** is demanded as a step. What is the roll after **{t} s** (first-order model, no delay)?",
    "params": {
     "tau": [
      0.3,
@@ -29,12 +29,12 @@
    "answer": "phi*(1-math.exp(-t/tau))",
    "unit": "°",
    "tol": 0.03,
-   "solution": "φ(t) = φ*·(1 − e^(−t/τ)); within τ — 63 %."
+   "solution": "φ(t) = φ*·(1 − e^(−t/τ)); 63% within τ."
   },
   {
    "id": "bank",
-   "title": "Bank for lateral acceleration",
-   "statement": "Guidance needs a lateral acceleration of **{a} m/s²**. What bank angle (°) is needed for that in a coordinated turn?",
+   "title": "Roll for a lateral acceleration",
+   "statement": "Guidance needs a lateral acceleration of **{a} m/s²**. What roll angle (°) does that take in a coordinated turn?",
    "params": {
     "a": {
      "min": 1,

@@ -1,0 +1,95 @@
+{
+  "module": "ap-vtol-anatomy",
+  "tasks": [
+    {
+      "id": "airspeed-min-from-stall",
+      "title": "AIRSPEED_MIN from the stall speed",
+      "statement": "A QuadPlane with a mass of **{m} kg**, a wing area of **{s} m²**, C_Lmax = **{cl}**, ρ = 1.225 kg/m³. Find the minimum allowed `AIRSPEED_MIN` by the 1.2 · V_s rule, in m/s.",
+      "params": {
+        "m": {
+          "min": 3,
+          "max": 9,
+          "step": 0.5
+        },
+        "s": [
+          0.45,
+          0.5,
+          0.6,
+          0.7,
+          0.8,
+          0.9
+        ],
+        "cl": [
+          1.0,
+          1.1,
+          1.2,
+          1.3
+        ]
+      },
+      "answer": "1.2*math.sqrt(2*m*9.81/(1.225*s*cl))",
+      "unit": "m/s",
+      "tol": 0.01,
+      "solution": "V_s = √(2·m·g / (ρ·S·C_Lmax)), then `AIRSPEED_MIN` = 1.2·V_s. The module's example: 6 kg, 0.6 m², 1.2 → V_s = 11.6 m/s, `AIRSPEED_MIN` ≥ 13.9 m/s. Lower than that means a stall right after \"Transition done\"."
+    },
+    {
+      "id": "hover-power",
+      "title": "Hover shaft power",
+      "statement": "A QuadPlane with a mass of **{m} kg** hovers on four propellers of diameter **{d} m**, with a propeller figure of merit FM = **{fm}**, ρ = 1.225 kg/m³. Find the total shaft power of the lift propellers, in W.",
+      "params": {
+        "m": {
+          "min": 3,
+          "max": 12,
+          "step": 0.5
+        },
+        "d": [
+          0.305,
+          0.33,
+          0.356,
+          0.381,
+          0.406,
+          0.457
+        ],
+        "fm": [
+          0.5,
+          0.55,
+          0.6,
+          0.65,
+          0.7
+        ]
+      },
+      "answer": "(m*9.81)**1.5/(fm*math.sqrt(2*1.225*4*math.pi*d**2/4))",
+      "unit": "W",
+      "tol": 0.01,
+      "solution": "A = 4·π·D²/4, P = (m·g)^1.5 / (FM·√(2·ρ·A)). The module's example: 6 kg, 0.381 m, 0.6 → A = 0.456 m², 427 W of ideal power, 712 W at the shaft."
+    },
+    {
+      "id": "hover-cruise-ratio",
+      "title": "How many times more hover costs than cruise",
+      "statement": "An aircraft: **{m} kg**, four lift propellers with D = 0.381 m, FM = 0.6, ρ = 1.225 kg/m³. Cruise at **{v} m/s**, lift-to-drag ratio L/D = **{ld}**, cruise propeller efficiency 0.6. Find the ratio of hover power to cruise power (both at the shaft).",
+      "params": {
+        "m": {
+          "min": 3,
+          "max": 10,
+          "step": 0.5
+        },
+        "v": [
+          16,
+          18,
+          20,
+          22,
+          25
+        ],
+        "ld": [
+          8,
+          10,
+          12,
+          14
+        ]
+      },
+      "answer": "((m*9.81)**1.5/(0.6*math.sqrt(2*1.225*4*math.pi*0.381**2/4)))/(m*9.81*v/(ld*0.6))",
+      "unit": "×",
+      "tol": 0.01,
+      "solution": "P_hov = (m·g)^1.5/(FM·√(2ρA)), P_cr = m·g·V/((L/D)·η_p); the ratio grows as √m for the same propeller area. The module's example: 6 kg, 20 m/s, L/D = 10 → 712 / 196 = 3.6."
+    }
+  ]
+}

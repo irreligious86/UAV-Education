@@ -3,7 +3,7 @@
  "pass": 80,
  "questions": [
   {
-   "q": "HDZero подключён к SERIAL3 двумя проводами. Какая пара параметров запускает OSD в ArduPilot 4.7.2?",
+   "q": "HDZero is connected to SERIAL3 with two wires. Which pair of parameters starts the OSD in ArduPilot 4.7.2?",
    "options": [
     "`SERIAL3_PROTOCOL = 33`, `OSD_TYPE = 3`",
     "`SERIAL3_PROTOCOL = 42`, `OSD_TYPE = 5`",
@@ -11,87 +11,87 @@
     "`SERIAL3_PROTOCOL = 42`, `OSD_TYPE = 1`"
    ],
    "answer": 1,
-   "explain": "DisplayPort — протокол порта 42 и бэкенд 5 (MSP_DISPLAYPORT). Бэкенд 5 ищет порт именно с протоколом 42 (AP_OSD_MSP_DisplayPort.cpp), с 32 или 33 он не запустится. Пара 33 + 3 — старые очки DJI V1/V2, тип 1 — чип MAX7456."
+   "explain": "DisplayPort is port protocol 42 and backend 5 (MSP_DISPLAYPORT). Backend 5 looks specifically for a port with protocol 42 (AP_OSD_MSP_DisplayPort.cpp); with 32 or 33 it does not start. The 33 + 3 pair is for legacy DJI V1/V2 goggles, and type 1 is the MAX7456 chip."
   },
   {
-   "q": "`OSD_SW_METHOD = 1`, экраны 1–3 включены с диапазонами 900–1300, 1300–1700, 1700–2100. Канал равен ровно 1700. Какой экран показан?",
+   "q": "`OSD_SW_METHOD = 1`, screens 1–3 are enabled with the ranges 900–1300, 1300–1700, 1700–2100. The channel is exactly 1700. Which screen is shown?",
    "options": [
-    "Экран 2: верхняя граница входит в диапазон",
-    "Экран не определён, прошивка покажет экран 1",
-    "Экран 3: нижняя граница входит, верхняя — нет",
-    "Экраны 2 и 3 будут чередоваться каждую секунду"
+    "Screen 2: the upper bound is part of the range",
+    "The screen is undefined, so the firmware shows screen 1",
+    "Screen 3: the lower bound is included, the upper is not",
+    "Screens 2 and 3 alternate every second"
    ],
    "answer": 2,
-   "explain": "Условие в AP_OSD.cpp: `channel_min <= value && channel_max > value`. 1700 не меньше 1700, поэтому экран 2 не подходит, а экран 3 подходит."
+   "explain": "The condition in AP_OSD.cpp is `channel_min <= value && channel_max > value`. 1700 is not less than 1700, so screen 2 does not match and screen 3 does."
   },
   {
-   "q": "`OSD_SW_METHOD = 0`, включены экраны 1 и 3, показан экран 1. Тумблер переводят 1000 → 2000, затем 2000 → 1000. Что на экране после каждого щелчка?",
+   "q": "`OSD_SW_METHOD = 0`, screens 1 and 3 are enabled, screen 1 is shown. The switch is moved 1000 → 2000, then 2000 → 1000. What is on the screen after each flick?",
    "options": [
-    "3, затем 1",
-    "2, затем 1",
-    "3, затем остаётся 3",
-    "2, затем 3"
+    "3, then 1",
+    "2, then 1",
+    "3, then it stays on 3",
+    "2, then 3"
    ],
    "answer": 0,
-   "explain": "Способ 0 при любом изменении канала больше чем на 200 мкс берёт следующий включённый экран по кругу; направление не важно, выключенные экраны пропускаются: 1 → 3 → 1."
+   "explain": "On any channel change of more than 200 µs, method 0 takes the next enabled screen around the circle; the direction does not matter, and disabled screens are skipped: 1 → 3 → 1."
   },
   {
-   "q": "В очках DJI O3 со шрифтом Betaflight вместо значков OSD ArduPilot видны чужие символы. Что исправит таблицу символов?",
+   "q": "In DJI O3 goggles with the Betaflight font you see foreign symbols instead of the ArduPilot OSD icons. What fixes the character table?",
    "options": [
-    "`MSP_OPTIONS = 1` и перезагрузка",
-    "`OSD_FONT = 2` и перезагрузка",
-    "`OSD1_TXT_RES = 2` без перезагрузки",
-    "`MSP_OPTIONS = 4` и перезагрузка"
+    "`MSP_OPTIONS = 1` and a reboot",
+    "`OSD_FONT = 2` and a reboot",
+    "`OSD1_TXT_RES = 2` with no reboot",
+    "`MSP_OPTIONS = 4` and a reboot"
    ],
    "answer": 3,
-   "explain": "Бит 2 (значение 4) включает номера символов Betaflight для DisplayPort; таблица выбирается при запуске бэкенда, поэтому нужна перезагрузка. Бит 0 — режим телеметрии для протокола 33. `OSD_FONT` действует только на MAX7456 и SITL."
+   "explain": "Bit 2 (value 4) enables Betaflight character indexes for DisplayPort; the table is selected when the backend starts, so a reboot is needed. Bit 0 is telemetry mode for protocol 33. `OSD_FONT` applies only to MAX7456 and SITL."
   },
   {
-   "q": "Раскладку делали под `OSD1_TXT_RES = 2`. Элемент стоит в X = 52, Y = 17. Что будет при `OSD1_TXT_RES = 1`?",
+   "q": "A layout was made for `OSD1_TXT_RES = 2`. An item is at X = 52, Y = 17. What happens with `OSD1_TXT_RES = 1`?",
    "options": [
-    "Прошивка сдвинет его в столбец 49",
-    "Он вне сетки: столбцов всего 50",
-    "Он вне сетки: строк всего 17",
-    "Он останется виден, сетка масштабируется"
+    "The firmware moves it to column 49",
+    "It is off the grid: there are only 50 columns",
+    "It is off the grid: there are only 17 rows",
+    "It stays visible, the grid is scaled"
    ],
    "answer": 1,
-   "explain": "Сетка 1 — 50×18: столбцы 0–49, строки 0–17. Строка 17 допустима, столбец 52 — нет. ArduPilot координаты не пересчитывает и не прижимает к краю."
+   "explain": "Grid 1 is 50×18: columns 0–49, rows 0–17. Row 17 is valid, column 52 is not. ArduPilot does not recalculate coordinates or clamp them to the edge."
   },
   {
-   "q": "`OSD_TYPE = 1`, `OSD_TYPE2 = 5`. Что это даёт?",
+   "q": "`OSD_TYPE = 1`, `OSD_TYPE2 = 5`. What does that give you?",
    "options": [
-    "Ошибку перед армом: два типа OSD несовместимы",
-    "DisplayPort заменит MAX7456, аналоговый OSD выключится",
-    "Два OSD сразу: аналоговый и DisplayPort, с одним текущим экраном",
-    "Два OSD сразу, у каждого свой независимый экран"
+    "A pre-arm error: the two OSD types are incompatible",
+    "DisplayPort replaces MAX7456 and the analog OSD turns off",
+    "Two OSDs at once, analog and DisplayPort, with one current screen",
+    "Two OSDs at once, each with its own independent screen"
    ],
    "answer": 2,
-   "explain": "MAX7456 совместим с DisplayPort и MSP (AP_OSD_MAX7456.h). Оба бэкенда рисуют один и тот же текущий экран, поэтому под разные сетки делают два экрана. Несовместимы два одинаковых типа и пара MSP + DisplayPort."
+   "explain": "MAX7456 is compatible with DisplayPort and MSP (AP_OSD_MAX7456.h). Both backends draw the same current screen, so for different grids you make two screens. Two identical types and the MSP + DisplayPort pair are incompatible."
   },
   {
-   "q": "Аппарат на 6S, `OSD_W_BATVOLT` оставлен по умолчанию. Когда замигает `BAT_VOLT`?",
+   "q": "A 6S vehicle with `OSD_W_BATVOLT` left at its default. When does `BAT_VOLT` start flashing?",
    "options": [
-    "Ниже 3.6 В на банку, то есть ниже 21.6 В",
-    "Ниже 10.0 В, то есть на практике никогда",
-    "При срабатывании `BATT_LOW_VOLT`",
-    "Ниже 10 % остатка ёмкости"
+    "Below 3.6 V per cell, that is, below 21.6 V",
+    "Below 10.0 V, that is, in practice never",
+    "When `BATT_LOW_VOLT` triggers",
+    "Below 10% of remaining capacity"
    ],
    "answer": 1,
-   "explain": "Порог по умолчанию — 10.0 В на всю батарею; элемент мигает, пока напряжение меньше порога. 3.6 В — умолчание `OSD_W_AVGCELLV` для другого элемента. С failsafe батареи порог OSD не связан."
+   "explain": "The default level is 10.0 V for the whole battery; the item flashes while the voltage is below the level. 3.6 V is the default of `OSD_W_AVGCELLV`, for a different item. The OSD level is not tied to the battery failsafe."
   },
   {
-   "q": "Старые очки DJI V2 без WTFOS, `SERIALn_PROTOCOL = 33`, `OSD_TYPE = 3`. Где будет текст режима полёта?",
+   "q": "Legacy DJI V2 goggles without WTFOS, `SERIALn_PROTOCOL = 33`, `OSD_TYPE = 3`. Where does the flight mode text appear?",
    "options": [
-    "В элементе FLTMODE, как на DisplayPort",
-    "Нигде: старый DJI режимы ArduPilot не показывает",
-    "В поле MESSAGE — у DJI это имя аппарата",
-    "В строке статистики после дизарма"
+    "In the FLTMODE item, as on DisplayPort",
+    "Nowhere: legacy DJI does not show ArduPilot modes",
+    "In the MESSAGE field, which is the craft name on DJI",
+    "In the statistics line after disarming"
    ],
    "answer": 2,
-   "explain": "В AP_MSP.cpp поле DJI «craft name» привязано к `OSDn_MESSAGE`: там идут режим и сообщения. Виджет FLYMODE скрыт и мигает только при failsafe (AP_MSP_Telem_DJI.cpp)."
+   "explain": "In AP_MSP.cpp the DJI \"craft name\" field is mapped to `OSDn_MESSAGE`: the mode and messages go there. The FLYMODE widget is hidden and flashes only on a failsafe (AP_MSP_Telem_DJI.cpp)."
   },
   {
-   "q": "Нужно: на земле VTX в пит-режиме, при арме — полная мощность, после дизарма — снова пит. Какое значение `VTX_OPTIONS`?",
+   "q": "You need the VTX in pit mode on the ground, full power on arming, and pit mode again after disarming. Which `VTX_OPTIONS` value?",
    "options": [
     "1",
     "2",
@@ -99,18 +99,18 @@
     "7"
    ],
    "answer": 3,
-   "explain": "Бит 0 — пит-режим, бит 1 — снять его при арме, бит 2 — включать при дизарме: 1 + 2 + 4 = 7. С 1 передатчик останется в пит-режиме и в полёте; 2 без бита 0 ничего не включает; с 3 после дизарма останется полная мощность до перезагрузки."
+   "explain": "Bit 0 is pit mode, bit 1 leaves it on arming, bit 2 enables it when disarmed: 1 + 2 + 4 = 7. With 1 the transmitter stays in pit mode in flight too; 2 without bit 0 enables nothing; with 3 full power stays on after disarming until a reboot."
   },
   {
-   "q": "`VTX_POWER = 450`. Какую мощность установит прошивка и сколько это в дБм?",
+   "q": "`VTX_POWER = 450`. What power does the firmware set, and how much is that in dBm?",
    "options": [
-    "500 мВт, 27 дБм",
-    "400 мВт, 26 дБм",
-    "450 мВт, 26.5 дБм",
-    "200 мВт, 23 дБм"
+    "500 mW, 27 dBm",
+    "400 mW, 26 dBm",
+    "450 mW, 26.5 dBm",
+    "200 mW, 23 dBm"
    ],
    "answer": 1,
-   "explain": "Таблица уровней AP_VideoTX.cpp: 25, 100, 200, 400, 500, 600, 800, 1000 мВт; значение округляется вниз — 400 мВт. 10 · lg 400 = 26.0 дБм."
+   "explain": "The level table in AP_VideoTX.cpp: 25, 100, 200, 400, 500, 600, 800, 1000 mW; the value is rounded down, to 400 mW. 10 · log₁₀ 400 = 26.0 dBm."
   }
  ]
 }

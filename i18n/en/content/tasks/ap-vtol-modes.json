@@ -1,0 +1,159 @@
+{
+  "module": "ap-vtol-modes",
+  "tasks": [
+    {
+      "id": "airbrake-distance",
+      "title": "Airbrake start distance",
+      "statement": "A VTOL landing in a mission: closing ground speed **{v} m/s**, `Q_TRANS_DECEL` = **{a} m/s²**. From what distance to the landing point does ArduPlane 4.7.2 begin the AIRBRAKE stage, in m?",
+      "params": {
+        "v": {
+          "min": 14,
+          "max": 28,
+          "step": 0.5
+        },
+        "a": [
+          1.0,
+          1.5,
+          2.0,
+          2.5,
+          3.0
+        ]
+      },
+      "answer": "v**2/(2*a) + 2*v",
+      "unit": "m",
+      "tol": 0.01,
+      "solution": "stop_distance = V²/(2·`Q_TRANS_DECEL`) + 2·V: the stopping distance plus two seconds for the VTOL motors to spin up. SITL: 19.2 m/s, 2 m/s² → 92.2 + 38.4 = 130.6 m, and the log has \"VTOL airbrake v=19.2 d=130 sd=130\"."
+    },
+    {
+      "id": "transition-distance",
+      "title": "Forward transition distance (lower bound)",
+      "statement": "`AIRSPEED_MIN` = **{vmin} m/s**, `Q_ASSIST_SPEED` = **{vas} m/s**, `Q_TRANSITION_MS` = **{tms} ms**, acceleration in the AIRSPEED_WAIT phase at a constant **{acc} m/s²** from a hover in still air. Find the lower bound of the distance from \"Transition started\" to \"Transition done\", in m.",
+      "params": {
+        "vmin": [
+          11,
+          12,
+          13,
+          14,
+          15,
+          16
+        ],
+        "vas": [
+          9,
+          10,
+          11,
+          12,
+          14,
+          16,
+          18
+        ],
+        "tms": [
+          3000,
+          4000,
+          5000,
+          6000,
+          8000
+        ],
+        "acc": [
+          2.0,
+          2.5,
+          3.0,
+          4.0,
+          5.0
+        ]
+      },
+      "answer": "max(vmin, vas)**2/(2*acc) + max(vmin, vas)*tms/1000",
+      "unit": "m",
+      "tol": 0.01,
+      "solution": "The threshold is max(`AIRSPEED_MIN`, `Q_ASSIST_SPEED`): while the airspeed is below `Q_ASSIST_SPEED`, Q-assist keeps the state in AIRSPEED_WAIT. Acceleration takes V²/(2a), then the timer T = `Q_TRANSITION_MS` runs at no less than the threshold speed: d ≥ V²/(2a) + V·T. SITL: 18 m/s, 5 m/s², 5 s → 122 m (159 m in reality, since the vehicle kept accelerating)."
+    },
+    {
+      "id": "vtol-land-too-short",
+      "title": "The \"VTOL land too short\" check",
+      "statement": "In a mission `NAV_VTOL_LAND` comes right after a `NAV_WAYPOINT`. `TECS_LAND_ARSPD` is not set (−1), `AIRSPEED_CRUISE` = **{vc} m/s**, `Q_TRANS_DECEL` = **{a} m/s²**. What minimum distance between these items passes the pre-arm check, in m?",
+      "params": {
+        "vc": [
+          16,
+          18,
+          20,
+          22,
+          25,
+          28
+        ],
+        "a": [
+          1.0,
+          1.5,
+          2.0,
+          2.5,
+          3.0
+        ]
+      },
+      "answer": "0.75*vc**2/(2*a)",
+      "unit": "m",
+      "tol": 0.01,
+      "solution": "AP_Arming_Plane: min = 0.75 · stopping_distance(V²) = 0.75 · V²/(2·`Q_TRANS_DECEL`), V = `TECS_LAND_ARSPD` or, if that is not set, `AIRSPEED_CRUISE`. SITL: 25 m/s, 2 m/s² → 117 m."
+    },
+    {
+      "id": "q-assist-speed",
+      "title": "Choosing Q_ASSIST_SPEED",
+      "statement": "A vehicle with an airspeed sensor: V_s = **{vs} m/s**, `AIRSPEED_MIN` = **{k}** · V_s. Using the module's rule (3 m/s below `AIRSPEED_MIN`, but not below V_s), find `Q_ASSIST_SPEED`, in m/s.",
+      "params": {
+        "vs": {
+          "min": 9,
+          "max": 20,
+          "step": 0.5
+        },
+        "k": [
+          1.2,
+          1.25,
+          1.3,
+          1.35,
+          1.4
+        ]
+      },
+      "answer": "max(k*vs - 3, vs)",
+      "unit": "m/s",
+      "tol": 0.01,
+      "solution": "`Q_ASSIST_SPEED` = max(`AIRSPEED_MIN` − 3, V_s). It must not be above `AIRSPEED_MIN`: CRUISE and FBWB at zero throttle hold `AIRSPEED_MIN`, and assistance would cycle on and off as in step 2 of the practice."
+    },
+    {
+      "id": "qrtl-cone",
+      "title": "QRTL climb altitude near home",
+      "statement": "QRTL is engaged in a hover **{d} m** from home at an altitude of 3 m. `WP_LOITER_RAD` = **{r} m**, `RTL_RADIUS` = 0, `Q_RTL_ALT` = **{h} m**, `Q_RTL_ALT_MIN` = **{hmin} m**, `Q_LAND_FINAL_ALT` = 6 m. To what altitude above home does the vehicle climb before returning, in m?",
+      "params": {
+        "d": [
+          10,
+          20,
+          30,
+          40,
+          50,
+          60,
+          70,
+          80
+        ],
+        "r": [
+          60,
+          70,
+          80,
+          100
+        ],
+        "h": [
+          15,
+          20,
+          25,
+          30,
+          40
+        ],
+        "hmin": [
+          5,
+          8,
+          10,
+          12
+        ]
+      },
+      "answer": "max(h*d/max(1.5*r, d), min(max(hmin, 6), h))",
+      "unit": "m",
+      "tol": 0.01,
+      "solution": "The return radius R = 1.5·max(`WP_LOITER_RAD`, `RTL_RADIUS`); the target = max(`Q_RTL_ALT`·d/max(R, d), `Q_RTL_ALT_MIN` constrained to the range `Q_LAND_FINAL_ALT`…`Q_RTL_ALT`). The module's example: 60 m → R = 90 m; d = 50 m → max(8.3, 10) = 10 m."
+    }
+  ]
+}

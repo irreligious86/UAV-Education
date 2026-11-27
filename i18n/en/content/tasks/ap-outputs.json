@@ -1,0 +1,215 @@
+{
+ "module": "ap-outputs",
+ "tasks": [
+  {
+   "id": "mask-encode",
+   "title": "A mask for a range of outputs",
+   "statement": "Bidirectional DShot is needed on outputs **{a}** through **{b}** inclusive. What value do you write to `SERVO_BLH_BDMASK`?",
+   "params": {
+    "a": [
+     1,
+     2,
+     3,
+     4,
+     5
+    ],
+    "b": [
+     6,
+     7,
+     8,
+     9,
+     10,
+     12
+    ]
+   },
+   "answer": "2**b - 2**(a - 1)",
+   "unit": "",
+   "tol": 1e-05,
+   "abs": 0.01,
+   "solution": "The weight of output n is 2^(n − 1). The sum of the weights from a to b: 2^b − 2^(a − 1). The module's example: outputs 1–4 → 16 − 1 = 15; outputs 9–10 → 1024 − 256 = 768."
+  },
+  {
+   "id": "mask-decode",
+   "title": "How many outputs are in the mask",
+   "statement": "`BRD_SAFETY_MASK = {v}`. How many outputs keep working with the safety switch engaged?",
+   "params": {
+    "v": [
+     3,
+     10,
+     15,
+     48,
+     192,
+     207,
+     304,
+     768,
+     4288,
+     4095,
+     5461,
+     12288,
+     16368,
+     16383
+    ]
+   },
+   "answer": "(v&1)+(v>>1&1)+(v>>2&1)+(v>>3&1)+(v>>4&1)+(v>>5&1)+(v>>6&1)+(v>>7&1)+(v>>8&1)+(v>>9&1)+(v>>10&1)+(v>>11&1)+(v>>12&1)+(v>>13&1)",
+   "unit": "",
+   "tol": 1e-05,
+   "abs": 0.01,
+   "solution": "Break the number into powers of two: every set bit is one output, and bit 0 is output 1. The module's examples: 4288 = 4096 + 128 + 64 is three outputs (13, 8, 7); 16383 = 2^14 − 1 is fourteen outputs; 16368 = 16383 − 15 is ten outputs (5–14), which is the Copter default for a quadcopter with motors on outputs 1–4."
+  },
+  {
+   "id": "servo-angle-us",
+   "title": "A surface servo pulse (the \"angle\" type)",
+   "statement": "An output with an \"angle\" function: `SERVOn_MIN = {mn}`, `SERVOn_MAX = {mx}`, `SERVOn_TRIM = {tr}`, `SERVOn_REVERSED = {r}`. The controller outputs **{p}%** of full travel (full travel is 4500). Find the pulse width in microseconds the way the firmware calculates it.",
+   "params": {
+    "mn": [
+     1000,
+     1050,
+     1100
+    ],
+    "mx": [
+     1900,
+     1950,
+     2000
+    ],
+    "tr": [
+     1400,
+     1450,
+     1500,
+     1520,
+     1550,
+     1600
+    ],
+    "r": [
+     0,
+     1
+    ],
+    "p": [
+     -95,
+     -85,
+     -70,
+     -55,
+     -45,
+     -35,
+     -15,
+     15,
+     25,
+     35,
+     45,
+     55,
+     65,
+     85,
+     95
+    ]
+   },
+   "answer": "(tr + (p*(1 - 2*r)*(mx - tr))//100) if p*(1 - 2*r) > 0 else (tr - (-p*(1 - 2*r)*(tr - mn))//100)",
+   "unit": "µs",
+   "tol": 1e-05,
+   "abs": 0.01,
+   "solution": "s = p · 45; `REVERSED = 1` flips the sign of s. For s > 0: TRIM + ⌊s · (MAX − TRIM) / 4500⌋, otherwise TRIM − ⌊|s| · (TRIM − MIN) / 4500⌋. The fractional part is truncated, not rounded. The module's example: MIN 1000, MAX 1900, TRIM 1520, s = 1500 → 1520 + ⌊126.67⌋ = 1646."
+  },
+  {
+   "id": "servo-range-us",
+   "title": "A flap servo pulse (the \"range\" type)",
+   "statement": "An output with a \"range\" function (H = 100): `SERVOn_MIN = {mn}`, `SERVOn_MAX = {mx}`, `SERVOn_REVERSED = {r}`. The input value is **{u}**. Find the pulse width in microseconds the way the firmware calculates it.",
+   "params": {
+    "mn": [
+     1000,
+     1050,
+     1100,
+     1150
+    ],
+    "mx": [
+     1850,
+     1900,
+     1950,
+     2000
+    ],
+    "r": [
+     0,
+     1
+    ],
+    "u": {
+     "min": 3,
+     "max": 97,
+     "step": 2
+    }
+   },
+   "answer": "mn + ((u if r == 0 else 100 - u)*(mx - mn))//100",
+   "unit": "µs",
+   "tol": 1e-05,
+   "abs": 0.01,
+   "solution": "PWM = MIN + ⌊s · (MAX − MIN) / 100⌋; with `REVERSED = 1`, s is first replaced with 100 − s. The module's example: MIN 1100, MAX 1950, s = 33 → 1100 + ⌊280.5⌋ = 1380; with the reversal s = 67 → 1100 + ⌊569.5⌋ = 1669."
+  },
+  {
+   "id": "erpm-to-rpm",
+   "title": "Motor RPM from ESC telemetry",
+   "statement": "An ESC reports an electrical frequency of **{e}** in units of 100 eRPM. `SERVO_BLH_POLES = {n}`. What RPM does the firmware write to the `RPM` field?",
+   "params": {
+    "e": {
+     "min": 300,
+     "max": 2400,
+     "step": 30
+    },
+    "n": [
+     12,
+     14,
+     24,
+     28
+    ]
+   },
+   "answer": "(e*200)//n",
+   "unit": "RPM",
+   "tol": 1e-05,
+   "abs": 0.6,
+   "solution": "RPM = ⌊E · 200 / poles⌋: a hundred eRPM per unit, two poles per pair. The module's example: E = 1470, 14 poles → 21000 RPM, that is, 350 Hz for the notch filter."
+  },
+  {
+   "id": "timer-free-outputs",
+   "title": "How many outputs are left for servos",
+   "statement": "MatekH743, standard build: TIM8 has outputs 1–2, TIM5 has 3–6, TIM4 has 7–10, TIM15 has 11–12. DShot motors are on outputs 1 through **{n}**. How many of outputs 1–12 can be given to servos with 50 Hz PWM?",
+   "params": {
+    "n": [
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9,
+     10,
+     11
+    ]
+   },
+   "answer": "10 - 4*(n >= 3) - 4*(n >= 7) - 2*(n >= 11)",
+   "unit": "",
+   "tol": 1e-05,
+   "abs": 0.01,
+   "solution": "A group with at least one DShot output is entirely digital. Count the outputs only in the groups the motors do not touch: motors 1–2 → TIM5, TIM4, TIM15 are free (10 outputs); motors 1–4 → TIM4 and TIM15 (6); motors 1–8 → only TIM15 (2)."
+  },
+  {
+   "id": "dshot-frame-rate",
+   "title": "DShot frame rate",
+   "statement": "The main loop rate is **{l} Hz**, `SERVO_DSHOT_RATE = {p}`, and all motors are on DShot. At what rate (Hz) does the flight controller send DShot frames?",
+   "params": {
+    "l": [
+     300,
+     400,
+     800
+    ],
+    "p": [
+     0,
+     1,
+     2,
+     3,
+     4
+    ]
+   },
+   "answer": "1000 if p == 0 else l*max(p, math.ceil(800/l))",
+   "unit": "Hz",
+   "tol": 1e-05,
+   "abs": 0.01,
+   "solution": "0 is a fixed 1000 Hz. Otherwise the rate equals the multiple × the loop rate, but the multiple is raised while the result is below 800 Hz. With a 400 Hz loop: 1 → 800, 2 → 800, 3 → 1200, 4 → 1600."
+  }
+ ]
+}

@@ -3,15 +3,15 @@
   "pass": 80,
   "questions": [
     {
-      "q": "The main downside of the coaxial X8 layout?",
+      "q": "What is the main drawback of the coaxial X8 layout?",
       "options": [
         "The frame ends up heavier",
-        "A thrust loss of about 15 %",
+        "A thrust loss of about 15%",
         "RTL is not supported",
         "No protection against failures"
       ],
       "answer": 1,
-      "explain": "The lower prop works in the upper prop's wash. You pay for compactness and fault tolerance with efficiency."
+      "explain": "The bottom prop works in the wash of the top one. You pay for compactness and fault tolerance with efficiency."
     },
     {
       "q": "FRAME_CLASS/FRAME_TYPE for an X8?",
@@ -22,10 +22,10 @@
         "7/1"
       ],
       "answer": 1,
-      "explain": "4 — OctaQuad, 1 — X."
+      "explain": "4 is OctaQuad, 1 is X."
     },
     {
-      "q": "What do you fix first with high VIBE on big props?",
+      "q": "What do you fix first when VIBE is high on large props?",
       "options": [
         "The gyro filters",
         "Balancing and stiffness",
@@ -33,15 +33,15 @@
         "The EKF settings"
       ],
       "answer": 1,
-      "explain": "Balancing props and motors, frame stiffness, FC damping. Filters are the last resort."
+      "explain": "Prop and motor balancing, frame stiffness, FC damping. Filters are the last resort."
     },
     {
       "q": "When do you test a motor failure?",
       "options": [
-        "Never — it is dangerous",
-        "SITL, then at altitude without a payload",
-        "Right away with the full payload, to test the worst case",
-        "On the bench with props on"
+        "Never, it is dangerous",
+        "SITL, then at altitude with no payload",
+        "Right away with a full payload, to test the worst case",
+        "On the bench with the props on"
       ],
       "answer": 1,
       "explain": "Fault tolerance is tested, not assumed."
@@ -55,40 +55,40 @@
         "The motor protocol"
       ],
       "answer": 1,
-      "explain": "Hover throttle, refined in flight; altitude hold depends on it."
+      "explain": "\"Hover throttle\" in ArduPilot terms is the hover thrust as a fraction of maximum (≈ 1/(T/W)), not the percent throttle on a thrust stand; it is refined in flight (MOT_HOVER_LEARN), and altitude hold depends on it."
     },
     {
       "q": "MOT_YAW_HEADROOM = 200 is:",
       "options": [
-        "The maximum bank angle in centidegrees",
-        "The output headroom reserved for yaw",
+        "The maximum roll angle in centidegrees",
+        "The output reserved for yaw",
         "The notch filter frequency",
         "The ESC current limit"
       ],
       "answer": 1,
-      "explain": "The motor output headroom (PWM) reserved for yaw at saturation; yaw is the mixer's lowest priority."
+      "explain": "The motor output (PWM) reserved for yaw at saturation; yaw is the lowest-priority attitude axis: roll and pitch come first, yaw keeps at least this headroom, and throttle gets what is left."
     },
     {
       "q": "How do you safely test a motor failure on an X8?",
       "options": [
-        "Remove a prop right in flight",
-        "An applet in SITL, then without a payload",
-        "Disconnect an ESC on the ground with props on",
-        "There is no way to test it"
+        "Take a prop off in flight",
+        "The applet in SITL, then with no payload",
+        "Disconnect an ESC on the ground with the props on",
+        "It cannot be tested at all"
       ],
       "answer": 1,
-      "explain": "motor_failure_test first in SITL, then at altitude without a payload; MOT_STOP_BITMASK + a switch."
+      "explain": "motor_failure_test first in SITL, then at altitude with no payload; MOT_STOP_BITMASK plus a switch."
     },
     {
-      "q": "Why is a heavy vehicle tuned slower and more carefully than a 5\"?",
+      "q": "Why is a heavy vehicle tuned more slowly and carefully than a 5\"?",
       "options": [
-        "Large inertia and slow motors: errors build up longer and are more dangerous",
+        "High inertia and slow motors: mistakes take longer to build up and are more dangerous",
         "It has no AUTOTUNE",
-        "ArduPilot does not support big props",
-        "It has no gyroscope"
+        "ArduPilot does not support large props",
+        "It has no gyro"
       ],
       "answer": 0,
-      "explain": "Big props and mass mean slow dynamics and a high cost of error."
+      "explain": "Large props and mass mean slow dynamics and a high cost of error."
     }
   ]
 }

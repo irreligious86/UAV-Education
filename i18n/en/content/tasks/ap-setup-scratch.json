@@ -1,0 +1,110 @@
+{
+ "module": "ap-setup-scratch",
+ "tasks": [
+  {
+   "id": "volt-mult",
+   "title": "Calibrating BATT_VOLT_MULT",
+   "statement": "`BATT_VOLT_MULT` is set to **{m}**. Mission Planner shows **{vr} V**, and a multimeter on the battery balance lead shows **{vm} V**. What new value of `BATT_VOLT_MULT` do you write?",
+   "params": {
+    "m": {
+     "min": 10.0,
+     "max": 18.0,
+     "step": 0.1
+    },
+    "vr": {
+     "min": 16.0,
+     "max": 16.6,
+     "step": 0.02
+    },
+    "vm": {
+     "min": 16.3,
+     "max": 16.8,
+     "step": 0.02
+    }
+   },
+   "answer": "m*vm/vr",
+   "unit": "",
+   "tol": 0.003,
+   "solution": "The firmware computes V = (V_pin − BATT_VLT_OFFSET) · BATT_VOLT_MULT, so the reading is directly proportional to the multiplier. New multiplier = old · V_multimeter / V_GCS. If the GCS reads low, the multiplier goes up."
+  },
+  {
+   "id": "amp-pervlt-mah",
+   "title": "BATT_AMP_PERVLT from the charger",
+   "statement": "`BATT_AMP_PERVLT` is set to **{k} A/V**. After a flight the flight controller counted **{mfc} mAh**, and the charger put **{mch} mAh** back into the battery (charged to the same voltage as before the flight; the zero offset is already calibrated). What is the new value of `BATT_AMP_PERVLT`?",
+   "params": {
+    "k": {
+     "min": 17.0,
+     "max": 60.0,
+     "step": 0.5
+    },
+    "mfc": {
+     "min": 1100,
+     "max": 1400,
+     "step": 10
+    },
+    "mch": {
+     "min": 1150,
+     "max": 1400,
+     "step": 10
+    }
+   },
+   "answer": "k*mch/mfc",
+   "unit": "A/V",
+   "tol": 0.005,
+   "solution": "I = (V_pin − BATT_AMP_OFFSET) · BATT_AMP_PERVLT, and mAh is the integral of current, so the capacity error equals the scale error. New = old · mAh_charger / mAh_flight_controller. The charger is the more honest reference: it measures what actually left the battery (less a charging efficiency correction of ~2–5 %)."
+  },
+  {
+   "id": "amp-offset",
+   "title": "BATT_AMP_OFFSET from the zero reading",
+   "statement": "The board is powered over USB, the main battery is disconnected, and the current through the sensor is zero. With `BATT_AMP_PERVLT` = **{k} A/V** and `BATT_AMP_OFFSET` = **{o} V** the GCS shows **{i0} A**. What new value of `BATT_AMP_OFFSET` (V) zeroes the reading?",
+   "params": {
+    "k": {
+     "min": 17.0,
+     "max": 60.0,
+     "step": 0.5
+    },
+    "o": [
+     0.0,
+     0.005,
+     0.01,
+     0.02
+    ],
+    "i0": {
+     "min": 0.2,
+     "max": 1.5,
+     "step": 0.05
+    }
+   },
+   "answer": "o+i0/k",
+   "unit": "V",
+   "tol": 0.01,
+   "solution": "The sensor zero: I₀ = (V_pin − o) · k, so V_pin = o + I₀/k. That voltage is the new offset. The offset is calibrated first; otherwise a scale fitted at one current point is wrong at every other point."
+  },
+  {
+   "id": "hover-pwm",
+   "title": "Hover PWM from T/W",
+   "statement": "The copter has a thrust-to-weight ratio of **{tw}** (maximum thrust is at `MOT_SPIN_MAX` = 0.95), `MOT_THST_EXPO` = **{e}**, `MOT_SPIN_MIN` = **{smin}**, `MOT_PWM_MIN/MAX` = 1000/2000 µs, and voltage compensation is off. Taking `MOT_THST_HOVER` = 1/(T/W), find the PWM at the motor output in a hover (µs).",
+   "params": {
+    "tw": {
+     "min": 2.0,
+     "max": 5.0,
+     "step": 0.1
+    },
+    "e": {
+     "min": 0.5,
+     "max": 0.8,
+     "step": 0.05
+    },
+    "smin": {
+     "min": 0.1,
+     "max": 0.2,
+     "step": 0.01
+    }
+   },
+   "answer": "1000+1000*(smin+(0.95-smin)*((e-1)+math.sqrt((1-e)**2+4*e/tw))/(2*e))",
+   "unit": "µs",
+   "tol": 0.005,
+   "solution": "Hover thrust t = 1/(T/W). The AP_Motors linearization (Thrust_Linearization): r = ((e−1) + √((1−e)² + 4·e·t)) / (2e), the inverse of T = (1−e)·r + e·r². Output: actuator = SPIN_MIN + (SPIN_MAX − SPIN_MIN)·r, PWM = PWM_MIN + actuator·(PWM_MAX − PWM_MIN). Example: T/W 3, e 0.65, SPIN_MIN 0.15 → t 0.333, r 0.496, PWM ≈ 1547 µs."
+  }
+ ]
+}

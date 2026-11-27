@@ -1,0 +1,181 @@
+{
+ "module": "ap-aux-tune",
+ "tasks": [
+  {
+   "id": "knob-value",
+   "title": "The value from the knob (Copter TUNE)",
+   "statement": "`RC6_OPTION = 219`, `RC6_MIN = {mn}`, `RC6_MAX = {mx}`, `RC6_REVERSED = 0`, `TUNE = 4`, `TUNE_MIN = {a}`, `TUNE_MAX = {b}`. The knob is at **{p} µs**. What value does `ATC_RAT_RLL_P` get?",
+   "params": {
+    "mn": [
+     1000,
+     1050,
+     1100
+    ],
+    "mx": [
+     1900,
+     1950,
+     2000
+    ],
+    "a": [
+     0.05,
+     0.08,
+     0.1
+    ],
+    "b": [
+     0.2,
+     0.25,
+     0.3
+    ],
+    "p": {
+     "min": 950,
+     "max": 2050,
+     "step": 25
+    }
+   },
+   "answer": "a + (b - a)*min(1, max(0, (p - mn)/(mx - mn)))",
+   "unit": "",
+   "tol": 0.005,
+   "abs": 0.0002,
+   "solution": "The fraction of travel is d = (PWM − RC6_MIN) / (RC6_MAX − RC6_MIN), constrained to 0…1; value = TUNE_MIN + (TUNE_MAX − TUNE_MIN) · d. `RC6_TRIM` is not involved. The module's example: 1100…1900, 0.05…0.25, 1750 µs → d = 0.8125 → 0.2125; 1000 µs → d is constrained to 0 → 0.05."
+  },
+  {
+   "id": "knob-pwm-for-value",
+   "title": "Where the original value is on the knob",
+   "statement": "`RC6_MIN = {mn}`, `RC6_MAX = {mx}`, `TUNE_MIN = {a}`, `TUNE_MAX = {b}`. The saved value of the gain is **{v}**. At how many microseconds must the knob be for the gain not to change after power-up?",
+   "params": {
+    "mn": [
+     1000,
+     1100
+    ],
+    "mx": [
+     1900,
+     2000
+    ],
+    "a": [
+     0.05,
+     0.08
+    ],
+    "b": [
+     0.2,
+     0.25
+    ],
+    "v": [
+     0.09,
+     0.1,
+     0.11,
+     0.12,
+     0.135,
+     0.15,
+     0.16,
+     0.18
+    ]
+   },
+   "answer": "mn + (v - a)/(b - a)*(mx - mn)",
+   "unit": "µs",
+   "tol": 0.001,
+   "abs": 1.5,
+   "solution": "The inverse formula: PWM = RC6_MIN + (v − TUNE_MIN) / (TUNE_MAX − TUNE_MIN) · (RC6_MAX − RC6_MIN). The module's example: 1100…1900, 0.05…0.25, v = 0.135 → 1100 + 0.425 · 800 = 1440 µs. The middle of the travel gives the middle of the range, not the saved value."
+  },
+  {
+   "id": "debounce-time",
+   "title": "When a switch triggers",
+   "statement": "Aux channels are read at the 0, 100, 200 ms marks and so on (an ideal 10 Hz tick). A switch changed position at **{t} ms** and did not move again. At which mark (ms) does ArduPilot call the function?",
+   "params": {
+    "t": [
+     1030,
+     1070,
+     1110,
+     1250,
+     1390,
+     2050,
+     2460,
+     3020,
+     3333,
+     4010,
+     5010,
+     5990,
+     6040,
+     7070,
+     8125
+    ]
+   },
+   "answer": "((t + 99)//100)*100 + 200",
+   "unit": "ms",
+   "tol": 1e-05,
+   "abs": 0.5,
+   "solution": "The new position is seen at the first mark not earlier than the flick: ⌈t / 100⌉ · 100. The function is called at the first mark where at least `SWITCH_DEBOUNCE_TIME_MS` = 200 ms have passed: another + 200. The module's example: 1030 → seen at 1100 → called at 1300 ms."
+  },
+  {
+   "id": "sixpos-position",
+   "title": "Position of a six-position switch",
+   "statement": "The mode channel (`FLTMODE_CH`) or the VTX power channel (`RCx_OPTION = 94`) is at **{p} µs**. Which position (from 1 to 6) does ArduPilot determine?",
+   "params": {
+    "p": [
+     988,
+     1100,
+     1165,
+     1230,
+     1231,
+     1295,
+     1360,
+     1361,
+     1425,
+     1490,
+     1491,
+     1500,
+     1555,
+     1620,
+     1621,
+     1685,
+     1749,
+     1750,
+     1815,
+     2012
+    ]
+   },
+   "answer": "1 + (p >= 1231) + (p >= 1361) + (p >= 1491) + (p >= 1621) + (p >= 1750)",
+   "unit": "",
+   "tol": 1e-05,
+   "abs": 0.01,
+   "solution": "The boundaries from `read_6pos_switch`: below 1231 is position 1, below 1361 is 2, below 1491 is 3, below 1621 is 4, below 1750 is 5, otherwise 6. A three-position switch at 988 / 1500 / 2012 µs lands in positions 1, 4, and 6."
+  },
+  {
+   "id": "plane-tune-value",
+   "title": "The value from the knob on Plane (AP_Tuning)",
+   "statement": "Plane: `TUNE_CHAN_MIN = 1000`, `TUNE_CHAN_MAX = 2000`, `TUNE_RANGE = {r}`. The parameter value at the moment of selection (the center) is **{c}**. The knob has passed the middle and is at **{p} µs**. What is the parameter?",
+   "params": {
+    "r": [
+     1.5,
+     2,
+     3
+    ],
+    "c": [
+     0.1,
+     0.2,
+     0.3,
+     0.5,
+     0.8
+    ],
+    "p": [
+     1000,
+     1100,
+     1200,
+     1250,
+     1300,
+     1400,
+     1600,
+     1700,
+     1750,
+     1800,
+     1900,
+     2000
+    ]
+   },
+   "answer": "c*(1 + (p - 1500)/500*(r - 1)) if p >= 1500 else c/r + (p - 1000)/500*(c - c/r)",
+   "unit": "",
+   "tol": 0.005,
+   "abs": 0.0002,
+   "solution": "The knob position is k = (PWM − 1500) / 500, from −1 to +1. Above the middle: center · (1 + k · (RANGE − 1)); below it: center / RANGE + (k + 1) · (center − center / RANGE). The module's example: center 0.3, RANGE 2 → 1000 µs: 0.15; 1250: 0.225; 1750: 0.45; 2000: 0.6."
+  }
+ ]
+}

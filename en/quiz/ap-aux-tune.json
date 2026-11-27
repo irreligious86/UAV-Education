@@ -3,62 +3,62 @@
  "pass": 80,
  "questions": [
   {
-   "q": "Тумблер с `RC8_OPTION = 28` (реле 1) стоял на 1810 мкс, реле включено. Из-за подстройки на пульте канал стал 1795 мкс. Что сделает ArduPilot 4.7.2?",
+   "q": "A switch with `RC8_OPTION = 28` (relay 1) was at 1810 µs, with the relay on. After a trim adjustment on the transmitter the channel became 1795 µs. What does ArduPilot 4.7.2 do?",
    "options": [
-    "Ничего: между 1200 и 1800 мкс действует гистерезис, положение HIGH удерживается",
-    "Через 200–300 мс выключит реле: 1795 мкс — это MIDDLE",
-    "Выключит реле только после падения ниже 1200 мкс",
-    "Сообщит `Invalid channel option` и оставит реле как было"
+    "Nothing: there is hysteresis between 1200 and 1800 µs, and the HIGH position is held",
+    "After 200–300 ms it turns the relay off: 1795 µs is MIDDLE",
+    "It turns the relay off only after the channel drops below 1200 µs",
+    "It reports `Invalid channel option` and leaves the relay as it was"
    ],
    "answer": 1,
-   "explain": "Гистерезиса нет: HIGH — строго больше 1800 мкс, всё от 1200 до 1800 включительно — MIDDLE (`read_3pos_switch`). Смена положения исполняется после задержки 200 мс, а для реле HIGH включает, остальные положения выключают."
+   "explain": "There is no hysteresis: HIGH is strictly above 1800 µs, and everything from 1200 to 1800 inclusive is MIDDLE (`read_3pos_switch`). A change of position is executed after the 200 ms debounce, and for a relay HIGH turns it on and the other positions turn it off."
   },
   {
-   "q": "Aux-каналы читаются на отметках 0, 100, 200 мс и далее. Тумблер E-Stop (`31`) ушёл в HIGH в момент 4010 мс и вернулся в LOW в 4190 мс. Когда остановятся моторы?",
+   "q": "Aux channels are read at the 0, 100, 200 ms marks and so on. An E-Stop switch (`31`) went to HIGH at 4010 ms and came back to LOW at 4190 ms. When do the motors stop?",
    "options": [
-    "В 4100 мс — на первом такте после щелчка",
-    "В 4210 мс — через 200 мс после щелчка",
-    "В 4300 мс — через 200 мс после такта, на котором впервые замечено положение HIGH",
-    "Не остановятся: на отметке 4200 канал снова в LOW, отсчёт сброшен"
+    "At 4100 ms, on the first tick after the flick",
+    "At 4210 ms, 200 ms after the flick",
+    "At 4300 ms, 200 ms after the tick on which the HIGH position was first seen by the firmware",
+    "They do not stop: at the 4200 mark the channel is in LOW again and the count is reset"
    ],
    "answer": 3,
-   "explain": "На отметке 4100 замечено новое положение и запомнено время; на отметке 4200 канал уже равен текущему положению LOW, и `debounce_completed` сбрасывает ожидание. Импульс короче двух тактов опроса не исполняется."
+   "explain": "At the 4100 mark the new position is seen and the time is remembered; at the 4200 mark the channel already equals the current position, LOW, and `debounce_completed` resets the wait. A pulse shorter than two polling ticks is not executed."
   },
   {
-   "q": "Пульт включён с тумблером `RC7_OPTION = 153` (ArmDisarm) в HIGH и тумблером `RC9_OPTION = 4` (RTL) в HIGH. Что произойдёт через 200 мс после первого кадра приёмника?",
+   "q": "The transmitter is switched on with the `RC7_OPTION = 153` (ArmDisarm) switch in HIGH and the `RC9_OPTION = 4` (RTL) switch in HIGH. What happens 200 ms after the first receiver frame?",
    "options": [
-    "Арм и попытка включить RTL",
-    "Только попытка включить RTL; арма нет, положение тумблера 153 лишь запомнено",
-    "Ничего: при первом кадре приёмника все функции без исключения только запоминают положение",
-    "Только арм: режимы при загрузке не переключаются"
+    "An arm and an attempt to engage RTL",
+    "Only an attempt to engage RTL; no arm, since the position of the 153 switch is only remembered",
+    "Nothing: on the first receiver frame every function without exception only remembers its position",
+    "Only an arm: modes are not switched at boot"
    ],
    "answer": 1,
-   "explain": "`init_position_on_first_radio_read` возвращает `true` только для 153, 154, 165 и 22. Остальные функции исполняют текущее положение после 200 мс, потому что запомненное положение канала изначально равно −1."
+   "explain": "`init_position_on_first_radio_read` returns `true` only for 153, 154, 165, and 22. The other functions execute the current position after 200 ms, because the remembered position of a channel is initially −1."
   },
   {
-   "q": "В полёте пилот задел тумблер с `RCx_OPTION = 31` (Motor Emergency Stop), канал ушёл в HIGH. Что делает Copter 4.7.2?",
+   "q": "In flight the pilot bumped a switch with `RCx_OPTION = 31` (Motor Emergency Stop), and the channel went to HIGH. What does Copter 4.7.2 do?",
    "options": [
-    "Игнорирует: функция действует только на земле",
-    "Плавно снижает газ и садится в режиме LAND",
-    "Сразу обнуляет выходы моторов; аппарат остаётся в арме, задержка автодизарма вдвое короче",
-    "Делает дизарм, как тумблер 153 в LOW, пишет событие в лог и до перезагрузки запрещает повторный арм"
+    "It ignores it: the function works only on the ground",
+    "It reduces throttle smoothly and lands in LAND mode",
+    "It zeroes the motor outputs immediately; the vehicle stays armed, and the auto-disarm delay is halved",
+    "It disarms, just like a 153 switch in LOW, logs an event, and refuses to arm again until the next reboot"
    ],
    "answer": 2,
-   "explain": "`SRV_Channels::set_emergency_stop(true)` обнуляет выходы моторных функций без проверки высоты и режима; дизарма нет, но `DISARM_DELAY` делится на два (`motors.cpp`). Возврат тумблера в LOW до автодизарма снова запускает моторы."
+   "explain": "`SRV_Channels::set_emergency_stop(true)` zeroes the outputs of the motor functions with no check of altitude or mode; there is no disarm, but `DISARM_DELAY` is divided by two (`motors.cpp`). Putting the switch back in LOW before the auto-disarm starts the motors again."
   },
   {
-   "q": "`RC9_OPTION = 31`, `RC9_REVERSED = 1`, `RC_OPTIONS = 32`. В каком положении тумблера остановятся моторы?",
+   "q": "`RC9_OPTION = 31`, `RC9_REVERSED = 1`, `RC_OPTIONS = 32`. In which switch position do the motors stop?",
    "options": [
-    "Выше 1800 мкс: разворот тумблера не действует без бита 7 в `RC_OPTIONS`",
-    "Ниже 1200 мкс: `RCx_REVERSED` разворачивает любой канал независимо от `RC_OPTIONS`",
-    "В среднем положении",
-    "Ни в каком: развёрнутый канал отключает функцию"
+    "Above 1800 µs: the switch reversal has no effect without bit 7 in `RC_OPTIONS`",
+    "Below 1200 µs: `RCx_REVERSED` reverses any channel regardless of the `RC_OPTIONS` bits",
+    "In the middle position",
+    "In none: a reversed channel disables the function"
    ],
    "answer": 0,
-   "explain": "`read_3pos_switch` учитывает `RCx_REVERSED` только при установленном бите 7 (128, Allow Switch reverse). 32 — это бит 5. Нужно `RC_OPTIONS = 160` или разворот на пульте."
+   "explain": "`read_3pos_switch` takes `RCx_REVERSED` into account only when bit 7 (128, Allow Switch reverse) is set. 32 is bit 5. You need `RC_OPTIONS = 160` or a reversal on the transmitter."
   },
   {
-   "q": "`RC6_OPTION = 219`, `RC6_MIN = 1100`, `RC6_MAX = 1900`, `TUNE = 4`, `TUNE_MIN = 0.05`, `TUNE_MAX = 0.25`. Крутилка на 1750 мкс. Чему равен `ATC_RAT_RLL_P`?",
+   "q": "`RC6_OPTION = 219`, `RC6_MIN = 1100`, `RC6_MAX = 1900`, `TUNE = 4`, `TUNE_MIN = 0.05`, `TUNE_MAX = 0.25`. The knob is at 1750 µs. What is `ATC_RAT_RLL_P`?",
    "options": [
     "0.2000",
     "0.2125",
@@ -66,21 +66,21 @@
     "0.1350"
    ],
    "answer": 1,
-   "explain": "Доля хода (1750 − 1100) / (1900 − 1100) = 0.8125; значение 0.05 + 0.2 · 0.8125 = 0.2125. Ответ 0.20 получается, если взять ход 1000…2000 вместо `RC6_MIN…RC6_MAX`; 0.135 — сохранённое значение, крутилка его не знает."
+   "explain": "The fraction of travel is (1750 − 1100) / (1900 − 1100) = 0.8125; the value is 0.05 + 0.2 · 0.8125 = 0.2125. You get 0.20 if you take a travel of 1000…2000 instead of `RC6_MIN…RC6_MAX`; 0.135 is the saved value, which the knob knows nothing about."
   },
   {
-   "q": "В полёте крутилкой подобран `ATC_RAT_RLL_P = 0.18` (`TUNE = 4`). После посадки пилот выключил питание. Что будет в параметре при следующем включении с крутилкой в том же положении?",
+   "q": "In flight the knob was used to find `ATC_RAT_RLL_P = 0.18` (`TUNE = 4`). After landing the pilot switched off the power. What is in the parameter at the next power-up with the knob in the same position?",
    "options": [
-    "0.18 из памяти: подстройка сохраняет значение при дизарме",
-    "Сохранённое до подстройки значение, и оно останется таким, пока пилот не сдвинет крутилку хотя бы на 1 %",
-    "Сначала сохранённое до подстройки значение, затем снова 0.18 от крутилки, пока `TUNE` не равен 0",
-    "`TUNE_MIN`, пока крутилку не провести через середину"
+    "0.18 from storage: tuning saves the value on disarm",
+    "The value saved before tuning, and it stays that way until the pilot moves the knob by at least 1%",
+    "First the value saved before tuning, then 0.18 from the knob again, as long as `TUNE` is not 0",
+    "`TUNE_MIN`, until the knob is moved through the middle"
    ],
    "answer": 2,
-   "explain": "Подстройка пишет только в оперативную копию (`set_kP`), поэтому из памяти загрузится старое значение. Но `TUNE` всё ещё 4, и расчёт 3 раза в секунду снова поставит значение по положению крутилки. Чтобы закрепить результат, значение записывают с наземной станции и ставят `TUNE = 0`. Проход через середину нужен в Plane, не в Copter."
+   "explain": "Tuning writes only to the in-memory copy (`set_kP`), so the old value is loaded from storage. But `TUNE` is still 4, and the calculation, 3 times per second, sets the value from the knob position again. To keep the result, write the value from the ground station and set `TUNE = 0`. Passing through the middle is required on Plane, not on Copter."
   },
   {
-   "q": "Нужно подстроить в полёте D только по крену, сейчас `ATC_RAT_RLL_D = 0.0036`, а `ATC_RAT_PIT_D = 0.0052`. Какой набор безопасен?",
+   "q": "You need to tune D in flight on roll only; right now `ATC_RAT_RLL_D = 0.0036` and `ATC_RAT_PIT_D = 0.0052`. Which set is safe?",
    "options": [
     "`TUNE = 21`, `TUNE_MIN = 0`, `TUNE_MAX = 0.01`",
     "`TUNE = 21`, `TUNE_MIN = 0.00288`, `TUNE_MAX = 0.00432`",
@@ -88,29 +88,29 @@
     "`TUNE = 48`, `TUNE_MIN = 0.0036`, `TUNE_MAX = 0.0036`"
    ],
    "answer": 2,
-   "explain": "51 меняет только D крена; диапазон ±20 % вокруг 0.0036 ставит исходное значение на середину хода. 21 записал бы одно число в обе оси и стёр 0.0052 по тангажу; 48 — это тангаж, а при равных `TUNE_MIN` и `TUNE_MAX` подстройка в 4.7 выключена."
+   "explain": "51 changes only the roll D; a ±20% range around 0.0036 puts the original value at the middle of the travel. 21 would write one number to both axes and wipe out the 0.0052 on pitch; 48 is pitch, and with equal `TUNE_MIN` and `TUNE_MAX` tuning is off in 4.7."
   },
   {
-   "q": "Plane, `TUNE_PARAM = 101`, `TUNE_RANGE = 2`. Пилот поднял селектор (`TUNE_SELECTOR`) в HIGH на 3 секунды и отпустил. Что произошло?",
+   "q": "Plane, `TUNE_PARAM = 101`, `TUNE_RANGE = 2`. The pilot raised the selector (`TUNE_SELECTOR`) to HIGH for 3 seconds and released it. What happened?",
    "options": [
-    "Текущее значение стало новым центром (`Tuning: recentered`)",
-    "Переход к следующему параметру набора (`Tuning: started …`)",
-    "Значения набора сохранены (`Tuning: Saved`)",
-    "Несохранённые значения возвращены (`Tuning: reverted`)"
+    "The current value became the new center point (`Tuning: recentered`)",
+    "It moved to the next parameter of the set (`Tuning: started …`)",
+    "The set's values were saved (`Tuning: Saved`)",
+    "The unsaved values were reverted (`Tuning: reverted`)"
    ],
    "answer": 1,
-   "explain": "`check_selector_switch`: удержание 0.2–2 с — новый центр, 2–5 с — следующий параметр, дольше 5 с (пока селектор ещё в HIGH и значение менялось) — сохранение. Возврат делает смена режима при `TUNE_MODE_REVERT = 1`."
+   "explain": "`check_selector_switch`: a hold of 0.2–2 s sets a new center, 2–5 s moves to the next parameter, and longer than 5 s (while the selector is still in HIGH and the value has changed) saves. A revert is done by a mode change with `TUNE_MODE_REVERT = 1`."
   },
   {
-   "q": "Скрипт Lua вызывает `rc:get_aux_cached(300)` сразу после загрузки полётника, тумблер `RC10_OPTION = 300` стоит в LOW, пульт ещё выключен. Что вернёт вызов?",
+   "q": "A Lua script calls `rc:get_aux_cached(300)` right after the flight controller boots; the `RC10_OPTION = 300` switch is in LOW, and the transmitter is still off. What does the call return?",
    "options": [
-    "0 — тумблер в LOW",
-    "`nil` — функция ещё ни разу не вызывалась",
-    "1 — среднее положение по умолчанию",
-    "Ошибку скрипта: канал недействителен, пока нет связи с пультом"
+    "0, the switch is in LOW",
+    "`nil`, the function has not been called yet",
+    "1, the middle position by default",
+    "A script error: the channel is invalid while there is no link to the transmitter"
    ],
    "answer": 1,
-   "explain": "Кэш положения заполняется в `run_aux_function`. Функции 300–315 при инициализации не вызываются; первый вызов происходит через 200 мс после первого кадра приёмника. До этого `get_aux_cached` возвращает `nil`, и скрипт обязан это обработать."
+   "explain": "The position cache is filled in `run_aux_function`. Functions 300–315 are not called at initialization; the first call happens 200 ms after the first receiver frame. Until then `get_aux_cached` returns `nil`, and the script has to handle that."
   }
  ]
 }

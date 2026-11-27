@@ -1,0 +1,116 @@
+{
+ "module": "ap-aux-tune",
+ "pass": 80,
+ "questions": [
+  {
+   "q": "A switch with `RC8_OPTION = 28` (relay 1) was at 1810 µs, with the relay on. After a trim adjustment on the transmitter the channel became 1795 µs. What does ArduPilot 4.7.2 do?",
+   "options": [
+    "Nothing: there is hysteresis between 1200 and 1800 µs, and the HIGH position is held",
+    "After 200–300 ms it turns the relay off: 1795 µs is MIDDLE",
+    "It turns the relay off only after the channel drops below 1200 µs",
+    "It reports `Invalid channel option` and leaves the relay as it was"
+   ],
+   "answer": 1,
+   "explain": "There is no hysteresis: HIGH is strictly above 1800 µs, and everything from 1200 to 1800 inclusive is MIDDLE (`read_3pos_switch`). A change of position is executed after the 200 ms debounce, and for a relay HIGH turns it on and the other positions turn it off."
+  },
+  {
+   "q": "Aux channels are read at the 0, 100, 200 ms marks and so on. An E-Stop switch (`31`) went to HIGH at 4010 ms and came back to LOW at 4190 ms. When do the motors stop?",
+   "options": [
+    "At 4100 ms, on the first tick after the flick",
+    "At 4210 ms, 200 ms after the flick",
+    "At 4300 ms, 200 ms after the tick on which the HIGH position was first seen by the firmware",
+    "They do not stop: at the 4200 mark the channel is in LOW again and the count is reset"
+   ],
+   "answer": 3,
+   "explain": "At the 4100 mark the new position is seen and the time is remembered; at the 4200 mark the channel already equals the current position, LOW, and `debounce_completed` resets the wait. A pulse shorter than two polling ticks is not executed."
+  },
+  {
+   "q": "The transmitter is switched on with the `RC7_OPTION = 153` (ArmDisarm) switch in HIGH and the `RC9_OPTION = 4` (RTL) switch in HIGH. What happens 200 ms after the first receiver frame?",
+   "options": [
+    "An arm and an attempt to engage RTL",
+    "Only an attempt to engage RTL; no arm, since the position of the 153 switch is only remembered",
+    "Nothing: on the first receiver frame every function without exception only remembers its position",
+    "Only an arm: modes are not switched at boot"
+   ],
+   "answer": 1,
+   "explain": "`init_position_on_first_radio_read` returns `true` only for 153, 154, 165, and 22. The other functions execute the current position after 200 ms, because the remembered position of a channel is initially −1."
+  },
+  {
+   "q": "In flight the pilot bumped a switch with `RCx_OPTION = 31` (Motor Emergency Stop), and the channel went to HIGH. What does Copter 4.7.2 do?",
+   "options": [
+    "It ignores it: the function works only on the ground",
+    "It reduces throttle smoothly and lands in LAND mode",
+    "It zeroes the motor outputs immediately; the vehicle stays armed, and the auto-disarm delay is halved",
+    "It disarms, just like a 153 switch in LOW, logs an event, and refuses to arm again until the next reboot"
+   ],
+   "answer": 2,
+   "explain": "`SRV_Channels::set_emergency_stop(true)` zeroes the outputs of the motor functions with no check of altitude or mode; there is no disarm, but `DISARM_DELAY` is divided by two (`motors.cpp`). Putting the switch back in LOW before the auto-disarm starts the motors again."
+  },
+  {
+   "q": "`RC9_OPTION = 31`, `RC9_REVERSED = 1`, `RC_OPTIONS = 32`. In which switch position do the motors stop?",
+   "options": [
+    "Above 1800 µs: the switch reversal has no effect without bit 7 in `RC_OPTIONS`",
+    "Below 1200 µs: `RCx_REVERSED` reverses any channel regardless of the `RC_OPTIONS` bits",
+    "In the middle position",
+    "In none: a reversed channel disables the function"
+   ],
+   "answer": 0,
+   "explain": "`read_3pos_switch` takes `RCx_REVERSED` into account only when bit 7 (128, Allow Switch reverse) is set. 32 is bit 5. You need `RC_OPTIONS = 160` or a reversal on the transmitter."
+  },
+  {
+   "q": "`RC6_OPTION = 219`, `RC6_MIN = 1100`, `RC6_MAX = 1900`, `TUNE = 4`, `TUNE_MIN = 0.05`, `TUNE_MAX = 0.25`. The knob is at 1750 µs. What is `ATC_RAT_RLL_P`?",
+   "options": [
+    "0.2000",
+    "0.2125",
+    "0.1500",
+    "0.1350"
+   ],
+   "answer": 1,
+   "explain": "The fraction of travel is (1750 − 1100) / (1900 − 1100) = 0.8125; the value is 0.05 + 0.2 · 0.8125 = 0.2125. You get 0.20 if you take a travel of 1000…2000 instead of `RC6_MIN…RC6_MAX`; 0.135 is the saved value, which the knob knows nothing about."
+  },
+  {
+   "q": "In flight the knob was used to find `ATC_RAT_RLL_P = 0.18` (`TUNE = 4`). After landing the pilot switched off the power. What is in the parameter at the next power-up with the knob in the same position?",
+   "options": [
+    "0.18 from storage: tuning saves the value on disarm",
+    "The value saved before tuning, and it stays that way until the pilot moves the knob by at least 1%",
+    "First the value saved before tuning, then 0.18 from the knob again, as long as `TUNE` is not 0",
+    "`TUNE_MIN`, until the knob is moved through the middle"
+   ],
+   "answer": 2,
+   "explain": "Tuning writes only to the in-memory copy (`set_kP`), so the old value is loaded from storage. But `TUNE` is still 4, and the calculation, 3 times per second, sets the value from the knob position again. To keep the result, write the value from the ground station and set `TUNE = 0`. Passing through the middle is required on Plane, not on Copter."
+  },
+  {
+   "q": "You need to tune D in flight on roll only; right now `ATC_RAT_RLL_D = 0.0036` and `ATC_RAT_PIT_D = 0.0052`. Which set is safe?",
+   "options": [
+    "`TUNE = 21`, `TUNE_MIN = 0`, `TUNE_MAX = 0.01`",
+    "`TUNE = 21`, `TUNE_MIN = 0.00288`, `TUNE_MAX = 0.00432`",
+    "`TUNE = 51`, `TUNE_MIN = 0.00288`, `TUNE_MAX = 0.00432`",
+    "`TUNE = 48`, `TUNE_MIN = 0.0036`, `TUNE_MAX = 0.0036`"
+   ],
+   "answer": 2,
+   "explain": "51 changes only the roll D; a ±20% range around 0.0036 puts the original value at the middle of the travel. 21 would write one number to both axes and wipe out the 0.0052 on pitch; 48 is pitch, and with equal `TUNE_MIN` and `TUNE_MAX` tuning is off in 4.7."
+  },
+  {
+   "q": "Plane, `TUNE_PARAM = 101`, `TUNE_RANGE = 2`. The pilot raised the selector (`TUNE_SELECTOR`) to HIGH for 3 seconds and released it. What happened?",
+   "options": [
+    "The current value became the new center point (`Tuning: recentered`)",
+    "It moved to the next parameter of the set (`Tuning: started …`)",
+    "The set's values were saved (`Tuning: Saved`)",
+    "The unsaved values were reverted (`Tuning: reverted`)"
+   ],
+   "answer": 1,
+   "explain": "`check_selector_switch`: a hold of 0.2–2 s sets a new center, 2–5 s moves to the next parameter, and longer than 5 s (while the selector is still in HIGH and the value has changed) saves. A revert is done by a mode change with `TUNE_MODE_REVERT = 1`."
+  },
+  {
+   "q": "A Lua script calls `rc:get_aux_cached(300)` right after the flight controller boots; the `RC10_OPTION = 300` switch is in LOW, and the transmitter is still off. What does the call return?",
+   "options": [
+    "0, the switch is in LOW",
+    "`nil`, the function has not been called yet",
+    "1, the middle position by default",
+    "A script error: the channel is invalid while there is no link to the transmitter"
+   ],
+   "answer": 1,
+   "explain": "The position cache is filled in `run_aux_function`. Functions 300–315 are not called at initialization; the first call happens 200 ms after the first receiver frame. Until then `get_aux_cached` returns `nil`, and the script has to handle that."
+  }
+ ]
+}

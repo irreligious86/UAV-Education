@@ -89,7 +89,7 @@ def item(seq, cmd, lat=0, lon=0, alt=0, p1=0):
         0, 1, p1, 0, 0, 0, int(lat * 1e7), int(lon * 1e7), alt)
 
 items = [item(0, mavutil.mavlink.MAV_CMD_NAV_WAYPOINT), item(1, mavutil.mavlink.MAV_CMD_NAV_TAKEOFF, alt=20)]  # seq 0 = home
-items += [item(i + 1, mavutil.mavlink.MAV_CMD_NAV_WAYPOINT, *wp) for i, wp in enumerate(ROUTE)]
+items += [item(i + 2, mavutil.mavlink.MAV_CMD_NAV_WAYPOINT, *wp) for i, wp in enumerate(ROUTE)]  # seq 2, 3, 4: після дому (0) і TAKEOFF (1)
 items.append(item(len(items), mavutil.mavlink.MAV_CMD_NAV_RETURN_TO_LAUNCH))
 
 m.waypoint_clear_all_send()

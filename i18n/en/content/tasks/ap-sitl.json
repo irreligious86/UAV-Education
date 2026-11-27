@@ -1,0 +1,80 @@
+{
+  "module": "ap-sitl",
+  "tasks": [
+    {
+      "id": "rtl-cone",
+      "title": "Return altitude with the RTL cone",
+      "statement": "Copter 4.7.2, `RTL_ALT_M` = **{r} m**, `RTL_CONE_SLOPE` = 3, `RTL_CLIMB_MIN_M` = 0. The vehicle hovers at **{h} m**, **{d} m** horizontally from home, and switches to RTL. What altitude (m) does it reach before flying home?",
+      "params": {
+        "r": {
+          "min": 15,
+          "max": 40,
+          "step": 5
+        },
+        "h": {
+          "min": 5,
+          "max": 30,
+          "step": 1
+        },
+        "d": {
+          "min": 0,
+          "max": 30,
+          "step": 1
+        }
+      },
+      "answer": "min(max(r, h), max(d*3, h))",
+      "unit": "m",
+      "tol": 0.01,
+      "abs": 0.1,
+      "solution": "The code in `mode_rtl.cpp`: h_ret = min(max(`RTL_ALT_M`, h), max(d·`RTL_CONE_SLOPE`, h)). The cone prevents a climb close to home: at d = 0 the vehicle stays at its current altitude; RTL never descends below the current altitude."
+    },
+    {
+      "id": "speedup-real",
+      "title": "Real SITL speedup",
+      "statement": "In **{w} s** on the computer's clock, `time_boot_ms` in `SYSTEM_TIME` increased by **{x} s**. How many minutes of real time does a mission of **{t} min** of simulated time take?",
+      "params": {
+        "w": {
+          "min": 10,
+          "max": 20,
+          "step": 1
+        },
+        "x": {
+          "min": 40,
+          "max": 200,
+          "step": 5
+        },
+        "t": {
+          "min": 5,
+          "max": 40,
+          "step": 1
+        }
+      },
+      "answer": "t*w/x",
+      "unit": "min",
+      "tol": 0.01,
+      "solution": "The real speedup is k = x / w (simulated seconds per computer second), not the `--speedup` value: the machine may not keep up. Real time = t / k = t·w / x."
+    },
+    {
+      "id": "sitl-port",
+      "title": "SITL TCP port",
+      "statement": "SITL is started with `-I {i}`. Which TCP port does the firmware's SERIAL**{n}** listen on?",
+      "params": {
+        "i": {
+          "min": 0,
+          "max": 9,
+          "step": 1
+        },
+        "n": [
+          0,
+          1,
+          2
+        ]
+      },
+      "answer": "5760 + 10*i + [0, 2, 3][n]",
+      "unit": "",
+      "tol": 0.0001,
+      "abs": 0.5,
+      "solution": "`SITL_State.h`: SERIAL0 is `tcp:0:wait` (base + 0), SERIAL1 is `tcp:2` (base + 2), SERIAL2 is `tcp:3` (base + 3). Base = 5760 + 10·instance (`SITL_cmdline.cpp`)."
+    }
+  ]
+}

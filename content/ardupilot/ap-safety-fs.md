@@ -28,13 +28,13 @@ next:
 ### Карта failsafe ArduCopter
 | Failsafe | Триггер | Параметры | Действия (значения) |
 |---|---|---|---|
-| Радио (RC) | приёмник перестал выдавать кадры (no pulses) или канал газа ≤ `FS_THR_VALUE` (PWM, 910–1100) | `FS_THR_ENABLE`, `FS_THR_VALUE` | 0 выкл, 1 RTL, 3 Land, 4 SmartRTL/RTL, 5 SmartRTL/Land, 6 DO_LAND_START или RTL, 7 Brake/Land |
+| Радио (RC) | приёмник перестал выдавать кадры (no pulses) или канал газа ниже `FS_THR_VALUE` три чтения подряд (PWM, 910–1100) | `FS_THR_ENABLE`, `FS_THR_VALUE` | 0 выкл, 1 RTL, 3 Land, 4 SmartRTL/RTL, 5 SmartRTL/Land, 6 DO_LAND_START или RTL, 7 Brake/Land |
 | GCS | нет heartbeat от наземки > `FS_GCS_TIMEOUT` (5 с по умолчанию) | `FS_GCS_ENABLE`, `FS_GCS_TIMEOUT` | 0 выкл, 1 RTL, 3 SmartRTL/RTL, 4 SmartRTL/Land, 5 Land, 6 DO_LAND_START или RTL, 7 Brake/Land (нумерация отличается от `FS_THR_ENABLE`); актуален для Guided/телеметрии |
 | АКБ низкая | напряжение < `BATT_LOW_VOLT` (с таймером `BATT_LOW_TIMER`) или остаток < `BATT_LOW_MAH` | `BATT_FS_LOW_ACT` | 0 предупреждение, 1 Land, 2 RTL, 3 SmartRTL/RTL, 4 SmartRTL/Land, 5 Terminate, 6 DO_LAND_START/RTL, 7 Brake/Land |
 | АКБ критическая | напряжение < `BATT_CRT_VOLT` (тот же таймер `BATT_LOW_TIMER`) или остаток < `BATT_CRT_MAH` | `BATT_FS_CRT_ACT` | те же значения; умолчание 0 — только предупреждение, поэтому действие (обычно 1 Land) задают явно |
 | EKF | дисперсии > `FS_EKF_THRESH` | `FS_EKF_ACTION` | 0 только сообщение (появилось в 4.7), 1 Land если режим требует позицию, 2 AltHold, 3 Land всегда |
 | Dead reckoning | EKF потерял источники позиции и скорости и считает по оценке ветра (сообщение `Dead Reckoning started`) | `FS_DR_ENABLE` (по умолчанию 2), `FS_DR_TIMEOUT` (по умолчанию 30 с, 0–120) | 0 выкл, 1 Land, 2 RTL, 3 SmartRTL/RTL, 4 SmartRTL/Land, 6 DO_LAND_START или RTL; только в режимах с позицией; через `FS_DR_TIMEOUT` счисление кончается и срабатывает EKF failsafe |
-| Вибрации | клиппинг акселерометра, ошибка высоты | `FS_VIBE_ENABLE` | изменённая оценка высоты и управление |
+| Вибрации | вертикальные инновации скорости и позиции EKF обе положительны при высокой вариации скорости 1 с (признак клиппинга/алиасинга) | `FS_VIBE_ENABLE` | изменённая оценка высоты и управление (`ERR` FAILSAFE_VIBE, «Vibration compensation ON») |
 | Геозона | выход за круг/многоугольник/высоту | `FENCE_ENABLE`, `FENCE_TYPE`, `FENCE_ACTION`, `FENCE_ALT_MAX`, `FENCE_RADIUS`, `FENCE_MARGIN` | 0 сообщение, 1 RTL/Land, 2 Land всегда, 3 SmartRTL/RTL, 4 Brake/Land, 5 SmartRTL/Land |
 | Опции | что делать вместо действия по умолчанию | `FS_OPTIONS` (битмаска) | продолжать Auto при потере RC (бит 0), продолжать Auto при потере GCS (бит 1), Guided при потере RC (бит 2), продолжать посадку (бит 3), пилотируемые режимы при потере GCS (бит 4) |
 
@@ -47,7 +47,7 @@ ArduPlane устроен иначе: потерю RC ловит `THR_FAILSAFE` �
 - RTL требует позицию: при EKF failsafe действие деградирует до Land/AltHold.
 - RTL сначала набирает `RTL_ALT_M` (метры; до 4.7 — `RTL_ALT` в сантиметрах; минимальная высота над домом для возврата, по умолчанию 15 м; если аппарат уже выше — возвращается на текущей), рядом с домом высоту ограничивает конус `RTL_CONE_SLOPE` (по умолчанию 3): h_ret = min(max(`RTL_ALT_M`, h), max(3·d, h)), где d — расстояние до дома, поэтому прямо над домом набора нет (разбор — `ap-sitl`); летит домой, висит `RTL_LOIT_TIME`, садится (`RTL_ALT_FINAL_M = 0`; до 4.7 — `RTL_ALT_FINAL`, см). Над препятствиями выше RTL_ALT_M — столкновение; геозона по высоте — ещё один ограничитель.
 - SmartRTL возвращается по пройденному пути (память точек, `SRTL_POINTS`) — хорош в лесу/между зданиями, но требует, чтобы память не переполнилась.
-- Геозона: при нарушении — действие; `FENCE_MARGIN` и предупреждение заранее; пред-армовая проверка не даёт армить вне зоны.
+- Геозона: при нарушении — действие; `FENCE_MARGIN` — расстояние, которое автоматические режимы держат от границы (предупреждение при входе в эту полосу — только с битом 2 `FENCE_OPTIONS`); пред-армовая проверка не даёт армить вне зоны.
 - `FS_OPTIONS` «продолжать Auto при потере RC» — для BVLOS-миссий по разрешению; без разрешения — выключено.
 
 ### Геозона: типы, включение, полигоны

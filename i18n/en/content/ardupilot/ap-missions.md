@@ -1,9 +1,9 @@
 ---
 id: ap-missions
-title: "Missions and Planning"
+title: "Missions and planning"
 level: L2
-readingTime: 25 min
-firmware: ArduPilot 4.5+
+readingTime: 35 min
+firmware: ArduPilot 4.7 (checked against 4.7.3; the lab was captured on SITL 4.7.2)
 status: published
 added: 2026-11-07
 tags:
@@ -16,59 +16,111 @@ related:
 next:
   - ap-ekf
 source: content/ardupilot/ap-missions.md
-source_hash: 2c8780dcaaa0
+source_hash: 26d4647a0ac2
 ---
 
 ## summary
-A mission in ArduPilot is a list of commands the flight controller executes on its own in AUTO mode: take off, fly through waypoints, take a picture, come back. This module explains what a mission is made of, how navigation commands differ from DO and CONDITION commands, how altitude is calculated, where home is, and what happens when the link is lost mid-route. Practice is in SITL, following the “route separately, scenario separately” pattern.
+A mission in ArduPilot is a list of commands that the flight controller executes by itself in AUTO mode: take off, fly the waypoints, take a picture, come back. This module explains what a mission is made of, how navigation commands differ from DO and CONDITION commands, how altitude is defined, where home is, and what happens when the link is lost in the middle of a route. The practice runs in SITL on the "route separate from scenario" pattern.
 
 ## theory
 ### Three types of commands
-- **NAV** — where to fly. `NAV_TAKEOFF` (22), `NAV_WAYPOINT` (16), `NAV_LOITER_TIME` (19), `NAV_RETURN_TO_LAUNCH` (20), `NAV_LAND` (21). The mission goes from one NAV command to the next.
-- **DO** — what to do along the way without changing the route: `DO_CHANGE_SPEED` (178), `DO_SET_SERVO` (183), `DO_SET_CAM_TRIGG_DIST` (206), `DO_JUMP` (177) for loops.
-- **CONDITION** — wait for a condition before the next DO command: `CONDITION_DELAY` (112), `CONDITION_DISTANCE`.
+- **NAV**: where to fly. `NAV_TAKEOFF` (22), `NAV_WAYPOINT` (16), `NAV_LOITER_TIME` (19), `NAV_RETURN_TO_LAUNCH` (20), `NAV_LAND` (21). A mission moves from one NAV command to the next.
+- **DO**: what to do along the way without changing the route: `DO_CHANGE_SPEED` (178), `DO_SET_SERVO` (183), `DO_SET_CAM_TRIGG_DIST` (206), `DO_JUMP` (177) for loops.
+- **CONDITION**: wait for a condition before the next DO command: `CONDITION_DELAY` (112), `CONDITION_DISTANCE`.
 
-The numbers in parentheses are MAV_CMD codes: that's how the commands look in a mission file and in MAVLink.
+The numbers in parentheses are MAV_CMD codes: that is how the commands appear in a mission file and in MAVLink.
+
+### How the list is executed
+The mission is stored in the flight controller as a numbered list, and `seq` 0 is always home: on upload the vehicle puts its own home location there, and until home is set it returns zeros (in the download in step 4, line 0 is `0.0000000 0.0000000`). The real commands start at `seq` 1, and the number of commands including home is the read-only parameter `MIS_TOTAL`.
+
+The executor (`libraries/AP_Mission/AP_Mission.cpp`, `advance_current_nav_cmd`) keeps one current NAV command and one current DO command. When the NAV command is complete (an intermediate waypoint with no delay: when the trajectory target has reached the waypoint; a waypoint with a stop: when the vehicle is within `WP_RADIUS_M`; a takeoff: when the altitude is reached), it moves forward through the list: it starts any DO command it meets and makes the next NAV command current. So a DO command placed **after** NAV number N runs at the moment of arrival at waypoint N, that is, it applies to the leg to the next waypoint. In the step 4 run you can see this in the lines `Mission: 2 ChangeSpeed` and `Mission: 3 WP` in the same second, right after the takeoff completes. A CONDITION command holds the following DO commands until its condition is met, but it does not stop the flight to the current waypoint.
+
+### DO_JUMP and DO_CHANGE_SPEED
+`DO_JUMP` (177): `param1` is the number of the command to jump to (`seq`), `param2` is how many times to repeat, with −1 meaning forever. A repeat count of 1 means the section between the target and the jump is flown **twice**: the first time in sequence, the second after the jump. In the run: waypoints 3→4, `Mission: 5 Jump 1/1`, 3→4 again, then the jump is skipped and the mission goes on to command 6. The jump counters are reset when the mission is started again, and a finite counter is also zeroed after its loop completes, so if you send the mission back to the start of the loop it runs again (bit 3 of `MIS_OPTIONS`, DontZeroCounter, turns that off, but it is not listed among the options for Copter); the number of `DO_JUMP` commands tracked in one mission is up to 100 on boards in the ≥ 500 kB memory class and 15 on the rest (`AP_Mission.h:29–33`). The target can also be a DO command: it executes, and the flight continues to the NAV command after it; a target of 0 or ≥ `MIS_TOTAL` ends the mission. A `DO_JUMP` with −1 and no exit is an endless circuit until the battery runs down; the only ways out of such a loop are a mode change, by the pilot or the GCS, or a failsafe (battery, RC, GCS) or geofence action.
+
+`DO_CHANGE_SPEED` (178): `param1` is the speed type (0 airspeed, 1 ground speed, 2 climb, 3 descent), `param2` is the speed in m/s, `param3` is the throttle in percent (−1 means no change; Copter ignores it). On Copter, types 0 and 1 both change the horizontal speed `WP_SPD`, and 2 and 3 change `WP_SPD_UP` and `WP_SPD_DN` (`ArduCopter/mode_auto.cpp:1991`); a value ≤ 0 is ignored. The new speed applies until the end of the mission or the next `DO_CHANGE_SPEED`, and the `WP_SPD` parameter itself does not change.
+
+### Leg time
+The trajectory generator accelerates the vehicle at no more than `WP_ACC` (2.5 m/s²) to the leg speed v and decelerates before the waypoint, and the acceleration changes no faster than the jerk `WP_JERK` (1 m/s³, `AC_WPNav.cpp:37`). For a leg of length d with a stop at each end, when d is noticeably longer than v²/a:
+
+t ≈ d / v + v / a + a / J,
+
+where J = `WP_JERK`. Without the last term you get a trapezoidal speed profile, a teaching model with no jerk limit (it is what the module's problem calculates).
+
+For 100 m with stops: at 5 m/s ≈ 20 + 2 + 2.5 = 24.5 s, at 10 m/s ≈ 10 + 4 + 2.5 = 16.5 s. An independent run in SITL 4.7.2 with a stop at every waypoint (waypoints with a 3 s delay) gave 24.1–24.6 s and 16.8–16.9 s of movement. In step 4 the intermediate waypoints are flown **without stopping**, so it does not test the formula: the legs there are shorter, 20.6–21.6 s at 5 m/s (≈ d/v plus the turn) and 14.0–14.8 s at 10 m/s, with the first leg after takeoff at 23.2 s. This is a course guideline for the time budget: to the sum of the legs add takeoff, landing, wind, and a 10–20% margin.
+
+### End of the mission
+If the last command is an ordinary waypoint and not `NAV_RETURN_TO_LAUNCH` or `NAV_LAND`, Copter **stays in AUTO** when the list ends and holds position (`ModeAuto::exit_mission`: `loiter_start()`); if the position is bad it switches to LAND, and if the vehicle is already on the ground it disarms. In the run, 20 s after the last waypoint: mode AUTO, 20.0 m, armed, speed 0.01 m/s. A vehicle hovering in AUTO burns battery until the battery failsafe triggers, hence the rule (a course guideline): the last command of a mission is `NAV_RETURN_TO_LAUNCH` or `NAV_LAND`. `MIS_OPTIONS` bit 2 (ContinueAfterLand) lets the mission continue after a `NAV_LAND` in the middle of the list, for delivery with a landing.
+
+### Upload and download are a dialog
+Upload uses the MAVLink Mission protocol: the client sends `MISSION_COUNT`, then the **vehicle** requests every command by number (ArduPilot 4.7 still sends the older `MISSION_REQUEST(seq)`; the spec and other autopilots use `MISSION_REQUEST_INT`, so accept both), the client answers with `MISSION_ITEM_INT`, and at the end the vehicle sends `MISSION_ACK` (0 is `MAV_MISSION_ACCEPTED`). Download is the mirror image: the client sends `MISSION_REQUEST_LIST`, receives `MISSION_COUNT`, requests every command itself, and answers with `MISSION_ACK` at the end. The coordinates in `MISSION_ITEM_INT` are integers in degrees × 10⁷, and the altitude is a float in meters; frame 3/6 is relative to home. An observation from the run: in the first seconds after SITL starts an upload can be refused, so the step 4 script waits 10 s on the firmware clock.
+
+{{diagram:mavlink-mission-seq|The vehicle drives a mission upload: it requests every command by number itself and re-requests a lost answer.}}
+
+### Reference: mission commands and parameters (Copter 4.7.2)
+| Command / parameter | Code / default | Parameters or meaning | Trap |
+|---|---|---|---|
+| `NAV_WAYPOINT` | 16 | p1 is the delay at the waypoint, s; lat/lon/alt | with no delay the waypoint is flown without stopping |
+| `NAV_TAKEOFF` | 22 | alt is the takeoff altitude | on the ground in AUTO you need throttle or `AUTO_OPTIONS` bit 1 |
+| `NAV_LAND` | 21 | lat/lon = 0 means in place | without `MIS_OPTIONS` bit 2 the mission ends on it |
+| `NAV_RETURN_TO_LAUNCH` | 20 | — | altitude by the RTL rules, including the cone |
+| `DO_JUMP` | 177 | p1 is the target `seq`, p2 the repeats, −1 forever | N repeats = N + 1 passes |
+| `DO_CHANGE_SPEED` | 178 | p1 is the type 0…3, p2 m/s, p3 throttle % or −1 (Copter ignores it) | applies until the end of the mission |
+| `CONDITION_DELAY` | 112 | p1 in s | holds DO commands, not the flight |
+| `MIS_TOTAL` | read-only | number of commands including home | |
+| `MIS_RESTART` | 0 | 0 Resume Mission, 1 Restart Mission when entering AUTO | |
+| `MIS_OPTIONS` | 0 | Copter: bit 0 Clear Mission on reboot, bit 2 ContinueAfterLand | |
+| `WP_SPD`, m/s | 10 | horizontal speed (before 4.7, `WPNAV_SPEED`, cm/s) | `DO_CHANGE_SPEED` overrides it |
+| `WP_ACC`, m/s² | 2.5 | acceleration (before 4.7, `WPNAV_ACCEL`, cm/s²) | part of t ≈ d/v + v/a + a/J |
+| `WP_JERK`, m/s³ | 1 | jerk, the rate of change of acceleration | adds ≈ a/J to a leg with stops |
+| `WP_RADIUS_M`, m | 2 | the "reached" radius for a waypoint with a stop; for fly-through waypoints, the corner-cutting radius (before 4.7, `WPNAV_RADIUS`, cm) | intermediate waypoints with no delay are not checked against the radius |
+| `AUTO_OPTIONS` | 0 | bit 0 Allow Arming in AUTO, bit 1 Allow Takeoff Without Raising Throttle | for scripts and SITL |
 
 ### Altitude
-Every waypoint has a reference frame. For missions you almost always use altitude **relative to home** (`MAV_FRAME_GLOBAL_RELATIVE_ALT`, code 3): “100 m” means 100 m above the arming point. Absolute altitude above sea level (`MAV_FRAME_GLOBAL`, 0) is rarely needed and easily leads to an error of hundreds of meters. Altitude above terrain requires terrain data.
+Every waypoint has a reference frame. For missions you almost always use altitude **relative to home** (`MAV_FRAME_GLOBAL_RELATIVE_ALT`, code 3): "100 m" means 100 m above the arming location. Absolute altitude above mean sea level (`MAV_FRAME_GLOBAL`, 0) is rarely needed and easily leads to an error of hundreds of meters. Altitude above terrain needs terrain data.
 
 ### Home
-For Copter, the home point is where the aircraft armed. RTL returns there, not to where the pilot is standing. If you took off from the roof of a car and then drove somewhere else — home stayed at the old spot. In the GCS you can reset home before takeoff.
+The home location for Copter is where the vehicle armed. RTL returns there, not to where the pilot is standing. If you launched from the roof of a car and drove off, home stayed in the old place. You can reset home in the GCS before takeoff.
 
 ### Starting and resuming
-A Copter mission usually starts with `NAV_TAKEOFF`. Switching to AUTO on the ground with the aircraft armed starts the takeoff once the pilot raises the throttle (or immediately, if bit 1 “Allow Takeoff Without Raising Throttle” is set in `AUTO_OPTIONS`); in SITL — `rc 3 1500`. By default, when you re-enter AUTO the mission continues from the current command; the `MIS_RESTART` parameter makes it start from the first one.
+A Copter mission normally starts with `NAV_TAKEOFF`. Switching to AUTO on the ground with the vehicle armed starts the takeoff once the pilot raises the throttle (or right away, if bit 1 of `AUTO_OPTIONS`, "Allow Takeoff Without Raising Throttle", is set); in SITL use `rc 3 1500`. By default, when you enter AUTO again the mission resumes from the current command; the `MIS_RESTART` parameter makes it restart from the first one.
 
-### Failsafe during a mission
-Loss of the radio link during AUTO behaves per `FS_THR_ENABLE` (RTL, Land, SmartRTL…), and continuing the mission is enabled by bit 0 of `FS_OPTIONS`. For autonomous beyond-visual-line-of-sight flights this decision is made before takeoff, not after the fact. GCS loss is a separate parameter, `FS_GCS_ENABLE`. The battery failsafe (`BATT_FS_LOW_ACT`, `BATT_FS_CRT_ACT`) overrides the mission.
+### Failsafe in a mission
+RC loss during AUTO follows `FS_THR_ENABLE` (RTL, Land, SmartRTL…), and continuing the mission is enabled with bit 0 of `FS_OPTIONS`. For autonomous flights beyond visual line of sight you make that decision before takeoff, not after the fact. GCS loss has its own parameter, `FS_GCS_ENABLE`. The battery failsafe (`BATT_FS_LOW_ACT`, `BATT_FS_CRT_ACT`) overrides the mission.
+
+{{lesson:ap-safety-fs|Which failsafe action to choose for an autonomous mission and how to test it in SITL before the flight.}}
 
 ### Mission file
-GCSs save the mission to a text file in the `QGC WPL 110` format: one line per command — index, current flag, frame, command code, four parameters, latitude, longitude, altitude, autocontinue flag. Such a file is convenient to keep in git next to the parameters.
+Ground stations save a mission as a text file in the `QGC WPL 110` format: one line per command with the number, the current flag, the frame, the command code, four parameters, latitude, longitude, altitude, and the autocontinue flag. A file like that is convenient to keep in git next to the parameters.
 
 ### Commands worth knowing by heart
-NAV: `NAV_WAYPOINT` (p1 — delay at the waypoint, s), `NAV_TAKEOFF` (alt), `NAV_LAND`, `NAV_RETURN_TO_LAUNCH`, `NAV_LOITER_TIME/TURNS/UNLIM`, `NAV_SPLINE_WAYPOINT` (spline), `NAV_DELAY`; DO: `DO_SET_SERVO`, `DO_SET_RELAY`, `DO_DIGICAM_CONTROL`, `DO_SET_CAM_TRIGG_DIST` (a shot every N m — the basis of photogrammetry), `DO_CHANGE_SPEED`, `DO_SET_ROI` (point the gimbal/nose), `DO_JUMP` (a loop, with a counter), `DO_LAND_START` (the entry point of the landing sequence for a failsafe), `DO_SET_HOME`; CONDITION: `CONDITION_DELAY`, `CONDITION_DISTANCE`, `CONDITION_YAW`. Execution parameters: `WP_SPD` (m/s horizontal), `WP_SPD_UP/DN`, `WP_RADIUS_M` (acceptance radius), `WP_ACC` (before 4.7 — `WPNAV_SPEED` in cm/s, `WPNAV_SPEED_UP/DN`, `WPNAV_RADIUS`, `WPNAV_ACCEL`), `WP_YAW_BEHAVIOR` (nose along the course or not), `MIS_RESTART` (0 — resume from the last command when entering Auto, 1 — from the start), `MIS_OPTIONS` (bit 0 — clear the mission on reboot; bit 1 — use distance to landing in the battery failsafe (Plane only); bit 2 — continue after landing), `RTL_*` for the end of the mission.
+NAV: `NAV_WAYPOINT` (p1 is the delay at the waypoint, s), `NAV_TAKEOFF` (alt), `NAV_LAND`, `NAV_RETURN_TO_LAUNCH`, `NAV_LOITER_TIME/TURNS/UNLIM`, `NAV_SPLINE_WAYPOINT` (spline), `NAV_DELAY`; DO: `DO_SET_SERVO`, `DO_SET_RELAY`, `DO_DIGICAM_CONTROL`, `DO_SET_CAM_TRIGG_DIST` (a picture every N m, the basis of photogrammetry), `DO_CHANGE_SPEED`, `DO_SET_ROI` (point the gimbal or the nose), `DO_JUMP` (a loop, with a counter), `DO_LAND_START` (the entry point of a landing sequence for failsafes), `DO_SET_HOME`; CONDITION: `CONDITION_DELAY`, `CONDITION_DISTANCE`, `CONDITION_YAW`. Execution parameters: `WP_SPD` (horizontal m/s, default 10), `WP_SPD_UP/DN` (2.5 and 1.5 m/s), `WP_RADIUS_M` (waypoint radius, 2 m), `WP_ACC` (2.5 m/s²) (before 4.7, `WPNAV_SPEED`, `WPNAV_SPEED_UP/DN`, `WPNAV_RADIUS`, `WPNAV_ACCEL` in cm/s, cm, and cm/s²), `WP_YAW_BEHAVIOR` (face the next waypoint or not), `MIS_RESTART` (0 resumes from the last command run when entering Auto, 1 restarts from the beginning), `MIS_OPTIONS` (bit 0 clears the mission on reboot; bit 1 uses the distance to land in the battery failsafe (Plane only); bit 2 continues after land), `RTL_*` for the end of the mission.
 
 ### Altitudes: three frames and one mistake
-Relative (above home, `MAV_FRAME_GLOBAL_RELATIVE_ALT`, the default), absolute (above sea level — wrong if you take off somewhere else), terrain (above ground from SRTM data via the GCS or from a rangefinder, `TERRAIN_ENABLE`, the “Terrain” frame on waypoints and `WP_RFND_USE`/`RTL_ALT_TYPE`). The classic crash: a mission with absolute altitudes, made for a different site 300 m higher — the aircraft tries to dive into the ground or climb into the sky. The rule: relative altitudes, and check the altitude-above-terrain profile in the GCS.
+Relative (above home, `MAV_FRAME_GLOBAL_RELATIVE_ALT`, the default), absolute (above mean sea level, wrong as soon as the takeoff site changes), terrain (above terrain from SRTM data supplied by the GCS or from a rangefinder: `TERRAIN_ENABLE`, the "Terrain" frame on waypoints, and `WP_RFND_USE`/`RTL_ALT_TYPE`). The classic crash: a mission with absolute altitudes, planned for a different site 300 m higher, so the vehicle tries to go underground or into the sky. The rule (a course guideline): relative altitudes, checked in the GCS with a terrain elevation profile.
+
+{{diagram:mission-jump-order|Execution order of the step 4 mission: DO commands run at leg boundaries, a DO_JUMP with a repeat count of 1 gives a second A–B pass, and with no RTL at the end the vehicle hovers in AUTO.}}
 
 ### Worked example: surveying a 300×200 m area
-Mission Planner → Survey (Grid): camera (sensor, focal length), altitude 80 m, overlap 75/65% → the planner calculates the spacing between survey lines and `DO_SET_CAM_TRIGG_DIST` itself; speed 8 m/s (based on camera exposure: motion blur ≤ 1 px → v·t_exp ≤ GSD); `NAV_TAKEOFF` 80, survey lines, `DO_SET_CAM_TRIGG_DIST 0` at the end, `NAV_RETURN_TO_LAUNCH`. Checks: the altitude profile, mission time vs. battery capacity (`BATT_LOW_MAH` with margin for RTL + capacity margin for the return), a geofence around the area. A run in SITL with the same mission file is mandatory.
+Mission Planner → Survey (Grid): camera (sensor, focal length), altitude 80 m, overlap 75/65% → the planner calculates the line spacing and `DO_SET_CAM_TRIGG_DIST` itself; speed 8 m/s (from the camera's exposure time: blur ≤ 1 px → v·t_exp ≤ GSD); `NAV_TAKEOFF` 80, the survey lines, `DO_SET_CAM_TRIGG_DIST 0` at the end, `NAV_RETURN_TO_LAUNCH`. Checks: the elevation profile, the mission time against the battery capacity (`BATT_LOW_MAH` with a margin for RTL plus reserve capacity for the return), a geofence around the area. A run in SITL with the same mission file is mandatory.
 
-{{diagram:mavlink-mission-seq|Загрузка миссии ведёт аппарат: он сам запрашивает каждую команду по номеру, а потерянный ответ запрашивает повторно.}}
+{{diagram:mission-alt-frames|Choosing the altitude frame in a mission: Relative for a flat area, Terrain when the terrain varies, Absolute when an altitude above mean sea level is specified.}}
 
-{{diagram:mission-jump-order|Порядок выполнения миссии шага 4: DO-команды срабатывают на границе участков, DO_JUMP с повтором 1 даёт второй проход A–B, а без RTL в конце аппарат висит в AUTO.}}
+### Place in the system
 
-{{diagram:mission-alt-frames|Choosing the altitude frame in a mission: Relative for flat ground, Terrain for varying terrain, Absolute when altitude above sea level is given.}}
+- **Receives:** position and the home location from the EKF, since AUTO needs a healthy estimate (`ap-ekf`); the actions on link loss and low battery (`ap-safety-fs`); terrain data for terrain altitudes (`nav-terrain`).
+- **Provides:** waypoints and the `WP_SPD` and `WP_ACC` limits to the trajectory generator (`ctl-guidance`); `DO_SET_CAM_TRIGG_DIST` to the survey (`per-mapping`); the mission file to the run in `ap-sitl`.
+- **If you get it wrong here:** absolute altitudes in a mission planned for a different site → the vehicle heads underground or into the sky; you catch that with the elevation profile and a run in `ap-sitl`. A mission time longer than the battery capacity allows → the battery failsafe overrides the mission in the middle of the route (`ap-safety-fs`); where the sag comes from is in `f-power`.
 
 ## practice
-### Step 1. A mission in SITL via the GCS
+### Step 1. A mission in SITL through the GCS
 1. Start SITL: `sim_vehicle.py -v ArduCopter --console --map`.
-2. In Mission Planner (Plan) or QGC (Plan), set TAKEOFF 20 m, three waypoints, RTL.
-3. Write the mission to the aircraft, save the `.waypoints` file.
-4. Arm, AUTO mode, watch. Then try switching to LOITER mid-route and back to AUTO.
+2. In Mission Planner (Plan) or QGC (Plan) place a TAKEOFF to 20 m, three waypoints, and an RTL.
+3. Write the mission to the vehicle and save the `.waypoints` file.
+4. Arm, switch to AUTO, and watch. Then try switching to LOITER in the middle of the route and back to AUTO.
 
 ### Step 2. The same mission from code
-The route is data, the scenario is commands. An example of uploading a route via pymavlink:
+The route is data, the scenario is commands. An example of uploading a route with pymavlink:
 
 ```python
 from pymavlink import mavutil
@@ -89,7 +141,7 @@ def item(seq, cmd, lat=0, lon=0, alt=0, p1=0):
         0, 1, p1, 0, 0, 0, int(lat * 1e7), int(lon * 1e7), alt)
 
 items = [item(0, mavutil.mavlink.MAV_CMD_NAV_WAYPOINT), item(1, mavutil.mavlink.MAV_CMD_NAV_TAKEOFF, alt=20)]  # seq 0 = home
-items += [item(i + 1, mavutil.mavlink.MAV_CMD_NAV_WAYPOINT, *wp) for i, wp in enumerate(ROUTE)]
+items += [item(i + 2, mavutil.mavlink.MAV_CMD_NAV_WAYPOINT, *wp) for i, wp in enumerate(ROUTE)]  # seq 2, 3, 4: after home (0) and TAKEOFF (1)
 items.append(item(len(items), mavutil.mavlink.MAV_CMD_NAV_RETURN_TO_LAUNCH))
 
 m.waypoint_clear_all_send()
@@ -101,14 +153,13 @@ ack = m.recv_match(type="MISSION_ACK", blocking=True)
 print("mission upload:", ack.type)  # 0 = MAV_MISSION_ACCEPTED
 ```
 
-A mission upload is a dialog: the aircraft requests each waypoint by its index, so you can't send them in one “batch.”
+A mission upload is a dialog: the vehicle requests every item by number itself, so you cannot send them in one batch.
 
 ### Step 3. Scenarios on top of a route
-Write three scenarios that take the route as a parameter: “fly through,” “fly through and take a photo at every waypoint” (`DO_DIGICAM_CONTROL`), “fly through with a motor failure at the second waypoint” (the switch from the Lua module). One route — three scenarios with no edits to the coordinates.
+Write three scenarios that take the route as a parameter: "fly it", "fly it and take a photo at every waypoint" (`DO_DIGICAM_CONTROL`), "fly it with a motor failure at the second waypoint" (the switch from the Lua module). One route, three scenarios, and no coordinate edits.
 
-**Automatic log check:** `check_lab_log.py <log.bin> --lab mission` — AUTO engaged, ≥ 3 navigation commands, “Reached” messages, RTL/LAND at the end, satellites ≥ 6, no EKF/GPS errors.
-
-SITL run of this step (ArduCopter 4.7.2); walkthrough and expected output are in the Russian source.
+### Step 4. DO_JUMP, DO_CHANGE_SPEED, and the end of the list: a SITL run
+This step was run on ArduCopter 4.7.2 SITL (the `+` frame, `--speedup 10`, pymavlink 2.4.50) with no MAVProxy and no GCS. The route is a 100 × 100 m square at 20 m, the `ROUTE` dictionary (data); the plan is a list of commands (the scenario): takeoff, a speed of 5 m/s, waypoints A and B, a `DO_JUMP` to A with a repeat count of 1, a speed of 10 m/s, waypoints C and D. There is deliberately **no** RTL at the end, so you can see what Copter does when the list runs out. The script uploads the mission, downloads it back into a `QGC WPL 110` file, flies it, and prints the time of every leg and the top speed on it. Run it with `mkdir run && cd run && python3 ../mission_lab.py ~/ardupilot`; it takes about 1 min of real time.
 
 ```python
 """Mission lab: upload, download to a QGC WPL 110 file and fly a mission with DO_CHANGE_SPEED and DO_JUMP
@@ -195,6 +246,8 @@ print(f"+20 s after the last item: mode {mavutil.mode_string_v10(hb)}, armed {bo
 sitl.terminate()
 ```
 
+Output of the run (2026-11-26):
+
 ```text
 upload: MISSION_ACK type 0 (0 = MAV_MISSION_ACCEPTED)
 QGC WPL 110
@@ -226,37 +279,58 @@ QGC WPL 110
 +20 s after the last item: mode AUTO, armed True, alt 20.0 m, speed 0.01 m/s
 ```
 
+What to read in the output. `MISSION_ACK type 0` means the upload was accepted. The downloaded file matches the plan: `seq` 2 is `178 1 5 -1` (ground speed 5 m/s, throttle unchanged), `seq` 5 is `177 3 1` (jump to 3, repeat 1), and the waypoint coordinates are home plus 100 m (−35.3623626 = −35.3632610 + 100 / 111319.5; ArduPilot itself uses the spherical constant of 111318.845 m per degree, a difference in the seventh decimal place). Line 0 is zeros: home was not yet set at the time of the upload. The order flown is 3, 4, `Jump 1/1`, 3, 4, 6, 7, 8, so one repeat gave two A–B passes. The speed on the legs after `DO_CHANGE_SPEED 5` is 5.0 m/s and after `DO_CHANGE_SPEED 10` it is 9.9 m/s, although `WP_SPD` = 10 the whole time. Legs without a stop last about d/v plus the turn; the formula from the theory is for a leg with stops. The last line shows the vehicle hovering in AUTO at 20 m: without `NAV_RETURN_TO_LAUNCH` the mission is "over", but the flight is not.
+
+**Automatic log check:** `check_lab_log.py <log.bin> --lab mission` checks that AUTO was engaged, there are ≥ 3 navigation commands, there are "Reached" messages, there is an RTL/LAND at the end, satellites ≥ 6, and there are no EKF/GPS errors.
+
+**Reference for the self-check.** Step 2: the script prints `mission upload: 0`, which is `MAV_MISSION_ACCEPTED`; if it hangs on the upload, the items were sent in one batch without waiting for the requests: the vehicle requests each one by number itself; if it prints 13 (`MAV_MISSION_INVALID_SEQUENCE`), the `seq` field of an item does not match its position in the list: the waypoints start at seq 2, after home and TAKEOFF. Step 3: all three scenarios receive the same `ROUTE` as a parameter, and there is not a single coordinate in the scenario code, so changing the route requires no scenario edits. The automatic check passes on every item for the log of every run: AUTO engaged, at least three navigation commands, "Reached" present, RTL/LAND at the end. Step 4, typical wrong results: (1) after the jump waypoints 3–4 are flown three times, because `param2` is 2 (N repeats give N + 1 passes); (2) the speed on the first leg is 10 m/s instead of 5, because `DO_CHANGE_SPEED` was placed after waypoint A and not before it, so it applies only from the next leg; (3) the vehicle "hung" after waypoint D, which is not a fault but the end of a list with no RTL; (4) the upload was refused, because the script sent `MISSION_COUNT` in the first seconds after SITL started.
+
+Self-check: the lab is done when in step 2 the script prints `mission upload: 0`; in step 3 three scenarios use one `ROUTE` with no coordinates in the code; in step 4 you get `MISSION_ACK type 0`, the downloaded file matches the plan table line by line (codes 16, 22, 178, 16, 16, 177, 178, 16, 16), the order of `Reached` is 3, 4, 3, 4, 7, 8, the speed on legs 3–4 is 5.0 ± 0.2 m/s and on legs 7–8 it is 10 ± 0.3 m/s, the time of the 100-meter legs is 20–23 s at 5 m/s and 13.5–15.5 s at 10 m/s, and 20 s after waypoint 8 the mode is AUTO with the vehicle armed at 20 ± 0.5 m; if you add `NAV_RETURN_TO_LAUNCH` at the end and run it again, the vehicle lands at home and disarms.
 
 ## diagnostics
-- **Symptom:** AUTO doesn't start, the aircraft just sits there
-  - Possible cause: the mission isn't uploaded, `NAV_TAKEOFF` isn't the first command, or the aircraft isn't armed.
-  - What to do: read the mission back from the aircraft, check the first command and the GCS messages.
-- **Symptom:** the aircraft flies 100 m higher than expected
+- **Symptom:** AUTO does not start, the vehicle sits there
+  - Possible cause: the mission is not loaded, `NAV_TAKEOFF` is not the first command, or the vehicle is not armed.
+  - What to do: read the mission back from the vehicle, check the first command and the GCS messages.
+- **Symptom:** the vehicle flies 100 m higher than expected
   - Possible cause: absolute altitude instead of relative.
   - What to do: check the frame of every waypoint in the mission file.
-- **Symptom:** RTL returns somewhere other than where the pilot is
+- **Symptom:** RTL returns to a place where the pilot is not
   - Possible cause: home is the arming location.
-  - What to do: reset home before takeoff after relocating.
+  - What to do: reset home before takeoff after moving.
 - **Symptom:** the mission upload hangs
-  - Possible cause: sending waypoints without waiting for requests, or a wrong `seq`.
-  - What to do: answer `MISSION_REQUEST(_INT)` by index, check `MISSION_ACK`.
-- **Symptom:** in Auto the aircraft dove into the ground/climbed after a change of site
+  - Possible cause: items sent without waiting for the requests, or a wrong `seq`.
+  - What to do: answer `MISSION_REQUEST(_INT)` by number, check `MISSION_ACK`.
+- **Symptom:** in Auto the vehicle went into the ground or into a climb after a change of site
   - Possible cause: absolute altitudes in the mission.
-  - What to do: relative/terrain; check the altitude profile in the GCS.
-- **Symptom:** after a landing in the mission the aircraft doesn't disarm or keeps going
+  - What to do: relative or terrain altitudes; check the elevation profile in the GCS.
+- **Symptom:** after the last waypoint the vehicle hovers in place in AUTO
+  - Possible cause: there is no `NAV_RETURN_TO_LAUNCH`/`NAV_LAND` at the end of the mission; at the end of the list Copter switches to holding position within AUTO.
+  - What to do: make the last command RTL or LAND; right now, switch to RTL.
+  - Consequences: hovering until the battery failsafe.
+- **Symptom:** a `DO_JUMP` loop is flown one time more or fewer than you expected
+  - Possible cause: `param2` is the number of repeats, not passes; N repeats = N + 1 passes; −1 is forever.
+  - What to do: count the passes from `Mission: N Jump k/N` in the GCS messages.
+- **Symptom:** `DO_CHANGE_SPEED` "has no effect" on the leg you wanted
+  - Possible cause: a DO command runs when the previous NAV command completes, so it affects the leg **after** the waypoint it follows.
+  - What to do: place it before the NAV waypoint of the leg that needs the new speed; verify from the speed in the log.
+- **Symptom:** after a landing in the mission the vehicle does not disarm or carries on
   - Possible cause: `MIS_OPTIONS` bit 2 (ContinueAfterLand), `LAND_*`.
-  - What to do: set it deliberately; verify in SITL.
+  - What to do: set it deliberately; test in SITL.
 
 ## references
 - Planning a Mission with Waypoints and Events — ArduPilot Copter | https://ardupilot.org/copter/docs/common-planning-a-mission-with-waypoints-and-events.html | primary | A
 - Copter Mission Command List — ArduPilot | https://ardupilot.org/copter/docs/mission-command-list.html | primary | A
 - MAVLink Mission Protocol | https://mavlink.io/en/services/mission.html | primary | A
 - MAVLink common message set (common.xml) | https://github.com/mavlink/mavlink/blob/master/message_definitions/v1.0/common.xml | primary | A
+- AP_Mission.cpp (MIS_* parameters, DO_JUMP, command execution), Copter-4.7.2 | https://raw.githubusercontent.com/ArduPilot/ardupilot/Copter-4.7.2/libraries/AP_Mission/AP_Mission.cpp | primary | A
+- mode_auto.cpp (DO_CHANGE_SPEED, end of mission), Copter-4.7.2 | https://raw.githubusercontent.com/ArduPilot/ardupilot/Copter-4.7.2/ArduCopter/mode_auto.cpp | primary | A
 
 ## checklist
-- I know the difference between NAV, DO and CONDITION commands
-- All mission waypoints use relative altitude
+- I know the difference between NAV, DO, and CONDITION commands
+- Every waypoint in the mission uses relative altitude
 - I understand where home is and how to reset it
-- Radio/GCS/battery failsafes are configured before an autonomous flight
+- The radio, GCS, and battery failsafes are configured before an autonomous flight
 - The mission is uploaded from code as a request–response dialog
 - The route is stored separately from the scenario
+- The last command of the mission is RTL or LAND
+- The number of `DO_JUMP` loop passes and the placement of `DO_CHANGE_SPEED` are tested in SITL

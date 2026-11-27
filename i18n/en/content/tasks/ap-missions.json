@@ -1,0 +1,78 @@
+{
+  "module": "ap-missions",
+  "tasks": [
+    {
+      "id": "leg-time",
+      "title": "Mission leg time",
+      "statement": "A mission leg of **{d} m**, leg speed **{v} m/s**, `WP_ACC` = **{a} m/s²**. The vehicle starts from rest and stops at the end. Estimate the leg time (s) with a trapezoidal speed profile.",
+      "params": {
+        "d": {
+          "min": 150,
+          "max": 400,
+          "step": 10
+        },
+        "v": [
+          3,
+          5,
+          8,
+          10,
+          12
+        ],
+        "a": [
+          1.0,
+          2.0,
+          2.5,
+          3.0
+        ]
+      },
+      "answer": "d/v + v/a",
+      "unit": "s",
+      "tol": 0.01,
+      "solution": "Accelerating to v and decelerating take v/a seconds each and together cover v²/a meters; the remaining d − v²/a is flown at v. The sum: t = d/v + v/a (if d ≥ v²/a). This is a model with no jerk limit: in SITL 4.7.2 (`WP_JERK` = 1 m/s³) a 100 m leg with stops at 10 m/s took 16.8–16.9 s, that is, about a/J ≈ 2.5 s more than the 14 s from the formula."
+    },
+    {
+      "id": "jump-time",
+      "title": "DO_JUMP loop",
+      "statement": "A loop of waypoints **{p} m** long is closed by a `DO_JUMP` with `param2` = **{r}**. The speed is **{v} m/s**; ignore acceleration. How many minutes does the whole loop take with all its passes?",
+      "params": {
+        "p": {
+          "min": 200,
+          "max": 1200,
+          "step": 50
+        },
+        "r": {
+          "min": 1,
+          "max": 6,
+          "step": 1
+        },
+        "v": [
+          5,
+          8,
+          10,
+          12
+        ]
+      },
+      "answer": "p*(r + 1)/v/60",
+      "unit": "min",
+      "tol": 0.01,
+      "solution": "`param2` is the number of repeats: the first pass is flown in sequence, then r more after the jumps, r + 1 in all (in the module's run a repeat count of 1 gave two A–B passes). t = p·(r + 1) / v, divided by 60."
+    },
+    {
+      "id": "item-lat",
+      "title": "Latitude in MISSION_ITEM_INT",
+      "statement": "Home is at latitude −35.363261°. A mission waypoint is **{n} m** north of home. What is the integer value of the `x` field in `MISSION_ITEM_INT`? (1° of latitude ≈ 111319.5 m)",
+      "params": {
+        "n": {
+          "min": 20,
+          "max": 500,
+          "step": 10
+        }
+      },
+      "answer": "(-35.363261 + n/111319.5)*1e7",
+      "unit": "",
+      "tol": 1e-07,
+      "abs": 2,
+      "solution": "The waypoint latitude = −35.363261 + n / 111319.5 degrees; in `MISSION_ITEM_INT` it is sent as an integer in degrees × 10⁷. The module's example: 100 m → −35.3623626° → −353623626. (Internally ArduPilot uses the spherical constant of 111318.845 m/°; that does not affect the answer.)"
+    }
+  ]
+}

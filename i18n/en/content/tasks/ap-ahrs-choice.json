@@ -1,0 +1,150 @@
+{
+  "module": "ap-ahrs-choice",
+  "tasks": [
+    {
+      "id": "pos-test-ratio",
+      "title": "XKF4.SP from the position innovation",
+      "statement": "The GPS position innovation in an EKF3 core: north **{yn} m**, east **{ye} m**. The innovation variance on each of the two axes is **{s} m²**, `EK3_POS_I_GATE = {g}`. What value of `XKF4.SP` does the log record?",
+      "params": {
+        "yn": {
+          "min": 0.5,
+          "max": 6,
+          "step": 0.5
+        },
+        "ye": {
+          "min": 0,
+          "max": 4,
+          "step": 0.5
+        },
+        "s": [
+          0.3,
+          0.5,
+          0.8,
+          1.2,
+          2.0
+        ],
+        "g": [
+          300,
+          500,
+          700,
+          1000
+        ]
+      },
+      "answer": "math.sqrt((yn**2 + ye**2)/((g/100)**2*(2*s)))",
+      "unit": "",
+      "tol": 0.02,
+      "solution": "test ratio = (y_N² + y_E²) / ((G/100)² · (S_N + S_E)) (`AP_NavEKF3_PosVelFusion.cpp`); `XKF4.SP` holds its square root. A value above 1 means the gate rejected the measurement."
+    },
+    {
+      "id": "thresh-sigma",
+      "title": "The FS_EKF_THRESH threshold in sigmas",
+      "statement": "`FS_EKF_THRESH = {t}`, and the measurement gate (`EK3_*_I_GATE`) is **{g}**. How many standard deviations of the innovation does the EKF failsafe threshold correspond to?",
+      "params": {
+        "t": [
+          0.6,
+          0.8,
+          1.0
+        ],
+        "g": [
+          300,
+          400,
+          500,
+          700,
+          1000
+        ]
+      },
+      "answer": "t*g/100",
+      "unit": "σ",
+      "tol": 0.01,
+      "solution": "A variance in `XKF4` and in the GCS is |y| / ((G/100)·√S), that is the innovation as a fraction of the gate. A threshold T corresponds to an innovation of T · G/100 sigmas: 0.8 with a gate of 500 is 4σ, and with the compass gate of 300 it is 2.4σ."
+    },
+    {
+      "id": "synthetic-airspeed",
+      "title": "EKF3 synthetic airspeed",
+      "statement": "There is no airspeed sensor. EKF3 gives a ground velocity of N **{vn} m/s**, E **{ve} m/s** and a wind estimate (the direction it blows toward) of N **{wn} m/s**, E **{we} m/s**; the vertical velocity is 0, `AHRS_WIND_MAX = 0`. What true airspeed (TAS) does `AP_AHRS` compute?",
+      "params": {
+        "vn": {
+          "min": 14,
+          "max": 25,
+          "step": 1
+        },
+        "ve": {
+          "min": -8,
+          "max": 8,
+          "step": 1
+        },
+        "wn": {
+          "min": -5,
+          "max": 5,
+          "step": 1
+        },
+        "we": {
+          "min": -5,
+          "max": 5,
+          "step": 1
+        }
+      },
+      "answer": "math.sqrt((vn - wn)**2 + (ve - we)**2)",
+      "unit": "m/s",
+      "tol": 0.01,
+      "solution": "The wind triangle: v_air = v_ground − wind, TAS = |v_ground − wind| (`AP_AHRS::_airspeed_EAS`, the EKF3_SYNTHETIC branch; the vector is three-dimensional, but the EKF3 wind is horizontal, so with zero vertical velocity N and E are enough; outward the AHRS returns EAS = TAS / EAS2TAS). With `AHRS_WIND_MAX` > 0 the result is also constrained to ground speed ± that limit."
+    },
+    {
+      "id": "dr-wind-error",
+      "title": "Dead reckoning error of a plane without GPS",
+      "statement": "SITL ArduPlane: `SIM_WIND_SPD = {W}` m/s, a square-root profile up to `SIM_WIND_T_ALT` = 60 m, flight at **{h} m** with an airspeed sensor. EKF3 underestimated the wind by **{p} %**, with the correct direction. Estimate the position error after **{t} s** without GPS (error ≈ Δw · t), in m.",
+      "params": {
+        "W": [
+          6,
+          8,
+          10,
+          12
+        ],
+        "h": [
+          20,
+          30,
+          40,
+          50
+        ],
+        "p": [
+          2,
+          3,
+          5,
+          8
+        ],
+        "t": [
+          30,
+          60,
+          120
+        ]
+      },
+      "answer": "W*math.sqrt(h/60)*p/100*t",
+      "unit": "m",
+      "tol": 0.02,
+      "solution": "The wind at height h: W · √(h/60). The estimation error Δw = wind · p/100. With an airspeed sensor the airspeed is known, so the position drifts at the rate Δw: e ≈ Δw · t. The module's example: 8 · √(50/60) = 7.30 m/s, estimate 7.1, Δw = 0.2 m/s, 12 m in 60 s (11.5 m in SITL). Without a sensor the error grows faster than this formula gives."
+    },
+    {
+      "id": "tilt-drift",
+      "title": "Position drift from a tilt error",
+      "statement": "A copter with no position or velocity sources. The tilt error in the EKF is **{th}°**, everything else is ideal. By how many meters does the horizontal position estimate drift in **{t} s**?",
+      "params": {
+        "th": [
+          0.2,
+          0.3,
+          0.5,
+          1.0
+        ],
+        "t": [
+          2,
+          5,
+          8,
+          10
+        ]
+      },
+      "answer": "0.5*9.80665*math.sin(math.radians(th))*t**2",
+      "unit": "m",
+      "tol": 0.02,
+      "solution": "A wrong tilt δθ turns part of g into a false horizontal acceleration a = g · sin δθ; uncorrected, the position drifts by ½ · a · t². At 0.5° and 10 s that is 4.3 m, which is why EKF3 declares the position lost after only 7–10 s without measurements."
+    }
+  ]
+}

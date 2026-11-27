@@ -3,7 +3,7 @@
   "pass": 80,
   "questions": [
     {
-      "q": "In LOCAL_NED, climbing 10 m means Z = …",
+      "q": "In LOCAL_NED a 10 m climb is Z = …",
       "options": [
         "+10",
         "−10",
@@ -19,57 +19,57 @@
         "It keeps flying at the last velocity",
         "It hovers after GUID_TIMEOUT",
         "It cuts the motors and falls",
-        "It goes into RTL immediately"
+        "It goes straight into RTL"
       ],
       "answer": 1,
-      "explain": "GUID_TIMEOUT (3 s by default) is a protection you rely on, not work around."
+      "explain": "GUID_TIMEOUT (3 s by default) is protection you rely on, not work around."
     },
     {
-      "q": "At what rate should you send velocity targets?",
+      "q": "How often do you send velocity targets?",
       "options": [
         "Once",
-        "Regularly, 5–10 Hz",
+        "Regularly, at 5–10 Hz",
         "Once a minute",
-        "100 Hz is mandatory"
+        "100 Hz, without fail"
       ],
       "answer": 1,
       "explain": "Within the timeout, even if the target has not changed."
     },
     {
-      "q": "The pilot switched the mode from GUIDED to LOITER. What should the code do?",
+      "q": "The pilot switched the mode from GUIDED to LOITER. What must the code do?",
       "options": [
         "Switch back to GUIDED with a command",
         "Stop sending targets",
-        "Reboot the controller",
+        "Reboot the flight controller",
         "Keep sending targets"
       ],
       "answer": 1,
       "explain": "The code must respect the pilot."
     },
     {
-      "q": "The vehicle stops without reaching the target. Likely cause?",
+      "q": "The vehicle stops before reaching the target. What is the likely cause?",
       "options": [
         "A bug in pymavlink",
-        "The geofence or the WPNAV_* limits",
-        "The velocity loop P in GUIDED is too low",
+        "The geofence or the WP_* limits (before 4.7, WPNAV_*)",
+        "Too low a P gain in the velocity loop in GUIDED",
         "The companion's heartbeat was lost"
       ],
       "answer": 1,
-      "explain": "It is an FC protection; check FENCE_* and the messages."
+      "explain": "This is the FC's protection; check FENCE_* and the messages."
     },
     {
       "q": "Where do you run offboard code first?",
       "options": [
         "On a real drone",
         "In SITL",
-        "On the bench with props on",
+        "On the bench with the props on",
         "In your head"
       ],
       "answer": 1,
-      "explain": "The same code, the same port, only the address differs."
+      "explain": "The same code, the same port, only the address."
     },
     {
-      "q": "The default GUID_TIMEOUT:",
+      "q": "The default GUID_TIMEOUT is:",
       "options": [
         "0.5 s",
         "3 s",
@@ -88,7 +88,7 @@
         "Yaw only"
       ],
       "answer": 1,
-      "explain": "Bits 0–2 (position), 6–8 (acceleration), 10–11 (yaw, yaw rate) = ignore; bit 9 (force) is set too, ArduPilot does not use it."
+      "explain": "Bits 0–2 (position), 6–8 (acceleration), 10–11 (yaw, yaw rate) = ignore; bit 9 (force) is set too, and ArduPilot does not use it."
     }
   ]
 }

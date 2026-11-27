@@ -16,7 +16,7 @@ related:
 next:
   - f-motors-esc
 source: content/foundation/f-power.md
-source_hash: d3f0cc66d732
+source_hash: 995f6feaaa1a
 ---
 
 ## summary
@@ -68,7 +68,7 @@ U under load = E − I·R. A “fresh” LiPo 6S 1300 mAh 100C: R ≈ 2 mΩ/cell
 | Chemistry and class | Warning | Critical (land now) | Lower limit under load | Why | Where the numbers come from |
 |---|---|---|---|---|---|
 | LiPo / LiHV, 4–6S: 5", 3–3.5", cinewhoop | 3.5 V | 3.3 V | 3.0 V | after 3.5 V under working current little energy remains; below 3.0 V — damage | 3.5 and 3.3 — Betaflight defaults (`sensors/battery.c`); 3.5 — Tattu's recommendation for UAVs and Oscar Liang (“think about landing around 3.5–3.6 V” in flight); 3.0 — Tattu, Gens Ace |
-| LiPo, 7–10" and heavy craft, return longer than a minute | 3.6 V or by mAh | 3.5 V | 3.0 V | after the warning you still have to fly back: the threshold is higher by the return time | 3.6 / 3.5 — the 6S values in `ap-setup-scratch` (ArduPilot Initial Parameter Setup gives the same); for your own route — by the procedure below |
+| LiPo, 7–10" and heavy craft, return longer than a minute | 3.6 V or by mAh | 3.5 V | 3.0 V | after the warning you still have to fly back: the threshold is higher by the return time | 3.6 / 3.5 — the 6S values in `ap-setup-scratch` (ArduPilot Initial Tune Parameter gives the same); for your own route — by the procedure below |
 | LiPo / LiHV 1S, whoop | 3.3–3.4 V | 3.1–3.2 V | 3.0 V | on 1S the same 0.3 V of cell and connector sag is 8 % of the voltage (`f-micro-whoop`): with a 3.5 V threshold the alarm comes on a punch with a half-empty cell, and landing indoors takes seconds | estimate (`f-micro-whoop`); 3.0 — Tattu |
 | Li-Ion 18650/21700: 7" LR, wing, cargo | 3.3 V or by mAh | 3.0 V | cell datasheet (P42A — 2.5 V) | the sag is large (6S4P at 60 A — 0.4–0.5 V per cell), so the main signal is mAh | 3.3 / 3.0 — course values (`bf-modes-osd`, `inav-setup-wing`), estimate; 2.5 — P42A datasheet |
 
