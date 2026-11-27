@@ -56,7 +56,7 @@ The takeaway: before touching the PID, check that the filters sit where the nois
 | `dshot_bidir` | OFF → ON | eRPM telemetry over the same DShot line |
 | `motor_poles` | 14 | number of magnets; eRPM/(poles/2) = RPM |
 | `rpm_filter_harmonics` | 3 | harmonics 1×, 2×, 3× of the motor frequency |
-| `rpm_filter_weights` | 100,100,100 | “weight” (depth) of each harmonic in %; the 2nd and 3rd can often be weakened to 50–80 on clean aircraft → less delay |
+| `rpm_filter_weights` | 100,100,100 | “weight” (depth) of each harmonic in %; the other harmonics (not the blade-pass one) can often be weakened to 50–80 on clean aircraft → less delay. Number of harmonics: `rpm_filter_harmonics` = N filters 1…N and drops only from the top; a single harmonic is switched off with weight 0. Do not remove or weaken the harmonic whose number equals the blade count (2nd for two blades, 3rd for three); on a four-blade prop it is the 4th and outside the RPM filter — the dynamic notch takes it. Notches per axis = motors × N (12 on a quad, 24 on an X8) — course rule, details in `f-micro-whoop` |
 | `rpm_filter_q` | 500 | Q factor: notch width ≈ f/(Q/100); 500 → f/5 |
 | `rpm_filter_min_hz` | 100 | below it no notch is placed (protects the useful band); for 10" — 50 |
 | `rpm_filter_fade_range_hz` | 50 | smooth fade-in of the notch above min_hz |

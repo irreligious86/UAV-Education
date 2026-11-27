@@ -75,7 +75,7 @@ Distinguish three types of causes: **hardware failure** (a part broke), **config
 
 **What you would have seen in the log.** Voltage under load below the threshold long before the warning; the warning triggering at a voltage that left seconds, not minutes.
 
-**Fixes.** Thresholds no lower than the manufacturer's recommendations, and for your own batteries — based on the measured discharge curve; the pre-flight voltage check is a checklist item that can't be skipped; tracking the number of flights on each battery set.
+**Fixes.** Thresholds no lower than the manufacturer's recommendations, and for your own batteries — based on the measured discharge curve (procedure and the threshold table by chemistry and class — `f-power`, “Setup order and check”, step 6); the pre-flight voltage check is a checklist item that can't be skipped; tracking the number of flights on each battery set.
 
 **Line for your checklist:** “Battery voltage recorded before every takeoff; warning and failsafe thresholds justified by the discharge curve, not lowered for an extra minute”.
 

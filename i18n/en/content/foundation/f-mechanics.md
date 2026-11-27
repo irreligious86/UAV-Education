@@ -76,7 +76,7 @@ A mode table and moments of inertia for your own build, checked against a log on
 ## diagnostics
 - **Symptom:** in Angle mode the drone loses altitude in a hard bank
   - Possible cause: T = m·g/cos φ exceeds the available thrust; T/W is low or the tilt limit is high.
-  - What to do: limit the angle, enable tilt throttle compensation, increase T/W.
+  - What to do: limit the angle, enable tilt throttle compensation (Angle/Horizon only; starting value and check — the table in the theory), increase T/W.
 - **Symptom:** a big aircraft “doesn't complete” yaw, I-term winds up
   - Possible cause: reaction torques are small, I_yaw is large.
   - What to do: lower your expectations for yaw rates, revisit the yaw PID, tilt the motors on big frames.

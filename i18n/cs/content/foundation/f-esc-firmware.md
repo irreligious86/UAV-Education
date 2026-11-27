@@ -58,7 +58,7 @@ Název firmwaru na krabici vypovídá o mikrokontroléru regulátoru: „BLHeli_
 - **Před nahráním firmwaru**: sundejte vrtule, uložte aktuální nastavení (snímek obrazovky nebo soubor), při pochybnostech nahrávejte vždy jen do jednoho ESC, baterii připojte přes ochranu (smoke stopper).
 
 ### Řídicí jednotka: co zapnout
-- Betaflight: `set motor_pwm_protocol = DSHOT600` (nebo 300), `set dshot_bidir = ON`, `set motor_poles = 14`; kontrola – záložka Motors ukazuje RPM, chyby DShot ≈ 0 %.
+- Betaflight: `set motor_pwm_protocol = DSHOT600` (nebo 300 — podle cyklu PID a MCU, pravidlo v `f-motors-esc`; na F405/F411/G47x s bidir nastaví firmware 300 sám), `set dshot_bidir = ON`, `set motor_poles = 14`; kontrola – záložka Motors ukazuje RPM, chyby DShot ≈ 0 %.
 - ArduPilot: `MOT_PWM_TYPE` – DShot300/600, `SERVO_BLH_BDMASK` – maska výstupů s obousměrným DShotem, `SERVO_BLH_POLES` – počet pólů; telemetrie ESC je vidět v logu (`ESC`) a využívá ji harmonický notch filtr (`INS_HNTCH_MODE = 3` – podle telemetrie ESC).
 
 {{diagram:esc-firmware-choice|Výběr firmwaru ESC: 8bitový regulátor s BB21/BB51 – Bluejay místo BLHeli_S, 32bitový – AM32, pokud existuje target, fungující BLHeli_32 lze ponechat, bez targetu firmware nenahrávat.}}

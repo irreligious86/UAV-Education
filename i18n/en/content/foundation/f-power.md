@@ -33,7 +33,7 @@ The battery is the heaviest and the most dangerous part of a drone. This module 
 - **LiPo:** nominal 3.7 V/cell, full charge 4.2 V (LiHV — 4.35 V). Delivers huge currents, but less energy per gram. For freestyle, racing, anything with high currents and short flights.
 - **Li-Ion (18650, 21700):** nominal around 3.6 V, full 4.2 V, deeper discharge — down to 2.8–3.0 V. Noticeably more energy per gram, more modest currents. For long-range 7–10", wings, long hovers at moderate throttle.
 
-Selection rule: if the average current per cell is low (long-range flight, a wing), Li-Ion gives more minutes. If you need peaks of tens of amps — LiPo.
+Selection rule (numbers — `el-battery-packs`): Li-Ion gives more minutes if (1) the average current per cell is no higher than 1.5C — a course guideline for heating of a 21700 without airflow, not a datasheet figure (for a 4.2 Ah P42A that is 6.3 A per cell, 25 A for a 4P pack) and (2) the peak current per cell is no higher than 0.6 × the datasheet continuous rating (P42A: 0.6 × 45 = 27 A, 108 A for a 4P pack). If either fails — more P (mass grows, recompute the flight time) or LiPo; if you need peaks of tens of amps per kilogram of pack — LiPo. Take the average current from the log or the hover calculation (`f-components-choice`); check after the flight: average current from the log / P, and the pack warm, not hot.
 
 ### Voltage sag
 Every cell has an internal resistance R. Under a current I the voltage drops by I × R. On a sharp throttle punch the sag is instant, and the flight controller sees not “how much is left” but “how much is left minus the sag”. Hence false low-voltage warnings on punches, and real ESC cutouts with a depleted battery.

@@ -67,7 +67,7 @@ ESCs switch the windings at tens of kHz, and the current in the battery wires je
 ### Wire gauges
 {{widget:wire-drop}}
 
-Rule of thumb for short runs on board: 12 AWG up to ~60–80 A, 14 AWG up to ~40–50 A, 16 AWG up to ~25 A, 18 AWG up to ~15 A, 20–22 AWG — signal and 5 V branches up to 2–3 A. The criteria are insulation heating and the acceptable drop; long wires on a wing — one size up.
+Rule of thumb for short runs on board — **continuous** (cruise) current: 12 AWG up to ~60–80 A, 14 AWG up to ~40–50 A, 16 AWG up to ~25 A, 18 AWG up to ~15 A (course guideline), 20–22 AWG — signal and 5 V branches up to 2–3 A. **Peak** current (a punch, seconds) is checked not by this line but by the drop criterion: ≤ 1 % of the pack voltage on the power pair. So 14 AWG on a 5" with 60–100 A peaks (`f-power`) passes with short leads: a 0.2 m loop at 100 A gives 0.17 V, 0.75 % of 22.2 V. Long wires on a wing — one size up.
 
 ## practice
 ### Step 1. Power tree

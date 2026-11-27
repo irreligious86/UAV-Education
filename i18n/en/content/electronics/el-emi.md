@@ -60,7 +60,7 @@ Satellite count and HDOP drop late. The first thing to react to interference is 
 - **Twist** the power + and −: opposing currents cancel the magnetic field; twisting signal wires with ground reduces pickup.
 - **Separate**: compass and GPS on a mast pointing up (10–15 cm of distance gives ×3–5 on the field), receiver antennas away from the VTX and companion, preferably at the other end of the frame.
 - **Shield**: copper foil/shielding fabric on the companion and camera, grounded at a single point; ferrite rings on USB/HDMI cables (turns through the ring — more turns, stronger suppression).
-- **Filter**: an LC filter on the VTX/camera supply, a capacitor on the power bus (see power circuit design), an LDO for the receiver.
+- **Filter**: an LC filter on the VTX/camera supply (how to choose L, C, ESR and the inductor saturation current — `el-power-design`, “LC filter for video”; check — an oscilloscope at the VTX input before and after the filter under throttle, `el-measure`), a capacitor on the power bus (see power circuit design), an LDO for the receiver.
 - **Single ground**: a star from the PDB, not a daisy chain; a cable shield grounded at one end (otherwise — a ground loop).
 
 ### Measure, don't guess

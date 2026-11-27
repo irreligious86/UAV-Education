@@ -36,6 +36,16 @@ next:
 - φ = 60°: T = 2·m·g — T/W 2:1 уже не хватит удержать высоту.
 Это причина, почему в режиме Angle с ограничением наклона 60° дрон с T/W 2:1 проседает в резких манёврах, и почему Betaflight/INAV/ArduPilot имеют компенсацию газа по углу наклона (например, `thr_corr_value` (Betaflight), `throttle_tilt_comp_str` (INAV), `ATC_ANGLE_BOOST` (ArduPilot) в разных формах).
 
+**Компенсация газа по наклону: включать ли и сколько.** Она работает только в режимах с самовыравниванием; в Acro её нет ни в одной прошивке — газ в крене добавляет пилот. Как устроена по исходникам:
+
+| Прошивка | Параметр, умолчание | Что делает | Старт |
+|---|---|---|---|
+| Betaflight 2025.12.5 | `thr_corr_value` 0 (выкл.), диапазон 0–150; `thr_corr_angle` 800 (десятые градуса, 1–900) | только в Angle и Horizon в арме: к команде газа (шкала 0–1000, 1 = 0.1 % хода) добавляет `thr_corr_value` × синус от наклона, отнесённого к `thr_corr_angle` (`flight/imu.c`); добавка не зависит от газа, и по коду на `thr_corr_angle` она около 0.6 × `thr_corr_value` | комментарий в `fc/core.c`: «40 для FPV» при угле 45.0° — заведомо мало: при газе висения 40 % крену 30° нужно около +4 % хода, а 40 даёт 1.6 %; ближе — около 100 при `thr_corr_angle` 450 (оценка курса: 100 × 0.41 ≈ 41 единица = 4.1 %) |
+| INAV 9.1.0 | `throttle_tilt_comp_str` 0 (выкл.), 0–100 % | в Angle и Horizon газ выше холостого умножается на 1 + (1/cos φ − 1) × str/100, cos φ ограничен 0.6 (около 53°) (`fc/fc_core.c`); в навигационных режимах прошивка включает 100 % сама | оценка курса: 50 — str 100 умножает газ, а не тягу, и из-за нелинейности тяги перекомпенсирует: при газе висения 40 % и крене 30° нужно около 44 % газа (кривая 0.65, `f-physics`), str 100 даёт 46 %, str 50 — 43 % |
+| ArduPilot 4.7 | `ATC_ANGLE_BOOST` 1 (вкл.) | газ × 1/cos **текущего** наклона корпуса (`_thrust_angle_rad` из `thrust_vector_rotation_angles()`, `AC_AttitudeControl.cpp`), cos ограничен снизу 0.1; выше 60° добавка плавно убывает до нуля к 90° (`inverted_factor`); в Stabilize и режимах с удержанием высоты, в Acro — нет (`AC_AttitudeControl_Multi.cpp`) | оставить умолчание |
+
+Правило курса: Acro-5" — не трогать (не действует); Angle у новичка, cinewhoop и съёмка в Angle — включить со стартового значения; ArduPilot — оставить 1. Проверка: в Angle крен 30° с неподвижным стиком газа — высота по логу (баро или GPS) или по предмету известной высоты держится; аппарат проседает — значение выше (у Betaflight добавка мала: 40 на крене 30° при `thr_corr_angle` 450 даёт около 1.6 % хода, на 45° и круче — 2.4 %, а крену 30° на газу висения 40 % нужно около +4 %; отсюда старт около 100), набирает высоту — ниже.
+
 **4. Разворот (координированный вираж).** Центростремительное ускорение v²/r даёт горизонтальная составляющая тяги: m·v²/r = m·g·tan φ → **r = v² / (g·tan φ)**. 15 м/с при крене 30°: r = 225 / 5.66 = 40 м. Чтобы вписаться в радиус 20 м на той же скорости, нужен крен 49° и газ ×1.52.
 
 ### Сопротивление воздуха
@@ -82,7 +92,7 @@ I по крену/тангажу: моторы+пропы на L, АКБ и FC �
 ## diagnostics
 - **Симптом:** в режиме Angle при резком крене дрон теряет высоту
   - Возможная причина: T = m·g/cos φ превышает доступную тягу; T/W мал или ограничение наклона велико.
-  - Что сделать: ограничить угол, включить компенсацию газа по наклону, увеличить T/W.
+  - Что сделать: ограничить угол, включить компенсацию газа по наклону (только Angle/Horizon; старт и проверка — таблица в теории), увеличить T/W.
 - **Симптом:** большой аппарат «не докручивает» yaw, I-term накапливается
   - Возможная причина: реактивные моменты малы, I_yaw велик.
   - Что сделать: снизить ожидания по rates на yaw, пересмотреть PID yaw, наклон моторов на больших рамах.
@@ -97,6 +107,9 @@ I по крену/тангажу: моторы+пропы на L, АКБ и FC �
 - Multicopter Dynamics (equations of motion) — PX4 Autopilot documentation | https://docs.px4.io/v1.17/en/flight_stack/controller_diagrams.html | primary | A
 - Quadrotor dynamics — Beard, "Quadrotor Dynamics and Control", BYU (PDF) | https://scholarsarchive.byu.edu/facpub/1325/ | primary | A
 - Newton's laws and drag — NASA Glenn Beginner's Guide to Aeronautics | https://www1.grc.nasa.gov/beginners-guide-to-aeronautics/ | secondary | B
+- Betaflight 2025.12.5: flight/imu.c, fc/core.c (`thr_corr_value`, `thr_corr_angle`) | https://github.com/betaflight/betaflight/blob/2025.12.5/src/main/flight/imu.c | primary | A
+- INAV 9.1.0: fc/fc_core.c, fc/settings.yaml (`throttle_tilt_comp_str`) | https://github.com/iNavFlight/inav/blob/9.1.0/src/main/fc/fc_core.c | primary | A
+- ArduPilot: AC_AttitudeControl_Multi.cpp (`get_throttle_boosted`, `ATC_ANGLE_BOOST`) | https://github.com/ArduPilot/ardupilot/blob/Copter-4.7.3/libraries/AC_AttitudeControl/AC_AttitudeControl_Multi.cpp | primary | A
 
 ## checklist
 - Умею записать баланс сил для висения, набора, крена и разворота

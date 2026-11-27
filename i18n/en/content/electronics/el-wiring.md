@@ -49,7 +49,7 @@ A copper wire is a resistor. Resistance per meter (20 °C) by gauge:
 | 20–22 | 33–53 | 5 V BEC, VTX, camera |
 | 26–28 | 134–213 | UART, I²C signals, sensors |
 
-Worked example: a 10" on 6S, 60 A peak current, positive and negative 15 cm each (0.3 m of loop). 14 AWG: R = 8.3·0.3 = 2.5 mΩ, a 0.15 V drop, 9 W of heating in the wire at peak. 18 AWG: 0.38 V and 23 W — the wire heats up, the insulation softens, and the drop adds to the battery sag. 12 AWG: 0.09 V and 5.6 W. Conclusion: power gauge is chosen by peak current and length, not “like everyone else”; short power wires are a free voltage bonus.
+Worked example: a 10" on 6S, 60 A peak current, positive and negative 15 cm each (0.3 m of loop). 14 AWG: R = 8.3·0.3 = 2.5 mΩ, a 0.15 V drop, 9 W of heating in the wire at peak. 18 AWG: 0.38 V and 23 W — the wire heats up, the insulation softens, and the drop adds to the battery sag. 12 AWG: 0.09 V and 5.6 W. Criterion (course guideline, the same as in `el-power-design`): the drop on the power pair at peak current ≤ 1 % of the pack voltage — 0.22 V for 22.2 V; continuous current no higher than the gauge rule there. 14 AWG (0.15 V, 0.7 %) and 12 AWG (0.09 V) pass, 18 AWG (0.38 V, 1.7 %) does not. For a 5" the table's “14 AWG” row holds with short leads: a 0.2 m loop at a 100 A peak — 0.17 V. Conclusion: power gauge is chosen by peak current and length, not “like everyone else”; short power wires are a free voltage bonus.
 
 {{widget:wire-drop}}
 

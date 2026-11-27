@@ -60,7 +60,7 @@ Rozměr statoru určuje moment (objem magnetického materiálu): statory 2207 a 
 ESC je třífázový střídač se 6 tranzistory MOSFET. Komutuje fáze podle polohy rotoru, kterou odhaduje ze zpětného elektromotorického napětí v nenapájené fázi (zero-crossing). Parametry firmwaru ESC, které má smysl řešit:
 - **PWM frequency** (24/48/96 kHz) – frekvence PWM na spínacích tranzistorech: vyšší znamená tišší a plynulejší chod při malém plynu, ale větší spínací ztráty a ohřev ESC; 48 kHz je kompromis pro 5".
 - **Timing** (motor timing; ve firmwarech 0–30°, výchozí AM32 15°, Bluejay 22.5°) – předstih komutace: vyšší dává víc otáček a proudu a víc tepla, ale větší rezervu proti demagnetizaci; nižší je chladnější a účinnější, ale těžké vrtule a motory s velkou indukčností častěji ztrácejí synchronizaci při prudkém plynu.
-- **Demag compensation** – ochrana před desyncem při prudkých změnách plynu, hlavně při zrychlení z malých otáček s těžkou vrtulí (demagnetizační proud roste s proudem motoru); „High“ pro těžké vrtule.
+- **Demag compensation** – ochrana před desyncem při prudkých změnách plynu, hlavně při zrychlení z malých otáček s těžkou vrtulí (demagnetizační proud roste s proudem motoru). Start pro každou třídu je výchozí hodnota firmwaru ESC (Bluejay Low, AM32 `demag_comp` podle tabulky v `f-esc-firmware`); zvyšovat o jeden stupeň jen při známce desyncu: propad eRPM jednoho motoru při prudkém plynu v Blackboxu. Častěji to potřebují velké motory s těžkými vrtulemi, 7" a víc (odhad kurzu). Kontrola po každém stupni: tři punch-outy z visu na 100 % bez propadů eRPM (`f-esc-firmware`).
 - **Startup power / rampup** – plynulý rozběh velkých vrtulí.
 - **Current limit / temperature protection** – ESC při přehřátí snižuje výkon: v logu to vypadá jako „propad tahu“.
 Desync znamená, že ESC ztratil polohu rotoru: motor sebou škube, piští, klesá tah; příčinami jsou dlouhé fázové vodiče, slabá kompenzace demagnetizace nebo nízký timing pro těžkou vrtuli, příliš velká vrtule pro dané KV, starý firmware.
@@ -69,7 +69,7 @@ Desync znamená, že ESC ztratil polohu rotoru: motor sebou škube, piští, kle
 16 bitů: 11 bitů hodnoty (0 – stop, 1–47 – speciální příkazy, 48–2047 – plyn), 1 bit žádosti o telemetrii, 4 bity CRC. Bit je kódován šířkou impulzu: „1“ ≈ 75 % periody bitu, „0“ ≈ 37 %; DShot300 – bit 3.33 µs, rámec 53 µs; DShot600 – 1.67 µs a 27 µs. Rámec se odesílá v každém cyklu PID. **Bidirectional DShot**: po rámci se směr linky obrátí a ESC odpoví rámcem s eRPM (perioda elektrické otáčky) zakódovaným v GCR; chyby této odpovědi jsou vidět jako `E%` na záložce Motors – normální hodnota je 0, při více než 1–2 % staví RPM filtr notche mimo skutečné frekvence. Speciální příkazy DShot (1–47): bzučák, obrácení směru otáčení (`dshot_cmd` 7/8 – `motor direction`), zapnutí/vypnutí 3D, dotaz na informace o ESC – ty používá konfigurátor na záložce Motors.
 
 ### Řešený příklad: výběr dvojice motor–vrtule
-5" freestyle 6S, 700 g: je potřeba T/W ≥ 5 → 3500 g celkem, maximálně 875 g na motor. Tabulka motoru 2207 1750KV s vrtulí 5.1×3: maximum ~1600 g při 38 A – rezerva je, vis ~180 g na motor při ~4 A. ESC 45 A 4-in-1 – trvalých 45 A při špičce 38 A na kanál: stačí, ale při agresivním letu s čerstvou baterií je to „na hraně“; s 55–60 A budete klidnější. 7" long range 6S 1.4 kg: 2806.5 1300KV + 7×3.5: maximum ~1200 g při ~22 A → ESC 35–45 A. Rozdíl KV mezi 5" a 7" je dán právě momentem na vrtuli (Kt).
+5" freestyle 6S, 700 g: je potřeba T/W ≥ 6 (pásmo freestylu v `f-physics`) → 4200 g celkem, maximálně 1050 g na motor. Tabulka motoru 2207 1750KV s vrtulí 5.1×3: maximum ~1600 g při 38 A – rezerva je, vis ~180 g na motor při ~4 A. ESC 45 A 4-in-1 – trvalých 45 A při špičce 38 A na kanál: stačí, ale při agresivním letu s čerstvou baterií je to „na hraně“; s 55–60 A budete klidnější. 7" long range 6S 1.4 kg: 2806.5 1300KV + 7×3.5: maximum ~1200 g při ~22 A → ESC 35–45 A. Rozdíl KV mezi 5" a 7" je dán právě momentem na vrtuli (Kt).
 
 {{diagram:motor-esc-selection|Цепочка подбора: ток ESC считают от пикового тока мотора по таблице тяги — 38 А × 1.3 = 49.4 А, поэтому 45 А впритык, а для 7" с 22 А хватает 35–45 А.}}
 
@@ -82,7 +82,7 @@ Desync znamená, že ESC ztratil polohu rotoru: motor sebou škube, piští, kle
 5. Zkontrolujte rukou: zvon motoru se točí bez vůle a bez drhnutí, magnety jsou celé, šrouby se nedotýkají vinutí.
 
 ### Volba protokolu
-Pro Betaflight s typickým cyklem 4k–8k DShot300 nebo DShot600 (viz modul o RPM filtru). Pro ArduPilot DShot tam, kde ho ESC podporuje, jinak PWM s kalibrací.
+Pro Betaflight se rychlost DShot volí podle cyklu PID (pravidlo z `config/config.c` 2025.12.5): rámec i odpověď bidir DShot se musí vejít do cyklu, takže DShot300 s bidir dovolí PID do 4 kHz při gyru 8 kHz, DShot600 do 8 kHz. Na F405, F411 a G47x (a APM32F405/F407) s `dshot_bidir = ON` firmware sám přepíše DSHOT600 na DSHOT300 a PID na 4 kHz, kromě F405 s `cpu_overclock` od 216 MHz (`bf-filters`; `f-micro-whoop`). F7, H7 a AT32F435 toto omezení nemají: DSHOT600 při PID 8 kHz, DSHOT300 při PID 4 kHz a níže nebo při chybách DShot nad 1 % (orientační hodnota kurzu). Kontrola: `status` v CLI a chyby DShot v záložce Motors. Pro ArduPilot DShot tam, kde ho ESC podporuje, jinak PWM s kalibrací.
 
 ### Co zapsat: tabulka motorů
 | Motor | Směr | Zvuk a plynulost | Vůle, drhnutí | eRPM při 10 % plynu | Chyby DShot |

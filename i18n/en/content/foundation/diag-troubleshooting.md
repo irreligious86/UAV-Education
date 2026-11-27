@@ -54,7 +54,7 @@ Props off.
 - **No motor responds in the Motors tab.** → Does the protocol (DShot300/600) and `motor_pwm_protocol` match the ESC? → Are the ESCs getting power (voltage at the pads)? → Are the signal wires on the right pads (`resource MOTOR`)? → Do the ESCs beep when power is applied (startup tune)? If not, the ESC is dead or has no power.
 - **One motor doesn't spin, the others do.** → Swap its signal wire with a working one: if the problem moved with the wire — it's the signal/FC pad; if it stayed — it's the ESC or the motor. → Is the resistance of all three motor phases the same? → Phase solder joints (a cold joint is typical).
 - **The motor twitches but won't start.** → Lost contact on one phase (solder joint, chafed wire) or a damaged ESC. → Continuity-test the phases, wiggle them.
-- **Spinning the wrong way / wrong order.** → Motors tab: check the number and direction of each one against the frame diagram; change the direction in the ESC firmware (BLHeli Suite/Configurator) or by swapping two phases. The “props in/out” direction must be consistent across all four.
+- **Spinning the wrong way / wrong order.** → Motors tab: check the number and direction of each one against the frame diagram; change the direction in the ESC firmware (BLHeli Suite/Configurator) or by swapping two phases. The “props in/out” direction must be consistent across all four (which scheme to choose — `f-physics`, “Props in or props out”).
 - **The drone flips over on takeoff.** → This is Tree 2: order/direction or the wrong mixer (`mixer` isn't for your frame).
 
 ### Tree 3. “Goes crazy” on throttle

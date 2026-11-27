@@ -95,6 +95,83 @@ Line numbers are those of the files on 2026-11-22.
 - Second recurring defect: the same threshold stated differently in 3–5 modules — hover throttle, T/W for freestyle, DShot error rate, cell imbalance, connector current, RSSI warning margin.
 - Modules written recently are at or near target quality: `f-esc-firmware`, `f-starter-kit`, `ops-pilot-training`, `link-elrs`, `link-digital-video`, `bf-rpm-filter`, `bf-filters`, `des-sizing`.
 
+## Status of the medium findings — 2026-11-27
+
+The 4 high findings were fixed in commit 7f293211. This pass re-checked the 34 medium selection findings against the current text and fixed what was still open. Line numbers below are those of the files after this pass. Translations: where the changed line exists in `i18n/{en,uk,uk-galych}/content`, the same fact was changed there; new standalone paragraphs exist only in the Russian source (the translations were already stale before this pass, `check_i18n.py`: 0/176 current). The T-section medium rows (T1-1, T1-5, T1-7, T1-8, T1-9, T2-3, T2-4) are terminology, not selection findings, and were not part of this pass.
+
+**Totals:** 25 fixed in this pass, 9 already fixed by earlier commits (no longer applies), 0 rejected.
+
+| ID | Status | Edit (file:line) | Source |
+|---|---|---|---|
+| PHY-1 | fixed | `f-physics.md:77` rule props in / props out by class + 2 references; `yaw_motors_reversed = ON` only flips the yaw-PID sign, direction is changed in the ESC (aligned with `bf-motor-balance.md:122`; FC-sel E1); pointer in `diag-troubleshooting.md:55` | Betaflight 2025.12.5 `flight/mixer_init.c` (`YAW_MOTORS_REVERSED 0`), `flight/mixer.c`; Oscar Liang «Props In vs Props Out» (updated 2024-01-06) |
+| PHY-2 | fixed | `f-physics.md:32` and a new row «Вупы, тупики, 3–3.5" фристайл» in the class table (оценка, as 5" freestyle; FC-sel I1) (cinewhoop → class table; wing: thrust ≈ weight / L/D, criterion in `aero-wing`; one canonical list); `f-motors-esc.md:74` T/W ≥ 5 → ≥ 6, arithmetic redone (4200 g, 1050 g per motor); `assets/widgets/tw-calc.js:53` T/W tag now critical < 2, caution < 2.5 (was 1.6 / 2.2) | course bands in `f-physics`; limit T/W 2 in `f-components-choice` |
+| PHY-3 | no longer applies | fixed in 7f293211: `f-physics.md:34–70` hover throttle from T/W on the course curve, class bands; `f-mechanics`, `ops-weather`, `eng-method-101` aligned | — |
+| MEC-1 | fixed | `f-mechanics.md:39` table: parameter, default, mechanism, start, check (BF start ~100, the source comment's 40 is knowingly low; AP boost uses the **current** lean, cos ≥ 0.1, fades above 60° — FC-sel I3 and nit); diagnostics `:95` | Betaflight 2025.12.5 `cli/settings.c:984–985`, `flight/imu.c:727–764`, `fc/core.c:178–179`; INAV 9.1.0 `fc/settings.yaml`, `fc/fc_core.c:864–884`; ArduPilot `AC_AttitudeControl.cpp:55–60, 1062–1070` (`thrust_angle_rad` = current lean), `AC_AttitudeControl_Multi.cpp:373–390`, `mode_stabilize.cpp:60`, `mode_acro.cpp:67` |
+| AER-2 | fixed | `f-aero-props.md:41` procedure (start prop from the motor table or course examples, compare a neighbour by g/W at hover thrust and full-throttle current, direction by task); lab reference reworded (step 2 has 7×4 only as a fallback) | course examples (`f-motors-esc` 5.1×3, `f-aero-props` 7×3.5, MN4006 15×5); direction labelled «оценка курса» |
+| AER-3 | no longer applies | fixed in 7f293211: `f-aero-props.md:133` and `:91` compare with the **continuous** rating (maximum only if continuous is not given), same as `des-sizing` and `f-components-choice` | — |
+| ELE-1 | no longer applies | fixed in 7f293211: `f-electricity-101.md:48` points to the `f-power` rule (capacity from average current, label C as a filter, R_cell ≤ 0.5 / I_peak) | — |
+| POW-1 | fixed | `f-power.md:34` numbers: average ≤ 1.5C per cell, peak ≤ 0.6 × datasheet continuous per cell, worked for P42A, check; 1.5C labelled «ориентир курса» (not a datasheet figure, FC-sel I9); `el-battery-packs.md:37` aligned (was «≤ 1–2C»); `f-components-choice.md:93`; quiz `el-battery-packs.json` explain | Molicel P42A datasheet values already cited in `el-battery-packs`; 1.5C and 0.6 are the course rules of `el-battery-packs` |
+| MOT-1 | fixed (with RPM-3) | `f-motors-esc.md:93` rule DShot speed ↔ PID loop ↔ MCU, wrong pointer removed; `f-esc-firmware.md:232` pointer | Betaflight 2025.12.5 `config/config.c:585–646` (`USE_PID_DENOM_CHECK`, `motorUpdateRestriction` 100 µs DShot300, ×2 with bidir), `target.h` of STM32F405/F411/G47X, APM32F405/F407 (`USE_PID_DENOM_OVERCLOCK_LEVEL 2`) |
+| MOT-2 | fixed (with ESC-1) | `f-motors-esc.md:65` start = firmware default for every class, raise one step only on evidence (eRPM dip), check = 3 punch-outs; pointer to the `f-esc-firmware` tables, which already hold the Bluejay / AM32 values from source | `f-esc-firmware` tables (Bluejay, AM32 source); «7" and up» labelled «оценка курса» |
+| FCS-1 | fixed | `f-fc-sensors.md:54` BMI270 runs at 3.2 kHz in Betaflight by default, 6.4 kHz without hardware LPF with `gyro_hardware_lpf = EXPERIMENTAL` (was «6.4 кГц»; FC-sel I7); `:56` loop-rate rule by MCU and gyro, buyer consequence, check via `status` | Betaflight 2025.12.5 `drivers/accgyro/gyro_sync.c:60–72` (3200 Hz default, 6400 with `GYRO_HARDWARE_LPF_EXPERIMENTAL`), `config/config.c`, `cli/cli.c:4896` (`status` line) |
+| FRM-1 | fixed | `f-frame-mech.md:40` contradiction removed: start with grommets on 5", hard mount only on evidence; `:49` f₀ measured by tap test, target 50–83 Hz for 5" (the earlier «60–80» in the same paragraph unified to 50–83) | the module's own window diagram (`chart-fc-damper-window`) and tap-test method; measurement labelled «метод курса» |
+| FRM-2 | fixed | `f-components-choice.md:45` 5" 4–5 mm; 7" 5 mm is in the danger zone, thickness alone does not fix it, rule = tap test → notch or mounting point | `f-frame-mech` numbers and worked example. Frame geometry (X / stretched X / H / deadcat) still has no rule — no primary source in hand; left open as a low item |
+| CMP-1 | no longer applies | fixed in 7f293211: `f-components-choice.md:48` class bands from `f-physics`; KV part fixed with AER-1 | — |
+| CMP-5 | fixed | `f-components-choice.md:59` band and video by task with pointers to `link-elrs` and `link-digital-video`; «900 МГц для 5+ км» removed | `link-elrs` «Выбор режима под задачу», «Регуляторные домены»; `link-digital-video` «Как выбирать» |
+| WHP-1 | fixed | `f-micro-whoop.md:153` start procedure (static idle → slowest-motor rpm at zero throttle → `dyn_idle_min_rpm`), check by `debug_mode = DYN_IDLE` (debug[3] = min rps × 10, `mixer.c:234`); table cell `:135` | mechanism and check from `bf-features-tour` (Betaflight 2025.12 `mixer.c`, `mixer_init.c`); doc value 30–40 for 5"; the whoop procedure is labelled «оценка курса» |
+| WHP-3 | fixed (with RPM-1) | `f-micro-whoop.md:154` rule rewritten after FC-sel I4: `rpm_filter_harmonics` drops only from the top, so a single harmonic is switched off by `rpm_filter_weights` = 0; blade-pass = harmonic number = blade count (2/3 blades inside the filter, 4 blades = 4th, outside it — dynamic notch); notches = motors × N per axis (X8 ×2); check by spectrogram; table cell; `bf-rpm-filter.md:106` same rule, «ослабить до 50–80» limited to non-blade-pass harmonics | Betaflight 2025.12.5 `flight/rpm_filter.c:97–101` (`notch[axis][motor][harmonic]`, harmonics 0…N−1); blade-pass mechanism labelled «оценка курса» |
+| WHP-4 | no longer applies | fixed in 7f293211: `f-micro-whoop.md:160` reason (8 % sag on 1S), check (rest 3.6–3.7 V, recharge ≤ 0.8), «опускать в последнюю очередь» explained; `f-power` canonical table row for 1S | — |
+| WHP-5 | fixed | `f-micro-whoop.md:48` where to start in the KV range (middle; up for light/race, down for heavy), pointer to `f-aero-props` table (fixed in 7f293211) | Oscar Liang KV table already cited in `f-aero-props` |
+| ENG-1 | no longer applies | fixed in 7f293211: `eng-method-101.md:39` R-02 criterion «газ ≤ 63 %», reason at `:44` | — |
+| CAS-1 | fixed | procedure was added to `f-power.md:98` (step 6) in 7f293211; this pass added the pointer in `ops-case-studies.md:76` | — |
+| PWR-1 | fixed | `el-power-design.md:66` manufacturer minimums (Holybro 35 V noted as the manufacturer's minimum, not a margin), class table, when to add a second capacitor, check | FETtec «How to use caps and FETtec Spike Absorber» (6S: ≥ 470 µF 50 V); Holybro Tekko32 F4 4in1 50A spec (1000 µF 35 V included, «highly recommended for 6s»); whoop row labelled «оценка» |
+| PWR-2 | no longer applies | fixed in 7ca39a09: `el-power-design.md:96–105` continuous current from the Amass datasheet for the wire gauge, short-term ≤ 1-minute figure, heat table | Amass XT30/XT60/XT90 datasheets (already cited) |
+| PWR-3 | fixed | `el-power-design.md:110` gauge line is **continuous** current; peak checked by ≤ 1 % drop; 14 AWG on 5" reconciled (0.2 m loop, 100 A → 0.17 V) | copper resistance per AWG already in the module (ρ = 1.724·10⁻⁸ Ω·m); 1 % is the module's existing course criterion |
+| BAT-3 | no longer applies | fixed in 7f293211: `el-battery-packs.md:29` thresholds from the `f-power` table | — |
+| WIR-1 | fixed | `el-wiring.md:50` pass/fail criterion (≤ 1 % at peak; continuous ≤ gauge rule), worked example scored; `assets/widgets/wire-drop.js:42` tag thresholds 1 % / 5 % (was 2.5 % / 5 %) and hint text, catalogs in `i18n/*/ui.json` re-keyed | same as PWR-3 |
+| WIR-2 | no longer applies | fixed in 7ca39a09: `el-wiring.md:55` Amass datasheet values, rule in `el-power-design` | — |
+| EMI-1 | fixed | selection was added to `el-power-design.md:77` («LC-фильтр для видео»: f₀, Q vs ESR, I_sat ≥ 1.5 × peak) in 1161e41e; this pass added the pointer and the oscilloscope check in `el-emi.md:61` | `el-power-design` calculation and lab; `el-measure` for the measurement |
+| VTX-1 | fixed | `link-vtx.md:58` which mode and why (UNTIL_FIRST_ARM default on the field, ON in a group, OFF only with manual pit mode), check; `:112` note on the CLI example | Betaflight 2025.12.5 `io/vtx.c:131–135` (`!ARMED && !failsafeIsActive()`, `WAS_EVER_ARMED`) |
+| ETX-1 | fixed | `link-edgetx.md:195` table split into «recommended» and «firmware hard limit» columns; the 400k row no longer contradicts the text | ExpressLRS 4.1.0 `src/lib/Handset/CRSFHandset.cpp:413–425` (115k → 250 Hz, 200 Hz half-duplex; 400k → 500 Hz). The ELRS «Radio Preparation» page could not be fetched in this pass; the «recommended» column keeps the attribution the module already had |
+| GNS-1 | fixed | `est-gnss.md:67` receiver choice without RTK (M10 default; 4 constellations on M10: 4 Hz by default, 10 Hz only in high-performance mode; M9N when 4 constellations at 10 Hz are wanted without that mode — «и выше» removed, EKF needs ≤ 10 Hz; M8N only if fitted; F9P only for RTK / dual antenna — unsourced «UM982» removed here; FC-sel I6), check | u-blox MAX-M10S, NEO-M9N, NEO-M8, ZED-F9P documents already cited in the module |
+| BFS-2 | fixed | `bf-failsafe.md:34` rule: Stage 1 = fall at minimum throttle (h = ½gt²), trade-off vs false Stage 2, values by procedure and packet rate, check from LQ telemetry | Betaflight 2025.12.5 `rx/rx.c:131, 158–161, 625–636` (300 ms hold, `RX_FAILSAFE_MODE_AUTO` → `rx_min_usec` for throttle), `flight/failsafe.c:75`, `cli/settings.c:988`; values labelled «оценка курса» |
+| FIL-1 | fixed | `bf-filters.md:59` class paragraph (harmonics by class; 7" given as 110–200 Hz so both cited sources agree — FC-sel I5; `rpm_filter_min_hz` first, `dyn_notch_min_hz` range); `:137` «ниже 100 Гц» limited to 5" | Betaflight 2025.12.5 `cli/settings.c:805` (`dyn_notch_min_hz` 20–250), `pg/dyn_notch.c:33`; class values from `bf-rpm-filter` and `f-frame-mech` |
+| RAT-1 | fixed | `bf-rates-rc.md:92` new subsection: M ≤ α × 0.25–0.5 s, worked for 5" (one α: 75 rad/s² conservative, 125 as the upper end; «в 10–20 раз» — FC-sel I2) and X8, Actual settings for a heavy aircraft, saturation check by log | α from `f-mechanics` and `f-physics`; Actual formula (`fc/rc.c`) already in the module; 0.25–0.5 s labelled «оценка курса» |
+
+**Fact-check (FC-sel, `/tmp/claude-0/work/s6/FC-sel.md`), all items applied:**
+- E1 → PHY-1.
+- I1 → PHY-2.
+- I2 → RAT-1.
+- I3 → MEC-1.
+- I4 → WHP-3 / RPM-1.
+- I5 → FIL-1.
+- I6 → GNS-1.
+- I7 → FCS-1.
+- I8: the old wrong facts are also fixed in the `cs` and `ru-odessa` copies, in the lines that exist there. `ru-odessa` received the Russian source sentences. The files touched:
+  - f-motors-esc: T/W, DShot, demag
+  - f-fc-sensors: BMI270
+  - f-components-choice: band and video, frame, Li-Ion C
+  - f-frame-mech: hard mount, f₀
+  - f-esc-firmware; `cs` stops here
+  - ru-odessa only: f-power, f-mechanics diagnostics, diag-troubleshooting, ops-case-studies, bf-filters, bf-rpm-filter
+
+  Their new standalone paragraphs exist only in the Russian source, as for the other languages.
+- I9 → POW-1.
+
+Nits fixed:
+- f₀ range in `f-frame-mech`;
+- the tilt-comp start value;
+- the DYN_IDLE units;
+- `tw-calc.js` header comment (hover throttle from the 0.65 curve, not 1/(T/W));
+- the unsourced «UM982» in the GNSS choice;
+- the Holybro capacitor note;
+- the `f-aero-props` lab wording;
+- «больше пропвоша» added to the props-in cons.
+
+Accepted as is, per FC-sel: wire-drop rates only the percentage drop (the hint says to check the continuous current separately); «DShot600 — до 8 кГц» is the practical number (the code limit is 16 kHz).
+
+Checks after this pass: `validate_content.py` OK, `check_i18n.py` 0 errors, `check_diagrams.py` 0 errors, `check_js.py` 0 errors.
+
 ---
 
 ## 1. Foundation

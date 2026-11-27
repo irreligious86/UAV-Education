@@ -21,7 +21,7 @@ var T = (typeof window !== "undefined" && window.T) || function (s) { return s; 
       var self = this;
       this.classList.add("widget");
       this.innerHTML = T('<p class="gc-label gc-muted">Интерактив · падение напряжения на проводе</p>') +
-        T('<p class="widget__hint gc-muted">Ток, длина одного провода (туда; обратный учитывается автоматически) и напряжение шины. Таблица — падение и тепло для каждого калибра. Правило: падение ≤ 2–3 % шины, тепло — не более нескольких ватт на коротком отрезке; на длинных жгутах крыла берут калибр крупнее.</p>');
+        T('<p class="widget__hint gc-muted">Ток, длина одного провода (туда; обратный учитывается автоматически) и напряжение шины. Таблица — падение и тепло для каждого калибра. Критерий курса для силового провода: падение на пиковом токе ≤ 1 % шины, 1–5 % — много, выше 5 % — нельзя; длительный ток — не выше правила калибра в модуле «Питание»; на длинных жгутах крыла берут калибр крупнее.</p>');
       var p = this.p = { i: 60, len: 0.2, volts: 22.2, awg: 2 };
       var sl = document.createElement("div"); sl.className = "widget__controls";
       function add(o) { var s = UAVPlot.slider(o); sl.appendChild(s.el); return s; }
@@ -39,7 +39,7 @@ var T = (typeof window !== "undefined" && window.T) || function (s) { return s; 
       var rows = AWG.map(function (w, idx) {
         var r = RHO * (2 * p.len) / w.mm2;        // Ω, both conductors
         var drop = p.i * r, heat = p.i * p.i * r, pct = 100 * drop / p.volts;
-        var state = pct > 5 ? "critical" : pct > 2.5 ? "caution" : "ok";
+        var state = pct > 5 ? "critical" : pct > 1 ? "caution" : "ok";   // course criterion: <= 1 % at peak (el-power-design)
         return '<tr class="' + (idx === p.awg ? "is-current" : "") + '" data-i="' + idx + '"><td>' + w.awg + "</td><td>" + w.mm2.toFixed(2) + "</td><td>" + (r * 1000).toFixed(1) + "</td><td>" + drop.toFixed(2) + "</td><td>" + pct.toFixed(1) + "</td><td>" + heat.toFixed(1) + '</td><td><span class="gc-tag" data-state="' + state + '">' + (state === "ok" ? T("норма") : state === "caution" ? T("много") : T("нельзя")) + "</span></td></tr>";
       }).join("");
       this.tableEl.innerHTML = T('<div class="widget__table-wrap"><table class="widget__table"><thead><tr><th>AWG</th><th>мм²</th><th>R, мОм</th><th>ΔU, В</th><th>% шины</th><th>Тепло, Вт</th><th></th></tr></thead><tbody>') + rows + "</tbody></table></div>";

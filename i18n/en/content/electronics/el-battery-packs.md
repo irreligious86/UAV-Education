@@ -36,7 +36,7 @@ LiPo is the norm for 5" and anything that needs 20C+, but long-range wings, 7–
 | Safety | catches fire easily, puffs | burns, but protected by the can; CID/PTC in “protected” versions | very tolerant of overcharge and temperature |
 | Where it fits | racing, freestyle, anything with T/W > 3 | long range, wings, heavy-lift, companion power | ground equipment, heavy slow platforms, stationary |
 
-Rule: Li-Ion wins when the average pack current is ≤ 1–2C and the flight is longer than 15 minutes. If hover needs > 3C, go LiPo.
+Rule: Li-Ion wins when the average current per cell is ≤ 1.5C (the heating limit, “Heat” below), the peak is within the 0.6 rule (practice step 2) and the flight is longer than 15 minutes. Between 1.5C and 3C — more P if the mass passes the flight-time calculation (`des-sizing`), otherwise LiPo. If hover needs > 3C, go LiPo.
 
 ### S/P configuration
 - **S** sets the voltage: 6S Li-Ion = 21.6 V nominal, 25.2 full, 18 V to land (3.0 V/cell), 15 V is the absolute limit.

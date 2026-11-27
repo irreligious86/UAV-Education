@@ -1,7 +1,8 @@
 /*
  * <uav-tw-calc>: thrust-to-weight and flight-time calculator.
  *
- * T/W = n·Tmax / m; hover throttle ≈ 1/(T/W) (thrust ~ throttle to first order);
+ * T/W = n·Tmax / m; hover thrust fraction f = 1/(T/W); hover throttle from the course
+ * thrust curve T = 0.35u + 0.65u² (f-physics), solved for u;
  * hover power = (m/n) / efficiency [g/W] per motor; current = P / (cells·3.7 V);
  * flight time = usable capacity / current. Numbers are first-order estimates:
  * efficiency at hover from the motor's thrust table is the input that matters most.
@@ -50,7 +51,7 @@ var T = (typeof window !== "undefined" && window.T) || function (s) { return s; 
 
     update() {
       var p = this.p, r = this.calc(p.mass);
-      var twState = r.tw < 1.6 ? "critical" : r.tw < 2.2 ? "caution" : "ok";
+      var twState = r.tw < 2 ? "critical" : r.tw < 2.5 ? "caution" : "ok";    // course limit T/W 2 (f-physics, f-components-choice); 2-2.5 = cargo band
       var thrState = r.tw < 2 ? "critical" : r.tw < 2.5 ? "caution" : "ok";  // 65 % / 56 % throttle on the course curve
       this.metricsEl.innerHTML =
         '<span class="gc-tag" data-state="' + twState + '">T/W ' + r.tw.toFixed(2) + "</span>" +

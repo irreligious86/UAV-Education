@@ -125,7 +125,7 @@ Blackbox Explorer → gyro spectrogram (before and after filters) on roll/pitch;
 - A horizontal peak at 100–300 Hz → `dyn_notch_count` +1 or a static `gyro_notch1_hz` = the frequency, `cutoff` = frequency × 0.7; in parallel — mechanics.
 - Clean spectrum, cold motors, mushy response → `simplified_gyro_filter_multiplier` 100→125→150, `simplified_dterm_filter_multiplier` 100→120, one step at a time with a log.
 - Motors heat up with a clean gyro spectrum → look at D: `dterm_lpf1_dyn_max_hz` 20% lower or `dterm_lpf1_type = PT2`; lower D.
-- Nothing helps below 100 Hz → it's not the filters: props, D, mechanics.
+- Nothing helps below 100 Hz → on a 5" it's not the filters: props, D, mechanics. On a 7–15" the motor harmonic itself lies below 100 Hz — first check `rpm_filter_min_hz` for the class (`bf-rpm-filter`).
 
 ### Step 4. Locking it in
 Before/after logs; a “parameter — was — now — why — effect (dB, °C, bounce-back)” table in the engineering folder; `diff all` into the config repo.
