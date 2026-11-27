@@ -129,17 +129,16 @@ var T = (typeof window !== "undefined" && window.T) || function (s) { return s; 
     openBtn.addEventListener("click", function () { panelOpen() ? closePanel() : openPanel("", openBtn); });
     fbBtn.addEventListener("click", function () { feedbackDialog({ module: mid, section: section, anchor: "", title: title, heading: "" }); });
 
-    // ---- buttons inside every section heading
+    // ---- a bookmark button in every section heading. Notes and feedback live once per lesson, in the bar above
+    // (owner's request 2026-11-27); a section that already has a note keeps a ✎ marker that opens it.
     heads.forEach(function (h) {
       var name = textOf(h);
       var tools = el("span", { class: "nb-tools" });
       var b1 = btn("nb-tool", T("Закладка на раздел «{h}»", { h: name }), "☆"); b1.setAttribute("aria-pressed", "false"); b1.setAttribute("data-nb-mark", h.id);
-      var b2 = btn("nb-tool", T("Заметка к разделу «{h}»", { h: name }), "✎"); b2.setAttribute("data-nb-note", h.id);
-      var b3 = btn("nb-tool", T("Сообщить о разделе «{h}»", { h: name }), "⚑");
+      var b2 = btn("nb-tool", T("Заметка к разделу «{h}»", { h: name }), "✎"); b2.setAttribute("data-nb-note", h.id); b2.hidden = true;
       b1.addEventListener("click", function () { toggleMark(h.id); });
       b2.addEventListener("click", function () { openPanel(h.id, b2); });
-      b3.addEventListener("click", function () { feedbackDialog({ module: mid, section: section, anchor: h.id, title: title, heading: name }); });
-      tools.append(b1, b2, b3);
+      tools.append(b1, b2);
       h.append(tools);
     });
 
@@ -160,7 +159,10 @@ var T = (typeof window !== "undefined" && window.T) || function (s) { return s; 
         var m = !!UD.bookmarks.get(mid, b.getAttribute("data-nb-mark"));
         b.setAttribute("aria-pressed", String(m)); b.textContent = m ? "★" : "☆";
       });
-      art.querySelectorAll("[data-nb-note]").forEach(function (b) { b.toggleAttribute("data-has", !!UD.notes.get(mid, b.getAttribute("data-nb-note"))); });
+      art.querySelectorAll("[data-nb-note]").forEach(function (b) {
+        var has = !!UD.notes.get(mid, b.getAttribute("data-nb-note"));
+        b.toggleAttribute("data-has", has); b.hidden = !has;
+      });
     }
 
     // ---- notes panel (not modal: the lesson stays readable next to it)

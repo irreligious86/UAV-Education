@@ -66,18 +66,20 @@ const NOTES = "uav-student:notes:v1", MARKS = "uav-student:bookmarks:v1";
     assert.ok(!(await p.isVisible("#nb-panel")));
     assert.strictEqual(await p.evaluate(() => document.activeElement.getAttribute("aria-controls")), "nb-panel");
     assert.strictEqual((await ls(p, NOTES))["bf-pid#"].body, "PID: P first, then D.", "closing flushes the pending save");
-    // section note from the heading button
+    // headings carry only a bookmark button; the note marker appears only on a section that already has a note
+    assert.strictEqual(await p.locator(".module-body h2 .nb-tools button:visible").count(), await p.locator(".module-body h2").count(), "one visible button per heading");
     const noteBtn = p.locator(".module-body h2 [data-nb-note]").nth(2);
     const anchor = await p.locator(".module-body h2").nth(2).getAttribute("id");
+    assert.ok(await noteBtn.isHidden(), "no note marker without a note");
+    await p.evaluate((a) => { window.UAVUserData.notes.set("bf-pid", a, { body: "D-term: watch the motor temperature.", label: "", title: "", path: "" }); }, anchor);
+    await p.reload({ waitUntil: "networkidle" });
+    assert.ok(await noteBtn.isVisible(), "a section with a note shows the marker");
     await noteBtn.click();
     assert.strictEqual(await p.evaluate(() => document.activeElement.closest(".nb-note").getAttribute("data-anchor")), anchor);
-    await p.keyboard.type("D-term: watch the motor temperature.");
-    await p.waitForTimeout(800);
     assert.strictEqual((await ls(p, NOTES))["bf-pid#" + anchor].body, "D-term: watch the motor temperature.");
-    assert.ok(await noteBtn.getAttribute("data-has") !== null);
     await p.keyboard.press("Escape");
     assert.ok(await noteBtn.evaluate((b) => b === document.activeElement), "focus back on the heading button");
-    ok(`${width}px: notes panel — autosave, saved state, counter, section note, Escape`);
+    ok(`${width}px: notes panel — autosave, saved state, counter, section note marker, Escape`);
 
     // feedback for a guest: explained, link to the account page, modal, Escape
     await p.click(".nb-bar >> text=Сообщить разработчику");
@@ -89,9 +91,7 @@ const NOTES = "uav-student:notes:v1", MARKS = "uav-student:bookmarks:v1";
     await p.screenshot({ path: path.join(process.env.SHOTS || "/tmp", `notes-dialog-${width}.png`) });
     await p.keyboard.press("Escape");
     assert.ok(!(await p.isVisible("dialog.nb-dialog")));
-    await p.locator(".module-body h2 .nb-tools button").nth(2).click();       // section variant
-    assert.match(await p.textContent("dialog.nb-dialog"), /раздел «/);
-    await p.keyboard.press("Escape");
+    assert.strictEqual(await p.locator('.module-body [aria-label^="Сообщить о разделе"]').count(), 0, "feedback only once per lesson");
     await noSideScroll(p, width, "lesson");
     ok(`${width}px: feedback — guests see why sign-in is needed, dialog is modal and closes on Escape`);
 
@@ -343,7 +343,7 @@ const NOTES = "uav-student:notes:v1", MARKS = "uav-student:bookmarks:v1";
 
     // feedback: send, staff sees it and changes the status, the author sees the status
     await p.goto(`${BASE}/${LESSON}`, { waitUntil: "networkidle" });
-    await p.locator(".module-body h2 .nb-tools button").nth(2).click();
+    await p.click(".nb-bar >> text=Сообщить разработчику");
     await p.fill("dialog.nb-dialog textarea", "short");
     await p.click("dialog.nb-dialog button[type=submit]");
     assert.match(await p.textContent("dialog.nb-dialog .acc-msg"), /хотя бы 10/);
@@ -352,7 +352,7 @@ const NOTES = "uav-student:notes:v1", MARKS = "uav-student:bookmarks:v1";
     await p.click("dialog.nb-dialog button[type=submit]");
     await p.waitForSelector("dialog.nb-dialog [role=status]");
     const fb = (await db()).feedback[0];
-    assert.deepStrictEqual([fb.module_id, fb.section_key, fb.kind, fb.anchor, fb.page_lang], ["bf-pid", "betaflight", "unclear", "teoriya", "ru"]);
+    assert.deepStrictEqual([fb.module_id, fb.section_key, fb.kind, fb.anchor, fb.page_lang], ["bf-pid", "betaflight", "unclear", "", "ru"]);
     await p.keyboard.press("Escape");
     await p.goto(`${BASE}/pages/account.html`, { waitUntil: "networkidle" });
     await p.click("[data-acc-logout]");
@@ -364,7 +364,7 @@ const NOTES = "uav-student:notes:v1", MARKS = "uav-student:bookmarks:v1";
     await p.goto(`${BASE}/pages/admin.html`, { waitUntil: "networkidle" });
     await p.waitForSelector("[data-adm-feedback] [data-fb]");
     assert.match(await p.textContent("[data-adm-feedback]"), /0\.65[\s\S]*/);
-    assert.ok(/m\/bf-pid\.html#teoriya$/.test(await p.getAttribute("[data-adm-feedback] [data-fb] a", "href")), "link to the exact place");
+    assert.ok(/m\/bf-pid\.html$/.test(await p.getAttribute("[data-adm-feedback] [data-fb] a", "href")), "link to the lesson");
     await p.selectOption("[data-fb-kind]", "error");
     assert.strictEqual(await p.locator("[data-adm-feedback] [data-fb]").count(), 0);
     await p.selectOption("[data-fb-kind]", "");
