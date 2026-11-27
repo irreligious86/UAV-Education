@@ -182,7 +182,7 @@ next:
 ### Профили: что переключается и чем
 | Профиль | Штук | CLI | Стики | В полёте |
 |---|---|---|---|---|
-| control (PID, рейты) | 3 | `control_profile N` | да, `TX_PROF_SEL` | операция логики 42 Set Profile; следом за батарейным (`use_control_profile`, до 9.0 `controlrate_profile`) или миксерным профилем (`mixer_control_profile_linking`) |
+| control (PID, рейты) | 3 | `control_profile N` | да, `TX_PROF_SEL` | операция логики 42 Set Control Profile; следом за батарейным (`use_control_profile`, до 9.0 `controlrate_profile`) или миксерным профилем (`mixer_control_profile_linking`) |
 | battery | 3 | `battery_profile N` | да, `TX_PROF_SEL` | нет; `BAT_PROF_AUTOSWITCH` выбирает профиль при подключении батареи |
 | mixer | 2 | `mixer_profile N` | нет | режим `MIXER PROFILE 2`, `mixer_automated_switch` |
 

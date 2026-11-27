@@ -3,114 +3,114 @@
  "pass": 80,
  "questions": [
   {
-   "q": "Строка `geozone 1 0 0 0 8000 0 2 2`. Что это за зона?",
+   "q": "The line `geozone 1 0 0 0 8000 0 2 2`. What kind of zone is it?",
    "options": [
-    "Полигон, разрешённая, от земли до 80 м, действие RTH",
-    "Круг, запретная, от земли до 80 м, действие POS_HOLD",
-    "Круг, разрешённая, от земли до 8000 м, действие AVOID",
-    "Полигон, запретная, от 80 м и без потолка, POS_HOLD"
+    "A polygon, a fly zone, from the ground to 80 m, action RTH",
+    "A circle, a no-fly zone, from the ground to 80 m, action POS_HOLD",
+    "A circle, a fly zone, from the ground to 8000 m, action AVOID",
+    "A polygon, a no-fly zone, from 80 m with no ceiling, POS_HOLD"
    ],
    "answer": 1,
-   "explain": "Поля по порядку: id 1, shape 0 — круг, type 0 — exclusive (NFZ), min 0, max 8000 см = 80 м, высоты от дома, action 2 — POS_HOLD, две вершины (центр и радиус)."
+   "explain": "The fields in order: id 1, shape 0 — circular, type 0 — exclusive (NFZ), min 0, max 8000 cm = 80 m, altitudes relative to home, action 2 — POS_HOLD, two vertices (center and radius)."
   },
   {
-   "q": "У круглой зоны записано `geozone vertex 1 1 12000 0`. Что означает 12000?",
+   "q": "A circular zone has `geozone vertex 1 1 12000 0`. What does 12000 mean?",
    "options": [
-    "Широта 0.0012000° второй точки на окружности зоны",
-    "Высота потолка зоны: 12000 см над точкой дома",
-    "Радиус 120 м: у круга вершина 1 хранит сантиметры",
-    "Дистанция обнаружения именно этой зоны: 120 м"
+    "The latitude 0.0012000° of a second point on the circumference of the zone",
+    "The zone ceiling altitude: 12000 cm above the home point",
+    "A radius of 120 m: for a circle vertex 1 holds centimeters",
+    "The detection distance of this particular zone: 120 m"
    ],
    "answer": 2,
-   "explain": "В `geoZoneInit()` для круга значение `lat` вершины с индексом 1 берётся как радиус в сантиметрах; `lon` не используется. Центр — вершина 0."
+   "explain": "In `geoZoneInit()` for a circle the `lat` value of the vertex with index 1 is taken as the radius in centimeters; `lon` is not used. The center is vertex 0."
   },
   {
-   "q": "NFZ задана с `min alt = 3000`, `max alt = 0`. Аппарат стоит на земле внутри её контура. Что с армом?",
+   "q": "An NFZ is defined with `min alt = 3000`, `max alt = 0`. The aircraft is on the ground inside its outline. What about arming?",
    "options": [
-    "Арм запрещён: аппарат стоит внутри контура запретной зоны",
-    "Арм разрешён: на высоте 0 аппарат вне диапазона высот зоны",
-    "Арм разрешён только аварийным армом с обходом блокировок",
-    "Арм запрещён, пока не включён `geozone_safehome_as_inclusive`"
+    "Arming is forbidden: the aircraft is inside the outline of a no-fly zone",
+    "Arming is allowed: at altitude 0 the aircraft is outside the altitude range of the zone",
+    "Arming is allowed only with an emergency arm that overrides the blocks",
+    "Arming is forbidden until `geozone_safehome_as_inclusive` is enabled"
    ],
    "answer": 1,
-   "explain": "`isInGeozone()` после проверки контура проверяет высоту: z ≥ min (если min не 0) и z ≤ max. На земле z = 0 меньше 30 м, значит аппарат не в зоне и `geozoneIsBlockingArming()` её не учитывает."
+   "explain": "After the outline check `isInGeozone()` checks the altitude: z ≥ min (if min is not 0) and z ≤ max. On the ground z = 0 is less than 30 m, so the aircraft is not in the zone and `geozoneIsBlockingArming()` does not take it into account."
   },
   {
-   "q": "В конфиге у зоны `vertex count = 4`, а строк `geozone vertex` для неё три. Что произойдёт после перезагрузки?",
+   "q": "In the config a zone has `vertex count = 4`, but there are three `geozone vertex` lines for it. What happens after a reboot?",
    "options": [
-    "Зона станет треугольником из трёх вершин",
-    "Отключится только эта зона, остальные работают",
-    "Арм будет заблокирован флагом GEOZONE",
-    "Задача геозон выключится целиком и молча"
+    "The zone becomes a triangle of three vertices",
+    "Only this zone is disabled, the others work",
+    "Arming is blocked by the GEOZONE flag",
+    "The geozone task is turned off entirely and silently"
    ],
    "answer": 3,
-   "explain": "`geoZoneInit()` сравнивает сумму `vertex count` с числом записанных вершин; при несовпадении выключает TASK_GEOZONE. Ни блокировки арма, ни действий, ни обхода в RTH после этого нет."
+   "explain": "`geoZoneInit()` compares the sum of `vertex count` with the number of stored vertices; on a mismatch it turns TASK_GEOZONE off. After that there is no arming block, no actions and no detour in RTH."
   },
   {
-   "q": "В каком наборе режимов геозоны выполняют действия (AVOID, POS_HOLD, RTH)?",
+   "q": "In which set of modes do geozones execute actions (AVOID, POS_HOLD, RTH)?",
    "options": [
     "ANGLE, HORIZON, NAV CRUISE, NAV COURSE HOLD",
-    "Во всех, кроме MANUAL",
-    "Только в NAV POSHOLD и NAV RTH",
-    "ACRO, ANGLE и NAV WP"
+    "In all except MANUAL",
+    "Only in NAV POSHOLD and NAV RTH",
+    "ACRO, ANGLE and NAV WP"
    ],
    "answer": 0,
-   "explain": "`isNonGeozoneModeFromBoxInput()` возвращает «не геозонный режим», если не активен ни один из четырёх: ANGLE, HORIZON, NAV CRUISE, NAV COURSE HOLD. В ACRO и MANUAL INAV не вмешивается."
+   "explain": "`isNonGeozoneModeFromBoxInput()` returns “not a geozone mode” if none of the four is active: ANGLE, HORIZON, NAV CRUISE, NAV COURSE HOLD. In ACRO and MANUAL INAV does not intervene."
   },
   {
-   "q": "RTH с активными геозонами не нашёл обходной путь, `geozone_no_way_home_action` по умолчанию. Что сделает аппарат?",
+   "q": "RTH with active geozones found no detour, `geozone_no_way_home_action` is at the default. What does the aircraft do?",
    "options": [
-    "Зависнет или встанет в круг до команды пилота",
-    "Выполнит аварийную посадку на том же месте",
-    "Полетит домой по прямой, игнорируя зоны",
-    "Вернётся по записанным точкам trackback"
+    "Hovers or loiters until the pilot gives a command",
+    "Performs an emergency landing on the spot",
+    "Flies home in a straight line, ignoring the zones",
+    "Returns along the recorded trackback points"
    ],
    "answer": 2,
-   "explain": "Умолчание — RTH: обычный возврат по прямой сквозь зоны. Аварийную посадку даёт значение EMRG_LAND. Выбор надо делать осознанно под местность."
+   "explain": "The default is RTH: an ordinary straight-line return through the zones. The value EMRG_LAND gives an emergency landing. The choice has to be made deliberately for the terrain."
   },
   {
-   "q": "Арм в 172 м от safehome 3 и в 176 м от safehome 1, оба включены; safehome 2 в 71 м, но выключен. `safehome_max_distance = 20000`. Какой будет выбран?",
+   "q": "Armed 172 m from safehome 3 and 176 m from safehome 1, both enabled; safehome 2 is 71 m away but disabled. `safehome_max_distance = 20000`. Which one is selected?",
    "options": [
-    "Safehome 2: он ближе всех остальных к точке арма",
-    "Safehome 1: меньший индекс из двух подходящих",
-    "Safehome 3: ближайший включённый в пределах 200 м",
-    "Никакой: два близких кандидата дают неоднозначность"
+    "Safehome 2: it is the closest of all to the arming point",
+    "Safehome 1: the lower index of the two suitable ones",
+    "Safehome 3: the nearest enabled one within 200 m",
+    "None: two close candidates are ambiguous"
    ],
    "answer": 2,
-   "explain": "`findNearestSafeHome()` пропускает выключенные записи и берёт ближайшую из оставшихся, если расстояние не больше `safehome_max_distance`. Порядок индексов не важен."
+   "explain": "`findNearestSafeHome()` skips disabled entries and takes the nearest of the rest if the distance is no more than `safehome_max_distance`. The index order does not matter."
   },
   {
-   "q": "`nav_rth_trackback_distance = 500`. В каких единицах это значение и от чего отсчитывается?",
+   "q": "`nav_rth_trackback_distance = 500`. What units is this value in, and what is it measured from?",
    "options": [
-    "Сантиметры пути, пройденного по записанному следу",
-    "Метры по прямой от места, где начался trackback",
-    "Метры по прямой от точки дома до аппарата",
-    "Секунды полёта по записанному следу до RTH"
+    "Centimeters of path traveled along the recorded track",
+    "Meters in a straight line from the place where the trackback started",
+    "Meters in a straight line from the home point to the aircraft",
+    "Seconds of flight along the recorded track before RTH"
    ],
    "answer": 1,
-   "explain": "Настройка в метрах (50–2000). `rthTrackBackSetNewPosition()` сравнивает с ней прямое расстояние от последней сохранённой точки — места начала trackback; при превышении включается обычный RTH."
+   "explain": "The setting is in meters (50–2000). `rthTrackBackSetNewPosition()` compares it with the straight-line distance from the last saved point — the place where the trackback started; when it is exceeded, a normal RTH takes over."
   },
   {
-   "q": "`fwapproach 3 5000 0 1 270 -180 0`. С какими курсами INAV может посадить крыло?",
+   "q": "`fwapproach 3 5000 0 1 270 -180 0`. With which headings can INAV land the wing?",
    "options": [
-    "Только 270° и 180°",
-    "270°, 90° и 180°",
-    "270°, 90°, 180° и 360°",
-    "Только 90° и 360°"
+    "Only 270° and 180°",
+    "270°, 90° and 180°",
+    "270°, 90°, 180° and 360°",
+    "Only 90° and 360°"
    ],
    "answer": 1,
-   "explain": "Положительный курс разрешает и обратное направление: 270° и 90°. Отрицательный — только сам курс: 180°. Курс 0 означал бы «выключено»."
+   "explain": "A positive heading also allows the opposite direction: 270° and 90°. A negative one — only the heading itself: 180°. A heading of 0 would mean “disabled”."
   },
   {
-   "q": "approach alt = 5000, `nav_fw_land_approach_length = 40000`, land alt = 0. Какая высота у `WP_FINAL_APPROACH` и где цель финальной прямой?",
+   "q": "approach alt = 5000, `nav_fw_land_approach_length = 40000`, land alt = 0. What is the altitude of `WP_FINAL_APPROACH`, and where is the target of the final leg?",
    "options": [
-    "33.32 м; цель в 400 м за точкой посадки на высоте −33.32 м",
-    "33.33 м; цель в самой точке посадки на высоте 0 м, без запаса",
-    "50 м; цель в 400 м перед точкой посадки на высоте 33.32 м",
-    "25 м; цель в 200 м за точкой посадки на высоте 0 м над ней"
+    "33.32 m; the target is 400 m beyond the landing point at an altitude of −33.32 m",
+    "33.33 m; the target is at the landing point itself at an altitude of 0 m, with no margin",
+    "50 m; the target is 400 m before the landing point at an altitude of 33.32 m",
+    "25 m; the target is 200 m beyond the landing point at an altitude of 0 m above it"
    ],
    "answer": 0,
-   "explain": "h_fa = 5000 / 3 × 2 в целых = 3332 см. `WP_LAND` отнесена на L вперёд по посадочному курсу и опущена до land alt − h_fa, поэтому линия цели пересекает землю раньше точки посадки."
+   "explain": "h_fa = 5000 / 3 × 2 in integers = 3332 cm. `WP_LAND` is moved by L forward along the landing heading and lowered to land alt − h_fa, so the target line meets the ground before the landing point."
   }
  ]
 }

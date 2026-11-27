@@ -3,73 +3,73 @@
  "pass": 80,
  "questions": [
   {
-   "q": "Воздушный модуль Walksnail Avatar подключён к UART полётника с INAV 9.1. Какие функция порта и `osd_video_system` нужны?",
+   "q": "A Walksnail Avatar air unit is connected to a UART of a flight controller with INAV 9.1. Which port function and `osd_video_system` are needed?",
    "options": [
-    "Маска 33554432 и AVATAR",
-    "Маска 131073 и HD",
-    "Маска 2097152 и AVATAR",
-    "Маска 33554432 и DJIWTF"
+    "Mask 33554432 and AVATAR",
+    "Mask 131073 and HD",
+    "Mask 2097152 and AVATAR",
+    "Mask 33554432 and DJIWTF"
    ],
    "answer": 0,
-   "explain": "MSP DisplayPort в INAV — бит 1 << 25 = 33554432 (serial.h). AVATAR задаёт сетку 53×20. 131073 и HD — это Betaflight; 2097152 — старый протокол DJI; DJIWTF — сетка 60×22 для WTFOS."
+   "explain": "MSP DisplayPort in INAV is the bit 1 << 25 = 33554432 (serial.h). AVATAR sets a 53×20 grid. 131073 and HD are Betaflight; 2097152 is the old DJI protocol; DJIWTF is the 60×22 grid for WTFOS."
   },
   {
-   "q": "Какие значения `osd_video_system` в INAV 9.1.0 дают одну и ту же сетку 53×20?",
+   "q": "Which `osd_video_system` values in INAV 9.1.0 give the same 53×20 grid?",
    "options": [
-    "HDZERO, AVATAR и DJIWTF",
-    "AVATAR, BFHDCOMPAT и DJI_NATIVE",
-    "AVATAR, BF43COMPAT и DJI_NATIVE",
-    "DJIWTF, BFHDCOMPAT и DJI_NATIVE"
+    "HDZERO, AVATAR and DJIWTF",
+    "AVATAR, BFHDCOMPAT and DJI_NATIVE",
+    "AVATAR, BF43COMPAT and DJI_NATIVE",
+    "DJIWTF, BFHDCOMPAT and DJI_NATIVE"
    ],
    "answer": 1,
-   "explain": "В displayport_msp_osd.c ветка HD_5320 общая для VIDEO_SYSTEM_DJICOMPAT_HD (BFHDCOMPAT), AVATAR и DJI_NATIVE. HDZERO — 50×18, DJIWTF — 60×22, BF43COMPAT — 30×16."
+   "explain": "In displayport_msp_osd.c the HD_5320 branch is shared by VIDEO_SYSTEM_DJICOMPAT_HD (BFHDCOMPAT), AVATAR and DJI_NATIVE. HDZERO is 50×18, DJIWTF is 60×22, BF43COMPAT is 30×16."
   },
   {
-   "q": "DJI O3 и очки, в меню которых нет типа OSD «INAV». Что выбрать в `osd_video_system` и чего ждать?",
+   "q": "A DJI O3 and goggles whose menu has no OSD type “INAV”. What do you choose in `osd_video_system`, and what do you expect?",
    "options": [
-    "DJI_NATIVE: полный шрифт INAV",
-    "DJIWTF: сетка 60×22 без потерь",
-    "BFHDCOMPAT: часть значков заменится на «?»",
-    "AVATAR: шрифт INAV подгрузится с полётника"
+    "DJI_NATIVE: the full INAV font",
+    "DJIWTF: a 60×22 grid without losses",
+    "BFHDCOMPAT: some icons are replaced with “?”",
+    "AVATAR: the INAV font is loaded from the flight controller"
    ],
    "answer": 2,
-   "explain": "Без шрифта INAV в очках работает режим совместимости: символы INAV перекодируются в шрифт DJI, непарные выводятся как «?» (osd_highlight_djis_missing_font_symbols = ON). Шрифт с полётника в очки не передаётся."
+   "explain": "Without the INAV font in the goggles the compatibility mode is what works: INAV characters are remapped to the DJI font, and those without a match are output as “?” (osd_highlight_djis_missing_font_symbols = ON). A font is not transferred from the flight controller to the goggles."
   },
   {
-   "q": "Строка `osd_layout 0 12 44 18 V`. Что произойдёт с элементом на HDZero (`osd_video_system = HDZERO`)?",
+   "q": "The line `osd_layout 0 12 44 18 V`. What happens to the element on HDZero (`osd_video_system = HDZERO`)?",
    "options": [
-    "Прошивка прижмёт его к строке 17",
-    "Он не будет виден: строки сетки — 0…17",
-    "Он будет виден в столбце 44, строке 18",
-    "CLI отклонит строку как ошибочную"
+    "The firmware clamps it to row 17",
+    "It is not visible: the grid rows are 0…17",
+    "It is visible in column 44, row 18",
+    "The CLI rejects the line as an error"
    ],
    "answer": 1,
-   "explain": "Сетка HDZERO — 50×18, строки 0–17. CLI принимает столбец и строку 0–63 и ничего не проверяет; osd.c берёт координаты как есть и элемент не сдвигает."
+   "explain": "The HDZERO grid is 50×18, rows 0–17. The CLI accepts a column and a row of 0–63 and checks nothing; osd.c takes the coordinates as they are and does not move the element."
   },
   {
-   "q": "По MSP2_INAV_OSD_LAYOUTS пришло слово 0x2118. Какая это позиция?",
+   "q": "The word 0x2118 came over MSP2_INAV_OSD_LAYOUTS. What position is it?",
    "options": [
-    "Столбец 24, строка 8, виден",
-    "Столбец 4, строка 24, виден",
-    "Столбец 24, строка 4, скрыт",
-    "Столбец 24, строка 4, виден"
+    "Column 24, row 8, visible",
+    "Column 4, row 24, visible",
+    "Column 24, row 4, hidden",
+    "Column 24, row 4, visible"
    ],
    "answer": 3,
-   "explain": "x = 0x2118 & 63 = 24; y = (0x2118 >> 6) & 63 = 4; бит 0x2000 установлен — элемент виден. (24, 8) получается при пятибитной формуле, которая в INAV относится только к старому протоколу DJI."
+   "explain": "x = 0x2118 & 63 = 24; y = (0x2118 >> 6) & 63 = 4; the 0x2000 bit is set — the element is visible. (24, 8) comes from the five-bit formula, which in INAV applies only to the old DJI protocol."
   },
   {
-   "q": "Включены режим OSD ALT 2 (тумблером) и логическое условие с операцией 32 «Set OSD Layout», операнд 3. Failsafe нет. Какая раскладка на экране?",
+   "q": "The OSD ALT 2 mode (from a switch) and a logic condition with operation 32 “Set OSD Layout”, operand 3, are both active. There is no failsafe. Which layout is on the screen?",
    "options": [
-    "Раскладка 3",
-    "Раскладка 2",
-    "Раскладка 0",
-    "Раскладки 2 и 3 чередуются"
+    "Layout 3",
+    "Layout 2",
+    "Layout 0",
+    "Layouts 2 and 3 alternate"
    ],
    "answer": 1,
-   "explain": "В osdRefresh() режимы OSD ALT проверяются раньше флага программного фреймворка: ALT 3, затем ALT 2, затем ALT 1, и только потом операция 32."
+   "explain": "In osdRefresh() the OSD ALT modes are checked before the programming framework flag: ALT 3, then ALT 2, then ALT 1, and only then operation 32."
   },
   {
-   "q": "На экране футы (`osd_units = IMPERIAL`), тревога высоты нужна на 400 футах. Что записать в `osd_alt_alarm`?",
+   "q": "The screen shows feet (`osd_units = IMPERIAL`), and the altitude alarm is needed at 400 feet. What do you write in `osd_alt_alarm`?",
    "options": [
     "400",
     "122",
@@ -77,42 +77,42 @@
     "1219"
    ],
    "answer": 2,
-   "explain": "Порог хранится в метрах при любых osd_units: 400 × 0.3048 = 121.92 м. Верхний порог округляют вниз — 121; 122 м это уже 400.3 фута. 400 дало бы тревогу на 1312 футах."
+   "explain": "The threshold is stored in meters with any osd_units: 400 × 0.3048 = 121.92 m. An upper threshold is rounded down — 121; 122 m is already 400.3 feet. 400 would give the alarm at 1312 feet."
   },
   {
-   "q": "Фрагмент конфигурации аналогового аппарата: видео в очках есть, OSD нет. В чём причина?",
+   "q": "A fragment of the configuration of an analog aircraft: there is video in the goggles but no OSD. What is the cause?",
    "kind": "apply",
    "fragment": "feature OSD\nserial 0 64 115200 115200 0 115200\nserial 2 2 115200 115200 0 115200\nserial 5 33554432 115200 115200 0 115200\nset osd_video_system = PAL",
    "options": [
-    "Значение PAL вместо AUTO отключает чип",
-    "Порту 5 назначен MSP DisplayPort — MAX7456 не используется",
-    "На порту 0 приёмник мешает OSD",
-    "Не хватает бита MSP на порту 5"
+    "The value PAL instead of AUTO disables the chip",
+    "MSP DisplayPort is assigned to port 5 — the MAX7456 is not used",
+    "The receiver on port 0 interferes with the OSD",
+    "The MSP bit is missing on port 5"
    ],
    "answer": 1,
-   "explain": "fc_init.c сначала пробует MSP DisplayPort и берёт MAX7456, только если порта с FUNCTION_MSP_OSD нет. Сними функцию 33554432 с порта 5."
+   "explain": "fc_init.c tries MSP DisplayPort first and takes the MAX7456 only if there is no port with FUNCTION_MSP_OSD. Remove function 33554432 from port 5."
   },
   {
-   "q": "Строка `osd_custom_elements 0 1 0 6 2 0 0 2 5 \"bat low\"`. Когда элемент виден и что показывает?",
+   "q": "The line `osd_custom_elements 0 1 0 6 2 0 0 2 5 \"bat low\"`. When is the element visible, and what does it show?",
    "options": [
-    "Всегда; текст и логическое условие 6",
-    "Пока GVAR 5 ≠ 0; текст и значок с кодом 6",
-    "Пока истинно условие 2; текст и GVAR 5",
-    "Пока истинно условие 5; BAT LOW и GVAR 2 двумя цифрами"
+    "Always; the text and logic condition 6",
+    "While GVAR 5 ≠ 0; the text and an icon with code 6",
+    "While condition 2 is true; the text and GVAR 5",
+    "While condition 5 is true; BAT LOW and GVAR 2 with two digits"
    ],
    "answer": 3,
-   "explain": "Части: тип 1 — текст (выводится в верхнем регистре), тип 6 значение 2 — GVAR 2 двумя цифрами, третья часть пустая. Видимость: тип 2 — логическое условие, номер 5."
+   "explain": "The parts: type 1 — text (output in upper case), type 6 value 2 — GVAR 2 with two digits, the third part is empty. Visibility: type 2 — a logic condition, number 5."
   },
   {
-   "q": "HD-модуль подключён одним проводом: TX полётника → RX модуля. Порт и `osd_video_system` настроены верно. Что будет с OSD INAV?",
+   "q": "An HD air unit is connected with one wire: flight controller TX → unit RX. The port and `osd_video_system` are set correctly. What happens to the INAV OSD?",
    "options": [
-    "OSD не появится: полётник ждёт MSP-запрос от модуля",
-    "OSD будет, но без управления мощностью VTX",
-    "OSD появится через 1 с после включения",
-    "OSD будет обновляться раз в секунду"
+    "The OSD does not appear: the flight controller waits for an MSP request from the unit",
+    "There is an OSD, but without VTX power control",
+    "The OSD appears 1 s after power-up",
+    "The OSD is updated once a second"
    ],
    "answer": 0,
-   "explain": "В displayport_msp_osd.c передача включается флагом vtxActive, который ставится только при приёме MSP-команды от модуля и сбрасывается через 1 с тишины. Без линии RX полётника он не установится никогда."
+   "explain": "In displayport_msp_osd.c transmission is enabled by the vtxActive flag, which is set only when an MSP command is received from the unit and is cleared after 1 s of silence. Without the flight controller's RX line it is never set."
   }
  ]
 }

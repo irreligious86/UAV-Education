@@ -3,18 +3,18 @@
  "pass": 80,
  "questions": [
   {
-   "q": "Активны профили 1/1/1. Что напечатает `diff` без аргументов в INAV 9.1.0?",
+   "q": "Profiles 1/1/1 are active. What does `diff` without arguments print in INAV 9.1.0?",
    "options": [
-    "Только раздел `master`, без единого профиля — профили печатает `diff all`",
-    "Раздел `master` и по одному активному профилю каждого вида",
-    "Раздел `master` и все 3 + 2 + 3 профиля",
-    "Только настройки, изменённые после последнего `save`"
+    "Only the `master` section, without a single profile — profiles are printed by `diff all`",
+    "The `master` section and one active profile of each kind",
+    "The `master` section and all 3 + 2 + 3 profiles",
+    "Only the settings changed since the last `save`"
    ],
    "answer": 1,
-   "explain": "В `printConfig()` при маске `DUMP_MASTER` выполняется ветка «dump just the current profiles»: печатаются master и активные control-, mixer- и battery-профиль. Все профили и `defaults noreboot` даёт только `diff all`."
+   "explain": "In `printConfig()` with the `DUMP_MASTER` mask the branch “dump just the current profiles” is executed: master and the active control, mixer and battery profile are printed. All profiles and `defaults noreboot` come only from `diff all`."
   },
   {
-   "q": "Сколько команд выбора профиля (`control_profile N`, `mixer_profile N`, `battery_profile N`) в `diff all` платы на H743 с INAV 9.1.0?",
+   "q": "How many profile selection commands (`control_profile N`, `mixer_profile N`, `battery_profile N`) are in the `diff all` of an H743 board with INAV 9.1.0?",
    "options": [
     "8",
     "10",
@@ -22,32 +22,32 @@
     "13"
    ],
    "answer": 2,
-   "explain": "Блоков 3 + 2 + 3 = 8, перед каждым своя команда выбора; в конце ещё три строки возвращают исходный выбор: 8 + 3 = 11. На F411 профиль миксера один, там 7 + 3 = 10."
+   "explain": "There are 3 + 2 + 3 = 8 blocks, each preceded by its own selection command; at the end three more lines restore the original selection: 8 + 3 = 11. An F411 has one mixer profile, so there it is 7 + 3 = 10."
   },
   {
-   "q": "Файл начинается с `batch start`. При вставке две строки дали `### ERROR: Invalid name`. Что сделает первая `save`?",
+   "q": "A file starts with `batch start`. On paste two lines gave `### ERROR: Invalid name`. What does the first `save` do?",
    "options": [
-    "Откажет, напечатает число ошибок и сбросит пакетный режим",
-    "Сохранит всё, кроме двух строк, и перезагрузит плату",
-    "Откатит конфигурацию к состоянию до вставки и перезагрузит",
-    "Сохранит конфигурацию, но оставит флаг `SETTINGFAIL` до исправления"
+    "Refuses, prints the number of errors and resets batch mode",
+    "Saves everything except the two lines and reboots the board",
+    "Rolls the configuration back to the state before the paste and reboots",
+    "Saves the configuration but leaves the `SETTINGFAIL` flag until it is fixed"
    ],
    "answer": 0,
-   "explain": "`cliSave()` при активном пакете с ошибками печатает «N ERRORS WERE DETECTED» и «PLEASE FIX ERRORS THEN 'SAVE'», сбрасывает пакет и выходит без записи. Вторая `save` уже запишет — поэтому её и нельзя набирать, не исправив файл."
+   "explain": "With an active batch that has errors `cliSave()` prints “N ERRORS WERE DETECTED” and “PLEASE FIX ERRORS THEN 'SAVE'”, resets the batch and returns without writing. A second `save` will write — which is exactly why you must not type it without fixing the file."
   },
   {
-   "q": "Ты вставил `diff all` с тремя control-профилями, передумал и набрал `exit`. Почему часть настроек всё равно изменилась?",
+   "q": "You pasted a `diff all` with three control profiles, changed your mind and typed `exit`. Why did some settings change anyway?",
    "options": [
-    "`exit` в INAV сохраняет конфигурацию так же, как `save`",
-    "`batch start` записывает каждую строку сразу",
-    "Команды выбора профиля при смене номера сами пишут EEPROM",
-    "`defaults noreboot` в начале файла уже стёр старый конфиг в ОЗУ"
+    "`exit` in INAV saves the configuration just like `save`",
+    "`batch start` writes every line at once",
+    "The profile selection commands write EEPROM themselves when the number changes",
+    "`defaults noreboot` at the start of the file had already erased the old config in RAM"
    ],
    "answer": 2,
-   "explain": "`control_profile`, `mixer_profile` и `battery_profile` вызывают `set…ProfileAndWriteEEPROM`: при смене индекса текущая конфигурация записывается. Отменяет такую вставку только `defaults` и восстановление из бэкапа."
+   "explain": "`control_profile`, `mixer_profile` and `battery_profile` call `set…ProfileAndWriteEEPROM`: on a change of index the current configuration is written. Only `defaults` and a restore from a backup undo such a paste."
   },
   {
-   "q": "Какая строка из `diff all` INAV 8.0.1 даст `### ERROR: Invalid name` в 9.1.0 и при этом НЕ исправляется файлом миграции `8_to_9.json` Configurator 9.1.0?",
+   "q": "Which line from an INAV 8.0.1 `diff all` gives `### ERROR: Invalid name` in 9.1.0 and is NOT fixed by the migration file `8_to_9.json` of Configurator 9.1.0?",
    "options": [
     "`set mixer_pid_profile_linking = ON`",
     "`set controlrate_profile = 2`",
@@ -55,62 +55,62 @@
     "`set reboot_character = 114`"
    ],
    "answer": 3,
-   "explain": "Три первых имени файл миграции переименовывает. `reboot_character` убрана в 9.0, а список `removed` в `8_to_9.json` пуст — строка останется красной, её удаляют вручную."
+   "explain": "The migration file renames the first three names. `reboot_character` was removed in 9.0, and the `removed` list in `8_to_9.json` is empty — the line stays red and is deleted by hand."
   },
   {
-   "q": "Ты сохранил `diff all` из вкладки CLI в текстовый файл и отдал его кнопке Restore Config в Configurator 9.1. Окна миграции нет. Почему?",
+   "q": "You saved a `diff all` from the CLI tab to a text file and gave it to the Restore Config button in Configurator 9.1. There is no migration window. Why?",
    "options": [
-    "Миграция работает только для авто-бэкапов с именем `UPDATE_…`",
-    "Configurator читает версию из строки `# INAV/<target> 8.0.1`, а она закомментирована",
-    "Миграция включается только при прошивке без Full chip erase",
-    "В файле нет строки `# Version: X.Y.Z`, версия бэкапа не распознана"
+    "Migration works only for auto-backups named `UPDATE_…`",
+    "The Configurator reads the version from the line `# INAV/<target> 8.0.1`, and it is commented out",
+    "Migration is enabled only when flashing without Full chip erase",
+    "The file has no `# Version: X.Y.Z` line, and the backup version was not recognized"
    ],
    "answer": 3,
-   "explain": "`extractBackupVersion()` ищет только шаблон `# Version: …` из шапки, которую Configurator пишет сам. Без неё цепочка миграций пуста, файл уходит в CLI как есть."
+   "explain": "`extractBackupVersion()` looks only for the pattern `# Version: …` from the header that the Configurator writes itself. Without it the migration chain is empty, and the file goes to the CLI as is."
   },
   {
-   "q": "Какие калибровки попадают в `diff all` INAV 9.1.0?",
+   "q": "Which calibrations get into an INAV 9.1.0 `diff all`?",
    "options": [
-    "Никакие: калибровки хранятся отдельно от настроек и переживают `defaults`",
-    "Только `vbat_scale` и `current_meter_scale`",
-    "Акселерометр, компас, нули гироскопа, шкалы напряжения и тока",
-    "Только компас: `magzero_*` и `maggain_*`"
+    "None: calibrations are stored separately from the settings and survive `defaults`",
+    "Only `vbat_scale` and `current_meter_scale`",
+    "The accelerometer, the compass, the gyro zeros, the voltage and current scales",
+    "Only the compass: `magzero_*` and `maggain_*`"
    ],
    "answer": 2,
-   "explain": "`acczero_*`, `accgain_*`, `magzero_*`, `maggain_*`, `gyro_zero_*`, `vbat_scale`, `current_meter_*` — обычные настройки раздела master. Поэтому на другую плату их переносить нельзя."
+   "explain": "`acczero_*`, `accgain_*`, `magzero_*`, `maggain_*`, `gyro_zero_*`, `vbat_scale`, `current_meter_*` are ordinary settings of the master section. That is why they must not be moved to another board."
   },
   {
-   "q": "`status` показал `Arming disabled flags: NAV ARMSW CLI`. Что делать первым?",
+   "q": "`status` showed `Arming disabled flags: NAV ARMSW CLI`. What do you do first?",
    "options": [
-    "Щёлкнуть тумблером арма несколько раз — `ARMSW` самый важный из трёх",
-    "Перепрошить плату: `NAV` означает сбой навигационного ядра",
-    "Выйти из CLI и выключить тумблер арма, затем разбираться с `NAV`",
-    "Откалибровать компас и акселерометр"
+    "Flip the arm switch several times — `ARMSW` is the most important of the three",
+    "Reflash the board: `NAV` means a failure of the navigation core",
+    "Leave the CLI and turn the arm switch off, then deal with `NAV`",
+    "Calibrate the compass and the accelerometer"
    ],
    "answer": 2,
-   "explain": "`CLI` стоит, пока открыт CLI. `ARMSW` появляется, когда тумблер включён при любой другой блокировке, и уходит после его выключения. Остаётся `NAV`: нет фикса, активен режим навигации или ошибка миссии — под флагом печатается пояснение."
+   "explain": "`CLI` is set while the CLI is open. `ARMSW` appears when the switch is on during any other block and clears after it is turned off. `NAV` is left: no fix, a navigation mode is active or a mission error — an explanation is printed under the flag."
   },
   {
-   "q": "Чем `dump all` хуже `diff all` как файл для переноса на новую мажорную версию?",
+   "q": "Why is `dump all` worse than `diff all` as a file for moving to a new major version?",
    "options": [
-    "Он не содержит профилей, только master",
-    "Он печатает настройки в шестнадцатеричном виде, и CLI новой версии их не разберёт",
-    "Его нельзя вставить в CLI: формат строк другой",
-    "Он фиксирует все старые умолчания и не начинается с `defaults noreboot`"
+    "It does not contain the profiles, only master",
+    "It prints the settings in hexadecimal, and the CLI of the new version cannot parse them",
+    "It cannot be pasted into the CLI: the line format is different",
+    "It fixes all the old defaults in place and does not start with `defaults noreboot`"
    ],
    "answer": 3,
-   "explain": "`dump` печатает каждую настройку, включая равные умолчанию: после вставки новые умолчания 9.x окажутся затёрты старыми. `defaults noreboot` печатается только при `diff all`. `docs/Cli.md` тоже советует восстанавливать из `diff`."
+   "explain": "`dump` prints every setting, including those equal to the default: after a paste the new 9.x defaults are overwritten with the old ones. `defaults noreboot` is printed only with `diff all`. `docs/Cli.md` also advises restoring from a `diff`."
   },
   {
-   "q": "Команда `resource` в INAV 9.1.0:",
+   "q": "The `resource` command in INAV 9.1.0:",
    "options": [
-    "только показывает, какой вывод чем занят",
-    "переназначает функцию вывода, как в Betaflight",
-    "сбрасывает назначения таймеров к умолчаниям target",
-    "показывает свободную память и стек"
+    "only shows which pin is used for what",
+    "reassigns the function of a pin, as in Betaflight",
+    "resets the timer assignments to the target defaults",
+    "shows free memory and the stack"
    ],
    "answer": 0,
-   "explain": "`cliResource()` печатает таблицу выводов и аргументов не принимает. Назначение выходов меняют через `timer_output_mode` и вкладку Mixer либо своим target."
+   "explain": "`cliResource()` prints the pin table and takes no arguments. The output assignment is changed through `timer_output_mode` and the Mixer tab or with a custom target."
   }
  ]
 }

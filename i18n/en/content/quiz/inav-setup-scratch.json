@@ -1,0 +1,96 @@
+{
+  "module": "inav-setup-scratch",
+  "pass": 80,
+  "questions": [
+    {
+      "q": "The multimeter shows 16.42 V, INAV — 15.95 V with vbat_scale = 1100. What is the new value?",
+      "options": [
+        "1069",
+        "1132",
+        "1100",
+        "1116"
+      ],
+      "answer": 1,
+      "explain": "The voltage in INAV is directly proportional to vbat_scale: new = 1100 × 16.42 / 15.95 ≈ 1132. You get 1069 if you invert the ratio."
+    },
+    {
+      "q": "INAV counted 1120 mAh, the charger put back 1030 mAh, current_meter_scale = 400. What do you set?",
+      "options": [
+        "368",
+        "400",
+        "435",
+        "490"
+      ],
+      "answer": 2,
+      "explain": "I = (U − offset) / scale: the reading is inversely proportional to scale, so new = 400 × 1120 / 1030 ≈ 435 (the formula from docs/Battery.md)."
+    },
+    {
+      "q": "After `set motor_pwm_protocol = DSHOT300` and `save` in SITL, `get` shows MULTISHOT. Why?",
+      "options": [
+        "SITL is built without USE_DSHOT, config.c replaces the protocol",
+        "DSHOT300 was removed from INAV 9, only DSHOT600 is left",
+        "`feature DSHOT` was not run, and without it the protocol is reset",
+        "The protocol is changed only on the Outputs tab, the CLI does not write it"
+      ],
+      "answer": 0,
+      "explain": "In fc/config.c: #if !defined(USE_DSHOT) — a protocol above BRUSHED is replaced with MULTISHOT. The protocol and the motors are checked only on a real board."
+    },
+    {
+      "q": "A script sends channels to SITL in AETR order (throttle = 1000), but MSP_RC shows throttle 1500 and pitch 1000. What is the error?",
+      "kind": "apply",
+      "fragment": "# map\nMap: TAER\nMSP_RC ch1-8: (1500, 1000, 1500, 1500, 1000, 1000, 1500, 1500)\n# MSP_RC order: roll, pitch, yaw, throttle",
+      "options": [
+        "rxrange 1 and 3 are swapped",
+        "The channel map is TAER instead of AETR",
+        "Pitch reverse is enabled on the radio",
+        "receiver_type = MSP instead of SERIAL"
+      ],
+      "answer": 1,
+      "explain": "With map TAER the first channel (roll 1500) is read as throttle, the third (throttle 1000) — as pitch. CRSF needs the AETR map (default)."
+    },
+    {
+      "q": "In INAV Quad X the rule `mmix 0 1.000 -1.000 1.000 -1.000` — which motor is it?",
+      "options": [
+        "Front left, CW rotation",
+        "Front right, CCW rotation",
+        "Rear left, CCW rotation",
+        "Rear right, CW rotation"
+      ],
+      "answer": 3,
+      "explain": "Roll −1 — the right side, pitch +1 — a rear motor (it speeds up when the nose goes down), yaw −1 — it slows down on a “clockwise” command, so it spins clockwise itself."
+    },
+    {
+      "q": "failsafe_procedure = RTH, but when the radio was turned off at 80 m the aircraft immediately started landing on the spot. The most likely cause?",
+      "options": [
+        "There was no GPS fix or compass at the moment it triggered",
+        "failsafe_delay = 5 is too short for RTH",
+        "nav_rth_altitude is lower than the current flight altitude",
+        "failsafe_stick_threshold = 50 blocks RTH"
+      ],
+      "answer": 0,
+      "explain": "Multirotor RTH requires GPS, a compass and a baro; if a sensor is missing, INAV performs an emergency landing immediately (docs/Failsafe.md)."
+    },
+    {
+      "q": "INAV shows an idle current of 0.69 A, the ammeter — 0.45 A, current_meter_scale = 435, offset = 0. The new current_meter_offset?",
+      "options": [
+        "24",
+        "104",
+        "240",
+        "−104"
+      ],
+      "answer": 1,
+      "explain": "The offset is subtracted from the sensor voltage and removes offset/scale amps: new = 0 + (0.69 − 0.45) × 435 ≈ 104."
+    },
+    {
+      "q": "Which of these cannot be checked in INAV SITL without an external simulator?",
+      "options": [
+        "The channel map over MSP RX",
+        "The RX flag when RC is lost",
+        "RTH from 100 m with a landing at home",
+        "Restoring the config from diff all"
+      ],
+      "answer": 2,
+      "explain": "Without RealFlight/X-Plane SITL runs in Configurator only mode: there is no physics, and the aircraft does not arm (CAL NAV ACC). The config, channels and flags can be checked, flight cannot."
+    }
+  ]
+}

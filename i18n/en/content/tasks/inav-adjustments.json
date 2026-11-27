@@ -1,0 +1,112 @@
+{
+  "module": "inav-adjustments",
+  "tasks": [
+    {
+      "id": "range-step",
+      "title": "Range step",
+      "statement": "A range boundary of **{v} µs** is entered in an INAV 9.1.0 `adjrange`. As which step number (0…48) is it stored?",
+      "params": {
+        "v": {
+          "min": 905,
+          "max": 2095,
+          "step": 10
+        }
+      },
+      "answer": "math.floor((v - 900)/25)",
+      "unit": "",
+      "tol": 0.0001,
+      "abs": 0.1,
+      "solution": "`CHANNEL_VALUE_TO_STEP`: step = (v − 900) / 25 with the fractional part dropped (before that the value is constrained to 900…2100)."
+    },
+    {
+      "id": "range-readback",
+      "title": "What the CLI reads back",
+      "statement": "A boundary of **{v} µs** is entered in `adjrange`. What value does the CLI show when the line is read back, in µs?",
+      "params": {
+        "v": {
+          "min": 905,
+          "max": 2095,
+          "step": 10
+        }
+      },
+      "answer": "900 + 25*math.floor((v - 900)/25)",
+      "unit": "µs",
+      "tol": 0.0001,
+      "abs": 0.5,
+      "solution": "The step number is stored, and `MODE_STEP_TO_CHANNEL_VALUE` = 900 + 25 · step is printed back. The boundary is rounded down to a multiple of 25."
+    },
+    {
+      "id": "hold-value",
+      "title": "The value after a hold",
+      "statement": "Function 32 (`nav_fw_cruise_thr`, step 10, limits 1000…2000). It is now **{v0}**. A self-centering switch is held high from center for **{T} s**. What does the value become?",
+      "params": {
+        "v0": {
+          "min": 1300,
+          "max": 1950,
+          "step": 50
+        },
+        "T": [
+          0.3,
+          0.7,
+          1.2,
+          1.8,
+          2.3,
+          2.9,
+          3.4,
+          4.6,
+          6.1,
+          8.3
+        ]
+      },
+      "answer": "min(2000, v0 + 10*(1 + math.floor(T/0.5)))",
+      "unit": "",
+      "tol": 0.0001,
+      "abs": 0.5,
+      "solution": "The number of steps is n = 1 + ⌊T / 0.5⌋: the first at the moment of the press, then once every 500 ms. Value = min(2000, v0 + 10·n): at the limit the number stands still while the beeper keeps beeping."
+    },
+    {
+      "id": "hold-time",
+      "title": "How long to hold the switch",
+      "statement": "A function with a step of **{s}**: you need to raise the value from **{v0}** to **{v0} + {k}·{s}** with a single hold of the switch from center. What is the minimum number of seconds to hold?",
+      "params": {
+        "s": [
+          1,
+          5,
+          10
+        ],
+        "v0": {
+          "min": 20,
+          "max": 60,
+          "step": 5
+        },
+        "k": {
+          "min": 2,
+          "max": 24,
+          "step": 1
+        }
+      },
+      "answer": "(k - 1)*0.5",
+      "unit": "s",
+      "tol": 0.01,
+      "abs": 0.05,
+      "solution": "You need k steps. The first happens at once, the other k − 1 with a period of 0.5 s: T = (k − 1) · 0.5 s. Short presses with a return to center are faster."
+    },
+    {
+      "id": "clamp-time",
+      "title": "Time to the limit",
+      "statement": "A two-position switch sits on the adjustment channel in the 1000 µs position, function 8 (PITCH_ROLL_D, step 1, limits 0…255). `mc_d_roll` = **{d}**. How many seconds after the slot becomes active does D reach 0?",
+      "params": {
+        "d": {
+          "min": 10,
+          "max": 60,
+          "step": 1
+        }
+      },
+      "answer": "(d - 1)*0.5",
+      "unit": "s",
+      "tol": 0.01,
+      "abs": 0.05,
+      "solution": "The channel is below 1300 — a step of −1 at once and then once every 500 ms. Reaching zero takes d steps: (d − 1) · 0.5 s. That is why a self-centering switch is used on the adjustment channel."
+    }
+  ]
+}

@@ -1,0 +1,156 @@
+{
+ "module": "inav-osd-hd",
+ "tasks": [
+  {
+   "id": "pos-encode",
+   "title": "Element position: the layout word",
+   "statement": "An OSD element is in column **{x}**, row **{y}** and is visible (`V`). As what 16-bit word (in decimal) is it stored in an INAV 9.1 layout? The `osd.h` format: x — bits 0–5, y — bits 6–11, visibility — 0x2000.",
+   "params": {
+    "x": {
+     "min": 0,
+     "max": 59,
+     "step": 1
+    },
+    "y": {
+     "min": 0,
+     "max": 21,
+     "step": 1
+    }
+   },
+   "answer": "x + y * 64 + 8192",
+   "unit": "",
+   "tol": 1e-05,
+   "solution": "word = x + y·64 + 8192. For example, (44, 18): 44 + 1152 + 8192 = 9388 = 0x24AC."
+  },
+  {
+   "id": "pos-decode-row",
+   "title": "Element position: the row from the word",
+   "statement": "The layout word **{w}** (decimal) came over MSP. In which row of the grid is the element? The INAV 9.1 format: x — bits 0–5, y — bits 6–11, visibility — bit 13.",
+   "params": {
+    "w": [
+     8258,
+     8322,
+     8300,
+     8364,
+     9346,
+     9304,
+     9357,
+     9388,
+     194,
+     8406,
+     8472,
+     981,
+     9005,
+     1217
+    ]
+   },
+   "answer": "(w // 64) % 64",
+   "unit": "",
+   "tol": 1e-05,
+   "abs": 0.01,
+   "solution": "y = (word >> 6) & 63, that is, the integer part of the division by 64, taken modulo 64. 9388 // 64 = 146; 146 mod 64 = 18. The column is the remainder of the division by 64: 9388 mod 64 = 44."
+  },
+  {
+   "id": "canvas-fit",
+   "title": "How many characters are beyond the edge of the grid",
+   "statement": "An element **{n}** cells wide is in column **{x}**. The grid has **{c}** columns (columns are numbered from zero). How many of its characters end up beyond the right edge? If the element fits completely, the answer is 0.",
+   "params": {
+    "n": [
+     3,
+     5,
+     7,
+     10,
+     15,
+     28
+    ],
+    "x": {
+     "min": 0,
+     "max": 52,
+     "step": 1
+    },
+    "c": [
+     30,
+     50,
+     53,
+     60
+    ]
+   },
+   "answer": "min(n, max(0, x + n - c))",
+   "unit": "",
+   "tol": 1e-05,
+   "abs": 0.01,
+   "solution": "The element occupies columns x … x + n − 1, the grid — 0 … c − 1. max(0, x + n − c) characters are beyond the edge, but no more than n. The example from the module: n = 10, x = 22, c = 30 → 2. INAV does not move the element."
+  },
+  {
+   "id": "alt-alarm-m",
+   "title": "Altitude alarm: feet → meters",
+   "statement": "The screen shows feet, and the altitude alarm is needed at **{h} feet**. What value in meters corresponds to this threshold (to hundredths; an integer rounded down is then written to `osd_alt_alarm`)?",
+   "params": {
+    "h": [
+     200,
+     250,
+     300,
+     328,
+     400,
+     500,
+     650,
+     1000,
+     1640
+    ]
+   },
+   "answer": "h * 0.3048",
+   "unit": "m",
+   "tol": 0.005,
+   "solution": "1 foot = 0.3048 m. 400 feet = 121.92 m → `osd_alt_alarm = 121`. The threshold in the firmware is always in meters and does not depend on `osd_units`."
+  },
+  {
+   "id": "airspeed-alarm",
+   "title": "Airspeed alarm: km/h → cm/s",
+   "statement": "The minimum airspeed of a wing is **{v} km/h**. What value in the units of `osd_airspeed_alarm_min` (cm/s) does that correspond to?",
+   "params": {
+    "v": {
+     "min": 30,
+     "max": 120,
+     "step": 2
+    }
+   },
+   "answer": "v / 3.6 * 100",
+   "unit": "cm/s",
+   "tol": 0.002,
+   "solution": "km/h → m/s: divide by 3.6; m/s → cm/s: multiply by 100. 40 km/h = 1111 cm/s. The range of the setting is 0–27000, and 0 turns the alarm off."
+  },
+  {
+   "id": "pan-servo",
+   "title": "Home arrow correction for a pan servo",
+   "statement": "`osd_pan_servo_range_decadegrees = {r}`, the servo is set up for {lo}–{hi} µs with a center of 1500. The servo is now at **{p} µs**. By how many whole degrees does the firmware consider the camera turned (absolute value; the firmware drops the fractional part)?",
+   "params": {
+    "r": [
+     9,
+     12,
+     18,
+     27,
+     36
+    ],
+    "lo": [
+     900,
+     1000,
+     1100
+    ],
+    "hi": [
+     1900,
+     2000,
+     2100
+    ],
+    "p": {
+     "min": 1550,
+     "max": 1900,
+     "step": 25
+    }
+   },
+   "answer": "math.trunc((p - 1500) * r * 1000 / (hi - lo) / 100)",
+   "unit": "°",
+   "tol": 0.001,
+   "solution": "osd.c: angle = (PWM − center) · range · 1000 / (max − min) / 100. For 18, 1000–2000 and 1750 µs: 250 · 18 · 1 / 100 = 45°. The result is converted to an integer by dropping the fractional part (`(int16_t)` in `osdGetPanServoOffset`): for 9, 1000–2000 and 1575 µs 6.75 → 6°."
+  }
+ ]
+}

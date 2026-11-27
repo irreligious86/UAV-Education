@@ -1,0 +1,104 @@
+{
+  "module": "inav-sensors-extra",
+  "tasks": [
+    {
+      "id": "airspeed-from-pa",
+      "title": "Airspeed from differential pressure",
+      "statement": "The pitot shows a differential pressure of **{dp} Pa** relative to the zero, `pitot_scale = {s}`. What airspeed does INAV 9.1.0 compute, in m/s?",
+      "params": {
+        "dp": {
+          "min": 50,
+          "max": 800,
+          "step": 25
+        },
+        "s": [
+          0.9,
+          1.0,
+          1.08,
+          1.2
+        ]
+      },
+      "answer": "s*math.sqrt(2*dp/1.225)",
+      "unit": "m/s",
+      "tol": 0.01,
+      "solution": "V = `pitot_scale` × √(2 × |ΔP| / 1.225). The density 1.225 kg/m³ is hard-coded (`SSL_AIR_DENSITY`), and there is no altitude correction. For 245 Pa and a scale of 1.0: √(490 / 1.225) = 20.0 m/s. The scale is in front of the root: 1.08 gives 21.6 m/s, not 20.8."
+    },
+    {
+      "id": "tilt-range",
+      "title": "Rangefinder altitude with tilt compensation",
+      "statement": "`rangefinder_hardware = MSP` (a 90° cone, an allowed tilt of 45°). The sensor returned **{d} cm**, roll **{r}°**, pitch **{p}°**. What altitude in centimeters does `rangefinderProcess()` pass to the estimator?",
+      "params": {
+        "d": {
+          "min": 60,
+          "max": 400,
+          "step": 10
+        },
+        "r": {
+          "min": 0,
+          "max": 25,
+          "step": 5
+        },
+        "p": {
+          "min": 0,
+          "max": 25,
+          "step": 5
+        }
+      },
+      "answer": "math.floor(d*math.cos(math.radians(r))*math.cos(math.radians(p)))",
+      "unit": "cm",
+      "tol": 0.001,
+      "abs": 1.0,
+      "solution": "cos θ = cos(roll) × cos(pitch); altitude = distance × cos θ, with the fractional part dropped. For 150 cm, 8° and 6°: 150 × 0.9903 × 0.9945 = 147.7 → 147 cm. The largest tilt in the problem is 34.8° (25° and 25°), which is less than 45°, so the reading is not discarded. The estimator then compares the result with `inav_max_surface_altitude`."
+    },
+    {
+      "id": "flow-velocity",
+      "title": "Velocity from optical flow",
+      "statement": "The flow sensor sent a count of **{c}** per 100 ms, `opflow_scale = {s}`. The gyro on the same axis showed **{g} °/s** over this interval, the rangefinder — **{h} cm**. What velocity on this axis does the estimator get, in cm/s?",
+      "params": {
+        "c": {
+          "min": 10,
+          "max": 60,
+          "step": 2
+        },
+        "s": [
+          8.0,
+          9.5,
+          10.5,
+          12.0
+        ],
+        "g": {
+          "min": 0,
+          "max": 8,
+          "step": 1
+        },
+        "h": {
+          "min": 40,
+          "max": 180,
+          "step": 10
+        }
+      },
+      "answer": "math.radians(c*10/s-g)*h",
+      "unit": "cm/s",
+      "tol": 0.01,
+      "abs": 0.2,
+      "solution": "Flow in °/s = count × (10⁶ / Δt) / `opflow_scale`; with Δt = 100 ms the factor is 10. Subtract the body rotation, convert to radians and multiply by the altitude: V = (flow − gyro) × π / 180 × h. For a count of 30, a scale of 9.535, 5 °/s and 80 cm: 31.46 − 5 = 26.46 °/s = 0.4618 rad/s, V = 36.9 cm/s."
+    },
+    {
+      "id": "temp-alarm",
+      "title": "A temperature threshold in CLI units",
+      "statement": "The OSD element of an external sensor has to blink above **{t} °C**. What number do you write in the `alarm_max` field of the `temp_sensor` command?",
+      "params": {
+        "t": {
+          "min": 45,
+          "max": 120,
+          "step": 2.5
+        }
+      },
+      "answer": "t*10",
+      "unit": "",
+      "tol": 1e-09,
+      "abs": 0.5,
+      "solution": "The thresholds of `temp_sensor` and `osd_*_temp_alarm_*` are set in tenths of a degree Celsius, with a range from −550 to 1250. 85 °C = 850. The number 85 in this field means 8.5 °C — the element would blink all the time."
+    }
+  ]
+}

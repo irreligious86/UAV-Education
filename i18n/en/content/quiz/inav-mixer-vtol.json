@@ -1,0 +1,118 @@
+{
+  "module": "inav-mixer-vtol",
+  "pass": 80,
+  "questions": [
+    {
+      "q": "A motor is at the rear right, and its prop spins clockwise (top view). Which mmix line corresponds to it in INAV?",
+      "options": [
+        "mmix 0 1.000 1.000 1.000 1.000",
+        "mmix 0 1.000 -1.000 1.000 -1.000",
+        "mmix 0 1.000 -1.000 -1.000 1.000",
+        "mmix 0 1.000 1.000 -1.000 -1.000"
+      ],
+      "answer": 1,
+      "explain": "A right motor slows down on a roll to the right — roll is negative. A rear one speeds up when the nose goes down — pitch is positive. A positive yaw goes to a prop that spins counterclockwise; here it is clockwise — yaw −1. This is the REAR_R line of the Quad X preset."
+    },
+    {
+      "q": "A mixer profile has the line mmix 4 -1.200 0 0 0. What does motor 4 do?",
+      "options": [
+        "It spins in reverse at 120 % throttle if REVERSIBLE_MOTORS is enabled",
+        "It is always stopped: any negative throttle value works only as a placeholder",
+        "It is stopped, and with MIXER TRANSITION active it outputs 1200 µs",
+        "It gets 20 % of the stick throttle in any mode and in any profile"
+      ],
+      "answer": 2,
+      "explain": "mixer.c: throttle ≤ 0 — the motor is stopped; with transition mixing and −2.0 ≤ throttle ≤ −1.05 the motor gets −throttle × 1000 = 1200 µs. A placeholder without spin-up is a value between −1.05 and 0, usually −1."
+    },
+    {
+      "q": "The configuration: servo 3 1100 1900 1520 100 and one rule smix 0 3 0 100 0 -1. Stabilized roll is +250. The servo pulse:",
+      "options": [
+        "1770 µs",
+        "1710 µs",
+        "1750 µs",
+        "1900 µs"
+      ],
+      "answer": 1,
+      "explain": "The sum is 250, rate 100 %. The positive branch is scaled by (max − mid)/500 = 380/500 = 0.76: 250 × 0.76 = 190, the result is 1520 + 190 = 1710. The 1770 option comes from forgetting the endpoint scaling."
+    },
+    {
+      "q": "A board: S1–S2 on TIM8, S3–S4 on TIM1, S5–S8 on TIM2, S9 on TIM12, S10 on TIM13, S11 on TIM4; all timer_output_mode = AUTO. The mixer requires 5 motors. How many outputs are left for the servos?",
+      "options": [
+        "6",
+        "7",
+        "3",
+        "2"
+      ],
+      "answer": 2,
+      "explain": "The firmware takes whole timers for the motors: TIM8 and TIM1 give 4 outputs, the fifth motor takes TIM2, and S6–S8 become motor outputs too. The servos are left with S9, S10, S11."
+    },
+    {
+      "q": "Why can a DShot motor and a 50 Hz servo not sit on channels of the same timer?",
+      "options": [
+        "A timer has one counter and one period for all its channels",
+        "A servo draws too much current from the microcontroller pin",
+        "DShot takes both DMA channels of the microcontroller entirely",
+        "INAV forbids this only on F4 boards, there is no limit on H7"
+      ],
+      "answer": 0,
+      "explain": "The channels of a timer differ only in the compare value; the prescaler and the period are shared. A servo timer is set to a period of 1 MHz / servo_pwm_rate, a motor timer — to the DShot bit rate, so INAV assigns functions to whole timers."
+    },
+    {
+      "q": "smix rules with inputs 12 and 13 are written, the gimbal servo works and sits at center, but it does not respond to the tilt of the frame. The most likely cause:",
+      "options": [
+        "The CAMSTAB mode is not enabled",
+        "The GIMBAL port function is not assigned",
+        "servo_lpf_hz is 20 Hz",
+        "gimbal_tilt_channel is not set"
+      ],
+      "answer": 0,
+      "explain": "servos.c: the inputs GIMBAL PITCH and GIMBAL ROLL are non-zero only with the CAMSTAB mode active. The GIMBAL port function and gimbal_*_channel belong to the serial gimbal, not to the servo mixer."
+    },
+    {
+      "q": "In the multirotor profile mixer_automated_switch = ON and mixer_switch_trans_timer = 35. What happens on RTH 600 m from home (nav_fw_loiter_radius = 7500)?",
+      "options": [
+        "The profile changes instantly: the timer applies only to a manual transition from the switch",
+        "3.5 s of transition mixing, then the airplane profile",
+        "35 s of transition mixing with altitude hold, then the airplane profile",
+        "Nothing: the automated transition works only closer than 225 m to home"
+      ],
+      "answer": 1,
+      "explain": "The threshold is farther than 3 × 7500 cm = 225 m, and the condition is met. The timer is set in tenths of a second: 35 → 3.5 s. Transition mixing is enabled for that time, then the profile changes and RTH continues."
+    },
+    {
+      "q": "In POSHOLD the pilot activates MIXER TRANSITION. What does the pusher motor with the line mmix 4 -1.300 0 0 0 do?",
+      "options": [
+        "It outputs 1300 µs, as in any other flight mode",
+        "It outputs 300 µs above idle while the mode is active",
+        "It stays stopped",
+        "The mixer profile changes to the airplane one at once"
+      ],
+      "answer": 2,
+      "explain": "mixer_profile.c: transition mixing is active only without navigation or in ALTHOLD. In POSHOLD, RTH and a mission the request is ignored, input 38 is 0, and a motor with a negative throttle is stopped."
+    },
+    {
+      "q": "After an update to INAV 9.1 the line set mixer_pid_profile_linking = ON from an old diff is highlighted as an error. What do you do?",
+      "options": [
+        "Delete the line: in 9.x the control profile always follows the mixer profile",
+        "Replace the name with mixer_control_profile_linking",
+        "Replace it with use_control_profile = 2 in the mixer profile",
+        "Move the line from the mixer_profile block to the control_profile block"
+      ],
+      "answer": 1,
+      "explain": "In 9.0 the setting was renamed to mixer_control_profile_linking; the meaning and the default (OFF) are the same. use_control_profile is a different setting, and it lives in the battery profile."
+    },
+    {
+      "q": "A fragment of the airplane profile of a 4+1 VTOL. After a restore from `diff all` the pusher motor disappeared from the configuration. Why?",
+      "kind": "apply",
+      "fragment": "mixer_profile 1\nset platform_type = AIRPLANE\nmmix 0 0.000 0 0 0\nmmix 1 0.000 0 0 0\nmmix 2 0.000 0 0 0\nmmix 3 0.000 0 0 0\nmmix 4 1.000 0 0 0",
+      "options": [
+        "The mmix output stops at the first line with throttle 0",
+        "The AIRPLANE profile allows no more than four mmix lines",
+        "A motor with zero roll, pitch and yaw is considered unused",
+        "diff does not save the mmix of the second mixer profile"
+      ],
+      "answer": 0,
+      "explain": "cli.c, printMotorMix: the loop breaks at the first line with throttle == 0. Stopped motors before a working one have to be written as the −1.000 placeholder, and then all the lines get into the diff."
+    }
+  ]
+}

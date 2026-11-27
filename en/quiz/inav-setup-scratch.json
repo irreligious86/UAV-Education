@@ -3,79 +3,94 @@
   "pass": 80,
   "questions": [
     {
-      "q": "Мультиметр показывает 16.42 В, INAV — 15.95 В при vbat_scale = 1100. Какое новое значение?",
-      "options": ["1069", "1132", "1100", "1116"],
-      "answer": 1,
-      "explain": "Напряжение в INAV прямо пропорционально vbat_scale: new = 1100 × 16.42 / 15.95 ≈ 1132. 1069 получается, если перевернуть отношение."
-    },
-    {
-      "q": "INAV насчитал 1120 мА·ч, зарядное вернуло 1030 мА·ч, current_meter_scale = 400. Что ставить?",
-      "options": ["368", "400", "435", "490"],
-      "answer": 2,
-      "explain": "I = (U − offset) / scale: показания обратно пропорциональны scale, поэтому new = 400 × 1120 / 1030 ≈ 435 (формула из docs/Battery.md)."
-    },
-    {
-      "q": "После `set motor_pwm_protocol = DSHOT300` и `save` в SITL `get` показывает MULTISHOT. Почему?",
+      "q": "The multimeter shows 16.42 V, INAV — 15.95 V with vbat_scale = 1100. What is the new value?",
       "options": [
-        "SITL собран без USE_DSHOT, config.c подменяет протокол",
-        "DSHOT300 убран из INAV 9, остался только DSHOT600",
-        "Не выполнен `feature DSHOT`, без него протокол сбрасывается",
-        "Протокол меняется только на вкладке Outputs, CLI его не пишет"
+        "1069",
+        "1132",
+        "1100",
+        "1116"
+      ],
+      "answer": 1,
+      "explain": "The voltage in INAV is directly proportional to vbat_scale: new = 1100 × 16.42 / 15.95 ≈ 1132. You get 1069 if you invert the ratio."
+    },
+    {
+      "q": "INAV counted 1120 mAh, the charger put back 1030 mAh, current_meter_scale = 400. What do you set?",
+      "options": [
+        "368",
+        "400",
+        "435",
+        "490"
+      ],
+      "answer": 2,
+      "explain": "I = (U − offset) / scale: the reading is inversely proportional to scale, so new = 400 × 1120 / 1030 ≈ 435 (the formula from docs/Battery.md)."
+    },
+    {
+      "q": "After `set motor_pwm_protocol = DSHOT300` and `save` in SITL, `get` shows MULTISHOT. Why?",
+      "options": [
+        "SITL is built without USE_DSHOT, config.c replaces the protocol",
+        "DSHOT300 was removed from INAV 9, only DSHOT600 is left",
+        "`feature DSHOT` was not run, and without it the protocol is reset",
+        "The protocol is changed only on the Outputs tab, the CLI does not write it"
       ],
       "answer": 0,
-      "explain": "В fc/config.c: #if !defined(USE_DSHOT) — протокол выше BRUSHED заменяется на MULTISHOT. Протокол и моторы проверяют только на реальной плате."
+      "explain": "In fc/config.c: #if !defined(USE_DSHOT) — a protocol above BRUSHED is replaced with MULTISHOT. The protocol and the motors are checked only on a real board."
     },
     {
-      "q": "Скрипт шлёт в SITL каналы в порядке AETR (газ = 1000), но MSP_RC показывает газ 1500, а тангаж 1000. В чём ошибка?",
+      "q": "A script sends channels to SITL in AETR order (throttle = 1000), but MSP_RC shows throttle 1500 and pitch 1000. What is the error?",
       "kind": "apply",
-      "fragment": "# map\nMap: TAER\nMSP_RC ch1-8: (1500, 1000, 1500, 1500, 1000, 1000, 1500, 1500)\n# порядок MSP_RC: roll, pitch, yaw, throttle",
+      "fragment": "# map\nMap: TAER\nMSP_RC ch1-8: (1500, 1000, 1500, 1500, 1000, 1000, 1500, 1500)\n# MSP_RC order: roll, pitch, yaw, throttle",
       "options": [
-        "Перепутаны rxrange 1 и 3",
-        "Карта каналов TAER вместо AETR",
-        "Включён реверс тангажа на пульте",
-        "receiver_type = MSP вместо SERIAL"
+        "rxrange 1 and 3 are swapped",
+        "The channel map is TAER instead of AETR",
+        "Pitch reverse is enabled on the radio",
+        "receiver_type = MSP instead of SERIAL"
       ],
       "answer": 1,
-      "explain": "С map TAER первый канал (крен 1500) читается как газ, третий (газ 1000) — как тангаж. Для CRSF нужна карта AETR (по умолчанию)."
+      "explain": "With map TAER the first channel (roll 1500) is read as throttle, the third (throttle 1000) — as pitch. CRSF needs the AETR map (default)."
     },
     {
-      "q": "В Quad X INAV правило `mmix 0 1.000 -1.000 1.000 -1.000` — это какой мотор?",
+      "q": "In INAV Quad X the rule `mmix 0 1.000 -1.000 1.000 -1.000` — which motor is it?",
       "options": [
-        "Передний левый, вращение CW",
-        "Передний правый, вращение CCW",
-        "Задний левый, вращение CCW",
-        "Задний правый, вращение CW"
+        "Front left, CW rotation",
+        "Front right, CCW rotation",
+        "Rear left, CCW rotation",
+        "Rear right, CW rotation"
       ],
       "answer": 3,
-      "explain": "Крен −1 — правая сторона, тангаж +1 — задний мотор (ускоряется при опускании носа), рыскание −1 — замедляется при команде «по часовой», значит, сам крутится по часовой."
+      "explain": "Roll −1 — the right side, pitch +1 — a rear motor (it speeds up when the nose goes down), yaw −1 — it slows down on a “clockwise” command, so it spins clockwise itself."
     },
     {
-      "q": "failsafe_procedure = RTH, но при выключении пульта на 80 м аппарат сразу начал садиться на месте. Самая вероятная причина?",
+      "q": "failsafe_procedure = RTH, but when the radio was turned off at 80 m the aircraft immediately started landing on the spot. The most likely cause?",
       "options": [
-        "Не было GPS-фикса или компаса в момент срабатывания",
-        "failsafe_delay = 5 слишком короткий для RTH",
-        "nav_rth_altitude меньше текущей высоты полёта",
-        "failsafe_stick_threshold = 50 блокирует RTH"
+        "There was no GPS fix or compass at the moment it triggered",
+        "failsafe_delay = 5 is too short for RTH",
+        "nav_rth_altitude is lower than the current flight altitude",
+        "failsafe_stick_threshold = 50 blocks RTH"
       ],
       "answer": 0,
-      "explain": "RTH мультиротора требует GPS, компас и баро; если датчика нет, INAV сразу выполняет аварийную посадку (docs/Failsafe.md)."
+      "explain": "Multirotor RTH requires GPS, a compass and a baro; if a sensor is missing, INAV performs an emergency landing immediately (docs/Failsafe.md)."
     },
     {
-      "q": "INAV показывает ток покоя 0.69 А, амперметр — 0.45 А, current_meter_scale = 435, offset = 0. Новый current_meter_offset?",
-      "options": ["24", "104", "240", "−104"],
-      "answer": 1,
-      "explain": "offset вычитается из напряжения датчика и убирает offset/scale ампер: new = 0 + (0.69 − 0.45) × 435 ≈ 104."
-    },
-    {
-      "q": "Что из этого нельзя проверить в INAV SITL без внешнего симулятора?",
+      "q": "INAV shows an idle current of 0.69 A, the ammeter — 0.45 A, current_meter_scale = 435, offset = 0. The new current_meter_offset?",
       "options": [
-        "Карту каналов по MSP RX",
-        "Флаг RX при пропадании RC",
-        "RTH со 100 м с посадкой у дома",
-        "Восстановление конфига из diff all"
+        "24",
+        "104",
+        "240",
+        "−104"
+      ],
+      "answer": 1,
+      "explain": "The offset is subtracted from the sensor voltage and removes offset/scale amps: new = 0 + (0.69 − 0.45) × 435 ≈ 104."
+    },
+    {
+      "q": "Which of these cannot be checked in INAV SITL without an external simulator?",
+      "options": [
+        "The channel map over MSP RX",
+        "The RX flag when RC is lost",
+        "RTH from 100 m with a landing at home",
+        "Restoring the config from diff all"
       ],
       "answer": 2,
-      "explain": "Без RealFlight/X-Plane SITL работает в режиме Configurator only: физики нет, аппарат не армится (CAL NAV ACC). Конфиг, каналы и флаги проверяются, полёт — нет."
+      "explain": "Without RealFlight/X-Plane SITL runs in Configurator only mode: there is no physics, and the aircraft does not arm (CAL NAV ACC). The config, channels and flags can be checked, flight cannot."
     }
   ]
 }

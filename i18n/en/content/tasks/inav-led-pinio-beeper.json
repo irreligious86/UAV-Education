@@ -1,0 +1,154 @@
+{
+  "module": "inav-led-pinio-beeper",
+  "tasks": [
+    {
+      "id": "led-current",
+      "title": "Strip current and the BEC rating",
+      "statement": "A strip of **{n}** WS2812 LEDs, the worst case is white, 0.06 A per LED. The other loads on the same 5 V rail are **{o} A**. What minimum BEC rating is needed by the rule “rating ≥ 1.5 × the sum”, in A?",
+      "params": {
+        "n": {
+          "min": 4,
+          "max": 64,
+          "step": 2
+        },
+        "o": [
+          0.3,
+          0.45,
+          0.55,
+          0.7,
+          0.9,
+          1.2
+        ]
+      },
+      "answer": "1.5*(n*0.06 + o)",
+      "unit": "A",
+      "tol": 0.01,
+      "abs": 0.02,
+      "solution": "The strip current is I = n · 0.06 A; the sum with the other loads; the BEC rating ≥ 1.5 × (n · 0.06 + the others)."
+    },
+    {
+      "id": "led-max-count",
+      "title": "How many LEDs a BEC can handle",
+      "statement": "A 5 V BEC rated at **{b} A**, other loads of **{o} A**. How many LEDs (0.06 A each on white) can be powered from it by the rule “rating ≥ 1.5 × the sum”? The answer is an integer.",
+      "params": {
+        "b": [
+          1.5,
+          2,
+          2.5,
+          3,
+          4,
+          5
+        ],
+        "o": [
+          0.3,
+          0.45,
+          0.55,
+          0.7,
+          0.9
+        ]
+      },
+      "answer": "math.floor(round((b/1.5 - o)/0.06, 6))",
+      "unit": "LEDs",
+      "tol": 0.0001,
+      "abs": 0.1,
+      "solution": "What is left for the strip is b / 1.5 − the others; divide by 0.06 A and round down: n = ⌊(b / 1.5 − the others) / 0.06⌋."
+    },
+    {
+      "id": "photo-count",
+      "title": "The number of shots on a leg",
+      "statement": "The shutter fires at every multiple of **{N} m** of the trip distance. A leg **{L} m** long starts when the trip distance was **{d0} m**. How many shots are taken on the leg? (The leg starts outside the trigger window.)",
+      "params": {
+        "N": [
+          20,
+          25,
+          30,
+          40,
+          50
+        ],
+        "L": {
+          "min": 300,
+          "max": 1500,
+          "step": 50
+        },
+        "d0": {
+          "min": 208,
+          "max": 2998,
+          "step": 15
+        }
+      },
+      "answer": "math.floor((d0 + L)/N) - math.floor(d0/N)",
+      "unit": "frames",
+      "tol": 0.0001,
+      "abs": 0.1,
+      "solution": "The shots are tied to the distance since arming: n = ⌊(d₀ + L) / N⌋ − ⌊d₀ / N⌋. A plain ⌊L / N⌋ can be off by one shot."
+    },
+    {
+      "id": "photo-window",
+      "title": "The minimum distance window",
+      "statement": "INAV logic is evaluated 10 times a second, and the window “remainder < W” must last at least two ticks. The ground speed is **{v} m/s**. What is the minimum W, in m?",
+      "params": {
+        "v": {
+          "min": 5,
+          "max": 30,
+          "step": 1
+        }
+      },
+      "answer": "0.2*v",
+      "unit": "m",
+      "tol": 0.01,
+      "abs": 0.05,
+      "solution": "Two logic ticks are 0.2 s; in that time the aircraft covers W = 0.2 s · v."
+    },
+    {
+      "id": "sat-beeps",
+      "title": "The satellite count cycle",
+      "statement": "The `BEEPER` mode, a GPS fix, **{s}** satellites. How many milliseconds does one cycle of beeps last (a beep of 50 ms, a pause of 100 ms, a last pause of 500 ms, no more than 10 beeps)?",
+      "params": {
+        "s": {
+          "min": 5,
+          "max": 24,
+          "step": 1
+        }
+      },
+      "answer": "50*min(s,10) + 100*(min(s,10) - 1) + 500",
+      "unit": "ms",
+      "tol": 0.0001,
+      "abs": 1,
+      "solution": "n = min(satellites, 10); T = 50·n + 100·(n − 1) + 500 ms."
+    },
+    {
+      "id": "aux-readback",
+      "title": "A mode range boundary",
+      "statement": "A boundary of **{v} µs** is entered in the `aux` line for the USER1 mode. What value does the CLI show when the line is read back, in µs?",
+      "params": {
+        "v": {
+          "min": 905,
+          "max": 2095,
+          "step": 10
+        }
+      },
+      "answer": "900 + 25*math.floor((v - 900)/25)",
+      "unit": "µs",
+      "tol": 0.0001,
+      "abs": 0.5,
+      "solution": "The range is stored in steps of 25 µs from 900: step = ⌊(v − 900) / 25⌋, and 900 + 25 · step is printed back."
+    },
+    {
+      "id": "battery-hue",
+      "title": "The hue of the L function",
+      "statement": "An LED with the base function `L` (without the `T` overlay), the battery charge is **{p} %**. What hue H (0…359) does the INAV 9.1.0 firmware set?",
+      "params": {
+        "p": {
+          "min": 0,
+          "max": 100,
+          "step": 4
+        }
+      },
+      "answer": "(329 + math.floor(1.5*p)) % 360",
+      "unit": "",
+      "tol": 0.0001,
+      "abs": 0.5,
+      "solution": "H = (359 + (−30 + ⌊150 · p / 100⌋)) mod 360 = (329 + ⌊1.5 · p⌋) mod 360: 0 % — 329 (pink), 20 % — 359 (red), 100 % — 119 (green)."
+    }
+  ]
+}

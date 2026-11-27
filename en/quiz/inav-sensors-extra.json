@@ -3,95 +3,95 @@
  "pass": 80,
  "questions": [
   {
-   "q": "На плате нет барометра, `baro_hardware` оставлен `AUTO`. Что покажет `status` в INAV 9.1.0?",
+   "q": "The board has no barometer, and `baro_hardware` is left at `AUTO`. What does `status` show in INAV 9.1.0?",
    "options": [
-    "Ничего особенного: `AUTO` без датчика тихо превращается в `NONE`",
-    "Флаг `HWFAIL`: датчик выбран, но не найден, арм запрещён",
-    "Флаг `NAV`: без барометра навигация считается небезопасной",
-    "Флаг `CAL`: прошивка бесконечно ждёт калибровку барометра"
+    "Nothing special: `AUTO` without a sensor quietly turns into `NONE`",
+    "The `HWFAIL` flag: the sensor is selected but not found, arming is disabled",
+    "The `NAV` flag: without a barometer navigation is considered unsafe",
+    "The `CAL` flag: the firmware waits for the barometer calibration forever"
    ],
    "answer": 1,
-   "explain": "`getHwBarometerStatus()` возвращает «недоступен», если запрошенный датчик не найден, `isHardwareHealthy()` даёт false, и выставляется `ARMING_DISABLED_HARDWARE_FAILURE` (`HWFAIL`). То же правило действует для дальномера, пито и потока. Для отсутствующего датчика ставят `NONE`."
+   "explain": "`getHwBarometerStatus()` returns “unavailable” if the requested sensor is not found, `isHardwareHealthy()` gives false, and `ARMING_DISABLED_HARDWARE_FAILURE` (`HWFAIL`) is set. The same rule applies to the rangefinder, the pitot and the flow. For a missing sensor set `NONE`."
   },
   {
-   "q": "`rangefinder_hardware = VL53L1X` (конус 27°). Крен 10°, тангаж 10°, драйвер вернул 150 см, `inav_max_surface_altitude = 200`. Что получит оценщик?",
+   "q": "`rangefinder_hardware = VL53L1X` (a 27° cone). Roll 10°, pitch 10°, the driver returned 150 cm, `inav_max_surface_altitude = 200`. What does the estimator get?",
    "options": [
-    "148 см: 150 × cos 10°, наклон по каждой оси меньше 13.5°",
-    "145 см: 150 × cos 10° × cos 10°, дробная часть отброшена",
-    "150 см: при наклоне меньше 13.5° компенсация не применяется",
-    "−1: общий наклон 14.1° больше половины конуса 13.5°"
+    "148 cm: 150 × cos 10°, the tilt on each axis is less than 13.5°",
+    "145 cm: 150 × cos 10° × cos 10°, the fractional part dropped",
+    "150 cm: at a tilt of less than 13.5° no compensation is applied",
+    "−1: the total tilt of 14.1° is greater than half the cone, 13.5°"
    ],
    "answer": 3,
-   "explain": "cos θ = cos 10° × cos 10° = 0.9699, это меньше порога cos 13.5° = 0.9724. `rangefinderProcess()` заменяет отсчёт на «вне диапазона», надёжность получает ноль. Сравнивается общий наклон, а не углы по отдельности."
+   "explain": "cos θ = cos 10° × cos 10° = 0.9699, which is less than the threshold cos 13.5° = 0.9724. `rangefinderProcess()` replaces the reading with “out of range”, and the reliability gets a zero. The total tilt is compared, not the angles separately."
   },
   {
-   "q": "Дальномер исправен и измеряет, барометр на плате отсутствует (`baro_hardware = NONE`). Что с высотой AGL?",
+   "q": "The rangefinder is healthy and measuring, and there is no barometer on the board (`baro_hardware = NONE`). What about the AGL altitude?",
    "options": [
-    "Качество AGL всегда LOW: расчёт требует исправного барометра",
-    "AGL считается как обычно, барометр на неё не влияет",
-    "AGL считается, но с уменьшенными весами `inav_w_z_surface_*`",
-    "AGL берётся напрямую из дальномера без фильтрации"
+    "The AGL quality is always LOW: the calculation requires a healthy barometer",
+    "AGL is computed as usual, the barometer does not affect it",
+    "AGL is computed, but with reduced `inav_w_z_surface_*` weights",
+    "AGL is taken straight from the rangefinder without filtering"
    ],
    "answer": 0,
-   "explain": "В `estimationCalculateAGL()` условие — одновременно `EST_SURFACE_VALID` и `EST_BARO_VALID`. Без барометра выполняется ветка, где AGL равна общей высоте, а качество — LOW. Режима SURFACE в списке тоже не будет: он требует оба датчика."
+   "explain": "In `estimationCalculateAGL()` the condition is `EST_SURFACE_VALID` and `EST_BARO_VALID` at the same time. Without a barometer the branch is executed in which AGL equals the general altitude and the quality is LOW. The SURFACE mode will not be in the list either: it requires both sensors."
   },
   {
-   "q": "Мультиротор в ALTHOLD с включённым SURFACE вылетел выше `inav_max_surface_altitude`. Газ в середине. Что сделает INAV?",
+   "q": "A multirotor in ALTHOLD with SURFACE on flew above `inav_max_surface_altitude`. The throttle is in the middle. What does INAV do?",
    "options": [
-    "Удержит текущую высоту по барометру, как обычный ALTHOLD",
-    "Выключит SURFACE и вернёт управление высотой пилоту",
-    "Начнёт снижаться со скоростью 50 см/с, пока AGL не вернётся",
-    "Поднимется до `nav_max_terrain_follow_alt` и удержит эту высоту по барометру"
+    "It holds the current altitude on the barometer, like an ordinary ALTHOLD",
+    "It turns SURFACE off and returns altitude control to the pilot",
+    "It starts descending at 50 cm/s until AGL comes back",
+    "It climbs to `nav_max_terrain_follow_alt` and holds that altitude on the barometer"
    ],
    "answer": 2,
-   "explain": "Отсчёты выше предела не принимаются, надёжность падает, AGL перестаёт быть достоверной. В `adjustMulticopterAltitudeFromRCInput()` для этого случая задано снижение: 50 см/с при газе от середины и выше, до 200 см/с на холостом. В OSD — «(!SURFACE UNRELIABLE!)»."
+   "explain": "Readings above the limit are not accepted, the reliability falls, and AGL stops being trusted. `adjustMulticopterAltitudeFromRCInput()` sets a descent for this case: 50 cm/s with the throttle at the middle or above, up to 200 cm/s at idle. In the OSD — “(!SURFACE UNRELIABLE!)”."
   },
   {
-   "q": "На аппарате есть GPS с хорошим фиксом, оптический поток и дальномер. Как поток участвует в оценке позиции?",
+   "q": "The aircraft has GPS with a good fix, optical flow and a rangefinder. How does the flow take part in the position estimate?",
    "options": [
-    "Смешивается с GPS по весам `inav_w_xy_flow_p` и `inav_w_xy_gps_p`",
-    "Заменяет GPS на высоте ниже `inav_max_surface_altitude`",
-    "Правит только скорость, позицию оставляет GPS",
-    "Никак: пока GPS по горизонтали достоверен, поток не вызывается"
+    "It is blended with GPS by the weights `inav_w_xy_flow_p` and `inav_w_xy_gps_p`",
+    "It replaces GPS at an altitude below `inav_max_surface_altitude`",
+    "It corrects only the velocity and leaves the position to GPS",
+    "It does not: while horizontal GPS is trusted, the flow is not called"
    ],
    "answer": 3,
-   "explain": "В `updateEstimatedTopic()` коррекции записаны как «GPS или поток»: `estimationCalculateCorrection_XY_GPS(&ctx) || estimationCalculateCorrection_XY_FLOW(&ctx)`. Если GPS достоверен, первая функция возвращает true и вторая не выполняется."
+   "explain": "In `updateEstimatedTopic()` the corrections are written as “GPS or flow”: `estimationCalculateCorrection_XY_GPS(&ctx) || estimationCalculateCorrection_XY_FLOW(&ctx)`. If GPS is trusted, the first function returns true and the second is not executed."
   },
   {
-   "q": "Как INAV 9.1.0 получает `opflow_scale` при калибровке с вкладки Calibration?",
+   "q": "How does INAV 9.1.0 obtain `opflow_scale` in the calibration from the Calibration tab?",
    "options": [
-    "Аппарат проносят на известное расстояние, поток делится на путь",
-    "Аппарат качают на месте 30 с: сумма потока делится на сумму скорости гироскопа",
-    "Аппарат висит неподвижно 30 с, масштаб подбирается по дрейфу",
-    "Масштаб читается из датчика по MSP при первом пакете"
+    "The aircraft is carried over a known distance, and the flow is divided by the path",
+    "The aircraft is rocked in place for 30 s: the sum of the flow is divided by the sum of the gyro rate",
+    "The aircraft hovers still for 30 s, and the scale is fitted to the drift",
+    "The scale is read from the sensor over MSP with the first packet"
    ],
    "answer": 1,
-   "explain": "`opflowUpdate()` 30 секунд складывает по годным отсчётам модуль потока в единицах датчика, приведённый к секунде, и модуль скорости корпуса в °/с; масштаб — их отношение. Сохраняется, если сумма скоростей корпуса больше 3600. При вращении на месте поток обязан равняться вращению."
+   "explain": "For 30 seconds `opflowUpdate()` sums, over the valid samples, the magnitude of the flow in sensor units normalized to a second and the magnitude of the body rate in °/s; the scale is their ratio. It is saved if the sum of the body rates is greater than 3600. With rotation in place the flow has to equal the rotation."
   },
   {
-   "q": "MS4525, `pitot_scale = 1.0`, перепад давления 245 Па. Затем шкалу поставили 1.1. Какие скорости покажет INAV?",
+   "q": "MS4525, `pitot_scale = 1.0`, a differential pressure of 245 Pa. Then the scale was set to 1.1. What speeds does INAV show?",
    "options": [
-    "20.0 м/с, затем 22.0 м/с: шкала множит скорость",
-    "20.0 м/с, затем 21.0 м/с: шкала множит давление под корнем",
-    "14.1 м/с, затем 15.6 м/с: под корнем ΔP / 1.225 без двойки",
-    "20.0 м/с, затем 24.2 м/с: шкала входит в квадрате"
+    "20.0 m/s, then 22.0 m/s: the scale multiplies the speed",
+    "20.0 m/s, then 21.0 m/s: the scale multiplies the pressure under the root",
+    "14.1 m/s, then 15.6 m/s: ΔP / 1.225 under the root without the factor of two",
+    "20.0 m/s, then 24.2 m/s: the scale enters squared"
    ],
    "answer": 0,
-   "explain": "V = `pitot_scale` × √(2 × |ΔP| / 1.225). √(490 / 1.225) = 20 м/с; шкала стоит перед корнем, поэтому 1.1 даёт 22 м/с. Отсюда и правило поправки: новая шкала = старая × эталонная скорость / показанная."
+   "explain": "V = `pitot_scale` × √(2 × |ΔP| / 1.225). √(490 / 1.225) = 20 m/s; the scale is in front of the root, so 1.1 gives 22 m/s. Hence the correction rule: new scale = old × reference speed / indicated speed."
   },
   {
-   "q": "`pitot_hardware = VIRTUAL`. Путевая скорость 18 м/с, нос на 90°, вектор ветра оценщика: 5 м/с, направление 270°. Какая воздушная скорость?",
+   "q": "`pitot_hardware = VIRTUAL`. Ground speed 18 m/s, nose at 90°, the wind vector of the estimator: 5 m/s, direction 270°. What is the airspeed?",
    "options": [
-    "13 м/с: ветер вычитается из путевой скорости",
-    "18 м/с: без датчика берётся путевая скорость",
-    "18.7 м/с: корень из суммы квадратов 18 и 5",
-    "23 м/с: ветер встречный, скорости складываются"
+    "13 m/s: the wind is subtracted from the ground speed",
+    "18 m/s: without a sensor the ground speed is taken",
+    "18.7 m/s: the square root of the sum of the squares of 18 and 5",
+    "23 m/s: it is a headwind, and the speeds add up"
    ],
    "answer": 3,
-   "explain": "Вектор ветра показывает, куда движется воздух. Попутная составляющая W × cos(270° − 90°) = −5 м/с, воздушная скорость = 18 − (−5) = 23 м/с. Так считает `virtualPitotCalculate()`."
+   "explain": "The wind vector shows where the air is moving to. The tailwind component is W × cos(270° − 90°) = −5 m/s, and the airspeed = 18 − (−5) = 23 m/s. That is how `virtualPitotCalculate()` computes it."
   },
   {
-   "q": "Нужно, чтобы элемент OSD внешнего датчика LM75 (слот 0, адрес 0) мигал выше 85 °C. Какая строка верна?",
+   "q": "The OSD element of an external LM75 sensor (slot 0, address 0) has to blink above 85 °C. Which line is correct?",
    "options": [
     "`temp_sensor 0 1 0 -20 85 2 ESC`",
     "`temp_sensor 0 2 0 -200 850 2 ESC`",
@@ -99,18 +99,18 @@
     "`temp_sensor 0 1 0x48 -200 8500 2 ESC`"
    ],
    "answer": 2,
-   "explain": "Тип 1 — LM75, адрес — номер 0–7, пороги в десятых долях градуса: 85 °C = 850, допустимо от −550 до 1250. Тип 2 — DS18B20 с 16-значным ROM. Число 85 означало бы 8.5 °C, 8500 выходит за диапазон и даёт ошибку разбора."
+   "explain": "Type 1 is LM75, the address is a number 0–7, the thresholds are in tenths of a degree: 85 °C = 850, and −550 to 1250 is allowed. Type 2 is a DS18B20 with a 16-digit ROM. The number 85 would mean 8.5 °C, and 8500 is out of range and gives a parse error."
   },
   {
-   "q": "Крыло, `apa_pow = 120`, `fw_reference_airspeed = 1500`. Трубка пито частично забита и показывает 10 м/с при реальных 20 м/с. Что произойдёт с усилениями P, D и FF?",
+   "q": "A fixed wing, `apa_pow = 120`, `fw_reference_airspeed = 1500`. The pitot tube is partly blocked and shows 10 m/s at a real 20 m/s. What happens to the P, D and FF gains?",
    "options": [
-    "Вырастут в 1.63 раза вместо уменьшения до 0.71: риск раскачки",
-    "Не изменятся: APA работает только по виртуальной скорости",
-    "Упадут до 0.3: сработает нижний предел множителя",
-    "Уменьшатся до 0.71, как и положено на скорости 20 м/с: ошибки в усилениях нет"
+    "They grow by a factor of 1.63 instead of dropping to 0.71: a risk of oscillation",
+    "They do not change: APA works only on the virtual airspeed",
+    "They drop to 0.3: the lower limit of the factor applies",
+    "They drop to 0.71, as they should at 20 m/s: there is no error in the gains"
    ],
    "answer": 0,
-   "explain": "Множитель = (1500 / V)^1.2. По показанию 1000 см/с это 1.5^1.2 = 1.63, а при настоящих 2000 см/с должно быть 0.75^1.2 = 0.71. Усиления завышены в 2.3 раза относительно нужных. Контроль пито по GPS сработает только ниже 30 % виртуальной скорости, здесь 50 %."
+   "explain": "Factor = (1500 / V)^1.2. From the reading of 1000 cm/s it is 1.5^1.2 = 1.63, while at the real 2000 cm/s it should be 0.75^1.2 = 0.71. The gains are 2.3 times higher than needed. The GPS check of the pitot triggers only below 30 % of the virtual airspeed, and here it is 50 %."
   }
  ]
 }

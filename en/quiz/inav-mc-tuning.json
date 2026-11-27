@@ -3,42 +3,42 @@
  "pass": 80,
  "questions": [
   {
-   "q": "В профиле INAV стоит `roll_rate = 45`. Какая скорость крена будет на полном стике?",
+   "q": "An INAV profile has `roll_rate = 45`. What is the roll rate at full stick?",
    "options": [
-    "45 °/с",
-    "450 °/с",
-    "45 % от скорости, заданной в Betaflight",
-    "4500 °/с"
+    "45 °/s",
+    "450 °/s",
+    "45 % of the rate set in Betaflight",
+    "4500 °/s"
    ],
    "answer": 1,
-   "explain": "Рейты INAV заданы в десятках °/с (`pidRcCommandToRate`: maxRate = rate · 10). Диапазон `roll_rate` — 4…180, то есть 40…1800 °/с."
+   "explain": "INAV rates are set in tens of °/s (`pidRcCommandToRate`: maxRate = rate · 10). The range of `roll_rate` is 4…180, that is, 40…1800 °/s."
   },
   {
-   "q": "`mc_i_roll = 30`. Чему равен коэффициент kI, с которым работает регулятор?",
+   "q": "`mc_i_roll = 30`. What is the gain kI the controller works with?",
    "options": [
-    "0.97 — делитель 31, как у P",
-    "7.5 — делитель 4",
-    "0.0157 — делитель 1905",
-    "30 — число используется как есть"
+    "0.97 — the divisor is 31, as for P",
+    "7.5 — the divisor is 4",
+    "0.0157 — the divisor is 1905",
+    "30 — the number is used as is"
    ],
    "answer": 1,
-   "explain": "`pid.h`: P делится на 31, I — на 4, D — на 1905, CD — на 7270. При ошибке 10 °/с интеграл растёт на 75 единиц в секунду, пока его не остановят I-term relax и предел 33 %."
+   "explain": "`pid.h`: P is divided by 31, I by 4, D by 1905, CD by 7270. At an error of 10 °/s the integral grows by 75 units a second until I-term relax and the 33 % limit stop it."
   },
   {
-   "q": "Фрагмент конфига квадрокоптера на INAV 9.1. Что с RPM-фильтром?",
+   "q": "A fragment of the config of a quadcopter on INAV 9.1. What about the RPM filter?",
    "kind": "apply",
    "fragment": "serial 1 2 115200 115200 0 115200\nserial 2 64 115200 115200 0 115200\nset motor_pwm_protocol = DSHOT600\nset motor_poles = 14\nset rpm_gyro_filter_enabled = ON\nset rpm_gyro_harmonics = 1",
    "options": [
-    "Работает: обороты приходят по той же линии DShot",
-    "Не инициализирован: нет порта ESC-телеметрии",
-    "Работает только на первой гармонике каждого мотора",
-    "Работает, но обновляется с частотой 500 Гц вместо 2 кГц"
+    "It works: RPM comes over the same DShot line",
+    "It is not initialized: there is no ESC telemetry port",
+    "It works only on the first harmonic of each motor",
+    "It works but is updated at 500 Hz instead of 2 kHz"
    ],
    "answer": 1,
-   "explain": "Двунаправленного DShot в INAV 9.1.0 нет. Обороты читаются из ESC-телеметрии по UART с функцией 262144; в конфиге функции портов — 2 (GPS) и 64 (приёмник). `fc_init.c` запускает RPM-фильтр только при открытом порте ESC-телеметрии."
+   "explain": "INAV 9.1.0 has no bidirectional DShot. RPM is read from ESC telemetry over a UART with function 262144; in the config the port functions are 2 (GPS) and 64 (receiver). `fc_init.c` starts the RPM filter only with an ESC telemetry port open."
   },
   {
-   "q": "EZ Tune включён, `ez_response = 120`, `ez_axis_ratio = 110`, остальные ползунки по умолчанию. Какой `mc_p_pitch` запишет прошивка?",
+   "q": "EZ Tune is enabled, `ez_response = 120`, `ez_axis_ratio = 110`, the other sliders are at their defaults. What `mc_p_pitch` does the firmware write?",
    "options": [
     "48",
     "52",
@@ -46,45 +46,45 @@
     "44"
    ],
    "answer": 1,
-   "explain": "P крена = 40 · 120 / 100 = 48; P тангажа = 48 · 110 / 100 = 52.8, дробная часть отбрасывается — 52. 44 получилось бы при response 100."
+   "explain": "Roll P = 40 · 120 / 100 = 48; pitch P = 48 · 110 / 100 = 52.8, the fractional part is dropped — 52. 44 would be the result at response 100."
   },
   {
-   "q": "Какой из фильтров INAV единственный работает на частоте опроса гироскопа, а не в PID-задаче?",
+   "q": "Which INAV filter is the only one that runs at the gyro sampling rate rather than in the PID task?",
    "options": [
     "`gyro_main_lpf_hz`",
-    "Динамический notch (`dynamic_gyro_notch_*`)",
+    "The dynamic notch (`dynamic_gyro_notch_*`)",
     "`gyro_anti_aliasing_lpf_hz`",
     "`dterm_lpf_hz`"
    ],
    "answer": 2,
-   "explain": "`gyroUpdate()` применяет только PT1 anti-alias (250 Гц). RPM-notch, LULU, главный LPF, динамический notch и Kalman стоят в `gyroFilter()`, которую вызывает PID-задача с периодом `looptime`."
+   "explain": "`gyroUpdate()` applies only the anti-alias PT1 (250 Hz). The RPM notch, LULU, the main LPF, the dynamic notch and Kalman are in `gyroFilter()`, which the PID task calls with the period `looptime`."
   },
   {
-   "q": "Что означает `mc_d_level = 75` на мультироторе?",
+   "q": "What does `mc_d_level = 75` mean on a multirotor?",
    "options": [
-    "D-составляющую углового контура ANGLE, как `mc_d_roll` в rate-контуре",
-    "Срез фильтра углового контура, 75 Гц",
-    "Ход стика 75 %, выше которого HORIZON управляет по скорости",
-    "Предельный угол наклона 75° в режиме HORIZON"
+    "The D term of the ANGLE loop, like `mc_d_roll` in the rate loop",
+    "The cutoff of the angle loop filter, 75 Hz",
+    "A stick travel of 75 %, above which HORIZON controls by rate",
+    "A maximum tilt angle of 75° in HORIZON mode"
    ],
    "answer": 2,
-   "explain": "В блоке LEVEL настоящий регулятор — только P (`mc_p_level` / 6.56). `mc_i_level` — срез PT1 на setpoint скорости в герцах, `mc_d_level` — точка перехода HORIZON в процентах хода стика."
+   "explain": "In the LEVEL block the only real controller is P (`mc_p_level` / 6.56). `mc_i_level` is the cutoff of the PT1 on the rate setpoint in hertz, `mc_d_level` is the HORIZON transition point in percent of stick travel."
   },
   {
-   "q": "POSHOLD. Аппарат летел 8 м/с, после отпускания стика остановился через 13 м и вернулся назад. Что менять первым?",
+   "q": "POSHOLD. The aircraft was flying at 8 m/s, after the stick was released it stopped after 13 m and came back. What do you change first?",
    "kind": "apply",
    "fragment": "set nav_mc_pos_deceleration_time = 120\nset nav_mc_pos_xy_p = 65\nset nav_mc_vel_xy_dterm_attenuation = 90\nset nav_mc_bank_angle = 35",
    "options": [
-    "`nav_mc_pos_xy_p` увеличить",
-    "`nav_mc_pos_deceleration_time` увеличить",
-    "`nav_mc_vel_xy_dterm_attenuation` увеличить",
-    "`nav_mc_bank_angle` уменьшить"
+    "Increase `nav_mc_pos_xy_p`",
+    "Increase `nav_mc_pos_deceleration_time`",
+    "Increase `nav_mc_vel_xy_dterm_attenuation`",
+    "Decrease `nav_mc_bank_angle`"
    ],
    "answer": 1,
-   "explain": "Цель остановки ставится в 8 · 1.2 = 9.6 м впереди, а аппарату нужно 13 м: он проходит цель и возвращается. 13 / 8 = 1.63 с, значит значение не меньше 163. Больший P позиции сделает возврат резче, меньший угол — тормозной путь длиннее, а ослабление D на скорости к точке остановки отношения не имеет."
+   "explain": "The stop target is placed 8 · 1.2 = 9.6 m ahead, and the aircraft needs 13 m: it passes the target and comes back. 13 / 8 = 1.63 s, so the value is no less than 163. A larger position P makes the return sharper, a smaller angle makes the braking distance longer, and the attenuation of D at speed has nothing to do with the stop point."
   },
   {
-   "q": "`nav_mc_bank_angle = 35`, `max_angle_inclination_rll = 250`, `max_angle_inclination_pit = 250`. Какой наибольший угол задаст навигация?",
+   "q": "`nav_mc_bank_angle = 35`, `max_angle_inclination_rll = 250`, `max_angle_inclination_pit = 250`. What is the largest angle navigation will command?",
    "options": [
     "35°",
     "25°",
@@ -92,29 +92,29 @@
     "30°"
    ],
    "answer": 1,
-   "explain": "Угол навигации передаётся в ANGLE-контур через `pidAngleToRcCommand`, которая обрезает его по `max_angle_inclination_*` (дециградусы: 250 = 25°). Действует меньший из двух пределов, ускорение — не больше g · tan 25° = 4.57 м/с²."
+   "explain": "The navigation angle is passed to the ANGLE loop through `pidAngleToRcCommand`, which clips it by `max_angle_inclination_*` (decidegrees: 250 = 25°). The smaller of the two limits applies, and the acceleration is no more than g · tan 25° = 4.57 m/s²."
   },
   {
-   "q": "В POSHOLD аппарат кружит вокруг точки, радиус растёт; в ANGLE летает нормально. Самая вероятная причина?",
+   "q": "In POSHOLD the aircraft circles around the point, and the radius grows; in ANGLE it flies normally. The most likely cause?",
    "options": [
-    "Завышен `nav_mc_vel_xy_p`",
-    "Ошибка курса: компас",
-    "Занижен `nav_mc_hover_thr`",
-    "Мал вес `inav_w_xy_gps_p`"
+    "`nav_mc_vel_xy_p` is too high",
+    "A heading error: the compass",
+    "`nav_mc_hover_thr` is too low",
+    "The weight `inav_w_xy_gps_p` is too small"
    ],
    "answer": 1,
-   "explain": "Коррекция считается в осях север–восток и поворачивается в оси аппарата по текущему курсу. Ошибка курса разворачивает её мимо точки — получается спираль. В воздухе сразу уходят в ANGLE; на земле проверяют ориентацию, калибровку и помехи компаса."
+   "explain": "The correction is computed in north–east axes and rotated into the aircraft axes by the current heading. A heading error turns it past the point — the result is a spiral. In the air you go to ANGLE at once; on the ground you check the alignment, calibration and interference of the compass."
   },
   {
-   "q": "Какую пару настроек переключение `control_profile` НЕ меняет?",
+   "q": "Which pair of settings does switching `control_profile` NOT change?",
    "options": [
-    "`mc_p_roll` и `max_angle_inclination_rll`",
-    "`gyro_main_lpf_hz` и `nav_mc_hover_thr`",
-    "`nav_mc_vel_z_p` и `dterm_lpf_hz`",
-    "`ez_response` и `tpa_rate`"
+    "`mc_p_roll` and `max_angle_inclination_rll`",
+    "`gyro_main_lpf_hz` and `nav_mc_hover_thr`",
+    "`nav_mc_vel_z_p` and `dterm_lpf_hz`",
+    "`ez_response` and `tpa_rate`"
    ],
    "answer": 1,
-   "explain": "Фильтры гироскопа общие для всех профилей, а `nav_mc_hover_thr` лежит в батарейном профиле. PID, навигационные PID, `dterm_lpf_hz`, рейты, TPA и ползунки EZ Tune входят в control-профиль."
+   "explain": "The gyro filters are common to all profiles, and `nav_mc_hover_thr` is in the battery profile. The PIDs, the navigation PIDs, `dterm_lpf_hz`, the rates, TPA and the EZ Tune sliders are part of the control profile."
   }
  ]
 }

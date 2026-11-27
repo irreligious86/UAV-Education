@@ -1,0 +1,154 @@
+{
+ "module": "inav-cli-backup",
+ "tasks": [
+  {
+   "id": "diff-lost-lines",
+   "title": "How many setting lines diff loses",
+   "statement": "On an H743 board with INAV 9.1, **each** of the three control profiles has **{c}** changed settings, each of the two mixer profiles has **{m}** lines (`set`, `mmix`, `smix`), and each of the three battery profiles has **{b}** settings. Profiles 1/1/1 are active. How many lines with settings from `diff all` do not get into an ordinary `diff`? Do not count the profile selection commands.",
+   "params": {
+    "c": {
+     "min": 2,
+     "max": 14,
+     "step": 1
+    },
+    "m": {
+     "min": 6,
+     "max": 20,
+     "step": 1
+    },
+    "b": {
+     "min": 1,
+     "max": 8,
+     "step": 1
+    }
+   },
+   "answer": "2*c + m + 2*b",
+   "unit": "lines",
+   "tol": 1e-05,
+   "abs": 0.01,
+   "solution": "`diff` prints only the active profiles: 3 − 1 = 2 control profiles, 2 − 1 = 1 mixer profile and 3 − 1 = 2 battery profiles are lost. The loss = 2·c + m + 2·b. In the module's example the profiles differ: 4 + 2 + 13 + 4 = 23."
+  },
+  {
+   "id": "diffall-total",
+   "title": "Length of diff all in command lines",
+   "statement": "In the `diff all` of an H743 board (3 control, 2 mixer, 3 battery profiles) there are **{h}** command lines before the first profile (including `batch start` and `defaults noreboot`). Each control profile has **{c}** changed settings, each mixer profile — **{m}** lines, each battery profile — **{b}**. How many command lines are in the file in total, counting the profile selection commands, the selection restore and `save`?",
+   "params": {
+    "h": {
+     "min": 10,
+     "max": 60,
+     "step": 1
+    },
+    "c": {
+     "min": 0,
+     "max": 12,
+     "step": 1
+    },
+    "m": {
+     "min": 0,
+     "max": 18,
+     "step": 1
+    },
+    "b": {
+     "min": 0,
+     "max": 6,
+     "step": 1
+    }
+   },
+   "answer": "h + 3*(1+c) + 2*(1+m) + 3*(1+b) + 3 + 1",
+   "unit": "lines",
+   "tol": 1e-05,
+   "abs": 0.01,
+   "solution": "Each profile block = 1 selection command + its lines: 3·(1 + c) + 2·(1 + m) + 3·(1 + b). Plus 3 selection restore lines and `save`. A check on the module's example (blocks of different lengths): 14 + 5 + 5 + 3 + 15 + 14 + 3 + 5 + 1 + 3 + 1 = 69."
+  },
+  {
+   "id": "arming-mask",
+   "title": "The armingFlags mask from three flags",
+   "statement": "`status` shows three arming-disabled flags; by the module's table these are bits **{a}**, **{b}** and **{c}**. What is the decimal value of the 32-bit `armingFlags` in `MSP2_INAV_STATUS` if the other bits are zero?",
+   "params": {
+    "a": [
+     6,
+     8,
+     9,
+     11,
+     12,
+     13
+    ],
+    "b": [
+     14,
+     15,
+     16,
+     18,
+     19,
+     20
+    ],
+    "c": [
+     21,
+     23,
+     24,
+     26,
+     27,
+     28,
+     30
+    ]
+   },
+   "answer": "2**a + 2**b + 2**c",
+   "unit": "",
+   "tol": 1e-09,
+   "abs": 0.5,
+   "solution": "Each flag is one bit: mask = 2^a + 2^b + 2^c. For example, `NAV` (11), `RX` (18), `CLI` (20): 2048 + 262144 + 1048576 = 1312768 = 0x140800. INAV 9.1 has no bit 17, and bits 2–5 are used not for blocking reasons but for state (ARMED, WAS_EVER_ARMED, simulator)."
+  },
+  {
+   "id": "arming-top-bit",
+   "title": "The highest flag in the mask",
+   "statement": "`armingFlags` = **{w}** (decimal) came over MSP. What is the number of the highest set bit? (It is used to find the last name in the `Arming disabled flags` line in the module's table.)",
+   "params": {
+    "w": [
+     1325312,
+     1312768,
+     270592,
+     9472,
+     67379200,
+     134488064,
+     1052672,
+     8448,
+     268699648,
+     1073745920,
+     2359552,
+     541696
+    ]
+   },
+   "answer": "math.floor(math.log2(w))",
+   "unit": "",
+   "tol": 1e-09,
+   "abs": 0.01,
+   "solution": "The number of the highest bit = the integer part of log₂(w). 1325312 = 0x143900: 2^20 = 1048576 ≤ w < 2^21, the highest bit is 20 — `CLI`; it is last in the `status` line because the names are printed in ascending bit order."
+  },
+  {
+   "id": "task-load",
+   "title": "Task load in tasks",
+   "statement": "`tasks` shows for a task an average execution time of **{t} µs** at a rate of **{f} Hz**. What average load (in percent, with one decimal place) does INAV 9.1 print in the `avgload` column?",
+   "params": {
+    "t": [
+     35,
+     60,
+     85,
+     120,
+     150,
+     180,
+     210,
+     260
+    ],
+    "f": [
+     500,
+     1000,
+     2000
+    ]
+   },
+   "answer": "((t*f + 5000)//1000)/10",
+   "unit": "%",
+   "tol": 0.001,
+   "abs": 0.051,
+   "solution": "`cliTasks()`: the load in tenths of a percent = (t·f + 5000) / 1000 with integer division. 120 µs × 2000 Hz = 240000; (240000 + 5000) / 1000 = 245 → 24.5 %. The added 5000 is +0.5 % on every line, so the sum over the tasks is overstated."
+  }
+ ]
+}

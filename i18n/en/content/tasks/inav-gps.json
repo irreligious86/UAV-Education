@@ -1,0 +1,50 @@
+{
+  "module": "inav-gps",
+  "tasks": [
+    {
+      "id": "rth-alt-at-least",
+      "title": "Return altitude in AT_LEAST mode",
+      "statement": "`nav_rth_alt_mode = AT_LEAST`, `nav_rth_altitude = {a}`. RTH is activated at **{h} m** above the takeoff point. At what altitude (m) does the aircraft head home?",
+      "params": {
+        "a": [
+          3000,
+          4000,
+          5000,
+          6000,
+          8000
+        ],
+        "h": {
+          "min": 10,
+          "max": 120,
+          "step": 5
+        }
+      },
+      "answer": "max(h, a/100)",
+      "unit": "m",
+      "tol": 0.001,
+      "solution": "`nav_rth_altitude` is set in centimeters. AT_LEAST is like FIXED, but climb only: below the set altitude the aircraft climbs to it, above — it stays at the current one. The answer is the larger of the two numbers."
+    },
+    {
+      "id": "rth-alt-extra",
+      "title": "Return altitude in EXTRA mode",
+      "statement": "`nav_rth_alt_mode = EXTRA`, `nav_rth_altitude = {a}`. RTH is activated at an altitude of **{h} m**. At what altitude (m) does the aircraft head home?",
+      "params": {
+        "a": [
+          1000,
+          2000,
+          3000,
+          5000
+        ],
+        "h": {
+          "min": 10,
+          "max": 120,
+          "step": 5
+        }
+      },
+      "answer": "h + a/100",
+      "unit": "m",
+      "tol": 0.001,
+      "solution": "EXTRA is the current altitude plus `nav_rth_altitude` (in centimeters). With a large addition this is exactly the symptom “RTH climbs into the sky”."
+    }
+  ]
+}

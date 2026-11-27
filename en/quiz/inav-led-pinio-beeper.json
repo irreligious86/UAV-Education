@@ -3,73 +3,73 @@
  "pass": 80,
  "questions": [
   {
-   "q": "INAV 9.1.0, крыло. `led 3 12,7::AIW:0`, палитра и `mode_color` по умолчанию. Аппарат в арме, стик крена влево за мёртвой зоной. Что показывает светодиод?",
+   "q": "INAV 9.1.0, a fixed wing. `led 3 12,7::AIW:0`, the default palette and `mode_color`. The aircraft is armed, the roll stick is to the left beyond the deadband. What does the LED show?",
    "options": [
-    "Синий постоянно: у него x ≥ 8, а влево мигают только светодиоды с x < 8",
-    "Синий с оранжевым миганием: оверлей `I` на крыле реагирует на крен в любую сторону",
-    "Зелёный постоянно: функция `A` в арме берёт особый цвет 0",
-    "Оранжевый постоянно: оверлей `I` перекрывает базовую функцию"
+    "Steady blue: it has x ≥ 8, and to the left only the LEDs with x < 8 blink",
+    "Blue with orange blinking: on a fixed wing the `I` overlay reacts to roll in either direction",
+    "Steady green: the `A` function takes special color 0 while armed",
+    "Steady orange: the `I` overlay overrides the base function"
    ],
    "answer": 0,
-   "explain": "`A` в арме — особый цвет 1 (BLUE по умолчанию). На крыле поворотник смотрит только на крен: влево мигают `I` с x < 8, вправо — с x ≥ 8. У светодиода x = 12, при крене влево он не мигает."
+   "explain": "`A` while armed is special color 1 (BLUE by default). On a fixed wing the indicator looks only at roll: to the left the `I` LEDs with x < 8 blink, to the right — those with x ≥ 8. The LED has x = 12, and it does not blink on a left roll."
   },
   {
-   "q": "В CLI INAV 9.1.0 введено `mode_color 6 1 2`. Что изменилось?",
+   "q": "`mode_color 6 1 2` is entered in the INAV 9.1.0 CLI. What changed?",
    "options": [
-    "Цвет арма стал красным",
-    "Цвет «восток» режима LOITER стал красным",
-    "Цвет «восток» режима HORIZON стал красным",
-    "Ничего: ошибка разбора"
+    "The arm color became red",
+    "The “east” color of the LOITER mode became red",
+    "The “east” color of the HORIZON mode became red",
+    "Nothing: a parse error"
    ],
    "answer": 1,
-   "explain": "В 9.1.0 режим 6 — LOITER, индексы 0…5 — направления N, E, S, W, U, D. Особые цвета (дизарм, арм, GPS) — режим 7; в 8.0.1 они были режимом 6, отсюда ловушка при переносе конфига."
+   "explain": "In 9.1.0 mode 6 is LOITER, and indexes 0…5 are the directions N, E, S, W, U, D. The special colors (disarmed, armed, GPS) are mode 7; in 8.0.1 they were mode 6, hence the trap when moving a config."
   },
   {
-   "q": "Какой цвет задаёт `color 14 30,0,128` в INAV?",
+   "q": "What color does `color 14 30,0,128` set in INAV?",
    "options": [
-    "Оранжевый половинной яркости",
-    "Почти белый с оранжевым оттенком",
-    "Тёмно-серый",
-    "Жёлтый полной яркости"
+    "Orange at half brightness",
+    "Almost white with an orange tint",
+    "Dark gray",
+    "Yellow at full brightness"
    ],
    "answer": 0,
-   "explain": "H = 30 — оранжевый, S = 0 — чистый цвет (насыщенность инвертирована: 255 дало бы белый), V = 128 — половина яркости."
+   "explain": "H = 30 is orange, S = 0 is a pure color (the saturation is inverted: 255 would give white), V = 128 is half brightness."
   },
   {
-   "q": "Плата F7, сервы элевонов на S3 и S4 (оба на TIM3), других серво-выходов нет. В конфиге `feature LED_STRIP` и `timer_output_mode 2 LED`. Что произойдёт?",
+   "q": "An F7 board, the elevon servos on S3 and S4 (both on TIM3), no other servo outputs. The config has `feature LED_STRIP` and `timer_output_mode 2 LED`. What happens?",
    "options": [
-    "Сервы работают, лента переезжает на S3",
-    "Оба выхода TIM3 пропущены при раздаче, арм закрыт флагом `PWMOUT`",
-    "Лента и сервы работают вместе: у них разные каналы одного таймера, конфликта нет",
-    "Прошивка сама снимет `feature LED_STRIP` при загрузке"
+    "The servos work, the strip moves to S3",
+    "Both TIM3 outputs are skipped in the assignment, arming is blocked by the `PWMOUT` flag",
+    "The strip and the servos work together: they have different channels of one timer, there is no conflict",
+    "The firmware clears `feature LED_STRIP` at boot by itself"
    ],
    "answer": 1,
-   "explain": "При включённой LED_STRIP каждый выход на таймере, где есть канал с флагом LED, пропускается (`checkPwmTimerConflicts`). Сервам выходов не осталось — `PWMOUT`. Фичу прошивка снимает только при общем таймере с SoftSerial."
+   "explain": "With LED_STRIP enabled every output on a timer that has a channel with the LED flag is skipped (`checkPwmTimerConflicts`). No outputs are left for the servos — `PWMOUT`. The firmware clears the feature only for a timer shared with SoftSerial."
   },
   {
-   "q": "Какие числа ставить в `pinio_box1` и в `aux`, чтобы PINIO1 следовал за режимом USER1 в INAV 9.1.0?",
+   "q": "Which numbers do you put in `pinio_box1` and in `aux` so that PINIO1 follows the USER1 mode in INAV 9.1.0?",
    "options": [
-    "37 и 37",
-    "40 и 40",
-    "47 и 47",
-    "37 в `pinio_box1`, 47 в `aux`"
+    "37 and 37",
+    "40 and 40",
+    "47 and 47",
+    "37 in `pinio_box1`, 47 in `aux`"
    ],
    "answer": 2,
-   "explain": "И `pinio_box`, и `aux` принимают постоянный id: USER1 = 47 (USER2 = 48, USER3 = 57, USER4 = 58). 37 — внутренний `boxId` USER1, а как постоянный id это SERVO AUTOTRIM. 40 — USER1 в Betaflight."
+   "explain": "Both `pinio_box` and `aux` take the permanent id: USER1 = 47 (USER2 = 48, USER3 = 57, USER4 = 58). 37 is the internal `boxId` of USER1, and as a permanent id it is SERVO AUTOTRIM. 40 is USER1 in Betaflight."
   },
   {
-   "q": "Как логическое условие INAV 9.1.0 может переключить PINIO2?",
+   "q": "How can an INAV 9.1.0 logic condition switch PINIO2?",
    "options": [
-    "Операцией 21 (Set IO Port): операнд A — номер PINIO, операнд B — уровень 0 или 1",
-    "Операцией 52 (LED Pin PWM) со значением 100",
-    "Операцией 38 подменить канал, на котором стоит диапазон режима из `pinio_box2`",
-    "Никак: PINIO управляется только тумблером"
+    "With operation 21 (Set IO Port): operand A is the PINIO number, operand B is the level 0 or 1",
+    "With operation 52 (LED Pin PWM) with the value 100",
+    "With operation 38, by overriding the channel that carries the range of the mode from `pinio_box2`",
+    "It cannot: PINIO is controlled only with a switch"
    ],
    "answer": 2,
-   "explain": "Прямой операции нет. Операция 38 подменяет значение RC-канала, диапазон `aux` на нём включает режим USER, за режимом следует PINIO. Операция 21 пишет в расширитель I²C, операция 52 управляет пином LED, а не PINIO."
+   "explain": "There is no direct operation. Operation 38 overrides the value of an RC channel, the `aux` range on it activates the USER mode, and PINIO follows the mode. Operation 21 writes to an I²C IO expander, operation 52 controls the LED pin, not PINIO."
   },
   {
-   "q": "Правила затвора: остаток от деления пройденного пути на 30 м, окно «остаток < 3», импульс по фронту. Участок 600 м начат при пути d₀ = 905 м. Сколько кадров?",
+   "q": "The shutter rules: the remainder of the trip distance divided by 30 m, the window “remainder < 3”, a pulse on the rising edge. A 600 m leg starts at a distance of d₀ = 905 m. How many shots?",
    "options": [
     "19",
     "20",
@@ -77,40 +77,40 @@
     "30"
    ],
    "answer": 1,
-   "explain": "n = ⌊(905 + 600) / 30⌋ − ⌊905 / 30⌋ = 50 − 30 = 20. Кадры привязаны к пути от арма (930, 960, … 1500 м), а не к началу участка."
+   "explain": "n = ⌊(905 + 600) / 30⌋ − ⌊905 / 30⌋ = 50 − 30 = 20. The shots are tied to the distance since arming (930, 960, … 1500 m), not to the start of the leg."
   },
   {
-   "q": "Квадрокоптер на DShot, `dshot_beeper_enabled = ON`, в конфиге `beeper -RX_LOST`. После полёта и дизарма пульт выключен. Что слышно (INAV 9.1.0)?",
+   "q": "A quadcopter on DShot, `dshot_beeper_enabled = ON`, the config has `beeper -RX_LOST`. After a flight and a disarm the radio is off. What do you hear (INAV 9.1.0)?",
    "options": [
-    "Пищалка молчит, моторы пищат раз в секунду",
-    "Пищалка пищит, моторы молчат",
-    "Молчат и пищалка, и моторы",
-    "Пищат и пищалка, и моторы"
+    "The beeper is silent, the motors beep once a second",
+    "The beeper beeps, the motors are silent",
+    "Both the beeper and the motors are silent",
+    "Both the beeper and the motors beep"
    ],
    "answer": 2,
-   "explain": "В 9.1.0 DShot-маяк не шлётся по условиям, выключенным командой `beeper` (в 8.0.1 моторы пищали бы). Выключив RX_LOST, ты лишаешься обоих сигналов поиска."
+   "explain": "In 9.1.0 the DShot beacon is not sent on conditions disabled with the `beeper` command (in 8.0.1 the motors would beep). By disabling RX_LOST you lose both lost-model signals."
   },
   {
-   "q": "Режим `BEEPER` включён тумблером, `feature GPS`, фикс, 8 спутников. Что звучит и с каким циклом?",
+   "q": "The `BEEPER` mode is on from a switch, `feature GPS`, a fix, 8 satellites. What sounds, and with what cycle?",
    "options": [
-    "8 сигналов, цикл 1.6 с",
-    "8 сигналов, цикл 1.2 с",
-    "10 сигналов, цикл 1.9 с",
-    "короткие сигналы RX_SET без счёта"
+    "8 beeps, a 1.6 s cycle",
+    "8 beeps, a 1.2 s cycle",
+    "10 beeps, a 1.9 s cycle",
+    "the short RX_SET beeps without counting"
    ],
    "answer": 0,
-   "explain": "n = min(8, 10) = 8; T = 50·8 + 100·7 + 500 = 1600 мс. Счёт идёт при фиксе и не меньше 5 спутниках, максимум 10 сигналов; иначе звучит RX_SET."
+   "explain": "n = min(8, 10) = 8; T = 50·8 + 100·7 + 500 = 1600 ms. The count runs with a fix and at least 5 satellites, with a maximum of 10 beeps; otherwise RX_SET sounds."
   },
   {
-   "q": "Что есть в INAV 9.1.0 для управления камерой?",
+   "q": "What does INAV 9.1.0 have for controlling a camera?",
    "options": [
-    "Настройка интервала съёмки по дистанции и отдельная команда «снимок» в точке миссии",
-    "Режимы CAMERA CONTROL 1–3 для кнопок RunCam и user actions миссии как операнды логики",
-    "Режим `LIGHTS` и настройки `failsafe_lights*` в любой официальной сборке",
-    "Отдельная команда CLI `beacon` для DShot-маяка"
+    "A distance-based shooting interval setting and a separate “take a picture” command at a mission waypoint",
+    "The CAMERA CONTROL 1–3 modes for RunCam buttons and mission user actions as logic operands",
+    "The `LIGHTS` mode and the `failsafe_lights*` settings in any official build",
+    "A separate CLI command `beacon` for the DShot beacon"
    ],
    "answer": 1,
-   "explain": "Готового триггера камеры в прошивке нет: затвор по дистанции собирают из логических условий. LIGHTS скрыт под `USE_LIGHTS`, которого нет ни у одной платы; команда `beacon` — из Betaflight."
+   "explain": "The firmware has no ready-made camera trigger: a distance-based shutter is assembled from logic conditions. LIGHTS is hidden under `USE_LIGHTS`, which no board defines; the `beacon` command is from Betaflight."
   }
  ]
 }

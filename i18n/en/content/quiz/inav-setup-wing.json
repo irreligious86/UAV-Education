@@ -1,0 +1,96 @@
+{
+  "module": "inav-setup-wing",
+  "pass": 80,
+  "questions": [
+    {
+      "q": "The left elevon deflects the wrong way on both the roll stick and the pitch stick. The correct fix in INAV:",
+      "options": [
+        "Enable roll channel reverse on the radio",
+        "A negative rate in the servo command of this servo",
+        "Change the sign of the roll weight in the smix of this servo",
+        "Swap the connectors of the left and right servos on the board"
+      ],
+      "answer": 1,
+      "explain": "If a servo is wrong on both axes, it has to be reversed as a whole: rate with a minus sign. The sign of a weight in smix is changed when the error is on one axis only. A reverse on the radio breaks the agreement between stabilization and the stick."
+    },
+    {
+      "q": "The OSD shows 16.08 V, the multimeter — 16.42 V, the current vbat_scale = 1100. The new value:",
+      "options": [
+        "1077",
+        "1134",
+        "1123",
+        "1046"
+      ],
+      "answer": 2,
+      "explain": "In battery.c the voltage is proportional to vbat_scale: 1100 × 16.42 / 16.08 ≈ 1123."
+    },
+    {
+      "q": "Over the flight the flight controller counted 2860 mAh, the charger put in 3180 mAh, current_meter_scale = 250. The new value:",
+      "options": [
+        "278",
+        "225",
+        "250",
+        "310"
+      ],
+      "answer": 1,
+      "explain": "The current in INAV is inversely proportional to scale (microvolts / scale), hence the Battery.md formula: 250 × 2860 / 3180 ≈ 225. The flight controller undercounted, so scale decreases."
+    },
+    {
+      "q": "Why does a wing need failsafe_throttle_low_delay = 0?",
+      "options": [
+        "So that the motor does not stop in the middle of the RTH procedure over home",
+        "So that at zero throttle in a glide failsafe does not disarm the wing as if it were on the ground",
+        "So that failsafe triggers at once, skipping the 0.5 s failsafe_delay",
+        "So that autolaunch is not enabled again on a brief link loss"
+      ],
+      "answer": 1,
+      "explain": "If the throttle has been low for longer than this delay, INAV considers the aircraft landed and simply disarms it. A wing glides at zero throttle, so the check is turned off (Failsafe.md)."
+    },
+    {
+      "q": "nav_fw_loiter_radius = 3000, cruise 15 m/s, nav_fw_bank_angle = 35°. What happens over home?",
+      "options": [
+        "The wing holds the 30 m radius with about 25° of bank in any wind",
+        "The wing goes on to land because the radius is below the 50 m minimum",
+        "About 37° of bank is needed, which is above the limit, and the circle comes out wider than 30 m",
+        "The firmware temporarily raises nav_fw_bank_angle to 45° for the circle"
+      ],
+      "answer": 2,
+      "explain": "tan φ = V²/(g·R) = 225/(9.81·30) ≈ 0.76, φ ≈ 37°. The bank is limited to 35°, so the radius comes out larger than set."
+    },
+    {
+      "q": "What does fixed-wing AUTO TUNE change in INAV 9.1 (pid_autotune.c)?",
+      "options": [
+        "Only FF and the rates per axis",
+        "P, I and D on all three axes",
+        "The servo centers and the pitch trim",
+        "The autolaunch thresholds and the cruise throttle"
+      ],
+      "answer": 0,
+      "explain": "The code writes pid[axis].FF and stabilized.rates[axis]. P and I are tuned by hand; it was the same in 8.0.1, and the documentation text about PIFF was corrected in 9.1. You have to save after disarm with the stick command."
+    },
+    {
+      "q": "Servo autotrim (the SERVO AUTOTRIM mode) ran in flight. The switch was turned off while still in the air, then you landed and disarmed. The result:",
+      "options": [
+        "The new centers are saved on disarm",
+        "Centers averaged over the whole flight are saved",
+        "The old centers came back, the new ones are not saved",
+        "The centers are reset to 1500 µs"
+      ],
+      "answer": 2,
+      "explain": "In servos.c leaving the mode in the SAVE_PENDING state restores servoMiddleBackup. Saving happens only on a disarm with the switch still on."
+    },
+    {
+      "q": "The Flying Wing preset was edited by hand. Why is this fragment dangerous?",
+      "kind": "apply",
+      "fragment": "set platform_type = AIRPLANE\nsmix 0 1 0 50 0 -1\nsmix 1 1 1 50 0 -1\nsmix 2 2 0 -50 0 -1\nsmix 3 2 1 -50 0 -1\nservo 1 1000 2000 1500 100\nservo 2 1000 2000 1500 100",
+      "options": [
+        "The 50 % weights are too small, and the surfaces will not reach the stops",
+        "On the pitch stick the elevons move apart, as for roll",
+        "Servo 2 is reversed in roll and in pitch at once",
+        "A smix rule for the motor is missing"
+      ],
+      "answer": 1,
+      "explain": "In the preset the pitch weight of both servos is +50. Here servo 2 has −50: on the pitch stick the elevons go in opposite directions, and that is already a roll command. The motor is set by mmix, not smix."
+    }
+  ]
+}

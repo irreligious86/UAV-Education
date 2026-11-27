@@ -1,0 +1,116 @@
+{
+ "module": "inav-led-pinio-beeper",
+ "pass": 80,
+ "questions": [
+  {
+   "q": "INAV 9.1.0, a fixed wing. `led 3 12,7::AIW:0`, the default palette and `mode_color`. The aircraft is armed, the roll stick is to the left beyond the deadband. What does the LED show?",
+   "options": [
+    "Steady blue: it has x ≥ 8, and to the left only the LEDs with x < 8 blink",
+    "Blue with orange blinking: on a fixed wing the `I` overlay reacts to roll in either direction",
+    "Steady green: the `A` function takes special color 0 while armed",
+    "Steady orange: the `I` overlay overrides the base function"
+   ],
+   "answer": 0,
+   "explain": "`A` while armed is special color 1 (BLUE by default). On a fixed wing the indicator looks only at roll: to the left the `I` LEDs with x < 8 blink, to the right — those with x ≥ 8. The LED has x = 12, and it does not blink on a left roll."
+  },
+  {
+   "q": "`mode_color 6 1 2` is entered in the INAV 9.1.0 CLI. What changed?",
+   "options": [
+    "The arm color became red",
+    "The “east” color of the LOITER mode became red",
+    "The “east” color of the HORIZON mode became red",
+    "Nothing: a parse error"
+   ],
+   "answer": 1,
+   "explain": "In 9.1.0 mode 6 is LOITER, and indexes 0…5 are the directions N, E, S, W, U, D. The special colors (disarmed, armed, GPS) are mode 7; in 8.0.1 they were mode 6, hence the trap when moving a config."
+  },
+  {
+   "q": "What color does `color 14 30,0,128` set in INAV?",
+   "options": [
+    "Orange at half brightness",
+    "Almost white with an orange tint",
+    "Dark gray",
+    "Yellow at full brightness"
+   ],
+   "answer": 0,
+   "explain": "H = 30 is orange, S = 0 is a pure color (the saturation is inverted: 255 would give white), V = 128 is half brightness."
+  },
+  {
+   "q": "An F7 board, the elevon servos on S3 and S4 (both on TIM3), no other servo outputs. The config has `feature LED_STRIP` and `timer_output_mode 2 LED`. What happens?",
+   "options": [
+    "The servos work, the strip moves to S3",
+    "Both TIM3 outputs are skipped in the assignment, arming is blocked by the `PWMOUT` flag",
+    "The strip and the servos work together: they have different channels of one timer, there is no conflict",
+    "The firmware clears `feature LED_STRIP` at boot by itself"
+   ],
+   "answer": 1,
+   "explain": "With LED_STRIP enabled every output on a timer that has a channel with the LED flag is skipped (`checkPwmTimerConflicts`). No outputs are left for the servos — `PWMOUT`. The firmware clears the feature only for a timer shared with SoftSerial."
+  },
+  {
+   "q": "Which numbers do you put in `pinio_box1` and in `aux` so that PINIO1 follows the USER1 mode in INAV 9.1.0?",
+   "options": [
+    "37 and 37",
+    "40 and 40",
+    "47 and 47",
+    "37 in `pinio_box1`, 47 in `aux`"
+   ],
+   "answer": 2,
+   "explain": "Both `pinio_box` and `aux` take the permanent id: USER1 = 47 (USER2 = 48, USER3 = 57, USER4 = 58). 37 is the internal `boxId` of USER1, and as a permanent id it is SERVO AUTOTRIM. 40 is USER1 in Betaflight."
+  },
+  {
+   "q": "How can an INAV 9.1.0 logic condition switch PINIO2?",
+   "options": [
+    "With operation 21 (Set IO Port): operand A is the PINIO number, operand B is the level 0 or 1",
+    "With operation 52 (LED Pin PWM) with the value 100",
+    "With operation 38, by overriding the channel that carries the range of the mode from `pinio_box2`",
+    "It cannot: PINIO is controlled only with a switch"
+   ],
+   "answer": 2,
+   "explain": "There is no direct operation. Operation 38 overrides the value of an RC channel, the `aux` range on it activates the USER mode, and PINIO follows the mode. Operation 21 writes to an I²C IO expander, operation 52 controls the LED pin, not PINIO."
+  },
+  {
+   "q": "The shutter rules: the remainder of the trip distance divided by 30 m, the window “remainder < 3”, a pulse on the rising edge. A 600 m leg starts at a distance of d₀ = 905 m. How many shots?",
+   "options": [
+    "19",
+    "20",
+    "21",
+    "30"
+   ],
+   "answer": 1,
+   "explain": "n = ⌊(905 + 600) / 30⌋ − ⌊905 / 30⌋ = 50 − 30 = 20. The shots are tied to the distance since arming (930, 960, … 1500 m), not to the start of the leg."
+  },
+  {
+   "q": "A quadcopter on DShot, `dshot_beeper_enabled = ON`, the config has `beeper -RX_LOST`. After a flight and a disarm the radio is off. What do you hear (INAV 9.1.0)?",
+   "options": [
+    "The beeper is silent, the motors beep once a second",
+    "The beeper beeps, the motors are silent",
+    "Both the beeper and the motors are silent",
+    "Both the beeper and the motors beep"
+   ],
+   "answer": 2,
+   "explain": "In 9.1.0 the DShot beacon is not sent on conditions disabled with the `beeper` command (in 8.0.1 the motors would beep). By disabling RX_LOST you lose both lost-model signals."
+  },
+  {
+   "q": "The `BEEPER` mode is on from a switch, `feature GPS`, a fix, 8 satellites. What sounds, and with what cycle?",
+   "options": [
+    "8 beeps, a 1.6 s cycle",
+    "8 beeps, a 1.2 s cycle",
+    "10 beeps, a 1.9 s cycle",
+    "the short RX_SET beeps without counting"
+   ],
+   "answer": 0,
+   "explain": "n = min(8, 10) = 8; T = 50·8 + 100·7 + 500 = 1600 ms. The count runs with a fix and at least 5 satellites, with a maximum of 10 beeps; otherwise RX_SET sounds."
+  },
+  {
+   "q": "What does INAV 9.1.0 have for controlling a camera?",
+   "options": [
+    "A distance-based shooting interval setting and a separate “take a picture” command at a mission waypoint",
+    "The CAMERA CONTROL 1–3 modes for RunCam buttons and mission user actions as logic operands",
+    "The `LIGHTS` mode and the `failsafe_lights*` settings in any official build",
+    "A separate CLI command `beacon` for the DShot beacon"
+   ],
+   "answer": 1,
+   "explain": "The firmware has no ready-made camera trigger: a distance-based shutter is assembled from logic conditions. LIGHTS is hidden under `USE_LIGHTS`, which no board defines; the `beacon` command is from Betaflight."
+  }
+ ]
+}

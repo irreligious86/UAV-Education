@@ -1,0 +1,118 @@
+{
+ "module": "inav-telemetry-gcs",
+ "pass": 80,
+ "questions": [
+  {
+   "q": "INAV 9.1.0: `serial 3 288 115200 115200 57600 115200`. What happens after `save` and a reboot?",
+   "options": [
+    "MAVLink and SmartPort work on UART4 in turn",
+    "The whole port table is reset to the board default",
+    "Only the UART4 line is reset, the others are kept",
+    "MAVLink runs while armed, SmartPort — while disarmed"
+   ],
+   "answer": 1,
+   "explain": "288 = 256 + 32: two telemetry protocols on one port. A pair is allowed only with MSP or (for LTM and IBUS) with RX_SERIAL. With an invalid table `validateAndFixConfig()` resets it entirely."
+  },
+  {
+   "q": "Which pair of functions on one UART is allowed by the rules of `isSerialConfigValid()` in 9.1.0?",
+   "options": [
+    "RX_SERIAL + TELEMETRY_MAVLINK (320)",
+    "MSP + MSP_OSD (33554433)",
+    "MSP + GPS (3)",
+    "RX_SERIAL + TELEMETRY_LTM (80)"
+   ],
+   "answer": 3,
+   "explain": "Only LTM and IBUS share a port with the receiver; with MSP — HOTT, SMARTPORT, LTM, MAVLINK, IBUS, BLACKBOX and LOG. GPS and DisplayPort are not combined with MSP."
+  },
+  {
+   "q": "A port: mask 17, baud rates `57600 115200 0 115200`, `telemetry_switch = OFF`, `feature TELEMETRY` enabled. What goes over the port, and when?",
+   "options": [
+    "While disarmed MSP at 57600, while armed LTM at 19200",
+    "Always LTM at 57600, MSP is disabled",
+    "While disarmed LTM at 19200, while armed MSP at 57600",
+    "MSP and LTM at the same time at 57600"
+   ],
+   "answer": 0,
+   "explain": "17 = MSP + LTM. A shared port is given to telemetry while armed. A telemetry field of 0 is `AUTO`, which for LTM is 19200 (for MAVLink it would be 57600)."
+  },
+  {
+   "q": "A pilot upgraded from INAV 8.0.1 to 9.1.0, and an alert on the `FM` string stopped triggering on the radio. Which string disappeared from CRSF telemetry?",
+   "options": [
+    "`RTH`",
+    "`AIR`",
+    "`CRUZ`",
+    "`!FS!`"
+   ],
+   "answer": 1,
+   "explain": "In 9.1.0, with no modes active while armed, `ACRO` is sent; `AIR` was removed, and `GEO`, `TURT`, `WRTH` and `LOTR` were added."
+  },
+  {
+   "q": "`mavlink_extra1_rate = 10`, there are no `RADIO_STATUS` messages on the port. At what rate does `ATTITUDE` go?",
+   "options": [
+    "10 Hz",
+    "5 Hz",
+    "8.33 Hz",
+    "25 Hz"
+   ],
+   "answer": 2,
+   "explain": "f = 50 / (⌊50 / 10⌋ + 1) = 50 / 6 = 8.33 Hz: the counter is loaded with 5 and fires on the sixth call, and the calls come once every 20 ms."
+  },
+  {
+   "q": "The MAVLink defaults in INAV 9.1.0 (ext 2, rc 1, pos 2, extra1 2, extra2 2, extra3 1). What is the nominal budget, and does it fit into ELRS 250 Hz at 1:2 (615 bytes/s) by the 80 % rule?",
+   "options": [
+    "402 bytes/s, it fits",
+    "719 bytes/s, it fits",
+    "719 bytes/s, it does not fit",
+    "1447 bytes/s, it does not fit"
+   ],
+   "answer": 2,
+   "explain": "110 + 54 + 272 + 80 + 64 + 94 + 45 = 719 bytes/s. 80 % of 615 is 492 bytes/s: it does not fit. The most expensive stream is position, 136 bytes per hertz."
+  },
+  {
+   "q": "A ground station sent INAV 9.1.0 a `COMMAND_LONG` with an arm command over MAVLink. What does the flight controller do?",
+   "options": [
+    "It arms if there are no arming blocks",
+    "It replies `COMMAND_ACK` with `DENIED`",
+    "Nothing: `COMMAND_LONG` is not handled",
+    "It arms only in `GCS NAV` mode"
+   ],
+   "answer": 2,
+   "explain": "In the handler of incoming messages `COMMAND_LONG` is commented out. Of the commands only `COMMAND_INT` with `MAV_CMD_DO_REPOSITION` is accepted, and only with `GCS NAV` and POSHOLD active."
+  },
+  {
+   "q": "A script over MSP has to control roll, pitch and CH8, and the `MSP RC OVERRIDE` mode is switched on CH7. What is the smallest value of `msp_override_channels` that is enough for this?",
+   "options": [
+    "131",
+    "67",
+    "195",
+    "134"
+   ],
+   "answer": 0,
+   "explain": "Bits 0, 1 and 7: 1 + 2 + 128 = 131. Adding the bit of the channel with the mode itself (CH7, bit 6) is pointless: the firmware excludes it from the mask, so 195 would work the same, but it is not the smallest."
+  },
+  {
+   "q": "The `MSP RC OVERRIDE` mode is active, a script sends frames 50 times a second, `failsafe_delay = 5`. The radio lost its link to the receiver. What happens?",
+   "options": [
+    "The aircraft keeps flying on the commands of the script while MSP frames arrive",
+    "Failsafe on the main receiver comes after 0.7 s",
+    "The overridden channels return to the radio values at once",
+    "Failsafe comes 0.9 s after the script stops"
+   ],
+   "answer": 1,
+   "explain": "Failsafe is counted from the main receiver only: 200 ms + 5 × 100 ms. The MSP stream does not extend the link. 0.9 s is a different number: that is how long the values of the script are held after the script itself stops."
+  },
+  {
+   "q": "A fragment of the config of an F7 board with a FrSky X-series receiver: S.Port is connected with one wire to the TX of UART3. There is no telemetry on the radio. What is the cause?",
+   "kind": "apply",
+   "fragment": "feature TELEMETRY\nserial 0 64 115200 115200 0 115200\nserial 2 32 115200 115200 0 115200\nset serialrx_provider = SBUS\nset telemetry_inverted = OFF\nset telemetry_halfduplex = OFF",
+   "options": [
+    "A telemetry baud rate of 0 instead of 57600",
+    "`telemetry_halfduplex = OFF`: the port does not listen for polls on the TX wire",
+    "Mask 32 is LTM, SmartPort needs 16",
+    "`telemetry_inverted` must be ON on an F7"
+   ],
+   "answer": 1,
+   "explain": "SmartPort works by polling on a single wire, and an F7 needs `telemetry_inverted = OFF` and `telemetry_halfduplex = ON`. The SmartPort baud rate is fixed (57600) and does not read the field; 32 is exactly SmartPort."
+  }
+ ]
+}

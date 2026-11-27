@@ -89,7 +89,7 @@ INAV считает позицию и высоту комплементарны�
 | `RPM_FILTERS`, `SUPEREXPO`, `VTX`, `TRANSPONDER` | ничего: в 9.1.0 код эти биты не читает (бит `RPM_FILTERS` к тому же стирается при загрузке) | RPM-фильтр включают `rpm_gyro_filter_enabled` и порт ESC-телеметрии (`inav-mc-tuning`), VTX — порт с функцией VTX |
 
 Что вырезано на маленьких платах (`target/common.h` 9.1.0). Правило: смотри объём флеша MCU своей платы до покупки.
-- **Флеш 512 КБ и меньше** (F411, F722): нет геозон (`USE_GEOZONE`), FrSky SmartPort master, HoTT, VTX FuriousFPV, SUMD, каналов AUX15–AUX30 (каналы 19–34) и справки в `help`.
+- **Флеш 512 КБ и меньше** (F411, F722): нет геозон (`USE_GEOZONE`), FrSky SmartPort master, HoTT, VTX FuriousFPV, SUMD, приёмников Spektrum serial (`USE_SERIALRX_SPEKTRUM`), телеметрии SRXL, каналов AUX15–AUX30 (каналы 19–34) и справки в `help`.
 - **F411** вдобавок: один профиль миксера (`MAX_MIXER_PROFILE_COUNT 1`), значит, VTOL невозможен (`inav-mixer-vtol`). F722 — F7, у него два профиля.
 - **CAN / DroneCAN**: в INAV 9.1.0 нет. `USE_DRONECAN` объявлен в трёх H7-target'ах, но драйвера в дереве исходников нет, так что CAN-GPS и CAN-ESC подключить нельзя — это повод для ArduPilot (`el-dronecan`).
 
@@ -97,7 +97,7 @@ INAV считает позицию и высоту комплементарны�
 Курс сверен с INAV 9.1.0: имена и умолчания даны для 9.1, прежняя форма стоит в скобках при первом упоминании. H7/F7 рекомендуемы, F4 поддерживается с ограничениями по памяти (часть функций вырезана в target'ах). Конфигуратор строго совпадает с прошивкой по мажорной версии: для INAV 9.x нужен Configurator 9.x. `diff all` между мажорными версиями переносится только через проверку — параметры переименовываются (в 8.0 `nav_use_midthr_for_althold` → `nav_mc_althold_throttle`; в 9.0 — таблица ниже).
 
 Порядок обновления 8.0 → 9.1 (release notes 9.0.0 и 9.1.0):
-1. Поставь INAV Configurator 9.1. На старой прошивке сними `diff all` в файл (CLI или кнопки Diff All → Save to file), в имени файла — версия и дата. Configurator 9.1 перед прошивкой сам сохраняет авто-бэкап (Firmware Flasher → Open Backups Folder), но свой файл надёжнее.
+1. Поставь INAV Configurator 9.1. На старой прошивке сними `diff all` в файл (CLI или кнопки Diff All → Save to File), в имени файла — версия и дата. Configurator 9.1 перед прошивкой сам сохраняет авто-бэкап (Firmware Flasher → Open Backups), но свой файл надёжнее.
 2. Прошей 9.1 **с Full chip erase**. Это обязательное условие перехода между мажорными версиями.
 3. Вставь старый diff в CLI. Строки, которых в 9.1 нет, CLI отметит красным: `### ERROR: Invalid name`. Выпиши их и исправь в копии файла по таблице ниже.
 4. Набери `defaults`, после перезагрузки вставь исправленный diff и сохрани. Если профилей несколько, вставляй двумя частями: сначала до конца блока `# master` и `save`, потом остальное от `# control_profile 1`. Шаги 3–4 Configurator 9.1 умеет сделать сам: после прошивки с Full chip erase он предлагает восстановить бэкап и показывает окно миграции 8 → 9 (переименования и предупреждения); результат всё равно сравни своим `diff all`.
@@ -140,7 +140,7 @@ INAV считает позицию и высоту комплементарны�
 | servo autotrim (`feature FW_AUTOTRIM`) | + проверка I-составляющей | центр сервы двигается, только пока I-составляющая стабильна; настройка `servo_autotrim_iterm_rate_limit` была только в 9.1.0-RC1 — в 9.1.0 её нет | 9.1 |
 | — | команда CLI `bind_msp_rx` | bind MSP-приёмника (mLRS) | 9.1 |
 | MSP v1: `MSP_STATUS` (101), `MSP_STATUS_EX` (150), `MSP_ANALOG` (110), `MSP_MISC`, `MSP_DEBUG` и ещё 14 команд | помечены устаревшими | работают, но будут убраны в INAV 10; замены — `MSP2_INAV_STATUS`, `MSP2_INAV_ANALOG` и другие. `MSP_RC` (105) и `MSP_SET_RAW_RC` (200) не затронуты | 9.1 |
-| ручной перенос diff | авто-бэкап и миграция в Configurator | Firmware Flasher 9.1: кнопки Backup Config, Restore Config, Open Backups Folder; файлы `js/migration/7_to_8.json` и `8_to_9.json` | 9.1 |
+| ручной перенос diff | авто-бэкап и миграция в Configurator | Firmware Flasher 9.1: кнопки Backup Config, Restore Config, Open Backups; файлы `js/migration/7_to_8.json` и `8_to_9.json` | 9.1 |
 | `mode_color 6 <0…8> <цвет>` — особые цвета ленты (дизарм, арм, GPS…) | `mode_color 7 <0…8> <цвет>`; режим 6 — новый LOITER (NAV POSHOLD) с шестью направлениями | при переносе конфига заменить 6 на 7: иначе строки с индексом 0…5 перекрасят LOITER, а 6…8 дадут ошибку разбора (`inav-led-pinio-beeper`) | 9.x (в 9.1.0 есть) |
 | MSP RC Override только в собственной сборке, `msp_override_channels` до 65535 | в штатных прошивках, до 4294967295 (32 канала) | `USE_MSP_RC_OVERRIDE` включён в `target/common.h`; маска 32 бита (`inav-telemetry-gcs`) | 9.x (в 9.1.0 есть) |
 | `pitot_hardware`: NONE, AUTO, MS4525, ADC, VIRTUAL, FAKE, MSP, DLVR-L10D | + `MS5525`; контроль пито по GPS с подменой на виртуальную скорость | новый датчик; в арме показание сверяется с расчётной скоростью (коридор 30–200 %), при отказе скорость считается по GPS и ветру (`inav-sensors-extra`) | 9.x (в 9.1.0 есть) |
@@ -170,7 +170,7 @@ INAV считает позицию и высоту комплементарны�
 ### Шаг 2. Датчики
 1. Калибровка акселерометра (6 положений).
 2. Компас: калибровка на открытом месте, проверка ориентации (`align_mag`).
-3. GPS на UART: порт и скорость — на вкладке Ports, протокол (обычно UBLOX) — на вкладке GPS. В Configurator 9.1 там же пресет под модуль (M8, M9, M10 или Auto-detect).
+3. GPS на UART: порт и скорость — на вкладке Ports, протокол (обычно UBLOX) — на вкладке GPS. В Configurator 9.1 там же пресет под модуль (M8, M9, M10 или Auto-detect GPS Type).
 
 ### Шаг 3. Режимы
 ARM — отдельный тумблер. ANGLE — базовый. NAV ALTHOLD, NAV POSHOLD, NAV RTH — на трёхпозиционном тумблере по нарастанию автономности. Для крыла: MANUAL обязательно на отдельном тумблере.

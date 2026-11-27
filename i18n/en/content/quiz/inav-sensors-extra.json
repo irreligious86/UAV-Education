@@ -1,0 +1,116 @@
+{
+ "module": "inav-sensors-extra",
+ "pass": 80,
+ "questions": [
+  {
+   "q": "The board has no barometer, and `baro_hardware` is left at `AUTO`. What does `status` show in INAV 9.1.0?",
+   "options": [
+    "Nothing special: `AUTO` without a sensor quietly turns into `NONE`",
+    "The `HWFAIL` flag: the sensor is selected but not found, arming is disabled",
+    "The `NAV` flag: without a barometer navigation is considered unsafe",
+    "The `CAL` flag: the firmware waits for the barometer calibration forever"
+   ],
+   "answer": 1,
+   "explain": "`getHwBarometerStatus()` returns “unavailable” if the requested sensor is not found, `isHardwareHealthy()` gives false, and `ARMING_DISABLED_HARDWARE_FAILURE` (`HWFAIL`) is set. The same rule applies to the rangefinder, the pitot and the flow. For a missing sensor set `NONE`."
+  },
+  {
+   "q": "`rangefinder_hardware = VL53L1X` (a 27° cone). Roll 10°, pitch 10°, the driver returned 150 cm, `inav_max_surface_altitude = 200`. What does the estimator get?",
+   "options": [
+    "148 cm: 150 × cos 10°, the tilt on each axis is less than 13.5°",
+    "145 cm: 150 × cos 10° × cos 10°, the fractional part dropped",
+    "150 cm: at a tilt of less than 13.5° no compensation is applied",
+    "−1: the total tilt of 14.1° is greater than half the cone, 13.5°"
+   ],
+   "answer": 3,
+   "explain": "cos θ = cos 10° × cos 10° = 0.9699, which is less than the threshold cos 13.5° = 0.9724. `rangefinderProcess()` replaces the reading with “out of range”, and the reliability gets a zero. The total tilt is compared, not the angles separately."
+  },
+  {
+   "q": "The rangefinder is healthy and measuring, and there is no barometer on the board (`baro_hardware = NONE`). What about the AGL altitude?",
+   "options": [
+    "The AGL quality is always LOW: the calculation requires a healthy barometer",
+    "AGL is computed as usual, the barometer does not affect it",
+    "AGL is computed, but with reduced `inav_w_z_surface_*` weights",
+    "AGL is taken straight from the rangefinder without filtering"
+   ],
+   "answer": 0,
+   "explain": "In `estimationCalculateAGL()` the condition is `EST_SURFACE_VALID` and `EST_BARO_VALID` at the same time. Without a barometer the branch is executed in which AGL equals the general altitude and the quality is LOW. The SURFACE mode will not be in the list either: it requires both sensors."
+  },
+  {
+   "q": "A multirotor in ALTHOLD with SURFACE on flew above `inav_max_surface_altitude`. The throttle is in the middle. What does INAV do?",
+   "options": [
+    "It holds the current altitude on the barometer, like an ordinary ALTHOLD",
+    "It turns SURFACE off and returns altitude control to the pilot",
+    "It starts descending at 50 cm/s until AGL comes back",
+    "It climbs to `nav_max_terrain_follow_alt` and holds that altitude on the barometer"
+   ],
+   "answer": 2,
+   "explain": "Readings above the limit are not accepted, the reliability falls, and AGL stops being trusted. `adjustMulticopterAltitudeFromRCInput()` sets a descent for this case: 50 cm/s with the throttle at the middle or above, up to 200 cm/s at idle. In the OSD — “(!SURFACE UNRELIABLE!)”."
+  },
+  {
+   "q": "The aircraft has GPS with a good fix, optical flow and a rangefinder. How does the flow take part in the position estimate?",
+   "options": [
+    "It is blended with GPS by the weights `inav_w_xy_flow_p` and `inav_w_xy_gps_p`",
+    "It replaces GPS at an altitude below `inav_max_surface_altitude`",
+    "It corrects only the velocity and leaves the position to GPS",
+    "It does not: while horizontal GPS is trusted, the flow is not called"
+   ],
+   "answer": 3,
+   "explain": "In `updateEstimatedTopic()` the corrections are written as “GPS or flow”: `estimationCalculateCorrection_XY_GPS(&ctx) || estimationCalculateCorrection_XY_FLOW(&ctx)`. If GPS is trusted, the first function returns true and the second is not executed."
+  },
+  {
+   "q": "How does INAV 9.1.0 obtain `opflow_scale` in the calibration from the Calibration tab?",
+   "options": [
+    "The aircraft is carried over a known distance, and the flow is divided by the path",
+    "The aircraft is rocked in place for 30 s: the sum of the flow is divided by the sum of the gyro rate",
+    "The aircraft hovers still for 30 s, and the scale is fitted to the drift",
+    "The scale is read from the sensor over MSP with the first packet"
+   ],
+   "answer": 1,
+   "explain": "For 30 seconds `opflowUpdate()` sums, over the valid samples, the magnitude of the flow in sensor units normalized to a second and the magnitude of the body rate in °/s; the scale is their ratio. It is saved if the sum of the body rates is greater than 3600. With rotation in place the flow has to equal the rotation."
+  },
+  {
+   "q": "MS4525, `pitot_scale = 1.0`, a differential pressure of 245 Pa. Then the scale was set to 1.1. What speeds does INAV show?",
+   "options": [
+    "20.0 m/s, then 22.0 m/s: the scale multiplies the speed",
+    "20.0 m/s, then 21.0 m/s: the scale multiplies the pressure under the root",
+    "14.1 m/s, then 15.6 m/s: ΔP / 1.225 under the root without the factor of two",
+    "20.0 m/s, then 24.2 m/s: the scale enters squared"
+   ],
+   "answer": 0,
+   "explain": "V = `pitot_scale` × √(2 × |ΔP| / 1.225). √(490 / 1.225) = 20 m/s; the scale is in front of the root, so 1.1 gives 22 m/s. Hence the correction rule: new scale = old × reference speed / indicated speed."
+  },
+  {
+   "q": "`pitot_hardware = VIRTUAL`. Ground speed 18 m/s, nose at 90°, the wind vector of the estimator: 5 m/s, direction 270°. What is the airspeed?",
+   "options": [
+    "13 m/s: the wind is subtracted from the ground speed",
+    "18 m/s: without a sensor the ground speed is taken",
+    "18.7 m/s: the square root of the sum of the squares of 18 and 5",
+    "23 m/s: it is a headwind, and the speeds add up"
+   ],
+   "answer": 3,
+   "explain": "The wind vector shows where the air is moving to. The tailwind component is W × cos(270° − 90°) = −5 m/s, and the airspeed = 18 − (−5) = 23 m/s. That is how `virtualPitotCalculate()` computes it."
+  },
+  {
+   "q": "The OSD element of an external LM75 sensor (slot 0, address 0) has to blink above 85 °C. Which line is correct?",
+   "options": [
+    "`temp_sensor 0 1 0 -20 85 2 ESC`",
+    "`temp_sensor 0 2 0 -200 850 2 ESC`",
+    "`temp_sensor 0 1 0 -200 850 2 ESC`",
+    "`temp_sensor 0 1 0x48 -200 8500 2 ESC`"
+   ],
+   "answer": 2,
+   "explain": "Type 1 is LM75, the address is a number 0–7, the thresholds are in tenths of a degree: 85 °C = 850, and −550 to 1250 is allowed. Type 2 is a DS18B20 with a 16-digit ROM. The number 85 would mean 8.5 °C, and 8500 is out of range and gives a parse error."
+  },
+  {
+   "q": "A fixed wing, `apa_pow = 120`, `fw_reference_airspeed = 1500`. The pitot tube is partly blocked and shows 10 m/s at a real 20 m/s. What happens to the P, D and FF gains?",
+   "options": [
+    "They grow by a factor of 1.63 instead of dropping to 0.71: a risk of oscillation",
+    "They do not change: APA works only on the virtual airspeed",
+    "They drop to 0.3: the lower limit of the factor applies",
+    "They drop to 0.71, as they should at 20 m/s: there is no error in the gains"
+   ],
+   "answer": 0,
+   "explain": "Factor = (1500 / V)^1.2. From the reading of 1000 cm/s it is 1.5^1.2 = 1.63, while at the real 2000 cm/s it should be 0.75^1.2 = 0.71. The gains are 2.3 times higher than needed. The GPS check of the pitot triggers only below 30 % of the virtual airspeed, and here it is 50 %."
+  }
+ ]
+}

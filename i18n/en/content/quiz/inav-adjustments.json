@@ -1,0 +1,116 @@
+{
+ "module": "inav-adjustments",
+ "pass": 80,
+ "questions": [
+  {
+   "q": "INAV 9.1.0: `adjrange 0 0 2 900 1300 32 3`. What does this line do?",
+   "options": [
+    "When AUX3 is in 900…1299, AUX4 changes `nav_fw_cruise_thr` in steps of 10 through slot 0",
+    "When AUX4 is in 900…1299, AUX3 changes `nav_fw_cruise_thr` in steps of 1",
+    "When AUX3 is in 900…1300, AUX4 changes `nav_fw_pitch2thr` in steps of 10",
+    "When AUX2 is in 900…1299, AUX3 changes `nav_fw_cruise_thr` in steps of 10"
+   ],
+   "answer": 0,
+   "explain": "The field order: index, slot, range channel (AUX1 = 0, so 2 = AUX3), start, end (not included), function (32 = NAV_FW_CRUISE_THR, step 10), adjustment channel (3 = AUX4)."
+  },
+  {
+   "q": "A step function with a step of 1, the value is 40. A self-centering switch is held high from center for 1.7 s. What does the value become?",
+   "options": [
+    "41",
+    "43",
+    "44",
+    "57"
+   ],
+   "answer": 2,
+   "explain": "n = 1 + ⌊1.7 / 0.5⌋ = 4: a step at the moment of the press and repeats once every 500 ms (RESET_FREQUENCY_2HZ). 40 + 4 = 44."
+  },
+  {
+   "q": "`adjrange 4 1 2 1310 1690 56 3` is entered in the CLI. What range does the `adjrange` command show?",
+   "options": [
+    "1310…1690",
+    "1300…1700",
+    "1325…1675",
+    "1300…1675"
+   ],
+   "answer": 3,
+   "explain": "The range is stored in steps of 25: (1310 − 900) / 25 = 16.4 → 16 → 1300; (1690 − 900) / 25 = 31.6 → 31 → 1675. The fractional part is dropped."
+  },
+  {
+   "q": "What happens if you assign function 22 (RATE_PROFILE) in INAV 9.1.0 and press the adjustment switch?",
+   "options": [
+    "The control profile switches to the next one",
+    "The beeper sounds, nothing changes",
+    "The CLI does not accept the number 22",
+    "The battery profile switches"
+   ],
+   "answer": 1,
+   "explain": "22 is left in the enum as a “placeholder for compatibility”: applyStepAdjustment has no branch for it, and the beep is issued before the function is dispatched. The select-by-position mode is compiled under the commented-out USE_INFLIGHT_PROFILE_ADJUSTMENT."
+  },
+  {
+   "q": "`mc_d_roll` was adjusted in flight, `stats = ON`. After landing and disarming the power was turned off, Save was not given. What happens after power-up?",
+   "options": [
+    "The old value: nothing is written without Save",
+    "The new value: on a disarm after being armed for ≥ 10 s statistics save the whole config",
+    "The default value: an unsaved profile is reset",
+    "The new value, but only in control profile 1"
+   ],
+   "answer": 1,
+   "explain": "statsOnDisarm calls saveConfigAndNotify, and an EEPROM write always saves the whole copy of the configuration from RAM — together with the adjustment."
+  },
+  {
+   "q": "Which stick command saves the settings in INAV 9.1.0, and when does it work?",
+   "options": [
+    "Throttle LOW, yaw LOW, pitch LOW, roll HIGH; only while disarmed",
+    "Throttle LOW, yaw LOW, pitch LOW, roll HIGH; armed and disarmed",
+    "Throttle HIGH, yaw LOW, pitch LOW, roll CENTER; only while disarmed",
+    "Throttle LOW, yaw HIGH, pitch CENTER, roll CENTER; only while disarmed"
+   ],
+   "answer": 0,
+   "explain": "THR_LO + YAW_LO + PIT_LO + ROL_HI → saveConfigAndNotify. Stick commands are disabled while armed, with the CLI open and in the CMS menu. The third option is accelerometer calibration, the fourth is the combination from Controls.md for bypassing the navigation arming block (in it the code checks only yaw HIGH at the moment ARM is switched on)."
+  },
+  {
+   "q": "What do you need to switch control profile 1 / 2 / 3 with the sticks?",
+   "options": [
+    "Nothing, it always works",
+    "The `MIXER PROFILE 2` mode on a switch",
+    "`feature TX_PROF_SEL` and a disarmed aircraft",
+    "Function 22 in `adjrange`"
+   ],
+   "answer": 2,
+   "explain": "The profile selection block in processRcStickPositions is guarded by the check feature(FEATURE_TX_PROF_SEL); Betaflight has no such check."
+  },
+  {
+   "q": "One slot holds `adjrange 0 0 2 900 1300 6 3` and `adjrange 2 0 2 1700 2100 6 3`. The AUX3 selector is high (2000), AUX4 is held high. What follows from the 9.1.0 code?",
+   "options": [
+    "A step once every 500 ms, as usual",
+    "No steps: the slot is taken by line 0",
+    "A step on every receiver cycle: the inactive line 0 frees the slot on every cycle",
+    "The CLI rejects the second line"
+   ],
+   "answer": 2,
+   "explain": "An inactive line frees the slot if the slot holds its function. Line 2 takes the slot anew with a zeroed timer — a step happens on every cycle, that is, at the frame rate of the radio link (50 times a second on a 50 Hz link, 150 on a 150 Hz one). With the selector low the picture is reversed: line 2 releases the slot after line 0, and there are no steps."
+  },
+  {
+   "q": "Where is `nav_fw_cruise_thr`, which function 32 changes, stored?",
+   "options": [
+    "In the control profile",
+    "In the battery profile",
+    "In the mixer profile",
+    "In the master navigation settings"
+   ],
+   "answer": 1,
+   "explain": "The function writes to currentBatteryProfileMutable->nav.fw.cruise_throttle; `nav_fw_cruise_thr` and `nav_fw_pitch2thr` are battery profile settings."
+  },
+  {
+   "q": "How do INAV 9.1.0 adjustments differ from Betaflight 2025.12?",
+   "options": [
+    "INAV has 30 ranges and an absolute mode",
+    "In INAV the function number in the CLI is offset by 1 from the enum",
+    "INAV has step mode only, 20 ranges and 4 slots",
+    "In INAV adjustments are saved automatically"
+   ],
+   "answer": 2,
+   "explain": "MAX_ADJUSTMENT_RANGE_COUNT 20, MAX_SIMULTANEOUS_ADJUSTMENT_COUNT 4, all functions are ADJUSTMENT_MODE_STEP; the number in the CLI equals the enum. 30 ranges, an absolute mode and the number offset are Betaflight."
+  }
+ ]
+}

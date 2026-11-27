@@ -11,29 +11,29 @@
         "A Lua function with parameters"
       ],
       "answer": 1,
-      "explain": "One line is one command."
+      "explain": "One line — one command."
     },
     {
       "q": "What is an activator?",
       "options": [
         "The number of a logic rule in the mission list",
-        "Another condition that is true",
-        "A GVAR",
+        "Another condition that = true",
+        "GVAR",
         "A timer that starts the rule"
       ],
       "answer": 1,
       "explain": "−1 means “always”."
     },
     {
-      "q": "GVAR range?",
+      "q": "The default GVAR range (without the gvar command)?",
       "options": [
         "0–255, like a byte",
         "−32768…32767",
         "0–100",
-        "Anything"
+        "Any"
       ],
       "answer": 1,
-      "explain": "16-bit integers."
+      "explain": "By default the min/max of every GVAR is −32768…32767; the command gvar <i> <default> <min> <max> changes the limits (they are stored as int32)."
     },
     {
       "q": "To write to GVAR 1, operand A must be…",
@@ -44,7 +44,7 @@
         "Flight param 1"
       ],
       "answer": 1,
-      "explain": "The index is specified as a Value; “Global Variable 1” means the value stored in GVAR 1."
+      "explain": "The index is given as a Value; “Global Variable 1” means the value inside GVAR 1."
     },
     {
       "q": "When is it better to replace IPF with Lua/ArduPilot?",
@@ -58,34 +58,34 @@
       "explain": "IPF is rules without loops or functions."
     },
     {
-      "q": "Why can rules break after an INAV update?",
+      "q": "Why may the rules break after an INAV upgrade?",
       "options": [
-        "They get deleted",
-        "Operation numbers change",
+        "They are deleted",
+        "Operation numbers or semantics change",
         "All GVARs are reset on flashing",
-        "No reason"
+        "There is no reason"
       ],
       "answer": 1,
-      "explain": "Check against the tables for your version."
+      "explain": "Check against the tables of your version. Between 8.0.1 and 9.1.0 the numbers did not shift: operations 55–56 and operands 46–49 were appended at the end."
     },
     {
       "q": "Override RC channel in IPF conflicts with:",
       "options": [
         "GVAR",
         "The real stick on the same channel",
-        "PID and OSD at the same time",
+        "The PID and the OSD at once",
         "OSD"
       ],
       "answer": 1,
-      "explain": "Better to use a virtual channel for modes."
+      "explain": "A virtual channel is better for modes."
     },
     {
       "q": "What is a Programming PID in INAV?",
       "options": [
-        "A configurable controller whose output is available to the logic",
-        "The rate-loop PID in the flight loop",
-        "PID autotune from Blackbox logs after a flight",
-        "A real-time ESC temperature controller based on DShot telemetry"
+        "A configurable controller whose output is available in the logic",
+        "The PID of the rate loop in the flight loop",
+        "PID autotune from Blackbox logs after the flight",
+        "An ESC temperature controller on DShot telemetry in real time"
       ],
       "answer": 0,
       "explain": "Four programmable PID controllers; their output can be used in logic conditions."

@@ -1,0 +1,176 @@
+{
+ "module": "inav-mc-tuning",
+ "tasks": [
+  {
+   "id": "p-term",
+   "title": "The P term from an integer",
+   "statement": "The profile has `mc_p_roll = {p}`, TPA is off. The gyro lags the setpoint by **{e} °/s**. Find the roll P term in axisPID units (the sum limit is ±500).",
+   "params": {
+    "p": {
+     "min": 20,
+     "max": 90,
+     "step": 2
+    },
+    "e": {
+     "min": 10,
+     "max": 150,
+     "step": 10
+    }
+   },
+   "answer": "p*e/31",
+   "unit": "units",
+   "tol": 0.01,
+   "solution": "`pid.h`: FP_PID_RATE_P_MULTIPLIER = 31, so kP = mc_p_roll / 31 units per °/s, and P = kP · error. For I the divisor is 4, for D — 1905, for CD — 7270."
+  },
+  {
+   "id": "tpa-kp",
+   "title": "The P gain with TPA",
+   "statement": "`mc_p_pitch = {p}`, `tpa_rate = {t}`, `tpa_breakpoint = {b}`. Throttle **{thr}**, maximum throttle 2000. Find the effective pitch kP, in units per °/s.",
+   "params": {
+    "p": {
+     "min": 30,
+     "max": 80,
+     "step": 2
+    },
+    "t": [
+     10,
+     20,
+     30,
+     40,
+     50
+    ],
+    "b": [
+     1400,
+     1500,
+     1600
+    ],
+    "thr": [
+     1650,
+     1700,
+     1800,
+     1900
+    ]
+   },
+   "answer": "p/31*(100 - t*(thr - b)/(2000 - b))/100",
+   "unit": "units/(°/s)",
+   "tol": 0.01,
+   "solution": "`calculateMultirotorTPAFactor`: factor = (100 − tpa_rate · (throttle − breakpoint) / (2000 − breakpoint)) / 100 at a throttle above the breakpoint. kP = mc_p / 31 · factor. On a multirotor TPA attenuates P, D and CD but not I. `tpa_rate` must not be set above 100 on a multirotor: the factor at high throttle becomes negative, and P and D change sign."
+  },
+  {
+   "id": "rate-curve",
+   "title": "Rotation rate from the stick position",
+   "statement": "`roll_rate = {r}`, `rc_expo = {ex}`. The roll stick is deflected by **{x}** of full travel (after the deadband). Find the roll rate setpoint, °/s.",
+   "params": {
+    "r": [
+     20,
+     30,
+     36,
+     40,
+     50,
+     60,
+     75
+    ],
+    "ex": [
+     0,
+     20,
+     40,
+     60,
+     70,
+     85
+    ],
+    "x": [
+     0.2,
+     0.4,
+     0.5,
+     0.6,
+     0.8
+    ]
+   },
+   "answer": "round((2500 + ex*((5*x)**2 - 25))*(5*x)/25)/500*r*10",
+   "unit": "°/s",
+   "tol": 0.02,
+   "abs": 1.0,
+   "solution": "`rc_curves.c`: rcCommand = lrint(500 · s · (1 − e · (1 − s²))), e = rc_expo / 100; then ω = rcCommand / 500 · roll_rate · 10. The rate is in tens of °/s; expo changes the shape of the curve but not the maximum. An answer without rounding rcCommand to an integer differs by no more than 1 °/s — it is accepted too."
+  },
+  {
+   "id": "ez-pitch-p",
+   "title": "EZ Tune: pitch P from the sliders",
+   "statement": "EZ Tune is enabled: `ez_response = {r}`, `ez_axis_ratio = {a}`. What value of `mc_p_pitch` does the firmware write?",
+   "params": {
+    "r": [
+     60,
+     70,
+     80,
+     90,
+     100,
+     110,
+     115,
+     120,
+     130,
+     140
+    ],
+    "a": [
+     100,
+     105,
+     110,
+     115,
+     120,
+     125,
+     130
+    ]
+   },
+   "answer": "math.floor(40*r*a/10000)",
+   "unit": "",
+   "tol": 0.001,
+   "abs": 0.4,
+   "solution": "`ez_tune.c`: roll P = 40 · response / 100, pitch P = 40 · response / 100 · axis_ratio / 100; the result is written to an integer, and the fractional part is dropped. The base for I is 75, for D — 23, for CD — 100."
+  },
+  {
+   "id": "nav-accel",
+   "title": "The horizontal acceleration limit in navigation",
+   "statement": "`nav_mc_bank_angle = {b}`, and `max_angle_inclination_rll` and `max_angle_inclination_pit` are greater than it. What is the largest horizontal acceleration navigation can request without losing altitude, in m/s²? (g = 9.80665)",
+   "params": {
+    "b": {
+     "min": 15,
+     "max": 45,
+     "step": 1
+    }
+   },
+   "answer": "9.80665*math.tan(math.radians(b))",
+   "unit": "m/s²",
+   "tol": 0.01,
+   "solution": "Navigation converts acceleration to an angle: θ = atan(a / g), so a_max = g · tan θ. At 35° that is 6.87 m/s²; at 45° — 9.81 m/s², which is also the hard limit of the code (980 cm/s²)."
+  },
+  {
+   "id": "brake-distance",
+   "title": "Braking distance and the stop point",
+   "statement": "The aircraft flies at **{v} m/s**, `nav_mc_bank_angle = {b}`, `nav_mc_pos_deceleration_time = {t}`. Assuming that it brakes at once with the maximum acceleration g · tan θ, find by how many meters the stop target (velocity × time) is farther than the minimum braking distance. A negative answer means that the aircraft overshoots the target. (g = 9.80665)",
+   "params": {
+    "v": {
+     "min": 4,
+     "max": 20,
+     "step": 1
+    },
+    "b": [
+     20,
+     25,
+     30,
+     35,
+     40
+    ],
+    "t": [
+     60,
+     90,
+     120,
+     150,
+     180
+    ]
+   },
+   "answer": "v*t/100 - v*v/(2*9.80665*math.tan(math.radians(b)))",
+   "unit": "m",
+   "tol": 0.02,
+   "abs": 0.1,
+   "solution": "The target is placed v · nav_mc_pos_deceleration_time / 100 meters ahead. The minimum distance at a constant deceleration a = g · tan θ is v² / (2a). The difference is the margin; the real distance is longer than the calculated one because the acceleration builds up with the jerk limit of 1700 cm/s³."
+  }
+ ]
+}

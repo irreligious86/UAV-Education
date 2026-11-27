@@ -1,0 +1,224 @@
+{
+ "module": "inav-telemetry-gcs",
+ "tasks": [
+  {
+   "id": "serial-mask",
+   "title": "The port function mask",
+   "statement": "One INAV 9.1.0 UART needs two functions: bit **{a}** and bit **{b}** from the table of `io/serial.h`. What number do you write as the second field of the `serial` line?",
+   "params": {
+    "a": [
+     0,
+     6
+    ],
+    "b": [
+     4,
+     9
+    ]
+   },
+   "answer": "2**a + 2**b",
+   "unit": "",
+   "tol": 1e-09,
+   "abs": 0.5,
+   "solution": "The mask is the sum of 2^bit. Bit 0 is MSP (1), bit 6 is RX_SERIAL (64), bit 4 is LTM (16), bit 9 is IBUS (512). All four combinations are allowed: MSP shares a port with telemetry, the receiver — with LTM or IBUS."
+  },
+  {
+   "id": "msp-ports",
+   "title": "How many MSP ports can be added",
+   "statement": "In a `serial` dump the port masks are: 1, **{m1}**, 64, **{m2}**, 2, **{m3}**. How many more ports can be given to MSP without exceeding the INAV 9.1.0 limit? If the limit is already exceeded, the answer is negative.",
+   "params": {
+    "m1": [
+     16,
+     17,
+     256,
+     257
+    ],
+    "m2": [
+     32,
+     33,
+     128,
+     129
+    ],
+    "m3": [
+     1,
+     512,
+     513,
+     33554432
+    ]
+   },
+   "answer": "3 - (1 + m1 % 2 + m2 % 2 + m3 % 2)",
+   "unit": "",
+   "tol": 1e-09,
+   "abs": 0.5,
+   "solution": "MSP is bit 0, that is, an odd mask. There are no more than three ports with MSP (`MAX_MSP_PORT_COUNT`), and USB VCP counts. The answer = 3 − the number of odd masks; a negative answer means that on saving the port table is reset to the default."
+  },
+  {
+   "id": "mavlink-budget",
+   "title": "The nominal MAVLink budget",
+   "statement": "INAV 9.1.0, MAVLink 2: `mavlink_ext_status_rate = {e}`, `mavlink_rc_chan_rate = {c}`, `mavlink_pos_rate = {p}`, `mavlink_extra1_rate = {a}`, `mavlink_extra2_rate = {h}`, `mavlink_extra3_rate = {b}`. Find the nominal budget of the stream, in bytes/s (the frame lengths are from the module, without STATUSTEXT).",
+   "params": {
+    "e": [
+     0,
+     1,
+     2,
+     4
+    ],
+    "c": [
+     0,
+     1,
+     2
+    ],
+    "p": [
+     0,
+     1,
+     2,
+     5
+    ],
+    "a": [
+     1,
+     2,
+     5,
+     10
+    ],
+    "h": [
+     0,
+     1,
+     2,
+     5
+    ],
+    "b": [
+     0,
+     1,
+     2
+    ]
+   },
+   "answer": "55*e + 54*c + 136*p + 40*a + 32*h + 94*b + 45",
+   "unit": "bytes/s",
+   "tol": 0.001,
+   "abs": 0.5,
+   "solution": "Budget = 55·ext + 54·rc + 136·pos + 40·extra1 + 32·extra2 + 94·extra3 + 45. 136 is the three position messages (64 + 40 + 32), 94 is BATTERY_STATUS and SCALED_PRESSURE, 45 is HEARTBEAT and SYSTEM_TIME once a second."
+  },
+  {
+   "id": "mavlink-real-rate",
+   "title": "The real stream rate",
+   "statement": "An INAV 9.1.0 MAVLink stream is set to **{r} Hz**, and no `RADIO_STATUS` arrives on the port. At what rate does the message actually go, in Hz?",
+   "params": {
+    "r": [
+     1,
+     2,
+     3,
+     4,
+     5,
+     8,
+     10,
+     15,
+     20,
+     25,
+     30,
+     50
+    ]
+   },
+   "answer": "50/(math.floor(50/r) + 1)",
+   "unit": "Hz",
+   "tol": 0.01,
+   "abs": 0.01,
+   "solution": "The counter is loaded with ⌊50 / r⌋ and fires on the call after zero, and the calls come once every 20 ms: f = 50 / (⌊50 / r⌋ + 1). For 10 Hz that is 8.33 Hz, and it never exceeds 25 Hz."
+  },
+  {
+   "id": "override-mask",
+   "title": "The msp_override_channels mask",
+   "statement": "A script over MSP has to control the channels **CH{c1}**, **CH{c2}** and **CH{c3}**. What is `msp_override_channels`?",
+   "params": {
+    "c1": [
+     1,
+     2,
+     3
+    ],
+    "c2": [
+     4,
+     5,
+     6,
+     7
+    ],
+    "c3": [
+     8,
+     9,
+     10,
+     12,
+     13,
+     16
+    ]
+   },
+   "answer": "2**(c1-1) + 2**(c2-1) + 2**(c3-1)",
+   "unit": "",
+   "tol": 1e-09,
+   "abs": 0.5,
+   "solution": "Bit = channel number − 1: CH1 (roll) is bit 0, CH4 (throttle) is bit 3, CH5 (AUX1) is bit 4. The mask is the sum of 2^(n − 1). The firmware itself excludes the channel that carries the `MSP RC OVERRIDE` mode."
+  },
+  {
+   "id": "override-hold",
+   "title": "How long the override holds after the script stops",
+   "statement": "`failsafe_delay = {d}`. A script stopped sending `MSP_SET_RAW_RC`, and the main receiver is connected. After how many milliseconds do the overridden channels return to the pilot?",
+   "params": {
+    "d": {
+     "min": 0,
+     "max": 30,
+     "step": 1
+    }
+   },
+   "answer": "400 + 100*d",
+   "unit": "ms",
+   "tol": 0.001,
+   "abs": 20,
+   "solution": "200 ms is the signal timeout of the MSP receiver (5 Hz), then the failure period of 200 ms + `failsafe_delay` × 100 ms: T = 400 + 100 · failsafe_delay. At the default 5 — 900 ms, and all that time the last values of the script are in effect."
+  },
+  {
+   "id": "elrs-downlink",
+   "title": "ELRS telemetry bandwidth",
+   "statement": "ELRS 4.1.0, an ordinary (not Full) mode at **{f} Hz**, a telemetry ratio of 1:**{n}**. How many bytes/s of payload go down by the formula from the module (integer division)?",
+   "params": {
+    "f": [
+     50,
+     150,
+     250,
+     500
+    ],
+    "n": [
+     2,
+     4,
+     8,
+     16,
+     32,
+     64
+    ]
+   },
+   "answer": "(40 * max(1, math.floor(512*f/n/1000) - (1 if math.floor(512*f/n/1000) > 1 else 0)) * f // n // (max(1, math.floor(512*f/n/1000) - (1 if math.floor(512*f/n/1000) > 1 else 0)) + 1)) / 8",
+   "unit": "bytes/s",
+   "tol": 0.01,
+   "abs": 0.2,
+   "solution": "burst = ⌊512 · f / N / 1000⌋ − 1, but no less than 1; bit/s = 5 · 8 · burst · f / N / (burst + 1) with integer division; bytes/s = bit/s / 8. The factor burst / (burst + 1) is the link statistics slot. 250 Hz, 1:64: burst 1, 78 bit/s, 9.75 bytes/s."
+  },
+  {
+   "id": "ltm-fit",
+   "title": "LTM headroom on the port baud rate",
+   "statement": "LTM with a schedule of **{s}** bytes/s goes through a port at **{b}** baud (8N1, 10 bits per byte). What share of the port capacity does it take, in %?",
+   "params": {
+    "s": [
+     303,
+     164,
+     105
+    ],
+    "b": [
+     4800,
+     9600,
+     19200,
+     57600
+    ]
+   },
+   "answer": "s/(b/10)*100",
+   "unit": "%",
+   "tol": 0.01,
+   "abs": 0.05,
+   "solution": "The port carries b / 10 bytes/s. 303 bytes/s is NORMAL, 164 is MEDIUM, 105 is SLOW. At 2400 baud the firmware itself replaces NORMAL with MEDIUM, at 1200 — any schedule with SLOW."
+  }
+ ]
+}

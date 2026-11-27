@@ -3,7 +3,7 @@
   "pass": 80,
   "questions": [
     {
-      "q": "Мотор стоит справа-сзади, проп вращается по часовой (вид сверху). Какая строка mmix ему соответствует в INAV?",
+      "q": "A motor is at the rear right, and its prop spins clockwise (top view). Which mmix line corresponds to it in INAV?",
       "options": [
         "mmix 0 1.000 1.000 1.000 1.000",
         "mmix 0 1.000 -1.000 1.000 -1.000",
@@ -11,32 +11,32 @@
         "mmix 0 1.000 1.000 -1.000 -1.000"
       ],
       "answer": 1,
-      "explain": "Правый мотор замедляется при крене вправо — roll отрицательный. Задний ускоряется при опускании носа — pitch положительный. Положительный yaw получает проп, вращающийся против часовой; здесь по часовой — yaw −1. Это строка REAR_R пресета Quad X."
+      "explain": "A right motor slows down on a roll to the right — roll is negative. A rear one speeds up when the nose goes down — pitch is positive. A positive yaw goes to a prop that spins counterclockwise; here it is clockwise — yaw −1. This is the REAR_R line of the Quad X preset."
     },
     {
-      "q": "В профиле миксера стоит строка mmix 4 -1.200 0 0 0. Что делает мотор 4?",
+      "q": "A mixer profile has the line mmix 4 -1.200 0 0 0. What does motor 4 do?",
       "options": [
-        "Крутится в обратную сторону на 120 % газа, если включена REVERSIBLE_MOTORS",
-        "Всегда стоит: любое отрицательное значение throttle работает только как пустышка",
-        "Стоит, а при активном MIXER TRANSITION выдаёт 1200 мкс",
-        "Получает 20 % от газа стика в любом режиме и в любом профиле"
+        "It spins in reverse at 120 % throttle if REVERSIBLE_MOTORS is enabled",
+        "It is always stopped: any negative throttle value works only as a placeholder",
+        "It is stopped, and with MIXER TRANSITION active it outputs 1200 µs",
+        "It gets 20 % of the stick throttle in any mode and in any profile"
       ],
       "answer": 2,
-      "explain": "mixer.c: throttle ≤ 0 — мотор остановлен; при переходном смешивании и −2.0 ≤ throttle ≤ −1.05 мотор получает −throttle × 1000 = 1200 мкс. Пустышка без раскрутки — значения между −1.05 и 0, обычно −1."
+      "explain": "mixer.c: throttle ≤ 0 — the motor is stopped; with transition mixing and −2.0 ≤ throttle ≤ −1.05 the motor gets −throttle × 1000 = 1200 µs. A placeholder without spin-up is a value between −1.05 and 0, usually −1."
     },
     {
-      "q": "Конфигурация: servo 3 1100 1900 1520 100 и одно правило smix 0 3 0 100 0 -1. Стабилизированный крен равен +250. Импульс сервы:",
+      "q": "The configuration: servo 3 1100 1900 1520 100 and one rule smix 0 3 0 100 0 -1. Stabilized roll is +250. The servo pulse:",
       "options": [
-        "1770 мкс",
-        "1710 мкс",
-        "1750 мкс",
-        "1900 мкс"
+        "1770 µs",
+        "1710 µs",
+        "1750 µs",
+        "1900 µs"
       ],
       "answer": 1,
-      "explain": "Сумма 250, rate 100 %. Положительная ветка масштабируется на (max − mid)/500 = 380/500 = 0.76: 250 × 0.76 = 190, итог 1520 + 190 = 1710. Вариант 1770 получается, если забыть масштаб концов."
+      "explain": "The sum is 250, rate 100 %. The positive branch is scaled by (max − mid)/500 = 380/500 = 0.76: 250 × 0.76 = 190, the result is 1520 + 190 = 1710. The 1770 option comes from forgetting the endpoint scaling."
     },
     {
-      "q": "Плата: S1–S2 на TIM8, S3–S4 на TIM1, S5–S8 на TIM2, S9 на TIM12, S10 на TIM13, S11 на TIM4; все timer_output_mode = AUTO. Миксер требует 5 моторов. Сколько выходов останется сервам?",
+      "q": "A board: S1–S2 on TIM8, S3–S4 on TIM1, S5–S8 on TIM2, S9 on TIM12, S10 on TIM13, S11 on TIM4; all timer_output_mode = AUTO. The mixer requires 5 motors. How many outputs are left for the servos?",
       "options": [
         "6",
         "7",
@@ -44,75 +44,75 @@
         "2"
       ],
       "answer": 2,
-      "explain": "Прошивка забирает под моторы таймеры целиком: TIM8 и TIM1 дают 4 выхода, пятый мотор занимает TIM2, и S6–S8 тоже становятся моторными. Сервам остаются S9, S10, S11."
+      "explain": "The firmware takes whole timers for the motors: TIM8 and TIM1 give 4 outputs, the fifth motor takes TIM2, and S6–S8 become motor outputs too. The servos are left with S9, S10, S11."
     },
     {
-      "q": "Почему мотор на DShot и серва 50 Гц не могут сидеть на каналах одного таймера?",
+      "q": "Why can a DShot motor and a 50 Hz servo not sit on channels of the same timer?",
       "options": [
-        "У таймера один счётчик и один период на все каналы",
-        "Серва потребляет слишком большой ток с ножки микроконтроллера",
-        "DShot занимает оба канала DMA микроконтроллера целиком",
-        "INAV запрещает это только на платах F4, на H7 ограничения нет"
+        "A timer has one counter and one period for all its channels",
+        "A servo draws too much current from the microcontroller pin",
+        "DShot takes both DMA channels of the microcontroller entirely",
+        "INAV forbids this only on F4 boards, there is no limit on H7"
       ],
       "answer": 0,
-      "explain": "Каналы таймера отличаются только значением сравнения; предделитель и период общие. Серво-таймер настраивается на период 1 МГц / servo_pwm_rate, моторный — на битовую частоту DShot, поэтому INAV раздаёт функции целыми таймерами."
+      "explain": "The channels of a timer differ only in the compare value; the prescaler and the period are shared. A servo timer is set to a period of 1 MHz / servo_pwm_rate, a motor timer — to the DShot bit rate, so INAV assigns functions to whole timers."
     },
     {
-      "q": "Правила smix с входами 12 и 13 записаны, серва подвеса исправна и стоит в центре, но на наклон рамы не реагирует. Самая вероятная причина:",
+      "q": "smix rules with inputs 12 and 13 are written, the gimbal servo works and sits at center, but it does not respond to the tilt of the frame. The most likely cause:",
       "options": [
-        "Не включён режим CAMSTAB",
-        "Не назначена функция порта GIMBAL",
-        "servo_lpf_hz равен 20 Гц",
-        "Не задан gimbal_tilt_channel"
+        "The CAMSTAB mode is not enabled",
+        "The GIMBAL port function is not assigned",
+        "servo_lpf_hz is 20 Hz",
+        "gimbal_tilt_channel is not set"
       ],
       "answer": 0,
-      "explain": "servos.c: входы GIMBAL PITCH и GIMBAL ROLL отличны от нуля только при активном режиме CAMSTAB. Функция порта GIMBAL и gimbal_*_channel относятся к серийному подвесу, а не к серво-миксеру."
+      "explain": "servos.c: the inputs GIMBAL PITCH and GIMBAL ROLL are non-zero only with the CAMSTAB mode active. The GIMBAL port function and gimbal_*_channel belong to the serial gimbal, not to the servo mixer."
     },
     {
-      "q": "В мультироторном профиле mixer_automated_switch = ON и mixer_switch_trans_timer = 35. Что произойдёт при RTH в 600 м от дома (nav_fw_loiter_radius = 7500)?",
+      "q": "In the multirotor profile mixer_automated_switch = ON and mixer_switch_trans_timer = 35. What happens on RTH 600 m from home (nav_fw_loiter_radius = 7500)?",
       "options": [
-        "Профиль сменится мгновенно: таймер действует только при ручном переходе тумблером",
-        "3.5 с переходного смешивания, затем самолётный профиль",
-        "35 с переходного смешивания с удержанием высоты, затем самолётный профиль",
-        "Ничего: автоматический переход работает только ближе 225 м от дома"
+        "The profile changes instantly: the timer applies only to a manual transition from the switch",
+        "3.5 s of transition mixing, then the airplane profile",
+        "35 s of transition mixing with altitude hold, then the airplane profile",
+        "Nothing: the automated transition works only closer than 225 m to home"
       ],
       "answer": 1,
-      "explain": "Порог — дальше 3 × 7500 см = 225 м, условие выполнено. Таймер задаётся в десятых долях секунды: 35 → 3.5 с. На это время включается переходное смешивание, затем профиль меняется и RTH продолжается."
+      "explain": "The threshold is farther than 3 × 7500 cm = 225 m, and the condition is met. The timer is set in tenths of a second: 35 → 3.5 s. Transition mixing is enabled for that time, then the profile changes and RTH continues."
     },
     {
-      "q": "Пилот в POSHOLD включает MIXER TRANSITION. Что делает толкающий мотор со строкой mmix 4 -1.300 0 0 0?",
+      "q": "In POSHOLD the pilot activates MIXER TRANSITION. What does the pusher motor with the line mmix 4 -1.300 0 0 0 do?",
       "options": [
-        "Выдаёт 1300 мкс, как и в любом другом режиме полёта",
-        "Выдаёт 300 мкс сверх холостого хода, пока активен режим",
-        "Остаётся остановленным",
-        "Профиль миксера сразу меняется на самолётный"
+        "It outputs 1300 µs, as in any other flight mode",
+        "It outputs 300 µs above idle while the mode is active",
+        "It stays stopped",
+        "The mixer profile changes to the airplane one at once"
       ],
       "answer": 2,
-      "explain": "mixer_profile.c: переходное смешивание активно только без навигации или в ALTHOLD. В POSHOLD, RTH и миссии запрос игнорируется, вход 38 равен 0, мотор с отрицательным throttle стоит."
+      "explain": "mixer_profile.c: transition mixing is active only without navigation or in ALTHOLD. In POSHOLD, RTH and a mission the request is ignored, input 38 is 0, and a motor with a negative throttle is stopped."
     },
     {
-      "q": "После обновления до INAV 9.1 строка set mixer_pid_profile_linking = ON из старого diff подсвечена ошибкой. Что делать?",
+      "q": "After an update to INAV 9.1 the line set mixer_pid_profile_linking = ON from an old diff is highlighted as an error. What do you do?",
       "options": [
-        "Удалить строку: в 9.x control-профиль всегда следует за профилем миксера",
-        "Заменить имя на mixer_control_profile_linking",
-        "Заменить на use_control_profile = 2 в профиле миксера",
-        "Перенести строку из блока mixer_profile в блок control_profile"
+        "Delete the line: in 9.x the control profile always follows the mixer profile",
+        "Replace the name with mixer_control_profile_linking",
+        "Replace it with use_control_profile = 2 in the mixer profile",
+        "Move the line from the mixer_profile block to the control_profile block"
       ],
       "answer": 1,
-      "explain": "В 9.0 настройка переименована в mixer_control_profile_linking, смысл и умолчание (OFF) прежние. use_control_profile — другая настройка, она живёт в батарейном профиле."
+      "explain": "In 9.0 the setting was renamed to mixer_control_profile_linking; the meaning and the default (OFF) are the same. use_control_profile is a different setting, and it lives in the battery profile."
     },
     {
-      "q": "Фрагмент самолётного профиля VTOL 4+1. После восстановления из `diff all` толкающий мотор исчез из конфигурации. Почему?",
+      "q": "A fragment of the airplane profile of a 4+1 VTOL. After a restore from `diff all` the pusher motor disappeared from the configuration. Why?",
       "kind": "apply",
       "fragment": "mixer_profile 1\nset platform_type = AIRPLANE\nmmix 0 0.000 0 0 0\nmmix 1 0.000 0 0 0\nmmix 2 0.000 0 0 0\nmmix 3 0.000 0 0 0\nmmix 4 1.000 0 0 0",
       "options": [
-        "Вывод mmix обрывается на первой строке с throttle 0",
-        "В профиле AIRPLANE допускается не больше четырёх строк mmix",
-        "Мотор с нулевыми roll, pitch и yaw считается неиспользуемым",
-        "diff не сохраняет mmix второго профиля миксера"
+        "The mmix output stops at the first line with throttle 0",
+        "The AIRPLANE profile allows no more than four mmix lines",
+        "A motor with zero roll, pitch and yaw is considered unused",
+        "diff does not save the mmix of the second mixer profile"
       ],
       "answer": 0,
-      "explain": "cli.c, printMotorMix: цикл прерывается на первой строке с throttle == 0. Остановленные моторы перед рабочим нужно записывать пустышкой −1.000, тогда все строки попадут в diff."
+      "explain": "cli.c, printMotorMix: the loop breaks at the first line with throttle == 0. Stopped motors before a working one have to be written as the −1.000 placeholder, and then all the lines get into the diff."
     }
   ]
 }

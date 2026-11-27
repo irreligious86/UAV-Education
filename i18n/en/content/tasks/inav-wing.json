@@ -1,0 +1,54 @@
+{
+  "module": "inav-wing",
+  "tasks": [
+    {
+      "id": "nav-throttle",
+      "title": "Fixed-wing throttle in navigation",
+      "statement": "`nav_fw_cruise_thr` = **{c}**, `nav_fw_pitch2thr` = **{k}**, `nav_fw_min_thr` = 1200, `nav_fw_max_thr` = 1700. Navigation commands a pitch of **{a}°** (plus — climb, minus — dive). What throttle does INAV set?",
+      "params": {
+        "c": [
+          1350,
+          1400,
+          1450,
+          1500
+        ],
+        "k": [
+          5,
+          10,
+          15,
+          20
+        ],
+        "a": [
+          -15,
+          -10,
+          -5,
+          5,
+          10,
+          15,
+          20
+        ]
+      },
+      "answer": "min(max(c + k*a, 1200), 1700)",
+      "unit": "",
+      "tol": 0.0005,
+      "abs": 0.5,
+      "solution": "Throttle = `nav_fw_cruise_thr` + `nav_fw_pitch2thr` · the pitch in degrees, and the result is limited to the range `nav_fw_min_thr`…`nav_fw_max_thr`. At the defaults a 20° climb gives 1600, a 15° dive — 1250; with `pitch2thr` = 20 both values hit the limits 1700 and 1200."
+    },
+    {
+      "id": "loiter-length",
+      "title": "Length of the loiter circle",
+      "statement": "`nav_fw_loiter_radius = {r}`. What distance (m) does the wing cover in one circle?",
+      "params": {
+        "r": {
+          "min": 5000,
+          "max": 12000,
+          "step": 500
+        }
+      },
+      "answer": "2*math.pi*r/100",
+      "unit": "m",
+      "tol": 0.01,
+      "solution": "The radius is in centimeters: r/100 meters. The circumference is 2π · R; for the default 7500 cm — 2π · 75 = 471 m."
+    }
+  ]
+}

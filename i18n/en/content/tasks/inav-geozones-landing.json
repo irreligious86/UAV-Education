@@ -1,0 +1,161 @@
+{
+  "module": "inav-geozones-landing",
+  "tasks": [
+    {
+      "id": "deg-to-int",
+      "title": "Degrees to a CLI integer",
+      "statement": "A map shows the latitude **{d}.{f}°** (six decimal places). As what integer do you write it in `safehome` or `geozone vertex`?",
+      "params": {
+        "d": [
+          43,
+          48,
+          50,
+          51,
+          54,
+          55,
+          59
+        ],
+        "f": {
+          "min": 100000,
+          "max": 999999,
+          "step": 1
+        }
+      },
+      "answer": "d*10000000+f*10",
+      "unit": "",
+      "tol": 1e-09,
+      "abs": 0.5,
+      "solution": "Coordinates in INAV are degrees × 10⁷ as an integer: pad the fractional part with zeros to seven digits and remove the point. 50.001260° → 500012600. Six digits without padding give a number ten times smaller — a point at 5° of latitude instead of 50°."
+    },
+    {
+      "id": "east-offset",
+      "title": "Longitude offset in meters",
+      "statement": "The origin is at latitude **{lat}°**. A zone vertex differs from it in longitude by **{d}** CLI units (degrees × 10⁷). How many meters east of it is the vertex?",
+      "params": {
+        "lat": [
+          40,
+          45,
+          50,
+          55,
+          60
+        ],
+        "d": {
+          "min": 5000,
+          "max": 60000,
+          "step": 1000
+        }
+      },
+      "answer": "d*0.01113195*math.cos(math.radians(lat))",
+      "unit": "m",
+      "tol": 0.01,
+      "solution": "E = Δlon × 1.113195 cm × cos(latitude). At 50° one unit is 0.716 cm: 42000 units give 300.5 m. Without the cosine you get the distance along latitude, which at 50° is 1.56 times larger."
+    },
+    {
+      "id": "circle-margin",
+      "title": "A circular zone: inside or outside",
+      "statement": "A circular NFZ: the line `geozone vertex <id> 1` contains **{r}**. The aircraft is north of the center by **{a}** units of latitude and east of it by **{b}** units of longitude (the latitude of the place is 50°, cos 50° = 0.64279). How many meters is it from the aircraft to the zone border? Inside the zone give the answer with a plus sign, outside — with a minus.",
+      "params": {
+        "r": [
+          6000,
+          8000,
+          10000,
+          12000,
+          15000
+        ],
+        "a": {
+          "min": -12000,
+          "max": 12000,
+          "step": 1500
+        },
+        "b": {
+          "min": -16000,
+          "max": 16000,
+          "step": 2000
+        }
+      },
+      "answer": "r/100 - math.hypot(a*0.01113195, b*0.01113195*0.64279)",
+      "unit": "m",
+      "tol": 0.01,
+      "abs": 0.3,
+      "solution": "For a circle vertex 1 holds the radius in centimeters: r/100 meters. N = a × 0.01113195 m, E = b × 0.01113195 × 0.64279 m, the distance to the center is √(N² + E²). Margin = radius − distance; the aircraft is inside while the distance is strictly less than the radius (and the altitude is within the range of the zone)."
+    },
+    {
+      "id": "glide-angle",
+      "title": "Autoland glide slope",
+      "statement": "`fwapproach`: approach alt = **{h}** cm, land alt = 0. `nav_fw_land_approach_length = {l}`. Find the slope of the target trajectory on the final leg in degrees.",
+      "params": {
+        "h": [
+          3000,
+          4000,
+          4500,
+          5000,
+          6000
+        ],
+        "l": {
+          "min": 30000,
+          "max": 60000,
+          "step": 2500
+        }
+      },
+      "answer": "math.degrees(math.atan(2*(h//3*2)/(1.8*l)))",
+      "unit": "°",
+      "tol": 0.01,
+      "solution": "h_fa = approach alt / 3 × 2 in integers (5000 gives 3332). The final leg goes from h_fa to −h_fa and reaches the target when 10 % of 2L is left: tan γ = 2 × h_fa / (1.8 × L). For 5000 and 40000 — 5.29°. The answer atan(h_fa / L) understates the angle by a factor of 1.11."
+    },
+    {
+      "id": "motor-cut",
+      "title": "Where the motor is cut",
+      "statement": "approach alt = **{h}** cm, land alt = 0, `nav_fw_land_approach_length = {l}`, `nav_fw_land_glide_alt = {g}`. How many meters before the safehome point does the target trajectory come down to the glide altitude, cutting the motor?",
+      "params": {
+        "h": [
+          3000,
+          4500,
+          5000,
+          6000
+        ],
+        "l": {
+          "min": 30000,
+          "max": 60000,
+          "step": 5000
+        },
+        "g": [
+          200,
+          300,
+          500
+        ]
+      },
+      "answer": "l/100*(0.1+0.9*g/(h//3*2))",
+      "unit": "m",
+      "tol": 0.01,
+      "solution": "The slope k = 2 × h_fa / (1.8 × L). From `WP_FINAL_APPROACH` to the glide altitude: (h_fa − g) / k. What is left to the safehome is L − (h_fa − g) / k = L × (0.1 + 0.9 × g / h_fa). For 5000, 40000 and 200: 400 × (0.1 + 0.054) = 61.6 m."
+    },
+    {
+      "id": "tailwind",
+      "title": "Tailwind component",
+      "statement": "The wind blows **from {w}°** at **{v} m/s**. The wing lands on a heading of **{c}°**. Find the tailwind component (m/s); write a headwind with a minus sign.",
+      "params": {
+        "w": {
+          "min": 0,
+          "max": 350,
+          "step": 10
+        },
+        "v": {
+          "min": 1,
+          "max": 8,
+          "step": 0.5
+        },
+        "c": [
+          90,
+          180,
+          270,
+          360
+        ]
+      },
+      "answer": "-v*math.cos(math.radians(w-c))",
+      "unit": "m/s",
+      "tol": 0.02,
+      "abs": 0.05,
+      "solution": "The headwind component = V × cos(the “from” direction − the heading), and the tailwind component is the same with the opposite sign. Wind from 120°, heading 270°: −V × cos(−150°) = +0.87 V. INAV compares with `nav_fw_land_max_tailwind` not this component but the full wind speed: below the threshold the wind is simply ignored."
+    }
+  ]
+}

@@ -3,18 +3,18 @@
   "pass": 80,
   "questions": [
     {
-      "q": "Левый элевон отклоняется неверно и на стик крена, и на стик тангажа. Правильное исправление в INAV:",
+      "q": "The left elevon deflects the wrong way on both the roll stick and the pitch stick. The correct fix in INAV:",
       "options": [
-        "Включить реверс канала крена на пульте",
-        "Отрицательный rate в команде servo этой сервы",
-        "Сменить знак веса крена в smix этой сервы",
-        "Поменять местами разъёмы левой и правой сервы на плате"
+        "Enable roll channel reverse on the radio",
+        "A negative rate in the servo command of this servo",
+        "Change the sign of the roll weight in the smix of this servo",
+        "Swap the connectors of the left and right servos on the board"
       ],
       "answer": 1,
-      "explain": "Если серва ошибается по обеим осям, развернуть нужно её целиком: rate со знаком минус. Знак веса в smix меняют, когда ошибка только по одной оси. Реверс на пульте ломает согласие между стабилизацией и стиком."
+      "explain": "If a servo is wrong on both axes, it has to be reversed as a whole: rate with a minus sign. The sign of a weight in smix is changed when the error is on one axis only. A reverse on the radio breaks the agreement between stabilization and the stick."
     },
     {
-      "q": "OSD показывает 16.08 В, мультиметр — 16.42 В, текущий vbat_scale = 1100. Новое значение:",
+      "q": "The OSD shows 16.08 V, the multimeter — 16.42 V, the current vbat_scale = 1100. The new value:",
       "options": [
         "1077",
         "1134",
@@ -22,10 +22,10 @@
         "1046"
       ],
       "answer": 2,
-      "explain": "В battery.c напряжение пропорционально vbat_scale: 1100 × 16.42 / 16.08 ≈ 1123."
+      "explain": "In battery.c the voltage is proportional to vbat_scale: 1100 × 16.42 / 16.08 ≈ 1123."
     },
     {
-      "q": "За полёт полётник насчитал 2860 мА·ч, зарядка залила 3180 мА·ч, current_meter_scale = 250. Новое значение:",
+      "q": "Over the flight the flight controller counted 2860 mAh, the charger put in 3180 mAh, current_meter_scale = 250. The new value:",
       "options": [
         "278",
         "225",
@@ -33,64 +33,64 @@
         "310"
       ],
       "answer": 1,
-      "explain": "Ток в INAV обратно пропорционален scale (микровольты / scale), отсюда формула Battery.md: 250 × 2860 / 3180 ≈ 225. Полётник недосчитал, значит, scale уменьшается."
+      "explain": "The current in INAV is inversely proportional to scale (microvolts / scale), hence the Battery.md formula: 250 × 2860 / 3180 ≈ 225. The flight controller undercounted, so scale decreases."
     },
     {
-      "q": "Зачем крылу failsafe_throttle_low_delay = 0?",
+      "q": "Why does a wing need failsafe_throttle_low_delay = 0?",
       "options": [
-        "Чтобы мотор не останавливался посреди процедуры RTH над домом",
-        "Чтобы на нуле газа в планировании failsafe не дизармил крыло как стоящее на земле",
-        "Чтобы failsafe срабатывал сразу, минуя задержку failsafe_delay в 0.5 с",
-        "Чтобы автозапуск не включался повторно при кратковременной потере связи"
+        "So that the motor does not stop in the middle of the RTH procedure over home",
+        "So that at zero throttle in a glide failsafe does not disarm the wing as if it were on the ground",
+        "So that failsafe triggers at once, skipping the 0.5 s failsafe_delay",
+        "So that autolaunch is not enabled again on a brief link loss"
       ],
       "answer": 1,
-      "explain": "Если газ был внизу дольше этой задержки, INAV считает аппарат приземлившимся и просто дизармит его. Крыло планирует на нуле газа, поэтому проверку отключают (Failsafe.md)."
+      "explain": "If the throttle has been low for longer than this delay, INAV considers the aircraft landed and simply disarms it. A wing glides at zero throttle, so the check is turned off (Failsafe.md)."
     },
     {
-      "q": "nav_fw_loiter_radius = 3000, крейсер 15 м/с, nav_fw_bank_angle = 35°. Что будет над домом?",
+      "q": "nav_fw_loiter_radius = 3000, cruise 15 m/s, nav_fw_bank_angle = 35°. What happens over home?",
       "options": [
-        "Крыло удержит радиус 30 м с креном около 25° при любом ветре",
-        "Крыло перейдёт к посадке, так как радиус меньше минимальных 50 м",
-        "Нужен крен около 37°, это больше предела, круг выйдет шире 30 м",
-        "Прошивка временно поднимет nav_fw_bank_angle до 45° на время круга"
+        "The wing holds the 30 m radius with about 25° of bank in any wind",
+        "The wing goes on to land because the radius is below the 50 m minimum",
+        "About 37° of bank is needed, which is above the limit, and the circle comes out wider than 30 m",
+        "The firmware temporarily raises nav_fw_bank_angle to 45° for the circle"
       ],
       "answer": 2,
-      "explain": "tan φ = V²/(g·R) = 225/(9.81·30) ≈ 0.76, φ ≈ 37°. Крен ограничен 35°, поэтому радиус получится больше заданного."
+      "explain": "tan φ = V²/(g·R) = 225/(9.81·30) ≈ 0.76, φ ≈ 37°. The bank is limited to 35°, so the radius comes out larger than set."
     },
     {
-      "q": "Что меняет AUTO TUNE крыла в INAV 9.1 (pid_autotune.c)?",
+      "q": "What does fixed-wing AUTO TUNE change in INAV 9.1 (pid_autotune.c)?",
       "options": [
-        "Только FF и рейты по осям",
-        "P, I и D по всем трём осям",
-        "Центры серв и тример тангажа",
-        "Пороги автозапуска и газ крейсера"
+        "Only FF and the rates per axis",
+        "P, I and D on all three axes",
+        "The servo centers and the pitch trim",
+        "The autolaunch thresholds and the cruise throttle"
       ],
       "answer": 0,
-      "explain": "Код пишет pid[axis].FF и stabilized.rates[axis]. P и I настраиваются вручную; так же было в 8.0.1, а текст документации про PIFF исправлен в 9.1. Сохранять нужно после дизарма стик-командой."
+      "explain": "The code writes pid[axis].FF and stabilized.rates[axis]. P and I are tuned by hand; it was the same in 8.0.1, and the documentation text about PIFF was corrected in 9.1. You have to save after disarm with the stick command."
     },
     {
-      "q": "Servo autotrim (режим SERVO AUTOTRIM) отработал в полёте. Тумблер выключили ещё в воздухе, потом сели и дизармили. Результат:",
+      "q": "Servo autotrim (the SERVO AUTOTRIM mode) ran in flight. The switch was turned off while still in the air, then you landed and disarmed. The result:",
       "options": [
-        "Новые центры сохранены при дизарме",
-        "Сохранены центры, усреднённые за весь полёт",
-        "Вернулись старые центры, новые не сохранены",
-        "Центры сброшены на 1500 мкс"
+        "The new centers are saved on disarm",
+        "Centers averaged over the whole flight are saved",
+        "The old centers came back, the new ones are not saved",
+        "The centers are reset to 1500 µs"
       ],
       "answer": 2,
-      "explain": "В servos.c выход из режима в состоянии SAVE_PENDING восстанавливает servoMiddleBackup. Сохранение идёт только при дизарме с ещё включённым тумблером."
+      "explain": "In servos.c leaving the mode in the SAVE_PENDING state restores servoMiddleBackup. Saving happens only on a disarm with the switch still on."
     },
     {
-      "q": "Пресет Flying Wing правили вручную. Чем этот фрагмент опасен?",
+      "q": "The Flying Wing preset was edited by hand. Why is this fragment dangerous?",
       "kind": "apply",
       "fragment": "set platform_type = AIRPLANE\nsmix 0 1 0 50 0 -1\nsmix 1 1 1 50 0 -1\nsmix 2 2 0 -50 0 -1\nsmix 3 2 1 -50 0 -1\nservo 1 1000 2000 1500 100\nservo 2 1000 2000 1500 100",
       "options": [
-        "Веса по 50 % слишком малы, и рули не дойдут до упоров",
-        "На стик тангажа элевоны расходятся, как при крене",
-        "Серва 2 развёрнута по крену и по тангажу сразу",
-        "Не хватает правила smix для мотора"
+        "The 50 % weights are too small, and the surfaces will not reach the stops",
+        "On the pitch stick the elevons move apart, as for roll",
+        "Servo 2 is reversed in roll and in pitch at once",
+        "A smix rule for the motor is missing"
       ],
       "answer": 1,
-      "explain": "У пресета вес тангажа у обеих серв +50. Здесь у сервы 2 стоит −50: на стик тангажа элевоны идут в разные стороны, а это уже команда крена. Мотор задаётся mmix, а не smix."
+      "explain": "In the preset the pitch weight of both servos is +50. Here servo 2 has −50: on the pitch stick the elevons go in opposite directions, and that is already a roll command. The motor is set by mmix, not smix."
     }
   ]
 }

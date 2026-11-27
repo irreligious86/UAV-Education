@@ -1,0 +1,116 @@
+{
+ "module": "inav-cli-backup",
+ "pass": 80,
+ "questions": [
+  {
+   "q": "Profiles 1/1/1 are active. What does `diff` without arguments print in INAV 9.1.0?",
+   "options": [
+    "Only the `master` section, without a single profile — profiles are printed by `diff all`",
+    "The `master` section and one active profile of each kind",
+    "The `master` section and all 3 + 2 + 3 profiles",
+    "Only the settings changed since the last `save`"
+   ],
+   "answer": 1,
+   "explain": "In `printConfig()` with the `DUMP_MASTER` mask the branch “dump just the current profiles” is executed: master and the active control, mixer and battery profile are printed. All profiles and `defaults noreboot` come only from `diff all`."
+  },
+  {
+   "q": "How many profile selection commands (`control_profile N`, `mixer_profile N`, `battery_profile N`) are in the `diff all` of an H743 board with INAV 9.1.0?",
+   "options": [
+    "8",
+    "10",
+    "11",
+    "13"
+   ],
+   "answer": 2,
+   "explain": "There are 3 + 2 + 3 = 8 blocks, each preceded by its own selection command; at the end three more lines restore the original selection: 8 + 3 = 11. An F411 has one mixer profile, so there it is 7 + 3 = 10."
+  },
+  {
+   "q": "A file starts with `batch start`. On paste two lines gave `### ERROR: Invalid name`. What does the first `save` do?",
+   "options": [
+    "Refuses, prints the number of errors and resets batch mode",
+    "Saves everything except the two lines and reboots the board",
+    "Rolls the configuration back to the state before the paste and reboots",
+    "Saves the configuration but leaves the `SETTINGFAIL` flag until it is fixed"
+   ],
+   "answer": 0,
+   "explain": "With an active batch that has errors `cliSave()` prints “N ERRORS WERE DETECTED” and “PLEASE FIX ERRORS THEN 'SAVE'”, resets the batch and returns without writing. A second `save` will write — which is exactly why you must not type it without fixing the file."
+  },
+  {
+   "q": "You pasted a `diff all` with three control profiles, changed your mind and typed `exit`. Why did some settings change anyway?",
+   "options": [
+    "`exit` in INAV saves the configuration just like `save`",
+    "`batch start` writes every line at once",
+    "The profile selection commands write EEPROM themselves when the number changes",
+    "`defaults noreboot` at the start of the file had already erased the old config in RAM"
+   ],
+   "answer": 2,
+   "explain": "`control_profile`, `mixer_profile` and `battery_profile` call `set…ProfileAndWriteEEPROM`: on a change of index the current configuration is written. Only `defaults` and a restore from a backup undo such a paste."
+  },
+  {
+   "q": "Which line from an INAV 8.0.1 `diff all` gives `### ERROR: Invalid name` in 9.1.0 and is NOT fixed by the migration file `8_to_9.json` of Configurator 9.1.0?",
+   "options": [
+    "`set mixer_pid_profile_linking = ON`",
+    "`set controlrate_profile = 2`",
+    "`set osd_pan_servo_pwm2centideg = 18`",
+    "`set reboot_character = 114`"
+   ],
+   "answer": 3,
+   "explain": "The migration file renames the first three names. `reboot_character` was removed in 9.0, and the `removed` list in `8_to_9.json` is empty — the line stays red and is deleted by hand."
+  },
+  {
+   "q": "You saved a `diff all` from the CLI tab to a text file and gave it to the Restore Config button in Configurator 9.1. There is no migration window. Why?",
+   "options": [
+    "Migration works only for auto-backups named `UPDATE_…`",
+    "The Configurator reads the version from the line `# INAV/<target> 8.0.1`, and it is commented out",
+    "Migration is enabled only when flashing without Full chip erase",
+    "The file has no `# Version: X.Y.Z` line, and the backup version was not recognized"
+   ],
+   "answer": 3,
+   "explain": "`extractBackupVersion()` looks only for the pattern `# Version: …` from the header that the Configurator writes itself. Without it the migration chain is empty, and the file goes to the CLI as is."
+  },
+  {
+   "q": "Which calibrations get into an INAV 9.1.0 `diff all`?",
+   "options": [
+    "None: calibrations are stored separately from the settings and survive `defaults`",
+    "Only `vbat_scale` and `current_meter_scale`",
+    "The accelerometer, the compass, the gyro zeros, the voltage and current scales",
+    "Only the compass: `magzero_*` and `maggain_*`"
+   ],
+   "answer": 2,
+   "explain": "`acczero_*`, `accgain_*`, `magzero_*`, `maggain_*`, `gyro_zero_*`, `vbat_scale`, `current_meter_*` are ordinary settings of the master section. That is why they must not be moved to another board."
+  },
+  {
+   "q": "`status` showed `Arming disabled flags: NAV ARMSW CLI`. What do you do first?",
+   "options": [
+    "Flip the arm switch several times — `ARMSW` is the most important of the three",
+    "Reflash the board: `NAV` means a failure of the navigation core",
+    "Leave the CLI and turn the arm switch off, then deal with `NAV`",
+    "Calibrate the compass and the accelerometer"
+   ],
+   "answer": 2,
+   "explain": "`CLI` is set while the CLI is open. `ARMSW` appears when the switch is on during any other block and clears after it is turned off. `NAV` is left: no fix, a navigation mode is active or a mission error — an explanation is printed under the flag."
+  },
+  {
+   "q": "Why is `dump all` worse than `diff all` as a file for moving to a new major version?",
+   "options": [
+    "It does not contain the profiles, only master",
+    "It prints the settings in hexadecimal, and the CLI of the new version cannot parse them",
+    "It cannot be pasted into the CLI: the line format is different",
+    "It fixes all the old defaults in place and does not start with `defaults noreboot`"
+   ],
+   "answer": 3,
+   "explain": "`dump` prints every setting, including those equal to the default: after a paste the new 9.x defaults are overwritten with the old ones. `defaults noreboot` is printed only with `diff all`. `docs/Cli.md` also advises restoring from a `diff`."
+  },
+  {
+   "q": "The `resource` command in INAV 9.1.0:",
+   "options": [
+    "only shows which pin is used for what",
+    "reassigns the function of a pin, as in Betaflight",
+    "resets the timer assignments to the target defaults",
+    "shows free memory and the stack"
+   ],
+   "answer": 0,
+   "explain": "`cliResource()` prints the pin table and takes no arguments. The output assignment is changed through `timer_output_mode` and the Mixer tab or with a custom target."
+  }
+ ]
+}

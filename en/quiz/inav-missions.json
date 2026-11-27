@@ -8,13 +8,13 @@
         "Meters",
         "Degrees × 10⁷",
         "Radians",
-        "Decimal degrees"
+        "Degrees with a decimal point"
       ],
       "answer": 1,
       "explain": "123456789 = 12.3456789°."
     },
     {
-      "q": "What flag does the last point have?",
+      "q": "What flag does the last waypoint have?",
       "options": [
         "0",
         "1",
@@ -36,29 +36,29 @@
       "explain": "1 WAYPOINT, 3 POSHOLD_TIME, 4 RTH, 6 JUMP."
     },
     {
-      "q": "What does p1 set for an RTH point?",
+      "q": "What does p1 of an RTH waypoint set?",
       "options": [
-        "Speed",
-        "Landing permission",
-        "Time",
-        "Altitude in centimeters"
+        "The speed",
+        "Permission to land",
+        "The time",
+        "The altitude in centimeters"
       ],
       "answer": 1,
-      "explain": "For RTH, p1 > 0 enables landing at home; p1 is the speed in cm/s for a normal WAYPOINT."
+      "explain": "For RTH p1 > 0 allows landing at home; p1 sets the speed in cm/s for an ordinary WAYPOINT."
     },
     {
       "q": "Why does INAV block arming with a mission loaded?",
       "options": [
         "No compass",
-        "The first point is too far away",
-        "Missions are not allowed without a compass",
+        "The first waypoint is too far away",
+        "Missions are forbidden without a compass",
         "Not enough memory"
       ],
       "answer": 1,
-      "explain": "Protection against “yesterday's mission on a different field”."
+      "explain": "Protection against “yesterday's mission at a different field”."
     },
     {
-      "q": "How do you save the points to EEPROM?",
+      "q": "How do you save waypoints to EEPROM?",
       "options": [
         "save",
         "wp save",
@@ -66,29 +66,29 @@
         "wp reset"
       ],
       "answer": 1,
-      "explain": "wp save also saves any unsaved CLI settings."
+      "explain": "wp save also saves unsaved CLI settings."
     },
     {
       "q": "nav_wp_max_safe_distance = 100 means:",
       "options": [
         "The waypoint radius",
-        "The limit to the first point",
+        "The limit to the first waypoint",
         "The altitude",
         "The maximum mission length"
       ],
       "answer": 1,
-      "explain": "The first mission point must be closer than 100 m to the arming location: protection against “yesterday's mission”."
+      "explain": "The first waypoint of the mission must be closer than 100 m to the arming point: protection against “yesterday's mission”."
     },
     {
-      "q": "The waypoint acceptance radius nav_wp_radius for a wing compared to a copter:",
+      "q": "The waypoint radius nav_wp_radius for a fixed wing compared with a copter:",
       "options": [
         "Larger than for a copter: 10–30 m",
-        "Same as for a copter: about 1 m",
-        "Zero: a wing passes the point exactly",
+        "The same as for a copter: about 1 m",
+        "Zero: a fixed wing passes the waypoint exactly",
         "Smaller than for a copter: 10–30 cm"
       ],
       "answer": 0,
-      "explain": "A wing doesn't stop and turns along an arc: 1000–3000 cm instead of 100 cm for a copter."
+      "explain": "A fixed wing does not stop and turns on an arc: 1000–3000 cm instead of 100 cm for a copter."
     }
   ]
 }
