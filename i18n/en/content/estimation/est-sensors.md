@@ -52,7 +52,7 @@ Measures the magnetic field (µT or mGauss) on three axes; the heading is the pr
 - **Current-induced interference** (see the EMI module): depends on throttle → `compassmot`, `COMPASS_MOT_*`.
 - Compass orientation relative to the FC (`COMPASS_ORIENT`) — a common mistake with an external compass; ArduPilot can detect it automatically during calibration.
 
-{{diagram:compass-cal-choice-tree|В ArduPilot способ калибровки компаса задают два вопроса — можно ли вращать аппарат и зависит ли поле от газа; помеху от тока вычитают CompassMot или MagFit только после механики.}}
+{{diagram:compass-cal-choice-tree|In ArduPilot two questions set the compass calibration method — can you rotate the aircraft, and does the field depend on throttle; current interference is subtracted with CompassMot or MagFit only after the mechanics are fixed.}}
 
 ### Barometer (briefly; more in the altitude module)
 Pressure → altitude via the standard atmosphere; errors: temperature drift, prop airflow, weather (1–3 m drift in half an hour), solar heating. Resolution of good MEMS baros is ~10 cm, noise ~0.5 m unfiltered.

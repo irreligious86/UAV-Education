@@ -46,7 +46,7 @@ A regular node starts working as soon as it is launched. A lifecycle node (`rclp
 
 {{diagram:ros2-lifecycle|Lifecycle node states: configuration is separated from operation, pausing doesn't kill the process.}}
 
-{{diagram:ros2-executor-gaps|В одной группе с инференсом таймер уставок 20 Гц ждёт: зависание на 400 мс рвёт поток уставок на 400 мс; инференс в своей группе на втором потоке оставляет ровный шаг 50 мс.}}
+{{diagram:ros2-executor-gaps|In one group with inference the 20 Hz setpoint timer waits: a 400 ms hang breaks the setpoint stream for 400 ms; inference in its own group on a second thread leaves an even 50 ms step.}}
 
 ### Freshness watchdog
 Every input message has a maximum allowed age. The watchdog (`examples/ros2-docker/.../watchdog.py`, no ROS inside) stores the time of the last message for each input and outputs a single system level:

@@ -53,7 +53,7 @@ Frying a flight controller port is easier than it seems: 5 V on a 3.3 V pin, swa
 
 {{diagram:i2c-transaction|An I2C transaction bit by bit — exactly what the logic analyzer sees when “the sensor can't be found.”}}
 
-{{diagram:chart-i2c-pullup-window|Подтяжка должна лежать между красной линией (0.97 кОм) и кривой режима: при 100 пФ одиночные 4.7 кОм для 400 кГц слишком слабы, а две параллельные (2.35 кОм) — в окне.}}
+{{diagram:chart-i2c-pullup-window|The pull-up must lie between the red line (0.97 kΩ) and the mode's curve: at 100 pF a single 4.7 kΩ is too weak for 400 kHz, while two in parallel (2.35 kΩ) are inside the window.}}
 
 ### DroneCAN: when and how
 When: the aircraft is large (long wires → UART/I2C pick up noise), there are many devices, you need ESC and sensor telemetry on one bus, redundancy. In ArduPilot: `CAN_P1_DRIVER = 1` (enable port 1), `CAN_D1_PROTOCOL = 1` (DroneCAN), reboot; GPS `GPS_TYPE = 9` (`GPS1_TYPE` in 4.6+) — DroneCAN, the compass is detected automatically. The bus: twisted pair, 120 Ω terminators at both ends (many devices have a terminator jumper), node power per the spec (usually 5 V), unique node IDs (the autopilot hands them out as a DNA server with dynamic allocation; `CAN_D1_UC_NODE` is the autopilot's own node ID).
@@ -67,7 +67,7 @@ When: the aircraft is large (long wires → UART/I2C pick up noise), there are m
 6. Firmware: port → function → protocol/speed. Check the data (GPS: satellites; compass: heading changes when you rotate; ESC telemetry: RPM on the motors tab).
 7. If there's no data — analyzer on the line: are there bytes, what speed, inversion.
 
-{{diagram:periph-connect-flow|Мультиметр и smoke stopper — до прошивки; если данных нет, следующий шаг — анализатор на линии: есть ли байты, какая скорость, нет ли инверсии.}}
+{{diagram:periph-connect-flow|The multimeter and smoke stopper come before the firmware; if there is no data, the next step is an analyzer on the line: are there bytes, what baud rate, is there inversion.}}
 
 ## practice
 ### Step 0. Bus calculation before soldering

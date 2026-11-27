@@ -126,9 +126,11 @@ def tr_data(value, name: str = "data"):
     return walk(value)
 
 
-# JSON keys whose string values are identifiers, paths or code, never prose
-NON_TEXT_KEYS = {"id", "module", "modules", "prerequisites", "sourceFile", "stack", "stacks", "status", "level", "url",
-                 "diagram", "starter", "capstoneFor", "sectionKey", "key", "related", "expr", "answer", "checks",
+# JSON keys whose string values are identifiers, paths or code, never prose.
+# Not here on purpose: formulas.json "expr" and projects.json "stack" are human-readable (unit names, comments,
+# "JS, Leaflet, no framework") and go through the data catalog; a value without words is looked up and kept as is.
+NON_TEXT_KEYS = {"id", "module", "modules", "prerequisites", "sourceFile", "stacks", "status", "level", "url",
+                 "diagram", "starter", "capstoneFor", "sectionKey", "key", "related", "answer", "checks",
                  "firmware", "tags", "readingTime", "kind", "group", "ids", "capstones", "autotest_cmd"}
 
 

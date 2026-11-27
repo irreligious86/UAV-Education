@@ -45,7 +45,7 @@ DroneCAN (formerly UAVCAN v0) defines **what** goes in the frames: the 29-bit fr
 
 **DNA (dynamic node allocation)**: a new node without an ID asks the server for one, and the flight controller hands out a free one and remembers it by the node's unique ID. That's why peripherals “just plug in and work”. It breaks when nodes are moved between vehicles or settings are copied: two nodes with the same stored ID means a conflict. The fix is clearing the DNA table on the flight controller or a fixed ID on the node.
 
-{{diagram:dronecan-dna-flow|Номер узла привязан к его уникальному ID в таблице полётника: перенесённый или скопированный узел даёт дубль номера и «Duplicate Node», а лечится очисткой таблицы битом 0 CAN_D1_UC_OPTION или жёстким номером.}}
+{{diagram:dronecan-dna-flow|The node ID is tied to its unique ID in the flight controller's table: a moved or copied node gives a duplicate ID and “Duplicate Node”; the fix is clearing the table with bit 0 of CAN_D1_UC_OPTION or a fixed ID.}}
 
 Cyphal (UAVCAN v1) is the next, incompatible version of the protocol; ArduPilot and most peripherals use DroneCAN, PX4 supports both. When buying peripherals, check that they speak DroneCAN.
 

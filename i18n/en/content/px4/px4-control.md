@@ -55,7 +55,7 @@ Units matter: the error is in rad/s, the output is a fraction of the maximum tor
 ### Autotune in more detail
 `MC_AT_EN` = 1 enables the `mc_autotune_attitude_control` module; it is started from QGC (PID Tuning → Autotune) in Altitude/Position while hovering in calm air; the module injects an excitation with amplitude `MC_AT_SYSID_AMP` (0.7) on each axis, identifies the model of the rate loop and computes the gains; `MC_AT_APPLY` (0 — don't apply, 1 — after landing, 2 — immediately in flight) — the default is 1. Afterwards — a check flight and Flight Review: a response with no overshoot > 10%, D without noise. Autotune doesn't tune the filters and doesn't cure vibration — those are done **before** (spectrum!).
 
-{{diagram:px4-tune-order-flow|Фильтры настраивают до всего; autotune заменяет ручной rate и attitude P, а контуры скорости и позиции настраивают уже после него — сначала скорость.}}
+{{diagram:px4-tune-order-flow|Filters are tuned before everything; autotune replaces manual rate and attitude P, and the velocity and position loops are tuned after it — velocity first.}}
 
 ### Worked example: 7" 6S, 1.4 kg
 Start: airframe Generic Quad, `CA_ROTOR_COUNT` = 4, `IMU_GYRO_RATEMAX` 400 → 800 Hz (H7), `IMU_GYRO_CUTOFF` 40 → 80, `IMU_DGYRO_CUTOFF` 20 → 40 (default 20 since 1.17, 30 up to 1.16); eRPM over DShot (bidirectional DShot or ESC telemetry over UART — `DSHOT_TEL_CFG`), `IMU_GYRO_DNF_EN` = 1; `MPC_THR_HOVER` will be refined by the HTE estimator; first flight in Stabilized — `MC_ROLLRATE_K` 1.0 → 0.7 if it wobbles; autotune; `MPC_XY_VEL_MAX` to suit the task. Log → Flight Review: rate tracking, spectrum, `vehicle_torque_setpoint` without saturation.

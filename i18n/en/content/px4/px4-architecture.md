@@ -66,7 +66,7 @@ Parameters live in flash/EEPROM (`param save`, `param reset_all`), missions and 
 4. Flight Review → spectrum: a motor peak in the passband? → `IMU_GYRO_CUTOFF`/notch (`IMU_GYRO_NF0_FRQ`/`BW`, `IMU_GYRO_DNF_EN`).
 This is how the architecture turns into a method: topic → module → parameter, instead of “bump P a bit”.
 
-{{diagram:px4-roll-osc-tree|Каждый вопрос задаётся топику, а не параметру: сначала частота гироскопа, потом — есть ли колебания в уставке; только после этого понятно, какой модуль крутить.}}
+{{diagram:px4-roll-osc-tree|Every question is asked of a topic, not a parameter: first the gyro rate, then whether the oscillation is in the setpoint; only then is it clear which module to tune.}}
 
 {{diagram:px4-uorb-path|The data path in PX4 from sensors to motors: modules exchange uORB topics, and every step can be inspected with the listener command.}}
 

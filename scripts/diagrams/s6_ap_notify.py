@@ -9,7 +9,7 @@ ap-notify-led-states  — state-colour chart: the twelve sequences of RGBLed.h /
 """
 from __future__ import annotations
 
-from svg import ACCENT, INK, MUTED, Box, flow, svg, text
+from svg import ACCENT, INK, MUTED, Box, esc, flow, svg, text
 
 # colours of RGBLed.h: BLACK 0, BLUE 1, GREEN 2, RED 4, YELLOW = RED|GREEN, WHITE = all
 K, B, G, R, Y, W = "K", "B", "G", "R", "Y", "W"
@@ -86,7 +86,7 @@ def build(D: dict) -> None:
                        f'stroke="{MUTED if c == K else INK}" stroke-width="1"{dash}/>')
             if c != K:
                 out.append(f'<text x="{x + cw / 2}" y="{y + 14}" text-anchor="middle" '
-                           f'style="font-size:10px;font-weight:600;fill:#111">{LETTER[c]}</text>')
+                           f'style="font-size:10px;font-weight:600;fill:#111">{esc(LETTER[c])}</text>')   # the legend letters go through the catalog
         out.append(text(x0 + 10 * cw + 8, y + 14, f"{on_time_ms(seq)} мс", "m t", "start", 10))
     yb = y0 + len(STATES) * (ch + 6) + 12
     out.append(text(lx, yb, "К красный, С синий, З зелёный, Ж жёлтый, Б белый; пунктир — не горит. Справа — свечение за 1 с.", "m t", "start"))

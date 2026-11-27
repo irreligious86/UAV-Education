@@ -60,7 +60,7 @@ Verification: the same held-out set before and after quantization, comparing met
 - **Thermal behavior**: a 20–30 minute run inside the enclosure, at a temperature close to field conditions; log clocks and temperature (`tegrastats` on a Jetson, `vcgencmd measure_temp` and `get_throttled` on a Pi). If p99 after 20 minutes is twice as bad as in the first minute, the budget isn't met.
 - **Concurrent load**: on board, video recording, MAVLink and ROS 2 all run at the same time — profile together with them.
 
-{{diagram:edge-budget-verdict|Бюджет выполнен, только если пройдены все три проверки: p99 всего конвейера под нагрузкой, 20–30 минут в корпусе без удвоения p99 и метрики по срезам после квантования.}}
+{{diagram:edge-budget-verdict|The budget is met only if all three checks pass: p99 of the whole pipeline under load, 20–30 minutes in the enclosure without p99 doubling, and per-slice metrics after quantization.}}
 
 ### Evaluation: your own data and the cost of an error
 A model trained on an open dataset sees the world “from eye level”, while a drone camera looks from above, at an angle, with small objects and motion blur. Therefore:

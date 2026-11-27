@@ -121,9 +121,9 @@ def bounce_back(sp, gy, fs, big=200.0):
 ```
 Reference values for a 5" (Betaflight): overshoot 5–15% is good; bounce-back < 10% is good, > 25% means too much D or poor mechanics.
 
-{{diagram:step-metrics-anatomy|Что считают функции: overshoot — перелёт над нормированной ступенькой, время установления — вход в ±5 % навсегда, bounce-back — отскок после отпущенного стика в процентах от пика (форма отклика условная).}}
+{{diagram:step-metrics-anatomy|What the functions compute: overshoot — the overshoot above a normalized step, settling time — entering ±5 % for good, bounce-back — the rebound after the stick is released, in percent of the peak (the response shape is schematic).}}
 
-{{diagram:chart-dpy-sitl-roll-step|Реальная ступенька крена из лабораторного лога ArduCopter 4.7.2 SITL: цель (RDes) ограничена по ускорению и растёт около 100 мс, отклик (R) отстаёт на 30 мс на уровне 50 % и входит в коридор ±5 % через 202 мс без перелёта.}}
+{{diagram:chart-dpy-sitl-roll-step|A real roll step from the lab's ArduCopter 4.7.2 SITL log: the target (RDes) is acceleration-limited and rises for about 100 ms, the response (R) lags by 30 ms at the 50 % level and enters the ±5 % band after 202 ms without overshoot.}}
 
 ### Loop jitter
 ```python

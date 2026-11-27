@@ -64,7 +64,7 @@ The ELRS rule: warning when RSSI is ~8–10 dB above the mode's sensitivity; the
 ### Why the calculation doesn't match the field
 Multipath (ground reflections add up out of phase), obstacles in the Fresnel zone (the first-zone radius at 2.4 GHz over 5 km is ~12 m: flying low over the ground costs 6–20 dB), onboard interference (it reduces effective sensitivity), the real antenna orientation. That's why a range test is mandatory and a 10–15 dB margin is the minimum.
 
-{{diagram:chart-link-two-ray|Пример модуля на 2.4 ГГц: при полёте на 10 м отражение от земли съедает 10 дБ на 5 км, и предупреждение −98 дБм наступает на 3.9 км вместо 10 км; на 120 м излом уходит за 5.9 км, остаются только короткие провалы.}}
+{{diagram:chart-link-two-ray|The module's 2.4 GHz example: flying at 10 m, the ground reflection eats 10 dB at 5 km, and the −98 dBm warning comes at 3.9 km instead of 10 km; at 120 m the break point moves beyond 5.9 km and only short dips remain.}}
 
 {{diagram:link-budget-chain|Worked budget example: ELRS 2.4 GHz, 250 mW, 10 km — received power of −98 dBm against a sensitivity of −108 dBm gives a 10 dB margin.}}
 

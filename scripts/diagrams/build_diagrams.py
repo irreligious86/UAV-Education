@@ -10,7 +10,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from svg import Box, Node, flow, frame, sequence, timeline, tree  # noqa: E402
+from svg import Box, Node, esc, flow, frame, sequence, timeline, tree  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[2]
 OUT = ROOT / "assets" / "diagrams"
@@ -136,7 +136,7 @@ D["component-choice-tree"] = tree("Подбор силовой установк�
 
 # ---------------------------------------------------------------- physics (hand-built SVG)
 D["quad-forces"] = """<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 290" width="100%" role="img" aria-labelledby="t" style="max-width:720px;display:block;margin:0 auto">
-<title id="t">Силы и моменты квадрокоптера</title>""" + __import__("svg").STYLE + """
+<title id="t">""" + esc('Силы и моменты квадрокоптера') + """</title>""" + __import__("svg").STYLE + """
 <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker>
 <marker id="ara" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--gc-accent-hud,#5ef1d2)"/></marker></defs>
 <g transform="translate(180,150)">
@@ -144,10 +144,10 @@ D["quad-forces"] = """<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 2
 <circle class="box" cx="-110" cy="0" r="10"/><circle class="box" cx="110" cy="0" r="10"/><circle class="box" cx="0" cy="-70" r="10"/><circle class="box" cx="0" cy="70" r="10"/>
 <path class="lna" d="M-110 -10 L-110 -55" marker-end="url(#ara)"/><path class="lna" d="M110 -10 L110 -40" marker-end="url(#ara)"/>
 <path class="lna" d="M0 -80 L0 -115" marker-end="url(#ara)"/><path class="lna" d="M0 60 L0 25" marker-end="url(#ara)"/>
-<text x="-110" y="-62" class="a t">T₃ ↑ больше</text><text x="110" y="-47" class="a t">T₂</text>
+<text x="-110" y="-62" class="a t">""" + esc('T₃ ↑ больше') + """</text><text x="110" y="-47" class="a t">T₂</text>
 <path class="ln" d="M0 10 L0 55" marker-end="url(#ar)"/><text x="18" y="40" class="t" text-anchor="start">m·g</text>
-<text x="0" y="105" class="m t">Крен: разность тяг × плечо = момент</text>
-<text x="0" y="-130" class="t">вид сзади</text>
+<text x="0" y="105" class="m t">""" + esc('Крен: разность тяг × плечо = момент') + """</text>
+<text x="0" y="-130" class="t">""" + esc('вид сзади') + """</text>
 </g>
 <g transform="translate(540,150)">
 <line class="ln" x1="-80" y1="-80" x2="80" y2="80"/><line class="ln" x1="-80" y1="80" x2="80" y2="-80"/>
@@ -155,26 +155,26 @@ D["quad-forces"] = """<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 2
 <text x="-80" y="-100" class="t">CCW</text><text x="80" y="-100" class="t">CW</text><text x="80" y="104" class="t">CCW</text><text x="-80" y="104" class="t">CW</text>
 <path class="lna" d="M-60 -95 A75 75 0 0 1 60 -95" marker-end="url(#ara)"/>
 <text x="0" y="-5" class="t">yaw</text>
-<text x="0" y="125" class="m t">Рыскание: пара CCW быстрее →</text><text x="0" y="139" class="m t">реактивный момент не скомпенсирован</text>
-<text x="0" y="-125" class="t">вид сверху</text>
+<text x="0" y="125" class="m t">""" + esc('Рыскание: пара CCW быстрее →') + """</text><text x="0" y="139" class="m t">""" + esc('реактивный момент не скомпенсирован') + """</text>
+<text x="0" y="-125" class="t">""" + esc('вид сверху') + """</text>
 </g>
 </svg>
 """
 
 D["actuator-disk"] = """<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 220" width="100%" role="img" aria-labelledby="t" style="max-width:720px;display:block;margin:0 auto">
-<title id="t">Диск-актуатор: тяга как изменение импульса воздуха</title>""" + __import__("svg").STYLE + """
+<title id="t">""" + esc('Диск-актуатор: тяга как изменение импульса воздуха') + """</title>""" + __import__("svg").STYLE + """
 <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker></defs>
-<rect class="boxa" x="300" y="40" width="120" height="8" rx="3"/><text x="360" y="32" class="t">проп = диск площадью A</text>
+<rect class="boxa" x="300" y="40" width="120" height="8" rx="3"/><text x="360" y="32" class="t">""" + esc('проп = диск площадью A') + """</text>
 <path class="lnm" d="M250 60 C 280 90, 290 150, 300 200"/><path class="lnm" d="M470 60 C 440 90, 430 150, 420 200"/>
 <g class="m"><path class="ln" d="M330 70 L330 110" marker-end="url(#ar)"/><path class="ln" d="M360 70 L360 110" marker-end="url(#ar)"/><path class="ln" d="M390 70 L390 110" marker-end="url(#ar)"/></g>
 <path class="ln" d="M330 130 L330 190" marker-end="url(#ar)"/><path class="ln" d="M360 130 L360 190" marker-end="url(#ar)"/><path class="ln" d="M390 130 L390 190" marker-end="url(#ar)"/>
-<text x="440" y="100" class="t" text-anchor="start">V₀ (набегающий, 0 на висении)</text>
-<text x="440" y="170" class="t" text-anchor="start">Vₑ (за диском)</text>
+<text x="440" y="100" class="t" text-anchor="start">""" + esc('V₀ (набегающий, 0 на висении)') + """</text>
+<text x="440" y="170" class="t" text-anchor="start">""" + esc('Vₑ (за диском)') + """</text>
 <text x="20" y="80" class="b" text-anchor="start">F = ½·ρ·A·(Vₑ² − V₀²)</text>
-<text x="20" y="104" class="m t" text-anchor="start">Тяга ~ импульс (~V), мощность ~ энергия (~V²):</text>
-<text x="20" y="120" class="m t" text-anchor="start">большой диск при той же тяге тратит меньше мощности.</text>
-<text x="20" y="150" class="m t" text-anchor="start">Cт = T/(ρ·n²·D⁴) — тяга ~ n²</text>
-<text x="20" y="166" class="m t" text-anchor="start">Cₚ = P/(ρ·n³·D⁵) — мощность ~ n³</text>
+<text x="20" y="104" class="m t" text-anchor="start">""" + esc('Тяга ~ импульс (~V), мощность ~ энергия (~V²):') + """</text>
+<text x="20" y="120" class="m t" text-anchor="start">""" + esc('большой диск при той же тяге тратит меньше мощности.') + """</text>
+<text x="20" y="150" class="m t" text-anchor="start">""" + esc('Cт = T/(ρ·n²·D⁴) — тяга ~ n²') + """</text>
+<text x="20" y="166" class="m t" text-anchor="start">""" + esc('Cₚ = P/(ρ·n³·D⁵) — мощность ~ n³') + """</text>
 </svg>
 """
 

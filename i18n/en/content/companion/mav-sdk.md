@@ -77,7 +77,7 @@ asyncio.run(main())
 
 The `MissionItem` constructor changes between MAVSDK versions (fields get added) — check the documentation for the version you have installed; that's the normal price of a high-level API.
 
-{{diagram:mav-sdk-ap-startup-seq|Скрипт MAVSDK против ArduCopter 4.7 сначала просит потоки (по умолчанию их нет), потом ждёт здоровья из EKF_STATUS_REPORT, а при загрузке миссии теряет seq 0 под дом — отсюда пункт-подставка.}}
+{{diagram:mav-sdk-ap-startup-seq|A MAVSDK script against ArduCopter 4.7 first requests the streams (there are none by default), then waits for health from EKF_STATUS_REPORT, and on a mission upload loses seq 0 to home — hence the placeholder item.}}
 
 ### Async without surprises
 - **Subscriptions are endless**: `async for x in telemetry.position()` won't end on its own. The way out is a `break` on a condition, or a separate task that you cancel.
@@ -97,7 +97,7 @@ High-level control from the companion: in PX4 — Offboard mode (MAVSDK `offboar
 
 Design it so that safety is provided by the lower level (the autopilot), and the upper level only restores operation.
 
-{{diagram:mav-offboard-loss-timeline|После kill -9 скрипта PX4 через 1 с выходит из Offboard, а ArduPilot ещё 3 с летит с прежней скоростью и только потом останавливается, оставаясь в GUIDED.}}
+{{diagram:mav-offboard-loss-timeline|After kill -9 of the script, PX4 leaves Offboard after 1 s, while ArduPilot keeps flying at the previous velocity for 3 s more and only then stops, staying in GUIDED.}}
 
 {{diagram:mav-sdk-layers|pymavlink, MAVSDK and MAVROS are different levels of abstraction over the same MAVLink.}}
 

@@ -110,6 +110,19 @@ def module_source(m: dict) -> str:
     return text
 
 
+def module_firmware(m: dict) -> str:
+    """The firmware/version tag of a module page: the translated module's own `firmware:` front matter when it has
+    one (the manifest value is source-language text), else the manifest's."""
+    art = m.get("articleMeta") or {}
+    if i18n.lang() != i18n.SOURCE and art.get("sourceFile"):
+        t = i18n.translated_path(ROOT / art["sourceFile"])
+        if t.is_file():
+            fw = re.search(r"^firmware:\s*(.+?)\s*$", parse_front_matter(t.read_text(encoding="utf-8")) or "", flags=re.M)
+            if fw:
+                return fw.group(1).strip("\"'")
+    return str(art.get("firmware") or "")
+
+
 def translation_notice(m: dict) -> str:
     st = TRANSLATION_STATE.get(i18n.lang(), {}).get(m["id"])
     if st == "missing":
@@ -295,7 +308,7 @@ def layout(*, title: str, base: str, body: str, active: str, description: str = 
 
 
 def level_tag(level: str) -> str:
-    label = LEVEL_LABELS.get(level, level)
+    label = _(LEVEL_LABELS.get(level, level))
     return f'<span class="gc-tag" title="{esc(label)}">{esc(level)}</span>'
 
 
@@ -681,8 +694,9 @@ def render_module(m: dict, model: dict) -> str:
         tags.append(f'<span class="gc-tag">{_("чтение {t}", t=esc(_(str(art["readingTime"]))))}</span>')
     if m.get("hours"):
         tags.append(f'<span class="gc-tag">{_("учёба {t}", t=hours_text(m["hours"]))}</span>')
-    if art.get("firmware"):
-        tags.append(f'<span class="gc-tag">{esc(str(art["firmware"]))}</span>')
+    firmware = module_firmware(m)
+    if firmware:
+        tags.append(f'<span class="gc-tag">{esc(firmware)}</span>')
     if planned:
         tags.append(status_tag("planned"))
 
