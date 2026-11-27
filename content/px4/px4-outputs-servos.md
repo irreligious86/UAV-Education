@@ -3,7 +3,7 @@ id: px4-outputs-servos
 title: "Выходы PX4: функции, таймеры, сервы, поверхности, реле"
 level: L2
 readingTime: 50 мин
-firmware: PX4 1.17 (сверено с 1.17.0)
+firmware: PX4 1.18 (сверено с v1.18.0)
 status: published
 added: 2026-11-18
 tags:
@@ -24,7 +24,7 @@ next:
 ---
 
 ## summary
-Экран Actuators в QGroundControl и то, что за ним стоит в коде PX4 1.17.0: как значение проходит путь от контроллера до пина, какие функции можно повесить на выход и под какими номерами, что значат `PWM_AUX_MINn` / `MAXn` / `DISn` / `FAILn` / `CENTn` / `REV` / `TIMn`, почему серва и мотор DShot не живут в одной группе таймера, чем MAIN (IO) отличается от AUX (FMU), как описать рулевые поверхности через `CA_SV_*` и чем в PX4 заменяют реле. После модуля ты по `timer_config.cpp` платы раскладываешь моторы, сервы и триггер камеры по выходам и считаешь импульс сервы так, как его считает `mixer_module`. Лабораторная — без железа и симулятора: план выходов для fmu-v6x, расчёт микросекунд, знаки `CA_SV_CSn_TRQ_*` и разбор параметров с ошибками, ответы сверяются с эталоном на странице.
+Экран Actuators в QGroundControl и то, что за ним стоит в коде PX4 1.18.0: как значение проходит путь от контроллера до пина, какие функции можно повесить на выход и под какими номерами, что значат `PWM_AUX_MINn` / `MAXn` / `DISn` / `FAILn` / `CENTn` / `REV` / `TIMn`, почему серва и мотор DShot не живут в одной группе таймера, чем MAIN (IO) отличается от AUX (FMU), как описать рулевые поверхности через `CA_SV_*` и чем в PX4 заменяют реле. После модуля ты по `timer_config.cpp` платы раскладываешь моторы, сервы и триггер камеры по выходам и считаешь импульс сервы так, как его считает `mixer_module`. Лабораторная — без железа и симулятора: план выходов для fmu-v6x, расчёт микросекунд, знаки `CA_SV_CSn_TRQ_*` и разбор параметров с ошибками, ответы сверяются с эталоном на странице.
 
 ## theory
 ### Путь значения: от момента до импульса
@@ -41,7 +41,7 @@ next:
 
 - значение NaN → `DIS`;
 - если у выхода стоит бит в `REV`, значение меняет знак;
-- обычный случай: `мкс = MIN + (v + 1) / 2 · (MAX − MIN)`, результат округляется (`lroundf`);
+- обычный случай: `мкс = MIN + (v + 1) / 2 · (MAX − MIN)`, результат округляется (`lroundf`; в 1.18 — уже в драйвере, `PWMOut.cpp`);
 - **с 1.17**, если функция — Servo, Gimbal или Landing Gear Wheel и `CENTn` задан (800…2200): две прямые, `v < 0` → `MIN + (v + 1) · (CENT − MIN)`, `v ≥ 0` → `CENT + v · (MAX − CENT)`.
 
 У моторов аллокатор отдаёт 0…1, `mixer_module` сначала растягивает это в −1…+1 (`2·v − 1`), поэтому 0 % тяги даёт `MIN`, а не `DIS`.
@@ -54,7 +54,7 @@ next:
 | Disabled | 0 | — | импульса нет вообще |
 | Constant Min / Constant Max | 1 / 2 | константа −1 / +1 | выход держит `MIN` или `MAX` |
 | Motor 1…12 | 101…112 | `actuator_motors` | в prearm не работает |
-| Servo 1…8 | 201…208 | `actuator_servos` | поверхности, затем tilt-сервы |
+| Servo 1…15 | 201…215 | `actuator_servos` | поверхности, затем tilt-сервы; до 1.18 — Servo 1…8 (201…208) |
 | Peripheral via Actuator Set 1…6 | 301…306 | `MAV_CMD_DO_SET_ACTUATOR` | «реле» PX4 |
 | Landing Gear | 400 | топик `landing_gear` | выпущено −1, убрано +1 |
 | Parachute | 401 | константа −1 | при termination +1 |
@@ -83,9 +83,9 @@ next:
 | `PWM_AUX_CENTn` | −1 | −1, 800…2200 мкс | центр сервы; −1 — прямая от MIN до MAX. **Новый в 1.17**, на выходах IO его нет |
 | `PWM_AUX_FAILn` | −1 | −1, 800…2200 мкс | значение при flight termination; −1 — по функции |
 | `PWM_AUX_REV` | 0 | битовая маска | бит n−1 разворачивает диапазон выхода n |
-| `PWM_AUX_TIMn` | 400 | −5, −4, −3, −1, 50, 100, 200, 400, любое > 0 | протокол группы таймера с индексом n |
+| `PWM_AUX_TIMn` | 400 | −8, −7, −6 (с 1.18), −5, −4, −3, −1, 50, 100, 200, 400, любое > 0 | протокол группы таймера с индексом n |
 
-`FAILn` = −1 означает «по функции»: Constant Min → `MIN`, Constant Max и Parachute → `MAX`, Servo → значение 0 (середина между `MIN` и `MAX` или `CENT`), всё остальное, включая моторы, → `DIS`. Значения `TIMn`: −5 DShot150, −4 DShot300, −3 DShot600, −1 OneShot, 50/100/200/400 — PWM с этой частотой в герцах; любое другое положительное число — своя частота PWM. Смена `TIMn` требует перезагрузки. В 1.15 было ещё −2 = DShot1200; в 1.16 значение убрано.
+`FAILn` = −1 означает «по функции»: Constant Min → `MIN`, Constant Max и Parachute → `MAX`, Servo → значение 0 (середина между `MIN` и `MAX` или `CENT`), всё остальное, включая моторы, → `DIS`. Значения `TIMn`: −8 BDShot150, −7 BDShot300, −6 BDShot600 (bidirectional, с 1.18), −5 DShot150, −4 DShot300, −3 DShot600, −1 OneShot, 50/100/200/400 — PWM с этой частотой в герцах; любое другое положительное число — своя частота PWM. Смена `TIMn` требует перезагрузки. В 1.15 было ещё −2 = DShot1200; в 1.16 значение убрано.
 
 Если `MIN` записан больше `MAX`, прошивка молча меняет их местами: развернуть серву так не получится, для этого есть `REV`.
 
@@ -104,10 +104,10 @@ next:
 
 | | MAIN на плате с IO (`px4io`) | AUX — выходы FMU (`pwm_out`, `dshot`) |
 |---|---|---|
-| Протоколы | PWM 50…400 Гц, OneShot | PWM, OneShot, DShot150/300/600 |
+| Протоколы | PWM 50…400 Гц, OneShot | PWM, OneShot, DShot150/300/600, с 1.18 — BDShot150/300/600 |
 | DShot, bidirectional DShot | нет | да, в группах с DMA |
 | Camera Trigger / Capture, PPS, RPM | нет | да |
-| `CENTn` (1.17) | нет | да |
+| `CENTn` (с 1.17) | нет | да |
 | Задержка | выше: значение идёт FMU → IO по UART | ниже |
 | Если FMU завис при арме | через 0.5 с IO сам выдаёт `FAILn` (при `CBRK_FLIGHTTERM` = 0) | подстраховки нет: выходами управляет сам FMU |
 
@@ -119,20 +119,21 @@ next:
 | Параметр | Умолчание | Смысл |
 |---|---|---|
 | `DSHOT_MIN` | 0.055 | минимальная команда при арме, доля от полной (в 1.15–1.16 единица подписана как %) |
-| `DSHOT_BIDIR_EN` | 0 | bidirectional DShot: eRPM по сигнальному проводу. **Появился в 1.16**, нужна перезагрузка |
+| `PWM_AUX_TIMn` = −6 / −7 / −8 | — | bidirectional DShot (BDShot600 / 300 / 150): eRPM по сигнальному проводу, выбирается **по группе таймера** (с 1.18; в 1.16–1.17 — общий `DSHOT_BIDIR_EN`), нужна перезагрузка |
+| `DSHOT_BIDIR_EDT` | 0 | Extended DShot Telemetry (с 1.18): в кадрах eRPM приходят температура, напряжение и ток ESC; перезагрузка |
 | `DSHOT_TEL_CFG` | 0 (Disabled) | порт UART для телеметрии ESC по отдельному проводу; номера портов — в `px4-hardware-peripherals` |
 | `DSHOT_3D_ENABLE` | 0 | 3D-режим: диапазон делится на два направления, `DSHOT_MIN` ставят в 0 |
 | `DSHOT_3D_DEAD_L` / `DSHOT_3D_DEAD_H` | 1000 / 1000 | мёртвая зона 3D в единицах 0…1999 |
-| `MOT_POLE_COUNT` | 14 | число магнитов ротора: пересчёт eRPM → RPM |
+| `DSHOT_MOT_POL1…12` | 14 | число магнитов ротора, свой у каждого мотора: пересчёт eRPM → RPM (до 1.18 — один `MOT_POLE_COUNT`; при обновлении его значение копируется во все 12) |
 | `CA_R_REV` | 0 | маска реверсивных моторов (бит 0 — Motor 1) |
 
 Что нужно знать:
 
 - В группе DShot параметры `MINn` / `MAXn` / `DISn` / `FAILn` не действуют: драйвер ставит свои значения 1…1999, «стоп» = 0, минимум = `DSHOT_MIN` × 1999 (при 0.055 — 109).
-- Все группы DShot работают на одной скорости. Если в двух группах выбраны разные, драйвер пишет «Only supporting a single frequency» и правит параметр.
-- **Bidirectional DShot.** В 1.15 его нет вообще — только телеметрия по UART (`DSHOT_TEL_CFG`). С 1.16 по документации он поддержан на STM32H7 для первых четырёх выходов FMU, если они на одном таймере, и на i.MXRT (восемь выходов); Kakute H7 не поддержан — его первые четыре выхода на разных таймерах. В коде STM32 это жёстче: при `DSHOT_BIDIR_EN` = 1 DShot остаётся только у таймера с индексом 0, остальные группы DShot пропускаются. На fmu-v6x и fmu-v6c это AUX1–4; моторы 5–6 гексакоптера на AUX5–6 при включённом bidirectional сигнала не получат.
-- Сейчас bidirectional DShot в PX4 даёт только обороты. Напряжение, ток и температура ESC идут по UART-телеметрии.
-- RPM считается целочисленно: `RPM = eRPM100 · 100 / (MOT_POLE_COUNT / 2)`, где eRPM100 — электрические обороты в сотнях. При неверном `MOT_POLE_COUNT` обороты в `esc_status` врут ровно в отношение пар полюсов, и динамический notch встаёт не на ту частоту.
+- Все группы DShot работают на одной скорости. Если в двух группах выбраны разные, драйвер 1.18 пишет «Mixed DShot frequencies across timers, using freq: …» и берёт скорость последней группы (в 1.17 — «Only supporting a single frequency» с правкой параметра).
+- **Bidirectional DShot.** В 1.15 его нет вообще — только телеметрия по UART (`DSHOT_TEL_CFG`). В 1.16–1.17 его включал `DSHOT_BIDIR_EN`, и в коде STM32 DShot тогда оставался только у таймера с индексом 0 (на fmu-v6x и fmu-v6c — AUX1–4; моторы 5–6 гексакоптера сигнала не получали). В 1.18 протокол выбирается на группу: `PWM_AUX_TIMn` = −6/−7/−8 — BDShot600/300/150. Драйвер STM32 запускает каждую группу по очереди со своим каналом DMA и в каждом цикле читает ответ одного канала группы по кругу (`dshot.c`, `up_dshot_init`): обороты обновляются у каждого мотора, но реже, чем выходов в группе. Ограничение «только таймер 0» снято; группа без DMA (`DMA{…}` в `timer_config.cpp`) DShot по-прежнему не берёт. Работает ли конкретная плата и ESC — проверяй `dshot status` на столе (не проверено на железе).
+- С `DSHOT_BIDIR_EDT` = 1 (1.18) bidirectional DShot приносит, кроме оборотов, температуру, напряжение и ток (Extended DShot Telemetry, если ESC её умеет: Bluejay, AM32; у штатного BLHeli_S нет ни bidirectional DShot, ни EDT). Без EDT обороты — по сигнальному проводу, остальное — по UART-телеметрии.
+- RPM считается целочисленно: `RPM = eRPM / (DSHOT_MOT_POLn / 2)` (`DShot.cpp`, v1.18.0; до 1.18 — общий `MOT_POLE_COUNT`). При неверном числе полюсов обороты в `esc_status` врут ровно в отношение пар полюсов, и динамический notch встаёт не на ту частоту.
 
 Что за протоколы и что такое eRPM — в модуле f-esc-firmware.
 
@@ -194,19 +195,19 @@ next:
 - Значение −1…1; у мотора 0…1 (0 = `MIN`, а не `DIS`). Без `-t` команда держит выход до нажатия Enter.
 - `actuator_test iterate-motors` — по очереди все моторы на 15 % по 0.4 с; `iterate-servos` — все сервы на +0.3.
 
-Пока идёт тест, остальные выходы стоят в `DIS`; к значению сервы прибавляется её trim. При арме и при kill тест не действует. Слайдеры QGC шлют `MAV_CMD_ACTUATOR_TEST` (310), и commander отвечает **DENIED** в трёх случаях: аппарат заармлен; есть кнопка safety и она не нажата; `COM_MOT_TEST_EN` = 0. Это и есть «Motor test command denied». Таймаут одной команды по MAVLink — не больше 3 с. Консольная `actuator_test` публикует команду напрямую и эти три проверки обходит — пропеллеры снимают до неё. Состояние выходов: `pwm_out status`, `dshot status`, `px4io status`.
+Пока идёт тест, остальные выходы стоят в `DIS`; к значению сервы прибавляется её trim. При арме и при kill тест не действует. Слайдеры QGC шлют `MAV_CMD_ACTUATOR_TEST` (310), и commander отвечает **DENIED** в двух случаях: аппарат заармлен; есть кнопка safety и она не нажата (`Commander.cpp`, `handleCommandActuatorTest`). Это и есть «Motor test command denied». Выключателя теста `COM_MOT_TEST_EN` (до 1.18, умолчание 1) больше нет — тест разрешён всегда. Таймаут одной команды по MAVLink — не больше 3 с. Консольная `actuator_test` публикует команду напрямую и эти проверки обходит — пропеллеры снимают до неё. Состояние выходов: `pwm_out status`, `dshot status`, `px4io status`.
 
 ### Место в системе
 
 - **Получает:** матрицу эффективности от аллокатора (`ctl-allocation`); флаги armed, prearmed, kill, termination от commander (`px4-safety-return`); протокол ESC и eRPM (`f-esc-firmware`); первый проход экрана Actuators (`px4-setup-scratch`); номера портов UART и включение выходов DroneCAN (`px4-hardware-peripherals`); схему питания серв (`bf-servos-pwm`).
 - **Отдаёт:** импульсы и кадры DShot моторам и сервам; обороты в `esc_status` — динамическому notch и детектору отказа мотора (`px4-control`); выходы нагрузки — миссиям и companion; значения `FAILn` — flight termination (`px4-safety-return`).
-- **Если ошибиться здесь:** серва в группе DShot или на 400 Гц — отказ руля в полёте; неверный знак `CA_SV_CSn_TRQ_*` или лишний бит `REV` — стабилизация раскачивает самолёт (`ctl-allocation`); `MOT_POLE_COUNT` не по мотору — notch мимо, вибрации в гироскопе (`px4-control`); `FAILn` парашюта не проверен — termination не раскроет купол (`px4-safety-return`). Версии — по таблице в `px4-intro`.
+- **Если ошибиться здесь:** серва в группе DShot или на 400 Гц — отказ руля в полёте; неверный знак `CA_SV_CSn_TRQ_*` или лишний бит `REV` — стабилизация раскачивает самолёт (`ctl-allocation`); `DSHOT_MOT_POLn` не по мотору — notch мимо, вибрации в гироскопе (`px4-control`); `FAILn` парашюта не проверен — termination не раскроет купол (`px4-safety-return`). Версии — по таблице в `px4-intro`.
 
 ## practice
 Упражнение без железа и симулятора. Нужны бумага или редактор и калькулятор; все ответы выводятся из таблиц теории и сверяются с эталоном в конце.
 
 ### Шаг 1. План выходов по `timer_config.cpp`
-Плата — px4/fmu-v6x (Pixhawk 6X). Строки 59–77 файла `boards/px4/fmu-v6x/src/timer_config.cpp` (v1.17.0):
+Плата — px4/fmu-v6x (Pixhawk 6X). Строки 59–77 файла `boards/px4/fmu-v6x/src/timer_config.cpp` (v1.17.0; в v1.18.0 файл не изменился):
 ```
 constexpr io_timers_t io_timers[MAX_IO_TIMERS] = {
 	initIOTimer(Timer::Timer5, DMA{DMA::Index1}),
@@ -327,7 +328,7 @@ PWM_AUX_FAIL5      -1
 1. Сервы — от отдельного BEC на рейку выходов, земля общая с полётником. Сигнальный провод ESC DShot — в AUX.
 2. В QGC → Actuators назначь функции по своему плану, перезагрузи плату (смена `TIMn`), проверь в `pwm_out status` и `dshot status`, что каждая группа получила свой протокол.
 3. Слайдером или `actuator_test set -s 1 -v 0.3 -t 2` подай положительную команду на каждую поверхность: кромка должна пойти вверх (руль направления — вправо). Идёт не туда — бит `REV`, а не знак `TRQ`.
-4. Упоры: уменьшай `MAXn` и увеличивай `MINn`, пока серва не перестанет гудеть в крайних положениях. Нейтраль — `CENTn` (FMU, 1.17) или `TRIM`.
+4. Упоры: уменьшай `MAXn` и увеличивай `MINn`, пока серва не перестанет гудеть в крайних положениях. Нейтраль — `CENTn` (FMU, с 1.17) или `TRIM`.
 5. Моторы: `actuator_test set -m 1 -v 0.1 -t 1` по одному, порядок и направление — как в px4-setup-scratch.
 
 Критерии для железа: на каждом выходе тот протокол, что в плане; положительная команда отклоняет каждую поверхность по правилу; в крайних положениях серва не упирается (ток покоя не растёт); без арма при `COM_PREARM_MODE` = 0 рули стоят в нейтрали `DIS`.
@@ -359,12 +360,12 @@ PWM_AUX_FAIL5      -1
   - Возможная причина: группа осталась на 400 Гц (в ней уже была функция) или стоит в DShot.
   - Что сделать: `PWM_AUX_TIMn` группы = 50, перезагрузка; мотор и серву развести по разным группам.
 - **Симптом:** после включения bidirectional DShot моторы 5 и 6 молчат или нет оборотов в `esc_status`.
-  - Возможная причина: bidirectional DShot в 1.16–1.17 работает только на таймере с индексом 0 (первые четыре выхода FMU на H7); в 1.15 его нет; ESC не поддерживает.
-  - Что видно в логе: `esc_status.esc_rpm` = 0 при вращении, `dshot status` показывает DShot только на первой группе.
-  - Что сделать: моторы на первые четыре выхода FMU; для гекса и окта — телеметрия по UART (`DSHOT_TEL_CFG`); версию прошивки сверить с таблицей в px4-intro.
+  - Возможная причина: в 1.18 BDShot выбран только у одной группы (`PWM_AUX_TIMn` = −6…−8 нужен у каждой группы моторов); в 1.16–1.17 bidirectional работал только на таймере с индексом 0 (первые четыре выхода FMU на H7); в 1.15 его нет; у группы нет DMA; ESC не поддерживает.
+  - Что видно в логе: `esc_status.esc_rpm` = 0 при вращении, `dshot status` показывает BDShot не на всех группах.
+  - Что сделать: в 1.18 — −6/−7/−8 в `TIMn` каждой группы моторов, перезагрузка; в 1.16–1.17 — моторы на первые четыре выхода FMU, для гекса и окта — телеметрия по UART (`DSHOT_TEL_CFG`); версию прошивки сверить с таблицей в px4-intro.
 - **Симптом:** QGC на слайдере мотора пишет «command denied».
-  - Возможная причина: аппарат заармлен; кнопка safety есть и не нажата; `COM_MOT_TEST_EN` = 0.
-  - Что сделать: дизарм, нажать safety (или `CBRK_IO_SAFETY` = 22027 на плате без кнопки), `COM_MOT_TEST_EN` = 1; из консоли — `actuator_test set -m 1 -v 0.1 -t 1`.
+  - Возможная причина: аппарат заармлен; кнопка safety есть и не нажата; в 1.17 и раньше ещё `COM_MOT_TEST_EN` = 0 (в 1.18 параметра нет).
+  - Что сделать: дизарм, нажать safety (или `CBRK_IO_SAFETY` = 22027 на плате без кнопки); из консоли — `actuator_test set -m 1 -v 0.1 -t 1`.
 - **Симптом:** на земле рули не реагируют на стики.
   - Возможная причина: `COM_PREARM_MODE` = 0 — без арма выход стоит в `DIS`.
   - Что сделать: `COM_PREARM_MODE` = 2 (или 1 с кнопкой safety); проверять слайдерами.
@@ -378,7 +379,7 @@ PWM_AUX_FAIL5      -1
   - Возможная причина: IO умеет только PWM и OneShot.
   - Что сделать: перенести ESC на AUX (FMU PWM OUT) и переназначить функции.
 - **Симптом:** обороты в `esc_status` не сходятся с расчётом по KV, динамический notch не помогает.
-  - Возможная причина: `MOT_POLE_COUNT` не равен числу магнитов мотора.
+  - Возможная причина: `DSHOT_MOT_POLn` этого мотора (до 1.18 — `MOT_POLE_COUNT`) не равен числу магнитов.
   - Что сделать: посчитать магниты на колоколе; 12 полюсов вместо 14 дают ошибку в 7/6.
 - **Симптом:** выход Peripheral via Actuator Set не реагирует на команду.
   - Возможная причина: param7 (индекс) не 0; значение в микросекундах вместо −1…1; выход в группе, занятой триггером или DShot.
@@ -387,12 +388,12 @@ PWM_AUX_FAIL5      -1
 ## checklist
 - Группы таймеров платы выписаны из `timer_config.cpp` или с экрана Actuators до пайки.
 - В каждой группе один протокол: моторы DShot отдельно, сервы 50 Гц отдельно, триггер камеры — своя группа.
-- DShot и bidirectional DShot — только на выходах FMU; при `DSHOT_BIDIR_EN` = 1 моторы на первых четырёх.
+- DShot и bidirectional DShot — только на выходах FMU; в 1.18 BDShot (−6/−7/−8) задан у каждой группы моторов (в 1.16–1.17 при `DSHOT_BIDIR_EN` = 1 — моторы только на первых четырёх).
 - После назначения Servo проверено: `DISn` = 1500, `TIMn` группы = 50.
 - Каждая поверхность идёт по правилу знаков; механика исправлена битом `REV`.
 - `MINn` / `MAXn` подобраны по упорам, нейтраль — `CENTn` или `TRIM`, но не оба.
 - `FAILn` проверен для парашюта и рулей; `COM_PREARM_MODE` выбран осознанно.
-- `MOT_POLE_COUNT` равен числу магнитов мотора.
+- `DSHOT_MOT_POLn` каждого мотора равен числу его магнитов.
 - Сервы питаются от отдельного BEC, земля общая.
 
 ## references
@@ -402,10 +403,10 @@ PWM_AUX_FAIL5      -1
 - PX4 Guide v1.17: Arm, Disarm, Prearm Configuration | https://docs.px4.io/v1.17/en/advanced_config/prearm_arm_disarm | primary | A
 - PX4 Guide v1.17: Cameras Connected to Flight Controller Outputs | https://docs.px4.io/v1.17/en/camera/fc_connected_camera | primary | A
 - PX4 Guide v1.17: PWM Servos and ESCs (питание рейки серв) | https://docs.px4.io/v1.17/en/peripherals/pwm_escs_and_servo | primary | A
-- PX4-Autopilot v1.17.0: src/lib/mixer_module/output_functions.yaml | https://github.com/PX4/PX4-Autopilot/blob/v1.17.0/src/lib/mixer_module/output_functions.yaml | primary | A
-- PX4-Autopilot v1.17.0: src/lib/mixer_module/mixer_module.cpp | https://github.com/PX4/PX4-Autopilot/blob/v1.17.0/src/lib/mixer_module/mixer_module.cpp | primary | A
-- PX4-Autopilot v1.17.0: src/drivers/pwm_out/PWMOut.cpp | https://github.com/PX4/PX4-Autopilot/blob/v1.17.0/src/drivers/pwm_out/PWMOut.cpp | primary | A
-- PX4-Autopilot v1.17.0: boards/px4/fmu-v6x/src/timer_config.cpp | https://github.com/PX4/PX4-Autopilot/blob/v1.17.0/boards/px4/fmu-v6x/src/timer_config.cpp | primary | A
+- PX4-Autopilot v1.18.0: src/lib/mixer_module/output_functions.yaml | https://github.com/PX4/PX4-Autopilot/blob/v1.18.0/src/lib/mixer_module/output_functions.yaml | primary | A
+- PX4-Autopilot v1.18.0: src/lib/mixer_module/mixer_module.cpp | https://github.com/PX4/PX4-Autopilot/blob/v1.18.0/src/lib/mixer_module/mixer_module.cpp | primary | A
+- PX4-Autopilot v1.18.0: src/drivers/pwm_out/PWMOut.cpp | https://github.com/PX4/PX4-Autopilot/blob/v1.18.0/src/drivers/pwm_out/PWMOut.cpp | primary | A
+- PX4-Autopilot v1.18.0: boards/px4/fmu-v6x/src/timer_config.cpp | https://github.com/PX4/PX4-Autopilot/blob/v1.18.0/boards/px4/fmu-v6x/src/timer_config.cpp | primary | A
 - PX4-Autopilot v1.17.0: src/modules/control_allocator/module.yaml | https://github.com/PX4/PX4-Autopilot/blob/v1.17.0/src/modules/control_allocator/module.yaml | primary | A
 
 ## notes

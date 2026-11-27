@@ -82,15 +82,15 @@
       "explain": "В AP_NavEKF3_PosVelFusion.cpp: R = sq(constrain(gpsPosAccuracy, EK3_POSNE_M_NSE, 100)). Честная σ от узла зрения (1 м с привязками, 10+ м после долгого счисления) реально меняет вес измерения; до использования приёмника EK3_GPS_CHECK требует hAcc ≤ 5 м."
     },
     {
-      "q": "PX4 1.17: узел привязки выдаёт широту и долготу с σ. Каким входом EKF2 их принять как абсолютную позицию?",
+      "q": "PX4 1.18: узел привязки выдаёт широту и долготу с σ. Каким входом EKF2 их принять как абсолютную позицию?",
       "options": [
         "MAVLink GPS_INPUT и EKF2_GPS_CTRL бит 0",
-        "Топик aux_global_position и EKF2_AGP_CTRL бит 0",
+        "Топик aux_global_position и EKF2_AGP0_CTRL бит 0",
         "VISION_POSITION_ESTIMATE и EKF2_EV_CTRL бит 3 (yaw)",
         "ODOMETRY и EKF2_HGT_REF = 3"
       ],
       "answer": 1,
-      "explain": "Приёмник MAVLink PX4 1.17 (как и 1.15) не обрабатывает GPS_INPUT. EKF2_EV_CTRL принимает внешнее зрение в локальной системе (бит 0 — горизонтальная позиция, бит 3 — yaw), а для глобальных lat/lon есть aux_global_position (uXRCE-DDS /fmu/in/aux_global_position) с EKF2_AGP_NOISE и воротами EKF2_AGP_GATE; с 1.16 EKF2_AGP_CTRL по умолчанию 0, бит 0 включают сами."
+      "explain": "Приёмник MAVLink PX4 1.18 (как и 1.15–1.17) не обрабатывает GPS_INPUT. EKF2_EV_CTRL принимает внешнее зрение в локальной системе (бит 0 — горизонтальная позиция, бит 3 — yaw), а для глобальных lat/lon есть aux_global_position (uXRCE-DDS /fmu/in/aux_global_position). В 1.18 источников до четырёх, у каждого свой набор EKF2_AGPn_*: EKF2_AGP0_CTRL бит 0 (по умолчанию 0, включают сами), EKF2_AGP0_ID — id принимаемых сообщений, EKF2_AGP0_NOISE 1.0 м и ворота EKF2_AGP0_GATE; до 1.18 — один набор EKF2_AGP_*."
     }
   ]
 }

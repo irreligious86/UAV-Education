@@ -40,7 +40,7 @@
   {
    "id": "servo-us-center-rev",
    "title": "Импульс сервы: CENT и реверс (1.17)",
-   "statement": "PX4 1.17, серва на выходе FMU: `MIN` = **{mn}**, `CENT` = **{cn}**, `MAX` = **{mx}** мкс, бит выхода в `PWM_AUX_REV` **установлен**. Аллокатор отдаёт v = **{v}**. Сколько микросекунд на выходе?",
+   "statement": "PX4 1.18 (как и 1.17), серва на выходе FMU: `MIN` = **{mn}**, `CENT` = **{cn}**, `MAX` = **{mx}** мкс, бит выхода в `PWM_AUX_REV` **установлен**. Аллокатор отдаёт v = **{v}**. Сколько микросекунд на выходе?",
    "params": {
     "mn": [
      1000,
@@ -105,7 +105,7 @@
   {
    "id": "erpm-rpm",
    "title": "eRPM → RPM",
-   "statement": "ESC по bidirectional DShot сообщает **{e}** (электрические обороты в сотнях, eRPM/100). `MOT_POLE_COUNT` = **{p}**. Какое значение `esc_rpm` опубликует драйвер `dshot`?",
+   "statement": "ESC по bidirectional DShot сообщает **{e}** (электрические обороты в сотнях, eRPM/100). `DSHOT_MOT_POLn` этого мотора = **{p}** (до 1.18 — `MOT_POLE_COUNT`). Какое значение `esc_rpm` опубликует драйвер `dshot`?",
    "params": {
     "e": {
      "min": 400,
@@ -123,7 +123,7 @@
    "unit": "об/мин",
    "tol": 0.0005,
    "abs": 1,
-   "solution": "`DShot::handle_new_bdshot_erpm`: esc_rpm = (erpm · 100) / (MOT_POLE_COUNT / 2), всё в целых числах — дробная часть отбрасывается. Число пар полюсов = полюса / 2."
+   "solution": "`DShot::process_bdshot_telemetry` (v1.18.0): erpm = значение · 100, затем esc_rpm = erpm / (`DSHOT_MOT_POLn` / 2), всё в целых числах — дробная часть отбрасывается. Число пар полюсов = полюса / 2. В 1.16–1.17 та же формула шла через общий `MOT_POLE_COUNT`."
   },
   {
    "id": "timer-feasibility",

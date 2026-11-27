@@ -1,6 +1,6 @@
 """Thin-module pass (stage 6) diagram for module px4-ros2.
 
-px4-offboard-loss-timeline — when PX4 1.17.0 drops out of Offboard. offboardCheck.cpp marks the offboard signal as
+px4-offboard-loss-timeline — when PX4 1.17.0 / 1.18.0 drops out of Offboard (offboardCheck.cpp: same timing logic). offboardCheck.cpp marks the offboard signal as
                              lost when hrt_absolute_time() >= OffboardControlMode.timestamp + COM_OF_LOSS_T
                              (default 1.0 s, commander_params.c); failsafe.cpp checkModeFallback() then applies
                              COM_OBL_RC_ACT (default 0 = Position). Numbers are the module's lab (dds_lab.py, part 3):
@@ -21,7 +21,7 @@ FALLBACK = round(LAST + LOSS_T, 1)      # 5.9 s
 def loss_timeline() -> str:
     lanes = [
         ("Узел, 10 Гц", [(0, STOP, "OffboardControlMode + уставка", True), (STOP, 8, "тишина")]),
-        ("PX4 1.17", [(0, 1, "поток"), (1, FALLBACK, "Offboard", True), (FALLBACK, 8, "COM_OBL_RC_ACT")]),
+        ("PX4 1.17–1.18", [(0, 1, "поток"), (1, FALLBACK, "Offboard", True), (FALLBACK, 8, "COM_OBL_RC_ACT")]),
         ("метки −1.5 с", [(0, 8, "сигнал «старый» всегда: в Offboard не войти")]),
     ]
     return timeline("Выход из Offboard: последняя метка + COM_OF_LOSS_T (1 с), а не «частота ниже 2 Гц»",

@@ -3,7 +3,7 @@ id: px4-control
 title: "Контуры управления и тюнинг PX4"
 level: L3
 readingTime: 25 мин
-firmware: PX4 1.17 (сверено с v1.17.0)
+firmware: PX4 1.18 (сверено с v1.18.0)
 status: published
 added: 2026-03-21
 tags:
@@ -50,7 +50,9 @@ PX4 использует параллельную форму с общим мн�
 
 Единицы важны: ошибка в рад/с, выход — доля максимального момента. P = 0.15 означает: ошибка 1 рад/с (57°/с) даёт 15% момента. Для сравнения с Betaflight (безразмерные «45») — только качественно, через модуль «Теория управления» (ζ, запас по фазе).
 
-### Умолчания по всем осям (v1.17.0)
+### Умолчания по всем осям (v1.17.0; в v1.18.0 те же)
+В 1.18 к контуру угла добавлен необязательный feed-forward от эталонной модели второго порядка: `MC_REF_FF` (0…1, по умолчанию 0 — прежнее поведение), собственная частота `MC_REF_W_N` (50 рад/с) и предел `MC_REF_FF_MAX` (100 °/с) (`mc_att_control_params.yaml`, v1.18.0). Таблица ниже — без него.
+
 Правило чтения: вход — ось и уровень каскада; по таблице — с какого числа стартует универсальный airframe (4001 Generic Quadcopter усиления не переопределяет; готовые airframe конкретных рам могут); проверка — `param show MC_ROLLRATE*` (и `MC_PITCHRATE*`, `MC_YAWRATE*`; `*` допускается только в конце фильтра) в консоли совпадает с таблицей, пока ты ничего не менял.
 
 | Уровень | Крен (roll) | Тангаж (pitch) | Рыскание (yaw) | Единица |
@@ -86,7 +88,7 @@ PX4 использует параллельную форму с общим мн�
 {{diagram:px4-tune-order-flow|Фильтры настраивают до всего; autotune заменяет ручной rate и attitude P, а контуры скорости и позиции настраивают уже после него — сначала скорость.}}
 
 ### Разобранный пример: 7" 6S, 1.4 кг
-Старт: airframe Generic Quad, `CA_ROTOR_COUNT` = 4, проверить `IMU_GYRO_RATEMAX` = 800 Гц (airframe уже поднял его с 400), `IMU_GYRO_CUTOFF` 40 → 80, `IMU_DGYRO_CUTOFF` 20 → 40 (до 1.17 умолчание было 30); eRPM от ESC: bidirectional DShot (`DSHOT_BIDIR_EN` = 1; появился в 1.16, работает на поддерживаемых платах и выходах FMU) или телеметрия ESC по UART (`DSHOT_TEL_CFG` — в 1.15 единственный вариант), `IMU_GYRO_DNF_EN` = 1; `MPC_THR_HOVER` уточнится оценщиком HTE; первый полёт Stabilized — `MC_ROLLRATE_K` 1.0 → 0.7 если качает; autotune; `MPC_XY_VEL_MAX` под задачу. Лог → Flight Review: rate tracking, спектр, `vehicle_torque_setpoint` без насыщения.
+Старт: airframe Generic Quad, `CA_ROTOR_COUNT` = 4, проверить `IMU_GYRO_RATEMAX` = 800 Гц (airframe уже поднял его с 400), `IMU_GYRO_CUTOFF` 40 → 80, `IMU_DGYRO_CUTOFF` 20 → 40 (до 1.17 умолчание было 30); eRPM от ESC: bidirectional DShot (в 1.18 — `PWM_AUX_TIMn` = −6/−7/−8 у группы моторов; в 1.16–1.17 — `DSHOT_BIDIR_EN` = 1; работает на поддерживаемых платах и выходах FMU) или телеметрия ESC по UART (`DSHOT_TEL_CFG` — в 1.15 единственный вариант), `IMU_GYRO_DNF_EN` = 1; `MPC_THR_HOVER` уточнится оценщиком HTE; первый полёт Stabilized — `MC_ROLLRATE_K` 1.0 → 0.7 если качает; autotune; `MPC_XY_VEL_MAX` под задачу. Лог → Flight Review: rate tracking, спектр, `vehicle_torque_setpoint` без насыщения.
 
 {{diagram:px4-cascade|Каскад PX4: позиция → скорость → ориентация → угловая скорость → аллокатор, с параметрами каждого уровня.}}
 

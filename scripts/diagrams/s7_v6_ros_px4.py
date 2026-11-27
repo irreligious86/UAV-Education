@@ -193,7 +193,7 @@ def mode_ladder() -> str:
         out.append(_arrow(f"M620 {ya:.1f} L640 {ya:.1f} L640 {yb:.1f} L622 {yb:.1f}", True))
         out.append(text(647, (ya + yb) / 2 - 2, lab[0], "a t", "start", 10.5))
         out.append(text(647, (ya + yb) / 2 + 12, lab[1], "a t", "start", 10.5))
-    out.append(text(632, top - 10, "откат 1.17", "a t", "start", 10.5))
+    out.append(text(632, top - 10, "откат с 1.17", "a t", "start", 10.5))
     H = top + 4 * (rh + gap) - gap + 10
     return svg(W, H, "Режимы мультиротора PX4 и нужные им оценки", "".join(out))
 

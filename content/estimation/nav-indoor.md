@@ -3,7 +3,7 @@ id: nav-indoor
 title: "Без GNSS: оптический поток, UWB, motion capture и внешняя навигация в EKF"
 level: L3
 readingTime: 50 мин
-firmware: ArduCopter 4.7 (сверено с 4.7.3; лабораторная снята на 4.6.3) · PX4 1.17 (сверено с v1.17.0)
+firmware: ArduCopter 4.7 (сверено с 4.7.3; лабораторная снята на 4.6.3) · PX4 1.18 (параметры сверены с v1.18.0)
 status: published
 tags:
   - ExternalNav
@@ -89,7 +89,7 @@ EKF2 (1.17): `EKF2_EV_CTRL` — битовая маска (0 — горизон�
 | Драйвер потока (I²C/SPI) | `SENS_EN_PMW3901`, `SENS_EN_PAA3905`, `SENS_EN_PAW3902`, `SENS_EN_PX4FLOW` | 0 | 1 для своего датчика |
 | Драйвер потока (UART, ThoneFlow) | `SENS_TFLOW_CFG` | 0 | порт датчика |
 | Поток по CAN или MAVLink | `UAVCAN_SUB_FLOW` (CAN); MAVLink `OPTICAL_FLOW_RAD` — без отдельного включения | 0 | 1 для CAN-модуля (`el-dronecan`) |
-| Дальномер (I²C) | `SENS_EN_VL53L1X`, `SENS_EN_SF1XX` (номер модели 1…7), `SENS_EN_LL40LS` (1 — PWM, 2 — I²C) | 0 | 1 / модель / интерфейс |
+| Дальномер (I²C) | `SENS_EN_VL53L1X`, `SENS_EN_SF1XX` (номер модели 1…7; в 1.18 — 1…9, добавлены GRF250 и GRF500), `SENS_EN_LL40LS` (1 — PWM, 2 — I²C) | 0 | 1 / модель / интерфейс |
 | Дальномер (UART) | `SENS_TFMINI_CFG`, `SENS_SF0X_CFG` и другие `SENS_*_CFG` | 0 | порт; список драйверов — `px4-hardware-peripherals` |
 | Установка потока | `SENS_FLOW_ROT` (0 — ось X датчика вперёд, шаг 45°), `EKF2_OF_POS_X/Y/Z` | 0 | поворот и смещение линзы от центра масс |
 | Масштаб потока | `SENS_FLOW_SCALE` (с 1.16; 0.5…1.5) | 1.0 | поправка, если пройденное по потоку расстояние систематически не совпадает с рулеткой |

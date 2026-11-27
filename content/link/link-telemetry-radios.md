@@ -3,7 +3,7 @@ id: link-telemetry-radios
 title: "Телеметрийные радиомодемы: SiK, RFD900, ELRS MAVLink, IP-радио и LTE"
 level: L2
 readingTime: 30 мин
-firmware: ArduPilot 4.5+ · PX4 1.17 (сверено с v1.17.0) · SiK 2.x
+firmware: ArduPilot 4.5+ · PX4 1.18 (параметры сверены с v1.18.0) · SiK 2.x
 status: published
 tags:
   - телеметрия

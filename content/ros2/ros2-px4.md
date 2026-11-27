@@ -41,7 +41,7 @@ def topic(base, msg_cls):
 ### Правила Offboard
 1. Внешний контроллер обязан непрерывно слать `OffboardControlMode` (какие уставки активны: position, velocity, acceleration, attitude, body_rate…) с частотой заметно **выше 2 Гц** (документация называет 2 Гц; по коду PX4 теряет сигнал, когда метка последнего сообщения старше `COM_OF_LOSS_T`, см. `px4-ros2`) — это «доказательство жизни». Реальные уставки — в `TrajectorySetpoint` (position/velocity/acceleration/yaw, неиспользуемые поля = NaN).
 2. Поток должен идти **до** переключения в Offboard (и до арминга в Offboard), иначе PX4 откажет.
-3. Если поток прервался дольше `COM_OF_LOSS_T`, PX4 выходит из Offboard и переключается в режим из `COM_OBL_RC_ACT` (Position, Altitude, Stabilized, Return, Land, Hold, Terminate, Disarm; значение 2 до 1.16 называлось Manual). В 1.17 при выборе Position, Altitude или Stabilized без ручного управления выполняется `NAV_RCL_ACT`.
+3. Если поток прервался дольше `COM_OF_LOSS_T`, PX4 выходит из Offboard и переключается в режим из `COM_OBL_RC_ACT` (Position, Altitude, Stabilized, Return, Land, Hold, Terminate, Disarm; значение 2 до 1.16 называлось Manual). С 1.17 при выборе Position, Altitude или Stabilized без ручного управления выполняется `NAV_RCL_ACT` (в 1.18 при `NAV_RCL_ACT` = 7 — Hold).
 4. Команды — `VehicleCommand` в `/fmu/in/vehicle_command`: арм `VEHICLE_CMD_COMPONENT_ARM_DISARM` (param1 = 1), режим `VEHICLE_CMD_DO_SET_MODE` (param1 = 1 — custom, param2 = 6 — Offboard), посадка `VEHICLE_CMD_NAV_LAND`. Подтверждение — в `/fmu/out/vehicle_command_ack`; состояние — `VehicleStatus.arming_state`, `nav_state`.
 5. Координаты в `TrajectorySetpoint` — **NED, локальные**, начало — точка инициализации EKF; высота отрицательная.
 
@@ -67,7 +67,7 @@ def topic(base, msg_cls):
 
 - **Получает:** топики `/fmu/out/*` и правила Offboard (`px4-ros2`); QoS и время (`ros2-basics`); `px4_msgs` той же версии, что прошивка (`px4-intro`); мир для полёта квадрата (`tools-gazebo`).
 - **Отдаёт:** поток `OffboardControlMode` и `TrajectorySetpoint` — контроллеру позиции PX4 (`px4-control`); автомат `OffboardFSM` — обёртке ArduPilot (`ros2-ardupilot`); роль «решение» — архитектуре приложения (`ros2-app-arch`).
-- **Если ошибиться здесь:** имя топика вписано руками, прошивка обновлена → `vehicle_status` публикуется с суффиксом `_v1` → статус «устарел» → автомат уходит в ABORT на земле (`px4-intro`). Поток прервался дольше `COM_OF_LOSS_T` → PX4 выполняет `COM_OBL_RC_ACT`, а в 1.17 без ручного управления — `NAV_RCL_ACT` (`px4-setup-scratch`).
+- **Если ошибиться здесь:** имя топика вписано руками, прошивка обновлена → `vehicle_status` публикуется с суффиксом версии (`_v1` в 1.16–1.17, `_v4` в 1.18) → статус «устарел» → автомат уходит в ABORT на земле (`px4-intro`). Поток прервался дольше `COM_OF_LOSS_T` → PX4 выполняет `COM_OBL_RC_ACT`, а с 1.17 без ручного управления — `NAV_RCL_ACT` (`px4-setup-scratch`).
 
 ## practice
 ### Шаг 1. Тест автомата

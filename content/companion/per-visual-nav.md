@@ -3,7 +3,7 @@ id: per-visual-nav
 title: "Визуальная навигация: оптический поток, VIO, SLAM обзорно"
 level: L4
 readingTime: 55 мин
-firmware: ArduPilot 4.7 (сверено с 4.7.3; лабораторная снята на SITL 4.7.2) · PX4 1.17.0
+firmware: ArduPilot 4.7 (сверено с 4.7.3; лабораторная снята на SITL 4.7.2) · PX4 1.18 (параметры сверены с v1.18.0)
 status: published
 added: 2026-11-08
 tags:

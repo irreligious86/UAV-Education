@@ -3,7 +3,7 @@ id: nav-rtk
 title: "RTK/PPK: база и ровер, NTRIP, moving baseline, GPS yaw"
 level: L3
 readingTime: 45 мин
-firmware: ArduPilot 4.7 (сверено с 4.7.3; лабораторная снята на 4.6.3) · PX4 1.17 (сверено с v1.17.0)
+firmware: ArduPilot 4.7 (сверено с 4.7.3; лабораторная снята на 4.6.3) · PX4 1.18 (параметры сверены с v1.18.0)
 status: published
 added: 2026-11-10
 tags:

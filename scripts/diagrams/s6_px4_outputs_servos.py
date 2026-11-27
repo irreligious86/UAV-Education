@@ -1,9 +1,9 @@
 """Stage 6 diagrams for px4-outputs-servos.
 
-1. px4-outputs-pipeline — who produces an output value in PX4 1.17 and in which order
+1. px4-outputs-pipeline — who produces an output value in PX4 1.18 (same chain as 1.17) and in which order
    (control_allocator -> actuator_motors / actuator_servos -> mixer_module -> driver -> timer).
 2. px4-outputs-timers-v6x — timer groups of px4/fmu-v6x (boards/px4/fmu-v6x/src/timer_config.cpp,
-   v1.17.0, lines 59-77) and of its IO processor (boards/px4/io-v2/src/timer_config.cpp, lines 36-51),
+   v1.17.0, lines 59-77; unchanged in v1.18.0) and of its IO processor (boards/px4/io-v2/src/timer_config.cpp, lines 36-51),
    with the reference plan from the module's practice step 1 written under each group.
 """
 from __future__ import annotations
@@ -43,7 +43,7 @@ def build(D: dict) -> None:
         ("drv", "tim", "", False, "v"),
     ]
     D["px4-outputs-pipeline"] = flow(
-        "PX4 1.17: путь значения от контроллера до пина", boxes, links, 720, 262,
+        "PX4 1.18: путь значения от контроллера до пина", boxes, links, 720, 262,
         notes=[
             (12, 232, "mixer_module работает внутри каждого драйвера выходов: функция выхода выбирает источник,", "m t"),
             (12, 247, "MIN/MAX/CENT/REV переводят −1…+1 в мкс (DShot: 1…1999); armed-флаги решают — значение, DIS или FAIL.", "m t"),

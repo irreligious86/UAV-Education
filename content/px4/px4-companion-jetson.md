@@ -3,7 +3,7 @@ id: px4-companion-jetson
 title: "PX4 + Jetson Orin: companion по UART, MAVLink и uXRCE-DDS"
 level: L3
 readingTime: 45 мин
-firmware: PX4 1.17.0 (сверено с исходниками v1.17.0) · JetPack 7.2.2 (Jetson Linux 39.2.2, Ubuntu 24.04) / JetPack 6.2.x (Ubuntu 22.04)
+firmware: PX4 1.18 (сверено с исходниками v1.17.0; отличия 1.18.0 по параметрам отмечены, расчёт канала — по топикам 1.17.0) · JetPack 7.2.2 (Jetson Linux 39.2.2, Ubuntu 24.04) / JetPack 6.2.x (Ubuntu 22.04)
 status: published
 tags:
   - Jetson
@@ -24,7 +24,7 @@ Jetson Orin Nano/NX — стандартный companion для зрения н�
 
 ## theory
 ### Роли и граница
-Pixhawk (PX4) — стабилизация, EKF, failsafe, миссии; Jetson — зрение, планирование, ROS 2, сеть. Граница та же, что в модуле «Companion: роль и границы»: без Jetson аппарат обязан лететь и возвращаться, а потеря companion в offboard обрабатывается failsafe PX4 (`COM_OF_LOSS_T`, `COM_OBL_RC_ACT`), а не надеждой. PX4 следит за companion и вторым способом: если по MAVLink перестал приходить HEARTBEAT от компонента типа «onboard controller», через `COM_OBC_LOSS_T` (5 с по умолчанию) commander пишет «Connection to mission computer lost». Это только предупреждение, действия нет (`Commander.cpp`, v1.17.0) — реакцию задаёт offboard-failsafe.
+Pixhawk (PX4) — стабилизация, EKF, failsafe, миссии; Jetson — зрение, планирование, ROS 2, сеть. Граница та же, что в модуле «Companion: роль и границы»: без Jetson аппарат обязан лететь и возвращаться, а потеря companion в offboard обрабатывается failsafe PX4 (`COM_OF_LOSS_T`, `COM_OBL_RC_ACT`), а не надеждой. PX4 следит за companion и вторым способом: если по MAVLink перестал приходить HEARTBEAT от компонента типа «onboard controller», через 5 с (до 1.18 — `COM_OBC_LOSS_T`, 5 с по умолчанию) commander пишет «Connection to mission computer lost». Это только предупреждение, действия нет (`Commander.cpp`, v1.17.0 и v1.18.0) — реакцию задаёт offboard-failsafe. В 1.18 таймаут параметром не задаётся: 5 с зашиты в коде, `COM_OBC_LOSS_T` удалён.
 
 ### Какой Jetson и какая система
 | Плата | Режимы мощности: исходные → Super (`nvpmodel`) | INT8 sparse, TOPS: исходно → Super | Что даёт |
@@ -81,7 +81,7 @@ UART 8N1 переносит байт за 10 бит: 921600 бод — 92 160 б
 | `SER_TEL2_BAUD` | 921600 | бод | скорость TELEM2 |
 | `UXRCE_DDS_CFG` | 0 (выкл.) | 102 TELEM2, 1000 Ethernet | порт клиента DDS |
 | `UXRCE_DDS_AG_IP` / `UXRCE_DDS_PRT` | 2130706433 / 8888 | int32 / 0–65535 | агент по Ethernet |
-| `COM_OBC_LOSS_T` | 5 с | 0–60 с | предупреждение о потере companion (MAVLink) |
+| — (до 1.18 `COM_OBC_LOSS_T`) | 5 с | в 1.18 не настраивается | предупреждение о потере companion (MAVLink) |
 | `COM_OF_LOSS_T` / `COM_OBL_RC_ACT` | 1 с / 0 (Position) | с / 0–7 | потеря Offboard (`px4-ros2`) |
 | `sudo nvpmodel -q` / `-m <N>` | — | режимы модуля | режим мощности |
 | `sudo jetson_clocks` | — | — | частоты на максимум режима |
@@ -273,7 +273,7 @@ WantedBy=multi-user.target
   - Возможная причина: плата прошита без конфигурации Super; ISO не переводит её в Super.
   - Что сделать: перепрошить с x86-хоста конфигурацией `jetson-orin-nano-devkit-super`, проверить `nvpmodel -q`.
 - **Симптом:** в QGC «Connection to mission computer lost»
-  - Возможная причина: HEARTBEAT companion по MAVLink пропал дольше `COM_OBC_LOSS_T` (5 с): упал процесс, перезагрузка Jetson.
+  - Возможная причина: HEARTBEAT companion по MAVLink пропал дольше 5 с (до 1.18 — `COM_OBC_LOSS_T`): упал процесс, перезагрузка Jetson.
   - Что сделать: это предупреждение без действия — проверить, что offboard-failsafe (`COM_OBL_RC_ACT`) настроен; разобрать `journalctl` на Jetson.
 - **Симптом:** задержка детекции растёт через 10 минут полёта
   - Возможная причина: троттлинг Jetson.

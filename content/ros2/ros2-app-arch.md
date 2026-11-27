@@ -3,7 +3,7 @@ id: ros2-app-arch
 title: "Архитектура бортового приложения на ROS 2: узлы, lifecycle, watchdog"
 level: L3
 readingTime: 65 мин
-firmware: ROS 2 Jazzy · PX4 1.17 · ArduPilot 4.7
+firmware: ROS 2 Jazzy · PX4 1.18 · ArduPilot 4.7
 status: published
 added: 2026-11-08
 tags:

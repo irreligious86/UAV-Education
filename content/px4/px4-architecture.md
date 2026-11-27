@@ -3,7 +3,7 @@ id: px4-architecture
 title: "Архитектура PX4: модули и uORB"
 level: L3
 readingTime: 25 мин
-firmware: PX4 1.17 (сверено с v1.17.0)
+firmware: PX4 1.18 (параметры сверены с v1.18.0; модули и uORB — по исходникам v1.17.0)
 status: published
 added: 2026-11-08
 tags:

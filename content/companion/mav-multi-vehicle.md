@@ -3,7 +3,7 @@ id: mav-multi-vehicle
 title: "Несколько аппаратов: адресация, разнесение, строй и супервизор"
 level: L3
 readingTime: 35 мин
-firmware: ArduPilot 4.7 (сверено с 4.7.3) · PX4 1.17 (сверено с v1.17.0) · MAVLink 2
+firmware: ArduPilot 4.7 (сверено с 4.7.3) · PX4 1.18 (параметры сверены с v1.18.0) · MAVLink 2
 status: published
 tags:
   - флот

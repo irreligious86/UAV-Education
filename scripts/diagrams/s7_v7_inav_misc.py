@@ -45,7 +45,7 @@ inav-surface-limits        est-alt-sources — INAV SURFACE (id 33): appears onl
                            pair 100 at 200 (default) and 250 at 200 (wrong) on a linear 0–300 cm scale; the top
                            (250 − 200)/250 = 20 % of throttle travel lands above the limit (computed here).
 gps-loss-ladder            nav-resilience — what each firmware does as navigation degrades, from «Что делает прошивка сама»:
-                           ArduPilot (EK3_GLITCH_RAD 25 m reset, EKF failsafe FS_EKF_ACTION 0–3), PX4 1.17 (COM_POS_LOW_ACT
+                           ArduPilot (EK3_GLITCH_RAD 25 m reset, EKF failsafe FS_EKF_ACTION 0–3), PX4 1.18 (COM_POS_LOW_ACT
                            in Mission/Hold, Position -> Altitude -> Stabilized), INAV (nav_position_timeout 5 s ->
                            emergency landing 5 m/s -> failsafe_throttle); bottom — the module's choice by place.
 gimbal-control-paths       payload-gimbal — the command path per firmware: ArduPilot clients -> mount manager
@@ -530,7 +530,7 @@ def surface_limits() -> str:
 def gps_loss_ladder() -> str:
     W = 720
     out = [text(16, 18, "Что делает прошивка сама, когда навигация деградирует (по ступеням)", "m t", "start")]
-    cols = [(104, "ArduPilot 4.7"), (308, "PX4 1.17"), (512, "INAV 9.1")]
+    cols = [(104, "ArduPilot 4.7"), (308, "PX4 1.18"), (512, "INAV 9.1")]
     cw = 200
     rungs = [("позиция", "врёт / хуже"), ("позиции", "нет"), ("нет и", "высоты")]
     for cx, h in cols:
@@ -541,7 +541,7 @@ def gps_loss_ladder() -> str:
         (2, 0): ["короткие пропадания:", "счисление на секунды", "(inav_allow_dead_reckoning)"],
         (0, 1): ["EKF failsafe: порог", "FS_EKF_THRESH; FS_EKF_ACTION", "1 Land, 2 AltHold — если", "режим требует позицию;",
                  "3 Land всегда; 0 сообщение"],
-        (1, 1): ["Position → Altitude", "(1.17 сам; до 1.17 —", "COM_POSCTL_NAVL)"],
+        (1, 1): ["Position → Altitude", "(с 1.17 сам; до 1.17 —", "COM_POSCTL_NAVL)"],
         (2, 1): ["RTH / WP: нет позиции", "> nav_position_timeout (5 с)", "→ аварийная посадка 5 м/с", "(оба — умолч.) до детектора"],
         (1, 2): ["Altitude → Stabilized"],
         (2, 2): ["снижения по скорости нет:", "газ failsafe_throttle"],
@@ -568,7 +568,7 @@ def gps_loss_ladder() -> str:
 # ---------------------------------------------------------------- payload-gimbal
 def gimbal_control_paths() -> str:
     W = 720
-    out = [text(16, 18, "Путь команды подвесу: где включается и где молча обрывается (ArduPilot 4.7.2, PX4 1.17)",
+    out = [text(16, 18, "Путь команды подвесу: где включается и где молча обрывается (ArduPilot 4.7.2, PX4 1.18)",
                 "m t", "start")]
     # ArduPilot lane
     y = 46

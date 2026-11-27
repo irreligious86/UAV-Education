@@ -3,7 +3,7 @@ id: mav-sdk
 title: "Библиотеки над MAVLink: pymavlink, MAVSDK, MAVROS — что и когда"
 level: L3
 readingTime: 55 мин
-firmware: ArduPilot 4.7 (сверено с 4.7.3; лабораторная снята на SITL 4.7.2) · PX4 1.17 · MAVSDK 4.2.1 · pymavlink 2.4.50
+firmware: ArduPilot 4.7 (сверено с 4.7.3; лабораторная снята на SITL 4.7.2) · PX4 1.18 (параметры сверены с v1.18.0) · MAVSDK 4.2.1 · pymavlink 2.4.50
 status: published
 added: 2026-11-08
 tags:

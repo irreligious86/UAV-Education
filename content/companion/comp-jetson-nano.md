@@ -3,7 +3,7 @@ id: comp-jetson-nano
 title: "Jetson Nano как компаньон: что он может, чего нет и как выжать максимум"
 level: L2
 readingTime: 50 мин
-firmware: ArduPilot 4.7 (сверено с 4.7.3; лабораторная снята на 4.6.3) · PX4 1.17 (сверено с v1.17.0) · JetPack 4.6.6 / 6.2
+firmware: ArduPilot 4.7 (сверено с 4.7.3; лабораторная снята на 4.6.3) · PX4 1.18 (параметры сверены с v1.18.0) · JetPack 4.6.6 / 6.2
 status: published
 added: 2026-11-14
 tags:

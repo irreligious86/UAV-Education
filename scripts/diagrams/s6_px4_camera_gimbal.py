@@ -1,9 +1,10 @@
-"""Stage 6 diagrams for px4-camera-gimbal (PX4 v1.17.0).
+"""Stage 6 diagrams for px4-camera-gimbal (PX4 v1.18.0).
 
 px4-gimbal-flow            — command sources -> gimbal module (input selected by MNT_MODE_IN, gimbal
                              manager, angle math) -> output selected by MNT_MODE_OUT. Mirrors
                              src/modules/gimbal/gimbal.cpp (input/output objects), output.cpp and
-                             output_rc.cpp (limits, offsets, stabilisation only for AUX and MAVLink v1).
+                             output_rc.cpp (limits MNT_MIN/MAX_PITCH, filter MNT_TAU, stabilisation only for AUX and MAVLink v1;
+                             v1.18 removed MNT_RANGE_PITCH and MNT_OFF_*).
 chart-px4-trigger-interval — time between frames T = F * (1 - p) / v for the module's worked example
                              (frame footprint along track F = 90 m) and three forward overlaps, with the
                              camera cycle time 1.2 s and TRIG_MIN_INTERVA 1.0 s of the exercise.
@@ -31,10 +32,10 @@ def build(D: dict) -> None:
         Box("rc", ["Пульт: RC_MAP_AUXn", "→ MNT_MAN_*"], x0, ya, w, h, note="угол или скорость"),
         Box("gcs", ["Наземка, companion:", "GIMBAL_MANAGER_*"], x0, yb + 5, w, h, note="нужен primary control"),
         Box("mis", ["Миссия: ROI,", "DO_GIMBAL_MANAGER_*"], x0, yc + 5, w, h, note="через navigator"),
-        Box("in", ["Вход: MNT_MODE_IN", "0 оба · 1 пульт · 4 v2"], x1, ya, 160, h, accent=True),
+        Box("in", ["Вход: MNT_MODE_IN", "0 оба · 1 пульт · 4 v2 · 5 фикс."], x1, ya, 160, h, accent=True),
         Box("mgr", ["Gimbal manager:", "кто управляет,", "ROI → углы"], x1, yb, 160, 56, accent=True),
-        Box("calc", ["Только AUX и v1:", "DO_STAB, ±RANGE/2,", "LND_P, OFF"], x2, yb, 160, 56),
-        Box("aux", ["MNT_MODE_OUT 0:", "функции 420–422"], x3, ya, w, h, note="mixer: MIN…MAX, мкс"),
+        Box("calc", ["Только AUX и v1:", "DO_STAB, MIN/MAX_PITCH,", "LND_P, TAU"], x2, yb, 160, 56),
+        Box("aux", ["MNT_MODE_OUT 0:", "функции 420–422"], x3, ya, w, h, note="mixer: MIN–CENT–MAX, мкс"),
         Box("v1", ["MNT_MODE_OUT 1:", "DO_MOUNT_CONTROL"], x3, yb + 5, w, h, note="MNT_MAV_SYSID/COMPID"),
         Box("v2", ["MNT_MODE_OUT 2:", "GIMBAL_DEVICE_", "SET_ATTITUDE"], x2, yc, 160, 56, accent=True,
             note="кватернион как есть"),
@@ -46,10 +47,10 @@ def build(D: dict) -> None:
         ("mgr", "v2", "", True, "h"), ("v2", "dev", "", True),
     ]
     D["px4-gimbal-flow"] = flow(
-        "PX4 1.17: от источника команды до подвеса", boxes, links, 720, 330,
+        "PX4 1.18: от источника команды до подвеса", boxes, links, 720, 330,
         notes=[
             (12, 308, "MNT_MODE_IN = −1 (по умолчанию): модуль gimbal не запущен. Смена MODE_IN / MODE_OUT — с перезагрузкой.", "m t"),
-            (12, 323, "Выход v2: MNT_RANGE, MNT_OFF, MNT_DO_STAB не действуют; адрес — из GIMBAL_DEVICE_INFORMATION.", "m t"),
+            (12, 323, "Выход v2: MNT_MIN/MAX_PITCH, MNT_TAU, MNT_DO_STAB не действуют; адрес — из GIMBAL_DEVICE_INFORMATION.", "m t"),
         ])
 
     vs = [4 + i * 0.1 for i in range(0, 181)]          # 4…22 m/s

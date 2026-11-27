@@ -3,7 +3,7 @@ id: nav-terrain
 title: "Следование рельефу: terrain data, дальномер, TERRAIN_*, безопасность"
 level: L2
 readingTime: 40 мин
-firmware: ArduCopter 4.7 (сверено с 4.7.3; лабораторная снята на 4.6.3) · ArduPlane 4.7 · PX4 1.17 (сверено с v1.17.0)
+firmware: ArduCopter 4.7 (сверено с 4.7.3; лабораторная снята на 4.6.3) · ArduPlane 4.7 · PX4 1.18 (параметры сверены с v1.18.0)
 status: published
 tags:
   - terrain following

@@ -1,4 +1,4 @@
-"""Stage 6 diagrams for px4-rc-tuning (PX4 v1.17.0, src/modules/rc_update/rc_update.cpp).
+"""Stage 6 diagrams for px4-rc-tuning (PX4 v1.17.0 and v1.18.0, src/modules/rc_update/rc_update.cpp unchanged).
 
 1. px4-rc-flow             — input_rc -> rc_update (calibration, normalisation) -> three products:
                              manual_control_input (sticks, flaps, AUX), manual_control_switches (mode slot and
@@ -54,7 +54,7 @@ def build(D: dict) -> None:
         ("mc", "cm", "", False, "v"),
     ]
     D["px4-rc-flow"] = flow(
-        "PX4 1.17: канал пульта → нормировка → стики, тумблеры, подстройка", boxes, links, 720, 330,
+        "PX4 1.18: канал пульта → нормировка → стики, тумблеры, подстройка", boxes, links, 720, 330,
         notes=[
             (12, 300, "Тумблеры и ручки подстройки живут только в rc_update: джойстик MAVLink приходит", "m t"),
             (12, 315, "в manual_control мимо него — слотов режимов, kill и RC_MAP_PARAMn у джойстика нет.", "m t"),

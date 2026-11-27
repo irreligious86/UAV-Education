@@ -3,7 +3,7 @@ id: nav-vtrn
 title: "Ориентирование по местности камерой: кадр против карты, визуальная одометрия и возврат без GNSS"
 level: L3
 readingTime: 55 мин
-firmware: ArduPilot 4.7 (сверено с 4.7.3; лабораторная снята на 4.6.3) · PX4 1.17 (сверено с v1.17.0)
+firmware: ArduPilot 4.7 (сверено с 4.7.3; лабораторная снята на 4.6.3) · PX4 1.18 (параметры сверены с v1.18.0)
 status: published
 added: 2026-11-14
 tags:
@@ -79,7 +79,7 @@ VIO (per-visual-nav) берёт масштаб из акселерометра, 
 
 **Путь 2 — ExternalNav.** `VISION_POSITION_ESTIMATE` (#102: x, y, z в локальной системе, `covariance[21]`, `reset_counter`) или `ODOMETRY`, `VISO_TYPE = 1`, `EK3_SRC2_POSXY = 6`; переключение наборов — тумблер `RCx_OPTION = 90` или `MAV_CMD_SET_EKF_SOURCE_SET` (per-visual-nav, nav-resilience). Нужен origin и своя пересчётка lat/lon → локальные метры. `GPS_INPUT` проще для абсолютных привязок: глобальные координаты и автоматический UseBest; ExternalNav честнее разделяет источники и не маскирует зрение под GNSS в логах.
 
-**PX4.** `GPS_INPUT` приёмник MAVLink PX4 1.17 не обрабатывает (как и в 1.15, 1.16). Внешнее зрение — `VISION_POSITION_ESTIMATE`/`ODOMETRY` в локальной NED, `EKF2_EV_CTRL` (биты: 0 — горизонтальная позиция, 1 — вертикальная, 2 — скорость, 3 — yaw; по умолчанию 0, в 1.15 было 15), шум из сообщения или `EKF2_EVP_NOISE` (`EKF2_EV_NOISE_MD`), ворота `EKF2_EVP_GATE` 5σ, `EKF2_EV_DELAY`. Для абсолютных lat/lon есть отдельный вход: топик `aux_global_position` (uXRCE-DDS `/fmu/in/aux_global_position`), `EKF2_AGP_CTRL` бит 0 (по умолчанию 0 — вход выключен; в 1.15 было 1), `EKF2_AGP_NOISE` 0.9 м, `EKF2_AGP_GATE` 3σ.
+**PX4.** `GPS_INPUT` приёмник MAVLink PX4 1.18 не обрабатывает (как и в 1.15–1.17). Внешнее зрение — `VISION_POSITION_ESTIMATE`/`ODOMETRY` в локальной NED, `EKF2_EV_CTRL` (биты: 0 — горизонтальная позиция, 1 — вертикальная, 2 — скорость, 3 — yaw; по умолчанию 0, в 1.15 было 15), шум из сообщения или `EKF2_EVP_NOISE` (`EKF2_EV_NOISE_MD`), ворота `EKF2_EVP_GATE` 5σ, `EKF2_EV_DELAY`. Для абсолютных lat/lon есть отдельный вход: топик `aux_global_position` (uXRCE-DDS `/fmu/in/aux_global_position`), в 1.18 — до четырёх источников с наборами `EKF2_AGP0…3_*`: `EKF2_AGP0_CTRL` бит 0 (по умолчанию 0 — вход выключен; бит 1 зарезервирован), `EKF2_AGP0_ID` — какой `id` сообщения принимать (по умолчанию 0; при переносе с 1.17 с включённым входом ставится 1 — id, который шлёт `GlobalPositionMeasurementInterface`), `EKF2_AGP0_NOISE` 1.0 м, `EKF2_AGP0_GATE` 3σ (`params_aux_global_position.yaml`, v1.18.0). До 1.18 — один набор `EKF2_AGP_CTRL` (в 1.15 по умолчанию 1), `EKF2_AGP_NOISE` 0.9 м, `EKF2_AGP_GATE` 3σ.
 
 ### Место в системе
 
