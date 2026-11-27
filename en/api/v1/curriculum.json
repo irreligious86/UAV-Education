@@ -46,7 +46,7 @@
           ]
         },
         {
-          "title": "Настройка с нуля",
+          "title": "Setup from scratch",
           "modules": [
             "bf-setup-scratch",
             "bf-arming-safety"
@@ -66,7 +66,7 @@
           ]
         },
         {
-          "title": "Конструктор",
+          "title": "Designer",
           "modules": [
             "des-sizing",
             "des-thrust-stand"
@@ -198,7 +198,7 @@
           ]
         },
         {
-          "title": "Настройка с нуля",
+          "title": "Setup from scratch",
           "modules": [
             "ap-setup-scratch",
             "ap-osd-video",
@@ -1131,7 +1131,7 @@
         },
         {
           "id": "bf-setup-scratch",
-          "title": "Betaflight с нуля: от пустой платы до первого висения",
+          "title": "Betaflight from scratch: from a blank board to the first hover",
           "level": "L2",
           "hours": 7,
           "status": "published",
@@ -1140,17 +1140,17 @@
             "bf-ports"
           ],
           "objectives": [
-            "настроить Betaflight 4.5 по 17 шагам, проверяя конфиг и failsafe в SITL",
-            "откалибровать vbat_scale, ibata_offset и ibata_scale по мультиметру и зарядному",
-            "проверить порядок и направление моторов и провести первое висение с критериями прерывания"
+            "set up Betaflight 4.5 in 17 steps, checking the config and failsafe in SITL",
+            "calibrate vbat_scale, ibata_offset and ibata_scale against a multimeter and a charger",
+            "check motor order and direction and do the first hover with abort criteria"
           ],
           "lab": {
-            "title": "5″ квадрокоптер с нуля: SITL, стол, первое висение",
+            "title": "A 5″ quadcopter from scratch: SITL, bench, first hover",
             "criteria": [
-              "SITL: diff all с aux ARM/ANGLE/FAILSAFE, лог арма и failsafe по тумблеру, восстановление diff проверено",
-              "Порядок и направление моторов соответствуют QUADX, таблица каналов заполнена, PWM-ESC откалиброваны",
-              "Ошибка напряжения < 0.05 В на банку в двух точках, мА·ч FC в пределах 5 % от зарядного",
-              "Stage 2 failsafe записан; Blackbox 60-секундного висения и diff all с реального аппарата сданы"
+              "SITL: diff all with aux ARM/ANGLE/FAILSAFE, a log of arming and a switch-triggered failsafe, diff restore verified",
+              "Motor order and direction match QUADX, channel table filled in, PWM ESCs calibrated",
+              "Voltage error < 0.05 V per cell at two points, FC mAh within 5 % of the charger",
+              "Stage 2 failsafe logged; Blackbox log of a 60-second hover and diff all from the real aircraft submitted"
             ]
           },
           "url": "m/bf-setup-scratch.html"
@@ -1739,41 +1739,41 @@
     {
       "id": "designer",
       "kind": "track",
-      "title": "Конструктор",
+      "title": "Designer",
       "level": "L2–L3",
-      "goal": "Спроектировать аппарат под задачу: посчитать массу, энергию и тягу, проверить силовую установку на стенде, обеспечить устойчивость и собрать миксер под свою раму.",
+      "goal": "Design an aircraft for a mission: calculate mass, energy and thrust, test the powertrain on a thrust stand, ensure stability and build a mixer for your own frame.",
       "capstone": {
         "id": "cap-designer",
-        "title": "Аппарат под ТЗ",
-        "result": "Проект аппарата под заданную миссию: расчёт, проверка силовой установки на стенде (или по датасету), устойчивость или миксер, сравнение прогноза с измерением",
+        "title": "An aircraft built to a spec",
+        "result": "An aircraft design for a given mission: calculations, a powertrain test on the stand (or from the dataset), stability or mixer, prediction compared with measurement",
         "deliverables": [
-          "ТЗ в числах: полезная нагрузка, время полёта, ветер, габариты, запас",
-          "Скрипт расчёта (sizing) в репозитории с замкнутым бюджетом массы и выбором конфигурации",
-          "Данные стенда для выбранной пары мотор/проп (своего или из датасета модуля): г/Вт, C_T, бюджет погрешности",
-          "Для крыла — центровка и статический запас; для мультиротора нестандартной схемы — матрица эффективности и проверка насыщения",
-          "Если аппарат собран: лог висения или полёта и сравнение с прогнозом"
+          "The spec in numbers: payload, flight time, wind, dimensions, margin",
+          "A sizing script in the repository with a closed mass budget and the configuration choice",
+          "Thrust stand data for the chosen motor/prop pair (your own or from the module dataset): g/W, C_T, uncertainty budget",
+          "For a wing: CG and static margin; for a non-standard multirotor: the effectiveness matrix and a saturation check",
+          "If the aircraft is built: a hover or flight log and a comparison with the prediction"
         ],
         "criteria": [
-          "Каждое число ТЗ прослеживается до расчёта, а расчёт — до даташита, стенда или допущения с пометкой",
-          "Бюджет массы замкнут, расчёт воспроизводится одной командой",
-          "Прогноз времени полёта или тока висения сверен с измерением (или с датасетом), расхождение объяснено",
-          "Выбор конфигурации обоснован сравнением хотя бы двух вариантов"
+          "Every number in the spec traces to a calculation, and every calculation to a datasheet, a stand measurement or a flagged assumption",
+          "Mass budget closed, the calculation reproduces with a single command",
+          "Predicted flight time or hover current checked against a measurement (or the dataset), discrepancy explained",
+          "Configuration choice justified by comparing at least two options"
         ],
         "rubric": [
           {
-            "criterion": "Расчёт",
-            "bad": "Время полёта «около 25 минут» по калькулятору",
-            "good": "Скрипт: 4.29 кг, 6S3P, 28.8 мин при T/W 2.05 на просевшей АКБ; допущения перечислены"
+            "criterion": "Calculation",
+            "bad": "Flight time \"about 25 minutes\" from a calculator",
+            "good": "Script: 4.29 kg, 6S3P, 28.8 min at T/W 2.05 on a sagging battery; assumptions listed"
           },
           {
-            "criterion": "Проверка",
-            "bad": "Таблица производителя принята как есть",
-            "good": "Стенд: г/Вт на 8 % ниже даташита при совпадающем C_T — потери в приводе, прогноз пересчитан"
+            "criterion": "Verification",
+            "bad": "Manufacturer's table taken at face value",
+            "good": "Stand: g/W 8 % below the datasheet with matching C_T, so the losses are in the drive; prediction recalculated"
           },
           {
-            "criterion": "Сравнение вариантов",
-            "bad": "Квадрокоптер, потому что привычно",
-            "good": "Квадро 15″ не проходит по T/W, квадро 17″ и гекса проходят; выбран квадро 17″ по массе"
+            "criterion": "Comparing options",
+            "bad": "A quadcopter because that's what you're used to",
+            "good": "A 15″ quad fails on T/W, a 17″ quad and a hexa pass; the 17″ quad chosen for its mass"
           },
           {
             "criterion": "Системность",
@@ -1785,7 +1785,7 @@
       "modules": [
         {
           "id": "des-sizing",
-          "title": "Проектирование под задачу: ТЗ → масса, энергия, тяга, конфигурация",
+          "title": "Designing for a mission: spec → mass, energy, thrust, configuration",
           "level": "L3",
           "hours": 6,
           "status": "published",
@@ -1794,24 +1794,24 @@
             "el-battery-packs"
           ],
           "objectives": [
-            "перевести ТЗ в бюджет массы, энергии и тяги",
-            "рассчитать мощность висения через теорию импульсов, FM и нагрузку на диск",
-            "выбрать мотор, проп, АКБ и схему аппарата по T/W, ветру и времени"
+            "turn a spec into a mass, energy and thrust budget",
+            "calculate hover power via momentum theory, FM and disk loading",
+            "choose the motor, prop, battery and aircraft configuration by T/W, wind and flight time"
           ],
           "lab": {
-            "title": "Скрипт расчёта аппарата под миссию",
+            "title": "A script to size an aircraft for a mission",
             "criteria": [
-              "Скрипт воспроизведён и сходится, вариант выбран по T/W, запасу на ветер и времени",
-              "Расхождение FM-модели и таблицы мотора посчитано и не превышает 10 %",
-              "Таблица чувствительности заполнена: найден параметр, сильнее всего двигающий массу",
-              "Железо: масса взвешена по группам, мощность висения и MOT_THST_HOVER из лога в пределах ±15 % от прогноза"
+              "Script reproduced and converges, option chosen by T/W, wind margin and flight time",
+              "Discrepancy between the FM model and the motor table calculated, no more than 10 %",
+              "Sensitivity table filled in: the parameter that moves the mass the most identified",
+              "Hardware: mass weighed by group, hover power and MOT_THST_HOVER from the log within ±15 % of the prediction"
             ]
           },
           "url": "m/des-sizing.html"
         },
         {
           "id": "des-thrust-stand",
-          "title": "Тяговый стенд: тензодатчик + HX711, ток, обороты, КПД",
+          "title": "Thrust stand: load cell + HX711, current, RPM, efficiency",
           "level": "L2",
           "hours": 6,
           "status": "published",
@@ -1820,24 +1820,24 @@
             "el-measure"
           ],
           "objectives": [
-            "откалибровать тензодатчик: масштаб, тара, дрейф, ползучесть, неопределённость",
-            "получить кривую г/Вт, C_T и FM и сравнить с таблицей производителя при равной тяге",
-            "собрать безопасный стенд на ESP32 с лимитом тока и таймаутом команды"
+            "calibrate a load cell: scale, tare, drift, creep, uncertainty",
+            "get the g/W, C_T and FM curves and compare them with the manufacturer's table at equal thrust",
+            "build a safe ESP32 stand with a current limit and a command timeout"
           ],
           "lab": {
-            "title": "Обработка данных стенда и (опционально) свой стенд",
+            "title": "Thrust stand data processing and (optionally) your own stand",
             "criteria": [
-              "Генератор и обработка запущены, k, дрейф и таблица точек совпадают с приведёнными",
-              "Бюджет неопределённости посчитан для одной точки, U (k = 2) указана",
-              "По C_T и г/Вт сделан вывод, где потери; FM посчитан правильной формулой",
-              "Железо: аварийные пути проверены без пропа, ≥ 5 точек газа, остаток калибровки ≤ 3 г"
+              "Generator and processing run; k, drift and the point table match the ones given",
+              "Uncertainty budget calculated for one point, U (k = 2) stated",
+              "A conclusion on where the losses are drawn from C_T and g/W; FM calculated with the correct formula",
+              "Hardware: emergency stop paths tested without a prop, ≥ 5 throttle points, calibration residual ≤ 3 g"
             ]
           },
           "url": "m/des-thrust-stand.html"
         },
         {
           "id": "aero-stability",
-          "title": "Самолёт: устойчивость, центровка, статический запас, поляра",
+          "title": "The plane: stability, CG, static margin, drag polar",
           "level": "L3",
           "hours": 6,
           "status": "published",
@@ -1846,24 +1846,24 @@
             "f-aero-props"
           ],
           "objectives": [
-            "рассчитать САХ, нейтральную точку и ЦТ летающего крыла и самолёта с ГО",
-            "построить поляру и найти скорости максимальной дальности и продолжительности",
-            "проверить центровку и триммер в полёте и по логу ArduPlane/INAV"
+            "calculate the MAC, neutral point and CG of a flying wing and of a plane with a horizontal tail",
+            "build the drag polar and find the maximum-range and maximum-endurance speeds",
+            "check the CG and trim in flight and from the ArduPlane/INAV log"
           ],
           "lab": {
-            "title": "Центровка и поляра: расчёт, балансировка, тест планирования",
+            "title": "CG and drag polar: calculation, balancing, glide test",
             "criteria": [
-              "Скрипт запущен: MAC, V_h, NP, ЦТ при запасе 10 % и (L/D)max, V_md, V_mp, V_s записаны",
-              "AIRSPEED_MIN и AIRSPEED_CRUISE обоснованы полярой и скоростью сваливания",
-              "Железо: самолёт отбалансирован в расчётной точке ±3 мм, dive test пройден",
-              "Железо: тест планирования с пересчётом C_D0, знак PIDP.I на крейсере объяснён"
+              "Script run: MAC, V_h, NP, CG at a 10 % margin and (L/D)max, V_md, V_mp, V_s written down",
+              "AIRSPEED_MIN and AIRSPEED_CRUISE justified by the drag polar and the stall speed",
+              "Hardware: plane balanced at the calculated point ±3 mm, dive test passed",
+              "Hardware: glide test with C_D0 recalculated, the sign of PIDP.I at cruise explained"
             ]
           },
           "url": "m/aero-stability.html"
         },
         {
           "id": "ctl-allocation",
-          "title": "Миксер и распределение управления: матрица, насыщение, PX4 Control Allocation, наклонные моторы",
+          "title": "Mixer and control allocation: the matrix, saturation, PX4 Control Allocation, tilted motors",
           "level": "L3",
           "hours": 4,
           "status": "published",
@@ -1872,17 +1872,17 @@
             "px4-control"
           ],
           "objectives": [
-            "построить матрицу эффективности и миксер своей рамы через псевдообратную",
-            "объяснить, какая ось уступает при насыщении в PX4, ArduPilot и Betaflight",
-            "перенести матрицу в CA_*, mmix и Lua MotorsMatrix с верными знаками"
+            "build the effectiveness matrix and the mixer of your frame via the pseudoinverse",
+            "explain which axis gives way under saturation in PX4, ArduPilot and Betaflight",
+            "transfer the matrix to CA_*, mmix and Lua MotorsMatrix with the correct signs"
           ],
           "lab": {
-            "title": "Свой миксер: Python → PX4 SITL → тест моторов",
+            "title": "Your own mixer: Python → PX4 SITL → motor test",
             "criteria": [
-              "Столбцы mix и распределение тяги своего фрейма посчитаны в Python и объяснены геометрией",
-              "Таблица насыщения (обрезка, десатурация, airmode) повторена для своего фрейма, указано, какая ось уступает первой",
-              "В SIH-гексе после failure motor off есть motor_stop_mask, записано, сработало ли удаление из матрицы, выходы сравнены с расчётом",
-              "Тест моторов без пропов совпал со схемой, лог висения: отношение выходов в пределах ±5 % от расчёта, ни один мотор не выше 90 %"
+              "Mix columns and the thrust distribution of your frame calculated in Python and explained by the geometry",
+              "Saturation table (clipping, desaturation, airmode) reproduced for your frame, with the axis that gives way first identified",
+              "In the SIH hexacopter, motor_stop_mask is set after failure motor off; whether removal from the matrix worked is recorded; outputs compared with the calculation",
+              "Motor test with the props off matches the diagram; hover log: output ratios within ±5 % of the calculation, no motor above 90 %"
             ]
           },
           "url": "m/ctl-allocation.html"
@@ -2849,7 +2849,7 @@
         },
         {
           "id": "ap-setup-scratch",
-          "title": "ArduPilot с нуля: Copter через Mission Planner / QGC",
+          "title": "ArduPilot from scratch: Copter with Mission Planner / QGC",
           "level": "L2",
           "hours": 7,
           "status": "published",
@@ -2859,17 +2859,17 @@
             "f-motors-esc"
           ],
           "objectives": [
-            "настроить ArduCopter 4.6 от прошивки до первого висения по 17 шагам",
-            "откалибровать датчик АКБ, моторы и радио по формулам прошивки",
-            "проверить failsafe и сохранить .param и лог"
+            "set up ArduCopter 4.6 from firmware to the first hover in 17 steps",
+            "calibrate the battery monitor, motors and radio using the firmware formulas",
+            "test failsafe and save the .param and the log"
           ],
           "lab": {
-            "title": "Квадрокоптер с нуля: SITL, затем стол и поле",
+            "title": "A quadcopter from scratch: SITL, then bench and field",
             "criteria": [
-              "SITL: .param до и после сохранены и сравнены, таблица Motor Test A→1, B→4, C→2, D→3 записана",
-              "SITL: BATT_VOLT_MULT посчитан и проверен, в логе ERR Subsys 5 и 6 с переходом в RTL, MOT_THST_HOVER 0.2–0.5",
-              "Железо: .param и .BIN первого висения Stabilize → AltHold → Loiter, MOT_THST_HOVER 0.2–0.5, VIBE p95 < 30 м/с² без клиппинга",
-              "Железо: RC- и battery-failsafe в логе, напряжение < 0.02 В/банка, мА·ч в пределах 5 % от зарядки"
+              "SITL: the .param files from before and after are saved and compared, the Motor Test table A→1, B→4, C→2, D→3 is written down",
+              "SITL: BATT_VOLT_MULT calculated and verified, ERR Subsys 5 and 6 in the log with a switch to RTL, MOT_THST_HOVER 0.2–0.5",
+              "Hardware: .param and .BIN of the first hover Stabilize → AltHold → Loiter, MOT_THST_HOVER 0.2–0.5, VIBE p95 < 30 m/s² with no clipping",
+              "Hardware: RC and battery failsafe in the log, voltage < 0.02 V/cell, mAh within 5 % of the charge"
             ]
           },
           "url": "m/ap-setup-scratch.html"
@@ -4342,38 +4342,38 @@
       "goal": null,
       "capstone": {
         "id": "cap-inav-gps",
-        "title": "INAV-аппарат с нуля",
-        "result": "Квадрокоптер или крыло на INAV, настроенный с пустой платы: миссия из 5 точек и проверенный failsafe с возвратом домой",
+        "title": "An INAV aircraft from scratch",
+        "result": "A quadcopter or wing on INAV, set up from a blank board: a 5-waypoint mission and a tested failsafe with return to home",
         "deliverables": [
-          "Выбор платформы (квадрокоптер или крыло) и паспорт сборки: вес, моторы, АКБ, расчётное время полёта",
-          "Конфигурация `diff all` до и после настройки, с комментариями к каждому изменённому параметру",
-          "Протокол калибровок: напряжение и ток против мультиметра и зарядника, компас, акселерометр (крыло: центровка, расходы рулей)",
-          "SITL-репетиция настройки: `diff all`, флаги арминга, восстановление конфигурации на чистой плате; полёт и RTH в SITL — по желанию (нужен RealFlight или X-Plane)",
-          "Лог реального полёта: удержание позиции, миссия из 5 точек, failsafe по выключенному пульту с возвратом домой",
-          "Карточка настройки на одну страницу под свой аппарат"
+          "Platform choice (quadcopter or wing) and a build sheet: weight, motors, battery, estimated flight time",
+          "The `diff all` configuration before and after setup, with a comment on every changed parameter",
+          "Calibration record: voltage and current vs. a multimeter and charger, compass, accelerometer (wing: CG, control surface throws)",
+          "SITL rehearsal of the setup: `diff all`, arming flags, restoring the configuration on a blank board; flight and RTH in SITL are optional (they require RealFlight or X-Plane)",
+          "Log of a real flight: position hold, a 5-waypoint mission, failsafe from a switched-off radio with return to home",
+          "A one-page setup card for your aircraft"
         ],
         "criteria": [
-          "Конфигурация восстанавливается из `diff all` на чистой плате без ручных правок",
-          "Ошибка напряжения меньше 0.05 В на банку, израсходованные мАч в пределах 5 % от зарядника",
-          "Failsafe проверен: в логе видны потеря сигнала, переход в RTH и посадка или кружение над домом",
-          "Посадка по RTH в пределах 5 м от точки старта (крыло: кружение над домом на заданной высоте)",
-          "Каждая аномалия в логе объяснена или исправлена"
+          "The configuration restores from `diff all` on a blank board without manual edits",
+          "Voltage error under 0.05 V per cell, consumed mAh within 5 % of the charger",
+          "Failsafe tested: the log shows the signal loss, the switch to RTH and the landing or loiter over home",
+          "RTH landing within 5 m of the launch point (wing: loiter over home at the set altitude)",
+          "Every anomaly in the log explained or fixed"
         ],
         "rubric": [
           {
-            "criterion": "Калибровка батареи",
-            "bad": "Напряжение «примерно совпадает»",
-            "good": "16.62 В на мультиметре против 16.58 В в OSD до калибровки, `vbat_scale` пересчитан, после — 16.61 В; мАч: 1312 в OSD против 1290 у зарядника (1.7 %)"
+            "criterion": "Battery calibration",
+            "bad": "Voltage \"roughly matches\"",
+            "good": "16.62 V on the multimeter vs. 16.58 V in the OSD before calibration, `vbat_scale` recalculated, 16.61 V after; mAh: 1312 in the OSD vs. 1290 from the charger (1.7 %)"
           },
           {
             "criterion": "Failsafe",
-            "bad": "Failsafe настроен, но не проверялся",
-            "good": "Пульт выключен на 2-й точке миссии, в логе: потеря RX через 0.3 с, RTH, посадка в 2.8 м от старта"
+            "bad": "Failsafe configured but never tested",
+            "good": "Radio switched off at mission waypoint 2; the log shows RX loss after 0.3 s, RTH, landing 2.8 m from the launch point"
           },
           {
             "criterion": "Configuration",
-            "bad": "Скриншоты вкладок Configurator",
-            "good": "`diff all` в репозитории, комментарий к каждой строке, восстановлен на второй плате"
+            "bad": "Screenshots of Configurator tabs",
+            "good": "`diff all` in the repository, a comment on every line, restored on a second board"
           },
           {
             "criterion": "Системность",
@@ -4429,7 +4429,7 @@
         },
         {
           "id": "inav-setup-scratch",
-          "title": "INAV с нуля: GPS-квадрокоптер",
+          "title": "INAV from scratch: a GPS quadcopter",
           "level": "L2",
           "hours": 7,
           "status": "published",
@@ -4440,17 +4440,17 @@
             "f-motors-esc"
           ],
           "objectives": [
-            "настроить GPS-квадрокоптер INAV от пустой платы по 17 шагам, проверив конфигурацию в SITL",
-            "откалибровать vbat_scale, current_meter_scale и current_meter_offset по формулам из исходника",
-            "проверить failsafe → RTH, провести первое висение по критериям прерывания и сохранить diff all"
+            "set up an INAV GPS quadcopter from a blank board in 17 steps, verifying the configuration in SITL",
+            "calibrate vbat_scale, current_meter_scale and current_meter_offset using the formulas from the source code",
+            "test failsafe → RTH, do the first hover with abort criteria and save diff all"
           ],
           "lab": {
-            "title": "INAV-квадрокоптер от SITL до первого RTH",
+            "title": "An INAV quadcopter from SITL to the first RTH",
             "criteria": [
-              "SITL: diff all с Quad X, aux ARM/ANGLE/POSHOLD/RTH, failsafe_procedure = RTH и рассчитанными калибровками; флаг RX при остановке RC; восстановление diff проверено",
-              "Железо: таблица каналов, порядок и вращение моторов совпадают с Quad X; ошибка напряжения < 50 мВ/банку, мА·ч в пределах 5 % от зарядного",
-              "Blackbox 60-секундного висения, nav_mc_hover_thr взят из лога",
-              "RTH со 100 м садится в пределах 5 м от дома (3 м в SITL с RealFlight); failsafe → RTH записан; сдан diff all с аппарата"
+              "SITL: diff all with Quad X, aux ARM/ANGLE/POSHOLD/RTH, failsafe_procedure = RTH and the calculated calibrations; RX flag when RC stops; diff restore verified",
+              "Hardware: channel table filled in, motor order and rotation match Quad X; voltage error < 50 mV/cell, mAh within 5 % of the charger",
+              "Blackbox log of a 60-second hover, nav_mc_hover_thr taken from the log",
+              "RTH from 100 m lands within 5 m of home (3 m in SITL with RealFlight); failsafe → RTH logged; diff all from the aircraft submitted"
             ]
           },
           "url": "m/inav-setup-scratch.html"
@@ -4536,7 +4536,7 @@
         },
         {
           "id": "inav-setup-wing",
-          "title": "INAV с нуля: крыло",
+          "title": "INAV from scratch: a flying wing",
           "level": "L2",
           "hours": 7,
           "status": "published",
@@ -4545,17 +4545,17 @@
             "aero-wing"
           ],
           "objectives": [
-            "настроить крыло в INAV от пустой платы: миксер, сервы, мотор, батарею, failsafe и RTH",
-            "проверить направления и расходы рулей, центровку и автозапуск до первого броска",
-            "выполнить первый бросок, autotrim и autotune и сохранить diff all с логами"
+            "set up a wing in INAV from a blank board: mixer, servos, motor, battery, failsafe and RTH",
+            "check control surface directions and throws, the CG and autolaunch before the first throw",
+            "make the first throw, run autotrim and autotune, and save diff all with the logs"
           ],
           "lab": {
-            "title": "Крыло INAV: от пустой платы до RTH с кружением",
+            "title": "An INAV wing: from a blank board to RTH with a loiter",
             "criteria": [
-              "SITL: diff all с AIRPLANE, smix, failsafe RTH, failsafe_throttle_low_delay = 0, nav_rth_allow_landing = NEVER и автозапуском; ЦТ и расходы посчитаны",
-              "Таблица теста серв заполнена, ЦТ в расчётном диапазоне 15–20 % MAC",
-              "Батарея: ошибка < 0.05 В/банку, мА·ч в пределах 5 % от зарядки; failsafe проверен на столе",
-              "Логи первого броска с автозапуском и RTH с кружением, итоговый diff all после autotune/autotrim"
+              "SITL: diff all with AIRPLANE, smix, failsafe RTH, failsafe_throttle_low_delay = 0, nav_rth_allow_landing = NEVER and autolaunch; CG and throws calculated",
+              "Servo test table filled in, CG within the calculated range of 15–20 % MAC",
+              "Battery: error < 0.05 V/cell, mAh within 5 % of the charge; failsafe tested on the bench",
+              "Logs of the first throw with autolaunch and of RTH with a loiter, the final diff all after autotune/autotrim"
             ]
           },
           "url": "m/inav-setup-wing.html"
@@ -4800,37 +4800,37 @@
       "goal": null,
       "capstone": {
         "id": "cap-px4-scratch",
-        "title": "PX4 с нуля до миссии",
-        "result": "Мультиротор на PX4, настроенный в QGroundControl с пустой платы: SITL-репетиция, матрица failsafe, миссия и разбор ULog",
+        "title": "PX4 from scratch to a mission",
+        "result": "A PX4 multirotor set up in QGroundControl from a blank board: SITL rehearsal, failsafe matrix, mission and ULog analysis",
         "deliverables": [
-          "SITL-репетиция (Gazebo или SIH): тот же airframe, та же геометрия моторов, миссия и все failsafe-сценарии",
-          "Файл параметров после настройки с комментариями к изменённым значениям",
-          "Матрица failsafe: потеря RC, потеря телеметрии, низкий заряд, выход за геозону — ожидаемое и наблюдаемое действие в SITL и на железе",
-          "Протокол Vehicle Setup: датчики, радио, Actuators (геометрия и тест моторов), питание (делитель напряжения и датчик тока против мультиметра)",
-          "ULog реального полёта и отчёт Flight Review: висение в Position, миссия, RTL",
-          "Если железа пока нет: полный SITL-комплект сейчас, аппаратная часть сдаётся позже по тем же критериям"
+          "SITL rehearsal (Gazebo or SIH): the same airframe, the same motor geometry, the mission and every failsafe scenario",
+          "The parameter file after setup with comments on the changed values",
+          "Failsafe matrix: RC loss, telemetry loss, low battery, geofence breach, with the expected and observed action in SITL and on hardware",
+          "Vehicle Setup record: sensors, radio, Actuators (geometry and motor test), power (voltage divider and current sensor vs. a multimeter)",
+          "ULog of a real flight and a Flight Review report: hover in Position, mission, RTL",
+          "If you have no hardware yet: the full SITL set now, the hardware part submitted later against the same criteria"
         ],
         "criteria": [
-          "Каждая строка матрицы failsafe проверена и подтверждена логом",
-          "Тест моторов совпадает с геометрией в Actuators: номер, позиция и направление каждого мотора",
-          "Напряжение в QGC отличается от мультиметра не больше чем на 0.05 В на банку",
-          "В отчёте Flight Review нет необъяснённых предупреждений; вибрация и отслеживание ориентации разобраны"
+          "Every row of the failsafe matrix tested and confirmed by a log",
+          "Motor test matches the geometry in Actuators: number, position and direction of each motor",
+          "Voltage in QGC differs from the multimeter by no more than 0.05 V per cell",
+          "The Flight Review report has no unexplained warnings; vibration and attitude tracking analyzed"
         ],
         "rubric": [
           {
             "criterion": "Failsafe",
-            "bad": "Параметры выставлены по умолчанию",
-            "good": "Матрица из 4 сценариев: в SITL через команду failure, на железе — выключенный пульт и низкий заряд; у каждого время срабатывания из ULog"
+            "bad": "Parameters left at defaults",
+            "good": "A matrix of 4 scenarios: in SITL via the failure command, on hardware a switched-off radio and low battery; each with its trigger time from the ULog"
           },
           {
             "criterion": "Actuators",
-            "bad": "«Моторы крутятся»",
-            "good": "Таблица: мотор 1 — передний правый, CCW, совпадает с CA_ROTOR0_*; проверено без пропеллеров"
+            "bad": "\"The motors spin\"",
+            "good": "Table: motor 1 is front right, CCW, matches CA_ROTOR0_*; checked with the props off"
           },
           {
-            "criterion": "Разбор лога",
-            "bad": "Ссылка на Flight Review без выводов",
-            "good": "Газ висения 0.38, вибрация в норме, перерегулирование по крену 12 %; два вывода и одно изменение параметров"
+            "criterion": "Log analysis",
+            "bad": "A Flight Review link with no conclusions",
+            "good": "Hover throttle 0.38, vibration within limits, roll overshoot 12 %; two conclusions and one parameter change"
           },
           {
             "criterion": "Системность",
@@ -4863,7 +4863,7 @@
         },
         {
           "id": "px4-setup-scratch",
-          "title": "PX4 с нуля: Vehicle Setup в QGroundControl",
+          "title": "PX4 from scratch: Vehicle Setup in QGroundControl",
           "level": "L2",
           "hours": 7,
           "status": "published",
@@ -4873,17 +4873,17 @@
             "link-elrs"
           ],
           "objectives": [
-            "настроить порты, вход CRSF, Actuators и питание PX4 по шагам",
-            "проверить failsafe RC loss и low battery инъекцией в SITL",
-            "откалибровать BAT1_V_DIV и BAT1_A_PER_V и записать первое висение"
+            "set up the ports, CRSF input, Actuators and power in PX4 step by step",
+            "test the RC loss and low battery failsafes by injection in SITL",
+            "calibrate BAT1_V_DIV and BAT1_A_PER_V and record the first hover"
           ],
           "lab": {
-            "title": "От пустого полётника до висения в Position",
+            "title": "From a blank flight controller to a hover in Position",
             "criteria": [
-              "SITL: таблица моторов совпадает с CA_ROTOR*, HTE совпал с 1/(T/W) в пределах 0.01",
-              "SITL: цепочки RC loss и battery failsafe записаны с временами, autotune до/после",
-              "Железо: .params экспортирован, тест моторов по геометрии, ошибка напряжения < 0.05 В/эл, мА·ч в пределах 5 %",
-              "Железо: RC loss и low battery в ULog, отчёт Flight Review 60-секундного висения"
+              "SITL: the motor table matches CA_ROTOR*, HTE matches 1/(T/W) within 0.01",
+              "SITL: RC loss and battery failsafe sequences logged with timings, autotune before/after",
+              "Hardware: .params exported, motor test matches the geometry, voltage error < 0.05 V/cell, mAh within 5 %",
+              "Hardware: RC loss and low battery in the ULog, a Flight Review report of a 60-second hover"
             ]
           },
           "url": "m/px4-setup-scratch.html"
