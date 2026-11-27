@@ -70,7 +70,7 @@ The protocol determines both the wiring and the **Serial Receiver Provider** ent
 - **IBUS** (FlySky, Turnigy) — **IBUS**, signal → **RX**.
 - **Spektrum DSM** — **SPEKTRUM1024** / **SPEKTRUM2048**, signal wire per the receiver documentation.
 
-**F4 and SBUS:** some boards have **no** hardware inverter for inverted SBUS — use the dedicated **SBUS** pin on the FC or another protocol (**FPort** etc.), otherwise you'll need an external inverter.
+**F4 and SBUS:** some boards have **no** hardware inverter for inverted SBUS — use the dedicated **SBUS** pin on the FC or another protocol — for a new build **CRSF** (ELRS): it is not inverted and is full duplex (`link-protocols`); FPort only if you already have a FrSky receiver, and its inversion also depends on the board; otherwise you'll need an external inverter.
 
 ### Betaflight 4.4+ and Cloud Build
 
@@ -92,7 +92,7 @@ The Ports tab is a wrapper around `serial <id> <function mask> <msp baud> <gps b
 |---|---|---|---|
 | Serial RX (CRSF) | TX+RX | nothing | full duplex, telemetry on the same port |
 | Serial RX (SBUS) | RX | — | inverter on F4 |
-| GPS | TX+RX | — | 57600/115200, UBX; `gps_auto_config` |
+| GPS | TX+RX | — | 57600 (default; at 115200 the documentation reports lost frames, `bf-gps-setup`), UBX; `gps_auto_config` |
 | MSP (configurator/computer) | TX+RX | — | ≤ 3 ports with MSP |
 | MSP DisplayPort (HD OSD) | TX+RX | — | 115200, VTX settings through the same port |
 | ESC Sensor (ESC telemetry) | RX | — | one shared wire from all ESCs |

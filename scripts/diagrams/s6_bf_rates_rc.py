@@ -63,7 +63,7 @@ def build(D: dict) -> None:
              label_at=0.40, label_dy=-22),
         dict(name="BF 1.01/0.70/0.01", xs=xs, ys=[_bf(x, 101, 70, 1) for x in xs], cls="ink", dash=True,
              label_at=0.80, label_dy=22, label_anchor="start"),
-        dict(name="Actual 7/67/0 (дефолт)", xs=xs, ys=[_actual(x, 7, 67, 0) for x in xs], cls="w",
+        dict(name="Actual 7/67/0 (по умолчанию)", xs=xs, ys=[_actual(x, 7, 67, 0) for x in xs], cls="w",
              label_at=0.50, label_dy=-10),
         dict(xs=xs, ys=[_bf(x, 208, 3, 89) for x in xs], cls="d", dash=True),
     ]
@@ -103,7 +103,7 @@ def build_ff(D: dict) -> None:
         "Actual: C·x + (M − C)·|x|·(x⁵·e + x·(1 − e))",
         [dict(name="200/850/0.20", xs=xs, ys=[_actual(x, 20, 85, 20) for x in xs], cls="a",
               label_at=0.80, label_dy=-10),
-         dict(name="70/670/0 (дефолт)", xs=xs, ys=[_actual(x, 7, 67, 0) for x in xs], cls="w",
+         dict(name="70/670/0 (по умолчанию)", xs=xs, ys=[_actual(x, 7, 67, 0) for x in xs], cls="w",
               label_at=0.62, label_dy=24, label_anchor="start"),
          dict(name="200·x", xs=xs, ys=[200 * x for x in xs], cls="a", dash=True, w=1.2, label_at=1.0, label_dy=-6),
          dict(name="70·x", xs=xs, ys=[70 * x for x in xs], cls="w", dash=True, w=1.2, label_at=1.0, label_dy=-6)],

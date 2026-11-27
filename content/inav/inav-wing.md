@@ -133,7 +133,7 @@ MANUAL — отдельный тумблер. ARM — отдельный. На �
   - Что сделать: порог выше, держать спокойно, проверять без пропа.
 - **Симптом:** в loiter крыло «валится» внутрь круга
   - Возможная причина: радиус мал для скорости, крен ограничен.
-  - Что сделать: `nav_fw_loiter_radius` больше, `nav_fw_bank_angle` (дефолт 35°) по расчёту V_s в вираже.
+  - Что сделать: `nav_fw_loiter_radius` больше, `nav_fw_bank_angle` (по умолчанию 35°) по расчёту V_s в вираже.
 
 ## references
 - INAV Mixer (platform type) | https://github.com/iNavFlight/inav/blob/master/docs/Mixer.md | primary | A

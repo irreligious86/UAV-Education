@@ -86,7 +86,7 @@
 
 <h2 id="praktika">Practice</h2>
 <h4 id="step-0-preparation" class="md-subheading">Step 0. Preparation</h4>
-<p>ESCs with bidirectional DShot (BLHeli_32/Bluejay/AM32), <code>dshot_bidir = ON</code>, <code>motor_poles</code> per the magnet count, Motors tab: RPM from every motor, errors <code>E = 0%</code>. Mechanics per the checklist. Blackbox at 2 kHz or higher, <code>debug_mode = GYRO_SCALED</code> (4.5 only; in 2025.12 the mode was removed — the unfiltered gyro is logged in the <code>gyroUnfilt</code> field). <code>diff all</code> saved.</p>
+<p>ESCs with bidirectional DShot (BLHeli_32/Bluejay/AM32), <code>dshot_bidir = ON</code>, <code>motor_poles</code> per the magnet count, Motors tab: RPM from every motor, errors <code>E</code> ≤ 1 % (course guideline, <code>bf-rpm-filter</code>). Mechanics per the checklist. Blackbox at 2 kHz or higher, <code>debug_mode = GYRO_SCALED</code> (4.5 only; in 2025.12 the mode was removed — the unfiltered gyro is logged in the <code>gyroUnfilt</code> field). <code>diff all</code> saved.</p>
 <h4 id="step-1-baseline" class="md-subheading">Step 1. Baseline</h4>
 <pre class="cli-block"><code>set dshot_bidir = ON
 set motor_poles = 14

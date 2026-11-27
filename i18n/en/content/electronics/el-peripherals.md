@@ -29,7 +29,7 @@ Frying a flight controller port is easier than it seems: 5 V on a 3.3 V pin, swa
 ### Three buses and their character
 | Bus | Wires | Speed | Addressing | Typical devices | Main pitfalls |
 |---|---|---|---|---|---|
-| UART | TX, RX, GND (+power) | 9600 – 2 Mbaud; GPS 38400–115200, CRSF 420000, MSP 115200 | point-to-point | GPS, receiver, telemetry, VTX, rangefinder, companion | TX↔RX crossed; inversion (SBUS); one port — one device |
+| UART | TX, RX, GND (+power) | 9600 – 2 Mbaud; GPS 57600–230400 (depends on the firmware: Betaflight 57600, ArduPilot sets 230400), CRSF 420000, MSP 115200 | point-to-point | GPS, receiver, telemetry, VTX, rangefinder, companion | TX↔RX crossed; inversion (SBUS); one port — one device |
 | I2C | SDA, SCL, GND | 100/400 kHz | 7-bit address, many devices on the bus | compass, barometer, OLED, some rangefinders | no pull-ups; identical addresses; long wires (> 30 cm — trouble) |
 | SPI | CLK, MOSI, MISO, CS | up to tens of MHz | by CS | gyro, OSD, flash, sometimes baro | on-board only; almost never brought out |
 | CAN (DroneCAN) | CAN_H, CAN_L, GND (+power) | 1 Mbit/s | node ID 1–125 | GPS/compass, ESC, current sensors, servos, rangefinders | no 120 Ω terminators at the ends; twisted pair; identical node IDs |

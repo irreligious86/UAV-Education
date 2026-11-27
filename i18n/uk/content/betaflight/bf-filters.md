@@ -101,7 +101,7 @@ source_hash: d8da04494915
 ## practice
 
 ### Крок 0. Підготовка
-ESC з bidirectional DShot (BLHeli_32/Bluejay/AM32), `dshot_bidir = ON`, `motor_poles` за кількістю магнітів, вкладка Motors: RPM від кожного мотора, помилки `E = 0%`. Механіка за чек-листом. Blackbox на 2 кГц і вище, `debug_mode = GYRO_SCALED` (лише 4.5; у 2025.12 режим видалено — нефільтрований гіроскоп пишеться в поле `gyroUnfilt`). `diff all` збережено.
+ESC з bidirectional DShot (BLHeli_32/Bluejay/AM32), `dshot_bidir = ON`, `motor_poles` за кількістю магнітів, вкладка Motors: RPM від кожного мотора, помилки `E` ≤ 1 % (орієнтир курсу, `bf-rpm-filter`). Механіка за чек-листом. Blackbox на 2 кГц і вище, `debug_mode = GYRO_SCALED` (лише 4.5; у 2025.12 режим видалено — нефільтрований гіроскоп пишеться в поле `gyroUnfilt`). `diff all` збережено.
 
 ### Крок 1. Базова точка
 ```text

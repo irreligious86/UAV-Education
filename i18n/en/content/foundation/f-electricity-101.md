@@ -50,7 +50,7 @@ Example: a 10" heavy-lift, 4 × 5 A = 20 A in hover, R_int of a 6S Li-Ion 4P bat
 Capacity in Ah (or mAh) is how much current for how many hours. Energy in Wh = Ah × U_nom. 6S 4 Ah = 88.8 Wh. At an average power of 300 W that's 0.3 h = 18 min in theory, ~14 if you use 80%. **C rating** is the maximum current as a multiple of capacity: 4 Ah × 25C = 100 A. Real values are often lower than the label; look at the sag under load.
 
 ### Multimeter: what and how
-- **Voltage (V⎓)**: probes in parallel with what you measure; black in COM, red in V. Safe almost always. Battery check: the whole pack and each cell through the balance connector (a difference > 0.05 V means imbalance).
+- **Voltage (V⎓)**: probes in parallel with what you measure; black in COM, red in V. Safe almost always. Battery check: the whole pack and each cell through the balance connector (spread thresholds are one line in `f-power`: after charging ≤ 0.02 V, after a flight ≤ 0.05 V, after charging and rest more than 0.05 V — retire the pack).
 - **Continuity (•)))**: only on a de-energized circuit. A beep between + and − of the power bus = short circuit. On a circuit with a capacitor the beep may be short and then the resistance rises; that's normal.
 - **Resistance (Ω)**: de-energized. Motor windings give three identical values (0.05–0.3 Ω; a cheap multimeter will show noise, what matters is that they match). A difference means a short between turns.
 - **Current (A)**: probes *in series*, red in the 10 A jack; above 10 A is off-limits (you'll blow the fuse or the meter). The classic beginner mistake: leaving the probe in the A jack and measuring voltage, which is a short circuit through the meter. Onboard current is measured with the FC's current sensor (calibrated) or with an inline wattmeter.
@@ -60,7 +60,7 @@ Capacity in Ah (or mAh) is how much current for how many hours. Energy in Wh = A
 - Per-cell voltages: full 4.20 V (HV: 4.35), nominal 3.7, storage 3.80–3.85, minimum under load ~3.3–3.5, below 3.0 means damage.
 - **Charging**: only with a balance charger, current ≤ 1C (4 Ah → 4 A) unless the manufacturer allows more; in a LiPo bag or on a non-flammable surface; never unattended; don't charge it cold (< 5 °C) or hot.
 - **Storage**: at storage voltage, somewhere cool; don't leave it full for more than a day, or it loses capacity and puffs up.
-- **Damage**: puffing, a puncture, a smell: the battery doesn't fly anymore. Discharge it to 0 (salt water or a discharger) and dispose of it properly. After a drone crash, put the battery in an open, non-flammable spot for 30 minutes.
+- **Damage**: puffing, a puncture, a smell: the battery doesn't fly anymore. Discharge it to 0 through a load (a discharger or a resistor; not salt water — procedure in `f-power`) and dispose of it properly. After a drone crash, put the battery in an open, non-flammable spot for 30 minutes.
 - **Fire**: a LiPo sustains its own fire and is hard to put out. Plan ahead: a bucket of sand, a place to throw it, don't breathe the smoke. Lots of water cools it and is acceptable for LiPo (there's no metallic lithium in it), but the best tool is prevention: correct charging, inspection, a bag.
 - **Short circuit**: short-circuit current is hundreds of amps; a connector welds itself in a fraction of a second. Solder the power connector one contact at a time, insulate your tools, don't put an XT60 down on metal.
 
@@ -82,7 +82,7 @@ After a hover, get the average current from the log (the current sensor must be 
 Your own one-page checklist: charging, storage, inspection, what to do after a crash, where the sand is. Pin it up at your charging spot.
 
 ### Reference values and a worked example
-- **LiPo cells:** 4.20 V is fully charged, 3.80–3.85 V is storage. After balancing, the difference between cells is hundredths of a volt; more than 0.05 V is a reason to check the battery (the “Maintenance” module).
+- **LiPo cells:** 4.20 V is fully charged, 3.80–3.85 V is storage. After balancing, the difference between cells is ≤ 0.02 V; after charging and rest, from 0.03 V — watch it, more than 0.05 V — retire the pack (course guideline, `f-power` and the “Maintenance” module).
 - **BEC:** 5 V should be within roughly ±5% (4.75–5.25 V) with the electronics connected. If the voltage sags noticeably under load, the BEC's current rating is too small.
 - **Pack internal resistance:** 25.2 V with no load, 24.4 V at 20 A → R = (25.2 − 24.4) / 20 = 0.04 Ω for a 6S pack, ≈ 6.7 mΩ per cell. At hover current the sag will be proportionally smaller.
 - **Motor windings:** phase resistance is tenths and hundredths of an ohm, and an ordinary multimeter measures it poorly: the probes and the contact add a comparable error. Compare the three phases of one motor with each other: they should match. A bad solder joint on a lead raises the two pairs that include that lead; one pair that stands out from the other two means a damaged winding (an inter-turn short); an “open” means a broken winding or lead. For more accuracy, pass a known current from a bench power supply (for example, 1 A) and measure the voltage drop.

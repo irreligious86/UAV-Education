@@ -87,7 +87,7 @@ var T = (typeof window !== "undefined" && window.T) || function (s) { return s; 
         T('<span class="gc-tag">бюджет без антенн ') + budget.toFixed(0) + T(" дБ</span>") +
         T('<span class="gc-tag">пакет каждые ') + linkPkt.toFixed(1) + T(" мс</span>") +
         '<span class="gc-tag" data-state="' + tcls + T('">телеметрия каждые ') + tel.toFixed(0) + T(" мс</span>") +
-        T('<span class="gc-tag" data-state="caution">предупреждение RSSI ставь на ') + (ref.sens + 8) + T(" дБм (порог + 5…10)</span>") +
+        T('<span class="gc-tag" data-state="caution">предупреждение RSSI ставь на ') + (ref.sens + 10) + T(" дБм (порог + 10, ориентир курса)</span>") +
         T('<span class="gc-tag">+6 дБ мощности ≈ ×2 дальности</span>');
     }
   }

@@ -76,7 +76,7 @@ var T = (typeof window !== "undefined" && window.T) || function (s) { return s; 
       this.plot = UAVPlot.create(c1, { xLabel: T("Гц"), yLabel: T("дБ"), height: 240 });
       var m = document.createElement("div"); m.className = "widget__metrics"; this.appendChild(m); this.metricsEl = m;
       var presets = document.createElement("div"); presets.className = "widget__presets";
-      [[T("5\" дефолт"), { lpf1: 250, lpf2: 500, motor: 300, dynF: 350, rpm: 1, dyn: 1 }], [T("10\" медленные моторы"), { lpf1: 250, lpf2: 500, motor: 90, dynF: 150, rpm: 1, dyn: 1 }], [T("RPM-фильтр мимо (min_hz выше моторов)"), { lpf1: 250, lpf2: 500, motor: 90, dynF: 350, rpm: 0, dyn: 1 }], [T("Только LPF 100 Гц"), { lpf1: 100, lpf2: 0, rpm: 0, dyn: 0 }], [T("Без фильтров"), { lpf1: 0, lpf2: 0, rpm: 0, dyn: 0 }]].forEach(function (pr) {
+      [[T("5\" по умолчанию"), { lpf1: 250, lpf2: 500, motor: 300, dynF: 350, rpm: 1, dyn: 1 }], [T("10\" медленные моторы"), { lpf1: 250, lpf2: 500, motor: 90, dynF: 150, rpm: 1, dyn: 1 }], [T("RPM-фильтр мимо (min_hz выше моторов)"), { lpf1: 250, lpf2: 500, motor: 90, dynF: 350, rpm: 0, dyn: 1 }], [T("Только LPF 100 Гц"), { lpf1: 100, lpf2: 0, rpm: 0, dyn: 0 }], [T("Без фильтров"), { lpf1: 0, lpf2: 0, rpm: 0, dyn: 0 }]].forEach(function (pr) {
         var b = document.createElement("button"); b.type = "button"; b.className = "gc-tag"; b.textContent = pr[0];
         b.addEventListener("click", function () {
           Object.keys(pr[1]).forEach(function (k) { p[k] = pr[1][k]; });

@@ -50,7 +50,7 @@ Příklad: nákladní 10", 4 × 5 A = 20 A ve visu, R_i baterie 6S Li-Ion 4P je 
 Kapacita v Ah (nebo mAh) říká, kolik proudu po kolik hodin. Energie Wh = Ah × U_nom. 6S 4 Ah = 88.8 Wh. Při středním výkonu 300 W je to teoreticky 0.3 h = 18 min, ~14 min s ohledem na využitelných 80 %. **Hodnocení C (C-rating)** je maximální proud v násobcích kapacity: 4 Ah × 25C = 100 A. Skutečné hodnoty bývají nižší než údaj na štítku; sledujte úbytek napětí při zátěži.
 
 ### Multimetr: co a jak
-- **Napětí (V⎓)**: hroty paralelně k měřenému místu; černý do COM, červený do V. Bezpečné téměř vždy. Kontrola baterie: celkové napětí a každý článek přes balanční konektor (rozdíl > 0.05 V znamená nevyvážené články).
+- **Napětí (V⎓)**: hroty paralelně k měřenému místu; černý do COM, červený do V. Bezpečné téměř vždy. Kontrola baterie: celkové napětí a každý článek přes balanční konektor (prahy rozptylu jsou na jednom řádku v `f-power`: po nabití ≤ 0.02 V, po letu ≤ 0.05 V, po nabití a odpočinku víc než 0.05 V — vyřadit).
 - **Test spojitosti (•)))**: jen na obvodu bez napětí. Pípnutí mezi + a − napájecí větve = zkrat. U obvodu s kondenzátorem může být pípnutí krátké a odpor potom roste – to je v pořádku.
 - **Odpor (Ω)**: bez napětí. Vinutí motoru – tři stejné hodnoty (0.05–0.3 Ω; levný multimetr ukáže šum – důležitá je shoda hodnot). Rozdíl znamená mezizávitový zkrat.
 - **Proud (A)**: hroty *sériově*, červený do zdířky 10 A; nad 10 A se měřit nesmí (shoří pojistka nebo přístroj). Hlavní chyba začátečníka: nechat hrot ve zdířce A a změřit napětí – to je zkrat přes přístroj. Proud celého stroje se měří proudovým senzorem FC (kalibruje se) nebo wattmetrem zapojeným do série s baterií.
@@ -60,7 +60,7 @@ Kapacita v Ah (nebo mAh) říká, kolik proudu po kolik hodin. Energie Wh = Ah �
 - Napětí na článek: plně nabitý 4.20 V (HV – 4.35), jmenovité 3.7, skladovací 3.80–3.85, minimum při zátěži ~3.3–3.5, pod 3.0 dochází k poškození.
 - **Nabíjení**: jen nabíječkou s balancováním, proudem ≤ 1C (4 Ah → 4 A), pokud výrobce nepovoluje víc; v LiPo vaku nebo na nehořlavém povrchu; nenechávejte bez dozoru; nenabíjejte studenou (< 5 °C) ani horkou baterii.
 - **Skladování**: při skladovacím napětí, v chladu; plně nabitou baterii neskladujte déle než den – ztrácí kapacitu a nafukuje se.
-- **Poškození**: nafouknutí, proražení, zápach – taková baterie už nelétá. Vybijte ji na 0 (solný roztok nebo vybíječ) a zlikvidujte podle předpisů. Po pádu dronu položte baterii na 30 minut na otevřené nehořlavé místo.
+- **Poškození**: nafouknutí, proražení, zápach – taková baterie už nelétá. Vybijte ji na 0 přes zátěž (vybíječ nebo rezistor; ne slaná voda — postup v `f-power`) a zlikvidujte podle předpisů. Po pádu dronu položte baterii na 30 minut na otevřené nehořlavé místo.
 - **Požár**: LiPo hoří sama a hasí se špatně. Plán mějte předem: kbelík písku, místo, kam baterii vyhodit, nevdechujte kouř. Velké množství vody chladí a u LiPo je přípustné (kovové lithium v ní není), ale nejlepším nástrojem je prevence: správné nabíjení, prohlídka, vak.
 - **Zkrat**: zkratový proud jsou stovky ampérů, konektor se svaří za zlomek sekundy. Napájecí konektor pájejte vždy jen po jednom kontaktu, nářadí izolujte, XT60 nepokládejte na kov.
 
@@ -82,7 +82,7 @@ Po visu odečtěte střední proud z logu (proudový senzor musí být zkalibrov
 Vlastní kontrolní seznam na jednu stránku: nabíjení, skladování, prohlídka, co dělat po pádu, kde je písek. Připevněte ho u nabíjecího místa.
 
 ### Orientační hodnoty a řešený příklad
-- **Články LiPo:** 4.20 V je plné nabití, 3.80–3.85 V skladování. Po balancování je rozdíl mezi články v setinách voltu; víc než 0.05 V je důvod baterii zkontrolovat (modul „Údržba“).
+- **Články LiPo:** 4.20 V je plné nabití, 3.80–3.85 V skladování. Po balancování je rozdíl mezi články ≤ 0.02 V; po nabití a odpočinku od 0.03 V — sledovat, víc než 0.05 V — vyřadit (orientační hodnota kurzu, `f-power` a modul „Údržba“).
 - **BEC:** 5 V má být s připojenou palubní elektronikou v rozmezí přibližně ±5 % (4.75–5.25 V). Pokud napětí při zátěži znatelně klesá, je BEC proudově poddimenzovaný.
 - **Vnitřní odpor baterie:** bez zátěže 25.2 V, při proudu 20 A 24.4 V → R = (25.2 − 24.4) / 20 = 0.04 Ω na baterii 6S, ≈ 6.7 mΩ na článek. Při proudu ve visu bude úbytek úměrně menší.
 - **Vinutí motorů:** odpor fází jsou desetiny a setiny ohmu a běžný multimetr ho měří špatně: hroty a přechodový odpor dávají srovnatelnou chybu. Porovnávejte tři fáze jednoho motoru mezi sebou: musí se shodovat. Špatně připájený vývod zvýší hodnotu u obou dvojic s tímto vývodem; jedna dvojice, která se liší od zbylých dvou, znamená poškozené vinutí (mezizávitový zkrat); „přerušení“ znamená přerušené vinutí nebo vývod. Přesnější je pustit vinutím známý proud z laboratorního zdroje (například 1 A) a změřit úbytek napětí.

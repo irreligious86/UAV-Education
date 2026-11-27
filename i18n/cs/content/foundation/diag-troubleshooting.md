@@ -104,7 +104,7 @@ Závada: motor 3 se po armování netočí, ostatní se točí.
 | Dojde povel až k ESC? | záložka Motors, posuvník motoru 3 | ESC při připojení napájení pípá, na posuvník nereaguje | ESC žije, signál chybí nebo je špatný |
 | Signál na výstupu FC | `resource` v CLI, osciloskop nebo přehození signálového vodiče na sousední výstup | na sousedním výstupu se motor 3 točí | ESC i motor jsou v pořádku |
 | Výstup FC | pájení plošky M3 pod lupou, měření průchodnosti | studený spoj signálového vodiče | příčina nalezena |
-| Kontrola po opravě | Motors, všechny čtyři motory, chyby DShot | všechny se točí, chyby 0 % | uzavřeno |
+| Kontrola po opravě | Motors, všechny čtyři motory, chyby DShot | všechny se točí, chyby ≤ 1 % (`bf-rpm-filter`) | uzavřeno |
 
 Každý řádek je fakt, který lze zopakovat. Řádek „asi ESC“ bez ověření není krok, ale dohad.
 

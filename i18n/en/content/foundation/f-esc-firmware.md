@@ -58,7 +58,7 @@ The firmware name on the box tells you about the ESC's microcontroller: “BLHel
 - **Before flashing**: remove the props, save the current settings (a screenshot or a file), flash one ESC at a time if in doubt, use a protected battery (smoke stopper).
 
 ### Flight controller: what to enable
-- Betaflight: `set motor_pwm_protocol = DSHOT600` (or 300 — by PID loop and MCU, rule in `f-motors-esc`; on F405/F411/G47x with bidir the firmware sets 300 itself), `set dshot_bidir = ON`, `set motor_poles = 14`; to check, the Motors tab shows RPM, DShot errors ≈ 0%.
+- Betaflight: `set motor_pwm_protocol = DSHOT600` (or 300 — by PID loop and MCU, rule in `f-motors-esc`; on F405/F411/G47x with bidir the firmware sets 300 itself), `set dshot_bidir = ON`, `set motor_poles = 14`; to check, the Motors tab shows RPM, DShot errors ≤ 1 % (`bf-rpm-filter`).
 - ArduPilot: `MOT_PWM_TYPE` set to DShot300/600, `SERVO_BLH_BDMASK` is the mask of outputs with bidirectional DShot, `SERVO_BLH_POLES` is the pole count; ESC telemetry shows up in the log (`ESC`) and is used by the harmonic notch (`INS_HNTCH_MODE = 3`, driven by ESC telemetry).
 
 {{diagram:esc-firmware-choice|Choosing ESC firmware: an 8-bit ESC on BB21/BB51 gets Bluejay instead of BLHeli_S, a 32-bit one gets AM32 if a target exists, a working BLHeli_32 can stay, and without a target don't flash.}}

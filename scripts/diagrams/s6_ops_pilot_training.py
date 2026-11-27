@@ -21,7 +21,7 @@ def _actual(x, rc_rate, srate, expo):        # applyActualRates
 def build(D: dict) -> None:
     xs = [i / 100 for i in range(101)]
     series = [
-        dict(name="дефолт 7/67/0", xs=xs, ys=[_actual(x, 7, 67, 0) for x in xs], cls="w",
+        dict(name="по умолчанию 7/67/0", xs=xs, ys=[_actual(x, 7, 67, 0) for x in xs], cls="w",
              label_at=0.80, label_dy=-14, label_anchor="end"),
         dict(name="учебный 15/60/40", xs=xs, ys=[_actual(x, 15, 60, 40) for x in xs], cls="a",
              label_at=0.80, label_dy=24, label_anchor="start"),

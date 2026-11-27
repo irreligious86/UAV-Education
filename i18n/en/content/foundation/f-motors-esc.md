@@ -66,7 +66,7 @@ An ESC is a three-phase inverter on 6 MOSFETs. It commutates the phases accordin
 Desync means the ESC lost the rotor position: the motor stutters, screams, thrust drops; causes — long phase wires, too little demag compensation or too low timing for a heavy prop, a prop too big for the KV, old firmware.
 
 ### DShot: how a frame is built
-16 bits: 11 bits of value (0 — stop, 1–47 — special commands, 48–2047 — throttle), 1 telemetry request bit, 4 CRC bits. A bit is encoded by pulse width: “1” ≈ 75% of the bit period, “0” ≈ 37%; DShot300 — a 3.33 µs bit, a 53 µs frame; DShot600 — 1.67 µs and 27 µs. A frame is sent every PID loop. **Bidirectional DShot**: after the frame the line is turned around, and the ESC replies with a frame carrying eRPM (the period of an electrical revolution), GCR-encoded; errors in this reply show up as `E%` on the Motors tab — normal is 0, and at > 1–2% the RPM filter places its notches in the wrong spot. Special DShot commands (1–47): beeper, spin direction reversal (`dshot_cmd` 7/8 — `motor direction`), 3D on/off, ESC info request — the configurator uses these on the Motors tab.
+16 bits: 11 bits of value (0 — stop, 1–47 — special commands, 48–2047 — throttle), 1 telemetry request bit, 4 CRC bits. A bit is encoded by pulse width: “1” ≈ 75% of the bit period, “0” ≈ 37%; DShot300 — a 3.33 µs bit, a 53 µs frame; DShot600 — 1.67 µs and 27 µs. A frame is sent every PID loop. **Bidirectional DShot**: after the frame the line is turned around, and the ESC replies with a frame carrying eRPM (the period of an electrical revolution), GCR-encoded; errors in this reply show up as `E%` on the Motors tab — normal is at most 1 % (course guideline, `bf-rpm-filter`; usually about 0), and above that the RPM filter places its notches in the wrong spot. A notch is a narrow cut in the gyro spectrum that removes one frequency and barely touches its neighbours; the RPM filter places these cuts at the motor rotation frequencies from eRPM, so a wrong eRPM or `motor_poles` moves the cut off the noise. Special DShot commands (1–47): beeper, spin direction reversal (`dshot_cmd` 7/8 — `motor direction`), 3D on/off, ESC info request — the configurator uses these on the Motors tab.
 
 ### Worked example: matching a motor and prop
 A 5" freestyle on 6S, 700 g: you need T/W ≥ 6 (the freestyle band in `f-physics`) → 4200 g total, 1050 g max per motor. The table for a 2207 1750KV with a 5.1×3 prop: max ~1600 g at 38 A — there's margin; hover ~180 g per motor at ~4 A. A 45 A 4-in-1 ESC — 45 A continuous against a 38 A peak per channel: enough, but “cutting it close” in aggressive flying on a fresh battery; 55–60 A is more relaxed. A 7" long range on 6S at 1.4 kg: 2806.5 1300KV + 7×3.5: max ~1200 g at ~22 A → a 35–45 A ESC. The KV difference between 5" and 7" is precisely because of the torque on the prop (Kt).
@@ -78,7 +78,7 @@ A 5" freestyle on 6S, 700 g: you need T/W ≥ 6 (the freestyle band in `f-physic
 1. Remove the props.
 2. Connect the battery through a current limiter (smoke stopper) the first time you power up a new build.
 3. On the Motors tab, spin each motor at low throttle: check direction and smoothness.
-4. With bidirectional DShot, make sure each motor reports RPM and there are almost no telemetry errors.
+4. With bidirectional DShot, make sure each motor reports RPM and telemetry errors are at most 1 % (course guideline, `bf-rpm-filter`).
 5. Check by hand: the bell spins without play or grit, the magnets are intact, the screws don't touch the winding.
 
 ### Choosing a protocol

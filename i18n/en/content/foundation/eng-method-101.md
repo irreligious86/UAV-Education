@@ -35,7 +35,7 @@ A requirement is a statement about what the vehicle must do that can be **verifi
 |---|---|---|---|
 | R-01 | Hovers with a 30 g payload for at least 15 min | ≥ 15:00 down to 3.5 V/cell | Timed flight, voltage log |
 | R-02 | T/W at takeoff weight ≥ 2.5 | calculation and hover throttle ≤ 40% | Thrust table + log |
-| R-03 | On link loss, lands in place after 1.5 s | DROP after 1.5 s | Ground test without props + log |
+| R-03 | On link loss, ends the flight in place after 1.5 s | DROP after 1.5 s (5" over a safe zone: it falls nearby instead of flying away; for 7–10" and flights over people — AUTO-LAND or GPS Rescue, `bf-failsafe`) | Ground test without props + log |
 | R-04 | Video and RC are not lost out to 1 km at 50 m altitude | LQ > 70%, video without dropouts | Field test with recording |
 | R-05 | Takeoff weight ≤ 900 g | scale | Weighing |
 

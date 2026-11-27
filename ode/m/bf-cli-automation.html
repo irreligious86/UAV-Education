@@ -70,7 +70,7 @@
 <h4 id="grabli-4-diff-ne-perenositsya-mezhdu-versiyami" class="md-subheading">Грабли 4: diff не переносится между версиями</h4>
 <p>Имена и смысл параметров таки меняются между версиями прошивки: переименовываются <code>debug_mode</code>, меняется синтаксис команды <code>serial</code>, меняется смысл PID-параметров D-term. Вставлять <code>diff all</code> от 2025.12 в 4.5 (и наоборот) построчно нельзя. Переносить настройки между версиями — только осмысленно, по разделам, с перечитыванием.</p>
 <h4 id="pochemu-dif-a-ne-damp" class="md-subheading">Почему диф, а не дамп</h4>
-<p><code>diff all</code> содержит только отличия от дефолтов — его можно читать глазами и хранить в git. <code>dump</code> — всё подряд, при обновлении прошивки он тащит старые дефолты как явные значения.</p>
+<p><code>diff all</code> содержит только отличия от умолчаний — его можно читать глазами и хранить в git. <code>dump</code> — всё подряд, при обновлении прошивки он тащит старые умолчания как явные значения.</p>
 <h4 id="minimalnyy-skript-vygruzki-diff-all-pyserial" class="md-subheading">Минимальный скрипт выгрузки <code>diff all</code> (pyserial)</h4>
 <pre class="cli-block"><code>import serial, time, sys, glob
 

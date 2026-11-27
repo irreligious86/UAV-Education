@@ -58,7 +58,7 @@ source_hash: e6c1fde3e719
 - **Перед прошивкой**: снять винты, сохранить текущие настройки (скриншот или файл), прошивать по одному ESC при сомнениях, батарея с защитой (smoke stopper).
 
 ### Полётник: что включить
-- Betaflight: `set motor_pwm_protocol = DSHOT600` (или 300 — по циклу PID и MCU, правило в `f-motors-esc`; на F405/F411/G47x с bidir прошивка сама ставит 300), `set dshot_bidir = ON`, `set motor_poles = 14`; проверка — вкладка Motors показывает RPM, ошибки DShot ≈ 0 %.
+- Betaflight: `set motor_pwm_protocol = DSHOT600` (или 300 — по циклу PID и MCU, правило в `f-motors-esc`; на F405/F411/G47x с bidir прошивка сама ставит 300), `set dshot_bidir = ON`, `set motor_poles = 14`; проверка — вкладка Motors показывает RPM, ошибки DShot ≤ 1 % (`bf-rpm-filter`).
 - ArduPilot: `MOT_PWM_TYPE` — DShot300/600, `SERVO_BLH_BDMASK` — маска выходов с двунаправленным DShot, `SERVO_BLH_POLES` — число полюсов; ESC-телеметрия видна в логе (`ESC`) и используется гармоническим notch (`INS_HNTCH_MODE = 3` — по ESC-телеметрии).
 
 {{diagram:esc-firmware-choice|Выбор прошивки ESC: 8-битный регулятор на BB21/BB51 — Bluejay вместо BLHeli_S, 32-битный — AM32 при наличии таргета, работающий BLHeli_32 можно оставить, без таргета — не прошивать.}}

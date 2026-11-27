@@ -172,6 +172,130 @@ Accepted as is, per FC-sel: wire-drop rates only the percentage drop (the hint s
 
 Checks after this pass: `validate_content.py` OK, `check_i18n.py` 0 errors, `check_diagrams.py` 0 errors, `check_js.py` 0 errors.
 
+## Status of the low findings and the medium terminology rows — 2026-11-27
+
+This pass re-checked the 80 low selection findings and the seven medium T rows (T1-1, T1-5, T1-7, T1-8, T1-9, T2-3, T2-4) against the current text. Line numbers are those of the files after this pass. Numbers that are not from a datasheet, firmware source or standard are labelled «ориентир курса» (or «оценка курса») in the text.
+
+Translations: where the old wrong fact exists in `i18n/{en,uk,uk-galych,cs,ru-odessa}/content`, the same fact was changed there:
+- FC MCU rule (`f-components-choice`);
+- cell-imbalance thresholds (`f-electricity-101`);
+- Li-Ion charge current and warm-up temperature (`f-power`);
+- DShot error ceiling and the notch gloss (`f-motors-esc`, `f-esc-firmware`);
+- 7" harmonic band (`f-frame-mech`);
+- GPS baud (`el-peripherals`, `bf-ports`);
+- R-03 DROP wording (`eng-method-101`);
+- SBUS on F4 → CRSF (`bf-ports`).
+
+`ru-odessa` also received the «дефолт» and the in-scope «тюнинг» replacements. New standalone paragraphs exist only in the Russian source. UI strings changed in widgets were re-keyed in `i18n/*/ui.json`, `todo-ui.json` and `assets/i18n/*.js`; changed `data/*.json` strings were re-keyed in `i18n/*/data.json` and `todo-data.json`.
+
+**Totals, low:** 75 fixed, 5 no longer applies, 0 rejected. **T rows:** 6 fixed, 1 fixed in scope with a remainder left open (T2-4).
+
+| ID | Status | Edit (file:line) | Source |
+|---|---|---|---|
+| MEC-2 | fixed | `f-mechanics.md:62` why 20 % (T ∝ U², 10 % sag → 19 % thrust), differs from T/W ≥ 2 | course model T ∝ n², n ∝ U; «ориентир курса» |
+| AER-4 | fixed | `f-aero-props.md:100` wing-prop procedure: J at cruise, η peak, pitch speed > V, check by cruise current | UIUC Propeller Database (already cited); «оценка курса» |
+| AER-5 | fixed | `f-aero-props.md:97` g/W bands labelled, pointer to the 10" note in `f-components-choice` | «оценка курса» |
+| ELE-2 | no longer applies | fixed in 7f293211: `f-electricity-101.md:58` gives the 4–6S defaults and points to the `f-power` table | — |
+| ELE-3 | fixed | `f-electricity-101.md:51`, `:89`, `:100` aligned to the canonical line `f-power.md:123` (≤ 0.02 after charge, ≤ 0.05 after flight, > 0.05 after rest — retire) | course rule in `f-power` / `ops-maintenance` |
+| POW-3 | fixed (with PWR-4) | `f-power.md:153` 9 V 2 A = 1.7 × peak, passes the 1.5× rule with a small margin | `el-power-design` rule |
+| POW-4 | fixed | `f-power.md:123` Li-Ion at the datasheet standard current, 0.5C without one; when 4.1 V | Molicel INR21700-P42A datasheet V4 (standard charge 4.2 A CC-CV, charge 0–45 °C) |
+| POW-5 | fixed | `f-power.md:123` 20–25 °C, as `ops-weather.md:49` | «ориентир курса» |
+| POW-6 | fixed | procedure was already at `f-power.md:182`; pointer to the scale formulas in `el-measure` added | Betaflight `sensors/current.c` (cited in `el-measure`) |
+| MOT-3 | fixed | `f-motors-esc.md:64` start = firmware default, pointer to `f-esc-firmware` | `f-esc-firmware` Bluejay / AM32 tables |
+| MOT-4 | fixed | one ceiling ≤ 1 % («ориентир курса», canonical `bf-rpm-filter.md:76`): `f-motors-esc.md:71`, `:89`, `:103`; `f-esc-firmware.md:116`, `:232`; after FC-low I6 also `f-micro-whoop.md:252`, `diag-troubleshooting.md:149`, `bf-filters.md:111` (and translations) | «ориентир курса» |
+| MOT-5 | fixed | T/W part fixed in 2389ded6; `f-motors-esc.md:74` 7" ESC: 1.3 × 22 ≈ 29 A, 35–45 A explained as extra margin | `f-components-choice` rule |
+| MOT-6 | fixed | `f-motors-esc.md:54` first build: thrust-table peak × 1.3 | `f-components-choice` Шаг 5а |
+| FCS-2 | fixed | `f-fc-sensors.md:51` size set by the frame; AIO / stack rule pointer | `f-components-choice` Шаг 5а |
+| FCS-3 | fixed | `f-fc-sensors.md:64` 1 kHz PID / 2 kHz filters (1.6 kHz BMI270), minutes per 16 MB | `bf-blackbox` |
+| FRM-3 | fixed | `f-frame-mech.md:54` why cutoff 150/180 (Q ≈ 2.7) and not 0.7 (Q ≈ 1.4, edge on the 125 Hz harmonic); `bf-filters.md:134` pointer | Betaflight 2025.12.5 `common/filter.c:166` (`filterGetNotchQ`) |
+| FRM-4 | fixed | `f-frame-mech.md:43`, `:85` 7" = 110–200 Hz; `f-esc-firmware.md:91` 110–130 marked as the 7" LR example; stale «120–200» cross-reference in `bf-filters.md:59` fixed (FC-low I5) | same band as `bf-filters` (FIL-1) |
+| CMP-2 | fixed | `f-components-choice.md:53` 1.3× labelled, reason | «ориентир курса» |
+| CMP-3 | fixed | `f-components-choice.md:53` 4-in-1 up to 7", separate ESCs on 10"+ / X8 | «ориентир курса» |
+| CMP-6 | fixed | `f-components-choice.md:59`, `:66` INAV: F405 full, ≤ 512 KB flash (F411/F722) drops features incl. geozones (F411 also the 2nd mixer profile); ArduPilot: H7 (65 of 82 F4 flight controllers minimized, 2 of 118 H7; both counts without AP_Periph boards); INAV list also allows F745/F765 | INAV 9.1.0 `target/common.h:205–227`, `cmake/stm32f4.cmake` (`MCU_FLASH_SIZE`), `flight/mixer_profile.h:9`, 117 F405 targets in 88 board directories; ArduPilot 4.7.3 `hwdef/include/minimize_*.inc`, hwdef count |
+| SAF-1 | fixed | `f-safety.md:135` «тяжёлых» = 7"+ and X8, tied to prop energy | module's own energy numbers; «ориентир курса» |
+| SAF-2 | fixed | `f-safety.md:128` reason linked (10 / 19 J vs 5.8 J) | same |
+| KIT-1 | fixed | `f-starter-kit.md:105` S = that of the main aircraft, KV to it | `f-aero-props` KV × S rule |
+| KIT-2 | fixed | `f-starter-kit.md:63` bay by what is already owned | «ориентир курса» |
+| WHP-2 | fixed | `f-micro-whoop.md:134` start = minimum stable idle + a little (`f-esc-firmware`) | `f-esc-firmware.md:113` |
+| WHP-6 | fixed | `f-micro-whoop.md:45`, `:46` S under the motor KV | «оценка» |
+| WHP-7 | fixed | `f-micro-whoop.md:139` reason (8 % on 1S) and check `debug_mode = BATTERY` | Betaflight 2025.12.5 `flight/mixer.c:261` (DEBUG_BATTERY[2] = sag goodness × 100); `bf-pid-reg-in-bf:148` |
+| ENG-2 | fixed | `eng-method-101.md:40` why DROP, when AUTO-LAND / Rescue; «садится» → «прекращает полёт» | `bf-failsafe` «Что выбрать» |
+| PLT-1 | fixed | `ops-pilot-training.md:102` start 20 (default), steps to 45 | Betaflight 2025.12.5 `flight/pid.c:169` (20), `cli/settings.c:1268` (10–80) |
+| BFP-1 | fixed | `bf-ports.md:71`, `:228` CRSF first, FPort only with a FrSky receiver | `link-protocols` rule |
+| BFP-2 | fixed | `bf-ports.md:117` 57600 (115200 loses frames) | `bf-gps-setup` (`io/gps.c` 2025.12.5) |
+| PRO-1 | fixed | `bf-ports.md:107`, `link-protocols.md:44` OFF with ELRS and why | Betaflight 2025.12.5 `pg/rx.c:117` (default OFF), `telemetry/crsf.c:922` (0x70); ELRS 4.1.0: no 0x70 subcommand in `src/include/crsf_protocol.h` or `src/lib/CrsfProtocol`, UART baud = `uart_baud` (`rx_main.cpp:1287`) |
+| BFS-3 | fixed | `bf-failsafe.md:108` GPS Rescue defaults and what to change | Betaflight 2025.12.5 `pg/gps_rescue_multirotor.c`, `cli/settings.c:1151–1165` |
+| BFS-4 | fixed | `bf-failsafe.md:50` check via `debug_mode = EZLANDING` in log units: debug[7] = jerk × 1000, disarm when debug[7] > threshold × 10 000 (÷ 1.5 low in ALT_HOLD); the two source comments (`pid.c:243` «around 100», `pid.c:968` «around 10») disagree, stated in the text | Betaflight 2025.12.5 `flight/pid.c:946–972`, `pid_init.c:582`, `build/debug.c:119` |
+| ETX-2 | no longer applies | fixed in 7f293211: `link-edgetx.md:162` LiPo, Li-Ion and 1S thresholds with a pointer to `f-power` | — |
+| ELR-1 | fixed | one number S + 10 dB, ELRS documentation attributed once as «5–10 dB», turn-back −103 dBm in both modules: `rf-link-budget.md:72`; widget `assets/widgets/elrs-calc.js:90` was sens + 8 «порог + 5…10», now sens + 10 «ориентир курса» (catalogs re-keyed) | «ориентир курса» (already in `link-elrs:189`, `rf-link-budget:118`) |
+| ELR-2 | fixed | `link-elrs.md:204` Hybrid vs Wide vs Full Res by AUX use | ELRS 4.1.0 switch modes already in the module; «ориентир курса» |
+| ELR-3 | fixed | `link-elrs.md:213` CH5 vs Switch | module text (EdgeTX 2.11.0+); «ориентир курса» |
+| ELR-4 | fixed | `link-elrs.md:349` ceiling = legal EIRP, then 12 dB budget | `f-regulations`, `rf-link-budget` |
+| VTX-2 | fixed | `link-vtx.md:53` procedure: legal EIRP → budget → field test; 25 mW indoors | `f-regulations`, `rf-link-budget`, `f-micro-whoop` |
+| VTX-1 (medium, follow-up) | fixed | `link-vtx.md:59` UNTIL_FIRST_ARM worded as the course recommendation, OFF as the firmware default (FC-low I4) | Betaflight 2025.12.5 `io/vtx.c` |
+| VTX-3 | fixed | `link-vtx.md:41` vendor table in its mode, otherwise CUSTOM; check | module's FACTORY/CUSTOM mechanism |
+| VTX-4 | fixed (with ANT-2) | `link-vtx.md:53` pointer to `rf-antennas.md:53` | — |
+| DIG-1 | fixed | `link-digital-video.md:104`, `:116` OSD threshold = link quality at the first bitrate drop in the lab test | «ориентир курса» |
+| FLD-1 | fixed | `ops-field.md:39` reason (20–27 MHz occupied, IMD), pointer `link-vtx` | `link-vtx.md:49` |
+| FLD-2 | fixed | `ops-field.md:40` one-line summary of `link-elrs` «Выбор режима под задачу» | `link-elrs.md:339–342` |
+| PWR-4 | fixed | `el-power-design.md:49` reason for 1.5×; `f-power` reconciled (POW-3) | «ориентир курса» |
+| PWR-5 | fixed | `el-power-design.md:93` rating 1.3×, time-delay, pointer | `el-redundancy` (RED-1) |
+| BAT-2 | no longer applies | fixed in 2389ded6 (POW-1): `el-battery-packs.md:37` defines the 1.5–3C band; the «типично 2–3C» line in `f-components-choice` is gone | — |
+| BAT-4 | fixed | `el-battery-packs.md:70` ratio to own new IR decides (×1.5–2), absolute 50+/10+ mΩ only without a record | `ops-maintenance` rule; «ориентир курса» |
+| WIR-3 | fixed | `el-wiring.md:27` start by pad size; bigger tip before more heat | «ориентир курса» |
+| EMI-2 | fixed | `el-emi.md:60` ferrite material by frequency (31: 1–300 MHz, 43: 25–300, 61: 200–1000); GNSS remark labelled as a course conclusion | Fair-Rite Cable Snap-Its page (via Mouser), reference added |
+| PER-1 | fixed | `el-peripherals.md:30`, `:47` baud by firmware: Betaflight 57600 (NAV-PVT 10 Hz + NAV-SAT 2 Hz only while the configurator is connected, `io/gps.c:950`), ArduPilot 230400 | Betaflight `io/gps.c` (via `bf-gps-setup`); ArduPilot 4.7.3 `AP_GPS.cpp:79, 540`, `AP_GPS_UBLOX.h:57`, `GPS_DRV_OPTIONS` bit 2 |
+| ANT-1 | fixed | `rf-antennas.md:113` why 1.5 (margin to 2 on the airframe) | module's SWR → loss table; «ориентир курса» |
+| ANT-2 | fixed | `rf-antennas.md:53` video antenna type by task, check by orbit | «ориентир курса» |
+| LB-1 | fixed | `rf-link-budget.md:72` LQ threshold independent of rate (share of packets), RSSI is the margin | `link-edgetx`, `link-elrs` |
+| LB-2 | fixed | `rf-link-budget.md:134` why 12 dB | «ориентир курса» |
+| SIZ-2 | fixed | `des-sizing.md:75` 1.5× and 80 % labelled with reasons; tied to the `ops-weather` gust rule | «ориентир курса» |
+| STD-1 | fixed | `des-thrust-stand.md:402` capacity ≥ 2 × max thrust, counts/g halve with 2× capacity | module's HX711 arithmetic (430 counts/g at 5 kg) |
+| STD-2 | fixed | `des-thrust-stand.md:36` why 10 SPS | qualitative, «ориентир курса»; the HX711 datasheet could not be fetched in this pass, so no settling or noise numbers were added |
+| FIL-2 | fixed | `bf-filters.md:77` reason and start (count 1, Q 500 with RPM filter) | «ориентир курса» |
+| RPM-1 | no longer applies | fixed in 2389ded6 with WHP-3: `bf-rpm-filter.md:106` | — |
+| RPM-2 | fixed | `bf-rpm-filter.md:106` «чистый» defined (≤ ~10 dB over floor in `gyroUnfilt`), check linked | «ориентир курса» |
+| RPM-4 | fixed (with MOT-4) | `bf-rpm-filter.md:76` is the canonical ≤ 1 %; other modules aligned | — |
+| PID-1 | fixed | `bf-pid.md:105` 7–10" scaling labelled «оценка курса», whoop / X8: own best log | — |
+| PID-2 | fixed | `bf-pid.md:107` TPA on high-hover aircraft: breakpoint above hover, check `debug_mode = TPA` | `bf-pid-reg-in-bf` formula; Betaflight 2025.12.5 `flight/pid.c:228–236`, `build/debug.c:120` |
+| RAT-2 | fixed | `bf-rates-rc.md:102` start `thr_expo` 0, then 20–50, check | «ориентир курса» |
+| RAT-3 | fixed | `bf-rates-rc.md:49` Actual and why, pointer `ops-pilot-training` | — |
+| WTH-1 | fixed | `ops-weather.md:33` labelled; derived from 1.5 × wind (1/1.5 ≈ 67 %) | «ориентир курса» |
+| WTH-2 | fixed | `ops-weather.md:71` go / no-go ≥ 3 °C | module's own fog signs; «ориентир курса» |
+| MNT-1 | no longer applies | canonical imbalance line `f-power.md:123` (2389ded6) matches `ops-maintenance:34`; the last mismatch was ELE-3 | — |
+| RID-1 | fixed | `f-remote-id-security.md:52` ArduPilot/PX4 module vs standalone beacon on Betaflight/INAV | no OpenDroneID in Betaflight 2025.12.5 / INAV 9.1.0 sources (grep) |
+| RED-1 | fixed | `el-redundancy.md:39` 1.3 = 1/0.75 derating; time-delay type | Littelfuse «The Twelve Cardinal Rules of Fuseology», rules 1 and 6 (reference added) |
+| TEL-1 | fixed | `link-telemetry-radios.md:132` why 6–10 dB is allowed only for a non-control link | «ориентир курса» |
+| TEL-2 | fixed | `link-telemetry-radios.md:50` start from defaults; `MAX_WINDOW` 131 ms is default and max | SiK `Firmware/radio/parameters.c` (GitHub) |
+| SEN-1 | fixed | `est-sensors.md:33` keep the board default (45 °C on Cube Orange / Pixhawk 6X), check `IMU.T`, `BRD_HEAT_LOWMGN` | ArduPilot 4.7.3 `AP_BoardConfig.cpp:59–64, 247–253, 388–394`, `hwdef` `HAL_IMU_TEMP_DEFAULT`, `LogStructure.h:138` |
+| GNS-2 | fixed | `est-gnss.md:79` pointer to the UART load rule | `el-peripherals` |
+| GNS-3 | fixed | `est-gnss.md:81` BeiDou vs GLONASS by region, decided by NAV-SAT / HDOP on site | orbit facts (BeiDou GEO/IGSO; GLONASS 64.8°); «ориентир курса» |
+| AST-1 | fixed | `aero-stability.md:46` start 0.6 for a new design, measured for a kit | module's own Skywalker table |
+| ALC-1 | fixed | `ctl-allocation.md:68` θ from needed yaw factor, ×1.5 → ~6° for 0.5 % thrust | module's formula |
+| ALC-2 | fixed | `ctl-allocation.md:53` four `mixer_type` values, LEGACY recommended | Betaflight 2025.12.5 `cli/settings.c:571–573`, `flight/mixer.c:826–840`, `mixer_init.c:70` |
+
+| T row | Status | Edit | Note |
+|---|---|---|---|
+| T1-1 | fixed | `f-physics.md:96` air mode and mixer scaling glossed, pointer `ctl-allocation` | — |
+| T1-5 | fixed | `f-motors-esc.md:71` notch glossed at first use | — |
+| T1-7 | fixed | `f-fc-sensors.md:40`, `:54`, `:63`, `:66`, `:68`, `:71` one-line glosses (EKF, anti-aliasing, LPF, DMA, MSP DisplayPort, PDB, SmartAudio, hwdef, unified target, DroneCAN) | glosses rather than splitting the subsection |
+| T1-8 | fixed | `f-safety.md:151` LQ and RSSI glossed in the checklist | — |
+| T1-9 | fixed | `f-regulations.md:102` EIRP defined with a 25 mW + 3 dBi example | — |
+| T2-3 | fixed | «дефолт*» → «по умолчанию / умолчание»: 0 left in `content/**/*.md`, diagram generators `scripts/diagrams/s6_bf_rates_rc.py:66, 106`, `s6_ops_pilot_training.py:24` (SVGs rebuilt with `build_diagrams.py`, which rewrote `i18n/.diagram-keys.json`), `content/quiz`, `content/tasks`, `content/pages/setup-cards.html`, `data/curriculum.json`, `data/glossary.json`, `i18n/ru-odessa/content`; widget label `filter-response.js:79` | catalogs re-keyed |
+| T2-4 | fixed in scope; remainder open | audit-scope modules: `bf-pid` (title also in `data/curriculum.json` and `content-manifest.json`, tag, `:28`, `:33`, `:110`, `:112`), `bf-filters:70`, `:105`, `:106`, `aero-stability:75`, `ctl-allocation:195`, `:253`, `:308`, `:311`, `f-mechanics:101`; same lines in `ru-odessa` | Kept on purpose: the heading «### Протокол тюнинга» in `bf-pid`, so that saved anchors of notes and bookmarks stay valid. Not changed: ≈ 200 uses in ArduPilot, PX4, `tools`, `companion` and `math` modules, including «автотюн» (the AUTOTUNE mode name). These wait for the SPEC "Terminology" decision. |
+
+**Fact-check FC-low (`/tmp/claude-0/work/s6/FC-low.md`), all items applied:**
+- E1 (safety): the en, uk, uk-galych, uk-zakarpat, cs and ru-odessa copies still advised discharging in salt water (`f-power`, `f-safety`, `f-electricity-101`). Aligned with the source: discharge to ~0 V through a load, not salt water, procedure in `f-power`. No other salt-water advice is left in the translations; the source `f-safety.md:353` is a true/false item whose answer is «неверно».
+- I1: ArduPilot counts both without AP_Periph (65 of 82 F4, 2 of 118 H7); INAV «117 целей сборки в 88 каталогах плат». Fixed in the source and all translations.
+- I2: diagram generators fixed and SVGs rebuilt. Ukrainian «дефолт» is slang rather than standard Ukrainian (the uk catalogs already use «типово»), so it was replaced with «типово / типові значення» in the uk, uk-galych and uk-zakarpat content, quizzes and `data.json` values.
+- I3: BFS-4.
+- I4: VTX-1 follow-up.
+- I5: FRM-4.
+- I6: MOT-4.
+- Nits: «интервалы потоков по умолчанию», «период микшера EdgeTX по умолчанию», «с гейнами по умолчанию» (`px4-control`, `data/curriculum.json`, re-keyed), «большое жало», ELRS RSSI attribution, WHP-7 source cell, PRO-1 ELRS path, the CMP-6 INAV list now includes F745/F765, the PER-1 NAV-SAT rate, the EMI-2 label.
+
+Checks after this pass: `validate_content.py` OK, `check_i18n.py` 0 errors (counts identical to before the pass), `check_js.py` 0 errors, `check_diagrams.py` 0 errors.
+
 ---
 
 ## 1. Foundation

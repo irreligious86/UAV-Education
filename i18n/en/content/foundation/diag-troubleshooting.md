@@ -104,7 +104,7 @@ Fault: motor 3 doesn't spin when armed, the others do.
 | Does the command reach the ESC? | Motors tab, motor 3 slider | the ESC beeps when power is applied, doesn't respond to the slider | the ESC is alive, there's no signal or it's the wrong one |
 | Signal at the FC output | `resource` in the CLI, an oscilloscope or moving the signal wire to a neighboring output | on the neighboring output motor 3 spins | the ESC and motor are fine |
 | FC output | the M3 pad solder joint under a magnifier, continuity test | a cold solder joint on the signal wire | cause found |
-| Check after the repair | Motors, all four motors, DShot errors | all spin, errors 0 % | closed |
+| Check after the repair | Motors, all four motors, DShot errors | all spin, errors ≤ 1 % (`bf-rpm-filter`) | closed |
 
 Every row is a fact that can be reproduced. A row saying “probably the ESC” without a check isn't a step, it's a guess.
 

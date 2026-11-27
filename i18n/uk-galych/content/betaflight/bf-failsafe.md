@@ -28,12 +28,12 @@ Failsafe — то є то, що дрон робить, коли щез зв'яз
 {{diagram:failsafe-stages|Часова діаграма failsafe: виявлення втрати, коротке утримання, Stage 1 і Stage 2.}}
 
 ### Stage 1 — захисний інтервал
-Триває `failsafe_delay` (у десятих частках секунди: 15 = 1.5 с; дефолт 1.5 с (так само в 4.3–4.4; між 4.4 і 4.5 змінився `failsafe_recovery_delay`: 1.0 → 0.5 с)). За замовчуванням стіки в центрі, газ на нулі, положення тумблерів тримаються. Значення для кожного каналу задаються в Configurator (Channel fallback) або командою `rxfail`. Як зв'язок вернувся під час Stage 1, керування вертається миттєво.
+Триває `failsafe_delay` (у десятих частках секунди: 15 = 1.5 с; типово 1.5 с (так само в 4.3–4.4; між 4.4 і 4.5 змінився `failsafe_recovery_delay`: 1.0 → 0.5 с)). За замовчуванням стіки в центрі, газ на нулі, положення тумблерів тримаються. Значення для кожного каналу задаються в Configurator (Channel fallback) або командою `rxfail`. Як зв'язок вернувся під час Stage 1, керування вертається миттєво.
 
 ### Stage 2 — процедура
 Вибирається параметром `failsafe_procedure`:
 
-- `DROP` (дефолт) — миттєвий дизарм, мотори стоп. Повторний арм можливий після `failsafe_recovery_delay` стабільного зв'язку (0.5 с за замовчуванням у 4.5) і вимкненого тумблера ARM.
+- `DROP` (типово) — миттєвий дизарм, мотори стоп. Повторний арм можливий після `failsafe_recovery_delay` стабільного зв'язку (0.5 с за замовчуванням у 4.5) і вимкненого тумблера ARM.
 - `AUTO-LAND` — стіки в центрі, газ на `failsafe_throttle`, режими Stage 1 застосовано, через `failsafe_off_delay` — дизарм. Повторний арм — після `failsafe_recovery_delay` стабільного зв'язку, так само як у DROP.
 - `GPS_RESCUE` — треба GPS: дрон летить додому й сідає. Аби вернути керування, треба зв'язок протягом `failsafe_recovery_delay` і відхилення стіків більше за `failsafe_stick_threshold` (30% ходу стіка).
 
@@ -52,7 +52,7 @@ DROP — чесний вибір для фрістайлу над безпечн
 - `KILL` — миттєвий дизарм. Один гліч каналу = падіння. Не для польотів.
 
 ### Параметри повністю (CLI)
-`failsafe_delay` (десяті секунди, Stage 1), `failsafe_off_delay` (десяті, час AUTO-LAND до дизарму; у 2025.12 замінений на `failsafe_landing_time` у секундах, дефолт 60), `failsafe_throttle` (газ AUTO-LAND, 1000–2000), `failsafe_throttle_low_delay` (десяті: як газ був нижче мінімуму довше за то — просто дизарм; дефолт 100 = 10 с; 0 — дизарм за будь-якого низького газу в момент втрати зв'язку), `failsafe_procedure` (DROP / AUTO-LAND / GPS-RESCUE), `failsafe_switch_mode` (STAGE1 / KILL / STAGE2), `failsafe_recovery_delay` (десяті, скільки зв'язок мусить бути стабільним до повернення), `failsafe_stick_threshold` (%, відхилення стіка для виходу з GPS Rescue). Значення каналів на Stage 1 — `rxfail <channel> <mode> [value]`: `a` (auto: центр/мін газу), `h` (hold — тримати останнє), `s <value>` (set — фіксоване значення, наприклад 1700 на каналі ANGLE). Перевірка: `rxfail` без аргументів друкує таблицю.
+`failsafe_delay` (десяті секунди, Stage 1), `failsafe_off_delay` (десяті, час AUTO-LAND до дизарму; у 2025.12 замінений на `failsafe_landing_time` у секундах, типово 60), `failsafe_throttle` (газ AUTO-LAND, 1000–2000), `failsafe_throttle_low_delay` (десяті: як газ був нижче мінімуму довше за то — просто дизарм; типово 100 = 10 с; 0 — дизарм за будь-якого низького газу в момент втрати зв'язку), `failsafe_procedure` (DROP / AUTO-LAND / GPS-RESCUE), `failsafe_switch_mode` (STAGE1 / KILL / STAGE2), `failsafe_recovery_delay` (десяті, скільки зв'язок мусить бути стабільним до повернення), `failsafe_stick_threshold` (%, відхилення стіка для виходу з GPS Rescue). Значення каналів на Stage 1 — `rxfail <channel> <mode> [value]`: `a` (auto: центр/мін газу), `h` (hold — тримати останнє), `s <value>` (set — фіксоване значення, наприклад 1700 на каналі ANGLE). Перевірка: `rxfail` без аргументів друкує таблицю.
 
 ### GPS Rescue: що треба, аби він працював
 GPS із fix ≥ `gps_rescue_min_sats` (8 за замовчуванням) **до арму** (дім записується під час арму), `gps_rescue_min_start_dist` (мінімальна дистанція, ближче — просто логіка посадки/DROP), висота повернення `gps_rescue_alt_mode` (MAX_ALT / FIXED_ALT / CURRENT_ALT) і `gps_rescue_return_alt`, швидкості `gps_rescue_ground_speed`, `gps_rescue_ascend_rate/descend_rate`, зниження й посадка `gps_rescue_descent_dist` (дистанція, з котрої починається зниження), `gps_rescue_descend_rate`, `gps_rescue_disarm_threshold` (дизарм при ударі), `gps_rescue_initial_climb`; без компаса курс береться з GPS у русі — тому Rescue спершу набирає висоту й летить, «намацуючи» курс; з компасом (`mag_hardware`) надійніше. Санітарні перевірки (`gps_rescue_sanity_checks`) переривають Rescue, як відстань росте або апарат падає. Тест — лиш на відкритому майданчику, тумблером GPS RESCUE на помірній висоті й дистанції, з пальцем на тумблері режиму та зі спостерігачем; `gps_rescue_allow_arming_without_fix` лишити OFF — інакше Rescue без дому ніц не вартий.
@@ -62,7 +62,7 @@ GPS із fix ≥ `gps_rescue_min_sats` (8 за замовчуванням) **д�
 
 ## practice
 ### Крок 1. Глянути теперішні значення
-Не зубри дефолти — читай їх із конкретного контролера:
+Не зубри типові значення — читай їх із конкретного контролера:
 
 ```
 get failsafe

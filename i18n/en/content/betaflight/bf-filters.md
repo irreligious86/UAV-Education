@@ -101,7 +101,7 @@ A peak that doesn't go away after balancing and the RPM filter is mechanical (th
 ## practice
 
 ### Step 0. Preparation
-ESCs with bidirectional DShot (BLHeli_32/Bluejay/AM32), `dshot_bidir = ON`, `motor_poles` per the magnet count, Motors tab: RPM from every motor, errors `E = 0%`. Mechanics per the checklist. Blackbox at 2 kHz or higher, `debug_mode = GYRO_SCALED` (4.5 only; in 2025.12 the mode was removed — the unfiltered gyro is logged in the `gyroUnfilt` field). `diff all` saved.
+ESCs with bidirectional DShot (BLHeli_32/Bluejay/AM32), `dshot_bidir = ON`, `motor_poles` per the magnet count, Motors tab: RPM from every motor, errors `E` ≤ 1 % (course guideline, `bf-rpm-filter`). Mechanics per the checklist. Blackbox at 2 kHz or higher, `debug_mode = GYRO_SCALED` (4.5 only; in 2025.12 the mode was removed — the unfiltered gyro is logged in the `gyroUnfilt` field). `diff all` saved.
 
 ### Step 1. Baseline
 ```text

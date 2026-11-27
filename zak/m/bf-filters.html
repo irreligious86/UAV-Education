@@ -86,7 +86,7 @@
 
 <h2 id="praktika">Практика</h2>
 <h4 id="krok-0-pidgotovka" class="md-subheading">Крок 0. Підготовка</h4>
-<p>ESC з bidirectional DShot (BLHeli_32/Bluejay/AM32), <code>dshot_bidir = ON</code>, <code>motor_poles</code> за кількістю магнітів, вкладка Motors: RPM від кожного мотора, помилки <code>E = 0%</code>. Механіка за чек-листом. Blackbox на 2 кГц і вище, <code>debug_mode = GYRO_SCALED</code> (лише 4.5; у 2025.12 режим видалено — нефільтрований гіроскоп пишеться в поле <code>gyroUnfilt</code>). <code>diff all</code> збережено.</p>
+<p>ESC з bidirectional DShot (BLHeli_32/Bluejay/AM32), <code>dshot_bidir = ON</code>, <code>motor_poles</code> за кількістю магнітів, вкладка Motors: RPM від кожного мотора, помилки <code>E</code> ≤ 1 % (орієнтир курсу, <code>bf-rpm-filter</code>). Механіка за чек-листом. Blackbox на 2 кГц і вище, <code>debug_mode = GYRO_SCALED</code> (лише 4.5; у 2025.12 режим видалено — нефільтрований гіроскоп пишеться в поле <code>gyroUnfilt</code>). <code>diff all</code> збережено.</p>
 <h4 id="krok-1-bazova-tochka" class="md-subheading">Крок 1. Базова точка</h4>
 <pre class="cli-block"><code>set dshot_bidir = ON
 set motor_poles = 14

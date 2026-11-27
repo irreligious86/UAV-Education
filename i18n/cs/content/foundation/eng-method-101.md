@@ -35,7 +35,7 @@ Požadavek je tvrzení o tom, co má stroj dělat, které lze **ověřit**. Form
 |---|---|---|---|
 | R-01 | Visí s užitečným zatížením 30 g nejméně 15 min | ≥ 15:00 do 3.5 V/článek | Let se stopkami, log napětí |
 | R-02 | T/W při vzletové hmotnosti ≥ 2.5 | výpočet a plyn ve visu ≤ 40 % | Tabulka tahu + log |
-| R-03 | Při ztrátě spojení přistane na místě po 1.5 s | DROP po 1.5 s | Test na zemi bez vrtulí + log |
+| R-03 | Při ztrátě spojení ukončí let na místě po 1.5 s | DROP po 1.5 s (5" nad bezpečnou zónou: spadne poblíž, neuletí; pro 7–10" a lety nad lidmi — AUTO-LAND nebo GPS Rescue, `bf-failsafe`) | Test na zemi bez vrtulí + log |
 | R-04 | Video a RC se neztrácejí do 1 km ve výšce 50 m | LQ > 70 %, video bez výpadků | Test v terénu se záznamem |
 | R-05 | Vzletová hmotnost ≤ 900 g | váha | Vážení |
 
