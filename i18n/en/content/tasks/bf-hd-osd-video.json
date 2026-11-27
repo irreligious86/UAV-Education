@@ -1,0 +1,69 @@
+{
+ "module": "bf-hd-osd-video",
+ "tasks": [
+  {
+   "id": "osd-pos-encode",
+   "title": "OSD element position in HD",
+   "statement": "An OSD element has to be placed in column **x = {x}**, row **y = {y}** of the HD canvas and made visible only in profile 1. What number do you write in `set osd_..._pos`? (Betaflight 2025.12, the formula is the same as in 4.5: `OSD_POS(x,y) = (x & 31) | ((x << 5) & 0x400) | ((y & 31) << 5)`, profile 1 is bit 11.)",
+   "params": {
+    "x": {
+     "min": 0,
+     "max": 52,
+     "step": 1
+    },
+    "y": {
+     "min": 0,
+     "max": 19,
+     "step": 1
+    }
+   },
+   "answer": "(x % 32) + (x // 32) * 1024 + y * 32 + 2048",
+   "unit": "",
+   "tol": 0.0001,
+   "solution": "The low 5 bits of x → bits 0–4, the sixth bit of x (x ≥ 32) → bit 10 (1024), y → bits 5–9 (y·32), profile 1 → 2048. For example, (46, 1): 14 + 1024 + 32 + 2048 = 3118."
+  },
+  {
+   "id": "eirp-mw",
+   "title": "EIRP from dBm to mW",
+   "statement": "An air unit's specification states an EIRP of **< {p} dBm**. How many milliwatts is that?",
+   "params": {
+    "p": [
+     14,
+     20,
+     23,
+     25,
+     27,
+     30,
+     33
+    ]
+   },
+   "answer": "10 ** (p / 10)",
+   "unit": "mW",
+   "tol": 0.01,
+   "solution": "P[mW] = 10^(P[dBm]/10). 14 dBm (CE) ≈ 25 mW, 30 dBm = 1 W, 33 dBm ≈ 2 W."
+  },
+  {
+   "id": "hdzero-latency",
+   "title": "Latency of a frame-synchronous system",
+   "statement": "By the Divimath model the HDZero frame latency ≈ a pixel latency of **{d} ms** + the frame period. The camera runs at **{f} fps**. Estimate the frame latency in ms.",
+   "params": {
+    "d": [
+     2,
+     3,
+     4
+    ],
+    "f": [
+     30,
+     60,
+     90,
+     100,
+     120
+    ]
+   },
+   "answer": "d + 1000 / f",
+   "unit": "ms",
+   "tol": 0.02,
+   "solution": "Δt₂ ≈ Δt₁ + T, T = 1000/f ms. With 3 ms and 90 fps: 3 + 11.1 ≈ 14.1 ms; at 60 fps — 19.7 ms."
+  }
+ ]
+}

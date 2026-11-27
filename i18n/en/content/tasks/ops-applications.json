@@ -1,0 +1,189 @@
+{
+  "module": "ops-applications",
+  "tasks": [
+    {
+      "id": "spray-sorties",
+      "title": "Number of sprayer flights",
+      "statement": "A **{a} ha** field, application rate **{q} L/ha**, tank **{vt} L** (filled completely for every flight). How many flights are needed for the whole field?",
+      "params": {
+        "a": {
+          "min": 10,
+          "max": 60,
+          "step": 5
+        },
+        "q": [
+          8,
+          10,
+          12,
+          15,
+          20,
+          25,
+          30
+        ],
+        "vt": [
+          10,
+          20,
+          30,
+          40,
+          50
+        ]
+      },
+      "answer": "math.ceil(a*q/vt - 1e-9)",
+      "unit": "flights",
+      "tol": 0.001,
+      "solution": "Area per flight S = V/q, number of flights = ⌈A/S⌉ = ⌈A·q/V⌉. The module's example: 40 ha, 15 L/ha, 40 L → S = 2.667 ha, ⌈15⌉ = 15 flights. Round up only: the last partial tank is a flight too."
+    },
+    {
+      "id": "spray-pump-rate",
+      "title": "SPRAY_PUMP_RATE for the application rate",
+      "statement": "ArduCopter 4.7.2, a pump with a linear characteristic gives **{qm} L/min** at 100 % duty. Swath width **{b} m**, rate **{q} L/ha**. Which `SPRAY_PUMP_RATE` value (% of duty per 1 m/s) will give this rate at any speed up to saturation?",
+      "params": {
+        "qm": [
+          8,
+          10,
+          12,
+          16,
+          20,
+          24
+        ],
+        "b": {
+          "min": 4,
+          "max": 11,
+          "step": 0.5
+        },
+        "q": [
+          10,
+          12,
+          15,
+          20,
+          25,
+          30
+        ]
+      },
+      "answer": "q*b*0.6/qm",
+      "unit": "%/(m/s)",
+      "tol": 0.01,
+      "solution": "The required flow is Q(v) = q·B·v·60/10,000 L/min, the pump duty = Q(v)/Q_max·100 %. `AC_Sprayer` sets duty = v·SPRAY_PUMP_RATE, so SPRAY_PUMP_RATE = q·B·0.6/Q_max — the speed cancels out. Example: 15·7·0.6/16 = 3.94; saturation at 100/3.94 = 25.4 m/s."
+    },
+    {
+      "id": "gsd-fov",
+      "title": "GSD from the field of view",
+      "statement": "A camera with a horizontal field of view of **{hfov}°** and a frame width of **{w} px** shoots nadir from a height of **{h} m**. Find the GSD, cm/px.",
+      "params": {
+        "hfov": [
+          45,
+          54,
+          61.2,
+          70,
+          84
+        ],
+        "w": [
+          1280,
+          2592,
+          4000,
+          5280
+        ],
+        "h": {
+          "min": 40,
+          "max": 120,
+          "step": 10
+        }
+      },
+      "answer": "2*h*math.tan(math.radians(hfov/2))/w*100",
+      "unit": "cm/px",
+      "tol": 0.01,
+      "solution": "Frame width on the ground = 2H·tan(HFOV/2), GSD = width / W_px. The module's example: 2·100·tan(30.6°) = 118.3 m, 118.3/2592 = 4.56 cm/px."
+    },
+    {
+      "id": "thermal-dmax",
+      "title": "Maximum distance for a thermal measurement",
+      "statement": "A thermal camera: **{p} µm** pixel, **{f} mm** lens. A target **{l} cm** in size must cover at least 3 × 3 pixels. Find the maximum measurement distance, m.",
+      "params": {
+        "p": [
+          12,
+          17
+        ],
+        "f": [
+          9,
+          13,
+          19,
+          25,
+          35
+        ],
+        "l": [
+          5,
+          10,
+          15,
+          20,
+          30
+        ]
+      },
+      "answer": "(l/100)*(f/1000)/(3*p*1e-6)",
+      "unit": "m",
+      "tol": 0.01,
+      "solution": "A pixel at a distance D covers s = D·p/f. The condition 3s ≤ L gives D_max = L·f/(3p). Example: 0.10·0.013/(3·12·10⁻⁶) = 36.1 m. Without the factor of 3 it would come out three times larger — one point per target, which mixes the target and the background."
+    },
+    {
+      "id": "show-count",
+      "title": "Number of aircraft in a flat show picture",
+      "statement": "A flat rectangular picture **{wf} × {hf} m**, aircraft at the nodes of a grid with a spacing of **{d} m**, the grid starts from a corner of the picture, the edge rows are included (if the size is not divisible by the spacing, a remainder smaller than the spacing does not add a row). How many aircraft are needed?",
+      "params": {
+        "wf": {
+          "min": 30,
+          "max": 120,
+          "step": 10
+        },
+        "hf": {
+          "min": 20,
+          "max": 60,
+          "step": 5
+        },
+        "d": [
+          2,
+          2.5,
+          3,
+          4,
+          5
+        ]
+      },
+      "answer": "(math.floor(wf/d + 1e-9) + 1)*(math.floor(hf/d + 1e-9) + 1)",
+      "unit": "aircraft",
+      "tol": 0.001,
+      "solution": "⌊W/d⌋ + 1 nodes across the width, ⌊H/d⌋ + 1 across the height, and their product is the number of aircraft. Example: 60 × 30 m, 3 m spacing → 21·11 = 231. A common mistake is forgetting the +1 and losing the edge rows (200 instead of 231)."
+    },
+    {
+      "id": "delivery-endurance",
+      "title": "Required delivery flight time",
+      "statement": "Delivery over **{dkm} km** one way and back, cruise speed **{v} m/s**. At the point the line is lowered and raised by **{h} m** at 1 m/s, plus a 60 s hover. Reserve **{r} %** of the flight time. Find the required flight time, min.",
+      "params": {
+        "dkm": {
+          "min": 2,
+          "max": 12,
+          "step": 1
+        },
+        "v": [
+          10,
+          12,
+          15,
+          18,
+          20
+        ],
+        "h": [
+          10,
+          20,
+          30,
+          40
+        ],
+        "r": [
+          20,
+          25,
+          30
+        ]
+      },
+      "answer": "(2*dkm*1000/v + 2*h + 60)/60/(1 - r/100)",
+      "unit": "min",
+      "tol": 0.01,
+      "solution": "t = 2d/v + 2h/v_line + t_hover; required time = t/(1 − reserve). Example: 2·8000/15 + 60 + 60 = 1187 s = 19.8 min; /0.7 = 28.3 min. More than 40 min is no longer a multirotor but a VTOL."
+    }
+  ]
+}

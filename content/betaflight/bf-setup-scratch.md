@@ -112,7 +112,7 @@ mkdir -p ~/bfsitl && cd ~/bfsitl && ~/betaflight/obj/main/betaflight_SITL.elf
  291764	  16456	  73832	 382052	  5d464	./obj/main/betaflight_SITL.elf
 ```
 
-Официальный путь подключения — Betaflight App 2025.12 (веб-версия) через websockify. Включи в Options «manual connection mode» и в поле порта впиши `ws://127.0.0.1:6761`:
+Официальный путь подключения — Betaflight App 2025.12 (веб-версия) через websockify. Включи в Options «Enable manual connection mode» и в поле порта впиши `ws://127.0.0.1:6761`:
 
 ```bash
 pip3 install --user websockify
@@ -292,7 +292,7 @@ set craft_name = SCRATCH5
 
 **1. Прошивка (шаг 1).** `diff all` старой прошивки — в файл. В Betaflight App: target платы, Cloud Build с опциями под этот аппарат (CRSF, DShot, OSD SD или HD, GPS, магнитометр если есть, протокол VTX), Full chip erase (bf-intro; там же чек-лист перехода с 4.5).
 
-**2. Ориентация и порты (шаги 2–3).** На вкладке Setup наклони аппарат: модель должна повторять движение. Если плата повёрнута, выставь `align_board_yaw`. На Ports: UART приёмника → Serial RX; GPS (если есть) → GPS; VTX → Peripherals: SmartAudio или Tramp для аналога, MSP + `osd_displayport_device = MSP` для HD (bf-ports, link-vtx).
+**2. Ориентация и порты (шаги 2–3).** На вкладке Setup наклони аппарат: модель должна повторять движение. Если плата повёрнута, выставь `align_board_yaw`. На Ports: UART приёмника → Serial Rx; GPS (если есть) → GPS; VTX → Peripherals: SmartAudio или Tramp для аналога, MSP + `osd_displayport_device = MSP` для HD (bf-ports, link-vtx).
 
 **3. Приёмник и каналы (шаги 4–5).** Receiver: Serial, `serialrx_provider = CRSF`. Bind ELRS — binding phrase, мажорные версии ELRS на TX и RX совпадают (4.x с 4.x; 3.x и 4.x между собой не связываются). Встроенный SPI-приёмник под Betaflight 2025.12 — это ELRS 3: для модуля на 4.x нужен отдельный приёмник на UART (link-elrs). Пульт: `map AETR1234`. CRSF в Betaflight даёт 988–2012 мкс (`rx/crsf.c`: 172 → 988, 1811 → 2012). Заполни таблицу каналов:
 

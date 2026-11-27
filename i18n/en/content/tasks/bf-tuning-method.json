@@ -1,0 +1,81 @@
+{
+  "module": "bf-tuning-method",
+  "tasks": [
+    {
+      "id": "perm-min-p",
+      "title": "The limit of the permutation test",
+      "statement": "An A/B comparison, **{n}** flights per arm, an exact two-sided permutation test on the difference of the means. What is the smallest p it can give (with perfect separation of the arms)?",
+      "params": {
+        "n": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ]
+      },
+      "answer": "2/math.comb(2*n, n)",
+      "unit": "",
+      "tol": 0.02,
+      "solution": "The number of splits of 2n numbers into two groups of n is C(2n, n). With perfect separation the observed |difference of the means| is reached only by the two extreme splits (all B below all A and vice versa), so p_min = 2 / C(2n, n): 0.333 at n = 2, 0.100 at n = 3, 0.0286 at n = 4."
+    },
+    {
+      "id": "effect-to-se",
+      "title": "The effect in standard errors",
+      "statement": "Propwash by flight: the mean of A is **{a}** °/s, the mean of B is **{b}** °/s, the pooled spread s_p = **{s}** °/s, **{n}** flights per arm. Find |Δ|/SE.",
+      "params": {
+        "a": {
+          "min": 18,
+          "max": 26,
+          "step": 0.5
+        },
+        "b": {
+          "min": 14,
+          "max": 17.5,
+          "step": 0.5
+        },
+        "s": {
+          "min": 1.0,
+          "max": 3.0,
+          "step": 0.25
+        },
+        "n": [
+          3,
+          4,
+          5,
+          6,
+          8
+        ]
+      },
+      "answer": "abs(b - a)/(s*math.sqrt(2/n))",
+      "unit": "",
+      "tol": 0.01,
+      "solution": "SE = s_p·√(1/n_A + 1/n_B) = s_p·√(2/n) with equal arms; |Δ|/SE = |x̄_B − x̄_A| / SE. A course guideline: the effect is real if this is greater than 2 and the permutation test gave p < 0.05."
+    },
+    {
+      "id": "plan-n",
+      "title": "How many flights per arm",
+      "statement": "An A/A test showed a flight-to-flight spread of the metric of CV = **{cv} %**. The expected effect of the change is **{d} %**. How many flights per arm are needed by the course formula (an integer, taking the limit of the permutation test into account)?",
+      "params": {
+        "cv": [
+          8,
+          10,
+          12,
+          15
+        ],
+        "d": [
+          8,
+          10,
+          12,
+          15
+        ]
+      },
+      "answer": "max(4, math.ceil(16*(cv/d)**2 - 1e-9))",
+      "unit": "flights",
+      "tol": 0.001,
+      "abs": 0.4,
+      "solution": "n ≈ 16·(CV/Δ)² (about an 80 % chance of catching the effect with the “2 SE” rule), rounded up. Fewer than 4 is not allowed: at n ≤ 3 an exact permutation test cannot give p < 0.05. Example: CV 8 %, Δ 15 % → 4.55 → 5."
+    }
+  ]
+}

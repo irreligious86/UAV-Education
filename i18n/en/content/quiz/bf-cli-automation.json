@@ -3,92 +3,92 @@
   "pass": 80,
   "questions": [
     {
-      "q": "Why can't you rely on the COM port number?",
+      "q": "Why can't you bind to a COM port number?",
       "options": [
-        "Windows forbids access by port number",
+        "Windows prohibits access by port number",
         "The number changes after a reboot",
-        "It's always COM1",
-        "Linux doesn't support COM"
+        "It is always COM1",
+        "Linux does not support COM"
       ],
       "answer": 1,
-      "explain": "Identical boards share one VID/PID, and the number changes after a reboot. Find the drone by craft_name inside the CLI."
+      "explain": "Identical boards share one VID/PID, and the number changes after a reboot. Find the drone by its craft_name, read over MSP (MSP_NAME)."
     },
     {
-      "q": "What does exit noreboot do in Betaflight 4.5.x?",
+      "q": "What does exit noreboot do in Betaflight 4.5.0–4.5.3?",
       "options": [
-        "Exits without rebooting",
+        "Exits without a reboot",
         "Reboots anyway",
         "Saves the settings",
         "Erases the flash"
       ],
       "answer": 1,
-      "explain": "The noreboot flag started working in newer versions. To peek at a value, just close the port."
+      "explain": "The noreboot argument appeared in 4.5.4; in 2025.12 `exit noreboot` and `save noreboot` really do work without a reboot. To peek at a value, just close the port."
     },
     {
       "q": "After set + save the value turned out different. Why?",
       "options": [
-        "The port was busy with another program during the write",
+        "The port was held by another program during the write",
         "The firmware corrected the value",
         "The script is broken",
         "A bad USB cable"
       ],
       "answer": 1,
-      "explain": "Betaflight corrects incompatible combinations on boot. Rule: after save, re-read every changed value with get."
+      "explain": "Betaflight corrects incompatible combinations at boot. The rule: after save, re-read every changed value with get."
     },
     {
-      "q": "What should the script do right after save?",
+      "q": "What must a script do right after save?",
       "options": [
-        "Send the diff again to confirm the write",
+        "Send diff once more to confirm the write",
         "Find the port by craft_name again",
         "Exit the CLI",
         "Enable dshot_bidir"
       ],
       "answer": 1,
-      "explain": "After a reboot the COM port may get a different number."
+      "explain": "After a reboot the COM port may change its number; find the board again by craft_name over MSP."
     },
     {
-      "q": "Why store a diff and not a dump?",
+      "q": "Why diff and not dump for storage?",
       "options": [
-        "A dump can't be saved to a text file",
-        "A diff is only the differences from defaults",
-        "A diff is shorter in bytes",
-        "dump doesn't work"
+        "dump cannot be saved to a text file",
+        "diff is only the differences from the defaults",
+        "diff is shorter in bytes",
+        "dump does not work"
       ],
       "answer": 1,
-      "explain": "A diff is readable and portable; a dump forces old defaults as explicit values when you update."
+      "explain": "A diff is readable and portable; a dump forces the old defaults as explicit values on an update."
     },
     {
       "q": "What is safe to automate with a CLI script?",
       "options": [
-        "Exporting diff all and verifying values after save",
-        "Picking PIDs by pilot feel after every flight",
-        "Deciding whether a drone is cleared to fly",
+        "Downloading diff all and checking values after save",
+        "Choosing PIDs by the pilot's feel after every flight",
+        "The decision to clear a drone for flight",
         "Flashing the bootloader instead of DFU"
       ],
       "answer": 0,
       "explain": "Routine work with a verifiable result — yes; decisions and risky operations — no."
     },
     {
-      "q": "Moving a diff from an old major version to a new one:",
+      "q": "Carrying a diff from an old major version to a new one:",
       "options": [
         "Always works unchanged",
-        "Is impossible under any circumstances",
-        "Is done only via dump",
+        "Is impossible under any conditions",
+        "Is done only through dump",
         "Requires checking: setting names and meanings change"
       ],
       "answer": 3,
-      "explain": "Settings get renamed and changed between versions; you check a diff instead of pasting it blindly."
+      "explain": "Settings are renamed and changed between versions; a diff is checked, not pasted blindly."
     },
     {
-      "q": "How does a script enter the Betaflight CLI?",
+      "q": "How does a script enter Betaflight's CLI mode?",
       "options": [
-        "It presses the BOOT button on the board",
-        "It sends the MAVLink command COMMAND_LONG",
-        "It sends the # character to the serial port",
-        "It opens the CLI tab in the configurator"
+        "Presses the BOOT button on the board",
+        "Sends the MAVLink command COMMAND_LONG",
+        "Sends the # character to the serial port",
+        "Opens the CLI tab in the configurator"
       ],
       "answer": 2,
-      "explain": "The # character puts the firmware into the CLI; after that, commands are plain text."
+      "explain": "The # character puts the firmware into the CLI; from there commands are plain text."
     }
   ]
 }

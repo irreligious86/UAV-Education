@@ -1,0 +1,90 @@
+{
+ "module": "bf-adjustments",
+ "tasks": [
+  {
+   "id": "abs-value",
+   "title": "Absolute adjustment with a pot",
+   "statement": "The slot `adjrange 2 0 2 1700 2100 18 4 {c} {s}` (ROLL_P, absolute mode). The pot on AUX5 outputs **{rc} µs**. What `p_roll` value will Betaflight 2025.12 set?",
+   "params": {
+    "c": [
+     35,
+     40,
+     45,
+     50,
+     55
+    ],
+    "s": [
+     5,
+     10,
+     12,
+     15,
+     20
+    ],
+    "rc": {
+     "min": 1003,
+     "max": 1997,
+     "step": 7
+    }
+   },
+   "answer": "c+math.trunc((rc-1500)*s/500)",
+   "unit": "",
+   "tol": 0.001,
+   "abs": 0.5,
+   "solution": "processContinuosAdjustments(): value = center + (rc − 1500)·scale / 500, integer division (C truncates toward zero, so −9.96 → −9, not −10). Then a clamp to 0…200 for P — with these numbers it does not trigger."
+  },
+  {
+   "id": "select-pos",
+   "title": "Switch position in select mode",
+   "statement": "A select function with **{n}** positions (for example, RATE_PROFILE with `rate_6pos_switch` = ON for 6). The channel is at **{rc} µs**. Which position number (counting from 1) will the firmware select?",
+   "params": {
+    "n": [
+     3,
+     6
+    ],
+    "rc": {
+     "min": 950,
+     "max": 2050,
+     "step": 13
+    }
+   },
+   "answer": "(min(max(rc,900),2099)-900)//(1200//n)+1",
+   "unit": "",
+   "tol": 0.001,
+   "abs": 0.5,
+   "solution": "Position width = (2100 − 900) / N as an integer (400 µs for 3, 200 for 6); position = (constrain(rc, 900, 2099) − 900) / width, counted from 0. Plus 1 gives the “human” number (Betaflight App numbers them the same way)."
+  },
+  {
+   "id": "step-count",
+   "title": "D steps after taps and a hold",
+   "statement": "A ROLL_D step slot, the initial `d_roll` = **{d0}**. The pilot made **{k}** short presses up (each < 0.4 s, with a return to center), then one hold down for **{t} ms** from center. What will `d_roll` become?",
+   "params": {
+    "d0": [
+     30,
+     35,
+     40,
+     45,
+     50
+    ],
+    "k": [
+     1,
+     2,
+     3,
+     4,
+     5
+    ],
+    "t": [
+     700,
+     1200,
+     1600,
+     2300,
+     3100
+    ]
+   },
+   "answer": "d0+k-(1+t//500)",
+   "unit": "",
+   "tol": 0.001,
+   "abs": 0.5,
+   "solution": "A short press from center gives exactly 1 step (the slot is armed, a repeat only after ~500 ms). A hold: a step at once, then every 500 ms (RESET_FREQUENCY_2HZ) — 1 + ⌊t/500⌋ steps for these durations. The result is d0 + k − (1 + ⌊t/500⌋)."
+  }
+ ]
+}

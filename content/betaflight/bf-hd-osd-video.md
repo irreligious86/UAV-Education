@@ -58,7 +58,7 @@ next: []
 {{diagram:bf-hd-wiring|Разобранный пример: ELRS на UART1, воздушный модуль на UART4 с маской 131073 = MSP + VTX_MSP; питание модуля по его спецификации — от VBAT или только от BEC.}}
 
 ### Сторона Betaflight: маска порта
-Вкладка Ports хранит для каждого порта строку `serial <id> <маска> <msp_baud> <gps_baud> <telemetry_baud> <blackbox_baud>` (`id`: 0 = UART1 … 9 = UART10, 20 = USB VCP, 30/31 = SoftSerial, 40 = LPUART1). Маска — сумма битов `serialPortFunction_e` из `io/serial.h`. Для видео важны четыре бита: MSP = 1, VTX SmartAudio = 2048, VTX Tramp = 8192, **VTX_MSP = 131072** (`1 << 17`). Пункт Peripherals «VTX (MSP + DisplayPort)» вместе с включённым MSP даёт маску **131073**. Значение 131072 из аудита курса по исходнику (4.5 и 2025.12) подтверждено, но это один бит VTX_MSP. На порту должно стоять 131073.
+Вкладка Ports хранит для каждого порта строку `serial <id> <маска> <msp_baud> <gps_baud> <telemetry_baud> <blackbox_baud>` (`id`: 0 = UART1 … 9 = UART10, 20 = USB VCP, 30/31 = SoftSerial, 40 = LPUART1). Маска — сумма битов `serialPortFunction_e` из `io/serial.h`. Для видео важны четыре бита: MSP = 1, VTX SmartAudio = 2048, VTX Tramp = 8192, **VTX_MSP = 131072** (`1 << 17`). Пункт Peripherals «VTX (MSP + Displayport)» вместе с включённым MSP даёт маску **131073**. Значение 131072 из аудита курса по исходнику (4.5 и 2025.12) подтверждено, но это один бит VTX_MSP. На порту должно стоять 131073.
 
 Что прошивка делает с маской при загрузке (`io/serial.c`, `config/config.c`; логика одинакова в 4.5 и 2025.12):
 1. `isSerialConfigValid()`: VTX_MSP в одиночку недопустим, только вместе с MSP или Serial RX. MSP может быть не больше чем на 3 портах, на VCP MSP обязателен. MSP и Serial RX на SoftSerial молча снимаются. При любом нарушении **весь** конфиг портов сбрасывается к умолчаниям платы, и приёмник «пропадает» вместе с OSD.
@@ -115,7 +115,7 @@ next: []
 ### Сторона очков
 - **DJI O3/O4.** По инструкции DJI режим Canvas работает с Betaflight 4.3+. Набор элементов и их места задаются в Betaflight, в меню очков отдельной раскладки нет. Мощность, канал, полоса и запись (`Record With`, `Auto Record on Takeoff`) настраиваются в меню очков, VTX-таблицы аналога не нужны. Порядок линковки: сначала модуль с очками, потом пульт.
 - **Старые DJI FPV Air Unit/Vista.** Стоковая прошивка рисует собственный OSD DJI из данных MSP: до 24 элементов, прошивка v01.00.02.00 (2019). Порт — только MSP (маска 1). Полный OSD Betaflight через DisplayPort даёт неофициальный WTFOS с пакетом msp-osd. Его ставят на очки и на каждый модуль, а полётник настраивают как HD (маска 131073, `vcd_video_system = HD`).
-- **Walksnail Avatar.** OSD — «Canvas mode». Полётник настраивается так же: Peripherals «VTX (MSP + DisplayPort)», `osd_displayport_device = MSP`, `vcd_video_system = HD`. Режим standby снижает мощность, пока аппарат не армлен.
+- **Walksnail Avatar.** OSD — «Canvas mode». Полётник настраивается так же: Peripherals «VTX (MSP + Displayport)», `osd_displayport_device = MSP`, `vcd_video_system = HD`. Режим standby снижает мощность, пока аппарат не армлен.
 - **HDZero.** VTX сам заполняет VTX-таблицу полётника. Мощность и канал задаются из Betaflight (вкладка Video Transmitter, CMS) или из меню VTX: `LP_MODE` (25 мВт до арма), `PIT_MODE` (P1MW = 0.1 мВт, 0MW), стик-команды выхода из 0 мВт. Режим `VTX PIT MODE` на тумблере (`bf-modes-osd`) и `vtx_low_power_disarm` доходят до VTX по тому же MSP. Синий светодиод мигает трижды после загрузки, если обмен MSP обнаружен. Записи на VTX нет, DVR — в очках.
 
 ### Порядок включения, нагрев, запись
@@ -405,7 +405,7 @@ set osd_warnings_pos = 2452
 3. Тот же HD-конфиг на аналоге: LQ и таймер прижимаются к столбцу 29, и текст обрезается правым краем.
 
 ### Шаг 4. Конфиг для трёх систем (процедура по документации)
-Betaflight App: Ports → UART4 → Peripherals «VTX (MSP + DisplayPort)», MSP включён, 115200 → Save and Reboot; Configuration → OSD включён; OSD → Video Format HD. То же в CLI (общая часть для O3/O4, Walksnail, HDZero и DJI V1 с WTFOS):
+Betaflight App: Ports → UART4 → Peripherals «VTX (MSP + Displayport)», MSP включён, 115200 → Save and Reboot; Configuration → OSD включён; OSD → Video Format HD. То же в CLI (общая часть для O3/O4, Walksnail, HDZero и DJI V1 с WTFOS):
 
 ```text
 serial UART4 131073 115200 57600 0 115200

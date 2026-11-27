@@ -1,0 +1,98 @@
+{
+ "module": "bf-arming-safety",
+ "tasks": [
+  {
+   "id": "beeper-bit",
+   "title": "Beeper code → bit number",
+   "statement": "On an arm attempt Betaflight 2025.12 beeps: a series of fast beeps (4; in 4.5 — 5), then **{L}** long and **{S}** short. Find the bit number (from zero) in the `armingDisableFlags` mask that the beeper is reporting.",
+   "params": {
+    "L": [
+     0,
+     1,
+     2,
+     3,
+     4
+    ],
+    "S": [
+     1,
+     2,
+     3,
+     4
+    ]
+   },
+   "answer": "5*L+S-1",
+   "unit": "",
+   "tol": 0.001,
+   "abs": 0.01,
+   "solution": "`tryArm()` calls `beeperWarningBeeps(ffs(flags))`: the code N = 5·long + short, and `ffs()` numbers bits from one, so bit = N − 1. Look up the name in the table for your version: up to and including bit 24 the 2025.12 and 4.5 tables match, beyond that they do not (ARM_SWITCH: bit 28 in 2025.12, bit 25 in 4.5)."
+  },
+  {
+   "id": "runaway-throttle",
+   "title": "The throttle from which “normal flight” accumulates",
+   "statement": "`min_check` = **{mc}** µs, `runaway_takeoff_deactivate_throttle_percent` = **{p}** %. From what throttle channel value (µs) does Betaflight start to consider this throttle percentage reached? Give the answer without rounding.",
+   "params": {
+    "mc": [
+     1000,
+     1020,
+     1050,
+     1080,
+     1100
+    ],
+    "p": [
+     10,
+     15,
+     20,
+     25,
+     30
+    ]
+   },
+   "answer": "mc+p*(2000-mc)/100",
+   "unit": "µs",
+   "tol": 0.002,
+   "solution": "`calculateThrottlePercent()`: percent = (rc − min_check)·100 / (2000 − min_check). Hence rc = min_check + p·(2000 − min_check)/100. With the defaults (1050, 20 %) that is 1240 µs. Without a stick deflection ≥ 15 % time accumulates only from twice the percentage."
+  },
+  {
+   "id": "yaw-spin-auto",
+   "title": "The yaw spin recovery threshold in AUTO mode",
+   "statement": "Actual rates, `yaw_srate` = **{s}** (maximum yaw = yaw_srate × 10 °/s), `yaw_spin_recovery = AUTO`. Find the threshold at which the recovery turns on, in °/s.",
+   "params": {
+    "s": {
+     "min": 30,
+     "max": 180,
+     "step": 5
+    }
+   },
+   "answer": "max(500, min(1950, s*10 + max(s*10/4, 200)))",
+   "unit": "°/s",
+   "tol": 0.003,
+   "solution": "`initYawSpinRecovery()`: threshold = max_yaw + max(max_yaw/4, 200), then a limit of 500…1950 °/s. Up to 800 °/s the margin is 200 °/s, above that — 25 %; with max_yaw ≥ 1560 °/s the threshold hits 1950. The mode exits below the threshold − 100 °/s for longer than 20 ms."
+  },
+  {
+   "id": "small-angle",
+   "title": "Will the ANGLE check pass",
+   "statement": "The aircraft stands on a slope, the accelerometer reads a_x = **{ax}** m/s², a_y = **{ay}** m/s², a_z = **{az}** m/s². Find the tilt angle in degrees. Compare it with `small_angle` = 25°.",
+   "params": {
+    "ax": {
+     "min": -4.0,
+     "max": 4.0,
+     "step": 0.2
+    },
+    "ay": {
+     "min": -4.0,
+     "max": 4.0,
+     "step": 0.2
+    },
+    "az": {
+     "min": 7.0,
+     "max": 9.8,
+     "step": 0.1
+    }
+   },
+   "answer": "math.degrees(math.acos(az/math.sqrt(ax**2+ay**2+az**2)))",
+   "unit": "°",
+   "tol": 0.01,
+   "abs": 0.05,
+   "solution": "The tilt is the angle between the body vertical and the gravity vector: cos θ = a_z / |a|. `isUpright()` compares cos θ with cos(`small_angle`): arming is allowed at θ < 25°. For 25° the ratio a_z/|a| = 0.906."
+  }
+ ]
+}

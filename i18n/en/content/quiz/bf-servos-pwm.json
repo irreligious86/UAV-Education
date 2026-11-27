@@ -1,0 +1,94 @@
+{
+ "module": "bf-servos-pwm",
+ "pass": 80,
+ "questions": [
+  {
+   "q": "SpeedyBee F405 V4: motors M3 and M4 sit on TIM3 CH3/CH4 and run DSHOT600 through the timer and DMA. Why can a servo not be put on a free channel of the same TIM3?",
+   "options": [
+    "TIM3 has no free DMA stream left: both streams are taken by the DShot of motors M3 and M4, and a servo needs its own",
+    "The period and prescaler are shared by the timer: DShot600 needs PSC 6/ARR 19, a 50 Hz servo — PSC 83/ARR 19999",
+    "Betaflight forbids `resource SERVO` on pins of a timer where a motor is already assigned and gives an error on save",
+    "The TIM3 channels output 3.3 V logic, and a servo on this timer needs a 5 V signal through a level shifter"
+   ],
+   "answer": 1,
+   "explain": "A channel sets only the width (CCR); the time base is shared by the timer. timerAllocate() does not block a neighboring channel, and servoDevInit() runs after the motors and will overwrite the base — DShot on M3/M4 will break. A servo does not need DMA."
+  },
+  {
+   "q": "In the CLI `resource SERVO 1 NONE` and `resource SERVO 2 B10` were typed, `feature CHANNEL_FORWARDING` was enabled, and it was saved. What will be on pad B10?",
+   "options": [
+    "AUX1: forwarding starts from the first servo created, and that will be SERVO 2 on pad B10",
+    "AUX2: the resource number SERVO 2 corresponds to the second AUX channel with channel_forwarding_start = 4",
+    "Nothing: servoDevInit() stops at the first empty SERVO, and no servo is created",
+    "A constant 1500 µs from servo_center_pulse, because SERVO 1 is not assigned and forwarding shifts"
+   ],
+   "answer": 2,
+   "explain": "The loop in servoDevInit() breaks at the first empty ioTag. Servos are assigned in order, starting from SERVO 1."
+  },
+  {
+   "q": "A QUADX quad with SERVO_TILT enabled. The pilot added `smix 0 0 5 100 0 0 100 0` so that the gimbal tilt follows the pitch stick. What will change?",
+   "options": [
+    "The tilt will follow the pitch stick at 100 % on top of CAMSTAB stabilization, in any flight mode and while disarmed",
+    "The tilt will follow the pitch stick, but only while the CAMSTAB mode is on from the switch",
+    "The CLI will reject the rule: source 5 (RC pitch) is not allowed for gimbal servo 0 in the QUADX mixer",
+    "Nothing: on QUADX servoMixer() is not called, and smix rules are loaded only for CUSTOMAIRPLANE/CUSTOMTRI"
+   ],
+   "answer": 3,
+   "explain": "servoTable() calls servoMixer() only for airplane and similar mixers, and loadCustomServoMixer() — only for CUSTOMAIRPLANE and CUSTOMTRI. A gimbal on a quad is computed by the SERVO_TILT formula."
+  },
+  {
+   "q": "SERVO_TILT, CAMSTAB is on, `gimbal_mode = NORMAL`, `servo 0 1000 2000 1500 50 -1`. The frame is tilted in pitch by +12°. What is the pulse of the pitch servo?",
+   "options": [
+    "1560 µs",
+    "1620 µs",
+    "1740 µs",
+    "1512 µs"
+   ],
+   "answer": 1,
+   "explain": "servoTable(): middle + rate·pitch_decideg/50 = 1500 + 50·120/50 = 1620 µs, that is, rate/5 = 10 µs per degree."
+  },
+  {
+   "q": "A quad with SERVO_TILT and CHANNEL_FORWARDING enabled, `channel_forwarding_start = 4`. Which output will AUX1 go to?",
+   "options": [
+    "SERVO 1, forwarding always starts from the first output",
+    "SERVO 2, right after the pitch servo",
+    "SERVO 3: the first two outputs are taken by the gimbal servos",
+    "Nowhere: the SERVO_TILT and CHANNEL_FORWARDING features are incompatible"
+   ],
+   "answer": 2,
+   "explain": "writeServos() first writes servo[0] and servo[1] of the gimbal, then forwardAuxChannelsToServos(servoIndex) from index 2, that is, SERVO 3."
+  },
+  {
+   "q": "2025.12 firmware was built in Betaflight App through Cloud Build for an F405, and the CLI has no `servo` and `smix` commands. Why?",
+   "options": [
+    "USE_SERVOS is in the common_pre.h block for non-cloud builds only; a cloud build needs the SERVOS option",
+    "In 2025.12 the servo and smix commands were moved to the Servos tab of the application and removed from the CLI entirely",
+    "Servos in Betaflight 2025.12 are supported only on F7/H7; an F405 does not have enough timers for servos",
+    "feature SERVO_TILT has to be enabled first, followed by a reboot; the commands appear only after save"
+   ],
+   "answer": 0,
+   "explain": "The `#if !defined(CLOUD_BUILD) && !defined(SITL)` block in target/common_pre.h defines USE_SERVOS. Cloud Build gets it only with the SERVOS option or, from 2025.12, through the WING package (in 4.5 — only SERVOS)."
+  },
+  {
+   "q": "A pilot connected two MG996R servos (2.5 A at stall at 6 V per the datasheet) to the flight controller's five volts. What will most likely happen, and what is the right way?",
+   "options": [
+    "Nothing serious: servos draw current only when moving, on average a few hundred milliamps for both",
+    "The servos will get slower; raise servo_pwm_rate to 333 Hz so that they get pulses more often",
+    "The flight controller's signal pad will overheat; put a 1 kΩ resistor in series with the signal wire",
+    "A 5 V sag and a flight controller reset at stall; power them from a separate BEC with a common ground"
+   ],
+   "answer": 3,
+   "explain": "Two servos at stall — about 5 A, and the flight controller's BEC already feeds the receiver and peripherals. The servo positive supply — from a separate BEC, a common ground, and only the signal from the flight controller."
+  },
+  {
+   "q": "An airplane mixer, an `smix` rule with speed 10, a PID loop of 8 kHz. How long will the rule output take to go from 0 to 500 (1500 → 2000 µs)?",
+   "options": [
+    "6.25 ms: speed is a step per PID loop, 50 loops of 125 µs",
+    "0.5 s: speed is a step per 10 ms",
+    "50 ms: speed is counted per loop at 1 kHz",
+    "Instantly: speed affects only RC sources"
+   ],
+   "answer": 0,
+   "explain": "servoMixer() is called in subTaskMotorUpdate every PID loop; 500/10 = 50 loops × 125 µs = 6.25 ms. The “1 ms per loop” description in the documentation is out of date."
+  }
+ ]
+}

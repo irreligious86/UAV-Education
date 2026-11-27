@@ -1,0 +1,118 @@
+{
+  "module": "ops-applications",
+  "pass": 80,
+  "questions": [
+    {
+      "q": "Where does the rule for choosing an aircraft for an applied job start?",
+      "options": [
+        "With a description of the job in one sentence with numbers: what, where, how much, how accurately, over whom",
+        "With choosing firmware that supports the required payload and release mechanism",
+        "With checking which aircraft are already in the fleet and what they can carry",
+        "With calculating the radio link budget for the maximum range"
+      ],
+      "answer": 0,
+      "explain": "The order is the reverse of “from the aircraft”: job → six requirements → class by the tree → positioning → regulatory corridor. The aircraft and firmware follow from the requirements."
+    },
+    {
+      "q": "Swath width 7 m, speed 6 m/s. What is the theoretical productivity of the sprayer?",
+      "options": [
+        "4.2 ha/h",
+        "15.12 ha/h",
+        "42 ha/h",
+        "10.58 ha/h"
+      ],
+      "answer": 1,
+      "explain": "P = B·v·3600/10,000 = 7·6·0.36 = 15.12 ha/h. 10.58 ha/h is already with the utilization factor of 0.7 (turns, refilling), not the theoretical value."
+    },
+    {
+      "q": "ArduCopter 4.7.2, `SPRAY_PUMP_RATE = 10`, `SPRAY_PUMP_MIN = 0`. What happens to the application rate at a pass speed of 12 m/s?",
+      "options": [
+        "The rate stays constant: the pump duty grows in proportion to speed without limits",
+        "Spraying turns off because the speed is above `SPRAY_SPEED_MIN`",
+        "The pump hits 100 % already at 10 m/s, and at 12 m/s the rate per hectare drops",
+        "The pump switches to `SPRAY_PUMP_MIN`, and the rate drops to zero"
+      ],
+      "answer": 2,
+      "explain": "In `AC_Sprayer.cpp` the pump duty = speed·SPRAY_PUMP_RATE, limited to 100 %. At 10 %/(m/s) saturation occurs at 10 m/s; above that the flow does not grow while the area per minute does — the rate per hectare drops. `SPRAY_SPEED_MIN` is the lower turn-on threshold, not an upper one."
+    },
+    {
+      "q": "Why does a sprayer under Part 107 need an exemption from § 107.36?",
+      "options": [
+        "§ 107.36 limits flight altitude to 400 feet above the ground",
+        "§ 107.36 prohibits flying at night without anti-collision lights",
+        "§ 107.36 prohibits one pilot from operating several aircraft",
+        "§ 107.36 prohibits a small UAV from carrying hazardous materials (hazmat)"
+      ],
+      "answer": 3,
+      "explain": "§ 107.36: “A small unmanned aircraft may not carry hazardous material”. So for aircraft lighter than 55 pounds the FAA grants an exemption from § 107.36 and a number of Part 137 rules; heavier ones go through Parts 91 and 137."
+    },
+    {
+      "q": "You need to record the temperature of contacts at a substation in a report. Which thermal camera, and why?",
+      "kind": "apply",
+      "fragment": "Target: a 10 cm contact\nCamera A: radiometric, 640x512, 12 µm pixel, f = 13 mm\nCamera B: non-radiometric, 640x512, 12 µm pixel, f = 13 mm\nPlanned distance: 30 m",
+      "options": [
+        "B: with the same sensor and lens the only difference is the price",
+        "A: only a radiometric one records the pixel temperature, and 30 m is less than D_max = 36.1 m",
+        "A, but from 30 m the target is smaller than 3×3 pixels, you have to fly in to 10 m",
+        "B: at 30 m the target covers more than 3×3 pixels, which is enough for a measurement"
+      ],
+      "answer": 1,
+      "explain": "Degrees in a report mean quantitative thermography, which needs a radiometric camera. D_max = L·f/(3p) = 0.10·0.013/(3·12e-6) = 36.1 m, so 30 m fits within FLIR's 3×3 rule."
+    },
+    {
+      "q": "A show: a 60 × 30 m picture with a 3 m spacing, ordinary GNSS with an error of 2.5 m. What conclusion follows from the module's rule?",
+      "options": [
+        "231 aircraft; the spacing-to-error ratio of 1.2 is less than three, RTK is needed",
+        "200 aircraft; GNSS is enough if the show is raised above 120 m",
+        "231 aircraft; GNSS is enough because the spacing is larger than the position error",
+        "200 aircraft; RTK is needed because the error is larger than the spacing"
+      ],
+      "answer": 0,
+      "explain": "N = (⌊60/3⌋ + 1)·(⌊30/3⌋ + 1) = 21·11 = 231. The ratio 3/2.5 = 1.2 < 3, so without RTK (1–10 cm per Skybrush) the picture does not hold. You get 200 if you forget the +1 — the edge rows."
+    },
+    {
+      "q": "What is the Skybrush onboard firmware for outdoor show drones built on?",
+      "options": [
+        "On PX4 with a swarm module that has been part of the PX4 main branch since 1.15",
+        "On Betaflight with GPS Rescue and an external trajectory controller",
+        "On a modified ArduCopter, which you build and flash yourself",
+        "On closed firmware; only the server and the ground control station are open"
+      ],
+      "answer": 2,
+      "explain": "The Skybrush documentation calls the firmware “the Skybrush fork of the ArduPilot firmware”; the FAQ requires building and installing a modified version of ArduCopter, a flight controller with ArduPilot support and a microSD, with 2 MB of flash recommended."
+    },
+    {
+      "q": "What is needed in the USA for commercial delivery of other people's packages by drone beyond visual line of sight (November 2026)?",
+      "options": [
+        "Only a § 107.31 waiver for BVLOS: Part 107 covers any work for compensation",
+        "A Part 108 certificate, which took effect in the summer of 2026",
+        "A Part 107 certificate and aircraft registration with Remote ID",
+        "A Part 135 certificate, an airspace authorization and a BVLOS exemption or waiver"
+      ],
+      "answer": 3,
+      "explain": "FAA: Part 135 is the only path for small UAVs to carry another person's property BVLOS; § 107.205 expressly prohibits a waiver of § 107.25 and § 107.31 from allowing the carriage of another person's property for compensation. As of 2026-11-22 Part 108 is under OIRA review and not published."
+    },
+    {
+      "q": "Delivery: 8 km one way, 15 m/s, a 30 m line at 1 m/s down and up, a 60 s hover, a 30 % reserve. How much flight time is needed?",
+      "options": [
+        "19.8 min",
+        "25.7 min",
+        "28.3 min",
+        "17.8 min"
+      ],
+      "answer": 2,
+      "explain": "t = 2·8000/15 + 2·30/1 + 60 = 1067 + 60 + 60 = 1187 s = 19.8 min; with the reserve t/(1 − 0.3) = 28.3 min. 19.8 is without the reserve, 17.8 is the cruise only."
+    },
+    {
+      "q": "Which of these is true for the EU regarding spraying from drones as of November 2026?",
+      "options": [
+        "Spraying is allowed in subcategory A3 of Open if the aircraft is lighter than 25 kg",
+        "Art. 9 of Directive 2009/128/EC prohibits aerial spraying with exceptions; the amendment for UAS is still a draft",
+        "EASA has issued a standard scenario STS-03 for agricultural works, by declaration",
+        "The ban was lifted by Regulation 2019/947: for agricultural works an operational authorization from the national aviation authority is enough"
+      ],
+      "answer": 1,
+      "explain": "Art. 9(1): member states prohibit aerial spraying; 9(2) — exceptions under strict conditions. On 16.12.2025 the Commission proposed allowing member states to take certain types of UAS out of the ban (2025/0409(COD)) — that is a proposal. On the aviation side it is the Specific category."
+    }
+  ]
+}

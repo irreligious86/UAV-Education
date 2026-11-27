@@ -1,0 +1,94 @@
+{
+ "module": "bf-led-buzzer",
+ "pass": 80,
+ "questions": [
+  {
+   "q": "Betaflight 2025.12, the STATUS profile, default `mode_color`. An LED is defined as `led 4 14,14:SE:FW:0`. What color does it show in ACRO while disarmed, with no warnings?",
+   "options": [
+    "DARK_VIOLET — the color of direction E",
+    "RED — the color of direction S",
+    "WHITE — the color of direction N",
+    "A mix of RED and DARK_VIOLET"
+   ],
+   "answer": 0,
+   "explain": "The F function takes the color of the first set direction bit in the order N, E, S, W, U, D (getDirectionalModeColor). For “SE” E comes first — DARK_VIOLET. The order of the letters in the line does not matter, and `led` will print it as ES anyway. To get red, leave only S."
+  },
+  {
+   "q": "A strip of 12 LEDs was working. You added the line `led 5 0,0::C:0` to turn the fifth one off. What happened?",
+   "options": [
+    "Only the fifth went dark, the rest shine as before",
+    "The fifth shines white per the palette",
+    "The CLI rejected the line as invalid",
+    "The strip ended at the 4th, and 5–11 went dark"
+   ],
+   "answer": 3,
+   "explain": "The line 0,0::C:0 packs into a 32-bit zero, and updateLedCount() counts LEDs up to the first zero entry. Indices 5–11 cease to exist for the firmware. A single LED can be turned off with color 0 at non-zero coordinates, for example `led 5 5,0::C:0`."
+  },
+  {
+   "q": "You want to make palette entry `color 14` pure blue at full brightness. Which line is correct for Betaflight 2025.12?",
+   "options": [
+    "color 14 240,255,255",
+    "color 14 240,0,255",
+    "color 14 0,0,255",
+    "color 14 240,255,0"
+   ],
+   "answer": 1,
+   "explain": "In hsvToRgb24() the saturation is inverted: sat = 255 − s. S = 0 gives the pure color, S = 255 — white (which is why the default WHITE = 0,255,255). Blue is H = 240, S = 0, V = 255, like the default BLUE."
+  },
+  {
+   "q": "The strip LED was put on a pad whose timer TIM3 also drives motor 4 (DShot600 through DMA, no bitbang). What should you expect?",
+   "options": [
+    "The strip will not light up, the motors are fine",
+    "Everything works, timer channels are independent",
+    "Motor 4 will stop working properly",
+    "The firmware will refuse to save the resource"
+   ],
+   "answer": 2,
+   "explain": "A timer has one time base (prescaler and period) for all its channels. The strip driver is initialized after the motors and sets the base for 800 kHz, while DShot600 needs 12 MHz × 20 ticks. The motor on the same timer gets a corrupted frame. The check is `timer show`. A dark strip with the motors unharmed is a different case: no DMA was found."
+  },
+  {
+   "q": "An aircraft with Betaflight 2025.12 is on the bench with the battery and a USB cable to a laptop connected. The radio was turned off, and everything is enabled in `beeper`. What will you hear?",
+   "options": [
+    "Nothing: RX_LOST does not sound with USB plugged in",
+    "The RX_LOST signal: 0.5 s of sound, 0.5 s of pause, while there is no link",
+    "SOS on the RX_LOST_LANDING condition",
+    "Only the DShot beacon through the motors once a second"
+   ],
+   "answer": 0,
+   "explain": "In 2025.12 failsafe.c sets BEEPER_RX_LOST with `!receivingRxData && !usbCableIsInserted()`: with USB the beeper is silent, without USB it sounds even without a preceding arm. In 4.5 the condition was different — `!receivingRxData && (armed || WAS_EVER_ARMED)`: without an arm since power-up the beeper was silent. For a bench check, disconnect USB and turn the radio off."
+  },
+  {
+   "q": "In 2025.12 `beacon RX_LOST` has been run, USB is not connected. The aircraft crashed, failsafe disarmed it, and the pilot turned the radio off 0.3 s after the disarm. When will the motors first beep?",
+   "options": [
+    "At once, 0.3 s after the disarm",
+    "No sooner than 1.2 s after the disarm",
+    "Only after the radio is turned on again",
+    "Never: the beacon works only on RX_SET"
+   ],
+   "answer": 1,
+   "explain": "beeperUpdate() sends the DShot BEACON command only with !areMotorsRunning(), if more than DSHOT_BEACON_GUARD_DELAY_US = 1.2 s has passed since the disarm, and no more often than once per 450 ms (in 4.5 for RX_LOST — 950 ms). The lab (captured on 4.5): the disarm at 1.0 s, the first beacon at 2.5 s."
+  },
+  {
+   "q": "The pilot typed `beeper -RX` to “turn off the beeping from RX_SET”. What was actually turned off?",
+   "options": [
+    "RX_SET — the BEEPER mode on a switch",
+    "Nothing: the name is incomplete, the CLI will give an error",
+    "RX_LOST and RX_SET together",
+    "RX_LOST — the link-loss signal"
+   ],
+   "answer": 3,
+   "explain": "processBeeperCommand() compares the name by prefix, case-insensitively (strncasecmp over the length typed), and takes the first match in the table. RX_LOST comes before RX_SET, so the link-loss signal was turned off — the one most needed in a search."
+  },
+  {
+   "q": "The BEACON profile, defaults (the same in 4.5 and 2025.12: `ledstrip_beacon_period_ms` 500, `ledstrip_beacon_percent` 50). Failsafe has triggered. How does the strip blink?",
+   "options": [
+    "2 times a second in white per the BEACON settings",
+    "Once a second, as the documentation says",
+    "4 times a second in the visual_beeper_color",
+    "It does not blink: in failsafe the strip goes dark"
+   ],
+   "answer": 2,
+   "explain": "applySimpleProfile() on failsafe or in BEEPER mode substitutes the period with BEACON_FAILSAFE_PERIOD_US = 250 at 50 %. The value goes into millis() %, so it is 250 ms, 4 flashes a second, contrary to the “_US” name and the “2Hz” comment. The color is ledstrip_visual_beeper_color, WHITE by default."
+  }
+ ]
+}

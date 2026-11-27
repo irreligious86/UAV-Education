@@ -1,0 +1,78 @@
+{
+ "module": "bf-modes-osd",
+ "tasks": [
+  {
+   "id": "pos-encode",
+   "title": "Encode the position of an OSD element",
+   "statement": "An HD canvas of 53×20. The element has to go in column **x = {x}**, row **y = {y}** and be shown only in OSD profile **{p}** (display variant 0). What number goes into `set osd_link_quality_pos = …` (Betaflight 4.5 / 2025.12)?",
+   "params": {
+    "x": {
+     "min": 3,
+     "max": 52,
+     "step": 7
+    },
+    "y": {
+     "min": 0,
+     "max": 19,
+     "step": 3
+    },
+    "p": [
+     1,
+     2,
+     3
+    ]
+   },
+   "answer": "(x & 31) | ((x << 5) & 1024) | ((y & 31) << 5) | (1 << (p + 10))",
+   "unit": "",
+   "tol": 1e-06,
+   "abs": 0.5,
+   "solution": "OSD_POS(x, y) = (x & 31) | ((x << 5) & 0x400) | (y << 5): the low 5 bits of x go to bits 0–4, bit 5 of x goes to bit 10 (the value 1024), and y goes to bits 5–9. Visibility in profile p is bit 10 + p: 2048, 4096 or 8192. Add everything up. If x ≤ 31, bit 10 is not needed."
+  },
+  {
+   "id": "pos-decode-x",
+   "title": "Decode the column of an element",
+   "statement": "A `diff` has the line `set osd_avg_cell_voltage_pos = {v}`. In which column **x** is the element?",
+   "params": {
+    "v": [
+     3118,
+     6721,
+     14358,
+     5681,
+     2509,
+     25892,
+     389,
+     11892
+    ]
+   },
+   "answer": "(v & 31) | ((v & 1024) >> 5)",
+   "unit": "",
+   "tol": 1e-06,
+   "abs": 0.5,
+   "solution": "OSD_X(v) = (v & 31) | ((v & 0x400) >> 5): take the low 5 bits and add 32 if bit 10 is set (v & 1024 ≠ 0). Bits 5–9 are y, bits 11–13 are the profiles, 14–15 are the variant; they do not affect x. Example: 3118 & 31 = 14, bit 10 is set → x = 46."
+  },
+  {
+   "id": "warn-enable",
+   "title": "Enable a warning in the 2025.12 mask",
+   "statement": "Betaflight 2025.12: `osd_warn_bitmask` is now **{m}**. You have to enable the warning with bit number **{b}** (13 — LINK_QUALITY, 14 — RSSI_DBM, 15 — OVER_CAP, 16 — RSNR) and leave the rest alone. What number goes into `set osd_warn_bitmask = …`?",
+   "params": {
+    "m": [
+     397311,
+     405503,
+     421887,
+     430079
+    ],
+    "b": [
+     13,
+     14,
+     15,
+     16
+    ]
+   },
+   "answer": "m | (1 << b)",
+   "unit": "",
+   "tol": 1e-06,
+   "abs": 0.5,
+   "solution": "Setting bit N is a bitwise OR: mask | 2^N. If the bit is already set (for example, 405503 already contains bit 13 = 8192), the number does not change — plain addition would give a wrong mask. 397311 is the 2025.12 default, where bits 12–16 (RSSI, LINK_QUALITY, RSSI_DBM, OVER_CAP, RSNR) are off."
+  }
+ ]
+}

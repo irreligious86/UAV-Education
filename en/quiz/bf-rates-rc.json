@@ -3,94 +3,94 @@
   "pass": 80,
   "questions": [
     {
-      "q": "Профиль Betaflight по умолчанию 2025.12 (тот же, что в 4.5): `rates_type = ACTUAL`, `roll_rc_rate = 7`, `roll_srate = 67`, `roll_expo = 0`. Что это значит для крена?",
+      "q": "The default Betaflight 2025.12 profile (the same as in 4.5): `rates_type = ACTUAL`, `roll_rc_rate = 7`, `roll_srate = 67`, `roll_expo = 0`. What does this mean for roll?",
       "options": [
-        "Центр 70 °/с на полный ход, максимум 670 °/с",
-        "RC rate 0.07, super rate 0.67, максимум около 42 °/с",
-        "Центр 14 °/с, максимум 670 °/с",
-        "Центр 70 °/с, максимум 1998 °/с, ограниченный rate_limit"
+        "A center of 70 °/s per full travel, a maximum of 670 °/s",
+        "RC rate 0.07, super rate 0.67, a maximum of about 42 °/s",
+        "A center of 14 °/s, a maximum of 670 °/s",
+        "A center of 70 °/s, a maximum of 1998 °/s limited by rate_limit"
       ],
       "answer": 0,
-      "explain": "В Actual `rc_rate`×10 — чувствительность в центре, `srate`×10 — максимальная скорость (`applyActualRates`, fc/rc.c). Вариант с 0.07/0.67 — это та же тройка чисел, прочитанная по модели Betaflight."
+      "explain": "In Actual `rc_rate`×10 is the sensitivity at the center and `srate`×10 is the maximum rate (`applyActualRates`, fc/rc.c). The 0.07/0.67 option is the same three numbers read with the Betaflight model."
     },
     {
-      "q": "В модели BETAFLIGHT поставили `roll_expo = 50`, не трогая RC rate и super rate. Что изменится?",
+      "q": "In the BETAFLIGHT model `roll_expo = 50` was set without touching RC rate and super rate. What will change?",
       "options": [
-        "Упадёт максимум, центр останется прежним",
-        "Центр станет вдвое мягче, максимум не изменится",
-        "Центр и максимум не изменятся, сдвинется только середина",
-        "Центр и максимум вырастут в полтора раза"
+        "The maximum will drop, the center will stay the same",
+        "The center will become twice as soft, the maximum will not change",
+        "The center and the maximum will not change, only the middle will shift",
+        "The center and the maximum will grow by half"
       ],
       "answer": 1,
-      "explain": "x' = x·|x|³·e + x·(1−e): при x→0 наклон умножается на (1−e) = 0.5, а при x = 1 x' = 1, поэтому максимум 200·r/(1−s) сохраняется. Сдвиг только середины — это expo в Actual."
+      "explain": "x' = x·|x|³·e + x·(1−e): as x→0 the slope is multiplied by (1−e) = 0.5, and at x = 1 x' = 1, so the maximum 200·r/(1−s) is kept. A shift of the middle only is expo in Actual."
     },
     {
-      "q": "ELRS 500 Гц, `rc_smoothing_auto_factor = 30`, все `rc_smoothing_*_cutoff = 0`. Какой срез покажет строка «Active setpoint and FF cutoff» в `rc_smoothing_info` (2025.12)?",
+      "q": "ELRS 500 Hz, `rc_smoothing_auto_factor = 30`, all `rc_smoothing_*_cutoff = 0`. What cutoff will the “Active setpoint and FF cutoff” line of `rc_smoothing_info` show (2025.12)?",
       "options": [
-        "500 Гц — срез равен packet rate",
-        "15 Гц — минимальный срез",
-        "187 Гц",
-        "250 Гц — половина packet rate"
+        "500 Hz — the cutoff equals the packet rate",
+        "15 Hz — the minimum cutoff",
+        "187 Hz",
+        "250 Hz — half of the packet rate"
       ],
       "answer": 2,
-      "explain": "cutoff = max(15, f_rx·1.5/(1 + 30/10)) = 500·0.375 = 187.5, хранится целым → 187 Гц (`rcSmoothingSetFilterCutoffs`). 15 Гц — нижняя граница, она действует только на медленных линках. В 4.5 формула та же, но срез setpoint и срез FF печатались отдельными строками."
+      "explain": "cutoff = max(15, f_rx·1.5/(1 + 30/10)) = 500·0.375 = 187.5, stored as an integer → 187 Hz (`rcSmoothingSetFilterCutoffs`). 15 Hz is the lower bound, and it applies only on slow links. In 4.5 the formula is the same, but the setpoint cutoff and the FF cutoff were printed on separate lines."
     },
     {
-      "q": "Какой вывод `rc_smoothing_info` указывает на проблему с линком на ELRS 250 Гц?",
+      "q": "Which `rc_smoothing_info` output points to a link problem on ELRS 250 Hz?",
       "kind": "apply",
       "fragment": "# Detected Rx frequency: 148Hz\n# RC Smoothing: ON\n# Active setpoint and FF cutoff: 55Hz (auto)\n# Active throttle cutoff: 55Hz (auto)",
       "options": [
-        "Всё в норме: срез 55 Гц соответствует factor 30 и измеренной частоте линка",
-        "Срезы ручные, авто-режим выключен",
-        "Сглаживание выключено, нужен `rc_smoothing = ON`",
-        "Измерено 148 Гц вместо 250: пакеты теряются или на пульте другой режим"
+        "Everything is fine: the 55 Hz cutoff corresponds to factor 30 and the measured link rate",
+        "The cutoffs are manual, the auto mode is off",
+        "Smoothing is off, `rc_smoothing = ON` is needed",
+        "148 Hz was measured instead of 250: packets are being lost, or the radio is in a different mode"
       ],
       "answer": 3,
-      "explain": "Срез 55 Гц честно посчитан от 148 Гц (⌊148·0.375⌋), но сама частота на 40 % ниже заданного packet rate. Строки «(auto)» и «RC Smoothing: ON» говорят, что авто-режим и сглаживание включены (формат 2025.12; в 4.5 первая строка — «RC Smoothing Type: FILTER», срез FF — отдельной строкой)."
+      "explain": "The 55 Hz cutoff is honestly computed from 148 Hz (⌊148·0.375⌋), but the rate itself is 40 % below the configured packet rate. The “(auto)” lines and “RC Smoothing: ON” say that the auto mode and smoothing are on (the 2025.12 format; in 4.5 the first line is “RC Smoothing Type: FILTER”, and the FF cutoff is on a separate line)."
     },
     {
-      "q": "Пульт с ELRS: стик в упоре даёт 2012 мкс, `rxrange` по умолчанию. Что происходит?",
+      "q": "A radio with ELRS: the stick at the stop gives 2012 µs, `rxrange` is at the default. What happens?",
       "options": [
-        "Канал выходит за rx_max_usec, и через 300 мс он получает значение rxfail",
-        "Полный рейт достигается на 2000 мкс, последние ~2 % хода мертвы",
-        "Рейт на упоре превышает максимум профиля на 2.4 %",
-        "Ничего: Betaflight сам калибрует ELRS"
+        "The channel goes beyond rx_max_usec, and after 300 ms it gets the rxfail value",
+        "The full rate is reached at 2000 µs, and the last ~2 % of travel are dead",
+        "The rate at the stop exceeds the profile maximum by 2.4 %",
+        "Nothing: Betaflight calibrates ELRS by itself"
       ],
       "answer": 1,
-      "explain": "`rcCommand` ограничен ±500, поэтому всё выше 2000 обрезается. Окно валидности 885…2115 не нарушено. Лечится `rxrange <ch> 988 2012`."
+      "explain": "`rcCommand` is limited to ±500, so everything above 2000 is cut off. The validity window 885…2115 is not violated. The fix is `rxrange <ch> 988 2012`."
     },
     {
-      "q": "Пилот перешёл с ELRS 150 Гц на 500 Гц, и FF на Blackbox превратился в «траву» при почти неподвижных стиках. Что советуют примечания 4.3 для 500 Гц?",
+      "q": "A pilot moved from ELRS 150 Hz to 500 Hz, and FF in Blackbox turned into “grass” with almost still sticks. What do the 4.3 notes advise for 500 Hz?",
       "options": [
-        "`feedforward_smooth_factor` 65–70 и `feedforward_averaging = 2_POINT`",
-        "`feedforward_boost` 40 и `feedforward_transition` 0",
-        "`rc_smoothing = OFF`, чтобы FF не запаздывал",
-        "`feedforward_jitter_factor = 0` и `feedforward_averaging = OFF` для меньшей задержки"
+        "`feedforward_smooth_factor` 65–70 and `feedforward_averaging = 2_POINT`",
+        "`feedforward_boost` 40 and `feedforward_transition` 0",
+        "`rc_smoothing = OFF`, so that FF does not lag",
+        "`feedforward_jitter_factor = 0` and `feedforward_averaging = OFF` for less delay"
       ],
       "answer": 0,
-      "explain": "В 4.5 сглаживание FF шло на каждый пакет: на 500 Гц коэффициент 25 по умолчанию почти не сглаживал. В 2025.12 значения 65 и 2_POINT стали умолчанием, а шкала smooth нормирована на 250 Гц. Отключение jitter-фильтра и сглаживания только усилит шум."
+      "explain": "In 4.5 FF smoothing was applied per packet: at 500 Hz the default coefficient of 25 smoothed almost nothing. In 2025.12 the values 65 and 2_POINT became the defaults, and the smooth scale is normalized to 250 Hz. Disabling the jitter filter and the smoothing would only increase the noise."
     },
     {
-      "q": "Betaflight 2025.12: `thr_mid = 40`, `thr_hover = 40`, `thr_expo = 0`. Как изменится кривая газа по сравнению с умолчаниями 50 / 50 / 0?",
+      "q": "Betaflight 2025.12: `thr_mid = 40`, `thr_hover = 40`, `thr_expo = 0`. How will the throttle curve change compared with the defaults 50 / 50 / 0?",
       "options": [
-        "Газ висения сдвинется на 40 % хода",
-        "Кривая станет круче ниже 40 % хода и положе выше 40 %",
-        "Никак: при thr_expo = 0 и thr_mid = thr_hover кривая — прямая",
-        "Газ будет ограничен 40 % сверху"
+        "The hover throttle will shift to 40 % of travel",
+        "The curve will become steeper below 40 % of travel and flatter above 40 %",
+        "It will not: with thr_expo = 0 and thr_mid = thr_hover the curve is a straight line",
+        "The throttle will be limited to 40 % at the top"
       ],
       "answer": 2,
-      "explain": "В 2025.12 кривая — два отрезка Безье через точку (thr_mid, thr_hover). При expo = 0 это прямые (0,0) → (40,40) → (100,100), то есть одна прямая. Если бы thr_hover остался 50, кривая стала бы круче ниже 40 % и положе выше. В 4.5 переменной thr_hover нет, и при expo = 0 thr_mid не влиял вообще. Ограничение сверху — это `throttle_limit_*`."
+      "explain": "In 2025.12 the curve is two Bezier segments through the point (thr_mid, thr_hover). With expo = 0 these are the straight lines (0,0) → (40,40) → (100,100), that is, a single straight line. If thr_hover had stayed at 50, the curve would have become steeper below 40 % and flatter above. In 4.5 there is no thr_hover variable, and with expo = 0 thr_mid had no effect at all. A limit at the top is `throttle_limit_*`."
     },
     {
-      "q": "Нужно переключать профили рейтов тумблером в полёте. Что верно для Betaflight 2025.12?",
+      "q": "Rate profiles have to be switched from a switch in flight. What is true for Betaflight 2025.12?",
       "options": [
-        "Нужен режим RATE PROFILE на вкладке Modes",
-        "С `rate_6pos_switch = ON` доступно шесть разных профилей",
-        "Тот же тумблер переключает и PID-профиль",
-        "`adjrange` с функцией 12; 3 позиции → профили 0–2"
+        "A RATE PROFILE mode is needed in the Modes tab",
+        "With `rate_6pos_switch = ON` six different profiles are available",
+        "The same switch also changes the PID profile",
+        "`adjrange` with function 12; 3 positions → profiles 0–2"
       ],
       "answer": 3,
-      "explain": "RATE_PROFILE — функция Adjustments номер 12, режима в Modes для неё нет. Профилей рейтов четыре, поэтому позиции 5–6 при `rate_6pos_switch` никуда не ведут. PID-профиль через Adjustments не переключается (ни в 4.5, ни в 2025.12)."
+      "explain": "RATE_PROFILE is Adjustments function number 12, and there is no mode for it in Modes. There are four rate profiles, so positions 5–6 with `rate_6pos_switch` lead nowhere. The PID profile is not switched through Adjustments (neither in 4.5 nor in 2025.12)."
     }
   ]
 }

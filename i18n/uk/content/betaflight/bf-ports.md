@@ -131,10 +131,10 @@ source_hash: 381df4def8cc
 4. Увімкнути тільки **Serial Rx** на вибраному UART; **решту функцій** на тому самому UART — вимкнути (**MSP**, зайва телеметрія тощо, якщо вони конфліктують з твоєю схемою).
 5. **Save and Reboot**.
 
-### Крок 4. Протокол приймача (Configuration)
+### Крок 4. Протокол приймача (вкладка Receiver)
 
 1. Після перезавантаження — вкладка **Receiver**.
-2. **Receiver Mode:** **Serial-based receiver** (як у підказці конфігуратора).
+2. **Receiver Mode:** **Serial (via UART)** (як у підказці конфігуратора).
 3. **Serial Receiver Provider** — строго під залізо:
 
    - TBS Crossfire / **ELRS** → **CRSF**

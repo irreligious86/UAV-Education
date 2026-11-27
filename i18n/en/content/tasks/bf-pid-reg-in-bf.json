@@ -1,0 +1,134 @@
+{
+  "module": "bf-pid-reg-in-bf",
+  "tasks": [
+    {
+      "id": "p-term",
+      "title": "The P term from the error",
+      "statement": "`p_roll` = **{p}**, the roll error (setpoint − gyro) is **{e} °/s**. Find the value of the P term (in `pidSum` units), taking the P scale factor from the module — 0.032.",
+      "params": {
+        "p": {
+          "min": 30,
+          "max": 70,
+          "step": 1
+        },
+        "e": {
+          "min": 20,
+          "max": 200,
+          "step": 10
+        }
+      },
+      "answer": "p*0.032*e",
+      "unit": "",
+      "tol": 0.01,
+      "solution": "Kp = `p_roll` · 0.032, P = Kp · e. For the default 45 and an error of 50 °/s: 1.44 · 50 = 72. The mixer divides the sum by 1000, and the axis limit is `pidsum_limit` = 500."
+    },
+    {
+      "id": "iterm-ceiling-time",
+      "title": "The time to the I-term limit",
+      "statement": "`i_roll` = **{i}**, `iterm_windup` = **{w}**, `pidsum_limit` = 500. The error is held constant: **{e} °/s**, and I starts from zero. After how many seconds will I hit the limit (the I scale factor is 0.244; relax and anti-gravity take no part)?",
+      "params": {
+        "i": {
+          "min": 60,
+          "max": 120,
+          "step": 5
+        },
+        "w": [
+          60,
+          80,
+          100
+        ],
+        "e": [
+          5,
+          10,
+          15,
+          20,
+          30
+        ]
+      },
+      "answer": "w/100*500/(i*0.244*e)",
+      "unit": "s",
+      "tol": 0.02,
+      "solution": "The I limit = `iterm_windup`/100 · `pidsum_limit`. Ki = `i_roll` · 0.244, and I grows at Ki · e per second, so t = limit / (Ki · e). For the defaults (80, 80) and an error of 10 °/s: 400 / 195.2 = 2.05 s."
+    },
+    {
+      "id": "tpa-d-eff",
+      "title": "The effective D under TPA",
+      "statement": "`tpa_mode = D`, `tpa_rate` = **{r}**, `tpa_breakpoint` = **{bp}**, `d_roll` = **{d}**. The throttle (rcCommand) = **{thr}**. What will the effective roll D be (D × the TPA factor)? The low-throttle TPA is already off.",
+      "params": {
+        "r": [
+          50,
+          65,
+          80
+        ],
+        "bp": [
+          1250,
+          1350,
+          1450
+        ],
+        "d": [
+          30,
+          34,
+          40
+        ],
+        "thr": {
+          "min": 1500,
+          "max": 2000,
+          "step": 25
+        }
+      },
+      "answer": "d*(1 - r/100*max((thr-1000)/1000 - (bp-1000)/1000, 0)/(1 - (bp-1000)/1000))",
+      "unit": "",
+      "tol": 0.01,
+      "solution": "t = (throttle − 1000)/1000, tbp = (`tpa_breakpoint` − 1000)/1000; the factor = 1 − `tpa_rate`/100 · (t − tbp)/(1 − tbp) (`pidUpdateTpaFactor()`, `pid_init.c`). The defaults 65/1350, throttle 2000: 1 − 0.65 · 0.65/0.65 = 0.35, D 30 → 10.5."
+    },
+    {
+      "id": "thrust-linear-out",
+      "title": "The motor output with thrust_linear",
+      "statement": "`thrust_linear` = **{k}**. The sum of the throttle and the PID correction for a motor is x = **{x}** (a fraction of the range). Find the motor command after linearization (a fraction of the range).",
+      "params": {
+        "k": [
+          20,
+          30,
+          40,
+          60
+        ],
+        "x": {
+          "min": 0.05,
+          "max": 0.6,
+          "step": 0.05
+        }
+      },
+      "answer": "x*(1 + k/100*(1-x)**2)",
+      "unit": "",
+      "tol": 0.01,
+      "solution": "Output = x · (1 + k · (1 − x)²), k = `thrust_linear`/100 (`pidApplyThrustLinearization()`). At 40 and x = 0.10: 0.1 · (1 + 0.4 · 0.81) = 0.132; the slope at zero is 1 + k, and at x = 1/3 it is 1 again."
+    },
+    {
+      "id": "vbat-sag-cut",
+      "title": "The top cut by vbat_sag_compensation",
+      "statement": "`vbat_sag_compensation` = **{c}**, `vbat_warning_cell_voltage` = **{w}** (0.01 V), the cell voltage under load (after the filter) is **{v} V**. What fraction of the motor range (%) will the compensation cut from the top?",
+      "params": {
+        "c": [
+          50,
+          100,
+          150
+        ],
+        "w": [
+          300,
+          330,
+          350
+        ],
+        "v": {
+          "min": 3.6,
+          "max": 4.2,
+          "step": 0.05
+        }
+      },
+      "answer": "(420-w)/420*(1-min(max((420-v*100)/(420-w),0),1))*c",
+      "unit": "%",
+      "tol": 0.01,
+      "abs": 0.05,
+      "solution": "The upper point is hard-coded — 4.20 V. Goodness = 1 − (4.20 − V)/(4.20 − V_warn), cut = (4.20 − V_warn)/4.20 · goodness · c/100. The default 350 and 100 %: at 4.20 V the cut is 16.7 %, at 3.85 V — 8.3 %, below 3.50 V — 0."
+    }
+  ]
+}

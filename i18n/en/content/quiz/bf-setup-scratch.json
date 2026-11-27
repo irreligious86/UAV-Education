@@ -1,0 +1,96 @@
+{
+ "module": "bf-setup-scratch",
+ "pass": 80,
+ "questions": [
+  {
+   "q": "A multimeter on the XT60 shows 24.42 V, Betaflight — 24.04 V with vbat_scale = 110. What is the new vbat_scale value?",
+   "options": [
+    "108",
+    "112",
+    "110 and adjust vbat_divider",
+    "106"
+   ],
+   "answer": 1,
+   "explain": "In voltage.c the voltage is directly proportional to vbat_scale: 110 × 24.42 / 24.04 = 111.7 → 112. Reducing scale (108) would move the reading the wrong way."
+  },
+  {
+   "q": "The FC counted 905 mAh over the flight, the charger put back 1032 mAh, ibata_scale = 400. What should be set?",
+   "options": [
+    "456",
+    "351",
+    "400 and ibata_offset = 127",
+    "374"
+   ],
+   "answer": 1,
+   "explain": "In current.c the current is 10000·mV/ibata_scale + offset, that is, inversely proportional to scale. The new scale = 400 × 905 / 1032 ≈ 351. 456 is the mistake of getting the direction of the proportion wrong."
+  },
+  {
+   "q": "On the bench an ammeter shows a quiescent current of 0.42 A, Betaflight — 0.19 A, ibata_offset = 0. What is the new ibata_offset value?",
+   "options": [
+    "−230",
+    "23",
+    "230",
+    "2300"
+   ],
+   "answer": 2,
+   "explain": "ibata_offset is in mA and is simply added to the current: 0 + (0.42 − 0.19) × 1000 = 230 mA."
+  },
+  {
+   "q": "How do you reverse the rotation of motor 3 on a DShot ESC in Betaflight without resoldering?",
+   "options": [
+    "set motor_direction = 3",
+    "dshotprog 2 8 12 (or the Motor direction dialog)",
+    "set yaw_motors_reversed = ON",
+    "resource MOTOR 3 none"
+   ],
+   "answer": 1,
+   "explain": "Betaflight has no motor_direction parameter (neither in 4.5 nor in 2025.12): the direction is stored in the ESC. dshotprog takes an index from zero, command 8 (SPIN_DIRECTION_2) and 12 (SAVE_SETTINGS). yaw_motors_reversed only tells the mixer that all four motors spin the other way (props out); the direction itself is still set in the ESC."
+  },
+  {
+   "q": "A motor test: slider 1 spins the front right, slider 2 — the rear right, 3 and 4 are in place. Which motor_output_reordering will fix the order?",
+   "kind": "apply",
+   "fragment": "mixer QUADX: 1=REAR_R 2=FRONT_R 3=REAR_L 4=FRONT_L\nslider 1 -> FRONT_R spins\nslider 2 -> REAR_R spins\nslider 3 -> REAR_L spins\nslider 4 -> FRONT_L spins\nmotor_output_reordering = 0,1,2,3,4,5,6,7",
+   "options": [
+    "1,0,2,3,4,5,6,7",
+    "0,1,3,2,4,5,6,7",
+    "2,3,0,1,4,5,6,7",
+    "3,2,1,0,4,5,6,7"
+   ],
+   "answer": 0,
+   "explain": "Mixer motor i is output on the pad numbered reordering[i]. The rear right (motor 1) physically sits on pad M2 (index 1), and the front right — on M1 (index 0). So 1,0,2,3."
+  },
+  {
+   "q": "In Betaflight SITL the stream of RC packets on UDP 9004 was stopped. What will status show?",
+   "options": [
+    "RXLOSS after 100 ms, then Stage 1 and Stage 2 by failsafe_delay, as on a board",
+    "FAILSAFE and a disarm after failsafe_delay",
+    "Nothing: the frame status in SITL is always “received”; a FAILSAFE switch is needed",
+    "MSP: RC is taken over by MSP"
+   ],
+   "answer": 2,
+   "explain": "rxRCFrameStatus() in sitl.c always returns RX_FRAME_COMPLETE after the first packet. Failsafe in SITL is checked with the FAILSAFE mode (id 27) with failsafe_switch_mode."
+  },
+  {
+   "q": "An aircraft with PWM ESCs (min_command 1000, max_throttle 2000): one motor starts noticeably later than the others. What should be done?",
+   "options": [
+    "Raise motor_idle to 700 so that the motor starts earlier",
+    "ESC calibration with the master slider 2000 → 1000 without props",
+    "Change motor_poles from 14 to 12 and save",
+    "Enable dshot_bidir and the RPM filter on all the ESCs"
+   ],
+   "answer": 1,
+   "explain": "PWM ESCs determine the pulse limits themselves, so they have to be taught 1000/2000 µs. motor_idle (before 2025.12 — dshot_idle_value) does not replace calibration of the limits, and dshot_bidir and motor_poles have nothing to do with PWM."
+  },
+  {
+   "q": "The first hover: at liftoff the aircraft rolls sharply and spins in place. The correct reaction?",
+   "options": [
+    "Add throttle and level the aircraft with the sticks in the air",
+    "Disarm immediately; on the bench without props check the motor order and direction",
+    "Raise roll P by 20 %, check that the props are tight and repeat the liftoff right away on the same spot",
+    "Switch to ACRO, where there is no self-leveling, and try again"
+   ],
+   "answer": 1,
+   "explain": "A flip at liftoff is a sign of a wrong motor order or direction, or of a board orientation error. PID has nothing to do with it, and trying to “pull it out” with the sticks breaks props and the frame."
+  }
+ ]
+}

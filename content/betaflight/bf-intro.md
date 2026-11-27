@@ -244,20 +244,20 @@ diff all
 ### Вкладка Configuration
 
 - **Mixer** — тип рамы (**Quad X** для типичного FPV-квада).
-- **Board and Sensor Alignment** — **Yaw degrees**, если FC повёрнут на раме.
-- **Battery Voltage** — **VBAT** для отображения напряжения.
-- **ESC/Motor** — в текущем приложении протокол DShot, **Bidirectional DShot** и Motor idle настраиваются во вкладке **Motors**.
-- **Motor Stop** — если моторы не должны крутиться на нулевом газу после арм.
+- **Board Alignment** — **Yaw Degrees** (подписи App 2025.12), если FC повёрнут на раме.
+- Вкладка **Power & Battery** — источник измерения напряжения для его отображения.
+- **ESC/Motor Features** — в текущем приложении протокол DShot, **Bidirectional DShot** и Motor idle настраиваются во вкладке **Motors**.
+- **MOTOR_STOP** («Don't spin the motors when armed») — если моторы не должны крутиться на нулевом газу после арм.
 
 ### Вкладка Ports
 
 - **USB VCP** — отдельная строка в Ports (не UART1), MSP на ней обязателен; UART1 — обычный аппаратный порт.
-- **UART2/3/4** — **Serial RX** на том порту, куда припаян приёмник.
+- **UART2/3/4** — **Serial Rx** на том порту, куда припаян приёмник.
 - **UART5** (пример) — **GPS**, скорость **57600** или **115200**.
 
 ### Вкладка Receiver
 
-- **Serial-based receiver** для CRSF / SBUS / FPORT.
+- Режим приёмника **Serial (via UART)** для CRSF / SBUS / FPORT.
 - **Provider:** **CRSF** (ELRS, TBS), **SBUS** (FrSky, DJI и др.).
 - Стики на пульте → ползунки в конфигураторе должны двигаться.
 - Диапазон **1000–2000** (центр **1500**); иначе **rxrange** в CLI или endpoints на пульте.
@@ -279,7 +279,7 @@ diff all
 ### Калибровка датчиков
 
 - **Акселерометр:** **Setup**, горизонтальная поверхность → **Calibrate Accelerometer**.
-- **Магнитометр:** **Calibrate Magnetometer**, ~30 с вращений по осям; проверить согласованность с реальным курсом.
+- **Магнитометр:** **Calibrate Magnetometer** (подпись App 2025.12), ~30 с вращений по осям; проверить согласованность с реальным курсом.
 
 ### ESC и моторы (без пропеллеров!)
 

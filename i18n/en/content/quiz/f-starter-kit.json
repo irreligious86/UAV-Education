@@ -1,0 +1,94 @@
+{
+  "module": "f-starter-kit",
+  "pass": 80,
+  "questions": [
+    {
+      "q": "In what order is the first kit put together?",
+      "options": [
+        "Aircraft → batteries and charger → goggles for the aircraft → radio for its receiver",
+        "Radio → simulator → video system and goggles → aircraft → batteries and charger",
+        "Goggles → aircraft → radio → charger",
+        "Charger and batteries → aircraft → radio → goggles"
+      ],
+      "answer": 1,
+      "explain": "You buy from the long-lived to the consumable: the radio lasts the longest and is needed for the simulator, the goggles lock the ecosystem and are chosen before the aircraft."
+    },
+    {
+      "q": "A radio is sold in “ELRS” and “4-in-1” variants. How do they differ for a beginner in 2026?",
+      "options": [
+        "The 4-in-1 includes ELRS and three more protocols",
+        "The ELRS version does not work with a simulator",
+        "The 4-in-1 cannot do ELRS: it is for FrSky, FlySky, DSM",
+        "There is no difference, the protocol is selected in EdgeTX"
+      ],
+      "answer": 2,
+      "explain": "A multiprotocol module is four radio chips running the MULTI-Module firmware; ExpressLRS is not among its protocols. Modern BNFs come with ELRS receivers."
+    },
+    {
+      "q": "You have DJI Goggles N3. Which air unit will not work with them?",
+      "options": [
+        "O4 Air Unit",
+        "O4 Air Unit Pro",
+        "O3 Air Unit",
+        "All three work"
+      ],
+      "answer": 2,
+      "explain": "According to the DJI specification the N3 work with the O4 and O4 Pro; according to Oscar Liang's review the N3 have no O3 support. Goggles from other brands do not work with DJI air units at all."
+    },
+    {
+      "q": "Three aircraft on analog, and you decided to move to DJI. What does the price of the move consist of?",
+      "options": [
+        "New goggles only",
+        "New goggles and an air unit for every aircraft",
+        "New goggles, a DJI radio and new antennas for the aircraft",
+        "Only the goggles firmware"
+      ],
+      "answer": 1,
+      "explain": "DJI goggles do not show analog, and the video transmitter of every aircraft has to be of the same system: $229–499 for the goggles plus $130–229 per aircraft."
+    },
+    {
+      "q": "The radio has been updated to ExpressLRS 4.1.0. A new whoop with an SPI receiver on Betaflight 2025.12 does not link. Why?",
+      "options": [
+        "For 4.x the binding phrase must be set again on both devices",
+        "The SPI receiver there is ELRS 3, and it is incompatible with 4.x",
+        "The whoop uses a different frequency band",
+        "EdgeTX 2.12 does not support whoops"
+      ],
+      "answer": 1,
+      "explain": "The SPI receiver's protocol is executed by Betaflight; in 2025.12 that is over-the-air version 3. Major versions 3.x and 4.x do not link by any means, and ELRS Configurator does not flash such a receiver."
+    },
+    {
+      "q": "The dry weight of a 3.5\" is 158 g. A 4S 850 mAh battery weighs 98 g, a 4S 650 mAh — 76 g. With which battery does the aircraft stay under 250 g?",
+      "options": [
+        "With both",
+        "Only with the 650 mAh (234 g)",
+        "Only with the 850 mAh (246 g)",
+        "With neither"
+      ],
+      "answer": 1,
+      "explain": "158 + 98 = 256 g — above the threshold; 158 + 76 = 234 g. You weigh it with the battery and everything attached."
+    },
+    {
+      "q": "Four 6S 1200 mAh batteries are charged in parallel at 1C. What charger power is needed?",
+      "options": [
+        "≈ 30 W",
+        "≈ 60 W",
+        "≈ 121 W",
+        "≈ 480 W"
+      ],
+      "answer": 2,
+      "explain": "I = 4 × 1.2 = 4.8 A; U = 6 × 4.2 = 25.2 V; P = 25.2 × 4.8 ≈ 121 W. A charger with a 60 W supply will reduce the current and take twice as long."
+    },
+    {
+      "q": "Which first aircraft leaves the fewest regrets?",
+      "options": [
+        "A self-built 5\" freestyle",
+        "An RTF kit, to add aircraft to its radio later",
+        "A BNF whoop or 3.5\" for your own radio and goggles",
+        "A 7\" long range with GPS to grow into"
+      ],
+      "answer": 2,
+      "explain": "A BNF flies right away and works with the radio and goggles that will stay. A 5\" is dangerous and expensive to crash, the radio and goggles of RTF kits are usually no good for the next aircraft, and a self-build is for the second aircraft."
+    }
+  ]
+}

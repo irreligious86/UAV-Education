@@ -97,7 +97,7 @@ next: []
 | Setup → Firmware info | ссылки `Config`, `Log`, `Options` на build.betaflight.com/api/builds/<ключ>/… | локальная сборка: `Local Build - no Cloud information` |
 | Firmware Flasher и журнал Configurator | опции текущей сборки подставляются в списки флешера | при подключении в журнале `Build Key: <ключ>` |
 
-Configurator 10.10 по списку опций ещё и **прячет вкладки**: GPS, LED Strip, OSD и Servos показываются, только если в сборке есть соответствующая опция (`gui.js:57–63`, `serial_backend.js:611–620`; подстроку `osd` даёт и `USE_FRSKYOSD`). Вкладка Transponder в 4.5 скрыта на любой сборке: такой опции нет в MSP_BUILD_INFO. Список опций плата сообщает сама (MSP_BUILD_INFO, API 1.46), поэтому так же ведут себя и локальные сборки. На вкладке Features так же пропадают пункты, чьей опции нет (`Features.js:44–51`), в том числе TRANSPONDER и SONAR.
+Configurator 10.10 по списку опций ещё и **прячет вкладки**: GPS, LED Strip, OSD и Servos показываются, только если в сборке есть соответствующая опция (`gui.js:57–63`, `serial_backend.js:611–620`; подстроку `osd` даёт и `USE_FRSKYOSD`). Вкладка Race Transponder в 4.5 скрыта на любой сборке: такой опции нет в MSP_BUILD_INFO. Список опций плата сообщает сама (MSP_BUILD_INFO, API 1.46), поэтому так же ведут себя и локальные сборки. В списке Other Features вкладки Configuration так же пропадают пункты, чьей опции нет (`Features.js:44–51`), в том числе TRANSPONDER и SONAR.
 
 {{lesson:bf-cli|Как сохранять `diff all`, читать `dump` и автоматизировать проверки CLI — там подробно.}}
 

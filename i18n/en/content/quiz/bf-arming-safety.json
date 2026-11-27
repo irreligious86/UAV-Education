@@ -1,0 +1,96 @@
+{
+ "module": "bf-arming-safety",
+ "pass": 80,
+ "questions": [
+  {
+   "q": "On an arm attempt the beeper gives a series of fast beeps (4 in 2025.12, 5 in 4.5), then 1 long and 3 short. Which Betaflight 2025.12 flag is it reporting?",
+   "options": [
+    "ANGLE",
+    "THROTTLE",
+    "RUNAWAY",
+    "BOOTGRACE"
+   ],
+   "answer": 1,
+   "explain": "Code = 5 × long + short = 8, which is bit 7 + 1. Bit 7 in armingDisableFlags_e is THROTTLE (throttle ≥ min_check 1050). ANGLE is code 9, RUNAWAY — 6, BOOTGRACE — 10. Codes 1–25 are the same in 4.5 and 2025.12."
+  },
+  {
+   "q": "An aircraft with Betaflight 2025.12 does not arm, the ARM switch is on. What does the beeper report if RXLOSS, ANGLE and ARM_SWITCH are all set?",
+   "options": [
+    "All three codes one after another",
+    "Only ARM_SWITCH, as the last flag",
+    "Only RXLOSS, the lowest bit",
+    "Only ANGLE, because RXLOSS is visible in the OSD"
+   ],
+   "answer": 2,
+   "explain": "tryArm() calls beeperWarningBeeps(ffs(flags)): ffs returns the lowest set bit. The flags are ordered by criticality, and RXLOSS is bit 2 (code 3). The other reasons are visible in status and the OSD. In 4.5 the last flag was called ARMSWITCH, the logic is the same."
+  },
+  {
+   "q": "A script got a flag count of 29 and the mask 0x10000080 from MSP_STATUS_EX. Which flags are set?",
+   "kind": "apply",
+   "fragment": "MSP_STATUS_EX: arming flag count = 29\narmingDisableFlags = 0x10000080\n4.5 table: bit 25 = ARMSWITCH (26 flags)\n2025.12 table: bit 25 FLIP_SWITCH, 26 ALT_HOLD_SW, 27 POS_HOLD_SW, 28 ARM_SWITCH",
+   "options": [
+    "THROTTLE and ARM_SWITCH (2025.12)",
+    "THROTTLE and an unknown bit — the mask is corrupt",
+    "ANGLE and ARMSWITCH (4.5)",
+    "THROTTLE and POS_HOLD_SW (2025.12)"
+   ],
+   "answer": 0,
+   "explain": "0x80 is bit 7 (THROTTLE), 0x10000000 is bit 28. With 29 flags this is 2025.12, where ARM_SWITCH moved to bit 28. The 4.5 table would give an “unknown bit”, which is why the table is chosen by the number of flags."
+  },
+  {
+   "q": "Runaway takeoff prevention (the logic is the same in 4.5 and 2025.12) disarms the aircraft when…",
+   "options": [
+    "|pidSum| on any axis ≥ 600 and the gyro is above 15 °/s (roll/pitch) or 50 °/s (yaw) continuously for longer than 75 ms",
+    "|pidSum| on any axis ≥ 500 (pidsum_limit) for longer than 500 ms after arming",
+    "the gyro on any axis is above 600 °/s for longer than 75 ms regardless of pidSum",
+    "the throttle is above 20 % with the sticks centered for longer than runaway_takeoff_deactivate_delay"
+   ],
+   "answer": 0,
+   "explain": "fc/core.c: RUNAWAY_TAKEOFF_PIDSUM_THRESHOLD 600, GYRO_LIMIT_RP 15, GYRO_LIMIT_YAW 50, ACTIVATE_DELAY 75 ms. 500 is the mixer limit, the pidSum itself is not clipped. Throttle 20 % and 500 ms are the conditions for deactivating the protection, not for triggering it."
+  },
+  {
+   "q": "A 5″ hovers at 26 % throttle (1300 µs with min_check 1050), sticks centered, runaway parameters at their defaults. Will the runaway protection be deactivated during this flight?",
+   "options": [
+    "Yes, after 500 ms, because the throttle is above 20 %",
+    "Yes, after 250 ms, because the aircraft is in the air",
+    "No: without a stick deflection ≥ 15 % time accumulates only at throttle ≥ 40 %",
+    "No: the protection is deactivated only after a disarm and a repeat arm, and in the air it stays active"
+   ],
+   "answer": 2,
+   "explain": "In processRx() “normal flight” is (throttle ≥ 20 % and a stick ≥ 15 %) or throttle ≥ 2 × 20 = 40 %, with |pidSum| < 100. At 26 % without sticks no time accumulates. 250 ms applies only at throttle ≥ 75 %."
+  },
+  {
+   "q": "Actual rates, yaw_srate = 67 (670 °/s), yaw_spin_recovery = AUTO. At what yaw rate will the recovery turn on?",
+   "options": [
+    "1950 °/s",
+    "837 °/s",
+    "870 °/s",
+    "770 °/s"
+   ],
+   "answer": 2,
+   "explain": "initYawSpinRecovery(): threshold = max_yaw + max(max_yaw/4, 200) = 670 + 200 = 870 °/s (limited to 500…1950). 1950 is the threshold only for ON with the default yaw_spin_threshold; 770 is the level below which the mode turns off (threshold − 100)."
+  },
+  {
+   "q": "A new build, the first liftoff: within a fraction of a second the aircraft flips over its right side and disarms, the beeper gives 1 long + 1 short. What do you check first?",
+   "options": [
+    "Raise P and D on roll: on liftoff the aircraft lacks controller authority on this axis",
+    "Without props: the motor order, the rotation direction and the board orientation",
+    "Turn off runaway_takeoff_prevention, it is triggering falsely",
+    "Increase small_angle, the ANGLE flag is getting in the way of liftoff"
+   ],
+   "answer": 1,
+   "explain": "1 + 1 = code 6 = RUNAWAY: the controller has hit the limit and the aircraft keeps rotating. This is positive feedback — swapped motors, direction, props or align_board_*. PIDs will not help here, and disabling the protection removes the last safety net."
+  },
+  {
+   "q": "Betaflight 2025.12 at defaults (feature AIRMODE enabled, `landing_disarm_threshold` = 0), a 5″ has landed on grass after a hover, the pilot holds the throttle at zero and does not disarm. What will happen?",
+   "options": [
+    "After auto_disarm_delay = 5 s the FC disarms by itself",
+    "The motors will stop because the throttle is below min_check",
+    "Nothing: the PIDs turn off at throttle below airmode_start_throttle_percent, the motors go to idle and the aircraft stands quietly",
+    "The PIDs will keep holding level with the props in the ground, and the aircraft may bounce or flip over"
+   ],
+   "answer": 3,
+   "explain": "Airmode latched when the throttle passed 25 %, and until disarm it keeps full PID authority at zero throttle. auto_disarm_delay works only with MOTOR_STOP without airmode and with stick arming. The fix is disarming right after touchdown; in 2025.12 `landing_disarm_threshold` can do this (off by default, 4.5 does not have it)."
+  }
+ ]
+}

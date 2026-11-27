@@ -3,29 +3,29 @@
   "pass": 80,
   "questions": [
     {
-      "q": "Какой мотор Quad X в Betaflight пишется в лог как `motor[2]`?",
+      "q": "Which Quad X motor does Betaflight write to the log as `motor[2]`?",
       "options": [
-        "Задний правый (мотор 1)",
-        "Передний правый (мотор 2)",
-        "Задний левый (мотор 3)",
-        "Передний левый (мотор 4)"
+        "Rear right (motor 1)",
+        "Front right (motor 2)",
+        "Rear left (motor 3)",
+        "Front left (motor 4)"
       ],
       "answer": 2,
-      "explain": "Нумерация 1 RR, 2 FR, 3 RL, 4 FL, индексы в логе с нуля: motor[2] — мотор 3, задний левый (mixerQuadX[] в flight/mixer_init.c)."
+      "explain": "The numbering is 1 RR, 2 FR, 3 RL, 4 FL, and the log indices start from zero: motor[2] is motor 3, the rear left (mixerQuadX[] in flight/mixer_init.c)."
     },
     {
-      "q": "Что делает `set yaw_motors_reversed = ON`?",
+      "q": "What does `set yaw_motors_reversed = ON` do?",
       "options": [
-        "Разворачивает вращение моторов через DShot",
-        "Инвертирует знак yaw-PID перед миксером",
-        "Меняет номера моторов на зеркальные",
-        "Переставляет выходы моторов на площадках"
+        "Reverses the motor rotation over DShot",
+        "Inverts the sign of the yaw PID before the mixer",
+        "Mirrors the motor numbers",
+        "Reorders the motor outputs on the pads"
       ],
       "answer": 1,
-      "explain": "В mixTable() знак scaledAxisPidYaw меняется по этому флагу; таблица миксера, номера и реальное вращение моторов остаются прежними — направление меняют в ESC."
+      "explain": "In mixTable() the sign of scaledAxisPidYaw changes with this flag; the mixer table, the numbers and the actual motor rotation stay the same — the direction is changed in the ESC."
     },
     {
-      "q": "В заголовке лога `motorOutput:158,2047`, медиана `motor[0]` = 1102. Сколько это в процентах хода?",
+      "q": "The log header has `motorOutput:158,2047`, and the median of `motor[0]` = 1102. What is that in percent of travel?",
       "options": [
         "53.8 %",
         "50.0 %",
@@ -33,62 +33,62 @@
         "55.1 %"
       ],
       "answer": 1,
-      "explain": "p = (1102 − 158)/(2047 − 158)·100 = 944/1889·100 = 50.0 %. 52.7 % получается, если взять диапазон 48,2047 (так бывает только при dynamic idle), 53.8 % — если разделить 1102 на 2047, не вычтя нижнюю границу."
+      "explain": "p = (1102 − 158)/(2047 − 158)·100 = 944/1889·100 = 50.0 %. 52.7 % comes out if the range 48,2047 is used (that happens only with dynamic idle), and 53.8 % — if 1102 is divided by 2047 without subtracting the lower limit."
     },
     {
-      "q": "Почему перекос считают по медиане участка, а не по среднему?",
+      "q": "Why is the imbalance computed from the median of the segment, not the mean?",
       "options": [
-        "Медиана устойчива к порывам и разовым поправкам",
-        "Среднее нельзя посчитать по целым значениям DShot",
-        "Blackbox пишет моторы только раз в секунду",
-        "Медиана учитывает заголовок motorOutput сама"
+        "The median is robust to gusts and one-off corrections",
+        "A mean cannot be computed from integer DShot values",
+        "Blackbox records the motors only once a second",
+        "The median accounts for the motorOutput header by itself"
       ],
       "answer": 0,
-      "explain": "Выход мотора всё время скачет от поправок PID; один порыв ветра сдвигает среднее, а медиану почти не трогает."
+      "explain": "The motor output jumps all the time from PID corrections; one gust of wind shifts the mean and hardly touches the median."
     },
     {
-      "q": "Индексы: I_pitch = +4.5 %, I_roll = +0.3 %, I_yaw = −0.2 %. Самая вероятная причина?",
+      "q": "The indices: I_pitch = +4.5 %, I_roll = +0.3 %, I_yaw = −0.2 %. The most likely cause?",
       "options": [
-        "Слабый мотор 4 (передний левый)",
-        "Наклонён один мотор по касательной",
-        "ЦТ смещён назад",
-        "Разный тайминг двух ESC"
+        "A weak motor 4 (front left)",
+        "One motor is tilted tangentially",
+        "The CG is offset to the rear",
+        "Different timing on two ESCs"
       ],
       "answer": 2,
-      "explain": "Только pitch при нулевом yaw — сигнатура смещённого ЦТ: задние моторы держат больше. Слабый мотор дал бы три индекса одной величины, наклон — только yaw."
+      "explain": "Pitch alone with zero yaw is the signature of an offset CG: the rear motors carry more. A weak motor would give three indices of the same magnitude, a tilt — only yaw."
     },
     {
-      "q": "Индексы примерно равны: I_pitch ≈ −3 %, I_roll ≈ +3 %, I_yaw ≈ +3 %. На что это указывает в первую очередь?",
+      "q": "The indices are roughly equal: I_pitch ≈ −3 %, I_roll ≈ +3 %, I_yaw ≈ +3 %. What does this point to first of all?",
       "options": [
-        "На смещённый влево центр тяжести",
-        "На один угол: мотор 4 FL или его проп",
-        "На перепутанный `yaw_motors_reversed`",
-        "На слишком низкий I-член по рысканию"
+        "A center of gravity offset to the left",
+        "One corner: motor 4 FL or its prop",
+        "A wrong `yaw_motors_reversed`",
+        "A yaw I term that is too low"
       ],
       "answer": 1,
-      "explain": "Три индекса одной величины ≈ w/2 со знаками «перёд, лево, диагональ 1+4» — узор одного угла FL. Мотор это или проп, решает swap-тест."
+      "explain": "Three indices of the same magnitude ≈ w/2 with the signs “front, left, diagonal 1+4” are the pattern of the single corner FL. Whether it is the motor or the prop is decided by the swap test."
     },
     {
-      "q": "Постоянный I_yaw 7 % при I_pitch и I_roll около нуля. Swap пропов и моторов перекос не переносит. Что проверять?",
+      "q": "A constant I_yaw of 7 % with I_pitch and I_roll near zero. Swapping the props and the motors does not move the imbalance. What should be checked?",
       "options": [
-        "Поднять P и I по рысканию",
-        "Поменять `motor_output_reordering`",
-        "Включить `thrust_linear`",
-        "Наклон осей моторов и прямоту лучей"
+        "Raise yaw P and I",
+        "Change `motor_output_reordering`",
+        "Enable `thrust_linear`",
+        "The tilt of the motor axes and the straightness of the arms"
       ],
       "answer": 3,
-      "explain": "Чистый yaw, который не переезжает с деталями, — момент от геометрии: мотор, наклонённый по касательной на ~1°, на 10\" даёт по оценке модуля порядка 7–13 % по команде."
+      "explain": "Pure yaw that does not move with the parts is a torque from the geometry: a motor tilted tangentially by ~1° on a 10\" gives, by the module's estimate, on the order of 7–13 % in terms of the command."
     },
     {
-      "q": "Зачем в лабораторной лог B снят после перестановки моторов 1 и 4?",
+      "q": "Why, in the lab, is log B recorded after motors 1 and 4 are swapped?",
       "options": [
-        "Чтобы проверить порядок моторов во вкладке Motors",
-        "Чтобы ЦТ сместился и индекс тангажа обнулился",
-        "Масса не двигалась: верная гипотеза сохраняет ЦТ",
-        "Чтобы перекос по диагонали сменил знак"
+        "To check the motor order in the Motors tab",
+        "So that the CG shifts and the pitch index goes to zero",
+        "No mass was moved: the correct hypothesis keeps the CG",
+        "So that the diagonal imbalance changes sign"
       ],
       "answer": 2,
-      "explain": "По одному логу «мотор 4 + ЦТ назад» и «мотор 1 + ЦТ вбок» одинаково точно описывают медианы. После swap ЦТ прежний, поэтому верна гипотеза, у которой оценка ЦТ не изменилась (0.3 % против 12.3 %)."
+      "explain": "From one log, “motor 4 + CG rearward” and “motor 1 + CG sideways” describe the medians equally well. After the swap the CG is the same, so the correct hypothesis is the one whose CG estimate did not change (0.3 % against 12.3 %)."
     }
   ]
 }

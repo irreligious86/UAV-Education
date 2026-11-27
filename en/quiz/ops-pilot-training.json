@@ -3,92 +3,92 @@
  "pass": 80,
  "questions": [
   {
-   "q": "В конфигурации `rates_type = ACTUAL`, `roll_rc_rate = 15`, `roll_srate = 60`, `roll_expo = 40`. Что покажет Betaflight App?",
+   "q": "The configuration has `rates_type = ACTUAL`, `roll_rc_rate = 15`, `roll_srate = 60`, `roll_expo = 40`. What will Betaflight App show?",
    "options": [
-    "Center 15 °/с, Max 60 °/с, Expo 40",
-    "Center 150 °/с, Max 600 °/с, Expo 0.40",
+    "Center 15 °/s, Max 60 °/s, Expo 40",
+    "Center 150 °/s, Max 600 °/s, Expo 0.40",
     "RC Rate 1.5, Super Rate 0.60, Expo 0.40",
-    "Center 300 °/с, Max 750 °/с, Expo 0.40"
+    "Center 300 °/s, Max 750 °/s, Expo 0.40"
    ],
    "answer": 1,
-   "explain": "В CLI rc_rate и srate хранятся в десятках °/с, expo — в сотых: 150 / 600 / 0.40."
+   "explain": "In the CLI rc_rate and srate are stored in tens of °/s, expo in hundredths: 150 / 600 / 0.40."
   },
   {
-   "q": "Профиль Actual 15/60/40, стик крена на половине хода. Какой setpoint?",
+   "q": "An Actual 15/60/40 profile, the roll stick at half travel. What is the setpoint?",
    "options": [
-    "300 °/с",
-    "375 °/с",
-    "145 °/с",
-    "75 °/с"
+    "300 °/s",
+    "375 °/s",
+    "145 °/s",
+    "75 °/s"
    ],
    "answer": 2,
-   "explain": "150·0.5 + 450·0.5·(0.5⁵·0.4 + 0.5·0.6) = 75 + 70.3 = 145.3 °/с."
+   "explain": "150·0.5 + 450·0.5·(0.5⁵·0.4 + 0.5·0.6) = 75 + 70.3 = 145.3 °/s."
   },
   {
-   "q": "В симуляторе есть только тип рейтов Betaflight. В поля внесли 1.50 / 0.60 / 0.40 вместо Actual 150 / 600 / 0.40. Что получится на полном стике?",
+   "q": "The simulator has only the Betaflight rate type. 1.50 / 0.60 / 0.40 was entered in the fields instead of Actual 150 / 600 / 0.40. What will you get at full stick?",
    "options": [
-    "600 °/с — типы эквивалентны",
-    "750 °/с вместо 600 °/с",
-    "300 °/с вместо 600 °/с",
-    "1500 °/с вместо 600 °/с"
+    "600 °/s — the types are equivalent",
+    "750 °/s instead of 600 °/s",
+    "300 °/s instead of 600 °/s",
+    "1500 °/s instead of 600 °/s"
    ],
    "answer": 1,
-   "explain": "Тип Betaflight: максимум 200·r/(1 − s) = 200·1.5/0.4 = 750 °/с. Числа между типами пересчитывают, а не переписывают."
+   "explain": "The Betaflight type: maximum 200·r/(1 − s) = 200·1.5/0.4 = 750 °/s. Numbers are converted between types, not copied over."
   },
   {
-   "q": "Чем Acro отличается от ANGLE при отпущенном правом стике?",
+   "q": "How does Acro differ from ANGLE with the right stick released?",
    "options": [
-    "В Acro аппарат возвращается в горизонт медленнее",
-    "В Acro аппарат сохраняет текущий наклон",
-    "В Acro аппарат удерживает высоту",
-    "В Acro моторы останавливаются"
+    "In Acro the aircraft returns to level more slowly",
+    "In Acro the aircraft keeps its current tilt",
+    "In Acro the aircraft holds altitude",
+    "In Acro the motors stop"
    ],
    "answer": 1,
-   "explain": "В Acro стик задаёт скорость вращения; в центре скорость ноль, наклон остаётся. В ANGLE стик задаёт угол, центр — горизонт."
+   "explain": "In Acro the stick sets the rotation rate; at center the rate is zero and the tilt remains. In ANGLE the stick sets the angle, and center is level."
   },
   {
-   "q": "Почему геймпад плохо подходит для обучения в симуляторе?",
+   "q": "Why is a gamepad a poor fit for learning in a simulator?",
    "options": [
-    "Симуляторы не распознают геймпады",
-    "У геймпада нет оси рыскания",
-    "Стик газа подпружинен, ход стиков короткий",
-    "Геймпад передаёт команды с задержкой больше секунды"
+    "Simulators do not recognize gamepads",
+    "A gamepad has no yaw axis",
+    "The throttle stick is spring-loaded, and the stick travel is short",
+    "A gamepad sends commands with a delay of more than a second"
    ],
    "answer": 2,
-   "explain": "Симуляторы геймпад принимают, но газ на пульте не возвращается в центр, а ход стиков длиннее: мышечная память не переносится."
+   "explain": "Simulators accept a gamepad, but the throttle on a radio does not return to center, and the stick travel is longer: muscle memory does not transfer."
   },
   {
-   "q": "Вираж с креном 60° без потери высоты. Во сколько раз должна вырасти тяга по сравнению с висением?",
+   "q": "A turn with a 60° roll without losing altitude. By what factor must thrust grow compared with hover?",
    "options": [
-    "В 1.15 раза",
-    "В 1.41 раза",
-    "В 2 раза",
-    "Не должна меняться"
+    "By 1.15",
+    "By 1.41",
+    "By 2",
+    "It must not change"
    ],
    "answer": 2,
-   "explain": "Вертикальная доля тяги — cos φ, значит нужна тяга в 1/cos 60° = 2 раза больше."
+   "explain": "The vertical share of thrust is cos φ, so thrust 1/cos 60° = 2 times greater is needed."
   },
   {
-   "q": "Лёгкий аппарат над пустым полем на высоте 2 м потерял управление и летит в землю. Что делать?",
+   "q": "A light aircraft over an empty field at a height of 2 m has lost control and is flying into the ground. What do you do?",
    "options": [
-    "Дать полный газ и набирать высоту",
-    "Дизарм до касания",
-    "Включить HORIZON и ждать выравнивания",
-    "Отпустить оба стика и ждать"
+    "Give full throttle and climb",
+    "Disarm before touchdown",
+    "Turn on HORIZON and wait for it to level out",
+    "Let go of both sticks and wait"
    ],
    "answer": 1,
-   "explain": "У земли над пустым полем дизарм сохраняет моторы и регуляторы и не даёт пропеллерам крутиться в траве. Над людьми и на высоте порядок другой — см. рефлекс восстановления."
+   "explain": "Near the ground over an empty field a disarm saves the motors and ESCs and keeps the propellers from spinning in the grass. Over people and at altitude the order is different — see the recovery reflex."
   },
   {
-   "q": "Когда по плану курса переходят с симулятора на следующую ступень?",
+   "q": "When, by the course plan, do you move from the simulator to the next rung?",
    "options": [
-    "После 10 часов налёта в симуляторе",
-    "После 5 кругов «восьмёрки» подряд без сброса в двух тренировках",
-    "После покупки очков и первого аппарата",
-    "Когда упражнения начинают казаться лёгкими"
+    "After 10 hours of flight time in the simulator",
+    "After 5 figure-eight laps in a row without a reset in two training sessions",
+    "After buying goggles and the first aircraft",
+    "When the exercises start to seem easy"
    ],
    "answer": 1,
-   "explain": "Ворота — проверяемый критерий. Источники называют от 5 до 20 часов, но часы лишь оценка времени."
+   "explain": "The gate is a verifiable criterion. The sources name from 5 to 20 hours, but hours are only a time estimate."
   }
  ]
 }

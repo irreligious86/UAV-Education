@@ -1,0 +1,106 @@
+{
+ "module": "f-starter-kit",
+ "tasks": [
+  {
+   "id": "kit-total",
+   "title": "Kit total",
+   "statement": "Radio **${r}**, goggles **${g}**, BNF aircraft **${a}**, **{n}** batteries at **${p}** each, charger **${c}**, tools and consumables **$40**. How much does the kit cost ($)?",
+   "params": {
+    "r": [
+     35,
+     65,
+     110,
+     154,
+     200
+    ],
+    "g": [
+     75,
+     160,
+     229,
+     499
+    ],
+    "a": [
+     100,
+     244,
+     438,
+     480
+    ],
+    "n": {
+     "min": 3,
+     "max": 6,
+     "step": 1
+    },
+    "p": [
+     5,
+     20,
+     35
+    ],
+    "c": [
+     30,
+     60,
+     120,
+     200
+    ]
+   },
+   "answer": "r+g+a+n*p+c+40",
+   "unit": "$",
+   "tol": 0.005,
+   "solution": "The sum of the items: radio + goggles + aircraft + n·battery price + charger + 40. The simulator, shipping and taxes come on top."
+  },
+  {
+   "id": "packs-for-session",
+   "title": "How many batteries per session",
+   "statement": "A **{c} mAh** battery, average current in flight **{i} A**, 80 % of the capacity is used. How many batteries are needed to fly at least **{t} min** per session? The answer is a whole number.",
+   "params": {
+    "c": [
+     650,
+     850,
+     1100,
+     1300
+    ],
+    "i": [
+     9,
+     11,
+     13
+    ],
+    "t": {
+     "min": 10,
+     "max": 30,
+     "step": 5
+    }
+   },
+   "answer": "math.ceil(t/(0.8*c/1000/i*60))",
+   "unit": "pcs",
+   "tol": 0.001,
+   "abs": 0.01,
+   "solution": "Time per battery: t₁ = 0.8·Q/I (in hours) × 60. The number of batteries is t/t₁ rounded up: you cannot buy a fraction of a battery."
+  },
+  {
+   "id": "parallel-charge-power",
+   "title": "Parallel charging power",
+   "statement": "**{n}** **{s}S {c} mAh** batteries are charged in parallel at 1C to 4.2 V per cell. What power must the charger deliver at the end of the charge (W)?",
+   "params": {
+    "n": {
+     "min": 2,
+     "max": 6,
+     "step": 1
+    },
+    "s": [
+     4,
+     6
+    ],
+    "c": [
+     650,
+     850,
+     1100,
+     1300,
+     1500
+    ]
+   },
+   "answer": "n*c/1000*s*4.2",
+   "unit": "W",
+   "tol": 0.02,
+   "solution": "In parallel the capacities add up: I = n·Q (1C), U = S·4.2 V, P = U·I. If the charger is weaker, it will reduce the current, and the charge will take more than an hour."
+  }
+ ]
+}

@@ -1,0 +1,49 @@
+{
+ "module": "bf-custom",
+ "tasks": [
+  {
+   "id": "flash-used",
+   "title": "Flash usage",
+   "statement": "The main code region `FLASH1` on an F411 is **{cap} KB** (the 4.5.3 linker script). The build takes **{s} KB**. What share of `FLASH1` is used, %?",
+   "params": {
+    "cap": [
+     480
+    ],
+    "s": {
+     "min": 380,
+     "max": 475,
+     "step": 5
+    }
+   },
+   "answer": "100*s/cap",
+   "unit": "%",
+   "tol": 0.01,
+   "solution": "Share = 100·s/cap. 450 KB on an F411: 100·450/480 = 93.8 %; 470 KB — 97.9 %. More than 100 % — the linker will report an overflow of the FLASH1 region (on the F405 it is 992 KB, on the F722 — AXIM_FLASH1, 480 KB)."
+  },
+  {
+   "id": "flash-headroom",
+   "title": "Will one more option fit",
+   "statement": "The main code region `FLASH1` is **{cap} KB**, the build takes **{s} KB**, and a new option will add about **{a} KB**. The course guideline is to leave at least 5 % of `FLASH1` free. How many KB will remain beyond that margin (a negative number means the option does not fit the guideline)?",
+   "params": {
+    "cap": [
+     480
+    ],
+    "s": {
+     "min": 380,
+     "max": 450,
+     "step": 5
+    },
+    "a": {
+     "min": 2,
+     "max": 30,
+     "step": 2
+    }
+   },
+   "answer": "0.95*cap - s - a",
+   "unit": "KB",
+   "tol": 0.01,
+   "abs": 0.5,
+   "solution": "Allowed: 0.95·cap = 456 KB on an F411. Remainder = 0.95·cap − s − a: with 420 KB and a 20 KB option — 16 KB; with 440 KB and 20 KB — −4 KB, meaning the build still fits in FLASH1 but there is no margin left for the next release."
+  }
+ ]
+}

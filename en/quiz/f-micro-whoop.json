@@ -3,92 +3,92 @@
  "pass": 80,
  "questions": [
   {
-   "q": "Пульт обновлён до ExpressLRS 4.1, вуп с SPI-приёмником на Betaflight 2025.12, фраза привязки верная. Связи нет. Почему?",
+   "q": "The radio has been updated to ExpressLRS 4.1, the whoop has an SPI receiver on Betaflight 2025.12, the binding phrase is correct. There is no link. Why?",
    "options": [
-    "SPI-приёмник нужно отдельно обновить до 4.x через Wi-Fi или ExpressLRS Configurator",
-    "Код приёмника в Betaflight 2025.12 использует OTA-версию 3, а передатчик — 4",
-    "В 4.x сменился алгоритм вычисления UID из фразы",
-    "SPI-приёмники работают только на 900 МГц"
+    "The SPI receiver must be updated separately to 4.x over Wi-Fi or with ExpressLRS Configurator",
+    "The receiver code in Betaflight 2025.12 uses OTA version 3, while the transmitter uses 4",
+    "In 4.x the algorithm for computing the UID from the phrase changed",
+    "SPI receivers work only on 900 MHz"
    ],
    "answer": 1,
-   "explain": "В expresslrs_common.h тега 2025.12.5 ELRS_OTA_VERSION_ID = 3, в ExpressLRS 4.1.0 OTA_VERSION_ID = 4. Версия входит в CRC и зерно прыжков, поэтому пакеты не принимаются. Своей прошивки у SPI-приёмника нет, обновлять через Wi-Fi нечего."
+   "explain": "In expresslrs_common.h of tag 2025.12.5 ELRS_OTA_VERSION_ID = 3, in ExpressLRS 4.1.0 OTA_VERSION_ID = 4. The version goes into the CRC and the hopping seed, so the packets are not accepted. An SPI receiver has no firmware of its own, so there is nothing to update over Wi-Fi."
   },
   {
-   "q": "Чем SPI-приёмник ELRS на плате 5-в-1 отличается от отдельного приёмника по UART?",
+   "q": "How does an ELRS SPI receiver on a 5-in-1 board differ from a separate UART receiver?",
    "options": [
-    "У него нет своего MCU: протокол исполняет прошивка полётника",
-    "Он передаёт каналы по CRSF на скорости 420 000 бод",
-    "У него выше чувствительность и дальность за счёт короткой линии SPI до радиочипа",
-    "Он прошивается через ExpressLRS Configurator по passthrough"
+    "It has no MCU of its own: the protocol is executed by the flight controller firmware",
+    "It sends channels over CRSF at 420,000 baud",
+    "It has higher sensitivity and range thanks to the short SPI line to the radio chip",
+    "It is flashed through ExpressLRS Configurator via passthrough"
    ],
    "answer": 0,
-   "explain": "На плате только радиочип SX1280 на шине SPI, весь ELRS — в src/main/rx/expresslrs*.c Betaflight. Поэтому версия протокола определяется сборкой Betaflight, а CRSF и UART не используются."
+   "explain": "The board carries only an SX1280 radio chip on the SPI bus, and all of ELRS lives in src/main/rx/expresslrs*.c of Betaflight. So the protocol version is determined by the Betaflight build, and CRSF and a UART are not used."
   },
   {
-   "q": "Ток 10 А, разъём PH2.0 после износа: 20 мОм на контакт (максимум по даташиту JST), в цепи два контакта. Сколько вольт теряется на разъёме и сколько ватт в нём выделяется?",
+   "q": "A current of 10 A, a PH2.0 connector after wear: 20 mΩ per contact (the maximum per the JST datasheet), two contacts in the circuit. How many volts are lost across the connector and how many watts are dissipated in it?",
    "options": [
-    "0.20 В и 2 Вт",
-    "0.40 В и 4 Вт",
-    "0.04 В и 0.4 Вт",
-    "0.80 В и 8 Вт"
+    "0.20 V and 2 W",
+    "0.40 V and 4 W",
+    "0.04 V and 0.4 W",
+    "0.80 V and 8 W"
    ],
    "answer": 1,
-   "explain": "R = 2 × 0.020 = 0.040 Ом. U = 10 × 0.040 = 0.40 В, P = 10² × 0.040 = 4 Вт. Для A30 (1.6 мОм на контакт) те же формулы дают 0.032 В и 0.32 Вт."
+   "explain": "R = 2 × 0.020 = 0.040 Ω. U = 10 × 0.040 = 0.40 V, P = 10² × 0.040 = 4 W. For an A30 (1.6 mΩ per contact) the same formulas give 0.032 V and 0.32 W."
   },
   {
-   "q": "На моторах 0702 написано 9N12P. Какое значение `motor_poles` верное и что будет при умолчании 14?",
+   "q": "The 0702 motors are marked 9N12P. Which `motor_poles` value is correct, and what happens with the default 14?",
    "options": [
-    "9; при 14 обороты завышены",
-    "14; умолчание менять не нужно",
-    "12; при 14 обороты занижены, режекторы RPM-фильтра стоят ниже реальной частоты",
-    "12; при 14 двунаправленный DShot не включится совсем, и вкладка Motors покажет 100 % ошибок"
+    "9; with 14 the RPM is overstated",
+    "14; the default does not need changing",
+    "12; with 14 the RPM is understated, and the RPM filter notches sit below the real frequency",
+    "12; with 14 bidirectional DShot will not turn on at all, and the Motors tab will show 100 % errors"
    ],
    "answer": 2,
-   "explain": "12P — двенадцать магнитов. Betaflight делит eRPM на число пар полюсов: при 14 вместо 12 обороты получаются в 12/14 = 0.86 от реальных, и режекторы промахиваются. 9 — это зубцы статора."
+   "explain": "12P means twelve magnets. Betaflight divides eRPM by the number of pole pairs: with 14 instead of 12 the RPM comes out at 12/14 = 0.86 of the real value, and the notches miss. 9 is the stator teeth."
   },
   {
-   "q": "Плата на STM32F411 с гироскопом 8 кГц, включён `dshot_bidir = ON`. Что прошивка Betaflight 2025.12 сделает сама?",
+   "q": "A board on an STM32F411 with an 8 kHz gyro, `dshot_bidir = ON` is enabled. What will the Betaflight 2025.12 firmware do by itself?",
    "options": [
-    "Отключит RPM-фильтр и dynamic idle из-за нехватки ресурсов процессора на этой плате",
-    "Переведёт гироскоп на 3.2 кГц",
-    "Сменит DSHOT600 на DSHOT300 и поднимет `pid_process_denom` минимум до 2",
-    "Сменит протокол на PROSHOT1000"
+    "Disable the RPM filter and dynamic idle because of a lack of CPU resources on this board",
+    "Switch the gyro to 3.2 kHz",
+    "Change DSHOT600 to DSHOT300 and raise `pid_process_denom` to at least 2",
+    "Change the protocol to PROSHOT1000"
    ],
    "answer": 2,
-   "explain": "validateAndFixGyroConfig() в config.c: на платформах с USE_PID_DENOM_CHECK (F411, F405, G47x) при включённой телеметрии DShot протокол 600 заменяется на 300, а при частоте гироскопа выше 4 кГц делитель PID становится не меньше 2 — PID 4 кГц."
+   "explain": "validateAndFixGyroConfig() in config.c: on platforms with USE_PID_DENOM_CHECK (F411, F405, G47x), with DShot telemetry enabled protocol 600 is replaced with 300, and with a gyro rate above 4 kHz the PID denominator becomes no less than 2 — PID 4 kHz."
   },
   {
-   "q": "Свежий LiHV 4.35 В подключён к вупу с `vbat_max_cell_voltage = 430`. Что происходит по логике battery.c?",
+   "q": "A fresh 4.35 V LiHV is connected to a whoop with `vbat_max_cell_voltage = 430`. What happens by the logic of battery.c?",
    "options": [
-    "Батарея определяется как 2S",
-    "Батарея не считается подключённой, пока напряжение не упадёт до 4.30 В",
-    "Срабатывает защита от перенапряжения, арм запрещён до падения напряжения ниже 4.20 В",
-    "Ничего: параметр влияет только на шкалу OSD"
+    "The battery is detected as 2S",
+    "The battery is not considered connected until the voltage drops to 4.30 V",
+    "Overvoltage protection triggers, and arming is blocked until the voltage drops below 4.20 V",
+    "Nothing: the parameter affects only the OSD scale"
    ],
    "answer": 1,
-   "explain": "isVoltageFromBattery() принимает напряжение не выше vbat_max_cell_voltage либо выше удвоенного vbat_detect (6.00 В). 4.35 В попадает в зону 4.31–6.00 В, число банок и пороги не считаются. Для LiHV ставят 440."
+   "explain": "isVoltageFromBattery() accepts a voltage no higher than vbat_max_cell_voltage or above twice vbat_detect (6.00 V). 4.35 V falls into the 4.31–6.00 V zone, and the cell count and thresholds are not computed. For LiHV, 440 is set."
   },
   {
-   "q": "Вуп 75 мм: банка 480 мА·ч, используем 80 % ёмкости, средний ток 3.4 А. Сколько длится полёт?",
+   "q": "A 75 mm whoop: a 480 mAh cell, 80 % of the capacity is used, average current 3.4 A. How long does the flight last?",
    "options": [
-    "Около 4.5 минуты",
-    "Около 8.5 минуты",
-    "Около 6.8 минуты",
-    "Около 11 минут"
+    "About 4.5 minutes",
+    "About 8.5 minutes",
+    "About 6.8 minutes",
+    "About 11 minutes"
    ],
    "answer": 2,
-   "explain": "t = 0.48 × 0.8 × 60 / 3.4 = 6.8 мин. Это совпадает с заявленными производителем 6:50 на 480 мА·ч для спокойного полёта."
+   "explain": "t = 0.48 × 0.8 × 60 / 3.4 = 6.8 min. This matches the manufacturer's claimed 6:50 on 480 mAh for calm flying."
   },
   {
-   "q": "Что из перечисленного — плата за переход со стека на AIO 5-в-1?",
+   "q": "Which of the following is a price of moving from a stack to a 5-in-1 AIO?",
    "options": [
-    "Нельзя использовать DShot",
-    "Сгоревший ключ одного ESC означает замену всей платы, свободных UART мало",
-    "Betaflight не поддерживает такие платы официально, нужна только прошивка производителя",
-    "Нельзя подключить цифровое видео"
+    "DShot cannot be used",
+    "A burned FET of one ESC means replacing the whole board, and there are few free UARTs",
+    "Betaflight does not officially support such boards, only the manufacturer's firmware will do",
+    "Digital video cannot be connected"
    ],
    "answer": 1,
-   "explain": "Всё на одной плате: чинить по частям нельзя. На F411 платформа даёт 3 UART, часть занята встроенными VTX и приёмником. DShot, Betaflight и цифровое видео доступны, но цифре нужен свободный UART."
+   "explain": "Everything is on one board: it cannot be repaired part by part. On an F411 the platform gives 3 UARTs, and some are taken by the built-in VTX and receiver. DShot, Betaflight and digital video are available, but digital needs a free UART."
   }
  ]
 }

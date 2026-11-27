@@ -174,7 +174,7 @@ https://build.betaflight.com/api/builds/<BUILD_KEY>/json
 | Узнать версию, target / BUILD KEY | `version` / `status` |
 | Загрузка CPU, флаги арма, частота гироскопа | `status`, `tasks` |
 | Переназначить мотор на другой пад | `resource MOTOR 3 B01` → `save` (`resource show all` — занятость) |
-| Поменять порядок моторов без перепайки | `resource` своп пар или в Motors tab «Motor direction/remap» |
+| Поменять порядок моторов без перепайки | `resource` своп пар или кнопки «Reorder motors» / «Motor direction» на вкладке Motors |
 | Реверс направления одного мотора (DShot-команды) | `dshotprog 0 8` (7 — `SPIN_DIRECTION_1`, 8 — `SPIN_DIRECTION_2`: постоянное направление в ESC), затем `dshotprog 0 12` (save settings); команды 20/21 — временный разворот для turtle, их шлёт сама прошивка; моторы без пропов, индекс с 0 (255 — все моторы) |
 | Проверить DShot-телеметрию | `dshot_telemetry_info` |
 | Таймеры/DMA (конфликты моторов, LED, serial) | `timer`, `dma show` |

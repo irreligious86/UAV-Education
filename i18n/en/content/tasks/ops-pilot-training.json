@@ -1,0 +1,100 @@
+{
+  "module": "ops-pilot-training",
+  "tasks": [
+    {
+      "id": "actual-setpoint",
+      "title": "°/s from Actual rates",
+      "statement": "The configuration has `rates_type = ACTUAL`, `roll_rc_rate = {rc}`, `roll_srate = {sr}`, `roll_expo = {ex}`. The roll stick is deflected to **{x}** of full travel. What roll rate is the pilot commanding, °/s?",
+      "params": {
+        "rc": {
+          "min": 10,
+          "max": 20,
+          "step": 1
+        },
+        "sr": {
+          "min": 50,
+          "max": 90,
+          "step": 5
+        },
+        "ex": [
+          0,
+          20,
+          40,
+          60
+        ],
+        "x": [
+          0.25,
+          0.5,
+          0.75
+        ]
+      },
+      "answer": "x*rc*10 + (sr*10 - rc*10)*x*(x**5*ex/100 + x*(1 - ex/100))",
+      "unit": "°/s",
+      "tol": 0.01,
+      "solution": "C = rc_rate·10, M = srate·10, e = expo/100. `applyActualRates` (Betaflight 2025.12, `fc/rc.c`): ω = C·x + (M − C)·|x|·(x⁵·e + x·(1 − e)). For 15/60/40 and x = 0.5 you get 145.3 °/s."
+    },
+    {
+      "id": "roll-time",
+      "title": "Time of flips at full stick",
+      "statement": "An Actual profile, `roll_srate = {sr}`. How many seconds will **{n}** full roll rotations take at full stick (ignore the acceleration)?",
+      "params": {
+        "sr": {
+          "min": 50,
+          "max": 100,
+          "step": 5
+        },
+        "n": [
+          2,
+          3,
+          4
+        ]
+      },
+      "answer": "n*360/(sr*10)",
+      "unit": "s",
+      "tol": 0.02,
+      "solution": "At full stick (x = 1) the Actual model gives exactly M = srate·10 °/s at any expo. t = n·360/M. For 60 and one rotation — 0.60 s."
+    },
+    {
+      "id": "turn-radius",
+      "title": "Turn radius",
+      "statement": "The aircraft flies a level turn without losing altitude at a speed of **{v} m/s** with a roll of **{phi}°**. Find the turn radius, m (g = 9.81 m/s²).",
+      "params": {
+        "v": {
+          "min": 5,
+          "max": 20,
+          "step": 1
+        },
+        "phi": [
+          30,
+          45,
+          60
+        ]
+      },
+      "answer": "v**2/(9.81*math.tan(math.radians(phi)))",
+      "unit": "m",
+      "tol": 0.02,
+      "solution": "r = v²/(g·tan φ). For 10 m/s and 45°: 100/9.81 = 10.2 m."
+    },
+    {
+      "id": "turn-rate-thrust",
+      "title": "Turn rate in a turn",
+      "statement": "A turn without losing altitude: speed **{v} m/s**, roll **{phi}°**. At what angular rate is the aircraft turning, °/s (g = 9.81 m/s²)?",
+      "params": {
+        "v": {
+          "min": 5,
+          "max": 20,
+          "step": 1
+        },
+        "phi": [
+          30,
+          45,
+          60
+        ]
+      },
+      "answer": "math.degrees(9.81*math.tan(math.radians(phi))/v)",
+      "unit": "°/s",
+      "tol": 0.02,
+      "solution": "ω = g·tan φ/v in rad/s, then ×57.3. For 10 m/s and 45°: 0.981 rad/s = 56 °/s. Thrust must grow by a factor of 1/cos φ: 1.15 at 30°, 1.41 at 45°, 2.0 at 60°."
+    }
+  ]
+}

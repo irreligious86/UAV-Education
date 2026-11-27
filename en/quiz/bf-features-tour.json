@@ -3,31 +3,31 @@
  "pass": 80,
  "questions": [
   {
-   "q": "Аппарат лежит вверх ногами. Как в Betaflight 2025.12 правильно войти в turtle mode и выйти из него (способ, работающий в любой версии)?",
+   "q": "The aircraft is lying upside down. In Betaflight 2025.12, what is the correct way to enter turtle mode and leave it (the method that works in any version)?",
    "options": [
-    "ARM, затем тумблер turtle; выход — выключить тумблер turtle в любой момент",
-    "Тумблер turtle, затем ARM; выход — дизарм, turtle выкл., снова ARM",
-    "Тумблер turtle при включённом ARM; выход — газ выше 20 %",
-    "ARM стиками с газом в центре; выход — повторный жест арма"
+    "ARM, then the turtle switch; exit — turn the turtle switch off at any moment",
+    "The turtle switch, then ARM; exit — disarm, turtle off, ARM again",
+    "The turtle switch with ARM on; exit — throttle above 20 %",
+    "Stick arming with the throttle centered; exit — repeat the arm gesture"
    ],
    "answer": 1,
-   "explain": "tryArm() отправляет DShot-команду 21 (реверс), только если режим активен в момент арма. Состояние crashFlipModeActive (в 4.5 — flipOverAfterCrashActive) сбрасывается при дизарме, а следующий арм без режима отправляет команду 20 (нормальное направление). В 4.5 выключенный при арме тумблер ничего не меняет; в 2025.12 его выключение при crashflip_auto_rearm = OFF вызывает дизарм и флаг FLIP_SWITCH, так что ручной дизарм и новый арм нужны всё равно."
+   "explain": "tryArm() sends DShot command 21 (reverse) only if the mode is active at the moment of arming. The crashFlipModeActive state (in 4.5 — flipOverAfterCrashActive) is reset on disarm, and the next arm without the mode sends command 20 (normal direction). In 4.5 turning the switch off while armed changes nothing; in 2025.12 turning it off with crashflip_auto_rearm = OFF causes a disarm and the FLIP_SWITCH flag, so a manual disarm and a new arm are needed anyway."
   },
   {
-   "q": "Фрагмент CLI. Почему dynamic idle не работает?",
+   "q": "A CLI fragment. Why does dynamic idle not work?",
    "kind": "apply",
    "fragment": "# get dyn_idle_min_rpm\ndyn_idle_min_rpm = 35\n# get dshot_bidir\ndshot_bidir = OFF\n# get motor_pwm_protocol\nmotor_pwm_protocol = DSHOT600\n# get motor_idle\nmotor_idle = 550",
    "options": [
-    "35 больше допустимого предела, нужно ≤ 20",
-    "motor_idle 550 перекрывает цель dynamic idle и отключает его регулятор",
-    "Без телеметрии eRPM цель dynamic idle обнуляется при инициализации",
-    "DSHOT600 несовместим с dynamic idle, нужен DSHOT300"
+    "35 is above the allowed limit, it must be ≤ 20",
+    "motor_idle 550 overrides the dynamic idle target and disables its controller",
+    "Without eRPM telemetry the dynamic idle target is zeroed at initialization",
+    "DSHOT600 is incompatible with dynamic idle, DSHOT300 is needed"
    ],
    "answer": 2,
-   "explain": "mixerInitProfile(): dynIdleMinRps = dyn_idle_min_rpm·100/60, только если useDshotTelemetry, иначе 0. Ошибки нет, функция просто не работает. Диапазон dyn_idle_min_rpm 0–200, а motor_idle (до 2025.12 — dshot_idle_value) при работающем dynamic idle полом не служит."
+   "explain": "mixerInitProfile(): dynIdleMinRps = dyn_idle_min_rpm·100/60 only if useDshotTelemetry, otherwise 0. There is no error, the feature simply does not work. The range of dyn_idle_min_rpm is 0–200, and motor_idle (before 2025.12 — dshot_idle_value) does not serve as a floor when dynamic idle is working."
   },
   {
-   "q": "Betaflight 2025.12, рейты по умолчанию (Actual, roll_rc_rate 7, roll_srate 67, expo 0), angle_limit 60. Какой целевой угол крена в Angle при стике на 50 % хода?",
+   "q": "Betaflight 2025.12, default rates (Actual, roll_rc_rate 7, roll_srate 67, expo 0), angle_limit 60. What is the roll target angle in Angle with the stick at 50 % of travel?",
    "options": [
     "30°",
     "16.6°",
@@ -35,10 +35,10 @@
     "60° × 0.5² = 15°"
    ],
    "answer": 1,
-   "explain": "pidLevel(): цель = angle_limit · setpoint / max_rate. Setpoint на полстика = 0.5·70 + 600·0.5·0.5 = 185 °/с, максимум 670 °/с, 60·185/670 = 16.6°. 30° было бы при линейных рейтах, 27.5° — по старой формуле 4.4 с level_limit 55."
+   "explain": "pidLevel(): target = angle_limit · setpoint / max_rate. The setpoint at half stick = 0.5·70 + 600·0.5·0.5 = 185 °/s, the maximum is 670 °/s, 60·185/670 = 16.6°. 30° would be with linear rates, 27.5° — by the old 4.4 formula with level_limit 55."
   },
   {
-   "q": "Horizon в 2025.12 с умолчаниями (horizon_level_strength 75, horizon_limit_sticks 75, horizon_limit_degrees 135). Аппарат ровный, стик крена на 50 %. Какая сила выравнивания?",
+   "q": "Horizon in 2025.12 with the defaults (horizon_level_strength 75, horizon_limit_sticks 75, horizon_limit_degrees 135). The aircraft is level, the roll stick is at 50 %. What is the leveling strength?",
    "options": [
     "0.75",
     "0.50",
@@ -46,32 +46,32 @@
     "0"
    ],
    "answer": 2,
-   "explain": "calcHorizonLevelStrength(): 0.75 · (1 − 0/135) · (1 − 0.5/0.75) = 0.75 · 1/3 = 0.25. При стике 75 % сила уже 0 — чистый ACRO."
+   "explain": "calcHorizonLevelStrength(): 0.75 · (1 − 0/135) · (1 − 0.5/0.75) = 0.75 · 1/3 = 0.25. With the stick at 75 % the strength is already 0 — pure ACRO."
   },
   {
-   "q": "Квадрик в 3D с DShot. Пилот меняет 3d_deadband_low с 1406 на 1450. Что изменится?",
+   "q": "A quad in 3D with DShot. The pilot changes 3d_deadband_low from 1406 to 1450. What will change?",
    "options": [
-    "Ничего: эти границы используются только для PWM/OneShot",
-    "Реверс начнётся при газе 1450 мкс вместо 1406, мёртвая зона сузится",
-    "Холостой ход в обратную сторону станет выше",
-    "Арм станет возможен только выше 1450 мкс"
+    "Nothing: these boundaries are used only for PWM/OneShot",
+    "Reverse will start at a throttle of 1450 µs instead of 1406, the deadband will narrow",
+    "The idle in the reverse direction will become higher",
+    "Arming will be possible only above 1450 µs"
    ],
    "answer": 0,
-   "explain": "3d_deadband_low/high, 3d_neutral и 3d_limit_* читает только analogInitEndpoints() (drivers/motor.c). При DShot разделение фиксировано в dshot.c: 48–1047 — назад, 1048–2047 — вперёд. Арм зависит от 3d_deadband_throttle вокруг mid_rc."
+   "explain": "3d_deadband_low/high, 3d_neutral and 3d_limit_* are read only by analogInitEndpoints() (drivers/motor.c). With DShot the split is fixed in dshot.c: 48–1047 — reverse, 1048–2047 — forward. Arming depends on 3d_deadband_throttle around mid_rc."
   },
   {
-   "q": "Тумблер LAUNCH CONTROL включён, но после арма OSD не показывает LAUNCH. Какая из причин действительно блокирует launch control в 2025.12?",
+   "q": "The LAUNCH CONTROL switch is on, but after arming the OSD does not show LAUNCH. Which of these causes really blocks launch control in 2025.12?",
    "options": [
-    "Включён airmode",
-    "Не задан launch_angle_limit, поэтому режиму не на что опереться",
-    "Арм выполнен стиками, а не тумблером",
-    "launch_control_gain меньше 50"
+    "Airmode is enabled",
+    "launch_angle_limit is not set, so the mode has nothing to rely on",
+    "Arming was done with the sticks, not with a switch",
+    "launch_control_gain is less than 50"
    ],
    "answer": 2,
-   "explain": "canUseLaunchControl() требует арм тумблером, режим ACRO, отсутствие feature 3D, а при MOTOR_STOP — ещё и airmode. launch_angle_limit = 0 просто снимает ограничение угла, а gain влияет только на удержание."
+   "explain": "canUseLaunchControl() requires switch arming, ACRO mode, no feature 3D, and with MOTOR_STOP — airmode as well. launch_angle_limit = 0 simply removes the angle limit, and the gain affects only the hold."
   },
   {
-   "q": "Какую строку CLI ввести, чтобы FLIP OVER AFTER CRASH включался на AUX3 в верхнем положении (слот 3)?",
+   "q": "Which CLI line do you enter so that FLIP OVER AFTER CRASH is enabled on AUX3 in the upper position (slot 3)?",
    "options": [
     "aux 3 35 2 1700 2100 0 0",
     "aux 3 35 3 1700 2100 0 0",
@@ -79,10 +79,10 @@
     "aux 3 13 2 1700 2100 0 0"
    ],
    "answer": 0,
-   "explain": "Формат: слот, permanentId (FLIP OVER AFTER CRASH = 35 в msp_box.c), канал с нуля (AUX3 = 2), диапазон, логика, связанный режим. 47 — ACRO TRAINER, 13 — BEEPER, канал 3 — это AUX4."
+   "explain": "The format: slot, permanentId (FLIP OVER AFTER CRASH = 35 in msp_box.c), channel from zero (AUX3 = 2), range, logic, linked mode. 47 is ACRO TRAINER, 13 is BEEPER, channel 3 is AUX4."
   },
   {
-   "q": "Dynamic idle: dyn_idle_min_rpm 30, dyn_idle_p_gain 50, airmode защёлкнут. Самый медленный мотор крутится на 2000 об/мин. Какую прибавку к нижней границе моторов даёт один P-член?",
+   "q": "Dynamic idle: dyn_idle_min_rpm 30, dyn_idle_p_gain 50, airmode latched. The slowest motor is spinning at 2000 RPM. What increase to the lower motor limit does the P term alone give?",
    "options": [
     "5 %",
     "15 %",
@@ -90,7 +90,7 @@
     "12.5 %"
    ],
    "answer": 3,
-   "explain": "Ошибка (3000 − 2000)/60 = 16.67 об/с, P = 50·0.00015 = 0.0075 на 1 об/с, итого 0.125 = 12.5 %. Это меньше предела dyn_idle_max_increase (15 %). До первого подъёма газа выше порога airmode действует меньший предел: в 2025.12 это motor_idle (5.5 %), в 4.5 — dyn_idle_start_increase (5 %)."
+   "explain": "The error is (3000 − 2000)/60 = 16.67 rev/s, P = 50·0.00015 = 0.0075 per 1 rev/s, giving 0.125 = 12.5 %. That is less than the dyn_idle_max_increase limit (15 %). Until the throttle is first raised above the airmode threshold a smaller limit applies: in 2025.12 it is motor_idle (5.5 %), in 4.5 — dyn_idle_start_increase (5 %)."
   }
  ]
 }

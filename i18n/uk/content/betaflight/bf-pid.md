@@ -34,7 +34,7 @@ PID посилює все, що приходить з гіроскопа, вкл
 - **Tracking** (P та I) — точність стеження за стиком і збуреннями; вище — осциляції.
 - **Stick Response** (FF) — реакція на швидкі рухи стика; вище — переліт наприкінці фліпу.
 - **Dynamic Damping** (D max) — наскільки D може зрости на швидких рухах.
-- **Drift – Wobble** (I) — утримання в поворотах і на нульовому газі.
+- **Drift - Wobble** (I) — утримання в поворотах і на нульовому газі.
 - **Master Multiplier** — усе разом; чіпають, коли решті не вистачає ходу.
 
 У CLI це `simplified_pi_gain`, `simplified_d_gain`, `simplified_feedforward_gain`, `simplified_dmax_gain` (у 2025.12 — `simplified_d_max_gain`), `simplified_i_gain`, `simplified_master_multiplier` плюс `simplified_tuning apply`. Профілів PID чотири, профілів рейтів чотири — перемикаються тумблером або в CLI командою `profile N`.

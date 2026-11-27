@@ -1,0 +1,112 @@
+{
+ "module": "bf-setup-scratch",
+ "tasks": [
+  {
+   "id": "vbat-scale",
+   "title": "Calibrating vbat_scale",
+   "statement": "Betaflight shows **{vfc} V** with `vbat_scale` = **{old}**, and a multimeter on the XT60 — **{vm} V**. Find the new `vbat_scale` value (without rounding).",
+   "params": {
+    "old": [
+     100,
+     105,
+     110,
+     115,
+     120
+    ],
+    "vfc": {
+     "min": 23.0,
+     "max": 25.2,
+     "step": 0.02
+    },
+    "vm": {
+     "min": 23.4,
+     "max": 25.0,
+     "step": 0.02
+    }
+   },
+   "answer": "old*vm/vfc",
+   "unit": "",
+   "tol": 0.005,
+   "solution": "In voltage.c the voltage is directly proportional to vbat_scale, so new = old × V_multimeter / V_FC. An integer is entered in the CLI; a step of 1 corresponds to ≈ 0.9 % of the voltage."
+  },
+  {
+   "id": "ibata-scale",
+   "title": "Calibrating ibata_scale from mAh",
+   "statement": "Over a flight Betaflight counted **{mfc} mAh** with `ibata_scale` = **{old}**, and the charger put back **{mch} mAh**. Find the new `ibata_scale` (without rounding).",
+   "params": {
+    "old": [
+     170,
+     250,
+     300,
+     350,
+     400,
+     450
+    ],
+    "mfc": {
+     "min": 700,
+     "max": 1100,
+     "step": 5
+    },
+    "mch": {
+     "min": 800,
+     "max": 1150,
+     "step": 5
+    }
+   },
+   "answer": "old*mfc/mch",
+   "unit": "",
+   "tol": 0.005,
+   "solution": "In current.c the current I[mA] = 10000·mV/ibata_scale + ibata_offset, that is, inversely proportional to scale. So new = old × mAh_FC / mAh_charger: if the FC undercounted, scale is reduced."
+  },
+  {
+   "id": "ibata-offset",
+   "title": "The current sensor offset",
+   "statement": "The motors are stopped, an ammeter in series with the battery shows **{im} A**, Betaflight — **{ifc} A**, and the current `ibata_offset` = **{off} mA**. Find the new `ibata_offset` in mA.",
+   "params": {
+    "im": {
+     "min": 0.25,
+     "max": 0.9,
+     "step": 0.01
+    },
+    "ifc": {
+     "min": 0.0,
+     "max": 1.2,
+     "step": 0.01
+    },
+    "off": [
+     -200,
+     -100,
+     0,
+     100,
+     200
+    ]
+   },
+   "answer": "off+(im-ifc)*1000",
+   "unit": "mA",
+   "tol": 0.01,
+   "abs": 2,
+   "solution": "ibata_offset in mA is simply added to the current: new = old + (I_ammeter − I_FC) × 1000. It can be negative if the FC overstates the quiescent current."
+  },
+  {
+   "id": "hover-throttle",
+   "title": "The expected hover throttle",
+   "statement": "A quadcopter with a mass of **{m} g**; each of the four motors gives a maximum of **{t} g** of thrust. Estimate the hover throttle in percent with the model “thrust ∝ throttle²”.",
+   "params": {
+    "m": {
+     "min": 450,
+     "max": 900,
+     "step": 10
+    },
+    "t": {
+     "min": 900,
+     "max": 2000,
+     "step": 50
+    }
+   },
+   "answer": "100*math.sqrt(m/(4*t))",
+   "unit": "%",
+   "tol": 0.02,
+   "solution": "T/W = 4·t/m; with thrust ∝ (throttle)² the hover throttle ≈ √(m / (4·t)). This is a rough estimate: the real throttle from the log of the first hover goes into ap_hover_throttle (before 2025.12 — gps_rescue_throttle_hover) and into the abort criterion (above 60 % — land)."
+  }
+ ]
+}

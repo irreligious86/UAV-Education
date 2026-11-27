@@ -1,0 +1,83 @@
+{
+ "module": "bf-gps-setup",
+ "tasks": [
+  {
+   "id": "gps-uart-load",
+   "title": "GPS UART load",
+   "statement": "Betaflight (the message set was verified on the 4.5-maintenance branch, code = release 4.5.5) has configured a u-blox for **{f} Hz**: NAV-PVT (92 bytes of payload + 8 of overhead) every cycle and NAV-SAT (16 + 12·N bytes) every 5th cycle. NAV-SAT has **N = {n}** satellites, the port is **{b} baud**, 8N1 (10 bits per byte). What is the channel load in percent?",
+   "params": {
+    "f": [
+     5,
+     10
+    ],
+    "n": {
+     "min": 10,
+     "max": 32,
+     "step": 1
+    },
+    "b": [
+     19200,
+     38400,
+     57600,
+     115200
+    ]
+   },
+   "answer": "100 * 10 * (f * 100 + f / 5 * (16 + 12 * n)) / b",
+   "unit": "%",
+   "tol": 0.01,
+   "solution": "Bytes per second: f·100 + (f/5)·(16 + 12N). Bits: ×10 (start, 8 data, stop). Load = bit/s ÷ baud × 100. Example: 10 Hz, 28 satellites, 57600 → 17040 bit/s → 29.6 %. At 19200 (the SoftSerial limit) the same gives 88.8 % — no margin."
+  },
+  {
+   "id": "gps-home-distance",
+   "title": "Distance to home by the Betaflight formula",
+   "statement": "Home was recorded on arming. The aircraft is now north of home by **{dlat}** and east by **{dlon}** units of 1e-7° (that is how `gpsSol` stores coordinates), and the latitude of home is **{lat}°**. Find the distance to home in meters by `GPS_distance_cm_bearing()` (2025.12, the formula is the same as in 4.5): d[cm] = √(Δlat² + (Δlon·cos lat)²) · 1.113195.",
+   "params": {
+    "dlat": {
+     "min": 0,
+     "max": 20000,
+     "step": 500
+    },
+    "dlon": {
+     "min": 500,
+     "max": 20000,
+     "step": 500
+    },
+    "lat": [
+     0,
+     30,
+     45,
+     50,
+     55,
+     60
+    ]
+   },
+   "answer": "math.sqrt(dlat**2 + (dlon * math.cos(math.radians(lat)))**2) * 1.113195 / 100",
+   "unit": "m",
+   "tol": 0.01,
+   "solution": "1e-7° of latitude = 1.113195 cm. Longitude shrinks as cos(latitude) (`GPS_scaleLonDown`, computed when home is recorded). Example: Δlat = 3000, Δlon = 4000 at 50°: √(3000² + (4000·0.6428)²) = 3951 → ×1.113195 = 4398 cm ≈ 44.0 m."
+  },
+  {
+   "id": "gps-alt-trust",
+   "title": "Trust in the GPS altitude",
+   "statement": "In `flight/position.c` (2025.12, the same in 4.5) the weight of GPS when blending altitude with the baro is gpsTrust = min(1/PDOP, 0.9) (0.3 by default if PDOP is unknown). The module reports **PDOP = {p}**. What is gpsTrust?",
+   "params": {
+    "p": [
+     0.8,
+     0.9,
+     1.0,
+     1.1,
+     1.35,
+     1.5,
+     2.0,
+     2.5,
+     3.3,
+     4.7
+    ]
+   },
+   "answer": "min(1 / p, 0.9)",
+   "unit": "",
+   "tol": 0.01,
+   "solution": "In the code gpsTrust = 100 / pdop, where pdop is stored ×100, that is 1/PDOP. Then MIN(gpsTrust, 0.9): the baro always gets at least 10 %. PDOP 1.35 → 0.74; PDOP ≤ 1.11 → 0.9 (the ceiling); at PDOP 3.3 the weight of 0.30 equals the default."
+  }
+ ]
+}

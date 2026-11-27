@@ -50,12 +50,12 @@
       "q": "Порядок каскаду в Betaflight 4.5?",
       "options": [
         "LPF → notch → RPM",
-        "RPM → dyn notch → LPF",
+        "RPM-notch → статичні notch → LPF1 → динамічний notch",
         "Лише LPF, notch вимкнені за замовчуванням",
         "Лише RPM"
       ],
       "answer": 1,
-      "explain": "Спочатку точні notch за моторами, потім автоматичні, потім фінальний lowpass."
+      "explain": "У filterGyro() спочатку точні RPM-notch за моторами (після LPF2, застосованого під час даунсемплінгу), потім статичні notch і LPF1, динамічний notch — останнім."
     },
     {
       "q": "Мотори гарячі після зміни фільтрів. Що робити?",
@@ -72,12 +72,12 @@
       "q": "У якому порядку застосовуються фільтри гіроскопа в Betaflight 4.5?",
       "options": [
         "LPF1 → LPF2 → RPM → dyn notch",
-        "RPM → dyn notch → LPF1 → LPF2",
+        "LPF2 → RPM → статичні notch → LPF1 → dyn notch",
         "dyn notch → RPM → LPF1 → LPF2",
         "LPF1 → LPF2 без notch"
       ],
       "answer": 1,
-      "explain": "Порядок із gyroFiltering(): спочатку вузькосмугові notch, потім LPF."
+      "explain": "Порядок із filterGyro() (sensors/gyro_filter_impl.c): LPF2 під час даунсемплінгу, RPM-notch, два статичні notch, LPF1, динамічний notch — останнім."
     },
     {
       "q": "Що робить simplified_gyro_filter_multiplier = 150?",

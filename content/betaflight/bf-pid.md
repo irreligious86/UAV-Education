@@ -36,7 +36,7 @@ PID усиливает всё, что приходит с гироскопа, в
 - **Tracking** (P и I) — точность следования за стиком и возмущениями; выше — осцилляции.
 - **Stick Response** (FF) — реакция на быстрые движения стика; выше — перелёт в конце флипа.
 - **Dynamic Damping** (D max) — насколько D может вырасти на быстрых движениях.
-- **Drift – Wobble** (I) — удержание в поворотах и на нулевом газу.
+- **Drift - Wobble** (I) — удержание в поворотах и на нулевом газу.
 - **Master Multiplier** — всё разом; трогают, когда остальным не хватает хода.
 
 В CLI это `simplified_pi_gain`, `simplified_d_gain`, `simplified_feedforward_gain`, `simplified_d_max_gain` (до 2025.12 — `simplified_dmax_gain`), `simplified_i_gain`, `simplified_master_multiplier` плюс `simplified_tuning apply`. Профилей PID четыре, профилей рейтов четыре. В полёте переключается только рейт-профиль (adjustment `RATE PROFILE`). PID-профиль меняется лишь на земле при снятом арме: стиками, через OSD-меню, в Betaflight App или в CLI командой `profile N` (N = 0–3) — ни режима, ни adjustment для него нет.

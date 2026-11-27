@@ -3,29 +3,29 @@
  "pass": 80,
  "questions": [
   {
-   "q": "Мультиметр на XT60 показывает 24.42 В, Betaflight — 24.04 В при vbat_scale = 110. Какое новое значение vbat_scale?",
+   "q": "A multimeter on the XT60 shows 24.42 V, Betaflight — 24.04 V with vbat_scale = 110. What is the new vbat_scale value?",
    "options": [
     "108",
     "112",
-    "110 и поправить vbat_divider",
+    "110 and adjust vbat_divider",
     "106"
    ],
    "answer": 1,
-   "explain": "В voltage.c напряжение прямо пропорционально vbat_scale: 110 × 24.42 / 24.04 = 111.7 → 112. Уменьшение scale (108) сдвинуло бы показание не в ту сторону."
+   "explain": "In voltage.c the voltage is directly proportional to vbat_scale: 110 × 24.42 / 24.04 = 111.7 → 112. Reducing scale (108) would move the reading the wrong way."
   },
   {
-   "q": "FC насчитал за полёт 905 мА·ч, зарядное залило 1032 мА·ч, ibata_scale = 400. Что ставить?",
+   "q": "The FC counted 905 mAh over the flight, the charger put back 1032 mAh, ibata_scale = 400. What should be set?",
    "options": [
     "456",
     "351",
-    "400 и ibata_offset = 127",
+    "400 and ibata_offset = 127",
     "374"
    ],
    "answer": 1,
-   "explain": "В current.c ток равен 10000·mV/ibata_scale + offset, то есть обратно пропорционален scale. Новый scale = 400 × 905 / 1032 ≈ 351. 456 — это ошибка направления пропорции."
+   "explain": "In current.c the current is 10000·mV/ibata_scale + offset, that is, inversely proportional to scale. The new scale = 400 × 905 / 1032 ≈ 351. 456 is the mistake of getting the direction of the proportion wrong."
   },
   {
-   "q": "На столе амперметр показывает ток покоя 0.42 А, Betaflight — 0.19 А, ibata_offset = 0. Какое новое значение ibata_offset?",
+   "q": "On the bench an ammeter shows a quiescent current of 0.42 A, Betaflight — 0.19 A, ibata_offset = 0. What is the new ibata_offset value?",
    "options": [
     "−230",
     "23",
@@ -33,21 +33,21 @@
     "2300"
    ],
    "answer": 2,
-   "explain": "ibata_offset задан в мА и просто прибавляется к току: 0 + (0.42 − 0.19) × 1000 = 230 мА."
+   "explain": "ibata_offset is in mA and is simply added to the current: 0 + (0.42 − 0.19) × 1000 = 230 mA."
   },
   {
-   "q": "Как в Betaflight развернуть вращение мотора 3 на DShot-ESC без перепайки?",
+   "q": "How do you reverse the rotation of motor 3 on a DShot ESC in Betaflight without resoldering?",
    "options": [
     "set motor_direction = 3",
-    "dshotprog 2 8 12 (или диалог Motor direction)",
+    "dshotprog 2 8 12 (or the Motor direction dialog)",
     "set yaw_motors_reversed = ON",
     "resource MOTOR 3 none"
    ],
    "answer": 1,
-   "explain": "Параметра motor_direction в Betaflight нет (ни в 4.5, ни в 2025.12): направление хранится в ESC. dshotprog принимает индекс с нуля, команду 8 (SPIN_DIRECTION_2) и 12 (SAVE_SETTINGS). yaw_motors_reversed меняет все четыре мотора и миксер (props out)."
+   "explain": "Betaflight has no motor_direction parameter (neither in 4.5 nor in 2025.12): the direction is stored in the ESC. dshotprog takes an index from zero, command 8 (SPIN_DIRECTION_2) and 12 (SAVE_SETTINGS). yaw_motors_reversed only tells the mixer that all four motors spin the other way (props out); the direction itself is still set in the ESC."
   },
   {
-   "q": "Тест моторов: ползунок 1 крутит передний правый, ползунок 2 — задний правый, 3 и 4 на месте. Какой motor_output_reordering исправит порядок?",
+   "q": "A motor test: slider 1 spins the front right, slider 2 — the rear right, 3 and 4 are in place. Which motor_output_reordering will fix the order?",
    "kind": "apply",
    "fragment": "mixer QUADX: 1=REAR_R 2=FRONT_R 3=REAR_L 4=FRONT_L\nslider 1 -> FRONT_R spins\nslider 2 -> REAR_R spins\nslider 3 -> REAR_L spins\nslider 4 -> FRONT_L spins\nmotor_output_reordering = 0,1,2,3,4,5,6,7",
    "options": [
@@ -57,40 +57,40 @@
     "3,2,1,0,4,5,6,7"
    ],
    "answer": 0,
-   "explain": "Мотор миксера i выводится на пад с номером reordering[i]. Задний правый (мотор 1) физически сидит на паде M2 (индекс 1), передний правый — на M1 (индекс 0). Значит, 1,0,2,3."
+   "explain": "Mixer motor i is output on the pad numbered reordering[i]. The rear right (motor 1) physically sits on pad M2 (index 1), and the front right — on M1 (index 0). So 1,0,2,3."
   },
   {
-   "q": "В Betaflight SITL остановили поток RC-пакетов на UDP 9004. Что покажет status?",
+   "q": "In Betaflight SITL the stream of RC packets on UDP 9004 was stopped. What will status show?",
    "options": [
-    "RXLOSS через 100 мс, затем Stage 1 и Stage 2 по failsafe_delay, как на плате",
-    "FAILSAFE и снятие арма через failsafe_delay",
-    "Ничего: статус кадра в SITL всегда «получен», нужен тумблер FAILSAFE",
-    "MSP: RC перехватывается по MSP"
+    "RXLOSS after 100 ms, then Stage 1 and Stage 2 by failsafe_delay, as on a board",
+    "FAILSAFE and a disarm after failsafe_delay",
+    "Nothing: the frame status in SITL is always “received”; a FAILSAFE switch is needed",
+    "MSP: RC is taken over by MSP"
    ],
    "answer": 2,
-   "explain": "rxRCFrameStatus() в sitl.c всегда возвращает RX_FRAME_COMPLETE после первого пакета. Failsafe в SITL проверяют режимом FAILSAFE (id 27) с failsafe_switch_mode."
+   "explain": "rxRCFrameStatus() in sitl.c always returns RX_FRAME_COMPLETE after the first packet. Failsafe in SITL is checked with the FAILSAFE mode (id 27) with failsafe_switch_mode."
   },
   {
-   "q": "Аппарат с PWM-ESC (min_command 1000, max_throttle 2000): один мотор стартует заметно позже остальных. Что сделать?",
+   "q": "An aircraft with PWM ESCs (min_command 1000, max_throttle 2000): one motor starts noticeably later than the others. What should be done?",
    "options": [
-    "Поднять motor_idle до 700, чтобы мотор раньше трогался",
-    "Калибровка ESC мастер-ползунком 2000 → 1000 без пропов",
-    "Поменять motor_poles с 14 на 12 и сохранить",
-    "Включить dshot_bidir и RPM-фильтр на всех ESC"
+    "Raise motor_idle to 700 so that the motor starts earlier",
+    "ESC calibration with the master slider 2000 → 1000 without props",
+    "Change motor_poles from 14 to 12 and save",
+    "Enable dshot_bidir and the RPM filter on all the ESCs"
    ],
    "answer": 1,
-   "explain": "PWM-ESC сами определяют границы импульса, их надо научить 1000/2000 мкс. motor_idle (до 2025.12 — dshot_idle_value) калибровку границ не заменяет, а dshot_bidir и motor_poles к PWM не относятся."
+   "explain": "PWM ESCs determine the pulse limits themselves, so they have to be taught 1000/2000 µs. motor_idle (before 2025.12 — dshot_idle_value) does not replace calibration of the limits, and dshot_bidir and motor_poles have nothing to do with PWM."
   },
   {
-   "q": "Первое висение: при отрыве аппарат резко кренится и крутится на месте. Правильная реакция?",
+   "q": "The first hover: at liftoff the aircraft rolls sharply and spins in place. The correct reaction?",
    "options": [
-    "Добавить газ и выровнять аппарат стиками в воздухе",
-    "Немедленный дизарм; на столе без пропов проверить порядок и направление моторов",
-    "Поднять P на крене на 20 %, проверить затяжку пропов и сразу повторить отрыв на той же площадке",
-    "Переключиться в ACRO, где нет самовыравнивания, и попробовать снова"
+    "Add throttle and level the aircraft with the sticks in the air",
+    "Disarm immediately; on the bench without props check the motor order and direction",
+    "Raise roll P by 20 %, check that the props are tight and repeat the liftoff right away on the same spot",
+    "Switch to ACRO, where there is no self-leveling, and try again"
    ],
    "answer": 1,
-   "explain": "Переворот при отрыве — признак неверного порядка или направления моторов либо ошибки ориентации платы. PID здесь ни при чём, а попытка «вытянуть» стиками ломает пропы и раму."
+   "explain": "A flip at liftoff is a sign of a wrong motor order or direction, or of a board orientation error. PID has nothing to do with it, and trying to “pull it out” with the sticks breaks props and the frame."
   }
  ]
 }

@@ -1,0 +1,57 @@
+{
+  "module": "bf-ports",
+  "tasks": [
+    {
+      "id": "mask-msp-shared",
+      "title": "A port mask: MSP and a second function",
+      "statement": "A port has MSP enabled plus one more function whose bit in the `serialPortFunction_e` table is **{b}**. What function mask will the `serial` line of this port show?",
+      "params": {
+        "b": [
+          4,
+          16,
+          32,
+          128,
+          512,
+          131072
+        ]
+      },
+      "answer": "1 + b",
+      "unit": "",
+      "tol": 0.0001,
+      "abs": 0.5,
+      "solution": "A port mask is the sum of the bits of its functions. MSP = 1, so the mask = 1 + the bit of the second function: for example, 1 + 131072 = 131073 for an HD system (MSP + VTX), 1 + 128 = 129 for MSP with Blackbox."
+    },
+    {
+      "id": "msp-port-count",
+      "title": "How many ports with MSP",
+      "statement": "The port masks in `diff all` are: VCP — 1, UART1 — **{a}**, UART2 — **{b}**, UART3 — **{c}**, UART4 — **{d}**. How many ports with MSP will the configuration check count (no more than three are allowed)?",
+      "params": {
+        "a": [
+          1,
+          64,
+          131073
+        ],
+        "b": [
+          2,
+          64,
+          129
+        ],
+        "c": [
+          1,
+          33,
+          2048
+        ],
+        "d": [
+          0,
+          513,
+          1024
+        ]
+      },
+      "answer": "1 + a%2 + b%2 + c%2 + d%2",
+      "unit": "ports",
+      "tol": 0.0001,
+      "abs": 0.4,
+      "solution": "MSP is bit 1, that is, the lowest bit of the mask: every odd mask has it (1, 33, 129, 513, 131073). USB VCP counts on a par with the UARTs, and MSP is mandatory on it. If the result is more than three, the port configuration is invalid and is reset to defaults at boot."
+    }
+  ]
+}

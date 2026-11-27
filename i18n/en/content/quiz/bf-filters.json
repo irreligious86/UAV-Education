@@ -6,7 +6,7 @@
       "q": "Why filter the gyro signal?",
       "options": [
         "To make the graphs look nice",
-        "To keep noise out of the PID",
+        "So that noise does not go into the PID",
         "To reduce delay",
         "To raise P"
       ],
@@ -14,51 +14,51 @@
       "explain": "Motor and frame noise must not reach the PID and the motors: D amplifies noise, and the motors heat up."
     },
     {
-      "q": "What is the price of any filter?",
+      "q": "What is the cost of any filter?",
       "options": [
-        "Higher battery draw for processing",
+        "More battery drain for processing",
         "Signal delay",
-        "Link loss",
-        "There is no price"
+        "Loss of link",
+        "There is no cost"
       ],
       "answer": 1,
       "explain": "A filter lags behind the signal: more filtering means a slower response."
     },
     {
-      "q": "The most effective motor-noise filter in Betaflight?",
+      "q": "The most effective motor noise filter in Betaflight?",
       "options": [
-        "Static notch",
-        "RPM filter",
+        "A static notch",
+        "The RPM filter",
         "LPF2",
-        "The D-term filter"
+        "The D term filter"
       ],
       "answer": 1,
-      "explain": "The RPM filter puts narrow notches exactly on each motor's frequency using ESC telemetry."
+      "explain": "The RPM filter places narrow notches exactly on the frequency of each motor using ESC telemetry."
     },
     {
       "q": "What does the dynamic notch do?",
       "options": [
         "Cuts everything above a frequency",
-        "Puts notches on spectrum peaks",
+        "Places notches on the peaks of the spectrum",
         "Lowers P",
         "Doubles D at the peak frequency"
       ],
       "answer": 1,
-      "explain": "The dynamic notch tracks frame resonances and whatever else the RPM filter didn't catch."
+      "explain": "The dynamic notch tracks frame resonances and whatever else the RPM filter did not catch."
     },
     {
-      "q": "The cascade order in Betaflight 4.5?",
+      "q": "The order of the cascade in Betaflight (4.5 and 2025.12)?",
       "options": [
         "LPF → notch → RPM",
-        "RPM → dyn notch → LPF",
-        "Only LPF, notches are off by default",
+        "RPM notches → static notches → LPF1 → dynamic notch",
+        "Only LPF, the notches are off by default",
         "Only RPM"
       ],
       "answer": 1,
-      "explain": "First the precise per-motor notches, then the automatic ones, then the final lowpass."
+      "explain": "In filterGyro() the precise per-motor RPM notches come first (after the LPF2 applied at downsampling), then the static notches and LPF1, and the dynamic notch runs last."
     },
     {
-      "q": "The motors are hot after changing the filters. What do you do?",
+      "q": "The motors are hot after a filter change. What do you do?",
       "options": [
         "Raise P to override the noise",
         "Roll back and look at the spectrum",
@@ -66,25 +66,25 @@
         "Keep flying"
       ],
       "answer": 1,
-      "explain": "Heat is a sign of noise getting through. Go back to a working state, then analyze."
+      "explain": "Heat is a sign of noise getting through. Go back to the working state, then analyze."
     },
     {
-      "q": "In what order are the gyro filters applied in Betaflight 4.5?",
+      "q": "In what order are the gyro filters applied in Betaflight (4.5 and 2025.12)?",
       "options": [
         "LPF1 → LPF2 → RPM → dyn notch",
-        "RPM → dyn notch → LPF1 → LPF2",
+        "LPF2 → RPM → static notches → LPF1 → dyn notch",
         "dyn notch → RPM → LPF1 → LPF2",
-        "LPF1 → LPF2 without notches"
+        "LPF1 → LPF2 with no notches"
       ],
       "answer": 1,
-      "explain": "The order from gyroFiltering(): narrowband notches first, then the LPFs."
+      "explain": "The order from filterGyro() (sensors/gyro_filter_impl.c): LPF2 at downsampling, the RPM notches, the two static notches, LPF1, and the dynamic notch last."
     },
     {
       "q": "What does simplified_gyro_filter_multiplier = 150 do?",
       "options": [
-        "Lowers the cutoff frequencies by 50%",
-        "Raises the cutoff frequencies by 50%",
-        "Disables the RPM filter and enables PT3 instead",
+        "Lowers the cutoff frequencies by 50 %",
+        "Raises the cutoff frequencies by 50 %",
+        "Disables the RPM filter and enables a PT3 instead",
         "Doubles the notch frequency"
       ],
       "answer": 1,
@@ -94,25 +94,25 @@
       "q": "Which “filtered enough” criterion is wrong?",
       "options": [
         "Motor peaks ≤ 5–10 dB above the floor",
-        "Motors warm, not hot",
-        "Gyro LPF below 100 Hz on a 5\"",
-        "bounce-back < 15% and no “mush”"
+        "The motors are warm, not hot",
+        "The gyro LPF below 100 Hz on a 5\"",
+        "bounce-back < 15% and no “mushiness”"
       ],
       "answer": 2,
-      "explain": "A low LPF “hides” mechanics at the cost of delay — that's not a criterion, it's a symptom."
+      "explain": "A low LPF “hides” the mechanics at the cost of delay — that is not a criterion but a symptom."
     },
     {
       "q": "The course grader's output for a 5\" log. Which conclusion is correct?",
       "kind": "apply",
       "fragment": "[FAIL] filters  roll noise after filters: 12.9 (limit <= 4.0 deg/s)\n[FAIL] filters  roll noise reduction: 4.4 (limit >= 6.0 dB)\n[PASS] filters  roll dominant noise frequency: 250.0\n[FAIL] rpm      eRPM telemetry logged: None (limit present)",
       "options": [
-        "Motor noise (~250 Hz) gets through the filters, and the RPM filter isn't working — there's no eRPM telemetry",
-        "The 250 Hz peak is a frame resonance; the RPM filter won't help here, only a static notch will",
-        "The filters are too strong: 4 dB of reduction means an over-filtered gyro, they need to be relaxed",
+        "Motor noise (~250 Hz) gets through the filters, and the RPM filter is not working — there is no eRPM telemetry",
+        "The 250 Hz peak is a frame resonance; the RPM filter will not help here, only a static notch is needed",
+        "The filters are too strong: 4 dB of attenuation means an over-filtered gyro, they have to be loosened",
         "The gyro is damaged: 13 °/s of noise after the filters is impossible on a healthy sensor"
       ],
       "answer": 0,
-      "explain": "A peak at the motor frequency, weak reduction and no eRPM point to a non-working RPM filter."
+      "explain": "A peak at the motor frequency, weak attenuation and the absence of eRPM point to an RPM filter that is not working."
     }
   ]
 }

@@ -7,44 +7,44 @@
       "options": [
         "Choosing the VTX channel",
         "UART roles: RX, VTX, GPS",
-        "OSD setup",
-        "Motor and ESC calibration"
+        "Setting up the OSD",
+        "Calibrating the motors and ESCs"
       ],
       "answer": 1,
-      "explain": "Each UART gets a role; without it the FC doesn't know where to look for the receiver or GPS."
+      "explain": "Every UART is given a role; without it the FC does not know where to look for the receiver or GPS."
     },
     {
-      "q": "Serial RX is enabled on UART2, the receiver is soldered to UART1. The result?",
+      "q": "Serial RX is enabled on UART2, and the receiver is soldered to UART1. The result?",
       "options": [
         "Arming is impossible because of RXLOSS",
-        "The FC listens to the wrong port",
+        "The FC listens on the wrong port",
         "Everything works",
-        "The VTX won't configure"
+        "The VTX cannot be set up"
       ],
       "answer": 1,
       "explain": "The port role must match the physical connection."
     },
     {
-      "q": "Can you assign two devices to one UART?",
+      "q": "Can two devices be assigned to one UART?",
       "options": [
-        "Only GPS and VTX on F7",
-        "No, one role per UART",
+        "Only GPS and VTX on an F7",
+        "Only in the pairs the firmware allows",
         "Yes, always",
-        "Only on F7"
+        "Only on an F7"
       ],
       "answer": 1,
-      "explain": "A UART is one TX/RX pair. Two roles on one port conflict."
+      "explain": "A UART is one TX/RX pair, and the firmware accepts only certain pairs of functions on one port: MSP with telemetry, Blackbox or VTX_MSP; Serial RX with some telemetry. Any other pair makes the port configuration invalid."
     },
     {
       "q": "What is softserial?",
       "options": [
-        "The USB port",
+        "A USB port",
         "A slow software UART",
-        "A lightweight firmware for F4",
+        "Lightweight firmware for F4",
         "A receiver type"
       ],
       "answer": 1,
-      "explain": "Software emulation of a UART on regular pins: it helps when you've run out of UARTs, but it's no good for SBUS."
+      "explain": "A software emulation of a UART on ordinary pins: it helps when the UARTs have run out, but it is not suitable for SBUS."
     },
     {
       "q": "The FC's USB port is shown in Ports as…",
@@ -52,10 +52,10 @@
         "UART0",
         "USB VCP",
         "Softserial",
-        "Not shown"
+        "It is not shown"
       ],
       "answer": 1,
-      "explain": "USB VCP is a virtual COM port for the configurator and the CLI."
+      "explain": "USB VCP is the virtual COM port for the configurator and the CLI."
     },
     {
       "q": "The line `serial 2 64 115200 57600 0 115200` means:",
@@ -66,7 +66,7 @@
         "UART2 = MSP at 115200"
       ],
       "answer": 1,
-      "explain": "Identifier 2 = UART3, 64 = Serial RX."
+      "explain": "Identifier 2 = UART3, 64 = Serial RX. This is the 4.5 notation; in 2025.12 `diff` writes `serial UART3 64 …`, but it accepts the numbers too."
     },
     {
       "q": "How many ports with MSP are allowed at the same time?",
@@ -77,20 +77,20 @@
         "Any number, if the baud rates differ"
       ],
       "answer": 1,
-      "explain": "A fourth one causes the MSP settings to reset."
+      "explain": "A fourth makes the port configuration invalid, and at boot all ports are reset to the board defaults."
     },
     {
-      "q": "An ExpressLRS receiver is connected to UART2. The aircraft doesn't see the sticks. The cause is in this diff:",
+      "q": "An ExpressLRS receiver is connected to UART2. The aircraft does not see the sticks. The cause is in this diff:",
       "kind": "apply",
       "fragment": "serial 1 64 115200 57600 0 115200\nset serialrx_provider = SBUS\nset serialrx_inverted = OFF",
       "options": [
-        "serialrx_provider = SBUS, but ELRS speaks CRSF — you need serialrx_provider = CRSF",
-        "Mask 64 on UART2 means MSP, not Serial RX — the receiver is connected to the telemetry port",
-        "115200 baud is too low for ELRS: CRSF requires 420000, and that is set in the serial command",
-        "serialrx_inverted = OFF: ELRS on UART2 needs the software inverter turned on"
+        "serialrx_provider = SBUS, while ELRS speaks CRSF — serialrx_provider = CRSF is needed",
+        "Mask 64 on UART2 means MSP, not Serial RX — the receiver is connected to a telemetry port",
+        "115200 is too slow for ELRS: CRSF requires 420000, and that is set in the serial command",
+        "serialrx_inverted = OFF: ELRS on UART2 needs the software inverter enabled"
       ],
       "answer": 0,
-      "explain": "serial 1 (UART2) with mask 64 is Serial RX, that's correct; the protocol is wrong."
+      "explain": "serial 1 (UART2) with mask 64 is Serial RX, which is correct; the protocol is the wrong one."
     }
   ]
 }

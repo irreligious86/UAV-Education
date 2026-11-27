@@ -1,0 +1,105 @@
+{
+  "module": "bf-tuning-method",
+  "pass": 80,
+  "questions": [
+    {
+      "q": "Profile B differs from A in D alone. One flight of A was compared with one flight of B: propwash −13 %. What can be said?",
+      "options": [
+        "B is better: 13 % is more than the typical noise",
+        "Nothing: the spread within an arm is not estimated",
+        "B is better if the pilot felt the difference too",
+        "B is worse: the effect is below 15 %"
+      ],
+      "answer": 1,
+      "explain": "With one flight per arm the standard deviation is undefined, and the minimum p of the permutation test is 1. In the lab the same pair showed −33 % in motor headroom, which B does not change at all."
+    },
+    {
+      "q": "A session of 10 flights, and the wind picks up toward evening. Which order of A and B mixes the drift with the effect the least?",
+      "options": [
+        "AAAAA BBBBB — the profiles do not get mixed up in the field",
+        "BBBBB AAAAA — the control at the end",
+        "ABBA ABBA AB — the drift is split almost evenly",
+        "Any: the number of flights is the same"
+      ],
+      "answer": 2,
+      "explain": "In blocks B gets all of the late drift (in the lab +21 % against +6 % for A), and the −15 % effect disappears. In ABBA the average drift of the arms is +13.2 % and +13.8 %."
+    },
+    {
+      "q": "What is the smallest two-sided p that an exact permutation test can give with 3 flights per arm?",
+      "options": [
+        "0.050",
+        "0.029",
+        "0.100",
+        "0.333"
+      ],
+      "answer": 2,
+      "explain": "The minimum p = 2 / C(2n, n). At n = 3: C(6, 3) = 20, p = 2/20 = 0.10. The 0.05 threshold is unattainable even with perfect separation; no fewer than 4 flights per arm are needed."
+    },
+    {
+      "q": "Can the PID profile be switched from a switch in flight in Betaflight 4.5?",
+      "options": [
+        "Yes, with function 12 in `adjrange`",
+        "Yes, with a separate PID PROFILE mode in the Modes tab",
+        "No, only the OSD and LED profiles",
+        "No: the PID profile is changed only on the ground"
+      ],
+      "answer": 3,
+      "explain": "`fc/rc_adjustments.h` has no PID-profile select function, and there is no such mode either. Function 12 is RATE_PROFILE. The PID profile: the sticks while disarmed, the OSD menu, the App or `profile N`; MSP_SELECT_SETTING ignores it while armed. The gains can be written over MSP in flight, but that is not a profile change, and there is no Blackbox event."
+    },
+    {
+      "q": "The slot `adjrange 0 0 3 900 2100 20 3 43 3`, and the AUX4 switch gives 988 and 2012 µs. What are the `d_roll` values?",
+      "options": [
+        "40 and 46",
+        "37 and 49",
+        "43 and 46",
+        "40 and 43"
+      ],
+      "answer": 0,
+      "explain": "Absolute mode: 43 + (rc − 1500)·3/500 with C division toward zero. 988 → −3.07 → −3 → 40; 2012 → +3.07 → +3 → 46."
+    },
+    {
+      "q": "In the same slot the switch gives 1100 µs in the lower position. What is the result?",
+      "options": [
+        "`d_roll` = 40, as intended",
+        "`d_roll` = 41: C division dropped the fraction",
+        "The slot is not active outside the 1000–2000 µs range",
+        "`d_roll` = 39 because of rounding down"
+      ],
+      "answer": 1,
+      "explain": "(1100 − 1500)·3/500 = −2.4, C integer division gives −2, and the value is 41. The channel endpoints must reach 1000 and 2000."
+    },
+    {
+      "q": "The flight-to-flight spread of propwash is CV = 8 %, and the expected effect is 15 %. How many flights per arm by the course formula?",
+      "options": [
+        "2",
+        "3",
+        "5",
+        "12"
+      ],
+      "answer": 2,
+      "explain": "n ≈ 16·(CV/Δ)² = 16·(0.08/0.15)² = 4.55 → 5. In the lab at n = 5 the effect is found in 92.5 % of series, and at n = 4 — in 67 %."
+    },
+    {
+      "q": "Why fly A against A once with the same program?",
+      "options": [
+        "To warm up the motors before the session",
+        "To measure the metric's own noise",
+        "To check that Blackbox works on the ground",
+        "To zero the I term before B"
+      ],
+      "answer": 1,
+      "explain": "An A/A test shows the spread of the metric without any effect: the CV for the plan is taken from it, and it shows the false alarm rate (about 5 % in the lab)."
+    },
+    {
+      "q": "Profile A is on the first 7\" and profile B on a second identical one; B has 12 % less propwash. How do you get an honest conclusion?",
+      "options": [
+        "Repeat the comparison on the same two drones",
+        "Swap the props and compare again",
+        "Each drone flies both profiles, the effect within the drone",
+        "Take the average of the two drones as the control"
+      ],
+      "answer": 2,
+      "explain": "The aircraft and the profile change together. In the bf-pid case one profile gave a bounce-back of 2.9 and 8.5 % on two “identical” drones (the analysis there — different piloting sharpness): the “drone/session” difference is larger than the difference between profiles. A crossover design separates the profile from the aircraft."
+    }
+  ]
+}

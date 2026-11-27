@@ -5,16 +5,16 @@
     {
       "q": "What is P responsible for in PID?",
       "options": [
-        "It accumulates error",
-        "It pushes back based on the current error",
+        "It accumulates the error",
+        "It pushes back in proportion to the current error",
         "It filters noise",
-        "It predicts motion from the stick"
+        "It predicts the movement from the stick"
       ],
       "answer": 1,
-      "explain": "P reacts to the current deviation: the bigger the error, the stronger the correction right now."
+      "explain": "P reacts to the current deviation: the larger the error, the stronger the correction right now."
     },
     {
-      "q": "The drone is hovering, but the wind keeps pushing it and it doesn't return exactly to its spot. Which PID term is responsible for this?",
+      "q": "A drone hovers, but the wind keeps pushing it away and it does not return exactly to its place. Which PID term is responsible for this?",
       "options": [
         "P",
         "I",
@@ -27,40 +27,40 @@
     {
       "q": "What does D do?",
       "options": [
-        "Amplifies P",
-        "Brakes fast changes",
-        "Changes throttle",
-        "Enables air mode at zero throttle"
+        "It boosts P",
+        "It damps fast changes",
+        "It changes the throttle",
+        "It turns on air mode at zero throttle"
       ],
       "answer": 1,
-      "explain": "D looks at the rate of change of the error and damps overshoot."
+      "explain": "D looks at the rate of change of the error and damps the overshoot."
     },
     {
-      "q": "Too much D usually gives you…",
+      "q": "A D that is too high usually gives…",
       "options": [
         "Sluggishness and drift",
         "Hot motors",
-        "Slow wobble",
+        "Slow rocking",
         "Loss of link"
       ],
       "answer": 1,
-      "explain": "Hot motors and a “mushy” response: D amplifies high-frequency noise, the motors chase it and heat up."
+      "explain": "Hot motors and a “mushy” response: D amplifies high-frequency noise, and the motors work it off and heat up."
     },
     {
       "q": "What is feedforward?",
       "options": [
         "A gyro filter",
         "A contribution straight from stick movement",
-        "Doubled P on fast moves",
+        "A doubled P on fast movements",
         "A flight mode"
       ],
       "answer": 1,
-      "explain": "FF reacts to the pilot's command before an error appears and speeds up the start of the move."
+      "explain": "FF reacts to the pilot's command before an error appears and speeds up the start of the movement."
     },
     {
-      "q": "Too much P gives you…",
+      "q": "A P that is too high gives…",
       "options": [
-        "Hot motors with no visible oscillation",
+        "Hot motors without visible oscillations",
         "Fast oscillation, twitchiness",
         "Drift",
         "Loss of altitude"
@@ -69,26 +69,26 @@
       "explain": "P overcorrects — the drone shakes at a high frequency."
     },
     {
-      "q": "What is the D-term computed from in Betaflight?",
+      "q": "What is the D term computed from in Betaflight?",
       "options": [
-        "The pilot's setpoint",
-        "The gyro",
-        "The error",
-        "The motors"
+        "From the pilot's setpoint",
+        "From the gyro",
+        "From the error",
+        "From the motors"
       ],
       "answer": 1,
-      "explain": "From the filtered gyro: no derivative kick when the stick moves."
+      "explain": "From the filtered gyro: there is no derivative kick when the stick moves."
     },
     {
       "q": "What does I-term relax do?",
       "options": [
-        "Raises I",
-        "Doesn't accumulate I on sharp stick input",
-        "Disables I at zero throttle",
-        "Smooths D"
+        "It raises I",
+        "It does not accumulate I on a sharp stick movement",
+        "It turns I off at zero throttle",
+        "It smooths D"
       ],
       "answer": 1,
-      "explain": "It pauses I accumulation during fast stick moves; otherwise I “carries through” after a flip."
+      "explain": "It suspends I accumulation during fast stick movements; otherwise I adds extra rotation after a flip."
     }
   ]
 }

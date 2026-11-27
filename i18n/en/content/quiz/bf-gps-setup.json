@@ -1,0 +1,96 @@
+{
+ "module": "bf-gps-setup",
+ "pass": 80,
+ "questions": [
+  {
+   "q": "Betaflight 2025.12, gps_auto_config = ON. When does the u-blox module get the dynamic model gps_ublox_flight_model (AIRBORNE_4G)?",
+   "options": [
+    "On the first 3D fix after power-up",
+    "At the moment the aircraft is first armed",
+    "When the satellite count reaches gps_rescue_min_sats",
+    "Right after the UART is switched to 57600"
+   ],
+   "answer": 0,
+   "explain": "gpsUpdate(): in the RECEIVING_DATA state, on the first STATE(GPS_FIX), NAV5/VALSET with the flight model is sent. Arming has nothing to do with it, although the GPS page in the documentation says “Stationary before arming”. Before the fix gps_ublox_acquire_model (STATIONARY) is in effect. The same in 4.5."
+  },
+  {
+   "q": "What does the variable gps_auto_baud = ON do in Betaflight 2025.12 for gps_provider = UBLOX?",
+   "kind": "apply",
+   "fragment": "# status\nGPS: connected, UART2 57600 (set to AUTO), configured, version =  M10\n# get gps_auto_baud\ngps_auto_baud = ON",
+   "options": [
+    "Enables the baud rate search; without it the module is looked for only at 57600",
+    "Changes only the text in status: the baud rate search for UBLOX always runs",
+    "Lets the module choose the baud rate itself after every reboot",
+    "Enables a new baud rate search after every 2.5 s loss of communication"
+   ],
+   "answer": 1,
+   "explain": "In both 2025.12 and 4.5 autoBaud is read only in cli.c (the “set to AUTO” string) and in MSP. gpsConfigureUblox() always cycles through the baud rates with MON-VER requests; the comment in LOST_COMMUNICATION says outright that the auto-baud code was removed."
+  },
+  {
+   "q": "GPS Rescue is configured (failsafe_procedure = GPS-RESCUE), gps_rescue_min_sats = 8. The module gives a 3D fix and 7 satellites. What happens on an arm attempt?",
+   "options": [
+    "It arms, but home is not recorded",
+    "It does not arm: the GPS flag is set",
+    "It arms, and Rescue turns off",
+    "It arms after READY_BEEP"
+   ],
+   "answer": 1,
+   "explain": "updateArmingStatus(): with Rescue configured the ARMING_DISABLED_GPS flag is cleared only with a fix and numSat ≥ minSats (or after the first arm, or with allow_arming_without_fix). With 7 out of 8 the flag stays set."
+  },
+  {
+   "q": "gps_set_home_point_once = OFF. The aircraft landed 300 m from the launch point, the pilot disarmed, armed again and took off. Then the link was lost. Where will GPS Rescue return to?",
+   "options": [
+    "To the point of the first arm after power-up",
+    "To the point of the re-arm, 300 m from the launch point",
+    "To the point of the last 3D fix before landing",
+    "Nowhere: after a disarm home is unavailable until reboot"
+   ],
+   "answer": 1,
+   "explain": "With OFF gpsUpdate() clears GPS_FIX_HOME on every disarm, and GPS_reset_home_position() on arming writes the current point (with a fix and sats ≥ min_sats). ON keeps the first home until reboot."
+  },
+  {
+   "q": "A MAX-M10S with the factory constellation set (GPS + Galileo + BeiDou B1I), and Betaflight requests gps_update_rate_hz = 10. What navigation rate ceiling does the datasheet give for this set?",
+   "options": [
+    "18 Hz",
+    "10 Hz",
+    "3 Hz",
+    "6 Hz"
+   ],
+   "answer": 2,
+   "explain": "The MAX-M10S datasheet (SPG 5.10): 3 Hz for GPS+GAL+BDS B1I, 10 Hz for GPS+GAL, 6 Hz for GPS+GAL+GLO, 18 Hz for a single system. Either set 3 Hz, or use u-center to select the GPS+GAL set."
+  },
+  {
+   "q": "In the lab, VTX noise of +10 dB on a cold start: all 28 satellites are tracked, but only 9 are in the solution. Why?",
+   "options": [
+    "Betaflight discards satellites with C/N0 below 30 dB-Hz",
+    "PDOP rose above the mask of 25, and the extra satellites are excluded",
+    "The ephemeris needs a stronger signal than tracking does",
+    "The UART cannot carry NAV-SAT with 28 satellites at 57600"
+   ],
+   "answer": 2,
+   "explain": "The cold-start sensitivity of the M10 is −148 dBm, tracking — −167 dBm. The weak satellites are visible, but their ephemeris has not been downloaded, and they do not go into the solution. Betaflight does not select satellites at all; it takes numSV from NAV-PVT."
+  },
+  {
+   "q": "An M10 receives Galileo by default. In Betaflight 2025.12: gps_ublox_use_galileo = OFF, gps_sbas_mode = AUTO. What happens to Galileo?",
+   "options": [
+    "It is disabled: Betaflight writes that to CFG-SIGNAL",
+    "It is disabled after the aircraft is first armed",
+    "It stays as in the module: the CFG-GNSS step is skipped",
+    "It is forced on together with SBAS"
+   ],
+   "answer": 2,
+   "explain": "The UBLOX_MSG_CFG_GNSS step runs only with SBAS = NONE or Galileo = ON. With SBAS AUTO and Galileo OFF it is skipped, and Galileo stays as set in the module. Betaflight does not write CFG-SIGNAL at all (verified on 4.5-maintenance, code = 4.5.5; the condition of the CFG-GNSS step in 2025.12.5 is the same)."
+  },
+  {
+   "q": "There is no compass. Right after takeoff the home arrow in the OSD points the wrong way. What, by the imu.c code (2025.12, the same in 4.5), will correct the heading?",
+   "options": [
+    "Hovering in place for 30 s while GPS averages the heading",
+    "A straight, level pass faster than 1–2 m/s",
+    "Rewriting home with the GPS RESCUE switch on the ground",
+    "A slow 360° yaw rotation in place"
+   ],
+   "answer": 1,
+   "explain": "The correction from the GPS course over ground kicks in after the speed exceeds 1 m/s, the weight grows with speed and with the forward nose tilt (it is zero when level), and a roll of more than 12° and the yaw stick suppress it. In a hover the course over ground is random and the weight is about zero. The documentation: 30–50 m straight."
+  }
+ ]
+}

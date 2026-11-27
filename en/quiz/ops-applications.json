@@ -3,116 +3,116 @@
   "pass": 80,
   "questions": [
     {
-      "q": "С чего начинается правило выбора аппарата под прикладную задачу?",
+      "q": "Where does the rule for choosing an aircraft for an applied job start?",
       "options": [
-        "С описания работы одной фразой с числами: что, где, сколько, как точно, над кем",
-        "С выбора прошивки, которая поддерживает нужную полезную нагрузку и механизм сброса",
-        "С проверки, какие аппараты уже есть в парке и что они могут нести",
-        "С расчёта бюджета радиолинии на максимальную дальность"
+        "With a description of the job in one sentence with numbers: what, where, how much, how accurately, over whom",
+        "With choosing firmware that supports the required payload and release mechanism",
+        "With checking which aircraft are already in the fleet and what they can carry",
+        "With calculating the radio link budget for the maximum range"
       ],
       "answer": 0,
-      "explain": "Порядок обратный «от аппарата»: работа → шесть требований → класс по дереву → позиционирование → регуляторный коридор. Аппарат и прошивка — следствие требований."
+      "explain": "The order is the reverse of “from the aircraft”: job → six requirements → class by the tree → positioning → regulatory corridor. The aircraft and firmware follow from the requirements."
     },
     {
-      "q": "Ширина захвата 7 м, скорость 6 м/с. Какова теоретическая производительность опрыскивателя?",
+      "q": "Swath width 7 m, speed 6 m/s. What is the theoretical productivity of the sprayer?",
       "options": [
-        "4.2 га/ч",
-        "15.12 га/ч",
-        "42 га/ч",
-        "10.58 га/ч"
+        "4.2 ha/h",
+        "15.12 ha/h",
+        "42 ha/h",
+        "10.58 ha/h"
       ],
       "answer": 1,
-      "explain": "P = B·v·3600/10 000 = 7·6·0.36 = 15.12 га/ч. 10.58 га/ч — это уже с коэффициентом использования 0.7 (развороты, дозаправка), а не теоретическое значение."
+      "explain": "P = B·v·3600/10,000 = 7·6·0.36 = 15.12 ha/h. 10.58 ha/h is already with the utilization factor of 0.7 (turns, refilling), not the theoretical value."
     },
     {
-      "q": "ArduCopter 4.7.2, `SPRAY_PUMP_RATE = 10`, `SPRAY_PUMP_MIN = 0`. Что происходит с нормой внесения на скорости галса 12 м/с?",
+      "q": "ArduCopter 4.7.2, `SPRAY_PUMP_RATE = 10`, `SPRAY_PUMP_MIN = 0`. What happens to the application rate at a pass speed of 12 m/s?",
       "options": [
-        "Норма остаётся постоянной: ход насоса растёт пропорционально скорости без ограничений",
-        "Распыление выключается, потому что скорость выше `SPRAY_SPEED_MIN`",
-        "Насос упирается в 100 % уже на 10 м/с, и на 12 м/с норма на гектар падает",
-        "Насос переходит на `SPRAY_PUMP_MIN`, и норма падает до нуля"
+        "The rate stays constant: the pump duty grows in proportion to speed without limits",
+        "Spraying turns off because the speed is above `SPRAY_SPEED_MIN`",
+        "The pump hits 100 % already at 10 m/s, and at 12 m/s the rate per hectare drops",
+        "The pump switches to `SPRAY_PUMP_MIN`, and the rate drops to zero"
       ],
       "answer": 2,
-      "explain": "В `AC_Sprayer.cpp` ход насоса = скорость·SPRAY_PUMP_RATE, ограниченный 100 %. При 10 %/(м/с) насыщение наступает на 10 м/с; выше расход не растёт, а площадь в минуту растёт — норма на гектар падает. `SPRAY_SPEED_MIN` — нижний порог включения, не верхний."
+      "explain": "In `AC_Sprayer.cpp` the pump duty = speed·SPRAY_PUMP_RATE, limited to 100 %. At 10 %/(m/s) saturation occurs at 10 m/s; above that the flow does not grow while the area per minute does — the rate per hectare drops. `SPRAY_SPEED_MIN` is the lower turn-on threshold, not an upper one."
     },
     {
-      "q": "Почему опрыскивателю под Part 107 нужно освобождение от § 107.36?",
+      "q": "Why does a sprayer under Part 107 need an exemption from § 107.36?",
       "options": [
-        "§ 107.36 ограничивает высоту полёта 400 футами над землёй",
-        "§ 107.36 запрещает полёты ночью без огней предупреждения столкновений",
-        "§ 107.36 запрещает одному пилоту управлять несколькими аппаратами",
-        "§ 107.36 запрещает малому БПЛА нести опасные вещества (hazmat)"
+        "§ 107.36 limits flight altitude to 400 feet above the ground",
+        "§ 107.36 prohibits flying at night without anti-collision lights",
+        "§ 107.36 prohibits one pilot from operating several aircraft",
+        "§ 107.36 prohibits a small UAV from carrying hazardous materials (hazmat)"
       ],
       "answer": 3,
-      "explain": "§ 107.36: «A small unmanned aircraft may not carry hazardous material». Поэтому FAA для аппаратов легче 55 фунтов даёт exemption от § 107.36 и ряда правил Part 137; тяжелее — путь через Parts 91 и 137."
+      "explain": "§ 107.36: “A small unmanned aircraft may not carry hazardous material”. So for aircraft lighter than 55 pounds the FAA grants an exemption from § 107.36 and a number of Part 137 rules; heavier ones go through Parts 91 and 137."
     },
     {
-      "q": "Нужно записать в отчёт температуру контактов на подстанции. Какой тепловизор и почему?",
+      "q": "You need to record the temperature of contacts at a substation in a report. Which thermal camera, and why?",
       "kind": "apply",
-      "fragment": "Цель: контакт 10 см\nКамера A: радиометрическая, 640x512, пиксель 12 мкм, f = 13 мм\nКамера B: нерадиометрическая, 640x512, пиксель 12 мкм, f = 13 мм\nПланируемая дистанция: 30 м",
+      "fragment": "Target: a 10 cm contact\nCamera A: radiometric, 640x512, 12 µm pixel, f = 13 mm\nCamera B: non-radiometric, 640x512, 12 µm pixel, f = 13 mm\nPlanned distance: 30 m",
       "options": [
-        "B: при одинаковой матрице и объективе разница только в цене",
-        "A: только радиометрическая записывает температуру пикселя, а 30 м меньше D_max = 36.1 м",
-        "A, но с дистанции 30 м цель меньше 3×3 пикселей, надо подлететь на 10 м",
-        "B: на 30 м цель занимает больше 3×3 пикселей, этого достаточно для измерения"
+        "B: with the same sensor and lens the only difference is the price",
+        "A: only a radiometric one records the pixel temperature, and 30 m is less than D_max = 36.1 m",
+        "A, but from 30 m the target is smaller than 3×3 pixels, you have to fly in to 10 m",
+        "B: at 30 m the target covers more than 3×3 pixels, which is enough for a measurement"
       ],
       "answer": 1,
-      "explain": "Градусы в отчёте — количественная термография, нужна радиометрическая камера. D_max = L·f/(3p) = 0.10·0.013/(3·12e-6) = 36.1 м, значит 30 м укладывается в правило 3×3 FLIR."
+      "explain": "Degrees in a report mean quantitative thermography, which needs a radiometric camera. D_max = L·f/(3p) = 0.10·0.013/(3·12e-6) = 36.1 m, so 30 m fits within FLIR's 3×3 rule."
     },
     {
-      "q": "Шоу: картинка 60 × 30 м с шагом 3 м, обычный GNSS с ошибкой 2.5 м. Какой вывод следует из правила модуля?",
+      "q": "A show: a 60 × 30 m picture with a 3 m spacing, ordinary GNSS with an error of 2.5 m. What conclusion follows from the module's rule?",
       "options": [
-        "231 аппарат; отношение шага к ошибке 1.2 меньше трёх, нужен RTK",
-        "200 аппаратов; GNSS хватает, если поднять шоу выше 120 м",
-        "231 аппарат; GNSS хватает, потому что шаг больше ошибки позиции",
-        "200 аппаратов; нужен RTK, потому что ошибка больше шага"
+        "231 aircraft; the spacing-to-error ratio of 1.2 is less than three, RTK is needed",
+        "200 aircraft; GNSS is enough if the show is raised above 120 m",
+        "231 aircraft; GNSS is enough because the spacing is larger than the position error",
+        "200 aircraft; RTK is needed because the error is larger than the spacing"
       ],
       "answer": 0,
-      "explain": "N = (⌊60/3⌋ + 1)·(⌊30/3⌋ + 1) = 21·11 = 231. Отношение 3/2.5 = 1.2 < 3, поэтому без RTK (1–10 см по Skybrush) картинка не держится. 200 получается, если забыть +1 — крайние ряды."
+      "explain": "N = (⌊60/3⌋ + 1)·(⌊30/3⌋ + 1) = 21·11 = 231. The ratio 3/2.5 = 1.2 < 3, so without RTK (1–10 cm per Skybrush) the picture does not hold. You get 200 if you forget the +1 — the edge rows."
     },
     {
-      "q": "На чём построена бортовая прошивка Skybrush для уличных шоу-дронов?",
+      "q": "What is the Skybrush onboard firmware for outdoor show drones built on?",
       "options": [
-        "На PX4 с модулем роя, который входит в основную ветку PX4 начиная с 1.15",
-        "На Betaflight с GPS Rescue и внешним контроллером траекторий",
-        "На модифицированном ArduCopter, который собирают и прошивают сами",
-        "На закрытой прошивке, открыты только сервер и наземная станция"
+        "On PX4 with a swarm module that has been part of the PX4 main branch since 1.15",
+        "On Betaflight with GPS Rescue and an external trajectory controller",
+        "On a modified ArduCopter, which you build and flash yourself",
+        "On closed firmware; only the server and the ground control station are open"
       ],
       "answer": 2,
-      "explain": "Документация Skybrush называет прошивку «the Skybrush fork of the ArduPilot firmware»; FAQ требует собрать и установить модифицированную версию ArduCopter, полётник с поддержкой ArduPilot и microSD, рекомендован флеш 2 МБ."
+      "explain": "The Skybrush documentation calls the firmware “the Skybrush fork of the ArduPilot firmware”; the FAQ requires building and installing a modified version of ArduCopter, a flight controller with ArduPilot support and a microSD, with 2 MB of flash recommended."
     },
     {
-      "q": "Что в США нужно для коммерческой доставки чужих посылок дроном за пределами прямой видимости (ноябрь 2026)?",
+      "q": "What is needed in the USA for commercial delivery of other people's packages by drone beyond visual line of sight (November 2026)?",
       "options": [
-        "Только waiver § 107.31 на BVLOS: Part 107 покрывает любую работу за плату",
-        "Сертификат по Part 108, который вступил в силу летом 2026 года",
-        "Удостоверение Part 107 и регистрация аппарата с Remote ID",
-        "Сертификат Part 135, разрешение на воздушное пространство и BVLOS exemption или waiver"
+        "Only a § 107.31 waiver for BVLOS: Part 107 covers any work for compensation",
+        "A Part 108 certificate, which took effect in the summer of 2026",
+        "A Part 107 certificate and aircraft registration with Remote ID",
+        "A Part 135 certificate, an airspace authorization and a BVLOS exemption or waiver"
       ],
       "answer": 3,
-      "explain": "FAA: Part 135 — единственный путь для малых БПЛА возить чужое имущество BVLOS; § 107.205 прямо запрещает waiver § 107.25 и § 107.31 разрешать перевозку чужого имущества за плату. Part 108 на 2026-11-22 на рассмотрении OIRA, не опубликован."
+      "explain": "FAA: Part 135 is the only path for small UAVs to carry another person's property BVLOS; § 107.205 expressly prohibits a waiver of § 107.25 and § 107.31 from allowing the carriage of another person's property for compensation. As of 2026-11-22 Part 108 is under OIRA review and not published."
     },
     {
-      "q": "Доставка: 8 км в одну сторону, 15 м/с, трос 30 м при 1 м/с вниз и вверх, висение 60 с, резерв 30 %. Сколько нужно времени полёта?",
+      "q": "Delivery: 8 km one way, 15 m/s, a 30 m line at 1 m/s down and up, a 60 s hover, a 30 % reserve. How much flight time is needed?",
       "options": [
-        "19.8 мин",
-        "25.7 мин",
-        "28.3 мин",
-        "17.8 мин"
+        "19.8 min",
+        "25.7 min",
+        "28.3 min",
+        "17.8 min"
       ],
       "answer": 2,
-      "explain": "t = 2·8000/15 + 2·30/1 + 60 = 1067 + 60 + 60 = 1187 с = 19.8 мин; с резервом t/(1 − 0.3) = 28.3 мин. 19.8 — без резерва, 17.8 — только крейсер."
+      "explain": "t = 2·8000/15 + 2·30/1 + 60 = 1067 + 60 + 60 = 1187 s = 19.8 min; with the reserve t/(1 − 0.3) = 28.3 min. 19.8 is without the reserve, 17.8 is the cruise only."
     },
     {
-      "q": "Что из этого верно для ЕС по распылению с дронов на ноябрь 2026?",
+      "q": "Which of these is true for the EU regarding spraying from drones as of November 2026?",
       "options": [
-        "Распыление разрешено в подкатегории A3 Open, если аппарат легче 25 кг",
-        "Ст. 9 Директивы 2009/128/EC запрещает распыление с воздуха с исключениями; поправка для БАС — пока проект",
-        "EASA выпустила стандартный сценарий STS-03 для агроработ, по декларации",
-        "Запрет снят Регламентом 2019/947: для агроработ достаточно операционного разрешения национального авиационного органа"
+        "Spraying is allowed in subcategory A3 of Open if the aircraft is lighter than 25 kg",
+        "Art. 9 of Directive 2009/128/EC prohibits aerial spraying with exceptions; the amendment for UAS is still a draft",
+        "EASA has issued a standard scenario STS-03 for agricultural works, by declaration",
+        "The ban was lifted by Regulation 2019/947: for agricultural works an operational authorization from the national aviation authority is enough"
       ],
       "answer": 1,
-      "explain": "Ст. 9(1): государства запрещают aerial spraying; 9(2) — исключения при жёстких условиях. Комиссия 16.12.2025 предложила разрешить государствам выводить отдельные типы БАС из-под запрета (2025/0409(COD)) — это предложение. С авиационной стороны это категория Specific."
+      "explain": "Art. 9(1): member states prohibit aerial spraying; 9(2) — exceptions under strict conditions. On 16.12.2025 the Commission proposed allowing member states to take certain types of UAS out of the ban (2025/0409(COD)) — that is a proposal. On the aviation side it is the Specific category."
     }
   ]
 }

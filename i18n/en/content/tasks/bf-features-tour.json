@@ -1,0 +1,119 @@
+{
+ "module": "bf-features-tour",
+ "tasks": [
+  {
+   "id": "angle-target",
+   "title": "Angle target angle from the rates",
+   "statement": "Betaflight 2025.12 (the formula is the same as in 4.5), Actual rates: `roll_rc_rate` = **{rc}**, `roll_srate` = **{sr}**, `roll_expo` = 0; `angle_limit` = **{lim}**. The roll stick is deflected to **{x}** of travel. Find the roll target angle in Angle (°).",
+   "params": {
+    "rc": [
+     5,
+     7,
+     10,
+     15,
+     20
+    ],
+    "sr": [
+     50,
+     67,
+     80,
+     100
+    ],
+    "lim": [
+     45,
+     55,
+     60,
+     70
+    ],
+    "x": {
+     "min": 0.1,
+     "max": 0.9,
+     "step": 0.1
+    }
+   },
+   "answer": "lim*(x*rc*10 + (sr*10 - rc*10)*x*x)/(sr*10)",
+   "unit": "°",
+   "tol": 0.005,
+   "abs": 0.02,
+   "solution": "`pidLevel()`: target = `angle_limit` · setpoint / max_rate. Actual with expo 0: setpoint = x·rc·10 + (srate·10 − rc·10)·x², maximum = srate·10 °/s. With the defaults 7/67 and x = 0.5: 185/670 · 60 = 16.6°."
+  },
+  {
+   "id": "horizon-strength",
+   "title": "Horizon leveling strength",
+   "statement": "Horizon (2025.12, the formula is the same as in 4.5) with the defaults (`horizon_level_strength` 75, `horizon_limit_sticks` 75, `horizon_limit_degrees` 135). The aircraft inclination is **{a}°**, the stick is deflected to **{s}** of travel. Find the leveling strength (0…1) in steady state.",
+   "params": {
+    "a": {
+     "min": 0,
+     "max": 120,
+     "step": 10
+    },
+    "s": [
+     0.0,
+     0.1,
+     0.2,
+     0.3,
+     0.4,
+     0.5,
+     0.6
+    ]
+   },
+   "answer": "0.75*(135-a)/135*(0.75-s)/0.75",
+   "unit": "",
+   "tol": 0.005,
+   "abs": 0.002,
+   "solution": "`calcHorizonLevelStrength()`: s = 0.75 · (1 − inclination/135) · (1 − stick/0.75), each factor no less than 0. Setpoint = acro·(1 − s) + angle·s. The rise of s is additionally smoothed by the PT1 `horizon_delay_ms` (500 ms), the fall is instant."
+  },
+  {
+   "id": "dyn-idle-p",
+   "title": "The P term of dynamic idle",
+   "statement": "`dyn_idle_min_rpm` = **{n}**, `dyn_idle_p_gain` = **{p}**. The slowest motor is spinning at **{r}** RPM. Find the contribution of the P term alone to the increase of the lower motor limit (% of the range), before the limits.",
+   "params": {
+    "n": [
+     25,
+     30,
+     35,
+     40
+    ],
+    "p": [
+     40,
+     50,
+     60,
+     80
+    ],
+    "r": {
+     "min": 1200,
+     "max": 2400,
+     "step": 100
+    }
+   },
+   "answer": "(n*100 - r)/60*p*0.00015*100",
+   "unit": "%",
+   "tol": 0.003,
+   "solution": "`mixerInitProfile()`: target = n·100/60 rev/s, the P gain = p·0.00015 per 1 rev/s. The error is (n·100 − r)/60 rev/s. With 30/50 and 2000 RPM: 16.67 · 0.0075 = 12.5 %. The sum P + I + D is then limited by `dyn_idle_max_increase` (15 %) or, until the throttle is first raised, by the value of `motor_idle` (5.5 %; in 4.5 — `dyn_idle_start_increase`, 5 %)."
+  },
+  {
+   "id": "crashflip-dshot",
+   "title": "DShot output in turtle mode",
+   "statement": "Betaflight 4.5 (in 2025.12 `crashflip_expo` was removed and the turtle power is calculated differently — the task is kept for 4.5). Turtle mode, QUADX, `dshot_idle_value` 550 (5.5 %), dynamic idle off, `crashflip_expo` = **{e}**, `crashflip_motor_percent` = 0. The roll stick is deflected to **{x}** of travel, pitch and yaw are centered. Find the DShot value for the working motors (before rounding).",
+   "params": {
+    "e": [
+     0,
+     20,
+     35,
+     50,
+     70
+    ],
+    "x": {
+     "min": 0.3,
+     "max": 0.9,
+     "step": 0.05
+    }
+   },
+   "answer": "157.945 + (((1-e/100)*x + (e/100)*x**3) - ((1-e/100)*0.15 + (e/100)*0.15**3))/(1 - ((1-e/100)*0.15 + (e/100)*0.15**3))*(2047-157.945) - 20",
+   "unit": "",
+   "tol": 0.002,
+   "abs": 1,
+   "solution": "`applyFlipOverAfterCrashModeToMotors()`: the lower limit is 48 + 0.055·1999 = 157.9, the upper is 2047. The deflection x' = (1 − e/100)·x + (e/100)·x³, the deadband min' = the same for 0.15. Power = (x' − min')/(1 − min'), output = 157.9 + power·1889 − 20 (`CRASH_FLIP_DEADBAND`). With e = 35 and x = 0.6: power 0.407, output 907."
+  }
+ ]
+}

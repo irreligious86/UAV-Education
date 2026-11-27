@@ -48,8 +48,8 @@ next:
 | Код | Флаг | Когда взводится | Что делать |
 |---|---|---|---|
 | 1 | `NOGYRO` | гироскоп не найден при старте (`fc/init.c`) | не тот target или мёртвый гиро; в строке датчиков `status` нет `GYRO=` |
-| 2 | `FAILSAFE` | идёт Stage 2 failsafe (`flight/failsafe.c`) | вернуть связь; снимается после восстановления |
-| 3 | `RXLOSS` | нет валидных RC-кадров 100 мс; после появления связи держится `failsafe_recovery_delay` = 5 (0.5 с) | проводка RX, bind, `serialrx_provider`, вкладка Receiver |
+| 2 | `FAILSAFE` | failsafe снял арм (`FAILSAFE_LANDED`, `flight/failsafe.c`); держится, пока связь не вернётся на `failsafe_recovery_delay` | вернуть связь; снимается после восстановления |
+| 3 | `RXLOSS` | нет валидных RC-кадров 150 мс (в 4.5 — 100 мс); после появления связи держится `failsafe_recovery_delay` = 5 (0.5 с) | проводка RX, bind, `serialrx_provider`, вкладка Receiver |
 | 4 | `NOT_DISARMED` | связь вернулась, а тумблер ARM включён | выключить ARM |
 | 5 | `BOXFAILSAFE` | включён тумблер режима FAILSAFE | выключить |
 | 6 | `RUNAWAY` | сработала защита runaway takeoff | выключить ARM (или дизарм стиками), искать причину |

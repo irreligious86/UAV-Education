@@ -1,0 +1,94 @@
+{
+  "module": "bf-motor-balance",
+  "pass": 80,
+  "questions": [
+    {
+      "q": "Which Quad X motor does Betaflight write to the log as `motor[2]`?",
+      "options": [
+        "Rear right (motor 1)",
+        "Front right (motor 2)",
+        "Rear left (motor 3)",
+        "Front left (motor 4)"
+      ],
+      "answer": 2,
+      "explain": "The numbering is 1 RR, 2 FR, 3 RL, 4 FL, and the log indices start from zero: motor[2] is motor 3, the rear left (mixerQuadX[] in flight/mixer_init.c)."
+    },
+    {
+      "q": "What does `set yaw_motors_reversed = ON` do?",
+      "options": [
+        "Reverses the motor rotation over DShot",
+        "Inverts the sign of the yaw PID before the mixer",
+        "Mirrors the motor numbers",
+        "Reorders the motor outputs on the pads"
+      ],
+      "answer": 1,
+      "explain": "In mixTable() the sign of scaledAxisPidYaw changes with this flag; the mixer table, the numbers and the actual motor rotation stay the same — the direction is changed in the ESC."
+    },
+    {
+      "q": "The log header has `motorOutput:158,2047`, and the median of `motor[0]` = 1102. What is that in percent of travel?",
+      "options": [
+        "53.8 %",
+        "50.0 %",
+        "52.7 %",
+        "55.1 %"
+      ],
+      "answer": 1,
+      "explain": "p = (1102 − 158)/(2047 − 158)·100 = 944/1889·100 = 50.0 %. 52.7 % comes out if the range 48,2047 is used (that happens only with dynamic idle), and 53.8 % — if 1102 is divided by 2047 without subtracting the lower limit."
+    },
+    {
+      "q": "Why is the imbalance computed from the median of the segment, not the mean?",
+      "options": [
+        "The median is robust to gusts and one-off corrections",
+        "A mean cannot be computed from integer DShot values",
+        "Blackbox records the motors only once a second",
+        "The median accounts for the motorOutput header by itself"
+      ],
+      "answer": 0,
+      "explain": "The motor output jumps all the time from PID corrections; one gust of wind shifts the mean and hardly touches the median."
+    },
+    {
+      "q": "The indices: I_pitch = +4.5 %, I_roll = +0.3 %, I_yaw = −0.2 %. The most likely cause?",
+      "options": [
+        "A weak motor 4 (front left)",
+        "One motor is tilted tangentially",
+        "The CG is offset to the rear",
+        "Different timing on two ESCs"
+      ],
+      "answer": 2,
+      "explain": "Pitch alone with zero yaw is the signature of an offset CG: the rear motors carry more. A weak motor would give three indices of the same magnitude, a tilt — only yaw."
+    },
+    {
+      "q": "The indices are roughly equal: I_pitch ≈ −3 %, I_roll ≈ +3 %, I_yaw ≈ +3 %. What does this point to first of all?",
+      "options": [
+        "A center of gravity offset to the left",
+        "One corner: motor 4 FL or its prop",
+        "A wrong `yaw_motors_reversed`",
+        "A yaw I term that is too low"
+      ],
+      "answer": 1,
+      "explain": "Three indices of the same magnitude ≈ w/2 with the signs “front, left, diagonal 1+4” are the pattern of the single corner FL. Whether it is the motor or the prop is decided by the swap test."
+    },
+    {
+      "q": "A constant I_yaw of 7 % with I_pitch and I_roll near zero. Swapping the props and the motors does not move the imbalance. What should be checked?",
+      "options": [
+        "Raise yaw P and I",
+        "Change `motor_output_reordering`",
+        "Enable `thrust_linear`",
+        "The tilt of the motor axes and the straightness of the arms"
+      ],
+      "answer": 3,
+      "explain": "Pure yaw that does not move with the parts is a torque from the geometry: a motor tilted tangentially by ~1° on a 10\" gives, by the module's estimate, on the order of 7–13 % in terms of the command."
+    },
+    {
+      "q": "Why, in the lab, is log B recorded after motors 1 and 4 are swapped?",
+      "options": [
+        "To check the motor order in the Motors tab",
+        "So that the CG shifts and the pitch index goes to zero",
+        "No mass was moved: the correct hypothesis keeps the CG",
+        "So that the diagonal imbalance changes sign"
+      ],
+      "answer": 2,
+      "explain": "From one log, “motor 4 + CG rearward” and “motor 1 + CG sideways” describe the medians equally well. After the swap the CG is the same, so the correct hypothesis is the one whose CG estimate did not change (0.3 % against 12.3 %)."
+    }
+  ]
+}

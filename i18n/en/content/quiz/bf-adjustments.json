@@ -1,0 +1,98 @@
+{
+ "module": "bf-adjustments",
+ "pass": 80,
+ "questions": [
+  {
+   "q": "In Betaflight 2025.12 you typed `adjrange 0 0 3 900 2100 27 3 0 0`. What will the AUX4 switch change?",
+   "options": [
+    "ROLL_F (f_roll)",
+    "ROLL_RC_EXPO (roll_expo)",
+    "YAW_F (f_yaw)",
+    "Nothing: number 27 is empty"
+   ],
+   "answer": 0,
+   "explain": "The CLI number is the position in defaultAdjustmentConfigs[] plus 1. In the enum, positions 25–28 hold ROLL/PITCH RC RATE/EXPO, which are not in the array, so CLI 27 = ROLL_F (enum 31). The empty numbers are 32–35 in 2025.12 (31–34 in 4.5)."
+  },
+  {
+   "q": "A PITCH_ROLL_D step slot, `mid_rc` = 1500. A momentary switch is held up for 1.6 s, starting from center. By how much will `d_roll` change?",
+   "options": [
+    "+1",
+    "+3",
+    "+4",
+    "+16"
+   ],
+   "answer": 2,
+   "explain": "The first step is at the moment of the press, then every 500 ms of holding (RESET_FREQUENCY_2HZ): 0, ~490, ~990, ~1490 ms → 4 steps of 1. Taps with a return to center re-arm the slot immediately and are faster than holding."
+  },
+  {
+   "q": "An absolute slot: `adjrange 1 0 2 1700 2100 14 4 67 20`. The pot channel AUX5 = 1251 µs. What value will `roll_srate` get?",
+   "options": [
+    "57",
+    "58",
+    "62",
+    "77"
+   ],
+   "answer": 1,
+   "explain": "value = center + (rc − 1500)·scale/500 = 67 + (−249·20)/500 = 67 + (−4980/500). The division is integer division in C, truncating toward zero: −9.96 → −9, giving 58. Rounding down (like // in Python) would give 57."
+  },
+  {
+   "q": "The pilot adjusted P in the air, landed and disconnected the battery without doing anything else. What will happen at the next power-up?",
+   "options": [
+    "The new P: adjustments are written to EEPROM on disarm",
+    "The old P: the change was only in RAM",
+    "The new P, but only in the current rate profile",
+    "The old P, if Blackbox was not enabled"
+   ],
+   "answer": 1,
+   "explain": "An adjustment only calls setConfigDirty(). To save: sticks while disarmed (throttle down, yaw left, pitch down, roll right), CLI save, or Refresh + Save in Betaflight App."
+  },
+  {
+   "q": "How do you switch the PID profile in flight in Betaflight 2025.12?",
+   "options": [
+    "adjrange with function 12",
+    "With the PID PROFILE mode in the Modes tab",
+    "With the sticks: throttle down + yaw left + roll right",
+    "You cannot: only while disarmed"
+   ],
+   "answer": 3,
+   "explain": "There is no function for the PID profile in either 2025.12 or 4.5, and no mode either. Function 12 is the rate profile. The profile stick command is processed only while disarmed."
+  },
+  {
+   "q": "A config for the VTX. In flight the pilot moves AUX5 up (slot 3 — band R, channel 1). What will happen?",
+   "kind": "apply",
+   "fragment": "vtx 0 3 0 0 1 900 1300\nvtx 1 3 0 0 2 1300 1700\nvtx 2 3 0 0 3 1700 2100\nvtx 3 4 5 1 0 1700 2100",
+   "options": [
+    "Nothing: after the first arm the band and channel are latched until reboot",
+    "Nothing: slots 0–2 cover the travel of AUX4, and slot 3 never gets its turn",
+    "The VTX will move to R1 at once, the power will not change",
+    "The VTX will move to R1 and minimum power"
+   ],
+   "answer": 0,
+   "explain": "vtxUpdateActivatedChannel() is called on every RC frame and skips the slot applied last time (lastIndex), so the active slot 3 is processed every other frame, alternating with the power slot. But after arming the locked latch is set: the band and channel do not change until reboot, only the power changes (and for slot 3 it is 0 — “do not touch”)."
+  },
+  {
+   "q": "`vtx_low_power_disarm = UNTIL_FIRST_ARM`, the power switch is in the “400 mW” position. What does the VTX radiate on the bench right after power-up?",
+   "options": [
+    "400 mW",
+    "The minimum power from the table",
+    "Nothing: pit mode",
+    "The power from vtx_power saved in EEPROM"
+   ],
+   "answer": 1,
+   "explain": "io/vtx.c: while disarmed, without failsafe and as long as the aircraft has never been armed, the power is forced to the 1st row of the table. After the first arm — the working power even while disarmed."
+  },
+  {
+   "q": "The save stick gesture was performed while disarmed, but instead of one beep the PID profile changed to 3. Why?",
+   "kind": "apply",
+   "fragment": "min_check = 1050\nmax_check = 1900\nReceiver: THR 1000  YAW 1002  PITCH 1068  ROLL 1995",
+   "options": [
+    "Throttle is above min_check",
+    "Pitch at 1068 > min_check, it counts as center",
+    "Roll is below max_check",
+    "Yaw must be to the right"
+   ],
+   "answer": 1,
+   "explain": "Saving is THR_LO + YAW_LO + PIT_LO + ROL_HI. “Down” is ≤ min_check. With pitch at center the combination THR_LO + YAW_LO + PIT_CE + ROL_HI is a change of the PID profile to 3. The fix is calibrating the stick endpoints."
+  }
+ ]
+}

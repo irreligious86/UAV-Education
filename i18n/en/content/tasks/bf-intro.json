@@ -1,0 +1,41 @@
+{
+  "module": "bf-intro",
+  "tasks": [
+    {
+      "id": "pid-loop-period",
+      "title": "PID loop period",
+      "statement": "The gyro is read at **{g} Hz**, `pid_process_denom` = **{d}**. Find the PID loop period in microseconds.",
+      "params": {
+        "g": [
+          4000,
+          8000
+        ],
+        "d": [
+          1,
+          2,
+          4
+        ]
+      },
+      "answer": "1000000*d/g",
+      "unit": "µs",
+      "tol": 0.001,
+      "solution": "PID rate = gyro rate / `pid_process_denom`, period = 10⁶ · denom / gyro rate. 8 kHz and denom 1 — 125 µs; denom 2 — 4 kHz and 250 µs."
+    },
+    {
+      "id": "failsafe-landing-time",
+      "title": "Converting failsafe_off_delay",
+      "statement": "A backup from 4.5.3 has `set failsafe_off_delay = {v}`. Which `failsafe_landing_time` value gives the same landing time in 2025.12?",
+      "params": {
+        "v": {
+          "min": 10,
+          "max": 200,
+          "step": 10
+        }
+      },
+      "answer": "v/10",
+      "unit": "s",
+      "tol": 0.001,
+      "solution": "`failsafe_off_delay` was stored in tenths of a second, `failsafe_landing_time` is in seconds: the old value is divided by 10. Carried over as the number “50” it would give 50 s instead of 5."
+    }
+  ]
+}

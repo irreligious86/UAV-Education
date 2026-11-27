@@ -3,7 +3,7 @@
  "pass": 80,
  "questions": [
   {
-   "q": "Какая маска должна стоять в строке serial на UART воздушного модуля DJI O3/Walksnail/HDZero в Betaflight 2025.12?",
+   "q": "Which mask must be in the serial line for the UART of a DJI O3/Walksnail/HDZero air unit in Betaflight 2025.12?",
    "options": [
     "131072",
     "131073",
@@ -11,32 +11,32 @@
     "64"
    ],
    "answer": 1,
-   "explain": "131073 = MSP (1) + VTX_MSP (1 << 17 = 131072). DisplayPort берётся с первого порта, где стоят оба бита (config.c); 2048 — SmartAudio, 64 — Serial RX."
+   "explain": "131073 = MSP (1) + VTX_MSP (1 << 17 = 131072). DisplayPort is taken from the first port that has both bits set (config.c); 2048 is SmartAudio, 64 is Serial RX."
   },
   {
-   "q": "Что сделает Betaflight 2025.12 при загрузке с конфигом, где на UART4 стоит маска 131072, а остальные порты в порядке?",
+   "q": "What will Betaflight 2025.12 do when booting with a config where UART4 has the mask 131072 and the other ports are fine?",
    "options": [
-    "Включит DisplayPort на UART4, но без MSP-ответов",
-    "Сбросит весь конфиг портов к умолчаниям платы",
-    "Отключит только UART4, остальные порты оставит",
-    "Добавит бит MSP сам и сохранит маску 131073"
+    "Enable DisplayPort on UART4, but without MSP replies",
+    "Reset the whole port config to the board defaults",
+    "Disable only UART4 and leave the other ports alone",
+    "Add the MSP bit itself and save the mask 131073"
    ],
    "answer": 1,
-   "explain": "isSerialConfigValid(): VTX_MSP в одиночку (bitCount == 1) недопустим, функция возвращает false, и config.c вызывает pgResetFn_serialConfig — сбрасываются все порты, вместе с приёмником."
+   "explain": "isSerialConfigValid(): VTX_MSP alone (bitCount == 1) is not allowed, the function returns false, and config.c calls pgResetFn_serialConfig — all ports are reset, the receiver included."
   },
   {
-   "q": "Инструкция к модулю велит ввести set displayport_msp_serial = 3. Что ответит CLI Betaflight 2025.12?",
+   "q": "An air unit manual tells you to enter set displayport_msp_serial = 3. What will the Betaflight 2025.12 CLI answer?",
    "options": [
-    "Назначит UART4 портом DisplayPort до перезагрузки",
-    "INVALID NAME: переменная удалена в 4.4",
-    "Назначит UART3 портом DisplayPort и сохранит",
-    "Потребует save, затем применит после перезагрузки"
+    "It will make UART4 the DisplayPort port until reboot",
+    "INVALID NAME: the variable was removed in 4.4",
+    "It will make UART3 the DisplayPort port and save",
+    "It will require save, then apply it after a reboot"
    ],
    "answer": 1,
-   "explain": "displayport_msp_serial была в 4.2–4.3; в settings.c веток 4.4, 4.5 и 2025.12 её нет. Порт DisplayPort определяется маской MSP + VTX_MSP."
+   "explain": "displayport_msp_serial existed in 4.2–4.3; it is not in settings.c of the 4.4, 4.5 and 2025.12 branches. The DisplayPort port is determined by the MSP + VTX_MSP mask."
   },
   {
-   "q": "Как значение osd_link_quality_pos кодирует элемент в столбце 46, строке 1, видимый в профиле 1?",
+   "q": "How does the value of osd_link_quality_pos encode an element in column 46, row 1, visible in profile 1?",
    "kind": "apply",
    "fragment": "OSD_POS(x,y) = (x & 31) | ((x << 5) & 0x400) | ((y & 31) << 5)\nOSD_PROFILE_FLAG(1) = 1 << 11",
    "options": [
@@ -46,51 +46,51 @@
     "3086"
    ],
    "answer": 1,
-   "explain": "46 & 31 = 14; бит 5 от 46 переносится в бит 10 → 1024; y = 1 → 32; профиль 1 → 2048. 14 + 1024 + 32 + 2048 = 3118."
+   "explain": "46 & 31 = 14; bit 5 of 46 is moved to bit 10 → 1024; y = 1 → 32; profile 1 → 2048. 14 + 1024 + 32 + 2048 = 3118."
   },
   {
-   "q": "Раскладку, сделанную на канве 53×20, загрузили на аппарат с HDZero (канва 50×18). Что сделает osdInit() с элементом в точке (1, 18)?",
+   "q": "A layout made on a 53×20 canvas was loaded onto an aircraft with HDZero (a 50×18 canvas). What will osdInit() do with an element at the point (1, 18)?",
    "options": [
-    "Переместит в (1, 17) — прижмёт к последней строке",
-    "Масштабирует в (1, 16) пропорционально канве 50×18",
-    "Скроет элемент, сняв флаг видимости профиля 1",
-    "Оставит в (1, 18), а очки обрежут нижнюю строку"
+    "Move it to (1, 17) — clamp it to the last row",
+    "Scale it to (1, 16) in proportion to the 50×18 canvas",
+    "Hide the element by clearing the profile 1 visibility flag",
+    "Leave it at (1, 18), and the goggles will cut off the bottom row"
    ],
    "answer": 0,
-   "explain": "osdInit() только прижимает x ≥ cols к cols − 1 и y ≥ rows к rows − 1, профиль и тип сохраняет. Пропорционального переноса в прошивке нет, поэтому элементы могут налечь друг на друга."
+   "explain": "osdInit() only clamps x ≥ cols to cols − 1 and y ≥ rows to rows − 1 and keeps the profile and type. The firmware has no proportional remapping, so elements can land on top of each other."
   },
   {
-   "q": "Какой модуль из списка нельзя питать напрямую от 4S по спецификации производителя?",
+   "q": "Which air unit in the list must not be powered directly from 4S per the manufacturer's specification?",
    "options": [
     "DJI O3 Air Unit",
     "DJI O4 Air Unit Pro",
     "DJI O4 Air Unit",
-    "Caddx Vista (с камерой)"
+    "Caddx Vista (with a camera)"
    ],
    "answer": 2,
-   "explain": "O4 Air Unit: 3.7–13.2 В, BEC ≥ 10 Вт (5 В/2 А). O3, O4 Pro и Vista — 7.4–26.4 В, 2S–6S."
+   "explain": "O4 Air Unit: 3.7–13.2 V, BEC ≥ 10 W (5 V/2 A). The O3, O4 Pro and Vista — 7.4–26.4 V, 2S–6S."
   },
   {
-   "q": "Аппарат с DJI O3 управляется пультом DJI. Куда идёт жёлтый провод DJI HDL/S.Bus и какой провайдер ставить?",
+   "q": "An aircraft with a DJI O3 is controlled from a DJI radio. Where does the yellow DJI HDL/S.Bus wire go, and which provider do you set?",
    "options": [
-    "На TX любого свободного UART, CRSF",
-    "На S.Bus-пад FC, serialrx_provider = SBUS",
-    "На RX порта DisplayPort, провайдер SBUS",
-    "На пад LED_STRIP, провайдер PPM через resource"
+    "To the TX of any free UART, CRSF",
+    "To the FC's S.Bus pad, serialrx_provider = SBUS",
+    "To the RX of the DisplayPort port, the SBUS provider",
+    "To the LED_STRIP pad, the PPM provider through resource"
    ],
    "answer": 1,
-   "explain": "По инструкции DJI жёлтый провод — к S.Bus полётника; на F4 S.Bus-пад идёт через инвертор. На порту DisplayPort приёмник не совмещают; при ELRS жёлтый провод не подключают."
+   "explain": "Per the DJI manual the yellow wire goes to the flight controller's S.Bus; on an F4 the S.Bus pad goes through an inverter. A receiver is not combined with the DisplayPort port; with ELRS the yellow wire is not connected."
   },
   {
-   "q": "Почему DJI O4 Air Unit, включённый на столе без обдува, может отключиться через несколько минут?",
+   "q": "Why can a DJI O4 Air Unit, powered on the bench without airflow, shut down after a few minutes?",
    "options": [
-    "Защита от перегрева: без обдува холодный старт — около 2.5 мин",
-    "Betaflight отключает VTX после 5 минут на земле без арма",
-    "Модуль не дождался линка с пультом DJI и ушёл в сон",
-    "vtx_low_power_disarm = ON полностью выключает RF модуля"
+    "Overheat protection: without airflow a cold start gives about 2.5 min",
+    "Betaflight turns the VTX off after 5 minutes on the ground without arming",
+    "The air unit did not get a link with the DJI radio and went to sleep",
+    "vtx_low_power_disarm = ON turns the air unit's RF off completely"
    ],
    "answer": 0,
-   "explain": "Инструкция DJI: перегрев на земле — защитное отключение; время в простое от холодного старта при 25 °C — около 2.5 мин для O4 и около 20 мин для O4 Pro. На столе нужен вентилятор."
+   "explain": "The DJI manual: overheating on the ground means a protective shutdown; the idle time from a cold start at 25 °C is about 2.5 min for the O4 and about 20 min for the O4 Pro. On the bench a fan is needed."
   }
  ]
 }

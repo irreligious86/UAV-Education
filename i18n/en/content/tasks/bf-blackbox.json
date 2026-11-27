@@ -1,0 +1,49 @@
+{
+  "module": "bf-blackbox",
+  "tasks": [
+    {
+      "id": "log-rate",
+      "title": "Log rate",
+      "statement": "The PID loop runs at **{f} Hz**, `blackbox_sample_rate` = 1/**{d}**. At what rate is the log written, Hz?",
+      "params": {
+        "f": [
+          3200,
+          4000,
+          8000
+        ],
+        "d": [
+          1,
+          2,
+          4,
+          8
+        ]
+      },
+      "answer": "f/d",
+      "unit": "Hz",
+      "tol": 0.001,
+      "solution": "Log rate = PID rate × `blackbox_sample_rate`: at 8 kHz and 1/4 — 2 kHz, at 3.2 kHz (BMI270) and 1/2 — 1.6 kHz. 1 kHz is enough for basic PID analysis, noise and filters need 2 kHz (1.6 kHz for the BMI270)."
+    },
+    {
+      "id": "flash-time",
+      "title": "How long the flash lasts",
+      "statement": "Onboard flash of **{m} MB**, a Blackbox data rate of **{r} KB/s**. After how many seconds of recording will the memory be full (1 MB = 1024 KB)?",
+      "params": {
+        "m": [
+          2,
+          4,
+          8,
+          16
+        ],
+        "r": {
+          "min": 60,
+          "max": 100,
+          "step": 5
+        }
+      },
+      "answer": "m*1024/r",
+      "unit": "s",
+      "tol": 0.03,
+      "solution": "Time = capacity / data rate = m · 1024 / r. For 16 MB at 60–100 KB/s that is 273–164 s, the “3–4 minutes” from the theory; 2 MB of flash at 80 KB/s fills up in 26 s. The 3 % tolerance covers a calculation with 1 MB = 1000 KB."
+    }
+  ]
+}

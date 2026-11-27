@@ -1,0 +1,94 @@
+{
+ "module": "f-micro-whoop",
+ "pass": 80,
+ "questions": [
+  {
+   "q": "The radio has been updated to ExpressLRS 4.1, the whoop has an SPI receiver on Betaflight 2025.12, the binding phrase is correct. There is no link. Why?",
+   "options": [
+    "The SPI receiver must be updated separately to 4.x over Wi-Fi or with ExpressLRS Configurator",
+    "The receiver code in Betaflight 2025.12 uses OTA version 3, while the transmitter uses 4",
+    "In 4.x the algorithm for computing the UID from the phrase changed",
+    "SPI receivers work only on 900 MHz"
+   ],
+   "answer": 1,
+   "explain": "In expresslrs_common.h of tag 2025.12.5 ELRS_OTA_VERSION_ID = 3, in ExpressLRS 4.1.0 OTA_VERSION_ID = 4. The version goes into the CRC and the hopping seed, so the packets are not accepted. An SPI receiver has no firmware of its own, so there is nothing to update over Wi-Fi."
+  },
+  {
+   "q": "How does an ELRS SPI receiver on a 5-in-1 board differ from a separate UART receiver?",
+   "options": [
+    "It has no MCU of its own: the protocol is executed by the flight controller firmware",
+    "It sends channels over CRSF at 420,000 baud",
+    "It has higher sensitivity and range thanks to the short SPI line to the radio chip",
+    "It is flashed through ExpressLRS Configurator via passthrough"
+   ],
+   "answer": 0,
+   "explain": "The board carries only an SX1280 radio chip on the SPI bus, and all of ELRS lives in src/main/rx/expresslrs*.c of Betaflight. So the protocol version is determined by the Betaflight build, and CRSF and a UART are not used."
+  },
+  {
+   "q": "A current of 10 A, a PH2.0 connector after wear: 20 mΩ per contact (the maximum per the JST datasheet), two contacts in the circuit. How many volts are lost across the connector and how many watts are dissipated in it?",
+   "options": [
+    "0.20 V and 2 W",
+    "0.40 V and 4 W",
+    "0.04 V and 0.4 W",
+    "0.80 V and 8 W"
+   ],
+   "answer": 1,
+   "explain": "R = 2 × 0.020 = 0.040 Ω. U = 10 × 0.040 = 0.40 V, P = 10² × 0.040 = 4 W. For an A30 (1.6 mΩ per contact) the same formulas give 0.032 V and 0.32 W."
+  },
+  {
+   "q": "The 0702 motors are marked 9N12P. Which `motor_poles` value is correct, and what happens with the default 14?",
+   "options": [
+    "9; with 14 the RPM is overstated",
+    "14; the default does not need changing",
+    "12; with 14 the RPM is understated, and the RPM filter notches sit below the real frequency",
+    "12; with 14 bidirectional DShot will not turn on at all, and the Motors tab will show 100 % errors"
+   ],
+   "answer": 2,
+   "explain": "12P means twelve magnets. Betaflight divides eRPM by the number of pole pairs: with 14 instead of 12 the RPM comes out at 12/14 = 0.86 of the real value, and the notches miss. 9 is the stator teeth."
+  },
+  {
+   "q": "A board on an STM32F411 with an 8 kHz gyro, `dshot_bidir = ON` is enabled. What will the Betaflight 2025.12 firmware do by itself?",
+   "options": [
+    "Disable the RPM filter and dynamic idle because of a lack of CPU resources on this board",
+    "Switch the gyro to 3.2 kHz",
+    "Change DSHOT600 to DSHOT300 and raise `pid_process_denom` to at least 2",
+    "Change the protocol to PROSHOT1000"
+   ],
+   "answer": 2,
+   "explain": "validateAndFixGyroConfig() in config.c: on platforms with USE_PID_DENOM_CHECK (F411, F405, G47x), with DShot telemetry enabled protocol 600 is replaced with 300, and with a gyro rate above 4 kHz the PID denominator becomes no less than 2 — PID 4 kHz."
+  },
+  {
+   "q": "A fresh 4.35 V LiHV is connected to a whoop with `vbat_max_cell_voltage = 430`. What happens by the logic of battery.c?",
+   "options": [
+    "The battery is detected as 2S",
+    "The battery is not considered connected until the voltage drops to 4.30 V",
+    "Overvoltage protection triggers, and arming is blocked until the voltage drops below 4.20 V",
+    "Nothing: the parameter affects only the OSD scale"
+   ],
+   "answer": 1,
+   "explain": "isVoltageFromBattery() accepts a voltage no higher than vbat_max_cell_voltage or above twice vbat_detect (6.00 V). 4.35 V falls into the 4.31–6.00 V zone, and the cell count and thresholds are not computed. For LiHV, 440 is set."
+  },
+  {
+   "q": "A 75 mm whoop: a 480 mAh cell, 80 % of the capacity is used, average current 3.4 A. How long does the flight last?",
+   "options": [
+    "About 4.5 minutes",
+    "About 8.5 minutes",
+    "About 6.8 minutes",
+    "About 11 minutes"
+   ],
+   "answer": 2,
+   "explain": "t = 0.48 × 0.8 × 60 / 3.4 = 6.8 min. This matches the manufacturer's claimed 6:50 on 480 mAh for calm flying."
+  },
+  {
+   "q": "Which of the following is a price of moving from a stack to a 5-in-1 AIO?",
+   "options": [
+    "DShot cannot be used",
+    "A burned FET of one ESC means replacing the whole board, and there are few free UARTs",
+    "Betaflight does not officially support such boards, only the manufacturer's firmware will do",
+    "Digital video cannot be connected"
+   ],
+   "answer": 1,
+   "explain": "Everything is on one board: it cannot be repaired part by part. On an F411 the platform gives 3 UARTs, and some are taken by the built-in VTX and receiver. DShot, Betaflight and digital video are available, but digital needs a free UART."
+  }
+ ]
+}

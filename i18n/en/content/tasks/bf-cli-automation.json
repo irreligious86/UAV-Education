@@ -1,0 +1,56 @@
+{
+  "module": "bf-cli-automation",
+  "tasks": [
+    {
+      "id": "msp-checksum",
+      "title": "Checksum of an MSP v1 request",
+      "statement": "A script sends an MSP v1 request: command **{c}**, payload — the two bytes **{b1}** and **{b2}** (decimal). The frame: `$M<`, size, command, payload, checksum. What is the checksum (a decimal number 0–255)?",
+      "params": {
+        "c": [
+          11,
+          68,
+          200,
+          202,
+          217,
+          250
+        ],
+        "b1": {
+          "min": 0,
+          "max": 255,
+          "step": 17
+        },
+        "b2": [
+          0,
+          1,
+          7,
+          32,
+          100,
+          128,
+          255
+        ]
+      },
+      "answer": "2 ^ c ^ b1 ^ b2",
+      "unit": "",
+      "tol": 0.0001,
+      "abs": 0.1,
+      "solution": "The MSP v1 checksum is the XOR of the size byte, the command byte and all payload bytes (`$M<` is not included). The size here is 2, so cs = 2 ⊕ c ⊕ b1 ⊕ b2. With a wrong checksum the firmware silently drops the frame, and the script gets a timeout."
+    },
+    {
+      "id": "msp-name-reply-len",
+      "title": "Length of the MSP_NAME reply",
+      "statement": "The aircraft has `craft_name = ` a name of **{n}** characters. How many bytes in total will come back in reply to an `MSP_NAME` (10) request over MSP v1, counting `$M>` and the checksum?",
+      "params": {
+        "n": {
+          "min": 1,
+          "max": 16,
+          "step": 1
+        }
+      },
+      "answer": "n + 6",
+      "unit": "bytes",
+      "tol": 0.0001,
+      "abs": 0.1,
+      "solution": "An MSP v1 reply: `$`, `M`, `>` (3 bytes) + size (1) + command (1) + payload (the name, n bytes with no terminating zero) + checksum (1) = n + 6. A script that reads a fixed number of bytes will truncate the reply or wait for a timeout on a name of a different length; read by the size field."
+    }
+  ]
+}

@@ -1,0 +1,96 @@
+{
+ "module": "f-micro-whoop",
+ "tasks": [
+  {
+   "id": "connector-drop",
+   "title": "Voltage drop across the connector",
+   "statement": "A current of **{i} A** flows through the connector of a 1S battery. The resistance of one contact is **{r} mΩ**, and there are two contacts in the circuit (positive and negative). Find the voltage drop across the connector in volts.",
+   "params": {
+    "i": {
+     "min": 2,
+     "max": 12,
+     "step": 0.5
+    },
+    "r": [
+     1.6,
+     3,
+     5,
+     10,
+     15,
+     20
+    ]
+   },
+   "answer": "i*2*r/1000",
+   "unit": "V",
+   "tol": 0.02,
+   "abs": 0.002,
+   "solution": "R of the circuit = 2·R contact; U = I·R. Example: 10 A and 20 mΩ → 10 × 0.040 = 0.40 V. The power in the connector is P = I²·R — 4 W with the same numbers."
+  },
+  {
+   "id": "flight-time",
+   "title": "Flight time from capacity and average current",
+   "statement": "A 1S **{c} mAh** cell, **{u} %** of the capacity is used, the average current in flight is **{i} A**. Find the flight time in minutes.",
+   "params": {
+    "c": [
+     260,
+     300,
+     380,
+     450,
+     480,
+     550,
+     580
+    ],
+    "u": [
+     70,
+     80,
+     90
+    ],
+    "i": {
+     "min": 2.5,
+     "max": 7,
+     "step": 0.5
+    }
+   },
+   "answer": "c/1000*u/100*60/i",
+   "unit": "min",
+   "tol": 0.02,
+   "solution": "t = C(Ah) · fraction · 60 / I. Example: 300 mAh, 80 %, 3.6 A → 0.3 × 0.8 × 60 / 3.6 = 4.0 min."
+  },
+  {
+   "id": "sag-ir",
+   "title": "1S sag under load",
+   "statement": "The cell EMF is **{e} V**, the internal resistance of the cell is **{rc} mΩ**, the wire and connector together are **{rx} mΩ**. What voltage will the board see at a current of **{i} A**?",
+   "params": {
+    "e": [
+     3.7,
+     3.8,
+     3.9,
+     4.0,
+     4.1,
+     4.2,
+     4.35
+    ],
+    "rc": {
+     "min": 40,
+     "max": 100,
+     "step": 5
+    },
+    "rx": [
+     7,
+     15,
+     24,
+     44
+    ],
+    "i": {
+     "min": 2,
+     "max": 10,
+     "step": 0.5
+    }
+   },
+   "answer": "e-i*(rc+rx)/1000",
+   "unit": "V",
+   "tol": 0.01,
+   "solution": "U = E − I·(R cell + R wire and connector). Example: 3.90 V, 60 mΩ, 44 mΩ, 10 A → 3.90 − 10 × 0.104 = 2.86 V — below the 3.30 V critical threshold with a half-full cell."
+  }
+ ]
+}

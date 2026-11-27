@@ -166,10 +166,10 @@ diff all
 ### Вкладка Configuration
 
 - **Mixer** — тип рами (**Quad X** для типового FPV-квада).
-- **Board and Sensor Alignment** — **Yaw degrees**, якщо FC повернутий на рамі.
-- **Battery Voltage** — **VBAT** для відображення напруги.
-- **ESC/Motor** — у поточному застосунку протокол DShot, **Bidirectional DShot** і Motor idle налаштовуються у вкладці **Motors**.
-- **Motor Stop** — якщо мотори не повинні крутитися на нульовому газу після арму.
+- **Board Alignment** — **Yaw Degrees** (підписи App 2025.12), якщо FC повернутий на рамі.
+- Вкладка **Power & Battery** — джерело вимірювання напруги для її відображення.
+- **ESC/Motor Features** — у поточному застосунку протокол DShot, **Bidirectional DShot** і Motor idle налаштовуються у вкладці **Motors**.
+- **MOTOR_STOP** («Don't spin the motors when armed») — якщо мотори не повинні крутитися на нульовому газу після арму.
 
 ### Вкладка Ports
 
@@ -179,7 +179,7 @@ diff all
 
 ### Вкладка Receiver
 
-- **Serial-based receiver** для CRSF / SBUS / FPORT.
+- Режим приймача **Serial (via UART)** для CRSF / SBUS / FPORT.
 - **Provider:** **CRSF** (ELRS, TBS), **SBUS** (FrSky, DJI тощо).
 - Стіки на пульті → повзунки в конфігураторі мають рухатися.
 - Діапазон **1000–2000** (центр **1500**); інакше **rxrange** у CLI або endpoints на пульті.

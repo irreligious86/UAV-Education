@@ -1,0 +1,183 @@
+{
+  "module": "bf-rates-rc",
+  "tasks": [
+    {
+      "id": "actual-rate",
+      "title": "The setpoint in the Actual model",
+      "statement": "A profile with `rates_type = ACTUAL`: `roll_rc_rate = {rc}`, `roll_srate = {sr}`, `roll_expo = {ex}`. The roll stick is deflected by **{x}** of travel to the right. Find the roll setpoint in °/s.",
+      "params": {
+        "rc": {
+          "min": 5,
+          "max": 25,
+          "step": 1
+        },
+        "sr": {
+          "min": 50,
+          "max": 100,
+          "step": 5
+        },
+        "ex": [
+          0,
+          20,
+          40,
+          54,
+          60,
+          80
+        ],
+        "x": [
+          0.25,
+          0.5,
+          0.75,
+          0.9
+        ]
+      },
+      "answer": "x*rc*10 + (sr*10 - rc*10)*x*(x**5*ex/100 + x*(1 - ex/100))",
+      "unit": "°/s",
+      "tol": 0.01,
+      "solution": "C = rc_rate·10, M = srate·10, e = expo/100. `applyActualRates`: rate = C·x + (M − C)·|x|·(x⁵·e + x·(1 − e)). The center and the maximum are set directly, and expo changes only the shape between them."
+    },
+    {
+      "id": "bf-max-rate",
+      "title": "The maximum rate of the Betaflight model",
+      "statement": "The BETAFLIGHT model: RC rate **{r}**, super rate **{s}**, expo 0.30. Find the maximum angular rate at full stick, °/s.",
+      "params": {
+        "r": {
+          "min": 0.8,
+          "max": 1.8,
+          "step": 0.05
+        },
+        "s": {
+          "min": 0.5,
+          "max": 0.8,
+          "step": 0.02
+        }
+      },
+      "answer": "200*r/(1 - s)",
+      "unit": "°/s",
+      "tol": 0.01,
+      "solution": "At x = 1 the expo term gives x' = 1, and the super factor is 1/(1 − s). Maximum = 200·r/(1 − s). Expo affects the center (×(1 − e)) but not the maximum; RC rate ≤ 2.0, so the RC_RATE_INCREMENTAL correction is not needed."
+    },
+    {
+      "id": "auto-cutoff",
+      "title": "The automatic RC smoothing cutoff",
+      "statement": "Betaflight 2025.12 measured a receiver rate of **{f} Hz**, `rc_smoothing_auto_factor = {a}`, `rc_smoothing_setpoint_cutoff = 0`. What setpoint cutoff (the “Active setpoint and FF cutoff” line) will `rc_smoothing_info` show, Hz?",
+      "params": {
+        "f": [
+          50,
+          100,
+          150,
+          250,
+          333,
+          500,
+          1000
+        ],
+        "a": [
+          10,
+          20,
+          30,
+          45,
+          60,
+          90,
+          120
+        ]
+      },
+      "answer": "max(15, math.floor(f*1.5/(1 + a/10)))",
+      "unit": "Hz",
+      "tol": 0.001,
+      "abs": 0.5,
+      "solution": "`rcSmoothingSetFilterCutoffs`: cutoff = max(15, (uint16)(f_rx·1.5/(1 + factor/10))). The fractional part is dropped, and the lower bound is 15 Hz. The formula is the same in 4.5 and 2025.12."
+    },
+    {
+      "id": "rxrange-scale",
+      "title": "A channel after rxrange",
+      "statement": "`rxrange 0 {lo} {hi}` is set for roll. The receiver outputs **{v} µs**. Find the channel value after scaling (rcData), µs.",
+      "params": {
+        "lo": [
+          980,
+          985,
+          988,
+          990,
+          995
+        ],
+        "hi": [
+          2005,
+          2010,
+          2012,
+          2015,
+          2020
+        ],
+        "v": {
+          "min": 1050,
+          "max": 1950,
+          "step": 25
+        }
+      },
+      "answer": "1000 + (v - lo)*1000/(hi - lo)",
+      "unit": "µs",
+      "tol": 0.0005,
+      "abs": 0.5,
+      "solution": "`applyRxChannelRangeConfiguraton` calls scaleRangef(v, min, max, 1000, 2000): rcData = 1000 + (v − min)·1000/(max − min). Only channels 0–3 after `map` are scaled."
+    },
+    {
+      "id": "actual-two-profiles",
+      "title": "Two Actual profiles at the same stick deflection",
+      "statement": "Profile A is the default `ACTUAL 7/67/0` (70/670/0). Profile B is `roll_rc_rate = {rc}`, `roll_srate = {sr}`, `roll_expo = {ex}`. The roll stick is deflected by **{x}** of travel. By how many °/s is the setpoint of profile B greater than that of A (B − A; if B is slower, the answer is negative)?",
+      "params": {
+        "rc": {
+          "min": 12,
+          "max": 25,
+          "step": 1
+        },
+        "sr": {
+          "min": 70,
+          "max": 100,
+          "step": 5
+        },
+        "ex": [
+          0,
+          10,
+          20,
+          30
+        ],
+        "x": [
+          0.25,
+          0.5,
+          0.75
+        ]
+      },
+      "answer": "(x*rc*10 + (sr*10 - rc*10)*x*(x**5*ex/100 + x*(1 - ex/100))) - (x*70 + 600*x*x)",
+      "unit": "°/s",
+      "tol": 0.01,
+      "abs": 0.5,
+      "solution": "`applyActualRates` (4.5.3 `fc/rc.c:209`): rate = C·x + (M − C)·|x|·(x⁵·e + x·(1 − e)), C = rc_rate·10, M = srate·10, e = expo/100. For A (e = 0): 70·x + 600·x². Example: B = 20/85/20 at x = 0.5 gives 100 + 650·0.203125 = 232.0 °/s, A — 185 °/s, a difference of +47.0 °/s."
+    },
+    {
+      "id": "ff-jitter-453",
+      "title": "The feedforward jitter multiplier in 4.5.3",
+      "statement": "Betaflight 4.5.3, `feedforward_jitter_factor = {j}`. An ELRS link at **{f} Hz**, the roll stick moves uniformly at **{v}** units of `rcCommand` per second (from center to stop — 500 units, full travel — 1000). What value will `debug_mode = FEEDFORWARD_LIMIT` show in the field debug[0] (the jitter multiplier × 100, %)?",
+      "params": {
+        "j": [
+          5,
+          7,
+          10,
+          12
+        ],
+        "f": [
+          250,
+          500,
+          1000
+        ],
+        "v": {
+          "min": 500,
+          "max": 3000,
+          "step": 250
+        }
+      },
+      "answer": "100*(1 - max(1 - v/(f*j), 0)**2)",
+      "unit": "%",
+      "tol": 0.01,
+      "abs": 0.6,
+      "solution": "The step per packet is Δ = v/f, and the previous one is the same. `rc.c:535`: at Δ < j the multiplier = 1 − (1 − (Δ + Δprev)/(2j))² = 1 − (1 − Δ/j)², and at Δ ≥ j it is 1 (100 %). Example: 1500 units/s at 500 Hz — Δ = 3, j = 7: 1 − (4/7)² = 0.673 → 67 %. In 2025.12 the formula is different: min(1, (Δ + 1)/(1 + j))."
+    }
+  ]
+}
