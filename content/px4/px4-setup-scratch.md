@@ -59,7 +59,7 @@ next:
 |---|---|---|
 | Обычный параметр (усиления, пороги, failsafe) | сразу; на flash/SD записывается сам — автосохранение (`autosave.cpp`), отдельный `param save` не нужен | значение видно после перезагрузки |
 | Порт `*_CONFIG`, `BAT1_V_DIV` / `BAT1_A_PER_V`, `SENS_EN_*`, `MC_AT_EN` | только после перезагрузки: у первых трёх в описании стоит «reboot required», `MC_AT_EN` читает стартовый скрипт `rc.mc_apps` | драйвер виден в `<модуль> status`, порт — в `dmesg` |
-| `SYS_AUTOSTART` (airframe) | после Apply and Restart: `SYS_AUTOCONFIG` = 1 сбрасывает все параметры, кроме калибровок `CAL_*`, `RC*` и `COM_FLTMODE*`, затем скрипт airframe заново ставит свои умолчания | `param show SYS_AUTOSTART` — новый номер; `param show-for-airframe` печатает только отличия от умолчаний — остаются калибровки и режимы |
+| `SYS_AUTOSTART` (airframe) | после Apply and Restart: `SYS_AUTOCONFIG` = 1 сбрасывает все параметры, кроме калибровок `CAL_*` (а также `TC_*`, `LND_FLIGHT*`, `COM_FLIGHT*`; до 1.18 сохранялись ещё `RC*` и `COM_FLTMODE*`, `rcS` v1.18.0), затем скрипт airframe заново ставит свои умолчания | `param show SYS_AUTOSTART` — новый номер; `param show-for-airframe` печатает только отличия от умолчаний — остаются калибровки (до 1.18 — и режимы); калибровку радио и режимы в 1.18 повторяют |
 
 Подробно — хранилище, BSON, `param reset` — в `px4-console-params`.
 
@@ -99,7 +99,7 @@ Airframe мультиротора поверх умолчаний парамет
 ### Шаг 1. Прошивка → сборка SITL (шаг 1 из 17)
 Вместо прошивки — сборка SITL. Я собирал v1.15.4 в контейнере (2 ядра, 7 ГБ): `make px4_sitl_default` — 1024 цели. Python-зависимости ставил в venv по `Tools/setup/requirements.txt`, а не скриптом `ubuntu.sh`. Gazebo в контейнере нет, поэтому основной путь здесь — SIH: физика считается внутри самого PX4. С Gazebo команда та же, что в px4-intro: `make px4_sitl gz_x500`.
 
-Вывод снят на v1.15.4; в 1.17 и 1.18 цели `sihsim_quadx` и `gz_x500` называются так же, для целевого релиза клонируй `--branch v1.18.0` (SITL v1.18.0 c `sihsim_quadx` собран и запущен при подготовке перехода на 1.18; сам вывод ниже не переснимался).
+Вывод снят на v1.15.4; в 1.17 и 1.18 цели `sihsim_quadx` и `gz_x500` называются так же, для целевого релиза клонируй `--branch v1.18.0` (SITL v1.18.0 c `sihsim_quadx` собран и запущен при подготовке перехода на 1.18; сам вывод ниже не переснимался; 1.18 печатает ту же строку 250 Hz и ещё `Simulation with 1.0x speedup. Loop with (4000 us wall time interval)`).
 ```
 git clone --branch v1.15.4 --recursive https://github.com/PX4/PX4-Autopilot.git
 cd PX4-Autopilot && bash ./Tools/setup/ubuntu.sh --no-nuttx
@@ -147,7 +147,7 @@ INFO  [commander] Preflight check: OK
 В QGC → Flight Modes: канал `RC_MAP_FLTMODE`, слоты `COM_FLTMODE1…6` (0 Manual, 1 Altitude, 2 Position, 4 Hold, 5 Return, 8 Stabilized; в 1.17 добавлен 16 — Altitude Cruise). Арм-тумблер — `RC_MAP_ARM_SW`, `COM_ARM_SWISBTN` = 0 (тумблер) или 1 (кнопка). Kill — `RC_MAP_KILL_SW`. Без взлёта PX4 сам снимет арм через `COM_DISARM_PRFLT` = 10 с.
 
 ### Шаг 6. Failsafe с инъекцией отказов (12, 14)
-Инъекция работает при `SYS_FAILURE_EN` = 1 (в SITL — по умолчанию). `failure rc_signal off` в SIH не реализован. Вывод этого шага снят на v1.15.4; в 1.17 и 1.18 обработчика инъекции `rc_signal` в исходниках симуляторов тоже нет (батарею обрабатывает `battery_simulator`, моторы — `FailureInjector`), текст ответа может отличаться:
+Инъекция работает при `SYS_FAILURE_EN` = 1 (в SITL — по умолчанию). `failure rc_signal off` в SIH не реализован. Вывод этого шага снят на v1.15.4; в 1.17 обработчика `rc_signal` тоже нет (батарею обрабатывает `battery_simulator`, моторы — `FailureInjector`), а в 1.18 новый `failure_injection_manager` явно отклоняет её (в консоли `ERROR [failure] Result: 3`, UNSUPPORTED; поддержаны датчики, GPS, воздушная скорость, моторы, батарея):
 ```
 pxh> failure rc_signal off
 ERROR [failure] Timeout waiting for ack
@@ -181,7 +181,7 @@ INFO  [commander] Disarmed by landing
 
 {{diagram:chart-px4-hte|HTE сходится к 0.488–0.493 за ~25 с и совпадает с расчётом 1/(T/W) = 0.4905; MPC_THR_HOVER = 0.5 — только стартовая точка.}}
 
-Autotune: Position на 2.5 м, `MAV_CMD_DO_AUTOTUNE_ENABLE` (в QGC — PID Tuning → Autotune). По `autotune_attitude_control_status` идентификация заняла 26 с (35.4 → 61.2 с от арма), коэффициенты применились после дизарма (`MC_AT_APPLY` = 1). Таблица снята на v1.15.4: стартовое `MC_ROLL_P` там 6.5, в 1.17 умолчание — 4.0:
+Autotune: Position на 2.5 м, `MAV_CMD_DO_AUTOTUNE_ENABLE` (в QGC — PID Tuning → Start AutoTune). По `autotune_attitude_control_status` идентификация заняла 26 с (35.4 → 61.2 с от арма), коэффициенты применились после дизарма (`MC_AT_APPLY` = 1). Таблица снята на v1.15.4: стартовое `MC_ROLL_P` там 6.5, в 1.17 умолчание — 4.0:
 
 | Параметр | До | После |
 |---|---|---|
@@ -217,7 +217,7 @@ param set-default MC_ROLLRATE_P 0.1564
 10. **Питание.** QGC → Power: `BAT1_N_CELLS` 4, `BAT1_V_EMPTY` 3.6, `BAT1_V_CHARGED` 4.05. Напряжение: QGC показывает 16.42 В, мультиметр — 16.71 В, `BAT1_V_DIV` 18.000 → 18.000 × 16.71 / 16.42 = 18.318 (ошибка была 0.072 В/эл). Кнопка Calculate в QGC считает ту же пропорцию. Умолчание `BAT1_V_DIV` и `BAT1_A_PER_V` в самом параметре — −1 («значение платы»): число ставит скрипт платы `rc.board_defaults` (fmu-v6c — 18.1 и 36.37), код `analog_battery.cpp` подстановки не делает. Если в QGC видишь −1, плата аналоговый делитель не задала — введи коэффициент из паспорта силового модуля, затем калибруй пропорцией; оба параметра требуют перезагрузки. Ток проверяется после первого полёта: в логе 2310 мА·ч, зарядка залила 2465 → `BAT1_A_PER_V` 36.0 × 2465 / 2310 = 38.416. `BAT1_CAPACITY` = 4500.
 11. **Failsafe.** `COM_LOW_BAT_ACT` = 3 (в 1.18 с заданной на шаге 10 `BAT1_CAPACITY` это ещё и возврат по остатку времени полёта: Return может начаться раньше уровня critical; не нужен — 5), `NAV_RCL_ACT` = 2, `RTL_RETURN_ALT` выше препятствий (airframe мультиротора ставит 30 м, `RTL_DESCEND_ALT` 10 м; 60 м — умолчание самого параметра), `GF_ACTION` по задаче (умолчание 2 = Hold). Геозона по радиусу выключена, пока `GF_MAX_HOR_DIST` = 0 (и `GF_MAX_VER_DIST` = 0): для первого полёта поставь радиус и высоту с запасом над зоной полётов, например 150 м и 60 м. Потеря связи с QGC `NAV_DLL_ACT` = 0 — выключено. Решение: летаешь с пульта, телеметрия только для наблюдения — оставь 0 (иначе обрыв SiK-радио на краю зоны вызовет Return при живом пульте); летаешь миссию без пульта, QGC — единственный канал — ставь 2 (Return) после `COM_DL_LOSS_T` = 10 с. Вся матрица — в `px4-safety-return`. На столе без пропов и без арма: выключить пульт → в QGC сообщение о потере ручного управления, в консоли `listener failsafe_flags` → `manual_control_signal_lost: True`.
 12. **OSD и телеметрия.** MSP OSD — `MSP_OSD_CONFIG` на свободный UART, если драйвер есть в сборке платы. В default-сборках v1.17.0 `msp_osd` есть у px4 fmu-v5x, fmu-v6x, fmu-v6xrt, ark fpv, cuav 7-nano, cuav fmu-v6x, cuav x25-evo, micoair h743 / h743-aio / h743-v2, radiolink PIX6, hkust nxt-dual, zeroone x6, accton-godwit ga1, nxp tropic-community и mr-tropic, modalai voxl2 (и SITL); в v1.18.0 к ним добавились новые платы aedrox aedroxh7, corvon 743v2, cuav x25-mega и x25-super, gearup airbrainh743, svehicle e2; в 1.15.4 — только fmu-v5x, fmu-v6x, fmu-v6xrt и voxl2 (и SITL). У fmu-v6c и fmu-v5 его нет: нет параметра `MSP_OSD_CONFIG` → нужна своя сборка (`px4-console-params`); с 1.16 драйвер шлёт MSP DisplayPort (до 1.16 — элементы DJI legacy MSP), совместимость с конкретными очками PX4 не документирует. Иначе телеметрия на пульте через CRSF (`RC_CRSF_TEL_EN`).
-13. **Предполётная проверка и висение.** Пропы — по схеме CW/CCW. GPS ≥ 10 спутников, «Ready to fly», kill-тумблер под пальцем, 10 м до людей. Взлёт в Position, 2–3 м, 60 с висения, по 2 м в стороны, посадка. Прерывай (kill или Land), если: раскачка больше ±5°, дрейф больше 1 м при отпущенных стиках, «toilet bowl» (раскрутка по кругу — компас), газ висения выше 0.7.
+13. **Предполётная проверка и висение.** Пропы — по схеме CW/CCW. GPS ≥ 10 спутников, «Ready To Fly», kill-тумблер под пальцем, 10 м до людей. Взлёт в Position, 2–3 м, 60 с висения, по 2 м в стороны, посадка. Прерывай (kill или Land), если: раскачка больше ±5°, дрейф больше 1 м при отпущенных стиках, «toilet bowl» (раскрутка по кругу — компас), газ висения выше 0.7.
 14. **Тест failsafe в воздухе.** Position на 10 м, пульт выключить → Hold 5 с → Return. Включить пульт, сменой режима перехватить.
 15. **Autotune.** Сначала `MC_AT_EN` = 1 и перезагрузка: на полётнике умолчание 0 и модуль не запущен, а SITL ставит 1 сам. Altitude, 4–20 м, штиль. Порядок — как в шаге 7 SITL, но фильтры и вибрации заранее проверены по px4-control.
 16. **Лог и бэкап.** ULog в Flight Review: вибрации, газ висения, RC и батарея. `.params` из QGC — в репозиторий аппарата.
@@ -253,8 +253,8 @@ param set-default MC_ROLLRATE_P 0.1564
 - **Симптом:** после потери RC аппарат 5 с висит и только потом идёт домой
   - Возможная причина: это норма — Hold на `COM_FAIL_ACT_T`.
   - Что сделать: учитывать при планировании дистанции; уменьшать задержку осознанно.
-- **Симптом:** `failure rc_signal off` в SITL отвечает «Timeout waiting for ack»
-  - Возможная причина: эта инъекция в симуляторах не обрабатывается (ответ снят на 1.15.4; в исходниках 1.17 и 1.18 обработчика тоже нет).
+- **Симптом:** `failure rc_signal off` в SITL отвечает «Timeout waiting for ack» (1.15–1.17) или «Result: 3» (1.18)
+  - Возможная причина: эта инъекция в симуляторах не обрабатывается (ответ снят на 1.15.4; в исходниках 1.17 обработчика тоже нет, а в 1.18 `failure_injection_manager` сообщает, что она не поддерживается).
   - Что сделать: имитировать потерю, прекратив `MANUAL_CONTROL` (джойстик QGC или скрипт).
 
 ## references

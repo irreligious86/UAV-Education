@@ -1,0 +1,169 @@
+{
+ "module": "px4-hardware-peripherals",
+ "tasks": [
+  {
+   "id": "baud-to-bytes",
+   "title": "Rate limit at MAV_n_RATE = 0",
+   "statement": "A MAVLink instance is on a port at **{b}** baud, `MAV_n_RATE` = 0. What rate limit (bytes/s) does the firmware use?",
+   "params": {
+    "b": [
+     9600,
+     19200,
+     38400,
+     57600,
+     115200,
+     230400,
+     460800,
+     921600
+    ]
+   },
+   "answer": "b/20",
+   "unit": "B/s",
+   "tol": 0.0005,
+   "abs": 0.5,
+   "solution": "`mavlink_main.cpp`: with a zero limit `_datarate = _baudrate / 20`. On an 8N1 port a byte is 10 bits, so the port limit is `baud / 10`; the firmware takes half. This rule is for UART; on USB (`/dev/ttyACM*`) zero means 100 000 B/s."
+  },
+  {
+   "id": "rate-mult",
+   "title": "MAVLink rate multiplier",
+   "statement": "`MAV_0_RATE` = **{r}** B/s. Constant-rate streams (HEARTBEAT) take 21 B/s. By the sum of \"size × rate\" the scalable streams need **{s}** B/s. Find the `tx rate mult` multiplier (with the 0.05…1 bounds).",
+   "params": {
+    "r": [
+     600,
+     1200,
+     1800,
+     2400,
+     2880,
+     5760
+    ],
+    "s": [
+     1500,
+     2344.5,
+     3200,
+     4800,
+     9600,
+     22680
+    ]
+   },
+   "answer": "max(0.05, min(1.0, (r - 21)/s))",
+   "unit": "",
+   "tol": 0.01,
+   "abs": 0.005,
+   "solution": "`update_rate_mult()`: mult = (limit − constant-rate) / scalable, then constrained to 0.05…1. The multiplier never goes above 1, so rates do not rise beyond what is configured."
+  },
+  {
+   "id": "stream-hz",
+   "title": "Actual message rate",
+   "statement": "Port at **{b}** baud, `MAV_n_RATE` = 0. The scalable streams need **{s}** B/s, the constant-rate ones 21 B/s. A message is configured for **{f}** Hz. At what rate will it go out?",
+   "params": {
+    "b": [
+     19200,
+     38400,
+     57600,
+     115200
+    ],
+    "s": [
+     2344.5,
+     4800,
+     9600,
+     22680
+    ],
+    "f": [
+     5,
+     10,
+     15,
+     50,
+     100
+    ]
+   },
+   "answer": "f*max(0.05, min(1.0, (b/20 - 21)/s))",
+   "unit": "Hz",
+   "tol": 0.02,
+   "abs": 0.05,
+   "solution": "Limit = baud / 20. mult = (limit − 21) / scalable sum, constrained to 0.05…1. Rate = configured × mult."
+  },
+  {
+   "id": "msg-budget",
+   "title": "How many bytes per second a stream takes",
+   "statement": "A MAVLink 2 message with a **{p}**-byte payload is sent at **{f}** Hz. How many bytes per second does the firmware budget for it when computing the multiplier?",
+   "params": {
+    "p": [
+     9,
+     20,
+     28,
+     32,
+     42,
+     43,
+     48,
+     52,
+     54,
+     63,
+     233
+    ],
+    "f": [
+     0.5,
+     1,
+     4,
+     5,
+     10,
+     15,
+     30,
+     50
+    ]
+   },
+   "answer": "(p + 12)*f",
+   "unit": "B/s",
+   "tol": 0.0005,
+   "abs": 0.5,
+   "solution": "The stream size is the full payload length + 12 bytes (10 of header and 2 of checksum, no signature), times the rate: `MAVLINK_MSG_ID_*_LEN + MAVLINK_NUM_NON_PAYLOAD_BYTES`."
+  },
+  {
+   "id": "gps-blend-weight",
+   "title": "Receiver weight when blending two GPS units",
+   "statement": "`SENS_GPS_MASK` = 2 (horizontal accuracy only). The first receiver reports `eph` = **{a}** m, the second **{c}** m, both have a 3D fix. What weight does the first receiver get?",
+   "params": {
+    "a": [
+     0.6,
+     0.8,
+     1.0,
+     1.2,
+     1.5,
+     2.0
+    ],
+    "c": [
+     0.7,
+     0.9,
+     1.1,
+     1.6,
+     2.4,
+     3.0
+    ]
+   },
+   "answer": "c**2/(a**2 + c**2)",
+   "unit": "",
+   "tol": 0.01,
+   "abs": 0.005,
+   "solution": "`gps_blending.cpp`: the weight is inversely proportional to the square of the error and normalized: w₁ = (1/eph₁²) / (1/eph₁² + 1/eph₂²) = eph₂² / (eph₁² + eph₂²). The more accurate receiver gets the larger weight; with equal eph both get 0.5."
+  },
+  {
+   "id": "gnss-mask",
+   "title": "GPS_1_GNSS mask",
+   "statement": "You need to enable these systems on a u-blox: GPS (bit 0), Galileo (bit 2), plus bits **{x}** and **{y}** (1 SBAS, 3 BeiDou, 4 GLONASS, 5 NAVIC). What number goes into `GPS_1_GNSS`?",
+   "params": {
+    "x": [
+     1,
+     3
+    ],
+    "y": [
+     4,
+     5
+    ]
+   },
+   "answer": "1 + 4 + 2**x + 2**y",
+   "unit": "",
+   "tol": 0.0001,
+   "abs": 0.4,
+   "solution": "Mask = sum of 2^bit: GPS 1 + Galileo 4 + 2^x + 2^y. For example, GPS + SBAS + Galileo + GLONASS = 1 + 2 + 4 + 16 = 23."
+  }
+ ]
+}

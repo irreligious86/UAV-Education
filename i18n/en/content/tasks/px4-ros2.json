@@ -1,0 +1,72 @@
+{
+  "module": "px4-ros2",
+  "tasks": [
+    {
+      "id": "rate-cap",
+      "title": "Rate cap of an outgoing topic",
+      "statement": "In `dds_topics.yaml` a topic has `rate_limit: {r}.`. The PX4 1.17 uXRCE-DDS client calls `orb_set_interval` with a period of 1000/`rate_limit` ms converted to whole milliseconds. What is the maximum rate at which the topic goes out to ROS 2, in Hz?",
+      "params": {
+        "r": [
+          3,
+          7,
+          15,
+          30,
+          40,
+          60,
+          70,
+          90
+        ]
+      },
+      "answer": "1000/math.floor(1000/r)",
+      "unit": "Hz",
+      "tol": 0.002,
+      "solution": "Period = (uint64)(1000/r) ms, the fractional part is dropped, rate = 1000/period. For example, 30 Hz → 33 ms → 30.30 Hz; 60 Hz → 16 ms → 62.5 Hz. Without `rate_limit` the period is 10 ms, so no more than 100 Hz."
+    },
+    {
+      "id": "stall-margin",
+      "title": "How long a stall Offboard survives",
+      "statement": "A node publishes `OffboardControlMode` at **{f} Hz**, `COM_OF_LOSS_T = {lt} s`. What is the longest node stall (a pause on top of the normal period) that PX4 still does not treat as signal loss, in s?",
+      "params": {
+        "f": [
+          2,
+          5,
+          10,
+          20,
+          50
+        ],
+        "lt": [
+          1.0,
+          1.5,
+          2.0,
+          3.0
+        ]
+      },
+      "answer": "lt - 1/f",
+      "unit": "s",
+      "tol": 0.01,
+      "abs": 0.005,
+      "solution": "The signal is lost when the last message's timestamp is older than `COM_OF_LOSS_T` (offboardCheck.cpp). The gap between messages = the period 1/f + the stall d; the condition d + 1/f < L → d < L − 1/f. At 2 Hz and 1 s the margin is only 0.5 s."
+    },
+    {
+      "id": "uart-load",
+      "title": "UART load from the DDS bridge",
+      "statement": "`uxrce_dds_client status` shows `Payload tx: {p} B/s` on TELEM2 at **{b} baud** (8N1). What share of the line capacity does the traffic take, in %?",
+      "params": {
+        "p": {
+          "min": 20000,
+          "max": 90000,
+          "step": 5000
+        },
+        "b": [
+          921600,
+          1500000,
+          3000000
+        ]
+      },
+      "answer": "100*p/(b/10)",
+      "unit": "%",
+      "tol": 0.01,
+      "solution": "An 8N1 byte is 10 bits, capacity = baud/10 bytes/s. Share = P/(B/10)·100 %. `Payload tx` counts only the CDR data, without the XRCE headers and framing (at most ~23 bytes per sample), so the course guideline is to keep it below ~50 % (with headers that is about 70 % of the line)."
+    }
+  ]
+}

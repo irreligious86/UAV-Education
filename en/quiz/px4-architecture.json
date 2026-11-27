@@ -11,10 +11,10 @@
         "Files"
       ],
       "answer": 1,
-      "explain": "Asynchronously; the subscriber wakes up on new data."
+      "explain": "Asynchronously: a subscriber wakes up on new data."
     },
     {
-      "q": "What is mandatory in every .msg?",
+      "q": "What must every .msg contain?",
       "options": [
         "Nothing",
         "uint64 timestamp",
@@ -22,10 +22,10 @@
         "An id field and the module name"
       ],
       "answer": 1,
-      "explain": "It is filled in on publication."
+      "explain": "It is filled in when publishing."
     },
     {
-      "q": "How does VehicleAttitude.msg turn into a topic name?",
+      "q": "How does VehicleAttitude.msg become a topic name?",
       "options": [
         "VA",
         "vehicle_attitude",
@@ -44,10 +44,10 @@
         "EKF2"
       ],
       "answer": 1,
-      "explain": "According to the CA_AIRFRAME and CA_ROTOR* geometry."
+      "explain": "From the CA_AIRFRAME and CA_ROTOR* geometry."
     },
     {
-      "q": "Who is responsible for arming, modes and failsafe?",
+      "q": "Who handles arming, modes and failsafes?",
       "options": [
         "Navigator",
         "Commander",
@@ -66,7 +66,7 @@
         "listener"
       ],
       "answer": 1,
-      "explain": "listener shows the content, top shows module load."
+      "explain": "listener shows the contents, top the module load (on a flight controller; the SITL build has no top command, use `listener cpuload` and `work_queue status` there)."
     },
     {
       "q": "Where do most PX4 modules run on NuttX?",
@@ -77,15 +77,15 @@
         "Lua"
       ],
       "answer": 1,
-      "explain": "wq:rate_ctrl is higher, wq:lp_default is lower."
+      "explain": "wq:rate_ctrl is higher, wq:lp_default lower."
     },
     {
       "q": "What belongs to the PX4 flight stack rather than the middleware?",
       "options": [
-        "State estimation, controllers, navigator, commander",
+        "Estimation, controllers, navigator, commander",
         "Sensor drivers",
         "The uORB bus",
-        "MAVLink and uXRCE-DDS communication"
+        "MAVLink and uXRCE-DDS links"
       ],
       "answer": 0,
       "explain": "Middleware is drivers, the bus and communication; the flight stack is the algorithms."

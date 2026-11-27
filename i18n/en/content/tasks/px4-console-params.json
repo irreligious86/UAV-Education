@@ -1,0 +1,127 @@
+{
+ "module": "px4-console-params",
+ "tasks": [
+  {
+   "id": "autosave-delay",
+   "title": "Autosave delay",
+   "statement": "PX4 parameters were saved **{e} s** ago. You change a parameter with `param set`. After how many seconds does the autosave fire?",
+   "params": {
+    "e": [
+     0.1,
+     0.4,
+     0.8,
+     1.0,
+     1.3,
+     1.6,
+     1.9,
+     2.5,
+     5.0
+    ]
+   },
+   "answer": "max(0.3, 2 - e)",
+   "unit": "s",
+   "tol": 0.01,
+   "abs": 0.01,
+   "solution": "`ParamAutosave::request()`: a delay of 0.3 s, but no more than one save per 2 s. Delay = max(0.3, 2 − t), where t is the time since the last save. For t ≥ 1.7 s it stays at 0.3 s."
+  },
+  {
+   "id": "bson-size",
+   "title": "Parameter file size",
+   "statement": "PX4 storage gets **{a}** integer parameters and **{b}** float ones; the average name length is exactly **{L}** characters. What is the size of the BSON document in bytes?",
+   "params": {
+    "a": [
+     3,
+     6,
+     10,
+     20,
+     40
+    ],
+    "b": [
+     2,
+     5,
+     12,
+     30
+    ],
+    "L": [
+     9,
+     11,
+     12,
+     13
+    ]
+   },
+   "answer": "5 + a*(L + 6) + b*(L + 10)",
+   "unit": "bytes",
+   "tol": 0.0005,
+   "abs": 0.5,
+   "solution": "Document: 4 length bytes + the records + 1 terminating byte. A record: 1 type byte, the name, 1 zero byte and the value, 4 bytes for an int32 and 8 for a double (PX4 writes floats as double). Total 5 + a·(L + 6) + b·(L + 10)."
+  },
+  {
+   "id": "cpu-average",
+   "title": "Average load from the Uptime line",
+   "statement": "At the bottom of the `top` output there is the line `Uptime: {t}s total, {i}s idle`. What is the average CPU load since power-on, in percent?",
+   "params": {
+    "t": [
+     1200,
+     1840,
+     2400,
+     3600
+    ],
+    "i": [
+     300,
+     480,
+     750,
+     1100
+    ]
+   },
+   "answer": "(1 - i/t)*100",
+   "unit": "%",
+   "tol": 0.01,
+   "abs": 0.1,
+   "solution": "Load = 1 − idle / total time. `load_mon` computes the `cpuload` topic the same way, only over the last interval. Compare it with `COM_CPU_MAX` = 95 %: the arming check trips when it is exceeded for more than 2 s."
+  },
+  {
+   "id": "listener-count",
+   "title": "How many messages listener prints",
+   "statement": "You typed `listener sensor_combined -r {r}` without `-n`, and the topic publishes continuously. How many messages does the command print before it exits?",
+   "params": {
+    "r": [
+     1,
+     2,
+     5,
+     10,
+     20,
+     50
+    ]
+   },
+   "answer": "30*r",
+   "unit": "messages",
+   "tol": 0.0005,
+   "abs": 0.5,
+   "solution": "`listener_main.cpp`: if `-n` is not given but `-r` is, the message count = 30 · rate, \"30 seconds at the given rate\". Without both options it prints one message."
+  },
+  {
+   "id": "sd-minutes",
+   "title": "Card headroom before the cleanup threshold",
+   "statement": "A 16 GB card running PX4 1.17 has **{f} MiB** free. `logger status` shows an average write rate of **{r} KiB/s**. How many minutes of logging are left before the 300 MiB threshold below which the logger starts deleting old logs at its next start?",
+   "params": {
+    "f": [
+     2000,
+     3600,
+     7200,
+     14500
+    ],
+    "r": [
+     40,
+     60,
+     95,
+     150
+    ]
+   },
+   "answer": "(f - 300)*1024/r/60",
+   "unit": "min",
+   "tol": 0.01,
+   "abs": 0.5,
+   "solution": "`check_free_space()`: a threshold of 300 MiB (or 10 % of the card, if that is less). Headroom = (free − 300) MiB · 1024 / rate in KiB/s, then divide the seconds by 60. The cleanup runs once at logger start; below 50 MiB the log does not start. In 1.18.0 the rule is based on `SDLOG_ROTATE` and `SDLOG_MAX_SIZE` instead."
+  }
+ ]
+}

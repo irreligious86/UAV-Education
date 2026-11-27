@@ -5,16 +5,16 @@
     {
       "q": "What does MicroXRCEAgent do?",
       "options": [
-        "Calibrates sensors over ROS 2",
+        "Calibrates sensors through ROS 2",
         "Bridges uORB ↔ DDS",
-        "Flies",
+        "Flies the vehicle",
         "Replaces QGC"
       ],
       "answer": 1,
       "explain": "The client runs on the flight controller, the agent on the companion/PC."
     },
     {
-      "q": "Which message must be streamed before switching to Offboard?",
+      "q": "Which message must stream before switching to Offboard?",
       "options": [
         "TrajectorySetpoint",
         "OffboardControlMode",
@@ -22,10 +22,10 @@
         "VehicleCommand"
       ],
       "answer": 1,
-      "explain": "Otherwise PX4 won't switch or arm in Offboard."
+      "explain": "Otherwise PX4 will not switch or arm in Offboard."
     },
     {
-      "q": "At what OffboardControlMode rate does PX4 exit Offboard?",
+      "q": "Below what OffboardControlMode rate does PX4 exit Offboard?",
       "options": [
         "Below ~2 Hz",
         "Below 50 Hz",
@@ -33,21 +33,21 @@
         "Never"
       ],
       "answer": 0,
-      "explain": "The timeout protects against a companion that has gone quiet."
+      "explain": "That is how the documentation puts it; the code is more precise (offboardCheck.cpp): the signal is lost when the last OffboardControlMode timestamp is older than COM_OF_LOSS_T = 1 s. 2 Hz is a margin: at 2 Hz one missed message already gives a 1 s gap."
     },
     {
       "q": "What matters about the px4_msgs branch?",
       "options": [
         "Only the main branch",
-        "It must match the PX4 version",
-        "Any branch",
-        "It isn't needed"
+        "It matches the PX4 version",
+        "Any branch works",
+        "It is not needed"
       ],
       "answer": 1,
-      "explain": "Otherwise the message definitions don't match."
+      "explain": "Otherwise the message definitions do not match."
     },
     {
-      "q": "What are the topics coming from PX4 called in ROS 2?",
+      "q": "What are the topics from PX4 called in ROS 2?",
       "options": [
         "/px4/*",
         "/fmu/out/*",
@@ -55,7 +55,7 @@
         "/mavlink/*"
       ],
       "answer": 1,
-      "explain": "The ones going into PX4 are /fmu/in/*."
+      "explain": "Topics to PX4 are /fmu/in/*."
     },
     {
       "q": "An altitude of 3 m in TrajectorySetpoint (NED) is Z = …",
@@ -80,15 +80,15 @@
       "explain": "NED: the Z axis points down."
     },
     {
-      "q": "What QoS does a subscriber to /fmu/out/* need?",
+      "q": "Which QoS does a subscriber to /fmu/out/* need?",
       "options": [
         "RELIABLE",
         "BEST_EFFORT",
-        "Only TRANSIENT_LOCAL",
+        "TRANSIENT_LOCAL only",
         "Any"
       ],
       "answer": 1,
-      "explain": "A QoS mismatch = the topic “stays silent”."
+      "explain": "A QoS mismatch means the topic stays silent."
     }
   ]
 }

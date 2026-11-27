@@ -1,0 +1,137 @@
+{
+ "module": "px4-setup-vtol",
+ "tasks": [
+  {
+   "id": "vtol-stall-speed",
+   "title": "Stall speed from mass and wing",
+   "statement": "Mass **{m}** kg, wing area **{S}** m², C_Lmax = **{cl}**, ρ = 1.225 kg/m³. Find the stall speed V_s.",
+   "params": {
+    "m": {
+     "min": 1.5,
+     "max": 6.0,
+     "step": 0.5
+    },
+    "S": [
+     0.35,
+     0.45,
+     0.55,
+     0.65,
+     0.75,
+     0.9
+    ],
+    "cl": [
+     1.0,
+     1.1,
+     1.2,
+     1.3
+    ]
+   },
+   "answer": "math.sqrt(2*m*9.81/(1.225*S*cl))",
+   "unit": "m/s",
+   "tol": 0.01,
+   "solution": "V_s = √(2·m·g / (ρ·S·C_Lmax)). The module example: 4.5 kg, 0.75 m², 1.2 → 8.95 m/s. Then, by the module's rules: FW_AIRSPD_STALL = V_s, FW_AIRSPD_MIN = 1.25·V_s (rounded up to 0.5)."
+  },
+  {
+   "id": "vtol-turn-min-airspeed",
+   "title": "Minimum airspeed in a turn",
+   "statement": "`FW_AIRSPD_MIN` = **{vmin}** m/s, bank angle in a steady turn **{phi}**°. What minimum airspeed will TECS hold in this turn (`WEIGHT_*` not set)?",
+   "params": {
+    "vmin": {
+     "min": 8,
+     "max": 18,
+     "step": 0.5
+    },
+    "phi": [
+     20,
+     30,
+     35,
+     40,
+     45,
+     50,
+     55,
+     60
+    ]
+   },
+   "answer": "vmin*math.sqrt(1/math.cos(math.radians(phi)))",
+   "unit": "m/s",
+   "tol": 0.01,
+   "solution": "PerformanceModel::getMinimumCalibratedAirspeed: MIN·√n, n = 1/cos φ. At 50° n = 1.556, √n = 1.247: 11.5 → 14.34 m/s. The stall speed in a turn grows the same way."
+  },
+  {
+   "id": "vtol-backtrans-distance",
+   "title": "Back transition start distance",
+   "statement": "Groundspeed before the VTOL_LAND item **{v}** m/s, `VT_B_DEC_MSS` = **{a}** m/s². At what distance before the point does the mission start the back transition?",
+   "params": {
+    "v": {
+     "min": 12,
+     "max": 26,
+     "step": 1
+    },
+    "a": [
+     1.0,
+     1.5,
+     2.0,
+     2.5,
+     3.0
+    ]
+   },
+   "answer": "v**2/(2*a)",
+   "unit": "m",
+   "tol": 0.01,
+   "solution": "mission_block.cpp: the waypoint acceptance radius = v²/(2·VT_B_DEC_MSS). 16 m/s and 2 m/s² → 64 m. By the code the transition ends earlier, at MPC_XY_CRUISE (5 m/s), after (v² − 25)/(2a) meters."
+  },
+  {
+   "id": "vtol-front-trans-time",
+   "title": "Front transition time",
+   "statement": "A standard VTOL with a sensor, ρ = 1.225. After the switch, airspeed rises uniformly at **{acc}** m/s². `VT_ARSP_TRANS` = **{vt}** m/s, `VT_TRANS_MIN_TM` = **{tm}** s, everything else at the defaults (`VT_ARSP_BLEND` = 8 m/s, `VT_F_TR_OL_TM` = 6 s, `VT_TRANS_TIMEOUT` = 15 s). After how many seconds does the vehicle become a fixed-wing?",
+   "params": {
+    "acc": [
+     1.5,
+     2.0,
+     2.5,
+     3.0
+    ],
+    "vt": {
+     "min": 9,
+     "max": 16,
+     "step": 0.5
+    },
+    "tm": [
+     2,
+     3,
+     4,
+     5
+    ]
+   },
+   "answer": "max(tm, vt/acc)",
+   "unit": "s",
+   "tol": 0.01,
+   "solution": "isFrontTransitionCompletedBase: both conditions are needed, time > VT_TRANS_MIN_TM and V ≥ VT_ARSP_TRANS. Reaching the airspeed takes vt/acc, so the result is max(VT_TRANS_MIN_TM, vt/acc). Check separately that VT_ARSP_BLEND is reached before VT_F_TR_OL_TM; otherwise you get a quad-chute."
+  },
+  {
+   "id": "vtol-timeout-density",
+   "title": "Transition timeout at altitude",
+   "statement": "`VT_TRANS_TIMEOUT` = **{to}** s, air density **{rho}** kg/m³. After how many seconds does the transition timeout fire?",
+   "params": {
+    "to": [
+     10,
+     12,
+     15,
+     18,
+     20
+    ],
+    "rho": [
+     0.8,
+     0.9,
+     1.0,
+     1.1,
+     1.225
+    ]
+   },
+   "answer": "to*(1.225/max(0.7,min(1.5,rho)))**1.5",
+   "unit": "s",
+   "tol": 0.01,
+   "solution": "getFrontTransitionTimeFactor: the factor is (ρ₀/ρ)^1.5, with ρ limited to 0.7…1.5 kg/m³. At ρ = 1.0 the factor is 1.356: 15 s → 20.3 s. VT_TRANS_MIN_TM and VT_F_TR_OL_TM get the same factor."
+  }
+ ]
+}

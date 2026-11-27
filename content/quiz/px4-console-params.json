@@ -25,15 +25,15 @@
    "explain": "В `param_import_callback()` значения пишутся с флагом mark_saved, а `param_autosave()` вызывается только для несохранённых изменений. Основное хранилище остаётся прежним, пока не набран `param save` или не изменён любой другой параметр."
   },
   {
-   "q": "Какой сброс оставит калибровку акселерометра (`CAL_ACC*`) и радио (`RC*`)?",
+   "q": "PX4 1.17: какой сброс оставит калибровку акселерометра (`CAL_ACC*`) и радио (`RC*`)?",
    "options": [
     "Консольный `param reset_all` без аргументов",
-    "QGC: Reset all to firmware defaults",
+    "QGC: Reset all to firmware's defaults",
     "QGC: Reset to vehicle's configuration defaults",
     "`param load` без аргументов"
    ],
    "answer": 2,
-   "explain": "Этот пункт QGC пишет `SYS_AUTOCONFIG`, и `rcS` при загрузке выполняет `param reset_all SYS_AUTOSTART SYS_PARAM_VER RC* CAL_* COM_FLTMODE* LND_FLIGHT* TC_* COM_FLIGHT*`. Консольный сброс без аргументов стирает всё, firmware defaults оставляет только налёт и `COM_FLIGHT_UUID`."
+   "explain": "Этот пункт QGC пишет `SYS_AUTOCONFIG`, и `rcS` при загрузке выполняет `param reset_all SYS_AUTOSTART SYS_PARAM_VER RC* CAL_* COM_FLTMODE* LND_FLIGHT* TC_* COM_FLIGHT*`. Консольный сброс без аргументов стирает всё, firmware's defaults оставляет только налёт и `COM_FLIGHT_UUID`. В 1.18.0 `RC*` и `COM_FLTMODE*` из этого списка убраны."
   },
   {
    "q": "`listener sensor_gps` печатает координаты, а QGC сообщает о потере GPS. Что набрать следующим?",

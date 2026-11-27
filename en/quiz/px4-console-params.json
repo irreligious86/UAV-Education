@@ -3,114 +3,114 @@
  "pass": 80,
  "questions": [
   {
-   "q": "Квадрокоптер, PX4 1.17: умолчание `RTL_RETURN_ALT` в прошивке 60 м, `rc.mc_defaults` ставит 30 м. Оператор записал 45, потом вернул 30. Вышла новая прошивка, где airframe ставит 50 м. Какая высота возврата будет после обновления?",
+   "q": "A quadcopter, PX4 1.17: the firmware default of `RTL_RETURN_ALT` is 60 m, `rc.mc_defaults` sets 30 m. The operator wrote 45, then set it back to 30. New firmware comes out in which the airframe sets 50 m. What return altitude will there be after the update?",
    "options": [
-    "30 м — значение записано оператором и сохранено",
-    "45 м — в хранилище осталась первая запись",
-    "50 м — значение 30 в хранилище не попало",
-    "60 м — после обновления действует умолчание прошивки"
+    "30 m: the operator wrote the value and it was saved",
+    "45 m: the first write stayed in storage",
+    "50 m: the value 30 never reached storage",
+    "60 m: after the update the firmware default applies"
    ],
    "answer": 2,
-   "explain": "`param_export_internal()` не пишет значения, равные умолчанию запуска. 30 совпадало с умолчанием airframe, в BSON его нет, и после обновления параметр получает новое умолчание airframe — 50 м. 60 м было бы без airframe."
+   "explain": "`param_export_internal()` does not write values equal to the startup default. 30 matched the airframe default, so it is not in the BSON, and after the update the parameter gets the new airframe default, 50 m. 60 m would only apply without an airframe."
   },
   {
-   "q": "Набрано `param import /fs/microsd/backup.bson`, значения в `param show` верные. После перезагрузки вернулись старые. Почему?",
+   "q": "You typed `param import /fs/microsd/backup.bson`, and the values in `param show` are right. After a reboot the old ones are back. Why?",
    "options": [
-    "Импорт помечает значения сохранёнными и автосохранение не запускает; нужен `param save`",
-    "`param import` читает только параметры `CAL_*`, остальные пропускает",
-    "Файл на SD-карте читается только командой `param load`",
-    "Автосохранение отключено, пока к плате подключён USB"
+    "Import marks the values as saved and does not trigger an autosave; you need `param save`",
+    "`param import` reads only the `CAL_*` parameters and skips the rest",
+    "A file on the SD card can only be read with `param load`",
+    "Autosave is disabled while USB is connected to the board"
    ],
    "answer": 0,
-   "explain": "В `param_import_callback()` значения пишутся с флагом mark_saved, а `param_autosave()` вызывается только для несохранённых изменений. Основное хранилище остаётся прежним, пока не набран `param save` или не изменён любой другой параметр."
+   "explain": "In `param_import_callback()` the values are written with the mark_saved flag, and `param_autosave()` is called only for unsaved changes. The main storage stays as it was until you type `param save` or change any other parameter."
   },
   {
-   "q": "Какой сброс оставит калибровку акселерометра (`CAL_ACC*`) и радио (`RC*`)?",
+   "q": "PX4 1.17: which reset keeps the accelerometer calibration (`CAL_ACC*`) and the radio (`RC*`)?",
    "options": [
-    "Консольный `param reset_all` без аргументов",
-    "QGC: Reset all to firmware defaults",
+    "The console `param reset_all` with no arguments",
+    "QGC: Reset all to firmware's defaults",
     "QGC: Reset to vehicle's configuration defaults",
-    "`param load` без аргументов"
+    "`param load` with no arguments"
    ],
    "answer": 2,
-   "explain": "Этот пункт QGC пишет `SYS_AUTOCONFIG`, и `rcS` при загрузке выполняет `param reset_all SYS_AUTOSTART SYS_PARAM_VER RC* CAL_* COM_FLTMODE* LND_FLIGHT* TC_* COM_FLIGHT*`. Консольный сброс без аргументов стирает всё, firmware defaults оставляет только налёт и `COM_FLIGHT_UUID`."
+   "explain": "That QGC item writes `SYS_AUTOCONFIG`, and at boot `rcS` runs `param reset_all SYS_AUTOSTART SYS_PARAM_VER RC* CAL_* COM_FLTMODE* LND_FLIGHT* TC_* COM_FLIGHT*`. The console reset with no arguments erases everything, firmware's defaults keeps only the flight time and `COM_FLIGHT_UUID`. In 1.18.0 `RC*` and `COM_FLTMODE*` were dropped from this list."
   },
   {
-   "q": "`listener sensor_gps` печатает координаты, а QGC сообщает о потере GPS. Что набрать следующим?",
+   "q": "`listener sensor_gps` prints coordinates, while QGC reports GPS lost. What do you type next?",
    "options": [
-    "`listener sensor_gps -i 1` — посмотреть второй экземпляр",
-    "`listener sensor_gps -n 5` — дождаться новых сообщений",
-    "`param show GPS*` — проверить настройки порта",
-    "`uorb status` — посмотреть размер очереди топика"
+    "`listener sensor_gps -i 1` to see the second instance",
+    "`listener sensor_gps -n 5` to wait for new messages",
+    "`param show GPS*` to check the port settings",
+    "`uorb status` to see the topic's queue size"
    ],
    "answer": 1,
-   "explain": "Без `-n` listener печатает последнее опубликованное сообщение, даже если оно старое. С `-n 5` он ждёт новые и через 2 с пишет «Waited for 2.0 seconds without a message. Giving up.» — тогда драйвер молчит, и дальше идут `gps status` и `dmesg`."
+   "explain": "Without `-n`, listener prints the last published message even if it is old. With `-n 5` it waits for new ones and after 2 s prints \"Waited for 2.0 seconds without a message. Giving up.\": then the driver is silent, and next come `gps status` and `dmesg`."
   },
   {
-   "q": "В SITL (`pxh>`) команда `top` отвечает `command not found`. Чем посмотреть загрузку процессора?",
+   "q": "In SITL (`pxh>`) the `top` command answers `command not found`. How do you see the CPU load?",
    "options": [
-    "`top once` — в SITL работает только разовый вывод",
-    "`ps` — список задач NuttX с долей процессора",
-    "`dmesg` — в нём есть строка CPU usage",
-    "`listener cpuload` и `work_queue status`"
+    "`top once`: SITL supports only a one-shot output",
+    "`ps`: the NuttX task list with CPU share",
+    "`dmesg`: it has a CPU usage line",
+    "`listener cpuload` and `work_queue status`"
    ],
    "answer": 3,
-   "explain": "В `boards/px4/sitl/default.px4board` нет `CONFIG_SYSTEMCMDS_TOP`, `DMESG` и `REBOOT`, а `ps` — встроенная команда nsh, которой в pxh нет. Топик `cpuload` публикует `load_mon`, `work_queue status` показывает частоты элементов очередей."
+   "explain": "`boards/px4/sitl/default.px4board` has no `CONFIG_SYSTEMCMDS_TOP`, `DMESG` or `REBOOT`, and `ps` is an nsh built-in that pxh does not have. The `cpuload` topic is published by `load_mon`, and `work_queue status` shows the rates of the queue items."
   },
   {
-   "q": "Параметры сохранялись 0.5 с назад. Ты меняешь ещё один. Через сколько сработает автосохранение?",
+   "q": "Parameters were saved 0.5 s ago. You change one more. When does the autosave fire?",
    "options": [
-    "Через 0.3 с",
-    "Через 1.5 с",
-    "Через 2.0 с",
-    "Через 2.3 с"
+    "After 0.3 s",
+    "After 1.5 s",
+    "After 2.0 s",
+    "After 2.3 s"
    ],
    "answer": 1,
-   "explain": "`ParamAutosave::request()`: задержка 0.3 с, но не чаще одного сохранения в 2 с — `max(0.3, 2 − 0.5)` = 1.5 с."
+   "explain": "`ParamAutosave::request()`: a delay of 0.3 s, but no more than one save per 2 s, so `max(0.3, 2 − 0.5)` = 1.5 s."
   },
   {
-   "q": "В `config.txt` нужно задать значение, которое действует на всех бортах, но оператор может изменить его в QGC, и изменение сохранится. Какой командой?",
+   "q": "In `config.txt` you need a value that applies on every vehicle, but the operator can change it in QGC and the change sticks. Which command?",
    "options": [
-    "`param set <имя> <значение>`",
-    "`param set <имя> <значение> fail`",
-    "`param set-default <имя> <значение>`",
-    "`param touch <имя>` и значение в `extras.txt`"
+    "`param set <name> <value>`",
+    "`param set <name> <value> fail`",
+    "`param set-default <name> <value>`",
+    "`param touch <name>` and the value in `extras.txt`"
    ],
    "answer": 2,
-   "explain": "`param set-default` меняет умолчание запуска — нижний слой; сохранённое оператором значение лежит выше и побеждает. `param set` в `config.txt` выполняется при каждой загрузке и перебивает запись QGC."
+   "explain": "`param set-default` changes the startup default, a lower layer; the value saved by the operator sits above it and wins. `param set` in `config.txt` runs on every boot and overrides what QGC wrote."
   },
   {
-   "q": "На второй борт той же модели платы загрузили `.params` первого вместе с `CAL_ACC*`. Что произойдёт с проверкой калибровки акселерометра?",
+   "q": "The first vehicle's `.params`, including `CAL_ACC*`, was loaded onto a second vehicle with the same board model. What happens to the accelerometer calibration check?",
    "options": [
-    "Проверка не пройдёт: в `CAL_ACC0_ID` записан серийный номер чужого датчика",
-    "QGC откажется загружать файл: не совпадёт `PX4GUID` платы",
-    "Параметры `CAL_*` в `.params` не попадают, калибровка не изменится",
-    "Проверка пройдёт: идентификаторы совпадут, а смещения будут чужими"
+    "It fails: `CAL_ACC0_ID` holds the other sensor's serial number",
+    "QGC refuses to load the file: the board's `PX4GUID` does not match",
+    "`CAL_*` parameters are not in `.params`, so the calibration does not change",
+    "It passes: the IDs match, but the offsets are someone else's"
    ],
    "answer": 3,
-   "explain": "Идентификатор устройства — тип шины, номер шины, адрес и тип микросхемы, без серийного номера. На плате той же модели он совпадает, `FindCurrentCalibrationIndex()` находит запись, проверка проходит, а смещения и масштабы взяты от другого экземпляра. QGC сверяет только System Id."
+   "explain": "A device ID is the bus type, bus number, address and chip type, with no serial number. On a board of the same model it matches, `FindCurrentCalibrationIndex()` finds the entry, the check passes, and the offsets and scales come from another unit. QGC checks only the System Id."
   },
   {
-   "q": "`MAV_1_RATE` нет в списке QGC. `param find MAV_1_RATE` отвечает «Found param … at index …», `param show MAV_1_RATE` ничего не печатает. Что делать?",
+   "q": "`MAV_1_RATE` is not in the QGC list. `param find MAV_1_RATE` answers \"Found param … at index …\", `param show MAV_1_RATE` prints nothing. What do you do?",
    "options": [
-    "Пересобрать прошивку через `boardconfig` с модулем mavlink",
-    "Записать `MAV_1_CONFIG` ≠ 0 и перезагрузить плату",
-    "Выполнить `param reset MAV_1_RATE` и обновить список",
-    "Ничего: параметр относится к самолётам и на мультироторе скрыт"
+    "Rebuild the firmware via `boardconfig` with the mavlink module",
+    "Write `MAV_1_CONFIG` ≠ 0 and reboot the board",
+    "Run `param reset MAV_1_RATE` and refresh the list",
+    "Nothing: the parameter is for planes and hidden on a multicopter"
    ],
    "answer": 1,
-   "explain": "Параметр в сборке есть, но не используется: его читает команда запуска экземпляра MAVLink, а она выполняется в `rc.serial` только при назначенном порте. QGC получает от прошивки только используемые параметры."
+   "explain": "The parameter is in the build but not used: the MAVLink instance start command reads it, and `rc.serial` runs that only when a port is assigned. QGC gets only the used parameters from the firmware."
   },
   {
-   "q": "`commander check` в MAVLink Console ответил `Preflight check: FAILED` и больше ничего. Как узнать причину, не подключая панель QGC?",
+   "q": "`commander check` in the MAVLink Console answered `Preflight check: FAILED` and nothing else. How do you find the reason without the QGC panel?",
    "options": [
-    "`commander arm -f` — причина появится в ответе на арм",
-    "`commander status` — причина в строке navigation mode",
-    "`dmesg` — строки `Preflight Fail: …` от commander",
-    "`param show -c` — причина помечена звёздочкой"
+    "`commander arm -f`: the reason appears in the arming reply",
+    "`commander status`: the reason is in the navigation mode line",
+    "`dmesg`: the `Preflight Fail: …` lines from commander",
+    "`param show -c`: the reason is marked with an asterisk"
    ],
    "answer": 2,
-   "explain": "Сообщения проверок печатает задача commander, а MAVLink-оболочка показывает только вывод запущенной в ней команды. `dmesg` читает буфер консоли. Сама строка `FAILED` — итог прошлой оценки: команда запускает новую, её причины приходят через секунду, а повторный `commander check` покажет свежий итог. `commander arm -f` причины не покажет — он обходит проверки и запускает моторы."
+   "explain": "The check messages are printed by the commander task, and the MAVLink shell shows only the output of the command run in it. `dmesg` reads the console buffer. The `FAILED` line itself is the result of the previous evaluation: the command starts a new one, its reasons arrive a second later, and a repeated `commander check` shows the fresh result. `commander arm -f` shows no reasons: it bypasses the checks and starts the motors."
   }
  ]
 }

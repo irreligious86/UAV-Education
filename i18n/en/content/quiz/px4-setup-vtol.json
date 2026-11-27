@@ -1,0 +1,107 @@
+{
+ "module": "px4-setup-vtol",
+ "pass": 80,
+ "questions": [
+  {
+   "q": "Standard VTOL with an airspeed sensor, PX4 1.18. Under what condition does the front transition complete?",
+   "options": [
+    "time greater than VT_F_TRANS_DUR and airspeed at least VT_ARSP_BLEND",
+    "time greater than VT_TRANS_MIN_TM and airspeed at least VT_ARSP_TRANS",
+    "airspeed at least FW_AIRSPD_MIN, and the transition time does not matter at all",
+    "time greater than VT_F_TR_OL_TM, whatever the airspeed"
+   ],
+   "answer": 1,
+   "explain": "isFrontTransitionCompletedBase: with a sensor it needs both time > VT_TRANS_MIN_TM and airspeed ≥ VT_ARSP_TRANS (corrected by √(WEIGHT_GROSS/WEIGHT_BASE)). VT_F_TR_OL_TM is the condition without a sensor; a standard VTOL does not read VT_F_TRANS_DUR."
+  },
+  {
+   "q": "The same VTOL, but FW_USE_AIRSPD = 0, VT_TRANS_MIN_TM = 2 s, VT_F_TR_OL_TM = 6 s. What happens to the lift motors?",
+   "options": [
+    "full weight until 6 s, then all of them off at once, in one step",
+    "they lose weight linearly from 0 to 6 s",
+    "fading from 1 s, off by 2 s; fixed-wing at 6 s",
+    "they stop at VT_ARSP_BLEND airspeed from GPS"
+   ],
+   "answer": 2,
+   "explain": "Without a sensor w = clamp(2·(1 − t/VT_TRANS_MIN_TM), 0, 1): from half of VT_TRANS_MIN_TM to its end the weight falls to zero, and completion comes at VT_F_TR_OL_TM. That is why VT_TRANS_MIN_TM is taken from a reference flight + 30 %."
+  },
+  {
+   "q": "With an airspeed sensor: VT_F_TR_OL_TM = 6 s, VT_ARSP_BLEND = 8 m/s, VT_TRANS_TIMEOUT = 15 s. At 6.5 s the airspeed is 7 m/s. What happens?",
+   "kind": "apply",
+   "fragment": "VT_F_TR_OL_TM     6.0\nVT_ARSP_BLEND     8.0\nVT_ARSP_TRANS    10.0\nVT_TRANS_TIMEOUT 15.0\nt = 6.5 s, airspeed = 7.0 m/s, rho = 1.225",
+   "options": [
+    "quad-chute on the transition timeout",
+    "the transition continues until 15 s",
+    "the vehicle becomes a fixed-wing, since the OL time has passed",
+    "the transition starts over"
+   ],
+   "answer": 0,
+   "explain": "isFrontTransitionTimeout: with a valid airspeed the timeout comes when time > VT_F_TR_OL_TM while airspeed < VT_ARSP_BLEND. 15 s is the overall limit for the case where this early check did not fire."
+  },
+  {
+   "q": "Which quad-chute conditions are active with the PX4 1.18 defaults (apart from the external command)?",
+   "options": [
+    "minimum altitude and the roll limit",
+    "transition timeout and altitude loss in transition",
+    "the pitch limit and uncommanded descent",
+    "all six conditions except the external MAVLink command"
+   ],
+   "answer": 1,
+   "explain": "VT_FW_MIN_ALT, VT_QC_ALT_LOSS, VT_FW_QC_P, VT_FW_QC_R default to 0, which disables them. VT_QC_T_ALT_LOSS = 20 m and the transition timeouts work right away."
+  },
+  {
+   "q": "A VTOL flies in Position as a fixed-wing, quad-chute fires on roll, COM_QC_ACT = 0. What happens next?",
+   "options": [
+    "Return, because COM_QC_ACT = 0",
+    "Land on the spot",
+    "multirotor in the same Position mode, no Return",
+    "back to fixed-wing once roll is below the VT_FW_QC_R threshold"
+   ],
+   "answer": 2,
+   "explain": "failsafe.cpp applies COM_QC_ACT only when the pilot's intended mode is Mission, Hold, Takeoff or VTOL Takeoff. In manual modes the vehicle switches to hover and stays in the selected mode."
+  },
+  {
+   "q": "V_s = 9 m/s, FW_AIRSPD_MIN = 11.5 m/s, FW_R_LIM = 50°. What minimum airspeed will PX4 hold in a full-bank turn?",
+   "options": [
+    "11.5 m/s",
+    "12.6 m/s",
+    "14.3 m/s",
+    "17.9 m/s"
+   ],
+   "answer": 2,
+   "explain": "getMinimumCalibratedAirspeed: FW_AIRSPD_MIN · √n, n = 1/cos 50° = 1.556, √n = 1.247 → 14.3 m/s. 17.9 is what you get multiplying by n without the root."
+  },
+  {
+   "q": "Mission: groundspeed before VTOL_LAND 18 m/s, VT_B_DEC_MSS = 2 m/s². How many meters before the point does the back transition start?",
+   "options": [
+    "36 m",
+    "45 m",
+    "81 m",
+    "162 m"
+   ],
+   "answer": 2,
+   "explain": "mission_block.cpp: R = v²/(2·a) = 324/4 = 81 m. 162 means the factor of two was forgotten, 36 is v·a, 45 is v·2.5."
+  },
+  {
+   "q": "Why do the surfaces of a standard VTOL on the bench not respond to tilting in hover (MC)?",
+   "options": [
+    "VT_ELEV_MC_LOCK = 1 keeps the surfaces locked in hover",
+    "FW_ARSP_SCALE_EN zeroes the surface output while airspeed is below V_s",
+    "without arming the servos always sit at PWM_*_DIS",
+    "FW_MAN_R_SC = 0 by default"
+   ],
+   "answer": 0,
+   "explain": "With VT_ELEV_MC_LOCK = 1 (the default, except on a tailsitter) the fixed-wing torques are not sent to the surfaces in MC. Check them after a transition to FW, which on the ground without arming completes at once."
+  },
+  {
+   "q": "A plane without an airspeed sensor. What airspeed value does the rate loop use for surface scaling in flight?",
+   "options": [
+    "FW_AIRSPD_MIN",
+    "FW_AIRSPD_TRIM",
+    "GPS groundspeed",
+    "FW_AIRSPD_STALL"
+   ],
+   "answer": 1,
+   "explain": "get_airspeed_and_update_scaling: with no airspeed sensor in use V = FW_AIRSPD_TRIM, so s = 1. FW_AIRSPD_STALL is used only by a VTOL in hover."
+  }
+ ]
+}

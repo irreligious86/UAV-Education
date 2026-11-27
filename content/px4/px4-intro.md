@@ -70,28 +70,28 @@ QGroundControl: прошивка, выбор airframe, калибровки, п�
 |---|---|---|
 | Summary | ничего: красные/зелёные плашки готовности страниц | — |
 | Firmware | прошивка PX4 stable / beta / свой `.px4`, загрузчик | `px4-setup-scratch` |
-| Airframe | `SYS_AUTOSTART` → умолчания airframe (геометрия `CA_*`, усиления, `rc.mc_defaults`); Apply and Restart сбрасывает параметры, кроме калибровок `CAL_*`, `RC*` и `COM_FLTMODE*` | `px4-setup-scratch` |
+| Airframe | `SYS_AUTOSTART` → умолчания airframe (геометрия `CA_*`, усиления, `rc.mc_defaults`); Apply and Restart сбрасывает параметры, кроме калибровок `CAL_*` (и, до 1.18, `RC*` и `COM_FLTMODE*`; `rcS` v1.18.0 их больше не сохраняет) | `px4-setup-scratch` |
 | Sensors | калибровки компаса, гироскопа, акселерометра, горизонта, датчика скорости; ориентации `SENS_BOARD_ROT`, `CAL_MAGn_ROT` | `px4-setup-scratch`, `px4-hardware-peripherals` |
 | Radio | `RCn_MIN/TRIM/MAX/REV`, `RC_MAP_ROLL…THROTTLE`; Copy Trims; каналы AUX `RC_MAP_AUX1…6`; каналы подстройки `RC_MAP_PARAM1…3` | `px4-setup-scratch`, `px4-rc-tuning` |
 | Flight Modes | `RC_MAP_FLTMODE` + `COM_FLTMODE1…6`, `RC_MAP_ARM_SW`, `RC_MAP_KILL_SW`, `RC_MAP_RETURN_SW`, `RC_MAP_LOITER_SW`, `RC_MAP_OFFB_SW` | `px4-rc-tuning` |
 | Power | `BAT1_N_CELLS`, `BAT1_V_CHARGED/EMPTY`, `BAT1_V_DIV`, `BAT1_A_PER_V` (кнопки Calculate), калибровка ESC, настройки UAVCAN | `px4-setup-scratch` |
 | Actuators | геометрия `CA_*`, функция каждого выхода `PWM_MAIN_FUNCn`, протокол группы `PWM_MAIN_TIMn`, Disarmed/Min/Max/Failsafe на выход, реверс `PWM_MAIN_REV`, слайдеры теста, Set Spin Direction (DShot) | `px4-outputs-servos` |
 | Safety | low battery, потеря RC и канала данных, геозона, Return, Land, kill switch | `px4-safety-return` |
-| PID Tuning | кнопка Autotune (нужен `MC_AT_EN` = 1; кнопка шлёт `MAV_CMD_DO_AUTOTUNE_ENABLE`), ползунки rate / attitude / velocity / position, графики отклика | `px4-control` |
-| Camera | триггер камеры `TRIG_*`, обратная связь `CAM_CAP_*` | `px4-camera-gimbal` |
-| Parameters | весь список, Save/Load `.params`, Reset all to firmware's / vehicle's defaults, Set RC to Param, Reboot | `px4-console-params`, `px4-rc-tuning` |
+| PID Tuning | кнопка Start AutoTune (нужен `MC_AT_EN` = 1; кнопка шлёт `MAV_CMD_DO_AUTOTUNE_ENABLE`), ползунки rate / attitude / velocity / position, графики отклика | `px4-control` |
+| Camera | триггер камеры `TRIG_*`, обратная связь `CAM_CAP_*` (страница есть в руководстве QGC, но в исходниках Stable 5.0 для PX4 её нет — задавать в Parameters) | `px4-camera-gimbal` |
+| Parameters | весь список, Save/Load `.params`, Reset all to firmware's defaults / Reset to vehicle's configuration defaults, Set RC to Param, Reboot Vehicle | `px4-console-params`, `px4-rc-tuning` |
 | Joystick | геймпад вместо пульта по MAVLink (`COM_RC_IN_MODE`) | `px4-setup-scratch` |
 | Analyze Tools | MAVLink Console (`nsh>`), Log Download (ULog), MAVLink Inspector | `px4-console-params` |
-| Plan → Geofence, Rally | полигоны и круги геозоны, rally-точки для Return | `px4-safety-return` |
+| Plan → Fence, Rally | полигоны и круги геозоны, rally-точки для Return | `px4-safety-return` |
 
 ### Параметры: как они устроены
 Имена — группами по модулю: `MC_*` (контроллеры мультиротора), `MPC_*` (позиция), `EKF2_*`, `IMU_*`, `COM_*` (commander/failsafe), `NAV_*`, `RTL_*`, `BAT*`, `CA_*` (control allocation), `SER_*`/`MAV_*`/`UXRCE_*` (порты). Полный справочник с диапазонами и умолчаниями — «Parameter Reference» в документации (генерируется из исходников, как у ArduPilot). Экспорт/импорт — QGC → Parameters → Tools (файл `.params`), версионируется (модуль «CI»).
 
 ### Числа для ориентира (умолчания, мультиротор)
-Значения — для PX4 1.18 (сверено с v1.18.0; в 1.17 те же), прежние умолчания — в скобках. Внутренний контур на `IMU_GYRO_RATEMAX` = 800 Гц: у самого параметра умолчание 400, но airframe мультиротора поднимает его до 800 (`rc.mc_defaults`); максимум — 2000 Гц. Фильтр гироскопа `IMU_GYRO_CUTOFF` = 40 Гц, D-term `IMU_DGYRO_CUTOFF` = 20 Гц (до 1.17 — 30) — заметно ниже Betaflight: PX4 рассчитан на более крупные и медленные аппараты, для 5" их поднимают (80–120 / 40–60) вместе с notch по ESC (`IMU_GYRO_DNF_EN`, нужны обороты ESC: bidirectional DShot — в 1.18 значения −6/−7/−8 в `PWM_AUX_TIMn` группы моторов, в 1.16–1.17 — `DSHOT_BIDIR_EN`; в 1.15 была только телеметрия ESC по UART `DSHOT_TEL_CFG`). Максимальный наклон `MPC_TILTMAX_AIR` = 45°, в ручных режимах `MPC_MAN_TILT_MAX` = 35°; максимальная скорость `MPC_XY_VEL_MAX` = 12 м/с.
+Значения — для PX4 1.18 (сверено с v1.18.0; в 1.17 те же), прежние умолчания — в скобках. Внутренний контур на `IMU_GYRO_RATEMAX` = 800 Гц: у самого параметра умолчание 400, но airframe мультиротора поднимает его до 800 (`rc.mc_defaults`); максимум — 2000 Гц. Фильтр гироскопа `IMU_GYRO_CUTOFF` = 40 Гц, D-term `IMU_DGYRO_CUTOFF` = 20 Гц (до 1.17 — 30) — заметно ниже Betaflight: PX4 рассчитан на более крупные и медленные аппараты, для 5" их поднимают (гироскоп около 120, D-term 50–80 — по руководству PX4 по фильтрам) вместе с notch по ESC (`IMU_GYRO_DNF_EN`, нужны обороты ESC: bidirectional DShot — в 1.18 значения −6/−7/−8 в `PWM_AUX_TIMn` группы моторов, в 1.16–1.17 — `DSHOT_BIDIR_EN`; в 1.15 была только телеметрия ESC по UART `DSHOT_TEL_CFG`). Максимальный наклон `MPC_TILTMAX_AIR` = 45°, в ручных режимах `MPC_MAN_TILT_MAX` = 35°; максимальная скорость `MPC_XY_VEL_MAX` = 12 м/с.
 
 ### Логи ULog и Flight Review
-Лог включается при арме (`SDLOG_MODE`), содержит топики uORB с заданной частотой (`SDLOG_PROFILE` — профили: по умолчанию, высокая частота для тюнинга, ...). С 1.18 ротация включена по умолчанию: файл не больше `SDLOG_MAX_SIZE` = 1024 МБ, при старте записи старые логи удаляются, пока свободно меньше (100 − `SDLOG_ROTATE`) = 10 % карты; свой `etc/logging/logger_topics.txt` на SD добавляется к профилю, а не заменяет его. Flight Review (веб) рисует: отклик rate (setpoint vs actual), спектр вибраций (acceleration power spectral density — по нему видно моторы и резонансы), оценку GPS/EKF (innovation test ratios — те же «ворота», что в модуле про Калмана), загрузку CPU и RAM, потери RC. `pyulog` (`ulog2csv`) — для Python-анализа (модуль «Python для данных»).
+Лог включается при арме (`SDLOG_MODE`), содержит топики uORB с заданной частотой (`SDLOG_PROFILE` — профили: по умолчанию, высокая частота для тюнинга, ...). С 1.18 ротация включена по умолчанию: файл не больше `SDLOG_MAX_SIZE` = 1024 МиБ, при старте записи старые логи удаляются, пока свободно меньше (100 − `SDLOG_ROTATE`) = 10 % карты; свой `etc/logging/logger_topics.txt` на SD добавляется к профилю, а не заменяет его. Flight Review (веб) рисует: отклик rate (setpoint vs actual), спектр вибраций (acceleration power spectral density — по нему видно моторы и резонансы), оценку EKF («Estimator Flags»; точность GPS — «GPS Uncertainty», «GPS Noise & Jamming»), загрузку CPU и RAM, входы RC и флаги failsafe (потеря RC видна там как `manual_control_signal_lost`). Innovation test ratios (те же «ворота», что в модуле про Калмана) Flight Review не рисует — их берут из `estimator_innovation_test_ratios` через `pyulog`. `pyulog` (`ulog2csv`) — для Python-анализа (модуль «Python для данных»).
 
 ### Переход 1.15 → 1.17: что переименовано и изменилось
 До 27 ноября 2026 курс был сверен с PX4 v1.17.0; таблица ниже — переход на него с 1.15 (v1.15.4) и 1.16 (v1.16.2), следующий шаг — «Переход 1.17 → 1.18» после неё. Таблица получена сравнением определений параметров и airframe-умолчаний трёх тегов. Порядок обновления:
@@ -115,7 +115,7 @@ QGroundControl: прошивка, выбор airframe, калибровки, п�
 | только телеметрия ESC по UART (`DSHOT_TEL_CFG`) | `DSHOT_BIDIR_EN` (в 1.18 удалён, см. ниже) | bidirectional DShot (eRPM для динамического notch) появился в 1.16; только на поддерживаемых платах и выходах FMU | 1.16 |
 | `DSHOT_MIN`, единица % | `DSHOT_MIN`, единица norm (0…1) | значение по умолчанию 0.055 то же, изменилась только подпись единицы | 1.17 |
 | `PWM_MAIN_TIMn` / `PWM_AUX_TIMn` = −2 — DShot1200 (1.15) | значения нет: DShot только −5 / −4 / −3 (150 / 300 / 600) | DShot1200 убран | 1.16 |
-| — | `PWM_MAIN_CENTn`, `PWM_AUX_CENTn` (−1 или 800…2200 мкс; на выходах IO параметра нет) | центр сервы в микросекундах: две прямые `MIN`–`CENT`–`MAX` (`px4-outputs-servos`) | 1.17 |
+| — | `PWM_MAIN_CENTn`, `PWM_AUX_CENTn` (−1 или 800…2200 мкс; на выходах IO — с 1.18) | центр сервы в микросекундах: две прямые `MIN`–`CENT`–`MAX` (`px4-outputs-servos`) | 1.17 |
 | `CA_SV_CSn_TRIM` для любых серв | для PWM-серв заменён на `CENTn`; при любом `CENTn` ≠ −1 прошивка обнуляет все ненулевые `CA_SV_CSn_TRIM` | нейтраль переехала из миксера на выход | 1.17 |
 | функции выходов до 440 (1.15) | + 450–453 IC Engine Ignition / Throttle / Choke / Starter, + 2070 RPM Input | новые функции | 1.16 |
 | `PD_GRIPPER_EN` (0), `PD_GRIPPER_TO` = 3 с (1.15) | `PD_GRIPPER_EN` удалён, `PD_GRIPPER_TO` = 1 с | отдельного включения захвата больше нет: достаточно `PD_GRIPPER_TYPE` = 0 (Servo, умолчание) и выхода с функцией Gripper | 1.16 |
@@ -217,7 +217,7 @@ PX4 v1.18.0 (тег от 23 ноября 2026, коммит 935addf) — цел�
 | `RCn_REV` — дробный | целый (−1 / 1) | при загрузке `.params` старым QGC проверить реверс | `rc_update/params.yaml:32`, `param_translation.cpp:236` |
 | функции Servo 1…8 (201…208) | Servo 1…15 (201…215) | — | `output_functions.yaml:14` |
 | — | `COM_FLTMODE_BOOT` = 4 (Hold) — режим до первой команды; `SYS_HAS_NUM_GNSS` + `COM_GNSSLOSS_ACT`; `FD_ALT_LOSS`; `ESC_TEMP_WARN_TH` 90 °C; `COM_CC_TEMP_WARN` 80 °C; `MC_REF_FF` 0; `MPC_Z_ERR_MAX` 1 м; `EKF2_POS_LOCK`; `EKF2_SENS_EN`; `RTL_TYPE` = 5 | новые возможности, по умолчанию прежнее поведение, кроме предупреждений о температуре и `MPC_Z_ERR_MAX` = 1 м: растяжение вертикальной траектории в авторежимах включено (0 — как в 1.17; `multicopter_autonomous_params.yaml:134`, `FlightTaskAuto.cpp:782`) | `commander_params.yaml:132, 309, 612`, `system_params.yaml:139`, `failure_detector_params.yaml:94` |
-| логи: без ограничения размера файла, старые каталоги удалялись только при свободном месте меньше 300 МиБ (`logger/util.cpp:192`, v1.17.0); `logger_topics.txt` заменяет профиль | `SDLOG_MAX_SIZE` = 1024 МБ, `SDLOG_ROTATE` = 90 % (свободно ≥ 10 % карты); `logger_topics.txt` добавляется к профилю | в своём `logger_topics.txt` оставить только лишние топики | `logger/module.yaml:105, 120` |
+| логи: без ограничения размера файла, старые каталоги удалялись только при свободном месте меньше 300 МиБ (`logger/util.cpp:192`, v1.17.0); `logger_topics.txt` заменяет профиль | `SDLOG_MAX_SIZE` = 1024 МиБ, `SDLOG_ROTATE` = 90 % (свободно ≥ 10 % карты); `logger_topics.txt` добавляется к профилю | в своём `logger_topics.txt` оставить только лишние топики | `logger/module.yaml:105, 120` |
 | MAVLink-подписи в 1.17.0 нет | подпись по стандарту MAVLink: ключ на SD-карте, `SETUP_SIGNING` по любому каналу, но не в арме | — (`mav-protocol`) | `mavlink_sign_control.h:46`, `mavlink_main.cpp:1224` |
 | `MAV_CMD_REQUEST_AUTOPILOT_CAPABILITIES`, `GET_HOME_POSITION` и др. | удалены — только `MAV_CMD_REQUEST_MESSAGE`; команды из таблицы проверки с ненулевым неиспользуемым параметром (1–7) отклоняются `DENIED`, а миссия с таким пунктом не загружается (`MAV_MISSION_INVALID_PARAMn`, `mavlink_mission.cpp`) | скрипты companion: неиспользуемые параметры — 0 или NaN | `mavlink_command_params.hpp`, `mavlink_receiver.cpp:685` |
 | топики uXRCE-DDS `_v1` | `vehicle_status_v4`, `vehicle_command_ack_v1` и др. | `px4_msgs` ветки v1.18.0 (`px4-ros2`) | `msg/versioned/` |
@@ -267,14 +267,14 @@ make px4_sitl gz_x500
   - Что сделать: закрыть старые процессы, перезапустить SITL.
 - **Симптом:** Position не включается
   - Возможная причина: нет GPS-фикса (в SITL — ждать инициализации).
-  - Что сделать: подождать «ready for takeoff» в QGC.
+  - Что сделать: подождать «Ready To Fly» в QGC.
 - **Симптом:** прошивка не ставится на F4-плату
   - Возможная причина: PX4 не поддерживает это железо.
   - Что сделать: Pixhawk-совместимый FMUv5/v6 или ArduPilot.
 - **Симптом:** `make` падает на зависимостях
   - Возможная причина: не выполнен `ubuntu.sh`.
   - Что сделать: запустить скрипт настройки окружения, перелогиниться.
-- **Симптом:** «Preflight Fail: Compass sensor 0 missing» / «Accel inconsistent»
+- **Симптом:** «Preflight Fail: Compass Sensor 0 missing» / «Preflight Fail: Accel 0 inconsistent - check cal»
   - Возможная причина: не выполнена калибровка или датчик не найден (ориентация, шлейф).
   - Что сделать: калибровать по порядку, проверить `SENS_BOARD_ROT`, лог `dmesg` в консоли.
 - **Симптом:** Position mode не включается

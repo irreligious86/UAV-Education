@@ -1,0 +1,118 @@
+{
+ "module": "px4-rc-tuning",
+ "pass": 80,
+ "questions": [
+  {
+   "q": "A three-position switch on the `RC_MAP_FLTMODE` channel, calibration 1000/1500/2000, the positions give 1000, 1500 and 2000 µs. Which parameters do you fill in so that all three positions select a mode?",
+   "options": [
+    "`COM_FLTMODE1`, `COM_FLTMODE2`, `COM_FLTMODE3`",
+    "`COM_FLTMODE1`, `COM_FLTMODE3`, `COM_FLTMODE6`",
+    "`COM_FLTMODE1`, `COM_FLTMODE4`, `COM_FLTMODE6`",
+    "`COM_FLTMODE2`, `COM_FLTMODE4`, `COM_FLTMODE5`"
+   ],
+   "answer": 2,
+   "explain": "The slot boundaries on the normalized scale: −0.786, −0.436, −0.086, +0.264, +0.614. The channel center (0) lies between −0.086 and +0.264, which is slot 4, not 3; the ends give slots 1 and 6."
+  },
+  {
+   "q": "Channel: `RC6_MIN` = 988, `RC6_TRIM` = 1500, `RC6_MAX` = 2012, `RC6_REV` = 1. Pulse 1100 µs. What is the normalized value?",
+   "options": [
+    "−0.781",
+    "−0.400",
+    "−0.800",
+    "−0.609"
+   ],
+   "answer": 0,
+   "explain": "Below TRIM the lower segment applies: (1100 − 1500)/(1500 − 988) = −400/512 = −0.781. −0.8 comes out if you compute from 1000/1500/2000, −0.4 if you divide by 1000."
+  },
+  {
+   "q": "A two-position Return switch gives 988 µs in its \"down\" working position and 2012 µs up. Which `RC_RETURN_TH` threshold turns Return on only in the low position?",
+   "options": [
+    "0.25",
+    "−0.75",
+    "−0.25",
+    "0.75"
+   ],
+   "answer": 2,
+   "explain": "Travel fraction p = 0.5·v + 0.5: 0 at the bottom, 1 at the top. A negative threshold turns the function on when p < |threshold|. −0.25: on when p < 0.25, only at the bottom. −0.75 would turn the function on in the middle of the travel too (p < 0.75), and positive thresholds turn it on at the top."
+  },
+  {
+   "q": "Kill is assigned to a momentary button. The pilot pressed it in a hover and released it a second later. What does PX4 1.18 do with default settings?",
+   "options": [
+    "The vehicle stays disarmed: kill is irreversible until the flight controller reboots",
+    "The motors start again: releasing clears kill as long as 5 s have not passed",
+    "The motors start only after the throttle stick goes down and you re-arm with the switch or gesture",
+    "Nothing happens: kill triggers only after holding the button for 1 s"
+   ],
+   "answer": 1,
+   "explain": "Moving the kill switch to \"off\" sends ACTION_UNKILL, and `_actuator_armed.kill` is cleared: the vehicle stays armed and the outputs work again. A disarm happens only if kill is held longer than 5 s (hard-coded in `Commander.cpp` in 1.18; before 1.18 `COM_KILL_DISARM`). The 1 s hold is for the arm button (`COM_ARM_SWISBTN` = 1), not for kill. What is irreversible is termination (`RC_MAP_TERM_SW`), not kill."
+  },
+  {
+   "q": "A knob is bound to `MC_PITCHRATE_K`: value0 = 1.0, scale = 0.4, min = 0.8, max = 1.2. The knob's normalized value is −0.75. What does the parameter get?",
+   "options": [
+    "0.80",
+    "0.70",
+    "0.85",
+    "1.30"
+   ],
+   "answer": 0,
+   "explain": "value0 + scale·rc = 1.0 + 0.4·(−0.75) = 0.70, then the min clip: clamp(0.70, 0.8, 1.2) = 0.80. 0.70 means the limit was forgotten, 1.30 means the sign was lost."
+  },
+  {
+   "q": "With a knob, the pilot found `MC_ROLLRATE_K` = 1.25, landed, disarmed and rebooted the flight controller. What does he see after boot?",
+   "options": [
+    "The parameter went back to 1.0, the knob binding is kept",
+    "The parameter is 1.25, and the knob no longer changes it until the GCS sends the binding again",
+    "The parameter is 1.25, and the knob keeps changing it",
+    "The parameter went back to 1.0, and `RC_MAP_PARAM1` was reset to 0, so the knob channel must be assigned again"
+   ],
+   "answer": 1,
+   "explain": "The value is written with an ordinary `param_set()` and reaches storage through autosave. The binding lives in the `rc_parameter_map` topic in RAM: after a reboot it is gone, although `RC_MAP_PARAM1` is still there."
+  },
+  {
+   "q": "`MC_ACRO_R_MAX` = 600, `MC_ACRO_EXPO` = 0.5, `MC_ACRO_SUPEXPO` = 0. What rate does the roll stick give at half travel?",
+   "options": [
+    "300 °/s",
+    "112.5 °/s",
+    "187.5 °/s",
+    "37.5 °/s"
+   ],
+   "answer": 2,
+   "explain": "expo(0.5) = (1 − 0.5)·0.5 + 0.5·0.125 = 0.3125; without superexpo the multiplier is 1; 0.3125·600 = 187.5 °/s. 300 is the linear formula without expo."
+  },
+  {
+   "q": "The vehicle is controlled with the QGC virtual joystick (`COM_RC_IN_MODE` = 1). Which of these works?",
+   "options": [
+    "Mode slots `COM_FLTMODEn` on the `RC_MAP_FLTMODE` channel",
+    "The `RC_MAP_KILL_SW` kill switch",
+    "The `RC_MAP_PARAM1` tuning knob",
+    "Arming by stick gesture with `MAN_ARM_GESTURE` = 1"
+   ],
+   "answer": 3,
+   "explain": "The joystick reaches `manual_control` as a MANUAL_CONTROL message, bypassing `rc_update`. Slots, switches and tuning knobs are computed only by `rc_update` from `input_rc`, and `manual_control` processes switches only with the RC as the source. The stick gesture is evaluated on the selected setpoint and works with any source."
+  },
+  {
+   "q": "What is wrong in this PX4 1.18 parameter fragment for a quadcopter that flies in Stabilized and Position?",
+   "kind": "apply",
+   "fragment": "RC_MAP_FLTMODE    6\nCOM_FLTMODE1      8\nCOM_FLTMODE6      2\nRC_MAP_ARM_SW     6\nRC_ARMSWITCH_TH   0.75\nCOM_ARM_SWISBTN   0",
+   "options": [
+    "`COM_FLTMODE1` = 8: no such mode in 1.18",
+    "Arm sits on the mode channel: switching to Position arms, going back to Stabilized disarms",
+    "The 0.75 threshold is too high: the arm switch will not trigger in any position",
+    "With `COM_ARM_SWISBTN` = 0 the arm switch is ignored: for it to work as a switch you need value 1"
+   ],
+   "answer": 1,
+   "explain": "The top position of channel 6 gives p = 1 > 0.75, which is both slot 6 and arm. The reverse flick is a disarm request, and in Stabilized (manual throttle) a disarm from the transmitter is carried out in the air (always in 1.18; before 1.18 with `COM_DISARM_MAN` = 1). 8 is Stabilized, and `COM_ARM_SWISBTN` = 0 is an ordinary switch."
+  },
+  {
+   "q": "How is autotune started from the transmitter in PX4 1.18?",
+   "options": [
+    "On a multirotor with a switch bound to `MC_AT_EN`; on a plane only with a button in QGC, there is no switch",
+    "On both with a dedicated `COM_FLTMODEn` mode slot",
+    "On a plane with the `RC_MAP_AUXn` channel selected in `FW_AT_MAN_AUX`; a multirotor has no switch",
+    "On both with the `RC_MAP_PARAM1` knob bound to `MC_AT_EN`"
+   ],
+   "answer": 2,
+   "explain": "`FW_AT_MAN_AUX` = n takes the `RC_MAP_AUXn` channel: a value above 0.5 starts the identification. A multirotor has no such parameter: `MC_AT_EN` = 1, reboot and start from QGC (`MAV_CMD_DO_AUTOTUNE_ENABLE`; the \"button\" parameters `MC_AT_START` and `FW_AT_START` were removed in 1.18). You cannot change an integer parameter with an `RC_MAP_PARAM` knob: the code writes a float without checking the type."
+  }
+ ]
+}

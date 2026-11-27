@@ -1,0 +1,154 @@
+{
+ "module": "px4-outputs-servos",
+ "tasks": [
+  {
+   "id": "servo-us-linear",
+   "title": "Servo pulse: the MIN…MAX line",
+   "statement": "A servo on an output without `CENT`: `MIN` = **{mn}**, `MAX` = **{mx}** µs, `REV` bit cleared. `CA_SV_CSn_TRIM` = **{t}**, loop command u = **{u}**. How many microseconds does `mixer_module` output?",
+   "params": {
+    "mn": [
+     1000,
+     1050,
+     1100,
+     1150
+    ],
+    "mx": [
+     1850,
+     1900,
+     1950,
+     2000
+    ],
+    "t": [
+     -0.1,
+     -0.05,
+     0,
+     0.05,
+     0.1
+    ],
+    "u": {
+     "min": -0.8,
+     "max": 0.8,
+     "step": 0.1
+    }
+   },
+   "answer": "mn + (max(-1, min(1, u + t)) + 1)/2*(mx - mn)",
+   "unit": "µs",
+   "tol": 0.0005,
+   "abs": 1,
+   "solution": "The allocator outputs v = clamp(TRIM + u, −1, 1). `output_limit_calc_single`: µs = MIN + (v + 1)/2 · (MAX − MIN), then rounded with `lroundf`. Tolerance ±1 µs."
+  },
+  {
+   "id": "servo-us-center-rev",
+   "title": "Servo pulse: CENT and reversal (1.17)",
+   "statement": "PX4 1.18 (as in 1.17), a servo on an FMU output: `MIN` = **{mn}**, `CENT` = **{cn}**, `MAX` = **{mx}** µs, the output's bit in `PWM_AUX_REV` is **set**. The allocator outputs v = **{v}**. How many microseconds on the output?",
+   "params": {
+    "mn": [
+     1000,
+     1050,
+     1100
+    ],
+    "cn": [
+     1450,
+     1480,
+     1500,
+     1520,
+     1560
+    ],
+    "mx": [
+     1900,
+     1950,
+     2000
+    ],
+    "v": [
+     -0.8,
+     -0.6,
+     -0.5,
+     -0.25,
+     0.2,
+     0.4,
+     0.5,
+     0.75
+    ]
+   },
+   "answer": "(mn + (1 - v)*(cn - mn)) if v > 0 else (cn + (-v)*(mx - cn))",
+   "unit": "µs",
+   "tol": 0.0005,
+   "abs": 1,
+   "solution": "Reversal first: w = −v. Then two lines through the center: w < 0 → MIN + (w + 1) · (CENT − MIN); w ≥ 0 → CENT + w · (MAX − CENT). Reversal mirrors the command, and the center stays put."
+  },
+  {
+   "id": "rev-mask",
+   "title": "REV mask",
+   "statement": "You need to reverse the range of outputs **{a}**, **{b}** and **{c}**. What number goes into `PWM_AUX_REV`?",
+   "params": {
+    "a": [
+     1,
+     2
+    ],
+    "b": [
+     3,
+     4,
+     5
+    ],
+    "c": [
+     6,
+     7,
+     8
+    ]
+   },
+   "answer": "2**(a-1) + 2**(b-1) + 2**(c-1)",
+   "unit": "",
+   "tol": 0.0001,
+   "abs": 0.4,
+   "solution": "Bit n−1 is output n: mask = 2^(a−1) + 2^(b−1) + 2^(c−1). For example, outputs 2, 3, 5 → 2 + 4 + 16 = 22."
+  },
+  {
+   "id": "erpm-rpm",
+   "title": "eRPM → RPM",
+   "statement": "An ESC reports **{e}** over bidirectional DShot (electrical RPM in hundreds, eRPM/100). This motor's `DSHOT_MOT_POLn` = **{p}** (before 1.18, `MOT_POLE_COUNT`). What `esc_rpm` value does the `dshot` driver publish?",
+   "params": {
+    "e": {
+     "min": 400,
+     "max": 4200,
+     "step": 100
+    },
+    "p": [
+     12,
+     14,
+     24,
+     28
+    ]
+   },
+   "answer": "math.floor(e*100/(p//2))",
+   "unit": "RPM",
+   "tol": 0.0005,
+   "abs": 1,
+   "solution": "`DShot::process_bdshot_telemetry` (v1.18.0): erpm = value · 100, then esc_rpm = erpm / (`DSHOT_MOT_POLn` / 2), all in integers, so the fractional part is dropped. Pole pairs = poles / 2. In 1.16–1.17 the same formula used the shared `MOT_POLE_COUNT`."
+  },
+  {
+   "id": "timer-feasibility",
+   "title": "How many servos go to MAIN",
+   "statement": "Pixhawk 6X: the FMU groups are AUX1–4, AUX5–6 (both with DShot) and AUX7–8 (no DShot); CAP1 is not used. You need to connect **{m}** DShot motors, **{s}** servos at 50 Hz and one camera trigger (FMU only, takes a whole group). How many servos have to move to the MAIN outputs?",
+   "params": {
+    "m": [
+     3,
+     4,
+     5,
+     6
+    ],
+    "s": [
+     1,
+     2,
+     3,
+     4,
+     5
+    ]
+   },
+   "answer": "max(0, s - ((4 if m <= 4 else 2) - 2))",
+   "unit": "servos",
+   "tol": 0.0001,
+   "abs": 0.4,
+   "solution": "3–4 DShot motors fit only in the AUX1–4 group and take all of it; 5–6 motors also take AUX5–6. That leaves 4 or 2 FMU outputs for 50 Hz. The trigger takes one two-output group. For servos on the FMU that leaves 2 outputs (3–4 motors) or 0 (5–6 motors); the other servos go to MAIN."
+  }
+ ]
+}

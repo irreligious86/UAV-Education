@@ -1,0 +1,96 @@
+{
+ "module": "px4-setup-scratch",
+ "pass": 80,
+ "questions": [
+  {
+   "q": "On a Pixhawk 6X, TELEM2 was used by a companion over MAVLink (MAV_1_CONFIG = TELEM 2), and now you are connecting an ELRS receiver there through the crsf_rc driver (PX4 1.18). What do you do before RC_CRSF_PRT_CFG = TELEM 2?",
+   "options": [
+    "MAV_1_CONFIG = Disabled",
+    "SER_TEL2_BAUD = 420000",
+    "RC_INPUT_PROTO = 2",
+    "COM_RC_IN_MODE = 1"
+   ],
+   "answer": 0,
+   "explain": "On this vehicle TELEM2 is taken by MAVLink for the companion (MAV_1_CONFIG = TELEM 2; on fresh firmware the default is 0 = Disabled). PX4 does not forbid two drivers on one port, so you free the port first. The driver sets the CRSF baud rate itself, 2 in RC_INPUT_PROTO is SBUS (and it is a parameter of the rc_input driver, which the fmu-v6x default build of 1.17 and 1.18 does not have: before 1.17 it had rc_input, and RC_PORT_CONFIG set the port), and COM_RC_IN_MODE = 1 means \"MAVLink joystick only\"."
+  },
+  {
+   "q": "QGC shows 16.42 V, a multimeter on the battery connector 16.71 V, BAT1_V_DIV = 18.000. What is the new value?",
+   "options": [
+    "17.687",
+    "18.318",
+    "18.290",
+    "17.710"
+   ],
+   "answer": 1,
+   "explain": "V = V_adc · BAT1_V_DIV, the coefficient is in the numerator: 18.000 × 16.71 / 16.42 = 18.318. The inverse proportion (17.687) would double the error."
+  },
+  {
+   "q": "With actuator_test set -m 3 -v 0.15, SITL output 3 shows 1150 and the others 900. What does 900 mean?",
+   "options": [
+    "The motor minimum (idle)",
+    "The disarmed value",
+    "The failsafe value",
+    "The low point of ESC calibration"
+   ],
+   "answer": 1,
+   "explain": "Outputs not being tested sit at their disarmed value; the tested one gets min + 0.15 × (max − min) = 1000 + 150."
+  },
+  {
+   "q": "A motor in a PX4 quad X has CA_ROTOR2_PX = 1, CA_ROTOR2_PY = −1, CA_ROTOR2_KM = −0.05. This is…",
+   "options": [
+    "Motor 3: front right, CCW",
+    "Motor 2: front left, CW",
+    "Motor 3: front left, CW",
+    "Motor 4: rear left, CCW"
+   ],
+   "answer": 2,
+   "explain": "CA_ROTOR indices start at 0, so ROTOR2 is motor 3. PX > 0 is forward, PY < 0 is left (FRD), KM < 0 is CW rotation."
+  },
+  {
+   "q": "In SITL you stopped sending MANUAL_CONTROL in Position. What is the mode sequence with PX4 1.18 defaults?",
+   "options": [
+    "Return at once",
+    "Land after 0.5 s",
+    "Hold for ~5 s, then Return",
+    "Hold until the link comes back"
+   ],
+   "answer": 2,
+   "explain": "The loss is detected after COM_RC_LOSS_T = 0.5 s, then Hold for COM_FAIL_ACT_T = 5 s, then NAV_RCL_ACT = 2 (Return). The defaults are the same in 1.15–1.18. In the module's log (captured on 1.15.4): Hold at 39.4 s, RTL at 44.5 s."
+  },
+  {
+   "q": "PX4 1.18 (as in 1.17). The vehicle is hovering, current 9.8 A, voltage 14.4 V on 4S, BAT1_V_EMPTY 3.6, BAT1_V_CHARGED 4.05, BAT1_R_INTERNAL set by hand to 0.005 Ω, BAT1_CAPACITY not set. What warning level do you get with the default thresholds?",
+   "kind": "apply",
+   "fragment": "BAT_LOW_THR      0.15\nBAT_CRIT_THR     0.07\nBAT_EMERGEN_THR  0.05\nbattery_status.voltage_v = 14.40\nvehicle_thrust_setpoint |xyz| = 0.49",
+   "options": [
+    "Emergency: remaining 0",
+    "Critical: remaining 0.06",
+    "Low: remaining ≈ 0.11",
+    "No warning"
+   ],
+   "answer": 2,
+   "explain": "3.6 + 0.005 × 9.8 = 3.649 V/cell; (3.649 − 3.6) / 0.45 = 0.109, between 0.07 and 0.15, so LOW. The R · I load compensation raises the estimate in flight; at zero current it would be 0 and Emergency. In 1.15 without a current sensor throttle × BAT1_V_LOAD_DROP played the same role; the parameter was removed in 1.16, and without a current sensor there is now no correction."
+  },
+  {
+   "q": "A Pixhawk with an IO processor, DShot ESCs connected to MAIN 1–4, and the motors are silent in the test. Why?",
+   "options": [
+    "DShot requires ESC calibration",
+    "DShot works only on the FMU outputs (AUX)",
+    "You need DSHOT_3D_ENABLE = 1",
+    "MAIN outputs through IO understand only DShot150"
+   ],
+   "answer": 1,
+   "explain": "On such boards MAIN are the IO processor's outputs, and they have no DShot at any speed. DShot needs no calibration, and 3D mode is for reversing motors."
+  },
+  {
+   "q": "The log of the first flight shows 2310 mAh, the charger put in 2465 mAh, BAT1_A_PER_V = 36.0. What do you do?",
+   "options": [
+    "BAT1_A_PER_V = 33.73",
+    "BAT_V_OFFS_CURR = 0.067",
+    "BAT1_A_PER_V = 38.42",
+    "BAT1_CAPACITY = 2465"
+   ],
+   "answer": 2,
+   "explain": "I = (V_adc − offset) · A_PER_V, and the current reads 6.7 % low: 36.0 × 2465 / 2310 = 38.42. The offset corrects the error at zero current, not the scale; BAT1_CAPACITY is the battery capacity (≈ 90 % of rated)."
+  }
+ ]
+}

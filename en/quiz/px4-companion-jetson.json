@@ -22,12 +22,12 @@
         "SER_TEL2_PROTOCOL = 2 and BAUD"
       ],
       "answer": 1,
-      "explain": "Onboard mode is the message set for an onboard computer."
+      "explain": "Onboard mode is the message set for an on-board computer."
     },
     {
-      "q": "Can you run MAVLink and uXRCE-DDS on the same port?",
+      "q": "Can one port carry both MAVLink and uXRCE-DDS?",
       "options": [
-        "Yes, if the baud rate is 921600",
+        "Yes, at 921600",
         "No, you pick one",
         "Only on H7",
         "Only over UDP"
@@ -44,15 +44,15 @@
         "9600"
       ],
       "answer": 2,
-      "explain": "SER_TEL2_BAUD = 921600 for a short wire and a heavy data stream."
+      "explain": "SER_TEL2_BAUD = 921600 for a short wire and heavy traffic."
     },
     {
       "q": "What should happen when the companion fails?",
       "options": [
-        "PX4 reboots via watchdog",
+        "PX4 reboots on a watchdog timer",
         "Offboard ends on a timeout",
         "The vehicle crashes",
-        "Offboard doesn't change"
+        "Offboard stays unchanged"
       ],
       "answer": 1,
       "explain": "The boundary of responsibility: the FC flies on its own."
@@ -61,29 +61,29 @@
       "q": "Why add the Jetson user to the dialout group?",
       "options": [
         "For Wi-Fi",
-        "Access to the UART without sudo",
+        "UART access without sudo",
         "For access to CUDA and the GPU",
         "For autostart"
       ],
       "answer": 1,
-      "explain": "Otherwise the serial port is not accessible to a regular user."
+      "explain": "Otherwise a regular user cannot open the serial port."
     },
     {
-      "q": "How do you reliably find out which /dev/ttyTHS* corresponds to pins 8/10 on your JetPack version?",
+      "q": "How do you reliably find which /dev/ttyTHS* is pins 8/10 on your JetPack version?",
       "options": [
         "Take the name from any article",
-        "With a loopback: a jumper on 8–10 and an echo test",
-        "By the first port in ls /dev",
+        "Loopback: jumper 8–10, echo test",
+        "The first port in ls /dev",
         "It is always /dev/ttyAMA0"
       ],
       "answer": 1,
-      "explain": "The name depends on the board and JetPack (ttyTHS0 or ttyTHS1); the echo through the jumper only comes back from the right port."
+      "explain": "The name depends on the board and JetPack (ttyTHS0 or ttyTHS1); only the right port echoes through the jumper."
     },
     {
       "q": "Can MAVLink and uXRCE-DDS share one TELEM2?",
       "options": [
-        "Only over USB, not over UART",
-        "No, different ports",
+        "Only over USB, not UART",
+        "No, use different ports",
         "Only in SITL",
         "Yes"
       ],

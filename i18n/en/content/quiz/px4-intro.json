@@ -3,7 +3,7 @@
   "pass": 80,
   "questions": [
     {
-      "q": "Which GCS is “native” to PX4?",
+      "q": "Which GCS is the native one for PX4?",
       "options": [
         "Mission Planner",
         "QGroundControl",
@@ -11,21 +11,21 @@
         "Betaflight App"
       ],
       "answer": 1,
-      "explain": "QGC does it all: firmware, airframe, calibrations, missions, logs."
+      "explain": "QGC covers everything: firmware, airframe, calibration, missions, logs."
     },
     {
       "q": "How does PX4 integrate with ROS 2?",
       "options": [
-        "Via MAVLink only",
-        "Natively via uXRCE-DDS",
-        "Via Lua scripts on board",
-        "It doesn't"
+        "Only through MAVLink",
+        "Natively through uXRCE-DDS",
+        "Through on-board Lua scripts",
+        "It does not"
       ],
       "answer": 1,
-      "explain": "uORB topics are exposed directly to ROS 2."
+      "explain": "uORB topics are exposed directly in ROS 2."
     },
     {
-      "q": "The PX4 log format?",
+      "q": "What is the PX4 log format?",
       "options": [
         "DataFlash .bin",
         "ULog .ulg",
@@ -33,10 +33,10 @@
         "CSV"
       ],
       "answer": 1,
-      "explain": "Analysis — Flight Review or pyulog."
+      "explain": "Analyze it in Flight Review or with pyulog."
     },
     {
-      "q": "Which mode requires a reliable GPS?",
+      "q": "Which mode needs a reliable GPS?",
       "options": [
         "Stabilized",
         "Acro",
@@ -44,10 +44,10 @@
         "Altitude"
       ],
       "answer": 2,
-      "explain": "Position holds the position by GPS."
+      "explain": "Position holds position using GPS."
     },
     {
-      "q": "The command to start SITL with Gazebo and the x500 quadcopter?",
+      "q": "Which command starts SITL with Gazebo and the x500 quadcopter?",
       "options": [
         "sim_vehicle.py -v ArduCopter",
         "make px4_sitl gz_x500",
@@ -55,29 +55,29 @@
         "ros2 launch px4"
       ],
       "answer": 1,
-      "explain": "The uXRCE-DDS client starts by itself in SITL."
+      "explain": "In SITL the uXRCE-DDS client starts on its own."
     },
     {
-      "q": "When should you choose ArduPilot over PX4?",
+      "q": "When should you pick ArduPilot over PX4?",
       "options": [
         "For ROS 2 and Gazebo",
-        "Exotic hardware, Lua, the community",
+        "Exotic hardware, Lua, community",
         "Always",
         "For racing"
       ],
       "answer": 1,
-      "explain": "PX4 is stronger in research and ROS 2."
+      "explain": "PX4 is stronger for research and ROS 2."
     },
     {
-      "q": "The PX4 filter defaults (IMU_GYRO_CUTOFF 40 Hz, IMU_DGYRO_CUTOFF 20 Hz) compared with Betaflight:",
+      "q": "Compared with Betaflight, the PX4 filter defaults (IMU_GYRO_CUTOFF 40 Hz, IMU_DGYRO_CUTOFF 20 Hz; 30 before 1.17) are:",
       "options": [
         "Higher",
-        "Noticeably lower",
+        "Much lower",
         "The same",
-        "Not adjustable"
+        "Not configurable"
       ],
       "answer": 1,
-      "explain": "PX4 is designed for large vehicles; for a 5\" they are raised. Plus a notch from ESC telemetry (IMU_GYRO_DNF_EN)."
+      "explain": "PX4 targets larger vehicles; on a 5\" quad they are raised. Add the ESC RPM notch (IMU_GYRO_DNF_EN)."
     },
     {
       "q": "What does changing the airframe in QGC reset?",
@@ -88,7 +88,7 @@
         "Only the missions"
       ],
       "answer": 1,
-      "explain": "After the change — set up again."
+      "explain": "After the change, set the vehicle up again."
     }
   ]
 }

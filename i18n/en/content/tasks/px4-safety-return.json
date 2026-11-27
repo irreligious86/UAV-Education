@@ -1,0 +1,140 @@
+{
+ "module": "px4-safety-return",
+ "tasks": [
+  {
+   "id": "rtl-cone-alt",
+   "title": "Return altitude from the cone",
+   "statement": "A multirotor, PX4 1.18: `RTL_RETURN_ALT` = **{R} m**, `RTL_MIN_DIST` = **{M} m**, `RTL_CONE_ANG` = **{a}°**, `NAV_ACC_RAD` = 2 m (set explicitly; the 1.18 multirotor default is 10 m). The vehicle is at **{h} m** above home, **{d} m** from it horizontally. To what altitude above home does it go in Return (m)?",
+   "params": {
+    "R": [
+     30,
+     40,
+     60
+    ],
+    "M": [
+     10,
+     40,
+     80
+    ],
+    "a": [
+     25,
+     45,
+     65,
+     80
+    ],
+    "h": [
+     2,
+     5,
+     12
+    ],
+    "d": {
+     "min": 3,
+     "max": 120,
+     "step": 1
+    }
+   },
+   "answer": "max(h, max(min(d/math.tan(math.radians(a)), R), 4) if d <= M else R)",
+   "unit": "m",
+   "tol": 0.02,
+   "solution": "At d > `RTL_MIN_DIST` the cone does not apply: h = `RTL_RETURN_ALT`. At `NAV_ACC_RAD` < d ≤ `RTL_MIN_DIST`: h = min(d / tan(angle), `RTL_RETURN_ALT`), but not below 2·`NAV_ACC_RAD` = 4 m. The result is not below the current altitude."
+  },
+  {
+   "id": "time-to-action",
+   "title": "Time to Return given the delay budget",
+   "statement": "`COM_RC_LOSS_T` = **{L} s**, `COM_FAIL_ACT_T` = **{T} s**, `NAV_RCL_ACT` = 2. A previous failsafe used up the Hold delay completely; the pilot took back control with a mode change. **{x} s** after the end of that delay the last RC frame arrives. How many seconds after that frame does Return start?",
+   "params": {
+    "L": [
+     0.3,
+     0.5,
+     1.0,
+     2.0
+    ],
+    "T": [
+     3,
+     5,
+     10
+    ],
+    "x": {
+     "min": 2,
+     "max": 60,
+     "step": 2
+    }
+   },
+   "answer": "L + min(T, (x + L)/4)",
+   "unit": "s",
+   "tol": 0.02,
+   "solution": "The loss flag goes up `COM_RC_LOSS_T` after the last frame. The delay budget recovers four times more slowly than it is spent, and it keeps recovering until the flag goes up, that is, another `COM_RC_LOSS_T` after the last frame. At the moment of the flag, min(`COM_FAIL_ACT_T`, (x + `COM_RC_LOSS_T`)/4) is available. Time from the last frame = `COM_RC_LOSS_T` + min(`COM_FAIL_ACT_T`, (x + `COM_RC_LOSS_T`)/4)."
+  },
+  {
+   "id": "bat-time-to-critical",
+   "title": "Time to the critical battery threshold",
+   "statement": "A **{C} mAh** battery, the PX4 remaining charge is now **{r}**, average current **{I} A**, `BAT_CRIT_THR` = **{k}**. Treating consumption as linear in amp-hours, in how many seconds does the critical level trigger?",
+   "params": {
+    "C": [
+     3000,
+     5000,
+     8000,
+     10000,
+     16000
+    ],
+    "r": {
+     "min": 0.3,
+     "max": 0.9,
+     "step": 0.05
+    },
+    "I": {
+     "min": 8,
+     "max": 40,
+     "step": 2
+    },
+    "k": [
+     0.07,
+     0.1,
+     0.15,
+     0.2
+    ]
+   },
+   "answer": "(r - k)*C/1000/I*3600",
+   "unit": "s",
+   "tol": 0.02,
+   "solution": "To reach the threshold you must use (remaining − `BAT_CRIT_THR`) · C amp-hours. t = (r − k) · C[Ah] / I; convert hours to seconds (× 3600)."
+  },
+  {
+   "id": "bat-return-radius",
+   "title": "The range from which Return makes it before emergency",
+   "statement": "A **{C} mAh** battery, current in Return **{I} A**, `BAT_CRIT_THR` = **{k}**, `BAT_EMERGEN_THR` = 0.05, `COM_LOW_BAT_ACT` = 5 (Return at critical, Land at emergency, no remaining-time return, PX4 1.18), `COM_FAIL_ACT_T` = **{T} s**, return speed **{v} m/s**. The vehicle is already at the return altitude. From what greatest distance (m) does it reach home before the emergency level puts it into Land?",
+   "params": {
+    "C": [
+     5000,
+     8000,
+     10000
+    ],
+    "I": {
+     "min": 10,
+     "max": 30,
+     "step": 2
+    },
+    "k": [
+     0.1,
+     0.15,
+     0.2
+    ],
+    "T": [
+     0,
+     5,
+     10
+    ],
+    "v": [
+     5,
+     8,
+     10,
+     12
+    ]
+   },
+   "answer": "v*((k - 0.05)*C/1000/I*3600 - T)",
+   "unit": "m",
+   "tol": 0.02,
+   "solution": "Between critical and emergency (k − 0.05) · C[Ah] / I · 3600 seconds pass. For `COM_FAIL_ACT_T` of them the vehicle hovers in Hold, and the rest it flies: d = v · (t − `COM_FAIL_ACT_T`). With `COM_LOW_BAT_ACT` = 3 in 1.18 and `BAT1_CAPACITY` set, Return could start before critical, from the remaining flight time estimate."
+  }
+ ]
+}

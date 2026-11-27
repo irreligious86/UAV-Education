@@ -1,0 +1,118 @@
+{
+ "module": "px4-camera-gimbal",
+ "pass": 80,
+ "questions": [
+  {
+   "q": "Fresh PX4 1.18 firmware on a Pixhawk 6X, default parameters. `gimbal status` answers \"not running\". Why?",
+   "options": [
+    "The `gimbal` module is not in the default fmu-v6x build",
+    "`MNT_MODE_IN` = −1, so `rcS` does not start the module",
+    "Output functions 420…422 are not assigned",
+    "`MNT_MODE_OUT` = 0 requires a connected gimbal"
+   ],
+   "answer": 1,
+   "explain": "`rcS` has the condition `if param greater -s MNT_MODE_IN -1`; the default is −1, so the module does not start. The fmu-v6x `default.px4board` does have `CONFIG_MODULES_GIMBAL=y`, and output functions or a connected gimbal do not affect startup."
+  },
+  {
+   "q": "PX4 1.18, AUX output: `MNT_MIN_PITCH` = −60, `MNT_MAX_PITCH` = 60, `MIN` = 1100, `CENT` = 1460, `MAX` = 1900 µs, `MNT_DO_STAB` = 1, frame level, vehicle in flight. Pitch setpoint −75°. What is on the output?",
+   "options": [
+    "1010 µs",
+    "1100 µs",
+    "1190 µs",
+    "1000 µs"
+   ],
+   "answer": 1,
+   "explain": "First the angle is clamped by `MNT_MIN_PITCH`: θ = −60°. Lower half-axis: c = −60/60 = −1, pulse = `CENT` + c · (`CENT` − `MIN`) = 1100 µs. 1010 comes out without the clamp (c = −1.25), 1000 if you use a single line 1100…1900 without the clamp, and 1190 is the pulse for −45°."
+  },
+  {
+   "q": "A servo gimbal on an AUX output with default `MNT_*` parameters (PX4 1.18) will not tilt the camera below −45°, although the mechanics allow −90°. What do you change?",
+   "options": [
+    "`PWM_AUX_CENTn` 250 µs lower",
+    "`MNT_LND_P_MIN` = −90",
+    "`MNT_MIN_PITCH` = −90",
+    "`MNT_RC_IN_MODE` = 0 (angle)"
+   ],
+   "answer": 2,
+   "explain": "The setpoint is clamped to `MNT_MIN_PITCH` / `MNT_MAX_PITCH`, −45 and +45 by default. A lower limit of −90 opens up nadir, the upper one stays. Moving `CENT` changes only the zero, not the command range; `MNT_LND_P_MIN` is already −90 and acts only on the ground; the stick mode does not change the limit. Before 1.18 the same was done with `MNT_RANGE_PITCH` = 180."
+  },
+  {
+   "q": "PX4 1.18: `MNT_RC_IN_MODE` = 1, `MNT_RATE_PITCH` = 30 °/s, `MNT_MIN_PITCH` = −60, `MNT_MAX_PITCH` = 60, `MNT_TAU` = 0. The gimbal is at 0°, and the stick is held at −1.0 for four seconds. What angle do you get?",
+   "options": [
+    "−120°",
+    "−90°",
+    "−30°",
+    "−60°"
+   ],
+   "answer": 3,
+   "explain": "The rate is −30 °/s; over 4 s the integral would give −120°, but the angle is clamped at `MNT_MIN_PITCH` = −60° and hits the limit after only 2 s. `MNT_TAU` = 0 matters here: with the 0.3 default the filter sits inside the accumulation loop, and in 4 s the gimbal would turn only a few degrees."
+  },
+  {
+   "q": "A companion sends `MAV_CMD_DO_GIMBAL_MANAGER_PITCHYAW` to a PX4 1.18 autopilot (`MNT_MODE_IN` = 4) and gets `DENIED`. The most likely cause?",
+   "options": [
+    "The command is not supported; you need `GIMBAL_MANAGER_SET_PITCHYAW`",
+    "The sender has no primary control: `DO_GIMBAL_MANAGER_CONFIGURE` first",
+    "The angles are outside `MNT_MIN_PITCH` / `MNT_MAX_PITCH`",
+    "The companion port is not in `MAV_n_MODE` = 10"
+   ],
+   "answer": 1,
+   "explain": "`input_mavlink.cpp` compares the sender's sysid and compid with the primary control owner and answers `DENIED` on a mismatch. There is no `GIMBAL_MANAGER_SET_PITCHYAW` handler at all in 1.17.0 and 1.18.0; the range does not affect the answer; the Gimbal set (10) is for the gimbal's own port, not the companion's."
+  },
+  {
+   "q": "A MAVLink gimbal acting as a Gimbal v2 device is connected, `MNT_MODE_OUT` = 2. Which PX4 parameters still limit its angles?",
+   "options": [
+    "`MNT_MIN_PITCH` / `MNT_MAX_PITCH` and `MNT_TAU`",
+    "Only `MNT_LND_P_MIN` / `MNT_LND_P_MAX`, and only on the ground",
+    "`MNT_DO_STAB` and `MNT_RANGE_*`",
+    "None: the quaternion goes to the device as is"
+   ],
+   "answer": 3,
+   "explain": "For the v2 output the angle calculation function is not called: `GIMBAL_DEVICE_SET_ATTITUDE` carries the setpoint and lock flags with no limits, filter or stabilization. The gimbal handles the limits itself. `MNT_MIN_PITCH` / `MNT_MAX_PITCH`, `MNT_RANGE_*`, `MNT_TAU`, `MNT_LND_P_*`, `MNT_DO_STAB` work for AUX."
+  },
+  {
+   "q": "Pixhawk 6X, PX4 1.18, capture in a Survey mission. What is wrong in this fragment?",
+   "kind": "apply",
+   "fragment": "TRIG_MODE         4\nTRIG_INTERFACE    4\nTRIG_DISTANCE     18\nTRIG_MIN_INTERVA  1200\nTRIG_ACT_TIME     40\nPWM_MAIN_FUNC5    2000\nPWM_AUX_TIM1      50",
+   "options": [
+    "`TRIG_MODE` = 4 does not work with a mission; you need 1",
+    "`TRIG_ACT_TIME` = 40 ms is too short for PWM",
+    "Function 2000 is on an IO output: the driver looks for it in `PWM_AUX_FUNCn`",
+    "`TRIG_INTERFACE` = 4 requires `TRIG_POLARITY` = 1"
+   ],
+   "answer": 2,
+   "explain": "On a board with an IO processor the `camera_trigger` driver is built with the `PWM_AUX` prefix and reads only `PWM_AUX_FUNCn`; the trigger works only on FMU outputs. Mode 4 is exactly the one for Survey, 40 ms is the minimum allowed time for PWM, and `TRIG_POLARITY` applies only to GPIO."
+  },
+  {
+   "q": "`TRIG_DISTANCE` = 18 m, groundspeed 12 m/s, `TRIG_MIN_INTERVA` = 2000 ms, frame along the track 90 m. What forward overlap do you actually get?",
+   "options": [
+    "60 %",
+    "80 %",
+    "73 %",
+    "40 %"
+   ],
+   "answer": 0,
+   "explain": "The 18/12 = 1.5 s interval is shorter than 2 s: the driver skips (does not delay) every other release, having already moved the distance reference point. The spacing becomes 36 m, overlap 1 − 36/90 = 60 %."
+  },
+  {
+   "q": "No hot shoe feedback. Speed 12 m/s, the camera fires 250 ms after the command. Where does the frame position from `camera_capture` lie relative to the true capture point?",
+   "options": [
+    "3 m behind along the flight direction",
+    "3 m ahead along the flight direction",
+    "0.3 m behind along the flight direction",
+    "It matches: PX4 interpolates the position"
+   ],
+   "answer": 0,
+   "explain": "Without feedback `camera_feedback` records the time and position of the command. The shutter fires 0.25 s later, and in that time the vehicle moves 12 · 0.25 = 3 m forward, so the recorded point stays behind. `camera_feedback` does no interpolation to the frame time."
+  },
+  {
+   "q": "`CAM_CAP_FBACK` = 1, function 2032 is assigned, but the wire from the hot shoe broke. What ends up in the log after the survey?",
+   "options": [
+    "`camera_capture` with command positions, as without feedback",
+    "`camera_capture` is empty; the commands remain in `camera_trigger`",
+    "Both topics are empty",
+    "`camera_capture` with `result` = 0 for every frame"
+   ],
+   "answer": 1,
+   "explain": "With feedback enabled `camera_feedback` discards `camera_trigger` records with `feedback = false` and builds `camera_capture` only from hot shoe signals. No signals, so the topic is empty. The release commands are still published to `camera_trigger`, and geotags can be rebuilt from them and `vehicle_global_position`."
+  }
+ ]
+}

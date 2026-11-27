@@ -1,0 +1,116 @@
+{
+ "module": "px4-safety-return",
+ "pass": 80,
+ "questions": [
+  {
+   "q": "A multirotor in Position, default parameters (COM_RC_LOSS_T = 0.5 s, COM_FAIL_ACT_T = 5 s, NAV_RCL_ACT = 2). The last RC frame arrived at t = 0. When does Return start?",
+   "options": [
+    "after 0.5 s",
+    "after 5.0 s",
+    "after 5.5 s",
+    "after 10.5 s"
+   ],
+   "answer": 2,
+   "explain": "The manual control loss flag goes up after COM_RC_LOSS_T = 0.5 s, then Hold for COM_FAIL_ACT_T = 5 s, 5.5 s in total. 10 s is COM_DL_LOSS_T for the ground station link; it does not apply to RC."
+  },
+  {
+   "q": "The vehicle is executing Return after RC loss. The charge drops below BAT_EMERGEN_THR, COM_LOW_BAT_ACT = 3. What happens?",
+   "options": [
+    "Return continues: it was started earlier",
+    "First Hold for 5 s, then Land",
+    "Land at once, at the current point",
+    "Flight termination and the parachute"
+   ],
+   "answer": 2,
+   "explain": "Of the active actions the most severe is taken: Land is more severe than RTL. The vehicle is already in a failsafe more severe than Hold, so the COM_FAIL_ACT_T delay is skipped and Land runs at once. The battery failsafe has no termination."
+  },
+  {
+   "q": "GF_ACTION = 2 (Hold). The vehicle, in Return after RC loss, crosses the geofence boundary. What does PX4 do?",
+   "options": [
+    "Continues Return and issues a warning",
+    "Stops in Hold at the geofence boundary",
+    "Lands at the crossing point",
+    "Disarms after 5 s"
+   ],
+   "answer": 0,
+   "explain": "The severity order: Hold < RTL < Land. Hold from the geofence is lighter than the RTL already running, so the mode does not change and only a violation message remains. For the geofence to stop a Return you need an action more severe than RTL, which means Land or Terminate."
+  },
+  {
+   "q": "RTL_RETURN_ALT = 30 m, RTL_MIN_DIST = 10 m, RTL_CONE_ANG = 45°, NAV_ACC_RAD = 2 m. A multirotor is at 3 m altitude, 20 m from home. To what altitude does it climb in Return?",
+   "options": [
+    "3 m, it stays at the current altitude",
+    "10 m, per RTL_DESCEND_ALT",
+    "20 m, per the 45° cone",
+    "30 m, the full RTL_RETURN_ALT"
+   ],
+   "answer": 3,
+   "explain": "In the 1.17.0 and 1.18.0 code the cone applies only at d ≤ RTL_MIN_DIST. 20 m is more than 10 m, so the return altitude is RTL_RETURN_ALT = 30 m. 20 m would result if RTL_MIN_DIST were at least 20 m. NAV_ACC_RAD is set explicitly here: the 1.18 multirotor default is 10 m (it was 2 m in 1.17), which does not affect the answer at d = 20 m."
+  },
+  {
+   "q": "CBRK_FLIGHTTERM is left at its default (121212). In flight in Position, roll exceeded FD_FAIL_R = 60° for 0.5 s, a minute after arming. What does PX4 do?",
+   "options": [
+    "A warning only",
+    "Disarms the motors in the air",
+    "Flight termination, the parachute",
+    "Kill for 5 s, then disarm"
+   ],
+   "answer": 0,
+   "explain": "121212 is an engaged circuit breaker: termination by the failure detector is forbidden, leaving a warning. A disarm on this flag is possible only in the first COM_SPOOLUP_TIME + 3 s = 4 s after arming (the 3 s are hard-coded in 1.18; before 1.18 COM_LKDOWN_TKO). Termination would happen with CBRK_FLIGHTTERM = 0."
+  },
+  {
+   "q": "How does the kill switch (RC_MAP_KILL_SW) differ from flight termination?",
+   "options": [
+    "Kill sets the outputs to failsafe values and opens the parachute, termination only disarms",
+    "Kill is reversible within 5 s and sets disarmed values, termination is irreversible",
+    "Kill works only on the ground, termination only in the air above RTL_DESCEND_ALT",
+    "There is no difference: these are two names for the same action in different firmware versions"
+   ],
+   "answer": 1,
+   "explain": "Kill sets the outputs to disarmed values at once, but the vehicle stays armed: flip the switch back within 5 s and the motors run (in 1.18 these 5 s are hard-coded; before 1.18 COM_KILL_DISARM). Termination sends the outputs to failsafe values, commands the parachute and is not cleared until a reboot."
+  },
+  {
+   "q": "On a flight controller with factory PX4 1.18 parameters, telemetry with the ground station is lost for 30 s while the transmitter works. What happens?",
+   "options": [
+    "Return after 10 s",
+    "Hold after 15 s",
+    "Nothing",
+    "Land after 10 s"
+   ],
+   "answer": 2,
+   "explain": "NAV_DLL_ACT defaults to 0: the GCS link failsafe is off. The loss flag goes up after COM_DL_LOSS_T = 10 s, but there is no action. With NAV_DLL_ACT = 2 it would be: 10 s to the flag, 5 s of Hold, then Return."
+  },
+  {
+   "q": "PX4 1.18, a multirotor in Position. EKF lost the horizontal position, altitude is still estimated. This version has no COM_POSCTL_NAVL. What does the vehicle do?",
+   "options": [
+    "Switches to Altitude",
+    "Switches to Land",
+    "Executes Return",
+    "Stays in Position"
+   ],
+   "answer": 0,
+   "explain": "The parameter was removed in 1.17; the chain of mode requirements applies: Position without position → Altitude, without altitude → Stabilized. Land and Return are not selected here: Return is not available at all without a position."
+  },
+  {
+   "q": "COM_FAIL_ACT_T was set to 0, MAN_OVERRIDE_SPD = 1 (PX4 1.18). The vehicle went into Return on critical charge. How does the pilot get control back?",
+   "options": [
+    "Deflect a stick more than 30 %",
+    "Change the mode with a switch",
+    "No way until landing and disarm",
+    "Switch kill on and off"
+   ],
+   "answer": 1,
+   "explain": "With a zero delay the framework allows takeover only by a mode change: the sticks have no effect in a failsafe (AlwaysModeSwitchOnly in the code). With a delay above 0.1 s, both ways work after it ends. Stick takeover by movement speed (MAN_OVERRIDE_SPD; before 1.18 COM_RC_OVERRIDE and COM_RC_STICK_OV) works only with Always."
+  },
+  {
+   "q": "After touchdown in Return the motors stop about 3 s later. What makes up this time with multirotor defaults?",
+   "options": [
+    "COM_SPOOLUP_TIME 1 s + COM_DISARM_LAND 2 s",
+    "Land detector 1 s + COM_DISARM_LAND 2 s",
+    "COM_RC_LOSS_T 0.5 s + kill delay 2.5 s",
+    "RTL_LAND_DELAY 1 s + COM_DISARM_PRFLT 2 s"
+   ],
+   "answer": 1,
+   "explain": "The land detector goes through three stages in 1 s (in 1.18 this time is hard-coded in MulticopterLandDetector.cpp; before 1.18 LNDMC_TRIG_TIME = 1 s) and sets landed; commander waits COM_DISARM_LAND = 2 s and disarms. COM_SPOOLUP_TIME is about arming, COM_DISARM_PRFLT about the case where the vehicle did not take off."
+  }
+ ]
+}

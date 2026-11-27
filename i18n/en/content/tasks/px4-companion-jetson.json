@@ -1,0 +1,68 @@
+{
+  "module": "px4-companion-jetson",
+  "tasks": [
+    {
+      "id": "ag-ip",
+      "title": "UXRCE_DDS_AG_IP from an address",
+      "statement": "The Micro XRCE-DDS agent on the Jetson listens at **192.168.{c}.{d}**. What value goes into `UXRCE_DDS_AG_IP` (IPv4 as a signed int32)?",
+      "params": {
+        "c": {
+          "min": 0,
+          "max": 10,
+          "step": 1
+        },
+        "d": {
+          "min": 2,
+          "max": 250,
+          "step": 1
+        }
+      },
+      "answer": "192*2**24 + 168*2**16 + c*2**8 + d - 2**32",
+      "unit": "",
+      "tol": 1e-12,
+      "abs": 0.5,
+      "solution": "u = 192·2²⁴ + 168·2¹⁶ + c·2⁸ + d. The top bit is set (192 ≥ 128), so the signed value = u − 2³². Check against the parameter description: 192.168.1.2 → −1062731518."
+    },
+    {
+      "id": "mav-auto-rate",
+      "title": "MAVLink bandwidth with MAV_1_RATE = 0",
+      "statement": "`MAV_1_RATE = 0`, `SER_TEL2_BAUD = {b}`. What bandwidth does the MAVLink instance take by itself, in bytes/s?",
+      "params": {
+        "b": [
+          57600,
+          115200,
+          460800,
+          921600,
+          1500000,
+          3000000
+        ]
+      },
+      "answer": "b/20",
+      "unit": "bytes/s",
+      "tol": 0.001,
+      "solution": "Per the parameter description (mavlink module.yaml): 0 is half the theoretical bandwidth, baud/20 bytes/s (baud/10 is the maximum for 8N1)."
+    },
+    {
+      "id": "dcdc-current",
+      "title": "Battery-side current of the Jetson",
+      "statement": "The Jetson in the **{p} W** mode plus 5 W for the carrier board and camera, a DC-DC with efficiency 0.9, a **{n}S** battery at the lower limit of 3.3 V per cell. What current does the converter draw from the battery, in A?",
+      "params": {
+        "n": [
+          3,
+          4,
+          6
+        ],
+        "p": [
+          7,
+          15,
+          25,
+          40
+        ]
+      },
+      "answer": "(p + 5)/(0.9*3.3*n)",
+      "unit": "A",
+      "tol": 0.01,
+      "solution": "I = (P + 5)/(η·U_min), U_min = 3.3·n. The module example: 25 W on 4S → 30/(0.9·13.2) = 2.53 A. Size the converter for 1.5 × (P + 5) W (a course guideline)."
+    }
+  ]
+}

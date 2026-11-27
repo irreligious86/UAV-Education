@@ -69,10 +69,10 @@ QGroundControl: прошивка, вибір airframe, калібрування,
 Імена — групами за модулем: `MC_*` (контролери мультиротора), `MPC_*` (позиція), `EKF2_*`, `IMU_*`, `COM_*` (commander/failsafe), `NAV_*`, `RTL_*`, `BAT*`, `CA_*` (control allocation), `SER_*`/`MAV_*`/`UXRCE_*` (порти). Повний довідник із діапазонами й значеннями за замовчуванням — «Parameter Reference» у документації (генерується з вихідного коду, як в ArduPilot). Експорт/імпорт — QGC → Parameters → Tools (файл `.params`), версіонується (модуль «CI»).
 
 ### Числа для орієнтиру (значення за замовчуванням, мультиротор)
-Внутрішній контур на `IMU_GYRO_RATEMAX` = 400 Гц (до 1 кГц на швидких платах); фільтр гіроскопа `IMU_GYRO_CUTOFF` = 40 Гц, D-term `IMU_DGYRO_CUTOFF` = 20 Гц — помітно нижче, ніж у Betaflight: PX4 розрахований на більші й повільніші апарати, для 5" їх піднімають (80–120 / 40–60) разом із notch за ESC (`IMU_GYRO_DNF_EN`, потрібна телеметрія DShot). Максимальний нахил `MPC_TILTMAX_AIR` = 45°, у ручних режимах `MPC_MAN_TILT_MAX` = 35°; максимальна швидкість `MPC_XY_VEL_MAX` = 12 м/с.
+Внутрішній контур на `IMU_GYRO_RATEMAX` = 400 Гц (до 1 кГц на швидких платах); фільтр гіроскопа `IMU_GYRO_CUTOFF` = 40 Гц, D-term `IMU_DGYRO_CUTOFF` = 20 Гц — помітно нижче, ніж у Betaflight: PX4 розрахований на більші й повільніші апарати, для 5" їх піднімають (гіроскоп близько 120, D-term 50–80 — за посібником PX4 з фільтрів) разом із notch за ESC (`IMU_GYRO_DNF_EN`, потрібна телеметрія DShot). Максимальний нахил `MPC_TILTMAX_AIR` = 45°, у ручних режимах `MPC_MAN_TILT_MAX` = 35°; максимальна швидкість `MPC_XY_VEL_MAX` = 12 м/с.
 
 ### Логи ULog і Flight Review
-Лог вмикається під час арму (`SDLOG_MODE`), містить топіки uORB із заданою частотою (`SDLOG_PROFILE` — профілі: за замовчуванням, висока частота для налаштування, ...). Flight Review (веб) малює: відгук rate (setpoint vs actual), спектр вібрацій (acceleration power spectral density — за ним видно мотори й резонанси), оцінку GPS/EKF (innovation test ratios — ті самі «ворота», що в модулі про Калмана), завантаження CPU і RAM, втрати RC. `pyulog` (`ulog2csv`) — для аналізу в Python (модуль «Python для даних»).
+Лог вмикається під час арму (`SDLOG_MODE`), містить топіки uORB із заданою частотою (`SDLOG_PROFILE` — профілі: за замовчуванням, висока частота для налаштування, ...). Flight Review (веб) малює: відгук rate (setpoint vs actual), спектр вібрацій (acceleration power spectral density — за ним видно мотори й резонанси), оцінку EKF («Estimator Flags»; точність GPS — «GPS Uncertainty», «GPS Noise & Jamming»), завантаження CPU і RAM, входи RC і прапорці failsafe (втрата RC видна там як `manual_control_signal_lost`). Innovation test ratios (ті самі «ворота», що в модулі про Калмана) Flight Review не малює — їх беруть із `estimator_innovation_test_ratios` через `pyulog`. `pyulog` (`ulog2csv`) — для аналізу в Python (модуль «Python для даних»).
 
 {{diagram:px4-upgrade-param-tree|Опаснее всего правая ветка: параметр, который совпадал со старым умолчанием, после прошивки молча получает новое — MC_ROLL_P 4.0 вместо 6.5.}}
 
@@ -111,14 +111,14 @@ make px4_sitl gz_x500
   - Що зробити: закрити старі процеси, перезапустити SITL.
 - **Симптом:** Position не вмикається
   - Можлива причина: немає GPS-фіксу (у SITL — чекати ініціалізації).
-  - Що зробити: дочекатися «ready for takeoff» у QGC.
+  - Що зробити: дочекатися «Ready To Fly» у QGC.
 - **Симптом:** прошивка не ставиться на F4-плату
   - Можлива причина: PX4 не підтримує це залізо.
   - Що зробити: Pixhawk-сумісний FMUv5/v6 або ArduPilot.
 - **Симптом:** `make` падає на залежностях
   - Можлива причина: не виконано `ubuntu.sh`.
   - Що зробити: запустити скрипт налаштування оточення, перелогінитися.
-- **Симптом:** «Preflight Fail: Compass sensor 0 missing» / «Accel inconsistent»
+- **Симптом:** «Preflight Fail: Compass Sensor 0 missing» / «Preflight Fail: Accel 0 inconsistent - check cal»
   - Можлива причина: не виконано калібрування або датчик не знайдено (орієнтація, шлейф).
   - Що зробити: калібрувати по порядку, перевірити `SENS_BOARD_ROT`, лог `dmesg` у консолі.
 - **Симптом:** Position mode не вмикається

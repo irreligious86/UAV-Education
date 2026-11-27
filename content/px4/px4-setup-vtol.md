@@ -3,7 +3,7 @@ id: px4-setup-vtol
 title: "PX4 с нуля: самолёт и VTOL"
 level: L3
 readingTime: 75 мин
-firmware: PX4 1.18 (параметры сверены с v1.18.0; поведение — по исходникам v1.17.0)
+firmware: PX4 1.18 (сверено с v1.18.0)
 status: published
 added: 2026-11-22
 tags:
@@ -31,7 +31,7 @@ next:
 ---
 
 ## summary
-Самолёт и VTOL на PX4 1.17.0 от выбора airframe до первого перехода — в порядке тех же 17 шагов, что и мультиротор в `px4-setup-scratch`, но с тем, чего у мультиротора нет: огибающая скоростей `FW_AIRSPD_*` и её связь со сваливанием, газ и углы TECS, rate-контур крыла с масштабом по скорости, взлёт с руки и с полосы, посадочная схема миссии, автотюн самолёта, переход вперёд и назад так, как его реализует `vtol_att_control` (условия завершения, работа без датчика скорости, таймауты), и quad-chute — с точными условиями срабатывания из исходника и тем, что после него делает аппарат. Каждое число, которое приходится выбирать, идёт с правилом выбора. Практика без железа и симулятора: огибающая из массы, площади и C_Lmax, хронология перехода по таблице скорости, знаки рулей и поиск трёх ошибок в файле параметров; ответы сверяются с эталоном на странице.
+Самолёт и VTOL на PX4 1.18 от выбора airframe до первого перехода — в порядке тех же 17 шагов, что и мультиротор в `px4-setup-scratch`, но с тем, чего у мультиротора нет: огибающая скоростей `FW_AIRSPD_*` и её связь со сваливанием, газ и углы TECS, rate-контур крыла с масштабом по скорости, взлёт с руки и с полосы, посадочная схема миссии, автотюн самолёта, переход вперёд и назад так, как его реализует `vtol_att_control` (условия завершения, работа без датчика скорости, таймауты), и quad-chute — с точными условиями срабатывания из исходника и тем, что после него делает аппарат. Каждое число, которое приходится выбирать, идёт с правилом выбора. Практика без железа и симулятора: огибающая из массы, площади и C_Lmax, хронология перехода по таблице скорости, знаки рулей и поиск трёх ошибок в файле параметров; ответы сверяются с эталоном на странице.
 
 ## theory
 ### Что в модуле и в каком порядке читать
@@ -62,7 +62,7 @@ next:
 {{diagram:px4-vtol-setup-flow|Из 17 шагов в поле уходят только failsafe-тест, первый полёт с переходом и настройка; всё остальное, включая направление рулей и проверку перехода на земле, делается на столе без пропеллеров.}}
 
 ### Airframe и `CA_AIRFRAME`
-Тип аппарата задаёт airframe-скрипт (`ROMFS/px4fmu_common/init.d/airframes/`, v1.17.0): он подключает `rc.fw_defaults` или `rc.vtol_defaults` и пишет геометрию. Номер файла — значение `SYS_AUTOSTART`.
+Тип аппарата задаёт airframe-скрипт (`ROMFS/px4fmu_common/init.d/airframes/`, v1.18.0): он подключает `rc.fw_defaults` или `rc.vtol_defaults` и пишет геометрию. Номер файла — значение `SYS_AUTOSTART`.
 
 | `SYS_AUTOSTART` | Файл | `CA_AIRFRAME` | `VT_TYPE` | Исполнители по умолчанию |
 |---|---|---|---|---|
@@ -86,7 +86,7 @@ param set-default VT_TYPE 0
 param set-default VT_ELEV_MC_LOCK 0
 param set-default VT_B_TRANS_DUR 5
 ```
-Остальные значения `CA_AIRFRAME`: 0 Multirotor, 5–6 Rover, 7 Motors (6DOF), 8 Multirotor with Tilt, 9 Custom, 10–12 вертолёты, 13 Rover (Mecanum), 14–15 Spacecraft. Положение роторов (`CA_ROTORn_PX/PY`, оси `AX/AZ`, `KM`) и поверхностей (`CA_SV_CSn_*`, `CA_SV_TLn_*`) правится на экране Actuators — смысл полей в `px4-outputs-servos`. Airframe-файлы 2100, 3000, 13000, 13100, 13200 в 1.15.4, 1.16.2 и 1.17.0 одинаковы. `rc.vtol_defaults` ставит `SYS_HAS_NUM_ASPD` 1, `MIS_TKO_LAND_REQ` 2, `MIS_TAKEOFF_ALT` 20 м, `RTL_TYPE` 1, `WV_EN` 1; `rc.fw_defaults` — `SYS_HAS_NUM_ASPD` 1, `MIS_TKO_LAND_REQ` 2, `RTL_TYPE` 1, `MIS_TAKEOFF_ALT` 25 м, `RTL_RETURN_ALT` и `RTL_DESCEND_ALT` 100 м, `COM_DISARM_PRFLT` −1 (без `WV_EN`).
+Остальные значения `CA_AIRFRAME`: 0 Multirotor, 5–6 Rover, 7 Motors (6DOF), 8 Multirotor with Tilt, 9 Custom, 10–12 вертолёты, 13 Rover (Mecanum), 14–15 Spacecraft. Положение роторов (`CA_ROTORn_PX/PY`, оси `AX/AZ`, `KM`) и поверхностей (`CA_SV_CSn_*`, `CA_SV_TLn_*`) правится на экране Actuators — смысл полей в `px4-outputs-servos`. Airframe-файлы 13000, 13100, 13200 в 1.15.4–1.18.0 одинаковы; у 2100 и 3000 в 1.18 строка `CA_AIRFRAME 1` перенесена в `rc.fw_defaults`. `rc.vtol_defaults` ставит `SYS_HAS_NUM_ASPD` 1, `MIS_TKO_LAND_REQ` 2, `MIS_TAKEOFF_ALT` 20 м, `RTL_TYPE` 1, `WV_EN` 1; `rc.fw_defaults` — `CA_AIRFRAME` 1 (с 1.18), `SYS_HAS_NUM_ASPD` 1, `MIS_TKO_LAND_REQ` 2, `RTL_TYPE` 1, `MIS_TAKEOFF_ALT` 25 м, `RTL_RETURN_ALT` и `RTL_DESCEND_ALT` 100 м, `COM_DISARM_PRFLT` −1 (без `WV_EN`).
 
 ### Какой тип выбрать
 Инженерная оценка, не правило прошивки (вопрос J5 сообщества):
@@ -111,10 +111,10 @@ param set-default VT_B_TRANS_DUR 5
 | `fw_lat_lon_control` (каталог `fw_lateral_longitudinal_control`) | TECS и боковое ускорение | `FW_T_*`, `FW_THR_SLEW_MAX`, `FW_GND_SPD_MIN` | часть `fw_pos_control` |
 | библиотека `fw_performance_model` | огибающая и газ | `FW_AIRSPD_*`, `FW_THR_TRIM`, `FW_THR_ASPD_MIN/MAX`, `FW_T_CLMB_MAX`, `FW_T_SINK_MIN`, `WEIGHT_*` | та же |
 
-Имена параметров при разделении сохранились. Изменения по сравнению трёх деревьев: в 1.16 удалён `FW_SPOILERS_DESC`, добавлены `FW_T_F_ALT_ERR`, `FW_T_THR_LOW_HGT`, `LNDFW_ROT_MAX`; в 1.17 удалены `FW_AT_SYSID_AMP` (амплитуда возбуждения автотюна), `RWTO_HDG`, `RWTO_NPFG_PERIOD`, `NPFG_EN_MIN_GSP`, `NPFG_GSP_MAX_TK`, `NPFG_TRACK_KEEP`, `NPFG_WIND_REG`, добавлен `FW_AIRSPD_FLP_SC`; у автотюна сменились умолчания `FW_AT_SYSID_F1` 20 → 10 Гц и `FW_AT_SYSID_TYPE` 0 (Step) → 1 (Linear sine sweep). Все `VT_*` в трёх релизах совпадают по именам и умолчаниям. В консоли и в `top` TECS в 1.17 — процесс `fw_lat_lon_control`, а не `fw_pos_control`.
+Имена параметров при разделении сохранились. Изменения по сравнению трёх деревьев: в 1.16 удалён `FW_SPOILERS_DESC`, добавлены `FW_T_F_ALT_ERR`, `FW_T_THR_LOW_HGT`, `LNDFW_ROT_MAX`; в 1.17 удалены `FW_AT_SYSID_AMP` (амплитуда возбуждения автотюна), `RWTO_HDG`, `RWTO_NPFG_PERIOD`, `NPFG_EN_MIN_GSP`, `NPFG_GSP_MAX_TK`, `NPFG_TRACK_KEEP`, `NPFG_WIND_REG`, добавлен `FW_AIRSPD_FLP_SC`; у автотюна сменились умолчания `FW_AT_SYSID_F1` 20 → 10 Гц и `FW_AT_SYSID_TYPE` 0 (Step) → 1 (Linear sine sweep). Все `VT_*` в этих трёх релизах совпадают по именам и умолчаниям. В 1.18 удалён `FW_AT_START`, добавлены `FW_GC_EN`, `FW_GC_GAIN_MIN` и `FW_LAUN_CS_LK_DY`, у `VT_PITCH_MIN` и `VT_LND_PITCH_MIN` умолчание стало 0° вместо −5°, а `FW_RR_FF`, `FW_PR_FF`, `FW_YR_FF` допускают минимум −10. В консоли и в `top` TECS с 1.17 — процесс `fw_lat_lon_control`, а не `fw_pos_control`.
 
 ### Огибающая скоростей
-Все скорости — калиброванные (CAS), м/с, `performance_model_params.c`:
+Все скорости — калиброванные (CAS), м/с, `performance_model_params.yaml`:
 
 | Параметр | Умолчание | Смысл в коде |
 |---|---|---|
@@ -125,7 +125,7 @@ param set-default VT_B_TRANS_DUR 5
 | `FW_AIRSPD_FLP_SC` | 1.0 | 0.5…1: множитель MIN и STALL при полностью выпущенных закрылках (с 1.17) |
 | `WEIGHT_BASE` / `WEIGHT_GROSS` | −1 / −1 кг | при обоих > 0 MIN, STALL, TRIM и скорость перехода умножаются на √(GROSS/BASE), отношение ограничено 0.5…2 |
 
-**Вираж.** `fw_lat_lon_control` передаёт в TECS минимальную скорость `FW_AIRSPD_MIN · √n`, где n = 1/cos φ по заданному крену (`PerformanceModel.cpp:147–151`, `FwLateralLongitudinalControl.cpp:840–850`). Это та же физика, что в `aero-wing`: V_s(φ) = V_s · √n. При `FW_R_LIM` = 50° n = 1.556, √n = 1.247: минимальная скорость в полном крене на четверть выше прямолинейной.
+**Вираж.** `fw_lat_lon_control` передаёт в TECS минимальную скорость `FW_AIRSPD_MIN · √n`, где n = 1/cos φ по текущему крену (с 1.18; в 1.17 — по заданному; `PerformanceModel.cpp:147–151`, `FwLateralLongitudinalControl.cpp:613–621`). Это та же физика, что в `aero-wing`: V_s(φ) = V_s · √n. При `FW_R_LIM` = 50° n = 1.556, √n = 1.247: минимальная скорость в полном крене на четверть выше прямолинейной.
 
 **Правило выбора** (запасы — из `aero-wing`: минимальная безопасная скорость ≥ 1.2–1.3 V_s, крейсер 1.3–1.6 V_s; исходник PX4 требует лишь «MIN с запасом над STALL», документация VTOL — переход «comfortably above stall speed»):
 - `FW_AIRSPD_STALL` = V_s (расчёт из `aero-wing` или замер), с округлением вверх до 0.5;
@@ -161,23 +161,23 @@ param set-default VT_B_TRANS_DUR 5
 
 D у всех трёх осей по умолчанию 0; единицы — %/рад/с. Контур углов: `FW_R_TC` и `FW_P_TC` по 0.4 с, пределы скорости `FW_R_RMAX` 70, `FW_P_RMAX_POS/NEG` 60, `FW_Y_RMAX` 50 °/с.
 
-Масштаб по скорости (`FW_ARSP_SCALE_EN` = 1, `FixedwingRateControl.cpp:153–193`): s = `FW_AIRSPD_TRIM` / max(V, `FW_AIRSPD_STALL`). Весь выход контура умножается на s², а коэффициент FF перед этим делится на s: в итоге вклад P, I и D растёт как s², вклад FF — как s. На вдвое меньшей скорости P-часть отклоняет рули вчетверо сильнее — момент от поверхности падает как V². Без используемого датчика скорости V = `FW_AIRSPD_TRIM`, а у VTOL в висении — `FW_AIRSPD_STALL`. `FW_ARSP_SCALE_EN` = 0 — только для аппаратов без аэродинамических рулей (автожир).
+Масштаб по скорости (`FW_ARSP_SCALE_EN` = 1, `FixedwingRateControl.cpp:155–201`): s = `FW_AIRSPD_TRIM` / max(V, `FW_AIRSPD_STALL`). Весь выход контура умножается на s², а положительный коэффициент FF перед этим делится на s (отрицательный FF с 1.18 не масштабируется): в итоге вклад P, I и D растёт как s², вклад FF — как s. На вдвое меньшей скорости P-часть отклоняет рули вчетверо сильнее — момент от поверхности падает как V². С 1.18 поверх этого работает сжатие усиления `FW_GC_EN` (по умолчанию 1): при высокочастотной раскачке выход контура уменьшается, до множителя `FW_GC_GAIN_MIN` (0.3). Без используемого датчика скорости V = `FW_AIRSPD_TRIM`, а у VTOL в висении — `FW_AIRSPD_STALL`. `FW_ARSP_SCALE_EN` = 0 — только для аппаратов без аэродинамических рулей (автожир).
 
-Триммирование: `TRIM_ROLL/PITCH/YAW` (−0.5…0.5, `commander_params.c`) добавляются к выходу контура с тем же множителем s², а `FW_DTRIM_*_VMIN/VMAX` меняют триммер с ростом и падением скорости. Механическая нейтраль поверхности — `PWM_*_CENTn` в 1.17 или `CA_SV_CSn_TRIM`, но не оба: ловушка со сбросом `TRIM` — в `px4-outputs-servos`. В Manual команда стика умножается на `FW_MAN_R_SC`, `FW_MAN_P_SC`, `FW_MAN_Y_SC` (по умолчанию 1) — это расходы рулей в ручном режиме; пределы углов в Stabilized — `FW_MAN_R_MAX` 45° и `FW_MAN_P_MAX` 30°.
+Триммирование: `TRIM_ROLL/PITCH/YAW` (−0.5…0.5, `commander_params.yaml`) добавляются к выходу контура с тем же множителем s², а `FW_DTRIM_*_VMIN/VMAX` меняют триммер с ростом и падением скорости. Механическая нейтраль поверхности — `PWM_*_CENTn` в 1.17 или `CA_SV_CSn_TRIM`, но не оба: ловушка со сбросом `TRIM` — в `px4-outputs-servos`. В Manual команда стика умножается на `FW_MAN_R_SC`, `FW_MAN_P_SC`, `FW_MAN_Y_SC` (по умолчанию 1) — это расходы рулей в ручном режиме; пределы углов в Stabilized — `FW_MAN_R_MAX` 45° и `FW_MAN_P_MAX` 30°.
 
 ### Полёт без датчика скорости
-`FW_USE_AIRSPD` = 1 включает скорость датчика в масштаб рулей, координированный разворот, TECS, логику взлёта и переход VTOL (`fw_rate_control_params.c:55`). Отказаться от датчика можно (вопрос J6): `SYS_HAS_NUM_ASPD` = 0 и `FW_USE_AIRSPD` = 0 (или `ASPD_PRIMARY` = 0 — оценка по GPS и ветру, `px4-hardware-peripherals`). Документация PX4 называет это экспериментальным режимом для опытных пилотов. Порядок из неё: опорный полёт с датчиком в штиль; `FW_THR_TRIM` — по наибольшему газу в вираже или наборе плюс около 10 %; `VT_TRANS_MIN_TM` — по времени перехода из лога плюс 30 %; `VT_FW_MIN_ALT` 15–20 м. Ограничение остаётся: запас до сваливания в полёте ничем не измеряется, поэтому самолёту без датчика нужна большая разница между крейсером и V_s, а не меньшая.
+`FW_USE_AIRSPD` = 1 включает скорость датчика в масштаб рулей, координированный разворот, TECS, логику взлёта и переход VTOL (`fw_rate_control_params.yaml:5`). Отказаться от датчика можно (вопрос J6): `SYS_HAS_NUM_ASPD` = 0 и `FW_USE_AIRSPD` = 0 (или `ASPD_PRIMARY` = 0 — оценка по GPS и ветру, `px4-hardware-peripherals`). Документация PX4 называет это экспериментальным режимом для опытных пилотов. Порядок из неё: опорный полёт с датчиком в штиль; `FW_THR_TRIM` — по наибольшему газу в вираже или наборе плюс около 10 %; `VT_TRANS_MIN_TM` — по времени перехода из лога плюс 30 %; `VT_FW_MIN_ALT` 15–20 м. Ограничение остаётся: запас до сваливания в полёте ничем не измеряется, поэтому самолёту без датчика нужна большая разница между крейсером и V_s, а не меньшая.
 
 ### Взлёт с руки, катапульты и полосы
 | Параметр | Умолчание | Смысл |
 |---|---|---|
 | `FW_LAUN_DETCN_ON` | 0 | детектор броска; при 0 мотор в Takeoff запускается сразу после арма |
-| `FW_LAUN_AC_THLD` | 30 м/с² | ускорение вперёд для детекции |
+| `FW_LAUN_AC_THLD` | 30 м/с² | порог модуля ускорения в связанных осях (до 1.18 — продольного ускорения) |
 | `FW_LAUN_AC_T` | 0.05 с | сколько оно должно держаться |
 | `FW_LAUN_MOT_DEL` | 0 с | задержка мотора после детекции; до неё газ = `FW_THR_IDLE` |
 | `FW_TKO_AIRSPD` | −1 | скорость набора; ≤ 0 — `FW_AIRSPD_MIN` |
 | `FW_TKO_PITCH_MIN` | 10° | минимальный тангаж в наборе |
-| `MIS_TAKEOFF_ALT` | 25 м (FW) | высота, после которой Takeoff переходит в Hold |
+| `MIS_TAKEOFF_ALT` | 25 м (FW), 20 м (VTOL) | высота, после которой Takeoff переходит в Hold |
 | `RWTO_TKOFF` | 0 | взлёт с полосы; нужен `FW_W_EN` = 1 (руление колесом) |
 | `RWTO_MAX_THR` / `RWTO_RAMP_TIME` | 1.0 / 2 с | газ разбега и время его нарастания |
 | `RWTO_ROT_AIRSPD` / `RWTO_ROT_TIME` | −1 (0.9 · `FW_TKO_AIRSPD`) / 1 с | скорость и длительность подъёма носа |
@@ -187,7 +187,7 @@ D у всех трёх осей по умолчанию 0; единицы — %/
 **Безопасность.** При `FW_LAUN_DETCN_ON` = 0 мотор начинает вращаться при арме в Takeoff — держишь самолёт в руках, значит детектор включён, а пропеллер направлен от тебя. 30 м/с² за 0.05 с — это около 3 g: уверенный бросок, а не встряхивание. `RWTO_HDG` в 1.17 удалён.
 
 ### Посадка по миссии
-Посадочная схема — точка `MAV_CMD_NAV_LOITER_TO_ALT` и точка `MAV_CMD_NAV_LAND`; их положения задают глиссаду. Если её угол больше `FW_LND_ANG` (5°, 1…45), миссия отклоняется при загрузке. `MIS_TKO_LAND_REQ` = 2 (умолчание FW и VTOL) требует посадку в каждой миссии; полный список значений — в `px4-safety-return`.
+Посадочная схема — точка `MAV_CMD_NAV_LOITER_TO_ALT` и точка `MAV_CMD_NAV_LAND`; их положения задают глиссаду. Если её угол больше `FW_LND_ANG` (5°, 1…45), миссия самолёта отклоняется при загрузке (у VTOL эта проверка не выполняется). `MIS_TKO_LAND_REQ` = 2 (умолчание FW и VTOL) требует посадку в каждой миссии; полный список значений — в `px4-safety-return`.
 
 | Параметр | Умолчание | Смысл |
 |---|---|---|
@@ -205,13 +205,13 @@ D у всех трёх осей по умолчанию 0; единицы — %/
 Пример: заход на 2 м/с вниз → выравнивание с max(0.5; 1 · 2) = 2 м. Уход на второй круг вручную — `MAV_CMD_DO_GO_AROUND`. Режим Land у самолёта — снижение по кругу над текущей точкой, только для аварии.
 
 ### Автотюн самолёта
-Модуль `fw_autotune_attitude_control` стартует и на самолёте, и на VTOL. Запуск — кнопкой Autotune в QGC (команда `MAV_CMD_DO_AUTOTUNE_ENABLE`; параметр-«кнопка» `FW_AT_START` удалён в 1.18) или тумблером: `FW_AT_MAN_AUX` = n берёт канал `RC_MAP_AUXn`, значение > 0.5 начинает идентификацию (настройка канала — `px4-rc-tuning`). Любое движение стиков прерывает возбуждение.
+Модуль `fw_autotune_attitude_control` стартует и на самолёте, и на VTOL. Запуск — кнопкой Start AutoTune в QGC (команда `MAV_CMD_DO_AUTOTUNE_ENABLE`; параметр-«кнопка» `FW_AT_START` удалён в 1.18) или тумблером: `FW_AT_MAN_AUX` = n берёт канал `RC_MAP_AUXn`, значение > 0.5 начинает идентификацию (настройка канала — `px4-rc-tuning`). Прерывают автотюн смена режима или выключение тумблера («Autotune aborted before finishing»); документация пишет, что его прерывает и движение стиков, но в коде самолётного модуля такой проверки нет. Если ось не сходится за 30 с, модуль переходит к следующей.
 
-| Параметр | Умолчание (1.17) | Смысл |
+| Параметр | Умолчание (1.17–1.18) | Смысл |
 |---|---|---|
 | `FW_AT_AXES` | 3 | биты: 0 крен, 1 тангаж, 2 рыскание |
 | `FW_AT_APPLY` | 2 | 0 — только в лог, 1 — после дизарма, 2 — сразу в воздухе |
-| `FW_AT_SYSID_TYPE` | 1 Linear sine sweep | 0 Step, 2 Logarithmic sweep; в 1.16 — 0 |
+| `FW_AT_SYSID_TYPE` | 1 Linear sine sweep | 0 Step, 2 Logarithmic sine sweep; в 1.16 — 0 |
 | `FW_AT_SYSID_F0` / `_F1` | 1 / 10 Гц | диапазон частот; в 1.16 `F1` = 20 |
 | `FW_AT_SYSID_TIME` | 10 с | длительность по каждой оси |
 
@@ -220,21 +220,21 @@ D у всех трёх осей по умолчанию 0; единицы — %/
 ### Переход вперёд: как это сделано в коде
 Тумблер перехода, команда `MAV_CMD_DO_VTOL_TRANSITION` или пункт миссии ставят запрос «FW». Команда `MAV_CMD_DO_VTOL_TRANSITION` (и пункт миссии) в FW отклоняется в Takeoff, Land, RTL и Orbit; запрос **тумблером** эта проверка не охватывает (`vtol_att_control_main.cpp`). При входе в RTL идущий переход вперёд отменяется — но только в момент входа.
 
-**Внимание: тумблер перехода в Land и RTL.** Если во время посадки или возврата в режиме мультиротора перевести тумблер в FW, прошивка начнёт переход вперёд: тянущий мотор выйдет на `VT_F_TRANS_THR` у земли. Правило: пока аппарат в Land или RTL (и в Takeoff), тумблер перехода стоит в положении MC; перед включением Land или RTL с пульта сначала верни тумблер в MC; на пульте сделай тумблер перехода двухпозиционным, без пружины, и не ставь его рядом с тумблером режимов. Если RTL сработал как failsafe, пока тумблер в FW, — не трогай тумблер до посадки или до перехода на ручной режим. Стандартный VTOL (`standard.cpp`, `vtol_type.cpp`, v1.17.0) проходит так:
+**Внимание: тумблер перехода в Land и RTL.** Если во время посадки или возврата в режиме мультиротора перевести тумблер в FW, прошивка начнёт переход вперёд: тянущий мотор выйдет на `VT_F_TRANS_THR` у земли. Правило: пока аппарат в Land или RTL (и в Takeoff), тумблер перехода стоит в положении MC; перед включением Land или RTL с пульта сначала верни тумблер в MC; на пульте сделай тумблер перехода двухпозиционным, без пружины, и не ставь его рядом с тумблером режимов. Если RTL сработал как failsafe, пока тумблер в FW, — не трогай тумблер до посадки или до перехода на ручной режим. Стандартный VTOL (`standard.cpp`, `vtol_type.cpp`, v1.18.0) проходит так:
 
 1. **Разгон.** Газ тянущего мотора растёт со скоростью `VT_PSHER_SLEW` (0.33 1/с) до `VT_F_TRANS_THR` (1.0); при `VT_PSHER_SLEW` = 0 — сразу. Подъёмные моторы держат аппарат с весом 1.
-2. **Смешивание.** Когда скорость ≥ `VT_ARSP_BLEND` (8 м/с) и прошло больше `VT_TRANS_MIN_TM` (2 с), вес мультироторного контура w = 1 − (V − BLEND) / (TRANS − BLEND). Тот же w уменьшает тягу подъёмных моторов; тангаж плавно уходит к `FW_PSP_OFF` · (1 − w). `VT_ARSP_BLEND` = 0: по описанию параметра смешивание выключено, но по коду 1.17 оно идёт с момента `VT_TRANS_MIN_TM` по закону w = 1 − V / `VT_ARSP_TRANS`, а ранний таймаут «скорость не растёт» перестаёт работать — остаётся только `VT_TRANS_TIMEOUT`.
+2. **Смешивание.** Когда скорость ≥ `VT_ARSP_BLEND` (8 м/с) и прошло больше `VT_TRANS_MIN_TM` (2 с), вес мультироторного контура w = 1 − (V − BLEND) / (TRANS − BLEND). Тот же w уменьшает тягу подъёмных моторов; тангаж плавно уходит к `FW_PSP_OFF` · (1 − w). `VT_ARSP_BLEND` = 0: по описанию параметра смешивание выключено, но по коду (1.17 и 1.18) оно идёт с момента `VT_TRANS_MIN_TM` по закону w = 1 − V / `VT_ARSP_TRANS`, а ранний таймаут «скорость не растёт» перестаёт работать — остаётся только `VT_TRANS_TIMEOUT`.
 3. **Завершение.** С датчиком: время > `VT_TRANS_MIN_TM` **и** V ≥ `VT_ARSP_TRANS` (10 м/с, умноженная на √(`WEIGHT_GROSS`/`WEIGHT_BASE`)). Без датчика: время > `VT_F_TR_OL_TM` (6 с). Подъёмные моторы выключаются, в течение 1 с газ переходит от тянущего мотора к TECS.
 4. **Таймаут.** Quad-chute, если время > `VT_TRANS_TIMEOUT` (15 с), а с датчиком — ещё раньше: время > `VT_F_TR_OL_TM`, а V всё ещё < `VT_ARSP_BLEND`.
 
 Без датчика вес меняется по времени: w = clamp(2 · (1 − t / `VT_TRANS_MIN_TM`), 0, 1) — подъёмные моторы начинают гаснуть с половины `VT_TRANS_MIN_TM` и к его концу выключены, хотя самолётом аппарат станет только на `VT_F_TR_OL_TM`. Поэтому без датчика `VT_TRANS_MIN_TM` берут из опорного полёта, а не оставляют 2 с.
 
-Все три времени умножаются на (ρ₀/ρ)^1.5, ρ ограничена 0.7…1.5 кг/м³ (`getFrontTransitionTimeFactor`): при ρ = 1.0 множитель 1.36, таймаут 15 с становится 20.3 с. Прошивка сама поднимает `VT_ARSP_TRANS` до `VT_ARSP_BLEND` и `VT_F_TR_OL_TM` до `VT_TRANS_MIN_TM`, если задано меньше. `VT_F_TRANS_DUR` (5 с) стандартный VTOL в 1.17 не читает — он задаёт наклон tiltrotor и поворот tailsitter; совет документации «уменьши `VT_F_TRANS_DUR` без датчика» к 4+1 не относится. Запрос «MC» во время перехода вперёд сразу возвращает висение с выключенным тянущим мотором.
+Все три времени умножаются на (ρ₀/ρ)^1.5, ρ ограничена 0.7…1.5 кг/м³ (`getFrontTransitionTimeFactor`): при ρ = 1.0 множитель 1.36, таймаут 15 с становится 20.3 с. Прошивка сама поднимает `VT_ARSP_TRANS` до `VT_ARSP_BLEND` и `VT_F_TR_OL_TM` до `VT_TRANS_MIN_TM`, если задано меньше. `VT_F_TRANS_DUR` (5 с) стандартный VTOL в 1.17 и 1.18 не читает — он задаёт наклон tiltrotor и поворот tailsitter; совет документации «уменьши `VT_F_TRANS_DUR` без датчика» к 4+1 не относится. Запрос «MC» во время перехода вперёд сразу возвращает висение с выключенным тянущим мотором.
 
 {{diagram:chart-px4-vtol-transition|В учебном примере переход завершается на 8.6 с, когда скорость достигла VT_ARSP_TRANS = 11.5 м/с; тянущий мотор вышел на 0.9 уже к 2.7 с, а подъёмные моторы теряют вес только с 6.25 с — после VT_ARSP_BLEND и VT_TRANS_MIN_TM.}}
 
 ### Переход назад и торможение
-Запрос «MC» в самолёте: тянущий мотор выключается сразу, вес подъёмных моторов растёт за `VT_B_TRANS_RAMP` (3 с, не больше `VT_B_TRANS_DUR`). В режимах с управлением вертикальной скоростью задача Transition поднимает нос, чтобы торможение было `VT_B_DEC_MSS` (2 м/с², 0.5…10); интегратор `VT_B_DEC_I` (0.1) — насколько энергично. Если впереди точка посадки, заданное торможение v² / (2 · d), но не больше 2 · `VT_B_DEC_MSS`. Переход заканчивается, когда скорость вдоль оси корпуса (по GPS, без него — воздушная) < `MPC_XY_CRUISE` (5 м/с), или через `VT_B_TRANS_DUR` (10 с), или на земле.
+Запрос «MC» в самолёте: тянущий мотор выключается сразу, вес подъёмных моторов растёт за `VT_B_TRANS_RAMP` (3 с, не больше `VT_B_TRANS_DUR`). В режимах с управлением вертикальной скоростью задача Transition поднимает нос, чтобы торможение было `VT_B_DEC_MSS` (2 м/с², 0.5…10); интегратор `VT_B_DEC_I` (0.1) — насколько энергично. С 1.18 в этих режимах задание крена тоже переходит от самолётного к мультироторному с тем же весом за `VT_B_TRANS_RAMP` (в 1.17 крен весь переход брался из самолётного задания). Если впереди точка посадки (с 1.18 — ещё и при погрешности горизонтальной позиции eph < 10 м), заданное торможение v² / (2 · d), но не больше 2 · `VT_B_DEC_MSS`. Переход заканчивается, когда скорость вдоль оси корпуса (по GPS, без него — воздушная) < `MPC_XY_CRUISE` (5 м/с), или через `VT_B_TRANS_DUR` (10 с), или на земле.
 
 Миссия начинает переход перед `VTOL_LAND` на дистанции R = v² / (2 · `VT_B_DEC_MSS`) (`mission_block.cpp`), где v — путевая скорость: 16 м/с и 2 м/с² дают 64 м. Переход по коду кончается уже на 5 м/с: (16² − 5²) / 4 = 57.75 м за (16 − 5) / 2 = 5.5 с — меньше `VT_B_TRANS_DUR`, значит таймаут не вмешается. Если реальное торможение слабее `VT_B_DEC_MSS`, аппарат проскакивает точку — подбирают по логу.
 
@@ -256,16 +256,16 @@ Quad-chute — принудительный переход в висение. П
 | Таймаут перехода | `VT_TRANS_TIMEOUT`, `VT_F_TR_OL_TM` | см. шаг 4 перехода вперёд | «…transition timeout» |
 | Внешняя команда | — | `MAV_CMD_DO_VTOL_TRANSITION`, param1 = MC, param2 = 1 | «…external command» |
 
-Из коробки активны только таймаут и потеря высоты в переходе. `VT_FW_MIN_ALT`, `VT_FW_QC_P`, `VT_FW_QC_R` действуют и в переходе назад: тангаж торможения должен быть ниже `VT_FW_QC_P`, а переход назад ниже `VT_FW_MIN_ALT` сам вызовет quad-chute.
+Из коробки активны только таймаут и потеря высоты в переходе. `VT_FW_MIN_ALT`, `VT_FW_QC_P`, `VT_FW_QC_R` действуют и в переходе назад (у tailsitter с 1.18 пределы тангажа и крена проверяются только в самолётном режиме и в самолётных осях): тангаж торможения должен быть ниже `VT_FW_QC_P`, а переход назад ниже `VT_FW_MIN_ALT` сам вызовет quad-chute.
 
-**Что происходит после.** Флаг `fixed_wing_system_failure`: стандартный VTOL сразу в висении, тянущий мотор 0; в QGC «Quad-chute triggered». Commander применяет `COM_QC_ACT` (0 Return, −1 Warning, 1 Land, 2 Hold) только если пилот был в Mission, Hold, Takeoff или VTOL Takeoff (`failsafe.cpp:520–526`); в Position, Altitude и Stabilized аппарат просто остаётся мультиротором в том же режиме. Return VTOL в висении идёт как мультиротор (`px4-safety-return`). Флаг держится до следующего запроса перехода в FW, а на земле блокирует арм: «VTOL fixed-wing system failure detected… reboot the vehicle once confirmed safe».
+**Что происходит после.** Флаг `fixed_wing_system_failure`: стандартный VTOL сразу в висении, тянущий мотор 0; в QGC «Quad-chute triggered». Commander применяет `COM_QC_ACT` (0 Return, −1 Warning, 1 Land, 2 Hold) только если пилот был в Mission, Hold, Takeoff или VTOL Takeoff (`failsafe.cpp:575–582`); в Position, Altitude и Stabilized аппарат просто остаётся мультиротором в том же режиме. Return VTOL в висении идёт как мультиротор (`px4-safety-return`). Флаг держится до следующего запроса перехода в FW, а на земле блокирует арм: «VTOL fixed-wing system failure detected… reboot the vehicle once confirmed safe».
 
 **Чего quad-chute не спасёт.** Отказ подъёмных моторов или их питания — переходить некуда. Нехватку батареи на висение: висение на крейсерской высоте вдали от дома — самый дорогой по энергии режим; поэтому `VT_FW_QC_HMAX` и резерв батареи. Срыв ниже высоты, на которой мультиротор успевает остановить падение. Ошибку направления рулей — в висении рули заблокированы, но до quad-chute аппарат уже может быть перевёрнут. Отказ датчика ориентации — обе половины летят по одной оценке.
 
 ### Висение VTOL: рули, тяга вперёд, флюгер
 - `VT_ELEV_MC_LOCK` = 1 (умолчание; tailsitter — 0): в висении поверхности стоят неподвижно. Проверять их направление поэтому можно только в самолётном режиме; на столе без арма переход в FW завершается сразу (`can_transition_on_ground`), а арм в самолётном режиме запрещён (`CBRK_VTOLARMING`, `px4-safety-return`).
-- `VT_FWD_THRUST_EN` (0; 1 — кроме посадки, 2/3 — выше `MPC_LAND_ALT1/2`, 4 — всегда, 5/6 — выше ALT1/2 и кроме посадки) и `VT_FWD_THRUST_SC` (0.7): когда контур висения хочет наклонить нос ниже `VT_PITCH_MIN` (0°, до 1.18 — −5°; на посадке `VT_LND_PITCH_MIN` 0°, до 1.18 — −5°), остаток разгона отдаётся тянущему мотору, до 0.9. Нос не «клюёт» против ветра, крыло не давит вниз. Только в режимах с управлением вертикальной скоростью.
-- `WV_EN` (0 параметра, 1 у VTOL), `WV_ROLL_MIN` 1°, `WV_GAIN` 1 Гц, `WV_YRATE_MAX` 90 °/с: в Position и Mission нос разворачивается на ветер, курс миссии игнорируется.
+- `VT_FWD_THRUST_EN` (0; 1 — кроме посадки, 2/3 — выше `MPC_LAND_ALT1/2`, 4 — всегда, 5/6 — выше ALT1/2 и кроме посадки) и `VT_FWD_THRUST_SC` (0.7): когда контур висения хочет наклонить нос ниже `VT_PITCH_MIN` (0°, до 1.18 — −5°; на посадке `VT_LND_PITCH_MIN` 0°, до 1.18 — −5°), остаток разгона отдаётся тянущему мотору, до 0.9, а нос держится на `VT_PITCH_MIN` (до 1.18 — не ниже 0° при любом значении параметра); команда тянущему мотору ниже 0.02 в висении с 1.18 означает остановленный мотор. Нос не «клюёт» против ветра, крыло не давит вниз. Только в режимах с управлением вертикальной скоростью.
+- `WV_EN` (0 параметра, 1 у VTOL), `WV_ROLL_MIN` 1°, `WV_GAIN` 1 Гц, `WV_YRATE_MAX` 90 °/с: в Position и автоматических режимах нос разворачивается на ветер вместо автоматического курса, в авто — только пока навигатор не задаёт свой курс: курс точки (param4 пункта), ROI, выравнивание перед переходом или при возобновлении миссии важнее ветра, и на этом отрезке weathervane выключен (`FlightTaskAuto.cpp`).
 - `NAV_FORCE_VT` = 1: пункт `NAV_LAND` миссии и режим Descend на самолётном режиме выполняются переходом в висение; 0 — посадка по-самолётному.
 - `VT_SPOILER_MC_LD` (0): положение спойлеров при посадке в висении.
 
@@ -288,7 +288,7 @@ Quad-chute — принудительный переход в висение. П
 **Безопасность в поле.** Первый переход — на высоте не ниже 20 м (документация PX4: «at least 20 meters»), против ветра, из устойчивого висения, с местом на 50–100 м разгона. До полёта план на каждую из трёх фаз: что делаешь, если что-то пошло не так в висении, в переходе, в самолёте. Батарея — с запасом на висение при посадке.
 
 ### PX4 и ArduPlane: соответствие понятий
-| Понятие | PX4 1.17 | ArduPlane 4.7 |
+| Понятие | PX4 1.18 | ArduPlane 4.7 |
 |---|---|---|
 | Включить VTOL | airframe 13000 / 13100 / 13200, `VT_TYPE` | `Q_ENABLE`, `Q_TILT_ENABLE`, `Q_TAILSIT_ENABLE` |
 | Огибающая | `FW_AIRSPD_STALL/MIN/TRIM/MAX` | `AIRSPEED_STALL`, `AIRSPEED_MIN`, `AIRSPEED_CRUISE`, `AIRSPEED_MAX` |
@@ -457,9 +457,9 @@ WV_EN              1
   - Возможная причина: `FW_LAUN_AC_THLD` выше реального броска; или `FW_LAUN_DETCN_ON` = 0.
   - Что видно в логе: `launch_detection_status.launch_detection_state` остаётся в ожидании.
   - Что сделать: детектор включить; порог не ниже 2 g, чтобы встряхивание не запускало мотор.
-- **Симптом:** миссия VTOL отклонена при загрузке.
-  - Возможная причина: нет посадки при `MIS_TKO_LAND_REQ` = 2; угол глиссады больше `FW_LND_ANG`.
-  - Что сделать: добавить посадку или отодвинуть точку `LOITER_TO_ALT`.
+- **Симптом:** миссия самолёта или VTOL отклонена при загрузке.
+  - Возможная причина: нет посадки при `MIS_TKO_LAND_REQ` = 2; у самолёта без VTOL — ещё угол глиссады больше `FW_LND_ANG` («Mission rejected: the landing glide slope is steeper than the vehicle setting of …»), у VTOL эта проверка не выполняется.
+  - Что сделать: добавить посадку или (у самолёта) отодвинуть точку `LOITER_TO_ALT`.
 - **Симптом:** VTOL проскакивает точку посадки в переходе назад.
   - Возможная причина: реальное торможение меньше `VT_B_DEC_MSS`; попутный ветер.
   - Что сделать: по логу посчитать среднее торможение, поставить его в `VT_B_DEC_MSS`; заходить против ветра.
@@ -477,16 +477,16 @@ WV_EN              1
 - ULog первого перехода и оба `.params` сохранены.
 
 ## references
-- PX4 v1.17.0 source — vtol_att_control/vtol_type.cpp (завершение перехода, quad-chute) | https://raw.githubusercontent.com/PX4/PX4-Autopilot/v1.17.0/src/modules/vtol_att_control/vtol_type.cpp | primary | A
-- PX4 v1.17.0 source — vtol_att_control/standard.cpp (переход стандартного VTOL) | https://raw.githubusercontent.com/PX4/PX4-Autopilot/v1.17.0/src/modules/vtol_att_control/standard.cpp | primary | A
-- PX4 v1.17.0 source — vtol_att_control/vtol_att_control_params.c | https://raw.githubusercontent.com/PX4/PX4-Autopilot/v1.17.0/src/modules/vtol_att_control/vtol_att_control_params.c | primary | A
-- PX4 v1.17.0 source — fw_performance_model/performance_model_params.c (огибающая) | https://raw.githubusercontent.com/PX4/PX4-Autopilot/v1.17.0/src/lib/fw_performance_model/performance_model_params.c | primary | A
-- PX4 v1.17.0 source — fw_mode_manager/fw_mode_manager_params.c (взлёт, посадка) | https://raw.githubusercontent.com/PX4/PX4-Autopilot/v1.17.0/src/modules/fw_mode_manager/fw_mode_manager_params.c | primary | A
-- PX4 v1.17.0 source — fw_rate_control/FixedwingRateControl.cpp (масштаб по скорости) | https://raw.githubusercontent.com/PX4/PX4-Autopilot/v1.17.0/src/modules/fw_rate_control/FixedwingRateControl.cpp | primary | A
+- PX4 v1.18.0 source — vtol_att_control/vtol_type.cpp (завершение перехода, quad-chute) | https://raw.githubusercontent.com/PX4/PX4-Autopilot/v1.18.0/src/modules/vtol_att_control/vtol_type.cpp | primary | A
+- PX4 v1.18.0 source — vtol_att_control/standard.cpp (переход стандартного VTOL) | https://raw.githubusercontent.com/PX4/PX4-Autopilot/v1.18.0/src/modules/vtol_att_control/standard.cpp | primary | A
+- PX4 v1.18.0 source — vtol_att_control/vtol_att_control_params.yaml | https://raw.githubusercontent.com/PX4/PX4-Autopilot/v1.18.0/src/modules/vtol_att_control/vtol_att_control_params.yaml | primary | A
+- PX4 v1.18.0 source — fw_performance_model/performance_model_params.yaml (огибающая) | https://raw.githubusercontent.com/PX4/PX4-Autopilot/v1.18.0/src/lib/fw_performance_model/performance_model_params.yaml | primary | A
+- PX4 v1.18.0 source — fw_mode_manager/fw_mode_manager_params.yaml (взлёт, посадка) | https://raw.githubusercontent.com/PX4/PX4-Autopilot/v1.18.0/src/modules/fw_mode_manager/fw_mode_manager_params.yaml | primary | A
+- PX4 v1.18.0 source — fw_rate_control/FixedwingRateControl.cpp (масштаб по скорости) | https://raw.githubusercontent.com/PX4/PX4-Autopilot/v1.18.0/src/modules/fw_rate_control/FixedwingRateControl.cpp | primary | A
 - PX4 User Guide — VTOL Configuration (transition tuning) | https://docs.px4.io/main/en/config_vtol/vtol_quad_configuration.html | primary | A
 - PX4 User Guide — VTOL Without an Airspeed Sensor | https://docs.px4.io/main/en/config_vtol/vtol_without_airspeed_sensor.html | primary | A
 - PX4 User Guide — Safety: Quad-chute Failsafe | https://docs.px4.io/main/en/config/safety.html | primary | A
 - PX4 User Guide — Mission Mode (FW): Mission Landing | https://docs.px4.io/main/en/flight_modes_fw/mission.html | primary | A
 
 ## notes
-Прошивка в этом проходе не собиралась и не запускалась: поведение перехода и quad-chute взято из чтения исходников v1.17.0, документация — из каталога `docs/en` того же тега. Расхождения документации с кодом: совет уменьшать `VT_F_TRANS_DUR` без датчика к стандартному VTOL не относится (`standard.cpp` его не читает); `VT_FW_MIN_ALT` в safety.md описан «над домом», в коде и описании параметра — над началом локальных координат. Параметров `VT_TILT_SPINUP`, `VT_FW_PERM_STAB`, `VT_MC_ON_FMU`, `VT_FW_ALT_ERR`, `VT_QC_HR_ERROR_I` нет ни в 1.15.4, ни в 1.16.2, ни в 1.17.0. Запасы скорости над V_s — из `aero-wing`, остальные правила выбора помечены как инженерная оценка.
+Прошивка в этом проходе не собиралась и не запускалась: поведение перехода и quad-chute взято из чтения исходников v1.18.0 (отличия от v1.17.0 отмечены в тексте), документация — из каталога `docs/en` того же тега. Расхождения документации с кодом: совет уменьшать `VT_F_TRANS_DUR` без датчика к стандартному VTOL не относится (`standard.cpp` его не читает); `VT_FW_MIN_ALT` в safety.md описан «над домом», в коде и описании параметра — над началом локальных координат. Параметров `VT_TILT_SPINUP`, `VT_FW_PERM_STAB`, `VT_MC_ON_FMU`, `VT_FW_ALT_ERR`, `VT_QC_HR_ERROR_I` нет ни в 1.15.4, ни в 1.16.2, ни в 1.17.0, ни в 1.18.0. Запасы скорости над V_s — из `aero-wing`, остальные правила выбора помечены как инженерная оценка.

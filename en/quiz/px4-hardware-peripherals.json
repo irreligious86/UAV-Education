@@ -3,116 +3,116 @@
  "pass": 80,
  "questions": [
   {
-   "q": "Ты записал `SENS_TFMINI_CFG` = 103 и сразу набрал `tfmini status` — драйвер не запущен. Почему?",
+   "q": "You set `SENS_TFMINI_CFG` = 103 and typed `tfmini status` right away: the driver is not running. Why?",
    "options": [
-    "Драйверу нужна скорость `SER_TEL3_BAUD` = 115200, иначе он не стартует",
-    "Драйвер запускает загрузочный скрипт `rc.serial`: нужна перезагрузка",
-    "TFmini включается параметром `SENS_EN_TFMINI`, а не портом",
-    "Значение 103 — это GPS 2, порт занят"
+    "The driver needs `SER_TEL3_BAUD` = 115200, otherwise it does not start",
+    "It is started by the `rc.serial` boot script: you need a reboot",
+    "TFmini is enabled with the `SENS_EN_TFMINI` parameter, not with a port",
+    "Value 103 is GPS 2, and that port is taken"
    ],
    "answer": 1,
-   "explain": "Параметр порта помечен reboot_required: команду `tfmini start -d …` выполняет rc.serial при загрузке. Скорость драйвер ставит сам (115200), параметра SENS_EN_TFMINI не существует, 103 — TELEM 3 (GPS 2 — это 202)."
+   "explain": "The port parameter is marked reboot_required: rc.serial runs the `tfmini start -d …` command at boot. The driver sets the baud rate itself (115200), there is no SENS_EN_TFMINI parameter, and 103 is TELEM 3 (GPS 2 is 202)."
   },
   {
-   "q": "`SER_TEL1_BAUD` = 57600, `MAV_0_RATE` = 0. Какой лимит потока получит экземпляр MAVLink?",
+   "q": "`SER_TEL1_BAUD` = 57600, `MAV_0_RATE` = 0. What rate limit does the MAVLink instance get?",
    "options": [
-    "5760 Б/с",
-    "57600 Б/с",
-    "2880 Б/с",
-    "1200 Б/с"
+    "5760 B/s",
+    "57600 B/s",
+    "2880 B/s",
+    "1200 B/s"
    ],
    "answer": 2,
-   "explain": "В mavlink_main.cpp: при datarate = 0 берётся baudrate / 20 — половина пропускной способности порта 8N1 (бод / 10 = 5760 Б/с). 1200 — это умолчание MAV_0_RATE, а не результат нуля."
+   "explain": "In mavlink_main.cpp, with datarate = 0 the firmware takes baudrate / 20: half the bandwidth of an 8N1 port (baud / 10 = 5760 B/s). 1200 is the MAV_0_RATE default, not the result of zero."
   },
   {
-   "q": "Pixhawk 6X, PX4 1.17. Что не так в этом фрагменте?",
+   "q": "Pixhawk 6X, PX4 1.17. What is wrong in this fragment?",
    "kind": "apply",
    "fragment": "GPS_1_CONFIG     201\nGPS_2_CONFIG     202\nMAV_0_CONFIG     101\nMAV_1_CONFIG     102\nUXRCE_DDS_CFG    102\nSENS_TFMINI_CFG  103\nMSP_OSD_CONFIG   401",
    "options": [
-    "`MSP_OSD_CONFIG` = 401: такого порта на fmu-v6x нет",
-    "`GPS_2_CONFIG` = 202 конфликтует с `GPS_1_CONFIG`",
-    "`MAV_1_CONFIG` и `UXRCE_DDS_CFG` указывают на один порт TELEM 2",
-    "`SENS_TFMINI_CFG` = 103: порт TELEM 3 на этой плате принимает только MAVLink"
+    "`MSP_OSD_CONFIG` = 401: fmu-v6x has no such port",
+    "`GPS_2_CONFIG` = 202 conflicts with `GPS_1_CONFIG`",
+    "`MAV_1_CONFIG` and `UXRCE_DDS_CFG` both point at the TELEM 2 port",
+    "`SENS_TFMINI_CFG` = 103: TELEM 3 on this board accepts MAVLink only"
    ],
    "answer": 2,
-   "explain": "102 — TELEM 2, и на него претендуют два драйвера: второй получит «Conflicting config for /dev/ttyS4» и не запустится. 401 — EXT2 (разъём UART4 & I2C), 202 — отдельный порт GPS 2, а TELEM 3 можно отдать любому драйверу."
+   "explain": "102 is TELEM 2, and two drivers claim it: the second one gets \"Conflicting config for /dev/ttyS4\" and does not start. 401 is EXT2 (the UART4 & I2C connector), 202 is a separate GPS 2 port, and TELEM 3 can go to any driver."
   },
   {
-   "q": "Набор потоков экземпляра требует 2400 Б/с масштабируемых сообщений и 21 Б/с постоянных. `MAV_0_RATE` = 1200. С какой частотой пойдёт `ATTITUDE`, заданный на 15 Гц?",
+   "q": "An instance's stream set needs 2400 B/s of scalable messages and 21 B/s of constant-rate ones. `MAV_0_RATE` = 1200. At what rate will `ATTITUDE`, configured for 15 Hz, go out?",
    "options": [
-    "15 Гц, остальные сообщения будут отброшены",
-    "Около 7.4 Гц",
-    "Около 0.75 Гц",
-    "Ровно 7.5 Гц, HEARTBEAT тоже станет вдвое реже"
+    "15 Hz, the other messages are dropped",
+    "About 7.4 Hz",
+    "About 0.75 Hz",
+    "Exactly 7.5 Hz, and HEARTBEAT is halved too"
    ],
    "answer": 1,
-   "explain": "mult = (1200 − 21) / 2400 = 0.49; 15 × 0.49 ≈ 7.4 Гц. Масштабируются все непостоянные потоки сразу, HEARTBEAT (const_rate) не трогается. 0.75 Гц получилось бы при нижней границе 0.05."
+   "explain": "mult = (1200 − 21) / 2400 = 0.49; 15 × 0.49 ≈ 7.4 Hz. All non-constant streams are scaled together, HEARTBEAT (const_rate) is left alone. 0.75 Hz would come from the 0.05 lower bound."
   },
   {
-   "q": "Аппарат на 1.16 обновили до 1.17, параметры не трогали. Что произошло с `GPS_UBX_DYNMODEL` у мультиротора?",
+   "q": "A vehicle on 1.16 was updated to 1.17 without touching the parameters. What happened to `GPS_UBX_DYNMODEL` on the multicopter?",
    "options": [
-    "Был 6 из airframe, стал 7 — умолчание параметра",
-    "Был 7, стал 8, как у самолёта",
-    "Остался 6: airframe мультиротора по-прежнему задаёт его",
-    "Параметр удалён, модель выбирает приёмник"
+    "It was 6 from the airframe, now it is the default 7",
+    "It was 7, now it is 8, like on a plane",
+    "It stayed 6: the multicopter airframe still sets it",
+    "The parameter was removed; the receiver picks the model"
    ],
    "answer": 0,
-   "explain": "В 1.15–1.16 rc.mc_defaults содержал `param set-default GPS_UBX_DYNMODEL 6`; в 1.17 строка убрана, остаётся умолчание 7 (airborne < 2 g). 8 ставит только rc.fw_defaults."
+   "explain": "In 1.15–1.16 rc.mc_defaults had `param set-default GPS_UBX_DYNMODEL 6`; in 1.17 that line is gone, so the default 7 (airborne < 2 g) applies. Only rc.fw_defaults sets 8."
   },
   {
-   "q": "На плате внутренний компас и внешний в модуле GPS. После первой калибровки ты ничего не менял. Какой из них основной и почему?",
+   "q": "The board has an internal compass and an external one in the GPS module. You changed nothing after the first calibration. Which one is primary, and why?",
    "options": [
-    "Внутренний: у него слот 0",
-    "Тот, что откалиброван первым",
-    "Внешний: ему прошивка даёт приоритет 75, внутреннему — 50",
-    "Оба усредняются с равными весами, пока `SENS_MAG_MODE` = 1 и калибровка свежая"
+    "The internal one: it is in slot 0",
+    "The one that was calibrated first",
+    "The external one: the firmware gives it priority 75 and the internal one 50",
+    "Both are averaged with equal weights while `SENS_MAG_MODE` = 1 and the calibration is fresh"
    ],
    "answer": 2,
-   "explain": "В Magnetometer.hpp DEFAULT_EXTERNAL_PRIORITY = 75, DEFAULT_PRIORITY = 50; значения записываются в CAL_MAGn_PRIO. SENS_MAG_MODE = 1 означает «публиковать только основной», усреднения нет."
+   "explain": "In Magnetometer.hpp DEFAULT_EXTERNAL_PRIORITY = 75 and DEFAULT_PRIORITY = 50; the values are written to CAL_MAGn_PRIO. SENS_MAG_MODE = 1 means \"publish the primary only\"; there is no averaging."
   },
   {
-   "q": "ESC подключены по DroneCAN, но на экране Actuators нет группы выходов CAN. `UAVCAN_ENABLE` = 2. В чём дело?",
+   "q": "The ESCs are on DroneCAN, but the Actuators screen has no CAN output group. `UAVCAN_ENABLE` = 2. What is wrong?",
    "options": [
-    "Нужно `UAVCAN_SUB_ESC` = 1",
-    "Выходы на ESC и сервы включает только значение 3",
-    "`UAVCAN_NODE_ID` должен быть 0 для раздачи номеров",
-    "Значение 2 отключает раздачу номеров узлов"
+    "You need `UAVCAN_SUB_ESC` = 1",
+    "Only value 3 enables ESC and servo outputs",
+    "`UAVCAN_NODE_ID` must be 0 for node ID allocation",
+    "Value 2 disables node ID allocation"
    ],
    "answer": 1,
-   "explain": "UAVCAN_ENABLE: 1 — датчики с ручными номерами, 2 — датчики с раздачей номеров и обновлением прошивок, 3 — то же плюс актуаторы (module.yaml: show_subgroups_if 'UAVCAN_ENABLE>=3'). Параметра UAVCAN_SUB_ESC нет, номер узла полётника — 1…125."
+   "explain": "UAVCAN_ENABLE: 1 is sensors with manual IDs, 2 sensors with dynamic node ID allocation and firmware update, 3 the same plus actuators (module.yaml: show_subgroups_if 'UAVCAN_ENABLE>=3'). There is no UAVCAN_SUB_ESC parameter, and the flight controller's node ID is 1…125."
   },
   {
-   "q": "Pixhawk 6X, стандартная прошивка. Нужно вывести OSD через MSP на видеопередатчик. Что верно?",
+   "q": "Pixhawk 6X, stock firmware. You want OSD over MSP to the video transmitter. What is true?",
    "options": [
-    "`msp_osd` в сборку fmu-v6x не входит: сначала собери свою прошивку через `boardconfig`",
-    "`msp_osd` в сборке есть; порт — `MSP_OSD_CONFIG`, скорость 115200 драйвер ставит сам",
-    "Скорость задаётся `SER_*_BAUD`, по умолчанию 57600 — VTX надо перенастроить",
-    "В 1.17 драйвер шлёт элементы DJI legacy MSP, DisplayPort появится позже"
+    "`msp_osd` is not in the fmu-v6x build: first make your own firmware with `boardconfig`",
+    "`msp_osd` is in the build; port `MSP_OSD_CONFIG`, the driver sets 115200",
+    "The rate comes from `SER_*_BAUD`, 57600 by default, so you must reconfigure the VTX",
+    "In 1.17 the driver sends DJI legacy MSP elements; DisplayPort comes later"
    ],
    "answer": 1,
-   "explain": "В default.px4board fmu-v6x есть CONFIG_DRIVERS_OSD_MSP_OSD=y (1.15–1.17); своя сборка нужна для fmu-v6c, Kakute H7, Matek H743. В msp_osd.cpp скорость жёстко B115200. DisplayPort — с 1.16, legacy был в 1.15."
+   "explain": "The fmu-v6x default.px4board has CONFIG_DRIVERS_OSD_MSP_OSD=y (1.15–1.17); you need your own build for fmu-v6c, Kakute H7, Matek H743. msp_osd.cpp hard-codes B115200. DisplayPort arrived in 1.16; legacy was 1.15."
   },
   {
-   "q": "Аппарат не заармлен. Светодиод состояния «дышит» синим. Что это значит?",
+   "q": "The vehicle is disarmed. The status LED is breathing blue. What does that mean?",
    "options": [
-    "Предполётные проверки не пройдены, арм запрещён до их устранения в QGC",
-    "Проверки пройдены, но нет глобальной позиции или точки дома",
-    "Батарея ниже порога Low",
-    "Идёт калибровка компаса"
+    "Preflight checks failed; arming is denied until you fix them in QGC",
+    "The checks passed, but there is no global position or home position",
+    "The battery is below the Low threshold",
+    "Compass calibration is in progress"
    ],
    "answer": 1,
-   "explain": "control_status_leds: без арма и при пройденных проверках режим BREATHE; цвет зелёный, только если валидны и home, и global position, иначе синий. Проваленные проверки — быстрое красное мигание, Low — янтарный цвет."
+   "explain": "control_status_leds: disarmed with checks passed gives BREATHE mode; the color is green only if both home and global position are valid, otherwise blue. Failed checks are a fast red blink, Low is amber."
   },
   {
-   "q": "`CBRK_BUZZER` = 782090. Что услышишь при включении, если параметры не удалось импортировать?",
+   "q": "`CBRK_BUZZER` = 782090. What do you hear at power-on if the parameters failed to import?",
    "options": [
-    "Ничего: пищалка отключена целиком",
-    "Стартовую мелодию 1",
-    "Мелодию ошибки 2",
-    "Мелодию 15 (SD_ERROR)"
+    "Nothing: the buzzer is disabled entirely",
+    "The startup tune 1",
+    "The error tune 2",
+    "Tune 15 (SD_ERROR)"
    ],
    "answer": 2,
-   "explain": "782090 отключает только стартовую мелодию: rcS играет мелодию, если CBRK_BUZZER ≠ 782090 ИЛИ STARTUP_TUNE ≠ 1. При ошибке импорта STARTUP_TUNE = 2, поэтому сигнал ошибки прозвучит. Полное отключение — 782097."
+   "explain": "782090 disables only the startup tune: rcS plays a tune if CBRK_BUZZER ≠ 782090 OR STARTUP_TUNE ≠ 1. On an import failure STARTUP_TUNE = 2, so the error tune plays. Full silence is 782097."
   }
  ]
 }

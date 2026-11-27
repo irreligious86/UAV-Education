@@ -3,7 +3,7 @@
  "pass": 80,
  "questions": [
   {
-   "q": "Руль высоты в геометрии — вторая поверхность (`CA_SV_CS1`). Какой номер функции нужно записать в `PWM_AUX_FUNC6`, чтобы он оказался на выходе AUX6?",
+   "q": "The elevator is the second surface in the geometry (`CA_SV_CS1`). Which function number goes into `PWM_AUX_FUNC6` to put it on output AUX6?",
    "options": [
     "102",
     "202",
@@ -11,34 +11,34 @@
     "402"
    ],
    "answer": 1,
-   "explain": "Поверхность CA_SV_CS1 — это второй исполнитель типа «серва», то есть Servo 2. Сервы занимают номера 201…215 (в 1.18; до 1.18 — 201…208, output_functions.yaml), значит 202. 102 — Motor 2, 302 — Peripheral via Actuator Set 2, 402 — RC Roll."
+   "explain": "Surface CA_SV_CS1 is the second actuator of type \"servo\", that is, Servo 2. Servos take numbers 201…215 (in 1.18; before 1.18 they were 201…208, output_functions.yaml), so 202. 102 is Motor 2, 302 Peripheral via Actuator Set 2, 402 RC Roll."
   },
   {
-   "q": "Pixhawk 6X (fmu-v6x), PX4 1.18. Что не так в этом фрагменте?",
+   "q": "Pixhawk 6X (fmu-v6x), PX4 1.18. What is wrong in this fragment?",
    "kind": "apply",
    "fragment": "PWM_AUX_TIM0   -3\nPWM_AUX_TIM1   50\nPWM_AUX_FUNC1  101\nPWM_AUX_FUNC2  102\nPWM_AUX_FUNC3  103\nPWM_AUX_FUNC4  201\nPWM_AUX_FUNC5  104",
    "options": [
-    "Servo 1 стоит в группе DShot600 вместе с моторами",
-    "Motor 4 на AUX5: у Timer4 нет DMA, DShot там невозможен",
-    "Значение −3 не существует в 1.18, DShot600 — это −2",
-    "Функцию 201 нельзя назначать выходам FMU, только MAIN"
+    "Servo 1 sits in the DShot600 group with the motors",
+    "Motor 4 on AUX5: Timer4 has no DMA, so DShot is impossible there",
+    "The value −3 does not exist in 1.18; DShot600 is −2",
+    "Function 201 cannot be assigned to FMU outputs, only MAIN"
    ],
    "answer": 0,
-   "explain": "AUX1–4 висят на Timer5, это одна группа с параметром PWM_AUX_TIM0 = −3 (DShot600): серва на AUX4 получит кадры DShot, а не импульс 50 Гц. Motor 4 на AUX5 при TIM1 = 50 тоже будет работать неверно, но причина не в DMA: у Timer4 DMA есть. −2 было DShot1200 в 1.15 и убрано в 1.16. В 1.18 добавились −6…−8 — те же скорости с bidirectional DShot."
+   "explain": "AUX1–4 hang off Timer5, one group with PWM_AUX_TIM0 = −3 (DShot600): the servo on AUX4 will get DShot frames instead of a 50 Hz pulse. Motor 4 on AUX5 with TIM1 = 50 will not work right either, but not because of DMA: Timer4 has DMA. −2 was DShot1200 in 1.15 and was removed in 1.16. 1.18 added −6…−8, the same speeds with bidirectional DShot."
   },
   {
-   "q": "Выходу, у которого раньше была функция Disabled, назначили Motor 1 (PWM). Что драйвер `pwm_out` запишет сам?",
+   "q": "An output whose function used to be Disabled was assigned Motor 1 (PWM). What does the `pwm_out` driver write by itself?",
    "options": [
     "`DIS` = 900, `MIN` = 1000, `MAX` = 2000",
-    "`DIS` = 1500 и 50 Гц на группу",
+    "`DIS` = 1500 and 50 Hz for the group",
     "`MIN` = 1100, `MAX` = 1900",
     "`MIN` = 1000, `MAX` = 2000, `FAIL` = 1000"
    ],
    "answer": 2,
-   "explain": "PWMOut::update_params в момент, когда функция выхода на работающей прошивке меняется с Disabled на Motor, ставит MIN 1100 и MAX 1900; DIS остаётся 1000. DIS = 1500 и переход группы с 400 на 50 Гц — это автоматика для Servo, и частота меняется только если в группе раньше не было ни одной функции."
+   "explain": "PWMOut::update_params, at the moment an output's function changes from Disabled to Motor on running firmware, sets MIN 1100 and MAX 1900; DIS stays 1000. DIS = 1500 and the group switching from 400 to 50 Hz is the automation for Servo, and the rate changes only if the group had no function before."
   },
   {
-   "q": "Серва на выходе IO: `MIN` = 1000, `MAX` = 2000, бит выхода в `PWM_MAIN_REV` установлен. Аллокатор отдаёт +0.5. Сколько микросекунд на выходе?",
+   "q": "A servo on an IO output: `MIN` = 1000, `MAX` = 2000, the output's bit in `PWM_MAIN_REV` is set. The allocator outputs +0.5. How many microseconds on the output?",
    "options": [
     "1750",
     "1500",
@@ -46,43 +46,43 @@
     "1000"
    ],
    "answer": 2,
-   "explain": "Реверс меняет знак значения до пересчёта: −0.5. Затем MIN + (v + 1)/2 · (MAX − MIN) = 1000 + 0.25 · 1000 = 1250. Без реверса было бы 1750."
+   "explain": "Reversal flips the sign of the value before conversion: −0.5. Then MIN + (v + 1)/2 · (MAX − MIN) = 1000 + 0.25 · 1000 = 1250. Without reversal it would be 1750."
   },
   {
-   "q": "`PWM_AUX_REV` = 10. У каких выходов развёрнут диапазон?",
+   "q": "`PWM_AUX_REV` = 10. Which outputs have their range reversed?",
    "options": [
-    "AUX1 и AUX3",
-    "AUX2 и AUX4",
-    "AUX3 и AUX5",
-    "AUX1 и AUX10"
+    "AUX1 and AUX3",
+    "AUX2 and AUX4",
+    "AUX3 and AUX5",
+    "AUX1 and AUX10"
    ],
    "answer": 1,
-   "explain": "10 = 8 + 2 = биты 3 и 1. Бит n−1 отвечает за выход n, значит выходы 4 и 2. AUX1 и AUX3 дали бы маску 5."
+   "explain": "10 = 8 + 2 = bits 3 and 1. Bit n−1 is output n, so outputs 4 and 2. AUX1 and AUX3 would give mask 5."
   },
   {
-   "q": "Гексакоптер на Pixhawk 6X, PX4 1.18: моторы на AUX1–6, `PWM_AUX_TIM0` = `PWM_AUX_TIM1` = −6 (BDShot600). На каких выходах будет bidirectional DShot с оборотами?",
+   "q": "A hexacopter on a Pixhawk 6X, PX4 1.18: motors on AUX1–6, `PWM_AUX_TIM0` = `PWM_AUX_TIM1` = −6 (BDShot600). Which outputs get bidirectional DShot with RPM?",
    "options": [
-    "На AUX1–6",
-    "Только на AUX1–4, как с `DSHOT_BIDIR_EN` в 1.17",
-    "На AUX1–8, включая Timer12",
-    "Только на AUX5–6"
+    "AUX1–6",
+    "Only AUX1–4, as with `DSHOT_BIDIR_EN` in 1.17",
+    "AUX1–8, including Timer12",
+    "Only AUX5–6"
    ],
    "answer": 0,
-   "explain": "В 1.18 bidirectional DShot выбирается на группу таймера: −6 у TIM0 (Timer5, AUX1–4) и у TIM1 (Timer4, AUX5–6), у обоих таймеров есть DMA. Драйвер STM32 запускает группы по очереди и читает обороты одного канала группы за цикл (dshot.c, v1.18.0) — ограничения «только таймер 0» больше нет. В 1.16–1.17 при `DSHOT_BIDIR_EN` = 1 DShot оставался только у таймера с индексом 0, и AUX5–6 сигнала не получали. Timer12 (AUX7–8) DMA не имеет и DShot не берёт. На железе это сочетание не проверялось."
+   "explain": "In 1.18 bidirectional DShot is chosen per timer group: −6 on TIM0 (Timer5, AUX1–4) and on TIM1 (Timer4, AUX5–6), and both timers have DMA. The STM32 driver triggers the groups in turn and reads the RPM of one channel of the group per cycle (dshot.c, v1.18.0); the \"timer 0 only\" limitation is gone. In 1.16–1.17 with `DSHOT_BIDIR_EN` = 1 DShot stayed only on the timer with index 0, and AUX5–6 got no signal. Timer12 (AUX7–8) has no DMA and cannot do DShot. This combination was not tested on hardware."
   },
   {
-   "q": "Серва руля на выходе IO: `MIN` = 1000, `MAX` = 1800, `DIS` = 1500, `FAIL` = −1. Сработал flight termination. Что на выходе?",
+   "q": "A control surface servo on an IO output: `MIN` = 1000, `MAX` = 1800, `DIS` = 1500, `FAIL` = −1. Flight termination fired. What is on the output?",
    "options": [
-    "1500 мкс",
-    "1000 мкс",
-    "1800 мкс",
-    "1400 мкс"
+    "1500 µs",
+    "1000 µs",
+    "1800 µs",
+    "1400 µs"
    ],
    "answer": 3,
-   "explain": "FAIL = −1 означает значение по функции; для Servo это 0, то есть середина между MIN и MAX: (1000 + 1800)/2 = 1400. DIS = 1500 выход получил бы при kill или без арма. MAX по умолчанию получает только Parachute и Constant Max."
+   "explain": "FAIL = −1 means the value by function; for Servo that is 0, the midpoint between MIN and MAX: (1000 + 1800)/2 = 1400. The output would get DIS = 1500 on kill or when disarmed. Only Parachute and Constant Max get MAX by default."
   },
   {
-   "q": "По правилу знаков PX4 положительная команда поднимает заднюю кромку. Какие коэффициенты у **правого** элевона?",
+   "q": "By the PX4 sign rule a positive command raises the trailing edge. What are the coefficients of the **right** elevon?",
    "options": [
     "`TRQ_R` = −0.5, `TRQ_P` = +0.5",
     "`TRQ_R` = +0.5, `TRQ_P` = −0.5",
@@ -90,10 +90,10 @@
     "`TRQ_R` = −0.5, `TRQ_P` = −0.5"
    ],
    "answer": 2,
-   "explain": "Кромка правого элевона вверх: подъёмная сила правого крыла падает, оно идёт вниз — крен вправо, положительный. Одновременно хвостовая часть крыла давит вниз — нос вверх, тангаж положительный. Так и в airframe 3000_generic_wing: CA_SV_CS1_TRQ_R 0.5, CA_SV_CS1_TRQ_P 0.5. Вариант −0.5/+0.5 — левый элевон."
+   "explain": "The right elevon edge goes up: the right wing loses lift and goes down, a roll to the right, positive. At the same time the rear of the wing pushes down, nose up, positive pitch. That is what the 3000_generic_wing airframe has: CA_SV_CS1_TRQ_R 0.5, CA_SV_CS1_TRQ_P 0.5. The −0.5/+0.5 option is the left elevon."
   },
   {
-   "q": "Выходу назначена функция Peripheral via Actuator Set 2 (302). Какой командой companion переключит его в максимум?",
+   "q": "An output has the Peripheral via Actuator Set 2 (302) function. Which command lets a companion switch it to maximum?",
    "options": [
     "`MAV_CMD_DO_SET_ACTUATOR`: param2 = 1, param7 = 0",
     "`MAV_CMD_DO_SET_ACTUATOR`: param1 = 1, param7 = 2",
@@ -101,18 +101,18 @@
     "`MAV_CMD_DO_GRIPPER`: param1 = 2, param2 = 1"
    ],
    "answer": 0,
-   "explain": "FunctionActuatorSet читает VEHICLE_CMD_DO_SET_ACTUATOR (187): param1…param6 — значения −1…1 для Peripheral 1…6, param7 — индекс набора, принимается только 0. NaN в параметре оставляет выход как был. DO_SET_SERVO этой функцией не обрабатывается, DO_GRIPPER управляет функцией Gripper (430)."
+   "explain": "FunctionActuatorSet reads VEHICLE_CMD_DO_SET_ACTUATOR (187): param1…param6 are the −1…1 values for Peripheral 1…6, param7 is the set index, and only 0 is accepted. NaN in a parameter leaves the output as it was. This function does not handle DO_SET_SERVO, and DO_GRIPPER drives the Gripper function (430)."
   },
   {
-   "q": "Самолёт на столе, не заармлен: в Manual рули не идут за стиками, слайдеры Actuators работают. Какой параметр это объясняет?",
+   "q": "A plane on the bench, disarmed: in Manual the control surfaces do not follow the sticks, but the Actuators sliders work. Which parameter explains this?",
    "options": [
-    "`PWM_MAIN_TIMn` = 400 у группы рулей",
+    "`PWM_MAIN_TIMn` = 400 on the control surface group",
     "`COM_PREARM_MODE` = 0",
     "`CBRK_IO_SAFETY` = 22027",
     "`PWM_MAIN_FAILn` = −1"
    ],
    "answer": 1,
-   "explain": "При COM_PREARM_MODE = 0 состояния prearm нет: без арма каждый выход стоит в DIS, значение сервы не используется. Значение 2 включает prearm через 5 с после загрузки, и сервы (но не моторы) начинают работать. 400 Гц — неверная частота для аналоговой сервы, но рули тогда двигались бы. Слайдеры работают, потому что тест выходов в 1.18 разрешён всегда (до 1.18 его мог запретить COM_MOT_TEST_EN = 0)."
+   "explain": "With COM_PREARM_MODE = 0 there is no prearm state: when disarmed every output sits at DIS, and the servo value is not used. Value 2 enables prearm 5 s after boot, and the servos (but not the motors) start working. 400 Hz is the wrong rate for an analog servo, but the surfaces would still move. The sliders work because in 1.18 output testing is always allowed (before 1.18 COM_MOT_TEST_EN = 0 could forbid it)."
   }
  ]
 }
