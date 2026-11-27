@@ -26,7 +26,7 @@ Letová řídicí jednotka (FC) je malý počítač, který tisíckrát za sekun
 ### Procesor
 Srdcem FC je mikrokontrolér. Možnosti určuje jeho řada:
 
-- **F4** – nejrozšířenější a nejlevnější; mají omezený počet UART a neumějí UART hardwarově invertovat (viz modul o SBUS).
+- **F4** – nejrozšířenější a nejlevnější; mají omezený počet UART a neumějí UART invertovat softwarově (pro SBUS je potřeba externí hardwarový invertor na desce, jen u některých portů) (viz modul o SBUS).
 - **F7** – rychlejší, víc UART, softwarová inverze.
 - **H7** – nejvýkonnější, standard pro ArduPilot a PX4 na složitých platformách.
 

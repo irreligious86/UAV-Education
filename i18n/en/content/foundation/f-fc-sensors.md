@@ -16,7 +16,7 @@ related:
 next:
   - bf-pid-reg-in-bf
 source: content/foundation/f-fc-sensors.md
-source_hash: dfcd5736567b
+source_hash: 2a787a49bfe6
 ---
 
 ## summary
@@ -26,7 +26,7 @@ The flight controller (FC) is a small computer that reads the sensors, runs the 
 ### Processor
 The heart of an FC is a microcontroller. The series determines the capabilities:
 
-- **F4** — the most common and cheapest; limited in the number of UARTs and cannot invert UARTs in hardware (see the module on SBUS).
+- **F4** — the most common and cheapest; limited in the number of UARTs and cannot invert UARTs in software: SBUS needs an external hardware inverter on the board, and only some ports have one (see the module on SBUS).
 - **F7** — faster, more UARTs, software inversion.
 - **H7** — the most powerful, the standard for ArduPilot and PX4 on complex platforms.
 

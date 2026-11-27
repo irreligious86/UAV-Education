@@ -18,7 +18,7 @@ related:
 next:
   - f-power
 source: content/foundation/f-electricity-101.md
-source_hash: 34fe88759b61
+source_hash: 2cf7c6692e0b
 ---
 
 ## summary
@@ -88,7 +88,7 @@ After hovering — the average current from the log (the current sensor must be 
 Your own one-page checklist: charging, storage, inspection, what to do after a crash, where the sand is. Pin it at the charging spot.
 
 ### Reference values and a worked example
-- **LiPo cells:** 4.20 V — full charge, 3.80–3.85 V — storage. After balancing the difference between cells is ≤ 0.02 V; after charging and resting, from 0.03 V — watch it, more than 0.05 V — retire it (course guideline, `f-power` and the “Maintenance” module).
+- **LiPo cells:** 4.20 V — full charge, 3.80–3.90 V — storage (Gens Ace datasheet, `f-power`). After balancing the difference between cells is ≤ 0.02 V; after charging and resting, from 0.03 V — watch it, more than 0.05 V — retire it (course guideline, `f-power` and the “Maintenance” module).
 - **BEC:** 5 V should be within about ±5 % (4.75–5.25 V) with the on-board equipment connected. If the voltage sags noticeably under load, the BEC is too small for the current.
 - **Pack internal resistance:** 25.2 V with no load, 24.4 V under a 20 A current → R = (25.2 − 24.4) / 20 = 0.04 Ω for a 6S pack, ≈ 6.7 mΩ per cell. At hover current the sag will be proportionally smaller.
 - **Motor windings:** phase resistance is tenths and hundredths of an ohm, and an ordinary multimeter measures it poorly: the probes and the contact give a comparable error. Compare the three phases of one motor with each other: they must match. A bad solder joint on a lead raises the two pairs that include that lead; one pair that stands out from the other two — a damaged winding (inter-turn short); “open” — a broken winding or lead. More precisely — pass a known current from a bench supply (for example, 1 A) and measure the voltage drop.
