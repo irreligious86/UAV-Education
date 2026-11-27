@@ -50,6 +50,9 @@ jobs:
       - name: Rendering check (no raw Markdown tables, bold or headings in pages)
         run: python scripts/check_rendering.py
 
+      - name: Stable heading ids (notes, bookmarks, history anchors)
+        run: python -m pytest -q -p no:cacheprovider tests/py
+
       - name: Compile starter examples
         run: python -m compileall -q examples
 

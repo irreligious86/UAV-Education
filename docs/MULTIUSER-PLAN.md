@@ -241,9 +241,33 @@ per-row pushes, settings tied to their account, staff paging.
 ### Anchors
 
 A place in a lesson is `(module_id, anchor)`; `anchor` is the id of a section heading, `''` = the whole lesson.
-Headings get positional ids `sec-N` in the browser (`assets/history.js`, shared by history, notes, bookmarks and
-feedback). They move when a lesson gains or loses a heading above them; every note and bookmark also keeps the
-heading text (`label`), so a moved anchor is still recognisable. Text highlights (phase B) need a different
+Section headings (`h2`, `h3`, `h4.md-subheading` anywhere inside the lesson body `.module-body`, diagnostics
+cards included — the selector of `assets/history.js` `headings()`) have stable ids from the build
+(`scripts/content_pipeline.py` `assign_heading_ids`, since 2026-11-27; `scripts/check_rendering.py` fails a page
+where one is missing, `tests/py/test_heading_ids.py`): a slug of the heading text — Cyrillic transliterated,
+`[a-z0-9-]`, at most 60 characters, `-2`, `-3` for a repeated text on the same page — so adding a heading above no
+longer moves the anchor. Renaming a heading does (its notes stay listed with the saved `label`, unattached), and so
+does inserting a second heading with the same text above an existing one (the `-2` moves). Neither a slug nor a
+`-N` suffix ever looks like `sec-N`.
+Across languages: a page that shows the source text (module not translated) or a translation that matches the
+current source (`source_hash` fresh) reuses all source-language ids when its heading structure is the same; a
+stale translation reuses only the `h2` ids (the fixed skeleton Теория, Практика, Диагностика, … — when the `h2`
+count matches) and its sub-headings get slugs of their own text, because a stale translation can have the same
+number of steps with different content and a note must never open on a different section. So a note on a section
+heading follows the user into another language where that language's translation is up to date (and on `h2`
+sections always); elsewhere it stays in the lesson's notes, unattached. Capstone and project pages have
+build-generated headings and always share their ids.
+Before that the ids were positional (`sec-N`, assigned in the browser). Data saved then is migrated in the browser
+on the lesson page, where the headings are known: `UAVUserData.migrateAnchors()` (`assets/user-data.js`
+`migrateRows`, unit-tested) moves notes, bookmarks and their copies (`sec-N-copy-K`, always together with their
+original) to the new ids — by the saved heading text when the lesson changed since, else by position — and the
+next push sends them under the new anchor and deletes the old server row (a row the server never saw is just
+dropped), so old and new rows never coexist. Reading history needs no migration (the lesson's entry is rewritten
+on every visit) and feedback is server-only; for both, and for any old `#sec-N` link (progress and account lists,
+staff feedback list), the lesson page resolves `sec-N` on load (and on an in-page change to such a hash) — by the
+heading text saved with it in this browser (history entry, not yet migrated note or bookmark), else the N-th
+heading — and fixes the address. Sync must send the migrated anchors; the server needs no change (the anchor
+check `^[A-Za-z0-9_-]{0,80}$` of 0007 accepts both forms; no user data existed before the change). Text highlights (phase B) need a different
 anchor (text quote + offsets) and will get their own table; nothing here blocks that.
 
 ### Sync rules
@@ -300,5 +324,5 @@ feedback without an author.
   nothing about other users' rows and takes no lock on their key), size checks on every text and jsonb column, settings accept known
   keys and types only, history accepts ≤ 30 objects with `id` and `at`.
 - Rendering: notes and feedback are shown with `textContent` / escaped HTML only, never as markup.
-- Accepted: anchors are positional (see above); a student can write any text into their own notes (only they
+- Accepted: an anchor follows its heading's text, so renaming a heading orphans its notes (still listed, with the saved label); a student can write any text into their own notes (only they
   see it); feedback text is visible to staff with the author's username (said in the dialog).

@@ -11,7 +11,8 @@
  *   uav-student:bookmarks:v1  {"<module>#<anchor>": {m, a, label, title, at, dirty, srv, del, err}}
  *     at = local edit time (ms), srv = server updated_at of the version this browser last saw, dirty = not on the
  *     server yet, del = deleted here, the server row still to delete, err = why the server refused this row.
- *     anchor "" = the whole lesson.
+ *     anchor = a heading id from the build (assets/history.js headings()), "" = the whole lesson; old positional
+ *     "sec-N" anchors are moved on the lesson page (migrateRows).
  *   uav-student:settings, uav-student:ready-only   (assets/account-page.js, assets/app.js)
  *   uav-student:settings-owner  user id whose settings these are ('' or absent = a guest's)
  *   uav-student:history:v1    (assets/history.js)
@@ -131,7 +132,65 @@ var T = (typeof window !== "undefined" && window.T) || function (s) { return s; 
     return "";
   }
 
-  var pure = { mergeRows: mergeRows, mergeHistory: mergeHistory, cleanSettings: cleanSettings, resolve: resolve, key: key, invalid: invalid };
+  // Anchors saved before the build gave headings stable ids were positional ("sec-N", also in note copies
+  // "sec-N-copy-K"). On a lesson page, where the headings are known, migrateRows() moves this lesson's rows to the
+  // ids the headings have now. rows: {key: row} of one store; to(anchor, label) -> the new anchor or null (keep:
+  // not an old anchor, or no such heading any more). Idempotent: a new anchor never looks like an old one.
+  //   - a copy "sec-N-copy-K" goes wherever its original "sec-N" goes: `to` is asked once per old anchor, with the
+  //     original's label (or the copy's label without its trailing "(copy …)" when the original is gone);
+  //   - the moved row is new on the server (dirty, no version) and the old one is deleted there: a row the server
+  //     knows (srv) stays as a deletion to push, one it never saw is just dropped — never both rows;
+  //   - a row deleted here (del) stays as it is: its deletion goes up under the old anchor;
+  //   - the place already holds a row: a bookmark keeps that one; a note with the same text keeps that one, with a
+  //     different text becomes a copy "<new>-copy-N" next to it (nothing is lost).
+  // Returns {rows, moved}.
+  var OLD_ANCHOR = /^(sec-\d+)(-copy-\d+)?$/;
+  function migrateRows(rows, moduleId, to, opts) {
+    opts = opts || {};
+    rows = isRow(rows) ? rows : {};
+    var out = Object.assign({}, rows), moved = 0, now = opts.now || Date.now();
+    var copyLabel = opts.copyLabel || "(copy)";
+    var mine = Object.keys(rows).sort().filter(function (k) {
+      var r = rows[k];
+      return isRow(r) && r.m === moduleId && OLD_ANCHOR.test(r.a || "");
+    });
+    // one target per old anchor, decided by the original's label (a deleted original still tells its heading)
+    var labels = {}, targets = {};
+    mine.forEach(function (k) { var r = rows[k], m = OLD_ANCHOR.exec(r.a); if (!m[2] && r.label) labels[m[1]] = r.label; });
+    mine.forEach(function (k) {
+      var r = rows[k], m = OLD_ANCHOR.exec(r.a);
+      if (m[2] && !(m[1] in labels) && r.label) labels[m[1]] = String(r.label).replace(/\s*\([^()]*\)\s*$/, "");
+    });
+    var target = function (old) { if (!(old in targets)) targets[old] = to(old, labels[old] || ""); return targets[old]; };
+    mine.forEach(function (k) {
+      var r = rows[k];
+      if (r.del) return;
+      var m = OLD_ANCHOR.exec(r.a);
+      var base = target(m[1]);
+      if (!base || base === m[1] || OLD_ANCHOR.test(base)) return;
+      var a = base + (m[2] || ""), nk = key(moduleId, a), there = out[nk];
+      var row = Object.assign({}, r, { a: a, dirty: true, srv: null, del: false });
+      delete row.err;
+      if (there && !there.del) {
+        if (!("body" in r) || there.body === r.body) row = null;           // already there
+        else {
+          a = copyAnchor(base, function (x) { return !!out[key(moduleId, x)]; });
+          nk = key(moduleId, a);
+          var lab = String(r.label || "");
+          if (lab.slice(-copyLabel.length) !== copyLabel) lab = (lab + " " + copyLabel).trim();
+          row = Object.assign(row, { a: a, label: lab.slice(0, LABEL_MAX) });
+        }
+      } else if (there && there.del) row.srv = there.srv;                   // overwrite our own pending deletion
+      if (row) out[nk] = row;
+      if (r.srv) { out[k] = Object.assign({}, r, { del: true, dirty: true, at: now }); delete out[k].err; }
+      else delete out[k];
+      moved++;
+    });
+    return { rows: out, moved: moved };
+  }
+
+  var pure = { mergeRows: mergeRows, mergeHistory: mergeHistory, cleanSettings: cleanSettings, resolve: resolve, key: key, invalid: invalid,
+               migrateRows: migrateRows };
   if (typeof module !== "undefined" && module.exports) module.exports = pure;
   if (typeof document === "undefined") return;
 
@@ -176,6 +235,18 @@ var T = (typeof window !== "undefined" && window.T) || function (s) { return s; 
 
   var notes = rowsStore(NOTES, NOTE_ROWS, true);
   var marks = rowsStore(MARKS, MARK_ROWS, false);
+
+  // notes.js on a lesson page: old positional anchors of this lesson -> the heading ids (migrateRows above).
+  // The moved rows are dirty, so the next push sends them under the new anchors and deletes the old server rows.
+  function migrateAnchors(moduleId, to) {
+    var n = 0;
+    [[NOTES, notes], [MARKS, marks]].forEach(function (p) {
+      var r = migrateRows(p[1].all(), moduleId, to, { copyLabel: T("(копия с другого устройства)") });
+      if (r.moved) { put(p[0], r.rows); n += r.moved; }
+    });
+    if (n) { emit("migrated"); schedule(); }
+    return n;
+  }
 
   function meta() { var m = get(META, {}); return isRow(m) ? m : {}; }
   function setMeta(part, v) { var m = meta(); m[part] = Object.assign({}, m[part] || {}, v); put(META, m); }
@@ -365,7 +436,7 @@ var T = (typeof window !== "undefined" && window.T) || function (s) { return s; 
   }
 
   window.UAVUserData = Object.assign({
-    NOTE_MAX: NOTE_MAX, notes: notes, bookmarks: marks,
+    NOTE_MAX: NOTE_MAX, notes: notes, bookmarks: marks, migrateAnchors: migrateAnchors,
     readSettings: readSettings, syncAll: syncAll, signedIn: signedIn,
     pending: dirtyCount, error: function () { return lastError; },
     keepUnsynced: keepUnsynced,

@@ -29,6 +29,7 @@ from i18n import _, tr_html, up  # noqa: E402
 from content_pipeline import (  # noqa: E402
     LEVEL_LABELS,
     ROADMAP_URL,
+    assign_heading_ids,
     block_to_paragraphs,
     diagnostics_to_html,
     extract_section,
@@ -641,6 +642,26 @@ def neighbours(m: dict, model: dict) -> tuple[dict | None, dict | None]:
     return prev, nxt
 
 
+# Heading ids of every lesson page in the source language, "m/bf-pid.html" -> [(tag, id)]: translated pages reuse
+# them (content_pipeline.assign_heading_ids), so an anchor means the same section in every language. main() builds the
+# source language first.
+SOURCE_HEADINGS: dict[str, list[tuple[str, str]]] = {}
+
+
+def with_heading_ids(page: str, rel: str, module_id: str | None = None) -> str:
+    """Stable ids for the section headings of a lesson page (notes, bookmarks, history, feedback anchors).
+    module_id: a Markdown module, whose translation may be stale (then only its h2 ids are shared with the source);
+    capstone and project pages have build-generated headings only."""
+    if i18n.lang() == i18n.SOURCE:
+        page, ids = assign_heading_ids(page)
+        SOURCE_HEADINGS[rel] = ids
+        return page
+    assert SOURCE_HEADINGS, "the source language must be built first (main(): i18n.LANGS[0])"
+    fresh = module_id is None or TRANSLATION_STATE.get(i18n.lang(), {}).get(module_id, "missing") in ("ok", "missing")
+    page, _ids = assign_heading_ids(page, SOURCE_HEADINGS.get(rel), fresh=fresh)
+    return page
+
+
 def render_module(m: dict, model: dict) -> str:
     base = "../"
     planned = m["status"] == "planned"
@@ -754,8 +775,8 @@ def render_module(m: dict, model: dict) -> str:
       {related_html}
       {pager_html}
     </article>"""
-    return layout(title=m["title"], base=base, body=body, active="course", description=" ".join(m.get("objectives", [])), section=module_section(m),
-                  extra_head=widget_scripts(content if not planned else "", base))
+    return with_heading_ids(layout(title=m["title"], base=base, body=body, active="course", description=" ".join(m.get("objectives", [])),
+                                   section=module_section(m), extra_head=widget_scripts(content if not planned else "", base)), f"m/{m['id']}.html", m["id"])
 
 
 # ---------------------------------------------------------------- capstone
@@ -803,7 +824,7 @@ def render_capstone(g: dict, model: dict) -> str:
       </div>
       <div class="module-done"><gc-button variant="secondary" data-done-toggle="{esc(c['id'])}" data-done-label="{_("завершённый")}" data-done-past="{_("Завершён")}">{_("Отметить как завершённый")}</gc-button></div>
     </article>"""
-    return layout(title=c["title"], base=base, body=body, active="course", description=c.get("result", ""))
+    return with_heading_ids(layout(title=c["title"], base=base, body=body, active="course", description=c.get("result", "")), f"cap/{c['id']}.html")
 
 
 # ---------------------------------------------------------------- project catalogue
@@ -907,7 +928,7 @@ def render_project(p: dict, model: dict) -> str:
       </div>
       <div class="module-done"><gc-button variant="secondary" data-done-toggle="{esc(p['id'])}" data-done-label="{_("завершённый")}" data-done-past="{_("Завершён")}">{_("Отметить как завершённый")}</gc-button></div>
     </article>"""
-    return layout(title=p["title"], base=base, body=body, active="course", description=p["summary"][:200])
+    return with_heading_ids(layout(title=p["title"], base=base, body=body, active="course", description=p["summary"][:200]), f"projects/{p['id']}.html")
 
 
 # ---------------------------------------------------------------- reference
@@ -1719,6 +1740,7 @@ def write_js_catalogs() -> None:
 
 def main() -> None:
     write_js_catalogs()
+    assert i18n.LANGS[0]["code"] == i18n.SOURCE, "the source language is built first: translations reuse its heading ids"
     stats = []
     for l in i18n.LANGS:
         model = build_language(l["code"])

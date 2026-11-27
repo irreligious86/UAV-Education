@@ -31,7 +31,8 @@ const NOTES = "uav-student:notes:v1", MARKS = "uav-student:bookmarks:v1";
     const heads = await p.$$eval(".module-body h2 .nb-tools", (t) => t.length);
     assert.ok(heads > 3, "every h2 has tools");
     const firstId = await p.$eval(".module-body h2", (h) => h.id);
-    assert.match(firstId, /^sec-\d+$/);
+    assert.match(firstId, /^[a-z0-9-]{1,60}$/, "stable id from the build");
+    assert.ok(!/^sec-\d+$/.test(firstId), "not a positional id");
     await p.evaluate(() => window.scrollTo(0, document.querySelectorAll(".module-body h2")[1].offsetTop + 10));
     await p.waitForTimeout(600);
     const hist = await ls(p, "uav-student:history:v1");
@@ -134,6 +135,68 @@ const NOTES = "uav-student:notes:v1", MARKS = "uav-student:bookmarks:v1";
     await ctx.close();
   }
 
+  // ------------------------------------------------------------------ old positional anchors ("sec-N", before build ids)
+  {
+    const ctx = await browser.newContext({ viewport: { width: 1280, height: 900 } });
+    const p = await ctx.newPage(); watch(p);
+    await p.goto(`${BASE}/${LESSON}`, { waitUntil: "networkidle" });
+    const H = await p.$$eval(".module-body h2, .module-body h3, .module-body h4.md-subheading",
+                             (hs) => hs.map((h) => ({ id: h.id, text: window.UAVHistory.headingText(h).slice(0, 160) })));
+    assert.ok(H.length > 8);
+    assert.ok(H.every((h) => /^[a-z0-9-]{1,60}$/.test(h.id) && !/^sec-\d+$/.test(h.id)), "every section heading, after the diagnostics too, has a build id");
+    await p.goto(`${BASE}/pages/progress.html`, { waitUntil: "networkidle" });   // leave the lesson: it saves history on pagehide
+    // what an older version of the site left in this browser: positional anchors = N-th heading in document order
+    await p.evaluate(({ H, NOTES, MARKS }) => {
+      localStorage.setItem(MARKS, JSON.stringify({
+        "bf-pid#sec-3": { m: "bf-pid", a: "sec-3", label: H[2].text, title: "PID", at: 1, dirty: false, srv: null },
+        // the lesson changed since: this bookmark was made on what is now heading 5 (its text wins over the position)
+        "bf-pid#sec-1": { m: "bf-pid", a: "sec-1", label: H[4].text, title: "PID", at: 1, dirty: false, srv: null },
+        "bf-cli#sec-3": { m: "bf-cli", a: "sec-3", label: "", title: "CLI", at: 1, dirty: false, srv: null }
+      }));
+      localStorage.setItem(NOTES, JSON.stringify({
+        "bf-pid#sec-2": { m: "bf-pid", a: "sec-2", label: H[1].text, title: "PID", body: "old note", at: 1, dirty: false, srv: null },
+        "bf-pid#sec-2-copy-1": { m: "bf-pid", a: "sec-2-copy-1", label: H[1].text + " (copy)", title: "PID", body: "old copy", at: 1, dirty: false, srv: null }
+      }));
+      localStorage.setItem("uav-student:history:v1", JSON.stringify({ items: [{ id: "bf-pid", path: "m/bf-pid.html", title: "PID", anchor: "sec-1", heading: H[3].text, at: Date.now() }], last: "bf-pid" }));
+    }, { H, NOTES, MARKS });
+    // progress page lists still carry the old anchors: the link opens the lesson on the right heading
+    await p.reload({ waitUntil: "networkidle" });
+    const histLink = p.locator("[data-history-list] a").first();
+    assert.match(await histLink.getAttribute("href"), /bf-pid\.html#sec-1$/);
+    await histLink.click();
+    await p.waitForLoadState("networkidle");
+    await p.waitForFunction((id) => location.hash === "#" + id, H[3].id, { timeout: 5000 });
+    const top = await p.evaluate((id) => document.getElementById(id).getBoundingClientRect().top, H[3].id);
+    assert.ok(top > -5 && top < 200, `old #sec-1 lands on the heading saved with it (top ${top})`);
+    ok("old #sec-N link from the progress page lands on the heading saved with it (the lesson changed), the address is fixed");
+
+    // the lesson page migrated this lesson's rows, and only them
+    const marks = await ls(p, MARKS), notes = await ls(p, NOTES);
+    assert.deepStrictEqual(Object.keys(marks).sort(), ["bf-cli#sec-3", "bf-pid#" + H[2].id, "bf-pid#" + H[4].id].sort());
+    assert.deepStrictEqual(Object.keys(notes).sort(), ["bf-pid#" + H[1].id, "bf-pid#" + H[1].id + "-copy-1"].sort());
+    assert.strictEqual(notes["bf-pid#" + H[1].id].body, "old note");
+    assert.strictEqual(await p.getAttribute(`[data-nb-mark="${H[2].id}"]`, "aria-pressed"), "true", "old sec-3 bookmark shows on heading 3");
+    assert.strictEqual(await p.getAttribute(`[data-nb-mark="${H[4].id}"]`, "aria-pressed"), "true", "moved heading found by its text");
+    assert.ok(await p.getAttribute(`[data-nb-note="${H[1].id}"]`, "data-has") !== null, "old sec-2 note shows on heading 2");
+    await p.reload({ waitUntil: "networkidle" });
+    assert.deepStrictEqual([await ls(p, MARKS), await ls(p, NOTES)], [marks, notes], "migration is idempotent");
+    // a direct old link too
+    await p.goto(`${BASE}/${LESSON}#sec-2`, { waitUntil: "networkidle" });
+    await p.waitForFunction((id) => location.hash === "#" + id, H[1].id, { timeout: 5000 });   // nothing saved: by position
+    // an in-page hash change to an old anchor is resolved too; an ordinary one is left to the browser
+    await p.evaluate(() => { location.hash = "#sec-3"; });
+    await p.waitForFunction((id) => location.hash === "#" + id, H[2].id, { timeout: 5000 });
+    await p.evaluate((id) => { location.hash = "#" + id; }, H[5].id);
+    await p.waitForTimeout(200);
+    assert.strictEqual(await p.evaluate(() => location.hash), "#" + H[5].id);
+    // the progress list now links to the new anchors
+    await p.goto(`${BASE}/pages/progress.html`, { waitUntil: "networkidle" });
+    const hrefs = await p.$$eval('[data-nb-list="bookmarks"] a[href*="bf-pid"]', (as) => as.map((a) => a.getAttribute("href")));
+    assert.ok(hrefs.some((h) => h.endsWith("#" + H[2].id)) && !hrefs.some((h) => /#sec-\d+$/.test(h)), "bookmark links use the new ids: " + hrefs);
+    ok("old sec-N notes, copies and bookmarks move to the heading ids on the lesson page (by text when the lesson changed), once");
+    await ctx.close();
+  }
+
   // ------------------------------------------------------------------ signed in (fake backend)
   {
     const ctx = await browser.newContext({ viewport: { width: 400, height: 860 } });
@@ -223,13 +286,27 @@ const NOTES = "uav-student:notes:v1", MARKS = "uav-student:bookmarks:v1";
     await p.keyboard.press("Escape");
     ok("signed in: a push over a newer server version merges instead of overwriting");
 
+    // a row synced under an old positional anchor: the lesson page moves it; the server ends with the new row only
+    await editServer((d) => { const r = d.tables.user_notes.find((x) => x.anchor === ""); d.tables.user_notes.push(Object.assign({}, r, { anchor: "sec-1", label: "Теория", body: "synced under sec-1", updated_at: new Date(Date.now() + 240000).toISOString() })); });
+    await p.evaluate(() => window.UAVUserData.syncAll());
+    assert.strictEqual((await ls(p, NOTES))["bf-pid#sec-1"].dirty, false, "came down as a clean synced row");
+    await p.goto(`${BASE}/${LESSON}`, { waitUntil: "networkidle" });
+    await p.waitForFunction(() => window.UAVUserData.pending() === 0, null, { timeout: 8000 });
+    rows = await serverNotes();
+    assert.ok(!rows.some((r) => r.anchor === "sec-1"), "the old server row is gone");
+    assert.strictEqual(rows.find((r) => r.anchor === "teoriya").body, "synced under sec-1");
+    assert.ok(!Object.keys(await ls(p, NOTES)).some((k) => /#sec-/.test(k)));
+    await editServer((d) => { d.tables.user_notes = d.tables.user_notes.filter((r) => r.anchor !== "teoriya"); });
+    await editLocal((l) => { delete l["bf-pid#teoriya"]; });
+    ok("signed in: a synced sec-N note is pushed under its new anchor and the old server row is deleted");
+
     // a row the server refuses does not block the others, and logout names the real reason
     await editLocal((l) => {
       l["BAD ID#"] = { m: "BAD ID", a: "", body: "hand-edited", at: 1, dirty: true, srv: null };
-      l["bf-pid#sec-1"] = { m: "bf-pid", a: "sec-1", body: "good one", at: 2, dirty: true, srv: null, label: "" };
+      l["bf-pid#teoriya"] = { m: "bf-pid", a: "teoriya", body: "good one", at: 2, dirty: true, srv: null, label: "" };
     });
     await p.evaluate(() => window.UAVUserData.syncAll());
-    assert.ok((await serverNotes()).some((r) => r.anchor === "sec-1" && r.body === "good one"), "the good row went up");
+    assert.ok((await serverNotes()).some((r) => r.anchor === "teoriya" && r.body === "good one"), "the good row went up");
     await p.goto(`${BASE}/pages/account.html`, { waitUntil: "networkidle" });
     await p.click("[data-acc-logout]");
     await p.waitForFunction(() => /неверной ссылкой/.test(document.querySelector("[data-acc-msg]").textContent));
@@ -239,17 +316,17 @@ const NOTES = "uav-student:notes:v1", MARKS = "uav-student:bookmarks:v1";
     // the session ends by itself (expired / revoked): unsynced notes stay and go up at the same account's next login
     await p.goto(`${BASE}/${LESSON}`, { waitUntil: "networkidle" });
     await p.waitForFunction(() => window.UAVUserData.pending() === 0, null, { timeout: 8000 });
-    await editLocal((l) => { l["bf-pid#sec-2"] = { m: "bf-pid", a: "sec-2", body: "typed offline", at: 3, dirty: true, srv: null, label: "" }; });
+    await editLocal((l) => { l["bf-pid#praktika"] = { m: "bf-pid", a: "praktika", body: "typed offline", at: 3, dirty: true, srv: null, label: "" }; });
     await p.evaluate(() => window.UAV_BACKEND.client.auth.signOut());     // not our logout: the session just ended
     await p.waitForFunction(() => !window.UAVAccount.state().user);
     let local = await ls(p, NOTES);
-    assert.deepStrictEqual(Object.keys(local), ["bf-pid#sec-2"], "only the unsynced note is kept");
+    assert.deepStrictEqual(Object.keys(local), ["bf-pid#praktika"], "only the unsynced note is kept");
     await login("nina@example.org", "ninapassword1");
-    await p.waitForFunction(() => JSON.parse(localStorage.getItem("fake-supabase-db")).tables.user_notes.some((r) => r.anchor === "sec-2" && r.body === "typed offline"), null, { timeout: 8000 });
+    await p.waitForFunction(() => JSON.parse(localStorage.getItem("fake-supabase-db")).tables.user_notes.some((r) => r.anchor === "praktika" && r.body === "typed offline"), null, { timeout: 8000 });
     // … and another account never gets them; nina's settings do not leak into it either
     await p.check('[data-setting="notesPanel"]');
     await p.waitForFunction(() => { const d = JSON.parse(localStorage.getItem("fake-supabase-db")); return (d.tables.user_settings || []).some((r) => r.data.notesPanel === true); }, null, { timeout: 8000 });
-    await editLocal((l) => { l["bf-pid#sec-3"] = { m: "bf-pid", a: "sec-3", body: "nina's secret", at: 4, dirty: true, srv: null, label: "" }; });
+    await editLocal((l) => { l["bf-pid#diagnostika"] = { m: "bf-pid", a: "diagnostika", body: "nina's secret", at: 4, dirty: true, srv: null, label: "" }; });
     await p.evaluate(() => window.UAV_BACKEND.client.auth.signOut());
     await p.waitForFunction(() => !window.UAVAccount.state().user);
     await login("adam@example.org", "adminpassword1");
@@ -275,7 +352,7 @@ const NOTES = "uav-student:notes:v1", MARKS = "uav-student:bookmarks:v1";
     await p.click("dialog.nb-dialog button[type=submit]");
     await p.waitForSelector("dialog.nb-dialog [role=status]");
     const fb = (await db()).feedback[0];
-    assert.deepStrictEqual([fb.module_id, fb.section_key, fb.kind, /^sec-\d+$/.test(fb.anchor), fb.page_lang], ["bf-pid", "betaflight", "unclear", true, "ru"]);
+    assert.deepStrictEqual([fb.module_id, fb.section_key, fb.kind, fb.anchor, fb.page_lang], ["bf-pid", "betaflight", "unclear", "teoriya", "ru"]);
     await p.keyboard.press("Escape");
     await p.goto(`${BASE}/pages/account.html`, { waitUntil: "networkidle" });
     await p.click("[data-acc-logout]");
@@ -287,7 +364,7 @@ const NOTES = "uav-student:notes:v1", MARKS = "uav-student:bookmarks:v1";
     await p.goto(`${BASE}/pages/admin.html`, { waitUntil: "networkidle" });
     await p.waitForSelector("[data-adm-feedback] [data-fb]");
     assert.match(await p.textContent("[data-adm-feedback]"), /0\.65[\s\S]*/);
-    assert.ok(/m\/bf-pid\.html#sec-\d+$/.test(await p.getAttribute("[data-adm-feedback] [data-fb] a", "href")), "link to the exact place");
+    assert.ok(/m\/bf-pid\.html#teoriya$/.test(await p.getAttribute("[data-adm-feedback] [data-fb] a", "href")), "link to the exact place");
     await p.selectOption("[data-fb-kind]", "error");
     assert.strictEqual(await p.locator("[data-adm-feedback] [data-fb]").count(), 0);
     await p.selectOption("[data-fb-kind]", "");

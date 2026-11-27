@@ -4,7 +4,8 @@
  *
  *   lesson page (<article data-module-page>): a bar under the tags (bookmark the lesson, open the notes panel,
  *     report to the developer) and three small buttons in every section heading (bookmark, note, report).
- *     Anchors are the heading ids from assets/history.js ("sec-N"), '' = the whole lesson.
+ *     Anchors are the heading ids from assets/history.js (stable ids from the build, e.g. "teoriya"), '' = the
+ *     whole lesson; rows under the old positional anchors ("sec-N") are migrated here (UAVUserData.migrateAnchors).
  *   [data-nb-list="notes" | "bookmarks"]: list with search and section filter; data-nb-compact="N" shows the
  *     newest N without tools (account page). Module titles and sections come from <script id="nb-modules">.
  *   Feedback is sent only by a signed-in user (the database also requires a confirmed email); guests see why
@@ -106,6 +107,10 @@ var T = (typeof window !== "undefined" && window.T) || function (s) { return s; 
     var path = location.pathname.split("/").filter(Boolean).slice(-2).join("/");
     var heads = window.UAVHistory && window.UAVHistory.headings ? window.UAVHistory.headings(art) : [];
     var textOf = function (h) { return window.UAVHistory ? window.UAVHistory.headingText(h) : h.textContent.trim(); };
+    // notes and bookmarks saved under the old positional anchors ("sec-N") move to the heading ids, once
+    if (window.UAVHistory && window.UAVHistory.legacyAnchor && UD.migrateAnchors) {
+      UD.migrateAnchors(mid, function (a, label) { return window.UAVHistory.legacyAnchor(heads, a, label); });
+    }
     var meta = function (anchor) {
       var h = anchor ? document.getElementById(anchor) : null;
       return { label: h ? textOf(h).slice(0, 160) : "", title: title, path: path };

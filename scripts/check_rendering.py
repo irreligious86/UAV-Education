@@ -5,6 +5,9 @@ A table that the renderer did not recognise shows up as one long paragraph of pi
 an unclosed ** or a stray ### shows up literally. Readers see garbage, CI stays green — unless this
 check runs. It scans the text of generated pages (outside <pre>, <code>, <script>, <style>, <svg>)
 for Markdown syntax that should never survive rendering.
+
+On lesson pages (<article data-module-page>) it also checks that every section heading carries a stable id from
+the build (content_pipeline.assign_heading_ids): the anchor of notes, bookmarks, history and feedback.
 """
 from __future__ import annotations
 
@@ -48,6 +51,56 @@ class Text(HTMLParser):
             self.chunks.append(data)
 
 
+HEAD_ID = re.compile(r"^[a-z0-9-]{1,60}$")        # fits the server's anchor check (0007) with a "-copy-N" suffix
+
+
+VOID = {"area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta", "param", "source", "track", "wbr"}
+
+
+class Sections(HTMLParser):
+    """Section headings as assets/history.js headings() selects them: h2, h3, h4.md-subheading that are descendants of
+    .module-body (nested elements such as <article class="diag-item"> included). Parsed independently of the build's
+    own region finder (content_pipeline.module_body_span), so a mistake there shows up here."""
+    def __init__(self):
+        super().__init__(convert_charrefs=True)
+        self.stack: list[tuple[str, bool]] = []   # open elements: (tag, is it or an ancestor .module-body)
+        self.heads: list[tuple[str, str]] = []
+
+    def handle_starttag(self, tag, attrs):
+        a = dict(attrs)
+        cls = (a.get("class") or "").split()
+        inside = bool(self.stack and self.stack[-1][1])
+        if inside and (tag in ("h2", "h3") or (tag == "h4" and "md-subheading" in cls)):
+            self.heads.append((tag, a.get("id") or ""))
+        if tag not in VOID:
+            self.stack.append((tag, inside or "module-body" in cls))
+
+    def handle_startendtag(self, tag, attrs):
+        pass
+
+    def handle_endtag(self, tag):
+        if tag in VOID or all(t != tag for t, _ in self.stack):
+            return
+        while self.stack and self.stack.pop()[0] != tag:   # an implicitly closed <p>/<li> closes with its parent
+            pass
+
+
+def heading_errors(html_text: str) -> list[str]:
+    if "data-module-page" not in html_text:
+        return []
+    from content_pipeline import LEGACY_ANCHOR_RE
+    p = Sections()
+    p.feed(html_text)
+    out, seen = [], set()
+    for tag, hid in p.heads:
+        if not hid or not HEAD_ID.match(hid) or LEGACY_ANCHOR_RE.match(hid):
+            out.append(f"section heading <{tag}> without a stable build id ({hid or 'none'})")
+        elif hid in seen:
+            out.append(f"duplicate heading id {hid}")
+        seen.add(hid)
+    return out
+
+
 def main() -> int:
     errors = []
     pages = 0
@@ -55,7 +108,9 @@ def main() -> int:
         for f in sorted((ROOT / d).glob("*.html")) if (ROOT / d).is_dir() else []:
             pages += 1
             p = Text()
-            p.feed(f.read_text(encoding="utf-8"))
+            src = f.read_text(encoding="utf-8")
+            p.feed(src)
+            errors += [f"{f.relative_to(ROOT)}: {e}" for e in heading_errors(src)]
             text = " ".join(p.chunks)
             for rx, what in PATTERNS:
                 m = rx.search(text)

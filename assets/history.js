@@ -28,8 +28,10 @@ var T = (typeof window !== "undefined" && window.T) || function (s) { return s; 
     if (s < 86400) return Math.round(s / 3600) + " " + T("ч назад");
     return Math.round(s / 86400) + " " + T("дн назад");
   }
-  // Section headings of a lesson body. Ones without an id get a positional one ("sec-3") so a link can return there;
-  // notes, bookmarks and feedback (assets/notes.js) use the same ids. Idempotent.
+  // Section headings of a lesson body. The build gives each a stable id from its text (scripts/content_pipeline.py
+  // assign_heading_ids), the same in every language where the structure matches; notes, bookmarks and feedback
+  // (assets/notes.js) use the same ids. A heading without one (a page built before that) gets the old positional id
+  // ("sec-3"). Idempotent.
   function headings(article) {
     var heads = Array.prototype.slice.call(article.querySelectorAll(".module-body h2, .module-body h3, .module-body h4.md-subheading"));
     heads.forEach(function (el, i) { if (!el.id) el.id = "sec-" + (i + 1); });
@@ -41,6 +43,54 @@ var T = (typeof window !== "undefined" && window.T) || function (s) { return s; 
     c.querySelectorAll(".nb-tools").forEach(function (t) { t.remove(); });
     return c.textContent.replace(/[#¶]\s*$/, "").trim();
   }
+  // Anchors saved before the build ids existed were positional: "sec-N" = the N-th heading of the selector above,
+  // in document order. legacyAnchor(heads, "sec-3", label) -> the id that place has now, or null when the anchor is
+  // not an old one (or still exists as it is: an old page) or there is no such heading any more. When the lesson
+  // changed since, the saved heading text (label) wins over the position: the heading with that text nearest to
+  // the old position, else the N-th heading.
+  var LEGACY = /^sec-(\d+)$/;
+  function legacyAnchor(heads, anchor, label) {
+    var m = LEGACY.exec(anchor || "");
+    if (!m || heads.some(function (h) { return h.id === anchor; })) return null;
+    var n = parseInt(m[1], 10) - 1, at = heads[n] || null;
+    label = String(label || "").trim().slice(0, 160);
+    if (label) {
+      var text = function (h) { return headingText(h).slice(0, 160); };
+      if (at && text(at) === label) return at.id;
+      var best = null;
+      heads.forEach(function (h, i) { if (text(h) === label && (!best || Math.abs(i - n) < Math.abs(best.i - n))) best = { h: h, i: i }; });
+      if (best) return best.h.id;
+    }
+    return at ? at.id : null;
+  }
+  // The heading text saved with an old anchor of this lesson, if this browser has one: a history entry ("heading"),
+  // or a note / bookmark not migrated yet ("label"; notes.js migrates them after this runs). Lets an old link land
+  // by text when the lesson changed since, like the migration does.
+  function savedLabel(moduleId, anchor) {
+    var it = read().items.filter(function (x) { return x.id === moduleId && x.anchor === anchor && x.heading; })[0];
+    if (it) return it.heading;
+    var k = moduleId + "#" + anchor, label = "";
+    ["uav-student:bookmarks:v1", "uav-student:notes:v1"].forEach(function (store) {
+      try { var r = (JSON.parse(localStorage.getItem(store) || "{}") || {})[k]; if (!label && r && r.label) label = String(r.label); } catch (e) { /* storage off */ }
+    });
+    return label;
+  }
+  function hashAnchor() {
+    var a = location.hash.slice(1);
+    try { a = decodeURIComponent(a); } catch (e) { /* keep as typed */ }
+    return a;
+  }
+  // only an old "#sec-N" that is no id of this page needs resolving; every other hash is the browser's business
+  function isLegacyHash() { var a = hashAnchor(); return LEGACY.test(a) && !document.getElementById(a); }
+  // the element an old "#sec-N" link of this page means now (and the address is fixed to its id), or null
+  function hashTarget(heads, moduleId) {
+    if (!location.hash || !isLegacyHash()) return null;
+    var a = hashAnchor();
+    var id = legacyAnchor(heads, a, savedLabel(moduleId, a));
+    if (!id) return null;
+    try { history.replaceState(history.state, "", "#" + encodeURIComponent(id)); } catch (e) { /* file:// or old browser */ }
+    return document.getElementById(id);
+  }
   function hrefOf(item) { return base() + item.path + (item.anchor ? "#" + encodeURIComponent(item.anchor) : ""); }
 
   // ------------------------------------------------------------------ lesson page: record
@@ -51,9 +101,11 @@ var T = (typeof window !== "undefined" && window.T) || function (s) { return s; 
     var h1 = article.querySelector("h1");
     var item = { id: article.getAttribute("data-module-page"), path: path, title: h1 ? h1.textContent.trim() : document.title,
                  anchor: "", heading: "", at: Date.now() };
-    // section headings of the lesson; ones without an id get a positional one ("sec-3") so a link can return there
     var heads = headings(article);
-    if (location.hash) { var target = document.getElementById(decodeURIComponent(location.hash.slice(1))); if (target) setTimeout(function () { target.scrollIntoView(); }, 0); }
+    // an old link (history, bookmark lists, feedback) may still say "#sec-N": land on that heading and fix the address
+    var go = function (target) { if (target) setTimeout(function () { target.scrollIntoView(); }, 0); };
+    go(location.hash ? hashTarget(heads, item.id) || document.getElementById(hashAnchor()) : null);   // at load, as before
+    window.addEventListener("hashchange", function () { if (isLegacyHash()) go(hashTarget(heads, item.id)); });
 
     function save() {
       item.at = Date.now();
@@ -126,6 +178,6 @@ var T = (typeof window !== "undefined" && window.T) || function (s) { return s; 
     document.querySelectorAll("[data-resume]").forEach(resumeCard);
     document.querySelectorAll("[data-history-list]").forEach(historyList);
   }
-  window.UAVHistory = { read: read, headings: headings, headingText: headingText };
+  window.UAVHistory = { read: read, headings: headings, headingText: headingText, legacyAnchor: legacyAnchor };
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", start); else start();
 })();
