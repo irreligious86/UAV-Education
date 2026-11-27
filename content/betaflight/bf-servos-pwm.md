@@ -3,7 +3,7 @@ id: bf-servos-pwm
 title: "Сервы, PWM и таймеры: `resource SERVO`, `servo`, `smix`, SERVO_TILT и channel forwarding"
 level: L2
 readingTime: 50 мин
-firmware: Betaflight 2025.12 (сверено с 2025.12.5); лабораторная снята на исходнике 4.5.6
+firmware: Betaflight 2025.12 (сверено с 2025.12.5); лабораторная снята на исходнике 4.5.x (ветка 4.5-maintenance, 7dcc851; version.h 4.5.6, последний выпуск 4.5.5)
 status: published
 added: 2026-11-14
 tags:
@@ -148,7 +148,7 @@ DShot бывает двух видов. **Timer + DMA**: каждый мотор
 - **Если ошибиться здесь:** серва назначена на канал моторного таймера → она переписывает базу времени, DShot на этих моторах ломается; прошивка этого не проверяет, а выглядит это как отказ ESC (`f-motors-esc`, `bf-cli`). Серва питается от 5 В полётника → на упоре шина проседает, MCU перезагружается в воздухе (`el-power-design`).
 
 ## practice
-Основной путь — Python-модель. Скрипт и вывод сняты на исходнике 4.5.6 и конфиге ветки `4.5-config`; формулы `servos.c` (`servoTable()`, `servoMixer()`, `writeServos()`) в 2025.12 не изменились, а драйверы таймеров переехали из `src/main/drivers/stm32/` в `src/platform/STM32/`, поэтому путь к `timer_stm32f4xx.c` для дерева 2025.12 другой. Betaflight SITL (4.5 и 2025.12) собран без `USE_SERVOS` (условие `!defined(SITL)` в `common_pre.h`), а сборка SITL в этой среде всё равно запрещена политикой. Скрипт `bf-servos-pwm.servo_lab.py` (рабочая папка курса, этап 6) читает конфиг платы из `betaflight/config` ветки `4.5-config` и исходник 4.5: таблицу `fullTimerHardware[]` (`timer_stm32f4xx.c`), константы `servos.h`, `servos.c`, `dshot_dpwm.h`. Затем он повторяет `timerGetByTagAndIndex()`, `servoDevInit()`, `writeServos()`, `servoTable()` и `servoMixer()` с целочисленной арифметикой C. Всё ниже — реальный прогон.
+Основной путь — Python-модель. Скрипт и вывод сняты на исходнике 4.5.x (ветка `4.5-maintenance`, коммит `7dcc851`: в `version.h` стоит 4.5.6, но такого выпуска нет; последний выпуск 4.5.5, код `src/` совпадает с ним, кроме номера версии в `version.h`) и конфиге ветки `4.5-config`; формулы `servos.c` (`servoTable()`, `servoMixer()`, `writeServos()`) в 2025.12 не изменились, а драйверы таймеров переехали из `src/main/drivers/stm32/` в `src/platform/STM32/`, поэтому путь к `timer_stm32f4xx.c` для дерева 2025.12 другой. Betaflight SITL (4.5 и 2025.12) собран без `USE_SERVOS` (условие `!defined(SITL)` в `common_pre.h`), а сборка SITL в этой среде всё равно запрещена политикой. Скрипт `bf-servos-pwm.servo_lab.py` (рабочая папка курса, этап 6) читает конфиг платы из `betaflight/config` ветки `4.5-config` и исходник 4.5: таблицу `fullTimerHardware[]` (`timer_stm32f4xx.c`), константы `servos.h`, `servos.c`, `dshot_dpwm.h`. Затем он повторяет `timerGetByTagAndIndex()`, `servoDevInit()`, `writeServos()`, `servoTable()` и `servoMixer()` с целочисленной арифметикой C. Всё ниже — реальный прогон.
 
 ### Шаг 1. Карта таймеров настоящей платы
 ```

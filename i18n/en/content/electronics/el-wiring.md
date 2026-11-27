@@ -54,7 +54,7 @@ Worked example: a 10" on 6S, 60 A peak current, positive and negative 15 cm each
 {{widget:wire-drop}}
 
 ### Contact: where you lose more than in the wire
-A bad joint or an old connector is 1–5 mΩ instead of fractions of a mΩ. At 50 A every extra milliohm is 2.5 W of heat in a spot the size of a pea; the connector plastic melts before anything is noticeable in flight. An XT60 is rated for roughly 30 A continuous (more at peak); for 40–60 A continuous — XT90 or AS150. A connector that's warm after a flight while the wires are cold is a candidate for replacement.
+A bad joint or an old connector is 1–5 mΩ instead of fractions of a mΩ. At 50 A every extra milliohm is 2.5 W of heat in a spot the size of a pea; the connector plastic melts before anything is noticeable in flight. Per the Amass datasheet an XT60 is 30 A continuous (60 A instantaneous); an XT90 is 45–55 A continuous depending on the wire (12–8 AWG), an AS150 75 A on 8 AWG (the rule is in `el-power-design`). A connector that's warm after a flight while the wires are cold is a candidate for replacement.
 
 ### Crimping vs soldering
 Crimping with the right tool gives a gas-tight joint that isn't afraid of vibration; soldering a crimp makes the strands stiff at the edge and the wire breaks next to it. Signs of a bad crimp: strands sticking out of the barrel, the insulation not gripped by the second pair of tabs, the wire rotates. Test: pull with 2–3 kg of force for 26–28 AWG — it shouldn't come out.
@@ -117,6 +117,11 @@ Photos of the build from above and below: nothing in the prop zone, no contact w
 - NASA-STD-8739.4 — Crimping, Interconnecting Cables, Harnesses, and Wiring | https://standards.nasa.gov/standard/nasa/nasa-std-87394 | primary | A
 - Adafruit — Guide to Excellent Soldering | https://learn.adafruit.com/adafruit-guide-excellent-soldering | secondary | B
 - Oscar Liang — A Beginner's Guide to Soldering for FPV Drones | https://oscarliang.com/soldering-guide | secondary | B
+- Amass — XT90H-M datasheet (UL1977 30 A; 60 A for 1 min; recommended 45/50/55 A on 12/10/8 AWG at 60 K rise) | https://atta.szlcsc.com/upload/public/pdf/source/20220706/D6369ADC773D7B5378E901BEE0D5B60C.pdf | primary | A
+- Amass — XT60H-M datasheet V1.2 (30 A continuous, 60 A instantaneous, 12 AWG) | https://cdn.eicom.ru/media/PDF/XT60H-M.pdf | primary | A
+- Amass — XT30UPB datasheet (UL1977 15 A; 30 A for 1 min; 15 A on 18 AWG, 20 A on 16 AWG at 60 K rise) | https://atta.szlcsc.com/upload/public/pdf/source/20230412/7B5DFEF57C9EA5273853390C734B3AC5.pdf | primary | A
+- Amass — product catalogue (AS150: 75 A MAX, 8 AWG, rise < 85 K) | https://www.rcscomponents.kiev.ua/datasheets/Amas-cat1.pdf | primary | B
+- Holybro — Connector & Wire Rating (XT60 12 AWG: 30 A for 4 h and 60 A for 1 min at < 60 K rise) | https://docs.holybro.com/power-module-and-pdb/power-module/connector-and-wire-rating | secondary | B
 
 ## checklist
 - Joints are shiny, cone-shaped, without balls

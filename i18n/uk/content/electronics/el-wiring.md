@@ -54,7 +54,7 @@ source_hash: 62b456a1d80e
 {{widget:wire-drop}}
 
 ### Контакт: місце, де втрачають більше, ніж у проводі
-Погане паяння або старий роз'єм — це 1–5 мОм замість часток мОм. При 50 А кожен зайвий міліом — 2.5 Вт тепла в точці завбільшки з горошину; пластик роз'єму плавиться раніше, ніж щось стане помітно в польоті. XT60 розрахований приблизно на 30 А тривало (пікове більше); для 40–60 А тривало — XT90 або AS150. Роз'єм, теплий після польоту за холодних проводів, — кандидат на заміну.
+Погане паяння або старий роз'єм — це 1–5 мОм замість часток мОм. При 50 А кожен зайвий міліом — 2.5 Вт тепла в точці завбільшки з горошину; пластик роз'єму плавиться раніше, ніж щось стане помітно в польоті. XT60 за паспортом Amass — 30 А тривало (60 А миттєво); XT90 — 45–55 А тривало залежно від проводу (12–8 AWG), AS150 — 75 А на 8 AWG (правило — в `el-power-design`). Роз'єм, теплий після польоту за холодних проводів, — кандидат на заміну.
 
 ### Обтискання проти паяння
 Обтискання правильним інструментом — газощільне з'єднання, що не боїться вібрації; паяння обтискання робить жили жорсткими біля краю, і провід ламається поруч. Ознаки поганого обтискання: жили стирчать із гільзи, ізоляцію не захоплено другою парою пелюсток, провід провертається. Тест: потягнути із зусиллям 2–3 кг для 26–28 AWG — не має вийти.
@@ -117,6 +117,11 @@ R = U / I. Приклад: 1.2 мВ при 5 А → 0.24 мОм — добре. 
 - NASA-STD-8739.4 — Crimping, Interconnecting Cables, Harnesses, and Wiring | https://standards.nasa.gov/standard/nasa/nasa-std-87394 | primary | A
 - Adafruit — Guide to Excellent Soldering | https://learn.adafruit.com/adafruit-guide-excellent-soldering | secondary | B
 - Oscar Liang — A Beginner's Guide to Soldering for FPV Drones | https://oscarliang.com/soldering-guide | secondary | B
+- Amass — XT90H-M datasheet (UL1977 30 A; 60 A for 1 min; recommended 45/50/55 A on 12/10/8 AWG at 60 K rise) | https://atta.szlcsc.com/upload/public/pdf/source/20220706/D6369ADC773D7B5378E901BEE0D5B60C.pdf | primary | A
+- Amass — XT60H-M datasheet V1.2 (30 A continuous, 60 A instantaneous, 12 AWG) | https://cdn.eicom.ru/media/PDF/XT60H-M.pdf | primary | A
+- Amass — XT30UPB datasheet (UL1977 15 A; 30 A for 1 min; 15 A on 18 AWG, 20 A on 16 AWG at 60 K rise) | https://atta.szlcsc.com/upload/public/pdf/source/20230412/7B5DFEF57C9EA5273853390C734B3AC5.pdf | primary | A
+- Amass — product catalogue (AS150: 75 A MAX, 8 AWG, rise < 85 K) | https://www.rcscomponents.kiev.ua/datasheets/Amas-cat1.pdf | primary | B
+- Holybro — Connector & Wire Rating (XT60 12 AWG: 30 A for 4 h and 60 A for 1 min at < 60 K rise) | https://docs.holybro.com/power-module-and-pdb/power-module/connector-and-wire-rating | secondary | B
 
 ## checklist
 - Паяні з'єднання блискучі, конусом, без кульок

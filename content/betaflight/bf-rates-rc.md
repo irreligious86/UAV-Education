@@ -3,7 +3,7 @@ id: bf-rates-rc
 title: "Рейты, RC smoothing и feedforward: от стика до setpoint"
 level: L2
 readingTime: 55 мин
-firmware: Betaflight 2025.12 (сверено с 2025.12.5) и 4.5.3 (конвейер FF, оценка частоты RX); лабораторные сняты на исходниках 4.5.6 и 4.5.3
+firmware: Betaflight 2025.12 (сверено с 2025.12.5) и 4.5.3 (конвейер FF, оценка частоты RX); лабораторные сняты на исходниках 4.5.x (ветка 4.5-maintenance, 7dcc851; version.h 4.5.6, последний выпуск 4.5.5) и 4.5.3
 status: published
 added: 2026-11-14
 tags:

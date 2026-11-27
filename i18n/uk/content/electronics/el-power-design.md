@@ -62,7 +62,7 @@ ESC комутують обмотки з частотою в десятки кГ
 - **Smoke stopper** — лампочка або резистор/обмежувач струму в розрив плюса під час першого ввімкнення. Коротке замикання — лампочка світиться, борт не димить.
 - **Запобіжник** — на великих апаратах на силовій шині (не на моторах — струм надто великий та імпульсний) і на шині companion.
 - **Переполюсування** — XT60/XT30 захищають геометрією, але паяння навпаки вбиває плату за секунду. Діод Шотткі послідовно (спад 0.3–0.5 В) або P-MOSFET в ідеальному діоді для низьковольтних гілок.
-- **Роз'єми**: XT30 до ~15–30 А тривало, XT60 ~30 А тривало (короткочасно до ~60 А), XT90 ~45 А тривало; AS150/XT150 для великих струмів. Роз'єм, перевантажений за струмом (номінал нижчий за реальний струм), гріється, нагрітий — окиснюється, окиснений — гріється сильніше.
+- **Роз'єми** (правило курсу — паспорти Amass, посилання в джерелах): тривалий струм — «рекомендований струм» паспорта для твого калібру проводу при перегріві ≤ 60 K, короткочасний (до 1 хв) — не вище паспортного миттєвого. XT30 — 15 А на 18 AWG (20 А на 16 AWG), до 30 А короткочасно; XT60 — 30 А тривало і 60 А миттєво на 12 AWG (паспорт V1.2 умов не вказує; Holybro для 12 AWG дає ті самі 30 А за 4 год і 60 А за 1 хв при перегріві < 60 K); XT90 — 45 А на 12 AWG, 50 А на 10 AWG, 55 А на 8 AWG, до 60 А за 1 хв (номінал за UL1977 — 30 А; 40 А трапляється лише в описах продавців); AS150 — 75 А на 8 AWG, це максимум із каталогу Amass при перегріві < 85 K, хвилинного струму каталог не дає. Каталог старший за паспорти й для XT пише інші цифри (XT30 20 А, XT60 35 А, XT90 45 А — максимум при < 85 K); для XT курс бере паспорти. Роз'єм, перевантажений за струмом (номінал нижчий за реальний струм), гріється, нагрітий — окиснюється, окиснений — гріється сильніше.
 
 ### Перерізи
 {{widget:wire-drop}}
@@ -199,6 +199,11 @@ Smoke stopper під час кожного першого ввімкнення �
 - Oscar Liang — Capacitors for noise filtering in mini quad | https://oscarliang.com/capacitors-mini-quad | secondary | B
 - ArduPilot — Powering the Flight Controller | https://ardupilot.org/copter/docs/common-powering-the-pixhawk.html | primary | A
 - INAV — Battery documentation | https://github.com/iNavFlight/inav/blob/master/docs/Battery.md | primary | A
+- Amass — XT90H-M datasheet (UL1977 30 A; 60 A for 1 min; recommended 45/50/55 A on 12/10/8 AWG at 60 K rise) | https://atta.szlcsc.com/upload/public/pdf/source/20220706/D6369ADC773D7B5378E901BEE0D5B60C.pdf | primary | A
+- Amass — XT60H-M datasheet V1.2 (30 A continuous, 60 A instantaneous, 12 AWG) | https://cdn.eicom.ru/media/PDF/XT60H-M.pdf | primary | A
+- Amass — XT30UPB datasheet (UL1977 15 A; 30 A for 1 min; 15 A on 18 AWG, 20 A on 16 AWG at 60 K rise) | https://atta.szlcsc.com/upload/public/pdf/source/20230412/7B5DFEF57C9EA5273853390C734B3AC5.pdf | primary | A
+- Amass — product catalogue (AS150: 75 A MAX, 8 AWG, rise < 85 K) | https://www.rcscomponents.kiev.ua/datasheets/Amas-cat1.pdf | primary | B
+- Holybro — Connector & Wire Rating (XT60 12 AWG: 30 A for 4 h and 60 A for 1 min at < 60 K rise) | https://docs.holybro.com/power-module-and-pdb/power-module/connector-and-wire-rating | secondary | B
 
 ## checklist
 - Дерево живлення намальоване зі струмами по гілках

@@ -252,7 +252,7 @@ Rough size: an iteration of 4–5 modules ≈ 25–30k words of Russian source p
      an older guide can map it. Each firmware track keeps one migration table (old → new, with the version
      where it changed) and modules link to it.
    - The front matter `firmware:` field states the release the module was verified against.
-   - Betaflight 4.5 patch levels: the existing modules were verified on tag 4.5.5 / branch 4.5.6; differences
+   - Betaflight 4.5 patch levels: the existing modules were verified on tag 4.5.5 / branch 4.5-maintenance (version.h 4.5.6, not a release); differences
      inside 4.5.x that matter (e.g. `noreboot` from 4.5.4) are stated with the patch number.
 
 ## 5a. Original questions

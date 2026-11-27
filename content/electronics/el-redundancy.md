@@ -43,7 +43,7 @@ next:
 - **IMU**: у H7-полётников два-три IMU — EKF переключается сам (EK3 несколько ядер).
 
 ### Токи по лучам X8
-На каждом луче два мотора: ток луча = 2 × ток мотора. Висение ~7.5 А, максимум ~32 А на луч. Провод луча 12–14 AWG, разъём луча XT60 (~30 А длительно, ~60 А кратковременно) — на полном газу на пределе; XT90 — с запасом. Центральная плата распределения: 4 луча × 32 ≈ 130 А пик — медные шины или PDB на 150+ А, XT90/AS150 от АКБ, конденсаторы на входе каждой пары ESC.
+На каждом луче два мотора: ток луча = 2 × ток мотора. Висение ~7.5 А, максимум ~32 А на луч. Провод луча 12–14 AWG, разъём луча XT60 (30 А длительно, 60 А мгновенно по паспорту Amass) — на полном газу на пределе; XT90 (45 А на 12 AWG) — с запасом. Центральная плата распределения: 4 луча × 32 ≈ 130 А пик — медные шины или PDB на 150+ А, AS150 на каждой АКБ: при двух АКБ в параллель через разъём идёт ~65 А в пике и ~15 А на висении — в пределах 75 А по каталогу Amass; на одной АКБ 130 А превышают и AS150, и XT90 (60 А на минуту); конденсаторы на входе каждой пары ESC.
 
 Падение на проводе луча 30 см 12 AWG при 32 А: R = 0.0172 × 0.6 / 3.31 ≈ 3.1 мОм → 0.10 В, 3.2 Вт тепла в пике — приемлемо; при 14 AWG (≈ 5.0 мОм) — 0.16 В и 5 Вт, допустимо, но запаса на длинные серии меньше.
 
@@ -100,6 +100,11 @@ ArduPilot SITL: `SIM_ENGINE_FAIL` — битовая маска моторов (
 - ArduPilot — Motor Mixing and Yaw Headroom (MOT_YAW_HEADROOM) | https://ardupilot.org/copter/docs/parameters.html#mot-yaw-headroom | primary | A
 - ArduPilot — SITL simulation parameters (SIM_* incl. engine failure) | https://ardupilot.org/dev/docs/SITL_simulation_parameters.html | primary | A
 - PX4 — Motor Failure Detection | https://docs.px4.io/main/en/config/motor_failure_detection | primary | A
+- Amass — XT90H-M datasheet (UL1977 30 А; 60 А 1 мин; рекомендуемый ток 45/50/55 А на 12/10/8 AWG при перегреве 60 K) | https://atta.szlcsc.com/upload/public/pdf/source/20220706/D6369ADC773D7B5378E901BEE0D5B60C.pdf | primary | A
+- Amass — XT60H-M datasheet V1.2 (30 А длительно, 60 А мгновенно, 12 AWG) | https://cdn.eicom.ru/media/PDF/XT60H-M.pdf | primary | A
+- Amass — XT30UPB datasheet (UL1977 15 А; 30 А 1 мин; 15 А на 18 AWG, 20 А на 16 AWG при перегреве 60 K) | https://atta.szlcsc.com/upload/public/pdf/source/20230412/7B5DFEF57C9EA5273853390C734B3AC5.pdf | primary | A
+- Amass — каталог продукции (AS150: 75 A MAX, 8 AWG, перегрев < 85 K) | https://www.rcscomponents.kiev.ua/datasheets/Amas-cat1.pdf | primary | B
+- Holybro — Connector & Wire Rating (XT60 12 AWG: 30 А за 4 ч и 60 А за 1 мин при перегреве < 60 K) | https://docs.holybro.com/power-module-and-pdb/power-module/connector-and-wire-rating | secondary | B
 
 ## checklist
 - Знаю, какую схему какой отказ ломает и почему

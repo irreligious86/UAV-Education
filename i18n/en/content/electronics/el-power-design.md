@@ -62,7 +62,7 @@ ESCs switch the windings at tens of kHz, and the current in the battery wires je
 - **Smoke stopper** — a bulb or a resistor/current limiter in series with the positive lead at the first power-up. A short circuit — the bulb lights up, the aircraft doesn't smoke.
 - **Fuse** — on large aircraft on the power bus (not on the motors — the current is too high and pulsed) and on the companion bus.
 - **Reverse polarity** — XT60/XT30 protect by their shape, but soldering one backwards kills the board in a second. A Schottky diode in series (0.3–0.5 V drop) or a P-MOSFET ideal diode for low-voltage branches.
-- **Connectors**: XT30 up to ~15–30 A continuous, XT60 ~30 A continuous (briefly up to ~60 A), XT90 ~45 A continuous; AS150/XT150 for high currents. A connector overloaded for its current (rated below the real current) heats up, a hot one oxidizes, an oxidized one heats up even more.
+- **Connectors** (course rule — Amass datasheets, links in the references): continuous current is the datasheet's recommended current for your wire gauge at ≤ 60 K temperature rise; short-term (up to 1 min) — no more than the datasheet's instantaneous current. XT30 — 15 A on 18 AWG (20 A on 16 AWG), up to 30 A briefly; XT60 — 30 A continuous and 60 A instantaneous on 12 AWG (datasheet V1.2 gives no conditions; Holybro gives the same 30 A for 4 h and 60 A for 1 min at < 60 K rise on 12 AWG); XT90 — 45 A on 12 AWG, 50 A on 10 AWG, 55 A on 8 AWG, up to 60 A for 1 min (UL1977 rating 30 A; 40 A appears only in retailer listings); AS150 — 75 A on 8 AWG, the Amass catalogue maximum at < 85 K rise, with no 1-minute figure. The catalogue is older than the datasheets and gives other XT figures (XT30 20 A, XT60 35 A, XT90 45 A — maximum at < 85 K); for XT the course uses the datasheets. A connector overloaded for its current (rated below the real current) heats up, a hot one oxidizes, an oxidized one heats up even more.
 
 ### Wire gauges
 {{widget:wire-drop}}
@@ -199,6 +199,11 @@ Sag under load: battery voltage with no load and in hover (from the log). 5 V ri
 - Oscar Liang — Capacitors for noise filtering in mini quad | https://oscarliang.com/capacitors-mini-quad | secondary | B
 - ArduPilot — Powering the Flight Controller | https://ardupilot.org/copter/docs/common-powering-the-pixhawk.html | primary | A
 - INAV — Battery documentation | https://github.com/iNavFlight/inav/blob/master/docs/Battery.md | primary | A
+- Amass — XT90H-M datasheet (UL1977 30 A; 60 A for 1 min; recommended 45/50/55 A on 12/10/8 AWG at 60 K rise) | https://atta.szlcsc.com/upload/public/pdf/source/20220706/D6369ADC773D7B5378E901BEE0D5B60C.pdf | primary | A
+- Amass — XT60H-M datasheet V1.2 (30 A continuous, 60 A instantaneous, 12 AWG) | https://cdn.eicom.ru/media/PDF/XT60H-M.pdf | primary | A
+- Amass — XT30UPB datasheet (UL1977 15 A; 30 A for 1 min; 15 A on 18 AWG, 20 A on 16 AWG at 60 K rise) | https://atta.szlcsc.com/upload/public/pdf/source/20230412/7B5DFEF57C9EA5273853390C734B3AC5.pdf | primary | A
+- Amass — product catalogue (AS150: 75 A MAX, 8 AWG, rise < 85 K) | https://www.rcscomponents.kiev.ua/datasheets/Amas-cat1.pdf | primary | B
+- Holybro — Connector & Wire Rating (XT60 12 AWG: 30 A for 4 h and 60 A for 1 min at < 60 K rise) | https://docs.holybro.com/power-module-and-pdb/power-module/connector-and-wire-rating | secondary | B
 
 ## checklist
 - The power tree is drawn with currents per branch

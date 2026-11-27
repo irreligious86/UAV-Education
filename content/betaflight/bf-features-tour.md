@@ -3,7 +3,7 @@ id: bf-features-tour
 title: "Остальные режимы и функции Betaflight: turtle, launch control, 3D, acro trainer, Angle/Horizon, dynamic idle, camera control"
 level: L2
 readingTime: 55 мин
-firmware: Betaflight 2025.12 (сверено с 2025.12.5); лабораторная снята на исходниках 4.5.6
+firmware: Betaflight 2025.12 (сверено с 2025.12.5); лабораторная снята на исходниках 4.5.x (ветка 4.5-maintenance, 7dcc851; version.h 4.5.6, последний выпуск 4.5.5)
 status: published
 added: 2026-11-15
 tags:
@@ -218,7 +218,7 @@ Horizon: уставка = acro·(1 − s) + angle·s, где s = `horizon_level_
 Цель: увидеть, что рейты меняют Angle, что `angle_p_gain` — это постоянная времени, и как Horizon 4.5 смешивает ACRO и Angle.
 
 ```python
-# bf-features-tour lab: Betaflight 4.5 maths reproduced from the source (4.5-maintenance, 4.5.6).
+# bf-features-tour lab: Betaflight 4.5 maths reproduced from the source (4.5-maintenance 7dcc851; version.h says 4.5.6, not a release; src/ equals 4.5.5 except the version number in version.h).
 # Part 1: Angle/Horizon setpoint law (flight/pid.c pidLevel, calcHorizonLevelStrength; flight/pid_init.c gains).
 import math
 

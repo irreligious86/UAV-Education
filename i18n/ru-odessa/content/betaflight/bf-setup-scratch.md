@@ -3,7 +3,7 @@ id: bf-setup-scratch
 title: "Betaflight с нуля: от пустой платы до первого висения"
 level: L2
 readingTime: 55 мин
-firmware: Betaflight 4.5 (проверено на 4.5.6 SITL, ветка 4.5-maintenance)
+firmware: Betaflight 4.5 (SITL из ветки 4.5-maintenance, 7dcc851; version.h 4.5.6, последний выпуск 4.5.5)
 status: published
 added: 2026-11-10
 tags:
@@ -92,10 +92,10 @@ SITL — та же прошивка 4.5, собранная обычным gcc �
 
 ## practice
 ### Шаг 1. Собрать SITL, подключить Configurator, сохранить исходный конфиг
-Шаг 1 из 17. Сборка из ветки 4.5-maintenance (коммит 7dcc851, версия 4.5.6) на gcc 13.3 заняла около минуты:
+Шаг 1 из 17. Сборка из ветки 4.5-maintenance (коммит 7dcc851; в version.h 4.5.6, но такого выпуска нет, последний выпуск 4.5.5 с тем же кодом, кроме номера версии; ветка движется, поэтому клонируй тег `4.5.5`) на gcc 13.3 заняла около минуты:
 
 ```bash
-git clone --depth 1 -b 4.5-maintenance https://github.com/betaflight/betaflight.git && cd betaflight
+git clone --depth 1 -b 4.5.5 https://github.com/betaflight/betaflight.git && cd betaflight
 make arm_sdk_install        # Makefile проверяет arm-none-eabi-gcc даже для SITL
 make TARGET=SITL            # -> obj/main/betaflight_SITL.elf
 mkdir -p ~/bfsitl && cd ~/bfsitl && ~/betaflight/obj/main/betaflight_SITL.elf

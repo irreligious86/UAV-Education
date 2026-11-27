@@ -1,6 +1,6 @@
 # Betaflight migration 4.5.3 → 2025.12 (Phase 0, step M2) — 2026-11-17
 
-Scope: Betaflight 4.5.3 (previous significant release; course previously verified on tag 4.5.5 / branch 4.5.6) →
+Scope: Betaflight 4.5.3 (previous significant release; course previously verified on tag 4.5.5 / branch 4.5-maintenance 7dcc851, whose version.h says 4.5.6 — not a release; its src/ equals 4.5.5) →
 2025.12 line, latest patch 2025.12.5. The 2026.6 tags are not the target and are mentioned in the course only where a
 student trips (ELRS 4 for SPI receivers, removed `gps_rescue_velocity_*`, IIM-42652 range).
 Not committed, `scripts/publish.py` not run. `scripts/validate_content.py`: OK (140 articles, 140 quizzes, 0 errors).
