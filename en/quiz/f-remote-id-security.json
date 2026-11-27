@@ -5,38 +5,38 @@
     {
       "q": "What does Remote ID broadcast?",
       "options": [
-        "ID, aircraft and pilot coordinates",
-        "The video stream from the aircraft's camera",
+        "ID, aircraft and pilot position",
+        "The aircraft camera's video stream",
         "Only the serial number once a minute",
         "The flight log after landing"
       ],
       "answer": 0,
-      "explain": "The identifier, the aircraft's position and speed, the pilot's position, time and status."
+      "explain": "The identifier, the aircraft's position and speed, the pilot's position, the time and status."
     },
     {
-      "q": "Over which channels is Remote ID broadcast?",
+      "q": "Over which channels does the Remote ID broadcast go?",
       "options": [
         "LTE and satellite link",
         "Bluetooth and Wi-Fi",
         "ELRS 2.4 GHz",
-        "Analog 5.8 GHz video channel"
+        "The 5.8 GHz analog video channel"
       ],
       "answer": 1,
       "explain": "Bluetooth 4/5 and Wi-Fi NAN/Beacon — an ordinary smartphone receives it."
     },
     {
-      "q": "What does MAVLink 2 signing give you?",
+      "q": "What does MAVLink 2 signing provide?",
       "options": [
         "Encrypts all telemetry",
         "Compresses packets for range",
-        "Rejects commands without the right key",
-        "Protects the radio link from jamming and interference"
+        "Rejects commands without the correct key",
+        "Protects the radio channel from jamming and interference"
       ],
       "answer": 2,
-      "explain": "It's authentication: unsigned commands aren't executed, the traffic stays readable."
+      "explain": "It is authentication: commands without a signature are not executed, the traffic remains readable."
     },
     {
-      "q": "Why isn't USB protected by signing in ArduPilot?",
+      "q": "Why is USB not protected by signing in ArduPilot?",
       "options": [
         "USB doesn't support MAVLink 2",
         "USB works only in MAVLink 1",
@@ -44,7 +44,7 @@
         "Physical access gives you everything anyway"
       ],
       "answer": 3,
-      "explain": "Over USB you can change or erase the key — physical access equals full access."
+      "explain": "The key can be changed or erased over USB — physical access equals full access."
     },
     {
       "q": "How many bytes does signing add to a MAVLink 2 packet?",
@@ -60,13 +60,13 @@
     {
       "q": "Why does signing need an increasing timestamp?",
       "options": [
-        "To drop a repeated packet",
+        "To reject a replayed packet",
         "To synchronize the GNSS clock",
         "To measure link latency",
         "To sort logs on the ground"
       ],
       "answer": 0,
-      "explain": "A replay of a recorded packet with the same timestamp is dropped."
+      "explain": "A replay of a recorded packet with the same timestamp is rejected."
     },
     {
       "q": "What does ROS_DOMAIN_ID do?",
@@ -77,18 +77,18 @@
         "Separates systems without protecting them"
       ],
       "answer": 3,
-      "explain": "It's separation, not security; protection is SROS2, restricting discovery is ROS_AUTOMATIC_DISCOVERY_RANGE."
+      "explain": "It is separation, not security; protection is SROS2, limiting discovery is ROS_AUTOMATIC_DISCOVERY_RANGE."
     },
     {
-      "q": "What does signed firmware with a secure bootloader give you?",
+      "q": "What does signed firmware with a secure bootloader provide?",
       "options": [
         "Encryption of parameters in EEPROM",
         "The bootloader won't start a foreign build",
         "Over-the-air updates without USB",
-        "Automatic Remote ID check"
+        "Automatic Remote ID checks"
       ],
       "answer": 1,
-      "explain": "The public key in the bootloader verifies the firmware signature."
+      "explain": "The public key in the bootloader verifies the firmware's signature."
     }
   ]
 }

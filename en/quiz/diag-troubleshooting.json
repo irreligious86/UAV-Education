@@ -8,10 +8,10 @@
         "Resoldering the receiver",
         "The status command in the CLI",
         "Replacing the flight controller",
-        "Flashing the latest version"
+        "Reflashing to the latest version"
       ],
       "answer": 1,
-      "explain": "status shows the Arming disable flags — the firmware names the cause itself."
+      "explain": "status shows the Arming disable flags — the firmware names the reason itself."
     },
     {
       "q": "The RXLOSS flag means:",
@@ -19,13 +19,13 @@
         "Low voltage",
         "No channels from the receiver",
         "The OSD menu is open during arming",
-        "The vehicle is tilted"
+        "The aircraft is tilted"
       ],
       "answer": 1,
-      "explain": "Check the port, protocol and inversion, the bind and 5 V at the receiver."
+      "explain": "Check the port, protocol and inversion, the bind and 5 V on the receiver."
     },
     {
-      "q": "One motor doesn't spin. What's the first cheap step?",
+      "q": "One motor doesn't spin. The first cheap step?",
       "options": [
         "Buy a new motor",
         "Swap the signal wires",
@@ -33,32 +33,32 @@
         "Reflash the ESC and calibrate the throttle"
       ],
       "answer": 1,
-      "explain": "Swap with a working motor: if the problem moved with the wire — it's the signal/FC pad; if it stayed — it's the ESC/motor."
+      "explain": "Swap with a working motor: if the problem moved with the wire — signal/FC pad; if it stayed — ESC/motor."
     },
     {
-      "q": "The smoke stopper bulb glows brightly, the vehicle doesn't power up:",
+      "q": "The smoke stopper bulb glows brightly, the aircraft doesn't power up:",
       "options": [
         "The battery is discharged below the BEC threshold",
         "A short circuit",
         "The bulb is broken",
-        "That's normal"
+        "This is normal"
       ],
       "answer": 1,
-      "explain": "Disconnect the loads one at a time: where the bulb goes out — that's the short."
+      "explain": "Disconnect the loads one at a time: where the bulb goes out — that's where the short is."
     },
     {
-      "q": "It shakes above 70% throttle. What's the first action?",
+      "q": "It shakes above 70% throttle. The first action?",
       "options": [
-        "Reduce P on all axes by 20 %",
+        "Lower P on all axes by 20 %",
         "Record a Blackbox log and the spectrum",
         "Change the props",
         "Reflash"
       ],
       "answer": 1,
-      "explain": "Without a log you're guessing; the spectrum distinguishes mechanics, filtering and resonance."
+      "explain": "Without a log it's guesswork; the spectrum distinguishes mechanics, filtering and resonance."
     },
     {
-      "q": "The sign of an ESC desync in the log:",
+      "q": "The sign of ESC desync in the log:",
       "options": [
         "An LQ drop at the moment of a throttle punch",
         "An eRPM dip on one motor",
@@ -69,26 +69,26 @@
       "explain": "A sudden eRPM dip on one motor with a jerk: ESC settings, DShot, phases."
     },
     {
-      "q": "The “one change — one test” rule is needed in order to:",
+      "q": "The “one change — one check” rule is needed in order to:",
       "options": [
         "Save time",
         "Know what helped",
-        "Avoid touching the CLI unnecessarily between flights",
+        "Avoid touching the CLI between flights",
         "Spare the soldering iron"
       ],
       "answer": 1,
-      "explain": "Two changes at once — the cause isn't established."
+      "explain": "Two changes at once — the cause is not established."
     },
     {
       "q": "The ANGLE flag when arming in Betaflight means:",
       "options": [
-        "The vehicle is tilted more than small_angle",
-        "The gyro isn't calibrated",
+        "The aircraft is tilted more than small_angle",
+        "The gyro is not calibrated",
         "Throttle is above minimum",
         "No receiver signal"
       ],
       "answer": 0,
-      "explain": "ANGLE means a tilt greater than small_angle: set it level or calibrate the accelerometer."
+      "explain": "ANGLE — tilted more than small_angle: put it level or calibrate the accelerometer."
     }
   ]
 }

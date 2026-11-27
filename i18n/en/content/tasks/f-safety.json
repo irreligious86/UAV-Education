@@ -1,0 +1,127 @@
+{
+ "module": "f-safety",
+ "tasks": [
+  {
+   "id": "tip-speed",
+   "title": "Prop tip speed",
+   "statement": "A propeller with a diameter of **{d} inches** spins at **{n} rpm**. Find the blade tip speed, m/s (1 inch = 0.0254 m).",
+   "params": {
+    "d": [
+     5,
+     7,
+     10
+    ],
+    "n": {
+     "min": 6000,
+     "max": 14000,
+     "step": 1000
+    }
+   },
+   "answer": "math.pi*d*0.0254*n/60",
+   "unit": "m/s",
+   "tol": 0.02,
+   "solution": "v = π · D · n, with D in meters and n in revolutions per second (rpm ÷ 60). For a 5\" at 14,000 rpm: 0.399 m · 233 rev/s ≈ 93 m/s, about 335 km/h."
+  },
+  {
+   "id": "tip-speed-rpm",
+   "title": "RPM from tip speed",
+   "statement": "At what RPM (rpm) does the tip of a **{d}-inch** propeller move at **{v} m/s** (1 inch = 0.0254 m)?",
+   "params": {
+    "d": [
+     5,
+     7,
+     10
+    ],
+    "v": [
+     80,
+     100,
+     120,
+     150,
+     200
+    ]
+   },
+   "answer": "v*60/(math.pi*d*0.0254)",
+   "unit": "rpm",
+   "tol": 0.02,
+   "solution": "From v = π · D · n: n = v / (π · D) revolutions per second, multiplied by 60. For a 5\" (0.127 m) a speed of 200 m/s is reached at about 30,000 rpm — the full-throttle RPM from the theory (course estimate)."
+  },
+  {
+   "id": "pack-wh",
+   "title": "Pack energy for transport",
+   "statement": "LiPo **{s}S {c} mAh**, nominal 3.7 V per cell. Find the pack's energy in Wh (IATA uses it to decide whether the battery may go in carry-on baggage).",
+   "params": {
+    "s": [
+     3,
+     4,
+     6,
+     8,
+     12
+    ],
+    "c": {
+     "min": 1000,
+     "max": 10000,
+     "step": 500
+    }
+   },
+   "answer": "s*3.7*c/1000",
+   "unit": "Wh",
+   "tol": 0.02,
+   "solution": "Wh = Ah × nominal voltage: s × 3.7 V × c / 1000. 6S 1300 mAh — 28.9 Wh. Up to 100 Wh — carry-on without approval, 100–160 — no more than 2 with the airline's approval, more than 160 — cargo only (IATA 2026)."
+  },
+  {
+   "id": "charge-power",
+   "title": "Charging power at 1C",
+   "statement": "You charge **{n}** LiPo pack(s) **{s}S {c} mAh** in parallel at 1C per pack up to 4.2 V/cell. What power does the charger need at the end of the charge, W?",
+   "params": {
+    "n": [
+     1,
+     2,
+     3,
+     4,
+     6
+    ],
+    "s": [
+     4,
+     6
+    ],
+    "c": {
+     "min": 1000,
+     "max": 2500,
+     "step": 100
+    }
+   },
+   "answer": "n*s*4.2*c/1000",
+   "unit": "W",
+   "tol": 0.02,
+   "solution": "The 1C current per pack is c/1000 A, on the board — n × c/1000 A. Power P = U × I = s × 4.2 V × n × c/1000. Six 6S 1300 — 196 W; if the charger is weaker, it will lower the current, and the charge will take more than an hour."
+  },
+  {
+   "id": "prop-energy",
+   "title": "Energy of a spinning prop",
+   "statement": "A prop with a diameter of **{d} inches** and a mass of **{m} g** spins at **{n} rpm**. Estimate its kinetic energy in the thin-rod model (I = m·D²/12), J. 1 inch = 0.0254 m.",
+   "params": {
+    "d": [
+     5,
+     6,
+     7
+    ],
+    "m": [
+     3,
+     4,
+     5,
+     6,
+     8
+    ],
+    "n": {
+     "min": 6000,
+     "max": 12000,
+     "step": 1000
+    }
+   },
+   "answer": "0.5*(m/1000*(d*0.0254)**2/12)*(n*2*math.pi/60)**2",
+   "unit": "J",
+   "tol": 0.02,
+   "solution": "I = m · D² / 12 (m in kg, D in meters), ω = 2π · n / 60, E = ½ · I · ω². A 5\" 4 g at 14,000 rpm — 5.8 J, at 30,000 — 26 J. The rod model overestimates the moment of inertia of a blade that tapers toward the tip, so this is an upper estimate."
+  }
+ ]
+}

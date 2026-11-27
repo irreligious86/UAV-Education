@@ -1,161 +1,161 @@
 {
-  "module": "f-esc-firmware",
-  "tasks": [
-    {
-      "id": "rpm",
-      "title": "eRPM to RPM",
-      "statement": "The ESC reports **{e} eRPM**, the motor has **{p} poles**. Find the mechanical RPM.",
-      "params": {
-        "e": {
-          "min": 20000,
-          "max": 180000,
-          "step": 5000
-        },
-        "p": [
-          12,
-          14
-        ]
-      },
-      "answer": "e/(p/2)",
-      "unit": "rpm",
-      "tol": 0.01,
-      "solution": "RPM = eRPM / (poles / 2)."
+ "module": "f-esc-firmware",
+ "tasks": [
+  {
+   "id": "rpm",
+   "title": "eRPM to RPM",
+   "statement": "The ESC reports **{e} eRPM**, the motor has **{p} poles**. Find the mechanical RPM (rpm).",
+   "params": {
+    "e": {
+     "min": 20000,
+     "max": 180000,
+     "step": 5000
     },
-    {
-      "id": "hz",
-      "title": "Motor frequency for the filter",
-      "statement": "The motor spins at **{rpm} RPM**. Find the fundamental harmonic frequency (Hz).",
-      "params": {
-        "rpm": {
-          "min": 3000,
-          "max": 30000,
-          "step": 500
-        }
-      },
-      "answer": "rpm/60",
-      "unit": "Hz",
-      "tol": 0.01,
-      "solution": "f = RPM / 60."
-    },
-    {
-      "id": "pwm-ripple",
-      "title": "Пульсация тока обмотки",
-      "statement": "Обмотка мотора (две фазы последовательно) имеет индуктивность **{l} мкГн**, напряжение батареи **{u} В**, заполнение ШИМ **{d}**, частота ШИМ **{f} кГц**. Найдите размах пульсации тока ΔI по формуле треугольного приближения, А.",
-      "params": {
-        "u": [
-          4,
-          8,
-          16,
-          24
-        ],
-        "l": [
-          10,
-          20,
-          50,
-          100
-        ],
-        "d": [
-          0.3,
-          0.5,
-          0.7
-        ],
-        "f": [
-          24,
-          48,
-          96
-        ]
-      },
-      "answer": "u*d*(1 - d)*1000/(l*f)",
-      "unit": "А",
-      "tol": 0.02,
-      "solution": "ΔI = U·D·(1 − D)/(L·f). L переводим в генри (мкГн · 10⁻⁶), f — в герцы (кГц · 10³): ΔI = U·D·(1 − D)·1000/(L[мкГн]·f[кГц]). Удвоение частоты уменьшает пульсацию вдвое, а добавочные потери в меди (∝ ΔI²) — вчетверо."
-    },
-    {
-      "id": "pwm-periods",
-      "title": "Периодов ШИМ на шаг коммутации",
-      "statement": "На висении ESC сообщает **{e} eRPM**, частота ШИМ **{f} кГц**. Сколько периодов ШИМ приходится на один шаг коммутации (шагов шесть на электрический оборот)?",
-      "params": {
-        "e": {
-          "min": 40000,
-          "max": 300000,
-          "step": 10000
-        },
-        "f": [
-          24,
-          48,
-          96
-        ]
-      },
-      "answer": "10000*f/e",
-      "unit": "периодов",
-      "tol": 0.02,
-      "solution": "Электрических оборотов в секунду eRPM/60, шагов коммутации в секунду 6·eRPM/60 = eRPM/10. N = f_ШИМ[Гц]/(eRPM/10) = 10·f_ШИМ/eRPM. Ориентир модуля — N около 3–5 и больше на висении."
-    },
-    {
-      "id": "pwm-deadtime",
-      "title": "Доля мёртвого времени",
-      "statement": "Layout Bluejay оканчивается на **{dt}** (dead time в шагах по 20.4 нс), частота ШИМ **{f} кГц**. Какую долю периода ШИМ занимает одно мёртвое время, %?",
-      "params": {
-        "dt": [
-          5,
-          10,
-          20,
-          30,
-          50,
-          70
-        ],
-        "f": [
-          24,
-          48,
-          96
-        ]
-      },
-      "answer": "dt*20.4e-9*f*1000*100",
-      "unit": "%",
-      "tol": 0.02,
-      "solution": "t_d = шаги · 20.4 нс; доля = t_d · f · 100 %. Доля растёт пропорционально частоте: на 96 кГц она вчетверо больше, чем на 24 кГц."
-    },
-    {
-      "id": "am32-advance",
-      "title": "Тайминг AM32 в градусах",
-      "statement": "В дампе настроек AM32 2.22 байт `advance_level` = **{b}**. Найдите угол опережения коммутации в электрических градусах.",
-      "params": {
-        "b": {
-          "min": 10,
-          "max": 42,
-          "step": 1
-        }
-      },
-      "answer": "(b - 10)*60/64",
-      "unit": "°",
-      "tol": 0.01,
-      "abs": 0.01,
-      "solution": "В новом формате (байт 10–42) прошивка вычитает 10: temp_advance = байт − 10 = 0…32. Опережение = commutation_interval·temp_advance/64, а commutation_interval — это 60° шага коммутации, значит один отсчёт = 60/64 = 0.9375°. Угол = (байт − 10)·0.9375°, от 0 до 30°."
-    },
-    {
-      "id": "am32-lvc",
-      "title": "Порог отсечки AM32 по банке",
-      "statement": "AM32 2.22: `low_voltage_cut_off` = 1, байт `low_cell_volt_cutoff` = **{b}**. Батарея 6S подключена при напряжении **{v} В**. Найдите порог отсечки всей батареи, В.",
-      "params": {
-        "b": [
-          20,
-          30,
-          50,
-          80
-        ],
-        "v": [
-          25.2,
-          24.6,
-          23.4,
-          22.3,
-          22.1,
-          21.6
-        ]
-      },
-      "answer": "math.floor(round(v*100)/370)*(b + 250)/100",
-      "unit": "В",
-      "tol": 0.01,
-      "solution": "Порог на банку = (байт + 250)·10 мВ, то есть 2.50–3.50 В. Число банок ESC считает при арме: напряжение в единицах 10 мВ делится нацело на 370 (3.70 В), дробная часть отбрасывается. Порог = банки · порог на банку. Подсевший 6S ниже 22.2 В засчитан как 5 банок — порог на одну банку ниже задуманного."
+    "p": [
+     12,
+     14
+    ]
+   },
+   "answer": "e/(p/2)",
+   "unit": "rpm",
+   "tol": 0.01,
+   "solution": "RPM = eRPM / (poles / 2)."
+  },
+  {
+   "id": "hz",
+   "title": "Motor frequency for the filter",
+   "statement": "The motor spins at **{rpm} RPM**. Find the fundamental harmonic frequency (Hz).",
+   "params": {
+    "rpm": {
+     "min": 3000,
+     "max": 30000,
+     "step": 500
     }
-  ]
+   },
+   "answer": "rpm/60",
+   "unit": "Hz",
+   "tol": 0.01,
+   "solution": "f = RPM / 60."
+  },
+  {
+   "id": "pwm-ripple",
+   "title": "Winding current ripple",
+   "statement": "The motor winding (two phases in series) has an inductance of **{l} µH**, battery voltage **{u} V**, PWM duty cycle **{d}**, PWM frequency **{f} kHz**. Find the peak-to-peak current ripple ΔI using the triangular approximation, A.",
+   "params": {
+    "u": [
+     4,
+     8,
+     16,
+     24
+    ],
+    "l": [
+     10,
+     20,
+     50,
+     100
+    ],
+    "d": [
+     0.3,
+     0.5,
+     0.7
+    ],
+    "f": [
+     24,
+     48,
+     96
+    ]
+   },
+   "answer": "u*d*(1 - d)*1000/(l*f)",
+   "unit": "A",
+   "tol": 0.02,
+   "solution": "ΔI = U·D·(1 − D)/(L·f). Convert L to henries (µH · 10⁻⁶), f to hertz (kHz · 10³): ΔI = U·D·(1 − D)·1000/(L[µH]·f[kHz]). Doubling the frequency halves the ripple, and the additional copper losses (∝ ΔI²) drop fourfold."
+  },
+  {
+   "id": "pwm-periods",
+   "title": "PWM periods per commutation step",
+   "statement": "In hover the ESC reports **{e} eRPM**, PWM frequency **{f} kHz**. How many PWM periods fall on one commutation step (there are six steps per electrical revolution)?",
+   "params": {
+    "e": {
+     "min": 40000,
+     "max": 300000,
+     "step": 10000
+    },
+    "f": [
+     24,
+     48,
+     96
+    ]
+   },
+   "answer": "10000*f/e",
+   "unit": "periods",
+   "tol": 0.02,
+   "solution": "Electrical revolutions per second eRPM/60, commutation steps per second 6·eRPM/60 = eRPM/10. N = f_PWM[Hz]/(eRPM/10) = 10·f_PWM/eRPM. The module's guideline is N around 3–5 and above in hover."
+  },
+  {
+   "id": "pwm-deadtime",
+   "title": "Dead time fraction",
+   "statement": "A Bluejay layout ends in **{dt}** (dead time in steps of 20.4 ns), PWM frequency **{f} kHz**. What fraction of the PWM period does one dead time take, %?",
+   "params": {
+    "dt": [
+     5,
+     10,
+     20,
+     30,
+     50,
+     70
+    ],
+    "f": [
+     24,
+     48,
+     96
+    ]
+   },
+   "answer": "dt*20.4e-9*f*1000*100",
+   "unit": "%",
+   "tol": 0.02,
+   "solution": "t_d = steps · 20.4 ns; fraction = t_d · f · 100 %. The fraction grows in proportion to the frequency: at 96 kHz it is four times larger than at 24 kHz."
+  },
+  {
+   "id": "am32-advance",
+   "title": "AM32 timing in degrees",
+   "statement": "In an AM32 2.22 settings dump, the `advance_level` byte = **{b}**. Find the commutation advance angle in electrical degrees.",
+   "params": {
+    "b": {
+     "min": 10,
+     "max": 42,
+     "step": 1
+    }
+   },
+   "answer": "(b - 10)*60/64",
+   "unit": "°",
+   "tol": 0.01,
+   "abs": 0.01,
+   "solution": "In the new format (byte 10–42) the firmware subtracts 10: temp_advance = byte − 10 = 0…32. Advance = commutation_interval·temp_advance/64, and commutation_interval is the 60° of a commutation step, so one count = 60/64 = 0.9375°. Angle = (byte − 10)·0.9375°, from 0 to 30°."
+  },
+  {
+   "id": "am32-lvc",
+   "title": "AM32 per-cell cutoff threshold",
+   "statement": "AM32 2.22: `low_voltage_cut_off` = 1, the `low_cell_volt_cutoff` byte = **{b}**. A 6S battery is connected at a voltage of **{v} V**. Find the cutoff threshold for the whole battery, V.",
+   "params": {
+    "b": [
+     20,
+     30,
+     50,
+     80
+    ],
+    "v": [
+     25.2,
+     24.6,
+     23.4,
+     22.3,
+     22.1,
+     21.6
+    ]
+   },
+   "answer": "math.floor(round(v*100)/370)*(b + 250)/100",
+   "unit": "V",
+   "tol": 0.01,
+   "solution": "The per-cell threshold = (byte + 250)·10 mV, i.e. 2.50–3.50 V. The ESC counts the cells when it arms: the voltage in units of 10 mV is integer-divided by 370 (3.70 V), the fractional part is discarded. Threshold = cells · per-cell threshold. A sagging 6S below 22.2 V is counted as 5 cells — the threshold is one cell's worth lower than intended."
+  }
+ ]
 }

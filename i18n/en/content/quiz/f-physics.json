@@ -3,7 +3,7 @@
   "pass": 80,
   "questions": [
     {
-      "q": "Why do neighboring propellers of a quadcopter spin in opposite directions?",
+      "q": "Why do neighboring quadcopter propellers spin in opposite directions?",
       "options": [
         "The firmware requires it for the mixer",
         "To cancel the reaction torques",
@@ -11,18 +11,18 @@
         "To reduce noise"
       ],
       "answer": 1,
-      "explain": "Each motor tries to turn the frame opposite to the prop's rotation. Two pairs spinning in opposite directions cancel this torque."
+      "explain": "Each motor tries to turn the frame in the direction opposite to the prop's rotation. Two pairs with opposite rotation compensate this torque."
     },
     {
       "q": "How does a quadcopter turn in yaw?",
       "options": [
-        "It tilts all motors with servos",
+        "It tilts all the motors with servos",
         "It deflects a rudder",
         "It speeds up one diagonal",
         "It shuts off one motor"
       ],
       "answer": 2,
-      "explain": "The difference in the reaction torques of the diagonal pairs creates a moment about the vertical axis while total thrust stays almost unchanged."
+      "explain": "The difference in the reaction torques of the diagonal pairs creates a moment about the vertical axis with almost unchanged total thrust."
     },
     {
       "q": "What is a thrust-to-weight ratio (T/W) of 2:1?",
@@ -33,12 +33,12 @@
         "Hover throttle of 20 % on a full battery"
       ],
       "answer": 0,
-      "explain": "T/W = maximum thrust of all motors / takeoff weight. At 2:1 hover is at about half throttle — there is almost no margin for maneuvering."
+      "explain": "T/W = maximum thrust of all motors / takeoff weight. At 2:1 hover takes half the thrust — that is about 65–71 % throttle, because thrust grows faster than throttle; there is almost no margin for maneuvering."
     },
     {
       "q": "What does the mixer do?",
       "options": [
-        "Mixes the fuel",
+        "Mixes fuel",
         "Distributes the axes across the motors",
         "Calibrates the ESCs",
         "Filters the gyro before the PID"
@@ -47,29 +47,29 @@
       "explain": "The mixer is a table of signs for each motor by frame type: how much RPM to add/subtract for each control axis."
     },
     {
-      "q": "The drone flips over right on takeoff. The most likely cause?",
+      "q": "The drone flips over immediately on takeoff. The most likely cause?",
       "options": [
         "Low hover throttle",
-        "Motor order or spin direction",
+        "Motor order or rotation",
         "High P and too powerful a battery",
         "Weak GPS"
       ],
       "answer": 1,
-      "explain": "If the real build doesn't match the frame diagram in the firmware, the mixer commands the wrong motors, and the drone tumbles in a fraction of a second."
+      "explain": "If the real build does not match the frame diagram in the firmware, the mixer commands the wrong motors, and the drone tumbles in a fraction of a second."
     },
     {
       "q": "Which control axis of a multirotor is the weakest, and why?",
       "options": [
         "Throttle: the motors are slow",
-        "Pitch: the center of gravity is offset",
+        "Pitch: the center of gravity is shifted",
         "Yaw: the reaction torque is small",
         "Roll: the frame is narrow"
       ],
       "answer": 2,
-      "explain": "Yaw is produced by reaction torque, which is much smaller than the moment from a thrust difference. So yaw is slower and is the first to hit motor saturation."
+      "explain": "Yaw is produced by the reaction torque, which is much smaller than the moment from a thrust difference. So yaw is slower and is the first to hit motor saturation."
     },
     {
-      "q": "The yaw moment of a quad, roughly, compared with roll:",
+      "q": "A quad's yaw moment roughly, compared with roll:",
       "options": [
         "Larger",
         "Several times smaller",

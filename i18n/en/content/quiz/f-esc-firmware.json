@@ -14,81 +14,81 @@
       "explain": "Bluejay is open-source firmware for the same EFM8 ESCs; it adds bidir DShot and EDT."
     },
     {
-      "q": "What does the ESC send back with bidirectional DShot?",
+      "q": "What does the ESC transmit with bidirectional DShot?",
       "options": [
-        "Battery voltage instead of throttle",
+        "The battery voltage instead of throttle",
         "The motor's electrical RPM",
-        "Rotor position in degrees",
+        "The rotor position in degrees",
         "A command to change direction"
       ],
       "answer": 1,
-      "explain": "The ESC replies with eRPM; it's the input for the RPM filter and the ESC-driven notch."
+      "explain": "The ESC replies with eRPM; this is the input of the RPM filter and of the ESC-based notch."
     },
     {
       "q": "A 14-pole motor, the ESC reports 70,000 eRPM. Mechanical RPM?",
       "options": [
-        "70,000 RPM",
-        "5,000 RPM",
-        "10,000 RPM",
-        "140,000 RPM"
+        "70,000 rpm",
+        "5,000 rpm",
+        "10,000 rpm",
+        "140,000 rpm"
       ],
       "answer": 2,
-      "explain": "RPM = eRPM / (poles / 2) = 70,000 / 7 = 10,000 RPM."
+      "explain": "RPM = eRPM / (poles / 2) = 70,000 / 7 = 10,000 rpm."
     },
     {
       "q": "What does EDT add to the DShot replies?",
       "options": [
-        "Encryption of the whole flight controller → ESC link",
+        "Encryption of the whole flight controller → ESC channel",
         "A second PWM frequency",
         "Automatic throttle calibration",
-        "ESC temperature, voltage, current"
+        "The ESC's temperature, voltage, current"
       ],
       "answer": 3,
-      "explain": "Extended DShot Telemetry sends the ESC status without a separate wire."
+      "explain": "Extended DShot Telemetry transmits the ESC's status without a separate wire."
     },
     {
-      "q": "What do you risk by flashing an ESC with the wrong target?",
+      "q": "What do you risk by flashing an ESC with someone else's target?",
       "options": [
-        "Only a reset of the startup melody",
-        "A change of rotation direction",
-        "It not working or burned MOSFETs",
+        "Only a reset of the startup tune",
+        "A change of spin direction",
+        "It not working, or burned switches",
         "Losing bidir DShot until a reboot"
       ],
       "answer": 2,
-      "explain": "The target describes a specific board; a wrong one can kill the ESC."
+      "explain": "A target describes a specific board; a wrong one can destroy the ESC."
     },
     {
-      "q": "The motor twitches and stops on sharp throttle. What do you adjust first in the ESC?",
+      "q": "A motor twitches and stops on a sharp throttle input. What do you adjust first in the ESC?",
       "options": [
         "Demagnetization, then timing",
-        "The startup melody",
-        "PWM frequency to the maximum",
-        "Rotation direction"
+        "The startup tune",
+        "The PWM frequency to maximum",
+        "The spin direction"
       ],
       "answer": 0,
-      "explain": "It's a loss of sync; the fix is raising demag compensation and lowering the timing."
+      "explain": "This is a loss of synchronization; it is cured by raising demag compensation and lowering the timing."
     },
     {
-      "q": "Why doesn't passthrough work on the MAIN outputs in ArduPilot?",
+      "q": "Why doesn't passthrough in ArduPilot work on the MAIN outputs?",
       "options": [
-        "MAIN doesn't support DShot at all",
-        "MAIN only works in MAVLink 1",
+        "MAIN does not support DShot at all",
+        "MAIN works only in MAVLink 1",
         "MAIN needs BLHeliSuite32",
-        "They're IOMCU outputs, you need FMU/AUX"
+        "They are IOMCU outputs, FMU/AUX are needed"
       ],
       "answer": 3,
-      "explain": "The IOMCU coprocessor outputs don't pass the signal through; use FMU/AUX."
+      "explain": "The IOMCU coprocessor's outputs do not pass the signal through; use FMU/AUX."
     },
     {
       "q": "What changed with BLHeli_32 in 2024?",
       "options": [
-        "It was open-sourced under the GPL",
+        "It was opened under the GPL",
         "Development and support ended",
         "It was built into Betaflight",
         "It became a paid subscription"
       ],
       "answer": 1,
-      "explain": "BLHeli_32 is no longer developed; for ARM ESCs with a target there's an open-source replacement, AM32."
+      "explain": "BLHeli_32 is no longer developed; for ARM ESCs with a target there is an open-source replacement — AM32."
     }
   ]
 }

@@ -6,12 +6,12 @@
       "q": "What does “2207” mean in a motor designation?",
       "options": [
         "22 poles, 7 windings",
-        "A 22 × 7 mm stator",
+        "Stator 22 × 7 mm",
         "2207 KV",
         "22 A, 7 V"
       ],
       "answer": 1,
-      "explain": "The first two digits are the stator diameter in mm, the second two the height. A bigger stator means more torque."
+      "explain": "The first two digits are the stator diameter in mm, the second two — the height. A bigger stator — more torque."
     },
     {
       "q": "A 1750KV motor on 6S (25.2 V) with no load spins at roughly…",
@@ -27,46 +27,46 @@
     {
       "q": "Why is DShot better than PWM?",
       "options": [
-        "It's analog, so it's more precise",
-        "A digital frame with a CRC",
+        "It is analog, so more precise",
+        "A digital frame with CRC",
         "It works without an ESC",
-        "It's cheaper"
+        "It is cheaper"
       ],
       "answer": 1,
-      "explain": "No range calibration needed, and noise doesn't shift the throttle."
+      "explain": "No range calibration needed, noise does not shift the throttle."
     },
     {
-      "q": "What does the ESC send back over bidirectional DShot?",
+      "q": "What does an ESC send back over bidirectional DShot?",
       "options": [
-        "Battery temperature",
+        "The battery temperature",
         "The motor's eRPM",
-        "Cell voltages",
-        "Stick positions"
+        "The cell voltages",
+        "The stick positions"
       ],
       "answer": 1,
-      "explain": "The DShot return channel carries electrical RPM. The RPM filter is built on this."
+      "explain": "The DShot return channel carries the electrical RPM. The RPM filter is built on this."
     },
     {
       "q": "What happened to BLHeli_32 in 2024?",
       "options": [
         "Version 33 was released",
-        "The project shut down",
+        "The project was shut down",
         "It became open source",
         "It was renamed Bluejay"
       ],
       "answer": 1,
-      "explain": "In June 2024 BLHeli_32 shut down. Existing ESCs work, but there are no updates. The replacement for 32-bit ESCs is AM32, for BLHeli_S it's Bluejay."
+      "explain": "BLHeli_32 shut down in June 2024. Existing ESCs work, but there are no updates. The replacement for 32-bit ESCs is AM32, for BLHeli_S — Bluejay."
     },
     {
       "q": "What is ESC desync?",
       "options": [
         "Different firmware on the motors",
-        "The ESC lost the rotor position",
+        "The ESC has lost the rotor position",
         "Battery overheating",
         "The ESC frequency out of sync with the radio"
       ],
       "answer": 1,
-      "explain": "Sensorless control determines the rotor position from the back-EMF. On a sharp load change the estimate breaks down — the motor loses sync."
+      "explain": "Sensorless control determines the rotor position from the EMF. On a sharp load change the estimate breaks down — the motor loses synchronization."
     },
     {
       "q": "How do you get shaft RPM from eRPM?",
@@ -74,10 +74,10 @@
         "eRPM × number of magnets",
         "eRPM / (magnets / 2)",
         "eRPM / 60",
-        "eRPM as is"
+        "eRPM with no conversion"
       ],
       "answer": 1,
-      "explain": "Electrical RPM is divided by the number of pole pairs: for 14 magnets, by 7."
+      "explain": "The electrical RPM is divided by the number of pole pairs: for 14 magnets — by 7."
     },
     {
       "q": "The Kt of a 1750KV motor is roughly:",
@@ -85,13 +85,13 @@
         "0.0055 N·m/A",
         "5.5 N·m/A",
         "0.55 N·m/A",
-        "0.055 N·m/A — from the formula 1/KV"
+        "0.055 N·m/A — by the 1/KV formula"
       ],
       "answer": 0,
       "explain": "Kt = 60/(2π·KV)."
     },
     {
-      "q": "How many bits of throttle value are in a DShot frame, and what is the range?",
+      "q": "How many throttle value bits are in a DShot frame, and what is the range?",
       "options": [
         "8 bits, 0–255",
         "11 bits, 48–2047",

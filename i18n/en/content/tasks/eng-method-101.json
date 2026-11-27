@@ -1,0 +1,102 @@
+{
+ "module": "eng-method-101",
+ "tasks": [
+  {
+   "id": "tw-conditions",
+   "title": "T/W at the requirement's conditions",
+   "statement": "On the stand, one motor with its prop gave **{thr} g** at **{v0} V** under load and +20 °C. Requirement: T/W ≥ 2.5 at **{v} V** and air at **+{t} °C**. Takeoff mass **{m} g**, four motors, thrust at full throttle ∝ V^1.8, air density ∝ 1/T_abs at the same pressure. Find T/W at the requirement's conditions.",
+   "params": {
+    "thr": {
+     "min": 600,
+     "max": 900,
+     "step": 10
+    },
+    "v0": [
+     16.0,
+     16.4,
+     16.8
+    ],
+    "v": [
+     13.6,
+     14.0,
+     14.4
+    ],
+    "t": [
+     25,
+     30,
+     35,
+     40
+    ],
+    "m": {
+     "min": 700,
+     "max": 1100,
+     "step": 10
+    }
+   },
+   "answer": "4*thr*(v/v0)**1.8*(273.15+20)/(273.15+t)/m",
+   "unit": "",
+   "tol": 0.005,
+   "solution": "T/W = 4·T·(V/V₀)^1.8·(293.15/(273.15 + t))/m. Both corrections are less than one: the end of the flight and the heat reduce thrust, so the bench T/W without corrections is overestimated. The module's example: 4·750·0.7863·0.9513/860 = 2.610."
+  },
+  {
+   "id": "tw-expanded-u",
+   "title": "Expanded uncertainty of T/W",
+   "statement": "T/W budget: stand calibration **U = {c} %** (k = 2, one for all four motors); unit-to-unit spread of motor + prop **{s} %** per unit relative to the batch mean (k = 1). **One of the four installed** motors was measured on the stand, and its thrust was multiplied by four. Scales **±{a} g** (uniform distribution) at a mass of **{m} g**. Find the relative expanded uncertainty of T/W at k = 2, %.",
+   "params": {
+    "c": [
+     0.4,
+     0.61,
+     1.0,
+     2.0
+    ],
+    "s": [
+     2,
+     3,
+     4,
+     5
+    ],
+    "a": [
+     1,
+     2,
+     5
+    ],
+    "m": {
+     "min": 600,
+     "max": 1200,
+     "step": 20
+    }
+   },
+   "answer": "2*math.sqrt((c/2)**2 + (s*math.sqrt(12)/4)**2 + (a/math.sqrt(3)/m*100)**2)",
+   "unit": "%",
+   "tol": 0.01,
+   "solution": "Calibration: u = U/2, not divided over the sum of the four motors (a common source). Spread: the sum of four differs from 4·T₁ by e₂ + e₃ + e₄ − 3e₁, hence u = s·√12/4 ≈ 0.866·s (not s/√4: the deviation of the measured motor enters all four). Scales: a/√3/m·100 %. U = 2·√((c/2)² + (s·√12/4)² + (a/√3/m·100)²). The module's example (0.61 %, 3 %, ±2 g, 860 g, no corrections): 2·√(0.305² + 2.598² + 0.134²) = 5.24 %; if T₁ were the batch mean over many measurements, s/2 would stand in place of s·√12/4."
+  },
+  {
+   "id": "guard-band",
+   "title": "Decision with a guard band",
+   "statement": "Measured T/W = **{y}**, combined relative standard uncertainty **u_c = {u} %**. Requirement T/W ≥ 2.5. Find the lower bound T/W − U at k = 2 (the decision is made by it: ≥ 2.5 — met, otherwise — not proven or not met).",
+   "params": {
+    "y": [
+     2.45,
+     2.55,
+     2.6,
+     2.65,
+     2.7,
+     2.8
+    ],
+    "u": [
+     1.0,
+     1.5,
+     2.0,
+     2.63,
+     3.0,
+     4.0
+    ]
+   },
+   "answer": "y*(1 - 2*u/100)",
+   "unit": "",
+   "tol": 0.002,
+   "solution": "U = 2·u_c·y, lower bound = y·(1 − 2·u_c). The module's example: 2.610·(1 − 0.0526) = 2.473 < 2.5 → “not proven”, even though the mean is 4 % above the limit. If the upper bound y·(1 + 2·u_c) is also below 2.5 — “not met”."
+  }
+ ]
+}

@@ -3,15 +3,15 @@
   "pass": 80,
   "questions": [
     {
-      "q": "When can you keep the props on the drone on the bench?",
+      "q": "When can props stay on the drone on the bench?",
       "options": [
-        "When the battery isn't plugged in",
+        "When the battery is not connected",
         "When the ARM switch is off",
         "Never",
         "When the configurator is open"
       ],
       "answer": 2,
-      "explain": "The only reliable rule: no props on the bench. Any exception will end in an injury one day."
+      "explain": "The only reliable rule: no props on the bench. Any exception will one day end in an injury."
     },
     {
       "q": "What does the RXLOSS arming disable flag mean?",
@@ -25,18 +25,18 @@
       "explain": "Without a valid receiver signal Betaflight won't let you arm."
     },
     {
-      "q": "The drone won't arm, the OSD shows ARMSWITCH. The cause?",
+      "q": "A Betaflight drone won't arm, the OSD shows ARM_SWITCH (before 2025.12 — ARMSWITCH). The cause?",
       "options": [
         "No GPS",
         "The switch was on",
-        "Broken receiver or bind",
+        "A broken receiver or bind",
         "Overheating"
       ],
       "answer": 1,
-      "explain": "Protection against arming right after power-on: turn the switch off and on again."
+      "explain": "ARM_SWITCH is set when the ARM switch is on while any other block is active; in the OSD it is shown only if it is the only one left. Lower the switch and raise it again."
     },
     {
-      "q": "What do you do if an arming disable flag keeps you from taking off?",
+      "q": "What do you do if an arming disable flag stops you from taking off?",
       "options": [
         "Disable the check",
         "Fix the cause",
@@ -44,29 +44,29 @@
         "Arm via the CLI"
       ],
       "answer": 1,
-      "explain": "The flags are a safety net. Disabling the check removes the symptom, not the danger."
+      "explain": "The flags are a safeguard. Disabling the check removes the symptom, not the danger."
     },
     {
-      "q": "What is PREARM mode for?",
+      "q": "What is the PREARM mode for?",
       "options": [
         "For calibration",
         "A second switch for arming",
         "For logs",
-        "For motor tests without props"
+        "For a motor test without props"
       ],
       "answer": 1,
-      "explain": "Two-stage arming lowers the chance of accidental activation — especially with heavy props."
+      "explain": "Two-stage arming reduces the chance of accidental arming — especially with heavy props."
     },
     {
-      "q": "What do you do with a battery that heats up with no load after a crash?",
+      "q": "What do you do with a battery that heats up without a load after a crash?",
       "options": [
-        "Charge it right away",
+        "Charge it immediately",
         "Isolate it, don't charge it",
         "Discharge it to zero with a flashlight",
         "Put it in the fridge"
       ],
       "answer": 1,
-      "explain": "Heating with no load is a sign of an internal short. Such a battery is taken out of service."
+      "explain": "Heating without a load is a sign of an internal short. Such a battery is taken out of service."
     },
     {
       "q": "The DSHOT_TELEM flag in status means:",
@@ -83,12 +83,12 @@
       "q": "How do you put out a burning LiPo?",
       "options": [
         "Blow it out",
-        "Sand and a non-flammable container",
+        "With sand and a non-flammable container",
         "Cover it with a cloth",
-        "Water from a bottle, a little at a time"
+        "With a little water from a bottle"
       ],
       "answer": 1,
-      "explain": "It burns with its own oxidizer; what matters is isolation and cooling."
+      "explain": "It burns with its own oxidizer; the key is isolation and cooling."
     }
   ]
 }
