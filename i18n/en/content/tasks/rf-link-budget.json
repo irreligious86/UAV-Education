@@ -23,12 +23,12 @@
    "answer": "20*math.log10(d)+20*math.log10(f)+32.44",
    "unit": "dB",
    "tol": 0.01,
-   "solution": "FSPL = 20·lg(d_km) + 20·lg(f_MHz) + 32.44. Doubling the distance or the frequency adds +6 dB."
+   "solution": "FSPL = 20·lg(d_km) + 20·lg(f_MHz) + 32.44. Doubling the distance or the frequency adds 6 dB."
   },
   {
    "id": "margin",
    "title": "Link margin",
-   "statement": "Transmitter **{p} dBm**, antennas **{g} dBi** on both ends, FSPL **{l} dB**, receiver sensitivity **−{s} dBm**. Find the margin (dB).",
+   "statement": "Transmitter **{p} dBm**, antennas of **{g} dBi** at both ends, FSPL **{l} dB**, receiver sensitivity **−{s} dBm**. Find the margin (dB).",
    "params": {
     "p": {
      "min": 14,
@@ -54,12 +54,12 @@
    "answer": "p+2*g-l+s",
    "unit": "dB",
    "tol": 0.01,
-   "solution": "Margin = P_tx + G_tx + G_rx − FSPL − S_rx (the sensitivity is negative, so we add its absolute value). The minimum is 10–15 dB for fading, 20 dB is comfortable."
+   "solution": "Margin = P_tx + G_tx + G_rx − FSPL − S_rx (the sensitivity is negative, so you add its absolute value). The minimum is 10–15 dB for fading; 20 dB is comfortable."
   },
   {
    "id": "fresnel",
    "title": "Fresnel zone",
-   "statement": "A **{d} km** link at **{f} GHz**. Find the radius of the first Fresnel zone at the midpoint of the path (m).",
+   "statement": "A **{d} km** link at **{f} GHz**. Find the radius of the first Fresnel zone at mid-path (m).",
    "params": {
     "d": {
      "min": 1,
@@ -76,12 +76,12 @@
    "answer": "17.32*math.sqrt(d/(4*f))",
    "unit": "m",
    "tol": 0.02,
-   "solution": "r₁ = 17.32·√(d_km/(4·f_GHz)) at the midpoint of the path. 60% of this radius must be clear of obstacles."
+   "solution": "r₁ = 17.32·√(d_km/(4·f_GHz)) at mid-path. 60 % of this radius must be clear of obstacles."
   },
   {
    "id": "range-from-margin",
-   "title": "Дальность по запасу",
-   "statement": "На дистанции **{d0} км** расчётный запас линка **{m0} дБ** (свободное пространство). На какой дистанции запас упадёт до **{m} дБ** (км)?",
+   "title": "Range from margin",
+   "statement": "At a distance of **{d0} km** the calculated link margin is **{m0} dB** (free space). At what distance will the margin fall to **{m} dB** (km)?",
    "params": {
     "d0": [
      0.5,
@@ -102,14 +102,14 @@
     ]
    },
    "answer": "d0*10**((m0-m)/20)",
-   "unit": "км",
+   "unit": "km",
    "tol": 0.01,
-   "solution": "FSPL растёт на 20·lg(d), поэтому d = d₀·10^((M₀ − M)/20): каждые 6 дБ запаса — удвоение дальности. Пример модуля: 29.8 дБ на 1 км → 12 дБ на 1·10^(17.8/20) ≈ 7.8 км."
+   "solution": "FSPL grows as 20·lg(d), so d = d₀·10^((M₀ − M)/20): every 6 dB of margin doubles the range. The module's example: 29.8 dB at 1 km → 12 dB at 1·10^(17.8/20) ≈ 7.8 km."
   },
   {
    "id": "radio-horizon",
-   "title": "Радиогоризонт",
-   "statement": "Антенна пульта на высоте **{h1} м**, аппарат на высоте **{h2} м**. Найдите дальность радиогоризонта при k = 4/3 (км).",
+   "title": "Radio horizon",
+   "statement": "The transmitter antenna at a height of **{h1} m**, the aircraft at **{h2} m**. Find the radio horizon range with k = 4/3 (km).",
    "params": {
     "h1": [
      1.5,
@@ -125,14 +125,14 @@
     }
    },
    "answer": "4.12*(math.sqrt(h1)+math.sqrt(h2))",
-   "unit": "км",
+   "unit": "km",
    "tol": 0.01,
-   "solution": "d = √(2kRh₁) + √(2kRh₂), R = 6371 км, k = 4/3 → d ≈ 4.12·(√h₁ + √h₂) км при h в метрах. Пример модуля: 2 м и 120 м → 51 км. За горизонтом связь пропадает обрывом при любом запасе по FSPL."
+   "solution": "d = √(2kRh₁) + √(2kRh₂), R = 6371 km, k = 4/3 → d ≈ 4.12·(√h₁ + √h₂) km with h in meters. The module's example: 2 m and 120 m → 51 km. Beyond the horizon the link drops abruptly, whatever the FSPL margin."
   },
   {
    "id": "two-ray-breakpoint",
-   "title": "Излом модели двух лучей",
-   "statement": "Частота **{f} МГц**, антенна земли на **{h1} м**, аппарат на **{h2} м**. Найдите дистанцию излома d_c = 4·h₁·h₂/λ (км).",
+   "title": "Two-ray model breakpoint",
+   "statement": "Frequency **{f} MHz**, ground antenna at **{h1} m**, aircraft at **{h2} m**. Find the breakpoint distance d_c = 4·h₁·h₂/λ (km).",
    "params": {
     "f": [
      915,
@@ -152,9 +152,9 @@
     }
    },
    "answer": "4*h1*h2/(299.792458/f)/1000",
-   "unit": "км",
+   "unit": "km",
    "tol": 0.01,
-   "solution": "λ = c/f = 299.79/f(МГц) м; d_c = 4·h₁·h₂/λ. За изломом мощность падает на 40 дБ за декаду (12 дБ на удвоение) вместо 20. Пример модуля: 2440 МГц, 1.5 и 10 м → λ = 0.123 м, d_c = 0.49 км."
+   "solution": "λ = c/f = 299.79/f(MHz) m; d_c = 4·h₁·h₂/λ. Beyond the breakpoint the power falls at 40 dB per decade (12 dB per doubling) instead of 20. The module's example: 2440 MHz, 1.5 and 10 m → λ = 0.123 m, d_c = 0.49 km."
   }
  ]
 }

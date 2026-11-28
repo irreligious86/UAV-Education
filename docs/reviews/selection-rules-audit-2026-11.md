@@ -127,7 +127,7 @@ The 4 high findings were fixed in commit 7f293211. This pass re-checked the 34 m
 | PWR-1 | fixed | `el-power-design.md:66` manufacturer minimums (Holybro 35 V noted as the manufacturer's minimum, not a margin), class table, when to add a second capacitor, check | FETtec «How to use caps and FETtec Spike Absorber» (6S: ≥ 470 µF 50 V); Holybro Tekko32 F4 4in1 50A spec (1000 µF 35 V included, «highly recommended for 6s»); whoop row labelled «оценка» |
 | PWR-2 | no longer applies | fixed in 7ca39a09: `el-power-design.md:96–105` continuous current from the Amass datasheet for the wire gauge, short-term ≤ 1-minute figure, heat table | Amass XT30/XT60/XT90 datasheets (already cited) |
 | PWR-3 | fixed | `el-power-design.md:110` gauge line is **continuous** current; peak checked by ≤ 1 % drop; 14 AWG on 5" reconciled (0.2 m loop, 100 A → 0.17 V) | copper resistance per AWG already in the module (ρ = 1.724·10⁻⁸ Ω·m); 1 % is the module's existing course criterion |
-| BAT-3 | no longer applies | fixed in 7f293211: `el-battery-packs.md:29` thresholds from the `f-power` table | — |
+| BAT-3 | no longer applies | fixed in 7f293211: `el-battery-packs.md:29` thresholds from the `f-power` table; LiFePO4 «2.5 посадка» corrected 2026-11-28 (FC-el) to landing 2.8–3.0 V under load, 2.5 V = cut-off | Battery University BU-205 (2.50 V cut-off) |
 | WIR-1 | fixed | `el-wiring.md:50` pass/fail criterion (≤ 1 % at peak; continuous ≤ gauge rule), worked example scored; `assets/widgets/wire-drop.js:42` tag thresholds 1 % / 5 % (was 2.5 % / 5 %) and hint text, catalogs in `i18n/*/ui.json` re-keyed | same as PWR-3 |
 | WIR-2 | no longer applies | fixed in 7ca39a09: `el-wiring.md:55` Amass datasheet values, rule in `el-power-design` | — |
 | EMI-1 | fixed | selection was added to `el-power-design.md:77` («LC-фильтр для видео»: f₀, Q vs ESR, I_sat ≥ 1.5 × peak) in 1161e41e; this pass added the pointer and the oscilloscope check in `el-emi.md:61` | `el-power-design` calculation and lab; `el-measure` for the measurement |
@@ -239,7 +239,7 @@ Translations: where the old wrong fact exists in `i18n/{en,uk,uk-galych,cs,ru-od
 | FLD-1 | fixed | `ops-field.md:39` reason (20–27 MHz occupied, IMD), pointer `link-vtx` | `link-vtx.md:49` |
 | FLD-2 | fixed | `ops-field.md:40` one-line summary of `link-elrs` «Выбор режима под задачу» | `link-elrs.md:339–342` |
 | PWR-4 | fixed | `el-power-design.md:49` reason for 1.5×; `f-power` reconciled (POW-3) | «ориентир курса» |
-| PWR-5 | fixed | `el-power-design.md:93` rating 1.3×, time-delay, pointer | `el-redundancy` (RED-1) |
+| PWR-5 | fixed | `el-power-design.md:93` rating ≥ 1.33 × max continuous current (I / 0.75; was 1.3×, corrected 2026-11-28 after FC-el), rounded up to the next standard rating, extra derating in a hot frame, time-delay, DC voltage ≥ full-charge pack voltage, interrupting rating ≥ pack short-circuit current, pointer | `el-redundancy` (RED-1); Littelfuse rules 1, 2, 3, 5 |
 | BAT-2 | no longer applies | fixed in 2389ded6 (POW-1): `el-battery-packs.md:37` defines the 1.5–3C band; the «типично 2–3C» line in `f-components-choice` is gone | — |
 | BAT-4 | fixed | `el-battery-packs.md:70` ratio to own new IR decides (×1.5–2), absolute 50+/10+ mΩ only without a record | `ops-maintenance` rule; «ориентир курса» |
 | WIR-3 | fixed | `el-wiring.md:27` start by pad size; bigger tip before more heat | «ориентир курса» |
@@ -264,7 +264,7 @@ Translations: where the old wrong fact exists in `i18n/{en,uk,uk-galych,cs,ru-od
 | WTH-2 | fixed | `ops-weather.md:71` go / no-go ≥ 3 °C | module's own fog signs; «ориентир курса» |
 | MNT-1 | no longer applies | canonical imbalance line `f-power.md:123` (2389ded6) matches `ops-maintenance:34`; the last mismatch was ELE-3 | — |
 | RID-1 | fixed | `f-remote-id-security.md:52` ArduPilot/PX4 module vs standalone beacon on Betaflight/INAV | no OpenDroneID in Betaflight 2025.12.5 / INAV 9.1.0 sources (grep) |
-| RED-1 | fixed | `el-redundancy.md:39` 1.3 = 1/0.75 derating; time-delay type | Littelfuse «The Twelve Cardinal Rules of Fuseology», rules 1 and 6 (reference added) |
+| RED-1 | fixed | `el-redundancy.md:39` ≥ 1.33 = 1/0.75 derating (was 1.3, which put the operating current at 77 % of the rating; corrected 2026-11-28 after FC-el), rounded up to a standard rating; time-delay type; DC voltage rating vs full-charge pack (ANL/MIDI typically 32 V DC: 6S yes, 8S no), interrupting rating vs pack short-circuit current, hot-frame derating; `:78` and the `x8-power-redundancy` diagram label follow | Littelfuse «The Twelve Cardinal Rules of Fuseology», rules 1, 2, 3, 5 and 6 (reference added) |
 | TEL-1 | fixed | `link-telemetry-radios.md:132` why 6–10 dB is allowed only for a non-control link | «ориентир курса» |
 | TEL-2 | fixed | `link-telemetry-radios.md:50` start from defaults; `MAX_WINDOW` 131 ms is default and max | SiK `Firmware/radio/parameters.c` (GitHub) |
 | SEN-1 | fixed | `est-sensors.md:33` keep the board default (45 °C on Cube Orange / Pixhawk 6X), check `IMU.T`, `BRD_HEAT_LOWMGN` | ArduPilot 4.7.3 `AP_BoardConfig.cpp:59–64, 247–253, 388–394`, `hwdef` `HAL_IMU_TEMP_DEFAULT`, `LogStructure.h:138` |

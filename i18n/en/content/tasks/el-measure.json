@@ -4,7 +4,7 @@
   {
    "id": "crc",
    "title": "DShot frame CRC",
-   "statement": "DShot throttle **{thr}**, telemetry bit 0. Compute the 4-bit CRC: v = throttle·2 + telemetry, CRC = (v ⊕ v>>4 ⊕ v>>8) & 0xF. The answer is a decimal number 0–15.",
+   "statement": "DShot throttle **{thr}**, telemetry bit 0. Calculate the 4-bit CRC: v = throttle·2 + telemetry, CRC = (v ⊕ v>>4 ⊕ v>>8) & 0xF. Give the answer as a decimal number 0–15.",
    "params": {
     "thr": {
      "min": 48,
@@ -21,7 +21,7 @@
   {
    "id": "ri",
    "title": "Internal resistance from sag",
-   "statement": "With no load the pack reads **{u0} V**; at **{i} A** the voltage sagged by **{s} V**. Find the internal resistance of the pack (mΩ).",
+   "statement": "At no load the pack reads **{u0} V**; under a current of **{i} A** the voltage sagged by **{s} V**. Find the internal resistance of the pack (mΩ).",
    "params": {
     "u0": [
      16.8,
@@ -45,8 +45,8 @@
   },
   {
    "id": "bf-ibata",
-   "title": "Новый ibata_scale по мА·ч зарядного",
-   "statement": "Betaflight: `ibata_scale = {s}`. За полёт OSD насчитал **{fc} мА·ч**, зарядное залило обратно **{ch} мА·ч**. Какой `ibata_scale` поставить (одноточечная калибровка, без округления)?",
+   "title": "A new ibata_scale from the charger's mAh",
+   "statement": "Betaflight: `ibata_scale = {s}`. Over a flight the OSD counted **{fc} mAh**, and the charger put back **{ch} mAh**. What `ibata_scale` do you set (one-point calibration, no rounding)?",
    "params": {
     "s": [
      250,
@@ -68,12 +68,12 @@
    "answer": "s*fc/ch",
    "unit": "",
    "tol": 0.01,
-   "solution": "В current.c ток I[мА] = 10000·U[мВ]/ibata_scale + offset — показание обратно пропорционально scale. Полётник насчитал меньше, чем было, → scale надо уменьшить: new = old × мА·ч_FC / мА·ч_зарядки. Пример модуля: 400 × 1018/1350 = 302."
+   "solution": "In current.c the current is I[mA] = 10000·U[mV]/ibata_scale + offset: the reading is inversely proportional to the scale. The flight controller counted less than was used → the scale must go down: new = old × mAh_FC / mAh_charger. The module's example: 400 × 1018/1350 = 302."
   },
   {
    "id": "ap-pervlt",
-   "title": "Новый BATT_AMP_PERVLT по мА·ч зарядного",
-   "statement": "ArduPilot: `BATT_AMP_PERVLT = {p}` А/В, `BATT_AMP_OFFSET = 0`. Лог насчитал **{fc} мА·ч**, зарядное залило **{ch} мА·ч**. Какой `BATT_AMP_PERVLT` поставить?",
+   "title": "A new BATT_AMP_PERVLT from the charger's mAh",
+   "statement": "ArduPilot: `BATT_AMP_PERVLT = {p}` A/V, `BATT_AMP_OFFSET = 0`. The log counted **{fc} mAh**, the charger put back **{ch} mAh**. What `BATT_AMP_PERVLT` do you set?",
    "params": {
     "p": [
      17.0,
@@ -93,14 +93,14 @@
     }
    },
    "answer": "p*ch/fc",
-   "unit": "А/В",
+   "unit": "A/V",
    "tol": 0.01,
-   "solution": "I = (U − BATT_AMP_OFFSET) · BATT_AMP_PERVLT — показание прямо пропорционально параметру: new = old × мА·ч_зарядки / мА·ч_лога. Направление пропорции противоположно Betaflight; так же считается BAT1_A_PER_V в PX4."
+   "solution": "I = (U − BATT_AMP_OFFSET) · BATT_AMP_PERVLT: the reading is directly proportional to the parameter, so new = old × mAh_charger / mAh_log. The direction of the proportion is the opposite of Betaflight; BAT1_A_PER_V in PX4 is calculated the same way."
   },
   {
    "id": "alias",
-   "title": "Частота, которую покажет выборка",
-   "statement": "Сигнал **{f} Гц** оцифрован с частотой выборки **{fs} Гц** без фильтра. На какой частоте (Гц) он появится в данных?",
+   "title": "The frequency a sampled reading shows",
+   "statement": "A **{f} Hz** signal is digitized at a sample rate of **{fs} Hz** without a filter. At what frequency (Hz) will it appear in the data?",
    "params": {
     "f": [
      117,
@@ -119,10 +119,10 @@
     ]
    },
    "answer": "abs(f - round(f/fs)*fs)",
-   "unit": "Гц",
+   "unit": "Hz",
    "tol": 0.001,
    "abs": 0.5,
-   "solution": "f_alias = |f − k·f_s|, k — ближайшее целое к f/f_s. Если f < f_s/2, сигнал виден на своей частоте. Примеры модуля: 24 кГц при 10 кГц → 4 кГц, 117 Гц при 100 Гц → 17 Гц, 1010 Гц при 1 кГц → 10 Гц."
+   "solution": "f_alias = |f − k·f_s|, where k is the nearest integer to f/f_s. If f < f_s/2, the signal appears at its own frequency. The module's examples: 24 kHz at 10 kHz → 4 kHz, 117 Hz at 100 Hz → 17 Hz, 1010 Hz at 1 kHz → 10 Hz."
   }
  ]
 }

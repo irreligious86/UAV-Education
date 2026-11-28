@@ -12,7 +12,7 @@ chart-pack-sag-sp           el-battery-packs — sag ΔU = I·R_pack, R_pack = R
 periph-connect-flow         el-peripherals — the module's connection protocol (steps 1–7) as a flow: datasheet, FC map,
                             wiring, multimeter before power, smoke stopper, firmware check; no data -> analyzer: bytes,
                             speed, inversion.
-x8-power-redundancy         el-redundancy — the X8 power scheme of the module: two batteries with a fuse each (1.3 × branch
+x8-power-redundancy         el-redundancy — the X8 power scheme of the module: two batteries with a fuse each (≥ 1.33 × branch
                             maximum), ORing or parallel, PDB / copper bars for 150+ A (peak ~130 A), 4 arms of ~32 A with no
                             fuses on motors, fused companion branch, two BECs with diode ORing to FC and receiver.
 kicad-design-flow           el-kicad — the KiCad cycle with its checks: schematic -> ERC -> footprints -> fab rules in
@@ -262,8 +262,8 @@ def x8_power_redundancy() -> str:
     i_peak = 4 * i_arm
     assert i_arm == 32 and abs(i_peak - 130) < 5
     W = 720
-    b1 = Box("b1", ["АКБ 1 6S,", "предохранитель", "1.3 × I_max ветки"], 10, 40, 150, 58)
-    b2 = Box("b2", ["АКБ 2 6S,", "предохранитель", "1.3 × I_max ветки"], 10, 120, 150, 58)
+    b1 = Box("b1", ["АКБ 1 6S,", "предохранитель", "≥ 1.33 × I_max ветки"], 10, 40, 150, 58)
+    b2 = Box("b2", ["АКБ 2 6S,", "предохранитель", "≥ 1.33 × I_max ветки"], 10, 120, 150, 58)
     orr = Box("or", ["ORing или", "параллель:", "отказ АКБ —", "летим на второй"], 190, 66, 130, 84)
     pdb = Box("pdb", ["PDB / медные", "шины 150+ А", "(пик ~130 А)"], 350, 72, 128, 72, accent=True)
     arms = Box("arms", ["4 луча × 2 мотора:", "до ~32 А на луч,", "12–14 AWG, XT90;", "предохранителей нет"], 520, 36, 190, 84)

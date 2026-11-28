@@ -3,18 +3,18 @@
   "pass": 80,
   "questions": [
     {
-      "q": "What does ERC catch in KiCad?",
+      "q": "What does ERC in KiCad catch?",
       "options": [
         "Trace clearance violations on the board",
         "Wrong layers in the output Gerber and drill files",
-        "Schematic connection errors: floating pins, output conflicts",
+        "Schematic connection errors: floating pins, conflicting outputs",
         "Shunt overheating"
       ],
       "answer": 2,
       "explain": "ERC checks the schematic; the fab's rules on the board are checked by DRC."
     },
     {
-      "q": "A shunt for an INA226 at 100 A, ±81.92 mV range. Which resistance fits?",
+      "q": "A shunt for an INA226 at 100 A, range ±81.92 mV. Which resistance fits?",
       "options": [
         "0.5 mΩ",
         "5 mΩ",
@@ -36,18 +36,18 @@
       "explain": "I²R = 1600 · 0.0005 = 0.8 W."
     },
     {
-      "q": "Why use a Kelvin connection for the shunt?",
+      "q": "Why a Kelvin connection for the shunt?",
       "options": [
-        "To protect the board from reverse battery polarity",
-        "So the drop across the copper doesn't get into the measurement",
+        "To protect the board from reversed battery polarity",
+        "So the copper drop stays out of the reading",
         "To reduce trace heating",
-        "It's required by the I²C protocol"
+        "It is required by the I²C protocol"
       ],
       "answer": 1,
       "explain": "The sense pair leaves from the shunt pads, not from the power trace."
     },
     {
-      "q": "Width of a 1 oz outer trace for 5 A at +10 °C per IPC-2221?",
+      "q": "External 1 oz trace width for 5 A at +10 °C per IPC-2221?",
       "options": [
         "about 2.8 mm",
         "about 0.3 mm",
@@ -58,37 +58,37 @@
       "explain": "From I = k·ΔT^0.44·A^0.725 for 35 µm copper ≈ 2.8 mm."
     },
     {
-      "q": "Why is a slot in the ground pour under a trace bad?",
+      "q": "Why is a slot in the ground zone under a trace bad?",
       "options": [
         "It noticeably increases the manufacturing cost",
-        "DRC won't pass such a board",
-        "The return current goes around the slot — the loop radiates",
-        "You can't place components on it"
+        "DRC will not pass such a board",
+        "The return current goes around the slot, and the loop radiates",
+        "No components can be placed on it"
       ],
       "answer": 2,
-      "explain": "The current returns under the trace; going around the slot makes a big loop, an antenna."
+      "explain": "The current returns under the trace; going around the slot makes a large loop, an antenna."
     },
     {
-      "q": "Where do you put the input capacitor of a buck converter?",
+      "q": "Where does the input capacitor of a buck converter go?",
       "options": [
         "At the battery connector on the edge of the board",
         "Right next to the switch",
         "Under the compass for filtering",
-        "Wherever is convenient"
+        "Wherever it fits best"
       ],
       "answer": 1,
-      "explain": "The loop with fast current must be minimal."
+      "explain": "The loop with the fast current must be minimal."
     },
     {
-      "q": "What do you check before the first power-up of an assembled board?",
+      "q": "What do you check before first powering up an assembled board?",
       "options": [
         "Only the look of the solder joints",
-        "Connect the battery right away to check the current in operation",
+        "Connect the battery straight away to check the current in operation",
         "The flight controller firmware",
-        "Shorts, and power from a supply with current limiting"
+        "Shorts, and power from a current-limited supply"
       ],
       "answer": 3,
-      "explain": "A continuity check and a current-limited bench supply save the board and the battery."
+      "explain": "A continuity check and a current-limited bench supply save both the board and the battery."
     }
   ]
 }

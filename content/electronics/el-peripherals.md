@@ -33,7 +33,7 @@ next:
 | CAN (DroneCAN) | CAN_H, CAN_L, GND (+питание) | 1 Мбит/с | node ID 1–127 (126–127 — сервисные инструменты, автораздача — до 125) | GPS/компас, ESC, датчики тока, серво, дальномеры, воздушная скорость | нет терминаторов 120 Ом на концах; витая пара; одинаковые node ID |
 
 ### Уровни и питание
-- Логика FC — **3.3 В**. Большинство входов терпят 5 В («5V tolerant»), но не все: читай даташит МК (STM32F4/F7/H7 — большинство GPIO 5V-tolerant, кроме ног с аналоговыми функциями). Правило: сомневаешься — делитель 1k/2k на входе FC или согласователь уровней.
+- Логика FC — **3.3 В**. Большинство входов терпят 5 В («5V tolerant»), но не все: читай даташит МК (STM32F4/F7/H7 — большинство GPIO 5V-tolerant, кроме ног с аналоговыми функциями, и только пока FC запитан). Правило: сомневаешься — делитель 1k/2k на входе FC или согласователь уровней.
 - **Питание портов**: пады 5 В и 9 В на FC идут от бортовых BEC с лимитом (типично 5 В/2–3 А, 9 В/2–3 А суммарно на все потребители). Подключение Raspberry Pi или цифрового air unit «от пада» — перегрузка BEC; питай от отдельного BEC.
 - **Общая земля** — всегда. Устройство со своим питанием без общей земли с FC — мусор на UART или сгоревший порт.
 - **Две точки питания** (устройство запитано от FC и от USB companion одновременно) — обратный ток через BEC. Диод или одно питание.
@@ -48,7 +48,7 @@ next:
 
 ### I2C: детали
 - Подтяжки 2.2–4.7 кОм на SDA и SCL к 3.3 В — обычно уже на FC и на плате GPS; несколько плат с подтяжками включаются параллельно, и суммарное сопротивление падает. Встроенные подтяжки МК (Betaflight `i2cN_pullup`, по умолчанию выключены, если цель не задаёт `USE_I2C_PULLUP`) слабые и годятся только для коротких шин на плате.
-- Адреса (7 бит, из драйверов ArduPilot 4.7.2): компас HMC5883 0x1E, QMC5883L 0x0D, IST8310 — один из 0x0C, 0x0D, 0x0E, 0x0F (задаётся выводами), баро BMP280 0x76/0x77, MS5611 0x77/0x76, датчик воздушной скорости MS4525DO 0x28 (варианты 0x36, 0x46), PX4Flow 0x42 (+ `FLOW_ADDR`, до 0x49). Два устройства с одним адресом на одной шине — конфликт.
+- Адреса (7 бит, из драйверов ArduPilot 4.7.3): компас HMC5883 0x1E, QMC5883L 0x0D, IST8310 — один из 0x0C, 0x0D, 0x0E, 0x0F (задаётся выводами), баро BMP280 0x76/0x77, MS5611 0x77/0x76, датчик воздушной скорости MS4525DO 0x28 (варианты 0x36, 0x46), PX4Flow 0x42 (+ `FLOW_ADDR`, до 0x49). Два устройства с одним адресом на одной шине — конфликт.
 - Длина: короткие провода, витые с землёй; на мачте GPS 15–20 см — норма, 50 см — уже рискованно (снизить частоту; ориентир курса).
 
 {{diagram:i2c-transaction|Транзакция I2C по битам — именно это видит логический анализатор, когда «датчик не находится».}}
@@ -72,7 +72,7 @@ SPI — четыре провода и отдельный CS на каждое �
 {{lesson:el-dronecan|Там — шина DroneCAN системно: арбитраж, DNA, резервирование, длина и топология, прошивка узлов.}}
 
 ### Справочник: где устройство включается в прошивке
-| Устройство | Betaflight 2025.12.5 | ArduPilot 4.7.2 | PX4 1.17.0 |
+| Устройство | Betaflight 2025.12.5 | ArduPilot 4.7.3 | PX4 1.18.0 |
 |---|---|---|---|
 | GPS (UART) | `serial <n> 2 …` (функция GPS = 2), `gps_provider = UBLOX`, `gps_auto_config` (вкл.), `gps_auto_baud` (по умолчанию выкл.) | `SERIALn_PROTOCOL = 5`, `GPS1_TYPE = 1` (авто) или 2 (u-blox); до 4.6 — `GPS_TYPE` | `GPS_1_CONFIG` (по умолчанию GPS1), `GPS_1_PROTOCOL = 1` (u-blox), `SER_GPS1_BAUD = 0` (авто) |
 | Компас (I²C) | `mag_hardware` (AUTO, QMC5883, IST8310…), `mag_bustype`, `mag_i2c_device`, `mag_i2c_address`, `mag_align_*` | автоопрос; `COMPASS_EXTERNAL`, `COMPASS_ORIENT`, `COMPASS_DISBLMSK` | автоопрос при `SENS_EXT_I2C_PRB = 1` (умолчание), поворот `CAL_MAGn_ROT` |
@@ -134,7 +134,7 @@ for r in (4700, 2350, 1000):
     tr = 0.8473 * r * 100e-12
     print(f"   rise time with {r} Ohm and 100 pF: {tr * 1e9:.0f} ns")
 
-# Address conflicts (7-bit) from ArduPilot 4.7.2 drivers
+# Address conflicts (7-bit) from ArduPilot 4.7.3 drivers
 DEV = {"QMC5883L": [0x0D], "IST8310": [0x0C, 0x0D, 0x0E, 0x0F], "HMC5883": [0x1E],
        "MS5611": [0x76, 0x77], "BMP280": [0x76, 0x77], "MS4525DO": [0x28, 0x36, 0x46], "PX4Flow": [0x42]}
 print("\n2) I2C address overlaps (possible addresses per driver):")
@@ -254,8 +254,8 @@ for rate in (1_000_000, 500_000):
 - ArduPilot — Serial Port Options and Protocols | https://ardupilot.org/copter/docs/common-serial-options.html | primary | A
 - Texas Instruments SLVA689 — I2C Bus Pullup Resistor Calculation | https://ti.com/lit/SLVA689 | primary | A
 - Betaflight 2025.12 source — cli/settings.c (i2cN_clockspeed_khz, mag_*, rangefinder_hardware) | https://github.com/betaflight/betaflight/blob/2025.12.5/src/main/cli/settings.c | primary | A
-- ArduPilot 4.7.2 source — AP_GPS_UBLOX.h (ubx_nav_pvt), AP_Compass.cpp (IST8310 addresses) | https://github.com/ArduPilot/ardupilot/tree/Copter-4.7.2/libraries | primary | A
-- PX4-Autopilot v1.17.0 — uavcan_params.c (UAVCAN_ENABLE, UAVCAN_SUB_*) | https://github.com/PX4/PX4-Autopilot/blob/v1.17.0/src/drivers/uavcan/uavcan_params.c | primary | A
+- ArduPilot 4.7.3 source — AP_GPS_UBLOX.h (ubx_nav_pvt), AP_Compass.cpp (IST8310 addresses) | https://github.com/ArduPilot/ardupilot/tree/Copter-4.7.3/libraries | primary | A
+- PX4-Autopilot v1.18.0 — uavcan_params.yaml (UAVCAN_ENABLE, UAVCAN_SUB_*) | https://github.com/PX4/PX4-Autopilot/blob/v1.18.0/src/drivers/uavcan/uavcan_params.yaml | primary | A
 
 ## checklist
 - Знаю уровни, питание и грабли каждой шины

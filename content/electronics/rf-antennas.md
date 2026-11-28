@@ -47,7 +47,7 @@ next:
 +6 дБ усиления = ×2 дальности в свободном пространстве. Патч 8 dBi на земле вместо диполя 2 dBi даёт +6 дБ — удвоение, но **только в секторе луча**: вышел аппарат из сектора — потерял больше, чем получил. Направленная антенна без наведения (трекера или пилота, поворачивающего пульт) — ловушка для полётов «по кругу».
 
 ### Поляризация
-- **Линейная** (диполь, «T», монополь): поле колеблется в одной плоскости. Приёмная антенна должна быть в той же плоскости: поворот на 90° даёт потери до 20–30 дБ в теории, на практике из-за отражений 10–20. При кренах аппарата поляризация рассогласовывается.
+- **Линейная** (диполь, «T», монополь): поле колеблется в одной плоскости. Приёмная антенна должна быть в той же плоскости: поворот на 90° теоретически даёт неограниченные потери (cos² 90° = 0); у реальных антенн — 20–30 дБ, в полёте из-за отражений — 10–20 дБ. При кренах аппарата поляризация рассогласовывается.
 - **Круговая** (клевер, спираль, патч с круговой): поле вращается — правая (RHCP) или левая (LHCP). Ориентация антенн почти не важна; отражения меняют направление вращения и ослабляются (меньше multipath — чище видео). Платим ~3 дБ при приёме линейной антенной круговой и наоборот. RHCP↔LHCP — потери 15–20 дБ: не смешивать.
 - Для видео 5.8 ГГц — круговая на обоих концах; для RC 900 МГц/2.4 ГГц — линейные диполи, расположенные ортогонально.
 - Тип видеоантенны по задаче (ориентир курса): на борту — всенаправленная круговая (клевер, pagoda, lollipop): аппарат вертится, и узкий луч всё время терял бы приёмник; stubby (укороченная) — на вупах и там, где антенну часто бьют, ценой усиления. На очках — всенаправленная плюс направленный патч, если полёт идёт в одном секторе (ширина луча — «Наземные антенны и трекеры» ниже). Проверка — облёт по кругу на рабочей дистанции: провалов картинки в одном направлении нет.
@@ -86,7 +86,7 @@ SMA и RP-SMA выглядят одинаково, но у одного штыр
 
 | Источник | Пример | Что настроить и проверить |
 |---|---|---|
-| MAVLink | прошивка ArduPilot AntennaTracker 4.7.2 на отдельном полётнике с сервами | `SYSID_TARGET` (0 — автоопределение); своя позиция — GPS или `START_LATITUDE`/`START_LONGITUDE`; `SERVO_YAW_TYPE`/`SERVO_PITCH_TYPE`: 0 — позиционные, 1 — вкл/выкл, 2 — постоянного вращения; `YAW_RANGE` 360, `PITCH_MIN`/`PITCH_MAX` −90/90; ближе `DISTANCE_MIN` = 5 м не наводится |
+| MAVLink | прошивка ArduPilot AntennaTracker 4.7.3 на отдельном полётнике с сервами | `SYSID_TARGET` (0 — автоопределение); своя позиция — GPS или `START_LATITUDE`/`START_LONGITUDE`; `SERVO_YAW_TYPE`/`SERVO_PITCH_TYPE`: 0 — позиционные, 1 — вкл/выкл, 2 — постоянного вращения; `YAW_RANGE` 360, `PITCH_MIN`/`PITCH_MAX` −90/90; ближе `DISTANCE_MIN` = 5 м не наводится |
 | CRSF через ELRS Backpack | трекер с приёмником Backpack (пример — Sentinel) | `Backpack → Telemetry = ESPNOW` (ELRS 3.4+); GPS аппарата приходит в телеметрии пульта; трекер в пределах 10 м от модуля, лучше 5 м; Telem Ratio от 1:2 до 1:16 |
 | Аналоговое видео INAV | Sentinel по строке OSD | `osd_telemetry = ON` (по умолчанию `OFF`) |
 
@@ -139,7 +139,7 @@ NanoVNA (если есть):
 ## references
 - ExpressLRS — Hardware Selection (antennas RX/TX) | https://www.expresslrs.org/hardware/hardware-selection/ | primary | A
 - Balanis C. A. — Antenna Theory: Analysis and Design, 4th ed., Wiley 2016 (глава 2, направленность; приближение Крауса D ≈ 41253 / (Θ1·Θ2)) | https://au.mathworks.com/academia/books/antenna-theory-balanis.html | primary | A
-- ArduPilot Copter-4.7.2 AntennaTracker/Parameters.cpp и config.h (параметры и умолчания трекера) | https://github.com/ArduPilot/ardupilot/blob/Copter-4.7.2/AntennaTracker/Parameters.cpp | primary | A
+- ArduPilot Copter-4.7.3 AntennaTracker/Parameters.cpp и config.h (параметры и умолчания трекера) | https://github.com/ArduPilot/ardupilot/blob/Copter-4.7.3/AntennaTracker/Parameters.cpp | primary | A
 - ExpressLRS — Backpack Telemetry (ESP-NOW, трекер; открыто 2026-11-22) | https://www.expresslrs.org/software/backpack-telemetry/ | primary | A
 - INAV wiki — AAT Automatic Antenna Tracker (телеметрия в аналоговом видео) | https://github.com/inavFlight/inav/wiki/AAT-Automatic-Antenna-Tracker | primary | B
 - Oscar Liang — FPV Antenna guide (polarization, types) | https://oscarliang.com/fpv-antenna/ | secondary | B

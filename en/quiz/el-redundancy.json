@@ -3,7 +3,7 @@
   "pass": 80,
   "questions": [
     {
-      "q": "Which layout is the most survivable when one motor fails?",
+      "q": "Which layout is the most survivable on a single motor failure?",
       "options": [
         "Quad",
         "Hexa",
@@ -11,43 +11,43 @@
         "Tricopter"
       ],
       "answer": 2,
-      "explain": "The coaxial partner and the opposite pair compensate for both thrust and moment."
+      "explain": "The coaxial partner and the opposite pair compensate both thrust and torque."
     },
     {
-      "q": "What happens to a hexa when a motor fails without thrust margin?",
+      "q": "What happens to a hexa with thrust margin (T/W ≥ 2 on the remaining five) on a motor failure?",
       "options": [
-        "Automatic landing on a timer",
+        "An automatic landing on a timer",
         "Altitude holds, yaw gets worse",
-        "Auto-landing",
-        "Switch to Acro"
+        "It falls immediately",
+        "A switch to Acro"
       ],
       "answer": 1,
-      "explain": "Five motors pull, but the CW/CCW balance is broken; with T/W < 2 it falls."
+      "explain": "Five motors lift, but the CW/CCW balance is broken; with T/W < 2 it falls."
     },
     {
-      "q": "Why aren't fuses put on the motors?",
+      "q": "Why are fuses not put on the motors?",
       "options": [
-        "They interfere with ESC telemetry and DShot",
-        "Pulsed current: it will blow for nothing",
-        "Motors don't break",
-        "Too expensive"
+        "It interferes with ESC telemetry and DShot",
+        "Pulsed current: it blows for nothing",
+        "Motors do not break",
+        "It is expensive"
       ],
       "answer": 1,
-      "explain": "Fuses go on the battery, the BEC and the payload branches."
+      "explain": "Fuses go on the batteries, the BECs and the payload branches."
     },
     {
       "q": "How is the FC's BEC made redundant?",
       "options": [
         "Two BECs with diode ORing",
         "One BEC with current margin",
-        "Backup from the USB connector",
-        "A big capacitor on the bus"
+        "A backup from the USB connector",
+        "A large capacitor on the bus"
       ],
       "answer": 0,
       "explain": "If one fails, power keeps coming from the second."
     },
     {
-      "q": "X8 arm current relative to motor current:",
+      "q": "The current of an X8 arm relative to the motor current:",
       "options": [
         "The same",
         "2 times higher",
@@ -55,29 +55,29 @@
         "8 times higher"
       ],
       "answer": 1,
-      "explain": "There are two motors on an arm."
+      "explain": "An arm carries two motors."
     },
     {
       "q": "How do you simulate a motor failure in ArduPilot SITL?",
       "options": [
         "Lower SIM_BATT_VOLTAGE",
         "SIM_ENGINE_FAIL and SIM_ENGINE_MUL",
-        "Disable the ESC via MOT_FAIL = 1",
+        "Disable the ESC with MOT_FAIL = 1",
         "Remove it from the mixer"
       ],
       "answer": 1,
-      "explain": "SITL applies a multiplier to the output of the selected motors."
+      "explain": "SITL applies the multiplier to the output of the selected motors."
     },
     {
-      "q": "What do you see in the ArduPilot log when a motor fails?",
+      "q": "What shows in the ArduPilot log on a motor failure?",
       "options": [
-        "Battery voltage rises and current falls",
+        "The voltage rises and the battery current falls",
         "RCOU at maximum, RPM 0",
-        "GPS loses satellites",
+        "The GPS loses satellites",
         "Nothing"
       ],
       "answer": 1,
-      "explain": "One RCOU channel at maximum, its neighbor at minimum, RPM 0 in the ESC telemetry: the mixer compensates."
+      "explain": "One RCOU channel at maximum, its neighbor at minimum, RPM 0 in the ESC telemetry: the mixer is compensating."
     },
     {
       "q": "A flat octo compared with a hexa:",
@@ -85,10 +85,10 @@
         "Survives no failures at all",
         "Needs less total thrust to hover the same mass",
         "Loses yaw control",
-        "Bigger margin, can survive two failures in favorable positions"
+        "More margin, can survive two failures in lucky positions"
       ],
       "answer": 3,
-      "explain": "Eight motors give a bigger margin and, with a favorable arrangement, survive two failures."
+      "explain": "Eight motors give more margin and, in a lucky arrangement, survive two failures."
     }
   ]
 }

@@ -1,0 +1,79 @@
+{
+  "module": "el-peripherals",
+  "tasks": [
+    {
+      "id": "rp-max",
+      "title": "Upper limit of an I²C pull-up",
+      "statement": "I²C bus capacitance **{cb} pF**, allowed edge **{tr} ns** (1000 ns for 100 kHz, 300 ns for 400 kHz). Find the largest pull-up resistance, kΩ.",
+      "params": {
+        "cb": {
+          "min": 50,
+          "max": 300,
+          "step": 10
+        },
+        "tr": [
+          1000,
+          300
+        ]
+      },
+      "answer": "tr/(0.8473*cb)",
+      "unit": "kΩ",
+      "tol": 0.01,
+      "solution": "t_r = 0.8473·Rp·Cb (the 30→70 % edge), so Rp_max = t_r/(0.8473·Cb); ns/pF = kΩ. The lower limit at 3.3 V is 967 Ω; if Rp_max comes out smaller, the bus is impossible at this clock."
+    },
+    {
+      "id": "rise-time",
+      "title": "I²C line edge",
+      "statement": "Pull-up **{r} kΩ**, bus capacitance **{c} pF**. Find the edge time from 30 to 70 % of the voltage, ns.",
+      "params": {
+        "r": [
+          1.0,
+          1.5,
+          2.2,
+          2.35,
+          3.3,
+          4.7,
+          10
+        ],
+        "c": {
+          "min": 30,
+          "max": 250,
+          "step": 10
+        }
+      },
+      "answer": "0.8473*r*c",
+      "unit": "ns",
+      "tol": 0.01,
+      "solution": "t_r = 0.8473·R·C; kΩ·pF = ns. Compare with 300 ns (400 kHz) and 1000 ns (100 kHz): 4.7 kΩ at 100 pF gives 398 ns, already too much for 400 kHz."
+    },
+    {
+      "id": "gps-uart-load",
+      "title": "UART load from a GPS stream",
+      "statement": "A GPS sends frames of **{nb} bytes** at **{f} Hz** on a **{b} baud** 8N1 line. What share of the line does the stream take, %?",
+      "params": {
+        "f": [
+          1,
+          5,
+          10,
+          18
+        ],
+        "nb": [
+          60,
+          100,
+          172
+        ],
+        "b": [
+          9600,
+          38400,
+          57600,
+          115200,
+          230400
+        ]
+      },
+      "answer": "100*nb*f*10/b",
+      "unit": "%",
+      "tol": 0.01,
+      "solution": "10 bits per byte (start + 8 + stop): load = N·f·10/B. UBX-NAV-PVT is 100 bytes with the header: at 9600 baud and 10 Hz that is 104 %, at 115200 it is 8.7 %. Above 100 % the stream does not fit on the line and messages are lost."
+    }
+  ]
+}

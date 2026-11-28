@@ -61,7 +61,7 @@ next:
 Цифровой прибор и полётник не видят сигнал непрерывно — они берут отсчёты с частотой f_s. Всё, что выше f_s/2 (частота Найквиста), появляется в данных на ложной частоте f_alias = |f − k·f_s|, где k — ближайшее целое к f/f_s. Три места, где это бьёт на практике:
 
 1. **Длинная развёртка осциллографа.** Частота выборки = глубина памяти / (10 делений × время на деление). Память 10 тыс. точек на 100 мс/дел — это 10 кГц: пульсации ESC 24 кГц нарисуются как 4 кГц (вывод лабораторной). Признак: «частота пульсаций» меняется при смене развёртки. Лечение — короткая развёртка или режим пикового детектора.
-2. **Датчик тока полётника.** Betaflight 2025.12.5 опрашивает ток задачей 50 Гц и сглаживает фильтром PT1 1 Гц (`ibat_lpf_period` = 10, в десятых долях секунды); ArduCopter 4.7.2 читает батарею в задаче 10 Гц. Пульсации ESC десятки кГц такой выборкой не измерить в принципе — показание полётника годится только для среднего тока и мА·ч.
+2. **Датчик тока полётника.** Betaflight 2025.12.5 опрашивает ток задачей 50 Гц и сглаживает фильтром PT1 1 Гц (`ibat_lpf_period` = 10, в десятых долях секунды); ArduCopter 4.7.3 читает батарею в задаче 10 Гц. Пульсации ESC десятки кГц такой выборкой не измерить в принципе — показание полётника годится только для среднего тока и мА·ч.
 3. **Логи.** Гироскоп, записанный с частотой 1 кГц, показывает вибрацию 1010 Гц как 10 Гц. Поэтому перед выборкой ставят аналоговый или цифровой фильтр ниже f_s/2 (Betaflight: `acc_lpf_hz` 25 Гц перед задачей ориентации 100 Гц).
 
 {{lesson:ctl-signals|Спектр гироскопа, частота лога и антиалиасинговые фильтры — с синтетическим сигналом, где ответ известен.}}
@@ -71,8 +71,8 @@ next:
 
 Формулы из исходников:
 - Betaflight 2025.12.5 (`sensors/current.c`): I[мА] = 10000 · U[мВ] / `ibata_scale` + `ibata_offset`; смещение добавляется **после** масштаба, в мА.
-- ArduPilot 4.7.2 (`AP_BattMonitor_Analog.cpp`): I = (U − `BATT_AMP_OFFSET`) · `BATT_AMP_PERVLT`; U = (U_пин − `BATT_VLT_OFFSET`) · `BATT_VOLT_MULT`.
-- PX4 1.17.0 (`analog_battery.cpp`): I = (U − `BAT_V_OFFS_CURR`) · `BAT1_A_PER_V`; U = U_АЦП · `BAT1_V_DIV`; отрицательный ток код обрезает до 0 (`fmaxf(current_a, 0)`), поэтому завышенное смещение на нуле не видно — проверяй его на малом токе.
+- ArduPilot 4.7.3 (`AP_BattMonitor_Analog.cpp`): I = (U − `BATT_AMP_OFFSET`) · `BATT_AMP_PERVLT`; U = (U_пин − `BATT_VLT_OFFSET`) · `BATT_VOLT_MULT`.
+- PX4 1.18.0 (`analog_battery.cpp`): I = (U − `BAT_V_OFFS_CURR`) · `BAT1_A_PER_V`; U = U_АЦП · `BAT1_V_DIV`; отрицательный ток код обрезает до 0 (`fmaxf(current_a, 0.f)`) только при включённом фильтре тока `BAT1_I_FILT` > 0 (по умолчанию 0); тогда завышенное смещение на нуле не видно — проверяй его на малом токе.
 - INAV 9.1.0 (`sensors/battery.c`): I = (U − offset)/`current_meter_scale`, scale в 0.1 мВ/А; в коде смещение вычитается как `current_meter_offset` × 100 мкВ, то есть в единицах 0.1 мВ, хотя описание параметра говорит «мВ» (вывод из кода, строка 557).
 
 **Одна точка или две.** Калибровка по мА·ч зарядного (один полёт) правит только наклон и точна на среднем токе того полёта. Если у датчика есть смещение нуля, на малом токе ошибка остаётся большой: в лабораторной датчик со смещением 50 мВ после калибровки по одному полёту врёт на +74 % при 2 А и на −2.2 % при 25 А. Две и больше точек по клещам (малый и большой ток) дают и наклон, и смещение: ошибка < 0.5 % во всём диапазоне. Порядок: сначала напряжение, затем смещение при нулевом токе моторов, затем наклон на большом токе, и проверка по мА·ч после полёта (ориентир курса — расхождение с зарядным < 5 %).
@@ -84,12 +84,12 @@ next:
 | Betaflight 2025.12.5 | `ibata_scale` | 400 (−16000…16000) | 0.1 мВ/А | обратная |
 | Betaflight 2025.12.5 | `ibata_offset` | 0 | мА, после масштаба | сдвиг |
 | Betaflight 2025.12.5 | `ibat_lpf_period` | 10 | 0.1 с (PT1 1 Гц) | — |
-| ArduPilot 4.7.2 | `BATT_VOLT_MULT` | 10.1 или из hwdef (MatekH743: 11.0) | В/В | прямая |
-| ArduPilot 4.7.2 | `BATT_AMP_PERVLT` | 17.0 или из hwdef (MatekH743: 40.0) | А/В | прямая |
-| ArduPilot 4.7.2 | `BATT_AMP_OFFSET`, `BATT_VLT_OFFSET` | 0, 0 | В, до масштаба | сдвиг |
-| PX4 1.17.0 | `BAT1_V_DIV` | −1 в module.yaml; на fmu-v6c `set-default` 18.1 | В/В | прямая, нужна перезагрузка |
-| PX4 1.17.0 | `BAT1_A_PER_V` | −1 в module.yaml; на fmu-v6c `set-default` 36.367515 | А/В | прямая, нужна перезагрузка |
-| PX4 1.17.0 | `BAT_V_OFFS_CURR` | 0 | В, до масштаба | сдвиг |
+| ArduPilot 4.7.3 | `BATT_VOLT_MULT` | 10.1 или из hwdef (MatekH743: 11.0) | В/В | прямая |
+| ArduPilot 4.7.3 | `BATT_AMP_PERVLT` | 17.0 или из hwdef (MatekH743: 40.0) | А/В | прямая |
+| ArduPilot 4.7.3 | `BATT_AMP_OFFSET`, `BATT_VLT_OFFSET` | 0, 0 | В, до масштаба | сдвиг |
+| PX4 1.18.0 | `BAT1_V_DIV` | −1 в module.yaml; на fmu-v6c `set-default` 18.1 | В/В | прямая, нужна перезагрузка |
+| PX4 1.18.0 | `BAT1_A_PER_V` | −1 в module.yaml; на fmu-v6c `set-default` 36.367515 | А/В | прямая, нужна перезагрузка |
+| PX4 1.18.0 | `BAT_V_OFFS_CURR` | 0 | В, до масштаба | сдвиг |
 | INAV 9.1.0 | `vbat_scale`, `current_meter_scale` | 1100, 400 (если плата не задала) | ×100 к делителю; 0.1 мВ/А | прямая; обратная |
 
 {{lesson:bf-setup-scratch|Пошаговая калибровка vbat_scale, ibata_scale и ibata_offset в Betaflight 2025.12 на столе и после полёта, с критериями ошибки.}}
@@ -258,8 +258,8 @@ ALIASING: what a sampled reading shows
 
 ## references
 - Betaflight 2025.12.5 — `src/main/sensors/current.c` (ibata_scale, ibata_offset, задача 50 Гц) | https://raw.githubusercontent.com/betaflight/betaflight/2025.12.5/src/main/sensors/current.c | primary | A
-- ArduPilot Copter-4.7.2 — `AP_BattMonitor_Analog.cpp` (BATT_VOLT_MULT, BATT_AMP_PERVLT, BATT_AMP_OFFSET) | https://raw.githubusercontent.com/ArduPilot/ardupilot/Copter-4.7.2/libraries/AP_BattMonitor/AP_BattMonitor_Analog.cpp | primary | A
-- PX4 v1.17.0 — `battery_status/module.yaml` и `analog_battery.cpp` (BAT1_V_DIV, BAT1_A_PER_V, BAT_V_OFFS_CURR) | https://raw.githubusercontent.com/PX4/PX4-Autopilot/v1.17.0/src/modules/battery_status/analog_battery.cpp | primary | A
+- ArduPilot Copter-4.7.3 — `AP_BattMonitor_Analog.cpp` (BATT_VOLT_MULT, BATT_AMP_PERVLT, BATT_AMP_OFFSET) | https://raw.githubusercontent.com/ArduPilot/ardupilot/Copter-4.7.3/libraries/AP_BattMonitor/AP_BattMonitor_Analog.cpp | primary | A
+- PX4 v1.18.0 — `battery_status/module.yaml` и `analog_battery.cpp` (BAT1_V_DIV, BAT1_A_PER_V, BAT_V_OFFS_CURR) | https://raw.githubusercontent.com/PX4/PX4-Autopilot/v1.18.0/src/modules/battery_status/analog_battery.cpp | primary | A
 - Betaflight — DSHOT ESC Protocol | https://betaflight.com/docs/development/API/Dshot | primary | A
 - sigrok — PulseView (logic analyzer software) | https://sigrok.org/wiki/PulseView | primary | A
 - Crossfire/CRSF protocol — TBS (community reference) | https://github.com/crsf-wg/crsf/wiki | secondary | B

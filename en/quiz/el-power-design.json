@@ -3,7 +3,7 @@
   "pass": 80,
   "questions": [
     {
-      "q": "How much heat does a linear BEC dissipate with 25 V in, 5 V out and 0.5 A of current?",
+      "q": "How much heat does a linear BEC dissipate with a 25 V input, a 5 V output and a 0.5 A current?",
       "options": [
         "2.5 W",
         "5 W",
@@ -11,21 +11,21 @@
         "12.5 W"
       ],
       "answer": 2,
-      "explain": "(25 − 5) V × 0.5 A = 10 W — a linear regulator dumps the entire voltage difference as heat."
+      "explain": "(25 − 5) V × 0.5 A = 10 W: a linear regulator dumps the whole voltage difference as heat."
     },
     {
-      "q": "Why put a low-ESR capacitor on the power bus?",
+      "q": "Why a low-ESR capacitor on the power bus?",
       "options": [
         "To increase the battery capacity",
-        "To absorb spikes caused by inductance",
+        "To absorb spikes from the inductance",
         "To raise the voltage",
-        "Reverse-polarity protection for the battery connector"
+        "To protect the battery connector from reverse polarity"
       ],
       "answer": 1,
-      "explain": "U = L·dI/dt when the ESC switches: the capacitor acts as a local source and clips the spikes."
+      "explain": "U = L·dI/dt during ESC switching: the capacitor acts as a local source and clips the spikes."
     },
     {
-      "q": "What voltage margin should the capacitor have on 6S (25.2 V fully charged)?",
+      "q": "What voltage margin should the capacitor have on 6S (25.2 V full charge)?",
       "options": [
         "Exactly 25 V",
         "35 V",
@@ -33,45 +33,45 @@
         "100 V"
       ],
       "answer": 2,
-      "explain": "Margin ≥ 30%: for 6S use 50 V; 35 V is for 4S."
+      "explain": "30 % (32.8 V) is only the minimum; braking spikes on 6S exceed 35 V, so 50 V (1.98 × full charge); 35 V is for 4S."
     },
     {
       "q": "What is a smoke stopper?",
       "options": [
         "A power filter",
-        "A current limiter for power-up",
+        "A current limiter at power-up",
         "A temperature sensor",
-        "A fuse on the motor wires"
+        "A fuse in series with the motor wires"
       ],
       "answer": 1,
-      "explain": "A bulb or a resistor in series with the positive lead at the first power-up after soldering: on a short the bulb lights up and the aircraft doesn't smoke."
+      "explain": "A bulb or resistor in series with the positive at the first power-up after soldering: on a short the bulb lights up and the aircraft does not smoke."
     },
     {
-      "q": "Why is a voltage sag dangerous for the FC?",
+      "q": "Why is voltage sag dangerous for the FC?",
       "options": [
         "The gyro overheats",
-        "The BEC shuts off — the FC resets",
+        "BEC shuts off → FC resets",
         "The motors change direction",
         "The bind is lost"
       ],
       "answer": 1,
-      "explain": "Buck converters have a minimum input voltage; a sag below it restarts the board."
+      "explain": "Buck converters have a minimum input voltage; sag below it restarts the board."
     },
     {
-      "q": "What happens to a connector that's overloaded for the current?",
+      "q": "What happens to a connector overloaded with current?",
       "options": [
-        "It reduces the ripple on the power bus",
+        "It reduces ripple on the power bus",
         "It heats up and oxidizes",
         "It gets better",
         "Nothing"
       ],
       "answer": 1,
-      "explain": "Heating → oxidation → rising resistance → even more heating."
+      "explain": "Heating → oxidation → higher resistance → even more heating."
     },
     {
-      "q": "Which BEC is better for powering the receiver and the sensitive RF part?",
+      "q": "Which BEC is best for powering the receiver and the sensitive RF part?",
       "options": [
-        "A buck with no filter",
+        "A buck without a filter",
         "An LDO after a buck",
         "Straight from the battery",
         "From the ESC"
@@ -84,13 +84,13 @@
       "kind": "apply",
       "fragment": "[  812.4] hwmon hwmon1: Undervoltage detected!\n[  812.9] hwmon hwmon1: Voltage normalised\nPower: 5 V / 1 A BEC from the flight controller",
       "options": [
-        "A 1 A BEC can't handle a Pi (up to 2–3 A): it sags on peaks — you need a separate 5 V / 5 A BEC",
-        "The CPU is overheating: hwmon is reporting throttling, not voltage",
-        "The memory card is damaged, and the kernel misinterprets write failures as a sag",
-        "The message is routine: a Pi always logs it when Wi-Fi starts and it can be ignored"
+        "A 1 A BEC cannot power the Pi (up to 2–3 A): sag on the peaks, so you need a separate 5 V / 5 A BEC",
+        "CPU overheating: hwmon reports throttling, not voltage",
+        "The memory card is damaged and the kernel misreads write errors as sag",
+        "The message is normal: the Pi always logs it when Wi-Fi starts, and it can be ignored"
       ],
       "answer": 0,
-      "explain": "The Pi itself reports the sag; the on-board 5 V from the FC is meant for light loads."
+      "explain": "The Pi reports the sag itself; the onboard 5 V from the FC is meant for light loads."
     }
   ]
 }

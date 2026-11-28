@@ -4,7 +4,7 @@
   {
    "id": "quarter",
    "title": "Quarter-wave element length",
-   "statement": "Frequency **{f} MHz**. Find the quarter wavelength in free space (mm).",
+   "statement": "Frequency **{f} MHz**. Find a quarter of the free-space wavelength (mm).",
    "params": {
     "f": [
      433,
@@ -19,12 +19,12 @@
    "answer": "299792458/(f*1e6)/4*1000",
    "unit": "mm",
    "tol": 0.01,
-   "solution": "λ = c/f, a quarter is λ/4. On a real conductor the element is slightly shorter (velocity factor 0.95–0.97), which is why the antenna is trimmed by SWR."
+   "solution": "λ = c/f, a quarter is λ/4. On a real conductor the element is slightly shorter (a velocity factor of 0.95–0.97), so the antenna is trimmed by SWR."
   },
   {
    "id": "polar",
    "title": "Loss from rotating linear antennas",
-   "statement": "Two linear antennas are rotated **{t}°** relative to each other. Find the polarization mismatch loss (dB).",
+   "statement": "Two linear antennas are rotated relative to each other by **{t}°**. Find the polarization mismatch loss (dB).",
    "params": {
     "t": {
      "min": 10,
@@ -35,7 +35,7 @@
    "answer": "-20*math.log10(math.cos(math.radians(t)))",
    "unit": "dB",
    "tol": 0.02,
-   "solution": "Received power ∝ cos²θ, loss = −20·lg(cos θ). 45° gives 3 dB, 90° is infinite in theory, 20+ dB in practice. Circular polarization removes this dependence on bank angle."
+   "solution": "Received power ∝ cos²θ, loss = −20·lg(cos θ). 45° is 3 dB, 90° is infinite in theory and 20+ dB in practice. Circular polarization removes this dependence on bank."
   }
  ]
 }
