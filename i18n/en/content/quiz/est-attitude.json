@@ -6,12 +6,12 @@
       "q": "What is gimbal lock?",
       "options": [
         "A camera gimbal failure",
-        "Degeneration of Euler angles",
+        "Degeneracy of Euler angles",
         "Loss of the compass",
         "Gyro saturation during a flip"
       ],
       "answer": 1,
-      "explain": "At ±90° pitch, roll and yaw merge; that's why firmware uses quaternions."
+      "explain": "At ±90° pitch, roll and yaw merge; that is why firmware uses quaternions."
     },
     {
       "q": "How many numbers and constraints does an attitude quaternion have?",
@@ -33,10 +33,10 @@
         "Never"
       ],
       "answer": 1,
-      "explain": "The gyro is fast but drifts; the accelerometer is slow, without drift."
+      "explain": "The gyro is fast but drifts; the accelerometer is slow but does not drift."
     },
     {
-      "q": "What does Ki do in the Mahony filter?",
+      "q": "What does Ki do in a Mahony filter?",
       "options": [
         "Corrects yaw from gravity",
         "Estimates the gyro bias",
@@ -50,8 +50,8 @@
       "q": "Why does yaw drift without a compass?",
       "options": [
         "The Z gyro is worse",
-        "Gravity doesn't know the heading",
-        "The accelerometer doesn't work on Z",
+        "Gravity carries no heading",
+        "The accelerometer does not work on Z",
         "Because of GPS"
       ],
       "answer": 1,
@@ -60,29 +60,29 @@
     {
       "q": "How does an EKF differ from a complementary filter?",
       "options": [
-        "An EKF doesn't use the gyro at all",
+        "The EKF does not use the gyro at all",
         "Adaptive K and bias estimation",
-        "An EKF is simpler",
-        "No difference"
+        "The EKF is simpler",
+        "It does not"
       ],
       "answer": 1,
       "explain": "A complementary filter is an EKF with a fixed K."
     },
     {
-      "q": "Where is the primary attitude calculation in ArduPilot?",
+      "q": "Where does ArduPilot compute its primary attitude?",
       "options": [
-        "In EKF3; DCM is the fallback",
+        "In EKF3; DCM is the backup",
         "Only in DCM",
         "In the AHRS_ORIENTATION module",
         "In the GPS receiver"
       ],
       "answer": 0,
-      "explain": "The primary estimate is EKF3, DCM remains as a fallback."
+      "explain": "The primary estimate is EKF3; DCM remains as a backup."
     },
     {
-      "q": "Why are Euler angles bad for calculations at θ = ±90°?",
+      "q": "Why are Euler angles bad for computation at θ = ±90°?",
       "options": [
-        "They require eight numbers",
+        "They need eight numbers",
         "Sine stops being periodic",
         "The gyro stops working",
         "Roll and yaw merge into one degree of freedom"

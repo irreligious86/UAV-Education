@@ -1,0 +1,96 @@
+{
+  "module": "nav-indoor",
+  "pass": 80,
+  "questions": [
+    {
+      "q": "A mocap bridge sends VISION_POSITION_ESTIMATE with the exact capture time in the usec field; the full pipeline delay is 120 ms and VISO_DELAY_MS = 10. What will ArduPilot 4.6 do?",
+      "options": [
+        "Subtract the 120 ms itself by comparing the usec stamp with its own clock",
+        "Fuse the measurement as if it were taken about 10 ms ago",
+        "Drop packets older than 100 ms",
+        "Fall back to the compass and barometer"
+      ],
+      "answer": 1,
+      "explain": "The usec field is used only to remove jitter (JitterCorrection): the fastest packet is assumed to arrive with zero delay. Only VISO_DELAY_MS sets the constant delay; the remaining 110 ms produce a lag of v·Δτ and phase lag in the position loop."
+    },
+    {
+      "q": "Which EKF3 source set matches flying on optical flow with a rangefinder and no GPS?",
+      "options": [
+        "POSXY 5, VELXY 5, POSZ 2, VELZ 5, YAW 6",
+        "POSXY 6, VELXY 0, POSZ 6, YAW 6",
+        "POSXY 0, VELXY 5, POSZ 1 or 2, YAW 1",
+        "POSXY 4, VELXY 0, POSZ 4 or 1, YAW 1"
+      ],
+      "answer": 2,
+      "explain": "Flow is a velocity-only source (VELXY = 5); POSXY has no value 5. The set with sixes is ExternalNav, the one with fours is beacons."
+    },
+    {
+      "q": "The EKF uses external navigation, there is no GPS, and arming in Loiter returns \"PreArm: AHRS: waiting for home\". What is missing?",
+      "options": [
+        "Compass calibration and magnetic declination from the coordinates",
+        "The EKF origin: SET_GPS_GLOBAL_ORIGIN",
+        "A VISION_SPEED_ESTIMATE message",
+        "ARMING_SKIPCHK = −1 (before 4.7, ARMING_CHECK = 0)"
+      ],
+      "answer": 1,
+      "explain": "Without GPS nothing sets the lat/lon origin, and without it there is no home. The GCS or the bridge sets the origin once; a second time gives \"EKF3: origin already set\"."
+    },
+    {
+      "q": "A log fragment from a hover on external navigation. What happened, and what did the bridge fail to do?",
+      "kind": "apply",
+      "fragment": "    t   VISP.PX  XKF1.PN  XKF3.IPN  XKF4.SP  VISP.Rst\n  44.2    -0.04    -0.00     -0.01     0.02      0\n  45.2     2.02    -0.01     -2.00     1.36      0\n  46.3     2.00    -0.01     -1.99     1.12      0\n  47.3     1.86     1.70      0.08     0.11      0",
+      "options": [
+        "The source delay grew by 2 s; the bridge did not update VISO_DELAY_MS and the timestamps",
+        "The source shifted the pose by 2 m in a jump; the bridge did not increment reset_counter",
+        "The barometer failed; the bridge did not send altitude",
+        "The X and Y axes are swapped; the bridge did not convert ENU to NED"
+      ],
+      "answer": 1,
+      "explain": "VISP.PX steps by +2 m, the innovation is −2 m, SP > 1, so the measurements are rejected, and Rst stayed at 0. After 2 s the EKF accepted the new pose and the vehicle flew off to \"correct\" the error. With reset_counter the EKF would have moved the position at once, and the controller would have shifted the target."
+    },
+    {
+      "q": "EK3_FLOW_MAX = 2.5 rad/s, flying on flow alone at a height of 2 m. What ground speed limit will the EKF impose?",
+      "options": [
+        "1.5 m/s",
+        "3 m/s",
+        "5 m/s",
+        "7 m/s"
+      ],
+      "answer": 1,
+      "explain": "ekfGndSpdLimit = (EK3_FLOW_MAX − 1) · h = 1.5 · 2 = 3 m/s: 1 rad/s is reserved for body rotation. Before 4.7 the parameter was called EK3_MAX_FLOW."
+    },
+    {
+      "q": "In the lab, with X/Y swapped, the vehicle flew off by hundreds of meters. Why did the EKF not save it?",
+      "options": [
+        "The position innovation gate was disabled by EK3_POS_I_GATE = 0",
+        "The EKF rejected the measurements, but after 7 s without position it reset to the source",
+        "External navigation does not go through the innovation check",
+        "The compass overrode the heading and hid the error"
+      ],
+      "answer": 1,
+      "explain": "SP was 5–7, so the measurements were rejected, but on the position timeout (posRetryTimeNoVel_ms = 7000) the EKF resets to the only source. Wrong axes are caught only by the hand check before takeoff."
+    },
+    {
+      "q": "Which limitation of beacons (BCN_TYPE) in ArduPilot 4.6 is correct?",
+      "options": [
+        "No more than 4 anchors, a compass is required",
+        "Mocap is needed to calibrate the anchors",
+        "They work only with EKF2",
+        "Heading comes from the beacons, so the compass is disabled"
+      ],
+      "answer": 0,
+      "explain": "AP_BEACON_MAX_BEACONS = 4; EKF3 starts fusing ranges only after yaw alignment, and beacons give no heading, so EK3_SRC1_YAW = 1."
+    },
+    {
+      "q": "An ODOMETRY message with frame_id = MAV_FRAME_LOCAL_NED and child_frame_id = MAV_FRAME_BODY_FRD reaches ArduPilot 4.6 with VISO_TYPE = 1. The result?",
+      "options": [
+        "Position is accepted, velocity is ignored",
+        "The message is silently dropped",
+        "Position is automatically converted to FRD",
+        "The EKF switches to the SRC2 set"
+      ],
+      "answer": 1,
+      "explain": "handle_odometry accepts only the MAV_FRAME_LOCAL_FRD / MAV_FRAME_BODY_FRD pair and simply returns on anything else: there will be no VISP in the log, and pre-arm will say \"VisOdom: not healthy\"."
+    }
+  ]
+}

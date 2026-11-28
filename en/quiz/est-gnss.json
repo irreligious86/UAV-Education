@@ -16,24 +16,24 @@
     {
       "q": "What is HDOP?",
       "options": [
-        "Position accuracy in meters",
-        "An error multiplier from geometry",
-        "Satellite count",
-        "Update rate"
+        "Horizontal position accuracy in meters",
+        "An error multiplier from the geometry",
+        "The satellite count",
+        "The update rate"
       ],
       "answer": 1,
       "explain": "All satellites on one side of the sky means a large DOP."
     },
     {
-      "q": "What is more accurate from a GPS receiver?",
+      "q": "Which is more accurate from a GPS receiver?",
       "options": [
         "Position",
         "Velocity",
         "Altitude",
-        "Heading in a hover"
+        "Heading in hover"
       ],
       "answer": 1,
-      "explain": "Doppler velocity: 0.05–0.2 m/s versus 1.5–3 m for position."
+      "explain": "Doppler velocity: 0.05–0.2 m/s against 1.5–3 m for position."
     },
     {
       "q": "Which u-blox dynamic model suits a drone?",
@@ -44,26 +44,26 @@
         "Stationary"
       ],
       "answer": 2,
-      "explain": "The pedestrian/automotive models smooth and lag."
+      "explain": "The pedestrian and automotive models smooth and lag."
     },
     {
       "q": "What does RTK give you?",
       "options": [
-        "Protection against jamming and spoofing",
+        "Protection from jamming and spoofing",
         "Centimeters from the carrier phase",
         "More satellites",
         "Operation under a roof"
       ],
       "answer": 1,
-      "explain": "You need a dual-frequency receiver, a base and an RTCM stream."
+      "explain": "It needs a carrier-phase receiver (in practice dual-frequency), a base and an RTCM stream."
     },
     {
-      "q": "The main technique against multipath from the frame:",
+      "q": "The main remedy for multipath from the frame:",
       "options": [
         "More power",
         "A higher antenna, a ground plane",
         "A 25 Hz rate",
-        "Turn off GLONASS and keep GPS only"
+        "Disable GLONASS and keep only GPS"
       ],
       "answer": 1,
       "explain": "Reflections from the frame and the ground are the main source of jumps."
@@ -71,46 +71,46 @@
     {
       "q": "What GPS rate is reasonable for a copter in ArduPilot?",
       "options": [
-        "5 Hz (GPS1_RATE_MS = 200; before 4.6 — GPS_RATE_MS)",
-        "1 Hz — saves traffic and less load on the UART",
-        "50 Hz — the more often, the better",
-        "The rate doesn't matter to the EKF"
+        "5 Hz (GPS1_RATE_MS = 200; before 4.6, GPS_RATE_MS)",
+        "1 Hz: saves traffic and loads the UART less",
+        "50 Hz: the more often the better",
+        "The rate does not matter to the EKF"
       ],
       "answer": 0,
-      "explain": "5–10 Hz is enough; the EKF gains nothing above that, while the UART and the receiver get loaded."
+      "explain": "5–10 Hz is enough; above that the EKF gains nothing, while the UART and the receiver get loaded."
     },
     {
       "q": "Why is UBX better than NMEA for an autopilot?",
       "options": [
         "Every ground station and radio understands it without setup",
         "It carries the camera video",
-        "NMEA can't do coordinates",
-        "It's binary, more compact and has quality status"
+        "NMEA cannot carry coordinates",
+        "It is binary, more compact and carries quality status"
       ],
       "answer": 3,
-      "explain": "UBX is more compact and carries accuracy and status fields that NMEA lacks or has only partially."
+      "explain": "UBX is more compact and carries accuracy and status fields that NMEA lacks or carries only partly."
     },
     {
-      "q": "ArduCopter 4.7.2, GPS с 3D fix видит 5 спутников. Что ответит автопилот на попытку армить в Loiter?",
+      "q": "ArduCopter 4.7.2, a GPS with a 3D fix sees 5 satellites. How does the autopilot respond to an attempt to arm in Loiter?",
       "options": [
-        "Армится: 5 спутников достаточно для 3D fix",
-        "«PreArm: AHRS: waiting for home» — EKF3 не взял GPS (нужно 6), дома нет",
-        "«Arm: High GPS HDOP» — порог `GPS_HDOP_GOOD`",
-        "«GPS 1: Bad fix» — нужен fix 4 и выше"
+        "It arms: 5 satellites are enough for a 3D fix",
+        "\"PreArm: AHRS: waiting for home\": EKF3 did not take GPS (it needs 6), so there is no home",
+        "\"Arm: High GPS HDOP\": the `GPS_HDOP_GOOD` threshold",
+        "\"GPS 1: Bad fix\": it needs fix 4 or higher"
       ],
       "answer": 1,
-      "explain": "EKF3 требует ≥ 6 спутников (`EK3_GPS_CHECK` бит 0); без GPS в EKF дом не ставится, и сообщение арма называет следствие. В SITL: 5 спутников — отказ, 6 — арм."
+      "explain": "EKF3 requires ≥ 6 satellites (`EK3_GPS_CHECK` bit 0); without GPS in the EKF home is not set, and the arming message names the consequence. In SITL: 5 satellites, refused; 6, armed."
     },
     {
-      "q": "u-blox MAX-M10S с набором созвездий по умолчанию (GPS + Galileo + BeiDou B1I) в обычном режиме выдаёт навигационное решение с частотой до:",
+      "q": "A u-blox MAX-M10S with the default constellation set (GPS + Galileo + BeiDou B1I) in normal mode outputs a navigation solution at up to:",
       "options": [
-        "3 Гц",
-        "10 Гц",
-        "18 Гц",
-        "25 Гц"
+        "3 Hz",
+        "10 Hz",
+        "18 Hz",
+        "25 Hz"
       ],
       "answer": 0,
-      "explain": "По даташиту UBX-20035208: 3 Гц для GPS + GAL + BDS B1I, 10 Гц для GPS + GAL; 25 Гц на четырёх созвездиях — это NEO-M9N."
+      "explain": "Per datasheet UBX-20035208: 3 Hz for GPS + GAL + BDS B1I, 10 Hz for GPS + GAL; 25 Hz on four constellations is the NEO-M9N."
     }
   ]
 }

@@ -3,18 +3,18 @@
   "pass": 80,
   "questions": [
     {
-      "q": "What does the accelerometer measure in a steady hover?",
+      "q": "What does an accelerometer measure in steady hover?",
       "options": [
-        "Motion acceleration",
-        "Specific force of ~1 g",
+        "The acceleration of motion",
+        "A specific force of ~1 g",
         "Zero",
         "Velocity"
       ],
       "answer": 1,
-      "explain": "The accelerometer measures the support reaction force/specific force, not acceleration relative to the ground."
+      "explain": "An accelerometer measures the support reaction, the specific force, not the acceleration relative to the ground."
     },
     {
-      "q": "A gyro bias of 0.05 °/s, when integrated, gives an angle error per minute of:",
+      "q": "Integrated, a gyro bias of 0.05 °/s gives an angle error per minute of:",
       "options": [
         "0.05°",
         "0.5°",
@@ -25,21 +25,21 @@
       "explain": "0.05 °/s × 60 s = 3°."
     },
     {
-      "q": "What does the 6-position accelerometer calibration calibrate?",
+      "q": "What does a 6-position accelerometer calibration calibrate?",
       "options": [
         "Only the zero",
-        "Bias and scale per axis",
-        "Temperature",
-        "Gyro temperature drift"
+        "Per-axis bias and scale",
+        "The temperature",
+        "The gyro temperature drift"
       ],
       "answer": 1,
-      "explain": "Six known orientations give a system of equations for the offsets and scales."
+      "explain": "Six known orientations give a system for the offsets and scales."
     },
     {
-      "q": "In compass calibration, hard iron is:",
+      "q": "Hard iron in compass calibration is:",
       "options": [
         "Distortion into an ellipsoid",
-        "A constant field offset",
+        "A constant offset of the field",
         "Interference from motor current",
         "An orientation error"
       ],
@@ -49,7 +49,7 @@
     {
       "q": "What does VIBE.Clip > 0 mean in ArduPilot?",
       "options": [
-        "The barometer drifts from heating",
+        "The barometer drifts as it heats up",
         "The accelerometer is saturating",
         "The compass is lying",
         "The baro is drifting"
@@ -60,7 +60,7 @@
     {
       "q": "Which biases does EKF3 estimate in flight?",
       "options": [
-        "Only compass and barometer",
+        "Only the compass and barometer",
         "Gyro and accelerometer",
         "None",
         "Magnetic declination"
@@ -69,26 +69,26 @@
       "explain": "Sensor biases are part of the EKF3 state vector."
     },
     {
-      "q": "Why does a compass give a wrong heading without knowing roll/pitch?",
+      "q": "Why does a compass give the wrong heading without knowing roll and pitch?",
       "options": [
         "The Earth's field is weak",
-        "The vertical component of the field leaks into the axes",
-        "It only works horizontally",
+        "The vertical field component leaks into the axes",
+        "It works only when level",
         "Because of GPS"
       ],
       "answer": 1,
       "explain": "The large vertical component (inclination up to 70°) projects onto the horizontal axes when tilted."
     },
     {
-      "q": "Why does the gyro bias change after power-up?",
+      "q": "Why does the gyro bias change after power-on?",
       "options": [
         "Temperature drift as the board warms up",
-        "Because of a firmware change",
+        "Because the firmware changed",
         "It grows with flight altitude",
-        "Bias never changes"
+        "The bias never changes"
       ],
       "answer": 0,
-      "explain": "Temperature drift of 0.01–0.05 °/s per °C: the board warming up shifts the bias."
+      "explain": "Temperature drift of 0.005–0.05 °/s per °C: the board warming up shifts the bias."
     }
   ]
 }

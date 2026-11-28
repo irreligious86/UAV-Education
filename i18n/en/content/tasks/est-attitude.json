@@ -22,12 +22,12 @@
    "answer": "w*t*60",
    "unit": "°",
    "tol": 0.01,
-   "solution": "Heading error = bias · time."
+   "solution": "Heading error = bias × time."
   },
   {
    "id": "mahony-steady",
-   "title": "Постоянная ошибка Mahony без интегратора",
-   "statement": "Фильтр Mahony с **Kp = {kp}** и Ki = 0. Остаточный bias гироскопа по крену и тангажу (модуль вектора) **{b} °/с**. Какая постоянная ошибка наклона (°) установится на висении?",
+   "title": "Constant Mahony error without an integrator",
+   "statement": "A Mahony filter with **Kp = {kp}** and Ki = 0. The residual gyro bias in roll and pitch (vector magnitude) is **{b} °/s**. What constant tilt error (°) settles in hover?",
    "params": {
     "kp": [
      0.1,
@@ -48,12 +48,12 @@
    "answer": "b/kp",
    "unit": "°",
    "tol": 0.01,
-   "solution": "В установившемся режиме поправка Kp·e уравновешивает bias: e = b/Kp (в радианах; если b взят в °/с, ответ сразу в градусах). Пример модуля: 0.583 °/с и Kp = 0.25 → 2.33°. Интегратор Ki или калибровка гироскопа убирают эту ошибку."
+   "solution": "In steady state the Kp·e correction balances the bias: e = b/Kp (in radians; if b is in °/s, the answer comes out directly in degrees). The module's example: 0.583 °/s and Kp = 0.25 → 2.33°. The Ki integrator or gyro calibration removes this error."
   },
   {
    "id": "false-tilt",
-   "title": "Ложный наклон по акселерометру при разгоне",
-   "statement": "Коптер разгоняется горизонтально с ускорением **{a} м/с²**. На сколько градусов ошибётся наклон, посчитанный только по акселерометру (g = 9.81 м/с²)?",
+   "title": "False accelerometer tilt during acceleration",
+   "statement": "A copter accelerates horizontally at **{a} m/s²**. By how many degrees is the tilt computed from the accelerometer alone wrong (g = 9.81 m/s²)?",
    "params": {
     "a": {
      "min": 0.5,
@@ -64,12 +64,12 @@
    "answer": "math.degrees(math.atan(a/9.81))",
    "unit": "°",
    "tol": 0.01,
-   "solution": "Акселерометр видит удельную силу f = a − g; её направление отклонено от вертикали на atan(a/g). При 4 м/с² — 22.2°, а |f| = 1.08 g ещё внутри окна 0.9–1.1 g Betaflight."
+   "solution": "The accelerometer sees the specific force f = a − g; its direction is tilted from vertical by atan(a/g). At 4 m/s² that is 22.2°, while |f| = 1.08 g is still inside the Betaflight 0.9–1.1 g window."
   },
   {
    "id": "turn-g",
-   "title": "Модуль ускорения в координированном вираже",
-   "statement": "Самолёт выполняет координированный вираж с креном **{phi}°**. Какой модуль удельной силы (в g) покажет акселерометр? Пройдёт ли он окно Betaflight 0.9–1.1 g — проверь сам.",
+   "title": "Acceleration magnitude in a coordinated turn",
+   "statement": "A plane flies a coordinated turn banked **{phi}°**. What specific-force magnitude (in g) will the accelerometer show? Check yourself whether it passes the Betaflight 0.9–1.1 g window.",
    "params": {
     "phi": {
      "min": 5,
@@ -80,7 +80,7 @@
    "answer": "1/math.cos(math.radians(phi))",
    "unit": "g",
    "tol": 0.005,
-   "solution": "В координированном вираже равнодействующая направлена вдоль оси Z аппарата: |f| = g/cos φ, а наклон по акселерометру — 0°. При 30° — 1.155 g (вне окна), при 25° — 1.103 g (на волосок вне окна), при 20° — 1.064 g (внутри окна: Betaflight примет ложный горизонт)."
+   "solution": "In a coordinated turn the resultant force points along the vehicle's Z axis: |f| = g/cos φ, and the accelerometer tilt is 0°. At 30° it is 1.155 g (outside the window), at 25° 1.103 g (just outside the window), at 20° 1.064 g (inside the window: Betaflight will accept the false horizon)."
   }
  ]
 }

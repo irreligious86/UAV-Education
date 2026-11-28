@@ -1,0 +1,86 @@
+{
+ "module": "nav-rtk",
+ "tasks": [
+  {
+   "id": "rtk-ppm",
+   "title": "RTK accuracy versus baseline length",
+   "statement": "A ZED-F9P rover in RTK fixed, an NTRIP base station **{d} km** away. Per the data sheet the accuracy is 0.01 m + 1 ppm. Find the expected horizontal error (cm, CEP).",
+   "params": {
+    "d": {
+     "min": 1,
+     "max": 60,
+     "step": 1
+    }
+   },
+   "answer": "1 + 0.1*d",
+   "unit": "cm",
+   "tol": 0.02,
+   "solution": "1 ppm = 1 mm per 1 km: error = 1 cm + 0.1 cm/km · d. At 20 km it is 3 cm, at 60 km 7 cm, which is why the station is chosen closer than 50–100 km."
+  },
+  {
+   "id": "mb-yaw-sigma",
+   "title": "Moving-baseline heading error",
+   "statement": "Two antennas are **{L} cm** apart, and the RTK relative vector accuracy is σ = **{s} cm**. Estimate the heading error (degrees, σ_yaw ≈ atan(σ/L)).",
+   "params": {
+    "L": {
+     "min": 20,
+     "max": 120,
+     "step": 5
+    },
+    "s": {
+     "min": 0.5,
+     "max": 2.0,
+     "step": 0.25
+    }
+   },
+   "answer": "math.degrees(math.atan(s/L))",
+   "unit": "°",
+   "tol": 0.02,
+   "solution": "σ_yaw = atan(σ_rel / L): 1 cm over 1 m gives 0.57°, the same 1 cm over 30 cm gives 1.9°. Hence the ArduPilot wiki's recommendation of ≥ 30 cm between the antennas (the code rejects only < 5 cm); the 0.4° in the F9P data sheet is given in a table without a baseline length (the length dependence is in a separate figure)."
+  },
+  {
+   "id": "mb-baseline-check",
+   "title": "The ArduPilot baseline check tolerance",
+   "statement": "The base sits at **GPS1_POS_Y = −{a} cm**, the rover at **GPS2_POS_Y = +{b} cm**. The receiver reports a baseline length of **{L} cm**. The ArduPilot driver allows a mismatch of no more than 20% of the smaller of the two lengths. Find the maximum allowed mismatch (cm).",
+   "params": {
+    "a": {
+     "min": 10,
+     "max": 40,
+     "step": 5
+    },
+    "b": {
+     "min": 10,
+     "max": 40,
+     "step": 5
+    },
+    "L": {
+     "min": 20,
+     "max": 80,
+     "step": 2
+    }
+   },
+   "answer": "0.2*min(a+b, L)",
+   "unit": "cm",
+   "tol": 0.02,
+   "solution": "Configured length = a + b (the antennas are on opposite sides of the center). In calculate_moving_base_yaw(): |offset − reported| ≤ 0.2 · min(offset, reported). If the actual mismatch is larger, no heading is output (GPS2_RAW.yaw = 65535)."
+  },
+  {
+   "id": "mb-link-latency",
+   "title": "RTCM latency budget for a moving base",
+   "statement": "The rover computes heading at **{f} Hz**. Per the u-blox application note, the RTCM delivery latency from the base must be below the navigation period minus 50 ms. Find the allowed latency (ms).",
+   "params": {
+    "f": [
+     1,
+     2,
+     4,
+     5,
+     8
+    ]
+   },
+   "answer": "1000/f - 50",
+   "unit": "ms",
+   "tol": 0.01,
+   "solution": "T = 1000/f ms; the allowance is T − 50 ms: at 5 Hz that is 150 ms, at 1 Hz 950 ms. Hence a UART2↔UART2 crossover at 460800 baud for 5 Hz, and a relaxed 38400 baud for 1 Hz."
+  }
+ ]
+}

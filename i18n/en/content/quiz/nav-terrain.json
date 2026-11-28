@@ -1,0 +1,96 @@
+{
+  "module": "nav-terrain",
+  "pass": 80,
+  "questions": [
+    {
+      "q": "Copter 4.7: `TERRAIN_ENABLE = 1`, tiles loaded, a downward rangefinder configured, `WP_RFND_USE = 1`. In AUTO on terrain items the rangefinder goes OutOfRangeHigh. What happens?",
+      "options": [
+        "The flight controller switches to the terrain database and continues the mission without stopping",
+        "The mission continues at the last known barometric altitude until the next item",
+        "The vehicle stops in Loiter and waits for the rangefinder to come back into range",
+        "After 5 s (or immediately at an item change): a terrain failsafe and RTL"
+      ],
+      "answer": 3,
+      "explain": "AC_WPNav::get_terrain_source() chooses the rangefinder if it is configured and WP_RFND_USE = 1 (before 4.7, WPNAV_RFND_USE); there is no fallback to the database. An unhealthy rangefinder = \"no data\" → terrain failsafe: in 4.7 the message is \"Failsafe: Terrain Rangefinder Unhealthy\" (in 4.6, \"Failsafe: Terrain data missing\"), RTL, MODE.Rsn 11."
+    },
+    {
+      "q": "A mission log fragment: takeoff to 40 m (Relative frame), then Terrain-frame items. Why RTL?",
+      "kind": "apply",
+      "fragment": "PARM RNGFND1_MAX_CM 2500   PARM WPNAV_RFND_USE 1   TERR Pending=0 Loaded=392\nt=287.8 RFND.Stat 4 -> 3  Dist=25.0  CTUN.Alt=23.8\nt=296.0 MSG Mission: 2 WP\nt=296.0 MSG Failsafe: Terrain data missing\nt=296.0 ERR Subsys 23 ECode 1\nt=296.0 MODE Mode 6 Rsn 11",
+      "options": [
+        "The terrain database tiles did not finish loading before takeoff, and the database is the main source",
+        "The 40 m target is beyond the sensor's 25 m range, and the terrain source is the rangefinder",
+        "The EKF rejected the barometer, and the height above home became unreliable during the climb",
+        "An altitude geofence fired: the 40 m target exceeds the rangefinder limit of 25 m"
+      ],
+      "answer": 1,
+      "explain": "The log fragment was captured on Copter 4.6.3: RNGFND1_MAX_CM 2500 and WPNAV_RFND_USE are called RNGFND1_MAX = 25 (m) and WP_RFND_USE in 4.7. Loaded=392, Pending=0: the database is in place, but with WP_RFND_USE = 1 only the rangefinder is used. Stat 3 = OutOfRangeHigh from 25 m; the first terrain item could not get a height, so the failsafe fired in the same second. The fix is WP_RFND_USE = 0 or a sensor with range to spare."
+    },
+    {
+      "q": "A Terrain-frame mission at 40 m, `WP_SPD = 12`, `WP_SPD_UP = 2.5` (m/s). A 30% slope lies ahead. What happens on the climb?",
+      "options": [
+        "It needs 3.6 m/s up against a 2.5 limit: the height above ground sags on the climb",
+        "Nothing: the flight controller climbs early, looking at the terrain ahead along its course",
+        "A terrain failsafe fires: the grade exceeds what a 100 m database grid allows",
+        "The vehicle stops at the foot of the slope and climbs vertically, as on takeoff"
+      ],
+      "answer": 0,
+      "explain": "Required climb = V · grade = 12 · 0.30 = 3.6 m/s. Copter does not look ahead; anything beyond WP_SPD_UP is lost AGL until the error exceeds half of WP_TER_MARGIN and the flight controller cuts the ground speed (before 4.7: WPNAV_SPEED = 1200 and WPNAV_SPEED_UP = 250 in cm/s, WPNAV_TER_MARGIN). In the lab, on 35% the minimum was 23.5 m out of 40."
+    },
+    {
+      "q": "Home is at 588 m AMSL, with an 876 m ridge between the vehicle and home. `RTL_ALT_TYPE = 0`, `RTL_ALT_M = 15`, and the vehicle is in the valley beyond the ridge, 78 m above home. What will RTL do?",
+      "options": [
+        "Climb to 15 m above terrain and follow the slope",
+        "Climb to the ridge height plus `RTL_ALT_M` using the terrain database",
+        "Head home at the current 78 m above home, into the slope",
+        "Refuse RTL and Land at the current location"
+      ],
+      "answer": 2,
+      "explain": "Type 0 is height above home: max(current, RTL_ALT_M) = 78 m above home = 666 m AMSL, and the ridge is 210 m higher. In SITL: impact with the slope at 3.63 km. You need RTL_ALT_M above the ridge (288 m + margin) or rally points. Before 4.7 the parameter was called RTL_ALT and was set in centimeters (1500)."
+    },
+    {
+      "q": "What does `TERRAIN_MARGIN` set?",
+      "options": [
+        "The minimum height above terrain below which the mission is aborted",
+        "The coordinate tolerance when accepting terrain blocks from the GCS",
+        "The altitude error at which AUTO starts reducing ground speed",
+        "The limit of the terrain database shift at arming to match the home height"
+      ],
+      "answer": 1,
+      "explain": "It is the \"acceptance margin\" for data from the GCS and has nothing to do with safety. Braking on altitude error is WP_TER_MARGIN (10 m; before 4.7, WPNAV_TER_MARGIN), the database shift at arming is TERRAIN_OFS_MAX (30 m), and TERRAIN_* has no minimum height above terrain at all."
+    },
+    {
+      "q": "A mission on the terrain database at 30 m over a 25 m tall forest. Why is this a bad idea?",
+      "options": [
+        "Over a forest the flight controller cannot load tiles, so pre-arm will not pass",
+        "The terrain database works only above 60 m; below that ArduPilot ignores it",
+        "A 100 m grid and an error of about 10 m: the margin over the canopy can go negative",
+        "`TERRAIN_OFS_MAX` shifts the database 30 m down, and the vehicle descends into the canopy"
+      ],
+      "answer": 2,
+      "explain": "The canopy is only partly in the database, the grid smooths, and the typical error is ±10 m (up to 35 m on summits). 30 − 25 − 10 < 0. The ArduPilot documentation considers following on the database usable from 60 m; below that, a rangefinder and open terrain."
+    },
+    {
+      "q": "PX4 1.15, Position mode, `MPC_ALT_MODE = 1`. The vehicle climbed above the distance sensor's range. What happens?",
+      "options": [
+        "A failsafe with return fires, as in ArduCopter on terrain loss",
+        "PX4 takes the terrain height from an on-board SRTM database on the SD card",
+        "The vehicle starts descending until the sensor sees the ground again",
+        "PX4 switches to EKF altitude hold without any warning"
+      ],
+      "answer": 3,
+      "explain": "With an invalid distance-to-ground estimate the controller returns to altitude relative to the origin (altitude following). PX4 has no on-board terrain database; in missions only QGroundControl accounts for terrain, at planning time."
+    },
+    {
+      "q": "ArduPlane: why does it need `TERRAIN_LOOKAHD` (2000 m) when Copter has no such parameter?",
+      "options": [
+        "The plane requests tiles from the GCS 2 km ahead, while Copter loads them on the spot",
+        "It is the distance at which the plane switches from the rangefinder to the terrain database",
+        "The plane looks at the terrain ahead along its course and starts climbing early, before the slope",
+        "It is the radius within which the plane's RTL counts height above terrain rather than above home"
+      ],
+      "answer": 2,
+      "explain": "A plane's climb rate is limited by its thrust-to-weight ratio, and it cannot stop and climb in place, so its altitude target takes the terrain ahead into account (in AUTO, no farther than the next waypoint). Copter follows the ground below itself, and only slowing down saves it."
+    }
+  ]
+}

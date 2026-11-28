@@ -62,7 +62,7 @@ def build(D: dict) -> None:
         [Box("base", ["F9P база", "GPS1_TYPE = 17", "RTCM 4072.0 + MSM4"], 10, 30, 160, 54, accent=True),
          Box("rover", ["F9P ровер", "GPS2_TYPE = 18", "UBX-NAV-RELPOSNED"], 10, 140, 160, 54, accent=True),
          Box("drv", ["AP_GPS_UBLOX", "relPosHeading, Length", "carrSoln = fixed?"], 250, 30, 180, 54),
-         Box("chk", ["Проверка базы", "L ≥ 5 см, fix = 6,", "|L − L_POS| ≤ 20 %"], 250, 140, 180, 54),
+         Box("chk", ["Проверка базы", "L ≥ 5 см, D по наклону,", "|L − L_POS| ≤ 20 %"], 250, 140, 180, 54),
          Box("out", ["GPS2_RAW.yaw", "0 / 65535 / 1…36000", "лог GPS.Yaw, GPA.YAcc"], 250, 250, 180, 54),
          Box("ekf", ["EKF3", "EK3_SRC1_YAW = 2 / 3", "σ_yaw ≥ 5°, XKF3.IYAW"], 520, 140, 180, 54, accent=True)],
         [("base", "rover", "UART2→UART2, 1–5 Гц", True, "v"), ("rover", "drv", "UART1 → FC", False, "h"), ("drv", "chk", "", False, "v"),

@@ -88,7 +88,7 @@
         "Перезавантажує польотник"
       ],
       "answer": 0,
-      "explain": "Якщо позиції немає довше ніж ~2 с, INAV у RTH/WP переходить в Emergency Landing: коптер в ANGLE знижується на failsafe_throttle і вимикає мотори через failsafe_off_delay (за нульових значень — фактично DROP). failsafe_procedure — реакція на втрату RC, а не GPS; крило з inav_allow_gps_fix_estimation може продовжити повернення за оцінкою."
+      "explain": "Якщо позиції немає довше ніж nav_position_timeout (5 с), INAV у RTH/WP переходить в Emergency Landing: поки є оцінка висоти, коптер знижується з контролем швидкості (nav_emerg_landing_speed) до детектора посадки; failsafe_throttle використовується, лише якщо немає й висоти. failsafe_procedure — реакція на втрату RC, а не GPS; крило з inav_allow_gps_fix_estimation може продовжити повернення за оцінкою."
     }
   ]
 }

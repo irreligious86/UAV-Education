@@ -63,17 +63,17 @@ next:
 Дальше поправки едут в аппарат по телеметрии: **Mission Planner → Setup → Optional Hardware → RTK/GPS Inject** режет поток на пакеты `GPS_RTCM_DATA` (id 233; `flags`: бит 0 — фрагментирован, биты 1–2 — номер фрагмента, биты 3–7 — sequence id; `data[180]`). Старый `GPS_INJECT_DATA` (id 123, 110 байт) в MAVLink помечен superseded с 2022-05, ArduPilot его ещё принимает. На борту `AP_GPS::handle_gps_rtcm_fragment()` собирает фрагменты и пишет байты в UART приёмника, выбранного `GPS_INJECT_TO` (0 — первый, 1 — второй, 127 — все). `GPA.RTCMFU/RTCMFD` в логе — фрагменты использованные/выброшенные. При двух источниках RTCM драйвер начинает полный разбор сообщений; бит 6 `GPS_DRV_OPTIONS` включает его принудительно, бит 7 — запрещает. Альтернатива без GCS: радиомодем базы прямо в UART2 ровера.
 
 ### Состояния fix и возраст поправок
-`GPS_RAW_INT.fix_type` и `GPS.Status` в логе — одна шкала `AP_GPS::GPS_Status`: 0 нет GPS, 1 нет fix, 2 — 2D, 3 — 3D, 4 — DGPS, **5 — RTK float**, **6 — RTK fixed**. Float — неоднозначности ещё вещественные, точность порядка 10–50 см и «плывёт» (практический ориентир, в data sheet u-blox такой цифры нет); fixed — целочисленные, 1–3 см. У u-blox статус берётся из `carrSoln` в UBX-NAV-PVT. Важно: драйвер u-blox в ArduPilot не заполняет `rtk_age_ms` (проверено по исходнику 4.6.3 и 4.7.2), поэтому `GPS2_RAW.dgps_age` для F9P всегда 0 (в `GPS_RAW_INT` такого поля нет вовсе) — возраст поправок смотри в Mission Planner (окно RTK) или по `RTCMFU`; `dgps_age` честно заполняют только драйверы ERB, NOVA и SBF. EKF3 не различает float и fixed: шум измерения позиции он берёт как `max(GPA.HAcc, EK3_POSNE_M_NSE)²`, а `EK3_POSNE_M_NSE` у Copter по умолчанию 0.5 м (`AP_NavEKF3_PosVelFusion.cpp`, `R_OBS[3]`). Сантиметры RTK попадают в фильтр, только если снизить этот параметр (0.1–0.2 м для посадки); то же для скорости — `EK3_GPS_V_NSE` 0.3 м/с.
+`GPS_RAW_INT.fix_type` и `GPS.Status` в логе — одна шкала `AP_GPS::GPS_Status`: 0 нет GPS, 1 нет fix, 2 — 2D, 3 — 3D, 4 — DGPS, **5 — RTK float**, **6 — RTK fixed**. Float — неоднозначности ещё вещественные, точность порядка 10–50 см и «плывёт» (практический ориентир, в data sheet u-blox такой цифры нет); fixed — целочисленные, 1–3 см. У u-blox статус берётся из `carrSoln` в UBX-NAV-PVT. Важно: драйвер u-blox в ArduPilot не заполняет `rtk_age_ms` (проверено по исходнику 4.6.3 и 4.7.3), поэтому `GPS2_RAW.dgps_age` для F9P всегда 0 (в `GPS_RAW_INT` такого поля нет вовсе) — возраст поправок смотри в Mission Planner (окно RTK) или по `RTCMFU`; `dgps_age` честно заполняют только драйверы ERB, NOVA и SBF. EKF3 не различает float и fixed: шум измерения позиции он берёт как `max(GPA.HAcc, EK3_POSNE_M_NSE)²`, а `EK3_POSNE_M_NSE` у Copter по умолчанию 0.5 м (`AP_NavEKF3_PosVelFusion.cpp`, `R_OBS[3]`). Сантиметры RTK попадают в фильтр, только если снизить этот параметр (0.1–0.2 м для посадки); то же для скорости — `EK3_VELNE_M_NSE` 0.3 м/с у Copter (0.5 у Plane и Rover).
 
 ### Moving baseline: курс по двум антеннам
-Если «база» стоит на самой раме, RTK решает вектор между антеннами с точностью около сантиметра; его направление — курс. Погрешность: σ_yaw ≈ atan(σ_rel / L); при σ_rel = 1 см и L = 1 м — 0.57°. Data sheet ZED-F9P-04B (табл. «moving base») даёт heading accuracy 0.4° без указания длины линии в таблице — зависимость от длины показана отдельным графиком; при L = 30 см по той же формуле выходит около 2° (оценка, не спецификация). ArduPilot требует ≥ 30 см между антеннами, u-blox для дрона называет 20–30 см. Курс есть **стоя на земле** — преимущество перед GSF (`EK3_SRC1_YAW = 8`), которому нужно движение, и перед компасом у силовых проводов.
+Если «база» стоит на самой раме, RTK решает вектор между антеннами с точностью около сантиметра; его направление — курс. Погрешность: σ_yaw ≈ atan(σ_rel / L); при σ_rel = 1 см и L = 1 м — 0.57°. Data sheet ZED-F9P-04B (табл. «moving base») даёт heading accuracy 0.4° без указания длины линии в таблице — зависимость от длины показана отдельным графиком; при L = 30 см по той же формуле выходит около 2° (оценка, не спецификация). Вики ArduPilot рекомендует ≥ 30 см между антеннами (код отбрасывает только < 5 см), u-blox для дрона называет 20–30 см. Курс есть **стоя на земле** — преимущество перед GSF (`EK3_SRC1_YAW = 8`), которому нужно движение, и перед компасом у силовых проводов.
 
 {{diagram:rtk-mb-yaw-chain|База шлёт роверу 4072.0 + MSM4 по UART2, ровер отдаёт RELPOSNED, драйвер проверяет длину базовой линии против GPSx_POS и только при RTK fixed отдаёт курс в EKF3; любой сбой превращает GPS2_RAW.yaw в 65535.}}
 
 ArduPilot 4.7 (имена с индексом приёмника — с 4.6; до 4.6 они были без индекса: `GPS_TYPE`, `GPS_TYPE2`, `GPS_POS1_X`, `GPS_MB1_TYPE` — апгрейд переименовывает автоматически; между 4.6 и 4.7 имена `GPS*` не менялись):
 - `GPS1_TYPE = 17` (uBlox-MovingBaseline-Base), `GPS2_TYPE = 18` (Rover); DroneCAN — 22/23; Unicore UM982 — 25; Septentrio dual antenna — 26.
 - `GPS1_POS_X/Y/Z`, `GPS2_POS_X/Y/Z` — фазовые центры антенн относительно центра аппарата (X вперёд, Y вправо, Z вниз); из них драйвер считает ожидаемую линию. Или `GPS1_MB_TYPE = 1` и `GPS1_MB_OFS_X/Y/Z` — вектор базы относительно ровера напрямую. `GPS_YAW_OFFSET` в ArduPilot нет — ориентацию линии задают эти офсеты.
-- Проверки в `calculate_moving_base_yaw()`: линия ≥ 5 см, расхождение измеренной и заданной длины ≤ 20 % от меньшей из них, вертикальная составляющая — в пределах ожидаемой по наклону рамы ± 20 % длины, у ровера `fix = 6`. Иначе курс не отдаётся.
+- Проверки: драйвер u-blox пропускает RELPOSNED только при RTK-fixed относительном решении (флаги `carrSolnFixed`, `gnssFixOK`, `relPosValid`, `relPosHeadingValid`, `isMoving` выставлены, `carrSolnFloat`, `refPosMiss`, `refObsMiss` сброшены; `AP_GPS_UBLOX.cpp`), затем `calculate_moving_base_yaw()` требует линию ≥ 5 см, расхождение измеренной и заданной длины ≤ 20 % от меньшей из них, вертикальную составляющую в пределах ожидаемой по наклону рамы ± 20 % этой длины. Иначе курс не отдаётся.
 - `GPS_AUTO_SWITCH = 1` (UseBest); **не 2 (Blend)**. `GPS_DRV_OPTIONS` бит 0 — RTCM между модулями по кроссоверу UART2↔UART2 (иначе ArduPilot гоняет поправки базы через свой UART); бит 3 — то же по отдельному CAN.
 - `EK3_SRC1_YAW = 2` (GPS) или `3` (GPS с откатом на компас). EKF3 ограничивает заявленную точность снизу 5° (`min_yaw_accuracy_deg`), ворота — `EK3_YAW_I_GATE`. В логе: `GPS.Yaw`, `GPA.YAcc`, `XKF3.IYAW` (градусы), `XKF4.SM`.
 - `GPS2_RAW.yaw`: 0 — курс не настроен, 65535 — настроен, но сейчас недоступен, 1…36000 — сотые доли градуса (36000 = север). F9H как ровер сообщает фиктивную длину 1 м — проверка по длине линии с ним не работает.
@@ -88,12 +88,12 @@ ArduPilot 4.7 (имена с индексом приёмника — с 4.6; д�
 - **Если ошибиться здесь:** неверные `GPS1_POS_*` → измеренная длина линии расходится с заданной, курс не отдаётся (`GPS2_RAW.yaw` = 65535), EKF остаётся без yaw или откатывается на компас с его помехами (`ap-ekf`, `el-emi`). Связь с базой рвётся → поправки устаревают, статус падает из fixed в 3D, точность возвращается к метрам. Ошибка координат базы → на столько же сдвинута вся съёмка (`per-mapping`).
 
 ## practice
-Главный путь — SITL ArduCopter 4.6.3 (`arducopter -S --model + --defaults copter.parm,copter-gps-for-yaw.parm`). Симулятор u-blox всегда отдаёт `carrSoln = fixed` (`SIM_GPS_UBLOX.cpp`, `pvt.flags = 0b10000011`), поэтому `fix_type = 6` появляется без базы — конвенция SITL, не достижение. Зато moving baseline честный: при `SIM_GPS2_HDG = 1` второй приёмник считает RELPOSNED из `SIM_GPS_POS_Y`/`SIM_GPS2_POS_Y` и истинного курса модели. SIM-параметры первого приёмника в 4.6.3 без индекса (`SIM_GPS_ACC`), второго — с индексом (`SIM_GPS2_ACC`). В 4.7.2 индекс есть у обоих (`SIM_GPS1_POS_Y`, `SIM_GPS1_ACC`, `SIM_GPS1_HDG`), `SIM_GPS2_DISABLE 0` стал `SIM_GPS2_ENABLE 1`, а в эталонный файл добавлен `SIM_GPS1_HDG 4` — первый приёмник объявлен базой moving baseline.
+Главный путь — SITL ArduCopter 4.6.3 (`arducopter -S --model + --defaults copter.parm,copter-gps-for-yaw.parm`). Симулятор u-blox всегда отдаёт `carrSoln = fixed` (`SIM_GPS_UBLOX.cpp`, `pvt.flags = 0b10000011`), поэтому `fix_type = 6` появляется без базы — конвенция SITL, не достижение. Зато moving baseline честный: при `SIM_GPS2_HDG = 1` второй приёмник считает RELPOSNED из `SIM_GPS_POS_Y`/`SIM_GPS2_POS_Y` и истинного курса модели. SIM-параметры первого приёмника в 4.6.3 без индекса (`SIM_GPS_ACC`), второго — с индексом (`SIM_GPS2_ACC`). В 4.7.3 (как и в 4.7.2) индекс есть у обоих (`SIM_GPS1_POS_Y`, `SIM_GPS1_ACC`, `SIM_GPS1_HDG`), `SIM_GPS2_DISABLE 0` стал `SIM_GPS2_ENABLE 1`, а в эталонный файл добавлен `SIM_GPS1_HDG 4` — первый приёмник объявлен базой moving baseline.
 
 ### Шаг 1. Параметры стенда
-`Tools/autotest/default_params/copter-gps-for-yaw.parm` — эталон: `EK3_SRC1_YAW 2`, `GPS_AUTO_CONFIG 0`, `GPS1_TYPE 17`, `GPS2_TYPE 18`, `GPS1_POS_Y -0.2`, `GPS2_POS_Y 0.2`, те же `SIM_GPS_POS_Y`/`SIM_GPS2_POS_Y`, `SIM_GPS2_DISABLE 0`, `SIM_GPS2_HDG 1` (файл из 4.6.3; в 4.7.2 в нём `SIM_GPS1_POS_Y`, `SIM_GPS2_POS_Y`, `SIM_GPS2_ENABLE 1`, `SIM_GPS2_HDG 1`, `SIM_GPS1_HDG 4`). Линия 0.4 м поперёк рамы: база слева, ровер справа. Читаем параметры через pymavlink (фрагмент вывода):
+`Tools/autotest/default_params/copter-gps-for-yaw.parm` — эталон: `EK3_SRC1_YAW 2`, `GPS_AUTO_CONFIG 0`, `GPS1_TYPE 17`, `GPS2_TYPE 18`, `GPS1_POS_Y -0.2`, `GPS2_POS_Y 0.2`, те же `SIM_GPS_POS_Y`/`SIM_GPS2_POS_Y`, `SIM_GPS2_DISABLE 0`, `SIM_GPS2_HDG 1` (файл из 4.6.3; в 4.7.3 в нём `SIM_GPS1_POS_Y`, `SIM_GPS2_POS_Y`, `SIM_GPS2_ENABLE 1`, `SIM_GPS2_HDG 1`, `SIM_GPS1_HDG 4`). Линия 0.4 м поперёк рамы: база слева, ровер справа. Читаем параметры через pymavlink (скрипты `examples/sitl-nav-labs/rtk_mb_lab.py` и `rtk_mb_lab2.py`, запуск — в README папки; фрагмент вывода):
 
-Вывод снят на Copter-4.6.3; в 4.7.2 `SIM_GPS_HDG` и `SIM_GPS_ACC` называются `SIM_GPS1_HDG` и `SIM_GPS1_ACC`.
+Вывод снят на Copter-4.6.3; в 4.7.3 `SIM_GPS_HDG` и `SIM_GPS_ACC` называются `SIM_GPS1_HDG` и `SIM_GPS1_ACC`.
 
 ```
 == params (copter-gps-for-yaw.parm)
@@ -160,16 +160,22 @@ XKF4 {'C': 0, 'SV': 0.0, 'SP': 0.0, 'SM': 0.01, 'SS': 107327, 'PI': 0}
 `GPS.Status = 6` у обоих экземпляров, `GPA.Delta = 200` мс (5 Гц), `XKF3.IYAW = −0.29°` — инновация курса, `GPA.YAcc = 0` — SITL не моделирует `accHeading`; на железе здесь будет `accHeading` из RELPOSNED — порядка десятых долей градуса–единиц градусов в зависимости от длины линии и неба (ориентир, не спецификация).
 
 ### Шаг 5. Тип fix против точности на логе ровера
-Реального F9P-лога у курса нет, поэтому скрипт генерирует 300-секундный CSV (`t, fix_type, hacc_m, nsats, corr_age_s`): 3D → поправки с 20-й секунды → DGPS → float → fixed на 60-й; с 150-й обрыв NTRIP на 25 с, возраст поправок растёт до 26 с, fix откатывается fixed → float → 3D; повторная сходимость 15 с. hAcc по состояниям — из data sheet (1.5 м / 0.014 м) и типичного float 0.25 м. Тот же скрипт принимает настоящий CSV из u-center или из `GPS`+`GPA` лога:
+Реального F9P-лога у курса нет, поэтому скрипт `examples/sitl-nav-labs/rtk_fixlog.py` (60 строк; тот же набор лежит рядом как `rtk_fixlog.csv`) генерирует 300-секундный CSV (`t, fix_type, hacc_m, nsats, corr_age_s`): 3D → поправки с 20-й секунды → DGPS → float → fixed на 60-й; с 150-й обрыв NTRIP на 25 с, возраст поправок растёт до 26 с, fix откатывается fixed → float → 3D; повторная сходимость 15 с. hAcc по состояниям — из data sheet (1.5 м / 0.014 м) и типичного float 0.25 м. Тот же скрипт принимает настоящий CSV из u-center или из `GPS`+`GPA` лога:
 
 ```python
+# аналитическая часть rtk_fixlog.py; generate()/load() и график опущены
 rows = load(sys.argv[1]) if len(sys.argv) > 1 else generate()
+print(f"{len(rows)} fixes, {rows[-1][0] - rows[0][0]:.0f} s")
+print(f"{'fix':10} {'n':>4} {'share':>6} {'hAcc mean':>10} {'hAcc p95':>9}")
 for k in sorted(FIX):
     h = sorted(r[2] for r in rows if r[1] == k)
     if h:
         print(f"{FIX[k]:10} {len(h):4d} {len(h)/len(rows):6.1%} {sum(h)/len(h):8.3f} m {h[int(len(h)*0.95)]:7.3f} m")
+fixed = [r for r in rows if r[1] == 6]
+print(f"time-to-fixed from first correction: {fixed[0][0] - next(r[0] for r in rows if r[4] > 0):.0f} s")
 lost = [r for r in rows if r[4] >= 10]
-print(f"samples with correction age >= 10 s: {len(lost)}, worst age {max(r[4] for r in rows):.0f} s")
+print(f"samples with correction age >= 10 s: {len(lost)}, worst age {max(r[4] for r in rows):.0f} s, "
+      f"fix during them: {sorted(set(FIX[r[1]] for r in lost))}")
 ```
 
 ```
@@ -231,7 +237,7 @@ samples with correction age >= 10 s: 17, worst age 26 s, fix during them: ['3D',
 - u-blox — ZED-F9P Moving base application note | https://content.u-blox.com/sites/default/files/documents/ZED-F9P-MovingBase_AppNote_UBX-19009093.pdf | primary | A
 - PX4 — RTK GPS heading with dual u-blox F9P | https://docs.px4.io/v1.17/en/gps_compass/u-blox_f9p_heading.html | primary | A
 - PX4 — RTK GPS integration (QGC, GPS_RTCM_DATA, RTCM set) | https://docs.px4.io/v1.17/en/advanced/rtk_gps.html | primary | A
-- PX4 source v1.17.0 — `src/drivers/gps/params.c`, `src/modules/ekf2/params_gnss.yaml` | https://github.com/PX4/PX4-Autopilot/tree/v1.17.0 | primary | A
+- PX4 source v1.18.0 — `src/drivers/gps/params.yaml`, `src/modules/ekf2/params_gnss.yaml` | https://github.com/PX4/PX4-Autopilot/tree/v1.18.0 | primary | A
 - Mission Planner source — `ConfigSerialInjectGPS.cs`, `ExtLibs/Utilities/ubx_m8p.cs` (survey-in, RTCM rates, GPS_RTCM_DATA fragments) | https://github.com/ArduPilot/MissionPlanner | primary | B
 - RTK2go — community NTRIP caster | http://rtk2go.com/ | secondary | B
 

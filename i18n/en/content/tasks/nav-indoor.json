@@ -1,0 +1,101 @@
+{
+ "module": "nav-indoor",
+ "tasks": [
+  {
+   "id": "flow-speed-limit",
+   "title": "Optical flow speed limit",
+   "statement": "EKF3 runs on optical flow alone. `EK3_FLOW_MAX` = **{mf} rad/s**, the height above the floor is **{h} m**. What maximum ground speed will the EKF allow (m/s)? The margin for body rotation is 1 rad/s.",
+   "params": {
+    "mf": [
+     2.0,
+     2.5,
+     3.0,
+     4.0
+    ],
+    "h": {
+     "min": 0.5,
+     "max": 4,
+     "step": 0.25
+    }
+   },
+   "answer": "(mf-1)*h",
+   "unit": "m/s",
+   "tol": 0.02,
+   "solution": "`ekfGndSpdLimit` = (EK3_FLOW_MAX − 1 rad/s) · h: 1 rad/s for body rotation is subtracted from the sensor limit, and the rest is multiplied by the height (before 4.7 the parameter was called `EK3_MAX_FLOW`). At 1 m with 2.5 rad/s that is only 1.5 m/s: you cannot fly fast low over the floor."
+  },
+  {
+   "id": "lag-error",
+   "title": "Estimate lag from an uncompensated delay",
+   "statement": "A mocap bridge delivers the pose with a full delay of **{tau} ms**, and the flight controller has `VISO_DELAY_MS` = **{d} ms**. The vehicle flies at a constant **{v} m/s**. By how many meters does the EKF position estimate lag the truth in steady motion?",
+   "params": {
+    "tau": {
+     "min": 120,
+     "max": 400,
+     "step": 10
+    },
+    "d": [
+     10,
+     50,
+     100
+    ],
+    "v": {
+     "min": 0.5,
+     "max": 5,
+     "step": 0.5
+    }
+   },
+   "answer": "v*(tau-d)/1000",
+   "unit": "m",
+   "tol": 0.02,
+   "solution": "e = v · (τ − VISO_DELAY_MS). The EKF assigns the measurement to the moment \"received − VISO_DELAY_MS\"; whatever the parameter does not cover becomes a lag of v·Δτ. This is a lower bound: in the lab, at Δτ = 200 ms and 1.5 m/s the p95 error is 0.51 m instead of 0.30 m, because the position loop starts to oscillate."
+  },
+  {
+   "id": "gate",
+   "title": "Position innovation gate",
+   "statement": "`EK3_POS_I_GATE` = **{g}** (hundredths of σ), the EKF state position uncertainty on each axis is σ_P = **{sp} m**, and the measurement noise `VISO_POS_M_NSE` = **{sr} m**. What is the largest horizontal jump of the external position (m) that the EKF will still accept (XKF4.SP = 1)?",
+   "params": {
+    "g": [
+     300,
+     500
+    ],
+    "sp": {
+     "min": 0.05,
+     "max": 0.5,
+     "step": 0.05
+    },
+    "sr": [
+     0.1,
+     0.2,
+     0.3,
+     0.5
+    ]
+   },
+   "answer": "g/100*math.sqrt(2*(sp**2+sr**2))",
+   "unit": "m",
+   "tol": 0.02,
+   "solution": "The test in `FuseVelPosNED`: (ΔN² + ΔE²) / [(g/100)² · (var_N + var_E)] < 1, where var = σ_P² + σ_R². The limit is |Δ| = (g/100) · √(2·(σ_P² + σ_R²)). A larger jump means the measurements are rejected, and after 7–10 s the EKF resets the position to the source."
+  },
+  {
+   "id": "fxscaler",
+   "title": "Calibrating FLOW_FXSCALER",
+   "statement": "Rocking in roll over a textured floor: the `OF.bodyX` (gyro) amplitude is **{b} rad/s**, the `OF.flowX` (sensor) amplitude is **{f} rad/s**, and `FLOW_FXSCALER` is currently 0. What `FLOW_FXSCALER` value will match the flow to the gyro?",
+   "params": {
+    "b": {
+     "min": 0.6,
+     "max": 0.9,
+     "step": 0.05
+    },
+    "f": {
+     "min": 0.55,
+     "max": 1.0,
+     "step": 0.05
+    }
+   },
+   "answer": "(b/f-1)*1000",
+   "unit": "",
+   "tol": 0.03,
+   "abs": 2,
+   "solution": "The flow is multiplied by (1 + FLOW_FXSCALER/1000). You need (1 + k/1000)·flow = body → k = (body/flow − 1)·1000. The allowed range is ±800; a value beyond ±200 is a reason to check the lens and the orientation rather than keep turning the knob."
+  }
+ ]
+}

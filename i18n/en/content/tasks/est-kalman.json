@@ -4,7 +4,7 @@
   {
    "id": "fuse",
    "title": "Fusing two measurements",
-   "statement": "Two sensors measure the same altitude: the first gives **{x1} m** with σ₁ = **{s1} m**, the second gives **{x2} m** with σ₂ = **{s2} m**. Find the optimal estimate (m).",
+   "statement": "Two sensors measure the same altitude: the first gives **{x1} m** with σ₁ = **{s1} m**, the second **{x2} m** with σ₂ = **{s2} m**. Find the optimal estimate (m).",
    "params": {
     "x1": {
      "min": 9,
@@ -30,11 +30,11 @@
    "answer": "(x1/s1**2+x2/s2**2)/(1/s1**2+1/s2**2)",
    "unit": "m",
    "tol": 0.01,
-   "solution": "Weight by inverse variances: x̂ = (x₁/σ₁² + x₂/σ₂²)/(1/σ₁² + 1/σ₂²). The more accurate sensor pulls the estimate toward itself."
+   "solution": "Weight by inverse variances: x̂ = (x₁/σ₁² + x₂/σ₂²)/(1/σ₁² + 1/σ₂²). The precise sensor pulls the estimate toward itself."
   },
   {
    "id": "fuse-sigma",
-   "title": "Accuracy after fusion",
+   "title": "Precision after fusion",
    "statement": "Two independent measurements with σ₁ = **{s1} m** and σ₂ = **{s2} m**. What is the σ of the optimal combined estimate (m)?",
    "params": {
     "s1": {
@@ -51,12 +51,12 @@
    "answer": "math.sqrt(1/(1/s1**2+1/s2**2))",
    "unit": "m",
    "tol": 0.01,
-   "solution": "1/σ² = 1/σ₁² + 1/σ₂². The combined estimate is always more accurate than the best of the sensors."
+   "solution": "1/σ² = 1/σ₁² + 1/σ₂². The combined estimate is always more precise than the better of the two sensors."
   },
   {
    "id": "gain",
    "title": "Kalman gain",
-   "statement": "Prediction variance P = **{p}**, measurement variance R = **{r}** (in the same units). Find the Kalman gain K.",
+   "statement": "The prediction variance is P = **{p}**, the measurement variance is R = **{r}** (in the same units). Find the Kalman gain K.",
    "params": {
     "p": {
      "min": 0.1,

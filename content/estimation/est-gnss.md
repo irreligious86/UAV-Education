@@ -83,14 +83,14 @@ GPS (США, L1 C/A), GLONASS (Россия), Galileo (ЕС, L1 + E5), BeiDou (�
 - **Сообщения**: UBX (бинарный) вместо NMEA — компактнее, точнее, со статусом качества; ArduPilot сам настраивает приёмник u-blox при `GPS_AUTO_CONFIG = 1`.
 
 ### RTK и PPK
-**RTK** (Real-Time Kinematic): базовая станция с известной позицией передаёт поправки фазы несущей (RTCM) ровер-приёмнику по радио/4G; точность 1–3 см при fix (статус RTK Fixed), 10–50 см при float. Нужен двухчастотный приёмник (F9P, UM982) на обоих концах, своя база в радиусе ~10–20 км (для NTRIP-сети допускают до 50–100 км ценой точности 1 ppm и более долгой сходимости — nav-rtk), непрерывная связь. **PPK** — то же, но постобработка по логам: нужна для фотограмметрии, не для управления полётом.
+**RTK** (Real-Time Kinematic): базовая станция с известной позицией передаёт поправки фазы несущей (RTCM) ровер-приёмнику по радио/4G; точность 1–3 см при fix (статус RTK Fixed), 10–50 см при float. На практике нужен двухчастотный приёмник (F9P, UM982) на обоих концах (одночастотный L1 RTK, например NEO-M8P, работает лишь на коротких базах и дольше фиксируется), своя база в радиусе ~10–20 км (для NTRIP-сети допускают до 50–100 км ценой точности 1 ppm и более долгой сходимости — nav-rtk), непрерывная связь. **PPK** — то же, но постобработка по логам: нужна для фотограмметрии, не для управления полётом.
 
 Когда нужен RTK: точная посадка, геодезия, moving baseline для курса (два GPS → yaw без компаса: ArduPilot «GPS for yaw», база `GPS_TYPE = 17`, ровер `GPS_TYPE2 = 18`; в 4.6+ — `GPS1_TYPE`/`GPS2_TYPE`). Когда не нужен: обычный полёт по точкам (EKF и 2 м ошибки достаточно), FPV. RTK не лечит многолучёвость и потерю спутников под крышей.
 
 {{diagram:gnss-rtk-choice-tree|RTK нужен, только когда задаче нужны сантиметры в полёте; для полёта по точкам хватает 1.5–3 м обычного GNSS, для фотограмметрии — PPK.}}
 
 ### Как GPS входит в EKF
-EKF получает позицию, скорость, их оценки точности (`GPA.HAcc/VAcc/SAcc`) и задержку — измерение «старое», EKF сопоставляет его с прошлым состоянием. В ArduPilot 4.7.2 `GPS1_DELAY_MS` по умолчанию 0, и это значит «взять задержку драйвера»: 120 мс для u-blox M8/M9/M10/F9, ещё +40 мс в режиме moving baseline, 220 мс для старых и неопознанных приёмников (`AP_GPS_UBLOX.cpp:2236–2276`). Ненулевое значение параметра всегда важнее драйвера. В PX4 1.18 задержка задаётся на приёмник: `SENS_GPS0_DELAY` и `SENS_GPS1_DELAY` = 110 мс, привязка к приёмнику — `SENS_GPS0_ID` (до 1.18 — общий `EKF2_GPS_DELAY`, переносится при обновлении); при активной синхронизации по PPS она важнее параметра. Glitch-защита — ворота инноваций (модуль про Калмана).
+EKF получает позицию, скорость, их оценки точности (`GPA.HAcc/VAcc/SAcc`) и задержку — измерение «старое», EKF сопоставляет его с прошлым состоянием. В ArduPilot 4.7.3 `GPS1_DELAY_MS` по умолчанию 0, и это значит «взять задержку драйвера»: 120 мс для u-blox M8/M9/M10/F9, ещё +40 мс в режиме moving baseline, 220 мс для старых и неопознанных приёмников (`AP_GPS_UBLOX.cpp:2236–2276`). Ненулевое значение параметра всегда важнее драйвера. В PX4 1.18 задержка задаётся на приёмник: `SENS_GPS0_DELAY` и `SENS_GPS1_DELAY` = 110 мс, привязка к приёмнику — `SENS_GPS0_ID` (до 1.18 — общий `EKF2_GPS_DELAY`, переносится при обновлении); при активной синхронизации по PPS она важнее параметра. Glitch-защита — ворота инноваций (модуль про Калмана).
 
 **Проверки перед армом — на двух уровнях.** Первый — EKF3: пока GPS их не проходит, фильтр GPS не использует, точка дома не ставится, и арм в режимах с позицией запрещён. `EK3_GPS_CHECK` по умолчанию 31 — биты 0–4 (`AP_NavEKF3_VehicleStatus.cpp:24–187`):
 
@@ -100,7 +100,7 @@ EKF получает позицию, скорость, их оценки точ�
 - hAcc ≤ 5 м и vAcc ≤ 7.5 м;
 - согласие курса компаса.
 
-Биты 5–7 — дрейф на земле ≤ 3 м, вертикальная и горизонтальная скорость на земле ≤ 0.3 м/с. На `EK3_CHECK_SCALE`/100 (по умолчанию 100 %) умножаются только пороги точности и движения — hAcc, vAcc, ошибка скорости, дрейф и скорости на земле; число спутников (6) и HDOP (2.5) жёстко зашиты и не масштабируются (`AP_NavEKF3_VehicleStatus.cpp:66–187`: HDOP — строка 170, спутники — 182). После того как проверки один раз пройдены, множитель ещё ×1.3 — гистерезис, чтобы готовность к арму не мигала (`:26–34`). Второй уровень — Copter: если режим требует GPS, HDOP должен быть не выше `GPS_HDOP_GOOD` (1.4), иначе «High GPS HDOP» (`AP_Arming_Copter.cpp:395`). Порог Copter строже порога EKF3: при HDOP 2.0 EKF GPS примет, а арм в Loiter всё равно запрещён.
+Биты 5–7 — дрейф на земле ≤ 3 м, вертикальная и горизонтальная скорость на земле ≤ 0.3 м/с. На `EK3_CHECK_SCALE`/100 (по умолчанию 100 %) умножаются только пороги точности и движения — hAcc, vAcc, ошибка скорости, дрейф и скорости на земле; число спутников (6) и HDOP (2.5) жёстко зашиты и не масштабируются (`AP_NavEKF3_VehicleStatus.cpp:66–187`: HDOP — строка 170, спутники — 182). После того как проверки один раз пройдены, множитель ещё ×1.3 — гистерезис, чтобы готовность к арму не мигала (`:26–34`). Второй уровень — Copter: если режим требует GPS, HDOP должен быть не выше `GPS_HDOP_GOOD` (1.4), иначе «High GPS HDOP» (`AP_Arming_Copter.cpp:396`). Порог Copter строже порога EKF3: при HDOP 2.0 EKF GPS примет, а арм в Loiter всё равно запрещён.
 
 Как это выглядит в SITL ArduCopter 4.7.2 (шаг 2 практики): при 5 спутниках и при hAcc 6 м арм отказан сообщением «PreArm: AHRS: waiting for home». Сообщение называет следствие — дома нет, потому что EKF3 не взял GPS, — а не причину. Причину ищи сравнением `GPS_RAW_INT` с порогами выше. При 6 спутниках и hAcc 4.5 м аппарат армится. При `GPS_HDOP_GOOD = 110` и HDOP 1.21 — «Arm: High GPS HDOP».
 
@@ -118,7 +118,7 @@ EKF получает позицию, скорость, их оценки точ�
 | `GPS_SBAS_MODE` | ArduPilot | 2 (не менять) | 0 выкл., 1 вкл. |
 | `GPS_HDOP_GOOD` | ArduPilot Copter | 140 (HDOP 1.4) | 100–900 |
 | `EK3_GPS_CHECK` / `EK3_CHECK_SCALE` | ArduPilot | 31 / 100 % | пороги: 6 спутн., HDOP 2.5, 5 м, 1 м/с |
-| `GPS_1_CONFIG`, `GPS_1_GNSS` | PX4 1.17.0 | порт / 0 (умолчание приёмника) | биты: GPS, SBAS, Galileo, BeiDou, GLONASS, NAVIC |
+| `GPS_1_CONFIG`, `GPS_1_GNSS` | PX4 1.18.0 | порт / 0 (умолчание приёмника) | биты: GPS, SBAS, Galileo, BeiDou, GLONASS, NAVIC |
 | `GPS_UBX_DYNMODEL` | PX4 | 7 (Airborne < 2g) | 6 — < 1g, 8 — < 4g |
 | `SENS_GPS0_DELAY` (до 1.18 — `EKF2_GPS_DELAY`) / `EKF2_GPS_CTRL` | PX4 | 110 мс / 7 | бит 3 — курс по двум антеннам |
 | `EKF2_GPS_CHECK`, `EKF2_REQ_*` | PX4 | 2047; 6 спутн., PDOP 2.5, EPH 3 м | `EKF2_REQ_GPS_H` 10 с |
@@ -304,10 +304,10 @@ print(f"{len(r)} fixes, median {r[len(r) // 2]:.2f} m, p95 {r[int(len(r) * 0.95)
 ## references
 - IS-GPS-200N — Navstar GPS Space Segment / Navigation User Interfaces (мощность L1 C/A, код C/A) | https://www.gps.gov/technical/icwg/IS-GPS-200N.pdf | primary | A
 - ArduPilot — GPS/Compass (landing page) | https://ardupilot.org/copter/docs/common-positioning-landing-page.html | primary | A
-- ArduPilot 4.7.2 — AP_GPS (AP_GPS.cpp, AP_GPS_Params.cpp, AP_GPS_UBLOX.cpp) | https://github.com/ArduPilot/ardupilot/tree/Copter-4.7.2/libraries/AP_GPS | primary | A
-- ArduPilot 4.7.2 — AP_NavEKF3_VehicleStatus.cpp (пороги GPS перед использованием) | https://github.com/ArduPilot/ardupilot/blob/Copter-4.7.2/libraries/AP_NavEKF3/AP_NavEKF3_VehicleStatus.cpp | primary | A
+- ArduPilot 4.7.3 — AP_GPS (AP_GPS.cpp, AP_GPS_Params.cpp, AP_GPS_UBLOX.cpp) | https://github.com/ArduPilot/ardupilot/tree/Copter-4.7.3/libraries/AP_GPS | primary | A
+- ArduPilot 4.7.3 — AP_NavEKF3_VehicleStatus.cpp (пороги GPS перед использованием) | https://github.com/ArduPilot/ardupilot/blob/Copter-4.7.3/libraries/AP_NavEKF3/AP_NavEKF3_VehicleStatus.cpp | primary | A
 - ArduPilot — GPS for Yaw (moving baseline) | https://ardupilot.org/copter/docs/common-gps-for-yaw.html | primary | A
-- PX4 v1.17.0 — params_gnss.yaml (EKF2_GPS_*, EKF2_REQ_*) | https://github.com/PX4/PX4-Autopilot/blob/v1.17.0/src/modules/ekf2/params_gnss.yaml | primary | A
+- PX4 v1.18.0 — params_gnss.yaml (EKF2_GPS_*, EKF2_REQ_*) | https://github.com/PX4/PX4-Autopilot/blob/v1.18.0/src/modules/ekf2/params_gnss.yaml | primary | A
 - u-blox — MAX-M10S Data Sheet UBX-20035208 (частота по наборам созвездий, CEP, скорость) | https://content.u-blox.com/sites/default/files/MAX-M10S_DataSheet_UBX-20035208.pdf | primary | A
 - u-blox — NEO-M9N Product Summary UBX-19027207 | https://content.u-blox.com/sites/default/files/NEO-M9N_ProductSummary_UBX-19027207.pdf | primary | A
 - u-blox — NEO-M8 FW3 Data Sheet UBX-15031086 | https://www.mouser.lt/datasheet/3/3699/1/NEO_M8_FW3_DataSheet_UBX_15031086.pdf | primary | A

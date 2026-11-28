@@ -8,10 +8,10 @@
         "Полётник переключится на базу рельефа и продолжит миссию без остановки",
         "Миссия продолжится на последней известной высоте по барометру до следующей точки",
         "Аппарат зависнет в Loiter и будет ждать, пока дальномер вернётся в диапазон",
-        "Через 5 с (или сразу на смене точки) — «Failsafe: Terrain data missing» и RTL"
+        "Через 5 с (или сразу на смене точки) — terrain failsafe и RTL"
       ],
       "answer": 3,
-      "explain": "AC_WPNav::get_terrain_source() выбирает дальномер, если он настроен и WP_RFND_USE = 1 (до 4.7 — WPNAV_RFND_USE); фолбэка на базу нет. Нездоровый дальномер = «данных нет» → terrain failsafe (RTL, MODE.Rsn 11)."
+      "explain": "AC_WPNav::get_terrain_source() выбирает дальномер, если он настроен и WP_RFND_USE = 1 (до 4.7 — WPNAV_RFND_USE); фолбэка на базу нет. Нездоровый дальномер = «данных нет» → terrain failsafe: в 4.7 сообщение «Failsafe: Terrain Rangefinder Unhealthy» (в 4.6 — «Failsafe: Terrain data missing»), RTL, MODE.Rsn 11."
     },
     {
       "q": "Фрагмент лога миссии: взлёт на 40 м (frame Relative), дальше точки frame Terrain. Почему RTL?",

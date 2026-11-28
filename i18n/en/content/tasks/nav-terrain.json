@@ -1,0 +1,91 @@
+{
+ "module": "nav-terrain",
+ "tasks": [
+  {
+   "id": "terrain-agl",
+   "title": "Height above terrain from AMSL",
+   "statement": "GPS shows **{amsl} m** AMSL, and `TERRAIN_REPORT.terrain_height` below the vehicle is **{terr} m**. Find the height above terrain (m).",
+   "params": {
+    "amsl": {
+     "min": 700,
+     "max": 950,
+     "step": 5
+    },
+    "terr": {
+     "min": 590,
+     "max": 680,
+     "step": 5
+    }
+   },
+   "answer": "amsl - terr",
+   "unit": "m",
+   "tol": 0.01,
+   "abs": 0.5,
+   "solution": "h_AGL = h_AMSL − h_terrain. This is the same number as `TERRAIN_REPORT.current_height` and `CTUN.TAlt`; remember the ±10 m database error."
+  },
+  {
+   "id": "terrain-climb",
+   "title": "Required climb rate on a slope",
+   "statement": "A copter flies terrain items at **{v} m/s** onto a slope with a **{s} %** grade. What vertical speed is needed to hold the height above ground (m/s)?",
+   "params": {
+    "v": {
+     "min": 4,
+     "max": 15,
+     "step": 1
+    },
+    "s": {
+     "min": 5,
+     "max": 45,
+     "step": 5
+    }
+   },
+   "answer": "v*s/100",
+   "unit": "m/s",
+   "tol": 0.02,
+   "solution": "v_z = V · grade. At 10 m/s and 35% that is 3.5 m/s, more than the default `WP_SPD_UP` of 2.5 m/s (before 4.7, `WPNAV_SPEED_UP`, 250 cm/s), which is why in the lab the height above ground dropped from 40 to 23.5 m."
+  },
+  {
+   "id": "terrain-vmax",
+   "title": "Speed limit on a climb",
+   "statement": "`WP_SPD_UP` = **{up} m/s**, and the steepest section of the route is **{s} %**. At what ground speed can you fly without losing height above ground (m/s)?",
+   "params": {
+    "up": [
+     1.5,
+     2.0,
+     2.5,
+     3.0
+    ],
+    "s": {
+     "min": 20,
+     "max": 45,
+     "step": 5
+    }
+   },
+   "answer": "up/(s/100)",
+   "unit": "m/s",
+   "tol": 0.02,
+   "solution": "V_max = WP_SPD_UP / grade. 2.5 m/s and 35% → 7.1 m/s: exactly the speed the flight controller braked the vehicle to by itself in the lab (6.4–7.2 m/s). Set `WP_SPD` for the steepest section. Before 4.7 the parameters were called `WPNAV_SPEED_UP` and `WPNAV_SPEED` and were set in cm/s (250 cm/s = 2.5 m/s)."
+  },
+  {
+   "id": "terrain-rfnd-tilt",
+   "title": "Rangefinder range with tilt",
+   "statement": "Terrain following on a rangefinder at **{h} m**; when accelerating and into the wind the vehicle tilts up to **{th}°**. What slant range will the sensor see (m)? This is the minimum for `RNGFND1_MAX` (m; before 4.7, `RNGFND1_MAX_CM`, cm) with no margin.",
+   "params": {
+    "h": {
+     "min": 10,
+     "max": 60,
+     "step": 5
+    },
+    "th": {
+     "min": 10,
+     "max": 40,
+     "step": 5
+    }
+   },
+   "answer": "h/math.cos(math.radians(th))",
+   "unit": "m",
+   "tol": 0.02,
+   "solution": "D = H / cos θ. In the lab: 39.85 m at 28.9° pitch → 45.5 m in `RFND.Dist`. A 40 m sensor would have gone OutOfRangeHigh and caused a terrain failsafe."
+  }
+ ]
+}

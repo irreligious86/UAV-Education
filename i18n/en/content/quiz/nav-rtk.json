@@ -1,0 +1,96 @@
+{
+  "module": "nav-rtk",
+  "pass": 80,
+  "questions": [
+    {
+      "q": "An F9P rover shows fix_type = 6, but after the base was moved to a new spot and ran a 60-second survey-in, the whole mission \"shifted\" by 1.5 m. Why?",
+      "options": [
+        "The base point error after survey-in is meters, and it transfers entirely to the rover",
+        "At fix_type = 6 the receiver has not yet resolved the integer ambiguities; you have to wait for fix_type = 7 (static)",
+        "The rover lost message 1230 and treats GLONASS in float mode",
+        "Telemetry lost GPS_RTCM_DATA fragments, and RTCMFD grew"
+      ],
+      "answer": 0,
+      "explain": "RTK gives centimeters relative to the base. A 2 m / 60 s survey-in is an averaged standalone solution with an error of meters; for a repeatable absolute position the base needs known coordinates (CFG-TMODE FIXED)."
+    },
+    {
+      "q": "What happens to an F9P rover if the base stops sending message 1230 while the others (1005, MSM4) keep coming?",
+      "options": [
+        "The rover will not enter RTK at all: 1230 is mandatory for any RTK solution",
+        "GLONASS stays float even with an overall RTK fixed, accuracy slightly worse",
+        "Nothing: 1230 is only needed for moving baseline",
+        "The rover drops to DGPS (fix_type = 4) until 1230 returns"
+      ],
+      "answer": 1,
+      "explain": "1230 carries the GLONASS code-phase biases. Per the u-blox integration manual, without 1230 (or 1033) the GLONASS ambiguities are estimated only as float, while GPS/Galileo/BeiDou still get fixed."
+    },
+    {
+      "q": "GPS2_RAW.yaw = 65535 with fix_type = 6 on both F9P units. What does this mean in ArduPilot 4.6?",
+      "options": [
+        "The rover is not configured as a heading source: GPS2_TYPE must be 18, not 2, and heading is off",
+        "The heading is north: 65535 is a reserved value for 0°",
+        "Heading is configured but unavailable now: the length check failed or no RELPOSNED",
+        "EKF3 rejected the heading at the EK3_YAW_I_GATE gate"
+      ],
+      "answer": 2,
+      "explain": "By the GPS_RAW_INT convention: 0 means heading is not configured, 65535 configured but unable to provide it, 36000 north. Typical causes of 65535: the relative solution is not RTK fixed (the u-blox driver checks the RELPOSNED flags), the calculate_moving_base_yaw checks failed (≥ 5 cm, ≤ 20% length mismatch) or there is no RELPOSNED."
+    },
+    {
+      "q": "A log fragment after enabling moving baseline. Which setting is wrong?",
+      "kind": "apply",
+      "fragment": "PARM GPS1_TYPE 17\nPARM GPS2_TYPE 18\nPARM GPS1_POS_Y -0.25\nPARM GPS2_POS_Y 0.25\nPARM GPS_AUTO_SWITCH 2\nPARM EK3_SRC1_YAW 2\nGPS I=1 Status=6 NSats=22 Yaw=184.3\nGPA I=1 YAcc=0.9",
+      "options": [
+        "EK3_SRC1_YAW = 2: without a compass it must be 8 (GSF)",
+        "GPS_AUTO_SWITCH = 2 (Blend) is incompatible with moving baseline",
+        "GPS2_POS_Y is positive: the rover must be on the left",
+        "GPS1_TYPE and GPS2_TYPE are swapped: 18 belongs to the first receiver"
+      ],
+      "answer": 1,
+      "explain": "The ArduPilot documentation explicitly forbids Blend with moving baseline: the position is blended from two receivers, while the heading is computed relative to one. The other parameters are correct: base on the left (−0.25), rover on the right (+0.25), heading from GPS."
+    },
+    {
+      "q": "Moving-baseline antennas are 30 cm apart, and the RTK relative vector accuracy is about 1 cm. What order of heading error should you expect?",
+      "options": [
+        "About 0.1°",
+        "About 2°",
+        "About 10°",
+        "No heading with such a baseline: the minimum is 1 m"
+      ],
+      "answer": 1,
+      "explain": "σ_yaw ≈ atan(σ_rel / L) = atan(0.01 / 0.3) ≈ 1.9°. The F9P data sheet gives 0.4° without a baseline length in the table (the length dependence is in a figure), so it is not a figure for 30 cm; the ArduPilot wiki recommends at least 30 cm, and the code rejects baselines shorter than 5 cm."
+    },
+    {
+      "q": "Which message does Mission Planner (RTK/GPS Inject) use to send corrections on board, and how does ArduPilot decide which receiver to write them to?",
+      "options": [
+        "GPS_INJECT_DATA, with the receiver chosen by GPS_PRIMARY",
+        "GPS_RTCM_DATA in 180-byte fragments, with the receiver chosen by GPS_INJECT_TO",
+        "RTCM inside SERIAL_CONTROL for the receiver port, with the receiver chosen by GPS_AUTO_SWITCH",
+        "GPS_RTK with the baseline_*_mm fields, with the receiver chosen by GPS_DRV_OPTIONS"
+      ],
+      "answer": 1,
+      "explain": "GPS_RTCM_DATA (id 233): flags hold the fragmentation bit, 2 bits of fragment number and 5 bits of sequence id; data[180]. GPS_INJECT_DATA (123) has been marked superseded since 2022-05. GPS_INJECT_TO: 0 the first receiver, 1 the second, 127 all."
+    },
+    {
+      "q": "The F9P rover is the second receiver; on ArduPilot 4.6 the dgps_age field in GPS2_RAW is always 0, although RTK fixed holds. How do you check the correction age?",
+      "options": [
+        "The field is filled only with GPS_DRV_OPTIONS bit 6: enable full RTCM parsing and then reboot the autopilot",
+        "The u-blox driver does not fill rtk_age_ms; look at the RTK window in Mission Planner and GPA.RTCMFU/RTCMFD",
+        "The dgps_age field is zeroed while GPS_AUTO_SWITCH = 1: you need GPS_PRIMARY = 1 to make the rover primary",
+        "Raise GPS1_RATE_MS to 100: at 5 Hz the field is zeroed"
+      ],
+      "answer": 1,
+      "explain": "In AP_GPS 4.6, rtk_age_ms (from which send_mavlink_gps2_raw takes dgps_age; GPS_RAW_INT has no such field) is filled only by the ERB, NOVA and SBF drivers. For u-blox the correction age is visible in the GCS, and in the log through RTCMFU growing continuously and RTCMFD not growing."
+    },
+    {
+      "q": "In PX4 1.17 two F9P units provide heading. Which parameters enable it in EKF2?",
+      "options": [
+        "GPS_UBX_MODE 1 on the rover and 2 on the base, bit 3 in EKF2_GPS_CTRL, GPS_YAW_OFFSET for the baseline orientation",
+        "GPS_1_PROTOCOL = 1 and GPS_2_PROTOCOL = 1 on both, EKF2_MAG_TYPE = 5, SENS_BOARD_ROT set for the baseline orientation",
+        "GPS_UBX_MODE = 5 on the rover, EKF2_GPS_CTRL = 7, GPS_YAW_OFFSET = 90",
+        "GPS_DUMP_COMM = 2 on both, EKF2_AID_MASK bit 7"
+      ],
+      "answer": 0,
+      "explain": "GPS_UBX_MODE: 1 is the heading rover (UART2 from the base), 2 the moving base. EKF2_GPS_CTRL bit 3 \"Dual antenna heading\" (7 → 15). GPS_YAW_OFFSET is the angle of the base→rover baseline from the nose (0 means the rover is in front, 90 on the right). Mode 5 is a rover with a static base on UART2, and GPS_DUMP_COMM = 2 logs RTCM for PPK."
+    }
+  ]
+}

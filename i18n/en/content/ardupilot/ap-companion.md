@@ -20,7 +20,7 @@ related:
 next:
   - bf-custom
 source: content/ardupilot/ap-companion.md
-source_hash: 3f7e3293fdd1
+source_hash: 353b0e3c7668
 ---
 
 ## summary
@@ -160,7 +160,7 @@ for _ in range(50):                          # 10 s at 5 Hz: forward 1 m/s in bo
 The full starter project (a square, a failsafe test, CI) is `examples/sitl-pymavlink` in the course repository. `GUID_TIMEOUT` = 3.0 s by default (range 0.1–5); the `GUID_OPTIONS` bits: 0 allows arming from the transmitter in GUIDED, 2 ignores pilot yaw, 6 uses waypoint navigation for position targets, 7 allows weathervaning.
 
 ### Worked example: "the vehicle does not move on a velocity command"
-The checks, in order: (1) the mode is GUIDED (`HEARTBEAT.custom_mode`); (2) `type_mask`: is velocity masked out; (3) the sending rate is ≥ 2 Hz (the timeout is 3 s); (4) `WP_SPD` (before 4.7, `WPNAV_SPEED`)/`PSC_*` are not limiting it to zero; (5) the geofence is not holding it at the boundary; (6) `STATUSTEXT`: "EKF needs position" and the like. A course guideline: most often the culprit is (1) or (2).
+The checks, in order: (1) the mode is GUIDED (`HEARTBEAT.custom_mode`); (2) `type_mask`: is velocity masked out; (3) the sending rate is ≥ 2 Hz (the timeout is 3 s); (4) `WP_SPD` (before 4.7, `WPNAV_SPEED`)/`PSC_*` are not limiting it to zero; (5) the geofence is not holding it at the boundary; (6) `STATUSTEXT`: "Mode change to Guided failed: requires position", "PreArm: Need Position Estimate" and the like. A course guideline: most often the culprit is (1) or (2).
 
 {{diagram:guided-timeout|A velocity target in GUIDED is valid for GUID_TIMEOUT (3 s by default): the companion must repeat it more often, otherwise the vehicle stops and hovers.}}
 

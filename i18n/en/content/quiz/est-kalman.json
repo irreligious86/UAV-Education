@@ -5,21 +5,21 @@
     {
       "q": "The Kalman gain K tends to 1 when:",
       "options": [
-        "The measurement is more accurate than the prediction",
+        "The measurement is more precise than the prediction",
         "Always",
         "There are no measurements",
         "The process model is accurate and the noise is small"
       ],
       "answer": 0,
-      "explain": "K = P⁻/(P⁻+R): small R → trust the measurement."
+      "explain": "K = P⁻/(P⁻+R): a small R → trust the measurement."
     },
     {
       "q": "What is an innovation?",
       "options": [
         "A new parameter",
-        "Measurement minus prediction",
-        "Covariance",
-        "Process noise at the prediction step"
+        "The measurement minus the prediction",
+        "The covariance",
+        "The process noise in the prediction step"
       ],
       "answer": 1,
       "explain": "y = z − h(x⁻)."
@@ -27,19 +27,19 @@
     {
       "q": "What happens when XKF4.SP > 1 in ArduPilot?",
       "options": [
-        "Position is accepted",
-        "Position is rejected by the gate",
-        "The EKF is reset and reinitialized",
+        "The position is accepted",
+        "The position is rejected by the gate",
+        "The EKF is reset and fully reinitialized",
         "GPS is lost"
       ],
       "answer": 1,
       "explain": "SP is the ratio of the innovation to the allowed one (the square root of the test ratio); >1 means rejected."
     },
     {
-      "q": "What does a long (10 s) barometer outlier do to a 1D filter with gates?",
+      "q": "What does a long (10 s) barometer outlier do to a 1D filter with a gate?",
       "options": [
-        "The gates widen and let everything through",
-        "At first it is rejected, then the filter “drifts away”",
+        "The gate widens over time and lets everything through",
+        "Rejected at first, then the estimate \"drifts off\"",
         "The filter stops",
         "Nothing"
       ],
@@ -50,9 +50,9 @@
       "q": "What is a lane in EKF3?",
       "options": [
         "A GPS type",
-        "An EKF core running on its own IMU",
+        "An EKF core for its own IMU",
         "A flight mode",
-        "The frequency band of the gyro filter"
+        "The gyro filter's frequency band"
       ],
       "answer": 1,
       "explain": "XKF4.PI is the index of the active core."
@@ -66,29 +66,29 @@
         "48"
       ],
       "answer": 2,
-      "explain": "Quaternion, velocity, position, gyro and accel bias, Earth and body field, wind."
+      "explain": "Quaternion, velocity, position, gyro and accel bias, earth and body magnetic field, wind."
     },
     {
       "q": "What does a large R for a measurement mean?",
       "options": [
         "The filter blindly follows the sensor",
         "The model is considered inaccurate",
-        "The filter step gets larger",
+        "The filter step becomes larger",
         "The filter trusts this sensor less"
       ],
       "answer": 3,
-      "explain": "R is the measurement noise variance: the larger it is, the smaller K and the measurement's weight."
+      "explain": "R is the variance of the measurement noise: the larger it is, the smaller K and the measurement's weight."
     },
     {
-      "q": "Why does the EKF account for sensor delay?",
+      "q": "Why does the EKF account for sensor delays?",
       "options": [
         "To call the firmware less often",
         "To reduce the number of states",
         "The EKF does not account for delays",
-        "The measurement refers to a past moment, not the current one"
+        "The measurement belongs to a past moment, not the current one"
       ],
       "answer": 3,
-      "explain": "The filter matches the measurement with the state at the time of the measurement; otherwise it introduces an error."
+      "explain": "The filter matches the measurement with the state at the time of measurement; otherwise it introduces an error."
     }
   ]
 }
