@@ -3,51 +3,51 @@
   "pass": 80,
   "questions": [
     {
-      "q": "A script on the companion doesn't receive replies addressed to it. The most common cause:",
+      "q": "A script on the companion gets no replies addressed to it. The most common cause:",
       "options": [
-        "It doesn't send a heartbeat",
+        "It sends no heartbeat",
         "No signing",
-        "Baud rate too high",
-        "Bad CRC in the autopilot's replies"
+        "Too high a baud rate",
+        "A bad CRC in the autopilot's replies"
       ],
       "answer": 0,
-      "explain": "The route to its compid appears after the first packet from the addressee."
+      "explain": "The route to its compid appears after the first packet from the target."
     },
     {
-      "q": "A broadcast message (target_system = 0) is forwarded by the autopilot:",
+      "q": "The autopilot forwards a broadcast message (target_system = 0):",
       "options": [
-        "To all ports except the input one",
+        "To every other active port",
         "Nowhere",
-        "Only to the port with the GCS on it",
+        "Only to the port with the GCS",
         "Back to the input port"
       ],
       "answer": 0,
-      "explain": "The MAVLink_routing.cpp rules."
+      "explain": "The rules in MAVLink_routing.cpp."
     },
     {
       "q": "Why is UDP better than TCP for telemetry over 4G?",
       "options": [
-        "TCP holds fresh data behind old data",
-        "UDP encrypts data at the protocol level",
-        "TCP doesn't pass through NAT",
+        "TCP holds fresh data behind stale",
+        "UDP encrypts the data at the protocol level",
+        "TCP cannot pass NAT",
         "UDP has more bandwidth"
       ],
       "answer": 0,
-      "explain": "Head-of-line blocking: under loss TCP retransmits old data and holds back fresh data."
+      "explain": "Head-of-line blocking: on loss, TCP retransmits stale data and holds back the fresh data."
     },
     {
-      "q": "A vehicle with a 4G modem behind the carrier's NAT. How do you connect to it from the GCS?",
+      "q": "A vehicle with a 4G modem behind the carrier's NAT. How does the GCS connect to it?",
       "options": [
         "A VPN or a relay",
         "Open a port on the modem",
         "Directly to the modem's IP",
-        "Only via SiK"
+        "Only over SiK"
       ],
       "answer": 0,
       "explain": "Incoming connections to a private IP are impossible."
     },
     {
-      "q": "The typical compid of an onboard computer:",
+      "q": "A typical onboard computer compid:",
       "options": [
         "191",
         "1",
@@ -58,7 +58,7 @@
       "explain": "MAV_COMP_ID_ONBOARD_COMPUTER = 191."
     },
     {
-      "q": "Two GCSs with sysid 255 on the same network lead to:",
+      "q": "Two GCSs with sysid 255 on one network lead to:",
       "options": [
         "Routing conflicts",
         "Automatic selection of the primary GCS",
@@ -69,18 +69,18 @@
       "explain": "The sysid must be unique."
     },
     {
-      "q": "Disable MAVLink forwarding through a port in ArduPilot 4.7+:",
+      "q": "Disabling MAVLink forwarding through a port in ArduPilot 4.7+:",
       "options": [
         "MAVn_OPTIONS bit 1",
         "Impossible",
-        "SYSID_THISMAV = 0",
+        "MAV_SYSID = 0",
         "SERIALn_BAUD = 0 on that port"
       ],
       "answer": 0,
-      "explain": "In 4.6 and earlier — SERIALn_OPTIONS bit 10."
+      "explain": "MAVn_OPTIONS bit 1 is the ArduPilot 4.7 name; in 4.6 and earlier it was SERIALn_OPTIONS bit 10 (and MAV_SYSID was called SYSID_THISMAV)."
     },
     {
-      "q": "What do you use to reproduce a bad network on Linux without a radio?",
+      "q": "What reproduces a bad network on Linux without a radio?",
       "options": [
         "tc netem",
         "ping -f",
@@ -91,17 +91,17 @@
       "explain": "delay/jitter/loss on an interface."
     },
     {
-      "q": "QGroundControl on the laptop stopped seeing the vehicle as soon as the script was started. Configuration:",
+      "q": "QGroundControl on a laptop lost the vehicle as soon as a script started. The configuration:",
       "kind": "apply",
-      "fragment": "SITL: --out udp:127.0.0.1:14550\nQGC: listens on UDP 14550\nscript.py: mavutil.mavlink_connection('udpin:0.0.0.0:14550')",
+      "fragment": "SITL: --out udp:127.0.0.1:14550\nQGC: listening on UDP 14550\nscript.py: mavutil.mavlink_connection('udpin:0.0.0.0:14550')",
       "options": [
         "The script and QGC listen on the same UDP port 14550: you need a second SITL output (14551) or a router",
         "udpin in the script grabs sysid 255, and QGC drops the vehicle as foreign",
         "QGC requires MAVLink 1 on port 14550, and pymavlink switched the whole SITL stream to MAVLink 2",
-        "SITL sends data only to the first client to connect over TCP 5760"
+        "SITL sends data only to the first client connected over TCP 5760"
       ],
       "answer": 0,
-      "explain": "One UDP port — one listener; split the streams with a router or separate outputs."
+      "explain": "One UDP port, one listener; split the streams with a router or separate outputs."
     }
   ]
 }

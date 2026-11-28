@@ -3,7 +3,7 @@
   "pass": 80,
   "questions": [
     {
-      "q": "How much time is there for one cycle at 8 kHz?",
+      "q": "How much time is there for one loop at 8 kHz?",
       "options": [
         "1 ms",
         "125 µs",
@@ -22,7 +22,7 @@
         "Filters the gyro signal"
       ],
       "answer": 1,
-      "explain": "It copies data between peripherals and memory without the CPU's involvement: DShot, the SPI gyro, UART reception."
+      "explain": "It copies data between peripherals and memory with no CPU involvement: DShot, the SPI gyro, UART reception."
     },
     {
       "q": "Which rule is mandatory for an interrupt handler?",
@@ -33,18 +33,18 @@
         "Wait for the UART"
       ],
       "answer": 1,
-      "explain": "No blocking and no printf, heavy work goes to a task via a queue; the ISR finishes in microseconds."
+      "explain": "No blocking and no printf; heavy work goes to a task through a queue; the ISR finishes in microseconds."
     },
     {
       "q": "Why is blocking code in the control loop a disaster?",
       "options": [
         "It breaks DMA",
-        "Missed cycles and the watchdog",
+        "Missed loops and the watchdog",
         "It heats the CPU and lowers the voltage",
         "It breaks the interrupt vector table"
       ],
       "answer": 1,
-      "explain": "Cycles get skipped: stale gyro data, D jumps, a possible watchdog reboot."
+      "explain": "Loops are missed: stale gyro data, D-term jumps, a possible watchdog reboot."
     },
     {
       "q": "How do you get a precise task period in FreeRTOS?",
@@ -60,30 +60,30 @@
     {
       "q": "What is a watchdog?",
       "options": [
-        "A logger of the latest events",
+        "A log of the latest events",
         "An MCU reset timer",
         "A sensor",
         "A filter"
       ],
       "answer": 1,
-      "explain": "A hardware timer reboots the MCU if it isn't “fed”: a hang = a reboot."
+      "explain": "A hardware timer resets the MCU if it is not \"fed\": a hang means a reboot."
     },
     {
-      "q": "What happens to the sensor task's jitter if a higher-priority task does a 5 ms busy-wait?",
+      "q": "What happens to the sensor task's jitter if a higher-priority task busy-waits for 5 ms?",
       "options": [
-        "It decreases thanks to preemption",
+        "It drops thanks to preemption",
         "It grows to milliseconds",
         "Nothing",
         "The task speeds up"
       ],
       "answer": 1,
-      "explain": "The preemptive scheduler gives the core to the higher-priority task."
+      "explain": "A preemptive scheduler gives the core to the higher-priority task."
     },
     {
-      "q": "Why can't you call printf in an interrupt handler?",
+      "q": "Why must you not call printf in an interrupt handler?",
       "options": [
-        "It's slow and blocking — it delays the other interrupts",
-        "It doesn't compile on STM32",
+        "It is slow and blocking, and delays the other interrupts",
+        "It does not compile on an STM32",
         "Interrupts have no access to memory",
         "printf only works in main"
       ],

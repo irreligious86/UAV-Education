@@ -3,7 +3,7 @@ id: emb-basics
 title: "Embedded: прерывания, таймеры, DMA, RTOS"
 level: L3
 readingTime: 40 мин
-firmware: любая прошивка
+firmware: любая прошивка (примеры сверены с Betaflight 2026.6.2 и ArduPilot 4.7.3)
 status: published
 added: 2026-11-08
 tags:
@@ -25,7 +25,7 @@ next:
 
 ## theory
 ### Чем занят процессор полётника
-Бюджет на 8 кГц — 125 мкс на цикл. Гироскоп по SPI на 8+ МГц читает 14 байт за ~15 мкс — если ждать в цикле; с DMA — 0 мкс процессорного времени. PID по трём осям на F4 (168 МГц) — ~10–20 мкс, фильтры — столько же, DShot — через таймер+DMA (0 мкс), CRSF — UART с прерыванием/DMA. Остаток — для задач пониже (`src/main/fc/tasks.c`): `TASK_RX` — событийно по приходу кадра с запасным периодом 33 Гц, `TASK_SERIAL` 100 Гц, `TASK_BATTERY_CURRENT` 50 Гц, `TASK_OSD` по `osd framerate_hz`, `TASK_GPS` по скорости порта, blackbox — на делителе от цикла PID. Betaflight — кооперативный планировщик без RTOS (`scheduler.c`): каждая задача имеет желаемый период, приоритет и оценку времени; критические задачи (gyro/PID) ничего не вытесняют — планировщик просто не запускает задачу пониже, если её оценка времени выполнения (`anticipatedExecutionTime`) не помещается до следующего цикла гироскопа; остальные ждут «дырки».
+Бюджет на 8 кГц — 125 мкс на цикл. Гироскоп по SPI на 8+ МГц читает 14 байт за ~15 мкс — если ждать в цикле; с DMA — 0 мкс процессорного времени. PID по трём осям на F4 (168 МГц) — ~10–20 мкс, фильтры — столько же, DShot — через таймер+DMA (0 мкс), CRSF — UART с прерыванием/DMA. Остаток — для задач пониже (`src/main/fc/tasks.c`): `TASK_RX` — событийно по приходу кадра с запасным периодом 33 Гц, `TASK_SERIAL` 100 Гц, `TASK_BATTERY_CURRENT` 50 Гц, `TASK_OSD` по `osd_framerate_hz`, `TASK_GPS` 100 Гц (500 Гц, пока в буфере приёма есть байты), blackbox — на делителе от цикла PID. Betaflight — кооперативный планировщик без RTOS (`scheduler.c`): каждая задача имеет желаемый период, приоритет и оценку времени; критические задачи (gyro/PID) ничего не вытесняют — планировщик просто не запускает задачу пониже, если её оценка времени выполнения (`anticipatedExecutionTime`) не помещается до следующего цикла гироскопа; остальные ждут «дырки».
 
 ### Прерывания
 Прерывание — аппаратный сигнал, который приостанавливает текущий код и вызывает обработчик (ISR). Источники: готов байт UART, завершился DMA, сработал таймер, фронт на ноге (EXTI — так гироскоп сообщает «данные готовы», Betaflight `gyro_sync` по EXTI). Правила ISR: коротко (микросекунды), без блокирующих вызовов и `printf`, без выделения памяти; тяжёлую работу — в задачу через флаг/очередь. **Приоритеты** (NVIC у Cortex-M): прерывание с большим приоритетом вытесняет ISR с меньшим; гироскоп/DShot — выше, UART-лог — ниже. На ESP32 — `ESP_INTR_FLAG_LEVEL1..3`, ISR в IRAM (`IRAM_ATTR`), на другом ядре — через очередь.
@@ -47,7 +47,7 @@ FreeRTOS (ESP32; PX4 работает на NuttX — другой RTOS с тем
 {{diagram:emb-blocking-timeline|50 мс ожидания UART — это 400 невыполненных циклов на 8 кГц; правильный цикл не ждёт, байты собирает прерывание или DMA в кольцевой буфер.}}
 
 ### Watchdog
-Аппаратный таймер, который перезагружает МК, если его не «кормят». Betaflight/ArduPilot/PX4 используют: зависание = перезагрузка (лучше, чем вечный «моторы на последнем значении»); ArduPilot пишет причину в `WDOG`/`BRD_OPTIONS`. На ESP32 — task watchdog на idle-задачи: задача без `vTaskDelay` блокирует idle → TWDT срабатывает.
+Аппаратный таймер, который перезагружает МК, если его не «кормят». Betaflight/ArduPilot/PX4 используют: зависание = перезагрузка (лучше, чем вечный «моторы на последнем значении»); в ArduPilot за него отвечает бит 0 `BRD_OPTIONS` (на платах ChibiOS включён по умолчанию), подробности пишутся в сообщение лога `WDOG`. На ESP32 — task watchdog на idle-задачи: задача без `vTaskDelay` блокирует idle → TWDT срабатывает.
 
 {{diagram:fc-loop-125us|Один цикл 8 кГц: чтение гироскопа по DMA, фильтры, PID и миксер, кадр DShot по DMA; прерывание UART вклинивается, остаток цикла — медленные задачи (порядок величин, не точный профиль).}}
 
@@ -66,7 +66,7 @@ static TaskHandle_t sensorTask;
 static void IRAM_ATTR on_timer(void *arg) {           // ISR: just notify
   BaseType_t hp = pdFALSE;
   vTaskNotifyGiveFromISR(sensorTask, &hp);
-  if (hp) portYIELD_FROM_ISR();
+  if (hp) esp_timer_isr_dispatch_need_yield();   // not portYIELD_FROM_ISR() in an esp_timer ISR callback
 }
 static void sensor_task(void *arg) {
   int64_t last = esp_timer_get_time();
@@ -80,7 +80,7 @@ static void sensor_task(void *arg) {
 }
 static void uart_task(void *arg) {                    // lower priority: formats and prints
   sample_t s;
-  for (;;) if (xQueueReceive(q, &s, portMAX_DELAY)) printf("%lld,%ld,%.2f\n", s.t_us, (long)s.dt_us, s.gyro);
+  for (;;) if (xQueueReceive(q, &s, portMAX_DELAY)) printf("%lld,%ld,%.2f\n", (long long)s.t_us, (long)s.dt_us, s.gyro);
 }
 // app_main: q = xQueueCreate(64, sizeof(sample_t)); create sensor_task prio 10, uart_task prio 3;
 // esp_timer periodic 1000 us -> on_timer with dispatch_method = ESP_TIMER_ISR (needs CONFIG_ESP_TIMER_SUPPORTS_ISR_DISPATCH_METHOD); default ESP_TIMER_TASK runs the callback in the esp_timer task, not an ISR

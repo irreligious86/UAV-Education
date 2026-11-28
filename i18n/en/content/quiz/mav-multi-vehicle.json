@@ -3,26 +3,26 @@
   "pass": 80,
   "questions": [
     {
-      "q": "What happens with two vehicles with sysid 1 on the same network?",
+      "q": "What happens with two vehicles with sysid 1 on one network?",
       "options": [
-        "One “jumping” vehicle, commands go to both",
-        "The GCS will show both vehicles separately",
-        "The second vehicle won't be able to arm at all",
-        "The router will reassign one of the sysids itself"
+        "One \"jumping\" vehicle, commands go to both",
+        "The GCS shows the two vehicles separately",
+        "The second vehicle cannot arm at all",
+        "The router reassigns one of the sysids itself"
       ],
       "answer": 0,
-      "explain": "Addressing is by sysid: without unique numbers the GCS and commands mix up the vehicles."
+      "explain": "Addressing is by sysid: without unique numbers the GCS and the commands mix up the vehicles."
     },
     {
       "q": "Why do you set source_system for a pymavlink supervisor?",
       "options": [
-        "Otherwise it won't receive telemetry",
-        "pymavlink doesn't send commands without it",
-        "By default it's 255, same as the GCS",
+        "Otherwise it gets no telemetry",
+        "pymavlink sends no commands without it",
+        "By default it is 255, like the GCS",
         "mavlink-router requires it"
       ],
       "answer": 2,
-      "explain": "Two participants with sysid 255 confuse failsafe and routing."
+      "explain": "Two participants with sysid 255 confuse the failsafe and the routing."
     },
     {
       "q": "What does target_system = 0 mean?",
@@ -33,7 +33,7 @@
         "A packet with no addressee is dropped"
       ],
       "answer": 1,
-      "explain": "Broadcast: for a global stop — yes, as a default — no."
+      "explain": "Broadcast: yes for a common stop, no as a default."
     },
     {
       "q": "Closing speed 20 m/s, delays 1 s, braking 1.5 s. Roughly how far is covered before stopping?",
@@ -44,23 +44,23 @@
         "50 m"
       ],
       "answer": 3,
-      "explain": "20 m/s × 2.5 s ≈ 50 m; plus position errors — the trigger threshold is around 60 m."
+      "explain": "20 m/s × 2.5 s ≈ 50 m; add the position errors, and the trigger threshold is about 60 m."
     },
     {
-      "q": "What's the danger of a shared RTL for several vehicles?",
+      "q": "What is the danger of a shared RTL for several vehicles?",
       "options": [
-        "It doesn't work in a fleet at all",
-        "Draining all vehicles' batteries at once",
+        "It does not work in a fleet at all",
+        "Draining every vehicle's battery at once",
         "Converging over home at the same altitude",
         "Resetting the sysid after landing"
       ],
       "answer": 2,
-      "explain": "Separate RTL_ALT_M and rally points, land one at a time."
+      "explain": "Separate RTL_ALT_M and rally points, and land one at a time."
     },
     {
       "q": "What does FOLL_DIST_MAX do in FOLLOW mode?",
       "options": [
-        "Beyond it the follower stops following",
+        "Beyond it, the follower stops following",
         "Sets the follower's offset from the leader",
         "Limits the follower's flight altitude",
         "Sets the speed for catching up with the leader"
@@ -69,26 +69,26 @@
       "explain": "If the leader is farther than FOLL_DIST_MAX, the follower holds position."
     },
     {
-      "q": "Why don't altitude layers solve everything?",
+      "q": "Why do altitude layers not solve everything?",
       "options": [
-        "Altitude is equally accurate for everyone",
+        "Everyone's altitude is equally accurate",
         "Layers are prohibited by flight rules",
-        "ArduPilot can't hold altitude",
+        "ArduPilot cannot hold altitude",
         "Takeoff and landing cross the layers"
       ],
       "answer": 3,
-      "explain": "Changing altitude crosses other vehicles' layers — takeoff and landing are separated in time."
+      "explain": "Changing altitude crosses other vehicles' layers, so takeoff and landing are separated in time."
     },
     {
       "q": "Why does a vehicle in a fleet need MAV_GCS_SYSID?",
       "options": [
         "To choose the telemetry rate",
-        "So another station's heartbeat doesn't keep the link alive",
+        "So another station's heartbeat does not keep the link",
         "To enable FOLLOW mode",
         "To set the router's number"
       ],
       "answer": 1,
-      "explain": "The loss-of-link failsafe must watch its own GCS, not just any GCS."
+      "explain": "The link-loss failsafe must watch its own GCS, not just any GCS."
     }
   ]
 }

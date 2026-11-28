@@ -6,23 +6,23 @@
       "q": "What is a heartbeat?",
       "options": [
         "The arm command",
-        "A once-a-second “I'm alive”",
+        "A once-a-second \"I'm alive\"",
         "A GPS position packet once a second",
         "A reply to a command"
       ],
       "answer": 1,
-      "explain": "A message once a second from every participant: type, mode, arm. No heartbeat, no link."
+      "explain": "A message sent once a second by every participant: type, mode, arming state. No heartbeat means no connection."
     },
     {
       "q": "How do you know a command was executed?",
       "options": [
         "Just wait",
-        "By COMMAND_ACK",
-        "By the heartbeat",
-        "Only by STATUSTEXT"
+        "From COMMAND_ACK",
+        "From the heartbeat",
+        "Only from STATUSTEXT"
       ],
       "answer": 1,
-      "explain": "MAV_RESULT_ACCEPTED (0) means accepted; anything else is a refusal."
+      "explain": "MAV_RESULT_ACCEPTED (0) means accepted; anything else is a rejection."
     },
     {
       "q": "The message ID of GLOBAL_POSITION_INT?",
@@ -33,18 +33,18 @@
         "1"
       ],
       "answer": 1,
-      "explain": "0 — HEARTBEAT, 1 — SYS_STATUS, 30 — ATTITUDE, 33 — GLOBAL_POSITION_INT."
+      "explain": "0 is HEARTBEAT, 1 is SYS_STATUS, 30 is ATTITUDE, 33 is GLOBAL_POSITION_INT."
     },
     {
-      "q": "How do you request ATTITUDE at 10 Hz?",
+      "q": "Which single command requests only ATTITUDE at 10 Hz?",
       "options": [
-        "It can't be done",
+        "It cannot be done",
         "SET_MESSAGE_INTERVAL 100000",
-        "Via the SR2_EXTRA1 parameter over MAVLink",
-        "Via PARAM_SET"
+        "Send REQUEST_DATA_STREAM to the GCS",
+        "With PARAM_SET"
       ],
       "answer": 1,
-      "explain": "The interval is in microseconds."
+      "explain": "The interval is in microseconds; a stream-rate parameter (MAV3_EXTRA1) set with PARAM_SET changes a whole group of messages."
     },
     {
       "q": "system_id and component_id are…",
@@ -55,21 +55,21 @@
         "The radio channel and band"
       ],
       "answer": 1,
-      "explain": "The companion is a separate component of the same system."
+      "explain": "A companion is a separate component of the same system."
     },
     {
       "q": "When should you use MAVSDK instead of pymavlink?",
       "options": [
-        "Only with PX4, ArduPilot isn't supported",
-        "For applications built on actions",
+        "Only with PX4; ArduPilot is not supported",
+        "For applications built from actions",
         "Never",
         "Always"
       ],
       "answer": 1,
-      "explain": "MAVSDK offers high-level arm()/takeoff() for applications; pymavlink is for learning and non-standard things."
+      "explain": "MAVSDK offers high-level arm()/takeoff() for applications; pymavlink is for learning and anything non-standard."
     },
     {
-      "q": "The MAVLink 2 start byte:",
+      "q": "The MAVLink 2 start marker:",
       "options": [
         "0xFE",
         "0xFD",
@@ -82,13 +82,13 @@
     {
       "q": "What is CRC_EXTRA for?",
       "options": [
-        "For speed",
+        "Speed",
         "Checking that the dialects match",
-        "For compression",
-        "For signing and spoofing protection"
+        "Compression",
+        "Signing and spoofing protection"
       ],
       "answer": 1,
-      "explain": "A mismatch means “silence”."
+      "explain": "A mismatch means \"silence\"."
     }
   ]
 }

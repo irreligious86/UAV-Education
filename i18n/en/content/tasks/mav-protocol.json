@@ -4,7 +4,7 @@
   {
    "id": "frame-len",
    "title": "Frame size",
-   "statement": "A MAVLink 2 message with a payload of **{n}** bytes after zero truncation, frame: **{s}**. How many bytes go out on the link?",
+   "statement": "A MAVLink 2 message with a payload of **{n}** bytes after zero truncation, sent **{s}**. How many bytes go out on the link?",
    "params": {
     "n": {
      "min": 1,
@@ -20,7 +20,7 @@
    "unit": "bytes",
    "tol": 0.001,
    "abs": 0.1,
-   "solution": "10 header bytes + payload + 2 CRC bytes (+13 signature bytes).",
+   "solution": "10 bytes of header + payload + 2 bytes of CRC (+13 bytes of signature).",
    "labels": {
     "s": {
      "без подписи": "unsigned",
@@ -30,8 +30,8 @@
   },
   {
    "id": "seq-loss",
-   "title": "Losses from seq",
-   "statement": "The previous frame from the vehicle had seq = **{a}**, the next received one has seq = **{b}**. How many frames were lost?",
+   "title": "Loss from seq",
+   "statement": "The previous frame from the vehicle had seq = **{a}**, the next one received has seq = **{b}**. How many frames were lost?",
    "params": {
     "a": {
      "min": 200,
@@ -48,12 +48,12 @@
    "unit": "",
    "tol": 0.001,
    "abs": 0.1,
-   "solution": "(seq_new − seq_old − 1) mod 256 — accounting for the wrap past 255."
+   "solution": "(seq_new − seq_old − 1) mod 256, accounting for the wrap after 255."
   },
   {
    "id": "bw",
    "title": "Stream budget",
-   "statement": "ATTITUDE (payload 28 bytes) at **{f} Hz** and GLOBAL_POSITION_INT (payload 28 bytes) at **{g} Hz**, MAVLink 2 unsigned. What is the load on the link (bytes/s)?",
+   "statement": "ATTITUDE (28-byte payload) at **{f} Hz** and GLOBAL_POSITION_INT (28-byte payload) at **{g} Hz**, MAVLink 2 unsigned. What is the load on the link (bytes/s)?",
    "params": {
     "f": {
      "min": 1,

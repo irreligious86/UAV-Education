@@ -36,15 +36,15 @@
       "explain": "0 — HEARTBEAT, 1 — SYS_STATUS, 30 — ATTITUDE, 33 — GLOBAL_POSITION_INT."
     },
     {
-      "q": "Как попросить ATTITUDE с частотой 10 Гц?",
+      "q": "Какой одной командой попросить только ATTITUDE с частотой 10 Гц?",
       "options": [
         "Никак нельзя",
         "SET_MESSAGE_INTERVAL 100000",
-        "Через параметр MAV3_EXTRA1 (до 4.7 — SR2_EXTRA1) по MAVLink",
+        "Отправить REQUEST_DATA_STREAM на GCS",
         "Через PARAM_SET"
       ],
       "answer": 1,
-      "explain": "Интервал в микросекундах."
+      "explain": "Интервал в микросекундах; параметр потока (MAV3_EXTRA1) через PARAM_SET меняет сразу группу сообщений."
     },
     {
       "q": "system_id и component_id — это…",

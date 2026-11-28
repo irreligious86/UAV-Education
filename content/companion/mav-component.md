@@ -3,7 +3,7 @@ id: mav-component
 title: "Свой компонент MAVLink: датчик, параметры, сообщения"
 level: L3
 readingTime: 45 мин
-firmware: ArduPilot · PX4
+firmware: ArduPilot 4.7 (сверено с 4.7.3) · PX4 1.18 (сверено с v1.18.0) · MAVLink 2
 status: published
 added: 2026-11-08
 tags:
@@ -91,7 +91,7 @@ python -m pytest -q tests/test_component.py
 Запустите SITL (модуль ap-sitl), задайте `RNGFND1_TYPE = 10`, `RNGFND1_ORIENT = 25`, `RNGFND1_MAX = 40` (на 4.6 и раньше — `RNGFND1_MAX_CM = 4000`), перезагрузите. Запустите `virtual_rangefinder.py --master udpin:0.0.0.0:14551` (скрипт слушает отдельный выход SITL/роутера `--out=udp:127.0.0.1:14551` и отвечает на адрес, с которого пришёл поток). Взлетите на 10 м: в Mission Planner `rangefinder1` показывает ~10 м минус «рельеф», в логе — `RFND`. Остановите скрипт — через несколько сотен миллисекунд автопилот должен перестать считать дальномер здоровым.
 
 ### Шаг 3. Параметр компонента
-Добавьте компоненту параметр `RF_OFFSET_CM` (смещение установки): ответы на `PARAM_REQUEST_LIST`/`READ`/`SET` для своего compid, хранение в JSON-файле. Проверьте, что QGC видит его в группе компонента и что изменение из QGC сразу меняет `DISTANCE_SENSOR`.
+Добавьте компоненту параметр `RF_OFFSET_CM` (смещение установки): ответы на `PARAM_REQUEST_LIST`/`READ`/`SET` для своего compid, хранение в JSON-файле. Проверьте, что QGC видит его в группе компонента и что изменение из QGC сразу меняет `DISTANCE_SENSOR`. Учтите: по определению MAVLink `MAV_COMP_ID_PERIPHERAL` (158) — для устройств без протокола параметров; когда у компонента появились параметры, дайте ему другой свободный compid (например, `MAV_COMP_ID_USER1`… или `MAV_COMP_ID_ONBOARD_COMPUTER2` (192) на companion).
 
 ### Шаг 4. ESP32
 Перенесите компонент на ESP32: UART к TELEM-порту SITL через USB-UART адаптер (или к реальному FC), heartbeat + `DISTANCE_SENSOR` с синусом вместо датчика; затем подключите реальный дальномер (VL53L1X по I2C или TFmini по UART). Сверьте `RFND` в логе с показаниями.

@@ -3,7 +3,7 @@
   "pass": 80,
   "questions": [
     {
-      "q": "How many bits does one byte take in UART 8N1?",
+      "q": "How many bits does one byte take on a UART at 8N1?",
       "options": [
         "8",
         "9",
@@ -16,7 +16,7 @@
     {
       "q": "What does a framing error mean?",
       "options": [
-        "Wrong slave address on the bus",
+        "A wrong target address on the bus",
         "No stop bit: baud rate/inversion",
         "A lost byte",
         "No pull-up"
@@ -29,14 +29,14 @@
       "options": [
         "For speed",
         "To switch W→R without a STOP",
-        "To get a second ACK from the slave",
+        "To get a second ACK from the target",
         "For a reset"
       ],
       "answer": 1,
       "explain": "Write the register address, then read with no STOP in between."
     },
     {
-      "q": "How do you recover a stuck I2C bus (the slave holds SDA)?",
+      "q": "How do you recover a stuck I2C bus (the target holds SDA)?",
       "options": [
         "Reboot the MCU",
         "9 SCL clocks, then STOP",
@@ -44,18 +44,18 @@
         "Raise the bus speed to 400 kHz"
       ],
       "answer": 1,
-      "explain": "Bus recovery is the standard technique."
+      "explain": "Bus recovery is a standard technique."
     },
     {
-      "q": "Why is there no ACK in SPI?",
+      "q": "Why does SPI have no ACK?",
       "options": [
-        "There is one, hidden in the MISO line",
-        "Full duplex with no addresses and no ACK",
+        "It does, hidden on the MISO line",
+        "Full duplex with no addresses or ACK",
         "It is slow",
         "Because of the CS line"
       ],
       "answer": 1,
-      "explain": "Data shifts in both directions every clock; integrity is checked by meaning — WHO_AM_I and the value range."
+      "explain": "Data shifts both ways on every clock; integrity is checked by meaning: WHO_AM_I and the value range."
     },
     {
       "q": "How does CAN resolve simultaneous transmission?",
@@ -63,24 +63,24 @@
         "With a random delay",
         "By arbitration on the ID",
         "By electing a master",
-        "Collision and retry"
+        "By colliding, then retrying"
       ],
       "answer": 1,
       "explain": "A dominant 0 wins: the lower ID wins with no time lost."
     },
     {
-      "q": "What is the node ID in DroneCAN?",
+      "q": "What is a node ID in DroneCAN?",
       "options": [
-        "Bus speed in kbit/s",
-        "Node number 1–127",
-        "I2C address",
-        "Message type"
+        "The bus rate in kbit/s",
+        "A node number 1–127",
+        "An I2C address",
+        "A message type"
       ],
       "answer": 1,
       "explain": "It is part of the 29-bit CAN ID."
     },
     {
-      "q": "How long does it take to transmit one UART 8N1 byte at 115200 baud?",
+      "q": "How long does one UART 8N1 byte take at 115200 baud?",
       "options": [
         "≈ 87 µs (10 bits)",
         "≈ 8.7 µs",

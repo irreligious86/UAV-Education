@@ -30,7 +30,7 @@ Raspberry Pi на борту — классический первый companion
 Питание Pi — от отдельного BEC 5 В с запасом по току (Pi 4/5 под нагрузкой — больше ампера), не с порта телеметрии FC.
 
 ### UART на Raspberry Pi
-По умолчанию UART занят консолью Linux. В `raspi-config` → Interfacing → Serial: консоль по serial — **нет**, аппаратный порт — **да**. После перезагрузки порт доступен как `/dev/serial0` — так на Pi 3/4. **На Pi 5** `/dev/serial0` указывает на отладочный разъём (`/dev/ttyAMA10`), а UART на GPIO 14/15 включается строкой `dtparam=uart0=on` в `/boot/firmware/config.txt` и называется `/dev/ttyAMA0` — в примерах ниже подставьте его. На Pi 3/4 основной UART по умолчанию отдан Bluetooth, а на GPIO остаётся mini-UART, скорость которого «плавает» вместе с частотой ядра: для стабильных 921600 — `enable_uart=1` и `dtoverlay=disable-bt` в `config.txt`.
+По умолчанию UART занят консолью Linux. В `raspi-config` → Interface Options → Serial Port: консоль по serial — **нет**, аппаратный порт — **да**. После перезагрузки порт доступен как `/dev/serial0` — так на Pi 3/4. **На Pi 5** `/dev/serial0` указывает на отладочный разъём (`/dev/ttyAMA10`), а UART на GPIO 14/15 включается строкой `dtoverlay=uart0-pi5` (так в документации Raspberry Pi; встречается и `dtparam=uart0=on`) в `/boot/firmware/config.txt` и называется `/dev/ttyAMA0` — в примерах ниже подставьте его. На Pi 3/4 основной UART по умолчанию отдан Bluetooth, а на GPIO остаётся mini-UART, скорость которого «плавает» вместе с частотой ядра: для стабильных 921600 — `enable_uart=1` и `dtoverlay=disable-bt` в `config.txt`.
 
 ### Маршрутизация
 Один UART, а потребителей несколько: GCS по Wi-Fi, твой скрипт, запись tlog. Решение — маршрутизатор MAVLink: `mavlink-router` или `mavp2p` читает порт и раздаёт по UDP/TCP всем подключённым. Скрипты тогда подключаются к локальному UDP-порту, а не к `/dev/serial0` напрямую, и не мешают друг другу.
@@ -63,7 +63,7 @@ BEC берут с запасом минимум в полтора-два раз�
 Скрипт, запущенный из терминала по SSH, умирает вместе с сессией. На борту всё должно стартовать само: `systemd`-юнит с `Restart=always`, логи — в `journalctl`. Если скрипт может не упасть, а зависнуть (сокет, камера, бесконечный цикл), нужен ещё и сторожевой таймер: `Type=notify` и `WatchdogSec=` — systemd перезапускает сервис, если тот перестал сообщать «я жив». Без сообщений от скрипта `WatchdogSec` просто убивает его каждые N секунд — эту ловушку проходят почти все. Рабочий вариант — в практике, шаг 3.
 
 ### Время и логи
-Pi без RTC и без сети стартует с 1970 года: точного времени после загрузки нет, абсолютные метки до синхронизации бессмысленны. Практично: скрипт при старте пишет пару (`SYSTEM_TIME.time_unix_usec` из MAVLink — время GPS от полётника, и свой `time.monotonic()`) и дальше использует монотонные метки (`TimeUS`-подобный счётчик плюс записанный момент синхронизации); при разборе логи companion сопоставляются с DataFlash полётника по этой паре. На Pi 5 есть разъём батарейки RTC — с ней время переживает перезагрузку без сети.
+Pi без RTC и без сети стартует со «старым» временем (сохранённым при прошлом выключении через fake-hwclock, на голой системе — с 1970 года): точного времени после загрузки нет, абсолютные метки до синхронизации бессмысленны. Практично: скрипт при старте пишет пару (`SYSTEM_TIME.time_unix_usec` из MAVLink — время GPS от полётника, и свой `time.monotonic()`) и дальше использует монотонные метки (`TimeUS`-подобный счётчик плюс записанный момент синхронизации); при разборе логи companion сопоставляются с DataFlash полётника по этой паре. На Pi 5 есть разъём батарейки RTC — с ней время переживает отключение питания без сети.
 
 ### Место в системе
 
@@ -74,13 +74,13 @@ Pi без RTC и без сети стартует с 1970 года: точног
 ## practice
 ### Шаг 1. Порт и проверка
 ```
-sudo raspi-config        # Interfacing Options -> Serial: console NO, hardware YES
+sudo raspi-config        # Interface Options -> Serial Port: login shell NO, hardware YES
 sudo reboot
-pip install --user pymavlink MAVProxy
+python3 -m venv ~/uav && . ~/uav/bin/activate && pip install pymavlink MAVProxy
 mavproxy.py --master=/dev/serial0 --baudrate 921600
 ```
 
-Увидел heartbeat и параметры — связь есть. Команду `arm throttle` на столе давать только без пропов.
+С Bookworm `pip` вне виртуального окружения пакеты не ставит (`externally-managed-environment`), поэтому — venv `~/uav`. Увидел heartbeat и параметры — связь есть. Команду `arm throttle` на столе давать только без пропов.
 
 ### Шаг 2. Маршрутизатор
 Пример конфигурации `mavlink-router` (`/etc/mavlink-router/main.conf`):
@@ -151,11 +151,12 @@ Requires=mavlink-router.service
 [Service]
 Type=notify
 NotifyAccess=main
-ExecStart=/usr/bin/python3 /opt/uav/telemetry_logger.py
+ExecStart=/home/pilot/uav/bin/python3 /opt/uav/telemetry_logger.py
 WatchdogSec=10
 Restart=always
 RestartSec=2
-User=pi
+User=pilot
+LogsDirectory=uav
 
 [Install]
 WantedBy=multi-user.target
@@ -166,7 +167,7 @@ sudo systemctl daemon-reload
 sudo systemctl enable --now uav-telemetry
 journalctl -u uav-telemetry -f
 ```
-Проверка сторожевого таймера: `sudo kill -STOP $(systemctl show -p MainPID --value uav-telemetry)` замораживает процесс — через 10 с в журнале будет `Watchdog timeout`, и systemd перезапустит сервис.
+`pilot` — условное имя: с 2022 года в Raspberry Pi OS нет пользователя `pi` по умолчанию, подставьте в `User=` и в путь `ExecStart=` пользователя, созданного в Raspberry Pi Imager. `LogsDirectory=uav` — systemd сам создаёт `/var/log/uav` с владельцем этого пользователя; без этого скрипт без прав root не сможет создать каталог в `/var/log`, и сервис уйдёт в цикл перезапусков. Проверка сторожевого таймера: `sudo kill -STOP $(systemctl show -p MainPID --value uav-telemetry)` замораживает процесс — через 10 с в журнале будет `Watchdog timeout`, и systemd перезапустит сервис.
 
 ### Шаг 4. Питание и температура под нагрузкой
 Нагрузить CPU (`stress-ng --cpu 4 --timeout 300s` или свой алгоритм зрения) и раз в 10 с записывать `vcgencmd measure_temp` и `vcgencmd get_throttled`. Записать: через сколько секунд начался троттлинг (если начался), была ли просадка питания. Повторить с радиатором или обдувом и с другим BEC.

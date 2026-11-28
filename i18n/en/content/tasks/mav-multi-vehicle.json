@@ -4,7 +4,7 @@
   {
    "id": "sep",
    "title": "Supervisor trigger distance",
-   "statement": "Two vehicles are closing, each at **{v} m/s**. Telemetry delay is **{d1} s**, decision **{d2} s**, braking **{b} s**, and the combined position error of the two vehicles is **{e} m**. Estimate the minimum trigger distance (m), assuming constant closing speed for this whole time.",
+   "statement": "Two vehicles close on each other at **{v} m/s** each. Telemetry delay **{d1} s**, decision **{d2} s**, braking **{b} s**, combined position error of the two vehicles **{e} m**. Estimate the minimum trigger distance (m), assuming a constant closing speed the whole time.",
    "params": {
     "v": {
      "min": 3,
@@ -34,7 +34,7 @@
    "answer": "2*v*(d1+d2+b)+e",
    "unit": "m",
    "tol": 0.03,
-   "solution": "Closing speed is 2v; the distance covered during (delays + braking) plus position errors."
+   "solution": "Closing speed 2v; the distance covered during (delays + braking), plus the position errors."
   }
  ]
 }

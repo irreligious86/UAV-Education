@@ -38,7 +38,7 @@ MAVLink 2 — бінарний протокол поверх UART, UDP або TC
 - Частота потоків: `MAV_CMD_SET_MESSAGE_INTERVAL` (511) — попросити конкретне повідомлення з потрібним інтервалом; `MAV_CMD_REQUEST_MESSAGE` (512) — один раз.
 - Параметри: `PARAM_REQUEST_READ` (20) → `PARAM_VALUE` (22); запис `PARAM_SET` (23), підтвердження тим самим `PARAM_VALUE`.
 - Керування в GUIDED: `SET_POSITION_TARGET_LOCAL_NED` (84) і `SET_POSITION_TARGET_GLOBAL_INT` (86) — ціль за позицією або швидкістю; основа offboard-керування з companion.
-- Місії: `MISSION_COUNT` (44), `MISSION_ITEM_INT` (73), `MISSION_REQUEST_INT` (51), `MISSION_ACK` (47) — діалог із модуля про місії.
+- Місії: `MISSION_COUNT` (44), `MISSION_ITEM_INT` (73), `MISSION_REQUEST_INT` (51; ArduPilot 4.7 під час приймання місії надсилає `MISSION_REQUEST` (40) і приймає у відповідь `MISSION_ITEM_INT`), `MISSION_ACK` (47) — діалог із модуля про місії.
 
 ### Правило підтверджень
 Команда без перевірки `COMMAND_ACK` — це надія, а не керування. Результат `MAV_RESULT_ACCEPTED` (0) означає «прийнято»; решта кодів — відмова, і її причина зазвичай приходить у `STATUSTEXT`.

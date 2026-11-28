@@ -6,59 +6,59 @@
       "q": "What stays on the flight controller rather than the companion?",
       "options": [
         "Computer vision",
-        "Stabilization and failsafe",
-        "Logs to the cloud",
-        "Internet access and cloud logs"
+        "Stabilization and failsafes",
+        "Cloud logging",
+        "Video streaming to the ground station"
       ],
       "answer": 1,
-      "explain": "Stabilization, navigation, failsafe, mixer: whatever the aircraft would crash without goes on the FC."
+      "explain": "Stabilization, navigation, failsafes, the mixer: whatever the vehicle would crash without goes on the FC."
     },
     {
-      "q": "The companion…",
+      "q": "Companion…",
       "options": [
-        "Controls the motors",
+        "Drives the motors",
         "Advises, and the FC decides",
-        "Only writes logs for analysis",
+        "Only writes logs for later analysis",
         "Replaces the FC"
       ],
       "answer": 1,
-      "explain": "The FC checks the geofence, the battery, the EKF and executes or refuses."
+      "explain": "The FC checks the geofence, the battery, and the EKF, then executes the request or rejects it."
     },
     {
-      "q": "The companion hung in flight. What is the correct aircraft behavior?",
+      "q": "The companion hangs in flight. What is the correct vehicle behavior?",
       "options": [
-        "Waits forever at the last target",
-        "Timeout → safe mode",
-        "Crashes",
-        "Kills the motors"
+        "Waits forever on the last target",
+        "A timeout, then safe behavior",
+        "It crashes",
+        "It cuts the motors"
       ],
       "answer": 1,
-      "explain": "GUIDED timeouts and the GCS failsafe are part of the design."
+      "explain": "GUIDED timeouts and the GCS failsafe are part of the design: in Copter, velocity targets expire after GUID_TIMEOUT and the vehicle brakes and hovers."
     },
     {
-      "q": "Which platform for telemetry on a screen and setup from a phone?",
+      "q": "Which platform fits telemetry on a screen and settings from a phone?",
       "options": [
         "Jetson",
         "ESP32",
         "Raspberry Pi",
-        "PC"
+        "A PC"
       ],
       "answer": 1,
-      "explain": "A microcontroller with Wi-Fi: instant boot, milliwatts."
+      "explain": "A microcontroller with Wi-Fi: instant boot, well under a watt."
     },
     {
-      "q": "Where should you power the companion from?",
+      "q": "Where should the companion get its power?",
       "options": [
-        "The FC telemetry port",
-        "A separate BEC",
-        "The receiver",
-        "The video transmitter"
+        "From the FC telemetry port",
+        "From a dedicated BEC",
+        "From the receiver",
+        "From the video transmitter"
       ],
       "answer": 1,
-      "explain": "The telemetry port isn't rated for a computer's current."
+      "explain": "A telemetry port is not designed for a computer's current draw."
     },
     {
-      "q": "The ArduPilot companion port speed for 10–50 Hz streams:",
+      "q": "The ArduPilot companion port baud rate for 10–50 Hz streams:",
       "options": [
         "57600",
         "921600",
@@ -71,24 +71,24 @@
     {
       "q": "What must the FC survive when the companion fails?",
       "options": [
-        "Only a broken UART, the rest doesn't matter",
+        "Only a broken UART; nothing else matters",
         "A hang, a reboot, a broken link",
         "Only a reboot",
         "Nothing"
       ],
       "answer": 1,
-      "explain": "This is tested by pulling the UART in SITL/on the bench."
+      "explain": "You test it by pulling the UART in SITL or on the bench."
     },
     {
-      "q": "What is the component_id of an onboard computer in MAVLink?",
+      "q": "What component_id does an onboard computer have in MAVLink?",
       "options": [
         "191 (MAV_COMP_ID_ONBOARD_COMPUTER)",
-        "1 — same as the autopilot",
-        "255 — same as the GCS",
-        "0 — broadcast"
+        "1, the same as the autopilot",
+        "255, the same as the GCS",
+        "0, broadcast"
       ],
       "answer": 0,
-      "explain": "The companion is a separate component 191 of the same system."
+      "explain": "The companion is a separate component, 191, in the same system."
     }
   ]
 }

@@ -3,7 +3,7 @@
   "pass": 80,
   "questions": [
     {
-      "q": "A sensor component sets autopilot in its HEARTBEAT to",
+      "q": "A sensor component puts this in its HEARTBEAT autopilot field:",
       "options": [
         "MAV_AUTOPILOT_INVALID",
         "MAV_AUTOPILOT_ARDUPILOTMEGA",
@@ -14,7 +14,7 @@
       "explain": "It is not an autopilot; otherwise the GCS may mistake it for a vehicle."
     },
     {
-      "q": "Units of current_distance in DISTANCE_SENSOR:",
+      "q": "The units of current_distance in DISTANCE_SENSOR:",
       "options": [
         "Centimeters",
         "Meters",
@@ -30,7 +30,7 @@
         "RNGFND1_TYPE = 10, ORIENT = 25",
         "RNGFND1_TYPE = 1, ORIENT = 25",
         "PRX1_TYPE = 2, PRX1_ORIENT = 0",
-        "EK3_SRC1_POSZ = 2 with no sensor"
+        "EK3_SRC1_POSZ = 2 without a sensor"
       ],
       "answer": 0,
       "explain": "10 is MAVLink, 25 is Down; the orientation in the message must match."
@@ -38,24 +38,24 @@
     {
       "q": "What should a component do when it loses measurements?",
       "options": [
-        "Stop sending or flag it",
+        "Stop sending, or flag the data",
         "Reboot the autopilot",
         "Send zeros instead of data",
         "Keep sending the last value at the same rate"
       ],
       "answer": 0,
-      "explain": "The autopilot will detect the timeout and disable the source."
+      "explain": "The autopilot detects the timeout and disables the source."
     },
     {
-      "q": "Quickly show your own number in the GCS and the log without your own dialect:",
+      "q": "Quickly showing your own number in the GCS and the log without a dialect of your own:",
       "options": [
         "NAMED_VALUE_FLOAT",
-        "STATUSTEXT with a number",
+        "STATUSTEXT with the number",
         "PARAM_VALUE",
         "HEARTBEAT.custom_mode"
       ],
       "answer": 0,
-      "explain": "The GCS shows the value, ArduPilot writes it to the log as NVAL."
+      "explain": "The GCS displays the value, and ArduPilot logs it as NVAL."
     },
     {
       "q": "MAVLink frames from an ESP32 are sometimes broken. The likely cause:",
@@ -63,27 +63,27 @@
         "Several tasks write to the UART",
         "Signing is enabled",
         "Wrong CRC_EXTRA",
-        "A too-frequent heartbeat clogs the buffer"
+        "Too frequent a heartbeat clogs the buffer"
       ],
       "answer": 0,
       "explain": "You need a single sender task or a mutex on the UART."
     },
     {
-      "q": "Which test level proves that the autopilot uses the component's data?",
+      "q": "Which test level proves the autopilot uses the component's data?",
       "options": [
-        "SITL with a check in the log",
+        "SITL, checked against the log",
         "A packing unit test",
         "A test against a fake vehicle",
-        "A successful compile"
+        "A successful build"
       ],
       "answer": 0,
-      "explain": "Only it verifies that the parameters and the message agree."
+      "explain": "Only it checks that the parameters and the message agree."
     },
     {
       "q": "A 2D lidar for obstacle avoidance sends:",
       "options": [
         "OBSTACLE_DISTANCE",
-        "DISTANCE_SENSOR with a downward orientation",
+        "DISTANCE_SENSOR oriented down",
         "ODOMETRY",
         "GPS_INPUT"
       ],

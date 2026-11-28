@@ -32,7 +32,7 @@ Raspberry Pi на борту — класичний перший companion: Linu
 Живлення Pi — від окремого BEC 5 В із запасом за струмом (Pi 4/5 під навантаженням — понад ампер), не з порту телеметрії FC.
 
 ### UART на Raspberry Pi
-За замовчуванням UART зайнятий консоллю Linux. У `raspi-config` → Interfacing → Serial: консоль по serial — **ні**, апаратний порт — **так**. Після перезавантаження порт доступний як `/dev/serial0` — так на Pi 3/4. **На Pi 5** `/dev/serial0` вказує на налагоджувальний роз'єм (`/dev/ttyAMA10`), а UART на GPIO 14/15 вмикається рядком `dtparam=uart0=on` у `/boot/firmware/config.txt` і називається `/dev/ttyAMA0` — у прикладах нижче підстав його. На Pi 3/4 основний UART за замовчуванням віддано Bluetooth, а на GPIO лишається mini-UART, швидкість якого «пливе» разом із частотою ядра: для стабільних 921600 — `enable_uart=1` і `dtoverlay=disable-bt` у `config.txt`.
+За замовчуванням UART зайнятий консоллю Linux. У `raspi-config` → Interface Options → Serial Port: консоль по serial — **ні**, апаратний порт — **так**. Після перезавантаження порт доступний як `/dev/serial0` — так на Pi 3/4. **На Pi 5** `/dev/serial0` вказує на налагоджувальний роз'єм (`/dev/ttyAMA10`), а UART на GPIO 14/15 вмикається рядком `dtoverlay=uart0-pi5` (так у документації Raspberry Pi; трапляється й `dtparam=uart0=on`) у `/boot/firmware/config.txt` і називається `/dev/ttyAMA0` — у прикладах нижче підстав його. На Pi 3/4 основний UART за замовчуванням віддано Bluetooth, а на GPIO лишається mini-UART, швидкість якого «пливе» разом із частотою ядра: для стабільних 921600 — `enable_uart=1` і `dtoverlay=disable-bt` у `config.txt`.
 
 ### Маршрутизація
 Один UART, а споживачів кілька: GCS через Wi-Fi, твій скрипт, запис tlog. Рішення — маршрутизатор MAVLink: `mavlink-router` або `mavp2p` читає порт і роздає по UDP/TCP усім під'єднаним. Скрипти тоді під'єднуються до локального UDP-порту, а не до `/dev/serial0` напряму, і не заважають одне одному.
@@ -71,18 +71,18 @@ BEC беруть із запасом щонайменше в півтора-дв
 Скрипт, запущений із термінала по SSH, помирає разом із сесією. На борту все стартує саме: `systemd`-юніт з `Restart=always`. Якщо скрипт може не впасти, а зависнути (сокет, камера, нескінченний цикл), потрібен ще й сторожовий таймер: `Type=notify` і `WatchdogSec=` — systemd перезапускає сервіс, якщо той перестав повідомляти «я живий». Без повідомлень від скрипта `WatchdogSec` просто вбиває його кожні N секунд — у цю пастку потрапляють майже всі. Робочий варіант — у практиці, крок 3.
 
 ### Час і логи
-Pi без RTC і без мережі стартує з 1970 року — абсолютні мітки до синхронізації безглузді. Практично: скрипт під час старту пише пару (`SYSTEM_TIME.time_unix_usec` з MAVLink — час GPS від польотного контролера, і свій `time.monotonic()`) і далі використовує монотонні мітки; під час розбору логи companion зіставляються з DataFlash польотного контролера за цією парою. На Pi 5 є роз'єм батарейки RTC — з нею час переживає перезавантаження без мережі.
+Pi без RTC і без мережі стартує зі «старим» часом (збереженим під час попереднього вимкнення через fake-hwclock, на голій системі — з 1970 року) — абсолютні мітки до синхронізації безглузді. Практично: скрипт під час старту пише пару (`SYSTEM_TIME.time_unix_usec` з MAVLink — час GPS від польотного контролера, і свій `time.monotonic()`) і далі використовує монотонні мітки; під час розбору логи companion зіставляються з DataFlash польотного контролера за цією парою. На Pi 5 є роз'єм батарейки RTC — з нею час переживає вимкнення живлення без мережі.
 
 ## practice
 ### Крок 1. Порт і перевірка
 ```
-sudo raspi-config        # Interfacing Options -> Serial: console NO, hardware YES
+sudo raspi-config        # Interface Options -> Serial Port: login shell NO, hardware YES
 sudo reboot
-pip install --user pymavlink MAVProxy
+python3 -m venv ~/uav && . ~/uav/bin/activate && pip install pymavlink MAVProxy
 mavproxy.py --master=/dev/serial0 --baudrate 921600
 ```
 
-Побачив heartbeat і параметри — зв'язок є. Команду `arm throttle` на столі давати лише без пропелерів.
+З Bookworm `pip` поза віртуальним оточенням пакети не встановлює (`externally-managed-environment`), тому — venv `~/uav`. Побачив heartbeat і параметри — зв'язок є. Команду `arm throttle` на столі давати лише без пропелерів.
 
 ### Крок 2. Маршрутизатор
 Приклад конфігурації `mavlink-router` (`/etc/mavlink-router/main.conf`):
@@ -153,11 +153,12 @@ Requires=mavlink-router.service
 [Service]
 Type=notify
 NotifyAccess=main
-ExecStart=/usr/bin/python3 /opt/uav/telemetry_logger.py
+ExecStart=/home/pilot/uav/bin/python3 /opt/uav/telemetry_logger.py
 WatchdogSec=10
 Restart=always
 RestartSec=2
-User=pi
+User=pilot
+LogsDirectory=uav
 
 [Install]
 WantedBy=multi-user.target
@@ -168,7 +169,7 @@ sudo systemctl daemon-reload
 sudo systemctl enable --now uav-telemetry
 journalctl -u uav-telemetry -f
 ```
-Перевірка сторожового таймера: `sudo kill -STOP $(systemctl show -p MainPID --value uav-telemetry)` заморожує процес — через 10 с у журналі буде `Watchdog timeout`, і systemd перезапустить сервіс.
+`pilot` — умовне ім'я: з 2022 року в Raspberry Pi OS немає користувача `pi` за замовчуванням, підстав у `User=` і в шлях `ExecStart=` користувача, створеного в Raspberry Pi Imager. `LogsDirectory=uav` — systemd сам створює `/var/log/uav` з власником цього користувача; без цього скрипт без прав root не зможе створити каталог у `/var/log`, і сервіс піде в цикл перезапусків. Перевірка сторожового таймера: `sudo kill -STOP $(systemctl show -p MainPID --value uav-telemetry)` заморожує процес — через 10 с у журналі буде `Watchdog timeout`, і systemd перезапустить сервіс.
 
 ### Крок 4. Живлення і температура під навантаженням
 Навантажити CPU (`stress-ng --cpu 4 --timeout 300s` або свій алгоритм зору) і раз на 10 с записувати `vcgencmd measure_temp` і `vcgencmd get_throttled`. Записати: через скільки секунд почався тротлінг (якщо почався), чи було просідання живлення. Повторити з радіатором або обдувом і з іншим BEC.

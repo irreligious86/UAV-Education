@@ -3,7 +3,7 @@
   "pass": 80,
   "questions": [
     {
-      "q": "The length of the MAVLink 2 header including the STX byte:",
+      "q": "The length of the MAVLink 2 header, including the STX byte:",
       "options": [
         "10 bytes",
         "6 bytes",
@@ -16,43 +16,43 @@
     {
       "q": "Why is CRC_EXTRA mixed into the CRC?",
       "options": [
-        "To reject mismatched definitions",
+        "To reject foreign definitions",
         "For encryption",
         "To lengthen the checksum",
         "For signing"
       ],
       "answer": 0,
-      "explain": "If message definitions diverge, the frame is dropped; otherwise different dialects with the same length would produce garbage fields."
+      "explain": "When the message definitions diverge, the frame is dropped; otherwise different dialects with the same length would yield garbage fields."
     },
     {
-      "q": "The COMMAND_LONG payload length in a frame is less than 33 bytes. This is:",
+      "q": "The COMMAND_LONG payload in a frame is shorter than 33 bytes. This is:",
       "options": [
-        "Normal: the zeros were truncated",
+        "Normal: zeros were truncated",
         "A sign of signing",
-        "A sender error: the frame is truncated",
+        "A sender error: the frame was cut off",
         "A sign of MAVLink 1"
       ],
       "answer": 0,
       "explain": "The receiver pads it with zeros to the full size."
     },
     {
-      "q": "The order of message fields on the wire:",
+      "q": "The field order of a message on the wire:",
       "options": [
         "By type size, extensions at the end",
-        "In random order",
+        "Random",
         "Alphabetical by field name",
-        "In the order the fields are declared in the XML"
+        "The order the fields are declared in the XML"
       ],
       "answer": 0,
-      "explain": "That's how mavgen aligns the struct."
+      "explain": "That is how mavgen aligns the struct."
     },
     {
       "q": "Adding an extension field to an existing message:",
       "options": [
-        "Doesn't change CRC_EXTRA",
+        "Does not change CRC_EXTRA",
         "Breaks old receivers",
         "Requires a new msgid",
-        "Is forbidden"
+        "Is not allowed"
       ],
       "answer": 0,
       "explain": "Extension fields are not part of CRC_EXTRA."
@@ -60,27 +60,27 @@
     {
       "q": "MAVLink 2 signing protects against:",
       "options": [
-        "Spoofing and replay of commands",
+        "Spoofed and replayed commands",
         "Eavesdropping on telemetry",
         "Jamming",
         "Packet loss"
       ],
       "answer": 0,
-      "explain": "There's no encryption; for confidentiality — a VPN or an encrypting radio."
+      "explain": "There is no encryption; for confidentiality, use a VPN or an encrypting radio."
     },
     {
       "q": "How does a receiver count lost frames?",
       "options": [
-        "By gaps in seq",
-        "It doesn't",
-        "By the CRC",
-        "By RSSI and the CRC error counter"
+        "From gaps in seq",
+        "It cannot",
+        "From the CRC",
+        "From RSSI and the CRC error counter"
       ],
       "answer": 0,
       "explain": "(seq_new − seq_old − 1) mod 256."
     },
     {
-      "q": "The signing key is passed to ArduPilot with:",
+      "q": "The signing key reaches ArduPilot in:",
       "options": [
         "SETUP_SIGNING over USB",
         "A HEARTBEAT field",
@@ -88,20 +88,20 @@
         "A Lua script"
       ],
       "answer": 0,
-      "explain": "Usually over USB; it's stored in flash."
+      "explain": "Usually over USB; it is stored in flash."
     },
     {
-      "q": "Your MAVLink 2 decoder rejects frames from the telemetry radio modem. Start of the frame:",
+      "q": "Your MAVLink 2 decoder rejects frames from a telemetry radio. The start of a frame:",
       "kind": "apply",
       "fragment": "fe 1c 4a 01 01 1e 0c 4f 00 00 ...",
       "options": [
-        "Start byte 0xFE is MAVLink 1: the port is configured for v1 or the modem forwards v1",
-        "Bad CRC: the modem reorders bytes, so the decoder can't find the end of the frame",
+        "The 0xFE start byte is MAVLink 1: the port is set to v1, or the radio forwards v1",
+        "Bad CRC: the radio reorders bytes, so the decoder cannot find the end of the frame",
         "This message is signed: length 0x1c includes 13 signature bytes that are missing",
-        "msgid 0x1e doesn't exist in common.xml, so the frame is dropped as a foreign dialect"
+        "msgid 0x1e does not exist in common.xml, so the frame is dropped as a foreign dialect"
       ],
       "answer": 0,
-      "explain": "MAVLink 2 starts with 0xFD, MAVLink 1 with 0xFE; the header has a different length."
+      "explain": "MAVLink 2 starts with 0xFD, MAVLink 1 with 0xFE; the header length differs."
     }
   ]
 }
