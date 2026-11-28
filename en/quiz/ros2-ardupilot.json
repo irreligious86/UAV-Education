@@ -3,7 +3,7 @@
   "pass": 80,
   "questions": [
     {
-      "q": "To enable AP_DDS over a serial port:",
+      "q": "Enable AP_DDS on a serial port:",
       "options": [
         "PROTOCOL 45, DDS_ENABLE",
         "MAV_SYSID = 45",
@@ -11,10 +11,10 @@
         "SERIALn_PROTOCOL = 2 (MAVLink2)"
       ],
       "answer": 0,
-      "explain": "For UDP — DDS_UDP_PORT (2019) and DDS_IP0..3."
+      "explain": "For UDP: DDS_UDP_PORT (2019) and DDS_IP0..3."
     },
     {
-      "q": "What coordinate frame is /ap/pose/filtered in?",
+      "q": "Which frame is /ap/pose/filtered in?",
       "options": [
         "ENU relative to home",
         "NED relative to home",
@@ -22,10 +22,10 @@
         "FRD"
       ],
       "answer": 0,
-      "explain": "AP_DDS converts it itself; the firmware writes base_link into header.frame_id."
+      "explain": "AP_DDS converts by itself; the firmware writes base_link into header.frame_id."
     },
     {
-      "q": "The service to switch Copter to GUIDED:",
+      "q": "The mode-change service to GUIDED for Copter:",
       "options": [
         "/ap/mode_switch, 4",
         "/ap/arm_motors",
@@ -36,9 +36,9 @@
       "explain": "GUIDED = 4, LAND = 9."
     },
     {
-      "q": "/ap/cmd_vel setpoints are ignored on the ground. What's missing?",
+      "q": "/ap/cmd_vel setpoints are ignored on the ground. What is missing?",
       "options": [
-        "A takeoff in GUIDED",
+        "Takeoff in GUIDED",
         "QoS RELIABLE",
         "MAVROS",
         "The prearm service and QoS"
@@ -55,15 +55,15 @@
         "DDS_TIMEOUT_MS"
       ],
       "answer": 0,
-      "explain": "The counterpart of PX4's 2 Hz."
+      "explain": "The counterpart of the 2 Hz rule in PX4."
     },
     {
-      "q": "Where do you get the ardupilot_msgs types?",
+      "q": "Where do the ardupilot_msgs types come from?",
       "options": [
         "Tools/ros2 in ArduPilot",
-        "In px4_msgs",
-        "In mavros_msgs",
-        "In ROS core"
+        "px4_msgs",
+        "mavros_msgs",
+        "ROS core"
       ],
       "answer": 0,
       "explain": "The branch must match the firmware."
@@ -73,7 +73,7 @@
       "options": [
         "Missions, parameters, all of MAVLink",
         "Always",
-        "For minimum latency",
+        "For the lowest possible latency",
         "Never"
       ],
       "answer": 0,

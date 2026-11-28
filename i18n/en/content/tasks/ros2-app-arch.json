@@ -1,0 +1,72 @@
+{
+  "module": "ros2-app-arch",
+  "tasks": [
+    {
+      "id": "ipc-image-bandwidth",
+      "title": "Frame stream between processes",
+      "statement": "The camera driver and the detector are separate processes. The frame is **{px}**, the format **{bpp}**, **{fps} frames/s**. How many megabytes per second (1 MB = 10⁶ bytes) go through DDS without composition?",
+      "params": {
+        "px": [
+          307200,
+          921600,
+          2073600
+        ],
+        "bpp": [
+          1,
+          2,
+          3
+        ],
+        "fps": [
+          15,
+          30,
+          60
+        ]
+      },
+      "answer": "px*bpp*fps/1e6",
+      "unit": "MB/s",
+      "tol": 0.01,
+      "solution": "Bytes per second = W·H·(bytes per pixel)·fps. The module's example: 1280×720×3×30 = 82.9 MB/s, which is why heavy streams in C++ are put into one container with `use_intra_process_comms` instead of being passed between processes.",
+      "labels": {
+        "px": {
+          "307200": "640×480",
+          "921600": "1280×720",
+          "2073600": "1920×1080"
+        },
+        "bpp": {
+          "1": "mono8 (1 byte/pixel)",
+          "2": "yuv422 (2 bytes/pixel)",
+          "3": "rgb8 (3 bytes/pixel)"
+        }
+      }
+    },
+    {
+      "id": "bag-ring-history",
+      "title": "How much history a circular bag keeps",
+      "statement": "The key topics are recorded at **{r} MB/s**. The bag is split by size at **{b} MB** (`-b` takes bytes), with the ring `--max-bag-files {n}` (rosbag2 for Lyrical). How many minutes of history are guaranteed to be on disk before an incident (count only complete files, not the one currently being written)?",
+      "params": {
+        "r": [
+          0.2,
+          0.5,
+          1.0,
+          2.0,
+          5.0
+        ],
+        "b": [
+          100,
+          250,
+          500,
+          1000
+        ],
+        "n": [
+          5,
+          10,
+          20
+        ]
+      },
+      "answer": "(n-1)*b/r/60",
+      "unit": "min",
+      "tol": 0.01,
+      "solution": "The ring keeps n files, one of which is being written now, so n − 1 are complete. History = (n − 1)·b / r seconds; divide by 60. The disk space for the ring is n·b MB. Humble/Jazzy/Kilted have no `--max-bag-files` flag: a script of your own deletes old files."
+    }
+  ]
+}

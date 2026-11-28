@@ -1,0 +1,101 @@
+{
+ "module": "ctl-allocation",
+ "tasks": [
+  {
+   "id": "cg-offset-load",
+   "title": "Front motor load with an offset CG",
+   "statement": "A quadcopter of **{m} kg**: the front motors are **{xf} m** ahead of the CG, the rear ones **{xr} m** behind it. What thrust (g) does one front motor carry in hover if the pitching moment is zero?",
+   "params": {
+    "m": {
+     "min": 0.6,
+     "max": 3.0,
+     "step": 0.1
+    },
+    "xf": {
+     "min": 0.08,
+     "max": 0.2,
+     "step": 0.01
+    },
+    "xr": {
+     "min": 0.08,
+     "max": 0.2,
+     "step": 0.01
+    }
+   },
+   "answer": "m*1000*xr/(2*(xf+xr))",
+   "unit": "g",
+   "tol": 0.02,
+   "solution": "Moment balance: 2·T_f·x_f = 2·T_r·x_r, and the sum 2·T_f + 2·T_r = m. Hence T_f = m·x_r / (2·(x_f + x_r)). The pair closer to the CG carries more; the PX4 pseudo-inverse gives the same split right away."
+  },
+  {
+   "id": "tilt-yaw-gain",
+   "title": "Yaw gain from tilting the motors",
+   "statement": "The motors sit on a radius of **{r} m**, KM = **{km}**. Their axes are tilted **{th}°** tangentially toward the reaction torque. By what factor has the yaw torque grown compared with vertical motors?",
+   "params": {
+    "r": {
+     "min": 0.1,
+     "max": 0.4,
+     "step": 0.01
+    },
+    "km": [
+     0.02,
+     0.03,
+     0.04,
+     0.05,
+     0.06
+    ],
+    "th": {
+     "min": 3,
+     "max": 15,
+     "step": 1
+    }
+   },
+   "answer": "(r*math.sin(math.radians(th))+km*math.cos(math.radians(th)))/km",
+   "unit": "×",
+   "tol": 0.02,
+   "solution": "Mz = CT·(r·sinθ + KM·cosθ), while for a vertical motor Mz = CT·KM. The ratio is (r·sinθ + KM·cosθ)/KM. The vertical thrust drops as cosθ. The PX4 normalization keeps the command, so the yaw loop gain grows by the same factor."
+  },
+  {
+   "id": "hexa-motor-loss",
+   "title": "Hexacopter motor load after a failure",
+   "statement": "An X hexacopter (PNPNPN) of **{m} kg**, maximum thrust of one motor **{tmax} g**. After one motor fails, the opposite one goes to 0, and four motors hold the hover. What fraction of its maximum thrust (%) does each of them produce?",
+   "params": {
+    "m": {
+     "min": 2.0,
+     "max": 5.0,
+     "step": 0.1
+    },
+    "tmax": {
+     "min": 1600,
+     "max": 3000,
+     "step": 100
+    }
+   },
+   "answer": "m*1000/4/tmax*100",
+   "unit": "%",
+   "tol": 0.02,
+   "solution": "Four motors carry the whole weight: T = m/4 per motor, the fraction is m/(4·T_max)·100 %. Before the failure it was m/6, so the load has grown 1.5 times. The closer the result is to 100 %, the less is left for control."
+  },
+  {
+   "id": "bf-legacy-scale",
+   "title": "Axis squeeze in the Betaflight LEGACY mixer",
+   "statement": "In the Betaflight mixer (mixer_type = LEGACY, airmode on) the roll+pitch+yaw sum over the motors has a maximum of **{mx}** and a minimum of **{mn}**. What fraction (%) of the requested roll reaches the motors?",
+   "params": {
+    "mx": {
+     "min": 0.3,
+     "max": 1.0,
+     "step": 0.05
+    },
+    "mn": {
+     "min": -1.0,
+     "max": -0.3,
+     "step": 0.05
+    }
+   },
+   "answer": "100*min(1, 1/(mx-mn))",
+   "unit": "%",
+   "tol": 0.02,
+   "solution": "motorMixRange = max − min. If the span is larger than 1, all three axes are multiplied by 1/span (applyMixerAdjustment); otherwise they stay as they are. Then the throttle is shifted so that the outputs fit into the range."
+  }
+ ]
+}

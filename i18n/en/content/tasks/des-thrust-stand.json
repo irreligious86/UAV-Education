@@ -1,0 +1,85 @@
+{
+ "module": "des-thrust-stand",
+ "tasks": [
+  {
+   "id": "stand-drift-thrust",
+   "title": "Thrust from a raw sample with drift correction",
+   "statement": "The load cell scale is **k = {k} counts/g**. The zero before the run is **{z0}** counts, and the zero after the run has grown by **{dz}** counts (linear drift in time). A throttle step lies exactly in the middle of the run, and its mean raw sample is **{raw}**. Find the thrust in grams.",
+   "params": {
+    "k": {
+     "min": 400,
+     "max": 460,
+     "step": 2
+    },
+    "z0": {
+     "min": 60000,
+     "max": 120000,
+     "step": 1000
+    },
+    "dz": {
+     "min": 0,
+     "max": 3000,
+     "step": 100
+    },
+    "raw": {
+     "min": 450000,
+     "max": 1000000,
+     "step": 5000
+    }
+   },
+   "answer": "(raw-(z0+dz/2))/k",
+   "unit": "g",
+   "tol": 0.01,
+   "solution": "The zero in the middle of the run: z = z0 + dz/2. Thrust T = (raw − z)/k. Without the drift correction the error is dz/(2k), a few grams, comparable with the vibration noise."
+  },
+  {
+   "id": "stand-ct",
+   "title": "Thrust coefficient from stand data",
+   "statement": "On the stand a prop of **{d} inches** gave a thrust of **{t} g** at **{rpm} RPM**. Air density **ρ = 1.204 kg/m³**, g = 9.80665. Find C_T = T/(ρ·n²·D⁴).",
+   "params": {
+    "d": [
+     15
+    ],
+    "t": {
+     "min": 900,
+     "max": 1100,
+     "step": 10
+    },
+    "rpm": {
+     "min": 4200,
+     "max": 4600,
+     "step": 20
+    }
+   },
+   "answer": "t/1000*9.80665/(1.204*(rpm/60)**2*(d*0.0254)**4)",
+   "unit": "",
+   "tol": 0.02,
+   "solution": "T in newtons = t/1000·g; n = rpm/60 rev/s; D = d·0.0254 m. C_T = T/(ρ·n²·D⁴). For the T-Motor 15×5 it comes out around 0.08; a constant C_T across the points checks the thrust and RPM channels."
+  },
+  {
+   "id": "stand-fm",
+   "title": "Prop figure of merit",
+   "statement": "A prop of **{d} inches** gives **{t} g** of thrust, and the shaft power (from a torque sensor) is **{p} W**. ρ = 1.204 kg/m³, g = 9.80665. Find FM = P_id/P_shaft, P_id = T^1.5/√(2·ρ·A).",
+   "params": {
+    "d": [
+     15,
+     16
+    ],
+    "t": {
+     "min": 950,
+     "max": 1050,
+     "step": 25
+    },
+    "p": {
+     "min": 85,
+     "max": 100,
+     "step": 5
+    }
+   },
+   "answer": "(t/1000*9.80665)**1.5/math.sqrt(2*1.204*math.pi*(d*0.0254)**2/4)/p",
+   "unit": "",
+   "tol": 0.02,
+   "solution": "A = π·D²/4, D = d·0.0254 m; T = t/1000·g; P_id = T^1.5/√(2ρA); FM = P_id/P_shaft. Good copter props give 0.6–0.75; if you use the electrical power instead of P_shaft, you get FM·η of the drive."
+  }
+ ]
+}

@@ -3,18 +3,18 @@
  "pass": 80,
  "questions": [
   {
-   "q": "Почему цикл «масса ↔ АКБ ↔ мощность» приходится решать итерациями?",
+   "q": "Why does the \"mass ↔ battery ↔ power\" loop have to be solved by iteration?",
    "options": [
-    "Банка добавляет массу, а с ней растут мощность и нужная энергия",
-    "Ёмкость элемента падает с каждым циклом заряда, и её надо пересчитывать",
-    "Таблица мотора дана лишь для пяти точек газа, между ними нужна интерполяция",
-    "Python не умеет решать нелинейные уравнения в замкнутом виде без цикла"
+    "A cell adds mass, and with it the power and the energy needed grow",
+    "Cell capacity drops with every charge cycle and must be recomputed",
+    "The motor table gives only five throttle points, so it needs interpolation",
+    "Python cannot solve nonlinear equations in closed form without a loop"
    ],
    "answer": 0,
-   "explain": "Энергия нужна под мощность, мощность растёт как m^1.5, масса растёт с АКБ — величины связаны в кольцо, и решение ищется последовательными приближениями."
+   "explain": "Energy is needed for the power, the power grows as m^1.5, the mass grows with the battery: the quantities form a loop, and the solution is found by successive approximation."
   },
   {
-   "q": "Идеальная мощность висения по теории импульсов равна…",
+   "q": "The ideal hover power from momentum theory is…",
    "options": [
     "T² / (2·ρ·A)",
     "T^1.5 / √(2·ρ·A)",
@@ -22,73 +22,73 @@
     "T^1.5 · ρ / (2·A)"
    ],
    "answer": 1,
-   "explain": "P_ideal = T·v_i, v_i = √(T/(2ρA)), отсюда T^1.5/√(2ρA). Реальная мощность больше в 1/FM раз."
+   "explain": "P_ideal = T·v_i, v_i = √(T/(2ρA)), hence T^1.5/√(2ρA). The real power is 1/FM times larger."
   },
   {
-   "q": "Мотор с пропом 15×5 даёт 1430 г при 173 Вт, идеальная мощность для этой тяги 99 Вт. Что значит FM_sys ≈ 0.57?",
+   "q": "A motor with a 15×5 prop gives 1430 g at 173 W, and the ideal power for that thrust is 99 W. What does FM_sys ≈ 0.57 mean?",
    "options": [
-    "57 % электрической мощности идёт в идеальную мощность потока",
-    "Проп работает на 57 % от своих максимальных оборотов по таблице",
-    "57 % тяги теряется из-за взаимного влияния соседних пропов",
-    "КПД одного только ESC равен 57 %, мотор и проп идеальны"
+    "57 % of the electrical power goes into ideal flow power",
+    "The prop runs at 57 % of its maximum RPM from the table",
+    "57 % of the thrust is lost to interaction between neighboring props",
+    "The ESC alone is 57 % efficient, the motor and prop are ideal"
    ],
    "answer": 0,
-   "explain": "Системный FM считается от электрической мощности из таблицы, поэтому включает аэродинамические потери пропа и КПД мотора с ESC."
+   "explain": "The system FM is referred to the electrical power from the table, so it includes the aerodynamic losses of the prop and the efficiency of the motor and ESC."
   },
   {
-   "q": "Аппарат 4.29 кг: на четырёх 15″ нагрузка на диск 92 Н/м², на четырёх 17″ — 72 Н/м². Что происходит с мощностью висения при переходе на 17″?",
+   "q": "A 4.29 kg vehicle: on four 15″ props the disc loading is 92 N/m², on four 17″ props 72 N/m². What happens to the hover power when moving to 17″?",
    "options": [
-    "Растёт: больший проп тяжелее раскрутить",
-    "Не меняется: масса аппарата та же",
-    "Падает примерно на 13 %",
-    "Падает вдвое: мощность ∝ площади диска"
+    "It grows: a larger prop is harder to spin up",
+    "It does not change: the vehicle mass is the same",
+    "It drops by about 13 %",
+    "It halves: power ∝ disc area"
    ],
    "answer": 2,
-   "explain": "Удельная мощность P/T = √(DL/2ρ)/FM: меньше нагрузка на диск — меньше мощность. √(72/92) ≈ 0.88 с поправкой на чуть другой FM — около 13 %, в примере 464 → 403 Вт."
+   "explain": "The specific power P/T = √(DL/2ρ)/FM: lower disc loading means lower power. √(72/92) ≈ 0.88, corrected for a slightly different FM, gives about 13 %; in the example 464 → 403 W."
   },
   {
-   "q": "Пакет из P45B: 16.2 Вт·ч и 70 г на элемент, +10 % на сборку, DoD 85 %, резерв 20 %. Сколько энергии реально уходит в полёт с килограмма пакета?",
+   "q": "A pack of P45B: 16.2 Wh and 70 g per cell, +10 % for the build, DoD 85 %, reserve 20 %. How much energy per kilogram of pack actually goes into the flight?",
    "options": [
-    "≈ 231 Вт·ч",
-    "≈ 210 Вт·ч",
-    "≈ 178 Вт·ч",
-    "≈ 143 Вт·ч"
+    "≈ 231 Wh",
+    "≈ 210 Wh",
+    "≈ 178 Wh",
+    "≈ 143 Wh"
    ],
    "answer": 3,
-   "explain": "231 Вт·ч/кг на элемент → ≈210 со сборкой → × 0.85 × 0.8 ≈ 143 Вт·ч/кг. Остальные варианты — промежуточные шаги расчёта."
+   "explain": "231 Wh/kg per cell → ≈210 with the build → × 0.85 × 0.8 ≈ 143 Wh/kg. The other options are intermediate steps of the calculation."
   },
   {
-   "q": "Квадро 15″ даёт 25.1 мин при ТЗ 25 мин, но T/W на просевшей АКБ 1.51. Верное решение?",
+   "q": "The 15″ quad gives 25.1 min against a 25 min requirement, but T/W on a sagged battery is 1.51. The right decision?",
    "options": [
-    "Принять: время по ТЗ выполнено, остальное вторично",
-    "Отклонить: нет запаса тяги к концу разряда",
-    "Поднять `MOT_THST_HOVER` до 0.66 вручную перед полётом",
-    "Добавить ещё одну параллель АКБ и пересчитать время"
+    "Accept: the time requirement is met, the rest is secondary",
+    "Reject: no thrust margin by the end of the discharge",
+    "Raise `MOT_THST_HOVER` to 0.66 by hand before the flight",
+    "Add one more parallel cell and recompute the time"
    ],
    "answer": 1,
-   "explain": "T/W ≥ 2 — отдельное требование: к концу разряда висение около 66 % газа, нечем бороться с ветром. Лишняя банка — больше масса и ещё меньше T/W; помогает больший диск (17″) или больше моторов (гекса)."
+   "explain": "T/W ≥ 2 is a separate requirement: by the end of the discharge it hovers at about 66 % of its maximum thrust and has nothing left to fight the wind. An extra cell means more mass and even lower T/W; a larger disc (17″) or more motors (a hexa) helps."
   },
   {
-   "q": "Таблица мотора снята при 22.2 В, а Li-Ion под нагрузкой во второй половине разряда даёт около 20.4 В. Как меняется максимальная тяга?",
+   "q": "The motor table was taken at 22.2 V, while Li-ion under load in the second half of the discharge gives about 20.4 V. How does the maximum thrust change?",
    "options": [
-    "Падает примерно в (20.4/22.2)² ≈ 0.84 раза",
-    "Падает в 20.4/22.2 ≈ 0.92 раза, линейно",
-    "Не меняется: ESC держит заданные обороты",
-    "Растёт за счёт большего тока на просадке"
+    "It drops by about (20.4/22.2)² ≈ 0.84",
+    "It drops by 20.4/22.2 ≈ 0.92, linearly",
+    "It does not change: the ESC holds the set RPM",
+    "It grows thanks to the higher current at sag"
    ],
    "answer": 0,
-   "explain": "Обороты ∝ напряжению, тяга ∝ оборотам² — значит ∝ U². Поэтому T/W проверяют на просевшей, а не на заряженной АКБ."
+   "explain": "RPM ∝ voltage, thrust ∝ RPM², so it is ∝ U². That is why T/W is checked on a sagged battery, not a charged one."
   },
   {
-   "q": "По ТЗ нужно 70 минут обследовать линейный маршрут, взлёт с поля без полосы, висение — только на взлёте и посадке. Какая схема?",
+   "q": "The mission requires a 70-minute survey of a linear route, takeoff from a field without a runway, hover only at takeoff and landing. Which configuration?",
    "options": [
-    "Октокоптер с АКБ 6S8P на максимальной раме",
-    "Квадрокоптер с соосными пропами X8",
+    "An octocopter with a 6S8P battery on the largest frame",
+    "A quadcopter with coaxial X8 props",
     "VTOL (QuadPlane)",
-    "Гексакоптер на пропах максимального диаметра"
+    "A hexacopter on the largest-diameter props"
    ],
    "answer": 2,
-   "explain": "Мультиротор упирается в 30–40 мин: время растёт как f_АКБ/√m. Крыло тратит P = W·V/(L/D)/η — в разы меньше висения; VTOL платит +20–30 % массы за взлёт без полосы."
+   "explain": "A multirotor hits a ceiling at 30–40 min: the time grows as f_battery/√m. A wing spends P = W·V/(L/D)/η, several times less than hover; VTOL pays +20–30 % mass for takeoff without a runway."
   }
  ]
 }

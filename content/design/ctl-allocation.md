@@ -3,7 +3,7 @@ id: ctl-allocation
 title: "Миксер и распределение управления: матрица, насыщение, PX4 Control Allocation, наклонные моторы"
 level: L3
 readingTime: 45 мин
-firmware: PX4 1.18 (параметры сверены с v1.18.0; код аллокатора — по v1.17.0, в 1.15 и 1.16 то же) · ArduCopter 4.7 (сверено с 4.7.3) · Betaflight 2025.12 (сверено с 2025.12.5)
+firmware: PX4 1.18 (параметры сверены с v1.18.0; код аллокатора — по v1.17.0, в 1.15, 1.16 и v1.18.0 то же) · ArduCopter 4.7 (сверено с 4.7.3) · Betaflight 2025.12 (сверено с 2025.12.5)
 status: published
 tags:
   - миксер
@@ -27,7 +27,7 @@ next:
 
 ## theory
 ### Матрица эффективности B
-Каждый мотор i с нормированной командой uᵢ ∈ [0, 1] создаёт силу и момент. PX4 считает их по формуле из `ActuatorEffectivenessRotors.cpp` (одинаково в 1.15, 1.16 и 1.17):
+Каждый мотор i с нормированной командой uᵢ ∈ [0, 1] создаёт силу и момент. PX4 считает их по формуле из `ActuatorEffectivenessRotors.cpp` (одинаково в 1.15–1.18):
 
 - тяга: **Fᵢ = CT · aᵢ**, где aᵢ — единичная ось ротора (`CA_ROTORn_AX/AY/AZ`, по умолчанию (0, 0, −1), то есть вверх в осях FRD);
 - момент: **Mᵢ = CT · (pᵢ × aᵢ) − CT · KM · aᵢ**, где pᵢ — положение ротора относительно ЦТ в метрах (`CA_ROTORn_PX/PY/PZ`), `KM` — отношение реактивного момента к тяге: положительное у CCW-ротора, отрицательное у CW (умолчания `CT` = 6.5, `KM` = 0.05).
@@ -82,7 +82,7 @@ Betaflight и ArduPilot получают готовые коэффициенты
 Файл `alloc.py` — это прямой перенос трёх функций PX4: `computeEffectivenessMatrix`, `updateControlAllocationMatrixScale` и `ControlAllocationSequentialDesaturation`.
 
 ```python
-# alloc.py - control allocation as PX4 control_allocator does it (v1.15-1.17)
+# alloc.py - control allocation as PX4 control_allocator does it (v1.15-1.18)
 import numpy as np
 
 def effectiveness(rotors):

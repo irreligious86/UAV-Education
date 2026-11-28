@@ -3,94 +3,94 @@
  "pass": 80,
  "questions": [
   {
-   "q": "По формуле PX4 (ActuatorEffectivenessRotors) момент ротора равен CT·(p × a) − CT·KM·a. Что задаёт знак CA_ROTORn_KM?",
+   "q": "In the PX4 formula (ActuatorEffectivenessRotors) the rotor torque is CT·(p × a) − CT·KM·a. What does the sign of CA_ROTORn_KM set?",
    "options": [
-    "Направление вращения: плюс у CCW, минус у CW",
-    "Положение мотора: плюс перед ЦТ, минус позади ЦТ",
-    "Тип ESC: плюс у DShot, минус у PWM",
-    "Ось тяги: плюс вниз, минус вверх по FRD"
+    "The spin direction: plus for CCW, minus for CW",
+    "The motor position: plus ahead of the CG, minus behind it",
+    "The ESC type: plus for DShot, minus for PWM",
+    "The thrust axis: plus down, minus up in FRD"
    ],
    "answer": 0,
-   "explain": "В module.yaml: «Use a positive value for a rotor with CCW rotation. Use a negative value for a rotor with CW rotation.» Положение задают CA_ROTORn_PX/PY/PZ, ось — CA_ROTORn_AX/AY/AZ."
+   "explain": "In module.yaml: \"Use a positive value for a rotor with CCW rotation. Use a negative value for a rotor with CW rotation.\" The position is set by CA_ROTORn_PX/PY/PZ, the axis by CA_ROTORn_AX/AY/AZ."
   },
   {
-   "q": "Dead cat: передние моторы в 0.13 м перед ЦТ, задние в 0.15 м за ним. Как PX4 распределит тягу на висении?",
+   "q": "Dead cat: the front motors are 0.13 m ahead of the CG, the rear ones 0.15 m behind it. How will PX4 split the thrust in hover?",
    "options": [
-    "Поровну, а моменты от смещения ЦТ уберёт I-составляющая",
-    "Передние на 15 % больше задних (0.15/0.13)",
-    "Задние на 15 % больше передних (0.15/0.13)",
-    "Передние на 30 % больше, по сумме обоих плеч"
+    "Equally, and the I term removes the moments from the CG offset",
+    "The front ones 15 % more than the rear (0.15/0.13)",
+    "The rear ones 15 % more than the front (0.15/0.13)",
+    "The front ones 30 % more, from the sum of both arms"
    ],
    "answer": 1,
-   "explain": "Чтобы тангажный момент был нулевым, T_перед·0.13 = T_зад·0.15, отсюда T_перед/T_зад = 1.154. Псевдообратная учитывает это сразу; в примере модуля получилось u = 0.536 / 0.464."
+   "explain": "For a zero pitching moment, T_front·0.13 = T_rear·0.15, hence T_front/T_rear = 1.154. The pseudo-inverse accounts for this right away; in the module's example u = 0.536 / 0.464."
   },
   {
-   "q": "PX4, CA_METHOD = 1, MC_AIRMODE = 0. Пилот на 60 % тяги резко кренит и одновременно рыскает, и моторам не хватает диапазона. Что уступит первым?",
+   "q": "PX4, CA_METHOD = 1, MC_AIRMODE = 0. At 60 % thrust the pilot rolls hard while yawing, and the motors run out of range. What gives way first?",
    "options": [
-    "Крен: он ужимается до того, как рыскание добавят",
-    "Тяга: её поднимут, чтобы освободить место",
-    "Рыскание: его добавляют последним и режут первым",
-    "Все оси уменьшатся в одной и той же пропорции"
+    "Roll: it is squeezed before yaw is added",
+    "Thrust: it is raised to make room",
+    "Yaw: it is added last and cut first",
+    "All axes shrink in the same proportion"
    ],
    "answer": 2,
-   "explain": "mixAirmodeDisabled: тягу можно только снижать, потом ужимаются крен и тангаж, а рыскание добавляется в mixYaw() и десатурируется первым (запас MINIMUM_YAW_MARGIN = 15 %). В примере: крен 100 %, рыскание 15 %."
+   "explain": "mixAirmodeDisabled: thrust can only be reduced, then roll and pitch are squeezed, and yaw is added in mixYaw() and desaturated first (with the MINIMUM_YAW_MARGIN of 15 %). In the example: roll 100 %, yaw 15 %."
   },
   {
-   "q": "Чем отличается MC_AIRMODE = 1 от 0 при почти нулевом газе?",
+   "q": "How does MC_AIRMODE = 1 differ from 0 at nearly zero throttle?",
    "options": [
-    "Ничем: airmode влияет только на верхний упор газа",
-    "При 1 отключается рыскание, чтобы сберечь крен",
-    "При 1 крен и тангаж ужимаются, а тяга не меняется",
-    "При 1 тягу можно поднять, чтобы крен выполнился"
+    "No difference: airmode affects only the upper throttle stop",
+    "With 1 yaw is turned off to preserve roll",
+    "With 1 roll and pitch are squeezed and thrust is unchanged",
+    "With 1 thrust may be raised so the roll is executed"
    ],
    "answer": 3,
-   "explain": "mixAirmodeRP десатурирует по вектору тяги в обе стороны. В примере при газе 5 % крен вырос с 16 % до 100 %, а тяга — в 6 раз. Поэтому описание параметра просит выключать airmode на время тюнинга."
+   "explain": "mixAirmodeRP desaturates along the thrust vector in both directions. In the example at 5 % throttle the roll went from 16 % to 100 %, and the thrust grew 6 times. That is why the parameter description asks you to keep airmode off while tuning."
   },
   {
-   "q": "Гекса X с чередованием PNPNPN теряет мотор, CA_FAILURE_MODE = 1. Что делает псевдообратная на висении?",
+   "q": "An X hexacopter with alternating PNPNPN rotation loses a motor, CA_FAILURE_MODE = 1. What does the pseudo-inverse do in hover?",
    "kind": "apply",
    "fragment": "PNPNPN, M0 lost, pinv hover u: [-0.    0.75  0.75 -0.    0.75  0.75]\nhealthy hover u: 0.50 each (W = 3, T/W = 2)",
    "options": [
-    "Ставит M3 в 0, остальные четыре несут по W/4",
-    "Делит вес поровну между пятью моторами, по 0.6 на каждый",
-    "Включает реверс M3, чтобы вернуть управление рысканием",
-    "Поднимает все пять моторов до 1.0, и аппарат снижается"
+    "Sets M3 to 0, the other four carry W/4 each",
+    "Splits the weight equally over five motors, 0.6 each",
+    "Reverses M3 to restore yaw authority",
+    "Raises all five motors to 1.0, and the vehicle descends"
    ],
    "answer": 0,
-   "explain": "Чтобы сохранить нулевые моменты, решение с минимальной нормой ставит противоположный мотор в 0, остальные — 0.75 = 3/4. M3 на нижней границе, поэтому в части направлений запаса нет. Реверс противоположного мотора есть только в ветке main (режим 2)."
+   "explain": "To keep the moments at zero, the minimum-norm solution sets the opposite motor to 0 and the rest to 0.75 = 3/4. M3 sits at its lower bound, so some directions have no margin. Reversing the opposite motor exists only on the main branch (mode 2)."
   },
   {
-   "q": "Моторы x500 (r = 0.246 м, KM = 0.05) наклонены на 10° по касательной в сторону своих реактивных моментов. Что происходит с рысканием и тягой?",
+   "q": "The x500 motors (r = 0.246 m, KM = 0.05) are tilted 10° tangentially toward their reaction torques. What happens to yaw and thrust?",
    "options": [
-    "Рыскание ×1.18, вертикальная тяга −10 %",
-    "Рыскание ×1.84, вертикальная тяга −1.5 %",
-    "Рыскание ×2.46, вертикальная тяга −0.4 %",
-    "Рыскание не меняется, появляется боковая сила"
+    "Yaw ×1.18, vertical thrust −10 %",
+    "Yaw ×1.84, vertical thrust −1.5 %",
+    "Yaw ×2.46, vertical thrust −0.4 %",
+    "Yaw is unchanged, a side force appears"
    ],
    "answer": 1,
-   "explain": "Mz ∝ r·sinθ + KM·cosθ = 0.0427 + 0.0492 = 0.0920 против 0.05, то есть ×1.84; Fz ∝ cos 10° = 0.985. Боковые силы пар CCW и CW взаимно гасятся."
+   "explain": "Mz ∝ r·sinθ + KM·cosθ = 0.0427 + 0.0492 = 0.0920 against 0.05, that is ×1.84; Fz ∝ cos 10° = 0.985. The side forces of the CCW and CW pairs cancel each other."
   },
   {
-   "q": "Матрицу dead cat из PX4 переносят в Betaflight через mmix. Какой столбец надо взять с обратным знаком?",
+   "q": "A dead cat matrix from PX4 is carried over to Betaflight with mmix. Which column must take the opposite sign?",
    "options": [
-    "Roll: в Betaflight правый мотор получает +1.000",
-    "Yaw: в Betaflight CW-мотор получает +1.000 вместо −1",
-    "Pitch: в mixerQuadX задний мотор получает +1",
-    "Throttle: в Betaflight он отрицательный"
+    "Roll: in Betaflight the right motor gets +1.000",
+    "Yaw: in Betaflight a CW motor gets +1.000 instead of −1",
+    "Pitch: in mixerQuadX the rear motor gets +1",
+    "Throttle: in Betaflight it is negative"
    ],
    "answer": 2,
-   "explain": "В mixerQuadX у REAR_R pitch = +1, у PX4 и ArduPilot задний мотор по тангажу отрицательный. Roll у правого мотора −1 везде, yaw у CW −1 (документация Betaflight: 1.0 = CCW, −1.0 = CW)."
+   "explain": "In mixerQuadX REAR_R has pitch = +1, while in PX4 and ArduPilot a rear motor is negative in pitch. Roll of a right motor is −1 everywhere, and yaw of a CW motor is −1 (Betaflight documentation: 1.0 = CCW, −1.0 = CW)."
   },
   {
-   "q": "ArduPilot, FRAME_CLASS = 15, скрипт вызывает MotorsMatrix:init(4), а потом set_throttle_factor(0, 1.07). Что будет?",
+   "q": "ArduPilot, FRAME_CLASS = 15, the script calls MotorsMatrix:init(4) and then set_throttle_factor(0, 1.07). What happens?",
    "options": [
-    "Коэффициент применится после перезагрузки",
-    "Скрипт упадёт на assert, аппарат не армится",
-    "Коэффициент молча применится к первому мотору",
-    "Вызов вернёт false, коэффициент не изменится"
+    "The factor takes effect after a reboot",
+    "The script fails on the assert, the vehicle does not arm",
+    "The factor is silently applied to the first motor",
+    "The call returns false, the factor does not change"
    ],
    "answer": 3,
-   "explain": "AP_MotorsMatrix::set_throttle_factor возвращает false, если матрица уже инициализирована (initialised_ok()) или класс рамы не Scripting Matrix. Throttle factor задаётся между add_motor_raw и init()."
+   "explain": "AP_MotorsMatrix::set_throttle_factor returns false if the matrix is already initialized (initialised_ok()) or the frame class is not Scripting Matrix. The throttle factor is set between add_motor_raw and init()."
   }
  ]
 }

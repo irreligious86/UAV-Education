@@ -42,7 +42,7 @@ DDS сам знаходить учасників у мережі (discovery) в 
 
 Головне правило: видавець BEST_EFFORT + підписник RELIABLE = немає зв'язку. PX4 публікує `/fmu/out/*` як BEST_EFFORT (і TRANSIENT_LOCAL), а підписник ROS 2 за замовчуванням RELIABLE. Тому підписку на PX4 роблять профілем `qos_profile_sensor_data` (BEST_EFFORT) або явним `QoSProfile`. Навіщо BEST_EFFORT для телеметрії: у разі втрати пакета по Wi-Fi повтор старого положення марний, потрібне наступне — та сама логіка, що UDP проти TCP у модулі mav-routing.
 
-Перевірка: `ros2 topic info -v /fmu/out/vehicle_status_v1` покаже профілі обох сторін.
+Перевірка: `ros2 topic info -v /fmu/out/vehicle_status_v4` (PX4 1.18; у 1.16–1.17 — `_v1`) покаже профілі обох сторін.
 
 {{diagram:ros2-qos|Сумісність reliability: BEST_EFFORT-видавець не зв'язується з RELIABLE-підписником — мовчки.}}
 
@@ -86,7 +86,7 @@ ros2 doctor --report | head -20
 
 ## diagnostics
 - **Симптом:** `ros2 topic echo /fmu/out/...` мовчить, хоча `topic list` його показує
-  - Можлива причина: QoS — підписка RELIABLE на BEST_EFFORT-видавця; або немає суфікса версії `_v1`.
+  - Можлива причина: QoS — підписка RELIABLE на BEST_EFFORT-видавця; або немає/не той суфікс версії (`_v1`, `_v4`, …).
   - Що зробити: `--qos-reliability best_effort`; перевірити точне ім'я топіка.
 - **Симптом:** ноутбук у тій самій мережі «втручається» в топіки апарата
   - Можлива причина: спільний ROS_DOMAIN_ID і відкритий discovery.

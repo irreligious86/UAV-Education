@@ -56,7 +56,7 @@
 <div class="gc-callout" data-state="caution" data-untranslated><strong>Модуль ещё не переведён.</strong> Ниже — оригинал (Русский). Прогресс и оценки общие для всех языков.</div>
 <h2 id="teoriya">Теорія</h2>
 <h4 id="matritsa-effektivnosti-b" class="md-subheading">Матрица эффективности B</h4>
-<p>Каждый мотор i с нормированной командой uᵢ ∈ [0, 1] создаёт силу и момент. PX4 считает их по формуле из <code>ActuatorEffectivenessRotors.cpp</code> (одинаково в 1.15, 1.16 и 1.17):</p>
+<p>Каждый мотор i с нормированной командой uᵢ ∈ [0, 1] создаёт силу и момент. PX4 считает их по формуле из <code>ActuatorEffectivenessRotors.cpp</code> (одинаково в 1.15–1.18):</p>
 <ul><li>тяга: <strong>Fᵢ = CT · aᵢ</strong>, где aᵢ — единичная ось ротора (<code>CA_ROTORn_AX/AY/AZ</code>, по умолчанию (0, 0, −1), то есть вверх в осях FRD);</li><li>момент: <strong>Mᵢ = CT · (pᵢ × aᵢ) − CT · KM · aᵢ</strong>, где pᵢ — положение ротора относительно ЦТ в метрах (<code>CA_ROTORn_PX/PY/PZ</code>), <code>KM</code> — отношение реактивного момента к тяге: положительное у CCW-ротора, отрицательное у CW (умолчания <code>CT</code> = 6.5, <code>KM</code> = 0.05).</li></ul>
 <p>Столбцы [Mx My Mz Fx Fy Fz]ᵀ образуют матрицу B размером 6×N; нужно найти u, при котором B·u равно запрошенным моментам и тяге. У коптера с вертикальными моторами строки Fx и Fy нулевые, независимых осей четыре.</p>
 <h4 id="psevdoobratnaya-i-normirovka" class="md-subheading">Псевдообратная и нормировка</h4>
@@ -82,7 +82,7 @@
 <p>Основной путь — Python 3 + numpy/scipy (numpy 2.5.3, scipy 1.18.1) и PX4 SITL. PX4 в контейнере автора не собирался (2 ядра, неполное дерево исходников), поэтому команды SITL взяты из документации PX4 1.17 и помечены как цитаты. Python-код запускался, вывод вставлен без правок.</p>
 <h4 id="shag-1-allokator-kak-v-px4" class="md-subheading">Шаг 1. Аллокатор как в PX4</h4>
 <p>Файл <code>alloc.py</code> — это прямой перенос трёх функций PX4: <code>computeEffectivenessMatrix</code>, <code>updateControlAllocationMatrixScale</code> и <code>ControlAllocationSequentialDesaturation</code>.</p>
-<pre class="cli-block"><code># alloc.py - control allocation as PX4 control_allocator does it (v1.15-1.17)
+<pre class="cli-block"><code># alloc.py - control allocation as PX4 control_allocator does it (v1.15-1.18)
 import numpy as np
 
 def effectiveness(rotors):

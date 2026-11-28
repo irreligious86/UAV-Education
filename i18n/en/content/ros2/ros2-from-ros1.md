@@ -2,8 +2,8 @@
 id: ros2-from-ros1
 title: "From ROS 1 to ROS 2: reading old projects and porting them"
 level: L3
-readingTime: 30 min
-firmware: PX4 · ArduPilot
+readingTime: 45 min
+firmware: ROS 2 Humble · Jazzy · Lyrical · ROS 1 Noetic (EOL) · PX4 · ArduPilot
 status: published
 added: 2026-11-08
 tags:
@@ -18,41 +18,87 @@ related:
 next:
   - ros2-app-arch
 source: content/ros2/ros2-from-ros1.md
-source_hash: a1ec2f4af0ee
+source_hash: 06593181b99e
 ---
 
 ## summary
-ROS 1 Noetic reached end of support in May 2025, but half of the open drone projects, papers and tutorials are on ROS 1: MAVROS 1, catkin workspaces, XML launch files, `rospy`. This module teaches you to read such a project quickly (“what matters here and what depends on what”), to know how ROS 1 concepts map to ROS 2, to decide whether to port or run side by side through a bridge, and to port a small package. Lab: porting a ROS 1 node to ROS 2 while preserving its behavior, verified on recorded data.
+ROS 1 Noetic reached end of life on May 31, 2025, yet half of the open drone projects, papers and tutorials are on ROS 1: MAVROS 1, catkin workspaces, XML launch files, `rospy`. This module teaches you to read such a project quickly ("what matters here and what depends on what"), to know how ROS 1 concepts map to ROS 2, to decide whether to port or to run side by side through a bridge, and to port a small package. It gives the status of the distributions as of November 2026 and how to choose a target, what replaced `roscore` (DDS discovery, domains, RMW), which implicit ROS 1 behaviors you now have to set explicitly through QoS, and how the build (catkin → colcon) and launch files carry over. Lab (done without ROS installed): a ROS 1 bag with the reference output of the old node → `rosbags-convert` → a ROS 2 bag in MCAP → the ported logic with pytest and a comparison of the outputs; plus a QoS compatibility check on typical MAVROS 2 cases.
 
 ## theory
-### How ROS 2 differs in substance
+### What really differs in ROS 2
 | ROS 1 | ROS 2 | What it changes |
 |---|---|---|
-| `roscore` (master) — a central name server | no master, DDS discovery | no single point of failure; you need domains/discovery limits |
+| `roscore` (master), the central name service | no master, DDS discovery | no single point of failure; you need domains/limited discovery |
 | TCPROS/UDPROS | DDS with QoS | you have to think about QoS (module ros2-basics) |
 | `rospy`, `roscpp` | `rclpy`, `rclcpp` | a different API, but the same ideas |
 | catkin, `catkin_make`/`catkin build` | ament, `colcon build` | a different build, `package.xml` format 3 |
 | XML launch (`.launch`) | Python/XML/YAML launch (`.launch.py`) | logic in the launch file |
-| parameters in a global server | parameters per node | `rosparam` → `ros2 param` against a specific node |
-| `rosbag` (`.bag`) | `ros2 bag` (SQLite3/MCAP) | converters exist (rosbags) |
+| parameters on a global server | parameters belong to each node | `rosparam` → `ros2 param` against a specific node |
+| `rosbag` (`.bag`) | `ros2 bag` (MCAP by default since Iron, SQLite3 as an option) | converters exist (rosbags) |
 | `tf` | `tf2` (also existed in ROS 1) | almost unchanged |
 | nodelets | components (composable nodes) | several nodes in one process without copying |
 | MAVROS 1 | MAVROS 2 (`mavros` in ROS 2) | the same plugins, different service names/QoS |
 
-### How to read a ROS 1 project in 30 minutes
-1. **The root**: `package.xml`/`CMakeLists.txt` — dependencies (which sensors, whether it's MAVROS, whether it's OpenCV).
-2. **Launch files** (`launch/*.launch`) — what gets started, with which parameters and remaps. This is the “system diagram”.
-3. **Nodes** (`scripts/*.py`, `src/*.cpp`): find `init_node`, `Subscriber`, `Publisher`, `Service`, `Timer`/`Rate`. Draw the graph: what it listens to, what it publishes.
-4. **Parameters** (`config/*.yaml`, `rospy.get_param`) — what is configurable.
-5. **Messages** (`msg/`, `srv/`) — custom types.
-6. **MAVROS specifics**: `/mavros/setpoint_*`, `/mavros/set_mode`, `/mavros/cmd/arming` — where the project controls the vehicle and in which coordinate frame.
+### Version status as of November 2026 and choosing a target
+ROS 1 Noetic reached end of life on May 31, 2025, the same day as the end of standard support for Ubuntu 20.04; the last package sync was on May 29, 2025. After EOL there will be no fixes in the binary packages. In December 2025 Open Robotics announced the decommissioning of the ROS 1 infrastructure: the build.ros.org build farm (which is to redirect to build.ros2.org once it is shut down) and the internal repositories.ros.org; packages already built remain on packages.ros.org. You can read and run an old project in a container on Ubuntu 20.04, but developing it further on ROS 1 means piling up debt.
 
-The result is a node graph (as in ros2-basics) and a list of external dependencies. With it, you can see what the port will cost.
+| Distribution | Release | End of support | Ubuntu (Tier 1) | Status on November 26, 2026 |
+|---|---|---|---|---|
+| Noetic (ROS 1) | May 2020 | May 31, 2025 | 20.04 | EOL |
+| Foxy | June 5, 2020 | June 20, 2023 | 20.04 | EOL |
+| Humble (LTS) | May 23, 2022 | May 2027 | 22.04 | supported, six months to EOL |
+| Iron | May 23, 2023 | December 4, 2024 | 22.04 | EOL |
+| Jazzy (LTS) | May 23, 2024 | May 2029 | 24.04 | supported |
+| Kilted | May 23, 2025 | December 2026 (REP 2000 says November 2026) | 24.04 | in its last weeks |
+| Lyrical (LTS) | May 22, 2026 | May 2031 | 26.04 (24.04 is Tier 3, source only) | supported, the newest LTS |
+
+How to choose a target for porting a drone project. The target is set not by the newest distribution but by the "narrowest" dependency. AP_DDS in ArduPilot 4.7 officially supports only Humble (`ros2-ardupilot`), the PX4 documentation (main) recommends Jazzy on Ubuntu 24.04, while the release documentation up to and including v1.18 recommends Humble on 22.04 (`ros2-px4`), and MAVROS 2.17.0 is released for Humble, Jazzy, Kilted and Lyrical (rosdistro, November 2026). Hence the course rule: ArduPilot through AP_DDS means Humble, but with a plan to move before May 2027; PX4 or MAVROS means Jazzy; Lyrical is for a new project if every package you need is already released for it (check `distribution.yaml` in rosdistro). Kilted is not a porting target: its support ends in December 2026.
+
+{{diagram:ros2-distro-timeline|Support windows by year: in November 2026 Humble (until May 2027), Jazzy, Lyrical and the outgoing Kilted are alive; Noetic and the bridge to it are already past the line.}}
+
+### What replaced `roscore`: DDS, domains, RMW
+In ROS 1 a node first registered with the master (`roscore`), asked it who publishes the topic it needs, and only then opened a direct TCP connection. If the master went down, new nodes could not find each other. ROS 2 has no master: every process is a DDS participant that announces itself over UDP multicast and listens to the announcements of others (discovery). The upside is no single point of failure; the downside is that every node on the network sees everyone, and you have to limit that.
+
+There are three ways to limit it. The **domain** `ROS_DOMAIN_ID`: participants in different domains do not see each other; the safe range is 0–101 (the ROS 2 documentation also lists 215–232 as safe on Linux; the rest overlap with the ephemeral ports). The **discovery range** `ROS_AUTOMATIC_DISCOVERY_RANGE` (introduced in Iron, so it exists in Jazzy and later, but not in Humble; `LOCALHOST` means this machine only, `SUBNET` is the default) replaced the deprecated `ROS_LOCALHOST_ONLY=1` from Humble. The **middleware implementation (RMW)**: the default is `rmw_fastrtps_cpp` (eProsima Fast DDS) in every supported distribution; there are also Cyclone DDS, Connext and, since Kilted, `rmw_zenoh_cpp` at Tier 1. Communication between different DDS implementations (Fast DDS and Cyclone DDS often do connect over the common RTPS protocol) is not guaranteed, and `rmw_zenoh_cpp` does not talk to the DDS RMWs at all, so `RMW_IMPLEMENTATION`, the domain and the distribution must match on board and on the laptop. ROS 1 had none of these settings, so in a ported project you have to set them explicitly in the launch file or in the service environment.
+
+### QoS: what was implicit in ROS 1
+ROS 1 almost always transported over TCPROS, which is essentially "reliable", with a `queue_size` queue, and a "latched" (`latch=True`) publisher handed its last message to a late subscriber. In ROS 2 these properties became QoS policies, and they are set separately on the publisher and on the subscriber. A connection is made only if the subscriber requests no more than the publisher offers (the "request vs offered" model).
+
+| Policy | Publisher | Subscriber | Connection |
+|---|---|---|---|
+| Reliability | best effort | best effort | yes |
+| | best effort | reliable | **no** |
+| | reliable | best effort / reliable | yes |
+| Durability | volatile | transient local | **no** |
+| | transient local | volatile | yes, new messages only |
+| | transient local | transient local | yes, new messages and the last stored one ("latched") |
+
+The default profile is keep last 10, reliable, volatile; the sensor data profile is keep last 5, best effort, volatile (`rmw/qos_profiles.h`). The ROS 1 counterparts: `queue_size` ≈ depth, TCPROS ≈ reliable, `latch=True` ≈ transient local **on both sides**. The main trap when porting drone nodes: MAVROS 2 publishes telemetry (`~/pose`, velocities) with `SensorDataQoS`, that is best effort, while the ported node subscribes with the default profile (reliable): no connection, no error, no data. MAVROS 2 publishes `/mavros/state` with transient local (the publisher is created in `plugins/sys_status.cpp` with the `StateQoS()` profile from `mavros/qos.hpp`), so a default subscription to it works. To check, run `ros2 topic info -v <topic>`: it shows the profiles of all publishers and subscribers.
+
+{{lesson:ros2-basics|Nodes, topics, QoS and discovery in ROS 2 from scratch: the foundation the port builds on.}}
+
+### Build and launch: catkin → colcon, XML → Python
+**Build.** catkin is replaced by ament (the package build system) and colcon (the workspace build tool). A Python package is now an ordinary setuptools package: in `package.xml` (format 3; format 2 is also accepted) `<build_type>ament_python</build_type>`, with the nodes declared as `console_scripts` in `setup.py`; a C++ package is `ament_cmake`. Commands: `colcon build --symlink-install` instead of `catkin_make` (with `--symlink-install`, edits to Python code need no rebuild), `colcon build --packages-select <pkg>` for a single package, `source install/setup.bash` instead of `devel/setup.bash`, `colcon test` and `colcon test-result --verbose` for tests. There is no `devel/` directory any more: only `build/`, `install/`, `log/`.
+
+**Launch.** ROS 2 reads launch files in Python, XML and YAML, but ROS 1 XML is not compatible one to one (the launch file migration guide): the `type` attribute is now `exec`, `ns` is now `namespace`, `required="true"` is now `on_exit="shutdown"`, `$(find pkg)` is now `$(find-pkg-share pkg)`, `<rosparam>` has been replaced with a `from` attribute in `<param>` tags, and there are no global parameters: every parameter belongs to a node. The minimal port is XML with these replacements; you need a Python launch file once logic appears: conditions, loops over vehicles, computed parameters. An example Python launch for the ported node: `Node(package="descent_guard", executable="guard", name="guard", parameters=[{"k": 0.5}], remappings=[("pose", "/mavros/local_position/pose")])` inside `LaunchDescription([...])`.
+
+### How to read a ROS 1 project in 30 minutes
+1. **Root**: `package.xml`/`CMakeLists.txt` give the dependencies (which sensors, whether it is MAVROS, whether it is OpenCV).
+2. **Launch files** (`launch/*.launch`): what starts, with which parameters and remaps. This is the "system diagram".
+3. **Nodes** (`scripts/*.py`, `src/*.cpp`): find `init_node`, `Subscriber`, `Publisher`, `Service`, `Timer`/`Rate`. Draw the graph: what it listens to, what it publishes.
+4. **Parameters** (`config/*.yaml`, `rospy.get_param`): what can be configured.
+5. **Messages** (`msg/`, `srv/`): custom types.
+6. **MAVROS specifics**: `/mavros/setpoint_*`, `/mavros/set_mode`, `/mavros/cmd/arming`: where the project controls the vehicle and in which frame.
+
+The result is a node graph (as in ros2-basics) and a list of external dependencies. With these, you know what the port will cost.
 
 ### Port or bridge
-- **ros1_bridge** — a bidirectional bridge for topics/services between ROS 1 and ROS 2 with both running. It requires a compatible build (the same message types on both sides), historically Noetic + Foxy/Humble from source. Now that Noetic support has ended, this is a temporary solution.
-- **Porting** — the right path for living code. The order: messages → library code without ROS (pull it out!) → nodes → launch → tests on recorded data.
-- **Running ROS 1 in a container** — to “see how it used to work” and to record reference data before porting.
+- **ros1_bridge** is a bidirectional bridge of topics/services between ROS 1 and ROS 2 while both are running. The bridge is C++ and knows only the types it was built with: it knows the standard interfaces even in a regular source build, but your own types only if it was built against both workspaces. A binary package existed up to and including Foxy/Galactic. As of November 2026 no ROS 2 distribution has a binary `ros1_bridge` package (rosdistro: Humble has a release repository entry without a version; Jazzy, Kilted and Lyrical have no release), and the bridge README says it plainly: Ubuntu 24.04 has no ROS 1, so there is no bridge; full support is Ubuntu 20.04 only (Noetic), and on 22.04 it is a source build without official ROS 1 support. In practice the bridge is a temporary crutch in a 20.04 container, not a way forward.
+- **Porting** is the right way for living code. The order: messages → ROS-free library code (extract it!) → nodes → launch → tests on recorded data.
+- **Running ROS 1 in a container** is for "seeing how it worked" and for recording reference data before the port.
+
+### Data: bag files and the reference
+Bag files recorded in ROS 1 are the main asset of a port: they are how you check that the new node behaves like the old one. The pure Python package `rosbags` (0.11.11, released November 27, 2026; the lab below was captured on 0.11.10, and 0.11.11 gives the same output) reads and writes ROS 1 and ROS 2 bags without ROS installed, and `rosbags-convert --src old.bag --dst new_dir --dst-storage mcap` converts one format to the other. The types themselves change in the conversion: in ROS 2 `std_msgs/Header` has no `seq` field, and time is `builtin_interfaces/Time` with the fields `sec` and `nanosec`, not `rospy.Time` with `secs`/`nsecs`; the converter drops `seq` by itself. Your own message types (`msg/`) must be registered in the `rosbags` typestore, or the converter cannot parse them. Outputs are compared by recording time: a timer in ROS 2 must tick on the same grid as `rospy.Rate` in the old node, or the number of outputs and their times will not match. These are the "timing differences" that the lab shows in numbers.
 
 ### Typical code replacements (Python)
 | ROS 1 (rospy) | ROS 2 (rclpy) |
@@ -66,35 +112,36 @@ The result is a node graph (as in ros2-basics) and a list of external dependenci
 | `rospy.Time.now()` | `node.get_clock().now()` |
 | `rospy.loginfo(...)` | `node.get_logger().info(...)` |
 
-The main shift in thinking: **the `while` loop with `rate.sleep()` is replaced by a timer and callbacks**, and a synchronous service call inside a callback by an asynchronous one, otherwise the node will block itself (the same executor services the response).
+The main change in thinking: **the `while` loop with `rate.sleep()` is replaced by a timer and callbacks**, and a synchronous service call inside a callback by an asynchronous one; otherwise the node deadlocks itself (the same executor has to deliver the response).
 
-{{diagram:ros2-distro-timeline|Support windows by year: in November 2026 Humble (until May 2027), Jazzy, Lyrical and the outgoing Kilted are alive; Noetic and the bridge to it are already past the line.}}
-
-{{diagram:ros2-sync-call-deadlock|A synchronous cli.call() in a callback takes the executor's only thread: there is no one to deliver the reply, and timer ticks are lost; call_async() returns at once, and setpoints go out every 50 ms.}}
+{{diagram:ros2-sync-call-deadlock|A synchronous cli.call() in a callback occupies the executor's only thread: nobody can deliver the response and timer ticks are lost; call_async() returns at once, and setpoints go out every 50 ms.}}
 
 ### MAVROS 1 → MAVROS 2
-The topic names are mostly the same (`/mavros/state`, `/mavros/local_position/pose`, `/mavros/setpoint_position/local`), but: telemetry QoS is sensor data; some services and parameters have been renamed; launch is `ros2 launch mavros apm.launch fcu_url:=...` (or `px4.launch`). For PX4 in ROS 2, people usually move from MAVROS to uXRCE-DDS (module ros2-px4); for ArduPilot — to AP_DDS where its features are enough (module ros2-ardupilot).
+The topic names are mostly the same (`/mavros/state`, `/mavros/local_position/pose`, `/mavros/setpoint_position/local`), but: telemetry QoS is sensor data; some services and parameters were renamed; the launch is `ros2 launch mavros apm.launch fcu_url:=...` (or `px4.launch`). For PX4 in ROS 2 people usually move from MAVROS to uXRCE-DDS (module ros2-px4), and for ArduPilot to AP_DDS where its features are enough (module ros2-ardupilot).
 
 {{diagram:ros1-migration|What to do with an old ROS 1 project: a temporary bridge, a port, MAVROS 2, or a rewrite based on its ideas.}}
 
+### Place in the system
+
+- **Receives:** the old project: launch files, nodes, calls to `/mavros/*`; the concepts of QoS, timers and node parameters (`ros2-basics`); reference data recorded before the port.
+- **Provides:** the node graph and the list of dependencies to the "bridge or port" decision; the ported node to the application architecture (`ros2-app-arch`); the choice of autopilot bridge: uXRCE-DDS (`ros2-px4`), AP_DDS (`ros2-ardupilot`) or MAVROS 2 (`mav-sdk`).
+- **If you get it wrong here:** you left a synchronous service call inside a callback → the node deadlocks itself → setpoints stop going out → the autopilot leaves Offboard or stops on a timeout (`ros2-px4`). You ported MAVROS subscriptions without sensor data QoS → telemetry does not arrive (`ros2-basics`).
+
 ## practice
 ### Step 1. Reading the project
-Take an open ROS 1 drone project (for example, the offboard example from the PX4 documentation for ROS 1 / MAVROS, or any repository with MAVROS 1). In 30 minutes, draw the node graph, the list of dependencies and where the project controls the vehicle.
+Take an open ROS 1 drone project (for example, the offboard example from the PX4 documentation for ROS 1 / MAVROS, or any repository with MAVROS 1). In 30 minutes, draw the node graph, the list of dependencies, and where the project controls the vehicle.
 
 ### Step 2. Reference data
 If you can, run the project in a ROS 1 Noetic container with SITL and record a `rosbag` of the node's inputs and outputs. If not, use a bag from open sources or synthetic inputs.
 
-### Step 3. Porting
-Port one node (up to ~200 lines): the logic without ROS goes into a separate module with pytest tests (like `offboard_fsm.py`), the node is a thin `rclpy` wrapper. Convert the bag to the ROS 2 format (the `rosbags` package: `rosbags-convert`) and check that the outputs of the ported node match the reference ones.
+### Step 3. The port
+Port one node (up to ~200 lines): the ROS-free logic goes into a separate module with pytest tests (like `offboard_fsm.py` from the `ros2-px4` module), and the node becomes a thin `rclpy` wrapper. Convert the bag to the ROS 2 format (the `rosbags` package: `rosbags-convert`) and check that the outputs of the ported node match the reference.
 
-### Step 4. Report
-A table: what was replaced, how many lines of logic became testable without ROS, what behavior differences were found (usually QoS and time).
-
-The lab counts as done when you have the graph of the original project, the ported node with logic tests and a comparison of the outputs on the same data.
+### Step 4. The write-up
+A table: what was replaced, how many lines of logic became testable without ROS, which behavior differences you found (usually QoS and time).
 
 ### Step 5. A worked port on a synthetic flight (done, without ROS)
-
-Steps 1–4 need a real project and ROS; this step runs on any machine with Python 3 and shows the whole cycle on a small node. The “descent guard” node subscribes to the MAVROS pose and publishes a vertical speed 20 times per second: no faster than 1.5 m/s, below 2 m no faster than 0.3 m/s, on the ground 0. The old rospy node (for reading, not run):
+Steps 1–4 need a real project and ROS; this step runs on any machine with Python 3 and shows the whole cycle on a small node. A "descent guard" node subscribes to the MAVROS pose and publishes a vertical speed 20 times a second: no faster than 1.5 m/s, below 2 m no faster than 0.3 m/s, on the ground 0. The old rospy node (for reading, not run):
 
 ```python
 # ROS 1 (rospy) — the node being ported; shown for reading, not run (no ROS 1 here)
@@ -118,7 +165,7 @@ while not rospy.is_shutdown():
     rate.sleep()
 ```
 
-The logic without ROS is moved into a module and covered by tests — it carries over without a single change:
+The ROS-free logic is moved into a module and covered by tests; it carries over without a single change:
 
 ```python
 """ROS-free logic of the ported node: vertical speed command for a guarded descent (ENU, up positive)."""
@@ -139,7 +186,7 @@ def test_slow_zone_below_2m():          assert descent_cmd(1.0) == -0.3
 def test_stop_on_ground():              assert descent_cmd(0.03) == 0.0
 ```
 
-The rclpy wrapper (syntax checked with `py_compile`; the author's environment has no ROS 2, so it was not run). Note the subscription QoS and the timer instead of a loop:
+The rclpy wrapper (syntax checked with `py_compile`; the author's environment has no ROS 2, so it was not run). Note the subscription QoS and the timer instead of the loop:
 
 ```python
 # ROS 2 (rclpy) — thin wrapper around the same logic; syntax checked, not run (no ROS 2 here)
@@ -177,7 +224,7 @@ if __name__ == "__main__":
     main()
 ```
 
-Checking the behavior without ROS: the script writes a ROS 1 bag (pose at 30 Hz, a 10 s descent from 8 m at 1 m/s, plus the old node's reference output on a 20 Hz grid), converts it with `rosbags-convert` into a ROS 2 bag in MCAP with Jazzy types, reads it back and runs the logic two ways: as a timer on the same grid and “naively”, publishing right in the pose callback. All you need is `pip install rosbags pytest`.
+Checking the behavior without ROS: the script writes a ROS 1 bag (pose at 30 Hz, a 10 s descent from 8 m at 1 m/s, plus the reference output of the old node on a 20 Hz grid), converts it with `rosbags-convert` into a ROS 2 bag in MCAP with Jazzy types, reads it back and runs the logic two ways: as a timer on the same grid and "naively", publishing directly in the pose callback. All you need is `pip install rosbags pytest`.
 
 ```python
 """ros2-from-ros1 lab without ROS: ROS 1 bag (reference) -> rosbags-convert -> ROS 2 bag -> ported logic -> compare."""
@@ -239,7 +286,7 @@ for name, out in (("timer port", timer_port()), ("callback port", callback_port(
     print(f"{name:13s}: {len(out)} outputs vs {len(ref)} reference -> {'MATCH' if same else 'DIFFERENT'}")
 ```
 
-The last script checks the ROS 2 documentation's QoS compatibility rules on typical porting cases:
+The last script applies the QoS compatibility rules from the ROS 2 documentation to typical porting cases:
 
 ```python
 """Request-vs-offered QoS rules from the ROS 2 docs (reliability, durability) applied to typical migration cases."""
@@ -280,35 +327,53 @@ NO  ROS 1 latched map, ported as default -> late subscriber wants transient_loca
 OK  transient_local publisher -> default subscriber (no old samples)
 ```
 
-What this shows. The logic passed the tests and, on the converted bag, gave the same 200 values at the same moments as the reference — when the timer ticks on the grid of the old `rospy.Rate(20)`. The “naive” port into the callback gave 300 outputs: the output rate became the input rate (30 Hz), and the comparison with the reference fails — an example of a “timing difference” without a single error in the logic. A subscription with the default profile to MAVROS 2 telemetry (best effort) is incompatible; a transient local subscriber to a late “latched” topic gets anything only if the publisher is transient local too.
+What this shows. The logic passed its tests and produced, on the converted bag, the same 200 values at the same times as the reference, when the timer ticks on the grid of the old `rospy.Rate(20)`. The "naive" port into the callback produced 300 outputs: the output rate became the input rate (30 Hz), and the comparison with the reference fails. That is an example of a "timing difference" without a single error in the logic. A default-profile subscription to MAVROS 2 telemetry (best effort) is incompatible; on a late "latched" topic a transient local subscriber gets anything only if the publisher is transient local too.
 
-Self-check: the lab is done when **(step 5, without ROS)** the 4 tests pass, `rosbags-convert` exits with code 0 and creates `flight_ros2.mcap`, the ROS 2 bag has 300 pose messages and 200 reference ones, “timer port” gives 200 outputs and MATCH, “callback port” 300 and DIFFERENT, and `qos_check.py` prints NO for exactly two cases: sensor data → default and default → transient local; **(your own project, steps 1–4)** the graph of the original project is drawn (nodes, topics, dependencies and the place where the project controls the aircraft), the ported node is a thin `rclpy` wrapper around a ROS-free logic module, the logic tests pass under pytest, the ported node's outputs on the converted bag match the reference outputs from step 2, and in the step 4 table every behavior difference found is traced to its cause.
+Self-check: the lab is done when **(step 5, without ROS)** the 4 tests pass, `rosbags-convert` exited with code 0 and created `flight_ros2.mcap`, the ROS 2 bag holds 300 pose messages and 200 reference messages, "timer port" gives 200 outputs and MATCH, "callback port" 300 and DIFFERENT, and `qos_check.py` prints NO for exactly two cases: sensor data → default and default → transient local; **(your own project, steps 1–4)** the graph of the original project is drawn (nodes, topics, dependencies and the place where the project controls the vehicle), the ported node is a thin `rclpy` wrapper around a ROS-free logic module, the logic tests pass under pytest, the outputs of the ported node on the converted bag match the reference outputs from step 2, and in the step 4 table every behavior difference you found is attributed to a cause.
 
-**Reference for the self-check.** The correct result: on the same inputs the old and the new node give the same outputs, and the differences are explained by QoS and timing. Typical wrong ones: (1) the ported node “hangs” on a service call — a synchronous call inside a callback, you need `call_async`; (2) the node gets no telemetry or parameters “are not applied” — the subscription is incompatible with the publisher's QoS or the parameter was not declared with `declare_parameter`; (3) a `while` loop with `rate.sleep()` is left in the node — in ROS 2 a timer and callbacks replace it; (4) in step 5 your “timer port” gave 199 or 201 outputs — the timer grid is shifted relative to the reference (it does not start at T0 or the step is not 50 ms); (5) `rosbags-convert` fails on your own type — the type is not registered in the typestore.
+**Reference for the self-check.** The correct result: on the same inputs the old and the new node give the same outputs, and the differences are explained by QoS and time. Typical wrong results: (1) the ported node "hangs" on a service call: a synchronous call inside a callback, you need `call_async`; (2) the node gets no telemetry, or parameters "do not apply": the subscription is incompatible with the publisher's QoS, or the parameter was not declared with `declare_parameter`; (3) a `while` loop with `rate.sleep()` remained in the node: in ROS 2 it is replaced by a timer and callbacks; (4) in step 5 your "timer port" gave 199 or 201 outputs: the timer grid is shifted relative to the reference (it does not start at T0, or the step is not 50 ms); (5) `rosbags-convert` fails on your own type: the type is not registered in the typestore.
 
 ## diagnostics
-- **Symptom:** the ported node “hangs” on a service call
+- **Symptom:** the ported node "hangs" on a service call
   - Possible cause: a synchronous call in a callback of a single-threaded executor.
-  - What to do: call_async + handling the future, or a separate callback group.
-- **Symptom:** the node doesn't receive MAVROS 2 telemetry
+  - What to do: call_async plus handling the future, or a separate callback group.
+- **Symptom:** the node gets no MAVROS 2 telemetry
   - Possible cause: QoS (sensor data on the publisher) or a different topic name.
   - What to do: `ros2 topic info -v`, the subscription profile.
-- **Symptom:** parameters “don't apply”
+- **Symptom:** parameters "do not apply"
   - Possible cause: in ROS 2 a parameter must be declared (`declare_parameter`) and passed to a specific node.
-  - What to do: declare it in the constructor, YAML with the node name in launch.
-- **Symptom:** ros1_bridge doesn't pass your custom message type
-  - Possible cause: the bridge was built without this type or the definitions differ.
-  - What to do: build the bridge from source with both workspaces; better yet — port.
+  - What to do: a declaration in the constructor, a YAML file with the node name in the launch file.
+- **Symptom:** the nodes on board and on the laptop do not see each other, although the network is up
+  - Possible cause: different `ROS_DOMAIN_ID`, `RMW_IMPLEMENTATION` or distribution; `ROS_AUTOMATIC_DISCOVERY_RANGE=LOCALHOST` on one of the machines; the Wi-Fi access point drops multicast.
+  - What to do: `printenv | grep ROS` and `ros2 doctor --report` on both machines; align the domain and the RMW.
+- **Symptom:** after converting the bag the comparison with the reference "almost matches": a different number of outputs
+  - Possible cause: the ported node publishes in the input callback instead of on a timer with the grid of the old `rospy.Rate`.
+  - What to do: a timer with the same period; compare by recording time, as in step 5.
+- **Symptom:** `apt` cannot find `ros-<distro>-ros1-bridge`
+  - Possible cause: there is no binary package in any supported ROS 2 distribution (rosdistro, November 2026), and Ubuntu 24.04 has no ROS 1.
+  - What to do: an Ubuntu 20.04 container with Noetic and a bridge built from source, only as a temporary measure; porting is better.
+- **Symptom:** ros1_bridge does not pass your own message type
+  - Possible cause: the bridge was built without that type, or the definitions differ.
+  - What to do: build the bridge from source against both workspaces; porting is better.
 
 ## references
 - ROS 2 — Migration guide from ROS 1 | https://docs.ros.org/en/jazzy/How-To-Guides/Migrating-from-ROS1.html | primary | A
 - ros1_bridge | https://github.com/ros2/ros1_bridge | primary | A
 - rosbags (bag conversion, pure Python) | https://gitlab.com/ternaris/rosbags | primary | A
 - MAVROS (ROS 2 branch) | https://github.com/mavlink/mavros | primary | A
+- ROS 2 Documentation source — Distributions (release and EOL dates, November 2026) | https://github.com/ros2/ros2_documentation/blob/rolling/source/Releases.rst | primary | A
+- REP 2000 — ROS 2 Releases and Target Platforms | https://github.com/ros-infrastructure/rep/blob/master/rep-2000.rst | primary | A
+- ROS Noetic End-of-Life: May 31, 2025 — Open Robotics Discourse | https://discourse.openrobotics.org/t/ros-noetic-end-of-life-may-31-2025/43160 | primary | A
+- ROS 2 Documentation (Lyrical) — Migrating launch files from ROS 1 | https://github.com/ros2/ros2_documentation/blob/lyrical/source/Migration-and-Upgrades/Migrating-from-ROS1/Migrating-Launch-Files.rst | primary | A
+- ROS 2 Documentation — About Quality of Service settings (policy compatibility) | https://github.com/ros2/ros2_documentation/blob/rolling/source/ROS-Framework/interfaces/topics/About-Quality-of-Service-Settings.rst | primary | A
+- ros2/rmw — qos_profiles.h (default and sensor data profiles) | https://github.com/ros2/rmw/blob/jazzy/rmw/include/rmw/qos_profiles.h | primary | A
+- rosdistro — distribution.yaml (mavros 2.17.0, ros1_bridge without a release in Humble/Jazzy/Kilted/Lyrical) | https://github.com/ros/rosdistro/blob/master/jazzy/distribution.yaml | primary | A
 
 ## checklist
-- I know how ROS 1 concepts map to ROS 2 and what changes in substance
+- I know how ROS 1 concepts map to ROS 2 and what really changes
+- I choose the target distribution by the narrowest dependency (AP_DDS means Humble, PX4 means Jazzy) and know the EOL dates
+- I set the domain, the RMW and the subscription QoS explicitly; I subscribe to MAVROS 2 telemetry with sensor data
 - I read a ROS 1 project through its launch files and draw the node graph
 - I choose between a bridge and a port
-- I replace the rate.sleep loop with a timer, synchronous services with asynchronous ones
-- I verify the port on reference recorded data
+- I replace the rate.sleep loop with a timer, and synchronous services with asynchronous ones
+- I check the port against recorded reference data

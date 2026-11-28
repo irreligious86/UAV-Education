@@ -1,0 +1,60 @@
+{
+  "module": "ros2-ardupilot",
+  "tasks": [
+    {
+      "id": "cmd-vel-map-course",
+      "title": "Where cmd_vel in the map frame will go",
+      "statement": "The node publishes to `/ap/cmd_vel` with `frame_id = map`: `linear.x = {e}` m/s, `linear.y = {n}` m/s. On what course (degrees from north, clockwise, 0…360) will ArduCopter 4.7.2 fly?",
+      "params": {
+        "e": [
+          -3,
+          -2,
+          -1,
+          1,
+          2,
+          3
+        ],
+        "n": [
+          -3,
+          -1,
+          0.5,
+          1,
+          2,
+          4
+        ]
+      },
+      "answer": "math.degrees(math.atan2(e, n)) % 360",
+      "unit": "°",
+      "tol": 0.002,
+      "abs": 0.1,
+      "solution": "In map (ENU) x is east and y is north; AP_DDS converts to NED as (north, east) = (y, x). Course = atan2(east, north) = atan2(x, y), wrapped to 0…360°. The module's example: x = 1, y = 2 → NED (2, 1) → 26.6°. A common mistake is atan2(y, x): that is the angle from east, counterclockwise (the mathematical angle), not the course."
+    },
+    {
+      "id": "dds-exiting-count",
+      "title": "How many times the GCS will print \"exiting\"",
+      "statement": "The ArduPilot 4.7.2 DDS client starts pinging the agent at second 2 after power-up; `DDS_TIMEOUT_MS = {ms}`, `DDS_MAX_RETRY = {r}`. The agent on the companion computer is ready at second **{t}**. How many \"DDS: No ping response, exiting\" messages will the GCS show before the connection?",
+      "params": {
+        "ms": [
+          500,
+          1000,
+          2000
+        ],
+        "r": [
+          5,
+          10,
+          20
+        ],
+        "t": {
+          "min": 10,
+          "max": 90,
+          "step": 5
+        }
+      },
+      "answer": "math.floor((t - 2) / (ms * r / 1000))",
+      "unit": "messages",
+      "tol": 0.001,
+      "abs": 0.01,
+      "solution": "A batch lasts DDS_TIMEOUT_MS × DDS_MAX_RETRY; after each failed batch there is one \"exiting\" message, and the loop continues. Before the agent starts, ⌊(t − 2) / (ms·r/1000)⌋ batches have time to finish. The module's example: 1000 ms × 10, agent at 35 s → ⌊33/10⌋ = 3 messages (at 12, 22, 32 s). On a batch boundary (t − 2 a multiple of the batch length) the agent comes up exactly at the end of a batch: a race, answer ±1."
+    }
+  ]
+}

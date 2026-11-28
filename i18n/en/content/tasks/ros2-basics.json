@@ -4,7 +4,7 @@
   {
    "id": "yaw-enu",
    "title": "Heading in ENU",
-   "statement": "The vehicle's heading in NED is ψ = **{y}°** (from north, clockwise). Find the yaw angle in ENU (degrees, from east, counterclockwise, in the range (−180…180]).",
+   "statement": "The vehicle's heading in NED is ψ = **{y}°** (from north, clockwise). Find the yaw angle in ENU (degrees, from east, counterclockwise, in the range [−180…180)).",
    "params": {
     "y": {
      "min": 0,
@@ -16,7 +16,7 @@
    "unit": "°",
    "tol": 0.001,
    "abs": 0.5,
-   "solution": "ψ_enu = 90° − ψ_ned, then wrap to (−180°, 180°]."
+   "solution": "ψ_enu = 90° − ψ_ned, then wrap to [−180°, 180°): ψ_ned = 270° gives −180°."
   },
   {
    "id": "pos-enu",

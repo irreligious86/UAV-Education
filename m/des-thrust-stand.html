@@ -57,7 +57,7 @@
 <p>Минимум — четыре величины с одной меткой времени: тяга T, напряжение U, ток I, обороты n. Из них: P = U·I, удельная тяга T/P (г/Вт) и C_T. Датчик реактивного момента Q добавляет мощность на валу P_вал = 2π·n·Q, а с ней КПД привода и FM пропа.</p>
 <figure class="diagram" data-diagram="stand-signal-chain"><div class="diagram__svg"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 250" width="100%" role="img" aria-labelledby="t" style="max-width:720px;display:block;margin:0 auto"><title id="t">Тяговый стенд: датчики → ESP32 → CSV → обработка</title><style>text{font-family: var(--gc-font-mono, ui-monospace, Menlo, monospace); font-size: 12px;fill:currentColor} .m{fill:var(--gc-ink-muted, #8a93a3)} .a{fill:var(--gc-accent-hud, #5ef1d2)} .w{fill:var(--gc-signal-amber, #f0b24c)} .d{fill:var(--gc-signal-red, #e8636b)} .box{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:currentColor;stroke-width:1.2} .boxa{fill:var(--gc-surface-200, rgba(128,128,128,0.08));stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6} .ln{stroke:currentColor;stroke-width:1.2;fill:none} .lna{stroke:var(--gc-accent-hud, #5ef1d2);stroke-width:1.6;fill:none} .lnm{stroke:var(--gc-ink-muted, #8a93a3);stroke-width:1;fill:none;stroke-dasharray:4 3} .t{font-size:11px} .b{font-weight:600}</style><defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker><marker id="ara" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--gc-accent-hud, #5ef1d2)"/></marker></defs><rect class="boxa" x="10" y="20" width="150" height="44" rx="6"/><text x="85.0" y="39.0" text-anchor="middle" class="b">Тензодатчик 5 кг</text><text x="85.0" y="53.0" text-anchor="middle" class="b">1.0 мВ/В, мост</text><rect class="boxa" x="190" y="20" width="150" height="44" rx="6"/><text x="265.0" y="39.0" text-anchor="middle" class="b">HX711, 24 бит</text><text x="265.0" y="53.0" text-anchor="middle" class="b">×128, 10 Гц</text><rect class="box" x="10" y="100" width="150" height="44" rx="6"/><text x="85.0" y="119.0" text-anchor="middle">Шунт 2 мОм</text><text x="85.0" y="133.0" text-anchor="middle">в минусе АКБ</text><rect class="box" x="190" y="100" width="150" height="44" rx="6"/><text x="265.0" y="119.0" text-anchor="middle">INA226, I²C</text><text x="265.0" y="133.0" text-anchor="middle">1.25 мВ / 1.25 мА</text><rect class="box" x="10" y="180" width="150" height="44" rx="6"/><text x="85.0" y="199.0" text-anchor="middle">Метка на колоколе</text><text x="85.0" y="213.0" text-anchor="middle">мотора</text><rect class="box" x="190" y="180" width="150" height="44" rx="6"/><text x="265.0" y="199.0" text-anchor="middle">Оптодатчик</text><text x="265.0" y="213.0" text-anchor="middle">импульс/оборот</text><rect class="boxa" x="380" y="80" width="140" height="80" rx="6"/><text x="450.0" y="103.0" text-anchor="middle" class="b">ESP32</text><text x="450.0" y="117.0" text-anchor="middle" class="b">чтение 10 Гц,</text><text x="450.0" y="131.0" text-anchor="middle" class="b">лимит 16 А,</text><text x="450.0" y="145.0" text-anchor="middle" class="b">таймаут 0.5 с</text><rect class="box" x="560" y="20" width="150" height="44" rx="6"/><text x="635.0" y="39.0" text-anchor="middle">ESC → мотор</text><text x="635.0" y="53.0" text-anchor="middle">PWM 1000–2000 мкс</text><rect class="box" x="560" y="150" width="150" height="44" rx="6"/><text x="635.0" y="169.0" text-anchor="middle">ПК: CSV →</text><text x="635.0" y="183.0" text-anchor="middle">г/Вт, C_T, U</text><path class="ln" d="M160 42.0 L190 42.0" marker-end="url(#ar)"/><text x="175.0" y="35.0" text-anchor="middle" class="m t" style="font-size:10px">мВ</text><path class="lna" d="M340 42.0 L360.0 42.0 L360.0 120.0 L380 120.0" marker-end="url(#ara)"/><path class="ln" d="M160 122.0 L190 122.0" marker-end="url(#ar)"/><text x="175.0" y="115.0" text-anchor="middle" class="m t" style="font-size:10px">мВ</text><path class="ln" d="M340 122.0 L360.0 122.0 L360.0 120.0 L380 120.0" marker-end="url(#ar)"/><path class="ln" d="M160 202.0 L190 202.0" marker-end="url(#ar)"/><path class="ln" d="M340 202.0 L360.0 202.0 L360.0 120.0 L380 120.0" marker-end="url(#ar)"/><path class="lna" d="M520 120.0 L540.0 120.0 L540.0 42.0 L560 42.0" marker-end="url(#ara)"/><text x="540.0" y="36.0" text-anchor="middle" class="m t" style="font-size:10px">газ</text><path class="ln" d="M520 120.0 L540.0 120.0 L540.0 172.0 L560 172.0" marker-end="url(#ar)"/><text x="540.0" y="114.0" text-anchor="middle" class="m t" style="font-size:10px">USB</text><text x="380" y="200" text-anchor="start" class="m t">ПК шлёт команду ≥ 2 Гц;</text><text x="380" y="214" text-anchor="start" class="m t">молчит — газ 0.</text></svg></div><figcaption class="gc-muted">Стенд — это четыре канала с одной меткой времени. Безопасность (лимит тока, таймаут команды) живёт в ESP32 и не зависит ни от HX711, ни от ПК.</figcaption><div class="diagram__hint">Схему можно прокрутить по горизонтали</div></figure>
 <h4 id="tenzodatchik-i-hx711" class="md-subheading">Тензодатчик и HX711</h4>
-<p>Балочный тензодатчик — мост Уитстона из четырёх тензорезисторов. Выход пропорционален нагрузке и напряжению возбуждения: U_вых = S·U_exc·F/F_ном, где S — чувствительность в мВ/В. У типовой дешёвой балки (серия TAL220) S = 1.0 ± 0.15 мВ/В, нелинейность и гистерезис ±0.05 % FS, ползучесть ±0.1 % FS за 30 мин, температурный уход нуля ±0.2 % FS на 10 °C. Для балки на 5 кг это ±2.5 г нелинейности, ±5 г ползучести и ±10 г ухода нуля на 10 °C. Отсюда главное правило: тара до и после каждого прогона.</p>
+<p>Балочный тензодатчик — мост Уитстона из четырёх тензорезисторов. Выход пропорционален нагрузке и напряжению возбуждения: U_вых = S·U_exc·F/F_ном, где S — чувствительность в мВ/В. У типовой дешёвой балки (серия TAL220; цифры — из паспорта TAL220F, где 1.0 мВ/В указано для ёмкостей 1–3 кг, балку 5 кг считаем такой же) S = 1.0 ± 0.15 мВ/В, нелинейность и гистерезис ±0.05 % FS, ползучесть ±0.1 % FS за 30 мин, температурный уход нуля ±0.2 % FS на 10 °C. Для балки на 5 кг это ±2.5 г нелинейности, ±5 г ползучести и ±10 г ухода нуля на 10 °C. Отсюда главное правило: тара до и после каждого прогона.</p>
 <p>HX711 — 24-битный АЦП для моста. Канал A с усилением 128 даёт полную шкалу ±0.5·AVDD/128 (±20 мВ при 5 В). Скорость 10 или 80 отсчётов/с (вывод RATE; курс берёт 10: каждый отсчёт усредняется в 8 раз дольше, поэтому шум ниже, а на ступени газа 10 с это всё равно 100 отсчётов, из которых первые секунды после шага отбрасываются; 80 — только для быстрых процессов, например разгона мотора после шага газа, ценой шума — ориентир курса), формат — дополнительный код, насыщение на 800000h / 7FFFFFh. Обычно мост питается от того же AVDD, поэтому измерение ратиометрическое и не зависит от точного напряжения: S·128·2²³ / 0.5 = 2 147 484 отсчёта на полную шкалу, то есть около 430 отсчётов/г для балки 5 кг. 24 импульса PD_SCK — данные, 25-й выбирает канал A×128. Ловушка в другом: если PD_SCK держится в высоком уровне дольше 60 мкс, чип уходит в power-down. Прерывание (Wi-Fi, другой ISR) посреди чтения портит отсчёт, поэтому чтение должно идти в критической секции.</p>
 <h4 id="kalibrovka-model-oshibok" class="md-subheading">Калибровка: модель ошибок</h4>
 <p>Модель сырого отсчёта: raw = b + k·m + e_нелин + e_гист + e_полз(t) + e_дрейф(t) + шум.</p>
@@ -248,14 +248,14 @@ for thr, Tg, Pel, rpm, tau in [(50, 805, 74, 3746, 0.15), (75, 1561, 199, 5215, 
 100%  P_shaft=258.7 W  eta_drive=0.72  P_ideal=194.9 W  FM=0.75  FM(CT,CP)=0.75  wrong CT^1.5/(sqrt2*CP)=0.67  FM*eta=0.54</code></pre>
 <p>Выходит, что FM пропа 0.72–0.75 (момент в таблице дан двумя значащими цифрами, отсюда ±3–4 %), а мотор с ESC отдают на вал 72–80 % электрической мощности. На полном газе КПД привода падает до 0.72: потери в меди растут как I². Строка <code>wrong</code> показывает, что даёт вертолётная формула с пропеллерными коэффициентами.</p>
 <h4 id="shag-6-proshivka-stenda-esp32-platformio" class="md-subheading">Шаг 6. Прошивка стенда (ESP32, PlatformIO)</h4>
-<p><code>platformio.ini</code>: <code>platform = espressif32</code>, <code>board = esp32dev</code>, <code>framework = arduino</code>, <code>monitor_speed = 115200</code>. HX711 читается вручную, без библиотеки, чтобы было видно критическую секцию. Безопасность работает на своём таймере каждые 100 мс: отвалился HX711 — газ всё равно сбросится.</p>
+<p><code>platformio.ini</code>: <code>platform = espressif32</code>, <code>board = esp32dev</code>, <code>framework = arduino</code>, <code>monitor_speed = 115200</code>. HX711 читается вручную, без библиотеки, чтобы было видно критическую секцию. Безопасность проверяется каждые 100 мс в главном цикле независимо от HX711 (отвалившийся HX711 её не останавливает), и ничто в цикле не должно блокировать дольше нескольких миллисекунд.</p>
 <pre class="cli-block"><code>// Thrust stand: HX711 (thrust) + INA226 (V, I) + optical tach (RPM) + ESC PWM. CSV at 10 Hz.
 #include &lt;Arduino.h&gt;
 #include &lt;Wire.h&gt;
 
 const int HX_DOUT = 16, HX_SCK = 17, ESC_PIN = 25, TACH_PIN = 27;
 const float I_LIMIT = 16.0f;          // A: MN4006 KV380 peak 16 A (180 s); fuse 20 A in series
-const uint32_t CMD_TIMEOUT_MS = 500;  // no command from the PC -&gt; throttle 0
+const uint32_t CMD_TIMEOUT_MS = 500;  // no valid command from the PC -&gt; throttle 0, disarm
 const int RAMP_PER_TICK = 2;          // % per 100 ms tick = 20 %/s
 const uint8_t INA = 0x40;
 const int TACH_PPR = 1;               // reflective marks per revolution
@@ -281,10 +281,11 @@ void inaWrite(uint8_t reg, uint16_t val) {
   Wire.beginTransmission(INA); Wire.write(reg); Wire.write(val &gt;&gt; 8); Wire.write(val &amp; 0xFF);
   Wire.endTransmission();
 }
-int16_t inaRead(uint8_t reg) {
-  Wire.beginTransmission(INA); Wire.write(reg); Wire.endTransmission(false);
-  Wire.requestFrom(INA, (uint8_t)2);
-  return (int16_t)((Wire.read() &lt;&lt; 8) | Wire.read());
+bool inaRead(uint8_t reg, int16_t &amp;out) {  // false = I2C error: INA226 lost or not answering
+  Wire.beginTransmission(INA); Wire.write(reg);
+  if (Wire.endTransmission(false) != 0 || Wire.requestFrom(INA, (uint8_t)2) != 2) return false;
+  uint8_t hi = Wire.read(), lo = Wire.read();  // MSB first: two separate reads, defined order
+  out = (int16_t)((hi &lt;&lt; 8) | lo); return true;
 }
 
 void IRAM_ATTR tachIsr() { uint32_t now = micros(); tachPeriodUs = now - tachLastUs; tachLastUs = now; }
@@ -298,27 +299,32 @@ void escWriteUs(int us) {             // 50 Hz, 16-bit: 1 us = 65536 / 20000 cou
 #endif
 }
 
-void safetyTick(float amps) {         // runs every 100 ms
-  if (millis() - lastCmdMs &gt; CMD_TIMEOUT_MS) thrCmd = 0;
-  if (armed &amp;&amp; amps &gt; I_LIMIT) { armed = false; Serial.println(&quot;#TRIP overcurrent&quot;); }
-  int target = armed ? thrCmd : 0;
+void safetyTick(bool inaOk, float amps) {  // called every 100 ms from loop()
+  if (millis() - lastCmdMs &gt; CMD_TIMEOUT_MS) { armed = false; thrCmd = 0; }  // PC silent
+  if (armed &amp;&amp; (!inaOk || fabsf(amps) &gt; I_LIMIT)) {  // fabsf: a reversed shunt reads &lt; 0
+    armed = false; thrCmd = 0;        // restart only after a new &quot;arm&quot; and a new &quot;tNN&quot;
+    Serial.println(inaOk ? &quot;#TRIP overcurrent&quot; : &quot;#TRIP INA226 lost&quot;);
+  }
   if (!armed) thrOut = 0;             // disarm cuts immediately, ramp only upwards
-  else thrOut += constrain(target - thrOut, -100, RAMP_PER_TICK);
+  else thrOut += constrain(thrCmd - thrOut, -100, RAMP_PER_TICK);
   escWriteUs(1000 + thrOut * 10);
 }
 
-void handleSerial() {                 // &quot;arm&quot;, &quot;disarm&quot;, &quot;t55&quot; (throttle %), sent &gt;= 2 Hz by the PC
+void handleSerial() {                 // &quot;arm&quot;, &quot;disarm&quot;, &quot;t55&quot; (throttle %), sent &gt;= 5 Hz by the PC
   if (!Serial.available()) return;
-  String s = Serial.readStringUntil(&#x27;\n&#x27;); s.trim();
-  lastCmdMs = millis();
-  if (s == &quot;arm&quot; &amp;&amp; thrOut == 0) armed = true;
-  else if (s == &quot;disarm&quot;) armed = false;
+  String s = Serial.readStringUntil(&#x27;\n&#x27;); s.trim();  // waits &lt;= 10 ms (setTimeout in setup)
+  if (s == &quot;arm&quot;) { if (thrOut == 0 &amp;&amp; thrCmd == 0) armed = true; }  // arm only at throttle 0
+  else if (s == &quot;disarm&quot;) { armed = false; thrCmd = 0; }
   else if (s.startsWith(&quot;t&quot;)) thrCmd = constrain(s.substring(1).toInt(), 0, 100);
+  else return;                        // unknown line or noise: does not refresh the timeout
+  lastCmdMs = millis();
 }
 
 void setup() {
   Serial.begin(115200);
-  pinMode(HX_SCK, OUTPUT); digitalWrite(HX_SCK, LOW); pinMode(HX_DOUT, INPUT);
+  Serial.setTimeout(10);              // never block the safety loop on a partial line (default 1000 ms)
+  pinMode(HX_SCK, OUTPUT); digitalWrite(HX_SCK, LOW);
+  pinMode(HX_DOUT, INPUT_PULLUP);     // DOUT wire off -&gt; reads HIGH = &quot;not ready&quot;, no garbage reads
   pinMode(TACH_PIN, INPUT_PULLUP); attachInterrupt(TACH_PIN, tachIsr, FALLING);
   Wire.begin();
   inaWrite(0x00, 0x4527);             // AVG 16, VBUSCT = VSHCT = 1.1 ms, continuous
@@ -335,10 +341,11 @@ void setup() {
 void loop() {
   handleSerial();
   static uint32_t tSafe = 0; static float volt = 0, amp = 0;
-  if (millis() - tSafe &gt;= 100) {      // safety runs on its own clock: a dead HX711 must not stop it
+  if (millis() - tSafe &gt;= 100) {      // safety every 100 ms, whether or not the HX711 is alive
     tSafe += 100;
-    volt = inaRead(0x02) * 0.00125f; amp = inaRead(0x04) * 0.00125f;
-    safetyTick(amp);
+    int16_t rv, ra; bool ok = inaRead(0x02, rv) &amp;&amp; inaRead(0x04, ra);
+    if (ok) { volt = rv * 0.00125f; amp = ra * 0.00125f; }
+    safetyTick(ok, amp);              // I2C error = sensor lost = trip
   }
   if (digitalRead(HX_DOUT) == LOW) {  // HX711 RATE=0: a new sample every 100 ms
     int32_t raw = hx711Read();
@@ -347,32 +354,45 @@ void loop() {
     Serial.printf(&quot;%lu,%d,%ld,%.3f,%.3f,%.0f\n&quot;, millis(), thrOut, (long)raw, volt, amp, rpm);
   }
 }</code></pre>
-<p>Без платы логику проверяют на ПК: тот же <code>main.cpp</code> собирается <code>g++ -std=c++17</code> с подменой Arduino API (stubs) и симуляторами HX711 и INA226; в тесте безопасности HX711 всё время «не готов». Вывод:</p>
-<pre class="cli-block"><code>HX711 decode:
+<p>Без платы логику проверяют на ПК: тот же <code>main.cpp</code> собирается <code>g++ -std=c++17</code> с подменой Arduino API (stubs) и симуляторами HX711 и INA226; в тесте безопасности HX711 всё время «не готов», ПК шлёт команды с частотой 5 Гц, имитатор Serial ведёт себя как <code>Stream</code> в Arduino (строка без <code>\n</code> блокирует <code>readStringUntil</code> на весь таймаут), а симулятор INA226 умеет показать перевёрнутый шунт и пропасть с шины I²C. Вывод (одинаковый для core 2 и core 3):</p>
+<pre class="cli-block"><code>HX711 decode (DOUT pin mode INPUT_PULLUP):
   sent         0 -&gt; read         0
   sent         1 -&gt; read         1
   sent        -1 -&gt; read        -1
   sent   8388607 -&gt; read   8388607
   sent  -8388608 -&gt; read  -8388608
   sent    421646 -&gt; read    421646
-Safety (HX711 not ready the whole time):
+Safety (HX711 not ready the whole time, PC commands at 5 Hz):
   t= 500 ms thrOut=10% ESC=1100 us
   t= 900 ms thrOut=18% ESC=1180 us
   t=1300 ms thrOut=26% ESC=1260 us
   t=1700 ms thrOut=34% ESC=1340 us
-  700 ms without commands: thrOut=0% ESC=1000 us
-  re-armed: thrOut=20%
+  700 ms without commands: armed=0 thrOut=0% ESC=1000 us
+  t100 for 1 s without a new arm: armed=0 thrOut=0%
+  arm while t100 is pending: armed=0 (refused)
+  t0, arm, t100 for 1 s: armed=1 thrOut=20%
+  partial line &quot;dis&quot; (no newline), then silence: longest loop() 10 ms, disarmed 589 ms after the last valid command
+  re-armed, t100 for 1 s: thrOut=20%
   serial&gt; #TRIP overcurrent
-  17 A: armed=0 thrOut=0% ESC=1000 us</code></pre>
-<p>Знак расширяется верно на границах шкалы, рампа держит 20 %/с, тишина 500 мс и ток 17 А сбрасывают газ — при мёртвом HX711.</p>
+  17 A: armed=0 thrOut=0% ESC=1000 us
+  arm after the trip, no new tNN: armed=1 thrOut=0%
+  t100 for 1 s: thrOut=20%
+  serial&gt; #TRIP overcurrent
+  reversed shunt, -17 A: armed=0 thrOut=0% ESC=1000 us
+  re-armed, t100 for 1 s: thrOut=20%
+  serial&gt; #TRIP INA226 lost
+  INA226 off the bus: armed=0 thrOut=0% ESC=1000 us
+  serial&gt; #TRIP INA226 lost
+  arm + t100 with the INA226 still off: armed=0 thrOut=0%</code></pre>
+<p>Знак расширяется верно на границах шкалы, рампа держит 20 %/с, и всё это при мёртвом HX711: тишина 500 мс сбрасывает газ и разоружает стенд, а снова он запускается только после <code>t0</code>, <code>arm</code> и свежей <code>tNN</code>; строка, оборванная без <code>\n</code>, держит <code>loop()</code> не дольше 10 мс и не продлевает таймаут (с таймаутом <code>Stream</code> по умолчанию 1000 мс и таймаутом, который обновляла любая строка, тот же тест давал зависание на 1000 мс, стенд оставался армленным, а газ уходил в 0 лишь через 1.8 с после последней верной команды); 17 А, −17 А (перевёрнутый шунт) и пропавший INA226 — всё это срабатывание защиты.</p>
 <h4 id="perekhod-na-realnoe-zhelezo" class="md-subheading">Переход на реальное железо</h4>
 <p>Железо: ESP32 DevKit, балка 5 кг (запас 2.2× к 2228 г; правило (ориентир курса): наименьшая стандартная ёмкость балки ≥ 2 × максимальной тяги — запас на рывок газа и вибрацию, допустимую перегрузку проверить по паспорту балки; более ёмкая балка даёт меньше отсчётов на грамм — 10 кг вместо 5 вдвое меньше, около 215 отсчётов/г, — поэтому брать с запасом сверх 2× незачем), HX711 с RATE = 0, INA226 с шунтом 2 мОм в минусе, оптодатчик, ESC с PWM-входом, предохранитель 20 А, БП 24 В с лимитом тока или 6S. Конец лопасти 15&quot; на 6177 об/мин идёт со скоростью π·0.381·103 ≈ 123 м/с: обломок пропа — это пуля.</p>
-<ol><li><strong>Механика, пропа нет.</strong> Стенд на двух струбцинах, поток от балки и от людей, до стен, пола и потолка ≥ 1–2 диаметра пропа (ближе рециркуляция меняет тягу). Вокруг диска — кольцо или сетка. Плоскость вращения — запретная зона, работаешь в очках.</li><li><strong>Электрика, пропа нет.</strong> Первое включение через smoke stopper или БП с лимитом 2 А. Проверь, что INA226 показывает напряжение БП ±0.05 В по мультиметру, а ток растёт при газе, а не падает (полярность шунта). Проверь направление вращения и обороты на 20 % газа по оптодатчику и по тахометру.</li><li><strong>Калибровка, пропа нет.</strong> Прогрей 15 мин. Нагружай гирями 0–100–200–500–1000–2000 г вдоль оси пропа (блок на подшипнике), потом разгружай. По 20 отсчётов на точку. Посчитай k, остатки и гистерезис скриптом шага 2. Оставь 1000 г на 10 мин — это ползучесть.</li><li><strong>Аварийные пути, пропа нет.</strong> Выдерни USB — газ должен уйти в 0 за 0.5 с. Временно поставь <code>I_LIMIT</code> = 1 А — должен быть <code>#TRIP</code>. Вынь провод DOUT HX711 — безопасность должна работать дальше.</li><li><strong>Прогон, проп установлен (только здесь).</strong> Затяни гайку, убедись в направлении. Пульт скрипта на ПК шлёт команду ≥ 2 Гц. Нуль 20 с, затем 7 ступеней по 10 с (50…100 %), снова нуль 20 с. Аварийный выключатель питания ESC держишь в руке. На 100 % экземпляр из примера берёт 15.75 А — почти лимит 16 А (паспортный пик — 16 А на 180 с), поэтому верхнюю ступень держи не дольше 10 с. Запиши температуру и давление и посчитай ρ.</li><li><strong>Обработка</strong> — тем же скриптом. Сравнение с таблицей — при равной тяге.</li></ol>
+<ol><li><strong>Механика, пропа нет.</strong> Стенд на двух струбцинах, поток от балки и от людей, до стен, пола и потолка ≥ 1–2 диаметра пропа (ближе рециркуляция меняет тягу). Вокруг диска — кольцо или сетка. Плоскость вращения — запретная зона, работаешь в очках.</li><li><strong>Электрика, пропа нет.</strong> Первое включение через smoke stopper или БП с лимитом 2 А. Проверь, что INA226 показывает напряжение БП ±0.05 В по мультиметру, а ток растёт при газе, а не падает (полярность шунта). Проверь направление вращения и обороты на 20 % газа по оптодатчику и по тахометру.</li><li><strong>Калибровка, пропа нет.</strong> Прогрей 15 мин. Нагружай гирями 0–100–200–500–1000–2000 г вдоль оси пропа (блок на подшипнике), потом разгружай. По 20 отсчётов на точку. Посчитай k, остатки и гистерезис скриптом шага 2. Оставь 1000 г на 10 мин — это ползучесть.</li><li><strong>Аварийные пути, пропа нет.</strong> Питай ESP32 от отдельных 5 В (не только от USB) и останови скрипт на ПК / выдерни USB: газ должен уйти в 0 за 0.6 с, стенд — разоружиться. Временно поставь <code>I_LIMIT</code> = 1 А — должен быть <code>#TRIP</code>. Отключи провод SDA INA226 при армленном стенде — должен быть <code>#TRIP INA226 lost</code>. Вынь провод DOUT HX711 — безопасность должна работать дальше.</li><li><strong>Прогон, проп установлен (только здесь).</strong> Затяни гайку, убедись в направлении. Скрипт на ПК шлёт команду не реже 5 Гц (прошивка сбрасывает газ через 0.5–0.6 с после последней команды). Нуль 20 с, затем 7 ступеней по 10 с (50…100 %), снова нуль 20 с. Аварийный выключатель питания ESC держишь в руке. На 100 % экземпляр из примера берёт 15.75 А — почти лимит 16 А (паспортный пик — 16 А на 180 с), поэтому верхнюю ступень держи не дольше 10 с. Запиши температуру и давление и посчитай ρ.</li><li><strong>Обработка</strong> — тем же скриптом. Сравнение с таблицей — при равной тяге.</li></ol>
 <p>Критерии железа: остаток калибровки ≤ 3 г, дрейф нуля ≤ 5 г и учтён, ≥ 5 точек газа, C_T постоянен в пределах ±5 %, расхождение г/Вт с паспортом при равной тяге объяснено с U (k = 2).</p>
 <p>Самопроверка: лабораторная выполнена, когда: (основной путь) генератор и обработка запущены и k, дрейф и таблица точек совпадают с приведёнными; бюджет неопределённости посчитан для одной точки; по C_T и г/Вт сделан вывод, где потери — в пропе или в приводе; FM посчитан из паспортного момента правильной формулой; (железо) выполнены пункты 1–6, аварийные пути проверены без пропа, выполнены критерии железа.</p>
 
 <h2 id="diagnostika">Диагностика</h2>
-<div class="diag-groups"><article class="diag-item"><h4><strong>Симптом:</strong> редкие огромные скачки тяги (тысячи граммов) или значения около ±8388608</h4><ul><li>Возможная причина: прерывание (Wi-Fi, другой ISR) растянуло импульс PD_SCK дольше 60 мкс — HX711 ушёл в power-down или сдвинул биты.</li><li>Что сделать: чтение в <code>portENTER_CRITICAL</code>, Wi-Fi выключить на время прогона, отбрасывать отсчёты на границах шкалы.</li><li>Что видно в логе: одиночные выбросы на ровном сигнале.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> при постоянной нагрузке показания медленно растут, ноль после прогона не совпадает с нулём до</h4><ul><li>Возможная причина: ползучесть балки и температурный уход нуля (±0.2 % FS на 10 °C — до ±10 г у балки 5 кг).</li><li>Что сделать: прогрев 15 мин, нуль до и после, линейная поправка по времени, короткие ступени.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> тяга со знаком минус или растёт при снятии гири</h4><ul><li>Возможная причина: перепутаны A+ и A− или балка стоит вверх ногами; под мотором — перевёрнут проп или неверное вращение.</li><li>Что сделать: поменять провода сигнала или знак k, проверить проп и направление.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> тяга на 10–20 % выше паспорта при нормальном токе</h4><ul><li>Возможная причина: калибровали в другой точке приложения силы (ошибка плеча), или блок с трением съел часть веса гирь; проп близко к полу или стене.</li><li>Что сделать: калибровать вдоль оси пропа, проверить гистерезис, отодвинуть стенд на 1–2 D.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> C_T совпадает с паспортом, а г/Вт ниже на 5–15 %</h4><ul><li>Возможная причина: потери в приводе — другой ESC и тайминг, тонкие или длинные провода, напряжение меряется на БП, а не на ESC.</li><li>Что сделать: мерить U на входе ESC, сравнить с ESC из таблицы, проверить сечения.</li><li>Последствия: время висения будет меньше паспортного расчёта в той же пропорции.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> обороты вдвое выше ожидаемых или C_T скачет от точки к точке</h4><ul><li>Возможная причина: оптодатчик ловит две метки или блики от лопастей, неверный <code>TACH_PPR</code> или делитель полюсов для eRPM.</li><li>Что сделать: одна матовая метка, экран от света, сверка с внешним тахометром.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> мотор продолжает крутиться, когда завис ПК или отвалился датчик</h4><ul><li>Возможная причина: безопасность привязана к циклу чтения датчика или нет таймаута команды.</li><li>Что сделать: отдельный таймер безопасности, таймаут 0.5 с, аппаратный выключатель питания ESC.</li><li>Последствия: неуправляемый проп 15&quot; — травма.</li></ul></article></div>
+<div class="diag-groups"><article class="diag-item"><h4><strong>Симптом:</strong> редкие огромные скачки тяги (тысячи граммов) или значения около ±8388608</h4><ul><li>Возможная причина: прерывание (Wi-Fi, другой ISR) растянуло импульс PD_SCK дольше 60 мкс — HX711 ушёл в power-down или сдвинул биты.</li><li>Что сделать: чтение в <code>portENTER_CRITICAL</code>, Wi-Fi выключить на время прогона, отбрасывать отсчёты на границах шкалы.</li><li>Что видно в логе: одиночные выбросы на ровном сигнале.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> при постоянной нагрузке показания медленно растут, ноль после прогона не совпадает с нулём до</h4><ul><li>Возможная причина: ползучесть балки и температурный уход нуля (±0.2 % FS на 10 °C — до ±10 г у балки 5 кг).</li><li>Что сделать: прогрев 15 мин, нуль до и после, линейная поправка по времени, короткие ступени.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> тяга со знаком минус или растёт при снятии гири</h4><ul><li>Возможная причина: перепутаны A+ и A− или балка стоит вверх ногами; под мотором — перевёрнут проп или неверное вращение.</li><li>Что сделать: поменять провода сигнала или знак k, проверить проп и направление.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> тяга на 10–20 % выше паспорта при нормальном токе</h4><ul><li>Возможная причина: калибровали в другой точке приложения силы (ошибка плеча), или блок с трением съел часть веса гирь; проп близко к полу или стене.</li><li>Что сделать: калибровать вдоль оси пропа, проверить гистерезис, отодвинуть стенд на 1–2 D.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> C_T совпадает с паспортом, а г/Вт ниже на 5–15 %</h4><ul><li>Возможная причина: потери в приводе — другой ESC и тайминг, тонкие или длинные провода, напряжение меряется на БП, а не на ESC.</li><li>Что сделать: мерить U на входе ESC, сравнить с ESC из таблицы, проверить сечения.</li><li>Последствия: время висения будет меньше паспортного расчёта в той же пропорции.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> обороты вдвое выше ожидаемых или C_T скачет от точки к точке</h4><ul><li>Возможная причина: оптодатчик ловит две метки или блики от лопастей, неверный <code>TACH_PPR</code> или делитель полюсов для eRPM.</li><li>Что сделать: одна матовая метка, экран от света, сверка с внешним тахометром.</li></ul></article><article class="diag-item"><h4><strong>Симптом:</strong> мотор продолжает крутиться, когда завис ПК или отвалился датчик</h4><ul><li>Возможная причина: безопасность привязана к циклу чтения датчика, блокирующее чтение (<code>readStringUntil</code> с таймаутом по умолчанию 1 с) останавливает цикл, или нет таймаута команды.</li><li>Что сделать: проверка безопасности каждые 100 мс независимо от датчиков, ничего блокирующего в цикле (<code>Serial.setTimeout(10)</code>), таймаут 0.5 с с разоружением, аппаратный выключатель питания ESC.</li><li>Последствия: неуправляемый проп 15&quot; — травма.</li></ul></article></div>
 
 <h2 id="chek-list">Чек-лист</h2>
 <ul class="gc-checklist"><li><label><input type="checkbox" data-check-id="des-thrust-stand:0"><span>Стенд на струбцинах, проп за кольцом, до стен ≥ 1–2 D</span></label></li><li><label><input type="checkbox" data-check-id="des-thrust-stand:1"><span>Лимит тока и таймаут проверены без пропа</span></label></li><li><label><input type="checkbox" data-check-id="des-thrust-stand:2"><span>Калибровка вдоль оси пропа, k и остатки записаны</span></label></li><li><label><input type="checkbox" data-check-id="des-thrust-stand:3"><span>Ноль до и после прогона, дрейф учтён</span></label></li><li><label><input type="checkbox" data-check-id="des-thrust-stand:4"><span>г/Вт сравнено с паспортом при равной тяге, U (k = 2) указана</span></label></li></ul>

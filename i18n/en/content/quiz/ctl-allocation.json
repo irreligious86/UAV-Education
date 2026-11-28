@@ -1,0 +1,96 @@
+{
+ "module": "ctl-allocation",
+ "pass": 80,
+ "questions": [
+  {
+   "q": "In the PX4 formula (ActuatorEffectivenessRotors) the rotor torque is CT·(p × a) − CT·KM·a. What does the sign of CA_ROTORn_KM set?",
+   "options": [
+    "The spin direction: plus for CCW, minus for CW",
+    "The motor position: plus ahead of the CG, minus behind it",
+    "The ESC type: plus for DShot, minus for PWM",
+    "The thrust axis: plus down, minus up in FRD"
+   ],
+   "answer": 0,
+   "explain": "In module.yaml: \"Use a positive value for a rotor with CCW rotation. Use a negative value for a rotor with CW rotation.\" The position is set by CA_ROTORn_PX/PY/PZ, the axis by CA_ROTORn_AX/AY/AZ."
+  },
+  {
+   "q": "Dead cat: the front motors are 0.13 m ahead of the CG, the rear ones 0.15 m behind it. How will PX4 split the thrust in hover?",
+   "options": [
+    "Equally, and the I term removes the moments from the CG offset",
+    "The front ones 15 % more than the rear (0.15/0.13)",
+    "The rear ones 15 % more than the front (0.15/0.13)",
+    "The front ones 30 % more, from the sum of both arms"
+   ],
+   "answer": 1,
+   "explain": "For a zero pitching moment, T_front·0.13 = T_rear·0.15, hence T_front/T_rear = 1.154. The pseudo-inverse accounts for this right away; in the module's example u = 0.536 / 0.464."
+  },
+  {
+   "q": "PX4, CA_METHOD = 1, MC_AIRMODE = 0. At 60 % thrust the pilot rolls hard while yawing, and the motors run out of range. What gives way first?",
+   "options": [
+    "Roll: it is squeezed before yaw is added",
+    "Thrust: it is raised to make room",
+    "Yaw: it is added last and cut first",
+    "All axes shrink in the same proportion"
+   ],
+   "answer": 2,
+   "explain": "mixAirmodeDisabled: thrust can only be reduced, then roll and pitch are squeezed, and yaw is added in mixYaw() and desaturated first (with the MINIMUM_YAW_MARGIN of 15 %). In the example: roll 100 %, yaw 15 %."
+  },
+  {
+   "q": "How does MC_AIRMODE = 1 differ from 0 at nearly zero throttle?",
+   "options": [
+    "No difference: airmode affects only the upper throttle stop",
+    "With 1 yaw is turned off to preserve roll",
+    "With 1 roll and pitch are squeezed and thrust is unchanged",
+    "With 1 thrust may be raised so the roll is executed"
+   ],
+   "answer": 3,
+   "explain": "mixAirmodeRP desaturates along the thrust vector in both directions. In the example at 5 % throttle the roll went from 16 % to 100 %, and the thrust grew 6 times. That is why the parameter description asks you to keep airmode off while tuning."
+  },
+  {
+   "q": "An X hexacopter with alternating PNPNPN rotation loses a motor, CA_FAILURE_MODE = 1. What does the pseudo-inverse do in hover?",
+   "kind": "apply",
+   "fragment": "PNPNPN, M0 lost, pinv hover u: [-0.    0.75  0.75 -0.    0.75  0.75]\nhealthy hover u: 0.50 each (W = 3, T/W = 2)",
+   "options": [
+    "Sets M3 to 0, the other four carry W/4 each",
+    "Splits the weight equally over five motors, 0.6 each",
+    "Reverses M3 to restore yaw authority",
+    "Raises all five motors to 1.0, and the vehicle descends"
+   ],
+   "answer": 0,
+   "explain": "To keep the moments at zero, the minimum-norm solution sets the opposite motor to 0 and the rest to 0.75 = 3/4. M3 sits at its lower bound, so some directions have no margin. Reversing the opposite motor exists only on the main branch (mode 2)."
+  },
+  {
+   "q": "The x500 motors (r = 0.246 m, KM = 0.05) are tilted 10° tangentially toward their reaction torques. What happens to yaw and thrust?",
+   "options": [
+    "Yaw ×1.18, vertical thrust −10 %",
+    "Yaw ×1.84, vertical thrust −1.5 %",
+    "Yaw ×2.46, vertical thrust −0.4 %",
+    "Yaw is unchanged, a side force appears"
+   ],
+   "answer": 1,
+   "explain": "Mz ∝ r·sinθ + KM·cosθ = 0.0427 + 0.0492 = 0.0920 against 0.05, that is ×1.84; Fz ∝ cos 10° = 0.985. The side forces of the CCW and CW pairs cancel each other."
+  },
+  {
+   "q": "A dead cat matrix from PX4 is carried over to Betaflight with mmix. Which column must take the opposite sign?",
+   "options": [
+    "Roll: in Betaflight the right motor gets +1.000",
+    "Yaw: in Betaflight a CW motor gets +1.000 instead of −1",
+    "Pitch: in mixerQuadX the rear motor gets +1",
+    "Throttle: in Betaflight it is negative"
+   ],
+   "answer": 2,
+   "explain": "In mixerQuadX REAR_R has pitch = +1, while in PX4 and ArduPilot a rear motor is negative in pitch. Roll of a right motor is −1 everywhere, and yaw of a CW motor is −1 (Betaflight documentation: 1.0 = CCW, −1.0 = CW)."
+  },
+  {
+   "q": "ArduPilot, FRAME_CLASS = 15, the script calls MotorsMatrix:init(4) and then set_throttle_factor(0, 1.07). What happens?",
+   "options": [
+    "The factor takes effect after a reboot",
+    "The script fails on the assert, the vehicle does not arm",
+    "The factor is silently applied to the first motor",
+    "The call returns false, the factor does not change"
+   ],
+   "answer": 3,
+   "explain": "AP_MotorsMatrix::set_throttle_factor returns false if the matrix is already initialized (initialised_ok()) or the frame class is not Scripting Matrix. The throttle factor is set between add_motor_raw and init()."
+  }
+ ]
+}

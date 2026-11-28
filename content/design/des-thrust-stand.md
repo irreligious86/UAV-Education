@@ -31,7 +31,7 @@ next:
 {{diagram:stand-signal-chain|Стенд — это четыре канала с одной меткой времени. Безопасность (лимит тока, таймаут команды) живёт в ESP32 и не зависит ни от HX711, ни от ПК.}}
 
 ### Тензодатчик и HX711
-Балочный тензодатчик — мост Уитстона из четырёх тензорезисторов. Выход пропорционален нагрузке и напряжению возбуждения: U_вых = S·U_exc·F/F_ном, где S — чувствительность в мВ/В. У типовой дешёвой балки (серия TAL220) S = 1.0 ± 0.15 мВ/В, нелинейность и гистерезис ±0.05 % FS, ползучесть ±0.1 % FS за 30 мин, температурный уход нуля ±0.2 % FS на 10 °C. Для балки на 5 кг это ±2.5 г нелинейности, ±5 г ползучести и ±10 г ухода нуля на 10 °C. Отсюда главное правило: тара до и после каждого прогона.
+Балочный тензодатчик — мост Уитстона из четырёх тензорезисторов. Выход пропорционален нагрузке и напряжению возбуждения: U_вых = S·U_exc·F/F_ном, где S — чувствительность в мВ/В. У типовой дешёвой балки (серия TAL220; цифры — из паспорта TAL220F, где 1.0 мВ/В указано для ёмкостей 1–3 кг, балку 5 кг считаем такой же) S = 1.0 ± 0.15 мВ/В, нелинейность и гистерезис ±0.05 % FS, ползучесть ±0.1 % FS за 30 мин, температурный уход нуля ±0.2 % FS на 10 °C. Для балки на 5 кг это ±2.5 г нелинейности, ±5 г ползучести и ±10 г ухода нуля на 10 °C. Отсюда главное правило: тара до и после каждого прогона.
 
 HX711 — 24-битный АЦП для моста. Канал A с усилением 128 даёт полную шкалу ±0.5·AVDD/128 (±20 мВ при 5 В). Скорость 10 или 80 отсчётов/с (вывод RATE; курс берёт 10: каждый отсчёт усредняется в 8 раз дольше, поэтому шум ниже, а на ступени газа 10 с это всё равно 100 отсчётов, из которых первые секунды после шага отбрасываются; 80 — только для быстрых процессов, например разгона мотора после шага газа, ценой шума — ориентир курса), формат — дополнительный код, насыщение на 800000h / 7FFFFFh. Обычно мост питается от того же AVDD, поэтому измерение ратиометрическое и не зависит от точного напряжения: S·128·2²³ / 0.5 = 2 147 484 отсчёта на полную шкалу, то есть около 430 отсчётов/г для балки 5 кг. 24 импульса PD_SCK — данные, 25-й выбирает канал A×128. Ловушка в другом: если PD_SCK держится в высоком уровне дольше 60 мкс, чип уходит в power-down. Прерывание (Wi-Fi, другой ISR) посреди чтения портит отсчёт, поэтому чтение должно идти в критической секции.
 
@@ -272,7 +272,7 @@ for thr, Tg, Pel, rpm, tau in [(50, 805, 74, 3746, 0.15), (75, 1561, 199, 5215, 
 Выходит, что FM пропа 0.72–0.75 (момент в таблице дан двумя значащими цифрами, отсюда ±3–4 %), а мотор с ESC отдают на вал 72–80 % электрической мощности. На полном газе КПД привода падает до 0.72: потери в меди растут как I². Строка `wrong` показывает, что даёт вертолётная формула с пропеллерными коэффициентами.
 
 ### Шаг 6. Прошивка стенда (ESP32, PlatformIO)
-`platformio.ini`: `platform = espressif32`, `board = esp32dev`, `framework = arduino`, `monitor_speed = 115200`. HX711 читается вручную, без библиотеки, чтобы было видно критическую секцию. Безопасность работает на своём таймере каждые 100 мс: отвалился HX711 — газ всё равно сбросится.
+`platformio.ini`: `platform = espressif32`, `board = esp32dev`, `framework = arduino`, `monitor_speed = 115200`. HX711 читается вручную, без библиотеки, чтобы было видно критическую секцию. Безопасность проверяется каждые 100 мс в главном цикле независимо от HX711 (отвалившийся HX711 её не останавливает), и ничто в цикле не должно блокировать дольше нескольких миллисекунд.
 
 ```cpp
 // Thrust stand: HX711 (thrust) + INA226 (V, I) + optical tach (RPM) + ESC PWM. CSV at 10 Hz.
@@ -281,7 +281,7 @@ for thr, Tg, Pel, rpm, tau in [(50, 805, 74, 3746, 0.15), (75, 1561, 199, 5215, 
 
 const int HX_DOUT = 16, HX_SCK = 17, ESC_PIN = 25, TACH_PIN = 27;
 const float I_LIMIT = 16.0f;          // A: MN4006 KV380 peak 16 A (180 s); fuse 20 A in series
-const uint32_t CMD_TIMEOUT_MS = 500;  // no command from the PC -> throttle 0
+const uint32_t CMD_TIMEOUT_MS = 500;  // no valid command from the PC -> throttle 0, disarm
 const int RAMP_PER_TICK = 2;          // % per 100 ms tick = 20 %/s
 const uint8_t INA = 0x40;
 const int TACH_PPR = 1;               // reflective marks per revolution
@@ -307,10 +307,11 @@ void inaWrite(uint8_t reg, uint16_t val) {
   Wire.beginTransmission(INA); Wire.write(reg); Wire.write(val >> 8); Wire.write(val & 0xFF);
   Wire.endTransmission();
 }
-int16_t inaRead(uint8_t reg) {
-  Wire.beginTransmission(INA); Wire.write(reg); Wire.endTransmission(false);
-  Wire.requestFrom(INA, (uint8_t)2);
-  return (int16_t)((Wire.read() << 8) | Wire.read());
+bool inaRead(uint8_t reg, int16_t &out) {  // false = I2C error: INA226 lost or not answering
+  Wire.beginTransmission(INA); Wire.write(reg);
+  if (Wire.endTransmission(false) != 0 || Wire.requestFrom(INA, (uint8_t)2) != 2) return false;
+  uint8_t hi = Wire.read(), lo = Wire.read();  // MSB first: two separate reads, defined order
+  out = (int16_t)((hi << 8) | lo); return true;
 }
 
 void IRAM_ATTR tachIsr() { uint32_t now = micros(); tachPeriodUs = now - tachLastUs; tachLastUs = now; }
@@ -324,27 +325,32 @@ void escWriteUs(int us) {             // 50 Hz, 16-bit: 1 us = 65536 / 20000 cou
 #endif
 }
 
-void safetyTick(float amps) {         // runs every 100 ms
-  if (millis() - lastCmdMs > CMD_TIMEOUT_MS) thrCmd = 0;
-  if (armed && amps > I_LIMIT) { armed = false; Serial.println("#TRIP overcurrent"); }
-  int target = armed ? thrCmd : 0;
+void safetyTick(bool inaOk, float amps) {  // called every 100 ms from loop()
+  if (millis() - lastCmdMs > CMD_TIMEOUT_MS) { armed = false; thrCmd = 0; }  // PC silent
+  if (armed && (!inaOk || fabsf(amps) > I_LIMIT)) {  // fabsf: a reversed shunt reads < 0
+    armed = false; thrCmd = 0;        // restart only after a new "arm" and a new "tNN"
+    Serial.println(inaOk ? "#TRIP overcurrent" : "#TRIP INA226 lost");
+  }
   if (!armed) thrOut = 0;             // disarm cuts immediately, ramp only upwards
-  else thrOut += constrain(target - thrOut, -100, RAMP_PER_TICK);
+  else thrOut += constrain(thrCmd - thrOut, -100, RAMP_PER_TICK);
   escWriteUs(1000 + thrOut * 10);
 }
 
-void handleSerial() {                 // "arm", "disarm", "t55" (throttle %), sent >= 2 Hz by the PC
+void handleSerial() {                 // "arm", "disarm", "t55" (throttle %), sent >= 5 Hz by the PC
   if (!Serial.available()) return;
-  String s = Serial.readStringUntil('\n'); s.trim();
-  lastCmdMs = millis();
-  if (s == "arm" && thrOut == 0) armed = true;
-  else if (s == "disarm") armed = false;
+  String s = Serial.readStringUntil('\n'); s.trim();  // waits <= 10 ms (setTimeout in setup)
+  if (s == "arm") { if (thrOut == 0 && thrCmd == 0) armed = true; }  // arm only at throttle 0
+  else if (s == "disarm") { armed = false; thrCmd = 0; }
   else if (s.startsWith("t")) thrCmd = constrain(s.substring(1).toInt(), 0, 100);
+  else return;                        // unknown line or noise: does not refresh the timeout
+  lastCmdMs = millis();
 }
 
 void setup() {
   Serial.begin(115200);
-  pinMode(HX_SCK, OUTPUT); digitalWrite(HX_SCK, LOW); pinMode(HX_DOUT, INPUT);
+  Serial.setTimeout(10);              // never block the safety loop on a partial line (default 1000 ms)
+  pinMode(HX_SCK, OUTPUT); digitalWrite(HX_SCK, LOW);
+  pinMode(HX_DOUT, INPUT_PULLUP);     // DOUT wire off -> reads HIGH = "not ready", no garbage reads
   pinMode(TACH_PIN, INPUT_PULLUP); attachInterrupt(TACH_PIN, tachIsr, FALLING);
   Wire.begin();
   inaWrite(0x00, 0x4527);             // AVG 16, VBUSCT = VSHCT = 1.1 ms, continuous
@@ -361,10 +367,11 @@ void setup() {
 void loop() {
   handleSerial();
   static uint32_t tSafe = 0; static float volt = 0, amp = 0;
-  if (millis() - tSafe >= 100) {      // safety runs on its own clock: a dead HX711 must not stop it
+  if (millis() - tSafe >= 100) {      // safety every 100 ms, whether or not the HX711 is alive
     tSafe += 100;
-    volt = inaRead(0x02) * 0.00125f; amp = inaRead(0x04) * 0.00125f;
-    safetyTick(amp);
+    int16_t rv, ra; bool ok = inaRead(0x02, rv) && inaRead(0x04, ra);
+    if (ok) { volt = rv * 0.00125f; amp = ra * 0.00125f; }
+    safetyTick(ok, amp);              // I2C error = sensor lost = trip
   }
   if (digitalRead(HX_DOUT) == LOW) {  // HX711 RATE=0: a new sample every 100 ms
     int32_t raw = hx711Read();
@@ -375,28 +382,41 @@ void loop() {
 }
 ```
 
-Без платы логику проверяют на ПК: тот же `main.cpp` собирается `g++ -std=c++17` с подменой Arduino API (stubs) и симуляторами HX711 и INA226; в тесте безопасности HX711 всё время «не готов». Вывод:
+Без платы логику проверяют на ПК: тот же `main.cpp` собирается `g++ -std=c++17` с подменой Arduino API (stubs) и симуляторами HX711 и INA226; в тесте безопасности HX711 всё время «не готов», ПК шлёт команды с частотой 5 Гц, имитатор Serial ведёт себя как `Stream` в Arduino (строка без `\n` блокирует `readStringUntil` на весь таймаут), а симулятор INA226 умеет показать перевёрнутый шунт и пропасть с шины I²C. Вывод (одинаковый для core 2 и core 3):
 
 ```text
-HX711 decode:
+HX711 decode (DOUT pin mode INPUT_PULLUP):
   sent         0 -> read         0
   sent         1 -> read         1
   sent        -1 -> read        -1
   sent   8388607 -> read   8388607
   sent  -8388608 -> read  -8388608
   sent    421646 -> read    421646
-Safety (HX711 not ready the whole time):
+Safety (HX711 not ready the whole time, PC commands at 5 Hz):
   t= 500 ms thrOut=10% ESC=1100 us
   t= 900 ms thrOut=18% ESC=1180 us
   t=1300 ms thrOut=26% ESC=1260 us
   t=1700 ms thrOut=34% ESC=1340 us
-  700 ms without commands: thrOut=0% ESC=1000 us
-  re-armed: thrOut=20%
+  700 ms without commands: armed=0 thrOut=0% ESC=1000 us
+  t100 for 1 s without a new arm: armed=0 thrOut=0%
+  arm while t100 is pending: armed=0 (refused)
+  t0, arm, t100 for 1 s: armed=1 thrOut=20%
+  partial line "dis" (no newline), then silence: longest loop() 10 ms, disarmed 589 ms after the last valid command
+  re-armed, t100 for 1 s: thrOut=20%
   serial> #TRIP overcurrent
   17 A: armed=0 thrOut=0% ESC=1000 us
+  arm after the trip, no new tNN: armed=1 thrOut=0%
+  t100 for 1 s: thrOut=20%
+  serial> #TRIP overcurrent
+  reversed shunt, -17 A: armed=0 thrOut=0% ESC=1000 us
+  re-armed, t100 for 1 s: thrOut=20%
+  serial> #TRIP INA226 lost
+  INA226 off the bus: armed=0 thrOut=0% ESC=1000 us
+  serial> #TRIP INA226 lost
+  arm + t100 with the INA226 still off: armed=0 thrOut=0%
 ```
 
-Знак расширяется верно на границах шкалы, рампа держит 20 %/с, тишина 500 мс и ток 17 А сбрасывают газ — при мёртвом HX711.
+Знак расширяется верно на границах шкалы, рампа держит 20 %/с, и всё это при мёртвом HX711: тишина 500 мс сбрасывает газ и разоружает стенд, а снова он запускается только после `t0`, `arm` и свежей `tNN`; строка, оборванная без `\n`, держит `loop()` не дольше 10 мс и не продлевает таймаут (с таймаутом `Stream` по умолчанию 1000 мс и таймаутом, который обновляла любая строка, тот же тест давал зависание на 1000 мс, стенд оставался армленным, а газ уходил в 0 лишь через 1.8 с после последней верной команды); 17 А, −17 А (перевёрнутый шунт) и пропавший INA226 — всё это срабатывание защиты.
 
 ### Переход на реальное железо
 Железо: ESP32 DevKit, балка 5 кг (запас 2.2× к 2228 г; правило (ориентир курса): наименьшая стандартная ёмкость балки ≥ 2 × максимальной тяги — запас на рывок газа и вибрацию, допустимую перегрузку проверить по паспорту балки; более ёмкая балка даёт меньше отсчётов на грамм — 10 кг вместо 5 вдвое меньше, около 215 отсчётов/г, — поэтому брать с запасом сверх 2× незачем), HX711 с RATE = 0, INA226 с шунтом 2 мОм в минусе, оптодатчик, ESC с PWM-входом, предохранитель 20 А, БП 24 В с лимитом тока или 6S. Конец лопасти 15" на 6177 об/мин идёт со скоростью π·0.381·103 ≈ 123 м/с: обломок пропа — это пуля.
@@ -404,8 +424,8 @@ Safety (HX711 not ready the whole time):
 1. **Механика, пропа нет.** Стенд на двух струбцинах, поток от балки и от людей, до стен, пола и потолка ≥ 1–2 диаметра пропа (ближе рециркуляция меняет тягу). Вокруг диска — кольцо или сетка. Плоскость вращения — запретная зона, работаешь в очках.
 2. **Электрика, пропа нет.** Первое включение через smoke stopper или БП с лимитом 2 А. Проверь, что INA226 показывает напряжение БП ±0.05 В по мультиметру, а ток растёт при газе, а не падает (полярность шунта). Проверь направление вращения и обороты на 20 % газа по оптодатчику и по тахометру.
 3. **Калибровка, пропа нет.** Прогрей 15 мин. Нагружай гирями 0–100–200–500–1000–2000 г вдоль оси пропа (блок на подшипнике), потом разгружай. По 20 отсчётов на точку. Посчитай k, остатки и гистерезис скриптом шага 2. Оставь 1000 г на 10 мин — это ползучесть.
-4. **Аварийные пути, пропа нет.** Выдерни USB — газ должен уйти в 0 за 0.5 с. Временно поставь `I_LIMIT` = 1 А — должен быть `#TRIP`. Вынь провод DOUT HX711 — безопасность должна работать дальше.
-5. **Прогон, проп установлен (только здесь).** Затяни гайку, убедись в направлении. Пульт скрипта на ПК шлёт команду ≥ 2 Гц. Нуль 20 с, затем 7 ступеней по 10 с (50…100 %), снова нуль 20 с. Аварийный выключатель питания ESC держишь в руке. На 100 % экземпляр из примера берёт 15.75 А — почти лимит 16 А (паспортный пик — 16 А на 180 с), поэтому верхнюю ступень держи не дольше 10 с. Запиши температуру и давление и посчитай ρ.
+4. **Аварийные пути, пропа нет.** Питай ESP32 от отдельных 5 В (не только от USB) и останови скрипт на ПК / выдерни USB: газ должен уйти в 0 за 0.6 с, стенд — разоружиться. Временно поставь `I_LIMIT` = 1 А — должен быть `#TRIP`. Отключи провод SDA INA226 при армленном стенде — должен быть `#TRIP INA226 lost`. Вынь провод DOUT HX711 — безопасность должна работать дальше.
+5. **Прогон, проп установлен (только здесь).** Затяни гайку, убедись в направлении. Скрипт на ПК шлёт команду не реже 5 Гц (прошивка сбрасывает газ через 0.5–0.6 с после последней команды). Нуль 20 с, затем 7 ступеней по 10 с (50…100 %), снова нуль 20 с. Аварийный выключатель питания ESC держишь в руке. На 100 % экземпляр из примера берёт 15.75 А — почти лимит 16 А (паспортный пик — 16 А на 180 с), поэтому верхнюю ступень держи не дольше 10 с. Запиши температуру и давление и посчитай ρ.
 6. **Обработка** — тем же скриптом. Сравнение с таблицей — при равной тяге.
 
 Критерии железа: остаток калибровки ≤ 3 г, дрейф нуля ≤ 5 г и учтён, ≥ 5 точек газа, C_T постоянен в пределах ±5 %, расхождение г/Вт с паспортом при равной тяге объяснено с U (k = 2).
@@ -434,8 +454,8 @@ Safety (HX711 not ready the whole time):
   - Возможная причина: оптодатчик ловит две метки или блики от лопастей, неверный `TACH_PPR` или делитель полюсов для eRPM.
   - Что сделать: одна матовая метка, экран от света, сверка с внешним тахометром.
 - **Симптом:** мотор продолжает крутиться, когда завис ПК или отвалился датчик
-  - Возможная причина: безопасность привязана к циклу чтения датчика или нет таймаута команды.
-  - Что сделать: отдельный таймер безопасности, таймаут 0.5 с, аппаратный выключатель питания ESC.
+  - Возможная причина: безопасность привязана к циклу чтения датчика, блокирующее чтение (`readStringUntil` с таймаутом по умолчанию 1 с) останавливает цикл, или нет таймаута команды.
+  - Что сделать: проверка безопасности каждые 100 мс независимо от датчиков, ничего блокирующего в цикле (`Serial.setTimeout(10)`), таймаут 0.5 с с разоружением, аппаратный выключатель питания ESC.
   - Последствия: неуправляемый проп 15" — травма.
 
 ## checklist

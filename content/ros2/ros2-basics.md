@@ -3,7 +3,7 @@ id: ros2-basics
 title: "ROS 2 для борта: узлы, топики, QoS, tf2, bag"
 level: L3
 readingTime: 50 мин
-firmware: PX4 · ArduPilot
+firmware: ROS 2 Jazzy (отличия Humble отмечены) · PX4 1.18 (сверено с v1.18.0) · ArduPilot 4.7 (сверено с 4.7.3)
 status: published
 added: 2026-11-08
 tags:
@@ -40,7 +40,7 @@ DDS сам находит участников в сети (discovery) внут�
 
 Главное правило: издатель BEST_EFFORT + подписчик RELIABLE = нет связи. PX4 публикует `/fmu/out/*` как BEST_EFFORT (и TRANSIENT_LOCAL), а подписчик ROS 2 по умолчанию RELIABLE. Поэтому подписка на PX4 делается профилем `qos_profile_sensor_data` (BEST_EFFORT) или явным `QoSProfile`. Зачем BEST_EFFORT для телеметрии: при потере пакета по Wi-Fi повтор старого положения бесполезен, нужен следующий — та же логика, что UDP против TCP в модуле mav-routing.
 
-Проверка: `ros2 topic info -v /fmu/out/vehicle_status_v1` покажет профили обеих сторон.
+Проверка: `ros2 topic info -v /fmu/out/vehicle_status_v4` (PX4 1.18; в 1.16–1.17 — `_v1`) покажет профили обеих сторон.
 
 {{diagram:ros2-qos|Совместимость reliability: BEST_EFFORT-издатель не связывается с RELIABLE-подписчиком — молча.}}
 
@@ -88,11 +88,11 @@ ros2 doctor --report | head -20
 
 Самопроверка: лабораторная выполнена, когда вывод `topic info -v` записан для обоих случаев и по нему видно, что связи нет именно при издателе BEST_EFFORT и подписчике RELIABLE, CSV логгера получен в SITL и перестаёт пополняться при подписке RELIABLE, CSV из bag совпадает с CSV из SITL с точностью до момента старта, `tf2_echo base_link camera_link` возвращает заданные смещения (x = 0.1, z = −0.05) и pitch 0.5, а ваше объяснение знака pitch совпадает с эталоном ниже.
 
-**Эталон для самопроверки.** В FLU ось x смотрит вперёд, y — влево, z — вверх; положительный поворот вокруг y по правилу правой руки наклоняет ось x к −z, то есть вниз, — поэтому положительный pitch означает «камера смотрит вниз». Типичные неверные: (1) `ros2 topic echo` молчит, хотя топик есть в списке, — подписка RELIABLE на BEST_EFFORT-издателя или нет суффикса версии `_v1`; (2) при воспроизведении bag tf2 сообщает «extrapolation into the future» — узлы живут на системном времени: `ros2 bag play --clock` и `use_sim_time:=true`.
+**Эталон для самопроверки.** В FLU ось x смотрит вперёд, y — влево, z — вверх; положительный поворот вокруг y по правилу правой руки наклоняет ось x к −z, то есть вниз, — поэтому положительный pitch означает «камера смотрит вниз». Типичные неверные: (1) `ros2 topic echo` молчит, хотя топик есть в списке, — подписка RELIABLE на BEST_EFFORT-издателя или нет/не тот суффикс версии (`_v1`, `_v4`, …); (2) при воспроизведении bag tf2 сообщает «extrapolation into the future» — узлы живут на системном времени: `ros2 bag play --clock` и `use_sim_time:=true`.
 
 ## diagnostics
 - **Симптом:** `ros2 topic echo /fmu/out/...` молчит, хотя `topic list` его показывает
-  - Возможная причина: QoS — подписка RELIABLE на BEST_EFFORT-издателя; или нет суффикса версии `_v1`.
+  - Возможная причина: QoS — подписка RELIABLE на BEST_EFFORT-издателя; или нет/не тот суффикс версии (`_v1`, `_v4`, …).
   - Что сделать: `--qos-reliability best_effort`; проверить точное имя топика.
 - **Симптом:** ноутбук в той же сети «вмешивается» в топики аппарата
   - Возможная причина: общий ROS_DOMAIN_ID и открытый discovery.
@@ -109,7 +109,7 @@ ros2 doctor --report | head -20
 - ROS 2 — About Quality of Service settings (compatibility table) | https://docs.ros.org/en/jazzy/Concepts/Intermediate/About-Quality-of-Service-Settings.html | primary | A
 - REP-103 — Standard units and coordinate conventions | https://www.ros.org/reps/rep-0103.html | primary | A
 - REP-105 — Coordinate frames for mobile platforms | https://www.ros.org/reps/rep-0105.html | primary | A
-- PX4 — ROS 2 user guide (QoS for /fmu/out topics) | https://docs.px4.io/v1.17/en/ros2/user_guide.html | primary | A
+- PX4 — ROS 2 user guide (QoS for /fmu/out topics) | https://docs.px4.io/v1.18/en/ros2/user_guide.html | primary | A
 
 ## checklist
 - Различаю топик, сервис, действие и параметр и выбираю нужный

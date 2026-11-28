@@ -1,0 +1,96 @@
+{
+  "module": "aero-stability",
+  "pass": 80,
+  "questions": [
+    {
+      "q": "A static margin of SM = 10 % MAC means that when C_L rises by 0.1, the pitching moment about the CG changes by…",
+      "options": [
+        "+0.01 (nose-up)",
+        "−0.01 (nose-down)",
+        "−0.10 (nose-down)",
+        "0, the moment does not change"
+      ],
+      "answer": 1,
+      "explain": "dCm/dCL = −SM, so ΔCm = −0.1·0.1 = −0.01. The nose-down moment brings the airplane back to its original angle of attack."
+    },
+    {
+      "q": "A swept wing: root chord 300 mm, tip chord 180 mm, leading-edge sweep 25°. The pilot put the CG at 75 mm (a quarter of the root chord). What happens?",
+      "options": [
+        "A normal CG, margin about 8 %",
+        "Tail heavy: the CG is behind the NP, the wing is unstable",
+        "Nose heavy: the NP is at 168 mm, margin about 38 % MAC",
+        "Neutral CG: the CG coincides with the NP, margin about zero"
+      ],
+      "answer": 2,
+      "explain": "The aerodynamic center of a swept wing lies at a quarter of the MAC, and the MAC leading edge is 107 mm aft. NP = 107 + 0.25·245 = 168 mm, margin (168 − 75)/245 ≈ 38 %."
+    },
+    {
+      "q": "How does the tail volume coefficient V_h = S_h·l_h/(S·MAC) affect the neutral point position?",
+      "options": [
+        "Larger V_h: the NP moves aft, the CG can go further aft",
+        "Larger V_h: the NP moves forward, the CG must move forward",
+        "V_h affects only directional stability, not the NP",
+        "The NP is always at 25 % MAC; V_h changes only the trim deflection"
+      ],
+      "answer": 0,
+      "explain": "h_n = h_ac + η·V_h·(a_t/a_w)·(1 − dε/dα): the larger the tail or the longer the arm, the further aft the NP. That is why on an airplane with a tail the CG can be at 40 % MAC or more."
+    },
+    {
+      "q": "Why does a flying wing need a reflex airfoil or raised elevons?",
+      "options": [
+        "To lower the stall speed with more camber",
+        "To get Cm0 > 0: without it there is no trim at SM > 0",
+        "To move the neutral point aft and increase the margin",
+        "To reduce the induced drag in cruise"
+      ],
+      "answer": 1,
+      "explain": "Cm = Cm0 − SM·C_L, level flight at C_L,trim = Cm0/SM. With a positive margin you need a positive Cm0, and an ordinary cambered airfoil gives Cm0 < 0."
+    },
+    {
+      "q": "The polar C_D = C_D0 + k·C_L². At what C_L is the maximum L/D reached?",
+      "options": [
+        "C_L = √(3·C_D0/k)",
+        "C_L = C_Lmax / 1.3",
+        "C_L = C_D0/k",
+        "C_L = √(C_D0/k)"
+      ],
+      "answer": 3,
+      "explain": "C_D/C_L is minimal when the induced part equals the parasite part: k·C_L² = C_D0. √(3·C_D0/k) is minimum power (endurance)."
+    },
+    {
+      "q": "An electric airplane: V_md = 10.8 m/s, V_mp = 8.2 m/s, V_s = 9.4 m/s. Which speed do you take for maximum endurance?",
+      "options": [
+        "8.2 m/s: minimum power, which is what endurance is",
+        "About 1.2–1.3·V_s (11–12 m/s): V_mp is below the stall",
+        "10.8 m/s: the maximum L/D also gives endurance",
+        "As high as possible: the battery delivers more energy at higher current"
+      ],
+      "answer": 1,
+      "explain": "V_mp lies below V_s, and you cannot fly there. Endurance is limited by the safe minimum speed (`AIRSPEED_MIN`), not by the polar."
+    },
+    {
+      "q": "An ArduPlane log fragment, steady cruise in FBWA. What is most likely?",
+      "kind": "apply",
+      "fragment": "PIDP  Tar=0.1  Act=0.0  Err=0.1  P=0.002  I=0.21  D=0.000\nPIDP  Tar=-0.2 Act=-0.1 Err=-0.1 P=-0.003 I=0.22  D=0.001\nPIDP  Tar=0.0  Act=0.1  Err=-0.1 P=-0.002 I=0.21  D=0.000\nCTUN  NavPitch=2.1  Pitch=2.0  As=13.2",
+      "options": [
+        "Tail heavy: the airplane constantly needs down elevator to stay level",
+        "Nose heavy or wrong trim: the integrator holds up elevator",
+        "Pitch oscillation from too large a P",
+        "Airspeed sensor failure"
+      ],
+      "answer": 1,
+      "explain": "Per the ArduPlane documentation, a persistently positive PIDP.I means up elevator is needed: a heavy nose or an incorrect trim. The error is small and the pitch is tracked, so there is no oscillation."
+    },
+    {
+      "q": "Glide test: mass 2.7 kg, S = 0.41 m², AR 8.2, e = 0.8, L/D = 10.5 measured at 12 m/s. What does this measurement give you?",
+      "options": [
+        "The neutral point position without computing V_h",
+        "The stall speed through C_Lmax = C_L/L·D",
+        "C_D0 ≈ 0.044: C_D = C_L/(L/D), minus the induced part",
+        "The Oswald factor e, if you assume C_D0 is zero"
+      ],
+      "answer": 2,
+      "explain": "C_L = 2mg/(ρV²S) ≈ 0.73, C_D = 0.73/10.5 ≈ 0.070, k·C_L² ≈ 0.026, hence C_D0 ≈ 0.044. With it the polar is recomputed from real data."
+    }
+  ]
+}

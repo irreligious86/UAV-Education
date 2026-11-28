@@ -1,0 +1,109 @@
+{
+ "module": "des-sizing",
+ "tasks": [
+  {
+   "id": "hover-power-fm",
+   "title": "Electrical hover power through FM",
+   "statement": "A vehicle of **{m} kg**, **{n}** props of **{d} inches** each, system FM = **{fm}**. Find the electrical hover power of the propulsion system in watts (ρ = 1.225 kg/m³, g = 9.81).",
+   "params": {
+    "m": {
+     "min": 1.5,
+     "max": 8.0,
+     "step": 0.1
+    },
+    "n": [
+     4,
+     6,
+     8
+    ],
+    "d": {
+     "min": 10,
+     "max": 18,
+     "step": 1
+    },
+    "fm": {
+     "min": 0.5,
+     "max": 0.65,
+     "step": 0.01
+    }
+   },
+   "answer": "(m*9.81)**1.5/math.sqrt(2*1.225*n*math.pi*(d*0.0254/2)**2)/fm",
+   "unit": "W",
+   "tol": 0.02,
+   "solution": "A = n·π·(D/2)², D = d·0.0254 m; P_ideal = (m·g)^1.5 / √(2ρA); electrical power = P_ideal / FM."
+  },
+  {
+   "id": "endurance",
+   "title": "Hover time down to the reserve",
+   "statement": "A 6S**{p}**P battery of **{e} Wh** cells. 85 % of the energy comes out, and the reserve is 20 % of what is available. The hover power including onboard loads is **{pw} W**. Find the time down to the reserve in minutes.",
+   "params": {
+    "p": [
+     2,
+     3,
+     4
+    ],
+    "e": [
+     15.1,
+     16.2,
+     18.0
+    ],
+    "pw": {
+     "min": 250,
+     "max": 600,
+     "step": 10
+    }
+   },
+   "answer": "6*p*e*0.85*0.8/pw*60",
+   "unit": "min",
+   "tol": 0.02,
+   "solution": "E_flight = 6·P·E_cell·0.85·0.8; t = E_flight / P_hover · 60 min."
+  },
+  {
+   "id": "mass-closure",
+   "title": "Closing the mass budget",
+   "statement": "The payload, avionics, motors and battery together weigh **{mf} kg**, and the frame is **{f} %** of the takeoff mass. Find the takeoff mass in kilograms.",
+   "params": {
+    "mf": {
+     "min": 1.5,
+     "max": 6.0,
+     "step": 0.05
+    },
+    "f": {
+     "min": 12,
+     "max": 25,
+     "step": 1
+    }
+   },
+   "answer": "mf/(1-f/100)",
+   "unit": "kg",
+   "tol": 0.01,
+   "solution": "m = m_without_frame / (1 − f_frame): the frame grows with the vehicle, so you cannot simply add its mass."
+  },
+  {
+   "id": "wind-tilt",
+   "title": "Tilt into the wind",
+   "statement": "A multirotor of **{m} kg** holds an airspeed of **{v} m/s**, CdA = **{cda} m²**. Find the tilt angle in degrees (ρ = 1.225, g = 9.81).",
+   "params": {
+    "m": {
+     "min": 3.0,
+     "max": 8.0,
+     "step": 0.1
+    },
+    "v": {
+     "min": 6,
+     "max": 15,
+     "step": 1
+    },
+    "cda": {
+     "min": 0.03,
+     "max": 0.08,
+     "step": 0.01
+    }
+   },
+   "answer": "math.degrees(math.atan(0.5*1.225*v**2*cda/(m*9.81)))",
+   "unit": "°",
+   "tol": 0.02,
+   "solution": "D = ½·ρ·V²·CdA; θ = atan(D / (m·g)). The thrust is then √((mg)² + D²), and that is what you compare with the maximum."
+  }
+ ]
+}

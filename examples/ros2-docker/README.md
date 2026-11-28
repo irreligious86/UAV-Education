@@ -21,7 +21,7 @@ Inside the `ros` shell:
 ros2 topic list                                         # /fmu/... (PX4) or /ap/... (ArduPilot)
 ros2 launch uav_ros2_labs px4_square.launch.py          # logger + offboard square
 ros2 launch uav_ros2_labs ap_square.launch.py           # logger + GUIDED square over AP_DDS
-ros2 bag record -o /bags/flight1 /fmu/out/vehicle_local_position_v1 /fmu/out/vehicle_status_v1
+ros2 bag record -o /bags/flight1 /fmu/out/vehicle_local_position_v1 /fmu/out/vehicle_status_v4  # PX4 1.18 (1.16–1.17: vehicle_status_v1)
 ```
 
 ## What is verified where

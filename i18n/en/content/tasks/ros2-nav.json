@@ -3,8 +3,8 @@
  "tasks": [
   {
    "id": "brake",
-   "title": "Safe velocity",
-   "statement": "Deceleration **{a} m/s²**, reliable sensor range **{d} m**, margin **{m} m**, reaction delay **{t} s**. Find the maximum velocity (m/s) at which the vehicle stops before the margin: v·t + v²/(2a) = d − m.",
+   "title": "Safe speed",
+   "statement": "Deceleration **{a} m/s²**, reliable sensor range **{d} m**, margin **{m} m**, reaction delay **{t} s**. Find the maximum speed (m/s) at which the vehicle stops before the margin: v·t + v²/(2a) = d − m.",
    "params": {
     "a": {
      "min": 2,
@@ -30,7 +30,7 @@
    "answer": "a*(-t+math.sqrt(t*t+2*(d-m)/a))",
    "unit": "m/s",
    "tol": 0.02,
-   "solution": "The quadratic equation v²/(2a) + v·t − (d − m) = 0 → v = a·(−t + √(t² + 2(d − m)/a))."
+   "solution": "The quadratic v²/(2a) + v·t − (d − m) = 0 → v = a·(−t + √(t² + 2(d − m)/a))."
   },
   {
    "id": "octile",
@@ -51,12 +51,12 @@
    "answer": "(dx+dy)+(math.sqrt(2)-2)*min(dx,dy)",
    "unit": "",
    "tol": 0.01,
-   "solution": "min(dx,dy) diagonal steps of √2 each and |dx − dy| straight steps."
+   "solution": "min(dx,dy) diagonal steps of √2 each and |dx − dy| straight ones."
   },
   {
    "id": "oa-detour",
-   "title": "Путь Dijkstra вокруг квадратной зоны",
-   "statement": "Прямая от старта до цели длиной **{L} м** проходит через центр квадратной зоны исключения со стороной **{a} м**, центр зоны — на середине прямой. `OA_MARGIN_MAX` = **{M} м**. Dijkstra выносит каждую вершину зоны по биссектрисе на M и летит старт → две вынесенные вершины ближней стороны → цель. Найдите длину пути (м).",
+   "title": "Dijkstra path around a square zone",
+   "statement": "A straight line of **{L} m** from start to goal passes through the center of a square exclusion zone with a side of **{a} m**; the zone center is at the middle of the line. `OA_MARGIN_MAX` = **{M} m**. Dijkstra moves each vertex of the zone out along the bisector by M and flies start → the two moved vertices of the near side → goal. Find the path length (m).",
    "params": {
     "L": {
      "min": 60,
@@ -75,14 +75,14 @@
     }
    },
    "answer": "2*math.sqrt((L/2-a/2-M/math.sqrt(2))**2+(a/2+M/math.sqrt(2))**2)+a+2*M/math.sqrt(2)",
-   "unit": "м",
+   "unit": "m",
    "tol": 0.02,
-   "solution": "Смещение по каждой оси d = M/√2. Углы пути: (L/2 − a/2 − d, a/2 + d) и (L/2 + a/2 + d, a/2 + d). Длина = 2·√((L/2 − a/2 − d)² + (a/2 + d)²) + (a + 2d). Для L = 80, a = 20, M = 5: 29.72 + 27.07 + 29.72 = 86.5 м (SITL — 87.1 м)."
+   "solution": "Offset along each axis d = M/√2. The path corners: (L/2 − a/2 − d, a/2 + d) and (L/2 + a/2 + d, a/2 + d). Length = 2·√((L/2 − a/2 − d)² + (a/2 + d)²) + (a + 2d). For L = 80, a = 20, M = 5: 29.72 + 27.07 + 29.72 = 86.5 m (SITL: 87.0 m)."
   },
   {
    "id": "logodds",
-   "title": "Вероятность занятости после k попаданий",
-   "statement": "Ячейка сетки начинается с p = 0.5 (L = 0). Модель датчика: попадание луча — p_hit = **{ph}**. Луч попал в ячейку **{k}** раз подряд. Ограничение L = ±3.5 из модуля при этих значениях не достигается (k·ln(p_hit/(1 − p_hit)) ≤ 3.39). Какова вероятность занятости?",
+   "title": "Occupancy probability after k hits",
+   "statement": "A grid cell starts at p = 0.5 (L = 0). The sensor model: a beam hit has p_hit = **{ph}**. The beam hit the cell **{k}** times in a row. The module's clamp L = ±3.5 is not reached with these values (k·ln(p_hit/(1 − p_hit)) ≤ 3.39). What is the occupancy probability?",
    "params": {
     "ph": {
      "min": 0.55,
@@ -98,7 +98,7 @@
    "answer": "1-1/(1+math.exp(k*math.log(ph/(1-ph))))",
    "unit": "",
    "tol": 0.01,
-   "solution": "L = k·ln(p_hit/(1 − p_hit)), p = 1 − 1/(1 + e^L). Для p_hit = 0.7 и k = 3: L = 2.542, p = 0.927 — как в шаге 2."
+   "solution": "L = k·ln(p_hit/(1 − p_hit)), p = 1 − 1/(1 + e^L). For p_hit = 0.7 and k = 3: L = 2.542, p = 0.927, as in step 2."
   }
  ]
 }

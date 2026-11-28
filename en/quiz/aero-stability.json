@@ -3,51 +3,51 @@
   "pass": 80,
   "questions": [
     {
-      "q": "Статический запас SM = 10 % САХ означает, что при росте C_L на 0.1 момент тангажа относительно ЦТ изменится на…",
+      "q": "A static margin of SM = 10 % MAC means that when C_L rises by 0.1, the pitching moment about the CG changes by…",
       "options": [
-        "+0.01 (кабрирующий)",
-        "−0.01 (пикирующий)",
-        "−0.10 (пикирующий)",
-        "0 — момент не меняется"
+        "+0.01 (nose-up)",
+        "−0.01 (nose-down)",
+        "−0.10 (nose-down)",
+        "0, the moment does not change"
       ],
       "answer": 1,
-      "explain": "dCm/dCL = −SM, поэтому ΔCm = −0.1·0.1 = −0.01. Пикирующий момент возвращает самолёт к исходному углу атаки."
+      "explain": "dCm/dCL = −SM, so ΔCm = −0.1·0.1 = −0.01. The nose-down moment brings the airplane back to its original angle of attack."
     },
     {
-      "q": "Стреловидное крыло: корневая хорда 300 мм, концевая 180 мм, стреловидность передней кромки 25°. Пилот поставил ЦТ на 75 мм (четверть корневой хорды). Что будет?",
+      "q": "A swept wing: root chord 300 mm, tip chord 180 mm, leading-edge sweep 25°. The pilot put the CG at 75 mm (a quarter of the root chord). What happens?",
       "options": [
-        "Нормальная центровка, запас около 8 %",
-        "Хвостовая центровка: ЦТ позади NP, крыло неустойчиво",
-        "Тяжёлый нос: NP на 168 мм, запас около 38 % САХ",
-        "Нейтральная центровка: ЦТ совпадает с NP, запас около нуля"
+        "A normal CG, margin about 8 %",
+        "Tail heavy: the CG is behind the NP, the wing is unstable",
+        "Nose heavy: the NP is at 168 mm, margin about 38 % MAC",
+        "Neutral CG: the CG coincides with the NP, margin about zero"
       ],
       "answer": 2,
-      "explain": "Фокус стреловидного крыла лежит на четверти САХ, а передняя кромка САХ смещена назад на 107 мм. NP = 107 + 0.25·245 = 168 мм, запас (168 − 75)/245 ≈ 38 %."
+      "explain": "The aerodynamic center of a swept wing lies at a quarter of the MAC, and the MAC leading edge is 107 mm aft. NP = 107 + 0.25·245 = 168 mm, margin (168 − 75)/245 ≈ 38 %."
     },
     {
-      "q": "Как коэффициент объёма ГО V_h = S_h·l_h/(S·MAC) влияет на положение нейтральной точки?",
+      "q": "How does the tail volume coefficient V_h = S_h·l_h/(S·MAC) affect the neutral point position?",
       "options": [
-        "Больше V_h — NP дальше назад, ЦТ можно ставить дальше назад",
-        "Больше V_h — NP дальше вперёд, ЦТ нужно сдвигать вперёд",
-        "V_h влияет только на путевую устойчивость, а не на NP",
-        "NP всегда на 25 % САХ, а V_h меняет только балансировочный угол руля"
+        "Larger V_h: the NP moves aft, the CG can go further aft",
+        "Larger V_h: the NP moves forward, the CG must move forward",
+        "V_h affects only directional stability, not the NP",
+        "The NP is always at 25 % MAC; V_h changes only the trim deflection"
       ],
       "answer": 0,
-      "explain": "h_n = h_ac + η·V_h·(a_t/a_w)·(1 − dε/dα): чем больше стабилизатор или длиннее плечо, тем дальше назад NP. Поэтому у самолёта с хвостом ЦТ бывает на 40 % САХ и больше."
+      "explain": "h_n = h_ac + η·V_h·(a_t/a_w)·(1 − dε/dα): the larger the tail or the longer the arm, the further aft the NP. That is why on an airplane with a tail the CG can be at 40 % MAC or more."
     },
     {
-      "q": "Зачем летающему крылу reflex-профиль или поднятые элевоны?",
+      "q": "Why does a flying wing need a reflex airfoil or raised elevons?",
       "options": [
-        "Чтобы снизить скорость сваливания за счёт большей кривизны",
-        "Чтобы получить Cm0 > 0 — без него нет балансировки при SM > 0",
-        "Чтобы сдвинуть нейтральную точку назад и увеличить запас",
-        "Чтобы уменьшить индуктивное сопротивление на крейсере"
+        "To lower the stall speed with more camber",
+        "To get Cm0 > 0: without it there is no trim at SM > 0",
+        "To move the neutral point aft and increase the margin",
+        "To reduce the induced drag in cruise"
       ],
       "answer": 1,
-      "explain": "Cm = Cm0 − SM·C_L, ровный полёт при C_L,trim = Cm0/SM. При положительном запасе нужен положительный Cm0, а обычный несимметричный профиль даёт Cm0 < 0."
+      "explain": "Cm = Cm0 − SM·C_L, level flight at C_L,trim = Cm0/SM. With a positive margin you need a positive Cm0, and an ordinary cambered airfoil gives Cm0 < 0."
     },
     {
-      "q": "Поляра C_D = C_D0 + k·C_L². На каком C_L достигается максимальное качество?",
+      "q": "The polar C_D = C_D0 + k·C_L². At what C_L is the maximum L/D reached?",
       "options": [
         "C_L = √(3·C_D0/k)",
         "C_L = C_Lmax / 1.3",
@@ -55,42 +55,42 @@
         "C_L = √(C_D0/k)"
       ],
       "answer": 3,
-      "explain": "Минимум C_D/C_L — когда индуктивная часть равна вредной: k·C_L² = C_D0. √(3·C_D0/k) — это минимум мощности (продолжительность)."
+      "explain": "C_D/C_L is minimal when the induced part equals the parasite part: k·C_L² = C_D0. √(3·C_D0/k) is minimum power (endurance)."
     },
     {
-      "q": "Электросамолёт: V_md = 10.8 м/с, V_mp = 8.2 м/с, V_s = 9.4 м/с. Какую скорость брать для максимальной продолжительности?",
+      "q": "An electric airplane: V_md = 10.8 m/s, V_mp = 8.2 m/s, V_s = 9.4 m/s. Which speed do you take for maximum endurance?",
       "options": [
-        "8.2 м/с — минимум мощности, это и есть продолжительность",
-        "Около 1.2–1.3·V_s (11–12 м/с): V_mp ниже сваливания",
-        "10.8 м/с — максимум качества даёт и продолжительность",
-        "Как можно выше: батарея отдаёт больше энергии при большем токе"
+        "8.2 m/s: minimum power, which is what endurance is",
+        "About 1.2–1.3·V_s (11–12 m/s): V_mp is below the stall",
+        "10.8 m/s: the maximum L/D also gives endurance",
+        "As high as possible: the battery delivers more energy at higher current"
       ],
       "answer": 1,
-      "explain": "V_mp лежит ниже V_s, лететь там нельзя. Продолжительность ограничена безопасным минимумом скорости (`AIRSPEED_MIN`), а не полярой."
+      "explain": "V_mp lies below V_s, and you cannot fly there. Endurance is limited by the safe minimum speed (`AIRSPEED_MIN`), not by the polar."
     },
     {
-      "q": "Фрагмент лога ArduPlane, ровный крейсер в FBWA. Что вероятнее всего?",
+      "q": "An ArduPlane log fragment, steady cruise in FBWA. What is most likely?",
       "kind": "apply",
       "fragment": "PIDP  Tar=0.1  Act=0.0  Err=0.1  P=0.002  I=0.21  D=0.000\nPIDP  Tar=-0.2 Act=-0.1 Err=-0.1 P=-0.003 I=0.22  D=0.001\nPIDP  Tar=0.0  Act=0.1  Err=-0.1 P=-0.002 I=0.21  D=0.000\nCTUN  NavPitch=2.1  Pitch=2.0  As=13.2",
       "options": [
-        "Хвостовая центровка: самолёту всё время нужен руль вниз для горизонта",
-        "Тяжёлый нос или неверный триммер: интегратор держит руль вверх",
-        "Раскачка по тангажу из-за слишком большого P",
-        "Отказ датчика воздушной скорости"
+        "Tail heavy: the airplane constantly needs down elevator to stay level",
+        "Nose heavy or wrong trim: the integrator holds up elevator",
+        "Pitch oscillation from too large a P",
+        "Airspeed sensor failure"
       ],
       "answer": 1,
-      "explain": "По документации ArduPlane устойчиво положительный PIDP.I означает, что требуется руль вверх: тяжёлый нос или сбитый триммер. Ошибка мала и тангаж отслеживается, так что раскачки нет."
+      "explain": "Per the ArduPlane documentation, a persistently positive PIDP.I means up elevator is needed: a heavy nose or an incorrect trim. The error is small and the pitch is tracked, so there is no oscillation."
     },
     {
-      "q": "Тест планирования: масса 2.7 кг, S = 0.41 м², AR 8.2, e = 0.8, на 12 м/с измерено L/D = 10.5. Что даёт этот замер?",
+      "q": "Glide test: mass 2.7 kg, S = 0.41 m², AR 8.2, e = 0.8, L/D = 10.5 measured at 12 m/s. What does this measurement give you?",
       "options": [
-        "Положение нейтральной точки без расчёта V_h",
-        "Скорость сваливания через C_Lmax = C_L/L·D",
-        "C_D0 ≈ 0.044: C_D = C_L/(L/D), минус индуктивная часть",
-        "Коэффициент Освальда e, если принять, что C_D0 равен нулю"
+        "The neutral point position without computing V_h",
+        "The stall speed through C_Lmax = C_L/L·D",
+        "C_D0 ≈ 0.044: C_D = C_L/(L/D), minus the induced part",
+        "The Oswald factor e, if you assume C_D0 is zero"
       ],
       "answer": 2,
-      "explain": "C_L = 2mg/(ρV²S) ≈ 0.73, C_D = 0.73/10.5 ≈ 0.070, k·C_L² ≈ 0.026, отсюда C_D0 ≈ 0.044. С ним поляра пересчитывается по реальным данным."
+      "explain": "C_L = 2mg/(ρV²S) ≈ 0.73, C_D = 0.73/10.5 ≈ 0.070, k·C_L² ≈ 0.026, hence C_D0 ≈ 0.044. With it the polar is recomputed from real data."
     }
   ]
 }

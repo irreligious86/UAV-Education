@@ -3,12 +3,12 @@
   "pass": 80,
   "questions": [
     {
-      "q": "A BEST_EFFORT publisher and a RELIABLE subscriber:",
+      "q": "A BEST_EFFORT publisher and a RELIABLE subscription:",
       "options": [
-        "Don't connect, and there's no error",
-        "Work with a retransmission delay",
+        "Do not connect, and no error is raised",
+        "Work, with a delay for retransmission",
         "Work normally",
-        "Raise an exception in the publisher"
+        "Throw an exception in the publisher"
       ],
       "answer": 0,
       "explain": "A QoS incompatibility means silence and a warning in the log."
@@ -16,16 +16,16 @@
     {
       "q": "Why do you subscribe to /fmu/out/* with the sensor data profile?",
       "options": [
-        "PX4 sends BEST_EFFORT",
-        "It's faster",
+        "PX4 publishes BEST_EFFORT",
+        "It is faster",
         "tf2 requires it",
-        "Otherwise bag doesn't work"
+        "Otherwise bag recording does not work"
       ],
       "answer": 0,
-      "explain": "The default RELIABLE subscriber is incompatible."
+      "explain": "The default RELIABLE subscription is incompatible."
     },
     {
-      "q": "For the world and the body, REP-103 specifies:",
+      "q": "REP-103 defines for the world and the body:",
       "options": [
         "ENU and FLU",
         "NED and FRD",
@@ -41,18 +41,18 @@
         "An action",
         "A service",
         "A parameter",
-        "A topic with QoS RELIABLE"
+        "A topic with RELIABLE QoS"
       ],
       "answer": 0,
       "explain": "Nav2 NavigateToPose is an action."
     },
     {
-      "q": "tf2 “extrapolation into the future” when replaying a bag usually means:",
+      "q": "tf2 \"extrapolation into the future\" during bag replay usually means:",
       "options": [
-        "The nodes aren't on sim time",
+        "Nodes are not on sim time",
         "The tf tree is broken",
-        "There's no /tf_static",
-        "Wrong QoS"
+        "There is no /tf_static",
+        "Wrong QoS on the topic"
       ],
       "answer": 0,
       "explain": "ros2 bag play --clock and use_sim_time:=true."
@@ -60,13 +60,13 @@
     {
       "q": "How do you isolate the vehicle's ROS 2 from a laptop on the same Wi-Fi?",
       "options": [
-        "Your own ROS_DOMAIN_ID",
-        "You can't",
-        "Use MCAP",
-        "Change QoS to BEST_EFFORT"
+        "Its own ROS_DOMAIN_ID",
+        "You cannot",
+        "Use MCAP storage",
+        "Switch QoS to BEST_EFFORT"
       ],
       "answer": 0,
-      "explain": "Otherwise DDS discovery will find everyone."
+      "explain": "Otherwise DDS discovery finds everyone."
     },
     {
       "q": "A positive camera pitch in FLU (static_transform_publisher):",
@@ -74,21 +74,21 @@
         "Tilts the camera down",
         "Tilts it up",
         "Has no effect",
-        "Turns the camera left"
+        "Turns the camera to the left"
       ],
       "answer": 0,
-      "explain": "A rotation about the y axis, which points left, takes x downward."
+      "explain": "A rotation about the y axis, which points left, moves x down."
     },
     {
       "q": "The main value of ros2 bag for debugging:",
       "options": [
         "Replaying a flight on the bench",
         "Encryption",
-        "Compressing flight logs",
+        "Compressing flight logs on the SD card",
         "Clock synchronization"
       ],
       "answer": 0,
-      "explain": "Nodes can't tell a replay from real traffic."
+      "explain": "Nodes cannot tell a replay from real traffic."
     }
   ]
 }

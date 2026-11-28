@@ -138,7 +138,7 @@ Executor решает, какой готовый колбэк и в каком �
 
 {{diagram:ros2-executor-gaps|В одной группе с инференсом таймер уставок 20 Гц ждёт: зависание на 400 мс рвёт поток уставок на 400 мс; инференс в своей группе на втором потоке оставляет ровный шаг 50 мс.}}
 
-Две оговорки для Python. Первая: потоки rclpy — обычные потоки Python. Чистый Python-код держит GIL, поэтому параллельности нет; numpy и onnxruntime отпускают GIL на время вычислений, тогда потоки помогают. Вторая: для тяжёлого восприятия надёжнее отдельный процесс. Разрыв в 402 мс не превышает `COM_OF_LOSS_T` (PX4 1.17, по умолчанию 1.0 с) и `GUID_TIMEOUT` (3 с), но зависание на загрузке модели или сборке мусора больше секунды уже выводит PX4 из Offboard (`ros2-px4`), а ArduPilot через 3 с останавливает аппарат в GUIDED.
+Две оговорки для Python. Первая: потоки rclpy — обычные потоки Python. Чистый Python-код держит GIL, поэтому параллельности нет; numpy и onnxruntime отпускают GIL на время вычислений, тогда потоки помогают. Вторая: для тяжёлого восприятия надёжнее отдельный процесс. Разрыв в 402 мс не превышает `COM_OF_LOSS_T` (PX4 1.17/1.18, по умолчанию 1.0 с) и `GUID_TIMEOUT` (3 с), но зависание на загрузке модели или сборке мусора больше секунды уже выводит PX4 из Offboard (`ros2-px4`), а ArduPilot через 3 с останавливает аппарат в GUIDED.
 
 ### QoS по классам топиков
 Совместимость считается по модели «запрошено против предложенного» (RxO). Связь есть, только если по **каждой** политике подписчик запрашивает не больше, чем предлагает издатель: reliability (BEST_EFFORT < RELIABLE), durability (VOLATILE < TRANSIENT_LOCAL), deadline (запрошенный не короче предложенного), liveliness (AUTOMATIC < MANUAL_BY_TOPIC) и lease duration. При несовместимости исключения нет: в лог пишется предупреждение «incompatible QoS», подписчик молчит, а у обеих сторон срабатывают события `requested/offered incompatible QoS`. Основы и диагностика `topic info -v` разобраны в `ros2-basics`; здесь — выбор профиля по роли топика.
@@ -212,7 +212,7 @@ python -m pytest -q test/test_watchdog.py
 Результат в песочнице (Python 3.13): `5 passed in 0.01s`. Разбери `test_hysteresis_on_flapping_input`. Вход `targets` пропал на 1 с, вернулся на 0.5 с — уровень всё ещё DEGRADED; ещё 0.6 с — OK. Объясни, почему.
 
 ### Шаг 2. QoS-матрица своего графа без ROS
-Прежде чем запускать узлы, проверь, соединятся ли они. Скрипт ниже реализует правила RxO из документации ROS 2 (reliability, durability, deadline, liveliness, lease duration). Профили мостов взяты из исходников: PX4 1.17 `uxrce_dds_client/utilities.hpp`, ArduPilot 4.7.2 `AP_DDS_Topic_Table.h`. Добавь в `cases` все топики своего приложения с профилями, которые ты собираешься задать.
+Прежде чем запускать узлы, проверь, соединятся ли они. Скрипт ниже реализует правила RxO из документации ROS 2 (reliability, durability, deadline, liveliness, lease duration). Профили мостов взяты из исходников: PX4 1.17/1.18 `uxrce_dds_client/utilities.hpp`, ArduPilot 4.7.2 `AP_DDS_Topic_Table.h`. Добавь в `cases` все топики своего приложения с профилями, которые ты собираешься задать.
 
 ```python
 """Request-vs-offered QoS check (rules: ROS 2 docs, 'QoS compatibilities'). No ROS needed."""
@@ -387,7 +387,7 @@ MultiThreaded(2), inference in own ME group   max gap  50 ms  p99 late   0 ms  s
 - rcl_lifecycle — default_state_machine.c (переходы FAILURE/ERROR) | https://github.com/ros2/rcl/blob/jazzy/rcl_lifecycle/src/default_state_machine.c | primary | A
 - rmw — qos_profiles.h (профили sensor_data, default, parameters) | https://github.com/ros2/rmw/blob/jazzy/rmw/include/rmw/qos_profiles.h | primary | A
 - rosbag2 — ros2bag record verb (флаги -d, -b, --max-bag-files) | https://github.com/ros2/rosbag2/blob/rolling/ros2bag/ros2bag/verb/record.py | primary | A
-- PX4 v1.17 — uxrce_dds_client utilities.hpp (QoS писателей и читателей) | https://github.com/PX4/PX4-Autopilot/blob/v1.17.0/src/modules/uxrce_dds_client/utilities.hpp | primary | A
+- PX4 v1.18 — uxrce_dds_client utilities.hpp (QoS писателей и читателей) | https://github.com/PX4/PX4-Autopilot/blob/v1.18.0/src/modules/uxrce_dds_client/utilities.hpp | primary | A
 - ArduPilot 4.7.2 — AP_DDS_Topic_Table.h (QoS топиков /ap/*) | https://github.com/ArduPilot/ardupilot/blob/Copter-4.7.2/libraries/AP_DDS/AP_DDS_Topic_Table.h | primary | A
 - ros2_tracing | https://github.com/ros2/ros2_tracing | primary | A
 - Nav2 — lifecycle manager | https://api.nav2.org/nav2-jazzy/html/md_nav2_lifecycle_manager_README.html | primary | A

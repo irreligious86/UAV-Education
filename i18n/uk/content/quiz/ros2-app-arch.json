@@ -22,7 +22,7 @@
         "Завершений"
       ],
       "answer": 0,
-      "explain": "activate переводить в active."
+      "explain": "activate переводить в active. В inactive lifecycle-видавці мовчать, але таймери й підписки продовжують працювати, якщо їх не зупинити самому."
     },
     {
       "q": "Watchdog: втрата цілей від камери дає рівень",
@@ -82,13 +82,13 @@
     {
       "q": "Кільцевий запис bag на борту задається:",
       "options": [
-        "--max-bag-duration",
+        "--max-bag-files",
         "QoS depth",
         "ROS_DOMAIN_ID",
         "use_sim_time під час запису"
       ],
       "answer": 0,
-      "explain": "Щоб не переповнити диск."
+      "explain": "Кільце видаляє старі файли, щоб не переповнити диск; прапорець є з rosbag2 Lyrical і працює лише разом із -d/--max-bag-duration або -b/--max-bag-size (самі по собі вони лише ріжуть bag на файли)."
     }
   ]
 }

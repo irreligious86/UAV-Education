@@ -3,53 +3,53 @@
   "pass": 80,
   "questions": [
     {
-      "q": "Зачем на тяговом стенде снимают ноль и до, и после прогона?",
+      "q": "Why does a thrust stand take a zero both before and after a run?",
       "options": [
-        "Чтобы усреднить шум HX711 по двум отрезкам",
-        "Чтобы проверить, что гири не сдвинулись на подвесе",
-        "Чтобы вычесть дрейф нуля по времени",
-        "Чтобы пересчитать масштаб k по двум точкам"
+        "To average the HX711 noise over two segments",
+        "To check that the weights did not shift on the hanger",
+        "To subtract the zero drift over time",
+        "To recompute the scale k from two points"
       ],
       "answer": 2,
-      "explain": "Мотор и ESC греют балку: уход нуля у дешёвой балки до ±0.2 % FS на 10 °C (±10 г для 5 кг). В примере ноль ушёл на +3.29 г за прогон; поправка линейна по времени между нулём «до» и «после»."
+      "explain": "The motor and ESC warm the bar: the zero shift of a cheap bar is up to ±0.2 % FS per 10 °C (±10 g for 5 kg). In the example the zero moved by +3.29 g over the run; the correction is linear in time between the \"before\" and \"after\" zeros."
     },
     {
-      "q": "Что произойдёт, если прерывание Wi-Fi удержит PD_SCK HX711 в высоком уровне дольше 60 мкс посреди чтения?",
+      "q": "What happens if a Wi-Fi interrupt holds the HX711 PD_SCK high for longer than 60 µs in the middle of a read?",
       "options": [
-        "HX711 уйдёт в power-down, отсчёт будет испорчен",
-        "HX711 переключится на канал B с усилением 32",
-        "Отсчёт просто придёт на один такт позже, без ошибки",
-        "HX711 перейдёт на скорость 80 отсчётов в секунду"
+        "The HX711 enters power-down and the sample is corrupted",
+        "The HX711 switches to channel B with gain 32",
+        "The sample just arrives one clock later, with no error at all",
+        "The HX711 switches to 80 samples per second"
       ],
       "answer": 0,
-      "explain": "По даташиту PD_SCK высокий > 60 мкс — режим power-down. Поэтому 25 импульсов чтения идут в критической секции (portENTER_CRITICAL), а Wi-Fi на время прогона лучше выключить. Канал и усиление выбирает число импульсов (25/26/27), скорость — вывод RATE."
+      "explain": "Per the datasheet, PD_SCK high > 60 µs means power-down mode. That is why the 25 read pulses run in a critical section (portENTER_CRITICAL), and Wi-Fi is best turned off during the run. The channel and gain are selected by the number of pulses (25/26/27), and the rate by the RATE pin."
     },
     {
-      "q": "Фрагмент обработки стенда (MN4006 KV380, 15×5, 24 В). Где теряется эффективность?",
+      "q": "A fragment of stand processing (MN4006 KV380, 15×5, 24 V). Where is the efficiency lost?",
       "kind": "apply",
-      "fragment": "thr   T,g    I,A    P,W   g/W   rpm    C_T    gW/gW_ds(same T)\n 50   780.7   3.25   77.9 10.03  3689 0.0798  0.907\n 75  1515.7   8.72  207.6  7.30  5138 0.0799  0.914\n100  2161.9  15.75  373.1  5.79  6085 0.0812  0.914\nC_T по таблице производителя: 0.0798 (50 %), 0.0813 (100 %)\nU(k=2) по г/Вт: ±1.3 %",
+      "fragment": "thr   T,g    I,A    P,W   g/W   rpm    C_T    gW/gW_ds(same T)\n 50   780.7   3.25   77.9 10.03  3689 0.0798  0.907\n 75  1515.7   8.72  207.6  7.30  5138 0.0799  0.914\n100  2161.9  15.75  373.1  5.79  6085 0.0812  0.914\nC_T from the manufacturer's table: 0.0798 (50 %), 0.0813 (100 %)\nU(k=2) for g/W: ±1.3 %",
       "options": [
-        "В пропе: C_T заметно ниже паспортного",
-        "В приводе: C_T как в паспорте, а г/Вт ниже",
-        "Нигде: −9 % укладываются в неопределённость",
-        "В канале тяги: тензодатчик занижает тягу"
+        "In the prop: C_T is well below the datasheet",
+        "In the drive: C_T as in the datasheet, but g/W lower",
+        "Nowhere: −9 % fits within the uncertainty",
+        "In the thrust channel: the load cell reads low at high thrust"
       ],
       "answer": 1,
-      "explain": "C_T совпадает с паспортом — проп и измерение тяги в порядке. г/Вт стабильно на 8–9 % ниже при той же тяге, а U(k=2) всего ±1.3 %: это систематика электрической части (ESC, провода, место измерения напряжения)."
+      "explain": "C_T matches the datasheet, so the prop and the thrust measurement are fine. g/W is consistently 8–9 % lower at the same thrust, while U(k=2) is only ±1.3 %: this is a systematic effect of the electrical part (ESC, wiring, where the voltage is measured)."
     },
     {
-      "q": "Калибровка: ноль 84 254 отсчёта, k = 432 отсчёта/г, дрейфа нет. Сырой отсчёт 421 646. Какая тяга?",
+      "q": "Calibration: zero 84 254 counts, k = 432 counts/g, no drift. The raw sample is 421 646. What is the thrust?",
       "options": [
-        "≈ 976 г",
-        "≈ 337 г",
-        "≈ 1172 г",
-        "≈ 781 г"
+        "≈ 976 g",
+        "≈ 337 g",
+        "≈ 1172 g",
+        "≈ 781 g"
       ],
       "answer": 3,
-      "explain": "T = (raw − b)/k = (421 646 − 84 254)/432 ≈ 781 г. 976 г — если забыть вычесть ноль."
+      "explain": "T = (raw − b)/k = (421 646 − 84 254)/432 ≈ 781 g. 976 g is what you get if you forget to subtract the zero."
     },
     {
-      "q": "C_T и C_P определены через n (об/с) и D (м). Как правильно посчитать коэффициент качества FM?",
+      "q": "C_T and C_P are defined through n (rev/s) and D (m). How do you compute the figure of merit FM correctly?",
       "options": [
         "FM = C_T^1.5 / (√(π/2) · C_P)",
         "FM = C_T^1.5 / (√2 · C_P)",
@@ -57,10 +57,10 @@
         "FM = √2 · C_T^1.5 / (π · C_P)"
       ],
       "answer": 0,
-      "explain": "FM = P_ид/P_вал, P_ид = T^1.5/√(2ρA), A = πD²/4. Подстановка даёт C_T^1.5/(√(π/2)·C_P). Форма с √2 — для вертолётных коэффициентов на Ω·R; с пропеллерными она занижает FM на 11 % (0.64 вместо 0.72 в примере)."
+      "explain": "FM = P_id/P_shaft, P_id = T^1.5/√(2ρA), A = πD²/4. Substituting gives C_T^1.5/(√(π/2)·C_P). The form with √2 is for helicopter coefficients based on Ω·R; with propeller coefficients it understates FM by 11 % (0.64 instead of 0.72 in the example)."
     },
     {
-      "q": "Балка 5 кг, 1.0 мВ/В, мост питается от AVDD HX711, канал A ×128. Сколько примерно отсчётов на грамм?",
+      "q": "A 5 kg bar, 1.0 mV/V, the bridge powered from the HX711 AVDD, channel A ×128. About how many counts per gram?",
       "options": [
         "≈ 430",
         "≈ 43",
@@ -68,29 +68,29 @@
         "≈ 2 100 000"
       ],
       "answer": 0,
-      "explain": "Полная шкала HX711 ±0.5·AVDD/128, выход моста S·AVDD — измерение ратиометрическое: 0.001·128·2²³/0.5 ≈ 2 147 484 отсчёта на 5000 г, около 430 отсчётов/г. 2.1 млн — это на всю шкалу балки."
+      "explain": "The HX711 full scale is ±0.5·AVDD/128 and the bridge output is S·AVDD, so the measurement is ratiometric: 0.001·128·2²³/0.5 ≈ 2 147 484 counts per 5000 g, about 430 counts/g. 2.1 million is for the bar's whole scale."
     },
     {
-      "q": "Bidirectional DShot у MN4006 (24 полюса) показывает 74 000 eRPM. Механические обороты?",
+      "q": "Bidirectional DShot on an MN4006 (24 poles) shows 74 000 eRPM. The mechanical RPM?",
       "options": [
-        "≈ 3083 об/мин",
-        "≈ 12 333 об/мин",
-        "≈ 6167 об/мин",
-        "≈ 74 000 об/мин"
+        "≈ 3083 RPM",
+        "≈ 12 333 RPM",
+        "≈ 6167 RPM",
+        "≈ 74 000 RPM"
       ],
       "answer": 2,
-      "explain": "RPM = eRPM / (полюса/2) = 74 000/12 ≈ 6167. Деление на 24 (3083) — частая ошибка: делить надо на число пар полюсов."
+      "explain": "RPM = eRPM / (poles/2) = 74 000/12 ≈ 6167. Dividing by 24 (3083) is a common mistake: you have to divide by the number of pole pairs (12), not by the number of poles."
     },
     {
-      "q": "Почему в прошивке стенда проверка тока и таймаута работает на своём таймере, а не в ветке «HX711 готов»?",
+      "q": "Why does the stand firmware check the current and the timeout every 100 ms on their own schedule rather than in the \"HX711 ready\" branch?",
       "options": [
-        "Так INA226 успевает усреднить 16 отсчётов",
-        "Так HX711 не уйдёт в power-down во время I²C",
-        "Таймер нужен, чтобы ESC получал ровно 50 Гц",
-        "Отвалится HX711 — ветка не выполнится, газ не сбросится"
+        "So the INA226 has time to average 16 samples",
+        "So the HX711 does not enter power-down during I²C",
+        "The timer is needed so the ESC gets exactly 50 Hz",
+        "If the HX711 drops out, the branch never runs and the throttle is not cut"
       ],
       "answer": 3,
-      "explain": "Если DOUT не опускается (датчик отвалился), код в ветке готовности не выполняется никогда. Безопасность должна от него не зависеть: таймаут 0.5 с и лимит тока проверяются каждые 100 мс. Частоту PWM задаёт LEDC аппаратно."
+      "explain": "If DOUT never goes low (the sensor dropped out), the code in the ready branch never runs. Safety must not depend on it: the 0.5 s timeout and the current limit are checked every 100 ms, and nothing else in the loop may block for long. The PWM frequency is set by the LEDC hardware."
     }
   ]
 }

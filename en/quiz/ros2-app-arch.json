@@ -3,10 +3,10 @@
   "pass": 80,
   "questions": [
     {
-      "q": "Which node must NOT sit on the “autopilot status → setpoints” path?",
+      "q": "Which node must NOT be on the \"autopilot status → setpoints\" path?",
       "options": [
         "Perception",
-        "The bridge to the autopilot",
+        "The autopilot bridge",
         "Decision",
         "Safeguards"
       ],
@@ -14,18 +14,18 @@
       "explain": "A non-critical node must not block control."
     },
     {
-      "q": "A lifecycle node in the inactive state is:",
+      "q": "A lifecycle node in the inactive state:",
       "options": [
-        "Configured but not running",
-        "Waiting for a service response",
-        "Not configured and not created",
-        "Finalized"
+        "Is configured but not running",
+        "Is waiting for a service response",
+        "Is not configured or created",
+        "Is finalized"
       ],
       "answer": 0,
-      "explain": "activate moves it to active."
+      "explain": "activate takes it to active. In inactive, lifecycle publishers are silent, but timers and subscriptions keep running unless you stop them yourself."
     },
     {
-      "q": "Watchdog: losing targets from the camera gives the level",
+      "q": "Watchdog: losing the targets from the camera gives the level",
       "options": [
         "DEGRADED",
         "FAILSAFE",
@@ -33,14 +33,14 @@
         "A reboot"
       ],
       "answer": 0,
-      "explain": "A non-critical input — the function degrades."
+      "explain": "A non-critical input means a degraded function."
     },
     {
-      "q": "Why do you need hysteresis on input recovery?",
+      "q": "Why is there hysteresis on input recovery?",
       "options": [
-        "So the input doesn't make the mode flicker",
+        "So the input does not flap the mode",
         "For QoS",
-        "To bring the function back faster",
+        "To bring the tracking function back faster",
         "To save CPU"
       ],
       "answer": 0,
@@ -61,7 +61,7 @@
       "q": "Neural network inference delays the setpoint timer. The fix:",
       "options": [
         "Separate callback groups",
-        "A faster setpoint timer",
+        "A faster timer for the setpoint stream",
         "QoS RELIABLE",
         "A smaller depth"
       ],
@@ -69,26 +69,26 @@
       "explain": "Separate callback groups and a MultiThreadedExecutor, or a separate process: heavy callbacks must not block control."
     },
     {
-      "q": "Store the secret VPN key:",
+      "q": "Where do you keep a secret VPN key?",
       "options": [
-        "In a file with access permissions",
-        "In YAML parameters",
+        "In a file with permissions",
+        "In the node's YAML parameter file",
         "In the launch file",
         "In a topic"
       ],
       "answer": 0,
-      "explain": "Parameters are visible to all participants."
+      "explain": "Parameters are visible to every participant."
     },
     {
-      "q": "Ring-buffer bag recording on board is set with:",
+      "q": "Circular bag recording on board is set with:",
       "options": [
-        "--max-bag-duration",
+        "--max-bag-files",
         "QoS depth",
         "ROS_DOMAIN_ID",
         "use_sim_time while recording"
       ],
       "answer": 0,
-      "explain": "So you don't fill up the disk."
+      "explain": "The ring deletes old files so the disk does not fill up; the flag exists since rosbag2 for Lyrical and works only together with -d/--max-bag-duration or -b/--max-bag-size (on their own those only split the bag into files)."
     }
   ]
 }

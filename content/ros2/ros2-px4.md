@@ -3,7 +3,7 @@ id: ros2-px4
 title: "ROS 2 + PX4: uXRCE-DDS, offboard-узел как автомат состояний"
 level: L3
 readingTime: 50 мин
-firmware: PX4
+firmware: PX4 1.18 (сверено с v1.18.0; суффиксы 1.16–1.17 отмечены) · ROS 2 Jazzy / Humble
 status: published
 added: 2026-11-08
 tags:
@@ -30,7 +30,7 @@ next:
 {{diagram:uxrce-scheme|PX4 и ArduPilot подключаются к ROS 2 одинаковой схемой «клиент в прошивке — агент на companion».}}
 
 ### Версии сообщений
-Начиная с PX4 v1.16 у части сообщений есть версия (`MESSAGE_VERSION` в определении), и топики для них публикуются с суффиксом: `/fmu/out/vehicle_status_v1`. Для совместимости старых узлов с новой прошивкой и наоборот есть узел-переводчик (PX4 ROS 2 Message Translation Node). Практика для своих узлов: вычислять имя топика из `MESSAGE_VERSION` класса сообщения, а не писать руками — как это сделано в `px4_offboard_square.py`:
+Начиная с PX4 v1.16 у части сообщений есть версия (`MESSAGE_VERSION` в определении), и топики для них публикуются с суффиксом: `/fmu/out/vehicle_status_v1` (в 1.18 уже `_v4`). Для совместимости старых узлов с новой прошивкой и наоборот есть узел-переводчик (PX4 ROS 2 Message Translation Node). Практика для своих узлов: вычислять имя топика из `MESSAGE_VERSION` класса сообщения, а не писать руками — как это сделано в `px4_offboard_square.py`:
 
 ```python
 def topic(base, msg_cls):
@@ -42,7 +42,7 @@ def topic(base, msg_cls):
 1. Внешний контроллер обязан непрерывно слать `OffboardControlMode` (какие уставки активны: position, velocity, acceleration, attitude, body_rate…) с частотой заметно **выше 2 Гц** (документация называет 2 Гц; по коду PX4 теряет сигнал, когда метка последнего сообщения старше `COM_OF_LOSS_T`, см. `px4-ros2`) — это «доказательство жизни». Реальные уставки — в `TrajectorySetpoint` (position/velocity/acceleration/yaw, неиспользуемые поля = NaN).
 2. Поток должен идти **до** переключения в Offboard (и до арминга в Offboard), иначе PX4 откажет.
 3. Если поток прервался дольше `COM_OF_LOSS_T`, PX4 выходит из Offboard и переключается в режим из `COM_OBL_RC_ACT` (Position, Altitude, Stabilized, Return, Land, Hold, Terminate, Disarm; значение 2 до 1.16 называлось Manual). С 1.17 при выборе Position, Altitude или Stabilized без ручного управления выполняется `NAV_RCL_ACT` (в 1.18 при `NAV_RCL_ACT` = 7 — Hold).
-4. Команды — `VehicleCommand` в `/fmu/in/vehicle_command`: арм `VEHICLE_CMD_COMPONENT_ARM_DISARM` (param1 = 1), режим `VEHICLE_CMD_DO_SET_MODE` (param1 = 1 — custom, param2 = 6 — Offboard), посадка `VEHICLE_CMD_NAV_LAND`. Подтверждение — в `/fmu/out/vehicle_command_ack`; состояние — `VehicleStatus.arming_state`, `nav_state`.
+4. Команды — `VehicleCommand` в `/fmu/in/vehicle_command`: арм `VEHICLE_CMD_COMPONENT_ARM_DISARM` (param1 = 1), режим `VEHICLE_CMD_DO_SET_MODE` (param1 = 1 — custom, param2 = 6 — Offboard), посадка `VEHICLE_CMD_NAV_LAND`. Подтверждение — в `/fmu/out/vehicle_command_ack` (в 1.18 у сообщения версия 1, топик `/fmu/out/vehicle_command_ack_v1`); состояние — `VehicleStatus.arming_state`, `nav_state`.
 5. Координаты в `TrajectorySetpoint` — **NED, локальные**, начало — точка инициализации EKF; высота отрицательная.
 
 ### Логика полёта как автомат состояний
@@ -61,7 +61,7 @@ def topic(base, msg_cls):
 `test_offboard_fsm.py` гоняет автомат против игрушечной модели аппарата (армится по запросу, входит в Offboard только если уставки шли ≥ 0.5 с, летит к уставке со скоростью 2 м/с, садится): проверяются полный сценарий, порядок «уставки раньше режима», реакция на потерю позиции, устаревший статус и вмешательство пилота. Это пять тестов за 50 мс — их можно запускать на каждом коммите (в этом курсе — в CI), и только потом идти в Gazebo.
 
 ### Gazebo и SITL
-`make px4_sitl gz_x500` — квадрокоптер x500 в Gazebo Harmonic; Документация PX4 (main) рекомендует ROS 2 Jazzy на Ubuntu 24.04; на Ubuntu 22.04 — Humble (так же указано в документации релизов v1.16/v1.17). Агент: `MicroXRCEAgent udp4 -p 8888`. Для повторяемых тестов — headless (`HEADLESS=1`) и фиксированный мир. QGroundControl подключается по UDP 14550 параллельно — им удобно наблюдать режимы и прерывать полёт.
+`make px4_sitl gz_x500` — квадрокоптер x500 в Gazebo Harmonic; Документация PX4 (main) рекомендует ROS 2 Jazzy на Ubuntu 24.04; на Ubuntu 22.04 — Humble (документация релизов v1.16–v1.18 рекомендует именно Humble на Ubuntu 22.04). Агент: `MicroXRCEAgent udp4 -p 8888`. Для повторяемых тестов — headless (`HEADLESS=1`) и фиксированный мир. QGroundControl подключается по UDP 14550 параллельно — им удобно наблюдать режимы и прерывать полёт.
 
 ### Место в системе
 
@@ -88,7 +88,7 @@ ros2 launch uav_ros2_labs px4_square.launch.py
 Во время SQUARE: (а) переключите режим в QGC на Hold — узел должен перейти в DONE и перестать слать команды; (б) остановите узел (Ctrl+C) — PX4 должен выйти из Offboard через `COM_OF_LOSS_T` и выполнить настроенное действие (запишите, какое); (в) остановите агента — узел увидит устаревший статус и перейдёт в ABORT, но его команды уже не дойдут: что сделает PX4?
 
 ### Шаг 4. Повтор из bag
-Запишите bag полёта (`/fmu/out/vehicle_status_v1`, `/fmu/out/vehicle_local_position_v1` (в PX4 v1.16 — без суффикса, имя берите из `MESSAGE_VERSION`) и ваши `/fmu/in/*`), затем воспроизведите только `/fmu/out/*` и запустите узел: он должен пройти те же переходы (команды уйдут «в никуда»). Так отлаживают логику на столе.
+Запишите bag полёта (`/fmu/out/vehicle_status_v1` (в 1.18 — `vehicle_status_v4`), `/fmu/out/vehicle_local_position_v1` (в PX4 v1.16 — без суффикса, имя берите из `MESSAGE_VERSION`) и ваши `/fmu/in/*`), затем воспроизведите только `/fmu/out/*` и запустите узел: он должен пройти те же переходы (команды уйдут «в никуда»). Так отлаживают логику на столе.
 
 Самопроверка: лабораторная выполнена, когда проходит ваш тест автомата (`battery_low` → ABORT, тест написан раньше кода), траектория из `/tmp/px4_flight.csv` — квадрат 10 × 10 м на высоте 5 м, для трёх сценариев защит записано наблюдаемое и оно совпало с эталоном ниже, а при воспроизведении `/fmu/out/*` из bag узел прошёл те же переходы состояний, что в полёте.
 
@@ -99,7 +99,7 @@ ros2 launch uav_ros2_labs px4_square.launch.py
   - Возможная причина: OffboardControlMode не шёл до запроса режима или идёт реже 2 Гц; нет валидной локальной позиции.
   - Что сделать: STREAM_SETPOINTS ≥ 1 с; таймер 10–20 Гц; проверить xy_valid/z_valid.
 - **Симптом:** узел не видит `/fmu/out/vehicle_status`
-  - Возможная причина: суффикс версии (`_v1`) или QoS RELIABLE.
+  - Возможная причина: суффикс версии (`_v4` у vehicle_status в 1.18, `_v1` в 1.16–1.17) или QoS RELIABLE.
   - Что сделать: имя из MESSAGE_VERSION; профиль BEST_EFFORT.
 - **Симптом:** аппарат уходит вверх-вниз «наоборот»
   - Возможная причина: высота задана положительной в NED.
@@ -109,10 +109,10 @@ ros2 launch uav_ros2_labs px4_square.launch.py
   - Что сделать: распознать вмешательство и прекратить команды (состояние DONE).
 
 ## references
-- PX4 — ROS 2 user guide | https://docs.px4.io/v1.17/en/ros2/user_guide.html | primary | A
-- PX4 — uXRCE-DDS middleware | https://docs.px4.io/v1.17/en/middleware/uxrce_dds.html | primary | A
-- PX4 — Offboard mode (2 Hz proof of life, COM_OF_LOSS_T) | https://docs.px4.io/v1.17/en/flight_modes/offboard.html | primary | A
-- PX4 — ROS 2 message translation node (versioned topics) | https://docs.px4.io/v1.17/en/ros2/px4_ros2_msg_translation_node.html | primary | A
+- PX4 — ROS 2 user guide | https://docs.px4.io/v1.18/en/ros2/user_guide.html | primary | A
+- PX4 — uXRCE-DDS middleware | https://docs.px4.io/v1.18/en/middleware/uxrce_dds.html | primary | A
+- PX4 — Offboard mode (2 Hz proof of life, COM_OF_LOSS_T) | https://docs.px4.io/v1.18/en/flight_modes/offboard.html | primary | A
+- PX4 — ROS 2 message translation node (versioned topics) | https://docs.px4.io/v1.18/en/ros2/px4_ros2_msg_translation_node.html | primary | A
 - PX4 — px4_msgs | https://github.com/PX4/px4_msgs | primary | A
 
 ## checklist

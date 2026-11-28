@@ -1,0 +1,94 @@
+{
+ "module": "des-sizing",
+ "pass": 80,
+ "questions": [
+  {
+   "q": "Why does the \"mass ↔ battery ↔ power\" loop have to be solved by iteration?",
+   "options": [
+    "A cell adds mass, and with it the power and the energy needed grow",
+    "Cell capacity drops with every charge cycle and must be recomputed",
+    "The motor table gives only five throttle points, so it needs interpolation",
+    "Python cannot solve nonlinear equations in closed form without a loop"
+   ],
+   "answer": 0,
+   "explain": "Energy is needed for the power, the power grows as m^1.5, the mass grows with the battery: the quantities form a loop, and the solution is found by successive approximation."
+  },
+  {
+   "q": "The ideal hover power from momentum theory is…",
+   "options": [
+    "T² / (2·ρ·A)",
+    "T^1.5 / √(2·ρ·A)",
+    "T · √(2·ρ·A) / FM",
+    "T^1.5 · ρ / (2·A)"
+   ],
+   "answer": 1,
+   "explain": "P_ideal = T·v_i, v_i = √(T/(2ρA)), hence T^1.5/√(2ρA). The real power is 1/FM times larger."
+  },
+  {
+   "q": "A motor with a 15×5 prop gives 1430 g at 173 W, and the ideal power for that thrust is 99 W. What does FM_sys ≈ 0.57 mean?",
+   "options": [
+    "57 % of the electrical power goes into ideal flow power",
+    "The prop runs at 57 % of its maximum RPM from the table",
+    "57 % of the thrust is lost to interaction between neighboring props",
+    "The ESC alone is 57 % efficient, the motor and prop are ideal"
+   ],
+   "answer": 0,
+   "explain": "The system FM is referred to the electrical power from the table, so it includes the aerodynamic losses of the prop and the efficiency of the motor and ESC."
+  },
+  {
+   "q": "A 4.29 kg vehicle: on four 15″ props the disc loading is 92 N/m², on four 17″ props 72 N/m². What happens to the hover power when moving to 17″?",
+   "options": [
+    "It grows: a larger prop is harder to spin up",
+    "It does not change: the vehicle mass is the same",
+    "It drops by about 13 %",
+    "It halves: power ∝ disc area"
+   ],
+   "answer": 2,
+   "explain": "The specific power P/T = √(DL/2ρ)/FM: lower disc loading means lower power. √(72/92) ≈ 0.88, corrected for a slightly different FM, gives about 13 %; in the example 464 → 403 W."
+  },
+  {
+   "q": "A pack of P45B: 16.2 Wh and 70 g per cell, +10 % for the build, DoD 85 %, reserve 20 %. How much energy per kilogram of pack actually goes into the flight?",
+   "options": [
+    "≈ 231 Wh",
+    "≈ 210 Wh",
+    "≈ 178 Wh",
+    "≈ 143 Wh"
+   ],
+   "answer": 3,
+   "explain": "231 Wh/kg per cell → ≈210 with the build → × 0.85 × 0.8 ≈ 143 Wh/kg. The other options are intermediate steps of the calculation."
+  },
+  {
+   "q": "The 15″ quad gives 25.1 min against a 25 min requirement, but T/W on a sagged battery is 1.51. The right decision?",
+   "options": [
+    "Accept: the time requirement is met, the rest is secondary",
+    "Reject: no thrust margin by the end of the discharge",
+    "Raise `MOT_THST_HOVER` to 0.66 by hand before the flight",
+    "Add one more parallel cell and recompute the time"
+   ],
+   "answer": 1,
+   "explain": "T/W ≥ 2 is a separate requirement: by the end of the discharge it hovers at about 66 % of its maximum thrust and has nothing left to fight the wind. An extra cell means more mass and even lower T/W; a larger disc (17″) or more motors (a hexa) helps."
+  },
+  {
+   "q": "The motor table was taken at 22.2 V, while Li-ion under load in the second half of the discharge gives about 20.4 V. How does the maximum thrust change?",
+   "options": [
+    "It drops by about (20.4/22.2)² ≈ 0.84",
+    "It drops by 20.4/22.2 ≈ 0.92, linearly",
+    "It does not change: the ESC holds the set RPM",
+    "It grows thanks to the higher current at sag"
+   ],
+   "answer": 0,
+   "explain": "RPM ∝ voltage, thrust ∝ RPM², so it is ∝ U². That is why T/W is checked on a sagged battery, not a charged one."
+  },
+  {
+   "q": "The mission requires a 70-minute survey of a linear route, takeoff from a field without a runway, hover only at takeoff and landing. Which configuration?",
+   "options": [
+    "An octocopter with a 6S8P battery on the largest frame",
+    "A quadcopter with coaxial X8 props",
+    "VTOL (QuadPlane)",
+    "A hexacopter on the largest-diameter props"
+   ],
+   "answer": 2,
+   "explain": "A multirotor hits a ceiling at 30–40 min: the time grows as f_battery/√m. A wing spends P = W·V/(L/D)/η, several times less than hover; VTOL pays +20–30 % mass for takeoff without a runway."
+  }
+ ]
+}

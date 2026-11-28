@@ -3,37 +3,37 @@
   "pass": 80,
   "questions": [
     {
-      "q": "ArduPilot object avoidance with a reactive search for a way around:",
+      "q": "ArduPilot object avoidance with a reactive search for a detour direction:",
       "options": [
         "OA_TYPE = 1 (BendyRuler)",
         "CP_DIST",
         "AVOID_ENABLE = 0",
-        "OA_TYPE = 2 (Dijkstra) from sensors"
+        "OA_TYPE = 2 (Dijkstra) from the sensors"
       ],
       "answer": 0,
       "explain": "Dijkstra is a global path around polygons."
     },
     {
-      "q": "By default, unknown map cells are treated as:",
+      "q": "By default unknown map cells are treated as:",
       "options": [
         "Occupied",
         "Free",
-        "Removed",
-        "Half probability — free"
+        "Deleted",
+        "Half probability, so free"
       ],
       "answer": 0,
-      "explain": "Fly only where you've seen free space."
+      "explain": "Fly only where you have seen free space."
     },
     {
       "q": "An admissible A* heuristic for an 8-connected grid:",
       "options": [
-        "Octile distance",
-        "Manhattan distance",
-        "Zero only",
-        "Squared Euclidean distance"
+        "The octile distance",
+        "The Manhattan distance",
+        "Only zero",
+        "The squared Euclidean distance"
       ],
       "answer": 0,
-      "explain": "Zero is admissible too, but that's Dijkstra."
+      "explain": "Zero is admissible too, but that is Dijkstra."
     },
     {
       "q": "Why are obstacles inflated?",
@@ -47,26 +47,26 @@
       "explain": "Radius + position error + margin."
     },
     {
-      "q": "Safe-speed condition near an obstacle with reaction delay t_r (d = reliable range minus margin):",
+      "q": "The safe speed condition near an obstacle with a reaction delay t_r (d is the reliable range minus the margin):",
       "options": [
         "v·t_r + v²/(2·a) ≤ d",
         "v ≤ a·d",
         "v²/(2·a) ≤ d + v·t_r",
-        "independent of the sensor range"
+        "does not depend on the sensor range"
       ],
       "answer": 0,
-      "explain": "The vehicle first flies v·t_r, then brakes over v²/(2a). √(2·a·d) is the same calculation without the delay and overestimates the speed (6.0 instead of 5.2 m/s in the module's reference)."
+      "explain": "The vehicle first covers v·t_r, then brakes over v²/(2a). √(2·a·d) is the same calculation without the delay, and it overestimates the speed (6.0 instead of 5.2 m/s in the module's reference)."
     },
     {
       "q": "Nav2 for a multicopter:",
       "options": [
-        "A plane yes, 3D no",
+        "In a plane yes, in 3D no",
         "Built into PX4",
         "Not applicable at all",
         "Fully solves 3D flight"
       ],
       "answer": 0,
-      "explain": "Costmaps and BT are useful; 3D isn't covered."
+      "explain": "The costmap and BT are useful; 3D is not covered."
     },
     {
       "q": "Layer rates: global / local / setpoints:",
@@ -88,29 +88,29 @@
         "Mission only"
       ],
       "answer": 0,
-      "explain": "It limits velocity toward the obstacle."
+      "explain": "It limits the velocity toward an obstacle."
     },
     {
-      "q": "В ArduPilot 4.7.2 выставлен `OA_TYPE = 2`, загружен полигон исключения, но `FENCE_ENABLE = 0` при загрузке. Что покажет лог `OADJ` и как полетит аппарат?",
+      "q": "In ArduPilot 4.7.2 `OA_TYPE = 2` is set and an exclusion polygon is uploaded, but `FENCE_ENABLE = 0` at boot. What will the `OADJ` log show, and how will the vehicle fly?",
       "options": [
-        "`State = 2`, облёт зоны с запасом `OA_MARGIN_MAX`",
-        "`State = 0` («не требуется»), полёт по прямой сквозь зону",
-        "`State = 1`, остановка перед зоной до включения геозоны",
-        "Арм запрещён сообщением «Fence requires reboot»"
+        "`State = 2`, a detour around the zone with an `OA_MARGIN_MAX` margin",
+        "`State = 0` (\"not required\"), straight through the zone",
+        "`State = 1`, a stop in front of the zone until the fence is enabled",
+        "Arming is refused with \"Fence requires reboot\""
       ],
       "answer": 1,
-      "explain": "Dijkstra проверяет `some_fences_enabled()` и без включённой геозоны возвращает «не требуется» — в SITL трек прошёл сквозь квадрат (`max |E|` 0.0 м)."
+      "explain": "Dijkstra checks `some_fences_enabled()` and without an enabled fence returns \"not required\": in SITL the track went through the square (`max |E|` 0.0 m)."
     },
     {
-      "q": "Взвешенный A* с весом эвристики w = 2 по сравнению с обычным A* на той же сетке:",
+      "q": "Weighted A* with a heuristic weight of w = 2 compared with plain A* on the same grid:",
       "options": [
-        "Раскрывает больше клеток, но путь всегда короче",
-        "Раскрывает меньше клеток, путь не длиннее 2 × оптимального",
-        "Раскрывает столько же клеток, путь тот же",
-        "Раскрывает меньше клеток и всегда находит оптимальный путь"
+        "Expands more cells, but the path is always shorter",
+        "Expands fewer cells, the path is no longer than 2 × the optimal",
+        "Expands the same number of cells, the path is the same",
+        "Expands fewer cells and always finds the optimal path"
       ],
       "answer": 1,
-      "explain": "Эвристика × w переоценивает, поэтому оптимальность теряется (в «лесу» 37.85 м против 33.56 м), зато раскрыто 86 клеток вместо 462; гарантия — путь ≤ w × оптимальный."
+      "explain": "Heuristic × w overestimates, so optimality is lost (in the \"forest\" 37.85 m against 33.56 m), but only 86 cells are expanded instead of 462; the guarantee is path ≤ w × optimal."
     }
   ]
 }

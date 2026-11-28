@@ -7,7 +7,7 @@
       "options": [
         "Client in PX4, agent outside",
         "Agent in PX4, client outside",
-        "Agent only",
+        "Only an agent, no client",
         "A MAVLink router"
       ],
       "answer": 0,
@@ -19,26 +19,26 @@
         "uORB structures go over the wire",
         "Because of QoS",
         "Because of MAVLink CRC_EXTRA",
-        "It doesn't have to"
+        "It does not have to"
       ],
       "answer": 0,
-      "explain": "Otherwise the fields won't match; since v1.16, versions and the translator help."
+      "explain": "Otherwise the fields will not match; since v1.16 versions and the translator help."
     },
     {
-      "q": "Topic /fmu/out/vehicle_status_v1 — the suffix means:",
+      "q": "In the topic /fmu/out/vehicle_status_v1 the suffix means:",
       "options": [
-        "Message version",
-        "QoS profile",
-        "Agent number",
-        "Vehicle number in the swarm"
+        "The message version",
+        "The QoS profile",
+        "The agent number",
+        "The vehicle number in a swarm"
       ],
       "answer": 0,
-      "explain": "Better to compute the name from MESSAGE_VERSION."
+      "explain": "Better to derive the name from MESSAGE_VERSION."
     },
     {
       "q": "Minimum rate of OffboardControlMode:",
       "options": [
-        "More than 2 Hz",
+        "Above 2 Hz",
         "1 Hz",
         "50 Hz",
         "A single message is enough"
@@ -51,7 +51,7 @@
       "options": [
         "Without the stream PX4 refuses",
         "For QoS",
-        "They don't have to be",
+        "They do not have to be",
         "So the agent has time to create the DDS topics"
       ],
       "answer": 0,
@@ -69,7 +69,7 @@
       "explain": "NED: down is positive."
     },
     {
-      "q": "What should the node do if the pilot switched out of Offboard themselves?",
+      "q": "What should the node do if the pilot switched out of Offboard?",
       "options": [
         "Stop and hand over control",
         "Switch back to Offboard",
@@ -77,10 +77,10 @@
         "Request Offboard again after 1 s"
       ],
       "answer": 0,
-      "explain": "Don't fight the human."
+      "explain": "Do not fight the human."
     },
     {
-      "q": "Why is the flight logic moved into a pure state machine class without ROS?",
+      "q": "Why is the flight logic in a pure state machine class without ROS?",
       "options": [
         "It can be tested without a simulator",
         "PX4 requires it",
