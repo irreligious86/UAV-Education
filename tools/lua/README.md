@@ -1,6 +1,6 @@
 # EdgeTX Lua examples
 
-Code from the course module `tx-lua-widgets` («Lua-виджеты EdgeTX: свой экран телеметрии»).
+Code from the course module `tx-lua-widgets` ("EdgeTX Lua widgets: your own telemetry screen").
 
 ## LinkBox
 

@@ -26,7 +26,7 @@ related:
   - bf-custom
 next: []
 source: content/betaflight/bf-hd-osd-video.md
-source_hash: 9866b45dcc30
+source_hash: 56302fe92b18
 ---
 
 ## summary

@@ -3,7 +3,7 @@
  "pass": 80,
  "questions": [
   {
-   "q": "Куда положить виджет LinkBox, чтобы EdgeTX 2.12 на TX16S нашёл его при старте?",
+   "q": "Where do you put the LinkBox widget so that EdgeTX 2.12 on a TX16S finds it at startup?",
    "options": [
     "/SCRIPTS/WIDGETS/LinkBox.lua",
     "/WIDGETS/LinkBox/main.lua",
@@ -11,95 +11,95 @@
     "/WIDGETS/LinkBox.lua"
    ],
    "answer": 1,
-   "explain": "Пульт перебирает папки в /WIDGETS и в каждой ищет файл main.lua (widgets.cpp, LUA_WIDGET_FILENAME \"/main.lua\"). Отдельный .lua прямо в /WIDGETS не загружается."
+   "explain": "The radio goes through the folders in /WIDGETS and looks for a main.lua file in each (widgets.cpp, LUA_WIDGET_FILENAME \"/main.lua\"). A separate .lua directly in /WIDGETS is not loaded."
   },
   {
-   "q": "Почему в меню TX16S нет экранов телеметрии со скриптом из /SCRIPTS/TELEMETRY?",
+   "q": "Why does the TX16S menu have no telemetry screens with a script from /SCRIPTS/TELEMETRY?",
    "options": [
-    "Их запрещает включённый на пульте режим LUA_MIXER",
-    "Такие скрипты работают только по протоколу FrSky S.Port",
-    "Telemetry-скрипты собираются только для монохромных пультов",
-    "Имя telemetry-скрипта на цветном пульте должно быть длиннее 8 символов"
+    "The LUA_MIXER mode enabled on the radio forbids them",
+    "Such scripts work only over the FrSky S.Port protocol",
+    "Telemetry scripts are built only for monochrome radios",
+    "On a color radio a telemetry script name must be longer than 8 characters"
    ],
    "answer": 2,
-   "explain": "Загрузка telemetry-скриптов в interface.cpp стоит под PCBTARANIS, то есть только у монохромных пультов. На цветных ту же задачу решают виджеты."
+   "explain": "Loading telemetry scripts in interface.cpp sits under PCBTARANIS, that is, monochrome radios only. On color radios widgets do the same job."
   },
   {
-   "q": "Файл /WIDGETS/LinkBox/main.lua на месте, luac -p ошибок не находит, но LinkBox нет в списке виджетов, и ошибки на экране тоже нет. Что вероятнее всего?",
+   "q": "The file /WIDGETS/LinkBox/main.lua is in place, luac -p finds no errors, but LinkBox is not in the widget list, and there is no error on screen either. What is most likely?",
    "options": [
-    "В возвращаемой таблице нет функции background",
-    "В возвращаемой таблице нет ключа options",
-    "Функция refresh не вызывает lcd.refresh()",
-    "Функция update не объявлена как local"
+    "The returned table has no background function",
+    "The returned table has no options key",
+    "The refresh function does not call lcd.refresh()",
+    "The update function is not declared local"
    ],
    "answer": 1,
-   "explain": "Виджет регистрируется, только если есть name и create (widgets.cpp:146) и таблица options: без неё parseOptionDefinitions возвращает NULL и фабрика не создаётся. Хватит пустой options = {}."
+   "explain": "A widget is registered only if it has name and create (widgets.cpp:146) and an options table: without it parseOptionDefinitions returns NULL and no factory is created. An empty options = {} is enough."
   },
   {
-   "q": "Когда EdgeTX 2.12 вызывает функцию background виджета?",
+   "q": "When does EdgeTX 2.12 call a widget's background function?",
    "options": [
-    "Каждые 50 мс вместе с refresh, независимо от экрана",
-    "Только когда зона с виджетом не видна на экране",
-    "Только когда пропала телеметрия от приёмника",
-    "Один раз при загрузке модели, перед create"
+    "Every 50 ms together with refresh, regardless of the screen",
+    "Only when the widget's zone is not visible on screen",
+    "Only when telemetry from the receiver is lost",
+    "Once when the model loads, before create"
    ],
    "answer": 1,
-   "explain": "WidgetsContainer::refreshWidgets вызывает foreground() (а через перерисовку — refresh) для видимой зоны и background() для невидимой. Поэтому общий код опроса сенсоров вызывают из обеих функций."
+   "explain": "WidgetsContainer::refreshWidgets calls foreground() (and through the redraw, refresh) for a visible zone and background() for a hidden one. That is why shared sensor-polling code is called from both functions."
   },
   {
-   "q": "В refresh(widget, event, touchState) аргумент event всегда nil. Почему?",
+   "q": "In refresh(widget, event, touchState) the event argument is always nil. Why?",
    "options": [
-    "Виджет показан в зоне, а не в полноэкранном режиме",
-    "Пульт без сенсорного экрана вообще не передаёт события в Lua",
-    "В таблице опций не объявлен тип SWITCH",
-    "События получает только функция background"
+    "The widget is shown in a zone, not in full-screen mode",
+    "A radio without a touchscreen passes no events to Lua at all",
+    "The options table does not declare a SWITCH type",
+    "Only the background function receives events"
    ],
    "answer": 0,
-   "explain": "lua_widget.cpp передаёт код события и таблицу касания только при fullscreen; в обычной зоне оба аргумента nil, а нажатия обрабатывает сам интерфейс пульта."
+   "explain": "lua_widget.cpp passes the event code and the touch table only in fullscreen; in an ordinary zone both arguments are nil, and the radio's interface handles the presses itself."
   },
   {
-   "q": "Связь пропала 3 с назад. Что вернёт getSourceValue(id) для сенсора RxBt, который до этого принимался?",
+   "q": "The link was lost 3 s ago. What does getSourceValue(id) return for the RxBt sensor that was being received before?",
    "options": [
-    "0 и isCurrent = false",
-    "nil: сенсор удаляется из списка",
-    "Последнее значение и isCurrent = false",
-    "Последнее значение и isCurrent = true ещё 20 с"
+    "0 and isCurrent = false",
+    "nil: the sensor is removed from the list",
+    "The last value and isCurrent = false",
+    "The last value and isCurrent = true for another 20 s"
    ],
    "answer": 2,
-   "explain": "При остановке потока телеметрии EdgeTX помечает все сенсоры как old (telemetry.cpp:413), а getSourceValue отдаёт последнее значение с isCurrent = false. getValue в той же ситуации вернёт 0."
+   "explain": "When the telemetry stream stops, EdgeTX marks all sensors as old (telemetry.cpp:413), and getSourceValue returns the last value with isCurrent = false. getValue in the same situation returns 0."
   },
   {
-   "q": "Виджет вызывает lcd.drawNumber(x, y, getValue(\"RxBt\")) и при напряжении 16.4 В показывает «ERROR in refresh()». Как исправить?",
+   "q": "A widget calls lcd.drawNumber(x, y, getValue(\"RxBt\")) and at 16.4 V shows \"ERROR in refresh()\". How do you fix it?",
    "options": [
-    "Добавить флаг DBLSIZE: крупный шрифт показывает дроби",
-    "Передать math.floor(v * 10 + 0.5) с флагом PREC1",
-    "Перейти на lvgl, где drawNumber принимает дроби",
-    "Переименовать сенсор RxBt в Batt в списке телеметрии"
+    "Add the DBLSIZE flag: the large font shows fractions",
+    "Pass math.floor(v * 10 + 0.5) with the PREC1 flag",
+    "Switch to lvgl, where drawNumber accepts fractions",
+    "Rename the RxBt sensor to Batt in the telemetry list"
    ],
    "answer": 1,
-   "explain": "RxBt имеет точность 0.1, Lua получает 16.4 (float), а drawNumber требует целое (luaL_checkinteger): Lua 5.3 падает с «number has no integer representation». Целое в десятых плюс PREC1 даёт «16.4»."
+   "explain": "RxBt has 0.1 precision, Lua gets 16.4 (a float), and drawNumber needs an integer (luaL_checkinteger): Lua 5.3 fails with \"number has no integer representation\". An integer in tenths plus PREC1 gives \"16.4\"."
   },
   {
-   "q": "LinkBox с Cells = 0 подключили к 6S, разряженной до 3.50 В на банку (21.0 В). Что покажет авто-оценка ⌈V / 4.40⌉ и что делать?",
+   "q": "LinkBox with Cells = 0 is connected to a 6S discharged to 3.50 V per cell (21.0 V). What does the auto estimate ⌈V / 4.40⌉ show, and what do you do?",
    "options": [
-    "6S и 3.50 В/банку — авто-оценка верна при любом заряде",
-    "4S и 5.25 В/банку — нужно сменить сенсор",
-    "5S и 4.20 В/банку — задать Cells = 6 в опциях",
-    "7S и 3.00 В/банку — уменьшить делитель 4.40 В"
+    "6S and 3.50 V/cell: the auto estimate is right at any charge",
+    "4S and 5.25 V/cell: change the sensor",
+    "5S and 4.20 V/cell: set Cells = 6 in the options",
+    "7S and 3.00 V/cell: lower the 4.40 V divisor"
    ],
    "answer": 2,
-   "explain": "21.0 / 4.40 = 4.77, округление вверх даёт 5: полный 5S и пустой 6S дают одно и то же напряжение. Оценка верна, пока на банку больше 4.40·(n−1)/n (для 6S — 3.67 В); для полёта число банок задают явно."
+   "explain": "21.0 / 4.40 = 4.77, and rounding up gives 5: a full 5S and an empty 6S give the same voltage. The estimate is right while the voltage per cell is above 4.40·(n−1)/n (3.67 V for 6S); for flying, set the cell count explicitly."
   },
   {
-   "q": "Что происходит, если refresh виджета за один вызов выполняет больше примерно 20 000 инструкций Lua?",
+   "q": "What happens if a widget's refresh executes more than about 20 000 Lua instructions in one call?",
    "options": [
-    "Пульт пропускает кадр и продолжает со следующего",
-    "Остаток работы автоматически переносится в следующий вызов background",
-    "Перезагружается вся Lua-среда вместе с моделью",
-    "Ошибка «CPU limit», экземпляр виджета выключается до пересоздания"
+    "The radio skips a frame and continues with the next one",
+    "The rest of the work is automatically moved to the next background call",
+    "The whole Lua environment reloads together with the model",
+    "A \"CPU limit\" error; the widget instance is disabled until it is recreated"
    ],
    "answer": 3,
-   "explain": "Хук считает инструкции блоками по 200 (MAX_INSTRUCTIONS = 20000/100) и после 100 % вызывает luaL_error(\"CPU limit\") (widgets.cpp). Ошибка пишется в зону, и этот экземпляр больше не вызывается, пока виджет не создадут заново (смена модели, правка экрана, перезагрузка). В DEBUG-сборках лимит только печатается."
+   "explain": "The hook counts instructions in blocks of 200 (MAX_INSTRUCTIONS = 20000/100) and after 100 % calls luaL_error(\"CPU limit\") (widgets.cpp). The error is written into the zone, and this instance is not called again until the widget is created anew (a model change, a screen edit, a reboot). In DEBUG builds the limit is only printed."
   }
  ]
 }

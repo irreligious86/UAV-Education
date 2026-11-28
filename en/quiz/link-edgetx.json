@@ -3,18 +3,18 @@
  "pass": 80,
  "questions": [
   {
-   "q": "Канал в EdgeTX равен +50 %, пределы Outputs по умолчанию. Что уйдёт в модуль?",
+   "q": "An EdgeTX channel is at +50 %, Outputs limits at the defaults. What goes to the module?",
    "options": [
-    "1750 мкс, CRSF 1500",
-    "1756 мкс, CRSF 1401",
-    "1625 мкс, CRSF 1240",
-    "1756 мкс, CRSF 1756"
+    "1750 µs, CRSF 1500",
+    "1756 µs, CRSF 1401",
+    "1625 µs, CRSF 1240",
+    "1756 µs, CRSF 1756"
    ],
    "answer": 1,
-   "explain": "мкс = 1500 + 5.12·50 = 1756; CRSF = 992 + 512·4/5 = 1401. Полный ход ±100 % — это 988…2012 мкс и 173…1811 в единицах CRSF."
+   "explain": "µs = 1500 + 5.12·50 = 1756; CRSF = 992 + 512·4/5 = 1401. Full travel of ±100 % is 988…2012 µs and 173…1811 in CRSF units."
   },
   {
-   "q": "В Inputs на крене стоит expo 40. Стик отклонён на 50 %. Что получит микс?",
+   "q": "Inputs has expo 40 on roll. The stick is deflected 50 %. What does the mix get?",
    "options": [
     "20 %",
     "50 %",
@@ -22,97 +22,97 @@
     "30 %"
    ],
    "answer": 2,
-   "explain": "y = k·x³ + (1 − k)·x = 0.4·0.125 + 0.6·0.5 = 0.35. Полётник об этой кривой не знает и наложит свои рейты поверх."
+   "explain": "y = k·x³ + (1 − k)·x = 0.4·0.125 + 0.6·0.5 = 0.35. The flight controller knows nothing about this curve and applies its own rates on top."
   },
   {
-   "q": "Почему на CH5 для ExpressLRS ставят двухпозиционный тумблер с полным ходом?",
+   "q": "Why does CH5 get a two-position switch with full travel for ExpressLRS?",
    "options": [
-    "CH5 во всех режимах ELRS передаётся одним битом, поэтому промежуточные положения тумблера теряются в эфире",
-    "ELRS считает армом значение CH5 выше середины, и запас до порога должен быть большим",
-    "Betaflight принимает арм только на AUX1",
-    "Трёхпозиционные тумблеры EdgeTX не может назначить на каналы выше CH4"
+    "In every ELRS mode CH5 is sent as one bit, so intermediate switch positions are lost over the air",
+    "ELRS treats a CH5 value above the middle as armed, and the margin to the threshold should be large",
+    "Betaflight accepts arming only on AUX1",
+    "EdgeTX cannot assign three-position switches to channels above CH4"
    ],
    "answer": 1,
-   "explain": "При Arm using: CH5 модуль сравнивает канал с серединой (992 в единицах CRSF). «Выключено» ровно на 1500 мкс оставляет нулевой запас; 988 мкс — запас в полхода."
+   "explain": "With Arm using: CH5 the module compares the channel with the middle (992 in CRSF units). An \"off\" of exactly 1500 µs leaves zero margin; 988 µs leaves half the travel."
   },
   {
-   "q": "Для модели с полётником ADC filter в EdgeTX…",
+   "q": "For a model with a flight controller, the EdgeTX ADC filter is…",
    "options": [
-    "включают: он убирает шум потенциометров и датчиков Холла в стиках",
-    "выключают: сглаживание делает полётник",
-    "не влияет на каналы, только на экран",
-    "включают только при 500 Гц и выше"
+    "turned on: it removes noise from the stick potentiometers and Hall sensors",
+    "turned off: the flight controller does the smoothing",
+    "without effect on the channels, it only affects the screen",
+    "turned on only at 500 Hz and above"
    ],
    "answer": 1,
-   "explain": "Руководство EdgeTX прямо рекомендует выключать фильтр для моделей с полётником: RC smoothing уже есть в прошивке полёта, второй фильтр добавляет задержку."
+   "explain": "The EdgeTX manual explicitly recommends turning the filter off for models with a flight controller: the flight firmware already has RC smoothing, and a second filter adds latency."
   },
   {
-   "q": "После Discover new в списке только 1RSS, 2RSS, RQly, RSNR, ANT, RFMD, TPWR, TRSS, TQly, TSNR. Чего не хватает и почему?",
+   "q": "After Discover new the list has only 1RSS, 2RSS, RQly, RSNR, ANT, RFMD, TPWR, TRSS, TQly, TSNR. What is missing, and why?",
    "kind": "apply",
    "fragment": "Telemetry / Sensors\n1RSS  -62dBm\n2RSS  -64dBm\nRQly  100%\nRSNR  9dB\nANT   1\nRFMD  27\nTPWR  25mW\nTRSS  -60dBm\nTQly  100%\nTSNR  10dB",
    "options": [
-    "Линк не установлен: нужно заново привязать приёмник",
-    "Нет данных полётника: телеметрия в нём выключена или не подключён провод к RX приёмника",
-    "Скорость CRSF между пультом и модулем мала, и кадры с сенсорами батареи и GPS отбрасываются модулем",
-    "Сенсоры батареи появляются только после арма"
+    "The link is not established: rebind the receiver",
+    "No flight controller data: its telemetry is off or the wire to the receiver's RX is not connected",
+    "The CRSF speed between radio and module is too low, and the module drops the battery and GPS sensor frames",
+    "Battery sensors appear only after arming"
    ],
    "answer": 1,
-   "explain": "Эти десять сенсоров — статистика линка, её формируют приёмник и модуль сами. RxBt, Curr, Capa, GPS, FM приходят от полётника по проводу TX полётника → RX приёмника."
+   "explain": "These ten sensors are link statistics, produced by the receiver and the module themselves. RxBt, Curr, Capa, GPS, FM come from the flight controller over the flight controller TX → receiver RX wire."
   },
   {
-   "q": "Встроенные тревоги Rx-Stats (Low alarm 45, Critical alarm 42) при протоколе CRSF сравниваются с…",
+   "q": "With the CRSF protocol, the built-in alarms (Low alarm 45, Critical alarm 42) are compared with…",
    "options": [
-    "1RSS — уровнем сигнала на первой антенне, дБм",
-    "RQly — LQ в процентах",
+    "1RSS, the signal level at the first antenna, dBm",
+    "RQly, LQ in percent",
     "TPWR",
     "RSNR"
    ],
    "answer": 1,
-   "explain": "В telemetry/crossfire.cpp «RSSI» пульта для CRSF — это RX quality. 45 % LQ — слишком поздно, поэтому LQ озвучивают своим логическим переключателем с порогом 70–80."
+   "explain": "In telemetry/crossfire.cpp the radio's \"RSSI\" for CRSF is RX quality. 45 % LQ is too late, so LQ is announced with your own logical switch with a threshold of 70–80."
   },
   {
-   "q": "Логический переключатель L01: a<x, RQly, 70. Связь оборвалась полностью. Что с L01?",
+   "q": "Logical switch L01: a<x, RQly, 70. The link is lost completely. What happens to L01?",
    "options": [
-    "Истинен: пульт хранит последнее принятое значение RQly, а оно было ниже 70",
-    "Ложен: без телеметрии переключатели на сенсорах не срабатывают",
-    "Истинен на время Duration, затем ложен",
-    "Сохраняет то состояние, которое было до обрыва"
+    "True: the radio keeps the last received RQly value, and it was below 70",
+    "False: without telemetry, switches on sensors do not trigger",
+    "True for the Duration, then false",
+    "It keeps the state it had before the loss"
    ],
    "answer": 1,
-   "explain": "В switches.cpp условие с источником-сенсором возвращает false, пока телеметрия не идёт. Полный обрыв озвучивает встроенное «telemetry lost»."
+   "explain": "In switches.cpp a condition with a sensor source returns false while no telemetry is coming in. A complete loss is announced by the built-in \"telemetry lost\"."
   },
   {
-   "q": "В Lua ELRS выбран F1000, а строка Status в настройках модуля показывает 500 Hz. Причина?",
+   "q": "F1000 is selected in the ELRS Lua script, but the Status line in the module settings shows 500 Hz. The cause?",
    "options": [
-    "Включён Dynamic power",
-    "Скорость CRSF 400k — мала для F1000, модуль сам снизил частоту",
-    "Приёмник аппарата поддерживает только режимы до 500 Гц, и модуль под него подстроился",
-    "Модель скопирована, совпал Receiver No."
+    "Dynamic power is on",
+    "The CRSF speed of 400k is too low for F1000, and the module lowered the rate itself",
+    "The aircraft's receiver supports only modes up to 500 Hz, and the module adjusted to it",
+    "The model was copied, and the Receiver No. matches"
    ],
    "answer": 1,
-   "explain": "ELRS 4.1 ограничивает packet rate по скорости UART: 115k — до 250 Гц, 400k — до 500 Гц; для F1000 нужно 1.87M. Документация ELRS советует 400k до 250 Гц и 921k до 500 Гц."
+   "explain": "ELRS 4.1 limits the packet rate by UART speed: 115k up to 250 Hz, 400k up to 500 Hz; by the code F1000 works from 921k, and the ELRS documentation recommends 1.87M for it. The ELRS documentation suggests 400k up to 250 Hz and 921k up to 500 Hz."
   },
   {
-   "q": "Модель квадрокоптера скопирована через Duplicate для второго аппарата. Что сделать первым?",
+   "q": "A quadcopter model was copied with Duplicate for a second aircraft. What do you do first?",
    "options": [
-    "Перекалибровать стики",
-    "Сменить Receiver No. и проверить Model Match",
-    "Удалить все сенсоры телеметрии и заново выполнить Discover new",
-    "Сменить порядок каналов на TAER"
+    "Recalibrate the sticks",
+    "Change Receiver No. and check Model Match",
+    "Delete all telemetry sensors and run Discover new again",
+    "Change the channel order to TAER"
    ],
    "answer": 1,
-   "explain": "Копия наследует номер приёмника. С тем же номером (или при выключенном Model Match) вторая модель управляет первым аппаратом со своими тумблерами."
+   "explain": "A copy inherits the receiver number. With the same number (or with Model Match off) the second model controls the first aircraft with its own switches."
   },
   {
-   "q": "Где в EdgeTX настраивается failsafe для приёмника ELRS, подключённого к полётнику по CRSF?",
+   "q": "Where in EdgeTX do you set failsafe for an ELRS receiver connected to the flight controller over CRSF?",
    "options": [
-    "Model Setup → Failsafe mode: Custom, с положениями для каждого канала",
-    "Нигде в пульте: приёмник замолкает, поведение задаёт полётник",
+    "Model Setup → Failsafe mode: Custom, with positions for each channel",
+    "Nowhere in the radio: the receiver goes silent, the flight controller defines the behavior",
     "Special function SetFailsafe",
-    "Outputs → Min/Max каждого канала"
+    "Outputs → Min/Max of each channel"
    ],
    "answer": 1,
-   "explain": "Пункт Failsafe mode есть только у протоколов, где положения хранит приёмник (FrSky D16/ACCESS, R9M, Flysky, часть MPM). Для CRSF его нет в принципе."
+   "explain": "The Failsafe mode item exists only for protocols where the receiver stores the positions (FrSky D16/ACCESS, R9M, Flysky, some MPM). For CRSF it does not exist at all."
   }
  ]
 }

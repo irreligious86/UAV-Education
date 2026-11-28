@@ -11,7 +11,7 @@
         "UART speed"
       ],
       "answer": 1,
-      "explain": "More packets means lower latency, but worse sensitivity and range."
+      "explain": "More packets mean lower latency, but worse sensitivity and range."
     },
     {
       "q": "For a long-range wing over forest, the better choice is…",
@@ -22,7 +22,7 @@
         "2.4 GHz 500 Hz at maximum power"
       ],
       "answer": 1,
-      "explain": "The longer wavelength bends around obstacles, and a low packet rate gives you sensitivity margin."
+      "explain": "The long wavelength diffracts around obstacles, and a low packet rate gives sensitivity margin."
     },
     {
       "q": "Telem ratio 1:128 at 500 Hz gives telemetry once every…",
@@ -41,35 +41,35 @@
         "The VTX channel",
         "The basis of the hopping pattern",
         "The model name",
-        "The encryption password for the control link"
+        "A password that encrypts the control link"
       ],
       "answer": 1,
-      "explain": "Not a secret and not protection: a unique phrase is needed so you don't collide with your neighbors."
+      "explain": "It is not a secret and not protection: a unique phrase keeps you from coinciding with neighbors. A phrase alone is not enough: the ELRS major versions on the module and the receiver must match too."
     },
     {
-      "q": "LQ 100% with RSSI at the sensitivity threshold means…",
+      "q": "LQ at 100% with RSSI at the sensitivity threshold means…",
       "options": [
-        "Everything is great: all packets get through",
+        "All is well: every packet gets through",
         "The edge of the link with no margin",
         "A broken antenna",
         "The radio is off"
       ],
       "answer": 1,
-      "explain": "LQ is whether the packets get through, RSSI is how much margin is left. You need both."
+      "explain": "LQ says whether packets get through, RSSI how much margin is left. You need both."
     },
     {
-      "q": "RXLOSS when turning with the back toward the pilot. Likely cause?",
+      "q": "RXLOSS when turning with your back to the pilot. The likely cause?",
       "options": [
         "Bad PID",
         "The antenna is shadowed by the frame",
-        "Low packet rate and a weak radio battery",
+        "A low packet rate and a weak radio battery",
         "Interference from the 5.8 GHz video transmitter"
       ],
       "answer": 1,
-      "explain": "Antenna shadowing is a classic. Move it out and orient it."
+      "explain": "A shadowed antenna is the classic. Move it out and orient it."
     },
     {
-      "q": "Sensitivity of ELRS 2.4 GHz at 250 Hz:",
+      "q": "ELRS 2.4 GHz 250 Hz sensitivity:",
       "options": [
         "−115",
         "−108",
@@ -77,7 +77,7 @@
         "−123"
       ],
       "answer": 1,
-      "explain": "50 Hz is −115, 500 Hz is −105."
+      "explain": "50 Hz is −115, 500 Hz is −105. The LoRa mode thresholds in ELRS 4.1 are the same as in 3.x (the `common.cpp` table)."
     },
     {
       "q": "Telemetry ratio 1:128 at 250 Hz gives a telemetry interval of:",
@@ -91,50 +91,50 @@
       "explain": "128/250 s."
     },
     {
-      "q": "Long-range flight, ELRS 2.4 GHz in 250 Hz mode. Telemetry at the edge of the zone:",
+      "q": "A long-range flight, ELRS 2.4 GHz in 250 Hz mode. Telemetry at the edge of the area:",
       "kind": "apply",
-      "fragment": "RSSI1 -104 dBm  RSSI2 -106 dBm  LQ 71%  SNR -2 dB\nsensitivity of 250 Hz mode ≈ -108 dBm",
+      "fragment": "RSSI1 -104 dBm  RSSI2 -106 dBm  LQ 71%  SNR -2 dB\nmode sensitivity 250 Hz ≈ -108 dBm",
       "options": [
-        "A 2–4 dB margin — the link is on the verge of failsafe: lower the packet rate or turn back",
-        "LQ 71 % is normal for a long-range flight; failsafe only happens at LQ below 10 %",
-        "SNR -2 dB means a faulty receiver: on a working one it's always positive",
-        "You need to raise the packet rate to 500 Hz — that will increase receiver sensitivity"
+        "A 2–4 dB margin is a link on the verge of failsafe: lower the packet rate or turn back",
+        "LQ 71 % is normal for long range; failsafe only comes below LQ 10 %",
+        "SNR -2 dB means a faulty receiver: a healthy one is always positive",
+        "Raise the packet rate to 500 Hz: that improves receiver sensitivity"
       ],
       "answer": 0,
       "explain": "The margin is counted from the mode's sensitivity; 500 Hz is even less sensitive."
     },
     {
-      "q": "Модуль пульта обновили до ELRS 4.1, приёмник остался на 3.6 с той же binding phrase. Что будет?",
+      "q": "The radio module was updated to ELRS 4.1, the receiver stayed on 3.6 with the same binding phrase. What happens?",
       "options": [
-        "Свяжутся, но без телеметрии",
-        "Не свяжутся никаким способом привязки",
-        "Свяжутся только на 50 Гц",
-        "Свяжутся после трёх включений приёмника"
+        "They link, but without telemetry",
+        "They will not link by any binding method",
+        "They link only at 50 Hz",
+        "They link after three receiver power-ups"
       ],
       "answer": 1,
-      "explain": "`OTA_VERSION_ID` (3 → 4) подмешивается в CRC и в последовательность прыжков: 3.x и 4.x не синхронизируются. Обновлять нужно обе стороны."
+      "explain": "`OTA_VERSION_ID` (3 → 4) is mixed into the CRC and the hopping sequence: 3.x and 4.x do not sync. Both sides have to be updated."
     },
     {
-      "q": "Вуп со встроенным SPI-приёмником ELRS на Betaflight 2025.12 и модуль на ELRS 4.1. Рабочий вариант?",
+      "q": "A whoop with a built-in SPI ELRS receiver on Betaflight 2025.12 and a module on ELRS 4.1. A working option?",
       "options": [
-        "Прошить приёмник вупа через ExpressLRS Configurator до 4.1",
-        "Отдельный serial-приёмник ELRS 4.x на UART или модуль на 3.x для этой модели",
-        "Включить `Arm using = Switch`",
-        "Поставить Packet Rate 50 Гц"
+        "Flash the whoop's receiver to 4.1 with ExpressLRS Configurator",
+        "A separate ELRS 4.x serial receiver on a UART, or a 3.x module for this model",
+        "Enable `Arm using = Switch`",
+        "Set Packet Rate to 50 Hz"
       ],
       "answer": 1,
-      "explain": "SPI-приёмник исполняет код Betaflight; в 2025.12 это ELRS 3 (`ELRS_OTA_VERSION_ID 3`). Поддержка ELRS 4 для SPI — в Betaflight 2026.6 со сборкой `ELRSV4`."
+      "explain": "The SPI receiver runs Betaflight's code; in 2025.12 that is ELRS 3 (`ELRS_OTA_VERSION_ID 3`). ELRS 4 support for SPI comes in Betaflight 2026.6 with the `ELRSV4` build."
     },
     {
-      "q": "Что нужно сохранить перед обновлением устройства с ELRS 3.x на 4.x?",
+      "q": "What must you save before updating a device from ELRS 3.x to 4.x?",
       "options": [
-        "Binding phrase — она стирается",
-        "`hardware.json` и настройки Options из Web UI",
-        "Файл `elrsV3.lua`",
-        "Ничего: обновление идёт «на месте»"
+        "The binding phrase: it gets erased",
+        "`hardware.json` and the Options settings from the Web UI",
+        "The `elrsV3.lua` file",
+        "Nothing: the update happens in place"
       ],
       "answer": 1,
-      "explain": "Файловая система меняется со SPIFFS на LittleFS, пользовательские `hardware.json` и `options.json` стираются. `elrsV3.lua`, наоборот, удаляют и ставят `elrs.lua`."
+      "explain": "The file system changes from SPIFFS to LittleFS, and custom `hardware.json` and `options.json` are erased. `elrsV3.lua`, on the contrary, is deleted and replaced with `elrs.lua`."
     }
   ]
 }

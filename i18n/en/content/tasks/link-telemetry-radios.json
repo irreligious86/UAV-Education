@@ -4,7 +4,7 @@
   {
    "id": "dbm",
    "title": "SiK RSSI in dBm",
-   "statement": "A SiK modem reports RSSI = **{r}**. Convert it to dBm (approximately dBm ≈ RSSI/1.9 − 127).",
+   "statement": "A SiK radio reports RSSI = **{r}**. Convert it to dBm (approximately dBm ≈ RSSI/1.9 − 127).",
    "params": {
     "r": {
      "min": 60,
@@ -43,7 +43,7 @@
   {
    "id": "range",
    "title": "Margin and range",
-   "statement": "At the test distance the fade margin is **{m} dB**. How many times farther can you go if you keep **{k} dB** in reserve (every 6 dB doubles the range)?",
+   "statement": "At the test distance the fade margin is **{m} dB**. By what factor can you go farther if you keep **{k} dB** in reserve (every 6 dB is twice as far)?",
    "params": {
     "m": {
      "min": 12,
@@ -58,7 +58,7 @@
    "answer": "2**((m-k)/6)",
    "unit": "×",
    "tol": 0.03,
-   "solution": "Usable margin is m − k; range × 2^((m − k)/6)."
+   "solution": "The usable margin is m − k; range × 2^((m − k)/6)."
   }
  ]
 }

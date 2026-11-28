@@ -1,0 +1,51 @@
+== 1. UID from the phrase (MD5 of the string -DMY_BINDING_PHRASE="...", first 6 bytes) ==
+'my-quad-2026'     md5=fa93550f9b268736014918737860d8d7  UID=250,147,85,15,155,38
+'My-quad-2026'     md5=369c8d38d6dd2b0bedb1689141c804d1  UID=54,156,141,56,214,221
+'my-quad-2026 '    md5=9bc651e480307a02429678d1566f07dd  UID=155,198,81,228,128,48
+'12,34,56,78'      md5=eb7a97eb5a454e43e9659dacdeddaa70  UID=0,0,12,34,56,78
+(build_flags.py prints a line of the same form: 'UID bytes: a,b,c,d,e,f')
+
+== 2. What goes over the air from the UID (phrase my-quad-2026) ==
+FHSS seed = UID[2..5] with UID[5]^4 = 0x550F9B22
+CRC init  = (UID[4]<<8 | UID[5]) ^ 0x0400 = 0x9F26
+UID[0], UID[1] never go over the air: OtaUidIsBound() looks only at UID[2..5]
+
+== 3. First 12 hops (one phrase, different domains) ==
+ISM2G4 / CE_LBT  channels 80, sync channel 40, length 240: [40, 24, 70, 4, 9, 46, 43, 63, 20, 21, 55, 69]
+                 MHz: [2440.4, 2424.4, 2470.4, 2404.4, 2409.4, 2446.4]
+                 check: every block of 80 has each channel exactly once: True; sync at the start of every block: True
+FCC915           channels 40, sync channel 20, length 240: [20, 0, 19, 11, 24, 21, 23, 38, 27, 30, 6, 28]
+                 MHz: [915.5, 903.5, 914.9, 910.1, 917.9, 916.1]
+                 check: every block of 40 has each channel exactly once: True; sync at the start of every block: True
+EU868            channels 13, sync channel  6, length 247: [6, 11, 10, 5, 0, 12, 2, 4, 1, 8, 7, 9]
+                 MHz: [866.42, 869.05, 868.52, 865.9, 863.27, 869.58]
+                 check: every block of 13 has each channel exactly once: True; sync at the start of every block: True
+Phrase differs by one letter: 7 of 240 positions match (3 of them are the sync channel at the start of a block)
+
+== 4. Model Match: UID5 in the SYNC packet ==
+UID5 = 38 = 0b00100110; mask 0x3F = low 6 bits, model ID 0…63
+TX Model Match Off ID None -> UID5 in SYNC =  38;  RX stores ID Off (0xFF) -> link, channels flow
+TX Model Match On  ID 1    -> UID5 in SYNC =  24;  RX stores ID 1          -> link, channels flow
+TX Model Match On  ID 2    -> UID5 in SYNC =  27;  RX stores ID 1          -> link up, no channels (Model Mismatch)
+TX Model Match On  ID 0    -> UID5 in SYNC =  25;  RX stores ID Off (0xFF) -> link up, no channels (Model Mismatch)
+TX Model Match Off ID None -> UID5 in SYNC =  38;  RX stores ID 1          -> link up, no channels (Model Mismatch)
+TX Model Match On  ID 65   -> UID5 in SYNC =  24;  RX stores ID 1          -> link, channels flow
+ID 65 & 0x3F = 1: numbers 1 and 65 are indistinguishable (EdgeTX only offers 0…63 anyway)
+
+== 5. Link margin and range (free space, 20 dB per decade) ==
+6 dB -> x1.995, 3 dB -> x0.708 (minus), 10 dB -> x3.16
+2.4 GHz 250Hz  S=-108 dBm: margin at 1 km = 28 dB, 12 dB of margin remains out to 6.3 km; with a -6 dB reality correction: 3.2 km
+2.4 GHz 150Hz  S=-112 dBm: margin at 1 km = 32 dB, 12 dB of margin remains out to 10.0 km; with a -6 dB reality correction: 5.0 km
+2.4 GHz 50Hz   S=-115 dBm: margin at 1 km = 35 dB, 12 dB of margin remains out to 14.1 km; with a -6 dB reality correction: 7.1 km
+2.4 GHz F1000  S=-104 dBm: margin at 1 km = 24 dB, 12 dB of margin remains out to 4.0 km; with a -6 dB reality correction: 2.0 km
+
+== 6. Std: telemetry interval = ratio * 1000 / rate ==
+25Hz       1:8   -> every   320 ms, 3.1 packets/s
+50Hz       1:16  -> every   320 ms, 3.1 packets/s
+100Hz      1:32  -> every   320 ms, 3.1 packets/s
+150Hz      1:32  -> every   213 ms, 4.7 packets/s
+200Hz      1:64  -> every   320 ms, 3.1 packets/s
+250Hz      1:64  -> every   256 ms, 3.9 packets/s
+333Hz Full 1:128 -> every   384 ms, 2.6 packets/s
+500Hz      1:128 -> every   256 ms, 3.9 packets/s
+F1000      1:128 -> every   128 ms, 7.8 packets/s

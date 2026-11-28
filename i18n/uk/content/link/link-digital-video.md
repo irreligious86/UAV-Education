@@ -43,7 +43,7 @@ source_hash: 542319dc9938
 
 ### HD OSD: MSP DisplayPort
 У цифрових системах OSD малюють окуляри або повітряний модуль, а польотник лише надсилає, **що** малювати, за протоколом MSP DisplayPort через UART.
-- **Betaflight 4.4+**: UART на вкладці Ports — функція MSP для повітряного модуля (Peripherals: VTX (MSP + DisplayPort)); у CLI `set osd_displayport_device = MSP`, відеосистема `set vcd_video_system = HD`. Елементи OSD розставляються на більшому полотні.
+- **Betaflight 4.4+**: UART на вкладці Ports — функція MSP для повітряного модуля (Peripherals: VTX (MSP + Displayport)); у CLI `set osd_displayport_device = MSP`, відеосистема `set vcd_video_system = HD`. Елементи OSD розставляються на більшому полотні.
 - **INAV**: UART з MSP DisplayPort для HD OSD, тип OSD — за документацією своєї системи.
 - **ArduPilot**: `SERIALn_PROTOCOL = 42` (DisplayPort), `OSD_TYPE = 5` (MSP DisplayPort).
 - Керування VTX (канал, потужність) у цифрових систем іде або через той самий MSP, або з меню окулярів — VTX-таблиці аналогу тут не потрібні.

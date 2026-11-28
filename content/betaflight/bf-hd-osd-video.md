@@ -130,7 +130,7 @@ EIRP по спецификациям. DJI O3/O4 Pro: FCC < 33 дБм (≈ 2 Вт
 ### INAV и ArduPilot — коротко
 | | Betaflight 2025.12 | INAV 9.1 | ArduPilot 4.7 |
 |---|---|---|---|
-| Функция порта | VTX (MSP + DisplayPort), маска 131073 | MSP DisplayPort (`FUNCTION_MSP_OSD` = 1 << 25) | `SERIALn_PROTOCOL = 42` (DisplayPort); 33 — старый «DJI FPV» |
+| Функция порта | VTX (MSP + Displayport), маска 131073 | MSP DisplayPort (`FUNCTION_MSP_OSD` = 1 << 25) | `SERIALn_PROTOCOL = 42` (DisplayPort); 33 — старый «DJI FPV» |
 | Тип OSD | `osd_displayport_device = MSP` | выбор порта | `OSD_TYPE = 5` (MSP_DISPLAYPORT); 3 — MSP |
 | Сетка | `vcd_video_system = HD`, канва от очков | `osd_video_system` = HDZERO, DJIWTF, AVATAR, BF43COMPAT, BFHDCOMPAT, DJI_NATIVE | задаёт полётник, на каждый экран: `OSDn_TXT_RES` 0 — 30×16 (по умолчанию: HD-очки покажут SD-сетку), 1 — 50×18, 2 — 60×22; `MSP_OPTIONS` бит 2 — символы Betaflight, бит 3 — INAV (бит 0 — только для протокола 33); полная таблица по системам — `ap-osd-video` |
 | Скорость | 115200 | 115200 | `SERIALn_BAUD = 115` |

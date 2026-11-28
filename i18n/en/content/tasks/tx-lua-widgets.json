@@ -1,0 +1,80 @@
+{
+ "module": "tx-lua-widgets",
+ "tasks": [
+  {
+   "id": "auto-cells",
+   "title": "Auto estimate of the cell count",
+   "statement": "LinkBox with the option `Cells = 0` got `RxBt` = **{v} V** on the first connection and estimates the cell count as ⌈V / 4.40⌉. How many cells does it show?",
+   "params": {
+    "v": [
+     8.4,
+     12.6,
+     15.2,
+     16.4,
+     16.8,
+     21.0,
+     22.8,
+     24.6,
+     25.2
+    ]
+   },
+   "answer": "math.ceil(v/4.40)",
+   "unit": "cells",
+   "tol": 0.001,
+   "abs": 0.1,
+   "solution": "n = ⌈V / 4.40⌉: 4.40 V is slightly above a full LiHV cell (4.35 V), so that a full pack does not land on the boundary. The estimate is right while the per-cell voltage is above 4.40·(n−1)/n: 3.30 V for 4S, 3.67 V for 6S, 3.85 V for 8S. The trap is 21.0 V: it is both a full 5S (4.20 V/cell) and an empty 6S (3.50 V/cell); the formula gives 5. On a discharged pack (and for 8S and up, even a storage-charged one) the cell count is set with the `Cells` option."
+  },
+  {
+   "id": "rxbt-threshold",
+   "title": "RxBt alarm threshold",
+   "statement": "The flight controller sends the whole battery voltage in `RxBt`. The pack is **{n}S**, and the alarm is needed at **{c} V** per cell. What threshold in volts goes on `RxBt` (in the widget or a logical switch)?",
+   "params": {
+    "n": [
+     1,
+     2,
+     3,
+     4,
+     6,
+     8
+    ],
+    "c": [
+     3.3,
+     3.4,
+     3.5,
+     3.6
+    ]
+   },
+   "answer": "n*c",
+   "unit": "V",
+   "tol": 0.002,
+   "abs": 0.05,
+   "solution": "Threshold = cell count × voltage per cell. If `report_cell_voltage` is on in Betaflight, `RxBt` is already the per-cell average and the threshold equals c itself; LinkBox recognizes this case by a value ≤ 4.5 V."
+  },
+  {
+   "id": "refresh-per-telemetry",
+   "title": "Widget frames per telemetry packet",
+   "statement": "ELRS runs at **{rate} Hz** with telemetry ratio **1:{ratio}**, and the widget is redrawn in the EdgeTX menu cycle every 50 ms. How many `refresh` calls fall into one interval between telemetry packets?",
+   "params": {
+    "rate": [
+     50,
+     100,
+     150,
+     250,
+     500
+    ],
+    "ratio": [
+     8,
+     16,
+     32,
+     64,
+     128
+    ]
+   },
+   "answer": "ratio*1000/rate/50",
+   "unit": "calls",
+   "tol": 0.01,
+   "abs": 0.02,
+   "solution": "Telemetry interval = ratio × 1000 / rate ms (`link-elrs`), divided by the 50 ms cycle period. Example: 250 Hz, 1:64 → 256 ms → 5.12 calls. Almost every call draws the same numbers, which is why sensor IDs are cached and no tables are created in `refresh`."
+  }
+ ]
+}

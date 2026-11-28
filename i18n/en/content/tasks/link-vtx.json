@@ -1,87 +1,87 @@
 {
-  "module": "link-vtx",
-  "tasks": [
-    {
-      "id": "power-range",
-      "title": "VTX power and range",
-      "statement": "The video transmitter's power was raised from **{p1} mW** to **{p2} mW**. How many times does the free-space range grow?",
-      "params": {
-        "p1": [
-          25,
-          100,
-          200
-        ],
-        "p2": [
-          400,
-          600,
-          800,
-          1000
-        ]
-      },
-      "answer": "math.sqrt(p2/p1)",
-      "unit": "×",
-      "tol": 0.01,
-      "solution": "Received power falls off as 1/d², so range ∝ √P: every +3 dB (×2 power) gives ×1.41 range."
-    },
-    {
-      "id": "imd",
-      "title": "Intermodulation of two transmitters",
-      "statement": "Two VTXs side by side: **{f1} MHz** and **{f2} MHz**. Find the lower third-order product 2f₁ − f₂ (MHz).",
-      "params": {
-        "f1": [
-          5658,
-          5695,
-          5732,
-          5769
-        ],
-        "f2": [
-          5806,
-          5843,
-          5880,
-          5917
-        ]
-      },
-      "answer": "2*f1-f2",
-      "unit": "MHz",
-      "tol": 0.0001,
-      "solution": "The third-order products 2f₁ − f₂ and 2f₂ − f₁ sit away from the pair by the same spacing. If such a product lands on a third pilot's channel (on an evenly spaced grid — exactly on the adjacent one), that pilot gets lines and snow even though all the frequencies are “different”. Outside the 5.8 GHz band it is harmless."
-    },
-    {
-      "id": "dbm-to-mw",
-      "title": "Уровень мощности: дБм в мВт",
-      "statement": "В строке `vtxtable powervalues` стоит уровень **{d} дБм**. Сколько это милливатт?",
-      "params": {
-        "d": [
-          14,
-          17,
-          20,
-          23,
-          26,
-          27,
-          29
-        ]
-      },
-      "answer": "10**(d/10)",
-      "unit": "мВт",
-      "tol": 0.02,
-      "solution": "мВт = 10^(дБм/10): 0 дБм = 1 мВт, каждые +10 дБм — ×10, каждые +3 дБм — примерно ×2. Поэтому 14, 20 и 26 дБм подписаны в `powerlabels` как 25, 100 и 400 мВт."
-    },
-    {
-      "id": "raceband-frequency",
-      "title": "Частота канала Raceband",
-      "statement": "Какая частота (МГц) у канала **R{n}** в таблице Raceband из модуля?",
-      "params": {
-        "n": {
-          "min": 1,
-          "max": 8,
-          "step": 1
-        }
-      },
-      "answer": "5658 + 37*(n - 1)",
-      "unit": "МГц",
-      "tol": 5e-05,
-      "abs": 0.5,
-      "solution": "Raceband начинается с R1 = 5658 МГц и идёт с шагом 37 МГц: Rn = 5658 + 37 · (n − 1), R8 = 5917. Каналы через один (R1, R3, R5, R7) разнесены на 74 МГц."
+ "module": "link-vtx",
+ "tasks": [
+  {
+   "id": "power-range",
+   "title": "VTX power and range",
+   "statement": "The video transmitter power was raised from **{p1} mW** to **{p2} mW**. By what factor does the free-space range grow?",
+   "params": {
+    "p1": [
+     25,
+     100,
+     200
+    ],
+    "p2": [
+     400,
+     600,
+     800,
+     1000
+    ]
+   },
+   "answer": "math.sqrt(p2/p1)",
+   "unit": "×",
+   "tol": 0.01,
+   "solution": "Received power falls as 1/d², so range ∝ √P: every +3 dB (×2 power) gives ×1.41 range."
+  },
+  {
+   "id": "imd",
+   "title": "Intermodulation of two transmitters",
+   "statement": "Two VTXs side by side: **{f1} MHz** and **{f2} MHz**. Find the lower third-order product 2f₁ − f₂ (MHz).",
+   "params": {
+    "f1": [
+     5658,
+     5695,
+     5732,
+     5769
+    ],
+    "f2": [
+     5806,
+     5843,
+     5880,
+     5917
+    ]
+   },
+   "answer": "2*f1-f2",
+   "unit": "MHz",
+   "tol": 0.0001,
+   "solution": "The third-order products 2f₁ − f₂ and 2f₂ − f₁ sit one pair-spacing away from the pair. If such a product lands on a third pilot's channel (on an even grid, exactly the neighboring one), that pilot gets stripes and snow even though all the frequencies are \"different\". Outside the 5.8 GHz band it is harmless."
+  },
+  {
+   "id": "dbm-to-mw",
+   "title": "Power level: dBm to mW",
+   "statement": "A `vtxtable powervalues` line has a level of **{d} dBm**. How many milliwatts is that?",
+   "params": {
+    "d": [
+     14,
+     17,
+     20,
+     23,
+     26,
+     27,
+     29
+    ]
+   },
+   "answer": "10**(d/10)",
+   "unit": "mW",
+   "tol": 0.02,
+   "solution": "mW = 10^(dBm/10): 0 dBm = 1 mW, every +10 dBm is ×10, every +3 dBm is roughly ×2. That is why 14, 20 and 26 dBm are labeled 25, 100 and 400 mW in `powerlabels`."
+  },
+  {
+   "id": "raceband-frequency",
+   "title": "Raceband channel frequency",
+   "statement": "What is the frequency (MHz) of channel **R{n}** in the module's Raceband table?",
+   "params": {
+    "n": {
+     "min": 1,
+     "max": 8,
+     "step": 1
     }
-  ]
+   },
+   "answer": "5658 + 37*(n - 1)",
+   "unit": "MHz",
+   "tol": 5e-05,
+   "abs": 0.5,
+   "solution": "Raceband starts at R1 = 5658 MHz and goes in 37 MHz steps: Rn = 5658 + 37 · (n − 1), R8 = 5917. Every other channel (R1, R3, R5, R7) is 74 MHz apart."
+  }
+ ]
 }
