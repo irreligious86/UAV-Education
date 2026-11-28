@@ -44,7 +44,7 @@
         "Считает EKF и пишет лог"
       ],
       "answer": 1,
-      "explain": "Распределяет roll/pitch/yaw/throttle по матрице моторов с приоритетами; yaw — последним, в пределах MOT_YAW_HEADROOM."
+      "explain": "Распределяет roll/pitch/yaw/throttle по матрице моторов с приоритетами; сначала roll/pitch, затем yaw — сколько помещается (MOT_YAW_HEADROOM — гарантированный минимум), и throttle — в оставшийся диапазон."
     },
     {
       "q": "Откуда берётся вики параметров ArduPilot?",

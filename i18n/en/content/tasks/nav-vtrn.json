@@ -1,0 +1,100 @@
+{
+ "module": "nav-vtrn",
+ "tasks": [
+  {
+   "id": "vo-scale-drift",
+   "title": "VO drift from an altitude error",
+   "statement": "A nadir camera, with the frame scale taken from AGL. The height above ground is overestimated by **{e} %**, and the vehicle flew **{d} m** in a straight line. Find the position error of pure visual odometry due to scale (m).",
+   "params": {
+    "e": {
+     "min": 1,
+     "max": 10,
+     "step": 0.5
+    },
+    "d": {
+     "min": 200,
+     "max": 5000,
+     "step": 100
+    }
+   },
+   "answer": "d*e/100",
+   "unit": "m",
+   "tol": 0.02,
+   "solution": "The shift in meters = the shift in pixels · AGL / f, so the relative altitude error carries over entirely into the path length: Δ = D · e/100. 5 % over 1000 m is 50 m on a straight line. On a closed route the scale error partly cancels: in the lab, 20.8 m at 1000 m and 10.9 m at 1500 m."
+  },
+  {
+   "id": "ransac-iters",
+   "title": "How many RANSAC iterations a homography needs",
+   "statement": "After the ratio test, the inlier ratio is **{w}**. A homography needs 4 point pairs per hypothesis. How many RANSAC iterations give a 0.99 probability of drawing four correct pairs at least once? The formula is N = ln(1 − p) / ln(1 − w⁴).",
+   "params": {
+    "w": [
+     0.2,
+     0.25,
+     0.3,
+     0.35,
+     0.4,
+     0.45,
+     0.5,
+     0.6,
+     0.7
+    ]
+   },
+   "answer": "math.log(1-0.99)/math.log(1-w**4)",
+   "unit": "iterations",
+   "tol": 0.03,
+   "solution": "The probability that all 4 pairs are correct is w⁴; N = ln(0.01)/ln(1 − w⁴). At w = 0.5 that is 72 iterations, at w = 0.2 about 2900: a change of season that halves the inlier ratio makes RANSAC tens of times more expensive. Hence a strict ratio test and a search window from the position prediction."
+  },
+  {
+   "id": "fix-interval",
+   "title": "How often you need map fixes",
+   "statement": "Between fixes the position is carried by VO with a drift of **{k} %** of the path. The speed is **{v} m/s**, and the allowed error before the next fix is **{E} m**. Find the maximum interval between successful fixes (s).",
+   "params": {
+    "k": [
+     1,
+     1.5,
+     2,
+     3,
+     4,
+     5
+    ],
+    "v": {
+     "min": 5,
+     "max": 25,
+     "step": 1
+    },
+    "E": [
+     5,
+     10,
+     15,
+     20,
+     30
+    ]
+   },
+   "answer": "E/(k/100*v)",
+   "unit": "s",
+   "tol": 0.02,
+   "solution": "The error grows as k/100 · v · t, so t = E / (k/100 · v). At 3 %, 15 m/s and 15 m that is 33 s, or 500 m of path: a stretch without landmarks (water, a flat field) longer than this cannot be crossed within tolerance."
+  },
+  {
+   "id": "vo-min-fps",
+   "title": "Minimum frame rate for VO",
+   "statement": "A nadir camera: focal length 500 px, 480 px along the flight direction. Altitude **{h} m**, speed **{v} m/s**. For stable VO, consecutive frames must overlap by at least 60 %. Find the minimum frame rate (Hz).",
+   "params": {
+    "h": {
+     "min": 30,
+     "max": 150,
+     "step": 10
+    },
+    "v": {
+     "min": 5,
+     "max": 25,
+     "step": 1
+    }
+   },
+   "answer": "v/(0.4*480*h/500)",
+   "unit": "Hz",
+   "tol": 0.02,
+   "solution": "The frame footprint along the flight direction is L = 480 · h / 500 = 0.96 · h. The shift between frames is at most 40 % of the footprint: v / fps ≤ 0.4 · L, hence fps ≥ v / (0.384 · h). At 100 m and 10 m/s that is 0.26 Hz (2 Hz in the lab, 95 % overlap); at 30 m and 25 m/s it is already 2.2 Hz."
+  }
+ ]
+}

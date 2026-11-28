@@ -5,7 +5,8 @@ The copter flies in SITL over the SYNTHETIC orthophoto of vtrn_lab.py. A "vision
 camera frame from the simulator's true pose (stabilised camera: roll/pitch are not rendered), runs VO at
 5 Hz and map matching every 2 s (worker thread), fuses them in the lab's 2-state Kalman filter and
 publishes the estimate as a second GPS (GPS2_TYPE = 14, MAVLink GPS_INPUT, gps_id = 1) at 5 Hz.
-Scenario: take-off to 100 m, 400 m north with GNSS (vision in the shadow), SIM_GPS_DISABLE = 1, 250 m east
+Scenario: take-off to 100 m, 400 m north with GNSS (vision in the shadow), GNSS off (4.6.x: SIM_GPS_DISABLE = 1;
+4.7.x: SIM_GPS1_ENABLE = 0; the script checks which one exists and stops if neither is accepted), 250 m east
 and 400 m south on vision alone (with a 60 m wrong fix injected for 4 s), RTL; below 45 m EKF3 is switched
 to source set 2 (SITL optical flow + rangefinder) for the landing.
 
@@ -89,16 +90,34 @@ class Link:
         with self.lock:
             return self.last.get(t)
 
-    def set_param(self, name, value):
+    def set_param(self, name, value, required=False, timeout=30):
+        """PARAM_SET and wait for the echo; returns True if the vehicle now has this value."""
         with self.tx:
             self.m.mav.param_set_send(self.m.target_system, self.m.target_component, name.encode(), float(value),
                                       mavutil.mavlink.MAV_PARAM_TYPE_REAL32)
-        for _ in range(30):
+        t_end = time.time() + timeout
+        while time.time() < t_end:
             msg = self.m.recv_match(type="PARAM_VALUE", blocking=True, timeout=1)
             if msg and msg.param_id == name:
                 print(f"  set {name} = {msg.param_value:g}")
-                return
+                if abs(msg.param_value - float(value)) < 1e-3:
+                    return True
+                break
+        if required:
+            sys.exit(f"FATAL: {name} = {value:g} was not accepted by the vehicle; stopping the lab")
         print(f"  {name}: no ack")
+        return False
+
+    def has_param(self, name, timeout=5):
+        """PARAM_REQUEST_READ by name: True if the firmware has this parameter (ArduPilot is silent otherwise)."""
+        with self.tx:
+            self.m.mav.param_request_read_send(self.m.target_system, self.m.target_component, name.encode(), -1)
+        t_end = time.time() + timeout
+        while time.time() < t_end:
+            msg = self.m.recv_match(type="PARAM_VALUE", blocking=True, timeout=1)
+            if msg and msg.param_id == name:
+                return True
+        return False
 
     def cmd(self, cmd, *args):
         with self.tx:
@@ -388,6 +407,10 @@ def main():
     global T0
     T0 = time.time()
     print("== step 1: second GPS of MAVLink type, reboot")
+    # the switch that turns the simulated GNSS off was renamed in 4.7: find it now, not in flight
+    gnss_off = next(((n, v) for n, v in (("SIM_GPS_DISABLE", 1), ("SIM_GPS1_ENABLE", 0)) if L.has_param(n)), None)
+    if gnss_off is None:
+        sys.exit("FATAL: neither SIM_GPS_DISABLE (4.6.x) nor SIM_GPS1_ENABLE (4.7.x) exists: cannot simulate GNSS loss")
     L.set_param("GPS2_TYPE", 14)           # 14 = MAVLink (GPS_INPUT)
     L.set_param("GPS_AUTO_SWITCH", 1)      # 1 = UseBest (default)
     L.set_param("GPS2_DELAY_MS", 100)      # our output is extrapolated to "now": ~0.1 s old, not the 0.2 s assumed for MAVLink GPS
@@ -433,8 +456,8 @@ def main():
     print(f"  map fixes so far: {len(vn.fix_stats)} attempted, {len(ok)} matched, {sum(f[5] for f in ok)} accepted; "
           f"error median {np.median([f[1] for f in ok]):.2f} m, max {max(f[1] for f in ok):.2f} m; match time median {np.median([f[4] for f in ok]):.0f} ms")
 
-    print(f"== step 5: GNSS loss (SIM_GPS_DISABLE = 1), leg B: {X_EAST - 300:.0f} m east" + (" across the lake" if LAKE else "") + " on vision only")
-    L.set_param("SIM_GPS_DISABLE", 1)
+    print(f"== step 5: GNSS loss ({gnss_off[0]} = {gnss_off[1]}), leg B: {X_EAST - 300:.0f} m east" + (" across the lake" if LAKE else "") + " on vision only")
+    L.set_param(*gnss_off, required=True)   # without it the "vision only" legs would silently fly on GPS1
     for _ in range(10):
         L.pump(0.5)
         if L.get("GPS_RAW_INT").fix_type < 3:

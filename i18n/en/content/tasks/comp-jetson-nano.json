@@ -1,0 +1,102 @@
+{
+ "module": "comp-jetson-nano",
+ "tasks": [
+  {
+   "id": "u-board",
+   "title": "Voltage at the board input",
+   "statement": "The BEC outputs 5.0 V. The Jetson draws **{i} A** through a pair of wires **{l} m** long with a conductor resistance of **{r} mΩ/m**, and the connector adds 0.05 Ω. Find the voltage at the board input (V).",
+   "params": {
+    "i": {
+     "min": 0.5,
+     "max": 4.0,
+     "step": 0.5
+    },
+    "l": [
+     0.2,
+     0.3,
+     0.5,
+     1.0
+    ],
+    "r": [
+     33,
+     53,
+     84,
+     213
+    ]
+   },
+   "answer": "5.0-i*(2*l*r/1000+0.05)",
+   "unit": "V",
+   "tol": 0.01,
+   "abs": 0.01,
+   "solution": "R = 2·l·r + R_connector; U = U_BEC − I·R. Compare with the 4.75 V minimum for the Jetson Nano: anything below it is a brownout under load."
+  },
+  {
+   "id": "hover-loss",
+   "title": "The cost of a companion in hover time",
+   "statement": "A copter of mass **{m} kg** hovers at a specific power of **{k} W/kg**, and the usable battery energy is **{e} Wh**. A companion is added: mass **{dm} g**, consumption **{pc} W**. By how many minutes does the hover time shrink if hover power grows as m^1.5?",
+   "params": {
+    "m": [
+     1.5,
+     2.0,
+     2.5,
+     3.0,
+     4.0
+    ],
+    "k": [
+     120,
+     150,
+     180
+    ],
+    "e": {
+     "min": 50,
+     "max": 150,
+     "step": 10
+    },
+    "dm": {
+     "min": 100,
+     "max": 300,
+     "step": 50
+    },
+    "pc": {
+     "min": 5,
+     "max": 25,
+     "step": 5
+    }
+   },
+   "answer": "60*e/(k*m)-60*e/(k*m*((m+dm/1000)/m)**1.5+pc)",
+   "unit": "min",
+   "tol": 0.03,
+   "abs": 0.02,
+   "solution": "t₀ = 60·E/(k·m). After installation: P = k·m·((m+Δm)/m)^1.5 + P_c, t₁ = 60·E/P. The answer is t₀ − t₁. Mass usually costs more than watts."
+  },
+  {
+   "id": "pipeline-fps",
+   "title": "Pipeline frame rate",
+   "statement": "The stages run sequentially: capture and preprocessing **{tp} ms**, inference **{ti} ms**, NMS and tracker **{tn} ms** per frame. Find the pipeline frame rate (fps).",
+   "params": {
+    "tp": {
+     "min": 4,
+     "max": 15,
+     "step": 1
+    },
+    "ti": [
+     3.8,
+     4.57,
+     7.17,
+     52.6,
+     67.03,
+     108.1
+    ],
+    "tn": {
+     "min": 2,
+     "max": 10,
+     "step": 1
+    }
+   },
+   "answer": "1000/(tp+ti+tn)",
+   "unit": "fps",
+   "tol": 0.02,
+   "solution": "f = 1000 / (t_capture + t_inference + t_post). The inference time from the benchmark table is only part of the frame: with 4.57 ms of inference and 12 ms for everything else you get 60 fps, not 219."
+  }
+ ]
+}

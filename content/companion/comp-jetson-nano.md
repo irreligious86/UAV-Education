@@ -35,12 +35,12 @@ next:
 | | Jetson Nano (2019) | Jetson Orin Nano 8 ГБ (Super) |
 |---|---|---|
 | CPU | 4 × Cortex-A57, 1.43 ГГц | 6 × Cortex-A78AE, 1.7 ГГц |
-| GPU | Maxwell, 128 ядер, 472 GFLOPS, без тензорных ядер | Ampere, 1024 ядра, 32 тензорных, 67 TOPS |
+| GPU | Maxwell, 128 ядер, 472 GFLOPS, без тензорных ядер | Ampere, 1024 ядра, 32 тензорных, 67 TOPS (INT8, sparse) |
 | Память | 4 ГБ LPDDR4, общая для CPU и GPU | 8 ГБ LPDDR5, общая |
 | Режимы мощности | 10 Вт (MAXN), 5 Вт | 15 Вт, 25 Вт, MAXN_SUPER (без Super-конфигурации: 15 и 7 Вт) |
 | Аппаратный кодер | есть: 4Kp30 или 4 × 1080p30, H.264/H.265 | **нет NVENC**: 1080p30 программно, ≈ 2 ядра CPU |
-| Система | JetPack 4.6.6, L4T 32.7.6, Ubuntu 18.04, ядро 4.9 | JetPack 6.2, L4T 36.4.3, Ubuntu 22.04 |
-| CUDA / TensorRT | 10.2 / 8.2.1 | 12.6 / 10.3 |
+| Система | JetPack 4.6.6, L4T 32.7.6, Ubuntu 18.04, ядро 4.9 | JetPack 6.2, L4T 36.4.3, Ubuntu 22.04 (версия курса; с 2026 г. Orin поддерживает и JetPack 7.2.x, Jetson Linux 39.2, Ubuntu 24.04) |
+| CUDA / TensorRT | 10.2 / 8.2.1 | 12.6 / 10.3 (JetPack 7.2.1: 13.2 / 10.16) |
 | Питание devkit | 5 В: micro-USB 2 А или гнездо 4 А | гнездо 9–20 В (в комплекте 19 В) |
 | Модуль | 69.6 × 45 мм, SO-DIMM 260 | тот же форм-фактор |
 | Статус | модуль выпускается до января 2027; devkit снят | модуль до января 2032 |
@@ -101,7 +101,7 @@ gst-launch-1.0 nvarguscamerasrc sensor-id=0 \
   ! h264parse ! rtph264pay config-interval=1 pt=96 ! udpsink host=192.168.1.10 port=5600 sync=false
 ```
 
-- **На Orin Nano** кодера нет: вместо `nvv4l2h264enc` ставят `nvvidconv ! 'video/x-raw,format=I420' ! x264enc tune=zerolatency speed-preset=ultrafast bitrate=4000`. В документации NVIDIA `ultrafast` на потоке с камеры 30 к/с даёт 30.66 к/с при 38 % загрузки на ядро (все шесть ядер) — эти ядра уже не достанутся постобработке детектора.
+- **На Orin Nano** кодера нет: вместо `nvv4l2h264enc` ставят `nvvidconv ! 'video/x-raw,format=I420' ! x264enc tune=zerolatency speed-preset=ultrafast bitrate=4000`. В документации NVIDIA (libx264 через libav, а не этот конвейер GStreamer: 10 Мбит/с CBR, разрешение не указано) `ultrafast` на потоке с камеры 30 к/с даёт 30.66 к/с при 38 % загрузки на ядро (все шесть ядер) — эти ядра уже не достанутся постобработке детектора.
 
 Конвейеры на плате не запускались (Jetson нет): свойства кодера сверены с руководством Accelerated GStreamer, свойство `sensor-id` (оно же `sensor_id`) — по примерам JetsonHacks CSI-Camera; имя сенсора и режимы проверь по `gst-inspect-1.0 nvarguscamerasrc` и выводу камеры.
 
@@ -121,7 +121,7 @@ gst-launch-1.0 nvarguscamerasrc sensor-id=0 \
 | Orin Nano Super | YOLO26n | TensorRT INT8 | 3.80 | 263 | Ultralytics |
 | Orin Nano Super | YOLO26s | TensorRT FP16 | 7.17 | 139 | Ultralytics |
 
-Читать таблицу осторожно: это чужие замеры, мы ничего из этого не запускали. Строки Ultralytics — только время инференса без захвата, предобработки и NMS, вход 640 px; Orin Nano Super у них на JetPack 6.1. Строки Q-engineering — к/с их C++-демо: что входит в замер и размер входа там не указаны. Модели разных поколений (YOLOv8 и YOLO26), режим `nvpmodel` ни в одном источнике не указан — сравнивать строки можно только по порядку величины. Вывод всё равно устойчив: Nano с TensorRT даёт на nano-модели 19 к/с — на уровне Pi 5 на одном CPU (14.9 к/с); Orin Nano быстрее на порядок. Собственный бенчмарк NVIDIA 2019 года для Nano (TensorRT FP16): SSD MobileNet-V2 300 × 300 — 39 к/с, Tiny YOLO v3 416 × 416 — 25 к/с.
+Читать таблицу осторожно: это чужие замеры, мы ничего из этого не запускали. Строки Ultralytics — только время инференса без захвата, предобработки и NMS, вход 640 px; Orin Nano Super у них на JetPack 6.1. Строки Q-engineering — к/с их C++-демо, FP16, только инференс (в README: захват кадров, постобработка и отрисовка не учитываются); размер входа не указан. Модели разных поколений (YOLOv8 и YOLO26), режим `nvpmodel` ни в одном источнике не указан — сравнивать строки можно только по порядку величины. Вывод всё равно устойчив: Nano с TensorRT даёт на nano-модели 19 к/с — на уровне Pi 5 на одном CPU (14.9 к/с); Orin Nano быстрее на порядок. Собственный бенчмарк NVIDIA 2019 года для Nano (TensorRT FP16): SSD MobileNet-V2 300 × 300 — 39 к/с, Tiny YOLO v3 416 × 416 — 25 к/с.
 
 ### Что Nano тянет одновременно
 Память общая: в форумной строке под TensorRT занято 3100 из 3957 МБ и ещё 535 МБ в swap — с рабочим столом. Первое действие — headless: `sudo systemctl set-default multi-user.target` (по руководству Ultralytics для Jetson это до ~865 МБ).
@@ -136,7 +136,7 @@ gst-launch-1.0 nvarguscamerasrc sensor-id=0 \
 - На этом UART по умолчанию висит консоль: `sudo systemctl stop nvgetty && sudo systemctl disable nvgetty`, пользователя — в группу `dialout`.
 - ArduPilot: `SERIAL2_PROTOCOL = 2` (MAVLink 2), `SERIAL2_BAUD = 921` (в SITL по умолчанию 57). PX4: `MAV_1_CONFIG = TELEM 2`, `MAV_1_MODE = Onboard`, `SER_TEL2_BAUD = 921600`.
 - Один UART — несколько потребителей: `mavlink-routerd -e 192.168.1.10:14550 /dev/ttyTHS1:921600`, локальные скрипты — к TCP 5760 (модуль «Маршрутизация и транспорт MAVLink»); на стенде хватит `mavproxy.py --master=/dev/ttyTHS1 --baudrate 921600`. Управление из кода — модуль «Companion + ArduPilot».
-- ROS 2: для Ubuntu 18.04 нет бинарных пакетов актуальных дистрибутивов; рабочий путь на Nano — контейнеры `dustynv/ros:humble-ros-base-l4t-r32.7.1` (jetson-containers, нужен JetPack 4.6.1+). На Orin Nano с JetPack 6 Humble ставится из apt.
+- ROS 2: для Ubuntu 18.04 нет бинарных пакетов актуальных дистрибутивов; рабочий путь на Nano — контейнеры `dustynv/ros:humble-ros-base-l4t-r32.7.1` (jetson-containers, нужен JetPack 4.6.1+). На Orin Nano с JetPack 6 Humble ставится из apt (на JetPack 7.x с Ubuntu 24.04 из apt ставится Jazzy).
 
 ### Диск, headless, автозапуск, выключение
 - Nano devkit грузится с microSD (минимум 32 ГБ UHS-1), слота под NVMe нет (M.2 только Key E, под Wi-Fi); с JetPack 4.5 ядро и корневую ФС можно грузить с USB-накопителя (release notes JetPack 4.5), но вставленная microSD имеет приоритет — у нас не проверено. У Orin Nano devkit два слота M.2 Key M под NVMe — логи и видео пиши туда.
@@ -147,7 +147,7 @@ gst-launch-1.0 nvarguscamerasrc sensor-id=0 \
 ### Что выбрать
 {{diagram:jetson-sizing-tree|Выбор от задачи: MAVLink и логика — Pi 5; один небольшой детектор на уже купленном Nano; детектор с трекером — Orin Nano; SLAM и несколько сетей — Orin NX и выше.}}
 
-Pi 5 — 5 В 5 А, свежая система, детектор на CPU до ~15 к/с, аппаратного H.264-кодера тоже нет. Nano выигрывает у него только кодером и CSI-конвейером на GPU. Orin Nano — когда нужно больше 20 к/с, трекер или модель s/m.
+Pi 5 — 5 В 5 А, свежая система, детектор на CPU до ~15 к/с, аппаратного H.264-кодера тоже нет. Nano выигрывает у него только кодером и CSI-конвейером на GPU. Orin Nano — когда нужно больше 20 к/с, трекер или модель s/m. Преемника, Jetson Orin Nano 2, NVIDIA анонсировала 25.08.2026 (78 TOPS, 8 ГБ, 8-ядерный CPU; модуль и devkit ожидаются в первой половине 2027 г.) — в модуле он не рассматривается.
 
 ### Место в системе
 
@@ -419,7 +419,7 @@ WantedBy=multi-user.target
 ### Переход на реальное железо
 Пропеллеры сняты до последнего пункта; полётник на столе, питание Jetson — от лабораторного блока или того BEC, что пойдёт на борт.
 
-1. **Прошивка.** Nano: образ JetPack 4.6.x на microSD ≥ 32 ГБ, первая настройка по micro-USB (`/dev/ttyACM0`), питание в гнездо с перемычкой J48. Orin Nano: JetPack 6.2 по руководству devkit, затем `sudo nvpmodel -q`. Сразу — `sudo systemctl set-default multi-user.target`, запиши свободную память до и после (`free -m`).
+1. **Прошивка.** Nano: образ JetPack 4.6.x на microSD ≥ 32 ГБ, первая настройка по micro-USB (`/dev/ttyACM0`), питание в гнездо с перемычкой J48. Orin Nano: JetPack 6.2 (версия курса) по руководству devkit, затем `sudo nvpmodel -q`. Сразу — `sudo systemctl set-default multi-user.target`, запиши свободную память до и после (`free -m`).
 2. **Питание и тепло по режимам.** Для каждого режима `nvpmodel` (Nano: 0 и 1; Orin: 0, 1, 2): `sudo nvpmodel -m N`, `tegrastats --interval 1000 --logfile mode_N.log`, 20 минут детектора (контейнер Ultralytics, `yolo predict` на видеофайле с engine FP16) в том корпусе, в котором плата полетит. Мультиметром — напряжение на пинах 2/6 гребёнки под нагрузкой. В таблицу: к/с в первую и на двадцатой минуте, средняя и пиковая мощность на входе, максимум температуры, минимум частоты GPU, минимум напряжения.
 3. **UART-петля.** Полётник не подключён, перемычка между пинами 8 и 10, `nvgetty` выключен: отправленная на `/dev/ttyTHS1` строка на 921600 бод должна вернуться (скрипт петли — в модуле «PX4 + Jetson Orin», шаг 2).
 4. **MAVLink к полётнику.** TX→RX, RX→TX, GND; 5 В с TELEM не подключать. `SERIAL2_PROTOCOL = 2`, `SERIAL2_BAUD = 921`, перезагрузка полётника. `python3 cc_health.py --link /dev/ttyTHS1 --baud 921600 --count 60` — уже с настоящим `tegrastats`; затем mavlink-router и юнит из шага 4.
@@ -469,7 +469,7 @@ WantedBy=multi-user.target
   - Что сделать: выключать командой до снятия батареи, логи — на отдельный раздел или накопитель, журнал systemd в RAM (модуль «Raspberry Pi + ArduPilot»).
 
 ## checklist
-- Понятно, какая плата на руках: Nano (JetPack 4.6.x, EOL) или Orin Nano (JetPack 6.x)
+- Понятно, какая плата на руках: Nano (JetPack 4.6.x, EOL) или Orin Nano (JetPack 6.x в курсе; с 2026 г. и 7.2.x)
 - Питание: отдельный BEC, 4.75–5.25 В на входе Nano под пиковым током, перемычка J48 по назначению
 - Режим `nvpmodel` выбран и записан; headless-загрузка включена
 - 20 минут под детектором в полётном корпусе: без троттлинга, запас ≥ 10 °C
@@ -497,8 +497,8 @@ WantedBy=multi-user.target
 - Jetson Orin Nano Developer Kit User Guide — Hardware Layout | https://docs.nvidia.com/jetson/orin-nano-devkit/user-guide/latest/hardware_layout.html | primary | A
 - Getting Started with Jetson Nano Developer Kit (microSD, headless) | https://developer.nvidia.com/embedded/learn/get-started-jetson-nano-devkit | primary | A
 - Jetson Nano Brings AI Computing to Everyone (бенчмарки NVIDIA, кодер) | https://developer.nvidia.com/blog/jetson-nano-ai-computing/ | primary | B
-- ArduPilot 4.6.3 — GCS_Common.cpp, handle_named_value → NVAL | https://github.com/ArduPilot/ardupilot/blob/Copter-4.6.3/libraries/GCS_MAVLink/GCS_Common.cpp | primary | A
-- PX4 1.17 — mavlink_receiver.cpp, NAMED_VALUE_FLOAT → debug_key_value | https://github.com/PX4/PX4-Autopilot/blob/v1.17.0/src/modules/mavlink/mavlink_receiver.cpp | primary | A
+- ArduPilot 4.7.3 — GCS_Common.cpp, handle_named_value → NVAL | https://github.com/ArduPilot/ardupilot/blob/Copter-4.7.3/libraries/GCS_MAVLink/GCS_Common.cpp | primary | A
+- PX4 1.18 — mavlink_receiver.cpp, NAMED_VALUE_FLOAT → debug_key_value | https://github.com/PX4/PX4-Autopilot/blob/v1.18.0/src/modules/mavlink/mavlink_receiver.cpp | primary | A
 - MAVLink common.xml (NAMED_VALUE_FLOAT, MAV_COMP_ID_ONBOARD_COMPUTER, MAV_CMD_PREFLIGHT_REBOOT_SHUTDOWN) | https://github.com/mavlink/mavlink/blob/master/message_definitions/v1.0/common.xml | primary | A
 - ArduPilot Dev — Companion Computers | https://ardupilot.org/dev/docs/companion-computers.html | primary | A
 - mavlink-router — исходники и README | https://github.com/mavlink-router/mavlink-router | primary | A

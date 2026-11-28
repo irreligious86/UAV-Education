@@ -1,0 +1,94 @@
+{
+  "module": "per-vision-pipeline",
+  "pass": 80,
+  "questions": [
+    {
+      "q": "Which timestamp should go into LANDING_TARGET.time_usec and be used to pick the ATTITUDE for georeferencing?",
+      "options": [
+        "The frame's moment of exposure on the companion's clock",
+        "The moment the message is sent, on the companion's clock",
+        "The Unix time at which the V4L2 driver on the companion received the frame buffer",
+        "The time_boot_ms of the last HEARTBEAT received"
+      ],
+      "answer": 0,
+      "explain": "The attitude is needed at the moment the light hit the sensor. Everything else (processing, sending) is latency, which the autopilot compensates from its history (PLND_LAG), but only if the timestamp is honest."
+    },
+    {
+      "q": "The companion sends velocities in GUIDED through SET_POSITION_TARGET_LOCAL_NED and goes silent. What does ArduCopter 4.6 do by default?",
+      "options": [
+        "Keeps flying at the last velocity until the pilot changes mode on the radio",
+        "After GUID_TIMEOUT = 3 s zeroes the target velocity and hovers in GUIDED",
+        "Switches to LOITER immediately",
+        "Performs RTL after FS_GCS_TIMEOUT"
+      ],
+      "answer": 1,
+      "explain": "mode_guided.cpp: if the setpoint has not been updated for longer than GUID_TIMEOUT, guided_vel_target is zeroed; the mode stays GUIDED. Switching to Loiter is the job of the companion's interlock."
+    },
+    {
+      "q": "Which type_mask leaves only the vx, vy, vz velocities in SET_POSITION_TARGET_LOCAL_NED?",
+      "options": [
+        "0b0000_0000_0111 = 7",
+        "0b1101_1100_0111 = 3527",
+        "0b1111_1111_1000 = 4088",
+        "0b0000_0011_1000 = 56"
+      ],
+      "answer": 1,
+      "explain": "Ones in the mask mean \"ignore\": position (7) + acceleration (448) + yaw (1024) + yaw_rate (2048) = 3527; the velocity bits 8/16/32 are zero."
+    },
+    {
+      "q": "A nadir camera, AGL 15 m, the roll changes at 25°/s. The attitude was taken 100 ms after the exposure. The error of the point on the ground is on the order of:",
+      "options": [
+        "0.07 m",
+        "0.65 m",
+        "2.5 m",
+        "6.5 m"
+      ],
+      "answer": 1,
+      "explain": "δ ≈ h·ω·Δt = 15·(25°/s·0.1 s = 2.5° = 0.044 rad) ≈ 0.65 m. It is time and attitude, not the camera, that limit the accuracy."
+    },
+    {
+      "q": "The detector outputs one orange disc (the target) and one similar rock. Which of these does NOT help the tracker stay on the target?",
+      "options": [
+        "Locking one ID and reacquiring only within a radius of the last position",
+        "Choosing, on every frame, the track with the most hits",
+        "A size gate for the object derived from the flight altitude",
+        "Confirming a track with three frames in a row"
+      ],
+      "answer": 1,
+      "explain": "The stationary rock is always visible and accumulates hits while the target gets lost in shadow and behind the occlusion, so the \"max hits\" rule switches tracking to it (in the lab: 16 false frames during the occlusion against 3 with a single locked ID)."
+    },
+    {
+      "q": "What does ArduCopter 4.6 require of a LANDING_TARGET with position_valid = 1?",
+      "options": [
+        "frame = MAV_FRAME_LOCAL_NED and a filled-in quaternion q",
+        "frame = MAV_FRAME_BODY_FRD and distance > 0",
+        "angle_x/angle_y instead of x, y, z",
+        "type = LANDING_TARGET_TYPE_LIGHT_BEACON"
+      ],
+      "answer": 1,
+      "explain": "AC_PrecLand_Companion::handle_msg: the x, y, z vector is divided by distance; with any other frame you get \"Plnd: Frame not supported\", and with distance ≤ 0 the message is discarded."
+    },
+    {
+      "q": "FOLLOW mode in ArduCopter 4.6: where does it get the target's position, and what happens if the messages stop?",
+      "options": [
+        "From LANDING_TARGET sent by the companion; after 1 s without messages it starts landing per PLND_STRICT",
+        "From GLOBAL_POSITION_INT or FOLLOW_TARGET from sysid FOLL_SYSID; after 3 s without them it stops and hovers",
+        "From SET_POSITION_TARGET_GLOBAL_INT; after GUID_TIMEOUT = 3 s it switches to RTL per FS_GCS_ENABLE",
+        "From GPS_INPUT with sysid FOLL_SYSID; it keeps flying at the target's last velocity until FOLL_DIST_MAX"
+      ],
+      "answer": 1,
+      "explain": "AP_Follow::handle_msg accepts both messages from sysid FOLL_SYSID (0 means the first one seen). The timeout is 3 s: in 4.7 this is the FOLL_TIMEOUT parameter (default 3 s), in 4.6 the value is hard-coded in AP_FOLLOW_TIMEOUT_MS."
+    },
+    {
+      "q": "A pipeline on a Pi: capture 8 ms, undistort 6, YOLO 60, tracker 1, georeferencing 1, MAVLink 5. A camera with 25 ms of exposure and readout. What is the glass-to-command latency, and what is the cheapest thing to cut?",
+      "options": [
+        "106 ms; cut capture by switching from a USB camera to CSI",
+        "81 ms; remove undistort",
+        "106 ms; detection every 2–3 frames, tracker in between",
+        "131 ms; reduce exposure to 1 ms"
+      ],
+      "answer": 2,
+      "explain": "25 + 8 + 6 + 60 + 1 + 1 + 5 = 106 ms; 57 % is inference. Detecting every other frame with the tracker on every frame halves the inference load, and a command still goes out on every frame: on frames without a detection the path is shorter (≈ 46 ms). But the age of the detection itself does not decrease; between detections the tracker only extrapolates. Undistort can be kept for the point only."
+    }
+  ]
+}

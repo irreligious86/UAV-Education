@@ -3,29 +3,29 @@
   "pass": 80,
   "questions": [
     {
-      "q": "Why can't the heartbeat be sent only from an EdgeTX widget's refresh()?",
+      "q": "Why must the heartbeat not be sent only from an EdgeTX widget's refresh()?",
       "options": [
         "refresh() is called once per second",
-        "refresh() runs only when the widget is visible",
-        "There is no refresh() in EdgeTX",
+        "refresh() runs only while the widget is visible",
+        "EdgeTX has no refresh()",
         "The license forbids it"
       ],
       "answer": 1,
-      "explain": "Hide the screen and the link is gone. Call a shared tick() from refresh() and background()."
+      "explain": "Hide the screen and the link is gone. Call a shared tick() from both refresh() and background()."
     },
     {
-      "q": "What does serialRead() read with no argument?",
+      "q": "What does serialRead() read when called without an argument?",
       "options": [
         "One byte",
         "Up to the newline",
         "Nothing",
-        "The whole receive buffer"
+        "The entire receive buffer at once"
       ],
       "answer": 1,
-      "explain": "A “one line = one message” protocol fits it naturally."
+      "explain": "A line-based \"one line, one message\" protocol maps onto it naturally."
     },
     {
-      "q": "The undefined state of a radio companion should be…",
+      "q": "The undefined state of the radio companion must be…",
       "options": [
         "CONFIG with Wi-Fi",
         "FLIGHT without Wi-Fi",
@@ -33,10 +33,10 @@
         "Anything"
       ],
       "answer": 1,
-      "explain": "The access point comes up only after an explicit “disarmed” from the radio."
+      "explain": "The access point comes up only after an explicit \"disarmed\" from the radio."
     },
     {
-      "q": "How do you verifiably turn off Wi-Fi on an ESP32?",
+      "q": "How do you turn Wi-Fi off on an ESP32 verifiably?",
       "options": [
         "Lower the TX power",
         "WIFI_OFF + esp_wifi_stop()",
@@ -47,18 +47,18 @@
       "explain": "Turning it off must be an action, not an assumption."
     },
     {
-      "q": "What should you check before connecting the radio's UART to the ESP32?",
+      "q": "What do you check before connecting the radio's UART to the ESP32?",
       "options": [
-        "Internet speed",
-        "Levels and a common GND",
+        "The internet speed",
+        "Logic levels and a common GND",
         "The Lua version",
         "The VTX channel"
       ],
       "answer": 1,
-      "explain": "It is usually 3.3 V on both sides, but checking is mandatory."
+      "explain": "Usually 3.3 V on both sides, but checking is mandatory."
     },
     {
-      "q": "Where should the protection against writing settings in flight be?",
+      "q": "Where must the in-flight settings write protection be?",
       "options": [
         "Only in Lua",
         "Only in the ESP32 firmware",
@@ -66,29 +66,29 @@
         "Nowhere"
       ],
       "answer": 2,
-      "explain": "Defense in depth: each side checks arm independently."
+      "explain": "Defense in depth: each side checks the arm state independently."
     },
     {
-      "q": "Why is an onboard Wi-Fi bridge turned off in flight?",
+      "q": "Why is an onboard Wi-Fi bridge switched off in flight?",
       "options": [
         "The module heats up inside the radio case",
-        "It interferes with ELRS 2.4 GHz",
-        "There is no power",
+        "It interferes with 2.4 GHz ELRS",
+        "There is no power for it",
         "The law requires it"
       ],
       "answer": 1,
-      "explain": "For setup on the ground it is acceptable."
+      "explain": "For ground configuration it is fine."
     },
     {
-      "q": "How does an ESP32 pass its own rangefinder to ArduPilot?",
+      "q": "How does an ESP32 hand its own rangefinder to ArduPilot?",
       "options": [
         "Over I2C",
         "DISTANCE_SENSOR over MAVLink",
-        "It can't",
-        "Through a PWM input of the flight controller"
+        "It cannot",
+        "Through a PWM input on the flight controller"
       ],
       "answer": 1,
-      "explain": "DISTANCE_SENSOR and RNGFND1_TYPE = 10 (MAVLink); the rangefinder is used by the EKF and landing."
+      "explain": "DISTANCE_SENSOR and RNGFND1_TYPE = 10 (MAVLink); the EKF and landing use the rangefinder."
     }
   ]
 }

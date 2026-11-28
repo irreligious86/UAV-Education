@@ -1,0 +1,30 @@
+{
+  "module": "eng-ci-configs",
+  "tasks": [
+    {
+      "id": "rtl-margin-legacy",
+      "title": "RTL margin on a legacy config",
+      "statement": "The repository holds a `.param` from firmware before 4.7: `RTL_ALT = {x}`. In `fleet.yaml` the site has `obstacle_m: {h}`. By how many meters is the return altitude above the obstacles (a negative number means below)?",
+      "params": {
+        "x": [
+          1500,
+          2000,
+          2500,
+          3000,
+          4000,
+          5000
+        ],
+        "h": {
+          "min": 10,
+          "max": 40,
+          "step": 5
+        }
+      },
+      "answer": "x/100 - h",
+      "unit": "m",
+      "tol": 0.001,
+      "abs": 0.05,
+      "solution": "Before ArduPilot 4.7 the parameter was called `RTL_ALT` and was in centimeters; in 4.7 it is `RTL_ALT_M`, in meters. Margin = RTL_ALT/100 − obstacle_m. A rule that compares `RTL_ALT` with meters without dividing by 100 lets any config through (1500 \"m\" is higher than any obstacle)."
+    }
+  ]
+}

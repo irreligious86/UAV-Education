@@ -76,7 +76,7 @@ next:
 - `GLOBAL_POSITION_INT.relative_alt` — высота над точкой взлёта, а не над землёй под целью. На склоне нужен дальномер (`DISTANCE_SENSOR`, с поправкой на наклон) или карта высот.
 
 ### Что слать автопилоту
-| Интерфейс | Когда | ArduPilot 4.7 | PX4 1.17 |
+| Интерфейс | Когда | ArduPilot 4.7 | PX4 1.18 |
 |---|---|---|---|
 | `LANDING_TARGET` | точная посадка, Precision Loiter | `PLND_ENABLED = 1`, `PLND_TYPE = 1`; углы `angle_x/angle_y` либо `position_valid = 1`, frame `MAV_FRAME_BODY_FRD`, `distance > 0`; `PLND_LAG` (0.02–0.25 с) = твоя glass-to-command | с `position_valid = 1` — только `MAV_FRAME_LOCAL_NED` и `x, y, z`; с `position_valid = 0` углы идут как `irlock_report`; `PLD_BTOUT`, `PLD_SRCH_ALT` |
 | `SET_POSITION_TARGET_LOCAL_NED`, скорости | слежение своим регулятором | GUIDED, `type_mask = 3527`; без обновлений `GUID_TIMEOUT` (3 с) → скорость 0 | Offboard, поток ≥ 2 Гц; `COM_OF_LOSS_T`, действие `COM_OBL_RC_ACT` |
@@ -89,7 +89,7 @@ next:
 2. **Автопилот:** `GUID_TIMEOUT`; геозона `FENCE_ENABLE`, `FENCE_TYPE`, `FENCE_RADIUS`, `FENCE_ALT_MAX`, `FENCE_ACTION`; `AVOID_ENABLE` (по умолчанию 3) останавливает GUIDED-скорость за `FENCE_MARGIN` (2 м) до границы геозоны (`AVOID_MARGIN` — запас до препятствий по дальномерам, не до геозоны). В PX4 — `GF_ACTION`, `GF_MAX_HOR_DIST`, `MPC_XY_VEL_MAX`.
 3. **Пилот:** переключатель режима обрывает контур; companion после смены режима перестаёт слать команды.
 
-Два факта из лабораторной. ArduCopter **не ограничивает** GUIDED-скорость параметром `WP_SPD` (до 4.7 — `WPNAV_SPEED`, см/с): в прогоне на 4.6.3 при `WPNAV_SPEED = 300` (3 м/с) команда 6 м/с исполняется как 6.1 м/с, в исходнике 4.7.2 путь скоростной цели тот же — лимит обязан стоять на companion. И LOITER держит высоту только при газе в середине: без пилота с пультом таймаут должен вести в BRAKE или оставаться нулевой скоростью в GUIDED.
+Два факта из лабораторной. ArduCopter **не ограничивает** GUIDED-скорость параметром `WP_SPD` (до 4.7 — `WPNAV_SPEED`, см/с): в прогоне на 4.6.3 при `WPNAV_SPEED = 300` (3 м/с) команда 6 м/с исполняется как 6.1 м/с, в исходнике 4.7.3 путь скоростной цели тот же — лимит обязан стоять на companion. И LOITER держит высоту только при газе в середине: без пилота с пультом таймаут должен вести в BRAKE или оставаться нулевой скоростью в GUIDED.
 
 ### Место в системе
 
@@ -211,7 +211,7 @@ heartbeat from sysid 1, firmware: 4.6.3
    3 s later, still sending 3 m/s north: pos=(+54.4,+0.2) m v=(-2.6,-0.0) m/s mode=RTL
 ```
 
-Три вывода. `WPNAV_SPEED = 300` (прогон на 4.6.3; в 4.7 — `WP_SPD = 3`) скорость GUIDED не ограничил: 6.1 м/с. Замолчавший companion обходится в `GUID_TIMEOUT` секунд полёта с последней скоростью — в логе 5.3 м при 1.5 м/с (30.1 → 35.4 м), при 6 м/с это 18 м, поэтому свой watchdog на 0.5 с обязателен. Геозона для GUIDED-скорости работает как стена: аппарат остановился на 58.0 м при радиусе 60 (`AVOID_MARGIN` 2 м) и остался в GUIDED; пересечённая граница даёт «Circle fence breached» и RTL, команды companion после этого игнорируются.
+Три вывода. `WPNAV_SPEED = 300` (прогон на 4.6.3; в 4.7 — `WP_SPD = 3`) скорость GUIDED не ограничил: 6.1 м/с. Замолчавший companion обходится в `GUID_TIMEOUT` секунд полёта с последней скоростью — в логе 5.3 м при 1.5 м/с (30.1 → 35.4 м), при 6 м/с это 18 м, поэтому свой watchdog на 0.5 с обязателен. Геозона для GUIDED-скорости работает как стена: аппарат остановился на 58.0 м при радиусе 60 (`FENCE_MARGIN` 2 м) и остался в GUIDED; пересечённая граница даёт «Circle fence breached» и RTL, команды companion после этого игнорируются.
 
 ### Переход на реальное железо
 1. **Калибровка и метка времени.** Шахматная доска, 20+ кадров, RMS репроекции < 1 px (per-geometry); `K` и `dist` — в `pipeline.py`. Задержку камеры измерь светодиодом (per-camera) — это поправка метки кадра.
@@ -236,7 +236,7 @@ heartbeat from sysid 1, firmware: 4.6.3
   - Последствия: 18 м пути при 6 м/с.
   - Что сделать: `GUID_TIMEOUT` 0.5–1 с; watchdog отдельным процессом или systemd; геозона включена.
 - **Симптом:** запрошено 6 м/с — летит 6 м/с при `WP_SPD = 3`
-  - Возможная причина: `WP_SPD` не ограничивает скорости `SET_POSITION_TARGET_LOCAL_NED` (измерено на ArduCopter 4.6.3, код 4.7.2 тот же).
+  - Возможная причина: `WP_SPD` не ограничивает скорости `SET_POSITION_TARGET_LOCAL_NED` (измерено на ArduCopter 4.6.3, код 4.7.3 тот же).
   - Что сделать: лимит `v_max` на companion, проверка в SITL до полёта.
 - **Симптом:** после таймаута аппарат в LOITER снижается
   - Возможная причина: стик газа внизу или пульта нет.
@@ -258,17 +258,17 @@ heartbeat from sysid 1, firmware: 4.6.3
 
 ## references
 - ArduPilot Dev — Copter Commands in Guided Mode (type_mask 3527, остановка через 3 с) | https://ardupilot.org/dev/docs/copter-commands-in-guided-mode.html | primary | A
-- ArduPilot source — GUIDED velocity control and timeout (`ArduCopter/mode_guided.cpp`, Copter-4.6.3) | https://github.com/ArduPilot/ardupilot/blob/Copter-4.6.3/ArduCopter/mode_guided.cpp | primary | A
-- ArduPilot source — AP_Follow: messages, FOLL_* parameters, 3 s timeout | https://github.com/ArduPilot/ardupilot/blob/Copter-4.6.3/libraries/AP_Follow/AP_Follow.cpp | primary | A
-- ArduPilot source — LANDING_TARGET handling in the companion backend | https://github.com/ArduPilot/ardupilot/blob/Copter-4.6.3/libraries/AC_PrecLand/AC_PrecLand_Companion.cpp | primary | A
-- ArduPilot source — fence avoidance for velocity commands (AVOID_ENABLE, FENCE_MARGIN) | https://github.com/ArduPilot/ardupilot/blob/Copter-4.6.3/libraries/AC_Avoidance/AC_Avoid.cpp | primary | A
+- ArduPilot source — GUIDED velocity control and timeout (`ArduCopter/mode_guided.cpp`, Copter-4.7.3) | https://github.com/ArduPilot/ardupilot/blob/Copter-4.7.3/ArduCopter/mode_guided.cpp | primary | A
+- ArduPilot source — AP_Follow: messages, FOLL_* parameters, 3 s timeout | https://github.com/ArduPilot/ardupilot/blob/Copter-4.7.3/libraries/AP_Follow/AP_Follow.cpp | primary | A
+- ArduPilot source — LANDING_TARGET handling in the MAVLink backend (`AC_PrecLand_MAVLink.cpp`, `AC_PrecLand_Companion.cpp` before 4.7) | https://github.com/ArduPilot/ardupilot/blob/Copter-4.7.3/libraries/AC_PrecLand/AC_PrecLand_MAVLink.cpp | primary | A
+- ArduPilot source — fence avoidance for velocity commands (AVOID_ENABLE, FENCE_MARGIN) | https://github.com/ArduPilot/ardupilot/blob/Copter-4.7.3/libraries/AC_Avoidance/AC_Avoid.cpp | primary | A
 - ArduPilot Copter — Precision Landing and Loiter (PLND_*) | https://ardupilot.org/copter/docs/precision-landing-and-loiter.html | primary | A
 - ArduPilot Copter — Follow Mode | https://ardupilot.org/copter/docs/follow-mode.html | primary | A
 - MAVLink — Common message set (LANDING_TARGET, SET_POSITION_TARGET_LOCAL_NED, FOLLOW_TARGET, TIMESYNC) | https://mavlink.io/en/messages/common.html | primary | A
 - MAVLink — Time Synchronization Protocol | https://mavlink.io/en/services/timesync.html | primary | A
-- PX4 — Offboard Mode (2 Гц proof of life, COM_OF_LOSS_T, COM_OBL_RC_ACT) | https://docs.px4.io/v1.17/en/flight_modes/offboard.html | primary | A
-- PX4 — Precision Landing (LANDING_TARGET в MAV_FRAME_LOCAL_NED, PLD_*) | https://docs.px4.io/v1.17/en/advanced_features/precland.html | primary | A
-- PX4 source — `mavlink_receiver.cpp`, handle_message_landing_target (v1.17.0) | https://github.com/PX4/PX4-Autopilot/blob/v1.17.0/src/modules/mavlink/mavlink_receiver.cpp | primary | A
+- PX4 — Offboard Mode (2 Гц proof of life, COM_OF_LOSS_T, COM_OBL_RC_ACT; v1.18.0 docs source) | https://github.com/PX4/PX4-Autopilot/blob/v1.18.0/docs/en/flight_modes/offboard.md | primary | A
+- PX4 — Precision Landing (LANDING_TARGET в MAV_FRAME_LOCAL_NED, PLD_*; v1.18.0 docs source) | https://github.com/PX4/PX4-Autopilot/blob/v1.18.0/docs/en/advanced_features/precland.md | primary | A
+- PX4 source — `mavlink_receiver.cpp`, handle_message_landing_target (v1.18.0) | https://github.com/PX4/PX4-Autopilot/blob/v1.18.0/src/modules/mavlink/mavlink_receiver.cpp | primary | A
 - Linux kernel — V4L2 buffer: timestamp, TIMESTAMP_MONOTONIC, TSTAMP_SRC_EOF/SOE | https://docs.kernel.org/userspace-api/media/v4l/buffer.html | primary | A
 - OpenCV — Camera calibration With OpenCV | https://docs.opencv.org/4.x/d4/d94/tutorial_camera_calibration.html | primary | B
 - Bewley et al. — Simple Online and Realtime Tracking (SORT), 2016 | https://arxiv.org/abs/1602.00763 | primary | B

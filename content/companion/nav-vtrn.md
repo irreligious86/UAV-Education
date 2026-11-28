@@ -182,7 +182,7 @@ $ python3 sitl_vtrn.py tcp:127.0.0.1:5790
 ### Шаг 6. Потеря GNSS, ложная привязка, возврат
 Маршрут: взлёт на 100 м, 400 м на север с GNSS (зрение в тени), `SIM_GPS1_ENABLE = 0` (в прогоне на 4.6.3 — `SIM_GPS_DISABLE = 1`), 250 м на восток и 400 м на юг на зрении, затем RTL.
 
-Вывод снят на Copter-4.6.3; в 4.7.2 `SIM_GPS_DISABLE = 1` называется `SIM_GPS1_ENABLE = 0`.
+Вывод снят на Copter-4.6.3; в 4.7.x `SIM_GPS_DISABLE = 1` называется `SIM_GPS1_ENABLE = 0` — `sitl_vtrn.py` сам проверяет, какой из двух параметров есть в прошивке, и останавливается с ошибкой, если аппарат его не принял.
 
 ```text
   A: reached in 43 s; EKF-vs-truth error mean 0.23 m, max 0.30 m; GPS2(vision)-vs-truth mean 2.19 m, max 3.38 m
@@ -202,7 +202,7 @@ $ python3 sitl_vtrn.py tcp:127.0.0.1:5790
    vision estimate vs truth at frame time (TRACKING): median 0.44 m, p90 0.77 m, max 2.14 m; heading correction learned from the map +2.0 deg
 ```
 
-Что записать. (1) Колонка `GPS2(vision)-vs-truth` 2.2 м — это возраст измерения: `GPS2_RAW` описывает середину шага VO, 0.2–0.3 с назад при 10 м/с; ошибка самой оценки на момент кадра — 0.44 м. (2) После потери GNSS EKF держит истину в пределах 2 м. (3) Ложные +60 м на 4 с EKF не принял: флаг `EKF_GPS_GLITCHING` (0x8000), ошибка выросла с 0.4 до 1.8 м на инерциалке и вернулась после `Glitch cleared`. (4) RTL привёл к точке взлёта с ошибкой около 1 м на 100 м высоты; последние 45 м — набор `EK3_SRC2` (поток + дальномер), касание в 4.1 м. В dataflash-логе то же самое:
+Что записать. (1) Колонка `GPS2(vision)-vs-truth` 2.2 м — это возраст измерения: `GPS2_RAW` описывает середину шага VO, 0.2–0.3 с назад при 10 м/с; ошибка самой оценки на момент кадра — 0.44 м. (2) После потери GNSS EKF держит истину в пределах 2 м. (3) Ложные +60 м на 4 с EKF не принял: флаг `EKF_GPS_GLITCHING` (0x8000), ошибка выросла с 0.4 до 1.8 м на инерциалке и вернулась после `Glitch cleared`. (4) RTL привёл к точке взлёта с ошибкой около 1 м на 100 м высоты; последние 45 м — набор `EK3_SRC2` (поток + дальномер), касание в 4.1 м. В dataflash-логе то же самое (`python3 dfsum.py sitl3/logs/00000001.BIN`, в `examples/nav-vtrn/`):
 
 ```text
 on GPS2 (vision) from t = 127.7 s: 1498 XKF4 samples, SP max 8.13, SP median 0.04, SV max 0.95; samples with SP > 1: 42; |IPE| max 60.2 m
@@ -224,7 +224,7 @@ on GPS2 (vision) from t = 127.7 s: 1498 XKF4 samples, SP max 8.13, SP median 0.0
 5. **Теневой режим в полёте**: `GPS2_TYPE = 14`, GNSS основной (у зрения 8 «спутников»). Приёмка по логу: `GPS[1]` в пределах 5 м от `GPS[0]` 95 % времени, интервал сообщений 200 ± 45 мс.
 6. **Живой режим** — только после п. 4 и 5, пропы установлены: высота ≥ 60 м над полем без людей, геозона, `FS_EKF_ACTION = 1`, пилот готов уйти в AltHold. GNSS не глушить: `GPS_AUTO_SWITCH = 0`, `GPS_PRIMARY = 1` переводят EKF на зрение, а настоящий приёмник остаётся в логе эталоном. Прерывание: `EKF variance`, `GPS Glitch` дольше 10 с, расхождение с GNSS > 10 м.
 
-Самопроверка: лабораторная выполнена, когда (SITL-путь): есть своя таблица ошибки VO для трёх прогонов, сходящаяся с таблицей шага 2 (в конце маршрута порядка 6, 28 и 293 м), и график «ошибка — путь» с названными причинами дрейфа (ошибка AGL — масштаб, интегрированный курс — срыв в повороте, озеро — отказы VO); медиана ошибки привязок ≤ 0.5 м, найдена привязка с ошибкой > 3σ; арминг с `GPS2_TYPE = 14` прошёл, после `SIM_GPS1_ENABLE = 0` маршрут и RTL пройдены с ошибкой EKF против истины ≤ 3 м на рабочей высоте; ложная привязка +60 м отброшена (`GPS Glitch`, в логе `XKF4.SP` > 1), воспроизведён хотя бы один отказ из шага 7. (Железо): офлайн-прогон записи укладывается в критерии п. 4, теневой режим — в критерии п. 5; живой режим не обязателен.
+Самопроверка: лабораторная выполнена, когда (SITL-путь): есть своя таблица ошибки VO для трёх прогонов, сходящаяся с таблицей шага 2 (в конце маршрута порядка 6, 28 и 293 м), и график «ошибка — путь» с названными причинами дрейфа (ошибка AGL — масштаб, интегрированный курс — срыв в повороте, озеро — отказы VO); медиана ошибки привязок ≤ 0.5 м, найдена привязка с ошибкой > 3σ; арминг с `GPS2_TYPE = 14` прошёл, после `SIM_GPS_DISABLE = 1` (4.6.3; с 4.7 — `SIM_GPS1_ENABLE = 0`) маршрут и RTL пройдены с ошибкой EKF против истины ≤ 3 м на рабочей высоте; ложная привязка +60 м отброшена (`GPS Glitch`, в логе `XKF4.SP` > 1), воспроизведён хотя бы один отказ из шага 7. (Железо): офлайн-прогон записи укладывается в критерии п. 4, теневой режим — в критерии п. 5; живой режим не обязателен.
 
 ## diagnostics
 - **Симптом:** `PreArm: GPS 2: not healthy`, арминг отказан, хотя `GPS2_RAW.fix_type = 3`
@@ -264,15 +264,15 @@ on GPS2 (vision) from t = 127.7 s: 1498 XKF4 samples, SP max 8.13, SP median 0.0
 
 ## references
 - MAVLink common message set — GPS_INPUT (#232), VISION_POSITION_ESTIMATE (#102), GPS_INPUT_IGNORE_FLAGS | https://mavlink.io/en/messages/common.html | primary | A
-- ArduPilot source — MAVLink GPS driver, обработка GPS_INPUT (`libraries/AP_GPS/AP_GPS_MAV.cpp`) | https://github.com/ArduPilot/ardupilot/blob/Copter-4.6.3/libraries/AP_GPS/AP_GPS_MAV.cpp | primary | A
-- ArduPilot source — здоровье приёмника, UseBest, all_consistent (`libraries/AP_GPS/AP_GPS.cpp`) | https://github.com/ArduPilot/ardupilot/blob/Copter-4.6.3/libraries/AP_GPS/AP_GPS.cpp | primary | A
-- ArduPilot source — pre-arm проверки GPS (`libraries/AP_Arming/AP_Arming.cpp`) | https://github.com/ArduPilot/ardupilot/blob/Copter-4.6.3/libraries/AP_Arming/AP_Arming.cpp | primary | A
-- ArduPilot source — шум измерения GPS и ворота в EKF3 (`libraries/AP_NavEKF3/AP_NavEKF3_PosVelFusion.cpp`) | https://github.com/ArduPilot/ardupilot/blob/Copter-4.6.3/libraries/AP_NavEKF3/AP_NavEKF3_PosVelFusion.cpp | primary | A
+- ArduPilot source — MAVLink GPS driver, обработка GPS_INPUT (`libraries/AP_GPS/AP_GPS_MAV.cpp`) | https://github.com/ArduPilot/ardupilot/blob/Copter-4.7.3/libraries/AP_GPS/AP_GPS_MAV.cpp | primary | A
+- ArduPilot source — здоровье приёмника, UseBest, all_consistent (`libraries/AP_GPS/AP_GPS.cpp`) | https://github.com/ArduPilot/ardupilot/blob/Copter-4.7.3/libraries/AP_GPS/AP_GPS.cpp | primary | A
+- ArduPilot source — pre-arm проверки GPS (`libraries/AP_Arming/AP_Arming.cpp`) | https://github.com/ArduPilot/ardupilot/blob/Copter-4.7.3/libraries/AP_Arming/AP_Arming.cpp | primary | A
+- ArduPilot source — шум измерения GPS и ворота в EKF3 (`libraries/AP_NavEKF3/AP_NavEKF3_PosVelFusion.cpp`) | https://github.com/ArduPilot/ardupilot/blob/Copter-4.7.3/libraries/AP_NavEKF3/AP_NavEKF3_PosVelFusion.cpp | primary | A
 - ArduPilot Copter — EKF Source Selection and Switching (EK3_SRCn_*, RCx_OPTION 90, MAV_CMD_SET_EKF_SOURCE_SET) | https://ardupilot.org/copter/docs/common-ekf-sources.html | primary | A
 - ArduPilot Copter — Non-GPS Navigation | https://ardupilot.org/copter/docs/common-non-gps-navigation-landing-page.html | primary | A
-- PX4 source — параметры EKF2_EV_*, EKF2_AGP_* (`src/modules/ekf2/params_external_vision.yaml`, `params_aux_global_position.yaml`, v1.17.0) | https://github.com/PX4/PX4-Autopilot/tree/v1.17.0/src/modules/ekf2 | primary | A
-- PX4 source — приёмник MAVLink: VISION_POSITION_ESTIMATE, ODOMETRY (`src/modules/mavlink/mavlink_receiver.cpp`, v1.17.0) | https://github.com/PX4/PX4-Autopilot/blob/v1.17.0/src/modules/mavlink/mavlink_receiver.cpp | primary | A
-- PX4 User Guide — Using PX4's Navigation Filter (EKF2): External Vision System | https://docs.px4.io/v1.17/en/advanced_config/tuning_the_ecl_ekf.html | primary | A
+- PX4 source — параметры EKF2_EV_*, EKF2_AGP_* (`src/modules/ekf2/params_external_vision.yaml`, `params_aux_global_position.yaml`, v1.18.0) | https://github.com/PX4/PX4-Autopilot/tree/v1.18.0/src/modules/ekf2 | primary | A
+- PX4 source — приёмник MAVLink: VISION_POSITION_ESTIMATE, ODOMETRY (`src/modules/mavlink/mavlink_receiver.cpp`, v1.18.0) | https://github.com/PX4/PX4-Autopilot/blob/v1.18.0/src/modules/mavlink/mavlink_receiver.cpp | primary | A
+- PX4 User Guide — Using PX4's Navigation Filter (EKF2): External Vision System (v1.18.0 docs source) | https://github.com/PX4/PX4-Autopilot/blob/v1.18.0/docs/en/advanced_config/tuning_the_ecl_ekf.md | primary | A
 - OpenCV — Camera Calibration and 3D Reconstruction: findHomography, RANSAC | https://docs.opencv.org/4.x/d9/d0c/group__calib3d.html | primary | A
 - OpenCV — ORB (Oriented FAST and Rotated BRIEF) | https://docs.opencv.org/4.x/d1/d89/tutorial_py_orb.html | primary | A
 - DeTone, Malisiewicz, Rabinovich — SuperPoint: Self-Supervised Interest Point Detection and Description (2018) | https://arxiv.org/abs/1712.07629 | primary | B

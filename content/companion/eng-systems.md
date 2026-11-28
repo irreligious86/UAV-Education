@@ -105,7 +105,7 @@ Alternatives: LiPo 6S 8000 (heavier, hover ~18 A, 21 min at 80 % DoD), hybrid (o
 
 {{diagram:eng-verify-method-tree|Метод проверки выбирают по трём вопросам: видно ли свойство без работы изделия, можно ли его безопасно запустить и нужно ли число с допуском; SITL попадает в анализ, поэтому требование безопасности им одним не закрывается.}}
 
-Часть анализа уже написана за тебя. В ArduPilot 4.7.2 есть набор автотестов SITL (`Tools/autotest/`), и для требования вида `R-SAF-01` готов тест `ThrottleFailsafe` (`Tools/autotest/arducopter.py:897`). Он, среди прочего, включает `SIM_RC_FAIL` = 1 и проверяет реакцию прошивки. Запускается один тест так: `./Tools/autotest/autotest.py build.Copter test.Copter.ThrottleFailsafe` (разбор имени — `autotest.py:534–545`). Ссылка на такой тест в матрице законна, если записаны тег прошивки и твой файл параметров. Тест апстрима проверяет логику на своих тестовых значениях `FS_*` (он сам перебирает несколько значений `FS_THR_ENABLE` в подтестах) и на стандартной модели SITL, а не на твоём файле параметров. Поэтому к нему добавляют свой SITL-прогон на своих параметрах — как в `eng-ci-configs`.
+Часть анализа уже написана за тебя. В ArduPilot 4.7.3 есть набор автотестов SITL (`Tools/autotest/`), и для требования вида `R-SAF-01` готов тест `ThrottleFailsafe` (`Tools/autotest/arducopter.py:897`). Он, среди прочего, включает `SIM_RC_FAIL` = 1 и проверяет реакцию прошивки. Запускается один тест так: `./Tools/autotest/autotest.py build.Copter test.Copter.ThrottleFailsafe` (разбор имени — `autotest.py:534–545`). Ссылка на такой тест в матрице законна, если записаны тег прошивки и твой файл параметров. Тест апстрима проверяет логику на своих тестовых значениях `FS_*` (он сам перебирает несколько значений `FS_THR_ENABLE` в подтестах) и на стандартной модели SITL, а не на твоём файле параметров. Поэтому к нему добавляют свой SITL-прогон на своих параметрах — как в `eng-ci-configs`.
 
 ### Базовая линия, ревью и интерфейсы
 **Базовая линия** (baseline) — замороженный набор: требования, конфиг с тегом, BOM и FMEA на дату. После неё любое изменение идёт только через процесс изменений ниже, иначе матрица трассировки врёт: тест «pass» относится к другой версии. Практически базовая линия — это git-тег, под которым лежат все артефакты пакета, а не только прошивка.
@@ -346,7 +346,7 @@ holes: 4
 - Easy Approach to Requirements Syntax (EARS) — patterns and origin | https://en.wikipedia.org/wiki/Easy_Approach_to_Requirements_Syntax | secondary | B
 - AIAG — FMEA: AIAG & VDA FMEA Handbook (7-step approach, Action Priority instead of RPN) | https://aiag.org/FMEA | primary | B
 - Michael Nygard — Documenting Architecture Decisions (2011) | https://cognitect.com/blog/2011/11/15/documenting-architecture-decisions | primary | A
-- ArduPilot source, tag Copter-4.7.2: Tools/autotest/arducopter.py (ThrottleFailsafe) | https://github.com/ArduPilot/ardupilot/blob/Copter-4.7.2/Tools/autotest/arducopter.py | primary | A
+- ArduPilot source, tag Copter-4.7.3: Tools/autotest/arducopter.py (ThrottleFailsafe) | https://github.com/ArduPilot/ardupilot/blob/Copter-4.7.3/Tools/autotest/arducopter.py | primary | A
 
 ## checklist
 - Требования с ID, критерием и методом проверки

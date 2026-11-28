@@ -1,0 +1,94 @@
+{
+  "module": "eng-career",
+  "tasks": [
+    {
+      "id": "coverage-strict",
+      "title": "Strict role coverage",
+      "statement": "The target role has **{n}** skills. All modules are mastered for **{f}** skills, some for **{p}**, and the rest have not been started. Find the strict coverage of the role, %.",
+      "params": {
+        "n": {
+          "min": 8,
+          "max": 12,
+          "step": 1
+        },
+        "f": {
+          "min": 1,
+          "max": 4,
+          "step": 1
+        },
+        "p": {
+          "min": 1,
+          "max": 4,
+          "step": 1
+        }
+      },
+      "answer": "100*f/n",
+      "unit": "%",
+      "tol": 0.01,
+      "solution": "Strict coverage counts only fully covered skills: f / N × 100 %. Partly covered skills are not included, and neither are modules outside the role's list."
+    },
+    {
+      "id": "coverage-weighted",
+      "title": "Weighted role coverage",
+      "statement": "The target role has **{n}** skills. All modules are mastered for **{f}** skills, some for **{p}**, and the rest have not been started. Find the weighted coverage (a partial skill = 0.5), %.",
+      "params": {
+        "n": {
+          "min": 8,
+          "max": 12,
+          "step": 1
+        },
+        "f": {
+          "min": 1,
+          "max": 4,
+          "step": 1
+        },
+        "p": {
+          "min": 1,
+          "max": 4,
+          "step": 1
+        }
+      },
+      "answer": "100*(f + 0.5*p)/n",
+      "unit": "%",
+      "tol": 0.01,
+      "solution": "Weighted coverage = (f + 0.5·p) / N × 100 %. The module's example: (3 + 0.5·4) / 10 = 50 %. Counting partial skills as whole gives the inflated (f + p) / N."
+    },
+    {
+      "id": "weeks-to-close",
+      "title": "Weeks to close the gaps",
+      "statement": "The role's gaps are **{m}** modules averaging **{h}** h each in the course program, plus **{q}** h of their prerequisites that you do not have. You have **{w}** h per week for study. How many full weeks do you need (rounded up)?",
+      "params": {
+        "m": {
+          "min": 3,
+          "max": 12,
+          "step": 1
+        },
+        "h": [
+          2,
+          3,
+          3.5,
+          4,
+          5
+        ],
+        "q": [
+          0,
+          3,
+          6,
+          9,
+          12
+        ],
+        "w": [
+          4,
+          5,
+          6,
+          8,
+          10
+        ]
+      },
+      "answer": "math.ceil((m*h + q)/w)",
+      "unit": "weeks",
+      "tol": 0.001,
+      "solution": "Hours = m·h + q; weeks = ⌈hours / w⌉. The module's example: 32 h of gaps without prerequisites at 6 h per week → ⌈32/6⌉ = 6 weeks. Without q the plan comes out shorter than reality."
+    }
+  ]
+}

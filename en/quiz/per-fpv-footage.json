@@ -3,64 +3,114 @@
  "pass": 80,
  "questions": [
   {
-   "q": "Аппарат потерян в поле. Какая запись поможет найти его по последнему кадру и координатам?",
-   "options": ["Запись на борту DJI O4 Pro на microSD", "DVR очков с координатами в OSD", "Файл экшн-камеры GoPro на аппарате", "Встроенная память Walksnail HD Pro"],
+   "q": "The aircraft is lost in a field. Which recording helps you find it from the last frame and the coordinates?",
+   "options": [
+    "The DJI O4 Pro onboard recording on microSD",
+    "The goggle DVR with coordinates in the OSD",
+    "The GoPro action camera file on the aircraft",
+    "The Walksnail HD Pro internal memory"
+   ],
    "answer": 1,
-   "explain": "Бортовая запись и файл экшн-камеры остались на потерянном аппарате. DVR очков пишет то, что дошло по радио, вместе с OSD, включая широту и долготу, и остаётся у пилота."
+   "explain": "The onboard recording and the action camera file stayed on the lost aircraft. The goggle DVR records what made it through the radio, together with the OSD, including latitude and longitude, and it stays with the pilot."
   },
   {
-   "q": "60 кадр/с, угол затвора 180°. Какая выдержка?",
-   "options": ["1/60 с", "1/120 с", "1/240 с", "1/180 с"],
+   "q": "60 fps, a 180° shutter angle. What is the shutter speed?",
+   "options": [
+    "1/60 s",
+    "1/120 s",
+    "1/240 s",
+    "1/180 s"
+   ],
    "answer": 1,
-   "explain": "t = (угол/360)/fps = 0.5/60 = 1/120 с. Значение 1/60 соответствует 360°, а 1/240 — 90°."
+   "explain": "t = (angle/360)/fps = 0.5/60 = 1/120 s. 1/60 corresponds to 360°, and 1/240 to 90°."
   },
   {
-   "q": "Сколько стопов света гасит фильтр ND32?",
-   "options": ["3 стопа", "4 стопа", "5 стопов", "32 стопа"],
+   "q": "How many stops of light does an ND32 filter cut?",
+   "options": [
+    "3 stops",
+    "4 stops",
+    "5 stops",
+    "32 stops"
+   ],
    "answer": 2,
-   "explain": "Стопы = log2 32 = 5. Фильтр пропускает 1/32 света (3.125 %), оптическая плотность 1.5."
+   "explain": "Stops = log2 32 = 5. The filter passes 1/32 of the light (3.125 %), optical density 1.5."
   },
   {
-   "q": "Расчёт для сцены дал 5.45 стопа, базовое ISO камеры 100. Какой фильтр взять, чтобы сохранить выдержку 1/120 с?",
-   "options": ["ND32, ISO опустить до 73", "ND64, ISO поднять до 146", "ND32 и ISO оставить 100", "ND16, ISO поднять до 200"],
+   "q": "The calculation for a scene gave 5.45 stops, and the camera's base ISO is 100. Which filter keeps the shutter at 1/120 s?",
+   "options": [
+    "ND32, lower ISO to 73",
+    "ND64, raise ISO to 146",
+    "ND32 and leave ISO at 100",
+    "ND16, raise ISO to 200"
+   ],
    "answer": 1,
-   "explain": "Округление вверх: ND64 = 6 стопов, лишние 0.55 стопа добирает ISO 100·2^0.55 = 146. Ниже базового ISO камера не опускается, поэтому ND32 даёт пересвет на 0.45 стопа; ND16 оставил бы 1.45 стопа пересвета."
+   "explain": "Round up: ND64 = 6 stops, and ISO makes up the extra 0.55 stop: 100·2^0.55 = 146. The camera cannot go below its base ISO, so ND32 overexposes by 0.45 stop; ND16 would leave 1.45 stops of overexposure."
   },
   {
-   "q": "Ролик будет сильно стабилизирован в Gyroflow. Что советует документация Gyroflow по затвору?",
-   "options": ["Держать 180° с ND, смаз уберёт стабилизация", "Ставить 360° для максимального смаза", "Использовать 90° или даже 45° и добавить смаз в монтаже", "Включать авто-выдержку без ограничений"],
+   "q": "The video will be heavily stabilized in Gyroflow. What does the Gyroflow documentation advise about the shutter?",
+   "options": [
+    "Keep 180° with ND; stabilization will remove the blur",
+    "Use 360° for maximum blur",
+    "Use 90° or even 45° and add blur in the edit",
+    "Turn on auto shutter with no limits"
+   ],
    "answer": 2,
-   "explain": "Смаз из кадра не убрать: после стабилизации он остаётся в направлении исходного движения и «дрожит». Правило 180° работает только при плавном полёте."
+   "explain": "Blur cannot be removed from the frame: after stabilization it stays in the direction of the original motion and \"shakes\". The 180° rule works only with smooth flying."
   },
   {
-   "q": "Стабилизация в Gyroflow по логу Betaflight: горизонт заваливается, камера стоит под 30°. Что проверить первым?",
-   "options": ["Угол 30 в Motion data → Rotation → Pitch", "Включить в камере HyperSmooth", "Поставить blackbox_sample_rate = 1/1", "Поднять Smoothness до 1.0"],
+   "q": "Gyroflow stabilization from a Betaflight log: the horizon tilts, and the camera is mounted at 30°. What do you check first?",
+   "options": [
+    "The 30 angle in Motion data → Rotation → Pitch",
+    "Turn on HyperSmooth in the camera",
+    "Set blackbox_sample_rate = 1/1",
+    "Raise Smoothness to 1.0"
+   ],
    "answer": 0,
-   "explain": "Гироскоп полётника стоит в осях рамы, а камера наклонена: без угла наклона повороты раскладываются по осям кадра неверно. После изменения — пересинхронизация."
+   "explain": "The flight controller's gyro is in the frame axes, while the camera is tilted: without the tilt angle the rotations are split across the frame axes incorrectly. After changing it, resynchronize."
   },
   {
-   "q": "Gyroflow не находит гироскоп в файле с камеры DJI O4. Вероятная причина?",
-   "options": ["Камера снимала в 4K60", "Включён RockSteady или FOV не Wide", "Не записан Blackbox полётника", "Карта памяти класса V30"],
+   "q": "Gyroflow cannot find the gyro in a file from a DJI O4 camera. What is the likely cause?",
+   "options": [
+    "The camera shot in 4K60",
+    "RockSteady is on, or FOV is not Wide",
+    "No flight controller Blackbox was recorded",
+    "A class V30 memory card"
+   ],
    "answer": 1,
-   "explain": "По документации Gyroflow у DJI стабилизация в камере (EIS/RockSteady) должна быть выключена, а FOV — Wide, иначе гироскоп не пишется."
+   "explain": "Per the Gyroflow documentation, on DJI the in-camera stabilization (EIS/RockSteady) must be off and FOV set to Wide, otherwise the gyro is not recorded."
   },
   {
-   "q": "Поток 120 Мбит/с, полёт 4 минуты. Сколько займёт файл?",
-   "options": ["28.8 ГБ", "0.9 ГБ", "3.6 ГБ", "480 МБ"],
+   "q": "A 120 Mbit/s stream, a 4-minute flight. How big is the file?",
+   "options": [
+    "28.8 GB",
+    "0.9 GB",
+    "3.6 GB",
+    "480 MB"
+   ],
    "answer": 2,
-   "explain": "120/8 = 15 МБ/с; 15 × 240 с = 3600 МБ = 3.6 ГБ. 28.8 ГБ — если принять мегабиты за мегабайты, 0.9 ГБ — это одна минута."
+   "explain": "120/8 = 15 MB/s; 15 × 240 s = 3600 MB = 3.6 GB. 28.8 GB comes from taking megabits for megabytes, and 0.9 GB is one minute."
   },
   {
-   "q": "Синевуп в зале, сеть 50 Гц, 60 кадр/с, выдержка 1/120 с — по кадру ползут полосы. Что исправит?",
-   "options": ["ND8 на камеру", "50 кадр/с и выдержка 1/100 с", "Включить авто-баланс белого", "Поднять битрейт до максимума"],
+   "q": "A cinewhoop in a hall, 50 Hz mains, 60 fps, a 1/120 s shutter: bands crawl across the frame. What fixes it?",
+   "options": [
+    "An ND8 on the camera",
+    "50 fps and a 1/100 s shutter",
+    "Turn on auto white balance",
+    "Raise the bitrate to the maximum"
+   ],
    "answer": 1,
-   "explain": "Свет при сети 50 Гц пульсирует с частотой 100 Гц; выдержка, кратная 1/100 с, накапливает целое число периодов, и полосы пропадают."
+   "explain": "On 50 Hz mains the light pulses at 100 Hz; a shutter that is a multiple of 1/100 s collects a whole number of periods, and the bands disappear."
   },
   {
-   "q": "При 20 м/с наклон аппарата 30°. По модели tg θ ∝ v², какой наклон при 25 м/с?",
-   "options": ["37.5°", "35.8°", "42.1°", "46.9°"],
+   "q": "At 20 m/s the aircraft tilts 30°. With the model tan θ ∝ v², what is the tilt at 25 m/s?",
+   "options": [
+    "37.5°",
+    "35.8°",
+    "42.1°",
+    "46.9°"
+   ],
    "answer": 2,
-   "explain": "tg θ = tg 30° · (25/20)² = 0.577 · 1.5625 = 0.902, θ = 42.1°. 35.8° получается без квадрата, 37.5° — простой пропорцией углов."
+   "explain": "tan θ = tan 30° · (25/20)² = 0.577 · 1.5625 = 0.902, θ = 42.1°. 35.8° comes from leaving out the square, 37.5° from a simple proportion of the angles."
   }
  ]
 }

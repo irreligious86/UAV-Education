@@ -1,0 +1,116 @@
+{
+ "module": "per-fpv-footage",
+ "pass": 80,
+ "questions": [
+  {
+   "q": "The aircraft is lost in a field. Which recording helps you find it from the last frame and the coordinates?",
+   "options": [
+    "The DJI O4 Pro onboard recording on microSD",
+    "The goggle DVR with coordinates in the OSD",
+    "The GoPro action camera file on the aircraft",
+    "The Walksnail HD Pro internal memory"
+   ],
+   "answer": 1,
+   "explain": "The onboard recording and the action camera file stayed on the lost aircraft. The goggle DVR records what made it through the radio, together with the OSD, including latitude and longitude, and it stays with the pilot."
+  },
+  {
+   "q": "60 fps, a 180° shutter angle. What is the shutter speed?",
+   "options": [
+    "1/60 s",
+    "1/120 s",
+    "1/240 s",
+    "1/180 s"
+   ],
+   "answer": 1,
+   "explain": "t = (angle/360)/fps = 0.5/60 = 1/120 s. 1/60 corresponds to 360°, and 1/240 to 90°."
+  },
+  {
+   "q": "How many stops of light does an ND32 filter cut?",
+   "options": [
+    "3 stops",
+    "4 stops",
+    "5 stops",
+    "32 stops"
+   ],
+   "answer": 2,
+   "explain": "Stops = log2 32 = 5. The filter passes 1/32 of the light (3.125 %), optical density 1.5."
+  },
+  {
+   "q": "The calculation for a scene gave 5.45 stops, and the camera's base ISO is 100. Which filter keeps the shutter at 1/120 s?",
+   "options": [
+    "ND32, lower ISO to 73",
+    "ND64, raise ISO to 146",
+    "ND32 and leave ISO at 100",
+    "ND16, raise ISO to 200"
+   ],
+   "answer": 1,
+   "explain": "Round up: ND64 = 6 stops, and ISO makes up the extra 0.55 stop: 100·2^0.55 = 146. The camera cannot go below its base ISO, so ND32 overexposes by 0.45 stop; ND16 would leave 1.45 stops of overexposure."
+  },
+  {
+   "q": "The video will be heavily stabilized in Gyroflow. What does the Gyroflow documentation advise about the shutter?",
+   "options": [
+    "Keep 180° with ND; stabilization will remove the blur",
+    "Use 360° for maximum blur",
+    "Use 90° or even 45° and add blur in the edit",
+    "Turn on auto shutter with no limits"
+   ],
+   "answer": 2,
+   "explain": "Blur cannot be removed from the frame: after stabilization it stays in the direction of the original motion and \"shakes\". The 180° rule works only with smooth flying."
+  },
+  {
+   "q": "Gyroflow stabilization from a Betaflight log: the horizon tilts, and the camera is mounted at 30°. What do you check first?",
+   "options": [
+    "The 30 angle in Motion data → Rotation → Pitch",
+    "Turn on HyperSmooth in the camera",
+    "Set blackbox_sample_rate = 1/1",
+    "Raise Smoothness to 1.0"
+   ],
+   "answer": 0,
+   "explain": "The flight controller's gyro is in the frame axes, while the camera is tilted: without the tilt angle the rotations are split across the frame axes incorrectly. After changing it, resynchronize."
+  },
+  {
+   "q": "Gyroflow cannot find the gyro in a file from a DJI O4 camera. What is the likely cause?",
+   "options": [
+    "The camera shot in 4K60",
+    "RockSteady is on, or FOV is not Wide",
+    "No flight controller Blackbox was recorded",
+    "A class V30 memory card"
+   ],
+   "answer": 1,
+   "explain": "Per the Gyroflow documentation, on DJI the in-camera stabilization (EIS/RockSteady) must be off and FOV set to Wide, otherwise the gyro is not recorded."
+  },
+  {
+   "q": "A 120 Mbit/s stream, a 4-minute flight. How big is the file?",
+   "options": [
+    "28.8 GB",
+    "0.9 GB",
+    "3.6 GB",
+    "480 MB"
+   ],
+   "answer": 2,
+   "explain": "120/8 = 15 MB/s; 15 × 240 s = 3600 MB = 3.6 GB. 28.8 GB comes from taking megabits for megabytes, and 0.9 GB is one minute."
+  },
+  {
+   "q": "A cinewhoop in a hall, 50 Hz mains, 60 fps, a 1/120 s shutter: bands crawl across the frame. What fixes it?",
+   "options": [
+    "An ND8 on the camera",
+    "50 fps and a 1/100 s shutter",
+    "Turn on auto white balance",
+    "Raise the bitrate to the maximum"
+   ],
+   "answer": 1,
+   "explain": "On 50 Hz mains the light pulses at 100 Hz; a shutter that is a multiple of 1/100 s collects a whole number of periods, and the bands disappear."
+  },
+  {
+   "q": "At 20 m/s the aircraft tilts 30°. With the model tan θ ∝ v², what is the tilt at 25 m/s?",
+   "options": [
+    "37.5°",
+    "35.8°",
+    "42.1°",
+    "46.9°"
+   ],
+   "answer": 2,
+   "explain": "tan θ = tan 30° · (25/20)² = 0.577 · 1.5625 = 0.902, θ = 42.1°. 35.8° comes from leaving out the square, 37.5° from a simple proportion of the angles."
+  }
+ ]
+}

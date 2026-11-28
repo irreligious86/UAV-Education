@@ -3,94 +3,94 @@
   "pass": 80,
   "questions": [
     {
-      "q": "Jetson Nano в режиме MAXN под детектором. Что показывает эта строка tegrastats?",
+      "q": "A Jetson Nano in MAXN mode under a detector. What does this tegrastats line show?",
       "kind": "apply",
       "fragment": "RAM 3100/3957MB CPU [95%@918,100%@918,97%@918,98%@918] GR3D_FREQ 99%@537 CPU@97.5C PMIC@100C GPU@98C POM_5V_IN 5200/4900",
       "options": [
-        "Включён режим 5 Вт: два ядра выключены, а частота GPU ограничена потолком 640 МГц",
-        "Программный троттлинг: GPU загружен на 99 %, а частота упала до 537 МГц",
-        "Перегрет PMIC: 100 °C — порог аппаратного выключения платы",
-        "Просадка питания: POM_5V_IN ниже 4.75 В, плата в brown-out"
+        "5 W mode is on: two cores are offline, and the GPU clock is capped at its 640 MHz ceiling",
+        "Software throttling: the GPU is 99 % busy, yet its clock has dropped to 537 MHz",
+        "The PMIC is overheated: 100 °C is the board's hardware shutdown threshold",
+        "A supply dip: POM_5V_IN is below 4.75 V and the board is browning out"
       ],
       "answer": 1,
-      "explain": "Порог программного троттлинга Nano — 97.0 °C (CPU) и 97.5 °C (GPU); потолок GPU в MAXN — 921.6 МГц, в реальной строке под нагрузкой было 844 МГц. Все четыре ядра включены (в режиме 5 Вт было бы два `off`), PMIC@100C на Nano — константа, а POM_5V_IN — мощность в мВт, не напряжение."
+      "explain": "The Nano's software throttling threshold is 97.0 °C (CPU) and 97.5 °C (GPU); the GPU ceiling in MAXN is 921.6 MHz, and the real line under load showed 844 MHz. All four cores are online (in 5 W mode two would be `off`), PMIC@100C is a constant on the Nano, and POM_5V_IN is power in mW, not a voltage."
     },
     {
-      "q": "Nano питается от BEC 5.0 В через метровый micro-USB 28 AWG (R ≈ 0.53 Ом с разъёмом) и перезагружается при старте TensorRT (пик 7.7 Вт). Почему?",
+      "q": "A Nano is powered from a 5.0 V BEC through a meter-long micro-USB cable at 28 AWG (R ≈ 0.53 Ω including the connector) and reboots when TensorRT starts (a 7.7 W peak). Why?",
       "options": [
-        "Ток 1.54 А даёт падение 0.81 В: на плате 4.19 В при минимуме 4.75 В",
-        "micro-USB ограничен 0.5 А, плата не получает больше 2.5 Вт",
-        "Режим MAXN требует 10 В на входе, а не 5 В",
-        "BEC на 5.0 В слишком высок: модулю нужно не больше 4.75 В"
+        "A current of 1.54 A drops 0.81 V: the board sees 4.19 V against a minimum of 4.75 V",
+        "Micro-USB is limited to 0.5 A, so the board gets no more than 2.5 W",
+        "MAXN mode needs 10 V at the input, not 5 V",
+        "A 5.0 V BEC is set too high: the module itself needs no more than 4.75 V at its input pins"
       ],
       "answer": 0,
-      "explain": "U = U_BEC − I·R = 5.0 − 1.54·0.526 = 4.19 В. Модулю нужно 4.75–5.25 В; порог пройден уже при 0.48 А. Лечится коротким толстым проводом в гнездо или на пины 2/4."
+      "explain": "U = U_BEC − I·R = 5.0 − 1.54·0.526 = 4.19 V. The module needs 4.75–5.25 V; the threshold is already crossed at 0.48 A. The cure is a short thick wire into the barrel jack or onto pins 2/4."
     },
     {
-      "q": "Что ограничивает бюджет «10 Вт» режима MAXN у Jetson Nano?",
+      "q": "What does the \"10 W\" budget of the Jetson Nano's MAXN mode limit?",
       "options": [
-        "Мощность всей платы devkit вместе с USB-периферией",
-        "Ток через разъём micro-USB",
-        "Мощность шин CPU и GPU модуля",
-        "Среднюю мощность за 10 минут, пики не ограничены"
+        "The power of the whole devkit including USB peripherals",
+        "The current through the micro-USB connector",
+        "The power of the module's CPU and GPU rails",
+        "The average power over 10 minutes, with peaks unlimited"
       ],
       "answer": 2,
-      "explain": "По руководству devkit бюджеты 5 и 10 Вт относятся только к доменам CPU и GPU. Несущая плата добавляет 0.5–1.25 Вт, камера и USB — свои ватты, поэтому BEC считают на 15 Вт и берут 5 А."
+      "explain": "Per the devkit guide, the 5 and 10 W budgets apply only to the CPU and GPU domains. The carrier adds 0.5–1.25 W, and the camera and USB add their own watts, so the BEC is sized for 15 W and rated for 5 A."
     },
     {
-      "q": "Нужно одновременно детектировать и отдавать на землю H.264 1080p30. В чём разница между Nano и Orin Nano?",
+      "q": "You need to run detection and send H.264 1080p30 to the ground at the same time. What is the difference between the Nano and the Orin Nano?",
       "options": [
-        "Nano кодирует только на CPU, у Orin Nano аппаратный NVENC",
-        "У обоих аппаратный кодер, разницы нет",
-        "У Orin Nano нет NVENC: x264enc займёт около двух ядер CPU",
-        "Orin Nano не умеет захватывать CSI-камеру одновременно с инференсом"
+        "The Nano encodes only on the CPU, while the Orin Nano has hardware NVENC",
+        "Both have a hardware encoder, so there is no difference",
+        "The Orin Nano has no NVENC: x264enc takes about two CPU cores",
+        "The Orin Nano cannot capture a CSI camera while running inference"
       ],
       "answer": 2,
-      "explain": "У Nano есть аппаратный кодер (4Kp30 или 4 × 1080p30, `nvv4l2h264enc`). У Orin Nano NVENC отсутствует: NVIDIA для x264enc ultrafast на потоке камеры 30 к/с даёт 38 % загрузки на каждое из шести ядер — около 2.3 ядра."
+      "explain": "The Nano has a hardware encoder (4Kp30 or 4 × 1080p30, `nvv4l2h264enc`). The Orin Nano has no NVENC: for x264enc ultrafast on a 30 fps camera stream, NVIDIA reports 38 % load on each of the six cores, about 2.3 cores."
     },
     {
-      "q": "TensorRT engine собран на ноутбуке с RTX и скопирован на Jetson Nano. Что будет?",
+      "q": "A TensorRT engine was built on a laptop with an RTX GPU and copied to a Jetson Nano. What happens?",
       "options": [
-        "Заработает, но только в FP32",
-        "Не загрузится: engine привязан к GPU и версии TensorRT",
-        "Заработает после `nvpmodel -m 0`",
-        "Заработает, если на Nano установлен тот же ultralytics"
+        "It works, but only in FP32",
+        "It will not load: an engine is tied to the GPU and the TensorRT version",
+        "It works after `nvpmodel -m 0`",
+        "It works if the same version of ultralytics is installed on the Nano as on the laptop"
       ],
       "answer": 1,
-      "explain": "Engine оптимизируется под конкретный GPU и версию TensorRT/CUDA. Между платформами переносят ONNX, а engine собирают на целевой плате (на Nano — TensorRT 8.2.1)."
+      "explain": "An engine is optimized for a specific GPU and TensorRT/CUDA version. Between platforms you move the ONNX and build the engine on the target board (TensorRT 8.2.1 on the Nano)."
     },
     {
-      "q": "Мост шлёт `named_value_float_send(ms, b\"CC_GPU_FREQ_MHZ\", 537.0)`. В чём ошибка?",
+      "q": "The bridge sends `named_value_float_send(ms, b\"CC_GPU_FREQ_MHZ\", 537.0)`. What is wrong?",
       "options": [
-        "NAMED_VALUE_FLOAT может слать только автопилот",
-        "Значение должно быть целым: для float нужен DEBUG_VECT",
-        "Имя длиннее 10 символов — поле `name` это char[10]",
-        "Имя обязано начинаться с префикса MAV_"
+        "Only the autopilot may send NAMED_VALUE_FLOAT",
+        "The value must be an integer: a float needs DEBUG_VECT",
+        "The name is longer than 10 characters: the `name` field is char[10]",
+        "The name must start with the MAV_ prefix"
       ],
       "answer": 2,
-      "explain": "В common.xml у сообщения 251 поле name — char[10]. В лабораторной поле названо `CC_GPU_MHZ` — ровно 10 символов."
+      "explain": "In common.xml, the name field of message 251 is char[10]. In the lab the field is called `CC_GPU_MHZ`, exactly 10 characters."
     },
     {
-      "q": "На `/dev/ttyTHS1` Jetson Nano вместо MAVLink идёт мусор, хотя провода и скорость верны. Первая проверка?",
+      "q": "On the Jetson Nano's `/dev/ttyTHS1` there is garbage instead of MAVLink, although the wiring and the baud rate are right. What do you check first?",
       "options": [
-        "Сервис nvgetty: на UART гребёнки по умолчанию висит консоль",
-        "Перемычка J48: UART гребёнки работает только при питании от гнезда",
-        "Режим nvpmodel: в режиме 5 Вт UART отключается",
-        "Уровни: Nano выдаёт 1.8 В, нужен преобразователь до 3.3 В"
+        "The nvgetty service: the header UART carries the console by default",
+        "Jumper J48: the header UART works only when powered from the barrel jack",
+        "The nvpmodel mode: in 5 W mode the UART is disabled",
+        "Levels: the Nano outputs 1.8 V and needs a converter to 3.3 V"
       ],
       "answer": 0,
-      "explain": "`sudo systemctl stop nvgetty && sudo systemctl disable nvgetty`, пользователя — в dialout. Уровни UART гребёнки — 3.3 В; 5 В подавать нельзя."
+      "explain": "`sudo systemctl stop nvgetty && sudo systemctl disable nvgetty`, and add the user to dialout. The header UART levels are 3.3 V; never apply 5 V."
     },
     {
-      "q": "Детектор класса nano по опубликованным замерам: Pi 5 (NCNN, CPU) — 14.9 к/с, Jetson Nano (TensorRT FP16) — 19 к/с, Orin Nano Super (TensorRT FP16) — 219 к/с. Какой вывод корректен?",
+      "q": "A nano-class detector per published measurements: Pi 5 (NCNN, CPU) 14.9 fps, Jetson Nano (TensorRT FP16) 19 fps, Orin Nano Super (TensorRT FP16) 219 fps. Which conclusion is correct?",
       "options": [
-        "Nano втрое быстрее Pi 5, его стоит покупать под новый проект",
-        "Цифры включают захват и NMS, поэтому их можно сразу ставить в бюджет задержки",
-        "Nano по скорости близок к Pi 5 на одном CPU, Orin Nano быстрее на порядок",
-        "INT8 на Nano поднимет скорость до уровня Orin Nano"
+        "The Nano is three times faster than a Pi 5 and worth buying for a new project",
+        "The figures include capture and NMS, so they can go straight into the latency budget",
+        "The Nano is close to a Pi 5 on its CPU alone, and the Orin Nano is an order of magnitude faster",
+        "INT8 on the Nano will raise its speed to the Orin Nano's level"
       ],
       "answer": 2,
-      "explain": "Замеры чужие, модели разных поколений, у Ultralytics это только инференс, а у Q-engineering состав замера не указан — но порядок величин устойчив. Nano выигрывает у Pi 5 аппаратным кодером и CSI-конвейером, а не скоростью сети; INT8 в тесте Q-engineering на Nano скорости не дал."
+      "explain": "The measurements are other people's and the models are from different generations; Ultralytics and Q-engineering both measure inference only, but the orders of magnitude are robust. The Nano beats a Pi 5 with its hardware encoder and CSI pipeline, not with network speed; in Q-engineering's test INT8 gave the Nano no speedup."
     }
   ]
 }

@@ -47,7 +47,7 @@ ESP32-S3 с активным Wi-Fi потребляет пики в сотни �
 UART2 (`Serial2.begin(921600, SERIAL_8N1, RX_PIN, TX_PIN)`) ↔ WiFi UDP: всё, что пришло с FC, — в UDP на адрес последнего клиента (или broadcast 14550); всё, что пришло по UDP, — в UART. Буферы 1 КБ, без парсинга MAVLink (мост прозрачен); задача на втором ядре FreeRTOS (модуль «Embedded»): ядро 0 — Wi-Fi стек, ядро 1 — UART-копирование с приоритетом выше `loop()`. Задержка такого моста — единицы мс; потери — при перегрузке Wi-Fi (2.4 ГГц делит эфир с ELRS 2.4 — на борту мост по Wi-Fi уместен только для наземной настройки, в полёте выключать).
 
 ### Датчик на борту через MAVLink
-ESP32 как компонент системы: шлёт `HEARTBEAT` (свой component_id: `MAV_COMP_ID_PERIPHERAL` (158) или из диапазона USER1–USER75 (25–99)), данные — `NAMED_VALUE_FLOAT`/`NAMED_VALUE_INT` (видны в GCS и в логе `NVAL`), или `DISTANCE_SENSOR` (132) для своего дальномера — ArduPilot примет его как `RNGFND1_TYPE = 10` (MAVLink) и использует в EKF/посадке. Библиотека: `mavlink` C-headers из генератора (`common.xml`, 100 КБ flash), или минимальный ручной сборщик кадра с CRC (модуль «Протоколы MAVLink»).
+ESP32 как компонент системы: шлёт `HEARTBEAT` (свой component_id: `MAV_COMP_ID_PERIPHERAL` (158) или из диапазона USER1–USER75 (25–99)), данные — `NAMED_VALUE_FLOAT` (виден в GCS и, в ArduPilot, в логе `NVAL`; `NAMED_VALUE_INT` GCS покажет, но ArduPilot его не логирует), или `DISTANCE_SENSOR` (132) для своего дальномера — ArduPilot примет его как `RNGFND1_TYPE = 10` (MAVLink) и использует в EKF/посадке. Библиотека: `mavlink` C-headers из генератора (`common.xml`; библиотека только из заголовков, во flash попадают лишь используемые сообщения — единицы КБ на HEARTBEAT, пару сообщений данных и парсер), или минимальный ручной сборщик кадра с CRC (модуль «Протоколы MAVLink»).
 
 ### Разобранный пример: компаньон пульта (проект TX16S)
 Протокол строк: пульт → ESP32 `S,<mode>,<armed>,<vbat>,<rssi>\n` каждые 500 мс; ESP32 → пульт `A,<cmd>,<arg>\n`. Состояния ESP32: FLIGHT (радио выкл; по умолчанию и при таймауте строк > 2 с) → GROUND (пульт прислал `armed=0` ≥ 3 с подряд: Wi-Fi AP, веб-настройки) → FLIGHT при любом `armed=1`. Настройки: STAGE (JSON в RAM) → APPLY (запись NVS с копией предыдущей версии) только в GROUND; Lua на пульте блокирует `APPLY`, если телеметрия показывает арм. Тест: эмулятор строк с ПК по USB-UART, сценарии переходов и таймаутов, затем реальный пульт без аппарата.
@@ -62,13 +62,13 @@ ESP32 как компонент системы: шлёт `HEARTBEAT` (свой c
 | Прошивка | ESP32 в целевой версии | Что это значит |
 |---|---|---|
 | ArduPilot 4.7.3 | есть HAL `AP_HAL_ESP32`, 10 описаний плат (`esp32buzz`, `esp32s3devkit`, `esp32s3m5stampfly` и др.) | только сборка из исходников под Linux; в README порта DShot, GPIO и телеметрия ESC — в списке «ещё не сделано»; у StampFly `SCHED_LOOP_RATE 150` с комментарием «flash won't go faster» при 400 Гц по умолчанию у Copter, коллекторные моторы, лог по MAVLink |
-| Betaflight 2025.12.5 | нет: платформы STM32, AT32, APM32, PICO | в 2026.6 (вне целевой версии курса) появилась платформа `src/platform/ESP32` с целями ESP32S3, ESP32WROOM, ESP32C5 и ESP32P4 (исходник тега 2026.6.2): DShot есть (`dshot_esp32.c`), bidirectional DShot и bit-bang выключены (`#undef USE_DSHOT_TELEMETRY`, `USE_DSHOT_BITBANG` в `target.h`), blackbox по умолчанию в UART; по release notes статус **experimental** |
+| Betaflight 2025.12.5 | нет: платформы STM32, AT32, APM32, PICO | в 2026.6 (вне целевой версии курса) появилась платформа `src/platform/ESP32` с целями ESP32S3 и ESP32WROOM (плюс заготовки ESP32C5, ESP32P4; исходник тега 2026.6.2): DShot есть (`dshot_esp32.c`), bidirectional DShot и bit-bang выключены (`#undef USE_DSHOT_TELEMETRY`, `USE_DSHOT_BITBANG` в `target.h`), blackbox по умолчанию в UART; по release notes статус **experimental** |
 | INAV 9.1.0 | нет ни одной цели | — |
-| PX4 1.17.0 | `boards/espressif/esp32`, версия 0.1 | в конфиге сборки нет ни EKF2, ни регуляторов ориентации: это заготовка, а не полётник |
-| ESP-FC (отдельный проект, MIT, тег v0.2.1) | ESP32 и ESP32-S3 рекомендованы, S2, C3, RP2040, RP2350 — экспериментально | совместим с Betaflight Configurator; до 4 кГц цикла с SPI-гироскопом; ACRO, ANGLE, AIRMODE, только Quad X; удержания высоты и GPS нет; автор пишет, что это не Betaflight и часть вкладок Configurator не работает |
+| PX4 1.18.0 | `boards/espressif/esp32`, версия 0.1 | в конфиге сборки нет ни EKF2, ни регуляторов ориентации: это заготовка, а не полётник |
+| ESP-FC (отдельный проект, MIT, последний тег v0.2.1; списки по README ветки master) | ESP32 и ESP32-S3 рекомендованы, S2, C3, RP2040, RP2350 — экспериментально | совместим с Betaflight Configurator; до 4 кГц цикла с SPI-гироскопом; ACRO, ANGLE, AIRMODE, только Quad X; удержания высоты и GPS нет; автор пишет, что это не Betaflight и часть вкладок Configurator не работает |
 | ExpressLRS 4.1.0 | приёмники на ESP32, ESP32-C3, ESP32-S3 | выходы приёмника дают PWM 50–400 Гц и DShot300 прямо на ESC и сервы, но без стабилизации: для простого самолёта, не для коптера |
 
-Почему ESP32 упирается в потолок: код исполняется из внешней SPI-флеш через кеш — отсюда 150 Гц у ArduPilot на StampFly. Радио Wi-Fi на том же кристалле делит 2.4 ГГц с ELRS (раздел про мост выше). У STM32 — встроенная флеш и DShot во всех четырёх прошивках курса.
+Почему ESP32 упирается в потолок: код исполняется из внешней SPI-флеш через кеш — отсюда 150 Гц у ArduPilot на StampFly. Радио Wi-Fi на том же кристалле делит 2.4 ГГц с ELRS (раздел про мост выше). Большинство STM32-полётников исполняют код из встроенной флеш (платы H750/H730 «ExST» — ещё и из внешней QSPI-флеш), а DShot у STM32 есть во всех четырёх прошивках курса.
 
 **Правило выбора.**
 
@@ -218,9 +218,9 @@ return { name = "Companion", create = create, update = update, refresh = refresh
 - EdgeTX Lua serial API source (api_general.cpp, GitHub) | https://github.com/EdgeTX/edgetx/blob/main/radio/src/lua/api_general.cpp | primary | A
 - ESP32 Arduino core — Wi-Fi API (GitHub) | https://github.com/espressif/arduino-esp32 | primary | A
 - PlatformIO — Documentation | https://docs.platformio.org/ | primary | A
-- ArduPilot Copter-4.7.2 — AP_HAL_ESP32 README и hwdef esp32s3m5stampfly | https://github.com/ArduPilot/ardupilot/tree/Copter-4.7.2/libraries/AP_HAL_ESP32 | primary | A
+- ArduPilot Copter-4.7.3 — AP_HAL_ESP32 README и hwdef esp32s3m5stampfly | https://github.com/ArduPilot/ardupilot/tree/Copter-4.7.3/libraries/AP_HAL_ESP32 | primary | A
 - Betaflight 2026.6 Release Notes (ESP32 experimental; открыто 2026-11-22) | https://betaflight.com/docs/wiki/release/Betaflight-2026-6-Release-Notes | primary | A
-- PX4 v1.17.0 — boards/espressif/esp32 | https://github.com/PX4/PX4-Autopilot/tree/v1.17.0/boards/espressif/esp32 | primary | A
+- PX4 v1.18.0 — boards/espressif/esp32 | https://github.com/PX4/PX4-Autopilot/tree/v1.18.0/boards/espressif/esp32 | primary | A
 - ExpressLRS 4.1.0 — src/targets и include/common.h (режимы выходов PWM/DShot) | https://github.com/ExpressLRS/ExpressLRS/blob/4.1.0/src/include/common.h | primary | A
 - ESP-FC — README (MCU, функции, ограничения; открыто 2026-11-22) | https://github.com/rtlopez/esp-fc | primary | B
 

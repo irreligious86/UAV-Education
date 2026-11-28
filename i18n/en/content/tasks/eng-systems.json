@@ -1,0 +1,64 @@
+{
+ "module": "eng-systems",
+ "tasks": [
+  {
+   "id": "rpn-after",
+   "title": "RPN after a mitigation",
+   "statement": "An FMEA row: S = **{s}**, O = **{o}**, D = **{d1}**. A mitigation (a check in the preflight checklist) improved detection to D = **{d2}**; S and O did not change. By what percentage did the RPN drop?",
+   "params": {
+    "s": [
+     7,
+     8,
+     9,
+     10
+    ],
+    "o": [
+     2,
+     3,
+     4,
+     5
+    ],
+    "d1": [
+     6,
+     7,
+     8,
+     9
+    ],
+    "d2": [
+     2,
+     3,
+     4
+    ]
+   },
+   "answer": "(1 - d2/d1)*100",
+   "unit": "%",
+   "tol": 0.01,
+   "solution": "RPN = S·O·D; with S and O unchanged, the RPN drops by 1 − D₂/D₁. The module's example: the BEC failure, S 9, O 3, D 6 → 3: RPN 162 → 81, minus 50 %. A detection mitigation does not change S, which is why rows with S ≥ 9 are reviewed regardless of RPN."
+  },
+  {
+   "id": "rpn-rank",
+   "title": "The order for closing risks",
+   "statement": "Two FMEA rows. A: S = **{sa}**, O = **{oa}**, D = **{da}**. B: S = 6, O = 4, D = 7. Find the RPN of row A minus the RPN of row B (it can be negative).",
+   "params": {
+    "sa": [
+     9,
+     10
+    ],
+    "oa": [
+     2,
+     3
+    ],
+    "da": [
+     2,
+     3,
+     4
+    ]
+   },
+   "answer": "sa*oa*da - 6*4*7",
+   "unit": "",
+   "tol": 0.01,
+   "abs": 0.5,
+   "solution": "RPN B = 6·4·7 = 168. RPN A = S·O·D is at most 120, so the difference is negative and by RPN row A ranks lower. But A has severity S ≥ 9, so by the course rule it is closed with a mitigation regardless of RPN (like row F-15 with RPN 60 in the module's FMEA)."
+  }
+ ]
+}

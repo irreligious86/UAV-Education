@@ -1,0 +1,59 @@
+{
+  "module": "mav-sdk",
+  "tasks": [
+    {
+      "id": "raw-mission-count",
+      "title": "How many raw items ArduPilot will show",
+      "statement": "A MAVSDK plan: a placeholder item and **{n}** more route waypoints, each item with `speed_m_s` set. How many items will `MissionRawAsync.download_mission()` return from ArduCopter 4.7.2 (counting home in seq 0)?",
+      "params": {
+        "n": {
+          "min": 2,
+          "max": 30,
+          "step": 1
+        }
+      },
+      "answer": "2*(n + 1)",
+      "unit": "items",
+      "tol": 0.001,
+      "solution": "Every MissionItem with a speed becomes two items: NAV_WAYPOINT (16) and DO_CHANGE_SPEED (178). There are n + 1 plan items (with the placeholder), so 2·(n + 1) items; the placeholder went into seq 0 and was replaced by home, so the item count does not change. In the module's run: 3 waypoints → 8 items."
+    },
+    {
+      "id": "raw-lat-offset",
+      "title": "A waypoint's offset from the raw coordinates",
+      "statement": "In the raw mission, home `x` = −353632610 and the waypoint's `x` = −353632610 + **{d}** (degrees·10⁷, latitude). How many meters north of home is the waypoint? Take 1° of latitude = 111 320 m.",
+      "params": {
+        "d": {
+          "min": 500,
+          "max": 20000,
+          "step": 1
+        }
+      },
+      "answer": "d*1e-7*111320",
+      "unit": "m",
+      "tol": 0.005,
+      "solution": "Δ = d·10⁻⁷ degrees; meters = Δ·111 320. In the module's run, d = 3593 → 40.0 m, d = 7186 → 80.0 m, d = 10 780 → 120.0 m, matching the specified offsets."
+    },
+    {
+      "id": "queue-backlog",
+      "title": "How far a slow subscription consumer falls behind",
+      "statement": "The `subscribe_position()` subscription receives **{f} Hz**, and the handler spends **{t} ms** on each sample. The asyncio queue in the MAVSDK 4.x wrapper is unbounded. How many seconds old is the sample being processed after 60 s of operation?",
+      "params": {
+        "f": [
+          10,
+          20,
+          50
+        ],
+        "t": {
+          "min": 0,
+          "max": 200,
+          "step": 5
+        }
+      },
+      "answer": "max(0, 60 - 60000/(f*t)) if f*t > 1000 else 0",
+      "unit": "s",
+      "abs": 0.05,
+      "tol": 0.01,
+      "solution": "By second 60 the handler has processed 60000/t samples (t in ms). Sample number N arrived at second N/f, so the current one was taken at second 60000/(f·t), and its age is 60 − 60000/(f·t) s. If f·t ≤ 1000 (processing is faster than arrival), the queue does not build up and the age is ≈ 0. Examples: 50 Hz × 30 ms → 60 − 40 = 20 s; 20 Hz × 100 ms → 60 − 30 = 30 s. The cure: a one-off read of the latest value, or draining the queue."
+    }
+  ]
+}

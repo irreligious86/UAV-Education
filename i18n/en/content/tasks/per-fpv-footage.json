@@ -1,0 +1,127 @@
+{
+ "module": "per-fpv-footage",
+ "tasks": [
+  {
+   "id": "nd-stops",
+   "title": "ND filter: stops from the factor",
+   "statement": "An **ND{n}** filter passes 1/{n} of the light. How many stops is that?",
+   "params": {
+    "n": [
+     2,
+     4,
+     8,
+     16,
+     32,
+     64,
+     128,
+     256,
+     1000
+    ]
+   },
+   "answer": "math.log2(n)",
+   "unit": "stops",
+   "tol": 0.01,
+   "solution": "Stops = log2 N: each stop is half as much light. ND8 = 3, ND32 = 5, ND1000 ≈ 9.97. The optical density is lg N (ND8 = 0.9)."
+  },
+  {
+   "id": "shutter-angle",
+   "title": "Shutter speed from shutter angle",
+   "statement": "Frame rate **{fps} fps**, shutter angle **{angle}°**. Find the shutter speed in milliseconds.",
+   "params": {
+    "fps": [
+     24,
+     25,
+     30,
+     50,
+     60,
+     100,
+     120
+    ],
+    "angle": [
+     45,
+     90,
+     180,
+     270
+    ]
+   },
+   "answer": "1000*angle/360/fps",
+   "unit": "ms",
+   "tol": 0.01,
+   "solution": "t = (angle/360)/fps. At 180° that is 1/(2·fps): 60 fps → 1/120 s = 8.33 ms. For strong stabilization in Gyroflow, use 90° or less."
+  },
+  {
+   "id": "nd-needed",
+   "title": "How many stops of ND you need",
+   "statement": "A scene at **EV {ev}** (at ISO 100), a camera with a fixed **f/2.5** aperture, **{fps} fps**, a shutter angle of **{angle}°**. How many stops must the filter cut to get this shutter speed at ISO 100?",
+   "params": {
+    "ev": {
+     "min": 12,
+     "max": 16,
+     "step": 0.5
+    },
+    "fps": [
+     24,
+     30,
+     50,
+     60
+    ],
+    "angle": [
+     90,
+     180
+    ]
+   },
+   "answer": "math.log2((angle/360/fps)*2**ev/2.5**2)",
+   "unit": "stops",
+   "tol": 0.01,
+   "abs": 0.02,
+   "solution": "The unfiltered shutter speed is t₀ = N²/2^EV, the required one t = (angle/360)/fps, stops n = log2(t/t₀). Take the filter rounded up, and make up the remainder with ISO = 100·2^(k−n)."
+  },
+  {
+   "id": "record-size",
+   "title": "Recording size",
+   "statement": "The camera records at **{mbps} Mbit/s**, for **{minutes} min** in total per session. How many gigabytes does the recording take (1 GB = 1000 MB)?",
+   "params": {
+    "mbps": {
+     "min": 30,
+     "max": 150,
+     "step": 5
+    },
+    "minutes": {
+     "min": 2,
+     "max": 60,
+     "step": 1
+    }
+   },
+   "answer": "mbps/8*minutes*60/1000",
+   "unit": "GB",
+   "tol": 0.01,
+   "solution": "MB/s = Mbit/s / 8; size = MB/s · seconds / 1000. 120 Mbit/s is 15 MB/s, 0.9 GB per minute. The card must sustain at least the stream rate: V30 = 30 MB/s."
+  },
+  {
+   "id": "uptilt-speed",
+   "title": "Aircraft and camera tilt versus speed",
+   "statement": "At **{v0} m/s** the aircraft flies level with a tilt of **{th0}°**. A simplified model: tan θ = D/W, drag D ∝ v², so tan θ = tan θ₀ · (v/v₀)². What is the tilt (and the camera tilt needed to look along the flight path) at **{v} m/s**?",
+   "params": {
+    "v0": [
+     20,
+     25
+    ],
+    "th0": {
+     "min": 15,
+     "max": 35,
+     "step": 5
+    },
+    "v": {
+     "min": 10,
+     "max": 30,
+     "step": 5
+    }
+   },
+   "answer": "math.degrees(math.atan(math.tan(math.radians(th0))*(v/v0)**2))",
+   "unit": "°",
+   "tol": 0.01,
+   "abs": 0.2,
+   "solution": "tan θ = tan θ₀ · (v/v₀)², θ = arctan(…). Example: 30° at 20 m/s → 42.1° at 25 m/s. The model ignores the growth of drag area with tilt and the lift of the body."
+  }
+ ]
+}

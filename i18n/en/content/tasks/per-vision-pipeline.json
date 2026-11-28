@@ -1,0 +1,89 @@
+{
+ "module": "per-vision-pipeline",
+ "tasks": [
+  {
+   "id": "timesync-error",
+   "title": "Georeferencing error from a frame/attitude desync",
+   "statement": "A nadir camera at **{h} m** above the ground. The vehicle rotates in roll at **{w} °/s**. The attitude was taken **{dt} ms** after the moment of exposure. Estimate the shift of the point on the ground (m) for a target near the frame center.",
+   "params": {
+    "h": {
+     "min": 5,
+     "max": 60,
+     "step": 5
+    },
+    "w": {
+     "min": 5,
+     "max": 60,
+     "step": 5
+    },
+    "dt": {
+     "min": 20,
+     "max": 200,
+     "step": 10
+    }
+   },
+   "answer": "h*math.tan(math.radians(w*dt/1000))",
+   "unit": "m",
+   "tol": 0.02,
+   "solution": "The angular error is δθ = ω·Δt; the shift near nadir is δ = h·tan(δθ). At 15 m, 25 °/s and 100 ms that is 0.65 m, an order of magnitude more than the pixel error."
+  },
+  {
+   "id": "target-px",
+   "title": "Target size in pixels and the maximum altitude",
+   "statement": "A target **{d} cm** in diameter, a camera with f = **{f} px**. The detector needs at least **{npx} px** across. From what maximum altitude (m) is the target still detected?",
+   "params": {
+    "d": {
+     "min": 20,
+     "max": 120,
+     "step": 10
+    },
+    "f": [
+     400,
+     600,
+     800,
+     1000
+    ],
+    "npx": {
+     "min": 8,
+     "max": 24,
+     "step": 2
+    }
+   },
+   "answer": "d/100*f/npx",
+   "unit": "m",
+   "tol": 0.02,
+   "solution": "The size in pixels is s = D·f/h ⇒ h_max = D·f/s. An 80 cm disc at f = 400 px with a 10 px minimum gives 32 m; the detector's area gates are computed from the same formula."
+  },
+  {
+   "id": "glass-to-command",
+   "title": "Glass-to-command latency and the gain limit",
+   "statement": "Exposure + readout **{cam} ms**, capture and undistort **{cap} ms**, inference **{inf} ms**, tracker + georeferencing 2 ms, MAVLink and reception by the autopilot **{mav} ms**. Find the glass-to-command latency T_d and from it the ideal gain limit of the position loop K_p,max = π/(2·T_d) (1/s).",
+   "params": {
+    "cam": {
+     "min": 10,
+     "max": 40,
+     "step": 5
+    },
+    "cap": {
+     "min": 2,
+     "max": 12,
+     "step": 2
+    },
+    "inf": {
+     "min": 10,
+     "max": 120,
+     "step": 10
+    },
+    "mav": {
+     "min": 2,
+     "max": 20,
+     "step": 2
+    }
+   },
+   "answer": "math.pi/2/((cam+cap+inf+2+mav)/1000)",
+   "unit": "1/s",
+   "tol": 0.03,
+   "solution": "T_d = the sum of the stages (in seconds). For a \"position error → velocity\" loop with a pure delay, the −90° phase is reached at ω = π/(2·T_d), and that is the K_p limit without the autopilot's dynamics; with a velocity response τ = 0.4 s and limits it is lower (per-tracking), and the working value is another 3–5 times smaller."
+  }
+ ]
+}

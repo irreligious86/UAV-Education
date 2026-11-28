@@ -1,0 +1,96 @@
+{
+  "module": "comp-jetson-nano",
+  "pass": 80,
+  "questions": [
+    {
+      "q": "A Jetson Nano in MAXN mode under a detector. What does this tegrastats line show?",
+      "kind": "apply",
+      "fragment": "RAM 3100/3957MB CPU [95%@918,100%@918,97%@918,98%@918] GR3D_FREQ 99%@537 CPU@97.5C PMIC@100C GPU@98C POM_5V_IN 5200/4900",
+      "options": [
+        "5 W mode is on: two cores are offline, and the GPU clock is capped at its 640 MHz ceiling",
+        "Software throttling: the GPU is 99 % busy, yet its clock has dropped to 537 MHz",
+        "The PMIC is overheated: 100 °C is the board's hardware shutdown threshold",
+        "A supply dip: POM_5V_IN is below 4.75 V and the board is browning out"
+      ],
+      "answer": 1,
+      "explain": "The Nano's software throttling threshold is 97.0 °C (CPU) and 97.5 °C (GPU); the GPU ceiling in MAXN is 921.6 MHz, and the real line under load showed 844 MHz. All four cores are online (in 5 W mode two would be `off`), PMIC@100C is a constant on the Nano, and POM_5V_IN is power in mW, not a voltage."
+    },
+    {
+      "q": "A Nano is powered from a 5.0 V BEC through a meter-long micro-USB cable at 28 AWG (R ≈ 0.53 Ω including the connector) and reboots when TensorRT starts (a 7.7 W peak). Why?",
+      "options": [
+        "A current of 1.54 A drops 0.81 V: the board sees 4.19 V against a minimum of 4.75 V",
+        "Micro-USB is limited to 0.5 A, so the board gets no more than 2.5 W",
+        "MAXN mode needs 10 V at the input, not 5 V",
+        "A 5.0 V BEC is set too high: the module itself needs no more than 4.75 V at its input pins"
+      ],
+      "answer": 0,
+      "explain": "U = U_BEC − I·R = 5.0 − 1.54·0.526 = 4.19 V. The module needs 4.75–5.25 V; the threshold is already crossed at 0.48 A. The cure is a short thick wire into the barrel jack or onto pins 2/4."
+    },
+    {
+      "q": "What does the \"10 W\" budget of the Jetson Nano's MAXN mode limit?",
+      "options": [
+        "The power of the whole devkit including USB peripherals",
+        "The current through the micro-USB connector",
+        "The power of the module's CPU and GPU rails",
+        "The average power over 10 minutes, with peaks unlimited"
+      ],
+      "answer": 2,
+      "explain": "Per the devkit guide, the 5 and 10 W budgets apply only to the CPU and GPU domains. The carrier adds 0.5–1.25 W, and the camera and USB add their own watts, so the BEC is sized for 15 W and rated for 5 A."
+    },
+    {
+      "q": "You need to run detection and send H.264 1080p30 to the ground at the same time. What is the difference between the Nano and the Orin Nano?",
+      "options": [
+        "The Nano encodes only on the CPU, while the Orin Nano has hardware NVENC",
+        "Both have a hardware encoder, so there is no difference",
+        "The Orin Nano has no NVENC: x264enc takes about two CPU cores",
+        "The Orin Nano cannot capture a CSI camera while running inference"
+      ],
+      "answer": 2,
+      "explain": "The Nano has a hardware encoder (4Kp30 or 4 × 1080p30, `nvv4l2h264enc`). The Orin Nano has no NVENC: for x264enc ultrafast on a 30 fps camera stream, NVIDIA reports 38 % load on each of the six cores, about 2.3 cores."
+    },
+    {
+      "q": "A TensorRT engine was built on a laptop with an RTX GPU and copied to a Jetson Nano. What happens?",
+      "options": [
+        "It works, but only in FP32",
+        "It will not load: an engine is tied to the GPU and the TensorRT version",
+        "It works after `nvpmodel -m 0`",
+        "It works if the same version of ultralytics is installed on the Nano as on the laptop"
+      ],
+      "answer": 1,
+      "explain": "An engine is optimized for a specific GPU and TensorRT/CUDA version. Between platforms you move the ONNX and build the engine on the target board (TensorRT 8.2.1 on the Nano)."
+    },
+    {
+      "q": "The bridge sends `named_value_float_send(ms, b\"CC_GPU_FREQ_MHZ\", 537.0)`. What is wrong?",
+      "options": [
+        "Only the autopilot may send NAMED_VALUE_FLOAT",
+        "The value must be an integer: a float needs DEBUG_VECT",
+        "The name is longer than 10 characters: the `name` field is char[10]",
+        "The name must start with the MAV_ prefix"
+      ],
+      "answer": 2,
+      "explain": "In common.xml, the name field of message 251 is char[10]. In the lab the field is called `CC_GPU_MHZ`, exactly 10 characters."
+    },
+    {
+      "q": "On the Jetson Nano's `/dev/ttyTHS1` there is garbage instead of MAVLink, although the wiring and the baud rate are right. What do you check first?",
+      "options": [
+        "The nvgetty service: the header UART carries the console by default",
+        "Jumper J48: the header UART works only when powered from the barrel jack",
+        "The nvpmodel mode: in 5 W mode the UART is disabled",
+        "Levels: the Nano outputs 1.8 V and needs a converter to 3.3 V"
+      ],
+      "answer": 0,
+      "explain": "`sudo systemctl stop nvgetty && sudo systemctl disable nvgetty`, and add the user to dialout. The header UART levels are 3.3 V; never apply 5 V."
+    },
+    {
+      "q": "A nano-class detector per published measurements: Pi 5 (NCNN, CPU) 14.9 fps, Jetson Nano (TensorRT FP16) 19 fps, Orin Nano Super (TensorRT FP16) 219 fps. Which conclusion is correct?",
+      "options": [
+        "The Nano is three times faster than a Pi 5 and worth buying for a new project",
+        "The figures include capture and NMS, so they can go straight into the latency budget",
+        "The Nano is close to a Pi 5 on its CPU alone, and the Orin Nano is an order of magnitude faster",
+        "INT8 on the Nano will raise its speed to the Orin Nano's level"
+      ],
+      "answer": 2,
+      "explain": "The measurements are other people's and the models are from different generations; Ultralytics and Q-engineering both measure inference only, but the orders of magnitude are robust. The Nano beats a Pi 5 with its hardware encoder and CSI pipeline, not with network speed; in Q-engineering's test INT8 gave the Nano no speedup."
+    }
+  ]
+}

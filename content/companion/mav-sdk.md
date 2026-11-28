@@ -38,7 +38,7 @@ next:
 {{lesson:mav-services|Диалоги миссии, параметров и команд с ACK и повторами — то, что MAVSDK прячет внутри; без них tlog не прочитать.}}
 
 ### MAVSDK 4: нативная привязка вместо gRPC
-До версии 3.x включительно `pip install mavsdk` ставил MAVSDK-Python: асинхронную обёртку, которая запускала встроенный процесс `mavsdk_server` и говорила с ним по gRPC. С MAVSDK v4 имя `mavsdk` на PyPI занял другой продукт — нативная привязка, которая через C-обёртку `libcmavsdk` вызывает C++-ядро прямо в процессе Python (ctypes). Выпуски на PyPI: 3.17.4 — 17.09.2026 (последний старого типа), 4.0.0 — 22.09.2026, 4.2.1 — 17.11.2026 (текущий на ноябрь 2026; ядро сообщает `MAVSDK v4.2.1`). Старый gRPC-клиент продолжает развиваться под именем `mavsdk-grpc` (импорт `mavsdk_grpc`, тоже 4.2.1).
+До версии 3.x включительно `pip install mavsdk` ставил MAVSDK-Python: асинхронную обёртку, которая запускала встроенный процесс `mavsdk_server` и говорила с ним по gRPC. С MAVSDK v4 имя `mavsdk` на PyPI занял другой продукт — нативная привязка, которая через C-обёртку `libcmavsdk` вызывает C++-ядро прямо в процессе Python (ctypes). Выпуски на PyPI: 3.17.4 — 17.09.2026 (последний старого типа), 4.0.0 — 22.09.2026, 4.2.1 — 17.11.2026 (на нём снята лабораторная; ядро сообщает `MAVSDK v4.2.1`), 4.3.0 — 27.11.2026. Старый gRPC-клиент продолжает развиваться под именем `mavsdk-grpc` (импорт `mavsdk_grpc`, тоже 4.2.1).
 
 Что из этого следует на практике:
 
@@ -372,7 +372,7 @@ asyncio.run(main())
 - ArduPilot Copter-4.7.2 — GCS_MAVLink_Parameters.cpp (MAVn_* stream rates) | https://github.com/ArduPilot/ardupilot/blob/Copter-4.7.2/libraries/GCS_MAVLink/GCS_MAVLink_Parameters.cpp | primary | A
 - MAVSDK-Python (gRPC client, now mavsdk-grpc) | https://github.com/mavlink/MAVSDK-Python | primary | A
 - MAVROS | https://github.com/mavlink/mavros | primary | A
-- PX4 — Offboard mode (timeouts, COM_OF_LOSS_T) | https://docs.px4.io/v1.17/en/flight_modes/offboard.html | primary | A
+- PX4 — Offboard mode (timeouts, COM_OF_LOSS_T; v1.18.0 docs source) | https://github.com/PX4/PX4-Autopilot/blob/v1.18.0/docs/en/flight_modes/offboard.md | primary | A
 - ArduPilot — Copter commands in Guided mode | https://ardupilot.org/dev/docs/copter-commands-in-guided-mode.html | primary | A
 
 ## checklist

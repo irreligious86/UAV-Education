@@ -3,7 +3,7 @@ id: fw-reading
 title: "Как читать исходники прошивки: Betaflight и ArduPilot"
 level: L4
 readingTime: 45 мин
-firmware: Betaflight · ArduPilot
+firmware: Betaflight 2025.12 (сверено с 2025.12.5 и 2026.6.2) · ArduPilot 4.7 (сверено с 4.7.3)
 status: published
 added: 2026-11-08
 tags:
@@ -34,11 +34,11 @@ next:
 1. **Планировщик**: `scheduler/scheduler.c` — выбирает задачи из таблицы `fc/tasks.c`. Задача `TASK_GYRO` (`taskGyroSample`) и `TASK_FILTER`/`TASK_PID` (`taskMainPidLoop` в `fc/core.c`).
 2. **Гироскоп**: `sensors/gyro.c` — `gyroUpdate()` читает драйвер (`drivers/accgyro/accgyro_spi_icm426xx.c` и др., через DMA), LPF2 (`common/filter.c`: PT1/PT2/PT3/biquad) применяется ещё на частоте гироскопа, затем `gyroFiltering()` (`sensors/gyro_filter_impl.c`) применяет цепочку: RPM-notch (`flight/rpm_filter.c`), статические notch 1 и 2, LPF1 и последним динамический notch (`flight/dyn_notch_filter.c`). Порядок фильтров — именно здесь, и он не очевиден из конфигуратора.
 3. **PID**: `flight/pid.c` — `pidController()`: для каждой оси ошибка = setpoint − gyro, P, I с anti-windup и iterm_relax, D на отфильтрованном гироскопе (D-LPF, D max: `d_max_*` в 2025.12, `d_min_*` в 4.5), feedforward (`flight/pid_init.c`, `fc/rc.c` — FF считается из производной setpoint с интерполяцией/сглаживанием), TPA, anti-gravity, `pidSum` в `pidData[axis].Sum`.
-4. **Миксер**: `flight/mixer.c` — `mixTable()`: pidSum по осям × матрица миксера (`mixer_init.c`/`mixer_tricopter.c`) + газ → моторы, `airmode`, ограничение (`mixer_type`: LEGACY/LINEAR/DYNAMIC), idle (`motor_idle`, до 2025.12 — `dshot_idle_value`), `motorOutputLimit`.
+4. **Миксер**: `flight/mixer.c` — `mixTable()`: pidSum по осям × матрица миксера (`mixer_init.c`/`mixer_tricopter.c`) + газ → моторы, `airmode`, ограничение (`mixer_type`: LEGACY/LINEAR/DYNAMIC/EZLANDING), idle (`motor_idle`, до 2025.12 — `dshot_idle_value`), `motorOutputLimit`.
 5. **Вывод**: `drivers/dshot.c` (кодирование кадра), `drivers/pwm_output.c`; платформенная часть на текущем master — `src/platform/STM32/dshot_bitbang.c`, `src/platform/common/stm32/dshot_dpwm.c`, `pwm_output_dshot_shared.c` — формирование кадров DShot через таймер+DMA; декодирование eRPM bidirectional DShot — `drivers/dshot_bitbang_decode.c` (в 4.5 `dshot_dpwm.c` лежал в `src/main/drivers/`).
-6. **Blackbox**: `blackbox/blackbox.c` — что и как логируется (`blackbox_fields.c`).
+6. **Blackbox**: `blackbox/blackbox.c` — что и как логируется (таблица полей `blackboxMainFields[]` в том же файле).
 
-Проверка на теорию: в `pid.c` найти, как считается D — `-(gyroRateDterm[axis] - previousGyroRateDterm[axis]) * pidFrequency`, где `gyroRateDterm` — гироскоп, уже пропущенный через D-notch и D-LPF1/LPF2 (фильтры стоят до дифференцирования), затем умножение на `pidCoefficient[axis].Kd` и `dMinFactor` (в master — `dMaxMultiplier`): D берётся от **гироскопа**, а не от ошибки (нет «derivative kick» при движении стика), и масштаб коэффициента — константы в `pid.h`, применяются в `pid_init.c` (`PTERM_SCALE`, `ITERM_SCALE`, `DTERM_SCALE`: отсюда «безразмерные» значения в конфигураторе).
+Проверка на теорию: в `pid.c` найти, как считается D — `-(gyroRateDterm[axis] - previousGyroRateDterm[axis]) * pidFrequency`, где `gyroRateDterm` — гироскоп, уже пропущенный через D-notch и D-LPF1/LPF2 (фильтры стоят до дифференцирования), затем умножение на `pidCoefficient[axis].Kd` и `dMinFactor` (в 4.5; с 2025.12 — `dMaxMultiplier`): D берётся от **гироскопа**, а не от ошибки (нет «derivative kick» при движении стика), и масштаб коэффициента — константы в `pid.h`, применяются в `pid_init.c` (`PTERM_SCALE`, `ITERM_SCALE`, `DTERM_SCALE`: отсюда «безразмерные» значения в конфигураторе).
 
 ### ArduPilot: путь IMU → rate → motors
 Репозиторий `ArduPilot/ardupilot`, транспорт в `ArduCopter/`, библиотеки в `libraries/`:
@@ -48,12 +48,12 @@ next:
 1. **Планировщик**: `ArduCopter/Copter.cpp` — таблица `scheduler_tasks[]`: `FAST_TASK_CLASS(AP_InertialSensor, &copter.ins, update)` → `FAST_TASK(run_rate_controller_main)` → `FAST_TASK(motors_output_main)` → `FAST_TASK(read_AHRS)` → … → `FAST_TASK(update_flight_mode)`; медленные задачи `SCHED_TASK(rc_loop, 250, 130, 3)` с частотой, бюджетом (мкс) и приоритетом. Новые версии умеют выделенный rate-поток (`ArduCopter/rate_thread.cpp`, `FSTRATE_ENABLE`) на частоте гироскопа.
 2. **IMU и фильтры**: `libraries/AP_InertialSensor/` — `AP_InertialSensor.cpp` (`update()`), backend драйверы (`AP_InertialSensor_Invensensev3.cpp`), гармонический notch `libraries/Filter/HarmonicNotchFilter.cpp`, LPF `Filter/LowPassFilter2p.cpp`.
 3. **Rate-контур**: `ArduCopter/Attitude.cpp` — `run_rate_controller_main()` → `attitude_control->rate_controller_run()` в `libraries/AC_AttitudeControl/AC_AttitudeControl_Multi.cpp`: для каждой оси `_motors.set_roll(get_rate_roll_pid().update_all(target, gyro, dt, _motors.limit.roll, …))` в `libraries/AC_PID/AC_PID.cpp` (P, I с limit, D с фильтром `FLTD`, FF, ошибка через `FLTE`, цель через `FLTT`) → `_motors.set_roll(...)`.
-4. **Angle-контур**: `AC_AttitudeControl.cpp` — `input_euler_angle_roll_pitch_euler_rate_yaw()` и др. → кватернионная ошибка → `rate_target_ang_vel` с `ATC_ANG_*_P` и ограничениями ускорения (`ATC_ACC_*_MAX`, до 4.7 — `ATC_ACCEL_*_MAX`) — реализация input shaping.
+4. **Angle-контур**: `AC_AttitudeControl.cpp` — `input_euler_angle_roll_pitch_euler_rate_yaw_rad()` и др. → кватернионная ошибка → `rate_target_ang_vel` с `ATC_ANG_*_P` и ограничениями ускорения (`ATC_ACC_*_MAX`, до 4.7 — `ATC_ACCEL_*_MAX`) — реализация input shaping.
 5. **Моторы**: `ArduCopter/motors.cpp` `motors_output_main()` → `libraries/AP_Motors/AP_MotorsMulticopter.cpp` `output()` (фильтр газа, lift_max по напряжению АКБ, spool-логика) → `AP_MotorsMatrix.cpp` `output_armed_stabilizing()` (распределение roll/pitch/yaw/throttle по матрице с приоритетом и `MOT_YAW_HEADROOM`) → `output_to_motors()` → `SRV_Channel`/`AP_HAL` RCOutput (DShot/PWM).
 6. **EKF**: `libraries/AP_NavEKF3/` — `AP_NavEKF3_core.cpp` (`UpdateFilter`), по файлу на тип измерений (`*_PosVelFusion.cpp`, `*_MagFusion.cpp`, `*_OptFlowFusion.cpp`), источники в `AP_NavEKF/AP_NavEKF_Source.cpp`.
 7. **Параметры**: `ArduCopter/Parameters.cpp` и `*_Params.cpp` в библиотеках — блоки `// @Param:` с описанием, диапазоном и `@Values` — это источник вики параметров.
 
-Проверка на теорию: в `AC_PID::update_all()` увидеть, что D считается от ошибки, пропущенной через `FLTD`, а не от сырого гироскопа; что I ограничивается `IMAX` и не накапливается при `limit` (насыщение моторов) — это anti-windup; `AP_MotorsMatrix::output_armed_stabilizing()` — порядок: сначала roll/pitch, затем yaw — сколько помещается (`MOT_YAW_HEADROOM` — гарантированный минимум), и только потом подбирается throttle, который влезает в оставшийся диапазон.
+Проверка на теорию: в `AC_PID::update_all()` увидеть, что D — производная ошибки (уже сглаженной `FLTE`), пропущенная через фильтр `FLTD`, а не производная сырого гироскопа; что I ограничивается `IMAX` и не накапливается при `limit` (насыщение моторов) — это anti-windup; `AP_MotorsMatrix::output_armed_stabilizing()` — порядок: сначала roll/pitch, затем yaw — сколько помещается (`MOT_YAW_HEADROOM` — гарантированный минимум), и только потом подбирается throttle, который влезает в оставшийся диапазон.
 
 {{diagram:fw-gyro-motor-paths|Один и тот же путь гироскоп → моторы в двух кодовых базах с файлом на каждом шаге; выделен PID: D от гироскопа в Betaflight и от ошибки через FLTD в ArduPilot.}}
 

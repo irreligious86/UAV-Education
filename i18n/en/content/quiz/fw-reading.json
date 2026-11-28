@@ -3,7 +3,7 @@
   "pass": 80,
   "questions": [
     {
-      "q": "Where is the main PID loop in Betaflight?",
+      "q": "Where is Betaflight's main PID loop?",
       "options": [
         "main/scheduler",
         "fc/core.c: taskMainPidLoop",
@@ -11,18 +11,18 @@
         "drivers/dshot.c"
       ],
       "answer": 1,
-      "explain": "taskMainPidLoop → subTaskPidController → subTaskMotorUpdate: the PID and the mixer are subtasks of the loop."
+      "explain": "taskMainPidLoop → subTaskPidController → subTaskMotorUpdate: the PID controller and the mixer are subtasks of the loop."
     },
     {
-      "q": "What is the D-term computed from in Betaflight?",
+      "q": "What is the D term computed from in Betaflight?",
       "options": [
-        "The pilot's setpoint",
-        "The gyro",
-        "The error",
-        "The motors"
+        "From the pilot's setpoint",
+        "From the gyro",
+        "From the error",
+        "From the motors"
       ],
       "answer": 1,
-      "explain": "No derivative kick when the stick moves."
+      "explain": "So there is no derivative kick when the stick moves."
     },
     {
       "q": "Where in ArduCopter is the task table with rates and time budgets?",
@@ -39,12 +39,12 @@
       "q": "What does AP_MotorsMatrix::output_armed_stabilizing() do?",
       "options": [
         "Reads the gyro",
-        "Distributes the axes over the motors",
+        "Mixes the axes into the motors",
         "Sends MAVLink",
         "Runs the EKF and writes the log"
       ],
       "answer": 1,
-      "explain": "It distributes roll/pitch/yaw/throttle over the motor matrix with priorities; yaw goes last, within MOT_YAW_HEADROOM."
+      "explain": "It mixes roll/pitch/yaw/throttle through the motor matrix with priorities: roll/pitch first, then as much yaw as fits (MOT_YAW_HEADROOM is the guaranteed minimum), and throttle into the remaining range."
     },
     {
       "q": "Where does the ArduPilot parameter wiki come from?",
@@ -52,18 +52,18 @@
         "From MAVLink",
         "From the @Param blocks in the code",
         "From Mission Planner",
-        "Written by hand by the dev team"
+        "Written by hand by the developer team"
       ],
       "answer": 1,
-      "explain": "Description, range, @Values — in the code."
+      "explain": "The description, range and @Values live in the code."
     },
     {
-      "q": "How do you safely test a firmware patch?",
+      "q": "How do you test a firmware patch safely?",
       "options": [
         "Straight on the drone",
-        "SITL and tests, then the bench",
-        "You can't",
-        "In the configurator via the CLI"
+        "SITL and tests, then a bench",
+        "There is no way",
+        "In the Configurator through the CLI"
       ],
       "answer": 1,
       "explain": "make SITL / sim_vehicle.py; make test."
@@ -72,17 +72,17 @@
       "q": "git log -S \"name\" is used to:",
       "options": [
         "Build firmware from an old commit",
-        "Find the commit with that string",
+        "Find the commit with this string",
         "Delete the line",
-        "Check the style"
+        "Check the code style"
       ],
       "answer": 1,
-      "explain": "The PR comment explains the reason for the change."
+      "explain": "The PR discussion explains why the change was made."
     },
     {
-      "q": "Why link to a commit in the report rather than to master?",
+      "q": "Why link to a commit rather than to master in your notes?",
       "options": [
-        "A link to master points to different code over time",
+        "Over time a master link points to different code",
         "Commits open faster",
         "GitHub forbids links to master",
         "master has no line numbers"

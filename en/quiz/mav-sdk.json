@@ -3,15 +3,15 @@
   "pass": 80,
   "questions": [
     {
-      "q": "MAVSDK-Python 4.x (`pip install mavsdk`) inside:",
+      "q": "Inside MAVSDK-Python 4.x (`pip install mavsdk`) is:",
       "options": [
-        "C++ core via libcmavsdk",
+        "The C++ core through libcmavsdk",
         "Pure Python and pymavlink",
-        "A wrapper over MAVROS",
+        "A wrapper around MAVROS",
         "mavsdk_server over gRPC"
       ],
       "answer": 0,
-      "explain": "Since v4 (September 2026) the `mavsdk` package is a native binding through the C wrapper, no gRPC and no second process; the old gRPC client lives on as `mavsdk-grpc`."
+      "explain": "Since v4 (September 2026) the `mavsdk` package is a native binding through a C wrapper, with no gRPC and no second process; the old gRPC client lives on as `mavsdk-grpc`."
     },
     {
       "q": "`async for x in tel.subscribe_position()` (MAVSDK 4.x):",
@@ -22,15 +22,15 @@
         "Blocks the event loop"
       ],
       "answer": 0,
-      "explain": "Subscriptions never end; in 4.x a one-off value comes from `await tel.position()`."
+      "explain": "Subscriptions are endless; in 4.x a one-off value comes from `await tel.position()`."
     },
     {
-      "q": "PX4 exits Offboard right after starting. The cause:",
+      "q": "PX4 leaves Offboard right after start. The cause:",
       "options": [
-        "Setpoints before start, or slower than 2 Hz",
+        "Setpoints before start or below 2 Hz",
         "Wrong SERIAL baud rate",
         "Wrong sysid",
-        "Signing is enabled"
+        "Message signing is enabled"
       ],
       "answer": 0,
       "explain": "You need an initial setpoint and a continuous stream."
@@ -38,13 +38,13 @@
     {
       "q": "DroneKit-Python in 2026:",
       "options": [
-        "Unmaintained",
-        "Recommended for PX4",
-        "A replacement for MAVSDK",
-        "Part of ArduPilot"
+        "Is not maintained",
+        "Is recommended for PX4",
+        "Replaces MAVSDK",
+        "Is part of ArduPilot"
       ],
       "answer": 0,
-      "explain": "The project isn't being developed."
+      "explain": "The project is not being developed."
     },
     {
       "q": "The preferred bridge for PX4 + ROS 2:",
@@ -55,15 +55,15 @@
         "MAVProxy with a ROS 2 module"
       ],
       "answer": 0,
-      "explain": "MAVROS — for ArduPilot/ROS or special cases."
+      "explain": "MAVROS is for ArduPilot/ROS or special cases."
     },
     {
-      "q": "Who should ensure safety when the script on the companion “dies”?",
+      "q": "Who must provide safety when the companion script \"dies\"?",
       "options": [
         "The autopilot: timeouts and failsafe",
         "MAVSDK",
-        "The script itself via try/except",
-        "The operator manually"
+        "The script itself, through try/except blocks",
+        "The operator, by hand"
       ],
       "answer": 0,
       "explain": "The companion advises, the autopilot decides."
@@ -77,15 +77,15 @@
         "A TimeoutError exception after 30 s"
       ],
       "answer": 0,
-      "explain": "Wrap waits in asyncio.wait_for."
+      "explain": "Wrap your waits in asyncio.wait_for."
     },
     {
       "q": "On the wire, mission.upload_mission() is:",
       "options": [
-        "The same MISSION_* dialogue",
-        "One big packet over MAVFTP",
-        "A transfer over MAVFTP",
-        "MAVSDK's own protocol"
+        "The same MISSION_* dialog",
+        "One big packet sent through MAVFTP",
+        "PARAM_SET for each item",
+        "A MAVSDK protocol of its own"
       ],
       "answer": 0,
       "explain": "The upper layers implement the same microservices."
