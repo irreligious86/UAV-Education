@@ -31,7 +31,7 @@ SITL без зовнішнього симулятора рахує фізику 
 - Пара «ROS 2 — Gazebo» фіксована: змішувати версії поза рекомендованими парами — джерело важковловних проблем зі збиранням мостів.
 
 ### Як автопілот говорить зі світом
-- **ArduPilot**: плагін `ardupilot_gazebo` (система `ArduPilotPlugin` у моделі). Gazebo рахує фізику й датчики, плагін надсилає стан у SITL і отримує від нього команди моторам/сервам; обмін — JSON по UDP, у режимі lockstep (симуляція чекає на автопілот, час узгоджено). Запуск: в одному терміналі `gz sim -v4 -r iris_runway.sdf`, в іншому `sim_vehicle.py -v ArduCopter -f gazebo-iris --model JSON --map --console`. Ім'я фрейму має містити `gazebo-`, модель — `JSON`.
+- **ArduPilot**: плагін `ardupilot_gazebo` (система `ArduPilotPlugin` у моделі). Gazebo рахує фізику й датчики, плагін надсилає стан у SITL і отримує від нього команди моторам/сервам; обмін — JSON по UDP, у режимі lockstep (симуляція чекає на автопілот, час узгоджено). Запуск: в одному терміналі `gz sim -v4 -r iris_runway.sdf`, в іншому `sim_vehicle.py -v ArduCopter -f gazebo-iris --model JSON --map --console`. Зв'язок із Gazebo дає модель `JSON` (`--model JSON`), а фрейм `gazebo-iris` лише підвантажує параметри Iris (`default_params/gazebo-iris.parm`).
 - **PX4**: Gazebo вбудовано в збірку SITL: `make px4_sitl gz_x500`; варіанти моделей із датчиками (наприклад `gz_x500_depth`, `gz_x500_mono_cam`) і літаки/VTOL; світ вибирається змінною `PX4_GZ_WORLD`.
 - Змінні оточення: `GZ_SIM_SYSTEM_PLUGIN_PATH` — де шукати плагіни (збірка `ardupilot_gazebo`), `GZ_SIM_RESOURCE_PATH` — моделі й світи.
 
@@ -116,7 +116,7 @@ def test_takeoff_hold_land():
 
 ## diagnostics
 - **Симптом:** SITL не бачить Gazebo, апарат «висить» на землі
-  - Можлива причина: не виставлено `GZ_SIM_SYSTEM_PLUGIN_PATH`, плагін не зібрано, фрейм без `gazebo-` або модель не `JSON`.
+  - Можлива причина: не виставлено `GZ_SIM_SYSTEM_PLUGIN_PATH`, плагін не зібрано або SITL запущено не з моделлю `JSON`.
   - Що зробити: перевірити змінні, збірку плагіна, аргументи `sim_vehicle.py`.
 - **Симптом:** світ не знаходить моделі
   - Можлива причина: не виставлено `GZ_SIM_RESOURCE_PATH`.

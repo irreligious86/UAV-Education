@@ -84,7 +84,7 @@ pip install pymavlink MAVProxy pandas numpy scipy matplotlib pyserial
 sudo usermod -aG dialout $USER     # access to /dev/ttyACM*/ttyUSB*; re-login
 git clone --depth 1 https://github.com/ArduPilot/ardupilot && cd ardupilot && Tools/environment_install/install-prereqs-ubuntu.sh -y
 ```
-Перевірка: `mavproxy.py --master=tcp:127.0.0.1:5760` підключається до `sim_vehicle.py -v ArduCopter`. У WSL2 USB-пристрої прокидаються через `usbipd` (Windows 11) — або використовуй Windows-застосунки для USB, а Linux — для скриптів і логів.
+Перевірка: за запущеного `sim_vehicle.py -v ArduCopter` другий `mavproxy.py --master=udp:127.0.0.1:14550` отримує його UDP-вихід (tcp:5760 SITL уже зайнятий MAVProxy, якого запустив sim_vehicle.py, і приймає одного клієнта; щоб підключитися до нього самому, запусти `sim_vehicle.py -v ArduCopter --no-mavproxy` і `--master=tcp:127.0.0.1:5760`). У WSL2 USB-пристрої прокидаються через `usbipd` (Windows 11) — або використовуй Windows-застосунки для USB, а Linux — для скриптів і логів.
 
 ### Куди що логується (щоб потім знайти)
 Betaflight: flash на FC → вивантаження через конфігуратор (вкладка Blackbox) у `.BFL`; ArduPilot: SD-карта `/APM/LOGS/*.BIN` або MAVFtp з Mission Planner; телеметрійні логи GCS (`.tlog`) — окремо, містять усе, що йшло через MAVLink; PX4: `.ulg` на SD, перегляд через Flight Review (веб) або `pyulog`. Іменування: `ГГГГ-ММ-ДД_аппарат_цель.ext` у папці апарата.

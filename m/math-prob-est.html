@@ -79,7 +79,7 @@
 
 <h2 id="praktika">Практика</h2>
 <h4 id="shag-1-pasport-giroskopa-iz-zapisi" class="md-subheading">Шаг 1. Паспорт гироскопа из записи</h4>
-<p>Запишите 10–30 минут IMU в покое (<code>IMU</code> в DataFlash ArduPilot с <code>LOG_BITMASK</code>, включающим raw IMU; или <code>sensor_gyro</code> в ulog; или Blackbox без арма на столе). Для каждой оси: bias, σ, гистограмма с наложенной гауссианой. Проверьте долю отсчётов за ±3σ — для гауссианы это 0.3 %.</p>
+<p>Запишите 10–30 минут IMU в покое (<code>IMU</code> в DataFlash ArduPilot, а с битом raw IMU в <code>LOG_BITMASK</code> — сырые <code>GYR</code>/<code>ACC</code> на частоте датчика; или <code>sensor_gyro</code> в ulog; или Blackbox без арма на столе). Для каждой оси: bias, σ, гистограмма с наложенной гауссианой. Проверьте долю отсчётов за ±3σ — для гауссианы это 0.3 %.</p>
 <h4 id="shag-2-allan-deviation" class="md-subheading">Шаг 2. Allan deviation</h4>
 <pre class="cli-block"><code>import numpy as np
 
@@ -93,7 +93,7 @@ def allan_dev(x, fs, taus):
         d = theta[2*m:] - 2*theta[m:-m] + theta[:-2*m]
         out.append(np.sqrt(np.mean(d**2) / (2 * tau**2)))
     return np.array(out)</code></pre>
-<p>Постройте в log-log по τ от 0.01 до 300 с. Найдите ARW (значение на наклоне −½ при τ = 1 с) и bias instability (минимум). Сравните с паспортом чипа (ICM-42688: ~0.0028 °/с/√Гц). Переведите в единицы <code>EK3_GYRO_P_NSE</code> (рад/с/√Гц).</p>
+<p>Постройте в log-log по τ от 0.01 до 300 с. Найдите ARW (значение на наклоне −½ при τ = 1 с) и bias instability (минимум). Сравните с паспортом чипа (ICM-42688: ~0.0028 °/с/√Гц). Переведите в рад/с/√Гц (0.0028 °/с/√Гц = 4.9·10⁻⁵ рад/с/√Гц), а затем в СКЗ скорости в рад/с в полосе датчика (× √полосы, например × √200 ≈ 7·10⁻⁴ рад/с) — это единицы <code>EK3_GYRO_P_NSE</code> (рад/с): значение по умолчанию 0.015 примерно в 20 раз больше — запас на вибрации и ошибки модели.</p>
 <h4 id="shag-3-sliyanie-vruchnuyu" class="md-subheading">Шаг 3. Слияние вручную</h4>
 <p>Барометр даёт 101.3 м с σ = 0.5 м, дальномер — 100.2 м с σ = 0.1 м. Найдите оптимальную оценку и её σ (ответ: ≈100.24 м, σ ≈ 0.098 м). Затем «сломайте» дальномер: 95 м с тем же σ. Фильтр с воротами 3σ должен отбросить измерение — проверьте расчётом, почему (инновация 6.3 м при S = √(0.5² + 0.1²) ≈ 0.51 м).</p>
 <h4 id="shag-4-ellips" class="md-subheading">Шаг 4. Эллипс</h4>

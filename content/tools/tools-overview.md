@@ -39,7 +39,7 @@ next:
 - **Python** с `orangebox` (Betaflight), `pymavlink.DFReader` (ArduPilot) и `pyulog` (PX4) — когда нужны свои метрики.
 
 ### Терминал и Python
-Linux-терминал или WSL на Windows: `picocom`/`minicom` для UART, `pyserial` для скриптов к CLI, `pymavlink` для MAVLink, `scipy`/`matplotlib` для спектров. Виртуальное окружение на проект (`python -m venv`), чтобы версии библиотек не мешали друг другу. Зачем это нужно на практике: `pymavlink`, `MAVProxy` и `mavsdk` выходят по несколько раз в год, а скрипт разбора логов, написанный под одну версию, через год может упасть на другой. Поэтому рядом с кодом лежит `requirements.txt` с точными версиями: `pip freeze > requirements.txt` после того, как всё заработало, и `pip install -r requirements.txt` в новом venv на другой машине. Тот же принцип, что с конфигом дрона: зафиксированное состояние, к которому можно вернуться. Системный Python Ubuntu 24.04 и новее вообще не даёт ставить пакеты через `pip` вне venv (ошибка «externally-managed-environment», PEP 668) — это не поломка, а подсказка создать окружение.
+Linux-терминал или WSL на Windows: `picocom`/`minicom` для UART, `pyserial` для скриптов к CLI, `pymavlink` для MAVLink, `scipy`/`matplotlib` для спектров. Виртуальное окружение на проект (`python -m venv`), чтобы версии библиотек не мешали друг другу. Зачем это нужно на практике: `pymavlink`, `MAVProxy` и `mavsdk` выходят по несколько раз в год, а скрипт разбора логов, написанный под одну версию, через год может упасть на другой. Поэтому рядом с кодом лежит `requirements.txt` с точными версиями: `pip freeze > requirements.txt` после того, как всё заработало, и `pip install -r requirements.txt` в новом venv на другой машине. Тот же принцип, что с конфигом дрона: зафиксированное состояние, к которому можно вернуться. Системный Python Ubuntu 23.04 и новее (то есть каждой LTS начиная с 24.04) вообще не даёт ставить пакеты через `pip` вне venv (ошибка «externally-managed-environment», PEP 668) — это не поломка, а подсказка создать окружение.
 
 Порт и права. На Linux полётник появляется как `/dev/ttyACM0` (USB VCP) или `/dev/ttyUSB0` (через USB-UART), и доступ к нему есть только у группы `dialout`: без `usermod -aG dialout` и повторного входа конфигуратор и `picocom` получают «Permission denied». На Windows порт — `COMn`, а для DFU-режима нужен драйвер WinUSB (Zadig) — без него Betaflight App видит плату в DFU, но прошить не может. Один порт — один владелец: открытый в `picocom` порт конфигуратор не откроет, и наоборот; это самая частая причина «конфигуратор не видит плату» после драйвера и кабеля.
 
@@ -80,7 +80,7 @@ drones/
 | Версионирование | git + GitHub; `.gitattributes` с LFS для `.bin/.BFL` | конфиги и скрипты, модуль «CI» |
 
 ### Версии на ноябрь 2026
-Версии сверены по тегам релизов на GitHub и по PyPI 25–26 ноября 2026 года. Курс опирается на прошивки ArduPilot 4.7.3 (Copter и Plane, тег от 14.11.2026; отличия от 4.7.2 — в `ap-intro`), PX4 1.18.0 (тег от 23.11.2026; отличия от 1.17.0 — в `px4-intro`), Betaflight 2025.12.5, INAV 9.1.0, ExpressLRS 4.1.0; новее уже вышел Betaflight 2026.6.2 (17.09.2026) — его отличия в курсе разобраны только там, где о них спотыкаются (заметки «в 2026.6 …» в `bf-intro`).
+Версии сверены по тегам релизов на GitHub 25–26 ноября 2026 года и по PyPI 25 ноября 2026 года (pyulog 1.4.0 от 26.11.2026 и MAVSDK-Python 4.3.0 от 27.11.2026 вышли сразу после; в таблице — версии на момент сверки). Курс опирается на прошивки ArduPilot 4.7.3 (Copter и Plane, тег от 14.11.2026; отличия от 4.7.2 — в `ap-intro`), PX4 1.18.0 (тег от 23.11.2026; отличия от 1.17.0 — в `px4-intro`), Betaflight 2025.12.5, INAV 9.1.0, ExpressLRS 4.1.0; новее уже вышел Betaflight 2026.6.2 (17.09.2026) — его отличия в курсе разобраны только там, где о них спотыкаются (заметки «в 2026.6 …» в `bf-intro`).
 
 | Инструмент | Версия (дата тега) | Для чего | Совместимость, что проверено |
 |---|---|---|---|
@@ -93,7 +93,7 @@ drones/
 | pyulog | 1.3.0 (PyPI, 20.10.2026) | логи PX4 из Python | — |
 | MAVSDK-Python | 4.2.1 (PyPI, 17.11.2026) | управление аппаратом из Python | разбор — `mav-sdk` |
 | orangebox | 0.5.0 (PyPI, 16.05.2026) | логи Betaflight из Python | ставить отдельной последней командой: `pip install orangebox` печатает ERROR про точку входа `bb2csv` и выходит с кодом 1, библиотека при этом ставится и `from orangebox import Parser` работает; в одной команде с другими пакетами эта ошибка обрывает установку остальных (проверено) |
-| PlotJuggler | 4.2.0 (дата тега не сверялась) | графики `.ulg`, CSV, ROS 2 bag | — |
+| PlotJuggler | 4.2.0 (25.11.2026) | графики `.ulg`, CSV, ROS 2 bag | — |
 | ExpressLRS Configurator | 1.8.5 (14.11.2026) | сборка и прошивка ELRS | обе стороны линка — одной мажорной версии ELRS (`link-elrs`) |
 | EdgeTX / Companion | 2.12.5 (17.10.2026) | прошивка пульта, модели | Companion той же версии, что пульт |
 | ArduPilot SITL | Copter 4.7.3 (курс; лабораторная ниже снята на 4.7.2) | симуляция ArduPilot | `sim_vehicle.py` или бинарник `arducopter` |
@@ -138,7 +138,7 @@ pip install pymavlink MAVProxy pandas numpy scipy matplotlib pyserial
 sudo usermod -aG dialout $USER     # access to /dev/ttyACM*/ttyUSB*; re-login
 git clone --depth 1 https://github.com/ArduPilot/ardupilot && cd ardupilot && Tools/environment_install/install-prereqs-ubuntu.sh -y
 ```
-Проверка: `mavproxy.py --master=tcp:127.0.0.1:5760` подключается к `sim_vehicle.py -v ArduCopter`. В WSL2 USB-устройства пробрасываются через `usbipd` (Windows 11) — или использовать Windows-приложения для USB, Linux — для скриптов и логов.
+Проверка: при запущенном `sim_vehicle.py -v ArduCopter` второй `mavproxy.py --master=udp:127.0.0.1:14550` получает его UDP-выход (tcp:5760 SITL уже занят MAVProxy, который запустил sim_vehicle.py, и принимает одного клиента; чтобы подключиться к нему самому, запусти `sim_vehicle.py -v ArduCopter --no-mavproxy` и `--master=tcp:127.0.0.1:5760`). В WSL2 USB-устройства пробрасываются через `usbipd` (Windows 11) — или использовать Windows-приложения для USB, Linux — для скриптов и логов.
 
 ### Куда что логируется (чтобы потом найти)
 Betaflight: flash на FC → выгрузка через конфигуратор (Blackbox tab) в `.BFL`; ArduPilot: SD-карта `/APM/LOGS/*.BIN` или MAVFtp из Mission Planner; телеметрийные логи GCS (`.tlog`) — отдельно, содержат всё, что шло по MAVLink; PX4: `.ulg` на SD, просмотр через Flight Review (веб) или `pyulog`. Именование: `ГГГГ-ММ-ДД_аппарат_цель.ext` в папке аппарата.
@@ -272,7 +272,7 @@ index 4a5d4f5..2c809a9 100644
   - Возможная причина: мажорные версии не совпадают (Configurator 9.x принимает только прошивку 9.x).
   - Что сделать: поставить Configurator той же мажорной версии, что прошивка, или обновить прошивку.
 - **Симптом:** `pip install` в системный Python отвечает «externally-managed-environment»
-  - Возможная причина: Ubuntu 24.04+ запрещает ставить пакеты в системный Python (PEP 668).
+  - Возможная причина: Ubuntu 23.04+ (каждая LTS начиная с 24.04) запрещает ставить пакеты в системный Python (PEP 668).
   - Что сделать: `python3 -m venv` на проект; `requirements.txt` с точными версиями.
 - **Симптом:** библиотеки Python конфликтуют между проектами
   - Возможная причина: всё ставится в системный Python.

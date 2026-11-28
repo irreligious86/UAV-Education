@@ -1,9 +1,9 @@
 ---
 id: ctl-guidance
-title: "Guidance and Trajectories: Pure Pursuit, L1, S-Curves, Minimum Snap"
+title: "Guidance and trajectories: pure pursuit, L1, S-curves, minimum snap"
 level: L3
 readingTime: 40 min
-firmware: ArduPilot 4.5+ · PX4 1.15+ · Python 3
+firmware: ArduPilot 4.5+ (checked against 4.7.3) · PX4 1.15+ (checked against v1.18.0) · Python 3
 status: published
 tags:
   - guidance
@@ -18,55 +18,61 @@ related:
 next:
   - ap-plane-tuning
 source: content/tools/ctl-guidance.md
-source_hash: 9df9dc0d8b58
+source_hash: 202c5d50936d
 ---
 
 ## summary
-The controllers in this course hold angle, velocity and position. But who decides *which* position to hold at each moment so the vehicle follows the mission line, turns smoothly and doesn't jerk? That's guidance and trajectory generation. This module walks through the layers from the mission down to the controller, the pure pursuit law and its relative L1 in ArduPlane (with the lookahead distance formula via `NAVL1_PERIOD`), velocity profiles — the trapezoid and the jerk-limited S-curve that ArduCopter uses to fly between waypoints — and minimum snap for a quadcopter, with an explanation of why it's “snap” specifically. The simulation code reproduces the module's plots; the lab is to choose the lookahead from the overshoot and the time to converge onto the line.
+The controllers hold attitude, velocity and position. But who decides *which* position to hold at each instant so the vehicle follows the mission line, turns smoothly and does not jerk? That is guidance and trajectory generation. This module walks through the layers from the mission down to the controller, the pure pursuit law and its relative L1 in ArduPlane (with the lookahead-distance formula through `NAVL1_PERIOD`), velocity profiles (the trapezoid and the jerk-limited S-curve that ArduCopter uses between waypoints), and minimum snap for a quadrotor, with an explanation of why it is "snap." The simulation code reproduces the module's charts; in the lab you pick the lookahead from the overshoot and the time to converge onto the line.
 
 ## theory
 ### Layers: from waypoints to motors
-1. **Mission** — a list of waypoints and actions (the “Missions” module).
-2. **Path** — the geometry between waypoints: segments, turn arcs, splines (`NAV_SPLINE_WAYPOINT`).
-3. **Trajectory** — a path with time: where the vehicle must be at time t, with what velocity and acceleration, within the velocity, acceleration and jerk limits.
-4. **Guidance / tracking** — turns the deviation from the path or trajectory into a command (acceleration, bank, velocity) for the position controller.
+1. **Mission**: a list of waypoints and actions (the "Missions" module).
+2. **Path**: the geometry between waypoints: straight segments, turn arcs, splines (`NAV_SPLINE_WAYPOINT`).
+3. **Trajectory**: a path with time: where the vehicle must be at time t, at what velocity and acceleration, within the velocity, acceleration and jerk limits.
+4. **Guidance / tracking**: turns the deviation from the path or trajectory into a command (acceleration, bank angle, velocity) for the position controller.
 
-**Path following** doesn't care about time — the point is to be on the line. **Trajectory tracking** requires being at the point *on time* — for formations, synchronized filming, cooperative maneuvers.
+**Path following** does not care about time; all that matters is being on the line. **Trajectory tracking** requires being at the point *on time*: for formation flight, synchronized filming, cooperative maneuvers.
 
 ### Pure pursuit
-The vehicle “chases” a point on the path that lies a distance L ahead (the lookahead distance). If α is the angle between the velocity vector and the direction to that point, the curvature that brings the vehicle onto it along an arc is κ = 2·sin α / L, and the lateral acceleration is
+The vehicle "chases" a point on the path a distance L ahead (the lookahead distance). If α is the angle between the velocity vector and the direction to that point, the curvature of the arc that brings the vehicle onto it is κ = 2·sin α / L, and the lateral acceleration is
 a = V²·κ = 2·V²·sin α / L.
-- Small L — sharp convergence onto the line, overshoot and sensitivity to position noise.
-- Large L — smooth but slow, and the route corners get “cut.”
-- Starting 20 m to the side at 10 m/s (simulation below): L = 8 m — overshoot ~3 m; L = 20 m — overshoot ~1 m, within the ±1 m corridor after 35 m of path; L = 45 m — within the corridor only after ~90 m.
+- Small L: an aggressive approach to the line, overshoot, and sensitivity to position noise.
+- Large L: smooth but slow, and the corners of the route get "cut."
+- With a 20 m cross-track offset at 10 m/s (simulation below): L = 8 m gives ~3 m of overshoot; L = 20 m gives ~1 m of overshoot and stays inside a ±1 m corridor after 35 m of travel; L = 45 m reaches the corridor only after ~90 m.
 
-{{diagram:chart-pure-pursuit|Pure pursuit from 20 m to the side at 10 m/s: a short lookahead gives overshoot, a long one gives slow convergence onto the line.}}
+{{diagram:chart-pure-pursuit|Pure pursuit from a 20 m offset at 10 m/s: a short lookahead overshoots, a long one takes a long time to reach the line.}}
 
 ### L1 in ArduPlane and NPFG in PX4
-L1 is the same lateral acceleration law (in ArduPilot with a gain of 4ζ² instead of 2: a = 4ζ²·V²·sin η / L1; at ζ = 0.707 it's exactly pure pursuit), but the lookahead distance grows with speed so that the convergence dynamics don't depend on speed:
+L1 is the same lateral-acceleration law (ArduPilot uses a gain of 4ζ² instead of 2: a = 4ζ²·V²·sin η / L1, so at ζ = 0.707 it is exactly pure pursuit), but the lookahead distance grows with speed so that the convergence dynamics do not depend on speed:
 L1 = (1/π)·ζ·T·V, where T = `NAVL1_PERIOD`, ζ = `NAVL1_DAMPING`, V is the ground speed.
 - Example: V = 18 m/s, T = 17 s, ζ = 0.75 → L1 ≈ 0.318·0.75·17·18 ≈ 73 m.
-- Reducing `NAVL1_PERIOD` shortens L1 — sharper turns, risk of weaving (tuning is covered in the “ArduPlane Tuning” module).
-- The lateral acceleration is turned into bank: tan φ = a / g, limited by `ROLL_LIMIT_DEG`.
+- Reducing `NAVL1_PERIOD` shortens L1: sharper turns, with a risk of weaving (tuning is covered in the "ArduPlane tuning" module).
+- The lateral acceleration becomes a bank angle: tan φ = a / g, limited by `ROLL_LIMIT_DEG`.
 
-In PX4, fixed-wing guidance is done by NPFG (nonlinear path following guidance): the same lookahead principle plus explicit handling of wind comparable to the airspeed — when the line can't be held, NPFG picks a feasible heading instead of being “blown” sideways. The period and damping parameters (`NPFG_PERIOD`, `NPFG_DAMPING`) mean the same as in L1.
+In PX4, fixed-wing guidance is done by NPFG (nonlinear path following guidance): the same lookahead principle plus explicit handling of wind comparable to the airspeed. When the line cannot be held, NPFG picks a feasible bearing instead of being blown sideways. The period and damping parameters (`NPFG_PERIOD`, `NPFG_DAMPING`) mean the same as in L1.
 
 ### Velocity profiles: trapezoid and S-curve
-- **Trapezoid**: acceleration at constant rate, cruise, deceleration. Acceleration changes in a step — the jerk (the derivative of acceleration) is infinite. For a copter, a step in acceleration = a step in tilt: jerking, swinging of the payload and camera, overshoot.
-- **S-curve** (jerk-limited): acceleration ramps up with limited jerk. A 50 m move with v ≤ 10 m/s, a ≤ 5 m/s², jerk ≤ 10 m/s³: trapezoid — 7.0 s, S-curve — 7.5 s (+0.5 s for the acceleration ramp time), but with no steps.
-- **ArduCopter** (since 4.1) builds the waypoint path from S-curves: velocity, acceleration and jerk are set by the navigation parameters (`WPNAV_SPEED`, cm/s; `WPNAV_ACCEL`, cm/s²; `WPNAV_JERK`, m/s³; in Copter 4.7 — `WP_SPD`, m/s; `WP_ACC`, m/s²; `WP_JERK`, m/s³), and route corners are rounded with radius `WPNAV_RADIUS` (4.7 — `WP_RADIUS_M`).
+- **Trapezoid**: accelerate at constant acceleration, cruise, decelerate. The acceleration changes as a step, so the jerk (the derivative of acceleration) is infinite. For a copter a step in acceleration is a step in tilt: jerky motion, a swinging payload and camera, overshoot.
+- **S-curve** (jerk-limited): acceleration ramps up at a bounded jerk. A 50 m move with v ≤ 10 m/s, a ≤ 5 m/s², jerk ≤ 10 m/s³: the trapezoid takes 7.0 s, the S-curve 7.5 s (+0.5 s for the acceleration ramps), but without steps.
+- **ArduCopter** (since 4.1) builds the path between waypoints from S-curves: speed, acceleration and jerk are set by the navigation parameters (`WP_SPD`, m/s; `WP_ACC`, m/s²; `WP_JERK`, m/s³; before Copter 4.7 these were `WPNAV_SPEED`, cm/s; `WPNAV_ACCEL`, cm/s²; `WPNAV_JERK`, m/s³), and corners are rounded so the path passes within `WP_RADIUS_M` of the waypoint (m; before 4.7 `WPNAV_RADIUS`, cm).
 
-{{diagram:chart-scurve|Acceleration during a 50 m move: the trapezoid switches acceleration in a step, the S-curve with limited jerk, at a cost of 0.5 s.}}
+{{diagram:chart-scurve|Acceleration during a 50 m move: the trapezoid switches acceleration as a step, the S-curve with bounded jerk, at a cost of 0.5 s.}}
 
-### Minimum snap for a quadcopter
-A quadcopter is a differentially flat system: knowing the position and heading trajectory, you can compute everything else. Thrust is determined by acceleration, the body angular rate by jerk (the third derivative of position), and the motor torques by **snap** (the fourth derivative). That's why the trajectory with the minimum integral of snap squared gives the smoothest motor commands. In practice: 7th-order polynomials per axis between waypoints, continuous up to snap at the joints, with coefficients from a quadratic optimization problem (Mellinger, Kumar, 2011). Such trajectories are built on the companion and sent to the autopilot as position targets **together with velocity and acceleration** (feedforward), otherwise the position controller lags.
+### Minimum snap for a quadrotor
+A quadrotor is a differentially flat system: given the trajectory of position and yaw, you can compute everything else. Thrust is determined by acceleration, the body angular velocity by jerk (the third derivative of position), and the roll and pitch torques by **snap** (the fourth derivative; the yaw torque by the second derivative of yaw). That is why the trajectory that minimizes the integral of snap squared gives the smoothest motor commands. In practice: between waypoints, piecewise polynomials on each axis (7th order is the lowest that can minimize snap; the paper allows any order n), continuous up to snap at the joints, with coefficients from a quadratic program (Mellinger, Kumar, 2011). Such trajectories are generated on the companion and sent to the autopilot as position targets **together with velocity and acceleration** (feedforward); otherwise the position controller lags.
 
 ### Feedforward: not just position
-If the companion sends only position, the controller learns it needs to accelerate only once the error already exists — the vehicle lags in turns. `SET_POSITION_TARGET_LOCAL_NED` lets you send position, velocity and acceleration at once (the `type_mask`): the position controller only has to catch up with the residual error.
+If the companion sends only position, the controller learns that it has to accelerate only once there is already an error, and the vehicle lags in turns. `SET_POSITION_TARGET_LOCAL_NED` lets you send position, velocity and acceleration at once (the `type_mask` bitmask): the position controller only has to close the remaining error.
+
+### Where it fits
+
+- **Takes in:** mission waypoints and splines (`ap-missions`); the `WP_SPD`, `WP_ACC`, `WP_JERK` limits; position and velocity from the estimator (`ap-ekf`); the bank limit `ROLL_LIMIT_DEG` (`ap-plane-tuning`).
+- **Hands off:** an acceleration, bank or velocity command to the position controller and the cascade below it (`ctl-theory`); the L1 formula to `NAVL1_PERIOD` tuning (`ap-plane-tuning`); targets with feedforward through `SET_POSITION_TARGET_LOCAL_NED` (`ap-companion`).
+- **If you get this wrong:** too short a lookahead (`NAVL1_PERIOD`) → overshoot of the line and sensitivity to position noise, the plane weaves after turns (`ap-plane-tuning`). The companion sends only position without velocity and acceleration → the controller learns about the acceleration from the error that has already built up → the vehicle lags in turns (`ap-companion`).
 
 ## practice
 ### Step 1. Pure pursuit in simulation
-The script reproduces the module's plot and computes the overshoot and the distance until entering the ±1 m corridor:
+The script reproduces the module's chart and computes the overshoot and the distance to entering the ±1 m corridor:
 ```python
 import math
 
@@ -96,47 +102,49 @@ for L in (8, 20, 45):
 # L = 20 m: overshoot 1.0 m, within ±1 m from 35 m
 # L = 45 m: overshoot 0.9 m, within ±1 m from 91 m
 ```
-Sweep L from 5 to 50 m in steps of 5, plot the overshoot and the distance to the corridor against L, choose L for 10 and 20 m/s. Add ±1 m position noise and repeat: what happens with small L?
+Sweep L from 5 to 50 m in steps of 5, plot the overshoot and the distance to the corridor against L, and choose L for 10 and 20 m/s. Add ±1 m of position noise and repeat: what happens with small L?
 
-### Step 2. L1 of your own plane
-Use the formula to compute L1 for your plane at cruise speed with `NAVL1_PERIOD` 12, 17, 22. Compare with the size of the turns in your mission: if L1 is more than half a segment, turns will be cut heavily.
+### Step 2. L1 for your own plane
+Use the formula to compute L1 for your plane at cruise speed with `NAVL1_PERIOD` 12, 17, 22. Compare it with the size of the turns in your mission: if L1 is more than half a segment, the corners will be cut badly.
 
 ### Step 3. Trapezoid and S-curve
-Write a generator for both profiles for a move D with limits v, a, j (for the S-curve — the acceleration ramp-up and ramp-down phases). Check numerically: durations of 7.0 and 7.5 s for the example from the theory; the maximum jerk of the S-curve doesn't exceed the limit.
+Write a generator for both profiles for a move D with limits v, a, j (for the S-curve, with acceleration ramp-up and ramp-down phases). Check numerically: durations of 7.0 and 7.5 s for the example from the theory; the maximum jerk of the S-curve does not exceed the limit.
 
 ### Step 4. SITL: jerk and corner rounding
-ArduCopter SITL, a 50×50 m square mission. Two runs with different navigation jerk limits (half the default and the default). In the log — tilt (`ATT`) and acceleration in the turns. Describe how the completion time and the maximum tilt change.
+ArduCopter SITL, a 50×50 m square mission. Two runs with different navigation jerk limits (the default and 2× lower). In the log, look at the tilt (`ATT`) and the acceleration in the turns. Describe how the time to fly the square and the maximum tilt change.
 
-The lab counts as done when your choice of L is justified by a plot of overshoot and convergence (with and without noise), L1 is computed for your plane, the profile generator gives correct durations and bounded jerk, and the SITL comparison is described with numbers.
+Self-check: the lab is done when the step 1 script prints the same three lines as the code comments (overshoot 3.0 / 1.0 / 0.9 m, corridor from 35 / 35 / 91 m), your choice of L for 10 and 20 m/s is backed by the overshoot and corridor-distance chart (with and without noise), the L1 formula on the theory example (V = 18 m/s, T = 17 s, ζ = 0.75) gives ≈ 73 m and is then computed for your plane at three periods, the profile generator on the theory example gives 7.0 s for the trapezoid and 7.5 s for the S-curve with jerk no higher than 10 m/s³, and the SITL comparison is recorded as numbers: time to fly the square and maximum tilt in both runs.
+
+**Reference answer for self-check.** Correct result: with position noise, small L makes the vehicle weave (the aggressive approach to the line turns into sensitivity to noise), and with a lower jerk limit the tilt in turns builds up more smoothly at the cost of a longer flight time. Typical wrong results: (1) the S-curve came out at 7.0 s, like the trapezoid: the generator has no acceleration ramp-up and ramp-down phases; (2) L1 is more than half a mission segment: the corners will be cut badly, the period is too large for this mission.
 
 ## diagnostics
 - **Symptom:** the vehicle weaves around the line
-  - Possible cause: short lookahead (L, `NAVL1_PERIOD`), position noise, poorly tuned roll.
+  - Possible cause: lookahead too short (L, `NAVL1_PERIOD`), position noise, a poorly tuned roll loop.
   - What to do: increase the lookahead, check the inner loops, filter the position.
-- **Symptom:** route corners are cut heavily
-  - Possible cause: a lookahead or rounding radius that is large relative to the segment length.
-  - What to do: a shorter lookahead or radius, longer segments, waypoints at the corners.
+- **Symptom:** route corners are cut badly
+  - Possible cause: a lookahead or corner radius that is large relative to the segment length.
+  - What to do: a shorter lookahead or radius, longer segments, waypoints placed at the corners.
 - **Symptom:** the copter jerks at the start and end of every segment
-  - Possible cause: acceleration steps — a trajectory without a jerk limit (your own generator, position targets only).
+  - Possible cause: acceleration steps from a trajectory without a jerk limit (your own generator, position targets only).
   - What to do: S-curves, a jerk limit, velocity and acceleration feedforward.
-- **Symptom:** a vehicle controlled by the companion lags in turns
+- **Symptom:** the vehicle lags in turns under companion control
   - Possible cause: only position targets are sent.
   - What to do: send velocity and acceleration in `SET_POSITION_TARGET_LOCAL_NED`.
 - **Symptom:** strong wind pushes the plane off the line
-  - Possible cause: the wind is close to the airspeed, and guidance can't hold the line.
-  - What to do: a higher cruise speed, a route that accounts for the wind; in PX4 — look at the NPFG behavior.
+  - Possible cause: the wind is close to the airspeed, and guidance cannot hold the line.
+  - What to do: a higher cruise speed, a route planned around the wind; in PX4, look at what NPFG is doing.
 
 ## references
 - Park, Deyst, How — A New Nonlinear Guidance Logic for Trajectory Tracking (AIAA GNC 2004) | https://arc.aiaa.org/doi/10.2514/6.2004-4900 | primary | A
 - ArduPilot — AP_L1_Control (source) | https://github.com/ArduPilot/ardupilot/blob/master/libraries/AP_L1_Control/AP_L1_Control.cpp | primary | A
 - Mellinger, Kumar — Minimum snap trajectory generation and control for quadrotors (ICRA 2011) | https://doi.org/10.1109/ICRA.2011.5980409 | primary | A
 - ArduPilot — SCurves (source) | https://github.com/ArduPilot/ardupilot/blob/master/libraries/AP_Math/SCurve.cpp | primary | A
-- PX4 — Fixed-wing position tuning (NPFG) | https://docs.px4.io/main/en/config_fw/position_tuning_guide_fixedwing.html | primary | B
+- PX4 — Fixed-wing position tuning (NPFG) | https://docs.px4.io/v1.17/en/config_fw/position_tuning_guide_fixedwing.html | primary | B
 
 ## checklist
-- I distinguish path, trajectory and guidance; path following and trajectory tracking
+- I can tell a path, a trajectory and guidance apart, and path following from trajectory tracking
 - I can derive the pure pursuit law and understand the effect of the lookahead distance
-- I compute L1 from `NAVL1_PERIOD`, `NAVL1_DAMPING` and speed
-- I can explain why jerk is limited, and I can build an S-curve
-- I can explain minimum snap through the differential flatness of a quadcopter
+- I can compute L1 from `NAVL1_PERIOD`, `NAVL1_DAMPING` and speed
+- I can explain why jerk is limited and build an S-curve
+- I can explain minimum snap through the differential flatness of a quadrotor
 - I send velocity and acceleration feedforward together with position

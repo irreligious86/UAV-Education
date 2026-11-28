@@ -60,7 +60,7 @@ fs = 1 / np.median(np.diff(t))          # частота логирования,
 gyro_roll = df["gyroADC[0]"].to_numpy()
 ```
 
-Как `blackbox_decode` называет колонки и в каких они единицах — вывод из его исходников (`src/blackbox_decode.c`, коммит 49e18ca). Время по умолчанию в микросекундах, поэтому колонка называется `time (us)`. Гироскоп по умолчанию выводится «как записан» (`--unit-rotation raw`), и тогда имя колонки — просто `gyroADC[0]`. Betaflight пишет в заголовок лога `gyro_scale = 1.0` и кладёт в поле `gyroADC` округлённые градусы в секунду (`blackbox.c`, строка `lrintf(gyro.gyroADCf[i] * blackboxHighResolutionScale)`), так что «raw» здесь уже и есть °/с. Если передать `--unit-rotation deg/s`, значения останутся теми же (печатаются с двумя знаками после точки), а имя колонки станет `gyroADC[0] (deg/s)` — и код с `df["gyroADC[0]"]` упадёт с `KeyError`. Вторая ловушка — `blackbox_high_resolution = ON` (по умолчанию OFF в 4.5.3 и 2025.12.5): прошивка умножает на 10 `gyroADC`, `gyroUnfilt`, `rcCommand[0–3]` и `setpoint[0–2]` (`setpoint[3]` — газ ×1000, он не масштабируется; `blackbox.c` 4.5.3, строки 1137–1155), а в исходниках `blackbox_decode` эта настройка не учитывается. Проверка — строка заголовка `H blackbox_high_resolution:1` в самом `.BFL` (это текст, его видно `grep`); если она есть, дели эти колонки (кроме `setpoint[3]`) на 10 сам.
+Как `blackbox_decode` называет колонки и в каких они единицах — вывод из его исходников (`src/blackbox_decode.c`, коммит 49e18ca). Время по умолчанию в микросекундах, поэтому колонка называется `time (us)`. Гироскоп по умолчанию выводится «как записан» (`--unit-rotation raw`), и тогда имя колонки — просто `gyroADC[0]`. Betaflight пишет в заголовок лога `gyro_scale = 1.0` и кладёт в поле `gyroADC` округлённые градусы в секунду (`blackbox.c`, строка `lrintf(gyro.gyroADCf[i] * blackboxHighResolutionScale)`), так что «raw» здесь уже и есть °/с. Если передать `--unit-rotation deg/s`, значения останутся теми же (печатаются с двумя знаками после точки), а имя колонки станет `gyroADC[0] (deg/s)` — и код с `df["gyroADC[0]"]` упадёт с `KeyError`. Вторая ловушка — `blackbox_high_resolution = ON` (по умолчанию OFF в 4.5.3 и 2025.12.5): прошивка умножает на 10 `gyroADC`, `gyroUnfilt`, `rcCommand[0–3]` и `setpoint[0–2]` (`setpoint[3]` — газ ×1000, он не масштабируется; `blackbox.c` 4.5.3, строки 1138–1157), а в исходниках `blackbox_decode` эта настройка не учитывается. Проверка — строка заголовка `H blackbox_high_resolution:1` в самом `.BFL` (это текст, его видно `grep`); если она есть, дели эти колонки (кроме `setpoint[3]`) на 10 сам.
 
 Частота строк в CSV равна частоте цикла PID, делённой на `blackbox_sample_rate` (1/1, 1/2, 1/4, 1/8, 1/16; по умолчанию 1/4 — `blackbox.c`, `.sample_rate = BLACKBOX_RATE_QUARTER`): при 8 кГц цикла это 2 кГц. Но в анализе бери `fs` из временных меток, а не из настроек. Ошибка в `fs` сдвигает все частоты спектра в то же число раз: на синтетике в шаге 1 синус 210 Гц при `fs`, заниженной вдвое, «переезжает» на 105 Гц.
 
@@ -210,7 +210,7 @@ Usage: python3 -I make_log.py <arducopter> <copter.parm> <workdir>
 import os, subprocess, sys, time
 from pymavlink import mavutil
 
-ardu, parm, work = sys.argv[1:4]
+ardu, parm, work = (os.path.abspath(a) for a in sys.argv[1:4])
 os.makedirs(work, exist_ok=True)
 extra = os.path.join(work, "lab.parm")
 open(extra, "w").write("""LOG_BITMASK 267741

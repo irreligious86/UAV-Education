@@ -3,15 +3,15 @@
   "pass": 80,
   "questions": [
     {
-      "q": "What is the phase margin?",
+      "q": "What is phase margin?",
       "options": [
         "The difference between P and D",
-        "The degrees remaining to −180° at crossover",
-        "ESC delay in degrees of phase",
-        "The notch width"
+        "Degrees left to −180° at crossover",
+        "The ESC delay expressed in degrees of phase",
+        "The width of a notch"
       ],
       "answer": 1,
-      "explain": "How many degrees remain to −180° at the unity-gain frequency: 45–60° is a good tune, 0 means sustained oscillations."
+      "explain": "How many degrees are left to −180° at the unity-gain frequency: 45–60° is a good tune, 0 means sustained oscillations."
     },
     {
       "q": "How does a 5 ms pure delay affect the phase at 50 Hz?",
@@ -49,10 +49,10 @@
     {
       "q": "Why must the inner loop be faster than the outer one?",
       "options": [
-        "To save CPU time",
-        "Otherwise the cascade will oscillate",
-        "It's simpler that way",
-        "For telemetry"
+        "To save CPU time on the flight controller",
+        "Otherwise the cascade oscillates",
+        "It is simpler that way",
+        "For the sake of telemetry"
       ],
       "answer": 1,
       "explain": "Otherwise the outer loop sees the inner loop's dynamics. The rule is 3–10× in bandwidth."
@@ -60,18 +60,18 @@
     {
       "q": "What is the only way to raise P without oscillations?",
       "options": [
-        "Raise FF together with P",
+        "Raise FF along with P",
         "Reduce the delay",
         "Raise I",
         "Lower fs"
       ],
       "answer": 1,
-      "explain": "The delay sets the limit on the phase margin."
+      "explain": "The delay sets the limit on phase margin."
     },
     {
       "q": "Slow oscillations at 0.5–3 Hz are a sign of:",
       "options": [
-        "Aliasing from a low logging rate",
+        "Aliasing caused by a low logging rate",
         "Too much I or a fast outer loop",
         "Frame resonance",
         "Too much D"
@@ -88,7 +88,7 @@
         "It replaces the I-term"
       ],
       "answer": 0,
-      "explain": "FF derives the command from the setpoint itself; the controller only catches up with the residual error."
+      "explain": "FF issues a command from the setpoint itself; the controller only has to close the remaining error."
     }
   ]
 }

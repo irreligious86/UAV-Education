@@ -117,7 +117,7 @@ print("rot.py: all checks passed")
 Виконай Rx(90°)·Ry(90°) і Ry(90°)·Rx(90°), застосуй до вектора (1, 0, 0). Намалюй обидва результати. Потім зроби те саме для 1° і 1° та покажи, що різниця — другого порядку малості (звідси й працює малокутове наближення).
 
 ### Крок 4. Інтегрування гіроскопа
-Згенеруй ω(t) = (0, 0, 1 рад/с) на 2π секунд із кроком 1 мс. Проінтегруй `small_angle_update` і покажи, що через 2π с кватерніон повернувся до вихідного (з точністю до знака). Повтори з кроком 50 мс — похибку видно; з нормуванням на кожному кроці й без нього — порівняй норму.
+Згенеруй ω(t) = (0, 0, 1 рад/с) на 2π секунд із кроком 1 мс. Проінтегруй `small_angle_update` і покажи, що через 2π с кватерніон повернувся до вихідного (з точністю до знака). Повтори з кроком 50 мс (round(2π/Δt) = 126 кроків) — похибку видно; з нормуванням на кожному кроці й без нього — порівняй норму.
 
 Лабораторна зараховується, коли проходять автотести кроку 1 і є графіки кроків 3–4.
 
@@ -137,7 +137,7 @@ print("rot.py: all checks passed")
 
 ## references
 - ArduPilot — AP_Math: Matrix3, Quaternion (source) | https://github.com/ArduPilot/ardupilot/tree/master/libraries/AP_Math | primary | A
-- PX4 — Matrix library (Dcm, Euler, Quaternion) | https://github.com/PX4/PX4-Matrix | primary | A
+- PX4 — Matrix library (Dcm, Euler, Quaternion) | https://github.com/PX4/PX4-Autopilot/tree/v1.18.0/src/lib/matrix | primary | A
 - ROS REP-103 — Standard Units of Measure and Coordinate Conventions | https://www.ros.org/reps/rep-0103.html | primary | A
 - MIT OCW 18.06 — Linear Algebra (Strang) | https://ocw.mit.edu/courses/18-06-linear-algebra-spring-2010/ | secondary | A
 - J. Solà — Quaternion kinematics for the error-state Kalman filter | https://arxiv.org/abs/1711.02508 | secondary | A

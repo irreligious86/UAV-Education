@@ -1,0 +1,82 @@
+{
+  "module": "data-python",
+  "tasks": [
+    {
+      "id": "wrong-fs-peak",
+      "title": "Peak at the wrong logging rate",
+      "statement": "Betaflight: PID loop **{fp} Hz**, `blackbox_sample_rate = 1/{d}`. The spectrum was computed with `fs = {fp}` (the divider was forgotten) and showed a peak at **{fo} Hz**. At what frequency is the peak actually, in Hz?",
+      "params": {
+        "fp": [
+          4000,
+          8000
+        ],
+        "d": [
+          2,
+          4,
+          8
+        ],
+        "fo": [
+          480,
+          600,
+          720,
+          840,
+          960,
+          1200
+        ]
+      },
+      "answer": "fo/d",
+      "unit": "Hz",
+      "tol": 0.005,
+      "solution": "The true logging rate is fs = f_PID / d. Every frequency in the spectrum is scaled by fs_used / fs_true = d, so f = f_observed / d. One rule fixes it: take fs from the log timestamps, not from the settings."
+    },
+    {
+      "id": "alias-freq",
+      "title": "Where a peak above Nyquist folds to",
+      "statement": "The gyro was logged at **{fs} Hz** (with no anti-aliasing before logging). The mechanics have a vibration at **{f} Hz**. At what frequency will it appear in the spectrum of this log, in Hz?",
+      "params": {
+        "fs": [
+          400,
+          500,
+          1000
+        ],
+        "f": {
+          "min": 120,
+          "max": 900,
+          "step": 10
+        }
+      },
+      "answer": "abs(f - fs*round(f/fs))",
+      "unit": "Hz",
+      "tol": 0.005,
+      "abs": 0.5,
+      "solution": "A component f sampled at fs appears at |f − k·fs|, where k is the integer nearest to f/fs; the result always lies in 0…fs/2. If f < fs/2, the peak stays where it is. The module's example: 250 Hz at 400 Hz → 150 Hz."
+    },
+    {
+      "id": "overshoot-pct",
+      "title": "Step overshoot",
+      "statement": "The roll setpoint went from **{b} °/s** to **{s} °/s**. After the step the gyro peaked at **{p} °/s**, then settled. Find the overshoot as a % of the step size.",
+      "params": {
+        "b": [
+          -20,
+          0,
+          10,
+          50
+        ],
+        "s": [
+          400,
+          450,
+          500
+        ],
+        "p": {
+          "min": 505,
+          "max": 560,
+          "step": 5
+        }
+      },
+      "answer": "(p - s)/(s - b)*100",
+      "unit": "%",
+      "tol": 0.01,
+      "solution": "Normalize the response to the step: r = (gyro − base)/(target − base). Overshoot = (max r − 1)·100 = (peak − target)/(target − base)·100. Dividing by target instead of by the step is a common mistake when the step does not start from zero."
+    }
+  ]
+}

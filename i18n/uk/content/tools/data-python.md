@@ -80,7 +80,7 @@ f, tt, S = spectrogram(gyro_roll, fs=fs, nperseg=512, noverlap=256)
 - **Overshoot** — наскільки gyro перелітає setpoint після сходинки, у % від величини сходинки.
 - **Час встановлення** — через скільки мс gyro залишається в межах ±5% (або ±2%) від setpoint.
 - **Bounce-back** — після різкої зупинки стіка (setpoint → 0) gyro йде в протилежний бік: амплітуда відскоку в % від пікового значення перед зупинкою.
-- **Затримка** — лаг між setpoint і gyro за максимумом крос-кореляції.
+- **Затримка** — лаг між setpoint і gyro за максимумом крос-кореляції або, простіше, за моментом, коли обидва проходять 50 % сходинки.
 
 Зручна реалізація — не шукати сходинки вручну, а будувати **step response** деконволюцією (як PID Toolbox): рахувати імпульсну характеристику системи setpoint→gyro за вікнами й інтегрувати. Простіше для початку — відібрати ділянки, де |d setpoint/dt| великий, і міряти на них.
 
@@ -178,7 +178,7 @@ Usage: python3 -I make_log.py <arducopter> <copter.parm> <workdir>
 import os, subprocess, sys, time
 from pymavlink import mavutil
 
-ardu, parm, work = sys.argv[1:4]
+ardu, parm, work = (os.path.abspath(a) for a in sys.argv[1:4])
 os.makedirs(work, exist_ok=True)
 extra = os.path.join(work, "lab.parm")
 open(extra, "w").write("""LOG_BITMASK 267741

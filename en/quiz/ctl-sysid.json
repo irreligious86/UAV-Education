@@ -11,13 +11,13 @@
         "A sine wave with rising frequency"
       ],
       "answer": 3,
-      "explain": "The frequency rises from f₀ to f₁ — energy at every frequency in the range, one after another."
+      "explain": "The frequency rises from f₀ to f₁, putting energy into every frequency in the range in turn."
     },
     {
       "q": "How do you estimate the frequency response from a recording?",
       "options": [
-        "Cross-spectrum / input spectrum",
-        "Divide the output by the input in the time domain",
+        "Cross-spectrum / input auto-spectrum",
+        "Divide output by input in the time domain",
         "Take the maximum of the gyro signal",
         "Compute the average over the whole flight"
       ],
@@ -27,38 +27,38 @@
     {
       "q": "How does a delay τ show up on a Bode plot?",
       "options": [
-        "It lowers the gain equally at all frequencies",
-        "It shifts the gain corner to the right",
-        "It adds phase that grows with frequency",
-        "It doesn't show up on it at all"
+        "It lowers the magnitude equally at all frequencies",
+        "It shifts the magnitude corner to the right",
+        "It adds phase lag that grows with frequency",
+        "It does not show up on it at all"
       ],
       "answer": 2,
-      "explain": "e^(−sτ): gain 1, phase −360°·f·τ."
+      "explain": "e^(−sτ): magnitude 1, phase −360°·f·τ."
     },
     {
-      "q": "What's the danger of a “setpoint → output” estimate in a closed loop?",
+      "q": "What is the danger of a \"setpoint → output\" estimate in a closed loop?",
       "options": [
-        "None; for a linear system it's the same thing",
+        "None; for a linear system it is the same thing",
         "The model will include the controller, not the plant",
-        "It can't be computed in NumPy",
+        "It cannot be computed with NumPy",
         "It needs twice as much data"
       ],
       "answer": 1,
-      "explain": "The plant input must be the actual signal into the plant — the controller or mixer output."
+      "explain": "The plant input must be the actual signal into the plant: the controller or mixer output."
     },
     {
       "q": "What does a drop in coherence indicate?",
       "options": [
-        "Noise, nonlinearity or an outside input",
-        "That the estimate at these frequencies is perfectly linear",
+        "Noise, nonlinearity or another input",
+        "That the estimate is perfectly linear at those frequencies",
         "That the delay is zero",
         "Motors overheating in flight"
       ],
       "answer": 0,
-      "explain": "The output is no longer explained linearly by the input — don't trust the estimate at these frequencies."
+      "explain": "The output is no longer explained linearly by the input; do not trust the estimate at those frequencies."
     },
     {
-      "q": "How much phase will an 80 Hz filter take away at 20 Hz?",
+      "q": "How much phase will an 80 Hz filter take at 20 Hz?",
       "options": [
         "About 45°",
         "About 2°",
@@ -77,18 +77,18 @@
         "Sampling: half a step of delay"
       ],
       "answer": 3,
-      "explain": "The model is continuous, the data are discrete with a 2.5 ms step."
+      "explain": "The model is continuous, the data is discrete with a 2.5 ms step."
     },
     {
-      "q": "What is needed to enter SYSID in ArduCopter?",
+      "q": "What do you need to enter SYSID in ArduCopter?",
       "options": [
         "SID_MAGNITUDE greater than 1",
         "A nonzero SID_AXIS",
         "AUTOTUNE mode before it",
-        "A GCS connected over USB"
+        "A ground station connected over USB"
       ],
       "answer": 1,
-      "explain": "With SID_AXIS = 0, entering the mode is not allowed."
+      "explain": "With SID_AXIS = 0 the mode cannot be entered."
     }
   ]
 }

@@ -11,7 +11,7 @@
         "100 %"
       ],
       "answer": 0,
-      "explain": "1 − e⁻¹ ≈ 0.632; 3τ — 95 %, 5τ — 99 %."
+      "explain": "1 − e⁻¹ ≈ 0.632; 95 % at 3τ, 99 % at 5τ."
     },
     {
       "q": "A damping ratio ζ = 0.5 gives an overshoot of about:",
@@ -22,43 +22,43 @@
         "100 %"
       ],
       "answer": 0,
-      "explain": "100·e^(−πζ/√(1−ζ²)) ≈ 16 %; at ζ = 0.7 — 5 %."
+      "explain": "100·e^(−πζ/√(1−ζ²)) ≈ 16 %; at ζ = 0.7 it is 5 %."
     },
     {
       "q": "A pole with a positive real part means:",
       "options": [
         "Instability",
         "Fast decay",
-        "Undamped oscillations",
+        "Sustained oscillations",
         "A pure delay"
       ],
       "answer": 0,
       "explain": "e^(st) with Re s > 0 grows."
     },
     {
-      "q": "For a quadcopter axis with an angle P controller, raising P:",
+      "q": "For a quadrotor axis with a P angle controller, raising P:",
       "options": [
-        "Increases both frequency and overshoot",
+        "Increases frequency and overshoot",
         "Lowers the oscillation frequency",
         "Leaves the overshoot unchanged",
         "Adds delay"
       ],
       "answer": 0,
-      "explain": "ω₀ = √(K_p/J), ζ = K_d/(2√(K_p J)) drops → overshoot grows."
+      "explain": "ω₀ = √(K_p/J), and ζ = K_d/(2√(K_p J)) falls → the overshoot grows."
     },
     {
       "q": "A pure delay e^(−sL) in the loop:",
       "options": [
-        "Eats up the phase margin",
+        "Eats the phase margin",
         "Speeds the system up",
-        "Reduces the amplitude at high frequencies",
+        "Reduces the magnitude at high frequencies",
         "Is equivalent to a PT1 filter"
       ],
       "answer": 0,
-      "explain": "Phase −ω·L — that's exactly what limits the gain."
+      "explain": "A phase of −ω·L is exactly what limits the gain."
     },
     {
-      "q": "The PT1 filter coefficient in code is k = T_s/(τ + T_s). At f_c = 100 Hz and f_s = 8 kHz it is approximately:",
+      "q": "The PT1 filter coefficient in code is k = T_s/(τ + T_s). At f_c = 100 Hz and f_s = 8 kHz it is about:",
       "options": [
         "0.073",
         "0.5",
@@ -77,10 +77,10 @@
         "They are unrelated"
       ],
       "answer": 0,
-      "explain": "Otherwise discretization distorts the dynamics, and forward Euler can destabilize the system."
+      "explain": "Otherwise discretization distorts the dynamics, and forward Euler can destabilize it."
     },
     {
-      "q": "The loop oscillates at a frequency that doesn't depend on P. The most likely cause:",
+      "q": "The loop oscillates at a frequency that does not depend on P. The most likely cause:",
       "options": [
         "The total delay in the loop",
         "Motor inertia",
@@ -88,7 +88,7 @@
         "A low gyro rate"
       ],
       "answer": 0,
-      "explain": "The frequency is set by the condition ω·L ≈ π/2; the fix is reducing delay, not P."
+      "explain": "The frequency is set by the condition ω·L ≈ π/2; the cure is to reduce the delay, not P."
     }
   ]
 }

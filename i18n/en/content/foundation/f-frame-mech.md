@@ -16,7 +16,7 @@ related:
 next:
   - bf-pid-reg-in-bf
 source: content/foundation/f-frame-mech.md
-source_hash: 21ddc6e63d29
+source_hash: 7d6028282ae8
 ---
 
 ## summary
@@ -42,7 +42,7 @@ A frame has natural frequencies (arms, FC mount, standoffs). When a motor harmon
 The goal is to pass on the frame's movements but not high-frequency vibration. Standard practice: soft rubber grommets or standoffs with a damper, wires without tension (a taut harness is a rigid link that bypasses the dampers). A mount that is too soft has its own low-frequency resonances and gyro lag. For large aircraft — damping plates. On racing 5" you also see hard mounting with filter tuning: the motors there spin fast, and the grommets add their own 50–150 Hz resonance (section “Numbers”). The course rule for 5": start with the grommets that come with the stack — a 5" does have a soft-mount window (subsection “FC damping”); switch to hard mounting only if the spectrum shows a mount peak — a horizontal line below the motor harmonics that does not depend on throttle — and replacing the grommets with stiffer ones does not remove it.
 
 ### Numbers
-The motor's 1st-harmonic frequency = RPM/60. In hover a 5" is ~250–350 Hz (15–21 thousand rpm; a light aircraft is closer to 230 Hz — the 14,000 rpm used in the f-safety and f-physics calculations), 7" ~110–200 (the 1.4 kg 7" LR from the `bf-rpm-filter` example — 110–130), 10" ~80–100, 15" ~50–70. Carbon arm resonances are usually 100–400 Hz, FC mount resonances — 50–150 Hz.
+The motor's 1st-harmonic frequency = RPM/60. In hover a 5" is ~200–260 Hz (12–16 thousand rpm; 14,000 rpm ≈ 233 Hz, as in the f-safety and f-physics calculations; a heavier build runs higher; on a punch-out up to 400–600 Hz), 7" ~110–200 (the 1.4 kg 7" LR from the `bf-rpm-filter` example — 110–130), 10" ~80–100, 15" ~50–70. Carbon arm resonances are usually 100–400 Hz, FC mount resonances — 50–150 Hz.
 
 ### Natural frequencies: a rough estimate
 An arm as a cantilever beam: f₁ ≈ 0.56·√(E·I/(μ·L⁴)) (E — modulus of elasticity, I — second moment of area of the cross-section, μ — mass per meter, L — length); for an engineering estimate it is easier to measure: a tap on the arm with the accelerometer/gyro logging (`LOG_DISARMED`/`blackbox_mode = ALWAYS`) gives decaying oscillations — the frequency of the peak in the spectrum is the resonance. Typical values: a 5" carbon arm of 4–5 mm — 300–500 Hz (above the motor harmonics in hover, below them at full throttle); 7" 5 mm — 150–250 Hz (coincides with the 1st–2nd harmonics — the danger zone); 10"+ tubular arms of 16–25 mm — 60–150 Hz. Stiffen the arm (thicker, shorter, a tube instead of a plate) → the frequency rises as √(stiffness/mass); add mass at the tip (a heavier motor) → it falls.
@@ -84,7 +84,7 @@ Harnesses are not taut and do not touch rotating parts, power wires are twisted 
 ### Lab
 The spectrum before/after balancing the props on your own aircraft; write down the frequency of the main peak and the change in amplitude in dB.
 
-**Reference for self-check.** A correct result is two spectra of the same mode (hover) in which the peak and its nature are named: the motor peak follows throttle and sits at the RPM/60 frequency (in hover a 5" is ~250–350 Hz, 7" ~110–200, 10" ~80–100), a resonance stays put at any throttle. Prop balancing lowers specifically the peak of the motors' first harmonic; the difference is written down in dB in that peak's band. Common wrong results: the peak did not change — it does not move with throttle, it's a frame resonance, and balancing does not cure it (check with a tap on the arm); “before” and “after” were recorded at different throttle — the motor peak simply moved in frequency, there is nothing to compare; a low-frequency 20–40 Hz peak grew in the spectrum — that is a flight-controller mount that is too soft, not the props.
+**Reference for self-check.** A correct result is two spectra of the same mode (hover) in which the peak and its nature are named: the motor peak follows throttle and sits at the RPM/60 frequency (in hover a 5" is ~200–260 Hz, 7" ~110–200, 10" ~80–100), a resonance stays put at any throttle. Prop balancing lowers specifically the peak of the motors' first harmonic; the difference is written down in dB in that peak's band. Common wrong results: the peak did not change — it does not move with throttle, it's a frame resonance, and balancing does not cure it (check with a tap on the arm); “before” and “after” were recorded at different throttle — the motor peak simply moved in frequency, there is nothing to compare; a low-frequency 20–40 Hz peak grew in the spectrum — that is a flight-controller mount that is too soft, not the props.
 
 ## diagnostics
 - **Symptom:** a peak in the spectrum does not move when throttle changes

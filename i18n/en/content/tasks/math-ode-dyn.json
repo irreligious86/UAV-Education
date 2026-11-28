@@ -4,7 +4,7 @@
   {
    "id": "tau-63",
    "title": "First-order response",
-   "statement": "The motor time constant is τ = **{tau} ms**. How many milliseconds after a command step does thrust reach **{p} %** of its steady-state value?",
+   "statement": "The motor time constant is τ = **{tau} ms**. How many milliseconds after a command step does the thrust reach **{p} %** of its steady-state value?",
    "params": {
     "tau": {
      "min": 10,
@@ -27,7 +27,7 @@
   {
    "id": "zeta-overshoot",
    "title": "Overshoot from damping",
-   "statement": "A second-order loop with damping ratio ζ = **{z}**. Find the step overshoot (in percent).",
+   "statement": "A second-order loop with damping ratio ζ = **{z}**. Find the step-response overshoot (in percent).",
    "params": {
     "z": {
      "min": 0.2,
@@ -43,7 +43,7 @@
   {
    "id": "pt1-gain",
    "title": "PT1 coefficient",
-   "statement": "A PT1 filter with a cutoff frequency of **{fc} Hz** in a **{fs} kHz** loop. Find the coefficient k = T_s/(τ + T_s).",
+   "statement": "A PT1 filter with a cutoff of **{fc} Hz** in a **{fs} kHz** loop. Find the coefficient k = T_s/(τ + T_s).",
    "params": {
     "fc": {
      "min": 50,
@@ -60,7 +60,7 @@
    "answer": "(1/(fs*1000))/(1/(2*math.pi*fc)+1/(fs*1000))",
    "unit": "",
    "tol": 0.01,
-   "solution": "τ = 1/(2π f_c), T_s = 1/f_s, k = T_s/(τ + T_s). This is how pt1FilterGain() in Betaflight computes it."
+   "solution": "τ = 1/(2π f_c), T_s = 1/f_s, k = T_s/(τ + T_s). This is how pt1FilterGain() computes it in Betaflight."
   }
  ]
 }

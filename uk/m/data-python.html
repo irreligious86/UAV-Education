@@ -88,7 +88,7 @@ f, tt, S = spectrogram(gyro_roll, fs=fs, nperseg=512, noverlap=256)
 <p>Показує, як піки їдуть з обертами (мотори) або стоять на місці (резонанс) — модуль «Сигнали та спектри».</p>
 <h4 id="metriki-perekhidnogo-protsesu" class="md-subheading">Метрики перехідного процесу</h4>
 <p>За парою setpoint → gyro на одній осі:</p>
-<ul><li><strong>Похибка</strong> e(t) = setpoint − gyro.</li><li><strong>Overshoot</strong> — наскільки gyro перелітає setpoint після сходинки, у % від величини сходинки.</li><li><strong>Час встановлення</strong> — через скільки мс gyro залишається в межах ±5% (або ±2%) від setpoint.</li><li><strong>Bounce-back</strong> — після різкої зупинки стіка (setpoint → 0) gyro йде в протилежний бік: амплітуда відскоку в % від пікового значення перед зупинкою.</li><li><strong>Затримка</strong> — лаг між setpoint і gyro за максимумом крос-кореляції.</li></ul>
+<ul><li><strong>Похибка</strong> e(t) = setpoint − gyro.</li><li><strong>Overshoot</strong> — наскільки gyro перелітає setpoint після сходинки, у % від величини сходинки.</li><li><strong>Час встановлення</strong> — через скільки мс gyro залишається в межах ±5% (або ±2%) від setpoint.</li><li><strong>Bounce-back</strong> — після різкої зупинки стіка (setpoint → 0) gyro йде в протилежний бік: амплітуда відскоку в % від пікового значення перед зупинкою.</li><li><strong>Затримка</strong> — лаг між setpoint і gyro за максимумом крос-кореляції або, простіше, за моментом, коли обидва проходять 50 % сходинки.</li></ul>
 <p>Зручна реалізація — не шукати сходинки вручну, а будувати <strong>step response</strong> деконволюцією (як PID Toolbox): рахувати імпульсну характеристику системи setpoint→gyro за вікнами й інтегрувати. Простіше для початку — відібрати ділянки, де |d setpoint/dt| великий, і міряти на них.</p>
 <pre class="cli-block"><code>def step_metrics(sp, gy, fs, thr=200.0):
     &quot;&quot;&quot;Find fast setpoint steps (deg/s per sample threshold) and measure response.&quot;&quot;&quot;
@@ -158,7 +158,7 @@ Usage: python3 -I make_log.py &lt;arducopter&gt; &lt;copter.parm&gt; &lt;workdir
 import os, subprocess, sys, time
 from pymavlink import mavutil
 
-ardu, parm, work = sys.argv[1:4]
+ardu, parm, work = (os.path.abspath(a) for a in sys.argv[1:4])
 os.makedirs(work, exist_ok=True)
 extra = os.path.join(work, &quot;lab.parm&quot;)
 open(extra, &quot;w&quot;).write(&quot;&quot;&quot;LOG_BITMASK 267741
