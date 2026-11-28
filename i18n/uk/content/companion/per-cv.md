@@ -35,9 +35,9 @@ source_hash: 73867148b361
 ### Нейромережі: детекція
 Однопрохідні детектори (сімейство YOLO, SSD, NanoDet) — вхід 320–640 px, вихід — бокси з класом і впевненістю, потім NMS. Факти для борту:
 - **Розмір моделі**: nano/small (2–10 млн параметрів) — єдиний реальний варіант на Pi/Jetson Nano/Orin Nano; medium — Orin NX/AGX.
-- **Прискорення**: Jetson — експорт у TensorRT (FP16/INT8, ×3–10 до PyTorch); Pi 4/5 — NCNN або ONNX Runtime на CPU (nano-модель 320 px: 5–15 fps на Pi 5), Coral USB (INT8-моделі) або Hailo-8L (Pi AI Kit, 13 TOPS) чи Hailo-8 (AI HAT+ 26 TOPS) — десятки fps; ARM-ноутбуки/міні-ПК із GPU — будь-який стек.
+- **Прискорення**: Jetson — експорт у TensorRT (FP16/INT8, ×3–10 до PyTorch); Pi 4/5 — NCNN або ONNX Runtime на CPU (nano-модель 320 px: 5–15 fps на Pi 5), Coral USB (INT8-моделі), а лише на Pi 5 (PCIe) — Hailo-8L (Pi AI Kit / AI HAT+ 13 TOPS), Hailo-8 (AI HAT+ 26 TOPS) або Hailo-10H (AI HAT+ 2, 40 TOPS INT4) — десятки fps; ARM-ноутбуки/міні-ПК із GPU — будь-який стек.
 - **Донавчання** на своїх даних обов'язкове: попередньо навчена на COCO модель «бачить» людей і машини, але не твій маркер/об'єкт. 300–1000 розмічених кадрів із борту (різні висоти, освітлення, фон), аугментації, 50–100 епох на ПК/Colab; експорт в ONNX → TensorRT/NCNN.
-- **Квантування** INT8 — ×2 за швидкістю, −1–3% mAP; калібрувальний набір зі своїх даних.
+- **Квантування** INT8 — ×2–4 за швидкістю відносно FP32 на залізі з цілочисельними блоками, −1–5 пунктів mAP50-95; калібрувальний набір зі своїх даних.
 
 ### Метрики, які мають сенс
 - **Precision** = TP/(TP+FP) — частка правильних серед знайдених; **Recall** = TP/(TP+FN) — частка знайдених серед справжніх; поріг упевненості посуває одне коштом іншого (PR-крива).
@@ -65,7 +65,7 @@ source_hash: 73867148b361
 
 ## practice
 ### Крок 1. Класика
-ArUco — детекція маркера з камери, виведення id і кутів, FPS. З OpenCV 4.7 API інший (старі `cv2.aruco.detectMarkers` зі статей не працюють):
+ArUco — детекція маркера з камери, виведення id і кутів, FPS. З OpenCV 4.7 API інший: старих `cv2.aruco.Dictionary_get`/`DetectorParameters_create` зі статей немає, а вільна `cv2.aruco.detectMarkers` лишилася тільки в contrib-збірці як застаріла обгортка:
 ```python
 import cv2, time
 dictionary = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_4X4_50)

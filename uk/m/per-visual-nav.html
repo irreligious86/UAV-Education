@@ -80,8 +80,12 @@
 <p>ArduPilot SITL: скрипт pymavlink, що публікує <code>VISION_POSITION_ESTIMATE</code> з <strong>істинної позиції SITL</strong> (<code>SIMSTATE</code>/<code>LOCAL_POSITION_NED</code>) із доданим шумом 5 см і затримкою 50 мс, 30 Гц; <code>SIM_GPS1_ENABLE = 0</code>, <code>EK3_SRC1_* = 6</code>, <code>VISO_TYPE = 1</code>, <code>VISO_DELAY_MS = 50</code>. Зліт у Loiter, утримання, квадрат у Guided. Лог: <code>XKF1</code> проти істини, <code>XKF4</code>.</p>
 <h4 id="krok-4-vidmova" class="md-subheading">Крок 4. Відмова</h4>
 <p>Зупинити публікацію на 10 с у польоті → поведінка EKF (<code>XKF4</code>, повідомлення), failsafe; потім «сміття» (поза завмерла) → ворота; потім резервний набір <code>EK3_SRC2</code> на GPS, увімкнений тумблером → відновлення. Лабораторна: джерело ExternalNav подано, утримання без GPS, відмову відпрацьовано.</p>
-<pre class="cli-block"><code>SIM_GPS1_ENABLE 0
+<pre class="cli-block"><code># per-visual-nav: ExternalNav only (ArduCopter 4.7.2 SITL)
+SIM_GPS1_ENABLE 0
 GPS1_TYPE 0
+AHRS_EKF_TYPE 3
+EK3_ENABLE 1
+EK2_ENABLE 0
 VISO_TYPE 1
 VISO_DELAY_MS 50
 VISO_POS_M_NSE 0.2
@@ -92,7 +96,10 @@ EK3_SRC1_POSZ 6
 EK3_SRC1_VELZ 0
 EK3_SRC1_YAW 6
 COMPASS_USE 0
+COMPASS_USE2 0
+COMPASS_USE3 0
 FS_EKF_ACTION 1
+LOG_DISARMED 0
 SIM_WIND_SPD 3
 SIM_WIND_DIR 180</code></pre>
 <pre class="cli-block"><code>while queue and queue[0][0] &lt;= t_boot:          # deliver lagged samples (FC time)

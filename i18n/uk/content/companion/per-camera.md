@@ -52,7 +52,7 @@ while True:
     n += 1
     if n % 60 == 0: print(f"{n / (time.perf_counter() - t0):.1f} fps")
 ```
-Pi CSI: `picamera2` (`Picamera2().configure(create_video_configuration(main={"size": (640, 480), "format": "RGB888"}, buffer_count=2))`, `capture_array()`); Jetson: GStreamer-пайплайн `nvarguscamerasrc ! nvvidconv ! video/x-raw,format=BGRx ! appsink` через `cv2.VideoCapture(pipeline, cv2.CAP_GSTREAMER)`.
+Pi CSI: `picamera2` (`Picamera2().configure(create_video_configuration(main={"size": (640, 480), "format": "RGB888"}, buffer_count=2))`, `capture_array()`); Jetson: GStreamer-пайплайн `nvarguscamerasrc ! nvvidconv ! video/x-raw,format=BGRx ! videoconvert ! video/x-raw,format=BGR ! appsink drop=true max-buffers=1` через `cv2.VideoCapture(pipeline, cv2.CAP_GSTREAMER)`.
 
 ### Виміряти затримку
 «Glass-to-glass»: на екрані телефона секундомір із мілісекундами (або блимальний LED із таймером), камера дивиться на нього, програма показує кадр поруч — фото обох: різниця = затримка захоплення+обробка+виведення. Для передавання в GCS — те саме з екраном GCS. Типово: CSI + OpenCV локально 30–60 мс; USB MJPEG 60–120 мс; RTSP H.264 до QGC через Wi-Fi 150–300 мс (буферизація плеєра — головний внесок; у QGC і GStreamer-приймачі зменшувати `latency`).
@@ -63,11 +63,11 @@ FPS — рахувати за часом між кадрами, а не за з�
 GStreamer на борту (Pi 4, апаратний H.264 через `v4l2h264enc`; Jetson — `nvv4l2h264enc`):
 ```bash
 # UDP/RTP to the GCS (QGC: Video Source = UDP h.264, port 5600)
-gst-launch-1.0 libcamerasrc ! video/x-raw,width=1280,height=720,framerate=30/1 \
-  ! videoconvert ! v4l2h264enc extra-controls="controls,repeat_sequence_header=1,video_bitrate=2000000" \
+gst-launch-1.0 libcamerasrc ! video/x-raw,width=1280,height=720,framerate=30/1,format=NV12,interlace-mode=progressive \
+  ! v4l2h264enc extra-controls="controls,repeat_sequence_header=1,video_bitrate=2000000" ! 'video/x-h264,level=(string)4' \
   ! h264parse ! rtph264pay config-interval=1 pt=96 ! udpsink host=192.168.1.10 port=5600 sync=false
 ```
-RTSP-сервер (QGC: RTSP URL): `gst-rtsp-server` (`test-launch` з examples) або `mediamtx` з тим самим пайплайном; RTSP зручний для кількох клієнтів і перепідключень, UDP — мінімальна затримка. Бітрейт — за бюджетом лінку (2–4 Мбіт/с для 720p30 на Wi-Fi/4G; для далеких лінків 0.5–1 Мбіт/с із 480p). Ключові кадри частіше (`iframe period` 1 с) — швидше відновлення після втрат.
+На Pi 5 (апаратного кодера немає) замість `v4l2h264enc` і caps `video/x-h264,level=(string)4` після нього — `x264enc tune=zerolatency speed-preset=ultrafast bitrate=2000`. RTSP-сервер (QGC: RTSP URL): `gst-rtsp-server` (`test-launch` з examples) або `mediamtx` з тим самим пайплайном; RTSP зручний для кількох клієнтів і перепідключень, UDP — мінімальна затримка. Бітрейт — за бюджетом лінку (2–4 Мбіт/с для 720p30 на Wi-Fi/4G; для далеких лінків 0.5–1 Мбіт/с із 480p). Ключові кадри частіше (`iframe period` 1 с) — швидше відновлення після втрат.
 
 ### Камера й автопілот
 Час кадру має зіставлятися з даними польоту: timestamp кадру (монотонний годинник) + MAVLink `SYSTEM_TIME`/`TIMESYNC` для синхронізації з FC; зміщення та орієнтація камери відносно IMU (`CAM_*`/extrinsics) — для будь-якої геометрії (VIO, стеження). Companion живиться від свого BEC (модуль про периферію), камера й шлейф — подалі від силових проводів.
@@ -298,7 +298,7 @@ no distortion model: corner pixel (1270,710) really maps to (1409.0,789.9) -> er
   - Що зробити: фіксована експозиція/підсилення або обмеження діапазону.
 
 ## references
-- Raspberry Pi — Camera software (libcamera, picamera2) | https://raspberrypi.com/documentation/computers/camera_software.html | primary | A
+- Raspberry Pi — Camera software (libcamera, picamera2) | https://www.raspberrypi.com/documentation/accessories/camera-software.html | primary | A
 - GStreamer — Documentation | https://gstreamer.freedesktop.org/documentation/ | secondary | B
 - QGroundControl — Video settings (UDP/RTSP sources) | https://docs.qgroundcontrol.com/Stable_V5.0/en/qgc-user-guide/settings_view/video.html | primary | A
 

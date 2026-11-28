@@ -46,7 +46,7 @@ source_hash: 01805bd541c9
 | Режим за замовчуванням | `MNT1_DEFLT_MODE` | 0 retract, 1 neutral, 2 MAVLink, 3 RC, 4 GPS point, 5 SysID, 6 Home |
 | Межі | `MNT1_PITCH_MIN/MAX`, `MNT1_YAW_MIN/MAX`, `MNT1_ROLL_MIN/MAX` | механіка підвісу, у градусах |
 | Пульт: кут чи швидкість | `MNT1_RC_RATE` | 0 — стік задає кут, > 0 — швидкість у °/с |
-| Канали пульта | `RCx_OPTION` | 212 Mount1 Roll, 213 Mount1 Pitch, 214 Mount1 Yaw, 163 Mount Lock (утримання курсу) |
+| Канали пульта | `RCx_OPTION` | 212 Mount1 Roll, 213 Mount1 Pitch, 214 Mount1 Yaw, 163 Mount Yaw Lock (утримання курсу; до 4.7 — «Mount Lock») |
 | Сервопідвіс | `SERVOn_FUNCTION` | 6 Mount1 Yaw, 7 Mount1 Pitch, 8 Mount1 Roll |
 | Порт розумного підвісу | `SERIALn_PROTOCOL` | 8 = Gimbal (Siyi, ViewPro тощо); для MAVLink-підвісу — MAVLink 2 |
 
@@ -108,7 +108,7 @@ look(-30, 45, True)   # 45° від півночі, утримувати під 
   - Що зробити: інспектор MAVLink, `MNT1_DEFLT_MODE`, протокол порту, перезавантаження після зміни типу.
 - **Симптом:** камера йде вбік під час розвороту апарата
   - Можлива причина: рискання в режимі follow, а не lock.
-  - Що зробити: прапорець YAW_LOCK, Mount Lock з пульта (163) або ROI.
+  - Що зробити: прапорець YAW_LOCK, Mount Yaw Lock з пульта (163) або ROI.
 - **Симптом:** команди пульта й companion «б'ються»
   - Можлива причина: два клієнти без явного захоплення керування.
   - Що зробити: `MAV_CMD_DO_GIMBAL_MANAGER_CONFIGURE`, одна точка керування, на пульті — явний перемикач.

@@ -75,8 +75,12 @@ ArduPilot SITL: скрипт pymavlink, що публікує `VISION_POSITION_E
 Зупинити публікацію на 10 с у польоті → поведінка EKF (`XKF4`, повідомлення), failsafe; потім «сміття» (поза завмерла) → ворота; потім резервний набір `EK3_SRC2` на GPS, увімкнений тумблером → відновлення. Лабораторна: джерело ExternalNav подано, утримання без GPS, відмову відпрацьовано.
 
 ```text
+# per-visual-nav: ExternalNav only (ArduCopter 4.7.2 SITL)
 SIM_GPS1_ENABLE 0
 GPS1_TYPE 0
+AHRS_EKF_TYPE 3
+EK3_ENABLE 1
+EK2_ENABLE 0
 VISO_TYPE 1
 VISO_DELAY_MS 50
 VISO_POS_M_NSE 0.2
@@ -87,7 +91,10 @@ EK3_SRC1_POSZ 6
 EK3_SRC1_VELZ 0
 EK3_SRC1_YAW 6
 COMPASS_USE 0
+COMPASS_USE2 0
+COMPASS_USE3 0
 FS_EKF_ACTION 1
+LOG_DISARMED 0
 SIM_WIND_SPD 3
 SIM_WIND_DIR 180
 ```

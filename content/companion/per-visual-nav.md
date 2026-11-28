@@ -60,7 +60,7 @@ next:
 Детали, на которых спотыкаются при первом запуске:
 
 - **`ODOMETRY` в ArduPilot принимается только с `frame_id = MAV_FRAME_LOCAL_FRD` и `child_frame_id = MAV_FRAME_BODY_FRD`.** Любая другая пара молча отбрасывается, без сообщения и без записи `VISP` (`GCS_Common.cpp:4062–4066`). Скорость из `ODOMETRY` автопилот сам поворачивает из FRD тела в NED.
-- **Шум измерения.** Если `covariance[0]` у `VISION_POSITION_ESTIMATE` равен NaN, EKF3 берёт `VISO_POS_M_NSE` (по умолчанию 0.2 м) и `VISO_YAW_M_NSE` (0.2 рад). Присланная ковариация ограничивается этими параметрами снизу: позиция — от `VISO_POS_M_NSE` до 100 м, угол — от `VISO_YAW_M_NSE` до 1.5 рад (`AP_VisualOdom_MAV.cpp:41–42`). Шум скорости всегда берётся из `VISO_VEL_M_NSE`, что бы ни прислал VIO (`:76`). Поэтому занижающий ковариацию VIO не сделает EKF3 увереннее, чем позволяют параметры; самоуверенным фильтр делает слишком малый `VISO_POS_M_NSE` (ворота сужаются, честный шум отбраковывается), а слишком большой — заставляет его медленно следовать за источником. В PX4 с `EKF2_EV_NOISE_MD = 0` действует та же логика: шум из сообщения, `EKF2_EVP_NOISE` — нижняя граница.
+- **Шум измерения.** Если `covariance[0]` у `VISION_POSITION_ESTIMATE` равен NaN, EKF3 берёт `VISO_POS_M_NSE` (по умолчанию 0.2 м) и `VISO_YAW_M_NSE` (0.2 рад). Присланная ковариация ограничивается этими параметрами снизу: позиция — от `VISO_POS_M_NSE` до 100 м, угол — от `VISO_YAW_M_NSE` до 1.5 рад (`AP_VisualOdom_MAV.cpp:42–43`). Шум скорости всегда берётся из `VISO_VEL_M_NSE`, что бы ни прислал VIO (`:79`). Поэтому занижающий ковариацию VIO не сделает EKF3 увереннее, чем позволяют параметры; самоуверенным фильтр делает слишком малый `VISO_POS_M_NSE` (ворота сужаются, честный шум отбраковывается), а слишком большой — заставляет его медленно следовать за источником. В PX4 с `EKF2_EV_NOISE_MD = 0` действует та же логика: шум из сообщения, `EKF2_EVP_NOISE` — нижняя граница.
 - **`reset_counter`.** Когда SLAM замыкает петлю или VIO переинициализируется, поза прыгает. Изменённый `reset_counter` (обычно +1; EKF реагирует на любое изменение значения, `AP_VisualOdom_Backend.cpp:83–90`) говорит EKF: «это сброс, а не движение», и фильтр переставляет оценку за один шаг вместо отбраковки (проверено в `nav-indoor`).
 - **PX4 по умолчанию ничего не сливает:** `EKF2_EV_CTRL = 0`. Для позиции, высоты, скорости и курса нужно 15. `EKF2_EV_DELAY` по умолчанию 0 мс и применяется после перезагрузки. `EKF2_HGT_REF` по умолчанию 1 (GNSS); без GPS ставят 0 (баро) или 3 (vision). Ограничение «только над ровной поверхностью» относится к дальномеру (2): он меряет высоту над тем, что под ним, и опорная высота поднимается и опускается вместе с рельефом; z от VIO живёт в собственной системе координат и рельеф не повторяет (но дрейфует, как любая координата VIO). Среди общих наборов `rc.*_defaults` 15 по умолчанию стоит только у подводного и космического аппаратов (`rc.uuv_defaults`, `rc.sc_defaults`); отдельные конфигурации планеров, например `70000_atmos` и симуляционная `1013_gazebo-classic_iris_vision`, тоже ставят 15.
 
@@ -77,7 +77,7 @@ next:
 | `EK3_SRC1_POSXY/VELXY/POSZ/YAW` | ArduPilot | 3 / 3 / 1 / 1 (GPS, GPS, баро, компас) | 6 — ExternalNav |
 | `EK3_POS_I_GATE` | ArduPilot | 500 (5σ) | ворота инновации позиции |
 | `FS_EKF_ACTION` / `FS_EKF_THRESH` | ArduPilot Copter | 1 (Land) / 0.8 | реакция на рост дисперсий EKF |
-| `EKF2_EV_CTRL` | PX4 1.17.0 | 0 | биты 0 позиция XY, 1 высота, 2 скорость 3D, 3 курс |
+| `EKF2_EV_CTRL` | PX4 1.18.0 | 0 | биты 0 позиция XY, 1 высота, 2 скорость 3D, 3 курс |
 | `EKF2_EV_DELAY` | PX4 | 0 мс | 0–300 мс, нужна перезагрузка |
 | `EKF2_EV_NOISE_MD` | PX4 | 0 | 0 — шум из сообщения, параметры — нижняя граница; 1 — только параметры |
 | `EKF2_EVP_NOISE` / `EKF2_EVV_NOISE` / `EKF2_EVA_NOISE` | PX4 | 0.1 м / 0.1 м/с / 0.1 рад | шум позиции, скорости, угла |
@@ -114,8 +114,12 @@ VIO может молча выдавать мусор (потеря трекин
 Скрипты — в `examples/sitl-nav-labs/` (README там же). `run_lab.sh` запускает ArduCopter 4.7.2 SITL (`arducopter -w -S --model + --speedup 1`) с `Tools/autotest/default_params/copter.parm` плюс файлом лабораторной и сохраняет папку прогона с логом. Файл `extnav.parm`: GPS выключен, все источники EKF3 — ExternalNav, ветер 3 м/с с юга, чтобы ошибка оценки превращалась в реальный снос:
 
 ```text
+# per-visual-nav: ExternalNav only (ArduCopter 4.7.2 SITL)
 SIM_GPS1_ENABLE 0
 GPS1_TYPE 0
+AHRS_EKF_TYPE 3
+EK3_ENABLE 1
+EK2_ENABLE 0
 VISO_TYPE 1
 VISO_DELAY_MS 50
 VISO_POS_M_NSE 0.2
@@ -126,12 +130,15 @@ EK3_SRC1_POSZ 6
 EK3_SRC1_VELZ 0
 EK3_SRC1_YAW 6
 COMPASS_USE 0
+COMPASS_USE2 0
+COMPASS_USE3 0
 FS_EKF_ACTION 1
+LOG_DISARMED 0
 SIM_WIND_SPD 3
 SIM_WIND_DIR 180
 ```
 
-Источник позы — `vio_fault_feed.py` (162 строки, pymavlink), устроенный как мост из `nav-indoor`: читает истину `SIM_STATE` на 50 Гц, переводит в NED от первой точки, добавляет шум 2 см и задержку 50 мс по часам полётника и шлёт `VISION_POSITION_ESTIMATE` на 30 Гц с `covariance[0] = NaN`. Дальше автомат: `SET_GPS_GLOBAL_ORIGIN` → 25 с ожидания → арм в Loiter → взлёт в Guided на 3 м → Loiter. Через 10 с висения включается один отказ на 20 с, потом 15 с наблюдения. Раз в секунду печатаются истина, оценка EKF (`LOCAL_POSITION_NED`), `gap` — расхождение оценки с истиной, `drift` — снос аппарата от точки, где он висел при входе в Loiter, и `ratio` — `pos_horiz_variance` из `EKF_STATUS_REPORT`, в ArduPilot это √(отношение инновации позиции), то же, что `XKF4.SP` (`AP_NavEKF3_Outputs.cpp:504`). Ядро отказов:
+Источник позы — `vio_fault_feed.py` (162 строки, pymavlink), устроенный как мост из `nav-indoor`: читает истину `SIM_STATE` на 50 Гц, переводит в NED от первой точки, добавляет шум 2 см и задержку 50 мс по часам полётника и шлёт `VISION_POSITION_ESTIMATE` на 30 Гц с `covariance[0] = NaN`. Дальше автомат: `SET_GPS_GLOBAL_ORIGIN` → 25 с ожидания → арм в Loiter → взлёт в Guided на 3 м → Loiter. Через 10 с висения включается один отказ на 20 с, потом 15 с наблюдения. Раз в секунду печатаются истина, оценка EKF (`LOCAL_POSITION_NED`), `gap` — расхождение оценки с истиной, `drift` — снос аппарата от точки, где он висел при входе в Loiter, и `ratio` — `pos_horiz_variance` из `EKF_STATUS_REPORT`, в ArduPilot это √(отношение инновации позиции), то же, что `XKF4.SP` (`AP_NavEKF3_Outputs.cpp:504`). Ядро отказов (сокращённо из `vio_fault_feed.py:108–127`, без ветки `--detector`):
 
 ```python
 while queue and queue[0][0] <= t_boot:          # deliver lagged samples (FC time)
@@ -187,7 +194,7 @@ Failsafe через 7.9 с, касание через 18.4 с, снос 6.0 м �
 `--fault jump --jump 5`. Отношение 3.41 через 0.2 с после скачка, 1.13 через 4.3 с; через 5.3 с оценка уже +5.49 м к северу, а через 6.3 с истина на −3.17 м — аппарат дёрнулся на 3.2 м. До конца отказа оценка и истина расходятся на 5.0 м (оценка следует за смещённым источником). Обратный скачок в конце отказа ведёт себя так же: 3.31 → 0.99 за 4.5 с, затем принят. По логу `XKF4.SP`: 3.40 и 0.41 для первого скачка, 3.39 и 0.44 для второго.
 
 ### Шаг 6. Детектор замерзания на companion
-Живая поза никогда не повторяется до миллиметра: шум VIO (в мосту — 2 см) меняет её в каждом кадре. Замёрзшая поза повторяется точно. Поэтому простейший детектор в мосту — «поза не сдвинулась больше чем на 1 мм за 0.5 с → перестать публиковать, сдвинулась → снова публиковать» (флаг `--detector`, 12 строк). Повтор шага 3 с детектором:
+Живая поза никогда не повторяется до миллиметра: шум VIO (в мосту — 2 см) меняет её в каждом кадре. Замёрзшая поза повторяется точно. Поэтому простейший детектор в мосту — «поза не сдвинулась больше чем на 1 мм за 0.5 с → перестать публиковать, сдвинулась → снова публиковать» (флаг `--detector`, около десяти строк). Повтор шага 3 с детектором:
 
 ```text
 [   49.9s] >>> fault ON (freeze)
@@ -251,10 +258,10 @@ VIO на столе: OpenVINS или VINS-Fusion с USB global-shutter каме�
 
 ## references
 - ArduPilot — Non-GPS Navigation (landing page: VIO cameras, ExternalNav) | https://ardupilot.org/copter/docs/common-non-gps-navigation-landing-page.html | primary | A
-- ArduPilot 4.7.2 — AP_VisualOdom (VISO_* параметры, тайм-аут 300 мс) | https://github.com/ArduPilot/ardupilot/tree/Copter-4.7.2/libraries/AP_VisualOdom | primary | A
-- ArduPilot 4.7.2 — GCS_Common.cpp (handle_odometry, handle_vision_position_estimate) | https://github.com/ArduPilot/ardupilot/blob/Copter-4.7.2/libraries/GCS_MAVLink/GCS_Common.cpp | primary | A
-- PX4 — Using Vision or Motion Capture Systems for Position Estimation (EKF2_EV_*) | https://docs.px4.io/v1.17/en/ros/external_position_estimation.html | primary | A
-- PX4 v1.17.0 — params_external_vision.yaml | https://github.com/PX4/PX4-Autopilot/blob/v1.17.0/src/modules/ekf2/params_external_vision.yaml | primary | A
+- ArduPilot 4.7.3 — AP_VisualOdom (VISO_* параметры, тайм-аут 300 мс) | https://github.com/ArduPilot/ardupilot/tree/Copter-4.7.3/libraries/AP_VisualOdom | primary | A
+- ArduPilot 4.7.3 — GCS_Common.cpp (handle_odometry, handle_vision_position_estimate) | https://github.com/ArduPilot/ardupilot/blob/Copter-4.7.3/libraries/GCS_MAVLink/GCS_Common.cpp | primary | A
+- PX4 — Using Vision or Motion Capture Systems for Position Estimation (EKF2_EV_*) | https://docs.px4.io/main/en/ros/external_position_estimation.html | primary | A
+- PX4 v1.18.0 — params_external_vision.yaml | https://github.com/PX4/PX4-Autopilot/blob/v1.18.0/src/modules/ekf2/params_external_vision.yaml | primary | A
 - OpenVINS — repository and documentation (VIO, calibration requirements) | https://github.com/rpng/open_vins | primary | A
 - Qin, Li, Shen — VINS-Mono: A Robust and Versatile Monocular Visual-Inertial State Estimator (4 ненаблюдаемых степени свободы) | https://arxiv.org/abs/1708.03852 | secondary | A
 

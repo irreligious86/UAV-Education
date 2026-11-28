@@ -54,7 +54,7 @@ while True:
     n += 1
     if n % 60 == 0: print(f"{n / (time.perf_counter() - t0):.1f} fps")
 ```
-Pi CSI: `picamera2` (`Picamera2().configure(create_video_configuration(main={"size": (640, 480), "format": "RGB888"}, buffer_count=2))`, `capture_array()`); Jetson: GStreamer-пайплайн `nvarguscamerasrc ! nvvidconv ! video/x-raw,format=BGRx ! appsink` через `cv2.VideoCapture(pipeline, cv2.CAP_GSTREAMER)`.
+Pi CSI: `picamera2` (`Picamera2().configure(create_video_configuration(main={"size": (640, 480), "format": "RGB888"}, buffer_count=2))`, `capture_array()`); Jetson: GStreamer-пайплайн `nvarguscamerasrc ! nvvidconv ! video/x-raw,format=BGRx ! videoconvert ! video/x-raw,format=BGR ! appsink drop=true max-buffers=1` через `cv2.VideoCapture(pipeline, cv2.CAP_GSTREAMER)`.
 
 ### Измерить задержку
 «Glass-to-glass»: на экране телефона секундомер с миллисекундами (или мигающий LED с таймером), камера смотрит на него, программа показывает кадр рядом — фото обоих: разница = задержка захват+обработка+вывод. Для передачи в GCS — то же с экраном GCS. Типично: CSI + OpenCV локально 30–60 мс; USB MJPEG 60–120 мс; RTSP H.264 до QGC по Wi-Fi 150–300 мс (буферизация плеера — главный вклад; в QGC и GStreamer-приёмнике уменьшать `latency`).
@@ -65,11 +65,11 @@ FPS — считать по времени между кадрами, не по 
 GStreamer на борту (Pi 4, аппаратный H.264 через `v4l2h264enc`; Jetson — `nvv4l2h264enc`):
 ```bash
 # UDP/RTP to the GCS (QGC: Video Source = UDP h.264, port 5600)
-gst-launch-1.0 libcamerasrc ! video/x-raw,width=1280,height=720,framerate=30/1 \
-  ! videoconvert ! v4l2h264enc extra-controls="controls,repeat_sequence_header=1,video_bitrate=2000000" \
+gst-launch-1.0 libcamerasrc ! video/x-raw,width=1280,height=720,framerate=30/1,format=NV12,interlace-mode=progressive \
+  ! v4l2h264enc extra-controls="controls,repeat_sequence_header=1,video_bitrate=2000000" ! 'video/x-h264,level=(string)4' \
   ! h264parse ! rtph264pay config-interval=1 pt=96 ! udpsink host=192.168.1.10 port=5600 sync=false
 ```
-RTSP-сервер (QGC: RTSP URL): `gst-rtsp-server` (`test-launch` из examples) или `mediamtx` с тем же пайплайном; RTSP удобен для нескольких клиентов и переподключений, UDP — минимальная задержка. Битрейт — по бюджету линка (2–4 Мбит/с для 720p30 на Wi-Fi/4G; для дальних линков 0.5–1 Мбит/с с 480p). Ключевые кадры чаще (`iframe period` 1 с) — быстрее восстановление после потерь.
+На Pi 5 (аппаратного кодера нет) вместо `v4l2h264enc` и caps `video/x-h264,level=(string)4` после него — `x264enc tune=zerolatency speed-preset=ultrafast bitrate=2000`. RTSP-сервер (QGC: RTSP URL): `gst-rtsp-server` (`test-launch` из examples) или `mediamtx` с тем же пайплайном; RTSP удобен для нескольких клиентов и переподключений, UDP — минимальная задержка. Битрейт — по бюджету линка (2–4 Мбит/с для 720p30 на Wi-Fi/4G; для дальних линков 0.5–1 Мбит/с с 480p). Ключевые кадры чаще (`iframe period` 1 с) — быстрее восстановление после потерь.
 
 ### Камера и автопилот
 Время кадра должно сопоставляться с данными полёта: timestamp кадра (монотонные часы) + MAVLink `SYSTEM_TIME`/`TIMESYNC` для синхронизации с FC; смещение и ориентация камеры относительно IMU (`CAM_*`/extrinsics) — для любой геометрии (VIO, слежение). Companion питается от своего BEC (модуль про периферию), камера и шлейф — вдали от силовых проводов.
@@ -135,7 +135,7 @@ CM3 на 50 м (GSD 2.95 см/px, f_px 1693), 10 м/с и поворот 90°/с
 - **RMS перепроекции мал — ещё не значит, что калибровка верна.** 25 почти фронтальных кадров (наклон доски до 3°) дали RMS 0.42 px, а f_x = 919.6 ± 79.0 px: ошибка 2 % при неопределённости 9 %. Фокус и расстояние до доски на фронтальных кадрах неразличимы. `cv2.calibrateCameraExtended` возвращает стандартные отклонения параметров (`stdDeviationsIntrinsics`), и смотреть надо на них: σ(f_x) должна быть меньше 1 % от f_x (ориентир курса).
 - **Наклон доски до 40°** дал f_x = 899.4 ± 0.8 px и k₁ = −0.2793 при RMS 0.30 px.
 - **Край кадра — экстраполяция.** Даже хорошая калибровка в углу кадра (1270, 710) ошибается на 4.5 px: доска туда не доходила. Без модели дисторсии ошибка в той же точке — 160 px. Кадры, где доска заходит в углы, ценнее десятка кадров в центре.
-- **Калибровка привязана к режиму.** f_px в режиме 2304×1296 вдвое меньше, чем в 4608×2592; кроп сдвигает главную точку. Автофокус (у CM3 он есть) меняет f, поэтому на борту фокус фиксируют (`LensPosition` в picamera2) и калибруют при этой позиции.
+- **Калибровка привязана к режиму.** f_px в режиме 2304×1296 вдвое меньше, чем в 4608×2592; кроп сдвигает главную точку. Автофокус (у CM3 он есть) меняет f, поэтому на борту фокус фиксируют (`LensPosition` в picamera2, работает только при `AfMode` = Manual: `set_controls({"AfMode": controls.AfModeEnum.Manual, "LensPosition": x})`) и калибруют при этой позиции.
 
 {{lesson:per-geometry|Как калибровку используют: пиксель → луч → точка на земле, бюджет ошибок цепочки и синтетическая проверка «туда и обратно».}}
 
@@ -161,7 +161,7 @@ CM3 на 50 м (GSD 2.95 см/px, f_px 1693), 10 м/с и поворот 90°/с
 - **Если ошибиться здесь:** программа берёт первый кадр из очереди, а не последний → детектор работает по устаревшей картинке, контур слежения раскачивается (`per-tracking`). Rolling shutter при вибрации и быстром вращении → «желе», VIO теряет признаки (`per-visual-nav`); источник вибраций ищут в `f-frame-mech`.
 
 ## practice
-Шаги 1–2 не требуют камеры: расчёт оптики и настоящая калибровка OpenCV на шахматной доске, отрисованной кодом. Они запущены в песочнице курса (Python 3.13, NumPy 2.5, OpenCV 5.0.0 из `pip install opencv-python-headless`), вывод вставлен без правок. Шагам 3–6 нужны камера и companion.
+Шаги 1–2 не требуют камеры: расчёт оптики и настоящая калибровка OpenCV на шахматной доске, отрисованной кодом. Они запущены в песочнице курса (Python 3.13, NumPy 2.5, OpenCV 5.0.0: `pip install opencv-python-headless==5.0.0.93`), вывод вставлен без правок. Шагу 2 нужен OpenCV 5.x: у `cv2.undistortPoints(..., criteria=...)` в 4.x нет такого аргумента (TypeError «unexpected keyword argument 'criteria'»; в 4.x — `cv2.undistortPointsIter(pix, K_true, D_true, None, None, criteria)`); более новая 5.x может разойтись в последних знаках (5.1.0.95: σ(f_x) 78.5 вместо 79.0 в прогоне B). Шагам 3–6 нужны камера и companion.
 
 ### Шаг 1. Оптика в числах
 Скрипт считает по паспортным данным Raspberry Pi угол обзора, f_px, GSD и след кадра, смаз и перекос rolling shutter, пиксели на объекте 0.5 м. Подставь свою камеру (ширину сенсора, разрешение режима, пиксель, f), высоту и скорость своей задачи.
@@ -413,9 +413,9 @@ mediamtx или gst-rtsp-server; подключиться из QGC и VLC одн
   - Что сделать: фиксированная экспозиция/усиление или ограничение диапазона.
 
 ## references
-- Raspberry Pi — Camera software (libcamera, picamera2) | https://raspberrypi.com/documentation/computers/camera_software.html | primary | A
+- Raspberry Pi — Camera software (libcamera, picamera2) | https://www.raspberrypi.com/documentation/accessories/camera-software.html | primary | A
 - GStreamer — Documentation | https://gstreamer.freedesktop.org/documentation/ | secondary | B
-- Raspberry Pi — Camera hardware (таблица: сенсор, пиксель, f, HFOV) | https://www.raspberrypi.com/documentation/hardware/camera/computers/camera_software.html | primary | A
+- Raspberry Pi — Camera hardware (таблица: сенсор, пиксель, f, HFOV) | https://www.raspberrypi.com/documentation/accessories/camera.html | primary | A
 - Raspberry Pi — Camera Module 3 (IMX708, 4608×2592, 1.4 мкм) | https://www.raspberrypi.com/documentation/accessories/camera-module-3.html | primary | A
 - OpenCV — Camera calibration tutorial (Python) | https://github.com/opencv/opencv/blob/5.x/doc/py_tutorials/py_calib3d/py_calibration/py_calibration.markdown | primary | A
 - OpenCV — calib3d (calibrateCameraExtended, stdDeviationsIntrinsics) | https://docs.opencv.org/5.x/d9/d0c/group__calib3d.html | primary | A

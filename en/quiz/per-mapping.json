@@ -14,12 +14,12 @@
       "explain": "H·w/(f·W) = 100·13.2/(8.8·5472) = 0.0274 m."
     },
     {
-      "q": "Typical overlaps for photogrammetry over good texture:",
+      "q": "Typical overlaps for photogrammetry on good texture:",
       "options": [
         "75–80 / 65–70 %",
         "10 / 10 %",
         "50 / 0 %",
-        "95 / 95 %, always"
+        "95 / 95 % always"
       ],
       "answer": 0,
       "explain": "Higher for forest and water."
@@ -27,30 +27,30 @@
     {
       "q": "The difference between TRIG and CAM in the ArduPilot log:",
       "options": [
-        "Command versus fact",
-        "They're the same thing",
+        "Command versus actual event",
+        "They are the same",
         "Video versus photo",
         "Only PX4 writes TRIG"
       ],
       "answer": 0,
-      "explain": "TRIG is the shutter command, CAM is the actual firing from shutter feedback; the camera delay sits between them."
+      "explain": "TRIG is the trigger command, CAM is the actual shutter release from the shutter feedback; the camera latency lies between them."
     },
     {
-      "q": "Why DO_SET_CAM_TRIGG_DIST with zero at the end of the survey segment?",
+      "q": "Why DO_SET_CAM_TRIGG_DIST with zero at the end of the survey leg?",
       "options": [
-        "So you don't shoot the turns",
-        "To reset the image counter",
+        "To skip shooting the turns",
+        "To reset the shot counter",
         "To start video",
         "To save the camera battery"
       ],
       "answer": 0,
-      "explain": "Extra frames get in the way of processing and throw off the matching."
+      "explain": "Extra frames get in the way of processing and break the matching."
     },
     {
-      "q": "You can honestly assess the absolute accuracy of an orthophoto only against:",
+      "q": "The absolute accuracy of an orthophoto can be assessed honestly only on:",
       "options": [
-        "Checkpoints",
-        "The GCPs used",
+        "Check points",
+        "The GCPs that were used",
         "The ODM report without points",
         "The onboard GPS"
       ],
@@ -58,7 +58,7 @@
       "explain": "Points used as GCPs understate the error."
     },
     {
-      "q": "Motion blur at 10 m/s and a 1/1000 s shutter:",
+      "q": "Motion blur at 10 m/s and a 1/1000 s exposure:",
       "options": [
         "1 cm",
         "10 cm",
@@ -72,8 +72,8 @@
       "q": "Why is a 1280 px FPV camera with a 120° HFOV a poor choice for mapping from 100 m?",
       "options": [
         "GSD ≈ 27 cm/px",
-        "It can't take photos",
-        "The field of view is too narrow",
+        "It cannot take photos",
+        "The angle is too narrow",
         "It has no GPS"
       ],
       "answer": 0,
@@ -83,25 +83,25 @@
       "q": "The cheapest path to an absolute accuracy of 1–3 GSD without RTK on board:",
       "options": [
         "GCPs with RTK coordinates",
-        "A slow shutter",
-        "Lower altitude and more images",
+        "A long exposure",
+        "Lower altitude and more shots",
         "A camera with GPS"
       ],
       "answer": 0,
       "explain": "GCPs tie the model down independently of the onboard GNSS."
     },
     {
-      "q": "After processing, some of the frames have “drifted.” The flight summary:",
+      "q": "After processing, some of the frames are \"off\". The flight summary:",
       "kind": "apply",
-      "fragment": "Log: TRIG entries 412, CAM entries 0\nMemory card: 405 files\nCAM1_FEEDBAK_PIN = -1",
+      "fragment": "Log: CAM records 412, TRIG records 0\nMemory card: 405 files\nCAM1_FEEDBAK_PIN = -1",
       "options": [
-        "The camera missed 7 triggers and there's no feedback, so georeferencing by TRIG is shifted by several frames",
-        "CAM1_FEEDBAK_PIN = -1 makes the camera shoot with a delay of exactly one frame after TRIG",
-        "412 triggers with 405 files means the camera wrote RAW+JPEG to different folders",
-        "ODM dropped 7 frames as blurry, and that's why the map was assembled with an offset"
+        "The camera missed 7 triggers and there is no feedback: CAM records only the trigger commands, so georeferencing by number is shifted by frames",
+        "CAM1_FEEDBAK_PIN = -1 makes the camera shoot exactly one frame late after the trigger",
+        "412 triggers with 405 files means the camera wrote RAW+JPEG into different folders",
+        "ODM dropped 7 frames as blurred, and that is why the map is assembled with an offset"
       ],
       "answer": 0,
-      "explain": "Without shutter feedback CAM isn't logged; with missed triggers, matching by number slides off."
+      "explain": "Without shutter feedback ArduPilot writes only CAM, at the moment the trigger was sent, and no TRIG; missed shots do not show in the log, and matching by number slips."
     }
   ]
 }

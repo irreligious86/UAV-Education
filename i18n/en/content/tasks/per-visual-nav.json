@@ -1,0 +1,58 @@
+{
+ "module": "per-visual-nav",
+ "tasks": [
+  {
+   "id": "timeoffset",
+   "title": "Camera–IMU synchronization error",
+   "statement": "The vehicle rotates at **{w} °/s**, and the camera and IMU timestamps are offset by **{dt} ms**. How many centimeters does a feature at a distance of **{r} m** \"move\" because of the wrongly assigned rotation?",
+   "params": {
+    "w": {
+     "min": 30,
+     "max": 360,
+     "step": 30
+    },
+    "dt": {
+     "min": 1,
+     "max": 20,
+     "step": 1
+    },
+    "r": {
+     "min": 1,
+     "max": 10,
+     "step": 1
+    }
+   },
+   "answer": "math.radians(w)*dt/1000*r*100",
+   "unit": "cm",
+   "tol": 0.02,
+   "solution": "The error angle θ = ω·δt (in radians), the feature shift ≈ r·θ. For 180 °/s, 5 ms and 3 m: π·0.005 = 0.0157 rad → 4.7 cm."
+  },
+  {
+   "id": "delaymismatch",
+   "title": "Unaccounted external navigation latency",
+   "statement": "The real latency of the VIO pose to the autopilot is **{tr} ms**, but `VISO_DELAY_MS` is set to **{tp} ms**. The vehicle flies at **{v} m/s**. By how many meters does the measurement differ from the state the EKF compares it with?",
+   "params": {
+    "tr": {
+     "min": 60,
+     "max": 200,
+     "step": 10
+    },
+    "tp": {
+     "min": 0,
+     "max": 40,
+     "step": 10
+    },
+    "v": {
+     "min": 1,
+     "max": 8,
+     "step": 0.5
+    }
+   },
+   "answer": "v*(tr-tp)/1000",
+   "unit": "m",
+   "tol": 0.02,
+   "solution": "The EKF matches the measurement with the state `VISO_DELAY_MS` back; the unaccounted part of the latency (tr − tp) gives a mismatch of v·(tr − tp). For 120 ms versus 10 ms (the default) at 5 m/s that is 0.55 m, which with a `VISO_POS_M_NSE` noise of 0.2 m is already a noticeable share of the gate.",
+   "abs": 0.01
+  }
+ ]
+}

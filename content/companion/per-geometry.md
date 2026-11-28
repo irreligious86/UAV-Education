@@ -3,7 +3,7 @@ id: per-geometry
 title: "Геометрия камеры: от пикселя до точки на земле"
 level: L3
 readingTime: 45 мин
-firmware: ArduPilot · PX4 · companion
+firmware: ArduPilot 4.7 (сверено с 4.7.3) · PX4 · companion
 status: published
 added: 2026-11-08
 tags:

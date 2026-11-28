@@ -6,7 +6,7 @@
       "q": "When is a classical method (an ArUco marker) better than a neural network?",
       "options": [
         "Never",
-        "A known object with a code",
+        "A known object carrying a code",
         "Only at night with IR illumination",
         "Always"
       ],
@@ -17,23 +17,23 @@
       "q": "What is recall?",
       "options": [
         "Speed",
-        "The share found among the true objects",
-        "The area under the curve",
-        "The share of correct ones among all found"
+        "Share of true objects that were found",
+        "Area under the curve",
+        "Share of correct ones among all detections"
       ],
       "answer": 1,
       "explain": "Precision is TP/(TP+FP), recall is TP/(TP+FN)."
     },
     {
-      "q": "Why is fine-tuning on your own data needed?",
+      "q": "Why do you need fine-tuning on your own data?",
       "options": [
         "For speed",
-        "The model doesn't know your object",
-        "It isn't needed",
+        "It does not know your object",
+        "It is not needed",
         "To quantize the model to INT8"
       ],
       "answer": 1,
-      "explain": "300–1000 labeled frames from the vehicle."
+      "explain": "300–1000 labeled frames from the aircraft."
     },
     {
       "q": "How do you get a ×3–10 speedup on a Jetson?",
@@ -49,10 +49,10 @@
     {
       "q": "What data should you evaluate the model on?",
       "options": [
-        "The training data",
-        "Held-out data from the vehicle",
+        "Training data",
+        "Held-out frames from the aircraft",
         "Any data",
-        "COCO as the quality benchmark"
+        "COCO, as the reference for quality"
       ],
       "answer": 1,
       "explain": "Otherwise mAP 0.9 turns into 0.5 in the field."
@@ -61,29 +61,29 @@
       "q": "Why put a tracker on top of the detector?",
       "options": [
         "For looks",
-        "Stable IDs and surviving misses",
+        "Stable IDs, survives misses",
         "For training",
-        "To record video with annotations"
+        "To record video with overlays"
       ],
       "answer": 1,
-      "explain": "Commands to the control loop come from the tracker."
+      "explain": "The control loop gets its commands from the tracker."
     },
     {
-      "q": "False positives on shadows are cured by:",
+      "q": "False positives on shadows are fixed with:",
       "options": [
         "Only the threshold",
         "Negatives and a temporal filter",
-        "Lower FPS",
-        "A different, higher-resolution camera"
+        "A lower FPS",
+        "A different camera with a higher resolution"
       ],
       "answer": 1,
-      "explain": "Classify the FPs — each group has its own cure."
+      "explain": "Classify the FPs: each group has its own fix."
     },
     {
       "q": "What is precision?",
       "options": [
-        "The share of correct ones among all detections",
-        "The share found among all objects",
+        "Share of correct ones among all detections",
+        "Share of all objects that were found",
         "Inference speed in frames",
         "Model size in megabytes"
       ],

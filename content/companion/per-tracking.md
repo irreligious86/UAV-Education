@@ -3,7 +3,7 @@ id: per-tracking
 title: "Слежение и управление по цели"
 level: L4
 readingTime: 40 мин
-firmware: ArduPilot · PX4
+firmware: ArduPilot 4.7 (сверено с 4.7.3) · PX4 1.18 (сверено с v1.18.0)
 status: published
 added: 2026-11-08
 tags:
@@ -38,7 +38,7 @@ next:
 ### Интерфейсы
 **ArduPilot GUIDED**: `SET_POSITION_TARGET_LOCAL_NED` с `type_mask`, разрешающим только скорости (`0b110111000111` = 3527: позиция, ускорение, курс и скорость курса игнорируются, работают vx, vy, vz), frame `MAV_FRAME_BODY_OFFSET_NED` (скорость в осях аппарата — удобно для слежения) или `LOCAL_NED`; слать ≥ 2–3 Гц, иначе через `GUID_TIMEOUT` (3 с) цели сбрасываются (аппарат зависает — это и есть защита). Пилот перехватывает сменой режима с пульта — всегда.
 
-**Скорость в GUIDED со скоростными целями ArduCopter не ограничивает.** `WP_SPD` (м/с; до Copter 4.7 — `WPNAV_SPEED`, см/с) — скорость полёта к точкам, на скоростную команду он не действует: `ModeGuided::velaccel_control_run()` передаёт цель в `AC_PosControl::input_vel_accel_NE_m()` (в 4.6 — `input_vel_accel_xy()`), а та строит траекторию только с лимитами ускорения и рывка, без лимита скорости. По вертикали так же: `WP_SPD_UP/DN` к скоростной цели не применяются. Проверено в SITL ArduCopter 4.6.3: при `WPNAV_SPEED = 300` (в 4.7 это `WP_SPD = 3`) команда 6 м/с дала 6.1–6.2 м/с; в исходнике 4.7.2 этот путь не изменился. Входной фильтр отбрасывает только NaN и компоненты больше 1000 м/с. Что на этом пути реально действует со стороны автопилота:
+**Скорость в GUIDED со скоростными целями ArduCopter не ограничивает.** `WP_SPD` (м/с; до Copter 4.7 — `WPNAV_SPEED`, см/с) — скорость полёта к точкам, на скоростную команду он не действует: `ModeGuided::velaccel_control_run()` передаёт цель в `AC_PosControl::input_vel_accel_NE_m()` (в 4.6 — `input_vel_accel_xy()`), а та строит траекторию только с лимитами ускорения и рывка, без лимита скорости. По вертикали так же: `WP_SPD_UP/DN` к скоростной цели не применяются. Проверено в SITL ArduCopter 4.6.3: при `WPNAV_SPEED = 300` (в 4.7 это `WP_SPD = 3`) команда 6 м/с дала 6.1–6.2 м/с; в исходнике 4.7.3 этот путь не изменился. Входной фильтр отбрасывает только NaN и компоненты больше 1000 м/с. Что на этом пути реально действует со стороны автопилота:
 
 - ускорение — `WP_ACC` (2.5 м/с²; до 4.7 — `WPNAV_ACCEL`, 250 см/с²), по вертикали `WP_ACC_Z` (1 м/с²; до 4.7 — `WPNAV_ACCEL_Z`, 100 см/с²); рывок — `PSC_NE_JERK` (5 м/с³; в 4.6 — `PSC_JERK_XY`);
 - наклон — `PSC_ANGLE_MAX` (0 = брать `ATC_ANGLE_MAX`, 30°; до 4.7 — `ANGLE_MAX`, 3000 сантиградусов): это лимит ускорения, а не скорости, установившаяся скорость упирается только в сопротивление воздуха;
@@ -151,10 +151,10 @@ P-регулятор скорости в GUIDED (`BODY_OFFSET_NED`) или Offbo
 
 ## references
 - ArduPilot — Copter commands in Guided mode (SET_POSITION_TARGET_LOCAL_NED, type_mask) | https://ardupilot.org/dev/docs/copter-commands-in-guided-mode.html | primary | A
-- PX4 — Offboard mode (OffboardControlMode/TrajectorySetpoint, timeouts) | https://docs.px4.io/v1.17/en/flight_modes/offboard.html | primary | A
+- PX4 — Offboard mode (OffboardControlMode/TrajectorySetpoint, timeouts) | https://docs.px4.io/main/en/flight_modes/offboard.html | primary | A
 - MAVLink — Offboard Control Interface (SET_POSITION_TARGET_LOCAL_NED) | https://mavlink.io/en/services/offboard_control.html | primary | A
 - MAVLink — POSITION_TARGET_TYPEMASK | https://mavlink.io/en/messages/common.html#POSITION_TARGET_TYPEMASK | primary | A
-- ArduCopter 4.6.3 — mode_guided.cpp (velaccel_control_run: скоростная цель и AC_Avoid) | https://raw.githubusercontent.com/ArduPilot/ardupilot/Copter-4.6.3/ArduCopter/mode_guided.cpp | primary | A
+- ArduCopter 4.7.3 — mode_guided.cpp (velaccel_control_run: скоростная цель и AC_Avoid) | https://raw.githubusercontent.com/ArduPilot/ardupilot/Copter-4.7.3/ArduCopter/mode_guided.cpp | primary | A
 - ArduPilot — Copter Cylindrical Fence (FENCE_*, остановка у границы только с Object Avoidance) | https://ardupilot.org/copter/docs/common-ac2_simple_geofence.html | primary | B
 
 ## checklist

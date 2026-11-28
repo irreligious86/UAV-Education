@@ -3,8 +3,8 @@
  "tasks": [
   {
    "id": "target-shift",
-   "title": "Target shift during the delay",
-   "statement": "The target moves at **{v} m/s**, the camera → command delay is **{l} ms**. How many meters will the target move?",
+   "title": "Target shift during the latency",
+   "statement": "The target moves at **{v} m/s**, the camera → command latency is **{l} ms**. How many meters does the target move?",
    "params": {
     "v": {
      "min": 2,
@@ -24,8 +24,8 @@
   },
   {
    "id": "flight-share",
-   "title": "Compute module energy share",
-   "statement": "The vehicle uses **{p} W** to hover, the compute module **{c} W**. By what percentage will the hover time decrease because of the compute module?",
+   "title": "Computer's share of the energy",
+   "statement": "The vehicle uses **{p} W** to hover and the computer uses **{c} W**. By what percentage does the computer shorten the hover time?",
    "params": {
     "p": {
      "min": 150,
@@ -41,7 +41,7 @@
    "answer": "100*c/(p+c)",
    "unit": "%",
    "tol": 0.02,
-   "solution": "t ∝ 1/P: share = c/(p + c)."
+   "solution": "t ∝ 1/P: the share is c/(p + c)."
   }
  ]
 }

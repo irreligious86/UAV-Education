@@ -4,7 +4,7 @@
   {
    "id": "fx",
    "title": "Focal length in pixels from the field of view",
-   "statement": "Frame width **{w} px**, horizontal field of view **{fov}°**. Find f_x (px).",
+   "statement": "The frame is **{w} px** wide and the horizontal field of view is **{fov}°**. Find f_x (px).",
    "params": {
     "w": [
      640,
@@ -21,12 +21,12 @@
    "answer": "(w/2)/math.tan(math.radians(fov/2))",
    "unit": "px",
    "tol": 0.01,
-   "solution": "f_x = (W/2) / tan(HFOV/2): half the frame width over half the angle."
+   "solution": "f_x = (W/2) / tan(HFOV/2): half the frame width against half the angle."
   },
   {
    "id": "stereo",
    "title": "Depth from stereo",
-   "statement": "Stereo pair: f = **{f} px**, baseline **{b} cm**, disparity **{d} px**. Find the depth (m).",
+   "statement": "A stereo pair: f = **{f} px**, baseline **{b} cm**, disparity **{d} px**. Find the depth (m).",
    "params": {
     "f": {
      "min": 400,
@@ -47,7 +47,7 @@
    "answer": "f*b/100/d",
    "unit": "m",
    "tol": 0.01,
-   "solution": "Z = f·B/d (B in meters). A 1 px disparity error at small d gives a large depth error: stereo accuracy degrades with the square of the distance."
+   "solution": "Z = f·B/d (B in meters). An error of 1 px of disparity at small d gives a large depth error: stereo accuracy falls with the square of the distance."
   },
   {
    "id": "px-size",
@@ -68,7 +68,7 @@
    "answer": "z/f*100",
    "unit": "cm",
    "tol": 0.01,
-   "solution": "Pixel size on the object = Z/f. At f = 800 and 100 m it's 12.5 cm: a detection error of a couple of pixels is a quarter of a meter."
+   "solution": "Size of a pixel on the object = Z/f. At f = 800 and 100 m it is 12.5 cm: a detection error of a couple of pixels is a quarter of a meter."
   }
  ]
 }

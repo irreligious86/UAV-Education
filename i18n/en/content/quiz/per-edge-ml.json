@@ -5,8 +5,8 @@
     {
       "q": "The latency budget for a tracking loop is set by:",
       "options": [
-        "p99, not the average",
-        "The average",
+        "p99, not the mean",
+        "The mean",
         "The minimum",
         "The median of the first 10 runs"
       ],
@@ -14,7 +14,7 @@
       "explain": "One slow frame in the middle of a maneuver is a lost target."
     },
     {
-      "q": "The first quantization step on a GPU with almost no loss of accuracy:",
+      "q": "The first quantization step on a GPU, with almost no loss of accuracy:",
       "options": [
         "FP16",
         "INT4",
@@ -22,29 +22,29 @@
         "Removing layers"
       ],
       "answer": 0,
-      "explain": "FP16 is usually free in terms of accuracy."
+      "explain": "FP16 usually costs nothing in accuracy."
     },
     {
       "q": "PTQ was calibrated on daytime frames only. The expected consequence:",
       "options": [
-        "An accuracy drop at night",
+        "Accuracy drops at night",
         "Nothing",
-        "Higher accuracy at night because of noise",
-        "The model won't load"
+        "Accuracy rises at night because of the noise",
+        "The model will not load"
       ],
       "answer": 0,
-      "explain": "Activation ranges differ under other conditions."
+      "explain": "Activation ranges are different in other conditions."
     },
     {
-      "q": "Why is the held-out set split by flight rather than by frame?",
+      "q": "Why is the held-out set split by flight and not by frame?",
       "options": [
         "Otherwise similar frames leak",
-        "It's faster to label and train that way",
+        "It is faster to label and train that way",
         "ONNX requires it",
         "There are too many frames"
       ],
       "answer": 0,
-      "explain": "Nearly identical frames leak between train and test."
+      "explain": "Near-identical frames leak between train and test."
     },
     {
       "q": "After 20 minutes of operation p99 doubled. The most likely cause:",
@@ -55,10 +55,10 @@
         "Quantization"
       ],
       "answer": 0,
-      "explain": "Profile inside the enclosure and for a long time."
+      "explain": "Profile inside the enclosure, and for a long time."
     },
     {
-      "q": "A model layer the accelerator doesn't support:",
+      "q": "A model layer that the accelerator does not support:",
       "options": [
         "Falls back to the CPU",
         "Is skipped",
@@ -66,14 +66,14 @@
         "Speeds itself up"
       ],
       "answer": 0,
-      "explain": "It runs on the CPU and can eat the whole gain; the engine profiler shows this right away."
+      "explain": "It runs on the CPU and can eat the whole gain; the engine profiler shows it right away."
     },
     {
-      "q": "In a search for people, it makes sense to shift the detector threshold toward:",
+      "q": "In a search for people, the detector threshold should reasonably move toward:",
       "options": [
         "Higher recall",
         "Higher precision",
-        "The threshold doesn't matter",
+        "The threshold does not matter",
         "The maximum"
       ],
       "answer": 0,
@@ -82,26 +82,26 @@
     {
       "q": "What must be written to the log of every flight with ML on board?",
       "options": [
-        "The model and threshold version",
-        "Only FPS",
+        "The model and threshold versions",
+        "Only the FPS",
         "The Wi-Fi password",
-        "Nothing — the model doesn't change"
+        "Nothing, the model never changes"
       ],
       "answer": 0,
-      "explain": "Without the version, investigating an incident is impossible."
+      "explain": "Without the version, incident analysis is impossible."
     },
     {
-      "q": "The tracking loop budget is 80 ms. The onboard detector profile:",
+      "q": "The tracking loop budget is 80 ms. The detector profile on board:",
       "kind": "apply",
       "fragment": "n=300 mean=41.2 p50=33.8 p95=96.4 p99=211.7 max=402.3 budget_ms=80 ok=False over_budget_frac=0.07",
       "options": [
-        "The average fits, but the tail (p95/p99) doesn't: 7 % of frames take longer than the budget, find the source",
+        "The mean fits, but the tail (p95/p99) does not: 7 % of the frames exceed the budget, find the source",
         "over_budget_frac = 0.07 is perf_counter timer error, not real slow frames",
         "p50 = 34 ms means the model is underloaded and can be replaced with a heavier one",
-        "Everything is fine: the budget is checked against the average, and 41 ms is less than 80"
+        "All is fine: the budget is checked against the mean, and 41 ms is less than 80"
       ],
       "answer": 0,
-      "explain": "The loop budget is checked against p99: slow frames in the middle of a maneuver lose the target."
+      "explain": "A loop budget is checked against p99: slow frames in the middle of a maneuver lose the target."
     }
   ]
 }

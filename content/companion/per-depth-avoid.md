@@ -3,7 +3,7 @@ id: per-depth-avoid
 title: "Глубина и обход препятствий: датчики, OBSTACLE_DISTANCE, алгоритмы"
 level: L4
 readingTime: 45 мин
-firmware: ArduPilot · PX4 · companion
+firmware: ArduPilot 4.7 (сверено с 4.7.3) · PX4 1.18 (сверено с v1.18.0) · companion
 status: published
 added: 2026-11-08
 tags:
@@ -67,7 +67,7 @@ v_max = −a·L + √((a·L)² + 2a·(R − d_margin)).
 Источник данных — `PRX1_TYPE` (2 — MAVLink, тогда companion шлёт `OBSTACLE_DISTANCE` или `DISTANCE_SENSOR`; есть и прямые драйверы лидаров), с `PRX1_ORIENT` и `PRX1_YAW_CORR` для монтажа.
 
 ### PX4: Collision Prevention
-Работает на мультикоптерах в режиме Position (в части версий требует определённого значения `MPC_POS_MODE` — сверяйтесь с документацией своей версии). Данные — `OBSTACLE_DISTANCE` от companion, дальномеры по MAVLink или подключённые к контроллеру; данные сливаются в сектора вокруг аппарата, при пересечении берётся минимальное расстояние. Поведение: скорость снижается при приближении и обнуляется на минимальной дистанции.
+Работает на мультикоптерах в режиме Position (в PX4 1.18 — только при `MPC_POS_MODE` = Acceleration based, это значение по умолчанию). Данные — `OBSTACLE_DISTANCE` от companion, дальномеры по MAVLink или подключённые к контроллеру; данные всех датчиков сливаются в 72 сектора вокруг аппарата: в каждом — расстояние и время последнего наблюдения или пометка «нет данных». Поведение: скорость снижается при приближении и обнуляется на минимальной дистанции.
 - `CP_DIST` — минимальная дистанция (отрицательное значение — выключено). Мерится до **датчика**, а не до концов пропеллеров — добавьте полразмаха.
 - `CP_DELAY` — задержка от данных датчика до отработки скорости; учитывается при торможении.
 - `CP_GUIDE_ANG` — на сколько градусов в каждую сторону аппарат может отклонить заданное направление, если там свободнее.
@@ -96,10 +96,10 @@ ArduPilot SITL: `PRX1_TYPE = 10` (встроенный SITL-датчик при�
 
 ## diagnostics
 - **Симптом:** аппарат не реагирует на препятствие, хотя companion шлёт данные
-  - Возможная причина: `PRX1_TYPE` не 2, неверная `frame` или `angle_offset`, частота < 5 Гц, sysid не совпадает.
+  - Возможная причина: `PRX1_TYPE` не 2, неверный `angle_offset` (поле `frame` ArduPilot 4.7 не читает: сектора всегда относительно корпуса), сообщения приходят реже раза в 0.5 с (тайм-аут `AP_Proximity_MAV` 500 мс).
   - Что сделать: проверить `PRX` в логе и вкладку Proximity в Mission Planner — видны ли сектора.
 - **Симптом:** аппарат «боится» направления, где ничего нет
-  - Возможная причина: в секторе 0 или мусорное значение вместо 65535; отражения от рамы и ног.
+  - Возможная причина: в секторе мусорное значение вместо 65535 или 0 (PX4 считает 0 препятствием вплотную, ArduPilot 0 отбрасывает); отражения от рамы и ног.
   - Что сделать: 65535 для «нет данных», маскировать собственную конструкцию, `min_distance`.
 - **Симптом:** обход работает в Loiter, но не в миссии
   - Возможная причина: `OA_TYPE = 0` или выбран Dijkstra без полигональной геозоны.
@@ -116,7 +116,7 @@ ArduPilot SITL: `PRX1_TYPE = 10` (встроенный SITL-датчик при�
 - ArduPilot — Object Avoidance (landing page) | https://ardupilot.org/copter/docs/common-object-avoidance-landing-page.html | primary | A
 - ArduPilot — BendyRuler | https://ardupilot.org/copter/docs/common-oa-bendyruler.html | primary | A
 - ArduPilot — AC_Avoidance source (AVOID_*, OA_*) | https://github.com/ArduPilot/ardupilot/tree/master/libraries/AC_Avoidance | primary | A
-- PX4 — Collision Prevention | https://docs.px4.io/v1.17/en/computer_vision/collision_prevention.html | primary | A
+- PX4 — Collision Prevention | https://docs.px4.io/main/en/computer_vision/collision_prevention.html | primary | A
 
 ## checklist
 - Знаю пределы каждого типа датчика глубины, особенно для проводов

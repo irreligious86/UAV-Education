@@ -1,28 +1,28 @@
 {
-  "module": "payload-gimbal",
-  "tasks": [
-    {
-      "id": "shots",
-      "title": "Shots by distance",
-      "statement": "The survey leg is **{L} m**, `CAM1_TRIGG_DIST` = **{d} m**. How many shots should you expect (including the first one at the start of the leg)?",
-      "params": {
-        "L": {
-          "min": 100,
-          "max": 1000,
-          "step": 50
-        },
-        "d": [
-          2,
-          5,
-          10,
-          20
-        ]
-      },
-      "answer": "math.ceil(L/d - 1e-9)",
-      "unit": "шт",
-      "tol": 0.0001,
-      "solution": "A shot every d meters: ⌊L/d⌋ + 1.",
-      "abs": 0.5
-    }
-  ]
+ "module": "payload-gimbal",
+ "tasks": [
+  {
+   "id": "shots",
+   "title": "Shots by distance",
+   "statement": "The survey leg is **{L} m**, the `DO_SET_CAM_TRIGG_DIST` command is **{d} m** with the \"shoot immediately\" parameter (param3 = 1). What is the maximum number of shots to expect if a shot falling exactly at the end of the leg is not taken (ignore the accumulated overshoot of the 50 Hz check)?",
+   "params": {
+    "L": {
+     "min": 100,
+     "max": 1000,
+     "step": 50
+    },
+    "d": [
+     2,
+     5,
+     10,
+     20
+    ]
+   },
+   "answer": "math.ceil(L/d - 1e-9)",
+   "unit": "pcs",
+   "tol": 0.0001,
+   "solution": "The first shot is taken right on the command (param3 = 1), then one every d m with a small overshoot, so the point exactly at the end of the leg already falls past it: 1 + ⌈L/d⌉ − 1 = ⌈L/d⌉. Without param3 = 1 there is no first shot: the firmware only remembers the point (then ⌈L/d⌉ − 1, as in the `ap-payload` task). On a long leg with a small d the overshoot of up to v · 0.02 m per shot accumulates and can cost more shots, hence \"maximum\".",
+   "abs": 0.5
+  }
+ ]
 }

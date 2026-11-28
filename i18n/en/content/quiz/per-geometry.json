@@ -5,16 +5,16 @@
     {
       "q": "From a single pixel of a monocular camera you can recover:",
       "options": [
-        "A ray without a distance",
+        "A ray with no distance",
         "A point in 3D",
         "The distance to the object",
-        "Nothing without calibration"
+        "Nothing without a calibration"
       ],
       "answer": 0,
-      "explain": "The distance along the ray is unknown; you need height above a plane, stereo, the object's size or a rangefinder."
+      "explain": "The distance along the ray is unknown; you need the height above a plane, stereo, the object size or a rangefinder."
     },
     {
-      "q": "A 1280 px camera with a 90° horizontal field of view. f_x in pixels:",
+      "q": "A 1280 px camera with a horizontal field of view of 90°. f_x in pixels:",
       "options": [
         "640",
         "1280",
@@ -25,12 +25,12 @@
       "explain": "f_x = (W/2)/tan(HFOV/2) = 640/tan 45° = 640."
     },
     {
-      "q": "The “undistort” function for a measured pixel is usually computed:",
+      "q": "Removing the distortion from a measured pixel is usually computed:",
       "options": [
         "Iteratively",
         "By plugging into the same formula",
         "By dividing by k₁",
-        "It isn't needed for wide angles"
+        "It is not needed for wide angles"
       ],
       "answer": 0,
       "explain": "The model describes how an ideal point is distorted; the inverse problem is solved iteratively (undistortPoints)."
@@ -40,19 +40,19 @@
       "options": [
         "Bad calibration frames",
         "An excellent calibration",
-        "Wrong checkerboard square size",
+        "A wrong checkerboard square size",
         "A fisheye camera"
       ],
       "answer": 0,
-      "explain": "Motion blur, too few tilted views, a board that isn't flat, or stabilization turned on. Good is < 0.5 px, acceptable up to 1 px."
+      "explain": "Blur, too few tilted views, a board that is not flat, or stabilization left on. Good is < 0.5 px, acceptable up to 1 px."
     },
     {
-      "q": "Nadir camera, altitude 100 m, 1° roll error. The shift on the ground of the point below the vehicle:",
+      "q": "A nadir camera at 100 m, a roll error of 1°. How far does the point below the vehicle move on the ground:",
       "options": [
         "≈ 1.7 m",
         "≈ 17 cm",
         "≈ 17 m",
-        "It doesn't depend on altitude"
+        "It does not depend on altitude"
       ],
       "answer": 0,
       "explain": "100·tan 1° ≈ 1.75 m."
@@ -62,19 +62,19 @@
       "options": [
         "Frame and attitude out of sync",
         "Pixel size",
-        "Sensor noise at high ISO",
+        "Sensor noise at high ISO settings",
         "Video compression"
       ],
       "answer": 0,
       "explain": "At 100°/s a 50 ms offset is 5° of attitude, which is meters on the ground."
     },
     {
-      "q": "As distance increases, a stereo camera's depth error grows:",
+      "q": "As the distance grows, the depth error of a stereo camera grows:",
       "options": [
-        "As the square of the distance",
-        "Linearly with distance",
+        "As the distance squared",
+        "Linearly with the distance",
         "As the square root",
-        "It doesn't grow"
+        "It does not grow at all"
       ],
       "answer": 0,
       "explain": "δZ = Z²·δd/(f·B)."
@@ -85,7 +85,7 @@
         "The gimbal attitude",
         "The vehicle ATTITUDE",
         "Only the vehicle heading",
-        "Nothing, it looks down"
+        "Nothing, since it looks down"
       ],
       "answer": 0,
       "explain": "GIMBAL_DEVICE_ATTITUDE_STATUS: the camera is stabilized, so its orientation is the gimbal's orientation."
@@ -95,7 +95,7 @@
       "kind": "apply",
       "fragment": "K = [[812.4,   0.0,   0.0],\n     [  0.0, 811.9,   0.0],\n     [  0.0,   0.0,   1.0]]",
       "options": [
-        "The principal point (c_x, c_y) = (0, 0) instead of ~(640, 360): the calibration is corrupted or the wrong one was loaded",
+        "The principal point (c_x, c_y) = (0, 0) instead of ~(640, 360): the calibration is broken or the wrong one was loaded",
         "A focal length of 812 px is too large for 1280 px: it should be about 400 px with any lens",
         "The matrix has no distortion coefficients, and their absence shifts every point by exactly half a frame",
         "f_x and f_y differ by 0.5 px, which is enough for an error of tens of meters"

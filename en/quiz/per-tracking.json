@@ -5,87 +5,87 @@
     {
       "q": "For a downward camera, how is the target offset in meters related to the error in the frame?",
       "options": [
-        "It isn't related",
-        "Proportional to altitude",
-        "Inversely proportional to altitude",
+        "It is not related",
+        "Proportional to height",
+        "Inversely proportional to the height",
         "A constant"
       ],
       "answer": 1,
-      "explain": "≈ h·tan(e·FOV/2): that's why K_p “floats” if you don't account for altitude."
+      "explain": "≈ h·tan(e·FOV/2): that is why K_p \"drifts\" if the height is ignored."
     },
     {
-      "q": "What limits the gain of the tracking loop?",
+      "q": "What limits the gain of a tracking loop?",
       "options": [
         "Motor power",
-        "The latency of the chain",
+        "The chain latency",
         "Camera resolution",
-        "Bitrate"
+        "The bitrate"
       ],
       "answer": 1,
       "explain": "The K_p limit is ≈ π/(2·T_d) in the ideal case, lower in practice."
     },
     {
-      "q": "What happens in ArduPilot GUIDED if setpoints stop arriving?",
+      "q": "What happens in ArduPilot GUIDED if the setpoints stop arriving?",
       "options": [
-        "It flies forever",
-        "It hovers after GUID_TIMEOUT",
+        "It flies on forever",
+        "Hovers after GUID_TIMEOUT",
         "RTL",
-        "It lands where the link was lost"
+        "Lands where the link was lost"
       ],
       "answer": 1,
-      "explain": "This is a safeguard; your own watchdog should trigger earlier."
+      "explain": "That is a safeguard; your own watchdog must fire earlier."
     },
     {
-      "q": "What should you do when there's been no detection for 0.5 s?",
+      "q": "What should happen when there has been no detection for 0.5 s?",
       "options": [
-        "Hold the last command",
+        "Keep the last command",
         "Zero velocity",
-        "Increase speed",
-        "Change mode"
+        "Increase the speed",
+        "Switch the mode"
       ],
       "answer": 1,
       "explain": "The detection watchdog."
     },
     {
-      "q": "Where should the loop get its commands from?",
+      "q": "Where should the loop take its commands from?",
       "options": [
-        "The raw detector",
-        "The tracker",
-        "The camera",
-        "GPS"
+        "From the raw detector",
+        "From the tracker",
+        "From the camera",
+        "From the GPS"
       ],
       "answer": 1,
-      "explain": "Otherwise you get jerks on every detection."
+      "explain": "Otherwise there is a jerk on every detection."
     },
     {
       "q": "What must the companion do after the pilot takes over?",
       "options": [
         "Fight for control",
-        "Stop sending setpoints",
+        "Stop the setpoints",
         "Restart the loop",
         "Land"
       ],
       "answer": 1,
-      "explain": "A mode switch from the radio has absolute priority."
+      "explain": "A mode switch on the transmitter has absolute priority."
     },
     {
-      "q": "How do you account for target motion so you don't lag behind?",
+      "q": "How do you account for target motion so as not to lag behind?",
       "options": [
-        "More P and lower FPS",
-        "FF on the target velocity",
+        "More P and a lower FPS",
+        "FF on target velocity",
         "More latency",
         "A low-pass filter on the error"
       ],
       "answer": 1,
-      "explain": "P alone gives a steady-state velocity error."
+      "explain": "P alone leaves a steady-state velocity error."
     },
     {
-      "q": "Why does the detection watchdog send zero velocity rather than the last command?",
+      "q": "Why does the detection watchdog send zero velocity and not the last command?",
       "options": [
-        "The last command carries the vehicle off after the lost target",
+        "The last command takes the vehicle after the lost target",
         "Zero saves battery",
         "MAVLink requires it",
-        "The last command isn't available to the companion"
+        "The companion has no access to the last command"
       ],
       "answer": 0,
       "explain": "Without a target, the safe action is to stop and hover."

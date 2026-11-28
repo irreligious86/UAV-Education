@@ -3,11 +3,11 @@
   "pass": 80,
   "questions": [
     {
-      "q": "What does VIO give you that optical flow does not?",
+      "q": "What does VIO give that optical flow does not?",
       "options": [
         "A map",
         "A 6DoF pose",
-        "Velocity over ground",
+        "Velocity over the ground",
         "Height"
       ],
       "answer": 1,
@@ -22,14 +22,14 @@
         "From the compass"
       ],
       "answer": 1,
-      "explain": "A mono camera without an IMU does not know scale."
+      "explain": "A mono camera without an IMU does not know the scale."
     },
     {
       "q": "What breaks VIO the most?",
       "options": [
         "Wind",
-        "No texture, desynchronization",
-        "Camera frames that are too frequent",
+        "No texture, desync",
+        "Camera frames that come too often",
         "Sunny weather and altitude"
       ],
       "answer": 1,
@@ -47,7 +47,7 @@
       "explain": "6 = ExternalNav."
     },
     {
-      "q": "Which parameter sets the external source latency in ArduPilot?",
+      "q": "Which parameter sets the latency of the external source in ArduPilot?",
       "options": [
         "GPS1_DELAY_MS",
         "VISO_DELAY_MS",
@@ -58,59 +58,59 @@
       "explain": "The EKF accounts for the age of the measurement."
     },
     {
-      "q": "What should the companion do when VIO tracking is lost?",
+      "q": "What should the companion do when VIO loses tracking?",
       "options": [
-        "Keep sending the last pose",
+        "Send the last pose",
         "Stop publishing",
         "Send zeros as the position",
         "Reboot"
       ],
       "answer": 1,
-      "explain": "A “frozen” pose is the worst option."
+      "explain": "A \"frozen\" pose is the worst option."
     },
     {
       "q": "How do you test ExternalNav before going to the field?",
       "options": [
-        "On the bench, moving it by hand",
-        "SITL: pose from truth with noise",
-        "You can't",
+        "On a bench, moving it by hand",
+        "SITL: pose from truth plus noise",
+        "There is no way",
         "From video"
       ],
       "answer": 1,
-      "explain": "Then source failure and the backup set."
+      "explain": "Then a source failure and the backup source set."
     },
     {
       "q": "Why does VIO work poorly over a uniform surface (water, snow)?",
       "options": [
         "It has no stable points to track",
         "The camera overheats",
-        "The IMU doesn't work there",
+        "The IMU does not work there",
         "The GPS receiver interferes with the camera over water"
       ],
       "answer": 0,
-      "explain": "Visual odometry needs textured feature points; a uniform surface doesn't provide them."
+      "explain": "Visual odometry needs textured feature points; a uniform surface does not provide them."
     },
     {
-      "q": "VIO потерял трекинг, а companion продолжает слать ту же позу с новыми метками времени. Что показал SITL ArduCopter 4.7.2 за 20 с такого отказа?",
+      "q": "VIO lost tracking, but the companion keeps sending the same pose with new timestamps. What did ArduCopter 4.7.2 SITL show over 20 s of this failure?",
       "options": [
-        "`XKF4.SP` вырос выше 1, EKF отбросил источник и включил failsafe",
-        "`XKF4.SP` ≤ 0.01, оценка стоит, аппарат снесло ветром на 6–10 м",
-        "EKF3 через 300 мс объявил источник нездоровым и перешёл на инерциалку",
-        "Оценка поплыла вместе с аппаратом, расхождение осталось меньше 0.1 м"
+        "`XKF4.SP` rose above 1, the EKF rejected the source and triggered the failsafe",
+        "`XKF4.SP` ≤ 0.01, the estimate stays put, the wind carried the vehicle 6–10 m",
+        "After 300 ms EKF3 declared the source unhealthy and went to inertial-only",
+        "The estimate drifted with the vehicle, and the gap stayed below 0.1 m"
       ],
       "answer": 1,
-      "explain": "Замёрзшая поза совпадает с прогнозом «аппарат стоит», инновация мала, ворота молчат; здоровье источника автопилот определяет только по приходу сообщений."
+      "explain": "The frozen pose matches the \"vehicle is stationary\" prediction, the innovation is small, the gates stay silent; the autopilot judges source health only by whether messages arrive."
     },
     {
-      "q": "Companion шлёт ArduPilot `ODOMETRY` с `frame_id = MAV_FRAME_LOCAL_NED`. Что произойдёт?",
+      "q": "The companion sends ArduPilot `ODOMETRY` with `frame_id = MAV_FRAME_LOCAL_NED`. What happens?",
       "options": [
-        "EKF3 примет позу и сам повернёт её в FRD",
-        "Сообщение молча отбрасывается: нужны `MAV_FRAME_LOCAL_FRD` и `MAV_FRAME_BODY_FRD`",
-        "Автопилот выдаст PreArm «ODOMETRY frame» и не даст армить",
-        "Поза примется, а скорость будет проигнорирована"
+        "EKF3 accepts the pose and rotates it into FRD itself",
+        "The message is silently dropped: it needs `MAV_FRAME_LOCAL_FRD` and `MAV_FRAME_BODY_FRD`",
+        "The autopilot shows a PreArm \"ODOMETRY frame\" and blocks arming",
+        "The pose is accepted and the velocity is ignored"
       ],
       "answer": 1,
-      "explain": "`handle_odometry` в 4.7.2 выходит без сообщения, если пара фреймов не LOCAL_FRD / BODY_FRD (`GCS_Common.cpp:4062–4066`); в логе не будет `VISP`."
+      "explain": "`handle_odometry` in 4.7.2 returns without a message if the frame pair is not LOCAL_FRD / BODY_FRD (`GCS_Common.cpp:4062–4066`); there will be no `VISP` in the log."
     }
   ]
 }

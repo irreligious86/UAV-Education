@@ -40,7 +40,7 @@ next:
 ### ArduPilot: `MNT1_*`
 | Что | Параметр | Комментарий |
 |---|---|---|
-| Тип подвеса | `MNT1_TYPE` | ArduPilot 4.7.2: 0 нет, 1 Servo, 2 3DR Solo, 3 Alexmos Serial, 4 SToRM32 MAVLink, 5 SToRM32 Serial, 6 MAVLink (Gremsy, AVT), 7 BrushlessPWM, 8 Siyi, 9 Scripting, 10 Xacti, 11 Viewpro, 12 Topotek, 13 CADDX, 14 XFRobot (новое в 4.7; в 4.6 список кончался на 13). Пока 0 — остальные `MNT1_*` скрыты; после смены — перезагрузка |
+| Тип подвеса | `MNT1_TYPE` | ArduPilot 4.7.3: 0 нет, 1 Servo, 2 3DR Solo, 3 Alexmos Serial, 4 SToRM32 MAVLink, 5 SToRM32 Serial, 6 MAVLink (Gremsy, AVT), 7 BrushlessPWM, 8 Siyi, 9 Scripting, 10 Xacti, 11 Viewpro, 12 Topotek, 13 CADDX, 14 XFRobot (новое в 4.7; в 4.6 список кончался на 13). Пока 0 — остальные `MNT1_*` скрыты; после смены — перезагрузка |
 | Режим по умолчанию | `MNT1_DEFLT_MODE` | 0 retract, 1 neutral, 2 MAVLink, 3 RC, 4 GPS point, 5 SysID, 6 Home; по умолчанию 3 — подвес после загрузки слушает пульт |
 | Пределы | `MNT1_PITCH_MIN/MAX`, `MNT1_YAW_MIN/MAX`, `MNT1_ROLL_MIN/MAX` | механика подвеса, в градусах |
 | Пульт: угол или скорость | `MNT1_RC_RATE` | 0 — стик задаёт угол, > 0 — скорость в °/с |
@@ -132,7 +132,7 @@ look(-30, 45, True)   # 45° от севера, удерживать при ра
   - Что сделать: инспектор MAVLink, `MNT1_DEFLT_MODE`, протокол порта, перезагрузка после смены типа.
 - **Симптом:** камера уходит в сторону при развороте аппарата
   - Возможная причина: рыскание в режиме follow, а не lock.
-  - Что сделать: флаг YAW_LOCK, Mount Lock с пульта (163) или ROI.
+  - Что сделать: флаг YAW_LOCK, Mount Yaw Lock с пульта (163) или ROI.
 - **Симптом:** команды пульта и companion «дерутся»
   - Возможная причина: два клиента без явного захвата управления.
   - Что сделать: `MAV_CMD_DO_GIMBAL_MANAGER_CONFIGURE`, одна точка управления, у пульта — явный переключатель.
@@ -148,7 +148,7 @@ look(-30, 45, True)   # 45° от севера, удерживать при ра
 - ArduPilot — Mount targeting and RC control | https://ardupilot.org/copter/docs/common-mount-targeting.html | primary | A
 - MAVLink — Gimbal Protocol v2 | https://mavlink.io/en/services/gimbal_v2.html | primary | A
 - MAVLink — Camera Protocol v2 | https://mavlink.io/en/services/camera.html | primary | A
-- PX4 — Gimbal (Mount) configuration | https://docs.px4.io/v1.17/en/advanced/gimbal_control.html | primary | A
+- PX4 — Gimbal (Mount) configuration | https://docs.px4.io/main/en/advanced/gimbal_control.html | primary | A
 
 ## checklist
 - Объясняю роли gimbal manager и gimbal device в протоколе v2
